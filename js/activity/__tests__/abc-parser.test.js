@@ -11,8 +11,11 @@
 
 "use strict";
 
+const fs = require("fs");
+const path = require("path");
 const { setupActivityAbcParser } = require("../abc-parser.js");
 const ABCJS = require("../../../lib/abc.min.js");
+const { toFraction } = require("../../utils/utils-logic.js");
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -51,6 +54,7 @@ function makeNote(name, pitch, duration = 0.25, opts = {}) {
         pitches: [pitchObj],
         duration,
         startTriplet: opts.startTriplet ?? null,
+        tripletMultiplier: opts.tripletMultiplier,
         endTriplet: opts.endTriplet ?? null
     };
 }
@@ -91,20 +95,10 @@ function blocksOfType(blocks, type) {
 }
 
 // ---------------------------------------------------------------------------
-// Mock toFraction globally (musicutils.js is not loaded in this unit context)
+// Use the same fraction conversion as the importer at runtime.
 // ---------------------------------------------------------------------------
 beforeAll(() => {
-    global.toFraction = duration => {
-        // Simplified: return [numerator, denominator] for common durations
-        const map = {
-            0.0625: [1, 16],
-            0.125: [1, 8],
-            0.25: [1, 4],
-            0.5: [1, 2],
-            1: [1, 1]
-        };
-        return map[duration] ?? [Math.round(duration * 8), 8];
-    };
+    global.toFraction = toFraction;
 });
 
 afterEach(() => {
@@ -330,6 +324,85 @@ describe("Test 3: Repeat bars", () => {
 // Test 4 — Triplets
 // ---------------------------------------------------------------------------
 describe("Test 4: Triplets", () => {
+    test("imports the downloadable quarter-note triplet example", async () => {
+        const abc = fs.readFileSync(
+            path.join(__dirname, "fixtures", "quarter-note-triplets.abc"),
+            "utf8"
+        );
+        const tune = ABCJS.parseOnly(abc)[0];
+        expect(tune.warnings).toBeUndefined();
+        const blocks = await parseAndCapture(tune);
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const durations = blocksOfType(blocks, "newnote").map(note => {
+            const divide = byId.get(note[4][1]);
+            return byId.get(divide[4][1])[1][1].value / byId.get(divide[4][2])[1][1].value;
+        });
+        expect(durations).toEqual([
+            1 / 6,
+            1 / 6,
+            1 / 6,
+            1 / 4,
+            1 / 4,
+            1 / 6,
+            1 / 6,
+            1 / 6,
+            1 / 4,
+            1 / 4
+        ]);
+    });
+
+    test.each([
+        ["quarter-note triplets", "4/4", "1/4", "(3CDE F|", [1 / 6, 1 / 6, 1 / 6, 1 / 4]],
+        ["sixteenth-note triplets", "4/4", "1/16", "(3CDE F|", [1 / 24, 1 / 24, 1 / 24, 1 / 16]],
+        ["triplets in cut time", "2/2", "1/8", "(3CDE F|", [1 / 12, 1 / 12, 1 / 12, 1 / 8]],
+        ["duplets in compound time", "6/8", "1/8", "(2CD E|", [3 / 16, 3 / 16, 1 / 8]],
+        [
+            "an explicit tuplet ratio",
+            "4/4",
+            "1/8",
+            "(5:4:5CDEFG A|",
+            [0.1, 0.1, 0.1, 0.1, 0.1, 1 / 8]
+        ],
+        ["a rest in a tuplet", "4/4", "1/4", "(3CzE F|", [1 / 6, 1 / 6, 1 / 6, 1 / 4]],
+        [
+            "a spacer within a tuplet",
+            "4/4",
+            "1/4",
+            "(3CyDE F|",
+            [1 / 6, 1 / 4, 1 / 6, 1 / 6, 1 / 4]
+        ],
+        [
+            "a spacer across tuplet staff lines",
+            "4/4",
+            "1/4",
+            "(3C\nyDE F|",
+            [1 / 6, 1 / 4, 1 / 6, 1 / 6, 1 / 4]
+        ],
+        [
+            "unequal note lengths in a tuplet",
+            "4/4",
+            "1/8",
+            "(3C>D E F|",
+            [1 / 8, 1 / 24, 1 / 12, 1 / 8]
+        ],
+        [
+            "a tuplet spanning staff lines",
+            "4/4",
+            "1/8",
+            "(3C\nDE F|",
+            [1 / 12, 1 / 12, 1 / 12, 1 / 8]
+        ]
+    ])("preserves %s from parsed ABC", async (_name, meter, unit, music, expected) => {
+        const tune = ABCJS.parseOnly(`X:1\nM:${meter}\nL:${unit}\nK:C\n${music}`)[0];
+        const blocks = await parseAndCapture(tune);
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const durations = blocksOfType(blocks, "newnote").map(note => {
+            const divide = byId.get(note[4][1]);
+            return byId.get(divide[4][1])[1][1].value / byId.get(divide[4][2])[1][1].value;
+        });
+        expect(durations).toEqual(expected);
+    });
+
     const tune = makeTune({
         title: "Triplet Test",
         staves: [
@@ -338,7 +411,7 @@ describe("Test 4: Triplets", () => {
                 key: { root: "C", mode: "major", accidentals: [] },
                 voices: [
                     [
-                        makeNote("C", 0, 0.125, { startTriplet: 3 }),
+                        makeNote("C", 0, 0.125, { startTriplet: 3, tripletMultiplier: 2 / 3 }),
                         makeNote("D", 1, 0.125),
                         makeNote("E", 2, 0.125, { endTriplet: 3 }),
                         makeNote("F", 3, 0.25)
@@ -385,7 +458,7 @@ describe("Test 4: Triplets", () => {
                     key: { root: "C", mode: "major", accidentals: [] },
                     voices: [
                         [
-                            makeNote("C", 0, 0.125, { startTriplet: 3 }),
+                            makeNote("C", 0, 0.125, { startTriplet: 3, tripletMultiplier: 2 / 3 }),
                             makeNote("D", 1, 0.125),
                             makeNote("E", 2, 0.125, { endTriplet: 3 })
                         ],
@@ -414,10 +487,10 @@ describe("Test 4: Triplets", () => {
         expect(denomWith4.length).toBeGreaterThanOrEqual(3);
     });
 
-    test("tripletFinder does not bleed across voice boundaries even if triplet is unclosed", async () => {
-        // Voice 1: triplet C D E (no endTriplet, i.e., unclosed triplet).
+    test("tripletFinder does not bleed across voice boundaries while a triplet is still open", async () => {
+        // Voice 1: only C D of a three-note triplet, leaving one note outstanding.
         // Voice 2: plain quarter notes only — must NOT inherit the triplet state
-        // and must produce standard denominator (4).
+        // and must produce standard denominator (4). Voice 1 resumes on the next line.
         const twoVoiceTune = makeTune({
             title: "Unclosed Triplet Bleed Test",
             staves: [
@@ -426,11 +499,22 @@ describe("Test 4: Triplets", () => {
                     key: { root: "C", mode: "major", accidentals: [] },
                     voices: [
                         [
-                            makeNote("C", 0, 0.125, { startTriplet: 3 }),
-                            makeNote("D", 1, 0.125),
-                            makeNote("E", 2, 0.125)
+                            makeNote("C", 0, 0.125, { startTriplet: 3, tripletMultiplier: 2 / 3 }),
+                            makeNote("D", 1, 0.125)
                         ],
                         [makeNote("G", 4, 0.25), makeNote("A", 5, 0.25)]
+                    ]
+                }
+            ]
+        });
+        twoVoiceTune.lines.push({
+            staff: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "C", mode: "major", accidentals: [] },
+                    voices: [
+                        [makeNote("E", 2, 0.125, { endTriplet: 3 }), makeNote("F", 3, 0.25)],
+                        [makeNote("B", 6, 0.25)]
                     ]
                 }
             ]
@@ -438,18 +522,13 @@ describe("Test 4: Triplets", () => {
 
         const blocks = await parseAndCapture(twoVoiceTune);
 
-        // Voice 1 notes will all be processed under triplet state because it started and never closed,
-        // so all 3 notes get denominator 12.
-        const denomWith12 = blocks.filter(
-            b => Array.isArray(b[1]) && b[1][0] === "number" && b[1][1]?.value === 12
-        );
-        expect(denomWith12).toHaveLength(3);
-
-        // Voice 2 notes must not be affected. They must have standard denominator 4.
-        const denomWith4 = blocks.filter(
-            b => Array.isArray(b[1]) && b[1][0] === "number" && b[1][1]?.value === 4
-        );
-        expect(denomWith4.length).toBeGreaterThanOrEqual(3);
+        // Follow each note's duration connection, excluding meter and pitch numbers.
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const durations = blocksOfType(blocks, "newnote").map(note => {
+            const divide = byId.get(note[4][1]);
+            return byId.get(divide[4][1])[1][1].value / byId.get(divide[4][2])[1][1].value;
+        });
+        expect(durations).toEqual([1 / 12, 1 / 12, 1 / 4, 1 / 4, 1 / 12, 1 / 4, 1 / 4]);
     });
 });
 

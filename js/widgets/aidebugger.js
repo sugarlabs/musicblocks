@@ -139,14 +139,14 @@ function AIDebuggerWidget() {
     this._projectBeforeFix = null;
 
     /**
-     * Whether the user has consented to send project data to the backend.
-     * No data leaves the browser until this is true.
-     * @type {boolean}
+     * The id of the project _projectBeforeFix was taken from.
+     * @type {string|undefined}
      */
-    this._consentGiven = false;
+    this._projectBeforeFixId = undefined;
 
     /**
-     * Shared mount tracking and request cancellation for chat widgets
+     * Shared mount tracking, request cancellation and consent for chat
+     * widgets. No project data leaves the browser until the child agrees.
      * @type {object}
      */
     const createLifecycle =
@@ -172,12 +172,28 @@ function AIDebuggerWidget() {
      * @returns {void}
      */
     this.init = function (activity) {
+        // Running the block again while the window is open calls init again.
+        // The old session is closed first, or its unanswered request would
+        // leave _isProcessing set and Send would do nothing.
+        if (this._lifecycle.isMounted && this.widgetWindow) {
+            this.widgetWindow.onclose();
+        }
+
         this.activity = activity;
         this.activity.isInputON = true;
         this._lifecycle.mount();
 
-        if (!this.conversationId) {
-            this.conversationId = this._generateConversationId();
+        // The window below is built empty, so the conversation starts fresh too.
+        // Otherwise the next question would send a chat the child can no longer see.
+        this.chatHistory = [];
+        this.promptCount = 0;
+        this.conversationId = this._generateConversationId();
+
+        // Undo stays across a close and reopen, since closing does not change
+        // the canvas. In a new or different project it would bring back the
+        // old project's blocks, so it goes.
+        if (this._lifecycle.projectId() !== this._projectBeforeFixId) {
+            this._projectBeforeFix = null;
         }
 
         const widgetWindow = window.widgetWindows.windowFor(this, "Debugger");
@@ -349,6 +365,9 @@ function AIDebuggerWidget() {
         this.messageInput.type = "text";
         this.messageInput.className = "aidebugger-input";
         this.messageInput.placeholder = "Type your message here...";
+        // The server refuses longer messages. A refused message stays in the
+        // history, and one over 4000 characters made every later request fail.
+        this.messageInput.maxLength = 2000;
         this.messageInput.style.flex = "1";
         this.messageInput.style.padding = "12px";
         this.messageInput.style.backgroundColor = "var(--color-bg-primary)";
@@ -416,6 +435,8 @@ function AIDebuggerWidget() {
         this.editInput = document.createElement("textarea");
         this.editInput.className = "aidebugger-input";
         this.editInput.rows = 2;
+        // The same limit as the chat, for /fix and /make.
+        this.editInput.maxLength = 2000;
         this.editInput.placeholder = _(
             "What should I change in your project, or what new project should I make?"
         );
@@ -518,9 +539,9 @@ function AIDebuggerWidget() {
     this._sendMessage = function () {
         const messageText = this.messageInput.value.trim();
         if (messageText === "") return;
-        if (!this._isWidgetActive() || this._isProcessing) return;
+        if (!this._isWidgetActive() || this._isBusy()) return;
 
-        if (!this._consentGiven) {
+        if (!this._lifecycle.hasConsent()) {
             this._showConsentBanner(() => this._sendMessage());
             return;
         }
@@ -678,7 +699,13 @@ function AIDebuggerWidget() {
                 }
 
                 this._removeTypingIndicator(typingIndicator);
-                this.activity.textMsg(_("Server error: Unable to connect to AI backend."));
+                // The server says why it refused, such as a rate limit or a
+                // project that is too big. Telling the child to check their
+                // connection then sends them the wrong way.
+                const reason = error && error.reply && error.reply.error;
+                this.activity.textMsg(
+                    reason || _("Server error: Unable to connect to AI backend.")
+                );
 
                 if (error instanceof TypeError && error.message.includes("fetch")) {
                     console.error("Network/CORS error. Backend connection failed");
@@ -686,9 +713,11 @@ function AIDebuggerWidget() {
 
                 const fallbackResponse = {
                     type: "bot",
-                    content: _(
-                        "Could not reach the AI assistant. Please check your connection and try again."
-                    ),
+                    content:
+                        reason ||
+                        _(
+                            "Could not reach the AI assistant. Please check your connection and try again."
+                        ),
                     timestamp: new Date().toISOString()
                 };
 
@@ -799,89 +828,23 @@ function AIDebuggerWidget() {
      * @private
      */
     this._showConsentBanner = function (afterConsent) {
-        for (const old of this.chatLog.querySelectorAll(".aidebugger-consent-banner")) {
-            old.remove();
-        }
-        const banner = document.createElement("div");
-        banner.className = "aidebugger-consent-banner";
-        banner.style.padding = "16px 20px";
-        banner.style.margin = "12px";
-        banner.style.borderRadius = "12px";
-        banner.style.backgroundColor = "var(--color-warning-bg)";
-        banner.style.border = "1px solid var(--color-border-primary)";
-        banner.style.color = "var(--color-text-primary)";
-        banner.style.fontSize = "13px";
-        banner.style.lineHeight = "1.5";
-
-        const title = document.createElement("div");
-        title.style.fontWeight = "bold";
-        title.style.marginBottom = "8px";
-        title.style.fontSize = "14px";
-        title.textContent = _("Before we start");
-
-        const body = document.createElement("div");
-        body.style.marginBottom = "12px";
-        body.textContent = _(
-            "The AI Debugger will send your current project data to an external server for analysis. Your project blocks and structure will be shared with: "
-        );
-
-        const urlSpan = document.createElement("strong");
-        urlSpan.textContent = BACKEND_CONFIG.BASE_URL;
-        body.appendChild(urlSpan);
-
-        const btnRow = document.createElement("div");
-        btnRow.style.display = "flex";
-        btnRow.style.gap = "8px";
-        btnRow.style.marginTop = "4px";
-
-        const acceptBtn = document.createElement("button");
-        acceptBtn.textContent = _("Agree and continue");
-        acceptBtn.style.padding = "8px 16px";
-        acceptBtn.style.border = "none";
-        acceptBtn.style.borderRadius = "6px";
-        acceptBtn.style.backgroundColor = "#198754";
-        acceptBtn.style.color = "white";
-        acceptBtn.style.cursor = "pointer";
-        acceptBtn.style.fontSize = "13px";
-        acceptBtn.style.fontWeight = "600";
-
-        const declineBtn = document.createElement("button");
-        declineBtn.className = "cancel-button aidebugger-cancel-btn";
-        declineBtn.textContent = _("Cancel");
-        declineBtn.style.padding = "8px 16px";
-        declineBtn.style.border = "1px solid var(--color-border-primary)";
-        declineBtn.style.borderRadius = "6px";
-        declineBtn.style.backgroundColor = "var(--color-bg-primary)";
-        declineBtn.style.color = "var(--color-text-primary)";
-        declineBtn.style.cursor = "pointer";
-        declineBtn.style.fontSize = "13px";
-
-        acceptBtn.onclick = () => {
-            this._consentGiven = true;
-            banner.remove();
-            if (afterConsent) {
-                afterConsent();
-            } else {
-                this._loadProjectAndInitialize();
+        this._lifecycle.showConsentBanner(this.chatLog, {
+            classPrefix: "aidebugger",
+            text: _(
+                "The AI Debugger will send your current project data to an external server for analysis. Your project blocks and structure will be shared with: "
+            ),
+            url: BACKEND_CONFIG.BASE_URL,
+            onAgree: () => {
+                if (afterConsent) {
+                    afterConsent();
+                } else {
+                    this._loadProjectAndInitialize();
+                }
+            },
+            onDecline: () => {
+                this._notice(_("Nothing was sent. Your project stays here until you agree."));
             }
-        };
-
-        declineBtn.onclick = () => {
-            banner.remove();
-            const msg = {
-                type: "system",
-                content: _("Nothing was sent. Your project stays here until you agree."),
-                timestamp: new Date().toISOString()
-            };
-            this._addMessageToUI(msg);
-        };
-
-        btnRow.appendChild(acceptBtn);
-        btnRow.appendChild(declineBtn);
-        banner.appendChild(title);
-        banner.appendChild(body);
-        banner.appendChild(btnRow);
-        this.chatLog.appendChild(banner);
+        });
     };
 
     /**
@@ -1001,11 +964,14 @@ function AIDebuggerWidget() {
                     console.error("Network/CORS error. Backend connection failed");
                 }
 
+                const reason = error && error.reply && error.reply.error;
                 const errorMessage = {
                     type: "system",
-                    content: _(
-                        "Could not reach the AI assistant. Please check your connection and try again."
-                    ),
+                    content:
+                        reason ||
+                        _(
+                            "Could not reach the AI assistant. Please check your connection and try again."
+                        ),
                     timestamp: new Date().toISOString()
                 };
                 this._addMessageToUI(errorMessage);
@@ -1115,6 +1081,23 @@ function AIDebuggerWidget() {
     };
 
     /**
+     * Whether the canvas is still loading a project, with a notice if so.
+     * Blocks load in chunks, so until then the canvas holds only part of the
+     * project. Saving that part for Undo, or trashing it while the rest keeps
+     * arriving, would mix two projects.
+     * @returns {boolean}
+     * @private
+     */
+    this._projectIsLoading = function () {
+        const blocks = this.activity.blocks;
+        if (!blocks || typeof blocks.isLoading !== "function" || !blocks.isLoading()) {
+            return false;
+        }
+        this._notice(_("Your project is still loading. Please try again in a moment."));
+        return true;
+    };
+
+    /**
      * Adds a system notice to the chat.
      * @param {string} content
      * @private
@@ -1128,6 +1111,18 @@ function AIDebuggerWidget() {
     };
 
     /**
+     * Whether a request is still running, with a notice if so. Without the
+     * notice a press while waiting looked like it did nothing.
+     * @returns {boolean}
+     * @private
+     */
+    this._isBusy = function () {
+        if (!this._isProcessing) return false;
+        this._notice(_("I'm still working on your last request. Please wait a moment."));
+        return true;
+    };
+
+    /**
      * The Edit tab's "Change my project". Asks the backend to change the
      * project as the request and the chat describe, then loads the result.
      * With no request, the chat so far says what to fix.
@@ -1135,6 +1130,8 @@ function AIDebuggerWidget() {
      * @private
      */
     this._fixProject = function (requestText) {
+        if (this._isBusy()) return;
+
         const request = (requestText || "").trim();
         if (!request && !this.chatHistory.some(msg => msg.type === "user")) {
             this._notice(_("Tell me what to change first, then I can do it for you."));
@@ -1164,6 +1161,10 @@ function AIDebuggerWidget() {
      * @private
      */
     this._makeProject = function (description) {
+        // Checked before the description: the first press emptied the box, so
+        // a second press would otherwise ask what project to make.
+        if (this._isBusy()) return;
+
         const text = (description || "").trim();
         if (text.length < 3) {
             this._notice(_("Tell me what project to make, for example a drum beat or a song."));
@@ -1187,9 +1188,9 @@ function AIDebuggerWidget() {
      * @private
      */
     this._requestProject = function (endpoint, makePayload, userText, doneMessage) {
-        if (!this._isWidgetActive() || this._isProcessing) return;
+        if (!this._isWidgetActive() || this._isProcessing || this._projectIsLoading()) return;
 
-        if (!this._consentGiven) {
+        if (!this._lifecycle.hasConsent()) {
             this._showConsentBanner(() =>
                 this._requestProject(endpoint, makePayload, userText, doneMessage)
             );
@@ -1239,11 +1240,13 @@ function AIDebuggerWidget() {
 
                 this._loadBlocks(data.project);
                 this._projectBeforeFix = projectBefore;
+                this._projectBeforeFixId = this._lifecycle.projectId();
                 this._undoButton.style.display = "";
 
                 const botResponse = {
                     type: "bot",
-                    content: data.response,
+                    // Without a reply the bubble was empty and the export said "undefined".
+                    content: typeof data.response === "string" ? data.response : doneMessage,
                     timestamp: new Date().toISOString()
                 };
                 this.chatHistory.push(botResponse);
@@ -1266,7 +1269,7 @@ function AIDebuggerWidget() {
      * @private
      */
     this._undoFix = function () {
-        if (!this._projectBeforeFix || this._isProcessing) return;
+        if (!this._projectBeforeFix || this._isProcessing || this._projectIsLoading()) return;
 
         try {
             this._loadBlocks(JSON.parse(this._projectBeforeFix));
@@ -1296,7 +1299,7 @@ function AIDebuggerWidget() {
         this._removeTypingIndicator(null);
         this.chatLog.replaceChildren();
 
-        if (this._consentGiven) {
+        if (this._lifecycle.hasConsent()) {
             this._loadProjectAndInitialize();
         } else {
             this._showStart();

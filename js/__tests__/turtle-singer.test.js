@@ -988,7 +988,9 @@ describe("numberOfNotes — state restoration and tally logic", () => {
             stroke: 3,
             canvasAlpha: 1,
             penState: true,
-            doPenUp: jest.fn(),
+            doPenUp: jest.fn(() => {
+                turtleMock.painter.penState = false;
+            }),
             doSetXY: jest.fn(),
             doSetHeading: jest.fn()
         };
@@ -1024,6 +1026,49 @@ describe("numberOfNotes — state restoration and tally logic", () => {
         expect(result).toBe(5);
         expect(turtleMock.singer.tallyNotes).toBe(2);
         expect(turtleMock.painter.doPenUp).toHaveBeenCalled();
+        expect(turtleMock.painter.doSetXY).toHaveBeenCalledWith(10, 20);
+        expect(turtleMock.painter.doSetHeading).toHaveBeenCalledWith(90);
+        expect(turtleMock.painter.penState).toBe(true);
+    });
+
+    test("should restore pen state when pen starts down and keep pen up during position restore", () => {
+        turtleMock.painter.penState = true;
+        let penStateDuringSetXY;
+        turtleMock.painter.doSetXY = jest.fn(() => {
+            penStateDuringSetXY = turtleMock.painter.penState;
+        });
+
+        const result = Singer.numberOfNotes(logoMock, 0, 123);
+
+        expect(result).toBe(5);
+        expect(penStateDuringSetXY).toBe(false);
+        expect(turtleMock.painter.penState).toBe(true);
+        expect(turtleMock.painter.doSetXY).toHaveBeenCalledWith(10, 20);
+        expect(turtleMock.painter.doSetHeading).toHaveBeenCalledWith(90);
+    });
+
+    test("should keep pen up when pen starts up even if altered during counted run", () => {
+        turtleMock.painter.penState = false;
+        logoMock.runFromBlockNow = jest.fn(() => {
+            turtleMock.singer.tallyNotes += 5;
+            turtleMock.painter.penState = true;
+            turtleMock.x = 42;
+            turtleMock.y = 84;
+            turtleMock.orientation = 180;
+        });
+
+        let penStateDuringSetXY;
+        turtleMock.painter.doSetXY = jest.fn(() => {
+            penStateDuringSetXY = turtleMock.painter.penState;
+        });
+
+        const result = Singer.numberOfNotes(logoMock, 0, 123);
+
+        expect(result).toBe(5);
+        expect(penStateDuringSetXY).toBe(false);
+        expect(turtleMock.painter.penState).toBe(false);
+        expect(turtleMock.painter.doSetXY).toHaveBeenCalledWith(10, 20);
+        expect(turtleMock.painter.doSetHeading).toHaveBeenCalledWith(90);
     });
 
     test("should hold back the enclosing clamp signals by index", () => {
@@ -3277,5 +3322,370 @@ describe("processNote — drum mode parent block traversal null and cycle safety
         expect(
             activityMock.logo.synth.trigger.mock.calls.some(call => call[3] === "acoustic")
         ).toBe(false);
+    });
+});
+
+describe("Singer.resolveNoteEffects — isolate note effect resolution from playback", () => {
+    describe("resolveNoteEffects unit rules", () => {
+        it("returns disabled defaults when turtle state and instrument settings are empty", () => {
+            const resolved = Singer.resolveNoteEffects({}, {});
+            expect(resolved).toEqual({
+                doVibrato: false,
+                vibratoRate: 0,
+                vibratoIntensity: 0,
+                doDistortion: false,
+                distortionAmount: 0,
+                doTremolo: false,
+                tremoloFrequency: 0,
+                tremoloDepth: 0,
+                doPhaser: false,
+                rate: 0,
+                octaves: 0,
+                baseFrequency: 0,
+                doChorus: false,
+                chorusRate: 0,
+                delayTime: 0,
+                chorusDepth: 0
+            });
+        });
+
+        it("applies instrument settings when no overriding block exists", () => {
+            const turtleState = {
+                singer: {
+                    vibratoRate: [],
+                    vibratoIntensity: [],
+                    distortionAmount: [],
+                    tremoloDepth: [],
+                    tremoloFrequency: [],
+                    rate: [],
+                    octaves: [],
+                    baseFrequency: [],
+                    chorusRate: [],
+                    delayTime: [],
+                    chorusDepth: []
+                }
+            };
+            const instrumentSettings = {
+                vibratoActive: true,
+                vibratoRate: 16,
+                vibratoIntensity: 0.05,
+                distortionActive: true,
+                distortionAmount: 0.4,
+                tremoloActive: true,
+                tremoloFrequency: 10,
+                tremoloDepth: 0.5,
+                phaserActive: true,
+                rate: 2,
+                octaves: 3,
+                baseFrequency: 350,
+                chorusActive: true,
+                chorusRate: 1.5,
+                delayTime: 3.5,
+                chorusDepth: 0.7
+            };
+
+            const resolved = Singer.resolveNoteEffects(turtleState, instrumentSettings);
+            expect(resolved).toEqual({
+                doVibrato: true,
+                vibratoRate: 16,
+                vibratoIntensity: 0.05,
+                doDistortion: true,
+                distortionAmount: 0.4,
+                doTremolo: true,
+                tremoloFrequency: 10,
+                tremoloDepth: 0.5,
+                doPhaser: true,
+                rate: 2,
+                octaves: 3,
+                baseFrequency: 350,
+                doChorus: true,
+                chorusRate: 1.5,
+                delayTime: 3.5,
+                chorusDepth: 0.7
+            });
+        });
+
+        it("ensures inner effect blocks override outer ones", () => {
+            const turtleState = {
+                singer: {
+                    distortionAmount: [0.2, 0.5, 0.8],
+                    tremoloFrequency: [4, 8],
+                    tremoloDepth: [0.3, 0.6],
+                    rate: [1, 3],
+                    octaves: [2, 4],
+                    baseFrequency: [200, 400],
+                    chorusRate: [1.0, 2.5],
+                    delayTime: [2.0, 4.0],
+                    chorusDepth: [0.4, 0.9],
+                    vibratoRate: [8, 16],
+                    vibratoIntensity: [0.1, 0.2]
+                }
+            };
+
+            const resolved = Singer.resolveNoteEffects(turtleState, null);
+            expect(resolved.doDistortion).toBe(true);
+            expect(resolved.distortionAmount).toBe(0.8);
+
+            expect(resolved.doTremolo).toBe(true);
+            expect(resolved.tremoloFrequency).toBe(8);
+            expect(resolved.tremoloDepth).toBe(0.6);
+
+            expect(resolved.doPhaser).toBe(true);
+            expect(resolved.rate).toBe(3);
+            expect(resolved.octaves).toBe(4);
+            expect(resolved.baseFrequency).toBe(400);
+
+            expect(resolved.doChorus).toBe(true);
+            expect(resolved.chorusRate).toBe(2.5);
+            expect(resolved.delayTime).toBe(4.0);
+            expect(resolved.chorusDepth).toBe(0.9);
+
+            expect(resolved.doVibrato).toBe(true);
+            expect(resolved.vibratoRate).toBe(16);
+            expect(resolved.vibratoIntensity).toBe(0.2);
+        });
+
+        it("treats zero as a valid override", () => {
+            const turtleState = {
+                singer: {
+                    distortionAmount: [0]
+                }
+            };
+            const instrumentSettings = {
+                distortionActive: true,
+                distortionAmount: 0.4,
+                chorusActive: true,
+                chorusRate: 1.5,
+                delayTime: 3.5,
+                chorusDepth: 0.7
+            };
+
+            const resolved = Singer.resolveNoteEffects(turtleState, instrumentSettings);
+            expect(resolved.doDistortion).toBe(true);
+            expect(resolved.distortionAmount).toBe(0);
+
+            // Chorus remains enabled from instrument
+            expect(resolved.doChorus).toBe(true);
+            expect(resolved.chorusRate).toBe(1.5);
+            expect(resolved.delayTime).toBe(3.5);
+            expect(resolved.chorusDepth).toBe(0.7);
+        });
+
+        it("overriding one effect preserves unrelated effects", () => {
+            const turtleState = {
+                singer: {
+                    distortionAmount: [0.1]
+                }
+            };
+            const instrumentSettings = {
+                distortionActive: true,
+                distortionAmount: 0.4,
+                chorusActive: true,
+                chorusRate: 1.5,
+                delayTime: 3.5,
+                chorusDepth: 0.7,
+                tremoloActive: true,
+                tremoloFrequency: 6,
+                tremoloDepth: 0.3
+            };
+
+            const resolved = Singer.resolveNoteEffects(turtleState, instrumentSettings);
+            // Overridden effect
+            expect(resolved.doDistortion).toBe(true);
+            expect(resolved.distortionAmount).toBe(0.1);
+
+            // Preserved unrelated effects from instrument
+            expect(resolved.doChorus).toBe(true);
+            expect(resolved.chorusRate).toBe(1.5);
+            expect(resolved.delayTime).toBe(3.5);
+            expect(resolved.chorusDepth).toBe(0.7);
+
+            expect(resolved.doTremolo).toBe(true);
+            expect(resolved.tremoloFrequency).toBe(6);
+            expect(resolved.tremoloDepth).toBe(0.3);
+
+            // Unset effect remains disabled
+            expect(resolved.doVibrato).toBe(false);
+            expect(resolved.doPhaser).toBe(false);
+        });
+
+        it("ensures different turtles retain independent settings", () => {
+            const turtle0 = {
+                singer: {
+                    distortionAmount: [0.2],
+                    chorusRate: [1.2]
+                }
+            };
+            const turtle1 = {
+                singer: {
+                    distortionAmount: [0.8],
+                    chorusRate: [3.4]
+                }
+            };
+            const instSettings0 = {
+                tremoloActive: true,
+                tremoloFrequency: 5,
+                tremoloDepth: 0.2
+            };
+            const instSettings1 = {
+                tremoloActive: true,
+                tremoloFrequency: 15,
+                tremoloDepth: 0.8
+            };
+
+            const resolved0 = Singer.resolveNoteEffects(turtle0, instSettings0);
+            const resolved1 = Singer.resolveNoteEffects(turtle1, instSettings1);
+
+            expect(resolved0.distortionAmount).toBe(0.2);
+            expect(resolved0.chorusRate).toBe(1.2);
+            expect(resolved0.tremoloFrequency).toBe(5);
+            expect(resolved0.tremoloDepth).toBe(0.2);
+
+            expect(resolved1.distortionAmount).toBe(0.8);
+            expect(resolved1.chorusRate).toBe(3.4);
+            expect(resolved1.tremoloFrequency).toBe(15);
+            expect(resolved1.tremoloDepth).toBe(0.8);
+        });
+
+        it("ensures original settings and stacks remain unchanged", () => {
+            const distortionStack = [0.2, 0.6];
+            const chorusRateStack = [1.5];
+            const turtleState = {
+                singer: {
+                    distortionAmount: distortionStack,
+                    chorusRate: chorusRateStack
+                }
+            };
+            const instrumentSettings = Object.freeze({
+                distortionActive: true,
+                distortionAmount: 0.4,
+                vibratoActive: true,
+                vibratoRate: 10,
+                vibratoIntensity: 0.2
+            });
+
+            const resolved = Singer.resolveNoteEffects(turtleState, instrumentSettings);
+            expect(resolved.distortionAmount).toBe(0.6);
+
+            // Verify stacks were not popped or altered
+            expect(turtleState.singer.distortionAmount).toEqual([0.2, 0.6]);
+            expect(turtleState.singer.distortionAmount).toBe(distortionStack);
+            expect(turtleState.singer.chorusRate).toEqual([1.5]);
+            expect(turtleState.singer.chorusRate).toBe(chorusRateStack);
+            expect(instrumentSettings.distortionAmount).toBe(0.4);
+        });
+
+        it("resolves instrument settings from a map of instruments matching turtle active instrument name", () => {
+            const turtleState = {
+                singer: {
+                    instrumentNames: ["customFlute"],
+                    distortionAmount: []
+                }
+            };
+            const instrumentsMap = {
+                leadGuitar: {
+                    distortionActive: true,
+                    distortionAmount: 0.9
+                },
+                customFlute: {
+                    chorusActive: true,
+                    chorusRate: 1.8,
+                    delayTime: 2.2,
+                    chorusDepth: 0.6
+                }
+            };
+
+            const resolved = Singer.resolveNoteEffects(turtleState, instrumentsMap);
+            expect(resolved.doChorus).toBe(true);
+            expect(resolved.chorusRate).toBe(1.8);
+            expect(resolved.delayTime).toBe(2.2);
+            expect(resolved.chorusDepth).toBe(0.6);
+            expect(resolved.doDistortion).toBe(false);
+        });
+    });
+
+    describe("Singer.processNote playback integration", () => {
+        let turtleMock;
+        let activityMock;
+        let singer;
+
+        beforeEach(() => {
+            turtleMock = createTurtleMock();
+            turtleMock.doWait = jest.fn();
+            turtleMock.blink = jest.fn();
+            turtleMock.singer = new Singer(turtleMock);
+            turtleMock.inSetTimbre = true;
+            activityMock = createActivityMock(turtleMock);
+            activityMock.logo.specialArgs = [];
+            activityMock.logo.synth.trigger = jest.fn();
+            activityMock.logo.synth.start = jest.fn();
+            activityMock.logo.dispatchTurtleSignals = jest.fn();
+            activityMock.stage = {
+                update: jest.fn()
+            };
+            singer = turtleMock.singer;
+
+            global.instrumentsEffects = {
+                0: {
+                    synthLead: {
+                        distortionActive: true,
+                        distortionAmount: 0.4,
+                        chorusActive: true,
+                        chorusRate: 1.5,
+                        delayTime: 3.5,
+                        chorusDepth: 0.7,
+                        vibratoActive: true,
+                        vibratoRate: 10,
+                        vibratoIntensity: 0.05
+                    }
+                }
+            };
+            global.instrumentsFilters = {
+                0: {}
+            };
+        });
+
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
+
+        it("synthesizer receives the same final parameters as before with instrument settings and block overrides", () => {
+            const blk = "playbackBlock";
+            singer.inNoteBlock = [blk];
+            singer.instrumentNames = ["synthLead"];
+            singer.notePitches[blk] = ["C"];
+            singer.noteOctaves[blk] = [4];
+            singer.noteCents[blk] = [0];
+            singer.noteHertz[blk] = [0];
+            singer.oscList[blk] = false;
+            singer.noteBeat[blk] = 1;
+            singer.noteBeatValues[blk] = 4;
+            singer.noteDrums[blk] = [];
+            singer.embeddedGraphics[blk] = [];
+
+            // Override distortion to 0% via active block stack
+            singer.distortionAmount = [0];
+
+            Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+            expect(activityMock.logo.synth.trigger).toHaveBeenCalledTimes(1);
+            const callArgs = activityMock.logo.synth.trigger.mock.calls[0];
+            const paramsEffects = callArgs[4];
+
+            // Distortion overridden to 0
+            expect(paramsEffects.doDistortion).toBe(true);
+            expect(paramsEffects.distortionAmount).toBe(0);
+
+            // Chorus preserved from instrument
+            expect(paramsEffects.doChorus).toBe(true);
+            expect(paramsEffects.chorusRate).toBe(1.5);
+            expect(paramsEffects.delayTime).toBe(3.5);
+            expect(paramsEffects.chorusDepth).toBe(0.7);
+
+            // Vibrato preserved and converted with note duration
+            expect(paramsEffects.doVibrato).toBe(true);
+            expect(paramsEffects.vibratoIntensity).toBe(0.05);
+            expect(paramsEffects.vibratoFrequency).toBeGreaterThan(0);
+        });
     });
 });

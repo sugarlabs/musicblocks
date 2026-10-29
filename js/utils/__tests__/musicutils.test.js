@@ -943,6 +943,12 @@ describe("getOscillatorTypes", () => {
         expect(getOscillatorTypes("invalid")).toBe(null);
         expect(getOscillatorTypes("random")).toBe(null);
     });
+    it("should return null for empty string or non-string inputs", () => {
+        expect(getOscillatorTypes("")).toBe(null);
+        expect(getOscillatorTypes(null)).toBe(null);
+        expect(getOscillatorTypes(undefined)).toBe(null);
+        expect(getOscillatorTypes(123)).toBe(null);
+    });
 });
 
 describe("getDrumIcon", () => {
@@ -1432,6 +1438,12 @@ describe("getArticulation", () => {
     it("should handle empty and special cases", () => {
         expect(getArticulation("")).toBe("");
         expect(getArticulation("doremifa")).toBe("remifa"); // Only strips the first prefix
+    });
+    it("should return an empty string for invalid inputs", () => {
+        expect(getArticulation(null)).toBe("");
+        expect(getArticulation(undefined)).toBe("");
+        expect(getArticulation(42)).toBe("");
+        expect(getArticulation({})).toBe("");
     });
     it("should handle custom note names like BAGPIPE_D correctly", () => {
         // "BAGPIPE_D" should not have internal letters stripped.
@@ -3422,7 +3434,10 @@ describe("calcOctave", () => {
         expect(calcOctave(4, "7", ["C"], "C")).toBe(7);
     });
 
-    it("should clamp a numeric string to the 1..9 octave range", () => {
+    it("should clamp numeric arguments to the 1..9 octave range", () => {
+        expect(calcOctave(4, 0, ["C"], "C")).toBe(1);
+        expect(calcOctave(4, 12, ["C"], "C")).toBe(9);
+        expect(calcOctave(4, 3.7, ["C"], "C")).toBe(3);
         expect(calcOctave(4, "0", ["C"], "C")).toBe(1);
         expect(calcOctave(4, "12", ["C"], "C")).toBe(9);
         expect(calcOctave(4, "3.7", ["C"], "C")).toBe(3);
@@ -3433,6 +3448,10 @@ describe("calcOctave", () => {
             calcOctave(4, "current", ["C"], "C")
         );
         expect(calcOctave(4, "", ["C"], "C")).toBe(calcOctave(4, "current", ["C"], "C"));
+        expect(calcOctave(4, NaN, ["C"], "C")).toBe(calcOctave(4, "current", ["C"], "C"));
+        expect(calcOctave(4, NaN, ["C"], "G")).toBe(3);
+        expect(calcOctave(4, null, ["C"], "C")).toBe(calcOctave(4, "current", ["C"], "C"));
+        expect(calcOctave(4, undefined, ["C"], "C")).toBe(calcOctave(4, "current", ["C"], "C"));
     });
 
     it("should return correct octave based on currentNote and lastNotePlayed", () => {

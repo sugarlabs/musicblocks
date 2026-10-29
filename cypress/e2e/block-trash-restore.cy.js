@@ -56,27 +56,56 @@ describe("Block trash and restore", () => {
 
         cy.get("@dropPlan").then(plan => {
             cy.get('#PaletteBody tbody tr[aria-label="pitch"] img').then($img => {
-                const rect = $img[0].getBoundingClientRect();
-                const startX = rect.x + rect.width / 2;
-                const startY = rect.y + rect.height / 2;
-                const endX = plan.targetContainerX + rect.width / 2;
-                const endY = plan.targetContainerY + rect.height / 2;
+                cy.window().then(win => {
+                    const canvasRect = win.document
+                        .querySelector("#canvas")
+                        .getBoundingClientRect();
+                    const stageScale = win.ActivityContext.getActivity().getStageScale();
 
-                cy.get('#PaletteBody tbody tr[aria-label="pitch"] img')
-                    .trigger("mousedown", { which: 1, pageX: startX, pageY: startY, force: true })
-                    .then($draggedImg => {
-                        cy.document().trigger("mousemove", {
-                            pageX: (startX + endX) / 2,
-                            pageY: (startY + endY) / 2
-                        });
-                        cy.document().trigger("mousemove", { pageX: endX, pageY: endY });
-                        cy.wrap($draggedImg).trigger("mouseup", {
+                    const rect = $img[0].getBoundingClientRect();
+                    const startX = rect.left + rect.width / 2;
+                    const startY = rect.top + rect.height / 2;
+
+                    const clientX =
+                        canvasRect.left +
+                        (plan.targetContainerX +
+                            win.ActivityContext.getActivity().blocksContainer.x) *
+                            stageScale +
+                        rect.width / 2;
+
+                    const clientY =
+                        canvasRect.top +
+                        (plan.targetContainerY +
+                            win.ActivityContext.getActivity().blocksContainer.y) *
+                            stageScale +
+                        rect.height / 2;
+
+                    const endX = clientX + win.scrollX;
+                    const endY = clientY + win.scrollY;
+
+                    cy.wrap($img)
+                        .trigger("mousedown", {
                             which: 1,
-                            pageX: endX,
-                            pageY: endY,
+                            pageX: startX,
+                            pageY: startY,
                             force: true
+                        })
+                        .then($draggedImg => {
+                            cy.document().trigger("mousemove", {
+                                pageX: (startX + endX) / 2,
+                                pageY: (startY + endY) / 2
+                            });
+                            cy.document().trigger("mousemove", { pageX: endX, pageY: endY });
+                            cy.document().trigger("mouseup", {
+                                which: 1,
+                                clientX: clientX,
+                                clientY: clientY,
+                                pageX: endX,
+                                pageY: endY,
+                                force: true
+                            });
                         });
-                    });
+                });
             });
         });
 

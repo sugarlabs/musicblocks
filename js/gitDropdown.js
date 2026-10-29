@@ -372,7 +372,10 @@ class GitDropdownUI {
         });
         if (desc === null) return;
 
-        const repoName = this._sanitizeRepoName(rawName.trim());
+        // Use the unique fallback when no latin letter is left: an empty slug,
+        // or only digits ("私の曲 1" -> "1"), which many names would share.
+        const slug = this._sanitizeRepoName(rawName.trim());
+        const repoName = /[a-z]/.test(slug) ? slug : this._fallbackRepoName();
 
         await this._doCreate(repoName, rawName.trim(), desc.trim());
     }
@@ -1687,13 +1690,27 @@ class GitDropdownUI {
     }
 
     _sanitizeRepoName(name) {
-        return (
-            name
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, "-")
-                .replace(/^-+|-+$/g, "")
-                .substring(0, 100) || "my-music-project"
-        );
+        // Letters that NFKD does not split into a base letter plus a mark.
+        const LETTER_MAP = { ł: "l", ø: "o", ß: "ss", đ: "d", æ: "ae", œ: "oe" };
+        // NFKD splits an accented letter into the letter plus a combining mark
+        // (U+0300 to U+036F), so "Canción" becomes "cancion".
+        return name
+            .normalize("NFKD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .replace(/[łøßđæœ]/g, ch => LETTER_MAP[ch])
+            .replace(/[^a-z0-9]+/g, "-")
+            .substring(0, 100)
+            .replace(/^-+|-+$/g, "");
+    }
+
+    // Used when _sanitizeRepoName leaves nothing behind (e.g. Japanese, Hindi
+    // or Russian names). Repo names are unique on the server, so each project
+    // gets its own name. Not deterministic on purpose: the time and random
+    // parts keep two names made at the same moment apart.
+    _fallbackRepoName() {
+        const random = Math.random().toString(36).slice(2, 6).padEnd(4, "0");
+        return "my-music-project-" + Date.now().toString(36) + "-" + random;
     }
 
     _prettifyRepoName(slug) {
@@ -1768,15 +1785,35 @@ class GitDropdownUI {
             e.preventDefault();
         });
 
+        let rAFId = null;
+        let ticking = false;
+        let lastX, lastY;
         const onMove = e => {
             if (!dragging) return;
-            const maxL = Math.max(window.innerWidth - frame.offsetWidth, 8);
-            const maxT = Math.max(window.innerHeight - frame.offsetHeight, 64);
-            frame.style.left = `${Math.min(Math.max(e.clientX - dx, 8), maxL)}px`;
-            frame.style.top = `${Math.min(Math.max(e.clientY - dy, 64), maxT)}px`;
+            lastX = e.clientX;
+            lastY = e.clientY;
+            if (!ticking) {
+                ticking = true;
+                rAFId = window.requestAnimationFrame(() => {
+                    const maxL = Math.max(window.innerWidth - frame.offsetWidth, 8);
+                    const maxT = Math.max(window.innerHeight - frame.offsetHeight, 64);
+                    frame.style.left = `${Math.min(Math.max(lastX - dx, 8), maxL)}px`;
+                    frame.style.top = `${Math.min(Math.max(lastY - dy, 64), maxT)}px`;
+                    ticking = false;
+                });
+            }
         };
 
         const onUp = () => {
+            if (rAFId) {
+                window.cancelAnimationFrame(rAFId);
+                rAFId = null;
+                ticking = false;
+                const maxL = Math.max(window.innerWidth - frame.offsetWidth, 8);
+                const maxT = Math.max(window.innerHeight - frame.offsetHeight, 64);
+                frame.style.left = `${Math.min(Math.max(lastX - dx, 8), maxL)}px`;
+                frame.style.top = `${Math.min(Math.max(lastY - dy, 64), maxT)}px`;
+            }
             dragging = false;
         };
 

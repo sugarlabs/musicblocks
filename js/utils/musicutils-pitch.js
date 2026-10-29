@@ -58,6 +58,10 @@ if (typeof module !== "undefined" && module.exports) {
         (typeof require !== "undefined" ? require("./musicutils-temperament") : {});
     var { getCurrentEDO, getTemperament, generateNoteNames, isTrueEDO, TEMPERAMENT } =
         MusicUtilsTemperament;
+    var UtilsLogic =
+        (typeof window !== "undefined" && window.UtilsLogic) ||
+        (typeof require !== "undefined" ? require("./utils-logic") : {});
+    var { clampNumber } = UtilsLogic;
 }
 
 /**
@@ -67,9 +71,12 @@ if (typeof module !== "undefined" && module.exports) {
  * @param {string} note
  * @returns {string}
  */
-var stripMicrotonalPrefix = s => s.replace(/^[v^]{1,2}/, "");
+var stripMicrotonalPrefix = s => (typeof s === "string" ? s.replace(/^[v^]{1,2}/, "") : "");
 
 function normalizeNoteAccidentals(note) {
+    if (typeof note !== "string") {
+        return "";
+    }
     const map = { "♭": "b", "♯": "#", "𝄫": "bb", "𝄪": "x" };
     // Strip at most two leading ^ / v so "^C"/"vvD♭" resolve but "^^^C" keeps a "^"
     return stripMicrotonalPrefix(note).replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
@@ -165,9 +172,9 @@ var frequencyToPitch = (hz, temperament) => {
         return [pitchName, octaveNumber, cents];
     }
 
-    const nameIndex = Math.round((stepIndex / currentEDO) * 12);
-    const pitchName = PITCHES[(nameIndex + PITCHES.indexOf("A")) % PITCHES.length];
-    const octaveNumber = Math.floor((roundedSteps + PITCHES.indexOf("A")) / currentEDO);
+    const aIndex = 9;
+    const pitchName = PITCHES[(stepIndex + aIndex) % 12];
+    const octaveNumber = Math.floor((roundedSteps + aIndex) / 12);
 
     return [pitchName, octaveNumber, cents];
 };
@@ -181,40 +188,20 @@ var frequencyToPitch = (hz, temperament) => {
 var numberToPitchSharp = (i, temperament) => {
     const currentEDO = getCurrentEDO(temperament);
     if (currentEDO === 12) {
-        if (i < 0) {
-            let n = 0;
-            while (i < 0) {
-                i += 12;
-                n += 1;
-            }
-            const octave = Math.floor((i + PITCHES2.indexOf("A")) / 12) - n;
-            const nameIndex = Math.round(((i % 12) / 12) * 12);
-            return [PITCHES2[(nameIndex + PITCHES2.indexOf("A")) % 12], octave];
-        } else {
-            const octave = Math.floor((i + PITCHES2.indexOf("A")) / 12);
-            const nameIndex = Math.round(((i % 12) / 12) * 12);
-            return [PITCHES2[(nameIndex + PITCHES2.indexOf("A")) % 12], octave];
-        }
+        const aIndex = 9;
+        const octave = Math.floor((i + aIndex) / 12);
+        const nameIndex = Math.round((((i + aIndex) % 12) + 12) % 12) % 12;
+        return [PITCHES2[nameIndex], octave];
     }
     const edoNames = generateNoteNames(currentEDO);
     let aIndex = edoNames.indexOf("A");
     if (aIndex === -1) {
         aIndex = Math.round((9 / 12) * currentEDO);
     }
-    if (i < 0) {
-        let n = 0;
-        while (i < 0) {
-            i += currentEDO;
-            n += 1;
-        }
-        const octave = Math.floor((i + aIndex) / currentEDO) - n;
-        const nameIndex = (i + aIndex) % currentEDO;
-        return [edoNames[nameIndex], octave];
-    } else {
-        const octave = Math.floor((i + aIndex) / currentEDO);
-        const nameIndex = (i + aIndex) % currentEDO;
-        return [edoNames[nameIndex], octave];
-    }
+    const octave = Math.floor((i + aIndex) / currentEDO);
+    const nameIndex =
+        Math.round((((i + aIndex) % currentEDO) + currentEDO) % currentEDO) % currentEDO;
+    return [edoNames[nameIndex], octave];
 };
 
 /**
@@ -504,10 +491,6 @@ var calcOctave = (currentOctave, arg, lastNotePlayed, currentNote, temperament) 
     // which can be a number, a 'number' as a string, 'current',
     // 'previous', or 'next'.
 
-    if (typeof arg === "number") {
-        return Math.max(1, Math.min(Math.floor(arg), 9));
-    }
-
     const currentEDO = getCurrentEDO(temperament);
 
     // The relative octave for tritones are arbitrated as being in the
@@ -560,16 +543,13 @@ var calcOctave = (currentOctave, arg, lastNotePlayed, currentNote, temperament) 
         case "previous":
             return Math.max(changedCurrent - 1, 1);
         default: {
-            // A "number" passed as a string (e.g. "2") is a documented argument,
-            // but changedCurrent is always >= 1, so testing it for truthiness
-            // first made the numeric conversion unreachable and silently
-            // ignored the requested octave.
-            const parsed = typeof arg === "string" && arg.trim() !== "" ? Number(arg) : NaN;
-            if (!isNaN(parsed)) {
-                return Math.max(1, Math.min(Math.floor(parsed), 9));
-            }
-
-            return changedCurrent;
+            const num =
+                typeof arg === "number"
+                    ? arg
+                    : typeof arg === "string" && arg.trim() !== ""
+                      ? Number(arg)
+                      : NaN;
+            return clampNumber(Math.floor(num), 1, 9, changedCurrent);
         }
     }
 };

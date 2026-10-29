@@ -56,6 +56,25 @@
  * @returns {void}
  */
 function setupPitchActions(activity) {
+    /**
+     * Returns a unique stage listener name for a turtle by appending a numeric
+     * suffix if an active listener with the same base name already exists.
+     *
+     * @param {Object} tur - The turtle object.
+     * @param {string} baseName - The base name of the event listener.
+     * @returns {string} The unique listener name.
+     */
+    function getUniqueListenerName(tur, baseName) {
+        let name = baseName;
+        if (tur && tur.listeners) {
+            let suffix = 1;
+            while (name in tur.listeners) {
+                name = baseName + "_" + suffix++;
+            }
+        }
+        return name;
+    }
+
     Singer.PitchActions = class {
         /**
          * Processes (and/or plays) a pitch.
@@ -491,11 +510,12 @@ function setupPitchActions(activity) {
             if (!Number.isFinite(transValue)) return;
             const tur = activity.turtles.ithTurtle(turtle);
 
-            tur.singer.scalarTransposition +=
-                tur.singer.invertList.length > 0 ? -transValue : transValue;
+            const applied = tur.singer.invertList.length > 0 ? -transValue : transValue;
+            tur.singer.scalarTransposition += applied;
             tur.singer.scalarTranspositionValues.push(transValue);
 
-            const listenerName = "_scalar_transposition_" + turtle;
+            const baseListenerName = "_scalar_transposition_" + turtle + "_" + blk;
+            const listenerName = getUniqueListenerName(tur, baseListenerName);
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -503,10 +523,25 @@ function setupPitchActions(activity) {
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
+            let cleanedUp = false;
             const __listener = () => {
-                transValue = tur.singer.scalarTranspositionValues.pop();
-                tur.singer.scalarTransposition +=
-                    tur.singer.invertList.length > 0 ? transValue : -transValue;
+                if (cleanedUp) return;
+                cleanedUp = true;
+                if (tur && tur.listeners) {
+                    delete tur.listeners[listenerName];
+                }
+                if (
+                    activity &&
+                    activity.stage &&
+                    typeof activity.stage.removeEventListener === "function"
+                ) {
+                    activity.stage.removeEventListener(listenerName, __listener, false);
+                }
+                const index = tur.singer.scalarTranspositionValues.lastIndexOf(transValue);
+                if (index !== -1) {
+                    tur.singer.scalarTranspositionValues.splice(index, 1);
+                }
+                tur.singer.scalarTransposition -= applied;
             };
 
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
@@ -524,10 +559,12 @@ function setupPitchActions(activity) {
             if (!Number.isFinite(transValue)) return;
             const tur = activity.turtles.ithTurtle(turtle);
 
-            tur.singer.transposition += tur.singer.invertList.length > 0 ? -transValue : transValue;
+            const applied = tur.singer.invertList.length > 0 ? -transValue : transValue;
+            tur.singer.transposition += applied;
             tur.singer.transpositionValues.push(transValue);
 
-            const listenerName = "_transposition_" + turtle;
+            const baseListenerName = "_transposition_" + turtle + "_" + blk;
+            const listenerName = getUniqueListenerName(tur, baseListenerName);
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -535,10 +572,25 @@ function setupPitchActions(activity) {
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
+            let cleanedUp = false;
             const __listener = () => {
-                transValue = tur.singer.transpositionValues.pop();
-                tur.singer.transposition +=
-                    tur.singer.invertList.length > 0 ? transValue : -transValue;
+                if (cleanedUp) return;
+                cleanedUp = true;
+                if (tur && tur.listeners) {
+                    delete tur.listeners[listenerName];
+                }
+                if (
+                    activity &&
+                    activity.stage &&
+                    typeof activity.stage.removeEventListener === "function"
+                ) {
+                    activity.stage.removeEventListener(listenerName, __listener, false);
+                }
+                const index = tur.singer.transpositionValues.lastIndexOf(transValue);
+                if (index !== -1) {
+                    tur.singer.transpositionValues.splice(index, 1);
+                }
+                tur.singer.transposition -= applied;
             };
 
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
@@ -557,7 +609,8 @@ function setupPitchActions(activity) {
             const tur = activity.turtles.ithTurtle(turtle);
             tur.singer.transpositionRatios.push(value);
 
-            const listenerName = "_transposition_ratio_" + turtle;
+            const baseListenerName = "_transposition_ratio_" + turtle + "_" + blk;
+            const listenerName = getUniqueListenerName(tur, baseListenerName);
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -565,8 +618,24 @@ function setupPitchActions(activity) {
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
+            let cleanedUp = false;
             const __listener = () => {
-                tur.singer.transpositionRatios.pop();
+                if (cleanedUp) return;
+                cleanedUp = true;
+                if (tur && tur.listeners) {
+                    delete tur.listeners[listenerName];
+                }
+                if (
+                    activity &&
+                    activity.stage &&
+                    typeof activity.stage.removeEventListener === "function"
+                ) {
+                    activity.stage.removeEventListener(listenerName, __listener, false);
+                }
+                const index = tur.singer.transpositionRatios.lastIndexOf(value);
+                if (index !== -1) {
+                    tur.singer.transpositionRatios.splice(index, 1);
+                }
             };
 
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
@@ -606,6 +675,7 @@ function setupPitchActions(activity) {
 
             const tur = activity.turtles.ithTurtle(turtle);
 
+            let invertEntry = null;
             if (mode === "even" || mode === "odd" || mode === "scalar") {
                 const _octave = calcOctave(
                     tur.singer.currentOctave,
@@ -614,10 +684,12 @@ function setupPitchActions(activity) {
                     name,
                     activity.logo.synth.inTemperament
                 );
-                tur.singer.invertList.push([name, _octave, mode]);
+                invertEntry = [name, _octave, mode];
+                tur.singer.invertList.push(invertEntry);
             }
 
-            const listenerName = "_invert_" + turtle;
+            const baseListenerName = "_invert_" + turtle + "_" + blk;
+            const listenerName = getUniqueListenerName(tur, baseListenerName);
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -625,7 +697,27 @@ function setupPitchActions(activity) {
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = () => tur.singer.invertList.pop();
+            let cleanedUp = false;
+            const __listener = () => {
+                if (cleanedUp) return;
+                cleanedUp = true;
+                if (tur && tur.listeners) {
+                    delete tur.listeners[listenerName];
+                }
+                if (
+                    activity &&
+                    activity.stage &&
+                    typeof activity.stage.removeEventListener === "function"
+                ) {
+                    activity.stage.removeEventListener(listenerName, __listener, false);
+                }
+                if (invertEntry !== null) {
+                    const index = tur.singer.invertList.lastIndexOf(invertEntry);
+                    if (index !== -1) {
+                        tur.singer.invertList.splice(index, 1);
+                    }
+                }
+            };
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
         }
 

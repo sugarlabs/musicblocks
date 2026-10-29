@@ -89,6 +89,142 @@ const getOctaveInterval = activity => {
 };
 
 /**
+ * Resolves active audio effects (vibrato, distortion, tremolo, phaser, chorus)
+ * by applying disabled defaults, selected instrument settings, and innermost
+ * active effect block overrides.
+ *
+ * Precedence rules:
+ * 1. Default state: all effects are disabled.
+ * 2. Active instrument settings: applied if specified on the selected instrument.
+ * 3. Enclosing effect blocks: innermost active block overrides instrument setting.
+ *    Zero is treated as a valid override value.
+ *
+ * @param {Object} [turtleState] - Turtle or Singer state containing effect stacks
+ * @param {Object} [instrumentSettings] - Effect settings for the active instrument
+ * @returns {Object} Fresh resolved effect settings without modifying inputs
+ */
+const resolveNoteEffects = (turtleState, instrumentSettings) => {
+    const getLast = arr =>
+        Array.isArray(arr) && arr.length > 0
+            ? arr[arr.length - 1]
+            : typeof last === "function"
+              ? last(arr)
+              : arr && arr.length > 0
+                ? arr[arr.length - 1]
+                : undefined;
+
+    const singer =
+        turtleState && typeof turtleState === "object" ? turtleState.singer || turtleState : {};
+
+    let instEffects = instrumentSettings;
+    if (instEffects && typeof instEffects === "object") {
+        const hasDirectEffectFlag =
+            "vibratoActive" in instEffects ||
+            "distortionActive" in instEffects ||
+            "tremoloActive" in instEffects ||
+            "phaserActive" in instEffects ||
+            "chorusActive" in instEffects;
+
+        if (!hasDirectEffectFlag) {
+            const instrumentNames = singer.instrumentNames;
+            const currentInstrument = getLast(instrumentNames);
+            if (currentInstrument && currentInstrument in instEffects) {
+                instEffects = instEffects[currentInstrument];
+            }
+        }
+    }
+
+    // 1. Initialize disabled effect defaults.
+    const resolved = {
+        doVibrato: false,
+        vibratoRate: 0,
+        vibratoIntensity: 0,
+        doDistortion: false,
+        distortionAmount: 0,
+        doTremolo: false,
+        tremoloFrequency: 0,
+        tremoloDepth: 0,
+        doPhaser: false,
+        rate: 0,
+        octaves: 0,
+        baseFrequency: 0,
+        doChorus: false,
+        chorusRate: 0,
+        delayTime: 0,
+        chorusDepth: 0
+    };
+
+    // 2. Apply the selected instrument's enabled effects.
+    if (instEffects && typeof instEffects === "object") {
+        if (instEffects.vibratoActive) {
+            resolved.doVibrato = true;
+            resolved.vibratoRate = instEffects.vibratoRate ?? 0;
+            resolved.vibratoIntensity = instEffects.vibratoIntensity ?? 0;
+        }
+
+        if (instEffects.distortionActive) {
+            resolved.doDistortion = true;
+            resolved.distortionAmount = instEffects.distortionAmount ?? 0;
+        }
+
+        if (instEffects.tremoloActive) {
+            resolved.doTremolo = true;
+            resolved.tremoloFrequency = instEffects.tremoloFrequency ?? 0;
+            resolved.tremoloDepth = instEffects.tremoloDepth ?? 0;
+        }
+
+        if (instEffects.phaserActive) {
+            resolved.doPhaser = true;
+            resolved.rate = instEffects.rate ?? 0;
+            resolved.octaves = instEffects.octaves ?? 0;
+            resolved.baseFrequency = instEffects.baseFrequency ?? 0;
+        }
+
+        if (instEffects.chorusActive) {
+            resolved.doChorus = true;
+            resolved.chorusRate = instEffects.chorusRate ?? 0;
+            resolved.delayTime = instEffects.delayTime ?? 0;
+            resolved.chorusDepth = instEffects.chorusDepth ?? 0;
+        }
+    }
+
+    // 3. Apply overrides from the innermost active effect blocks.
+    if (singer.vibratoRate && singer.vibratoRate.length > 0) {
+        resolved.vibratoRate = getLast(singer.vibratoRate);
+        resolved.vibratoIntensity = getLast(singer.vibratoIntensity) ?? resolved.vibratoIntensity;
+        resolved.doVibrato = true;
+    }
+
+    if (singer.distortionAmount && singer.distortionAmount.length > 0) {
+        resolved.distortionAmount = getLast(singer.distortionAmount);
+        resolved.doDistortion = true;
+    }
+
+    if (singer.tremoloDepth && singer.tremoloDepth.length > 0) {
+        resolved.tremoloFrequency = getLast(singer.tremoloFrequency) ?? resolved.tremoloFrequency;
+        resolved.tremoloDepth = getLast(singer.tremoloDepth);
+        resolved.doTremolo = true;
+    }
+
+    if (singer.rate && singer.rate.length > 0) {
+        resolved.rate = getLast(singer.rate);
+        resolved.octaves = getLast(singer.octaves) ?? resolved.octaves;
+        resolved.baseFrequency = getLast(singer.baseFrequency) ?? resolved.baseFrequency;
+        resolved.doPhaser = true;
+    }
+
+    if (singer.chorusRate && singer.chorusRate.length > 0) {
+        resolved.chorusRate = getLast(singer.chorusRate);
+        resolved.delayTime = getLast(singer.delayTime) ?? resolved.delayTime;
+        resolved.chorusDepth = getLast(singer.chorusDepth) ?? resolved.chorusDepth;
+        resolved.doChorus = true;
+    }
+
+    // 4. Return fresh resolved settings without modifying the input state.
+    return resolved;
+};
+
+/**
  * Class pertaining to music related actions for each turtle.
  *
  * @class
@@ -742,6 +878,10 @@ class Singer {
         });
         restoreMeterState(tur.singer, saveState.meter);
 
+        tur.painter.doPenUp();
+        tur.painter.doSetXY(saveState.x, saveState.y);
+        tur.painter.doSetHeading(saveState.orientation);
+
         Object.assign(tur.painter, {
             color: saveState.color,
             value: saveState.value,
@@ -755,9 +895,6 @@ class Singer {
         activity.logo.turtleHeaps[turtle] = saveState.turtleHeaps ?? [];
         activity.logo.turtleDicts[turtle] = saveState.turtleDicts ?? {};
 
-        tur.painter.doPenUp();
-        tur.painter.doSetXY(saveState.x, saveState.y);
-        tur.painter.doSetHeading(saveState.orientation);
         tur.singer.justCounting.pop();
         tur.butNotThese = previousButNotThese;
 
@@ -1628,108 +1765,39 @@ class Singer {
                 : (bpmFactor * 1000) / noteValue
             : noteValue;
 
-        let vibratoRate = 0;
         let vibratoValue = 0;
-        let vibratoIntensity = 0;
-        let distortionAmount = 0;
-        let tremoloFrequency = 0;
-        let tremoloDepth = 0;
-        let rate = 0;
-        let octaves = 0;
-        let baseFrequency = 0;
-        let chorusRate = 0;
-        let delayTime = 0;
-        let chorusDepth = 0;
         let partials = [];
         const neighborArgNote1 = [];
         const neighborArgNote2 = [];
         let neighborArgBeat = 0;
         let neighborArgCurrentBeat = 0;
-        let doVibrato = false;
-        let doDistortion = false;
-        let doTremolo = false;
-        let doPhaser = false;
-        let doChorus = false;
         let doNeighbor = false;
         let filters = null;
         let noteInNote = false;
         let future = 0;
 
-        // Apply any effects and filters associated with a custom timbre
+        let instrumentSettings = null;
         if (tur.inSetTimbre && last(tur.singer.instrumentNames)) {
             const name = last(tur.singer.instrumentNames);
 
-            if (name in instrumentsEffects[turtle]) {
-                const timbreEffects = instrumentsEffects[turtle][name];
-
-                if (timbreEffects["vibratoActive"]) {
-                    vibratoRate = timbreEffects["vibratoRate"];
-                    vibratoIntensity = timbreEffects["vibratoIntensity"];
-                    doVibrato = true;
-                }
-
-                if (timbreEffects["distortionActive"]) {
-                    distortionAmount = timbreEffects["distortionAmount"];
-                    doDistortion = true;
-                }
-
-                if (timbreEffects["tremoloActive"]) {
-                    tremoloFrequency = timbreEffects["tremoloFrequency"];
-                    tremoloDepth = timbreEffects["tremoloDepth"];
-                    doTremolo = true;
-                }
-
-                if (timbreEffects["phaserActive"]) {
-                    rate = timbreEffects["rate"];
-                    octaves = timbreEffects["octaves"];
-                    baseFrequency = timbreEffects["baseFrequency"];
-                    doPhaser = true;
-                }
-
-                if (timbreEffects["chorusActive"]) {
-                    chorusRate = timbreEffects["chorusRate"];
-                    delayTime = timbreEffects["delayTime"];
-                    chorusDepth = timbreEffects["chorusDepth"];
-                    doChorus = true;
-                }
+            if (
+                typeof instrumentsEffects !== "undefined" &&
+                instrumentsEffects[turtle] &&
+                name in instrumentsEffects[turtle]
+            ) {
+                instrumentSettings = instrumentsEffects[turtle][name];
             }
 
-            if (name in instrumentsFilters[turtle]) {
+            if (
+                typeof instrumentsFilters !== "undefined" &&
+                instrumentsFilters[turtle] &&
+                name in instrumentsFilters[turtle]
+            ) {
                 filters = instrumentsFilters[turtle][name];
             }
         }
 
-        // Apply effects.
-        if (tur.singer.vibratoRate.length > 0) {
-            vibratoRate = last(tur.singer.vibratoRate);
-            vibratoIntensity = last(tur.singer.vibratoIntensity);
-            doVibrato = true;
-        }
-
-        if (tur.singer.distortionAmount.length > 0) {
-            distortionAmount = last(tur.singer.distortionAmount);
-            doDistortion = true;
-        }
-
-        if (tur.singer.tremoloDepth.length > 0) {
-            tremoloFrequency = last(tur.singer.tremoloFrequency);
-            tremoloDepth = last(tur.singer.tremoloDepth);
-            doTremolo = true;
-        }
-
-        if (tur.singer.rate.length > 0) {
-            rate = last(tur.singer.rate);
-            octaves = last(tur.singer.octaves);
-            baseFrequency = last(tur.singer.baseFrequency);
-            doPhaser = true;
-        }
-
-        if (tur.singer.chorusRate.length > 0) {
-            chorusRate = last(tur.singer.chorusRate);
-            delayTime = last(tur.singer.delayTime);
-            chorusDepth = last(tur.singer.chorusDepth);
-            doChorus = true;
-        }
+        const effects = resolveNoteEffects(tur, instrumentSettings);
 
         partials = [1];
         if (tur.singer.inHarmonic.length > 0) {
@@ -2318,8 +2386,10 @@ class Singer {
                     }
                 }
 
-                if (doVibrato) {
-                    vibratoValue = beatValue * (duration / vibratoRate);
+                if (effects.doVibrato) {
+                    vibratoValue = effects.vibratoRate
+                        ? beatValue * (duration / effects.vibratoRate)
+                        : 0;
                 }
 
                 // Check to see if we need any courtesy accidentals: e.g., are there any
@@ -2535,25 +2605,25 @@ class Singer {
                             if (!forceSilence) {
                                 // Parameters related to effects
                                 const paramsEffects = {
-                                    doVibrato: doVibrato,
-                                    doDistortion: doDistortion,
-                                    doTremolo: doTremolo,
-                                    doPhaser: doPhaser,
-                                    doChorus: doChorus,
+                                    doVibrato: effects.doVibrato,
+                                    doDistortion: effects.doDistortion,
+                                    doTremolo: effects.doTremolo,
+                                    doPhaser: effects.doPhaser,
+                                    doChorus: effects.doChorus,
                                     doPartials: true,
                                     doPortamento: true,
                                     doNeighbor: doNeighbor,
-                                    vibratoIntensity: vibratoIntensity,
+                                    vibratoIntensity: effects.vibratoIntensity,
                                     vibratoFrequency: vibratoValue,
-                                    distortionAmount: distortionAmount,
-                                    tremoloFrequency: tremoloFrequency,
-                                    tremoloDepth: tremoloDepth,
-                                    rate: rate,
-                                    octaves: octaves,
-                                    baseFrequency: baseFrequency,
-                                    chorusRate: chorusRate,
-                                    delayTime: delayTime,
-                                    chorusDepth: chorusDepth,
+                                    distortionAmount: effects.distortionAmount,
+                                    tremoloFrequency: effects.tremoloFrequency,
+                                    tremoloDepth: effects.tremoloDepth,
+                                    rate: effects.rate,
+                                    octaves: effects.octaves,
+                                    baseFrequency: effects.baseFrequency,
+                                    chorusRate: effects.chorusRate,
+                                    delayTime: effects.delayTime,
+                                    chorusDepth: effects.chorusDepth,
                                     partials: partials,
                                     portamento: portamento,
                                     neighborArgNote1: neighborArgNote1,
@@ -2953,6 +3023,19 @@ class Singer {
     }
 
     /**
+     * Resolves audio effects (vibrato, distortion, tremolo, phaser, chorus)
+     * by applying disabled defaults, selected instrument settings, and innermost
+     * active effect block overrides.
+     *
+     * @param {Object} [turtleState] - Turtle or Singer state containing effect stacks
+     * @param {Object} [instrumentSettings] - Effect settings for the active instrument
+     * @returns {Object} Fresh resolved effect settings without modifying inputs
+     */
+    static resolveNoteEffects(turtleState, instrumentSettings) {
+        return resolveNoteEffects(turtleState, instrumentSettings);
+    }
+
+    /**
      * Clears the pitch-to-frequency cache. Called when temperament changes
      * or between runs to prevent stale frequency values.
      */
@@ -2964,6 +3047,7 @@ class Singer {
 // Exposed for tests that need to exercise the real cache alongside
 // clearPitchToFrequencyCache(), rather than mocking the class methods.
 Singer.getCachedPitchToFrequency = getCachedPitchToFrequency;
+Singer.resolveNoteEffects = resolveNoteEffects;
 
 // Maintain CommonJS compatibility for tests
 if (typeof module !== "undefined" && module.exports) {

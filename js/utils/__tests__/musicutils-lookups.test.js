@@ -52,6 +52,23 @@ describe("musicutils-lookups", () => {
         expect(lookups.getVoiceSynthName("electronic synth")).toBe("electronic synth");
     });
 
+    it("looks up voice names by identifier when display names differ or are empty", () => {
+        const originalVoices = global.VOICENAMES;
+        global.VOICENAMES = [
+            ["Klavier", "piano", "images/piano.svg"],
+            ["", "custom voice", "images/custom.svg"],
+            ["electronic synth", "synth", "images/synth.svg"]
+        ];
+        try {
+            expect(lookups.getVoiceName("piano")).toBe("Klavier");
+            expect(lookups.getVoiceName("Klavier")).toBe("Klavier");
+            expect(lookups.getVoiceName("custom voice")).toBe("custom voice");
+            expect(lookups.getVoiceName("synth")).toBe("electronic synth");
+        } finally {
+            global.VOICENAMES = originalVoices;
+        }
+    });
+
     it("handles non-string inputs safely without throwing", () => {
         expect(lookups.getDrumName(undefined)).toBeNull();
         expect(lookups.getDrumIndex(123)).toBe(-1);
@@ -66,6 +83,11 @@ describe("musicutils-lookups", () => {
         expect(lookups.getVoiceName(123)).toBe("electronic synth");
         expect(lookups.getVoiceIcon({})).toBe("images/voices.svg");
         expect(lookups.getVoiceSynthName(undefined)).toBeNull();
+
+        expect(lookups.getOscillatorTypes("")).toBeNull();
+        expect(lookups.getOscillatorTypes(null)).toBeNull();
+        expect(lookups.getOscillatorTypes(undefined)).toBeNull();
+        expect(lookups.getOscillatorTypes(123)).toBeNull();
 
         expect(lookups.getIntervalNumber(undefined)).toBe(0);
         expect(lookups.getIntervalNumber(null)).toBe(0);
