@@ -195,6 +195,13 @@
     "branch": "test/abc-duplicate-tuplet-block",
     "headRepo": "Abhist17/musicblocks"
   },
+  "9834": {
+    "pushedAt": "2026-10-29T18:53:52.357Z",
+    "sha": "f318047e47b280c6833dee5036b95533cbdb17c1",
+    "actor": "codedbyanup",
+    "branch": "fix/9832-noise-name-lookup-display-name",
+    "headRepo": "codedbyanup/musicblocks"
+  },
   "9844": {
     "pushedAt": "2026-10-28T23:04:46.788Z",
     "sha": "c2e12fa491e475072ce305353bd485e6d3607dc6",
