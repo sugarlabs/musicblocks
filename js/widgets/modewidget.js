@@ -17,6 +17,8 @@
     normalizeNoteAccidentals, getCurrentEDO, getModePattern, DEFAULTMODE,
     numberToPitch, pitchToFrequency, MODE_PIE_MENUS, TEMPERAMENT, generateNoteNames,
     getSavedCustomModes, configureWheel, TuningFormats,
+    getTemperamentSliceAngles, applySliceAngles, enforceMinSliceAngles, getModeSliceArc,
+    rotateSliceAngles,
     scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes,
     isUnsafeObjectKey, ManagedTimer, readTextFile, downloadTextFile, createSharePopup,
     closeSharePopup
@@ -43,11 +45,16 @@ class ModeWidget {
     static ROTATESPEED = 125;
     static RESET_NOTES_DELAY = 500;
     static WHEELSIZE = 400;
+    // Label ring on the mode wheel, as fractions of wheelRadius. The slice
+    // labels sit at its midpoint, so move these together.
+    static MODE_WHEEL_MIN_RADIUS = 0.4;
+    static MODE_WHEEL_MAX_RADIUS = 0.75;
     static MIN_EDO = 5;
     static MAX_EDO = 55;
     static MAX_TITLE_FONT_SIZE = 48;
     static MIN_TITLE_FONT_SIZE = 10;
     static TITLE_FONT_SCALE = 580;
+    static MIN_SLICE_DEGREES = 12;
 
     /**
      * @param {object} activity
@@ -349,7 +356,7 @@ class ModeWidget {
             { edo: 7, key: "equal7", label: "7-EDO" },
             { edo: 12, key: "equal", label: "12-EDO (Equal)" },
             { edo: 17, key: "equal17", label: "17-EDO" },
-            { edo: 19, key: "equal19", label: "19-EDO (Meantone)" },
+            { edo: 19, key: "equal19", label: "19-EDO (Equal)" },
             { edo: 31, key: "equal31", label: "31-EDO" }
         ];
 
@@ -401,10 +408,16 @@ class ModeWidget {
         select.addEventListener("change", () => {
             const key = select.value;
             if (!key || key === this._activeTemperamentKey) {
+                this._syncDropdown();
+                return;
+            }
+            if (!this._isKnownTemperament(key)) {
+                this._syncDropdown();
                 return;
             }
             const newEDO = getCurrentEDO(key);
-            if (isNaN(newEDO) || newEDO < ModeWidget.MIN_EDO || newEDO > ModeWidget.MAX_EDO) {
+            if (!this._isValidEDO(newEDO)) {
+                this._syncDropdown();
                 return;
             }
 
@@ -416,30 +429,31 @@ class ModeWidget {
 
             const bothEqual =
                 isEquallyTempered(this._activeTemperamentKey) && isEquallyTempered(key);
-            const oldEDO = getCurrentEDO(this._activeTemperamentKey);
+            const oldEDO = this._activeEDO;
 
             if (bothEqual) {
                 this._cacheState(oldEDO);
             }
 
-            this.logo.synth.inTemperament = key;
             this._activeTemperamentKey = key;
+            this.logo.synth.inTemperament = key;
 
             // _translateNotesToEDO() and _restoreState() must run while
             // this._activeEDO still holds the OLD EDO: _translateNotesToEDO
             // reads it to know what to rescale from, and its no-op guard
             // (newEDO === this._activeEDO) would otherwise always be true if
             // this._activeEDO were already set to newEDO here.
+            let restoredFromCache = false;
             if (bothEqual) {
                 if (this._edoNoteCache[newEDO] !== undefined) {
                     this._restoreState(newEDO);
+                    restoredFromCache = true;
                 } else {
                     this._translateNotesToEDO(newEDO);
                 }
             }
-            this._activeEDO = newEDO;
 
-            this._rebuildWheel(newEDO);
+            this._rebuildWheel(newEDO, select);
             const tName = TEMPERAMENT[key]?.name || key;
             this.textMsg(
                 _(
@@ -467,23 +481,17 @@ class ModeWidget {
                 }
             }
 
-            // Preserve the current mode name across EDO switches.
-            // _setModeName() does a reverse-lookup from the note pattern,
-            // which changes when notes are translated to a different EDO.
-            // Instead, use the stored mode name so it persists.
-            const currentKey = keySignatureToMode(this.turtles.ithTurtle(0).singer.keySignature)[0];
-            const name = currentKey + " " + _(this._selectedModeName);
-            this._updateModeDisplay(name);
-            if (this._nameInput) {
-                this._nameInput.value = _(this._selectedModeName);
-            }
-            // Still sync the modename block in the workspace
-            this._syncModeBlockName();
+            // Re-derive the name from the notes that are actually selected; a
+            // cached restore can bring back a different mode than the one the
+            // user left, so keeping the old label would misdescribe the wheel.
+            this._setModeName();
 
-            // Only warn when going to a lesser EDO, where notes can be dropped
-            // by the rounding in _translateNotesToEDO. Lesser→greater only adds
-            // steps, so no message is needed.
-            if (bothEqual && oldEDO > newEDO) {
+            if (restoredFromCache && oldEDO !== newEDO) {
+                this.textMsg(_(`Restored your ${newEDO}-EDO selection.`), 3000);
+            } else if (bothEqual && oldEDO > newEDO) {
+                // Only warn when going to a lesser EDO, where notes can be dropped
+                // by the rounding in _translateNotesToEDO. Lesser→greater only adds
+                // steps, so no message is needed.
                 this.textMsg(
                     _(
                         `Mode remapped from ${oldEDO}-EDO to ${newEDO}-EDO. Some notes may have changed.`
@@ -493,19 +501,51 @@ class ModeWidget {
             }
         });
     }
-    _rebuildWheel(edoCount) {
+    _rebuildWheel(edoCount, select = this._edoSelect) {
         this._cancelAnimations();
-        this._activeEDO = edoCount;
         this._undoStack = []; // Clear stale undo entries from old EDO
-        // Only map EDO to a built-in temperament key when the active
-        // temperament is equally tempered; non-equal temperaments (just
-        // intonation, meantone, ...) keep their own key even though their
-        // pitch count collides with an equal EDO.
-        if (isEquallyTempered(this._activeTemperamentKey)) {
-            this.logo.synth.inTemperament = this._temperamentKeyForEDO(edoCount);
+        // A tuning may only be shown at its own pitch count. Map to equal N
+        // when the active key cannot serve this wheel; keep a matching key
+        // (including user-defined temperaments) untouched.
+        const key =
+            this._isKnownTemperament(this._activeTemperamentKey) &&
+            getCurrentEDO(this._activeTemperamentKey) === edoCount
+                ? this._activeTemperamentKey
+                : this._temperamentKeyForEDO(edoCount);
+        this._activeTemperamentKey = key;
+        this.logo.synth.inTemperament = key;
+        this._activeEDO = edoCount;
+        if (select) {
+            const label = isEquallyTempered(key)
+                ? edoCount + "-EDO"
+                : TEMPERAMENT[key]?.name || key;
+            // The dropdown may lack an option for an unusual value (e.g. 21
+            // from 1/4 comma meantone); add it so .value sticks. Compare option
+            // values instead of building a selector: `key` is a temperament key
+            // from the saved project, and temperament blocks are user-renamable,
+            // so it can contain characters that break a selector.
+            if (![...select.options].some(option => option.value === key)) {
+                const opt = document.createElement("option");
+                opt.value = key;
+                opt.textContent = label;
+                select.appendChild(opt);
+            }
+            select.value = key;
         }
         this._rebuildModeIndex();
         this._piemenuMode();
+    }
+
+    /** True only for keys defined directly on TEMPERAMENT, not object built-ins. */
+    _isKnownTemperament(key) {
+        return typeof key === "string" && Object.prototype.hasOwnProperty.call(TEMPERAMENT, key);
+    }
+
+    /** Shows the active tuning in the dropdown without changing any state. */
+    _syncDropdown() {
+        if (this._edoSelect) {
+            this._edoSelect.value = this._activeTemperamentKey;
+        }
     }
 
     _clearPieMenu() {
@@ -596,7 +636,12 @@ class ModeWidget {
         }
     }
 
-    _saveCustomMode(name, pattern, edo = this._activeEDO) {
+    _saveCustomMode(
+        name,
+        pattern,
+        edo = this._activeEDO,
+        temperamentKey = this._activeTemperamentKey
+    ) {
         if (!Number.isInteger(edo)) {
             this.errorMsg(_("Invalid EDO for mode."));
             return false;
@@ -621,7 +666,13 @@ class ModeWidget {
                 return false;
             }
         }
-        const entry = { name, pattern, edo };
+        // A stored key must describe the same pitch count as the pattern;
+        // otherwise reopening the mode draws one tuning over another.
+        const storedKey =
+            this._isKnownTemperament(temperamentKey) && getCurrentEDO(temperamentKey) === edo
+                ? temperamentKey
+                : this._temperamentKeyForEDO(edo);
+        const entry = { name, pattern, edo, temperamentKey: storedKey };
         if (existing >= 0) {
             modes[existing] = entry;
         } else {
@@ -651,10 +702,8 @@ class ModeWidget {
         this._rebuildModeIndex();
     }
 
-    _getModeEDO(modeName) {
-        // Saved custom modes carry their native EDO in the registry.
-        const custom = getSavedCustomModes().find(m => m.name === modeName);
-        return custom && custom.edo ? custom.edo : null;
+    _isValidEDO(edo) {
+        return !isNaN(edo) && edo >= ModeWidget.MIN_EDO && edo <= ModeWidget.MAX_EDO;
     }
 
     // ── Bottom control bar ────────────────────────────────────────
@@ -888,47 +937,44 @@ class ModeWidget {
             return;
         }
 
-        const nativeEDO = this._getModeEDO(currentModeName[1]);
-        if (nativeEDO && nativeEDO !== this._activeEDO) {
-            // Custom mode saved at a different EDO — rebuild the wheel to
-            // match its native tuning before applying the pattern.
-            // edoSelect is null here (built later); _loadMode handles that.
-            this._loadMode(currentModeName[1], currentMode, null);
-        } else {
-            this._applyModePattern(
-                nativeEDO ? currentMode : this._modeStepPattern(currentModeName[1], null)
-            );
-            this._setModeName();
-        }
+        // _loadMode covers a different native EDO and a same-EDO temperament drift.
+        this._loadMode(currentModeName[1], currentMode, null);
     }
 
     _loadMode(modeName, mode, edoSelect) {
-        const nativeEDO = this._getModeEDO(modeName);
+        const custom = getSavedCustomModes().find(m => m.name === modeName);
+        const nativeEDO = custom && custom.edo ? custom.edo : null;
+        const modeEDO = nativeEDO || this._activeEDO;
+        const savedKey = custom && custom.temperamentKey ? custom.temperamentKey : null;
+        // A mode carries its tuning. Adopt the saved key when it serves the
+        // mode's pitch count, otherwise equal N; never draw one tuning's ring
+        // over another tuning's playback.
+        const savedKeyMatches =
+            savedKey &&
+            this._isKnownTemperament(savedKey) &&
+            this._isValidEDO(modeEDO) &&
+            getCurrentEDO(savedKey) === modeEDO;
         if (nativeEDO && nativeEDO !== this._activeEDO) {
-            // The saved mode was authored in a different tuning, so sync the
-            // tuning dropdown and rebuild the wheel before selecting intervals.
-            // Cache the outgoing state exactly like the dropdown handler so
-            // round-trips restore it losslessly.
             const oldEDO = this._activeEDO;
             this._cacheState(oldEDO);
-            if (edoSelect) {
-                // The dropdown may lack an option for an unusual native EDO
-                // (e.g. 21 from 1/4 comma meantone); add it so .value sticks.
-                if (!edoSelect.querySelector(`option[value="${nativeEDO}"]`)) {
-                    const opt = document.createElement("option");
-                    opt.value = nativeEDO;
-                    opt.textContent = nativeEDO + "-EDO";
-                    edoSelect.appendChild(opt);
-                }
-                edoSelect.value = nativeEDO;
-            }
-            this._rebuildWheel(nativeEDO);
+            this._activeTemperamentKey = savedKeyMatches
+                ? savedKey
+                : this._temperamentKeyForEDO(nativeEDO);
+            this._rebuildWheel(nativeEDO, edoSelect);
             this.textMsg(
                 _(
                     `Mode ${modeName} is ${nativeEDO}-EDO; tuning switched from ${oldEDO}-EDO to ${nativeEDO}-EDO.`
                 ),
                 3000
             );
+        } else if (
+            savedKeyMatches &&
+            (savedKey !== this._activeTemperamentKey || savedKey !== this.logo.synth.inTemperament)
+        ) {
+            const savedName = TEMPERAMENT[savedKey]?.name || savedKey;
+            this._activeTemperamentKey = savedKey;
+            this._rebuildWheel(modeEDO, edoSelect);
+            this.textMsg(_(`Mode ${modeName} restored temperament ${savedName}.`), 3000);
         }
         // Built-in mode patterns are resolved via _modeStepPattern so
         // non-EDO temperaments use ratio-derived steps. Custom modes carry
@@ -936,9 +982,9 @@ class ModeWidget {
         const isCustom = !MUSICALMODES[modeName];
         const pattern = isCustom ? mode : nativeEDO ? mode : this._modeStepPattern(modeName, null);
         this._applyModePattern(pattern);
-        // Cache the incoming state so switching away and back preserves it.
+        // Cache under the active EDO: a restore may have rebuilt to a different pitch count.
         if (nativeEDO) {
-            this._cacheState(nativeEDO);
+            this._cacheState(this._activeEDO);
         }
         this._setModeName();
     }
@@ -1297,8 +1343,17 @@ class ModeWidget {
 
         // Check custom modes first — they take priority over built-in modes
         // when patterns match, since they are EDO-specific.
+        const savedByName = new Map(getSavedCustomModes().map(m => [m.name, m]));
         for (const mode of this._customModeNames) {
             if (!(mode in MUSICALMODES)) {
+                continue;
+            }
+            // Customs are EDO-specific: a rescaled cross-EDO pattern can
+            // collapse onto a built-in (e.g. 41-EDO major onto 12-EDO major),
+            // so only match customs authored at the active EDO. Entries
+            // without edo predate that field and keep matching as before.
+            const nativeEDO = savedByName.get(mode)?.edo;
+            if (nativeEDO && nativeEDO !== this._activeEDO) {
                 continue;
             }
             const modePattern = this._modeStepPattern(mode, null);
@@ -1630,7 +1685,19 @@ class ModeWidget {
             const parsed = this._parseImportFile(data);
             if (!parsed) return;
             const name = this._resolveBuiltInCollision(parsed.name, parsed.edo);
-            if (!this._saveCustomMode(name, parsed.pattern, parsed.edo)) return;
+            // The import retunes to _temperamentKeyForEDO(parsed.edo) in
+            // _applyImportedMode below; store that target key, not the
+            // still-previous _activeTemperamentKey.
+            if (
+                !this._saveCustomMode(
+                    name,
+                    parsed.pattern,
+                    parsed.edo,
+                    this._temperamentKeyForEDO(parsed.edo)
+                )
+            ) {
+                return;
+            }
             this._applyImportedMode(parsed.edo, parsed.pattern, name);
         });
     }
@@ -1715,8 +1782,81 @@ class ModeWidget {
         }, 2000);
     }
 
+    /** Title font size for a wheel of `count` slices, clamped to the widget's limits. */
+    _titleFontSize(count) {
+        return Math.min(
+            ModeWidget.MAX_TITLE_FONT_SIZE,
+            Math.max(
+                ModeWidget.MIN_TITLE_FONT_SIZE,
+                Math.floor(ModeWidget.TITLE_FONT_SCALE / count)
+            )
+        );
+    }
+
+    /**
+     * Hides labels on slices too narrow to hold them. A hidden label is not
+     * lost: hovering its slice reveals it, and selecting the slice keeps it
+     * shown (see `_syncNarrowLabels`).
+     */
+    _hideNarrowLabels(wheel) {
+        if (!Array.isArray(wheel.navItems)) {
+            return;
+        }
+        const labelRadius =
+            (ModeWidget.MODE_WHEEL_MIN_RADIUS + ModeWidget.MODE_WHEEL_MAX_RADIUS) / 2;
+        const fontSize = this._titleFontSize(wheel.navItems.length);
+        for (const item of wheel.navItems) {
+            const title = typeof item.title === "string" ? item.title.trim() : "";
+            if (
+                !Number.isFinite(item.sliceAngle) ||
+                title.length === 0 ||
+                !item.navTitle ||
+                !item.navItem
+            ) {
+                continue;
+            }
+            const available = getModeSliceArc(wheel.wheelRadius, item.sliceAngle, labelRadius);
+            // Roughly 0.6em per character is the usual sans-serif advance width.
+            item._narrow = available < fontSize * 0.6 * title.length;
+            if (item._narrow) {
+                item.navItem.mouseover(() => item.navTitle.show());
+                item.navItem.mouseout(() => {
+                    if (!item.selected) {
+                        item.navTitle.hide();
+                    }
+                });
+            } else {
+                item.navTitle.show();
+            }
+        }
+        // createWheel() force-selects the root slice, so honour any selection
+        // already in place instead of hiding labels unconditionally.
+        this._syncNarrowLabels(wheel);
+    }
+
+    /** Keeps the selected narrow slice's label visible; hides the rest. */
+    _syncNarrowLabels(wheel) {
+        if (!Array.isArray(wheel.navItems)) {
+            return;
+        }
+        for (const item of wheel.navItems) {
+            if (!item._narrow || !item.navTitle) {
+                continue;
+            }
+            item.navTitle[item.selected ? "show" : "hide"]();
+        }
+    }
+
     _piemenuMode() {
         const n = this._activeEDO;
+        // One floored array feeds all three rings, so they stay aligned.
+        const proportional = enforceMinSliceAngles(
+            getTemperamentSliceAngles(this._activeTemperamentKey, n),
+            ModeWidget.MIN_SLICE_DEGREES
+        );
+        // Slice i spans pitch i..i+1; the helper's slice 0 held the wrap gap.
+        const sliceAngles = rotateSliceAngles(proportional);
+        const navAngle = Array.isArray(sliceAngles) ? -90 + sliceAngles[0] / 2 : -90;
 
         // Explicitly clear any existing wheels and leftover SVG slices before
         // rendering with the current EDO count.
@@ -1737,31 +1877,31 @@ class ModeWidget {
         this._noteWheel = new wheelnav("_noteWheel", this._modeWheel.raphael);
         this._playWheel = new wheelnav("_playWheel", this._modeWheel.raphael);
 
-        this._createModeWheel(n);
-        this._createNoteWheel(n);
-        this._createPlayWheel(n);
+        this._createModeWheel(n, sliceAngles, navAngle);
+        this._createNoteWheel(n, sliceAngles, navAngle);
+        this._createPlayWheel(n, sliceAngles, navAngle);
         this._wireWheelEvents(n);
     }
 
-    _createModeWheel(n) {
-        const titleFontSize = Math.min(
-            ModeWidget.MAX_TITLE_FONT_SIZE,
-            Math.max(ModeWidget.MIN_TITLE_FONT_SIZE, Math.floor(ModeWidget.TITLE_FONT_SCALE / n))
-        );
+    _createModeWheel(n, sliceAngles, navAngle) {
+        const titleFontSize = this._titleFontSize(n);
         configureWheel(this._modeWheel, {
             colors: platformColor.modeWheelcolors,
-            minRadius: 0.4,
-            maxRadius: 0.75,
+            minRadius: ModeWidget.MODE_WHEEL_MIN_RADIUS,
+            maxRadius: ModeWidget.MODE_WHEEL_MAX_RADIUS,
             clickModeRotate: false,
             selectionPaths: true,
             titleFont: "400 " + titleFontSize + "px sans-serif",
-            navAngle: -90,
+            navAngle: navAngle,
             animatetime: 0
         });
-        this._modeWheel.createWheel(Array.from({ length: n }, (_, i) => String(i)));
+        this._modeWheel.initWheel(Array.from({ length: n }, (_, i) => String(i)));
+        applySliceAngles(this._modeWheel, sliceAngles);
+        this._modeWheel.createWheel();
+        this._hideNarrowLabels(this._modeWheel);
     }
 
-    _createNoteWheel(n) {
+    _createNoteWheel(n, sliceAngles, navAngle) {
         configureWheel(this._noteWheel, {
             colors: platformColor.noteValueWheelcolors,
             minRadius: 0.75,
@@ -1769,7 +1909,7 @@ class ModeWidget {
             clickModeRotate: false,
             selectionPaths: true,
             titleRotateAngle: 90,
-            navAngle: -90,
+            navAngle: navAngle,
             animatetime: 0
         });
 
@@ -1778,10 +1918,12 @@ class ModeWidget {
 
         // Slice 0: blank (no X toggle — root is always selected)
         // Slices 1..n-1: "x" toggle (dynamic EDO layout)
-        this._noteWheel.createWheel([" ", ...new Array(n - 1).fill("x")]);
+        this._noteWheel.initWheel([" ", ...new Array(n - 1).fill("x")]);
+        applySliceAngles(this._noteWheel, sliceAngles);
+        this._noteWheel.createWheel();
     }
 
-    _createPlayWheel(n) {
+    _createPlayWheel(n, sliceAngles, navAngle) {
         configureWheel(this._playWheel, {
             colors: [platformColor.orange],
             minRadius: 0.3,
@@ -1789,11 +1931,13 @@ class ModeWidget {
             clickModeRotate: false,
             selectionPaths: true,
             titleRotateAngle: 90,
-            navAngle: -90,
+            navAngle: navAngle,
             animatetime: 0
         });
 
-        this._playWheel.createWheel(new Array(n).fill(" "));
+        this._playWheel.initWheel(new Array(n).fill(" "));
+        applySliceAngles(this._playWheel, sliceAngles);
+        this._playWheel.createWheel();
 
         for (let i = 0; i < n; i++) {
             this._playWheel.navItems[i].navItem.hide();
@@ -1802,6 +1946,7 @@ class ModeWidget {
 
     _wireWheelEvents(n) {
         const __setNote = () => {
+            this._syncNarrowLabels(this._modeWheel);
             const i = this._modeWheel.selectedNavItemIndex;
             if (i === 0) {
                 return;

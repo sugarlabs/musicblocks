@@ -65,6 +65,26 @@ jobs:
             minor: ${{ steps.release.outputs.minor }}
             patch: ${{ steps.release.outputs.patch }}
         steps:
+            # GitHub rejects a release body over 125,000 characters, and then
+            # release-please creates neither the release nor its tag (#8889).
+            # Before release-please publishes a merged release PR, trim the
+            # notes it stored in release-notes.md. CHANGELOG.md keeps the full
+            # list. Does nothing on other pushes, and never blocks the release.
+            - name: Check out the release-notes cap script
+              uses: actions/checkout@v4
+              with:
+                  sparse-checkout: .github/scripts/cap-release-notes.js
+                  sparse-checkout-cone-mode: false
+                  persist-credentials: false
+
+            - name: Keep the release body under GitHub's limit
+              continue-on-error: true
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const { run } = require("./.github/scripts/cap-release-notes.js");
+                      await run({ github, context, core });
+
             - name: Run release-please
               id: release
               uses: googleapis/release-please-action@v4

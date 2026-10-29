@@ -67,12 +67,66 @@ describe("musicutils-pitch", () => {
         expect(pitch.numberToPitchSharp(-1, "equal19")).toEqual(["A♭", 0]);
     });
 
+    describe("numberToPitchSharp constant-time calculations", () => {
+        it("accurately computes boundary pitch and octave transitions across positive and negative ranges", () => {
+            // C0 boundary: i = -9 is C0, i = -10 is B-1
+            expect(pitch.numberToPitchSharp(-9, "equal")).toEqual(["C", 0]);
+            expect(pitch.numberToPitchSharp(-10, "equal")).toEqual(["B", -1]);
+
+            // C-1 boundary: i = -21 is C-1, i = -22 is B-2
+            expect(pitch.numberToPitchSharp(-21, "equal")).toEqual(["C", -1]);
+            expect(pitch.numberToPitchSharp(-22, "equal")).toEqual(["B", -2]);
+
+            // Octave intervals: multiples of 12 from A0 (i = 0)
+            expect(pitch.numberToPitchSharp(-12, "equal")).toEqual(["A", -1]);
+            expect(pitch.numberToPitchSharp(-24, "equal")).toEqual(["A", -2]);
+            expect(pitch.numberToPitchSharp(-36, "equal")).toEqual(["A", -3]);
+            expect(pitch.numberToPitchSharp(-48, "equal")).toEqual(["A", -4]);
+            expect(pitch.numberToPitchSharp(12, "equal")).toEqual(["A", 1]);
+            expect(pitch.numberToPitchSharp(24, "equal")).toEqual(["A", 2]);
+            expect(pitch.numberToPitchSharp(36, "equal")).toEqual(["A", 3]);
+            expect(pitch.numberToPitchSharp(48, "equal")).toEqual(["A", 4]);
+        });
+
+        it("handles deep negative and large positive pitch numbers in constant time", () => {
+            // -120 semitones = -10 octaves from A0 -> A-10
+            expect(pitch.numberToPitchSharp(-120, "equal")).toEqual(["A", -10]);
+            // -117 semitones = 3 semitones above A-10 -> C-9
+            expect(pitch.numberToPitchSharp(-117, "equal")).toEqual(["C", -9]);
+            // 120 semitones = +10 octaves from A0 -> A10
+            expect(pitch.numberToPitchSharp(120, "equal")).toEqual(["A", 10]);
+        });
+
+        it("accurately calculates microtonal octaves and pitch names below zero", () => {
+            // In 19-EDO, A0 is at i = 0.
+            expect(pitch.numberToPitchSharp(0, "equal19")).toEqual(["A", 0]);
+            expect(pitch.numberToPitchSharp(-19, "equal19")).toEqual(["A", -1]);
+            expect(pitch.numberToPitchSharp(-38, "equal19")).toEqual(["A", -2]);
+
+            // In 31-EDO
+            expect(pitch.numberToPitchSharp(0, "equal31")).toEqual(["A", 0]);
+            expect(pitch.numberToPitchSharp(-31, "equal31")).toEqual(["A", -1]);
+        });
+
+        it("preserves rounding for fractional pitch numbers", () => {
+            expect(pitch.numberToPitchSharp(0.6, "equal")).toEqual(["A♯", 0]);
+            expect(pitch.numberToPitchSharp(0.4, "equal")).toEqual(["A", 0]);
+            expect(pitch.numberToPitchSharp(-0.4, "equal")).toEqual(["A", 0]);
+            expect(pitch.numberToPitchSharp(-0.6, "equal")).toEqual(["G♯", 0]);
+            expect(pitch.numberToPitchSharp(2.6, "equal")).toEqual(["C", 0]);
+        });
+    });
+
     it("strips at most two microtonal prefix characters from the start of a note", () => {
         expect(pitch.stripMicrotonalPrefix("^C4")).toBe("C4");
         expect(pitch.stripMicrotonalPrefix("^^C4")).toBe("C4");
         expect(pitch.stripMicrotonalPrefix("vvC4")).toBe("C4");
         expect(pitch.stripMicrotonalPrefix("^^^C4")).toBe("^C4");
         expect(pitch.stripMicrotonalPrefix("x^C4")).toBe("x^C4");
+        expect(pitch.stripMicrotonalPrefix(undefined)).toBe("");
+        expect(pitch.stripMicrotonalPrefix(null)).toBe("");
+        expect(pitch.stripMicrotonalPrefix(42)).toBe("");
+        expect(pitch.stripMicrotonalPrefix({})).toBe("");
     });
 
     describe("normalizeNoteAccidentals", () => {
@@ -99,6 +153,10 @@ describe("musicutils-pitch", () => {
             expect(pitch.normalizeNoteAccidentals("D4")).toBe("D4");
             expect(pitch.normalizeNoteAccidentals("A0")).toBe("A0");
             expect(pitch.normalizeNoteAccidentals("")).toBe("");
+            expect(pitch.normalizeNoteAccidentals(undefined)).toBe("");
+            expect(pitch.normalizeNoteAccidentals(null)).toBe("");
+            expect(pitch.normalizeNoteAccidentals(42)).toBe("");
+            expect(pitch.normalizeNoteAccidentals({})).toBe("");
             expect(pitch.normalizeNoteAccidentals("Do")).toBe("Do");
             expect(pitch.normalizeNoteAccidentals("rest")).toBe("rest");
         });
@@ -214,12 +272,48 @@ describe("musicutils-pitch", () => {
         });
     });
 
+    describe("_calculate_pitch_number across the B/C boundary (#9765)", () => {
+        const fn = (name, octave) => pitch._calculate_pitch_number(name, octave, 0, "equal");
+
+        it("moves B sharps up an octave", () => {
+            expect(fn("B♯", 4)).toBe(fn("C", 5));
+            expect(fn("B#", 4)).toBe(72);
+            expect(fn("B𝄪", 4)).toBe(fn("C♯", 5));
+            expect(fn("Bx", 4)).toBe(73);
+        });
+
+        it("moves C flats down an octave", () => {
+            expect(fn("C♭", 4)).toBe(fn("B", 3));
+            expect(fn("Cb", 4)).toBe(59);
+            expect(fn("C𝄫", 4)).toBe(fn("B♭", 3));
+            expect(fn("C𝄫", 4)).toBe(58);
+        });
+
+        it("leaves spellings that stay inside the octave alone", () => {
+            expect(fn("C", 4)).toBe(60);
+            expect(fn("B", 4)).toBe(71);
+            expect(fn("E♯", 4)).toBe(fn("F", 4));
+            expect(fn("F♭", 4)).toBe(fn("E", 4));
+            expect(fn("A𝄪", 4)).toBe(fn("B", 4));
+            expect(fn("D𝄫", 4)).toBe(fn("C", 4));
+        });
+    });
+
     describe("getNumber", () => {
         it("handles double-sharp accidentals including 'x', '##', '*', and unicode '𝄪'", () => {
             expect(pitch.getNumber("Cx", 4, "equal")).toBe(39);
             expect(pitch.getNumber("C##", 4, "equal")).toBe(39);
             expect(pitch.getNumber("C*", 4, "equal")).toBe(39);
             expect(pitch.getNumber("C𝄪", 4, "equal")).toBe(39);
+        });
+
+        it("handles lowercase note names and microtonal prefixes", () => {
+            expect(pitch.getNumber("c", 4, "equal")).toBe(37);
+            expect(pitch.getNumber("d", 4, "equal")).toBe(39);
+            expect(pitch.getNumber("bb", 4, "equal")).toBe(47);
+            expect(pitch.getNumber("c#", 4, "equal")).toBe(38);
+            expect(pitch.getNumber("^C", 4, "equal")).toBe(37);
+            expect(pitch.getNumber("vD", 4, "equal")).toBe(39);
         });
     });
 

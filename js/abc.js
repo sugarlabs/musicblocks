@@ -22,16 +22,19 @@
 // This header is prepended to the Abc output.
 const ABCHEADER = "X:1\nT:Music Blocks composition\nC:Mr. Mouse\nL:1/16\nM:C\n";
 const OCTAVE_NOTATION_MAP = {
-    10: "'''''",
-    9: "''''",
-    8: "'''",
-    7: "''",
-    6: "'",
-    5: "",
-    4: "",
-    3: ",",
-    2: ",,",
-    1: ",,,"
+    "10": "'''''",
+    "9": "''''",
+    "8": "'''",
+    "7": "''",
+    "6": "'",
+    "5": "",
+    "4": "",
+    "3": ",",
+    "2": ",,",
+    "1": ",,,",
+    "0": ",,,,",
+    "-1": ",,,,,",
+    "-2": ",,,,,,"
 };
 
 const ACCIDENTAL_MAP = {
@@ -51,7 +54,7 @@ const PITCH_ACCIDENTAL_PATTERN = new RegExp(`^([A-Ga-g])([${ACCIDENTAL_SYMBOLS}]
 // A staged pitch name: a letter, then accidentals, an octave, and the accidental a courtesy
 // natural adds after the octave ("C♯4", "F4♮").
 const STAGED_PITCH_PATTERN = new RegExp(
-    `^([A-Ga-g])([${ACCIDENTAL_SYMBOLS}]*)(\\d+)([${ACCIDENTAL_SYMBOLS}]*)$`,
+    `^([A-Ga-g])([${ACCIDENTAL_SYMBOLS}]*)(-?\\d+)([${ACCIDENTAL_SYMBOLS}]*)$`,
     "u"
 );
 
@@ -208,6 +211,16 @@ const convertDuration = function (duration, dotCount = 0) {
     return `${num}/${den}`;
 };
 
+const lilypondDurationToWholeNotes = duration => {
+    let wholeNotes = 0;
+    for (const token of String(duration).trim().split(/\s+/)) {
+        const match = /^(\d+)(\.*)$/.exec(token);
+        if (match === null || Number(match[1]) === 0) return NaN;
+        wholeNotes += (1 / Number(match[1])) * (2 - 1 / Math.pow(2, match[2].length));
+    }
+    return wholeNotes;
+};
+
 class AbcExporter {
     constructor(logo, turtle, keySignature, voiceId = "") {
         this.logo = logo;
@@ -234,10 +247,20 @@ class AbcExporter {
         this.pendingAnnotations = [];
         this.prefixStart = null;
         this.queueSlur = 0;
+        this.activeVoice = 0;
+        this.voiceStates = {};
+        this.pickupDuration = null;
+        this.pickupOffset = null;
+        this.firstMeasure = true;
+        this.lastBarSixteenths = null;
+        this.currentMeterField = null;
 
         const { field: keyField, alterations: keyAlterations } = abcKeySignature(keySignature);
         this.keyField = keyField;
         this.keyAlterations = keyAlterations;
+        // The voice's K: field: the key it starts in, or one set before its first note.
+        this.startKeyField = keyField;
+        this.hasNotes = false;
         this.accidentalsInForce = {};
         this.pitchesInDoubt = new Set();
     }
@@ -258,7 +281,36 @@ class AbcExporter {
         return "[V:" + this.voiceId + (n === 0 ? "" : "v" + n) + "]";
     }
 
-    __voiceChanged() {
+    __voiceChanged(n = 0) {
+        if (this.voiceStates) {
+            this.voiceStates[this.activeVoice] = {
+                sixteenths: this.sixteenths,
+                measureSixteenths: this.measureSixteenths,
+                pickupDuration: this.pickupDuration,
+                firstMeasure: this.firstMeasure,
+                lastBarSixteenths: this.lastBarSixteenths
+            };
+            this.activeVoice = n;
+            const state = this.voiceStates[this.activeVoice] || {
+                sixteenths: 0,
+                measureSixteenths: this.measureSixteenths,
+                pickupDuration:
+                    this.pickupOffset !== null ? this.pickupOffset : this.pickupDuration,
+                firstMeasure: true,
+                lastBarSixteenths: null,
+                pendingMeter: this.currentMeterField
+            };
+            this.sixteenths = state.sixteenths;
+            this.measureSixteenths = state.measureSixteenths;
+            this.pickupDuration = state.pickupDuration;
+            this.firstMeasure = state.firstMeasure;
+            this.lastBarSixteenths = state.lastBarSixteenths;
+
+            if (state.pendingMeter) {
+                this.__pushField(state.pendingMeter, true);
+                delete state.pendingMeter;
+            }
+        }
         this.pitchesInDoubt = new Set(Object.keys(this.accidentalsInForce));
     }
 
@@ -322,10 +374,10 @@ class AbcExporter {
             note = note.replace(accidentalSymbols, "");
         }
 
-        const match = note.match(/\d+$/);
+        const match = note.match(/-?\d+$/);
         const octave = match ? parseInt(match[0], 10) : null;
         if (octave !== null && OCTAVE_NOTATION_MAP[octave] !== undefined) {
-            note = note.replace(/\d+$/, OCTAVE_NOTATION_MAP[octave]);
+            note = note.replace(/-?\d+$/, OCTAVE_NOTATION_MAP[octave]);
         }
 
         if (octave !== null) {
@@ -343,6 +395,11 @@ class AbcExporter {
     // barline and leaves every later one where it belongs.
     __onBarline() {
         if (this.measureSixteenths <= 0 || this.sixteenths <= 0) return false;
+        if (this.pickupDuration !== null && this.pickupDuration > 0) {
+            if (this.sixteenths < this.pickupDuration) return false;
+            const into = (this.sixteenths - this.pickupDuration) % this.measureSixteenths;
+            return into < 1e-6 || this.measureSixteenths - into < 1e-6;
+        }
         const into = this.sixteenths % this.measureSixteenths;
         return into < 1e-6 || this.measureSixteenths - into < 1e-6;
     }
@@ -373,6 +430,24 @@ class AbcExporter {
         this.parts.splice(at, 0, ...insert);
         if (this.prefixStart !== null) {
             this.prefixStart += insert.length;
+        }
+    }
+
+    __pushBarLine() {
+        if (this.lastBarSixteenths !== null && this.lastBarSixteenths === this.sixteenths) {
+            return;
+        }
+        const at = this.prefixStart === null ? this.parts.length : this.prefixStart;
+        const written = this.parts.slice(0, at).join("");
+        const trimmed = written.trimEnd();
+        if (trimmed.endsWith("|") || trimmed.endsWith("|:") || trimmed.endsWith(":|")) {
+            this.lastBarSixteenths = this.sixteenths;
+            return;
+        }
+        this.parts.splice(at, 0, "| ");
+        this.lastBarSixteenths = this.sixteenths;
+        if (this.prefixStart !== null) {
+            this.prefixStart += 1;
         }
     }
 
@@ -420,11 +495,36 @@ class AbcExporter {
                 break;
             case "begin repeat":
                 if (i === this.repeatStart) {
-                    this.parts.push("|: ");
+                    const at = this.prefixStart === null ? this.parts.length : this.prefixStart;
+                    let replaced = false;
+                    for (let p = at - 1; p >= 0 && p >= at - 2; p--) {
+                        if (this.parts[p] === "| ") {
+                            this.parts[p] = "|: ";
+                            replaced = true;
+                            break;
+                        }
+                    }
+                    if (!replaced) {
+                        this.parts.splice(at, 0, "|: ");
+                        if (this.prefixStart !== null) {
+                            this.prefixStart += 1;
+                        }
+                    }
+                    this.lastBarSixteenths = this.sixteenths;
                 }
                 break;
             case "end slur":
-                if (this.parts.length > 0 && this.parts[this.parts.length - 1].endsWith(" ")) {
+                if (this.parts.length > 0 && this.parts[this.parts.length - 1] === "| ") {
+                    if (this.parts.length > 1 && this.parts[this.parts.length - 2].endsWith(" ")) {
+                        const last = this.parts[this.parts.length - 2];
+                        this.parts[this.parts.length - 2] = last.slice(0, -1) + ") ";
+                    } else {
+                        this.parts.splice(this.parts.length - 1, 0, ")");
+                    }
+                } else if (
+                    this.parts.length > 0 &&
+                    this.parts[this.parts.length - 1].endsWith(" ")
+                ) {
                     const last = this.parts[this.parts.length - 1];
                     this.parts[this.parts.length - 1] = last.slice(0, -1) + ") ";
                 } else {
@@ -432,7 +532,17 @@ class AbcExporter {
                 }
                 break;
             case "tie":
-                if (this.parts.length > 0 && this.parts[this.parts.length - 1].endsWith(" ")) {
+                if (this.parts.length > 0 && this.parts[this.parts.length - 1] === "| ") {
+                    if (this.parts.length > 1 && this.parts[this.parts.length - 2].endsWith(" ")) {
+                        const last = this.parts[this.parts.length - 2];
+                        this.parts[this.parts.length - 2] = last.slice(0, -1) + "- ";
+                    } else {
+                        this.parts.splice(this.parts.length - 1, 0, "-");
+                    }
+                } else if (
+                    this.parts.length > 0 &&
+                    this.parts[this.parts.length - 1].endsWith(" ")
+                ) {
                     const last = this.parts[this.parts.length - 1];
                     this.parts[this.parts.length - 1] = last.slice(0, -1) + "- ";
                 } else {
@@ -441,13 +551,33 @@ class AbcExporter {
                 break;
             case "meter":
                 if (Number(this.staging[i + 1]) > 0 && Number(this.staging[i + 2]) > 0) {
+                    const num = Number(this.staging[i + 1]);
+                    const den = Number(this.staging[i + 2]);
+                    const newMeasureSixteenths = (num * 16) / den;
+                    const meterField = `M:${num}/${den}\n`;
+                    this.currentMeterField = meterField;
+
                     // A meter arriving part way through a measure still closes it.
-                    if (this.sixteenths > 0) this.__pushField("| ");
-                    this.__pushField(`M:${this.staging[i + 1]}/${this.staging[i + 2]}\n`, true);
+                    if (this.sixteenths > 0) this.__pushBarLine();
+                    this.__pushField(meterField, true);
                     this.counter = 0;
-                    this.measureSixteenths =
-                        (Number(this.staging[i + 1]) * 16) / Number(this.staging[i + 2]);
+                    this.measureSixteenths = newMeasureSixteenths;
                     this.sixteenths = 0;
+                    this.pickupDuration = null;
+                    this.pickupOffset = null;
+                    this.lastBarSixteenths = null;
+
+                    if (this.voiceStates) {
+                        for (const v of Object.keys(this.voiceStates)) {
+                            this.voiceStates[v].sixteenths = 0;
+                            this.voiceStates[v].measureSixteenths = newMeasureSixteenths;
+                            this.voiceStates[v].pickupDuration = null;
+                            this.voiceStates[v].lastBarSixteenths = null;
+                            if (String(v) !== String(this.activeVoice)) {
+                                this.voiceStates[v].pendingMeter = meterField;
+                            }
+                        }
+                    }
                 }
                 i += 2;
                 break;
@@ -460,13 +590,33 @@ class AbcExporter {
                 i += 2;
                 break;
             }
-            case "pickup":
+            case "pickup": {
+                const pickupWhole = lilypondDurationToWholeNotes(this.staging[i + 1]);
+                if (this.firstMeasure && pickupWhole > 0) {
+                    const pickup16ths = pickupWhole * 16;
+                    if (pickup16ths < this.measureSixteenths) {
+                        this.pickupDuration = pickup16ths;
+                        this.pickupOffset = pickup16ths;
+                        if (this.voiceStates) {
+                            for (const v of Object.keys(this.voiceStates)) {
+                                this.voiceStates[v].pickupDuration = pickup16ths;
+                            }
+                        }
+                    }
+                }
                 i += 1;
                 break;
+            }
             case "key": {
                 const changed = abcKeySignature(`${this.staging[i + 1]} ${this.staging[i + 2]}`);
                 if (changed.field !== this.keyField) {
-                    this.__pushField(`[K:${changed.field}]`);
+                    if (this.hasNotes) {
+                        // A key change on a barline belongs to the measure after it.
+                        if (this.__onBarline() && this.sixteenths > 0) this.__pushBarLine();
+                        this.__pushField(`[K:${changed.field}]`);
+                    } else {
+                        this.startKeyField = changed.field;
+                    }
                     this.keyField = changed.field;
                     this.keyAlterations = changed.alterations;
                 }
@@ -494,24 +644,29 @@ class AbcExporter {
                 this.pendingAnnotations.push(abcAnnotation("swing", "^"));
                 break;
             case "voice one":
+                if (this.__onBarline() && this.sixteenths > 0) this.__pushBarLine();
                 this.__pushField(this.__voiceField(1));
-                this.__voiceChanged();
+                this.__voiceChanged(1);
                 break;
             case "voice two":
+                if (this.__onBarline() && this.sixteenths > 0) this.__pushBarLine();
                 this.__pushField(this.__voiceField(2));
-                this.__voiceChanged();
+                this.__voiceChanged(2);
                 break;
             case "voice three":
+                if (this.__onBarline() && this.sixteenths > 0) this.__pushBarLine();
                 this.__pushField(this.__voiceField(3));
-                this.__voiceChanged();
+                this.__voiceChanged(3);
                 break;
             case "voice four":
+                if (this.__onBarline() && this.sixteenths > 0) this.__pushBarLine();
                 this.__pushField(this.__voiceField(4));
-                this.__voiceChanged();
+                this.__voiceChanged(4);
                 break;
             case "one voice":
+                if (this.__onBarline() && this.sixteenths > 0) this.__pushBarLine();
                 this.__pushField(this.__voiceField(0));
-                this.__voiceChanged();
+                this.__voiceChanged(0);
                 break;
             default:
                 break;
@@ -575,16 +730,18 @@ class AbcExporter {
     }
 
     processNoteArray(obj, i) {
+        this.firstMeasure = false;
+        this.hasNotes = true;
         const inChordContinuation =
             obj[NOTATIONINSIDECHORD] > 0 &&
             i > 0 &&
             Array.isArray(this.staging[i - 1]) &&
             this.staging[i - 1][NOTATIONINSIDECHORD] === obj[NOTATIONINSIDECHORD];
 
-        // Through __pushField so the barline lands before any decoration already
+        // Through __pushBarLine so the barline lands before any decoration already
         // waiting for this note, rather than between the decoration and the note.
         if (!inChordContinuation && this.__onBarline()) {
-            this.__pushField("| ");
+            this.__pushBarLine();
         }
         if (this.counter % 8 === 0 && this.counter > 0 && !inChordContinuation) {
             this.parts.push("\n");
@@ -695,6 +852,7 @@ class AbcExporter {
         }
 
         this.parts.push(" ");
+
         return i;
     }
 
@@ -707,8 +865,15 @@ class AbcExporter {
                 i = this.processNoteArray(obj, i);
             }
         }
+        if (this.__onBarline() && this.sixteenths > 0) {
+            this.__pushBarLine();
+        }
         if (this.repeatStart !== -1) {
-            this.parts.push(":|");
+            if (this.parts.length > 0 && this.parts[this.parts.length - 1] === "| ") {
+                this.parts[this.parts.length - 1] = ":|";
+            } else {
+                this.parts.push(":|");
+            }
         }
         this.logo.notationNotes[this.turtle] = this.parts.join("");
     }
@@ -718,13 +883,17 @@ class AbcExporter {
  * Processes musical notes and converts them into ABC notation format.
  * @param {object} logo - The logo object containing notationNotes to update.
  * @param {string} turtle - The identifier for the turtle.
- * @param {string} [keySignature] - the key the tune is written in, e.g. "G major". Staged
- *   pitches are absolute, so this is what the accidentals are written against.
+ * @param {string} [keySignature] - the key the turtle starts in, e.g. "G major". Staged
+ *   pitches are absolute, so accidentals are written against it until a staged key change.
  * @param {string} [voiceId] - the ABC voice these notes belong to. Staged voice
  *   changes are written inside it, so they cannot move notes to another turtle.
+ * @returns {string} the voice's K: field: the starting key, or a key set before its
+ *   first note.
  */
 const processABCNotes = function (logo, turtle, keySignature = "C major", voiceId = "") {
-    new AbcExporter(logo, turtle, keySignature, voiceId).process();
+    const exporter = new AbcExporter(logo, turtle, keySignature, voiceId);
+    exporter.process();
+    return exporter.startKeyField;
 };
 
 /**
@@ -745,10 +914,11 @@ const saveAbcOutput = function (activity) {
             continue;
         }
 
-        const keySignature = activity.turtles.ithTurtle(t).singer.keySignature;
         voice += 1;
         const voiceId = "t" + voice;
-        processABCNotes(activity.logo, t, keySignature, voiceId);
+        // Every turtle starts a run in C major (Singer.reset()); its staged key changes
+        // follow. The turtle's keySignature is the key it ended in.
+        const keyField = processABCNotes(activity.logo, t, "C major", voiceId);
         const notes = activity.logo.notationNotes[t];
         // A V: or K: field is only a field at the start of a line.
         if (!atLineStart) {
@@ -756,7 +926,7 @@ const saveAbcOutput = function (activity) {
         }
         // Without a V: field every turtle lands in one voice, one after another.
         outputParts.push("V:" + voiceId + "\n");
-        outputParts.push("K:" + abcKeySignature(keySignature).field + "\n");
+        outputParts.push("K:" + keyField + "\n");
         outputParts.push(notes);
         atLineStart = notes === "" || notes.endsWith("\n");
     }
@@ -773,7 +943,8 @@ if (typeof module !== "undefined" && module.exports) {
         saveAbcOutput,
         abcKeySignature,
         ACCIDENTAL_MAP,
-        OCTAVE_NOTATION_MAP
+        OCTAVE_NOTATION_MAP,
+        AbcExporter
     };
 }
 

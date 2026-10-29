@@ -207,7 +207,7 @@ requirejs.config({
             exports: "PieMenuUtils"
         },
         "utils/musicutils-modewheel": {
-            deps: ["utils/utils", "utils/musicutils-constants"],
+            deps: ["utils/utils", "utils/musicutils-constants", "utils/musicutils-temperament"],
             exports: "MusicUtilsModeWheel"
         },
         "utils/musicutils-modecore": {
@@ -312,6 +312,7 @@ requirejs.config({
                 "activity/turtles",
                 "activity/recorder",
                 "activity/abc-parser",
+                "activity/mxml-parser",
                 "activity/idle-watcher",
                 "activity/grid-controller",
                 "activity/grid-renderer",
@@ -380,14 +381,17 @@ requirejs.config({
         "utils/ai-widget-lifecycle": {
             exports: "createWidgetLifecycle"
         },
+        "utils/ai-markdown": {
+            exports: "renderChatMarkdown"
+        },
         "utils/tuningformats": {
             exports: "TuningFormats"
         },
         "widgets/reflection": {
-            deps: ["utils/ai-widget-lifecycle"]
+            deps: ["utils/ai-widget-lifecycle", "utils/ai-markdown"]
         },
         "widgets/aidebugger": {
-            deps: ["utils/ai-widget-lifecycle"]
+            deps: ["utils/ai-widget-lifecycle", "utils/ai-markdown"]
         }
     },
     paths: {
@@ -397,6 +401,7 @@ requirejs.config({
         "activity/recorder": "js/activity/recorder",
         "activity/exporters": "js/activity/exporters",
         "activity/abc-parser": "js/activity/abc-parser",
+        "activity/mxml-parser": "js/activity/mxml-parser",
         "activity/idle-watcher": "js/activity/idle-watcher",
         "activity/grid-controller": "js/activity/grid-controller",
         "activity/grid-renderer": "js/activity/grid-renderer",

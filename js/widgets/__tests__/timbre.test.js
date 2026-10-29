@@ -3119,6 +3119,53 @@ describe("TimbreWidget with a real DOM", () => {
         expect(blockList[2].connections[2]).toBe(6);
     });
 
+    test.each([1, 2])("reopening the panel keeps edited frequencies for %i filters", count => {
+        for (let f = 0; f < count; f++) {
+            const index = blockList.length;
+            timbre.activity.blocks.loadNewBlocks([
+                [0, "filter", 0, 0, [null, 1, 2, 3, null]],
+                [1, ["filtertype", { value: DEFAULTFILTERTYPE }], 0, 0, [0]],
+                [2, ["number", { value: -12 }], 0, 0, [0]],
+                [3, ["number", { value: 392 }], 0, 0, [0]]
+            ]);
+            timbre.fil.push(index);
+            timbre.filterParams.push(DEFAULTFILTERTYPE, -12, 392);
+            instrumentsFilters[0].custom.push({
+                filterType: DEFAULTFILTERTYPE,
+                filterRolloff: -12,
+                filterFrequency: 392
+            });
+        }
+        timbre._setActiveExclusive("filter");
+        timbre._filter();
+        for (let f = 0; f < count; f++) {
+            slide("myRangeF" + f, String(1000 + f), "input");
+        }
+
+        timbre._setActiveExclusive("effects");
+        timbre._effects();
+        timbre._setActiveExclusive("filter");
+        timbre._filter();
+
+        for (let f = 0; f < count; f++) {
+            expect(jsdomDocument.getElementById("myRangeF" + f).value).toBe(String(1000 + f));
+            expect(jsdomDocument.getElementById("myspanF" + f).textContent).toBe(String(1000 + f));
+            const frequencyBlock = blockList[timbre.fil[f]].connections[3];
+            expect(Number(blockList[frequencyBlock].value)).toBe(1000 + f);
+        }
+
+        timbre._undo();
+        timbre._filter();
+
+        for (let f = 0; f < count; f++) {
+            expect(jsdomDocument.getElementById("myRangeF" + f).value).toBe("392");
+            expect(jsdomDocument.getElementById("myspanF" + f).textContent).toBe("392");
+            expect(instrumentsFilters[0].custom[f].filterFrequency).toBe(392);
+            const frequencyBlock = blockList[timbre.fil[f]].connections[3];
+            expect(Number(blockList[frequencyBlock].value)).toBe(392);
+        }
+    });
+
     test("the 11th filter's controls edit the 11th filter", () => {
         for (let f = 0; f < 11; f++) {
             blockList.push(makeBlock("filter", undefined, [0, null, null, null, null]));

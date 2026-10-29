@@ -1207,6 +1207,34 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
         expect(painter.svgOutput).toContain('<path d="M');
     });
 
+    test("doBezier starts a new path so the previous line is not stroked again", () => {
+        const ctx = mockTurtle.ctx;
+        painter.turtle.x = 20;
+        painter.turtle.y = 30;
+        painter.cp1x = 10;
+        painter.cp1y = 10;
+        painter.cp2x = 50;
+        painter.cp2y = 50;
+
+        painter.doBezier(100, 100);
+        expect(ctx.beginPath).toHaveBeenCalled();
+        expect(ctx.moveTo).toHaveBeenCalledWith(20, 30);
+        expect(ctx.beginPath.mock.invocationCallOrder[0]).toBeLessThan(
+            ctx.lineTo.mock.invocationCallOrder[0]
+        );
+        expect(ctx.closePath.mock.invocationCallOrder[0]).toBeGreaterThan(
+            ctx.stroke.mock.invocationCallOrder[0]
+        );
+    });
+
+    test("doBezier inside a fill keeps adding to the fill path", () => {
+        painter._fillState = true;
+        painter.doBezier(100, 100);
+        expect(mockTurtle.ctx.beginPath).not.toHaveBeenCalled();
+        expect(mockTurtle.ctx.closePath).not.toHaveBeenCalled();
+        expect(mockTurtle.ctx.stroke).toHaveBeenCalled();
+    });
+
     test("doBezier with penUp", () => {
         painter._penDown = false;
         painter.doBezier(100, 100);
@@ -1283,8 +1311,8 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
 
         expect(painter.turtles.canvas1).toBeDefined();
         expect(turtle1.painter._processColor).toHaveBeenCalled();
-        expect(painter.turtles.gx).toBe(790); // 800 - 10
-        expect(painter.turtles.gy).toBe(580); // 600 - 20
+        expect(painter.turtles.gx).toBe(390); // (1600 - 800) / 2 - 10
+        expect(painter.turtles.gy).toBe(280); // (1200 - 600) / 2 - 20
         expect(mockTurtle.ctx.beginPath).toHaveBeenCalled();
         expect(mockTurtle.ctx.moveTo).toHaveBeenCalledWith(20, 40); // 10+10, 20+20
         expect(mockTurtle.ctx.lineTo).toHaveBeenCalledWith(10, 20);
@@ -1294,6 +1322,44 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
         painter.doScrollXY(1000, 1000);
         expect(painter.turtles.gx).toBe(0);
         expect(painter.turtles.gy).toBe(0);
+    });
+
+    test("doScrollXY with negative values keeps the read inside the scroll buffer", () => {
+        // The buffer gets its own context, so its reads are not mixed up with the turtle canvas
+        const bufferImage = { width: 800, height: 600, data: [] };
+        const bufferCtx = {
+            rect: jest.fn(),
+            fill: jest.fn(),
+            putImageData: jest.fn(),
+            getImageData: jest.fn(() => bufferImage)
+        };
+        HTMLCanvasElement.prototype.getContext.mockReturnValueOnce(bufferCtx);
+
+        painter.doScrollXY(-100, -100);
+        expect(painter.turtles.c1ctx).toBe(bufferCtx);
+        expect(painter.turtles.canvas1.width).toBe(1600);
+        expect(painter.turtles.canvas1.height).toBe(1200);
+        expect(bufferCtx.getImageData).toHaveBeenLastCalledWith(500, 400, 800, 600);
+        expect(mockTurtle.ctx.putImageData).toHaveBeenLastCalledWith(bufferImage, 0, 0);
+
+        painter.doScrollXY(-1000, -1000);
+        expect(bufferCtx.getImageData).toHaveBeenLastCalledWith(800, 600, 800, 600);
+    });
+
+    test("doClear with resetPosition moves the scroll back to the middle of the buffer", () => {
+        painter.doScrollXY(-1000, -1000);
+        expect(painter.turtles.gx).toBe(800);
+
+        painter.doClear(false, false, true);
+        expect(painter.turtles.gx).toBe(400);
+        expect(painter.turtles.gy).toBe(300);
+    });
+
+    test("doScrollXY creates the scroll buffer with willReadFrequently", () => {
+        painter.doScrollXY(10, 20);
+        expect(HTMLCanvasElement.prototype.getContext).toHaveBeenCalledWith("2d", {
+            willReadFrequently: true
+        });
     });
 });
 

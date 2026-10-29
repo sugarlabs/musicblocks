@@ -28,6 +28,7 @@ const ManagedTimer = require("../../utils/ManagedTimer.js");
 global.ManagedTimer = ManagedTimer;
 
 const ReflectionMatrix = require("../reflection");
+const { aiWidgetConsent } = require("../../utils/ai-widget-lifecycle");
 
 // Mock globals
 global._ = str => str;
@@ -56,6 +57,9 @@ beforeEach(() => {
     document.body.innerHTML = "";
     jest.clearAllMocks();
     jest.useFakeTimers();
+    // Consent is shared by the AI widgets for the page session, so each test
+    // starts from a child who has not agreed yet.
+    aiWidgetConsent.given = false;
 
     mockWidgetWindow = createMockWidgetWindow();
     window.widgetWindows = {
@@ -102,7 +106,8 @@ describe("ReflectionMatrix", () => {
                 user: "YOU",
                 meta: "ROHAN",
                 music: "BEETHOVEN",
-                code: "ALAN"
+                code: "ALAN",
+                report: "REPORT"
             });
             expect(reflection.triggerFirst).toBe(false);
             expect(reflection.projectAlgorithm).toBe("");
@@ -121,6 +126,12 @@ describe("ReflectionMatrix", () => {
 
         test("uses the HTTPS API on the hosted site", () => {
             expect(ReflectionMatrix.backendURL("musicblocks.sugarlabs.org")).toBe(
+                "https://api.musicblocks.sugarlabs.org"
+            );
+        });
+
+        test("uses the HTTPS API on the GitHub Pages site", () => {
+            expect(ReflectionMatrix.backendURL("sugarlabs.github.io")).toBe(
                 "https://api.musicblocks.sugarlabs.org"
             );
         });
@@ -184,6 +195,92 @@ describe("ReflectionMatrix", () => {
             const body = mockWidgetWindow.getWidgetBody();
             expect(body.style.height).toBe(ReflectionMatrix.OUTERWINDOWHEIGHT);
             expect(body.style.width).toBe(ReflectionMatrix.OUTERWINDOWWIDTH);
+        });
+
+        test("Asks again when reopened after closing before the first reply", () => {
+            const reflection = new ReflectionMatrix();
+            const start = jest.spyOn(reflection, "startChatSession").mockImplementation(() => {
+                reflection.triggerFirst = true;
+            });
+
+            reflection.init(mockActivity);
+            mockWidgetWindow.onclose();
+            expect(reflection.triggerFirst).toBe(false);
+
+            reflection.init(mockActivity);
+            expect(start).toHaveBeenCalledTimes(2);
+        });
+
+        test("Asks again when the block runs while the first description is pending", async () => {
+            const reflection = new ReflectionMatrix();
+            reflection._lifecycle.giveConsent();
+            // The first description never comes back.
+            global.fetch.mockImplementation(() => new Promise(() => {}));
+            const flush = async () => {
+                for (let i = 0; i < 10; i++) await Promise.resolve();
+            };
+
+            reflection.init(mockActivity);
+            await flush();
+            reflection.init(mockActivity);
+            await flush();
+
+            expect(global.fetch).toHaveBeenCalledTimes(2);
+            expect(global.fetch.mock.calls[1][0]).toBe(`${reflection.PORT}/projectcode`);
+        });
+
+        test("Grows the chat with the window when maximized", () => {
+            const reflection = new ReflectionMatrix();
+            jest.spyOn(reflection, "startChatSession").mockImplementation(() => {});
+            reflection.init(mockActivity);
+            const body = mockWidgetWindow.getWidgetBody();
+
+            mockWidgetWindow.isMaximized = jest.fn(() => true);
+            mockWidgetWindow.onmaximize();
+            expect(body.style.width).toBe("100%");
+            expect(body.style.height).toBe("100%");
+
+            mockWidgetWindow.isMaximized.mockReturnValue(false);
+            mockWidgetWindow.onmaximize();
+            expect(body.style.width).toBe(ReflectionMatrix.OUTERWINDOWWIDTH);
+            expect(body.style.height).toBe(ReflectionMatrix.OUTERWINDOWHEIGHT);
+        });
+
+        test("Opens when the browser blocks localStorage", () => {
+            const reflection = new ReflectionMatrix();
+            jest.spyOn(reflection, "startChatSession").mockImplementation(() => {});
+            jest.spyOn(console, "warn").mockImplementation(() => {});
+            jest.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+                throw new Error("SecurityError");
+            });
+
+            reflection.init(mockActivity);
+
+            expect(reflection.summary).toBe("No reports available");
+            expect(reflection.chatLog).toBeDefined();
+        });
+
+        test("Keeps messages within the length the server accepts", () => {
+            const reflection = new ReflectionMatrix();
+            jest.spyOn(reflection, "startChatSession").mockImplementation(() => {});
+
+            reflection.init(mockActivity);
+
+            // ChatRequest.query in mb-server-ai/widgets.py is at most 2000.
+            expect(reflection.input.maxLength).toBe(2000);
+        });
+
+        test("Does not send when Enter confirms a word in an input method", () => {
+            const reflection = new ReflectionMatrix();
+            jest.spyOn(reflection, "startChatSession").mockImplementation(() => {});
+            jest.spyOn(reflection, "sendMessage").mockImplementation(() => {});
+
+            reflection.init(mockActivity);
+            reflection.input.onkeydown({ key: "Enter", isComposing: true });
+            // Safari reports the confirming Enter with keyCode 229 instead.
+            reflection.input.onkeydown({ key: "Enter", isComposing: false, keyCode: 229 });
+
+            expect(reflection.sendMessage).not.toHaveBeenCalled();
         });
 
         test("Sets up onclose handler", () => {
@@ -284,6 +381,116 @@ describe("ReflectionMatrix", () => {
             expect(reflection.renderChatHistory).toHaveBeenCalled();
             expect(reflection.inputContainer.style.display).toBe("flex");
         });
+
+        test("Starts a new conversation when reopened in a different project", () => {
+            let projectId = "first";
+            mockActivity.planet = { getCurrentProjectID: () => projectId };
+            const reflection = new ReflectionMatrix();
+            jest.spyOn(reflection, "startChatSession").mockImplementation(() => {});
+            jest.spyOn(reflection, "renderChatHistory").mockImplementation(() => {});
+
+            reflection.init(mockActivity);
+            reflection.chatHistory = [{ role: "user", content: "Hi" }];
+            reflection.projectAlgorithm = "1. Play a C major scale.";
+            reflection.code = "old code";
+            reflection.triggerFirst = true;
+            mockWidgetWindow.onclose();
+
+            // Reopened in the same project, the chat comes back.
+            reflection.init(mockActivity);
+            expect(reflection.renderChatHistory).toHaveBeenCalledTimes(1);
+            mockWidgetWindow.onclose();
+
+            projectId = "second";
+            reflection.init(mockActivity);
+            expect(reflection.chatHistory).toEqual([]);
+            expect(reflection.projectAlgorithm).toBe("");
+            expect(reflection.code).toBe("");
+            expect(reflection.renderChatHistory).toHaveBeenCalledTimes(1);
+            expect(reflection.startChatSession).toHaveBeenCalledTimes(2);
+        });
+    });
+
+    describe("Consent before sending", () => {
+        const flush = async () => {
+            for (let i = 0; i < 10; i++) await Promise.resolve();
+        };
+        const banner = reflection => reflection.chatLog.querySelector(".reflection-consent-banner");
+
+        test("asks before sending the project, and sends nothing when declined", async () => {
+            const reflection = new ReflectionMatrix();
+
+            reflection.init(mockActivity);
+            await flush();
+
+            expect(global.fetch).not.toHaveBeenCalled();
+            expect(mockActivity.prepareExport).not.toHaveBeenCalled();
+            expect(banner(reflection).textContent).toContain("Before we start");
+            expect(banner(reflection).textContent).toContain(reflection.PORT);
+
+            reflection.chatLog.querySelector(".reflection-cancel-btn").onclick();
+            await flush();
+
+            expect(global.fetch).not.toHaveBeenCalled();
+            expect(banner(reflection)).toBeNull();
+            expect(reflection.chatLog.textContent).toContain("Nothing was sent");
+            expect(reflection._lifecycle.hasConsent()).toBe(false);
+            expect(reflection.triggerFirst).toBe(false);
+        });
+
+        test("starts the session once the child agrees", async () => {
+            const reflection = new ReflectionMatrix();
+            global.fetch.mockResolvedValue({
+                json: jest.fn().mockResolvedValue({ algorithm: "alg", response: "Hello" })
+            });
+
+            reflection.init(mockActivity);
+            banner(reflection).querySelectorAll("button")[0].onclick();
+            await flush();
+
+            expect(global.fetch).toHaveBeenCalledTimes(1);
+            expect(global.fetch.mock.calls[0][0]).toBe(`${reflection.PORT}/projectcode`);
+            expect(banner(reflection)).toBeNull();
+            expect(reflection.projectAlgorithm).toBe("alg");
+        });
+
+        test("does not ask again once the child agreed in either AI widget", async () => {
+            const reflection = new ReflectionMatrix();
+            // As if the child agreed in the AI Debugger earlier.
+            aiWidgetConsent.given = true;
+            global.fetch.mockImplementation(() => new Promise(() => {}));
+
+            reflection.init(mockActivity);
+            await flush();
+
+            expect(banner(reflection)).toBeNull();
+            expect(global.fetch).toHaveBeenCalledTimes(1);
+        });
+
+        test("asks again when reopened after declining", async () => {
+            const reflection = new ReflectionMatrix();
+
+            reflection.init(mockActivity);
+            reflection.chatLog.querySelector(".reflection-cancel-btn").onclick();
+            mockWidgetWindow.onclose();
+            reflection.init(mockActivity);
+            await flush();
+
+            expect(banner(reflection)).not.toBeNull();
+            expect(global.fetch).not.toHaveBeenCalled();
+        });
+
+        test("Refresh before consent asks instead of sending", async () => {
+            const reflection = new ReflectionMatrix();
+
+            reflection.init(mockActivity);
+            reflection.chatLog.querySelector(".reflection-cancel-btn").onclick();
+            await reflection.updateProjectCode();
+
+            expect(banner(reflection)).not.toBeNull();
+            expect(mockActivity.prepareExport).not.toHaveBeenCalled();
+            expect(global.fetch).not.toHaveBeenCalled();
+        });
     });
 
     describe("UI Methods", () => {
@@ -356,6 +563,7 @@ describe("ReflectionMatrix", () => {
             reflection.input = document.createElement("input");
             reflection.summaryButton = document.createElement("button");
             reflection._lifecycle.isMounted = true;
+            reflection._lifecycle.giveConsent();
             reflection.isOpen = true;
             reflection.PORT = ReflectionMatrix.backendURL();
 
@@ -398,6 +606,71 @@ describe("ReflectionMatrix", () => {
             expect(reflection.inputContainer.style.display).not.toBe("flex"); // Should not show
             expect(mockActivity.errorMsg).toHaveBeenCalledWith("Network error", 3000);
             expect(reflection.botReplyDiv).not.toHaveBeenCalled();
+            // Otherwise reopening the window would stay blank.
+            expect(reflection.triggerFirst).toBe(false);
+        });
+
+        test("updateProjectCode waits for the first description", async () => {
+            reflection.triggerFirst = true;
+            jest.spyOn(reflection, "generateNewAlgorithm");
+
+            await reflection.updateProjectCode();
+
+            expect(mockActivity.prepareExport).not.toHaveBeenCalled();
+            expect(reflection.generateNewAlgorithm).not.toHaveBeenCalled();
+        });
+
+        test("updateProjectCode shows the input after the first description failed", async () => {
+            reflection.inputContainer.style.display = "none";
+            jest.spyOn(reflection, "generateNewAlgorithm").mockResolvedValue({
+                algorithm: "alg",
+                response: "Your project plays a scale."
+            });
+
+            await reflection.updateProjectCode();
+
+            expect(reflection.inputContainer.style.display).toBe("flex");
+        });
+
+        test("shows the server's error text, such as the rate limit", async () => {
+            const limit = "That is a lot of requests in one minute. Please wait a little.";
+            global.fetch.mockResolvedValue({
+                ok: false,
+                status: 429,
+                json: jest.fn().mockResolvedValue({ error: limit })
+            });
+            reflection.pendingMessages = [{ text: "Hi", mentor: "meta", algorithm: "alg" }];
+
+            await reflection.processPendingMessages();
+
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(limit, 3000);
+        });
+
+        test("treats a reply without a response as an error", async () => {
+            global.fetch.mockResolvedValue({
+                ok: false,
+                status: 404,
+                json: jest.fn().mockResolvedValue({ detail: "Not Found" })
+            });
+            jest.spyOn(reflection, "appendBotReply");
+            reflection.pendingMessages = [{ text: "Hi", mentor: "meta", algorithm: "alg" }];
+
+            await reflection.processPendingMessages();
+
+            expect(reflection.appendBotReply).not.toHaveBeenCalled();
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith("Failed to send message.", 3000);
+        });
+
+        test("appendBotReply enables the summary button when getAnalysis allows it", () => {
+            reflection.chatHistory = new Array(9).fill({ role: "user", content: "Hi" });
+            reflection.summaryButton = { style: { removeProperty: jest.fn() } };
+
+            reflection.appendBotReply({ response: "Tenth message" });
+
+            expect(reflection.chatHistory.length).toBe(10);
+            expect(reflection.summaryButton.style.removeProperty).toHaveBeenCalledWith(
+                "background"
+            );
         });
 
         test("updateProjectCode skips if code unchanged", async () => {
@@ -433,7 +706,7 @@ describe("ReflectionMatrix", () => {
 
         test("generateAlgorithm makes correct API call", async () => {
             global.fetch.mockResolvedValue({
-                json: jest.fn().mockResolvedValue({ algorithm: "alg" })
+                json: jest.fn().mockResolvedValue({ algorithm: "alg", response: "Hi" })
             });
 
             const data = await reflection.generateAlgorithm("some_code");
@@ -447,7 +720,7 @@ describe("ReflectionMatrix", () => {
                     body: JSON.stringify({ code: "some_code" })
                 })
             );
-            expect(data).toEqual({ algorithm: "alg" });
+            expect(data).toEqual({ algorithm: "alg", response: "Hi" });
         });
 
         test("generateAlgorithm catches errors", async () => {
@@ -455,13 +728,13 @@ describe("ReflectionMatrix", () => {
 
             const data = await reflection.generateAlgorithm("some_code");
 
-            expect(data).toEqual({ error: "Failed to send message" });
+            expect(data).toEqual({ error: "Failed to send message." });
         });
 
         test("generateNewAlgorithm makes correct API call", async () => {
             reflection.code = "old_code";
             global.fetch.mockResolvedValue({
-                json: jest.fn().mockResolvedValue({ algorithm: "new_alg" })
+                json: jest.fn().mockResolvedValue({ algorithm: "new_alg", response: "Hi" })
             });
 
             const data = await reflection.generateNewAlgorithm("new_code");
@@ -474,7 +747,7 @@ describe("ReflectionMatrix", () => {
                     body: JSON.stringify({ oldcode: "old_code", newcode: "new_code" })
                 })
             );
-            expect(data).toEqual({ algorithm: "new_alg" });
+            expect(data).toEqual({ algorithm: "new_alg", response: "Hi" });
         });
 
         test("generateBotReply makes correct API call", async () => {
@@ -517,7 +790,8 @@ describe("ReflectionMatrix", () => {
             expect(reflection.botReplyDiv).toHaveBeenCalledWith(
                 { response: "Analysis body" },
                 false,
-                true
+                true,
+                "report"
             );
             expect(reflection.saveReport).toHaveBeenCalledWith({ response: "Analysis body" });
         });
@@ -528,7 +802,7 @@ describe("ReflectionMatrix", () => {
 
             const data = await reflection.generateAnalysis();
 
-            expect(data).toEqual({ error: "Failed to send message" });
+            expect(data).toEqual({ error: "Failed to send message." });
             expect(consoleSpy).toHaveBeenCalled();
 
             consoleSpy.mockRestore();
@@ -692,6 +966,7 @@ describe("ReflectionMatrix", () => {
             reflection.chatLog = document.createElement("div");
             reflection.input = document.createElement("input");
             reflection._lifecycle.isMounted = true;
+            reflection._lifecycle.giveConsent();
             reflection.isOpen = true;
             reflection.PORT = ReflectionMatrix.backendURL();
         });
@@ -912,7 +1187,7 @@ describe("ReflectionMatrix", () => {
             jest.advanceTimersByTime(ReflectionMatrix.REQUEST_TIMEOUT + 1);
             const data = await dataPromise;
 
-            expect(data).toEqual({ error: "Failed to send message" });
+            expect(data).toEqual({ error: "Failed to send message." });
             expect(reflection._lifecycle.pendingRequests.size).toBe(0);
 
             consoleSpy.mockRestore();
@@ -926,6 +1201,72 @@ describe("ReflectionMatrix", () => {
             await reflection.getAnalysis();
 
             expect(generateSpy).not.toHaveBeenCalled();
+        });
+
+        test("Summary on a short chat says the chat has to be longer", async () => {
+            reflection.chatHistory = new Array(9).fill({ role: "user", content: "Hi" });
+
+            await reflection.getAnalysis();
+
+            expect(global.fetch).not.toHaveBeenCalled();
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                expect.stringContaining("longer"),
+                3000
+            );
+        });
+
+        test("labels the summary as a report, not as the selected mentor", async () => {
+            reflection.summaryButton = document.createElement("button");
+            reflection.chatHistory = new Array(10).fill({ role: "user", content: "Hi" });
+            reflection.AImentor = "music";
+            // The report is Markdown. Sanitizing is tested in ai-markdown.test.js.
+            global.DOMPurify = { sanitize: html => html };
+            jest.spyOn(reflection, "saveReport").mockImplementation(() => {});
+            global.fetch.mockResolvedValue({
+                json: jest.fn().mockResolvedValue({ response: "Your report" })
+            });
+
+            await reflection.getAnalysis();
+
+            expect(reflection.chatHistory[10]).toEqual({ role: "report", content: "Your report" });
+            expect(reflection.chatLog.lastChild.firstChild.innerText).toBe("REPORT");
+
+            reflection.renderChatHistory();
+            expect(reflection.chatLog.lastChild.firstChild.innerText).toBe("REPORT");
+            delete global.DOMPurify;
+        });
+
+        test("closing takes back a message that was still waiting for its reply", async () => {
+            const widget = new ReflectionMatrix();
+            const answered = [
+                { role: "meta", content: "Your project plays a scale." },
+                { role: "user", content: "Why?" },
+                { role: "meta", content: "To practise." }
+            ];
+            widget.chatHistory = answered.slice();
+            widget._lifecycle.giveConsent();
+            global.fetch.mockImplementation(
+                (url, request) =>
+                    new Promise((resolve, reject) => {
+                        request.signal.addEventListener("abort", () => {
+                            const error = new Error("The operation was aborted");
+                            error.name = "AbortError";
+                            reject(error);
+                        });
+                    })
+            );
+
+            widget.init(mockActivity);
+            widget.input.value = "Can it be faster?";
+            widget.sendMessage();
+            expect(widget.chatHistory.length).toBe(4);
+
+            mockWidgetWindow.onclose();
+            for (let i = 0; i < 10; i++) await Promise.resolve();
+
+            expect(widget.chatHistory).toEqual(answered);
+            widget.init(mockActivity);
+            expect(widget.chatLog.querySelectorAll(".message-container").length).toBe(3);
         });
     });
 

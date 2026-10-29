@@ -14,22 +14,27 @@
       table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
       th, td { border: 1px solid #ddd; padding: 8px; }
       th { background-color: #f2f2f2; text-align: left; }
+      @media(min-width:992px){.row{display:flex;}.sidebar-sticky{position: sticky;top: 20px;}}
     </style>
+    <link rel="stylesheet" href="guide-theme.css" />
+    <script src="guide-theme.js"></script>
   </head>
   <body>
     <div class="container-fluid" style="max-width: 1200px;">
       <div class="row">
         <div class="col-md-3 sidebar">
-          <h4 style="margin-top: 0;">Navigation</h4>
-          <ul class="nav nav-pills nav-stacked" style="position: sticky; top: 20px;">
-	    <li><a href="index.html">Introduction</a></li>
-	    <li><a href="01-getting-started.html">1. Getting Started</a></li>
-	    <li><a href="02-making-sounds.html">2. Making Sounds</a></li>
-	    <li><a href="03-programming-with-music.html">3. Programming with Music</a></li>
-	    <li class="active"><a href="04-widgets.html">4. Widgets</a></li>
-	    <li><a href="05-beyond-music-blocks.html">5. Beyond Music Blocks</a></li>
-	    <li><a href="06-appendix.html">6. Appendix</a></li>
-	  </ul>
+		  <nav class="sidebar-sticky">
+            <h4 style="margin-top: 0;">Navigation</h4>
+            <ul class="nav nav-pills nav-stacked">
+              <li><a href="index.html">Introduction</a></li>
+              <li><a href="01-getting-started.html">1. Getting Started</a></li>
+	          <li><a href="02-making-sounds.html">2. Making Sounds</a></li>
+	          <li><a href="03-programming-with-music.html">3. Programming with Music</a></li>
+	          <li class="active"><a href="04-widgets.html">4. Widgets</a></li>
+	          <li><a href="05-beyond-music-blocks.html">5. Beyond Music Blocks</a></li>
+	          <li><a href="06-appendix.html">6. Appendix</a></li>
+            </ul>
+		  </nav>
         </div>
         <div class="col-md-9 content">
           <p>

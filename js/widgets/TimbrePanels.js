@@ -970,6 +970,10 @@ class TimbrePanels {
 
             const rolloff = instrumentsFilters[0][this.instrumentName][f]["filterRolloff"];
             this._setRolloffRadioChecked(radioIDs, rolloff);
+
+            const frequency = instrumentsFilters[0][this.instrumentName][f]["filterFrequency"];
+            docById("myRangeF" + f).value = frequency;
+            docById("myspanF" + f).textContent = frequency;
         }
     }
 
