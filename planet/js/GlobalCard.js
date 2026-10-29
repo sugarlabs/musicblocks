@@ -176,11 +176,7 @@ class GlobalCard {
             const moreTags = document.createElement("button");
             moreTags.type = "button";
             moreTags.classList.add("chipselect", "global-tags-more");
-            const moreTagsIcon = document.createElement("i");
-            moreTagsIcon.classList.add("material-icons");
-            moreTagsIcon.setAttribute("aria-hidden", "true");
-            moreTagsIcon.textContent = "add";
-            moreTags.appendChild(moreTagsIcon);
+            moreTags.textContent = `+${remainingTagCount}`;
             moreTags.title = _("Show all tags");
             moreTags.setAttribute("aria-label", `${_("Show all tags")}: ${remainingTagCount}`);
             moreTags.addEventListener("click", () => {

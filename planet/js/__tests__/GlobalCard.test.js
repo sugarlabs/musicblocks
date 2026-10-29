@@ -175,12 +175,13 @@ describe("GlobalCard", () => {
             expect(chips[1].textContent).toBe("Art");
         });
 
-        it("should show three full tags and open details from the add icon", () => {
+        it("should show three full tags and the remaining tag count", () => {
             mockPlanet.GlobalPlanet.cache["test-id-1"].ProjectTags = [
                 "1",
                 "2",
                 "long-tag-full-name",
-                "4"
+                "4",
+                "5"
             ];
             card.init("test-id-1");
             card.render();
@@ -193,7 +194,7 @@ describe("GlobalCard", () => {
             expect(visibleTags[2].textContent).toBe("Long-tag-full-name");
 
             const moreTags = tagContainer.querySelector(".global-tags-more");
-            expect(moreTags.querySelector(".material-icons").textContent).toBe("add");
+            expect(moreTags.textContent).toBe("+2");
             moreTags.click();
             expect(mockPlanet.GlobalPlanet.ProjectViewer.open).toHaveBeenCalledWith("test-id-1");
         });
