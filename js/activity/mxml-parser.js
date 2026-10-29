@@ -142,18 +142,75 @@ function _noteDuration(noteEl, divisions) {
     return [1, 4];
 }
 
+// Semitones above C of each step letter, for moving a spelled pitch by a
+// <transpose> interval.
+const _MXML_STEP_SEMITONES = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+const _MXML_STEPS = "CDEFGAB";
+
 /**
- * A <pitch> element's step+alter as a Music Blocks note name, and its octave.
+ * The interval a part's <transpose> puts between its written and sounding
+ * pitch, or null for none. A B-flat clarinet is written a major second above
+ * where it sounds (<diatonic>-1</diatonic><chromatic>-2</chromatic>), and
+ * Music Blocks plays what it reads, so the importer has to move the notes
+ * itself. <octave-change> folds into both counts; <diatonic> is optional, and
+ * without it the nearest number of steps for <chromatic> stands in.
+ * @param {Element|null} transposeEl - a MusicXML <transpose> element
+ * @returns {{diatonic: number, chromatic: number}|null}
+ */
+function _transposeInterval(transposeEl) {
+    if (transposeEl === null) return null;
+    const chromatic = Number(_text(transposeEl, "chromatic"));
+    if (!Number.isFinite(chromatic)) return null;
+    const diatonicText = _text(transposeEl, "diatonic");
+    const diatonic = Number.isInteger(Number(diatonicText ?? "x"))
+        ? Number(diatonicText)
+        : Math.round((chromatic * 7) / 12);
+    const octaveChange = Number(_text(transposeEl, "octave-change") ?? "0");
+    const octaves = Number.isInteger(octaveChange) ? octaveChange : 0;
+    if (diatonic === 0 && chromatic === 0 && octaves === 0) return null;
+    return { diatonic: diatonic + 7 * octaves, chromatic: chromatic + 12 * octaves };
+}
+
+/**
+ * The <transpose> in force for staff 1 of a measure's <attributes>, the only
+ * staff this importer reads (it stops at the first <backup>).
+ * @param {Element} attributesEl - a MusicXML <attributes> element
+ * @returns {Element|null}
+ */
+function _staffOneTranspose(attributesEl) {
+    for (const el of attributesEl.querySelectorAll(":scope > transpose")) {
+        const number = el.getAttribute("number");
+        if (number === null || number === "1") return el;
+    }
+    return null;
+}
+
+/**
+ * A <pitch> element's step+alter as a Music Blocks note name, and its octave,
+ * moved from written to sounding pitch when the part transposes.
  * @param {Element} pitchEl - a MusicXML <pitch> element
+ * @param {{diatonic: number, chromatic: number}|null} [interval] - from
+ *     _transposeInterval
  * @returns {{name: string, octave: number}}
  */
-function _pitchToNoteName(pitchEl) {
-    const step = _text(pitchEl, "step") ?? "C";
+function _pitchToNoteName(pitchEl, interval = null) {
+    let step = _text(pitchEl, "step") ?? "C";
     const alter = _text(pitchEl, "alter") ?? "0";
-    const octave = Number(_text(pitchEl, "octave") ?? "4");
+    let octave = Number(_text(pitchEl, "octave") ?? "4");
     // MusicXML defines <alter> as a decimal value, so equivalent integer
     // spellings such as "1.0" and "+1" must produce the same accidental.
-    const normalizedAlter = Number(alter);
+    let normalizedAlter = Number(alter);
+    if (interval !== null && step in _MXML_STEP_SEMITONES) {
+        // Move the letter by the diatonic steps, then make up the semitones
+        // with the accidental, so D written for a B-flat clarinet reads C
+        // and C reads B-flat, not A-sharp.
+        const semitones =
+            octave * 12 + _MXML_STEP_SEMITONES[step] + normalizedAlter + interval.chromatic;
+        const steps = octave * 7 + _MXML_STEPS.indexOf(step) + interval.diatonic;
+        step = _MXML_STEPS[((steps % 7) + 7) % 7];
+        octave = Math.floor(steps / 7);
+        normalizedAlter = semitones - (octave * 12 + _MXML_STEP_SEMITONES[step]);
+    }
     const suffix =
         Number.isInteger(normalizedAlter) && normalizedAlter in _MXML_ALTER_SUFFIX
             ? _MXML_ALTER_SUFFIX[normalizedAlter]
@@ -314,7 +371,13 @@ function _keySignature(partEl) {
     const fifthsText = keyEl && _text(keyEl, "fifths");
     if (fifthsText === null || fifthsText === undefined) return { root: "C", mode: "major" };
 
-    const fifths = Number(fifthsText);
+    // A transposing part writes its key signature at written pitch too (D major
+    // for a B-flat clarinet playing in C). An interval of d steps and c
+    // semitones moves a key 7c - 12d places round the circle of fifths.
+    const attributesEl = keyEl.parentElement;
+    const interval = _transposeInterval(attributesEl ? _staffOneTranspose(attributesEl) : null);
+    const fifths =
+        Number(fifthsText) + (interval ? 7 * interval.chromatic - 12 * interval.diatonic : 0);
     const modeText = (_text(keyEl, "mode") ?? "major").toLowerCase();
     const offset = _MXML_MODE_FIFTHS_OFFSET[modeText] ?? 0;
     const majorTonicFifths = fifths - offset;
@@ -609,6 +672,7 @@ function _processPart(partEl, blockId, chainPrevId, doc) {
     // beginning at A.
     let lastRepeatEnd = -1;
     let divisions = 1;
+    let interval = null;
     let prevId = chainPrevId;
     let producedNotes = false;
     let tieDuration = null;
@@ -629,6 +693,12 @@ function _processPart(partEl, blockId, chainPrevId, doc) {
             ":scope > attributes > divisions"
         )?.textContent;
         if (divisionsText !== undefined) divisions = Number(divisionsText);
+        // A part can change instrument (and transposition) mid-piece; a
+        // <transpose> holds until the next one replaces it.
+        for (const attributesEl of measureEl.querySelectorAll(":scope > attributes")) {
+            const transposeEl = _staffOneTranspose(attributesEl);
+            if (transposeEl !== null) interval = _transposeInterval(transposeEl);
+        }
 
         for (const child of measureEl.children) {
             if (child.tagName === "backup") break;
@@ -668,7 +738,7 @@ function _processPart(partEl, blockId, chainPrevId, doc) {
             } else if (unpitchedEl !== null) {
                 content = { type: "drum", name: _drumName(child, doc) };
             } else {
-                content = { type: "pitch", ..._pitchToNoteName(pitchEl) };
+                content = { type: "pitch", ..._pitchToNoteName(pitchEl, interval) };
             }
 
             let hasTieStart = false;
