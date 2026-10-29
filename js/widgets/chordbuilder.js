@@ -522,7 +522,7 @@ class ChordBuilderWidget {
             return;
         }
 
-        if (this.progression.length === 0) {
+        if (this.progression.every(chord => chord === null)) {
             this.errorMsg(_("Add chords to your progression before saving."));
             return;
         }
@@ -541,6 +541,45 @@ class ChordBuilderWidget {
         let lastFlowConnIndex = 1; // flow connection slot for start block
 
         this.progression.forEach(chord => {
+            if (chord === null) {
+                const noteBlockId = idCounter++;
+                const durationId = idCounter++;
+                const durationNumeratorId = idCounter++;
+                const durationDenominatorId = idCounter++;
+                const restId = idCounter++;
+                const noteEndId = idCounter++;
+
+                newStack.push([
+                    noteBlockId,
+                    ["newnote", {}],
+                    0,
+                    0,
+                    [lastFlowId, durationId, restId, noteEndId]
+                ]);
+                newStack.push([
+                    durationId,
+                    ["divide", {}],
+                    0,
+                    0,
+                    [noteBlockId, durationNumeratorId, durationDenominatorId]
+                ]);
+                newStack.push([durationNumeratorId, ["number", { value: 1 }], 0, 0, [durationId]]);
+                newStack.push([
+                    durationDenominatorId,
+                    ["number", { value: 4 }],
+                    0,
+                    0,
+                    [durationId]
+                ]);
+                newStack.push([restId, ["rest2", {}], 0, 0, [noteBlockId, null]]);
+                newStack.push([noteEndId, ["hidden", {}], 0, 0, [noteBlockId, null]]);
+
+                newStack[lastFlowId][4][lastFlowConnIndex] = noteBlockId;
+                lastFlowId = noteEndId;
+                lastFlowConnIndex = 1;
+                return;
+            }
+
             const chordBlockId = idCounter++;
             const chordNameId = idCounter++;
             const noteBlockId = idCounter++;
