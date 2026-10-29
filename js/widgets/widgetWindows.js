@@ -20,6 +20,7 @@ _, docById
 window.widgetWindows = {
     openWindows: {},
     _posCache: {},
+    _maximizedCache: {},
     focused: null,
     draggingWindow: null,
     _globalListenersInitialized: false,
@@ -362,9 +363,24 @@ class WidgetWindow {
 
         window.widgetWindows._initGlobalListeners();
 
+        this._restorePending = false;
         if (window.widgetWindows._posCache[this._key]) {
             const _pos = window.widgetWindows._posCache[this._key];
-            this.setPosition(_pos[0], _pos[1]);
+            const x = Number(_pos[0]);
+            const y = Number(_pos[1]);
+            if (
+                !Number.isNaN(x) &&
+                !Number.isNaN(y) &&
+                !window.widgetWindows._maximizedCache[this._key]
+            ) {
+                const clamped = this._clampToViewport(x, y);
+                this.setPosition(clamped[0], clamped[1]);
+                this._restorePending = true;
+            } else {
+                if (Number.isNaN(x) || Number.isNaN(y)) {
+                    delete window.widgetWindows._posCache[this._key];
+                }
+            }
         }
 
         this.takeFocus();
@@ -449,6 +465,9 @@ class WidgetWindow {
         this._frame.setAttribute("aria-labelledby", titleEl.id);
 
         this._nonclose.onmousedown = e => {
+            // Once the user interacts with the window, later explicit centering
+            // calls are intentional and should not be suppressed.
+            this._restorePending = false;
             window.widgetWindows.draggingWindow = this;
 
             this.takeFocus();
@@ -838,6 +857,11 @@ class WidgetWindow {
      * @returns {WidgetWindow} this
      */
     sendToCenter() {
+        // Some widgets call sendToCenter() more than once while opening, so the
+        // flag must stay set until the user interacts with the window.
+        if (this._restorePending) {
+            return this;
+        }
         const canvas = docById("myCanvas");
         if (!canvas) {
             this.setPosition(200, 140);
@@ -866,6 +890,8 @@ class WidgetWindow {
      * @returns {void}
      */
     _restore() {
+        this._restorePending = false;
+        window.widgetWindows._maximizedCache[this._key] = false;
         this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
         if (this._maxminButton) {
             this._maxminButton.title = _("Maximize window");
@@ -890,6 +916,7 @@ class WidgetWindow {
      * @returns {void}
      */
     _maximize() {
+        window.widgetWindows._maximizedCache[this._key] = true;
         this._maxminIcon.setAttribute("src", "header-icons/icon-contract.svg");
         if (this._maxminButton) {
             this._maxminButton.title = _("Restore");
@@ -990,6 +1017,30 @@ class WidgetWindow {
     }
 
     /**
+     * Keeps a restored position inside the current viewport so that a widget
+     * closed before a browser resize does not reopen off-screen.
+     * @private
+     * @param {number} x
+     * @param {number} y
+     * @returns {[number, number]}
+     */
+    _clampToViewport(x, y) {
+        const toolbarBottom = window.widgetWindows._getToolbarBottom();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        if (!viewportWidth || !viewportHeight) return [x, y];
+
+        const fRect = this._frame ? this._frame.getBoundingClientRect() : { width: 0, height: 0 };
+        const width = fRect.width || 470;
+        const height = fRect.height || 420;
+
+        const maxX = Math.max(0, viewportWidth - width);
+        const maxY = Math.max(toolbarBottom, viewportHeight - height);
+
+        return [Math.min(Math.max(x, 0), maxX), Math.min(Math.max(y, toolbarBottom), maxY)];
+    }
+
+    /**
      * @public
      * @param {number} x
      * @param {number} y
@@ -1002,6 +1053,7 @@ class WidgetWindow {
         this._frame.style.left = `${x}px`;
         this._frame.style.top = `${top}px`;
         window.widgetWindows._posCache[this._key] = [x, top];
+        window.widgetWindows._maximizedCache[this._key] = false;
         return this;
     }
 
@@ -1088,7 +1140,13 @@ window.widgetWindows.windowFor = (widget, title, saveAs, fullscreen) => {
     else key = saveAs || title;
 
     if (typeof window.widgetWindows.openWindows[key] === "undefined") {
-        const win = new WidgetWindow(key, title, fullscreen).sendToCenter();
+        const win = new WidgetWindow(key, title, fullscreen);
+        // The constructor restores a previously saved position, so only center
+        // the window the first time it is opened.
+        if (!window.widgetWindows._posCache[key] || window.widgetWindows._maximizedCache[key]) {
+            win.sendToCenter();
+        }
+        window.widgetWindows._maximizedCache[key] = false;
         window.widgetWindows.openWindows[key] = win;
     }
 
