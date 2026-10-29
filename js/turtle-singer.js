@@ -2432,7 +2432,8 @@ class Singer {
                                         chordDrums.push(tur.singer.noteDrums[thisBlk][0]);
                                     }
                                 } else {
-                                    if (courtesy[i]) {
+                                    // A frequency (cents or hertz) has no accidental to restate.
+                                    if (courtesy[i] && typeof notationNote !== "number") {
                                         if (!chordNotes.includes(notationNote + "♮")) {
                                             chordNotes.push(notationNote + "♮");
                                         }
