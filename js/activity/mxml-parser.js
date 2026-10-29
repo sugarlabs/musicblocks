@@ -300,8 +300,7 @@ function _noteDuration(noteEl, divisions) {
     // <duration> is what advances the position; its <type> only says how the
     // small cue is drawn.
     const measureRestLength = durationText?.trim() ? Number(durationText) : NaN;
-    const isMeasureRest =
-        noteEl.querySelector(":scope > rest")?.getAttribute("measure") === "yes";
+    const isMeasureRest = noteEl.querySelector(":scope > rest")?.getAttribute("measure") === "yes";
     const isCue = noteEl.querySelector(":scope > cue") !== null;
     const durationWins =
         (isMeasureRest || isCue) &&
