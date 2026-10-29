@@ -386,7 +386,6 @@ async function observe(win, delays = [], onPCM) {
 
 describe("Ordinary multisample programs", { testIsolation: true, retries: 0 }, () => {
     let observed;
-    const reports = [];
     beforeEach(() => {
         cy.visit("http://127.0.0.1:3000", {
             onBeforeLoad(win) {
@@ -395,20 +394,10 @@ describe("Ordinary multisample programs", { testIsolation: true, retries: 0 }, (
         });
         cy.waitForAppReady();
     });
-    afterEach(function () {
-        if (observed)
-            reports.push({
-                test: this.currentTest.title,
-                state: this.currentTest.state,
-                trace: observed.trace,
-                errors: observed.errors.args
-            });
+    afterEach(() => {
         observed?.dispose();
         observed = null;
     });
-    after(() =>
-        cy.writeFile(".scratch/multisample-implementation/i08-browser-evidence.json", reports)
-    );
 
     for (const mode of ["start", "drum", "bare", "no-start", "legacy"]) {
         it("preserves actual selection and invocation: " + mode, () => {
@@ -477,11 +466,13 @@ describe("Ordinary multisample programs", { testIsolation: true, retries: 0 }, (
                 expect(executed.callCount).to.equal(0);
                 if (stop) logo.doStopTurtles();
             });
-            cy.wait(750);
-            cy.then(() => {
+            if (stop) cy.wait(750);
+            cy.wrap(null).should(() => {
                 expect(executed.callCount).to.equal(stop ? 0 : 1);
                 expect(observed.trace.attacks).to.have.length(0);
                 expect(observed.logo.boxes.suffix).to.equal(0);
+            });
+            cy.then(() => {
                 if (stop) {
                     observed.activity.toolbarController.runStep();
                 }
@@ -914,7 +905,7 @@ describe("Ordinary multisample programs", { testIsolation: true, retries: 0 }, (
                 observed.logo.boxes = { suffix: 0 };
                 observed.logo.runLogoCommands();
             });
-            cy.wait(100);
+            cy.wrap(null).should(() => expect(observed.trace.decodes).to.have.length(1));
             cy.then(() => {
                 const owner = observed.activity.blocks.blockList.find(
                     b => !b.trash && b.name === "multisample"
@@ -961,8 +952,8 @@ describe("Ordinary multisample programs", { testIsolation: true, retries: 0 }, (
                 observed.logo.runLogoCommands();
             });
             cy.wrap(null).should(() => expect(changed).to.equal(true));
-            cy.wait(800);
-            cy.then(() => {
+            if (mutation === "equal replacement") cy.wait(800);
+            cy.wrap(null).should(() => {
                 expect(observed.errors.called).to.equal(false);
                 if (mutation === "equal replacement") {
                     expect(observed.trace.attacks).to.have.length(attacksAtChange);
