@@ -14,7 +14,7 @@
 
    _b64Cache, wholeNoteImg, halfNoteImg, quarterNoteImg, eighthNoteImg,
    sixteenthNoteImg, thirtysecondNoteImg, sixtyfourthNoteImg, CHORDVALUES,
-   setCustomChord, MUSICALMODES, customMode, getModeNumbers,
+   setCustomChord, MUSICALMODES, getModeNumbers,
    getNonEDOModeSteps, getArticulation, modeMapper, getCustomNote,
    GetNotesForInterval, base64Encode, MOVABLE_TONIC_DEGREE, scalePatternToEDO,
    PITCH_COLLECTIONS_EDO_OVERRIDES, getModePattern, MusicUtilsModeCore
@@ -229,12 +229,6 @@ for (const alias in PITCH_COLLECTION_ALIASES) {
 
 // User definition overrides this constant.
 MUSICALMODES["custom"] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-
-/**
- * Custom mode from the musical modes dictionary.
- * @constant {Object}
- */
-var customMode = MUSICALMODES["custom"];
 
 /**
  * Get the mode numbers for a specific mode name.
@@ -907,9 +901,12 @@ var PITCH_COLLECTIONS_EDO_OVERRIDES = {};
  * Get the step pattern for a mode in the given EDO (or temperament).
  *
  * Lookup order: PITCH_COLLECTIONS_EDO_OVERRIDES[edo][mode] first, then the
- * scalePatternToEDO conversion of MUSICALMODES[mode]. For the "custom"
- * (chromatic) mode, 12-EDO uses the stored customMode pattern and non-12 EDO
- * returns a full EDO-length step-1 pattern.
+ * scalePatternToEDO conversion of MUSICALMODES[mode]. For the "custom" mode,
+ * the current MUSICALMODES.custom pattern is used when its steps sum to the
+ * EDO; otherwise a full EDO-length step-1 (chromatic) pattern is returned.
+ * Unlike other modes, custom is not rescaled with scalePatternToEDO: define
+ * mode always stores steps that sum to the current EDO, and set temperament
+ * resets it when the EDO changes.
  *
  * When `temperament` is a non-EDO temperament (JI, meantone, Pythagorean), the
  * EDO step model does not apply, so the returned array is a list of per-step
@@ -930,8 +927,16 @@ var getModePattern = (mode, edo = 12) => {
         return overrides[mode].slice();
     }
     if (mode.toLowerCase() === "custom") {
-        if (edo === 12) {
-            return customMode.slice();
+        // Read MUSICALMODES.custom on each call instead of keeping a copy: the
+        // define mode block, set temperament and saved custom modes all
+        // replace that array, so the copy taken at load time goes stale.
+        const custom = MUSICALMODES.custom;
+        if (
+            Array.isArray(custom) &&
+            custom.every(step => Number.isInteger(step) && step > 0) &&
+            custom.reduce((a, b) => a + b, 0) === edo
+        ) {
+            return custom.slice();
         }
         return new Array(edo).fill(1);
     }
@@ -953,7 +958,6 @@ var MusicUtilsModeCore = {
     CHORDVALUES,
     setCustomChord,
     MUSICALMODES,
-    customMode,
     getModeNumbers,
     getNonEDOModeSteps,
     getArticulation,

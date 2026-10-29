@@ -71,7 +71,6 @@ const {
     deleteTemperamentFromList,
     DEFAULTINVERT,
     DEFAULTMODE,
-    customMode,
     getInvertMode,
     getIntervalNumber,
     getIntervalDirection,
@@ -657,12 +656,6 @@ describe("Constants", () => {
     it("should have correct default values", () => {
         expect(DEFAULTINVERT).toBe("even");
         expect(DEFAULTMODE).toBe("major");
-    });
-});
-
-describe("customMode", () => {
-    it("should return custom mode from MUSICALMODES", () => {
-        expect(customMode).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     });
 });
 
@@ -2521,6 +2514,56 @@ describe("getModePattern", () => {
 
     it("keeps the 12-EDO pattern identical", () => {
         expect(getModePattern("major", 12)).toEqual([2, 2, 1, 2, 2, 2, 1]);
+    });
+
+    describe("custom mode", () => {
+        let savedCustom;
+
+        beforeEach(() => {
+            savedCustom = MUSICALMODES.custom;
+        });
+
+        afterEach(() => {
+            MUSICALMODES.custom = savedCustom;
+        });
+
+        it("keeps the default chromatic pattern in 12-EDO", () => {
+            expect(getModePattern("custom", 12)).toEqual(new Array(12).fill(1));
+        });
+
+        it("uses the current pattern after MUSICALMODES.custom is replaced", () => {
+            // The define mode block (default name "custom") replaces the array.
+            MUSICALMODES.custom = [2, 2, 3, 2, 3];
+            expect(getModePattern("custom", 12)).toEqual([2, 2, 3, 2, 3]);
+            expect(buildScale("C custom")).toEqual([
+                ["C", "D", "E", "G", "A", "C"],
+                [2, 2, 3, 2, 3]
+            ]);
+        });
+
+        it("uses a replaced pattern in another EDO when its steps fit that EDO", () => {
+            MUSICALMODES.custom = [3, 3, 2, 3, 3, 3, 2]; // sums to 19
+            expect(getModePattern("custom", 19)).toEqual([3, 3, 2, 3, 3, 3, 2]);
+        });
+
+        it("falls back to one step per pitch when the pattern doesn't fit the EDO", () => {
+            MUSICALMODES.custom = [2, 2, 3, 2, 3]; // sums to 12
+            expect(getModePattern("custom", 19)).toEqual(new Array(19).fill(1));
+        });
+
+        it("falls back when a step is not a positive integer, even if the sum fits", () => {
+            MUSICALMODES.custom = [4, 3, 0, 3]; // sums to 10, but has a 0 step
+            expect(getModePattern("custom", 10)).toEqual(new Array(10).fill(1));
+            MUSICALMODES.custom = [6, -1, 7]; // sums to 12
+            expect(getModePattern("custom", 12)).toEqual(new Array(12).fill(1));
+        });
+
+        it("returns a copy, not the stored array", () => {
+            MUSICALMODES.custom = [2, 2, 3, 2, 3];
+            const out = getModePattern("custom", 12);
+            out.push(99);
+            expect(MUSICALMODES.custom).toEqual([2, 2, 3, 2, 3]);
+        });
     });
 
     it("rescales a native 19-EDO custom mode requested at EDO 12", () => {
@@ -5317,6 +5360,33 @@ describe("mode pie menu shared helpers", () => {
                 JSON.stringify([{ name: "my mode", pattern: [1, 2] }, { pattern: [1] }, null])
             );
             expect(getSavedCustomModes()).toEqual([{ name: "my mode", pattern: [1, 2] }]);
+        });
+
+        it("drops saved modes whose pattern isn't a list of positive whole steps", () => {
+            localStorage.setItem(
+                "customModes",
+                JSON.stringify([
+                    { name: "good", pattern: [2, 2, 3, 2, 3] },
+                    { name: "zero step", pattern: [4, 3, 0, 3] },
+                    { name: "fraction", pattern: [1.5, 10.5] },
+                    { name: "empty", pattern: [] },
+                    { name: "no pattern" }
+                ])
+            );
+            expect(getSavedCustomModes()).toEqual([{ name: "good", pattern: [2, 2, 3, 2, 3] }]);
+        });
+
+        it("keeps a saved mode only when its steps add up to its own saved EDO", () => {
+            localStorage.setItem(
+                "customModes",
+                JSON.stringify([
+                    { name: "fits 12", pattern: [2, 2, 3, 2, 3], edo: 12 },
+                    { name: "fits 19", pattern: [3, 3, 2, 3, 3, 3, 2], edo: 19 },
+                    { name: "wrong sum", pattern: [2, 2, 3, 2, 3], edo: 19 },
+                    { name: "bad edo", pattern: [2, 2, 3, 2, 3], edo: "12" }
+                ])
+            );
+            expect(getSavedCustomModes().map(m => m.name)).toEqual(["fits 12", "fits 19"]);
         });
 
         it("returns an empty list for corrupt or non-array data", () => {
