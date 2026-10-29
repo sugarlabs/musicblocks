@@ -944,6 +944,7 @@ class ProjectManager {
 
         const data = this.prepareExport();
         const rejectOnProjectSaveError = options.rejectOnProjectSaveError === true;
+        const reportSaveErrors = options.reportSaveErrors ?? !activity.sessionStorageManager;
 
         if (activity.storage.currentProject === undefined) {
             try {
@@ -951,7 +952,7 @@ class ProjectManager {
                 activity.storage.allProjects = JSON.stringify(["My Project"]);
             } catch (e) {
                 ErrorHandler.recoverable(e, { operation: "saveLocally_setCurrentProject" });
-                if (options.reportSaveErrors !== false) {
+                if (reportSaveErrors) {
                     activity.textMsg(
                         _(
                             "Could not write the local-storage session. Retry saving or export a Music Blocks project to keep your work."
@@ -973,7 +974,7 @@ class ProjectManager {
             // (IndexedDB) handles large payloads.
             console.warn("localStorage quota exceeded for SESSION. Relying on IndexedDB.", e);
             ErrorHandler.recoverable(e, { operation: "saveLocally_saveSession" });
-            if (options.reportSaveErrors !== false) {
+            if (reportSaveErrors) {
                 activity.textMsg(
                     _(
                         "Could not write the local-storage session. Retry saving or export a Music Blocks project to keep your work."

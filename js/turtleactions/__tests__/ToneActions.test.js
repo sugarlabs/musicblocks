@@ -247,6 +247,30 @@ describe("setupToneActions", () => {
             ]
         });
 
+        it("translates a complete capture refusal with reorderable literal names", () => {
+            const previousTranslate = global._;
+            const message = "Multisample instrument “%1” is not supported in %2.";
+            global._ = jest.fn(text => (text === message ? "%2 cannot capture %1." : text));
+            try {
+                const instrument = { ...multisampleValue(), name: "Cello $& $1 %2" };
+                expect(
+                    Singer.ToneActions.rejectMultisampleCapture(
+                        instrument,
+                        0,
+                        1,
+                        "Phrase Maker $& %1"
+                    )
+                ).toBe(true);
+                expect(global._).toHaveBeenCalledWith(message);
+                expect(activity.errorMsg).toHaveBeenCalledWith(
+                    "Phrase Maker $& %1 cannot capture Cello $& $1 %2.",
+                    1
+                );
+            } finally {
+                global._ = previousTranslate;
+            }
+        });
+
         it("consumes a prepared pair without loading or changing the legacy registry", () => {
             activity.logo.inTimbre = false;
             const descriptor = multisampleValue();

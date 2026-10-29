@@ -4283,7 +4283,10 @@ class Block {
      * @returns {void}
      */
     _changeLabel() {
-        if (this.name === "multisample") return;
+        if (this.name === "multisample") {
+            MultisampleEditor.open(this.activity, this, this.accessibleElement);
+            return;
+        }
         const that = this;
         this._capturedInitialValue = this.value;
         this._capturedInitialText = this.text ? this.text.text : null;

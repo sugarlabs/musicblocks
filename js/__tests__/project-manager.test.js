@@ -78,6 +78,36 @@ beforeAll(() => {
 // ---------------------------------------------------------------------------
 
 describe("multisample session recovery", () => {
+    it.each(["SESSIONTest Project", "allProjects"])(
+        "only warns about %s failure without fallback or when explicitly requested",
+        key => {
+            const activity = makeActivity({ sessionStorageManager: { saveSession: jest.fn() } });
+            if (key === "allProjects") {
+                Object.defineProperty(activity.storage, "currentProject", {
+                    get: () => undefined,
+                    set: () => {}
+                });
+            }
+            const error = new DOMException("full", "QuotaExceededError");
+            Object.defineProperty(activity.storage, key, {
+                set() {
+                    throw error;
+                }
+            });
+            const manager = new ProjectManager(activity);
+            expect(manager.saveLocally()).toBe(false);
+            expect(activity.textMsg).not.toHaveBeenCalled();
+            expect(manager.saveLocally({ reportSaveErrors: true })).toBe(false);
+            expect(activity.textMsg).toHaveBeenCalledWith(
+                expect.stringContaining("Retry saving or export")
+            );
+            activity.textMsg.mockClear();
+            activity.sessionStorageManager = null;
+            expect(manager.saveLocally()).toBe(false);
+            expect(activity.textMsg).toHaveBeenCalledTimes(1);
+        }
+    );
+
     it("lets the caller handle a session quota failure without losing rejection", () => {
         const activity = makeActivity();
         const error = new DOMException("full", "QuotaExceededError");
