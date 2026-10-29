@@ -12,7 +12,7 @@
 /*
    global
 
-   DRUMNAMES, NOISENAMES, VOICENAMES, CUSTOMSAMPLES
+   DRUMNAMES, NOISENAMES, VOICENAMES, CUSTOMSAMPLES, _
  */
 
 /*
@@ -359,7 +359,12 @@ var getNoiseName = name => {
     }
 
     for (let i = 0; i < NOISENAMES.length; i++) {
-        if (NOISENAMES[i][1] === name) {
+        const isMatch =
+            NOISENAMES[i][0] === name ||
+            NOISENAMES[i][1] === name ||
+            (typeof _ === "function" &&
+                (_(name) === NOISENAMES[i][0] || _(NOISENAMES[i][0]) === name));
+        if (isMatch) {
             if (NOISENAMES[i][0] !== "") {
                 return NOISENAMES[i][0];
             } else {
@@ -387,7 +392,12 @@ var getNoiseIcon = name => {
     }
 
     for (let i = 0; i < NOISENAMES.length; i++) {
-        if (NOISENAMES[i][0] === name || NOISENAMES[i][1] === name) {
+        const isMatch =
+            NOISENAMES[i][0] === name ||
+            NOISENAMES[i][1] === name ||
+            (typeof _ === "function" &&
+                (_(name) === NOISENAMES[i][0] || _(NOISENAMES[i][0]) === name));
+        if (isMatch) {
             return NOISENAMES[i][2];
         }
     }
@@ -410,7 +420,12 @@ var getNoiseSynthName = name => {
     }
 
     for (let i = 0; i < NOISENAMES.length; i++) {
-        if (NOISENAMES[i][0] === name || NOISENAMES[i][1] === name) {
+        const isMatch =
+            NOISENAMES[i][0] === name ||
+            NOISENAMES[i][1] === name ||
+            (typeof _ === "function" &&
+                (_(name) === NOISENAMES[i][0] || _(NOISENAMES[i][0]) === name));
+        if (isMatch) {
             return NOISENAMES[i][1];
         }
     }
