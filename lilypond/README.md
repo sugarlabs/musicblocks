@@ -18,14 +18,14 @@ We will use Music Blocks to create the music and then convert that to sheet musi
 Lilypond may be downloaded for Windows, Mac, and GNU/Linux from [LilyPond download page](http://www.lilypond.org/download.html)
 
 ## Generating LilyPond files from Music Blocks
-<img src='images/save_as_ly_bt.svg'></img>
+<img src='images/save_as_ly_bt.svg' alt='Save as LilyPond block'></img>
 
 *save as lilypond block*
 
 As you play music in Music Blocks, the notes you play are stored in a cache. The `save as lilypond` block is used to transcribe the notes in the cache into a `.ly` file.
 
 **Note**: Use the <img
-src="images/eraser_bt.svg" height="36"></img> (Erase button)  to clear the cache before you run your project to ensure you only get the notes from that project.
+src="images/eraser_bt.svg" alt="Erase button" height="36"></img> (Erase button)  to clear the cache before you run your project to ensure you only get the notes from that project.
 
 ### Microphone Analogy
 You can imagine this feature as a microphone. It starts recording as soon as you start the activity. So each time that you play a sound, it gets recorded in memory. When you run the `save as lilypond` button, a copy of all what it has recorded up until in the specified file.
@@ -58,7 +58,7 @@ Mi Fa
 ```
 
 **Hint:** Every time the save button gets pressed, the `.ly` file gets downloaded
-<img src="images/ly_from_mb_download.png"></img>
+<img src="images/ly_from_mb_download.png" alt="Music Blocks project with a save as lilypond block named title.ly"></img>
 
 
 ## Using LilyPond
@@ -73,9 +73,9 @@ Mi Fa
 ### For Windows
 1. Copy the generated `filename.ly` file to desktop.
 2. Drag and drop this file on the LilyPond shortcut.
-<img src="images/ly_windows_1.png"></img>
+<img src="images/ly_windows_1.png" alt="Dragging test.ly onto the LilyPond shortcut on the Windows desktop"></img>
 3. The `.pdf` and logs are created and can be found on the desktop.
-<img src="images/ly_windows_2.png"></img>
+<img src="images/ly_windows_2.png" alt="LilyPond compilation log in Notepad next to the generated PDF"></img>
 
 ### For Mac OS X
 ##### Compile (with LilyPad)
@@ -84,19 +84,19 @@ Mi Fa
 2. Close the example file which it opens.
 3. Use `File > Open` to open your `.ly` file:
 
-   <img src="images/ly_use_mac_1.png"></img>
+   <img src="images/ly_use_mac_1.png" alt="LilyPond File menu with Open selected"></img>
 4. From the menu along the top left of your screen, select `Compile > Typeset`
 
-   <img src="images/ly_use_mac_2.png"></img>
+   <img src="images/ly_use_mac_2.png" alt="LilyPond Compile menu with Typeset file selected"></img>
 
 5. A new window will open showing a progress log of the compilation of the file you have just saved.
 
-   <img src="images/ly_use_mac_3.png"></img>
+   <img src="images/ly_use_mac_3.png" alt="LilyPond window showing the compilation progress log"></img>
 
 ##### View output
 Once the compilation has finished, a `.pdf` file will be created with the same name as the original file. This file will be automatically opened in the default PDF viewer and displayed on your screen.
 
-   <img src="images/ly_use_mac_4.png"></img>
+   <img src="images/ly_use_mac_4.png" alt="The generated PDF showing a scale in LilyPond"></img>
 
 If the `.pdf` file is not displayed check the window with the progress log for any errors.
 
@@ -124,11 +124,11 @@ Optionally, you can install `frescobaldi` a Graphical User Interface [(GUI)](htt
 1. Download the [DMG disk images](https://github.com/wbsoft/frescobaldi/releases).
  (64 bit and 32 bit versions are provided (the "Frescobaldi-2.x.x-x86_64.dmg" and "Frescobaldi-2.x.x-i386.dmg" files, respectively)
 2. Click to open the downloaded `.dmg` file.
- <img src="images/frescobaldi_mac_1.png"></img>
+ <img src="images/frescobaldi_mac_1.png" alt="Frescobaldi releases page with the downloaded .dmg file"></img>
 3. This will open up a pop up in which you can see the `Applications` shortcut and the Frescobaldi logo, drag the logo onto the Applications shortcut.
- <img src="images/frescobaldi_mac_2.png"></img>
+ <img src="images/frescobaldi_mac_2.png" alt="Frescobaldi disk image window with the Applications shortcut"></img>
 4. Doing that will take you to the `Applications` folder and you can drop it there.
- <img src="images/frescobaldi_mac_3.png"></img>
+ <img src="images/frescobaldi_mac_3.png" alt="Dropping Frescobaldi into the Applications folder"></img>
 
 #### Alternative install via Homebrew or MacPorts
 1. If you have not already installed [Homebrew](http://brew.sh/) or [MacPorts](https://www.macports.org/), choose one of them and install.
@@ -180,7 +180,7 @@ More customization details are found in the .ly file. Further references include
 * [Lilypond output in a web browser](https://www.tunefl.com/)
 
 ## Example: Making a `.ly` file from Music Blocks and Output
-<img src='images/example.svg'></img>
+<img src='images/example.svg' alt='Music Blocks program that ends with a save as lilypond block saving hotdog.ly'></img>
 
 The `save as lilypond` block will transcribe your composition. The
 output of the program above is saved to `~/Downloads/hotdog.ly.`
@@ -205,7 +205,7 @@ e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
 }
 ```
 
-<img src='images/sheetmusic.png'></img>
+<img src='images/sheetmusic.png' alt='Sheet music generated from the example .ly file'></img>
 
 ## Example: Blank `.ly` file
 ```
