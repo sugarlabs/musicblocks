@@ -109,6 +109,14 @@ describe("Multisample unsupported destinations", { testIsolation: true, retries:
                                         _rowBlocks: [90]
                                     });
                                     activity.logo[key] = widget;
+                                    if (type === "musickeyboard") {
+                                        const block = activity.blocks.blockList.find(
+                                            block => !block.trash && block.name === type
+                                        );
+                                        activity.logo.musicKeyboards = {
+                                            [block.blockIndex]: widget
+                                        };
+                                    }
                                     init = cy.spy(widget, "init");
                                     before = { ...widget };
                                     decode = cy.spy(win.Tone.ToneAudioBuffer, "load");
