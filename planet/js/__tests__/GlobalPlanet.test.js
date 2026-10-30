@@ -813,6 +813,29 @@ describe("GlobalPlanet", () => {
 
             expect(gp.search).toHaveBeenCalledTimes(1);
         });
+
+        it("should restore the browse view when live search is manually cleared", () => {
+            const input = document.getElementById("global-search");
+
+            gp.search.mockRestore();
+            const refreshSpy = jest.spyOn(gp, "refreshProjects").mockImplementation(() => {});
+
+            gp.searchString = "wrong-query";
+            gp.oldSearchString = "wrong-query";
+            gp.searching = false;
+
+            document.getElementById("tagscontainer").style.display = "none";
+
+            input.value = "";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            jest.advanceTimersByTime(300);
+
+            expect(gp.searchString).toBe("");
+            expect(gp.oldSearchString).toBe("");
+            expect(document.getElementById("tagscontainer").style.display).not.toBe("none");
+            expect(refreshSpy).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe("destroy", () => {
