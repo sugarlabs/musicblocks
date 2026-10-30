@@ -92,6 +92,8 @@ class LocalPlanet {
     filterProjects(query) {
         this.searchString = query.trim().toLowerCase();
 
+        let matchCount = 0;
+
         for (let i = 0; i < this.projects.length; i++) {
             const id = this.projects[i][0];
 
@@ -105,7 +107,17 @@ class LocalPlanet {
 
             if (!card) continue;
 
-            card.style.display = projectName.includes(this.searchString) ? "" : "none";
+            const matches = projectName.includes(this.searchString);
+
+            card.style.display = matches ? "" : "none";
+
+            if (matches) matchCount++;
+        }
+
+        const emptyState = document.getElementById("local-search-empty");
+
+        if (emptyState) {
+            emptyState.hidden = this.searchString === "" || matchCount > 0;
         }
     }
 

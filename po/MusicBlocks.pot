@@ -413,7 +413,7 @@ msgstr ""
 #: js/widgets/temperament.js:546
 #: js/widgets/temperament.js:1677
 #: js/widgets/temperament.js:1678
-#: planet/js/StringHelper.js:76
+#: planet/js/StringHelper.js:80
 msgid "Close"
 msgstr ""
 
@@ -974,7 +974,7 @@ msgstr ""
 #: js/toolbar-ui.js:359
 #: planet/js/GlobalCard.js:56
 #: planet/js/LocalCard.js:64
-#: planet/js/StringHelper.js:78
+#: planet/js/StringHelper.js:82
 msgid "Merge with current project"
 msgstr ""
 
@@ -1055,7 +1055,7 @@ msgid "Right-click on a block to access common actions."
 msgstr ""
 
 #: js/turtledefs.js:639
-#: planet/js/StringHelper.js:48
+#: planet/js/StringHelper.js:52
 msgid "Delete"
 msgstr ""
 
@@ -1363,8 +1363,8 @@ msgstr ""
 #: js/svgAssetSelector.js:172
 #: js/widgets/aidebugger.js:581
 #: planet/js/Planet.js:176
-#: planet/js/StringHelper.js:42
-#: planet/js/StringHelper.js:49
+#: planet/js/StringHelper.js:46
+#: planet/js/StringHelper.js:53
 msgid "Cancel"
 msgstr ""
 
@@ -1389,7 +1389,7 @@ msgid "File name"
 msgstr ""
 
 #: js/SaveInterface.js:744
-#: planet/js/StringHelper.js:38
+#: planet/js/StringHelper.js:42
 #.TRANS: Project title prompt for save as Lilypond
 msgid "Project title"
 msgstr ""
@@ -8469,7 +8469,7 @@ msgid "All Projects"
 msgstr ""
 
 #: planet/js/GlobalTag.js:28
-#: planet/js/StringHelper.js:36
+#: planet/js/StringHelper.js:40
 #.TRANS: On the Planet, we use labels to tag projects.
 msgid "My Projects"
 msgstr ""
@@ -8514,7 +8514,7 @@ msgid "View published project"
 msgstr ""
 
 #: planet/js/LocalCard.js:44
-#: planet/js/StringHelper.js:37
+#: planet/js/StringHelper.js:41
 #: planet/js/Publisher.js:203
 msgid "Publish project"
 msgstr ""
@@ -8556,14 +8556,14 @@ msgid "Thank you for reporting this project. A moderator will review the project
 msgstr ""
 
 #: planet/js/ProjectViewer.js:33
-#: planet/js/StringHelper.js:64
-#: planet/js/StringHelper.js:66
-#: planet/js/StringHelper.js:75
+#: planet/js/StringHelper.js:68
+#: planet/js/StringHelper.js:70
+#: planet/js/StringHelper.js:79
 msgid "Report Project"
 msgstr ""
 
 #: planet/js/ProjectViewer.js:34
-#: planet/js/StringHelper.js:65
+#: planet/js/StringHelper.js:69
 msgid "Project Reported"
 msgstr ""
 
@@ -8632,89 +8632,93 @@ msgid "Search for projects"
 msgstr ""
 
 #: planet/js/StringHelper.js:39
-msgid "Tags (max 5)"
-msgstr ""
-
-#: planet/js/StringHelper.js:40
-#: planet/js/StringHelper.js:63
-msgid "Description"
-msgstr ""
-
-#: planet/js/StringHelper.js:41
-#: planet/js/StringHelper.js:74
-msgid "Submit"
+msgid "No projects match your search."
 msgstr ""
 
 #: planet/js/StringHelper.js:43
+msgid "Tags (max 5)"
+msgstr ""
+
+#: planet/js/StringHelper.js:44
+#: planet/js/StringHelper.js:67
+msgid "Description"
+msgstr ""
+
+#: planet/js/StringHelper.js:45
+#: planet/js/StringHelper.js:78
+msgid "Submit"
+msgstr ""
+
+#: planet/js/StringHelper.js:47
 msgid "Delete \"<span id=\"deleter-title\"></span>\"?"
 msgstr ""
 
-#: planet/js/StringHelper.js:46
+#: planet/js/StringHelper.js:50
 msgid "Permanently delete project \"<span id=\"deleter-name\"></span>\"?"
 msgstr ""
 
-#: planet/js/StringHelper.js:50
+#: planet/js/StringHelper.js:54
 msgid "Explore Projects"
 msgstr ""
 
-#: planet/js/StringHelper.js:51
+#: planet/js/StringHelper.js:55
 #: planet/js/helper.js:149
 msgid "Show more tags"
 msgstr ""
 
-#: planet/js/StringHelper.js:52
+#: planet/js/StringHelper.js:56
 msgid "Most recent"
 msgstr ""
 
-#: planet/js/StringHelper.js:53
+#: planet/js/StringHelper.js:57
 msgid "Most liked"
 msgstr ""
 
-#: planet/js/StringHelper.js:54
+#: planet/js/StringHelper.js:58
 msgid "Most downloaded"
 msgstr ""
 
-#: planet/js/StringHelper.js:55
+#: planet/js/StringHelper.js:59
 msgid "A-Z"
 msgstr ""
 
-#: planet/js/StringHelper.js:56
+#: planet/js/StringHelper.js:60
 msgid "Sort by"
 msgstr ""
 
-#: planet/js/StringHelper.js:57
+#: planet/js/StringHelper.js:61
 msgid "Load More Projects"
 msgstr ""
 
-#: planet/js/StringHelper.js:58
+#: planet/js/StringHelper.js:62
 msgid "Last Updated"
 msgstr ""
 
-#: planet/js/StringHelper.js:59
+#: planet/js/StringHelper.js:63
 msgid "Creation Date"
 msgstr ""
 
-#: planet/js/StringHelper.js:60
+#: planet/js/StringHelper.js:64
 msgid "Number of Downloads:"
 msgstr ""
 
-#: planet/js/StringHelper.js:61
+#: planet/js/StringHelper.js:65
 msgid "Number of Likes:"
 msgstr ""
 
-#: planet/js/StringHelper.js:62
+#: planet/js/StringHelper.js:66
 msgid "Tags:"
 msgstr ""
 
-#: planet/js/StringHelper.js:69
+#: planet/js/StringHelper.js:73
 msgid "Report projects which violate the <a href=\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\" target=\"_blank\" rel=\"noopener noreferrer\">Sugar Labs Code of Conduct</a>."
 msgstr ""
 
-#: planet/js/StringHelper.js:73
+#: planet/js/StringHelper.js:77
 msgid "Reason for reporting project"
 msgstr ""
 
-#: planet/js/StringHelper.js:77
+#: planet/js/StringHelper.js:81
 msgid "Download as File"
 msgstr ""
 
@@ -9072,15 +9076,15 @@ msgstr ""
 #~msgid "Trim"
 #~msgstr ""
 
-#: planet/js/StringHelper.js:43
+#: planet/js/StringHelper.js:47
 #~msgid "Delete \"<span id=\"deleter-title\"></span>\"?"
 #~msgstr ""
 
-#: planet/js/StringHelper.js:46
+#: planet/js/StringHelper.js:50
 #~msgid "Permanently delete project \"<span id=\"deleter-name\"></span>\"?"
 #~msgstr ""
 
-#: planet/js/StringHelper.js:69
+#: planet/js/StringHelper.js:73
 #~msgid "Report projects which violate the <a href=\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\" target=\"_blank\" rel=\"noopener noreferrer\">Sugar Labs Code of Conduct</a>."
 #~msgstr ""
 
