@@ -810,9 +810,9 @@ class GlobalPlanet {
             const scheduleGlobalSearch = value => {
                 clearTimeout(this.searchDebounce);
 
-                this.searchString = value.trim();
-
                 this.searchDebounce = setTimeout(() => {
+                    this.searchDebounce = null;
+                    this.searchString = value.trim();
                     this.search();
                 }, 300);
             };
