@@ -139,6 +139,9 @@ class ASTUtils {
     /** How many loops (Repeat, Forever, While, Until) the code being generated is inside. */
     static _loopDepth = 0;
 
+    /** Names of argument blocks exported as placeholders because they have no equivalent. */
+    static unsupportedArgBlocks = new Set();
+
     /**
      * Runs a generator with the loop depth raised by one, so action calls made inside it know
      * they are called from a loop.
@@ -890,9 +893,28 @@ class ASTUtils {
             } else {
                 return getCallExpAST(mathOps[methodName][1], args);
             }
-        } else {
+        } else if (JSInterface.isMethod(methodName)) {
             return getCallExpAST(JSInterface.getMethodName(methodName), args);
         }
+
+        return ASTUtils._getUnsupportedArgAST(methodName);
+    }
+
+    /**
+     * Returns a placeholder for an argument block that has no JavaScript equivalent, and records
+     * the block name so the export can report it.
+     *
+     * @static
+     * @param {String} blockName - block name
+     * @returns {Object} - Abstract Syntax Tree of an undefined literal marked with the block name
+     */
+    static _getUnsupportedArgAST(blockName) {
+        ASTUtils.unsupportedArgBlocks.add(blockName);
+        return {
+            type: "Literal",
+            value: undefined,
+            raw: `undefined /* unsupported block: ${blockName} */`
+        };
     }
 
     /**
