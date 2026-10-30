@@ -450,15 +450,21 @@ class WidgetWindow {
             };
         }
         const closeButton = this._create("div", "wftButton close", this._drag);
+        this._closeButton = closeButton;
         closeButton.title = _("Close");
         closeButton.setAttribute("role", "button");
         closeButton.setAttribute("aria-label", _("Close window"));
         closeButton.setAttribute("tabindex", "0");
         closeButton.onclick = e => {
             this.onclose();
-            e.preventDefault();
-            e.stopPropagation();
+            if (e && typeof e.preventDefault === "function") {
+                e.preventDefault();
+            }
+            if (e && typeof e.stopPropagation === "function") {
+                e.stopPropagation();
+            }
         };
+        makeKeyboardAccessible(closeButton, _("Close window"));
 
         this._nonclose = this._create("div", "nonclose", this._drag);
         this._nonclose.style.display = "flex";
@@ -504,9 +510,14 @@ class WidgetWindow {
             this._frame.style.width = "auto";
             this._frame.style.height = "auto";
             this._frame.style.minHeight = "0px";
-            e.preventDefault();
-            e.stopPropagation();
+            if (e && typeof e.preventDefault === "function") {
+                e.preventDefault();
+            }
+            if (e && typeof e.stopPropagation === "function") {
+                e.stopPropagation();
+            }
         };
+        makeKeyboardAccessible(rollButton, _("Roll up window"));
 
         if (this._fullscreenEnabled) {
             const maxminButton = this._create("div", "wftButton wftMaxmin", this._nonclosebuttons);
@@ -524,9 +535,14 @@ class WidgetWindow {
                 }
                 this.takeFocus();
                 this.onmaximize();
-                e.preventDefault();
-                e.stopImmediatePropagation();
+                if (e && typeof e.preventDefault === "function") {
+                    e.preventDefault();
+                }
+                if (e && typeof e.stopImmediatePropagation === "function") {
+                    e.stopImmediatePropagation();
+                }
             };
+            makeKeyboardAccessible(maxminButton, _("Maximize window"));
             this._maxminIcon = this._create("img", undefined, maxminButton);
             this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
         }
