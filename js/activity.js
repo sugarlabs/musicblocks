@@ -878,6 +878,10 @@ class Activity {
                     this.multisampleProjectGeneration !== projectGeneration
                 )
                     return;
+                if (this.multisampleEditor) {
+                    this.errorMsg(_("Finish or cancel instrument editing first."));
+                    return;
+                }
                 this._onResize();
                 this.blocks.activeBlock = null;
                 hideDOMLabel();
