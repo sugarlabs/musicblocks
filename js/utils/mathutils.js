@@ -64,6 +64,18 @@ class MathUtility {
         return typeof a === "number" && !Number.isNaN(a);
     }
 
+    /**
+     * Rounds a number to at most 10 decimal places to eliminate floating-point
+     * conversion artifacts from degree/radian transformations (matching Scratch-VM).
+     *
+     * @static
+     * @param {number} val
+     * @returns {number}
+     */
+    static _round10(val) {
+        return Number.isFinite(val) ? parseFloat(val.toFixed(10)) + 0 : val;
+    }
+
     static doRandom(a, b, c) {
         /**
          * Returns a random number between n1 and n2 (both inclusive).
@@ -402,6 +414,146 @@ class MathUtility {
      */
     static doRepeatCount(a) {
         return Number.isFinite(a) && a >= 1 ? Math.floor(a) : 0;
+    }
+
+    /**
+     * Returns the sine of a (angle in degrees).
+     *
+     * @static
+     * @param {number} a - Angle in degrees.
+     * @returns {number} - Sine of a.
+     * @throws {string} NanError if the argument is not a valid number.
+     */
+    static doSin(a) {
+        if (!MathUtility._isNumber(a)) {
+            throw new Error("NanError");
+        }
+        return MathUtility._round10(Math.sin(((Number(a) % 360) * Math.PI) / 180));
+    }
+
+    /**
+     * Returns the cosine of a (angle in degrees).
+     *
+     * @static
+     * @param {number} a - Angle in degrees.
+     * @returns {number} - Cosine of a.
+     * @throws {string} NanError if the argument is not a valid number.
+     */
+    static doCos(a) {
+        if (!MathUtility._isNumber(a)) {
+            throw new Error("NanError");
+        }
+        return MathUtility._round10(Math.cos(((Number(a) % 360) * Math.PI) / 180));
+    }
+
+    /**
+     * Returns the tangent of a (angle in degrees).
+     *
+     * @static
+     * @param {number} a - Angle in degrees.
+     * @returns {number} - Tangent of a.
+     * @throws {string} NanError if the argument is not a valid number or angle is equivalent to 90 degrees modulo 180.
+     */
+    static doTan(a) {
+        if (!MathUtility._isNumber(a) || (Number(a) - 90) % 180 === 0) {
+            throw new Error("NanError");
+        }
+        return MathUtility._round10(Math.tan(((Number(a) % 180) * Math.PI) / 180));
+    }
+
+    /**
+     * Returns the arcsine of a (result in degrees).
+     *
+     * @static
+     * @param {number} a - Value between -1 and 1.
+     * @returns {number} - Arcsine in degrees.
+     * @throws {string} NanError if the argument is not a valid number or out of [-1, 1].
+     */
+    static doArcSin(a) {
+        if (!MathUtility._isNumber(a) || a < -1 || a > 1) {
+            throw new Error("NanError");
+        }
+        return MathUtility._round10((Math.asin(Number(a)) * 180) / Math.PI);
+    }
+
+    /**
+     * Returns the arccosine of a (result in degrees).
+     *
+     * @static
+     * @param {number} a - Value between -1 and 1.
+     * @returns {number} - Arccosine in degrees.
+     * @throws {string} NanError if the argument is not a valid number or out of [-1, 1].
+     */
+    static doArcCos(a) {
+        if (!MathUtility._isNumber(a) || a < -1 || a > 1) {
+            throw new Error("NanError");
+        }
+        return MathUtility._round10((Math.acos(Number(a)) * 180) / Math.PI);
+    }
+
+    /**
+     * Returns the arctangent of a (result in degrees).
+     *
+     * @static
+     * @param {number} a
+     * @returns {number} - Arctangent in degrees.
+     * @throws {string} NanError if the argument is not a valid number.
+     */
+    static doArcTan(a) {
+        if (!MathUtility._isNumber(a)) {
+            throw new Error("NanError");
+        }
+        return MathUtility._round10((Math.atan(Number(a)) * 180) / Math.PI);
+    }
+
+    /**
+     * Returns the natural logarithm (base e) of a.
+     *
+     * @static
+     * @param {number} a - Positive number.
+     * @returns {number} - Natural logarithm of a.
+     * @throws {string} NanError if the argument is not a valid positive number.
+     */
+    static doLn(a) {
+        if (!MathUtility._isNumber(a) || a <= 0) {
+            throw new Error("NanError");
+        }
+        return Math.log(Number(a));
+    }
+
+    /**
+     * Returns the base-10 logarithm of a.
+     *
+     * @static
+     * @param {number} a - Positive number.
+     * @returns {number} - Base-10 logarithm of a.
+     * @throws {string} NanError if the argument is not a valid positive number.
+     */
+    static doLog(a) {
+        if (!MathUtility._isNumber(a) || a <= 0) {
+            throw new Error("NanError");
+        }
+        return Math.log10(Number(a));
+    }
+
+    /**
+     * Returns the mathematical constant π.
+     *
+     * @static
+     * @returns {number} - Mathematical constant π.
+     */
+    static doPi() {
+        return Math.PI;
+    }
+
+    /**
+     * Returns Euler's number e.
+     *
+     * @static
+     * @returns {number} - Euler's number e.
+     */
+    static doE() {
+        return Math.E;
     }
 }
 // Ensure mathutils.js exports the MathUtility class
