@@ -417,6 +417,8 @@ Music Blocks has handy widgets for various musical concepts to create musical co
 | scales-with-fifths.html | Cycle through scales and fifths |
 | intervals-with-events.html | generate random intervals by clicking on the mouse |
 | equal-temperament-calculation.html | Calculate an octave tuned to equal temperament by using 2^(1/12) |
+| polyrhythm-lcm-gcd.html | Polyrhythm & harmonic overtone explorer: uses GCD to calculate the acoustic fundamental root (150Hz from 300Hz and 450Hz) and arpeggiate the harmonic series; uses LCM to calculate 3:4 polyrhythm cycle length (12 beats) and cycle through interlocking cross-pulses |
+| smooth-dynamics-lerp-map.html | Continuous musical dynamics & sonification: uses LERP for smooth dynamic volume swells (crescendo/decrescendo) and MAP to continuously sonify step progression to pitch frequency |
 | Twinkle-Twinkle-with-Pythagorean-tuning.html | Listen to the difference tuning makes |
 | el.html | Experimentation with the *One of this or that* block.
 | Galton-music.html | Modeled after a Galton box, a Gaussian distribution of tones is generated. A nice way to explore musical mode. |

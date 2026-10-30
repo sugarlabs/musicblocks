@@ -16,16 +16,28 @@
  */
 
 /*
-   global SOLFEGENAMES
+   global SOLFEGENAMES, GCD
  */
 
 /*
    Global location
     js/utils/musicutils.js
         SOLFEGENAMES
+    js/utils/utils-logic.js
+        GCD
  */
 
 /* exported MathUtility */
+
+let _GCD = typeof GCD !== "undefined" ? GCD : null;
+if (typeof require !== "undefined" && !_GCD) {
+    try {
+        const utilsLogic = require("./utils-logic");
+        if (!_GCD) _GCD = utilsLogic.GCD;
+    } catch (e) {
+        // browser environment
+    }
+}
 
 /**
  * Utility class for managing math operations.
@@ -402,6 +414,118 @@ class MathUtility {
      */
     static doRepeatCount(a) {
         return Number.isFinite(a) && a >= 1 ? Math.floor(a) : 0;
+    }
+
+    /**
+     * Computes linear interpolation between start and stop for an amount amt.
+     *
+     * @static
+     * @param {number} start - Start value.
+     * @param {number} stop - Stop value.
+     * @param {number} amt - Interpolation factor.
+     * @returns {number} - Interpolated value.
+     * @throws {Error} NanError if any argument is not a valid number.
+     */
+    static doLerp(start, stop, amt) {
+        if (
+            MathUtility._isNumber(start) &&
+            MathUtility._isNumber(stop) &&
+            MathUtility._isNumber(amt)
+        ) {
+            return start + (stop - start) * amt;
+        } else {
+            throw new Error("NanError");
+        }
+    }
+
+    /**
+     * Re-maps a number from one range to another range.
+     *
+     * @static
+     * @param {number} val - The incoming value.
+     * @param {number} inMin - Lower bound of value's current range.
+     * @param {number} inMax - Upper bound of value's current range.
+     * @param {number} outMin - Lower bound of value's target range.
+     * @param {number} outMax - Upper bound of value's target range.
+     * @returns {number} - Re-mapped value.
+     * @throws {Error} DivByZeroError if inMin === inMax, NanError if any argument is not a valid number.
+     */
+    static doMap(val, inMin, inMax, outMin, outMax) {
+        if (
+            MathUtility._isNumber(val) &&
+            MathUtility._isNumber(inMin) &&
+            MathUtility._isNumber(inMax) &&
+            MathUtility._isNumber(outMin) &&
+            MathUtility._isNumber(outMax)
+        ) {
+            if (inMin === inMax) {
+                throw new Error("DivByZeroError");
+            }
+            return outMin + ((val - inMin) / (inMax - inMin)) * (outMax - outMin);
+        } else {
+            throw new Error("NanError");
+        }
+    }
+
+    /**
+     * Computes the greatest common divisor of two integers.
+     *
+     * @static
+     * @param {number} a
+     * @param {number} b
+     * @returns {number} - The greatest common divisor (non-negative integer).
+     * @throws {Error} NanError if any argument is not a valid number.
+     */
+    static doGcd(a, b) {
+        if (
+            MathUtility._isNumber(a) &&
+            MathUtility._isNumber(b) &&
+            Number.isFinite(a) &&
+            Number.isFinite(b)
+        ) {
+            const x = Math.abs(Math.trunc(a));
+            const y = Math.abs(Math.trunc(b));
+            if (_GCD) {
+                return _GCD(x, y);
+            }
+            let m = x;
+            let n = y;
+            while (n !== 0) {
+                const temp = n;
+                n = m % n;
+                m = temp;
+            }
+            return m;
+        } else {
+            throw new Error("NanError");
+        }
+    }
+
+    /**
+     * Computes the least common multiple of two integers.
+     *
+     * @static
+     * @param {number} a
+     * @param {number} b
+     * @returns {number} - The least common multiple (non-negative integer).
+     * @throws {Error} NanError if any argument is not a valid number.
+     */
+    static doLcm(a, b) {
+        if (
+            MathUtility._isNumber(a) &&
+            MathUtility._isNumber(b) &&
+            Number.isFinite(a) &&
+            Number.isFinite(b)
+        ) {
+            const x = Math.abs(Math.trunc(a));
+            const y = Math.abs(Math.trunc(b));
+            if (x === 0 || y === 0) return 0;
+            const gcd = MathUtility.doGcd(x, y);
+            if (gcd === 0) return 0;
+            return (x / gcd) * y;
+        } else {
+            throw new Error("NanError");
+        }
     }
 }
 // Ensure mathutils.js exports the MathUtility class
