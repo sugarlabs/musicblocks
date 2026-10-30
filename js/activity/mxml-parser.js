@@ -159,15 +159,9 @@ const _addFractionsWithoutCrossMultiplication = ([n1, d1], [n2, d2]) => {
         return [1, 4];
     }
 
-    let safeDenominator = Math.min(denominator, Number.MAX_VALUE / value);
-    let safeResult = [value * safeDenominator, safeDenominator];
-
-    if (!_isUsableFraction(safeResult)) {
-        safeDenominator /= 2;
-        safeResult = [value * safeDenominator, safeDenominator];
-    }
-
-    return _isUsableFraction(safeResult) ? safeResult : [1, 4];
+    // Exact fraction scaling is no longer safe here.
+    // Preserve the finite numeric duration instead.
+    return [value, 1];
 };
 
 // Keep tie durations reduced as they accumulate. Multiplying denominators on

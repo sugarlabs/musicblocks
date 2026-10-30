@@ -1289,6 +1289,33 @@ describe("Test 16: Ties", () => {
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
+    it("preserves a fractional sum when safe fallback scaling would round", async () => {
+        const xml =
+            '<score-partwise><part id="P1">' +
+            '<measure number="1"><attributes><divisions>5e-324</divisions></attributes>' +
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            '<duration>2e-323</duration><tie type="start"/></note>' +
+            "</measure>" +
+            '<measure number="2"><attributes><divisions>2.5e307</divisions></attributes>' +
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            '<duration>1.25e307</duration><tie type="stop"/></note>' +
+            "</measure>" +
+            "</part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        const values = noteValues(blocks);
+
+        expect(values).toHaveLength(1);
+
+        const [[numerator, denominator]] = values;
+        expect(Number.isFinite(numerator)).toBe(true);
+        expect(Number.isFinite(denominator)).toBe(true);
+        expect(numerator).toBeGreaterThan(0);
+        expect(denominator).toBeGreaterThan(0);
+        expect(numerator / denominator).toBe(1.125);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
     it("falls back safely when a tied duration sum exceeds the numeric range", async () => {
         const hugeDuration = `17${"0".repeat(307)}`;
         const note = tie =>
