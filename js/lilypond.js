@@ -55,6 +55,13 @@ const escapeLilypondString = text => String(text).replace(/\\/g, "\\\\").replace
 
 const toLilypondString = text => '"' + escapeLilypondString(text) + '"';
 
+const isLilypondWholeTuplet = tuplet =>
+    Array.isArray(tuplet) &&
+    Number.isInteger(tuplet[0]) &&
+    tuplet[0] > 0 &&
+    Number.isInteger(tuplet[1]) &&
+    tuplet[1] > 0;
+
 /**
  * Reads the beat a tempo or a pickup is staged with. notation.js stages it as a Lilypond
  * duration (convertFactor() in js/utils/musicutils-rhythm.js), which is a sum of them when
@@ -584,7 +591,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
 
             // If it is a tuplet, look ahead to see if it is complete.
             // While you are at it, add up the durations.
-            if (obj[NOTATIONTUPLETVALUE] !== null) {
+            if (isLilypondWholeTuplet(obj[NOTATIONTUPLETVALUE])) {
                 let f;
                 targetDuration = 1 / logo.notation.notationStaging[turtle][i][NOTATIONDURATION];
                 tupletDuration = 1 / logo.notation.notationStaging[turtle][i][NOTATIONROUNDDOWN];
@@ -623,7 +630,9 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                         incompleteTuplet = j;
                         break;
                     } else if (
-                        logo.notation.notationStaging[turtle][i + j][NOTATIONTUPLETVALUE] === null
+                        !isLilypondWholeTuplet(
+                            logo.notation.notationStaging[turtle][i + j][NOTATIONTUPLETVALUE]
+                        )
                     ) {
                         incompleteTuplet = j;
                         break;
@@ -674,10 +683,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                 }
             }
 
-            if (
-                obj[NOTATIONTUPLETVALUE] !== null &&
-                obj[NOTATIONTUPLETVALUE][0] * obj[NOTATIONTUPLETVALUE][1] > 0
-            ) {
+            if (isLilypondWholeTuplet(obj[NOTATIONTUPLETVALUE])) {
                 // Lilypond tuplets look like this: \tuplet 3/2 { f8 g a }
                 // multiplier = tupletDuration / targetDuration
                 // e.g., (3/8) / (1/4) = (3/8) * 4 = 12/8 = 3/2
@@ -745,8 +751,34 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                         logo.notationNotes[turtle] += ">";
                     }
 
-                    logo.notationNotes[turtle] += obj[NOTATIONDURATION];
-                    for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
+                    const isRejectedTuplet =
+                        obj[NOTATIONTUPLETVALUE] !== null &&
+                        obj[NOTATIONTUPLETVALUE] !== undefined &&
+                        !isLilypondWholeTuplet(obj[NOTATIONTUPLETVALUE]);
+                    let noteDuration;
+                    if (
+                        isRejectedTuplet &&
+                        Number.isInteger(obj[NOTATIONROUNDDOWN]) &&
+                        obj[NOTATIONROUNDDOWN] > 0
+                    ) {
+                        noteDuration = obj[NOTATIONROUNDDOWN];
+                    } else if (
+                        Number.isInteger(obj[NOTATIONDURATION]) &&
+                        obj[NOTATIONDURATION] > 0
+                    ) {
+                        noteDuration = obj[NOTATIONDURATION];
+                    } else if (
+                        Number.isInteger(obj[NOTATIONROUNDDOWN]) &&
+                        obj[NOTATIONROUNDDOWN] > 0
+                    ) {
+                        noteDuration = obj[NOTATIONROUNDDOWN];
+                    } else {
+                        noteDuration = Math.max(1, Math.round(obj[NOTATIONDURATION]) || 1);
+                    }
+                    const dotCount = isRejectedTuplet ? 0 : obj[NOTATIONDOTCOUNT];
+
+                    logo.notationNotes[turtle] += noteDuration;
+                    for (let d = 0; d < dotCount; d++) {
                         logo.notationNotes[turtle] += ".";
                     }
 

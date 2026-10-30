@@ -2982,18 +2982,28 @@ describe("durationToNoteValue", () => {
     });
 
     it("should handle tuplet durations that do not match power-of-two note values", () => {
-        expect(durationToNoteValue(1.5)).toEqual([1, 0, [3, 0.5], 1]);
-        expect(durationToNoteValue(1.75)).toEqual([1, 0, [3.5, 0.5], 1]);
+        expect(durationToNoteValue(3)).toEqual([1, 0, [3, 1], 2]);
+        expect(durationToNoteValue(6)).toEqual([1, 0, [3, 2], 4]);
     });
 
     it("should round down durations that do not match exact note values in POWER2", () => {
         const result = durationToNoteValue(0.3);
-        expect(result).toEqual([1, 0, [0.6, 0.5], 1]);
+        expect(result).toEqual([1, 0, null, 1]);
     });
 
     it("should return the default rounded value for durations without an exact tuplet factor", () => {
         const result = durationToNoteValue(0.5);
-        expect(result).toEqual([1, 0, [1, 0.5], 1]);
+        expect(result).toEqual([1, 0, null, 1]);
+        expect(durationToNoteValue(1.5)).toEqual([1, 0, null, 1]);
+        expect(durationToNoteValue(1.75)).toEqual([1, 0, null, 1]);
+        expect(durationToNoteValue(2.006018054162)).toEqual([2, 0, null, 2]);
+        expect(durationToNoteValue(0)).toEqual([1, 0, null, 1]);
+        expect(durationToNoteValue(-1)).toEqual([1, 0, null, 1]);
+    });
+
+    it("should normalize near-integer durations within floating-point epsilon tolerance", () => {
+        expect(durationToNoteValue(1.9999999995)).toEqual([2, 0, null]);
+        expect(durationToNoteValue(2.9999999995)).toEqual([1, 0, [3, 1], 2]);
     });
 });
 
