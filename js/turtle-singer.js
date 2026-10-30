@@ -25,7 +25,7 @@
    noteIsSolfege, getSolfege, SOLFEGENAMES1, NOTENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
    noteToFrequency, getTemperament,
-   SEMITONES, normalizeNoteAccidentals, parseNoteString, getCurrentEDO,
+   SEMITONES, normalizeNoteAccidentals, parseNoteString, getCurrentEDO, edoTransposition,
    keySignatureToMode, getSavedCustomModes,
    clampNumber, saveMeterState, restoreMeterState
  */
@@ -38,7 +38,7 @@
         frequencyToPitch, pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp, getStepSizeDown,
         numberToPitch, pitchToNumber, noteIsSolfege, getSolfege, SOLFEGENAMES1, NOTENAMES1,
         SOLFEGECONVERSIONTABLE, getInterval, noteToFrequency, getTemperament,
-        getCurrentEDO, isEquallyTempered
+        getCurrentEDO, isEquallyTempered, edoTransposition
     js/utils/musicutils-rhythm.js
         saveMeterState, restoreMeterState
     js/utils/utils.js
@@ -1015,27 +1015,6 @@ class Singer {
     // ========= Action =======================================================
 
     /**
-     * Combines a transposition in semitones with one in steps of the current
-     * temperament (scale steps from getInterval, or octaves of `edo` steps) into
-     * the transposition and isAlreadyEdoSteps arguments of getNote.
-     *
-     * getNote reads a plain transposition as semitones and, outside 12 EDO,
-     * rescales it to the temperament's steps, so a value that is already in
-     * steps must skip that conversion. In 12 EDO the two units are the same.
-     *
-     * @param {Number} semitones - Transposition in semitones
-     * @param {Number} steps - Transposition in steps of the temperament
-     * @param {Number} edo - The current EDO steps per octave
-     * @returns {Array} [transposition, isAlreadyEdoSteps] for getNote
-     */
-    static edoTransposition(semitones, steps, edo) {
-        if (edo === 12) {
-            return [semitones + steps, false];
-        }
-        return [Math.round((semitones * edo) / 12) + steps, true];
-    }
-
-    /**
      * Resolves the arpeggio interval for the current execution visit.
      * Advances tur.singer.arpeggioIndex and wraps around at the end of the chord.
      *
@@ -1225,7 +1204,7 @@ class Singer {
                 null,
                 edo
             );
-            const [atrans, atransInSteps] = Singer.edoTransposition(
+            const [atrans, atransInSteps] = edoTransposition(
                 transposition + cents / 100 + arpeggioSemitones,
                 arpeggioSteps,
                 edo
@@ -1291,7 +1270,7 @@ class Singer {
                 null,
                 edo
             );
-            const [atrans, atransInSteps] = Singer.edoTransposition(
+            const [atrans, atransInSteps] = edoTransposition(
                 transposition + cents / 100 + arpeggioSemitones,
                 arpeggioSteps,
                 edo
@@ -1371,7 +1350,7 @@ class Singer {
                 null,
                 edo
             );
-            const [atrans, atransInSteps] = Singer.edoTransposition(
+            const [atrans, atransInSteps] = edoTransposition(
                 transposition + cents / 100 + arpeggioSemitones,
                 arpeggioSteps,
                 edo
@@ -1465,7 +1444,7 @@ class Singer {
 
                 const register = isInterval ? 0 : tur.singer.register;
                 // getOctaveInterval is the number of steps in an octave.
-                const [pitchTransform, pitchTransformInSteps] = Singer.edoTransposition(
+                const [pitchTransform, pitchTransformInSteps] = edoTransposition(
                     atrans,
                     arpeggioSteps + register * getOctaveInterval(activity),
                     edo
@@ -1546,7 +1525,7 @@ class Singer {
 
             const intervals = tur.singer.intervals;
             for (let i = 0, len = intervals.length; i < len; i++) {
-                const [intervalTrans, intervalInSteps] = Singer.edoTransposition(
+                const [intervalTrans, intervalInSteps] = edoTransposition(
                     0,
                     getInterval(intervals[i], tur.singer.keySignature, noteObj1[0], edo),
                     edo
@@ -1585,7 +1564,7 @@ class Singer {
             const chordIntervals = tur.singer.chordIntervals;
             for (let i = 0, len = chordIntervals.length; i < len; i++) {
                 const chordInterval = chordIntervals[i];
-                const [chordTrans, chordInSteps] = Singer.edoTransposition(
+                const [chordTrans, chordInSteps] = edoTransposition(
                     chordInterval[1],
                     getInterval(chordInterval[0], tur.singer.keySignature, noteObj1[0], edo),
                     edo
@@ -1716,7 +1695,7 @@ class Singer {
                 const register = isInterval ? 0 : tur.singer.register;
 
                 // getOctaveInterval is the number of steps in an octave.
-                const [pitchTransform, pitchTransformInSteps] = Singer.edoTransposition(
+                const [pitchTransform, pitchTransformInSteps] = edoTransposition(
                     transposition,
                     register * getOctaveInterval(activity),
                     edo
@@ -1767,7 +1746,7 @@ class Singer {
 
             const intervals = tur.singer.intervals;
             for (let i = 0, len = intervals.length; i < len; i++) {
-                const [intervalTrans, intervalInSteps] = Singer.edoTransposition(
+                const [intervalTrans, intervalInSteps] = edoTransposition(
                     0,
                     getInterval(intervals[i], tur.singer.keySignature, noteObj1[0], edo),
                     edo
