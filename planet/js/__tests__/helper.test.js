@@ -41,7 +41,6 @@ function setupHelperDOM() {
         <div id="search-close" style="display:none;"></div>
         <div id="local-tab"></div>
         <div id="global-tab"></div>
-        <div id="searchcontainer" style="display:block;"></div>
         <div id="view-more-chips">Show more tags ▼</div>
         <div id="morechips" class="flexchips"></div>
     `;
@@ -320,7 +319,6 @@ describe("helper.js", () => {
                     </ul>
                 </nav>
 
-                <div id="searchcontainer"></div>
 
                 <div id="view-more-chips">Show more tags ▼</div>
                 <div id="morechips" class="flexchips"></div>

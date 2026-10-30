@@ -71,11 +71,6 @@ function setCookie(cname, cvalue, exdays) {
     document.cookie = `${cname}=${cvalue};${expires};path=/${flags}`;
 }
 
-function toggleSearch(on) {
-    const displayValue = on ? "block" : "none";
-    document.getElementById("searchcontainer").style.display = displayValue;
-}
-
 function toggleText(id, a, b) {
     const el = document.getElementById(id);
 
@@ -160,14 +155,6 @@ $(document).ready(() => {
     document.getElementById("global-search").addEventListener("input", evt => {
         document.getElementById("search-close").style.display =
             evt.target.value === "" ? "none" : "initial";
-    });
-
-    document.getElementById("local-tab").addEventListener("click", evt => {
-        toggleSearch(false);
-    });
-
-    document.getElementById("global-tab").addEventListener("click", evt => {
-        toggleSearch(true);
     });
 
     document.getElementById("view-more-chips").addEventListener("click", evt => {
