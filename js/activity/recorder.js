@@ -57,6 +57,7 @@ const setupActivityRecorder = activityInstance => {
         let flag = 0;
         let currentStream = null;
         let audioDestination = null;
+        let startupPending = false;
 
         /**
          * Dispatches to canvas-only or full-screen recording based on
@@ -121,18 +122,18 @@ const setupActivityRecorder = activityInstance => {
             copyFrame();
 
             const canvasStream = recordCanvas.captureStream(30);
+            currentStream = canvasStream;
 
             const Tone = that.logo.synth.tone;
             if (Tone && Tone.context) {
                 const dest = Tone.context.createMediaStreamDestination();
-                Tone.Destination.connect(dest);
                 audioDestination = dest;
+                Tone.Destination.connect(dest);
                 const audioTrack = dest.stream.getAudioTracks()[0];
                 if (audioTrack) {
                     canvasStream.addTrack(audioTrack);
                 }
             }
-            currentStream = canvasStream;
 
             canvasStream.getTracks()[0].addEventListener("ended", () => {
                 if (animationFrameId) {
@@ -325,6 +326,11 @@ const setupActivityRecorder = activityInstance => {
             }
 
             const handler = async function handler() {
+                if (startupPending) {
+                    return;
+                }
+
+                startupPending = true;
                 try {
                     const stream = await recordScreen();
                     mediaRecorder = createRecorder(stream);
@@ -352,6 +358,8 @@ const setupActivityRecorder = activityInstance => {
                     cleanupStreams();
                     isExecuting = false;
                     recording();
+                } finally {
+                    startupPending = false;
                 }
             };
 
