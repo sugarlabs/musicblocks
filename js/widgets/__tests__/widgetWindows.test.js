@@ -71,6 +71,33 @@ function createTestWindow(title = "Test Title", fullscreen = true) {
     return win;
 }
 
+function createToolbarLayout(auxDisplay = "none") {
+    const toolbars = document.createElement("div");
+    toolbars.id = "toolbars";
+
+    const mainToolbar = document.createElement("div");
+    mainToolbar.className = "main-nav-container";
+    mainToolbar.getBoundingClientRect = () => ({
+        top: 0,
+        bottom: 64,
+        height: 64
+    });
+
+    const auxToolbar = document.createElement("div");
+    auxToolbar.id = "aux-toolbar";
+    auxToolbar.style.display = auxDisplay;
+    auxToolbar.getBoundingClientRect = () => ({
+        top: 64,
+        bottom: 128,
+        height: 64
+    });
+
+    toolbars.append(mainToolbar, auxToolbar);
+    document.body.appendChild(toolbars);
+
+    return { toolbars, auxToolbar };
+}
+
 beforeEach(() => {
     if (window.widgetWindows._boundHandleGlobalKeyDown) {
         document.removeEventListener(
@@ -108,6 +135,7 @@ beforeEach(() => {
     };
     window.widgetWindows.openWindows = {};
     window.widgetWindows._posCache = {};
+    window.widgetWindows._maximizedCache = {};
     window.widgetWindows._globalListenersInitialized = false;
     window.widgetWindows.draggingWindow = null;
     // Restore functions
@@ -536,6 +564,45 @@ describe("widgetWindows", () => {
             expect(event.defaultPrevented).toBe(true);
             expect(window.onscroll).toBe(existingScrollHandler);
         });
+
+        const scrollableLog = win => {
+            const log = document.createElement("div");
+            log.style.overflowY = "auto";
+            Object.defineProperty(log, "scrollHeight", { value: 500 });
+            Object.defineProperty(log, "clientHeight", { value: 100 });
+            const message = document.createElement("p");
+            log.appendChild(message);
+            win._widget.appendChild(log);
+            return { log, message };
+        };
+
+        test("scrolls an inner scroll area under the pointer, such as a chat log", () => {
+            const win = createTestWindow();
+            const { log, message } = scrollableLog(win);
+
+            const event = new window.WheelEvent("wheel", {
+                deltaY: 30,
+                bubbles: true,
+                cancelable: true
+            });
+            message.dispatchEvent(event);
+
+            expect(log.scrollTop).toBe(30);
+            expect(win._widget.scrollTop).toBe(0);
+            expect(event.defaultPrevented).toBe(true);
+        });
+
+        test("scrolls the widget once the inner area cannot scroll further", () => {
+            const win = createTestWindow();
+            const { log, message } = scrollableLog(win);
+
+            message.dispatchEvent(
+                new window.WheelEvent("wheel", { deltaY: -30, bubbles: true, cancelable: true })
+            );
+
+            expect(log.scrollTop).toBe(0);
+            expect(win._scrollTargetFor(message, 0, -30)).toBe(win._widget);
+        });
     });
 
     describe("sendToCenter", () => {
@@ -622,6 +689,69 @@ describe("widgetWindows", () => {
                 window.innerWidth = originalWidth;
             }
         });
+
+        test("updates maximized windows on small viewports without moving floating windows", () => {
+            const { toolbars, auxToolbar } = createToolbarLayout("block");
+            const originalWidth = window.innerWidth;
+
+            window.innerWidth = 500;
+
+            try {
+                const maximized = createTestWindow("Maximized");
+                maximized._maximize();
+
+                expect(maximized._frame.style.top).toBe("128px");
+                expect(maximized._frame.style.height).toBe("calc(100vh - 128px)");
+
+                const floating = createTestWindow("Floating");
+                floating.setPosition(100, 200);
+
+                const leftBefore = floating._frame.style.left;
+                const topBefore = floating._frame.style.top;
+
+                auxToolbar.style.display = "none";
+                window.widgetWindows._handleResize();
+
+                expect(maximized._frame.style.top).toBe("64px");
+                expect(maximized._frame.style.height).toBe("calc(100vh - 64px)");
+                expect(floating._frame.style.left).toBe(leftBefore);
+                expect(floating._frame.style.top).toBe(topBefore);
+            } finally {
+                window.innerWidth = originalWidth;
+                toolbars.remove();
+            }
+        });
+
+        test("updates a maximized window when the auxiliary toolbar opens and closes", () => {
+            const { toolbars, auxToolbar } = createToolbarLayout("none");
+            const originalWidth = window.innerWidth;
+
+            window.innerWidth = 1024;
+
+            try {
+                const win = createTestWindow();
+
+                win._maximize();
+
+                expect(win._frame.style.top).toBe("64px");
+                expect(win._frame.style.height).toBe("calc(100vh - 64px)");
+
+                auxToolbar.style.display = "block";
+                window.widgetWindows._handleResize();
+
+                expect(win._frame.style.top).toBe("128px");
+                expect(win._frame.style.height).toBe("calc(100vh - 128px)");
+
+                auxToolbar.style.display = "none";
+                window.widgetWindows._handleResize();
+
+                expect(win._frame.style.top).toBe("64px");
+                expect(win._frame.style.height).toBe("calc(100vh - 64px)");
+            } finally {
+                window.innerWidth = originalWidth;
+                toolbars.remove();
+            }
+        });
     });
 
     describe("_maximize and _restore", () => {
@@ -631,6 +761,7 @@ describe("widgetWindows", () => {
             win._maximize();
 
             expect(win._maximized).toBe(true);
+            expect(window.widgetWindows._maximizedCache[win._key]).toBe(true);
         });
 
         test("_maximize sets frame to full viewport dimensions", () => {
@@ -675,6 +806,7 @@ describe("widgetWindows", () => {
             win._restore();
 
             expect(win._maximized).toBe(false);
+            expect(window.widgetWindows._maximizedCache[win._key]).toBe(false);
         });
 
         test("_restore changes icon to expand", () => {
@@ -715,6 +847,21 @@ describe("widgetWindows", () => {
             win._restore();
 
             expect(win._savedPos).toBeNull();
+        });
+
+        test("_maximize starts below the visible auxiliary toolbar", () => {
+            const { toolbars } = createToolbarLayout("block");
+
+            try {
+                const win = createTestWindow();
+
+                win._maximize();
+
+                expect(win._frame.style.top).toBe("128px");
+                expect(win._frame.style.height).toBe("calc(100vh - 128px)");
+            } finally {
+                toolbars.remove();
+            }
         });
     });
 
@@ -821,6 +968,15 @@ describe("widgetWindows", () => {
             expect(win1._frame.style.zIndex).toBe("0");
             expect(win2._frame.style.zIndex).toBe("10000");
         });
+
+        test("notifies the window via onfocused", () => {
+            const win = createTestWindow();
+            win.onfocused = jest.fn();
+
+            win.takeFocus();
+
+            expect(win.onfocused).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe("isMaximized", () => {
@@ -894,6 +1050,16 @@ describe("widgetWindows", () => {
             win.show();
 
             expect(win._frame.style.display).toBe("block");
+        });
+
+        test("show makes isVisible return true again", () => {
+            const win = createTestWindow();
+            window.widgetWindows.hideWindow(win._key);
+            expect(win.isVisible()).toBe(false);
+
+            win.show();
+
+            expect(win.isVisible()).toBe(true);
         });
 
         test("clear empties widget and toolbar", () => {
@@ -1118,6 +1284,39 @@ describe("widgetWindows", () => {
             expect(win2._frame.style.zIndex).toBe("10000");
             expect(win1._frame.style.opacity).toBe("0.7");
             expect(win1._frame.style.zIndex).toBe("0");
+        });
+
+        test("notifies the clicked window via onfocused", () => {
+            const win1 = createTestWindow("Window 1");
+            const win2 = createTestWindow("Window 2");
+            win1.onfocused = jest.fn();
+            win2.onfocused = jest.fn();
+
+            win1._frame.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+            expect(win1.onfocused).toHaveBeenCalledTimes(1);
+            expect(win2.onfocused).not.toHaveBeenCalled();
+        });
+
+        test("notifies the window that loses focus via onblurred", () => {
+            const win1 = createTestWindow("Window 1");
+            const win2 = createTestWindow("Window 2");
+            win1.onblurred = jest.fn();
+            win2.onblurred = jest.fn();
+
+            win1._frame.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+            expect(win2.onblurred).toHaveBeenCalledTimes(1);
+            expect(win1.onblurred).not.toHaveBeenCalled();
+        });
+
+        test("notifies the focused window when clicking outside all windows", () => {
+            const win1 = createTestWindow("Window 1");
+            win1.onblurred = jest.fn();
+
+            canvas.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+            expect(win1.onblurred).toHaveBeenCalledTimes(1);
         });
 
         test("clears focus and dims all windows when clicking outside all windows", () => {
@@ -1345,6 +1544,29 @@ describe("widgetWindows", () => {
             expect(win._dx).not.toBe(999);
             expect(win._dy).not.toBe(999);
         });
+
+        test("_dragTopHandler maximizes at the visible auxiliary toolbar boundary", () => {
+            const { toolbars } = createToolbarLayout("block");
+
+            try {
+                const win = createTestWindow();
+                const event = {
+                    preventDefault: jest.fn()
+                };
+
+                win.onmaximize = jest.fn();
+                win._frame.style.top = "128px";
+
+                win._dragTopHandler(event);
+
+                expect(win._maximized).toBe(true);
+                expect(win._frame.style.top).toBe("128px");
+                expect(win.onmaximize).toHaveBeenCalledTimes(1);
+                expect(event.preventDefault).toHaveBeenCalledTimes(1);
+            } finally {
+                toolbars.remove();
+            }
+        });
     });
 
     describe("window visibility and management helpers", () => {
@@ -1359,6 +1581,8 @@ describe("widgetWindows", () => {
 
             expect(win1._frame.style.display).toBe("none");
             expect(win2._frame.style.display).toBe("none");
+            expect(win1.isVisible()).toBe(false);
+            expect(win2.isVisible()).toBe(false);
             expect(win1._frame.style.zIndex).toBe("10");
             expect(win1._overlayframe.style.zIndex).toBe("-1");
             expect(win1._overlayframe.style.backgroundColor).toBe("transparent");
@@ -1372,6 +1596,7 @@ describe("widgetWindows", () => {
             window.widgetWindows.hideWindow(win._key);
 
             expect(win._frame.style.display).toBe("none");
+            expect(win.isVisible()).toBe(false);
             expect(window.widgetWindows.focused).toBeNull();
         });
 
@@ -1394,6 +1619,8 @@ describe("widgetWindows", () => {
 
             expect(win1._frame.style.display).toBe("block");
             expect(win2._frame.style.display).toBe("block");
+            expect(win1.isVisible()).toBe(true);
+            expect(win2.isVisible()).toBe(true);
         });
 
         test("clear calls onclose on the named window", () => {
@@ -1403,6 +1630,102 @@ describe("widgetWindows", () => {
             window.widgetWindows.clear(win._key);
 
             expect(win.onclose).toHaveBeenCalledTimes(1);
+        });
+
+        test("windowFor restores a saved position instead of centering", () => {
+            const widget = { blockNo: 99 };
+            const win = windowFor(widget, "Saved Position", undefined, true);
+            win.setPosition(123, 200);
+            win.destroy();
+
+            const reopened = windowFor(widget, "Saved Position", undefined, true);
+
+            expect(reopened._frame.style.left).toBe("123px");
+            expect(reopened._frame.style.top).toBe("200px");
+        });
+
+        test("windowFor centers a window that has no saved position", () => {
+            const widget = { blockNo: 98 };
+
+            const win = windowFor(widget, "Fresh Window", undefined, true);
+
+            expect(win._frame.style.left).toBe("200px");
+            expect(win._frame.style.top).toBe("140px");
+        });
+
+        test("windowFor keeps a restored position when the widget centers itself", () => {
+            const widget = { blockNo: 97 };
+            const win = windowFor(widget, "Self Centering", undefined, true);
+            win.setPosition(140, 220);
+            win.destroy();
+
+            const reopened = windowFor(widget, "Self Centering", undefined, true);
+            reopened.sendToCenter();
+
+            expect(reopened._frame.style.left).toBe("140px");
+            expect(reopened._frame.style.top).toBe("220px");
+        });
+
+        test("windowFor keeps a restored position when the widget centers itself twice", () => {
+            const widget = { blockNo: 93 };
+            const win = windowFor(widget, "Double Centering", undefined, true);
+            win.setPosition(160, 240);
+            win.destroy();
+
+            const reopened = windowFor(widget, "Double Centering", undefined, true);
+            reopened.sendToCenter();
+            reopened.sendToCenter();
+
+            expect(reopened._frame.style.left).toBe("160px");
+            expect(reopened._frame.style.top).toBe("240px");
+        });
+
+        test("windowFor centers a restored window after a title bar interaction", () => {
+            const widget = { blockNo: 92 };
+            const win = windowFor(widget, "Interactive Centering", undefined, true);
+            win.setPosition(180, 260);
+            win.destroy();
+
+            const reopened = windowFor(widget, "Interactive Centering", undefined, true);
+            reopened._nonclose.dispatchEvent(
+                new MouseEvent("mousedown", { bubbles: true, clientX: 10, clientY: 10 })
+            );
+            reopened.sendToCenter();
+
+            expect(reopened._frame.style.left).toBe("200px");
+            expect(reopened._frame.style.top).toBe("140px");
+        });
+
+        test("windowFor clamps a restored position to the viewport", () => {
+            const widget = { blockNo: 96 };
+            window.widgetWindows._posCache[96] = [5000, 5000];
+
+            const win = windowFor(widget, "Offscreen Window", undefined, true);
+
+            expect(win._frame.style.left).toBe(`${window.innerWidth - 470}px`);
+            expect(win._frame.style.top).toBe(`${window.innerHeight - 420}px`);
+        });
+
+        test("windowFor restores a position saved at the top edge", () => {
+            const widget = { blockNo: 95 };
+            window.widgetWindows._posCache[95] = [120, 64];
+
+            const win = windowFor(widget, "Maximized Window", undefined, true);
+
+            expect(win._frame.style.left).toBe("120px");
+            expect(win._frame.style.top).toBe("64px");
+        });
+
+        test("windowFor centers a window explicitly cached as maximized", () => {
+            const widget = { blockNo: 94 };
+            window.widgetWindows._posCache[94] = [120, 64];
+            window.widgetWindows._maximizedCache[94] = true;
+
+            const win = windowFor(widget, "Maximized Window", undefined, true);
+
+            expect(win._frame.style.left).toBe("200px");
+            expect(win._frame.style.top).toBe("140px");
+            expect(window.widgetWindows._maximizedCache[94]).toBe(false);
         });
     });
 

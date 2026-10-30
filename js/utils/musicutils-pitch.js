@@ -58,6 +58,10 @@ if (typeof module !== "undefined" && module.exports) {
         (typeof require !== "undefined" ? require("./musicutils-temperament") : {});
     var { getCurrentEDO, getTemperament, generateNoteNames, isTrueEDO, TEMPERAMENT } =
         MusicUtilsTemperament;
+    var UtilsLogic =
+        (typeof window !== "undefined" && window.UtilsLogic) ||
+        (typeof require !== "undefined" ? require("./utils-logic") : {});
+    var { clampNumber } = UtilsLogic;
 }
 
 /**
@@ -67,9 +71,12 @@ if (typeof module !== "undefined" && module.exports) {
  * @param {string} note
  * @returns {string}
  */
-var stripMicrotonalPrefix = s => s.replace(/^[v^]{1,2}/, "");
+var stripMicrotonalPrefix = s => (typeof s === "string" ? s.replace(/^[v^]{1,2}/, "") : "");
 
 function normalizeNoteAccidentals(note) {
+    if (typeof note !== "string") {
+        return "";
+    }
     const map = { "♭": "b", "♯": "#", "𝄫": "bb", "𝄪": "x" };
     // Strip at most two leading ^ / v so "^C"/"vvD♭" resolve but "^^^C" keeps a "^"
     return stripMicrotonalPrefix(note).replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
@@ -165,9 +172,9 @@ var frequencyToPitch = (hz, temperament) => {
         return [pitchName, octaveNumber, cents];
     }
 
-    const nameIndex = Math.round((stepIndex / currentEDO) * 12);
-    const pitchName = PITCHES[(nameIndex + PITCHES.indexOf("A")) % PITCHES.length];
-    const octaveNumber = Math.floor((roundedSteps + PITCHES.indexOf("A")) / currentEDO);
+    const aIndex = 9;
+    const pitchName = PITCHES[(stepIndex + aIndex) % 12];
+    const octaveNumber = Math.floor((roundedSteps + aIndex) / 12);
 
     return [pitchName, octaveNumber, cents];
 };
@@ -181,40 +188,20 @@ var frequencyToPitch = (hz, temperament) => {
 var numberToPitchSharp = (i, temperament) => {
     const currentEDO = getCurrentEDO(temperament);
     if (currentEDO === 12) {
-        if (i < 0) {
-            let n = 0;
-            while (i < 0) {
-                i += 12;
-                n += 1;
-            }
-            const octave = Math.floor((i + PITCHES2.indexOf("A")) / 12) - n;
-            const nameIndex = Math.round(((i % 12) / 12) * 12);
-            return [PITCHES2[(nameIndex + PITCHES2.indexOf("A")) % 12], octave];
-        } else {
-            const octave = Math.floor((i + PITCHES2.indexOf("A")) / 12);
-            const nameIndex = Math.round(((i % 12) / 12) * 12);
-            return [PITCHES2[(nameIndex + PITCHES2.indexOf("A")) % 12], octave];
-        }
+        const aIndex = 9;
+        const octave = Math.floor((i + aIndex) / 12);
+        const nameIndex = Math.round((((i + aIndex) % 12) + 12) % 12) % 12;
+        return [PITCHES2[nameIndex], octave];
     }
     const edoNames = generateNoteNames(currentEDO);
     let aIndex = edoNames.indexOf("A");
     if (aIndex === -1) {
         aIndex = Math.round((9 / 12) * currentEDO);
     }
-    if (i < 0) {
-        let n = 0;
-        while (i < 0) {
-            i += currentEDO;
-            n += 1;
-        }
-        const octave = Math.floor((i + aIndex) / currentEDO) - n;
-        const nameIndex = (i + aIndex) % currentEDO;
-        return [edoNames[nameIndex], octave];
-    } else {
-        const octave = Math.floor((i + aIndex) / currentEDO);
-        const nameIndex = (i + aIndex) % currentEDO;
-        return [edoNames[nameIndex], octave];
-    }
+    const octave = Math.floor((i + aIndex) / currentEDO);
+    const nameIndex =
+        Math.round((((i + aIndex) % currentEDO) + currentEDO) % currentEDO) % currentEDO;
+    return [edoNames[nameIndex], octave];
 };
 
 /**
@@ -247,9 +234,10 @@ var getNumber = (notename, octave, temperament, edo) => {
         num = currentEDO * (octave - 1);
     }
 
-    notename = String(notename);
-    if (notename.substring(0, 1) in NOTESTEP) {
-        num += Math.round((NOTESTEP[notename.substring(0, 1)] / 12) * currentEDO);
+    notename = stripMicrotonalPrefix(String(notename));
+    const letter = notename.substring(0, 1).toUpperCase();
+    if (letter in NOTESTEP) {
+        num += Math.round((NOTESTEP[letter] / 12) * currentEDO);
         if (notename.length >= 1) {
             const delta = notename.substring(1);
             if (delta === "bb" || delta === DOUBLEFLAT) {
@@ -274,47 +262,43 @@ var getNumber = (notename, octave, temperament, edo) => {
  * @returns {Array} An array containing [normalizedNoteName, octave].
  */
 function _parse_pitch_string(str) {
-    const match = str.match(/^([A-Ga-g])([#b♭♯𝄪𝄫x]*)(-?\d+)$/u);
-    if (match) {
-        const baseLetter = match[1].toUpperCase();
-        const accidentalStr = match[2];
-        const octave = parseInt(match[3], 10);
-
-        if (!accidentalStr) {
-            // No accidentals; return as-is
-            return [baseLetter, octave];
-        }
-
-        // Sum up semitone offsets for all accidental characters.
-        // 𝄪 and 𝄫 are multi-byte but treated as single code points by spread.
-        const accidentalChars = [...accidentalStr];
-        const semitoneOffset = accidentalChars.reduce(
-            (sum, char) => sum + (ACCIDENTAL_SEMITONE_MAP[char] || 0),
-            0
-        );
-
-        // Build a normalized name using canonical SHARP/FLAT symbols.
-        let normalizedName;
-        if (semitoneOffset === 0) {
-            normalizedName = baseLetter;
-        } else if (semitoneOffset === 1) {
-            normalizedName = baseLetter + SHARP;
-        } else if (semitoneOffset === -1) {
-            normalizedName = baseLetter + FLAT;
-        } else if (semitoneOffset === 2) {
-            normalizedName = baseLetter + DOUBLESHARP;
-        } else if (semitoneOffset === -2) {
-            normalizedName = baseLetter + DOUBLEFLAT;
-        } else {
-            // For unusual combinations, keep semitone representation as extra sharps/flats
-            const sym = semitoneOffset > 0 ? SHARP : FLAT;
-            normalizedName = baseLetter + sym.repeat(Math.abs(semitoneOffset));
-        }
-
-        return [normalizedName, octave];
+    if (typeof str === "number" && str > 0) {
+        return [str, 4];
     }
-    // Fallback: no octave digit found – normalize accidentals and default octave to 4
-    return [str.replaceAll("#", SHARP).replaceAll("b", FLAT), 4];
+    if (typeof str !== "string") {
+        return ["", 4];
+    }
+
+    const trimmed = str.trim();
+    const match = trimmed.match(/^([A-Ga-g])([#b♭♯𝄪𝄫x]*)(-?\d+)?$/u);
+    if (!match) {
+        // Fallback: unrecognized format – normalize accidentals and default octave to 4
+        return [trimmed.replace(/#/g, SHARP).replace(/b/g, FLAT), 4];
+    }
+
+    const baseLetter = match[1].toUpperCase();
+    const accidentalStr = match[2];
+    const octave = match[3] !== undefined ? parseInt(match[3], 10) : 4;
+
+    let semitoneOffset = 0;
+    for (const char of accidentalStr) {
+        semitoneOffset += ACCIDENTAL_SEMITONE_MAP[char] || 0;
+    }
+
+    let accidental = "";
+    if (semitoneOffset === 1) {
+        accidental = SHARP;
+    } else if (semitoneOffset === -1) {
+        accidental = FLAT;
+    } else if (semitoneOffset === 2) {
+        accidental = DOUBLESHARP;
+    } else if (semitoneOffset === -2) {
+        accidental = DOUBLEFLAT;
+    } else if (semitoneOffset !== 0) {
+        accidental = (semitoneOffset > 0 ? SHARP : FLAT).repeat(Math.abs(semitoneOffset));
+    }
+
+    return [baseLetter + accidental, octave];
 }
 
 /**
@@ -336,6 +320,25 @@ function _calculate_pitch_number(noteName, octave, applyOffset = 0, temperament)
         .replaceAll("*", DOUBLESHARP)
         .replaceAll("#", SHARP)
         .replaceAll("b", FLAT);
+
+    // The pitch parser also accepts solfege names. Normalize repeated
+    // accidentals and resolve those names before looking up western notes.
+    // Without this, values such as sol##4 reach the western-note tables as
+    // an unknown literal string and are reported as invalid pitches.
+    if (name.endsWith(SHARP + SHARP)) {
+        name = name.slice(0, -2) + DOUBLESHARP;
+    } else if (name.endsWith(FLAT + FLAT)) {
+        name = name.slice(0, -2) + DOUBLEFLAT;
+    }
+    const fixedSolfege = FIXEDSOLFEGE1[name.toLowerCase()];
+    if (fixedSolfege !== undefined) {
+        if (name.toLowerCase() === "do" + DOUBLEFLAT) {
+            octave -= 1;
+        } else if (name.toLowerCase() === "ti" + DOUBLESHARP) {
+            octave += 1;
+        }
+        name = fixedSolfege;
+    }
 
     // Non-equal temperaments: look up directly against the temperament's own noteLabels.
     // Do NOT use generateNoteNames() which produces EDO-specific names.
@@ -392,6 +395,18 @@ function _calculate_pitch_number(noteName, octave, applyOffset = 0, temperament)
     }
 
     // 12-EDO path: use EQUIVALENT lookups then NOTESSHARP / NOTESFLAT.
+    // The lookups only rename the note, so an accidental that crosses the B/C boundary
+    // (B♯4 is C5, C♭4 is B3) has to move the octave too, as pitchToNumber does.
+    let octaveShift = 0;
+    const letterIndex = NOTESSHARP.indexOf(name.charAt(0));
+    if (letterIndex !== -1) {
+        let semitones = letterIndex;
+        for (const char of name.slice(1)) {
+            semitones += ACCIDENTAL_SEMITONE_MAP[char] || 0;
+        }
+        octaveShift = Math.floor(semitones / 12);
+    }
+
     if (EQUIVALENTSHARPS[name]) {
         name = EQUIVALENTSHARPS[name];
     } else if (EQUIVALENTFLATS[name]) {
@@ -409,7 +424,7 @@ function _calculate_pitch_number(noteName, octave, applyOffset = 0, temperament)
         return INVALIDPITCH;
     }
 
-    return (parseInt(octave, 10) + 1) * currentEDO + pitchIndex - applyOffset;
+    return (parseInt(octave, 10) + 1 + octaveShift) * currentEDO + pitchIndex - applyOffset;
 }
 
 /**
@@ -495,10 +510,6 @@ var calcOctave = (currentOctave, arg, lastNotePlayed, currentNote, temperament) 
     // which can be a number, a 'number' as a string, 'current',
     // 'previous', or 'next'.
 
-    if (typeof arg === "number") {
-        return Math.max(1, Math.min(Math.floor(arg), 9));
-    }
-
     const currentEDO = getCurrentEDO(temperament);
 
     // The relative octave for tritones are arbitrated as being in the
@@ -551,16 +562,13 @@ var calcOctave = (currentOctave, arg, lastNotePlayed, currentNote, temperament) 
         case "previous":
             return Math.max(changedCurrent - 1, 1);
         default: {
-            // A "number" passed as a string (e.g. "2") is a documented argument,
-            // but changedCurrent is always >= 1, so testing it for truthiness
-            // first made the numeric conversion unreachable and silently
-            // ignored the requested octave.
-            const parsed = typeof arg === "string" && arg.trim() !== "" ? Number(arg) : NaN;
-            if (!isNaN(parsed)) {
-                return Math.max(1, Math.min(Math.floor(parsed), 9));
-            }
-
-            return changedCurrent;
+            const num =
+                typeof arg === "number"
+                    ? arg
+                    : typeof arg === "string" && arg.trim() !== ""
+                      ? Number(arg)
+                      : NaN;
+            return clampNumber(Math.floor(num), 1, 9, changedCurrent);
         }
     }
 };

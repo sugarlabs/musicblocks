@@ -38,7 +38,8 @@ const {
     processABCNotes,
     saveAbcOutput,
     ACCIDENTAL_MAP,
-    OCTAVE_NOTATION_MAP
+    OCTAVE_NOTATION_MAP,
+    AbcExporter
 } = require("../abc");
 
 describe("getABCHeader", () => {
@@ -68,7 +69,7 @@ describe("processABCNotes - Basic Note Processing", () => {
 
     it("should process notes and update notationNotes correctly", () => {
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("^G4 F4 ^G8 ");
+        expect(logo.notationNotes["0"]).toBe("^G4 F4 ^G8 | ");
     });
 
     it("should handle octaves 5 and above correctly (lowercase and proper octave markers)", () => {
@@ -97,6 +98,24 @@ describe("processABCNotes - Basic Note Processing", () => {
         processABCNotes(logo, "0");
         // Check if newline exists in the output
         expect(logo.notationNotes["0"]).toMatch(/\n/);
+    });
+
+    it("should format octave 0 and negative octaves (-1 and -2) with correct ABC octave commas and no hyphens", () => {
+        logo.notation.notationStaging["0"] = [
+            [["C0"], 4, 0, null, null, -1, false],
+            [["C-1"], 4, 0, null, null, -1, false],
+            [["D-2"], 4, 0, null, null, -1, false]
+        ];
+        processABCNotes(logo, "0", "C major");
+        expect(logo.notationNotes["0"]).toBe("C,,,,4 C,,,,,4 D,,,,,,4 ");
+    });
+
+    it("should format signed octaves in unkeyed __toABCnote fallback", () => {
+        const mockLogo = { notation: { notationStaging: { 0: [] } } };
+        const exporter = new AbcExporter(mockLogo, "0", "C major", "0");
+        expect(exporter.__toABCnote("C♯♯♯0")).toBe("^^^C,,,,");
+        expect(exporter.__toABCnote("C♯♯♯-1")).toBe("^^^C,,,,,");
+        expect(exporter.__toABCnote("C♯♯♯-2")).toBe("^^^C,,,,,,");
     });
 });
 describe("processABCNotes - Advanced Note Handling", () => {
@@ -147,7 +166,8 @@ describe("processABCNotes - Advanced Note Handling", () => {
 
         processABCNotes(logo, "0");
 
-        expect(logo.notationNotes["0"]).toBe("^^C4 ^D4 =E4 _F4 __G4 ");
+        // The header opens in M:C, so a barline falls after the fourth quarter note.
+        expect(logo.notationNotes["0"]).toBe("^^C4 ^D4 =E4 _F4 | __G4 ");
     });
 
     it("should support ASCII accidentals without changing lowercase B notes", () => {
@@ -325,7 +345,7 @@ describe("processABCNotes - Tuplet Handling", () => {
         ];
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(3:2^G8F8^G8 ");
+        expect(logo.notationNotes["0"]).toBe("(3:2^G8F8^G8 | ");
     });
 
     it("should preserve each note in a tuplet", () => {
@@ -336,7 +356,7 @@ describe("processABCNotes - Tuplet Handling", () => {
         ];
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(3:2G8F8A8 ");
+        expect(logo.notationNotes["0"]).toBe("(3:2G8F8A8 | ");
     });
 
     it("should handle array of notes (chords) inside tuplets", () => {
@@ -465,14 +485,89 @@ describe("saveAbcOutput", () => {
     });
 
     it("should generate the correct ABC notation output with key signature replacements", () => {
-        activity.turtles.ithTurtle = () => ({
-            singer: { keySignature: "B ♭ major" }
-        });
+        // A key set before the first note is the key the voice starts in.
+        activity.logo.notation.notationStaging[0].unshift("key", "B♭", "major");
 
         const result = saveAbcOutput(activity);
 
         expect(result).toContain("K:Bb\n");
+        expect(result).not.toContain("[K:");
         expect(result).toContain("b");
+    });
+
+    const note = pitch => [[pitch], 4, 0, null, null, -1, false];
+
+    it("starts in C major and writes a later key change where it happens", () => {
+        // The turtle's keySignature is the key the run ended in.
+        activity.turtles.ithTurtle = () => ({ singer: { keySignature: "D major" } });
+        activity.logo.notation.notationStaging[0] = [
+            note("C4"),
+            note("F4"),
+            "key",
+            "D",
+            "major",
+            note("F♯4"),
+            note("C5")
+        ];
+
+        const result = saveAbcOutput(activity);
+
+        expect(result).toContain("V:t1\nK:C\nC4 F4 [K:D]F4 =c4 ");
+    });
+
+    it("writes a key change on a barline after the barline", () => {
+        activity.logo.notation.notationStaging[0] = [
+            note("C4"),
+            note("D4"),
+            note("E4"),
+            note("F4"),
+            "key",
+            "D",
+            "major",
+            note("F♯4"),
+            note("A4")
+        ];
+
+        expect(saveAbcOutput(activity)).toContain("K:C\nC4 D4 E4 F4 | [K:D]F4 A4 ");
+    });
+
+    it("writes a return to the starting key", () => {
+        activity.logo.notation.notationStaging[0] = [
+            note("F4"),
+            "key",
+            "D",
+            "major",
+            note("F♯4"),
+            "key",
+            "C",
+            "major",
+            note("F4")
+        ];
+
+        expect(saveAbcOutput(activity)).toContain("K:C\nF4 [K:D]F4 [K:C]F4 ");
+    });
+
+    it("writes each voice's own starting key", () => {
+        activity.logo.notationNotes[1] = "";
+        activity.logo.notation.notationStaging = {
+            0: ["key", "G", "major", note("F♯4"), note("G4")],
+            1: [note("B♭4"), "key", "F", "major", note("B♭4")]
+        };
+
+        const result = saveAbcOutput(activity);
+
+        expect(result).toContain("V:t1\nK:G\nF4 G4 ");
+        expect(result).toContain("V:t2\nK:C\n_B4 [K:F]B4 ");
+    });
+
+    it("returns the voice's starting key from processABCNotes", () => {
+        const logo = {
+            notationNotes: { 0: "" },
+            notation: { notationStaging: { 0: ["key", "E♭", "major", note("E♭4")] } }
+        };
+
+        expect(processABCNotes(logo, "0")).toBe("Eb");
+        expect(logo.notationNotes["0"]).toBe("E4 ");
     });
 });
 
@@ -492,7 +587,7 @@ describe("processABCNotes - Tuplet Handling", () => {
         };
 
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("(3:2^G8F8^G8 ");
+        expect(logo.notationNotes["0"]).toBe("(3:2^G8F8^G8 | ");
     });
 });
 
@@ -544,7 +639,9 @@ describe("OCTAVE_NOTATION_MAP", () => {
         expect(OCTAVE_NOTATION_MAP[10]).toBe("'''''");
         expect(OCTAVE_NOTATION_MAP[2]).toBe(",,");
         expect(OCTAVE_NOTATION_MAP[1]).toBe(",,,");
-        expect(OCTAVE_NOTATION_MAP[0]).toBeUndefined();
+        expect(OCTAVE_NOTATION_MAP[0]).toBe(",,,,");
+        expect(OCTAVE_NOTATION_MAP[-1]).toBe(",,,,,");
+        expect(OCTAVE_NOTATION_MAP[-2]).toBe(",,,,,,");
     });
 });
 
@@ -648,6 +745,24 @@ describe("processABCNotes - notation markers", () => {
         expect(body).not.toContain("unknown command");
         expect(body).not.toContain("42");
         expect(parseNotes(body)).toHaveLength(2);
+    });
+
+    it("writes a rest for a staged note with no pitches inside a tuplet", () => {
+        const tupletNote = pitches => [pitches, 1, 0, [3, 2], 4, -1, false];
+        const body = exportBody([
+            note("C4"),
+            tupletNote(["G4"]),
+            tupletNote([]),
+            tupletNote(["B4"]),
+            note("C5")
+        ]);
+        const notes = parseNotes(body);
+
+        // Without the rest the note is left out and its duration runs on from the G,
+        // which abcjs reads as a single note eleven times as long.
+        expect(notes).toHaveLength(5);
+        expect(notes[2].rest).toBeDefined();
+        expect(notes.map(n => n.duration)).toEqual([0.25, 0.25, 0.25, 0.25, 0.25]);
     });
 
     describe("tempo", () => {
@@ -1230,5 +1345,358 @@ describe("saveAbcOutput - forever repeats", () => {
 
     it("writes no repeat bars without a forever", () => {
         expect(notesOf([note("C4"), note("G4")])).toBe("C4 G4 ");
+    });
+});
+
+describe("processABCNotes - bar lines", () => {
+    const abcjs = require("abcjs");
+
+    const note = (pitch, noteValue = 4, dotCount = 0) => [
+        [pitch],
+        noteValue,
+        dotCount,
+        null,
+        null,
+        -1,
+        false
+    ];
+
+    const exportBody = staged => {
+        const logo = { notationNotes: { 0: "" }, notation: { notationStaging: { 0: staged } } };
+        processABCNotes(logo, "0");
+        return logo.notationNotes["0"];
+    };
+
+    // What each measure of the exported body adds up to, in whole notes, as abcjs
+    // reads it. A measure has to come to exactly what the meter says it does.
+    const measureLengths = body => {
+        const [tune] = abcjs.parseOnly(`${getABCHeader()}K:C\n${body}\n`);
+        expect((tune.warnings || []).map(w => w.replace(/<[^>]*>/g, ""))).toEqual([]);
+        const elements = tune.lines.flatMap(line =>
+            (line.staff || []).flatMap(staff => staff.voices.flat())
+        );
+        const lengths = [];
+        let measure = 0;
+        for (const element of elements) {
+            if (element.el_type === "bar") {
+                lengths.push(measure);
+                measure = 0;
+            } else if (element.el_type === "note") {
+                measure += element.duration;
+            }
+        }
+        if (measure > 0) lengths.push(measure);
+        return lengths;
+    };
+
+    const parseElements = body => {
+        const [tune] = abcjs.parseOnly(`${getABCHeader()}K:C\n${body}\n`);
+        const warnings = (tune.warnings || []).map(w => w.replace(/<[^>]*>/g, ""));
+        expect(warnings).toEqual([]);
+        return tune.lines
+            .flatMap(line => (line.staff || []).flatMap(staff => staff.voices.flat()))
+            .filter(element => element.el_type === "note" || element.el_type === "bar");
+    };
+
+    const quarters = count => Array.from({ length: count }, () => note("C4"));
+
+    it("closes a measure of 4/4 after four quarter notes", () => {
+        expect(measureLengths(exportBody(["meter", 4, 4, ...quarters(8)]))).toEqual([1, 1]);
+    });
+
+    it("uses the meter the header opens in when none is staged", () => {
+        expect(measureLengths(exportBody(quarters(8)))).toEqual([1, 1]);
+    });
+
+    it.each([
+        [3, 4, 6, 0.75],
+        [6, 8, 6, 0.75],
+        [2, 4, 4, 0.5]
+    ])("closes a measure of %i/%i", (beats, beatType, count, want) => {
+        expect(measureLengths(exportBody(["meter", beats, beatType, ...quarters(count)]))).toEqual([
+            want,
+            want
+        ]);
+    });
+
+    it("counts a dotted note for what it is worth", () => {
+        const staged = ["meter", 6, 8, note("C4", 4, 1), note("D4", 4, 1), note("E4", 4, 1)];
+
+        expect(measureLengths(exportBody(staged))).toEqual([0.75, 0.375]);
+    });
+
+    it("counts a chord once, not once per pitch", () => {
+        const chord = [["C4", "E4", "G4"], 4, 0, null, null, -1, false];
+        const staged = ["meter", 4, 4, chord, ...quarters(3), chord, ...quarters(3)];
+
+        expect(measureLengths(exportBody(staged))).toEqual([1, 1]);
+    });
+
+    it("counts a rest for what it is worth", () => {
+        const staged = ["meter", 4, 4, note("R"), note("C4"), note("R"), note("D4"), note("E4")];
+
+        expect(measureLengths(exportBody(staged))).toEqual([1, 0.25]);
+    });
+
+    it("closes the measure a meter change interrupts", () => {
+        const staged = ["meter", 4, 4, ...quarters(4), "meter", 3, 4, ...quarters(6)];
+
+        expect(measureLengths(exportBody(staged))).toEqual([1, 0.75, 0.75]);
+    });
+
+    it("writes the barline before a decoration already waiting for its note", () => {
+        const staged = ["meter", 4, 4, ...quarters(4), "begin crescendo", note("D4")];
+
+        expect(exportBody(staged)).toContain("| !<(!D4");
+    });
+
+    // A note that runs over a barline would have to be split in two and tied for the
+    // barline to have anywhere to go. Until then it costs that one barline, and the
+    // barlines after it still land where they belong.
+    it("gives up one barline to a note that runs over it, and no more", () => {
+        const staged = [
+            "meter",
+            4,
+            4,
+            ...quarters(3),
+            note("F4", 2),
+            note("G4", 2),
+            note("A4"),
+            note("B4")
+        ];
+
+        expect(measureLengths(exportBody(staged))).toEqual([2, 0.25]);
+    });
+
+    it("bars an initial pickup measure and subsequent full measures", () => {
+        const staged = [
+            "pickup",
+            "8",
+            note("C4", 8),
+            note("D4"),
+            note("E4"),
+            note("F4"),
+            note("G4")
+        ];
+        const body = exportBody(staged);
+
+        expect(body).toBe("C2 | D4 E4 F4 G4 | ");
+        const elements = parseElements(body);
+        const bars = elements.filter(e => e.el_type === "bar");
+        expect(bars).toHaveLength(2);
+    });
+
+    it("attaches a tie to the preceding note before the bar line", () => {
+        const staged = [
+            note("C4"),
+            note("D4"),
+            note("E4"),
+            note("F4"),
+            "tie",
+            note("F4"),
+            note("G4"),
+            note("A4"),
+            note("B4")
+        ];
+        const body = exportBody(staged);
+
+        expect(body).toBe("C4 D4 E4 F4- | F4 G4 A4 B4 | ");
+        const elements = parseElements(body);
+        const bars = elements.filter(e => e.el_type === "bar");
+        expect(bars).toHaveLength(2);
+    });
+
+    it("attaches a slur ending to the preceding note before the bar line", () => {
+        const staged = [
+            "begin slur",
+            note("C4"),
+            note("D4"),
+            note("E4"),
+            note("F4"),
+            "end slur",
+            note("G4"),
+            note("A4"),
+            note("B4"),
+            note("C5")
+        ];
+        const body = exportBody(staged);
+
+        expect(body).toBe("(C4 D4 E4 F4) | G4 A4 B4 c4 | ");
+        const elements = parseElements(body);
+        const bars = elements.filter(e => e.el_type === "bar");
+        expect(bars).toHaveLength(2);
+    });
+
+    it("avoids redundant double bar lines when a repeat starts at a measure boundary", () => {
+        const staged = [
+            note("C4"),
+            note("D4"),
+            note("E4"),
+            note("F4"),
+            "begin repeat",
+            note("G4"),
+            note("A4"),
+            note("B4"),
+            note("C5")
+        ];
+        const body = exportBody(staged);
+
+        expect(body).toBe("C4 D4 E4 F4 |: G4 A4 B4 c4 :|");
+        const elements = parseElements(body);
+        const bars = elements.filter(e => e.el_type === "bar");
+        expect(bars.map(b => b.type)).toEqual(["bar_left_repeat", "bar_right_repeat"]);
+    });
+
+    it("aligns subsequent full measures when preceded by a quarter-note pickup", () => {
+        const staged = [
+            "pickup",
+            "4",
+            note("C4", 4),
+            ...Array.from({ length: 8 }, () => note("D4", 8))
+        ];
+        const body = exportBody(staged);
+
+        expect(body.replace(/\n/g, "")).toBe("C4 | D2 D2 D2 D2 D2 D2 D2 D2 | ");
+        const elements = parseElements(body);
+        const bars = elements.filter(e => e.el_type === "bar");
+        expect(bars).toHaveLength(2);
+    });
+
+    it("tracks measure timing independently per active voice", () => {
+        const staged = [
+            note("C4"),
+            note("D4"),
+            "voice two",
+            note("E4"),
+            note("F4"),
+            note("G4"),
+            note("A4"),
+            "one voice",
+            note("E4"),
+            note("F4")
+        ];
+        const body = exportBody(staged);
+
+        expect(body).toContain("[V:2]E4 F4 G4 A4 |");
+        expect(body).toContain("[V:1]E4 F4 |");
+        const elements = parseElements(body);
+        const bars = elements.filter(e => e.el_type === "bar");
+        expect(bars).toHaveLength(2);
+    });
+
+    it("handles notes that exceed measure duration and formats staccato on chords", () => {
+        const chordNote = (pitch, staccato) => [[pitch], 4, 0, null, null, 1, staccato];
+        const staged = [
+            "meter",
+            2,
+            4,
+            chordNote("C4", true),
+            chordNote("E4", false),
+            note("D4", 4),
+            note("G4", 1)
+        ];
+        const body = exportBody(staged);
+        expect(body).toContain(".[C E]4");
+        expect(body).toContain("G16 |");
+    });
+
+    it("handles isolated ties and slurs gracefully", () => {
+        const bodyTie = exportBody(["tie", note("C4")]);
+        expect(bodyTie).toContain("-C4 ");
+
+        const bodySlur = exportBody(["end slur", note("C4")]);
+        expect(bodySlur).toContain(")C4 ");
+    });
+
+    it("carries pickup duration into newly selected voices to align first measure barlines", () => {
+        const staged = [
+            "pickup",
+            "4",
+            note("C4", 4),
+            "voice two",
+            note("E4", 4),
+            "one voice",
+            note("D4", 4),
+            note("E4", 4),
+            note("F4", 4),
+            note("G4", 4)
+        ];
+        const body = exportBody(staged);
+        expect(body).toContain("C4 |");
+        expect(body).toContain("[V:2]E4 |");
+    });
+
+    it("places begin repeat barline ahead of pending crescendo prefix", () => {
+        const staged = ["begin crescendo", "begin repeat", note("C4"), note("D4")];
+        const body = exportBody(staged);
+        expect(body).toContain("|: !<(!C4 D4");
+    });
+
+    it("propagates meter change to all affected voice states and emits M: field on voice restore", () => {
+        const staged = [
+            note("C4"),
+            "voice two",
+            note("D4"),
+            "one voice",
+            "meter",
+            3,
+            4,
+            note("E4", 4),
+            note("F4", 4),
+            note("G4", 4),
+            "voice two",
+            note("A4", 4),
+            note("B4", 4),
+            note("c5", 4)
+        ];
+        const body = exportBody(staged);
+        expect(body).toContain("E4 F4 G4 |");
+        expect(body).toContain("[V:2]\nM:3/4\nA4 B4 c4 |");
+    });
+
+    it("avoids duplicate bar lines when a voice switches away at a measure boundary and returns", () => {
+        const staged = [
+            note("C4", 4),
+            note("D4", 4),
+            note("E4", 4),
+            note("F4", 4),
+            "voice two",
+            note("G4", 4),
+            note("A4", 4),
+            note("B4", 4),
+            note("c5", 4),
+            "one voice",
+            note("d5", 4),
+            note("e5", 4),
+            note("f5", 4),
+            note("g5", 4)
+        ];
+        const body = exportBody(staged);
+        expect(body).not.toContain("| [V:1]| ");
+        expect(body).not.toContain("[V:1]| ");
+        expect(body).toContain("C4 D4 E4 F4 | ");
+        expect(body).toContain("[V:2]G4 A4 B4 c4 | ");
+        expect(body).toMatch(/\[V:1\]\s*d4 e4 f4 g4 \| /);
+    });
+
+    it("declares the meter field for voices created after a meter change", () => {
+        const staged = [
+            note("C4", 4),
+            note("D4", 4),
+            note("E4", 4),
+            note("F4", 4),
+            "meter",
+            3,
+            4,
+            note("G4", 4),
+            note("A4", 4),
+            note("B4", 4),
+            "voice two",
+            note("C5", 4),
+            note("D5", 4),
+            note("E5", 4)
+        ];
+        const body = exportBody(staged);
+        expect(body).toContain("[V:2]\nM:3/4\nc4 d4 e4 |");
     });
 });

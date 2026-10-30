@@ -1948,7 +1948,7 @@ table {
     position: absolute;
     top: 0px;
     left: 0px;
-    background: rgba(255, 255, 255, 0.85) !important;
+    background: var(--color-bg-secondary, rgba(255, 255, 255, 0.85)) !important;
 }
 
 #mkbKeyboardDiv {
@@ -1956,7 +1956,7 @@ table {
     left: 0px;
     top: 0px;
     border: 0 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
+    background: var(--color-bg-secondary, rgba(255, 255, 255, 0.85)) !important;
     width: 1020px;
 }
 
@@ -1965,7 +1965,7 @@ table {
     left: 0px;
     top: 0px;
     border: 0 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
+    background: var(--color-bg-secondary, rgba(255, 255, 255, 0.85)) !important;
     width: 1020px;
 }
 
@@ -1974,7 +1974,7 @@ table {
     left: 0px;
     top: 0px;
     border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
+    background: var(--color-bg-secondary, rgba(255, 255, 255, 0.85));
 }
 
 #mkbOuterDiv {
@@ -1986,7 +1986,7 @@ table {
     left: 0px;
     top: 140px;
     right: 5em;
-    background: rgba(255, 255, 255, 0.85);
+    background: var(--color-bg-secondary, rgba(255, 255, 255, 0.85));
 }
 
 #mkbInnerDiv {
@@ -2787,7 +2787,8 @@ input.timbreName {
     margin-left: 200px;
 }
 
-.insideDivSynth input[type="range"] + .thumb {
+.insideDivSynth input[type="range"] + .thumb,
+.insideDivFilter input[type="range"] + .thumb {
     display: none !important;
 }
 
@@ -3313,6 +3314,51 @@ table {
 .aidebugger-message-user {
     background-color: var(--color-brand-primary);
     color: var(--color-text-inverse);
+}
+
+.ai-chat-markdown p {
+    margin: 0 0 0.5em;
+}
+
+.ai-chat-markdown p:last-child,
+.ai-chat-markdown ul:last-child,
+.ai-chat-markdown ol:last-child {
+    margin-bottom: 0;
+}
+
+.ai-chat-markdown ul,
+.ai-chat-markdown ol {
+    margin: 0 0 0.5em;
+    padding-left: 1.4em;
+}
+
+.ai-chat-markdown code {
+    padding: 0 0.25em;
+    border-radius: 4px;
+    background-color: var(--color-bg-primary);
+    font-family: monospace;
+}
+
+.ai-chat-markdown pre {
+    margin: 0 0 0.5em;
+    padding: 0.5em;
+    overflow-x: auto;
+    border-radius: 6px;
+    background-color: var(--color-bg-primary);
+}
+
+.ai-chat-markdown pre code {
+    padding: 0;
+}
+
+.ai-chat-markdown code.ai-block-link {
+    cursor: help;
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+}
+
+.ai-chat-markdown code.ai-block-link:hover {
+    background-color: var(--color-warning-bg);
 }
 
 .aidebugger-message-system {

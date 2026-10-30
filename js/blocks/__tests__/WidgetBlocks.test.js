@@ -98,6 +98,8 @@ global.Oscilloscope = jest.fn();
 global.Oscilloscope.dependencies = ["widgets/oscilloscope"];
 global.ModeWidget = jest.fn();
 global.ModeWidget.dependencies = ["widgets/modewidget"];
+global.ChordBuilderWidget = jest.fn();
+global.ChordBuilderWidget.dependencies = ["widgets/ChordBuilderAudio", "widgets/chordbuilder"];
 global.StatusMatrix = jest.fn(() => ({ init: jest.fn() }));
 global.Tempo = jest.fn(() => ({ BPMBlocks: [], BPMs: [], init: jest.fn() }));
 global.Tempo.dependencies = [
@@ -352,6 +354,7 @@ describe("setupWidgetBlocks", () => {
             expect(getBlock("timbre")).toBeDefined();
             expect(getBlock("tempo")).toBeDefined();
             expect(getBlock("meterwidget")).toBeDefined();
+            expect(getBlock("chordbuilder")).toBeDefined();
             expect(activity.blockTypes).toEqual([
                 "aidebugger",
                 "envelope",
@@ -362,6 +365,7 @@ describe("setupWidgetBlocks", () => {
                 "timbre",
                 "temperament",
                 "modewidget",
+                "chordbuilder",
                 "meterwidget",
                 "tempo",
                 "sampler",
@@ -627,6 +631,55 @@ describe("setupWidgetBlocks", () => {
         });
     });
 
+    describe("ChordBuilderBlock", () => {
+        it("sets insideChordBuilder and returns child block", () => {
+            const chordBuilder = getBlock("chordbuilder");
+            const result = chordBuilder.flow(["childBlk"], logo, 0, "chordBlk");
+            expect(logo.insideChordBuilder).toBe(true);
+            expect(result).toEqual(["childBlk", 1]);
+        });
+
+        it("shows existing widget window if widget already exists", () => {
+            const chordBuilder = getBlock("chordbuilder");
+            chordBuilder.flow(["childBlk"], logo, 0, "chordBlk");
+
+            const showMock = jest.fn();
+            logo.chordBuilderWidget = { widgetWindow: { show: showMock } };
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+
+            listener();
+            expect(showMock).toHaveBeenCalled();
+            expect(logo.insideChordBuilder).toBe(false);
+        });
+
+        it("does not trigger second load and resets flag if widget is loading", () => {
+            const chordBuilder = getBlock("chordbuilder");
+            chordBuilder.flow(["childBlk"], logo, 0, "chordBlk");
+
+            logo.chordBuilderWidget = "loading";
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            global.ChordBuilderWidget.mockClear();
+
+            listener();
+            expect(global.ChordBuilderWidget).not.toHaveBeenCalled();
+            expect(logo.insideChordBuilder).toBe(false);
+        });
+
+        it("clears loading placeholder and resets insideChordBuilder if widget construction fails", () => {
+            const chordBuilder = getBlock("chordbuilder");
+            chordBuilder.flow(["childBlk"], logo, 0, "chordBlk");
+
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            global.ChordBuilderWidget.mockImplementationOnce(() => {
+                throw new Error("Load failed");
+            });
+
+            listener();
+            expect(logo.chordBuilderWidget).toBeNull();
+            expect(logo.insideChordBuilder).toBe(false);
+        });
+    });
+
     describe("OscilloscopeWidgetBlock", () => {
         it("sets inOscilloscope and returns child block", () => {
             const oscilloscope = getBlock("oscilloscope");
@@ -713,6 +766,17 @@ describe("setupWidgetBlocks", () => {
             expect(result).toEqual(["childBlk", 1]);
             expect(logo.setDispatchBlock).toHaveBeenCalledWith("debuggerBlk", 0, "_aidebugger_0");
         });
+
+        it.each(["aidebugger", "reflection"])(
+            "gives the %s block a hidden block below its clamp to open the window from",
+            name => {
+                const macro = getBlock(name).macroFunc(0, 0);
+                const tail = macro[macro[0][4][2]];
+                expect(macro[0][4]).toHaveLength(3);
+                expect(tail[1]).toBe("hiddennoflow");
+                expect(tail[4]).toEqual([0, null]);
+            }
+        );
     });
 
     describe("First-Click Flow (Lazy Loading)", () => {
@@ -727,10 +791,12 @@ describe("setupWidgetBlocks", () => {
         it("gives the Music Keyboard the turtle that ran the block (#9337)", () => {
             const keyboard = getBlock("musickeyboard");
             let turtleAtInit = null;
-            logo.musicKeyboard = {
-                init: jest.fn(() => {
-                    turtleAtInit = logo.musicKeyboard.turtle;
-                })
+            logo.musicKeyboards = {
+                kbdBlk: {
+                    init: jest.fn(() => {
+                        turtleAtInit = logo.musicKeyboards.kbdBlk.turtle;
+                    })
+                }
             };
 
             keyboard.flow(["childBlk"], logo, 2, "kbdBlk");
@@ -743,8 +809,13 @@ describe("setupWidgetBlocks", () => {
         it("opens each turtle's Music Keyboard with that turtle, whatever ran in between", () => {
             const keyboard = getBlock("musickeyboard");
             const turtlesAtInit = [];
-            logo.musicKeyboard = {
-                init: jest.fn(() => turtlesAtInit.push(logo.musicKeyboard.turtle))
+            logo.musicKeyboards = {
+                kbdBlk1: {
+                    init: jest.fn(() => turtlesAtInit.push(logo.musicKeyboards.kbdBlk1.turtle))
+                },
+                kbdBlk2: {
+                    init: jest.fn(() => turtlesAtInit.push(logo.musicKeyboards.kbdBlk2.turtle))
+                }
             };
 
             // Two turtles run Music Keyboard blocks before either listener fires.
@@ -761,10 +832,61 @@ describe("setupWidgetBlocks", () => {
 
         it("returns interruption and triggers runFromBlockNow for MusicKeyboardBlock", () => {
             const keyboard = getBlock("musickeyboard");
-            logo.musicKeyboard = null;
+            logo.musicKeyboards = {};
             const res = keyboard.flow(["childBlk"], logo, 0, "kbdBlk", "received");
             expect(res).toEqual([null, 0, true]);
             expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, "kbdBlk", true, "received");
+        });
+
+        it("gives each Music Keyboard block its own keyboard instance", () => {
+            const keyboard = getBlock("musickeyboard");
+            logo.musicKeyboards = {};
+
+            // First pass lazy-loads; the re-run (mocked here) sets the instance active.
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk1", "received");
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk1", "received");
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk2", "received");
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk2", "received");
+
+            expect(logo.musicKeyboards.kbdBlk1).toBeDefined();
+            expect(logo.musicKeyboards.kbdBlk2).toBeDefined();
+            // The second block must not reuse (or overwrite) the first block's keyboard.
+            expect(logo.musicKeyboards.kbdBlk1).not.toBe(logo.musicKeyboards.kbdBlk2);
+            expect(logo.musicKeyboards.kbdBlk1.blockNo).toBe("kbdBlk1");
+            expect(logo.musicKeyboards.kbdBlk2.blockNo).toBe("kbdBlk2");
+        });
+
+        it("routes rows to the keyboard of the turtle that ran the block", () => {
+            const keyboard = getBlock("musickeyboard");
+            const kb1 = { instruments: [], noteNames: [], octaves: [], addRowBlock: jest.fn() };
+            const kb2 = { instruments: [], noteNames: [], octaves: [], addRowBlock: jest.fn() };
+            logo.musicKeyboards = { kbdBlk1: kb1, kbdBlk2: kb2 };
+            logo.musicKeyboardByTurtle = {};
+
+            keyboard.flow(["childBlk"], logo, 1, "kbdBlk1", "received");
+            keyboard.flow(["childBlk"], logo, 2, "kbdBlk2", "received");
+
+            // Both blocks ran, but a turtle's rows must resolve to its own keyboard.
+            const kb1Sink = logo.musicKeyboardByTurtle[1] || logo.musicKeyboard;
+            kb1Sink.instruments.push("snare");
+
+            expect(kb1.instruments).toContain("snare");
+            expect(kb2.instruments).not.toContain("snare");
+        });
+
+        it("points logo.musicKeyboard at the block that ran, so clamps land on it", () => {
+            const keyboard = getBlock("musickeyboard");
+            logo.musicKeyboards = {};
+
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk1", "received");
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk1", "received");
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk2", "received");
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk2", "received");
+
+            // The second block ran last, so its pitch/drum/meter rows must land
+            // on the second keyboard, not the first.
+            expect(logo.musicKeyboard).toBe(logo.musicKeyboards.kbdBlk2);
+            expect(logo.inMusicKeyboard).toBe(true);
         });
 
         it("returns interruption and triggers runFromBlockNow for MatrixBlock (PhraseMaker)", () => {
@@ -1031,7 +1153,6 @@ describe("setupWidgetBlocks", () => {
                 ["arpeggio", "Arpeggio"],
                 ["pitchDrumMatrix", "PitchDrumMatrix"],
                 ["pitchSlider", "PitchSlider"],
-                ["musicKeyboard", "MusicKeyboard"],
                 ["pitchStaircase", "PitchStaircase"],
                 ["rhythmRuler", "RhythmRuler"],
                 ["phraseMaker", "PhraseMaker"],
@@ -1043,7 +1164,8 @@ describe("setupWidgetBlocks", () => {
             const lazyLoadWidgetSites = [
                 ["meterWidget", "MeterWidget"],
                 ["Oscilloscope", "Oscilloscope"],
-                ["modeWidget", "ModeWidget"]
+                ["modeWidget", "ModeWidget"],
+                ["chordBuilderWidget", "ChordBuilderWidget"]
             ];
 
             const notWired = [];
@@ -1054,6 +1176,13 @@ describe("setupWidgetBlocks", () => {
                 if (!callSite.test(widgetBlocksSource)) {
                     notWired.push(`_ensureWidget("${widgetKey}") is missing a dependency fallback`);
                 }
+            }
+            // Music Keyboard lazy-loads per block, not via _ensureWidget.
+            const musicKeyboardCallSite = new RegExp(
+                `_getWidgetDependencies\\(\\s*typeof MusicKeyboard !== "undefined" \\? MusicKeyboard : null,`
+            );
+            if (!musicKeyboardCallSite.test(widgetBlocksSource)) {
+                notWired.push(`musicKeyboard is missing a dependency fallback`);
             }
             for (const [widgetKey, className] of lazyLoadWidgetSites) {
                 const callSite = new RegExp(
@@ -1089,10 +1218,20 @@ describe("setupWidgetBlocks", () => {
             expect(logo[logoKey]).toBeDefined();
         });
 
+        it("tells the Rhythm Maker which block opened it, so its edits are saved there", () => {
+            logo.rhythmRuler = { Rulers: [[[1], []]], Drums: [3] };
+
+            getBlock("rhythmruler2").flow(["childBlk"], logo, 0, "rrBlk");
+
+            expect(logo.rhythmRuler.rulerBlock).toBe("rrBlk");
+            expect(logo.rhythmRuler.Rulers).toEqual([]);
+        });
+
         it.each([
             ["meterwidget", "meterBlk", "meterWidget", global.MeterWidget],
             ["oscilloscope", "oscBlk", "Oscilloscope", global.Oscilloscope],
-            ["modewidget", "modeBlk", "modeWidget", global.ModeWidget]
+            ["modewidget", "modeBlk", "modeWidget", global.ModeWidget],
+            ["chordbuilder", "chordBlk", "chordBuilderWidget", global.ChordBuilderWidget]
         ])("%s lazy-loads its widget once its listener fires", (type, blk, logoKey, Widget) => {
             if (type === "meterwidget") {
                 activity.blocks.blockList = {

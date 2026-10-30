@@ -52,6 +52,78 @@ describe("musicutils-lookups", () => {
         expect(lookups.getVoiceSynthName("electronic synth")).toBe("electronic synth");
     });
 
+    it("looks up voice names by identifier when display names differ or are empty", () => {
+        const originalVoices = global.VOICENAMES;
+        global.VOICENAMES = [
+            ["Klavier", "piano", "images/piano.svg"],
+            ["", "custom voice", "images/custom.svg"],
+            ["electronic synth", "synth", "images/synth.svg"]
+        ];
+        try {
+            expect(lookups.getVoiceName("piano")).toBe("Klavier");
+            expect(lookups.getVoiceName("Klavier")).toBe("Klavier");
+            expect(lookups.getVoiceName("custom voice")).toBe("custom voice");
+            expect(lookups.getVoiceName("synth")).toBe("electronic synth");
+        } finally {
+            global.VOICENAMES = originalVoices;
+        }
+    });
+
+    it("looks up noise names by display name and identifier", () => {
+        const originalNoises = global.NOISENAMES;
+        global.NOISENAMES = [
+            ["white noise", "noise1", "images/synth.svg"],
+            ["brown noise", "noise2", "images/synth.svg"],
+            ["pink noise", "noise3", "images/synth.svg"],
+            ["", "custom noise", "images/custom.svg"]
+        ];
+        try {
+            expect(lookups.getNoiseName("pink noise")).toBe("pink noise");
+            expect(lookups.getNoiseName("noise3")).toBe("pink noise");
+            expect(lookups.getNoiseName("white noise")).toBe("white noise");
+            expect(lookups.getNoiseName("noise1")).toBe("white noise");
+            expect(lookups.getNoiseName("custom noise")).toBe("custom noise");
+        } finally {
+            global.NOISENAMES = originalNoises;
+        }
+    });
+
+    it("looks up noise names, icons, and synths with localized display names and cross-language translation", () => {
+        const originalNoises = global.NOISENAMES;
+        const originalTranslate = global._;
+        const translations = {
+            "pink noise": "ruido rosa",
+            "white noise": "ruido blanco",
+            "brown noise": "ruido marrón"
+        };
+        global._ = str => translations[str] || str;
+        global.NOISENAMES = [
+            ["ruido blanco", "noise1", "images/synth1.svg"],
+            ["ruido marrón", "noise2", "images/synth2.svg"],
+            ["ruido rosa", "noise3", "images/synth3.svg"]
+        ];
+        try {
+            expect(lookups.getNoiseName("ruido rosa")).toBe("ruido rosa");
+            expect(lookups.getNoiseIcon("ruido rosa")).toBe("images/synth3.svg");
+            expect(lookups.getNoiseSynthName("ruido rosa")).toBe("noise3");
+
+            expect(lookups.getNoiseName("noise3")).toBe("ruido rosa");
+            expect(lookups.getNoiseIcon("noise3")).toBe("images/synth3.svg");
+            expect(lookups.getNoiseSynthName("noise3")).toBe("noise3");
+
+            expect(lookups.getNoiseName("pink noise")).toBe("ruido rosa");
+            expect(lookups.getNoiseIcon("pink noise")).toBe("images/synth3.svg");
+            expect(lookups.getNoiseSynthName("pink noise")).toBe("noise3");
+
+            expect(lookups.getNoiseName("white noise")).toBe("ruido blanco");
+            expect(lookups.getNoiseIcon("white noise")).toBe("images/synth1.svg");
+            expect(lookups.getNoiseSynthName("white noise")).toBe("noise1");
+        } finally {
+            global.NOISENAMES = originalNoises;
+            global._ = originalTranslate;
+        }
+    });
+
     it("handles non-string inputs safely without throwing", () => {
         expect(lookups.getDrumName(undefined)).toBeNull();
         expect(lookups.getDrumIndex(123)).toBe(-1);
@@ -66,6 +138,11 @@ describe("musicutils-lookups", () => {
         expect(lookups.getVoiceName(123)).toBe("electronic synth");
         expect(lookups.getVoiceIcon({})).toBe("images/voices.svg");
         expect(lookups.getVoiceSynthName(undefined)).toBeNull();
+
+        expect(lookups.getOscillatorTypes("")).toBeNull();
+        expect(lookups.getOscillatorTypes(null)).toBeNull();
+        expect(lookups.getOscillatorTypes(undefined)).toBeNull();
+        expect(lookups.getOscillatorTypes(123)).toBeNull();
 
         expect(lookups.getIntervalNumber(undefined)).toBe(0);
         expect(lookups.getIntervalNumber(null)).toBe(0);
@@ -100,10 +177,20 @@ describe("musicutils-lookups", () => {
 
     it("looks up invert modes, intervals, filters and oscillators", () => {
         expect(lookups.getInvertMode("even")).toBe("even");
+        expect(lookups.getInvertMode(null)).toBeNull();
+        expect(lookups.getInvertMode(undefined)).toBeUndefined();
+        expect(lookups.getInvertMode(123)).toBe(123);
+        expect(lookups.getInvertMode({})).toEqual({});
+        expect(lookups.getInvertMode("")).toBe("");
         expect(lookups.getIntervalNumber("perfect 5")).toBe(7);
         expect(lookups.getIntervalDirection("perfect 5")).toBe(0);
         expect(lookups.getIntervalRatio("perfect 5")).toBeCloseTo(1.5, 5);
         expect(lookups.getFilterTypes("highpass")).toBe("highpass");
+        expect(lookups.getFilterTypes(null)).toBe("highpass");
+        expect(lookups.getFilterTypes(undefined)).toBe("highpass");
+        expect(lookups.getFilterTypes(123)).toBe("highpass");
+        expect(lookups.getFilterTypes({})).toBe("highpass");
+        expect(lookups.getFilterTypes("")).toBe("highpass");
         expect(lookups.getOscillatorTypes("sine")).toBe("sine");
     });
 

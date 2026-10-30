@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global DOMParser */
+/* global DOMParser, DRUM_MIDI_MAP, REVERSE_DRUM_MIDI_MAP */
 
 /* exported setupActivityMxmlParser */
 
@@ -45,12 +45,27 @@ const _MXML_TYPE_DENOMINATOR = {
 
 const _text = (parent, tag) => parent.querySelector(`:scope > ${tag}`)?.textContent ?? null;
 
-// Adds two [numerator, denominator] fractions without reducing the result --
-// same choice as js/utils/utils-logic.js's rationalSum, whose own doc comment
-// explains why: the "divide" block computes the reduction at runtime anyway,
-// so there's nothing to gain from doing it here, and an unreduced result is
-// just as correct.
-const _addFractions = ([n1, d1], [n2, d2]) => [n1 * d2 + n2 * d1, d1 * d2];
+const _fractionGcd = (a, b) => {
+    while (b) {
+        [a, b] = [b, a % b];
+    }
+    return Math.abs(a);
+};
+
+// Keep tie durations reduced as they accumulate. Multiplying denominators on
+// every note can overflow before the resulting divide block is ever evaluated.
+const _addFractions = ([n1, d1], [n2, d2]) => {
+    // MusicXML duration/divisions can be decimal; integer GCD reduction would
+    // amplify floating-point remainders into very large block operands.
+    if (![n1, d1, n2, d2].every(Number.isInteger)) {
+        return [n1 * d2 + n2 * d1, d1 * d2];
+    }
+    const common = _fractionGcd(d1, d2);
+    const numerator = n1 * (d2 / common) + n2 * (d1 / common);
+    const denominator = (d1 / common) * d2;
+    const divisor = _fractionGcd(numerator, denominator);
+    return [numerator / divisor, denominator / divisor];
+};
 
 // Whether two note "content" values (pitch/drum/rest, as built in
 // _processPart) are the same. A real tie is always same-pitch; used to
@@ -60,6 +75,19 @@ const _contentsEqual = (a, b) => {
     if (a === null || b === null) return a === b;
     if (a.type !== b.type) return false;
     return a.type === "pitch" ? a.name === b.name && a.octave === b.octave : a.name === b.name;
+};
+
+// A note's <time-modification> as [actual-notes, normal-notes], the ratio a
+// tuplet is played at, or 1:1 for a note that is not in one. Anything missing or
+// not a positive number is read as 1:1, so a malformed tuplet keeps its written
+// length rather than becoming zero or NaN.
+const _timeModification = noteEl => {
+    const el = noteEl.querySelector(":scope > time-modification");
+    if (el === null) return [1, 1];
+    const actual = Number(_text(el, "actual-notes"));
+    const normal = Number(_text(el, "normal-notes"));
+    if (!(actual > 0) || !(normal > 0)) return [1, 1];
+    return [actual, normal];
 };
 
 /**
@@ -81,13 +109,34 @@ const _contentsEqual = (a, b) => {
  */
 function _noteDuration(noteEl, divisions) {
     const typeName = _text(noteEl, "type");
-    if (typeName !== null && typeName in _MXML_TYPE_DENOMINATOR) {
+    const durationText = _text(noteEl, "duration");
+    // A whole-measure rest lasts the measure whatever <type> it is drawn
+    // with: PhotoScore writes a 3/4 bar's rest as <type>whole</type> over a
+    // three-beat <duration> (musescore.org/en/node/51611, the same bug in
+    // MuseScore's importer), and reading the type made every bar after it a
+    // beat late. Its <duration> is the length that counts.
+    // An empty or non-numeric <duration> says nothing, so it doesn't outrank
+    // <type> (Number("") is 0, not "missing").
+    // A cue note is imported as a rest that holds its place in time, and
+    // <duration> is what advances the position; its <type> only says how the
+    // small cue is drawn.
+    const measureRestLength = durationText?.trim() ? Number(durationText) : NaN;
+    const isMeasureRest = noteEl.querySelector(":scope > rest")?.getAttribute("measure") === "yes";
+    const isCue = noteEl.querySelector(":scope > cue") !== null;
+    const durationWins =
+        (isMeasureRest || isCue) &&
+        Number.isFinite(measureRestLength) &&
+        measureRestLength > 0 &&
+        divisions > 0;
+    if (!durationWins && typeName !== null && typeName in _MXML_TYPE_DENOMINATOR) {
         const dots = noteEl.querySelectorAll(":scope > dot").length;
         const denominator = _MXML_TYPE_DENOMINATOR[typeName];
-        return [2 ** (dots + 1) - 1, denominator * 2 ** dots];
+        // <type> is the note as written, so a tuplet note has to be shortened by
+        // its ratio. <duration> below needs no such adjustment, having it already.
+        const [actual, normal] = _timeModification(noteEl);
+        return [(2 ** (dots + 1) - 1) * normal, denominator * 2 ** dots * actual];
     }
 
-    const durationText = _text(noteEl, "duration");
     if (durationText !== null && divisions > 0) {
         // duration is in divisions; a quarter note is `divisions` divisions long.
         return [Number(durationText), divisions * 4];
@@ -117,19 +166,42 @@ function _pitchToNoteName(pitchEl) {
     return { name: step + suffix, octave };
 }
 
+// General MIDI kit pieces that REVERSE_DRUM_MIDI_MAP leaves out, each paired
+// with the nearest Music Blocks drum so a standard kit part doesn't send
+// them all to the kick.
+const _MXML_GM_DRUM_FALLBACK = {
+    35: "kick drum", // Acoustic Bass Drum
+    44: "hi hat", // Pedal Hi-Hat
+    46: "hi hat", // Open Hi-Hat
+    45: "tom tom", // Low Tom
+    48: "tom tom", // Hi-Mid Tom
+    51: "ride bell", // Ride Cymbal 1
+    57: "crash", // Crash Cymbal 2
+    59: "ride bell" // Ride Cymbal 2
+};
+
+// "Hi-Hat", "hi hat" and "HiHat" all name the same drum.
+const _drumKey = name => name.toLowerCase().replace(/[^a-z]/g, "");
+
 /**
- * The Music Blocks drum name for an unpitched <note>, from the
- * <score-instrument><instrument-name> its <instrument id> references.
+ * The Music Blocks drum name for an unpitched <note>, from the instrument its
+ * <instrument id> references in <part-list>.
  *
- * js/mxml.js writes <instrument-name> as the drum name directly (e.g. "snare
- * drum") for any drum it recognizes, so no MIDI-number round trip is needed --
- * the text is already what a drumname block's value should be. Falls back to
- * "kick drum" when the note has no <instrument> reference or the id doesn't
- * resolve, the same default js/midi.js's own importer uses for the same reason.
+ * js/mxml.js writes <instrument-name> as the drum name itself ("snare drum"),
+ * but other programs write their own names: the MusicXML tutorial's drum kit
+ * has "Snare Drum", "Kick Drum", "Crash Cymbal", "Hi-Hat Closed" and
+ * "Cowbell". Singer.DrumActions.GetDrumname matches names exactly and plays
+ * anything else as the default drum, so that kit came in as five kick drums.
+ * So: a name that is a Music Blocks drum up to case and punctuation is used;
+ * otherwise the <midi-unpitched> key on the matching <midi-instrument>
+ * (1-based, so GM key + 1, as js/mxml.js writes it) picks the drum through
+ * the reverse map js/midi.js's importer uses, with the name settling a key
+ * two drums share (56 is both "japanese drum" and "cow bell"). Falls back to
+ * "kick drum" when nothing resolves, as js/midi.js does.
  *
  * @param {Element} noteEl - a MusicXML <note> element with an <unpitched> child
- * @param {Document} doc - the whole document, since <score-instrument> lives in
- *     <part-list>, not inside the part being walked
+ * @param {Document} doc - the whole document, since <score-instrument> and
+ *     <midi-instrument> live in <part-list>, not inside the part being walked
  * @returns {string}
  */
 function _drumName(noteEl, doc) {
@@ -138,13 +210,31 @@ function _drumName(noteEl, doc) {
     // Matched by comparing the id in JS, not interpolated into a CSS attribute
     // selector -- an id containing a quote or other selector-special character
     // would otherwise produce a malformed (or, worse, unintended) selector.
-    for (const scoreInstrument of doc.querySelectorAll("score-instrument")) {
-        if (scoreInstrument.getAttribute("id") === instrumentId) {
-            const name = _text(scoreInstrument, "instrument-name")?.trim();
-            return name || "kick drum";
-        }
+    const byId = tag =>
+        Array.from(doc.querySelectorAll(tag)).find(el => el.getAttribute("id") === instrumentId);
+
+    const scoreInstrument = byId("score-instrument");
+    const name = scoreInstrument ? _text(scoreInstrument, "instrument-name")?.trim() : null;
+    const key = name ? _drumKey(name) : "";
+    const drums = typeof DRUM_MIDI_MAP !== "undefined" ? Object.keys(DRUM_MIDI_MAP) : [];
+    const named = drums.find(drum => _drumKey(drum) === key);
+    if (named) return named;
+
+    const midiInstrument = byId("midi-instrument");
+    const gmKey = midiInstrument ? Number(_text(midiInstrument, "midi-unpitched")) - 1 : NaN;
+    if (Number.isInteger(gmKey)) {
+        const candidates =
+            typeof REVERSE_DRUM_MIDI_MAP !== "undefined"
+                ? (REVERSE_DRUM_MIDI_MAP[gmKey] ?? [])
+                : [];
+        const mapped =
+            candidates.find(drum => _drumKey(drum) === key) ??
+            candidates[0] ??
+            _MXML_GM_DRUM_FALLBACK[gmKey];
+        if (mapped) return mapped;
     }
-    return "kick drum";
+
+    return name || "kick drum";
 }
 
 // Inverse of js/mxml.js's _MAJOR_FIFTHS: a <fifths> count -> the major-key tonic
@@ -322,9 +412,19 @@ function _createNoteBlocks(blockId, duration, content, prevId) {
 function _initialTimeSignature(partEl) {
     const timeEl = partEl.querySelector("measure attributes time");
     if (!timeEl) return { beats: 4, beatType: 4 };
+    // <beats> can be additive: the MusicXML spec writes a 3+2/8 bar as one
+    // <beats>3+2</beats>/<beat-type>8</beat-type> pair, and it holds the sum.
+    // Number("3+2") is NaN, and the meter block was handed that as its beat
+    // count.
+    // An empty part ("3+", "3++2", or an empty <beats>) is malformed, not
+    // zero, so it falls back to 4 with the rest.
+    const beats = (_text(timeEl, "beats") ?? "4")
+        .split("+")
+        .reduce((total, part) => total + (part.trim() === "" ? NaN : Number(part)), 0);
+    const beatType = Number(_text(timeEl, "beat-type") ?? "4");
     return {
-        beats: Number(_text(timeEl, "beats") ?? "4"),
-        beatType: Number(_text(timeEl, "beat-type") ?? "4")
+        beats: Number.isFinite(beats) && beats > 0 ? beats : 4,
+        beatType: Number.isFinite(beatType) && beatType > 0 ? beatType : 4
     };
 }
 
@@ -538,6 +638,22 @@ function _processPart(partEl, blockId, chainPrevId, doc) {
         for (const child of measureEl.children) {
             if (child.tagName === "backup") break;
 
+            // <forward> moves this voice on by its <duration> with no note
+            // written. Skipping it brought every later note in early.
+            if (child.tagName === "forward") {
+                const durationText = _text(child, "duration");
+                const length = durationText?.trim() ? Number(durationText) : NaN;
+                if (Number.isFinite(length) && length > 0 && divisions > 0) {
+                    if (tieDuration !== null) {
+                        emitNote(tieDuration, tieContent);
+                        tieDuration = null;
+                        tieContent = null;
+                    }
+                    emitNote([length, divisions * 4], null);
+                }
+                continue;
+            }
+
             if (child.tagName === "barline") {
                 const repeatEl = child.querySelector(":scope > repeat");
                 const direction = repeatEl?.getAttribute("direction");
@@ -563,8 +679,11 @@ function _processPart(partEl, blockId, chainPrevId, doc) {
             const duration = _noteDuration(child, divisions);
             const unpitchedEl = child.querySelector(":scope > unpitched");
             const pitchEl = child.querySelector(":scope > pitch");
+            // A cue note shows another part's line during this one's rest
+            // and MusicXML says it isn't played, but it still fills the time.
             const isRest =
                 child.querySelector(":scope > rest") !== null ||
+                child.querySelector(":scope > cue") !== null ||
                 (pitchEl === null && unpitchedEl === null);
 
             let content;
@@ -742,8 +861,12 @@ const setupActivityMxmlParser = activityInstance => {
         // settimbre/voicename/hidden despite having lower ids).
         allBlocks.sort((a, b) => a[0] - b[0]);
 
-        this.blocks.loadNewBlocks(allBlocks);
-        return null;
+        // Returned so callers (js/project-manager.js) can tell this load's
+        // "finishedLoading"/"loadFailed" pubsub events apart from any other
+        // in-flight load -- loadNewBlocks() finishes asynchronously, so a
+        // null return (the early-exit paths above) is the only way to tell
+        // "never started a load" apart from "started one".
+        return this.blocks.loadNewBlocks(allBlocks);
     };
 };
 

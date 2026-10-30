@@ -61,6 +61,44 @@ const MusicKeyboardEditing = {
     install(deps) {
         const { FAKEBLOCKNUMBER, beginnerMode, resolveSynthNoteName, fillChromaticGaps } = deps;
 
+        // Scoped element lookup. the ids repeat across keyboard windows.
+        if (typeof this._mkbEl !== "function") {
+            this._mkbEl = id => {
+                if (this._widgetBody && typeof this._widgetBody.querySelector === "function") {
+                    return this._widgetBody.querySelector(`[id="${id}"]`);
+                }
+                return docById(id);
+            };
+        }
+
+        // Only one keyboard can own the shared #wheelDivptm menu at a time.
+        this._claimWheelMenu = () => {
+            const previous = MusicKeyboardEditing._wheelMenuOwner;
+            if (previous && previous !== this && typeof previous._closeWheelMenu === "function") {
+                previous._closeWheelMenu();
+            }
+            MusicKeyboardEditing._wheelMenuOwner = this;
+        };
+
+        this._closeWheelMenu = () => {
+            if (MusicKeyboardEditing._wheelMenuOwner !== this) return;
+            const wheelDiv = docById("wheelDivptm");
+            if (wheelDiv && wheelDiv.style) wheelDiv.style.display = "none";
+            const wheels = [
+                this._menuWheel,
+                this._pitchWheel,
+                this._tabsWheel,
+                this._exitWheel,
+                this._durationWheel,
+                this._accidentalsWheel,
+                this._octavesWheel
+            ];
+            for (const wheel of wheels) {
+                if (wheel && typeof wheel.removeWheel === "function") wheel.removeWheel();
+            }
+            MusicKeyboardEditing._wheelMenuOwner = null;
+        };
+
         // Semitones for the pitch rows Add Note can create: C1 to B8.
         const LOWESTSTEP = 1 * 12;
         const HIGHESTSTEP = 8 * 12 + 11;
@@ -139,6 +177,7 @@ const MusicKeyboardEditing = {
          * @param {string} start - The start attribute of the cell.
          */
         this._createpiesubmenu = function (cellId, start) {
+            this._claimWheelMenu();
             docById("wheelDivptm").style.display = "";
             docById("wheelDivptm").style.zIndex = "10001";
 
@@ -228,8 +267,8 @@ const MusicKeyboardEditing = {
             docById("wheelDivptm").style.height = "250px";
             docById("wheelDivptm").style.width = "250px";
 
-            const x = docById(cellId).getBoundingClientRect().x;
-            const y = docById(cellId).getBoundingClientRect().y;
+            const x = this._mkbEl(cellId).getBoundingClientRect().x;
+            const y = this._mkbEl(cellId).getBoundingClientRect().y;
 
             docById("wheelDivptm").style.left =
                 Math.min(
@@ -243,9 +282,7 @@ const MusicKeyboardEditing = {
                 ) + "px";
 
             this._exitWheel.navItems[0].navigateFunction = () => {
-                docById("wheelDivptm").style.display = "none";
-                this._menuWheel.removeWheel();
-                this._exitWheel.removeWheel();
+                this._closeWheelMenu();
             };
 
             let flag = 0;
@@ -328,7 +365,7 @@ const MusicKeyboardEditing = {
          */
         this._addNotes = function (cellId, start, divideNoteBy) {
             start = parseInt(start, 10);
-            const cell = docById(cellId);
+            const cell = this._mkbEl(cellId);
             const dur = cell.getAttribute("dur");
 
             this._notesPlayed = this._notesPlayed.reduce(function (prevValue, curValue) {
@@ -418,6 +455,7 @@ const MusicKeyboardEditing = {
          * The submenu allows selection between pitch and hertz options.
          */
         this._createAddRowPieSubmenu = function () {
+            this._claimWheelMenu();
             docById("wheelDivptm").style.display = "";
             docById("wheelDivptm").style.zIndex = "10001";
             const pitchLabels = [
@@ -480,8 +518,11 @@ const MusicKeyboardEditing = {
             }
             this._configureExitWheel(this._exitWheel);
 
-            const x = docById("addnotes").getBoundingClientRect().x;
-            const y = docById("addnotes").getBoundingClientRect().y;
+            // The toolbar button lives outside the widget body, so _mkbEl can't see
+            // it; keep the direct reference and fall back to the document lookup.
+            const addNoteButton = this._addNoteButton || docById("addnotes");
+            const x = addNoteButton.getBoundingClientRect().x;
+            const y = addNoteButton.getBoundingClientRect().y;
 
             docById("wheelDivptm").style.position = "absolute";
             docById("wheelDivptm").style.height = "300px";
@@ -498,9 +539,7 @@ const MusicKeyboardEditing = {
                 ) + "px";
 
             this._exitWheel.navItems[0].navigateFunction = () => {
-                docById("wheelDivptm").style.display = "none";
-                this._menuWheel.removeWheel();
-                this._exitWheel.removeWheel();
+                this._closeWheelMenu();
             };
 
             let rLabel;
@@ -859,6 +898,7 @@ const MusicKeyboardEditing = {
          * @param {string} condition - The condition that determines the type of submenu to create ('synthsblocks' or 'pitchblocks').
          */
         this._createColumnPieSubmenu = function (index, condition) {
+            this._claimWheelMenu();
             index = parseInt(index, 10);
             const displayLayout = this.displayLayout || this.layout;
             const layoutItem = displayLayout[displayLayout.length - index - 1];
@@ -1005,8 +1045,8 @@ const MusicKeyboardEditing = {
                 }
             }
 
-            const x = docById("labelcol" + index).getBoundingClientRect().x;
-            const y = docById("labelcol" + index).getBoundingClientRect().y;
+            const x = this._mkbEl("labelcol" + index).getBoundingClientRect().x;
+            const y = this._mkbEl("labelcol" + index).getBoundingClientRect().y;
 
             docById("wheelDivptm").style.position = "absolute";
             docById("wheelDivptm").style.height = "300px";
@@ -1063,13 +1103,7 @@ const MusicKeyboardEditing = {
             }
 
             this._exitWheel.navItems[0].navigateFunction = () => {
-                docById("wheelDivptm").style.display = "none";
-                this._pitchWheel.removeWheel();
-                this._exitWheel.removeWheel();
-                if (condition === "pitchblocks") {
-                    this._accidentalsWheel.removeWheel();
-                    this._octavesWheel.removeWheel();
-                }
+                this._closeWheelMenu();
             };
 
             /**
@@ -1089,7 +1123,7 @@ const MusicKeyboardEditing = {
                 );
                 this.activity.blocks.blockList[argBlock].updateCache();
 
-                const cell = docById("labelcol" + (displayLayout.length - index - 1));
+                const cell = this._mkbEl("labelcol" + (displayLayout.length - index - 1));
                 displayLayout[index].noteOctave = parseInt(blockValue, 10);
                 if (this.layout[index]) {
                     this.layout[index].noteOctave = parseInt(blockValue, 10);
@@ -1154,7 +1188,7 @@ const MusicKeyboardEditing = {
                     );
                 }
 
-                const cell = docById("labelcol" + (displayLayout.length - index - 1));
+                const cell = this._mkbEl("labelcol" + (displayLayout.length - index - 1));
                 displayLayout[index].noteName = label;
                 displayLayout[index].noteOctave = octave;
                 if (this.layout[index]) {

@@ -11,7 +11,11 @@
 
 "use strict";
 
+const fs = require("fs");
+const path = require("path");
 const { setupActivityAbcParser } = require("../abc-parser.js");
+const ABCJS = require("../../../lib/abc.min.js");
+const { toFraction } = require("../../utils/utils-logic.js");
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -50,6 +54,7 @@ function makeNote(name, pitch, duration = 0.25, opts = {}) {
         pitches: [pitchObj],
         duration,
         startTriplet: opts.startTriplet ?? null,
+        tripletMultiplier: opts.tripletMultiplier,
         endTriplet: opts.endTriplet ?? null
     };
 }
@@ -90,20 +95,10 @@ function blocksOfType(blocks, type) {
 }
 
 // ---------------------------------------------------------------------------
-// Mock toFraction globally (musicutils.js is not loaded in this unit context)
+// Use the same fraction conversion as the importer at runtime.
 // ---------------------------------------------------------------------------
 beforeAll(() => {
-    global.toFraction = duration => {
-        // Simplified: return [numerator, denominator] for common durations
-        const map = {
-            0.0625: [1, 16],
-            0.125: [1, 8],
-            0.25: [1, 4],
-            0.5: [1, 2],
-            1: [1, 1]
-        };
-        return map[duration] ?? [Math.round(duration * 8), 8];
-    };
+    global.toFraction = toFraction;
 });
 
 afterEach(() => {
@@ -113,6 +108,66 @@ afterEach(() => {
 // ---------------------------------------------------------------------------
 // Test 1 — Simple melody (single voice, G major, 4/4)
 // ---------------------------------------------------------------------------
+describe("Header tempo", () => {
+    test.each([
+        ["1/4=120", 120, 1 / 4],
+        ["3/8=60", 60, 3 / 8],
+        ["1/4 1/8=60", 60, 3 / 8],
+        ["120", 120, 1 / 8],
+        ['"Allegro" 1/4=120', 120, 1 / 4]
+    ])("imports Q:%s with its own beat unit", async (header, bpm, beatValue) => {
+        const tune = ABCJS.parseOnly(`X:1\nM:6/8\nL:1/8\nQ:${header}\nK:C\nCDE|`)[0];
+        const blocks = await parseAndCapture(tune);
+        const tempos = blocksOfType(blocks, "setbpm3");
+        expect(tempos).toHaveLength(1);
+
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const tempo = tempos[0];
+        const beat = byId.get(tempo[4][2]);
+        expect(byId.get(tempo[4][1])[1][1].value).toBe(bpm);
+        expect(byId.get(beat[4][1])[1][1].value / byId.get(beat[4][2])[1][1].value).toBe(beatValue);
+
+        const key = blocksOfType(blocks, "setkey2")[0];
+        const spacer = byId.get(tempo[4][3]);
+        const timbre = blocksOfType(blocks, "settimbre")[0];
+        expect(key[4][3]).toBe(tempo[0]);
+        expect(tempo[4][0]).toBe(key[0]);
+        expect(spacer[4]).toEqual([tempo[0], timbre[0]]);
+        expect(timbre[4][0]).toBe(spacer[0]);
+        expect(byId.get(timbre[4][2])[1][0]).toBe("nameddo");
+        expect(new Set(blocks.map(block => block[0])).size).toBe(blocks.length);
+    });
+
+    test.each(["", 'Q:"Allegro"\n'])("does not invent a numeric tempo from %j", async header => {
+        const tune = ABCJS.parseOnly(`X:1\nM:4/4\nL:1/4\n${header}K:C\nCDE|`)[0];
+        expect(blocksOfType(await parseAndCapture(tune), "setbpm3")).toHaveLength(0);
+    });
+
+    test("sets the header tempo for every staff", async () => {
+        const staff = {
+            meter: { value: [{ num: 4, den: 4 }] },
+            key: { root: "C", mode: "major", accidentals: [] },
+            voices: [[makeNote("C", 0)]]
+        };
+        const tune = makeTune({ staves: [staff, staff] });
+        tune.metaText.tempo = { bpm: 120, duration: [0.25] };
+        const blocks = await parseAndCapture(tune);
+        expect(blocksOfType(blocks, "setbpm3")).toHaveLength(2);
+        expect(new Set(blocks.map(block => block[0])).size).toBe(blocks.length);
+    });
+
+    test.each([
+        { bpm: 0, duration: [0.25] },
+        { bpm: Infinity, duration: [0.25] },
+        { bpm: 120, duration: [] },
+        { bpm: 120, duration: [NaN] }
+    ])("ignores an invalid tempo %j", async tempo => {
+        const tune = makeTune();
+        tune.metaText.tempo = tempo;
+        expect(blocksOfType(await parseAndCapture(tune), "setbpm3")).toHaveLength(0);
+    });
+});
+
 describe("Test 1: Simple melody", () => {
     const tune = makeTune({
         title: "Twinkle",
@@ -269,6 +324,85 @@ describe("Test 3: Repeat bars", () => {
 // Test 4 — Triplets
 // ---------------------------------------------------------------------------
 describe("Test 4: Triplets", () => {
+    test("imports the downloadable quarter-note triplet example", async () => {
+        const abc = fs.readFileSync(
+            path.join(__dirname, "fixtures", "quarter-note-triplets.abc"),
+            "utf8"
+        );
+        const tune = ABCJS.parseOnly(abc)[0];
+        expect(tune.warnings).toBeUndefined();
+        const blocks = await parseAndCapture(tune);
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const durations = blocksOfType(blocks, "newnote").map(note => {
+            const divide = byId.get(note[4][1]);
+            return byId.get(divide[4][1])[1][1].value / byId.get(divide[4][2])[1][1].value;
+        });
+        expect(durations).toEqual([
+            1 / 6,
+            1 / 6,
+            1 / 6,
+            1 / 4,
+            1 / 4,
+            1 / 6,
+            1 / 6,
+            1 / 6,
+            1 / 4,
+            1 / 4
+        ]);
+    });
+
+    test.each([
+        ["quarter-note triplets", "4/4", "1/4", "(3CDE F|", [1 / 6, 1 / 6, 1 / 6, 1 / 4]],
+        ["sixteenth-note triplets", "4/4", "1/16", "(3CDE F|", [1 / 24, 1 / 24, 1 / 24, 1 / 16]],
+        ["triplets in cut time", "2/2", "1/8", "(3CDE F|", [1 / 12, 1 / 12, 1 / 12, 1 / 8]],
+        ["duplets in compound time", "6/8", "1/8", "(2CD E|", [3 / 16, 3 / 16, 1 / 8]],
+        [
+            "an explicit tuplet ratio",
+            "4/4",
+            "1/8",
+            "(5:4:5CDEFG A|",
+            [0.1, 0.1, 0.1, 0.1, 0.1, 1 / 8]
+        ],
+        ["a rest in a tuplet", "4/4", "1/4", "(3CzE F|", [1 / 6, 1 / 6, 1 / 6, 1 / 4]],
+        [
+            "a spacer within a tuplet",
+            "4/4",
+            "1/4",
+            "(3CyDE F|",
+            [1 / 6, 1 / 4, 1 / 6, 1 / 6, 1 / 4]
+        ],
+        [
+            "a spacer across tuplet staff lines",
+            "4/4",
+            "1/4",
+            "(3C\nyDE F|",
+            [1 / 6, 1 / 4, 1 / 6, 1 / 6, 1 / 4]
+        ],
+        [
+            "unequal note lengths in a tuplet",
+            "4/4",
+            "1/8",
+            "(3C>D E F|",
+            [1 / 8, 1 / 24, 1 / 12, 1 / 8]
+        ],
+        [
+            "a tuplet spanning staff lines",
+            "4/4",
+            "1/8",
+            "(3C\nDE F|",
+            [1 / 12, 1 / 12, 1 / 12, 1 / 8]
+        ]
+    ])("preserves %s from parsed ABC", async (_name, meter, unit, music, expected) => {
+        const tune = ABCJS.parseOnly(`X:1\nM:${meter}\nL:${unit}\nK:C\n${music}`)[0];
+        const blocks = await parseAndCapture(tune);
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const durations = blocksOfType(blocks, "newnote").map(note => {
+            const divide = byId.get(note[4][1]);
+            return byId.get(divide[4][1])[1][1].value / byId.get(divide[4][2])[1][1].value;
+        });
+        expect(durations).toEqual(expected);
+    });
+
     const tune = makeTune({
         title: "Triplet Test",
         staves: [
@@ -277,7 +411,7 @@ describe("Test 4: Triplets", () => {
                 key: { root: "C", mode: "major", accidentals: [] },
                 voices: [
                     [
-                        makeNote("C", 0, 0.125, { startTriplet: 3 }),
+                        makeNote("C", 0, 0.125, { startTriplet: 3, tripletMultiplier: 2 / 3 }),
                         makeNote("D", 1, 0.125),
                         makeNote("E", 2, 0.125, { endTriplet: 3 }),
                         makeNote("F", 3, 0.25)
@@ -324,7 +458,7 @@ describe("Test 4: Triplets", () => {
                     key: { root: "C", mode: "major", accidentals: [] },
                     voices: [
                         [
-                            makeNote("C", 0, 0.125, { startTriplet: 3 }),
+                            makeNote("C", 0, 0.125, { startTriplet: 3, tripletMultiplier: 2 / 3 }),
                             makeNote("D", 1, 0.125),
                             makeNote("E", 2, 0.125, { endTriplet: 3 })
                         ],
@@ -353,10 +487,10 @@ describe("Test 4: Triplets", () => {
         expect(denomWith4.length).toBeGreaterThanOrEqual(3);
     });
 
-    test("tripletFinder does not bleed across voice boundaries even if triplet is unclosed", async () => {
-        // Voice 1: triplet C D E (no endTriplet, i.e., unclosed triplet).
+    test("tripletFinder does not bleed across voice boundaries while a triplet is still open", async () => {
+        // Voice 1: only C D of a three-note triplet, leaving one note outstanding.
         // Voice 2: plain quarter notes only — must NOT inherit the triplet state
-        // and must produce standard denominator (4).
+        // and must produce standard denominator (4). Voice 1 resumes on the next line.
         const twoVoiceTune = makeTune({
             title: "Unclosed Triplet Bleed Test",
             staves: [
@@ -365,11 +499,22 @@ describe("Test 4: Triplets", () => {
                     key: { root: "C", mode: "major", accidentals: [] },
                     voices: [
                         [
-                            makeNote("C", 0, 0.125, { startTriplet: 3 }),
-                            makeNote("D", 1, 0.125),
-                            makeNote("E", 2, 0.125)
+                            makeNote("C", 0, 0.125, { startTriplet: 3, tripletMultiplier: 2 / 3 }),
+                            makeNote("D", 1, 0.125)
                         ],
                         [makeNote("G", 4, 0.25), makeNote("A", 5, 0.25)]
+                    ]
+                }
+            ]
+        });
+        twoVoiceTune.lines.push({
+            staff: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "C", mode: "major", accidentals: [] },
+                    voices: [
+                        [makeNote("E", 2, 0.125, { endTriplet: 3 }), makeNote("F", 3, 0.25)],
+                        [makeNote("B", 6, 0.25)]
                     ]
                 }
             ]
@@ -377,18 +522,13 @@ describe("Test 4: Triplets", () => {
 
         const blocks = await parseAndCapture(twoVoiceTune);
 
-        // Voice 1 notes will all be processed under triplet state because it started and never closed,
-        // so all 3 notes get denominator 12.
-        const denomWith12 = blocks.filter(
-            b => Array.isArray(b[1]) && b[1][0] === "number" && b[1][1]?.value === 12
-        );
-        expect(denomWith12).toHaveLength(3);
-
-        // Voice 2 notes must not be affected. They must have standard denominator 4.
-        const denomWith4 = blocks.filter(
-            b => Array.isArray(b[1]) && b[1][0] === "number" && b[1][1]?.value === 4
-        );
-        expect(denomWith4.length).toBeGreaterThanOrEqual(3);
+        // Follow each note's duration connection, excluding meter and pitch numbers.
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const durations = blocksOfType(blocks, "newnote").map(note => {
+            const divide = byId.get(note[4][1]);
+            return byId.get(divide[4][1])[1][1].value / byId.get(divide[4][2])[1][1].value;
+        });
+        expect(durations).toEqual([1 / 12, 1 / 12, 1 / 4, 1 / 4, 1 / 12, 1 / 4, 1 / 4]);
     });
 });
 
@@ -1037,5 +1177,175 @@ describe("Test 11: Inline accidentals last for the rest of the bar", () => {
             ["F♯", 4],
             ["F", 4]
         ]);
+    });
+});
+
+/**
+ * Walks the imported start stack the way Logo runs it and returns the note
+ * letters in play order: repeat blocks play their clamp twice and nameddo
+ * blocks run their action.
+ */
+function playOrder(blocks) {
+    const byId = new Map(blocks.map(b => [b[0], b]));
+    const type = b => (Array.isArray(b[1]) ? b[1][0] : b[1]);
+    const value = id => byId.get(id)[1][1].value;
+    const actions = new Map(
+        blocksOfType(blocks, "action").map(a => [value(a[4][1]), byId.get(a[4][2])])
+    );
+    const notes = [];
+    const run = block => {
+        for (; block; block = byId.get(block[4][block[4].length - 1])) {
+            if (type(block) === "repeat") {
+                run(byId.get(block[4][2]));
+                run(byId.get(block[4][2]));
+            } else if (type(block) === "nameddo") {
+                run(byId.get(actions.get(value(block[0]))[4][1]));
+            } else if (type(block) === "newnote") {
+                const pitch = byId.get(byId.get(block[4][2])[4][1]);
+                notes.push(value(pitch[4][1]));
+            }
+        }
+    };
+    const settimbre = blocksOfType(blocks, "settimbre")[0];
+    run(byId.get(settimbre[4][2]));
+    return notes.join("");
+}
+
+// ---------------------------------------------------------------------------
+// Test 12 — Repeat bars wrap only their own bars
+// ---------------------------------------------------------------------------
+describe("Test 12: Repeat bars wrap only their own bars", () => {
+    const key = { root: "C", acc: "", mode: "", accidentals: [] };
+    const melody = (letters, pitch = 0) => [...letters].map((l, i) => makeNote(l, pitch + i));
+    const parseLines = lines =>
+        parseAndCapture({
+            metaText: { title: "Repeats", instruction: "guitar" },
+            lines: lines.map(voice => ({
+                staff: [{ meter: { value: [{ num: 4, den: 4 }] }, key, voices: [voice] }]
+            }))
+        });
+
+    test("a repeat that ends mid-line repeats only its own bars", async () => {
+        const blocks = await parseLines([
+            [
+                makeBar("bar_left_repeat"),
+                ...melody("CDEF"),
+                makeBar("bar_right_repeat"),
+                ...melody("GABC", 4),
+                makeBar()
+            ]
+        ]);
+        expect(playOrder(blocks)).toBe("CDEFCDEFGABC");
+    });
+
+    test("a :| with no |: repeats from the start of the tune", async () => {
+        const blocks = await parseLines([
+            [...melody("CDEF"), makeBar(), ...melody("GABC", 4), makeBar("bar_right_repeat")]
+        ]);
+        expect(playOrder(blocks)).toBe("CDEFGABCCDEFGABC");
+    });
+
+    test(":: ends one repeat and starts the next", async () => {
+        const blocks = await parseLines([
+            [
+                makeBar("bar_left_repeat"),
+                ...melody("CDEF"),
+                makeBar("bar_dbl_repeat"),
+                ...melody("GABC", 4),
+                makeBar("bar_right_repeat")
+            ]
+        ]);
+        expect(playOrder(blocks)).toBe("CDEFCDEFGABCGABC");
+    });
+
+    test("music after a repeated line plays once, after the repeat", async () => {
+        const blocks = await parseLines([
+            [makeBar("bar_left_repeat"), ...melody("CDEF"), makeBar("bar_right_repeat")],
+            [...melody("GABC", 4), makeBar()],
+            [makeBar("bar_left_repeat"), ...melody("DEFG", 8), makeBar("bar_right_repeat")],
+            [...melody("ABC", 12), makeBar()]
+        ]);
+        expect(playOrder(blocks)).toBe("CDEFCDEFGABCDEFGDEFGABC");
+    });
+
+    test("a repeat can span two lines", async () => {
+        const blocks = await parseLines([
+            [makeBar("bar_left_repeat"), ...melody("CD"), makeBar()],
+            [...melody("EF", 2), makeBar("bar_right_repeat"), ...melody("G", 4), makeBar()]
+        ]);
+        expect(playOrder(blocks)).toBe("CDEFCDEFG");
+    });
+});
+
+describe("Meters abcjs reports by name rather than by number", () => {
+    // M:C and M:C| come back as a type with no value array, so reading a number
+    // straight out of one throws and the whole import stops.
+    const meterOf = blocks => {
+        const byIndex = new Map(blocks.map(block => [block[0], block]));
+        const meter = blocksOfType(blocks, "meter")[0];
+        const divide = byIndex.get(meter[4][2]);
+        return {
+            num: byIndex.get(meter[4][1])[1][1].value,
+            den: byIndex.get(divide[4][2])[1][1].value
+        };
+    };
+
+    const tuneWithMeter = meter =>
+        makeTune({
+            staves: [
+                {
+                    meter,
+                    key: { root: "C", mode: "major", accidentals: [] },
+                    voices: [[makeNote("C", 0)]]
+                }
+            ]
+        });
+
+    it("reads common time as 4/4", async () => {
+        const blocks = await parseAndCapture(tuneWithMeter({ type: "common_time" }));
+
+        expect(meterOf(blocks)).toEqual({ num: 4, den: 4 });
+    });
+
+    it("reads cut time as 2/2", async () => {
+        const blocks = await parseAndCapture(tuneWithMeter({ type: "cut_time" }));
+
+        expect(meterOf(blocks)).toEqual({ num: 2, den: 2 });
+    });
+
+    it("still reads a meter given as numbers", async () => {
+        const blocks = await parseAndCapture(
+            tuneWithMeter({ type: "specified", value: [{ num: "3", den: "4" }] })
+        );
+
+        expect(meterOf(blocks)).toEqual({ num: 3, den: 4 });
+    });
+
+    it("falls back to 4/4 when the tune states no meter at all", async () => {
+        const blocks = await parseAndCapture(tuneWithMeter(undefined));
+
+        expect(meterOf(blocks)).toEqual({ num: 4, den: 4 });
+    });
+
+    it("falls back to 4/4 when the meter carries an empty value", async () => {
+        const blocks = await parseAndCapture(tuneWithMeter({ type: "specified", value: [] }));
+
+        expect(meterOf(blocks)).toEqual({ num: 4, den: 4 });
+    });
+
+    it("keeps the notes a common-time tune carries", async () => {
+        const blocks = await parseAndCapture(
+            makeTune({
+                staves: [
+                    {
+                        meter: { type: "common_time" },
+                        key: { root: "C", mode: "major", accidentals: [] },
+                        voices: [[makeNote("C", 0), makeNote("D", 1), makeNote("E", 2)]]
+                    }
+                ]
+            })
+        );
+
+        expect(blocksOfType(blocks, "newnote")).toHaveLength(3);
     });
 });

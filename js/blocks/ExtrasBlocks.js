@@ -36,7 +36,7 @@ function setupExtrasBlocks(activity) {
                 `${_("Convert a float to a fraction")}: 0.5 -> 1/2`,
                 "documentation",
                 null,
-                "float2string"
+                "float2stringhelp"
             ]);
             this.parameter = true;
 
@@ -607,7 +607,7 @@ function setupExtrasBlocks(activity) {
                 logo.phraseMaker.lyricsON = true;
             } else if (!logo.inStatusMatrix) {
                 if (args.length === 1) {
-                    if (args[0] !== null) {
+                    if (args[0] !== null && args[0] !== undefined) {
                         const tur = activity.turtles.ithTurtle(turtle);
 
                         if (!tur.singer.suppressOutput) {
@@ -954,8 +954,7 @@ function setupExtrasBlocks(activity) {
                     "The Debug block adds a debug point in your code. When reached, execution will pause and you can inspect variables."
                 ),
                 "documentation",
-                "",
-                "debugger"
+                ""
             ]);
 
             this.formBlock({

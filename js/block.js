@@ -215,6 +215,7 @@ class Block {
         this._labelLock = false;
         this._piemenuExitTime = null;
         this._triggerLongPress = false;
+        this._longPressButton = 0;
 
         // Don't trigger notes on top of each other.
         this._triggerLock = false;
@@ -899,7 +900,7 @@ class Block {
                 this.container.setChildIndex(this.imageBitmap, zIndex);
             }
 
-            if (this.name === "start" || this.name === "drum") {
+            if (this.name === "start") {
                 // Rescale the decoration on the start blocks.
                 for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
                     if (this.activity.turtles.getTurtle(t).startBlock === this) {
@@ -999,7 +1000,8 @@ class Block {
                 case "equal":
                 case "greater":
                 case "less":
-                    obj = this.protoblock.generator(this.clampCount[0]);
+                    obj = this.protoblock.generator(this.clampCount[0], this.clampCount[1]);
+                    this.size += plusMinus;
                     break;
                 case "makeblock":
                 case "calcArg":
@@ -1016,9 +1018,9 @@ class Block {
                     break;
                 default:
                     if (this.isArgBlock()) {
-                        obj = this.protoblock.generator(this.clampCount[0]);
+                        obj = this.protoblock.generator(this.clampCount[0], this.clampCount[1]);
                     } else if (this.isTwoArgBlock()) {
-                        obj = this.protoblock.generator(this.clampCount[0]);
+                        obj = this.protoblock.generator(this.clampCount[0], this.clampCount[1]);
                     } else {
                         obj = this.protoblock.generator();
                     }
@@ -1994,7 +1996,6 @@ class Block {
             }
         }
 
-        this.updateCache();
         this.activity.refreshCanvas();
         this._removeAccessibleElement();
     }
@@ -2323,8 +2324,8 @@ class Block {
         }
 
         // Two-argument blocks and expandable argument blocks need ARG layout updates
-        // when a child connects to their first argument slot (connection index 1)
-        if (connectionIndex === 1) {
+        // when a child connects to their first or second argument slot (connection index 1 or 2)
+        if (connectionIndex === 1 || connectionIndex === 2) {
             if (this.isTwoArgBlock() || (this.isArgBlock() && this.isExpandableBlock())) {
                 return "ARG";
             }
@@ -2849,8 +2850,8 @@ class Block {
         while (c !== null) {
             lastIntervalBlock = c;
             const n = this.blocks.blockList[c].connections[1];
-            const cblock = this.blocks.blockList[n];
-            if (cblock.name === "number") {
+            const cblock = n === null ? null : this.blocks.blockList[n];
+            if (cblock !== null && cblock.name === "number") {
                 if (Math.abs(cblock.value) in intervalLabels) {
                     if (cblock.value < 0) {
                         intervals.push("-" + intervalLabels[-cblock.value]);
@@ -2894,6 +2895,8 @@ class Block {
                     const c1 = this.blocks.blockList[c].connections[1];
                     const c2 = this.blocks.blockList[c].connections[2];
                     if (
+                        c1 !== null &&
+                        c2 !== null &&
                         this.blocks.blockList[c1].name === "number" &&
                         this.blocks.blockList[c2].name === "number"
                     ) {
@@ -2937,6 +2940,8 @@ class Block {
                 const c1 = this.blocks.blockList[c].connections[1];
                 const c2 = this.blocks.blockList[c].connections[2];
                 if (
+                    c1 !== null &&
+                    c2 !== null &&
                     this.blocks.blockList[c1].name === "number" &&
                     this.blocks.blockList[c2].name === "number"
                 ) {
@@ -3551,6 +3556,11 @@ class Block {
         this.container.on("mousedown", event => {
             docById("contextWheelDiv").style.display = "none";
 
+            that._longPressButton =
+                event.nativeEvent && typeof event.nativeEvent.button === "number"
+                    ? event.nativeEvent.button
+                    : 0;
+
             // Reset any stale hover-scaling state from prior drags.
             this._trashHoverGroupState = null;
             this._dragPointerDown = true;
@@ -3566,7 +3576,7 @@ class Block {
             const onLongPress = () => {
                 that.blocks.activeBlock = that.blockIndex;
                 that._triggerLongPress = true;
-                window._contextWheelIgnoreNextClick = true;
+                window._contextWheelIgnoreNextClick = that._longPressButton === 0;
                 window._contextWheelIgnoreNextMouseUp = true;
                 that.blocks.triggerLongPress();
             };

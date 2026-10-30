@@ -54,6 +54,7 @@ body.highcontrast {
     outline: 3px solid #ffff00;
 }
 
+.dark #helpBodyDiv .help-tour-white-icon,
 .highcontrast #helpBodyDiv .help-tour-white-icon {
     filter: brightness(0) invert(1);
 }
@@ -154,14 +155,6 @@ body.highcontrast {
 
 .dark #floatingWindows .windowFrame {
     background-color: var(--color-widget-frame-bg) !important;
-}
-
-.dark #floatingWindows > .windowFrame > .wfTopBar .wftButton.rollup {
-    background-color: #ffffff;
-}
-
-.dark #floatingWindows > .windowFrame > .wfTopBar .wftButton.close {
-    background-color: #ffffff;
 }
 
 /* Fix white table header strip in floating widgets during dark mode while preserving table body colors */

@@ -686,7 +686,6 @@ class ProjectManager {
         document.querySelector("#myOpenFile").click();
         window.scroll(0, 0);
         that._doHardStopButton();
-        that._allClear(true, true);
     }
 
     doLoad() {
@@ -718,6 +717,7 @@ class ProjectManager {
             blockMap.push(blk);
         }
 
+        const restored = activity.logo.getRestoredConnections();
         const data = [];
         for (let blk = 0; blk < activity.blocks.blockList.length; blk++) {
             const myBlock = activity.blocks.blockList[blk];
@@ -728,7 +728,14 @@ class ProjectManager {
             let args = null;
             let exportName = myBlock.name;
 
-            if (
+            if (myBlock.unknownBlock !== undefined) {
+                if (Array.isArray(myBlock.unknownBlock)) {
+                    exportName = myBlock.unknownBlock[0];
+                    args = myBlock.unknownBlock[1] ?? null;
+                } else {
+                    exportName = myBlock.unknownBlock;
+                }
+            } else if (
                 myBlock.isValueBlock() ||
                 myBlock.name === "loadFile" ||
                 myBlock.name === "boolean"
@@ -806,9 +813,7 @@ class ProjectManager {
                     case "interval":
                     case "newnote":
                     case "action":
-                    case "matrix":
                     case "pitchdrummatrix":
-                    case "rhythmruler2":
                     case "timbre":
                     case "pitchstaircase":
                     case "tempo":
@@ -818,6 +823,42 @@ class ProjectManager {
                             collapsed: myBlock.collapsed
                         };
                         break;
+                    case "rhythmruler2":
+                        args = {
+                            collapsed: myBlock.collapsed
+                        };
+                        // The edits made in the widget, keyed by drum block. Drop the drums
+                        // that are no longer in the project.
+                        if (Array.isArray(myBlock.rulerHistory)) {
+                            args.rulerHistory = myBlock.rulerHistory
+                                .filter(entry => blockIndexById.has(entry[1]))
+                                .map(entry => [entry[0], blockIndexById.get(entry[1])]);
+                        }
+                        break;
+                    case "matrix": {
+                        args = {
+                            collapsed: myBlock.collapsed
+                        };
+                        // The selected cells, as [row block, [rhythm block, n], j]. A row block
+                        // inside a repeat has 1000000 added for each pass, which is kept. Drop
+                        // the cells whose blocks are no longer in the project.
+                        const cells =
+                            activity.logo?.phraseMaker?._blockMap?.[blk] ?? myBlock.matrixCells;
+                        if (Array.isArray(cells)) {
+                            args.matrixCells = [];
+                            for (const [rowBlock, [rhythmBlock, n], j] of cells) {
+                                const row = rowBlock % 1000000;
+                                if (blockIndexById.has(row) && blockIndexById.has(rhythmBlock)) {
+                                    args.matrixCells.push([
+                                        blockIndexById.get(row) + rowBlock - row,
+                                        [blockIndexById.get(rhythmBlock), n],
+                                        j
+                                    ]);
+                                }
+                            }
+                        }
+                        break;
+                    }
                     case "storein2":
                     case "nameddo":
                     case "nameddoArg":
@@ -827,13 +868,6 @@ class ProjectManager {
                         args = {
                             value: myBlock.privateData
                         };
-                        break;
-                    case "nopValueBlock":
-                    case "nopZeroArgBlock":
-                    case "nopOneArgBlock":
-                    case "nopTwoArgBlock":
-                    case "nopThreeArgBlock":
-                        exportName = myBlock.privateData;
                         break;
                     case "matrixData":
                         args = {
@@ -863,8 +897,7 @@ class ProjectManager {
             }
 
             const connections = [];
-            for (let c = 0; c < myBlock.connections.length; c++) {
-                const connection = myBlock.connections[c];
+            for (const connection of restored.get(blk) || myBlock.connections) {
                 const mapConnection = blockIndexById.get(connection);
                 if (connection === null || mapConnection === undefined) {
                     connections.push(null);
@@ -1191,12 +1224,9 @@ class ProjectManager {
             that.sendAllToTrash(false, true);
             if (clearCanvas) {
                 that._allClear(false, true);
-                if (
-                    that.gitDropdownUI &&
-                    typeof that.gitDropdownUI.clearForNewProject === "function"
-                ) {
-                    that.gitDropdownUI.clearForNewProject();
-                }
+            }
+            if (that.gitDropdownUI && typeof that.gitDropdownUI.clearForNewProject === "function") {
+                that.gitDropdownUI.clearForNewProject();
             }
 
             try {
@@ -1223,6 +1253,7 @@ class ProjectManager {
                 const reader = new FileReader();
                 const midiReader = new FileReader();
                 const abcReader = new FileReader();
+                const mxmlReader = new FileReader();
 
                 reader.onload = () => {
                     that.loading = true;
@@ -1266,7 +1297,7 @@ class ProjectManager {
                                         obj,
                                         that.fileChooser.files[0],
                                         "loadProjectFromFile",
-                                        true
+                                        false
                                     );
                                 } else {
                                     that.merging = false;
@@ -1326,15 +1357,91 @@ class ProjectManager {
                     }
                 };
 
+                mxmlReader.onload = async event => {
+                    that.loading = true;
+                    document.body.style.cursor = "wait";
+                    that.doLoadAnimation();
+
+                    // loadNewBlocks() (js/blocks.js) processes blocks in
+                    // chunks across setTimeout(0) boundaries and reports
+                    // completion asynchronously via the "finishedLoading"/
+                    // "loadFailed" pubsub events (tagged with the token it
+                    // returns), rather than returning only once every block
+                    // is in place. parseMXML's own promise resolving is not
+                    // enough to know the import is actually finished.
+                    // Listeners are registered before parseMXML runs so a
+                    // load that happens to finish synchronously (small
+                    // scores) is still observed.
+                    let loadToken = null;
+                    let settled = false;
+                    const belongsToThisLoad = payload =>
+                        loadToken === null || !payload || payload.token === loadToken;
+                    const stopWatching = () => {
+                        pubsub.off("finishedLoading", onFinished);
+                        pubsub.off("loadFailed", onFailed);
+                    };
+                    const onFinished = payload => {
+                        if (settled || !belongsToThisLoad(payload)) return;
+                        settled = true;
+                        stopWatching();
+                        finishLoading();
+                    };
+                    const onFailed = payload => {
+                        if (settled || !belongsToThisLoad(payload)) return;
+                        settled = true;
+                        stopWatching();
+                        const error =
+                            (payload && payload.error) || new Error("loadNewBlocks failed");
+                        ErrorHandler.capture(error, { operation: "mxmlImport" });
+                        that.errorMsg(
+                            _("Cannot load project from the file. Please check the file type.")
+                        );
+                        finishLoading();
+                    };
+
+                    pubsub.on("finishedLoading", onFinished);
+                    pubsub.on("loadFailed", onFailed);
+
+                    try {
+                        const mxmlData =
+                            (event && event.target && event.target.result) || mxmlReader.result;
+
+                        loadToken = await that.parseMXML(mxmlData);
+
+                        // A null token means parseMXML never reached
+                        // loadNewBlocks() (malformed XML, no part found) --
+                        // it already reported that via its own errorMsg
+                        // call, so no pubsub event is coming for it.
+                        if (loadToken === null && !settled) {
+                            settled = true;
+                            stopWatching();
+                            finishLoading();
+                        }
+                    } catch (e) {
+                        if (!settled) {
+                            settled = true;
+                            stopWatching();
+                            ErrorHandler.capture(e, { operation: "mxmlImport" });
+                            that.errorMsg(
+                                _("Cannot load project from the file. Please check the file type.")
+                            );
+                            finishLoading();
+                        }
+                    }
+                };
+
                 const file = that.fileChooser.files[0];
                 if (file) {
                     const extension = file.name.split(".").pop().toLowerCase();
                     const isMidi = extension === "mid" || extension === "midi";
                     const isABC = extension === "abc";
+                    const isMXML = extension === "xml" || extension === "musicxml";
                     if (isMidi) {
                         midiReader.readAsArrayBuffer(file);
                     } else if (isABC) {
                         abcReader.readAsText(file);
+                    } else if (isMXML) {
+                        mxmlReader.readAsText(file);
                     } else {
                         reader.readAsText(file);
                     }
@@ -1352,6 +1459,7 @@ class ProjectManager {
             const midiReader = new FileReader();
 
             const abcReader = new FileReader();
+            const mxmlReader = new FileReader();
             reader.onload = () => {
                 that.loading = true;
                 document.body.style.cursor = "wait";
@@ -1432,6 +1540,67 @@ class ProjectManager {
                 }
             };
 
+            mxmlReader.onload = async event => {
+                that.loading = true;
+                document.body.style.cursor = "wait";
+
+                // See the matching comment on the file-chooser's mxmlReader
+                // handler above: loadNewBlocks() finishes asynchronously, so
+                // completion is tracked via the "finishedLoading"/
+                // "loadFailed" pubsub events rather than parseMXML's own
+                // promise resolving.
+                let loadToken = null;
+                let settled = false;
+                const belongsToThisLoad = payload =>
+                    loadToken === null || !payload || payload.token === loadToken;
+                const stopWatching = () => {
+                    pubsub.off("finishedLoading", onFinished);
+                    pubsub.off("loadFailed", onFailed);
+                };
+                const onFinished = payload => {
+                    if (settled || !belongsToThisLoad(payload)) return;
+                    settled = true;
+                    stopWatching();
+                    finishLoading();
+                };
+                const onFailed = payload => {
+                    if (settled || !belongsToThisLoad(payload)) return;
+                    settled = true;
+                    stopWatching();
+                    const error = (payload && payload.error) || new Error("loadNewBlocks failed");
+                    ErrorHandler.capture(error, { operation: "mxmlImport" });
+                    that.errorMsg(
+                        _("Cannot load project from the file. Please check the file type.")
+                    );
+                    finishLoading();
+                };
+
+                pubsub.on("finishedLoading", onFinished);
+                pubsub.on("loadFailed", onFailed);
+
+                try {
+                    const mxmlData = event.target.result;
+
+                    loadToken = await that.parseMXML(mxmlData);
+
+                    if (loadToken === null && !settled) {
+                        settled = true;
+                        stopWatching();
+                        finishLoading();
+                    }
+                } catch (e) {
+                    if (!settled) {
+                        settled = true;
+                        stopWatching();
+                        ErrorHandler.capture(e, { operation: "mxmlImport" });
+                        that.errorMsg(
+                            _("Cannot load project from the file. Please check the file type.")
+                        );
+                        finishLoading();
+                    }
+                }
+            };
+
             if (files[0] !== undefined) {
                 const extension = files[0].name.split(".").pop().toLowerCase();
 
@@ -1444,6 +1613,12 @@ class ProjectManager {
                 const isABC = extension === "abc";
                 if (isABC) {
                     abcReader.readAsText(files[0]);
+                    return;
+                }
+
+                const isMXML = extension === "xml" || extension === "musicxml";
+                if (isMXML) {
+                    mxmlReader.readAsText(files[0]);
                     return;
                 }
                 reader.readAsText(files[0]);

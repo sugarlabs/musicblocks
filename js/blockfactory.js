@@ -454,6 +454,18 @@ class SVG {
     }
 
     /**
+     * Calculates the effective height of the block for label positioning.
+     * Preserves vertical centering shifts from first-slot expansion (_expandY)
+     * while ignoring second-slot bottom expansion (_expandY2).
+     * @private
+     * @returns {number}
+     */
+    _labelBaseHeight() {
+        const expandY2Px = (this._expandY2 || 0) * this._scale;
+        return this._height - expandY2Px;
+    }
+
+    /**
      * @private
      * @param {number} x
      * @param {number} y
@@ -1064,7 +1076,7 @@ class SVG {
             svg += this._doTail();
         }
         svg += this._corner(-1, -1, 90, 0, 1, true, true, false);
-        svg += this._rLineTo(0, -this._expandY);
+        svg += this._rLineTo(0, -(this._expandY + (this._expandY2 || 0)));
         if (this._innies.includes(true)) {
             svg += this._lineTo(x, this._radius + this._innieY2 + this._strokeWidth / 2.0);
             svg += this._doOutie();
@@ -1080,7 +1092,7 @@ class SVG {
             this._scale * (this._innieX1 + this._innieX2) -
             4 * this._strokeWidth +
             this._labelOffset * this._scale;
-        let ty = this._height / 2 + this._fontSize / (5 / this._scale);
+        let ty = this._labelBaseHeight() / 2 + this._fontSize / (5 / this._scale);
 
         // If we have an odd number of innie slots, we need to avoid a
         // collision between the block label and the slot label.
@@ -1326,7 +1338,7 @@ class SVG {
             2 * (this._innieX1 + this._innieX2) -
             4 * this._strokeWidth +
             this._labelOffset * this._scale;
-        const ty = this._height / 2 + this._fontSize / 2;
+        const ty = this._labelBaseHeight() / 2 + this._fontSize / 2;
         svg += this.text(
             tx / this._scale,
             ty / this._scale,
@@ -1353,7 +1365,8 @@ class SVG {
             2 * this._innieY2 +
             this._inniesSpacer +
             this._strokeWidth / 2.0 +
-            this._expandY;
+            this._expandY +
+            (this._expandY2 || 0);
         const xoffset = this._strokeWidth / 2.0;
 
         const yoff = this._radius * 2;
@@ -1389,7 +1402,7 @@ class SVG {
         svg += this._rarcTo(1, -1, 90, 0, 1);
         this._radius += this._strokeWidth;
         svg += this._rLineTo(this._strokeWidth, 0);
-        svg += this._rLineTo(0, -this._expandY);
+        svg += this._rLineTo(0, -(this._expandY + (this._expandY2 || 0)));
 
         yoffset = -2 * this._innieY2 - this._inniesSpacer - this._strokeWidth;
         svg += this._rLineTo(0, yoffset + this._radius);
@@ -1409,6 +1422,9 @@ class SVG {
         }
         svg += this._doInnie();
         this.docks[2][1] -= this._radius * 2 * this._scale;
+        if (this._expandY2 > 0) {
+            svg += this._rLineTo(0, this._expandY2);
+        }
         svg += this._rLineTo(0, this._radius);
         svg += this._lineTo(xx, this._y);
 
@@ -1436,7 +1452,7 @@ class SVG {
             2 * (this._innieX1 + this._innieX2) -
             4 * this._strokeWidth +
             this._labelOffset * this._scale;
-        const ty = this._height / 2 + this._fontSize / 2;
+        const ty = this._labelBaseHeight() / 2 + this._fontSize / 2;
         svg += this.text(
             tx / this._scale,
             ty / this._scale,

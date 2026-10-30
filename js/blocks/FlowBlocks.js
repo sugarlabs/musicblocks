@@ -1197,7 +1197,7 @@ function setupFlowBlocks(activity) {
             if (args[1] === undefined) return;
 
             let arg;
-            if (args[0] === null || typeof args[0] !== "number" || args[0] < 1) {
+            if (!Number.isFinite(args[0]) || args[0] < 1) {
                 if (args[0] < 0) activity.errorMsg(POSNUMBER, blk);
                 return [null, 0];
             } else {

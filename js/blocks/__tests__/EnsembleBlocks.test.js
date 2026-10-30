@@ -1018,12 +1018,62 @@ describe("setupEnsembleBlocks", () => {
             const tur = turtles.getTurtle(0);
             setTurtleNameBlock.flow([-1, "NewName"], logo, 0, 10);
             expect(tur.rename).toHaveBeenCalledWith("NewName");
+            expect(tur.rename).toHaveBeenCalledTimes(1);
+        });
+
+        it.each([1, "Turtle1"])("renames only the selected mouse %p", source => {
+            global._THIS_IS_MUSIC_BLOCKS_ = true;
+            for (let i = 0; i < turtles.getTurtleCount(); i++) {
+                const mouse = turtles.getTurtle(i);
+                mouse.rename.mockImplementation(name => {
+                    mouse.name = name;
+                });
+            }
+
+            setTurtleNameBlock.flow([source, "Melody"], logo, 0, 10);
+
+            expect(turtles.getTurtle(0).name).toBe("Yertle");
+            expect(turtles.getTurtle(0).rename).not.toHaveBeenCalled();
+            expect(turtles.getTurtle(1).name).toBe("Melody");
+            expect(turtles.getTurtle(1).rename).toHaveBeenCalledTimes(1);
+            expect(turtles.getTurtle(2).rename).not.toHaveBeenCalled();
+            expect(getTargetTurtle(turtles, "Melody")).toBe("1");
+            expect(activity.errorMsg).not.toHaveBeenCalled();
         });
 
         it("should rename turtle by index", () => {
             const tur = turtles.getTurtle(1);
             setTurtleNameBlock.flow([1, "NewName"], logo, 0, 10);
             expect(tur.rename).toHaveBeenCalledWith("NewName");
+        });
+
+        it("should rename the last turtle by index", () => {
+            const lastTurtle = turtles.getTurtle(2);
+            setTurtleNameBlock.flow([2, "NewName"], logo, 0, 10);
+
+            expect(lastTurtle.rename).toHaveBeenCalledWith("NewName");
+            expect(lastTurtle.rename).toHaveBeenCalledTimes(1);
+            expect(turtles.getTurtle(0).rename).not.toHaveBeenCalled();
+            expect(turtles.getTurtle(1).rename).not.toHaveBeenCalled();
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("should return an error for the first out-of-range index", () => {
+            setTurtleNameBlock.flow([3, "NewName"], logo, 0, 10);
+
+            expect(activity.errorMsg).toHaveBeenCalledWith("Cannot find turtle 3", 10);
+            expect(turtles.getTurtle(0).rename).not.toHaveBeenCalled();
+            expect(turtles.getTurtle(1).rename).not.toHaveBeenCalled();
+            expect(turtles.getTurtle(2).rename).not.toHaveBeenCalled();
+        });
+
+        it("should return an error if the new name is null", () => {
+            setTurtleNameBlock.flow([1, null], logo, 0, 10);
+
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+            expect(turtles.getTurtle(0).rename).not.toHaveBeenCalled();
+            expect(turtles.getTurtle(1).rename).not.toHaveBeenCalled();
+            expect(turtles.getTurtle(2).rename).not.toHaveBeenCalled();
         });
 
         it("should rename turtle by name", () => {

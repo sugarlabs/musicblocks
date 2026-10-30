@@ -130,8 +130,8 @@ function MusicKeyboard(activity) {
      */
     this._stopOrCloseClicked = false;
 
-    this._savedDocumentOnKeyDown = undefined;
-    this._savedDocumentOnKeyUp = undefined;
+    this._boundKeyDown = null;
+    this._boundKeyUp = null;
     if (typeof ManagedTimer !== "undefined") {
         this._timerManager = new ManagedTimer();
     } else if (typeof require !== "undefined") {
@@ -155,30 +155,73 @@ function MusicKeyboard(activity) {
      */
     this.playingNow = false;
 
-    this._cacheDocumentKeyHandlers = function () {
-        if (
-            this._savedDocumentOnKeyDown !== undefined ||
-            this._savedDocumentOnKeyUp !== undefined
-        ) {
-            return;
+    // document.onkeydown/up ownership across the open keyboards.
+    this._registerDocumentKeyHandlers = function (keyDown, keyUp) {
+        const stack = MusicKeyboard._keyHandlerStack;
+        if (stack.indexOf(this) === -1) {
+            // Capture the base handler only on the first registration.
+            if (stack.length === 0) {
+                MusicKeyboard._baseKeyDown = document.onkeydown;
+                MusicKeyboard._baseKeyUp = document.onkeyup;
+            } else {
+                // Opening a new keyboard takes input from the previous owner;
+                // finish any note it is still holding.
+                const previous = stack[stack.length - 1];
+                if (typeof previous._releaseActiveNotes === "function") {
+                    previous._releaseActiveNotes();
+                }
+            }
+            stack.push(this);
         }
-
-        this._savedDocumentOnKeyDown = document.onkeydown;
-        this._savedDocumentOnKeyUp = document.onkeyup;
+        this._boundKeyDown = keyDown;
+        this._boundKeyUp = keyUp;
+        // Only the newest open keyboard drives the document handlers.
+        if (stack[stack.length - 1] === this) {
+            document.onkeydown = keyDown;
+            document.onkeyup = keyUp;
+        }
     };
 
-    this._restoreDocumentKeyHandlers = function () {
-        if (
-            this._savedDocumentOnKeyDown === undefined &&
-            this._savedDocumentOnKeyUp === undefined
-        ) {
+    this._releaseDocumentKeyHandlers = function () {
+        const stack = MusicKeyboard._keyHandlerStack;
+        const existing = stack.indexOf(this);
+        if (existing === -1) {
             return;
         }
+        // If another window (or the canvas) already took input, leave it alone.
+        const wasActive =
+            document.onkeydown === this._boundKeyDown && document.onkeyup === this._boundKeyUp;
+        stack.splice(existing, 1);
+        if (!wasActive) return;
+        const owner = stack[stack.length - 1];
+        document.onkeydown = owner ? owner._boundKeyDown : MusicKeyboard._baseKeyDown;
+        document.onkeyup = owner ? owner._boundKeyUp : MusicKeyboard._baseKeyUp;
+    };
 
-        document.onkeydown = this._savedDocumentOnKeyDown;
-        document.onkeyup = this._savedDocumentOnKeyUp;
-        this._savedDocumentOnKeyDown = undefined;
-        this._savedDocumentOnKeyUp = undefined;
+    // Clicking this window hands it the document key handlers.
+    this._focusKeyboardInput = function () {
+        const stack = MusicKeyboard._keyHandlerStack;
+        const existing = stack.indexOf(this);
+        if (existing === -1) {
+            return; // not open
+        }
+        const previous = stack[stack.length - 1];
+        if (previous !== this && typeof previous._releaseActiveNotes === "function") {
+            previous._releaseActiveNotes();
+        }
+        stack.splice(existing, 1);
+        stack.push(this);
+        document.onkeydown = this._boundKeyDown;
+        document.onkeyup = this._boundKeyUp;
+    };
+
+    // Clicking another window or the canvas releases this keyboard's key input.
+    this._blurKeyboardInput = function () {
+        const stack = MusicKeyboard._keyHandlerStack;
+        if (stack[stack.length - 1] !== this) return;
+        if (typeof this._releaseActiveNotes === "function") this._releaseActiveNotes();
+        document.onkeydown = MusicKeyboard._baseKeyDown;
+        document.onkeyup = MusicKeyboard._baseKeyUp;
     };
 
     this._setWidgetInterval = function (callback, interval) {
@@ -365,7 +408,7 @@ function MusicKeyboard(activity) {
         this.tick = false;
         this.firstNote = false;
         this.metronomeON = false;
-        const countdownContainer = docById("countdownContainer");
+        const countdownContainer = this._mkbEl("countdownContainer");
         if (countdownContainer) {
             countdownContainer.remove();
         }
@@ -547,7 +590,7 @@ function MusicKeyboard(activity) {
         const __startNote = event => {
             const id = __getNoteId(event);
 
-            const ele = docById(id);
+            const ele = this._mkbEl(id);
             if (!(id in startTime)) {
                 startTime[id] = new Date().getTime();
             }
@@ -639,7 +682,7 @@ function MusicKeyboard(activity) {
          */
         const __endNote = event => {
             const id = __getNoteId(event);
-            const ele = docById(id);
+            const ele = this._mkbEl(id);
             const newDate = new Date();
             const noteEndTime = newDate.getTime();
             duration = (noteEndTime - startTime[id]) / 1000.0;
@@ -716,15 +759,24 @@ function MusicKeyboard(activity) {
          * @param {KeyboardEvent} event - The keyboard event.
          */
         const __keyboardup = function (event) {
-            if (isTextEntryActive() && !current.has(event.keyCode)) return;
+            // Only release keys this keyboard started, so a keyup that arrives
+            // after focus moved cannot record a note with no matching keydown.
+            if (!current.has(event.keyCode)) return;
 
             current.delete(event.keyCode);
             __endNote(event);
         };
 
-        this._cacheDocumentKeyHandlers();
-        document.onkeydown = __keyboarddown;
-        document.onkeyup = __keyboardup;
+        // Ends any physical keys this keyboard is still holding. Called when it
+        // hands the document key handlers to another keyboard.
+        this._releaseActiveNotes = () => {
+            for (const keyCode of Array.from(current)) {
+                current.delete(keyCode);
+                __endNote({ keyCode });
+            }
+        };
+
+        this._registerDocumentKeyHandlers(__keyboarddown, __keyboardup);
     };
 
     /**
@@ -888,10 +940,18 @@ function MusicKeyboard(activity) {
          * @type {Window}
          */
         const widgetWindow = window.widgetWindows.windowFor(this, "music keyboard");
+        this._midiClosed = false;
         announceToScreenReader(_("Music Keyboard opened"));
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
+        // Scope _mkbEl to this window's body.
+        this._widgetBody = widgetWindow.getWidgetBody();
+        // Focus routes physical-key input to this keyboard.
+        widgetWindow.onfocused = () => this._focusKeyboardInput();
+        widgetWindow.onblurred = () => this._blurKeyboardInput();
+        // Opening or re-opening an existing window must also take focus and raise it.
+        if (typeof widgetWindow.takeFocus === "function") widgetWindow.takeFocus();
         this.displayLayout = this._keysLayout();
         /**
          * Beats per minute (BPM) for the MusicKeyboard.
@@ -914,19 +974,20 @@ function MusicKeyboard(activity) {
          */
         widgetWindow.onclose = () => {
             let myNode;
-            this._restoreDocumentKeyHandlers();
+            this._releaseDocumentKeyHandlers();
 
-            if (document.getElementById("keyboardHolder2")) {
-                document.getElementById("keyboardHolder2").style.display = "none";
+            const keyboardHolder = this._mkbEl("keyboardHolder2");
+            if (keyboardHolder && keyboardHolder.style) {
+                keyboardHolder.style.display = "none";
             }
 
-            myNode = document.getElementById("myrow");
-            if (myNode !== null) {
+            myNode = this._mkbEl("myrow");
+            if (myNode && typeof myNode.replaceChildren === "function") {
                 myNode.replaceChildren();
             }
 
-            myNode = document.getElementById("myrow2");
-            if (myNode !== null) {
+            myNode = this._mkbEl("myrow2");
+            if (myNode && typeof myNode.replaceChildren === "function") {
                 myNode.replaceChildren();
             }
 
@@ -967,28 +1028,23 @@ function MusicKeyboard(activity) {
             this._stopOrCloseClicked = true;
             this.playingNow = false;
 
-            // Clear any active Web MIDI input handlers to prevent background notes & audio leaks
-            if (this.midiAccess && this.midiAccess.inputs) {
-                this.midiAccess.inputs.forEach(input => {
-                    input.onmidimessage = null;
+            // Detach only the MIDI listeners this keyboard attached so other
+            // keyboards sharing the same input keep receiving messages.
+            if (this._midiInputs && this._midiHandler) {
+                this._midiInputs.forEach(input => {
+                    input.removeEventListener("midimessage", this._midiHandler);
                 });
+                this._midiInputs.clear();
             }
+            this._midiHandler = null;
+            this._midiClosed = true;
             this.midiON = false;
             // Don't hold on to the turtle once the keyboard is closed.
             this.turtle = null;
 
             selectedNotes = [];
-            const wheelDiv = docById("wheelDivptm");
-            if (wheelDiv && wheelDiv.style) {
-                wheelDiv.style.display = "none";
-            }
-            if (this._menuWheel) this._menuWheel.removeWheel();
-            if (this._pitchWheel) this._pitchWheel.removeWheel();
-            if (this._tabsWheel) this._tabsWheel.removeWheel();
-            if (this._exitWheel) this._exitWheel.removeWheel();
-            if (this._durationWheel) this._durationWheel.removeWheel();
-            if (this._accidentalsWheel) this._accidentalsWheel.removeWheel();
-            if (this._octavesWheel) this._octavesWheel.removeWheel();
+            // Only tear down the shared menu if this keyboard still owns it.
+            if (typeof this._closeWheelMenu === "function") this._closeWheelMenu();
             announceToScreenReader(_("Music Keyboard closed"));
             widgetWindow.destroy();
         };
@@ -1041,6 +1097,8 @@ function MusicKeyboard(activity) {
          */
         const addNoteButton = widgetWindow.addButton("add2.svg", ICONSIZE, _("Add note"));
         addNoteButton.setAttribute("id", "addnotes");
+        // Toolbar button lives outside _widgetBody, so keep the reference.
+        this._addNoteButton = addNoteButton;
         addNoteButton.onclick = () => {
             this._createAddRowPieSubmenu();
         };
@@ -1068,7 +1126,7 @@ function MusicKeyboard(activity) {
                 this.metronomeON = true;
                 this.tickButton.style.background = platformColor.orange;
 
-                const winBody = document.getElementsByClassName("wfbWidget")[0];
+                const winBody = this.widgetWindow.getWidgetBody();
                 const countdownContainer = document.createElement("div");
                 countdownContainer.id = "countdownContainer";
 
@@ -1146,6 +1204,11 @@ function MusicKeyboard(activity) {
         this.keyTable.addEventListener("wheel", this._stopPropagationHandler);
         this.keyTable.addEventListener("DOMMouseScroll", this._stopPropagationHandler);
 
+        // Focus this window explicitly so physical-key input follows the keyboard being played.
+        this.keyboardDiv.addEventListener("pointerdown", () => {
+            this.widgetWindow.takeFocus();
+        });
+
         /**
          * Appends keyboard and table divs to the widget window body.
          */
@@ -1203,7 +1266,7 @@ function MusicKeyboard(activity) {
             let ele, zx, res, cell;
             for (let i = 0; i < selectedNotes[0].noteOctave.length; i++) {
                 if (this.keyboardShown && selectedNotes[0].objId[0] !== null) {
-                    ele = docById(selectedNotes[0].objId[i]);
+                    ele = this._mkbEl(selectedNotes[0].objId[i]);
                     if (ele !== null) {
                         ele.style.backgroundColor = "lightgrey";
                     }
@@ -1219,7 +1282,7 @@ function MusicKeyboard(activity) {
             }
 
             if (!this.keyboardShown) {
-                cell = docById("cells-0");
+                cell = this._mkbEl("cells-0");
                 cell.style.backgroundColor = platformColor.selectorBackground;
             }
 
@@ -1267,14 +1330,14 @@ function MusicKeyboard(activity) {
                 }
 
                 if (!this.keyboardShown) {
-                    cell = docById("cells-" + counter);
+                    cell = this._mkbEl("cells-" + counter);
                     cell.style.backgroundColor = platformColor.selectorBackground;
                 }
 
                 if (this.keyboardShown && selectedNotes[counter - 1].objId[0] !== null) {
                     for (let i = 0; i < selectedNotes[counter - 1].noteOctave.length; i++) {
                         eleid = selectedNotes[counter - 1].objId[i];
-                        ele = docById(eleid);
+                        ele = this._mkbEl(eleid);
                         if (eleid.includes("blackRow")) {
                             ele.style.backgroundColor = "black";
                         } else {
@@ -1292,7 +1355,7 @@ function MusicKeyboard(activity) {
                         });
                         */
 
-                        ele = docById(selectedNotes[counter].objId[i]);
+                        ele = this._mkbEl(selectedNotes[counter].objId[i]);
                         if (ele !== null) {
                             ele.style.backgroundColor = "lightgrey";
                         }
@@ -2069,9 +2132,9 @@ function MusicKeyboard(activity) {
             const key =
                 this.noteToKeyMap[pitch1 + "" + octave] || this.noteToKeyMap[pitch2 + "" + octave];
             if (event.data[0] === 144 && event.data[2] !== 0) {
-                __startNote(event, docById(key));
+                __startNote(event, this._mkbEl(key));
             } else {
-                __endNote(event, docById(key));
+                __endNote(event, this._mkbEl(key));
             }
         };
 
@@ -2083,14 +2146,19 @@ function MusicKeyboard(activity) {
          */
         const onMIDISuccess = midiAccess => {
             this.midiAccess = midiAccess;
+            if (this._midiClosed) return;
             // re-init widget
             if (this.midiON) {
                 this.midiButton.style.background = "#00FF00";
                 activity.textMsg(_("MIDI device present."), 3000);
                 return;
             }
+            this._midiHandler = onMIDIMessage;
+            this._midiInputs = this._midiInputs || new Set();
             midiAccess.inputs.forEach(input => {
-                input.onmidimessage = onMIDIMessage;
+                if (this._midiInputs.has(input)) return;
+                input.addEventListener("midimessage", onMIDIMessage);
+                this._midiInputs.add(input);
             });
             if (midiAccess.inputs.size) {
                 this.midiButton.style.background = "#00FF00";
@@ -2174,7 +2242,7 @@ function MusicKeyboard(activity) {
             for (let i = 0; i < this.displayLayout.length; i++) {
                 const item = this.displayLayout[i];
                 if (item.noteName !== "hertz") {
-                    const elem = docById("cell-" + i) || docById("blackRow" + i);
+                    const elem = this._mkbEl("cell-" + i) || this._mkbEl("blackRow" + i);
                     if (elem) {
                         const newSynthName = resolveSynthNoteName(item.noteName, item.noteOctave);
                         if (this.noteMapper && elem.id) {
@@ -2203,6 +2271,11 @@ function MusicKeyboard(activity) {
         }
     };
 }
+
+// Open keyboards, oldest first; the last one owns document.onkeydown/up.
+MusicKeyboard._keyHandlerStack = [];
+MusicKeyboard._baseKeyDown = undefined;
+MusicKeyboard._baseKeyUp = undefined;
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = MusicKeyboard;

@@ -53,6 +53,7 @@ describe("setupRhythmActions", () => {
                 factorList: [],
                 beatFactor: 1,
                 beatFactorValues: [],
+                dotCount: 0,
                 currentBeat: null,
                 currentMeasure: null,
 
@@ -630,6 +631,609 @@ describe("setupRhythmActions", () => {
         expect(targetTurtle.singer.beatFactor).toBeCloseTo(2);
     });
 
+    it("rejects non-finite dot values (Infinity, -Infinity, NaN) and overflowing values (-Number.MIN_VALUE) without mutating rhythmic state or registering side effects", () => {
+        const invalidValues = [
+            Infinity,
+            -Infinity,
+            NaN,
+            undefined,
+            null,
+            "invalid",
+            -Number.MIN_VALUE
+        ];
+
+        const originalIsRun = global.MusicBlocks.isRun;
+        try {
+            invalidValues.forEach(val => {
+                targetTurtle.singer.dotCount = 1;
+                targetTurtle.singer.beatFactor = 2;
+
+                activity.errorMsg = jest.fn();
+                activity.logo.setDispatchBlock = jest.fn();
+                activity.logo.setTurtleListener = jest.fn();
+                activity.blocks.blockList = { 1: {} };
+
+                const mockMouse = { MB: { listeners: [] } };
+                global.MusicBlocks.isRun = true;
+                global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+
+                Singer.RhythmActions.doRhythmicDot(val, 0, 1);
+
+                expect(activity.errorMsg).toHaveBeenCalledWith(
+                    "Dot value must be a finite number.",
+                    1
+                );
+                expect(targetTurtle.singer.dotCount).toBe(1);
+                expect(targetTurtle.singer.beatFactor).toBe(2);
+                expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+                expect(activity.logo.setTurtleListener).not.toHaveBeenCalled();
+                expect(mockMouse.MB.listeners).toHaveLength(0);
+            });
+        } finally {
+            global.MusicBlocks.isRun = originalIsRun;
+        }
+    });
+
+    it("rejects -Number.MIN_VALUE whose derived increment overflows to Infinity", () => {
+        expect(Number.isFinite(-Number.MIN_VALUE)).toBe(true);
+        expect(Number.isFinite(-1 / -Number.MIN_VALUE)).toBe(false);
+
+        targetTurtle.singer.dotCount = 1;
+        targetTurtle.singer.beatFactor = 2;
+
+        activity.errorMsg = jest.fn();
+        activity.logo.setDispatchBlock = jest.fn();
+        activity.logo.setTurtleListener = jest.fn();
+        activity.blocks.blockList = { 1: {} };
+
+        const mockMouse = { MB: { listeners: [] } };
+        const originalIsRun = global.MusicBlocks.isRun;
+        global.MusicBlocks.isRun = true;
+        global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+
+        try {
+            Singer.RhythmActions.doRhythmicDot(-Number.MIN_VALUE, 0, 1);
+
+            expect(activity.errorMsg).toHaveBeenCalledWith("Dot value must be a finite number.", 1);
+            expect(targetTurtle.singer.dotCount).toBe(1);
+            expect(targetTurtle.singer.beatFactor).toBe(2);
+            expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+            expect(activity.logo.setTurtleListener).not.toHaveBeenCalled();
+            expect(mockMouse.MB.listeners).toHaveLength(0);
+        } finally {
+            global.MusicBlocks.isRun = originalIsRun;
+        }
+    });
+
+    it("rejects finite input when resulting dotCount would overflow to Infinity", () => {
+        targetTurtle.singer.dotCount = Number.MAX_VALUE;
+        targetTurtle.singer.beatFactor = 1;
+
+        activity.errorMsg = jest.fn();
+        activity.logo.setDispatchBlock = jest.fn();
+        activity.logo.setTurtleListener = jest.fn();
+        activity.blocks.blockList = { 1: {} };
+
+        Singer.RhythmActions.doRhythmicDot(Number.MAX_VALUE, 0, 1);
+
+        expect(activity.errorMsg).toHaveBeenCalledWith("Dot value must be a finite number.", 1);
+        expect(targetTurtle.singer.dotCount).toBe(Number.MAX_VALUE);
+        expect(targetTurtle.singer.beatFactor).toBe(1);
+        expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+        expect(activity.logo.setTurtleListener).not.toHaveBeenCalled();
+    });
+
+    it("rejects valid dot input when computed candidate beatFactor overflows or is non-positive", () => {
+        targetTurtle.singer.dotCount = 1;
+        targetTurtle.singer.beatFactor = Number.MAX_VALUE;
+
+        activity.errorMsg = jest.fn();
+        activity.logo.setDispatchBlock = jest.fn();
+        activity.logo.setTurtleListener = jest.fn();
+        activity.blocks.blockList = { 1: {} };
+
+        // dotCount 1 -> currentDotFactor = 1.5; newDotCount 2 -> newDotFactor = 1.75;
+        // beatFactor * 1.5 overflows Number.MAX_VALUE to Infinity
+        Singer.RhythmActions.doRhythmicDot(1, 0, 1);
+
+        expect(activity.errorMsg).toHaveBeenCalledWith("Dot value must be a finite number.", 1);
+        expect(targetTurtle.singer.dotCount).toBe(1);
+        expect(targetTurtle.singer.beatFactor).toBe(Number.MAX_VALUE);
+        expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+        expect(activity.logo.setTurtleListener).not.toHaveBeenCalled();
+    });
+
+    it("nested dot blocks: invalid inner dot block does not corrupt outer dot block state or its cleanup", () => {
+        const listeners = {};
+        activity.logo.setTurtleListener = jest.fn((_, name, cb) => {
+            listeners[name] = cb;
+        });
+        activity.errorMsg = jest.fn();
+        activity.blocks.blockList = { 1: {}, 2: {}, 3: {}, 4: {} };
+
+        targetTurtle.singer.dotCount = 0;
+        targetTurtle.singer.beatFactor = 1;
+
+        // Valid outer block 1
+        Singer.RhythmActions.doRhythmicDot(1, 0, 1);
+        expect(targetTurtle.singer.dotCount).toBe(1);
+        const outerBeatFactor = targetTurtle.singer.beatFactor;
+        expect(outerBeatFactor).not.toBe(1);
+        const outerListener = listeners["_dot_0_1"];
+        expect(outerListener).toBeDefined();
+
+        // Clear recorded listener so we can check if invalid inner block registers one
+        delete listeners["_dot_0_1"];
+
+        // Invalid inner block 2 with Infinity
+        Singer.RhythmActions.doRhythmicDot(Infinity, 0, 2);
+        expect(activity.errorMsg).toHaveBeenCalledWith("Dot value must be a finite number.", 2);
+        expect(targetTurtle.singer.dotCount).toBe(1);
+        expect(targetTurtle.singer.beatFactor).toBe(outerBeatFactor);
+        expect(listeners["_dot_0_2"]).toBeUndefined();
+
+        // Invalid inner block 3 with NaN
+        Singer.RhythmActions.doRhythmicDot(NaN, 0, 3);
+        expect(activity.errorMsg).toHaveBeenCalledWith("Dot value must be a finite number.", 3);
+        expect(targetTurtle.singer.dotCount).toBe(1);
+        expect(targetTurtle.singer.beatFactor).toBe(outerBeatFactor);
+        expect(listeners["_dot_0_3"]).toBeUndefined();
+
+        // Invalid inner block 4 with -Number.MIN_VALUE
+        Singer.RhythmActions.doRhythmicDot(-Number.MIN_VALUE, 0, 4);
+        expect(activity.errorMsg).toHaveBeenCalledWith("Dot value must be a finite number.", 4);
+        expect(targetTurtle.singer.dotCount).toBe(1);
+        expect(targetTurtle.singer.beatFactor).toBe(outerBeatFactor);
+        expect(listeners["_dot_0_4"]).toBeUndefined();
+
+        // Teardown outer block
+        outerListener();
+        expect(targetTurtle.singer.dotCount).toBe(0);
+        expect(targetTurtle.singer.beatFactor).toBeCloseTo(1);
+    });
+
+    it("nested valid dot blocks preserve and restore dotCount and beatFactor through sequential teardown", () => {
+        const listeners = {};
+        activity.logo.setTurtleListener = jest.fn((_, name, cb) => {
+            listeners[name] = cb;
+        });
+
+        targetTurtle.singer.dotCount = 1;
+        targetTurtle.singer.beatFactor = 2;
+
+        // Outer dot block: +1
+        Singer.RhythmActions.doRhythmicDot(1, 0, 1);
+        expect(targetTurtle.singer.dotCount).toBe(2);
+        const intermediateBeatFactor = targetTurtle.singer.beatFactor;
+        expect(listeners["_dot_0_1"]).toBeDefined();
+
+        // Inner dot block: +2
+        Singer.RhythmActions.doRhythmicDot(2, 0, 2);
+        expect(targetTurtle.singer.dotCount).toBe(4);
+        expect(listeners["_dot_0_2"]).toBeDefined();
+
+        // Teardown inner dot block
+        listeners["_dot_0_2"]();
+        expect(targetTurtle.singer.dotCount).toBe(2);
+        expect(targetTurtle.singer.beatFactor).toBeCloseTo(intermediateBeatFactor);
+
+        // Teardown outer dot block
+        listeners["_dot_0_1"]();
+        expect(targetTurtle.singer.dotCount).toBe(1);
+        expect(targetTurtle.singer.beatFactor).toBeCloseTo(2);
+    });
+
+    describe("nested dot blocks listener collision & clamp dispatch lifecycle", () => {
+        let listeners;
+        let stageEvents;
+        let endOfClampSignals;
+
+        beforeEach(() => {
+            listeners = {};
+            stageEvents = {};
+            endOfClampSignals = {};
+
+            targetTurtle.listeners = listeners;
+            targetTurtle.endOfClampSignals = endOfClampSignals;
+            targetTurtle.singer.dotCount = 0;
+            targetTurtle.singer.beatFactor = 1;
+
+            // Faithful implementation of logo.setTurtleListener from js/logo.js
+            activity.logo.setTurtleListener = jest.fn(
+                (turIdx, listenerName, listener, persistent = false) => {
+                    if (listenerName in listeners) {
+                        delete stageEvents[listenerName];
+                        delete listeners[listenerName];
+                    }
+                    listener.persistent = persistent;
+                    listeners[listenerName] = listener;
+                    stageEvents[listenerName] = listener;
+                }
+            );
+
+            // Faithful implementation of logo.setDispatchBlock from js/logo.js
+            activity.logo.setDispatchBlock = jest.fn((blk, turIdx, listenerName) => {
+                const block = activity.blocks.blockList[blk];
+                if (!block || !block.connections) return;
+                const nextBlock = block.connections[block.connections.length - 1];
+                if (nextBlock !== null && nextBlock !== undefined) {
+                    if (!endOfClampSignals[nextBlock]) {
+                        endOfClampSignals[nextBlock] = [];
+                    }
+                    endOfClampSignals[nextBlock].push(listenerName);
+                }
+            });
+
+            // Faithful implementation of stage.dispatchEvent
+            activity.stage.dispatchEvent = jest.fn(signal => {
+                if (typeof signal === "string" && stageEvents[signal]) {
+                    stageEvents[signal]();
+                }
+            });
+        });
+
+        // Simulates clamp-end execution from logo.runStack (lines 2392-2400)
+        function triggerClampEnd(hiddenBlockId) {
+            if (hiddenBlockId in endOfClampSignals) {
+                while (endOfClampSignals[hiddenBlockId].length > 0) {
+                    const signal = endOfClampSignals[hiddenBlockId].pop();
+                    if (signal !== null && signal !== undefined) {
+                        activity.stage.dispatchEvent(signal);
+                    }
+                }
+            }
+        }
+
+        it("assigns distinct block-specific listener names preventing callback overwriting and ensures each clamp executes its own cleanup once", () => {
+            activity.blocks.blockList = {
+                10: { connections: [null, 1, 2, 11] }, // outer Dot block (closing hidden block 11)
+                20: { connections: [10, 3, 4, 21] } // inner Dot block (closing hidden block 21)
+            };
+
+            // Outer Dot block (blk 10): 1 dot
+            Singer.RhythmActions.doRhythmicDot(1, 0, 10);
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(10, 0, "_dot_0_10");
+            expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                "_dot_0_10",
+                expect.any(Function)
+            );
+            expect(listeners["_dot_0_10"]).toBeDefined();
+            expect(endOfClampSignals[11]).toEqual(["_dot_0_10"]);
+            expect(targetTurtle.singer.dotCount).toBe(1);
+            const outerBeatFactor = targetTurtle.singer.beatFactor;
+
+            // Inner Dot block (blk 20): 2 dots
+            Singer.RhythmActions.doRhythmicDot(2, 0, 20);
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(20, 0, "_dot_0_20");
+            expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                "_dot_0_20",
+                expect.any(Function)
+            );
+
+            // CRITICAL: Outer listener must NOT be replaced/removed by inner listener registration
+            expect(listeners["_dot_0_10"]).toBeDefined();
+            expect(listeners["_dot_0_20"]).toBeDefined();
+            expect(endOfClampSignals[21]).toEqual(["_dot_0_20"]);
+            expect(targetTurtle.singer.dotCount).toBe(3);
+
+            // Trigger inner clamp end (block 21)
+            triggerClampEnd(21);
+            expect(activity.stage.dispatchEvent).toHaveBeenCalledWith("_dot_0_20");
+            expect(targetTurtle.singer.dotCount).toBe(1);
+            expect(targetTurtle.singer.beatFactor).toBeCloseTo(outerBeatFactor);
+
+            // Outer listener must remain registered and intact
+            expect(listeners["_dot_0_10"]).toBeDefined();
+
+            // Trigger outer clamp end (block 11)
+            triggerClampEnd(11);
+            expect(activity.stage.dispatchEvent).toHaveBeenCalledWith("_dot_0_10");
+            expect(targetTurtle.singer.dotCount).toBe(0);
+            expect(targetTurtle.singer.beatFactor).toBeCloseTo(1);
+            expect(Number.isFinite(targetTurtle.singer.beatFactor)).toBe(true);
+            expect(Number.isFinite(targetTurtle.singer.dotCount)).toBe(true);
+        });
+
+        it("demonstrates the listener-replacement collision if non-distinct names are used vs verified fix", () => {
+            activity.blocks.blockList = {
+                10: { connections: [null, 1, 2, 11] },
+                20: { connections: [10, 3, 4, 21] }
+            };
+
+            // Both blocks executed
+            Singer.RhythmActions.doRhythmicDot(1, 0, 10);
+            Singer.RhythmActions.doRhythmicDot(2, 0, 20);
+
+            // Names are distinct
+            expect(Object.keys(listeners)).toContain("_dot_0_10");
+            expect(Object.keys(listeners)).toContain("_dot_0_20");
+            expect(Object.keys(listeners)).toHaveLength(2);
+
+            // Dispatches are isolated: invoking inner signal does not invoke outer listener
+            const outerSpy = jest.fn(listeners["_dot_0_10"]);
+            const innerSpy = jest.fn(listeners["_dot_0_20"]);
+            listeners["_dot_0_10"] = outerSpy;
+            listeners["_dot_0_20"] = innerSpy;
+            stageEvents["_dot_0_10"] = outerSpy;
+            stageEvents["_dot_0_20"] = innerSpy;
+
+            triggerClampEnd(21);
+            expect(innerSpy).toHaveBeenCalledTimes(1);
+            expect(outerSpy).not.toHaveBeenCalled();
+
+            triggerClampEnd(11);
+            expect(innerSpy).toHaveBeenCalledTimes(1);
+            expect(outerSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("unwinds deeply nested dot blocks (3 levels) sequentially restoring state at each level", () => {
+            activity.blocks.blockList = {
+                1: { connections: [null, null, null, 101] },
+                2: { connections: [1, null, null, 102] },
+                3: { connections: [2, null, null, 103] }
+            };
+
+            targetTurtle.singer.dotCount = 0;
+            targetTurtle.singer.beatFactor = 1;
+
+            // Level 1: +1 dot
+            Singer.RhythmActions.doRhythmicDot(1, 0, 1);
+            expect(targetTurtle.singer.dotCount).toBe(1);
+            const level1BeatFactor = targetTurtle.singer.beatFactor;
+
+            // Level 2: +1 dot
+            Singer.RhythmActions.doRhythmicDot(1, 0, 2);
+            expect(targetTurtle.singer.dotCount).toBe(2);
+            const level2BeatFactor = targetTurtle.singer.beatFactor;
+
+            // Level 3: +1 dot
+            Singer.RhythmActions.doRhythmicDot(1, 0, 3);
+            expect(targetTurtle.singer.dotCount).toBe(3);
+
+            expect(Object.keys(listeners)).toEqual(
+                expect.arrayContaining(["_dot_0_1", "_dot_0_2", "_dot_0_3"])
+            );
+
+            // Unwind level 3
+            triggerClampEnd(103);
+            expect(targetTurtle.singer.dotCount).toBe(2);
+            expect(targetTurtle.singer.beatFactor).toBeCloseTo(level2BeatFactor);
+
+            // Unwind level 2
+            triggerClampEnd(102);
+            expect(targetTurtle.singer.dotCount).toBe(1);
+            expect(targetTurtle.singer.beatFactor).toBeCloseTo(level1BeatFactor);
+
+            // Unwind level 1
+            triggerClampEnd(101);
+            expect(targetTurtle.singer.dotCount).toBe(0);
+            expect(targetTurtle.singer.beatFactor).toBeCloseTo(1);
+        });
+
+        it("handles recursive re-entry into the same Dot block ID with distinct listener names, preventing listener overwriting and correctly unwinding nested execution", () => {
+            activity.blocks.blockList = {
+                10: { connections: [null, 1, 2, 11] } // Dot block 10 with hidden clamp-end block 11
+            };
+
+            targetTurtle.singer.dotCount = 0;
+            targetTurtle.singer.beatFactor = 1;
+
+            // Outer execution of Dot block 10 (+1 dot)
+            Singer.RhythmActions.doRhythmicDot(1, 0, 10);
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(10, 0, "_dot_0_10");
+            expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                "_dot_0_10",
+                expect.any(Function)
+            );
+            expect(listeners["_dot_0_10"]).toBeDefined();
+            expect(endOfClampSignals[11]).toEqual(["_dot_0_10"]);
+            expect(targetTurtle.singer.dotCount).toBe(1);
+            const outerBeatFactor = targetTurtle.singer.beatFactor;
+
+            // Recursive re-entry into the SAME Dot block 10 (+2 dots) before outer clamp ends
+            Singer.RhythmActions.doRhythmicDot(2, 0, 10);
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(10, 0, "_dot_0_10_1");
+            expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                "_dot_0_10_1",
+                expect.any(Function)
+            );
+
+            // CRITICAL: Both outer and inner listeners are retained; outer is NOT replaced
+            expect(listeners["_dot_0_10"]).toBeDefined();
+            expect(listeners["_dot_0_10_1"]).toBeDefined();
+            expect(endOfClampSignals[11]).toEqual(["_dot_0_10", "_dot_0_10_1"]);
+            expect(targetTurtle.singer.dotCount).toBe(3);
+
+            // Spy on both listeners to verify exact call counts and isolation
+            const outerSpy = jest.fn(listeners["_dot_0_10"]);
+            const innerSpy = jest.fn(listeners["_dot_0_10_1"]);
+            listeners["_dot_0_10"] = outerSpy;
+            listeners["_dot_0_10_1"] = innerSpy;
+            stageEvents["_dot_0_10"] = outerSpy;
+            stageEvents["_dot_0_10_1"] = innerSpy;
+
+            // Trigger clamp end of inner block (LIFO pop from endOfClampSignals[11])
+            const innerSignal = endOfClampSignals[11].pop();
+            expect(innerSignal).toBe("_dot_0_10_1");
+            activity.stage.dispatchEvent(innerSignal);
+
+            expect(innerSpy).toHaveBeenCalledTimes(1);
+            expect(outerSpy).not.toHaveBeenCalled();
+            expect(targetTurtle.singer.dotCount).toBe(1);
+            expect(targetTurtle.singer.beatFactor).toBeCloseTo(outerBeatFactor);
+
+            // Trigger clamp end of outer block
+            const outerSignal = endOfClampSignals[11].pop();
+            expect(outerSignal).toBe("_dot_0_10");
+            activity.stage.dispatchEvent(outerSignal);
+
+            expect(innerSpy).toHaveBeenCalledTimes(1);
+            expect(outerSpy).toHaveBeenCalledTimes(1);
+            expect(targetTurtle.singer.dotCount).toBe(0);
+            expect(targetTurtle.singer.beatFactor).toBeCloseTo(1);
+            expect(Number.isFinite(targetTurtle.singer.dotCount)).toBe(true);
+            expect(Number.isFinite(targetTurtle.singer.beatFactor)).toBe(true);
+        });
+
+        it("unwinds deeply recursive executions (3 levels) of the same Dot block ID sequentially restoring state at each level", () => {
+            activity.blocks.blockList = {
+                5: { connections: [null, null, null, 55] }
+            };
+
+            targetTurtle.singer.dotCount = 0;
+            targetTurtle.singer.beatFactor = 1;
+
+            // Level 1: +1 dot on block 5
+            Singer.RhythmActions.doRhythmicDot(1, 0, 5);
+            expect(targetTurtle.singer.dotCount).toBe(1);
+            const level1BeatFactor = targetTurtle.singer.beatFactor;
+
+            // Level 2: +1 dot on block 5 (re-entry)
+            Singer.RhythmActions.doRhythmicDot(1, 0, 5);
+            expect(targetTurtle.singer.dotCount).toBe(2);
+            const level2BeatFactor = targetTurtle.singer.beatFactor;
+
+            // Level 3: +1 dot on block 5 (re-entry)
+            Singer.RhythmActions.doRhythmicDot(1, 0, 5);
+            expect(targetTurtle.singer.dotCount).toBe(3);
+
+            expect(Object.keys(listeners)).toEqual(
+                expect.arrayContaining(["_dot_0_5", "_dot_0_5_1", "_dot_0_5_2"])
+            );
+            expect(endOfClampSignals[55]).toEqual(["_dot_0_5", "_dot_0_5_1", "_dot_0_5_2"]);
+
+            // Unwind level 3
+            const sig3 = endOfClampSignals[55].pop();
+            expect(sig3).toBe("_dot_0_5_2");
+            activity.stage.dispatchEvent(sig3);
+            expect(targetTurtle.singer.dotCount).toBe(2);
+            expect(targetTurtle.singer.beatFactor).toBeCloseTo(level2BeatFactor);
+
+            // Unwind level 2
+            const sig2 = endOfClampSignals[55].pop();
+            expect(sig2).toBe("_dot_0_5_1");
+            activity.stage.dispatchEvent(sig2);
+            expect(targetTurtle.singer.dotCount).toBe(1);
+            expect(targetTurtle.singer.beatFactor).toBeCloseTo(level1BeatFactor);
+
+            // Unwind level 1
+            const sig1 = endOfClampSignals[55].pop();
+            expect(sig1).toBe("_dot_0_5");
+            activity.stage.dispatchEvent(sig1);
+            expect(targetTurtle.singer.dotCount).toBe(0);
+            expect(targetTurtle.singer.beatFactor).toBeCloseTo(1);
+        });
+
+        it("uses fallback listener name _dot_<turtle>_<blk> when blk is omitted or undefined and avoids collisions for concurrent invocations", () => {
+            Singer.RhythmActions.doRhythmicDot(1, 0, undefined);
+            expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                "_dot_0_undefined",
+                expect.any(Function)
+            );
+
+            // Concurrent re-entry without blk yields a distinct suffixed name
+            Singer.RhythmActions.doRhythmicDot(1, 0, undefined);
+            expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                "_dot_0_undefined_1",
+                expect.any(Function)
+            );
+
+            // Once prior listeners are cleared, the base name is available again
+            delete targetTurtle.listeners["_dot_0_undefined"];
+            delete targetTurtle.listeners["_dot_0_undefined_1"];
+
+            Singer.RhythmActions.doRhythmicDot(1, 0, undefined);
+            expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                "_dot_0_undefined",
+                expect.any(Function)
+            );
+        });
+    });
+
+    it("preserves fractional-dot semantics (-2) with non-default initial state and restores on cleanup", () => {
+        let listener;
+        activity.logo.setTurtleListener = jest.fn((_, __, fn) => {
+            listener = fn;
+        });
+
+        targetTurtle.singer.dotCount = 1;
+        targetTurtle.singer.beatFactor = 2;
+
+        Singer.RhythmActions.doRhythmicDot(-2, 0, 1);
+
+        // value = -2 means half dot: increases dotCount by -1 / -2 = 0.5
+        expect(targetTurtle.singer.dotCount).toBe(1.5);
+        expect(targetTurtle.singer.beatFactor).not.toBe(2);
+
+        listener();
+
+        expect(targetTurtle.singer.dotCount).toBe(1);
+        expect(targetTurtle.singer.beatFactor).toBeCloseTo(2);
+    });
+
+    it("subsequent note-duration calculations remain correct following invalid input", () => {
+        const listeners = {};
+        activity.logo.setTurtleListener = jest.fn((_, name, cb) => {
+            listeners[name] = cb;
+        });
+        activity.errorMsg = jest.fn();
+        activity.blocks.blockList = {
+            1: {},
+            2: {},
+            3: {},
+            4: {},
+            5: {},
+            6: {},
+            7: {},
+            8: {},
+            9: {}
+        };
+
+        targetTurtle.singer.dotCount = 0;
+        targetTurtle.singer.beatFactor = 1;
+
+        // Standalone invalid dot inputs: state remains uncorrupted
+        Singer.RhythmActions.doRhythmicDot(Infinity, 0, 1);
+        Singer.RhythmActions.doRhythmicDot(NaN, 0, 2);
+        Singer.RhythmActions.doRhythmicDot(-Infinity, 0, 3);
+        Singer.RhythmActions.doRhythmicDot(-Number.MIN_VALUE, 0, 4);
+
+        // Note duration calculation immediately following invalid input remains correct
+        Singer.RhythmActions.playNote(2, "note", 0, 5);
+        expect(targetTurtle.singer.noteValue[5]).toBeCloseTo(0.5);
+        expect(Number.isFinite(targetTurtle.singer.noteValue[5])).toBe(true);
+
+        // Nested context: valid outer dot, rejected inner dot, subsequent note calculation
+        Singer.RhythmActions.doRhythmicDot(1, 0, 6);
+        const outerListener = listeners["_dot_0_6"];
+        expect(outerListener).toBeDefined();
+        delete listeners["_dot_0_6"];
+
+        Singer.RhythmActions.doRhythmicDot(NaN, 0, 7);
+        expect(listeners["_dot_0_7"]).toBeUndefined();
+
+        Singer.RhythmActions.playNote(1, "note", 0, 8);
+        // beatFactor is 2/3 (for 1 dot, duration factor 1.5), noteValue is 1 / (1 * (2/3)) = 1.5
+        expect(targetTurtle.singer.noteValue[8]).toBeCloseTo(1.5);
+        expect(Number.isFinite(targetTurtle.singer.noteValue[8])).toBe(true);
+
+        // Cleanup outer dot block
+        outerListener();
+        expect(targetTurtle.singer.dotCount).toBe(0);
+        expect(targetTurtle.singer.beatFactor).toBeCloseTo(1);
+
+        Singer.RhythmActions.playNote(1, "note", 0, 9);
+        expect(targetTurtle.singer.noteValue[9]).toBeCloseTo(1);
+        expect(Number.isFinite(targetTurtle.singer.noteValue[9])).toBe(true);
+    });
+
     it("multiplies beatFactor correctly", () => {
         targetTurtle.singer.beatFactor = 2;
 
@@ -835,7 +1439,7 @@ describe("setupRhythmActions", () => {
 
             Singer.RhythmActions.playNote(1, "note", 0, 5);
 
-            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(5, 0, "_playnote_0");
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(5, 0, "_playnote_0_5");
         });
         it("playNote does not dispatch or register a mouse listener when blk is absent from blockList and MusicBlocks is not running", () => {
             activity.blocks.blockList = {};
@@ -853,7 +1457,7 @@ describe("setupRhythmActions", () => {
 
             Singer.RhythmActions.playNote(1, "note", 0, undefined);
 
-            expect(mockMouse.MB.listeners).toContain("_playnote_0");
+            expect(mockMouse.MB.listeners).toContain("_playnote_0_undefined");
         });
         it("playNote does not throw or dispatch when MusicBlocks.isRun and mouse is null", () => {
             global.MusicBlocks.isRun = true;
@@ -868,7 +1472,7 @@ describe("setupRhythmActions", () => {
 
             Singer.RhythmActions.doRhythmicDot(1, 0, 5);
 
-            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(5, 0, "_dot_0");
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(5, 0, "_dot_0_5");
         });
         it("doRhythmicDot does not dispatch or register a mouse listener when blk is absent from blockList and MusicBlocks is not running", () => {
             activity.blocks.blockList = {};
@@ -886,7 +1490,7 @@ describe("setupRhythmActions", () => {
 
             Singer.RhythmActions.doRhythmicDot(1, 0, undefined);
 
-            expect(mockMouse.MB.listeners).toContain("_dot_0");
+            expect(mockMouse.MB.listeners).toContain("_dot_0_undefined");
         });
         it("doRhythmicDot does not throw or dispatch when MusicBlocks.isRun and mouse is null", () => {
             global.MusicBlocks.isRun = true;

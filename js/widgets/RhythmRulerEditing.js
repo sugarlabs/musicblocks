@@ -515,6 +515,9 @@ class RhythmRulerEditing {
             }
 
             divisionHistory.push(cell.cellIndex);
+            if (addToUndoList) {
+                this.saveDissectHistory();
+            }
         }
     }
 
@@ -547,6 +550,9 @@ class RhythmRulerEditing {
             }
 
             divisionHistory.push([newCellIndex, newNoteValues]);
+            if (addToUndoList) {
+                this.saveDissectHistory();
+            }
 
             ruler.deleteCell(newCellIndex);
 
@@ -718,6 +724,9 @@ class RhythmRulerEditing {
             }
 
             divisionHistory.push(history);
+            if (addToUndoList) {
+                this.saveDissectHistory();
+            }
 
             const oldNoteValue = noteValues[downCellIndex];
             let noteValue = Math.abs(1 / oldNoteValue);
@@ -889,6 +898,7 @@ class RhythmRulerEditing {
         divisionHistory.pop();
         this._calculateZebraStripes(lastRuler);
         this._refreshCircularView();
+        this.saveDissectHistory();
     }
 
     /**

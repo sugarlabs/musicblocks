@@ -26,6 +26,7 @@
    deleteTemperamentFromList, addTemperamentToDictionary, updateTemperaments,
    isCustomTemperament, temperamentHasRatios, isTrueEDO, isEquallyTempered,
    isNonEDO, getTemperamentRatio, getTemperamentCents, getTemperamentName,
+   getEffectiveOctaveRatio,
    MusicUtilsTemperament
  */
 
@@ -42,6 +43,7 @@ if (typeof module !== "undefined" && module.exports) {
         DOUBLEFLAT,
         EQUIVALENTSHARPS,
         EQUIVALENTFLATS,
+        EQUIVALENTNATURALS,
         PITCHES2,
         PITCHES,
         DEFAULTTEMPERAMENT
@@ -208,6 +210,15 @@ function getEdoNoteNamePosition(name, edo) {
     if (edo === 12 && normalizedName in EQUIVALENTFLATS) {
         idx = names.indexOf(EQUIVALENTFLATS[normalizedName]);
         if (idx !== -1) return idx;
+    }
+    if (edo === 12 && normalizedName in EQUIVALENTNATURALS) {
+        const equiv = EQUIVALENTNATURALS[normalizedName];
+        idx = names.indexOf(equiv);
+        if (idx !== -1) return idx;
+        if (equiv in EQUIVALENTSHARPS) {
+            idx = names.indexOf(EQUIVALENTSHARPS[equiv]);
+            if (idx !== -1) return idx;
+        }
     }
 
     // Try 12-EDO proportional fallback for notes not in the EDO name set
@@ -945,52 +956,57 @@ var TEMPERAMENT = {
             "C" + FLAT,
             "B" + SHARP
         ],
+        // 1/4-comma meantone ratios (21 pitches per octave).
+        // Every pitch is a stack of fifths tempered narrow by 1/4 of a syntonic comma (81/80),
+        //   Tempered Fifth = (3/2) * (80/81)^(1/4) = 5^(1/4) ≈ 1.495349,
+        // so four fifths make a pure major third (5/4). C♯ is seven fifths up, D♭ five down,
+        // and so on; pitches reachable by pure thirds alone (E, F♭, G♯, A♭, B♯) stay exact.
         "ratios": [
             1,
-            25 / 24,
-            16 / 15,
-            9 / 8,
-            75 / 64,
-            6 / 5,
+            1.044907,
+            1.069984,
+            1.118034,
+            1.168241,
+            1.196279,
             5 / 4,
             32 / 25,
-            125 / 96,
-            4 / 3,
-            25 / 18,
-            36 / 25,
-            3 / 2,
+            1.306133,
+            1.337481,
+            1.397542,
+            1.431084,
+            1.495349,
             25 / 16,
             8 / 5,
-            5 / 3,
-            125 / 72,
-            9 / 5,
-            15 / 8,
-            48 / 25,
+            1.671851,
+            1.746928,
+            1.788854,
+            1.869186,
+            1.914046,
             125 / 64
         ],
         "octaveRatio": 2,
         "generator": 5 / 4,
         "pitchNumber": 21,
         "perfect 1": 1 / 1,
-        "minor 2": 16 / 15,
-        "augmented 1": 25 / 24,
-        "major 2": 9 / 8,
-        "augmented 2": 75 / 64,
-        "minor 3": 6 / 5,
+        "minor 2": 1.069984,
+        "augmented 1": 1.044907,
+        "major 2": 1.118034,
+        "augmented 2": 1.168241,
+        "minor 3": 1.196279,
         "major 3": 5 / 4,
         "diminished 4": 32 / 25,
-        "augmented 3": 125 / 96,
-        "perfect 4": 4 / 3,
-        "augmented 4": 25 / 18,
-        "diminished 5": 36 / 25,
-        "perfect 5": 3 / 2,
+        "augmented 3": 1.306133,
+        "perfect 4": 1.337481,
+        "augmented 4": 1.397542,
+        "diminished 5": 1.431084,
+        "perfect 5": 1.495349,
         "augmented 5": 25 / 16,
         "minor 6": 8 / 5,
-        "major 6": 5 / 3,
-        "augmented 6": 125 / 72,
-        "minor 7": 9 / 5,
-        "major 7": 15 / 8,
-        "diminished 8": 48 / 25,
+        "major 6": 1.671851,
+        "augmented 6": 1.746928,
+        "minor 7": 1.788854,
+        "major 7": 1.869186,
+        "diminished 8": 1.914046,
         "augmented 7": 125 / 64,
         "perfect 8": 2 / 1,
         "interval": [
@@ -1083,6 +1099,36 @@ var getOctaveRatio = () => {
 };
 
 /**
+ * Resolves the effective octave / period ratio (powerBase) for a given temperament.
+ * If the temperament explicitly defines an octaveRatio other than 2, that value is used.
+ * Otherwise, if the global octave ratio (via getOctaveRatio()) has been customized (!== 2),
+ * that is used. Otherwise it falls back to the temperament's octaveRatio or 2.
+ * @function
+ * @param {string|Object} [temperament] - Temperament key or definition object.
+ * @returns {number} The effective power base ratio.
+ */
+var getEffectiveOctaveRatio = temperament => {
+    const t =
+        typeof temperament === "object" && temperament !== null
+            ? temperament
+            : typeof getTemperament === "function"
+              ? getTemperament(temperament)
+              : undefined;
+    const temperamentRatio = Number(t?.octaveRatio);
+    if (Number.isFinite(temperamentRatio) && temperamentRatio > 1) {
+        return temperamentRatio;
+    }
+    if (typeof getOctaveRatio === "function") {
+        const gr = getOctaveRatio();
+        const globalRatio = Number(gr);
+        if (Number.isFinite(globalRatio) && globalRatio > 1) {
+            return globalRatio;
+        }
+    }
+    return 2;
+};
+
+/**
  * Converts a frequency ratio to a circle-of-notes wheel angle in degrees.
  * @function
  * @param {number} ratio - The ratio relative to the tonic.
@@ -1107,6 +1153,9 @@ var getTemperamentsList = () => {
  * @returns {Object} The interval ratios for the specified temperament.
  */
 var getTemperament = entry => {
+    if (typeof entry === "object" && entry !== null) {
+        return entry;
+    }
     if (TEMPERAMENT[entry]) {
         return TEMPERAMENT[entry];
     }
@@ -1269,13 +1318,14 @@ var isEquallyTempered = temperament => {
     if (!t || typeof t !== "object") return false;
     if (t.isEDO === true) return true;
     if (t.isEDO === false) return false;
+    const base = Number.isFinite(Number(t.octaveRatio)) ? Number(t.octaveRatio) : 2;
     if (t.ratios) {
         if (!Array.isArray(t.ratios) || t.ratios.length < 2) return false;
         const n = Number.isInteger(t.pitchNumber) ? t.pitchNumber : t.ratios.length;
         // 1e-9 is safe: stored ratios are exact Math.pow values or full-precision
         // editor output (toFixed(3) is display-only, never persisted).
         for (let i = 0; i < t.ratios.length; i++) {
-            if (Math.abs(t.ratios[i] - Math.pow(2, i / n)) > 1e-9) return false;
+            if (Math.abs(t.ratios[i] - Math.pow(base, i / n)) > 1e-9) return false;
         }
         return true;
     }
@@ -1284,7 +1334,7 @@ var isEquallyTempered = temperament => {
     for (let i = 0; i < n; i++) {
         const entry = t["" + i];
         if (!Array.isArray(entry) || typeof entry[0] !== "number") return false;
-        if (Math.abs(entry[0] - Math.pow(2, i / n)) > 1e-9) return false;
+        if (Math.abs(entry[0] - Math.pow(base, i / n)) > 1e-9) return false;
     }
     return true;
 };
@@ -1385,6 +1435,7 @@ var MusicUtilsTemperament = {
     TEMPERAMENT,
     setOctaveRatio,
     getOctaveRatio,
+    getEffectiveOctaveRatio,
     ratioToWheelAngle,
     getTemperamentsList,
     getTemperament,

@@ -630,6 +630,96 @@ describe("HelpWidget", () => {
             }
         });
 
+        test("_showPage makes regular semi-transparent SVG icons full strength in light mode without white filter", () => {
+            const svg =
+                '<svg xmlns="http://www.w3.org/2000/svg"><path style="fill:#292929;fill-opacity:0.4;stroke:#292929;stroke-opacity:0.4;opacity:0.4"/><rect style="fill:#ffffff;opacity:0"/></svg>';
+            const src = "data:image/svg+xml;base64," + window.btoa(svg);
+            HELPCONTENT.push(["Light Mode Icon", "Icon description", src]);
+
+            try {
+                const activity = createMockActivity();
+                const hw = new HelpWidget(activity, false);
+                jest.runAllTimers();
+
+                hw._showPage(HELPCONTENT.length - 1);
+
+                const helpBody = document.getElementById("helpBodyDiv");
+                const img = helpBody.querySelector("img");
+                const normalizedSvg = window.atob(
+                    img.getAttribute("src").replace("data:image/svg+xml;base64,", "")
+                );
+
+                expect(img.classList.contains("help-tour-icon")).toBe(true);
+                expect(img.classList.contains("help-tour-white-icon")).toBe(false);
+                expect(normalizedSvg).toContain("fill-opacity:1");
+                expect(normalizedSvg).toContain("stroke-opacity:1");
+                expect(normalizedSvg).toContain("opacity:1");
+                expect(normalizedSvg).toContain("opacity:0");
+            } finally {
+                HELPCONTENT.pop();
+            }
+        });
+
+        test("_showPage makes regular semi-transparent SVG icons full strength and applies white filter in dark mode", () => {
+            const svg =
+                '<svg xmlns="http://www.w3.org/2000/svg"><path style="fill:#292929;fill-opacity:0.4;stroke:#292929;stroke-opacity:0.4;opacity:0.4"/><rect style="fill:#ffffff;opacity:0"/></svg>';
+            const src = "data:image/svg+xml;base64," + window.btoa(svg);
+            HELPCONTENT.push(["Dark Mode Icon", "Icon description", src]);
+            document.body.classList.add("dark");
+
+            try {
+                const activity = createMockActivity();
+                const hw = new HelpWidget(activity, false);
+                jest.runAllTimers();
+
+                hw._showPage(HELPCONTENT.length - 1);
+
+                const helpBody = document.getElementById("helpBodyDiv");
+                const img = helpBody.querySelector("img");
+                const normalizedSvg = window.atob(
+                    img.getAttribute("src").replace("data:image/svg+xml;base64,", "")
+                );
+
+                expect(img.classList.contains("help-tour-icon")).toBe(true);
+                expect(img.classList.contains("help-tour-white-icon")).toBe(true);
+                expect(normalizedSvg).toContain("fill-opacity:1");
+                expect(normalizedSvg).toContain("stroke-opacity:1");
+                expect(normalizedSvg).toContain("opacity:1");
+                expect(normalizedSvg).toContain("opacity:0");
+            } finally {
+                HELPCONTENT.pop();
+            }
+        });
+
+        test("_showPage preserves regular black-and-white SVG icon details in dark mode", () => {
+            const svg =
+                '<svg xmlns="http://www.w3.org/2000/svg"><rect style="fill:#292929;opacity:0.4"/><path style="fill:#ffffff"/></svg>';
+            const src = "data:image/svg+xml;base64," + window.btoa(svg);
+            HELPCONTENT.push(["Dark Black White Icon", "Icon description", src]);
+            document.body.classList.add("dark");
+
+            try {
+                const activity = createMockActivity();
+                const hw = new HelpWidget(activity, false);
+                jest.runAllTimers();
+
+                hw._showPage(HELPCONTENT.length - 1);
+
+                const helpBody = document.getElementById("helpBodyDiv");
+                const img = helpBody.querySelector("img");
+                const normalizedSvg = window.atob(
+                    img.getAttribute("src").replace("data:image/svg+xml;base64,", "")
+                );
+
+                expect(img.classList.contains("help-tour-icon")).toBe(true);
+                expect(img.classList.contains("help-tour-white-icon")).toBe(false);
+                expect(normalizedSvg).toContain("opacity:1");
+                expect(normalizedSvg).toContain("fill:#ffffff");
+            } finally {
+                HELPCONTENT.pop();
+            }
+        });
+
         test("_showPage preserves regular black-and-white SVG icon details in high contrast mode", () => {
             const svg =
                 '<svg xmlns="http://www.w3.org/2000/svg"><rect style="fill:#292929;opacity:0.4"/><path style="fill:#ffffff"/></svg>';
@@ -1423,5 +1513,222 @@ describe("HelpWidget", () => {
             expect(rightArrow.getAttribute("aria-disabled")).toBe("true");
             expect(rightArrow.classList.contains("disabled")).toBe(true);
         });
+    });
+});
+
+describe("block help artwork", () => {
+    let hw;
+
+    beforeEach(() => {
+        hw = Object.create(HelpWidget.prototype);
+    });
+
+    afterEach(() => {
+        window.localStorage.languagePreference = "en";
+        delete window.localStorage.kanaPreference;
+    });
+
+    test.each([
+        ["en", undefined, "documentation"],
+        ["he", undefined, "documentation-he"],
+        ["es", undefined, "documentation-es"],
+        ["pt", undefined, "documentation-pt"],
+        ["ja", undefined, "documentation-ja"],
+        ["ja", "kana", "documentation-kana"]
+    ])("language %s (kana: %s) uses the %s folder", (language, kana, folder) => {
+        window.localStorage.languagePreference = language;
+        if (kana !== undefined) window.localStorage.kanaPreference = kana;
+
+        expect(hw._localizedHelpPath("documentation")).toBe(folder);
+    });
+
+    test.each([
+        ["pt-BR", "documentation-pt"],
+        ["es-ES", "documentation-es"],
+        ["ja-JP", "documentation-ja"],
+        ["es", "documentation-es"],
+        ["en-US", "documentation"],
+        ["", "documentation"]
+    ])("with no saved language, browser locale %s uses the %s folder", (locale, folder) => {
+        delete window.localStorage.languagePreference;
+        const languageSpy = jest.spyOn(window.navigator, "language", "get").mockReturnValue(locale);
+
+        expect(hw._localizedHelpPath("documentation")).toBe(folder);
+
+        languageSpy.mockRestore();
+    });
+
+    test("loads the localized image first", () => {
+        window.localStorage.languagePreference = "pt";
+
+        const figure = hw._makeBlockImageFigure("documentation", "settimbre");
+        const img = figure.querySelector("img.blockImage");
+
+        expect(figure.classList.contains("blockImage-wrapper")).toBe(true);
+        expect(img.getAttribute("src")).toBe("Docs/documentation-pt/settimbre_block.svg");
+    });
+
+    test("falls back to the default image when the localized one is missing", () => {
+        window.localStorage.languagePreference = "pt";
+        const parent = document.createElement("div");
+
+        const figure = hw._makeBlockImageFigure("documentation", "settimbre");
+        parent.append(figure);
+        const img = figure.querySelector("img");
+        img.onerror();
+
+        expect(img.getAttribute("src")).toBe("Docs/documentation/settimbre_block.svg");
+        expect(parent.contains(figure)).toBe(true);
+    });
+
+    test("removes the figure when no image exists in any folder", () => {
+        window.localStorage.languagePreference = "pt";
+        const parent = document.createElement("div");
+
+        const figure = hw._makeBlockImageFigure("documentation", "noimage");
+        parent.append(figure);
+        const img = figure.querySelector("img");
+        img.onerror();
+        img.onerror();
+
+        expect(parent.contains(figure)).toBe(false);
+        expect(img.onerror).toBeNull();
+    });
+
+    test("removes the figure at once when the default image is missing", () => {
+        const parent = document.createElement("div");
+
+        const figure = hw._makeBlockImageFigure("documentation", "noimage");
+        parent.append(figure);
+        const img = figure.querySelector("img");
+
+        expect(img.getAttribute("src")).toBe("Docs/documentation/noimage_block.svg");
+        img.onerror();
+
+        expect(parent.contains(figure)).toBe(false);
+    });
+
+    test("block help from the help pages uses the localized image too", () => {
+        window.localStorage.languagePreference = "es";
+        const block = {
+            name: "pitch",
+            staticLabels: ["pitch"],
+            helpString: ["Pitch help", "documentation"],
+            beginnerModeBlock: true,
+            palette: { name: "pitch", palettes: { showPalette: jest.fn() } }
+        };
+        const activity = createMockActivity({ protoBlockDict: { pitch: block } });
+
+        HelpWidget.showBlockHelp(activity, "pitch");
+        jest.runAllTimers();
+
+        const img = document.querySelector("#helpBodyDiv img.blockImage");
+        expect(img.getAttribute("src")).toBe("Docs/documentation-es/pitch_block.svg");
+    });
+});
+
+describe("block help image alt text", () => {
+    test("uses the translated block label", () => {
+        const hw = Object.create(HelpWidget.prototype);
+        expect(hw._blockImageAlt({ staticLabels: ["set instrument"] }, "settimbre")).toBe(
+            "set instrument"
+        );
+    });
+
+    test("falls back to the block name when there is no label", () => {
+        const hw = Object.create(HelpWidget.prototype);
+        expect(hw._blockImageAlt({ staticLabels: [""] }, "heap")).toBe("heap");
+        expect(hw._blockImageAlt({ staticLabels: [] }, "heap")).toBe("heap");
+        expect(hw._blockImageAlt(undefined, "heap")).toBe("heap");
+    });
+
+    test("help for a block on the canvas sets the image alt", () => {
+        const activity = createMockActivity({
+            blockList: [
+                {
+                    name: "settimbre",
+                    protoblock: {
+                        staticLabels: ["set instrument"],
+                        helpString: ["Set instrument help", "documentation"]
+                    }
+                }
+            ]
+        });
+        activity.blocks.activeBlock = 0;
+
+        new HelpWidget(activity, true);
+        jest.runAllTimers();
+
+        const img = document.querySelector("#helpBodyDiv img.blockImage");
+        expect(img.getAttribute("src")).toBe("Docs/documentation/settimbre_block.svg");
+        expect(img.alt).toBe("set instrument");
+    });
+
+    test("help opened for a named block sets the image alt", () => {
+        const block = {
+            name: "pitch",
+            staticLabels: ["pitch"],
+            helpString: ["Pitch help", "documentation"],
+            beginnerModeBlock: true,
+            palette: { name: "pitch", palettes: { showPalette: jest.fn() } }
+        };
+        const activity = createMockActivity({ protoBlockDict: { pitch: block } });
+
+        HelpWidget.showBlockHelp(activity, "pitch");
+        jest.runAllTimers();
+
+        const img = document.querySelector("#helpBodyDiv img.blockImage");
+        expect(img.alt).toBe("pitch");
+    });
+});
+
+describe("Hebrew block help artwork", () => {
+    afterEach(() => {
+        localStorage.languagePreference = "en";
+    });
+
+    test("help for a block on the canvas uses documentation-he", () => {
+        localStorage.languagePreference = "he";
+        const activity = createMockActivity({
+            blockList: [
+                {
+                    name: "repeat",
+                    protoblock: {
+                        staticLabels: ["repeat"],
+                        helpString: ["Repeat help", "documentation"]
+                    }
+                }
+            ]
+        });
+        activity.blocks.activeBlock = 0;
+
+        new HelpWidget(activity, true);
+        jest.runAllTimers();
+
+        const img = document.querySelector("#helpBodyDiv img.blockImage");
+        expect(img.getAttribute("src")).toBe("Docs/documentation-he/repeat_block.svg");
+    });
+});
+
+describe("committed block help artwork", () => {
+    const fs = require("fs");
+    const path = require("path");
+    const docsDir = path.join(__dirname, "..", "..", "..", "Docs");
+    const folders = fs.readdirSync(docsDir).filter(dir => /^documentation(-|$)/.test(dir));
+
+    test.each(folders)("every block image in %s is a complete, non-empty SVG", folder => {
+        const broken = fs
+            .readdirSync(path.join(docsDir, folder))
+            .filter(file => file.endsWith("_block.svg"))
+            .filter(file => {
+                const svg = fs.readFileSync(path.join(docsDir, folder, file), "utf8");
+                // A cut-off file never closes the <svg>, and an empty one
+                // is saved with a zero width or height and nothing in it.
+                return (
+                    !svg.trimEnd().endsWith("</svg>") ||
+                    /<svg[^>]*\s(?:width|height)="0(?:\.0+)?(?:px)?"/.test(svg)
+                );
+            });
+        expect(broken).toEqual([]);
     });
 });

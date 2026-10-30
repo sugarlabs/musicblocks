@@ -1587,15 +1587,23 @@ class Palette {
     showMenu(createHeader) {
         const palDiv = docById("palette");
         palDiv.childNodes[0].style.borderRight = "0";
-        if (docById("PaletteBody")) docById("PaletteBody").remove();
+        const existingPalBody = docById("PaletteBody");
+        if (existingPalBody) {
+            existingPalBody.remove();
+        }
         const palBody = document.createElement("table");
         palBody.id = "PaletteBody";
         const palBodyHeight = window.innerHeight - this.palettes.top - this.palettes.cellSize - 26;
 
         const thead = document.createElement("thead");
+        thead.style.boxSizing = "border-box";
+        thead.style.padding = "8px";
+
         const tbody = document.createElement("tbody");
         tbody.id = "PaletteBody_items";
         tbody.className = "PalScrol";
+        tbody.style.boxSizing = "border-box";
+        tbody.style.padding = "8px";
         tbody.style.display = "block";
         tbody.style.width = "100%";
         tbody.style.height = "auto";
@@ -1613,26 +1621,21 @@ class Palette {
         palBody.style.left = `${palDiv.offsetLeft + palDiv.children[0].offsetWidth}px`;
         palBody.style.top = `${palDiv.offsetTop}px`;
         palBody.style.zIndex = palDiv.style.zIndex;
-
         palBody.style.border = `1px solid ${platformColor.selectorSelected}`;
-        [palBody.childNodes[0], palBody.childNodes[1]].forEach(item => {
-            item.style.boxSizing = "border-box";
-            item.style.padding = "8px";
-        });
+
         palDiv.parentNode.appendChild(palBody);
 
         this.menuContainer = palBody;
 
         if (createHeader) {
-            let header = this.menuContainer.children[0];
-            header = header.insertRow();
-            header.style.backgroundColor = platformColor.paletteLabelBackground;
+            const headerTable = thead.insertRow ? thead : this.menuContainer.children[0];
+            const headerRow = headerTable.insertRow();
+            headerRow.style.backgroundColor = platformColor.paletteLabelBackground;
             const headerCell = document.createElement("td");
             headerCell.style.cssText =
                 "width: 100%; height: 42px; box-sizing: border-box; display: flex; flex-direction: row; align-items: center; justify-content: space-between;";
-            header.appendChild(headerCell);
-            header = header.children[0];
-            header.style.padding = "8px";
+            headerCell.style.padding = "8px";
+            headerRow.appendChild(headerCell);
 
             const labelImg = makePaletteIcons(
                 PALETTEICONS[this.name],
@@ -1642,13 +1645,13 @@ class Palette {
             labelImg.style.borderRadius = "4px";
             labelImg.style.padding = "2px";
             labelImg.style.backgroundColor = platformColor.paletteBackground;
-            header.appendChild(labelImg);
+            headerCell.appendChild(labelImg);
 
             const label = document.createElement("span");
             label.textContent = toTitleCase(_(this.name));
             label.style.fontWeight = "bold";
             label.style.color = platformColor.textColor;
-            header.appendChild(label);
+            headerCell.appendChild(label);
 
             const closeDownImg = document.createElement("span");
             closeDownImg.style.height = `${this.palettes.cellSize}px`;
@@ -1669,7 +1672,7 @@ class Palette {
             closeImg.onmouseover = () => (document.body.style.cursor = "pointer");
             closeImg.onmouseleave = () => (document.body.style.cursor = "default");
             closeDownImg.appendChild(closeImg);
-            header.appendChild(closeDownImg);
+            headerCell.appendChild(closeDownImg);
         }
 
         this._showMenuItems();
@@ -1677,9 +1680,11 @@ class Palette {
             return;
         }
         const paletteItems = docById("PaletteBody_items");
-        const height = `calc(100vh - ${paletteItems.getBoundingClientRect().top}px)`;
-        paletteItems.style.height = height;
-        paletteItems.style.maxHeight = height;
+        if (paletteItems) {
+            const height = `calc(100vh - ${paletteItems.getBoundingClientRect().top}px)`;
+            paletteItems.style.height = height;
+            paletteItems.style.maxHeight = height;
+        }
 
         // Close palette menu on outside click
         // Remove any existing outside-click listener
@@ -1707,7 +1712,10 @@ class Palette {
         if (this.name === "search" && this.activity.hideSearchWidget !== null) {
             this.activity.hideSearchWidget(true);
         }
-        if (docById("PaletteBody")) docById("PaletteBody").remove();
+        const palBody = docById("PaletteBody");
+        if (palBody) {
+            palBody.remove();
+        }
     }
 
     _showMenuItems() {
@@ -1771,17 +1779,28 @@ class Palette {
                     img.style.top = pageY - halfH + "px";
                 };
 
+                let rAFId = null;
+                let ticking = false;
+                let lastX, lastY;
                 const onMouseMove = e => {
                     e.preventDefault();
-                    let x, y;
-                    if (e.type === "touchmove") {
-                        x = e.touches[0].clientX;
-                        y = e.touches[0].clientY;
+                    if (e.type === "touchstart" || e.type === "touchmove") {
+                        const touch = e.touches && e.touches[0];
+                        if (touch) {
+                            lastX = touch.pageX !== undefined ? touch.pageX : touch.clientX;
+                            lastY = touch.pageY !== undefined ? touch.pageY : touch.clientY;
+                        }
                     } else {
-                        x = e.pageX;
-                        y = e.pageY;
+                        lastX = e.pageX;
+                        lastY = e.pageY;
                     }
-                    moveAt(x, y);
+                    if (!ticking) {
+                        ticking = true;
+                        rAFId = window.requestAnimationFrame(() => {
+                            moveAt(lastX, lastY);
+                            ticking = false;
+                        });
+                    }
                 };
                 onMouseMove(event);
 
@@ -1789,12 +1808,21 @@ class Palette {
                 document.addEventListener("mousemove", onMouseMove);
 
                 const that = this;
-                const up = event => {
+                let cancel;
+                const up = (event, cancelled = false) => {
                     document.body.style.cursor = "default";
                     document.removeEventListener("mousemove", onMouseMove);
                     document.removeEventListener("touchmove", onMouseMove);
-                    img.onmouseup = null;
-                    img.ontouchend = null;
+                    document.removeEventListener("mouseup", up);
+                    document.removeEventListener("touchend", up);
+                    document.removeEventListener("touchcancel", cancel);
+
+                    if (rAFId) {
+                        window.cancelAnimationFrame(rAFId);
+                        rAFId = null;
+                        ticking = false;
+                        moveAt(lastX, lastY);
+                    }
 
                     const x = parseInt(img.style.left, 10);
                     const y = parseInt(img.style.top, 10);
@@ -1803,6 +1831,8 @@ class Palette {
                     img.style.zIndex = zInd;
                     document.body.removeChild(img);
                     itemCell.appendChild(img);
+
+                    if (cancelled) return;
 
                     // if (!x || !y) return;
 
@@ -1817,9 +1847,11 @@ class Palette {
                             that.activity.blocksContainer.y
                     );
                 };
+                cancel = () => up(null, true);
 
-                img.ontouchend = up;
-                img.onmouseup = up;
+                document.addEventListener("mouseup", up);
+                document.addEventListener("touchend", up);
+                document.addEventListener("touchcancel", cancel);
             };
 
             img.ontouchstart = down;

@@ -19,7 +19,7 @@
    RhythmRuler, FILTERTYPES, instrumentsFilters, DEFAULTFILTERTYPE,
    TemperamentWidget, TimbreWidget, ModeWidget, PitchSlider,
    MusicKeyboard, PitchStaircase, SampleWidget, _THIS_IS_MUSIC_BLOCKS_,
-   AIWidget, AIDebuggerWidget, Arpeggio, LegoWidget
+   AIWidget, AIDebuggerWidget, Arpeggio, LegoWidget, ChordBuilderWidget
  */
 
 /*
@@ -77,9 +77,9 @@ function setupWidgetBlocks(activity) {
      * Environment-aware lazy module loader.
      * Uses AMD require() in the browser; calls callback synchronously in Node/Jest.
      */
-    function _lazyRequire(modules, callback) {
+    function _lazyRequire(modules, callback, errback) {
         if (typeof define === "function" && define.amd) {
-            require(Array.isArray(modules) ? modules : [modules], callback);
+            require(Array.isArray(modules) ? modules : [modules], callback, errback);
         } else {
             callback();
         }
@@ -141,11 +141,23 @@ function setupWidgetBlocks(activity) {
      * @param {Function} factory - Builds the widget instance.
      * @param {Function} [onReady] - Optional callback run after assignment.
      */
-    function _lazyLoadWidget(logo, widgetKey, modules, factory, onReady) {
-        _lazyRequire(modules, () => {
-            logo[widgetKey] = factory();
-            onReady?.();
-        });
+    function _lazyLoadWidget(logo, widgetKey, modules, factory, onReady, onError) {
+        _lazyRequire(
+            modules,
+            () => {
+                try {
+                    logo[widgetKey] = factory();
+                    onReady?.();
+                } catch (e) {
+                    logo[widgetKey] = null;
+                    onError?.(e);
+                }
+            },
+            err => {
+                logo[widgetKey] = null;
+                onError?.(err);
+            }
+        );
     }
 
     function _hasValidMeterWidgetInput(logo) {
@@ -875,6 +887,95 @@ function setupWidgetBlocks(activity) {
     }
 
     /**
+     * Represents a block for creating and exploring chord progressions.
+     * @extends StackClampBlock
+     */
+    class ChordBuilderBlock extends StackClampBlock {
+        /**
+         * Creates a ChordBuilderBlock instance.
+         */
+        constructor() {
+            super("chordbuilder");
+            this.setCapability("collapsible");
+            this.setPalette("widgets", activity);
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _(
+                    "The Chord progression block opens a tool to explore diatonic chords and build musical progressions."
+                ),
+                "documentation",
+                ""
+            ]);
+
+            //.TRANS: musical chord progression builder
+            this.formBlock({ name: _("chord progression"), canCollapse: true });
+            this.makeMacro((x, y) => [
+                [0, "chordbuilder", x, y, [null, 1, 4]],
+                [1, "setkey2", 0, 0, [0, 2, 3, null]],
+                [2, ["notename", { value: "C" }], 0, 0, [1]],
+                [3, ["modename", { value: DEFAULTMODE }], 0, 0, [1]],
+                [4, "hiddennoflow", 0, 0, [0, null]]
+            ]);
+        }
+
+        /**
+         * Handles the flow of data for the ChordBuilder block.
+         * @param {number[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         * @returns {number[]} - The output values.
+         */
+        flow(args, logo, turtle, blk) {
+            logo.insideChordBuilder = true;
+
+            const listenerName = "_chordbuilder_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            const resetFlag = () => {
+                logo.insideChordBuilder = false;
+            };
+
+            const cleanupOnError = () => {
+                logo.chordBuilderWidget = null;
+                resetFlag();
+            };
+
+            const __listener = () => {
+                if (logo.chordBuilderWidget && logo.chordBuilderWidget !== "loading") {
+                    if (typeof logo.chordBuilderWidget.syncKeyAndModeFromTurtle === "function") {
+                        logo.chordBuilderWidget.syncKeyAndModeFromTurtle(turtle);
+                    }
+                    logo.chordBuilderWidget.widgetWindow.show();
+                    resetFlag();
+                    return;
+                }
+                if (logo.chordBuilderWidget === "loading") {
+                    resetFlag();
+                    return;
+                }
+                logo.chordBuilderWidget = "loading";
+                _lazyLoadWidget(
+                    logo,
+                    "chordBuilderWidget",
+                    _getWidgetDependencies(
+                        typeof ChordBuilderWidget !== "undefined" ? ChordBuilderWidget : null,
+                        ["widgets/ChordBuilderAudio", "widgets/chordbuilder"]
+                    ),
+                    () => new ChordBuilderWidget(activity, { turtle }),
+                    () => resetFlag(),
+                    cleanupOnError
+                );
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            if (args.length === 1) return [args[0], 1];
+        }
+    }
+
+    /**
      * Represents a block for setting the tempo.
      * @extends StackClampBlock
      */
@@ -1315,25 +1416,14 @@ function setupWidgetBlocks(activity) {
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
-            if (activity.beginnerMode && this.lang === "ja") {
-                this.setHelpString([
-                    _(
-                        "The Music keyboard block opens a piano keyboard that can be used to create notes."
-                    ),
-                    "documentation",
-                    null,
-                    "musickeyboardja"
-                ]);
-            } else {
-                this.setHelpString([
-                    _(
-                        "The Music keyboard block opens a piano keyboard that can be used to create notes."
-                    ),
-                    "documentation",
-                    null,
-                    "musickeyboard2"
-                ]);
-            }
+            this.setHelpString([
+                _(
+                    "The Music keyboard block opens a piano keyboard that can be used to create notes."
+                ),
+                "documentation",
+                null,
+                "musickeyboard2"
+            ]);
 
             //.TRANS: widget to generate pitches using a slider
             this.formBlock({ name: _("music keyboard"), canCollapse: true });
@@ -1350,32 +1440,47 @@ function setupWidgetBlocks(activity) {
          * @returns {any[]} - Returns an array of arguments.
          */
         flow(args, logo, turtle, blk, receivedArg) {
-            const interruption = _ensureWidget(
-                logo,
-                "musicKeyboard",
-                _getWidgetDependencies(
-                    typeof MusicKeyboard !== "undefined" ? MusicKeyboard : null,
-                    [
-                        "widgets/MusicKeyboardEditing",
-                        "widgets/MusicKeyboardRendering",
-                        "widgets/musickeyboard"
-                    ]
-                ),
-                () => new MusicKeyboard(activity),
-                turtle,
-                blk,
-                receivedArg
-            );
-            if (interruption) return interruption;
+            // One MusicKeyboard per block.
+            const keyboards = (logo.musicKeyboards = logo.musicKeyboards || {});
+
+            if (keyboards[blk] === undefined) {
+                keyboards[blk] = "loading"; // Guard against multiple simultaneous loads
+                _lazyRequire(
+                    _getWidgetDependencies(
+                        typeof MusicKeyboard !== "undefined" ? MusicKeyboard : null,
+                        [
+                            "widgets/MusicKeyboardEditing",
+                            "widgets/MusicKeyboardRendering",
+                            "widgets/musickeyboard"
+                        ]
+                    ),
+                    () => {
+                        keyboards[blk] = new MusicKeyboard(activity);
+                        if (typeof logo.runFromBlockNow === "function") {
+                            logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
+                        }
+                    }
+                );
+                return [null, 0, true];
+            } else if (keyboards[blk] === "loading") {
+                return [null, 0, true];
+            }
+
+            // Active instance, so this clamp's pitch/drum/meter rows land here.
+            const keyboard = keyboards[blk];
+            logo.musicKeyboard = keyboard;
+            logo.musicKeyboardByTurtle = logo.musicKeyboardByTurtle || {};
+            logo.musicKeyboardByTurtle[turtle] = keyboard;
 
             logo.inMusicKeyboard = true;
-            logo.musicKeyboard.blockNo = blk;
-            logo.musicKeyboard.instruments = [];
-            logo.musicKeyboard.noteNames = [];
-            logo.musicKeyboard.octaves = [];
-            logo.musicKeyboard._rowBlocks = [];
+            keyboard.blockNo = blk;
+            keyboard.instruments = [];
+            keyboard.noteNames = [];
+            keyboard.octaves = [];
+            keyboard._rowBlocks = [];
 
-            const listenerName = "_musickeyboard_" + turtle;
+            // Include blk so keyboards on one turtle don't overwrite one listener.
+            const listenerName = "_musickeyboard_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // The keyboard plays and saves at this turtle's tempo (the turtle itself, not its
@@ -1383,8 +1488,8 @@ function setupWidgetBlocks(activity) {
             // another turtle's Music Keyboard block running in between can't swap it.
             const keyboardTurtle = activity.turtles.ithTurtle(turtle);
             const __listener = () => {
-                logo.musicKeyboard.turtle = keyboardTurtle;
-                logo.musicKeyboard.init(logo);
+                keyboard.turtle = keyboardTurtle;
+                keyboard.init(logo);
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -1583,6 +1688,7 @@ function setupWidgetBlocks(activity) {
 
             logo.rhythmRuler.Rulers = [];
             logo.rhythmRuler.Drums = [];
+            logo.rhythmRuler.rulerBlock = blk;
             logo.inRhythmRuler = true;
 
             const listenerName = "_rhythmruler_" + turtle;
@@ -2144,9 +2250,10 @@ function setupWidgetBlocks(activity) {
 
             this.formBlock({ name: _("reflection"), canCollapse: true });
             this.makeMacro((x, y) => [
-                [0, "reflection", x, y, [null, 1]],
+                [0, "reflection", x, y, [null, 1, 3]],
                 [1, "print", 0, 0, [0, 2, null]],
-                [2, ["text", { value: "Reflective Learning" }], 0, 0, [1]]
+                [2, ["text", { value: "Reflective Learning" }], 0, 0, [1]],
+                [3, "hiddennoflow", 0, 0, [0, null]]
             ]);
         }
 
@@ -2164,7 +2271,7 @@ function setupWidgetBlocks(activity) {
                 "reflection",
                 _getWidgetDependencies(
                     typeof ReflectionMatrix !== "undefined" ? ReflectionMatrix : null,
-                    ["utils/ai-widget-lifecycle", "widgets/reflection"]
+                    ["utils/ai-widget-lifecycle", "utils/ai-markdown", "widgets/reflection"]
                 ),
                 () => new ReflectionMatrix(),
                 turtle,
@@ -2313,9 +2420,10 @@ function setupWidgetBlocks(activity) {
 
             this.formBlock({ name: _("debugger"), canCollapse: true });
             this.makeMacro((x, y) => [
-                [0, "aidebugger", x, y, [null, 1]],
+                [0, "aidebugger", x, y, [null, 1, 3]],
                 [1, "print", 0, 0, [0, 2, null]],
-                [2, ["text", { value: "Debugger Initiated" }], 0, 0, [1]]
+                [2, ["text", { value: "Debugger Initiated" }], 0, 0, [1]],
+                [3, "hiddennoflow", 0, 0, [0, null]]
             ]);
         }
 
@@ -2333,7 +2441,7 @@ function setupWidgetBlocks(activity) {
                 "aiDebugger",
                 _getWidgetDependencies(
                     typeof AIDebuggerWidget !== "undefined" ? AIDebuggerWidget : null,
-                    ["utils/ai-widget-lifecycle", "widgets/aidebugger"]
+                    ["utils/ai-widget-lifecycle", "utils/ai-markdown", "widgets/aidebugger"]
                 ),
                 () => new AIDebuggerWidget(),
                 turtle,
@@ -2366,6 +2474,7 @@ function setupWidgetBlocks(activity) {
         new TimbreBlock().setup(activity);
         new TemperamentBlock().setup(activity);
         new ModeWidgetBlock().setup(activity);
+        new ChordBuilderBlock().setup(activity);
         new MeterWidgetBlock().setup(activity);
         new TempoBlock().setup(activity);
         new SamplerBlock().setup(activity);

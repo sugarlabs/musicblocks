@@ -542,6 +542,32 @@ a {
     justify-content: space-between;
 }
 
+#globalcontents .card,
+#local-projects .card {
+    transition:
+        transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#globalcontents .card:hover,
+#local-projects .card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.22);
+    z-index: 5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #globalcontents .card,
+    #local-projects .card {
+        transition: none;
+    }
+
+    #globalcontents .card:hover,
+    #local-projects .card:hover {
+        transform: none;
+    }
+}
+
 .nav-extended {
 	position: sticky;
 	top: 0;
