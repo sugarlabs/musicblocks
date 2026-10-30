@@ -721,6 +721,59 @@ describe("GlobalPlanet", () => {
             expect(gp.search).toHaveBeenCalledTimes(1);
         });
 
+        it("should not search while IME composition is in progress", () => {
+            const input = document.getElementById("global-search");
+
+            input.value = "ピ";
+
+            const composingInput = new Event("input", { bubbles: true });
+            Object.defineProperty(composingInput, "isComposing", {
+                value: true
+            });
+
+            input.dispatchEvent(composingInput);
+
+            expect(gp.searchString).toBe("");
+            expect(gp.search).not.toHaveBeenCalled();
+
+            jest.advanceTimersByTime(300);
+
+            expect(gp.search).not.toHaveBeenCalled();
+        });
+
+        it("should search once after IME composition ends", () => {
+            const input = document.getElementById("global-search");
+
+            input.value = "ピアノ";
+            input.dispatchEvent(new CompositionEvent("compositionend", { bubbles: true }));
+
+            expect(gp.searchString).toBe("ピアノ");
+            expect(gp.search).not.toHaveBeenCalled();
+
+            jest.advanceTimersByTime(300);
+
+            expect(gp.search).toHaveBeenCalledTimes(1);
+        });
+
+        it("should ignore Enter while IME composition is in progress", () => {
+            const input = document.getElementById("global-search");
+
+            input.value = "ピアノ";
+
+            const enter = new KeyboardEvent("keydown", {
+                key: "Enter",
+                bubbles: true
+            });
+
+            Object.defineProperty(enter, "isComposing", {
+                value: true
+            });
+
+            input.dispatchEvent(enter);
+
+            expect(gp.search).not.toHaveBeenCalled();
+        });
+
         it("should cancel pending debounce when Enter is pressed", () => {
             const input = document.getElementById("global-search");
 
