@@ -11,11 +11,14 @@
 
 "use strict";
 
+global.GCD = require("../../utils/utils-logic.js").GCD;
+
 const { setupActivityMxmlParser } = require("../mxml-parser.js");
 
 // Globals in the browser (js/utils/musicutils-constants.js); the drum-name
 // lookup reads them.
 const { DRUM_MIDI_MAP, REVERSE_DRUM_MIDI_MAP } = require("../../utils/musicutils-constants.js");
+
 global.DRUM_MIDI_MAP = DRUM_MIDI_MAP;
 global.REVERSE_DRUM_MIDI_MAP = REVERSE_DRUM_MIDI_MAP;
 
@@ -268,6 +271,34 @@ describe("Test 5: Duration/divisions fallback when <type> is absent", () => {
     it("falls back to a quarter note when both <type> and <duration> are missing", async () => {
         const { blocks } = await parseAndCapture(
             scorePartwise("<note><pitch><step>D</step><octave>4</octave></pitch></note>")
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 4]]);
+    });
+
+    it("falls back safely when finite divisions overflow the computed denominator", async () => {
+        const hugeDivisions = `1${"0".repeat(308)}`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                "<note><pitch><step>D</step><octave>4</octave></pitch><duration>1</duration></note>",
+                `<divisions>${hugeDivisions}</divisions>`
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 4]]);
+    });
+
+    it("falls back safely when the computed duration underflows to zero", async () => {
+        const tinyDuration = `0.${"0".repeat(308)}1`;
+        const hugeDivisions = `1${"0".repeat(307)}`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                `<note><pitch><step>D</step><octave>4</octave></pitch>` +
+                    `<duration>${tinyDuration}</duration></note>`,
+                `<divisions>${hugeDivisions}</divisions>`
+            )
         );
 
         expect(noteValues(blocks)).toEqual([[1, 4]]);
@@ -1136,6 +1167,238 @@ describe("Test 16: Ties", () => {
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
+    it("preserves the note-value fraction when decimal ties form a quarter note", async () => {
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>0.25</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(note("start") + note("stop"), "<divisions>0.5</divisions>")
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 4]]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("preserves very small decimal tie durations", async () => {
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>0.0001</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(note("start") + note("stop"), "<divisions>1</divisions>")
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 20000]]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("keeps an extremely small decimal tie finite when integer conversion cannot scale it", async () => {
+        const tinyDuration = `0.${"0".repeat(308)}1`;
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>${tinyDuration}</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(note("start") + note("stop"), "<divisions>1</divisions>")
+        );
+
+        const values = noteValues(blocks);
+        expect(values).toHaveLength(1);
+
+        const [[numerator, denominator]] = values;
+        expect(Number.isFinite(numerator)).toBe(true);
+        expect(Number.isFinite(denominator)).toBe(true);
+        expect(numerator).toBeGreaterThan(0);
+        expect(denominator).toBeGreaterThan(0);
+        expect(numerator / denominator).toBe(Number(tinyDuration) / 2);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("reduces huge integer tie operands before addition can overflow", async () => {
+        const hugeDuration = `1${"0".repeat(308)}`;
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>${hugeDuration}</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(note("start") + note("stop"), "<divisions>1</divisions>")
+        );
+
+        const values = noteValues(blocks);
+        expect(values).toHaveLength(1);
+
+        const [[numerator, denominator]] = values;
+        expect(Number.isFinite(numerator)).toBe(true);
+        expect(Number.isFinite(denominator)).toBe(true);
+        expect(numerator).toBeGreaterThan(0);
+        expect(denominator).toBeGreaterThan(0);
+        expect(numerator / denominator).toBe(Number(hugeDuration) / 2);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("keeps a large decimal-denominator tie finite when direct addition overflows", async () => {
+        const hugeDuration = `1${"0".repeat(308)}`;
+        const divisions = 1.025;
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>${hugeDuration}</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(note("start") + note("stop"), `<divisions>${divisions}</divisions>`)
+        );
+
+        const values = noteValues(blocks);
+        expect(values).toHaveLength(1);
+
+        const [[numerator, denominator]] = values;
+        const expected = (Number(hugeDuration) / (divisions * 4)) * 2;
+
+        expect(Number.isFinite(numerator)).toBe(true);
+        expect(Number.isFinite(denominator)).toBe(true);
+        expect(numerator).toBeGreaterThan(0);
+        expect(denominator).toBeGreaterThan(0);
+        expect(numerator / denominator).toBe(expected);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("preserves the sum when fallback denominator scaling underflows", async () => {
+        const xml =
+            '<score-partwise><part id="P1">' +
+            '<measure number="1"><attributes><divisions>5e-324</divisions></attributes>' +
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            '<duration>2e-323</duration><tie type="start"/></note>' +
+            "</measure>" +
+            '<measure number="2"><attributes><divisions>2.5e307</divisions></attributes>' +
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            '<duration>1e308</duration><tie type="stop"/></note>' +
+            "</measure>" +
+            "</part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        const values = noteValues(blocks);
+
+        expect(values).toHaveLength(1);
+
+        const [[numerator, denominator]] = values;
+        expect(Number.isFinite(numerator)).toBe(true);
+        expect(Number.isFinite(denominator)).toBe(true);
+        expect(numerator).toBeGreaterThan(0);
+        expect(denominator).toBeGreaterThan(0);
+        expect(numerator / denominator).toBe(2);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("preserves a fractional sum when safe fallback scaling would round", async () => {
+        const xml =
+            '<score-partwise><part id="P1">' +
+            '<measure number="1"><attributes><divisions>5e-324</divisions></attributes>' +
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            '<duration>2e-323</duration><tie type="start"/></note>' +
+            "</measure>" +
+            '<measure number="2"><attributes><divisions>2.5e307</divisions></attributes>' +
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            '<duration>1.25e307</duration><tie type="stop"/></note>' +
+            "</measure>" +
+            "</part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        const values = noteValues(blocks);
+
+        expect(values).toHaveLength(1);
+
+        const [[numerator, denominator]] = values;
+        expect(Number.isFinite(numerator)).toBe(true);
+        expect(Number.isFinite(denominator)).toBe(true);
+        expect(numerator).toBeGreaterThan(0);
+        expect(denominator).toBeGreaterThan(0);
+        expect(numerator / denominator).toBe(1.125);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("falls back safely when a tied duration sum exceeds the numeric range", async () => {
+        const hugeDuration = `17${"0".repeat(307)}`;
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>${hugeDuration}</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(note("start") + note("stop"), "<divisions>0.275</divisions>")
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 4]]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("falls back safely for a tied note with a non-numeric duration", async () => {
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>abc</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(scorePartwise(note("start") + note("stop")));
+
+        expect(noteValues(blocks)).toEqual([[1, 2]]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it.each([
+        ["empty", ""],
+        ["whitespace-only", "   "],
+        ["zero", "0"],
+        ["negative", "-1"]
+    ])("falls back safely for tied notes with %s duration", async (_name, duration) => {
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>${duration}</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(scorePartwise(note("start") + note("stop")));
+
+        expect(noteValues(blocks)).toEqual([[1, 2]]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("falls back safely for tied notes with non-finite divisions", async () => {
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>1</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(note("start") + note("stop"), "<divisions>Infinity</divisions>")
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 2]]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it.each([
+        ["decimal durations", 0.1, 1],
+        ["decimal divisions", 1, 0.3]
+    ])("keeps a long tie chain with %s finite", async (_name, duration, divisions) => {
+        const notes = Array.from({ length: 512 }, (_, index) => {
+            const ties =
+                (index > 0 ? '<tie type="stop"/>' : "") +
+                (index < 511 ? '<tie type="start"/>' : "");
+
+            return (
+                "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+                `<duration>${duration}</duration>${ties}</note>`
+            );
+        }).join("");
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(notes, `<divisions>${divisions}</divisions>`)
+        );
+
+        const values = noteValues(blocks);
+        expect(values).toHaveLength(1);
+
+        const [[numerator, denominator]] = values;
+        expect(Number.isFinite(numerator)).toBe(true);
+        expect(Number.isFinite(denominator)).toBe(true);
+        expect(numerator / denominator).toBeCloseTo((512 * duration) / (divisions * 4));
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
     it("emits the accumulated duration for a malformed file that ends mid-tie", async () => {
         const { blocks } = await parseAndCapture(
             scorePartwise(tiedNote("C", 4, '<tie type="start"/>'))
@@ -1404,10 +1667,26 @@ describe("Test 11: Tuplets are played at their time-modification ratio", () => {
         expect(noteValues(blocks)).toEqual([[1, 4]]);
     });
 
-    it("ignores a malformed time-modification rather than producing a zero length", async () => {
-        const { blocks } = await parseAndCapture(scorePartwise(TUPLET_NOTE("C", "quarter", 0, 2)));
+    it.each([0, Infinity])(
+        "ignores malformed actual-notes %s rather than producing an invalid length",
+        async actual => {
+            const { blocks } = await parseAndCapture(
+                scorePartwise(TUPLET_NOTE("C", "quarter", actual, 2))
+            );
 
-        expect(noteValues(blocks)).toEqual([[1, 4]]);
+            expect(noteValues(blocks)).toEqual([[1, 4]]);
+        }
+    );
+
+    it("uses the duration fallback when a finite tuplet ratio overflows", async () => {
+        const hugeActual = `1${"0".repeat(308)}`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(TUPLET_NOTE("C", "quarter", hugeActual, 2))
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 32]]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
     it("does not touch a note that falls back to duration, which already has the ratio", async () => {

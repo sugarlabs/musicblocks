@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global DOMParser, DRUM_MIDI_MAP, REVERSE_DRUM_MIDI_MAP */
+/* global DOMParser, DRUM_MIDI_MAP, GCD, REVERSE_DRUM_MIDI_MAP */
 
 /* exported setupActivityMxmlParser */
 
@@ -45,26 +45,191 @@ const _MXML_TYPE_DENOMINATOR = {
 
 const _text = (parent, tag) => parent.querySelector(`:scope > ${tag}`)?.textContent ?? null;
 
-const _fractionGcd = (a, b) => {
-    while (b) {
-        [a, b] = [b, a % b];
+const _isUsableFraction = fraction => {
+    if (!Array.isArray(fraction) || fraction.length !== 2) {
+        return false;
     }
-    return Math.abs(a);
+
+    const [numerator, denominator] = fraction;
+    const value = numerator / denominator;
+
+    return (
+        Number.isFinite(numerator) &&
+        Number.isFinite(denominator) &&
+        numerator > 0 &&
+        denominator > 0 &&
+        Number.isFinite(value) &&
+        value > 0
+    );
+};
+
+const _decimalToFraction = value => {
+    if (!Number.isFinite(value) || value <= 0) {
+        return null;
+    }
+
+    if (Number.isInteger(value)) {
+        return [value, 1];
+    }
+
+    const [mantissa, exponentText] = value.toString().toLowerCase().split("e");
+    const exponent = Number(exponentText ?? 0);
+    const decimalPlaces = (mantissa.split(".")[1] ?? "").length;
+    const scale = 10 ** Math.max(0, decimalPlaces - exponent);
+
+    if (!Number.isFinite(scale) || scale <= 0) {
+        return null;
+    }
+
+    const numerator = Math.round(value * scale);
+
+    if (!Number.isFinite(numerator) || numerator <= 0) {
+        return null;
+    }
+
+    const divisor = GCD(numerator, scale);
+
+    if (!Number.isFinite(divisor) || divisor <= 0) {
+        return null;
+    }
+
+    const result = [numerator / divisor, scale / divisor];
+
+    return _isUsableFraction(result) ? result : null;
+};
+
+const _toIntegerFraction = ([numerator, denominator]) => {
+    const numeratorFraction = _decimalToFraction(numerator);
+    const denominatorFraction = _decimalToFraction(denominator);
+
+    if (numeratorFraction === null || denominatorFraction === null) {
+        return null;
+    }
+
+    const [numeratorValue, numeratorScale] = numeratorFraction;
+    const [denominatorValue, denominatorScale] = denominatorFraction;
+
+    const top = numeratorValue * denominatorScale;
+    const bottom = numeratorScale * denominatorValue;
+
+    if (!_isUsableFraction([top, bottom])) {
+        return null;
+    }
+
+    const divisor = GCD(top, bottom);
+
+    if (!Number.isFinite(divisor) || divisor <= 0) {
+        return null;
+    }
+
+    const result = [top / divisor, bottom / divisor];
+
+    return result.every(Number.isInteger) && _isUsableFraction(result) ? result : null;
+};
+
+const _addFractionsWithoutCrossMultiplication = ([n1, d1], [n2, d2]) => {
+    const left = [n1, d1];
+    const right = [n2, d2];
+
+    if (!_isUsableFraction(left) || !_isUsableFraction(right)) {
+        return [1, 4];
+    }
+
+    // Keep the smaller denominator and scale the other numerator down toward it.
+    // This avoids multiplying the two denominators together.
+    const useFirstDenominator = d1 <= d2;
+    const denominator = useFirstDenominator ? d1 : d2;
+    const numerator = useFirstDenominator ? n1 + n2 * (d1 / d2) : n1 * (d2 / d1) + n2;
+
+    const value = n1 / d1 + n2 / d2;
+    const directResult = [numerator, denominator];
+
+    if (
+        _isUsableFraction(directResult) &&
+        Number.isFinite(value) &&
+        numerator / denominator === value
+    ) {
+        return directResult;
+    }
+
+    // If retaining either original scale would overflow, preserve the numeric
+    // duration using the largest denominator that still keeps the pair finite.
+
+    if (!Number.isFinite(value) || value <= 0) {
+        return [1, 4];
+    }
+
+    // Exact fraction scaling is no longer safe here.
+    // Preserve the finite numeric duration instead.
+    return [value, 1];
 };
 
 // Keep tie durations reduced as they accumulate. Multiplying denominators on
 // every note can overflow before the resulting divide block is ever evaluated.
 const _addFractions = ([n1, d1], [n2, d2]) => {
-    // MusicXML duration/divisions can be decimal; integer GCD reduction would
-    // amplify floating-point remainders into very large block operands.
-    if (![n1, d1, n2, d2].every(Number.isInteger)) {
-        return [n1 * d2 + n2 * d1, d1 * d2];
+    const left = [n1, d1];
+    const right = [n2, d2];
+
+    if (!_isUsableFraction(left) || !_isUsableFraction(right)) {
+        return [1, 4];
     }
-    const common = _fractionGcd(d1, d2);
+
+    // Convert decimal MusicXML components into integer fractions when the
+    // conversion stays finite. Otherwise use the safe numeric fallback below.
+    if (![n1, d1, n2, d2].every(Number.isInteger)) {
+        const integerLeft = _toIntegerFraction(left);
+        const integerRight = _toIntegerFraction(right);
+
+        if (integerLeft !== null && integerRight !== null) {
+            return _addFractions(integerLeft, integerRight);
+        }
+
+        return _addFractionsWithoutCrossMultiplication(left, right);
+    }
+
+    // Reduce both fractions before any cross-multiplication. This keeps very
+    // large but reducible operands from overflowing during the addition itself.
+    const firstDivisor = GCD(n1, d1);
+    const secondDivisor = GCD(n2, d2);
+
+    if (
+        !Number.isFinite(firstDivisor) ||
+        firstDivisor <= 0 ||
+        !Number.isFinite(secondDivisor) ||
+        secondDivisor <= 0
+    ) {
+        return _addFractionsWithoutCrossMultiplication(left, right);
+    }
+
+    n1 /= firstDivisor;
+    d1 /= firstDivisor;
+    n2 /= secondDivisor;
+    d2 /= secondDivisor;
+
+    const common = GCD(d1, d2);
+
+    if (!Number.isFinite(common) || common <= 0) {
+        return _addFractionsWithoutCrossMultiplication(left, right);
+    }
+
     const numerator = n1 * (d2 / common) + n2 * (d1 / common);
     const denominator = (d1 / common) * d2;
-    const divisor = _fractionGcd(numerator, denominator);
-    return [numerator / divisor, denominator / divisor];
+
+    if (!_isUsableFraction([numerator, denominator])) {
+        return _addFractionsWithoutCrossMultiplication(left, right);
+    }
+
+    const divisor = GCD(numerator, denominator);
+
+    if (!Number.isFinite(divisor) || divisor <= 0) {
+        return _addFractionsWithoutCrossMultiplication(left, right);
+    }
+
+    const result = [numerator / divisor, denominator / divisor];
+
+    return _isUsableFraction(result)
+        ? result
+        : _addFractionsWithoutCrossMultiplication(left, right);
 };
 
 // Whether two note "content" values (pitch/drum/rest, as built in
@@ -86,7 +251,11 @@ const _timeModification = noteEl => {
     if (el === null) return [1, 1];
     const actual = Number(_text(el, "actual-notes"));
     const normal = Number(_text(el, "normal-notes"));
-    if (!(actual > 0) || !(normal > 0)) return [1, 1];
+
+    if (!Number.isFinite(actual) || !Number.isFinite(normal) || actual <= 0 || normal <= 0) {
+        return [1, 1];
+    }
+
     return [actual, normal];
 };
 
@@ -110,6 +279,7 @@ const _timeModification = noteEl => {
 function _noteDuration(noteEl, divisions) {
     const typeName = _text(noteEl, "type");
     const durationText = _text(noteEl, "duration");
+    const hasValidDivisions = Number.isFinite(divisions) && divisions > 0;
     // A whole-measure rest lasts the measure whatever <type> it is drawn
     // with: PhotoScore writes a 3/4 bar's rest as <type>whole</type> over a
     // three-beat <duration> (musescore.org/en/node/51611, the same bug in
@@ -127,23 +297,36 @@ function _noteDuration(noteEl, divisions) {
         (isMeasureRest || isCue) &&
         Number.isFinite(measureRestLength) &&
         measureRestLength > 0 &&
-        divisions > 0;
+        hasValidDivisions;
+
     if (!durationWins && typeName !== null && typeName in _MXML_TYPE_DENOMINATOR) {
         const dots = noteEl.querySelectorAll(":scope > dot").length;
         const denominator = _MXML_TYPE_DENOMINATOR[typeName];
         // <type> is the note as written, so a tuplet note has to be shortened by
         // its ratio. <duration> below needs no such adjustment, having it already.
         const [actual, normal] = _timeModification(noteEl);
-        return [(2 ** (dots + 1) - 1) * normal, denominator * 2 ** dots * actual];
+        const computedDuration = [(2 ** (dots + 1) - 1) * normal, denominator * 2 ** dots * actual];
+
+        if (_isUsableFraction(computedDuration)) {
+            return computedDuration;
+        }
     }
 
-    if (durationText !== null && divisions > 0) {
+    if (durationText !== null && hasValidDivisions) {
         // duration is in divisions; a quarter note is `divisions` divisions long.
-        return [Number(durationText), divisions * 4];
+        const duration = Number(durationText);
+
+        if (durationText.trim() !== "" && Number.isFinite(duration) && duration > 0) {
+            const computedDuration = [duration, divisions * 4];
+
+            if (_isUsableFraction(computedDuration)) {
+                return computedDuration;
+            }
+        }
     }
 
-    // Malformed note with neither <type> nor <duration>: treat as a quarter note
-    // rather than producing a zero/NaN-length block.
+    // Fall back rather than producing a zero, negative, underflowed, or
+    // non-finite-length block.
     return [1, 4];
 }
 
