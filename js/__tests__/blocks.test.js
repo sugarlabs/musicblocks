@@ -931,39 +931,339 @@ describe("Blocks Foundation", () => {
     });
 
     describe("Undo/Redo System", () => {
-        it("should successfully undo and redo a block move", () => {
+        it("should successfully undo and redo a block move", async () => {
             const blocks = new Blocks(mockActivity);
             blocks.moveBlock = jest.fn();
             blocks.blockMoved = jest.fn();
             blocks.activity.refreshCanvas = jest.fn();
+            blocks.blockList = [null, { trash: false, connections: [null] }];
 
-            // Push a fake move action
             blocks.actionHistory.push({
                 type: "move",
                 blockId: 1,
                 oldX: 10,
                 oldY: 20,
                 newX: 30,
-                newY: 40
+                newY: 40,
+                from: { parent: null, slot: null },
+                bottom: null,
+                to: { parent: null, slot: null }
             });
 
-            // Undo it
-            blocks.undoAction();
+            await blocks.undoAction();
             expect(blocks.moveBlock).toHaveBeenCalledWith(1, 10, 20);
-            expect(blocks.blockMoved).toHaveBeenCalledWith(1);
+            expect(blocks.blockMoved).not.toHaveBeenCalled();
             expect(blocks.activity.refreshCanvas).toHaveBeenCalled();
             expect(blocks.redoActionHistory.length).toBe(1);
             expect(blocks.actionHistory.length).toBe(0);
 
-            // Redo it
-            blocks.redoAction();
+            await blocks.redoAction();
             expect(blocks.moveBlock).toHaveBeenCalledWith(1, 30, 40);
-            expect(blocks.blockMoved).toHaveBeenCalledWith(1); // 2nd time
             expect(blocks.actionHistory.length).toBe(1);
             expect(blocks.redoActionHistory.length).toBe(0);
         });
 
-        it("should successfully undo and redo a block trash", () => {
+        describe("restoring connections", () => {
+            const shape = (style = "flow") => ({
+                isArgClamp: () => style === "argclamp",
+                isTwoArgBlock: () => style === "twoarg",
+                isArgBlock: () => false,
+                isExpandableBlock: () => style !== "flow"
+            });
+            const flow = (x, y, connections) => ({
+                ...shape(),
+                trash: false,
+                container: { x, y },
+                docks: [
+                    [0, 0, "out"],
+                    [0, 40, "in"]
+                ],
+                connections
+            });
+
+            let blocks;
+            beforeEach(() => {
+                blocks = new Blocks(mockActivity);
+                blocks.moveBlock = jest.fn();
+                blocks.blockMoved = jest.fn();
+                blocks.addDefaultBlock = jest.fn();
+                blocks.adjustDocks = jest.fn();
+                blocks.adjustExpandableClampBlock = jest.fn();
+                blocks.insideExpandableBlock = jest.fn(() => null);
+                blocks.findTopBlock = jest.fn(blk => blk);
+                blocks.activity.refreshCanvas = jest.fn();
+            });
+
+            it("gives a stack back the blocks that followed an insertion when it is undone", async () => {
+                // a -> b was dragged from under 0 and dropped between 2 and 5
+                blocks.blockList = [
+                    flow(100, 100, [null, null]),
+                    flow(400, 100, [null, 2]),
+                    flow(400, 140, [1, 3]),
+                    flow(400, 180, [2, 4]),
+                    flow(400, 220, [3, 5]),
+                    flow(400, 260, [4, null])
+                ];
+                blocks.actionHistory.push({
+                    type: "move",
+                    blockId: 3,
+                    oldX: 100,
+                    oldY: 140,
+                    newX: 400,
+                    newY: 180,
+                    from: { parent: 0, slot: 1 },
+                    bottom: 4,
+                    to: { parent: 2, slot: 1 }
+                });
+
+                await blocks.undoAction();
+
+                expect(blocks.blockList[2].connections).toEqual([1, 5]);
+                expect(blocks.blockList[5].connections[0]).toBe(2);
+                expect(blocks.blockList[3].connections[0]).toBeNull();
+                expect(blocks.blockList[4].connections[1]).toBeNull();
+                expect(blocks.adjustDocks).toHaveBeenCalledWith(2, true);
+                expect(blocks.moveBlock).toHaveBeenCalledWith(3, 100, 140);
+                expect(blocks.blockMoved).toHaveBeenCalledWith(3);
+            });
+
+            it("resizes the clamp a stack left only once the stack is docked again", async () => {
+                blocks.blockList = [
+                    flow(100, 100, [null, null]),
+                    flow(400, 100, [null, 2]),
+                    flow(400, 140, [1, 3]),
+                    flow(400, 180, [2, null])
+                ];
+                blocks.insideExpandableBlock = jest.fn(blk => (blk === 3 ? 1 : null));
+                let resizedBeforeDocking = null;
+                blocks.blockMoved = jest.fn(() => {
+                    resizedBeforeDocking = blocks.adjustExpandableClampBlock.mock.calls.length > 0;
+                });
+                blocks.actionHistory.push({
+                    type: "move",
+                    blockId: 3,
+                    oldX: 100,
+                    oldY: 140,
+                    newX: 400,
+                    newY: 180,
+                    from: { parent: 0, slot: 1 },
+                    bottom: 3,
+                    to: { parent: 2, slot: 1 }
+                });
+
+                await blocks.undoAction();
+
+                expect(resizedBeforeDocking).toBe(false);
+                expect(blocks.clampBlocksToCheck).toEqual([[1, 0]]);
+                expect(blocks.adjustExpandableClampBlock).toHaveBeenCalledTimes(1);
+            });
+
+            it("docks a block moved back up its own stack onto where its old parent is now", async () => {
+                // 3 was dragged from under 2 to under 0; undoing must follow 2 to y = 180
+                blocks.blockList = [
+                    flow(100, 100, [null, 3]),
+                    flow(100, 180, [3, 2]),
+                    flow(100, 220, [1, null]),
+                    flow(100, 140, [0, 1])
+                ];
+                blocks.actionHistory.push({
+                    type: "move",
+                    blockId: 3,
+                    oldX: 100,
+                    oldY: 180,
+                    newX: 100,
+                    newY: 140,
+                    from: { parent: 2, slot: 1 },
+                    bottom: 3,
+                    to: { parent: 0, slot: 1 }
+                });
+                blocks.moveBlock = jest.fn((blk, x, y) => {
+                    blocks.blockList[blk].container = { x, y };
+                });
+                blocks.adjustDocks = jest.fn(() => {
+                    blocks.blockList[1].container.y = 140;
+                    blocks.blockList[2].container.y = 180;
+                });
+
+                await blocks.undoAction();
+
+                expect(blocks.blockList[0].connections).toEqual([null, 1]);
+                expect(blocks.blockList[1].connections[0]).toBe(0);
+                expect(blocks.moveBlock).toHaveBeenCalledWith(3, 100, 220);
+                expect(blocks.blockMoved).toHaveBeenCalledWith(3);
+            });
+
+            it.each([
+                ["twoarg", "_adjustExpandableTwoArgBlock"],
+                ["argclamp", "_adjustArgClampBlock"]
+            ])("resizes the %s block an undone argument leaves", async (style, resize) => {
+                const host = { ...shape(style), trash: false, connections: [null, 1, null] };
+                blocks.blockList = [host, { trash: false, connections: [0] }];
+                blocks._adjustExpandableTwoArgBlock = jest.fn();
+                blocks._adjustArgClampBlock = jest.fn();
+                blocks.actionHistory.push({
+                    type: "move",
+                    blockId: 1,
+                    oldX: 300,
+                    oldY: 50,
+                    newX: 20,
+                    newY: 0,
+                    from: { parent: null, slot: null },
+                    bottom: null,
+                    to: { parent: 0, slot: 1 }
+                });
+
+                await blocks.undoAction();
+
+                expect(host.connections).toEqual([null, null, null]);
+                expect(blocks[resize]).toHaveBeenCalledWith([0]);
+            });
+
+            it("puts a replaced argument back into its slot in one undo", async () => {
+                const host = {
+                    ...shape(),
+                    trash: false,
+                    container: { x: 0, y: 0 },
+                    docks: [
+                        [0, 0, "numberout"],
+                        [20, 0, "numberin"]
+                    ],
+                    connections: [null, 1]
+                };
+                const dropped = { trash: false, connections: [0] };
+                const replaced = { trash: true, connections: [null] };
+                blocks.blockList = [host, dropped, replaced];
+                blocks.activity._restoreTrashById = jest.fn(blk => {
+                    blocks.blockList[blk].trash = false;
+                });
+                blocks.actionHistory.push({
+                    type: "move",
+                    blockId: 1,
+                    oldX: 300,
+                    oldY: 50,
+                    newX: 20,
+                    newY: 0,
+                    from: { parent: null, slot: null },
+                    bottom: null,
+                    displaced: 2,
+                    to: { parent: 0, slot: 1 }
+                });
+
+                await blocks.undoAction();
+
+                expect(blocks.activity._restoreTrashById).toHaveBeenCalledWith(2);
+                expect(host.connections).toEqual([null, 2]);
+                expect(replaced.connections[0]).toBe(0);
+                expect(dropped.connections[0]).toBeNull();
+                expect(blocks.moveBlock).toHaveBeenCalledWith(1, 300, 50);
+                expect(blocks.actionHistory).toEqual([]);
+            });
+
+            it("redocks a move onto where it was dropped when it is redone", async () => {
+                blocks.blockList = [
+                    flow(100, 100, [null, 1]),
+                    flow(100, 140, [0, null]),
+                    flow(400, 100, [null, null])
+                ];
+                blocks.redoActionHistory.push({
+                    type: "move",
+                    blockId: 1,
+                    oldX: 100,
+                    oldY: 140,
+                    newX: 400,
+                    newY: 140,
+                    from: { parent: 0, slot: 1 },
+                    bottom: 1,
+                    to: { parent: 2, slot: 1 }
+                });
+
+                await blocks.redoAction();
+
+                expect(blocks.blockList[0].connections).toEqual([null, null]);
+                expect(blocks.blockList[1].connections[0]).toBeNull();
+                expect(blocks.moveBlock).toHaveBeenCalledWith(1, 400, 140);
+                expect(blocks.blockMoved).toHaveBeenCalledWith(1);
+            });
+
+            it("reconnects a stack restored by undoing its trash", async () => {
+                blocks.blockList = [flow(100, 100, [null, null]), flow(100, 300, [null, null])];
+                blocks.activity._restoreTrashById = jest.fn();
+                blocks.actionHistory.push({
+                    type: "trash",
+                    blockId: 1,
+                    from: { parent: 0, slot: 1 }
+                });
+
+                await blocks.undoAction();
+
+                expect(blocks.activity._restoreTrashById).toHaveBeenCalledWith(1);
+                expect(blocks.moveBlock).toHaveBeenCalledWith(1, 100, 140);
+                expect(blocks.blockMoved).toHaveBeenCalledWith(1);
+            });
+
+            it("leaves a stack loose when undoing its trash fails to restore it", async () => {
+                blocks.blockList = [flow(100, 100, [null, null]), flow(100, 300, [null, null])];
+                blocks.blockList[1].trash = true;
+                blocks.activity._restoreTrashById = jest.fn();
+                blocks.actionHistory.push({
+                    type: "trash",
+                    blockId: 1,
+                    from: { parent: 0, slot: 1 }
+                });
+
+                await blocks.undoAction();
+
+                expect(blocks.moveBlock).not.toHaveBeenCalled();
+                expect(blocks.blockMoved).not.toHaveBeenCalled();
+            });
+
+            it("waits for a redo that is still docking before it undoes", async () => {
+                blocks.blockList = [
+                    flow(100, 100, [null, 1]),
+                    flow(100, 140, [0, null]),
+                    flow(400, 100, [null, null])
+                ];
+                const docking = [];
+                blocks.blockMoved = jest.fn(
+                    blk =>
+                        new Promise(resolve => {
+                            docking.push(() => {
+                                blocks.blockList[2].connections[1] = blk;
+                                blocks.blockList[blk].connections[0] = 2;
+                                resolve();
+                            });
+                        })
+                );
+                blocks.redoActionHistory.push({
+                    type: "move",
+                    blockId: 1,
+                    oldX: 100,
+                    oldY: 140,
+                    newX: 400,
+                    newY: 140,
+                    from: { parent: 0, slot: 1 },
+                    bottom: 1,
+                    to: { parent: 2, slot: 1 }
+                });
+
+                const redo = blocks.redoAction();
+                const undo = blocks.undoAction();
+                await new Promise(resolve => setTimeout(resolve, 0));
+                expect(blocks.blockMoved).toHaveBeenCalledTimes(1);
+
+                docking.shift()();
+                await redo;
+                await new Promise(resolve => setTimeout(resolve, 0));
+
+                expect(blocks.blockMoved).toHaveBeenCalledTimes(2);
+                expect(blocks.blockList[2].connections[1]).toBeNull();
+                docking.shift()();
+                await undo;
+                expect(blocks.redoActionHistory.length).toBe(1);
+            });
+        });
+
+        it("should successfully undo and redo a block trash", async () => {
             const blocks = new Blocks(mockActivity);
             blocks.activity._restoreTrashById = jest.fn();
             blocks.sendStackToTrash = jest.fn();
@@ -974,19 +1274,19 @@ describe("Blocks Foundation", () => {
                 blockId: 2
             });
 
-            blocks.undoAction();
+            await blocks.undoAction();
             expect(blocks.activity._restoreTrashById).toHaveBeenCalledWith(2);
             expect(blocks.redoActionHistory[0].type).toBe("trash");
 
-            blocks.redoAction();
+            await blocks.redoAction();
             expect(blocks.sendStackToTrash).toHaveBeenCalledWith(blocks.blockList[2]);
             expect(blocks.actionHistory[0].type).toBe("trash");
         });
 
-        it("should gracefully handle empty history stacks", () => {
+        it("should gracefully handle empty history stacks", async () => {
             const blocks = new Blocks(mockActivity);
-            blocks.undoAction();
-            blocks.redoAction();
+            await blocks.undoAction();
+            await blocks.redoAction();
             expect(blocks.activity.textMsg).toHaveBeenCalledWith(expect.any(String), 3000);
         });
 
@@ -1010,7 +1310,44 @@ describe("Blocks Foundation", () => {
             document.getElementById = originalGetElementById;
         });
 
-        it("should undo and redo changing a number from 10 to 20", () => {
+        it("records where a trashed stack was docked, unless told to stay out of the history", () => {
+            const blocks = new Blocks(mockActivity);
+            const flowBlock = {
+                protoblock: { style: "basic" },
+                isTwoArgBlock: () => false,
+                isArgBlock: () => false,
+                isArgClamp: () => false
+            };
+            const parent = { ...flowBlock, name: "start", connections: [null, 1, null] };
+            const mockBlock = {
+                ...flowBlock,
+                name: "dummy",
+                blockIndex: 1,
+                connections: [0],
+                hide: jest.fn()
+            };
+            blocks.blockList = [parent, mockBlock];
+            blocks.turtles = { turtleList: [] };
+            blocks.insideExpandableBlock = jest.fn(() => null);
+            blocks.addDefaultBlock = jest.fn();
+            blocks._cleanupStacks = jest.fn();
+            blocks.activity.trashcan = { stopHighlightAnimation: jest.fn() };
+            const originalGetElementById = document.getElementById;
+            document.getElementById = jest.fn().mockReturnValue({ click: jest.fn() });
+
+            blocks.sendStackToTrash(mockBlock);
+            expect(blocks.actionHistory).toEqual([
+                { type: "trash", blockId: 1, from: { parent: 0, slot: 1 } }
+            ]);
+            expect(parent.connections[1]).toBeNull();
+
+            blocks.sendStackToTrash(mockBlock, false);
+            expect(blocks.actionHistory.length).toBe(1);
+
+            document.getElementById = originalGetElementById;
+        });
+
+        it("should undo and redo changing a number from 10 to 20", async () => {
             const blocks = new Blocks(mockActivity);
             blocks.activity.refreshCanvas = jest.fn();
             const mockBlock = {
@@ -1032,7 +1369,7 @@ describe("Blocks Foundation", () => {
             });
 
             // Undo value change
-            blocks.undoAction();
+            await blocks.undoAction();
             expect(mockBlock.label.value).toBe(10);
             expect(mockBlock.value).toBe(10);
             expect(mockBlock.text.text).toBe("10");
@@ -1042,14 +1379,14 @@ describe("Blocks Foundation", () => {
             expect(blocks.redoActionHistory.length).toBe(1);
 
             // Redo value change
-            blocks.redoAction();
+            await blocks.redoAction();
             expect(mockBlock.label.value).toBe(20);
             expect(mockBlock.value).toBe(20);
             expect(mockBlock.text.text).toBe("20");
             expect(mockBlock.actionHistory || blocks.actionHistory.length).toBeTruthy();
         });
 
-        it("reloads media artwork when undoing and redoing a media value", () => {
+        it("reloads media artwork when undoing and redoing a media value", async () => {
             const blocks = new Blocks(mockActivity);
             const mockBlock = {
                 name: "media",
@@ -1070,11 +1407,11 @@ describe("Blocks Foundation", () => {
                 newText: null
             });
 
-            blocks.undoAction();
+            await blocks.undoAction();
             expect(mockBlock.value).toBe("old-image");
             expect(mockBlock.loadThumbnail).toHaveBeenLastCalledWith(null);
 
-            blocks.redoAction();
+            await blocks.redoAction();
             expect(mockBlock.value).toBe("new-image");
             expect(mockBlock.loadThumbnail).toHaveBeenLastCalledWith(null);
             expect(mockBlock.loadThumbnail).toHaveBeenCalledTimes(2);
@@ -1083,7 +1420,7 @@ describe("Blocks Foundation", () => {
 
         it.each(["audiofile", "loadFile"])(
             "refreshes the %s label when undoing and redoing its value",
-            name => {
+            async name => {
                 const blocks = new Blocks(mockActivity);
                 const mockBlock = {
                     name,
@@ -1110,16 +1447,16 @@ describe("Blocks Foundation", () => {
                     newText: null
                 });
 
-                blocks.undoAction();
+                await blocks.undoAction();
                 expect(mockBlock.text.text).toBe("old-file");
 
-                blocks.redoAction();
+                await blocks.redoAction();
                 expect(mockBlock.text.text).toBe("new-file");
                 expect(mockBlock._labelChanged).not.toHaveBeenCalled();
             }
         );
 
-        it("should undo a restore action (send newly created block to trash)", () => {
+        it("should undo a restore action (send newly created block to trash)", async () => {
             const blocks = new Blocks(mockActivity);
             const mockBlock = { trash: false };
             blocks.blockList = [null, null, null, mockBlock];
@@ -1130,12 +1467,12 @@ describe("Blocks Foundation", () => {
                 blockId: 3
             });
 
-            blocks.undoAction();
+            await blocks.undoAction();
             expect(blocks.sendStackToTrash).toHaveBeenCalledWith(mockBlock);
             expect(blocks.redoActionHistory[0].type).toBe("restore");
         });
 
-        it("should redo a restore action (restore from trash)", () => {
+        it("should redo a restore action (restore from trash)", async () => {
             const blocks = new Blocks(mockActivity);
             blocks.activity._restoreTrashById = jest.fn();
 
@@ -1144,12 +1481,12 @@ describe("Blocks Foundation", () => {
                 blockId: 5
             });
 
-            blocks.redoAction();
+            await blocks.redoAction();
             expect(blocks.activity._restoreTrashById).toHaveBeenCalledWith(5);
             expect(blocks.actionHistory[0].type).toBe("restore");
         });
 
-        it("should hide helpfulWheelDiv when undoing if it is visible", () => {
+        it("should hide helpfulWheelDiv when undoing if it is visible", async () => {
             const blocks = new Blocks(mockActivity);
             blocks.moveBlock = jest.fn();
             blocks.blockMoved = jest.fn();
@@ -1159,6 +1496,7 @@ describe("Blocks Foundation", () => {
             const mockDiv = { style: { display: "block" } };
             const originalGetElementById = document.getElementById;
             document.getElementById = jest.fn().mockReturnValue(mockDiv);
+            blocks.blockList = [{ trash: false, connections: [null] }];
 
             blocks.actionHistory.push({
                 type: "move",
@@ -1169,37 +1507,37 @@ describe("Blocks Foundation", () => {
                 newY: 10
             });
 
-            blocks.undoAction();
+            await blocks.undoAction();
             expect(mockDiv.style.display).toBe("none");
             expect(blocks.activity.__tick).toHaveBeenCalled();
 
             document.getElementById = originalGetElementById;
         });
 
-        it("should set isUndoingOrRedoing to true during undo and reset after", () => {
+        it("should set isUndoingOrRedoing to true during undo and reset after", async () => {
             const blocks = new Blocks(mockActivity);
             blocks.activity._restoreTrashById = jest.fn();
 
             blocks.actionHistory.push({ type: "trash", blockId: 1 });
 
             expect(blocks.isUndoingOrRedoing).toBe(false);
-            blocks.undoAction();
+            await blocks.undoAction();
             // After undoAction completes, isUndoingOrRedoing should be reset
             expect(blocks.isUndoingOrRedoing).toBe(false);
         });
 
-        it("should set isUndoingOrRedoing to true during redo and reset after", () => {
+        it("should set isUndoingOrRedoing to true during redo and reset after", async () => {
             const blocks = new Blocks(mockActivity);
             blocks.activity._restoreTrashById = jest.fn();
 
             blocks.redoActionHistory.push({ type: "restore", blockId: 1 });
 
             expect(blocks.isUndoingOrRedoing).toBe(false);
-            blocks.redoAction();
+            await blocks.redoAction();
             expect(blocks.isUndoingOrRedoing).toBe(false);
         });
 
-        it("should handle value_change undo when block has no label", () => {
+        it("should handle value_change undo when block has no label", async () => {
             const blocks = new Blocks(mockActivity);
             blocks.activity.refreshCanvas = jest.fn();
             const mockBlock = {
@@ -1220,13 +1558,13 @@ describe("Blocks Foundation", () => {
                 newText: "4"
             });
 
-            blocks.undoAction();
+            await blocks.undoAction();
             // Should create a label object if it didn't exist
             expect(mockBlock.label).toEqual({ value: 1, style: {} });
             expect(mockBlock._labelChanged).toHaveBeenCalledWith(true, true);
         });
 
-        it("should handle value_change with null oldText gracefully", () => {
+        it("should handle value_change with null oldText gracefully", async () => {
             const blocks = new Blocks(mockActivity);
             blocks.activity.refreshCanvas = jest.fn();
             const mockBlock = {
@@ -1247,7 +1585,7 @@ describe("Blocks Foundation", () => {
                 newText: "x"
             });
 
-            blocks.undoAction();
+            await blocks.undoAction();
             // text.text should remain unchanged when oldText is null
             expect(mockBlock.text.text).toBe("x");
         });
@@ -1293,14 +1631,14 @@ describe("Blocks Foundation", () => {
             document.getElementById = originalGetElementById;
         });
 
-        it("should gracefully handle missing blocks during undo/redo", () => {
+        it("should gracefully handle missing blocks during undo/redo", async () => {
             const blocks = new Blocks(mockActivity);
             blocks.blockList = []; // Empty blocklist
             blocks.sendStackToTrash = jest.fn();
             blocks.activity._restoreTrashById = jest.fn();
 
             blocks.actionHistory.push({ type: "restore", blockId: 1 });
-            blocks.undoAction();
+            await blocks.undoAction();
             expect(blocks.sendStackToTrash).not.toHaveBeenCalled();
 
             blocks.actionHistory.push({
@@ -1309,16 +1647,16 @@ describe("Blocks Foundation", () => {
                 oldValue: 1,
                 newValue: 2
             });
-            blocks.undoAction();
+            await blocks.undoAction();
             expect(blocks.activity.refreshCanvas).not.toHaveBeenCalled();
 
             blocks.redoActionHistory.push({ type: "restore", blockId: 1 });
             // Should not throw or do anything
-            blocks.redoAction();
+            await blocks.redoAction();
             expect(blocks.activity._restoreTrashById).toHaveBeenCalled();
 
             blocks.redoActionHistory.push({ type: "value_change", blockId: 1, newValue: 2 });
-            blocks.redoAction();
+            await blocks.redoAction();
             expect(blocks.activity.refreshCanvas).not.toHaveBeenCalled();
         });
     });

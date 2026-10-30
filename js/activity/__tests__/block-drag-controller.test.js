@@ -99,6 +99,16 @@ function makeBlocks(blockList) {
         raiseStackToTop: jest.fn(),
         findTopBlock: jest.fn(blk => blk),
         findBottomBlock: jest.fn(blk => blk),
+        dockOf: myBlock => {
+            const parent = myBlock.connections[0];
+            return {
+                parent,
+                slot:
+                    parent === null
+                        ? null
+                        : blockList[parent].connections.indexOf(blockList.indexOf(myBlock))
+            };
+        },
         insideExpandableBlock: jest.fn(() => null),
         _insideNoteBlock: jest.fn(() => null),
         addDefaultBlock: jest.fn(),
@@ -713,7 +723,7 @@ describe("BlockDragController", () => {
 
             await blocks.blockMoved(2);
 
-            expect(blocks.sendStackToTrash).toHaveBeenCalledWith(occupant);
+            expect(blocks.sendStackToTrash).toHaveBeenCalledWith(occupant, true);
             expect(moving.connections[0]).toBe(0);
         });
 
@@ -1867,12 +1877,79 @@ describe("BlockDragController", () => {
                     oldX: 10,
                     oldY: 20,
                     newX: 50,
-                    newY: 60
+                    newY: 60,
+                    from: { parent: null, slot: null },
+                    bottom: null,
+                    to: { parent: null, slot: null }
                 }
             ]);
             expect(blocks.redoActionHistory).toEqual([]);
             expect(blocks.dragStartX).toBeUndefined();
             expect(blocks.dragStartY).toBeUndefined();
+        });
+
+        it("records the dock a flow block left, its own bottom block and the dock it joined", async () => {
+            const flow = (x, y, connections) =>
+                makeFlowBlock({
+                    x,
+                    y,
+                    docks: [
+                        [0, 0, "out"],
+                        [0, 40, "in"]
+                    ],
+                    connections
+                });
+            const blockList = [
+                flow(0, 0, [null, 1]),
+                flow(0, 40, [0, 2]),
+                flow(0, 80, [1, null]),
+                flow(300, 0, [null, null])
+            ];
+            const blocks = makeBlocks(blockList);
+            blocks.findBottomBlock = jest.fn(() => 2);
+            blocks.dragStartX = 0;
+            blocks.dragStartY = 40;
+            blocks.actionHistory = [];
+            blocks.isUndoingOrRedoing = false;
+            blockList[1].container = { x: 300, y: 40 };
+
+            await blocks.blockMoved(1);
+
+            expect(blocks.actionHistory).toEqual([
+                expect.objectContaining({
+                    blockId: 1,
+                    from: { parent: 0, slot: 1 },
+                    bottom: 2,
+                    to: { parent: 3, slot: 1 }
+                })
+            ]);
+        });
+
+        it("keeps a replaced argument in the same undo step as the drop", async () => {
+            const occupant = makeMovingArg({ value: "5" });
+            occupant.name = "number";
+            occupant.container = { x: 0, y: 0 };
+            const target = makeArgHost({ occupantIdx: 1 });
+            const moving = makeMovingArg({ value: "10" });
+
+            const blocks = makeBlocks([target, occupant, moving]);
+            blocks.dragStartX = 200;
+            blocks.dragStartY = 200;
+            blocks.actionHistory = [];
+            blocks.isUndoingOrRedoing = false;
+
+            await blocks.blockMoved(2);
+
+            expect(blocks.sendStackToTrash).toHaveBeenCalledWith(occupant, false);
+            expect(blocks.actionHistory).toEqual([
+                expect.objectContaining({
+                    blockId: 2,
+                    from: { parent: null, slot: null },
+                    bottom: null,
+                    displaced: 1,
+                    to: { parent: 0, slot: 1 }
+                })
+            ]);
         });
 
         it("preserves redoActionHistory when isUndoingOrRedoing is true", async () => {
