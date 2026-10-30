@@ -156,6 +156,103 @@ describe("JSGenerate Class", () => {
         expect(JSGenerate.startTrees).toEqual([[]]);
     });
 
+    test("should handle a block without a protoblock", () => {
+        globalActivity.blocks.stackList = [1];
+        globalActivity.blocks.blockList = {
+            1: {
+                name: "start",
+                trash: false,
+                connections: [null, 2, null],
+                protoblock: { style: "hat" }
+            },
+            2: {
+                name: "forward",
+                connections: [1, null]
+            }
+        };
+
+        expect(() => JSGenerate.generateStacksTree()).not.toThrow();
+        expect(JSGenerate.startTrees).toEqual([[["forward", null, null]]]);
+    });
+
+    test("should handle a connected argument block without a protoblock", () => {
+        globalActivity.blocks.stackList = [1];
+        globalActivity.blocks.blockList = {
+            1: {
+                name: "start",
+                trash: false,
+                connections: [null, 2, null],
+                protoblock: { style: "hat" }
+            },
+            2: {
+                name: "forward",
+                connections: [1, 3, null],
+                protoblock: { style: "basic", args: 1 }
+            },
+            3: {
+                name: "number",
+                connections: [2]
+            }
+        };
+
+        expect(() => JSGenerate.generateStacksTree()).not.toThrow();
+        expect(JSGenerate.startTrees).toEqual([[["forward", [null], null]]]);
+    });
+
+    test("should handle a connected argument block without a protoblock after hspace", () => {
+        globalActivity.blocks.stackList = [1];
+        globalActivity.blocks.blockList = {
+            1: {
+                name: "start",
+                trash: false,
+                connections: [null, 2, null],
+                protoblock: { style: "hat" }
+            },
+            2: {
+                name: "forward",
+                connections: [1, 3, null],
+                protoblock: { style: "basic", args: 1 }
+            },
+            3: {
+                name: "hspace",
+                connections: [2, 4],
+                protoblock: { style: "basic", args: 1 }
+            },
+            4: {
+                name: "number",
+                connections: [3]
+            }
+        };
+
+        expect(() => JSGenerate.generateStacksTree()).not.toThrow();
+        expect(JSGenerate.startTrees).toEqual([[["forward", [null], null]]]);
+    });
+
+    test("should handle an hspace with missing target block", () => {
+        globalActivity.blocks.stackList = [1];
+        globalActivity.blocks.blockList = {
+            1: {
+                name: "start",
+                trash: false,
+                connections: [null, 2, null],
+                protoblock: { style: "hat" }
+            },
+            2: {
+                name: "forward",
+                connections: [1, 3, null],
+                protoblock: { style: "basic", args: 1 }
+            },
+            3: {
+                name: "hspace",
+                connections: [2, null],
+                protoblock: { style: "basic", args: 1 }
+            }
+        };
+
+        expect(() => JSGenerate.generateStacksTree()).not.toThrow();
+        expect(JSGenerate.startTrees).toEqual([[["forward", [null], null]]]);
+    });
+
     test("should run code generator with print options", () => {
         JSGenerate.actionTrees = [[["action", null, null]]];
         JSGenerate.actionNames = ["action1"];
