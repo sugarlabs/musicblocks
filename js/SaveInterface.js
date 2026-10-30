@@ -45,6 +45,104 @@ function _lazyRequire(modules, callback) {
     }
 }
 
+/**
+ * Restore previously recorded notation from the recording buffer.
+ *
+ * @param {object} activity - The activity object.
+ * @returns {void}
+ */
+function restoreRecordedNotation(activity) {
+    if (!activity || !activity.logo || !activity.logo.recordingBuffer) {
+        return;
+    }
+    const { recordingBuffer } = activity.logo;
+    activity.logo.notationOutput = recordingBuffer.notationOutput;
+    activity.logo.notationNotes = recordingBuffer.notationNotes;
+
+    if (!activity.logo.notation) {
+        activity.logo.notation = {
+            notationStaging: {},
+            notationDrumStaging: {}
+        };
+    }
+    if (!activity.logo.notation.notationStaging) {
+        activity.logo.notation.notationStaging = {};
+    }
+    if (!activity.logo.notation.notationDrumStaging) {
+        activity.logo.notation.notationDrumStaging = {};
+    }
+
+    const turtleCount =
+        activity.turtles && typeof activity.turtles.getTurtleCount === "function"
+            ? activity.turtles.getTurtleCount()
+            : 0;
+
+    for (let t = 0; t < turtleCount; t++) {
+        if (
+            recordingBuffer.notationStaging &&
+            Object.prototype.hasOwnProperty.call(recordingBuffer.notationStaging, t) &&
+            recordingBuffer.notationStaging[t]
+        ) {
+            activity.logo.notation.notationStaging[t] = recordingBuffer.notationStaging[t];
+        }
+        if (
+            recordingBuffer.notationDrumStaging &&
+            Object.prototype.hasOwnProperty.call(recordingBuffer.notationDrumStaging, t) &&
+            recordingBuffer.notationDrumStaging[t]
+        ) {
+            activity.logo.notation.notationDrumStaging[t] = recordingBuffer.notationDrumStaging[t];
+        }
+    }
+}
+
+/**
+ * Prepare a fresh notation run by resetting notes, staging arrays, and clearing painters.
+ *
+ * @param {object} activity - The activity object.
+ * @returns {void}
+ */
+function prepareFreshNotation(activity) {
+    if (!activity) {
+        return;
+    }
+    if (activity.logo) {
+        activity.logo.notationNotes = {};
+        if (!activity.logo.notation) {
+            activity.logo.notation = {
+                notationStaging: {},
+                notationDrumStaging: {}
+            };
+        }
+        if (!activity.logo.notation.notationStaging) {
+            activity.logo.notation.notationStaging = {};
+        }
+        if (!activity.logo.notation.notationDrumStaging) {
+            activity.logo.notation.notationDrumStaging = {};
+        }
+    }
+
+    const turtleCount =
+        activity.turtles && typeof activity.turtles.getTurtleCount === "function"
+            ? activity.turtles.getTurtleCount()
+            : 0;
+
+    for (let t = 0; t < turtleCount; t++) {
+        if (activity.logo && activity.logo.notation) {
+            activity.logo.notation.notationStaging[t] = [];
+            activity.logo.notation.notationDrumStaging[t] = [];
+        }
+        if (
+            activity.turtles &&
+            typeof activity.turtles.getTurtle === "function" &&
+            activity.turtles.getTurtle(t) &&
+            activity.turtles.getTurtle(t).painter &&
+            typeof activity.turtles.getTurtle(t).painter.doClear === "function"
+        ) {
+            activity.turtles.getTurtle(t).painter.doClear(true, true, true);
+        }
+    }
+}
+
 class SaveInterface {
     /**
      * Creates an instance of SaveInterface.
@@ -684,6 +782,38 @@ class SaveInterface {
     }
 
     /**
+     * Restore previously recorded notation from the recording buffer.
+     *
+     * Copies recorded notation output, notes, and per-turtle note and drum staging
+     * arrays from the recording buffer into the logo notation state.
+     *
+     * @param {object} [activity=this.activity] - The activity object.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
+    restoreRecordedNotation(activity = this.activity) {
+        restoreRecordedNotation(activity);
+    }
+
+    /**
+     * Prepare a fresh notation run.
+     *
+     * Resets notation notes, initializes empty note and drum staging arrays
+     * for every turtle, and clears each turtle's painter canvas.
+     *
+     * @param {object} [activity=this.activity] - The activity object.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
+    prepareFreshNotation(activity = this.activity) {
+        prepareFreshNotation(activity);
+    }
+
+    /**
      * Save ABC notation representation of an activity.
      *
      * This method generates and prepares ABC notation output for the provided activity.
@@ -699,34 +829,11 @@ class SaveInterface {
 
         // Lazy-load abc module before using ABCHEADER
 
-        _lazyRequire(["activity/abc"], function () {
+        _lazyRequire(["activity/abc"], () => {
             // Check if we have buffered notation data (Issue #2330)
             if (activity.logo.recordingBuffer.hasData) {
                 // Use buffered data - restore it temporarily
-                activity.logo.notationOutput = activity.logo.recordingBuffer.notationOutput;
-                activity.logo.notationNotes = activity.logo.recordingBuffer.notationNotes;
-                for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
-                    if (
-                        Object.prototype.hasOwnProperty.call(
-                            activity.logo.recordingBuffer.notationStaging,
-                            t
-                        ) &&
-                        activity.logo.recordingBuffer.notationStaging[t]
-                    ) {
-                        activity.logo.notation.notationStaging[t] =
-                            activity.logo.recordingBuffer.notationStaging[t];
-                    }
-                    if (
-                        Object.prototype.hasOwnProperty.call(
-                            activity.logo.recordingBuffer.notationDrumStaging,
-                            t
-                        ) &&
-                        activity.logo.recordingBuffer.notationDrumStaging[t]
-                    ) {
-                        activity.logo.notation.notationDrumStaging[t] =
-                            activity.logo.recordingBuffer.notationDrumStaging[t];
-                    }
-                }
+                this.restoreRecordedNotation(activity);
 
                 // Save immediately
                 setTimeout(() => {
@@ -744,12 +851,7 @@ class SaveInterface {
                 //Suppress music and turtle output when generating Abc output.
                 activity.logo.runningAbc = true;
                 activity.logo.notationOutput = ABCHEADER;
-                activity.logo.notationNotes = {};
-                for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
-                    activity.logo.notation.notationStaging[t] = [];
-                    activity.logo.notation.notationDrumStaging[t] = [];
-                    activity.turtles.getTurtle(t).painter.doClear(true, true, true);
-                }
+                this.prepareFreshNotation(activity);
                 activity.logo.runLogoCommands();
             }
         });
@@ -804,30 +906,7 @@ class SaveInterface {
         // If so, use it directly; otherwise run the program
         if (activity.logo.recordingBuffer.hasData) {
             // Load buffered data
-            activity.logo.notationOutput = activity.logo.recordingBuffer.notationOutput;
-            activity.logo.notationNotes = activity.logo.recordingBuffer.notationNotes;
-            for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
-                if (
-                    Object.prototype.hasOwnProperty.call(
-                        activity.logo.recordingBuffer.notationStaging,
-                        t
-                    ) &&
-                    activity.logo.recordingBuffer.notationStaging[t]
-                ) {
-                    activity.logo.notation.notationStaging[t] =
-                        activity.logo.recordingBuffer.notationStaging[t];
-                }
-                if (
-                    Object.prototype.hasOwnProperty.call(
-                        activity.logo.recordingBuffer.notationDrumStaging,
-                        t
-                    ) &&
-                    activity.logo.recordingBuffer.notationDrumStaging[t]
-                ) {
-                    activity.logo.notation.notationDrumStaging[t] =
-                        activity.logo.recordingBuffer.notationDrumStaging[t];
-                }
-            }
+            this.restoreRecordedNotation(activity);
         }
 
         const lyext = "ly";
@@ -988,12 +1067,7 @@ class SaveInterface {
                     this.notationConvert = "";
                 }
                 this.activity.logo.notationOutput = lyheader;
-                this.activity.logo.notationNotes = {};
-                for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
-                    this.activity.logo.notation.notationStaging[t] = [];
-                    this.activity.logo.notation.notationDrumStaging[t] = [];
-                    this.activity.turtles.getTurtle(t).painter.doClear(true, true, true);
-                }
+                this.prepareFreshNotation(this.activity);
                 document.body.style.cursor = "wait";
                 this.activity.logo.runLogoCommands();
 
@@ -1173,12 +1247,7 @@ class SaveInterface {
 
     saveMxml(filename) {
         this.activity.logo.runningMxml = true;
-        for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
-            this.activity.logo.notation.notationStaging[t] = [];
-            this.activity.logo.notation.notationDrumStaging[t] = [];
-            this.activity.turtles.getTurtle(t).painter.doClear(true, true, true);
-        }
-
+        this.prepareFreshNotation(this.activity);
         this.activity.logo.runLogoCommands();
     }
 
@@ -1206,5 +1275,9 @@ class SaveInterface {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { SaveInterface };
+    module.exports = {
+        SaveInterface,
+        restoreRecordedNotation,
+        prepareFreshNotation
+    };
 }
