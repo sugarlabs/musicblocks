@@ -332,11 +332,7 @@ function setupVolumeActions(activity) {
          */
         static getSynthVolume(targetSynth, turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
-            let synth = targetSynth;
-
-            if (!Object.prototype.hasOwnProperty.call(tur.singer.synthVolume, synth)) {
-                synth = resolveSynthName(targetSynth);
-            }
+            const synth = resolveSynthName(targetSynth) || targetSynth;
 
             if (
                 synth !== null &&

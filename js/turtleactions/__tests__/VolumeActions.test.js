@@ -1039,6 +1039,7 @@ describe("setupVolumeActions", () => {
 
         it("should resolve display names before getting synth volume", () => {
             targetTurtle.singer.synthVolume.piano = [50, 70];
+            targetTurtle.singer.synthVolume.Piano = [50, 60];
 
             expect(Singer.VolumeActions.getSynthVolume("Piano", 0)).toBe(70);
         });
@@ -1047,6 +1048,12 @@ describe("setupVolumeActions", () => {
             targetTurtle.singer.synthVolume.customsample_bell = [50, 70];
 
             expect(Singer.VolumeActions.getSynthVolume("customsample_bell", 0)).toBe(70);
+        });
+
+        it("should return 50 for empty or non-string synth names", () => {
+            expect(Singer.VolumeActions.getSynthVolume("", 0)).toBe(50);
+            expect(Singer.VolumeActions.getSynthVolume(null, 0)).toBe(50);
+            expect(Singer.VolumeActions.getSynthVolume(42, 0)).toBe(50);
         });
 
         it("should return 50 when getting volume for non-existent synth", () => {
