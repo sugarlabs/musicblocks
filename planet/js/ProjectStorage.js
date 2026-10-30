@@ -420,6 +420,24 @@ class ProjectStorage {
         return decodeURIComponent(window.atob(tb));
     }
 
+    /**
+     * Decodes project data that may be either base64+URI encoded (legacy Planet)
+     * or the raw project string (git backend). Falls back to the input as-is.
+     */
+    decodeProjectData(data) {
+        if (typeof data !== "string") {
+            return data;
+        }
+        if (/^\s*[[{<]/.test(data)) {
+            return data;
+        }
+        try {
+            return this.decodeTB(data);
+        } catch (e) {
+            return data;
+        }
+    }
+
     isLiked(id) {
         return this.data.LikedProjects[id] === true;
     }

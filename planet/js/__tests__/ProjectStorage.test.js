@@ -72,6 +72,22 @@ describe("ProjectStorage", () => {
         });
     });
 
+    describe("decodeProjectData()", () => {
+        it("should decode base64 + URI encoded data", () => {
+            const raw = '[[0,"start",100,100,[null,null]]]';
+            expect(storage.decodeProjectData(storage.encodeTB(raw))).toBe(raw);
+        });
+
+        it("should return raw project JSON unchanged", () => {
+            const raw = '[[0,"start",100,100,[null,null]]]';
+            expect(storage.decodeProjectData(raw)).toBe(raw);
+        });
+
+        it("should return undecodable data unchanged instead of throwing", () => {
+            expect(storage.decodeProjectData("not base64!!")).toBe("not base64!!");
+        });
+    });
+
     describe("set() and get()", () => {
         it("should store and retrieve data", async () => {
             const testData = { Projects: { 1: { ProjectName: "Test" } } };
