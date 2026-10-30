@@ -55,11 +55,23 @@ function request(pathname, { mode = "no-cors", destination = "" } = {}) {
     };
 }
 
-function load({ cached = {}, network }) {
+class FakeRequest {
+    constructor(url) {
+        this.url = String(url);
+        this.method = "GET";
+        this.mode = "cors";
+        this.destination = "";
+        this.credentials = "same-origin";
+        this.headers = { has: () => false };
+    }
+}
+
+function load({ cached = {}, network, base = "/" }) {
     const store = new Map(Object.entries(cached).map(([p, body]) => [ORIGIN + p, body]));
     const cache = {
         match: jest.fn(async req => {
-            const url = typeof req === "string" ? new URL(req, ORIGIN + "/sw.js").href : req.url;
+            const url =
+                typeof req === "string" ? new URL(req, ORIGIN + base + "sw.js").href : req.url;
             return store.has(url) ? new FakeResponse(store.get(url)) : undefined;
         }),
         put: jest.fn(async (req, res) => store.set(req.url, res.body)),
@@ -68,7 +80,7 @@ function load({ cached = {}, network }) {
     const listeners = {};
     const sandbox = {
         self: {
-            location: new URL(ORIGIN + "/sw.js"),
+            location: new URL(ORIGIN + base + "sw.js"),
             addEventListener: (type, fn) => (listeners[type] = fn),
             skipWaiting: () => {},
             clients: { claim: async () => {} }
@@ -76,6 +88,7 @@ function load({ cached = {}, network }) {
         caches: { open: async () => cache, match: req => cache.match(req) },
         fetch: jest.fn(network),
         Response: FakeResponse,
+        Request: FakeRequest,
         URL,
         Set,
         Promise,
@@ -152,6 +165,45 @@ describe("sw.js fetch handler", () => {
         const response = await sw.dispatch(page());
 
         expect(response.status).toBe(503);
+    });
+
+    it("refreshes the offline copy when the page is opened as /", async () => {
+        const sw = load({
+            cached: { "/index.html": "old page" },
+            network: async () => new FakeResponse("new page")
+        });
+
+        await sw.dispatch(request("/", { mode: "navigate", destination: "document" }));
+
+        expect(sw.store.get(ORIGIN + "/index.html")).toBe("new page");
+    });
+
+    it("treats /musicblocks/ as the page when the worker lives there", async () => {
+        const sw = load({
+            base: "/musicblocks/",
+            cached: { "/musicblocks/index.html": "old page" },
+            network: async () => new FakeResponse("new page")
+        });
+
+        const response = await sw.dispatch(
+            request("/musicblocks/", { mode: "navigate", destination: "document" })
+        );
+
+        expect(response.body).toBe("new page");
+        expect(sw.store.get(ORIGIN + "/musicblocks/index.html")).toBe("new page");
+    });
+
+    it("does not store another document as the app's offline copy", async () => {
+        const sw = load({
+            cached: { "/index.html": "app page" },
+            network: async () => new FakeResponse("planet page")
+        });
+
+        await sw.dispatch(
+            request("/planet/index.html", { mode: "navigate", destination: "document" })
+        );
+
+        expect(sw.store.get(ORIGIN + "/index.html")).toBe("app page");
     });
 
     it("keeps serving cached scripts first and refreshing them in the background", async () => {

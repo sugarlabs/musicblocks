@@ -86,10 +86,12 @@ function isAppShellNavigation(request) {
     const url = new URL(request.url);
     if (url.origin !== self.location.origin) return false;
 
-    // Only treat the root and index.html as app-shell.
-    // Do not cache arbitrary documents.
+    // Only the app's own page: the service worker's directory (/ on
+    // musicblocks.sugarlabs.org, /musicblocks/ on GitHub Pages) and its
+    // index.html. Not other documents, such as planet/index.html.
     if (url.search) return false;
-    return url.pathname === "/" || url.pathname.toLowerCase().endsWith("/index.html");
+    const root = new URL(".", self.location).pathname;
+    return url.pathname === root || url.pathname.toLowerCase() === root + "index.html";
 }
 
 function shouldCacheResponse(request, response) {
@@ -157,7 +159,12 @@ self.addEventListener("fetch", function (event) {
             fetch(event.request)
                 .then(function (response) {
                     if (response.ok) {
-                        event.waitUntil(updateCache(event.request, response.clone()));
+                        // "/" and "index.html" are the same page, so keep one
+                        // offline copy current, whichever one was opened.
+                        const offlineCopy = new Request(
+                            new URL(offlineFallbackPage, self.location)
+                        );
+                        event.waitUntil(updateCache(offlineCopy, response.clone()));
                     }
                     return response;
                 })
