@@ -12,7 +12,7 @@
 // This is the "Offline page" service worker
 
 const CACHE = "pwabuilder-precache";
-const offlineFallbackPage = "/index.html";
+const offlineFallbackPage = "index.html";
 const precacheFiles = [
     /* Add an array of files to precache for your app */
     offlineFallbackPage
@@ -86,10 +86,12 @@ function isAppShellNavigation(request) {
     const url = new URL(request.url);
     if (url.origin !== self.location.origin) return false;
 
-    // Only treat the root and index.html as app-shell.
-    // Do not cache arbitrary documents.
+    // Only the app's own page: the service worker's directory (/ on
+    // musicblocks.sugarlabs.org, /musicblocks/ on GitHub Pages) and its
+    // index.html. Not other documents, such as planet/index.html.
     if (url.search) return false;
-    return url.pathname === "/" || url.pathname.toLowerCase().endsWith("/index.html");
+    const root = new URL(".", self.location).pathname;
+    return url.pathname === root || url.pathname.toLowerCase() === root + "index.html";
 }
 
 function shouldCacheResponse(request, response) {
@@ -147,6 +149,41 @@ self.addEventListener("fetch", function (event) {
     if (!event.request.url.startsWith("http")) return;
 
     if (event.request.method !== "GET") return;
+
+    // The page itself goes to the network first, so a deploy is picked up on
+    // the next load instead of the one after; the cached copy is the offline
+    // fallback. Scripts are versioned by RequireJS's urlArgs and are never
+    // cached (see isStaticAssetRequest), so the page is what could go stale.
+    if (isAppShellNavigation(event.request)) {
+        event.respondWith(
+            fetch(event.request)
+                .then(function (response) {
+                    if (response.ok) {
+                        // "/" and "index.html" are the same page, so keep one
+                        // offline copy current, whichever one was opened.
+                        const offlineCopy = new Request(
+                            new URL(offlineFallbackPage, self.location)
+                        );
+                        event.waitUntil(updateCache(offlineCopy, response.clone()));
+                    }
+                    return response;
+                })
+                .catch(function () {
+                    return fromCache(event.request).catch(function () {
+                        return caches.match(offlineFallbackPage).then(function (fallback) {
+                            return (
+                                fallback ||
+                                new Response("Service Unavailable", {
+                                    status: 503,
+                                    statusText: "offline"
+                                })
+                            );
+                        });
+                    });
+                })
+        );
+        return;
+    }
 
     event.respondWith(
         fromCache(event.request).then(
