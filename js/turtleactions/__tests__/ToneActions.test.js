@@ -154,10 +154,10 @@ describe("setupToneActions", () => {
             expect(targetTurtle.inSetTimbre).toBe(true);
             expect(targetTurtle.singer.instrumentNames).toContain("grand-piano");
             expect(activity.logo.synth.loadSynth).toHaveBeenCalledWith(0, "grand-piano");
-            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_settimbre_0");
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_settimbre_0_1");
 
-            if (listenerCallbacks["_settimbre_0"]) {
-                listenerCallbacks["_settimbre_0"]();
+            if (listenerCallbacks["_settimbre_0_1"]) {
+                listenerCallbacks["_settimbre_0_1"]();
                 expect(targetTurtle.inSetTimbre).toBe(false);
                 expect(targetTurtle.singer.instrumentNames.length).toBe(0);
             }
@@ -171,7 +171,7 @@ describe("setupToneActions", () => {
 
         it("should not re-initialize synthVolume for a synth that was pushed and popped previously", () => {
             Singer.ToneActions.setTimbre("piano", 0, 1);
-            listenerCallbacks["_settimbre_0"]();
+            listenerCallbacks["_settimbre_0_1"]();
             expect(targetTurtle.singer.instrumentNames).not.toContain("grand-piano");
             expect(targetTurtle.singer.synthVolume["grand-piano"]).toBeDefined();
 
@@ -194,7 +194,7 @@ describe("setupToneActions", () => {
             expect(targetTurtle.singer.instrumentNames).toEqual(["grand-piano"]);
             expect(targetTurtle.singer.synthVolume["grand-piano"]).toEqual([0.5]);
 
-            listenerCallbacks["_settimbre_0"]();
+            listenerCallbacks["_settimbre_0_1"]();
             expect(targetTurtle.inSetTimbre).toBe(false);
             expect(targetTurtle.singer.instrumentNames).toEqual(["grand-piano"]);
         });
@@ -204,7 +204,7 @@ describe("setupToneActions", () => {
             mouse.MB.listeners = [];
             Singer.ToneActions.setTimbre("piano", 0, 999);
             expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
-            expect(mouse.MB.listeners).toContain("_settimbre_0");
+            expect(mouse.MB.listeners).toContain("_settimbre_0_999");
         });
 
         it("should dispatch via neither branch when blk is not in blockList and not running", () => {
@@ -213,7 +213,7 @@ describe("setupToneActions", () => {
             mouse.MB.listeners = [];
             Singer.ToneActions.setTimbre("piano", 0, 999);
             expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
-            expect(mouse.MB.listeners).not.toContain("_settimbre_0");
+            expect(mouse.MB.listeners).not.toContain("_settimbre_0_999");
             MusicBlocks.isRun = true;
         });
 
@@ -228,9 +228,15 @@ describe("setupToneActions", () => {
             expect(global.CUSTOMSAMPLES["customsample_custom1"]).toEqual([
                 "sample1",
                 "sample2",
-                "sample3"
+                "sample3",
+                0
             ]);
             expect(targetTurtle.singer.instrumentNames).toContain("customsample_custom1");
+        });
+
+        it("should keep the cent adjustment of a custom sample", () => {
+            Singer.ToneActions.setTimbre(["tuned", "data", "la", 4, 50], 0, 1);
+            expect(global.CUSTOMSAMPLES["customsample_tuned"]).toEqual(["data", "la", 4, 50]);
         });
 
         it("should handle empty custom sample name", () => {
@@ -281,7 +287,7 @@ describe("setupToneActions", () => {
             const mouse = Mouse.getMouseFromTurtle(targetTurtle);
             mouse.MB.listeners = [];
             Singer.ToneActions.setTimbre("piano", 0);
-            expect(mouse.MB.listeners).not.toContain("_settimbre_0");
+            expect(mouse.MB.listeners).not.toContain("_settimbre_0_undefined");
             MusicBlocks.isRun = true;
         });
 
@@ -289,8 +295,41 @@ describe("setupToneActions", () => {
             const mouse = Mouse.getMouseFromTurtle(targetTurtle);
             mouse.MB.listeners = [];
             Singer.ToneActions.setTimbre("piano", 0);
-            expect(mouse.MB.listeners).toContain("_settimbre_0");
-            listenerCallbacks["_settimbre_0"]();
+            expect(mouse.MB.listeners).toContain("_settimbre_0_undefined");
+            listenerCallbacks["_settimbre_0_undefined"]();
+            expect(targetTurtle.inSetTimbre).toBe(false);
+        });
+
+        it("should give nested Set Instrument blocks their own cleanup listener", () => {
+            // Set Instrument piano (blk 1) > Set Instrument piano (blk 2). The inner
+            // block does not push, so it must not replace the outer block's pop.
+            Singer.ToneActions.setTimbre("piano", 0, 1);
+            Singer.ToneActions.setTimbre("piano", 0, 2);
+            expect(targetTurtle.singer.instrumentNames).toEqual(["grand-piano"]);
+
+            listenerCallbacks["_settimbre_0_2"]();
+            expect(targetTurtle.inSetTimbre).toBe(true);
+            expect(targetTurtle.singer.instrumentNames).toEqual(["grand-piano"]);
+
+            listenerCallbacks["_settimbre_0_1"]();
+            expect(targetTurtle.inSetTimbre).toBe(false);
+            expect(targetTurtle.singer.instrumentNames).toEqual([]);
+        });
+
+        it("should not leave the middle instrument behind after piano > violin > piano", () => {
+            activity.blocks.blockList[3] = {};
+            Singer.ToneActions.setTimbre("piano", 0, 1);
+            Singer.ToneActions.setTimbre("violin", 0, 2);
+            Singer.ToneActions.setTimbre("piano", 0, 3);
+            expect(targetTurtle.singer.instrumentNames).toEqual(["grand-piano", "acoustic-violin"]);
+
+            listenerCallbacks["_settimbre_0_3"]();
+            listenerCallbacks["_settimbre_0_2"]();
+            expect(targetTurtle.singer.instrumentNames).toEqual(["grand-piano"]);
+            expect(targetTurtle.inSetTimbre).toBe(true);
+
+            listenerCallbacks["_settimbre_0_1"]();
+            expect(targetTurtle.singer.instrumentNames).toEqual([]);
             expect(targetTurtle.inSetTimbre).toBe(false);
         });
     });
@@ -305,10 +344,10 @@ describe("setupToneActions", () => {
 
             expect(targetTurtle.singer.vibratoIntensity).toContain(intensity / 100);
             expect(targetTurtle.singer.vibratoRate).toContain(1 / rate);
-            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_vibrato_0");
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_vibrato_0_1");
 
-            if (listenerCallbacks["_vibrato_0"]) {
-                listenerCallbacks["_vibrato_0"]();
+            if (listenerCallbacks["_vibrato_0_1"]) {
+                listenerCallbacks["_vibrato_0_1"]();
                 expect(targetTurtle.singer.vibratoIntensity.length).toBe(0);
                 expect(targetTurtle.singer.vibratoRate.length).toBe(0);
             }
@@ -338,7 +377,7 @@ describe("setupToneActions", () => {
             mouse.MB.listeners = [];
             Singer.ToneActions.doVibrato(50, 10, 0, 999);
             expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
-            expect(mouse.MB.listeners).toContain("_vibrato_0");
+            expect(mouse.MB.listeners).toContain("_vibrato_0_999");
         });
 
         it("should reject truly invalid/missing inputs (NaN, Infinity, undefined, etc)", () => {
@@ -420,9 +459,9 @@ describe("setupToneActions", () => {
             Singer.ToneActions.doVibrato(50, 10, 0, 1);
             expect(targetTurtle.singer.vibratoIntensity).toContain(0.5);
             expect(targetTurtle.singer.vibratoRate).toContain(0.1);
-            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_vibrato_0");
-            if (listenerCallbacks["_vibrato_0"]) {
-                listenerCallbacks["_vibrato_0"]();
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_vibrato_0_1");
+            if (listenerCallbacks["_vibrato_0_1"]) {
+                listenerCallbacks["_vibrato_0_1"]();
                 expect(targetTurtle.singer.vibratoIntensity.length).toBe(0);
                 expect(targetTurtle.singer.vibratoRate.length).toBe(0);
             }
@@ -433,7 +472,7 @@ describe("setupToneActions", () => {
             const mouse = Mouse.getMouseFromTurtle(targetTurtle);
             mouse.MB.listeners = [];
             Singer.ToneActions.doVibrato(50, 5, 0);
-            expect(mouse.MB.listeners).not.toContain("_vibrato_0");
+            expect(mouse.MB.listeners).not.toContain("_vibrato_0_undefined");
             MusicBlocks.isRun = true;
         });
 
@@ -441,9 +480,24 @@ describe("setupToneActions", () => {
             const mouse = Mouse.getMouseFromTurtle(targetTurtle);
             mouse.MB.listeners = [];
             Singer.ToneActions.doVibrato(50, 5, 0);
-            expect(mouse.MB.listeners).toContain("_vibrato_0");
-            listenerCallbacks["_vibrato_0"]();
+            expect(mouse.MB.listeners).toContain("_vibrato_0_undefined");
+            listenerCallbacks["_vibrato_0_undefined"]();
             expect(targetTurtle.singer.vibratoIntensity.length).toBe(0);
+        });
+
+        it("should give nested Vibrato blocks their own cleanup listener", () => {
+            Singer.ToneActions.doVibrato(50, 10, 0, 1);
+            Singer.ToneActions.doVibrato(25, 5, 0, 2);
+            expect(targetTurtle.singer.vibratoIntensity).toEqual([0.5, 0.25]);
+            expect(targetTurtle.singer.vibratoRate).toEqual([0.1, 0.2]);
+
+            listenerCallbacks["_vibrato_0_2"]();
+            expect(targetTurtle.singer.vibratoIntensity).toEqual([0.5]);
+            expect(targetTurtle.singer.vibratoRate).toEqual([0.1]);
+
+            listenerCallbacks["_vibrato_0_1"]();
+            expect(targetTurtle.singer.vibratoIntensity).toEqual([]);
+            expect(targetTurtle.singer.vibratoRate).toEqual([]);
         });
     });
 
@@ -453,10 +507,10 @@ describe("setupToneActions", () => {
             expect(targetTurtle.singer.chorusRate).toContain(1.5);
             expect(targetTurtle.singer.delayTime).toContain(20);
             expect(targetTurtle.singer.chorusDepth).toContain(0.5);
-            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_chorus_0");
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_chorus_0_1");
 
-            if (listenerCallbacks["_chorus_0"]) {
-                listenerCallbacks["_chorus_0"]();
+            if (listenerCallbacks["_chorus_0_1"]) {
+                listenerCallbacks["_chorus_0_1"]();
                 expect(targetTurtle.singer.chorusRate.length).toBe(0);
                 expect(targetTurtle.singer.delayTime.length).toBe(0);
                 expect(targetTurtle.singer.chorusDepth.length).toBe(0);
@@ -519,7 +573,7 @@ describe("setupToneActions", () => {
             mouse.MB.listeners = [];
             Singer.ToneActions.doChorus(1.5, 20, 50, 0, 999);
             expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
-            expect(mouse.MB.listeners).toContain("_chorus_0");
+            expect(mouse.MB.listeners).toContain("_chorus_0_999");
         });
 
         it("should NOT register a mouse listener when blk is undefined", () => {
@@ -527,7 +581,7 @@ describe("setupToneActions", () => {
             const mouse = Mouse.getMouseFromTurtle(targetTurtle);
             mouse.MB.listeners = [];
             Singer.ToneActions.doChorus(1.5, 20, 50, 0);
-            expect(mouse.MB.listeners).not.toContain("_chorus_0");
+            expect(mouse.MB.listeners).not.toContain("_chorus_0_undefined");
             MusicBlocks.isRun = true;
         });
 
@@ -535,9 +589,27 @@ describe("setupToneActions", () => {
             const mouse = Mouse.getMouseFromTurtle(targetTurtle);
             mouse.MB.listeners = [];
             Singer.ToneActions.doChorus(1.5, 20, 50, 0);
-            expect(mouse.MB.listeners).toContain("_chorus_0");
-            listenerCallbacks["_chorus_0"]();
+            expect(mouse.MB.listeners).toContain("_chorus_0_undefined");
+            listenerCallbacks["_chorus_0_undefined"]();
             expect(targetTurtle.singer.chorusRate.length).toBe(0);
+        });
+
+        it("should give nested Chorus blocks their own cleanup listener", () => {
+            Singer.ToneActions.doChorus(1.5, 20, 50, 0, 1);
+            Singer.ToneActions.doChorus(2.0, 30, 80, 0, 2);
+            expect(targetTurtle.singer.chorusRate).toEqual([1.5, 2.0]);
+            expect(targetTurtle.singer.delayTime).toEqual([20, 30]);
+            expect(targetTurtle.singer.chorusDepth).toEqual([0.5, 0.8]);
+
+            listenerCallbacks["_chorus_0_2"]();
+            expect(targetTurtle.singer.chorusRate).toEqual([1.5]);
+            expect(targetTurtle.singer.delayTime).toEqual([20]);
+            expect(targetTurtle.singer.chorusDepth).toEqual([0.5]);
+
+            listenerCallbacks["_chorus_0_1"]();
+            expect(targetTurtle.singer.chorusRate).toEqual([]);
+            expect(targetTurtle.singer.delayTime).toEqual([]);
+            expect(targetTurtle.singer.chorusDepth).toEqual([]);
         });
     });
 
@@ -547,10 +619,10 @@ describe("setupToneActions", () => {
             expect(targetTurtle.singer.rate).toContain(2);
             expect(targetTurtle.singer.octaves).toContain(3);
             expect(targetTurtle.singer.baseFrequency).toContain(100);
-            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_phaser_0");
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_phaser_0_1");
 
-            if (listenerCallbacks["_phaser_0"]) {
-                listenerCallbacks["_phaser_0"]();
+            if (listenerCallbacks["_phaser_0_1"]) {
+                listenerCallbacks["_phaser_0_1"]();
                 expect(targetTurtle.singer.rate.length).toBe(0);
                 expect(targetTurtle.singer.octaves.length).toBe(0);
                 expect(targetTurtle.singer.baseFrequency.length).toBe(0);
@@ -562,7 +634,7 @@ describe("setupToneActions", () => {
             mouse.MB.listeners = [];
             Singer.ToneActions.doPhaser(2, 3, 100, 0, 999);
             expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
-            expect(mouse.MB.listeners).toContain("_phaser_0");
+            expect(mouse.MB.listeners).toContain("_phaser_0_999");
         });
 
         it("should NOT register a mouse listener when blk is undefined", () => {
@@ -570,7 +642,7 @@ describe("setupToneActions", () => {
             const mouse = Mouse.getMouseFromTurtle(targetTurtle);
             mouse.MB.listeners = [];
             Singer.ToneActions.doPhaser(2, 3, 100, 0);
-            expect(mouse.MB.listeners).not.toContain("_phaser_0");
+            expect(mouse.MB.listeners).not.toContain("_phaser_0_undefined");
             MusicBlocks.isRun = true;
         });
 
@@ -578,9 +650,27 @@ describe("setupToneActions", () => {
             const mouse = Mouse.getMouseFromTurtle(targetTurtle);
             mouse.MB.listeners = [];
             Singer.ToneActions.doPhaser(2, 3, 100, 0);
-            expect(mouse.MB.listeners).toContain("_phaser_0");
-            listenerCallbacks["_phaser_0"]();
+            expect(mouse.MB.listeners).toContain("_phaser_0_undefined");
+            listenerCallbacks["_phaser_0_undefined"]();
             expect(targetTurtle.singer.rate.length).toBe(0);
+        });
+
+        it("should give nested Phaser blocks their own cleanup listener", () => {
+            Singer.ToneActions.doPhaser(2, 3, 100, 0, 1);
+            Singer.ToneActions.doPhaser(4, 5, 200, 0, 2);
+            expect(targetTurtle.singer.rate).toEqual([2, 4]);
+            expect(targetTurtle.singer.octaves).toEqual([3, 5]);
+            expect(targetTurtle.singer.baseFrequency).toEqual([100, 200]);
+
+            listenerCallbacks["_phaser_0_2"]();
+            expect(targetTurtle.singer.rate).toEqual([2]);
+            expect(targetTurtle.singer.octaves).toEqual([3]);
+            expect(targetTurtle.singer.baseFrequency).toEqual([100]);
+
+            listenerCallbacks["_phaser_0_1"]();
+            expect(targetTurtle.singer.rate).toEqual([]);
+            expect(targetTurtle.singer.octaves).toEqual([]);
+            expect(targetTurtle.singer.baseFrequency).toEqual([]);
         });
     });
 
@@ -589,9 +679,9 @@ describe("setupToneActions", () => {
             Singer.ToneActions.doTremolo(5, 50, 0, 1);
             expect(targetTurtle.singer.tremoloFrequency).toContain(5);
             expect(targetTurtle.singer.tremoloDepth).toContain(0.5);
-            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_tremolo_0");
-            if (listenerCallbacks["_tremolo_0"]) {
-                listenerCallbacks["_tremolo_0"]();
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_tremolo_0_1");
+            if (listenerCallbacks["_tremolo_0_1"]) {
+                listenerCallbacks["_tremolo_0_1"]();
                 expect(targetTurtle.singer.tremoloFrequency.length).toBe(0);
                 expect(targetTurtle.singer.tremoloDepth.length).toBe(0);
             }
@@ -630,7 +720,7 @@ describe("setupToneActions", () => {
             mouse.MB.listeners = [];
             Singer.ToneActions.doTremolo(5, 50, 0, 999);
             expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
-            expect(mouse.MB.listeners).toContain("_tremolo_0");
+            expect(mouse.MB.listeners).toContain("_tremolo_0_999");
         });
 
         it("should NOT register a mouse listener when blk is undefined", () => {
@@ -638,7 +728,7 @@ describe("setupToneActions", () => {
             const mouse = Mouse.getMouseFromTurtle(targetTurtle);
             mouse.MB.listeners = [];
             Singer.ToneActions.doTremolo(5, 50, 0);
-            expect(mouse.MB.listeners).not.toContain("_tremolo_0");
+            expect(mouse.MB.listeners).not.toContain("_tremolo_0_undefined");
             MusicBlocks.isRun = true;
         });
 
@@ -646,9 +736,24 @@ describe("setupToneActions", () => {
             const mouse = Mouse.getMouseFromTurtle(targetTurtle);
             mouse.MB.listeners = [];
             Singer.ToneActions.doTremolo(5, 50, 0);
-            expect(mouse.MB.listeners).toContain("_tremolo_0");
-            listenerCallbacks["_tremolo_0"]();
+            expect(mouse.MB.listeners).toContain("_tremolo_0_undefined");
+            listenerCallbacks["_tremolo_0_undefined"]();
             expect(targetTurtle.singer.tremoloFrequency.length).toBe(0);
+        });
+
+        it("should give nested Tremolo blocks their own cleanup listener", () => {
+            Singer.ToneActions.doTremolo(5, 50, 0, 1);
+            Singer.ToneActions.doTremolo(10, 80, 0, 2);
+            expect(targetTurtle.singer.tremoloFrequency).toEqual([5, 10]);
+            expect(targetTurtle.singer.tremoloDepth).toEqual([0.5, 0.8]);
+
+            listenerCallbacks["_tremolo_0_2"]();
+            expect(targetTurtle.singer.tremoloFrequency).toEqual([5]);
+            expect(targetTurtle.singer.tremoloDepth).toEqual([0.5]);
+
+            listenerCallbacks["_tremolo_0_1"]();
+            expect(targetTurtle.singer.tremoloFrequency).toEqual([]);
+            expect(targetTurtle.singer.tremoloDepth).toEqual([]);
         });
     });
 
@@ -656,9 +761,9 @@ describe("setupToneActions", () => {
         it("should apply distortion effect correctly", () => {
             Singer.ToneActions.doDistortion(50, 0, 1);
             expect(targetTurtle.singer.distortionAmount).toContain(0.5);
-            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_distortion_0");
-            if (listenerCallbacks["_distortion_0"]) {
-                listenerCallbacks["_distortion_0"]();
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_distortion_0_1");
+            if (listenerCallbacks["_distortion_0_1"]) {
+                listenerCallbacks["_distortion_0_1"]();
                 expect(targetTurtle.singer.distortionAmount.length).toBe(0);
             }
         });
@@ -694,7 +799,7 @@ describe("setupToneActions", () => {
             mouse.MB.listeners = [];
             Singer.ToneActions.doDistortion(50, 0, 999);
             expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
-            expect(mouse.MB.listeners).toContain("_distortion_0");
+            expect(mouse.MB.listeners).toContain("_distortion_0_999");
         });
 
         it("should NOT register a mouse listener when blk is undefined", () => {
@@ -702,7 +807,7 @@ describe("setupToneActions", () => {
             const mouse = Mouse.getMouseFromTurtle(targetTurtle);
             mouse.MB.listeners = [];
             Singer.ToneActions.doDistortion(50, 0);
-            expect(mouse.MB.listeners).not.toContain("_distortion_0");
+            expect(mouse.MB.listeners).not.toContain("_distortion_0_undefined");
             MusicBlocks.isRun = true;
         });
 
@@ -710,9 +815,21 @@ describe("setupToneActions", () => {
             const mouse = Mouse.getMouseFromTurtle(targetTurtle);
             mouse.MB.listeners = [];
             Singer.ToneActions.doDistortion(50, 0);
-            expect(mouse.MB.listeners).toContain("_distortion_0");
-            listenerCallbacks["_distortion_0"]();
+            expect(mouse.MB.listeners).toContain("_distortion_0_undefined");
+            listenerCallbacks["_distortion_0_undefined"]();
             expect(targetTurtle.singer.distortionAmount.length).toBe(0);
+        });
+
+        it("should give nested Distortion blocks their own cleanup listener", () => {
+            Singer.ToneActions.doDistortion(50, 0, 1);
+            Singer.ToneActions.doDistortion(80, 0, 2);
+            expect(targetTurtle.singer.distortionAmount).toEqual([0.5, 0.8]);
+
+            listenerCallbacks["_distortion_0_2"]();
+            expect(targetTurtle.singer.distortionAmount).toEqual([0.5]);
+
+            listenerCallbacks["_distortion_0_1"]();
+            expect(targetTurtle.singer.distortionAmount).toEqual([]);
         });
     });
 
@@ -750,6 +867,31 @@ describe("setupToneActions", () => {
                 "Partial must be greater than or equal to 0."
             );
             expect(activity.logo.stopTurtle).toBe(true);
+        });
+
+        it("should show error for NaN harmonic value", () => {
+            Singer.ToneActions.doHarmonic(NaN, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Partial must be greater than or equal to 0."
+            );
+            expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.partials).toHaveLength(0);
+        });
+
+        it.each([1223, 1e9, Infinity])("should reject out-of-range harmonic %p", value => {
+            Singer.ToneActions.doHarmonic(value, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Partial must be less than or equal to 1222.",
+                1
+            );
+            expect(activity.logo.stopTurtle).toBe(true);
+            expect(targetTurtle.singer.partials).toHaveLength(0);
+        });
+
+        it("should accept the largest harmonic value", () => {
+            Singer.ToneActions.doHarmonic(1222, 0, 1);
+            expect(targetTurtle.singer.partials[0]).toHaveLength(1223);
+            expect(last(targetTurtle.singer.partials[0])).toBe(1);
         });
 
         it("should handle zero harmonic value", () => {

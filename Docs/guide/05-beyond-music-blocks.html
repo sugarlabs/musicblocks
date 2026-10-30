@@ -14,22 +14,27 @@
       table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
       th, td { border: 1px solid #ddd; padding: 8px; }
       th { background-color: #f2f2f2; text-align: left; }
+      @media(min-width:992px){.row{display:flex;}.sidebar-sticky{position: sticky;top: 20px;}}
     </style>
+    <link rel="stylesheet" href="guide-theme.css" />
+    <script src="guide-theme.js"></script>
   </head>
   <body>
     <div class="container-fluid" style="max-width: 1200px;">
       <div class="row">
         <div class="col-md-3 sidebar">
-          <h4 style="margin-top: 0;">Navigation</h4>
-          <ul class="nav nav-pills nav-stacked" style="position: sticky; top: 20px;">
-	    <li><a href="index.html">Introduction</a></li>
-	    <li><a href="01-getting-started.html">1. Getting Started</a></li>
-	    <li><a href="02-making-sounds.html">2. Making Sounds</a></li>
-	    <li><a href="03-programming-with-music.html">3. Programming with Music</a></li>
-	    <li><a href="04-widgets.html">4. Widgets</a></li>
-	    <li class="active"><a href="05-beyond-music-blocks.html">5. Beyond Music Blocks</a></li>
-	    <li><a href="06-appendix.html">6. Appendix</a></li>
-	  </ul>
+		  <nav class="sidebar-sticky">
+            <h4 style="margin-top: 0;">Navigation</h4>
+            <ul class="nav nav-pills nav-stacked">
+              <li><a href="index.html">Introduction</a></li>
+              <li><a href="01-getting-started.html">1. Getting Started</a></li>
+              <li><a href="02-making-sounds.html">2. Making Sounds</a></li>
+	          <li><a href="03-programming-with-music.html">3. Programming with Music</a></li>
+	          <li><a href="04-widgets.html">4. Widgets</a></li>
+	          <li class="active"><a href="05-beyond-music-blocks.html">5. Beyond Music Blocks</a></li>
+	          <li><a href="06-appendix.html">6. Appendix</a></li>
+            </ul>
+		  </nav>
         </div>
         <div class="col-md-9 content">
           <p>
@@ -73,6 +78,19 @@
 	  </code></pre>
 	  <p><img alt="sheet music" src="./hotdog.png" title="sheet music" /></p>
 	  <p><a href="https://musicblocks.sugarlabs.org/index.html?id=1523043053377623&amp;run=True">RUN LIVE</a></p>
+	  <h3><a name="RECORD-NOTATION">5.1.1 Recording Notation from a Program</a></h3>
+	  <p><img alt="record notation" src="./lilypond3.svg" title="Using the Record notation and Save as Lilypond blocks" /></p>
+	  <p>The <em>Save as Lilypond</em> option from the Save menu works for a program
+	    that plays the same music every time. For an interactive program, such
+	    as a game, use the <em>Record notation</em> block to record the music as it is
+	    played. In the example above, each note's pitch follows the cursor, so
+	    what is recorded and saved to <code>song.ly</code> is what you played.</p>
+	  <p>The <em>Save as Lilypond</em>, <em>Save as ABC</em> and <em>Save as MusicXML</em> blocks
+	    save what has been recorded so far, under the file name in the block.
+	    A program can save more than once, for example at the end of each
+	    level. Each mouse records its own part, and every run starts a new
+	    recording. The <em>Save as SVG</em> block saves the mouse artwork. These
+	    blocks are on the <em>Extras</em> palette (Only available in Advanced Mode).</p>
 	  <h2><a name="EXPORTS">5.2 Other Exports</a></h2>
 	  <p>In addition to Lilypond, there are several other export formats
 	    supported, including ABC, MusicXML, WAV, SVG, and PNG.</p>

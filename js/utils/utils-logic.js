@@ -59,7 +59,7 @@ var deepClone = obj => {
     if (Array.isArray(obj)) return obj.map(item => deepClone(item));
     const cloned = {};
     for (const key in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        if (Object.prototype.hasOwnProperty.call(obj, key) && !isUnsafeObjectKey(key)) {
             cloned[key] = deepClone(obj[key]);
         }
     }
@@ -70,7 +70,7 @@ var deepClone = obj => {
  * Extracts the file extension from a filename or URL.
  */
 var fileExt = file => {
-    if (file === null) {
+    if (typeof file !== "string") {
         return "";
     }
 
@@ -86,7 +86,7 @@ var fileExt = file => {
  * Extracts the base name (filename without extension) from a filename or URL.
  */
 var fileBasename = file => {
-    if (file === null) {
+    if (typeof file !== "string") {
         return "";
     }
 
@@ -208,10 +208,13 @@ var isUnsafeObjectKey = key => RESERVED_OBJECT_KEYS.includes(key);
  */
 var toFixed2 = n => {
     if (typeof n !== "number") return n;
-    const s = n.toString();
-    const decimalIndex = s.indexOf(".");
-    if (decimalIndex === -1) return s;
-    return n.toFixed(2).replace(/\.?0+$/, "");
+    // Integers are shown as they are. Everything else is rounded, including values
+    // whose toString() has no "." because it is in exponent form: a turtle at x = 0
+    // after a quarter turn holds 6.1e-15, which used to be shown as "6.123...e-15".
+    if (Number.isInteger(n)) return n.toString();
+    const s = n.toFixed(2).replace(/\.?0+$/, "");
+    // A small negative value rounds to "-0.00", which should read as 0.
+    return s === "-0" ? "0" : s;
 };
 
 /**
@@ -243,37 +246,50 @@ var LCD = (a, b) => {
  */
 var toFraction = d => {
     // Convert float to its approximate fractional representation.
-    let flip = false;
-    if (d > 1) {
-        flip = true;
-        d = 1 / d;
-    }
+    if (d === 0) return [0, 2];
+    if (isNaN(d) || !isFinite(d)) return [0, 1];
 
-    let df = 1.0;
-    let top = 1;
-    let bot = 1;
+    const sign = Math.sign(d);
+    const tolerance = 1e-7;
+    const maxDenominator = 20000;
 
-    let iterGuard = 0;
-    while (Math.abs(df - d) > 0.00000001) {
-        if (iterGuard++ > 10000) {
+    let h0 = 0;
+    let h1 = 1;
+    let k0 = 1;
+    let k1 = 0;
+    let b = Math.abs(d);
+
+    let iterations = 0;
+    const maxIterations = 50;
+
+    while (iterations++ < maxIterations) {
+        const a = Math.floor(b);
+        const h2 = a * h1 + h0;
+        const k2 = a * k1 + k0;
+
+        if (k2 > maxDenominator) {
             break;
         }
-        if (df < d) {
-            top += 1;
-        } else {
-            bot += 1;
-            top = parseInt(d * bot, 10);
+
+        h0 = h1;
+        h1 = h2;
+        k0 = k1;
+        k1 = k2;
+
+        const diff = b - a;
+        if (Math.abs(Math.abs(d) - h1 / k1) <= tolerance || Math.abs(diff) < 1e-12) {
+            break;
         }
-        df = top / bot;
+
+        b = 1 / diff;
     }
 
-    if (flip) {
-        const tmp = top;
-        top = bot;
-        bot = tmp;
+    if (h1 === 0 || k1 === 0) {
+        h1 = 1;
+        k1 = maxDenominator;
     }
 
-    return [top, bot];
+    return [sign * h1, k1];
 };
 
 /**
@@ -290,9 +306,8 @@ var isInt = value => {
  * Convert float to its approximate fractional representation.
  *
  * Returns a reduced [numerator, denominator] pair with a positive denominator.
- * Values above 1 are handled by inverting on entry and swapping back on
- * every exit path (including the iteration-cap path); the sign of the
- * input is carried on the numerator.
+ * Uses continued fraction expansion to converge in logarithmic steps rather than
+ * linear brute-force stepping.
  */
 function rationalToFraction(d) {
     if (d === 0 || isNaN(d) || !isFinite(d)) {
@@ -302,44 +317,49 @@ function rationalToFraction(d) {
     const sign = Math.sign(d);
     d = Math.abs(d);
 
-    let invert = d > 1;
-    if (invert) {
-        d = 1 / d;
-    }
+    const tolerance = 1e-7;
+    const maxDenominator = 20000;
 
-    let df = 1.0;
-    let top = 1;
-    let bot = 1;
+    let h0 = 0;
+    let h1 = 1;
+    let k0 = 1;
+    let k1 = 0;
+    let b = d;
+
     let iterations = 0;
-    const maxIterations = 10000;
+    const maxIterations = 50;
 
-    while (Math.abs(df - d) > 0.00000001 && iterations < maxIterations) {
-        if (df < d) {
-            top += 1;
-        } else {
-            bot += 1;
-            top = Math.round(d * bot);
+    while (iterations++ < maxIterations) {
+        const a = Math.floor(b);
+        const h2 = a * h1 + h0;
+        const k2 = a * k1 + k0;
+
+        if (k2 > maxDenominator) {
+            break;
         }
 
-        df = top / bot;
-        iterations++;
+        h0 = h1;
+        h1 = h2;
+        k0 = k1;
+        k1 = k2;
+
+        const diff = b - a;
+        if (Math.abs(d - h1 / k1) <= tolerance || Math.abs(diff) < 1e-12) {
+            break;
+        }
+
+        b = 1 / diff;
     }
 
-    // Swap back on every exit path, including the iteration cap.
-    if (invert) {
-        const temp = top;
-        top = bot;
-        bot = temp;
-    }
-
-    if (bot === 0 || top === 0) {
-        return [0, 1];
+    if (k1 === 0 || h1 === 0) {
+        h1 = 1;
+        k1 = maxDenominator;
     }
 
     // Reduce the result so it comes back in standard musical subdivision form.
-    const divisor = GCD(top, bot);
-    top /= divisor;
-    bot /= divisor;
+    const divisor = GCD(h1, k1);
+    const top = h1 / divisor;
+    const bot = k1 / divisor;
 
     return [sign * top, bot];
 }
@@ -355,6 +375,10 @@ function rationalToFraction(d) {
 var mixedNumber = d => {
     if (typeof d !== "number") {
         return d;
+    }
+
+    if (!Number.isFinite(d)) {
+        return String(d);
     }
 
     const sign = d < 0 ? "-" : "";
@@ -450,6 +474,9 @@ var rationalSum = (a, b) => {
  * Finds the nearest beat for a given fraction.
  */
 var nearestBeat = (d, b) => {
+    if (typeof b !== "number" || b <= 0 || !Number.isFinite(b) || !Number.isFinite(d)) {
+        return [0, typeof b === "number" && Number.isFinite(b) && b > 0 ? b : 0];
+    }
     let sum = 1 / (2 * b);
     let count = 0;
     const dd = d / 100;
@@ -662,7 +689,7 @@ var toArray = val => {
  * @returns {string} Formatted duration string e.g. "02:05" or "01:01:05", defaulting to "00:00" for invalid inputs
  */
 var formatSeconds = seconds => {
-    if (seconds === null || seconds === undefined) return "00:00";
+    if (typeof seconds !== "number" && typeof seconds !== "string") return "00:00";
     const num = Number(seconds);
     if (!Number.isFinite(num) || num < 0) return "00:00";
 

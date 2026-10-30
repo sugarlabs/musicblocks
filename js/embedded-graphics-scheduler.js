@@ -148,7 +148,7 @@ class EmbeddedGraphicsScheduler {
                     break;
 
                 case "clear":
-                    this._clear(tur, suppressOutput);
+                    this._clear(tur, suppressOutput, waitTime);
                     break;
 
                 case "fill":
@@ -276,7 +276,7 @@ class EmbeddedGraphicsScheduler {
                     tur.painter.doSetValue(arg);
                     break;
                 case "settranslucency":
-                    tur.painter.doSetPenAlpha(arg);
+                    tur.painter.doSetTranslucency(arg);
                     break;
                 case "setgrey":
                     tur.painter.doSetChroma(arg);
@@ -298,7 +298,7 @@ class EmbeddedGraphicsScheduler {
         }
     }
 
-    _clear(tur, suppressOutput) {
+    _clear(tur, suppressOutput, timeout) {
         const logo = this._logo;
         if (suppressOutput) {
             const savedPenState = tur.painter.penState;
@@ -308,11 +308,16 @@ class EmbeddedGraphicsScheduler {
             tur.painter.penState = savedPenState;
             logo.svgBackground = true;
         } else {
-            tur.painter.penState = false;
-            tur.painter.doSetHeading(0);
-            tur.painter.doSetXY(0, 0);
-            tur.painter.penState = true;
-            // tur.painter.doClear(true, true, true);
+            // Same as the Clear block outside a note, in turn with the
+            // note's other graphics.
+            logo._timerManager.setGuardedTimeout(
+                () => {
+                    logo.svgBackground = true;
+                    tur.painter.doClear(true, true, true);
+                },
+                timeout,
+                () => logo.stopTurtle
+            );
         }
     }
 
@@ -384,19 +389,19 @@ class EmbeddedGraphicsScheduler {
                 const deltaArg = arg / (NOTEDIV / tur.singer.dispatchFactor);
                 if (t === 0) {
                     logo._timerManager.setGuardedTimeout(
-                        () => tur.painter.doForward(deltaArg, "first"),
+                        () => tur.painter.doForward(deltaArg, "first", arg),
                         deltaTime,
                         () => logo.stopTurtle
                     );
                 } else if (t === Math.ceil(NOTEDIV / tur.singer.dispatchFactor) - 1) {
                     logo._timerManager.setGuardedTimeout(
-                        () => tur.painter.doForward(deltaArg, "last"),
+                        () => tur.painter.doForward(deltaArg, "last", arg),
                         deltaTime,
                         () => logo.stopTurtle
                     );
                 } else {
                     logo._timerManager.setGuardedTimeout(
-                        () => tur.painter.doForward(deltaArg, "middle"),
+                        () => tur.painter.doForward(deltaArg, "middle", arg),
                         deltaTime,
                         () => logo.stopTurtle
                     );

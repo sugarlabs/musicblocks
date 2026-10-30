@@ -55,6 +55,46 @@ const escapeLilypondString = text => String(text).replace(/\\/g, "\\\\").replace
 
 const toLilypondString = text => '"' + escapeLilypondString(text) + '"';
 
+/**
+ * Reads the beat a tempo or a pickup is staged with. notation.js stages it as a Lilypond
+ * duration (convertFactor() in js/utils/musicutils-rhythm.js), which is a sum of them when
+ * the beat is tied: "4 16" for five sixteenths. Lilypond takes one duration, so the beat
+ * comes back as a count of the note the sum divides into.
+ * @param {string} beat - space separated note values, each optionally dotted.
+ * @returns {{duration: string, beats: number}|null} e.g. "4." once, or "16" five times for
+ *   "4 16"; null unless every token is a note value Lilypond reads.
+ */
+const lilypondBeat = beat => {
+    const tokens = String(beat).trim().split(/\s+/);
+    const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
+
+    // Add the tokens up as a fraction of a whole note. A note value is a power of two and
+    // a dot adds half of what came before it, so the total is always a whole number of
+    // 1/denominator notes.
+    let numerator = 0;
+    let denominator = 1;
+    for (const token of tokens) {
+        const match = /^(\d+)(\.*)$/.exec(token);
+        // A Lilypond note value is a power of two, so "3" is not one to pass along.
+        if (match === null || !Number.isInteger(Math.log2(Number(match[1])))) return null;
+        // A note value v with k dots lasts (2^(k + 1) - 1) / (v * 2^k) of a whole note.
+        const dots = match[2].length;
+        const tokenDenominator = Number(match[1]) * Math.pow(2, dots);
+        const tokenNumerator = Math.pow(2, dots + 1) - 1;
+        numerator = numerator * tokenDenominator + tokenNumerator * denominator;
+        denominator = denominator * tokenDenominator;
+        const divisor = gcd(numerator, denominator);
+        numerator = numerator / divisor;
+        denominator = denominator / divisor;
+    }
+
+    // A single duration is one Lilypond already reads, and it keeps the dots a sum of
+    // notes would lose.
+    return tokens.length === 1
+        ? { duration: tokens[0], beats: 1 }
+        : { duration: String(denominator), beats: numerator };
+};
+
 const processLilypondNotes = (lilypond, logo, turtle) => {
     // obj = [instructions] or
     // obj = [note, duration, dotCount, tupletValue, roundDown, insideChord, staccato]
@@ -83,9 +123,12 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             "𝄫": "eses",
             "♯": "is",
             "♭": "es",
+            "-2": ",,,,,",
+            "-1": ",,,,",
             "10": "'''''''",
-            "1": ",, ",
-            "2": ", ",
+            "0": ",,,",
+            "1": ",,",
+            "2": ",",
             "3": "",
             "4": "'",
             "5": "''",
@@ -96,8 +139,9 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
         };
 
         return (
-            note.replace(/[♮♯♭𝄪𝄫]|10|[1-9]/gu, match => replacements[match]).toLowerCase() +
-            (natural ? "!" : "")
+            note
+                .replace(/[♮♯♭𝄪𝄫]|10|-[12]|[0-9]/gu, match => replacements[match] ?? match)
+                .toLowerCase() + (natural ? "!" : "")
         );
     };
 
@@ -105,8 +149,43 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
     let queueSlur = false;
     let queueCrescendo = false;
     let queueDecrescendo = false;
-    // With nested forevers, only the innermost one ever repeats.
-    const repeatStart = logo.notation.notationStaging[turtle].lastIndexOf("begin repeat");
+    // With nested forevers, only the innermost one ever repeats, and a
+    // forever with no notes after it has nothing to repeat.
+    const staged = logo.notation.notationStaging[turtle];
+    const lastRepeat = staged.lastIndexOf("begin repeat");
+    const repeatStart = staged.slice(lastRepeat + 1).some(Array.isArray) ? lastRepeat : -1;
+    // Lilypond cannot end a slur or hairpin on the note it starts on ("cannot end
+    // slur", "unterminated slur"), so one that covers fewer than two notes is left
+    // out: both its begin and its end marker are skipped.
+    const skippedSpanners = new Set();
+    const openSpanners = { slur: [], crescendo: [], decrescendo: [] };
+    let notesStaged = 0;
+    for (let s = 0; s < staged.length; s++) {
+        const entry = staged[s];
+        if (Array.isArray(entry)) {
+            notesStaged++;
+            continue;
+        }
+        if (entry === "markup" || entry === "markdown") {
+            s++; // The text that follows is not a marker.
+            continue;
+        }
+        const match =
+            typeof entry === "string" && entry.match(/^(begin|end) (slur|crescendo|decrescendo)$/);
+        if (!match) {
+            continue;
+        }
+        const [, edge, kind] = match;
+        if (edge === "begin") {
+            openSpanners[kind].push({ index: s, notesBefore: notesStaged });
+        } else if (openSpanners[kind].length > 0) {
+            const begin = openSpanners[kind].pop();
+            if (notesStaged - begin.notesBefore < 2) {
+                skippedSpanners.add(begin.index);
+                skippedSpanners.add(s);
+            }
+        }
+    }
     let articulation = false;
     let targetDuration = 0;
     let tupletDuration = 0;
@@ -143,6 +222,14 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
 
             notes = logo.notation.notationStaging[turtle][i + j][NOTATIONNOTE];
             if (typeof notes === "object") {
+                // A staged note with no pitches is silence for its duration, the same as
+                // one staged as ["R"], which is what the note outside a tuplet does with
+                // it. Without this nothing is written for the note and its duration runs
+                // on from the note before it, giving "g' 44", which is not a duration.
+                if (notes.length === 0) {
+                    notes = ["R"];
+                }
+
                 if (notes.length > 1) {
                     logo.notationNotes[turtle] += "<";
                 }
@@ -190,7 +277,9 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
         while (
             ["end slur", "end crescendo", "end decrescendo", "markup", "markdown"].includes(nextObj)
         ) {
-            if (nextObj === "end slur") {
+            if (skippedSpanners.has(i + j)) {
+                j += 1; // Its begin marker was skipped too.
+            } else if (nextObj === "end slur") {
                 logo.notationNotes[turtle] += ")  ";
                 j += 1;
             } else if (nextObj === "end crescendo" || nextObj === "end decrescendo") {
@@ -219,22 +308,36 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
     };
 
     for (let i = 0; i < logo.notation.notationStaging[turtle].length; i++) {
+        if (skippedSpanners.has(i)) {
+            continue;
+        }
         let obj = logo.notation.notationStaging[turtle][i];
         if (typeof obj === "string") {
             switch (obj) {
                 case "swing":
                     logo.notationNotes[turtle] += "\\tempo swing\n";
                     break;
-                case "tempo":
-                    // Lilypond only accepts a whole number of beats per minute.
-                    logo.notationNotes[turtle] +=
-                        "\\tempo " +
-                        logo.notation.notationStaging[turtle][i + 2] +
-                        " = " +
-                        Math.round(logo.notation.notationStaging[turtle][i + 1]) +
-                        "\n";
+                case "tempo": {
+                    // The same tempo counted in the note the beat divides into, because
+                    // Lilypond has nowhere to put the rest of a tied beat.
+                    const tempoBeat = lilypondBeat(logo.notation.notationStaging[turtle][i + 2]);
+                    // What Lilypond needs as a whole unsigned number is the count after
+                    // the "=", not the beats per minute, so the beat is counted first and
+                    // the tempo left out only if that count is not one, the way abc.js and
+                    // mxml.js leave out a tempo they cannot write.
+                    const beatsPerMinute =
+                        tempoBeat === null
+                            ? NaN
+                            : Math.round(
+                                  logo.notation.notationStaging[turtle][i + 1] * tempoBeat.beats
+                              );
+                    if (Number.isFinite(beatsPerMinute) && beatsPerMinute > 0) {
+                        logo.notationNotes[turtle] +=
+                            "\\tempo " + tempoBeat.duration + " = " + beatsPerMinute + "\n";
+                    }
                     i += 2;
                     break;
+                }
                 case "markup":
                     logo.notationNotes[turtle] +=
                         "^\\markup { \\abs-fontsize #6 { " +
@@ -405,11 +508,20 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                         "\n";
                     i += 2;
                     break;
-                case "pickup":
-                    logo.notationNotes[turtle] +=
-                        " \\partial " + logo.notation.notationStaging[turtle][i + 1] + "\n";
+                case "pickup": {
+                    // \partial takes a duration, so a tied beat goes in as that many of
+                    // the note it divides into: five sixteenths is "\partial 16*5".
+                    const pickupBeat = lilypondBeat(logo.notation.notationStaging[turtle][i + 1]);
+                    if (pickupBeat !== null) {
+                        logo.notationNotes[turtle] +=
+                            " \\partial " +
+                            pickupBeat.duration +
+                            (pickupBeat.beats === 1 ? "" : "*" + pickupBeat.beats) +
+                            "\n";
+                    }
                     i += 1;
                     break;
+                }
                 case "voice one":
                     if (multivoice) {
                         logo.notationNotes[turtle] += "}\n\\new Voice { \\voiceOne ";
@@ -771,7 +883,8 @@ const saveLilypondOutput = function (activity) {
                         if (obj[0][ii] === "R") {
                             continue;
                         } else if (typeof obj[0][ii] === "string") {
-                            octaveTotal += Number(obj[0][ii].slice(-1));
+                            const match = String(obj[0][ii]).match(/(-?\d+)$/);
+                            octaveTotal += match ? Number(match[1]) : 4;
                         } else {
                             const pitchObj = frequencyToPitch(obj[0][ii]);
                             octaveTotal += pitchObj[1];
@@ -788,18 +901,13 @@ const saveLilypondOutput = function (activity) {
                 console.debug(
                     octaveTotal + " " + noteCount + " " + Math.floor(0.5 + octaveTotal / noteCount)
                 );
-                switch (Math.floor(0.5 + octaveTotal / noteCount)) {
-                    case 0:
-                    case 1:
-                    case 2:
-                        clef.push("bass_8");
-                        break;
-                    case 3:
-                        clef.push("bass");
-                        break;
-                    default:
-                        clef.push("treble");
-                        break;
+                const avgOctave = Math.floor(0.5 + octaveTotal / noteCount);
+                if (avgOctave <= 2) {
+                    clef.push("bass_8");
+                } else if (avgOctave === 3) {
+                    clef.push("bass");
+                } else {
+                    clef.push("treble");
                 }
             } else {
                 clef.push("treble");

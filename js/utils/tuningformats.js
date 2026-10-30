@@ -30,27 +30,23 @@ const parseSclFile = content => {
         throw new Error("Invalid .scl file: empty content");
     }
 
+    // Per the Scala spec, lines beginning with "!" are comments and may appear
+    // anywhere, including between the pitch count and the pitch values.
+    // The first non-comment line is the description, even if empty or numeric.
     const lines = content
         .split("\n")
         .map(l => l.trim())
-        .filter(l => l.length > 0);
+        .filter(l => !l.startsWith("!"))
+        .filter((l, i) => i === 0 || l.length > 0);
 
     let idx = 0;
-    while (idx < lines.length && lines[idx].startsWith("!")) {
-        idx++;
-    }
 
     if (idx >= lines.length) {
         throw new Error("Invalid .scl file: no description or pitch count found");
     }
 
-    let description = "";
-    let pitchCountIdx = idx;
-
-    if (!/^\d+$/.test(lines[idx])) {
-        description = lines[idx];
-        pitchCountIdx = idx + 1;
-    }
+    const description = lines[idx];
+    const pitchCountIdx = idx + 1;
 
     if (pitchCountIdx >= lines.length) {
         throw new Error("Invalid .scl file: missing pitch count");
@@ -115,10 +111,8 @@ const parseSclFile = content => {
         pitches.push({ ratio, cents });
     }
 
-    for (let j = idx; j < lines.length; j++) {
-        if (!lines[j].startsWith("!")) {
-            throw new Error("Invalid .scl file: expected " + pitchCount + " pitches, got more");
-        }
+    if (idx < lines.length) {
+        throw new Error("Invalid .scl file: expected " + pitchCount + " pitches, got more");
     }
 
     if (pitches.length !== pitchCount) {

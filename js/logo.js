@@ -254,6 +254,8 @@ class Logo {
         this.inMusicKeyboard = false;
         this._currentDrumBlock = null;
         this.inTimbre = false;
+        this.inSample = false;
+        this.inReflectionMatrix = false;
         this.inArpeggio = false;
         this.insideModeWidget = false;
         this.insideMeterWidget = false;
@@ -335,8 +337,8 @@ class Logo {
         this._syncCounter = 0;
         this._YIELD_AFTER_SYNC_RUNS = 1000;
         this._EXPORT_YIELD_AFTER_SYNC_RUNS = 100; // Sync yield threshold during exports.
-        this._iterationBudget = this._MAX_ITERATIONS + 1;
         this._MAX_ITERATIONS = 1000000;
+        this._iterationBudget = this._MAX_ITERATIONS + 1;
 
         // When running in step-by-step mode, the next command to run
         // is queued here.
@@ -485,6 +487,31 @@ class Logo {
                 }
             }
         }
+    }
+
+    /**
+     * Gets the connections of the blocks a duplicate notes clamp has broken,
+     * as _restoreConnections() will leave them, without restoring them.
+     *
+     * @returns {Map<number, Array>} block index -> connections
+     */
+    getRestoredConnections() {
+        const restored = new Map();
+        const connectionsOf = blk => {
+            if (!restored.has(blk)) restored.set(blk, [...this.blockList[blk].connections]);
+            return restored.get(blk);
+        };
+
+        for (const turtle in this.connectionStore) {
+            for (const blk in this.connectionStore[turtle]) {
+                for (const [child, c, next] of this.connectionStore[turtle][blk]) {
+                    connectionsOf(child)[c] = next;
+                    if (next !== null && next !== undefined) connectionsOf(next)[0] = child;
+                }
+            }
+        }
+
+        return restored;
     }
 
     /**
@@ -1028,6 +1055,34 @@ class Logo {
     }
 
     /**
+     * Dispatches the end-of-clamp signals a finished flow never reached,
+     * except the ones listed by index in butNotThese.
+     *
+     * @param {Object} tur - Turtle object
+     * @returns {void}
+     */
+    dispatchUnissuedSignals(tur) {
+        for (const b in tur.endOfClampSignals) {
+            const signalsLength = tur.endOfClampSignals[b].length;
+            for (let i = 0; i < signalsLength; i++) {
+                // eslint-disable-next-line eqeqeq
+                if (tur.endOfClampSignals[b][i] != null) {
+                    if (
+                        // eslint-disable-next-line eqeqeq
+                        tur.butNotThese[b] == null ||
+                        tur.butNotThese[b].indexOf(i) === -1
+                    ) {
+                        if (!tur.singer.runningFromEvent) {
+                            this.stage.dispatchEvent(tur.endOfClampSignals[b][i]);
+                            tur.endOfClampSignals[b][i] = null;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Evaluates a block connection and returns its resolved value for use by
      * the calling block.
      *
@@ -1249,14 +1304,16 @@ class Logo {
      * @param {number} turtle - Index of the active turtle.
      * @param {number} bpm - Tempo in beats per minute at the time of the note.
      * @param {string} instrument - Instrument name for the note.
+     * @param {number[]} [meter] - The meter at the time of the note, as
+     *     [beats per measure, note value per beat].
      * @returns {void}
      */
-    notationMIDI(note, drum, duration, turtle, bpm, instrument) {
+    notationMIDI(note, drum, duration, turtle, bpm, instrument, meter) {
         if (!this._midiData[turtle]) {
             this._midiData[turtle] = [];
         }
         if (drum) drum = drum[0];
-        this._midiData[turtle].push({ note, duration, bpm, instrument, drum });
+        this._midiData[turtle].push({ note, duration, bpm, instrument, drum, meter });
     }
 
     // ========================================================================
@@ -1580,10 +1637,21 @@ class Logo {
                     this._unhighlightStepQueue[turtle] = null;
                 }
 
-                const blk = this.stepQueue[turtle].pop();
-                // eslint-disable-next-line eqeqeq
-                if (blk != null) {
-                    this.runFromBlockNow(this, turtle, blk, 0, null);
+                const stepItem = this.stepQueue[turtle].shift();
+                if (stepItem !== null && stepItem !== undefined) {
+                    const blk =
+                        typeof stepItem === "object" && stepItem !== null ? stepItem.blk : stepItem;
+                    const isflow =
+                        typeof stepItem === "object" && stepItem !== null
+                            ? (stepItem.isflow ?? 0)
+                            : 0;
+                    const receivedArg =
+                        typeof stepItem === "object" && stepItem !== null
+                            ? (stepItem.receivedArg ?? null)
+                            : null;
+                    if (blk !== null && blk !== undefined) {
+                        this.runFromBlockNow(this, turtle, blk, isflow, receivedArg);
+                    }
                 }
             }
         }
@@ -1764,8 +1832,15 @@ class Logo {
         this.inLegoWidget = false;
         this.inMusicKeyboard = false;
         this.inTimbre = false;
+        this.inSample = false;
+        this.inTempo = false;
+        this.inPitchSlider = false;
+        this.inPitchStaircase = false;
+        this.inReflectionMatrix = false;
+        this.inOscilloscope = false;
         this.inArpeggio = false;
         this.inRhythmRuler = false;
+        this.inTempo = false;
         this.insideModeWidget = false;
         this.insideMeterWidget = false;
         this.insideTemperament = false;
@@ -1847,6 +1922,7 @@ class Logo {
             turtle.parentFlowQueue = [];
             turtle.unhighlightQueue = [];
             turtle.parameterQueue = [];
+            turtle.actionBoundaries = [];
         }
 
         if (this.turtleDelay === 0) {
@@ -1894,6 +1970,7 @@ class Logo {
             tur.parentFlowQueue = [];
             tur.unhighlightQueue = [];
             tur.parameterQueue = [];
+            tur.actionBoundaries = [];
 
             tur.running = true;
             this.runFromBlock(this, turtle, startHere, 0, env);
@@ -1913,6 +1990,7 @@ class Logo {
                     tur.parentFlowQueue = [];
                     tur.unhighlightQueue = [];
                     tur.parameterQueue = [];
+                    tur.actionBoundaries = [];
 
                     tur.running = true;
                     delayStart = 250;
@@ -1942,6 +2020,7 @@ class Logo {
                             tur.parentFlowQueue = [];
                             tur.unhighlightQueue = [];
                             tur.parameterQueue = [];
+                            tur.actionBoundaries = [];
 
                             if (!tur.inTrash) {
                                 tur.running = true;
@@ -2026,7 +2105,11 @@ class Logo {
                 if (!(turtle in logo.stepQueue)) {
                     logo.stepQueue[turtle] = [];
                 }
-                logo.stepQueue[turtle].push(blk);
+                logo.stepQueue[turtle].push({
+                    blk: blk,
+                    isflow: isflow,
+                    receivedArg: receivedArg
+                });
             } else if (
                 logo.turtleDelay === 0 &&
                 delay > 0 &&
@@ -2146,6 +2229,7 @@ class Logo {
 ===========================================================================
 */
         const tur = logo.turtles.ithTurtle(turtle);
+        if (tur && !tur.actionBoundaries) tur.actionBoundaries = [];
         const args = [];
 
         if (proto.args > 0) {
@@ -2292,11 +2376,29 @@ class Logo {
                 if (cf !== undefined) childFlow = cf;
                 if (cfc !== undefined) childFlowCount = cfc;
                 if (ret) {
-                    if (profilingEnabled) {
-                        Logo._recordBlockTiming(logo, blk, profilingStart);
-                        tracker.exitBlock();
+                    if (currentBlock.name === "return") {
+                        const boundary =
+                            tur.actionBoundaries && tur.actionBoundaries.length > 0
+                                ? tur.actionBoundaries.pop()
+                                : queueStart;
+                        while (tur.queue.length > boundary) {
+                            const popped = tur.queue.pop();
+                            if (popped && popped.blk in tur.endOfClampSignals) {
+                                while (tur.endOfClampSignals[popped.blk].length > 0) {
+                                    const signal = tur.endOfClampSignals[popped.blk].pop();
+                                    if (signal !== null && signal !== undefined) {
+                                        logo.stage.dispatchEvent(signal);
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        if (profilingEnabled) {
+                            Logo._recordBlockTiming(logo, blk, profilingStart);
+                            tracker.exitBlock();
+                        }
+                        return ret;
                     }
-                    return ret;
                 }
             }
         } else {
@@ -2383,6 +2485,12 @@ class Logo {
             // eslint-disable-next-line eqeqeq
             if (tur.parentFlowQueue != undefined) {
                 tur.parentFlowQueue.push(blk);
+                if (["do", "nameddo", "doArg", "nameddoArg"].includes(blockName)) {
+                    if (!tur.actionBoundaries) {
+                        tur.actionBoundaries = [];
+                    }
+                    tur.actionBoundaries.push(tur.queue.length);
+                }
                 tur.queue.push(queueBlock);
             }
         }
@@ -2390,6 +2498,14 @@ class Logo {
         let nextBlock = null;
         let parentBlk = null;
         let passArg = null;
+
+        if (
+            tur.actionBoundaries &&
+            tur.actionBoundaries.length > 0 &&
+            tur.queue.length <= logo.deps.utils.last(tur.actionBoundaries)
+        ) {
+            tur.actionBoundaries.pop();
+        }
 
         // Run the last flow in the queue.
         if (tur.queue.length > queueStart) {
@@ -2520,28 +2636,17 @@ class Logo {
             } else {
                 logo.runFromBlock(logo, turtle, nextBlock, isflow, passArg);
             }
+        } else if (tur.singer.justCounting.length > 0) {
+            // A note counter's silent run ends here, but the turtle is still
+            // running its program, so only flush the counted flow's signals.
+            if (!logo._prematureRestart) {
+                logo.dispatchUnissuedSignals(tur);
+            }
         } else {
             logo._alreadyRunning = false;
 
             if (!logo._prematureRestart) {
-                // Make sure any unissued signals are dispatched.
-                for (const b in tur.endOfClampSignals) {
-                    const signalsLength = tur.endOfClampSignals[b].length;
-                    for (let i = 0; i < signalsLength; i++) {
-                        // eslint-disable-next-line eqeqeq
-                        if (tur.endOfClampSignals[b][i] != null) {
-                            if (
-                                // eslint-disable-next-line eqeqeq
-                                tur.butNotThese[b] == null ||
-                                tur.butNotThese[b].indexOf(i) === -1
-                            ) {
-                                if (!tur.singer.runningFromEvent) {
-                                    logo.stage.dispatchEvent(tur.endOfClampSignals[b][i]);
-                                }
-                            }
-                        }
-                    }
-                }
+                logo.dispatchUnissuedSignals(tur);
 
                 // Make sure SVG path is closed.
                 logo.turtles.getTurtle(turtle).painter.closeSVG();

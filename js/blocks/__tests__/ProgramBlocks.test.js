@@ -896,6 +896,14 @@ describe("ProgramBlocks", () => {
             expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 5);
         });
 
+        test("reports an error instead of throwing when the slot is empty", () => {
+            const block = getBlock("deleteblock");
+            activity.blocks.blockList = [{ connections: [null], trash: false }];
+            expect(() => block.flow([null], logo, 0, 5)).not.toThrow();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 5);
+            expect(activity.blocks.sendStackToTrash).not.toHaveBeenCalled();
+        });
+
         test("ignores if already in trash", () => {
             const block = getBlock("deleteblock");
             activity.blocks.blockList = [{ trash: true }];
@@ -920,6 +928,14 @@ describe("ProgramBlocks", () => {
             const block = getBlock("moveblock");
             block.flow([], logo, 0, 5);
             expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 5);
+        });
+
+        test("reports an error instead of moving when the block slot is empty", () => {
+            const block = getBlock("moveblock");
+            activity.blocks.blockList = [{}];
+            block.flow([null, null, null], logo, 0, 5);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 5);
+            expect(activity.blocks.moveBlock).not.toHaveBeenCalled();
         });
     });
 
@@ -946,6 +962,14 @@ describe("ProgramBlocks", () => {
             const args = ["myBlock"];
             block.flow(args, logo, 0, 5);
             expect(args[0]).toBe(0);
+        });
+
+        test("reports an error instead of throwing when the slot is empty", () => {
+            const block = getBlock("runblock");
+            activity.blocks.blockList = [{ name: "start", value: 0 }];
+            expect(() => block.flow([null], logo, 0, 5)).not.toThrow();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 5);
+            expect(logo.runFromBlock).not.toHaveBeenCalled();
         });
     });
 
@@ -982,6 +1006,22 @@ describe("ProgramBlocks", () => {
             const block = getBlock("dockblock");
             block.flow([], logo, 0, 5);
             expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 5);
+        });
+
+        test("reports an error instead of throwing when the target slot is empty", () => {
+            const block = getBlock("dockblock");
+            activity.blocks.blockList = [{ connections: [null, null] }, { connections: [null] }];
+            expect(() => block.flow([null, 1, 1], logo, 0, 5)).not.toThrow();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 5);
+            expect(activity.blocks.adjustDocks).not.toHaveBeenCalled();
+        });
+
+        test("reports an error instead of throwing when the block to connect is empty", () => {
+            const block = getBlock("dockblock");
+            activity.blocks.blockList = [{ connections: [null, null] }, { connections: [null] }];
+            expect(() => block.flow([0, 1, null], logo, 0, 5)).not.toThrow();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 5);
+            expect(activity.blocks.adjustDocks).not.toHaveBeenCalled();
         });
     });
 

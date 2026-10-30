@@ -26,6 +26,13 @@ const STR_MY_PROJECT = _("My Project");
 const STR_SHOW = _("Show");
 const STR_HIDE = _("Hide");
 
+// The MIDI and guitar tablature sections of a Lilypond file, commented out.
+const LY_MIDI_OFF =
+    "% MIDI SECTION\n% Delete the %{ and %} below to include MIDI output.\n%{\n\\midi {\n   \\tempo 4=90\n}\n%}\n\n}\n\n";
+const LY_GUITAR_HEAD_OFF =
+    '\n\n% GUITAR TAB SECTION\n% Delete the %{ and %} below to include guitar tablature output.\n%{\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
+const LY_GUITAR_END_OFF = "      >>\n%}\n";
+
 /**
  * Environment-aware lazy module loader.
  * Uses AMD require() in the browser; calls callback synchronously in Node/Jest.
@@ -215,6 +222,10 @@ class SaveInterface {
         const finishDownload = name => {
             if (name === null) {
                 console.debug("save cancelled");
+                // downloadURL() won't run to free a Blob URL, so free it here.
+                if (typeof URL.revokeObjectURL === "function") {
+                    URL.revokeObjectURL(dataurl);
+                }
                 return;
             }
 
@@ -339,11 +350,12 @@ class SaveInterface {
             image = planet.getCurrentProjectImage();
         }
 
+        // Function replacers keep "$&", "$$", etc. in user data from being expanded.
         file = file
-            .replace(/{{ project_description }}/g, escapeHTML(description))
-            .replace(/{{ project_name }}/g, escapeHTML(name))
-            .replace(/{{ data }}/g, escapeHTML(data))
-            .replace(/{{ project_image }}/g, escapeHTML(sanitizeImageURL(image)));
+            .replace(/{{ project_description }}/g, () => escapeHTML(description))
+            .replace(/{{ project_name }}/g, () => escapeHTML(name))
+            .replace(/{{ data }}/g, () => escapeHTML(data))
+            .replace(/{{ project_image }}/g, () => escapeHTML(sanitizeImageURL(image)));
 
         return file;
     }
@@ -423,9 +435,87 @@ class SaveInterface {
     afterSaveMIDI() {
         const instrumentMIDI = getMidiInstrument();
         const drumMIDI = getMidiDrum();
+
+        // Both count quarter notes per minute.
+        const noteBpm = noteData =>
+            typeof noteData.bpm === "number" && noteData.bpm > 0 && isFinite(noteData.bpm)
+                ? noteData.bpm
+                : 90;
+
+        // How long a note plays, in seconds, or null for a note that is not written.
+        const noteSeconds = noteData => {
+            if (!noteData.note || noteData.note.length === 0) return null;
+            if (
+                typeof noteData.duration !== "number" ||
+                noteData.duration <= 0 ||
+                !isFinite(noteData.duration)
+            ) {
+                return null;
+            }
+            const duration = ((1 / noteData.duration) * 60 * 4) / noteBpm(noteData);
+            return isFinite(duration) && duration > 0 ? duration : null;
+        };
+
+        // A MIDI time signature's note value is a power of two.
+        const isMidiMeter = meter =>
+            Array.isArray(meter) &&
+            Number.isInteger(meter[0]) &&
+            meter[0] > 0 &&
+            meter[0] < 256 &&
+            Number.isInteger(meter[1]) &&
+            meter[1] > 0 &&
+            (meter[1] & (meter[1] - 1)) === 0;
+
+        // Without a tempo and a time signature a MIDI file is read at 120 bpm in 4/4, so
+        // notes played at any other tempo fall off the beat grid. A MIDI file has one tempo
+        // map and one set of time signatures for all its tracks: take them from the first
+        // track. Notes are placed by the time they play, so every track keeps its timing.
+        const writeTempoAndMeter = (header, notes) => {
+            let time = 0;
+            let lastMeter = null;
+            notes.forEach(noteData => {
+                const duration = noteSeconds(noteData);
+                if (duration === null) return;
+
+                const bpm = noteBpm(noteData);
+                const tempos = header.tempos;
+                if (tempos.length === 0 || tempos[tempos.length - 1].bpm !== bpm) {
+                    tempos.push({ ticks: header.secondsToTicks(time), bpm });
+                    header.update();
+                }
+
+                const meter = noteData.meter;
+                if (
+                    isMidiMeter(meter) &&
+                    (lastMeter === null || meter[0] !== lastMeter[0] || meter[1] !== lastMeter[1])
+                ) {
+                    header.timeSignatures.push({
+                        ticks: header.secondsToTicks(time),
+                        timeSignature: [meter[0], meter[1]]
+                    });
+                    header.update();
+                    lastMeter = meter;
+                }
+
+                time += duration;
+            });
+        };
+
         const generateMidi = data => {
             const midi = new Midi();
             midi.header.ticksPerBeat = 480;
+
+            // The first track with a drum or pitch written to the file, not just rests.
+            const firstTrack = Object.values(data).find(notes =>
+                notes.some(
+                    noteData =>
+                        noteSeconds(noteData) !== null &&
+                        (noteData.drum || noteData.note.some(pitch => !pitch.includes("R")))
+                )
+            );
+            if (firstTrack) {
+                writeTempoAndMeter(midi.header, firstTrack);
+            }
 
             Object.entries(data).forEach(([blockIndex, notes]) => {
                 const mainTrack = midi.addTrack();
@@ -435,8 +525,8 @@ class SaveInterface {
                 let globalTime = 0;
 
                 notes.forEach(noteData => {
-                    if (!noteData.note || noteData.note.length === 0) return;
-                    const duration = ((1 / noteData.duration) * 60 * 4) / noteData.bpm;
+                    const duration = noteSeconds(noteData);
+                    if (duration === null) return;
                     const instrument = noteData.instrument || "default";
 
                     if (noteData.drum) {
@@ -502,29 +592,32 @@ class SaveInterface {
             generateMidi(data);
             this.activity.logo._midiData = {};
             document.body.style.cursor = "default";
-        }, 500);
+        }, 0);
     }
 
     /**
      * This method is to save SVG representation of an activity
      *
      * @param {SaveInterface} activity -The activity object to save
+     * @param {string} [filename] - The file name to save to, without asking.
      * @returns {void}
      * @method
      * @instance
      */
-    saveSVG(activity) {
-        const svg =
-            "data:image/svg+xml;utf8," +
-            doSVG(
-                activity.canvas,
-                activity.logo,
-                activity.turtles,
-                activity.canvas.width,
-                activity.canvas.height,
-                1.0
-            );
-        activity.save.download("svg", svg, null);
+    saveSVG(activity, filename) {
+        const svg = doSVG(
+            activity.canvas,
+            activity.logo,
+            activity.turtles,
+            activity.canvas.width,
+            activity.canvas.height,
+            1.0
+        );
+        // Use a Blob, not a data URL: there the first "#" (a colour like
+        // fill="#ffffff") starts the fragment and cuts the file off.
+        const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        activity.save.download("svg", url, filename || null);
     }
 
     /**
@@ -549,8 +642,11 @@ class SaveInterface {
      * @instance
      */
     saveBlockArtwork(activity) {
-        const svg = "data:image/svg+xml;utf8," + activity.printBlockSVG();
-        activity.save.download("svg", svg, null);
+        // printBlockSVG() returns the inside of the SVG URI-encoded.
+        const svg = decodeURIComponent(activity.printBlockSVG());
+        const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        activity.save.download("svg", url, null);
     }
 
     /**
@@ -664,18 +760,19 @@ class SaveInterface {
      *
      * This method handles the post-processing steps after saving ABC notation.
      *
+     * @param {string} [filename] - The file name to save to, without asking.
      * @returns {void}
      * @memberof SaveInterface
      * @method
      * @instance
      */
-    afterSaveAbc() {
+    afterSaveAbc(filename) {
         // Lazy-load abc module before using saveAbcOutput
 
         _lazyRequire(["activity/abc"], () => {
             try {
                 const abc = encodeURIComponent(saveAbcOutput(this.activity));
-                this.activity.save.download("abc", "data:text;utf8," + abc, null);
+                this.activity.save.download("abc", "data:text;utf8," + abc, filename || null);
             } catch (e) {
                 console.error("Error in ABC output generation: ", e);
                 this.activity.errorMsg(`${_("Error generating ABC output.")} ${e.message}`);
@@ -838,8 +935,7 @@ class SaveInterface {
                 this.activity.logo.MIDIOutput =
                     "% MIDI SECTION\n% MIDI Output included! \n\n\\midi {\n   \\tempo 4=90\n}\n\n\n}\n\n";
             } else {
-                this.activity.logo.MIDIOutput =
-                    "% MIDI SECTION\n% Delete the %{ and %} below to include MIDI output.\n%{\n\\midi {\n   \\tempo 4=90\n}\n%}\n\n}\n\n";
+                this.activity.logo.MIDIOutput = LY_MIDI_OFF;
             }
 
             if (guitarCheck) {
@@ -847,9 +943,8 @@ class SaveInterface {
                     '\n\n% GUITAR TAB SECTION\n% Guitar tablature output included!\n\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
                 this.activity.logo.guitarOutputEnd = "      >>\n\n";
             } else {
-                this.activity.logo.guitarOutputHead =
-                    '\n\n% GUITAR TAB SECTION\n% Delete the %{ and %} below to include guitar tablature output.\n%{\n      \\new TabStaff = "guitar tab" \n      <<\n         \\clef moderntab\n';
-                this.activity.logo.guitarOutputEnd = "      >>\n%}\n";
+                this.activity.logo.guitarOutputHead = LY_GUITAR_HEAD_OFF;
+                this.activity.logo.guitarOutputEnd = LY_GUITAR_END_OFF;
             }
 
             // Check if we're using buffered data (Issue #2330)
@@ -909,11 +1004,34 @@ class SaveInterface {
     }
 
     /**
+     * Save the notation recorded so far as a Lilypond file, for the save as
+     * Lilypond block. Without the Save as Lilypond dialog, the file gets the
+     * default header, and its MIDI and guitar sections are left commented out.
+     *
+     * @param {string} filename - The name of the Lilypond file.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
+    saveLilypondFromBlock(filename) {
+        _lazyRequire(["activity/lilypond"], () => {
+            const logo = this.activity.logo;
+            logo.notationOutput = LILYPONDHEADER;
+            logo.MIDIOutput = LY_MIDI_OFF;
+            logo.guitarOutputHead = LY_GUITAR_HEAD_OFF;
+            logo.guitarOutputEnd = LY_GUITAR_END_OFF;
+            this.afterSaveLilypond(filename);
+        });
+    }
+
+    /**
      * Perform actions after saving a Lilypond file.
      *
      * This method handles post-processing steps after saving a Lilypond file, such as handling PDF conversion.
      *
-     * @param {string} filename - The name of the Lilypond file.
+     * @param {string} [filename] - The name of the Lilypond file. Without one, the
+     * name typed into the Save as Lilypond dialog is used.
      * @returns {void}
      * @memberof SaveInterface
      * @method
@@ -923,7 +1041,7 @@ class SaveInterface {
         // Lazy-load lilypond module before using saveLilypondOutput
 
         _lazyRequire(["activity/lilypond"], () => {
-            filename = docById("fileName").value;
+            filename = filename || docById("fileName").value;
             try {
                 const ly = saveLilypondOutput(this.activity);
                 switch (this.notationConvert) {
@@ -956,7 +1074,8 @@ class SaveInterface {
      * This method handles post-processing steps specific to saving a Lilypond file in LY format.
      *
      * @param {string} lydata - The Lilypond data.
-     * @param {string} filename - The name of the Lilypond file.
+     * @param {string} [filename] - The name of the Lilypond file. Without one, the
+     * name typed into the Save as Lilypond dialog is used.
      * @returns {void}
      * @memberof SaveInterface
      * @method
@@ -964,7 +1083,7 @@ class SaveInterface {
      */
 
     afterSaveLilypondLY(lydata, filename) {
-        filename = docById("fileName").value;
+        filename = filename || docById("fileName").value;
         const showCopiedMessage = () => {
             this.activity.textMsg(
                 _("The Lilypond code is copied to clipboard. You can paste it here:") +

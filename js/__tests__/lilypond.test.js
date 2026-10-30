@@ -30,12 +30,14 @@ const toFraction = jest.fn(num => {
     return [num, 1];
 });
 
-const NOTATIONDURATION = 1;
-const NOTATIONNOTE = 0;
-const NOTATIONROUNDDOWN = 2;
-const NOTATIONSTACCATO = 6;
-const NOTATIONTUPLETVALUE = 3;
-const NOTATIONDOTCOUNT = 4;
+const {
+    NOTATIONNOTE,
+    NOTATIONDURATION,
+    NOTATIONDOTCOUNT,
+    NOTATIONTUPLETVALUE,
+    NOTATIONROUNDDOWN,
+    NOTATIONSTACCATO
+} = require("../logoconstants");
 
 global.frequencyToPitch = frequencyToPitch;
 global.getScaleAndHalfSteps = getScaleAndHalfSteps;
@@ -110,6 +112,33 @@ describe("processLilypondNotes", () => {
         expect(logo.notationNotes[turtle]).toContain("g''''4 g'''''4 g''''''4 g'''''''4 ");
     });
 
+    test("should format low octaves (0 to 2) with correct LilyPond octave commas and no extra spaces", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["A0"], 4, 0, null, 0, -1, false],
+            [["C1"], 4, 0, null, 0, -1, false],
+            [["C2"], 4, 0, null, 0, -1, false],
+            [["C3"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("a,,,4 c,,4 c,4 c4 ");
+    });
+
+    test("should format negative octaves (-1 and -2) with correct LilyPond octave commas and no hyphens", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["C-1"], 4, 0, null, 0, -1, false],
+            [["D-2"], 4, 0, null, 0, -1, false],
+            [["F♯-1"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain("c,,,,4 d,,,,,4 fis,,,,4 ");
+    });
+
+    test("should not produce undefined when processing unsupported negative octaves", () => {
+        logo.notation.notationStaging[turtle] = [[["C-3"], 4, 0, null, 0, -1, false]];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).not.toContain("undefined");
+    });
+
     test("should process a key signature correctly", () => {
         logo.notation.notationStaging[turtle] = ["key", "C", "major"];
         processLilypondNotes(lilypond, logo, turtle);
@@ -117,39 +146,154 @@ describe("processLilypondNotes", () => {
     });
 
     test("should process a tempo change correctly", () => {
-        logo.notation.notationStaging[turtle] = ["tempo", 120, "Allegro"];
+        logo.notation.notationStaging[turtle] = ["tempo", 120, "4"];
         processLilypondNotes(lilypond, logo, turtle);
-        expect(logo.notationNotes[turtle]).toContain("\\tempo Allegro = 120");
+        expect(logo.notationNotes[turtle]).toContain("\\tempo 4 = 120");
     });
+
+    test.each([
+        ["4", "\\tempo 4 = 90\n"],
+        ["4.", "\\tempo 4. = 90\n"],
+        ["8..", "\\tempo 8.. = 90\n"],
+        // Five sixteenths, which Lilypond cannot write as one note: 90 of them a minute is
+        // 450 sixteenths a minute.
+        ["4 16", "\\tempo 16 = 450\n"],
+        // Fifteen sixteenths.
+        ["2 4 8 16", "\\tempo 16 = 1350\n"]
+    ])("should count a tempo of 90 beats per %s in a note Lilypond reads", (beat, expected) => {
+        logo.notation.notationStaging[turtle] = ["tempo", 90, beat];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain(expected);
+    });
+
+    test.each([["Allegro"], ["0"], ["4 0"], [""], ["3"], ["4 3"]])(
+        "should skip a tempo whose beat is not a note value Lilypond reads (%s)",
+        beat => {
+            logo.notation.notationStaging[turtle] = ["tempo", 120, beat];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).not.toContain("\\tempo");
+        }
+    );
+
+    // \tempo takes an unsigned whole number of beats per minute.
+    test.each([[0], [-90], [0.4], ["fast"], [Infinity]])(
+        "should skip a tempo of %s beats per minute",
+        bpm => {
+            logo.notation.notationStaging[turtle] = ["tempo", bpm, "4"];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).not.toContain("\\tempo");
+        }
+    );
+
+    // It is the count after the "=" that has to be a whole number, not the beats per
+    // minute: 0.4 beats of five sixteenths a minute is exactly 2 sixteenths a minute.
+    test.each([
+        [0.4, "4 16", "\\tempo 16 = 2\n"],
+        [0.1, "4 16", "\\tempo 16 = 1\n"],
+        [0.2, "2 4 8 16", "\\tempo 16 = 3\n"]
+    ])("should write %s beats per %s a minute as a whole count", (bpm, beat, expected) => {
+        logo.notation.notationStaging[turtle] = ["tempo", bpm, beat];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain(expected);
+    });
+
+    test.each([[-90], [NaN], [Infinity], [0.01]])(
+        "should skip a tempo of %s beats per minute on a tied beat too",
+        bpm => {
+            logo.notation.notationStaging[turtle] = ["tempo", bpm, "4 16"];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).not.toContain("\\tempo");
+        }
+    );
 
     test("should process a slur correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "begin slur",
             [["G4"], 4, 0, null, 0, -1, false],
+            [["A4"], 4, 0, null, 0, -1, false],
             "end slur"
         ];
         processLilypondNotes(lilypond, logo, turtle);
-        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "g'4 (  )  ");
+        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "g'4 (  a'4 )  ");
     });
 
     test("should process a crescendo correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "begin crescendo",
             [["G4"], 4, 0, null, 0, -1, false],
+            [["A4"], 4, 0, null, 0, -1, false],
             "end crescendo"
         ];
         processLilypondNotes(lilypond, logo, turtle);
-        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "  g'4 \\< \\! ");
+        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "  g'4 \\< a'4 \\! ");
     });
 
     test("should process a decrescendo correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "begin decrescendo",
             [["G4"], 4, 0, null, 0, -1, false],
+            [["A4"], 4, 0, null, 0, -1, false],
             "end decrescendo"
         ];
         processLilypondNotes(lilypond, logo, turtle);
-        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "  g'4 \\> \\! ");
+        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "  g'4 \\> a'4 \\! ");
+    });
+
+    // Lilypond cannot end a slur or hairpin on the note it starts on, so these
+    // are left out rather than written as "g'4 (  )" or "g'4 \< \!".
+    describe("a slur or hairpin that covers fewer than two notes", () => {
+        test.each([
+            ["begin slur", "end slur"],
+            ["begin crescendo", "end crescendo"],
+            ["begin decrescendo", "end decrescendo"]
+        ])("should leave out %s / %s around a single note", (begin, end) => {
+            logo.notation.notationStaging[turtle] = [
+                begin,
+                [["G4"], 4, 0, null, 0, -1, false],
+                end,
+                [["A4"], 4, 0, null, 0, -1, false]
+            ];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).toBe("\\meter\n" + "g'4 a'4 ");
+        });
+
+        test("should not open an empty slur on the note after it", () => {
+            logo.notation.notationStaging[turtle] = [
+                "begin slur",
+                "end slur",
+                [["A4"], 4, 0, null, 0, -1, false]
+            ];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).toBe("\\meter\n" + "a'4 ");
+        });
+
+        test("should keep a following slur that covers two notes", () => {
+            logo.notation.notationStaging[turtle] = [
+                "begin slur",
+                [["C4"], 4, 0, null, 0, -1, false],
+                "end slur",
+                "begin slur",
+                [["D4"], 4, 0, null, 0, -1, false],
+                [["E4"], 4, 0, null, 0, -1, false],
+                "end slur"
+            ];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).toBe("\\meter\n" + "c'4 d'4 (  e'4 )  ");
+        });
+
+        test("should not treat markup text that reads 'end slur' as a marker", () => {
+            logo.notation.notationStaging[turtle] = [
+                "begin slur",
+                [["C4"], 4, 0, null, 0, -1, false],
+                "markup",
+                "end slur",
+                [["D4"], 4, 0, null, 0, -1, false],
+                "end slur"
+            ];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).toContain("c'4 (  ");
+            expect(logo.notationNotes[turtle]).toContain("d'4 )  ");
+        });
     });
 
     test("should process a tuplet correctly", () => {
@@ -225,6 +369,21 @@ describe("processLilypondNotes", () => {
         expect(logo.notationNotes[turtle]).toContain("{ c' 8(  d' 8e' 8)  } f'4 ");
     });
 
+    test("should leave out a single-note slur that ends on the last note of a tuplet", () => {
+        logo.notation.notationStaging[turtle] = [
+            tripletNote("C4"),
+            tripletNote("D4"),
+            "begin slur",
+            tripletNote("E4"),
+            "end slur",
+            [["F4"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).not.toContain("(");
+        expect(logo.notationNotes[turtle]).not.toContain(")");
+        expect(logo.notationNotes[turtle]).toContain("f'4 ");
+    });
+
     test("should wrap a forever loop in repeat bars that run to the end of the voice", () => {
         logo.notation.notationStaging[turtle] = [
             [["C4"], 4, 0, null, 0, -1, false],
@@ -262,6 +421,15 @@ describe("processLilypondNotes", () => {
         expect(logo.notationNotes[turtle]).toMatch(
             /^\\meter\n\\bar "\.\|:" \\tuplet .*\} \\bar ":\|\." $/
         );
+    });
+
+    test("should not add repeat bars when no notes follow the forever loop", () => {
+        logo.notation.notationStaging[turtle] = [
+            [["G4"], 4, 0, null, 0, -1, false],
+            "begin repeat"
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).not.toContain("\\bar");
     });
 
     test("should not add repeat bars without a forever loop", () => {
@@ -335,11 +503,49 @@ describe("processLilypondNotes", () => {
         expect(logo.notationNotes[turtle]).toContain("->");
     });
 
+    test("should write a rest for a staged note with no pitches inside a tuplet", () => {
+        const tupletNote = pitches => [pitches, 1, 0, [3, 2], 4, -1, false];
+        logo.notation.notationStaging[turtle] = [
+            tupletNote(["G4"]),
+            tupletNote([]),
+            tupletNote(["B4"])
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+
+        // Without the rest nothing is written for the note and its duration runs on from
+        // the g, giving "g' 44", which Lilypond rejects as not a duration.
+        expect(logo.notationNotes[turtle]).toContain("{ g' 4r 4b' 4}");
+        expect(logo.notationNotes[turtle]).not.toContain("44");
+    });
+
     test("should process a pickup command correctly", () => {
         logo.notation.notationStaging[turtle] = ["pickup", 4, [["G4"], 4, 0, null, 0, -1, false]];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\partial 4\n");
     });
+
+    test.each([
+        ["8", "\\partial 8\n"],
+        ["4.", "\\partial 4.\n"],
+        // Five sixteenths. \\partial takes one duration, with a multiplier for the rest.
+        ["4 16", "\\partial 16*5\n"],
+        ["2 4 8 16", "\\partial 16*15\n"],
+        // Two eighths add up to a quarter, which needs no multiplier.
+        ["8 8", "\\partial 4\n"]
+    ])("should write a pickup of %s as a duration Lilypond reads", (beat, expected) => {
+        logo.notation.notationStaging[turtle] = ["pickup", beat];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).toContain(expected);
+    });
+
+    test.each([["half a bar"], ["0"], ["3"], [""]])(
+        "should skip a pickup that is not a note value Lilypond reads (%s)",
+        beat => {
+            logo.notation.notationStaging[turtle] = ["pickup", beat];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).not.toContain("\\partial");
+        }
+    );
 
     test("should process voice commands correctly", () => {
         logo.notation.notationStaging[turtle] = [
@@ -368,7 +574,7 @@ describe("processLilypondNotes", () => {
     });
 
     test("should process note object with dot notation", () => {
-        logo.notation.notationStaging[turtle] = [[["G4"], 4, 0, null, 2, -1, false]];
+        logo.notation.notationStaging[turtle] = [[["G4"], 4, 2, null, 0, -1, false]];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("4..");
     });
@@ -425,9 +631,9 @@ describe("processLilypondNotes", () => {
     });
     test("should handle tuplet with notes of varying durations", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 8, 4, [3, 2], 0, -1, false],
-            [["A4"], 4, 2, [3, 2], 0, -1, false],
-            [["B4"], 8, 4, [3, 2], 0, -1, false]
+            [["G4"], 8, 0, [3, 2], 4, -1, false],
+            [["A4"], 4, 0, [3, 2], 2, -1, false],
+            [["B4"], 8, 0, [3, 2], 4, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
@@ -435,8 +641,8 @@ describe("processLilypondNotes", () => {
 
     test("should handle tuplet with varying tuplet factors", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 2, [3, 4], 0, -1, false],
-            [["A4"], 4, 2, [3, 2], 0, -1, false]
+            [["G4"], 4, 0, [3, 4], 2, -1, false],
+            [["A4"], 4, 0, [3, 2], 2, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
@@ -444,9 +650,9 @@ describe("processLilypondNotes", () => {
 
     test("should handle tie command within tuplet", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 2, [3, 2], 0, -1, false],
+            [["G4"], 4, 0, [3, 2], 2, -1, false],
             "tie",
-            [["A4"], 4, 2, [3, 2], 0, -1, false]
+            [["A4"], 4, 0, [3, 2], 2, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("~");
@@ -455,9 +661,9 @@ describe("processLilypondNotes", () => {
 
     test("should break tuplet when reaching POW2 duration (0.5)", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 2, [3, 2], 0, -1, false],
-            [["A4"], 4, 2, [3, 2], 0, -1, false],
-            [["B4"], 4, 2, [3, 2], 0, -1, false],
+            [["G4"], 4, 0, [3, 2], 2, -1, false],
+            [["A4"], 4, 0, [3, 2], 2, -1, false],
+            [["B4"], 4, 0, [3, 2], 2, -1, false],
             [["C4"], 4, 0, null, 0, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
@@ -465,26 +671,26 @@ describe("processLilypondNotes", () => {
     });
     test("should handle null tuplet value interrupting tuplet", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 2, [3, 2], 0, -1, false],
+            [["G4"], 4, 0, [3, 2], 2, -1, false],
             [["A4"], 4, 0, null, 0, -1, false],
-            [["B4"], 4, 2, [3, 2], 0, -1, false]
+            [["B4"], 4, 0, [3, 2], 2, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
     });
     test("should break tuplet when tuplet factor changes", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 2, [3, 2], 0, -1, false],
-            [["A4"], 4, 2, [5, 2], 0, -1, false]
+            [["G4"], 4, 0, [3, 2], 2, -1, false],
+            [["A4"], 4, 0, [5, 2], 2, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
     });
     test("should handle tuplet with mixed NOTATIONROUNDDOWN values (greater)", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 2, [3, 2], 0, -1, false],
-            [["A4"], 8, 4, [3, 2], 0, -1, false],
-            [["B4"], 4, 2, [3, 2], 0, -1, false]
+            [["G4"], 4, 0, [3, 2], 2, -1, false],
+            [["A4"], 8, 0, [3, 2], 4, -1, false],
+            [["B4"], 4, 0, [3, 2], 2, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
@@ -492,9 +698,9 @@ describe("processLilypondNotes", () => {
 
     test("should handle tuplet with mixed NOTATIONROUNDDOWN values (less)", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 4, [3, 2], 0, -1, false],
-            [["A4"], 8, 2, [3, 2], 0, -1, false],
-            [["B4"], 4, 4, [3, 2], 0, -1, false]
+            [["G4"], 4, 0, [3, 2], 4, -1, false],
+            [["A4"], 8, 0, [3, 2], 2, -1, false],
+            [["B4"], 4, 0, [3, 2], 4, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
@@ -502,9 +708,9 @@ describe("processLilypondNotes", () => {
 
     test("should handle tuplet with equal NOTATIONROUNDDOWN values", () => {
         logo.notation.notationStaging[turtle] = [
-            [["G4"], 4, 2, [3, 2], 0, -1, false],
-            [["A4"], 4, 2, [3, 2], 0, -1, false],
-            [["B4"], 4, 2, [3, 2], 0, -1, false]
+            [["G4"], 4, 0, [3, 2], 2, -1, false],
+            [["A4"], 4, 0, [3, 2], 2, -1, false],
+            [["B4"], 4, 0, [3, 2], 2, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
@@ -815,6 +1021,29 @@ describe("saveLilypondOutput", () => {
         const result = saveLilypondOutput(activity);
         expect(result).toContain('\\clef "bass_8"');
     });
+    test("should select bass_8 clef for negative octave sub-bass notes", () => {
+        activity.logo.notation.notationStaging = {
+            0: [[["C-1"], 4, 0, null, 0, -1, false]]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain('\\clef "bass_8"');
+    });
+    test("should select bass_8 clef for numeric frequency in negative octave", () => {
+        frequencyToPitch.mockReturnValue(["C", -1]);
+        activity.logo.notation.notationStaging = {
+            0: [[[16.35], 4, 0, null, 0, -1, false]]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain('\\clef "bass_8"');
+        expect(frequencyToPitch).toHaveBeenCalledWith(16.35, "equal");
+    });
+    test("should parse signed and multi-digit octaves in octave calculation", () => {
+        activity.logo.notation.notationStaging = {
+            0: [[["C10", "C4"], 4, 0, null, 0, -1, false]]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain('\\clef "treble"');
+    });
     test("should select bass clef for mid-low notes", () => {
         frequencyToPitch.mockReturnValue(["C", 3]);
         activity.logo.notation.notationStaging = {
@@ -952,6 +1181,16 @@ describe("saveLilypondOutput", () => {
         const result = saveLilypondOutput(activity);
         expect(result).toMatch(/Turtleone = \{\n[^}]*\\bar ":\|\." \n\}/);
         expect(result).not.toContain('\\bar "|."');
+    });
+
+    test("should keep the final bar when no notes follow the last voice's forever", () => {
+        activity.logo.notation.notationStaging[1] = [
+            [["E4"], 4, 0, null, 0, -1, false],
+            "begin repeat"
+        ];
+        const result = saveLilypondOutput(activity);
+        expect(result).toMatch(/Turtleone = \{\n[^}]*\\bar "\|\."/);
+        expect(result).not.toContain(":|.");
     });
 
     test("should repeat the drum staff along with the voice", () => {

@@ -87,14 +87,24 @@ class MeterWidget {
      *
      * @param {object} activity - The activity object.
      * @param {number} widgetBlock - The widget block number.
+     * @param {number} [turtle] - The turtle that ran the Meter widget block.
      */
-    constructor(activity, widgetBlock) {
+    constructor(activity, widgetBlock, turtle) {
         /**
          * The activity object.
          *
          * @type {object}
          */
         this.activity = activity;
+
+        /**
+         * The turtle that ran the Meter widget block, whose tempo the beats are played at. The
+         * turtle itself rather than its index, which shifts when a turtle is removed.
+         *
+         * @type {object|null}
+         * @private
+         */
+        this._turtle = turtle !== undefined ? this.activity.turtles.ithTurtle(turtle) : null;
 
         /**
          * The meter block.
@@ -185,6 +195,7 @@ class MeterWidget {
          */
         widgetWindow.onclose = () => {
             this._playing = false;
+            this._hidePlaybackIndicator();
             if (this._playBeatTimeout) {
                 this._clearWidgetTimeout(this._playBeatTimeout);
                 this._playBeatTimeout = null;
@@ -230,6 +241,7 @@ class MeterWidget {
                     playBtn.appendChild(img);
                     playBtn.appendChild(document.createTextNode("\u00A0\u00A0"));
                     this._playing = false;
+                    this._hidePlaybackIndicator();
                     if (this._playBeatTimeout) {
                         this._clearWidgetTimeout(this._playBeatTimeout);
                         this._playBeatTimeout = null;
@@ -332,6 +344,7 @@ class MeterWidget {
         widgetWindow.addButton("reload.svg", MeterWidget.ICONSIZE, _("Reset")).onclick = () => {
             //change Values of blocks in stack.
             this._playing = false;
+            this._hidePlaybackIndicator();
             if (this._playBeatTimeout) {
                 this._clearWidgetTimeout(this._playBeatTimeout);
                 this._playBeatTimeout = null;
@@ -465,24 +478,34 @@ class MeterWidget {
     }
 
     /**
+     * Hides all play-wheel beat indicator slices.
+     *
+     * @private
+     * @returns {void}
+     */
+    _hidePlaybackIndicator() {
+        if (this._playWheel && this._playWheel.navItems) {
+            for (let i = 0; i < this._strongBeats.length; i++) {
+                if (
+                    this._playWheel.navItems[i] &&
+                    this._playWheel.navItems[i].navItem &&
+                    typeof this._playWheel.navItems[i].navItem.hide === "function"
+                ) {
+                    this._playWheel.navItems[i].navItem.hide();
+                }
+            }
+        }
+    }
+
+    /**
      * @private
      * @param {number} i
      * @param {number} ms
      * @returns {void}
      */
     __playOneBeat(i, ms) {
-        if (!this._playing) {
-            return;
-        }
-
-        if (this.__getPauseStatus()) {
-            if (this._playWheel && this._playWheel.navItems) {
-                for (let i = 0; i < this._strongBeats.length; i++) {
-                    if (this._playWheel.navItems[i] && this._playWheel.navItems[i].navItem) {
-                        this._playWheel.navItems[i].navItem.hide();
-                    }
-                }
-            }
+        if (!this._playing || this.__getPauseStatus()) {
+            this._hidePlaybackIndicator();
             return;
         }
 
@@ -523,12 +546,12 @@ class MeterWidget {
      * @returns {void}
      */
     _playBeat() {
-        const tur = this.activity.turtles.ithTurtle(0);
+        // The tempo of the turtle that ran the block, not turtle 0: after a project is loaded,
+        // turtle 0 is a trashed turtle of the old project.
+        const tur = this._turtle;
         const bpmFactor =
-            TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
-        for (let i = 0; i < this._strongBeats.length; i++) {
-            this._playWheel.navItems[i].navItem.hide();
-        }
+            TONEBPM / (tur && tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
+        this._hidePlaybackIndicator();
 
         const noteBeatValue = bpmFactor * 1000 * this._beatValue;
         this.__playOneBeat(0, noteBeatValue);

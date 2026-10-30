@@ -58,8 +58,10 @@ const createBaseSandbox = () => ({
     announceToScreenReader: jest.fn(),
     define: () => {},
     require: () => {},
-    setTimeout,
-    setInterval,
+    setTimeout: (...args) => setTimeout(...args),
+    clearTimeout: (...args) => clearTimeout(...args),
+    setInterval: (...args) => setInterval(...args),
+    clearInterval: (...args) => clearInterval(...args),
     PluginDialog: class {
         constructor() {}
     },
@@ -117,6 +119,7 @@ const createBaseSandbox = () => ({
     hideDOMLabel: jest.fn(),
     setupActivityRecorder: jest.fn(),
     setupActivityAbcParser: jest.fn(),
+    setupActivityMxmlParser: jest.fn(),
     performance: global.performance || { now: () => Date.now() }
 });
 

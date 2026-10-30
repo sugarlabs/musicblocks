@@ -47,7 +47,8 @@ describe("setupPitchBlocks", () => {
         beginnerBlock() {
             return this;
         }
-        setHelpString() {
+        setHelpString(helpString) {
+            this.helpString = helpString;
             return this;
         }
         formBlock() {
@@ -429,6 +430,14 @@ describe("setupPitchBlocks", () => {
             block.arg(logo, 0, 10);
             expect(logo.statusFields).toContainEqual([10, "mypitch"]);
         });
+        it("Scalar change in pitch has its own help text and example", () => {
+            const half = createdBlocks["deltapitch"].helpString;
+            const scalar = createdBlocks["deltapitch2"].helpString;
+            expect(half[0]).toContain("in half steps");
+            expect(half[3]).toBe("deltapitchhelp");
+            expect(scalar[0]).toContain("in scale steps");
+            expect(scalar[3]).toBe("deltapitch2help");
+        });
         it("Generic check for all blocks updateParameter", () => {
             // This loop ensures that all updateParameter methods are called at least once
             Object.values(createdBlocks).forEach(block => {
@@ -608,6 +617,92 @@ describe("setupPitchBlocks", () => {
             block.flow([440], logo, 0, 10);
             expect(global.Singer.PitchActions.playHertz).toHaveBeenCalled();
         });
+
+        it("routes hertz rows to the turtle's own keyboard", () => {
+            const block = createdBlocks["hertz"];
+            const lastActive = {
+                instruments: [],
+                noteNames: [],
+                octaves: [],
+                addRowBlock: jest.fn()
+            };
+            const own = { instruments: [], noteNames: [], octaves: [], addRowBlock: jest.fn() };
+            global.frequencyToPitch.mockReturnValue(["A", 4, 0]);
+            logo.inMusicKeyboard = true;
+            logo.musicKeyboard = lastActive;
+            logo.musicKeyboardByTurtle = { 1: own };
+
+            block.flow([440], logo, 1, 10);
+
+            expect(own.noteNames).toEqual(["hertz"]);
+            expect(lastActive.noteNames).toEqual([]);
+        });
+    });
+
+    describe("HertzBlock in the Pitch-Drum Matrix", () => {
+        let pdm;
+        let singer;
+
+        beforeEach(() => {
+            pdm = {
+                rowLabels: [],
+                rowArgs: [],
+                drums: [],
+                addRowBlock: jest.fn(),
+                addColBlock: jest.fn()
+            };
+            logo.pitchDrumMatrix = pdm;
+            logo.pitchBlocks = [];
+            logo.inMatrix = false;
+            logo.inPitchDrumMatrix = true;
+            singer = turtles.ithTurtle(0).singer;
+            singer.drumStyle = [];
+            global.Singer.PitchActions.playHertz.mockClear();
+        });
+
+        afterEach(() => {
+            logo.inPitchDrumMatrix = false;
+        });
+
+        it("adds a row at the nearest note, without the cents", () => {
+            // 450 Hz is A4 and 39 cents.
+            global.frequencyToPitch.mockReturnValue(["A", 4, 39]);
+            singer.lastNotePlayed = ["G4", 4];
+
+            createdBlocks["hertz"].flow([450], logo, 0, 10);
+
+            expect(pdm.rowLabels).toEqual(["A"]);
+            expect(pdm.rowArgs).toEqual([4]);
+            expect(pdm.addRowBlock).toHaveBeenCalledWith(10);
+            expect(logo.pitchBlocks).toEqual([10]);
+            expect(singer.lastNotePlayed).toEqual(["A4", 4]);
+            expect(singer.previousNotePlayed).toEqual(["G4", 4]);
+            expect(global.Singer.PitchActions.playHertz).not.toHaveBeenCalled();
+        });
+
+        it("adds a drum column inside Set Drum", () => {
+            global.frequencyToPitch.mockReturnValue(["A", 4, 0]);
+            singer.drumStyle = ["snare drum"];
+
+            createdBlocks["hertz"].flow([440], logo, 0, 10);
+
+            expect(pdm.drums).toEqual(["snare drum"]);
+            expect(pdm.addColBlock).toHaveBeenCalledWith(10);
+            expect(pdm.rowLabels).toEqual([]);
+            expect(pdm.addRowBlock).not.toHaveBeenCalled();
+        });
+
+        it("leaves the last note alone for a drum column", () => {
+            global.frequencyToPitch.mockReturnValue(["A", 4, 0]);
+            singer.drumStyle = ["snare drum"];
+            singer.lastNotePlayed = ["G4", 4];
+            singer.previousNotePlayed = ["F4", 4];
+
+            createdBlocks["hertz"].flow([440], logo, 0, 10);
+
+            expect(singer.lastNotePlayed).toEqual(["G4", 4]);
+            expect(singer.previousNotePlayed).toEqual(["F4", 4]);
+        });
     });
 
     describe("SetPitchNumberOffsetBlock", () => {
@@ -767,6 +862,60 @@ describe("setupPitchBlocks", () => {
             activity.blocks.blockList[20] = { name: "scaledegree2", value: "5n" };
             block.flow(["1", 4], logo, 0, 10);
             expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith("G", 4, 0, 0, 10);
+        });
+
+        it("cancels the key's accidental with the opposite one on a scale degree", () => {
+            const block = createdBlocks["pitch"];
+            activity.blocks.blockList[10].connections[1] = 20;
+            activity.blocks.blockList[20] = { name: "plus" };
+
+            global.scaleDegreeToPitchMapping.mockReturnValue("F#");
+            block.flow(["7b", 4], logo, 0, 10);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith(
+                "F",
+                expect.anything(),
+                0,
+                0,
+                10
+            );
+
+            global.scaleDegreeToPitchMapping.mockReturnValue("Bb");
+            block.flow(["4#", 4], logo, 0, 10);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith(
+                "B",
+                expect.anything(),
+                0,
+                0,
+                10
+            );
+        });
+
+        it("treats a computed number with an accidental as a scale degree", () => {
+            const block = createdBlocks["pitch"];
+            activity.blocks.blockList[10].connections[1] = 20;
+            activity.blocks.blockList[20] = { name: "plus" };
+            global.scaleDegreeToPitchMapping.mockReturnValue("G");
+
+            [
+                ["5#", "G#"],
+                ["5b", "Gb"],
+                ["5n", "G"]
+            ].forEach(([degree, note]) => {
+                block.flow([degree, 4], logo, 0, 10);
+                expect(global.scaleDegreeToPitchMapping).toHaveBeenLastCalledWith(
+                    "C",
+                    5,
+                    expect.anything(),
+                    null
+                );
+                expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith(
+                    note,
+                    4,
+                    0,
+                    0,
+                    10
+                );
+            });
         });
 
         it("flow", () => {

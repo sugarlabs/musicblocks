@@ -26,7 +26,10 @@ const readSource = name => fs.readFileSync(path.join(__dirname, "..", name), "ut
 describe("musicutils-modewheel", () => {
     it("labels the major/ionian and minor/aeolian pairs together", () => {
         expect(modewheel.getModeLabel("major")).toBe("major / ionian");
+        expect(modewheel.getModeLabel("ionian")).toBe("major / ionian");
         expect(modewheel.getModeLabel("minor")).toBe("minor / aeolian");
+        expect(modewheel.getModeLabel("aeolian")).toBe("minor / aeolian");
+        expect(modewheel.getModeLabel(" ")).toBe(" ");
         expect(modewheel.getModeLabel("dorian")).toBe("dorian");
     });
 
@@ -34,10 +37,13 @@ describe("musicutils-modewheel", () => {
         expect(modewheel.getModeNameFromLabel("major / ionian", [])).toBe("major");
         expect(modewheel.getModeNameFromLabel("minor / aeolian", [])).toBe("aeolian");
         expect(modewheel.getModeNameFromLabel("dorian", ["dorian", "phrygian"])).toBe("dorian");
+        expect(modewheel.getModeNameFromLabel("unknown", ["dorian", "phrygian"])).toBe("unknown");
     });
 
     it("lists the mode names for a pie-menu group, padding custom slots", () => {
         expect(modewheel.getModeNamesForGroup("7")).toHaveLength(12);
+        expect(modewheel.getModeNamesForGroup("custom")).toHaveLength(12);
+        expect(modewheel.getModeNamesForGroup("custom", Array(15).fill("m"))).toHaveLength(12);
         expect(modewheel.getModeNamesForGroup("custom", ["a", "b"])).toEqual([
             "a",
             "b",
@@ -65,11 +71,60 @@ describe("musicutils-modewheel", () => {
 
     it("sizes the group title and slice fonts to the wheel radius", () => {
         expect(modewheel.getModeGroupTitleFont(100)).toBe("100 8px sans-serif");
-        expect(modewheel.getModeSliceFont(100, 7, 10)).toContain("sans-serif");
+        expect(modewheel.getModeSliceFont(100, 7, 10)).toBe("100 7px sans-serif");
+        expect(modewheel.getModeSliceFont(100, 100, 100)).toBe("100 6px sans-serif");
+        expect(modewheel.getModeSliceFont(100, 1, 1)).toBe("100 12px sans-serif");
     });
 
-    it("has no saved custom modes by default", () => {
-        expect(modewheel.getSavedCustomModes()).toEqual([]);
+    describe("getSavedCustomModes", () => {
+        afterEach(() => {
+            if (typeof localStorage !== "undefined" && localStorage.clear) {
+                localStorage.clear();
+            }
+        });
+
+        it("has no saved custom modes by default", () => {
+            if (typeof localStorage !== "undefined" && localStorage.clear) {
+                localStorage.clear();
+            }
+            expect(modewheel.getSavedCustomModes()).toEqual([]);
+        });
+
+        it("returns parsed custom modes when valid array is stored", () => {
+            const validModes = [
+                { name: "custom-1", pattern: [2, 2, 1, 2, 2, 2, 1] },
+                { name: "custom-2", pattern: [3, 4, 5] }
+            ];
+            localStorage.setItem("customModes", JSON.stringify(validModes));
+            expect(modewheel.getSavedCustomModes()).toEqual(validModes);
+        });
+
+        it("returns empty array when JSON is corrupt or malformed", () => {
+            localStorage.setItem("customModes", "{ invalid json");
+            expect(modewheel.getSavedCustomModes()).toEqual([]);
+        });
+
+        it("returns empty array when stored data is not an array", () => {
+            localStorage.setItem("customModes", JSON.stringify({ not: "an array" }));
+            expect(modewheel.getSavedCustomModes()).toEqual([]);
+
+            localStorage.setItem("customModes", JSON.stringify(12345));
+            expect(modewheel.getSavedCustomModes()).toEqual([]);
+        });
+
+        it("filters out null, non-objects, or items without string name", () => {
+            const mixedModes = [
+                null,
+                undefined,
+                { name: 123 },
+                { otherKey: "val" },
+                { name: "valid-mode", pattern: [12] }
+            ];
+            localStorage.setItem("customModes", JSON.stringify(mixedModes));
+            expect(modewheel.getSavedCustomModes()).toEqual([
+                { name: "valid-mode", pattern: [12] }
+            ]);
+        });
     });
 
     it("is still reachable through musicutils.js for callers that require it", () => {
@@ -92,6 +147,59 @@ describe("musicutils-modewheel", () => {
         for (const name of Object.keys(modewheel)) {
             expect(remaining).not.toMatch(new RegExp(`^(const|let|var|function) ${name}\\b`, "m"));
         }
+    });
+
+    describe("getModeSliceArc", () => {
+        it("is the circumference at the label radius, scaled by the slice angle", () => {
+            const fullTurn = modewheel.getModeSliceArc(200, 360);
+            expect(fullTurn).toBeCloseTo(2 * Math.PI * 0.575 * 200, 6);
+            // Half the degrees is half the arc: this is what lets the mode
+            // widget measure proportional slices and equal slices alike.
+            expect(modewheel.getModeSliceArc(200, 30)).toBeCloseTo(fullTurn / 12, 6);
+        });
+    });
+
+    describe("enforceMinSliceAngles", () => {
+        it("raises slices below the floor and takes the excess from wider slices", () => {
+            expect(modewheel.enforceMinSliceAngles([8.9, 351.1], 12)).toEqual([12, 348]);
+            expect(modewheel.enforceMinSliceAngles(null, 12)).toBeNull();
+        });
+    });
+
+    describe("rotateSliceAngles", () => {
+        it("re-anchors slice i to span pitch i..i+1, wrapping the last gap", () => {
+            expect(modewheel.rotateSliceAngles([10, 20, 30])).toEqual([20, 30, 10]);
+            expect(modewheel.rotateSliceAngles(null)).toBeNull();
+        });
+    });
+
+    describe("sliceAnglesFromRatios", () => {
+        it("sizes each slice by the log2 size of the interval it spans", () => {
+            const angles = modewheel.sliceAnglesFromRatios([1, 1.5], 2);
+            expect(angles).toHaveLength(2);
+            // 3/2 is 701.955 cents = 210.5865 degrees; slice 0 wraps the rest.
+            expect(angles[1]).toBeCloseTo(210.5865, 3);
+            expect(angles[0]).toBeCloseTo(149.4135, 3);
+            expect(angles[0] + angles[1]).toBeCloseTo(360, 6);
+            expect(modewheel.sliceAnglesFromRatios([1], 2)).toBeNull();
+            expect(modewheel.sliceAnglesFromRatios([1, 1.5, 1.2], 2)).toBeNull();
+            expect(modewheel.sliceAnglesFromRatios([1, 1.5], 1)).toBeNull();
+        });
+    });
+
+    describe("getTemperamentSliceAngles", () => {
+        it("returns proportional widths for a non-EDO temperament", () => {
+            expect(modewheel.getTemperamentSliceAngles("equal", 12)).toBeNull();
+            expect(modewheel.getTemperamentSliceAngles("made-up", 12)).toBeNull();
+            expect(modewheel.getTemperamentSliceAngles("just intonation", 19)).toBeNull();
+            const angles = modewheel.getTemperamentSliceAngles("just intonation", 12);
+            expect(angles).toHaveLength(12);
+            expect(angles.reduce((sum, a) => sum + a, 0)).toBeCloseTo(360, 6);
+            // 5-limit JI extremes: 6/5 to 5/4 is the narrowest slice,
+            // 5/3 to 9/5 the widest; equal slices would be 30 each.
+            expect(Math.min(...angles)).toBeCloseTo(21.2, 1);
+            expect(Math.max(...angles)).toBeCloseTo(39.97, 1);
+        });
     });
 
     describe("loaded as classic scripts, the way the browser does", () => {

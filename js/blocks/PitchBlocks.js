@@ -249,6 +249,14 @@ function setupPitchBlocks(activity) {
         constructor() {
             //.TRANS: the change measured in scale-steps between the current pitch and the previous pitch
             super("deltapitch2", _("scalar change in pitch"));
+            this.setHelpString([
+                _(
+                    "The Scalar change in pitch block is the difference (in scale steps) between the current pitch being played and the previous pitch played."
+                ),
+                "documentation",
+                null,
+                "deltapitch2help"
+            ]);
         }
     }
 
@@ -1674,6 +1682,24 @@ function setupPitchBlocks(activity) {
                 // convert hertz to note/octave
                 const note = obj;
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];
+            } else if (logo.inPitchDrumMatrix) {
+                // The widget's rows are notes, so use the nearest note and octave. The pitch
+                // path would add the cents as semitones.
+                const note = obj;
+                if (tur.singer.drumStyle.length > 0) {
+                    logo.pitchDrumMatrix.drums.push(last(tur.singer.drumStyle));
+                    logo.pitchDrumMatrix.addColBlock(blk);
+                } else {
+                    logo.pitchDrumMatrix.addRowBlock(blk);
+                    if (!logo.pitchBlocks.includes(blk)) {
+                        logo.pitchBlocks.push(blk);
+                    }
+
+                    logo.pitchDrumMatrix.rowLabels.push(note[0]);
+                    logo.pitchDrumMatrix.rowArgs.push(note[1]);
+                    tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
+                    tur.singer.lastNotePlayed = [note[0] + note[1], 4];
+                }
             } else if (logo.inLegoWidget) {
                 logo.legoWidget.addRowBlock(blk);
                 if (!logo.pitchBlocks.includes(blk)) {
@@ -1686,10 +1712,11 @@ function setupPitchBlocks(activity) {
                 const note = obj;
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];
             } else if (logo.inMusicKeyboard) {
-                logo.musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
-                logo.musicKeyboard.noteNames.push("hertz");
-                logo.musicKeyboard.octaves.push(arg);
-                logo.musicKeyboard.addRowBlock(blk);
+                const musicKeyboard = logo.musicKeyboardByTurtle?.[turtle] || logo.musicKeyboard;
+                musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
+                musicKeyboard.noteNames.push("hertz");
+                musicKeyboard.octaves.push(arg);
+                musicKeyboard.addRowBlock(blk);
                 // convert hertz to note/octave
                 const note = obj;
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];
@@ -1956,16 +1983,27 @@ function setupPitchBlocks(activity) {
 
             let note, octave, cents;
 
-            // Is the arg a scaledegree block?
+            // Is the arg a scaledegree block, or a number with an accidental,
+            // typed or computed (e.g. a box plus a sharp)? Either is a scale degree.
             const c = activity.blocks.blockList[blk].connections[1];
             let cname = null;
             if (c !== null) {
                 cname = activity.blocks.blockList[c].name;
             }
+            const degreeArg = String(arg0).replace(/#$/, SHARP).replace(/b$/, FLAT);
+            const isScaleDegree =
+                cname === "scaledegree2" ||
+                (typeof arg0 === "string" &&
+                    [SHARP, FLAT, DOUBLESHARP, DOUBLEFLAT, NATURAL].some(
+                        attr =>
+                            degreeArg.endsWith(attr) &&
+                            /^-?\d+$/.test(degreeArg.slice(0, -attr.length))
+                    ));
 
             if (!isNaN(Number(arg0[0])) || !isNaN(Number(arg0[1]))) {
-                if (cname === "scaledegree2") {
-                    let scaledegree = activity.blocks.blockList[c].value;
+                if (isScaleDegree) {
+                    let scaledegree =
+                        cname === "scaledegree2" ? activity.blocks.blockList[c].value : degreeArg;
                     let attr;
 
                     if (scaledegree.includes(SHARP)) {
@@ -2008,7 +2046,17 @@ function setupPitchBlocks(activity) {
                         null
                     );
                     if (attr !== NATURAL) {
-                        note += attr;
+                        // A sharp on a flat note of the key, or a flat on a sharp
+                        // one, cancels it (7♭ in G major is F, not F♯♭).
+                        const keyAttr = note.slice(1);
+                        if (
+                            (keyAttr === FLAT && attr === SHARP) ||
+                            (keyAttr === SHARP && attr === FLAT)
+                        ) {
+                            note = note.slice(0, 1);
+                        } else {
+                            note += attr;
+                        }
                     }
 
                     let semitones = ref;

@@ -59,6 +59,17 @@ const SCROLL_CANVAS_SCALE = 3;
 const MAX_ARC_ANGLE = 45000;
 
 /**
+ * Upper bound on the steps doForward() accepts in Wrap Mode. Wrapping draws the
+ * line in 5-step segments in a synchronous loop, and each segment adds to the SVG
+ * output, so very large values freeze the page and eventually overflow the SVG
+ * string. A million steps takes well under a second and crosses a typical canvas
+ * hundreds of times. The limit is fixed rather than derived from the canvas size so
+ * that a project behaves the same on every screen. Without wrapping, the line is
+ * drawn in one call and no limit is needed.
+ */
+const MAX_WRAP_STEPS = 1000000;
+
+/**
  * Class pertaining to visual actions for each turtle.
  *
  * @class
@@ -839,8 +850,11 @@ class Painter {
      * Takes in turtle functions to reset the turtle position, pen, skin, media.
      *
      * @param steps - the number of steps the turtle goes forward by
+     * @param linePart - "first", "middle" or "last" when drawing part of a longer move
+     * @param totalSteps - the whole move that steps is part of, checked against
+     *     MAX_WRAP_STEPS (defaults to steps)
      */
-    doForward(steps, linePart) {
+    doForward(steps, linePart, totalSteps = steps) {
         steps = Number(steps);
         if (!Number.isFinite(steps)) {
             this.turtles.activity.errorMsg(NANERRORMSG);
@@ -890,6 +904,16 @@ class Painter {
             this._move(ox, oy, nx, ny, true, linePart);
             this._scheduleCanvasUpdate();
         } else {
+            if (Math.abs(totalSteps) > MAX_WRAP_STEPS) {
+                this.turtles.activity.errorMsg(
+                    _("Steps must be within -%s to %s when Wrap Mode is on.").replace(
+                        /%s/g,
+                        MAX_WRAP_STEPS
+                    )
+                );
+                return;
+            }
+
             const stepUnit = 5;
             let xIncrease, yIncrease;
             if (steps > 0) {
@@ -919,6 +943,11 @@ class Painter {
                     this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
                 }
 
+                // Start a new path for each segment; otherwise every stroke() redraws
+                // all the earlier segments and the loop slows down quadratically.
+                this.turtle.ctx.beginPath();
+                this.turtle.ctx.moveTo(this.turtle.container.x, this.turtle.container.y);
+
                 // Get old turtle point
                 oy = turtles.screenY2turtleY(this.turtle.container.y);
                 ox = turtles.screenX2turtleX(this.turtle.container.x);
@@ -944,6 +973,18 @@ class Painter {
     }
 
     /**
+     * Maps any finite angle into [0, 360). A loop adding 360 per turn hangs on a
+     * large negative angle, and never ends once 360 is below the number's precision.
+     *
+     * @private
+     * @param {Number} degrees - finite angle in degrees
+     * @returns {Number} the same heading in [0, 360)
+     */
+    static _normalizeHeading(degrees) {
+        return ((degrees % 360) + 360) % 360;
+    }
+
+    /**
      * Turn right and display corresponding turtle graphic by rotating bitmap.
      *
      * @param degrees - degrees for right turn
@@ -955,18 +996,10 @@ class Painter {
             return;
         }
 
-        this.turtle.orientation += degrees;
-        while (this.turtle.orientation < 0) {
-            this.turtle.orientation += 360;
-        }
-
-        this.turtle.orientation %= 360;
+        this.turtle.orientation = Painter._normalizeHeading(this.turtle.orientation + degrees);
         this.turtle.container.rotation = this.turtle.orientation;
 
-        // We cannot update the cache during the 'tween'
-        if (!this.turtle.blinking()) {
-            this.turtle.updateCache();
-        }
+        this._scheduleCanvasUpdate();
     }
 
     /**
@@ -1023,18 +1056,10 @@ class Painter {
             return;
         }
 
-        this.turtle.orientation = degrees;
-        while (this.turtle.orientation < 0) {
-            this.turtle.orientation += 360;
-        }
-
-        this.turtle.orientation %= 360;
+        this.turtle.orientation = Painter._normalizeHeading(degrees);
         this.turtle.container.rotation = this.turtle.orientation;
 
-        // We cannot update the cache during the 'tween'
-        if (!this.turtle.blinking()) {
-            this.turtle.updateCache();
-        }
+        this._scheduleCanvasUpdate();
     }
 
     /**
@@ -1302,6 +1327,13 @@ class Painter {
                     '<path d="M ' + ix * turtlesScale + "," + iy * turtlesScale + " ";
             }
 
+            // Start a new path like forward and arc do, or the stroke below
+            // also paints the previous block's line again in this colour.
+            if (!this._fillState) {
+                this.turtle.ctx.beginPath();
+                this.turtle.ctx.moveTo(ix, iy);
+            }
+
             const nstepsCurve = this._estimateBezierSteps(ix, iy, cx1, cy1, cx2, cy2, fx, fy);
 
             this._svgBezier(nstepsCurve, ix, iy, cx1, cy1, cx2, cy2, fx, fy, true);
@@ -1311,6 +1343,9 @@ class Painter {
 
             // draw it
             this.turtle.ctx.stroke();
+            if (!this._fillState) {
+                this.turtle.ctx.closePath();
+            }
         } else {
             this.turtle.x = x2;
             this.turtle.y = y2;
@@ -1371,8 +1406,7 @@ class Painter {
             this.turtle.x = 0;
             this.turtle.y = 0;
             this.turtle.orientation = 0.0;
-            turtles.gx = this.turtle.ctx.canvas.width;
-            turtles.gy = this.turtle.ctx.canvas.height;
+            this._centerScroll();
         }
 
         const i = turtles.getIndexOfTurtle(this.turtle) % 10;
@@ -1454,6 +1488,20 @@ class Painter {
     }
 
     /**
+     * Puts the visible area in the middle of the scroll buffer, so that it can
+     * scroll the same distance in every direction.
+     */
+    _centerScroll() {
+        const turtles = this.turtles;
+        if (!turtles.canvas1) {
+            // doScrollXY centers it when it creates the buffer
+            return;
+        }
+        turtles.gx = Math.floor((turtles.canvas1.width - this.turtle.ctx.canvas.width) / 2);
+        turtles.gy = Math.floor((turtles.canvas1.height - this.turtle.ctx.canvas.height) / 2);
+    }
+
+    /**
      * As the canvas scrolls the turtle is drawn under.
      *
      * @param dx - change in x coordinate
@@ -1471,14 +1519,13 @@ class Painter {
 
         const turtles = this.turtles;
         if (!turtles.canvas1) {
-            turtles.gx = this.turtle.ctx.canvas.width;
-            turtles.gy = this.turtle.ctx.canvas.height;
             turtles.canvas1 = document.createElement("canvas");
             // Use 2x viewport instead of 3x to save ~40 MB of memory.
             // At 1920x1080: 2x = 3840x2160x4 = 33 MB vs 3x = 5760x3240x4 = 75 MB.
             turtles.canvas1.width = (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.width;
             turtles.canvas1.height = (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.height;
-            turtles.c1ctx = turtles.canvas1.getContext("2d");
+            this._centerScroll();
+            turtles.c1ctx = turtles.canvas1.getContext("2d", { willReadFrequently: true });
             turtles.c1ctx.rect(
                 0,
                 0,
@@ -1493,9 +1540,9 @@ class Painter {
 
         turtles.gy -= dy;
         turtles.gx -= dx;
-        // Clamp scroll position to stay within buffer canvas bounds
-        const maxScrollX = (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.width;
-        const maxScrollY = (SCROLL_CANVAS_SCALE - 1) * this.turtle.ctx.canvas.height;
+        // Clamp scroll position so the visible area stays inside the buffer canvas
+        const maxScrollX = turtles.canvas1.width - this.turtle.ctx.canvas.width;
+        const maxScrollY = turtles.canvas1.height - this.turtle.ctx.canvas.height;
         turtles.gx = clampNumber(turtles.gx, 0, maxScrollX);
         turtles.gy = clampNumber(turtles.gy, 0, maxScrollY);
 
@@ -1541,6 +1588,10 @@ class Painter {
      * @param color - hex code specifying color
      */
     doSetColor(color) {
+        if (!Number.isFinite(Number(color))) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
         this.closeSVG();
         this.color = Number(color);
         const results = getcolor(this.color);
@@ -1558,6 +1609,10 @@ class Painter {
      * @param chroma - chroma hex code
      */
     doSetChroma(chroma) {
+        if (!Number.isFinite(Number(chroma))) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
         this.closeSVG();
         this.chroma = Number(chroma);
         this._canvasColor = getMunsellColor(this.color, this.value, this.chroma);
@@ -1570,6 +1625,10 @@ class Painter {
      * @param shade - shade hex code
      */
     doSetValue(shade) {
+        if (!Number.isFinite(Number(shade))) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
         this.closeSVG();
         this.value = Number(shade);
         this._canvasColor = getMunsellColor(this.color, this.value, this.chroma);
@@ -1582,6 +1641,10 @@ class Painter {
      * @param hue - hue hex code
      */
     doSetHue(hue) {
+        if (!Number.isFinite(Number(hue))) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
         this.closeSVG();
         this.color = Number(hue);
         this._canvasColor = getMunsellColor(this.color, this.value, this.chroma);
@@ -1598,11 +1661,38 @@ class Painter {
     }
 
     /**
+     * Sets the pen's translucency as the Set Translucency block takes it:
+     * 0 is opaque and 100 is invisible.
+     *
+     * @param translucency - translucency from 0 to 100
+     */
+    doSetTranslucency(translucency) {
+        translucency = Number(translucency);
+        if (!Number.isFinite(translucency)) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+        this.doSetPenAlpha(1.0 - (translucency % 101) / 100);
+    }
+
+    /**
      * Sets pen size/thickness.
      *
      * @param size - pen size which is assigned to pen stroke
      */
     doSetPensize(size) {
+        size = Number(size);
+        if (!Number.isFinite(size)) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+        // A canvas ignores a lineWidth of 0 or less and keeps the old width, so
+        // storing it would leave the Pen size block and SVG export out of step.
+        if (size <= 0) {
+            this.turtles.activity.errorMsg(_("Pen size must be greater than 0."));
+            return;
+        }
+
         this.closeSVG();
         this.stroke = size;
         if (this.turtle.ctx.lineWidth !== this.stroke) {

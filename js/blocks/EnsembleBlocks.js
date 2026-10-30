@@ -128,8 +128,13 @@ function setupEnsembleBlocks(activity) {
             }
 
             const targetTurtle = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            if (targetTurtle === null) return -1;
+
             const i = getTargetTurtle(activity.turtles, targetTurtle);
-            if (i < 0) return -1;
+            if (i === null) {
+                activity.errorMsg(_("Cannot find turtle") + " " + targetTurtle, blk);
+                return -1;
+            }
 
             const cblk2 = activity.blocks.blockList[blk].connections[2];
             if (cblk2 === null) {
@@ -141,7 +146,21 @@ function setupEnsembleBlocks(activity) {
                         logo.turtleHeaps[i] = [];
                     }
 
-                    if (a < 1) {
+                    a = Math.floor(a);
+                    const heapLen = logo.turtleHeaps[i].length;
+
+                    if (a < 0) {
+                        if (heapLen === 0) {
+                            activity.errorMsg(_("empty heap"));
+                            return 0;
+                        }
+                        if (-a <= heapLen) {
+                            a = heapLen + a + 1;
+                        } else {
+                            a = 1;
+                            activity.errorMsg(_("Index must be > 0."));
+                        }
+                    } else if (a < 1) {
                         a = 1;
                         activity.errorMsg(_("Index must be > 0."));
                     }
@@ -1093,7 +1112,8 @@ function setupEnsembleBlocks(activity) {
 
             let fillColor;
             let strokeColor;
-            if (typeof args[0] === "number") {
+            // A non-finite number gets the default colour, like a non-number.
+            if (Number.isFinite(args[0])) {
                 fillColor = getMunsellColor(args[0], 50, 100);
                 strokeColor = getMunsellColor(args[0], 70, 80);
             } else {
@@ -1297,8 +1317,6 @@ function setupEnsembleBlocks(activity) {
                 } else {
                     activity.errorMsg(`${_("Cannot find turtle")} ${args[0]}`, blk);
                 }
-            } else {
-                activity.turtles.getTurtle(turtle).rename(args[1]);
             }
         }
     }

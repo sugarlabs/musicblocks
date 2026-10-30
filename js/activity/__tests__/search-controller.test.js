@@ -100,6 +100,126 @@ function makeActivity(protoBlocks = {}) {
 }
 
 // ---------------------------------------------------------------------------
+// drag handle
+// ---------------------------------------------------------------------------
+
+/** jsdom has no Pointer Capture API, so stand one in on the handle element. */
+function stubPointerCapture(handle) {
+    const captured = new Set();
+    handle.setPointerCapture = jest.fn(id => captured.add(id));
+    handle.releasePointerCapture = jest.fn(id => captured.delete(id));
+    handle.hasPointerCapture = jest.fn(id => captured.has(id));
+    return captured;
+}
+
+function pointerEvent(type, props) {
+    const event = new Event(type, { bubbles: true });
+    Object.assign(event, props);
+    return event;
+}
+
+describe("SearchController drag handle", () => {
+    let activity, sc;
+
+    beforeEach(() => {
+        document.body.innerHTML = "";
+        activity = makeActivity();
+        activity.searchWidget.getBoundingClientRect = jest.fn(() => ({
+            left: 200,
+            top: 120,
+            height: 50
+        }));
+        setupSearchController(activity);
+        sc = activity.searchController;
+    });
+
+    test("creates the handle once and reuses it on a second call", () => {
+        sc._addSearchDragHandle();
+        const first = document.getElementById("searchDragHandle");
+        expect(first).not.toBeNull();
+        expect(first.style.display).toBe("flex");
+
+        sc._addSearchDragHandle();
+        expect(document.querySelectorAll("#searchDragHandle")).toHaveLength(1);
+        expect(document.getElementById("searchDragHandle")).toBe(first);
+    });
+
+    test("positions the handle from the widget's bounding box", () => {
+        sc._addSearchDragHandle();
+        const handle = document.getElementById("searchDragHandle");
+        // left + 4, and centred on a 38px handle: top + (height - 38) / 2
+        expect(handle.style.left).toBe("204px");
+        expect(handle.style.top).toBe("126px");
+    });
+
+    test("dragging moves the widget by the pointer delta", () => {
+        sc._addSearchDragHandle();
+        const handle = document.getElementById("searchDragHandle");
+        stubPointerCapture(handle);
+        activity.searchWidget.style.left = "200px";
+        activity.searchWidget.style.top = "120px";
+
+        handle.dispatchEvent(
+            pointerEvent("pointerdown", { clientX: 300, clientY: 400, pointerId: 1 })
+        );
+        expect(handle.style.cursor).toBe("grabbing");
+        expect(activity.searchWidget.style.transition).toBe("none");
+
+        handle.dispatchEvent(
+            pointerEvent("pointermove", { clientX: 330, clientY: 375, pointerId: 1 })
+        );
+        expect(activity.searchWidget.style.left).toBe("230px");
+        expect(activity.searchWidget.style.top).toBe("95px");
+    });
+
+    test("ignores pointermove when the pointer was never captured", () => {
+        sc._addSearchDragHandle();
+        const handle = document.getElementById("searchDragHandle");
+        stubPointerCapture(handle);
+        activity.searchWidget.style.left = "200px";
+
+        handle.dispatchEvent(
+            pointerEvent("pointermove", { clientX: 999, clientY: 999, pointerId: 7 })
+        );
+        expect(activity.searchWidget.style.left).toBe("200px");
+    });
+
+    test("pointerup releases the capture and restores the cursor", () => {
+        sc._addSearchDragHandle();
+        const handle = document.getElementById("searchDragHandle");
+        stubPointerCapture(handle);
+
+        handle.dispatchEvent(
+            pointerEvent("pointerdown", { clientX: 10, clientY: 10, pointerId: 3 })
+        );
+        handle.dispatchEvent(pointerEvent("pointerup", { pointerId: 3 }));
+
+        expect(handle.releasePointerCapture).toHaveBeenCalledWith(3);
+        expect(handle.style.cursor).toBe("grab");
+        expect(activity.searchWidget.style.transition).toBe("");
+    });
+
+    test("_positionSearchDragHandle does nothing without a bounding box", () => {
+        sc._addSearchDragHandle();
+        const handle = document.getElementById("searchDragHandle");
+        handle.style.left = "50px";
+        delete activity.searchWidget.getBoundingClientRect;
+
+        expect(() => sc._positionSearchDragHandle()).not.toThrow();
+        expect(handle.style.left).toBe("50px");
+    });
+
+    test("_hideSearchDragHandle hides it, and is safe when absent", () => {
+        sc._addSearchDragHandle();
+        sc._hideSearchDragHandle();
+        expect(document.getElementById("searchDragHandle").style.display).toBe("none");
+
+        document.body.innerHTML = "";
+        expect(() => sc._hideSearchDragHandle()).not.toThrow();
+    });
+});
+
+// ---------------------------------------------------------------------------
 // setupSearchController
 // ---------------------------------------------------------------------------
 
@@ -625,6 +745,120 @@ describe("SearchController.doSearch - autocomplete initialization", () => {
         expect(renderSpy).toHaveBeenCalledWith(global.window.jQuery, ul, item);
     });
 
+    test("renders normal item and handles drag and drop with requestAnimationFrame correctly", () => {
+        const previousRaf = window.requestAnimationFrame;
+        const previousCancelRaf = window.cancelAnimationFrame;
+
+        let rafCallback = null;
+        window.requestAnimationFrame = jest.fn(cb => {
+            rafCallback = cb;
+            return 456;
+        });
+        window.cancelAnimationFrame = jest.fn();
+
+        try {
+            const instance = { _renderItem: null };
+            $elem = makeJQueryElem(false, instance);
+            global.window.jQuery = jest.fn(() => $elem);
+
+            const protoBlock = makeProtoBlock("drum", "drum beat");
+            const activity = makeActivity({ drum: protoBlock });
+            setupSearchController(activity);
+            const sc = activity.searchController;
+            sc.prepSearchWidget();
+
+            activity.searchWidget.idInput_custom = "";
+            activity.searchWidget.value = "";
+            sc.doSearch();
+
+            const ul = { css: jest.fn(), append: jest.fn() };
+            const liEl = {
+                addEventListener: jest.fn(),
+                append: jest.fn(() => liEl),
+                0: {
+                    addEventListener: jest.fn(),
+                    style: {},
+                    querySelector: jest.fn(() => null)
+                }
+            };
+            liEl.appendTo = jest.fn(() => liEl);
+            const mockA = { text: jest.fn(() => mockA) };
+            const mockSearch = { autocomplete: jest.fn() };
+            global.window.jQuery.mockImplementation(selector => {
+                if (selector === "<a>") return mockA;
+                if (selector === "#search") return mockSearch;
+                return liEl;
+            });
+
+            const originalCreateElement = document.createElement.bind(document);
+            document.createElement = jest.fn(tag => {
+                if (tag === "img") {
+                    const mockImg = originalCreateElement("img");
+                    Object.defineProperty(mockImg, "offsetWidth", { value: 20 });
+                    Object.defineProperty(mockImg, "offsetHeight", { value: 20 });
+                    return mockImg;
+                }
+                return originalCreateElement(tag);
+            });
+
+            const item = {
+                isEmptyState: false,
+                label: "drum",
+                value: "drum",
+                specialDict: protoBlock
+            };
+
+            jest.spyOn(document, "addEventListener");
+            jest.spyOn(document, "removeEventListener");
+
+            instance._renderItem(ul, item);
+
+            // Mousedown
+            const downHandler = liEl[0].addEventListener.mock.calls.find(
+                c => c[0] === "mousedown"
+            )[1];
+            downHandler({
+                stopPropagation: jest.fn(),
+                stopImmediatePropagation: jest.fn(),
+                preventDefault: jest.fn(),
+                pageX: 100,
+                pageY: 200,
+                type: "mousedown"
+            });
+
+            // Mousemove
+            const moveHandler = document.addEventListener.mock.calls.find(
+                c => c[0] === "mousemove"
+            )[1];
+            moveHandler({
+                preventDefault: jest.fn(),
+                pageX: 150,
+                pageY: 260,
+                type: "mousemove"
+            });
+
+            expect(window.requestAnimationFrame).toHaveBeenCalled();
+            expect(rafCallback).not.toBeNull();
+
+            // Mouseup before RAF fires
+            const upHandler = document.addEventListener.mock.calls.find(c => c[0] === "mouseup")[1];
+            upHandler();
+
+            expect(window.cancelAnimationFrame).toHaveBeenCalledWith(456);
+
+            expect(activity.palettes.dict["test-palette"].makeBlockFromSearch).toHaveBeenCalled();
+
+            const makeBlockCb =
+                activity.palettes.dict["test-palette"].makeBlockFromSearch.mock.calls[0][2];
+            const newBlock = {};
+            makeBlockCb(newBlock);
+            expect(activity.blocks.moveBlock).toHaveBeenCalledWith(newBlock, 140, 250);
+        } finally {
+            window.requestAnimationFrame = previousRaf;
+            window.cancelAnimationFrame = previousCancelRaf;
+        }
+    });
+
     test("select callback does not place a block for the empty-state row", () => {
         const activity = makeActivity({ drum: makeProtoBlock("drum", "drum beat") });
         setupSearchController(activity);
@@ -1131,5 +1365,118 @@ describe("SearchController._hideHelpfulSearchWidget", () => {
         sc._hideHelpfulSearchWidget();
 
         expect(removeChild).toHaveBeenCalledWith(sc.helpfulSearchDiv);
+    });
+});
+
+describe("SearchController touch result placement", () => {
+    let activity, placeBlock;
+
+    let row, listeners, originalAutocomplete, originalJQuery;
+    const $ = jest.requireActual("jquery");
+
+    beforeEach(() => {
+        // Earlier suites assign DOM mocks directly. Use real DOM methods for gestures.
+        delete document.getElementById;
+        delete document.createElement;
+        delete document.addEventListener;
+        delete document.removeEventListener;
+        delete document.body.appendChild;
+        delete document.body.removeChild;
+        document.body.innerHTML = '<input id="search"><ul id="touch-search-results"></ul>';
+        originalAutocomplete = $.fn.autocomplete;
+        originalJQuery = window.jQuery;
+        const instance = {};
+        $.fn.autocomplete = jest.fn(function (arg) {
+            return arg === "instance" ? instance : this;
+        });
+        window.jQuery = $;
+        listeners = jest.spyOn(document, "addEventListener");
+
+        const block = makeProtoBlock("forward", "forward");
+        activity = makeActivity({ forward: block });
+        activity.searchWidget = document.getElementById("search");
+        placeBlock = activity.palettes.dict["test-palette"].makeBlockFromSearch;
+        setupSearchController(activity);
+        activity.searchController.doSearch();
+        const item = { label: "forward", value: "forward", specialDict: block };
+        row = instance._renderItem($("#touch-search-results"), item)[0];
+    });
+
+    afterEach(() => {
+        for (const [type, listener, options] of listeners.mock.calls) {
+            document.removeEventListener(type, listener, options);
+        }
+        listeners.mockRestore();
+        $.fn.autocomplete = originalAutocomplete;
+        window.jQuery = originalJQuery;
+        document.body.innerHTML = "";
+    });
+
+    function touch(type, x, y, scrollX = 0, scrollY = 0) {
+        const event = new Event(type, { bubbles: true, cancelable: true });
+        Object.defineProperty(event, "touches", {
+            value:
+                type === "touchend"
+                    ? []
+                    : [{ clientX: x, clientY: y, pageX: x + scrollX, pageY: y + scrollY }]
+        });
+        return event;
+    }
+
+    test("places a block after a touch tap without movement", () => {
+        row.dispatchEvent(touch("touchstart", 150, 180));
+        document.dispatchEvent(touch("touchend", 150, 180));
+
+        expect(placeBlock).toHaveBeenCalledTimes(1);
+        expect(activity.blocks.moveBlock).toHaveBeenCalledWith(42, 150, 180);
+    });
+
+    test("places a dragged block at the last touch position", () => {
+        row.dispatchEvent(touch("touchstart", 150, 180));
+        document.dispatchEvent(touch("touchmove", 300, 350));
+        document.dispatchEvent(touch("touchend", 300, 350));
+
+        expect(placeBlock).toHaveBeenCalledTimes(1);
+        expect(activity.blocks.moveBlock).toHaveBeenCalledWith(42, 300, 350);
+    });
+
+    test("still places a block after a mouse click", () => {
+        row.dispatchEvent(
+            new MouseEvent("mousedown", { bubbles: true, clientX: 150, clientY: 180 })
+        );
+        document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+
+        expect(placeBlock).toHaveBeenCalledTimes(1);
+        expect(activity.blocks.moveBlock).toHaveBeenCalledWith(42, 150, 180);
+    });
+
+    test("uses page coordinates for a stationary tap on a scrolled page", () => {
+        row.dispatchEvent(touch("touchstart", 150, 180, 40, 90));
+        document.dispatchEvent(touch("touchend", 150, 180, 40, 90));
+
+        expect(placeBlock).toHaveBeenCalledTimes(1);
+        expect(activity.blocks.moveBlock).toHaveBeenCalledWith(42, 190, 270);
+    });
+
+    test("does not repeat a completed touch placement on the next mouse gesture", () => {
+        row.dispatchEvent(touch("touchstart", 150, 180));
+        document.dispatchEvent(touch("touchend", 150, 180));
+        row.dispatchEvent(
+            new MouseEvent("mousedown", { bubbles: true, clientX: 250, clientY: 280 })
+        );
+        document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+
+        expect(placeBlock).toHaveBeenCalledTimes(2);
+        expect(activity.blocks.moveBlock).toHaveBeenLastCalledWith(42, 250, 280);
+    });
+
+    test("does not repeat a completed mouse placement on a later touch release", () => {
+        row.dispatchEvent(
+            new MouseEvent("mousedown", { bubbles: true, clientX: 150, clientY: 180 })
+        );
+        document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+        document.dispatchEvent(touch("touchend", 250, 280));
+
+        expect(placeBlock).toHaveBeenCalledTimes(1);
     });
 });

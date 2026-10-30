@@ -33,10 +33,28 @@ global.window = { btoa: str => Buffer.from(str, "binary").toString("base64") };
 
 const buildscale = require("../musicutils-buildscale");
 const musicutils = require("../musicutils");
+const { SHARP, FLAT, NATURAL, DOUBLESHARP, DOUBLEFLAT } = require("../musicutils-constants");
 
 const readSource = name => fs.readFileSync(path.join(__dirname, "..", name), "utf8");
 
 describe("musicutils-buildscale", () => {
+    it("reads the pitch class a note name sounds as, whatever its spelling", () => {
+        expect(buildscale._notePitchClass("C")).toBe(0);
+        expect(buildscale._notePitchClass("G♯")).toBe(8);
+        expect(buildscale._notePitchClass("A♭")).toBe(8);
+        expect(buildscale._notePitchClass("F𝄪")).toBe(7);
+        expect(buildscale._notePitchClass("B𝄫")).toBe(9);
+        expect(buildscale._notePitchClass("C♭")).toBe(11);
+        expect(buildscale._notePitchClass("G#")).toBe(8);
+        expect(buildscale._notePitchClass("Bb")).toBe(10);
+        // ASCII double accidentals: ## and x are 𝄪, bb is 𝄫.
+        expect(buildscale._notePitchClass("F##")).toBe(7);
+        expect(buildscale._notePitchClass("Fx")).toBe(7);
+        expect(buildscale._notePitchClass("Abb")).toBe(7);
+        expect(buildscale._notePitchClass("xyz")).toBeNaN();
+        expect(buildscale._notePitchClass(undefined)).toBeNaN();
+    });
+
     it("still builds a scale and resolves frequencies", () => {
         expect(buildscale.buildScale("C major", 12)[0].slice(0, 3)).toEqual(["C", "D", "E"]);
         expect(buildscale.pitchToFrequency("A", 4, 0, "C major", "equal")).toBeCloseTo(440, 5);
@@ -46,6 +64,33 @@ describe("musicutils-buildscale", () => {
             noteName: "C",
             octave: 4
         });
+    });
+
+    it("unifies pitchToFrequency with dynamic powerBase for stretched and non-octave temperaments", () => {
+        // 1. Stretched 12-EDO (octaveRatio: 2.01)
+        const stretched12 = { isEDO: true, edo: 12, octaveRatio: 2.01 };
+        const a4Stretched = buildscale.pitchToFrequency("A", 4, 0, "C major", stretched12);
+        const a5Stretched = buildscale.pitchToFrequency("A", 5, 0, "C major", stretched12);
+        expect(a5Stretched / a4Stretched).toBeCloseTo(2.01, 5);
+
+        // 2. Bohlen-Pierce tritave (octaveRatio: 3, 13 steps per period)
+        const bohlenPierce = { isEDO: true, edo: 13, octaveRatio: 3 };
+        const bpA0 = buildscale.pitchToFrequency("A", 0, 0, "C major", bohlenPierce);
+        const bpA1 = buildscale.pitchToFrequency("A", 1, 0, "C major", bohlenPierce);
+        expect(bpA1 / bpA0).toBeCloseTo(3.0, 5);
+
+        // 3. Stretched non-EDO table (Just Intonation with octaveRatio: 2.02)
+        const jiStretched = {
+            ...musicutils.TEMPERAMENT["just intonation"],
+            octaveRatio: 2.02
+        };
+        const c4Ji = buildscale.pitchToFrequency("C", 4, 0, "C major", jiStretched);
+        const c5Ji = buildscale.pitchToFrequency("C", 5, 0, "C major", jiStretched);
+        expect(c5Ji / c4Ji).toBeCloseTo(2.02, 5);
+
+        // 4. Cents adjustment scales with powerBase (1200 cents = 1 period)
+        const a4With1200Cents = buildscale.pitchToFrequency("A", 4, 1200, "C major", stretched12);
+        expect(a4With1200Cents / a4Stretched).toBeCloseTo(2.01, 5);
     });
 
     it("still resolves scale degrees, step sizes and intervals", () => {
@@ -60,6 +105,87 @@ describe("musicutils-buildscale", () => {
         expect(buildscale._getStepSize("C major", "C", "up", 0, "equal19", 19)).toBe(3);
         expect(buildscale.getInterval(4, "C major", "C")).toBe(7);
         expect(buildscale.getInterval(-2, "C major", "C")).toBe(-3);
+    });
+
+    it("resolves correct accidentals in reverse scale-degree mapping for altered and unaltered pitches", () => {
+        // Flat-key scale note with natural pitch above it (F major: Bb -> B)
+        expect(buildscale.scaleDegreeToPitchMapping("F major", null, false, "B")).toEqual([
+            "4",
+            SHARP
+        ]);
+
+        // Flat-key scale note with lowered pitch (F major: Bb -> Bbb)
+        expect(
+            buildscale.scaleDegreeToPitchMapping("F major", null, false, "B" + DOUBLEFLAT)
+        ).toEqual(["4", FLAT]);
+
+        // Flat-key example from C minor (C minor: Bb -> B)
+        expect(buildscale.scaleDegreeToPitchMapping("C minor", null, false, "B")).toEqual([
+            "7",
+            SHARP
+        ]);
+
+        // Sharp-key scale note with raised pitch (G major: F# -> F##)
+        expect(
+            buildscale.scaleDegreeToPitchMapping("G major", null, false, "F" + DOUBLESHARP)
+        ).toEqual(["7", SHARP]);
+
+        // Sharp-key scale note with lowered pitch (G major: F# -> F)
+        expect(buildscale.scaleDegreeToPitchMapping("G major", null, false, "F")).toEqual([
+            "7",
+            FLAT
+        ]);
+
+        // Unaltered scale notes return natural
+        expect(buildscale.scaleDegreeToPitchMapping("F major", null, false, "B" + FLAT)).toEqual([
+            "4",
+            NATURAL
+        ]);
+        expect(buildscale.scaleDegreeToPitchMapping("G major", null, false, "F" + SHARP)).toEqual([
+            "7",
+            NATURAL
+        ]);
+
+        // Movable do behavior with altered scale note (F major: Bb -> B)
+        expect(buildscale.scaleDegreeToPitchMapping("F major", null, true, "B")).toEqual([
+            "4",
+            SHARP
+        ]);
+
+        // Double accidental on natural scale note (C major: C -> C##, C -> Cbb)
+        expect(
+            buildscale.scaleDegreeToPitchMapping("C major", null, false, "C" + DOUBLESHARP)
+        ).toEqual(["1", DOUBLESHARP, "8", DOUBLESHARP]);
+        expect(
+            buildscale.scaleDegreeToPitchMapping("C major", null, false, "C" + DOUBLEFLAT)
+        ).toEqual(["1", DOUBLEFLAT, "8", DOUBLEFLAT]);
+
+        // Explicit natural symbol on natural scale note
+        expect(buildscale.scaleDegreeToPitchMapping("C major", null, false, "C" + NATURAL)).toEqual(
+            ["1", NATURAL, "8", NATURAL]
+        );
+
+        // Boundary offsets (> 2 or < -2) return null accidental
+        expect(buildscale.scaleDegreeToPitchMapping("F♭ major", null, false, "B" + SHARP)).toEqual([
+            "4"
+        ]);
+        expect(
+            buildscale.scaleDegreeToPitchMapping("G major", null, false, "F" + DOUBLEFLAT)
+        ).toEqual(["7"]);
+
+        // Unrecognized accidental notation returns null accidental
+        expect(buildscale.scaleDegreeToPitchMapping("C major", null, false, "C?")).toEqual([
+            "1",
+            "8"
+        ]);
+
+        // Scales with < 7 notes and > 7 notes in reverse mapping
+        expect(
+            buildscale.scaleDegreeToPitchMapping("C major pentatonic", null, false, "D" + SHARP)
+        ).toEqual(["2", SHARP]);
+        expect(
+            buildscale.scaleDegreeToPitchMapping("C chromatic", null, false, "C" + SHARP)
+        ).toEqual(["1", SHARP]);
     });
 
     it("still resolves a minor key signature's scale and solfege", () => {

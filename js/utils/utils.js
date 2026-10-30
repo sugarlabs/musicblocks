@@ -98,41 +98,38 @@ const changeImage = (imgElement, from, to) => {
  * @param {string} text - The input text to be translated.
  * @returns {string} The translated text.
  */
+let _cachedKanaPreference = null;
+
+function _resetKanaCache() {
+    _cachedKanaPreference = null;
+}
+
+if (typeof window !== "undefined") {
+    window._resetKanaCache = _resetKanaCache;
+    if (typeof window.addEventListener === "function") {
+        window.addEventListener("storage", e => {
+            if (!e || e.key === null || e.key === "kanaPreference") {
+                _resetKanaCache();
+            }
+        });
+    }
+}
 
 function _(text, options = {}) {
     if (!text) return "";
 
     try {
-        const removeChars = [
-            ",",
-            "(",
-            ")",
-            "?",
-            "¿",
-            "<",
-            ">",
-            ".",
-            "\n",
-            '"',
-            ":",
-            "%s",
-            "%d",
-            "/",
-            "'",
-            ";",
-            "×",
-            "!",
-            "¡"
-        ];
-        let cleanedText = text;
-        for (let char of removeChars) cleanedText = cleanedText.split(char).join("");
-
         let translated = "";
         const lang = i18next.language;
 
         if (lang.startsWith("ja")) {
-            const kanaPref = localStorage.getItem("kanaPreference") || "kanji";
-            const script = kanaPref === "kana" ? "kana" : "kanji";
+            if (_cachedKanaPreference === null) {
+                _cachedKanaPreference =
+                    (typeof localStorage !== "undefined" &&
+                        localStorage.getItem("kanaPreference")) ||
+                    "kanji";
+            }
+            const script = _cachedKanaPreference === "kana" ? "kana" : "kanji";
 
             const resolveObj = key => {
                 let obj = i18next.t(key, { ...options, ns: undefined, returnObjects: true });
@@ -167,15 +164,18 @@ function _(text, options = {}) {
  * @returns {string} The formatted string.
  */
 let format = (str, data) => {
+    if (typeof str !== "string") return "";
+
     str = str.replace(/{([a-zA-Z0-9.]*)}/g, (match, name) => {
         let x = data;
-        name.split(".").forEach(v => {
-            if (x === undefined) {
-                console.debug("Undefined value in template string", str, name, x, v);
+        const parts = name.split(".");
+        for (let i = 0; i < parts.length; i++) {
+            if (x === null || x === undefined) {
+                x = undefined;
+                break;
             }
-
-            x = x[v];
-        });
+            x = x[parts[i]];
+        }
 
         return x === undefined ? "" : x;
     });
@@ -484,7 +484,8 @@ if (typeof module !== "undefined" && module.exports) {
         getTextWidth,
         doSVG,
         isSVGEmpty,
-        announceToScreenReader
+        announceToScreenReader,
+        _resetKanaCache
     };
 }
 

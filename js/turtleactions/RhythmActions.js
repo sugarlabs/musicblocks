@@ -66,7 +66,11 @@ function setupRhythmActions(activity) {
 
             // Use the outer most note when nesting to determine the beat and triggering
             if (tur.singer.inNoteBlock.length === 0) {
-                const { beat: beatValue, measure: measureValue } = getMeasurePosition(
+                const {
+                    beat: beatValue,
+                    measure: measureValue,
+                    beats: beatsPlayed
+                } = getMeasurePosition(
                     tur.singer,
                     tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1]
                 );
@@ -98,13 +102,16 @@ function setupRhythmActions(activity) {
                     activity.stage.dispatchEvent("__offbeat_" + turtleID + "__");
                 }
 
-                const thisBeat =
-                    beatValue + tur.singer.beatsPerMeasure * (tur.singer.currentMeasure - 1);
-                for (let f = 0; f < tur.singer.factorList.length; f++) {
-                    if (thisBeat % tur.singer.factorList[f] === 0) {
-                        const eventName =
-                            "__beat_" + tur.singer.factorList[f] + "_" + turtleID + "__";
-                        activity.stage.dispatchEvent(eventName);
+                // Count the beats actually played since the pickup, so "every N beats" keeps
+                // its rhythm across a meter change. Pickup notes are not counted.
+                if (measureValue !== 0) {
+                    const thisBeat = 1 + beatsPlayed;
+                    for (let f = 0; f < tur.singer.factorList.length; f++) {
+                        if (thisBeat % tur.singer.factorList[f] === 0) {
+                            const eventName =
+                                "__beat_" + tur.singer.factorList[f] + "_" + turtleID + "__";
+                            activity.stage.dispatchEvent(eventName);
+                        }
                     }
                 }
             }
@@ -122,7 +129,7 @@ function setupRhythmActions(activity) {
             tur.singer.noteValue[last(tur.singer.inNoteBlock)] =
                 1 / (noteBeatValue * tur.singer.beatFactor);
 
-            const listenerName = "_playnote_" + turtle;
+            const listenerName = "_playnote_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -224,22 +231,49 @@ function setupRhythmActions(activity) {
          * @returns {void}
          */
         static doRhythmicDot(value, turtle, blk) {
-            const tur = activity.turtles.ithTurtle(turtle);
-            const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
-            tur.singer.beatFactor *= currentDotFactor;
-            if (value >= 0) {
-                tur.singer.dotCount += value;
-            } else if (value === -1) {
-                activity.errorMsg(_("An argument of -1 results in a note value of 0."), blk);
-                value = 0;
-            } else {
-                tur.singer.dotCount += -1 / value;
+            if (!Number.isFinite(value)) {
+                activity.errorMsg(_("Dot value must be a finite number."), blk);
+                return;
             }
 
-            const newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
-            tur.singer.beatFactor /= newDotFactor;
+            let dotIncrement;
+            if (value >= 0) {
+                dotIncrement = value;
+            } else if (value === -1) {
+                activity.errorMsg(_("An argument of -1 results in a note value of 0."), blk);
+                dotIncrement = 0;
+            } else {
+                dotIncrement = -1 / value;
+            }
 
-            const listenerName = "_dot_" + turtle;
+            const tur = activity.turtles.ithTurtle(turtle);
+            const newDotCount = tur.singer.dotCount + dotIncrement;
+
+            if (!Number.isFinite(dotIncrement) || !Number.isFinite(newDotCount)) {
+                activity.errorMsg(_("Dot value must be a finite number."), blk);
+                return;
+            }
+
+            const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
+            const newDotFactor = 2 - 1 / Math.pow(2, newDotCount);
+            const newBeatFactor = (tur.singer.beatFactor * currentDotFactor) / newDotFactor;
+
+            if (!Number.isFinite(newBeatFactor) || newBeatFactor <= 0) {
+                activity.errorMsg(_("Dot value must be a finite number."), blk);
+                return;
+            }
+
+            tur.singer.beatFactor = newBeatFactor;
+            tur.singer.dotCount = newDotCount;
+
+            const baseListenerName = "_dot_" + turtle + "_" + blk;
+            let listenerName = baseListenerName;
+            if (tur && tur.listeners) {
+                let suffix = 1;
+                while (listenerName in tur.listeners) {
+                    listenerName = baseListenerName + "_" + suffix++;
+                }
+            }
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -250,7 +284,7 @@ function setupRhythmActions(activity) {
             const __listener = () => {
                 const currentDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
                 tur.singer.beatFactor *= currentDotFactor;
-                tur.singer.dotCount -= value >= 0 ? value : -1 / value;
+                tur.singer.dotCount -= dotIncrement;
                 const newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
                 tur.singer.beatFactor /= newDotFactor;
             };
@@ -399,6 +433,7 @@ function setupRhythmActions(activity) {
             }
 
             tur.singer.beatFactor /= factor;
+            tur.singer.beatFactorValues.push(factor);
 
             const listenerName = "_multiplybeat_" + turtle;
             if (blk !== undefined && blk in activity.blocks.blockList) {
@@ -408,7 +443,8 @@ function setupRhythmActions(activity) {
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
-            const __listener = () => (tur.singer.beatFactor *= factor);
+            // Nested clamps share one listener name, so each one pops its own factor.
+            const __listener = () => (tur.singer.beatFactor *= tur.singer.beatFactorValues.pop());
 
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
         }

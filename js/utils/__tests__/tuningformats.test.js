@@ -44,6 +44,73 @@ describe("parseSclFile", () => {
         expect(result.pitches[1].ratio).toBeCloseTo(1.25, 4);
     });
 
+    it.each(["12", "0012"])("preserves the numeric description %s", description => {
+        const content = ["! numeric.scl", description, "2", "700.0", "1200.0"].join("\n");
+
+        const result = parseSclFile(content);
+        expect(result.description).toBe(description);
+        expect(result.pitchCount).toBe(2);
+        expect(result.pitches.map(p => p.cents)).toEqual([700, 1200]);
+        expect(result.pitches[1].ratio).toBe(2);
+    });
+
+    it.each(["", " \t "])("preserves an empty description line %j", description => {
+        const content = ["! empty-description.scl", description, "2", "700.0", "1200.0"].join("\n");
+
+        const result = parseSclFile(content);
+        expect(result.description).toBe("");
+        expect(result.pitchCount).toBe(2);
+        expect(result.pitches.map(p => p.cents)).toEqual([700, 1200]);
+    });
+
+    it("preserves a numeric description with comments, blank data lines and CRLF", () => {
+        const content = [
+            "! numeric.scl",
+            " \t! header comment",
+            "0012",
+            "! between description and count",
+            "",
+            " 2 ",
+            "! before pitches",
+            "700.0 G",
+            " \t ",
+            "! between pitches",
+            "1200.0 octave",
+            "! after pitches",
+            ""
+        ].join("\r\n");
+
+        const result = parseSclFile(content);
+        expect(result.description).toBe("0012");
+        expect(result.pitchCount).toBe(2);
+        expect(result.pitches.map(p => p.cents)).toEqual([700, 1200]);
+    });
+
+    it.each(["12", ""])("rejects a missing pitch count after description %j", description => {
+        const content = ["! missing-count.scl", description, "! no count"].join("\n");
+        expect(() => parseSclFile(content)).toThrow("missing pitch count");
+    });
+
+    it.each(["abc", "2.0", "-1", "0", "501"])(
+        "rejects the invalid pitch count %s after a numeric description",
+        count => {
+            const content = ["! invalid-count.scl", "12", count, "700.0", "1200.0"].join("\n");
+            expect(() => parseSclFile(content)).toThrow("invalid pitch count");
+        }
+    );
+
+    it("rejects missing pitches after a numeric description", () => {
+        const content = ["! short.scl", "12", "2", "700.0"].join("\n");
+        expect(() => parseSclFile(content)).toThrow("Invalid .scl file: expected 2 pitches, got 1");
+    });
+
+    it("rejects surplus pitches after a numeric description", () => {
+        const content = ["! surplus.scl", "12", "2", "700.0", "1200.0", "1300.0"].join("\n");
+        expect(() => parseSclFile(content)).toThrow(
+            "Invalid .scl file: expected 2 pitches, got more"
+        );
+    });
+
     it("throws on empty content", () => {
         expect(() => parseSclFile("")).toThrow();
     });
@@ -99,6 +166,39 @@ describe("parseSclFile", () => {
         expect(result.pitches[1].ratio).toBeCloseTo(1.25, 10);
         expect(result.pitches[2].ratio).toBeCloseTo(1.5, 10);
         expect(result.pitches[3].ratio).toBeCloseTo(2, 10);
+    });
+
+    it("skips comment lines between the pitch count and the pitch values", () => {
+        const content = [
+            "! meanquar.scl",
+            "!",
+            "1/4-comma meantone scale",
+            " 3",
+            "!",
+            " 76.04900",
+            "   ! an indented comment between pitches",
+            " 5/4",
+            " 2/1"
+        ].join("\n");
+        const result = parseSclFile(content);
+        expect(result.pitchCount).toBe(3);
+        expect(result.pitches).toHaveLength(3);
+        expect(result.pitches[0].cents).toBeCloseTo(76.049, 3);
+        expect(result.pitches[1].ratio).toBeCloseTo(1.25, 10);
+        expect(result.pitches[2].ratio).toBeCloseTo(2, 10);
+    });
+
+    it("skips a comment line between the description and the pitch count", () => {
+        const content = ["! note.scl", "Note", "! a comment", "2", "3/2", "2/1"].join("\n");
+        const result = parseSclFile(content);
+        expect(result.description).toBe("Note");
+        expect(result.pitchCount).toBe(2);
+        expect(result.pitches[0].ratio).toBeCloseTo(1.5, 10);
+    });
+
+    it("does not count a comment line as a pitch value", () => {
+        const content = ["! short.scl", "!", "Short", "3", "100.0", "!", "2/1"].join("\n");
+        expect(() => parseSclFile(content)).toThrow("Invalid .scl file: expected 3 pitches, got 2");
     });
 
     it("rejects a cents unit on a number without a decimal point", () => {

@@ -121,7 +121,7 @@ Reporting Bugs
 --------------
 
 Bugs can be reported in the Music Blocks
-[issues section](./issues) of
+[issues section](https://github.com/sugarlabs/musicblocks/issues) of
 this repository.
 
 Contributing
@@ -131,7 +131,7 @@ Please consider contributing to the project, with your ideas, your
 artwork, your lesson plans, and your code.
 
 Programmers, please follow these general
-[guidelines for contributions](./contributing.md).
+[guidelines for contributions](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md).
 
 Advanced Features
 -----------------

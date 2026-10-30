@@ -405,6 +405,14 @@ describe("Turtle stopBlink()", () => {
     let turtle;
     let mockActivity;
 
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
     beforeEach(() => {
         mockActivity = { refreshCanvas: jest.fn() };
         turtle = new Turtle(mockActivity, 0, "turtle1", {}, null);
@@ -445,6 +453,50 @@ describe("Turtle stopBlink()", () => {
         clearSpy.mockRestore();
     });
 
+    it("cancels a blink started by blink() before its visibility callback runs", () => {
+        jest.useFakeTimers();
+        turtle.listeners = {};
+
+        turtle.blink(16, 50);
+        turtle.stopBlink();
+        jest.advanceTimersByTime(100);
+
+        expect(turtle._blinkFinished).toBe(true);
+        expect(turtle.container.visible).toBe(true);
+        expect(mockActivity.refreshCanvas).toHaveBeenCalledTimes(2);
+    });
+
+    it("registers and cancels blink timers through the Logo timer manager", () => {
+        jest.useFakeTimers();
+        const timerManager = {
+            setTimeout: jest.fn((callback, delay) => setTimeout(callback, delay)),
+            clearTimeout: jest.fn(id => clearTimeout(id))
+        };
+        mockActivity.logo = { _timerManager: timerManager };
+        turtle.listeners = {};
+
+        turtle.blink(16, 50);
+        const blinkTimeout = turtle._blinkTimeout;
+        turtle.stopBlink();
+        jest.advanceTimersByTime(100);
+
+        expect(timerManager.setTimeout).toHaveBeenCalledWith(expect.any(Function), 100);
+        expect(timerManager.clearTimeout).toHaveBeenCalledWith(blinkTimeout);
+        expect(turtle.container.visible).toBe(true);
+    });
+
+    it("restores visibility when a blink completes normally", () => {
+        jest.useFakeTimers();
+        turtle.listeners = {};
+
+        turtle.blink(16, 50);
+        jest.advanceTimersByTime(100);
+
+        expect(turtle._blinkTimeout).toBeNull();
+        expect(turtle._blinkFinished).toBe(true);
+        expect(turtle.container.visible).toBe(true);
+        expect(mockActivity.refreshCanvas).toHaveBeenCalledTimes(2);
+    });
     it("leaves a turtle that is not blinking untouched", () => {
         turtle._blinkTimeout = null;
         turtle._blinkFinished = true;
@@ -492,6 +544,7 @@ describe("Turtle accessors", () => {
             ["parentFlowQueue", "_parentFlowQueue", [7]],
             ["unhighlightQueue", "_unhighlightQueue", [8]],
             ["parameterQueue", "_parameterQueue", [9]],
+            ["actionBoundaries", "_actionBoundaries", [0]],
             ["listeners", "_listeners", { CursorOver0: () => {} }],
             ["media", "_media", [{ type: "gif" }]],
             ["x", "_x", 42],
@@ -629,6 +682,7 @@ describe("Turtle.TurtleModel", () => {
             expect(model._parentFlowQueue).toEqual([]);
             expect(model._unhighlightQueue).toEqual([]);
             expect(model._parameterQueue).toEqual([]);
+            expect(model._actionBoundaries).toEqual([]);
             expect(model._media).toEqual([]);
         });
 
@@ -924,6 +978,20 @@ describe("Turtle.TurtleView", () => {
             expect(view._decorationBitmap.x).toBe(100);
             expect(view._decorationBitmap.y).toBe(0);
             expect(view._decorationBitmap.scale).toBe(0);
+        });
+
+        it("safely returns without error when _decorationBitmap is null or undefined (e.g. drum start blocks)", () => {
+            const view = makeView();
+            view._decorationBitmap = null;
+
+            expect(() => {
+                view.resizeDecoration(2, 200);
+            }).not.toThrow();
+
+            view._decorationBitmap = undefined;
+            expect(() => {
+                view.resizeDecoration(1.5, 150);
+            }).not.toThrow();
         });
     });
 

@@ -308,10 +308,27 @@ describe("Pen operations", () => {
         expect(mockTurtle.ctx.lineWidth).toBe(10);
     });
 
-    test("doSetPensize should handle zero", () => {
-        painter.doSetPensize(0);
-        expect(painter.stroke).toBe(0);
-        expect(mockTurtle.ctx.lineWidth).toBe(0);
+    test.each([0, -5])("doSetPensize rejects %s and keeps the current size", size => {
+        painter.doSetPensize(20);
+        painter.doSetPensize(size);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(
+            "Pen size must be greater than 0."
+        );
+        expect(painter.stroke).toBe(20);
+        expect(mockTurtle.ctx.lineWidth).toBe(20);
+    });
+
+    test.each([NaN, Infinity, "abc"])("doSetPensize rejects the non-number %s", size => {
+        painter.doSetPensize(20);
+        painter.doSetPensize(size);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.stroke).toBe(20);
+    });
+
+    test("doSetPensize accepts a fractional size", () => {
+        painter.doSetPensize(0.5);
+        expect(painter.stroke).toBe(0.5);
+        expect(mockTurtle.turtles.activity.errorMsg).not.toHaveBeenCalled();
     });
 
     test("doSetPensize should handle large values", () => {
@@ -351,6 +368,27 @@ describe("Pen operations", () => {
         expect(getMunsellColor).toHaveBeenCalledWith(120, painter.value, painter.chroma);
     });
 
+    test.each([
+        ["doSetColor", "color"],
+        ["doSetHue", "color"],
+        ["doSetValue", "value"],
+        ["doSetChroma", "chroma"]
+    ])("%s should reject a non-finite value and keep the pen colour", (method, field) => {
+        for (const bad of [-Infinity, Infinity, NaN]) {
+            const before = painter[field];
+            getcolor.mockClear();
+            getMunsellColor.mockClear();
+            mockTurtle.turtles.activity.errorMsg.mockClear();
+
+            painter[method](bad);
+
+            expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+            expect(painter[field]).toBe(before);
+            expect(getcolor).not.toHaveBeenCalled();
+            expect(getMunsellColor).not.toHaveBeenCalled();
+        }
+    });
+
     test("doSetPenAlpha should update canvas alpha", () => {
         painter.doSetPenAlpha(0.5);
         expect(painter.canvasAlpha).toBe(0.5);
@@ -365,6 +403,27 @@ describe("Pen operations", () => {
         painter.doSetPenAlpha(1);
         expect(painter.canvasAlpha).toBe(1);
     });
+
+    test.each([
+        [0, 1],
+        [25, 0.75],
+        [50, 0.5],
+        [100, 0],
+        [225, 1 - 23 / 100]
+    ])("doSetTranslucency(%s) sets the pen alpha to %s", (translucency, alpha) => {
+        painter.doSetTranslucency(translucency);
+        expect(painter.canvasAlpha).toBeCloseTo(alpha);
+    });
+
+    test.each([NaN, Infinity, "abc"])(
+        "doSetTranslucency rejects the non-number %s and keeps the alpha",
+        translucency => {
+            painter.doSetTranslucency(50);
+            painter.doSetTranslucency(translucency);
+            expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+            expect(painter.canvasAlpha).toBe(0.5);
+        }
+    );
 
     test("doPenUp should set penDown to false", () => {
         painter.doPenUp();
@@ -519,6 +578,89 @@ describe("Drawing - doForward", () => {
         mockTurtle.turtleY2screenY = jest.fn(y => y);
         painter.doForward(10);
         expect(mockTurtle.container.y).toBe(595);
+    });
+
+    test("doForward with wrap ON strokes each segment on its own path", () => {
+        painter.wrap = true;
+        mockTurtle.container.x = 795;
+        mockTurtle.orientation = 90;
+        mockTurtle.turtleX2screenX = jest.fn(x => x);
+        mockTurtle.turtleY2screenY = jest.fn(y => y);
+        painter.doForward(100);
+
+        const ctx = mockTurtle.ctx;
+        const calls = [
+            ...ctx.beginPath.mock.invocationCallOrder.map(order => [order, "beginPath"]),
+            ...ctx.lineTo.mock.invocationCallOrder.map(order => [order, "lineTo"]),
+            ...ctx.stroke.mock.invocationCallOrder.map(order => [order, "stroke"])
+        ].sort((a, b) => a[0] - b[0]);
+
+        let linesInPath = 0;
+        let strokes = 0;
+        for (const [, name] of calls) {
+            if (name === "beginPath") {
+                linesInPath = 0;
+            } else if (name === "lineTo") {
+                linesInPath++;
+            } else {
+                strokes++;
+                expect(linesInPath).toBe(1);
+            }
+        }
+        expect(strokes).toBeGreaterThan(1);
+    });
+
+    test.each([1000001, -1000001])(
+        "doForward with wrap ON rejects %p steps without moving",
+        steps => {
+            painter.wrap = true;
+            mockTurtle.container.x = 795;
+            mockTurtle.orientation = 90;
+            mockTurtle.turtleX2screenX = jest.fn(x => x);
+            mockTurtle.turtleY2screenY = jest.fn(y => y);
+            painter.doForward(steps);
+            expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(
+                "Steps must be within -1000000 to 1000000 when Wrap Mode is on."
+            );
+            expect(mockTurtle.container.x).toBe(795);
+            expect(mockTurtle.ctx.stroke).not.toHaveBeenCalled();
+        }
+    );
+
+    test("doForward with wrap ON rejects a part of a move whose total is too large", () => {
+        painter.wrap = true;
+        mockTurtle.container.x = 795;
+        mockTurtle.orientation = 90;
+        mockTurtle.turtleX2screenX = jest.fn(x => x);
+        mockTurtle.turtleY2screenY = jest.fn(y => y);
+        painter.doForward(250000, "middle", 2000000);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(
+            "Steps must be within -1000000 to 1000000 when Wrap Mode is on."
+        );
+        expect(mockTurtle.container.x).toBe(795);
+        expect(mockTurtle.ctx.stroke).not.toHaveBeenCalled();
+    });
+
+    test("doForward with wrap ON accepts the largest step count", () => {
+        painter.wrap = true;
+        mockTurtle.container.x = 795;
+        mockTurtle.orientation = 90;
+        mockTurtle.turtleX2screenX = jest.fn(x => x);
+        mockTurtle.turtleY2screenY = jest.fn(y => y);
+        painter.doForward(1000000);
+        expect(mockTurtle.turtles.activity.errorMsg).not.toHaveBeenCalled();
+        expect(mockTurtle.ctx.stroke).toHaveBeenCalled();
+    });
+
+    test("doForward with wrap OFF does not limit large step counts", () => {
+        painter.wrap = false;
+        mockTurtle.container.x = 795;
+        mockTurtle.orientation = 90;
+        mockTurtle.turtleX2screenX = jest.fn(x => x);
+        mockTurtle.turtleY2screenY = jest.fn(y => y);
+        painter.doForward(1e9);
+        expect(mockTurtle.turtles.activity.errorMsg).not.toHaveBeenCalled();
+        expect(mockTurtle.container.x).toBe(795 + 1e9);
     });
 
     test("doForward with wrap OFF and out of bounds should stop at edge", () => {
@@ -696,15 +838,47 @@ describe("Heading and orientation", () => {
         expect(mockTurtle.container.rotation).toBe(180);
     });
 
-    test("doSetHeading should update cache when not blinking", () => {
+    test("doSetHeading should schedule canvas update and not update cache", () => {
         painter.doSetHeading(90);
-        expect(mockTurtle.updateCache).toHaveBeenCalled();
+        expect(mockTurtle.activity.refreshCanvas).toHaveBeenCalled();
+        expect(mockTurtle.updateCache).not.toHaveBeenCalled();
     });
 
-    test("doSetHeading should not update cache when blinking", () => {
-        mockTurtle.blinking.mockReturnValue(true);
-        painter.doSetHeading(90);
+    test("doRight should schedule canvas update and not update cache", () => {
+        painter.doRight(90);
+        expect(mockTurtle.activity.refreshCanvas).toHaveBeenCalled();
         expect(mockTurtle.updateCache).not.toHaveBeenCalled();
+    });
+
+    test.each([-1e20, 1e20, -1e300, -Number.MAX_VALUE])(
+        "doSetHeading(%s) returns a heading in [0, 360) without looping",
+        degrees => {
+            painter.doSetHeading(degrees);
+            expect(mockTurtle.orientation).toBeGreaterThanOrEqual(0);
+            expect(mockTurtle.orientation).toBeLessThan(360);
+        }
+    );
+
+    test.each([-1e20, 1e20, -1e300])(
+        "doRight(%s) returns a heading in [0, 360) without looping",
+        degrees => {
+            mockTurtle.orientation = 90;
+            painter.doRight(degrees);
+            expect(mockTurtle.orientation).toBeGreaterThanOrEqual(0);
+            expect(mockTurtle.orientation).toBeLessThan(360);
+        }
+    );
+
+    test.each([
+        [-90, 270],
+        [-360, 0],
+        [-450, 270],
+        [-1e9, 80],
+        [720, 0],
+        [-0.5, 359.5]
+    ])("doSetHeading(%s) normalizes to %s", (degrees, expected) => {
+        painter.doSetHeading(degrees);
+        expect(mockTurtle.orientation).toBeCloseTo(expected);
     });
 
     test("doSetHeading should handle NaN or Infinity gracefully", () => {
@@ -1116,6 +1290,34 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
         expect(painter.svgOutput).toContain('<path d="M');
     });
 
+    test("doBezier starts a new path so the previous line is not stroked again", () => {
+        const ctx = mockTurtle.ctx;
+        painter.turtle.x = 20;
+        painter.turtle.y = 30;
+        painter.cp1x = 10;
+        painter.cp1y = 10;
+        painter.cp2x = 50;
+        painter.cp2y = 50;
+
+        painter.doBezier(100, 100);
+        expect(ctx.beginPath).toHaveBeenCalled();
+        expect(ctx.moveTo).toHaveBeenCalledWith(20, 30);
+        expect(ctx.beginPath.mock.invocationCallOrder[0]).toBeLessThan(
+            ctx.lineTo.mock.invocationCallOrder[0]
+        );
+        expect(ctx.closePath.mock.invocationCallOrder[0]).toBeGreaterThan(
+            ctx.stroke.mock.invocationCallOrder[0]
+        );
+    });
+
+    test("doBezier inside a fill keeps adding to the fill path", () => {
+        painter._fillState = true;
+        painter.doBezier(100, 100);
+        expect(mockTurtle.ctx.beginPath).not.toHaveBeenCalled();
+        expect(mockTurtle.ctx.closePath).not.toHaveBeenCalled();
+        expect(mockTurtle.ctx.stroke).toHaveBeenCalled();
+    });
+
     test("doBezier with penUp", () => {
         painter._penDown = false;
         painter.doBezier(100, 100);
@@ -1192,8 +1394,8 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
 
         expect(painter.turtles.canvas1).toBeDefined();
         expect(turtle1.painter._processColor).toHaveBeenCalled();
-        expect(painter.turtles.gx).toBe(790); // 800 - 10
-        expect(painter.turtles.gy).toBe(580); // 600 - 20
+        expect(painter.turtles.gx).toBe(390); // (1600 - 800) / 2 - 10
+        expect(painter.turtles.gy).toBe(280); // (1200 - 600) / 2 - 20
         expect(mockTurtle.ctx.beginPath).toHaveBeenCalled();
         expect(mockTurtle.ctx.moveTo).toHaveBeenCalledWith(20, 40); // 10+10, 20+20
         expect(mockTurtle.ctx.lineTo).toHaveBeenCalledWith(10, 20);
@@ -1203,6 +1405,44 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
         painter.doScrollXY(1000, 1000);
         expect(painter.turtles.gx).toBe(0);
         expect(painter.turtles.gy).toBe(0);
+    });
+
+    test("doScrollXY with negative values keeps the read inside the scroll buffer", () => {
+        // The buffer gets its own context, so its reads are not mixed up with the turtle canvas
+        const bufferImage = { width: 800, height: 600, data: [] };
+        const bufferCtx = {
+            rect: jest.fn(),
+            fill: jest.fn(),
+            putImageData: jest.fn(),
+            getImageData: jest.fn(() => bufferImage)
+        };
+        HTMLCanvasElement.prototype.getContext.mockReturnValueOnce(bufferCtx);
+
+        painter.doScrollXY(-100, -100);
+        expect(painter.turtles.c1ctx).toBe(bufferCtx);
+        expect(painter.turtles.canvas1.width).toBe(1600);
+        expect(painter.turtles.canvas1.height).toBe(1200);
+        expect(bufferCtx.getImageData).toHaveBeenLastCalledWith(500, 400, 800, 600);
+        expect(mockTurtle.ctx.putImageData).toHaveBeenLastCalledWith(bufferImage, 0, 0);
+
+        painter.doScrollXY(-1000, -1000);
+        expect(bufferCtx.getImageData).toHaveBeenLastCalledWith(800, 600, 800, 600);
+    });
+
+    test("doClear with resetPosition moves the scroll back to the middle of the buffer", () => {
+        painter.doScrollXY(-1000, -1000);
+        expect(painter.turtles.gx).toBe(800);
+
+        painter.doClear(false, false, true);
+        expect(painter.turtles.gx).toBe(400);
+        expect(painter.turtles.gy).toBe(300);
+    });
+
+    test("doScrollXY creates the scroll buffer with willReadFrequently", () => {
+        painter.doScrollXY(10, 20);
+        expect(HTMLCanvasElement.prototype.getContext).toHaveBeenCalledWith("2d", {
+            willReadFrequently: true
+        });
     });
 });
 

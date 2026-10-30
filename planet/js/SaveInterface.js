@@ -111,6 +111,32 @@ class SaveInterface {
         return file;
     }
 
+    showToast(message, isError = false) {
+        if (typeof document === "undefined") {
+            return;
+        }
+        const toast = document.createElement("div");
+        toast.className = "toast planet-toast";
+        toast.textContent = message;
+        toast.style.background = isError ? "#d32f2f" : "#323232";
+        toast.style.position = "fixed";
+        toast.style.bottom = "20px";
+        toast.style.left = "50%";
+        toast.style.transform = "translateX(-50%)";
+        toast.style.zIndex = "10000";
+        toast.style.padding = "10px 20px";
+        toast.style.borderRadius = "4px";
+        toast.style.color = "#fff";
+        toast.style.boxShadow = "0 2px 5px rgba(0,0,0,0.26)";
+
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 3000);
+    }
+
     saveHTML(name, data, image, description, projectid) {
         const html =
             "data:text/plain;charset=utf-8," +

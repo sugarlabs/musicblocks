@@ -636,6 +636,18 @@ describe("setupIntervalsActions", () => {
         expect(Singer.IntervalsActions.getCurrentKey(0)).toBe("Db");
         expect(Singer.IntervalsActions.getCurrentMode(0)).toBe("dorian");
         expect(Singer.IntervalsActions.getModeLength(0)).toBe(7);
+
+        turtle.singer.keySignature = "C harmonic minor";
+        expect(Singer.IntervalsActions.getCurrentKey(0)).toBe("C");
+        expect(Singer.IntervalsActions.getCurrentMode(0)).toBe("harmonic minor");
+
+        turtle.singer.keySignature = "A natural minor";
+        expect(Singer.IntervalsActions.getCurrentKey(0)).toBe("A");
+        expect(Singer.IntervalsActions.getCurrentMode(0)).toBe("natural minor");
+
+        turtle.singer.keySignature = "E major pentatonic";
+        expect(Singer.IntervalsActions.getCurrentKey(0)).toBe("E");
+        expect(Singer.IntervalsActions.getCurrentMode(0)).toBe("major pentatonic");
     });
 
     test("setMovableDo", () => {
@@ -960,6 +972,18 @@ describe("setupIntervalsActions", () => {
         expect(MUSICALMODES.custom).toEqual([4, 3, 5]);
     });
 
+    test("defineMode calculates the same steps after ignoring a repeated pitch", () => {
+        let listener;
+        logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
+        Singer.IntervalsActions.defineMode("custom", 0, undefined);
+
+        turtle.singer.defineMode.push(0, 4, 7, 7);
+        listener();
+
+        expect(activity.errorMsg).toHaveBeenCalledWith(_("Ignoring duplicate pitch numbers."));
+        expect(MUSICALMODES.custom).toEqual([4, 3, 5]);
+    });
+
     test("defineMode does not dispatch when blk is undefined even if 'undefined' is a stray blockList key", () => {
         activity.blocks.blockList["undefined"] = {};
         Singer.IntervalsActions.defineMode("custom", 0, undefined);
@@ -1005,13 +1029,13 @@ describe("setupIntervalsActions", () => {
         expect(activity.errorMsg).not.toHaveBeenCalledWith(EDOBOUNDEXCEEDED, null);
     });
 
-    test("defineMode keeps a leading duplicate zero's step as 0, not wrapped to the temperament length", () => {
+    test("defineMode removes a leading duplicate zero before calculating steps", () => {
         let listener;
         logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
         Singer.IntervalsActions.defineMode("custom", 0, undefined);
         turtle.singer.defineMode.push(0, 0, 5);
         listener();
-        expect(MUSICALMODES.custom).toEqual([0, 7]);
+        expect(MUSICALMODES.custom).toEqual([5, 7]);
     });
 
     test("defineMode listener does not update block text when there is no connected child block", () => {
@@ -1084,14 +1108,14 @@ describe("setupIntervalsActions", () => {
 
         expect(activity.errorMsg).toHaveBeenCalledWith(EDOBOUNDEXCEEDED, null);
         // A null mode name still falls back to the "custom" key, not an empty string.
-        expect(MUSICALMODES.custom).toEqual([4, 0]);
+        expect(MUSICALMODES.custom).toEqual([4, 8]);
     });
 
     test("defineMode sets dispatch, resets turtle state, and lowercases the mode name", () => {
         activity.blocks.blockList.blk = {};
         Singer.IntervalsActions.defineMode("Custom", 0, "blk");
 
-        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_definemode_0");
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_definemode_0_blk");
         expect(turtle.singer.inDefineMode).toBe(true);
         expect(turtle.singer.defineMode).toEqual([]);
     });
@@ -1115,7 +1139,7 @@ describe("setupIntervalsActions", () => {
 
         expect(activity.errorMsg).toHaveBeenCalledWith(_("Adding missing pitch number 0."));
         expect(activity.errorMsg).toHaveBeenCalledWith(_("Ignoring duplicate pitch numbers."));
-        expect(MUSICALMODES.custom).toEqual([4, 3, 0, 3]);
+        expect(MUSICALMODES.custom).toEqual([4, 3, 2, 3]);
         expect(activity.blocks.updateBlockText).toHaveBeenCalledWith("text1");
         expect(turtle.singer.inDefineMode).toBe(false);
     });
@@ -1141,21 +1165,22 @@ describe("setupIntervalsActions", () => {
 
         Singer.IntervalsActions.defineMode("custom", 0, undefined);
 
-        expect(mockMouse.MB.listeners).toContain("_definemode_0");
+        expect(mockMouse.MB.listeners).toContain("_definemode_0_undefined");
     });
 
-    test("defineMode flags EDOBOUNDEXCEEDED when more pitch numbers than the temperament length are defined", () => {
+    test("defineMode ignores duplicates when counting pitch numbers", () => {
         let listener;
         logo.setTurtleListener.mockImplementation((_, __, fn) => (listener = fn));
 
         Singer.IntervalsActions.defineMode("custom", 0, undefined);
 
-        // 13 in-range (0-11) pitch numbers for a default 12-EDO temperament
-        // exceeds temperamentLength even though none of them are individually out of bounds.
+        // Twelve unique pitch numbers plus one repeated tonic should fit in
+        // the default 12-EDO temperament after duplicate removal.
         turtle.singer.defineMode.push(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0);
         listener();
 
-        expect(activity.errorMsg).toHaveBeenCalledWith(EDOBOUNDEXCEEDED, null);
+        expect(activity.errorMsg).not.toHaveBeenCalledWith(EDOBOUNDEXCEEDED, null);
+        expect(activity.errorMsg).toHaveBeenCalledWith(_("Ignoring duplicate pitch numbers."));
     });
 
     test("setTemperament state changes", () => {
@@ -1212,10 +1237,68 @@ describe("setupIntervalsActions", () => {
     test("setTemperament leaves the custom mode untouched when the EDO is unchanged", () => {
         global.getCurrentEDO = jest.fn(() => 12);
         // A sentinel value distinct from what a rebuild would produce (Array(12).fill(1))
-        // so an unwanted rebuild is observable.
-        MUSICALMODES.custom = new Array(12).fill(9);
+        // so an unwanted rebuild is observable. Its steps sum to 12.
+        MUSICALMODES.custom = [2, 2, 1, 2, 2, 2, 1];
         Singer.IntervalsActions.setTemperament("equal", "C", 4);
-        expect(MUSICALMODES.custom).toEqual(new Array(12).fill(9));
+        expect(MUSICALMODES.custom).toEqual([2, 2, 1, 2, 2, 2, 1]);
+    });
+
+    test("setTemperament keeps a defined custom mode with fewer steps than the EDO", () => {
+        // define mode stores steps that sum to the EDO, not one step per pitch.
+        global.getCurrentEDO = jest.fn(() => 12);
+        MUSICALMODES.custom = [2, 2, 3, 2, 3];
+        Singer.IntervalsActions.setTemperament("equal", "C", 4);
+        expect(MUSICALMODES.custom).toEqual([2, 2, 3, 2, 3]);
+    });
+
+    test("setTemperament rebuilds a custom mode whose steps don't fit the new EDO", () => {
+        global.getCurrentEDO = jest.fn(() => 19);
+        MUSICALMODES.custom = [2, 2, 3, 2, 3]; // sums to 12
+        Singer.IntervalsActions.setTemperament("equal19", "C", 4);
+        expect(MUSICALMODES.custom).toEqual(new Array(19).fill(1));
+    });
+
+    test("setTemperament tells the user when it drops a defined custom mode", () => {
+        global.getCurrentEDO = jest.fn(() => 19);
+        MUSICALMODES.custom = [2, 2, 3, 2, 3];
+        Singer.IntervalsActions.setTemperament("equal19", "C", 4);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "The custom mode does not fit the new tuning, so it was reset."
+        );
+    });
+
+    test("setTemperament warns only once for the same mode and tuning", () => {
+        global.getCurrentEDO = jest.fn(() => 19);
+        const warning = "The custom mode does not fit the new tuning, so it was reset.";
+        const countWarnings = () =>
+            activity.errorMsg.mock.calls.filter(c => c[0] === warning).length;
+
+        // the same saved 12-EDO mode comes back (e.g. after a reload) and is run in 19-EDO again
+        MUSICALMODES.custom = [2, 2, 3, 2, 3];
+        Singer.IntervalsActions.setTemperament("equal19", "C", 4);
+        MUSICALMODES.custom = [2, 2, 3, 2, 3];
+        Singer.IntervalsActions.setTemperament("equal19", "C", 4);
+        expect(countWarnings()).toBe(1);
+
+        // a different mode still gets its own warning
+        MUSICALMODES.custom = [3, 4, 5];
+        Singer.IntervalsActions.setTemperament("equal19", "C", 4);
+        expect(countWarnings()).toBe(2);
+    });
+
+    test("setTemperament stays quiet when it only resizes the default chromatic mode", () => {
+        global.getCurrentEDO = jest.fn(() => 19);
+        MUSICALMODES.custom = new Array(12).fill(1);
+        Singer.IntervalsActions.setTemperament("equal19", "C", 4);
+        expect(MUSICALMODES.custom).toEqual(new Array(19).fill(1));
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+    });
+
+    test("setTemperament rebuilds a custom mode with a 0 step even if the sum fits", () => {
+        global.getCurrentEDO = jest.fn(() => 12);
+        MUSICALMODES.custom = [5, 0, 7]; // sums to 12
+        Singer.IntervalsActions.setTemperament("equal", "C", 4);
+        expect(MUSICALMODES.custom).toEqual(new Array(12).fill(1));
     });
 
     describe("getTemperamentLength", () => {

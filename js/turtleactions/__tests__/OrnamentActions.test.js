@@ -51,7 +51,7 @@ describe("OrnamentActions", () => {
         errorMsgCalls = [];
         activity = {
             turtles: { ithTurtle: () => turtle },
-            blocks: { blockList: { 1: {}, 2: {} } },
+            blocks: { blockList: { 1: {}, 2: {}, 3: {}, 4: {} } },
             errorMsg: (msg, blk) => errorMsgCalls.push({ msg, blk }),
             logo: {
                 setDispatchBlock: (blk, idx, name) =>
@@ -139,10 +139,74 @@ describe("OrnamentActions", () => {
                 Singer.OrnamentActions.setStaccato(val, 0, 1);
                 expect(errorMsgCalls.length).toBeGreaterThan(0);
                 expect(errorMsgCalls[errorMsgCalls.length - 1].msg).toBe(
-                    "Staccato value must be non-zero."
+                    "Staccato value must be a positive number."
                 );
                 expect(turtle.singer.staccato).toEqual(initialStaccato);
             });
+        });
+
+        test("rejects negative, zero, non-finite, and overflow values with proper side effect suppression", () => {
+            const invalidValues = [
+                -2,
+                -1 / 16,
+                0,
+                -0,
+                NaN,
+                Infinity,
+                -Infinity,
+                null,
+                undefined,
+                "invalid",
+                Number.MIN_VALUE
+            ];
+
+            invalidValues.forEach(val => {
+                const dispatchCount = dispatchCalls.length;
+                const listenerCount = listenerCalls.length;
+                const mouseCount = mouseMB.listeners.length;
+                const initialStaccato = [...turtle.singer.staccato];
+                const initialErrors = errorMsgCalls.length;
+
+                Singer.OrnamentActions.setStaccato(val, 0, 1);
+
+                expect(errorMsgCalls.length).toBe(initialErrors + 1);
+                expect(errorMsgCalls[errorMsgCalls.length - 1]).toEqual({
+                    msg: "Staccato value must be a positive number.",
+                    blk: 1
+                });
+                expect(turtle.singer.staccato).toEqual(initialStaccato);
+                expect(dispatchCalls.length).toBe(dispatchCount);
+                expect(listenerCalls.length).toBe(listenerCount);
+                expect(mouseMB.listeners.length).toBe(mouseCount);
+            });
+        });
+
+        test("accepts valid positive values and restores stack on cleanup", () => {
+            const initialStaccato = [...turtle.singer.staccato];
+            Singer.OrnamentActions.setStaccato(1 / 16, 0, 1);
+            expect(turtle.singer.staccato).toEqual([...initialStaccato, 16]);
+            expect(listenerCalls.length).toBe(1);
+            listenerFunctions["_staccato_0_1"]();
+            expect(turtle.singer.staccato).toEqual(initialStaccato);
+        });
+
+        test("nested staccato: invalid inner block does not corrupt valid outer block", () => {
+            Singer.OrnamentActions.setStaccato(2, 0, 1);
+            expect(turtle.singer.staccato).toEqual([0.5]);
+            expect(listenerCalls.length).toBe(1);
+
+            const initialErrorCount = errorMsgCalls.length;
+            Singer.OrnamentActions.setStaccato(-2, 0, 2);
+            expect(errorMsgCalls.length).toBe(initialErrorCount + 1);
+            expect(errorMsgCalls[errorMsgCalls.length - 1].msg).toBe(
+                "Staccato value must be a positive number."
+            );
+            expect(turtle.singer.staccato).toEqual([0.5]);
+            expect(listenerCalls.length).toBe(1);
+            expect(listenerFunctions["_staccato_0_2"]).toBeUndefined();
+
+            listenerFunctions["_staccato_0_1"]();
+            expect(turtle.singer.staccato).toEqual([]);
         });
 
         test("does not throw and skips mouse listener when MusicBlocks is not defined", () => {
@@ -258,10 +322,91 @@ describe("OrnamentActions", () => {
                 Singer.OrnamentActions.setSlur(val, 0, 1);
                 expect(errorMsgCalls.length).toBeGreaterThan(0);
                 expect(errorMsgCalls[errorMsgCalls.length - 1].msg).toBe(
-                    "Slur value must be non-zero."
+                    "Slur value must be a positive number."
                 );
                 expect(turtle.singer.staccato).toEqual(initialStaccato);
             });
+        });
+
+        test("rejects negative, zero, non-finite, and overflow values with proper side effect suppression", () => {
+            const invalidValues = [
+                -2,
+                -1 / 16,
+                0,
+                -0,
+                NaN,
+                Infinity,
+                -Infinity,
+                null,
+                undefined,
+                "invalid",
+                Number.MIN_VALUE
+            ];
+
+            invalidValues.forEach(val => {
+                const dispatchCount = dispatchCalls.length;
+                const listenerCount = listenerCalls.length;
+                const mouseCount = mouseMB.listeners.length;
+                const beginCount = beginSlurCalls.length;
+                const endCount = endSlurCalls.length;
+                const initialStaccato = [...turtle.singer.staccato];
+                const initialErrors = errorMsgCalls.length;
+
+                Singer.OrnamentActions.setSlur(val, 0, 1);
+
+                expect(errorMsgCalls.length).toBe(initialErrors + 1);
+                expect(errorMsgCalls[errorMsgCalls.length - 1]).toEqual({
+                    msg: "Slur value must be a positive number.",
+                    blk: 1
+                });
+                expect(turtle.singer.staccato).toEqual(initialStaccato);
+                expect(dispatchCalls.length).toBe(dispatchCount);
+                expect(listenerCalls.length).toBe(listenerCount);
+                expect(mouseMB.listeners.length).toBe(mouseCount);
+                expect(beginSlurCalls.length).toBe(beginCount);
+                expect(endSlurCalls.length).toBe(endCount);
+            });
+        });
+
+        test("accepts valid positive values, starts/ends slur notation, and restores stack", () => {
+            const initialStaccato = [...turtle.singer.staccato];
+            Singer.OrnamentActions.setSlur(1 / 16, 0, 1);
+            expect(turtle.singer.staccato).toEqual([...initialStaccato, -16]);
+            expect(beginSlurCalls.length).toBe(1);
+            expect(listenerCalls.length).toBe(1);
+            listenerFunctions["_slur_0_1"]();
+            expect(turtle.singer.staccato).toEqual(initialStaccato);
+            expect(endSlurCalls.length).toBe(1);
+        });
+
+        test("nested slur and staccato: invalid inner block does not corrupt outer valid blocks", () => {
+            Singer.OrnamentActions.setSlur(2, 0, 1);
+            expect(turtle.singer.staccato).toEqual([-0.5]);
+            expect(beginSlurCalls.length).toBe(1);
+
+            Singer.OrnamentActions.setStaccato(4, 0, 2);
+            expect(turtle.singer.staccato).toEqual([-0.5, 0.25]);
+
+            Singer.OrnamentActions.setSlur(-2, 0, 3);
+            expect(errorMsgCalls[errorMsgCalls.length - 1].msg).toBe(
+                "Slur value must be a positive number."
+            );
+            expect(turtle.singer.staccato).toEqual([-0.5, 0.25]);
+            expect(beginSlurCalls.length).toBe(1);
+            expect(listenerFunctions["_slur_0_3"]).toBeUndefined();
+
+            Singer.OrnamentActions.setStaccato(Number.MIN_VALUE, 0, 4);
+            expect(errorMsgCalls[errorMsgCalls.length - 1].msg).toBe(
+                "Staccato value must be a positive number."
+            );
+            expect(turtle.singer.staccato).toEqual([-0.5, 0.25]);
+
+            listenerFunctions["_staccato_0_2"]();
+            expect(turtle.singer.staccato).toEqual([-0.5]);
+
+            listenerFunctions["_slur_0_1"]();
+            expect(turtle.singer.staccato).toEqual([]);
+            expect(endSlurCalls.length).toBe(1);
         });
 
         test("does not throw and skips mouse listener when MusicBlocks is not defined", () => {
@@ -373,6 +518,53 @@ describe("OrnamentActions", () => {
             } finally {
                 global.MusicBlocks = originalMusicBlocks;
             }
+        });
+
+        test("dispatches errorMsg and skips push when noteValue is invalid", () => {
+            const invalidNoteValues = [NaN, -1, -0.5, 0, Infinity, null, undefined, "invalid"];
+            invalidNoteValues.forEach(val => {
+                errorMsgCalls.length = 0;
+                const before = {
+                    inNeighbor: [...turtle.singer.inNeighbor],
+                    neighborStepPitch: [...turtle.singer.neighborStepPitch],
+                    neighborNoteValue: [...turtle.singer.neighborNoteValue]
+                };
+                Singer.OrnamentActions.doNeighbor(3, val, 0, 1);
+                expect(errorMsgCalls.length).toBeGreaterThan(0);
+                expect(errorMsgCalls[errorMsgCalls.length - 1].msg).toBe(
+                    "Neighbor note value must be a positive number."
+                );
+                expect(turtle.singer.inNeighbor).toEqual(before.inNeighbor);
+                expect(turtle.singer.neighborStepPitch).toEqual(before.neighborStepPitch);
+                expect(turtle.singer.neighborNoteValue).toEqual(before.neighborNoteValue);
+            });
+        });
+
+        test("dispatches errorMsg and skips push when interval is non-finite", () => {
+            const invalidIntervals = [NaN, Infinity, -Infinity, null, undefined, "bad"];
+            invalidIntervals.forEach(val => {
+                errorMsgCalls.length = 0;
+                const before = {
+                    inNeighbor: [...turtle.singer.inNeighbor],
+                    neighborStepPitch: [...turtle.singer.neighborStepPitch],
+                    neighborNoteValue: [...turtle.singer.neighborNoteValue]
+                };
+                Singer.OrnamentActions.doNeighbor(val, 4, 0, 1);
+                expect(errorMsgCalls.length).toBeGreaterThan(0);
+                expect(errorMsgCalls[errorMsgCalls.length - 1].msg).toBe(
+                    "Neighbor interval must be a finite number."
+                );
+                expect(turtle.singer.inNeighbor).toEqual(before.inNeighbor);
+                expect(turtle.singer.neighborStepPitch).toEqual(before.neighborStepPitch);
+                expect(turtle.singer.neighborNoteValue).toEqual(before.neighborNoteValue);
+            });
+        });
+
+        test("negative interval is accepted (pitch direction is valid)", () => {
+            Singer.OrnamentActions.doNeighbor(-3, 4, 0, 1);
+            expect(turtle.singer.neighborStepPitch).toContain(-3);
+            expect(turtle.singer.neighborNoteValue).toContain(4);
+            expect(errorMsgCalls.length).toBe(0);
         });
     });
 });

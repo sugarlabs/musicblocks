@@ -161,7 +161,8 @@ describe("MeterBlocks setup", () => {
             tempo: {
                 BPMBlocks: [],
                 BPMs: [],
-                BPMTurtles: []
+                BPMTurtles: [],
+                beatValues: []
             },
             inTempo: false,
             insideMeterWidget: false,
@@ -401,7 +402,8 @@ describe("MeterBlocks setup", () => {
         logo.actions = { action: jest.fn(), clap: jest.fn() };
 
         offBeat.flow(["missing"], logo, 0, "off");
-        expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, "off", undefined);
+        expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, "off", "missing");
+        expect(Singer.MeterActions.onWeakBeatDo).not.toHaveBeenCalled();
 
         offBeat.flow(["action"], logo, 0, "off", null, null, true);
         expect(Singer.MeterActions.onWeakBeatDo).toHaveBeenCalledWith(
@@ -452,7 +454,7 @@ describe("MeterBlocks setup", () => {
         expect(Singer.MeterActions.setMasterBPM).toHaveBeenCalledWith(120, 0.5, "master");
         expect(logo.notation.notationTempo).toHaveBeenCalledWith(0, 120, 0.5);
         expect(logo.tempo.BPMBlocks).toContain("master");
-        expect(logo.tempo.BPMs).toContain("90");
+        expect(logo.tempo.BPMs).toEqual([120]);
     });
 
     it("clamps legacy master BPM values and records tempo entries", () => {
@@ -477,7 +479,8 @@ describe("MeterBlocks setup", () => {
         expect(Singer.masterBPM).toBe(120);
         expect(Singer.defaultBPMFactor).toBe(TONEBPM / 120);
         expect(logo.tempo.BPMBlocks).toContain("legacy");
-        expect(logo.tempo.BPMs).toContain("legacy");
+        // The clamped tempo the block actually set.
+        expect(logo.tempo.BPMs).toEqual([30, 1000, 120]);
     });
 
     it("sets per-turtle BPM values and tempo metadata", () => {
@@ -491,7 +494,48 @@ describe("MeterBlocks setup", () => {
         expect(Singer.MeterActions.setBPM).toHaveBeenCalledWith(100, 0.25, 1, "bpm3");
         expect(logo.notation.notationTempo).toHaveBeenCalledWith(1, 100, 0.25);
         expect(logo.tempo.BPMBlocks).toContain("bpm3");
-        expect(logo.tempo.BPMs).toContain("text");
+        expect(logo.tempo.BPMs).toEqual([100]);
+    });
+
+    describe("the BPM given to the Tempo widget", () => {
+        beforeEach(() => {
+            logo.inTempo = true;
+            // An operator block in the BPM slot has no number in its label.
+            activity.blocks.blockList.slotBlock = { name: "multiply", text: { text: "" } };
+        });
+
+        it.each([
+            ["setmasterbpm2", [120, 0.25]],
+            ["setmasterbpm", [120]],
+            ["setbpm3", [120, 0.25]]
+        ])("%s gives the evaluated BPM, not the label of the block in the slot", (name, args) => {
+            const block = getBlock(name);
+            activity.blocks.blockList.bpmBlock = { connections: [null, "slotBlock"] };
+
+            block.flow(args, logo, 0, "bpmBlock");
+
+            expect(logo.tempo.BPMs).toEqual([120]);
+            expect(logo.tempo.BPMBlocks).toEqual(["bpmBlock"]);
+        });
+
+        it.each([Infinity, NaN])("treats a %s BPM like an empty label", bpm => {
+            const block = getBlock("setmasterbpm2");
+            activity.blocks.blockList.bpmBlock = { connections: [null, "slotBlock"] };
+
+            block.flow([bpm, 0.25], logo, 0, "bpmBlock");
+
+            expect(logo.tempo.BPMs).toEqual([""]);
+        });
+
+        it("falls back to the slot's label when the BPM isn't a number", () => {
+            const block = getBlock("setmasterbpm2");
+            activity.blocks.blockList.bpmBlock = { connections: [null, "slotBlock"] };
+            activity.blocks.blockList.slotBlock.text.text = "90";
+
+            block.flow(["90", 0.25], logo, 0, "bpmBlock");
+
+            expect(logo.tempo.BPMs).toEqual(["90"]);
+        });
     });
 
     it("records the turtle that ran each BPM block for the Tempo widget", () => {
@@ -521,6 +565,42 @@ describe("MeterBlocks setup", () => {
         getBlock("setbpm3").flow([200, 0.25], logo, 2, "bpmBlock");
 
         expect(logo.tempo.BPMTurtles).toEqual([]);
+    });
+
+    describe("the beat value given to the Tempo widget", () => {
+        beforeEach(() => {
+            logo.inTempo = true;
+            activity.blocks.blockList.bpmBlock = { connections: [null, "slotBlock"] };
+            activity.blocks.blockList.slotBlock = { name: "number", text: { text: "120" } };
+        });
+
+        it.each(["setmasterbpm2", "setbpm3"])("%s gives its evaluated beat value", name => {
+            getBlock(name).flow([120, 1 / 8], logo, 0, "bpmBlock");
+
+            expect(logo.tempo.BPMs).toEqual([120]);
+            expect(logo.tempo.beatValues).toEqual([1 / 8]);
+        });
+
+        it.each([0, -0.25, NaN, Infinity, "1/8"])("gives 1/4 for a beat value of %s", beatValue => {
+            getBlock("setmasterbpm2").flow([120, beatValue], logo, 0, "bpmBlock");
+
+            expect(logo.tempo.beatValues).toEqual([0.25]);
+        });
+
+        it("gives 1/4 for the legacy master BPM block, which has no beat value", () => {
+            getBlock("setmasterbpm").flow([120], logo, 0, "bpmBlock");
+
+            expect(logo.tempo.beatValues).toEqual([0.25]);
+        });
+
+        it("keeps one beat value for each recorded BPM block", () => {
+            getBlock("setmasterbpm").flow([90], logo, 0, "bpmBlock");
+            getBlock("setbpm3").flow([120, 1 / 8], logo, 0, "bpmBlock");
+            getBlock("setmasterbpm2").flow([60, 1 / 2], logo, 0, "bpmBlock");
+
+            expect(logo.tempo.BPMs).toEqual([90, 120, 60]);
+            expect(logo.tempo.beatValues).toEqual([0.25, 1 / 8, 1 / 2]);
+        });
     });
 
     it("clamps BPM ranges inside FlowClamp blocks and cleans up listeners", () => {
@@ -627,6 +707,20 @@ describe("MeterBlocks setup", () => {
         block.flow([6, 0.125], logo, 1, "meterBlk");
         expect(Singer.MeterActions.setMeter).toHaveBeenCalledWith(6, 0.125, 1);
     });
+
+    it("sets meterArgs on the turtle's own keyboard", () => {
+        const block = getBlock("meter");
+        const own = {};
+        const lastActive = {};
+        logo.inMusicKeyboard = true;
+        logo.musicKeyboard = lastActive;
+        logo.musicKeyboardByTurtle = { 1: own };
+
+        block.flow([4, 0.25], logo, 1, "meterBlk");
+
+        expect(own.meterArgs).toEqual([4, 0.25]);
+        expect(lastActive.meterArgs).toBeUndefined();
+    });
     it("bpmfactor arg pushes to statusFields when inStatusMatrix", () => {
         const block = getBlock("bpmfactor");
         activity.blocks.blockList.bpmBlk = { connections: ["printBlock"], value: 120 };
@@ -661,25 +755,52 @@ describe("MeterBlocks setup", () => {
         expect(logo.statusFields).toContainEqual(["en2Blk", "elapsednotes2"]);
     });
 
+    it("offbeatdo shows error when action not found", () => {
+        const block = getBlock("offbeatdo");
+        logo.actions = {};
+        block.flow(["missingActionForRegressionTest"], logo, 0, "blk", null, [], false);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            NOACTIONERRORMSG,
+            "blk",
+            "missingActionForRegressionTest"
+        );
+        expect(Singer.MeterActions.onWeakBeatDo).not.toHaveBeenCalled();
+    });
+
     it("onbeatdo shows error when action not found", () => {
         const block = getBlock("onbeatdo");
         logo.actions = {};
-        block.flow([1, "missing"], logo, 0, "blk", null, [], false);
-        expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, "blk", "missing");
+        block.flow([1, "missingActionForRegressionTest"], logo, 0, "blk", null, [], false);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            NOACTIONERRORMSG,
+            "blk",
+            "missingActionForRegressionTest"
+        );
+        expect(Singer.MeterActions.onStrongBeatDo).not.toHaveBeenCalled();
     });
 
     it("everybeatdonew shows error when action not found", () => {
         const block = getBlock("everybeatdonew");
         logo.actions = {};
-        block.flow(["missing"], logo, 0, "blk", null, [], false);
-        expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, "blk", undefined);
+        block.flow(["missingActionForRegressionTest"], logo, 0, "blk", null, [], false);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            NOACTIONERRORMSG,
+            "blk",
+            "missingActionForRegressionTest"
+        );
+        expect(Singer.MeterActions.onEveryBeatDo).not.toHaveBeenCalled();
     });
 
     it("everybeatdo shows error when action not found", () => {
         const block = getBlock("everybeatdo");
         logo.actions = {};
-        block.flow(["missing"], logo, 0, "blk", null, [], false);
-        expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, "blk", undefined);
+        block.flow(["missingActionForRegressionTest"], logo, 0, "blk", null, [], false);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            NOACTIONERRORMSG,
+            "blk",
+            "missingActionForRegressionTest"
+        );
+        expect(Singer.MeterActions.onEveryNoteDo).not.toHaveBeenCalled();
     });
 
     it("setter clamps BPM to 60 when value is not a number", () => {

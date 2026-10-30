@@ -20,7 +20,9 @@
 const ASTUtils = require("../ASTutils");
 const MathUtility = require("../../utils/mathutils");
 const astring = require("../../../lib/astring.min");
+const { deepClone } = require("../../utils/utils-logic");
 
+global.deepClone = deepClone;
 global.last = jest.fn(array => array[array.length - 1]);
 global.JSInterface = {
     isSetter: jest.fn(),
@@ -44,6 +46,15 @@ describe("ASTUtils", () => {
         it("should return the barebone AST", () => {
             const result = ASTUtils.BAREBONE_AST;
             expect(result).toEqual(ASTUtils._bareboneAST);
+        });
+
+        it("should return a new deep clone instance on each call", () => {
+            const ast1 = ASTUtils.BAREBONE_AST;
+            const ast2 = ASTUtils.BAREBONE_AST;
+            expect(ast1).not.toBe(ast2);
+            expect(ast1).not.toBe(ASTUtils._bareboneAST);
+            ast1.body.push({ type: "EmptyStatement" });
+            expect(ast2.body).not.toContainEqual({ type: "EmptyStatement" });
         });
     });
 
@@ -290,14 +301,40 @@ describe("ASTUtils", () => {
             const flow = ["flow"];
             const iteratorNum = 0;
             const result = ASTUtils._getDoWhileLoopAST(args, flow, iteratorNum);
+            // `until` repeats while the condition is false, so the exported
+            // do-while must test the negated condition.
             expect(result).toEqual({
                 type: "DoWhileStatement",
                 body: {
                     type: "BlockStatement",
                     body: ASTUtils._getBlockAST(flow, iteratorNum)
                 },
-                test: ASTUtils._getArgsAST(args)[0]
+                test: {
+                    type: "UnaryExpression",
+                    operator: "!",
+                    prefix: true,
+                    argument: ASTUtils._getArgsAST(args)[0]
+                }
             });
+        });
+
+        it("should collapse an already-negated condition instead of double-negating", () => {
+            // An `until (not done)` block yields a negated condition; the export
+            // must drop the outer negation rather than emit `!!done`.
+            const negated = {
+                type: "UnaryExpression",
+                operator: "!",
+                prefix: true,
+                argument: { type: "Identifier", name: "done" }
+            };
+            const original = ASTUtils._getArgsAST;
+            ASTUtils._getArgsAST = () => [negated];
+            try {
+                const result = ASTUtils._getDoWhileLoopAST(["ignored"], ["flow"], 0);
+                expect(result.test).toEqual({ type: "Identifier", name: "done" });
+            } finally {
+                ASTUtils._getArgsAST = original;
+            }
         });
     });
 
@@ -736,6 +773,18 @@ describe("ASTUtils", () => {
             ]);
         });
 
+        it("should return the AST for an if block with iteratorNum", () => {
+            const flows = [["if", ["testArg"], [["action1", ["arg1"]]]]];
+            const iteratorNum = 2;
+            JSInterface.isMethod.mockReturnValue(true);
+            JSInterface.isClampBlock.mockReturnValue(false);
+
+            const result = ASTUtils._getBlockAST(flows, iteratorNum);
+            expect(result).toEqual([
+                ASTUtils._getIfAST(["testArg"], [["action1", ["arg1"]]], undefined, iteratorNum)
+            ]);
+        });
+
         it("should return the AST for an if-else block", () => {
             const flows = [["ifthenelse", ["testArg"], ["ifFlow"], ["elseFlow"]]];
             const iteratorNum = 0;
@@ -806,6 +855,25 @@ describe("ASTUtils", () => {
                 {
                     type: "SwitchCase",
                     test: ASTUtils._getArgsAST(["testArg"])[0],
+                    consequent: [
+                        ...ASTUtils._getBlockAST(["flow"], iteratorNum),
+                        {
+                            type: "BreakStatement",
+                            label: null
+                        }
+                    ]
+                }
+            ]);
+        });
+
+        it("should stop after a default case instead of falling through", () => {
+            const flows = [["defaultcase", null, ["flow"]]];
+            const iteratorNum = 0;
+            const result = ASTUtils._getBlockAST(flows, iteratorNum);
+            expect(result).toEqual([
+                {
+                    type: "SwitchCase",
+                    test: null,
                     consequent: [
                         ...ASTUtils._getBlockAST(["flow"], iteratorNum),
                         {
@@ -1093,6 +1161,46 @@ describe("ASTUtils", () => {
                     ]
                 }
             });
+        });
+
+        it("should return a new deep clone instance independent of _mouseAST", () => {
+            const mouseAst1 = ASTUtils.getMouseAST([]);
+            const mouseAst2 = ASTUtils.getMouseAST([]);
+            expect(mouseAst1).not.toBe(mouseAst2);
+            expect(mouseAst1).not.toBe(ASTUtils._mouseAST);
+        });
+
+        it("should export a repeat containing an if with a nested repeat", async () => {
+            const tree = [
+                [
+                    "repeat",
+                    [2],
+                    [
+                        ["if", [["less", [1, 2]]], [["repeat", [3], [["print", ["hello"]]]]]],
+                        ["if", [["less", [2, 1]]], [["print", ["never"]]]]
+                    ]
+                ]
+            ];
+
+            JSInterface.isSetter.mockReturnValue(false);
+            JSInterface.isMethod.mockReturnValue(true);
+            JSInterface.isClampBlock.mockReturnValue(false);
+            JSInterface.isGetter.mockReturnValue(false);
+            JSInterface.methodReturns.mockReturnValue(false);
+            JSInterface.getMethodName.mockImplementation(methodName => methodName);
+            JSInterface.rearrangeMethodArgs.mockImplementation((methodName, args) => args);
+
+            const code = astring.generate(ASTUtils.getMouseAST(tree));
+            expect(code).toContain("let i0 = 0");
+            expect(code).toContain("let i1 = 0");
+
+            const printed = [];
+            let flow;
+            new Function("Mouse", code)(function Mouse(mouseFlow) {
+                flow = mouseFlow;
+            });
+            await flow({ print: value => printed.push(value) });
+            expect(printed).toEqual(["hello", "hello", "hello", "hello", "hello", "hello"]);
         });
     });
 });

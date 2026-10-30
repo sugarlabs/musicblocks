@@ -87,6 +87,11 @@ describe("Utility Logic Functions", () => {
             expect(fileExt("filename")).toBe("");
             expect(fileExt(null)).toBe("");
         });
+
+        it("returns empty string when input is undefined or non-string", () => {
+            expect(fileExt(undefined)).toBe("");
+            expect(fileExt(123)).toBe("");
+        });
     });
 
     describe("fileBasename()", () => {
@@ -105,6 +110,11 @@ describe("Utility Logic Functions", () => {
 
         it("returns empty string for null input", () => {
             expect(fileBasename(null)).toBe("");
+        });
+
+        it("returns empty string for undefined or non-string input", () => {
+            expect(fileBasename(undefined)).toBe("");
+            expect(fileBasename(123)).toBe("");
         });
     });
 
@@ -139,6 +149,25 @@ describe("Utility Logic Functions", () => {
         it("returns input as is if not a number", () => {
             expect(toFixed2("abc")).toBe("abc");
         });
+
+        it("rounds values whose string form is in exponent notation", () => {
+            // x after `right 90; forward 100` from the origin
+            expect(toFixed2(100 * Math.cos(Math.PI / 2))).toBe("0");
+            expect(toFixed2(0.3 - 0.1 - 0.2)).toBe("0");
+            expect(toFixed2(1.5e-7)).toBe("0");
+        });
+
+        it("shows a small negative value as 0, not -0", () => {
+            expect(toFixed2(-0.004)).toBe("0");
+            expect(toFixed2(-1e-15)).toBe("0");
+            expect(toFixed2(-0.005)).toBe("-0.01");
+        });
+
+        it("keeps integers, including large ones, as they are", () => {
+            expect(toFixed2(-7)).toBe("-7");
+            expect(toFixed2(1e21)).toBe("1e+21");
+            expect(toFixed2(100.001)).toBe("100");
+        });
     });
 
     describe("mixedNumber()", () => {
@@ -151,8 +180,15 @@ describe("Utility Logic Functions", () => {
             expect(mixedNumber(2)).toBe("2/1");
         });
 
+        it("handles zero and treats negative zero as zero", () => {
+            expect(mixedNumber(0)).toBe("0/1");
+            expect(mixedNumber(-0)).toBe("0/1");
+        });
+
         it("returns input if not a number", () => {
             expect(mixedNumber("abc")).toBe("abc");
+            expect(mixedNumber(null)).toBeNull();
+            expect(mixedNumber(undefined)).toBeUndefined();
         });
 
         it("takes the whole and fractional parts from the magnitude", () => {
@@ -177,6 +213,12 @@ describe("Utility Logic Functions", () => {
         it("falls back to two decimals for an awkward negative denominator", () => {
             expect(mixedNumber(-2.123456)).toBe("-2.12");
         });
+
+        it("returns standard string representation for non-finite numbers", () => {
+            expect(mixedNumber(NaN)).toBe("NaN");
+            expect(mixedNumber(Infinity)).toBe("Infinity");
+            expect(mixedNumber(-Infinity)).toBe("-Infinity");
+        });
     });
 
     describe("nearestBeat()", () => {
@@ -186,6 +228,14 @@ describe("Utility Logic Functions", () => {
 
         it("returns zero beat when very small", () => {
             expect(nearestBeat(1, 8)).toEqual([0, 8]);
+        });
+
+        it("safely handles non-positive or non-finite inputs without hanging", () => {
+            expect(nearestBeat(50, -1)).toEqual([0, 0]);
+            expect(nearestBeat(50, 0)).toEqual([0, 0]);
+            expect(nearestBeat(Infinity, 8)).toEqual([0, 8]);
+            expect(nearestBeat(50, Infinity)).toEqual([0, 0]);
+            expect(nearestBeat(50, NaN)).toEqual([0, 0]);
         });
     });
 
@@ -258,11 +308,23 @@ describe("Utility Logic Functions", () => {
             expect(GCD(Math.abs(n), d)).toBe(1);
         });
 
-        it("reduces fractions via GCD on iteration cap", () => {
+        it("reduces fractions via GCD", () => {
             const [n, d] = rationalToFraction(0.0003);
             expect(GCD(n, d)).toBe(1);
             expect(n).toBe(1);
-            expect(d).toBe(3334);
+            expect(d).toBe(3333);
+        });
+
+        it("preserves non-zero values with bounded approximation when denominator exceeds limit", () => {
+            const [nPos, dPos] = rationalToFraction(0.00003);
+            expect(nPos).toBe(1);
+            expect(dPos).toBe(20000);
+            expect(GCD(nPos, dPos)).toBe(1);
+
+            const [nNeg, dNeg] = rationalToFraction(-0.00003);
+            expect(nNeg).toBe(-1);
+            expect(dNeg).toBe(20000);
+            expect(GCD(Math.abs(nNeg), dNeg)).toBe(1);
         });
 
         it("ensures standard musical subdivisions stay exact and reduced", () => {
@@ -401,6 +463,16 @@ describe("Utility Logic Functions", () => {
             expect(formatSeconds(null)).toBe("00:00");
             expect(formatSeconds(undefined)).toBe("00:00");
             expect(formatSeconds("invalid")).toBe("00:00");
+        });
+
+        it("returns fallback 00:00 instead of coercing non-number, non-string inputs", () => {
+            expect(formatSeconds(true)).toBe("00:00");
+            expect(formatSeconds([65])).toBe("00:00");
+            expect(formatSeconds({ valueOf: () => 65 })).toBe("00:00");
+        });
+
+        it("returns fallback 00:00 for symbols without throwing", () => {
+            expect(formatSeconds(Symbol("duration"))).toBe("00:00");
         });
     });
 
@@ -551,6 +623,19 @@ describe("Utility Logic Functions", () => {
             expect(cloned.a[2]).not.toBe(obj.a[2]);
             expect(cloned.c.d).not.toBe(obj.c.d);
         });
+        it("does not copy unsafe object keys", () => {
+            const obj = JSON.parse(
+                '{"__proto__":{"polluted":true},"constructor":{"polluted":true},"prototype":{"polluted":true},"safe":1}'
+            );
+
+            const cloned = deepClone(obj);
+
+            expect(cloned.safe).toBe(1);
+            expect(Object.prototype.hasOwnProperty.call(cloned, "__proto__")).toBe(false);
+            expect(Object.prototype.hasOwnProperty.call(cloned, "constructor")).toBe(false);
+            expect(Object.prototype.hasOwnProperty.call(cloned, "prototype")).toBe(false);
+            expect(Object.getPrototypeOf(cloned)).toBe(Object.prototype);
+        });
     });
 
     describe("isSafeUrl()", () => {
@@ -602,6 +687,8 @@ describe("Utility Logic Functions", () => {
             expect(GCD(12, 18)).toBe(6);
             expect(GCD(17, 5)).toBe(1);
             expect(GCD(100, 10)).toBe(10);
+            expect(GCD(8, 16)).toBe(8);
+            expect(GCD(3, 12)).toBe(3);
         });
 
         it("is symmetric in its arguments", () => {
@@ -684,8 +771,34 @@ describe("Utility Logic Functions", () => {
             expect(toFraction(0.5)).toEqual([1, 2]);
         });
 
-        it("converts a decimal above one by inverting and swapping back", () => {
+        it("converts a decimal above one to a numerator/denominator pair", () => {
             expect(toFraction(1.5)).toEqual([3, 2]);
+            expect(toFraction(-1.5)).toEqual([-3, 2]);
+        });
+
+        it("handles zero and non-finite inputs", () => {
+            expect(toFraction(0)).toEqual([0, 2]);
+            expect(toFraction(NaN)).toEqual([0, 1]);
+            expect(toFraction(Infinity)).toEqual([0, 1]);
+        });
+
+        it("does not return a zero denominator for large finite inputs", () => {
+            const [n, d] = toFraction(20001);
+            expect(d).toBeGreaterThan(0);
+            expect(n).toBe(20001);
+            expect(d).toBe(1);
+
+            const [n2, d2] = toFraction(20001.5);
+            expect(d2).toBeGreaterThan(0);
+            expect(n2).toBe(40003);
+            expect(d2).toBe(2);
+        });
+
+        it("returns a bounded non-zero approximation for very small inputs", () => {
+            const [n, d] = toFraction(0.00003);
+            expect(d).toBeGreaterThan(0);
+            expect(n).toBe(1);
+            expect(d).toBe(20000);
         });
     });
 
@@ -778,6 +891,11 @@ describe("Utility Logic Functions", () => {
 
         it("falls back to a two-decimal string when the denominator is large", () => {
             expect(mixedNumber(2.123456)).toBe("2.12");
+        });
+
+        it("does not display a zero fractional part for tiny non-zero inputs", () => {
+            expect(mixedNumber(1.00003)).toBe("1.00");
+            expect(mixedNumber(0.00003)).toBe("1/20000");
         });
 
         it("returns a bare fraction when the whole part is zero", () => {

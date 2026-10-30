@@ -75,7 +75,9 @@ describe("StatsWindow", () => {
         });
 
         radarMock = {
-            toBase64Image: jest.fn().mockReturnValue("data:image/png;base64,fakedata")
+            toBase64Image: jest.fn().mockReturnValue("data:image/png;base64,fakedata"),
+            stop: jest.fn(),
+            destroy: jest.fn()
         };
         global.Chart = jest.fn().mockImplementation(() => ({
             Radar: jest.fn().mockReturnValue(radarMock)
@@ -92,6 +94,103 @@ describe("StatsWindow", () => {
         expect(sw.isOpen).toBe(true);
         expect(global.analyzeProject).toHaveBeenCalledWith(activity);
         expect(global.runAnalytics).toHaveBeenCalledWith(activity);
+    });
+
+    test("releases the chart after capturing its image on each refresh", () => {
+        const sw = new StatsWindow(activity);
+        for (let i = 1; i <= 3; i++) {
+            capturedCb();
+            expect(radarMock.toBase64Image).toHaveBeenCalledTimes(i);
+            expect(radarMock.stop).toHaveBeenCalledTimes(i);
+            expect(radarMock.destroy).toHaveBeenCalledTimes(i);
+            expect(body.querySelector("img").src).toContain("fakedata");
+            expect(sw._chart).toBeNull();
+            if (i < 3) sw.refresh();
+        }
+        widgetWin.onclose();
+        expect(radarMock.destroy).toHaveBeenCalledTimes(3);
+    });
+
+    test("closing during rendering cancels the chart and ignores a late callback", () => {
+        const sw = new StatsWindow(activity);
+        const callback = capturedCb;
+        widgetWin.onclose();
+        callback();
+
+        expect(radarMock.stop).toHaveBeenCalledTimes(1);
+        expect(radarMock.destroy).toHaveBeenCalledTimes(1);
+        expect(radarMock.toBase64Image).not.toHaveBeenCalled();
+        expect(body.querySelector("img")).toBeNull();
+        expect(activity.blocks.hideBlocks).not.toHaveBeenCalled();
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(sw._inFlight).toBe(false);
+    });
+
+    test("maximizing disposes the previous chart and ignores its completion", () => {
+        const sw = new StatsWindow(activity);
+        const oldCallback = capturedCb;
+        const oldChart = radarMock;
+        const nextChart = {
+            toBase64Image: jest.fn().mockReturnValue("data:image/png;base64,next"),
+            stop: jest.fn(),
+            destroy: jest.fn()
+        };
+        global.Chart.mockImplementation(() => ({ Radar: () => nextChart }));
+        widgetWin.onmaximize();
+        expect(oldChart.destroy).toHaveBeenCalledTimes(1);
+        oldCallback();
+        expect(oldChart.toBase64Image).not.toHaveBeenCalled();
+        expect(nextChart.destroy).not.toHaveBeenCalled();
+
+        capturedCb();
+        expect(nextChart.destroy).toHaveBeenCalledTimes(1);
+        expect(body.querySelector("img").src).toContain("next");
+        expect(sw._chart).toBeNull();
+    });
+
+    test("does not start delayed analysis or refresh after closing", () => {
+        const sw = new StatsWindow(activity);
+        widgetWin.onclose();
+        global.analyzeProject.mockClear();
+        sw.doAnalytics();
+        sw.refresh();
+        expect(global.analyzeProject).not.toHaveBeenCalled();
+    });
+
+    test("closing before Chart.js loads does not create a chart afterwards", async () => {
+        const chartConstructor = window.Chart;
+        delete window.Chart;
+        let finishLoading;
+        const loader = jest.spyOn(StatsWindow.prototype, "_ensureChartLoaded").mockReturnValue(
+            new Promise(resolve => {
+                finishLoading = resolve;
+            })
+        );
+        try {
+            const sw = new StatsWindow(activity);
+            widgetWin.onclose();
+            window.Chart = chartConstructor;
+            finishLoading();
+            await Promise.resolve();
+            expect(global.analyzeProject).not.toHaveBeenCalled();
+            expect(chartConstructor).not.toHaveBeenCalled();
+            expect(sw._chart).toBeNull();
+        } finally {
+            window.Chart = chartConstructor;
+            loader.mockRestore();
+        }
+    });
+
+    test("releases the chart and busy state if capturing the image fails", () => {
+        const sw = new StatsWindow(activity);
+        radarMock.toBase64Image.mockImplementation(() => {
+            throw new Error("snapshot failed");
+        });
+        expect(() => capturedCb()).toThrow("snapshot failed");
+        expect(radarMock.destroy).toHaveBeenCalledTimes(1);
+        expect(activity.loading).toBe(false);
+        expect(sw._inFlight).toBe(false);
     });
 
     test("onclose cleans up and marks window closed", () => {
@@ -114,6 +213,10 @@ describe("StatsWindow", () => {
         expect(body.style.display).toBe("flex");
         expect(body.style.justifyContent).toBe("space-between");
         expect(body.style.padding).toBe("0px 2vw");
+        expect(body.style.alignItems).toBe("flex-start");
+        expect(body.style.flexWrap).toBe("wrap");
+        expect(body.style.gap).toBe("16px");
+        expect(body.style.overflow).toBe("auto");
         expect(global.analyzeProject).toHaveBeenCalled();
     });
 
@@ -164,6 +267,21 @@ describe("StatsWindow", () => {
 
         const imgs = body.querySelectorAll("img");
         expect(imgs[imgs.length - 1].width).toBe(420); // 500 - 80
+    });
+
+    test("chart image stays within the widget body when the viewport narrows", () => {
+        widgetWin.isMaximized.mockReturnValue(true);
+        new StatsWindow(activity);
+
+        capturedCb();
+
+        const imgs = body.querySelectorAll("img");
+        const img = imgs[imgs.length - 1];
+
+        expect(img.style.maxWidth).toBe("100%");
+        expect(img.style.height).toBe("auto");
+        expect(img.style.minWidth).toBe("0");
+        expect(img.style.objectFit).toBe("contain");
     });
 
     test("doAnalytics initializes chart with canvas context and analytics data", () => {
@@ -247,9 +365,9 @@ describe("StatsWindow", () => {
         expect(html).toContain("pitch names: A, C#, E");
         expect(html).toContain("number of notes: 20");
         expect(html).toContain("lowest note: A4");
-        expect(html).toContain("441Hz"); // 440 + 0.5 rounded
+        expect(html).toContain("lowest note: A4,440Hz");
         expect(html).toContain("highest note: C5");
-        expect(html).toContain("524Hz"); // 523.25 + 0.5 rounded
+        expect(html).toContain("highest note: C5,523Hz");
         expect(html).toContain("rests used: 4");
         expect(html).toContain("ornaments used: 1");
     });

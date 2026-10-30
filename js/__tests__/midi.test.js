@@ -22,7 +22,7 @@ const { getClosestStandardNoteValue, transcribeMidi } = require("../midi");
 const mockMidi = {
     header: {
         ppq: 480,
-        tempos: [{ bpm: 120 }],
+        tempos: [{ bpm: 120, ticks: 0 }],
         timeSignatures: [{ timeSignature: [4, 4], ticks: 0 }]
     },
     tracks: [
@@ -459,6 +459,247 @@ describe("transcribeMidi", () => {
         expect(pitchBlocks[0][4][3]).toBe(pitchBlocks[1][0]);
         expect(pitchBlocks[1][4][3]).toBeNull();
     });
+    describe("polyphonic note boundaries", () => {
+        const { Midi } = require("@tonejs/midi");
+
+        const importNotes = async notes => {
+            const file = new Midi();
+            file.header.setTempo(120);
+            const track = file.addTrack();
+            notes.forEach(([midi, start, end]) => {
+                track.addNote({ midi, time: start, duration: end - start });
+            });
+            const parsed = new Midi(file.toArray());
+            await transcribeMidi(parsed, 1000);
+            const blocks = loadNewBlocksSpy.mock.calls[0][0];
+            const byIndex = new Map(blocks.map(block => [block[0], block]));
+            const events = blocks
+                .filter(block => blockName(block) === "newnote")
+                .map(block => {
+                    const divide = byIndex.get(block[4][1]);
+                    const numerator = byIndex.get(divide[4][1])[1][1].value;
+                    const denominator = byIndex.get(divide[4][2])[1][1].value;
+                    const pitches = [];
+                    let child = byIndex.get(byIndex.get(block[4][2])[4][1]);
+                    while (child && blockName(child) === "pitch") {
+                        const pitch = byIndex.get(child[4][1])[1][1].value;
+                        const octave = byIndex.get(child[4][2])[1][1].value;
+                        pitches.push(`${pitch}${octave}`);
+                        child = byIndex.get(child[4][3]);
+                    }
+                    return [(numerator / denominator) * 2, pitches];
+                });
+            expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+            return { events, blocks, parsed };
+        };
+
+        it.each([
+            [
+                "a later note outlasting the held note",
+                [
+                    [60, 0, 4],
+                    [64, 1, 2],
+                    [67, 3, 5]
+                ],
+                [
+                    [1, ["C4"]],
+                    [1, ["C4", "E4"]],
+                    [1, ["C4"]],
+                    [1, ["C4", "G4"]],
+                    [1, ["G4"]]
+                ]
+            ],
+            [
+                "nested overlaps that begin before the previous tail",
+                [
+                    [60, 0, 4],
+                    [64, 1, 3],
+                    [67, 2, 4]
+                ],
+                [
+                    [1, ["C4"]],
+                    [1, ["C4", "E4"]],
+                    [1, ["C4", "E4", "G4"]],
+                    [1, ["C4", "G4"]]
+                ]
+            ],
+            [
+                "unequal-length notes starting together",
+                [
+                    [60, 0, 2],
+                    [64, 0, 1]
+                ],
+                [
+                    [1, ["C4", "E4"]],
+                    [1, ["C4"]]
+                ]
+            ],
+            [
+                "a chord with identical start and end times",
+                [
+                    [60, 0, 1],
+                    [64, 0, 1],
+                    [67, 0, 1]
+                ],
+                [[1, ["C4", "E4", "G4"]]]
+            ],
+            [
+                "a note ending exactly when the next begins",
+                [
+                    [60, 0, 1],
+                    [64, 1, 2]
+                ],
+                [
+                    [1, ["C4"]],
+                    [1, ["E4"]]
+                ]
+            ],
+            [
+                "independent overlapping instances of the same pitch",
+                [
+                    [60, 0, 2],
+                    [60, 1, 3]
+                ],
+                [
+                    [1, ["C4"]],
+                    [1, ["C4", "C4"]],
+                    [1, ["C4"]]
+                ]
+            ],
+            [
+                "leading silence and gaps after a chord",
+                [
+                    [60, 1, 2],
+                    [64, 1, 2],
+                    [67, 3, 4]
+                ],
+                [
+                    [1, []],
+                    [1, ["C4", "E4"]],
+                    [1, []],
+                    [1, ["G4"]]
+                ]
+            ],
+            [
+                "zero-duration notes before leading silence",
+                [
+                    [60, 0, 0],
+                    [64, 1, 2]
+                ],
+                [
+                    [1, []],
+                    [1, ["E4"]]
+                ]
+            ],
+            [
+                "notes collapsed by centisecond rounding",
+                [
+                    [60, 0, 0.001],
+                    [64, 1, 2]
+                ],
+                [
+                    [1, []],
+                    [1, ["E4"]]
+                ]
+            ]
+        ])(
+            "preserves %s through MIDI decoding and block generation",
+            async (_, notes, expected) => {
+                const { events } = await importNotes(notes);
+                expect(events).toEqual(expected);
+            }
+        );
+
+        it("does not create an empty action or start stack for a track with no playable notes", async () => {
+            const { events, blocks } = await importNotes([[60, 0, 0.001]]);
+            expect(events).toEqual([]);
+            expect(blocks).toEqual([]);
+        });
+
+        it("preserves overlapping notes and valid connections across action chunks", async () => {
+            const notes = Array.from({ length: 60 }, (_, index) => [
+                60 + (index % 12),
+                index * 0.5,
+                index * 0.5 + 1
+            ]);
+            const { events, blocks, parsed } = await importNotes(notes);
+            expect(blocks.filter(block => blockName(block) === "action").length).toBeGreaterThan(1);
+            expect(events).toHaveLength(61);
+            events.forEach(([duration, pitches], index) => {
+                const start = index * 0.5;
+                expect(duration).toBe(0.5);
+                expect([...pitches].sort()).toEqual(
+                    parsed.tracks[0].notes
+                        .filter(note => note.time <= start && note.time + note.duration > start)
+                        .map(note => note.name)
+                        .sort()
+                );
+            });
+        });
+
+        it("skips an unplayable track without mixing subsequent tracks or their instruments", async () => {
+            const file = new Midi();
+            file.header.setTempo(120);
+            file.addTrack().addNote({ midi: 60, time: 0, duration: 0.001 });
+            const piano = file.addTrack();
+            piano.instrument.number = 0;
+            piano.addNote({ midi: 60, time: 0, duration: 2 });
+            piano.addNote({ midi: 64, time: 1, duration: 2 });
+            const guitar = file.addTrack();
+            guitar.instrument.number = 24;
+            guitar.addNote({ midi: 67, time: 0, duration: 1 });
+            await transcribeMidi(new Midi(file.toArray()), 1000);
+            const blocks = loadNewBlocksSpy.mock.calls[0][0];
+            expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+            expect(blocks.filter(block => blockName(block) === "start")).toHaveLength(2);
+            expect(
+                blocks
+                    .filter(block => blockName(block) === "voicename")
+                    .map(block => block[1][1].value)
+            ).toEqual(["piano", "guitar"]);
+            expect(blocks.filter(block => blockName(block) === "newnote")).toHaveLength(4);
+            expect(
+                blocks
+                    .filter(block => blockName(block) === "notename")
+                    .map(block => block[1][1].value)
+            ).toEqual(["C", "C", "E", "E", "G"]);
+        });
+
+        it("preserves active pitches for 100 deterministic overlapping tracks", async () => {
+            let seed = 12345;
+            const random = limit => {
+                seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+                return seed % limit;
+            };
+            for (let example = 0; example < 100; example++) {
+                loadNewBlocksSpy.mockClear();
+                const notes = Array.from({ length: 6 }, (_, index) => {
+                    const start = random(5) * 0.5;
+                    return [60 + index, start, start + (1 + random(4)) * 0.5];
+                });
+                const { events, parsed } = await importNotes(notes);
+                const source = parsed.tracks[0].notes;
+                const boundaries = [
+                    ...new Set([
+                        0,
+                        ...source.flatMap(note => [note.time, note.time + note.duration])
+                    ])
+                ].sort((a, b) => a - b);
+                const expected = boundaries.slice(0, -1).map((start, index) => {
+                    const end = boundaries[index + 1];
+                    const pitches = source
+                        .filter(note => note.time <= start && note.time + note.duration > start)
+                        .map(note => note.name)
+                        .sort();
+                    return [end - start, pitches];
+                });
+                expect(
+                    events.map(([duration, pitches]) => [duration, [...pitches].sort()])
+                ).toEqual(expected);
+            }
+        });
+    });
+
     describe("tempo and note values", () => {
         const { Midi } = require("@tonejs/midi");
         const PPQ = 480;
@@ -466,22 +707,24 @@ describe("transcribeMidi", () => {
         // Writes a real MIDI file with @tonejs/midi and reads it back, so every note carries
         // the time in seconds the library derives from the file's tempo map.
         // lengths are in quarter notes; a negative length is a rest.
-        const midiFile = ({ tempos = [], timeSignature = null, lengths }) => {
+        const midiFile = ({ tempos = [], timeSignature = null, lengths, tracks = [lengths] }) => {
             const midi = new Midi();
             midi.header.tempos = tempos.map(([ticks, bpm]) => ({ ticks, bpm }));
             if (timeSignature) {
                 midi.header.timeSignatures = [{ ticks: 0, timeSignature }];
             }
             midi.header.update();
-            const track = midi.addTrack();
-            track.instrument.number = 0;
-            let ticks = 0;
-            lengths.forEach((quarters, index) => {
-                const durationTicks = Math.abs(quarters) * PPQ;
-                if (quarters > 0) {
-                    track.addNote({ midi: 60 + index, ticks, durationTicks });
-                }
-                ticks += durationTicks;
+            tracks.forEach(trackLengths => {
+                const track = midi.addTrack();
+                track.instrument.number = 0;
+                let ticks = 0;
+                trackLengths.forEach((quarters, index) => {
+                    const durationTicks = Math.abs(quarters) * PPQ;
+                    if (quarters > 0) {
+                        track.addNote({ midi: 60 + index, ticks, durationTicks });
+                    }
+                    ticks += durationTicks;
+                });
             });
             return new Midi(midi.toArray());
         };
@@ -685,6 +928,94 @@ describe("transcribeMidi", () => {
             const seconds = (wholeNotes * 4 * 60) / tempoOf(blocks).quarterNotesPerMinute;
 
             expect(seconds).toBeCloseTo(lastNote.time + lastNote.duration, 2);
+        });
+
+        describe("long and tied lengths", () => {
+            // Where each track's notes and rests start in whole notes, then where it ends
+            const trackPositions = blocks => {
+                const byIndex = new Map(blocks.map(block => [block[0], block]));
+                const tracks = [];
+                let positions;
+                blocks.forEach(block => {
+                    if (blockName(block) === "action") {
+                        const track = parseInt(numberOf(byIndex, block[4][1]).slice(5));
+                        positions = tracks[track] = tracks[track] || [0];
+                    } else if (blockName(block) === "newnote") {
+                        const divide = byIndex.get(block[4][1]);
+                        const value =
+                            numberOf(byIndex, divide[4][1]) / numberOf(byIndex, divide[4][2]);
+                        positions.push(positions[positions.length - 1] + value);
+                    }
+                });
+                return tracks;
+            };
+
+            it("keeps a rest of several bars at its full length", async () => {
+                const blocks = await importBlocks(midiFile({ lengths: [-8, 1, 1] }));
+
+                expect(noteValues(blocks)).toEqual(["2/1", "1/4", "1/4"]);
+            });
+
+            it("keeps a track that comes in after a long rest in time with the others", async () => {
+                const blocks = await importBlocks(
+                    midiFile({ tracks: [Array(12).fill(1), [-8, 1, 1, 1, 1]] })
+                );
+
+                const [melody, bass] = trackPositions(blocks);
+                expect(bass[1]).toBe(melody[8]);
+                expect(bass[bass.length - 1]).toBe(melody[melody.length - 1]);
+            });
+
+            it("keeps a note held over several bars at its full length", async () => {
+                const blocks = await importBlocks(midiFile({ lengths: [9, 11.5, 1] }));
+
+                expect(noteValues(blocks)).toEqual(["9/4", "23/8", "1/4"]);
+            });
+
+            it("keeps a note that runs across a tempo change at its own length", async () => {
+                // One second at 120 bpm then one at 240 bpm, all played at 120 bpm
+                const blocks = await importBlocks(
+                    midiFile({
+                        tempos: [
+                            [0, 120],
+                            [2 * PPQ, 240]
+                        ],
+                        lengths: [6, 1]
+                    })
+                );
+
+                expect(noteValues(blocks)).toEqual(["1/1", "1/4"]);
+                expect(midTrackTempoChanges(blocks).map(t => t.quarterNotesPerMinute)).toEqual([
+                    240
+                ]);
+            });
+
+            it("writes tied lengths exactly", async () => {
+                const blocks = await importBlocks(
+                    midiFile({ lengths: [2.5, 0.5, 1, 5, 3, 3.5, 0.5, 1.75] })
+                );
+
+                expect(noteValues(blocks)).toEqual([
+                    "5/8",
+                    "1/8",
+                    "1/4",
+                    "5/4",
+                    "3/4",
+                    "7/8",
+                    "1/8",
+                    "7/16"
+                ]);
+            });
+
+            it("does not let rounding add up along a track", async () => {
+                const lengths = Array(12).fill(1.1);
+                const blocks = await importBlocks(midiFile({ lengths }));
+
+                const total = noteValues(blocks)
+                    .map(value => value.split("/").map(Number))
+                    .reduce((sum, [numerator, denominator]) => sum + numerator / denominator, 0);
+                expect(Math.abs(total - (12 * 1.1) / 4)).toBeLessThan(1 / 32);
+            });
         });
 
         describe("dotted notes and triplets", () => {

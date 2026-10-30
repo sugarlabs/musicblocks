@@ -77,6 +77,7 @@ describe("Activity <-> ProjectManager integration", () => {
                 }
             ]
         };
+        activity.logo = { getRestoredConnections: () => new Map() };
         // Seeded to the opposite of what prepareExport() sets, so the
         // assertion below proves a real mutation happened rather than
         // coincidentally matching Activity's initial value.

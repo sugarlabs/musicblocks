@@ -48,6 +48,7 @@ if (typeof module !== "undefined" && module.exports) {
         PITCHES2,
         PITCHES,
         INTERVALVALUES,
+        INTERVAL_ALIASES,
         SOLFNOTES,
         NOTESFLAT2,
         EQUIVALENTFLATS,
@@ -118,7 +119,7 @@ var NOTESYMBOLS = {
  */
 var keySignatureToMode = keySignature => {
     // Convert from "A Minor" to "A" and "MINOR"
-    if (keySignature === "" || keySignature === null) {
+    if (typeof keySignature !== "string" || keySignature.trim() === "") {
         return ["C", "major"];
     }
 
@@ -314,6 +315,9 @@ var getSharpFlatPreference = keySignature => {
  * @returns {number} The numeric representation of the pitch.
  */
 var pitchToNumber = (pitch, octave, keySignature, temperament) => {
+    if (typeof pitch !== "string") {
+        return 0;
+    }
     const currentEDO = getCurrentEDO(temperament);
     // Calculate the pitch index based on pitch and octave.
     if (pitch.toUpperCase() === "R") {
@@ -322,43 +326,53 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
     const originalPitch = pitch;
     // Check for flat, sharp, double flat, or double sharp.
     let transposition = 0;
-    const len = pitch.length;
-    let lastOne, lastTwo;
-    if (len > 1) {
-        if (len > 2) {
-            lastTwo = pitch.slice(len - 2);
-            //Unsure why slice is not working for double flats and double sharps.
-            lastOne = pitch.substring(1, len);
-            if (lastTwo === "bb") {
-                pitch = pitch.substring(0, 1);
-                transposition -= 2;
-            } else if (lastOne === DOUBLEFLAT) {
-                pitch = pitch.substring(0, 1);
-                transposition -= 2;
-            } else if (lastTwo === "##" || lastTwo === "*" || lastTwo === DOUBLESHARP) {
-                pitch = pitch.substring(0, 1);
-                transposition += 2;
-            } else if (
-                lastTwo === "#b" ||
-                lastTwo === SHARP + FLAT ||
-                lastTwo === "b#" ||
-                lastTwo === FLAT + SHARP
-            ) {
-                // Not sure this could occur... but just in case.
-                pitch = pitch.slice(0, len - 2);
-            }
-        }
+    if (pitch.length > 1) {
+        const doubleFlat = pitch.endsWith("bb")
+            ? "bb"
+            : pitch.endsWith(FLAT + FLAT)
+              ? FLAT + FLAT
+              : pitch.endsWith(DOUBLEFLAT)
+                ? DOUBLEFLAT
+                : null;
+        const doubleSharp = pitch.endsWith("##")
+            ? "##"
+            : pitch.endsWith(SHARP + SHARP)
+              ? SHARP + SHARP
+              : pitch.endsWith(DOUBLESHARP)
+                ? DOUBLESHARP
+                : null;
 
-        if (pitch.length > 1) {
-            lastOne = pitch.slice(len - 1);
+        if (doubleFlat) {
+            pitch = pitch.slice(0, -doubleFlat.length);
+            transposition -= 2;
+        } else if (doubleSharp) {
+            pitch = pitch.slice(0, -doubleSharp.length);
+            transposition += 2;
+        } else if (
+            pitch.endsWith("#b") ||
+            pitch.endsWith(SHARP + FLAT) ||
+            pitch.endsWith("#" + FLAT) ||
+            pitch.endsWith(SHARP + "b") ||
+            pitch.endsWith("b#") ||
+            pitch.endsWith(FLAT + SHARP) ||
+            pitch.endsWith("b" + SHARP) ||
+            pitch.endsWith(FLAT + "#")
+        ) {
+            // Mixed sharp+flat cancels out to a natural; this must be checked
+            // before the single-accidental checks below, since a mixed suffix
+            // also ends in "b" or "#" and would otherwise be caught by those
+            // first, stripping only one character instead of both.
+            pitch = pitch.slice(0, -2);
+        } else {
+            const lastOne = pitch.slice(-1);
             if (lastOne === "b" || lastOne === FLAT) {
-                pitch = pitch.slice(0, len - 1);
+                pitch = pitch.slice(0, -1);
                 transposition -= 1;
             } else if (lastOne === "#" || lastOne === SHARP) {
-                pitch = pitch.slice(0, len - 1);
+                pitch = pitch.slice(0, -1);
                 transposition += 1;
             } else if (lastOne === "x" || lastOne === "*") {
-                pitch = pitch.slice(0, len - 1);
+                pitch = pitch.slice(0, -1);
                 transposition += 2;
             }
         }
@@ -401,7 +415,12 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
     if (transposition !== 0) {
         const edoPos = getEdoNoteNamePosition(originalPitch, currentEDO);
         if (edoPos !== -1) {
-            return octave * currentEDO + edoPos - PITCHES.indexOf("A");
+            let octaveShift = 0;
+            const letterPos = PITCHES.indexOf(pitch.toUpperCase());
+            if (currentEDO === 12 && letterPos !== -1) {
+                octaveShift = Math.floor((letterPos + transposition) / 12);
+            }
+            return (octave + octaveShift) * currentEDO + edoPos - PITCHES.indexOf("A");
         }
     }
 
@@ -411,7 +430,7 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
     } else {
         // obj[1] is the solfege mapping for the current key/mode
         const obj = getScaleAndHalfSteps(keySignature);
-        if (obj[1].includes(pitch.toLowerCase())) {
+        if (pitch.length > 0 && obj[1].includes(pitch.toLowerCase())) {
             pitchNumber = obj[1].indexOf(pitch.toLowerCase());
         } else {
             console.debug("pitch " + pitch + " not found in mode.");
@@ -432,7 +451,7 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
  * Get the note based on a given pitch and interval.
  * @function
  * @param {string} pitch - The pitch, including the note name and octave (e.g., "C4").
- * @param {string} interval - The interval for which the note needs to be determined (e.g., "major 3rd").
+ * @param {string} interval - An INTERVALVALUES key, e.g. "major 3" or "octave".
  * @param {string} [temperament="equal"] - The temperament to use for pitch calculations.
  * @returns {Array} An array containing the note and octave.
  */
@@ -440,6 +459,12 @@ var getNoteFromInterval = (pitch, interval, temperament) => {
     if (temperament === undefined) {
         temperament = "equal";
     }
+
+    // Read another name for an interval as the "<quality> <number>" name it stands for.
+    if (Object.prototype.hasOwnProperty.call(INTERVAL_ALIASES, interval)) {
+        interval = INTERVAL_ALIASES[interval];
+    }
+
     const pitch1 = pitch.substring(0, 1);
     const parsed = parseNoteString(pitch);
     const note1 = parsed[0];
@@ -451,7 +476,7 @@ var getNoteFromInterval = (pitch, interval, temperament) => {
     /**
      * Find the note that corresponds to a major interval.
      * @function
-     * @param {string} interval - The interval for which the note needs to be determined (e.g., "major 3rd").
+     * @param {string} interval - The interval for which the note needs to be determined (e.g., "major 3").
      * @returns {Array} An array containing the note and octave.
      */
     const findMajorInterval = interval => {
@@ -888,10 +913,18 @@ var getNoteFromSolfege = (
     octave,
     transpositionFloor
 ) => {
-    let sharpFlat = false;
-    if (["#", SHARP, FLAT, "b"].includes(noteArg.slice(-1))) {
-        sharpFlat = true;
+    if (typeof noteArg !== "string" || noteArg.length === 0) {
+        return null;
     }
+    const normalizedNoteArg = noteArg.replace(/##$/g, DOUBLESHARP).replace(/bb$/g, DOUBLEFLAT);
+    const doubleSharp = normalizedNoteArg.endsWith(DOUBLESHARP);
+    const doubleFlat = normalizedNoteArg.endsWith(DOUBLEFLAT);
+    const accidentalLength = doubleSharp || doubleFlat ? DOUBLESHARP.length : 0;
+    const solfegeRoot = accidentalLength
+        ? normalizedNoteArg.slice(0, -accidentalLength)
+        : normalizedNoteArg;
+    const sharpFlat =
+        doubleSharp || doubleFlat || ["#", SHARP, FLAT, "b"].includes(normalizedNoteArg.slice(-1));
 
     if (!keySignature) {
         keySignature = "C major";
@@ -938,24 +971,28 @@ var getNoteFromSolfege = (
     }
 
     if (sharpFlat) {
-        if (noteArg.slice(-1) === "#") {
+        if (doubleSharp) {
+            offset += 2;
+        } else if (doubleFlat) {
+            offset -= 2;
+        } else if (normalizedNoteArg.slice(-1) === "#") {
             offset += 1;
-        } else if (noteArg.slice(-1) === SHARP) {
+        } else if (normalizedNoteArg.slice(-1) === SHARP) {
             offset += 1;
-        } else if (noteArg.slice(-1) === FLAT) {
+        } else if (normalizedNoteArg.slice(-1) === FLAT) {
             offset -= 1;
-        } else if (noteArg.slice(-1) === "b") {
+        } else if (normalizedNoteArg.slice(-1) === "b") {
             offset -= 1;
         }
     }
 
     let solfegePart;
-    if (halfSteps.includes(noteArg.slice(0, 1).toLowerCase())) {
-        solfegePart = noteArg.slice(0, 1).toLowerCase();
-    } else if (halfSteps.includes(noteArg.slice(0, 2).toLowerCase())) {
-        solfegePart = noteArg.slice(0, 2).toLowerCase();
-    } else if (halfSteps.includes(noteArg.slice(0, 3).toLowerCase())) {
-        solfegePart = noteArg.slice(0, 3).toLowerCase();
+    if (halfSteps.includes(solfegeRoot.slice(0, 1).toLowerCase())) {
+        solfegePart = solfegeRoot.slice(0, 1).toLowerCase();
+    } else if (halfSteps.includes(solfegeRoot.slice(0, 2).toLowerCase())) {
+        solfegePart = solfegeRoot.slice(0, 2).toLowerCase();
+    } else if (halfSteps.includes(solfegeRoot.slice(0, 3).toLowerCase())) {
+        solfegePart = solfegeRoot.slice(0, 3).toLowerCase();
     } else {
         // The note should already be translated, but just in case...
         // Reverse any i18n
@@ -997,8 +1034,15 @@ var getNoteFromSolfege = (
         let note = thisScale[index];
         // In non-12 EDO temperaments, enharmonic spellings are distinct
         // pitches, so the resolved note must honor the input's accidental.
+        // Use the already-parsed doubleSharp/normalizedNoteArg values rather
+        // than re-checking the raw noteArg, so ASCII ("##") and Unicode
+        // (DOUBLESHARP) double-sharp spellings resolve the same way.
         if (octaveLength !== 12 && sharpFlat) {
-            if (noteArg.slice(-1) === "#" || noteArg.slice(-1) === SHARP) {
+            if (
+                doubleSharp ||
+                normalizedNoteArg.slice(-1) === "#" ||
+                normalizedNoteArg.slice(-1) === SHARP
+            ) {
                 note = NOTESSHARP[index];
             } else {
                 note = NOTESFLAT[index];

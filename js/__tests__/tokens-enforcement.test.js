@@ -117,15 +117,18 @@ describe("Design Tokens Single Source of Truth", () => {
         expect(Object.keys(declared)).toEqual([]);
     });
 
-    it("keeps the floating widget roll-up button white in dark mode", () => {
-        expect(darkmodeCss).toMatch(
-            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\.rollup\s*\{[^}]*background-color:\s*#ffffff;/
+    it("does not hardcode dark-mode widget title bar button backgrounds", () => {
+        expect(darkmodeCss).not.toMatch(
+            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\.(?:rollup|close)\s*\{[^}]*background(?:-color)?\s*:\s*#[0-9a-f]{3,8}\b/i
+        );
+        expect(themesCss).toMatch(
+            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\s*\{[^}]*background-color\s*:\s*var\(--color-bg-tertiary\)\s*;/
         );
     });
 
-    it("keeps the floating widget close button white in dark mode", () => {
-        expect(darkmodeCss).toMatch(
-            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\.close\s*\{[^}]*background-color:\s*#ffffff;/
+    it("does not apply an inverse background to tour icons in dark mode", () => {
+        expect(darkmodeCss).not.toMatch(
+            /\.dark\s+#helpBodyDiv\s+\.help-tour-icon\s*\{[^}]*background(?:-color)?\s*:\s*var\(--color-bg-inverse\)/i
         );
     });
 
@@ -430,6 +433,19 @@ describe("Theme Switching & Inline Styles Purity", () => {
         expect(strippedCss).not.toMatch(/#[0-9a-fA-F]{3,6}/);
     });
 
+    it("allows inline toolbar offsets to override mobile window positioning", () => {
+        const windowsCss = fs.readFileSync(
+            path.join(ROOT_DIR, "dist", "css", "windows.css"),
+            "utf8"
+        );
+
+        const strippedWindowsCss = windowsCss.replace(/\/\*[\s\S]*?\*\//g, "");
+
+        expect(strippedWindowsCss).not.toMatch(
+            /[^{}]*\.windowFrame\s*\{[^}]*\btop:\s*0\s*!important;/
+        );
+    });
+
     it("ensures body element in index.html and activities stylesheets uses tokens without inline styles or !important", () => {
         const indexHtml = fs.readFileSync(path.join(ROOT_DIR, "index.html"), "utf8");
 
@@ -473,21 +489,79 @@ describe("Theme Switching & Inline Styles Purity", () => {
         }
     });
 
-    it("ensures #search does not suppress focus outline and defines visible focus indicator", () => {
+    it("ensures #search keeps a visible focus indicator from the global focus-visible rule", () => {
         const activitiesCss = fs.readFileSync(path.join(CSS_DIR, "activities.css"), "utf8");
 
         const searchFocusMatch = activitiesCss.match(/(?:^|\})\s*#search:focus\s*\{([^}]*)\}/);
         expect(searchFocusMatch).not.toBeNull();
         expect(searchFocusMatch[1]).not.toMatch(/outline\s*:\s*none/i);
         expect(searchFocusMatch[1]).not.toMatch(/outline\s*:\s*0\b/i);
-
-        const searchFocusVisibleMatch = activitiesCss.match(
-            /(?:^|\})\s*#search:focus-visible\s*\{([^}]*)\}/
+        expect(activitiesCss).not.toMatch(
+            /#search:focus-visible\s*\{[^}]*outline\s*:\s*(?:none|0\b)/i
         );
-        expect(searchFocusVisibleMatch).not.toBeNull();
-        expect(searchFocusVisibleMatch[1]).toMatch(
+
+        // The search input has no rule of its own; the global one draws its outline (#9152).
+        const focusVisibleMatch = activitiesCss.match(/(?:^|\})\s*\*:focus-visible\s*\{([^}]*)\}/);
+        expect(focusVisibleMatch).not.toBeNull();
+        expect(focusVisibleMatch[1]).toMatch(
             /outline\s*:\s*2px\s+solid\s+var\(--color-brand-primary\)/i
         );
-        expect(searchFocusVisibleMatch[1]).toMatch(/outline-offset\s*:\s*2px/i);
+        expect(focusVisibleMatch[1]).toMatch(/outline-offset\s*:\s*2px/i);
+    });
+
+    it("ensures highcontrast bright accent surfaces (cyan) do not use white text tokens", () => {
+        const themesCss = fs.readFileSync(path.join(CSS_DIR, "themes.css"), "utf8");
+
+        // Verify .highcontrast elements with cyan/bright background (var(--color-brand-secondary))
+        // do not set color to var(--color-text-primary) (which is white, failing WCAG contrast)
+        const brightBgRules = [
+            "#submitLilypond",
+            "\\.dropdown-content li:hover > a",
+            "\\.ui-autocomplete .ui-menu-item a:hover"
+        ];
+        brightBgRules.forEach(selector => {
+            const regex = new RegExp(
+                `\\.highcontrast\\s+[^}]*${selector}[^{]*\\{[^}]*color\\s*:\\s*var\\(--color-text-primary\\)`,
+                "i"
+            );
+            expect(themesCss).not.toMatch(regex);
+        });
+
+        // Contrast compliance check: var(--color-brand-secondary) with var(--color-text-inverse)
+        // must exceed WCAG AAA (>= 7:1), while var(--color-brand-secondary) with var(--color-text-primary) fails (< 4.5:1)
+        const hcTokens = THEMES.highcontrast;
+        const compliantContrast = contrastRatio(
+            hcTokens["--color-text-inverse"],
+            hcTokens["--color-brand-secondary"]
+        );
+        const failingContrast = contrastRatio(
+            hcTokens["--color-text-primary"],
+            hcTokens["--color-brand-secondary"]
+        );
+        expect(compliantContrast).toBeGreaterThanOrEqual(7);
+        expect(failingContrast).toBeLessThan(4.5);
+    });
+
+    it("ensures themes.css has valid highcontrast properties and avoids black-on-black text tokens", () => {
+        const themesCss = fs.readFileSync(path.join(CSS_DIR, "themes.css"), "utf8");
+
+        // Verify .highcontrast .blue rules have valid color syntax and do not contain fragmented tokens
+        expect(themesCss).not.toMatch(/var\(--color-text-inverse\)\s*0[0-9a-f]+/i);
+        expect(themesCss).toMatch(
+            /\.highcontrast\s+\.blue\s*\{[^}]*background-color\s*:\s*#000080\s*!important/i
+        );
+        expect(themesCss).toMatch(
+            /\.highcontrast\s+\.blue\.darken-1\s*\{[^}]*background-color\s*:\s*#0000ff\s*!important/i
+        );
+
+        // Verify .highcontrast pitch selector rules use readable var(--color-text-primary)
+        const pitchSelectorElements = ["#chooseKeyDiv", "#movable"];
+        pitchSelectorElements.forEach(selector => {
+            const regex = new RegExp(
+                `\\.highcontrast\\s+${selector}[^{]*\\{[^}]*color\\s*:\\s*var\\(--color-text-primary\\)`,
+                "i"
+            );
+            expect(themesCss).toMatch(regex);
+        });
     });
 });

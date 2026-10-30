@@ -70,6 +70,7 @@ if (typeof module !== "undefined" && module.exports) {
         TEMPERAMENT,
         setOctaveRatio,
         getOctaveRatio,
+        getEffectiveOctaveRatio,
         ratioToWheelAngle,
         getTemperamentsList,
         getTemperament,
@@ -167,14 +168,19 @@ if (typeof module !== "undefined" && module.exports) {
         getModeNameFromLabel,
         getModeSliceColors,
         getModeGroupTitleFont,
-        getModeSliceFont
+        getModeSliceArc,
+        getModeSliceFont,
+        getTemperamentSliceAngles,
+        sliceAnglesFromRatios,
+        rotateSliceAngles,
+        enforceMinSliceAngles,
+        applySliceAngles
     } = MusicUtilsModeWheel;
     var MusicUtilsModeCore =
         (typeof window !== "undefined" && window.MusicUtilsModeCore) ||
         (typeof require !== "undefined" ? require("./musicutils-modecore") : {});
     var {
         MUSICALMODES,
-        customMode,
         getModeNumbers,
         getNonEDOModeSteps,
         getArticulation,
@@ -246,7 +252,7 @@ if (typeof module !== "undefined" && module.exports) {
    getNumNote, calcOctave, calcOctaveInterval, isInt,
    convertFromSolfege, getPitchInfo, i18nSolfege,
    convertFactor, getMeasurePosition, getMeterAnchor, saveMeterState, restoreMeterState,
-   getReverseDrumMidi, getOctaveRatio, setOctaveRatio, getTemperamentsList,
+   getReverseDrumMidi, getOctaveRatio, getEffectiveOctaveRatio, setOctaveRatio, getTemperamentsList,
    addTemperamentToList, getTemperament, deleteTemperamentFromList,
    addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
    DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
@@ -332,6 +338,7 @@ if (typeof module !== "undefined" && module.exports) {
         INTERVAL_ORDER,
         setOctaveRatio,
         getOctaveRatio,
+        getEffectiveOctaveRatio,
         TEMPERAMENTS,
         INITIALTEMPERAMENTS,
         PreDefinedTemperaments,
@@ -343,7 +350,6 @@ if (typeof module !== "undefined" && module.exports) {
         addTemperamentToDictionary,
         DEFAULTINVERT,
         DEFAULTMODE,
-        customMode,
         getInvertMode,
         getIntervalNumber,
         getIntervalDirection,
@@ -434,7 +440,13 @@ if (typeof module !== "undefined" && module.exports) {
         getModeNameFromLabel,
         getModeSliceColors,
         getModeGroupTitleFont,
+        getModeSliceArc,
         getModeSliceFont,
+        getTemperamentSliceAngles,
+        sliceAnglesFromRatios,
+        rotateSliceAngles,
+        enforceMinSliceAngles,
+        applySliceAngles,
         getNonEDOFrequency
     };
 }

@@ -45,14 +45,40 @@ class RhythmRulerHistory {
      * @returns {void}
      */
     _restoreDissectHistory() {
+        // Edits saved with the project, for drums not edited yet in this session. They have no
+        // undo entries yet, so they get them as they are replayed, or undo and clear would stop.
+        const fromProject = new Set();
+        const savedHistory = this.activity?.blocks?.blockList?.[this.rulerBlock]?.rulerHistory;
+        if (Array.isArray(savedHistory)) {
+            const drums = new Set(this._dissectHistory.map(entry => entry[1]));
+            for (const entry of savedHistory) {
+                if (!drums.has(entry[1])) {
+                    const copy = deepClone(entry);
+                    this._dissectHistory.push(copy);
+                    fromProject.add(copy);
+                }
+            }
+        }
+
         let cell;
         for (let drum = 0; drum < this.Drums.length; drum++) {
             if (drum === null) {
                 continue;
             }
 
+            // A drum repeated in the clamp has one entry per row, saved in row order, so each row
+            // replays only its own entry.
+            const occurrence = this.Drums.slice(0, drum).filter(
+                other => other === this.Drums[drum]
+            ).length;
+            let match = -1;
             for (let i = 0; i < this._dissectHistory.length; i++) {
                 if (this._dissectHistory[i][1] !== this.Drums[drum]) {
+                    continue;
+                }
+
+                match++;
+                if (match !== occurrence) {
                     continue;
                 }
 
@@ -63,10 +89,15 @@ class RhythmRulerHistory {
                     }
 
                     this._rulerSelected = drum;
+                    const historyLength = this.Rulers[drum][1].length;
+                    let undoType;
 
                     if (typeof this._dissectHistory[i][0][j] === "number") {
                         cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j]];
-                        this.__toggleRestState(cell, false);
+                        if (cell !== undefined) {
+                            this.__toggleRestState(cell, false);
+                            undoType = "rest";
+                        }
                     } else if (typeof this._dissectHistory[i][0][j][0] === "number") {
                         if (typeof this._dissectHistory[i][0][j][1] === "number") {
                             // dissect is [cell, num]
@@ -77,6 +108,7 @@ class RhythmRulerHistory {
                                     this._dissectHistory[i][0][j][1],
                                     false
                                 );
+                                undoType = "dissect";
                             } else {
                                 // console.warn(
                                 //     "Could not find cell to divide. Did the order of the rhythm blocks change?"
@@ -91,6 +123,7 @@ class RhythmRulerHistory {
                                     this._dissectHistory[i][0][j][1],
                                     false
                                 );
+                                undoType = "tap";
                             }
                         }
                     } else {
@@ -100,10 +133,18 @@ class RhythmRulerHistory {
                         this._mouseUpCell = rhythmRulerTableRow.cells[last(history)[0]];
                         if (this._mouseUpCell !== undefined) {
                             this.__tie(false);
+                            undoType = "tie";
                         }
 
                         this._mouseDownCell = null;
                         this._mouseUpCell = null;
+                    }
+
+                    if (
+                        fromProject.has(this._dissectHistory[i]) &&
+                        this.Rulers[drum][1].length > historyLength
+                    ) {
+                        this._undoList.push([undoType, drum]);
                     }
                 }
             }
@@ -158,6 +199,16 @@ class RhythmRulerHistory {
         }
 
         this._dissectHistory = deepClone(dissectHistory);
+
+        // Keep this ruler's own entries (the first drums.length) on its block, so they are saved
+        // with the project. Drums this run didn't reach keep their saved edits.
+        const block = this.activity?.blocks?.blockList?.[this.rulerBlock];
+        if (block) {
+            const notReached = (block.rulerHistory || []).filter(entry => !drumsSet.has(entry[1]));
+            block.rulerHistory = deepClone(
+                dissectHistory.slice(0, drums.length).concat(notReached)
+            );
+        }
     }
 }
 

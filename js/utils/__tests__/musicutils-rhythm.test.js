@@ -47,6 +47,66 @@ describe("musicutils-rhythm", () => {
         expect(rhythm.calcNoteValueToDisplay(4, 1)).toContain("4");
     });
 
+    describe("calcNoteValueToDisplay dotted notes", () => {
+        // The symbol and its dots describe the whole fraction shown beside them:
+        // a dotted quarter lasts 3/8, a double-dotted half 7/8.
+        const { NSYMBOLS } = require("../musicutils-constants");
+        const WHOLE = NSYMBOLS[1];
+        const HALF = NSYMBOLS[2];
+        const QUARTER = NSYMBOLS[4];
+        const EIGHTH = NSYMBOLS[8];
+        const SIXTEENTH = NSYMBOLS[16];
+        const shown = (num, den, symbol) => num + "<br>&mdash;<br>" + den + "<br>" + symbol;
+
+        it("marks a duration that is exactly a dotted note", () => {
+            expect(rhythm.calcNoteValueToDisplay(8, 3)).toBe(shown(3, 8, QUARTER + "."));
+            expect(rhythm.calcNoteValueToDisplay(4, 3)).toBe(shown(3, 4, HALF + "."));
+            expect(rhythm.calcNoteValueToDisplay(16, 3)).toBe(shown(3, 16, EIGHTH + "."));
+        });
+
+        it("marks a duration that is exactly a double-dotted note", () => {
+            expect(rhythm.calcNoteValueToDisplay(16, 7)).toBe(shown(7, 16, QUARTER + ".."));
+            expect(rhythm.calcNoteValueToDisplay(4, 7)).toBe(shown(7, 4, WHOLE + ".."));
+        });
+
+        it("prefers two dots over a truncated one-dot match", () => {
+            // 7/8 is a double-dotted half. Truncating 8/7 * 1.5 to 1 labelled it a
+            // dotted whole note, which lasts 3/2.
+            expect(rhythm.calcNoteValueToDisplay(8, 7)).toBe(shown(7, 8, HALF + ".."));
+        });
+
+        it("counts the notes of a duration that is not a dotted note", () => {
+            // Neither 5/8 nor 9/16 is a dotted note: 8/5 * 1.5 and 16/9 * 1.5 only
+            // truncate to a half note, whose dotted value is 3/4. The plain fraction
+            // names the note it counts, so 5/8 is five eighth notes.
+            expect(rhythm.calcNoteValueToDisplay(8, 5)).toBe(shown(5, 8, EIGHTH));
+            expect(rhythm.calcNoteValueToDisplay(16, 9)).toBe(shown(9, 16, SIXTEENTH));
+            // A denominator with no note symbol gets none.
+            expect(rhythm.calcNoteValueToDisplay(5, 4)).toBe("4<br>&mdash;<br>5<br><br>");
+        });
+
+        it("reduces a note value that arrives as a float", () => {
+            // The note block and the tie in both widgets divide to get the note
+            // value, so the widgets call this with (float, 1). reducedFraction
+            // cannot reduce a float: its Euclid loop needs whole numbers.
+            expect(rhythm.calcNoteValueToDisplay(1 / 0.625, 1)).toBe(shown(5, 8, EIGHTH));
+            expect(rhythm.calcNoteValueToDisplay(1 / (0.25 + 0.125), 1)).toBe(
+                shown(3, 8, QUARTER + ".")
+            );
+            expect(rhythm.calcNoteValueToDisplay(1 / 0.875, 1)).toBe(shown(7, 8, HALF + ".."));
+        });
+
+        it("reduces the note values from the bug report", () => {
+            // A note of value 3. The float note value used to give a 16 digit ratio.
+            expect(rhythm.calcNoteValueToDisplay(1 / 3, 1)).toBe(shown(3, 1, WHOLE));
+            // Fifteen thirty-seconds tied together, which is not a dotted note.
+            expect(rhythm.calcNoteValueToDisplay(32 / 15, 1)).toBe("15<br>&mdash;<br>32<br><br>");
+            // A tuplet of five sixteenths. 16/5 * 1.5 truncates to a quarter note,
+            // whose dotted value is 3/8, so this used to be marked as dotted.
+            expect(rhythm.calcNoteValueToDisplay(16, 5)).toBe(shown(5, 16, SIXTEENTH));
+        });
+    });
+
     describe("getMeasurePosition", () => {
         const singer = overrides => ({
             pickup: 0,
@@ -60,12 +120,14 @@ describe("musicutils-rhythm", () => {
             expect(rhythm.getMeasurePosition(singer(), 0)).toEqual({
                 beat: 1,
                 measure: 1,
-                timeLeftInMeasure: 1
+                timeLeftInMeasure: 1,
+                beats: 0
             });
             expect(rhythm.getMeasurePosition(singer(), 1.25)).toEqual({
                 beat: 2,
                 measure: 2,
-                timeLeftInMeasure: 0.75
+                timeLeftInMeasure: 0.75,
+                beats: 5
             });
         });
 
@@ -73,27 +135,32 @@ describe("musicutils-rhythm", () => {
             expect(rhythm.getMeasurePosition(singer({ pickup: 0.25 }), 0)).toEqual({
                 beat: 0,
                 measure: 0,
-                timeLeftInMeasure: 0.25
+                timeLeftInMeasure: 0.25,
+                beats: 0
             });
             expect(rhythm.getMeasurePosition(singer({ pickup: 0.25 }), 0.25)).toEqual({
                 beat: 1,
                 measure: 1,
-                timeLeftInMeasure: 1
+                timeLeftInMeasure: 1,
+                beats: 0
             });
         });
 
         it("counts from the latest meter change", () => {
             // Three beats of 3/4, then 4/4 from measure 2.
-            const s = singer({ meterAnchor: { wholeNotes: 0.75, measures: 1 } });
+            const s = singer({ meterAnchor: { wholeNotes: 0.75, measures: 1, beats: 3 } });
             expect(rhythm.getMeasurePosition(s, 0.75)).toEqual({
                 beat: 1,
                 measure: 2,
-                timeLeftInMeasure: 1
+                timeLeftInMeasure: 1,
+                beats: 3
             });
+            // Three beats of 3/4 plus five of 4/4.
             expect(rhythm.getMeasurePosition(s, 2)).toEqual({
                 beat: 2,
                 measure: 3,
-                timeLeftInMeasure: 0.75
+                timeLeftInMeasure: 0.75,
+                beats: 8
             });
         });
 
@@ -118,23 +185,36 @@ describe("musicutils-rhythm", () => {
         it("anchors a change on a barline after the measures before it", () => {
             expect(rhythm.getMeterAnchor(singer([3, 4]))).toEqual({
                 wholeNotes: 0.75,
-                measures: 1
+                measures: 1,
+                beats: 3
             });
         });
 
         it("counts a measure the change cuts short", () => {
             expect(rhythm.getMeterAnchor(singer([1, 4]))).toEqual({
                 wholeNotes: 0.25,
-                measures: 1
+                measures: 1,
+                beats: 1
             });
         });
 
         it("builds on an earlier meter change", () => {
             const s = singer([7, 4], {
                 beatsPerMeasure: 4,
-                meterAnchor: { wholeNotes: 0.75, measures: 1 }
+                meterAnchor: { wholeNotes: 0.75, measures: 1, beats: 3 }
             });
-            expect(rhythm.getMeterAnchor(s)).toEqual({ wholeNotes: 1.75, measures: 2 });
+            // Three beats of 3/4 plus four of 4/4.
+            expect(rhythm.getMeterAnchor(s)).toEqual({ wholeNotes: 1.75, measures: 2, beats: 7 });
+        });
+
+        it("counts beats in each meter's own beat value", () => {
+            // Four quarter-note beats of 4/4, then 6/8 from 1.0: 0.375 more is three eighths.
+            const s = singer([11, 8], {
+                beatsPerMeasure: 6,
+                noteValuePerBeat: 8,
+                meterAnchor: { wholeNotes: 1, measures: 1, beats: 4 }
+            });
+            expect(rhythm.getMeasurePosition(s, 11 / 8).beats).toBe(7);
         });
 
         it("does not anchor before the pickup ends", () => {

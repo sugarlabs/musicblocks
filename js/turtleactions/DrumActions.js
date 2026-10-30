@@ -139,7 +139,7 @@ function setupDrumActions(activity) {
             // mapping that happens to exist when this clamp closes.
             const pitchDrumTableSnapshot = { ...tur.singer.pitchDrumTable };
 
-            const listenerName = "_setdrum_" + turtle;
+            const listenerName = "_setdrum_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -180,6 +180,10 @@ function setupDrumActions(activity) {
                 } else if (DRUMNAMES[d][1] === drum) {
                     drumname = drum;
                 }
+            }
+            // A drum played from a URL, as Play Drum allows.
+            if (typeof drum === "string" && drum.slice(0, 4) === "http") {
+                drumname = drum;
             }
 
             const tur = activity.turtles.ithTurtle(turtle);

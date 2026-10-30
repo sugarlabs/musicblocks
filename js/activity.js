@@ -40,7 +40,7 @@ try {
    setupBlockScaleController,
    setupContextMenuController,
    requestClear,
-   setupActivityAbcParser, setupActivityIdleWatcher, SessionStorageManager,
+   setupActivityAbcParser, setupActivityMxmlParser, setupActivityIdleWatcher, SessionStorageManager,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
    DEFAULTDELAY, define, doBrowserCheck, docByClass,
@@ -114,6 +114,7 @@ let MYDEFINES = [
     "utils/error-handler",
     "utils/debugLog",
     "activity/artwork",
+    "widgets/HarmonyUtils",
     "widgets/status",
     "utils/munsell",
     "activity/toolbar",
@@ -249,11 +250,12 @@ function lazyLoad(modulePaths) {
 let globalActivity;
 
 /**
- * Performs analysis on the project using the global activity.
+ * Performs analysis on a project: the given blocks, or the open workspace if none.
+ * @param {{blockList: Array}} [blocks] - blocks parsed from a saved project.
  * @returns {object} - The analysis result.
  */
-const doAnalyzeProject = function () {
-    return analyzeProject(globalActivity);
+const doAnalyzeProject = function (blocks) {
+    return analyzeProject(blocks ? { blocks } : globalActivity);
 };
 
 /**
@@ -855,41 +857,58 @@ class Activity {
                 return;
             }
 
-            this._onResize();
-            this.blocks.activeBlock = null;
-            hideDOMLabel();
+            // The rest of the Play action starts the Transport, which touches
+            // the Web Audio context synchronously. Tone.start()/context.resume()
+            // are async, so running that logic in parallel (fire-and-forget)
+            // still hits Tone's suspended-context check before the context has
+            // actually resumed, logging a warning every time. Wait for the
+            // unlock to settle first so the Transport only starts once the
+            // context is (or is as close as it will get to) running.
+            const runPlayAction = () => {
+                this._onResize();
+                this.blocks.activeBlock = null;
+                hideDOMLabel();
 
-            // If music is currently playing, stop it first
-            if (this.turtles.running()) {
-                this.logo.doStopTurtles();
-            }
-
-            const currentDelay = this.logo.turtleDelay;
-
-            // Delegate logic / execution control to the ToolbarController
-            this.toolbarController.runFast(env, currentDelay);
-
-            // Keep DOM queries, colors, and block visibilities in activity.js
-            const tempoTitle = document.getElementById("tempoWidgetID");
-            if (tempoTitle) {
-                if (this.logo.tempo.isMoving) {
-                    this.logo.tempo.pause();
+                // If music is currently playing, stop it first
+                if (this.turtles.running()) {
+                    this.logo.doStopTurtles();
                 }
 
-                this.logo.tempo.resume();
-            }
+                const currentDelay = this.logo.turtleDelay;
 
-            if (!this.turtles.running()) {
-                if (!this.turtles.isShrunk()) {
-                    this.blocks.hideBlocks();
-                    this.showBlocksAfterRun = true;
+                // Delegate logic / execution control to the ToolbarController
+                this.toolbarController.runFast(env, currentDelay);
+
+                // Keep DOM queries, colors, and block visibilities in activity.js
+                const tempoTitle = document.getElementById("tempoWidgetID");
+                if (tempoTitle) {
+                    if (this.logo.tempo.isMoving) {
+                        this.logo.tempo.pause();
+                    }
+
+                    this.logo.tempo.resume();
                 }
 
-                this.toolbar.highlightStop(window.platformColor.stopIconcolor);
+                if (!this.turtles.running()) {
+                    if (!this.turtles.isShrunk()) {
+                        this.blocks.hideBlocks();
+                        this.showBlocksAfterRun = true;
+                    }
+
+                    this.toolbar.highlightStop(window.platformColor.stopIconcolor);
+                } else {
+                    if (currentDelay === 0) {
+                        this.toolbar.dimThenRestoreStop(window.platformColor.stopIconcolor);
+                    }
+                }
+            };
+
+            // Unlock the Web Audio context while the play click is still a user
+            // gesture, then run the rest of the Play action once that settles.
+            if (this.logo.synth && typeof this.logo.synth.startAudio === "function") {
+                this.logo.synth.startAudio().then(runPlayAction, runPlayAction);
             } else {
-                if (currentDelay === 0) {
-                    this.toolbar.dimThenRestoreStop(window.platformColor.stopIconcolor);
-                }
+                runPlayAction();
             }
         };
 
@@ -1032,7 +1051,7 @@ class Activity {
             this.scrollBlockContainer = !this.scrollBlockContainer;
             const enableHorizScrollIcon = document.getElementById("enableHorizScrollIcon");
             const disableHorizScrollIcon = document.getElementById("disableHorizScrollIcon");
-            if (this.scrollBlockContainer && !this.beginnerMode) {
+            if (this.scrollBlockContainer) {
                 enableHorizScrollIcon.style.display = "none";
                 disableHorizScrollIcon.style.display = "block";
 
@@ -1732,7 +1751,9 @@ class Activity {
 
             // Reposition coordinate grids.
             const newX = this.canvas.width / (2 * this.turtleBlocksScale) - 600;
-            const newY = this.canvas.height / (2 * this.turtleBlocksScale) - 450;
+            const gridCenterY =
+                this.canvas.height / (2 * this.turtleBlocksScale) + this.toolbarHeight;
+            const newY = gridCenterY - 450;
             this.cartesianBitmap.x = newX;
             this.cartesianBitmap.y = newY;
             this.polarBitmap.x = newX;
@@ -1766,19 +1787,19 @@ class Activity {
             }
             // Position the sharps and flats
             this.grandSharpBitmap[0].y = newY;
-            this.grandSharpBitmap[1].y = this.canvas.height / (2 * this.turtleBlocksScale) - 412.5;
-            this.grandSharpBitmap[2].y = this.canvas.height / (2 * this.turtleBlocksScale) - 462.5;
-            this.grandSharpBitmap[3].y = this.canvas.height / (2 * this.turtleBlocksScale) - 425;
-            this.grandSharpBitmap[4].y = this.canvas.height / (2 * this.turtleBlocksScale) - 387.5;
-            this.grandSharpBitmap[5].y = this.canvas.height / (2 * this.turtleBlocksScale) - 437.5;
-            this.grandSharpBitmap[6].y = this.canvas.height / (2 * this.turtleBlocksScale) - 400;
+            this.grandSharpBitmap[1].y = gridCenterY - 412.5;
+            this.grandSharpBitmap[2].y = gridCenterY - 462.5;
+            this.grandSharpBitmap[3].y = gridCenterY - 425;
+            this.grandSharpBitmap[4].y = gridCenterY - 387.5;
+            this.grandSharpBitmap[5].y = gridCenterY - 437.5;
+            this.grandSharpBitmap[6].y = gridCenterY - 400;
             this.grandFlatBitmap[0].y = newY;
-            this.grandFlatBitmap[1].y = this.canvas.height / (2 * this.turtleBlocksScale) - 487.5;
-            this.grandFlatBitmap[2].y = this.canvas.height / (2 * this.turtleBlocksScale) - 437.5;
-            this.grandFlatBitmap[3].y = this.canvas.height / (2 * this.turtleBlocksScale) - 475;
-            this.grandFlatBitmap[4].y = this.canvas.height / (2 * this.turtleBlocksScale) - 425;
-            this.grandFlatBitmap[5].y = this.canvas.height / (2 * this.turtleBlocksScale) - 462.5;
-            this.grandFlatBitmap[6].y = this.canvas.height / (2 * this.turtleBlocksScale) - 412.5;
+            this.grandFlatBitmap[1].y = gridCenterY - 487.5;
+            this.grandFlatBitmap[2].y = gridCenterY - 437.5;
+            this.grandFlatBitmap[3].y = gridCenterY - 475;
+            this.grandFlatBitmap[4].y = gridCenterY - 425;
+            this.grandFlatBitmap[5].y = gridCenterY - 462.5;
+            this.grandFlatBitmap[6].y = gridCenterY - 412.5;
 
             for (let i = 0; i < 7; i++) {
                 this.trebleSharpBitmap[i].y = this.grandSharpBitmap[i].y;
@@ -1857,8 +1878,6 @@ class Activity {
         const canvas = document.getElementById("myCanvas");
         const overCanvas = document.getElementById("canvas");
         const canvasHolder = document.getElementById("canvasHolder");
-        const defaultWidth = 1600;
-        const defaultHeight = 900;
 
         function handleResize() {
             // Skip resize when the tab is hidden to prevent 0×0 canvas
@@ -1866,34 +1885,30 @@ class Activity {
                 return;
             }
 
-            const isMaximized =
-                window.innerWidth === window.screen.width &&
-                window.innerHeight === window.screen.height;
-            if (isMaximized) {
-                container.style.width = defaultWidth + "px";
-                container.style.height = defaultHeight + "px";
-                canvas.width = defaultWidth;
-                canvas.height = defaultHeight;
-                overCanvas.width = canvas.width;
-                overCanvas.height = canvas.height;
-                canvasHolder.width = defaultWidth;
-                canvasHolder.height = defaultHeight;
-            } else {
-                const windowWidth = window.innerWidth;
-                const windowHeight = window.innerHeight;
-
-                // Guard against zero or invalid dimensions
-                if (windowWidth <= 0 || windowHeight <= 0) {
-                    return;
-                }
-
-                container.style.width = windowWidth + "px";
-                container.style.height = windowHeight + "px";
-                overCanvas.width = canvas.width;
-                overCanvas.height = canvas.height;
-                canvasHolder.width = canvas.width;
-                canvasHolder.height = canvas.height;
+            let windowWidth = window.innerWidth;
+            let windowHeight = window.innerHeight;
+            const isAndroidWebkit =
+                (typeof platform !== "undefined" && platform.androidWebkit) ||
+                (typeof window !== "undefined" && window.platform && window.platform.androidWebkit);
+            if (isAndroidWebkit) {
+                windowWidth = window.outerWidth;
+                windowHeight = window.outerHeight;
             }
+
+            // Guard against zero or invalid dimensions
+            if (windowWidth <= 0 || windowHeight <= 0) {
+                return;
+            }
+
+            container.style.width = windowWidth + "px";
+            container.style.height = windowHeight + "px";
+            canvas.width = windowWidth;
+            canvas.height = windowHeight;
+            overCanvas.width = canvas.width;
+            overCanvas.height = canvas.height;
+            canvasHolder.width = canvas.width;
+            canvasHolder.height = canvas.height;
+
             const hideContents = document.getElementById("hideContents");
             if (hideContents) {
                 hideContents.click();
@@ -1906,15 +1921,28 @@ class Activity {
 
         this._handleWindowResize = () => {
             if (!resizeAnimationFrame) {
-                resizeAnimationFrame = requestAnimationFrame(() => {
-                    this._handleRepositionBlocksOnResize();
-                    resizeAnimationFrame = null;
-                });
+                const scheduleRaf =
+                    typeof requestAnimationFrame === "function"
+                        ? requestAnimationFrame
+                        : typeof window !== "undefined" &&
+                            typeof window.requestAnimationFrame === "function"
+                          ? window.requestAnimationFrame
+                          : null;
+
+                if (scheduleRaf) {
+                    resizeAnimationFrame = scheduleRaf(() => {
+                        if (typeof this._handleRepositionBlocksOnResize === "function") {
+                            this._handleRepositionBlocksOnResize();
+                        }
+                        resizeAnimationFrame = null;
+                    });
+                }
             }
 
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
                 handleResize();
+                this._onResize(false);
                 this.setupPaletteMenu();
             }, 200);
         };
@@ -2017,7 +2045,8 @@ class Activity {
 
             for (const blk of Object.keys(this.blocks.blockList)) {
                 const myBlock = this.blocks.blockList[blk];
-                if (!myBlock) continue;
+                // Blocks already in the trash were recorded when they were trashed.
+                if (!myBlock || myBlock.trash) continue;
 
                 // If this block is at the top of a stack, push it
                 // onto the trashStacks list.
@@ -2035,11 +2064,13 @@ class Activity {
                 ) {
                     const turtle = this.blocks.blockList[blk].value;
 
-                    if (!this.blocks.blockList[blk].trash && turtle !== null) {
+                    if (turtle !== null) {
                         const primaryTurtle = this.turtles.getTurtle(turtle);
 
                         primaryTurtle.inTrash = true;
-                        primaryTurtle.container.visible = false;
+                        if (primaryTurtle.container) {
+                            primaryTurtle.container.visible = false;
+                        }
 
                         const comp = primaryTurtle.companionTurtle;
 
@@ -2048,15 +2079,15 @@ class Activity {
 
                             if (companionTurtle) {
                                 companionTurtle.inTrash = true;
-                                companionTurtle.container.visible = false;
+                                if (companionTurtle.container) {
+                                    companionTurtle.container.visible = false;
+                                }
                             }
                         }
                     }
                 } else if (myBlock.name === "action") {
-                    if (!myBlock.trash) {
-                        this.blocks.deleteActionBlock(this.blocks.blockList[blk]);
-                        actionBlockCounter += 1;
-                    }
+                    this.blocks.deleteActionBlock(myBlock);
+                    actionBlockCounter += 1;
                 }
 
                 this.blocks.blockList[blk].trash = true;
@@ -2201,7 +2232,7 @@ class Activity {
                 // Skip trashed blocks — they are hidden and their backing
                 // canvases are freed in sendStackToTrash(). Re-caching them
                 // here would waste ~0.5–2 MB per trashed block.
-                if (block.trash) return;
+                if (!block || block.trash) return;
 
                 if (block.container) {
                     block.container.uncache();
@@ -2297,6 +2328,7 @@ class Activity {
 
         this._loadProject = (...args) => this.projectManager._loadProject(...args);
         setupActivityAbcParser(this);
+        setupActivityMxmlParser(this);
         this.loadStartWrapper = (...args) => this.projectManager.loadStartWrapper(...args);
 
         this.showContents = (...args) => this.projectManager.showContents(...args);
@@ -3222,8 +3254,7 @@ define(["domReady!", "activity/exporters"].concat(MYDEFINES), (doc, exportersMod
 
         if (globalsReady) {
             activity.setupDependencies();
-            activity.domReady(doc);
-            activity.doContextMenus();
+            activity.domReady(doc).then(() => activity.doContextMenus());
             activity.doPluginsAndPaletteCols();
         } else {
             // Race condition in Firefox: non-AMD scripts might not have
@@ -3233,8 +3264,7 @@ define(["domReady!", "activity/exporters"].concat(MYDEFINES), (doc, exportersMod
                 waitForReadiness(
                     () => {
                         activity.setupDependencies();
-                        activity.domReady(doc);
-                        activity.doContextMenus();
+                        activity.domReady(doc).then(() => activity.doContextMenus());
                         activity.doPluginsAndPaletteCols();
                     },
                     {

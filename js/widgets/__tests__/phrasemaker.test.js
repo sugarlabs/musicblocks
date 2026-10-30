@@ -502,6 +502,48 @@ describe("PhraseMaker Widget", () => {
             expect(activity.turtles.ithTurtle).toHaveBeenCalledWith(1);
         });
 
+        test("keeps the turtle that ran the block for the graphics rows (#9330)", () => {
+            const pm = new PhraseMaker(mockDeps);
+            const turtles = [0, 1].map(() => ({
+                singer: { beatsPerMeasure: 4, noteValuePerBeat: 4, keySignature: "C major" }
+            }));
+            const activity = { turtles: { ithTurtle: jest.fn(i => turtles[i]) } };
+
+            callInitPartial(pm, activity, 1);
+
+            expect(pm._turtle).toBe(turtles[1]);
+        });
+
+        test("keeps that turtle when the widget rebuilds itself (sort, add row, ...)", () => {
+            const pm = new PhraseMaker(mockDeps);
+            const turtles = [
+                { singer: { beatsPerMeasure: 4, noteValuePerBeat: 4, keySignature: "C major" } },
+                { singer: { beatsPerMeasure: 3, noteValuePerBeat: 4, keySignature: "C major" } }
+            ];
+            const activity = { turtles: { ithTurtle: jest.fn(i => turtles[i]) } };
+            callInitPartial(pm, activity, 1);
+
+            // _sort, _restartGrid, pitchBlockAdded and adding a row call init(this.activity).
+            callInitPartial(pm, activity, undefined);
+
+            expect(pm._turtle).toBe(turtles[1]);
+            // The meter is still read from that turtle: 3/4.
+            expect(pm._measureLimit).toBeCloseTo(0.75);
+        });
+
+        test("takes the turtle the block gives on a new run", () => {
+            const pm = new PhraseMaker(mockDeps);
+            const turtles = [0, 1].map(() => ({
+                singer: { beatsPerMeasure: 4, noteValuePerBeat: 4, keySignature: "C major" }
+            }));
+            const activity = { turtles: { ithTurtle: jest.fn(i => turtles[i]) } };
+            callInitPartial(pm, activity, 1);
+
+            callInitPartial(pm, activity, 0);
+
+            expect(pm._turtle).toBe(turtles[0]);
+        });
+
         test("falls back to 4/4 when singer meter is not yet initialized", () => {
             const pm = new PhraseMaker(mockDeps);
             // meterByIndex is empty: beats/noteValue are undefined, || 4 applies
@@ -688,6 +730,28 @@ describe("PhraseMaker Widget", () => {
         expect(phraseMaker.sorted).toBe(true);
         // Marked columns in the preserved row (original row index 0) should contain [0, 1] (column indices), NOT row index 1
         expect(phraseMaker._markedColsInRow[0]).toEqual([0, 1]);
+        expect(phraseMaker.rowLabels).toEqual(["sol"]);
+        expect(phraseMaker.rowArgs).toEqual([4]);
+        expect(phraseMaker.columnBlocksMap).toEqual([[0]]);
+    });
+    test("_sort orders arc before setxy using the secondary graphics list", () => {
+        phraseMaker.init = jest.fn();
+        phraseMaker.makeClickable = jest.fn();
+        phraseMaker.stylePhraseMaker = jest.fn();
+        phraseMaker.rowLabels = ["arc", "C", "setxy"];
+        phraseMaker.rowArgs = [90, 4, 0];
+        phraseMaker._rows = [{ cells: [] }, { cells: [] }, { cells: [] }];
+        phraseMaker._noteStored = ["arc", "C4", "setxy"];
+        phraseMaker.columnBlocksMap = [[0], [1], [2]];
+
+        phraseMaker.activity = {
+            turtles: { ithTurtle: () => ({ singer: { keySignature: 0 } }) },
+            logo: { tupletRhythms: [] }
+        };
+
+        phraseMaker._sort();
+
+        expect(phraseMaker.rowLabels).toEqual(["C", "arc", "setxy"]);
     });
     test("makeClickable safely handles sorted rows when cells are undefined", () => {
         phraseMaker.sorted = true;
@@ -1806,6 +1870,74 @@ describe("PhraseMaker Widget", () => {
         phraseMaker.init(mockActivity);
         expect(global.announceToScreenReader).not.toHaveBeenCalled();
     });
+
+    test("init starts from the cells saved with the project, until this session has its own", () => {
+        const savedCells = [[2, [23, 0], 0]];
+        const mockActivity = {
+            turtles: {
+                ithTurtle: jest.fn(() => ({
+                    singer: { beatsPerMeasure: 4, noteValuePerBeat: 4, keySignature: 0 }
+                }))
+            },
+            logo: {
+                tupletRhythms: [["notes", 0, 4]],
+                synth: {
+                    inTemperament: "equal",
+                    stopSound: jest.fn(),
+                    stop: jest.fn(),
+                    loadSynth: jest.fn()
+                }
+            },
+            blocks: {
+                protoBlockDict: {},
+                blockList: { 7: { name: "matrix", matrixCells: savedCells } }
+            },
+            canvas: { width: 800, height: 600 },
+            getStageScale: jest.fn(() => 1),
+            hideMsgs: jest.fn(),
+            textMsg: jest.fn()
+        };
+        const open = () => {
+            phraseMaker._rows = [];
+            phraseMaker._headcols = [];
+            phraseMaker._labelcols = [];
+            phraseMaker.init(mockActivity);
+        };
+
+        phraseMaker.blockNo = 7;
+        phraseMaker.rowLabels = ["C"];
+        phraseMaker.rowArgs = [4];
+        global.PhraseMakerUtils = { MATRIXGRAPHICS: [], MATRIXGRAPHICS2: [], MATRIXSYNTHS: [] };
+        global.window.widgetWindows = {
+            windowFor: jest.fn().mockReturnValue({
+                clear: jest.fn(),
+                show: jest.fn(),
+                addButton: jest.fn().mockReturnValue({
+                    onclick: null,
+                    innerHTML: "",
+                    style: {},
+                    setAttribute: jest.fn()
+                }),
+                getWidgetBody: jest.fn().mockReturnValue({
+                    appendChild: jest.fn(),
+                    append: jest.fn()
+                }),
+                sendToCenter: jest.fn(),
+                destroy: jest.fn()
+            })
+        };
+        global.PhraseMakerUI = { calculateNoteWidth: jest.fn(() => 80), resetMatrix: jest.fn() };
+
+        phraseMaker._blockMap = {};
+        open();
+        expect(phraseMaker._blockMap[7]).toEqual([[2, [23, 0], 0]]);
+        // A copy, so changing the matrix doesn't change the loaded project data.
+        expect(phraseMaker._blockMap[7][0]).not.toBe(savedCells[0]);
+
+        phraseMaker._blockMap = { 7: [[5, [23, 1], 0]] };
+        open();
+        expect(phraseMaker._blockMap[7]).toEqual([[5, [23, 1], 0]]);
+    });
     test("_createColumnPieSubmenu executes", () => {
         phraseMaker.platformColor = {
             pitchWheelcolors: [],
@@ -2269,6 +2401,27 @@ describe("PhraseMaker Widget", () => {
             phraseMaker._tupletValueRow = mockTable.insertRow();
             phraseMaker._noteValueRow = mockTable.insertRow();
             phraseMaker._rows = [firstRow];
+        });
+
+        test("addTuplet paints arc and setxy cells with the graphics background", () => {
+            global.PhraseMakerUtils.MATRIXGRAPHICS2 = ["arc", "setxy"];
+            const arcRow = mockTable.insertRow();
+            arcRow.insertCell();
+            const setxyRow = mockTable.insertRow();
+            setxyRow.insertCell();
+            phraseMaker.rowLabels = ["arc", "setxy"];
+            phraseMaker._rows = [arcRow, setxyRow];
+
+            phraseMaker.addTuplet([[1, 4], [8]]);
+
+            const arcCell = arcRow.cells[arcRow.cells.length - 1];
+            const setxyCell = setxyRow.cells[setxyRow.cells.length - 1];
+            expect(arcCell.getAttribute("cellColor")).toBe(
+                phraseMaker.platformColor.graphicsBackground
+            );
+            expect(setxyCell.getAttribute("cellColor")).toBe(
+                phraseMaker.platformColor.graphicsBackground
+            );
         });
 
         test("addTuplet initializes tuplet labels and inserts filler cells on first invocation", () => {
@@ -2810,13 +2963,6 @@ describe("PhraseMaker Widget", () => {
             expect(phraseMaker._notesBlocks.length).toBe(2);
         });
 
-        test("_removePitchBlock removes specified pitch block index", () => {
-            phraseMaker._rowBlocks = [5, 6, 7];
-            phraseMaker._rowMap = [0, 1, 2];
-
-            expect(phraseMaker._rowBlocks).toContain(6);
-        });
-
         test("_deleteRhythmBlock and _addRhythmBlock manage rhythm stack", () => {
             phraseMaker._colBlocks = [
                 [10, 4],
@@ -3167,6 +3313,46 @@ describe("PhraseMaker Widget", () => {
             expect(phraseMaker._markedColsInRow).toBeDefined();
             expect(phraseMaker._markedColsInRow[0]).toEqual([0]);
             expect(phraseMaker._markedColsInRow[1]).toEqual([]);
+        });
+
+        test("_sort preserves separate octaves and their pitch blocks", () => {
+            phraseMaker.rowLabels = ["G", "G", "E"];
+            phraseMaker.rowArgs = [4, 5, 4];
+            phraseMaker._noteStored = ["G4", "G5", "E4"];
+            phraseMaker.columnBlocksMap = [[1], [2], [3]];
+            phraseMaker._rows = [
+                { cells: [{ style: { backgroundColor: "black" } }] },
+                { cells: [{ style: { backgroundColor: "white" } }] },
+                { cells: [{ style: { backgroundColor: "black" } }] }
+            ];
+            phraseMaker._deps.noteToFrequency = note => ({ G4: 392, G5: 784, E4: 330 })[note];
+            const blockList = [
+                { name: "matrix", connections: [null, 1, null] },
+                { name: "pitch", connections: [0, 4, 5, 2], trash: false },
+                { name: "pitch", connections: [1, 6, 7, 3], trash: false },
+                { name: "pitch", connections: [2, 8, 9, null], trash: false }
+            ];
+            const originalBlocks = JSON.parse(JSON.stringify(blockList));
+            phraseMaker.activity.blocks = {
+                blockList,
+                sendStackToTrash: block => {
+                    block.trash = true;
+                },
+                adjustDocks: jest.fn(),
+                clampBlocksToCheck: []
+            };
+            phraseMaker.activity.refreshCanvas = jest.fn();
+
+            expect(() => phraseMaker._sort()).not.toThrow();
+
+            expect(phraseMaker.rowLabels).toEqual(["G", "G", "E"]);
+            expect(phraseMaker.rowArgs).toEqual([5, 4, 4]);
+            expect(phraseMaker._rowMap).toEqual([1, 0, 2]);
+            expect(phraseMaker._sortedRowMap).toEqual([0, 1, 2]);
+            expect(phraseMaker._noteStored).toEqual(["G5", "G4", "E4"]);
+            expect(phraseMaker.columnBlocksMap).toEqual([[2], [1], [3]]);
+            expect(phraseMaker._markedColsInRow).toEqual([[0], [], [0]]);
+            expect(blockList).toEqual(originalBlocks);
         });
     });
 

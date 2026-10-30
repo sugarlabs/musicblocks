@@ -180,8 +180,8 @@ describe("MusicKeyboardRendering", () => {
             keyboard.octaves = [];
             keyboard.displayLayout = displayLayout;
             keyboard.layout = displayLayout.map(note => ({ ...note }));
-            keyboard._cacheDocumentKeyHandlers = jest.fn();
             keyboard.loadHandler = jest.fn();
+            keyboard.loadRestHandler = jest.fn();
             keyboard.addKeyboardShortcuts = jest.fn();
             keyboard._createKeyboard();
             return keyboard;
@@ -212,6 +212,12 @@ describe("MusicKeyboardRendering", () => {
             expect(whiteKeys[whiteKeys.length - 1].textContent).toBe("(rest)");
         });
 
+        test("makes the rest key clickable", () => {
+            const keyboard = drawKeyboard([{ noteName: "hertz", noteOctave: 440, blockNumber: 6 }]);
+
+            expect(keyboard.loadRestHandler).toHaveBeenCalledWith(docById("rest"));
+        });
+
         test("writes key labels as text, not markup", () => {
             drawKeyboard([
                 { noteName: "drum", voice: "<img src=x onerror=alert(1)>", blockNumber: 5 }
@@ -220,6 +226,38 @@ describe("MusicKeyboardRendering", () => {
             const key = docById("whiteRow0");
             expect(key.querySelector("img")).toBeNull();
             expect(key.textContent).toContain("<img src=x onerror=alert(1)>");
+        });
+    });
+
+    describe("_mkbEl scoping", () => {
+        test("resolves ids inside this keyboard's own window body, not another's", () => {
+            const first = makeKeyboard();
+            const second = makeKeyboard();
+            const firstBody = document.createElement("div");
+            const secondBody = document.createElement("div");
+            const firstEl = document.createElement("div");
+            firstEl.id = "mkbInnerDiv";
+            firstEl.textContent = "first";
+            const secondEl = document.createElement("div");
+            secondEl.id = "mkbInnerDiv";
+            secondEl.textContent = "second";
+            firstBody.append(firstEl);
+            secondBody.append(secondEl);
+            first._widgetBody = firstBody;
+            second._widgetBody = secondBody;
+
+            // Both windows use the same id; each instance must find its own.
+            expect(first._mkbEl("mkbInnerDiv")).toBe(firstEl);
+            expect(second._mkbEl("mkbInnerDiv")).toBe(secondEl);
+        });
+
+        test("falls back to the document when no window body is set", () => {
+            const keyboard = makeKeyboard();
+            const el = document.createElement("div");
+            el.id = "mkbOuterDiv";
+            document.body.append(el);
+
+            expect(keyboard._mkbEl("mkbOuterDiv")).toBe(el);
         });
     });
 });

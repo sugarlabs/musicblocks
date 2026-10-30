@@ -751,6 +751,80 @@ describe("setupIntervalsBlocks", () => {
                 "You must use two pitch blocks when measuring an interval."
             );
         });
+
+        it("cleans up orphan pitch and prevents poisoning subsequent measurements when only one pitch is provided", () => {
+            activity.blocks.blockList.blkMeasure = { connections: [null, "child"] };
+            logo.runFromBlockNow = jest.fn(() => {
+                turtleState.singer.firstPitch.push(50);
+            });
+
+            const res1 = createdBlocks.measureintervalsemitones.arg(
+                logo,
+                turtleIndex,
+                "blkMeasure"
+            );
+            expect(res1).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "You must use two pitch blocks when measuring an interval."
+            );
+            expect(turtleState.singer.firstPitch).toEqual([]);
+            expect(turtleState.singer.lastPitch).toEqual([]);
+
+            logo.runFromBlockNow = jest.fn(() => {
+                turtleState.singer.firstPitch.push(60);
+                turtleState.singer.lastPitch.push(67);
+            });
+
+            const res2 = createdBlocks.measureintervalsemitones.arg(
+                logo,
+                turtleIndex,
+                "blkMeasure"
+            );
+            expect(res2).toBe(7);
+            expect(turtleState.singer.firstPitch).toEqual([]);
+            expect(turtleState.singer.lastPitch).toEqual([]);
+        });
+
+        it("restores turtle state, suppressOutput and measuring flags when execution throws", () => {
+            activity.blocks.blockList.blkMeasure = { connections: [null, "child"] };
+            turtleState.running = false;
+            logo.runFromBlockNow = jest.fn(() => {
+                turtleState.singer.firstPitch.push(60);
+                turtleState.singer.lastPitch.push(67);
+                throw new Error("Execution aborted");
+            });
+
+            expect(() => {
+                createdBlocks.measureintervalsemitones.arg(logo, turtleIndex, "blkMeasure");
+            }).toThrow("Execution aborted");
+
+            expect(turtleState.singer.suppressOutput).toBe(false);
+            expect(turtleState.singer.justMeasuring).toEqual([]);
+            expect(turtleState.singer.justCounting).toEqual([]);
+            expect(turtleState.singer.firstPitch).toEqual([]);
+            expect(turtleState.singer.lastPitch).toEqual([]);
+            expect(turtleState.running).toBe(false);
+        });
+
+        it("preserves pre-existing pitch and measuring entries after measurement", () => {
+            activity.blocks.blockList.blkMeasure = { connections: [null, "child"] };
+            turtleState.singer.firstPitch.push(40);
+            turtleState.singer.lastPitch.push(41);
+            turtleState.singer.justMeasuring.push(true);
+            turtleState.singer.justCounting.push(true);
+            logo.runFromBlockNow = jest.fn(() => {
+                turtleState.singer.firstPitch.push(60);
+                turtleState.singer.lastPitch.push(67);
+            });
+
+            const res = createdBlocks.measureintervalsemitones.arg(logo, turtleIndex, "blkMeasure");
+
+            expect(res).toBe(7);
+            expect(turtleState.singer.firstPitch).toEqual([40]);
+            expect(turtleState.singer.lastPitch).toEqual([41]);
+            expect(turtleState.singer.justMeasuring).toEqual([true]);
+            expect(turtleState.singer.justCounting).toEqual([true]);
+        });
     });
 
     describe("MeasureIntervalScalarBlock", () => {
@@ -796,6 +870,86 @@ describe("setupIntervalsBlocks", () => {
             expect(activity.errorMsg).toHaveBeenCalledWith(
                 "You must use two pitch blocks when measuring an interval."
             );
+        });
+
+        it("cleans up orphan pitch and prevents poisoning subsequent scalar measurements when only one pitch is provided", () => {
+            activity.blocks.blockList.blkMeasureScalar = { connections: [null, "child"] };
+            logo.runFromBlockNow = jest.fn(() => {
+                turtleState.singer.firstPitch.push(50);
+            });
+
+            const res1 = createdBlocks.measureintervalscalar.arg(
+                logo,
+                turtleIndex,
+                "blkMeasureScalar"
+            );
+            expect(res1).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "You must use two pitch blocks when measuring an interval."
+            );
+            expect(turtleState.singer.firstPitch).toEqual([]);
+            expect(turtleState.singer.lastPitch).toEqual([]);
+
+            logo.runFromBlockNow = jest.fn(() => {
+                turtleState.singer.firstPitch.push(60);
+                turtleState.singer.lastPitch.push(67);
+            });
+
+            const res2 = createdBlocks.measureintervalscalar.arg(
+                logo,
+                turtleIndex,
+                "blkMeasureScalar"
+            );
+            expect(res2).toBe(3);
+            expect(Singer.scalarDistance).toHaveBeenCalledWith(logo, turtleIndex, 60, 67);
+            expect(turtleState.singer.firstPitch).toEqual([]);
+            expect(turtleState.singer.lastPitch).toEqual([]);
+        });
+
+        it("restores turtle state, suppressOutput and measuring flags when scalar execution throws", () => {
+            activity.blocks.blockList.blkMeasureScalar = { connections: [null, "child"] };
+            turtleState.running = false;
+            logo.runFromBlockNow = jest.fn(() => {
+                turtleState.singer.firstPitch.push(60);
+                turtleState.singer.lastPitch.push(67);
+                throw new Error("Execution aborted");
+            });
+
+            expect(() => {
+                createdBlocks.measureintervalscalar.arg(logo, turtleIndex, "blkMeasureScalar");
+            }).toThrow("Execution aborted");
+
+            expect(turtleState.singer.suppressOutput).toBe(false);
+            expect(turtleState.singer.justMeasuring).toEqual([]);
+            expect(turtleState.singer.justCounting).toEqual([]);
+            expect(turtleState.singer.firstPitch).toEqual([]);
+            expect(turtleState.singer.lastPitch).toEqual([]);
+            expect(turtleState.running).toBe(false);
+        });
+
+        it("preserves pre-existing pitch and measuring entries after scalar measurement", () => {
+            activity.blocks.blockList.blkMeasureScalar = { connections: [null, "child"] };
+            turtleState.singer.firstPitch.push(40);
+            turtleState.singer.lastPitch.push(41);
+            turtleState.singer.justMeasuring.push(true);
+            turtleState.singer.justCounting.push(true);
+            logo.runFromBlockNow = jest.fn(() => {
+                turtleState.singer.firstPitch.push(60);
+                turtleState.singer.lastPitch.push(67);
+            });
+
+            const res = createdBlocks.measureintervalscalar.arg(
+                logo,
+                turtleIndex,
+                "blkMeasureScalar"
+            );
+
+            expect(res).toBe(3);
+            expect(Singer.scalarDistance).toHaveBeenCalledWith(logo, turtleIndex, 60, 67);
+            expect(turtleState.singer.firstPitch).toEqual([40]);
+            expect(turtleState.singer.lastPitch).toEqual([41]);
+            expect(turtleState.singer.justMeasuring).toEqual([true]);
+            expect(turtleState.singer.justCounting).toEqual([true]);
         });
     });
 
@@ -964,6 +1118,23 @@ describe("setupIntervalsBlocks", () => {
                     beatList: [1, 3],
                     defaultStrongBeats: true
                 });
+            }
+        );
+
+        it.each(["measureintervalsemitones", "measureintervalscalar"])(
+            "%s holds back the enclosing clamp signals by index",
+            blockName => {
+                logo.turtleHeaps = { [turtleIndex]: [] };
+                logo.turtleDicts = { [turtleIndex]: {} };
+                turtleState.endOfClampSignals = { 7: ["_transposition_0", "_multiplybeat_0"] };
+                let skipped;
+                logo.runFromBlockNow = jest.fn(() => {
+                    skipped = JSON.parse(JSON.stringify(turtleState.butNotThese));
+                });
+
+                createdBlocks[blockName].arg(logo, turtleIndex, "blkMeasure");
+
+                expect(skipped).toEqual({ 7: [0, 1] });
             }
         );
 

@@ -33,6 +33,11 @@ global.platformColor = {
     selectorBackground: "#aaa"
 };
 
+if (typeof global.TextDecoder === "undefined") {
+    const { TextDecoder } = require("util");
+    global.TextDecoder = TextDecoder;
+}
+
 const createMockElement = tagName => ({
     tagName,
     style: {},
@@ -49,6 +54,11 @@ const createMockElement = tagName => ({
         insertCell: jest.fn().mockImplementation(() => createMockElement("TD"))
     })),
     createTHead: jest.fn().mockImplementation(() => ({
+        insertRow: jest.fn().mockImplementation(() => ({
+            insertCell: jest.fn().mockImplementation(() => createMockElement("TD"))
+        }))
+    })),
+    createTBody: jest.fn().mockImplementation(() => ({
         insertRow: jest.fn().mockImplementation(() => ({
             insertCell: jest.fn().mockImplementation(() => createMockElement("TD"))
         }))
@@ -748,7 +758,7 @@ describe("StatusMatrix Widget", () => {
                             singer: {
                                 currentBeat: 1,
                                 currentMeasure: 1,
-                                noteStatus: [["C4"], 0.25]
+                                noteStatus: [["C4"], 4]
                             }
                         };
                     case 1:
@@ -756,7 +766,7 @@ describe("StatusMatrix Widget", () => {
                             singer: {
                                 currentBeat: 1,
                                 currentMeasure: 1,
-                                noteStatus: [["X4"], 0.25]
+                                noteStatus: [["X4"], 4]
                             }
                         };
                     case 2:
@@ -764,7 +774,7 @@ describe("StatusMatrix Widget", () => {
                             singer: {
                                 currentBeat: 1,
                                 currentMeasure: 1,
-                                noteStatus: [["E4"], 0.5]
+                                noteStatus: [["E4"], 2]
                             }
                         };
                     default:
@@ -783,16 +793,24 @@ describe("StatusMatrix Widget", () => {
         });
 
         test("displays note names from noteStatus", () => {
+            const mockCell = createMockElement("TD");
+            statusMatrix._statusTable.rows[2] = { cells: [createMockElement("TD"), mockCell] };
+
             mockActivity.turtles.ithTurtle.mockReturnValue({
                 singer: {
                     currentBeat: 1,
                     currentMeasure: 1,
-                    noteStatus: [["C4", "E4"], 0.25]
+                    noteStatus: [["C4", "E4"], 4]
                 }
             });
 
+            rationalToFraction.mockReturnValueOnce([4, 1]);
+
             statusMatrix.updateAll();
-            expect(rationalToFraction).toHaveBeenCalledWith(0.25);
+            expect(rationalToFraction).toHaveBeenCalledWith(4);
+            expect(mockCell.textContent).toContain("C4");
+            expect(mockCell.textContent).toContain("E4");
+            expect(mockCell.textContent).toBe("C4 E4 1/4");
         });
 
         test("collapses duplicate note names in the note row display", () => {
@@ -803,7 +821,7 @@ describe("StatusMatrix Widget", () => {
                 singer: {
                     currentBeat: 1,
                     currentMeasure: 1,
-                    noteStatus: [["G4", "G4"], 0.125]
+                    noteStatus: [["G4", "G4"], 8]
                 }
             });
 
@@ -812,6 +830,25 @@ describe("StatusMatrix Widget", () => {
             statusMatrix.updateAll();
 
             expect(mockCell.textContent).toBe("G4 1/8");
+        });
+
+        test("formats non-unit fraction durations with numerator and denominator", () => {
+            const mockCell = createMockElement("TD");
+            statusMatrix._statusTable.rows[2] = { cells: [createMockElement("TD"), mockCell] };
+
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: {
+                    currentBeat: 1,
+                    currentMeasure: 1,
+                    noteStatus: [["C4"], 8 / 3]
+                }
+            });
+
+            rationalToFraction.mockReturnValueOnce([8, 3]);
+
+            statusMatrix.updateAll();
+
+            expect(mockCell.textContent).toBe("C4 3/8");
         });
 
         test("formats numeric frequencies with Hz suffix", () => {
@@ -998,6 +1035,600 @@ describe("StatusMatrix Widget", () => {
             mockActivity.logo.statusFields = [[0, "namedbox"]];
             expect(() => statusMatrix._renderAll()).not.toThrow();
             expect(statusMatrix._statusTable.rows[1].cells[1].textContent).toBe("");
+        });
+    });
+
+    describe("Window Maximize and Responsive Layout", () => {
+        beforeEach(() => {
+            statusMatrix.init(mockActivity);
+        });
+
+        test("toggles isMaximized and applies maximized styles on header cells", () => {
+            const mockHeaderCell = createMockElement("TH");
+            statusMatrix._statusTable.querySelectorAll = jest
+                .fn()
+                .mockReturnValue([mockHeaderCell]);
+
+            expect(statusMatrix.isMaximized).toBe(false);
+            statusMatrix.widgetWindow.onmaximize();
+
+            expect(statusMatrix.isMaximized).toBe(true);
+            expect(mockHeaderCell.style.width).toBe("100vw");
+            expect(mockHeaderCell.style.paddingLeft).toBe("30px");
+
+            statusMatrix.widgetWindow.onmaximize();
+
+            expect(statusMatrix.isMaximized).toBe(false);
+            expect(mockHeaderCell.style.width).toBe("212.5px");
+            expect(mockHeaderCell.style.paddingLeft).toBe("");
+        });
+    });
+
+    describe("Outputtools and Arithmetic Status Fields", () => {
+        test("resolves label for outputtools with object privateData", () => {
+            mockActivity.blocks.blockList = {
+                0: { name: "outputtools", privateData: { value: "synth" } }
+            };
+            mockActivity.logo.statusFields = [[0, "outputtools"]];
+
+            statusMatrix.init(mockActivity);
+
+            const boldElements = global.document.createElement.mock.results
+                .map(result => result.value)
+                .filter(element => element.tagName.toLowerCase() === "b");
+
+            expect(boldElements[0].textContent).toBe("Synth");
+        });
+
+        test("resolves empty label for arithmetic statusFields", () => {
+            mockActivity.blocks.blockList = {
+                0: { name: "plus", protoblock: { staticLabels: ["+"] } }
+            };
+            mockActivity.logo.statusFields = [[0, "plus"]];
+
+            statusMatrix.init(mockActivity);
+
+            const boldElements = global.document.createElement.mock.results
+                .map(result => result.value)
+                .filter(element => element.tagName.toLowerCase() === "b");
+
+            expect(boldElements[0].textContent).toBe("");
+        });
+    });
+
+    describe("Language Preferences", () => {
+        const originalLocalStorage = global.localStorage;
+
+        beforeEach(() => {
+            global.localStorage = { languagePreference: "ja" };
+            if (global.window) {
+                global.window.localStorage = global.localStorage;
+            }
+        });
+
+        afterEach(() => {
+            global.localStorage = originalLocalStorage;
+            if (global.window) {
+                global.window.localStorage = originalLocalStorage;
+            }
+        });
+
+        test("uses beats per minute2 label when languagePreference is ja", () => {
+            mockActivity.blocks.blockList = {
+                0: { name: "bpm", protoblock: { staticLabels: ["BPM"] } }
+            };
+            mockActivity.logo.statusFields = [[0, "bpm"]];
+
+            statusMatrix.init(mockActivity);
+
+            const boldElements = global.document.createElement.mock.results
+                .map(result => result.value)
+                .filter(element => element.tagName.toLowerCase() === "b");
+
+            expect(boldElements[0].textContent).toBe("Beats per minute2");
+        });
+    });
+
+    describe("Turtle Blocks Mode", () => {
+        const originalMode = global._THIS_IS_MUSIC_BLOCKS_;
+
+        beforeEach(() => {
+            global._THIS_IS_MUSIC_BLOCKS_ = false;
+        });
+
+        afterEach(() => {
+            global._THIS_IS_MUSIC_BLOCKS_ = originalMode;
+        });
+
+        test("initializes table with turtle button icon instead of mouse icon", () => {
+            statusMatrix.init(mockActivity);
+
+            const imgElements = global.document.createElement.mock.results
+                .map(result => result.value)
+                .filter(element => element.tagName.toLowerCase() === "img");
+
+            expect(imgElements[0].src).toBe("header-icons/turtle-button.svg");
+        });
+    });
+
+    describe("updateAll rAF Fallback", () => {
+        const originalRAF = global.requestAnimationFrame;
+
+        beforeEach(() => {
+            jest.useFakeTimers();
+            delete global.requestAnimationFrame;
+            statusMatrix.init(mockActivity);
+        });
+
+        afterEach(() => {
+            global.requestAnimationFrame = originalRAF;
+            jest.useRealTimers();
+        });
+
+        test("uses setTimeout when requestAnimationFrame is undefined", () => {
+            statusMatrix.updateAll();
+            expect(statusMatrix._updateQueued).toBe(true);
+
+            jest.advanceTimersByTime(100);
+            expect(statusMatrix._updateQueued).toBe(false);
+        });
+    });
+
+    describe("Note Status Deduplication and Hertz Display", () => {
+        beforeEach(() => {
+            statusMatrix.init(mockActivity);
+            statusMatrix._statusTable.rows = [
+                { cells: [createMockElement("TD"), createMockElement("TD")] },
+                { cells: [createMockElement("TD"), createMockElement("TD")] }
+            ];
+        });
+
+        test("deduplicates notes and formats numeric frequency notes", () => {
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: {
+                    currentBeat: 1,
+                    currentMeasure: 1,
+                    noteStatus: [["C4", "C4", 440], 4]
+                }
+            });
+
+            statusMatrix.updateAll();
+            const noteCell = statusMatrix._statusTable.rows[1].cells[1];
+            expect(noteCell.textContent.match(/C4/g) || []).toHaveLength(1);
+            expect(noteCell.textContent).toBe("C4 440.00Hz 1/4");
+        });
+
+        test("formats duration correctly using real rationalToFraction helper", () => {
+            const utilsLogic = require("../../utils/utils-logic.js");
+            const originalRationalToFraction = global.rationalToFraction;
+            global.rationalToFraction = utilsLogic.rationalToFraction;
+
+            try {
+                // Quarter note: beat value 4 -> duration 1/4
+                mockActivity.turtles.ithTurtle.mockReturnValue({
+                    singer: {
+                        currentBeat: 1,
+                        currentMeasure: 1,
+                        noteStatus: [["C4"], 4]
+                    }
+                });
+
+                statusMatrix.updateAll();
+                let noteCell = statusMatrix._statusTable.rows[1].cells[1];
+                expect(noteCell.textContent).toBe("C4 1/4");
+
+                // Half note: beat value 2 -> duration 1/2
+                mockActivity.turtles.ithTurtle.mockReturnValue({
+                    singer: {
+                        currentBeat: 1,
+                        currentMeasure: 1,
+                        noteStatus: [["G4"], 2]
+                    }
+                });
+
+                statusMatrix.updateAll();
+                noteCell = statusMatrix._statusTable.rows[1].cells[1];
+                expect(noteCell.textContent).toBe("G4 1/2");
+
+                // Dotted quarter note: beat value 8/3 -> duration 3/8
+                mockActivity.turtles.ithTurtle.mockReturnValue({
+                    singer: {
+                        currentBeat: 1,
+                        currentMeasure: 1,
+                        noteStatus: [["D4"], 8 / 3]
+                    }
+                });
+
+                statusMatrix.updateAll();
+                noteCell = statusMatrix._statusTable.rows[1].cells[1];
+                expect(noteCell.textContent).toBe("D4 3/8");
+            } finally {
+                global.rationalToFraction = originalRationalToFraction;
+            }
+        });
+    });
+
+    describe("Table Section Structure (thead vs tbody)", () => {
+        let originalCreateElement;
+        let originalCreateTextNode;
+        let originalWindow;
+        let originalIsMusicBlocks;
+
+        beforeEach(() => {
+            const { JSDOM } = require("jsdom");
+            const dom = new JSDOM("<!DOCTYPE html><html><body></body></html>");
+
+            originalCreateElement = global.document.createElement;
+            originalCreateTextNode = global.document.createTextNode;
+            originalWindow = global.window;
+            originalIsMusicBlocks = global._THIS_IS_MUSIC_BLOCKS_;
+
+            global.document.createElement = dom.window.document.createElement.bind(
+                dom.window.document
+            );
+            global.document.createTextNode = dom.window.document.createTextNode.bind(
+                dom.window.document
+            );
+            global.window = dom.window;
+            global.window.innerWidth = 1200;
+            global._THIS_IS_MUSIC_BLOCKS_ = true;
+
+            const realWidgetBody = dom.window.document.createElement("div");
+            global.window.widgetWindows = {
+                windowFor: jest.fn().mockReturnValue({
+                    clear: jest.fn(),
+                    show: jest.fn(),
+                    getWidgetBody: () => realWidgetBody,
+                    sendToCenter: jest.fn(),
+                    destroy: jest.fn(),
+                    onclose: null,
+                    onmaximize: null
+                })
+            };
+        });
+
+        afterEach(() => {
+            global.document.createElement = originalCreateElement;
+            if (originalCreateTextNode !== undefined) {
+                global.document.createTextNode = originalCreateTextNode;
+            } else {
+                delete global.document.createTextNode;
+            }
+            global.window = originalWindow;
+            global._THIS_IS_MUSIC_BLOCKS_ = originalIsMusicBlocks;
+        });
+
+        test("places turtle/icon header row in thead and keeps dynamic data rows out of thead", () => {
+            mockActivity.logo.statusFields = [
+                [0, "letterclass"],
+                [1, "beatvalue"]
+            ];
+            mockActivity.blocks.blockList = {
+                0: { name: "x", protoblock: { staticLabels: ["letter class"] }, value: "G" },
+                1: { name: "beatvalue", protoblock: { staticLabels: ["beat count"] }, value: 1 }
+            };
+
+            statusMatrix.init(mockActivity);
+
+            const table = statusMatrix._statusTable;
+            expect(table.tHead).not.toBeNull();
+            expect(table.tHead.rows).toHaveLength(1);
+
+            const headerRow = table.tHead.rows[0];
+            const mouseImg = headerRow.querySelector("img");
+            expect(mouseImg).not.toBeNull();
+            expect(mouseImg.getAttribute("src")).toBe("images/mouse.svg");
+        });
+
+        test("places dynamic status rows in tbody", () => {
+            mockActivity.logo.statusFields = [
+                [0, "letterclass"],
+                [1, "beatvalue"]
+            ];
+            mockActivity.blocks.blockList = {
+                0: { name: "x", protoblock: { staticLabels: ["letter class"] }, value: "G" },
+                1: { name: "beatvalue", protoblock: { staticLabels: ["beat count"] }, value: 1 }
+            };
+
+            statusMatrix.init(mockActivity);
+
+            const table = statusMatrix._statusTable;
+            expect(table.tBodies).toHaveLength(1);
+            const tbody = table.tBodies[0];
+
+            // 2 status fields + note row + harmony row = 4 rows in tbody
+            expect(tbody.rows).toHaveLength(4);
+            expect(tbody.rows[0].cells[0].textContent).toContain("Letter class");
+            expect(tbody.rows[1].cells[0].textContent).toContain("Beat count");
+        });
+
+        test("places Note row in tbody when Music Blocks is enabled", () => {
+            mockActivity.logo.statusFields = [[0, "beatvalue"]];
+            mockActivity.blocks.blockList = {
+                0: { name: "beatvalue", protoblock: { staticLabels: ["beat count"] }, value: 1 }
+            };
+
+            statusMatrix.init(mockActivity);
+
+            const tbody = statusMatrix._statusTable.tBodies[0];
+            const noteRow = tbody.rows[tbody.rows.length - 2];
+            expect(noteRow.cells[0].textContent).toContain("Note");
+            const harmonyRow = tbody.rows[tbody.rows.length - 1];
+            expect(harmonyRow.cells[0].textContent).toContain("Harmony");
+        });
+
+        test("omits Note row in tbody when Music Blocks path is disabled", () => {
+            global._THIS_IS_MUSIC_BLOCKS_ = false;
+            mockActivity.logo.statusFields = [[0, "beatvalue"]];
+            mockActivity.blocks.blockList = {
+                0: { name: "beatvalue", protoblock: { staticLabels: ["beat count"] }, value: 1 }
+            };
+
+            statusMatrix.init(mockActivity);
+
+            const table = statusMatrix._statusTable;
+            expect(table.tHead.rows).toHaveLength(1);
+            expect(table.tBodies[0].rows).toHaveLength(1);
+            expect(table.tBodies[0].rows[0].cells[0].textContent).toContain("Beat count");
+        });
+
+        test("preserves row and cell indexing so updateAll updates data cells across sections", () => {
+            mockActivity.logo.statusFields = [
+                [0, "beatvalue"],
+                [1, "measurevalue"]
+            ];
+            mockActivity.blocks.blockList = {
+                0: { name: "beatvalue", protoblock: { staticLabels: ["beat count"] }, value: 1 },
+                1: {
+                    name: "measurevalue",
+                    protoblock: { staticLabels: ["measure count"] },
+                    value: 2
+                }
+            };
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: {
+                    currentBeat: 1,
+                    currentMeasure: 2,
+                    noteStatus: [["C4"], 0.25]
+                }
+            });
+
+            statusMatrix.init(mockActivity);
+            statusMatrix.updateAll();
+
+            const table = statusMatrix._statusTable;
+            // Row 0 is header in thead
+            // Row 1 is beatvalue in tbody
+            expect(table.rows[1].cells[1].textContent).toBe("1");
+            // Row 2 is measurevalue in tbody
+            expect(table.rows[2].cells[1].textContent).toBe("2");
+            // Row 3 is note row in tbody
+            expect(table.rows[3].cells[1].textContent).toBe("C4 1/4");
+        });
+
+        test("handles empty status fields gracefully without exceptions or misindexing", () => {
+            mockActivity.logo.statusFields = [];
+            mockActivity.blocks.blockList = {};
+
+            expect(() => statusMatrix.init(mockActivity)).not.toThrow();
+
+            const table = statusMatrix._statusTable;
+            expect(table.tHead.rows).toHaveLength(1);
+            expect(table.tBodies[0].rows).toHaveLength(2); // Note and Harmony rows only
+            expect(table.rows).toHaveLength(3);
+
+            expect(() => statusMatrix.updateAll()).not.toThrow();
+        });
+
+        test("handles missing block references without throwing or misaligning cells", () => {
+            mockActivity.logo.statusFields = [
+                [999, "missingBlock"],
+                [0, "beatvalue"]
+            ];
+            mockActivity.blocks.blockList = {
+                0: { name: "beatvalue", protoblock: { staticLabels: ["beat count"] }, value: 1 }
+            };
+
+            expect(() => statusMatrix.init(mockActivity)).not.toThrow();
+
+            const table = statusMatrix._statusTable;
+            expect(table.tBodies[0].rows).toHaveLength(4); // missing, beatvalue, note, harmony
+
+            expect(() => statusMatrix.updateAll()).not.toThrow();
+            expect(table.rows[1].cells[1].textContent).toBe("");
+            expect(table.rows[2].cells[1].textContent).toBe("1");
+        });
+
+        test("preserves the thead/tbody row distribution matching the observed defect", () => {
+            mockActivity.blocks.blockList = {
+                0: { name: "x", protoblock: { staticLabels: ["letter class"] }, value: "G" },
+                1: { name: "x", protoblock: { staticLabels: ["beat count"] }, value: "0/1" },
+                2: { name: "x", protoblock: { staticLabels: ["measure count"] }, value: 0 },
+                3: {
+                    name: "x",
+                    protoblock: { staticLabels: ["whole notes played"] },
+                    value: "0/1"
+                },
+                4: { name: "bpm", protoblock: { staticLabels: ["beats per minute"] }, value: 90 }
+            };
+            mockActivity.logo.statusFields = [
+                [0, "outputtools"],
+                [1, "outputtools"],
+                [2, "outputtools"],
+                [3, "outputtools"],
+                [4, "bpm"]
+            ];
+
+            statusMatrix.init(mockActivity);
+
+            const table = statusMatrix._statusTable;
+            const totalRows = table.rows.length;
+            const theadRows = table.tHead?.rows.length ?? 0;
+            const tbodyRows = [...table.tBodies].reduce((n, b) => n + b.rows.length, 0);
+
+            // header, 5 fields, note, harmony
+            expect(totalRows).toBe(8);
+            expect(theadRows).toBe(1);
+            expect(tbodyRows).toBe(7);
+        });
+    });
+
+    describe("Harmony row", () => {
+        // 12-EDO frequencies, A4 = 440 Hz.
+        const FREQUENCIES = { C4: 261.6256, E4: 329.6276, G4: 391.9954 };
+        const RATIOS = { 1.25: [5, 4], 1.5: [3, 2] };
+        let originalCreateElement;
+        let originalCreateTextNode;
+        let originalWindow;
+
+        // A mouse whose latest note group sounds from 10000 to 11000 ms.
+        const mouse = (notes, previousTurtleTime = 0, endsAt = 11000) => ({
+            singer: {
+                previousTurtleTime,
+                pitchStatus: [{ notes, start: 0, startsAt: 10000, endsAt }],
+                noteStatus: null
+            }
+        });
+
+        const useMice = mice => {
+            mockActivity.turtles.turtleList = mice.map((_, i) => ({ name: "Mouse" + i }));
+            mockActivity.turtles.ithTurtle.mockImplementation(i => mice[i]);
+        };
+
+        const harmonyText = () =>
+            Array.from(statusMatrix._harmonyCell.querySelectorAll("tr"))
+                .slice(1)
+                .map(tr => Array.from(tr.children).map(td => td.textContent));
+
+        beforeAll(() => {
+            // musicutils-modecore builds note images with window.btoa when it loads.
+            const savedWindow = global.window;
+            global.window = { btoa: str => Buffer.from(str, "binary").toString("base64") };
+            global.INTERVALVALUES = require("../../utils/musicutils-constants").INTERVALVALUES;
+            global.CHORDNAMES = require("../../utils/musicutils-constants").CHORDNAMES;
+            global.CHORDVALUES = require("../../utils/musicutils-modecore").CHORDVALUES;
+            global.HarmonyUtils = require("../HarmonyUtils");
+            global.window = savedWindow;
+        });
+
+        afterAll(() => {
+            delete global.HarmonyUtils;
+        });
+
+        beforeEach(() => {
+            const { JSDOM } = require("jsdom");
+            const dom = new JSDOM("<!DOCTYPE html><html><body></body></html>");
+            originalCreateElement = global.document.createElement;
+            originalCreateTextNode = global.document.createTextNode;
+            originalWindow = global.window;
+            global.document.createElement = dom.window.document.createElement.bind(
+                dom.window.document
+            );
+            global.document.createTextNode = dom.window.document.createTextNode.bind(
+                dom.window.document
+            );
+            global.window = dom.window;
+            global.window.innerWidth = 1200;
+            global.window.widgetWindows = {
+                windowFor: jest.fn().mockReturnValue(createMockWidgetWindow())
+            };
+            global._THIS_IS_MUSIC_BLOCKS_ = true;
+            global.rationalToFraction.mockImplementation(value => RATIOS[value] || [value, 1]);
+            mockActivity.logo.synth.getFrequency.mockImplementation(note =>
+                typeof note === "number" ? note : FREQUENCIES[note]
+            );
+            jest.spyOn(Date, "now").mockReturnValue(10500);
+            jest.useFakeTimers({ doNotFake: ["Date", "requestAnimationFrame"] });
+        });
+
+        afterEach(() => {
+            statusMatrix._clearHarmonyTimer();
+            jest.useRealTimers();
+            jest.restoreAllMocks();
+            global.rationalToFraction.mockReset();
+            global.rationalToFraction.mockReturnValue([4, 1]);
+            global.document.createElement = originalCreateElement;
+            if (originalCreateTextNode !== undefined) {
+                global.document.createTextNode = originalCreateTextNode;
+            } else {
+                delete global.document.createTextNode;
+            }
+            global.window = originalWindow;
+        });
+
+        test("adds a Harmony row with one cell across all the mice", () => {
+            useMice([mouse(["C4"]), mouse(["E4"])]);
+            statusMatrix.init(mockActivity);
+
+            const tbody = statusMatrix._statusTable.tBodies[0];
+            const row = tbody.rows[tbody.rows.length - 1];
+            expect(row.cells[0].textContent).toContain("Harmony");
+            expect(row.cells[1]).toBe(statusMatrix._harmonyCell);
+            expect(row.cells[1].colSpan).toBe(2);
+        });
+
+        test("shows the chord and intervals sounding across the mice", () => {
+            useMice([mouse(["C4"]), mouse(["E4"]), mouse(["G4"])]);
+            statusMatrix.init(mockActivity);
+            statusMatrix.updateAll();
+
+            expect(statusMatrix._harmonyCell.textContent).toContain("C major");
+            expect(harmonyText()).toEqual([
+                ["C4 → E4", "major 3", "5:4", "1.260", "+13.7"],
+                ["C4 → G4", "perfect 5", "3:2", "1.498", "-2.0"]
+            ]);
+        });
+
+        test("leaves out a mouse that has moved on to a rest or a drum", () => {
+            // The second mouse's last pitched note started at 0, but it is now at 0.5.
+            useMice([mouse(["C4"]), mouse(["E4"], 0.5)]);
+            statusMatrix.init(mockActivity);
+            statusMatrix.updateAll();
+
+            expect(statusMatrix._harmonyCell.textContent).toBe("");
+        });
+
+        test("clears the row when the project is stopped", () => {
+            useMice([mouse(["C4"]), mouse(["E4"])]);
+            mockActivity.logo.stopTurtle = true;
+            statusMatrix.init(mockActivity);
+            statusMatrix.updateAll();
+
+            expect(statusMatrix._harmonyCell.textContent).toBe("");
+        });
+
+        test("refreshes when a note stops sounding between blocks", () => {
+            // A staccato E4 that stops at 10600 ms, before the next block runs.
+            useMice([mouse(["C4"]), mouse(["E4"], 0, 10600)]);
+            statusMatrix.init(mockActivity);
+            statusMatrix.updateAll();
+            expect(harmonyText()).toHaveLength(1);
+
+            // The refresh is due 100 ms after the note ends.
+            Date.now.mockReturnValue(10701);
+            jest.advanceTimersByTime(201);
+
+            expect(statusMatrix._harmonyCell.textContent).toBe("");
+        });
+
+        test("stops refreshing when the window is closed", () => {
+            useMice([mouse(["C4"]), mouse(["E4"])]);
+            statusMatrix.init(mockActivity);
+            statusMatrix.updateAll();
+            expect(statusMatrix._harmonyTimer).not.toBeNull();
+
+            statusMatrix.widgetWindow.onclose();
+
+            expect(statusMatrix._harmonyTimer).toBeNull();
+        });
+
+        test("is not added in Turtle Blocks", () => {
+            global._THIS_IS_MUSIC_BLOCKS_ = false;
+            useMice([mouse(["C4"]), mouse(["E4"])]);
+            statusMatrix.init(mockActivity);
+            statusMatrix.updateAll();
+
+            expect(statusMatrix._harmonyCell).toBeNull();
         });
     });
 });

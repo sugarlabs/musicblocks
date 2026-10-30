@@ -20,6 +20,7 @@
 
 /* global
    _, docById, platformColor, wheelnav, slicePath, ratioToWheelAngle,
+   sliceAnglesFromRatios, rotateSliceAngles, applySliceAngles,
    frequencyToPitch,
    Singer
  */
@@ -178,25 +179,7 @@ const _highlightTab = (menuItems, activeIndex) => {
 };
 
 /**
- * Computes angular differences between consecutive wheel angles and wrap-around gap.
- * @param {number[]} angle - Array of wheel angles in degrees.
- * @param {number} pitchNumber - Number of pitches in the temperament.
- * @returns {number[]} Array of angle differences of length pitchNumber - 1.
- */
-const _computeAngleDiffs = (angle, pitchNumber) => {
-    const angleDiff = [];
-    for (let i = 1; i < pitchNumber; i++) {
-        if (i === pitchNumber - 1) {
-            angleDiff[i - 1] = angle[0] + 360 - angle[i];
-        } else {
-            angleDiff[i - 1] = angle[i] - angle[i - 1];
-        }
-    }
-    return angleDiff;
-};
-
-/**
- * Computes slice angles, base angles, and menu radius for main and inner wheels.
+ * Computes proportional slice angles and menu radius for main and inner wheels.
  * @param {Object} wheelInstance - The wheelnav instance.
  * @param {number[]} ratios - Pitch ratios array.
  * @param {number} powerBase - Base of the octave ratio space (e.g. 2).
@@ -205,28 +188,23 @@ const _computeAngleDiffs = (angle, pitchNumber) => {
  * @returns {void}
  */
 const _applyWheelGeometry = (wheelInstance, ratios, powerBase, pitchNumber, radius) => {
-    const angle = [];
-    const baseAngle = [];
-    const sliceAngle = [];
-    for (let i = 0; i < wheelInstance.navItemCount; i++) {
-        angle[i] = ratioToWheelAngle(ratios[i], powerBase);
-        if (i === 0) {
-            sliceAngle[i] = 360 / pitchNumber;
-            baseAngle[i] = wheelInstance.navAngle - sliceAngle[0] / 2;
-        } else {
-            baseAngle[i] = baseAngle[i - 1] + sliceAngle[i - 1];
-            sliceAngle[i] = 2 * (angle[i] - baseAngle[i]);
-        }
-        wheelInstance.navItems[i].sliceAngle = sliceAngle[i];
+    // Proportional widths from the temperament ratios; null keeps equal slices.
+    const widths = sliceAnglesFromRatios(ratios.slice(0, wheelInstance.navItemCount), powerBase);
+    // Equal-width rings keep their original start; only genuinely proportional
+    // rings rotate so slice i spans pitch i..i+1 and labels sit mid-interval.
+    const proportional =
+        widths !== null && widths.some(width => Math.abs(width - widths[0]) > 1e-9);
+    if (proportional) {
+        const rotated = rotateSliceAngles(widths);
+        applySliceAngles(wheelInstance, rotated);
+        wheelInstance.navAngle = 270 + rotated[0] / 2;
+    } else {
+        applySliceAngles(wheelInstance, widths);
     }
 
-    const angleDiff = _computeAngleDiffs(angle, pitchNumber);
-
     let menuRadius = (2 * Math.PI * radius) / pitchNumber / 3;
-    for (let i = 0; i < angleDiff.length; i++) {
-        if (angleDiff[i] < 11) {
-            menuRadius = (2 * Math.PI * radius) / pitchNumber / 6;
-        }
+    if (widths !== null && widths.some(width => width < 11)) {
+        menuRadius = (2 * Math.PI * radius) / pitchNumber / 6;
     }
     if (menuRadius > 29) {
         menuRadius = (2 * Math.PI * radius) / 33;
@@ -269,6 +247,18 @@ const _buildCompareRatios = ratios => {
         compareRatios[i] = ratios[i].toFixed(2);
     }
     return compareRatios;
+};
+
+/**
+ * Returns the wheel pitch count for a ratios array, excluding a trailing
+ * octave entry (last ratio equal to the power base) when present.
+ * @param {number[]} ratios - Array of numeric ratio values.
+ * @param {number} powerBase - Base of the octave ratio space (e.g. 2).
+ * @returns {number} Pitch count excluding the trailing octave.
+ */
+const _pitchCountExcludingOctave = (ratios, powerBase) => {
+    const n = ratios.length;
+    return n > 1 && Math.abs(ratios[n - 1] - powerBase) < 1e-6 ? n - 1 : n;
 };
 
 // ---------------------------------------------------------------------------
@@ -437,34 +427,23 @@ const TemperamentUI = {
         tw.wheel.titleRotateAngle = 90;
         tw.wheel.navItemsEnabled = false;
 
-        const minutes = [];
-        const angle = [];
-        const baseAngle1 = [];
-        const sliceAngle1 = [];
+        const minutes = new Array(pitchNumber).fill("|");
+        const angle = Array.from({ length: pitchNumber }, (_, i) =>
+            ratioToWheelAngle(ratios[i], tw.powerBase)
+        );
         const angle1 = [];
-        for (let i = 0; i <= pitchNumber; i++) {
-            if (i !== pitchNumber) {
-                minutes.push("|");
-            }
-            angle[i] = ratioToWheelAngle(ratios[i], tw.powerBase);
-        }
 
-        const angleDiff1 = _computeAngleDiffs(angle, pitchNumber);
-        for (let i = 0; i < angleDiff1.length; i++) {
-            angle1[i] = angle[i] + angleDiff1[i] / 2;
-        }
-
-        tw.wheel.navAngle = 270 + angleDiff1[0] / 2;
+        tw.wheel.navAngle = 270 + (angle[1] - angle[0]) / 2;
         tw.wheel.initWheel(minutes);
-        for (let i = 0; i < pitchNumber; i++) {
-            if (i === 0) {
-                sliceAngle1[i] = 360 / pitchNumber;
-                baseAngle1[i] = tw.wheel.navAngle - sliceAngle1[0] / 2;
-            } else {
-                baseAngle1[i] = baseAngle1[i - 1] + sliceAngle1[i - 1];
-                sliceAngle1[i] = 2 * (angle1[i] - baseAngle1[i]);
+        // Ticks sit between pitches (slice i spans pitch i..i+1); rotate the
+        // helper's pitch i-1..i convention into place.
+        const proportional = sliceAnglesFromRatios(ratios.slice(0, pitchNumber), tw.powerBase);
+        if (proportional) {
+            const widths = rotateSliceAngles(proportional);
+            applySliceAngles(tw.wheel, widths);
+            for (let i = 0; i < pitchNumber; i++) {
+                angle1[i] = angle[i] + widths[i] / 2;
             }
-            tw.wheel.navItems[i].sliceAngle = sliceAngle1[i];
         }
         tw.wheel.createWheel();
         docById("wheelDiv3").style.position = "absolute";
@@ -558,12 +537,14 @@ const TemperamentUI = {
                 };
                 docById("done").onclick = function () {
                     tw.tempRatios1 = tw.tempRatios.slice();
-                    const pn = tw.tempRatios1.length;
+                    // tempRatios1 carries a trailing octave entry; the wheel
+                    // pitch count excludes it.
+                    const pn = _pitchCountExcludingOctave(tw.tempRatios1, tw.powerBase);
                     TemperamentUI.createOuterWheel(tw, tw.tempRatios1, pn);
                 };
                 docById("close").onclick = function () {
                     tw.tempRatios = tw.tempRatios1.slice();
-                    const pn = tw.tempRatios.length;
+                    const pn = _pitchCountExcludingOctave(tw.tempRatios, tw.powerBase);
                     TemperamentUI.createInnerWheel(tw, tw.tempRatios, pn);
                     docById("noteInfo1").remove();
                 };
@@ -596,7 +577,7 @@ const TemperamentUI = {
                 break;
             }
         }
-        const pitchNumber = tw.tempRatios.length;
+        const pitchNumber = _pitchCountExcludingOctave(tw.tempRatios, tw.powerBase);
         tw._logo.resetSynth(0);
         tw._logo.synth.trigger(
             0,
@@ -772,8 +753,26 @@ const TemperamentUI = {
          */
         tw.performEqualEdit = function (event) {
             if (!docById("octaveIn")) return;
-            const pitchNumber1 = Number(docById("octaveIn").value);
-            const pitchNumber2 = Number(docById("octaveOut").value);
+            // Number("") is 0, so a blank field must not pass as pitch 0.
+            const toPitch = value => (String(value).trim() === "" ? NaN : Number(value));
+            const input1 = toPitch(docById("octaveIn").value);
+            const input2 = toPitch(docById("octaveOut").value);
+            const maxPitch = tw.ratios.length - 1;
+            if (
+                !Number.isInteger(input1) ||
+                !Number.isInteger(input2) ||
+                Math.min(input1, input2) < 0 ||
+                Math.max(input1, input2) > maxPitch
+            ) {
+                tw.activity.errorMsg(
+                    _("Please enter pitch numbers between 0 and %s.").replace("%s", maxPitch),
+                    3000
+                );
+                return;
+            }
+            // The range can be typed in either order.
+            const pitchNumber1 = Math.min(input1, input2);
+            const pitchNumber2 = Math.max(input1, input2);
             const numDivs = Number(docById("divisions").value);
             if (!Number.isFinite(numDivs) || !Number.isInteger(numDivs) || numDivs < 1) {
                 tw.activity.errorMsg(_("Please enter a valid number of divisions."), 3000);
@@ -894,10 +893,15 @@ const TemperamentUI = {
             if (!docById("ratioIn")) return;
             const input1 = docById("ratioIn").value;
             const input2 = docById("ratioOut").value;
-            const rec = docById("recursion").value;
-            const len = tw.frequencies.length;
+            const rec = Number(docById("recursion").value);
             const ratio1 = input1 / input2;
+            if (!Number.isInteger(rec) || rec < 1 || rec > 56) {
+                tw.activity.errorMsg(_("Please enter a recursion between 1 and 56."), 3000);
+                return;
+            }
             if (
+                !Number.isFinite(tw.powerBase) ||
+                tw.powerBase <= 1 ||
                 !isFinite(input1) ||
                 !isFinite(input2) ||
                 input1 <= 0 ||
@@ -914,39 +918,46 @@ const TemperamentUI = {
                 return;
             }
             const ratio = [];
-            const frequency = [];
             const ratioDifference = [];
             tw.tempRatios = tw.ratios.slice();
 
             /**
-             * Recursively calculates ratios to ensure they fit within the octave space.
-             * Inserts the resulting ratio into the sorted tempRatios array.
+             * Folds a ratio into the octave space [1, powerBase) and inserts it into the
+             * sorted tempRatios array, replacing an equal ratio if there is one.
              *
              * @param {number} i - The current iteration index.
              */
             const calculateRatios = function (i) {
-                if (frequency[i] < tw.frequencies[len - 1]) {
-                    for (let j = 0; j < tw.tempRatios.length; j++) {
-                        ratioDifference[j] = ratio[i] - tw.tempRatios[j];
-                        if (ratioDifference[j] < 0) {
-                            tw.tempRatios.splice(j, 0, ratio[i]);
-                            break;
-                        }
-                        if (ratioDifference[j] === 0) {
-                            tw.tempRatios.splice(j, 1, ratio[i]);
-                            break;
-                        }
-                    }
-                } else {
-                    ratio[i] = ratio[i] / 2;
-                    frequency[i] = tw.frequencies[0] * ratio[i];
-                    calculateRatios(i);
+                while (ratio[i] >= tw.powerBase) {
+                    ratio[i] /= tw.powerBase;
                 }
+                while (ratio[i] < 1) {
+                    ratio[i] *= tw.powerBase;
+                }
+                for (let j = 0; j < tw.tempRatios.length; j++) {
+                    ratioDifference[j] = ratio[i] - tw.tempRatios[j];
+                    if (ratioDifference[j] < 0) {
+                        tw.tempRatios.splice(j, 0, ratio[i]);
+                        return;
+                    }
+                    if (ratioDifference[j] === 0) {
+                        tw.tempRatios.splice(j, 1, ratio[i]);
+                        return;
+                    }
+                }
+                tw.tempRatios.push(ratio[i]);
             };
 
             for (let i = 0; i < rec; i++) {
                 ratio[i] = Math.pow(ratio1, i + 1);
-                frequency[i] = tw.frequencies[0] * ratio[i];
+                // An overflowed or underflowed ratio would never leave the fold loops.
+                if (!Number.isFinite(ratio[i]) || ratio[i] <= 0) {
+                    tw.activity.errorMsg(
+                        _("Please enter a valid ratio (e.g. 3:2) within the octave space."),
+                        3000
+                    );
+                    return;
+                }
                 calculateRatios(i);
             }
             tw.tempRatios.sort(function (a, b) {
@@ -1105,9 +1116,16 @@ const TemperamentUI = {
 
         divAppend.onclick = function () {
             if (!docById("startNote") || !docById("endNote")) return;
-            const startRatio = docById("startNote").value;
-            const endRatio = docById("endNote").value;
+            const startRatio = Number(docById("startNote").value);
+            const endRatio = Number(docById("endNote").value);
             const ratio = startRatio / endRatio;
+            if (!(startRatio > 0) || !(endRatio > 0) || !Number.isFinite(ratio) || ratio <= 1) {
+                tw.activity.errorMsg(
+                    _("Please enter an octave ratio greater than 1 (e.g. 2:1)."),
+                    3000
+                );
+                return;
+            }
             if (ratio !== 2) {
                 tw.activity.textMsg(
                     _("The octave ratio has changed. This changes temperament significantly."),

@@ -576,9 +576,11 @@ class PhraseMaker {
      * Initializes the PhraseMaker matrix widget.
      * This method sets up the PhraseMaker matrix in the DOM (Document Object Model) and initializes its functionality.
      * @param {Activity} activity - The activity instance associated with the PhraseMaker widget.
-     * @param {number} [turtleIndex=0] - Index of the turtle that triggered this widget.
+     * @param {number} [turtleIndex] - Index of the turtle that triggered this widget. Left out
+     * when the widget rebuilds itself (sort, add row, ...), which keeps the turtle it has; turtle
+     * 0 if it has none.
      */
-    init(activity, turtleIndex = 0) {
+    init(activity, turtleIndex) {
         // Initializes the matrix. First removes the previous matrix
         // and then make another one in DOM (document object model)
         let tempTable;
@@ -588,7 +590,13 @@ class PhraseMaker {
 
         // Read the meter from the turtle that triggered this widget so that
         // bar-line separators reflect the correct time signature.
-        const turtle = activity.turtles.ithTurtle(turtleIndex);
+        // Graphics rows draw with this turtle when played. Not turtle 0: after a project is
+        // loaded, turtle 0 is a hidden turtle of the old project.
+        const turtle =
+            turtleIndex === undefined && this._turtle
+                ? this._turtle
+                : activity.turtles.ithTurtle(turtleIndex === undefined ? 0 : turtleIndex);
+        this._turtle = turtle;
         const beatsPerMeasure = turtle.singer.beatsPerMeasure || 4;
         const noteValuePerBeat = turtle.singer.noteValuePerBeat || 4;
 
@@ -735,8 +743,8 @@ class PhraseMaker {
             // Depending on the row, we choose a different background color.
             if (this.rowLabels[i] === "print") break;
             else if (
-                PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1 ||
-                PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1
+                PhraseMakerUtils.MATRIXGRAPHICS.includes(this.rowLabels[i]) ||
+                PhraseMakerUtils.MATRIXGRAPHICS2.includes(this.rowLabels[i])
             ) {
                 cellColor = this.platformColor.graphicsLabelBackground;
             } else {
@@ -1174,7 +1182,11 @@ class PhraseMaker {
         ptmTableRow.insertCell().append(tempTable);
 
         if (this._blockMap[this.blockNo] === undefined) {
-            this._blockMap[this.blockNo] = [];
+            // The cells saved with the project, until the matrix is opened in this session.
+            const savedCells = this.activity.blocks.blockList?.[this.blockNo]?.matrixCells;
+            this._blockMap[this.blockNo] = Array.isArray(savedCells)
+                ? savedCells.map(cell => [cell[0], [cell[1][0], cell[1][1]], cell[2]])
+                : [];
         }
         this._lookForNoteBlocksOrRepeat();
 
@@ -2627,27 +2639,6 @@ class PhraseMaker {
     }
 
     /**
-     * Removes a pitch block and updates connections, adjusting docks, and refreshing the canvas.
-     * @param {string} blockNo - The ID of the pitch block to be removed.
-     */
-    _removePitchBlock(blockNo) {
-        const c0 = this.activity.blocks.blockList[blockNo].connections[0];
-        const c1 = this._deps.last(this.activity.blocks.blockList[blockNo].connections);
-        this.activity.blocks.blockList[c0].connections[
-            this.activity.blocks.blockList[c0].connections.length - 1
-        ] = c1;
-        this.activity.blocks.blockList[c1].connections[0] = c0;
-
-        this.activity.blocks.blockList[blockNo].connections[
-            this.activity.blocks.blockList[blockNo].connections.length - 1
-        ] = null;
-        this.activity.blocks.sendStackToTrash(this.activity.blocks.blockList[blockNo]);
-        this.activity.blocks.adjustDocks(this.blockNo, true);
-        this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
-        this.activity.refreshCanvas();
-    }
-
-    /**
      * Generates a data URI from the provided file content.
      * @param {string} file - The file content to be converted into a data URI.
      * @returns {string} The data URI representing the file content.
@@ -2767,7 +2758,7 @@ class PhraseMaker {
                     this._noteStored[i]
                 ]);
             } else if (PhraseMakerUtils.MATRIXGRAPHICS2.includes(this.rowLabels[i])) {
-                gi = PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[i]) + 200;
+                gi = PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) + 200;
                 sortableList.push([
                     -gi,
                     this.rowLabels[i],
@@ -2795,12 +2786,10 @@ class PhraseMaker {
             this._rowMapper.push(sortedList[i][3]);
         }
         const newColumnBlockMap = [];
-        const oldColumnBlockMap = this.columnBlocksMap;
         for (let i = 0; i < this._rowMapper.length; i++) {
             newColumnBlockMap.push(this.columnBlocksMap[this._rowMapper[i]]);
         }
         this.columnBlocksMap = newColumnBlockMap;
-        let lastObj = 0;
         let obj;
         for (let i = 0; i < sortedList.length; i++) {
             obj = sortedList[i];
@@ -2810,28 +2799,8 @@ class PhraseMaker {
 
             if (i === 0) {
                 this._sortedRowMap.push(0);
-            } else if (i > 0 && obj[1] !== "hertz" && obj[1] === this._deps.last(this.rowLabels)) {
-                this._sortedRowMap.push(this._deps.last(this._sortedRowMap));
-                if (oldColumnBlockMap[sortedList[lastObj][3]] !== undefined) {
-                    setTimeout(
-                        this._removePitchBlock(oldColumnBlockMap[sortedList[lastObj][3]][0]),
-                        500
-                    );
-                    this.columnBlocksMap = this.columnBlocksMap.filter(ele => {
-                        return ele[0] !== oldColumnBlockMap[sortedList[lastObj][3]][0];
-                    });
-                    lastObj = i;
-                }
-                // skip duplicates
-                for (let j = this._rowMap[i]; j < this._rowMap.length; j++) {
-                    this._rowOffset[j] -= 1;
-                }
-
-                this._rowMap[i] = this._rowMap[i - 1];
-                continue;
             } else {
                 this._sortedRowMap.push(this._deps.last(this._sortedRowMap) + 1);
-                lastObj = i;
                 this.stylePhraseMaker();
             }
 
@@ -2878,7 +2847,6 @@ class PhraseMaker {
     _export() {
         const exportWindow = window.open("");
         if (!exportWindow) {
-            console.debug("Could not create export window");
             this.activity.errorMsg(
                 this._(
                     "Could not open export window. This is often caused by a browser pop-up blocker — check your settings and try again."
@@ -3248,7 +3216,10 @@ class PhraseMaker {
             // Add the notes to the matrix a la addNote.
             for (let j = 0; j < this.rowLabels.length; j++) {
                 // Depending on the row, we choose a different background color.
-                if (PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[j]) !== -1) {
+                if (
+                    PhraseMakerUtils.MATRIXGRAPHICS.includes(this.rowLabels[j]) ||
+                    PhraseMakerUtils.MATRIXGRAPHICS2.includes(this.rowLabels[j])
+                ) {
                     cellColor = this.platformColor.graphicsBackground;
                 } else {
                     drumName = this._deps.getDrumName(this.rowLabels[j]);
@@ -3385,8 +3356,8 @@ class PhraseMaker {
             for (let i = 0; i < rowCount; i++) {
                 // Depending on the row, we choose a different background color.
                 if (
-                    PhraseMakerUtils.MATRIXGRAPHICS.indexOf(this.rowLabels[i]) !== -1 ||
-                    PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) !== -1
+                    PhraseMakerUtils.MATRIXGRAPHICS.includes(this.rowLabels[i]) ||
+                    PhraseMakerUtils.MATRIXGRAPHICS2.includes(this.rowLabels[i])
                 ) {
                     cellColor = this.platformColor.graphicsBackground;
                 } else {
@@ -4634,8 +4605,8 @@ class PhraseMaker {
             graphicsBlock = false;
             graphicNote = note.split(": ");
             if (
-                PhraseMakerUtils.MATRIXGRAPHICS.indexOf(graphicNote[0]) !== -1 ||
-                PhraseMakerUtils.MATRIXGRAPHICS2.indexOf(graphicNote[0]) !== -1
+                PhraseMakerUtils.MATRIXGRAPHICS.includes(graphicNote[0]) ||
+                PhraseMakerUtils.MATRIXGRAPHICS2.includes(graphicNote[0])
             ) {
                 graphicsBlock = true;
             }
@@ -4682,8 +4653,6 @@ class PhraseMaker {
                             null
                         );
                     }
-                } else {
-                    console.debug("Cannot parse note object: " + obj);
                 }
             }
         } else if (PhraseMakerUtils.MATRIXSYNTHS.includes(obj[0])) {
