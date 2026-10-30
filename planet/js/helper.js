@@ -179,11 +179,50 @@ $(document).ready(() => {
         })
         .filter(Boolean);
 
+    const moveSearch = (search, destination, docked) => {
+        if (typeof search.getAnimations === "function") {
+            search.getAnimations().forEach(animation => animation.cancel());
+        }
+        const first = search.getBoundingClientRect();
+
+        search.classList.toggle("project-search-docked", docked);
+        destination.appendChild(search);
+
+        const last = search.getBoundingClientRect();
+
+        const deltaX = first.left - last.left;
+        const deltaY = first.top - last.top;
+
+        const prefersReducedMotion =
+            typeof window.matchMedia === "function" &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        if (
+            !prefersReducedMotion &&
+            typeof search.animate === "function" &&
+            (deltaX !== 0 || deltaY !== 0)
+        ) {
+            search.animate(
+                [
+                    {
+                        transform: `translate(${deltaX}px, ${deltaY}px)`
+                    },
+                    {
+                        transform: "translate(0, 0)"
+                    }
+                ],
+                {
+                    duration: 420,
+                    easing: "cubic-bezier(0.22, 1, 0.36, 1)"
+                }
+            );
+        }
+    };
+
     const restoreSearch = state => {
         if (!searchSlot || state.search.parentElement !== searchSlot) return;
 
-        state.search.classList.remove("project-search-docked");
-        state.titleRow.appendChild(state.search);
+        moveSearch(state.search, state.titleRow, false);
     };
 
     const updateSearchDocking = () => {
@@ -205,8 +244,7 @@ $(document).ready(() => {
         const isDocked = activeState.search.parentElement === searchSlot;
 
         if (shouldDock && !isDocked) {
-            activeState.search.classList.add("project-search-docked");
-            searchSlot.appendChild(activeState.search);
+            moveSearch(activeState.search, searchSlot, true);
         } else if (!shouldDock && isDocked) {
             restoreSearch(activeState);
         }
