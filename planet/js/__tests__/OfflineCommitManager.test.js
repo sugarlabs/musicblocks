@@ -83,6 +83,15 @@ describe("OfflineCommitManager", () => {
                     hashedKey: key
                 };
             }),
+            addPublishedData: jest.fn(async (id, data) => {
+                storage.data.Projects[id].PublishedData = data;
+            }),
+            renameProject: jest.fn(async (id, name) => {
+                storage.data.Projects[id].ProjectName = name;
+            }),
+            clearPendingPublication: jest.fn(async id => {
+                storage.data.Projects[id].pendingPublication = null;
+            }),
             getCachedCommits: jest.fn(id => storage.data.Projects[id]?.cachedCommits || []),
             setCachedCommits: jest.fn(async (id, commits) => {
                 storage.data.Projects[id].cachedCommits = commits.slice(0, 3);
@@ -105,6 +114,7 @@ describe("OfflineCommitManager", () => {
         server = {
             addProject: jest.fn(),
             editProject: jest.fn(),
+            publishProject: jest.fn(),
             getCommitHistory: jest.fn()
         };
 
@@ -325,6 +335,76 @@ describe("OfflineCommitManager", () => {
     });
 
     describe("Automatic On-Reconnect Sync (_onOnline)", () => {
+        test("publishes a queued project after its offline repository is created", async () => {
+            storage.data.Projects.p_off = {
+                ProjectName: "Old title",
+                ProjectData: { blocks: [] },
+                commitDrafts: [],
+                pendingRepoCreation: {
+                    status: "pending",
+                    projectName: "Queued song",
+                    repoName: "queued-song"
+                },
+                pendingPublication: {
+                    repoName: "queued-song",
+                    projectName: "Queued song",
+                    description: "My description",
+                    tags: ["music"],
+                    thumbnail: "data:image/png;base64,AAAA"
+                },
+                GitRepoData: { repoName: "queued-song", hashedKey: "" }
+            };
+            server.addProject.mockImplementation((payload, callback) => {
+                callback({ success: true, repository: "queued-song", key: "owner-key" });
+            });
+            server.publishProject.mockImplementation((repo, key, callback) => {
+                callback({ success: true });
+            });
+            jest.spyOn(manager, "syncPending").mockResolvedValue({ success: true, synced: 0 });
+
+            await manager._onOnline();
+
+            expect(server.publishProject).toHaveBeenCalledWith(
+                "queued-song",
+                "owner-key",
+                expect.any(Function),
+                "Queued song",
+                "My description",
+                ["music"],
+                "data:image/png;base64,AAAA",
+                "p_off"
+            );
+            expect(storage.addPublishedData).toHaveBeenCalledWith("p_off", {
+                ProjectDescription: "My description",
+                ProjectTags: ["music"],
+                repoName: "queued-song"
+            });
+            expect(storage.clearPendingPublication).toHaveBeenCalledWith("p_off");
+        });
+
+        test("keeps a failed publication for the next reconnect", async () => {
+            storage.data.Projects.p1.pendingPublication = {
+                projectName: "My Jazz Project",
+                description: "Jazz",
+                tags: ["music"]
+            };
+            server.publishProject.mockImplementationOnce((repo, key, callback) => {
+                callback({ success: false, error: "NETWORK_ERROR" });
+            });
+
+            await manager._onOnline();
+
+            expect(storage.data.Projects.p1.pendingPublication).not.toBeNull();
+            expect(storage.clearPendingPublication).not.toHaveBeenCalled();
+
+            server.publishProject.mockImplementationOnce((repo, key, callback) => {
+                callback({ success: true });
+            });
+            await manager._onOnline();
+
+            expect(storage.clearPendingPublication).toHaveBeenCalledWith("p1");
+        });
+
         test("creates pending repos first, updates GitRepoData, and syncs all drafts", async () => {
             storage.data.Projects.p_off = {
                 ProjectName: "Offline Song",
