@@ -3059,12 +3059,13 @@ input.timbreName {
 }
 
 .popupMsg {
-    min-width: 50%;
+    width: max-content;
     max-width: 55%;
     height: auto;
     position: absolute;
-    top: 130px;
-    left: 33%;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
     border-radius: 8px;
     background-color: #8cc6ff;
     font-family: "Roboto", sans-serif;
@@ -3074,6 +3075,12 @@ input.timbreName {
     text-overflow: ellipsis;
     cursor: pointer;
     visibility: hidden;
+}
+
+@media (max-width: 600px) {
+    .popupMsg {
+        max-width: 90vw;
+    }
 }
 
 .popupMsg a {
