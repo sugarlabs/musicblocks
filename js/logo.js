@@ -103,7 +103,6 @@ class Queue {
      */
     static obtain(blk, count, parentBlk, args) {
         if (Queue._pool.length > 0) {
-            Queue.stats.reused++;
             const item = Queue._pool.pop();
             item.blk = blk;
             item.count = count;
@@ -111,7 +110,6 @@ class Queue {
             item.args = args;
             return item;
         }
-        Queue.stats.allocated++;
         return new Queue(blk, count, parentBlk, args);
     }
 
@@ -122,7 +120,6 @@ class Queue {
      */
     static recycle(item) {
         if (item && item instanceof Queue && Queue._pool.length < 512) {
-            Queue.stats.recycled++;
             item.args = null;
             Queue._pool.push(item);
         }
@@ -130,7 +127,6 @@ class Queue {
 }
 
 Queue._pool = [];
-Queue.stats = { allocated: 0, recycled: 0, reused: 0 };
 
 /**
  * @classdesc Logo owns global execution, scheduling, widget and session context, notation and

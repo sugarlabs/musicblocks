@@ -375,7 +375,6 @@ function makeNumArgBlock(name, value = null) {
 describe("Queue Class", () => {
     beforeEach(() => {
         Queue._pool = [];
-        Queue.stats = { allocated: 0, recycled: 0, reused: 0 };
     });
 
     test("constructor initializes all properties correctly", () => {
@@ -402,7 +401,7 @@ describe("Queue Class", () => {
         expect(queue.args).toEqual([]);
     });
 
-    test("obtain allocates when pool is empty and tracks stats", () => {
+    test("obtain allocates when pool is empty", () => {
         const queue = Queue.obtain(1, 5, 0, ["arg1"]);
 
         expect(queue).toBeInstanceOf(Queue);
@@ -410,8 +409,6 @@ describe("Queue Class", () => {
         expect(queue.count).toBe(5);
         expect(queue.parentBlk).toBe(0);
         expect(queue.args).toEqual(["arg1"]);
-        expect(Queue.stats.allocated).toBe(1);
-        expect(Queue.stats.reused).toBe(0);
     });
 
     test("recycle adds instance to pool and obtain reuses it", () => {
@@ -419,7 +416,6 @@ describe("Queue Class", () => {
         Queue.recycle(queue1);
 
         expect(Queue._pool.length).toBe(1);
-        expect(Queue.stats.recycled).toBe(1);
 
         const queue2 = Queue.obtain(2, 10, 1, ["b"]);
         expect(queue2).toBe(queue1);
@@ -428,7 +424,6 @@ describe("Queue Class", () => {
         expect(queue2.parentBlk).toBe(1);
         expect(queue2.args).toEqual(["b"]);
         expect(Queue._pool.length).toBe(0);
-        expect(Queue.stats.reused).toBe(1);
     });
 
     test("recycle ignores invalid items and caps pool at 512", () => {
