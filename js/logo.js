@@ -354,6 +354,7 @@ class Logo {
         this.synth.changeInTemperament = false;
         this._synthsInitialized = false;
         this._executionRequest = null;
+        this._pendingPlayRequest = null;
 
         // Persistent user-selected temperament (survives across runs).
         this._userTemperament = null;
@@ -1589,6 +1590,7 @@ class Logo {
      * @returns {void}
      */
     doStopTurtles() {
+        this._pendingPlayRequest = null;
         this._executionRequest = null;
         this.synth.releaseMultisamples?.();
         this.stopTurtle = true;
