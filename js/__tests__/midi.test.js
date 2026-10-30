@@ -251,6 +251,28 @@ describe("transcribeMidi", () => {
         expect(drumNames).toEqual(["kick drum", "snare drum"]);
     });
 
+    it("should map General MIDI kit pieces without a drum of their own to the nearest one", async () => {
+        const { REVERSE_DRUM_MIDI_MAP } = require("../utils/musicutils-constants.js");
+        global.getReverseDrumMidi = jest.fn(() => REVERSE_DRUM_MIDI_MAP);
+        // Acoustic Bass Drum, Open Hi-Hat, Ride Cymbal 1, Low Tom: each was a kick.
+        const notes = [35, 46, 51, 45].map((midi, i) => ({
+            name: "C2",
+            midi,
+            time: i * 0.5,
+            duration: 0.5
+        }));
+
+        await transcribeMidi({
+            header: mockMidi.header,
+            tracks: [{ instrument: { name: "drums", percussion: true }, channel: 9, notes }]
+        });
+
+        const drumNames = loadNewBlocksSpy.mock.calls[0][0]
+            .filter(block => Array.isArray(block[1]) && block[1][0] === "drumname")
+            .map(block => block[1][1].value);
+        expect(drumNames).toEqual(["kick drum", "hi hat", "ride bell", "tom tom"]);
+    });
+
     it("should preserve a leading rest before a note", async () => {
         const delayedNoteMidi = {
             header: mockMidi.header,
