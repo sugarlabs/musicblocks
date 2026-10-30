@@ -183,10 +183,18 @@ $(document).ready(() => {
         if (typeof search.getAnimations === "function") {
             search.getAnimations().forEach(animation => animation.cancel());
         }
+        const focusedElement = search.contains(document.activeElement)
+            ? document.activeElement
+            : null;
+
         const first = search.getBoundingClientRect();
 
         search.classList.toggle("project-search-docked", docked);
         destination.appendChild(search);
+
+        if (focusedElement && typeof focusedElement.focus === "function") {
+            focusedElement.focus({ preventScroll: true });
+        }
 
         const last = search.getBoundingClientRect();
 
