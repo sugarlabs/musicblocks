@@ -146,6 +146,8 @@ There is no fixed coverage minimum in `jest.config.js`. Instead, the Coverage de
 2. It compares statements, branches, functions and lines between the two.
 3. The **Coverage delta vs base** check fails if any of them drops by more than 0.1 percentage points. The comparison table is printed in that job's log.
 
+The check also fails if either measurement job fails, for example because of a failing Jest test. If it fails, look at those jobs before assuming that coverage dropped.
+
 So a pull request that adds code should also add tests for it, or overall coverage will drop.
 
 ### How CI Reports Coverage on PRs
