@@ -487,6 +487,18 @@ Turtles.TurtlesModel = class {
                 }
             }
 
+            for (const remainingTurtle of this._turtleList) {
+                if (remainingTurtle === turtle || remainingTurtle.companionTurtle === undefined) {
+                    continue;
+                }
+
+                if (remainingTurtle.companionTurtle === index) {
+                    delete remainingTurtle.companionTurtle;
+                } else if (remainingTurtle.companionTurtle > index) {
+                    remainingTurtle.companionTurtle -= 1;
+                }
+            }
+
             this._turtleList.splice(index, 1);
         }
     }

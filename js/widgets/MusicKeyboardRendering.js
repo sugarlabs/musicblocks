@@ -64,6 +64,16 @@ const MusicKeyboardRendering = {
             getSelectedNotes
         } = deps;
 
+        // Scoped element lookup. the ids repeat across keyboard windows.
+        if (typeof this._mkbEl !== "function") {
+            this._mkbEl = id => {
+                if (this._widgetBody && typeof this._widgetBody.querySelector === "function") {
+                    return this._widgetBody.querySelector(`[id="${id}"]`);
+                }
+                return docById(id);
+            };
+        }
+
         // Black-key column indices that are gaps in the piano layout (no black
         // key between E-F and B-C) and are rendered as invisible spacers.
         const BLACKKEY_SPACER_INDICES = [
@@ -99,7 +109,7 @@ const MusicKeyboardRendering = {
          * @param {boolean} playNote - Indicates whether to trigger note playback.
          */
         this._setNotes = function (colIndex, playNote) {
-            const start = docById("cells-" + colIndex).getAttribute("start");
+            const start = this._mkbEl("cells-" + colIndex).getAttribute("start");
 
             this._notesPlayed = this._notesPlayed.filter(function (ele) {
                 return ele.startTime !== parseInt(start, 10);
@@ -109,7 +119,7 @@ const MusicKeyboardRendering = {
             let silence = true;
             let row, cell, ele, dur;
             for (let j = 0; j < this.layout.length; j++) {
-                row = docById("mkb" + j);
+                row = this._mkbEl("mkb" + j);
                 cell = row.cells[colIndex];
                 if (cell.style.backgroundColor === "black") {
                     this._setNoteCell(j, colIndex, start, playNote);
@@ -118,7 +128,7 @@ const MusicKeyboardRendering = {
             }
 
             if (silence) {
-                ele = docById("cells-" + colIndex);
+                ele = this._mkbEl("cells-" + colIndex);
                 dur = ele.getAttribute("dur");
                 this._notesPlayed.push({
                     startTime: parseInt(start, 10),
@@ -152,7 +162,7 @@ const MusicKeyboardRendering = {
                 temp2 = resolveSynthNoteName(temp1, this.layout[n - j - 1].noteOctave);
             }
 
-            const ele = docById(j + ":" + colIndex);
+            const ele = this._mkbEl(j + ":" + colIndex);
             this._notesPlayed.push({
                 startTime: parseInt(start, 10),
                 noteOctave: temp2,
@@ -185,7 +195,7 @@ const MusicKeyboardRendering = {
          */
         this.makeClickable = function () {
             const selectedNotes = getSelectedNotes();
-            const rowNote = docById("mkbNoteDurationRow");
+            const rowNote = this._mkbEl("mkbNoteDurationRow");
             let cell;
 
             for (let i = 0; i < selectedNotes.length; i++) {
@@ -204,7 +214,7 @@ const MusicKeyboardRendering = {
             let row, isMouseDown;
             for (let i = 0; i < this.layout.length; i++) {
                 // The buttons get added to the embedded table.
-                row = docById("mkb" + i);
+                row = this._mkbEl("mkb" + i);
                 for (let j = 0; j < row.cells.length; j++) {
                     cell = row.cells[j];
                     // Give each clickable cell a unique id
@@ -249,7 +259,7 @@ const MusicKeyboardRendering = {
          * Update the widget window size based on whether it is maximized or not.
          */
         this._updateWidgetWindowSize = function () {
-            const outerDiv = docById("mkbOuterDiv");
+            const outerDiv = this._mkbEl("mkbOuterDiv");
             if (!outerDiv) return;
 
             if (this.widgetWindow._maximized) {
@@ -260,12 +270,12 @@ const MusicKeyboardRendering = {
                 outerDiv.style.height = "calc(100vh - 64px)";
                 outerDiv.style.width = "calc(200vh - 64px)";
 
-                const keyboardHolder = docById("keyboardHolder2");
+                const keyboardHolder = this._mkbEl("keyboardHolder2");
                 if (keyboardHolder) {
                     keyboardHolder.style.width = "calc(200vh - 64px)";
                 }
 
-                const innerDiv = docById("mkbInnerDiv");
+                const innerDiv = this._mkbEl("mkbInnerDiv");
                 if (innerDiv) {
                     innerDiv.style.width = "95.5vw";
                     innerDiv.style.height = "auto";
@@ -281,7 +291,7 @@ const MusicKeyboardRendering = {
                 this.widgetWindow.getWidgetBody().style.width = "1000px";
                 outerDiv.style.width = w + "px";
 
-                const innerDiv = docById("mkbInnerDiv");
+                const innerDiv = this._mkbEl("mkbInnerDiv");
                 if (innerDiv) {
                     innerDiv.style.height = "auto";
                 }
@@ -337,7 +347,7 @@ const MusicKeyboardRendering = {
             outerDiv.style.backgroundColor = "var(--color-bg-secondary)";
             outerDiv.style.marginTop = "15px";
 
-            docById("mkbInnerDiv").style.marginLeft = 0;
+            this._mkbEl("mkbInnerDiv").style.marginLeft = 0;
 
             if (selectedNotes.length < 1) {
                 outerDiv.replaceChildren();
@@ -393,7 +403,7 @@ const MusicKeyboardRendering = {
                 cellTable.setAttribute("cellpadding", "0px");
                 cellTable.id = `mkbCellTable${j}`;
                 mkbCell.append(cellTable);
-                mkbCellTable = docById("mkbCellTable" + j);
+                mkbCellTable = this._mkbEl("mkbCellTable" + j);
                 mkbCellTable.style.marginTop = "-1px";
 
                 // We'll use this element to put the clickable notes for this row.
@@ -434,7 +444,7 @@ const MusicKeyboardRendering = {
                     this._noteWidth(Math.max.apply(Math, selectedNotes[j].duration)) * 2 + "px";
                 n = this.displayLayout.length;
                 for (let i = 0; i < this.displayLayout.length; i++) {
-                    row = docById("mkb" + i);
+                    row = this._mkbEl("mkb" + i);
                     cell = row.insertCell();
                     cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
                     cell.style.width = noteMaxWidth;
@@ -464,7 +474,7 @@ const MusicKeyboardRendering = {
                 }
 
                 dur = toFraction(Math.max.apply(Math, selectedNotes[j].duration));
-                row = docById("mkbNoteDurationRow");
+                row = this._mkbEl("mkbNoteDurationRow");
                 cell = row.insertCell();
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
                 cell.style.width = noteMaxWidth;
@@ -491,8 +501,6 @@ const MusicKeyboardRendering = {
          * It sets up event handling for key presses on the keyboard.
          */
         this._createKeyboard = function () {
-            this._cacheDocumentKeyHandlers();
-            document.onkeydown = null;
             const mkbKeyboardDiv = this.keyboardDiv;
             mkbKeyboardDiv.style.display = "flex";
             mkbKeyboardDiv.style.visibility = "visible";
@@ -523,10 +531,9 @@ const MusicKeyboardRendering = {
             keyboardHolder2.style.left = "0px";
             keyboardHolder2.style.height = "145px";
             keyboardHolder2.style.backgroundColor = "var(--color-bg-secondary)";
-            const blackTables = document.getElementsByClassName("black");
-            blackTables[0].style.top = "1px";
-            blackTables[0].style.borderSpacing = "0px 0px 20px";
-            blackTables[0].style.borderCollapse = "separate";
+            blackTable.style.top = "1px";
+            blackTable.style.borderSpacing = "0px 0px 20px";
+            blackTable.style.borderCollapse = "separate";
 
             whiteRow.replaceChildren();
             blackRowElement.replaceChildren();
@@ -551,8 +558,8 @@ const MusicKeyboardRendering = {
             let myrow2Id = 0;
             let myrow3Id = 0;
 
-            let parenttbl = document.getElementById("myrow");
-            let parenttbl2 = document.getElementById("myrow2");
+            let parenttbl = this._mkbEl("myrow");
+            let parenttbl2 = this._mkbEl("myrow2");
             let newel, newel2, nname;
 
             for (let p = 0; p < this.displayLayout.length; p++) {
@@ -837,7 +844,7 @@ const MusicKeyboardRendering = {
                     continue;
                 }
                 this.loadHandler(
-                    document.getElementById(this.idContainer[i][0]),
+                    this._mkbEl(this.idContainer[i][0]),
                     i,
                     this.idContainer[i][1],
                     this.displayLayout

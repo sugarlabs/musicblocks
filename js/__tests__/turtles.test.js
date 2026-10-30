@@ -1050,6 +1050,41 @@ describe("TurtlesModel.removeTurtle", () => {
         expect(model._turtleList).toEqual([b]);
     });
 
+    it("keeps a companion reference valid when an earlier turtle is removed", () => {
+        const a = makeTurtle();
+        const b = makeTurtle();
+        const c = makeTurtle();
+        b.companionTurtle = 2;
+        model._turtleList = [a, b, c];
+
+        model.removeTurtle(0);
+
+        const companionIndex = model._turtleList[0].companionTurtle;
+        expect(model._turtleList[companionIndex]).toBe(c);
+    });
+
+    it("clears a companion reference when its target is removed", () => {
+        const owner = makeTurtle();
+        const target = makeTurtle();
+        owner.companionTurtle = 1;
+        model._turtleList = [owner, target];
+
+        model.removeTurtle(1);
+
+        expect(owner.companionTurtle).toBeUndefined();
+    });
+
+    it("preserves a companion reference when a later turtle is removed", () => {
+        const target = makeTurtle();
+        const owner = makeTurtle({ companionTurtle: 0 });
+        const third = makeTurtle();
+        model._turtleList = [target, owner, third];
+
+        model.removeTurtle(2);
+
+        expect(model._turtleList[owner.companionTurtle]).toBe(target);
+    });
+
     it("still clears a pending interval", () => {
         const clearSpy = jest.spyOn(global, "clearInterval");
         const turtle = makeTurtle({ interval: 4242 });

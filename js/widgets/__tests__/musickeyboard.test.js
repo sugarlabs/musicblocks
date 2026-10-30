@@ -20,7 +20,13 @@ global.MusicKeyboardEditing = require("../MusicKeyboardEditing.js");
 global.MusicKeyboardRendering = require("../MusicKeyboardRendering.js");
 const MusicKeyboard = require("../musickeyboard.js");
 
-describe("MusicKeyboard document key handler lifecycle", () => {
+// Shared across instances. reset between tests.
+afterEach(() => {
+    MusicKeyboard._keyHandlerStack.length = 0;
+    MusicKeyboardEditing._wheelMenuOwner = null;
+});
+
+describe("MusicKeyboard document key handler ownership", () => {
     let originalOnKeyDown;
     let originalOnKeyUp;
 
@@ -29,67 +35,205 @@ describe("MusicKeyboard document key handler lifecycle", () => {
         originalOnKeyUp = document.onkeyup;
         document.onkeydown = null;
         document.onkeyup = null;
+        MusicKeyboard._keyHandlerStack.length = 0;
     });
 
     afterEach(() => {
         document.onkeydown = originalOnKeyDown;
         document.onkeyup = originalOnKeyUp;
+        MusicKeyboard._keyHandlerStack.length = 0;
     });
 
-    test("captures the handlers active when the keyboard is opened", () => {
-        const firstHandler = jest.fn();
-        const newerHandler = jest.fn();
-        const newerKeyUpHandler = jest.fn();
-
-        document.onkeydown = firstHandler;
+    test("an open keyboard owns the document key handlers", () => {
         const keyboard = new MusicKeyboard({});
+        keyboard.addKeyboardShortcuts();
 
-        document.onkeydown = newerHandler;
-        document.onkeyup = newerKeyUpHandler;
-
-        keyboard._cacheDocumentKeyHandlers();
-
-        document.onkeydown = jest.fn();
-        document.onkeyup = jest.fn();
-        keyboard._restoreDocumentKeyHandlers();
-
-        expect(document.onkeydown).toBe(newerHandler);
-        expect(document.onkeyup).toBe(newerKeyUpHandler);
+        expect(document.onkeydown).toBe(keyboard._boundKeyDown);
+        expect(document.onkeyup).toBe(keyboard._boundKeyUp);
     });
 
-    test("does not overwrite the saved handlers after the first snapshot", () => {
-        const preservedOnKeyDown = jest.fn();
-        const preservedOnKeyUp = jest.fn();
+    test("a newer keyboard takes over and hands input back when it closes", () => {
+        const first = new MusicKeyboard({});
+        const second = new MusicKeyboard({});
+        first.addKeyboardShortcuts();
+        const firstDown = first._boundKeyDown;
+        const firstUp = first._boundKeyUp;
 
-        document.onkeydown = preservedOnKeyDown;
-        document.onkeyup = preservedOnKeyUp;
+        second.addKeyboardShortcuts();
+        expect(document.onkeydown).toBe(second._boundKeyDown);
+        expect(document.onkeyup).toBe(second._boundKeyUp);
 
-        const keyboard = new MusicKeyboard({});
+        second._releaseDocumentKeyHandlers();
+        expect(document.onkeydown).toBe(firstDown);
+        expect(document.onkeyup).toBe(firstUp);
 
-        keyboard._cacheDocumentKeyHandlers();
-        document.onkeydown = null;
-        document.onkeyup = jest.fn();
-        keyboard._cacheDocumentKeyHandlers();
-        keyboard._restoreDocumentKeyHandlers();
-
-        expect(document.onkeydown).toBe(preservedOnKeyDown);
-        expect(document.onkeyup).toBe(preservedOnKeyUp);
+        first._releaseDocumentKeyHandlers();
+        expect(document.onkeydown).toBeNull();
+        expect(document.onkeyup).toBeNull();
     });
 
-    test("clears the saved snapshot after restoring handlers", () => {
-        const previousOnKeyDown = jest.fn();
-        const previousOnKeyUp = jest.fn();
+    test("closing the elder keyboard leaves the newer one in control", () => {
+        const first = new MusicKeyboard({});
+        const second = new MusicKeyboard({});
+        first.addKeyboardShortcuts();
+        second.addKeyboardShortcuts();
 
-        document.onkeydown = previousOnKeyDown;
-        document.onkeyup = previousOnKeyUp;
+        first._releaseDocumentKeyHandlers();
+
+        expect(document.onkeydown).toBe(second._boundKeyDown);
+        expect(document.onkeyup).toBe(second._boundKeyUp);
+    });
+
+    test("restores the handler that was active before any keyboard opened", () => {
+        const preexisting = jest.fn();
+        document.onkeydown = preexisting;
 
         const keyboard = new MusicKeyboard({});
+        keyboard.addKeyboardShortcuts();
+        expect(document.onkeydown).not.toBe(preexisting);
 
-        keyboard._cacheDocumentKeyHandlers();
-        keyboard._restoreDocumentKeyHandlers();
+        keyboard._releaseDocumentKeyHandlers();
+        expect(document.onkeydown).toBe(preexisting);
+    });
 
-        expect(keyboard._savedDocumentOnKeyDown).toBeUndefined();
-        expect(keyboard._savedDocumentOnKeyUp).toBeUndefined();
+    test("re-registering an open keyboard keeps the original handler as the base", () => {
+        const preexisting = jest.fn();
+        document.onkeydown = preexisting;
+
+        const keyboard = new MusicKeyboard({});
+        keyboard.addKeyboardShortcuts();
+        // A re-render must not set its own handler as the base.
+        keyboard.addKeyboardShortcuts();
+        expect(keyboard._boundKeyDown).not.toBe(preexisting);
+
+        keyboard._releaseDocumentKeyHandlers();
+        expect(document.onkeydown).toBe(preexisting);
+    });
+
+    test("re-rendering an older keyboard does not steal input from the newer one", () => {
+        const first = new MusicKeyboard({});
+        const second = new MusicKeyboard({});
+        first.addKeyboardShortcuts();
+        second.addKeyboardShortcuts();
+        const secondDown = second._boundKeyDown;
+
+        first.addKeyboardShortcuts();
+
+        expect(document.onkeydown).toBe(secondDown);
+    });
+
+    test("focusing a keyboard gives it the document handlers", () => {
+        const first = new MusicKeyboard({});
+        const second = new MusicKeyboard({});
+        first.addKeyboardShortcuts();
+        second.addKeyboardShortcuts();
+        expect(document.onkeydown).toBe(second._boundKeyDown);
+
+        first._focusKeyboardInput();
+
+        expect(document.onkeydown).toBe(first._boundKeyDown);
+        expect(MusicKeyboard._keyHandlerStack[MusicKeyboard._keyHandlerStack.length - 1]).toBe(
+            first
+        );
+    });
+
+    test("focusing a keyboard that is not open does nothing", () => {
+        const orphan = new MusicKeyboard({});
+        orphan._focusKeyboardInput();
+        expect(document.onkeydown).toBeNull();
+    });
+
+    test("blurring a keyboard returns document handlers to the base", () => {
+        const first = new MusicKeyboard({});
+        first.addKeyboardShortcuts();
+
+        first._blurKeyboardInput();
+
+        expect(document.onkeydown).toBeNull();
+        expect(document.onkeyup).toBeNull();
+    });
+
+    test("closing a blurred keyboard does not restore its handler", () => {
+        const first = new MusicKeyboard({});
+        const second = new MusicKeyboard({});
+        first.addKeyboardShortcuts();
+        second.addKeyboardShortcuts();
+
+        second._blurKeyboardInput();
+        second._releaseDocumentKeyHandlers();
+
+        expect(document.onkeydown).toBeNull();
+        expect(document.onkeyup).toBeNull();
+    });
+
+    test("pressing a piano key focuses that keyboard so input follows it", () => {
+        const first = new MusicKeyboard({});
+        const second = new MusicKeyboard({});
+        first.addKeyboardShortcuts();
+        second.addKeyboardShortcuts();
+        // The newer keyboard owns the document handlers until another is focused.
+        expect(document.onkeydown).toBe(second._boundKeyDown);
+
+        const body = document.createElement("div");
+        first.widgetWindow = {
+            takeFocus: () => first._focusKeyboardInput(),
+            getWidgetBody: () => body
+        };
+        first._createKeyboard = jest.fn();
+        first._createTable = jest.fn();
+        first._createKeyboardContainers();
+
+        first.keyboardDiv.dispatchEvent(new Event("pointerdown"));
+
+        expect(document.onkeydown).toBe(first._boundKeyDown);
+        expect(MusicKeyboard._keyHandlerStack[MusicKeyboard._keyHandlerStack.length - 1]).toBe(
+            first
+        );
+    });
+
+    test("a key held while focus moves is finished by the keyboard that started it", () => {
+        const originalPlatformColor = global.platformColor;
+        global.platformColor = { orange: "orange" };
+        try {
+            const makeKeyboard = () => {
+                const synth = { trigger: jest.fn(), stopSound: jest.fn() };
+                const keyboard = new MusicKeyboard({ logo: { synth } });
+                keyboard.bpm = 90;
+                keyboard.meterArgs = [4, 0.25];
+                keyboard.instrumentMapper = { whiteRow0: "electronic synth" };
+                keyboard.blockNumberMapper = { whiteRow0: 1 };
+                keyboard._createTable = jest.fn();
+                keyboard._updateWidgetWindowSize = jest.fn();
+                keyboard._mkbEl = () => ({ style: {}, getAttribute: () => "do__4" });
+                keyboard.addKeyboardShortcuts();
+                return keyboard;
+            };
+
+            const first = makeKeyboard();
+            const second = makeKeyboard();
+            first._focusKeyboardInput();
+            expect(document.onkeydown).toBe(first._boundKeyDown);
+
+            document.onkeydown({
+                key: "a",
+                keyCode: 65,
+                shiftKey: false,
+                preventDefault: jest.fn()
+            });
+
+            // Focus moves to the other keyboard while the key is still held.
+            second._focusKeyboardInput();
+
+            // The held note is ended by its own keyboard with a real duration.
+            expect(first._notesPlayed).toHaveLength(1);
+            expect(Number.isFinite(first._notesPlayed[0].duration)).toBe(true);
+
+            // The later release must not record a bogus note on the second keyboard.
+            document.onkeyup({ key: "a", keyCode: 65 });
+            expect(second._notesPlayed).toHaveLength(0);
+        } finally {
+            global.platformColor = originalPlatformColor;
+        }
     });
 });
 
@@ -180,6 +324,73 @@ describe("MusicKeyboard add-row submenu", () => {
             [1, ["solfege", { value: "do" }], 0, 0, [0]],
             [2, ["number", { value: 4 }], 0, 0, [0]]
         ]);
+    });
+
+    test("only the keyboard that opened the shared menu can close it", () => {
+        const makeKeyboard = () =>
+            new MusicKeyboard({
+                canvas: { width: 800, height: 600 },
+                getStageScale: () => 1,
+                blocks: { blockList: [], loadNewBlocks: jest.fn() }
+            });
+        const first = makeKeyboard();
+        const second = makeKeyboard();
+        first.layout = [{ noteName: "hertz", noteOctave: 392, blockNumber: 100001 }];
+        second.layout = [{ noteName: "hertz", noteOctave: 436, blockNumber: 100002 }];
+
+        first._createAddRowPieSubmenu();
+        expect(MusicKeyboardEditing._wheelMenuOwner).toBe(first);
+        const firstWheel = first._menuWheel;
+        second._createAddRowPieSubmenu();
+
+        // Taking over tears down the first keyboard's wheels.
+        expect(firstWheel.removeWheel).toHaveBeenCalled();
+        expect(MusicKeyboardEditing._wheelMenuOwner).toBe(second);
+
+        first._closeWheelMenu();
+        expect(docById("wheelDivptm").style.display).not.toBe("none");
+
+        second._closeWheelMenu();
+        expect(docById("wheelDivptm").style.display).toBe("none");
+    });
+
+    test("positions the Add Note wheel from its own toolbar button, not a sibling window", () => {
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            blocks: { blockList: [], loadNewBlocks: jest.fn() }
+        });
+        // The toolbar button lives outside the scoped window body.
+        const ownButton = document.createElement("div");
+        ownButton.getBoundingClientRect = () => ({ x: 10, y: 20 });
+        const otherButton = document.createElement("div");
+        otherButton.id = "addnotes";
+        otherButton.getBoundingClientRect = () => ({ x: 999, y: 999 });
+        keyboard._widgetBody = document.createElement("div");
+        keyboard._widgetBody.append(otherButton);
+        document.body.append(ownButton);
+
+        keyboard._addNoteButton = ownButton;
+        keyboard.layout = [{ noteName: "hertz", noteOctave: 392, blockNumber: 100001 }];
+
+        keyboard._createAddRowPieSubmenu();
+
+        // 999 would clamp to the 800-wide canvas edge (600px).
+        expect(docById("wheelDivptm").style.left).toBe("10px");
+    });
+
+    test("falls back to the document Add Note button when no toolbar reference is kept", () => {
+        const keyboard = new MusicKeyboard({
+            canvas: { width: 800, height: 600 },
+            getStageScale: () => 1,
+            blocks: { blockList: [], loadNewBlocks: jest.fn() }
+        });
+        // A scoped body that does not contain the toolbar button.
+        keyboard._widgetBody = document.createElement("div");
+        keyboard.layout = [{ noteName: "hertz", noteOctave: 392, blockNumber: 100001 }];
+
+        expect(() => keyboard._createAddRowPieSubmenu()).not.toThrow();
+        expect(docById("wheelDivptm").style.left).toBe("0px");
     });
 
     test("adds next sequential pitch when layout contains existing pitch rows and inherits octave", () => {
@@ -762,6 +973,7 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
                     append: jest.fn(el => document.body.appendChild(el)),
                     style: {}
                 }),
+                takeFocus: jest.fn(),
                 sendToCenter: jest.fn()
             })
         };
@@ -843,6 +1055,20 @@ describe("MusicKeyboard widgetWindow.onclose & event cleanup", () => {
         global.PITCHES = originalPitches;
         global.PITCHES2 = originalPitches2;
         global.SOLFEGENAMES = originalSolfegeNames;
+    });
+
+    test("takes focus only after onfocused is wired", () => {
+        const keyboard = new MusicKeyboard(mockActivity);
+        keyboard._keysLayout = jest.fn().mockReturnValue([]);
+        const win = window.widgetWindows.windowFor();
+        win.takeFocus = jest.fn(() => {
+            expect(typeof win.onfocused).toBe("function");
+            win.onfocused();
+        });
+
+        keyboard.init();
+
+        expect(win.takeFocus).toHaveBeenCalledTimes(1);
     });
 
     test("wheel events on keyboardDiv and keyTable stop propagation", () => {
@@ -1783,12 +2009,17 @@ describe("MusicKeyboard core logic", () => {
     });
 
     describe("Web MIDI cleanup on widget close", () => {
-        test("resets onmidimessage handlers on all connected MIDI inputs when widgetWindow.onclose is called", () => {
-            const mockInput1 = { onmidimessage: jest.fn() };
-            const mockInput2 = { onmidimessage: jest.fn() };
+        test("removes MIDI listeners this keyboard added when widgetWindow.onclose is called", async () => {
+            const mockInput1 = { addEventListener: jest.fn(), removeEventListener: jest.fn() };
+            const mockInput2 = { addEventListener: jest.fn(), removeEventListener: jest.fn() };
             const mockMidiAccess = {
-                inputs: [mockInput1, mockInput2]
+                inputs: new Map([
+                    ["1", mockInput1],
+                    ["2", mockInput2]
+                ])
             };
+            const origRequestMIDIAccess = global.navigator.requestMIDIAccess;
+            global.navigator.requestMIDIAccess = jest.fn().mockResolvedValue(mockMidiAccess);
 
             const mockWidgetWindow = {
                 clear: jest.fn(),
@@ -1817,29 +2048,104 @@ describe("MusicKeyboard core logic", () => {
                             singer: { bpm: [90] }
                         })
                     },
-                    logo: { synth: { stopSound: jest.fn() } }
+                    logo: { synth: { stopSound: jest.fn() } },
+                    textMsg: jest.fn()
                 };
 
                 const keyboard = new MusicKeyboard(mockActivity);
                 keyboard._createWidgetWindow();
+                keyboard.midiButton = { style: {} };
 
-                keyboard.midiAccess = mockMidiAccess;
-                keyboard.midiON = true;
+                keyboard.doMIDI();
+                await Promise.resolve();
+                await Promise.resolve();
+
+                expect(mockInput1.addEventListener).toHaveBeenCalledWith(
+                    "midimessage",
+                    expect.any(Function)
+                );
+                const handler = mockInput1.addEventListener.mock.calls[0][1];
 
                 // Trigger actual onclose handler registered on widgetWindow
                 mockWidgetWindow.onclose();
 
-                expect(mockInput1.onmidimessage).toBeNull();
-                expect(mockInput2.onmidimessage).toBeNull();
+                expect(mockInput1.removeEventListener).toHaveBeenCalledWith("midimessage", handler);
+                expect(mockInput2.removeEventListener).toHaveBeenCalledWith("midimessage", handler);
                 expect(keyboard.midiON).toBe(false);
                 expect(mockWidgetWindow.destroy).toHaveBeenCalled();
             } finally {
                 global.window.widgetWindows = origWidgetWindows;
+                global.navigator.requestMIDIAccess = origRequestMIDIAccess;
+            }
+        });
+
+        test("closing one keyboard leaves another keyboard's MIDI listener attached", async () => {
+            const handlers = new Set();
+            const input = {
+                handlers,
+                addEventListener: (type, handler) => {
+                    if (type === "midimessage") handlers.add(handler);
+                },
+                removeEventListener: (type, handler) => {
+                    if (type === "midimessage") handlers.delete(handler);
+                }
+            };
+            const midiAccess = { inputs: new Map([["1", input]]) };
+            const origRequestMIDIAccess = global.navigator.requestMIDIAccess;
+            global.navigator.requestMIDIAccess = jest.fn().mockResolvedValue(midiAccess);
+
+            const makeWidgetWindow = () => ({
+                clear: jest.fn(),
+                show: jest.fn(),
+                destroy: jest.fn(),
+                takeFocus: jest.fn(),
+                addButton: jest.fn().mockReturnValue({ onclick: null, setAttribute: jest.fn() }),
+                addInputButton: jest.fn().mockReturnValue({
+                    addEventListener: jest.fn(),
+                    classList: { add: jest.fn() }
+                }),
+                getWidgetBody: jest.fn().mockReturnValue({ append: jest.fn(), style: {} })
+            });
+
+            const origWidgetWindows = global.window.widgetWindows;
+            global.window.widgetWindows = {
+                windowFor: jest.fn(() => makeWidgetWindow())
+            };
+
+            try {
+                const mockActivity = {
+                    turtles: {
+                        ithTurtle: jest.fn().mockReturnValue({ singer: { bpm: [] } })
+                    },
+                    logo: { synth: { stopSound: jest.fn() } },
+                    textMsg: jest.fn()
+                };
+                const first = new MusicKeyboard(mockActivity);
+                const second = new MusicKeyboard(mockActivity);
+                first._createWidgetWindow();
+                second._createWidgetWindow();
+                first.midiButton = { style: {} };
+                second.midiButton = { style: {} };
+
+                first.doMIDI();
+                second.doMIDI();
+                await Promise.resolve();
+                await Promise.resolve();
+
+                expect(handlers.size).toBe(2);
+
+                first.widgetWindow.onclose();
+
+                expect(handlers.size).toBe(1);
+                expect(handlers.has(second._midiHandler)).toBe(true);
+            } finally {
+                global.window.widgetWindows = origWidgetWindows;
+                global.navigator.requestMIDIAccess = origRequestMIDIAccess;
             }
         });
 
         test("doMIDI stores midiAccess reference when requestMIDIAccess succeeds", async () => {
-            const mockInput = { onmidimessage: null };
+            const mockInput = { addEventListener: jest.fn(), removeEventListener: jest.fn() };
             const mockMidiAccess = {
                 inputs: new Map([["1", mockInput]])
             };
@@ -1858,7 +2164,10 @@ describe("MusicKeyboard core logic", () => {
                 await Promise.resolve();
 
                 expect(keyboard.midiAccess).toBe(mockMidiAccess);
-                expect(mockInput.onmidimessage).toBeDefined();
+                expect(mockInput.addEventListener).toHaveBeenCalledWith(
+                    "midimessage",
+                    expect.any(Function)
+                );
             } finally {
                 global.navigator.requestMIDIAccess = origRequestMIDIAccess;
             }
@@ -1998,30 +2307,18 @@ describe("MusicKeyboard note duration rounding and key handlers", () => {
         expect(keyboard._roundNoteDuration(0)).toBe(0.125);
     });
 
-    test("caches and restores document key handlers safely", () => {
+    test("tracks keyboard ownership of the document key handlers", () => {
         const keyboard = new MusicKeyboard({});
-        const dummyKeyDown = jest.fn();
-        const dummyKeyUp = jest.fn();
+        const original = MusicKeyboard._keyHandlerStack.length;
 
-        document.onkeydown = dummyKeyDown;
-        document.onkeyup = dummyKeyUp;
+        keyboard.addKeyboardShortcuts();
+        expect(MusicKeyboard._keyHandlerStack[MusicKeyboard._keyHandlerStack.length - 1]).toBe(
+            keyboard
+        );
 
-        // First cache
-        keyboard._cacheDocumentKeyHandlers();
-        expect(keyboard._savedDocumentOnKeyDown).toBe(dummyKeyDown);
-        expect(keyboard._savedDocumentOnKeyUp).toBe(dummyKeyUp);
-
-        // Re-caching should not overwrite original
-        document.onkeydown = jest.fn();
-        keyboard._cacheDocumentKeyHandlers();
-        expect(keyboard._savedDocumentOnKeyDown).toBe(dummyKeyDown);
-
-        // Restore
-        keyboard._restoreDocumentKeyHandlers();
-        expect(document.onkeydown).toBe(dummyKeyDown);
-        expect(document.onkeyup).toBe(dummyKeyUp);
-        expect(keyboard._savedDocumentOnKeyDown).toBeUndefined();
-        expect(keyboard._savedDocumentOnKeyUp).toBeUndefined();
+        keyboard._releaseDocumentKeyHandlers();
+        expect(MusicKeyboard._keyHandlerStack.length).toBe(original);
+        expect(keyboard._releaseDocumentKeyHandlers()).toBeUndefined();
     });
 
     test("handles timer calls safely when ManagedTimer is null with native fallbacks", () => {

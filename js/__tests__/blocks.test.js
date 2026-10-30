@@ -479,16 +479,34 @@ describe("renameDos", () => {
             expect(blocks.blockList[1].container.updateCache).toHaveBeenCalled();
         });
 
-        it.each(["do", "calc", "doArg", "calcArg", "action"])(
-            "renames the argument of a %s block",
-            name => {
-                blocks.blockList = [parentBlock(name, [null, 1]), textBlock("myAction", 0)];
+        it.each([
+            "do",
+            "calc",
+            "doArg",
+            "calcArg",
+            "action",
+            "offbeatdo",
+            "everybeatdo",
+            "everybeatdonew"
+        ])("renames the argument of a %s block", name => {
+            blocks.blockList = [parentBlock(name, [null, 1]), textBlock("myAction", 0)];
 
-                blocks.renameDos("myAction", "newAction");
+            blocks.renameDos("myAction", "newAction");
 
-                expect(blocks.blockList[1].value).toBe("newAction");
-            }
-        );
+            expect(blocks.blockList[1].value).toBe("newAction");
+        });
+
+        it("leaves a value passed to a do with arguments alone", () => {
+            blocks.blockList = [
+                parentBlock("doArg", [null, 1, 2]),
+                textBlock("otherAction", 0),
+                textBlock("myAction", 0)
+            ];
+
+            blocks.renameDos("myAction", "newAction");
+
+            expect(blocks.blockList[2].value).toBe("myAction");
+        });
 
         it("leaves a block naming a different action alone", () => {
             blocks.blockList = [parentBlock("do", [null, 1]), textBlock("otherAction", 0)];
@@ -694,6 +712,134 @@ describe("Blocks Foundation", () => {
             setHomeContainers: jest.fn(),
             __tick: jest.fn()
         };
+    });
+
+    describe("bringToTop", () => {
+        let blocks;
+        let container;
+
+        beforeEach(() => {
+            blocks = new Blocks(mockActivity);
+            container = mockActivity.blocksContainer;
+            container.sortChildren = jest.fn(compare => container.children.sort(compare));
+            container.setChildIndex.mockImplementation((child, index) => {
+                const oldIndex = container.children.indexOf(child);
+                if (
+                    child.parent !== container ||
+                    oldIndex === -1 ||
+                    index < 0 ||
+                    index >= container.children.length
+                ) {
+                    return;
+                }
+                container.children.splice(oldIndex, 1);
+                container.children.splice(index, 0, child);
+            });
+        });
+
+        function makeBlock(connections) {
+            return { connections, trash: false, container: { parent: container } };
+        }
+
+        function expectChildren(expected) {
+            expect(container.children).toHaveLength(expected.length);
+            expected.forEach((child, index) => expect(container.children[index]).toBe(child));
+        }
+
+        it("batches stack ordering while preserving other display children", () => {
+            const first = makeBlock([null, 1]);
+            const firstChild = makeBlock([0, null]);
+            const second = makeBlock([null, 3]);
+            const secondChild = makeBlock([2, null]);
+            const overlay = { parent: container };
+            const collapseButton = { parent: container };
+            blocks.blockList = [first, firstChild, second, secondChild];
+            container.children = [
+                firstChild.container,
+                overlay,
+                second.container,
+                first.container,
+                collapseButton,
+                secondChild.container
+            ];
+
+            blocks.bringToTop();
+
+            const expected = [
+                overlay,
+                collapseButton,
+                firstChild.container,
+                first.container,
+                secondChild.container,
+                second.container
+            ];
+            expectChildren(expected);
+            expect(container.sortChildren).toHaveBeenCalledTimes(1);
+            expect(container.setChildIndex).not.toHaveBeenCalled();
+            expect(blocks._adjustTheseStacks).toEqual([0, 2]);
+            expect(blocks.dragGroup).toEqual([2, 3]);
+            expect(mockActivity.refreshCanvas).toHaveBeenCalledTimes(1);
+
+            blocks.bringToTop();
+            expectChildren(expected);
+        });
+
+        it("skips trashed roots and empty block slots", () => {
+            const root = makeBlock([null, 1]);
+            const child = makeBlock([0, null]);
+            const trashed = makeBlock([null]);
+            trashed.trash = true;
+            blocks.blockList = [root, child, null];
+            blocks.blockList[4] = trashed;
+            container.children = [root.container, trashed.container, child.container];
+
+            blocks.bringToTop();
+
+            expectChildren([trashed.container, child.container, root.container]);
+            expect(blocks._adjustTheseStacks).toEqual([0]);
+            expect(container.setChildIndex).not.toHaveBeenCalled();
+        });
+
+        it("leaves display children alone when there are no stacks", () => {
+            const overlay = { parent: container };
+            container.children = [overlay];
+
+            blocks.bringToTop();
+
+            expectChildren([overlay]);
+            expect(container.sortChildren).not.toHaveBeenCalled();
+            expect(container.setChildIndex).not.toHaveBeenCalled();
+            expect(mockActivity.refreshCanvas).toHaveBeenCalledTimes(1);
+        });
+
+        it("keeps the existing order when a stack contains a detached container", () => {
+            const root = makeBlock([null, 1, 2]);
+            const detached = makeBlock([0, null]);
+            const child = makeBlock([0, null]);
+            detached.container.parent = null;
+            const firstOverlay = { parent: container };
+            const secondOverlay = { parent: container };
+            blocks.blockList = [root, detached, child];
+            container.children = [root.container, firstOverlay, child.container, secondOverlay];
+
+            blocks.bringToTop();
+
+            expectChildren([firstOverlay, child.container, secondOverlay, root.container]);
+            expect(container.sortChildren).not.toHaveBeenCalled();
+        });
+
+        it("keeps the existing order when a connection visits a child twice", () => {
+            const root = makeBlock([null, 1, 1]);
+            const child = makeBlock([0, null]);
+            const orphan = makeBlock([99]);
+            blocks.blockList = [root, child, orphan];
+            container.children = [root.container, child.container, orphan.container];
+
+            blocks.bringToTop();
+
+            expectChildren([child.container, orphan.container, root.container]);
+            expect(container.sortChildren).not.toHaveBeenCalled();
+        });
     });
 
     describe("Constructor", () => {
@@ -1300,6 +1446,85 @@ describe("Blocks Foundation", () => {
             expect(blocks.updateParameterBlock({}, 0, 0)).toBe(true);
             expect(parameterBlock.text.text).toBe("10");
             expect(updateCache).toHaveBeenCalledTimes(2);
+        });
+    });
+
+    describe("Edge-scroll root cache", () => {
+        let blocks;
+
+        beforeEach(() => {
+            blocks = new Blocks(mockActivity);
+            blocks.moveBlockRelativeBatched = jest.fn();
+            blocks._beginDeferCheckBounds = jest.fn();
+            blocks._endDeferCheckBounds = jest.fn();
+        });
+
+        it("resolves a deep stack without repeatedly reading shared ancestors", () => {
+            let reads = 0;
+            blocks.blockList = Array.from({ length: 200 }, (_, i) => ({
+                connections: {
+                    length: 1,
+                    get 0() {
+                        reads++;
+                        return i === 199 ? null : i + 1;
+                    }
+                }
+            }));
+
+            blocks.moveAllBlocksExcept(blocks.blockList[0], 0, 10);
+
+            expect([...blocks._topBlockCache.values()]).toEqual(Array(200).fill(199));
+            expect(blocks.moveBlockRelativeBatched).not.toHaveBeenCalled();
+            expect(reads).toBeLessThan(200 * 10);
+        });
+
+        it("reuses roots until invalidated and excludes the dragged stack", () => {
+            blocks.blockList = [
+                { connections: [null] },
+                { connections: [0] },
+                { connections: [null] },
+                { connections: [2], trash: true },
+                undefined,
+                { connections: [3] }
+            ];
+            blocks.moveAllBlocksExcept(blocks.blockList[1], 10, -10);
+            expect([...blocks._topBlockCache]).toEqual([
+                [0, 0],
+                [1, 0],
+                [2, 2],
+                [5, 2]
+            ]);
+            expect(blocks.moveBlockRelativeBatched.mock.calls).toEqual([
+                [2, 10, -10],
+                [5, 10, -10]
+            ]);
+            const cache = blocks._topBlockCache;
+            blocks.moveAllBlocksExcept(null, 0, 0);
+            expect(blocks._topBlockCache).toBe(cache);
+
+            blocks.blockList[1].connections[0] = 2;
+            blocks.invalidateTopBlockCache();
+            expect(blocks._topBlockCache).toBeNull();
+            blocks.moveAllBlocksExcept(blocks.blockList[1], 0, 10);
+            expect(blocks._topBlockCache.get(1)).toBe(2);
+        });
+
+        it.each([
+            [null, [], [null]],
+            [[null], [0, 0], [1]],
+            [[1], [0], [1]],
+            [[1], [2], [0], [1]],
+            [[0]]
+        ])("preserves uncached roots for malformed connections: %j", (...connections) => {
+            blocks.blockList = connections.map(value => ({ connections: value, name: "forward" }));
+            const expected = blocks.blockList.map((_, i) => blocks.findTopBlock(i));
+
+            blocks.moveAllBlocksExcept(blocks.blockList[0], 0, 10);
+
+            expect([...blocks._topBlockCache.values()]).toEqual(expected);
+            expect(blocks.moveBlockRelativeBatched.mock.calls.map(call => call[0])).toEqual(
+                expected.flatMap((root, i) => (root === expected[0] ? [] : [i]))
+            );
         });
     });
 
@@ -2037,7 +2262,23 @@ describe("Blocks Foundation", () => {
                     { name: "text", value: "action", trash: false, connections: [0] }
                 ];
                 blocks.protoBlockDict = {};
-                for (const name of ["start", "action", "text", "nameddo", "do"]) {
+                for (const name of [
+                    "start",
+                    "action",
+                    "text",
+                    "namedbox",
+                    "nameddo",
+                    "do",
+                    "stack",
+                    "calc",
+                    "doArg",
+                    "calcArg",
+                    "listen",
+                    "onbeatdo",
+                    "offbeatdo",
+                    "everybeatdo",
+                    "everybeatdonew"
+                ]) {
                     blocks.protoBlockDict[name] = { hasCapability: () => false, dockTypes: [] };
                 }
                 blocks.setActionProtoVisibility = jest.fn();
@@ -2082,6 +2323,28 @@ describe("Blocks Foundation", () => {
                 expect(project[8][1][1]).toEqual({ value: "action11" });
             });
 
+            it("keeps a legacy stack block on the action it called", () => {
+                const project = actionsNamedByDefault();
+                project.push([4, "start", 0, 0, [null, 5, null]]);
+                project.push([5, "stack", 0, 0, [4, 6, null]]);
+                project.push([6, ["text", { value: "action" }], 0, 0, [5]]);
+
+                merge(project);
+
+                expect(project[6][1][1]).toEqual({ value: "action1" });
+            });
+
+            it("keeps a do block named by a legacy string block on its action", () => {
+                const project = actionsNamedByDefault();
+                project.push([4, "start", 0, 0, [null, 5, null]]);
+                project.push([5, "do", 0, 0, [4, 6, null]]);
+                project.push([6, ["string", { value: "action" }], 0, 0, [5]]);
+
+                merge(project);
+
+                expect(project[6][1][1]).toEqual({ value: "action1" });
+            });
+
             it("leaves do blocks alone when no action is renamed", () => {
                 const project = [
                     [0, ["action", { collapsed: false }], 0, 0, [null, 1, null, null]],
@@ -2094,6 +2357,47 @@ describe("Blocks Foundation", () => {
 
                 expect(project[1][1][1]).toEqual({ value: "chorus" });
                 expect(project[3][1][1]).toEqual({ value: "chorus" });
+            });
+
+            it.each([
+                ["calc", 1],
+                ["doArg", 1],
+                ["calcArg", 1],
+                ["listen", 2],
+                ["onbeatdo", 2],
+                ["offbeatdo", 1],
+                ["everybeatdo", 1],
+                ["everybeatdonew", 1]
+            ])("keeps each %s block on the action it called", (name, slot) => {
+                const project = actionsNamedByDefault();
+                const caller = (id, prev, next, action) => {
+                    const connections = [prev, id + 2, id + 2, next];
+                    connections[slot] = id + 1;
+                    project.push([id, name, 0, 0, connections]);
+                    project.push([id + 1, ["text", { value: action }], 0, 0, [id]]);
+                    project.push([id + 2, ["text", { value: "action" }], 0, 0, [id]]);
+                };
+                project.push([4, "start", 0, 0, [null, 5, null]]);
+                caller(5, 4, 8, "action");
+                caller(8, 5, null, "action1");
+
+                merge(project);
+
+                expect(project[6][1][1]).toEqual({ value: "action1" });
+                expect(project[9][1][1]).toEqual({ value: "action11" });
+                expect(project[7][1][1]).toEqual({ value: "action" });
+                expect(project[10][1][1]).toEqual({ value: "action" });
+            });
+
+            it("leaves a box naming the action of a do block alone", () => {
+                const project = actionsNamedByDefault();
+                project.push([4, "start", 0, 0, [null, 5, null]]);
+                project.push([5, "do", 0, 0, [4, 6, null]]);
+                project.push([6, ["namedbox", { value: "action" }], 0, 0, [5]]);
+
+                merge(project);
+
+                expect(project[6][1][1]).toEqual({ value: "action" });
             });
         });
 
@@ -3723,6 +4027,101 @@ describe("Blocks Foundation", () => {
 
             expect(mockBlock.text.text).toBe("project.mb");
             expect(mockBlock.container.updateCache).toHaveBeenCalled();
+        });
+
+        it.each([
+            [
+                "throwing toString method",
+                [
+                    {
+                        toString: () => {
+                            throw new Error("Invalid");
+                        }
+                    }
+                ]
+            ],
+            ["empty array", []],
+            ["empty string element", [""]],
+            ["whitespace-only string element", ["   "]],
+            ["null value", null],
+            ["undefined value", undefined],
+            ["array with null element", [null]],
+            ["array with undefined element", [undefined]]
+        ])("falls back to 'audio file' when audiofile value is %s", (_, invalidValue) => {
+            const mockBlock = createMockBlock({
+                name: "audiofile",
+                value: invalidValue
+            });
+
+            blocks.blockList = [mockBlock];
+            blocks.updateBlockText(0);
+
+            expect(mockBlock.text.text).toBe("audio file");
+            expect(global._).toHaveBeenCalledWith("audio file");
+            expect(mockBlock.container.setChildIndex).toHaveBeenCalledWith(mockBlock.text, 0);
+            expect(mockBlock.container.updateCache).toHaveBeenCalled();
+        });
+
+        it("displays formatted file name on valid audiofile value", () => {
+            const mockBlock = createMockBlock({
+                name: "audiofile",
+                value: ["beat.wav"]
+            });
+
+            blocks.blockList = [mockBlock];
+            blocks.updateBlockText(0);
+
+            expect(mockBlock.text.text).toBe("beat.wav");
+            expect(mockBlock.container.updateCache).toHaveBeenCalled();
+        });
+
+        it("truncates non-empty audiofile filename exceeding default maxLength", () => {
+            const mockBlock = createMockBlock({
+                name: "audiofile",
+                value: ["recording.wav"]
+            });
+
+            blocks.blockList = [mockBlock];
+            blocks.updateBlockText(0);
+
+            expect(mockBlock.text.text).toBe("recordi...");
+            expect(mockBlock.container.updateCache).toHaveBeenCalled();
+        });
+
+        it("never truncates localized fallback label even when exceeding default maxLength", () => {
+            global._ = jest.fn(() => "archivo de audio");
+
+            const mockBlock = createMockBlock({
+                name: "audiofile",
+                value: null
+            });
+
+            blocks.blockList = [mockBlock];
+            blocks.updateBlockText(0);
+
+            expect(mockBlock.text.text).toBe("archivo de audio");
+            expect(mockBlock.container.updateCache).toHaveBeenCalled();
+        });
+
+        it("truncates long audiofile label when exceeding TEXTWIDTH", () => {
+            const originalGetTextWidth = global.getTextWidth;
+            global.getTextWidth = jest.fn(() => TEXTWIDTH + 1);
+
+            try {
+                const mockBlock = createMockBlock({
+                    name: "audiofile",
+                    value: ["verylongaudiofilename.wav"]
+                });
+
+                blocks.blockList = [mockBlock];
+                blocks.updateBlockText(0);
+
+                expect(mockBlock.text.text.endsWith("...")).toBe(true);
+                expect(mockBlock.text.text).toBe("verylon...");
+                expect(mockBlock.container.updateCache).toHaveBeenCalled();
+            } finally {
+                global.getTextWidth = originalGetTextWidth;
+            }
         });
     });
 

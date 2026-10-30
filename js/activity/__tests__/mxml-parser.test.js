@@ -984,6 +984,59 @@ describe("Test 15b: drum kits named by other programs", () => {
     });
 });
 
+describe("Test 15c: <forward>", () => {
+    it("imports a <forward> as a rest of its length, so later notes keep their place", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                SIMPLE_NOTE("C", 4, "quarter") +
+                    "<forward><duration>16</duration></forward>" +
+                    SIMPLE_NOTE("D", 4, "quarter")
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([
+            [1, 4],
+            [16, 32],
+            [1, 4]
+        ]);
+        expect(blocks.filter(b => blockName(b) === "rest2")).toHaveLength(1);
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 }
+        ]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("ends an open tie at a <forward> instead of stretching it over the gap", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                '<note><pitch><step>C</step><octave>4</octave></pitch><duration>8</duration><tie type="start"/><type>quarter</type></note>' +
+                    "<forward><duration>8</duration></forward>"
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([
+            [1, 4],
+            [8, 32]
+        ]);
+    });
+
+    it("ignores a <forward> with no usable <duration>", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                SIMPLE_NOTE("C", 4, "quarter") +
+                    "<forward><duration></duration></forward><forward/>" +
+                    SIMPLE_NOTE("D", 4, "quarter")
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([
+            [1, 4],
+            [1, 4]
+        ]);
+    });
+});
+
 describe("Test 16: Ties", () => {
     const tiedNote = (step, octave, tieAttrs) =>
         `<note><pitch><step>${step}</step><octave>${octave}</octave></pitch>` +
@@ -1368,5 +1421,39 @@ describe("Test 11: Tuplets are played at their time-modification ratio", () => {
         );
 
         expect(noteValues(blocks)).toEqual([[8, 96]]);
+    });
+});
+
+describe("Test 19: Cue notes", () => {
+    it("takes a cue note's length from <duration>, not its drawn <type>", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                "<note><cue/><pitch><step>E</step><octave>5</octave></pitch><duration>8</duration><type>half</type></note>" +
+                    SIMPLE_NOTE("C", 4, "quarter")
+            )
+        );
+
+        // divisions 8: a duration of 8 is a quarter, whatever <type> says.
+        expect(noteValues(blocks)).toEqual([
+            [8, 32],
+            [1, 4]
+        ]);
+        expect(blocks.filter(b => blockName(b) === "rest2")).toHaveLength(1);
+    });
+
+    it("imports a cue note as a rest of the same length, since it isn't played", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                "<note><cue/><pitch><step>E</step><octave>5</octave></pitch><duration>8</duration><type>quarter</type></note>" +
+                    SIMPLE_NOTE("C", 4, "quarter")
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([
+            [8, 32],
+            [1, 4]
+        ]);
+        expect(blocks.filter(b => blockName(b) === "rest2")).toHaveLength(1);
+        expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
     });
 });

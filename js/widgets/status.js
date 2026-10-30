@@ -12,7 +12,12 @@
 // This widget makes displays the status of selected parameters and
 // notes as they are being played.
 
-/* global _, _THIS_IS_MUSIC_BLOCKS_, MATRIXBUTTONHEIGHT, toFixed2 */
+/*
+   global
+
+   _, _THIS_IS_MUSIC_BLOCKS_, MATRIXBUTTONHEIGHT, MATRIXSOLFEHEIGHT, toFixed2,
+   mixedNumber, rationalToFraction, frequencyToPitch, HarmonyUtils
+ */
 
 /* exported StatusMatrix */
 class StatusMatrix {
@@ -22,6 +27,9 @@ class StatusMatrix {
     static OUTERWINDOWWIDTH = 620;
     static INNERWINDOWWIDTH = this.OUTERWINDOWWIDTH - this.BUTTONSIZE * 1.5;
     static FONTSCALEFACTOR = 75;
+    // Milliseconds a note is listed in the Harmony row before it starts and
+    // after it stops sounding, so the row does not flicker between notes.
+    static HARMONY_GRACE = 100;
 
     /**
      * Initializes the status matrix. First removes the
@@ -34,6 +42,8 @@ class StatusMatrix {
         this.isMaximized = false;
         this._cellScale = window.innerWidth / 1200;
         let iconSize = StatusMatrix.ICONSIZE * this._cellScale;
+        this._clearHarmonyTimer();
+        this._harmonyCell = null;
 
         this.widgetWindow = window.widgetWindows.windowFor(this, "status", "status");
         this.widgetWindow.clear();
@@ -46,6 +56,7 @@ class StatusMatrix {
         this.widgetWindow.getWidgetBody().append(this._statusTable);
         this.widgetWindow.onclose = () => {
             this.isOpen = false;
+            this._clearHarmonyTimer();
             this.widgetWindow.destroy();
         };
 
@@ -242,6 +253,33 @@ class StatusMatrix {
                 cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.textAlign = "center";
             }
+
+            // The chord and intervals sounding across all the mice, in one wide cell.
+            const harmonyRow = body.insertRow();
+            cell = harmonyRow.insertCell();
+            cell.style.fontSize =
+                Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
+            const harmonyStr = _("harmony");
+            cell.textContent = "\u00A0";
+            const harmonyLabel = document.createElement("b");
+            harmonyLabel.textContent = harmonyStr.charAt(0).toUpperCase() + harmonyStr.slice(1);
+            cell.appendChild(harmonyLabel);
+            cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
+            cell.style.backgroundColor = selectorBg;
+            cell.style.color = selectorText;
+            cell.style.paddingLeft = "10px";
+
+            this._harmonyCell = harmonyRow.insertCell();
+            this._harmonyCell.colSpan = Math.max(
+                1,
+                turtleList.filter(turtle => !turtle.inTrash).length
+            );
+            this._harmonyCell.style.backgroundColor = selectorBg;
+            this._harmonyCell.style.color = selectorText;
+            this._harmonyCell.style.fontSize =
+                Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
+            this._harmonyCell.style.textAlign = "center";
+            this._shownHarmony = null;
         }
         this.widgetWindow.sendToCenter();
     }
@@ -462,6 +500,10 @@ class StatusMatrix {
                     if (value !== undefined && value !== null) {
                         obj = rationalToFraction(value);
                         if (obj && obj.length >= 2) {
+                            // noteStatus[1] stores noteBeatValue (1 / duration, e.g. 4 for quarter note,
+                            // 2 for half note, 8/3 for dotted quarter). rationalToFraction(noteBeatValue)
+                            // returns [numerator, denominator], so the duration fraction (1 / beatValue)
+                            // is denominator / numerator (obj[1] / obj[0]).
                             note += obj[1] + "/" + obj[0];
                         }
                     }
@@ -476,9 +518,190 @@ class StatusMatrix {
             activeTurtles += 1;
         }
 
+        if (_THIS_IS_MUSIC_BLOCKS_) {
+            this._renderHarmony();
+        }
+
         if (this.activity?.logo) {
             this.activity.logo.updatingStatusMatrix = false;
         }
+    }
+
+    /**
+     * @private
+     * @returns {void}
+     */
+    _clearHarmonyTimer() {
+        if (this._harmonyTimer) {
+            clearTimeout(this._harmonyTimer);
+            this._harmonyTimer = null;
+        }
+    }
+
+    /**
+     * Collects the pitches the mice are sounding now.
+     * @private
+     * @returns {{notes: Array<string|number>, nextChange: number}} The note names
+     *     (e.g. "E4") or frequencies, and the time (ms) at which that set next changes.
+     */
+    _soundingNotes() {
+        const notes = [];
+        let nextChange = Infinity;
+        if (this.activity?.logo?.stopTurtle) {
+            return { notes, nextChange };
+        }
+
+        const now = Date.now();
+        const grace = StatusMatrix.HARMONY_GRACE;
+        const turtleList = this.activity?.turtles?.turtleList || [];
+        for (let t = 0; t < turtleList.length; t++) {
+            const tur = this.activity.turtles.ithTurtle
+                ? this.activity.turtles.ithTurtle(t)
+                : turtleList[t];
+            const singer = tur?.singer;
+            if (turtleList[t]?.inTrash || !singer?.pitchStatus) {
+                continue;
+            }
+
+            for (const sound of singer.pitchStatus) {
+                // A rest or a drum-only note moves previousTurtleTime past the
+                // start of the last pitched notes, so they are no longer sounding.
+                if (sound.start !== singer.previousTurtleTime) {
+                    continue;
+                }
+                if (now < sound.startsAt - grace) {
+                    nextChange = Math.min(nextChange, sound.startsAt - grace);
+                } else if (now <= sound.endsAt + grace) {
+                    notes.push(...sound.notes);
+                    nextChange = Math.min(nextChange, sound.endsAt + grace);
+                }
+            }
+        }
+        return { notes, nextChange };
+    }
+
+    /**
+     * Translated name of an interval, e.g. "major 3 + 1 octave".
+     * @private
+     * @param {Object} interval - An entry of HarmonyUtils.analyze().intervals.
+     * @returns {string}
+     */
+    _intervalName(interval) {
+        let name;
+        if (interval.name === "perfect 1") {
+            name = _("unison");
+        } else if (interval.name === "perfect 8") {
+            name = _("octave");
+        } else {
+            const [quality, number] = interval.name.split(" ");
+            name = _(quality) + " " + number;
+        }
+
+        if (interval.octaves > 0) {
+            name += " + " + interval.octaves + " " + _("octave");
+        }
+        return name;
+    }
+
+    /**
+     * Shows the chord and the interval from the lowest sounding note to each
+     * other one, with the just ratio, the played ratio and the difference.
+     * @private
+     * @returns {void}
+     */
+    _renderHarmony() {
+        if (!this._harmonyCell || typeof HarmonyUtils === "undefined") {
+            return;
+        }
+
+        const synth = this.activity?.logo?.synth;
+        const { notes, nextChange } = this._soundingNotes();
+
+        // The interpreter only refreshes the Status between blocks, so refresh
+        // again when a note starts or stops in between (e.g. a staccato note).
+        this._clearHarmonyTimer();
+        if (nextChange !== Infinity) {
+            this._harmonyTimer = setTimeout(
+                () => this.updateAll(),
+                Math.max(0, nextChange - Date.now())
+            );
+        }
+
+        const key = (synth?.inTemperament || "") + "|" + notes.join("|");
+        if (key === this._shownHarmony) {
+            return;
+        }
+        this._shownHarmony = key;
+        this._harmonyCell.textContent = "";
+
+        if (!synth || typeof synth.getFrequency !== "function") {
+            return;
+        }
+
+        const analysis = HarmonyUtils.analyze(
+            notes.map(note => ({
+                label: typeof note === "number" ? toFixed2(note) + "Hz" : note,
+                frequency: synth.getFrequency(note, synth.changeInTemperament)
+            }))
+        );
+        if (analysis.intervals.length === 0) {
+            return;
+        }
+
+        if (analysis.chord) {
+            const root = analysis.voices.find(voice => voice.label === analysis.chord.root);
+            const rootName =
+                typeof root.label === "string" && !root.label.endsWith("Hz")
+                    ? root.label.replace(/-?\d+$/, "")
+                    : frequencyToPitch(root.frequency)[0];
+            const chord = document.createElement("div");
+            chord.style.fontWeight = "bold";
+            chord.textContent = rootName + " " + _(analysis.chord.name);
+            this._harmonyCell.appendChild(chord);
+        }
+
+        const table = document.createElement("table");
+        table.style.margin = "0 auto";
+        const header = document.createElement("tr");
+        for (const label of [
+            _("notes"),
+            _("interval"),
+            //.TRANS: the frequency ratio of the interval in just intonation, e.g. 5:4
+            _("just ratio"),
+            //.TRANS: the frequency ratio of the interval as it is actually played
+            _("played ratio"),
+            //.TRANS: how far the played interval is from its just-intonation ratio, in cents
+            _("cents from just")
+        ]) {
+            const th = document.createElement("th");
+            th.textContent = label;
+            th.style.padding = "2px 6px";
+            th.style.whiteSpace = "nowrap";
+            header.appendChild(th);
+        }
+        table.appendChild(header);
+
+        for (const interval of analysis.intervals) {
+            const [numerator, denominator] = rationalToFraction(interval.ideal);
+            // Avoid showing "-0.0" for an exactly tuned interval.
+            const cents = Math.abs(interval.cents) < 0.05 ? "0.0" : interval.cents.toFixed(1);
+            const row = document.createElement("tr");
+            for (const value of [
+                interval.from + " → " + interval.to,
+                this._intervalName(interval),
+                numerator + ":" + denominator,
+                interval.played.toFixed(3),
+                interval.cents > 0 ? "+" + cents : cents
+            ]) {
+                const td = document.createElement("td");
+                td.textContent = value;
+                td.style.padding = "2px 6px";
+                td.style.whiteSpace = "nowrap";
+                row.appendChild(td);
+            }
+            table.appendChild(row);
+        }
+        this._harmonyCell.appendChild(table);
     }
 }
 if (typeof module !== "undefined") {

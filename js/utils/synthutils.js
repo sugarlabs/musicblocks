@@ -799,6 +799,15 @@ function Synth() {
     this.tone = null;
     this.transport = transport;
 
+    // Expose the audio-context unlock so the play button can call it while
+    // the browser still considers the click a user gesture.
+    this.startAudio = () => {
+        if (Tone.context.state !== "running") {
+            return Tone.start();
+        }
+        return Promise.resolve();
+    };
+
     Tone.Buffer.onload = () => {
         console.debug("sample loaded");
     };

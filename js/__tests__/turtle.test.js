@@ -544,6 +544,7 @@ describe("Turtle accessors", () => {
             ["parentFlowQueue", "_parentFlowQueue", [7]],
             ["unhighlightQueue", "_unhighlightQueue", [8]],
             ["parameterQueue", "_parameterQueue", [9]],
+            ["actionBoundaries", "_actionBoundaries", [0]],
             ["listeners", "_listeners", { CursorOver0: () => {} }],
             ["media", "_media", [{ type: "gif" }]],
             ["x", "_x", 42],
@@ -681,6 +682,7 @@ describe("Turtle.TurtleModel", () => {
             expect(model._parentFlowQueue).toEqual([]);
             expect(model._unhighlightQueue).toEqual([]);
             expect(model._parameterQueue).toEqual([]);
+            expect(model._actionBoundaries).toEqual([]);
             expect(model._media).toEqual([]);
         });
 
@@ -976,6 +978,20 @@ describe("Turtle.TurtleView", () => {
             expect(view._decorationBitmap.x).toBe(100);
             expect(view._decorationBitmap.y).toBe(0);
             expect(view._decorationBitmap.scale).toBe(0);
+        });
+
+        it("safely returns without error when _decorationBitmap is null or undefined (e.g. drum start blocks)", () => {
+            const view = makeView();
+            view._decorationBitmap = null;
+
+            expect(() => {
+                view.resizeDecoration(2, 200);
+            }).not.toThrow();
+
+            view._decorationBitmap = undefined;
+            expect(() => {
+                view.resizeDecoration(1.5, 150);
+            }).not.toThrow();
         });
     });
 

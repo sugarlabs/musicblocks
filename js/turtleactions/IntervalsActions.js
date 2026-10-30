@@ -62,6 +62,10 @@ const MIN_SCALAR_INTERVAL = -63;
  * @returns {void}
  */
 function setupIntervalsActions(activity) {
+    // Custom modes (pattern + tuning) we've already warned about resetting, so
+    // re-running or reloading the same project doesn't repeat the message.
+    const warnedCustomModeResets = new Set();
+
     Singer.IntervalsActions = class {
         /**
          * Utility function that returns appropriate object key in MUSICMODES corresponding to passed parameter.
@@ -107,8 +111,8 @@ function setupIntervalsActions(activity) {
          */
         static GetIntervalNumber(turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
-            let { firstNote, secondNote, octave } = GetNotesForInterval(tur);
             const temperament = activity.logo.synth.inTemperament;
+            let { firstNote, secondNote, octave } = GetNotesForInterval(tur, temperament);
             const keySig = tur.singer.keySignature;
             const firstStep = pitchToNumber(firstNote, 0, keySig, temperament);
             const secondStep = pitchToNumber(secondNote, 0, keySig, temperament);
@@ -149,8 +153,8 @@ function setupIntervalsActions(activity) {
 
         static GetCurrentInterval(turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
-
-            const { firstNote, secondNote, octave } = GetNotesForInterval(tur);
+            const temperament = activity.logo.synth.inTemperament;
+            const { firstNote, secondNote, octave } = GetNotesForInterval(tur, temperament);
 
             const index1 = NOTENAMES.indexOf(firstNote.substring(0, 1));
             const index2 = NOTENAMES.indexOf(secondNote.substring(0, 1));
@@ -568,10 +572,27 @@ function setupIntervalsActions(activity) {
                 activity.logo.synth.changeInTemperament = true;
             }
 
-            // Update the default custom mode to match the new EDO's step count.
+            // Reset the custom mode only when its steps don't add up to the new
+            // EDO. A defined mode like [2, 2, 3, 2, 3] has fewer steps than the
+            // EDO, so comparing the length would throw it away.
             const edo = getCurrentEDO(temperament);
-            if (MUSICALMODES["custom"].length !== edo) {
+            const custom = MUSICALMODES["custom"];
+            if (
+                !Array.isArray(custom) ||
+                !custom.every(step => Number.isInteger(step) && step > 0) ||
+                custom.reduce((a, b) => a + b, 0) !== edo
+            ) {
+                // Only tell the user when a mode they defined is dropped, not
+                // when the default chromatic pattern is resized.
+                const wasDefined = Array.isArray(custom) && custom.some(step => step !== 1);
                 MUSICALMODES["custom"] = new Array(edo).fill(1);
+                const warningKey = wasDefined ? custom.join(",") + "@" + edo : null;
+                if (wasDefined && !warnedCustomModeResets.has(warningKey)) {
+                    warnedCustomModeResets.add(warningKey);
+                    activity.errorMsg(
+                        _("The custom mode does not fit the new tuning, so it was reset.")
+                    );
+                }
             }
         }
     };
