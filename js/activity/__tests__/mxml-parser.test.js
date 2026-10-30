@@ -365,7 +365,7 @@ describe("Test 6: Multiple notes chain correctly", () => {
     });
 });
 
-describe("Test 7: Chords and a second voice are skipped, not misread", () => {
+describe("Test 7: Chords and voices within a part", () => {
     it("keeps only the first note of a chord", async () => {
         const { blocks } = await parseAndCapture(
             scorePartwise(
@@ -378,7 +378,7 @@ describe("Test 7: Chords and a second voice are skipped, not misread", () => {
         expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
     });
 
-    it("stops a measure at <backup>, taking only the first voice", async () => {
+    it("imports both voices separated by <backup> as simultaneous turtles", async () => {
         const xml = scorePartwise(
             SIMPLE_NOTE("C", 4, "quarter") +
                 "<backup><duration>1</duration></backup>" +
@@ -386,7 +386,67 @@ describe("Test 7: Chords and a second voice are skipped, not misread", () => {
         );
 
         const { blocks } = await parseAndCapture(xml);
-        expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "G", octave: 3 }
+        ]);
+        expect(blocks.filter(b => blockName(b) === "start")).toHaveLength(2);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("keeps a later voice aligned when it enters in the second measure", async () => {
+        const xml =
+            '<score-partwise><part id="P1">' +
+            '<measure number="1"><attributes><divisions>4</divisions></attributes>' +
+            "<note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration><type>quarter</type><voice>1</voice></note>" +
+            '</measure><measure number="2">' +
+            "<note><pitch><step>D</step><octave>4</octave></pitch><duration>4</duration><type>quarter</type><voice>1</voice></note>" +
+            "<backup><duration>4</duration></backup>" +
+            "<note><pitch><step>E</step><octave>4</octave></pitch><duration>4</duration><type>quarter</type><voice>2</voice></note>" +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 },
+            { name: "E", octave: 4 }
+        ]);
+        expect(blocks.filter(b => blockName(b) === "start")).toHaveLength(2);
+        expect(blocks.filter(b => blockName(b) === "rest2")).toHaveLength(1);
+        expect(noteValues(blocks)).toEqual([
+            [1, 4],
+            [1, 4],
+            [4, 16],
+            [1, 4]
+        ]);
+    });
+
+    it("keeps a voice's <forward> gap and does not count grace notes as time", async () => {
+        const xml = scorePartwise(
+            "<note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration><type>quarter</type><voice>1</voice></note>" +
+                "<note><pitch><step>D</step><octave>4</octave></pitch><duration>4</duration><type>quarter</type><voice>1</voice></note>" +
+                "<backup><duration>8</duration></backup>" +
+                "<forward><duration>4</duration></forward>" +
+                "<note><grace/><pitch><step>F</step><octave>4</octave></pitch><voice>2</voice></note>" +
+                "<note><pitch><step>E</step><octave>4</octave></pitch><duration>4</duration><type>quarter</type><voice>2</voice></note>",
+            "<divisions>4</divisions>"
+        );
+
+        const { blocks } = await parseAndCapture(xml);
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 },
+            { name: "E", octave: 4 }
+        ]);
+        expect(blocks.filter(b => blockName(b) === "rest2")).toHaveLength(1);
+        expect(noteValues(blocks)).toEqual([
+            [1, 4],
+            [1, 4],
+            [4, 16],
+            [1, 4]
+        ]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 });
 
