@@ -1790,8 +1790,14 @@ function MusicKeyboard(activity) {
             }
             return ans;
         };
+
         const actionGroupInterval = 50;
-        const actionGroups = parseInt(selectedNotes.length / actionGroupInterval, 10) + 1;
+        const actionGroups = Math.ceil(selectedNotes.length / actionGroupInterval);
+
+        if (actionGroups === 0) {
+            activity.textMsg(_("No notes to save."), 3000);
+            return;
+        }
 
         for (let actionGroup = 0; actionGroup < actionGroups; actionGroup++) {
             const currentSelectedNotes = selectedNotes.slice(
@@ -1823,12 +1829,14 @@ function MusicKeyboard(activity) {
                 const selectedNotesGrp = newNotes[noteGrp];
                 const isLast = noteGrp === newNotes.length - 1;
                 id = newStack.length;
-                let voice = selectedNotes[selectedNotesGrp[0]].voice[0] || DEFAULTVOICE;
+                let voice = currentSelectedNotes[selectedNotesGrp[0]].voice[0] || DEFAULTVOICE;
                 // Don't use a drum name with set timbre.
-                if (selectedNotes[selectedNotesGrp[0]].noteOctave[0] === "drumnull") {
+                if (currentSelectedNotes[selectedNotesGrp[0]].noteOctave[0] === "drumnull") {
                     voice = DEFAULTVOICE;
                 }
-                const next = isLast ? null : id + 3 + this.findLen(selectedNotesGrp, selectedNotes);
+                const next = isLast
+                    ? null
+                    : id + 3 + this.findLen(selectedNotesGrp, currentSelectedNotes);
 
                 newStack.push(
                     [id, "settimbre", 0, 0, [prevId, id + 1, id + 3, id + 2]],
@@ -1840,7 +1848,7 @@ function MusicKeyboard(activity) {
                 endOfStackIdx = id;
 
                 for (let i = 0; i < selectedNotesGrp.length; i++) {
-                    const note = selectedNotes[selectedNotesGrp[i]];
+                    const note = currentSelectedNotes[selectedNotesGrp[i]];
 
                     // Add the Note block and its value
                     const idx = newStack.length;
