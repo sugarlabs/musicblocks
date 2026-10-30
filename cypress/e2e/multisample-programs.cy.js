@@ -774,6 +774,72 @@ describe("Ordinary multisample programs", { testIsolation: true, retries: 0 }, (
         });
     });
 
+    it("appending blocks preserves pending and playing multisample runs", () => {
+        load({ pitches: Array(12).fill("C") });
+        let request;
+        const append = activity => {
+            activity.blocks.loadNewBlocks([
+                [0, ["text", { value: "Pasted text" }], 100, 100, [null]]
+            ]);
+            expect(activity.logo._executionRequest).to.equal(request);
+        };
+        cy.window().then(async win => {
+            await win.Tone.start();
+            observed = await observe(win, [500, 500]);
+            observed.logo.boxes = { suffix: 0 };
+            observed.logo.runLogoCommands();
+            request = observed.logo._executionRequest;
+            expect(request.started).not.to.equal(true);
+            append(observed.activity);
+        });
+        cy.wrap(null).should(() => expect(observed.trace.attacks.length).to.be.greaterThan(0));
+        cy.then(() => {
+            expect(request.started).to.equal(true);
+            append(observed.activity);
+        });
+        cy.wrap(null).should(() => {
+            expect(observed.logo.boxes.suffix).to.equal(1);
+            expect(observed.trace.attacks).to.have.length(12);
+            expect(observed.errors).not.to.have.been.called;
+        });
+    });
+
+    for (const delayed of [false, true]) {
+        it("refused toolbar Play preserves the editor and workspace; delayed=" + delayed, () => {
+            load();
+            let activity, hide, highlight, errors, settle;
+            cy.window().then(win => {
+                activity = win.ActivityContext.getActivity();
+                hide = cy.spy(activity.blocks, "hideBlocks");
+                highlight = cy.spy(activity.toolbar, "highlightStop");
+                errors = cy.spy(activity, "errorMsg");
+                if (delayed) {
+                    cy.stub(activity.logo.synth, "startAudio").returns(
+                        new win.Promise(resolve => {
+                            settle = resolve;
+                        })
+                    );
+                    activity._doFastButton();
+                }
+                activity.blocks.blockList
+                    .find(b => !b.trash && b.name === "multisample")
+                    .activate();
+            });
+            cy.get("[data-multisample-editor]").should("be.visible");
+            cy.then(() => (delayed ? settle() : activity._doFastButton()));
+            cy.wrap(null).should(() => {
+                expect(errors).to.have.been.calledWith(
+                    "Finish or cancel instrument editing first."
+                );
+                expect(hide).not.to.have.been.called;
+                expect(highlight).not.to.have.been.called;
+                expect(activity.blocks.visible).to.equal(true);
+                expect(activity.showBlocksAfterRun).not.to.equal(true);
+                expect(activity.multisampleEditor).not.to.equal(null);
+            });
+        });
+    }
+
     for (const outcome of ["success", "failure"]) {
         it("Stop cancels delayed toolbar audio unlock " + outcome, () => {
             load();
