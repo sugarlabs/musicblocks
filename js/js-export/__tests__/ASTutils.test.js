@@ -1142,7 +1142,7 @@ describe("ASTUtils", () => {
             for (const code of codes) {
                 await new AsyncFunction("mouse", code)(mouse);
             }
-            return { codes, printed };
+            return { codes, printed, boxes };
         };
 
         it("keeps a box used in only one stack as a variable", async () => {
@@ -1173,6 +1173,22 @@ describe("ASTUtils", () => {
             expect(codes.join("\n")).not.toContain("var ");
             expect(printed).toEqual([7, 7]);
         });
+
+        it.each([
+            [["increment", ["count", 2]], 7],
+            [["incrementOne", ["count"]], 6],
+            [["decrementOne", ["count"]], 4]
+        ])(
+            "shares a box that another stack changes with %j naming it by text",
+            async (flow, expected) => {
+                const { codes, boxes } = await run([
+                    { flows: [["storein2_count", [5]]] },
+                    { flows: [flow] }
+                ]);
+                expect(codes.join("\n")).not.toContain("var ");
+                expect(boxes.count).toBe(expected);
+            }
+        );
 
         it("reads a box that no stack stores through getBox", async () => {
             const { codes } = await run([{ flows: [], reads: ["box_count"] }]);

@@ -151,7 +151,13 @@ class ASTUtils {
                     return;
                 }
                 if (!Array.isArray(node)) return;
-                if (node[0] === "box" && Array.isArray(node[1]) && typeof node[1][0] === "string") {
+                // A box block, or an increment naming its box with text rather than a box block
+                if (
+                    ["box", "increment", "incrementOne", "decrementOne"].includes(node[0]) &&
+                    Array.isArray(node[1]) &&
+                    typeof node[1][0] === "string" &&
+                    !node[1][0].startsWith("box_")
+                ) {
                     used.add(node[1][0]);
                 }
                 node.forEach(walk);
