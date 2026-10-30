@@ -982,6 +982,14 @@ describe("Test 15b: drum kits named by other programs", () => {
 
         expect(drumNames(blocks)).toEqual(["clap"]);
     });
+
+    it("resolves repeated notes referencing the same instrument correctly", async () => {
+        const { blocks } = await parseAndCapture(
+            kitScore([["X1", "Snare Drum", 39]], ["X1", "X1", "X1"])
+        );
+
+        expect(drumNames(blocks)).toEqual(["snare drum", "snare drum", "snare drum"]);
+    });
 });
 
 describe("Test 15c: <forward>", () => {
