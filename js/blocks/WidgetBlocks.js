@@ -676,13 +676,16 @@ function setupWidgetBlocks(activity) {
             const name = typeof args[0] === "string" ? args[0] : DEFAULTVOICE;
             const effects = instrumentsEffects[turtle][name];
             const filters = instrumentsFilters[turtle][name];
+            let synthCapture;
             const capture = _beginInstrumentCapture(logo, "timbre", turtle, blk, () => {
+                synthCapture?.abort();
                 if (effects === undefined) delete instrumentsEffects[turtle][name];
                 else instrumentsEffects[turtle][name] = effects;
                 if (filters === undefined) delete instrumentsFilters[turtle][name];
                 else instrumentsFilters[turtle][name] = filters;
             });
             if (!capture) return [null, 0];
+            synthCapture = logo.synth.beginTimbreCapture?.(turtle, name);
             logo.inTimbre = true;
 
             if (typeof args[0] === "string") {
@@ -731,6 +734,7 @@ function setupWidgetBlocks(activity) {
 
             const __listener = () => {
                 if (!capture.finish()) return;
+                synthCapture?.commit();
                 logo.timbre.init(activity);
             };
 

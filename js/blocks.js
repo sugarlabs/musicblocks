@@ -5338,7 +5338,6 @@ class Blocks {
          * @returns {number} this request's load token
          */
         this.loadNewBlocks = blockObjs => {
-            this.activity.logo?.invalidateMultisampleRun?.();
             const loadToken = ++this._nextLoadToken;
 
             if (this._loadInProgress) {

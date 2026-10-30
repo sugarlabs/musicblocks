@@ -2108,9 +2108,45 @@ function Synth() {
         return Promise.resolve();
     };
 
-    /**
-     * Internal implementation of createSynth, called after sample is ensured loaded.
-     */
+    const retainedTimbreSynths = new Map();
+    const disposeReplacedSynth = synth => {
+        if (!synth || retainedTimbreSynths.has(synth)) return;
+        try {
+            synth.dispose?.();
+        } catch (error) {
+            console.debug("Error disposing instrument:", error);
+        }
+    };
+
+    /** Retain the live node until a Timbre capture can safely publish its replacement. */
+    this.beginTimbreCapture = (turtle, name) => {
+        const previous = instruments[turtle]?.[name];
+        const source = instrumentsSource[name];
+        const epoch = this._instrumentEpoch;
+        let active = true;
+        if (previous) {
+            retainedTimbreSynths.set(previous, (retainedTimbreSynths.get(previous) || 0) + 1);
+        }
+        const finish = commit => {
+            if (!active) return;
+            active = false;
+            const count = retainedTimbreSynths.get(previous);
+            if (count > 1) retainedTimbreSynths.set(previous, count - 1);
+            else retainedTimbreSynths.delete(previous);
+            if (this._instrumentEpoch !== epoch) return;
+            const current = instruments[turtle]?.[name];
+            if (!commit) {
+                if (previous) instruments[turtle][name] = previous;
+                else delete instruments[turtle][name];
+                if (source === undefined) delete instrumentsSource[name];
+                else instrumentsSource[name] = source;
+            }
+            if (current !== previous) disposeReplacedSynth(commit ? previous : current);
+        };
+        return { commit: () => finish(true), abort: () => finish(false) };
+    };
+
+    /** Internal implementation of createSynth, called after sample is ensured loaded. */
     this.___createSynth = (turtle, instrumentName, sourceName, params) => {
         for (const [name, source] of multisamples) {
             if (source.loads.has(loadKey(turtle, instrumentName))) {
@@ -2129,13 +2165,7 @@ function Synth() {
             }
         } else if (sourceName in BUILTIN_SYNTHS) {
             if (instruments[turtle] && instruments[turtle][instrumentName]) {
-                if (typeof instruments[turtle][instrumentName].dispose === "function") {
-                    try {
-                        instruments[turtle][instrumentName].dispose();
-                    } catch (e) {
-                        console.debug("Error disposing instrument:", e);
-                    }
-                }
+                disposeReplacedSynth(instruments[turtle][instrumentName]);
                 delete instruments[turtle][instrumentName];
             }
 
@@ -2149,13 +2179,7 @@ function Synth() {
             }
         } else if (sourceName in CUSTOM_SYNTHS) {
             if (instruments[turtle] && instruments[turtle][instrumentName]) {
-                if (typeof instruments[turtle][instrumentName].dispose === "function") {
-                    try {
-                        instruments[turtle][instrumentName].dispose();
-                    } catch (e) {
-                        console.debug("Error disposing instrument:", e);
-                    }
-                }
+                disposeReplacedSynth(instruments[turtle][instrumentName]);
                 delete instruments[turtle][instrumentName];
             }
 
@@ -2166,13 +2190,7 @@ function Synth() {
             instrumentsSource[instrumentName] = [0, "poly"];
         } else if (sourceName in CUSTOMSAMPLES) {
             if (instruments[turtle] && instruments[turtle][instrumentName]) {
-                if (typeof instruments[turtle][instrumentName].dispose === "function") {
-                    try {
-                        instruments[turtle][instrumentName].dispose();
-                    } catch (e) {
-                        console.debug("Error disposing instrument:", e);
-                    }
-                }
+                disposeReplacedSynth(instruments[turtle][instrumentName]);
                 delete instruments[turtle][instrumentName];
             }
 
@@ -3431,6 +3449,13 @@ function Synth() {
      */
     this.disposeAllInstruments = () => {
         this._instrumentEpoch++;
+        const retained = [...retainedTimbreSynths.keys()];
+        retainedTimbreSynths.clear();
+        for (const synth of retained) {
+            if (!Object.values(instruments).some(bank => Object.values(bank).includes(synth))) {
+                disposeReplacedSynth(synth);
+            }
+        }
         for (const source of multisamples.values()) {
             for (const entry of source.loads.values()) {
                 if (entry.cancel) entry.cancel();

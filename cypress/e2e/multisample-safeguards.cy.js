@@ -165,6 +165,148 @@ describe("Multisample unsupported destinations", { testIsolation: true, retries:
         );
     }
 
+    for (const existing of [false, true]) {
+        for (const outcome of ["reject", "commit", "stop"]) {
+            it(
+                "handles live synth replacement during Timbre capture; existing=" +
+                    existing +
+                    "; " +
+                    outcome,
+                () => {
+                    const data = project("timbre");
+                    data[2][1][1].value.name += " " + existing + " " + outcome;
+                    data[3][4][2] = 14;
+                    data[4][4][0] = 14;
+                    data.push(
+                        [14, "fmsynth", 0, 0, [3, 15, 4]],
+                        [15, ["number", { value: 10 }], 0, 0, [14]]
+                    );
+                    load(data);
+                    cy.window().should(win => {
+                        const blocks = win.ActivityContext.getActivity().blocks;
+                        expect(
+                            blocks.blockList.some(
+                                b => !b.trash && b.name === "fmsynth" && b.loadComplete
+                            )
+                        ).to.equal(true);
+                    });
+                    let activity,
+                        turtle,
+                        original,
+                        replacements,
+                        table,
+                        sources,
+                        originalSource,
+                        errors;
+                    cy.window().then(
+                        win =>
+                            new Cypress.Promise(resolve => {
+                                win.require(["widgets/timbre"], () => {
+                                    const Widget = win.eval("TimbreWidget");
+                                    win.require(Widget.dependencies, () => {
+                                        activity = win.ActivityContext.getActivity();
+                                        activity.logo.timbre = new Widget();
+                                        cy.stub(activity.logo.timbre, "init");
+                                        turtle = activity.blocks.blockList.find(
+                                            b => !b.trash && b.name === "start"
+                                        ).value;
+                                        table = win.eval("instruments");
+                                        sources = win.eval("instrumentsSource");
+                                        activity.logo.prepSynths();
+                                        if (existing) {
+                                            activity.logo.synth.createSynth(
+                                                turtle,
+                                                "custom",
+                                                "amsynth",
+                                                { harmonicity: 7 }
+                                            );
+                                        }
+                                        original = table[turtle].custom;
+                                        originalSource = sources.custom;
+                                        replacements = [];
+                                        const create = activity.logo.synth._createCustomSynth;
+                                        cy.stub(
+                                            activity.logo.synth,
+                                            "_createCustomSynth"
+                                        ).callsFake(function (...args) {
+                                            const synth = create.apply(this, args);
+                                            replacements.push(synth);
+                                            return synth;
+                                        });
+                                        errors = cy.spy(activity, "errorMsg");
+                                        const timbre = activity.blocks.blockList.find(
+                                            b => !b.trash && b.name === "timbre"
+                                        );
+                                        const fm = activity.blocks.blockList.find(
+                                            b => !b.trash && b.name === "fmsynth"
+                                        );
+                                        const select = activity.blocks.blockList.find(
+                                            b => !b.trash && b.name === "settimbre"
+                                        );
+                                        timbre.protoblock.flow(
+                                            ["custom", timbre.connections[2]],
+                                            activity.logo,
+                                            turtle,
+                                            timbre.blockIndex
+                                        );
+                                        fm.protoblock.flow(
+                                            [10],
+                                            activity.logo,
+                                            turtle,
+                                            fm.blockIndex
+                                        );
+                                        const actions = win.eval("Singer.ToneActions");
+                                        if (outcome === "reject") {
+                                            expect(
+                                                actions.setTimbre(
+                                                    value("timbre"),
+                                                    turtle,
+                                                    select.blockIndex
+                                                )
+                                            ).to.equal(false);
+                                        } else if (outcome === "commit") {
+                                            activity.turtles
+                                                .ithTurtle(turtle)
+                                                .listeners["_timbre_" + turtle]();
+                                        } else {
+                                            activity.logo.clearTurtleListeners();
+                                        }
+                                        resolve();
+                                    });
+                                });
+                            })
+                    );
+                    cy.wrap(null).should(() => {
+                        if (outcome === "reject")
+                            expect(errors).to.have.been.calledWithMatch(
+                                "is not supported in Timbre"
+                            );
+                        else expect(errors).not.to.have.been.called;
+                        expect(replacements).to.have.length(1);
+                        if (outcome === "commit") {
+                            expect(table[turtle].custom).to.equal(replacements[0]);
+                            expect(replacements[0].disposed).to.equal(false);
+                            if (existing) expect(original.disposed).to.equal(true);
+                            return;
+                        }
+                        expect(table[turtle].custom).to.equal(original);
+                        expect(sources.custom).to.equal(originalSource);
+                        expect(replacements[0].disposed).to.equal(true);
+                        if (existing) {
+                            expect(original.disposed).to.equal(false);
+                            expect(original.harmonicity.value).to.equal(7);
+                        }
+                    });
+                    cy.then(() => {
+                        if (existing && outcome !== "commit")
+                            original.triggerAttackRelease("C4", 0.05);
+                        activity.logo.doStopTurtles();
+                    });
+                }
+            );
+        }
+    }
+
     it("refuses generated JavaScript without replacing existing editor text", () => {
         load(project("matrix"));
         cy.window().then(async win => {
