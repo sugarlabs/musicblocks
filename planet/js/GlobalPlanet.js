@@ -807,18 +807,28 @@ class GlobalPlanet {
                 }
             });
 
-            register("global-search", "input", function (evt) {
+            const scheduleGlobalSearch = value => {
                 clearTimeout(this.searchDebounce);
 
-                this.searchString = evt.target.value.trim();
+                this.searchString = value.trim();
 
                 this.searchDebounce = setTimeout(() => {
                     this.search();
                 }, 300);
+            };
+
+            register("global-search", "input", function (evt) {
+                if (evt.isComposing) return;
+
+                scheduleGlobalSearch.call(this, evt.target.value);
+            });
+
+            register("global-search", "compositionend", function (evt) {
+                scheduleGlobalSearch.call(this, evt.target.value);
             });
 
             register("global-search", "keydown", function (evt) {
-                if (evt.key === "Enter") {
+                if (evt.key === "Enter" && !evt.isComposing && evt.keyCode !== 229) {
                     clearTimeout(this.searchDebounce);
                     this.searchString = document.getElementById("global-search").value.trim();
                     this.search();
