@@ -26,7 +26,7 @@
    deleteTemperamentFromList, addTemperamentToDictionary, updateTemperaments,
    isCustomTemperament, temperamentHasRatios, isTrueEDO, isEquallyTempered,
    isNonEDO, getTemperamentRatio, getTemperamentCents, getTemperamentName,
-   getEffectiveOctaveRatio,
+   getEffectiveOctaveRatio, edoTransposition,
    MusicUtilsTemperament
  */
 
@@ -1421,6 +1421,27 @@ var getTemperamentName = name => {
     return DEFAULTTEMPERAMENT;
 };
 
+/**
+ * Combines a transposition in semitones with one in steps of the current
+ * temperament (scale steps from getInterval, or octaves of `edo` steps) into
+ * the transposition and isAlreadyEdoSteps arguments of getNote.
+ *
+ * getNote reads a plain transposition as semitones and, outside 12 EDO,
+ * rescales it to the temperament's steps, so a value that is already in
+ * steps must skip that conversion. In 12 EDO the two units are the same.
+ * @function
+ * @param {number} semitones - Transposition in semitones.
+ * @param {number} steps - Transposition in steps of the temperament.
+ * @param {number} edo - The current EDO steps per octave.
+ * @returns {Array} [transposition, isAlreadyEdoSteps] for getNote.
+ */
+var edoTransposition = (semitones, steps, edo) => {
+    if (edo === 12) {
+        return [semitones + steps, false];
+    }
+    return [Math.round((semitones * edo) / 12) + steps, true];
+};
+
 var MusicUtilsTemperament = {
     getCurrentEDO,
     EDO_NOTE_NAMES,
@@ -1451,7 +1472,8 @@ var MusicUtilsTemperament = {
     isNonEDO,
     getTemperamentRatio,
     getTemperamentCents,
-    getTemperamentName
+    getTemperamentName,
+    edoTransposition
 };
 
 if (typeof module !== "undefined" && module.exports) {
