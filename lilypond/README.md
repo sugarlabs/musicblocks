@@ -57,13 +57,13 @@ If you would rather not use the command line, [Frescobaldi](#using-frescobaldi) 
 
 ## Using Frescobaldi
 
-Optionally, you can install [Frescobaldi](https://frescobaldi.org/), an editor for LilyPond files. It shows your code and the sheet music side by side, and it can download and install LilyPond for you.
+Optionally, you can install [Frescobaldi](https://frescobaldi.org/), an editor for LilyPond files. It shows your code and the sheet music side by side, and from version 4.0 it can download and install LilyPond for you.
 
 1. Install Frescobaldi:
     - Windows: download the `.msi` file from the [Frescobaldi releases page](https://github.com/frescobaldi/frescobaldi/releases) and run it.
     - macOS: download the `.dmg` file from the [Frescobaldi releases page](https://github.com/frescobaldi/frescobaldi/releases), or run `brew install --cask frescobaldi`.
     - GNU/Linux: install it from your distribution's packages or from [Flathub](https://flathub.org/apps/org.frescobaldi.Frescobaldi).
-2. Open Frescobaldi, open its preferences and choose **LilyPond Preferences**. If no LilyPond version is listed, click **Add** to download one.
+2. Open Frescobaldi, open its preferences and choose **LilyPond Preferences**. If no LilyPond version is listed, click **Add** to download one. With a version older than 4.0, install LilyPond first.
 3. Open your `.ly` file and click the LilyPond button in the toolbar. The sheet music appears next to the code.
 
 ## Editing LilyPond Files
@@ -95,8 +95,8 @@ More customization details are found in the .ly file. Further references include
 ## Example: Making a `.ly` file from Music Blocks and Output
 <img src='images/example.svg' alt='Music Blocks program that plays a melody using actions, a box and semi-tone transpose'></img>
 
-Saving the program above with **Save sheet music as Lilypond** from the Save menu
-gives `hotdog.ly`:
+Saving the program above with **Save sheet music as Lilypond** from the Save menu,
+with `hotdog.ly` as the file name, gives:
 
 ```
 \version "2.18.2"
