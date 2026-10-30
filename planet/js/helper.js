@@ -71,11 +71,6 @@ function setCookie(cname, cvalue, exdays) {
     document.cookie = `${cname}=${cvalue};${expires};path=/${flags}`;
 }
 
-function toggleSearch(on) {
-    const displayValue = on ? "block" : "none";
-    document.getElementById("searchcontainer").style.display = displayValue;
-}
-
 function toggleText(id, a, b) {
     const el = document.getElementById(id);
 
@@ -162,20 +157,132 @@ $(document).ready(() => {
             evt.target.value === "" ? "none" : "initial";
     });
 
-    document.getElementById("local-tab").addEventListener("click", evt => {
-        toggleSearch(false);
-    });
-
-    document.getElementById("global-tab").addEventListener("click", evt => {
-        toggleSearch(true);
-    });
-
     document.getElementById("view-more-chips").addEventListener("click", evt => {
         const showMore = _("Show more tags") + " ▼";
         const showLess = _("Show fewer tags") + " ▲";
         toggleExpandable("morechips", "flexchips");
         toggleText("view-more-chips", showMore, showLess);
     });
+
+    const navbar = document.querySelector("nav");
+    const searchSlot = document.getElementById("planet-search-slot");
+    const localSection = document.getElementById("local");
+    const globalSection = document.getElementById("global");
+
+    const searchStates = [localSection, globalSection]
+        .filter(Boolean)
+        .map(section => {
+            const titleRow = section.querySelector(".projects-title-row");
+            const search = section.querySelector(".project-search-preview");
+
+            return titleRow && search ? { section, titleRow, search } : null;
+        })
+        .filter(Boolean);
+
+    const moveSearch = (search, destination, docked) => {
+        if (typeof search.getAnimations === "function") {
+            search.getAnimations().forEach(animation => animation.cancel());
+        }
+        const focusedElement = search.contains(document.activeElement)
+            ? document.activeElement
+            : null;
+
+        const first = search.getBoundingClientRect();
+
+        search.classList.toggle("project-search-docked", docked);
+        destination.appendChild(search);
+
+        if (focusedElement && typeof focusedElement.focus === "function") {
+            focusedElement.focus({ preventScroll: true });
+        }
+
+        const last = search.getBoundingClientRect();
+
+        const deltaX = first.left - last.left;
+        const deltaY = first.top - last.top;
+
+        const prefersReducedMotion =
+            typeof window.matchMedia === "function" &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        if (
+            !prefersReducedMotion &&
+            typeof search.animate === "function" &&
+            (deltaX !== 0 || deltaY !== 0)
+        ) {
+            search.animate(
+                [
+                    {
+                        transform: `translate(${deltaX}px, ${deltaY}px)`
+                    },
+                    {
+                        transform: "translate(0, 0)"
+                    }
+                ],
+                {
+                    duration: 420,
+                    easing: "cubic-bezier(0.22, 1, 0.36, 1)"
+                }
+            );
+        }
+    };
+
+    const restoreSearch = state => {
+        if (!searchSlot || state.search.parentElement !== searchSlot) return;
+
+        moveSearch(state.search, state.titleRow, false);
+    };
+
+    const updateSearchDocking = () => {
+        if (!navbar || !searchSlot || searchStates.length === 0) return;
+
+        const activeState = searchStates.find(
+            state => getComputedStyle(state.section).display !== "none"
+        );
+
+        if (!activeState) return;
+
+        searchStates.forEach(state => {
+            if (state !== activeState) restoreSearch(state);
+        });
+
+        const navbarBottom = navbar.getBoundingClientRect().bottom;
+        const titleTop = activeState.titleRow.getBoundingClientRect().top;
+        const shouldDock = titleTop <= navbarBottom;
+        const isDocked = activeState.search.parentElement === searchSlot;
+
+        if (shouldDock && !isDocked) {
+            moveSearch(activeState.search, searchSlot, true);
+        } else if (!shouldDock && isDocked) {
+            restoreSearch(activeState);
+        }
+    };
+
+    let searchDockScheduled = false;
+
+    const scheduleSearchDocking = () => {
+        if (searchDockScheduled) return;
+
+        searchDockScheduled = true;
+
+        requestAnimationFrame(() => {
+            searchDockScheduled = false;
+            updateSearchDocking();
+        });
+    };
+
+    window.addEventListener("scroll", scheduleSearchDocking, { passive: true });
+    window.addEventListener("resize", scheduleSearchDocking, { passive: true });
+
+    const scheduleAfterTabChange = () => {
+        requestAnimationFrame(scheduleSearchDocking);
+    };
+
+    document.getElementById("local-tab")?.addEventListener("click", scheduleAfterTabChange);
+
+    document.getElementById("global-tab")?.addEventListener("click", scheduleAfterTabChange);
+
+    scheduleSearchDocking();
 });
 
 if (typeof module !== "undefined" && module.exports) {

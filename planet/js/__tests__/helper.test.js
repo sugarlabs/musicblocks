@@ -41,7 +41,6 @@ function setupHelperDOM() {
         <div id="search-close" style="display:none;"></div>
         <div id="local-tab"></div>
         <div id="global-tab"></div>
-        <div id="searchcontainer" style="display:block;"></div>
         <div id="view-more-chips">Show more tags ▼</div>
         <div id="morechips" class="flexchips"></div>
     `;
@@ -297,6 +296,179 @@ describe("helper.js", () => {
 
             const urlInput = document.querySelector("#sharebox input[type=text]");
             expect(urlInput.value).toBe("https://example.com&a=True&b=True&c=True");
+        });
+    });
+    describe("responsive Planet search", () => {
+        let originalRequestAnimationFrame;
+        let localTitleTop;
+        let globalTitleTop;
+
+        beforeEach(() => {
+            jest.resetModules();
+
+            document.body.innerHTML = `
+                <div id="publisher"></div>
+                <div id="deleter"></div>
+                <div id="projectviewer"></div>
+
+                <nav id="main-nav">
+                    <a id="planet-new-project"></a>
+                    <div id="planet-search-slot"></div>
+
+                    <ul id="localglobal">
+                        <li><a id="local-tab"></a></li>
+                        <li><a id="global-tab"></a></li>
+                    </ul>
+                </nav>
+
+                <div id="view-more-chips">Show more tags ▼</div>
+                <div id="morechips" class="flexchips"></div>
+
+                <div id="local" style="display:block;">
+                    <div class="projects-title-row">
+                        <h3 id="localtitle">My Projects</h3>
+                        <div class="project-search-preview">
+                            <input id="local-search" value="" />
+                            <label class="project-search-icon"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="global" style="display:none;">
+                    <div class="projects-title-row">
+                        <h3 id="globaltitle">Explore Projects</h3>
+                        <div class="project-search-preview">
+                            <input id="global-search" value="" />
+                            <label class="project-search-icon"></label>
+                            <span id="search-close"></span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            originalRequestAnimationFrame = window.requestAnimationFrame;
+
+            window.requestAnimationFrame = callback => {
+                callback();
+                return 1;
+            };
+
+            const navbar = document.getElementById("main-nav");
+
+            navbar.getBoundingClientRect = jest.fn(() => ({
+                top: 0,
+                bottom: 64,
+                height: 64
+            }));
+
+            localTitleTop = 20;
+            globalTitleTop = 20;
+
+            document.querySelector("#local .projects-title-row").getBoundingClientRect = jest.fn(
+                () => ({
+                    top: localTitleTop,
+                    bottom: localTitleTop + 90,
+                    height: 90
+                })
+            );
+
+            document.querySelector("#global .projects-title-row").getBoundingClientRect = jest.fn(
+                () => ({
+                    top: globalTitleTop,
+                    bottom: globalTitleTop + 90,
+                    height: 90
+                })
+            );
+
+            jest.isolateModules(() => {
+                require("../helper");
+            });
+        });
+
+        afterEach(() => {
+            window.requestAnimationFrame = originalRequestAnimationFrame;
+        });
+
+        it("should dock the active Local search into the navbar slot", () => {
+            const slot = document.getElementById("planet-search-slot");
+            const search = document.getElementById("local-search").parentElement;
+
+            expect(slot.contains(search)).toBe(true);
+            expect(search.classList.contains("project-search-docked")).toBe(true);
+        });
+
+        it("should restore the search above the docking threshold", () => {
+            const titleRow = document.querySelector("#local .projects-title-row");
+            const search = document.getElementById("local-search").parentElement;
+
+            localTitleTop = 100;
+            window.dispatchEvent(new Event("scroll"));
+
+            expect(titleRow.contains(search)).toBe(true);
+            expect(search.classList.contains("project-search-docked")).toBe(false);
+        });
+
+        it("should switch the docked search when the active tab changes", () => {
+            const slot = document.getElementById("planet-search-slot");
+
+            const localSection = document.getElementById("local");
+            const globalSection = document.getElementById("global");
+
+            const localTitleRow = localSection.querySelector(".projects-title-row");
+            const localSearch = document.getElementById("local-search").parentElement;
+            const globalSearch = document.getElementById("global-search").parentElement;
+
+            localSection.style.display = "none";
+            globalSection.style.display = "block";
+
+            document
+                .getElementById("global-tab")
+                .dispatchEvent(new Event("click", { bubbles: true }));
+
+            expect(localTitleRow.contains(localSearch)).toBe(true);
+            expect(slot.contains(globalSearch)).toBe(true);
+            expect(globalSearch.classList.contains("project-search-docked")).toBe(true);
+        });
+
+        it("should preserve input focus while docking and restoring the search", () => {
+            const slot = document.getElementById("planet-search-slot");
+            const titleRow = document.querySelector("#local .projects-title-row");
+            const input = document.getElementById("local-search");
+            const search = input.parentElement;
+
+            localTitleTop = 100;
+            window.dispatchEvent(new Event("scroll"));
+
+            expect(titleRow.contains(search)).toBe(true);
+
+            input.focus();
+            expect(document.activeElement).toBe(input);
+
+            const focusSpy = jest.spyOn(input, "focus");
+
+            localTitleTop = 20;
+            window.dispatchEvent(new Event("scroll"));
+
+            expect(slot.contains(search)).toBe(true);
+            expect(document.activeElement).toBe(input);
+            expect(focusSpy).toHaveBeenCalledWith({ preventScroll: true });
+
+            localTitleTop = 100;
+            window.dispatchEvent(new Event("scroll"));
+
+            expect(titleRow.contains(search)).toBe(true);
+            expect(document.activeElement).toBe(input);
+            expect(focusSpy).toHaveBeenCalledTimes(2);
+        });
+
+        it("should recalculate docking on resize", () => {
+            const titleRow = document.querySelector("#local .projects-title-row");
+            const search = document.getElementById("local-search").parentElement;
+
+            localTitleTop = 100;
+            window.dispatchEvent(new Event("resize"));
+
+            expect(titleRow.contains(search)).toBe(true);
         });
     });
 });
