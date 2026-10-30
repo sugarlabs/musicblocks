@@ -240,6 +240,286 @@ describe("GlobalCard", () => {
                 "shareurl-advanced"
             );
         });
+
+        it("keeps the owning card above neighboring cards while the share popup is open", () => {
+            card.init("test-id-1");
+            card.render();
+
+            const shareButton = document.getElementById("global-project-share-test-id-1");
+            const projectCard = shareButton.closest(".card");
+
+            shareButton.click();
+
+            expect(projectCard.classList.contains("share-popup-open")).toBe(true);
+
+            shareButton.click();
+
+            expect(projectCard.classList.contains("share-popup-open")).toBe(false);
+        });
+
+        it("repositions an open share popup on viewport changes using requestAnimationFrame", () => {
+            card.init("test-id-1");
+
+            const positionSpy = jest.spyOn(card, "_positionShareCard");
+            const frameCallbacks = [];
+
+            const requestFrameSpy = jest
+                .spyOn(window, "requestAnimationFrame")
+                .mockImplementation(callback => {
+                    frameCallbacks.push(callback);
+                    return frameCallbacks.length;
+                });
+
+            card.render();
+
+            const shareButton = document.getElementById("global-project-share-test-id-1");
+
+            shareButton.click();
+
+            expect(positionSpy).toHaveBeenCalledTimes(1);
+
+            window.dispatchEvent(new Event("resize"));
+            window.dispatchEvent(new Event("scroll"));
+
+            // Multiple viewport events before the next frame should schedule only one update.
+            expect(requestFrameSpy).toHaveBeenCalledTimes(1);
+            expect(positionSpy).toHaveBeenCalledTimes(1);
+
+            frameCallbacks[0]();
+
+            expect(positionSpy).toHaveBeenCalledTimes(2);
+
+            // After that frame finishes, another viewport change may schedule another update.
+            window.dispatchEvent(new Event("scroll"));
+
+            expect(requestFrameSpy).toHaveBeenCalledTimes(2);
+
+            frameCallbacks[1]();
+
+            expect(positionSpy).toHaveBeenCalledTimes(3);
+
+            shareButton.click();
+
+            requestFrameSpy.mockRestore();
+        });
+
+        it("stops repositioning after the share popup is closed", () => {
+            card.init("test-id-1");
+
+            const positionSpy = jest.spyOn(card, "_positionShareCard");
+
+            card.render();
+
+            const shareButton = document.getElementById("global-project-share-test-id-1");
+
+            shareButton.click();
+
+            expect(positionSpy).toHaveBeenCalledTimes(1);
+
+            shareButton.click();
+
+            window.dispatchEvent(new Event("resize"));
+            window.dispatchEvent(new Event("scroll"));
+
+            expect(positionSpy).toHaveBeenCalledTimes(1);
+            expect(card._shareRepositionHandler).toBeNull();
+        });
+
+        it("stops repositioning when the share popup is dismissed outside", () => {
+            card.init("test-id-1");
+
+            const positionSpy = jest.spyOn(card, "_positionShareCard");
+
+            card.render();
+
+            const shareButton = document.getElementById("global-project-share-test-id-1");
+
+            shareButton.click();
+
+            expect(positionSpy).toHaveBeenCalledTimes(1);
+
+            const onHide = global.hideOnClickOutside.mock.calls[0][2];
+
+            expect(typeof onHide).toBe("function");
+
+            onHide();
+
+            window.dispatchEvent(new Event("resize"));
+            window.dispatchEvent(new Event("scroll"));
+
+            expect(positionSpy).toHaveBeenCalledTimes(1);
+            expect(card._shareRepositionHandler).toBeNull();
+        });
+
+        it("cancels a pending reposition frame when the share popup closes", () => {
+            card.init("test-id-1");
+
+            const frameCallback = jest.fn();
+
+            const requestFrameSpy = jest
+                .spyOn(window, "requestAnimationFrame")
+                .mockImplementation(callback => {
+                    frameCallback.mockImplementation(callback);
+                    return 123;
+                });
+
+            const cancelFrameSpy = jest
+                .spyOn(window, "cancelAnimationFrame")
+                .mockImplementation(() => {});
+
+            card.render();
+
+            const shareButton = document.getElementById("global-project-share-test-id-1");
+
+            shareButton.click();
+
+            window.dispatchEvent(new Event("scroll"));
+
+            expect(requestFrameSpy).toHaveBeenCalledTimes(1);
+            expect(card._shareRepositionFrame).toBe(123);
+
+            shareButton.click();
+
+            expect(cancelFrameSpy).toHaveBeenCalledWith(123);
+            expect(card._shareRepositionFrame).toBeNull();
+            expect(card._shareRepositionHandler).toBeNull();
+
+            requestFrameSpy.mockRestore();
+            cancelFrameSpy.mockRestore();
+        });
+    });
+
+    describe("_positionShareCard", () => {
+        it("positions the share card above when there is not enough space below", () => {
+            const shareBox = document.createElement("div");
+            const trigger = document.createElement("button");
+
+            Object.defineProperty(window, "innerHeight", {
+                configurable: true,
+                value: 800
+            });
+
+            trigger.getBoundingClientRect = jest.fn(() => ({
+                top: 700,
+                bottom: 740
+            }));
+
+            shareBox.getBoundingClientRect = jest.fn(() => ({
+                left: 100,
+                width: 350,
+                height: 200
+            }));
+
+            card._positionShareCard(shareBox, trigger);
+
+            expect(shareBox.classList.contains("share-card-above")).toBe(true);
+            expect(shareBox.classList.contains("share-card-below")).toBe(false);
+            expect(shareBox.style.maxHeight).toBe("692px");
+        });
+
+        it("positions the share card below when enough space is available", () => {
+            const shareBox = document.createElement("div");
+            const trigger = document.createElement("button");
+
+            Object.defineProperty(window, "innerHeight", {
+                configurable: true,
+                value: 800
+            });
+
+            trigger.getBoundingClientRect = jest.fn(() => ({
+                top: 200,
+                bottom: 240
+            }));
+
+            shareBox.getBoundingClientRect = jest.fn(() => ({
+                left: 100,
+                width: 350,
+                height: 200
+            }));
+
+            card._positionShareCard(shareBox, trigger);
+
+            expect(shareBox.classList.contains("share-card-below")).toBe(true);
+            expect(shareBox.classList.contains("share-card-above")).toBe(false);
+            expect(shareBox.style.maxHeight).toBe("552px");
+        });
+
+        it("clamps the share card horizontally inside the viewport", () => {
+            const container = document.createElement("div");
+            const shareBox = document.createElement("div");
+            const trigger = document.createElement("button");
+
+            container.appendChild(shareBox);
+
+            Object.defineProperty(window, "innerWidth", {
+                configurable: true,
+                value: 1024
+            });
+
+            Object.defineProperty(window, "innerHeight", {
+                configurable: true,
+                value: 800
+            });
+
+            trigger.getBoundingClientRect = jest.fn(() => ({
+                top: 200,
+                bottom: 240
+            }));
+
+            shareBox.getBoundingClientRect = jest.fn(() => ({
+                left: -30,
+                width: 350,
+                height: 200
+            }));
+
+            container.getBoundingClientRect = jest.fn(() => ({
+                left: 0
+            }));
+
+            card._positionShareCard(shareBox, trigger);
+
+            expect(shareBox.style.left).toBe("12px");
+            expect(shareBox.style.right).toBe("auto");
+        });
+
+        it("clears the previous max height before measuring again", () => {
+            const shareBox = document.createElement("div");
+            const trigger = document.createElement("button");
+
+            shareBox.style.maxHeight = "100px";
+
+            Object.defineProperty(window, "innerWidth", {
+                configurable: true,
+                value: 1024
+            });
+
+            Object.defineProperty(window, "innerHeight", {
+                configurable: true,
+                value: 800
+            });
+
+            trigger.getBoundingClientRect = jest.fn(() => ({
+                top: 500,
+                bottom: 540
+            }));
+
+            shareBox.getBoundingClientRect = jest.fn(() => {
+                expect(shareBox.style.maxHeight).toBe("");
+
+                return {
+                    left: 100,
+                    width: 350,
+                    height: 300
+                };
+            });
+
+            card._positionShareCard(shareBox, trigger);
+
+            expect(shareBox.getBoundingClientRect).toHaveBeenCalled();
+            expect(shareBox.classList.contains("share-card-above")).toBe(true);
+            expect(shareBox.classList.contains("share-card-below")).toBe(false);
+            expect(shareBox.style.maxHeight).toBe("492px");
+        });
     });
 
     describe("cleanup", () => {
