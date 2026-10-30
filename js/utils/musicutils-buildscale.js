@@ -1282,6 +1282,12 @@ var getSolfege = (note, keySignature, movable, temperament, edo) => {
             index = scale.indexOf(altNote);
         }
 
+        // 3) in 12-EDO, an enharmonic spelling of a scale note (D♯ for E♭)
+        if (index === -1 && currentEDO === 12) {
+            const pitchClass = _notePitchClass(note);
+            index = scale.slice(0, -1).findIndex(n => _notePitchClass(n) === pitchClass);
+        }
+
         // Modes with fewer than 7 notes: use the same solfege that
         // getNoteFromSolfege resolves, so display and input agree.
         if (index !== -1 && currentEDO === 12 && scale.length - 1 < 7) {
@@ -1305,7 +1311,7 @@ var getSolfege = (note, keySignature, movable, temperament, edo) => {
             return SOLFEGENAMES[(index + tonicDegree) % 7].toLowerCase();
         }
 
-        // 3) chromatic fallback (interval based)
+        // 4) chromatic fallback (interval based)
         const tonic = scale[0];
         const tonicPitch = pitchToNumber(tonic, 4, keySignature, temperament);
         const notePitch = pitchToNumber(note, 4, keySignature, temperament);

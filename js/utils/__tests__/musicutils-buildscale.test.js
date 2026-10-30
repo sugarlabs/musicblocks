@@ -218,6 +218,33 @@ describe("musicutils-buildscale", () => {
         ]);
     });
 
+    it("round-trips every spelling of a blues scale note through movable solfege", () => {
+        const names = ["C", "D", "E", "F", "G", "A", "B"].flatMap(letter => [
+            letter,
+            letter + SHARP,
+            letter + FLAT
+        ]);
+        const tonics = ["C", "G", "D", "A", "E", "B", "F♯", "F", "B♭", "E♭", "A♭", "D♭"];
+        for (const keySignature of tonics.flatMap(k => [k + " major blues", k + " minor blues"])) {
+            const scalePitches = buildscale
+                .buildScale(keySignature, 12)[0]
+                .map(buildscale._notePitchClass);
+            for (const name of names) {
+                const pitchClass = buildscale._notePitchClass(name);
+                if (!scalePitches.includes(pitchClass)) {
+                    continue;
+                }
+                const solfege = buildscale.getSolfege(name, keySignature, true, "equal", 12);
+                const note = musicutils.getNote(solfege, 4, 0, keySignature, true, null, null);
+                expect([keySignature, name, buildscale._notePitchClass(note[0])]).toEqual([
+                    keySignature,
+                    name,
+                    pitchClass
+                ]);
+            }
+        }
+    });
+
     it("still resolves a minor key signature's scale and solfege", () => {
         expect(buildscale.buildScale("A minor", 12)[0].slice(0, 3)).toEqual(["A", "B", "C"]);
         expect(buildscale.getSolfege("A", "A minor", false, "equal")).toBe("la");
