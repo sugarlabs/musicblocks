@@ -95,6 +95,24 @@ describe("recorder", () => {
             expect(activity._doRecordButton).toHaveBeenCalledTimes(1);
         });
 
+        it("resets the execution guard after a synchronous startup failure", () => {
+            const { doRecordButton } = require("../recorder");
+            const error = new Error("startup failed");
+            const activity = {
+                _doRecordButton: jest.fn().mockImplementationOnce(() => {
+                    throw error;
+                })
+            };
+
+            doRecordButton(activity);
+            doRecordButton(activity);
+
+            expect(activity._doRecordButton).toHaveBeenCalledTimes(2);
+            expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(error, {
+                operation: "recording"
+            });
+        });
+
         it("does nothing with null activity (no crash)", () => {
             const { doRecordButton } = require("../recorder");
             expect(() => doRecordButton(null)).not.toThrow();
@@ -268,6 +286,40 @@ describe("recorder", () => {
 
             expect(mockStart.classList.remove).toHaveBeenCalledWith("recording");
             expect(mockTrack.stop).toHaveBeenCalled();
+        });
+
+        it("cleans up the stream and state when recorder startup throws", async () => {
+            const { doRecordButton, setupActivityRecorder } = require("../recorder");
+            const startupError = new Error("recorder startup failed");
+            global.MediaRecorder = class {
+                constructor() {
+                    throw startupError;
+                }
+            };
+            const instance = {
+                textMsg: jest.fn(),
+                canvas: { height: 600 },
+                _onResize: jest.fn(),
+                logo: { synth: { tone: null } }
+            };
+            setupActivityRecorder(instance);
+            doRecordButton(instance);
+
+            await mockStart._recordHandler();
+            expect(mockTrack.stop).toHaveBeenCalled();
+            expect(mockStart.classList.remove).toHaveBeenCalledWith("recording");
+            expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(startupError, {
+                operation: "recording"
+            });
+
+            global.MediaRecorder = class {
+                constructor() {
+                    this.state = "inactive";
+                    this.start = jest.fn();
+                }
+            };
+            doRecordButton(instance);
+            expect(mockStart._recordHandler).toBeDefined();
         });
     });
 

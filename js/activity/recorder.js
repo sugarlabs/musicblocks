@@ -32,7 +32,16 @@ const doRecordButton = activity => {
     }
 
     isExecuting = true;
-    activity._doRecordButton();
+    try {
+        activity._doRecordButton();
+    } catch (error) {
+        isExecuting = false;
+        if (typeof ErrorHandler !== "undefined" && ErrorHandler.recoverable) {
+            ErrorHandler.recoverable(error, { operation: "recording" });
+        } else {
+            console.error(error);
+        }
+    }
 };
 
 /**
@@ -339,6 +348,8 @@ const setupActivityRecorder = activityInstance => {
                     ErrorHandler.recoverable(error, { operation: "recording" });
                     that.textMsg(_("Recording failed: %s").replace(/%s/g, error.message));
                     flag = 0;
+                    start.classList.remove("recording");
+                    cleanupStreams();
                     isExecuting = false;
                     recording();
                 }
