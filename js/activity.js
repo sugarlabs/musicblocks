@@ -2837,8 +2837,11 @@ class Activity {
                 this.toolbar.renderGitDropdownIcon(this.gitDropdownUI);
             }
             this.toolbar.renderMenuIcon(this.showHideAuxMenu);
-
-            this.toolbar.renderHelpIcon(this.showHelp, this.showKeyboardShortcuts);
+            this.toolbar.renderHelpIcon(
+                this.showHelp,
+                this.showKeyboardShortcuts,
+                this.showInteractiveTutorial
+            );
             this.toolbar.renderModeSelectIcon(
                 doSwitchMode,
                 () => doRecordButton(this),
@@ -3238,6 +3241,16 @@ class Activity {
 })();
 
 const activity = new Activity();
+
+// Global helper to open the Interface Tour help card.
+window.openFirstProjectTutorial = function () {
+    const act = ActivityContext.getActivity();
+    if (act && act.openFirstProjectTutorial) {
+        act.openFirstProjectTutorial();
+    } else if (typeof HelpWidget !== "undefined") {
+        HelpWidget.openFirstProjectTutorial(act);
+    }
+};
 
 // Execute initialization once all RequireJS modules are loaded AND DOM is ready
 define(["domReady!", "activity/exporters"].concat(MYDEFINES), (doc, exportersModule) => {

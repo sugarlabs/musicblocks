@@ -1799,5 +1799,12 @@
   "city": "city",
   "day": "day",
   "high": "high",
-  "low": "low"
+  "low": "low",
+  "Interface Tour": "Interface Tour",
+  "A short walkthrough of each part of the Music Blocks window.": "A short walkthrough of each part of the Music Blocks window.",
+  "Start Tour": "Start Tour",
+  "New to Music Blocks? Take a short walkthrough of the window.": "New to Music Blocks? Take a short walkthrough of the window.",
+  "We will highlight the toolbar, palettes, workspace, and other main sections so you know where everything lives.": "We will highlight the toolbar, palettes, workspace, and other main sections so you know where everything lives.",
+  "You only need to click Next — nothing on your project will change.": "You only need to click Next — nothing on your project will change.",
+  "Click Start Tour below to begin!": "Click Start Tour below to begin!"
 }

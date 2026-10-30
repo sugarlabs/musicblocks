@@ -145,6 +145,7 @@ class ToolbarUI {
                 ["shortcutsGuideItem", _("Keyboard shortcuts"), true],
                 ["practiceLessonsItem", _("Practice levels"), true],
                 ["explorerJournalItem", _("Explorer Journal"), true],
+                ["interactiveTutorialGuideItem", _("Interactive Tutorial"), true],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -225,6 +226,7 @@ class ToolbarUI {
                 ["shortcutsGuideItem", _("Keyboard shortcuts"), true],
                 ["practiceLessonsItem", _("Practice levels"), true],
                 ["explorerJournalItem", _("Explorer Journal"), true],
+                ["interactiveTutorialGuideItem", _("Interactive Tutorial"), true],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -1250,17 +1252,19 @@ class ToolbarUI {
      * @param {Function} onclick - The onclick handler for the help icon.
      * @returns {void}
      */
-    renderHelpIcon(onclick, shortcutsOnclick) {
+    renderHelpIcon(onclick, shortcutsOnclick, tutorialOnclick) {
         const helpIcon = docById("helpIcon");
         const helpGuideItem = docById("helpGuideItem");
         const shortcutsGuideItem = docById("shortcutsGuideItem");
         const practiceLessonsItem = docById("practiceLessonsItem");
         const explorerJournalItem = docById("explorerJournalItem");
+        const interactiveTutorialGuideItem = docById("interactiveTutorialGuideItem");
         const hasDropdownMenu =
             !!helpGuideItem ||
             !!shortcutsGuideItem ||
             !!practiceLessonsItem ||
-            !!explorerJournalItem;
+            !!explorerJournalItem ||
+            !!interactiveTutorialGuideItem;
 
         if (helpGuideItem) {
             helpGuideItem.onclick = event => {
@@ -1280,6 +1284,18 @@ class ToolbarUI {
                 }
                 if (shortcutsOnclick) {
                     shortcutsOnclick(this.activity);
+                }
+            };
+        }
+
+        if (interactiveTutorialGuideItem) {
+            interactiveTutorialGuideItem.onclick = event => {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                if (tutorialOnclick) {
+                    tutorialOnclick(this.activity);
                 }
             };
         }
