@@ -2019,10 +2019,10 @@ describe("MusicKeyboard core logic", () => {
 
             keyboard._notesPlayed = Array.from({ length: count }, (_, index) => ({
                 startTime: index,
-                noteOctave: 440 + index,
+                noteOctave: index === 50 ? "drumnull" : 440 + index,
                 objId: null,
                 duration: 1,
-                voice: "piano",
+                voice: index === 50 ? "kick drum" : index < 50 ? "piano" : "guitar",
                 blockNumber: index
             }));
             keyboard._save();
@@ -2030,20 +2030,50 @@ describe("MusicKeyboard core logic", () => {
             return { activity, loadNewBlocks };
         };
 
+        const getSavedNotes = loadNewBlocks =>
+            loadNewBlocks.mock.calls.flatMap(([stack]) =>
+                stack.reduce(
+                    (notes, block) => {
+                        if (Array.isArray(block[1]) && block[1][0] === "voicename") {
+                            notes.voice = block[1][1].value;
+                        } else if (block[1] === "playdrum") {
+                            const drumName = stack.find(entry => entry[0] === block[4][1]);
+                            notes.push({
+                                type: "drum",
+                                value: drumName[1][1].value,
+                                voice: notes.voice
+                            });
+                        } else if (block[1] === "hertz") {
+                            const value = stack.find(entry => entry[0] === block[4][1]);
+                            notes.push({
+                                type: "hertz",
+                                value: value[1][1].value,
+                                voice: notes.voice
+                            });
+                        }
+                        return notes;
+                    },
+                    Object.assign([], { voice: null })
+                )
+            );
+
         test.each([0, 49, 50, 51, 99, 100])(
             "saves %i notes without an empty trailing action",
             count => {
                 const { activity, loadNewBlocks } = saveNotes(count);
                 const expectedActions = Math.ceil(count / 50);
+                const expectedNotes = Array.from({ length: count }, (_, index) =>
+                    index === 50
+                        ? { type: "drum", value: "kick drum", voice: "electronic synth" }
+                        : {
+                              type: "hertz",
+                              value: 440 + index,
+                              voice: index < 50 ? "piano" : "guitar"
+                          }
+                );
 
                 expect(loadNewBlocks).toHaveBeenCalledTimes(expectedActions);
-                expect(
-                    loadNewBlocks.mock.calls.reduce(
-                        (total, [stack]) =>
-                            total + stack.filter(block => block[1] === "newnote").length,
-                        0
-                    )
-                ).toBe(count);
+                expect(getSavedNotes(loadNewBlocks)).toEqual(expectedNotes);
                 expect(
                     count === 0 ||
                         loadNewBlocks.mock.calls.every(([stack]) =>
