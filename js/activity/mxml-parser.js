@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global DOMParser, DRUM_MIDI_MAP, REVERSE_DRUM_MIDI_MAP */
+/* global DOMParser, DRUM_MIDI_MAP, GCD, REVERSE_DRUM_MIDI_MAP */
 
 /* exported setupActivityMxmlParser */
 
@@ -44,13 +44,6 @@ const _MXML_TYPE_DENOMINATOR = {
 };
 
 const _text = (parent, tag) => parent.querySelector(`:scope > ${tag}`)?.textContent ?? null;
-
-const _fractionGcd = (a, b) => {
-    while (b) {
-        [a, b] = [b, a % b];
-    }
-    return Math.abs(a);
-};
 
 const _isUsableFraction = fraction => {
     if (!Array.isArray(fraction) || fraction.length !== 2) {
@@ -94,7 +87,7 @@ const _decimalToFraction = value => {
         return null;
     }
 
-    const divisor = _fractionGcd(numerator, scale);
+    const divisor = GCD(numerator, scale);
 
     if (!Number.isFinite(divisor) || divisor <= 0) {
         return null;
@@ -123,7 +116,7 @@ const _toIntegerFraction = ([numerator, denominator]) => {
         return null;
     }
 
-    const divisor = _fractionGcd(top, bottom);
+    const divisor = GCD(top, bottom);
 
     if (!Number.isFinite(divisor) || divisor <= 0) {
         return null;
@@ -198,8 +191,8 @@ const _addFractions = ([n1, d1], [n2, d2]) => {
 
     // Reduce both fractions before any cross-multiplication. This keeps very
     // large but reducible operands from overflowing during the addition itself.
-    const firstDivisor = _fractionGcd(n1, d1);
-    const secondDivisor = _fractionGcd(n2, d2);
+    const firstDivisor = GCD(n1, d1);
+    const secondDivisor = GCD(n2, d2);
 
     if (
         !Number.isFinite(firstDivisor) ||
@@ -215,7 +208,7 @@ const _addFractions = ([n1, d1], [n2, d2]) => {
     n2 /= secondDivisor;
     d2 /= secondDivisor;
 
-    const common = _fractionGcd(d1, d2);
+    const common = GCD(d1, d2);
 
     if (!Number.isFinite(common) || common <= 0) {
         return _addFractionsWithoutCrossMultiplication(left, right);
@@ -228,7 +221,7 @@ const _addFractions = ([n1, d1], [n2, d2]) => {
         return _addFractionsWithoutCrossMultiplication(left, right);
     }
 
-    const divisor = _fractionGcd(numerator, denominator);
+    const divisor = GCD(numerator, denominator);
 
     if (!Number.isFinite(divisor) || divisor <= 0) {
         return _addFractionsWithoutCrossMultiplication(left, right);

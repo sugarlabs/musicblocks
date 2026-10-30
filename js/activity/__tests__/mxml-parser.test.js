@@ -11,6 +11,8 @@
 
 "use strict";
 
+global.GCD = require("../../utils/utils-logic.js").GCD;
+
 const { setupActivityMxmlParser } = require("../mxml-parser.js");
 
 // Globals in the browser (js/utils/musicutils-constants.js); the drum-name
