@@ -1794,8 +1794,14 @@ function MusicKeyboard(activity) {
             }
             return ans;
         };
+
         const actionGroupInterval = 50;
-        const actionGroups = parseInt(selectedNotes.length / actionGroupInterval, 10) + 1;
+        const actionGroups = Math.ceil(selectedNotes.length / actionGroupInterval);
+
+        if (actionGroups === 0) {
+            activity.textMsg(_("No notes to save."), 3000);
+            return;
+        }
 
         for (let actionGroup = 0; actionGroup < actionGroups; actionGroup++) {
             const currentSelectedNotes = selectedNotes.slice(

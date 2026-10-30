@@ -2008,6 +2008,53 @@ describe("MusicKeyboard core logic", () => {
         });
     });
 
+    describe("saving notes in bounded action groups", () => {
+        const saveNotes = count => {
+            const loadNewBlocks = jest.fn();
+            const activity = {
+                blocks: { blockList: [], loadNewBlocks },
+                textMsg: jest.fn()
+            };
+            const keyboard = new MusicKeyboard(activity);
+
+            keyboard._notesPlayed = Array.from({ length: count }, (_, index) => ({
+                startTime: index,
+                noteOctave: 440 + index,
+                objId: null,
+                duration: 1,
+                voice: "piano",
+                blockNumber: index
+            }));
+            keyboard._save();
+
+            return { activity, loadNewBlocks };
+        };
+
+        test.each([0, 49, 50, 51, 99, 100])(
+            "saves %i notes without an empty trailing action",
+            count => {
+                const { activity, loadNewBlocks } = saveNotes(count);
+                const expectedActions = Math.ceil(count / 50);
+
+                expect(loadNewBlocks).toHaveBeenCalledTimes(expectedActions);
+                expect(
+                    loadNewBlocks.mock.calls.reduce(
+                        (total, [stack]) =>
+                            total + stack.filter(block => block[1] === "newnote").length,
+                        0
+                    )
+                ).toBe(count);
+                expect(
+                    count === 0 ||
+                        loadNewBlocks.mock.calls.every(([stack]) =>
+                            stack.some(block => block[1] === "newnote")
+                        )
+                ).toBe(true);
+                expect(activity.textMsg).toHaveBeenCalled();
+            }
+        );
+    });
+
     describe("Web MIDI cleanup on widget close", () => {
         test("removes MIDI listeners this keyboard added when widgetWindow.onclose is called", async () => {
             const mockInput1 = { addEventListener: jest.fn(), removeEventListener: jest.fn() };
