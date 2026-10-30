@@ -152,11 +152,20 @@ describe("StringHelper", () => {
                 expect(elem.textContent).toBe("PrefixGit Planet");
             });
 
-            it("should set placeholder attribute for search input", () => {
-                document.body.innerHTML = '<input id="global-search" />';
+            it("should set translated placeholders for project search inputs", () => {
+                document.body.innerHTML = `
+                    <input id="local-search" />
+                    <input id="global-search" />
+                `;
+
                 helper.init();
-                const elem = document.getElementById("global-search");
-                expect(elem.getAttribute("placeholder")).toBe("Search for projects...");
+
+                expect(document.getElementById("local-search").getAttribute("placeholder")).toBe(
+                    "Search for projects"
+                );
+                expect(document.getElementById("global-search").getAttribute("placeholder")).toBe(
+                    "Search for projects"
+                );
             });
 
             it("should set accessible labels for project search inputs", () => {

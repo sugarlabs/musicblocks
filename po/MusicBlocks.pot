@@ -8625,7 +8625,10 @@ msgid "Global"
 msgstr ""
 
 #: planet/js/StringHelper.js:35
-msgid "Search for a project"
+#: planet/js/StringHelper.js:36
+#: planet/js/StringHelper.js:37
+#: planet/js/StringHelper.js:38
+msgid "Search for projects"
 msgstr ""
 
 #: planet/js/StringHelper.js:39
