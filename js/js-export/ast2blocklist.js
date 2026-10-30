@@ -132,21 +132,32 @@ class AST2BlockList {
             statement.alternate.body[0].argument.type === "MemberExpression" &&
             statement.alternate.body[0].argument.object.name === "mouse" &&
             statement.alternate.body[0].argument.property.name === "ENDFLOW";
-        let uses = 0;
-        const count = node => {
-            if (Array.isArray(node)) {
-                node.forEach(count);
-            } else if (node !== null && typeof node === "object") {
-                if (node.type === "Identifier" && node.name === name) uses++;
-                Object.values(node).forEach(count);
-            }
+        // The guard can sit anywhere in the action body, not just at the top
+        // level: a Stop nested in an if or a switch case gets its guard nested
+        // the same way, so look through every statement list in the function.
+        const walk = (node, replace) => {
+            let uses = 0;
+            let found = 0;
+            const visit = n => {
+                if (Array.isArray(n)) {
+                    for (let i = 0; i < n.length; i++) {
+                        if (n[i] !== null && typeof n[i] === "object" && generated(n[i])) {
+                            found++;
+                            if (replace) n[i] = n[i].consequent.body[0];
+                        }
+                        visit(n[i]);
+                    }
+                } else if (n !== null && typeof n === "object") {
+                    if (n.type === "Identifier" && n.name === name) uses++;
+                    Object.values(n).forEach(visit);
+                }
+            };
+            visit(node);
+            return { uses, found };
         };
-        count(fn.body);
-        const found = fn.body.body.filter(generated);
-        if (found.length !== uses) return;
-        fn.body.body = fn.body.body.map(statement =>
-            generated(statement) ? statement.consequent.body[0] : statement
-        );
+        const { uses, found } = walk(fn.body, false);
+        if (found === 0 || found !== uses) return;
+        walk(fn.body, true);
         fn.params.splice(2, 1);
     }
 
