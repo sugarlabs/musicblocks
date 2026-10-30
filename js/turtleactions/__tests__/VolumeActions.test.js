@@ -58,10 +58,10 @@ describe("setupVolumeActions", () => {
 
         global.last = jest.fn(array => array[array.length - 1]);
         global._ = jest.fn(msg => msg);
-        global.VOICENAMES = {
-            Piano: ["Piano", "piano"],
-            Violin: ["Violin", "violin"]
-        };
+        global.VOICENAMES = [
+            ["piano", "piano"],
+            ["violin", "violin"]
+        ];
         global.DRUMNAMES = {
             Kick: ["Kick", "kick"],
             Snare: ["Snare", "snare"]
@@ -1035,6 +1035,25 @@ describe("setupVolumeActions", () => {
             targetTurtle.singer.synthVolume.piano = [50, 70];
 
             expect(Singer.VolumeActions.getSynthVolume("piano", 0)).toBe(70);
+        });
+
+        it("should resolve display names before getting synth volume", () => {
+            targetTurtle.singer.synthVolume.piano = [50, 70];
+            targetTurtle.singer.synthVolume.Piano = [50, 60];
+
+            expect(Singer.VolumeActions.getSynthVolume("Piano", 0)).toBe(70);
+        });
+
+        it("should get synth volume for a stored custom sample key", () => {
+            targetTurtle.singer.synthVolume.customsample_bell = [50, 70];
+
+            expect(Singer.VolumeActions.getSynthVolume("customsample_bell", 0)).toBe(70);
+        });
+
+        it("should return 50 for empty or non-string synth names", () => {
+            expect(Singer.VolumeActions.getSynthVolume("", 0)).toBe(50);
+            expect(Singer.VolumeActions.getSynthVolume(null, 0)).toBe(50);
+            expect(Singer.VolumeActions.getSynthVolume(42, 0)).toBe(50);
         });
 
         it("should return 50 when getting volume for non-existent synth", () => {
