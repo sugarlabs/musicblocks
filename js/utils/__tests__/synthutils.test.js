@@ -331,6 +331,92 @@ describe("Utility Functions (logic-only)", () => {
         });
     });
 
+    describe("Timbre synth capture", () => {
+        const name = "capture-test";
+        let original, source, create;
+        beforeEach(() => {
+            loadSamples();
+            instruments[turtle] ||= {};
+            original = { dispose: jest.fn() };
+            source = [0, "old-source"];
+            instruments[turtle][name] = original;
+            instrumentsSource[name] = source;
+            create = jest
+                .spyOn(Synth, "_createCustomSynth")
+                .mockImplementation(() => ({ dispose: jest.fn() }));
+        });
+        afterEach(() => {
+            create.mockRestore();
+            delete instruments[turtle][name];
+            delete instrumentsSource[name];
+        });
+        it("restores the original node and source and disposes rejected replacements", async () => {
+            const capture = Synth.beginTimbreCapture(turtle, name);
+            await createSynth(turtle, name, "fmsynth", {});
+            const rejected = instruments[turtle][name];
+            expect(original.dispose).not.toHaveBeenCalled();
+            capture.abort();
+            capture.abort();
+            expect(instruments[turtle][name]).toBe(original);
+            expect(instrumentsSource[name]).toBe(source);
+            expect(rejected.dispose).toHaveBeenCalledTimes(1);
+            expect(original.dispose).not.toHaveBeenCalled();
+        });
+        it("disposes superseded candidates and the original only when committed", async () => {
+            const capture = Synth.beginTimbreCapture(turtle, name);
+            await createSynth(turtle, name, "fmsynth", {});
+            const first = instruments[turtle][name];
+            await createSynth(turtle, name, "amsynth", {});
+            const accepted = instruments[turtle][name];
+            expect(first.dispose).toHaveBeenCalledTimes(1);
+            expect(original.dispose).not.toHaveBeenCalled();
+            capture.commit();
+            capture.abort();
+            expect(original.dispose).toHaveBeenCalledTimes(1);
+            expect(accepted.dispose).not.toHaveBeenCalled();
+            expect(instruments[turtle][name]).toBe(accepted);
+        });
+        it("removes a rejected new instrument when none existed before", async () => {
+            delete instruments[turtle][name];
+            delete instrumentsSource[name];
+            const capture = Synth.beginTimbreCapture(turtle, name);
+            await createSynth(turtle, name, "fmsynth", {});
+            const rejected = instruments[turtle][name];
+            capture.abort();
+            expect(instruments[turtle][name]).toBeUndefined();
+            expect(instrumentsSource[name]).toBeUndefined();
+            expect(rejected.dispose).toHaveBeenCalledTimes(1);
+        });
+        it("keeps the original when a capture makes no synth change", () => {
+            const capture = Synth.beginTimbreCapture(turtle, name);
+            capture.commit();
+            expect(instruments[turtle][name]).toBe(original);
+            expect(original.dispose).not.toHaveBeenCalled();
+        });
+        it("rolls nested captures back in reverse order without disposing retained nodes", async () => {
+            const outer = Synth.beginTimbreCapture(turtle, name);
+            const inner = Synth.beginTimbreCapture(turtle, name);
+            await createSynth(turtle, name, "fmsynth", {});
+            const rejected = instruments[turtle][name];
+            inner.abort();
+            expect(original.dispose).not.toHaveBeenCalled();
+            outer.abort();
+            expect(instruments[turtle][name]).toBe(original);
+            expect(original.dispose).not.toHaveBeenCalled();
+            expect(rejected.dispose).toHaveBeenCalledTimes(1);
+        });
+        it("does not resurrect retained nodes after global disposal", async () => {
+            const capture = Synth.beginTimbreCapture(turtle, name);
+            await createSynth(turtle, name, "fmsynth", {});
+            const replacement = instruments[turtle][name];
+            Synth.disposeAllInstruments();
+            capture.abort();
+            expect(instruments[turtle][name]).toBeUndefined();
+            expect(original.dispose).toHaveBeenCalledTimes(1);
+            expect(replacement.dispose).toHaveBeenCalledTimes(1);
+        });
+    });
+
     describe("loadSynth", () => {
         it("it should loads a synth based on the user's input, creating and setting volume for the specified turtle.", async () => {
             // Use a built-in synth to avoid async sample loading timeout

@@ -5610,7 +5610,6 @@ class Blocks {
          * @returns {number} this request's load token
          */
         this.loadNewBlocks = blockObjs => {
-            this.activity.logo?.invalidateMultisampleRun?.();
             const loadToken = ++this._nextLoadToken;
 
             // Invalid input is reported by _loadNewBlocksNow when idle. Do not
