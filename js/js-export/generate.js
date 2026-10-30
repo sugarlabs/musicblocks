@@ -333,6 +333,7 @@ class JSGenerate {
                 ASTUtils.getBoxNames([...JSGenerate.actionTrees, ...JSGenerate.startTrees])
             );
             ASTUtils.setStoppingActions(JSGenerate.actionNames, JSGenerate.actionTrees);
+            ASTUtils.setSharedBoxes([...JSGenerate.actionTrees, ...JSGenerate.startTrees]);
             for (let i = 0; i < JSGenerate.actionTrees.length; i++) {
                 JSGenerate.AST["body"].splice(
                     i,

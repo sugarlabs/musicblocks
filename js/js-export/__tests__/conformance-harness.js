@@ -92,8 +92,7 @@ function resolveProtoBlock(name, connectionsLength = 0) {
             "voicename",
             "drumname",
             "namedbox",
-            "namedarg",
-            "box"
+            "namedarg"
         ].includes(name) ||
         JSInterface.isGetter(name) ||
         JSInterface.methodReturns(name)
@@ -120,7 +119,7 @@ function resolveProtoBlock(name, connectionsLength = 0) {
     ) {
         return { style: "arg", args: 2 };
     }
-    if (["neg", "not", "sqrt", "abs", "int", "round", "sin", "cos", "tan"].includes(name)) {
+    if (["neg", "not", "sqrt", "abs", "int", "round", "sin", "cos", "tan", "box"].includes(name)) {
         return { style: "arg", args: 1 };
     }
     if (name === "pitch") {

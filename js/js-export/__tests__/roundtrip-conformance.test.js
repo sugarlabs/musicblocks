@@ -189,6 +189,24 @@ MusicBlocks.run();`;
             });
         });
 
+        test.each(["box1", ""])(
+            "normalizes a box block named by text %p to the same node as a namedbox",
+            name => {
+                const indexed = indexBlockList([
+                    [0, "box", 0, 0, [null, 1]],
+                    [1, ["text", { value: name }], 0, 0, [0]],
+                    [2, ["namedbox", { value: name }], 0, 0, [null]]
+                ]);
+                expect(normalizeArgumentNode(0, indexed)).toEqual({
+                    name: "namedbox",
+                    value: name
+                });
+                expect(normalizeArgumentNode(2, indexed)).toEqual(
+                    normalizeArgumentNode(0, indexed)
+                );
+            }
+        );
+
         test("normalizes argument trees while skipping horizontal spacers (hspace)", () => {
             const blocks = [
                 [0, "start", 200, 200, [null, 1, null]],
