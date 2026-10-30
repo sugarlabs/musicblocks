@@ -27,6 +27,7 @@
 const ModeWidget = require("../modewidget.js");
 const ManagedTimer = require("../../utils/ManagedTimer.js");
 global.ManagedTimer = ManagedTimer;
+global.makeKeyboardAccessible = require("../../utils/dom-helpers.js").makeKeyboardAccessible;
 
 // --- 1. Global Mocks ---
 global._ = msg => msg;

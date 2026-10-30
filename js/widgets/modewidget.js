@@ -21,7 +21,7 @@
     rotateSliceAngles,
     scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes,
     isUnsafeObjectKey, ManagedTimer, readTextFile, downloadTextFile, createSharePopup,
-    closeSharePopup
+    closeSharePopup, makeKeyboardAccessible
  */
 
 /*
@@ -722,14 +722,23 @@ class ModeWidget {
         bar.style.gap = "8px";
         bar.style.padding = "6px 16px";
 
-        // Icon button with MB theme styling (wfbtItem class).
+        /**
+         * Creates an accessible action button, or a decorative icon when no action is provided.
+         * @param {string} icon - Header icon filename.
+         * @param {string} label - Translated control label.
+         * @param {Function|null} onclick - Action to activate with mouse or keyboard.
+         * @param {string} [imgFilter] - Optional CSS image filter.
+         * @returns {HTMLDivElement} The styled control or decorative icon.
+         */
         const iconButton = (icon, label, onclick, imgFilter) => {
             const btn = document.createElement("div");
             btn.className = "wfbtItem";
             btn.title = label;
-            btn.setAttribute("role", "button");
-            btn.setAttribute("aria-label", label);
-            btn.setAttribute("tabindex", "0");
+            if (typeof onclick === "function") {
+                makeKeyboardAccessible(btn, label);
+            } else {
+                btn.setAttribute("aria-hidden", "true");
+            }
             btn.style.flexShrink = "0";
             btn.style.display = "flex";
             btn.style.alignItems = "center";
@@ -778,6 +787,7 @@ class ModeWidget {
         });
 
         const tuningGroup = document.createElement("div");
+        tuningGroup.className = "mode-temperament-control";
         tuningGroup.style.position = "relative";
         tuningGroup.style.display = "inline-flex";
         tuningGroup.style.alignItems = "center";
