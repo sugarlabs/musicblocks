@@ -113,7 +113,13 @@ describe("ReflectionBackend", () => {
 
             const data = await reflection._postJSON("/chat", {});
 
-            expect(data).toEqual({ error: "Failed to send message" });
+            expect(data).toEqual({ error: "Failed to send message." });
+        });
+
+        test("turns an unexpected response without a response string into an error reply", async () => {
+            answer = { detail: "Not Found" };
+            const data = await reflection._postJSON("/chat", {});
+            expect(data).toEqual({ error: "Failed to send message." });
         });
     });
 

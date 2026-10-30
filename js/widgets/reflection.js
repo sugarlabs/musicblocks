@@ -193,7 +193,9 @@ class ReflectionMatrix {
             user: "YOU",
             meta: "ROHAN",
             music: "BEETHOVEN",
-            code: "ALAN"
+            code: "ALAN",
+            // The Summary report, so it is not shown or saved as a mentor's turn.
+            report: "REPORT"
         };
 
         /**
@@ -225,6 +227,12 @@ class ReflectionMatrix {
          * @type {number}
          */
         this.summarizedUpTo = 0;
+
+        /**
+         * The id of the project this conversation is about
+         * @type {string|undefined}
+         */
+        this._projectId = undefined;
 
         this.startChatTypingTimeout = null;
         this.dotsInterval = null;
@@ -263,6 +271,12 @@ class ReflectionMatrix {
         this.isProcessingPendingMessage = false;
 
         /**
+         * The user turn in chatHistory whose reply is still on its way
+         * @type {Object|null}
+         */
+        this._unansweredTurn = null;
+
+        /**
          * Whether a project-code refresh is in flight
          * @type {boolean}
          */
@@ -284,16 +298,32 @@ class ReflectionMatrix {
      */
 
     init(activity) {
-        this.activity = activity;
-        if (this.isOpen) {
-            // The block ran again with the widget still open.
-            this._endSession();
+        // Running the block again while the window is open calls init again.
+        // The old session is closed first, or its unanswered request and
+        // typing indicator would leave the new window blank.
+        if (this.isOpen && this.widgetWindow) {
+            this.widgetWindow.onclose();
         }
+
+        this.activity = activity;
         this.isOpen = true;
         this._lifecycle.mount();
         this.isMaximized = false;
         this.activity.isInputON = true;
         this.PORT = ReflectionMatrix.backendURL();
+
+        // The chat is kept between opens, but it is about one project. After the
+        // child starts or opens another, the old chat and description would make
+        // the mentor talk about blocks that are gone, so the new project gets a
+        // new conversation.
+        const projectId = this._lifecycle.projectId();
+        if (this.chatHistory.length > 0 && projectId !== this._projectId) {
+            this.chatHistory = [];
+            this.projectAlgorithm = "";
+            this.code = "";
+            this.triggerFirst = false;
+        }
+        this._projectId = projectId;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "reflection", "reflection");
         this.widgetWindow = widgetWindow;
@@ -301,6 +331,15 @@ class ReflectionMatrix {
         widgetWindow.show();
         widgetWindow.getWidgetBody().style.height = ReflectionMatrix.OUTERWINDOWHEIGHT;
         widgetWindow.getWidgetBody().style.width = ReflectionMatrix.OUTERWINDOWWIDTH;
+
+        // The chat has a fixed size, so without this it stays small in a
+        // maximized window.
+        widgetWindow.onmaximize = () => {
+            const maximized = widgetWindow.isMaximized();
+            const body = widgetWindow.getWidgetBody();
+            body.style.width = maximized ? "100%" : ReflectionMatrix.OUTERWINDOWWIDTH;
+            body.style.height = maximized ? "100%" : ReflectionMatrix.OUTERWINDOWHEIGHT;
+        };
 
         widgetWindow.onclose = () => this._closeWindow();
 

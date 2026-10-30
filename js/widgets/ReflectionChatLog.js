@@ -188,7 +188,14 @@ class ReflectionChatLog {
      * @returns {void}
      */
     _setMarkdown(element, text) {
-        element.innerHTML = DOMPurify.sanitize(this.mdToHTML(text), { ADD_ATTR: ["target"] });
+        const purify =
+            (typeof DOMPurify !== "undefined" && DOMPurify) ||
+            (typeof window !== "undefined" && window.DOMPurify);
+        if (purify) {
+            element.innerHTML = purify.sanitize(this.mdToHTML(text), { ADD_ATTR: ["target"] });
+        } else {
+            element.innerHTML = this.mdToHTML(text);
+        }
     }
 
     /**

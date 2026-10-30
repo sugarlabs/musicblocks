@@ -34,11 +34,13 @@ global.ReflectionReport = require("../ReflectionReport.js");
 global.ReflectionMarkdown = require("../ReflectionMarkdown.js");
 const ReflectionMatrix = require("../reflection.js");
 global.ReflectionMatrix = ReflectionMatrix;
+const { aiWidgetConsent } = require("../../utils/ai-widget-lifecycle");
 
 const ReflectionSession = global.ReflectionSession;
 const METHODS = [
     "processPendingMessages",
     "startChatSession",
+    "showConsentBanner",
     "updateProjectCode",
     "getAnalysis",
     "botReplyDiv",
@@ -78,6 +80,7 @@ describe("ReflectionSession", () => {
     };
 
     beforeEach(() => {
+        aiWidgetConsent.given = true;
         const body = document.createElement("div");
         widgetWindow = {
             clear: jest.fn(),
@@ -193,7 +196,7 @@ describe("ReflectionSession", () => {
 
         test("reports a failed reply", async () => {
             const reflection = await open();
-            answers["/chat"] = { error: "Failed to send message" };
+            answers["/chat"] = { error: "Failed to send message." };
 
             await send(reflection, "Hello");
 
@@ -267,7 +270,7 @@ describe("ReflectionSession", () => {
         test("does not save a failed analysis", async () => {
             localStorage.setItem("musicblocks_analysis", "Last time");
             const reflection = await open(history(10));
-            answers["/analysis"] = { error: "Failed to send message" };
+            answers["/analysis"] = { error: "Failed to send message." };
 
             await reflection.getAnalysis();
 

@@ -111,10 +111,15 @@ class ReflectionWindow {
         this.input.className = "input-query";
         this.input.placeholder = _("Type a message");
         this.input.style.marginLeft = "10px";
+        // The server refuses longer messages. A refused message stays in the
+        // history, and one over 4000 characters made every later request fail.
+        this.input.maxLength = 2000;
         this.inputContainer.appendChild(this.input);
 
         this.input.onkeydown = e => {
-            if (e.key === "Enter") {
+            // Enter also confirms a word typed with an input method (Japanese,
+            // Chinese), which must not send the half-typed message.
+            if (e.key === "Enter" && !e.isComposing && e.keyCode !== 229) {
                 this.sendMessage();
             }
         };
@@ -137,6 +142,15 @@ class ReflectionWindow {
      */
     _closeWindow() {
         this.isOpen = false;
+        // Its request is aborted below, so the message would stay in the
+        // history with no reply and no notice.
+        if (this._unansweredTurn) {
+            const index = this.chatHistory.indexOf(this._unansweredTurn);
+            if (index !== -1) this.chatHistory.splice(index, 1);
+            this._unansweredTurn = null;
+        }
+        // Closed before the first reply came, so the next open has to ask again.
+        if (this.chatHistory.length === 0) this.triggerFirst = false;
         this.activity.isInputON = false;
         this._endSession();
         this.widgetWindow.destroy();

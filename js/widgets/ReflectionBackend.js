@@ -53,12 +53,18 @@ class ReflectionBackend {
             return Promise.resolve(null);
         }
 
-        return this._lifecycle.postJSON(
-            `${this.PORT}${path}`,
-            payload,
-            ReflectionMatrix.REQUEST_TIMEOUT,
-            "Failed to send message"
-        );
+        // With the full stop, so _() finds the translation.
+        const failed = "Failed to send message.";
+        return this._lifecycle
+            .postJSON(`${this.PORT}${path}`, payload, ReflectionMatrix.REQUEST_TIMEOUT, failed)
+            .then(data => {
+                // Every route answers with a response or an error. Any other
+                // reply, such as {"detail": "Not Found"}, showed as an empty message.
+                if (data && !data.error && typeof data.response !== "string") {
+                    return { error: failed };
+                }
+                return data;
+            });
     }
 
     /**

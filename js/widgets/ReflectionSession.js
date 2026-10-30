@@ -48,10 +48,12 @@ class ReflectionSession {
         while (this.pendingMessages.length > 0 && this._isWidgetActive()) {
             const nextMessage = this.pendingMessages.shift();
 
-            this.chatHistory.push({
+            const turn = {
                 role: "user",
                 content: nextMessage.text
-            });
+            };
+            this.chatHistory.push(turn);
+            this._unansweredTurn = turn;
 
             const reply = await this.generateBotReply(
                 nextMessage.text,
@@ -63,6 +65,7 @@ class ReflectionSession {
             // The widget was reopened while this reply was in flight. Its queue
             // and flag belong to the new session now, so leave both alone.
             if (!this._isSameMount(generation)) return;
+            this._unansweredTurn = null;
 
             if (!this._isWidgetActive() || !reply) {
                 continue;
@@ -70,7 +73,8 @@ class ReflectionSession {
 
             if (reply.error) {
                 this.hideTypingIndicator();
-                this.activity.errorMsg(_("Failed to send message."), 3000);
+                // The server's text says what to do, such as to wait a minute.
+                this.activity.errorMsg(_(reply.error), 3000);
                 continue;
             }
 
@@ -86,6 +90,13 @@ class ReflectionSession {
      */
     async startChatSession() {
         if (this.triggerFirst === true || !this._isWidgetActive()) return;
+
+        // This is the first request that sends the project, so it asks first,
+        // as the AI Debugger does. Agreeing calls this again.
+        if (!this._lifecycle.hasConsent()) {
+            this.showConsentBanner();
+            return;
+        }
 
         const generation = this._lifecycle.generation;
         this.triggerFirst = true;
@@ -127,6 +138,30 @@ class ReflectionSession {
     }
 
     /**
+     * Asks before the project is sent to the server, with the AI Debugger's
+     * banner. Agreeing starts the session. Declining sends nothing.
+     * @returns {void}
+     */
+    showConsentBanner() {
+        this._lifecycle.showConsentBanner(this.chatLog, {
+            classPrefix: "reflection",
+            text: _(
+                "Reflection will send your current project data to an external server for analysis. Your project blocks and structure will be shared with: "
+            ),
+            url: this.PORT,
+            onAgree: () => this.startChatSession(),
+            onDecline: () => {
+                const notice = document.createElement("div");
+                notice.className = "message-container";
+                notice.textContent = _(
+                    "Nothing was sent. Your project stays here until you agree."
+                );
+                this.chatLog.appendChild(notice);
+            }
+        });
+    }
+
+    /**
      * Updates the project code and retrieves the new algorithm from the server.
      * @returns {Promise<void>}
      */
@@ -135,10 +170,17 @@ class ReflectionSession {
             return;
         }
 
-        // The chat never started, so there is no code to compare against yet.
-        if (this.code === "") {
-            return this.startChatSession();
+        // Refresh sends the project too. Before consent there is no first
+        // description yet, so this asks and then starts the session.
+        if (!this._lifecycle.hasConsent()) {
+            this.showConsentBanner();
+            return;
         }
+
+        // The first description is still on its way and describes the same
+        // project. The typing indicator shows only after a second, so the
+        // check above does not catch an early click.
+        if (this.triggerFirst && this.chatHistory.length === 0) return;
 
         const generation = this._lifecycle.generation;
         this._isUpdatingProjectCode = true;
@@ -163,6 +205,9 @@ class ReflectionSession {
             }
 
             if (!data.error) {
+                // Hidden still if the first description failed and this
+                // refresh is the first reply.
+                this.inputContainer.style.display = "flex";
                 if (data.algorithm !== "unchanged") {
                     this.projectAlgorithm = data.algorithm; // update algorithm
                     this.code = code;
@@ -185,8 +230,15 @@ class ReflectionSession {
      * @returns {Promise<void>}
      */
     async getAnalysis() {
-        const tooShort = this.chatHistory.length < ReflectionMatrix.ANALYSIS_MIN_MESSAGES;
-        if (tooShort || this.typingDiv || !this._isWidgetActive()) return;
+        if (this.typingDiv || !this._isWidgetActive()) return;
+        if (this.chatHistory.length < ReflectionMatrix.ANALYSIS_MIN_MESSAGES) {
+            // The button is grayed out, but pressing it said nothing at all.
+            this.activity.textMsg(
+                _("Chat a little longer first. The summary needs at least 10 messages."),
+                3000
+            );
+            return;
+        }
         const generation = this._lifecycle.generation;
         this.showTypingIndicator(_("Analyzing"));
         const data = await this.generateAnalysis();
@@ -194,7 +246,7 @@ class ReflectionSession {
 
         this.hideTypingIndicator();
         if (data && this._isWidgetActive()) {
-            this.botReplyDiv(data, false, true);
+            this.botReplyDiv(data, false, true, "report");
             // Expected errors in data.error:
             // 1. Server-side errors returned by the API (e.g., 500s or rate limits).
             // 2. Network failures caught by generateAnalysis().
@@ -208,10 +260,13 @@ class ReflectionSession {
      * Appends the bot's reply to the chat log.
      * @param {string} message - The bot's reply message.
      * @param {boolean} user_query - Flag indicating if the message is from the user.
+     * @param {boolean} md - Whether the reply should be rendered as markdown.
+     * @param {string} [role] - Who the reply is from. The selected mentor,
+     *     or "report" for the Summary.
      * @returns {Promise<void>}
      */
-    async botReplyDiv(message, user_query = true, md = false) {
-        const replyMentor = this.AImentor;
+    async botReplyDiv(message, user_query = true, md = false, role = this.AImentor) {
+        const replyMentor = role;
         const generation = this._lifecycle.generation;
         let reply;
         // check if message is from user or bot
@@ -235,7 +290,7 @@ class ReflectionSession {
 
         if (reply.error) {
             this.hideTypingIndicator();
-            this.activity.errorMsg(_("Failed to send message."), 3000);
+            this.activity.errorMsg(_(reply.error), 3000);
             return;
         }
 
