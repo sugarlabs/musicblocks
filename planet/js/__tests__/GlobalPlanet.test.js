@@ -63,12 +63,9 @@ describe("GlobalPlanet", () => {
             <div id="tagscontainer" style="display:block;"></div>
             <select id="sort-select"><option value="RECENT">Recent</option></select>
             <input id="global-search" value="" />
-            <input id="global-search-2" value="" />
             <div id="search-close" style="display:none;"></div>
-            <div id="search-close-2" style="display:none;"></div>
             <div id="global-tab"></div>
             <div id="local-tab"></div>
-            <div id="searchcontainer-one" style="display:block;"></div>
             <div id="globaltitle"></div>
             <div id="globalcontents"></div>
         `;
@@ -745,53 +742,12 @@ describe("GlobalPlanet", () => {
             expect(gp.search).toHaveBeenCalledTimes(1);
         });
 
-        it("should handle Enter on the secondary global search", () => {
-            const input = document.getElementById("global-search-2");
-
-            gp.searchDebounce = setTimeout(() => gp.search(), 300);
-
-            input.value = " drums ";
-            input.dispatchEvent(
-                new KeyboardEvent("keydown", {
-                    key: "Enter",
-                    bubbles: true
-                })
-            );
-
-            expect(gp.searchString).toBe("drums");
-            expect(gp.search).toHaveBeenCalledTimes(1);
-
-            jest.advanceTimersByTime(300);
-
-            expect(gp.search).toHaveBeenCalledTimes(1);
-        });
-
         it("should cancel pending debounce when primary search is cleared", () => {
             const input = document.getElementById("global-search");
             const close = document.getElementById("search-close");
 
             input.value = "piano";
             input.dispatchEvent(new Event("input", { bubbles: true }));
-
-            close.dispatchEvent(new Event("click", { bubbles: true }));
-
-            expect(input.value).toBe("");
-            expect(gp.searchString).toBe("");
-            expect(close.style.display).toBe("none");
-            expect(gp.search).toHaveBeenCalledTimes(1);
-
-            jest.advanceTimersByTime(300);
-
-            expect(gp.search).toHaveBeenCalledTimes(1);
-        });
-
-        it("should cancel pending debounce when secondary search is cleared", () => {
-            const input = document.getElementById("global-search-2");
-            const close = document.getElementById("search-close-2");
-
-            gp.searchDebounce = setTimeout(() => gp.search(), 300);
-            input.value = "drums";
-            gp.searchString = "drums";
 
             close.dispatchEvent(new Event("click", { bubbles: true }));
 

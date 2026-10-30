@@ -825,29 +825,12 @@ class GlobalPlanet {
                 }
             });
 
-            register("global-search-2", "keydown", function (evt) {
-                if (evt.key === "Enter") {
-                    clearTimeout(this.searchDebounce);
-                    this.searchString = document.getElementById("global-search-2").value.trim();
-                    this.search();
-                }
-            });
-
             register("search-close", "click", function (evt) {
                 clearTimeout(this.searchDebounce);
 
                 document.getElementById("global-search").value = "";
                 this.searchString = "";
                 document.getElementById("search-close").style.display = "none";
-                this.search();
-            });
-
-            register("search-close-2", "click", function (evt) {
-                clearTimeout(this.searchDebounce);
-
-                document.getElementById("global-search-2").value = "";
-                this.searchString = "";
-                document.getElementById("search-close-2").style.display = "none";
                 this.search();
             });
 
