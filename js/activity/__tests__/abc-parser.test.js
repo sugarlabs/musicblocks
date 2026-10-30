@@ -1349,3 +1349,51 @@ describe("Meters abcjs reports by name rather than by number", () => {
         expect(blocksOfType(blocks, "newnote")).toHaveLength(3);
     });
 });
+
+// ---------------------------------------------------------------------------
+// Ties (C2- | C2) — parsed by the real abcjs
+// ---------------------------------------------------------------------------
+describe("Ties", () => {
+    const abcjs = require("abcjs");
+    const importAbc = abc =>
+        parseAndCapture(abcjs.parseOnly(`X:1\nM:4/4\nL:1/4\nK:C\n${abc}\n`)[0]);
+    const noteValues = blocks => {
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        return blocksOfType(blocks, "newnote").map(note => {
+            const divide = byId.get(note[4][1]);
+            return byId.get(divide[4][1])[1][1].value / byId.get(divide[4][2])[1][1].value;
+        });
+    };
+
+    test("a tie across a bar line imports as one held note", async () => {
+        const blocks = await importAbc("C2- | C2 D2 |");
+
+        expect(pitchNames(blocks)).toEqual([
+            ["C", 4],
+            ["D", 4]
+        ]);
+        expect(noteValues(blocks)).toEqual([1, 0.5]);
+    });
+
+    test("a chain of ties imports as one note", async () => {
+        const blocks = await importAbc("D- D- D E |");
+
+        expect(pitchNames(blocks)).toEqual([
+            ["D", 4],
+            ["E", 4]
+        ]);
+        expect(noteValues(blocks)).toEqual([0.75, 0.25]);
+    });
+
+    test("a tie mark into a different pitch leaves both notes", async () => {
+        const blocks = await importAbc("C- D E F |");
+
+        expect(pitchNames(blocks).map(([name]) => name)).toEqual(["C", "D", "E", "F"]);
+    });
+
+    test("a tie is not folded across a repeat bar line", async () => {
+        const blocks = await importAbc("|: C2 D2- :| D2 E2 |");
+
+        expect(pitchNames(blocks).map(([name]) => name)).toEqual(["C", "D", "D", "E"]);
+    });
+});
