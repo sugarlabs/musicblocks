@@ -713,11 +713,43 @@ describe("GlobalPlanet", () => {
             input.value = " piano ";
             input.dispatchEvent(new Event("input", { bubbles: true }));
 
-            expect(gp.searchString).toBe("piano");
+            expect(gp.searchString).toBe("");
             expect(gp.search).not.toHaveBeenCalled();
 
             jest.advanceTimersByTime(300);
 
+            expect(gp.searchString).toBe("piano");
+            expect(gp.searchDebounce).toBeNull();
+            expect(gp.search).toHaveBeenCalledTimes(1);
+        });
+
+        it("should not let an in-flight search bypass the debounce", () => {
+            const input = document.getElementById("global-search");
+
+            gp.searchString = "old-query";
+            gp.oldSearchString = "old-query";
+            gp.searching = true;
+
+            input.value = "new-query";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            expect(gp.searchString).toBe("old-query");
+            expect(gp.search).not.toHaveBeenCalled();
+
+            gp.afterSearch();
+
+            expect(gp.searching).toBe(false);
+            expect(gp.search).not.toHaveBeenCalled();
+
+            jest.advanceTimersByTime(299);
+
+            expect(gp.searchString).toBe("old-query");
+            expect(gp.search).not.toHaveBeenCalled();
+
+            jest.advanceTimersByTime(1);
+
+            expect(gp.searchString).toBe("new-query");
+            expect(gp.searchDebounce).toBeNull();
             expect(gp.search).toHaveBeenCalledTimes(1);
         });
 
@@ -747,11 +779,12 @@ describe("GlobalPlanet", () => {
             input.value = "ピアノ";
             input.dispatchEvent(new CompositionEvent("compositionend", { bubbles: true }));
 
-            expect(gp.searchString).toBe("ピアノ");
+            expect(gp.searchString).toBe("");
             expect(gp.search).not.toHaveBeenCalled();
 
             jest.advanceTimersByTime(300);
 
+            expect(gp.searchString).toBe("ピアノ");
             expect(gp.search).toHaveBeenCalledTimes(1);
         });
 
