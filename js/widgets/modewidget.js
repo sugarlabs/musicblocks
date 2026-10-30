@@ -722,7 +722,14 @@ class ModeWidget {
         bar.style.gap = "8px";
         bar.style.padding = "6px 16px";
 
-        // Icon button with MB theme styling (wfbtItem class).
+        /**
+         * Creates an accessible action button, or a decorative icon when no action is provided.
+         * @param {string} icon - Header icon filename.
+         * @param {string} label - Translated control label.
+         * @param {Function|null} onclick - Action to activate with mouse or keyboard.
+         * @param {string} [imgFilter] - Optional CSS image filter.
+         * @returns {HTMLDivElement} The styled control or decorative icon.
+         */
         const iconButton = (icon, label, onclick, imgFilter) => {
             const btn = document.createElement("div");
             btn.className = "wfbtItem";
@@ -780,6 +787,7 @@ class ModeWidget {
         });
 
         const tuningGroup = document.createElement("div");
+        tuningGroup.className = "mode-temperament-control";
         tuningGroup.style.position = "relative";
         tuningGroup.style.display = "inline-flex";
         tuningGroup.style.alignItems = "center";
