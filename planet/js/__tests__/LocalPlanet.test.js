@@ -50,6 +50,7 @@ describe("LocalPlanet", () => {
         // Setup DOM for LocalPlanet
         document.body.innerHTML = `
             <div id="local-projects"></div>
+            <p id="local-search-empty" hidden></p>
             <input id="local-search" />
             <button id="deleter-button"></button>
             <span id="deleter-title"></span>
@@ -243,8 +244,24 @@ describe("LocalPlanet", () => {
             expect(project2.style.display).toBe("none");
         });
 
-        it("should show all projects when search is cleared", () => {
+        it("should show an empty state when no projects match", () => {
+            localPlanet.filterProjects("does not exist");
+
+            const emptyState = document.getElementById("local-search-empty");
+
+            expect(emptyState.hidden).toBe(false);
+        });
+
+        it("should hide the empty state when a project matches", () => {
             localPlanet.filterProjects("Project 1");
+
+            const emptyState = document.getElementById("local-search-empty");
+
+            expect(emptyState.hidden).toBe(true);
+        });
+
+        it("should show all projects and hide the empty state when search is cleared", () => {
+            localPlanet.filterProjects("does not exist");
             localPlanet.filterProjects("");
 
             const project1 = document
@@ -255,8 +272,11 @@ describe("LocalPlanet", () => {
                 .getElementById("local-project-input-testProj2")
                 .closest(".col");
 
+            const emptyState = document.getElementById("local-search-empty");
+
             expect(project1.style.display).toBe("");
             expect(project2.style.display).toBe("");
+            expect(emptyState.hidden).toBe(true);
         });
     });
 
