@@ -321,6 +321,8 @@ function setupIntervalsActions(activity) {
             if (name === null) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 modeName = "custom";
+            } else if (typeof name !== "string") {
+                modeName = String(name).toLowerCase();
             } else {
                 modeName = name.toLowerCase();
             }
