@@ -21,7 +21,7 @@
     rotateSliceAngles,
     scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes,
     isUnsafeObjectKey, ManagedTimer, readTextFile, downloadTextFile, createSharePopup,
-    closeSharePopup
+    closeSharePopup, makeKeyboardAccessible
  */
 
 /*
@@ -727,9 +727,11 @@ class ModeWidget {
             const btn = document.createElement("div");
             btn.className = "wfbtItem";
             btn.title = label;
-            btn.setAttribute("role", "button");
-            btn.setAttribute("aria-label", label);
-            btn.setAttribute("tabindex", "0");
+            if (typeof onclick === "function") {
+                makeKeyboardAccessible(btn, label);
+            } else {
+                btn.setAttribute("aria-hidden", "true");
+            }
             btn.style.flexShrink = "0";
             btn.style.display = "flex";
             btn.style.alignItems = "center";
