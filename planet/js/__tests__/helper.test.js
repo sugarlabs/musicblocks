@@ -430,6 +430,37 @@ describe("helper.js", () => {
             expect(globalSearch.classList.contains("project-search-docked")).toBe(true);
         });
 
+        it("should preserve input focus while docking and restoring the search", () => {
+            const slot = document.getElementById("planet-search-slot");
+            const titleRow = document.querySelector("#local .projects-title-row");
+            const input = document.getElementById("local-search");
+            const search = input.parentElement;
+
+            localTitleTop = 100;
+            window.dispatchEvent(new Event("scroll"));
+
+            expect(titleRow.contains(search)).toBe(true);
+
+            input.focus();
+            expect(document.activeElement).toBe(input);
+
+            const focusSpy = jest.spyOn(input, "focus");
+
+            localTitleTop = 20;
+            window.dispatchEvent(new Event("scroll"));
+
+            expect(slot.contains(search)).toBe(true);
+            expect(document.activeElement).toBe(input);
+            expect(focusSpy).toHaveBeenCalledWith({ preventScroll: true });
+
+            localTitleTop = 100;
+            window.dispatchEvent(new Event("scroll"));
+
+            expect(titleRow.contains(search)).toBe(true);
+            expect(document.activeElement).toBe(input);
+            expect(focusSpy).toHaveBeenCalledTimes(2);
+        });
+
         it("should recalculate docking on resize", () => {
             const titleRow = document.querySelector("#local .projects-title-row");
             const search = document.getElementById("local-search").parentElement;
