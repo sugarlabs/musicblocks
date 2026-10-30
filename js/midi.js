@@ -245,12 +245,19 @@ class MidiTranscriber {
         if (notes[0].name === "R") {
             ar.push([x, "rest2", 0, 0, [prev, null]]);
         } else if (isPercussionTrack) {
-            const drumname = this.drumMidi[notes[0].midi]?.[0] || "kick drum";
-            ar.push(
-                [x, "playdrum", 0, 0, [isFirstNote ? prev : x - 1, x + 1, null]],
-                [x + 1, ["drumname", { value: drumname }], 0, 0, [x]]
-            );
-            x += 2;
+            // Hits on the same beat (kick and hi-hat together) arrive as one
+            // chord; each gets its own playdrum in the note, chained like the
+            // pitches below. Reading notes[0] alone dropped the rest.
+            for (let na = 0; na < notes.length; na++) {
+                const drumname = this.drumMidi[notes[na].midi]?.[0] || "kick drum";
+                const first = na === 0;
+                const last = na === notes.length - 1;
+                ar.push(
+                    [x, "playdrum", 0, 0, [first ? prev : x - 2, x + 1, last ? null : x + 2]],
+                    [x + 1, ["drumname", { value: drumname }], 0, 0, [x]]
+                );
+                x += 2;
+            }
         } else {
             for (let na = 0; na < notes.length; na++) {
                 const [pitchName, octave] = splitNoteName(notes[na].name);
@@ -434,7 +441,22 @@ class MidiTranscriber {
             const obj = getNoteValue(this.wholeNotesAt(end - written, bpm));
             written += (obj[0] / obj[1]) * (240 / bpm);
 
-            const pitches = this.getPitch(val + 5, notes, val, isPercussionTrack, first);
+            // A drum is struck once. One still sounding from an earlier segment
+            // (a long kick under a short hi-hat) isn't struck again here, and a
+            // segment with nothing new struck is a rest.
+            const struck =
+                isPercussionTrack && notes[0].name !== "R"
+                    ? notes.filter(
+                          note => Math.round(this.noteSeconds(note)[0] * 100) / 100 === start
+                      )
+                    : notes;
+            const pitches = this.getPitch(
+                val + 5,
+                struck.length ? struck : [{ name: "R" }],
+                val,
+                isPercussionTrack,
+                first
+            );
             currentActionBlock.push(
                 [
                     val,
