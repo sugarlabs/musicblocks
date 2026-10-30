@@ -321,7 +321,8 @@ div.select-wrapper * {
 #search-close {
 	display: none;
 	position: absolute;
-	top: -4px;
+	top: 50%;
+	transform: translateY(-50%);
 	cursor: pointer;
 }
 
@@ -638,6 +639,7 @@ a {
     justify-content: flex-end;
 
     width: 40px;
+    max-width: 100%;
     height: 40px;
 
     overflow: hidden;
@@ -684,7 +686,10 @@ a {
 .project-search-preview:hover input,
 .project-search-preview:focus-within input,
 .project-search-preview:has(input:not(:placeholder-shown)) input {
-    width: calc(var(--project-search-expanded-width) - 65px) !important;
+    width: auto !important;
+    min-width: 0;
+    flex: 1 1 auto;
+
     opacity: 1;
 
     padding-left: 18px !important;
@@ -694,6 +699,11 @@ a {
 .project-search-preview input:focus {
     border-bottom: none !important;
     box-shadow: none !important;
+}
+
+.project-search-preview:has(input:focus-visible) {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
 }
 
 .project-search-preview input::placeholder {
@@ -777,5 +787,12 @@ a {
         --project-search-expanded-width: min(190px, 45vw);
 
         grid-column: 2;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .project-search-preview,
+    .project-search-preview input {
+        transition: none;
     }
 }
