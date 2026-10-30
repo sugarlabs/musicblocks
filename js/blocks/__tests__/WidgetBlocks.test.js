@@ -408,6 +408,7 @@ describe("setupWidgetBlocks", () => {
                 _blockMap: { 9: [[90, [91, 0], 0]] }
             };
             logo[key] = widget;
+            if (type === "musickeyboard") logo.musicKeyboards = { 9: widget };
             const before = { ...widget };
             try {
                 if (mode === "inherited alias") {

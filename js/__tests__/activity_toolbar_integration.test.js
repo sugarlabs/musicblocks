@@ -196,6 +196,41 @@ describe("Activity Toolbar Integration", () => {
     });
 
     describe("_doFastButton", () => {
+        test.each(["new Play", "new execution", "new project"])(
+            "ignores a late audio unlock after %s supersedes it",
+            async replacement => {
+                let unlock;
+                activity.logo.synth = {
+                    startAudio: jest
+                        .fn()
+                        .mockImplementationOnce(() => new Promise(resolve => (unlock = resolve)))
+                        .mockResolvedValue()
+                };
+                activity._doFastButton("old-env");
+                expect(activity.toolbarController.runFast).not.toHaveBeenCalled();
+                if (replacement === "new Play") activity._doFastButton("new-env");
+                if (replacement === "new execution") activity.logo._executionRequest = {};
+                if (replacement === "new project") activity.multisampleProjectGeneration = 1;
+                unlock();
+                await Promise.resolve();
+                if (replacement === "new Play") {
+                    expect(activity.toolbarController.runFast).toHaveBeenCalledTimes(1);
+                    expect(activity.toolbarController.runFast).toHaveBeenCalledWith("new-env", 0);
+                } else {
+                    expect(activity.toolbarController.runFast).not.toHaveBeenCalled();
+                }
+            }
+        );
+
+        test("retains upstream's playback attempt after an uncancelled unlock failure", async () => {
+            activity.logo.synth = {
+                startAudio: jest.fn().mockRejectedValue(new Error("unlock failed"))
+            };
+            activity._doFastButton("normal-env");
+            await Promise.resolve();
+            expect(activity.toolbarController.runFast).toHaveBeenCalledWith("normal-env", 0);
+        });
+
         test("calls highlightStop and delegates runFast when not already running", () => {
             activity.turtles.running.mockReturnValue(false);
             activity.logo.turtleDelay = 100;
