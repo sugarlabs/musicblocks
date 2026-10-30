@@ -194,6 +194,77 @@ describe("PlanetInterface", () => {
         };
         expect(planetInterface.getCurrentProjectID()).toBe("1234");
     });
+
+    describe("getCurrentGitRepoData", () => {
+        const useProjects = (current, projects) => {
+            planetInterface.planet = {
+                ProjectStorage: {
+                    getCurrentProjectID: jest.fn(() => current),
+                    data: { Projects: projects }
+                }
+            };
+        };
+
+        afterEach(() => localStorage.clear());
+
+        test("returns the repo linked to the current project", () => {
+            useProjects("guitar", {
+                guitar: {
+                    ProjectName: "Guitar Song",
+                    GitRepoData: { repoName: "guitar-song", hashedKey: "guitar-key" }
+                },
+                drums: {
+                    ProjectName: "Drum Beat",
+                    GitRepoData: { repoName: "drum-beat", hashedKey: "drum-key" }
+                }
+            });
+
+            expect(planetInterface.getCurrentGitRepoData()).toEqual({
+                projectId: "guitar",
+                repoName: "guitar-song",
+                hashedKey: "guitar-key",
+                displayName: "Guitar Song"
+            });
+        });
+
+        test("falls back to the key stored for the repo", () => {
+            localStorage.setItem("mb_git_key_guitar-song", "stored-key");
+            useProjects("guitar", {
+                guitar: { ProjectName: "Guitar Song", GitRepoData: { repoName: "guitar-song" } }
+            });
+
+            expect(planetInterface.getCurrentGitRepoData().hashedKey).toBe("stored-key");
+        });
+
+        test("reports no repo for an untracked copy", () => {
+            localStorage.setItem("mbGitRepoName", "guitar-song");
+            useProjects("copy", {
+                guitar: {
+                    ProjectName: "Guitar Song",
+                    GitRepoData: { repoName: "guitar-song", hashedKey: "guitar-key" }
+                },
+                copy: { ProjectName: "Guitar Song (Copy)", GitRepoData: null }
+            });
+
+            expect(planetInterface.getCurrentGitRepoData()).toEqual({
+                projectId: "copy",
+                repoName: "",
+                hashedKey: "",
+                displayName: "Guitar Song (Copy)"
+            });
+        });
+
+        test("returns null before Planet storage is ready", () => {
+            planetInterface.planet = null;
+            expect(planetInterface.getCurrentGitRepoData()).toBeNull();
+        });
+
+        test("returns null while the project table is not loaded", () => {
+            useProjects("guitar", undefined);
+            expect(planetInterface.getCurrentGitRepoData()).toBeNull();
+        });
+    });
+
     test("initialiseNewProject should reset project state", () => {
         planetInterface.planet = {
             ProjectStorage: { initialiseNewProject: jest.fn().mockResolvedValue() }
