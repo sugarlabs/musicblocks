@@ -1654,10 +1654,15 @@ class ModeWidget {
             if (!result) return null;
             const edoResult = this._findEdoSteps(result.pitches);
             if (!edoResult) {
+                // Ratio tunings (just intonation, meantone) fail here by design;
+                // say where they do import. A second string, so the first keeps
+                // its existing translations.
                 this.errorMsg(
                     _(
                         "Not a valid EDO mode. Import requires a mode that fits an equal division of the octave."
-                    )
+                    ) +
+                        " " +
+                        _("For a ratio-based tuning, import the file in the temperament widget.")
                 );
                 return null;
             }
