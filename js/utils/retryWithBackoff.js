@@ -45,6 +45,9 @@
  * @param {Function} [options.onRetry] - Optional callback invoked before each retry
  *   attempt, receiving the current attempt number (0-indexed). Useful for
  *   side effects like regenerating artwork.
+ * @param {Function} [options.shouldCancel] - Optional predicate that cancels retries
+ *   when it returns true.
+ * @param {Function} [options.onCancel] - Optional callback invoked once when cancelled.
  * @param {Function} [options.delayFn] - The delay function to use. Defaults to a
  *   Promise-based setTimeout wrapper. Injected for testability.
  * @param {number} [options.maxRetries=20] - Maximum number of retry attempts before
@@ -83,6 +86,8 @@ const retryWithBackoff = async ({
     check,
     onSuccess,
     onRetry,
+    shouldCancel,
+    onCancel,
     delayFn,
     maxRetries = 20,
     initialDelay = 50,
@@ -97,9 +102,30 @@ const retryWithBackoff = async ({
                 setTimeout(resolve, ms);
             }));
 
+    const cancelIfNeeded = () => {
+        if (typeof shouldCancel !== "function" || !shouldCancel()) {
+            return false;
+        }
+
+        if (typeof onCancel === "function") {
+            onCancel();
+        }
+
+        return true;
+    };
+
     for (let count = 0; count <= maxRetries; count++) {
+        if (cancelIfNeeded()) {
+            return undefined;
+        }
+
         const raw = check();
         const result = raw instanceof Promise ? await raw : raw;
+
+        // The block can be trashed while an asynchronous check is pending.
+        if (cancelIfNeeded()) {
+            return undefined;
+        }
 
         if (result) {
             await onSuccess(result);
@@ -112,6 +138,11 @@ const retryWithBackoff = async ({
 
         if (typeof onRetry === "function") {
             onRetry(count);
+        }
+
+        // Avoid scheduling another delay if onRetry changed the lifecycle state.
+        if (cancelIfNeeded()) {
+            return undefined;
         }
 
         const calculatedDelay = initialDelay * Math.pow(2, count);
