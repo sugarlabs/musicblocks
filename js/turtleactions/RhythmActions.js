@@ -156,6 +156,7 @@ function setupRhythmActions(activity) {
                                 ),
                                 blk
                             );
+                            tur.singer.neighborArgCurrentBeat.push(null);
                         } else {
                             tur.singer.neighborArgCurrentBeat.push(
                                 tur.singer.beatFactor * (1 / nextBeat)
