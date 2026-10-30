@@ -464,6 +464,36 @@ const actionsAndCalls = [
             [10, "start", 300, 100, [null, 11, null]],
             [11, ["nameddo", { value: "computeLocal" }], 0, 0, [10, null]]
         ]
+    },
+    {
+        name: "box_stored_in_start_read_in_action",
+        description: "Start stores a box that the action it calls prints",
+        category: "actions",
+        blocks: [
+            [0, "action", 100, 100, [null, 1, 2, null]],
+            [1, ["text", { value: "show" }], 0, 0, [0]],
+            [2, "print", 0, 0, [0, 3, null]],
+            [3, ["namedbox", { value: "shared" }], 0, 0, [2]],
+            [10, "start", 300, 100, [null, 11, null]],
+            [11, ["storein2", { value: "shared" }], 0, 0, [10, 12, 13]],
+            [12, ["number", { value: 5 }], 0, 0, [11]],
+            [13, ["nameddo", { value: "show" }], 0, 0, [11, null]]
+        ]
+    },
+    {
+        name: "box_stored_in_action_read_in_start",
+        description: "An action stores a box that Start prints after calling it",
+        category: "actions",
+        blocks: [
+            [0, "action", 100, 100, [null, 1, 2, null]],
+            [1, ["text", { value: "setup" }], 0, 0, [0]],
+            [2, ["storein2", { value: "shared" }], 0, 0, [0, 3, null]],
+            [3, ["number", { value: 5 }], 0, 0, [2]],
+            [10, "start", 300, 100, [null, 11, null]],
+            [11, ["nameddo", { value: "setup" }], 0, 0, [10, 12]],
+            [12, "print", 0, 0, [11, 13, null]],
+            [13, ["namedbox", { value: "shared" }], 0, 0, [12]]
+        ]
     }
 ];
 

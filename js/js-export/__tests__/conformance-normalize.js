@@ -136,6 +136,14 @@ function normalizeArgumentNode(blockId, blocksById) {
         }
     }
 
+    // A box block naming its box with text reads the same box as a namedbox block
+    if (block.name === "box") {
+        const nameArg = normalizeArgumentNode(block.connections[1], blocksById);
+        if (nameArg && nameArg.name === "text" && nameArg.value) {
+            return { name: "namedbox", value: String(nameArg.value) };
+        }
+    }
+
     // Value blocks: literals, box references, getters
     if (
         [
@@ -148,8 +156,7 @@ function normalizeArgumentNode(blockId, blocksById) {
             "voicename",
             "drumname",
             "namedbox",
-            "namedarg",
-            "box"
+            "namedarg"
         ].includes(block.name) ||
         JSInterface.isGetter(block.name) ||
         JSInterface.methodReturns(block.name)

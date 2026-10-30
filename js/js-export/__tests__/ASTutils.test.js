@@ -1113,6 +1113,79 @@ describe("ASTUtils", () => {
         });
     });
 
+    describe("boxes shared between stacks", () => {
+        afterEach(() => ASTUtils.setSharedBoxes([]));
+
+        // Exports each stack, printing its reads after its flows, and runs the stacks in order
+        // against one set of boxes.
+        const run = async stacks => {
+            ASTUtils.setSharedBoxes(stacks.map(({ flows, reads = [] }) => [...flows, reads]));
+            const codes = stacks.map(({ flows, reads = [] }) => {
+                const body = ASTUtils._getBlockAST(flows);
+                for (const read of ASTUtils._getArgsAST(reads)) {
+                    body.push({
+                        type: "ExpressionStatement",
+                        expression: ASTUtils._getMouseCallExpression("print", [read])
+                    });
+                }
+                return astring.generate({ type: "Program", body });
+            });
+            const boxes = {};
+            const printed = [];
+            const mouse = {
+                setBox: (name, value) => (boxes[name] = value),
+                getBox: name => boxes[name],
+                incrementBox: (name, delta) => (boxes[name] = (boxes[name] ?? 0) + delta),
+                print: value => printed.push(value)
+            };
+            const AsyncFunction = (async () => {}).constructor;
+            for (const code of codes) {
+                await new AsyncFunction("mouse", code)(mouse);
+            }
+            return { codes, printed };
+        };
+
+        it("keeps a box used in only one stack as a variable", async () => {
+            const { codes, printed } = await run([
+                {
+                    flows: [
+                        ["storein2_count", [5]],
+                        ["increment", ["box_count", 2]]
+                    ],
+                    reads: ["box_count"]
+                }
+            ]);
+            expect(codes[0]).toContain("var count = 5;");
+            expect(codes[0]).not.toContain("Box(");
+            expect(printed).toEqual([7]);
+        });
+
+        it("lets a stack read and change a box another stack stored", async () => {
+            const { codes, printed } = await run([
+                { flows: [["storein", ["count", 5]]] },
+                {
+                    flows: [["increment", ["box_count", 2]]],
+                    reads: ["box_count", ["box", ["count"]]]
+                }
+            ]);
+            expect(codes[0]).toContain('mouse.setBox("count", 5)');
+            expect(codes[1]).toContain('mouse.incrementBox("count", 2)');
+            expect(codes.join("\n")).not.toContain("var ");
+            expect(printed).toEqual([7, 7]);
+        });
+
+        it("reads a box that no stack stores through getBox", async () => {
+            const { codes } = await run([{ flows: [], reads: ["box_count"] }]);
+            expect(codes[0]).toContain('mouse.getBox("count")');
+        });
+
+        it("doesn't share boxes from an earlier program", async () => {
+            await run([{ flows: [["storein2_count", [5]]] }, { flows: [], reads: ["box_count"] }]);
+            const { codes } = await run([{ flows: [["storein2_count", [5]]] }]);
+            expect(codes[0]).toContain("var count = 5;");
+        });
+    });
+
     describe("getMouseAST", () => {
         it("should return the AST for a mouse", () => {
             const tree = ["flow"];
