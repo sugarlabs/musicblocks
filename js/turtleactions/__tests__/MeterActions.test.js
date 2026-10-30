@@ -382,6 +382,44 @@ describe("setupMeterActions", () => {
         );
     });
 
+    it("should reuse a companion turtle at index 0", () => {
+        const ownerTurtle = {
+            ...targetTurtle,
+            id: 1,
+            companionTurtle: 0
+        };
+        const companionTurtle = {
+            ...targetTurtle,
+            id: 0,
+            running: false
+        };
+        activity.turtles.getTurtle.mockImplementation(id =>
+            id === 1 ? ownerTurtle : companionTurtle
+        );
+        activity.turtles.ithTurtle.mockImplementation(id =>
+            id === 1 ? ownerTurtle : companionTurtle
+        );
+        activity.turtles.getTurtleCount.mockReturnValue(2);
+
+        Singer.MeterActions.onEveryBeatDo("testAction", false, null, 1, 1);
+
+        expect(activity.turtles.addTurtle).not.toHaveBeenCalled();
+        expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+            0,
+            "__everybeat_0__",
+            expect.any(Function)
+        );
+    });
+
+    it("should create a companion when the reference is undefined", () => {
+        delete targetTurtle.companionTurtle;
+
+        Singer.MeterActions.onEveryBeatDo("testAction", false, null, 0, 1);
+
+        expect(activity.turtles.addTurtle).toHaveBeenCalledTimes(1);
+        expect(targetTurtle.companionTurtle).toBe(1);
+    });
+
     it("should handle running turtle in onEveryBeatDo listener", () => {
         targetTurtle.id = 0;
         targetTurtle.companionTurtle = 1;
