@@ -91,6 +91,7 @@
                 <li><a id="planet-new-project" class="tooltipped" data-position="bottom" data-delay="50"
                         data-tooltip=""><i class="material-icons">note_add</i></a></li>
             </ul>
+            <div id="planet-search-slot" class="right"></div>
             <ul class="right tabs tabs-transparent" id="localglobal">
                 <li class="tab"><a class="active" id="local-tab" href="#local"></a></li>
                 <li class="tab"><a id="global-tab" href="#global"></a></li>
@@ -113,7 +114,7 @@
                             aria-label="Search for projects"
                             placeholder="Search for projects"
                         />
-                        <i class="material-icons project-search-icon">search</i>
+                        <label for="local-search" class="material-icons project-search-icon" aria-hidden="true">search</label>
                     </div>
                 </div>
             </div>
@@ -196,7 +197,7 @@
                             aria-label="Search for projects"
                             placeholder="Search for projects"
                         />
-                        <i class="material-icons project-search-icon">search</i>
+                        <label for="global-search" class="material-icons project-search-icon" aria-hidden="true">search</label>
                         <span>
                             <i class="material-icons" id="search-close">clear</i>
                         </span>
