@@ -164,339 +164,79 @@ $(document).ready(() => {
         toggleText("view-more-chips", showMore, showLess);
     });
 
-    const updateNavbarTabSpacing = () => {
-        const localSection = document.getElementById("local");
-        const globalSection = document.getElementById("global");
+    const navbar = document.querySelector("nav");
+    const searchSlot = document.getElementById("planet-search-slot");
+    const localSection = document.getElementById("local");
+    const globalSection = document.getElementById("global");
 
-        const activeSection =
-            globalSection && getComputedStyle(globalSection).display !== "none"
-                ? globalSection
-                : localSection;
+    const searchStates = [localSection, globalSection]
+        .filter(Boolean)
+        .map(section => {
+            const titleRow = section.querySelector(".projects-title-row");
+            const search = section.querySelector(".project-search-preview");
 
-        const tabs = document.getElementById("localglobal");
-        const globalTab = document.getElementById("global-tab");
+            return titleRow && search ? { section, titleRow, search } : null;
+        })
+        .filter(Boolean);
 
-        if (!activeSection || !tabs || !globalTab) return;
+    const restoreSearch = state => {
+        if (!searchSlot || state.search.parentElement !== searchSlot) return;
 
-        const search = activeSection.querySelector(".project-search-preview");
-
-        // Search is not in navbar -> restore normal tab position.
-        if (!search || !search.classList.contains("project-search-floating")) {
-            tabs.style.translate = "";
-            return;
-        }
-
-        const input = search.querySelector("input");
-
-        const isExpanded =
-            search.matches(":hover") ||
-            search.matches(":focus-within") ||
-            (input && input.value.trim() !== "");
-
-        // Search is docked but collapsed.
-        if (!isExpanded) {
-            tabs.style.translate = "";
-            return;
-        }
-
-        const globalRect = globalTab.getBoundingClientRect();
-        const searchRect = search.getBoundingClientRect();
-
-        /*
-         * Find the tab's real position before OUR extra translate.
-         * This avoids the feedback/jumping problem while the tabs
-         * themselves are animating.
-         */
-        const computedTranslate = getComputedStyle(tabs).translate;
-
-        let currentTranslateX = 0;
-
-        if (computedTranslate && computedTranslate !== "none") {
-            currentTranslateX = parseFloat(computedTranslate.split(" ")[0]) || 0;
-        }
-
-        const originalGlobalRight = globalRect.right - currentTranslateX;
-
-        /*
-         * Search is right-anchored.
-         * Its final expanded width is 230px.
-         */
-        const expandedSearchWidth = 230;
-        const searchLeft = searchRect.right - expandedSearchWidth;
-
-        // Keep a little breathing room between GLOBAL and search.
-        const minimumGap = 12;
-
-        const overlap = originalGlobalRight + minimumGap - searchLeft;
-
-        const requiredShift = Math.max(0, overlap);
-
-        tabs.style.translate = requiredShift > 0 ? `${-requiredShift}px 0` : "";
-    };
-
-    const updateTitleSearchSpacing = () => {
-        const localSection = document.getElementById("local");
-        const globalSection = document.getElementById("global");
-
-        const activeSection =
-            globalSection && getComputedStyle(globalSection).display !== "none"
-                ? globalSection
-                : localSection;
-
-        if (!activeSection) return;
-
-        const titleRow = activeSection.querySelector(".projects-title-row");
-        const search = activeSection.querySelector(".project-search-preview");
-
-        if (!titleRow || !search) return;
-
-        const title = titleRow.querySelector("h3");
-
-        if (!title) return;
-
-        // The navbar has its own overlap handling.
-        // Restore the title to its normal centered position while search is docked.
-        if (search.classList.contains("project-search-floating")) {
-            title.style.translate = "";
-            return;
-        }
-
-        const input = search.querySelector("input");
-
-        const isExpanded =
-            search.matches(":hover") ||
-            search.matches(":focus-within") ||
-            (input && input.value.trim() !== "");
-
-        // Collapsed search does not need extra title spacing.
-        if (!isExpanded) {
-            title.style.translate = "";
-            return;
-        }
-
-        const titleRect = title.getBoundingClientRect();
-        const searchRect = search.getBoundingClientRect();
-        const rowRect = titleRow.getBoundingClientRect();
-
-        /*
-         * Recover the title's original centered position before our translate.
-         * This prevents repeated measurements from making the title drift.
-         */
-        const computedTranslate = getComputedStyle(title).translate;
-
-        let currentTranslateX = 0;
-
-        if (computedTranslate && computedTranslate !== "none") {
-            currentTranslateX = parseFloat(computedTranslate.split(" ")[0]) || 0;
-        }
-
-        const originalTitleLeft = titleRect.left - currentTranslateX;
-        const originalTitleRight = titleRect.right - currentTranslateX;
-
-        // Search expands toward the left and reaches 230px.
-        const expandedSearchWidth = 230;
-        const searchLeft = searchRect.right - expandedSearchWidth;
-
-        // Keep visible breathing room between the heading and search.
-        const minimumGap = 20;
-
-        const overlap = originalTitleRight + minimumGap - searchLeft;
-
-        /*
-         * Never move the heading outside its title row.
-         * Keep at least 12px available on the left.
-         */
-        const edgeGap = 12;
-        const maxShift = Math.max(0, originalTitleLeft - (rowRect.left + edgeGap));
-
-        const requiredShift = Math.min(Math.max(0, overlap), maxShift);
-
-        title.style.translate = requiredShift > 0 ? `${-requiredShift}px 0` : "";
-    };
-
-    const updateSearchSpacing = () => {
-        updateNavbarTabSpacing();
-        updateTitleSearchSpacing();
+        state.search.classList.remove("project-search-docked");
+        state.titleRow.appendChild(state.search);
     };
 
     const updateSearchDocking = () => {
-        const localSection = document.getElementById("local");
-        const globalSection = document.getElementById("global");
+        if (!navbar || !searchSlot || searchStates.length === 0) return;
 
-        const activeSection =
-            globalSection && getComputedStyle(globalSection).display !== "none"
-                ? globalSection
-                : localSection;
-
-        if (!activeSection) return;
-
-        const titleRow = activeSection.querySelector(".projects-title-row");
-        const search = activeSection.querySelector(".project-search-preview");
-        const navbar = document.querySelector("nav");
-        const tabs = document.getElementById("localglobal");
-        const newProjectBtn = document.getElementById("planet-new-project");
-
-        if (!titleRow || !search || !navbar || !tabs || !newProjectBtn) return;
-
-        const navbarRect = navbar.getBoundingClientRect();
-        const titleRect = titleRow.getBoundingClientRect();
-
-        const shouldDock = titleRect.top <= navbarRect.bottom;
-        const isDocked = search.classList.contains("project-search-floating");
-
-        if (shouldDock === isDocked) return;
-
-        const first = search.getBoundingClientRect();
-
-        if (shouldDock) {
-            const newBtnRect = newProjectBtn.getBoundingClientRect();
-
-            search.classList.add("project-search-floating");
-
-            search.style.top = `${navbarRect.top + (navbarRect.height - first.height) / 2}px`;
-
-            search.style.left = "auto";
-            search.style.right = `${window.innerWidth - (newBtnRect.left - 1)}px`;
-            search.style.transform = "none";
-
-            tabs.style.transform = "translateX(-40px)";
-        } else {
-            search.classList.remove("project-search-floating");
-
-            search.style.top = "";
-            search.style.left = "";
-            search.style.right = "";
-            search.style.transform = "";
-
-            tabs.style.transform = "";
-        }
-
-        const last = search.getBoundingClientRect();
-
-        const deltaX = first.left - last.left;
-        const deltaY = first.top - last.top;
-
-        const animation = search.animate(
-            [
-                {
-                    transform: `translate(${deltaX}px, ${deltaY}px)`
-                },
-                {
-                    transform: "translate(0, 0)"
-                }
-            ],
-            {
-                duration: 350,
-                easing: "cubic-bezier(0.22, 1, 0.36, 1)"
-            }
+        const activeState = searchStates.find(
+            state => getComputedStyle(state.section).display !== "none"
         );
 
-        requestAnimationFrame(updateSearchSpacing);
+        if (!activeState) return;
 
-        animation.addEventListener("finish", updateSearchSpacing);
+        searchStates.forEach(state => {
+            if (state !== activeState) restoreSearch(state);
+        });
+
+        const navbarBottom = navbar.getBoundingClientRect().bottom;
+        const titleTop = activeState.titleRow.getBoundingClientRect().top;
+        const shouldDock = titleTop <= navbarBottom;
+        const isDocked = activeState.search.parentElement === searchSlot;
+
+        if (shouldDock && !isDocked) {
+            activeState.search.classList.add("project-search-docked");
+            searchSlot.appendChild(activeState.search);
+        } else if (!shouldDock && isDocked) {
+            restoreSearch(activeState);
+        }
     };
 
-    document.querySelectorAll(".project-search-preview").forEach(search => {
-        const input = search.querySelector("input");
+    let searchDockScheduled = false;
 
-        search.addEventListener("mouseenter", () => {
-            requestAnimationFrame(updateSearchSpacing);
-        });
+    const scheduleSearchDocking = () => {
+        if (searchDockScheduled) return;
 
-        search.addEventListener("mouseleave", () => {
-            requestAnimationFrame(updateSearchSpacing);
-        });
+        searchDockScheduled = true;
 
-        search.addEventListener("focusin", () => {
-            requestAnimationFrame(updateSearchSpacing);
-        });
-
-        search.addEventListener("focusout", () => {
-            requestAnimationFrame(updateSearchSpacing);
-        });
-
-        if (input) {
-            input.addEventListener("input", () => {
-                requestAnimationFrame(updateSearchSpacing);
-            });
-        }
-
-        search.addEventListener("transitionend", evt => {
-            if (evt.propertyName === "width") {
-                updateSearchSpacing();
-            }
-        });
-    });
-
-    window.addEventListener(
-        "scroll",
-        () => {
-            requestAnimationFrame(updateSearchDocking);
-        },
-        { passive: true }
-    );
-
-    window.addEventListener(
-        "resize",
-        () => {
-            requestAnimationFrame(() => {
-                const localSection = document.getElementById("local");
-                const globalSection = document.getElementById("global");
-
-                const activeSection =
-                    globalSection && getComputedStyle(globalSection).display !== "none"
-                        ? globalSection
-                        : localSection;
-
-                if (!activeSection) return;
-
-                const search = activeSection.querySelector(".project-search-preview");
-
-                if (!search) return;
-
-                if (!search.classList.contains("project-search-floating")) {
-                    search.style.left = "";
-                    search.style.right = "";
-
-                    updateSearchSpacing();
-                    return;
-                }
-
-                const newProjectBtn = document.getElementById("planet-new-project");
-
-                if (!newProjectBtn) return;
-
-                const newBtnRect = newProjectBtn.getBoundingClientRect();
-                const searchRect = search.getBoundingClientRect();
-
-                search.style.left = "auto";
-                search.style.right = `${window.innerWidth - (newBtnRect.left - 1)}px`;
-                updateSearchSpacing();
-            });
-        },
-        { passive: true }
-    );
-
-    document.getElementById("local-tab").addEventListener("click", () => {
         requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                updateSearchDocking();
-                updateSearchSpacing();
-            });
+            searchDockScheduled = false;
+            updateSearchDocking();
         });
-    });
+    };
 
-    document.getElementById("global-tab").addEventListener("click", () => {
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                updateSearchDocking();
-                updateSearchSpacing();
-            });
-        });
-    });
+    window.addEventListener("scroll", scheduleSearchDocking, { passive: true });
+    window.addEventListener("resize", scheduleSearchDocking, { passive: true });
 
-    updateSearchDocking();
-    requestAnimationFrame(updateSearchSpacing);
+    const scheduleAfterTabChange = () => {
+        requestAnimationFrame(scheduleSearchDocking);
+    };
+
+    document.getElementById("local-tab")?.addEventListener("click", scheduleAfterTabChange);
+
+    document.getElementById("global-tab")?.addEventListener("click", scheduleAfterTabChange);
+
+    scheduleSearchDocking();
 });
 
 if (typeof module !== "undefined" && module.exports) {

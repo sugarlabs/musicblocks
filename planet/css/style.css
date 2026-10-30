@@ -600,29 +600,27 @@ a {
 }
 
 .projects-title-row {
-    position: relative;
-
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
-    justify-content: center;
-
-    gap: 26px;
+    gap: 16px;
     min-height: 90px;
 }
 
 .projects-title-row h3 {
+    grid-column: 2;
     margin: 0;
+    text-align: center;
 }
 
 .project-search-preview {
-    position: absolute;
-    top: calc(50% + -2px);
-    right: 109px;
+    --project-search-expanded-width: min(230px, 45vw);
 
-    transform: translateY(-50%);
+    position: relative;
+    grid-column: 3;
+    justify-self: end;
 
     display: flex;
-    flex-direction: row;
     align-items: center;
     justify-content: flex-end;
 
@@ -630,26 +628,19 @@ a {
     height: 40px;
 
     overflow: hidden;
-
-    border-radius: 20px;
-
-    background: #e9ecef;
-    border: 1px solid #d0d0d0;
-
     flex-shrink: 0;
 
-    /*
-     * Only animate the opening/closing of the search field.
-     * Do not animate top/left/right positioning.
-     */
-	transition: width 0.25s ease;
+    border: 1px solid #d0d0d0;
+    border-radius: 20px;
+    background: #e9ecef;
+
+    transition: width 0.25s ease;
 }
 
-/* Open toward the LEFT */
 .project-search-preview:hover,
 .project-search-preview:focus-within,
 .project-search-preview:has(input:not(:placeholder-shown)) {
-    width: 230px;
+    width: var(--project-search-expanded-width);
 }
 
 .project-search-preview input {
@@ -667,7 +658,6 @@ a {
     box-shadow: none !important;
 
     background: transparent !important;
-
     color: #333 !important;
     font-size: 16px;
 
@@ -681,7 +671,7 @@ a {
 .project-search-preview:hover input,
 .project-search-preview:focus-within input,
 .project-search-preview:has(input:not(:placeholder-shown)) input {
-    width: 165px !important;
+    width: calc(var(--project-search-expanded-width) - 65px) !important;
     opacity: 1;
 
     padding-left: 18px !important;
@@ -698,11 +688,10 @@ a {
     opacity: 1;
 }
 
-/* Keep the lens fixed on the RIGHT side */
 .project-search-preview .project-search-icon {
-	width: 34px !important;
-	min-width: 34px !important;
-	height: 34px !important;
+    width: 34px !important;
+    min-width: 34px !important;
+    height: 34px !important;
 
     display: flex !important;
     align-items: center !important;
@@ -725,14 +714,6 @@ a {
     letter-spacing: normal !important;
     text-transform: none !important;
     white-space: nowrap !important;
-    word-wrap: normal !important;
-
-    direction: ltr;
-    -webkit-font-feature-settings: "liga";
-    -webkit-font-smoothing: antialiased;
-
-    opacity: 1 !important;
-    visibility: visible !important;
 
     flex-shrink: 0;
     cursor: pointer;
@@ -740,14 +721,48 @@ a {
     z-index: 10;
 }
 
-/* Search can still be placed in the navbar by JS */
-.project-search-preview.project-search-floating {
-    position: fixed;
-    z-index: 250;
+#planet-search-slot {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    height: 100%;
+    margin-right: 8px;
+}
+
+#planet-search-slot:empty {
+    display: none;
+}
+
+#planet-search-slot .project-search-preview {
+    --project-search-expanded-width: min(230px, 32vw);
+}
+
+.project-search-preview.project-search-docked {
+    position: relative;
+    top: auto;
+    right: auto;
+    transform: none;
+
+    grid-column: auto;
+    justify-self: auto;
 }
 
 @media screen and (max-width: 700px) {
-    .projects-title-row .project-search-preview:not(.project-search-floating) {
-        right: 10px;
+    .projects-title-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+    }
+
+    .projects-title-row h3 {
+        grid-column: 1;
+        justify-self: start;
+        text-align: left;
+    }
+
+    .projects-title-row .project-search-preview {
+        --project-search-expanded-width: min(190px, 45vw);
+
+        grid-column: 2;
     }
 }
