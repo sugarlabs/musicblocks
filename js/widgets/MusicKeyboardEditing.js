@@ -1148,11 +1148,10 @@ const MusicKeyboardEditing = {
                             ) ||
                             this.displayLayout.find(
                                 item =>
-                                    item.voice === note.voice &&
                                     (item.noteName === "hertz"
                                         ? item.noteOctave
                                         : resolveSynthNoteName(item.noteName, item.noteOctave)) ===
-                                        note.noteOctave
+                                    note.noteOctave
                             );
                         note.objId = row ? row.objId : null;
                         if (row) {

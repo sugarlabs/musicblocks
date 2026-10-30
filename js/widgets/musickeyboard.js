@@ -18,7 +18,7 @@
    last, ManagedTimer, Singer, noteToFrequency, i18nSolfege, toFraction,
    DEFAULTVOICE, SOLFEGECONVERSIONTABLE, NOTESSHARP, NOTESFLAT, PITCHES,
    PITCHES2, convertFromSolfege, announceToScreenReader, MusicKeyboardEditing,
-   MusicKeyboardRendering, getCurrentEDO, generateNoteNames */
+   MusicKeyboardRendering, getCurrentEDO, generateNoteNames, isEquallyTempered */
 /*
    Global Locations
     - js/utils/utils.js
@@ -31,7 +31,7 @@
         noteToFrequency, FIXEDSOLFEGE, FIXEDSOLFEGE1, SHARP, FLAT,
         i18nSolfege, toFraction, DEFAULTVOICE, PITCHES, PITCHES2,
         SOLFEGECONVERSIONTABLE, NOTESSHARP, NOTESFLAT, convertFromSolfege,
-        getCurrentEDO, generateNoteNames
+        getCurrentEDO, generateNoteNames, isEquallyTempered
     - js/utils/platformstyle.js
         platformColor
     - js/widgets/MusicKeyboardEditing.js
@@ -2025,6 +2025,8 @@ function MusicKeyboard(activity) {
      */
     this._refreshNoteToKeyMap = () => {
         this.noteToKeyMap = {};
+        const temperament = this.activity.logo.synth.inTemperament;
+        const mapEnharmonics = getCurrentEDO(temperament) === 12 && isEquallyTempered(temperament);
 
         for (let idx = 0; idx < this.layout.length; idx++) {
             const key = this.layout[idx];
@@ -2034,6 +2036,13 @@ function MusicKeyboard(activity) {
                     this.noteToKeyMap[
                         FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave
                     ] = key.objId; //convet solfege to alphabetic.
+                }
+                if (mapEnharmonics) {
+                    const pitch = FIXEDSOLFEGE1[key.noteName] || key.noteName;
+                    const step = NOTESFLAT.indexOf(pitch);
+                    if (step !== -1) {
+                        this.noteToKeyMap[NOTESSHARP[step] + key.noteOctave] ??= key.objId;
+                    }
                 }
             }
         }
