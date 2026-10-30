@@ -405,10 +405,6 @@ a {
 }
 
 @media only screen and (max-width: 1100px) {
-	#projectviewer-download-file, #projectviewer-open-mb, #projectviewer-merge-mb {
-		margin-left: -25px !important;
-	}
-
 	#projectviewer-report-project, #projectviewer-report-project-disabled {
 		padding-left: 0px;
 		padding-right: 0px;
