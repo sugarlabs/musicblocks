@@ -2090,4 +2090,141 @@ describe("widgetWindows", () => {
             expect(win.onmaximize).toHaveBeenCalledTimes(1);
         });
     });
+
+    describe("Window Control Button Keyboard Accessibility", () => {
+        test("closes window when Enter or Space is pressed on closeButton", () => {
+            const win = createTestWindow();
+            win.onclose = jest.fn();
+
+            expect(win._closeButton).toBeDefined();
+            expect(win._closeButton.getAttribute("role")).toBe("button");
+            expect(win._closeButton.getAttribute("tabindex")).toBe("0");
+
+            const enterEvent = new KeyboardEvent("keydown", {
+                key: "Enter",
+                bubbles: true,
+                cancelable: true
+            });
+            win._closeButton.dispatchEvent(enterEvent);
+            expect(win.onclose).toHaveBeenCalledTimes(1);
+
+            const spaceEvent = new KeyboardEvent("keydown", {
+                key: " ",
+                bubbles: true,
+                cancelable: true
+            });
+            win._closeButton.dispatchEvent(spaceEvent);
+            expect(win.onclose).toHaveBeenCalledTimes(2);
+
+            const arrowEvent = new KeyboardEvent("keydown", {
+                key: "ArrowDown",
+                bubbles: true,
+                cancelable: true
+            });
+            win._closeButton.dispatchEvent(arrowEvent);
+            expect(win.onclose).toHaveBeenCalledTimes(2);
+        });
+
+        test("toggles rollup/unroll when Enter or Space is pressed on rollButton", () => {
+            const win = createTestWindow();
+            expect(win._rollButton).toBeDefined();
+            expect(win._rollButton.getAttribute("role")).toBe("button");
+            expect(win._rollButton.getAttribute("tabindex")).toBe("0");
+
+            expect(win._rolled).toBe(false);
+
+            // Press Enter to roll up
+            const enterEvent = new KeyboardEvent("keydown", {
+                key: "Enter",
+                bubbles: true,
+                cancelable: true
+            });
+            win._rollButton.dispatchEvent(enterEvent);
+
+            expect(win._rolled).toBe(true);
+            expect(win._body.style.display).toBe("none");
+
+            // Press Space to unroll
+            const spaceEvent = new KeyboardEvent("keydown", {
+                key: " ",
+                bubbles: true,
+                cancelable: true
+            });
+            win._rollButton.dispatchEvent(spaceEvent);
+
+            expect(win._rolled).toBe(false);
+            expect(win._body.style.display).toBe("flex");
+        });
+
+        test("toggles maximize/restore when Enter or Space is pressed on maxminButton", () => {
+            const win = createTestWindow("Fullscreen Window", true);
+            expect(win._maxminButton).toBeDefined();
+            expect(win._maxminButton.getAttribute("role")).toBe("button");
+            expect(win._maxminButton.getAttribute("tabindex")).toBe("0");
+
+            expect(win._maximized).toBe(false);
+
+            // Press Enter to maximize
+            const enterEvent = new KeyboardEvent("keydown", {
+                key: "Enter",
+                bubbles: true,
+                cancelable: true
+            });
+            win._maxminButton.dispatchEvent(enterEvent);
+
+            expect(win._maximized).toBe(true);
+
+            // Press Space to restore
+            const spaceEvent = new KeyboardEvent("keydown", {
+                key: " ",
+                bubbles: true,
+                cancelable: true
+            });
+            win._maxminButton.dispatchEvent(spaceEvent);
+
+            expect(win._maximized).toBe(false);
+        });
+
+        test("ignores repeated keydown events when activation key is held down", () => {
+            const win = createTestWindow();
+            win.onclose = jest.fn();
+
+            const repeatEvent = new KeyboardEvent("keydown", {
+                key: "Enter",
+                repeat: true,
+                bubbles: true,
+                cancelable: true
+            });
+            win._closeButton.dispatchEvent(repeatEvent);
+
+            expect(win.onclose).not.toHaveBeenCalled();
+        });
+
+        test("restores focus to previously focused element when window closes", () => {
+            const externalButton = document.createElement("button");
+            document.body.appendChild(externalButton);
+            externalButton.focus();
+
+            const win = createTestWindow();
+            win._closeButton.focus();
+            expect(document.activeElement).toBe(win._closeButton);
+
+            win.destroy();
+
+            expect(document.activeElement).toBe(externalButton);
+            document.body.removeChild(externalButton);
+        });
+
+        test("transfers focus to remaining open window when closed with multiple open windows", () => {
+            const win1 = createTestWindow("First Window");
+            const win2 = createTestWindow("Second Window");
+
+            win2._closeButton.focus();
+            expect(document.activeElement).toBe(win2._closeButton);
+
+            win2.destroy();
+
+            expect(window.widgetWindows.focused).toBe(win1);
+        });
+    });
 });
