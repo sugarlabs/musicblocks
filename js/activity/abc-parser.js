@@ -211,7 +211,7 @@ function _organizeStaffs(lines) {
  * @param {object} staff - The staff object from the parsed tune.
  * @param {string} title - The tune title (lowercased).
  * @param {string} instruction - The instrument name (lowercased).
- * @param {string} staffIdx - The staff index key.
+ * @param {number} voiceNumber - The voice number shown on the imported turtle.
  * @returns {{ startBlock: Array, newBlockId: number }}
  */
 // A staff's meter as a numerator and denominator. abcjs spells M:C and M:C| as
@@ -238,7 +238,7 @@ function _tempoOf(tempo) {
     return { bpm: tempo.bpm, duration: toFraction(beatValue) };
 }
 
-function _buildStartBlock(blockId, staff, title, instruction, staffIdx, tempo) {
+function _buildStartBlock(blockId, staff, title, instruction, voiceNumber, tempo) {
     const keyRoot = staff.key.root + (_ABC_KEY_ACC_SUFFIX[staff.key.acc] || "");
     const keyMode = _ABC_MODE_MAP[staff.key.mode] || "major";
     const meter = _meterOf(staff);
@@ -251,13 +251,7 @@ function _buildStartBlock(blockId, staff, title, instruction, staffIdx, tempo) {
         [blockId + 1, "print", 0, 0, [blockId, blockId + 2, blockId + 3]],
         [blockId + 2, ["text", { value: title }], 0, 0, [blockId + 1]],
         [blockId + 3, "setturtlename2", 0, 0, [blockId + 1, blockId + 4, blockId + 5]],
-        [
-            blockId + 4,
-            ["text", { value: `Voice ${parseInt(staffIdx, 10) + 1} ` }],
-            0,
-            0,
-            [blockId + 3]
-        ],
+        [blockId + 4, ["text", { value: `Voice ${voiceNumber} ` }], 0, 0, [blockId + 3]],
         [blockId + 5, "meter", 0, 0, [blockId + 3, blockId + 6, blockId + 7, blockId + 10]],
         [blockId + 6, ["number", { value: meter.num }], 0, 0, [blockId + 5]],
         [blockId + 7, "divide", 0, 0, [blockId + 5, blockId + 8, blockId + 9]],
@@ -318,11 +312,11 @@ function _handleRepeatBar(type, staffRecord) {
  *
  * @param {Array} actionBlock - Note blocks of the segment (mutated in place).
  * @param {number} blockId - Current block ID counter.
- * @param {string} staffIdx - The staff index key.
+ * @param {number} voiceNumber - The voice number shown on the imported turtle.
  * @param {object} staffRecord - The localized staff record (mutated in place).
  * @returns {number} newBlockId
  */
-function _closeSegment(actionBlock, blockId, staffIdx, staffRecord) {
+function _closeSegment(actionBlock, blockId, voiceNumber, staffRecord) {
     if (actionBlock.length === 0) {
         return blockId;
     }
@@ -331,7 +325,7 @@ function _closeSegment(actionBlock, blockId, staffIdx, staffRecord) {
     actionBlock[0][4][0] = blockId + 3;
     actionBlock[actionBlock.length - 1][4][1] = null;
 
-    const lineLabel = `V: ${parseInt(staffIdx, 10) + 1} Line ${staffRecord.baseBlocks.length + 1}`;
+    const lineLabel = `V: ${voiceNumber} Line ${staffRecord.baseBlocks.length + 1}`;
 
     // Add the nameddo action text and hidden block for each line
     actionBlock.push(
@@ -364,12 +358,12 @@ function _closeSegment(actionBlock, blockId, staffIdx, staffRecord) {
  * @param {Array} voice - The voice element array.
  * @param {number} blockId - Current block ID counter.
  * @param {object} staff - The staff object.
- * @param {string} staffIdx - The staff index key.
+ * @param {number} voiceNumber - The voice number shown on the imported turtle.
  * @param {object} staffRecord - The localized staff record (mutated in place).
  * @param {number} voiceIdx - The voice's index within the staff.
  * @returns {number} newBlockId
  */
-function _processVoice(voice, blockId, staff, staffIdx, staffRecord, voiceIdx) {
+function _processVoice(voice, blockId, staff, voiceNumber, staffRecord, voiceIdx) {
     const tuplets = staffRecord.tuplets;
     // An inline accidental holds for the same pitch until the next bar line,
     // but abcjs only sets it on the note that carries the mark. A bar can run
@@ -422,14 +416,14 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord, voiceIdx) {
         } else if (element.el_type === "bar") {
             barAccidentals[voiceIdx] = {};
             if (_ABC_REPEAT_BARS.includes(element.type)) {
-                blockId = _closeSegment(actionBlock, blockId, staffIdx, staffRecord);
+                blockId = _closeSegment(actionBlock, blockId, voiceNumber, staffRecord);
                 actionBlock = [];
                 _handleRepeatBar(element.type, staffRecord);
             }
         }
     });
 
-    return _closeSegment(actionBlock, blockId, staffIdx, staffRecord);
+    return _closeSegment(actionBlock, blockId, voiceNumber, staffRecord);
 }
 
 /**
@@ -506,49 +500,55 @@ function _finalizeStaffBlocks(staffRecord, blockId, finalBlock) {
  */
 const setupActivityAbcParser = activityInstance => {
     activityInstance.parseABC = async function (tune) {
-        const staffBlocksMap = {};
+        const voiceBlocks = [];
         let blockId = 0;
+        let voiceNumber = 0;
         const title = (tune.metaText?.title ?? "title").toString().toLowerCase();
         const instruction = (tune.metaText?.instruction ?? "guitar").toString().toLowerCase();
         const tempo = _tempoOf(tune.metaText?.tempo);
 
         const organizedStaffs = _organizeStaffs(tune.lines ?? []);
         Object.keys(organizedStaffs).forEach(staffIdx => {
+            const staffVoices = new Map();
             organizedStaffs[staffIdx].arrangedBlocks?.forEach(staff => {
-                if (!Object.prototype.hasOwnProperty.call(staffBlocksMap, staffIdx)) {
-                    const { startBlock, newBlockId } = _buildStartBlock(
-                        blockId,
-                        staff,
-                        title,
-                        instruction,
-                        staffIdx,
-                        tempo
-                    );
-                    const staffMeter = _meterOf(staff);
-                    staffBlocksMap[staffIdx] = {
-                        meterNum: staffMeter.num,
-                        meterDen: staffMeter.den,
-                        keySignature: staff.key,
-                        baseBlocks: [],
-                        startBlock,
-                        repeatBlock: [],
-                        repeatArray: [],
-                        repeatStart: null,
-                        repeatFrom: 0,
-                        nameddoIds: [],
-                        barAccidentals: [],
-                        tuplets: []
-                    };
-                    blockId = newBlockId;
-                }
-
                 staff.voices.forEach((voice, voiceIdx) => {
+                    if (!staffVoices.has(voiceIdx)) {
+                        voiceNumber += 1;
+                        const { startBlock, newBlockId } = _buildStartBlock(
+                            blockId,
+                            staff,
+                            title,
+                            instruction,
+                            voiceNumber,
+                            tempo
+                        );
+                        const staffMeter = _meterOf(staff);
+                        staffVoices.set(voiceIdx, {
+                            voiceNumber,
+                            meterNum: staffMeter.num,
+                            meterDen: staffMeter.den,
+                            keySignature: staff.key,
+                            baseBlocks: [],
+                            startBlock,
+                            repeatBlock: [],
+                            repeatArray: [],
+                            repeatStart: null,
+                            repeatFrom: 0,
+                            nameddoIds: [],
+                            barAccidentals: [],
+                            tuplets: []
+                        });
+                        voiceBlocks.push(staffVoices.get(voiceIdx));
+                        blockId = newBlockId;
+                    }
+
+                    const voiceRecord = staffVoices.get(voiceIdx);
                     blockId = _processVoice(
                         voice,
                         blockId,
                         staff,
-                        staffIdx,
-                        staffBlocksMap[staffIdx],
+                        voiceRecord.voiceNumber,
+                        voiceRecord,
                         voiceIdx
                     );
                 });
@@ -556,8 +556,8 @@ const setupActivityAbcParser = activityInstance => {
         });
 
         const finalBlock = [];
-        Object.keys(staffBlocksMap).forEach(staffIndex => {
-            blockId = _finalizeStaffBlocks(staffBlocksMap[staffIndex], blockId, finalBlock);
+        voiceBlocks.forEach(voiceRecord => {
+            blockId = _finalizeStaffBlocks(voiceRecord, blockId, finalBlock);
         });
 
         this.blocks.loadNewBlocks(finalBlock);
