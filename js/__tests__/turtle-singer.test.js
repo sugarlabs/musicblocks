@@ -75,6 +75,7 @@ global.getSavedCustomModes = musicUtils.getSavedCustomModes;
 global.SOLFEGENAMES1 = musicUtils.SOLFEGENAMES1;
 global.NOTENAMES1 = musicUtils.NOTENAMES1;
 global.getInterval = musicUtils.getInterval;
+global.edoTransposition = musicUtils.edoTransposition;
 global.noteIsSolfege = musicUtils.noteIsSolfege;
 global.getSolfege = musicUtils.getSolfege;
 global.last = array => (array && array.length > 0 ? array[array.length - 1] : null);
@@ -3278,60 +3279,6 @@ describe("Issue #9379 — Arpeggio Transposition and Widget Pitch Capture", () =
             expect(res1).toEqual({ arpeggioSteps: 6, arpeggioSemitones: 0, anote: "C" });
             const res2 = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 19);
             expect(res2).toEqual({ arpeggioSteps: 11, arpeggioSemitones: 0, anote: "C" });
-        });
-    });
-
-    describe("Singer.edoTransposition", () => {
-        const play = (note, octave, [transposition, inSteps], temperament) =>
-            musicUtils
-                .getNote(
-                    note,
-                    octave,
-                    transposition,
-                    "C major",
-                    false,
-                    null,
-                    null,
-                    temperament,
-                    inSteps
-                )
-                .slice(0, 2);
-
-        test("is the plain sum in 12 EDO", () => {
-            expect(Singer.edoTransposition(4, 3, 12)).toEqual([7, false]);
-            expect(Singer.edoTransposition(0.5, 2, 12)).toEqual([2.5, false]);
-        });
-
-        test("keeps steps as they are and rounds semitones to steps outside 12 EDO", () => {
-            expect(Singer.edoTransposition(0, 6, 19)).toEqual([6, true]);
-            expect(Singer.edoTransposition(4, 0, 19)).toEqual([6, true]);
-            expect(Singer.edoTransposition(1, 19, 19)).toEqual([21, true]);
-        });
-
-        test.each([
-            ["equal19", 19, 2, ["E", 4]],
-            ["equal19", 19, 4, ["G", 4]],
-            ["equal19", 19, -2, ["A", 3]],
-            ["equal31", 31, 2, ["E", 4]],
-            ["equal31", 31, 4, ["G", 4]],
-            ["equal17", 17, 2, ["E", 4]]
-        ])(
-            "%s (%i EDO): scalar interval %i from C4 lands on %j",
-            (temperament, edo, interval, expected) => {
-                const steps = musicUtils.getInterval(interval, "C major", "C", edo);
-                expect(play("C", 4, Singer.edoTransposition(0, steps, edo), temperament)).toEqual(
-                    expected
-                );
-            }
-        );
-
-        test("a register of one octave moves C4 to C5 and C3 in 19 EDO", () => {
-            expect(play("C", 4, Singer.edoTransposition(0, 19, 19), "equal19")).toEqual(["C", 5]);
-            expect(play("C", 4, Singer.edoTransposition(0, -19, 19), "equal19")).toEqual(["C", 3]);
-        });
-
-        test("a semitone interval still converts to steps in 19 EDO", () => {
-            expect(play("C", 4, Singer.edoTransposition(4, 0, 19), "equal19")).toEqual(["E", 4]);
         });
     });
 

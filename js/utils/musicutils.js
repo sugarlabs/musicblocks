@@ -86,7 +86,8 @@ if (typeof module !== "undefined" && module.exports) {
         isNonEDO,
         getTemperamentRatio,
         getTemperamentCents,
-        getTemperamentName
+        getTemperamentName,
+        edoTransposition
     } = MusicUtilsTemperament;
     var MusicUtilsPitch =
         (typeof window !== "undefined" && window.MusicUtilsPitch) ||
@@ -253,6 +254,7 @@ if (typeof module !== "undefined" && module.exports) {
    convertFromSolfege, getPitchInfo, i18nSolfege,
    convertFactor, getMeasurePosition, getMeterAnchor, saveMeterState, restoreMeterState,
    getReverseDrumMidi, getOctaveRatio, getEffectiveOctaveRatio, setOctaveRatio, getTemperamentsList,
+   edoTransposition,
    addTemperamentToList, getTemperament, deleteTemperamentFromList,
    addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
    DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
@@ -379,6 +381,7 @@ if (typeof module !== "undefined" && module.exports) {
         getTemperamentRatio,
         getTemperamentCents,
         getTemperamentName,
+        edoTransposition,
         getCurrentEDO,
         noteToObj,
         frequencyToPitch,
