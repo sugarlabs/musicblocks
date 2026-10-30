@@ -858,6 +858,11 @@ class Activity {
                 return;
             }
 
+            const request = {};
+            this.logo._pendingPlayRequest = request;
+            const executionRequest = this.logo._executionRequest;
+            const projectGeneration = this.multisampleProjectGeneration;
+
             // The rest of the Play action starts the Transport, which touches
             // the Web Audio context synchronously. Tone.start()/context.resume()
             // are async, so running that logic in parallel (fire-and-forget)
@@ -866,6 +871,13 @@ class Activity {
             // unlock to settle first so the Transport only starts once the
             // context is (or is as close as it will get to) running.
             const runPlayAction = () => {
+                if (this.logo._pendingPlayRequest !== request) return;
+                this.logo._pendingPlayRequest = null;
+                if (
+                    this.logo._executionRequest !== executionRequest ||
+                    this.multisampleProjectGeneration !== projectGeneration
+                )
+                    return;
                 this._onResize();
                 this.blocks.activeBlock = null;
                 hideDOMLabel();

@@ -775,6 +775,37 @@ describe("Ordinary multisample programs", { testIsolation: true, retries: 0 }, (
     });
 
     for (const outcome of ["success", "failure"]) {
+        it("Stop cancels delayed toolbar audio unlock " + outcome, () => {
+            load();
+            cy.window().then(async win => {
+                observed = await observe(win);
+                const { activity, logo, synth } = observed;
+                logo.boxes = { suffix: 0 };
+                let settle;
+                cy.stub(synth, "startAudio").returns(
+                    new win.Promise((resolve, reject) => {
+                        settle = () =>
+                            outcome === "success" ? resolve() : reject(new Error("unlock failed"));
+                    })
+                );
+                activity._doFastButton();
+                activity._doHardStopButton(false);
+                settle();
+                await new win.Promise(resolve => win.setTimeout(resolve, 0));
+                expect(logo._executionRequest).to.equal(null);
+                expect(observed.trace.dispatch).to.have.length(0);
+                expect(logo.boxes.suffix).to.equal(0);
+                synth.startAudio.restore();
+                activity._doFastButton();
+            });
+            cy.window({ timeout: 20000 }).should(() => {
+                expect(observed.logo.boxes.suffix).to.equal(1);
+                expect(observed.trace.attacks).to.have.length(3);
+            });
+        });
+    }
+
+    for (const outcome of ["success", "failure"]) {
         it("Stop prevents late optional startup callback " + outcome, () => {
             load();
             let callbacks;
