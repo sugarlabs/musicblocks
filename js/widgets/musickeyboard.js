@@ -18,7 +18,7 @@
    last, ManagedTimer, Singer, noteToFrequency, i18nSolfege, toFraction,
    DEFAULTVOICE, SOLFEGECONVERSIONTABLE, NOTESSHARP, NOTESFLAT, PITCHES,
    PITCHES2, convertFromSolfege, announceToScreenReader, MusicKeyboardEditing,
-   MusicKeyboardRendering, getCurrentEDO, generateNoteNames */
+   MusicKeyboardRendering, getCurrentEDO, generateNoteNames, isEquallyTempered */
 /*
    Global Locations
     - js/utils/utils.js
@@ -31,7 +31,7 @@
         noteToFrequency, FIXEDSOLFEGE, FIXEDSOLFEGE1, SHARP, FLAT,
         i18nSolfege, toFraction, DEFAULTVOICE, PITCHES, PITCHES2,
         SOLFEGECONVERSIONTABLE, NOTESSHARP, NOTESFLAT, convertFromSolfege,
-        getCurrentEDO, generateNoteNames
+        getCurrentEDO, generateNoteNames, isEquallyTempered
     - js/utils/platformstyle.js
         platformColor
     - js/widgets/MusicKeyboardEditing.js
@@ -1660,14 +1660,10 @@ function MusicKeyboard(activity) {
             return false;
         });
 
-        function removeBlock(that, i) {
-            that._setWidgetTimeout(() => {
-                that._removePitchBlock(that.remove[i]);
+        for (const blockNumber of this.remove) {
+            this._setWidgetTimeout(() => {
+                this._removePitchBlock(blockNumber);
             }, 200);
-        }
-
-        for (let i = 0; i < this.remove.length; i++) {
-            removeBlock(this, i);
         }
 
         const sortedHertzList = sortedList.filter(note => note.noteName === "hertz");
@@ -2023,14 +2019,14 @@ function MusicKeyboard(activity) {
     };
 
     /**
-     * Initiates MIDI functionality, allowing notes to be triggered by user interaction.
+     * Rebuilds the MIDI pitch-to-key map from the current keyboard layout.
+     * @private
      * @memberof MusicKeyboard
      */
-    this.doMIDI = () => {
-        let duration = 0;
-        let startTime = 0;
-
+    this._refreshNoteToKeyMap = () => {
         this.noteToKeyMap = {};
+        const temperament = this.activity.logo.synth.inTemperament;
+        const mapEnharmonics = getCurrentEDO(temperament) === 12 && isEquallyTempered(temperament);
 
         for (let idx = 0; idx < this.layout.length; idx++) {
             const key = this.layout[idx];
@@ -2041,8 +2037,26 @@ function MusicKeyboard(activity) {
                         FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave
                     ] = key.objId; //convet solfege to alphabetic.
                 }
+                if (mapEnharmonics) {
+                    const pitch = FIXEDSOLFEGE1[key.noteName] || key.noteName;
+                    const step = NOTESFLAT.indexOf(pitch);
+                    if (step !== -1) {
+                        this.noteToKeyMap[NOTESSHARP[step] + key.noteOctave] ??= key.objId;
+                    }
+                }
             }
         }
+    };
+
+    /**
+     * Initiates MIDI functionality, allowing notes to be triggered by user interaction.
+     * @memberof MusicKeyboard
+     */
+    this.doMIDI = () => {
+        let duration = 0;
+        let startTime = 0;
+
+        this._refreshNoteToKeyMap();
 
         /**
          * Handler for starting a note on MIDI interaction.
