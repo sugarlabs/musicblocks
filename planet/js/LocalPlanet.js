@@ -109,9 +109,9 @@ class LocalPlanet {
         jQuery("#deleter").modal("open");
     }
 
-    openProject(id) {
+    async openProject(id) {
         const Planet = this.Planet;
-        Planet.ProjectStorage.setCurrentProjectID(id);
+        await Planet.ProjectStorage.setCurrentProjectID(id);
         // Notify the parent window of the new project's git state so that
         // the "My Project" toolbar menu (gitDropdownUI) shows Time Travel
         // when the opened project has a GitHub save spot.
