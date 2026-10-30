@@ -141,15 +141,19 @@ const _addFractionsWithoutCrossMultiplication = ([n1, d1], [n2, d2]) => {
     const denominator = useFirstDenominator ? d1 : d2;
     const numerator = useFirstDenominator ? n1 + n2 * (d1 / d2) : n1 * (d2 / d1) + n2;
 
+    const value = n1 / d1 + n2 / d2;
     const directResult = [numerator, denominator];
 
-    if (_isUsableFraction(directResult)) {
+    if (
+        _isUsableFraction(directResult) &&
+        Number.isFinite(value) &&
+        numerator / denominator === value
+    ) {
         return directResult;
     }
 
     // If retaining either original scale would overflow, preserve the numeric
     // duration using the largest denominator that still keeps the pair finite.
-    const value = n1 / d1 + n2 / d2;
 
     if (!Number.isFinite(value) || value <= 0) {
         return [1, 4];
