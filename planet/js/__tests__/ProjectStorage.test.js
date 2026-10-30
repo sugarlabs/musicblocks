@@ -856,6 +856,13 @@ describe("ProjectStorage", () => {
             expect(storage.getCurrentProjectID()).toBe("proj1");
         });
 
+        it("setCurrentProjectID should update CurrentProject and persist to storage", async () => {
+            const saveSpy = jest.spyOn(storage, "save").mockResolvedValue();
+            await storage.setCurrentProjectID("proj2");
+            expect(storage.getCurrentProjectID()).toBe("proj2");
+            expect(saveSpy).toHaveBeenCalledTimes(1);
+        });
+
         it("removeSyncedDrafts should drop only synced drafts matched by a commit", async () => {
             const saveSpy = jest.spyOn(storage, "save").mockResolvedValue();
             storage.data.Projects.proj1.commitDrafts = [
