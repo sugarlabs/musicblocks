@@ -1381,22 +1381,82 @@ describe("newProject / _afterDelete", () => {
         jest.useRealTimers();
     });
 
-    it("uses planet new-project path when available", () => {
+    it("waits for the current Planet project to save before creating a new one", async () => {
+        let finishSave;
         const planet = {
             planet: {},
             getCurrentProjectName: jest.fn(() => "Real Project"),
-            saveLocally: jest.fn(),
+            saveLocally: jest.fn(
+                () =>
+                    new Promise(resolve => {
+                        finishSave = resolve;
+                    })
+            ),
             initialiseNewProject: jest.fn()
         };
         const activity = makeActivity({ planet });
         const pm = new ProjectManager(activity);
         pm._loadStart = jest.fn();
 
-        pm._afterDelete();
+        const newProject = pm._afterDelete();
 
-        expect(planet.saveLocally).toHaveBeenCalled();
+        expect(planet.saveLocally).toHaveBeenCalledWith({ rejectOnProjectSaveError: true });
+        expect(planet.initialiseNewProject).not.toHaveBeenCalled();
+        finishSave();
+        await newProject;
         expect(planet.initialiseNewProject).toHaveBeenCalled();
         expect(pm._loadStart).toHaveBeenCalled();
+    });
+
+    it("keeps the current project when its save fails", async () => {
+        const planet = {
+            planet: {},
+            getCurrentProjectName: jest.fn(() => "Real Project"),
+            saveLocally: jest.fn().mockRejectedValue(new Error("Storage full")),
+            initialiseNewProject: jest.fn()
+        };
+        const activity = makeActivity({ planet });
+        const pm = new ProjectManager(activity);
+        pm._loadStart = jest.fn();
+
+        await pm._afterDelete();
+
+        expect(planet.initialiseNewProject).not.toHaveBeenCalled();
+        expect(pm._loadStart).not.toHaveBeenCalled();
+        expect(activity.storage.removeItem).not.toHaveBeenCalled();
+        expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(expect.any(Error), {
+            operation: "saveProjectBeforeNewProject"
+        });
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Could not save the current project, so the new project was not created."
+        );
+    });
+
+    it("ignores a second New project request while the first save is pending", async () => {
+        let finishSave;
+        const pendingSave = new Promise(resolve => {
+            finishSave = resolve;
+        });
+        const planet = {
+            planet: {},
+            getCurrentProjectName: jest.fn(() => "Real Project"),
+            saveLocally: jest.fn().mockReturnValueOnce(pendingSave).mockResolvedValue(undefined),
+            initialiseNewProject: jest.fn()
+        };
+        const activity = makeActivity({ planet });
+        const pm = new ProjectManager(activity);
+        pm._loadStart = jest.fn();
+
+        const first = pm.newProject();
+        const second = pm.newProject();
+
+        expect(second).toBeUndefined();
+        expect(planet.saveLocally).toHaveBeenCalledTimes(1);
+
+        finishSave();
+        await first;
+
+        expect(planet.initialiseNewProject).toHaveBeenCalledTimes(1);
     });
 
     it("does not use planet path when project name is 'My Project'", () => {
