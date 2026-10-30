@@ -2184,5 +2184,47 @@ describe("widgetWindows", () => {
 
             expect(win._maximized).toBe(false);
         });
+
+        test("ignores repeated keydown events when activation key is held down", () => {
+            const win = createTestWindow();
+            win.onclose = jest.fn();
+
+            const repeatEvent = new KeyboardEvent("keydown", {
+                key: "Enter",
+                repeat: true,
+                bubbles: true,
+                cancelable: true
+            });
+            win._closeButton.dispatchEvent(repeatEvent);
+
+            expect(win.onclose).not.toHaveBeenCalled();
+        });
+
+        test("restores focus to previously focused element when window closes", () => {
+            const externalButton = document.createElement("button");
+            document.body.appendChild(externalButton);
+            externalButton.focus();
+
+            const win = createTestWindow();
+            win._closeButton.focus();
+            expect(document.activeElement).toBe(win._closeButton);
+
+            win.destroy();
+
+            expect(document.activeElement).toBe(externalButton);
+            document.body.removeChild(externalButton);
+        });
+
+        test("transfers focus to remaining open window when closed with multiple open windows", () => {
+            const win1 = createTestWindow("First Window");
+            const win2 = createTestWindow("Second Window");
+
+            win2._closeButton.focus();
+            expect(document.activeElement).toBe(win2._closeButton);
+
+            win2.destroy();
+
+            expect(window.widgetWindows.focused).toBe(win1);
+        });
     });
 });

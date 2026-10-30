@@ -360,6 +360,24 @@ describe("makeKeyboardAccessible()", () => {
         });
     });
 
+    it("ignores repeated keydown events when key is held down", () => {
+        const button = document.createElement("div");
+        const onActivate = jest.fn();
+        makeKeyboardAccessible(button, "Action", onActivate);
+
+        const event = new KeyboardEvent("keydown", {
+            key: "Enter",
+            repeat: true,
+            bubbles: true,
+            cancelable: true
+        });
+        const preventDefaultSpy = jest.spyOn(event, "preventDefault");
+        button.dispatchEvent(event);
+
+        expect(preventDefaultSpy).not.toHaveBeenCalled();
+        expect(onActivate).not.toHaveBeenCalled();
+    });
+
     it("replaces previous handler when called multiple times on the same element", () => {
         const button = document.createElement("div");
         const firstHandler = jest.fn();
