@@ -304,7 +304,7 @@ Japanese is a special case: `ja.po` and `ja-kana.po` are merged into a single `l
 
 ```bash
 npx jest js/practiceLessons          # tests for this folder
-npm test                             # full suite, with coverage thresholds
+npm test                             # full suite, with coverage
 npm run lint                         # eslint
 npx prettier --check js/practiceLessons
 ```
