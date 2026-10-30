@@ -298,9 +298,222 @@ describe("Singer Class", () => {
         expect(result).toBeGreaterThan(0);
     });
 
-    test("should correctly calculate inversion", () => {
-        const result = Singer.calculateInvert(logoMock, turtleMock, "C", 4);
-        expect(result).toBe(0);
+    describe("calculateInvert", () => {
+        let originalGetNote;
+        let originalPitchToNumber;
+
+        beforeEach(() => {
+            originalGetNote = global.getNote;
+            originalPitchToNumber = global.pitchToNumber;
+        });
+
+        afterEach(() => {
+            global.getNote = originalGetNote;
+            global.pitchToNumber = originalPitchToNumber;
+        });
+
+        test("should return 0 when invertList is empty", () => {
+            const result = Singer.calculateInvert(logoMock, turtleMock, "C", 4);
+            expect(result).toBe(0);
+        });
+
+        test("should correctly calculate single even inversion delta", () => {
+            const noteMap = { C: 39, D: 41, E: 43 };
+            global.getNote = jest.fn((note, octave) => [note, octave]);
+            global.pitchToNumber = jest.fn(
+                (note, octave) => (noteMap[note] || 39) + (octave - 4) * 12
+            );
+
+            turtleMock.singer.pitchNumberOffset = 39;
+            turtleMock.singer.invertList = [["D", 4, "even"]];
+
+            // Invert C4 (0) around D4 (2): stepDelta = 2 - 0 = 2 -> delta = 2 (inverts to E4)
+            const result = Singer.calculateInvert(logoMock, turtleMock, "C", 4);
+            expect(result).toBe(2);
+        });
+
+        test("should correctly calculate single odd inversion delta", () => {
+            const noteMap = { C: 39, D: 41, E: 43 };
+            global.getNote = jest.fn((note, octave) => [note, octave]);
+            global.pitchToNumber = jest.fn(
+                (note, octave) => (noteMap[note] || 39) + (octave - 4) * 12
+            );
+
+            turtleMock.singer.pitchNumberOffset = 39;
+            turtleMock.singer.invertList = [["C", 4, "odd"]];
+
+            // Invert C4 (0) around C4 odd axis: stepDelta = 0 - 0 + 0.5 = 0.5 -> delta = 0.5
+            const result = Singer.calculateInvert(logoMock, turtleMock, "C", 4);
+            expect(result).toBe(0.5);
+        });
+
+        test("should calculate correct pitch for nested multiple inversions without corrupting intermediate pitch", () => {
+            const noteMap = { C: 39, D: 41, E: 43 };
+            global.getNote = jest.fn((note, octave) => [note, octave]);
+            global.pitchToNumber = jest.fn(
+                (note, octave) => (noteMap[note] || 39) + (octave - 4) * 12
+            );
+
+            turtleMock.singer.pitchNumberOffset = 39;
+            // Nested inversions: outer is D4 (2), inner is E4 (4)
+            turtleMock.singer.invertList = [
+                ["D", 4, "even"],
+                ["E", 4, "even"]
+            ];
+
+            // Inner inversion (E4=4): C4 (0) reflects around 4 -> 8 (G#4). stepDelta1 = 4 - 0 = 4.
+            // Outer inversion (D4=2): 8 reflects around 2 -> -4 (G#3). stepDelta2 = 2 - 8 = -6.
+            // Net delta = 4 + (-6) = -2 (transposition = 2 * delta = -4, taking C4 to -4).
+            const result = Singer.calculateInvert(logoMock, turtleMock, "C", 4);
+            expect(result).toBe(-2);
+        });
+
+        test("should correctly invert through three nested layers", () => {
+            const noteMap = { C: 39, D: 41, E: 43 };
+            global.getNote = jest.fn((note, octave) => [note, octave]);
+            global.pitchToNumber = jest.fn(
+                (note, octave) => (noteMap[note] || 39) + (octave - 4) * 12
+            );
+
+            turtleMock.singer.pitchNumberOffset = 39;
+            // Three nested clamps: outer C4 (0), middle D4 (2), inner E4 (4)
+            turtleMock.singer.invertList = [
+                ["C", 4, "even"],
+                ["D", 4, "even"],
+                ["E", 4, "even"]
+            ];
+
+            // Inner E4: 0 -> 8, stepDelta = 4
+            // Middle D4: 8 -> -4, stepDelta = -6
+            // Outer C4: -4 -> 4, stepDelta = 4
+            // Total delta = 4 + (-6) + 4 = 2 (transposition = 4, takes C4 to E4=4)
+            const result = Singer.calculateInvert(logoMock, turtleMock, "C", 4);
+            expect(result).toBe(2);
+        });
+
+        test("should forward cents to getNote as semitones and evaluate axis at 0", () => {
+            global.getNote = jest.fn((note, octave, transposition) => [
+                note,
+                octave,
+                transposition * 100
+            ]);
+            turtleMock.singer.invertList = [["D", 4, "even"]];
+
+            Singer.calculateInvert(logoMock, turtleMock, "C", 4, 35);
+
+            // First call evaluates target note with cents converted to semitones (35 / 100 = 0.35)
+            expect(global.getNote).toHaveBeenNthCalledWith(
+                1,
+                "C",
+                4,
+                0.35,
+                turtleMock.singer.keySignature,
+                turtleMock.singer.movable,
+                null,
+                activityMock.errorMsg,
+                activityMock.logo.synth.inTemperament
+            );
+
+            // Second call evaluates inversion center axis at 0 semitones
+            expect(global.getNote).toHaveBeenNthCalledWith(
+                2,
+                "D",
+                4,
+                0,
+                turtleMock.singer.keySignature,
+                turtleMock.singer.movable,
+                null,
+                activityMock.errorMsg,
+                activityMock.logo.synth.inTemperament
+            );
+        });
+
+        test("should preserve microtonal cents precision and calculate exact inversion delta with real getNote", () => {
+            global.getNote = musicUtils.getNote;
+            global.pitchToNumber = musicUtils.pitchToNumber;
+            global.getCurrentEDO = () => 12;
+
+            turtleMock.singer.pitchNumberOffset = 39;
+            turtleMock.singer.keySignature = "C major";
+            turtleMock.singer.movable = false;
+            activityMock.logo.synth.inTemperament = "equal";
+
+            // Invert C4 + 35 cents across D4 (even mode)
+            // num1 = 39 - 39 + 0.35 = 0.35
+            // num2 = 41 - 39 + 0 = 2.0
+            // stepDelta = 2.0 - 0.35 = 1.65
+            turtleMock.singer.invertList = [["D", 4, "even"]];
+            const deltaPositive = Singer.calculateInvert(logoMock, turtleMock, "C", 4, 35);
+            expect(deltaPositive).toBeCloseTo(1.65, 4);
+
+            // Verify the inverted note resolved through real getNote with (2 * delta + cents / 100):
+            // Transposition = 2 * 1.65 + 0.35 = 3.65 semitones above C4 (39 + 3.65 = 42.65 semitones = E4 - 35 cents)
+            const invertedNote = musicUtils.getNote(
+                "C",
+                4,
+                2 * deltaPositive + 0.35,
+                "C major",
+                false,
+                null,
+                () => {},
+                "equal"
+            );
+            const invertedPitch =
+                musicUtils.pitchToNumber(invertedNote[0], invertedNote[1], "C major", "equal") +
+                invertedNote[2] / 100;
+            expect(invertedPitch).toBeCloseTo(42.65, 4);
+
+            // Invert C4 - 35 cents across D4 (even mode)
+            // num1 = 39 - 39 - 0.35 = -0.35
+            // num2 = 41 - 39 = 2.0
+            // stepDelta = 2.0 - (-0.35) = 2.35
+            const deltaNegative = Singer.calculateInvert(logoMock, turtleMock, "C", 4, -35);
+            expect(deltaNegative).toBeCloseTo(2.35, 4);
+
+            // Verify negative cents inverted note: 2 * 2.35 - 0.35 = 4.35 semitones above C4 (E4 + 35 cents)
+            const invertedNegative = musicUtils.getNote(
+                "C",
+                4,
+                2 * deltaNegative - 0.35,
+                "C major",
+                false,
+                null,
+                () => {},
+                "equal"
+            );
+            const invertedNegativePitch =
+                musicUtils.pitchToNumber(
+                    invertedNegative[0],
+                    invertedNegative[1],
+                    "C major",
+                    "equal"
+                ) +
+                invertedNegative[2] / 100;
+            expect(invertedNegativePitch).toBeCloseTo(43.35, 4);
+        });
+
+        test("should preserve microtonal precision across nested multiple inversions", () => {
+            global.getNote = musicUtils.getNote;
+            global.pitchToNumber = musicUtils.pitchToNumber;
+            global.getCurrentEDO = () => 12;
+
+            turtleMock.singer.pitchNumberOffset = 39;
+            turtleMock.singer.keySignature = "C major";
+            turtleMock.singer.movable = false;
+            activityMock.logo.synth.inTemperament = "equal";
+
+            // Invert C4 + 20 cents:
+            // 1st layer: Invert around D4 (even): num1 = 0.2, num2 = 2.0 -> stepDelta = 1.8, num1 becomes 3.8 (E4 - 20 cents)
+            // 2nd layer: Invert around E4 (even): num2 = 4.0 -> stepDelta = 4.0 - 3.8 = 0.2, num1 becomes 4.2 (E4 + 20 cents)
+            // Total delta = 1.8 + 0.2 = 2.0
+            turtleMock.singer.invertList = [
+                ["E", 4, "even"],
+                ["D", 4, "even"]
+            ];
+
+            const delta = Singer.calculateInvert(logoMock, turtleMock, "C", 4, 20);
+            expect(delta).toBeCloseTo(2.0, 4);
+        });
     });
 
     test("should set master volume correctly", () => {
