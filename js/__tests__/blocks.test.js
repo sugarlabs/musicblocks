@@ -2162,17 +2162,15 @@ describe("Blocks Foundation", () => {
             };
 
             it("gives the temperament the octave space saved beside its notes", () => {
-                loadTemperament({
-                    customName: "tritave",
-                    customTemperamentNotes: { pitchNumber: 1, 0: [1, "C", 4] },
-                    octaveSpace: 3
-                });
+                const customTemperamentNotes = { pitchNumber: 1, 0: [1, "C", 4] };
+                loadTemperament({ customName: "tritave", customTemperamentNotes, octaveSpace: 3 });
 
                 expect(global.addTemperamentToDictionary).toHaveBeenCalledWith("tritave", {
                     pitchNumber: 1,
                     0: [1, "C", 4],
                     octaveRatio: 3
                 });
+                expect(customTemperamentNotes).not.toHaveProperty("octaveRatio");
                 expect(global.setOctaveRatio).not.toHaveBeenCalled();
             });
 
