@@ -1184,15 +1184,16 @@ class ProjectManager {
             }
         };
 
-        const replaceProjectFromFile = async (obj, file, errorOperation, clearCanvas) => {
+        let projectReplacementQueue = Promise.resolve();
+        const performProjectReplacementFromFile = async (
+            obj,
+            file,
+            errorOperation,
+            clearCanvas
+        ) => {
             if (that.blocks.isLoading()) {
-                return new Promise((resolve, reject) => {
-                    that.blocks.runAfterLoad(() => {
-                        replaceProjectFromFile(obj, file, errorOperation, clearCanvas).then(
-                            resolve,
-                            reject
-                        );
-                    });
+                await new Promise((resolve, reject) => {
+                    that.blocks.runAfterLoad(resolve, reject);
                 });
             }
 
@@ -1256,6 +1257,16 @@ class ProjectManager {
                 that.errorMsg(_("Cannot load project from the file. Please check the file type."));
                 finishLoading();
             }
+        };
+
+        const replaceProjectFromFile = (obj, file, errorOperation, clearCanvas) => {
+            const replacement = projectReplacementQueue.then(() =>
+                performProjectReplacementFromFile(obj, file, errorOperation, clearCanvas)
+            );
+
+            projectReplacementQueue = replacement.catch(() => {});
+
+            return replacement;
         };
 
         that.fileChooser.addEventListener("click", event => {

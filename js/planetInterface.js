@@ -160,7 +160,12 @@ class PlanetInterface {
             }
 
             if (!merge && this.activity.blocks.isLoading()) {
-                this.activity.blocks.runAfterLoad(() => this.loadProjectFromData(data, merge));
+                this.activity.blocks.runAfterLoad(
+                    () => this.loadProjectFromData(data, merge),
+                    error => {
+                        this.activity.errorMsg(error);
+                    }
+                );
                 return;
             }
 

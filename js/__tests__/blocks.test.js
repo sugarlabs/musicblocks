@@ -3133,6 +3133,46 @@ describe("Blocks Foundation", () => {
             expect(callback).not.toHaveBeenCalled();
         });
 
+        it("runAfterLoad calls the failure callback when the load fails partway", async () => {
+            let callCount = 0;
+            const loadError = new Error("deferred chunk failure");
+
+            blocks._processOneBlock = jest.fn((b, blockObjs, blockOffset) => {
+                callCount++;
+
+                if (callCount === 21) {
+                    throw loadError;
+                }
+
+                blocks.blockList[blockOffset + b] = {
+                    connections: null,
+                    trash: false
+                };
+
+                setTimeout(() => blocks.cleanupAfterLoad(), 0);
+            });
+
+            const onWindowError = event => event.preventDefault();
+            window.addEventListener("error", onWindowError);
+
+            const onSuccess = jest.fn();
+            const onFailure = jest.fn();
+
+            try {
+                blocks.loadNewBlocks(makeBatch(25));
+
+                blocks.runAfterLoad(onSuccess, onFailure);
+
+                await new Promise(resolve => setTimeout(resolve, 50));
+            } finally {
+                window.removeEventListener("error", onWindowError);
+            }
+
+            expect(onSuccess).not.toHaveBeenCalled();
+            expect(onFailure).toHaveBeenCalledTimes(1);
+            expect(onFailure).toHaveBeenCalledWith(loadError);
+        });
+
         it("runAfterLoad drops its callbacks when a load fails and a queued one then succeeds", async () => {
             let callCount = 0;
             blocks._processOneBlock = jest.fn((b, blockObjs, blockOffset) => {
