@@ -116,23 +116,28 @@ describe("MusicKeyboardInput", () => {
     });
 
     describe("MIDI", () => {
-        // Turns MIDI on with one fake input and returns a function that sends it bytes.
-        const connect = async keyboard => {
-            let handler = null;
-            const input = {
-                addEventListener: (type, fn) => {
-                    handler = fn;
-                },
-                removeEventListener: jest.fn()
-            };
-            navigator.requestMIDIAccess = jest
-                .fn()
-                .mockResolvedValue({ inputs: new Map([["in", input]]) });
+        // Turns MIDI on with fake inputs and returns, for each input, a function
+        // that sends it bytes.
+        const connectInputs = async (keyboard, count) => {
+            const inputs = [];
+            const senders = [];
+            for (let i = 0; i < count; i++) {
+                const input = {
+                    addEventListener: (type, fn) => {
+                        senders[i] = bytes => fn({ data: bytes, currentTarget: input });
+                    },
+                    removeEventListener: jest.fn()
+                };
+                inputs.push(["in" + i, input]);
+            }
+            navigator.requestMIDIAccess = jest.fn().mockResolvedValue({ inputs: new Map(inputs) });
             keyboard.doMIDI();
             await Promise.resolve();
             await Promise.resolve();
-            return bytes => handler({ data: bytes });
+            return senders;
         };
+
+        const connect = async keyboard => (await connectInputs(keyboard, 1))[0];
 
         const NOTE_ON = 0x90;
         const NOTE_OFF = 0x80;
@@ -314,6 +319,46 @@ describe("MusicKeyboardInput", () => {
                 null
             );
             expect(keyboard._notesPlayed.map(note => note.noteOctave)).toEqual(["C5"]);
+        });
+
+        test("the same note held on two channels is two notes", async () => {
+            const keyboard = makeKeyboard();
+            const send = await connect(keyboard);
+            const start = Date.now();
+
+            send([NOTE_ON, C4, 100]);
+            jest.advanceTimersByTime(500);
+            send([NOTE_ON + 1, C4, 100]);
+            jest.advanceTimersByTime(500);
+            send([NOTE_OFF, C4, 0]);
+            jest.advanceTimersByTime(500);
+            send([NOTE_OFF + 1, C4, 0]);
+
+            expect(keyboard._notesPlayed.map(note => [note.startTime, note.duration])).toEqual([
+                [start, 0.5],
+                [start + 500, 0.5]
+            ]);
+            expect(keyboard.activity.logo.synth.stopSound).toHaveBeenCalledTimes(2);
+        });
+
+        test("the same note held on two inputs is two notes", async () => {
+            const keyboard = makeKeyboard();
+            const [first, second] = await connectInputs(keyboard, 2);
+            const start = Date.now();
+
+            first([NOTE_ON, C4, 100]);
+            jest.advanceTimersByTime(500);
+            second([NOTE_ON, C4, 100]);
+            jest.advanceTimersByTime(500);
+            first([NOTE_OFF, C4, 0]);
+            jest.advanceTimersByTime(500);
+            second([NOTE_OFF, C4, 0]);
+
+            expect(keyboard._notesPlayed.map(note => [note.startTime, note.duration])).toEqual([
+                [start, 0.5],
+                [start + 500, 0.5]
+            ]);
+            expect(keyboard.activity.logo.synth.stopSound).toHaveBeenCalledTimes(2);
         });
 
         test("uses the same clock as the mouse and computer keyboard", async () => {

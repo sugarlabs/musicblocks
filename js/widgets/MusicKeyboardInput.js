@@ -333,11 +333,19 @@ const MusicKeyboardInput = {
          * @memberof MusicKeyboard
          */
         this.doMIDI = () => {
-            // The held notes, by MIDI note number. Each keeps the key, pitch, voice
-            // and block it started with, so an octave shift while it is held does
-            // not change what is stopped and recorded. The clock is the one the
-            // mouse and computer keyboard use, so all recorded notes sort together.
-            const activeNotes = {};
+            // The held notes of each MIDI input, by channel and note number, so the
+            // same note held on two inputs or channels is two notes. Each keeps the
+            // key, pitch, voice and block it started with, so an octave shift while
+            // it is held does not change what is stopped and recorded. The clock is
+            // the one the mouse and computer keyboard use, so all recorded notes
+            // sort together.
+            const activeNotes = new Map();
+            const __heldNotes = event => {
+                const input = event.currentTarget || null;
+                if (!activeNotes.has(input)) activeNotes.set(input, {});
+                return activeNotes.get(input);
+            };
+            const __noteId = event => (event.data[0] & 0x0f) + ":" + event.data[1];
             // Notes struck within this many milliseconds start together, so a chord
             // is recorded as one, as it is from the computer keyboard.
             const CHORDWINDOW = 100;
@@ -358,7 +366,7 @@ const MusicKeyboardInput = {
                         ? lastStartTime
                         : now;
                 lastStartTime = startTime;
-                activeNotes[event.data[1]] = {
+                __heldNotes(event)[__noteId(event)] = {
                     startTime: startTime,
                     objId: element.id,
                     noteOctave: this.noteMapper[element.id],
@@ -383,9 +391,10 @@ const MusicKeyboardInput = {
             const __endNote = event => {
                 // Ignore a note off for a note that was not started here, such as one
                 // held down before MIDI was turned on.
-                const note = activeNotes[event.data[1]];
+                const held = __heldNotes(event);
+                const note = held[__noteId(event)];
                 if (!note) return;
-                delete activeNotes[event.data[1]];
+                delete held[__noteId(event)];
 
                 const element = this._mkbEl(note.objId);
                 if (element) {
