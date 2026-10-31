@@ -231,6 +231,13 @@ class MeterWidget {
          */
         this._widgetBlock = widgetBlock;
 
+        // Running the block again while the widget is open takes over its window: the window is
+        // cleared and its close handler replaced, so the widget it replaces would keep playing.
+        const previous = this.activity.logo.meterWidget;
+        if (previous && previous !== this && typeof previous._stopPlayback === "function") {
+            previous._stopPlayback();
+        }
+
         /**
          * The widget window.
          *
