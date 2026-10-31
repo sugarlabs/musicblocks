@@ -773,6 +773,12 @@ class SaveInterface {
             try {
                 const abc = encodeURIComponent(saveAbcOutput(this.activity));
                 this.activity.save.download("abc", "data:text;utf8," + abc, filename || null);
+                if (this.activity.logo?.abcExportWarnings?.length > 0) {
+                    this.activity.textMsg(
+                        _("ABC export rounded one or more Hertz pitches to the nearest note."),
+                        5000
+                    );
+                }
             } catch (e) {
                 console.error("Error in ABC output generation: ", e);
                 this.activity.errorMsg(`${_("Error generating ABC output.")} ${e.message}`);
