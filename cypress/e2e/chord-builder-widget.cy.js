@@ -426,19 +426,31 @@ describe("Chord Builder widget", () => {
             const pitchBlocks = blocks.blockList.filter(b => !b.trash && b.name === "pitch");
             expect(pitchBlocks, "pitch blocks must be created for chord roots").to.have.length(4);
 
-            // Follow each chordinterval through its newnote, pitch, and notename connections
-            const roots = chordBlocks.map(chordBlock => {
-                const bodyBlock = blocks.blockList[chordBlock.connections[2]];
+            // Walk the flow chain from the first chord so roots keep progression order
+            const firstChord = chordBlocks.find(
+                b => blocks.blockList[b.connections[0]]?.name === "start"
+            );
+            expect(firstChord, "first chordinterval must follow the start block").to.exist;
+
+            const roots = [];
+            let currentChord = firstChord;
+            while (currentChord) {
+                expect(currentChord.name, "flow block must be a chordinterval").to.equal(
+                    "chordinterval"
+                );
+                const bodyBlock = blocks.blockList[currentChord.connections[2]];
                 const pitchBlock = blocks.blockList[bodyBlock.connections[2]];
                 const rootBlock = blocks.blockList[pitchBlock.connections[1]];
                 expect(rootBlock, "pitch root block must exist").to.exist;
                 expect(rootBlock.name, "pitch root block must be a notename").to.equal("notename");
-                return rootBlock.value;
-            });
+                roots.push(rootBlock.value);
+                currentChord = blocks.blockList[currentChord.connections[3]];
+            }
+
             expect(
                 roots,
-                "chord roots must match the pop progression (C, G, Am, F)"
-            ).to.have.members(["C", "G", "A", "F"]);
+                "chord roots must match the pop progression (C, G, Am, F) in flow order"
+            ).to.deep.equal(["C", "G", "A", "F"]);
         });
     });
 
