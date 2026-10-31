@@ -654,6 +654,30 @@ describe("setupWidgetBlocks", () => {
         it.each([
             ["is 0", { 3: { name: "number", value: 0, connections: [1] } }],
             [
+                "is 0 / 4",
+                {
+                    3: { name: "divide", value: 0 / 4, connections: [1, 4, 5] },
+                    4: { name: "number", value: 0 },
+                    5: { name: "number", value: 4 }
+                }
+            ],
+            [
+                "is -1 / 4",
+                {
+                    3: { name: "divide", value: -1 / 4, connections: [1, 4, 5] },
+                    4: { name: "number", value: -1 },
+                    5: { name: "number", value: 4 }
+                }
+            ],
+            [
+                "is 1 / -4",
+                {
+                    3: { name: "divide", value: 1 / -4, connections: [1, 4, 5] },
+                    4: { name: "number", value: 1 },
+                    5: { name: "number", value: -4 }
+                }
+            ],
+            [
                 "has no denominator",
                 {
                     3: { name: "divide", value: 0, connections: [1, 4, null] },
