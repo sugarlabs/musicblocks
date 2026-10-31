@@ -547,7 +547,6 @@ class SaveInterface {
                             drumTrack.channel = 9; // Drums must be on Channel 10
                             drumTracks.set(drum, drumTrack);
                         }
-
                         const drumTrack = drumTracks.get(drum);
                         const midiNumber =
                             Object.prototype.hasOwnProperty.call(drumMIDI, drum) && drumMIDI[drum]
