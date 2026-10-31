@@ -391,7 +391,7 @@ describe("Singer Class", () => {
             expect(result).toBe(2);
         });
 
-        test("should forward cents to getNote as semitones and evaluate axis at 0", () => {
+        test("should resolve target note without forwarding cents and evaluate axis at 0", () => {
             global.getNote = jest.fn((note, octave, transposition) => [
                 note,
                 octave,
@@ -401,12 +401,13 @@ describe("Singer Class", () => {
 
             Singer.calculateInvert(logoMock, turtleMock, "C", 4, 35);
 
-            // First call evaluates target note with cents converted to semitones (35 / 100 = 0.35)
+            // Target-note lookup receives 0 cents; the original cents are applied separately
+            // in the pitch calculation to avoid double-counting.
             expect(global.getNote).toHaveBeenNthCalledWith(
                 1,
                 "C",
                 4,
-                0.35,
+                0,
                 turtleMock.singer.keySignature,
                 turtleMock.singer.movable,
                 null,
@@ -426,6 +427,29 @@ describe("Singer Class", () => {
                 activityMock.errorMsg,
                 activityMock.logo.synth.inTemperament
             );
+        });
+
+        test("should not double-count cents in equal19 inversion", () => {
+            global.getNote = musicUtils.getNote;
+            global.pitchToNumber = musicUtils.pitchToNumber;
+            global.getCurrentEDO = () => 19;
+
+            turtleMock.singer.keySignature = "C major";
+            turtleMock.singer.movable = false;
+            activityMock.logo.synth.inTemperament = "equal19";
+
+            turtleMock.singer.pitchNumberOffset = musicUtils.pitchToNumber(
+                "C",
+                4,
+                "C major",
+                "equal19"
+            );
+
+            turtleMock.singer.invertList = [["C", 4, "even"]];
+
+            const delta = Singer.calculateInvert(logoMock, turtleMock, "C", 4, 35);
+
+            expect(delta).toBeCloseTo(-(35 * 19) / 1200, 6);
         });
 
         test("should preserve microtonal cents precision and calculate exact inversion delta with real getNote", () => {
