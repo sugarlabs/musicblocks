@@ -358,12 +358,18 @@ describe("Chord Builder widget", () => {
         // Load pop preset so there is a progression to play
         chordBuilderFrame().find("#chordPresetSelect").select("pop");
 
+        cy.window().then(win => {
+            const { logo } = win.ActivityContext.getActivity();
+            cy.spy(logo.chordBuilderWidget.audio, "playChord").as("playChord");
+        });
+
         // Initial state is Play
         chordBuilderFrame().find("#chordPlayBtn").should("be.visible").and("contain.text", "Play");
 
         // Click Play -> switches to Stop
         chordBuilderFrame().find("#chordPlayBtn").click();
         chordBuilderFrame().find("#chordPlayBtn").should("contain.text", "Stop");
+        cy.get("@playChord").should("have.been.called");
 
         // Click Stop -> switches back to Play
         chordBuilderFrame().find("#chordPlayBtn").click();
@@ -420,9 +426,19 @@ describe("Chord Builder widget", () => {
             const pitchBlocks = blocks.blockList.filter(b => !b.trash && b.name === "pitch");
             expect(pitchBlocks, "pitch blocks must be created for chord roots").to.have.length(4);
 
-            const noteNameBlocks = blocks.blockList.filter(b => !b.trash && b.name === "notename");
-            const roots = noteNameBlocks.map(b => b.value);
-            expect(roots).to.include.members(["C", "G", "A", "F"]);
+            // Follow each chordinterval through its newnote, pitch, and notename connections
+            const roots = chordBlocks.map(chordBlock => {
+                const bodyBlock = blocks.blockList[chordBlock.connections[2]];
+                const pitchBlock = blocks.blockList[bodyBlock.connections[2]];
+                const rootBlock = blocks.blockList[pitchBlock.connections[1]];
+                expect(rootBlock, "pitch root block must exist").to.exist;
+                expect(rootBlock.name, "pitch root block must be a notename").to.equal("notename");
+                return rootBlock.value;
+            });
+            expect(
+                roots,
+                "chord roots must match the pop progression (C, G, Am, F)"
+            ).to.have.members(["C", "G", "A", "F"]);
         });
     });
 
