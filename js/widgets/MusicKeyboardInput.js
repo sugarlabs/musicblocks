@@ -412,7 +412,7 @@ const MusicKeyboardInput = {
             };
 
             //event attributes : timeStamp , data
-            //data : length -3 [0] : 144/128 : noteOn/NoteOff
+            //data : length -3 [0] : status: noteOn (0x90) / noteOff (0x80), plus the channel
             //                 [1] : noteNumber : middle C always 60
             //                 [2] : velocity ,(currently not used).
 
@@ -422,6 +422,12 @@ const MusicKeyboardInput = {
              * @memberof MusicKeyboard
              */
             const onMIDIMessage = event => {
+                // The high nibble of the status byte is the message type and the low
+                // nibble is the channel. Only notes go to the keys: pedals, pitch bend,
+                // pressure and clock messages carry other values in data[1].
+                const command = event.data[0] & 0xf0;
+                if (command !== 0x90 && command !== 0x80) return;
+
                 const pitchOctave = numberToPitch(event.data[1]);
                 const pitch1 = pitchOctave[0];
                 const pitch2 = pitchOctave[1];
@@ -429,7 +435,8 @@ const MusicKeyboardInput = {
                 const key =
                     this.noteToKeyMap[pitch1 + "" + octave] ||
                     this.noteToKeyMap[pitch2 + "" + octave];
-                if (event.data[0] === 144 && event.data[2] !== 0) {
+                // A note on with velocity 0 is a note off.
+                if (command === 0x90 && event.data[2] !== 0) {
                     __startNote(event, this._mkbEl(key));
                 } else {
                     __endNote(event, this._mkbEl(key));
