@@ -1218,53 +1218,59 @@
         </script>
 
         <script>
-            // Register service worker only in production (not on localhost)
-            if ("serviceWorker" in navigator) {
-                const readStorage = key => {
-                    try {
-                        return localStorage.getItem(key);
-                    } catch (e) {
-                        return null;
-                    }
-                };
-                // Localhost SW is disabled to avoid caching; set allowLocalPwa to test installs.
-                const allowLocalPwa = readStorage("allowLocalPwa") === "true";
+            // Register service worker only in production (not on localhost).
+            // MB_ENV comes from env.js, which is deferred, so decide once parsing
+            // is done; deferred scripts have all run by DOMContentLoaded.
+            document.addEventListener("DOMContentLoaded", () => {
+                if ("serviceWorker" in navigator) {
+                    const readStorage = key => {
+                        try {
+                            return localStorage.getItem(key);
+                        } catch (e) {
+                            return null;
+                        }
+                    };
+                    // Localhost SW is disabled to avoid caching; set allowLocalPwa to test installs.
+                    const allowLocalPwa = readStorage("allowLocalPwa") === "true";
 
-                // Detect if running on localhost for development
-                const runtimeEnv = window.MB_ENV;
-                const isDevMode = runtimeEnv !== "production";
+                    // Detect if running on localhost for development
+                    const runtimeEnv = window.MB_ENV;
+                    const isDevMode = runtimeEnv !== "production";
 
-                if (!isDevMode || allowLocalPwa) {
-                    // Production: Register service worker for offline mode
-                    if (navigator.serviceWorker.controller) {
-                        console.debug(
-                            "[PWA Builder] Active service worker found, no need to register"
-                        );
+                    if (!isDevMode || allowLocalPwa) {
+                        // Production: Register service worker for offline mode
+                        if (navigator.serviceWorker.controller) {
+                            console.debug(
+                                "[PWA Builder] Active service worker found, no need to register"
+                            );
+                        } else {
+                            // Register the service worker
+                            navigator.serviceWorker
+                                .register("sw.js")
+                                .then(function (reg) {
+                                    console.debug(
+                                        "[PWA Builder] Service worker registered for scope: " +
+                                            reg.scope
+                                    );
+                                })
+                                .catch(function (err) {
+                                    console.error(
+                                        "[PWA Builder] Service worker registration failed:",
+                                        err
+                                    );
+                                });
+                        }
                     } else {
-                        // Register the service worker
-                        navigator.serviceWorker
-                            .register("/sw.js")
-                            .then(function (reg) {
-                                console.debug(
-                                    "[PWA Builder] Service worker registered for scope: " +
-                                        reg.scope
-                                );
-                            })
-                            .catch(function (err) {
-                                console.error(
-                                    "[PWA Builder] Service worker registration failed:",
-                                    err
-                                );
-                            });
+                        // Development: Skip service worker for instant updates
+                        console.log(
+                            "🔥 [DEV MODE] Service worker disabled for instant code updates"
+                        );
+                        console.log(
+                            "Set localStorage.allowLocalPwa = 'true' to enable PWA install testing on localhost."
+                        );
                     }
-                } else {
-                    // Development: Skip service worker for instant updates
-                    console.log("🔥 [DEV MODE] Service worker disabled for instant code updates");
-                    console.log(
-                        "Set localStorage.allowLocalPwa = 'true' to enable PWA install testing on localhost."
-                    );
                 }
-            }
+            });
         </script>
         <script>
             let deferredPrompt;

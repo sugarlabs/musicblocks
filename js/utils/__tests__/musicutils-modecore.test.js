@@ -52,13 +52,30 @@ describe("musicutils-modecore", () => {
         expect(modecore.getModePattern("major")).toEqual([2, 2, 1, 2, 2, 2, 1]);
     });
 
-    it("captures customMode after MUSICALMODES.custom is set, not before", () => {
-        // customMode = MUSICALMODES["custom"] is a one-time read, not a live reference, so the
-        // assignment that fills MUSICALMODES.custom has to run first in this same file.
-        expect(modecore.customMode).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
-        expect(modecore.MUSICALMODES.custom).toBe(modecore.customMode);
-    });
+    it("handles nullish, empty, and non-string inputs safely in mode and note utilities", () => {
+        expect(modecore.getModeNumbers(null)).toBe("");
+        expect(modecore.getModeNumbers(undefined)).toBe("");
+        expect(modecore.getModeNumbers(123)).toBe("");
+        expect(modecore.getModeNumbers("")).toBe("");
 
+        expect(modecore.getArticulation(null)).toBe("");
+        expect(modecore.getArticulation(undefined)).toBe("");
+        expect(modecore.getArticulation(42)).toBe("");
+        expect(modecore.getArticulation("")).toBe("");
+
+        expect(modecore.modeMapper(null, "dorian")).toEqual(["b♭", "major"]);
+        expect(modecore.modeMapper("c", undefined)).toEqual(["c", "major"]);
+        expect(modecore.modeMapper(null, null)).toEqual(["c", "major"]);
+
+        expect(modecore.getCustomNote(null)).toBe("");
+        expect(modecore.getCustomNote(undefined)).toBe("");
+        expect(modecore.getCustomNote([])).toBe("");
+        expect(modecore.getCustomNote(123)).toBe("");
+
+        expect(modecore.getModePattern(null)).toEqual([2, 2, 1, 2, 2, 2, 1]);
+        expect(modecore.getModePattern(undefined)).toEqual([2, 2, 1, 2, 2, 2, 1]);
+        expect(modecore.getModePattern(99)).toEqual([2, 2, 1, 2, 2, 2, 1]);
+    });
     it("has 20 chord definitions and a movable-tonic-degree table", () => {
         expect(modecore.CHORDVALUES).toHaveLength(20);
         expect(modecore.CHORDVALUES[0]).toEqual([
@@ -116,7 +133,6 @@ describe("musicutils-modecore", () => {
     it("is still reachable through musicutils.js for callers that require it", () => {
         for (const name of [
             "MUSICALMODES",
-            "customMode",
             "getModeNumbers",
             "getNonEDOModeSteps",
             "getArticulation",

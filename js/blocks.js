@@ -64,6 +64,20 @@
 */
 // Constants moved to js/block-constants.js
 
+const ACTION_NAME_SLOTS = {
+    action: 1,
+    do: 1,
+    stack: 1,
+    calc: 1,
+    doArg: 1,
+    calcArg: 1,
+    listen: 2,
+    onbeatdo: 2,
+    offbeatdo: 1,
+    everybeatdo: 1,
+    everybeatdonew: 1
+};
+
 /**
  * Blocks holds the list of blocks and most of the block-associated
  * methods, since most block manipulations are inter-block.
@@ -1979,8 +1993,34 @@ class Blocks {
                 }
             }
 
-            for (let blk = 0; blk < this._adjustTheseStacks.length; blk++) {
-                this.raiseStackToTop(this._adjustTheseStacks[blk]);
+            if (this._adjustTheseStacks.length > 0) {
+                const container = this.activity.blocksContainer;
+                const order = new Map(container.children.map((child, index) => [child, index]));
+                let nextIndex = container.children.length;
+                let canBatch = true;
+
+                for (const blk of this._adjustTheseStacks) {
+                    this.findDragGroup(this.findTopBlock(blk));
+                    const seen = new Set();
+                    for (let b = this.dragGroup.length - 1; b >= 0; b--) {
+                        const child = this.blockList[this.dragGroup[b]].container;
+                        if (seen.has(child) || child?.parent !== container || !order.has(child)) {
+                            canBatch = false;
+                            break;
+                        }
+                        seen.add(child);
+                        order.set(child, nextIndex++);
+                    }
+                    if (!canBatch) break;
+                }
+
+                if (canBatch) {
+                    container.sortChildren((a, b) => order.get(a) - order.get(b));
+                } else {
+                    for (const blk of this._adjustTheseStacks) {
+                        this.raiseStackToTop(blk);
+                    }
+                }
             }
 
             this.activity.refreshCanvas();
@@ -2109,9 +2149,10 @@ class Blocks {
             // avoiding repeated O(depth) findTopBlock walks.
             if (this._topBlockCache === null) {
                 this._topBlockCache = new Map();
+                const roots = new Map();
                 for (let i = 0; i < this.blockList.length; i++) {
                     if (!this.blockList[i] || this.blockList[i].trash) continue;
-                    this._topBlockCache.set(i, this.findTopBlock(i));
+                    this._topBlockCache.set(i, this.findTopBlock(i, roots));
                 }
             }
 
@@ -2163,12 +2204,17 @@ class Blocks {
                             label = _("audio file");
                         } else {
                             label = myBlock.value[0].toString();
-                            if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+                            if (label.trim() === "") {
+                                label = _("audio file");
+                            } else if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
                                 label = label.slice(0, STRINGLEN) + "...";
                             }
                         }
                     } catch (e) {
                         label = _("audio file");
+                    }
+                    if (label === _("audio file")) {
+                        maxLength = label.length;
                     }
                     break;
                 case "solfege":
@@ -2324,10 +2370,11 @@ class Blocks {
         /**
          * Find the top block in the stack.
          * @param - blk - block
+         * @param {Map|null} roots - resolved ancestor paths for a batch of lookups
          * @public
          * @returns blk
          */
-        this.findTopBlock = blk => {
+        this.findTopBlock = (blk, roots = null) => {
             /** Find the top block in a stack. */
             if (blk === null) {
                 return null;
@@ -2362,8 +2409,13 @@ class Blocks {
                 return blk;
             }
 
+            const path = roots === null ? null : [];
             let topBlockLoop = 0;
             while (myBlock.connections[0] !== null) {
+                if (roots !== null && roots.has(blk)) {
+                    blk = roots.get(blk);
+                    break;
+                }
                 topBlockLoop += 1;
                 if (topBlockLoop > 2 * this.blockList.length) {
                     /** Could happen if the block data is malformed. */
@@ -2371,12 +2423,18 @@ class Blocks {
                     if (myBlock.garbage) {
                         console.debug(myBlock.blockIndex + " " + myBlock.name);
                     }
-                    break;
+                    return blk;
                 }
+                if (path !== null) path.push(blk);
                 blk = myBlock.connections[0];
                 myBlock = this.blockList[blk];
             }
 
+            // Only share paths that reached a root, not malformed-data fallback results.
+            if (roots !== null) {
+                roots.set(blk, blk);
+                for (const index of path) roots.set(index, blk);
+            }
             return blk;
         };
 
@@ -4001,25 +4059,7 @@ class Blocks {
                     continue;
                 }
 
-                if (
-                    ![
-                        "do",
-                        "calc",
-                        "doArg",
-                        "calcArg",
-                        "action",
-                        "offbeatdo",
-                        "onbeatdo",
-                        "listen"
-                    ].includes(blkParent.name)
-                ) {
-                    continue;
-                }
-
-                if (
-                    (blkParent.name === "onbeatdo" || blkParent.name === "listen") &&
-                    blkParent.connections.indexOf(blk) !== 2
-                ) {
+                if (blkParent.connections.indexOf(blk) !== ACTION_NAME_SLOTS[blkParent.name]) {
                     continue;
                 }
 
@@ -5654,14 +5694,13 @@ class Blocks {
                         case "namedcalcArg":
                             doNames[b] = blkData[1][1]["value"];
                             break;
-                        case "do":
-                        case "stack":
-                            if (blkData[4][1] !== null) {
-                                doNames[b] = blkData[4][1];
+                        default: {
+                            const label = blkData[4][ACTION_NAME_SLOTS[name]];
+                            if (["text", "string"].includes(blockObjs[label]?.[1][0])) {
+                                doNames[b] = label;
                             }
                             break;
-                        default:
-                            break;
+                        }
                     }
 
                     const proto = this.protoBlockDict[name];

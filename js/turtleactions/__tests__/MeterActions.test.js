@@ -150,6 +150,29 @@ describe("setupMeterActions", () => {
         });
     });
 
+    describe("weak beat chosen with on weak beat alone", () => {
+        beforeEach(() => {
+            Singer.MeterActions.setMeter(4, 1 / 4, 0);
+            Singer.MeterActions.onWeakBeatDo("testAction", false, null, 0, 1);
+        });
+
+        // Weak beats are determined by exclusion from beatList (beatValue > 1 and
+        // !beatList.includes(beatValue)), so default strong beats must return for
+        // the new meter to distinguish strong beats from weak beats.
+        it("restores default strong beats for the new meter while preserving offbeat", () => {
+            Singer.MeterActions.setMeter(6, 1 / 8, 0);
+            expect(targetTurtle.singer.beatList).toEqual(["offbeat", 1, 4]);
+            expect(targetTurtle.singer.defaultStrongBeats).toBe(true);
+        });
+
+        it("restores default strong beats across multiple meter changes", () => {
+            Singer.MeterActions.setMeter(6, 1 / 8, 0);
+            Singer.MeterActions.setMeter(4, 1 / 4, 0);
+            expect(targetTurtle.singer.beatList).toEqual(["offbeat", 1, 3]);
+            expect(targetTurtle.singer.defaultStrongBeats).toBe(true);
+        });
+    });
+
     it("keeps a strong beat past the end of the measure from bringing the defaults back", () => {
         Singer.MeterActions.setMeter(4, 1 / 4, 0);
         Singer.MeterActions.onStrongBeatDo(9, "testAction", false, null, 0, 1);
@@ -357,6 +380,44 @@ describe("setupMeterActions", () => {
             "__everybeat_1__",
             expect.any(Function)
         );
+    });
+
+    it("should reuse a companion turtle at index 0", () => {
+        const ownerTurtle = {
+            ...targetTurtle,
+            id: 1,
+            companionTurtle: 0
+        };
+        const companionTurtle = {
+            ...targetTurtle,
+            id: 0,
+            running: false
+        };
+        activity.turtles.getTurtle.mockImplementation(id =>
+            id === 1 ? ownerTurtle : companionTurtle
+        );
+        activity.turtles.ithTurtle.mockImplementation(id =>
+            id === 1 ? ownerTurtle : companionTurtle
+        );
+        activity.turtles.getTurtleCount.mockReturnValue(2);
+
+        Singer.MeterActions.onEveryBeatDo("testAction", false, null, 1, 1);
+
+        expect(activity.turtles.addTurtle).not.toHaveBeenCalled();
+        expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+            0,
+            "__everybeat_0__",
+            expect.any(Function)
+        );
+    });
+
+    it("should create a companion when the reference is undefined", () => {
+        delete targetTurtle.companionTurtle;
+
+        Singer.MeterActions.onEveryBeatDo("testAction", false, null, 0, 1);
+
+        expect(activity.turtles.addTurtle).toHaveBeenCalledTimes(1);
+        expect(targetTurtle.companionTurtle).toBe(1);
     });
 
     it("should handle running turtle in onEveryBeatDo listener", () => {

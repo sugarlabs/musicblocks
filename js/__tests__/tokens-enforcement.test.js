@@ -126,6 +126,12 @@ describe("Design Tokens Single Source of Truth", () => {
         );
     });
 
+    it("does not apply an inverse background to tour icons in dark mode", () => {
+        expect(darkmodeCss).not.toMatch(
+            /\.dark\s+#helpBodyDiv\s+\.help-tour-icon\s*\{[^}]*background(?:-color)?\s*:\s*var\(--color-bg-inverse\)/i
+        );
+    });
+
     it("verifies themes.css declares no custom properties", () => {
         const declared = readTokenBlock(themesCss);
         expect(Object.keys(declared)).toEqual([]);

@@ -791,10 +791,12 @@ describe("setupWidgetBlocks", () => {
         it("gives the Music Keyboard the turtle that ran the block (#9337)", () => {
             const keyboard = getBlock("musickeyboard");
             let turtleAtInit = null;
-            logo.musicKeyboard = {
-                init: jest.fn(() => {
-                    turtleAtInit = logo.musicKeyboard.turtle;
-                })
+            logo.musicKeyboards = {
+                kbdBlk: {
+                    init: jest.fn(() => {
+                        turtleAtInit = logo.musicKeyboards.kbdBlk.turtle;
+                    })
+                }
             };
 
             keyboard.flow(["childBlk"], logo, 2, "kbdBlk");
@@ -807,8 +809,13 @@ describe("setupWidgetBlocks", () => {
         it("opens each turtle's Music Keyboard with that turtle, whatever ran in between", () => {
             const keyboard = getBlock("musickeyboard");
             const turtlesAtInit = [];
-            logo.musicKeyboard = {
-                init: jest.fn(() => turtlesAtInit.push(logo.musicKeyboard.turtle))
+            logo.musicKeyboards = {
+                kbdBlk1: {
+                    init: jest.fn(() => turtlesAtInit.push(logo.musicKeyboards.kbdBlk1.turtle))
+                },
+                kbdBlk2: {
+                    init: jest.fn(() => turtlesAtInit.push(logo.musicKeyboards.kbdBlk2.turtle))
+                }
             };
 
             // Two turtles run Music Keyboard blocks before either listener fires.
@@ -825,10 +832,61 @@ describe("setupWidgetBlocks", () => {
 
         it("returns interruption and triggers runFromBlockNow for MusicKeyboardBlock", () => {
             const keyboard = getBlock("musickeyboard");
-            logo.musicKeyboard = null;
+            logo.musicKeyboards = {};
             const res = keyboard.flow(["childBlk"], logo, 0, "kbdBlk", "received");
             expect(res).toEqual([null, 0, true]);
             expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, "kbdBlk", true, "received");
+        });
+
+        it("gives each Music Keyboard block its own keyboard instance", () => {
+            const keyboard = getBlock("musickeyboard");
+            logo.musicKeyboards = {};
+
+            // First pass lazy-loads; the re-run (mocked here) sets the instance active.
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk1", "received");
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk1", "received");
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk2", "received");
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk2", "received");
+
+            expect(logo.musicKeyboards.kbdBlk1).toBeDefined();
+            expect(logo.musicKeyboards.kbdBlk2).toBeDefined();
+            // The second block must not reuse (or overwrite) the first block's keyboard.
+            expect(logo.musicKeyboards.kbdBlk1).not.toBe(logo.musicKeyboards.kbdBlk2);
+            expect(logo.musicKeyboards.kbdBlk1.blockNo).toBe("kbdBlk1");
+            expect(logo.musicKeyboards.kbdBlk2.blockNo).toBe("kbdBlk2");
+        });
+
+        it("routes rows to the keyboard of the turtle that ran the block", () => {
+            const keyboard = getBlock("musickeyboard");
+            const kb1 = { instruments: [], noteNames: [], octaves: [], addRowBlock: jest.fn() };
+            const kb2 = { instruments: [], noteNames: [], octaves: [], addRowBlock: jest.fn() };
+            logo.musicKeyboards = { kbdBlk1: kb1, kbdBlk2: kb2 };
+            logo.musicKeyboardByTurtle = {};
+
+            keyboard.flow(["childBlk"], logo, 1, "kbdBlk1", "received");
+            keyboard.flow(["childBlk"], logo, 2, "kbdBlk2", "received");
+
+            // Both blocks ran, but a turtle's rows must resolve to its own keyboard.
+            const kb1Sink = logo.musicKeyboardByTurtle[1] || logo.musicKeyboard;
+            kb1Sink.instruments.push("snare");
+
+            expect(kb1.instruments).toContain("snare");
+            expect(kb2.instruments).not.toContain("snare");
+        });
+
+        it("points logo.musicKeyboard at the block that ran, so clamps land on it", () => {
+            const keyboard = getBlock("musickeyboard");
+            logo.musicKeyboards = {};
+
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk1", "received");
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk1", "received");
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk2", "received");
+            keyboard.flow(["childBlk"], logo, 0, "kbdBlk2", "received");
+
+            // The second block ran last, so its pitch/drum/meter rows must land
+            // on the second keyboard, not the first.
+            expect(logo.musicKeyboard).toBe(logo.musicKeyboards.kbdBlk2);
+            expect(logo.inMusicKeyboard).toBe(true);
         });
 
         it("returns interruption and triggers runFromBlockNow for MatrixBlock (PhraseMaker)", () => {
@@ -852,6 +910,159 @@ describe("setupWidgetBlocks", () => {
             expect(res).toEqual([null, 0, true]);
             // Should not trigger another runFromBlockNow or lazy load callback
             expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("Loading widget modules with RequireJS", () => {
+        let loads;
+        const failLoad = load => load.ids.forEach(id => load.onError({ requireModules: [id] }));
+
+        beforeEach(() => {
+            loads = [];
+            global.define = Object.assign(jest.fn(), { amd: {} });
+            global.requirejs = Object.assign(
+                jest.fn((ids, done, onError) => loads.push({ ids, done, onError })),
+                { undef: jest.fn() }
+            );
+            logo.runGeneration = 0;
+            logo.doStopTurtles = jest.fn(() => (logo.runGeneration += 1));
+            global.Oscilloscope.mockClear();
+            global.ChordBuilderWidget.mockClear();
+        });
+
+        afterEach(() => {
+            delete global.define;
+            delete global.requirejs;
+        });
+
+        const runTemperament = receivedArg =>
+            getBlock("temperament").flow([0, "childBlk"], logo, 0, "tempBlk", receivedArg);
+
+        it("resumes the block once the modules arrive", () => {
+            expect(runTemperament("received")).toEqual([null, 0, true]);
+            expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+
+            loads[0].done();
+
+            expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, "tempBlk", true, "received");
+        });
+
+        it("reports a failed load once, stops the run and fetches again on the next try", () => {
+            runTemperament("received");
+            failLoad(loads[0]);
+
+            expect(global.requirejs.undef.mock.calls).toEqual(loads[0].ids.map(id => [id]));
+            expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+            expect(logo.doStopTurtles).toHaveBeenCalledTimes(1);
+            expect(logo.temperament).toBeNull();
+
+            runTemperament("received");
+            // RequireJS also calls back the failed request once the retry loads the modules.
+            loads[0].done();
+            loads[1].done();
+
+            expect(logo.runFromBlockNow).toHaveBeenCalledTimes(1);
+            expect(logo.temperament).not.toBe("loading");
+        });
+
+        it("does not resume a block from a run that was stopped while loading", () => {
+            runTemperament("received");
+            logo.runGeneration += 2;
+
+            loads[0].done();
+
+            expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+            expect(logo.temperament).not.toBe("loading");
+        });
+
+        it("resumes only the block run again after a stop while loading", () => {
+            runTemperament("first run");
+            logo.runGeneration += 2;
+            runTemperament("second run");
+
+            expect(loads).toHaveLength(1);
+            loads[0].done();
+
+            expect(logo.runFromBlockNow).toHaveBeenCalledTimes(1);
+            expect(logo.runFromBlockNow).toHaveBeenCalledWith(
+                logo,
+                0,
+                "tempBlk",
+                true,
+                "second run"
+            );
+        });
+
+        it("does not resume the next waiting block once a resumed one stops the run", () => {
+            const temperament = getBlock("temperament");
+            temperament.flow([0, "childBlk"], logo, 0, "tempBlk1", "received");
+            temperament.flow([0, "childBlk"], logo, 1, "tempBlk2", "received");
+            logo.runFromBlockNow.mockImplementation(() => logo.doStopTurtles());
+
+            loads[0].done();
+
+            expect(logo.runFromBlockNow).toHaveBeenCalledTimes(1);
+            expect(logo.runFromBlockNow).toHaveBeenCalledWith(
+                logo,
+                0,
+                "tempBlk1",
+                true,
+                "received"
+            );
+        });
+
+        it("stays quiet about a failed load from a run that was stopped", () => {
+            runTemperament("received");
+            logo.runGeneration += 2;
+
+            failLoad(loads[0]);
+
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(logo.doStopTurtles).not.toHaveBeenCalled();
+            expect(logo.temperament).toBeNull();
+        });
+
+        describe("from a clamp listener", () => {
+            const runOscilloscopeListener = () => {
+                getBlock("oscilloscope").flow(["childBlk"], logo, 0, "oscBlk");
+                logo.setTurtleListener.mock.calls[0][2]();
+            };
+
+            it("opens the widget once the modules arrive", () => {
+                runOscilloscopeListener();
+                loads[0].done();
+
+                expect(global.Oscilloscope).toHaveBeenCalledTimes(1);
+                expect(logo.inOscilloscope).toBe(false);
+            });
+
+            it("does not open the widget for a run that was stopped while loading", () => {
+                runOscilloscopeListener();
+                logo.runGeneration += 1;
+                loads[0].done();
+
+                expect(global.Oscilloscope).not.toHaveBeenCalled();
+                expect(logo.Oscilloscope).toBeNull();
+            });
+
+            it("reports a failed load and leaves the oscilloscope mode", () => {
+                runOscilloscopeListener();
+                failLoad(loads[0]);
+
+                expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+                expect(logo.inOscilloscope).toBe(false);
+                expect(global.Oscilloscope).not.toHaveBeenCalled();
+            });
+
+            it("lets the Chord Builder load again after a load from a stopped run", () => {
+                getBlock("chordbuilder").flow(["childBlk"], logo, 0, "chordBlk");
+                logo.setTurtleListener.mock.calls[0][2]();
+                logo.runGeneration += 1;
+                loads[0].done();
+
+                expect(global.ChordBuilderWidget).not.toHaveBeenCalled();
+                expect(logo.chordBuilderWidget).toBeNull();
+            });
         });
     });
 
@@ -1095,7 +1306,6 @@ describe("setupWidgetBlocks", () => {
                 ["arpeggio", "Arpeggio"],
                 ["pitchDrumMatrix", "PitchDrumMatrix"],
                 ["pitchSlider", "PitchSlider"],
-                ["musicKeyboard", "MusicKeyboard"],
                 ["pitchStaircase", "PitchStaircase"],
                 ["rhythmRuler", "RhythmRuler"],
                 ["phraseMaker", "PhraseMaker"],
@@ -1119,6 +1329,13 @@ describe("setupWidgetBlocks", () => {
                 if (!callSite.test(widgetBlocksSource)) {
                     notWired.push(`_ensureWidget("${widgetKey}") is missing a dependency fallback`);
                 }
+            }
+            // Music Keyboard lazy-loads per block, not via _ensureWidget.
+            const musicKeyboardCallSite = new RegExp(
+                `_getWidgetDependencies\\(\\s*typeof MusicKeyboard !== "undefined" \\? MusicKeyboard : null,`
+            );
+            if (!musicKeyboardCallSite.test(widgetBlocksSource)) {
+                notWired.push(`musicKeyboard is missing a dependency fallback`);
             }
             for (const [widgetKey, className] of lazyLoadWidgetSites) {
                 const callSite = new RegExp(

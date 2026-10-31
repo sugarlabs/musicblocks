@@ -704,7 +704,6 @@ class ProjectManager {
         const activity = this.activity;
         const blockMap = [];
         const blockIndexById = new Map();
-        activity.hasMatrixDataBlock = false;
         for (let blk = 0; blk < activity.blocks.blockList.length; blk++) {
             const myBlock = activity.blocks.blockList[blk];
             if (myBlock && myBlock.trash) {
@@ -868,13 +867,6 @@ class ProjectManager {
                         args = {
                             value: myBlock.privateData
                         };
-                        break;
-                    case "matrixData":
-                        args = {
-                            notes: window.savedMatricesNotes,
-                            count: window.savedMatricesCount
-                        };
-                        activity.hasMatrixDataBlock = true;
                         break;
                     case "wrapmode":
                         args = {

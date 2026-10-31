@@ -2378,6 +2378,68 @@ describe("processNote notation and MIDI emission guards against non-positive dur
         expect(activityMock.logo.updateNotation).toHaveBeenCalledWith(["C4"], 4, 0, -1, []);
     });
 
+    test("passes a hertz note to notationMIDI as its nearest note name", () => {
+        const blk = "hertzNoteBlk";
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["A"] };
+        turtleMock.singer.noteOctaves = { [blk]: [4] };
+        turtleMock.singer.noteCents = { [blk]: [39] };
+        turtleMock.singer.noteHertz = { [blk]: [450] };
+        turtleMock.singer.noteDrums = { [blk]: [] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1] };
+        turtleMock.singer.instrumentNames = ["piano"];
+        turtleMock.singer.oscList = { [blk]: [] };
+        turtleMock.singer.bpm = [90];
+
+        const savedFrequencyToPitch = global.frequencyToPitch;
+        global.frequencyToPitch = jest.fn(() => ["A", 4, 39.1]);
+        try {
+            Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+        } finally {
+            global.frequencyToPitch = savedFrequencyToPitch;
+        }
+
+        expect(activityMock.logo.notationMIDI).toHaveBeenCalledWith(
+            ["A4"],
+            [],
+            4,
+            0,
+            90,
+            "piano",
+            [4, 4]
+        );
+        // The other notations read frequencies themselves.
+        expect(activityMock.logo.updateNotation).toHaveBeenCalledWith([450], 4, 0, -1, []);
+    });
+
+    test("does not add a courtesy natural to a hertz note in a chord with its sharp", () => {
+        // A4 at 450 Hz (39 cents) with A♯4 in the same note gets a courtesy natural.
+        const blk = "hertzChordBlk";
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["A", "A♯"] };
+        turtleMock.singer.noteOctaves = { [blk]: [4, 4] };
+        turtleMock.singer.noteCents = { [blk]: [39, 0] };
+        turtleMock.singer.noteHertz = { [blk]: [450, 0] };
+        turtleMock.singer.noteDrums = { [blk]: [] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1] };
+        turtleMock.singer.instrumentNames = ["piano"];
+        turtleMock.singer.oscList = { [blk]: [] };
+        turtleMock.singer.bpm = [90];
+
+        const savedFrequencyToPitch = global.frequencyToPitch;
+        global.frequencyToPitch = jest.fn(() => ["A", 4, 39.1]);
+        try {
+            Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+        } finally {
+            global.frequencyToPitch = savedFrequencyToPitch;
+        }
+
+        const midiNotes = activityMock.logo.notationMIDI.mock.calls[0][0];
+        expect(midiNotes[0]).toBe("A4");
+        expect(midiNotes.some(note => String(note).includes("450"))).toBe(false);
+        expect(activityMock.logo.updateNotation.mock.calls[0][0][0]).toBe(450);
+    });
+
     test.each([
         { bpm: [], masterBPM: 180, recorded: 180 },
         { bpm: [120], masterBPM: 180, recorded: 120 }
@@ -2697,6 +2759,28 @@ describe("processPitch music keyboard with movable Do", () => {
 
         expect(activityMock.logo.musicKeyboard.noteNames).toEqual([name]);
         expect(activityMock.logo.musicKeyboard.octaves).toEqual([oct]);
+    });
+
+    test("routes the row to the turtle's own keyboard", () => {
+        const turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        const activityMock = createActivityMock(turtleMock);
+        activityMock.logo.synth = { inTemperament: "equal" };
+        activityMock.logo.inMusicKeyboard = true;
+        const lastActive = {
+            instruments: [],
+            noteNames: [],
+            octaves: [],
+            addRowBlock: jest.fn()
+        };
+        const own = { instruments: [], noteNames: [], octaves: [], addRowBlock: jest.fn() };
+        activityMock.logo.musicKeyboard = lastActive;
+        activityMock.logo.musicKeyboardByTurtle = { 0: own };
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, "blk");
+
+        expect(own.noteNames).toEqual(["C"]);
+        expect(lastActive.noteNames).toEqual([]);
     });
 });
 
@@ -3831,6 +3915,202 @@ describe("processNote — drum mode parent block traversal null and cycle safety
         expect(
             activityMock.logo.synth.trigger.mock.calls.some(call => call[3] === "acoustic")
         ).toBe(false);
+    });
+
+    describe("pitchStatus - active note duration and drum filtering", () => {
+        it("records sounding duration using beatValue for staccato notes", () => {
+            const blk = "staccatoNoteBlk";
+            singer.inNoteBlock = [blk];
+            singer.notePitches[blk] = ["C"];
+            singer.noteOctaves[blk] = [4];
+            singer.noteCents[blk] = [0];
+            singer.noteHertz[blk] = [0];
+            singer.oscList[blk] = false;
+            singer.noteBeat[blk] = 1;
+            singer.noteBeatValues[blk] = 1;
+            singer.noteDrums[blk] = [];
+            singer.embeddedGraphics[blk] = [];
+            singer.previousTurtleTime = 0;
+            singer.turtleTime = 0;
+            singer.bpm = [60];
+            singer.staccato = [4];
+
+            activityMock.blocks.blockList = {
+                [blk]: { name: "note", connections: [null] }
+            };
+
+            jest.spyOn(Date, "now").mockReturnValue(5000);
+            Singer.processNote(activityMock, 1, false, blk, 0, jest.fn());
+            expect(singer.pitchStatus).toEqual([
+                { notes: ["C4"], start: 0, startsAt: 5000, endsAt: 5250 }
+            ]);
+            expect(singer.turtleTime).toBe(1);
+        });
+
+        it("records sounding duration using beatValueOverride when glideOverride is set", () => {
+            const blk = "glideNoteBlk";
+            singer.inNoteBlock = [blk];
+            singer.notePitches[blk] = ["C"];
+            singer.noteOctaves[blk] = [4];
+            singer.noteCents[blk] = [0];
+            singer.noteHertz[blk] = [0];
+            singer.oscList[blk] = false;
+            singer.noteBeat[blk] = 1;
+            singer.noteBeatValues[blk] = 1;
+            singer.noteDrums[blk] = [];
+            singer.embeddedGraphics[blk] = [];
+            singer.previousTurtleTime = 0;
+            singer.turtleTime = 0;
+            singer.bpm = [60];
+            singer.instrumentNames = ["flute"];
+            singer.glide = [1];
+            singer.glideOverride = 2;
+
+            activityMock.blocks.blockList = {
+                [blk]: { name: "note", connections: [null] }
+            };
+
+            jest.spyOn(Date, "now").mockReturnValue(5000);
+            Singer.processNote(activityMock, 1, false, blk, 0, jest.fn());
+            expect(singer.pitchStatus).toEqual([
+                { notes: ["C4"], start: 0, startsAt: 5000, endsAt: 7000 }
+            ]);
+            expect(singer.glideOverride).toBe(0);
+        });
+
+        it("does not record the zero-length first half of a tie", () => {
+            const blk = "tiedNoteBlk";
+            const previous = [{ notes: ["G4"], start: 0, startsAt: 1000, endsAt: 2000 }];
+            singer.pitchStatus = previous;
+            singer.tie = true;
+            singer.tieCarryOver = 0;
+            singer.inNoteBlock = [blk];
+            singer.notePitches[blk] = ["C"];
+            singer.noteOctaves[blk] = [4];
+            singer.noteCents[blk] = [0];
+            singer.noteHertz[blk] = [0];
+            singer.oscList[blk] = false;
+            singer.noteBeat[blk] = 1;
+            singer.noteBeatValues[blk] = 1;
+            singer.noteDrums[blk] = [];
+            singer.embeddedGraphics[blk] = [];
+
+            activityMock.blocks.blockList = {
+                [blk]: { name: "note", connections: [null] }
+            };
+
+            Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+            expect(singer.tieCarryOver).toBe(4);
+            expect(singer.pitchStatus).toBe(previous);
+        });
+
+        it("filters out notes played in drumStyle without settimbre", () => {
+            const blk = "drumOnlyNoteBlk";
+            singer.drumStyle = ["acoustic"];
+            singer.inNoteBlock = [blk];
+            singer.notePitches[blk] = ["C"];
+            singer.noteOctaves[blk] = [4];
+            singer.noteCents[blk] = [0];
+            singer.noteHertz[blk] = [0];
+            singer.oscList[blk] = false;
+            singer.noteBeat[blk] = 1;
+            singer.noteBeatValues[blk] = 1;
+            singer.noteDrums[blk] = [];
+            singer.embeddedGraphics[blk] = [];
+
+            activityMock.blocks.blockList = {
+                [blk]: { name: "note", connections: [null] }
+            };
+
+            Singer.processNote(activityMock, 1, false, blk, 0, jest.fn());
+            expect(singer.pitchStatus).toEqual([]);
+        });
+
+        it("filters out notes present in pitchDrumTable", () => {
+            const blk = "pitchDrumBlk";
+            singer.pitchDrumTable = { C4: "snare" };
+            singer.inNoteBlock = [blk];
+            singer.notePitches[blk] = ["C"];
+            singer.noteOctaves[blk] = [4];
+            singer.noteCents[blk] = [0];
+            singer.noteHertz[blk] = [0];
+            singer.oscList[blk] = false;
+            singer.noteBeat[blk] = 1;
+            singer.noteBeatValues[blk] = 1;
+            singer.noteDrums[blk] = [];
+            singer.embeddedGraphics[blk] = [];
+
+            activityMock.blocks.blockList = {
+                [blk]: { name: "note", connections: [null] }
+            };
+
+            Singer.processNote(activityMock, 1, false, blk, 0, jest.fn());
+            expect(singer.pitchStatus).toEqual([]);
+        });
+
+        it("does not update pitchStatus during note-counting passes", () => {
+            const blk = "countingBlk";
+            singer.justCounting = [1];
+            singer.pitchStatus = null;
+            singer.inNoteBlock = [blk];
+            singer.notePitches[blk] = ["C"];
+            singer.noteOctaves[blk] = [4];
+            singer.noteCents[blk] = [0];
+            singer.noteHertz[blk] = [0];
+            singer.oscList[blk] = false;
+            singer.noteBeat[blk] = 1;
+            singer.noteBeatValues[blk] = 1;
+            singer.noteDrums[blk] = [];
+            singer.embeddedGraphics[blk] = [];
+
+            activityMock.blocks.blockList = {
+                [blk]: { name: "note", connections: [null] }
+            };
+
+            Singer.processNote(activityMock, 1, false, blk, 0, jest.fn());
+            expect(singer.pitchStatus).toBeNull();
+        });
+
+        it("keeps a note nested in another note, which starts at the same time", () => {
+            const setUpNote = (blk, pitch) => {
+                singer.notePitches[blk] = [pitch];
+                singer.noteOctaves[blk] = [4];
+                singer.noteCents[blk] = [0];
+                singer.noteHertz[blk] = [0];
+                singer.oscList[blk] = false;
+                singer.noteBeat[blk] = 1;
+                singer.noteBeatValues[blk] = 1;
+                singer.noteDrums[blk] = [];
+                singer.embeddedGraphics[blk] = [];
+            };
+            setUpNote("outerBlk", "C");
+            setUpNote("innerBlk", "E");
+            singer.bpm = [60];
+            activityMock.blocks.blockList = {
+                outerBlk: { name: "note", connections: [null] },
+                innerBlk: { name: "note", connections: ["outerBlk"] }
+            };
+            jest.spyOn(Date, "now").mockReturnValue(5000);
+
+            // The nested note is played first, then the note around it.
+            singer.inNoteBlock = ["outerBlk", "innerBlk"];
+            global.getNote.mockImplementationOnce(() => ["E", 4]);
+            Singer.processNote(activityMock, 4, false, "innerBlk", 0, jest.fn());
+            singer.inNoteBlock = ["outerBlk"];
+            Singer.processNote(activityMock, 2, false, "outerBlk", 0, jest.fn());
+
+            expect(singer.pitchStatus).toEqual([
+                { notes: ["E4"], start: 0, startsAt: 5000, endsAt: 5250 },
+                { notes: ["C4"], start: 0, startsAt: 5000, endsAt: 5500 }
+            ]);
+
+            // The next note group replaces both.
+            singer.inNoteBlock = ["outerBlk"];
+            Singer.processNote(activityMock, 2, false, "outerBlk", 0, jest.fn());
+            expect(singer.pitchStatus).toEqual([
+                { notes: ["C4"], start: 0.5, startsAt: 5000, endsAt: 5500 }
+            ]);
+        });
     });
 });
 

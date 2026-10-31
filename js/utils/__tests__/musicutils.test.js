@@ -71,7 +71,6 @@ const {
     deleteTemperamentFromList,
     DEFAULTINVERT,
     DEFAULTMODE,
-    customMode,
     getInvertMode,
     getIntervalNumber,
     getIntervalDirection,
@@ -660,17 +659,18 @@ describe("Constants", () => {
     });
 });
 
-describe("customMode", () => {
-    it("should return custom mode from MUSICALMODES", () => {
-        expect(customMode).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
-    });
-});
-
 describe("getInvertMode", () => {
     it("should return the correct invert mode name", () => {
         expect(getInvertMode("even")).toBe("even");
         expect(getInvertMode("scalar")).toBe("scalar");
         expect(getInvertMode("nonexistent")).toBe("nonexistent");
+    });
+    it("should safely return non-string or nullish inputs without throwing", () => {
+        expect(getInvertMode(null)).toBeNull();
+        expect(getInvertMode(undefined)).toBeUndefined();
+        expect(getInvertMode(123)).toBe(123);
+        expect(getInvertMode({})).toEqual({});
+        expect(getInvertMode("")).toBe("");
     });
 });
 
@@ -919,6 +919,12 @@ describe("getFilterTypes", () => {
         expect(getFilterTypes("highpass")).toBe("highpass");
         expect(getFilterTypes("notch")).toBe("notch");
     });
+    it("should return default filter type for non-string or nullish inputs", () => {
+        expect(getFilterTypes(null)).toBe("highpass");
+        expect(getFilterTypes(undefined)).toBe("highpass");
+        expect(getFilterTypes(123)).toBe("highpass");
+        expect(getFilterTypes({})).toBe("highpass");
+    });
 });
 
 describe("getOscillatorTypes", () => {
@@ -1017,6 +1023,26 @@ describe("getNoiseName", () => {
     it("should return corresponding display name for valid identifiers", () => {
         expect(getNoiseName("noise1")).toBe("white noise");
         expect(getNoiseName("noise3")).toBe("pink noise");
+    });
+    it("should return corresponding display name when searching by display name", () => {
+        expect(getNoiseName("white noise")).toBe("white noise");
+        expect(getNoiseName("pink noise")).toBe("pink noise");
+        expect(getNoiseName("brown noise")).toBe("brown noise");
+    });
+    it("should return identifier when display name is empty", () => {
+        expect(getNoiseName("custom noise")).toBe("custom noise");
+    });
+    it("should resolve localized and cross-language noise display names via _()", () => {
+        const savedTranslate = global._;
+        global._ = str => (str === "pink noise" ? "ruido rosa" : str);
+        global.NOISENAMES = [["ruido rosa", "noise3", "images/noise3.svg"]];
+        try {
+            expect(getNoiseName("ruido rosa")).toBe("ruido rosa");
+            expect(getNoiseName("pink noise")).toBe("ruido rosa");
+            expect(getNoiseName("noise3")).toBe("ruido rosa");
+        } finally {
+            global._ = savedTranslate;
+        }
     });
 });
 
@@ -1583,6 +1609,14 @@ describe("modeMapper", () => {
     ])("should map %s %s to the flat key %j", (key, mode, expected) => {
         expect(modeMapper(key, mode)).toEqual(expected);
     });
+
+    it.each([
+        ["D", "major pentatonic", ["d", "major"]],
+        ["B", "minor pentatonic", ["b", "minor"]],
+        ["B", "minyo", ["b", "minor"]]
+    ])("should map %s %s to its parent key %j", (key, mode, expected) => {
+        expect(modeMapper(key, mode)).toEqual(expected);
+    });
 });
 
 describe("getSharpFlatPreference", () => {
@@ -1682,6 +1716,13 @@ describe("pitchToNumber", () => {
     it("should handle mixed accidental and normalize pitch", () => {
         expect(pitchToNumber("C#b", 4, "C major")).toBe(39);
         expect(pitchToNumber("c#", 4, "C major")).toBe(40);
+    });
+    it("should cancel a mixed accidental regardless of sharp/flat order", () => {
+        // Regression: a trailing "#b" or "b#" must be stripped as one unit
+        // (a cancelled accidental, net zero), not caught by the single-flat
+        // or single-sharp check first, which would strip only one character.
+        expect(pitchToNumber("C#b", 4, "C major")).toBe(pitchToNumber("C", 4, "C major"));
+        expect(pitchToNumber("Cb#", 4, "C major")).toBe(pitchToNumber("C", 4, "C major"));
     });
     it("should use solfege mapping when pitch not in PITCHES", () => {
         expect(pitchToNumber("do", 4, "C major")).toBe(39);
@@ -1955,6 +1996,34 @@ describe("GetNotesForInterval", () => {
         expect(GetNotesForInterval(tur)).toEqual({
             firstNote: "C",
             secondNote: "E",
+            octave: 0
+        });
+    });
+    it("should read notes stored as frequencies (cents or hertz)", () => {
+        // 450 Hz is A4 plus about 39 cents; 659.26 Hz is E5.
+        expect(GetNotesForInterval({ singer: { noteStatus: [[450]] } })).toEqual({
+            firstNote: "A",
+            secondNote: "A",
+            octave: 0
+        });
+        expect(GetNotesForInterval({ singer: { noteStatus: [["C4", 659.26]] } })).toEqual({
+            firstNote: "C",
+            secondNote: "E",
+            octave: 1
+        });
+        expect(GetNotesForInterval({ singer: { noteStatus: [[]] } })).toEqual({
+            firstNote: "C",
+            secondNote: "C",
+            octave: 0
+        });
+        expect(GetNotesForInterval({ singer: { noteStatus: [[440]] } }, "equal19")).toEqual({
+            firstNote: "A",
+            secondNote: "A",
+            octave: 0
+        });
+        expect(GetNotesForInterval({ singer: { noteStatus: [[450]] } }, "equal19")).toEqual({
+            firstNote: "A#",
+            secondNote: "A#",
             octave: 0
         });
     });
@@ -2370,6 +2439,28 @@ describe("buildScale", () => {
         expect(buildScale(keySignature)[0].join(" ")).toBe(expected);
     });
 
+    it.each([
+        ["D major pentatonic", "D E F♯ A B D"],
+        ["A major pentatonic", "A B C♯ E F♯ A"],
+        ["E major pentatonic", "E F♯ G♯ B C♯ E"],
+        ["B major pentatonic", "B C♯ D♯ F♯ G♯ B"],
+        ["B minor pentatonic", "B D E F♯ A B"],
+        ["B minyo", "B D E F♯ A B"],
+        ["B♭ major pentatonic", "B♭ C D F G B♭"],
+        ["F minor pentatonic", "F A♭ B♭ C E♭ F"]
+    ])("should spell %s with the accidentals of its key", (keySignature, expected) => {
+        expect(buildScale(keySignature)[0].join(" ")).toBe(expected);
+    });
+
+    it("should give each note of D major pentatonic one scale degree", () => {
+        expect(scaleDegreeToPitchMapping("D major pentatonic", 3, false, null)).toBe("F♯");
+        expect(scaleDegreeToPitchMapping("D major pentatonic", null, false, "G")).toEqual([
+            "4",
+            "♮"
+        ]);
+        expect(getSharpFlatPreference("D major pentatonic")).toBe("sharp");
+    });
+
     it("should not repeat a letter in any seven-note scale it can spell", () => {
         const roots = ["C", "D♭", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
         const modes = ["harmonic minor", "melodic minor", "harmonic major", "hungarian"];
@@ -2386,6 +2477,12 @@ describe("buildScale", () => {
     it("should spell a scale on a sharp or flat tonic from that tonic", () => {
         expect(buildScale("G♯ lydian")[0].join(" ")).toBe("G♯ A♯ B♯ C𝄪 D♯ E♯ F𝄪 G♯");
         expect(buildScale("B♭ harmonic minor")[0].join(" ")).toBe("B♭ C D♭ E♭ F G♭ A B♭");
+    });
+
+    it("should build the bebop scale as mixolydian with a passing major seventh", () => {
+        // Its steps were stored from the top down, so C bebop was C D♭ D E♭ F G A♭ B♭ (#9959).
+        expect(buildScale("C bebop")[0].join(" ")).toBe("C D E F G A B♭ B C");
+        expect(buildScale("F bebop")[0].join(" ")).toBe("F G A B♭ C D E♭ E F");
     });
 
     it("should keep the old spelling when a degree needs more than a double accidental", () => {
@@ -2450,6 +2547,56 @@ describe("getModePattern", () => {
 
     it("keeps the 12-EDO pattern identical", () => {
         expect(getModePattern("major", 12)).toEqual([2, 2, 1, 2, 2, 2, 1]);
+    });
+
+    describe("custom mode", () => {
+        let savedCustom;
+
+        beforeEach(() => {
+            savedCustom = MUSICALMODES.custom;
+        });
+
+        afterEach(() => {
+            MUSICALMODES.custom = savedCustom;
+        });
+
+        it("keeps the default chromatic pattern in 12-EDO", () => {
+            expect(getModePattern("custom", 12)).toEqual(new Array(12).fill(1));
+        });
+
+        it("uses the current pattern after MUSICALMODES.custom is replaced", () => {
+            // The define mode block (default name "custom") replaces the array.
+            MUSICALMODES.custom = [2, 2, 3, 2, 3];
+            expect(getModePattern("custom", 12)).toEqual([2, 2, 3, 2, 3]);
+            expect(buildScale("C custom")).toEqual([
+                ["C", "D", "E", "G", "A", "C"],
+                [2, 2, 3, 2, 3]
+            ]);
+        });
+
+        it("uses a replaced pattern in another EDO when its steps fit that EDO", () => {
+            MUSICALMODES.custom = [3, 3, 2, 3, 3, 3, 2]; // sums to 19
+            expect(getModePattern("custom", 19)).toEqual([3, 3, 2, 3, 3, 3, 2]);
+        });
+
+        it("falls back to one step per pitch when the pattern doesn't fit the EDO", () => {
+            MUSICALMODES.custom = [2, 2, 3, 2, 3]; // sums to 12
+            expect(getModePattern("custom", 19)).toEqual(new Array(19).fill(1));
+        });
+
+        it("falls back when a step is not a positive integer, even if the sum fits", () => {
+            MUSICALMODES.custom = [4, 3, 0, 3]; // sums to 10, but has a 0 step
+            expect(getModePattern("custom", 10)).toEqual(new Array(10).fill(1));
+            MUSICALMODES.custom = [6, -1, 7]; // sums to 12
+            expect(getModePattern("custom", 12)).toEqual(new Array(12).fill(1));
+        });
+
+        it("returns a copy, not the stored array", () => {
+            MUSICALMODES.custom = [2, 2, 3, 2, 3];
+            const out = getModePattern("custom", 12);
+            out.push(99);
+            expect(MUSICALMODES.custom).toEqual([2, 2, 3, 2, 3]);
+        });
     });
 
     it("rescales a native 19-EDO custom mode requested at EDO 12", () => {
@@ -5246,6 +5393,33 @@ describe("mode pie menu shared helpers", () => {
                 JSON.stringify([{ name: "my mode", pattern: [1, 2] }, { pattern: [1] }, null])
             );
             expect(getSavedCustomModes()).toEqual([{ name: "my mode", pattern: [1, 2] }]);
+        });
+
+        it("drops saved modes whose pattern isn't a list of positive whole steps", () => {
+            localStorage.setItem(
+                "customModes",
+                JSON.stringify([
+                    { name: "good", pattern: [2, 2, 3, 2, 3] },
+                    { name: "zero step", pattern: [4, 3, 0, 3] },
+                    { name: "fraction", pattern: [1.5, 10.5] },
+                    { name: "empty", pattern: [] },
+                    { name: "no pattern" }
+                ])
+            );
+            expect(getSavedCustomModes()).toEqual([{ name: "good", pattern: [2, 2, 3, 2, 3] }]);
+        });
+
+        it("keeps a saved mode only when its steps add up to its own saved EDO", () => {
+            localStorage.setItem(
+                "customModes",
+                JSON.stringify([
+                    { name: "fits 12", pattern: [2, 2, 3, 2, 3], edo: 12 },
+                    { name: "fits 19", pattern: [3, 3, 2, 3, 3, 3, 2], edo: 19 },
+                    { name: "wrong sum", pattern: [2, 2, 3, 2, 3], edo: 19 },
+                    { name: "bad edo", pattern: [2, 2, 3, 2, 3], edo: "12" }
+                ])
+            );
+            expect(getSavedCustomModes().map(m => m.name)).toEqual(["fits 12", "fits 19"]);
         });
 
         it("returns an empty list for corrupt or non-array data", () => {

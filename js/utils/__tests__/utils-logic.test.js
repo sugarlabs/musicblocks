@@ -180,8 +180,15 @@ describe("Utility Logic Functions", () => {
             expect(mixedNumber(2)).toBe("2/1");
         });
 
+        it("handles zero and treats negative zero as zero", () => {
+            expect(mixedNumber(0)).toBe("0/1");
+            expect(mixedNumber(-0)).toBe("0/1");
+        });
+
         it("returns input if not a number", () => {
             expect(mixedNumber("abc")).toBe("abc");
+            expect(mixedNumber(null)).toBeNull();
+            expect(mixedNumber(undefined)).toBeUndefined();
         });
 
         it("takes the whole and fractional parts from the magnitude", () => {
@@ -205,6 +212,12 @@ describe("Utility Logic Functions", () => {
 
         it("falls back to two decimals for an awkward negative denominator", () => {
             expect(mixedNumber(-2.123456)).toBe("-2.12");
+        });
+
+        it("returns standard string representation for non-finite numbers", () => {
+            expect(mixedNumber(NaN)).toBe("NaN");
+            expect(mixedNumber(Infinity)).toBe("Infinity");
+            expect(mixedNumber(-Infinity)).toBe("-Infinity");
         });
     });
 

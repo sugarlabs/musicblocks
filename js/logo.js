@@ -90,7 +90,43 @@ class Queue {
         this.parentBlk = parentBlk;
         this.args = args;
     }
+
+    /**
+     * Obtains a Queue instance from the object pool or allocates a new one.
+     * Minimizes heap allocations and GC pressure in tight execution loops.
+     *
+     * @param {*} blk - block
+     * @param {number} count - count
+     * @param {*} parentBlk - parent block
+     * @param {*} args - arguments
+     * @returns {Queue}
+     */
+    static obtain(blk, count, parentBlk, args) {
+        if (Queue._pool.length > 0) {
+            const item = Queue._pool.pop();
+            item.blk = blk;
+            item.count = count;
+            item.parentBlk = parentBlk;
+            item.args = args;
+            return item;
+        }
+        return new Queue(blk, count, parentBlk, args);
+    }
+
+    /**
+     * Recycles a Queue instance into the pool for reuse.
+     *
+     * @param {Queue} item
+     */
+    static recycle(item) {
+        if (item && item instanceof Queue && Queue._pool.length < 512) {
+            item.args = null;
+            Queue._pool.push(item);
+        }
+    }
 }
+
+Queue._pool = [];
 
 /**
  * @classdesc Logo owns global execution, scheduling, widget and session context, notation and
@@ -240,6 +276,8 @@ class Logo {
         this.sounds = [];
         this.cameraID = null;
         this.stopTurtle = false;
+        // Changes whenever a run starts or stops, so late callbacks can tell their run is over.
+        this.runGeneration = 0;
         this.lastKeyCode = null;
         this.setCameraID = this.setCameraID.bind(this);
 
@@ -1546,6 +1584,7 @@ class Logo {
      */
     doStopTurtles() {
         this.stopTurtle = true;
+        this.runGeneration += 1;
         this.turtles.markAllAsStopped();
         this._cancelSpeech();
 
@@ -1658,6 +1697,7 @@ class Logo {
                     if (blk !== null && blk !== undefined) {
                         this.runFromBlockNow(this, turtle, blk, isflow, receivedArg);
                     }
+                    Logo._recycleStepItem(stepItem);
                 }
             }
         }
@@ -1748,6 +1788,7 @@ class Logo {
         }
 
         this.stopTurtle = false;
+        this.runGeneration += 1;
 
         this._syncCounter = 0;
         this._iterationBudget = this._MAX_ITERATIONS + 1;
@@ -1928,6 +1969,7 @@ class Logo {
             turtle.parentFlowQueue = [];
             turtle.unhighlightQueue = [];
             turtle.parameterQueue = [];
+            turtle.actionBoundaries = [];
         }
 
         if (this.turtleDelay === 0) {
@@ -1975,6 +2017,7 @@ class Logo {
             tur.parentFlowQueue = [];
             tur.unhighlightQueue = [];
             tur.parameterQueue = [];
+            tur.actionBoundaries = [];
 
             tur.running = true;
             this.runFromBlock(this, turtle, startHere, 0, env);
@@ -1994,6 +2037,7 @@ class Logo {
                     tur.parentFlowQueue = [];
                     tur.unhighlightQueue = [];
                     tur.parameterQueue = [];
+                    tur.actionBoundaries = [];
 
                     tur.running = true;
                     delayStart = 250;
@@ -2023,6 +2067,7 @@ class Logo {
                             tur.parentFlowQueue = [];
                             tur.unhighlightQueue = [];
                             tur.parameterQueue = [];
+                            tur.actionBoundaries = [];
 
                             if (!tur.inTrash) {
                                 tur.running = true;
@@ -2107,11 +2152,7 @@ class Logo {
                 if (!(turtle in logo.stepQueue)) {
                     logo.stepQueue[turtle] = [];
                 }
-                logo.stepQueue[turtle].push({
-                    blk: blk,
-                    isflow: isflow,
-                    receivedArg: receivedArg
-                });
+                logo.stepQueue[turtle].push(Logo._obtainStepItem(blk, isflow, receivedArg));
             } else if (
                 logo.turtleDelay === 0 &&
                 delay > 0 &&
@@ -2182,597 +2223,659 @@ class Logo {
      * @returns {void}
      */
     runFromBlockNow(logo, turtle, blk, isflow, receivedArg, queueStart) {
-        const tracker = getPerformanceTracker();
-        const profilingEnabled =
-            tracker && typeof tracker.isEnabled === "function" && tracker.isEnabled();
-        let profilingStart = null;
-        if (profilingEnabled) {
-            profilingStart =
-                typeof performance !== "undefined" && typeof performance.now === "function"
-                    ? performance.now()
-                    : Date.now();
-            if (!logo.blockTimings) {
-                logo.blockTimings = {};
-            }
-            tracker.enterBlock();
-        }
-
-        this._alreadyRunning = true;
-
-        this.receivedArg = receivedArg;
-
-        if (--logo._iterationBudget <= 0) {
-            logo.deps.errorHandler(
-                _("Infinite loop detected. Execution stopped to prevent browser freeze."),
-                blk
-            );
-            logo.stopTurtle = true;
-            logo._alreadyRunning = false;
-            logo._syncCounter = 0;
-            logo._iterationBudget = logo._MAX_ITERATIONS + 1;
-            if (profilingEnabled) {
-                Logo._recordBlockTiming(logo, blk, profilingStart);
-                performanceTracker.exitBlock();
-            }
-            return;
-        }
-
         // Sometimes we don't want to unwind the entire queue.
         if (queueStart === undefined) queueStart = 0;
-        const currentBlock = logo.blockList[blk];
-        const blockName = currentBlock.name;
-        const proto = currentBlock.protoblock;
-        const connections = currentBlock.connections;
-        const lastConnection = logo.deps.utils.last(connections);
 
-        /*
+        while (blk !== null && blk !== undefined && !logo.stopTurtle) {
+            const tracker = getPerformanceTracker();
+            const profilingEnabled =
+                tracker && typeof tracker.isEnabled === "function" && tracker.isEnabled();
+            let profilingStart = null;
+            if (profilingEnabled) {
+                profilingStart =
+                    typeof performance !== "undefined" && typeof performance.now === "function"
+                        ? performance.now()
+                        : Date.now();
+                if (!logo.blockTimings) {
+                    logo.blockTimings = {};
+                }
+                tracker.enterBlock();
+            }
+
+            this._alreadyRunning = true;
+
+            this.receivedArg = receivedArg;
+
+            if (--logo._iterationBudget <= 0) {
+                logo.deps.errorHandler(
+                    _("Infinite loop detected. Execution stopped to prevent browser freeze."),
+                    blk
+                );
+                logo.stopTurtle = true;
+                logo._alreadyRunning = false;
+                logo._syncCounter = 0;
+                logo._iterationBudget = logo._MAX_ITERATIONS + 1;
+                if (profilingEnabled) {
+                    Logo._recordBlockTiming(logo, blk, profilingStart);
+                    performanceTracker.exitBlock();
+                }
+                return;
+            }
+
+            const currentBlock = logo.blockList[blk];
+            const blockName = currentBlock.name;
+            const proto = currentBlock.protoblock;
+            const connections = currentBlock.connections;
+            const lastConnection = logo.deps.utils.last(connections);
+
+            /*
 ===========================================================================
 (1) Evaluate any arguments (beginning with connection[1]).
 ===========================================================================
 */
-        const tur = logo.turtles.ithTurtle(turtle);
-        const args = [];
+            const tur = logo.turtles.ithTurtle(turtle);
+            if (tur && !tur.actionBoundaries) tur.actionBoundaries = [];
+            const args = [];
 
-        if (proto.args > 0) {
-            for (let i = 1; i <= proto.args; i++) {
-                if (proto.dockTypes[i] === "in") {
-                    if (connections[i] !== null) {
-                        args.push(connections[i]);
+            if (proto.args > 0) {
+                for (let i = 1; i <= proto.args; i++) {
+                    if (proto.dockTypes[i] === "in") {
+                        if (connections[i] !== null) {
+                            args.push(connections[i]);
+                        }
+                    } else {
+                        args.push(logo.parseArg(logo, turtle, connections[i], blk, receivedArg));
                     }
-                } else {
-                    args.push(logo.parseArg(logo, turtle, connections[i], blk, receivedArg));
-                }
 
-                if (
-                    tur.singer.inNoteBlock.length > 0 &&
-                    connections[i] !== undefined &&
-                    logo.blockList[connections[i]] !== undefined &&
-                    logo.blockList[connections[i]].name === "currentpitch"
-                ) {
-                    // Re-eval this arg after note block ends to
-                    // ensure that the current pitch is uptodate.
-                    logo.specialArgs.push([args, logo, turtle, blk, receivedArg, null, isflow]);
+                    if (
+                        tur.singer.inNoteBlock.length > 0 &&
+                        connections[i] !== undefined &&
+                        logo.blockList[connections[i]] !== undefined &&
+                        logo.blockList[connections[i]].name === "currentpitch"
+                    ) {
+                        // Re-eval this arg after note block ends to
+                        // ensure that the current pitch is uptodate.
+                        logo.specialArgs.push([args, logo, turtle, blk, receivedArg, null, isflow]);
+                    }
                 }
             }
-        }
 
-        /*
+            /*
         ===========================================================================
         (2) Run function associated with the block.
         ===========================================================================
         */
 
-        let nextFlow = null;
-        if (!currentBlock.isValueBlock()) {
-            // nextFlow remains null for value blocks.
+            let nextFlow = null;
+            if (!currentBlock.isValueBlock()) {
+                // nextFlow remains null for value blocks.
 
-            // All flow blocks have a last connection (nextFlow), but
-            // it can be null (i.e., end of a flow).
-            if (tur.singer.backward.length > 0) {
-                // Inside a "backward" (or "duplicatenotes") clamp: traverse
-                // the block chain in reverse using connections[0] (the
-                // "previous" link) instead of the normal lastConnection.
-                const lastBackward = logo.deps.utils.last(tur.singer.backward);
-                const backwardBlock = logo.blockList[lastBackward];
-                const backwardConnections = backwardBlock.connections;
+                // All flow blocks have a last connection (nextFlow), but
+                // it can be null (i.e., end of a flow).
+                if (tur.singer.backward.length > 0) {
+                    // Inside a "backward" (or "duplicatenotes") clamp: traverse
+                    // the block chain in reverse using connections[0] (the
+                    // "previous" link) instead of the normal lastConnection.
+                    const lastBackward = logo.deps.utils.last(tur.singer.backward);
+                    const backwardBlock = logo.blockList[lastBackward];
+                    const backwardConnections = backwardBlock.connections;
 
-                // connection[1] for "backward", connection[2] for wrapper
-                // blocks like "duplicatenotes" — points to the first block
-                // inside the clamp.
-                const c = backwardBlock.name === "backward" ? 1 : 2;
+                    // connection[1] for "backward", connection[2] for wrapper
+                    // blocks like "duplicatenotes" — points to the first block
+                    // inside the clamp.
+                    const c = backwardBlock.name === "backward" ? 1 : 2;
 
-                if (!logo.blocks.sameGeneration(backwardConnections[c], blk)) {
-                    // Current block is outside the backward clamp; use normal
-                    // forward flow.
-                    nextFlow = lastConnection;
-                } else {
-                    // Walk backward: step to the previous block in the chain.
-                    nextFlow = connections[0];
-                    if (
-                        nextFlow !== null &&
-                        (logo.blockList[nextFlow].name === "action" ||
-                            logo.blockList[nextFlow].name === "backward")
-                    ) {
-                        // Hit a clamp boundary block — stop traversal here.
-                        nextFlow = null;
+                    if (!logo.blocks.sameGeneration(backwardConnections[c], blk)) {
+                        // Current block is outside the backward clamp; use normal
+                        // forward flow.
+                        nextFlow = lastConnection;
                     } else {
-                        if (!logo.blocks.sameGeneration(backwardConnections[c], nextFlow)) {
-                            // nextFlow stepped outside the clamp scope; fall
-                            // back to forward flow.
-                            nextFlow = lastConnection;
+                        // Walk backward: step to the previous block in the chain.
+                        nextFlow = connections[0];
+                        if (
+                            nextFlow !== null &&
+                            (logo.blockList[nextFlow].name === "action" ||
+                                logo.blockList[nextFlow].name === "backward")
+                        ) {
+                            // Hit a clamp boundary block — stop traversal here.
+                            nextFlow = null;
                         } else {
-                            nextFlow = connections[0];
+                            if (!logo.blocks.sameGeneration(backwardConnections[c], nextFlow)) {
+                                // nextFlow stepped outside the clamp scope; fall
+                                // back to forward flow.
+                                nextFlow = lastConnection;
+                            } else {
+                                nextFlow = connections[0];
+                            }
+                        }
+                    }
+                } else {
+                    nextFlow = lastConnection;
+                }
+
+                if (nextFlow === -1) {
+                    nextFlow = null;
+                }
+
+                if (nextFlow !== null && nextFlow !== undefined) {
+                    tur.queue.push(Queue.obtain(nextFlow, 1, blk, receivedArg));
+                }
+            }
+
+            // Some flow blocks have childflows, e.g., repeat.
+            let childFlow = null;
+            let childFlowCount = 0;
+            const actionArgs = [];
+
+            // Highlight only the current executing block
+            if (logo.blocks.visible) {
+                if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
+                    // Unhighlight any previously highlighted block
+                    if (
+                        logo._currentlyHighlightedBlock !== null &&
+                        logo._currentlyHighlightedBlock !== blk
+                    ) {
+                        logo.blocks.unhighlight(logo._currentlyHighlightedBlock);
+                    }
+                    // Highlight the current block
+                    logo.blocks.highlight(blk, false);
+                    logo._currentlyHighlightedBlock = blk;
+                    // Force stage update so highlight is visible when blocks were shown during execution.
+                    // Skip if the block is off-screen — the highlight is invisible anyway.
+                    if (logo.stage && currentBlock._viewportVisible !== false) {
+                        logo.deps.markStageDirty();
+                    }
+                }
+            }
+
+            // Value blocks that are not styled as arg blocks (note counter,
+            // calculate, make block) define arg() but no flow(). Clicking one on
+            // its own should show its value like any other value block.
+            const returnsValue =
+                currentBlock.isArgBlock() ||
+                (!(currentBlock.name in logo.evalFlowDict) && typeof proto.flow !== "function");
+
+            if (!returnsValue) {
+                let res = null;
+                // Is it a plugin?
+                if (currentBlock.name in logo.evalFlowDict) {
+                    logo.pluginReturnValue = null;
+                    logo.safePluginExecute(
+                        logo.evalFlowDict[currentBlock.name],
+                        logo,
+                        turtle,
+                        blk,
+                        receivedArg,
+                        actionArgs,
+                        args,
+                        isflow
+                    );
+                    // Clamp blocks will return the child flow.
+                    res = logo.pluginReturnValue;
+                } else {
+                    res = proto.flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow);
+                }
+
+                if (res) {
+                    const [cf, cfc, ret] = res;
+                    if (cf !== undefined) childFlow = cf;
+                    if (cfc !== undefined) childFlowCount = cfc;
+                    if (ret) {
+                        if (currentBlock.name === "return") {
+                            const boundary =
+                                tur.actionBoundaries && tur.actionBoundaries.length > 0
+                                    ? tur.actionBoundaries.pop()
+                                    : queueStart;
+                            while (tur.queue.length > boundary) {
+                                const popped = tur.queue.pop();
+                                if (popped && popped.blk in tur.endOfClampSignals) {
+                                    while (tur.endOfClampSignals[popped.blk].length > 0) {
+                                        const signal = tur.endOfClampSignals[popped.blk].pop();
+                                        if (signal !== null && signal !== undefined) {
+                                            logo.stage.dispatchEvent(signal);
+                                        }
+                                    }
+                                }
+                                Queue.recycle(popped);
+                            }
+                        } else {
+                            if (profilingEnabled) {
+                                Logo._recordBlockTiming(logo, blk, profilingStart);
+                                tracker.exitBlock();
+                            }
+                            return ret;
                         }
                     }
                 }
             } else {
-                nextFlow = lastConnection;
-            }
-
-            if (nextFlow === -1) {
-                nextFlow = null;
-            }
-
-            if (nextFlow !== null && nextFlow !== undefined) {
-                tur.queue.push(new Queue(nextFlow, 1, blk, receivedArg));
-            }
-        }
-
-        // Some flow blocks have childflows, e.g., repeat.
-        let childFlow = null;
-        let childFlowCount = 0;
-        const actionArgs = [];
-
-        // Highlight only the current executing block
-        if (logo.blocks.visible) {
-            if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
-                // Unhighlight any previously highlighted block
                 if (
-                    logo._currentlyHighlightedBlock !== null &&
-                    logo._currentlyHighlightedBlock !== blk
+                    // If it's an arg block, print its value.
+                    currentBlock.isArgBlock() ||
+                    ["anyout", "numberout", "textout", "booleanout"].includes(proto.dockTypes[0])
                 ) {
-                    logo.blocks.unhighlight(logo._currentlyHighlightedBlock);
-                }
-                // Highlight the current block
-                logo.blocks.highlight(blk, false);
-                logo._currentlyHighlightedBlock = blk;
-                // Force stage update so highlight is visible when blocks were shown during execution.
-                // Skip if the block is off-screen — the highlight is invisible anyway.
-                if (logo.stage && currentBlock._viewportVisible !== false) {
-                    logo.deps.markStageDirty();
-                }
-            }
-        }
+                    args.push(logo.parseArg(logo, turtle, blk, blk, receivedArg));
 
-        // Value blocks that are not styled as arg blocks (note counter,
-        // calculate, make block) define arg() but no flow(). Clicking one on
-        // its own should show its value like any other value block.
-        const returnsValue =
-            currentBlock.isArgBlock() ||
-            (!(currentBlock.name in logo.evalFlowDict) && typeof proto.flow !== "function");
+                    const blockLabels = {
+                        width: _("width"),
+                        height: _("height"),
+                        rightpos: _("right (screen)"),
+                        leftpos: _("left (screen)"),
+                        toppos: _("top (screen)"),
+                        bottompos: _("bottom (screen)")
+                    };
 
-        if (!returnsValue) {
-            let res = null;
-            // Is it a plugin?
-            if (currentBlock.name in logo.evalFlowDict) {
-                logo.pluginReturnValue = null;
-                logo.safePluginExecute(
-                    logo.evalFlowDict[currentBlock.name],
-                    logo,
-                    turtle,
-                    blk,
-                    receivedArg,
-                    actionArgs,
-                    args,
-                    isflow
-                );
-                // Clamp blocks will return the child flow.
-                res = logo.pluginReturnValue;
-            } else {
-                res = proto.flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow);
-            }
+                    const label = blockLabels[blockName];
+                    const blockValue = currentBlock.value;
 
-            if (res) {
-                const [cf, cfc, ret] = res;
-                if (cf !== undefined) childFlow = cf;
-                if (cfc !== undefined) childFlowCount = cfc;
-                if (ret) {
-                    if (profilingEnabled) {
-                        Logo._recordBlockTiming(logo, blk, profilingStart);
-                        tracker.exitBlock();
+                    if (blockValue === null || blockValue === undefined) {
+                        logo.deps.textMsg("null block value");
+                    } else {
+                        const value = blockValue.toString();
+                        const displayText = label ? label + ": " + value : value;
+                        logo.deps.textMsg(displayText);
                     }
-                    return ret;
-                }
-            }
-        } else {
-            if (
-                // If it's an arg block, print its value.
-                currentBlock.isArgBlock() ||
-                ["anyout", "numberout", "textout", "booleanout"].includes(proto.dockTypes[0])
-            ) {
-                args.push(logo.parseArg(logo, turtle, blk, blk, receivedArg));
-
-                const blockLabels = {
-                    width: _("width"),
-                    height: _("height"),
-                    rightpos: _("right (screen)"),
-                    leftpos: _("left (screen)"),
-                    toppos: _("top (screen)"),
-                    bottompos: _("bottom (screen)")
-                };
-
-                const label = blockLabels[blockName];
-                const blockValue = currentBlock.value;
-
-                if (blockValue === null || blockValue === undefined) {
-                    logo.deps.textMsg("null block value");
+                    // Briefly block hotkeys so a hotkey press right after clicking
+                    // this value display can't accidentally spawn a new block
+                    // (#4931). Scoped to just this case, not every status message.
+                    if (logo.activity) {
+                        logo.activity.valueBarVisible = true;
+                        if (logo._valueBarTimeout !== null) {
+                            logo._timerManager.clearTimeout(logo._valueBarTimeout);
+                        }
+                        logo._valueBarTimeout = logo._timerManager.setTimeout(() => {
+                            logo._valueBarTimeout = null;
+                            if (logo.activity) logo.activity.valueBarVisible = false;
+                        }, 3000);
+                    }
                 } else {
-                    const value = blockValue.toString();
-                    const displayText = label ? label + ": " + value : value;
-                    logo.deps.textMsg(displayText);
+                    logo.deps.errorHandler("I do not know how to " + blockName + ".", blk);
                 }
-                // Briefly block hotkeys so a hotkey press right after clicking
-                // this value display can't accidentally spawn a new block
-                // (#4931). Scoped to just this case, not every status message.
-                if (logo.activity) {
-                    logo.activity.valueBarVisible = true;
-                    if (logo._valueBarTimeout !== null) {
-                        logo._timerManager.clearTimeout(logo._valueBarTimeout);
-                    }
-                    logo._valueBarTimeout = logo._timerManager.setTimeout(() => {
-                        logo._valueBarTimeout = null;
-                        if (logo.activity) logo.activity.valueBarVisible = false;
-                    }, 3000);
-                }
-            } else {
-                logo.deps.errorHandler("I do not know how to " + blockName + ".", blk);
+
+                logo.stopTurtle = true;
             }
 
-            logo.stopTurtle = true;
-        }
-
-        /*
+            /*
         ===========================================================================
         (3) Queue block below the current block.
         ===========================================================================
         */
-        // Is the block in a queued clamp?
-        if (blk !== logo._ignoringBlock) {
-            if (blk in tur.endOfClampSignals) {
-                while (tur.endOfClampSignals[blk].length > 0) {
-                    const signal = tur.endOfClampSignals[blk].pop();
-                    // eslint-disable-next-line eqeqeq
-                    if (signal != null) {
-                        logo.stage.dispatchEvent(signal);
+            // Is the block in a queued clamp?
+            if (blk !== logo._ignoringBlock) {
+                if (blk in tur.endOfClampSignals) {
+                    while (tur.endOfClampSignals[blk].length > 0) {
+                        const signal = tur.endOfClampSignals[blk].pop();
+                        // eslint-disable-next-line eqeqeq
+                        if (signal != null) {
+                            logo.stage.dispatchEvent(signal);
+                        }
                     }
                 }
             }
-        }
 
-        if (logo.statusMatrix && logo.statusMatrix.isOpen && !logo.inStatusMatrix) {
-            logo.statusMatrix.updateAll();
-        }
-
-        // If there is a child flow, queue it.
-        // eslint-disable-next-line eqeqeq
-        if (childFlow != null) {
-            let queueBlock;
-            if (blockName === "doArg" || blockName === "nameddoArg") {
-                queueBlock = new Queue(childFlow, childFlowCount, blk, actionArgs);
-            } else {
-                queueBlock = new Queue(childFlow, childFlowCount, blk, receivedArg);
+            if (logo.statusMatrix && logo.statusMatrix.isOpen && !logo.inStatusMatrix) {
+                logo.statusMatrix.updateAll();
             }
-            // We need to keep track of the parent block to the child
-            // flow so we can unhighlight the parent block after the
-            // child flow completes.
+
+            // If there is a child flow, queue it.
             // eslint-disable-next-line eqeqeq
-            if (tur.parentFlowQueue != undefined) {
-                tur.parentFlowQueue.push(blk);
-                tur.queue.push(queueBlock);
-            }
-        }
-
-        let nextBlock = null;
-        let parentBlk = null;
-        let passArg = null;
-
-        // Run the last flow in the queue.
-        if (tur.queue.length > queueStart) {
-            const lastQueue = logo.deps.utils.last(tur.queue);
-
-            nextBlock = lastQueue.blk;
-            parentBlk = lastQueue.parentBlk;
-            passArg = lastQueue.args;
-
-            if (lastQueue.count === 1) {
-                tur.queue.pop();
-            } else {
-                lastQueue.count--;
-            }
-        }
-
-        // eslint-disable-next-line eqeqeq
-        if (nextBlock != null) {
-            if (parentBlk !== blk) {
-                // The wait block waits _waitTimes longer than other
-                // blocks before it is unhighlighted.
-                if (logo.turtleDelay === TURTLESTEP) {
-                    logo._unhighlightStepQueue[turtle] = blk;
+            if (childFlow != null) {
+                let queueBlock;
+                if (blockName === "doArg" || blockName === "nameddoArg") {
+                    queueBlock = Queue.obtain(childFlow, childFlowCount, blk, actionArgs);
                 } else {
-                    if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
-                        logo._timerManager.setGuardedTimeout(
-                            () => {
-                                if (logo.blocks.visible) {
-                                    logo.blocks.unhighlight(blk);
-                                    // Clear the currently highlighted block if it was this one
-                                    if (logo._currentlyHighlightedBlock === blk) {
-                                        logo._currentlyHighlightedBlock = null;
-                                    }
-                                    if (logo.stage) {
-                                        logo.deps.markStageDirty();
-                                    }
-                                }
-                            },
-                            Math.max(logo.turtleDelay + tur.waitTime, MIN_HIGHLIGHT_DURATION_MS),
-                            () => logo.stopTurtle
-                        );
+                    queueBlock = Queue.obtain(childFlow, childFlowCount, blk, receivedArg);
+                }
+                // We need to keep track of the parent block to the child
+                // flow so we can unhighlight the parent block after the
+                // child flow completes.
+                // eslint-disable-next-line eqeqeq
+                if (tur.parentFlowQueue != undefined) {
+                    tur.parentFlowQueue.push(blk);
+                    if (["do", "nameddo", "doArg", "nameddoArg"].includes(blockName)) {
+                        if (!tur.actionBoundaries) {
+                            tur.actionBoundaries = [];
+                        }
+                        tur.actionBoundaries.push(tur.queue.length);
                     }
+                    tur.queue.push(queueBlock);
                 }
             }
+
+            let nextBlock = null;
+            let parentBlk = null;
+            let passArg = null;
 
             if (
-                // eslint-disable-next-line eqeqeq
-                (tur.singer.backward.length > 0 && connections[0] == null) ||
-                (tur.singer.backward.length === 0 &&
-                    // eslint-disable-next-line eqeqeq
-                    lastConnection == null)
+                tur.actionBoundaries &&
+                tur.actionBoundaries.length > 0 &&
+                tur.queue.length <= logo.deps.utils.last(tur.actionBoundaries)
             ) {
-                if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
-                    // If we are at the end of the child flow, queue
-                    // the unhighlighting of the parent block to the
-                    // flow.
-                    if (tur.unhighlightQueue !== undefined) {
-                        if (tur.parentFlowQueue.length > 0 && tur.queue.length > 0) {
-                            const lastQueue = logo.deps.utils.last(tur.queue);
-                            const lastParentFlow = logo.deps.utils.last(tur.parentFlowQueue);
+                tur.actionBoundaries.pop();
+            }
 
-                            if (lastQueue.parentBlk !== lastParentFlow) {
-                                tur.unhighlightQueue.push(lastParentFlow);
-                            }
-                        } else if (tur.unhighlightQueue.length > 0) {
-                            // The child flow is finally complete, so unhighlight.
+            // Run the last flow in the queue.
+            if (tur.queue.length > queueStart) {
+                const lastQueue = logo.deps.utils.last(tur.queue);
+
+                nextBlock = lastQueue.blk;
+                parentBlk = lastQueue.parentBlk;
+                passArg = lastQueue.args;
+
+                if (lastQueue.count === 1) {
+                    tur.queue.pop();
+                    Queue.recycle(lastQueue);
+                } else {
+                    lastQueue.count--;
+                }
+            }
+
+            // eslint-disable-next-line eqeqeq
+            if (nextBlock != null) {
+                if (parentBlk !== blk) {
+                    // The wait block waits _waitTimes longer than other
+                    // blocks before it is unhighlighted.
+                    if (logo.turtleDelay === TURTLESTEP) {
+                        logo._unhighlightStepQueue[turtle] = blk;
+                    } else {
+                        if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
                             logo._timerManager.setGuardedTimeout(
                                 () => {
                                     if (logo.blocks.visible) {
-                                        const unhighlightBlock = tur.unhighlightQueue.pop();
-                                        logo.blocks.unhighlight(unhighlightBlock);
+                                        logo.blocks.unhighlight(blk);
                                         // Clear the currently highlighted block if it was this one
-                                        if (logo._currentlyHighlightedBlock === unhighlightBlock) {
+                                        if (logo._currentlyHighlightedBlock === blk) {
                                             logo._currentlyHighlightedBlock = null;
                                         }
                                         if (logo.stage) {
                                             logo.deps.markStageDirty();
                                         }
-                                    } else {
-                                        tur.unhighlightQueue.pop();
                                     }
                                 },
-                                Math.max(logo.turtleDelay, MIN_HIGHLIGHT_DURATION_MS),
+                                Math.max(
+                                    logo.turtleDelay + tur.waitTime,
+                                    MIN_HIGHLIGHT_DURATION_MS
+                                ),
                                 () => logo.stopTurtle
                             );
                         }
                     }
                 }
-            }
-
-            // We don't update parameter blocks when running full speed.
-            if (logo.turtleDelay !== 0) {
-                let updatedParameterBlocks = false;
-                for (const pblk in tur.parameterQueue) {
-                    if (logo.blocks.updateParameterBlock(logo, turtle, tur.parameterQueue[pblk])) {
-                        updatedParameterBlocks = true;
-                    }
-                }
-
-                if (updatedParameterBlocks) {
-                    logo.deps.refreshCanvas();
-                }
-            }
-
-            if (isflow) {
-                // Async yield: periodically yield to the event loop so the
-                // browser can process paint/input events and the UI does not
-                // freeze during long-running or infinitely-recursive programs.
-                logo._syncCounter++;
-                if (logo._syncCounter >= logo._YIELD_AFTER_SYNC_RUNS) {
-                    logo._syncCounter = 0;
-                    logo._timerManager.setGuardedTimeout(
-                        () =>
-                            logo.runFromBlockNow(
-                                logo,
-                                turtle,
-                                nextBlock,
-                                isflow,
-                                passArg,
-                                queueStart
-                            ),
-                        0,
-                        () => logo.stopTurtle
-                    );
-                } else {
-                    logo.runFromBlockNow(logo, turtle, nextBlock, isflow, passArg, queueStart);
-                }
-            } else {
-                logo.runFromBlock(logo, turtle, nextBlock, isflow, passArg);
-            }
-        } else if (tur.singer.justCounting.length > 0) {
-            // A note counter's silent run ends here, but the turtle is still
-            // running its program, so only flush the counted flow's signals.
-            if (!logo._prematureRestart) {
-                logo.dispatchUnissuedSignals(tur);
-            }
-        } else {
-            logo._alreadyRunning = false;
-
-            if (!logo._prematureRestart) {
-                logo.dispatchUnissuedSignals(tur);
-
-                // Make sure SVG path is closed.
-                logo.turtles.getTurtle(turtle).painter.closeSVG();
-
-                // Mark the turtle as not running.
-                logo.turtles.getTurtle(turtle).running = false;
-                if (!logo.turtles.running() && queueStart === 0) {
-                    logo.onStopTurtle();
-                }
-            } else {
-                logo.turtles.getTurtle(turtle).running = false;
-            }
-
-            const comp = logo.turtles.getTurtle(turtle).companionTurtle;
-            if (comp) {
-                const compTurtle = logo.turtles.getTurtle(comp);
-                compTurtle.running = false;
-                // Null tur.interval after cancel — mirrors fix at doStopTurtles
-                // (~line 1123) to prevent stale-ID no-op on next Play.
-                if (compTurtle.interval !== undefined) {
-                    if (!logo._timerManager.clearInterval(compTurtle.interval)) {
-                        clearInterval(compTurtle.interval);
-                    }
-                    compTurtle.interval = undefined;
-                }
-            }
-            // Because flow can come from calc blocks, we are not
-            // ensured that the turtle is really finished running
-            // yet. Hence the timeout.
-            const __checkCompletionState = () => {
-                if (logo._exportNotationFinished) {
-                    return;
-                }
 
                 if (
-                    !logo.turtles.running() &&
-                    queueStart === 0 &&
-                    tur.singer.justCounting.length === 0
+                    // eslint-disable-next-line eqeqeq
+                    (tur.singer.backward.length > 0 && connections[0] == null) ||
+                    (tur.singer.backward.length === 0 &&
+                        // eslint-disable-next-line eqeqeq
+                        lastConnection == null)
                 ) {
-                    // Performance instrumentation: end tracking and log stats.
-                    // Looked up again because this runs on a timeout, well
-                    // after the lookup at the top of runFromBlockNow.
-                    const runTracker = getPerformanceTracker();
-                    if (runTracker) {
-                        runTracker.endRun();
-                        runTracker.logStats();
-                    }
+                    if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
+                        // If we are at the end of the child flow, queue
+                        // the unhighlighting of the parent block to the
+                        // flow.
+                        if (tur.unhighlightQueue !== undefined) {
+                            if (tur.parentFlowQueue.length > 0 && tur.queue.length > 0) {
+                                const lastQueue = logo.deps.utils.last(tur.queue);
+                                const lastParentFlow = logo.deps.utils.last(tur.parentFlowQueue);
 
-                    if (logo.runningLilypond) {
-                        logo._exportNotationFinished = true;
-                        try {
-                            if (logo.collectingStats) {
-                                logo.projectStats = logo.deps.utils.getStatsFromNotation(
-                                    logo.activity
+                                if (lastQueue.parentBlk !== lastParentFlow) {
+                                    tur.unhighlightQueue.push(lastParentFlow);
+                                }
+                            } else if (tur.unhighlightQueue.length > 0) {
+                                // The child flow is finally complete, so unhighlight.
+                                logo._timerManager.setGuardedTimeout(
+                                    () => {
+                                        if (logo.blocks.visible) {
+                                            const unhighlightBlock = tur.unhighlightQueue.pop();
+                                            logo.blocks.unhighlight(unhighlightBlock);
+                                            // Clear the currently highlighted block if it was this one
+                                            if (
+                                                logo._currentlyHighlightedBlock === unhighlightBlock
+                                            ) {
+                                                logo._currentlyHighlightedBlock = null;
+                                            }
+                                            if (logo.stage) {
+                                                logo.deps.markStageDirty();
+                                            }
+                                        } else {
+                                            tur.unhighlightQueue.pop();
+                                        }
+                                    },
+                                    Math.max(logo.turtleDelay, MIN_HIGHLIGHT_DURATION_MS),
+                                    () => logo.stopTurtle
                                 );
-                                logo.deps.statsWindow.displayInfo(logo.projectStats);
-                            } else {
-                                logo.deps.save.afterSaveLilypond();
-                            }
-                        } catch (e) {
-                            console.error("Error generating Lilypond output: ", e);
-                            logo.deps.errorHandler(
-                                `${_("Error generating Lilypond output.")} ${e.message}`
-                            );
-                        } finally {
-                            logo.collectingStats = false;
-                            logo.runningLilypond = false;
-                            document.body.style.cursor = "default";
-                        }
-                    } else if (logo.runningAbc) {
-                        logo._exportNotationFinished = true;
-                        try {
-                            logo.deps.save.afterSaveAbc();
-                        } catch (e) {
-                            console.error("Error generating ABC output: ", e);
-                            logo.deps.errorHandler(
-                                `${_("Error generating ABC output.")} ${e.message}`
-                            );
-                        } finally {
-                            logo.runningAbc = false;
-                            document.body.style.cursor = "default";
-                        }
-                    } else if (logo.runningMxml) {
-                        logo._exportNotationFinished = true;
-                        logo.deps.save.afterSaveMxml();
-                        logo.runningMxml = false;
-                    } else if (logo.runningMIDI) {
-                        logo._exportNotationFinished = true;
-                        logo.deps.save.afterSaveMIDI();
-                        logo.runningMIDI = false;
-                    } else if (tur.singer.suppressOutput) {
-                        if (!logo.recording) {
-                            logo.deps.errorHandler(_("Playback is ready."));
-                        }
-                    } else {
-                        // Record notation data into buffer for later save (Issue #2330)
-                        // This allows saving Lilypond/ABC from interactive sessions
-                        const hasStagedNotation =
-                            logo.notation &&
-                            logo.notation.notationStaging &&
-                            Object.values(logo.notation.notationStaging).some(
-                                staging => Array.isArray(staging) && staging.length > 0
-                            );
-                        if (
-                            hasStagedNotation &&
-                            logo.notationOutput &&
-                            logo.notationOutput.length > 0
-                        ) {
-                            logo.recordingBuffer.hasData = true;
-                            logo.recordingBuffer.notationOutput = logo.notationOutput;
-                            logo.recordingBuffer.notationNotes = JSON.parse(
-                                JSON.stringify(logo.notationNotes)
-                            );
-                            // Copy notation staging data
-                            logo.recordingBuffer.notationStaging = {};
-                            logo.recordingBuffer.notationDrumStaging = {};
-                            for (let t = 0; t < logo.turtles.getTurtleCount(); t++) {
-                                if (logo.notation.notationStaging[t]) {
-                                    logo.recordingBuffer.notationStaging[t] = [
-                                        ...logo.notation.notationStaging[t]
-                                    ];
-                                }
-                                if (logo.notation.notationDrumStaging[t]) {
-                                    logo.recordingBuffer.notationDrumStaging[t] = [
-                                        ...logo.notation.notationDrumStaging[t]
-                                    ];
-                                }
                             }
                         }
                     }
-
-                    // Wait a beat for the last note, then clean up.
-                    // Cancel any pending timer from a previous turtle.
-                    if (logo._lastNoteTimeout !== null) {
-                        logo._timerManager.clearTimeout(logo._lastNoteTimeout);
-                    }
-                    logo._lastNoteTimeout = logo._timerManager.setTimeout(() => {
-                        logo._lastNoteTimeout = null;
-                        tur.singer.runningFromEvent = false;
-                        if (tur.singer.suppressOutput && logo.recording) {
-                            tur.singer.suppressOutput = false;
-                        }
-                        // Skip if a new run already started or another
-                        // turtle's callback already cleaned up.
-                        if (!logo.turtles.running()) {
-                            logo._cleanupAfterCompletion();
-                        }
-                    }, 1000);
                 }
-            };
 
-            logo._timerManager.setTimeout(__checkCompletionState, 100);
-        }
+                // We don't update parameter blocks when running full speed.
+                if (logo.turtleDelay !== 0) {
+                    let updatedParameterBlocks = false;
+                    for (const pblk in tur.parameterQueue) {
+                        if (
+                            logo.blocks.updateParameterBlock(logo, turtle, tur.parameterQueue[pblk])
+                        ) {
+                            updatedParameterBlocks = true;
+                        }
+                    }
 
-        if (profilingEnabled) {
-            Logo._recordBlockTiming(logo, blk, profilingStart);
-            tracker.exitBlock();
+                    if (updatedParameterBlocks) {
+                        logo.deps.refreshCanvas();
+                    }
+                }
+
+                if (isflow) {
+                    // Async yield: periodically yield to the event loop so the
+                    // browser can process paint/input events and the UI does not
+                    // freeze during long-running or infinitely-recursive programs.
+                    logo._syncCounter++;
+                    if (logo._syncCounter >= logo._YIELD_AFTER_SYNC_RUNS) {
+                        logo._syncCounter = 0;
+                        logo._timerManager.setGuardedTimeout(
+                            () =>
+                                logo.runFromBlockNow(
+                                    logo,
+                                    turtle,
+                                    nextBlock,
+                                    isflow,
+                                    passArg,
+                                    queueStart
+                                ),
+                            0,
+                            () => logo.stopTurtle
+                        );
+                        if (profilingEnabled) {
+                            Logo._recordBlockTiming(logo, blk, profilingStart);
+                            tracker.exitBlock();
+                        }
+                        return;
+                    } else {
+                        if (profilingEnabled) {
+                            Logo._recordBlockTiming(logo, blk, profilingStart);
+                            tracker.exitBlock();
+                        }
+                        blk = nextBlock;
+                        receivedArg = passArg;
+                        continue;
+                    }
+                } else {
+                    logo.runFromBlock(logo, turtle, nextBlock, isflow, passArg);
+                    if (profilingEnabled) {
+                        Logo._recordBlockTiming(logo, blk, profilingStart);
+                        tracker.exitBlock();
+                    }
+                    return;
+                }
+            } else if (tur.singer.justCounting.length > 0) {
+                // A note counter's silent run ends here, but the turtle is still
+                // running its program, so only flush the counted flow's signals.
+                if (!logo._prematureRestart) {
+                    logo.dispatchUnissuedSignals(tur);
+                }
+            } else {
+                logo._alreadyRunning = false;
+
+                if (!logo._prematureRestart) {
+                    logo.dispatchUnissuedSignals(tur);
+
+                    // Make sure SVG path is closed.
+                    logo.turtles.getTurtle(turtle).painter.closeSVG();
+
+                    // Mark the turtle as not running.
+                    logo.turtles.getTurtle(turtle).running = false;
+                    if (!logo.turtles.running() && queueStart === 0) {
+                        logo.onStopTurtle();
+                    }
+                } else {
+                    logo.turtles.getTurtle(turtle).running = false;
+                }
+
+                const comp = logo.turtles.getTurtle(turtle).companionTurtle;
+                if (comp) {
+                    const compTurtle = logo.turtles.getTurtle(comp);
+                    compTurtle.running = false;
+                    // Null tur.interval after cancel — mirrors fix at doStopTurtles
+                    // (~line 1123) to prevent stale-ID no-op on next Play.
+                    if (compTurtle.interval !== undefined) {
+                        if (!logo._timerManager.clearInterval(compTurtle.interval)) {
+                            clearInterval(compTurtle.interval);
+                        }
+                        compTurtle.interval = undefined;
+                    }
+                }
+                // Because flow can come from calc blocks, we are not
+                // ensured that the turtle is really finished running
+                // yet. Hence the timeout.
+                const __checkCompletionState = () => {
+                    if (logo._exportNotationFinished) {
+                        return;
+                    }
+
+                    if (
+                        !logo.turtles.running() &&
+                        queueStart === 0 &&
+                        tur.singer.justCounting.length === 0
+                    ) {
+                        // Performance instrumentation: end tracking and log stats.
+                        // Looked up again because this runs on a timeout, well
+                        // after the lookup at the top of runFromBlockNow.
+                        const runTracker = getPerformanceTracker();
+                        if (runTracker) {
+                            runTracker.endRun();
+                            runTracker.logStats();
+                        }
+
+                        if (logo.runningLilypond) {
+                            logo._exportNotationFinished = true;
+                            try {
+                                if (logo.collectingStats) {
+                                    logo.projectStats = logo.deps.utils.getStatsFromNotation(
+                                        logo.activity
+                                    );
+                                    logo.deps.statsWindow.displayInfo(logo.projectStats);
+                                } else {
+                                    logo.deps.save.afterSaveLilypond();
+                                }
+                            } catch (e) {
+                                console.error("Error generating Lilypond output: ", e);
+                                logo.deps.errorHandler(
+                                    `${_("Error generating Lilypond output.")} ${e.message}`
+                                );
+                            } finally {
+                                logo.collectingStats = false;
+                                logo.runningLilypond = false;
+                                document.body.style.cursor = "default";
+                            }
+                        } else if (logo.runningAbc) {
+                            logo._exportNotationFinished = true;
+                            try {
+                                logo.deps.save.afterSaveAbc();
+                            } catch (e) {
+                                console.error("Error generating ABC output: ", e);
+                                logo.deps.errorHandler(
+                                    `${_("Error generating ABC output.")} ${e.message}`
+                                );
+                            } finally {
+                                logo.runningAbc = false;
+                                document.body.style.cursor = "default";
+                            }
+                        } else if (logo.runningMxml) {
+                            logo._exportNotationFinished = true;
+                            logo.deps.save.afterSaveMxml();
+                            logo.runningMxml = false;
+                        } else if (logo.runningMIDI) {
+                            logo._exportNotationFinished = true;
+                            logo.deps.save.afterSaveMIDI();
+                            logo.runningMIDI = false;
+                        } else if (tur.singer.suppressOutput) {
+                            if (!logo.recording) {
+                                logo.deps.errorHandler(_("Playback is ready."));
+                            }
+                        } else {
+                            // Record notation data into buffer for later save (Issue #2330)
+                            // This allows saving Lilypond/ABC from interactive sessions
+                            const hasStagedNotation =
+                                logo.notation &&
+                                logo.notation.notationStaging &&
+                                Object.values(logo.notation.notationStaging).some(
+                                    staging => Array.isArray(staging) && staging.length > 0
+                                );
+                            if (
+                                hasStagedNotation &&
+                                logo.notationOutput &&
+                                logo.notationOutput.length > 0
+                            ) {
+                                logo.recordingBuffer.hasData = true;
+                                logo.recordingBuffer.notationOutput = logo.notationOutput;
+                                logo.recordingBuffer.notationNotes = JSON.parse(
+                                    JSON.stringify(logo.notationNotes)
+                                );
+                                // Copy notation staging data
+                                logo.recordingBuffer.notationStaging = {};
+                                logo.recordingBuffer.notationDrumStaging = {};
+                                for (let t = 0; t < logo.turtles.getTurtleCount(); t++) {
+                                    if (logo.notation.notationStaging[t]) {
+                                        logo.recordingBuffer.notationStaging[t] = [
+                                            ...logo.notation.notationStaging[t]
+                                        ];
+                                    }
+                                    if (logo.notation.notationDrumStaging[t]) {
+                                        logo.recordingBuffer.notationDrumStaging[t] = [
+                                            ...logo.notation.notationDrumStaging[t]
+                                        ];
+                                    }
+                                }
+                            }
+                        }
+
+                        // Wait a beat for the last note, then clean up.
+                        // Cancel any pending timer from a previous turtle.
+                        if (logo._lastNoteTimeout !== null) {
+                            logo._timerManager.clearTimeout(logo._lastNoteTimeout);
+                        }
+                        logo._lastNoteTimeout = logo._timerManager.setTimeout(() => {
+                            logo._lastNoteTimeout = null;
+                            tur.singer.runningFromEvent = false;
+                            if (tur.singer.suppressOutput && logo.recording) {
+                                tur.singer.suppressOutput = false;
+                            }
+                            // Skip if a new run already started or another
+                            // turtle's callback already cleaned up.
+                            if (!logo.turtles.running()) {
+                                logo._cleanupAfterCompletion();
+                            }
+                        }, 1000);
+                    }
+                };
+
+                logo._timerManager.setTimeout(__checkCompletionState, 100);
+            }
+
+            if (profilingEnabled) {
+                Logo._recordBlockTiming(logo, blk, profilingStart);
+                tracker.exitBlock();
+            }
+            break;
         }
     }
 
@@ -2901,6 +3004,26 @@ class Logo {
         );
     }
 }
+
+Logo._stepItemPool = [];
+
+Logo._obtainStepItem = function _obtainStepItem(blk, isflow, receivedArg) {
+    if (Logo._stepItemPool.length > 0) {
+        const item = Logo._stepItemPool.pop();
+        item.blk = blk;
+        item.isflow = isflow;
+        item.receivedArg = receivedArg;
+        return item;
+    }
+    return { blk, isflow, receivedArg };
+};
+
+Logo._recycleStepItem = function _recycleStepItem(item) {
+    if (item && typeof item === "object" && Logo._stepItemPool.length < 128) {
+        item.receivedArg = null;
+        Logo._stepItemPool.push(item);
+    }
+};
 
 Logo._recordBlockTiming = function _recordBlockTiming(logo, blk, profilingStart) {
     if (profilingStart === null) return;
