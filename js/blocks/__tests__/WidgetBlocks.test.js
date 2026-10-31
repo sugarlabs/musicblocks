@@ -177,6 +177,8 @@ global.MusicKeyboard = jest.fn();
 global.MusicKeyboard.dependencies = [
     "widgets/MusicKeyboardEditing",
     "widgets/MusicKeyboardRendering",
+    "widgets/MusicKeyboardPlayback",
+    "widgets/MusicKeyboardInput",
     "widgets/musickeyboard"
 ];
 global.PhraseMaker = jest.fn();
