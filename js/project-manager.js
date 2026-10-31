@@ -1316,8 +1316,6 @@ class ProjectManager {
                                     that.palettes.dict[name].hideMenu(true);
                                 }
 
-                                that.stage.removeAllEventListeners("trashsignal");
-
                                 if (!that.merging) {
                                     await replaceProjectFromFile(
                                         obj,
