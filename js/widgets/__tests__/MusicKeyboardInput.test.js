@@ -265,6 +265,57 @@ describe("MusicKeyboardInput", () => {
             expect(keyboard.activity.logo.synth.stopSound).not.toHaveBeenCalled();
         });
 
+        // Shifts the keyboard up an octave the way the widget does: the keys are
+        // drawn again and get the new pitches.
+        const shiftUp = keyboard => {
+            keyboard.octaves = [4, 4, 4];
+            keyboard.noteNames = ["C", "D", "E"];
+            keyboard.keyboardDiv = document.createElement("div");
+            keyboard._createKeyboard = jest.fn(() => {
+                keyboard.noteMapper = { whiteRow0: "C5", whiteRow1: "D5", whiteRow2: "E5" };
+            });
+            keyboard.shiftOctave(1);
+        };
+
+        test("a note held across an octave shift stops and records its own pitch", async () => {
+            const keyboard = makeKeyboard();
+            const send = await connect(keyboard);
+
+            send([NOTE_ON, C4, 100]);
+            shiftUp(keyboard);
+            jest.advanceTimersByTime(1000);
+            send([NOTE_OFF, C4, 0]);
+
+            expect(keyboard.activity.logo.synth.stopSound).toHaveBeenCalledWith(0, "piano", "C4");
+            expect(keyboard._notesPlayed).toHaveLength(1);
+            expect(keyboard._notesPlayed[0]).toMatchObject({
+                noteOctave: "C4",
+                objId: "whiteRow0",
+                duration: 0.5,
+                blockNumber: 10
+            });
+            expect(document.getElementById("whiteRow0").style.backgroundColor).toBe("white");
+        });
+
+        test("after an octave shift MIDI notes go to the shifted keys", async () => {
+            const keyboard = makeKeyboard();
+            const send = await connect(keyboard);
+
+            shiftUp(keyboard);
+            send([NOTE_ON, C4 + 12, 100]);
+            send([NOTE_OFF, C4 + 12, 0]);
+
+            expect(keyboard.activity.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                "C5",
+                1,
+                "piano",
+                null,
+                null
+            );
+            expect(keyboard._notesPlayed.map(note => note.noteOctave)).toEqual(["C5"]);
+        });
+
         test("uses the same clock as the mouse and computer keyboard", async () => {
             const keyboard = makeKeyboard();
             const send = await connect(keyboard);

@@ -333,9 +333,11 @@ const MusicKeyboardInput = {
          * @memberof MusicKeyboard
          */
         this.doMIDI = () => {
-            // When each held key started, by key id. The clock is the one the mouse
-            // and computer keyboard use, so all recorded notes sort together.
-            const startTimes = {};
+            // The held notes, by MIDI note number. Each keeps the key, pitch, voice
+            // and block it started with, so an octave shift while it is held does
+            // not change what is stopped and recorded. The clock is the one the
+            // mouse and computer keyboard use, so all recorded notes sort together.
+            const activeNotes = {};
             // Notes struck within this many milliseconds start together, so a chord
             // is recorded as one, as it is from the computer keyboard.
             const CHORDWINDOW = 100;
@@ -351,11 +353,18 @@ const MusicKeyboardInput = {
             const __startNote = (event, element) => {
                 if (!element) return;
                 const now = new Date().getTime();
-                startTimes[element.id] =
+                const startTime =
                     lastStartTime !== null && now - lastStartTime < CHORDWINDOW
                         ? lastStartTime
                         : now;
-                lastStartTime = startTimes[element.id];
+                lastStartTime = startTime;
+                activeNotes[event.data[1]] = {
+                    startTime: startTime,
+                    objId: element.id,
+                    noteOctave: this.noteMapper[element.id],
+                    voice: this.instrumentMapper[element.id],
+                    blockNumber: this.blockNumberMapper[element.id]
+                };
                 element.style.backgroundColor = platformColor.orange;
                 this.activity.logo.synth.trigger(
                     0,
@@ -369,38 +378,35 @@ const MusicKeyboardInput = {
 
             /**
              * Handler for ending a note on MIDI interaction.
-             * @param {MouseEvent} event - The mouse event triggering the note end.
-             * @param {HTMLElement} element - The HTML element representing the note.
+             * @param {MIDIMessageEvent} event - The MIDI message ending the note.
              */
-            const __endNote = (event, element) => {
-                // Ignore a note off for a key that was not started here, such as one
+            const __endNote = event => {
+                // Ignore a note off for a note that was not started here, such as one
                 // held down before MIDI was turned on.
-                if (!element || !(element.id in startTimes)) return;
+                const note = activeNotes[event.data[1]];
+                if (!note) return;
+                delete activeNotes[event.data[1]];
 
-                const id = element.id;
-                if (id.includes("blackRow")) {
-                    element.style.backgroundColor = "black";
-                } else {
-                    element.style.backgroundColor = "white";
+                const element = this._mkbEl(note.objId);
+                if (element) {
+                    if (note.objId.includes("blackRow")) {
+                        element.style.backgroundColor = "black";
+                    } else {
+                        element.style.backgroundColor = "white";
+                    }
                 }
 
-                const startTime = startTimes[id];
-                delete startTimes[id];
-                let duration = (new Date().getTime() - startTime) / 1000;
-                this.activity.logo.synth.stopSound(
-                    0,
-                    this.instrumentMapper[element.id],
-                    this.noteMapper[element.id]
-                );
+                let duration = (new Date().getTime() - note.startTime) / 1000;
+                this.activity.logo.synth.stopSound(0, note.voice, note.noteOctave);
                 duration = this._roundNoteDuration(this._secondsToNoteValue(duration));
 
                 this._notesPlayed.push({
-                    startTime: startTime,
-                    noteOctave: this.noteMapper[element.id],
-                    objId: element.id,
+                    startTime: note.startTime,
+                    noteOctave: note.noteOctave,
+                    objId: note.objId,
                     duration: duration,
-                    voice: this.instrumentMapper[element.id],
-                    blockNumber: this.blockNumberMapper[element.id]
+                    voice: note.voice,
+                    blockNumber: note.blockNumber
                 });
                 this._createTable();
             };
@@ -448,7 +454,7 @@ const MusicKeyboardInput = {
                 if (command === 0x90 && event.data[2] !== 0) {
                     __startNote(event, this._mkbEl(key));
                 } else {
-                    __endNote(event, this._mkbEl(key));
+                    __endNote(event);
                 }
             };
 
@@ -565,6 +571,7 @@ const MusicKeyboardInput = {
                     this._releaseActiveNotes();
                 }
                 this._createKeyboard();
+                this._refreshNoteToKeyMap();
             }
 
             if (typeof this._createTable === "function") {
