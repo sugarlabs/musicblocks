@@ -1600,7 +1600,13 @@ class Logo {
             turtle.unhighlightQueue = [];
             if (turtle.singer) {
                 turtle.singer._unhighlightTimers = {};
+                turtle.singer.tie = false;
+                turtle.singer.tieCarryOver = 0;
+                turtle.singer.tieNotePitches = [];
+                turtle.singer.tieNoteExtras = [];
+                turtle.singer.tieFirstDrums = [];
             }
+            turtle.endOfClampSignals = {};
             if (turtle.delayTimeout !== null) {
                 clearTimeout(turtle.delayTimeout);
                 turtle.delayTimeout = null;

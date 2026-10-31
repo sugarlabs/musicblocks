@@ -1277,6 +1277,27 @@ describe("Logo doStopTurtles", () => {
         expect(turtle.singer._unhighlightTimers).toEqual({});
     });
 
+    test("resets tie state and pending carryover on turtle.singer and clears endOfClampSignals on stop", () => {
+        turtle.singer = {
+            _unhighlightTimers: {},
+            tie: true,
+            tieCarryOver: 4,
+            tieNotePitches: [["C", 4, 0, 261.63]],
+            tieNoteExtras: [5, ["sine"], 1, [1], [], undefined, false, 4],
+            tieFirstDrums: ["snare"]
+        };
+        turtle.endOfClampSignals = { 5: ["_tie_0"] };
+
+        logo.doStopTurtles();
+
+        expect(turtle.singer.tie).toBe(false);
+        expect(turtle.singer.tieCarryOver).toBe(0);
+        expect(turtle.singer.tieNotePitches).toEqual([]);
+        expect(turtle.singer.tieNoteExtras).toEqual([]);
+        expect(turtle.singer.tieFirstDrums).toEqual([]);
+        expect(turtle.endOfClampSignals).toEqual({});
+    });
+
     test("unhighlights all blocks on stop when blocks are visible", () => {
         mockActivity.blocks.visible = true;
         mockActivity.blocks.unhighlightAll = jest.fn();

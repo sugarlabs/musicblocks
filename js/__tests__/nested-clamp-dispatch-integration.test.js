@@ -59,7 +59,13 @@ function createTurtle() {
             inDuplicate: false,
             backward: [],
             suppressOutput: true,
-            justCounting: []
+            justCounting: [],
+            tie: false,
+            tieNotePitches: [],
+            tieNoteExtras: [],
+            tieCarryOver: 0,
+            tieFirstDrums: [],
+            bpm: []
         },
         painter: { closeSVG: jest.fn() },
         queue: [],
@@ -150,6 +156,11 @@ describe("nested clamps of the same kind", () => {
         };
         logo = new Logo(activity);
         activity.logo = logo;
+        activity.logo.notation = {
+            notationRemoveTie: jest.fn(),
+            notationStaging: { 0: [] }
+        };
+        turtle.doWait = jest.fn();
         setupRhythmActions(activity);
         setupDrumActions(activity);
     });
@@ -182,5 +193,42 @@ describe("nested clamps of the same kind", () => {
 
         expect(snapshots[1]).toEqual({ C4: "kick drum" });
         expect(snapshots[2]).toEqual({});
+    });
+
+    test("tie: outer tie is preserved when inner clamp completes", () => {
+        const tieSnapshots = [];
+        const probe = (parent, next) =>
+            flowBlock("probe", [parent, next], () => {
+                tieSnapshots.push(turtle.singer.tie);
+                return null;
+            });
+        const tieClamp = (parent, child, next) =>
+            flowBlock(
+                "tie",
+                [parent, child, next],
+                (args, l, t, blk) => {
+                    Singer.RhythmActions.doTie(t, blk);
+                    return [args[0], 1];
+                },
+                1
+            );
+
+        // outer tie (0) -> inner tie (1) -> probe (2) -> inner hidden (3) -> probe (4) -> outer hidden (5) -> probe (6)
+        const blocks = [
+            tieClamp(null, 1, 5),
+            tieClamp(0, 2, 3),
+            probe(1, null),
+            flowBlock("hidden", [1, 4]),
+            probe(3, null),
+            flowBlock("hidden", [0, 6]),
+            probe(5, null)
+        ];
+        logo.blockList = blocks;
+        logo.activity.blocks.blockList = blocks;
+        logo.runFromBlockNow(logo, 0, 0, 1, null);
+
+        // Before fix: inner tie exit dispatched inner listener which set tie = false at probe(4) -> [true, false, false].
+        // With defensive runtime fix: outer tie remains active across inner clamp exit -> [true, true, false].
+        expect(tieSnapshots).toEqual([true, true, false]);
     });
 });
