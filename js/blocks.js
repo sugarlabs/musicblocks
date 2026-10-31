@@ -7675,6 +7675,21 @@ class Blocks {
         };
 
         /**
+         * Permanently dispose blocks that have already been moved to trash.
+         * Live blocks are left untouched.
+         * @public
+         * @returns {void}
+         */
+        this.disposeTrashedBlocks = () => {
+            for (let i = 0; i < this.blockList.length; i++) {
+                const block = this.blockList[i];
+                if (block && block.trash) {
+                    this.disposeBlock(i);
+                }
+            }
+        };
+
+        /**
          * Send a stack of blocks to the trash.
          * @param - myBlock
          * @public

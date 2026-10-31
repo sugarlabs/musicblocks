@@ -4856,6 +4856,21 @@ describe("Spatial grid indexing", () => {
             expect(blocks._getNearbyBlocks(0, 0)).toEqual([0]);
         });
 
+        it("disposes trashed blocks while preserving live blocks", () => {
+            blocks.blockList[0].trash = false;
+            blocks.blockList[1].trash = true;
+
+            blocks.blockList[0].dispose = jest.fn();
+            blocks.blockList[1].dispose = jest.fn();
+
+            blocks.disposeTrashedBlocks();
+
+            expect(blocks.blockList[0]).not.toBeNull();
+            expect(blocks.blockList[0].dispose).not.toHaveBeenCalled();
+
+            expect(blocks.blockList[1]).toBeNull();
+        });
+
         it("empty-grid fallback also skips an undefined slot, not just a disposed (null) one", () => {
             // The fallback used to test `!== null`, which would still return
             // a hole/undefined slot -- only disposeBlock's exact `null`
