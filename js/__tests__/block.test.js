@@ -2466,6 +2466,38 @@ describe("Block Foundation", () => {
             expect(args[3]).toBe("custom");
             expect(args[4]).toBe("C(+0¢)");
         });
+
+        it("_changeLabel customNote seeds selectedCustom from active inTemperament when customID is null", () => {
+            global.piemenuCustomNotes = jest.fn();
+            global.piemenuPitches = jest.fn();
+            block.name = "customNote";
+            block.value = "C(+0¢)";
+            block.customID = null;
+            block.activity = {
+                logo: {
+                    customTemperamentDefined: true,
+                    synth: { inTemperament: "active_custom" }
+                },
+                canvas: { offsetLeft: 0, offsetTop: 0 },
+                blocksContainer: { y: 0 }
+            };
+            block.blocks = { blockScale: 1 };
+            block.container = { x: 0, y: 0 };
+            block.piemenuOKtoLaunch = jest.fn().mockReturnValue(true);
+            block._usePiemenu = jest.fn().mockReturnValue(true);
+
+            const customDef = {
+                0: [1, "C", 4],
+                1: [1.2, "D", 4],
+                pitchNumber: 2
+            };
+            addTemperamentToDictionary("active_custom", customDef);
+
+            block._changeLabel();
+            expect(global.piemenuCustomNotes).toHaveBeenCalledTimes(1);
+            const args = global.piemenuCustomNotes.mock.calls[0];
+            expect(args[3]).toBe("active_custom");
+        });
     });
 
     describe("ManagedTimer Integration in Block", () => {
