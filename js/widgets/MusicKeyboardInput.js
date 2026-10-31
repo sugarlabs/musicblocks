@@ -151,10 +151,9 @@ const MusicKeyboardInput = {
                     );
 
                     if (this.tick && this.endTime !== undefined && this.firstNote) {
-                        let restDuration = (startTime[id] - this.endTime) / 1000.0;
-                        restDuration /= 60; // Convert time to minutes
-                        restDuration *= this.bpm;
-                        restDuration *= this.meterArgs[1];
+                        let restDuration = this._secondsToNoteValue(
+                            (startTime[id] - this.endTime) / 1000.0
+                        );
                         restDuration = parseFloat(
                             (Math.round(restDuration * unit) / unit).toFixed(4)
                         );
@@ -214,9 +213,7 @@ const MusicKeyboardInput = {
                         ele.style.backgroundColor = "white";
                     }
 
-                    let processedDuration = duration / 60;
-                    processedDuration *= this.bpm;
-                    processedDuration *= this.meterArgs[1];
+                    let processedDuration = this._secondsToNoteValue(duration);
                     processedDuration = parseFloat(
                         (Math.round(processedDuration * unit) / unit).toFixed(4)
                     );
@@ -395,7 +392,7 @@ const MusicKeyboardInput = {
                     this.instrumentMapper[element.id],
                     this.noteMapper[element.id]
                 );
-                duration = this._roundNoteDuration(duration);
+                duration = this._roundNoteDuration(this._secondsToNoteValue(duration));
 
                 this._notesPlayed.push({
                     startTime: startTime,

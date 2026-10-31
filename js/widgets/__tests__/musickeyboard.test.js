@@ -3222,6 +3222,7 @@ describe("MusicKeyboard rest key pointer handler", () => {
             logo: { synth: { trigger: jest.fn(), stopSound: jest.fn() } }
         });
         keyboard._notesPlayed = [];
+        keyboard.bpm = 120;
         keyboard._createTable = jest.fn();
         keyboard._updateWidgetWindowSize = jest.fn();
         element = {
@@ -3239,16 +3240,17 @@ describe("MusicKeyboard rest key pointer handler", () => {
         jest.useRealTimers();
     });
 
-    test("records a rest lasting as long as the key was held", () => {
+    test("records a rest lasting as long as the key was held, at the tempo", () => {
         const start = Date.now();
         listener("pointerdown")({ preventDefault: jest.fn(), pointerId: 1 });
         expect(element.style.backgroundColor).toBe("orange");
 
+        // Half a second is one quarter note at 120 bpm.
         jest.advanceTimersByTime(500);
         listener("pointerup")();
 
         expect(keyboard._notesPlayed).toEqual([
-            { startTime: start, noteOctave: "R", objId: null, duration: 0.5 }
+            { startTime: start, noteOctave: "R", objId: null, duration: 0.25 }
         ]);
         expect(element.style.backgroundColor).toBe("white");
         expect(keyboard._createTable).toHaveBeenCalled();
