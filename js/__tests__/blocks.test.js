@@ -5615,6 +5615,23 @@ describe("sendStackToTrash – turtle container guard", () => {
         expect(mockTurtleList[1].inTrash).toBe(true);
     });
 
+    it("should trash companion turtle and hide container when companion is index 0", () => {
+        const container0 = { visible: true, uncache: jest.fn() };
+        const container1 = { visible: true, uncache: jest.fn() };
+        const myBlock = makeStartBlock(1);
+        blocks.blockList = [myBlock];
+
+        mockTurtleList[0] = { container: container0, inTrash: false };
+        mockTurtleList[1] = { container: container1, inTrash: false, companionTurtle: 0 };
+
+        blocks.sendStackToTrash(myBlock);
+
+        expect(container0.visible).toBe(false);
+        expect(container1.visible).toBe(false);
+        expect(mockTurtleList[0].inTrash).toBe(true);
+        expect(mockTurtleList[1].inTrash).toBe(true);
+    });
+
     describe("_adjustExpandableTwoArgBlock", () => {
         let blocksInstance;
         let setxyBlock;
