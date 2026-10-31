@@ -392,10 +392,13 @@ class TimbreBlocks {
                 this._update(blockValue, obj[0], 2);
 
                 if (instrumentsEffects[0] && instrumentsEffects[0][this.instrumentName]) {
+                    const undoFreq = parseFloat(obj[0]) / parseFloat(obj[1]);
+                    instrumentsEffects[0][this.instrumentName]["vibratoActive"] = true;
                     instrumentsEffects[0][this.instrumentName]["vibratoIntensity"] =
                         parseFloat(vals[0]) / 100;
-                    instrumentsEffects[0][this.instrumentName]["vibratoFrequency"] =
-                        parseFloat(obj[0]) / parseFloat(obj[1]);
+                    instrumentsEffects[0][this.instrumentName]["vibratoFrequency"] = undoFreq;
+                    instrumentsEffects[0][this.instrumentName]["vibratoRate"] =
+                        undoFreq > 0 ? 1 / undoFreq : 16;
                 }
             } else if (effect === "phaser") {
                 for (let i = 0; i < 3; i++) {

@@ -3882,6 +3882,24 @@ describe("Singer.resolveNoteEffects — isolate note effect resolution from play
             expect(resolved.chorusDepth).toBe(0.6);
             expect(resolved.doDistortion).toBe(false);
         });
+
+        it("resolves vibratoRate and vibratoIntensity fallback when only vibratoFrequency is present", () => {
+            const turtleState = {
+                singer: {
+                    vibratoRate: [],
+                    vibratoIntensity: []
+                }
+            };
+            const instrumentSettings = {
+                vibratoActive: true,
+                vibratoFrequency: 0.0625
+            };
+
+            const resolved = Singer.resolveNoteEffects(turtleState, instrumentSettings);
+            expect(resolved.doVibrato).toBe(true);
+            expect(resolved.vibratoRate).toBe(16);
+            expect(resolved.vibratoIntensity).toBe(0.05);
+        });
     });
 
     describe("Singer.processNote playback integration", () => {

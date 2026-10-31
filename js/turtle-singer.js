@@ -158,8 +158,16 @@ const resolveNoteEffects = (turtleState, instrumentSettings) => {
     if (instEffects && typeof instEffects === "object") {
         if (instEffects.vibratoActive) {
             resolved.doVibrato = true;
-            resolved.vibratoRate = instEffects.vibratoRate ?? 0;
-            resolved.vibratoIntensity = instEffects.vibratoIntensity ?? 0;
+            resolved.vibratoRate =
+                instEffects.vibratoRate !== undefined && instEffects.vibratoRate > 0
+                    ? instEffects.vibratoRate
+                    : instEffects.vibratoFrequency && instEffects.vibratoFrequency > 0
+                      ? 1 / instEffects.vibratoFrequency
+                      : 16;
+            resolved.vibratoIntensity =
+                instEffects.vibratoIntensity !== undefined && instEffects.vibratoIntensity > 0
+                    ? instEffects.vibratoIntensity
+                    : 0.05;
         }
 
         if (instEffects.distortionActive) {

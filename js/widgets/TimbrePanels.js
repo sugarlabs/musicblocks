@@ -1271,6 +1271,23 @@ class TimbrePanels {
                         myRangeFxs[1].value = 100 / parseFloat(this.vibratoParams[1]);
                         const obj = rationalToFraction(1 / parseFloat(this.vibratoParams[1]));
                         myspanFxs[1].textContent = obj[0] + "/" + obj[1]; // this.vibratoParams[1];
+
+                        if (!instrumentsEffects[0][this.instrumentName]) {
+                            instrumentsEffects[0][this.instrumentName] = {};
+                        }
+                        instrumentsEffects[0][this.instrumentName]["vibratoActive"] = true;
+                        const initialIntensity = parseFloat(this.vibratoParams[0]);
+                        instrumentsEffects[0][this.instrumentName]["vibratoIntensity"] = isNaN(
+                            initialIntensity
+                        )
+                            ? 0.05
+                            : initialIntensity / 100;
+                        const initialRate = parseFloat(this.vibratoParams[1]);
+                        const freq =
+                            isNaN(initialRate) || initialRate === 0 ? 1 / 16 : 1 / initialRate;
+                        instrumentsEffects[0][this.instrumentName]["vibratoFrequency"] = freq;
+                        instrumentsEffects[0][this.instrumentName]["vibratoRate"] =
+                            initialRate || 16;
                     } else {
                         // If necessary, add a vibrato block.
                         const topOfTimbreClamp =
@@ -1301,11 +1318,13 @@ class TimbrePanels {
 
                         myRangeFxs[0].value = 5;
                         myspanFxs[0].textContent = "5";
+                        instrumentsEffects[0][this.instrumentName]["vibratoActive"] = true;
                         instrumentsEffects[0][this.instrumentName]["vibratoIntensity"] = 0.05;
 
                         myRangeFxs[1].value = 100 / 16;
                         myspanFxs[1].textContent = "1/16";
                         instrumentsEffects[0][this.instrumentName]["vibratoFrequency"] = 1 / 16;
+                        instrumentsEffects[0][this.instrumentName]["vibratoRate"] = 16;
                     }
 
                     // Add the listeners for the sliders.
@@ -1323,6 +1342,7 @@ class TimbrePanels {
                         );
                         myRangeFxs[0].value = val;
                         myspanFxs[0].textContent = val;
+                        instrumentsEffects[0][this.instrumentName]["vibratoActive"] = true;
                         instrumentsEffects[0][this.instrumentName]["vibratoIntensity"] = val / 100;
                         this.vibratoParams[0] = elem.value;
                         this._update(this.vibratoEffect.length - 1, val, 0);
@@ -1346,7 +1366,16 @@ class TimbrePanels {
                         myspanFxs[1].textContent = obj[0] + "/" + obj[1];
                         const temp = parseFloat(obj[0]) / parseFloat(obj[1]);
 
+                        instrumentsEffects[0][this.instrumentName]["vibratoActive"] = true;
                         instrumentsEffects[0][this.instrumentName]["vibratoFrequency"] = temp;
+                        instrumentsEffects[0][this.instrumentName]["vibratoRate"] =
+                            temp > 0 ? 1 / temp : 16;
+                        if (
+                            instrumentsEffects[0][this.instrumentName]["vibratoIntensity"] ===
+                            undefined
+                        ) {
+                            instrumentsEffects[0][this.instrumentName]["vibratoIntensity"] = 0.05;
+                        }
                         this.vibratoParams[1] = elem.value;
                         this._update(this.vibratoEffect.length - 1, obj[1], 1);
                         this._update(this.vibratoEffect.length - 1, obj[0], 2);
