@@ -276,6 +276,8 @@ class Logo {
         this.sounds = [];
         this.cameraID = null;
         this.stopTurtle = false;
+        // Changes whenever a run starts or stops, so late callbacks can tell their run is over.
+        this.runGeneration = 0;
         this.lastKeyCode = null;
         this.setCameraID = this.setCameraID.bind(this);
 
@@ -1582,6 +1584,7 @@ class Logo {
      */
     doStopTurtles() {
         this.stopTurtle = true;
+        this.runGeneration += 1;
         this.turtles.markAllAsStopped();
         this._cancelSpeech();
 
@@ -1779,6 +1782,7 @@ class Logo {
         }
 
         this.stopTurtle = false;
+        this.runGeneration += 1;
 
         this._syncCounter = 0;
         this._iterationBudget = this._MAX_ITERATIONS + 1;
