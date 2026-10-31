@@ -230,6 +230,9 @@ class Turtles {
         for (let i = 0; i < this.getTurtleCount(); i++) {
             const turtle = this.getTurtle(i);
             turtle.running = false;
+            // Stop's clearAll() cancels managed timers, including a pending blink's
+            // "show the turtle again", so restore visibility explicitly.
+            turtle.stopBlink();
         }
 
         this.activity.refreshCanvas();
