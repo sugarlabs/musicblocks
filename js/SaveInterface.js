@@ -552,7 +552,10 @@ class SaveInterface {
                                 velocity: 0.9
                             });
                         }
-                    } else {
+                    }
+
+                    // A Note can hold pitch and drum blocks at once; write both.
+                    if (noteData.note.some(pitch => !pitch.includes("R"))) {
                         if (!instrumentTracks.has(instrument)) {
                             const instrumentTrack = midi.addTrack();
                             instrumentTrack.name = `Track ${

@@ -827,6 +827,46 @@ describe("afterSaveMIDI", () => {
         });
     });
 
+    it("writes both the pitch and the drum blocks in one Note", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                {
+                    note: ["C4", "E4"],
+                    drum: ["kick drum"],
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "guitar"
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const kickTrack = tracks.find(track => track.name === "Track 1 - kick drum");
+        const instrumentTrack = tracks.find(track => track.name === "Track 1 - guitar");
+        expect(kickTrack.addNote).toHaveBeenCalledWith({
+            midi: 36,
+            time: 0,
+            duration: 0.6666666666666666,
+            velocity: 0.9
+        });
+        expect(instrumentTrack.addNote).toHaveBeenCalledTimes(2);
+        expect(instrumentTrack.addNote).toHaveBeenCalledWith({
+            name: "C4",
+            time: 0,
+            duration: 0.6666666666666666,
+            velocity: 0.8
+        });
+        expect(instrumentTrack.addNote).toHaveBeenCalledWith({
+            name: "E4",
+            time: 0,
+            duration: 0.6666666666666666,
+            velocity: 0.8
+        });
+    });
+
     it("keeps a drum and an instrument of the same name on separate tracks", () => {
         mockActivity.logo._midiData = {
             0: [
