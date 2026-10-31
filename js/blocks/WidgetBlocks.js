@@ -261,12 +261,14 @@ function setupWidgetBlocks(activity) {
         const numeratorBlock = blockList[beatValueConnections?.[1]];
         const denominatorBlock = blockList[beatValueConnections?.[2]];
 
-        return (
-            meterBlock &&
-            typeof beatCountBlock?.value === "number" &&
-            typeof numeratorBlock?.value === "number" &&
-            typeof denominatorBlock?.value === "number"
-        );
+        // A plain number beat value, such as 0.25, is as good as 1 / 4.
+        const hasBeatValue =
+            beatValueBlock?.name === "number"
+                ? typeof beatValueBlock.value === "number" && beatValueBlock.value > 0
+                : typeof numeratorBlock?.value === "number" &&
+                  typeof denominatorBlock?.value === "number";
+
+        return meterBlock && typeof beatCountBlock?.value === "number" && hasBeatValue;
     }
 
     /**

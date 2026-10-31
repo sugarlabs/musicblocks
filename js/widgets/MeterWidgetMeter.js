@@ -42,8 +42,8 @@ class MeterWidgetMeter {
      * @private
      * @returns {{beats: (number|undefined), beatCountBlock: (number|null),
      *     beatValueBlock: (number|null), noteValueBlock: (number|null)}} The number of beats (not
-     *     set when there is no Meter block) and the blocks Reset writes to: the number of beats
-     *     and the denominator of the beat value.
+     *     set when there is no Meter block) and the blocks Reset writes to: the number of beats,
+     *     the beat value and, when the beat value is a fraction, its denominator.
      */
     _readMeterBlock() {
         const blockList = this.activity.blocks.blockList;
@@ -121,6 +121,18 @@ class MeterWidgetMeter {
 
         if (meter.noteValueBlock !== null) {
             this._setBlockValue(blockList[meter.noteValueBlock], noteValue);
+        } else if (meter.beatValueBlock !== null) {
+            // A plain number beat value, such as 0.375 for 3/8.
+            const beatValueBlock = blockList[meter.beatValueBlock];
+            if (
+                beatValueBlock &&
+                beatValueBlock.name === "number" &&
+                typeof beatValueBlock.value === "number" &&
+                beatValueBlock.value > 0
+            ) {
+                const numerator = rationalToFraction(beatValueBlock.value)[0];
+                this._setBlockValue(beatValueBlock, numerator / noteValue);
+            }
         }
     }
 
