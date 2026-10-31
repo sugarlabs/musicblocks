@@ -483,8 +483,7 @@ describe("_cleanupAfterCompletion", () => {
 // ─── notationMIDI ────────────────────────────────────────────────────────────
 //
 // Builds the MIDI data buffer used when exporting to .mid.
-// Never had any tests, and the drum-extraction logic (takes only drum[0])
-// is subtle enough to need one.
+// Includes the drum array used by MIDI export.
 
 describe("notationMIDI", () => {
     let logo;
@@ -517,10 +516,10 @@ describe("notationMIDI", () => {
         expect(logo._midiData[1]).toHaveLength(1);
     });
 
-    test("only the first drum name is stored, not the whole array", () => {
+    test("all drum names are stored", () => {
         logo.notationMIDI(["R"], ["kick", "snare", "hihat"], 0.5, 0, 90, "drum", [4, 4]);
 
-        expect(logo._midiData[0][0].drum).toBe("kick");
+        expect(logo._midiData[0][0].drum).toEqual(["kick", "snare", "hihat"]);
     });
 
     test("null drum is stored as null, not turned into something else", () => {
@@ -537,7 +536,7 @@ describe("notationMIDI", () => {
             duration: 0.125,
             bpm: 120,
             instrument: "guitar",
-            drum: "snare",
+            drum: ["snare"],
             meter: [6, 8]
         });
     });
