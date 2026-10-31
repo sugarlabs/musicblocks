@@ -1252,6 +1252,22 @@ describe("saveWAV & saveABC methods", () => {
         expect(activity.logo.recordingBuffer.hasData).toBe(false);
     });
 
+    it("shows a warning when ABC export rounds a Hertz pitch", () => {
+        const activity = {
+            save: { download: mockDownload },
+            textMsg: jest.fn(),
+            logo: { abcExportWarnings: ["445 Hz was rounded to A4 (+19.6 cents)"] }
+        };
+        global.saveAbcOutput = jest.fn(() => "mock_abc_data");
+
+        instance.afterSaveAbc.call({ activity });
+
+        expect(activity.textMsg).toHaveBeenCalledWith(
+            "ABC export rounded one or more Hertz pitches to the nearest note.",
+            5000
+        );
+    });
+
     it("should save ABC notation under the file name it is given", () => {
         global.saveAbcOutput = jest.fn(() => "mock_abc_data");
         const activity = { save: { download: mockDownload } };

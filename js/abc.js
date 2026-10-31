@@ -263,6 +263,7 @@ class AbcExporter {
         this.hasNotes = false;
         this.accidentalsInForce = {};
         this.pitchesInDoubt = new Set();
+        this.roundedFrequencyWarnings = [];
     }
 
     /**
@@ -354,6 +355,13 @@ class AbcExporter {
 
         if (typeof note === "number") {
             const pitchObj = frequencyToPitch(note);
+            const cents = Number(pitchObj[2]);
+            if (Number.isFinite(cents) && Math.abs(cents) >= 0.5) {
+                const sign = cents > 0 ? "+" : "";
+                this.roundedFrequencyWarnings.push(
+                    `${note} Hz was rounded to ${pitchObj[0]}${pitchObj[1]} (${sign}${cents} cents)`
+                );
+            }
             note = pitchObj[0] + pitchObj[1];
         }
 
@@ -890,9 +898,18 @@ class AbcExporter {
  * @returns {string} the voice's K: field: the starting key, or a key set before its
  *   first note.
  */
-const processABCNotes = function (logo, turtle, keySignature = "C major", voiceId = "") {
+const processABCNotes = function (
+    logo,
+    turtle,
+    keySignature = "C major",
+    voiceId = "",
+    warningCollector = null
+) {
     const exporter = new AbcExporter(logo, turtle, keySignature, voiceId);
     exporter.process();
+    if (warningCollector !== null) {
+        warningCollector.push(...exporter.roundedFrequencyWarnings);
+    }
     return exporter.startKeyField;
 };
 
@@ -903,6 +920,7 @@ const processABCNotes = function (logo, turtle, keySignature = "C major", voiceI
  */
 const saveAbcOutput = function (activity) {
     const outputParts = [getABCHeader()];
+    const roundedFrequencyWarnings = [];
     let atLineStart = true;
     let voice = 0;
 
@@ -918,7 +936,13 @@ const saveAbcOutput = function (activity) {
         const voiceId = "t" + voice;
         // Every turtle starts a run in C major (Singer.reset()); its staged key changes
         // follow. The turtle's keySignature is the key it ended in.
-        const keyField = processABCNotes(activity.logo, t, "C major", voiceId);
+        const keyField = processABCNotes(
+            activity.logo,
+            t,
+            "C major",
+            voiceId,
+            roundedFrequencyWarnings
+        );
         const notes = activity.logo.notationNotes[t];
         // A V: or K: field is only a field at the start of a line.
         if (!atLineStart) {
@@ -931,8 +955,15 @@ const saveAbcOutput = function (activity) {
         atLineStart = notes === "" || notes.endsWith("\n");
     }
 
+    const uniqueWarnings = [...new Set(roundedFrequencyWarnings)];
+    for (const warning of uniqueWarnings) {
+        outputParts.push(
+            `% WARNING: Music Blocks ${warning}; the cents offset was not exported.\n`
+        );
+    }
     outputParts.push("\n");
     activity.logo.notationOutput = outputParts.join("");
+    activity.logo.abcExportWarnings = uniqueWarnings;
     return activity.logo.notationOutput;
 };
 

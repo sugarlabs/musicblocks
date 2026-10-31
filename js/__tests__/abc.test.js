@@ -495,6 +495,18 @@ describe("saveAbcOutput", () => {
         expect(result).toContain("b");
     });
 
+    it("warns when a Hertz pitch has cents that ABC cannot preserve", () => {
+        global.frequencyToPitch.mockReturnValueOnce(["A", 4, 19.6]);
+        activity.logo.notation.notationStaging[0] = [[[445], 4, 0, null, null, -1, false]];
+
+        const result = saveAbcOutput(activity);
+
+        expect(result).toContain(
+            "% WARNING: Music Blocks 445 Hz was rounded to A4 (+19.6 cents); the cents offset was not exported."
+        );
+        expect(activity.logo.abcExportWarnings).toEqual(["445 Hz was rounded to A4 (+19.6 cents)"]);
+    });
+
     const note = pitch => [[pitch], 4, 0, null, null, -1, false];
 
     it("starts in C major and writes a later key change where it happens", () => {
