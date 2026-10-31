@@ -404,6 +404,30 @@ describe("Pen operations", () => {
         expect(painter.canvasAlpha).toBe(1);
     });
 
+    test("doSetPenAlpha should close active SVG path and update canvas styles", () => {
+        painter.doSetColor(0);
+        painter.doForward(50);
+        expect(painter._svgPath).toBe(true);
+
+        painter.doSetPenAlpha(0.5);
+
+        expect(painter._svgPath).toBe(false);
+        expect(mockTurtle.ctx.strokeStyle).toContain("0.5");
+        expect(mockTurtle.ctx.fillStyle).toContain("0.5");
+    });
+
+    test("doEndFill should fill with updated translucency", () => {
+        painter.doSetColor(0);
+        painter.doSetTranslucency(0);
+        painter.doStartFill();
+        painter.doForward(50);
+
+        painter.doSetTranslucency(50);
+        painter.doEndFill();
+
+        expect(mockTurtle.ctx.fillStyle).toContain("0.5");
+    });
+
     test.each([
         [0, 1],
         [25, 0.75],
