@@ -155,8 +155,9 @@ class MeterWidgetPlayback {
             this._playWheel.navItems[j] &&
             this._playWheel.navItems[j].navItem
         ) {
-            this._playWheel.navItems[i].navItem.show();
+            // Hide the previous beat first: in a one-beat meter it is this beat.
             this._playWheel.navItems[j].navItem.hide();
+            this._playWheel.navItems[i].navItem.show();
         }
 
         if (this._strongBeats[i]) {
