@@ -1185,6 +1185,17 @@ class ProjectManager {
         };
 
         const replaceProjectFromFile = async (obj, file, errorOperation, clearCanvas) => {
+            if (that.blocks.isLoading()) {
+                return new Promise((resolve, reject) => {
+                    that.blocks.runAfterLoad(() => {
+                        replaceProjectFromFile(obj, file, errorOperation, clearCanvas).then(
+                            resolve,
+                            reject
+                        );
+                    });
+                });
+            }
+
             if (that.planet) {
                 try {
                     await that.planet.saveLocally({ rejectOnProjectSaveError: true });
@@ -1225,7 +1236,19 @@ class ProjectManager {
                 const initialization = that.planet
                     ? that.planet.initialiseNewProject(getProjectName(file), false)
                     : null;
+
                 await Promise.all([trashComplete, initialization]);
+
+                if (!that.planet) {
+                    if (typeof that.blocks.disposeTrashedBlocks === "function") {
+                        that.blocks.disposeTrashedBlocks();
+                    }
+
+                    that.blocks.trashStacks = [];
+                    that.blocks.actionHistory = [];
+                    that.blocks.redoActionHistory = [];
+                }
+
                 loadImportedBlocks(obj, errorOperation);
             } catch (error) {
                 that.stage.removeAllEventListeners("trashsignal");
