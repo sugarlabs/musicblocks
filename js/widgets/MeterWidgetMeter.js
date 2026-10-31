@@ -16,13 +16,13 @@
 
 /*
    global
-   clampNumber
+   clampNumber, rationalToFraction
  */
 
 /*
    Globals location
     - js/utils/utils-logic.js
-        clampNumber
+        clampNumber, rationalToFraction
 */
 
 /* exported MeterWidgetMeter */
@@ -82,19 +82,29 @@ class MeterWidgetMeter {
     }
 
     /**
-     * The beat note value shown in the toolbar.
+     * The beat note value shown in the toolbar: the denominator of the beat value, which is what
+     * Reset changes, so 3/8 shows 8 rather than 1 / (3/8).
      *
      * @private
      * @param {object} meter - What _readMeterBlock returned.
      * @returns {number}
      */
     _noteValue(meter) {
+        const blockList = this.activity.blocks.blockList;
+        const denominator = meter.noteValueBlock !== null ? blockList[meter.noteValueBlock] : null;
+        if (denominator && typeof denominator.value === "number") {
+            return denominator.value;
+        }
+        if (typeof this._beatValue === "number" && this._beatValue > 0) {
+            return rationalToFraction(this._beatValue)[1];
+        }
         return 1 / this._beatValue;
     }
 
     /**
      * Writes the number of beats and the beat note value into the Meter block. The beat note
-     * value replaces the denominator of the beat value.
+     * value replaces the denominator of the beat value and keeps its numerator, so 3/8 with a
+     * note value of 4 becomes 3/4.
      *
      * @private
      * @param {object} meter - What _readMeterBlock returned.
