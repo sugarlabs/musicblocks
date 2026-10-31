@@ -501,6 +501,11 @@ const MusicKeyboardInput = {
              * Calls success or failure callback functions based on the result of the request.
              * @memberof MusicKeyboard
              */
+            // Browsers without Web MIDI, such as Safari, have no requestMIDIAccess.
+            if (typeof navigator.requestMIDIAccess !== "function") {
+                onMIDIFailure();
+                return;
+            }
             navigator.requestMIDIAccess({ sysex: true }).then(onMIDISuccess, onMIDIFailure);
         };
 
