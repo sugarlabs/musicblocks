@@ -2653,6 +2653,8 @@ describe("TimbreWidget", () => {
                     new jsdomDocument.defaultView.Event("change", { bubbles: true })
                 );
                 expect(global.instrumentsEffects[0]["custom"]["vibratoFrequency"]).toBeDefined();
+                expect(global.instrumentsEffects[0]["custom"]["vibratoRate"]).toBeDefined();
+                expect(global.instrumentsEffects[0]["custom"]["vibratoIntensity"]).toBe(0.1);
             });
 
             test("Chorus effect creation and slider changes", async () => {
