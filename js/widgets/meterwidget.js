@@ -11,29 +11,28 @@
 
 /* global
 
-   Singer, _, last, platformColor, docById, wheelnav, slicePath,
-   PREVIEWVOLUME, TONEBPM, clampNumber, ManagedTimer
+   Singer, _, PREVIEWVOLUME, ManagedTimer, MeterWidgetWindow, MeterWidgetMeter,
+   MeterWidgetPlayback, MeterWidgetWheel, MeterWidgetSave
 */
 
 /*
      Globals location
-     - lib/wheelnav
-         slicePath, wheelnav
-     
      - js/utils/utils.js
-         _, last, docById
+         _
 
      - js/utils/ManagedTimer.js
          ManagedTimer
-     
+
      - js/turtle-singer.js
          Singer
-     
-     - js/utils/platformstyle.js
-         platformColor
-     
+
      - js/logo.js
-         PREVIEWVOLUME, TONEBPM
+         PREVIEWVOLUME
+
+     - js/widgets/MeterWidgetWindow.js, MeterWidgetMeter.js, MeterWidgetPlayback.js,
+       MeterWidgetWheel.js, MeterWidgetSave.js
+         MeterWidgetWindow, MeterWidgetMeter, MeterWidgetPlayback, MeterWidgetWheel,
+         MeterWidgetSave
 */
 
 /**
@@ -44,18 +43,19 @@
  * @memberof global
  * @requires Singer
  * @requires _
- * @requires last
- * @requires platformColor
- * @requires docById
- * @requires wheelnav
- * @requires slicePath
  * @requires PREVIEWVOLUME
- * @requires TONEBPM
  * @exports MeterWidget
  */
 class MeterWidget {
     /** AMD module dependencies for lazy loading. */
-    static dependencies = ["widgets/meterwidget"];
+    static dependencies = [
+        "widgets/MeterWidgetWindow",
+        "widgets/MeterWidgetMeter",
+        "widgets/MeterWidgetPlayback",
+        "widgets/MeterWidgetWheel",
+        "widgets/MeterWidgetSave",
+        "widgets/meterwidget"
+    ];
 
     // A pie menu is used to show the meter and strong beats
     /**
@@ -83,6 +83,58 @@ class MeterWidget {
     static ICONSIZE = 32;
 
     /**
+     * Whether installModules has copied the module methods onto the prototype.
+     *
+     * @type {boolean}
+     * @static
+     */
+    static _modulesInstalled = false;
+
+    /**
+     * Copies the methods of the Meter widget modules (MeterWidgetWindow.js, MeterWidgetMeter.js,
+     * MeterWidgetPlayback.js, MeterWidgetWheel.js and MeterWidgetSave.js) onto
+     * MeterWidget.prototype, keeping their names and property descriptors, so they behave
+     * exactly like methods declared in this class and `this` inside them is the widget.
+     *
+     * RequireJS loads the modules alongside this file in no fixed order, so this runs when the
+     * file loads (if the modules are already defined) and again from the constructor, which
+     * only runs once every dependency has loaded.
+     *
+     * @returns {boolean} Whether the methods are installed.
+     */
+    static installModules() {
+        if (MeterWidget._modulesInstalled) {
+            return true;
+        }
+
+        const modules = [
+            typeof MeterWidgetWindow !== "undefined" ? MeterWidgetWindow : null,
+            typeof MeterWidgetMeter !== "undefined" ? MeterWidgetMeter : null,
+            typeof MeterWidgetPlayback !== "undefined" ? MeterWidgetPlayback : null,
+            typeof MeterWidgetWheel !== "undefined" ? MeterWidgetWheel : null,
+            typeof MeterWidgetSave !== "undefined" ? MeterWidgetSave : null
+        ];
+        if (modules.includes(null)) {
+            return false;
+        }
+
+        for (const module of modules) {
+            for (const name of Object.getOwnPropertyNames(module.prototype)) {
+                if (name !== "constructor") {
+                    Object.defineProperty(
+                        MeterWidget.prototype,
+                        name,
+                        Object.getOwnPropertyDescriptor(module.prototype, name)
+                    );
+                }
+            }
+        }
+
+        MeterWidget._modulesInstalled = true;
+        return true;
+    }
+
+    /**
      * Creates an instance of MeterWidget.
      *
      * @param {object} activity - The activity object.
@@ -90,6 +142,8 @@ class MeterWidget {
      * @param {number} [turtle] - The turtle that ran the Meter widget block.
      */
     constructor(activity, widgetBlock, turtle) {
+        MeterWidget.installModules();
+
         /**
          * The activity object.
          *
@@ -170,6 +224,14 @@ class MeterWidget {
         this._cellScale = w / 1200;
 
         /**
+         * The Meter widget block, which Reset runs again.
+         *
+         * @type {number}
+         * @private
+         */
+        this._widgetBlock = widgetBlock;
+
+        /**
          * The widget window.
          *
          * @type {object}
@@ -188,27 +250,7 @@ class MeterWidget {
         this.meterDiv = document.createElement("table");
         widgetWindow.getWidgetBody().append(this.meterDiv);
 
-        /**
-         * Callback for the widget window close event.
-         *
-         * @private
-         */
-        widgetWindow.onclose = () => {
-            this._playing = false;
-            this._hidePlaybackIndicator();
-            if (this._playBeatTimeout) {
-                this._clearWidgetTimeout(this._playBeatTimeout);
-                this._playBeatTimeout = null;
-            }
-            if (this._timerManager !== null) {
-                this._timerManager.clearAll();
-            }
-            if (Singer && Singer.masterVolume && Singer.masterVolume.length > 0) {
-                this.activity.logo.synth.setMasterVolume(last(Singer.masterVolume));
-            }
-            this.activity.hideMsgs();
-            widgetWindow.destroy();
-        };
+        widgetWindow.onclose = () => this._close();
 
         /**
          * Callback for the widget window maximize event.
@@ -218,59 +260,7 @@ class MeterWidget {
         widgetWindow.onmaximize = this._scale;
 
         this._click_lock = false;
-        /**
-         * Callback for the play button click event.
-         *
-         * @private
-         */
-        const playBtn = widgetWindow.addButton("play-button.svg", MeterWidget.ICONSIZE, _("Play"));
-        playBtn.onclick = () => {
-            if (this._get_click_lock()) {
-                return;
-            } else {
-                this._click_lock = true;
-                if (this.__getPlayingStatus()) {
-                    playBtn.textContent = "\u00A0\u00A0";
-                    const img = document.createElement("img");
-                    img.src = "header-icons/play-button.svg";
-                    img.title = _("Play");
-                    img.alt = _("Play");
-                    img.setAttribute("height", MeterWidget.ICONSIZE);
-                    img.setAttribute("width", MeterWidget.ICONSIZE);
-                    img.setAttribute("vertical-align", "middle");
-                    playBtn.appendChild(img);
-                    playBtn.appendChild(document.createTextNode("\u00A0\u00A0"));
-                    this._playing = false;
-                    this._hidePlaybackIndicator();
-                    if (this._playBeatTimeout) {
-                        this._clearWidgetTimeout(this._playBeatTimeout);
-                        this._playBeatTimeout = null;
-                    }
-                    if (this._timerManager !== null) {
-                        this._timerManager.clearAll();
-                    }
-                } else {
-                    playBtn.textContent = "\u00A0\u00A0";
-                    const img = document.createElement("img");
-                    img.src = "header-icons/stop-button.svg";
-                    img.title = _("Stop");
-                    img.alt = _("Stop");
-                    img.setAttribute("height", MeterWidget.ICONSIZE);
-                    img.setAttribute("width", MeterWidget.ICONSIZE);
-                    img.setAttribute("vertical-align", "middle");
-                    playBtn.appendChild(img);
-                    playBtn.appendChild(document.createTextNode("\u00A0\u00A0"));
-                    this._playing = true;
-                    this.activity.logo.turtleDelay = 0;
-                    this.activity.logo.resetSynth(0);
-                    this._playBeat();
-                }
-            }
-
-            setTimeout(() => {
-                this._click_lock = false;
-            }, 1000);
-        };
+        this._makePlayButton();
 
         widgetWindow.addButton("export-chunk.svg", MeterWidget.ICONSIZE, _("Save")).onclick =
             () => {
@@ -288,486 +278,23 @@ class MeterWidget {
         meterTableDiv.appendChild(meterWheelDiv);
 
         // Grab the number of beats and beat value from the meter block.
-        // this._meterBlock is a raw blockList index captured when the widget
-        // was requested; if that block has since been disposed (e.g. evicted
-        // by the trash undo history), blockList[this._meterBlock] is null, so
-        // guard the lookup itself rather than just the index being non-null.
-        let v1, c1, c2, c3;
-        if (this._meterBlock !== null && this.activity.blocks.blockList[this._meterBlock]) {
-            c1 = this.activity.blocks.blockList[this._meterBlock].connections[1];
-            v1 = c1 !== null ? this.activity.blocks.blockList[c1].value : 4;
-            v1 = isNaN(v1) ? 4 : clampNumber(v1, 1, 16);
-            c2 = this.activity.blocks.blockList[this._meterBlock].connections[2];
-            c3 =
-                c2 !== null &&
-                this.activity.blocks.blockList[c2] &&
-                this.activity.blocks.blockList[c2].connections
-                    ? this.activity.blocks.blockList[c2].connections[2]
-                    : null;
-            if (c2 !== null && this.activity.blocks.blockList[c2]) {
-                this._beatValue = this.activity.blocks.blockList[c2].value;
-            }
+        const meter = this._readMeterBlock();
+        this._piemenuMeter(meter.beats !== undefined ? meter.beats : 4, this._beatValue);
 
-            this._piemenuMeter(v1, this._beatValue);
-        } else {
-            this._piemenuMeter(4, this._beatValue);
-        }
-
-        const divInput = document.createElement("div");
-        divInput.className = "wfbtItem";
-        const input1 = document.createElement("input");
-        input1.style.cssFloat = "left";
-        input1.value = v1;
-        input1.type = "number";
-        input1.id = "beatCount";
-        input1.setAttribute("min", "1");
-        input1.setAttribute("max", "16");
-        input1.setAttribute("aria-label", _("Number of beats"));
-        divInput.appendChild(input1);
-
-        const divInput2 = document.createElement("div");
-        divInput2.className = "wfbtItem";
-        const input2 = document.createElement("input");
-        input2.style.cssFloat = "left";
-        input2.value = 1 / this._beatValue;
-        input2.type = "number";
-        input2.id = "beatValue";
-        input2.setAttribute("min", "1");
-        input2.setAttribute("max", "35");
-        input2.setAttribute("aria-label", _("Beat note value"));
-        divInput2.appendChild(input2);
-
-        widgetWindow._toolbar.appendChild(divInput);
-        widgetWindow._toolbar.appendChild(divInput2);
+        this._makeInputs(meter);
 
         //TRANS.: Reset the widget layout
         widgetWindow.addButton("reload.svg", MeterWidget.ICONSIZE, _("Reset")).onclick = () => {
-            //change Values of blocks in stack.
-            this._playing = false;
-            this._hidePlaybackIndicator();
-            if (this._playBeatTimeout) {
-                this._clearWidgetTimeout(this._playBeatTimeout);
-                this._playBeatTimeout = null;
-            }
-            if (this._timerManager !== null) {
-                this._timerManager.clearAll();
-            }
-            const el = divInput.children[0];
-            const el2 = divInput2.children[0];
-
-            divInput.children[0].value = clampNumber(
-                Math.round(Number(el.value)),
-                Number(el.min),
-                Number(el.max)
-            );
-            divInput2.children[0].value = clampNumber(
-                Math.round(Number(el2.value)),
-                Number(el2.min),
-                Number(el2.max)
-            );
-
-            const bnBlk = c1 !== null ? this.activity.blocks.blockList[c1] : null;
-            const bvBlk = c3 !== null ? this.activity.blocks.blockList[c3] : null;
-
-            const bnValue = divInput.children[0].value;
-            const bvValue = divInput2.children[0].value;
-
-            if (bnBlk) {
-                bnBlk.value = bnValue;
-                if (bnBlk.text) bnBlk.text.text = bnValue;
-                if (bnBlk.container && bnBlk.container.children) {
-                    bnBlk.container.setChildIndex(bnBlk.text, bnBlk.container.children.length - 1);
-                }
-            }
-
-            if (bvBlk) {
-                bvBlk.value = bvValue;
-                if (bvBlk.text) bvBlk.text.text = bvValue;
-                if (bvBlk.container && bvBlk.container.children) {
-                    bvBlk.container.setChildIndex(bvBlk.text, bvBlk.container.children.length - 1);
-                }
-            }
-
-            this.activity.logo.runLogoCommands(widgetBlock);
+            this._reset(meter);
         };
 
         activity.textMsg(_("Click in the circle to select strong beats for the meter."), 3000);
         widgetWindow.sendToCenter();
         this._scale.call(this.widgetWindow);
     }
-
-    _setWidgetTimeout(callback, delay) {
-        if (this._timerManager !== null) {
-            return this._timerManager.setTimeout(callback, delay);
-        }
-        return setTimeout(callback, delay);
-    }
-
-    _clearWidgetTimeout(id) {
-        if (id === null || id === undefined) {
-            return false;
-        }
-        if (this._timerManager !== null) {
-            return this._timerManager.clearTimeout(id);
-        }
-        clearTimeout(id);
-        return true;
-    }
-
-    /**
-     * Private method to scale the widget.
-     *
-     * @private
-     * @returns {void}
-     */
-    _scale() {
-        const windowHeight =
-            this.getWidgetFrame().offsetHeight - this.getDragElement().offsetHeight;
-        const svg = this.getWidgetBody().getElementsByTagName("svg")[0];
-        const scale = this.isMaximized() ? windowHeight / 400 : 1;
-        svg.style.pointerEvents = "none";
-        svg.setAttribute("height", `${400 * scale}px`);
-        svg.setAttribute("width", `${400 * scale}px`);
-        setTimeout(() => {
-            svg.style.pointerEvents = "auto";
-        }, 100);
-    }
-
-    /**
-     * Private method to get the click lock status.
-     *
-     * @private
-     * @returns {boolean} - The click lock status.
-     */
-    _get_click_lock() {
-        return this._click_lock;
-    }
-
-    /**
-     * @private
-     * @param {string} drum
-     * @returns {void}
-     */
-    __playDrum(drum) {
-        this.activity.logo.synth.trigger(
-            0,
-            "C4",
-            Singer.defaultBPMFactor * this._beatValue,
-            drum,
-            null,
-            null
-        );
-    }
-
-    /**
-     * Private method to get the playing status.
-     *
-     * @private
-     * @returns {boolean} - The playing status.
-     */
-    __getPlayingStatus() {
-        return this._playing;
-    }
-
-    /**
-     * @private
-     * @returns {boolean}
-     */
-    __getPauseStatus() {
-        return !this._playing;
-    }
-
-    /**
-     * Hides all play-wheel beat indicator slices.
-     *
-     * @private
-     * @returns {void}
-     */
-    _hidePlaybackIndicator() {
-        if (this._playWheel && this._playWheel.navItems) {
-            for (let i = 0; i < this._strongBeats.length; i++) {
-                if (
-                    this._playWheel.navItems[i] &&
-                    this._playWheel.navItems[i].navItem &&
-                    typeof this._playWheel.navItems[i].navItem.hide === "function"
-                ) {
-                    this._playWheel.navItems[i].navItem.hide();
-                }
-            }
-        }
-    }
-
-    /**
-     * @private
-     * @param {number} i
-     * @param {number} ms
-     * @returns {void}
-     */
-    __playOneBeat(i, ms) {
-        if (!this._playing || this.__getPauseStatus()) {
-            this._hidePlaybackIndicator();
-            return;
-        }
-
-        let j = i - 1;
-        if (j < 0) {
-            j += this._strongBeats.length;
-        }
-
-        if (
-            this._playWheel &&
-            this._playWheel.navItems &&
-            this._playWheel.navItems[i] &&
-            this._playWheel.navItems[i].navItem &&
-            this._playWheel.navItems[j] &&
-            this._playWheel.navItems[j].navItem
-        ) {
-            this._playWheel.navItems[i].navItem.show();
-            this._playWheel.navItems[j].navItem.hide();
-        }
-
-        if (this._strongBeats[i]) {
-            this.__playDrum("snare drum");
-        } else {
-            this.__playDrum("kick drum");
-        }
-
-        this._playBeatTimeout = this._setWidgetTimeout(() => {
-            if (this._playing) {
-                this.__playOneBeat((i + 1) % this._strongBeats.length, ms);
-            }
-        }, ms);
-    }
-
-    /**
-     * Private method to play the beat.
-     *
-     * @private
-     * @returns {void}
-     */
-    _playBeat() {
-        // The tempo of the turtle that ran the block, not turtle 0: after a project is loaded,
-        // turtle 0 is a trashed turtle of the old project.
-        const tur = this._turtle;
-        const bpmFactor =
-            TONEBPM / (tur && tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
-        this._hidePlaybackIndicator();
-
-        const noteBeatValue = bpmFactor * 1000 * this._beatValue;
-        this.__playOneBeat(0, noteBeatValue);
-    }
-
-    /**
-     * Private method to save the widget state.
-     *
-     * @private
-     * @returns {void}
-     */
-    _save() {
-        // Export onbeatdo blocks for each strong beat
-        const strongBeats = [];
-        const newStack = [];
-
-        const numberOfBeats = this._strongBeats.length;
-
-        for (let i = 0; i < numberOfBeats; i++) {
-            if (this._strongBeats[i]) {
-                strongBeats.push(i);
-            }
-        }
-
-        let n = 0;
-
-        for (let i = 0; i < strongBeats.length; i++) {
-            if (i === 0) {
-                if (strongBeats.length === 1) {
-                    newStack.push([0, "onbeatdo", 100, 100, [null, 1, 2, null]]);
-                    newStack.push([1, ["number", { value: strongBeats[i] + 1 }], 0, 0, [0]]);
-                    newStack.push([2, ["text", { value: "action" }], 0, 0, [0]]);
-                } else {
-                    newStack.push([0, "onbeatdo", 100, 100, [null, 1, 2, 3]]);
-                    newStack.push([1, ["number", { value: strongBeats[i] + 1 }], 0, 0, [0]]);
-                    newStack.push([2, ["text", { value: "action" }], 0, 0, [0]]);
-                }
-            } else if (i === strongBeats.length - 1) {
-                newStack.push([n, "onbeatdo", 0, 0, [n - 3, n + 1, n + 2, null]]);
-                newStack.push([n + 1, ["number", { value: strongBeats[i] + 1 }], 0, 0, [n]]);
-                newStack.push([n + 2, ["text", { value: "action" }], 0, 0, [n]]);
-            } else {
-                newStack.push([n, "onbeatdo", 0, 0, [n - 3, n + 1, n + 2, n + 3]]);
-                newStack.push([n + 1, ["number", { value: strongBeats[i] + 1 }], 0, 0, [n]]);
-                newStack.push([n + 2, ["text", { value: "action" }], 0, 0, [n]]);
-            }
-            n += 3;
-        }
-
-        this.activity.blocks.loadNewBlocks(newStack);
-    }
-
-    /**
-     * Private method to create and initialize the pie menu for strong beat selection.
-     *
-     * @private
-     * @param {number} numberOfBeats - The number of beats to be displayed.
-     * @param {number} beatValue - The value of each beat.
-     * @returns {void}
-     */
-    _piemenuMeter(numberOfBeats, beatValue) {
-        // pie menu for strong beat selection
-
-        docById("meterWheelDiv").style.display = "flex";
-        docById("meterWheelDiv").style.justifyContent = "center";
-
-        // Use advanced constructor for multiple wheelnavs in the same div.
-        // The meterWheel is used to hold the strong beats.
-        this._meterWheel = new wheelnav("meterWheelDiv", null, 400, 400);
-        // Strong beat is shown on this wheel
-        this._beatWheel = new wheelnav("_beatWheel", this._meterWheel.raphael);
-        // Play wheel is to show which beat is playing at any one time.
-        this._playWheel = new wheelnav("_playWheel", this._meterWheel.raphael);
-
-        wheelnav.cssMeter = true;
-
-        // Use the mode wheel color scheme
-        this._meterWheel.colors = platformColor.modeWheelcolors;
-
-        this._meterWheel.slicePathFunction = slicePath().DonutSlice;
-        this._meterWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._meterWheel.slicePathCustom.minRadiusPercent = 0.4;
-        this._meterWheel.slicePathCustom.maxRadiusPercent = 0.75;
-        this._meterWheel.sliceSelectedPathCustom = this._meterWheel.slicePathCustom;
-        this._meterWheel.sliceInitPathCustom = this._meterWheel.slicePathCustom;
-
-        // Disable rotation, set navAngle and create the menus
-        this._meterWheel.clickModeRotate = false;
-        this._meterWheel.navAngle = -90;
-        // this._meterWheel.selectedNavItemIndex = 2;
-        this._meterWheel.animatetime = 0; // 300;
-
-        if (numberOfBeats > 16) {
-            numberOfBeats = 16;
-        }
-
-        const labels = [
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8",
-            "9",
-            "10",
-            "11",
-            "12",
-            "13",
-            "14",
-            "15",
-            "16"
-        ];
-        let beatList = [];
-        this._strongBeats = [];
-        for (let i = 0; i < numberOfBeats; i++) {
-            beatList.push(labels[i]);
-            this._strongBeats.push(false);
-        }
-
-        this._meterWheel.createWheel(beatList);
-
-        this._beatWheel.colors = platformColor.modeWheelcolors;
-        this._beatWheel.slicePathFunction = slicePath().DonutSlice;
-        this._beatWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._beatWheel.slicePathCustom.minRadiusPercent = 0.75;
-        this._beatWheel.slicePathCustom.maxRadiusPercent = 0.9;
-        this._beatWheel.sliceSelectedPathCustom = this._beatWheel.slicePathCustom;
-        this._beatWheel.sliceInitPathCustom = this._beatWheel.slicePathCustom;
-        this._beatWheel.clickModeRotate = false;
-        this._beatWheel.navAngle = -90;
-        this._beatWheel.titleRotateAngle = 90;
-
-        beatList = [];
-        for (let i = 0; i < numberOfBeats; i++) {
-            beatList.push("x");
-        }
-
-        this._beatWheel.createWheel(beatList);
-
-        this._playWheel.colors = [platformColor.orange];
-        this._playWheel.slicePathFunction = slicePath().DonutSlice;
-        this._playWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        this._playWheel.slicePathCustom.minRadiusPercent = 0.3;
-        this._playWheel.slicePathCustom.maxRadiusPercent = 0.4;
-        this._playWheel.sliceSelectedPathCustom = this._playWheel.slicePathCustom;
-        this._playWheel.sliceInitPathCustom = this._playWheel.slicePathCustom;
-        this._playWheel.clickModeRotate = false;
-        this._playWheel.navAngle = -90;
-        this._playWheel.titleRotateAngle = 90;
-
-        beatList = [];
-        for (let i = 0; i < numberOfBeats; i++) {
-            beatList.push(" ");
-        }
-
-        this._playWheel.createWheel(beatList);
-
-        for (let i = 0; i < numberOfBeats; i++) {
-            this._playWheel.navItems[i].navItem.hide();
-        }
-
-        // If a meterWheel sector is selected, show the corresponding
-        // beat wheel sector.
-        const __setBeat = () => {
-            const i = this._meterWheel.selectedNavItemIndex;
-            this._strongBeats[i] = true;
-            this._beatWheel.navItems[i].navItem.show();
-        };
-
-        // If a beatWheel sector is selected, hide it.
-        const __clearBeat = () => {
-            const i = this._beatWheel.selectedNavItemIndex;
-            this._beatWheel.navItems[i].navItem.hide();
-            this._strongBeats[i] = false;
-        };
-
-        for (let i = 0; i < numberOfBeats; i++) {
-            this._meterWheel.navItems[i].navigateFunction = __setBeat;
-            this._beatWheel.navItems[i].navigateFunction = __clearBeat;
-            // Start with all beats hidden , except default strong/weak .
-            this._beatWheel.navItems[i].navItem.hide();
-        }
-
-        this._setupDefaultStrongWeakBeats(numberOfBeats, beatValue);
-    }
-
-    /**
-     * Private method to set up default strong and weak beats based on the beat value and number of beats.
-     *
-     * @private
-     * @param {number} numberOfBeats - The number of beats to be displayed.
-     * @param {number} beatValue - The value of each beat.
-     * @returns {void}
-     */
-    _setupDefaultStrongWeakBeats(numberOfBeats, beatValue) {
-        if (beatValue === 0.25 && numberOfBeats === 4) {
-            this._strongBeats[0] = true;
-            this._strongBeats[2] = true;
-            this._beatWheel.navItems[0].navItem.show();
-            this._beatWheel.navItems[2].navItem.show();
-        } else if (beatValue === 0.25 && numberOfBeats === 2) {
-            this._strongBeats[0] = true;
-            this._beatWheel.navItems[0].navItem.show();
-        } else if (beatValue === 0.25 && numberOfBeats === 3) {
-            this._strongBeats[0] = true;
-            this._beatWheel.navItems[0].navItem.show();
-        } else if (beatValue === 0.125 && numberOfBeats === 6) {
-            this._strongBeats[0] = true;
-            this._strongBeats[3] = true;
-            this._beatWheel.navItems[0].navItem.show();
-            this._beatWheel.navItems[3].navItem.show();
-        }
-    }
 }
+
+MeterWidget.installModules();
 
 if (typeof module !== "undefined") {
     module.exports = MeterWidget;
