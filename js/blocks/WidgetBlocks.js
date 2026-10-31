@@ -716,7 +716,14 @@ function setupWidgetBlocks(activity) {
                     "meterWidget",
                     _getWidgetDependencies(
                         typeof MeterWidget !== "undefined" ? MeterWidget : null,
-                        ["widgets/meterwidget"]
+                        [
+                            "widgets/MeterWidgetWindow",
+                            "widgets/MeterWidgetMeter",
+                            "widgets/MeterWidgetPlayback",
+                            "widgets/MeterWidgetWheel",
+                            "widgets/MeterWidgetSave",
+                            "widgets/meterwidget"
+                        ]
                     ),
                     () => new MeterWidget(activity, blk, turtle),
                     () => {

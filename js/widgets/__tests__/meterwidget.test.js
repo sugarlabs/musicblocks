@@ -24,10 +24,17 @@
  * Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
  */
 
-const MeterWidget = require("../meterwidget.js");
 const ManagedTimer = require("../../utils/ManagedTimer");
 
 global.ManagedTimer = ManagedTimer;
+global.rationalToFraction = require("../../utils/utils-logic.js").rationalToFraction;
+global.MeterWidgetWindow = require("../MeterWidgetWindow.js");
+global.MeterWidgetMeter = require("../MeterWidgetMeter.js");
+global.MeterWidgetPlayback = require("../MeterWidgetPlayback.js");
+global.MeterWidgetWheel = require("../MeterWidgetWheel.js");
+global.MeterWidgetSave = require("../MeterWidgetSave.js");
+const MeterWidget = require("../meterwidget.js");
+global.MeterWidget = MeterWidget;
 
 // --- 1. Global Mocks (Fake the Browser Environment) ---
 global._ = msg => msg; // Mock translation function
