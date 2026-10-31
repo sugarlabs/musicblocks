@@ -755,6 +755,99 @@ describe("GlobalPlanet", () => {
             );
         });
 
+        it("forceAddToCache should open only after details are cached", () => {
+            const cb = jest.fn();
+            gp.forceAddToCache("repo-1", cb);
+            const response = mockPlanet.ServerInterface.getProjectDetails.mock.calls[0][1];
+
+            response({ success: true, data: { ProjectName: "Test" } });
+
+            expect(gp.cache["repo-1"].ProjectName).toBe("Test");
+            expect(cb).toHaveBeenCalledTimes(1);
+            expect(gp.loadCount).toBe(0);
+        });
+
+        it("forceAddToCache should show an error without opening when details fail", () => {
+            const cb = jest.fn();
+            gp.forceAddToCache("repo-1", cb);
+            const response = mockPlanet.ServerInterface.getProjectDetails.mock.calls[0][1];
+
+            response({ success: false });
+
+            expect(cb).not.toHaveBeenCalled();
+            expect(document.getElementById("global-badge-error").textContent).toBe(
+                "Could not load the published project. Try again."
+            );
+            expect(gp.loadCount).toBe(0);
+        });
+
+        it("forceAddToCache should remove stale metadata when the project is gone", () => {
+            const cb = jest.fn();
+            gp.cache["repo-1"] = { ProjectName: "Stale" };
+            gp.forceAddToCache("repo-1", cb);
+            const response = mockPlanet.ServerInterface.getProjectDetails.mock.calls[0][1];
+
+            response({ success: false, error: "PROJECT_NOT_FOUND" });
+
+            expect(gp.cache["repo-1"]).toBeUndefined();
+            expect(cb).not.toHaveBeenCalled();
+            expect(document.getElementById("global-badge-error").textContent).toBe(
+                "This project is no longer available."
+            );
+        });
+
+        it("forceAddToCache should keep a pending list when the badge request fails", () => {
+            const cb = jest.fn();
+            const list = document.getElementById("global-projects");
+            list.innerHTML = "<div>existing card</div>";
+            gp.loadCount = 2;
+            gp.searching = true;
+
+            gp.forceAddToCache("repo-1", cb);
+            const response = mockPlanet.ServerInterface.getProjectDetails.mock.calls[0][1];
+            response({ success: false });
+
+            expect(cb).not.toHaveBeenCalled();
+            expect(list.innerHTML).toContain("existing card");
+            expect(gp.loadCount).toBe(2);
+            expect(gp.searching).toBe(true);
+            expect(document.getElementById("global-badge-error")).not.toBeNull();
+
+            gp.render([]);
+
+            expect(document.getElementById("global-badge-error")).not.toBeNull();
+        });
+
+        it("forceAddToCache should not disturb a list that is still loading", () => {
+            const cb = jest.fn();
+            gp.loadCount = 2;
+            gp.forceAddToCache("repo-1", cb);
+            const response = mockPlanet.ServerInterface.getProjectDetails.mock.calls[0][1];
+
+            response({ success: true, data: { ProjectName: "Test" } });
+
+            expect(cb).toHaveBeenCalledTimes(1);
+            expect(gp.loadCount).toBe(2);
+        });
+
+        it("clears the badge error when the project list refreshes", () => {
+            gp.showBadgeError("Could not load the published project. Try again.");
+            expect(document.getElementById("global-badge-error")).not.toBeNull();
+
+            gp.refreshProjects();
+
+            expect(document.getElementById("global-badge-error")).toBeNull();
+        });
+
+        it("clears the badge error when a search starts", () => {
+            gp.showBadgeError("Could not load the published project. Try again.");
+            gp.searchString = "music";
+
+            gp.search();
+
+            expect(document.getElementById("global-badge-error")).toBeNull();
+        });
+
         it("downloadDataToCache should pass expectedUpdatedAt from cache to downloadProject", () => {
             gp.cache["repo-1"] = {
                 ProjectLastUpdated: "2026-10-01T12:00:00Z"
