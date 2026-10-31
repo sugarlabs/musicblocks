@@ -381,7 +381,7 @@ class SaveInterface {
      * Save HTML representation of an activity without prompting the user.
      *
      * This method generates and downloads the HTML representation of the provided activity without
-     * prompting the user. It uses a setTimeout to delay the execution by 500 milliseconds.
+     * prompting the user.
      *
      * @param {SaveInterface} activity - The activity object to save.
      * @returns {void}
@@ -390,18 +390,16 @@ class SaveInterface {
      * @instance
      */
     saveHTMLNoPrompt(activity) {
-        setTimeout(() => {
-            const blob = new Blob([activity.save.prepareHTML()], {
-                type: "text/html;charset=utf-8"
-            });
-            const url = URL.createObjectURL(blob);
-            const planet = this.getPlanetInterface(activity);
-            if (planet && typeof planet.getCurrentProjectName === "function") {
-                activity.save.downloadURL(planet.getCurrentProjectName() + ".html", url);
-            } else {
-                activity.save.downloadURL(STR_MY_PROJECT.replace(" ", "_") + ".html", url);
-            }
-        }, 500);
+        const blob = new Blob([activity.save.prepareHTML()], {
+            type: "text/html;charset=utf-8"
+        });
+        const url = URL.createObjectURL(blob);
+        const planet = this.getPlanetInterface(activity);
+        if (planet && typeof planet.getCurrentProjectName === "function") {
+            activity.save.downloadURL(planet.getCurrentProjectName() + ".html", url);
+        } else {
+            activity.save.downloadURL(STR_MY_PROJECT.replace(" ", "_") + ".html", url);
+        }
     }
 
     /**
