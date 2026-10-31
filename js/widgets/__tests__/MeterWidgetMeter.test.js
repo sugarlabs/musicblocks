@@ -230,6 +230,35 @@ describe("MeterWidgetMeter", () => {
             expect(blockList[3].text.text).toBe("box");
         });
 
+        test("does not write into the operands of another expression", () => {
+            // Meter 3 (0.5 * 0.5)
+            const blockList = fractionMeter(3, 1, 4);
+            blockList[3].name = "multiply";
+            blockList[4].value = 0.5;
+            blockList[5].value = 0.5;
+            makeWidget(blockList);
+
+            const meter = widget._readMeterBlock();
+            widget._writeMeterBlock(meter, 3, 8);
+
+            expect(meter.noteValueBlock).toBeNull();
+            expect(widget._noteValue(meter)).toBe(4);
+            expect([blockList[4].value, blockList[5].value]).toEqual([0.5, 0.5]);
+        });
+
+        test("does not write into a denominator that is not a number block", () => {
+            const blockList = fractionMeter(3, 1, 4);
+            blockList[5] = { name: "box", value: 4, connections: [3, null], text: { text: "box" } };
+            makeWidget(blockList);
+
+            const meter = widget._readMeterBlock();
+            widget._writeMeterBlock(meter, 3, 8);
+
+            expect(meter.noteValueBlock).toBeNull();
+            expect(blockList[5].value).toBe(4);
+            expect(blockList[5].text.text).toBe("box");
+        });
+
         test("does nothing without a Meter block", () => {
             makeWidget({}, null);
 
