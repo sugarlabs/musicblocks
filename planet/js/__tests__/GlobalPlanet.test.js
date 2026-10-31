@@ -830,6 +830,24 @@ describe("GlobalPlanet", () => {
             expect(gp.loadCount).toBe(2);
         });
 
+        it("clears the badge error when the project list refreshes", () => {
+            gp.showBadgeError("Could not load the published project. Try again.");
+            expect(document.getElementById("global-badge-error")).not.toBeNull();
+
+            gp.refreshProjects();
+
+            expect(document.getElementById("global-badge-error")).toBeNull();
+        });
+
+        it("clears the badge error when a search starts", () => {
+            gp.showBadgeError("Could not load the published project. Try again.");
+            gp.searchString = "music";
+
+            gp.search();
+
+            expect(document.getElementById("global-badge-error")).toBeNull();
+        });
+
         it("downloadDataToCache should pass expectedUpdatedAt from cache to downloadProject", () => {
             gp.cache["repo-1"] = {
                 ProjectLastUpdated: "2026-10-01T12:00:00Z"

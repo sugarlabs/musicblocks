@@ -129,6 +129,7 @@ class GlobalPlanet {
         const Planet = this.Planet;
         const requestId = ++this._requestId;
 
+        this.hideBadgeError();
         this.index = 0;
         this._cleanupCards();
         document.getElementById("global-projects").innerHTML = "";
@@ -197,6 +198,7 @@ class GlobalPlanet {
         // A real search query — go into search mode.
         const requestId = ++this._requestId;
         this.searching = true;
+        this.hideBadgeError();
         this.hideTags();
         this.oldSearchString = this.searchString;
         this.index = 0;
