@@ -1538,7 +1538,7 @@ class Logo {
                 }
             }
             const comp = this.turtles.getTurtle(turtle).companionTurtle;
-            if (comp) {
+            if (comp !== null && comp !== undefined) {
                 const compTurtle = this.turtles.getTurtle(comp);
                 compTurtle.running = false;
                 if (compTurtle.interval !== undefined) {
@@ -2725,7 +2725,7 @@ class Logo {
                 }
 
                 const comp = logo.turtles.getTurtle(turtle).companionTurtle;
-                if (comp) {
+                if (comp !== null && comp !== undefined) {
                     const compTurtle = logo.turtles.getTurtle(comp);
                     compTurtle.running = false;
                     // Null tur.interval after cancel — mirrors fix at doStopTurtles

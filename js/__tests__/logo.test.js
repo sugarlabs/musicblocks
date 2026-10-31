@@ -1469,6 +1469,24 @@ describe("Logo doStopTurtles", () => {
 
             clearIntervalSpy.mockRestore();
         });
+
+        test("stops companion turtle and clears interval when companion index is zero", () => {
+            const clearIntervalSpy = jest
+                .spyOn(global, "clearInterval")
+                .mockImplementation(() => {});
+            turtle0.companionTurtle = null;
+            turtle1.companionTurtle = 0;
+            turtle0.interval = 888;
+            turtle0.running = true;
+
+            logo.doStopTurtles();
+
+            expect(turtle0.running).toBe(false);
+            expect(clearIntervalSpy).toHaveBeenCalledWith(888);
+            expect(turtle0.interval).toBeUndefined();
+
+            clearIntervalSpy.mockRestore();
+        });
     });
 });
 
@@ -2767,6 +2785,28 @@ describe("Logo runFromBlockNow", () => {
             expect(logo.sounds).toEqual([]);
             expect(logo._synthsInitialized).toBe(false);
             expect(turtle0.painter.doClear).not.toHaveBeenCalled();
+        });
+
+        test("stops companion turtle and clears interval on natural completion when companion index is zero", () => {
+            const turtle1 = createMockTurtle();
+            const twoTurtleActivity = createTwoTurtleActivity(turtle0, turtle1);
+            logo = new Logo(twoTurtleActivity);
+            logo.blockList = [makeFlowBlock()];
+            const clearIntervalSpy = jest
+                .spyOn(global, "clearInterval")
+                .mockImplementation(() => {});
+
+            turtle1.companionTurtle = 0;
+            turtle0.interval = 888;
+            turtle0.running = true;
+
+            logo.runFromBlockNow(logo, 1, 0, 0, null);
+
+            expect(turtle0.running).toBe(false);
+            expect(clearIntervalSpy).toHaveBeenCalledWith(888);
+            expect(turtle0.interval).toBeUndefined();
+
+            clearIntervalSpy.mockRestore();
         });
 
         test("!logo.turtles.running() guard skips cleanup during active run", () => {
