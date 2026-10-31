@@ -444,6 +444,7 @@ class GlobalPlanet {
     // reaches afterSearch(), so clear the flag too, or search() ignores every later
     // query (and the clear button) until reload.
     throwOfflineError() {
+        const wasSearching = this.searching;
         this.searching = false;
         this.hideLoading();
         this.hideLoadMore();
@@ -451,6 +452,8 @@ class GlobalPlanet {
         const element = document.getElementById("global-projects");
         element.innerHTML = "";
         element.insertAdjacentHTML("afterbegin", this.offlineHTML);
+
+        if (wasSearching && this.oldSearchString !== "") this.afterSearch();
     }
 
     throwNoProjectsError() {

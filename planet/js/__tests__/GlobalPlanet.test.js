@@ -548,6 +548,24 @@ describe("GlobalPlanet", () => {
             expect(mockPlanet.ServerInterface.searchProjects.mock.calls[1][0]).toBe("piano");
         });
 
+        it("resumes a pending query when the active search fails", () => {
+            gp.searchString = "drums";
+            gp.search();
+
+            gp.searchString = "piano";
+            gp.search();
+
+            expect(mockPlanet.ServerInterface.searchProjects).toHaveBeenCalledTimes(1);
+
+            mockPlanet.ServerInterface.searchProjects.mock.calls[0][4]({
+                success: false,
+                error: "ERROR_CONNECTION_FAILURE"
+            });
+
+            expect(mockPlanet.ServerInterface.searchProjects).toHaveBeenCalledTimes(2);
+            expect(mockPlanet.ServerInterface.searchProjects.mock.calls[1][0]).toBe("piano");
+        });
+
         it("clears a failed search back to the tag view", () => {
             gp.searchMode = "ALL_PROJECTS";
             gp.searchString = "drums";
