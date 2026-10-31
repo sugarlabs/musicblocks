@@ -351,6 +351,8 @@ class Logo {
         this.synth.activity = this.activity; // Reference for voice tracking
         this.synth.changeInTemperament = false;
         this._synthsInitialized = false;
+        this._executionRequest = null;
+        this._pendingPlayRequest = null;
 
         // Persistent user-selected temperament (survives across runs).
         this._userTemperament = null;
@@ -574,6 +576,7 @@ class Logo {
                 }
 
                 for (const instrumentName in this.deps.instruments[0]) {
+                    if (this.synth.isMultisampleAlias?.(instrumentName)) continue;
                     if (!(instrumentName in this.deps.instruments[turtle])) {
                         this.synth.loadSynth(turtle, instrumentName);
 
@@ -628,6 +631,7 @@ class Logo {
 
             // Copy any preloaded synths from the default turtle
             for (const instrumentName in this.deps.instruments[0]) {
+                if (this.synth.isMultisampleAlias?.(instrumentName)) continue;
                 if (!(instrumentName in this.deps.instruments[turtle])) {
                     this.synth.loadSynth(turtle, instrumentName);
 
@@ -1036,6 +1040,7 @@ class Logo {
      * @returns {void}
      */
     clearTurtleListeners(preservePersistent = false) {
+        for (const capture of [...(this.instrumentCaptures || [])].reverse()) capture.abort();
         for (const turtle of this.turtles.turtleList) {
             if (turtle && turtle.listeners) {
                 for (const listenerName in turtle.listeners) {
@@ -1163,7 +1168,9 @@ class Logo {
         }
 
         if (typeof proto.arg === "function") {
-            return (currentBlock.value = proto.arg(logo, turtle, blk, receivedArg));
+            currentBlock.value = proto.arg(logo, turtle, blk, receivedArg);
+            if (currentBlock.name === "multisample" && logo.stopTurtle) logo.doStopTurtles();
+            return currentBlock.value;
         }
 
         const blockName = currentBlock.name;
@@ -1581,7 +1588,16 @@ class Logo {
      * @returns {void}
      */
     doStopTurtles() {
+        this._pendingPlayRequest = null;
+        this._executionRequest = null;
+        this.synth.releaseMultisamples?.();
         this.stopTurtle = true;
+        this.runningLilypond = false;
+        this.runningAbc = false;
+        this.runningMxml = false;
+        this.runningMIDI = false;
+        this._exportNotationFinished = true;
+        this.collectingStats = false;
         this.turtles.markAllAsStopped();
         this._cancelSpeech();
 
@@ -1660,7 +1676,17 @@ class Logo {
      * @returns {void}
      */
     step() {
+        if (this.activity.multisampleEditor) {
+            this.activity.errorMsg(_("Finish or cancel instrument editing first."));
+            return;
+        }
+        const request = this._executionRequest;
+        if (request && !request.queuesReady) {
+            request.initialStep = true;
+            return;
+        }
         for (const turtle in this.stepQueue) {
+            if (this.stopTurtle || this._executionRequest !== request) return;
             if (this.stepQueue[turtle].length > 0) {
                 if (
                     turtle in this._unhighlightStepQueue &&
@@ -1717,6 +1743,48 @@ class Logo {
      * @returns {void}
      */
     runLogoCommands(startHere, env) {
+        if (this.activity.multisampleEditor) {
+            this.activity.errorMsg(_("Finish or cancel instrument editing first."));
+            return;
+        }
+        if (
+            this._executionRequest?.owners.length &&
+            (!this._executionRequest.started || this.turtles.running())
+        ) {
+            // Export callers set the next run's intent before entering this method.
+            const intent = {
+                runningLilypond: this.runningLilypond,
+                runningAbc: this.runningAbc,
+                runningMxml: this.runningMxml,
+                runningMIDI: this.runningMIDI,
+                collectingStats: this.collectingStats
+            };
+            this.doStopTurtles();
+            Object.assign(this, intent);
+        }
+        this.synth.releaseMultisamples?.();
+        const request = { owners: [] };
+        this._executionRequest = request;
+        this._runLogoCommands(startHere, env, request);
+    }
+
+    /** Stop feature work when its saved owners or project change; never restart it. */
+    invalidateMultisampleRun(owner) {
+        const request = this._executionRequest;
+        if (
+            request &&
+            (!request.started || request.owners.length > 0) &&
+            (!owner ||
+                request.owners.some(item => item.block === owner) ||
+                (["start", "drum"].includes(owner.name) &&
+                    request.participants?.some(item => item.index === owner.value)))
+        ) {
+            this.doStopTurtles();
+        }
+    }
+
+    _runLogoCommands(startHere, env, request) {
+        if (this._executionRequest !== request) return;
         // Drop any speech the previous run left queued immediately, including
         // while the optional performance tracker is still loading.
         this._cancelSpeech();
@@ -1733,10 +1801,11 @@ class Logo {
         ) {
             requirejs(
                 ["utils/performanceTracker"],
-                () => this.runLogoCommands(startHere, env),
+                () => this._runLogoCommands(startHere, env, request),
                 () => {
+                    if (this._executionRequest !== request) return;
                     this._performanceTrackerLoadFailed = true;
-                    this.runLogoCommands(startHere, env);
+                    this._runLogoCommands(startHere, env, request);
                 }
             );
             return;
@@ -1773,9 +1842,100 @@ class Logo {
 
         this._restoreConnections(); // Restore any broken connections.
         this.deps.storage.saveLocally(); // Save the state before running.
+        request.epoch = this.synth._instrumentEpoch;
+
+        // Ensure the bare-stack owner exists before snapshotting or initializing synths.
+        if (this.turtles.turtleCount() === 0) this.turtles.addTurtle(null);
+
+        if (this._exportingNotation) {
+            this._startLogoCommands(startHere, env, request);
+            return;
+        }
+
+        this.blocks.findStacks();
+        let participants;
+        if (startHere !== null && startHere !== undefined) {
+            const block = this.blockList[startHere];
+            const turtle = ["start", "drum"].includes(block.name)
+                ? block.value
+                : this.turtles.turtleList.findIndex(tur => !tur.inTrash);
+            participants = [turtle];
+        } else {
+            participants = this.blocks.stackList
+                .map(index => this.blockList[index])
+                .filter(
+                    block =>
+                        !block.trash &&
+                        ["start", "drum", "status", "oscilloscope"].includes(block.name)
+                )
+                .map(block => (["status", "oscilloscope"].includes(block.name) ? 0 : block.value));
+        }
+        participants = [...new Set(participants)].filter(
+            turtle => turtle >= 0 && !this.turtles.ithTurtle(turtle).inTrash
+        );
+        request.participants = participants.map(index => ({
+            index,
+            turtle: this.turtles.ithTurtle(index)
+        }));
+        for (const block of this.blockList) {
+            if (!block || block.name !== "multisample" || block.trash) continue;
+            try {
+                const value = block.value;
+                const isCurrent = () =>
+                    this._executionRequest === request &&
+                    this.synth._instrumentEpoch === request.epoch &&
+                    this.blockList.includes(block) &&
+                    !block.trash &&
+                    block.value === value &&
+                    request.participants.every(
+                        item =>
+                            this.turtles.ithTurtle(item.index) === item.turtle &&
+                            !item.turtle.inTrash
+                    );
+                const alias = this.synth.registerMultisample(value, isCurrent, error => {
+                    if (!isCurrent()) return;
+                    this.doStopTurtles();
+                    this.deps.errorHandler(error.message);
+                });
+                request.owners.push({ block, value, alias, isCurrent });
+            } catch {
+                // Opaque values remain recoverable and fail only on actual use.
+            }
+        }
+        const pairs = participants.flatMap(turtle =>
+            request.owners.map(owner => ({ turtle, owner }))
+        );
+        if (pairs.length === 0) {
+            this._startLogoCommands(startHere, env, request);
+            return;
+        }
+        this.stopTurtle = false;
+        this.deps.Singer.resetMasterVolume(this);
+        this.prepSynths();
+        this.onRunTurtle();
+        Promise.all(pairs.map(({ turtle, owner }) => this.synth.loadSynth(turtle, owner.alias)))
+            .then(() => {
+                if (this._executionRequest !== request) return;
+                if (!request.owners.every(owner => owner.isCurrent())) {
+                    this.doStopTurtles();
+                    return;
+                }
+                this._startLogoCommands(startHere, env, request);
+            })
+            .catch(error => {
+                if (this._executionRequest !== request) return;
+                this.doStopTurtles();
+                if (error.name !== "AbortError") this.deps.errorHandler(error.message);
+            });
+    }
+
+    _startLogoCommands(startHere, env, request) {
+        if (this._executionRequest !== request) return;
+        request.started = true;
 
         for (const arg in this.evalOnStartList) {
             this.safePluginExecute(this.evalOnStartList[arg], this);
+            if (this._executionRequest !== request) return;
         }
 
         this.stopTurtle = false;
@@ -1792,13 +1952,6 @@ class Logo {
         this.time = new Date().getTime();
         this.firstNoteTime = null;
         this.firstNoteAudioTime = null;
-
-        // Ensure we have at least one turtle that is not in the trash. This
-        // has to happen before prepSynths() and initTurtle() below, or a
-        // turtle added here gets no synth and no notation state.
-        if (this.turtles.turtleCount() === 0) {
-            this.turtles.addTurtle(null);
-        }
 
         this.deps.Singer.masterBPM = TARGETBPM;
         this.deps.Singer.defaultBPMFactor = TONEBPM / TARGETBPM;
@@ -1864,6 +2017,9 @@ class Logo {
             this.initTurtle(turtle);
         }
 
+        // Restore unfinished widget collections before resetting their run flags/data.
+        this.clearTurtleListeners();
+
         this.inPitchDrumMatrix = false;
         this.inMatrix = false;
         this.inLegoWidget = false;
@@ -1892,9 +2048,6 @@ class Logo {
         this.addingNotesToTuplet = {};
         this.modeBlock = null;
         this._meterBlock = null;
-
-        // Remove any listeners that might be still active.
-        this.clearTurtleListeners();
 
         // Init the graphic state.
         for (const turtle of Object.keys(this.turtles.turtleList)) {
@@ -1983,8 +2136,17 @@ class Logo {
         (2) Execute the stack. (A bit complicated due to lots of corner cases.)
         ===========================================================================
         */
+        const finishStepSetup = () => {
+            if (this._executionRequest !== request) return;
+            request.queuesReady = true;
+            if (request.initialStep && this.turtleDelay === TURTLESTEP) {
+                request.initialStep = false;
+                this.step();
+            }
+        };
         if (this.turtles.turtleCount() === 0) {
             this.deps.errorHandler(NOACTIONERRORMSG, null, _("start"));
+            finishStepSetup();
             // eslint-disable-next-line eqeqeq
         } else if (startHere != null) {
             // If a block to start from was passed, find its associated
@@ -2011,11 +2173,13 @@ class Logo {
 
             tur.running = true;
             this.runFromBlock(this, turtle, startHere, 0, env);
+            finishStepSetup();
         } else if (startBlocks.length > 0) {
             let delayStart = 0;
             const startBlocksLength = startBlocks.length;
             // Look for status and oscilloscope blocks.
             for (let b = 0; b < startBlocksLength; b++) {
+                if (this.stopTurtle || this._executionRequest !== request) return;
                 if (
                     ["status", "oscilloscope"].includes(this.blockList[startBlocks[b]].name) &&
                     !this.blockList[startBlocks[b]].trash
@@ -2037,6 +2201,7 @@ class Logo {
 
             this._timerManager.setGuardedTimeout(
                 () => {
+                    if (this._executionRequest !== request) return;
                     if (delayStart !== 0) {
                         // Launching status/oscilloscope block would have hidden the
                         // Stop Button so show it again.
@@ -2045,6 +2210,7 @@ class Logo {
 
                     // If there are multiple start blocks, run them all.
                     for (let b = 0; b < startBlocksLength; b++) {
+                        if (this.stopTurtle || this._executionRequest !== request) return;
                         if (
                             !["status", "oscilloscope"].includes(
                                 this.blockList[startBlocks[b]].name
@@ -2065,12 +2231,14 @@ class Logo {
                             }
                         }
                     }
+                    finishStepSetup();
                 },
                 delayStart,
                 () => this.stopTurtle
             );
         } else {
             document.body.style.cursor = "default";
+            finishStepSetup();
         }
 
         this.deps.refreshCanvas();
@@ -2101,6 +2269,8 @@ class Logo {
      * @returns {void}
      */
     runFromBlock(logo, turtle, blk, isflow, receivedArg) {
+        if (logo.stopTurtle) return;
+        const request = this._executionRequest;
         this._runningBlock = blk;
         // eslint-disable-next-line eqeqeq
         if (blk == null) return;
@@ -2113,7 +2283,10 @@ class Logo {
             if (logo._syncCounter >= logo._EXPORT_YIELD_AFTER_SYNC_RUNS) {
                 logo._syncCounter = 0;
                 logo._timerManager.setGuardedTimeout(
-                    () => logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg),
+                    () => {
+                        if (logo._executionRequest === request)
+                            logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg);
+                    },
                     0,
                     () => logo.stopTurtle
                 );
@@ -2156,6 +2329,7 @@ class Logo {
                 );
                 tur.delayParameters = { blk: blk, flow: isflow, arg: receivedArg };
                 tur._transportEventId = logo.synth.transport.schedule(audioContextTime => {
+                    if (logo._executionRequest !== request) return;
                     const tur2 = logo.activity.turtles.ithTurtle(turtle);
                     tur2._transportTime = logo.synth.transport.getSecondsAtTime(audioContextTime);
                     tur2._transportEventId = null;
@@ -2168,6 +2342,7 @@ class Logo {
                 tur.delayParameters = { blk: blk, flow: isflow, arg: receivedArg };
                 tur.delayTimeout = logo._timerManager.setGuardedTimeout(
                     () => {
+                        if (logo._executionRequest !== request) return;
                         if (logo.synth.transport.isAvailable) {
                             const tur2 = logo.activity.turtles.ithTurtle(turtle);
                             tur2._transportTime = logo.synth.transport.seconds;
@@ -2213,6 +2388,8 @@ class Logo {
      * @returns {void}
      */
     runFromBlockNow(logo, turtle, blk, isflow, receivedArg, queueStart) {
+        if (logo.stopTurtle) return;
+        const request = logo._executionRequest;
         // Sometimes we don't want to unwind the entire queue.
         if (queueStart === undefined) queueStart = 0;
 
@@ -2275,6 +2452,14 @@ class Logo {
                         }
                     } else {
                         args.push(logo.parseArg(logo, turtle, connections[i], blk, receivedArg));
+                    }
+
+                    if (logo._executionRequest !== request || (logo.stopTurtle && !tur.running)) {
+                        if (profilingEnabled) {
+                            Logo._recordBlockTiming(logo, blk, profilingStart);
+                            tracker.exitBlock();
+                        }
+                        return;
                     }
 
                     if (
@@ -2484,6 +2669,14 @@ class Logo {
                 logo.stopTurtle = true;
             }
 
+            if (logo._executionRequest !== request || (logo.stopTurtle && !tur.running)) {
+                if (profilingEnabled) {
+                    Logo._recordBlockTiming(logo, blk, profilingStart);
+                    tracker.exitBlock();
+                }
+                return;
+            }
+
             /*
         ===========================================================================
         (3) Queue block below the current block.
@@ -2672,7 +2865,7 @@ class Logo {
                                     queueStart
                                 ),
                             0,
-                            () => logo.stopTurtle
+                            () => logo.stopTurtle || logo._executionRequest !== request
                         );
                         if (profilingEnabled) {
                             Logo._recordBlockTiming(logo, blk, profilingStart);
@@ -2737,7 +2930,11 @@ class Logo {
                 // ensured that the turtle is really finished running
                 // yet. Hence the timeout.
                 const __checkCompletionState = () => {
-                    if (logo._exportNotationFinished) {
+                    if (
+                        logo.stopTurtle ||
+                        logo._executionRequest !== request ||
+                        logo._exportNotationFinished
+                    ) {
                         return;
                     }
 

@@ -14,7 +14,7 @@
 
    _, FlowBlock, NOINPUTERRORMSG, ValueBlock, FlowClampBlock,
    LeftBlock, DEFAULTOSCILLATORTYPE, OSCTYPES, Singer,
-   instrumentsEffects, last, VOICENAMES, DRUMNAMES, DEFAULTVOICE
+   instrumentsEffects, last, VOICENAMES, DRUMNAMES, DEFAULTVOICE, validateMultisample
  */
 
 /* exported setupToneBlocks */
@@ -958,6 +958,37 @@ function setupToneBlocks(activity) {
         }
     }
 
+    /** A self-contained saved instrument; authoring is separate from text labels. */
+    class MultisampleBlock extends ValueBlock {
+        constructor() {
+            super("multisample", _("Multisample instrument"));
+            this.setPalette("tone", activity);
+            this.setCapability("valueDrivenLabel");
+            this.setCapability("wideLabel");
+            this.hidden = true;
+            this.formBlock({ outType: "anyout" });
+            this.setHelpString([
+                _(
+                    "Use with Set Instrument in ordinary note programs. Widget capture and JavaScript export are not supported yet. Native project save/export includes the recordings."
+                ),
+                "documentation",
+                ""
+            ]);
+        }
+
+        arg(logo, turtle, blk) {
+            const block = activity.blocks.blockList[blk];
+            try {
+                validateMultisample(block.value);
+            } catch (error) {
+                activity.errorMsg(block.getMultisampleLabel() + ": " + error.message, blk);
+                logo.stopTurtle = true;
+            }
+            // Logo also assigns this result back to the block, even after an error.
+            return block.value;
+        }
+    }
+
     /**
      * Represents a SetTimbreBlock.
      * Extends FlowClampBlock.
@@ -1013,9 +1044,13 @@ function setupToneBlocks(activity) {
          * @returns {Array} - The next block and the number of ticks to wait.
          */
         flow(args, logo, turtle, blk) {
+            if (logo.stopTurtle) return [null, 0];
             if (args[0] === null) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
             } else {
+                if (Singer.ToneActions.setTimbre(args[0], turtle, blk) === false) {
+                    return [null, 0];
+                }
                 if (logo.inRhythmRuler) {
                     logo._currentDrumBlock = blk;
                     logo.rhythmRuler.Drums.push(blk);
@@ -1040,8 +1075,6 @@ function setupToneBlocks(activity) {
                         logo.sample.sampleOctave = 4;
                     }
                 }
-
-                Singer.ToneActions.setTimbre(args[0], turtle, blk);
             }
 
             return [args[1], 1];
@@ -1202,6 +1235,7 @@ function setupToneBlocks(activity) {
     new SetVoiceBlock().setup(activity);
     new SynthNameBlock().setup(activity);
     new VoiceNameBlock().setup(activity);
+    new MultisampleBlock().setup(activity);
     new SetTimbreBlock().setup(activity);
 }
 

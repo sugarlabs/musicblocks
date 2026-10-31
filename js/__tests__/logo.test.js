@@ -764,6 +764,17 @@ describe("Logo clearTurtleListeners", () => {
 
     afterEach(() => jest.restoreAllMocks());
 
+    test("abandons unfinished widget collections before removing their listeners", () => {
+        const abort = jest.fn(() => {
+            logo.instrumentCaptures = [];
+        });
+        logo.instrumentCaptures = [{ abort }];
+        logo.clearTurtleListeners(true);
+        expect(abort).toHaveBeenCalledTimes(1);
+        logo.clearTurtleListeners();
+        expect(abort).toHaveBeenCalledTimes(1);
+    });
+
     test("removes every listener when preservePersistent is not set", () => {
         const persistentListener = jest.fn();
         persistentListener.persistent = true;
@@ -864,7 +875,7 @@ describe("Logo step", () => {
     afterEach(() => jest.restoreAllMocks());
 
     test("processes step queue for each turtle", () => {
-        logo.stepQueue = { 0: [1] };
+        logo.stepQueue = { 0: [{ blk: 1, isflow: 0, receivedArg: null }] };
         logo._unhighlightStepQueue = { 0: 5 };
         logo.runFromBlockNow = jest.fn();
         mockActivity.blocks.visible = true;
@@ -872,6 +883,25 @@ describe("Logo step", () => {
         logo.step();
 
         expect(mockActivity.blocks.unhighlight).toHaveBeenCalledWith(5);
+    });
+
+    test("Step preserves the invocation and action arguments queued for each block", () => {
+        const env = [{ type: "multisample", name: "Passed value" }];
+        logo.turtleDelay = TURTLESTEP;
+        logo.runFromBlockNow = jest.fn();
+        logo.runFromBlock(logo, 0, 1, 0, env);
+        logo.step();
+        expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, "0", 1, 0, env);
+    });
+
+    test("Step stops iterating when a source failure clears every turtle queue", () => {
+        logo.stepQueue = {
+            0: [{ blk: 1, isflow: 0, receivedArg: null }],
+            1: [{ blk: 2, isflow: 0, receivedArg: null }]
+        };
+        logo.runFromBlockNow = jest.fn(() => logo.doStopTurtles());
+        expect(() => logo.step()).not.toThrow();
+        expect(logo.runFromBlockNow).toHaveBeenCalledTimes(1);
     });
 
     test("handles empty step queue", () => {
@@ -1631,7 +1661,7 @@ describe("Logo runLogoCommands", () => {
     test("executes startHere path", () => {
         logo._restoreConnections = jest.fn();
         logo.runFromBlock = jest.fn();
-        logo.blockList = [{ name: "start", value: 0, trash: false, connections: [] }];
+        logo.blockList = [{ name: "start", value: 0, trash: false, connections: [] }, null];
 
         logo.runLogoCommands(0, { test: true });
 
@@ -1642,6 +1672,317 @@ describe("Logo runLogoCommands", () => {
         expect(logo.runFromBlock).toHaveBeenCalledWith(logo, 0, 0, 0, { test: true });
         expect(mockActivity.refreshCanvas).toHaveBeenCalled();
     });
+
+    test("an active instrument editor blocks Play, selected stacks and Step before side effects", () => {
+        mockActivity.multisampleEditor = {};
+        logo.runFromBlock = jest.fn();
+        logo.synth.releaseMultisamples = jest.fn();
+        logo.runLogoCommands(null);
+        logo.runLogoCommands(0);
+        logo.step();
+        expect(mockActivity.errorMsg).toHaveBeenCalledTimes(3);
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+            "Finish or cancel instrument editing first."
+        );
+        expect(mockActivity.saveLocally).not.toHaveBeenCalled();
+        expect(logo.synth.releaseMultisamples).not.toHaveBeenCalled();
+        expect(logo.runFromBlock).not.toHaveBeenCalled();
+    });
+
+    test("Stop in a startup action prevents clocks and dispatch from restarting", () => {
+        logo.safePluginExecute = jest.fn(() => logo.doStopTurtles());
+        logo.evalOnStartList = { first: "stop", second: "obsolete" };
+        logo.runFromBlock = jest.fn();
+        logo.blockList = [{ name: "start", value: 0, connections: [] }, null];
+        logo.runLogoCommands(0);
+        expect(logo.safePluginExecute).toHaveBeenCalledTimes(1);
+        expect(logo.runFromBlock).not.toHaveBeenCalled();
+        expect(logo.stopTurtle).toBe(true);
+    });
+
+    test("a delayed prior startup cannot dispatch while a fresh request prepares", () => {
+        const dispatches = [];
+        jest.spyOn(logo._timerManager, "setGuardedTimeout").mockImplementation(fn => {
+            dispatches.push(fn);
+        });
+        logo.runFromBlock = jest.fn();
+        logo.blockList = [
+            { name: "start", value: 0, connections: [] },
+            { name: "status", connections: [] }
+        ];
+        mockActivity.blocks.stackList = [0, 1];
+        logo.runLogoCommands();
+        logo.runFromBlock.mockClear();
+        logo.blockList.push({ name: "multisample", value: {}, trash: false });
+        logo.synth.registerMultisample = jest.fn(() => "voice");
+        logo.synth.loadSynth = jest.fn(() => new Promise(() => {}));
+        logo.runLogoCommands();
+        dispatches[0]();
+        expect(logo.runFromBlock).not.toHaveBeenCalled();
+    });
+
+    test("Stop prevents synchronous notation dispatch", () => {
+        logo.runningLilypond = true;
+        logo.stopTurtle = true;
+        logo.runFromBlockNow = jest.fn();
+        logo.runFromBlock(logo, 0, 0, 0, "stopped");
+        expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+    });
+
+    test("Stop abandons silent export intent so ordinary retry prepares audio", () => {
+        logo.runningLilypond = true;
+        logo.runningAbc = true;
+        logo.runningMxml = true;
+        logo.runningMIDI = true;
+        logo.collectingStats = true;
+        logo.doStopTurtles();
+        expect(logo._exportingNotation).toBe(false);
+        expect(logo.collectingStats).toBe(false);
+    });
+
+    test.each(
+        [false, true].flatMap(started =>
+            ["runningLilypond", "runningAbc", "runningMxml", "runningMIDI", "collectingStats"].map(
+                mode => [started, mode]
+            )
+        )
+    )(
+        "preserves incoming %s/%s intent while cancelling the previous audio run",
+        (started, mode) => {
+            logo._executionRequest = { owners: [{}], started };
+            mockActivity.turtles.running = jest.fn(() => started);
+            logo[mode] = true;
+            if (mode === "collectingStats") logo.runningLilypond = true;
+            logo.synth.registerMultisample = jest.fn();
+            logo._restoreConnections = jest.fn();
+            logo.blockList = [
+                { name: "start", value: 0, connections: [] },
+                { name: "multisample", value: {}, trash: false }
+            ];
+            logo.runFromBlock = jest.fn(() => {
+                expect(logo._exportingNotation).toBe(true);
+                expect(logo[mode]).toBe(true);
+            });
+
+            logo.runLogoCommands(0);
+
+            expect(mockActivity.turtles.markAllAsStopped).toHaveBeenCalled();
+            expect(logo.runFromBlock).toHaveBeenCalledTimes(1);
+            expect(logo.synth.registerMultisample).not.toHaveBeenCalled();
+            expect(logo.synth.loadSynth).not.toHaveBeenCalled();
+        }
+    );
+
+    test("a synchronous silent failure does not leave later starts running", async () => {
+        logo.runningLilypond = true;
+        mockActivity.turtles.markAllAsStopped.mockImplementation(() => {
+            turtle0.running = false;
+            turtle1.running = false;
+        });
+        logo.blockList = [
+            { name: "start", value: 0, connections: [] },
+            { name: "start", value: 1, connections: [] }
+        ];
+        mockActivity.blocks.stackList = [0, 1];
+        logo.runFromBlock = jest.fn(() => logo.doStopTurtles());
+        logo.runLogoCommands();
+        await new Promise(resolve => setTimeout(resolve, 10));
+        expect(logo.runFromBlock).toHaveBeenCalledTimes(1);
+        expect(turtle0.running).toBe(false);
+        expect(turtle1.running).toBe(false);
+    });
+
+    test("a bare stack prepares for the fresh turtle when every previous turtle is trashed", async () => {
+        turtle0.inTrash = true;
+        turtle1.inTrash = true;
+        const turtles = mockActivity.turtles;
+        turtles.ithTurtle = jest.fn(i => turtles.turtleList[i]);
+        turtles.getTurtle = turtles.ithTurtle;
+        turtles.turtleCount = jest.fn(() => turtles.turtleList.filter(t => !t.inTrash).length);
+        turtles.getTurtleCount = jest.fn(() => turtles.turtleList.length);
+        turtles.addTurtle = jest.fn(() => turtles.turtleList.push(createMockTurtle()));
+        logo.synth.registerMultisample = jest.fn(() => "voice");
+        logo.synth.loadSynth = jest.fn(async () => ({}));
+        logo.runFromBlock = jest.fn();
+        logo.blockList = [
+            { name: "settimbre", connections: [] },
+            { name: "multisample", value: {}, trash: false }
+        ];
+        logo.runLogoCommands(0, "kept");
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(logo.synth.loadSynth).toHaveBeenCalledWith(2, "voice");
+        expect(logo.runFromBlock).toHaveBeenCalledWith(logo, 2, 0, 0, "kept");
+    });
+
+    test.each(["runningLilypond", "runningAbc", "runningMxml", "runningMIDI"])(
+        "%s starts without registering or preparing saved audio",
+        flag => {
+            logo[flag] = true;
+            logo.synth.registerMultisample = jest.fn(() => "voice");
+            logo.synth.loadSynth = jest.fn(() => new Promise(() => {}));
+            logo.runFromBlock = jest.fn();
+            logo.blockList = [
+                { name: "start", value: 0, connections: [] },
+                { name: "multisample", value: {}, trash: false }
+            ];
+            logo.runLogoCommands(0, "silent");
+            expect(logo.synth.registerMultisample).not.toHaveBeenCalled();
+            expect(logo.synth.loadSynth).not.toHaveBeenCalled();
+            expect(logo.runFromBlock).toHaveBeenCalledWith(logo, 0, 0, 0, "silent");
+        }
+    );
+
+    test("retains one Step during preparation until ordinary queues are populated", async () => {
+        let ready;
+        logo.synth.registerMultisample = jest.fn(() => "voice");
+        logo.synth.loadSynth = jest.fn(
+            () =>
+                new Promise(resolve => {
+                    ready = resolve;
+                })
+        );
+        logo.blockList = [
+            { name: "start", value: 0, connections: [] },
+            { name: "multisample", value: {}, trash: false }
+        ];
+        mockActivity.blocks.stackList = [0];
+        logo.turtleDelay = TURTLESTEP;
+        logo.runFromBlockNow = jest.fn();
+        logo.runLogoCommands(null, "initial");
+        logo.step();
+        logo.step();
+        expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+        ready();
+        await new Promise(resolve => setTimeout(resolve, 10));
+        expect(logo.runFromBlockNow).toHaveBeenCalledTimes(1);
+        expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, "0", 0, 0, "initial");
+    });
+
+    test("prepares saved values before startup and resumes the original invocation once", async () => {
+        let ready;
+        logo.synth.registerMultisample = jest.fn(() => "prepared voice");
+        logo.synth.loadSynth = jest.fn(
+            () =>
+                new Promise(resolve => {
+                    ready = resolve;
+                })
+        );
+        logo.runFromBlock = jest.fn();
+        logo.safePluginExecute = jest.fn();
+        logo.evalOnStartList = { first: "startup" };
+        const instrument = { type: "multisample", version: 1 };
+        logo.blockList = [
+            { name: "start", value: 1, trash: false, connections: [] },
+            { name: "multisample", value: instrument, trash: false }
+        ];
+        const env = { argument: "kept" };
+        logo.runLogoCommands(0, env);
+        expect(mockActivity.saveLocally).toHaveBeenCalledTimes(1);
+        expect(logo.prepSynths).toHaveBeenCalled();
+        expect(logo.safePluginExecute).not.toHaveBeenCalled();
+        expect(logo.runFromBlock).not.toHaveBeenCalled();
+        expect(logo.synth.loadSynth).toHaveBeenCalledWith(1, "prepared voice");
+        ready();
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(logo.safePluginExecute).toHaveBeenCalledTimes(1);
+        expect(logo.runFromBlock).toHaveBeenCalledTimes(1);
+        expect(logo.runFromBlock).toHaveBeenCalledWith(logo, 1, 0, 0, env);
+    });
+
+    test.each(["resolve", "reject"])(
+        "Stop and immediate retry ignore late decode %s",
+        async outcome => {
+            const held = [];
+            logo.synth.registerMultisample = jest.fn(() => "voice");
+            logo.synth.loadSynth = jest.fn(
+                () => new Promise((resolve, reject) => held.push({ resolve, reject }))
+            );
+            logo.runFromBlock = jest.fn();
+            logo.blockList = [
+                { name: "start", value: 0, trash: false, connections: [] },
+                { name: "multisample", value: {}, trash: false }
+            ];
+            logo.runLogoCommands(0, "old");
+            logo.doStopTurtles();
+            logo.runLogoCommands(0, "fresh");
+            held[1].resolve();
+            await new Promise(resolve => setTimeout(resolve, 0));
+            held[0][outcome](new Error("old decoder"));
+            await new Promise(resolve => setTimeout(resolve, 0));
+            expect(logo.runFromBlock).toHaveBeenCalledTimes(1);
+            expect(logo.runFromBlock).toHaveBeenCalledWith(logo, 0, 0, 0, "fresh");
+            expect(mockActivity.errorMsg).not.toHaveBeenCalled();
+            expect(logo.stopTurtle).toBe(false);
+        }
+    );
+
+    test("owner invalidation stops preparation without implicitly restarting", async () => {
+        let ready;
+        logo.synth.registerMultisample = jest.fn(() => "voice");
+        logo.synth.loadSynth = jest.fn(
+            () =>
+                new Promise(resolve => {
+                    ready = resolve;
+                })
+        );
+        logo.runFromBlock = jest.fn();
+        const owner = { name: "multisample", value: {}, trash: false };
+        logo.blockList = [{ name: "start", value: 0, connections: [] }, owner];
+        logo.runLogoCommands(0);
+        logo.invalidateMultisampleRun(owner);
+        ready();
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(logo.stopTurtle).toBe(true);
+        expect(logo.runFromBlock).not.toHaveBeenCalled();
+    });
+
+    test("an audio epoch change before resume cannot dispatch a prepared run", async () => {
+        let ready;
+        logo.synth._instrumentEpoch = 0;
+        logo.synth.registerMultisample = jest.fn(() => "voice");
+        logo.synth.loadSynth = jest.fn(
+            () =>
+                new Promise(resolve => {
+                    ready = resolve;
+                })
+        );
+        logo.runFromBlock = jest.fn();
+        logo.blockList = [
+            { name: "start", value: 0, connections: [] },
+            { name: "multisample", value: {}, trash: false }
+        ];
+        logo.runLogoCommands(0);
+        ready();
+        logo.synth._instrumentEpoch++;
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(logo.runFromBlock).not.toHaveBeenCalled();
+        expect(logo.stopTurtle).toBe(true);
+    });
+
+    test.each(["success", "failure"])(
+        "Stop prevents late startup module %s from restarting",
+        outcome => {
+            const previous = global.requirejs;
+            const debug = window.DEBUG_PERFORMANCE;
+            let callbacks;
+            global.requirejs = jest.fn((modules, success, failure) => {
+                callbacks = { success, failure };
+            });
+            window.DEBUG_PERFORMANCE = true;
+            logo.runFromBlock = jest.fn();
+            try {
+                logo.runLogoCommands(0, "obsolete");
+                logo.doStopTurtles();
+                callbacks[outcome]();
+                expect(logo.runFromBlock).not.toHaveBeenCalled();
+                expect(mockActivity.saveLocally).not.toHaveBeenCalled();
+                expect(logo.stopTurtle).toBe(true);
+            } finally {
+                global.requirejs = previous;
+                window.DEBUG_PERFORMANCE = debug;
+            }
+        }
+    );
 
     test("executes startBlocks branch including delayed non-status stacks", () => {
         timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {

@@ -34,7 +34,7 @@
    splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
     updateTemperaments, VALUETEXTX, DEFAULTCHORD, base64Encode,
    VOICENAMES, WESTERN2EISOLFEGENAMES, _THIS_IS_TURTLE_BLOCKS_,
-   widgetWindows, Turtle, ManagedTimer
+   widgetWindows, Turtle, ManagedTimer, validateMultisample, MultisampleEditor
  */
 
 /*
@@ -1552,7 +1552,9 @@ class Block {
                 }
             }
 
-            if (this.name === "solfege") {
+            if (this.name === "multisample") {
+                label = this.getMultisampleLabel();
+            } else if (this.name === "solfege") {
                 obj = splitSolfege(this.value);
                 label = i18nSolfege(obj[0]);
                 attr = obj[1];
@@ -2515,6 +2517,45 @@ class Block {
             newText
         });
         this.blocks.redoActionHistory = [];
+    }
+
+    /**
+     * Restore or replace the complete owned JSON value, including opaque payloads.
+     * Editor drafts and history must never share mutable data with a saved block.
+     * @param {*} value - Saved JSON value.
+     * @param {boolean} recordHistory - Record one completed replacement.
+     */
+    setMultisampleValue(value, recordHistory = false) {
+        this.blocks.activity?.multisampleEditor?.invalidateOwner(this);
+        this._multisampleRevision = (this._multisampleRevision || 0) + 1;
+        const snapshot = value === undefined ? undefined : JSON.parse(JSON.stringify(value));
+        const previous = this.value;
+        this.blocks.activity?.logo?.invalidateMultisampleRun?.(this);
+        this.value = snapshot;
+        this.blocks.updateBlockText(this.blockIndex);
+        if (recordHistory && JSON.stringify(previous) !== JSON.stringify(snapshot)) {
+            this._recordValueChange(
+                previous === undefined ? undefined : JSON.parse(JSON.stringify(previous)),
+                snapshot === undefined ? undefined : JSON.parse(JSON.stringify(snapshot))
+            );
+        }
+    }
+
+    /** @returns {string} A display-only label; validation never repairs saved data. */
+    getMultisampleLabel() {
+        const name =
+            typeof this.value?.name === "string" && this.value.name.trim()
+                ? this.value.name
+                : _("Multisample instrument");
+        if (this.value?.version !== 1) {
+            return _("Unsupported instrument") + ": " + name;
+        }
+        try {
+            validateMultisample(this.value);
+            return name;
+        } catch (error) {
+            return _("Invalid instrument") + ": " + name;
+        }
     }
 
     /**
@@ -3495,6 +3536,10 @@ class Block {
             }
 
             hideDOMLabel();
+            if (that.name === "multisample" && !moved && !that.trash) {
+                MultisampleEditor.open(that.activity, that, that.accessibleElement);
+                return;
+            }
             that._checkWidgets(false);
 
             let topBlk;
@@ -4238,6 +4283,10 @@ class Block {
      * @returns {void}
      */
     _changeLabel() {
+        if (this.name === "multisample") {
+            MultisampleEditor.open(this.activity, this, this.accessibleElement);
+            return;
+        }
         const that = this;
         this._capturedInitialValue = this.value;
         this._capturedInitialText = this.text ? this.text.text : null;
@@ -5097,6 +5146,7 @@ class Block {
      * @param {boolean} [notPieMenu] - Flag indicating whether to close pie menu.
      */
     _labelChanged(closeInput, notPieMenu) {
+        if (this.name === "multisample") return;
         // Update the block values as they change in the DOM label.
 
         // Instead, we do this when we hide the DOM element.
