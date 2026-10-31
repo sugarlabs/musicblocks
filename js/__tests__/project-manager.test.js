@@ -2764,6 +2764,7 @@ describe("_setupFileHandlers inner callbacks", () => {
             )
         };
         let projectData = "latest original data";
+        const replacementOrder = [];
         const saveLocally = jest.fn(() => {
             storage["SESSION" + storage.currentProject] = projectData;
         });
@@ -2773,7 +2774,11 @@ describe("_setupFileHandlers inner callbacks", () => {
         });
         const blocks = {
             ...makeActivity().blocks,
+            disposeTrashedBlocks: jest.fn(() => {
+                replacementOrder.push("dispose-trash");
+            }),
             loadNewBlocks: jest.fn(() => {
+                replacementOrder.push("load-import");
                 projectData = "new imported data";
                 return 7;
             })
@@ -2786,7 +2791,13 @@ describe("_setupFileHandlers inner callbacks", () => {
             saveSessionAsync,
             sessionStorageManager
         });
-        activity.sendAllToTrash = jest.fn(() => stage.dispatchEvent("trashsignal"));
+        activity.blocks.trashStacks = ["0"];
+        activity.blocks.actionHistory = [{ type: "trash", blockId: 0 }];
+        activity.blocks.redoActionHistory = [{ type: "restore", blockId: 0 }];
+        activity.sendAllToTrash = jest.fn(() => {
+            replacementOrder.push("send-to-trash");
+            stage.dispatchEvent("trashsignal");
+        });
         const handlers = captureHandlers(activity);
         const pm = new ProjectManager(activity);
         pm._setupFileHandlers();
@@ -2794,6 +2805,10 @@ describe("_setupFileHandlers inner callbacks", () => {
         activity.fileChooser.files = [{ name: "student-song.tb" }];
         handlers.change();
         await jest.advanceTimersByTimeAsync(200);
+        expect(replacementOrder).toEqual(["send-to-trash", "dispose-trash", "load-import"]);
+        expect(activity.blocks.trashStacks).toEqual([]);
+        expect(activity.blocks.actionHistory).toEqual([]);
+        expect(activity.blocks.redoActionHistory).toEqual([]);
 
         expect(storage["SESSIONOriginal Project"]).toBe("latest original data");
         expect(storage.currentProject).toBe("student-song 3");
@@ -2808,6 +2823,101 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(saveSessionAsync).toHaveBeenCalledTimes(2);
         expect(saveLocally).not.toHaveBeenCalled();
         expect(activity.loading).toBe(false);
+    });
+
+    it("defers local project replacement while blocks are loading", async () => {
+        origFileReader = global.FileReader;
+
+        class MockFR {
+            constructor() {
+                this.result = '[[0,"start",0,0,[]]]';
+                this.onload = null;
+            }
+
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+
+            readAsArrayBuffer() {}
+        }
+
+        global.FileReader = MockFR;
+
+        const listeners = {};
+        const stage = {
+            update: jest.fn(),
+            addEventListener: jest.fn((event, listener) => {
+                listeners[event] = listener;
+            }),
+            removeAllEventListeners: jest.fn(event => {
+                delete listeners[event];
+            }),
+            dispatchEvent: jest.fn(event => listeners[event]?.())
+        };
+
+        const replacementOrder = [];
+
+        const storage = {
+            "currentProject": "Original Project",
+            "SESSIONOriginal Project": "original data"
+        };
+
+        const sessionStorageManager = {
+            loadSession: jest.fn(() => Promise.resolve(null))
+        };
+
+        const blocks = {
+            ...makeActivity().blocks,
+            isLoading: jest.fn(() => true),
+            runAfterLoad: jest.fn(),
+            disposeTrashedBlocks: jest.fn(() => {
+                replacementOrder.push("dispose-trash");
+            }),
+            loadNewBlocks: jest.fn(() => {
+                replacementOrder.push("load-import");
+                return 7;
+            })
+        };
+
+        const activity = makeActivity({
+            stage,
+            storage,
+            blocks,
+            saveLocally: jest.fn(),
+            saveSessionAsync: jest.fn().mockResolvedValue(),
+            sessionStorageManager
+        });
+
+        activity.sendAllToTrash = jest.fn(() => {
+            replacementOrder.push("send-to-trash");
+            stage.dispatchEvent("trashsignal");
+        });
+
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "student-song.tb" }];
+
+        handlers.change();
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(activity.blocks.runAfterLoad).toHaveBeenCalledTimes(1);
+
+        expect(activity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(activity.blocks.disposeTrashedBlocks).not.toHaveBeenCalled();
+        expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+        expect(replacementOrder).toEqual([]);
+
+        const [replaceAfterLoad] = activity.blocks.runAfterLoad.mock.calls[0];
+
+        activity.blocks.isLoading.mockReturnValue(false);
+
+        replaceAfterLoad();
+
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(replacementOrder).toEqual(["send-to-trash", "dispose-trash", "load-import"]);
     });
 
     it("change handler aborts local replacement when the IndexedDB save fails", async () => {

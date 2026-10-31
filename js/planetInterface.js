@@ -159,6 +159,11 @@ class PlanetInterface {
                 merge = false;
             }
 
+            if (!merge && this.activity.blocks.isLoading()) {
+                this.activity.blocks.runAfterLoad(() => this.loadProjectFromData(data, merge));
+                return;
+            }
+
             this.closePlanet();
             if (!merge) {
                 this.activity.sendAllToTrash(false, true);
@@ -263,9 +268,15 @@ class PlanetInterface {
          * it cannot be restored into the next one or grow across project switches.
          */
         this._resetTrashHistory = () => {
-            this.activity.blocks.trashStacks = [];
-            this.activity.blocks.actionHistory = [];
-            this.activity.blocks.redoActionHistory = [];
+            const blocks = this.activity.blocks;
+
+            if (typeof blocks.disposeTrashedBlocks === "function") {
+                blocks.disposeTrashedBlocks();
+            }
+
+            blocks.trashStacks = [];
+            blocks.actionHistory = [];
+            blocks.redoActionHistory = [];
         };
 
         /**

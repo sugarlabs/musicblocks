@@ -295,6 +295,34 @@ describe("PlanetInterface", () => {
         expect(document.body.style.cursor).toBe("default");
     });
 
+    test("loadProjectFromData defers project replacement while blocks are loading", () => {
+        planetInterface.closePlanet = jest.fn();
+        mockActivity.blocks.disposeTrashedBlocks = jest.fn();
+
+        mockActivity.sendAllToTrash.mockClear();
+        mockActivity.blocks.loadNewBlocks.mockClear();
+        mockActivity.blocks.runAfterLoad.mockClear();
+
+        mockActivity.blocks.isLoading.mockReturnValueOnce(true);
+
+        planetInterface.loadProjectFromData(JSON.stringify({ whatever: 1 }), false);
+
+        expect(mockActivity.blocks.runAfterLoad).toHaveBeenCalledTimes(1);
+
+        expect(planetInterface.closePlanet).not.toHaveBeenCalled();
+        expect(mockActivity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(mockActivity.blocks.disposeTrashedBlocks).not.toHaveBeenCalled();
+        expect(mockActivity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+
+        const [replaceAfterLoad] = mockActivity.blocks.runAfterLoad.mock.calls[0];
+        replaceAfterLoad();
+
+        expect(planetInterface.closePlanet).toHaveBeenCalledTimes(1);
+        expect(mockActivity.sendAllToTrash).toHaveBeenCalledWith(false, true);
+        expect(mockActivity.blocks.disposeTrashedBlocks).toHaveBeenCalledTimes(1);
+        expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalledWith({ whatever: 1 });
+    });
+
     test("loadProjectFromData forgets the trash and undo history of the replaced project", () => {
         planetInterface.closePlanet = jest.fn();
         mockActivity.blocks.trashStacks = ["3", "7"];
@@ -302,6 +330,22 @@ describe("PlanetInterface", () => {
         mockActivity.blocks.redoActionHistory = [{ type: "trash", blockId: 7 }];
 
         planetInterface.loadProjectFromData(JSON.stringify([]));
+
+        expect(mockActivity.blocks.trashStacks).toEqual([]);
+        expect(mockActivity.blocks.actionHistory).toEqual([]);
+        expect(mockActivity.blocks.redoActionHistory).toEqual([]);
+    });
+
+    test("_resetTrashHistory disposes trashed blocks and clears project history", () => {
+        mockActivity.blocks.disposeTrashedBlocks = jest.fn();
+
+        mockActivity.blocks.trashStacks = ["0", "3"];
+        mockActivity.blocks.actionHistory = [{ type: "trash", blockId: 0 }];
+        mockActivity.blocks.redoActionHistory = [{ type: "trash", blockId: 3 }];
+
+        planetInterface._resetTrashHistory();
+
+        expect(mockActivity.blocks.disposeTrashedBlocks).toHaveBeenCalledTimes(1);
 
         expect(mockActivity.blocks.trashStacks).toEqual([]);
         expect(mockActivity.blocks.actionHistory).toEqual([]);
