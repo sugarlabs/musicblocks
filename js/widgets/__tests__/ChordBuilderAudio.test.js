@@ -113,6 +113,40 @@ describe("ChordBuilderAudio", () => {
             const flatNotes = ["Eb", "G", "Bb"];
             expect(audio.assignOctaves(flatNotes, 4)).toEqual(["Eb4", "G4", "Bb4"]);
         });
+
+        it("handles enharmonic accidentals (E#, B#, Fb, Cb) without false octave leaps", () => {
+            // C# major: E# must stay in the same octave as C# and G#
+            expect(audio.assignOctaves(["C♯", "E♯", "G♯"], 4)).toEqual(["C♯4", "E♯4", "G♯4"]);
+            expect(audio.assignOctaves(["C#", "E#", "G#"], 4)).toEqual(["C#4", "E#4", "G#4"]);
+
+            // G# major: G# and B# stay in octave 4, D# wraps to octave 5
+            expect(audio.assignOctaves(["G♯", "B♯", "D♯"], 4)).toEqual(["G♯4", "B♯4", "D♯5"]);
+            expect(audio.assignOctaves(["G#", "B#", "D#"], 4)).toEqual(["G#4", "B#4", "D#5"]);
+
+            // Db minor: Fb stays in the same octave as Db and Ab
+            expect(audio.assignOctaves(["D♭", "F♭", "A♭"], 4)).toEqual(["D♭4", "F♭4", "A♭4"]);
+            expect(audio.assignOctaves(["Db", "Fb", "Ab"], 4)).toEqual(["Db4", "Fb4", "Ab4"]);
+
+            // Ab minor: Cb and Eb wrap past B into octave 5
+            expect(audio.assignOctaves(["A♭", "C♭", "E♭"], 4)).toEqual(["A♭4", "C♭5", "E♭5"]);
+            expect(audio.assignOctaves(["Ab", "Cb", "Eb"], 4)).toEqual(["Ab4", "Cb5", "Eb5"]);
+        });
+
+        it("handles whitespace, non-string notes, and unrecognized note formats gracefully", () => {
+            expect(audio.assignOctaves([" C ", " E ", " G "], 4)).toEqual(["C4", "E4", "G4"]);
+            expect(audio.assignOctaves([1, 2], 4)).toEqual(["14", "24"]);
+        });
+
+        it("handles notes with matching letters according to accidental pitch order", () => {
+            // Ascending accidentals remain in the same octave
+            expect(audio.assignOctaves(["F", "F#"], 4)).toEqual(["F4", "F#4"]);
+            expect(audio.assignOctaves(["C", "C♯"], 4)).toEqual(["C4", "C♯4"]);
+
+            // Descending accidentals on matching letters advance octave to preserve ascending order
+            expect(audio.assignOctaves(["F#", "F"], 4)).toEqual(["F#4", "F5"]);
+            expect(audio.assignOctaves(["C♯", "C"], 4)).toEqual(["C♯4", "C5"]);
+            expect(audio.assignOctaves(["B", "Bb"], 4)).toEqual(["B4", "Bb5"]);
+        });
     });
 
     describe("playChord", () => {
