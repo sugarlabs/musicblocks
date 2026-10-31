@@ -1127,6 +1127,73 @@ describe("setupWidgetBlocks", () => {
             expect(logo.reflection.init).toHaveBeenCalledTimes(1);
             expect(logo.inReflectionMatrix).toBe(false);
         });
+
+        it("leaves the Status widget's fields alone", () => {
+            const reflection = getBlock("reflection");
+            const fields = [
+                ["xBlk", "x"],
+                ["bpmBlk", "bpm"]
+            ];
+            logo.statusFields = fields;
+
+            reflection.flow(["childBlk"], logo, 0, "reflBlk", "received");
+            reflection.flow(["childBlk"], logo, 0, "reflBlk");
+            logo.setTurtleListener.mock.calls[0][2]();
+
+            expect(logo.statusFields).toBe(fields);
+            expect(logo.statusFields).toEqual([
+                ["xBlk", "x"],
+                ["bpmBlk", "bpm"]
+            ]);
+        });
+
+        it("tries to load the widget again after its modules failed to load", () => {
+            // Jest's require is not AMD, so run the file with an AMD require that
+            // holds each load until the test finishes or fails it.
+            const loads = [];
+            const amdRequire = (modules, callback, errback) =>
+                loads.push({ modules, callback, errback });
+            const amdDefine = Object.assign(() => {}, { amd: true });
+            const amdModule = { exports: {} };
+            const source = require("fs").readFileSync(
+                require("path").join(__dirname, "..", "WidgetBlocks.js"),
+                "utf8"
+            );
+            new Function("require", "define", "module", source)(amdRequire, amdDefine, amdModule);
+            const amdActivity = createMockActivity();
+            amdModule.exports.setupWidgetBlocks(amdActivity);
+            const reflection = amdActivity.blockInstances.reflection;
+            const consoleError = jest.spyOn(console, "error").mockImplementation(() => {});
+            global.ReflectionMatrix.mockClear();
+
+            try {
+                expect(reflection.flow(["childBlk"], logo, 0, "reflBlk")).toEqual([null, 0, true]);
+                expect(logo.reflection).toBe("loading");
+
+                loads[0].errback(new Error("Script error for widgets/ReflectionWindow"));
+
+                expect(logo.reflection).toBeNull();
+                expect(consoleError).toHaveBeenCalledWith(
+                    "Failed to load the reflection widget",
+                    expect.any(Error)
+                );
+
+                expect(reflection.flow(["childBlk"], logo, 0, "reflBlk")).toEqual([null, 0, true]);
+                expect(loads).toHaveLength(2);
+                loads[1].callback();
+
+                expect(global.ReflectionMatrix).toHaveBeenCalledTimes(1);
+                expect(logo.runFromBlockNow).toHaveBeenCalledWith(
+                    logo,
+                    0,
+                    "reflBlk",
+                    true,
+                    undefined
+                );
+            } finally {
+                consoleError.mockRestore();
+            }
+        });
     });
 
     describe("Widget dependency resolution", () => {

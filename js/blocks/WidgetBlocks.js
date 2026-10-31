@@ -113,12 +113,20 @@ function setupWidgetBlocks(activity) {
     function _ensureWidget(logo, widgetKey, modules, initFn, turtle, blk, receivedArg) {
         if (logo[widgetKey] === null || logo[widgetKey] === undefined) {
             logo[widgetKey] = "loading"; // Guard against multiple simultaneous loads
-            _lazyRequire(modules, () => {
-                logo[widgetKey] = initFn();
-                if (typeof logo.runFromBlockNow === "function") {
-                    logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
+            _lazyRequire(
+                modules,
+                () => {
+                    logo[widgetKey] = initFn();
+                    if (typeof logo.runFromBlockNow === "function") {
+                        logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
+                    }
+                },
+                err => {
+                    // Otherwise the key stays "loading" and every later run is interrupted.
+                    logo[widgetKey] = null;
+                    console.error(`Failed to load the ${widgetKey} widget`, err);
                 }
-            });
+            );
             return [null, 0, true];
         } else if (logo[widgetKey] === "loading") {
             return [null, 0, true]; // Still loading, continue to interrupt
@@ -2258,7 +2266,7 @@ function setupWidgetBlocks(activity) {
         }
 
         /**
-         * Handles the flow of data for the status block.
+         * Handles the flow of data for the reflection block.
          * @param {any[]} args - The arguments passed to the block.
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
@@ -2271,7 +2279,18 @@ function setupWidgetBlocks(activity) {
                 "reflection",
                 _getWidgetDependencies(
                     typeof ReflectionMatrix !== "undefined" ? ReflectionMatrix : null,
-                    ["utils/ai-widget-lifecycle", "utils/ai-markdown", "widgets/reflection"]
+                    [
+                        "utils/ai-widget-lifecycle",
+                        "utils/ai-markdown",
+                        "widgets/ReflectionLifecycle",
+                        "widgets/ReflectionWindow",
+                        "widgets/ReflectionChatLog",
+                        "widgets/ReflectionSession",
+                        "widgets/ReflectionBackend",
+                        "widgets/ReflectionReport",
+                        "widgets/ReflectionMarkdown",
+                        "widgets/reflection"
+                    ]
                 ),
                 () => new ReflectionMatrix(),
                 turtle,
@@ -2279,8 +2298,6 @@ function setupWidgetBlocks(activity) {
                 receivedArg
             );
             if (interruption) return interruption;
-
-            logo.statusFields = [];
 
             logo.inReflectionMatrix = true;
 
