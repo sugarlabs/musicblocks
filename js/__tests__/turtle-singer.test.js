@@ -1806,8 +1806,9 @@ describe("processNote — nested tie note pairing and duration semantics (MB-010
     let turtleMock;
     let activityMock;
     let singer;
+    let savedGetNote;
 
-    const seedNoteBlock = (s, blk, pitch = "C", octave = 4, beatValue = 4) => {
+    const seedNoteBlock = (s, blk, pitch = "C", octave = 4, beatValue = 4, drums = []) => {
         s.notePitches[blk] = [pitch];
         s.noteOctaves[blk] = [octave];
         s.noteCents[blk] = [0];
@@ -1815,11 +1816,26 @@ describe("processNote — nested tie note pairing and duration semantics (MB-010
         s.oscList[blk] = false;
         s.noteBeat[blk] = 1;
         s.noteBeatValues[blk] = beatValue;
-        s.noteDrums[blk] = [];
+        s.noteDrums[blk] = drums;
         s.embeddedGraphics[blk] = [];
+        activityMock.blocks.blockList[blk] = { name: "note", connections: [] };
+    };
+
+    const getScheduledEvents = () => {
+        return activityMock.logo.synth.trigger.mock.calls.map(call => ({
+            turtle: call[0],
+            note: call[1],
+            beatValue: call[2],
+            instrument: call[3],
+            paramsEffects: call[4],
+            future: call[7]
+        }));
     };
 
     beforeEach(() => {
+        savedGetNote = global.getNote;
+        global.getNote = jest.fn((p, oct) => [p, oct || 4]);
+
         turtleMock = createTurtleMock();
         turtleMock.singer = new Singer(turtleMock);
         activityMock = createActivityMock(turtleMock);
@@ -1831,7 +1847,11 @@ describe("processNote — nested tie note pairing and duration semantics (MB-010
                 outerTie: { name: "tie" },
                 innerTie: { name: "tie" },
                 note1: { name: "note" },
-                note2: { name: "note" }
+                note2: { name: "note" },
+                note3: { name: "note" },
+                note4: { name: "note" },
+                note5: { name: "note" },
+                note6: { name: "note" }
             }
         };
         activityMock.logo.setDispatchBlock = jest.fn();
@@ -1851,155 +1871,442 @@ describe("processNote — nested tie note pairing and duration semantics (MB-010
         turtleMock.doWait = jest.fn();
         turtleMock.blink = jest.fn();
         singer = turtleMock.singer;
-        singer.suppressOutput = true;
+
+        // Enable real scheduling pathway: suppressOutput = false, active instrument, BPM = 120, drift = 1 (no clock lag)
+        singer.suppressOutput = false;
+        singer.instrumentNames = ["synthLead"];
+        singer.bpm = [120];
+        singer.drift = 1;
+        global.TONEBPM = 120;
 
         setupRhythmActions(activityMock);
     });
 
-    test("Test C & E: notes pair across nested tie boundary and combine durations correctly", () => {
-        // Outer tie starts
-        Singer.RhythmActions.doTie(0, "outerTie");
-        expect(singer.tie).toBe(true);
-
-        // Note 1 (C4, 1/4 note, beatValue = 4) in outer tie
-        seedNoteBlock(singer, "note1", "C", 4, 4);
-        singer.inNoteBlock = ["note1"];
-        Singer.processNote(activityMock, 4, false, "note1", 0, jest.fn());
-
-        // First note duration held: carryover is 4, tie is true
-        expect(singer.tieCarryOver).toBe(4);
-        expect(singer.tie).toBe(true);
-
-        // Inner tie starts: defensive guard prevents state reset
-        Singer.RhythmActions.doTie(0, "innerTie");
-        expect(singer.tieCarryOver).toBe(4);
-        expect(singer.tie).toBe(true);
-
-        // Note 2 (C4, 1/4 note, beatValue = 4) in inner tie
-        seedNoteBlock(singer, "note2", "C", 4, 4);
-        singer.inNoteBlock = ["note2"];
-        Singer.processNote(activityMock, 4, false, "note2", 0, jest.fn());
-
-        // Note 1 and Note 2 pair! Combined duration = 1 / (1/4 + 1/4) = 2 (half note)
-        // carryover returns to 0
-        expect(singer.tieCarryOver).toBe(0);
-        expect(singer.tie).toBe(true);
+    afterEach(() => {
+        global.getNote = savedGetNote;
+        global.TONEBPM = 60;
     });
 
-    test("Test E: handles mismatched pitches inside tie by warning and playing previous note without loss", () => {
-        Singer.RhythmActions.doTie(0, "outerTie");
-
-        // Note 1: C4 (beatValue = 4)
-        seedNoteBlock(singer, "note1", "C", 4, 4);
-        singer.inNoteBlock = ["note1"];
-        Singer.processNote(activityMock, 4, false, "note1", 0, jest.fn());
-        expect(singer.tieCarryOver).toBe(4);
-
-        // Inner tie enters
-        Singer.RhythmActions.doTie(0, "innerTie");
-        expect(singer.tieCarryOver).toBe(4);
-
-        // Note 2: D4 (different pitch!)
-        seedNoteBlock(singer, "note2", "D", 4, 4);
-        singer.inNoteBlock = ["note2"];
-        Singer.processNote(activityMock, 4, false, "note2", 0, jest.fn());
-
-        // Pitch mismatch reported to user
-        expect(activityMock.errorMsg).toHaveBeenCalledWith(
-            expect.stringContaining("You can only tie notes of the same pitch"),
-            "note2"
-        );
-
-        // Previous note (C4) was played, and D4 is retained as the new first note in carryover
-        expect(singer.tieCarryOver).toBe(4);
-        expect(singer.tieNotePitches).toEqual([["D", 4, 0, 261.63]]);
-    });
-
-    test("Test E: odd note sequence flushes remaining carried-over note on outer clamp exit", () => {
+    test("4-note nested arrangement: verifies exact effective half-note durations at synth scheduling boundary", () => {
         let outerCleanupListener;
         activityMock.logo.setTurtleListener = jest.fn((_, __, cb) => {
             outerCleanupListener = cb;
         });
 
-        Singer.RhythmActions.doTie(0, "outerTie");
-
-        // Note 1 (C4, 1/4 note)
-        seedNoteBlock(singer, "note1", "C", 4, 4);
-        singer.inNoteBlock = ["note1"];
-        Singer.processNote(activityMock, 4, false, "note1", 0, jest.fn());
-        expect(singer.tieCarryOver).toBe(4);
-
-        // Inner tie starts (non-owning)
-        Singer.RhythmActions.doTie(0, "innerTie");
-        expect(singer.tieCarryOver).toBe(4);
-
-        // Only 1 note was in the tie (odd count). Outer clamp exits and listener runs.
-        const processNoteSpy = jest.spyOn(Singer, "processNote");
-        outerCleanupListener();
-
-        // Carried-over note must be replayed on clamp exit, then cleared
-        expect(processNoteSpy).toHaveBeenCalledWith(
-            activityMock,
-            4, // rawDurationValue
-            false, // isOsc
-            "note1", // saveBlk
-            0 // turtle
-        );
-        expect(singer.tie).toBe(false);
-        expect(singer.tieCarryOver).toBe(0);
-        processNoteSpy.mockRestore();
-    });
-
-    test("Test C & 3: 4-note nested arrangement pairs first two and remaining two notes into half notes", () => {
-        let outerCleanupListener;
-        activityMock.logo.setTurtleListener = jest.fn((_, __, cb) => {
-            outerCleanupListener = cb;
-        });
-
-        activityMock.blocks.blockList.note3 = { name: "note" };
-        activityMock.blocks.blockList.note4 = { name: "note" };
-
-        // Outer Tie starts
+        // 1. Outer Tie starts
         Singer.RhythmActions.doTie(0, "outerTie");
         expect(singer.tie).toBe(true);
 
-        // Note 1 (C4, 1/4 note) in outer tie
+        // Note 1 (C4, quarter note: beatValue = 4, duration = 1/4 = 0.25)
         seedNoteBlock(singer, "note1", "C", 4, 4);
         singer.inNoteBlock = ["note1"];
         Singer.processNote(activityMock, 4, false, "note1", 0, jest.fn());
-        expect(singer.tieCarryOver).toBe(4);
 
-        // Inner Tie enters (guard preserves outer tie)
+        // First note duration held in carryover; NO synth event scheduled yet
+        expect(singer.tieCarryOver).toBe(4);
+        expect(singer.tie).toBe(true);
+        expect(getScheduledEvents()).toHaveLength(0);
+        expect(turtleMock.doWait).not.toHaveBeenCalled();
+
+        // 2. Inner Tie starts: defensive guard preserves outer state
         Singer.RhythmActions.doTie(0, "innerTie");
         expect(singer.tieCarryOver).toBe(4);
         expect(singer.tie).toBe(true);
+        expect(getScheduledEvents()).toHaveLength(0);
 
-        // Note 2 (C4, 1/4 note) inside inner tie -> pairs with Note 1!
+        // Note 2 (C4, quarter note: beatValue = 4) inside inner Tie -> pairs with Note 1!
         seedNoteBlock(singer, "note2", "C", 4, 4);
         singer.inNoteBlock = ["note2"];
         Singer.processNote(activityMock, 4, false, "note2", 0, jest.fn());
-        // Combined into half note (1/(1/4 + 1/4) = 2), carryover reset to 0
-        expect(singer.tieCarryOver).toBe(0);
 
-        // Note 3 (C4, 1/4 note) inside inner tie -> becomes first note of next pair
+        // Pair 1 scheduled! Combined duration: 1 / (1/4 + 1/4) = 2 (half note -> beatValue = 0.5s)
+        expect(singer.tieCarryOver).toBe(0);
+        expect(singer.lastNotePlayed).toEqual(["C4", 2]);
+        expect(getScheduledEvents()).toHaveLength(1);
+        expect(getScheduledEvents()[0]).toEqual(
+            expect.objectContaining({
+                turtle: 0,
+                note: "C4",
+                beatValue: 0.5,
+                instrument: "synthLead"
+            })
+        );
+        expect(turtleMock.doWait).toHaveBeenCalledTimes(1);
+        expect(turtleMock.doWait).toHaveBeenCalledWith(0.5);
+
+        // Note 3 (C4, quarter note: beatValue = 4) inside inner Tie -> starts second pair
         seedNoteBlock(singer, "note3", "C", 4, 4);
         singer.inNoteBlock = ["note3"];
         Singer.processNote(activityMock, 4, false, "note3", 0, jest.fn());
         expect(singer.tieCarryOver).toBe(4);
+        expect(getScheduledEvents()).toHaveLength(1); // still only 1 scheduled call
 
-        // Note 4 (C4, 1/4 note) in outer tie after inner tie -> pairs with Note 3!
+        // Inner Tie exits (transparent non-owning scope: no cleanup listener registered)
+
+        // Note 4 (C4, quarter note: beatValue = 4) in outer Tie -> pairs with Note 3!
         seedNoteBlock(singer, "note4", "C", 4, 4);
         singer.inNoteBlock = ["note4"];
         Singer.processNote(activityMock, 4, false, "note4", 0, jest.fn());
-        // Combined into half note, carryover reset to 0
-        expect(singer.tieCarryOver).toBe(0);
 
-        // Outer clamp finishes
+        // Pair 2 scheduled! Combined duration: half note -> beatValue = 0.5s
+        expect(singer.tieCarryOver).toBe(0);
+        expect(singer.lastNotePlayed).toEqual(["C4", 2]);
+        expect(getScheduledEvents()).toHaveLength(2);
+        expect(getScheduledEvents()[1]).toEqual(
+            expect.objectContaining({
+                turtle: 0,
+                note: "C4",
+                beatValue: 0.5,
+                instrument: "synthLead"
+            })
+        );
+        expect(turtleMock.doWait).toHaveBeenCalledTimes(2);
+        expect(turtleMock.doWait).toHaveBeenLastCalledWith(0.5);
+
+        // Total scheduled duration across both pairs = 0.5s + 0.5s = 1.0s (whole note)
+        const totalDuration = getScheduledEvents().reduce((sum, e) => sum + e.beatValue, 0);
+        expect(totalDuration).toBe(1.0);
+
+        // Outer Tie exits
         outerCleanupListener();
         expect(singer.tie).toBe(false);
         expect(singer.tieCarryOver).toBe(0);
         expect(singer.tieNotePitches).toEqual([]);
         expect(singer.tieNoteExtras).toEqual([]);
+    });
+
+    test("two matching notes combine into half note duration at synth scheduling boundary", () => {
+        Singer.RhythmActions.doTie(0, "outerTie");
+
+        seedNoteBlock(singer, "note1", "C", 4, 4);
+        singer.inNoteBlock = ["note1"];
+        Singer.processNote(activityMock, 4, false, "note1", 0, jest.fn());
+        expect(getScheduledEvents()).toHaveLength(0);
+
+        seedNoteBlock(singer, "note2", "C", 4, 4);
+        singer.inNoteBlock = ["note2"];
+        Singer.processNote(activityMock, 4, false, "note2", 0, jest.fn());
+
+        expect(getScheduledEvents()).toHaveLength(1);
+        expect(getScheduledEvents()[0].note).toBe("C4");
+        expect(getScheduledEvents()[0].beatValue).toBe(0.5);
+        expect(singer.lastNotePlayed).toEqual(["C4", 2]);
+        expect(turtleMock.doWait).toHaveBeenCalledWith(0.5);
+    });
+
+    test("six matching notes across nested boundary pair sequentially into three half notes", () => {
+        let outerCleanupListener;
+        activityMock.logo.setTurtleListener = jest.fn((_, __, cb) => {
+            outerCleanupListener = cb;
+        });
+
+        Singer.RhythmActions.doTie(0, "outerTie");
+
+        // Note 1 (outer)
+        seedNoteBlock(singer, "note1", "C", 4, 4);
+        singer.inNoteBlock = ["note1"];
+        Singer.processNote(activityMock, 4, false, "note1", 0, jest.fn());
+
+        // Inner tie starts
+        Singer.RhythmActions.doTie(0, "innerTie");
+
+        // Note 2 (inner) -> pairs with Note 1 (Pair 1)
+        seedNoteBlock(singer, "note2", "C", 4, 4);
+        singer.inNoteBlock = ["note2"];
+        Singer.processNote(activityMock, 4, false, "note2", 0, jest.fn());
+
+        // Note 3 (inner)
+        seedNoteBlock(singer, "note3", "C", 4, 4);
+        singer.inNoteBlock = ["note3"];
+        Singer.processNote(activityMock, 4, false, "note3", 0, jest.fn());
+
+        // Note 4 (inner) -> pairs with Note 3 (Pair 2)
+        seedNoteBlock(singer, "note4", "C", 4, 4);
+        singer.inNoteBlock = ["note4"];
+        Singer.processNote(activityMock, 4, false, "note4", 0, jest.fn());
+
+        // Note 5 (outer)
+        seedNoteBlock(singer, "note5", "C", 4, 4);
+        singer.inNoteBlock = ["note5"];
+        Singer.processNote(activityMock, 4, false, "note5", 0, jest.fn());
+
+        // Note 6 (outer) -> pairs with Note 5 (Pair 3)
+        seedNoteBlock(singer, "note6", "C", 4, 4);
+        singer.inNoteBlock = ["note6"];
+        Singer.processNote(activityMock, 4, false, "note6", 0, jest.fn());
+
+        outerCleanupListener();
+
+        expect(getScheduledEvents()).toHaveLength(3);
+        getScheduledEvents().forEach(evt => {
+            expect(evt.note).toBe("C4");
+            expect(evt.beatValue).toBe(0.5);
+        });
+        const totalDuration = getScheduledEvents().reduce((sum, e) => sum + e.beatValue, 0);
+        expect(totalDuration).toBe(1.5);
+    });
+
+    test("odd-length sequence flushes remaining carried-over note without dropped duration on outer clamp exit", () => {
+        let outerCleanupListener;
+        activityMock.logo.setTurtleListener = jest.fn((_, __, cb) => {
+            outerCleanupListener = cb;
+        });
+
+        Singer.RhythmActions.doTie(0, "outerTie");
+
+        // Note 1 (outer)
+        seedNoteBlock(singer, "note1", "C", 4, 4);
+        singer.inNoteBlock = ["note1"];
+        Singer.processNote(activityMock, 4, false, "note1", 0, jest.fn());
+
+        // Inner tie enters
+        Singer.RhythmActions.doTie(0, "innerTie");
+
+        // Note 2 (inner) -> pairs with Note 1 (half note)
+        seedNoteBlock(singer, "note2", "C", 4, 4);
+        singer.inNoteBlock = ["note2"];
+        Singer.processNote(activityMock, 4, false, "note2", 0, jest.fn());
+        expect(getScheduledEvents()).toHaveLength(1);
+        expect(getScheduledEvents()[0].beatValue).toBe(0.5);
+
+        // Note 3 (inner) -> odd note, duration deferred into carryover
+        seedNoteBlock(singer, "note3", "C", 4, 4);
+        singer.inNoteBlock = ["note3"];
+        Singer.processNote(activityMock, 4, false, "note3", 0, jest.fn());
+        expect(singer.tieCarryOver).toBe(4);
+
+        // Outer clamp exits -> listener flushes Note 3 at its original quarter-note duration (0.25s)
+        outerCleanupListener();
+
+        expect(getScheduledEvents()).toHaveLength(2);
+        expect(getScheduledEvents()[1]).toEqual(
+            expect.objectContaining({
+                note: "C4",
+                beatValue: 0.25,
+                instrument: "synthLead"
+            })
+        );
+        expect(turtleMock.doWait).toHaveBeenCalledWith(0.25);
+
+        // Total duration: 0.5s + 0.25s = 0.75s (three quarter notes exactly; 0 dropped duration)
+        const totalDuration = getScheduledEvents().reduce((sum, e) => sum + e.beatValue, 0);
+        expect(totalDuration).toBe(0.75);
+        expect(singer.tie).toBe(false);
+        expect(singer.tieCarryOver).toBe(0);
+    });
+
+    test("pitch mismatch inside nested tie emits user warning and plays both notes without loss", () => {
+        let outerCleanupListener;
+        activityMock.logo.setTurtleListener = jest.fn((_, __, cb) => {
+            outerCleanupListener = cb;
+        });
+
+        Singer.RhythmActions.doTie(0, "outerTie");
+
+        // Note 1: C4 (quarter note)
+        seedNoteBlock(singer, "note1", "C", 4, 4);
+        singer.inNoteBlock = ["note1"];
+        Singer.processNote(activityMock, 4, false, "note1", 0, jest.fn());
+        expect(singer.tieCarryOver).toBe(4);
+
+        // Inner tie starts
+        Singer.RhythmActions.doTie(0, "innerTie");
+
+        // Note 2: D4 (quarter note, pitch mismatch)
+        seedNoteBlock(singer, "note2", "D", 4, 4);
+        singer.inNoteBlock = ["note2"];
+        Singer.processNote(activityMock, 4, false, "note2", 0, jest.fn());
+
+        // Error message emitted identifying mismatched note block
+        expect(activityMock.errorMsg).toHaveBeenCalledWith(
+            expect.stringContaining("You can only tie notes of the same pitch"),
+            "note2"
+        );
+
+        // Note 1 (C4) was immediately played at its original duration (0.25s)
+        expect(getScheduledEvents()).toHaveLength(1);
+        expect(getScheduledEvents()[0].note).toBe("C4");
+        expect(getScheduledEvents()[0].beatValue).toBe(0.25);
+        expect(singer.previousNotePlayed).toEqual(["C4", 4]);
+
+        // D4 is preserved in carryover as the first note for the next pair
+        expect(singer.tieCarryOver).toBe(4);
+        expect(singer.tieNotePitches).toEqual([["D", 4, 0, 261.63]]);
+
+        // Outer clamp exits -> flushes D4 at its original duration (0.25s)
+        outerCleanupListener();
+
+        expect(getScheduledEvents()).toHaveLength(2);
+        expect(getScheduledEvents()[1].note).toBe("D4");
+        expect(getScheduledEvents()[1].beatValue).toBe(0.25);
+
+        // Neither note was lost, both played at full quarter-note duration
+        const totalDuration = getScheduledEvents().reduce((sum, e) => sum + e.beatValue, 0);
+        expect(totalDuration).toBe(0.5);
+    });
+
+    test("combines different note durations: eighth note + quarter note -> 3/8 note (0.375s)", () => {
+        Singer.RhythmActions.doTie(0, "outerTie");
+
+        // Note 1: eighth note (beatValue = 8, raw duration = 1/8 = 0.125s)
+        seedNoteBlock(singer, "note1", "C", 4, 8);
+        singer.inNoteBlock = ["note1"];
+        Singer.processNote(activityMock, 8, false, "note1", 0, jest.fn());
+        expect(singer.tieCarryOver).toBe(8);
+
+        // Inner tie enters
+        Singer.RhythmActions.doTie(0, "innerTie");
+
+        // Note 2: quarter note (beatValue = 4, raw duration = 1/4 = 0.25s)
+        seedNoteBlock(singer, "note2", "C", 4, 4);
+        singer.inNoteBlock = ["note2"];
+        Singer.processNote(activityMock, 4, false, "note2", 0, jest.fn());
+
+        // Combined beat value: 1 / (1/4 + 1/8) = 1 / 0.375 = 8/3 ≈ 2.6667
+        // Scheduled duration: bpmFactor / noteBeatValue = 1 / (8/3) = 3/8 = 0.375s!
+        expect(getScheduledEvents()).toHaveLength(1);
+        expect(getScheduledEvents()[0].beatValue).toBeCloseTo(0.375, 4);
+        expect(turtleMock.doWait).toHaveBeenCalledWith(expect.closeTo(0.375, 4));
+    });
+
+    test("carries drum metadata across tied notes so both drums play with combined note", () => {
+        Singer.RhythmActions.doTie(0, "outerTie");
+
+        // Note 1 has snare drum
+        seedNoteBlock(singer, "note1", "C", 4, 4, ["snare"]);
+        singer.inNoteBlock = ["note1"];
+        Singer.processNote(activityMock, 4, false, "note1", 0, jest.fn());
+        expect(singer.tieFirstDrums).toEqual(["snare"]);
+
+        // Inner tie enters
+        Singer.RhythmActions.doTie(0, "innerTie");
+
+        // Note 2 has bassdrum
+        seedNoteBlock(singer, "note2", "C", 4, 4, ["bassdrum"]);
+        singer.inNoteBlock = ["note2"];
+        Singer.processNote(activityMock, 4, false, "note2", 0, jest.fn());
+
+        // Note 2 triggers synth with combined duration (0.5s) for pitched note and both drums
+        expect(getScheduledEvents()).toHaveLength(3);
+        expect(getScheduledEvents().map(e => e.instrument)).toEqual(
+            expect.arrayContaining(["synthLead", "snare", "bassdrum"])
+        );
+        getScheduledEvents().forEach(e => {
+            expect(e.beatValue).toBe(0.5);
+        });
+
+        // tieFirstDrums was consumed and reset
+        expect(singer.tieFirstDrums).toEqual([]);
+    });
+
+    test("sequential sibling ties execute independently without cross-talk", () => {
+        let capturedListener;
+        activityMock.logo.setTurtleListener = jest.fn((_, __, cb) => {
+            capturedListener = cb;
+        });
+
+        // Sibling Tie 1: C4 + C4
+        Singer.RhythmActions.doTie(0, "outerTie1");
+        seedNoteBlock(singer, "note1", "C", 4, 4);
+        singer.inNoteBlock = ["note1"];
+        Singer.processNote(activityMock, 4, false, "note1", 0, jest.fn());
+        seedNoteBlock(singer, "note2", "C", 4, 4);
+        singer.inNoteBlock = ["note2"];
+        Singer.processNote(activityMock, 4, false, "note2", 0, jest.fn());
+        capturedListener(); // clamp 1 exits
+        expect(singer.tie).toBe(false);
+
+        // Sibling Tie 2: D4 + D4
+        Singer.RhythmActions.doTie(0, "outerTie2");
+        expect(singer.tie).toBe(true);
+        seedNoteBlock(singer, "note3", "D", 4, 4);
+        singer.inNoteBlock = ["note3"];
+        Singer.processNote(activityMock, 4, false, "note3", 0, jest.fn());
+        seedNoteBlock(singer, "note4", "D", 4, 4);
+        singer.inNoteBlock = ["note4"];
+        Singer.processNote(activityMock, 4, false, "note4", 0, jest.fn());
+        capturedListener(); // clamp 2 exits
+        expect(singer.tie).toBe(false);
+
+        expect(getScheduledEvents()).toHaveLength(2);
+        expect(getScheduledEvents()[0].note).toBe("C4");
+        expect(getScheduledEvents()[0].beatValue).toBe(0.5);
+        expect(getScheduledEvents()[1].note).toBe("D4");
+        expect(getScheduledEvents()[1].beatValue).toBe(0.5);
+    });
+
+    test("exact maintainer lifecycle: outer tie -> pending note -> inner tie enters & exits -> outer note executes & pairs -> outer tie exits", () => {
+        let outerCleanupListener;
+        activityMock.logo.setTurtleListener = jest.fn((_, __, cb) => {
+            outerCleanupListener = cb;
+        });
+
+        // 1. Enter outer Tie
+        Singer.RhythmActions.doTie(0, "outerTie");
+        expect(singer.tie).toBe(true);
+        expect(singer.tieCarryOver).toBe(0);
+        expect(singer.tieNotePitches).toEqual([]);
+        expect(singer.tieNoteExtras).toEqual([]);
+        expect(singer.tieFirstDrums).toEqual([]);
+        expect(activityMock.logo.setDispatchBlock).toHaveBeenCalledWith("outerTie", 0, "_tie_0");
+
+        // 2. Create a pending outer note: Note 1 (C4, quarter note: beatValue = 4)
+        seedNoteBlock(singer, "note1", "C", 4, 4);
+        singer.inNoteBlock = ["note1"];
+        Singer.processNote(activityMock, 4, false, "note1", 0, jest.fn());
+        expect(singer.tie).toBe(true);
+        expect(singer.tieCarryOver).toBe(4);
+        expect(singer.tieNotePitches).toEqual([["C", 4, 0, 261.63]]);
+        expect(singer.tieNoteExtras[0]).toBe("note1");
+        expect(getScheduledEvents()).toHaveLength(0);
+
+        // 3. Enter nested inner Tie
+        activityMock.logo.setDispatchBlock.mockClear();
+        activityMock.logo.setTurtleListener.mockClear();
+        Singer.RhythmActions.doTie(0, "innerTie");
+        // Inner entry returned early: no dispatch block registered, no listener overwritten
+        expect(activityMock.logo.setDispatchBlock).not.toHaveBeenCalled();
+        expect(activityMock.logo.setTurtleListener).not.toHaveBeenCalled();
+        expect(singer.tie).toBe(true);
+        expect(singer.tieCarryOver).toBe(4);
+        expect(singer.tieNotePitches).toEqual([["C", 4, 0, 261.63]]);
+        expect(singer.tieNoteExtras[0]).toBe("note1");
+
+        // 4. Exit the inner Tie clamp (non-owning: no cleanup listener fires because none was attached)
+        // 5. Verify the outer Tie remains active
+        expect(singer.tie).toBe(true);
+        expect(singer.tieCarryOver).toBe(4);
+        expect(singer.tieNotePitches).toEqual([["C", 4, 0, 261.63]]);
+        expect(singer.tieNoteExtras[0]).toBe("note1");
+        expect(getScheduledEvents()).toHaveLength(0);
+
+        // 6. Execute the next outer note: Note 2 (C4, quarter note: beatValue = 4)
+        seedNoteBlock(singer, "note2", "C", 4, 4);
+        singer.inNoteBlock = ["note2"];
+        Singer.processNote(activityMock, 4, false, "note2", 0, jest.fn());
+
+        // 7. Verify correct note pairing and effective duration
+        expect(singer.tieCarryOver).toBe(0);
+        expect(getScheduledEvents()).toHaveLength(1);
+        expect(getScheduledEvents()[0]).toEqual(
+            expect.objectContaining({
+                turtle: 0,
+                note: "C4",
+                beatValue: 0.5, // half note (1/4 + 1/4)
+                instrument: "synthLead"
+            })
+        );
+        expect(turtleMock.doWait).toHaveBeenCalledWith(0.5);
+
+        // 8. Exit the outer Tie clamp
+        outerCleanupListener();
+
+        // 9. Verify all Tie-related state is cleaned up
+        expect(singer.tie).toBe(false);
+        expect(singer.tieCarryOver).toBe(0);
+        expect(singer.tieNotePitches).toEqual([]);
+        expect(singer.tieNoteExtras).toEqual([]);
+        expect(singer.tieFirstDrums).toEqual([]);
     });
 });
 

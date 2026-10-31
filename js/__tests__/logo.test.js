@@ -1348,6 +1348,61 @@ describe("Logo doStopTurtles", () => {
         expect(turtle.listeners).toEqual({ clickListener: persistentListener });
     });
 
+    test("clears endOfClampSignals across representative non-Tie clamp actions (intervals, volume, articulation) on stop", () => {
+        const intervalListener = jest.fn();
+        const volumeListener = jest.fn();
+        const articulationListener = jest.fn();
+
+        turtle.listeners = {
+            _interval_0: intervalListener,
+            _volume_0: volumeListener,
+            _articulation_0_20: articulationListener
+        };
+        turtle.endOfClampSignals = {
+            10: ["_interval_0"],
+            20: ["_volume_0", "_articulation_0_20"]
+        };
+
+        logo.doStopTurtles();
+
+        // Stale listeners removed from stage
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "_interval_0",
+            intervalListener,
+            false
+        );
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "_volume_0",
+            volumeListener,
+            false
+        );
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "_articulation_0_20",
+            articulationListener,
+            false
+        );
+        expect(turtle.listeners).toEqual({});
+
+        // All pending clamp signals purged on stop
+        expect(turtle.endOfClampSignals).toEqual({});
+
+        // Stale signals cannot be dispatched later by dispatchUnissuedSignals
+        mockActivity.stage.dispatchEvent.mockClear();
+        logo.dispatchUnissuedSignals(turtle);
+        expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalled();
+    });
+
+    test("normal clamp completion preserves dispatchUnissuedSignals and cleans up normally", () => {
+        turtle.endOfClampSignals = { 10: ["_interval_0"] };
+        turtle.butNotThese = {};
+        turtle.singer = { runningFromEvent: false };
+
+        logo.dispatchUnissuedSignals(turtle);
+
+        expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_interval_0");
+        expect(turtle.endOfClampSignals[10][0]).toBeNull();
+    });
+
     describe("with Transport and audio streams", () => {
         let turtle0;
         let turtle1;
