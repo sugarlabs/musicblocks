@@ -1682,12 +1682,12 @@ body.highcontrast #themedropdown.dropdown-content li > a:hover {
 
 /* Music Keyboard Widget & Keys across themes */
 table.white > tbody > tr > td {
-    background-color: #ffffff !important;
+    background-color: #ffffff;
     color: #000000 !important;
 }
 
 table.black > tbody > tr > td:not(.spacer) {
-    background-color: #000000 !important;
+    background-color: #000000;
     color: #ffffff !important;
 }
 
