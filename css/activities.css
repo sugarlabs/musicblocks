@@ -374,6 +374,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 @media (max-width: 600px) {
     [data-multisample-editor] {
         width: 100%;
+        box-sizing: border-box;
     }
 
     [data-multisample-editor] .multisample-row-controls label {
