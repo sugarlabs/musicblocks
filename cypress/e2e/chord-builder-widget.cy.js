@@ -191,6 +191,7 @@ describe("Chord Builder widget", () => {
         // Clicking card auditions the chord without adding to progression
         chordBuilderFrame().find(".diatonic-chord-card").eq(0).click();
         cy.get("@playChord").should("have.been.calledOnce");
+        cy.get("@playChord").its("firstCall.returnValue").should("be.true");
 
         // Progression grid remains empty initially
         chordBuilderFrame().find(".bar-grid-cell").first().should("contain.text", "+");
@@ -202,6 +203,7 @@ describe("Chord Builder widget", () => {
             .focus()
             .trigger("keydown", { key: "Enter" });
         cy.get("@playChord").should("have.been.calledTwice");
+        cy.get("@playChord").its("secondCall.returnValue").should("be.true");
         chordBuilderFrame().find(".bar-grid-cell").first().should("contain.text", "+");
 
         chordBuilderFrame()
@@ -210,6 +212,7 @@ describe("Chord Builder widget", () => {
             .focus()
             .trigger("keydown", { key: " " });
         cy.get("@playChord").should("have.been.calledThrice");
+        cy.get("@playChord").its("thirdCall.returnValue").should("be.true");
         chordBuilderFrame().find(".bar-grid-cell").first().should("contain.text", "+");
     });
 
@@ -401,6 +404,18 @@ describe("Chord Builder widget", () => {
                 newNoteBlocks,
                 "newnote blocks must be created inside chord clamps"
             ).to.have.length(4);
+
+            // Verify each chordinterval block's clamp body connection points to a newnote block
+            chordBlocks.forEach(chordBlock => {
+                const bodyBlockIndex = chordBlock.connections[2];
+                expect(bodyBlockIndex, "chordinterval clamp must connect to body block").to.not.be
+                    .null;
+                const bodyBlock = blocks.blockList[bodyBlockIndex];
+                expect(bodyBlock, "connected body block must exist in blockList").to.exist;
+                expect(bodyBlock.name, "chordinterval clamp body must be a newnote block").to.equal(
+                    "newnote"
+                );
+            });
 
             const pitchBlocks = blocks.blockList.filter(b => !b.trash && b.name === "pitch");
             expect(pitchBlocks, "pitch blocks must be created for chord roots").to.have.length(4);
