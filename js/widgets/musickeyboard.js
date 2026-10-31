@@ -14,15 +14,15 @@
 /*
    global
 
-   docById, platformColor, FIXEDSOLFEGE, FIXEDSOLFEGE1, SHARP, FLAT,
-   last, ManagedTimer, Singer, noteToFrequency, i18nSolfege, toFraction,
-   DEFAULTVOICE, SOLFEGECONVERSIONTABLE, NOTESSHARP, NOTESFLAT, PITCHES,
-   PITCHES2, convertFromSolfege, announceToScreenReader, MusicKeyboardEditing,
-   MusicKeyboardRendering, getCurrentEDO, generateNoteNames, isEquallyTempered */
+   platformColor, FIXEDSOLFEGE, FIXEDSOLFEGE1, SHARP, FLAT, last, ManagedTimer,
+   Singer, noteToFrequency, i18nSolfege, toFraction, DEFAULTVOICE,
+   SOLFEGECONVERSIONTABLE, PITCHES, PITCHES2, convertFromSolfege,
+   announceToScreenReader, MusicKeyboardEditing, MusicKeyboardRendering,
+   MusicKeyboardPlayback, MusicKeyboardInput */
 /*
    Global Locations
     - js/utils/utils.js
-        _, docById, last, debugLog
+        _, last, debugLog
     - js/utils/ManagedTimer.js
         ManagedTimer
     - js/turtle-singer.js
@@ -30,14 +30,17 @@
     - js/utils/musicutils.js
         noteToFrequency, FIXEDSOLFEGE, FIXEDSOLFEGE1, SHARP, FLAT,
         i18nSolfege, toFraction, DEFAULTVOICE, PITCHES, PITCHES2,
-        SOLFEGECONVERSIONTABLE, NOTESSHARP, NOTESFLAT, convertFromSolfege,
-        getCurrentEDO, generateNoteNames, isEquallyTempered
+        SOLFEGECONVERSIONTABLE, convertFromSolfege
     - js/utils/platformstyle.js
         platformColor
     - js/widgets/MusicKeyboardEditing.js
         MusicKeyboardEditing
     - js/widgets/MusicKeyboardRendering.js
         MusicKeyboardRendering
+    - js/widgets/MusicKeyboardPlayback.js
+        MusicKeyboardPlayback
+    - js/widgets/MusicKeyboardInput.js
+        MusicKeyboardInput
 */
 /* exported MusicKeyboard */
 
@@ -45,6 +48,8 @@
 MusicKeyboard.dependencies = [
     "widgets/MusicKeyboardEditing",
     "widgets/MusicKeyboardRendering",
+    "widgets/MusicKeyboardPlayback",
+    "widgets/MusicKeyboardInput",
     "widgets/musickeyboard"
 ];
 
@@ -397,27 +402,6 @@ function MusicKeyboard(activity) {
      */
     this.firstNote = false;
 
-    // Turn off metronome and release timer/audio resources owned by it.
-    this.stopMetronome = () => {
-        if (this.tickButton) {
-            this.tickButton.style.removeProperty("background");
-        }
-        if (this.tick && this.loopTick) {
-            this.loopTick.stop();
-        }
-        this.tick = false;
-        this.firstNote = false;
-        this.metronomeON = false;
-        const countdownContainer = this._mkbEl("countdownContainer");
-        if (countdownContainer) {
-            countdownContainer.remove();
-        }
-        if (this.metronomeInterval) {
-            this._clearWidgetInterval(this.metronomeInterval);
-            this.metronomeInterval = null;
-        }
-    };
-
     /**
      * Array of selected notes.
      * @type {Array}
@@ -451,32 +435,6 @@ function MusicKeyboard(activity) {
         }
 
         this._rowBlocks.push(rowBlock);
-    };
-
-    /**
-     * Rebuilds the play button's icon/label to reflect whether playback is
-     * currently active.
-     * @param {HTMLElement} playButtonCell - The play button element.
-     * @param {boolean} isPlaying - Whether playback is currently active.
-     */
-    this._updatePlayButtonIcon = (playButtonCell, isPlaying) => {
-        playButtonCell.replaceChildren(
-            document.createTextNode("\u00a0\u00a0"),
-            (() => {
-                const img = document.createElement("img");
-                img.src = isPlaying
-                    ? "header-icons/stop-button.svg"
-                    : "header-icons/play-button.svg";
-                img.title = isPlaying ? _("Stop") : _("Play");
-                img.alt = isPlaying ? _("Stop") : _("Play");
-                img.height = ICONSIZE;
-                img.width = ICONSIZE;
-                img.style.verticalAlign = "middle";
-                img.style.alignContent = "center";
-                return img;
-            })(),
-            document.createTextNode("\u00a0\u00a0")
-        );
     };
 
     /**
@@ -534,249 +492,6 @@ function MusicKeyboard(activity) {
                 });
             }
         }
-    };
-
-    /**
-     * Adds keyboard shortcuts for triggering musical notes.
-     */
-    this.addKeyboardShortcuts = function () {
-        let duration = 0;
-        const startTime = {};
-        const temp1 = {};
-        const temp2 = {};
-        const current = new Set();
-        let chordBuffer = {};
-        let extraNoteCount = 0;
-        let startTimeNotes = 0;
-
-        const isTextEntryActive = () => {
-            const activeElement = document.activeElement;
-            return (
-                activeElement &&
-                (activeElement.tagName === "INPUT" ||
-                    activeElement.tagName === "TEXTAREA" ||
-                    activeElement.isContentEditable)
-            );
-        };
-
-        /**
-         * Gets the ID of the musical note associated with a keyboard event.
-         * @param {KeyboardEvent} event - The keyboard event.
-         * @returns {string} The ID of the musical note.
-         */
-        const __getNoteId = event => {
-            let id;
-            const key = event.keyCode;
-
-            if (WHITEKEYS.includes(key)) {
-                id = `whiteRow${WHITEKEYS.indexOf(key)}`;
-            } else if (BLACKKEYS.includes(key)) {
-                const i = BLACKKEYS.indexOf(key);
-                if ([2, 6, 9, 13, 16, 20].includes(i)) return null;
-                id = `blackRow${i}`;
-            } else if (HERTZKEYS.includes(key)) {
-                id = `hertzRow${HERTZKEYS.indexOf(key)}`;
-            } else if (key === SPACE) {
-                id = "rest";
-            }
-
-            return id;
-        };
-
-        /**
-         * Handles the start of a musical note when a keyboard key is pressed.
-         * @param {KeyboardEvent} event - The keyboard event.
-         */
-        const __startNote = event => {
-            const id = __getNoteId(event);
-
-            const ele = this._mkbEl(id);
-            if (!(id in startTime)) {
-                startTime[id] = new Date().getTime();
-            }
-
-            if (ele !== null && ele !== undefined) {
-                ele.style.backgroundColor = platformColor.orange;
-                temp1[id] = ele.getAttribute("alt").split("__")[0];
-                if (temp1[id] === "hertz") {
-                    temp2[id] = parseInt(ele.getAttribute("alt").split("__")[1], 10);
-                } else {
-                    temp2[id] = resolveSynthNoteName(
-                        temp1[id],
-                        ele.getAttribute("alt").split("__")[1]
-                    );
-                }
-
-                if (id === "rest") {
-                    return;
-                }
-
-                // Check if it is a chord
-                if (Object.keys(chordBuffer).length === 0) {
-                    chordBuffer[id] = temp2[id];
-                    startTimeNotes = Math.floor(startTime[id] / 100);
-                } else if (startTimeNotes === Math.floor(startTime[id] / 100)) {
-                    chordBuffer[id] = temp2[id];
-                    extraNoteCount++;
-                } else {
-                    extraNoteCount = 0;
-                    chordBuffer = {};
-                }
-
-                this.activity.logo.synth.trigger(
-                    0,
-                    temp2[id],
-                    1,
-                    this.instrumentMapper[id],
-                    null,
-                    null
-                );
-
-                if (this.tick && this.endTime !== undefined && this.firstNote) {
-                    let restDuration = (startTime[id] - this.endTime) / 1000.0;
-                    restDuration /= 60; // Convert time to minutes
-                    restDuration *= this.bpm;
-                    restDuration *= this.meterArgs[1];
-                    restDuration = parseFloat((Math.round(restDuration * unit) / unit).toFixed(4));
-                    const EPSILON = 0.06;
-
-                    if (restDuration > EPSILON && current.size === 0) {
-                        this._notesPlayed.push({
-                            startTime: this.endTime,
-                            noteOctave: "R",
-                            objId: null,
-                            duration: parseFloat(restDuration)
-                        });
-                    }
-                }
-                this.firstNote = true;
-            }
-        };
-
-        /**
-         * Handles the keyboard key down event to start playing musical notes.
-         * @param {KeyboardEvent} event - The keyboard event triggered when a key is pressed down.
-         */
-        const __keyboarddown = event => {
-            if (isTextEntryActive()) return;
-
-            if (event.shiftKey && (event.key === "ArrowUp" || event.code === "ArrowUp")) {
-                event.preventDefault();
-                this.shiftOctave(1);
-                return;
-            }
-            if (event.shiftKey && (event.key === "ArrowDown" || event.code === "ArrowDown")) {
-                event.preventDefault();
-                this.shiftOctave(-1);
-                return;
-            }
-            if (current.has(event.keyCode)) return;
-
-            __startNote(event);
-            current.add(event.keyCode);
-        };
-
-        /**
-         * Handles the keyboard key up event to stop playing musical notes.
-         * @param {KeyboardEvent} event - The keyboard event triggered when a key is released.
-         */
-        const __endNote = event => {
-            const id = __getNoteId(event);
-            const ele = this._mkbEl(id);
-            const newDate = new Date();
-            const noteEndTime = newDate.getTime();
-            duration = (noteEndTime - startTime[id]) / 1000.0;
-
-            if (ele !== null && ele !== undefined) {
-                if (id.includes("blackRow")) {
-                    ele.style.backgroundColor = "black";
-                } else {
-                    ele.style.backgroundColor = "white";
-                }
-
-                let processedDuration = duration / 60;
-                processedDuration *= this.bpm;
-                processedDuration *= this.meterArgs[1];
-                processedDuration = parseFloat(
-                    (Math.round(processedDuration * unit) / unit).toFixed(4)
-                );
-
-                if (processedDuration <= 0) {
-                    processedDuration = 1 / unit;
-                }
-
-                if (id === "rest") {
-                    this._notesPlayed.push({
-                        startTime: startTime[id],
-                        noteOctave: "R",
-                        objId: null,
-                        duration: parseFloat(processedDuration)
-                    });
-                } else {
-                    this.activity.logo.synth.stopSound(0, this.instrumentMapper[id], temp2[id]);
-                    // Handle Chord
-                    if (id in chordBuffer) {
-                        Object.entries(chordBuffer).forEach(([id, noteOctave]) => {
-                            this._notesPlayed.push({
-                                startTime: startTimeNotes * 100,
-                                noteOctave: noteOctave,
-                                objId: id,
-                                duration: processedDuration,
-                                voice: this.instrumentMapper[id],
-                                blockNumber: this.blockNumberMapper[id]
-                            });
-                            delete chordBuffer[id];
-                        });
-                    } else if (extraNoteCount > 0) {
-                        extraNoteCount--;
-                    }
-                    // Handle Single Notes
-                    else {
-                        this._notesPlayed.push({
-                            startTime: startTime[id],
-                            noteOctave: temp2[id],
-                            objId: id,
-                            duration: processedDuration,
-                            voice: this.instrumentMapper[id],
-                            blockNumber: this.blockNumberMapper[id]
-                        });
-                        chordBuffer = {};
-                    }
-                }
-
-                this._createTable();
-                this._updateWidgetWindowSize();
-                this.endTime = noteEndTime;
-                startTimeNotes = 0;
-                delete startTime[id];
-                delete temp1[id];
-                delete temp2[id];
-            }
-        };
-
-        /**
-         * Handles the end of a musical note when a key is released.
-         * @param {KeyboardEvent} event - The keyboard event.
-         */
-        const __keyboardup = function (event) {
-            // Only release keys this keyboard started, so a keyup that arrives
-            // after focus moved cannot record a note with no matching keydown.
-            if (!current.has(event.keyCode)) return;
-
-            current.delete(event.keyCode);
-            __endNote(event);
-        };
-
-        // Ends any physical keys this keyboard is still holding. Called when it
-        // hands the document key handlers to another keyboard.
-        this._releaseActiveNotes = () => {
-            for (const keyCode of Array.from(current)) {
-                current.delete(keyCode);
-                __endNote({ keyCode });
-            }
-        };
-
-        this._registerDocumentKeyHandlers(__keyboarddown, __keyboardup);
     };
 
     /**
@@ -1244,189 +959,6 @@ function MusicKeyboard(activity) {
     };
 
     /**
-     * Plays the selected musical notes.
-     * If no notes are selected, the function returns early.
-     */
-    this.playAll = function () {
-        if (selectedNotes.length <= 0) {
-            return;
-        }
-
-        this.playingNow = !this.playingNow;
-        const playButtonCell = this.playButton;
-
-        if (this.playingNow) {
-            this._updatePlayButtonIcon(playButtonCell, true);
-
-            if (selectedNotes.length < 1) {
-                return;
-            }
-
-            const notes = [];
-            let ele, zx, res, cell;
-            for (let i = 0; i < selectedNotes[0].noteOctave.length; i++) {
-                if (this.keyboardShown && selectedNotes[0].objId[0] !== null) {
-                    ele = this._mkbEl(selectedNotes[0].objId[i]);
-                    if (ele !== null) {
-                        ele.style.backgroundColor = "lightgrey";
-                    }
-                }
-
-                zx = selectedNotes[0].noteOctave[i];
-                res = zx;
-                if (typeof zx === "string") {
-                    res = zx.replace(SHARP, "#").replace(FLAT, "b");
-                }
-
-                notes.push(res);
-            }
-
-            if (!this.keyboardShown) {
-                cell = this._mkbEl("cells-0");
-                cell.style.backgroundColor = platformColor.selectorBackground;
-            }
-
-            this._stopOrCloseClicked = false;
-            this._clearPlaybackTimers();
-
-            // Convert durations to seconds based on BPM
-            const durationInSeconds = selectedNotes[0].duration.map(
-                beatDuration => (beatDuration * 60 * 4) / this.bpm
-            );
-            this._playChord(notes, durationInSeconds, selectedNotes[0].voice);
-            const maxDuration = Math.max(...durationInSeconds);
-            this.playOne(1, maxDuration, playButtonCell);
-        } else {
-            if (!this.keyboardShown) {
-                this._createTable();
-            } else {
-                this._createKeyboard();
-            }
-
-            this._stopOrCloseClicked = true;
-            this._clearPlaybackTimers();
-            this._updatePlayButtonIcon(playButtonCell, false);
-        }
-    };
-
-    /**
-     * Plays a sequence of musical notes recursively with a specified time delay.
-     *
-     * @param {number} counter - The index of the current note in the sequence.
-     * @param {number} time - The time duration of the current note.
-     * @param {HTMLElement} playButtonCell - The HTML element representing the play button.
-     */
-    this.playOne = function (counter, time, playButtonCell) {
-        if (this._playOneTimeout) {
-            this._clearWidgetTimeout(this._playOneTimeout);
-            this._playOneTimeout = null;
-        }
-        this._playOneTimeout = this._setWidgetTimeout(() => {
-            this._playOneTimeout = null;
-            let cell, eleid, ele, notes, zx, res, maxDuration;
-            if (counter < selectedNotes.length) {
-                if (this._stopOrCloseClicked) {
-                    return;
-                }
-
-                if (!this.keyboardShown) {
-                    cell = this._mkbEl("cells-" + counter);
-                    cell.style.backgroundColor = platformColor.selectorBackground;
-                }
-
-                if (this.keyboardShown && selectedNotes[counter - 1].objId[0] !== null) {
-                    for (let i = 0; i < selectedNotes[counter - 1].noteOctave.length; i++) {
-                        eleid = selectedNotes[counter - 1].objId[i];
-                        ele = this._mkbEl(eleid);
-                        if (eleid.includes("blackRow")) {
-                            ele.style.backgroundColor = "black";
-                        } else {
-                            ele.style.backgroundColor = "white";
-                        }
-                    }
-                }
-
-                notes = [];
-                for (let i = 0; i < selectedNotes[counter].noteOctave.length; i++) {
-                    if (this.keyboardShown && selectedNotes[counter].objId[0] !== null) {
-                        /*
-                        id = this.idContainer.findIndex((ele) => {
-                            return ele[1] === selectedNotes[counter].objId[i];
-                        });
-                        */
-
-                        ele = this._mkbEl(selectedNotes[counter].objId[i]);
-                        if (ele !== null) {
-                            ele.style.backgroundColor = "lightgrey";
-                        }
-                    }
-
-                    zx = selectedNotes[counter].noteOctave[i];
-                    res = zx;
-                    if (typeof zx === "string") {
-                        res = zx.replace(SHARP, "#").replace(FLAT, "b");
-                    }
-                    notes.push(res);
-                }
-
-                if (this.playingNow) {
-                    const durationInSeconds = selectedNotes[counter].duration.map(
-                        beatDuration => (beatDuration * 60 * 4) / this.bpm
-                    );
-
-                    this._playChord(notes, durationInSeconds, selectedNotes[counter].voice);
-                }
-
-                maxDuration = Math.max(
-                    ...selectedNotes[counter].duration.map(
-                        beatDuration => (beatDuration * 60 * 4) / this.bpm
-                    )
-                );
-
-                this.playOne(counter + 1, maxDuration, playButtonCell);
-            } else {
-                this._updatePlayButtonIcon(playButtonCell, false);
-                this.playingNow = false;
-                if (!this.keyboardShown) {
-                    this._createTable();
-                } else {
-                    this._createKeyboard();
-                }
-                this._updateWidgetWindowSize();
-            }
-        }, time * 1000);
-    };
-
-    /**
-     * Plays a chord (multiple notes simultaneously) using a synthesizer.
-     *
-     * @param {string[]} notes - Array of note names to be played as a chord.
-     * @param {number[]} noteValue - Array of note values (durations) for each note in the chord.
-     * @param {string[]} instruments - Array of instrument names or identifiers for each note.
-     */
-    this._playChord = (notes, noteValue, instruments) => {
-        if (notes[0] === "R") {
-            return;
-        }
-
-        for (let i = 0; i < notes.length; i++) {
-            const id = this._setWidgetTimeout(() => {
-                this.activity.logo.synth.trigger(
-                    0,
-                    notes[i],
-                    noteValue[0],
-                    instruments[i],
-                    null,
-                    null
-                );
-            }, 1);
-            if (id) {
-                this._chordTimeouts.push(id);
-            }
-        }
-    };
-
-    /**
      * Fills chromatic gaps in a given list of notes by padding with missing notes.
      *
      * @param {Object[]} noteList - List of notes represented as dictionaries containing `noteName` and `noteOctave`.
@@ -1720,6 +1252,24 @@ function MusicKeyboard(activity) {
         beginnerMode,
         resolveSynthNoteName,
         fillChromaticGaps
+    });
+
+    // Playback lives in MusicKeyboardPlayback.js: the Play button, highlighting the
+    // keys as the recorded notes play, and stopping the metronome.
+    MusicKeyboardPlayback.install.call(this, {
+        ICONSIZE,
+        getSelectedNotes: () => selectedNotes
+    });
+
+    // Live input lives in MusicKeyboardInput.js: the computer keyboard, Shift + Arrow
+    // octave shifts, and MIDI devices.
+    MusicKeyboardInput.install.call(this, {
+        BLACKKEYS,
+        WHITEKEYS,
+        HERTZKEYS,
+        SPACE,
+        unit,
+        resolveSynthNoteName
     });
 
     this._save = function () {
@@ -2024,273 +1574,6 @@ function MusicKeyboard(activity) {
     this.clearBlocks = function () {
         this.noteNames = [];
         this.octaves = [];
-    };
-
-    /**
-     * Rebuilds the MIDI pitch-to-key map from the current keyboard layout.
-     * @private
-     * @memberof MusicKeyboard
-     */
-    this._refreshNoteToKeyMap = () => {
-        this.noteToKeyMap = {};
-        const temperament = this.activity.logo.synth.inTemperament;
-        const mapEnharmonics = getCurrentEDO(temperament) === 12 && isEquallyTempered(temperament);
-
-        for (let idx = 0; idx < this.layout.length; idx++) {
-            const key = this.layout[idx];
-            if (key) {
-                this.noteToKeyMap[key.noteName.toString() + key.noteOctave.toString()] = key.objId;
-                if (FIXEDSOLFEGE1 && FIXEDSOLFEGE1[key.noteName.toString()]) {
-                    this.noteToKeyMap[
-                        FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave
-                    ] = key.objId; //convet solfege to alphabetic.
-                }
-                if (mapEnharmonics) {
-                    const pitch = FIXEDSOLFEGE1[key.noteName] || key.noteName;
-                    const step = NOTESFLAT.indexOf(pitch);
-                    if (step !== -1) {
-                        this.noteToKeyMap[NOTESSHARP[step] + key.noteOctave] ??= key.objId;
-                    }
-                }
-            }
-        }
-    };
-
-    /**
-     * Initiates MIDI functionality, allowing notes to be triggered by user interaction.
-     * @memberof MusicKeyboard
-     */
-    this.doMIDI = () => {
-        let duration = 0;
-        let startTime = 0;
-
-        this._refreshNoteToKeyMap();
-
-        /**
-         * Handler for starting a note on MIDI interaction.
-         * @param {MouseEvent} event - The mouse event triggering the note start.
-         * @param {HTMLElement} element - The HTML element representing the note.
-         */
-        const __startNote = (event, element) => {
-            if (!element) return;
-            startTime = event.timeStamp; // Milliseconds();
-            element.style.backgroundColor = platformColor.orange;
-            this.activity.logo.synth.trigger(
-                0,
-                this.noteMapper[element.id],
-                1,
-                this.instrumentMapper[element.id],
-                null,
-                null
-            );
-        };
-
-        /**
-         * Handler for ending a note on MIDI interaction.
-         * @param {MouseEvent} event - The mouse event triggering the note end.
-         * @param {HTMLElement} element - The HTML element representing the note.
-         */
-        const __endNote = (event, element) => {
-            if (!element) return;
-
-            const id = element.id;
-            if (id.includes("blackRow")) {
-                element.style.backgroundColor = "black";
-            } else {
-                element.style.backgroundColor = "white";
-            }
-
-            const now = event.timeStamp;
-            duration = now - startTime;
-            duration /= 1000;
-            this.activity.logo.synth.stopSound(
-                0,
-                this.instrumentMapper[element.id],
-                this.noteMapper[element.id]
-            );
-            duration = this._roundNoteDuration(duration);
-
-            this._notesPlayed.push({
-                startTime: startTime,
-                noteOctave: this.noteMapper[element.id],
-                objId: element.id,
-                duration: duration,
-                voice: this.instrumentMapper[element.id],
-                blockNumber: this.blockNumberMapper[element.id]
-            });
-            this._createTable();
-        };
-
-        /**
-         * Converts a MIDI note number to a pitch and octave.
-         * @param {number} num - The MIDI note number.
-         * @returns {Array<string>} An array containing two possible pitch names and the octave.
-         * @memberof MusicKeyboard
-         */
-        const numberToPitch = num => {
-            const offset = 4;
-            const currentEDO = getCurrentEDO(this.activity.logo.synth.inTemperament);
-            const octave = offset + Math.floor((num - 60) / currentEDO);
-            const noteNames = generateNoteNames(currentEDO);
-            const pitch1 = noteNames[num % currentEDO];
-            return [pitch1, pitch1, octave];
-        };
-
-        //event attributes : timeStamp , data
-        //data : length -3 [0] : 144/128 : noteOn/NoteOff
-        //                 [1] : noteNumber : middle C always 60
-        //                 [2] : velocity ,(currently not used).
-
-        /**
-         * Handles MIDI messages, triggering note start or end events based on the MIDI data.
-         * @param {MIDIMessageEvent} event - The MIDI message event containing note information.
-         * @memberof MusicKeyboard
-         */
-        const onMIDIMessage = event => {
-            const pitchOctave = numberToPitch(event.data[1]);
-            const pitch1 = pitchOctave[0];
-            const pitch2 = pitchOctave[1];
-            const octave = pitchOctave[2];
-            const key =
-                this.noteToKeyMap[pitch1 + "" + octave] || this.noteToKeyMap[pitch2 + "" + octave];
-            if (event.data[0] === 144 && event.data[2] !== 0) {
-                __startNote(event, this._mkbEl(key));
-            } else {
-                __endNote(event, this._mkbEl(key));
-            }
-        };
-
-        /**
-         * Success callback function triggered upon receiving MIDI access.
-         * Initializes MIDI widget and sets up MIDI event handlers.
-         * @param {MIDIAccess} midiAccess - The MIDI access object containing MIDI inputs and outputs.
-         * @memberof MusicKeyboard
-         */
-        const onMIDISuccess = midiAccess => {
-            this.midiAccess = midiAccess;
-            if (this._midiClosed) return;
-            // re-init widget
-            if (this.midiON) {
-                this.midiButton.style.background = "#00FF00";
-                activity.textMsg(_("MIDI device present."), 3000);
-                return;
-            }
-            this._midiHandler = onMIDIMessage;
-            this._midiInputs = this._midiInputs || new Set();
-            midiAccess.inputs.forEach(input => {
-                if (this._midiInputs.has(input)) return;
-                input.addEventListener("midimessage", onMIDIMessage);
-                this._midiInputs.add(input);
-            });
-            if (midiAccess.inputs.size) {
-                this.midiButton.style.background = "#00FF00";
-                activity.textMsg(_("MIDI device present."), 3000);
-                this.midiON = true;
-            } else {
-                activity.textMsg(_("No MIDI device found."), 3000);
-            }
-        };
-
-        /**
-         * Failure callback function triggered upon failing to get MIDI access in the browser.
-         * Displays an error message and updates MIDI state accordingly.
-         * @memberof MusicKeyboard
-         */
-        const onMIDIFailure = () => {
-            activity.errorMsg(_("Failed to get MIDI access in browser."), 3000);
-            this.midiON = false;
-        };
-
-        /**
-         * Requests MIDI access from the browser and initializes MIDI-related functionality.
-         * Calls success or failure callback functions based on the result of the request.
-         * @memberof MusicKeyboard
-         */
-        navigator.requestMIDIAccess({ sysex: true }).then(onMIDISuccess, onMIDIFailure);
-    };
-
-    /**
-     * Shifts keyboard octaves higher (+1) or lower (-1).
-     * @param {number} delta
-     */
-    this.shiftOctave = function (delta) {
-        if (!this.octaves || this.octaves.length === 0) return;
-
-        // Filter octaves for pitched notes only (exclude "hertz")
-        const pitchedOctaves = [];
-        for (let i = 0; i < this.octaves.length; i++) {
-            if (this.noteNames && this.noteNames[i] !== "hertz") {
-                pitchedOctaves.push(this.octaves[i]);
-            }
-        }
-        if (pitchedOctaves.length === 0) return;
-
-        const minOct = Math.min(...pitchedOctaves);
-        const maxOct = Math.max(...pitchedOctaves);
-
-        if (delta > 0 && maxOct >= 8) return;
-        if (delta < 0 && minOct <= 1) return;
-
-        for (let i = 0; i < this.octaves.length; i++) {
-            if (this.noteNames && this.noteNames[i] !== "hertz") {
-                this.octaves[i] += delta;
-            }
-        }
-
-        if (this.displayLayout) {
-            for (let i = 0; i < this.displayLayout.length; i++) {
-                if (
-                    this.displayLayout[i].noteName !== "hertz" &&
-                    this.displayLayout[i].noteOctave !== undefined
-                ) {
-                    this.displayLayout[i].noteOctave += delta;
-                }
-            }
-        }
-
-        if (this.layout) {
-            for (let i = 0; i < this.layout.length; i++) {
-                if (
-                    this.layout[i].noteName !== "hertz" &&
-                    this.layout[i].noteOctave !== undefined
-                ) {
-                    this.layout[i].noteOctave += delta;
-                }
-            }
-        }
-
-        // Update note mappings and key element labels
-        if (this.displayLayout && typeof docById === "function") {
-            for (let i = 0; i < this.displayLayout.length; i++) {
-                const item = this.displayLayout[i];
-                if (item.noteName !== "hertz") {
-                    const elem = this._mkbEl("cell-" + i) || this._mkbEl("blackRow" + i);
-                    if (elem) {
-                        const newSynthName = resolveSynthNoteName(item.noteName, item.noteOctave);
-                        if (this.noteMapper && elem.id) {
-                            this.noteMapper[elem.id] = newSynthName;
-                        }
-                        if (typeof elem.setAttribute === "function") {
-                            elem.setAttribute("alt", newSynthName);
-                            elem.setAttribute("title", newSynthName);
-                        }
-
-                        if (elem.childNodes && elem.childNodes.length > 0) {
-                            for (let j = 0; j < elem.childNodes.length; j++) {
-                                const node = elem.childNodes[j];
-                                if (node.nodeType === 3) {
-                                    node.textContent = `${item.noteName}${item.noteOctave}`;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (typeof this._createTable === "function") {
-            this._createTable();
-        }
     };
 }
 

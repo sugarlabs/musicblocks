@@ -18,6 +18,8 @@ const ManagedTimer = require("../../utils/ManagedTimer");
 // by the constructor, so they must be global before a keyboard is made.
 global.MusicKeyboardEditing = require("../MusicKeyboardEditing.js");
 global.MusicKeyboardRendering = require("../MusicKeyboardRendering.js");
+global.MusicKeyboardPlayback = require("../MusicKeyboardPlayback.js");
+global.MusicKeyboardInput = require("../MusicKeyboardInput.js");
 const MusicKeyboard = require("../musickeyboard.js");
 
 // Shared across instances. reset between tests.
