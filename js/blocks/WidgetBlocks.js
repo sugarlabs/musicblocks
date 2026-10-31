@@ -1451,6 +1451,8 @@ function setupWidgetBlocks(activity) {
                         [
                             "widgets/MusicKeyboardEditing",
                             "widgets/MusicKeyboardRendering",
+                            "widgets/MusicKeyboardPlayback",
+                            "widgets/MusicKeyboardInput",
                             "widgets/musickeyboard"
                         ]
                     ),
