@@ -1505,8 +1505,9 @@ describe("Chords", () => {
 describe("Key and meter changes inside a tune", () => {
     const parse = abc => parseAndCapture(ABCJS.parseOnly(abc)[0]);
 
-    // What one voice plays, in order: each note as name and octave, each key
-    // change as K:root mode and each meter change as M:num/den.
+    // What one voice plays, in order, with repeats played twice: each note as
+    // name and octave, each key change as K:root mode and each meter change as
+    // M:num/den.
     const scoreOrder = (blocks, voice = 0) => {
         const byId = new Map(blocks.map(b => [b[0], b]));
         const type = b => (Array.isArray(b[1]) ? b[1][0] : b[1]);
@@ -1517,7 +1518,10 @@ describe("Key and meter changes inside a tune", () => {
         const out = [];
         const run = block => {
             for (; block; block = byId.get(block[4][block[4].length - 1])) {
-                if (type(block) === "nameddo") {
+                if (type(block) === "repeat") {
+                    run(byId.get(block[4][2]));
+                    run(byId.get(block[4][2]));
+                } else if (type(block) === "nameddo") {
                     run(byId.get(actions.get(value(block[0]))[4][1]));
                 } else if (type(block) === "newnote") {
                     const pitch = byId.get(byId.get(block[4][2])[4][1]);
@@ -1679,7 +1683,23 @@ describe("Key and meter changes inside a tune", () => {
     test("a key change that starts a repeated section plays inside the repeat", async () => {
         const blocks = await parse("X:1\nM:4/4\nL:1/4\nK:C\nC D E F |: [K:D] F G A B :|]\n");
 
-        expect(playOrder(blocks)).toBe("CDEFF♯GABF♯GAB");
+        // The key block plays on both passes, not just once before the repeat.
+        expect(scoreOrder(blocks)).toEqual([
+            "C4",
+            "D4",
+            "E4",
+            "F4",
+            "K:D major",
+            "F♯4",
+            "G4",
+            "A4",
+            "B4",
+            "K:D major",
+            "F♯4",
+            "G4",
+            "A4",
+            "B4"
+        ]);
         expectLinked(blocks);
     });
 });
