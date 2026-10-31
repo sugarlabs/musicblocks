@@ -37,8 +37,16 @@ describe("MeterWidget Defensive Initialization", () => {
             logo._meterBlock = meterBlockId;
 
             return new Cypress.Promise((resolve, reject) => {
+                // The widget block loads the Meter widget modules with it.
                 win.require(
-                    ["widgets/meterwidget"],
+                    [
+                        "widgets/MeterWidgetWindow",
+                        "widgets/MeterWidgetMeter",
+                        "widgets/MeterWidgetPlayback",
+                        "widgets/MeterWidgetWheel",
+                        "widgets/MeterWidgetSave",
+                        "widgets/meterwidget"
+                    ],
                     () => {
                         try {
                             // Initialize the widget
