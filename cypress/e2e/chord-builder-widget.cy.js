@@ -183,8 +183,14 @@ describe("Chord Builder widget", () => {
     it("supports auditioning chords via card click and keyboard activation", () => {
         openChordBuilderWidget();
 
+        cy.window().then(win => {
+            const { logo } = win.ActivityContext.getActivity();
+            cy.spy(logo.chordBuilderWidget.audio, "playChord").as("playChord");
+        });
+
         // Clicking card auditions the chord without adding to progression
         chordBuilderFrame().find(".diatonic-chord-card").eq(0).click();
+        cy.get("@playChord").should("have.been.calledOnce");
 
         // Progression grid remains empty initially
         chordBuilderFrame().find(".bar-grid-cell").first().should("contain.text", "+");
@@ -195,12 +201,16 @@ describe("Chord Builder widget", () => {
             .eq(3) // IV (F)
             .focus()
             .trigger("keydown", { key: "Enter" });
+        cy.get("@playChord").should("have.been.calledTwice");
+        chordBuilderFrame().find(".bar-grid-cell").first().should("contain.text", "+");
 
         chordBuilderFrame()
             .find(".diatonic-chord-card")
             .eq(4) // V (G)
             .focus()
             .trigger("keydown", { key: " " });
+        cy.get("@playChord").should("have.been.calledThrice");
+        chordBuilderFrame().find(".bar-grid-cell").first().should("contain.text", "+");
     });
 
     // -- Test 4: Meter controls and bar-grid dimensions ----------------------
@@ -374,14 +384,22 @@ describe("Chord Builder widget", () => {
         chordBuilderFrame().find("#chordSaveBtn").click();
 
         // Workspace blockList should now contain generated chordinterval blocks
-        cy.window().should(win => {
+        cy.window({ timeout: 30000 }).should(win => {
             const { blocks } = win.ActivityContext.getActivity();
+            expect(blocks._loadCounter, "block loading should be finished").to.equal(0);
+
             const chordBlocks = blocks.blockList.filter(
                 b => !b.trash && b.name === "chordinterval"
             );
             expect(
                 chordBlocks,
                 "chordinterval blocks must be loaded onto the canvas"
+            ).to.have.length(4);
+
+            const newNoteBlocks = blocks.blockList.filter(b => !b.trash && b.name === "newnote");
+            expect(
+                newNoteBlocks,
+                "newnote blocks must be created inside chord clamps"
             ).to.have.length(4);
 
             const pitchBlocks = blocks.blockList.filter(b => !b.trash && b.name === "pitch");
