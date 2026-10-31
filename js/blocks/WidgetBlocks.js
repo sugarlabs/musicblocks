@@ -19,7 +19,7 @@
    RhythmRuler, FILTERTYPES, instrumentsFilters, DEFAULTFILTERTYPE,
    TemperamentWidget, TimbreWidget, ModeWidget, PitchSlider,
    MusicKeyboard, PitchStaircase, SampleWidget, _THIS_IS_MUSIC_BLOCKS_,
-   AIWidget, AIDebuggerWidget, Arpeggio, LegoWidget, ChordBuilderWidget
+   AIWidget, AIDebuggerWidget, Arpeggio, LegoWidget, ChordBuilderWidget, deepClone
  */
 
 /*
@@ -73,6 +73,66 @@
  * @param {string} activity - The activity for which blocks are being set up.
  */
 function setupWidgetBlocks(activity) {
+    /** Keep the previous widget contents until a collection can be published safely. */
+    function _beginInstrumentCapture(logo, key, turtle, blk, onAbort = () => {}) {
+        const [flag, destination] = {
+            sample: ["inSample", _("Sampler")],
+            timbre: ["inTimbre", _("Timbre")],
+            musicKeyboard: ["inMusicKeyboard", _("Music Keyboard")],
+            rhythmRuler: ["inRhythmRuler", _("Rhythm Ruler")],
+            phraseMaker: ["inMatrix", _("Phrase Maker")]
+        }[key];
+        if (
+            Singer.ToneActions.rejectMultisampleCapture(
+                last(activity.turtles.ithTurtle(turtle).singer.instrumentNames),
+                turtle,
+                blk,
+                destination
+            )
+        )
+            return null;
+        const widget = logo[key];
+        // Collection replaces its input arrays; retain the old references, not audio/DOM copies.
+        let previous = { ...widget };
+        const mutableFields =
+            {
+                phraseMaker: ["_blockMap"],
+                timbre: ["synthVals", "fmSynthParamvals", "amSynthParamvals", "duoSynthParamVals"]
+            }[key] || [];
+        for (const field of mutableFields) {
+            if (widget[field] !== undefined) widget[field] = deepClone(widget[field]);
+        }
+        const previousFlag = logo[flag];
+        const captures = logo.instrumentCaptures || (logo.instrumentCaptures = []);
+        const capture = {
+            aborted: false,
+            finish() {
+                if (logo.stopTurtle && !capture.aborted && previous) {
+                    capture.abort();
+                    return false;
+                }
+                const index = captures.indexOf(capture);
+                if (index !== -1) captures.splice(index, 1);
+                previous = null;
+                onAbort = null;
+                return !capture.aborted;
+            },
+            abort() {
+                if (!previous) return;
+                capture.aborted = true;
+                for (const name of Object.keys(widget)) {
+                    if (!(name in previous)) delete widget[name];
+                }
+                Object.assign(widget, previous);
+                logo[flag] = previousFlag;
+                onAbort();
+                capture.finish();
+            }
+        };
+        captures.push(capture);
+        return capture;
+    }
+
     /**
      * Environment-aware lazy module loader.
      * Uses AMD require() in the browser; calls callback synchronously in Node/Jest.
@@ -506,12 +566,15 @@ function setupWidgetBlocks(activity) {
             );
             if (interruption) return interruption;
 
+            const capture = _beginInstrumentCapture(logo, "sample", turtle, blk);
+            if (!capture) return [null, 0];
             logo.inSample = true;
 
             const listenerName = "_sampler_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = event => {
+                if (!capture.finish()) return;
                 logo.sample.init(activity);
                 logo.inSample = false;
             };
@@ -587,6 +650,12 @@ function setupWidgetBlocks(activity) {
          * @returns {number[]} - The output values.
          */
         flow(args, logo, turtle, blk, receivedArg) {
+            if (
+                logo.stopTurtle ||
+                Singer.ToneActions.rejectMultisampleCapture(args[0], turtle, blk, _("Timbre"))
+            ) {
+                return [null, 0];
+            }
             const interruption = _ensureWidget(
                 logo,
                 "timbre",
@@ -604,6 +673,19 @@ function setupWidgetBlocks(activity) {
             );
             if (interruption) return interruption;
 
+            const name = typeof args[0] === "string" ? args[0] : DEFAULTVOICE;
+            const effects = instrumentsEffects[turtle][name];
+            const filters = instrumentsFilters[turtle][name];
+            let synthCapture;
+            const capture = _beginInstrumentCapture(logo, "timbre", turtle, blk, () => {
+                synthCapture?.abort();
+                if (effects === undefined) delete instrumentsEffects[turtle][name];
+                else instrumentsEffects[turtle][name] = effects;
+                if (filters === undefined) delete instrumentsFilters[turtle][name];
+                else instrumentsFilters[turtle][name] = filters;
+            });
+            if (!capture) return [null, 0];
+            synthCapture = logo.synth.beginTimbreCapture?.(turtle, name);
             logo.inTimbre = true;
 
             if (typeof args[0] === "string") {
@@ -651,6 +733,8 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
+                if (!capture.finish()) return;
+                synthCapture?.commit();
                 logo.timbre.init(activity);
             };
 
@@ -1472,6 +1556,8 @@ function setupWidgetBlocks(activity) {
             logo.musicKeyboardByTurtle = logo.musicKeyboardByTurtle || {};
             logo.musicKeyboardByTurtle[turtle] = keyboard;
 
+            const capture = _beginInstrumentCapture(logo, "musicKeyboard", turtle, blk);
+            if (!capture) return [null, 0];
             logo.inMusicKeyboard = true;
             keyboard.blockNo = blk;
             keyboard.instruments = [];
@@ -1488,6 +1574,7 @@ function setupWidgetBlocks(activity) {
             // another turtle's Music Keyboard block running in between can't swap it.
             const keyboardTurtle = activity.turtles.ithTurtle(turtle);
             const __listener = () => {
+                if (!capture.finish()) return;
                 keyboard.turtle = keyboardTurtle;
                 keyboard.init(logo);
             };
@@ -1686,6 +1773,8 @@ function setupWidgetBlocks(activity) {
             );
             if (interruption) return interruption;
 
+            const capture = _beginInstrumentCapture(logo, "rhythmRuler", turtle, blk);
+            if (!capture) return [null, 0];
             logo.rhythmRuler.Rulers = [];
             logo.rhythmRuler.Drums = [];
             logo.rhythmRuler.rulerBlock = blk;
@@ -1695,6 +1784,7 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
+                if (!capture.finish()) return;
                 logo.rhythmRuler.init(activity);
             };
 
@@ -1938,6 +2028,16 @@ function setupWidgetBlocks(activity) {
             );
             if (interruption) return interruption;
 
+            const tuplets = {
+                tupletRhythms: logo.tupletRhythms,
+                tupletParams: logo.tupletParams,
+                addingNotesToTuplet: logo.addingNotesToTuplet
+            };
+            const capture = _beginInstrumentCapture(logo, "phraseMaker", turtle, blk, () => {
+                Object.assign(logo, tuplets);
+            });
+            if (!capture) return [null, 0];
+
             // Only mark collection mode once the widget is really available.
             // Setting the flag before the lazy-load finished let concurrently
             // playing stacks call into the "loading" placeholder and crash;
@@ -1962,6 +2062,7 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
+                if (!capture.finish()) return;
                 if (logo.tupletRhythms.length === 0 || logo.phraseMaker.rowLabels.length === 0) {
                     activity.errorMsg(
                         _(

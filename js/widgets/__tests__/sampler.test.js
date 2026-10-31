@@ -433,7 +433,10 @@ describe("Sampler Widget", () => {
                 "electronic synth",
                 null,
                 null,
-                false
+                false,
+                undefined,
+                undefined,
+                expect.any(Function)
             );
             expect(widget.setTimbre).toHaveBeenCalled();
             expect(widget._playDelayedSample).toHaveBeenCalled();
@@ -467,7 +470,10 @@ describe("Sampler Widget", () => {
                 "customsample_test",
                 null,
                 null,
-                false
+                false,
+                undefined,
+                undefined,
+                expect.any(Function)
             );
         });
 
@@ -943,6 +949,42 @@ describe("Sampler Widget", () => {
             expect(widget.stopPitchDetection).toHaveBeenCalled();
             expect(widgetWindow.destroy).toHaveBeenCalled();
             jest.useRealTimers();
+        });
+
+        test("pausing for instrument editing preserves pending legacy Save sample and its unlock", () => {
+            jest.useFakeTimers();
+            widget.init(mockActivity, 1);
+            mockActivity.blocks = { loadNewBlocks: jest.fn() };
+            const saveButton = widgetWindow._buttons.find(btn => btn.tip === "Save sample");
+            widget.sampleName = "legacy";
+            widget.sampleData = "legacy audio";
+            widget.centAdjustmentValue = 37;
+            saveButton.onclick();
+            widget.pauseForMultisample();
+            jest.advanceTimersByTime(1000);
+            expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalledTimes(1);
+            const saved = mockActivity.blocks.loadNewBlocks.mock.calls[0][0];
+            expect(saved[1][1][1].value).toEqual(["legacy", "legacy audio", "sol", "4", 37]);
+            expect(widget._get_save_lock()).toBe(false);
+            expect(widget.centAdjustmentValue).toBe(37);
+            expect(widgetWindow.getWidgetFrame().inert).toBe(true);
+        });
+
+        test("pending microphone entry cannot restart after instrument editing pauses it", async () => {
+            widget.init(mockActivity, 1);
+            let opened;
+            mockActivity.logo.synth.startRecording.mockReturnValue(
+                new Promise(resolve => {
+                    opened = resolve;
+                })
+            );
+            const recording = widget._recordBtn.onclick();
+            widget.pauseForMultisample();
+            opened();
+            await recording;
+            expect(widget.is_recording).not.toBe(true);
+            expect(mockActivity.logo.synth.stopRecording).toHaveBeenCalledTimes(1);
+            expect(mockActivity.logo.synth.LiveWaveForm).not.toHaveBeenCalled();
         });
 
         test("onclose stops an active recording and releases the mic", () => {
