@@ -2479,6 +2479,12 @@ describe("buildScale", () => {
         expect(buildScale("B♭ harmonic minor")[0].join(" ")).toBe("B♭ C D♭ E♭ F G♭ A B♭");
     });
 
+    it("should build the bebop scale as mixolydian with a passing major seventh", () => {
+        // Its steps were stored from the top down, so C bebop was C D♭ D E♭ F G A♭ B♭ (#9959).
+        expect(buildScale("C bebop")[0].join(" ")).toBe("C D E F G A B♭ B C");
+        expect(buildScale("F bebop")[0].join(" ")).toBe("F G A B♭ C D E♭ E F");
+    });
+
     it("should keep the old spelling when a degree needs more than a double accidental", () => {
         // Its sixth note, G♯, would need a triple sharp to be spelled as an F, so the scale is
         // left as it was.

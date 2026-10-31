@@ -280,6 +280,53 @@ describe("Test 2: Multiple voices", () => {
     });
 });
 
+describe("ABC voices sharing one staff", () => {
+    const staff = voices => ({
+        meter: { value: [{ num: 4, den: 4 }] },
+        key: { root: "C", mode: "major", accidentals: [] },
+        voices
+    });
+
+    test("imports simultaneous voices as separate Start stacks", async () => {
+        const abcjs = require("abcjs");
+        const tune = abcjs.parseOnly(
+            "X:1\nT:Two voices\nM:4/4\nL:1/4\n%%score (1 2)\nV:1\nV:2\nK:C\n[V:1] C4|\n[V:2] E4|"
+        )[0];
+        expect(tune.lines[0].staff[0].voices).toHaveLength(2);
+
+        const blocks = await parseAndCapture(tune);
+        expect(blocksOfType(blocks, "start")).toHaveLength(2);
+
+        const calls = blocksOfType(blocks, "nameddo");
+        expect(calls.map(block => block[1][1].value)).toEqual(["V: 1 Line 1", "V: 2 Line 1"]);
+        expect(calls.every(block => block[4][1] === null)).toBe(true);
+    });
+
+    test("keeps each voice's segments together across staff lines", async () => {
+        const tune = {
+            metaText: { title: "Two voices", instruction: "guitar" },
+            lines: [
+                { staff: [staff([[makeNote("C", 0)], [makeNote("E", 2)]])] },
+                { staff: [staff([[makeNote("D", 1)], [makeNote("F", 3)]])] }
+            ]
+        };
+
+        const blocks = await parseAndCapture(tune);
+        expect(blocksOfType(blocks, "start")).toHaveLength(2);
+
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const firstCalls = blocksOfType(blocks, "nameddo").filter(block => {
+            const previous = byId.get(block[4][0]);
+            return previous && previous[1] === "settimbre";
+        });
+        expect(firstCalls.map(block => block[1][1].value)).toEqual(["V: 1 Line 1", "V: 2 Line 1"]);
+        expect(firstCalls.map(block => byId.get(block[4][1])[1][1].value)).toEqual([
+            "V: 1 Line 2",
+            "V: 2 Line 2"
+        ]);
+    });
+});
+
 // ---------------------------------------------------------------------------
 // Test 3 — Repeat bars
 // ---------------------------------------------------------------------------
@@ -317,6 +364,41 @@ describe("Test 3: Repeat bars", () => {
             b => Array.isArray(b[1]) && b[1][0] === "number" && b[1][1]?.value === 2
         );
         expect(repeatCount).toBeDefined();
+    });
+
+    test("a repeat in one voice does not wrap the other voice", async () => {
+        const twoVoiceTune = makeTune({
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "C", mode: "major", accidentals: [] },
+                    voices: [
+                        [
+                            makeBar("bar_left_repeat"),
+                            makeNote("C", 0),
+                            makeBar("bar_right_repeat"),
+                            makeNote("D", 1)
+                        ],
+                        [makeNote("E", 2), makeNote("F", 3)]
+                    ]
+                }
+            ]
+        });
+
+        const blocks = await parseAndCapture(twoVoiceTune);
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const repeats = blocksOfType(blocks, "repeat");
+        expect(repeats).toHaveLength(1);
+        expect(byId.get(repeats[0][4][2])[1][1].value).toBe("V: 1 Line 1");
+        expect(blocksOfType(blocks, "start")).toHaveLength(2);
+        expect(
+            blocks.find(
+                block =>
+                    Array.isArray(block[1]) &&
+                    block[1][0] === "nameddo" &&
+                    block[1][1].value === "V: 2 Line 1"
+            )
+        ).toBeDefined();
     });
 });
 
@@ -528,7 +610,8 @@ describe("Test 4: Triplets", () => {
             const divide = byId.get(note[4][1]);
             return byId.get(divide[4][1])[1][1].value / byId.get(divide[4][2])[1][1].value;
         });
-        expect(durations).toEqual([1 / 12, 1 / 12, 1 / 4, 1 / 4, 1 / 12, 1 / 4, 1 / 4]);
+        // Each voice now has its own start stack, so its notes are grouped together.
+        expect(durations).toEqual([1 / 12, 1 / 12, 1 / 12, 1 / 4, 1 / 4, 1 / 4, 1 / 4]);
     });
 });
 
@@ -1347,5 +1430,74 @@ describe("Meters abcjs reports by name rather than by number", () => {
         );
 
         expect(blocksOfType(blocks, "newnote")).toHaveLength(3);
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Chords ([CEG]) — abcjs puts every note of the chord in pitches[]
+// ---------------------------------------------------------------------------
+describe("Chords", () => {
+    const cMajor = { root: "C", acc: "", mode: "", accidentals: [] };
+    const chord = (pitches, duration = 0.25) => ({
+        el_type: "note",
+        pitches,
+        duration,
+        startTriplet: null,
+        endTriplet: null
+    });
+
+    test("imports every note of a chord into one note block", async () => {
+        const blocks = await parseAndCapture(
+            makeVoiceTune(cMajor, [
+                chord([
+                    { name: "C", pitch: 0 },
+                    { name: "E", pitch: 2 },
+                    { name: "G", pitch: 4 }
+                ])
+            ])
+        );
+
+        expect(blocksOfType(blocks, "newnote")).toHaveLength(1);
+        expect(pitchNames(blocks)).toEqual([
+            ["C", 4],
+            ["E", 4],
+            ["G", 4]
+        ]);
+
+        // Chained inside the note's clamp, and the note still reaches its
+        // trailing hidden block.
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const [c, e, g] = blocksOfType(blocks, "pitch");
+        const newnote = blocksOfType(blocks, "newnote")[0];
+        expect(byId.get(c[4][0])[1]).toBe("vspace");
+        expect([c[4][3], e[4][0], e[4][3], g[4][0], g[4][3]]).toEqual([
+            e[0],
+            c[0],
+            g[0],
+            e[0],
+            null
+        ]);
+        expect(byId.get(newnote[4][3])[1]).toBe("hidden");
+    });
+
+    test("an accidental inside a chord carries to the end of the bar", async () => {
+        const blocks = await parseAndCapture(
+            makeVoiceTune(cMajor, [
+                chord([
+                    { name: "^F", pitch: 3, accidental: "sharp" },
+                    { name: "A", pitch: 5 }
+                ]),
+                makeNote("F", 3),
+                makeBar(),
+                makeNote("F", 3)
+            ])
+        );
+
+        expect(pitchNames(blocks)).toEqual([
+            ["F♯", 4],
+            ["A", 4],
+            ["F♯", 4],
+            ["F", 4]
+        ]);
     });
 });
