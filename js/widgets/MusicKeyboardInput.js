@@ -13,12 +13,12 @@
    global
 
    _, platformColor, FIXEDSOLFEGE1, NOTESSHARP, NOTESFLAT, getCurrentEDO,
-   generateNoteNames, isEquallyTempered, docById
+   generateNoteNames, isEquallyTempered
 */
 /*
    Global locations
     - js/utils/utils.js
-        _, docById
+        _
     - js/utils/musicutils.js
         FIXEDSOLFEGE1, NOTESSHARP, NOTESFLAT, getCurrentEDO, generateNoteNames,
         isEquallyTempered
@@ -535,36 +535,15 @@ const MusicKeyboardInput = {
                 }
             }
 
-            // Update note mappings and key element labels
-            if (this.displayLayout && typeof docById === "function") {
-                for (let i = 0; i < this.displayLayout.length; i++) {
-                    const item = this.displayLayout[i];
-                    if (item.noteName !== "hertz") {
-                        const elem = this._mkbEl("cell-" + i) || this._mkbEl("blackRow" + i);
-                        if (elem) {
-                            const newSynthName = resolveSynthNoteName(
-                                item.noteName,
-                                item.noteOctave
-                            );
-                            if (this.noteMapper && elem.id) {
-                                this.noteMapper[elem.id] = newSynthName;
-                            }
-                            if (typeof elem.setAttribute === "function") {
-                                elem.setAttribute("alt", newSynthName);
-                                elem.setAttribute("title", newSynthName);
-                            }
-
-                            if (elem.childNodes && elem.childNodes.length > 0) {
-                                for (let j = 0; j < elem.childNodes.length; j++) {
-                                    const node = elem.childNodes[j];
-                                    if (node.nodeType === 3) {
-                                        node.textContent = `${item.noteName}${item.noteOctave}`;
-                                    }
-                                }
-                            }
-                        }
-                    }
+            // Draw the keys again from the shifted layout, so every key gets its new
+            // label, note and handlers. The key ids count white and black keys
+            // separately, so they can not be looked up by layout index. End any key
+            // still held first, since the new handlers would never release it.
+            if (this.keyboardDiv && typeof this._createKeyboard === "function") {
+                if (typeof this._releaseActiveNotes === "function") {
+                    this._releaseActiveNotes();
                 }
+                this._createKeyboard();
             }
 
             if (typeof this._createTable === "function") {
