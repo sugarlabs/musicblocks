@@ -66,10 +66,15 @@ class MeterWidgetMeter {
         let v1 = c1 !== null ? blockList[c1].value : 4;
         v1 = isNaN(v1) ? 4 : clampNumber(v1, 1, 16);
         const c2 = blockList[this._meterBlock].connections[2];
-        const c3 =
-            c2 !== null && blockList[c2] && blockList[c2].connections
+        // Only the denominator of a divide block is a note value. The second operand of any
+        // other expression, such as 0.5 * 0.25, is left alone.
+        let c3 =
+            c2 !== null && blockList[c2] && blockList[c2].name === "divide"
                 ? blockList[c2].connections[2]
                 : null;
+        if (c3 !== null && !(blockList[c3] && blockList[c3].name === "number")) {
+            c3 = null;
+        }
         if (c2 !== null && blockList[c2]) {
             this._beatValue = blockList[c2].value;
         }
