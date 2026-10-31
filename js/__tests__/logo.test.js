@@ -3471,6 +3471,25 @@ describe("Logo updateNotation", () => {
             Object.assign(singer, { beatsPerMeasure: 2, noteValuePerBeat: 4 });
             expect(stage(["R"], 0.25, 1)).toEqual({ pieces: [0.25, 0.5, 0.25], ties: 0 });
         });
+
+        test("splits a note at up to 10000 barlines", () => {
+            // 4/4, a note of 10001 whole notes from a downbeat
+            Object.assign(singer, { beatsPerMeasure: 4, noteValuePerBeat: 4 });
+            const { pieces, ties } = stage(["C4"], 0, 10001);
+            expect(pieces).toHaveLength(10001);
+            expect(ties).toBe(10000);
+        });
+
+        test("writes a note across more than 10000 barlines without splitting it", () => {
+            Object.assign(singer, { beatsPerMeasure: 4, noteValuePerBeat: 4 });
+            expect(stage(["C4"], 0, 10002)).toEqual({ pieces: [10002], ties: 0 });
+        });
+
+        test("does not hang on a very small meter", () => {
+            // Each measure is too short to change the remaining time when subtracted.
+            Object.assign(singer, { beatsPerMeasure: 1e-20, noteValuePerBeat: 4 });
+            expect(stage(["C4"], 0, 0.25)).toEqual({ pieces: [0.25], ties: 0 });
+        });
     });
 });
 
