@@ -106,10 +106,18 @@ function MusicKeyboard(activity) {
     const unit = beginnerMode === "true" ? 8 : 16;
 
     /**
-     * Rounds a raw note duration (in seconds) to the nearest beginner-mode
-     * eighth or normal-mode sixteenth, then clamps it to a positive,
-     * non-zero value.
-     * @param {number} rawDuration - The raw duration in seconds.
+     * Converts how long a key was held into the note value it is recorded as, at the
+     * keyboard's tempo. A whole note lasts 240 / bpm seconds (bpm counts quarter notes),
+     * which is also how playAll and playOne turn the note value back into seconds.
+     * @param {number} seconds - How long the key was held.
+     * @returns {number} The note value, e.g. 0.25 for a quarter note.
+     */
+    this._secondsToNoteValue = seconds => (seconds * this.bpm) / 240;
+
+    /**
+     * Rounds a note value to the nearest beginner-mode eighth or normal-mode
+     * sixteenth, then clamps it to a positive, non-zero value.
+     * @param {number} rawDuration - The note value, from _secondsToNoteValue.
      * @returns {number} The rounded, clamped duration.
      */
     this._roundNoteDuration = rawDuration => {
@@ -555,7 +563,7 @@ function MusicKeyboard(activity) {
                 this.instrumentMapper[element.id],
                 this.noteMapper[element.id]
             );
-            duration = this._roundNoteDuration(duration);
+            duration = this._roundNoteDuration(this._secondsToNoteValue(duration));
 
             this._notesPlayed.push({
                 startTime: startTime,
@@ -587,7 +595,9 @@ function MusicKeyboard(activity) {
 
         const __endRest = element => {
             element.style.backgroundColor = "white";
-            const duration = this._roundNoteDuration((new Date().getTime() - startTime) / 1000);
+            const duration = this._roundNoteDuration(
+                this._secondsToNoteValue((new Date().getTime() - startTime) / 1000)
+            );
             this._notesPlayed.push({
                 startTime: startTime,
                 noteOctave: "R",
