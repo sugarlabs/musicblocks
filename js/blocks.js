@@ -6701,8 +6701,10 @@ class Blocks {
                                 customName = value.customName;
                             }
                             if (value.customTemperamentNotes !== undefined) {
-                                const notes = value.customTemperamentNotes;
-                                notes.octaveRatio ??= value.octaveSpace;
+                                const notes = {
+                                    octaveRatio: value.octaveSpace,
+                                    ...value.customTemperamentNotes
+                                };
                                 deleteTemperamentFromList(customName);
                                 addTemperamentToDictionary(customName, notes);
                                 updateTemperaments();
