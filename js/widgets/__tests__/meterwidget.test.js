@@ -859,4 +859,43 @@ describe("Meter Widget", () => {
             expect(hide).toHaveBeenCalledTimes(1);
         });
     });
+    describe("modules", () => {
+        test("loads the five modules before the widget", () => {
+            expect(MeterWidget.dependencies).toEqual([
+                "widgets/MeterWidgetWindow",
+                "widgets/MeterWidgetMeter",
+                "widgets/MeterWidgetPlayback",
+                "widgets/MeterWidgetWheel",
+                "widgets/MeterWidgetSave",
+                "widgets/meterwidget"
+            ]);
+        });
+
+        test("installModules is done once every module is defined", () => {
+            expect(MeterWidget._modulesInstalled).toBe(true);
+            expect(MeterWidget.installModules()).toBe(true);
+            expect(typeof MeterWidget.prototype._stopPlayback).toBe("function");
+        });
+    });
+
+    describe("running the block again while the widget is open", () => {
+        test("stops the beats of the widget it replaces", () => {
+            jest.useFakeTimers();
+            try {
+                meterWidget._playing = true;
+                meterWidget._playBeat();
+                expect(mockActivity.logo.synth.trigger).toHaveBeenCalledTimes(1);
+
+                mockActivity.logo.meterWidget = meterWidget;
+                const replacement = new MeterWidget(mockActivity, 1);
+                jest.advanceTimersByTime(5000);
+
+                expect(replacement).not.toBe(meterWidget);
+                expect(meterWidget._playing).toBe(false);
+                expect(mockActivity.logo.synth.trigger).toHaveBeenCalledTimes(1);
+            } finally {
+                jest.useRealTimers();
+            }
+        });
+    });
 });
