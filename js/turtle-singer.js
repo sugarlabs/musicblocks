@@ -647,7 +647,7 @@ class Singer {
         const note1 = getNote(
             note,
             octave,
-            cents / 100,
+            0,
             tur.singer.keySignature,
             tur.singer.movable,
             null,
@@ -657,7 +657,7 @@ class Singer {
         let num1 =
             pitchToNumber(note1[0], note1[1], tur.singer.keySignature, temperament) -
             tur.singer.pitchNumberOffset +
-            ((note1[2] || 0) / 1200) * edo;
+            (cents / 1200) * edo;
 
         for (let i = tur.singer.invertList.length - 1; i >= 0; i--) {
             const axisCents = tur.singer.invertList[i][3] || 0;
