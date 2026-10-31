@@ -172,7 +172,9 @@ class MeterWidgetWindow {
         input2.type = "number";
         input2.id = "beatValue";
         input2.setAttribute("min", "1");
-        input2.setAttribute("max", "35");
+        // Up to 35, or the meter's own note value when it is larger (1/64), so Reset doesn't
+        // change a meter it was not asked to.
+        input2.setAttribute("max", String(Math.max(35, Number(input2.value) || 0)));
         input2.setAttribute("aria-label", _("Beat note value"));
         divInput2.appendChild(input2);
 

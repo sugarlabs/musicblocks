@@ -237,6 +237,27 @@ describe("MeterWidgetWindow", () => {
             expect(blockList[5].value).toBe(3);
         });
 
+        test("keeps a note value above 35 that was not changed", () => {
+            blockList[5].value = 64;
+            const meter = widget._readMeterBlock();
+            widget._makeInputs(meter);
+
+            widget._reset(meter);
+
+            expect(widget._noteValueInput.value).toBe("64");
+            expect(blockList[5].value).toBe(64);
+        });
+
+        test("still limits a typed note value to 35", () => {
+            const meter = widget._readMeterBlock();
+            widget._makeInputs(meter);
+            widget._noteValueInput.value = "64";
+
+            widget._reset(meter);
+
+            expect(blockList[5].value).toBe(35);
+        });
+
         test("stops the beats first", () => {
             const meter = widget._readMeterBlock();
             widget._makeInputs(meter);
