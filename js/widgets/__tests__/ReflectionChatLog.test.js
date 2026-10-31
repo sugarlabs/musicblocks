@@ -227,4 +227,40 @@ describe("ReflectionChatLog", () => {
             expect(messages().map(m => m.classList.contains("user"))).toEqual([false, true, false]);
         });
     });
+
+    describe("with the page's Markdown renderer", () => {
+        const link = message => message.querySelector("a");
+
+        beforeEach(() => {
+            global.renderChatMarkdown = require("../../utils/ai-markdown.js").renderChatMarkdown;
+        });
+
+        afterEach(() => {
+            delete global.renderChatMarkdown;
+        });
+
+        test("opens reply links in a new tab", () => {
+            reflection.appendBotReply({ response: "[guide](https://example.com)" }, "meta");
+
+            const reply = link(messages().pop());
+            expect(reply.getAttribute("href")).toBe("https://example.com");
+            expect(reply.getAttribute("target")).toBe("_blank");
+            expect(reply.getAttribute("rel")).toBe("noopener noreferrer");
+        });
+
+        test("opens links in a new tab after reopening too", () => {
+            reflection.chatHistory = [
+                { role: "meta", content: "[guide](https://example.com)" },
+                { role: "user", content: "[mine](https://example.com)" }
+            ];
+
+            reflection.renderChatHistory();
+
+            const [reply, mine] = messages();
+            expect(link(reply).getAttribute("target")).toBe("_blank");
+            expect(link(reply).getAttribute("rel")).toBe("noopener noreferrer");
+            expect(link(mine)).toBeNull();
+            expect(text(mine)).toBe("[mine](https://example.com)");
+        });
+    });
 });
