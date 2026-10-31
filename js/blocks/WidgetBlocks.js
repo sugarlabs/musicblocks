@@ -80,6 +80,11 @@ function setupWidgetBlocks(activity) {
      * failed modules are undefined so that the next request fetches them again.
      * A failed request still gets its callback once a retry loads the modules,
      * so that callback is ignored.
+     *
+     * @param {string|string[]} modules - The AMD module ids to load.
+     * @param {Function} callback - Run once all the modules are loaded.
+     * @param {Function} onError - Run with the RequireJS error if a module fails to load.
+     * @returns {void}
      */
     function _lazyRequire(modules, callback, onError) {
         if (typeof define === "function" && define.amd) {
@@ -102,21 +107,46 @@ function setupWidgetBlocks(activity) {
         }
     }
 
+    /**
+     * Tells the user that a widget could not be loaded, so they can retry once
+     * their connection is back.
+     *
+     * @returns {void}
+     */
     function _widgetLoadFailed() {
         activity.errorMsg(
             _("The widget could not be loaded. Check your connection and try again.")
         );
     }
 
-    // Blocks waiting for each widget. Those from a run that has since stopped are dropped.
+    /**
+     * Blocks waiting for each widget to load, by widget key. Each entry holds the
+     * run that asked for the widget and a function that resumes its block.
+     *
+     * @type {Object.<string, Array<{run: number, resume: Function}>>}
+     */
     const _widgetRequests = {};
 
+    /**
+     * Removes and returns the blocks waiting for a widget.
+     *
+     * @param {string} widgetKey - The key for the widget in the logo object.
+     * @returns {Array<{run: number, resume: Function}>} The waiting blocks.
+     */
     function _takeWidgetRequests(widgetKey) {
         const requests = _widgetRequests[widgetKey];
         delete _widgetRequests[widgetKey];
         return requests;
     }
 
+    /**
+     * Checks whether a run is still playing, so a widget that finishes loading
+     * late does not resume a block from a run that was stopped or replaced.
+     *
+     * @param {object} logo - The logo object.
+     * @param {number} run - The run generation recorded when the load started.
+     * @returns {boolean} True if that run is still playing.
+     */
     function _isCurrentRun(logo, run) {
         return run === logo.runGeneration && !logo.stopTurtle;
     }
