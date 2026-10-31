@@ -336,8 +336,13 @@ const MusicKeyboardInput = {
          * @memberof MusicKeyboard
          */
         this.doMIDI = () => {
-            let duration = 0;
-            let startTime = 0;
+            // When each held key started, by key id. The clock is the one the mouse
+            // and computer keyboard use, so all recorded notes sort together.
+            const startTimes = {};
+            // Notes struck within this many milliseconds start together, so a chord
+            // is recorded as one, as it is from the computer keyboard.
+            const CHORDWINDOW = 100;
+            let lastStartTime = null;
 
             this._refreshNoteToKeyMap();
 
@@ -348,7 +353,12 @@ const MusicKeyboardInput = {
              */
             const __startNote = (event, element) => {
                 if (!element) return;
-                startTime = event.timeStamp; // Milliseconds();
+                const now = new Date().getTime();
+                startTimes[element.id] =
+                    lastStartTime !== null && now - lastStartTime < CHORDWINDOW
+                        ? lastStartTime
+                        : now;
+                lastStartTime = startTimes[element.id];
                 element.style.backgroundColor = platformColor.orange;
                 this.activity.logo.synth.trigger(
                     0,
@@ -366,7 +376,9 @@ const MusicKeyboardInput = {
              * @param {HTMLElement} element - The HTML element representing the note.
              */
             const __endNote = (event, element) => {
-                if (!element) return;
+                // Ignore a note off for a key that was not started here, such as one
+                // held down before MIDI was turned on.
+                if (!element || !(element.id in startTimes)) return;
 
                 const id = element.id;
                 if (id.includes("blackRow")) {
@@ -375,9 +387,9 @@ const MusicKeyboardInput = {
                     element.style.backgroundColor = "white";
                 }
 
-                const now = event.timeStamp;
-                duration = now - startTime;
-                duration /= 1000;
+                const startTime = startTimes[id];
+                delete startTimes[id];
+                let duration = (new Date().getTime() - startTime) / 1000;
                 this.activity.logo.synth.stopSound(
                     0,
                     this.instrumentMapper[element.id],
