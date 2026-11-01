@@ -111,7 +111,13 @@ class LocalPlanet {
 
     async openProject(id) {
         const Planet = this.Planet;
-        await Planet.ProjectStorage.setCurrentProjectID(id);
+        try {
+            await Planet.ProjectStorage.setCurrentProjectID(id);
+        } catch (e) {
+            // Persisting the selection is best-effort: a storage failure (e.g. a
+            // quota error) must not stop the project from opening.
+            console.error("[Planet] Failed to persist current project selection:", e);
+        }
         // Notify the parent window of the new project's git state so that
         // the "My Project" toolbar menu (gitDropdownUI) shows Time Travel
         // when the opened project has a GitHub save spot.

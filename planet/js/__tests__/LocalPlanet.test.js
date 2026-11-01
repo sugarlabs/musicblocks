@@ -236,6 +236,20 @@ describe("LocalPlanet", () => {
             expect(mockPlanet.ProjectStorage.setCurrentProjectID).toHaveBeenCalledWith("testProj1");
             expect(mockPlanet.loadProjectFromData).toHaveBeenCalledWith("data1");
         });
+
+        it("should still load the project when persisting the selection fails", async () => {
+            localPlanet.ProjectTable = mockPlanet.ProjectStorage.data.Projects;
+            mockPlanet.ProjectStorage.setCurrentProjectID.mockRejectedValueOnce(
+                new Error("quota exceeded")
+            );
+            const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+            await localPlanet.openProject("testProj1");
+
+            expect(mockPlanet.loadProjectFromData).toHaveBeenCalledWith("data1");
+            expect(errorSpy).toHaveBeenCalled();
+            errorSpy.mockRestore();
+        });
     });
 
     describe("mergeProject", () => {
