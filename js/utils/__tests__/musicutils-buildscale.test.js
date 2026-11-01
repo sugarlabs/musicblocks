@@ -245,6 +245,13 @@ describe("musicutils-buildscale", () => {
         }
     });
 
+    it("leaves movable solfege in chromatic and 8-note modes as it was", () => {
+        // Seven syllables can't name 12 or 8 notes, so an enharmonic match there
+        // would turn C♯ into "re" and play a D.
+        expect(buildscale.getSolfege("C♯", "C chromatic", true, "equal", 12)).toBe("di");
+        expect(buildscale.getSolfege("D♯", "C octatonic", true, "equal", 12)).toBe("ri");
+    });
+
     it("still resolves a minor key signature's scale and solfege", () => {
         expect(buildscale.buildScale("A minor", 12)[0].slice(0, 3)).toEqual(["A", "B", "C"]);
         expect(buildscale.getSolfege("A", "A minor", false, "equal")).toBe("la");

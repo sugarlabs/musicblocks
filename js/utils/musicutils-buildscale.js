@@ -1282,8 +1282,10 @@ var getSolfege = (note, keySignature, movable, temperament, edo) => {
             index = scale.indexOf(altNote);
         }
 
-        // 3) in 12-EDO, an enharmonic spelling of a scale note (D♯ for E♭)
-        if (index === -1 && currentEDO === 12) {
+        // 3) in 12-EDO, an enharmonic spelling of a scale note (D♯ for E♭).
+        // Not for modes with more than 7 notes (chromatic, octatonic): there a
+        // match would map onto the 7 diatonic syllables and give a wrong pitch.
+        if (index === -1 && currentEDO === 12 && scale.length - 1 <= 7) {
             const pitchClass = _notePitchClass(note);
             index = scale.slice(0, -1).findIndex(n => _notePitchClass(n) === pitchClass);
         }
