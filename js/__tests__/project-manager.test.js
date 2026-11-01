@@ -1239,6 +1239,59 @@ describe("prepareExport", () => {
         });
     });
 
+    describe("custom modes", () => {
+        const zelda = { pattern: [1, 3, 1, 2, 1, 2, 2], edo: 12, temperamentKey: "equal" };
+
+        const exportModes = (...values) => {
+            const activity = makeActivity();
+            activity.blocks.blockList = values.map(value => ({
+                name: "modename",
+                trash: false,
+                value,
+                container: { x: 0, y: 0 },
+                connections: [null],
+                isValueBlock: () => true
+            }));
+            return JSON.parse(new ProjectManager(activity).prepareExport()).map(b => b[1]);
+        };
+
+        beforeEach(() => {
+            global.getSavedCustomModes = jest.fn(() => [
+                { name: "Zelda", ...zelda },
+                { name: "Mine", pattern: [6, 6] }
+            ]);
+        });
+
+        afterEach(() => {
+            delete global.getSavedCustomModes;
+        });
+
+        it("saves the definition of a custom mode with its mode name block", () => {
+            expect(exportModes("Zelda")).toEqual([
+                ["modename", { value: "Zelda", customMode: zelda }]
+            ]);
+        });
+
+        it("saves a mode that predates the EDO field", () => {
+            expect(exportModes("Mine")).toEqual([
+                ["modename", { value: "Mine", customMode: { pattern: [6, 6] } }]
+            ]);
+        });
+
+        it("leaves a built-in mode as just its name", () => {
+            expect(exportModes("major", "dorian")).toEqual([
+                ["modename", { value: "major" }],
+                ["modename", { value: "dorian" }]
+            ]);
+        });
+
+        it("reads the saved modes once per save", () => {
+            exportModes("Zelda", "major", "Zelda");
+
+            expect(getSavedCustomModes).toHaveBeenCalledTimes(1);
+        });
+    });
+
     it("remaps connections to dense indices", () => {
         const activity = makeActivity();
         activity.blocks.blockList = [

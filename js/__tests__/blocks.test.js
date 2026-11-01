@@ -2401,6 +2401,122 @@ describe("Blocks Foundation", () => {
             });
         });
 
+        // A custom mode is saved in the browser of whoever made it, so a
+        // project carries its definition on the mode name block. Opening the
+        // project must bring the mode back, or it plays in major.
+        describe("custom modes carried by a project", () => {
+            const zelda = { pattern: [1, 3, 1, 2, 1, 2, 2], edo: 12, temperamentKey: "equal" };
+
+            const open = project => {
+                const blocks = new Blocks(mockActivity);
+                blocks.blockList = [];
+                blocks.protoBlockDict = {};
+                for (const name of ["start", "setkey2", "notename", "modename"]) {
+                    blocks.protoBlockDict[name] = { hasCapability: () => false, dockTypes: [] };
+                }
+                blocks.setActionProtoVisibility = jest.fn();
+                blocks._makeNewBlockWithConnections = jest.fn();
+                mockActivity._suppressRefresh = true;
+                blocks.loadNewBlocks(project);
+            };
+
+            const setKey = (mode, customMode) => [
+                [0, "start", 0, 0, [null, 1, null]],
+                [1, "setkey2", 0, 0, [0, 2, 3, null]],
+                [2, ["notename", { value: "C" }], 0, 0, [1]],
+                [3, ["modename", { value: mode, customMode }], 0, 0, [1]]
+            ];
+
+            const savedModes = () => JSON.parse(localStorage.getItem("customModes") || "[]");
+
+            beforeEach(() => {
+                global.MUSICALMODES = { major: [2, 2, 1, 2, 2, 2, 1], custom: [1] };
+                global.getSavedCustomModes =
+                    require("../utils/musicutils-modewheel").getSavedCustomModes;
+                global.isUnsafeObjectKey = require("../utils/utils-logic").isUnsafeObjectKey;
+                localStorage.clear();
+            });
+
+            afterEach(() => {
+                delete global.MUSICALMODES;
+                delete global.getSavedCustomModes;
+                delete global.isUnsafeObjectKey;
+                localStorage.clear();
+            });
+
+            it("registers the mode before the project runs and keeps it saved", () => {
+                open(setKey("Zelda", zelda));
+
+                expect(MUSICALMODES.Zelda).toEqual(zelda.pattern);
+                expect(MUSICALMODES.zelda).toEqual(zelda.pattern);
+                expect(savedModes()).toEqual([{ name: "Zelda", ...zelda }]);
+            });
+
+            it("plays the project's mode over a saved mode of the same name", () => {
+                localStorage.setItem(
+                    "customModes",
+                    JSON.stringify([{ name: "Zelda", pattern: [2, 2, 1, 2, 2, 2, 1], edo: 12 }])
+                );
+
+                open(setKey("Zelda", zelda));
+
+                expect(MUSICALMODES.Zelda).toEqual(zelda.pattern);
+                expect(savedModes()).toEqual([{ name: "Zelda", ...zelda }]);
+            });
+
+            it("keeps the other saved modes", () => {
+                const other = { name: "Mine", pattern: [6, 6], edo: 12 };
+                localStorage.setItem("customModes", JSON.stringify([other]));
+
+                open(setKey("Zelda", zelda));
+
+                expect(savedModes()).toEqual([other, { name: "Zelda", ...zelda }]);
+            });
+
+            it("does not write storage again when the mode is already saved", () => {
+                localStorage.setItem("customModes", JSON.stringify([{ name: "Zelda", ...zelda }]));
+                const setItem = jest.spyOn(Storage.prototype, "setItem");
+
+                open(setKey("Zelda", zelda));
+
+                expect(setItem).not.toHaveBeenCalled();
+                expect(MUSICALMODES.Zelda).toEqual(zelda.pattern);
+                setItem.mockRestore();
+            });
+
+            it("never replaces a built-in mode", () => {
+                open(setKey("Major", { pattern: [6, 6], edo: 12 }));
+
+                expect(MUSICALMODES.major).toEqual([2, 2, 1, 2, 2, 2, 1]);
+                expect(MUSICALMODES.Major).toBeUndefined();
+                expect(savedModes()).toEqual([]);
+            });
+
+            it("restores a mode named custom", () => {
+                open(setKey("custom", { pattern: [3, 4, 5], edo: 12 }));
+
+                expect(MUSICALMODES.custom).toEqual([3, 4, 5]);
+            });
+
+            it("ignores a definition that does not fit its EDO", () => {
+                open(setKey("Zelda", { pattern: [1, 3, 1, 2, 1, 2, 2], edo: 19 }));
+                open(setKey("Odd", { pattern: [1.5, 10.5] }));
+                open(setKey("__proto__", { pattern: [12] }));
+
+                expect(MUSICALMODES.Zelda).toBeUndefined();
+                expect(MUSICALMODES.Odd).toBeUndefined();
+                expect(Object.getPrototypeOf(MUSICALMODES)).toBe(Object.prototype);
+                expect(savedModes()).toEqual([]);
+            });
+
+            it("leaves a mode name without a definition alone", () => {
+                open(setKey("major"));
+
+                expect(MUSICALMODES).toEqual({ major: [2, 2, 1, 2, 2, 2, 1], custom: [1] });
+                expect(localStorage.getItem("customModes")).toBeNull();
+            });
+        });
+
         it("accepts valid parent-child stacks without false cycle detection", () => {
             const blocks = new Blocks(mockActivity);
             blocks.blockList = [];
