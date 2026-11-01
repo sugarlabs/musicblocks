@@ -66,7 +66,7 @@ describe("setupIntervalsActions", () => {
             "A#": 11,
             "Bb": 11,
             "B": 12,
-            "B#": 0
+            "B#": 13
         };
 
         global.pitchToNumber = jest.fn((note, octave, keySig, temperament) => {
@@ -210,20 +210,10 @@ describe("setupIntervalsActions", () => {
     });
 
     test("GetIntervalNumber handles B to B# enharmonic (same octave)", () => {
-        // B (12) to B# (0) should be 1 semitone (minor second), not 12
+        // B (12) to B# (13) should be 1 semitone
         GetNotesForInterval.mockReturnValueOnce({
             firstNote: "B",
             secondNote: "B#",
-            octave: 0
-        });
-        expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(1);
-    });
-
-    test("GetIntervalNumber handles B to Cb enharmonic (same octave)", () => {
-        // B (12) to Cb (0) should be 1 semitone (minor second), not 12
-        GetNotesForInterval.mockReturnValueOnce({
-            firstNote: "B",
-            secondNote: "Cb",
             octave: 0
         });
         expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(1);
@@ -239,14 +229,30 @@ describe("setupIntervalsActions", () => {
         expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(1);
     });
 
-    test("GetIntervalNumber handles Cb to B (same octave)", () => {
-        // Cb (0) to B (12) should be 1 semitone (wrap-around)
+    test("GetIntervalNumber handles descending intervals in same octave (> 6 semitones)", () => {
+        // G (8) -> C (1) should be 7 semitones (perfect fifth), not corrupted to 5
         GetNotesForInterval.mockReturnValueOnce({
-            firstNote: "Cb",
-            secondNote: "B",
+            firstNote: "G",
+            secondNote: "C",
             octave: 0
         });
-        expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(1);
+        expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(7);
+
+        // A (10) -> C (1) should be 9 semitones (major sixth), not corrupted to 3
+        GetNotesForInterval.mockReturnValueOnce({
+            firstNote: "A",
+            secondNote: "C",
+            octave: 0
+        });
+        expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(9);
+
+        // B (12) -> C (1) should be 11 semitones (major seventh), not corrupted to 1
+        GetNotesForInterval.mockReturnValueOnce({
+            firstNote: "B",
+            secondNote: "C",
+            octave: 0
+        });
+        expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(11);
     });
 
     test("GetIntervalNumber handles normal interval correctly", () => {
@@ -435,10 +441,8 @@ describe("setupIntervalsActions", () => {
             expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(22);
         });
 
-        test("uses the absolute step difference, not the sum, when the forward (wrap-around) distance is larger", () => {
-            // G (8) -> E (5): |8-5| = 3, but the forward distance (8 -> ... -> E going up)
-            // is 9. The smaller of the two (3) is correct; the raw sum (13) is not,
-            // and would incorrectly lose out to the forward distance in the min().
+        test("uses the absolute step difference for descending intervals in the same octave", () => {
+            // G (8) -> E (5): |8-5| = 3
             GetNotesForInterval.mockReturnValueOnce({ firstNote: "G", secondNote: "E", octave: 0 });
             expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(3);
         });

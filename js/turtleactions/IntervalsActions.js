@@ -121,17 +121,6 @@ function setupIntervalsActions(activity) {
             // Use dynamic temperament length for custom tunings
             const temperamentLength = this.getTemperamentLength();
 
-            // Handle octave boundary wrap-around for enharmonic equivalents
-            // For cases like B (12) to B#/Cb (0), the raw difference is 12 but should be 1
-            // Calculate forward distance across octave boundary using modular arithmetic
-            if (totalIntervals !== 0) {
-                const forwardDiff =
-                    (secondStep - firstStep + temperamentLength) % temperamentLength;
-                // When notes are at octave boundary (forwardDiff === 0), use 1 semitone
-                // Otherwise use the shorter of raw difference or forward distance
-                totalIntervals = forwardDiff === 0 ? 1 : Math.min(totalIntervals, forwardDiff);
-            }
-
             if (octave < 0 && totalIntervals !== 0 && totalIntervals !== temperamentLength)
                 totalIntervals = temperamentLength - totalIntervals;
 
@@ -206,7 +195,7 @@ function setupIntervalsActions(activity) {
 
             if (octave < 0) {
                 letterGap = letterGap !== 0 ? NOTENAMES.length - letterGap : letterGap;
-                if (octave < -1) lastWord = `,  ${os} ${plural}`;
+                if (octave < -1) lastWord = `, ${os} ${plural}`;
                 lastWord += ` ${_("below")}`;
             }
 
