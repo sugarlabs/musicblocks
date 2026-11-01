@@ -370,6 +370,29 @@ describe("GlobalPlanet", () => {
 
             gp.addProjectToCache.mockRestore();
         });
+
+        it("does not let an old callback change pagination after starting a newer request", () => {
+            const hideLoadMore = jest.spyOn(gp, "hideLoadMore");
+            let callback;
+
+            jest.spyOn(gp, "downloadProjectsToCache").mockImplementation((data, cb) => {
+                callback = cb;
+            });
+
+            gp._requestId = 1;
+
+            gp.addProjects([["proj1", 123]], 1);
+
+            jest.spyOn(gp, "render").mockImplementation(() => {
+                gp._requestId = 2;
+            });
+
+            hideLoadMore.mockClear();
+
+            callback();
+
+            expect(hideLoadMore).not.toHaveBeenCalled();
+        });
     });
     describe("addProjectToCache", () => {
         it("should add project data to cache on success", () => {
