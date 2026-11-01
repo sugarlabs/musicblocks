@@ -89,6 +89,8 @@ global.normalizeNoteAccidentals = note => {
     const map = { "♭": "b", "♯": "#", "𝄫": "bb", "𝄪": "x" };
     return note.replace(/[♭♯𝄫𝄪]/gu, m => map[m]);
 };
+const { frequencyToPitch } = require("../utils/musicutils-pitch");
+global.frequencyToPitch = frequencyToPitch;
 const { LILYPONDHEADER, escapeLilypondString } = require("../lilypond");
 global.LILYPONDHEADER = LILYPONDHEADER;
 global.escapeLilypondString = escapeLilypondString;
@@ -792,6 +794,109 @@ describe("afterSaveMIDI", () => {
             duration: 0.6666666666666666,
             velocity: 0.9
         });
+    });
+
+    it("should handle numeric frequencies (e.g. from cents or hertz blocks) without throwing", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                {
+                    note: [440],
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "guitar"
+                },
+                {
+                    note: [261.63],
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "guitar"
+                }
+            ]
+        };
+
+        expect(() => {
+            instance.afterSaveMIDI();
+            jest.runAllTimers();
+        }).not.toThrow();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const instrumentTrack = tracks.find(track => track.name === "Track 1 - guitar");
+
+        expect(instrumentTrack.addNote).toHaveBeenNthCalledWith(1, {
+            name: "A4",
+            time: 0,
+            duration: 0.6666666666666666,
+            velocity: 0.8
+        });
+        expect(instrumentTrack.addNote).toHaveBeenNthCalledWith(2, {
+            name: "C4",
+            time: 0.6666666666666666,
+            duration: 0.6666666666666666,
+            velocity: 0.8
+        });
+    });
+
+    it("should write tempo and meter for track containing numeric notes and rests", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                {
+                    note: ["R"],
+                    duration: 4,
+                    bpm: 120,
+                    meter: [3, 4],
+                    instrument: "guitar"
+                },
+                {
+                    note: [440],
+                    duration: 4,
+                    bpm: 120,
+                    meter: [3, 4],
+                    instrument: "guitar"
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const midiInstance = Midi.mock.results[0].value;
+        expect(midiInstance.header.tempos).toContainEqual({ ticks: 0, bpm: 120 });
+        expect(midiInstance.header.timeSignatures).toContainEqual({
+            ticks: 0,
+            timeSignature: [3, 4]
+        });
+    });
+
+    it("should fallback to MIDI note calculation if frequencyToPitch is unavailable", () => {
+        const originalF2P = global.frequencyToPitch;
+        delete global.frequencyToPitch;
+        try {
+            mockActivity.logo._midiData = {
+                0: [
+                    {
+                        note: [440],
+                        duration: 4,
+                        bpm: 90,
+                        instrument: "guitar"
+                    }
+                ]
+            };
+
+            instance.afterSaveMIDI();
+            jest.runAllTimers();
+
+            const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+            const instrumentTrack = tracks.find(track => track.name === "Track 1 - guitar");
+
+            expect(instrumentTrack.addNote).toHaveBeenCalledWith({
+                midi: 69,
+                time: 0,
+                duration: 0.6666666666666666,
+                velocity: 0.8
+            });
+        } finally {
+            global.frequencyToPitch = originalF2P;
+        }
     });
 });
 
