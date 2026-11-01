@@ -63,12 +63,9 @@ describe("GlobalPlanet", () => {
             <div id="tagscontainer" style="display:block;"></div>
             <select id="sort-select"><option value="RECENT">Recent</option></select>
             <input id="global-search" value="" />
-            <input id="global-search-2" value="" />
             <div id="search-close" style="display:none;"></div>
-            <div id="search-close-2" style="display:none;"></div>
             <div id="global-tab"></div>
             <div id="local-tab"></div>
-            <div id="searchcontainer-one" style="display:block;"></div>
             <div id="globaltitle"></div>
             <div id="globalcontents"></div>
         `;
@@ -373,6 +370,47 @@ describe("GlobalPlanet", () => {
 
             gp.addProjectToCache.mockRestore();
         });
+
+        it("does not let an old callback change pagination after starting a newer request", () => {
+            const hideLoadMore = jest.spyOn(gp, "hideLoadMore");
+            let callback;
+
+            jest.spyOn(gp, "downloadProjectsToCache").mockImplementation((data, cb) => {
+                callback = cb;
+            });
+
+            gp._requestId = 1;
+
+            gp.addProjects([["proj1", 123]], 1);
+
+            jest.spyOn(gp, "render").mockImplementation(() => {
+                gp._requestId = 2;
+            });
+
+            hideLoadMore.mockClear();
+
+            callback();
+
+            expect(hideLoadMore).not.toHaveBeenCalled();
+        });
+
+        it("does not update cached-result pagination after a newer request starts", () => {
+            gp.cache.proj1 = {
+                ProjectLastUpdated: 123
+            };
+
+            gp._requestId = 1;
+
+            const hideLoadMore = jest.spyOn(gp, "hideLoadMore");
+
+            jest.spyOn(gp, "render").mockImplementation(() => {
+                gp._requestId = 2;
+            });
+
+            gp.addProjects([["proj1", 123]], 1);
+
+            expect(hideLoadMore).not.toHaveBeenCalled();
+        });
     });
     describe("addProjectToCache", () => {
         it("should add project data to cache on success", () => {
@@ -551,6 +589,24 @@ describe("GlobalPlanet", () => {
             expect(mockPlanet.ServerInterface.searchProjects.mock.calls[1][0]).toBe("piano");
         });
 
+        it("resumes a pending query when the active search fails", () => {
+            gp.searchString = "drums";
+            gp.search();
+
+            gp.searchString = "piano";
+            gp.search();
+
+            expect(mockPlanet.ServerInterface.searchProjects).toHaveBeenCalledTimes(1);
+
+            mockPlanet.ServerInterface.searchProjects.mock.calls[0][4]({
+                success: false,
+                error: "ERROR_CONNECTION_FAILURE"
+            });
+
+            expect(mockPlanet.ServerInterface.searchProjects).toHaveBeenCalledTimes(2);
+            expect(mockPlanet.ServerInterface.searchProjects.mock.calls[1][0]).toBe("piano");
+        });
+
         it("clears a failed search back to the tag view", () => {
             gp.searchMode = "ALL_PROJECTS";
             gp.searchString = "drums";
@@ -698,6 +754,199 @@ describe("GlobalPlanet", () => {
         });
     });
 
+    describe("global search interactions", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+            jest.spyOn(gp, "initTagList").mockImplementation(() => {});
+            jest.spyOn(gp, "search").mockImplementation(() => {});
+            gp.init();
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+
+        it("should debounce global search input", () => {
+            const input = document.getElementById("global-search");
+
+            input.value = " piano ";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            expect(gp.searchString).toBe("");
+            expect(gp.search).not.toHaveBeenCalled();
+
+            jest.advanceTimersByTime(300);
+
+            expect(gp.searchString).toBe("piano");
+            expect(gp.searchDebounce).toBeNull();
+            expect(gp.search).toHaveBeenCalledTimes(1);
+        });
+
+        it("should not let an in-flight search bypass the debounce", () => {
+            const input = document.getElementById("global-search");
+
+            gp.searchString = "old-query";
+            gp.oldSearchString = "old-query";
+            gp.searching = true;
+
+            input.value = "new-query";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            expect(gp.searchString).toBe("old-query");
+            expect(gp.search).not.toHaveBeenCalled();
+
+            gp.afterSearch();
+
+            expect(gp.searching).toBe(false);
+            expect(gp.search).not.toHaveBeenCalled();
+
+            jest.advanceTimersByTime(299);
+
+            expect(gp.searchString).toBe("old-query");
+            expect(gp.search).not.toHaveBeenCalled();
+
+            jest.advanceTimersByTime(1);
+
+            expect(gp.searchString).toBe("new-query");
+            expect(gp.searchDebounce).toBeNull();
+            expect(gp.search).toHaveBeenCalledTimes(1);
+        });
+
+        it("should not search while IME composition is in progress", () => {
+            const input = document.getElementById("global-search");
+
+            input.value = "ピ";
+
+            const composingInput = new Event("input", { bubbles: true });
+            Object.defineProperty(composingInput, "isComposing", {
+                value: true
+            });
+
+            input.dispatchEvent(composingInput);
+
+            expect(gp.searchString).toBe("");
+            expect(gp.search).not.toHaveBeenCalled();
+
+            jest.advanceTimersByTime(300);
+
+            expect(gp.search).not.toHaveBeenCalled();
+        });
+
+        it("should search once after IME composition ends", () => {
+            const input = document.getElementById("global-search");
+
+            input.value = "ピアノ";
+            input.dispatchEvent(new CompositionEvent("compositionend", { bubbles: true }));
+
+            expect(gp.searchString).toBe("");
+            expect(gp.search).not.toHaveBeenCalled();
+
+            jest.advanceTimersByTime(300);
+
+            expect(gp.searchString).toBe("ピアノ");
+            expect(gp.search).toHaveBeenCalledTimes(1);
+        });
+
+        it("should ignore Enter while IME composition is in progress", () => {
+            const input = document.getElementById("global-search");
+
+            input.value = "ピアノ";
+
+            const enter = new KeyboardEvent("keydown", {
+                key: "Enter",
+                bubbles: true
+            });
+
+            Object.defineProperty(enter, "isComposing", {
+                value: true
+            });
+
+            input.dispatchEvent(enter);
+
+            expect(gp.search).not.toHaveBeenCalled();
+        });
+
+        it("should cancel pending debounce when Enter is pressed", () => {
+            const input = document.getElementById("global-search");
+
+            input.value = " piano ";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            input.dispatchEvent(
+                new KeyboardEvent("keydown", {
+                    key: "Enter",
+                    bubbles: true
+                })
+            );
+
+            expect(gp.searchString).toBe("piano");
+            expect(gp.search).toHaveBeenCalledTimes(1);
+
+            jest.advanceTimersByTime(300);
+
+            expect(gp.search).toHaveBeenCalledTimes(1);
+        });
+
+        it("should cancel pending debounce when primary search is cleared", () => {
+            const input = document.getElementById("global-search");
+            const close = document.getElementById("search-close");
+
+            input.value = "piano";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            close.dispatchEvent(new Event("click", { bubbles: true }));
+
+            expect(input.value).toBe("");
+            expect(gp.searchString).toBe("");
+            expect(close.style.display).toBe("none");
+            expect(gp.search).toHaveBeenCalledTimes(1);
+
+            jest.advanceTimersByTime(300);
+
+            expect(gp.search).toHaveBeenCalledTimes(1);
+        });
+
+        it("should restore the browse view when live search is manually cleared", () => {
+            const input = document.getElementById("global-search");
+
+            gp.search.mockRestore();
+            const refreshSpy = jest.spyOn(gp, "refreshProjects").mockImplementation(() => {});
+
+            gp.searchString = "wrong-query";
+            gp.oldSearchString = "wrong-query";
+            gp.searching = false;
+
+            document.getElementById("tagscontainer").style.display = "none";
+
+            input.value = "";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            jest.advanceTimersByTime(300);
+
+            expect(gp.searchString).toBe("");
+            expect(gp.oldSearchString).toBe("");
+            expect(document.getElementById("tagscontainer").style.display).not.toBe("none");
+            expect(refreshSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("should cancel a pending debounce when IME composition starts", () => {
+            const input = document.getElementById("global-search");
+
+            input.value = "p";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            expect(gp.search).not.toHaveBeenCalled();
+
+            input.dispatchEvent(new CompositionEvent("compositionstart", { bubbles: true }));
+
+            expect(gp.searchDebounce).toBeNull();
+
+            jest.advanceTimersByTime(300);
+
+            expect(gp.search).not.toHaveBeenCalled();
+        });
+    });
+
     describe("destroy", () => {
         it("should call ProjectViewer.destroy() when ProjectViewer exists", () => {
             const mockDestroy = jest.fn();
@@ -706,6 +955,23 @@ describe("GlobalPlanet", () => {
             gp.destroy();
 
             expect(mockDestroy).toHaveBeenCalled();
+        });
+
+        it("should cancel a pending search debounce timer", () => {
+            jest.useFakeTimers();
+
+            const delayedSearch = jest.fn();
+
+            gp.searchDebounce = setTimeout(delayedSearch, 300);
+
+            gp.destroy();
+
+            jest.advanceTimersByTime(300);
+
+            expect(delayedSearch).not.toHaveBeenCalled();
+            expect(gp.searchDebounce).toBeNull();
+
+            jest.useRealTimers();
         });
 
         it("should not throw when ProjectViewer is null", () => {
