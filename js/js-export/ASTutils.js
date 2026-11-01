@@ -831,6 +831,36 @@ class ASTUtils {
             return ASTUtils._getMouseCallExpression("getBox", [nameAst]);
         }
 
+        if (methodName === "pi") {
+            return {
+                type: "MemberExpression",
+                object: {
+                    type: "Identifier",
+                    name: "Math"
+                },
+                property: {
+                    type: "Identifier",
+                    name: "PI"
+                },
+                computed: false
+            };
+        }
+
+        if (methodName === "e") {
+            return {
+                type: "MemberExpression",
+                object: {
+                    type: "Identifier",
+                    name: "Math"
+                },
+                property: {
+                    type: "Identifier",
+                    name: "E"
+                },
+                computed: false
+            };
+        }
+
         const mathOps = {
             plus: ["binexp", "+"],
             minus: ["binexp", "-"],
@@ -847,9 +877,25 @@ class ASTUtils {
             neg: ["unexp", "-"],
             abs: ["method", "Math.abs"],
             sqrt: ["method", "Math.sqrt"],
-            power: ["method", "Math.pow"]
+            power: ["method", "Math.pow"],
+            sin: ["method", "MathUtility.doSin"],
+            cos: ["method", "MathUtility.doCos"],
+            tan: ["method", "MathUtility.doTan"],
+            arcsin: ["method", "MathUtility.doArcSin"],
+            arccos: ["method", "MathUtility.doArcCos"],
+            arctan: ["method", "MathUtility.doArcTan"],
+            ln: ["method", "MathUtility.doLn"],
+            log: ["method", "MathUtility.doLog"]
         };
 
+        /**
+         * Builds an AST for a binary or logical expression.
+         *
+         * @param {string} operator - Operator symbol.
+         * @param {*} operand1 - Left operand.
+         * @param {*} operand2 - Right operand.
+         * @returns {Object} AST node for binary or logical expression.
+         */
         function getBinaryExpAST(operator, operand1, operand2) {
             return {
                 type:
@@ -862,6 +908,13 @@ class ASTUtils {
             };
         }
 
+        /**
+         * Builds an AST for a unary expression.
+         *
+         * @param {string} operator - Unary operator symbol.
+         * @param {*} operand - Argument operand.
+         * @returns {Object} AST node for unary expression.
+         */
         function getUnaryExpAST(operator, operand) {
             return {
                 type: "UnaryExpression",
@@ -871,6 +924,13 @@ class ASTUtils {
             };
         }
 
+        /**
+         * Builds an AST for a function call expression.
+         *
+         * @param {string} methodName - Callee method name.
+         * @param {Array} args - Arguments to the call.
+         * @returns {Object} AST node for call expression.
+         */
         function getCallExpAST(methodName, args) {
             return {
                 type: "CallExpression",
