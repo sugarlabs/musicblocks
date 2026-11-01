@@ -74,10 +74,11 @@ const _performanceRequestedInURL = () => {
 
 /**
  * Most barlines one note is split at when writing notation. Splitting takes one
- * step per measure, so without a limit a tiny meter (or a very long note) makes
- * millions of tied pieces, and a small enough measure never finishes.
+ * step per measure, so without a limit a tiny meter makes millions of tied
+ * pieces, and a small enough measure never finishes. Saving as ABC slows down
+ * sharply with more tied pieces, so the limit is kept low.
  */
-const MAX_NOTATION_BARLINES = 10000;
+const MAX_NOTATION_BARLINES = 1000;
 
 /**
  * @class
