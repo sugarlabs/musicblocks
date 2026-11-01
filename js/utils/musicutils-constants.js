@@ -1216,7 +1216,18 @@ var REVERSE_DRUM_MIDI_MAP = {
     49: ["crash"],
     39: ["clap"],
     40: ["slap"],
-    88: ["raindrop"]
+    88: ["raindrop"],
+    // General MIDI kit pieces with no Music Blocks drum of their own, sent to
+    // the nearest one. A drum track uses these as often as the ones above,
+    // and without them every one imported as the kick drum.
+    35: ["kick drum"], // Acoustic Bass Drum
+    44: ["hi hat"], // Pedal Hi-Hat
+    46: ["hi hat"], // Open Hi-Hat
+    45: ["tom tom"], // Low Tom
+    48: ["tom tom"], // Hi-Mid Tom
+    51: ["ride bell"], // Ride Cymbal 1
+    57: ["crash"], // Crash Cymbal 2
+    59: ["ride bell"] // Ride Cymbal 2
 };
 
 /**
