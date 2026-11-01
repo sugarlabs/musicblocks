@@ -112,6 +112,19 @@ describe("GlobalCard", () => {
             expect(card.ProjectData.ProjectName).toBe("Test Project");
             expect(card.ProjectData.ProjectLikes).toBe(5);
         });
+
+        it("should sanitize id to prevent HTML attribute injection", () => {
+            mockPlanet.GlobalPlanet.cache['test-id" onfocus="alert(1)'] = {
+                ProjectName: "Injection Project",
+                ProjectLikes: 0,
+                ProjectTags: [],
+                ProjectIsMusicBlocks: 1,
+                hasThumbnail: 0,
+                ProjectImage: null
+            };
+            card.init('test-id" onfocus="alert(1)');
+            expect(card.id).toBe("test-idonfocusalert1");
+        });
     });
 
     describe("showToast", () => {
@@ -263,6 +276,22 @@ describe("GlobalCard", () => {
                 "global-advanced-test-id-1",
                 "shareurl-advanced"
             );
+        });
+
+        it("should safely sanitize {ID} in render() when id contains unsafe characters", () => {
+            card.id = 'safe-id" onfocus="alert(1)';
+            card.ProjectData = {
+                ProjectName: "XSS Test",
+                ProjectLikes: 0,
+                ProjectTags: [],
+                ProjectIsMusicBlocks: 1,
+                hasThumbnail: 0,
+                ProjectImage: null
+            };
+            card.render();
+            const el = document.getElementById("global-project-image-safe-idonfocusalert1");
+            expect(el).not.toBeNull();
+            expect(document.querySelector("[onfocus]")).toBeNull();
         });
     });
 

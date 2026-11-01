@@ -116,7 +116,12 @@ class GlobalCard {
 
     render() {
         const Planet = this.Planet;
-        const html = this.renderData.replace(new RegExp("{ID}", "g"), this.id);
+        const safeId =
+            this.id !== null && this.id !== undefined
+                ? String(this.id).replace(/[^a-zA-Z0-9._-]/g, "")
+                : "";
+        this.id = safeId;
+        const html = this.renderData.replace(new RegExp("{ID}", "g"), safeId);
         const frag = document.createRange().createContextualFragment(html);
 
         // ── Thumbnail (lazy) ─────────────────────────────────────────────
@@ -408,8 +413,11 @@ class GlobalCard {
     }
 
     init(id) {
-        this.id = id;
-        this.ProjectData = this.Planet.GlobalPlanet.cache[id];
+        this.id =
+            id !== null && id !== undefined ? String(id).replace(/[^a-zA-Z0-9._-]/g, "") : null;
+        this.ProjectData =
+            this.Planet.GlobalPlanet.cache[id] ||
+            (this.id ? this.Planet.GlobalPlanet.cache[this.id] : null);
     }
 }
 
