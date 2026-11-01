@@ -103,6 +103,40 @@
             }
         },
         {
+            "comment": "Dictionary block",
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "argument.callee.property.name",
+                        "value": "getDict"
+                    },
+                    {
+                        "property": "argument.arguments",
+                        "size": 1
+                    }
+                ],
+                "name_property": "argument.callee.property.name",
+                "argument_properties": [
+                    "argument.arguments[0]"
+                ]
+            },
+            "name_map": {
+                "getDict": "dictionary"
+            }
+        },
+        {
             "comment": "Dictionary get function for 2 arguments",
             "ast": {
                 "identifiers": [
