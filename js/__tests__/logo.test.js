@@ -1479,38 +1479,99 @@ describe("Logo doStopTurtles", () => {
         expect(turtle.endOfClampSignals[10][0]).toBe("_tie_0");
     });
 
-    test("event completion path dispatches deferred clamp signals once runningFromEvent is cleared", () => {
-        let timerCallback;
+    test("event completion path dispatches deferred clamp signals once runningFromEvent is cleared via production runFromBlockNow", () => {
+        const scheduledTimeouts = [];
         jest.spyOn(logo._timerManager, "setTimeout").mockImplementation(cb => {
-            timerCallback = cb;
-            return 1234;
+            scheduledTimeouts.push(cb);
+            return scheduledTimeouts.length;
         });
 
         turtle.endOfClampSignals = { 10: ["_tie_0"] };
         turtle.butNotThese = {};
-        turtle.singer = { runningFromEvent: true, suppressOutput: false };
+        turtle.queue = [];
+        turtle.parentFlowQueue = [];
+        turtle.running = true;
+        turtle.singer.runningFromEvent = true;
+        turtle.singer.suppressOutput = false;
+        turtle.singer.justCounting = [];
         logo.turtles.running = jest.fn().mockReturnValue(false);
+        logo.turtles.turtleList = [turtle];
+        logo.turtles.getTurtleCount = () => 1;
+        logo.turtles.getTurtle = () => turtle;
+        logo.turtles.ithTurtle = () => turtle;
         logo._cleanupAfterCompletion = jest.fn();
+        logo.blockList = [makeFlowBlock("print")];
 
-        // Simulate natural completion block path that schedules _lastNoteTimeout
-        logo._lastNoteTimeout = logo._timerManager.setTimeout(() => {
-            logo._lastNoteTimeout = null;
-            turtle.singer.runningFromEvent = false;
-            logo.dispatchUnissuedSignals(turtle);
-            if (!logo.turtles.running()) {
-                logo._cleanupAfterCompletion();
-            }
-        }, 1000);
+        // 1. Run through production Logo.prototype.runFromBlockNow on terminal block (0)
+        logo.runFromBlockNow(logo, 0, 0, 0, null, 0);
 
+        // dispatchUnissuedSignals was called during runFromBlockNow, but deferred because runningFromEvent is true
         expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalled();
+        expect(turtle.endOfClampSignals[10]).toEqual(["_tie_0"]);
 
-        // When the timer fires, runningFromEvent is cleared and deferred signals dispatch
-        timerCallback();
+        // First timer scheduled is __checkCompletionState (100ms)
+        expect(scheduledTimeouts.length).toBeGreaterThanOrEqual(1);
+        const checkCompletionState = scheduledTimeouts[0];
+        checkCompletionState();
 
+        // checkCompletionState scheduled _lastNoteTimeout (1000ms)
+        expect(scheduledTimeouts.length).toBeGreaterThanOrEqual(2);
+        const lastNoteCallback = scheduledTimeouts[1];
+
+        // 2. Fire the production _lastNoteTimeout callback
+        lastNoteCallback();
+
+        // Verified: runningFromEvent cleared and deferred clamp signals dispatched through production path
         expect(turtle.singer.runningFromEvent).toBe(false);
         expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_tie_0");
         expect(turtle.endOfClampSignals[10][0]).toBeNull();
         expect(logo._cleanupAfterCompletion).toHaveBeenCalled();
+    });
+
+    test("clears runningFromEvent and dispatches deferred signals for all finished turtles on event completion", () => {
+        const scheduledTimeouts = [];
+        jest.spyOn(logo._timerManager, "setTimeout").mockImplementation(cb => {
+            scheduledTimeouts.push(cb);
+            return scheduledTimeouts.length;
+        });
+
+        const turtle2 = createMockTurtle();
+        turtle2.singer.runningFromEvent = true;
+        turtle2.singer.suppressOutput = false;
+        turtle2.singer.justCounting = [];
+        turtle2.endOfClampSignals = { 20: ["_tie_1"] };
+        turtle2.butNotThese = {};
+        turtle2.queue = [];
+        turtle2.parentFlowQueue = [];
+        turtle2.running = false;
+
+        turtle.endOfClampSignals = { 10: ["_tie_0"] };
+        turtle.butNotThese = {};
+        turtle.queue = [];
+        turtle.parentFlowQueue = [];
+        turtle.running = true;
+        turtle.singer.runningFromEvent = true;
+        turtle.singer.suppressOutput = false;
+        turtle.singer.justCounting = [];
+
+        logo.turtles.turtleList = [turtle, turtle2];
+        logo.turtles.running = jest.fn().mockReturnValue(false);
+        logo.turtles.getTurtle = i => (i === 0 ? turtle : turtle2);
+        logo.turtles.ithTurtle = i => (i === 0 ? turtle : turtle2);
+        logo.turtles.getTurtleCount = () => 2;
+        logo._cleanupAfterCompletion = jest.fn();
+        logo.blockList = [makeFlowBlock("print")];
+
+        logo.runFromBlockNow(logo, 0, 0, 0, null, 0);
+
+        // Run check completion, then last note timeout
+        scheduledTimeouts[0]();
+        scheduledTimeouts[1]();
+
+        expect(turtle.singer.runningFromEvent).toBe(false);
+        expect(turtle2.singer.runningFromEvent).toBe(false);
+        expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_tie_0");
+        expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_tie_1");
     });
 
     describe("with Transport and audio streams", () => {

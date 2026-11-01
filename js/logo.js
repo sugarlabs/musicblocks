@@ -2855,8 +2855,23 @@ class Logo {
                         }
                         logo._lastNoteTimeout = logo._timerManager.setTimeout(() => {
                             logo._lastNoteTimeout = null;
-                            tur.singer.runningFromEvent = false;
-                            logo.dispatchUnissuedSignals(tur);
+                            if (logo.turtles && logo.turtles.turtleList) {
+                                for (const t of logo.turtles.turtleList) {
+                                    if (t && t.singer) {
+                                        t.singer.runningFromEvent = false;
+                                    }
+                                    if (t) {
+                                        logo.dispatchUnissuedSignals(t);
+                                    }
+                                }
+                            } else {
+                                if (tur && tur.singer) {
+                                    tur.singer.runningFromEvent = false;
+                                }
+                                if (tur) {
+                                    logo.dispatchUnissuedSignals(tur);
+                                }
+                            }
                             if (tur.singer.suppressOutput && logo.recording) {
                                 tur.singer.suppressOutput = false;
                             }
