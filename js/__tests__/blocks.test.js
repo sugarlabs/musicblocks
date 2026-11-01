@@ -2136,6 +2136,45 @@ describe("Blocks Foundation", () => {
             ]);
         });
 
+        it("restores the Pitch-Drum Matrix cells, moving the block ids like connections", () => {
+            const blocks = new Blocks(mockActivity);
+            // Two blocks already in the workspace, so the loaded blocks start at 2.
+            blocks.blockList = [null, null];
+            blocks.protoBlockDict = {
+                pitchdrummatrix: { hasCapability: () => false, dockTypes: [] }
+            };
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks._updateSpatialGrid = jest.fn();
+            blocks._makeNewBlockWithConnections = jest.fn(
+                (name, offset, conns, postProcess, args) => {
+                    blocks.blockList[args[0]] = {
+                        name,
+                        connections: [null, null, null],
+                        container: { x: 0, y: 0 }
+                    };
+                    postProcess(args);
+                }
+            );
+
+            const drumCells = [
+                [1, 2, 0],
+                // The second row of a repeated pitch block.
+                [1, 2, 1],
+                "not a cell",
+                [-1, 2, 0],
+                [1, null, 0],
+                [1, 2, "0"]
+            ];
+            blocks.loadNewBlocks([
+                [0, ["pitchdrummatrix", { collapsed: false, drumCells }], 0, 0, [null, null, null]]
+            ]);
+
+            expect(blocks.blockList[2].drumCells).toEqual([
+                [3, 4, 0],
+                [3, 4, 1]
+            ]);
+        });
+
         // SwitchBlock.flow hooks its case onto the block after the switch
         // (Logo.setDispatchBlock). Without the hidden block the switch macro
         // adds, the case runs after that block, or never when the switch is

@@ -72,6 +72,8 @@ class PitchDrumMatrixCells {
             }
         }
 
+        this.restoreSavedCells();
+
         // Mark any cells found in the blockMap from previous
         // instances of the matrix.
         let obj;

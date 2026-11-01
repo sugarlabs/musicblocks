@@ -35,7 +35,9 @@ const METHODS = [
     "addNode",
     "removeNode",
     "_rowRepeat",
-    "_rowOf"
+    "_rowOf",
+    "restoreSavedCells",
+    "_storeCells"
 ];
 
 describe("PitchDrumMatrixBlocks", () => {
@@ -161,5 +163,97 @@ describe("PitchDrumMatrixBlocks", () => {
 
         expect(pdm._rowOf(10, 2)).toBe(-1);
         expect(pdm._rowOf(12, 0)).toBe(-1);
+    });
+
+    describe("cells saved with the project", () => {
+        let block;
+
+        // The matrix opened by block 5, with rows for pitch blocks 10 and 11 and drums 20 and 21.
+        beforeEach(() => {
+            block = { name: "pitchdrummatrix" };
+            pdm.activity = { blocks: { blockList: { 5: block } } };
+            pdm.blockNo = 5;
+            [10, 11].forEach(blk => pdm.addRowBlock(blk));
+            [20, 21].forEach(blk => pdm.addColBlock(blk));
+        });
+
+        test("addNode and removeNode keep the cells on the block that opened the matrix", () => {
+            pdm.addNode(10, 20);
+            pdm.addNode(11, 21, 1);
+            expect(block.drumCells).toEqual([
+                [10, 20, 0],
+                [11, 21, 1]
+            ]);
+
+            pdm.removeNode(10, 20);
+            expect(block.drumCells).toEqual([[11, 21, 1]]);
+        });
+
+        test("keeps the saved cells of pitches and drums this run didn't reach", () => {
+            block.drumCells = [
+                [12, 20, 0],
+                [10, 22, 0],
+                [10, 21, 0]
+            ];
+
+            pdm.addNode(11, 20);
+
+            expect(block.drumCells).toEqual([
+                [12, 20, 0],
+                [10, 22, 0],
+                [11, 20, 0]
+            ]);
+        });
+
+        test("doesn't put the cells of another matrix on this block", () => {
+            pdm._blockMap = [[40, 50, 0]];
+
+            pdm.addNode(10, 20);
+
+            expect(block.drumCells).toEqual([[10, 20, 0]]);
+        });
+
+        test("does nothing without the block that opened the matrix", () => {
+            pdm.blockNo = null;
+
+            pdm.addNode(10, 20);
+
+            expect(pdm._blockMap).toEqual([[10, 20, 0]]);
+            expect(block.drumCells).toBeUndefined();
+        });
+
+        test("restoreSavedCells adds the saved cells to the block map once", () => {
+            pdm._blockMap = [[10, 20, 0]];
+            block.drumCells = [
+                [10, 20, 0],
+                [11, 21, 1]
+            ];
+
+            pdm.restoreSavedCells();
+            pdm.restoreSavedCells();
+
+            expect(pdm._blockMap).toEqual([
+                [10, 20, 0],
+                [11, 21, 1]
+            ]);
+        });
+
+        test("a cell cleared in this session stays cleared", () => {
+            block.drumCells = [[10, 20, 0]];
+            pdm.restoreSavedCells();
+
+            pdm.removeNode(10, 20);
+            pdm.restoreSavedCells();
+
+            expect(pdm._blockMap).toEqual([]);
+        });
+
+        test("restoreSavedCells ignores a block without saved cells", () => {
+            pdm.restoreSavedCells();
+            pdm.blockNo = 6;
+            pdm.restoreSavedCells();
+
+            expect(pdm._blockMap).toEqual([]);
+        });
     });
 });
