@@ -84,6 +84,18 @@
 /js/blocks/__tests__/ToneBlocks*.test.js @omsuneri @Ashutoshx7 @vanshika2720
 /js/blocks/__tests__/VolumeBlocks*.test.js @omsuneri @Ashutoshx7 @vanshika2720
 
+# Area: Release, Security & Infrastructure
+# Releases, deployment config, the server and the service worker. After the
+# Tests & CI rules, so the release workflow is owned here.
+/release-please-config.json @kunalKumar-13
+/.release-please-manifest.json @kunalKumar-13
+/.github/workflows/release-please.yml @kunalKumar-13
+/.github/scripts/cap-release-notes*.js @kunalKumar-13
+/dockerfile @kunalKumar-13
+/.dockerignore @kunalKumar-13
+/index.js @kunalKumar-13
+/sw.js @kunalKumar-13
+/env.js @kunalKumar-13
 # Area: Governance
 # Ownership and governance
 /.github/CODEOWNERS @walterbender @pikurasa
