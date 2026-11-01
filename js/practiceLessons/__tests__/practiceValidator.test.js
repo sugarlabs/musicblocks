@@ -672,6 +672,12 @@ describe("PracticeValidator pitch octaves", () => {
         expect(PracticeValidator.hasChangedPitchOctave([4, 4])).toBe(false);
     });
 
+    test("deleting every note is not a move", () => {
+        useBlocks({});
+
+        expect(PracticeValidator.hasChangedPitchOctave([4, 4])).toBe(false);
+    });
+
     test("a note added in an octave the starter never used counts", () => {
         useBlocks({
             ...pitchAtOctave("p1", 4),
