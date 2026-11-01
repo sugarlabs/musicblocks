@@ -149,24 +149,26 @@ class Logo {
      * const logo = new Logo(deps);
      */
     constructor(activityOrDeps) {
+        if (
+            !activityOrDeps ||
+            typeof activityOrDeps !== "object" ||
+            Array.isArray(activityOrDeps)
+        ) {
+            throw new Error("Logo: dependencies must be an object");
+        }
+
         // `errorHandler` is the single property that distinguishes a
-        // LogoDependencies container from a legacy Activity object (which uses
-        // `errorMsg` instead). instanceof is checked first as the strongest
-        // signal; the typeof clause is a fallback for plain objects that satisfy
-        // the shape but are not formal instances (e.g. after jest.resetModules()
-        // clears module identity). When the project migrates to ES modules the
-        // require fallback and typeof clause can be removed.
+        // LogoDependencies container (or explicit dependency object) from a
+        // legacy Activity object (which uses `errorMsg` instead).
         const LD =
             typeof LogoDependencies !== "undefined"
                 ? LogoDependencies
                 : require("./LogoDependencies");
-        const isExplicitDeps =
-            activityOrDeps instanceof LD ||
-            (activityOrDeps !== null &&
-                activityOrDeps !== undefined &&
-                typeof activityOrDeps.errorHandler === "function");
+        const isExplicitDeps = activityOrDeps instanceof LD || "errorHandler" in activityOrDeps;
 
         if (isExplicitDeps) {
+            LD.validate(activityOrDeps);
+
             // Explicit dependency container: use directly and build a
             // compatibility facade so callers that expect an activity object
             // still work (Notation constructor, plugins, getStatsFromNotation).
@@ -178,18 +180,28 @@ class Logo {
                 turtles: deps.turtles,
                 stage: deps.stage,
                 errorMsg: (msg, blk) => deps.errorHandler(msg, blk),
-                hideMsgs: () => deps.messageHandler.hide(),
-                saveLocally: () => deps.storage.saveLocally(),
+                hideMsgs: () =>
+                    deps.messageHandler && typeof deps.messageHandler.hide === "function"
+                        ? deps.messageHandler.hide()
+                        : undefined,
+                saveLocally: () =>
+                    deps.storage && typeof deps.storage.saveLocally === "function"
+                        ? deps.storage.saveLocally()
+                        : undefined,
                 get showBlocksAfterRun() {
-                    return deps.config.showBlocksAfterRun;
+                    return deps.config ? deps.config.showBlocksAfterRun : false;
                 },
                 set showBlocksAfterRun(value) {
-                    deps.config.showBlocksAfterRun = value;
+                    if (deps.config) {
+                        deps.config.showBlocksAfterRun = value;
+                    }
                 },
-                onStopTurtle: deps.callbacks.onStopTurtle,
-                onRunTurtle: deps.callbacks.onRunTurtle,
-                refreshCanvas: () => deps.refreshCanvas(),
-                textMsg: msg => deps.textMsg(msg),
+                onStopTurtle: deps.callbacks ? deps.callbacks.onStopTurtle : undefined,
+                onRunTurtle: deps.callbacks ? deps.callbacks.onRunTurtle : undefined,
+                refreshCanvas: () =>
+                    typeof deps.refreshCanvas === "function" ? deps.refreshCanvas() : undefined,
+                textMsg: msg =>
+                    typeof deps.textMsg === "function" ? deps.textMsg(msg) : undefined,
                 save: deps.save,
                 statsWindow: deps.statsWindow,
                 logo: this
@@ -210,9 +222,9 @@ class Logo {
         this.turtles = this.deps.turtles;
         this.stage = this.deps.stage;
 
-        this.blockList = this.blocks.blockList;
-        this._onStopTurtle = this.deps.callbacks.onStopTurtle;
-        this._onRunTurtle = this.deps.callbacks.onRunTurtle;
+        this.blockList = this.blocks ? this.blocks.blockList : undefined;
+        this._onStopTurtle = this.deps.callbacks ? this.deps.callbacks.onStopTurtle : undefined;
+        this._onRunTurtle = this.deps.callbacks ? this.deps.callbacks.onRunTurtle : undefined;
 
         // Widgets
         this.reflection = null;
