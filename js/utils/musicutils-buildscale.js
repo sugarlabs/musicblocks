@@ -317,7 +317,18 @@ var buildScale = (keySignature, edo) => {
         // A scale that needs both sharps and flats (harmonic or melodic minor,
         // for example) can still repeat a letter here: A harmonic minor came
         // out as A B C D E F A♭. Spell such a scale with one letter per degree.
+        // A blues scale repeats a letter on purpose: its blue note is the
+        // flattened neighbour of a scale note (A C D E♭ E G), which the passes
+        // above respelled as F♭. Give each of its notes the degree it belongs to.
+        let letterDegrees = null;
         if (halfSteps.length === 7 && new Set(scale.slice(0, 7).map(note => note[0])).size < 7) {
+            letterDegrees = [0, 1, 2, 3, 4, 5, 6];
+        } else if (obj[1] === "minor blues" && halfSteps.length === 6) {
+            letterDegrees = [0, 2, 3, 4, 4, 6];
+        } else if (obj[1] === "major blues" && halfSteps.length === 6) {
+            letterDegrees = [0, 1, 2, 2, 4, 5];
+        }
+        if (letterDegrees !== null) {
             const letters = "CDEFGAB";
             const naturalPitches = [0, 2, 4, 5, 7, 9, 11];
             const accidentalNames = {
@@ -335,9 +346,9 @@ var buildScale = (keySignature, edo) => {
 
             let spellable = true;
             const letterScale = [myKeySignature];
-            for (let degree = 1; spellable && degree < 7; degree++) {
-                pitch += halfSteps[degree - 1];
-                const letter = (tonicLetter + degree) % 7;
+            for (let i = 1; spellable && i < letterDegrees.length; i++) {
+                pitch += halfSteps[i - 1];
+                const letter = (tonicLetter + letterDegrees[i]) % 7;
                 // How far the pitch is from the natural letter, in -6..5 semitones.
                 const offset = ((((pitch - naturalPitches[letter]) % 12) + 18) % 12) - 6;
                 if (!(offset in accidentalNames)) {
@@ -1271,6 +1282,14 @@ var getSolfege = (note, keySignature, movable, temperament, edo) => {
             index = scale.indexOf(altNote);
         }
 
+        // 3) in 12-EDO, an enharmonic spelling of a scale note (D♯ for E♭).
+        // Not for modes with more than 7 notes (chromatic, octatonic): there a
+        // match would map onto the 7 diatonic syllables and give a wrong pitch.
+        if (index === -1 && currentEDO === 12 && scale.length - 1 <= 7) {
+            const pitchClass = _notePitchClass(note);
+            index = scale.slice(0, -1).findIndex(n => _notePitchClass(n) === pitchClass);
+        }
+
         // Modes with fewer than 7 notes: use the same solfege that
         // getNoteFromSolfege resolves, so display and input agree.
         if (index !== -1 && currentEDO === 12 && scale.length - 1 < 7) {
@@ -1294,7 +1313,7 @@ var getSolfege = (note, keySignature, movable, temperament, edo) => {
             return SOLFEGENAMES[(index + tonicDegree) % 7].toLowerCase();
         }
 
-        // 3) chromatic fallback (interval based)
+        // 4) chromatic fallback (interval based)
         const tonic = scale[0];
         const tonicPitch = pitchToNumber(tonic, 4, keySignature, temperament);
         const notePitch = pitchToNumber(note, 4, keySignature, temperament);

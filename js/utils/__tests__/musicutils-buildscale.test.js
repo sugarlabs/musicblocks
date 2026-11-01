@@ -188,6 +188,70 @@ describe("musicutils-buildscale", () => {
         ).toEqual(["1", SHARP]);
     });
 
+    it.each([
+        ["A minor blues", "A C D E♭ E G A"],
+        ["E minor blues", "E G A B♭ B D E"],
+        ["B minor blues", "B D E F F♯ A B"],
+        ["F♯ minor blues", "F♯ A B C C♯ E F♯"],
+        ["C minor blues", "C E♭ F G♭ G B♭ C"],
+        ["B♭ minor blues", "B♭ D♭ E♭ F♭ F A♭ B♭"],
+        ["C major blues", "C D E♭ E G A C"],
+        ["D major blues", "D E F F♯ A B D"],
+        ["E major blues", "E F♯ G G♯ B C♯ E"],
+        ["F♯ major blues", "F♯ G♯ A A♯ C♯ D♯ F♯"],
+        ["E♭ major blues", "E♭ F G♭ G B♭ C E♭"]
+    ])("spells %s with its blue note flattened", (keySignature, expected) => {
+        expect(buildscale.buildScale(keySignature, 12)[0].join(" ")).toBe(expected);
+    });
+
+    it("gives the notes of a blues scale their own scale degrees", () => {
+        const degree = pitch =>
+            buildscale.scaleDegreeToPitchMapping("D major blues", null, false, pitch).join("");
+        // D E F F♯ A B: the blue note F is degree 3, and F♯ is not a flat 4.
+        expect(buildscale.buildScale("D major blues", 12)[0].slice(0, 6).map(degree)).toEqual([
+            "1" + NATURAL,
+            "2" + NATURAL,
+            "3" + NATURAL,
+            "3" + SHARP,
+            "5" + NATURAL,
+            "6" + NATURAL
+        ]);
+    });
+
+    it("round-trips every spelling of a blues scale note through movable solfege", () => {
+        const names = ["C", "D", "E", "F", "G", "A", "B"].flatMap(letter => [
+            letter,
+            letter + SHARP,
+            letter + FLAT
+        ]);
+        const tonics = ["C", "G", "D", "A", "E", "B", "F♯", "F", "B♭", "E♭", "A♭", "D♭"];
+        for (const keySignature of tonics.flatMap(k => [k + " major blues", k + " minor blues"])) {
+            const scalePitches = buildscale
+                .buildScale(keySignature, 12)[0]
+                .map(buildscale._notePitchClass);
+            for (const name of names) {
+                const pitchClass = buildscale._notePitchClass(name);
+                if (!scalePitches.includes(pitchClass)) {
+                    continue;
+                }
+                const solfege = buildscale.getSolfege(name, keySignature, true, "equal", 12);
+                const note = musicutils.getNote(solfege, 4, 0, keySignature, true, null, null);
+                expect([keySignature, name, buildscale._notePitchClass(note[0])]).toEqual([
+                    keySignature,
+                    name,
+                    pitchClass
+                ]);
+            }
+        }
+    });
+
+    it("leaves movable solfege in chromatic and 8-note modes as it was", () => {
+        // Seven syllables can't name 12 or 8 notes, so an enharmonic match there
+        // would turn C♯ into "re" and play a D.
+        expect(buildscale.getSolfege("C♯", "C chromatic", true, "equal", 12)).toBe("di");
+        expect(buildscale.getSolfege("D♯", "C octatonic", true, "equal", 12)).toBe("ri");
+    });
+
     it("still resolves a minor key signature's scale and solfege", () => {
         expect(buildscale.buildScale("A minor", 12)[0].slice(0, 3)).toEqual(["A", "B", "C"]);
         expect(buildscale.getSolfege("A", "A minor", false, "equal")).toBe("la");
