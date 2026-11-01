@@ -133,6 +133,29 @@ function drumNames(blocks) {
         .map(b => byIndex.get(b[4][1])[1][1].value);
 }
 
+/**
+ * Every lyric print's text, in block-array order. A lyric print is chained
+ * off a note's vspace -- possibly through earlier verses' prints -- rather
+ * than hanging off the preamble's "start".
+ */
+function lyricTexts(blocks) {
+    const byIndex = new Map(blocks.map(block => [block[0], block]));
+    const lyrics = [];
+    for (const vspace of blocks.filter(b => blockName(b) === "vspace")) {
+        let next = byIndex.get(vspace[4][1]);
+        while (next && blockName(next) === "print") {
+            lyrics.push(byIndex.get(next[4][1])[1][1].value);
+            next = byIndex.get(next[4][2]);
+        }
+    }
+    return lyrics;
+}
+
+const LYRIC = (text, { verse = null, syllabic = null, extra = "" } = {}) =>
+    `<lyric${verse === null ? "" : ` number="${verse}"`}>${extra}${
+        syllabic === null ? "" : `<syllabic>${syllabic}</syllabic>`
+    }<text>${text}</text></lyric>`;
+
 const SIMPLE_NOTE = (step, octave, type, opts = "") =>
     `<note><pitch><step>${step}</step>${opts}<octave>${octave}</octave></pitch><duration>1</duration><type>${type}</type></note>`;
 
@@ -1742,5 +1765,95 @@ describe("Test 19: Cue notes", () => {
         ]);
         expect(blocks.filter(b => blockName(b) === "rest2")).toHaveLength(1);
         expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
+    });
+});
+
+describe("Test 20: Lyrics", () => {
+    const sungNote = (step, lyricXml) =>
+        `<note><pitch><step>${step}</step><octave>4</octave></pitch>` +
+        `<duration>1</duration><type>quarter</type>${lyricXml}</note>`;
+
+    it("imports a verse as a print nested inside its note", async () => {
+        const { blocks } = await parseAndCapture(scorePartwise(sungNote("C", LYRIC("star"))));
+
+        expect(lyricTexts(blocks)).toEqual(["star"]);
+
+        // The print sits between the note's vspace and its pitch -- inside the
+        // newnote clamp, the shape Music Blocks' own lyric convention uses
+        // (issue #948), not a print block beside the note.
+        const newnote = blocks.find(b => blockName(b) === "newnote");
+        const vspace = blocks.find(b => b[0] === newnote[4][2]);
+        const lyricPrint = blocks.find(b => b[0] === vspace[4][1]);
+        const pitch = blocks.find(b => blockName(b) === "pitch");
+        expect(blockName(lyricPrint)).toBe("print");
+        expect(lyricPrint[4][2]).toBe(pitch[0]);
+        expect(pitch[4][0]).toBe(lyricPrint[0]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("writes <syllabic> as the hyphen a singer reads", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                sungNote("C", LYRIC("twin", { syllabic: "begin" })) +
+                    sungNote("C", LYRIC("kle", { syllabic: "middle" })) +
+                    sungNote("C", LYRIC("star", { syllabic: "end" })) +
+                    sungNote("C", LYRIC("how", { syllabic: "single" }))
+            )
+        );
+
+        expect(lyricTexts(blocks)).toEqual(["twin-", "kle-", "star", "how"]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("keeps each verse in its own print, in verse-number order", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                sungNote("C", LYRIC("tenth", { verse: 10 }) + LYRIC("second", { verse: 2 }))
+            )
+        );
+
+        // Two verses on one note are separate, editable prints -- numbered
+        // 2 then 10, not 10 then 2 -- chained before the pitch.
+        expect(lyricTexts(blocks)).toEqual(["second", "tenth"]);
+
+        const newnote = blocks.find(b => blockName(b) === "newnote");
+        const vspace = blocks.find(b => b[0] === newnote[4][2]);
+        const firstPrint = blocks.find(b => b[0] === vspace[4][1]);
+        const secondPrint = blocks.find(b => b[0] === firstPrint[4][2]);
+        const pitch = blocks.find(b => blockName(b) === "pitch");
+        expect(blockName(secondPrint)).toBe("print");
+        expect(secondPrint[4][2]).toBe(pitch[0]);
+        expect(pitch[4][0]).toBe(secondPrint[0]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("imports no lyric for an empty verse slot or a melisma <extend/>", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                sungNote("C", LYRIC("", { extra: "<extend/>" })) +
+                    sungNote("D", "<lyric><text>   </text></lyric>")
+            )
+        );
+
+        expect(lyricTexts(blocks)).toEqual([]);
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 }
+        ]);
+    });
+
+    it("keeps the lyric when a tie merges its notes into one", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                sungNote("C", `${LYRIC("star")}<tie type="start"/>`) +
+                    sungNote("C", '<tie type="stop"/>')
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 2]]);
+        expect(lyricTexts(blocks)).toEqual(["star"]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 });
