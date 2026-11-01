@@ -203,7 +203,7 @@ jobs:
               shell: bash
 
             # There is no fixed coverage minimum here. coverage-delta.yml fails the
-            # pull request if coverage drops.
+            # pull request if coverage drops by more than 0.1 percentage points.
             - name: Run Jest with coverage
               run: npm test -- --coverage --ci
 

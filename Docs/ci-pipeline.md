@@ -63,7 +63,8 @@ For a normal pull request targeting `master`, the main checks are:
    make the branch mergeable.
 7. `po-to-json-validation.yml` runs only when a pull request changes a PO
    translation file.
-8. `coverage-delta.yml` fails if coverage drops or a measurement job fails.
+8. `coverage-delta.yml` fails if coverage drops by more than 0.1 percentage
+   points or a measurement job fails.
 
 The workflows that execute pull-request code use the `pull_request` event
 rather than `pull_request_target`. For pull requests from forks, GitHub does
