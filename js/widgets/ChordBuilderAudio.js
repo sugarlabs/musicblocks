@@ -103,50 +103,43 @@ class ChordBuilderAudio {
             return [];
         }
 
-        const SEMITONE_MAP = {
-            "C": 0,
-            "C#": 1,
-            "C♯": 1,
-            "Db": 1,
-            "D♭": 1,
-            "D": 2,
-            "D#": 3,
-            "D♯": 3,
-            "Eb": 3,
-            "E♭": 3,
-            "E": 4,
-            "F": 5,
-            "F#": 6,
-            "F♯": 6,
-            "Gb": 6,
-            "G♭": 6,
-            "G": 7,
-            "G#": 8,
-            "G♯": 8,
-            "Ab": 8,
-            "A♭": 8,
-            "A": 9,
-            "A#": 10,
-            "A♯": 10,
-            "Bb": 10,
-            "B♭": 10,
-            "B": 11
+        const LETTER_ORDER = { C: 0, D: 1, E: 2, F: 3, G: 4, A: 5, B: 6 };
+        const ACCIDENTAL_OFFSETS = {
+            "#": 1,
+            "♯": 1,
+            "##": 2,
+            "x": 2,
+            "𝄪": 2,
+            "b": -1,
+            "♭": -1,
+            "bb": -2,
+            "𝄫": -2
         };
 
         const result = [];
         let currentOctave = baseOctave;
-        let lastSemitone = -1;
+        let lastLetter = -1;
+        let lastAccidental = 0;
 
         for (let i = 0; i < notes.length; i++) {
             const note = notes[i];
             const cleanNote = typeof note === "string" ? note.trim() : String(note);
-            const semitone = SEMITONE_MAP[cleanNote] !== undefined ? SEMITONE_MAP[cleanNote] : 0;
+            const letter = cleanNote.charAt(0).toUpperCase();
+            const letterIndex = LETTER_ORDER[letter];
+            const accidental = cleanNote.slice(1);
+            const accidentalOffset = ACCIDENTAL_OFFSETS[accidental] || 0;
 
-            if (i > 0 && semitone < lastSemitone) {
-                // Pitch wrapped past B -> advance octave
-                currentOctave++;
+            if (i > 0 && letterIndex !== undefined && lastLetter !== -1) {
+                if (
+                    letterIndex < lastLetter ||
+                    (letterIndex === lastLetter && accidentalOffset < lastAccidental)
+                ) {
+                    currentOctave++;
+                }
             }
-            lastSemitone = semitone;
+
+            lastLetter = letterIndex !== undefined ? letterIndex : -1;
+            lastAccidental = accidentalOffset;
             result.push(`${cleanNote}${currentOctave}`);
         }
 
