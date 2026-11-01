@@ -7839,20 +7839,15 @@ class Blocks {
                 if (turtle !== null) {
                     console.debug("putting turtle " + turtle + " in the trash");
                     const comp = this.turtles.turtleList[turtle].companionTurtle;
-                    if (comp) {
+                    if (comp !== null && comp !== undefined) {
                         this.turtles.turtleList[comp].inTrash = true;
                         if (this.turtles.turtleList[comp].container) {
                             this.turtles.turtleList[comp].container.visible = false;
                         }
-                        this.turtles.turtleList[turtle].inTrash = true;
-                        if (this.turtles.turtleList[turtle].container) {
-                            this.turtles.turtleList[turtle].container.visible = false;
-                        }
-                    } else {
-                        this.turtles.turtleList[turtle].inTrash = true;
-                        if (this.turtles.turtleList[turtle].container) {
-                            this.turtles.turtleList[turtle].container.visible = false;
-                        }
+                    }
+                    this.turtles.turtleList[turtle].inTrash = true;
+                    if (this.turtles.turtleList[turtle].container) {
+                        this.turtles.turtleList[turtle].container.visible = false;
                     }
                 }
             } else if (myBlock.name === "action") {
