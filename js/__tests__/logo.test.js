@@ -1469,6 +1469,24 @@ describe("Logo doStopTurtles", () => {
 
             clearIntervalSpy.mockRestore();
         });
+
+        test("stops companion turtle and clears interval when companion index is zero", () => {
+            const clearIntervalSpy = jest
+                .spyOn(global, "clearInterval")
+                .mockImplementation(() => {});
+            turtle0.companionTurtle = null;
+            turtle1.companionTurtle = 0;
+            turtle0.interval = 888;
+            turtle0.running = true;
+
+            logo.doStopTurtles();
+
+            expect(turtle0.running).toBe(false);
+            expect(clearIntervalSpy).toHaveBeenCalledWith(888);
+            expect(turtle0.interval).toBeUndefined();
+
+            clearIntervalSpy.mockRestore();
+        });
     });
 });
 
