@@ -324,6 +324,34 @@ describe("GlobalCard", () => {
             );
         });
 
+        it("should replace the optimistic count with the server count", () => {
+            card.init("test-id-1");
+            card.render();
+            mockPlanet.ServerInterface.likeProject.mockImplementation((id, like, callback) => {
+                callback({ success: true, likes: 1 });
+            });
+
+            card.like();
+            jest.advanceTimersByTime(500);
+
+            expect(document.getElementById("global-project-likes-test-id-1").textContent).toBe("1");
+            expect(card.ProjectData.ProjectLikes).toBe(1);
+        });
+
+        it("should restore the previous liked state and count when the request fails", () => {
+            card.init("test-id-1");
+            card.render();
+            mockPlanet.ServerInterface.likeProject.mockImplementation((id, like, callback) => {
+                callback({ success: false });
+            });
+
+            card.like();
+            jest.advanceTimersByTime(500);
+
+            expect(document.getElementById("global-project-likes-test-id-1").textContent).toBe("5");
+            expect(mockPlanet.ProjectStorage.like).toHaveBeenLastCalledWith("test-id-1", false);
+        });
+
         it("should unlike when project is already liked", () => {
             mockPlanet.ProjectStorage.isLiked.mockReturnValue(true);
             card.like();

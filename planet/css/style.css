@@ -46,6 +46,10 @@
 	justify-content: center;
 }
 
+button.project-icon {
+	color: #ffab40;
+}
+
 .projectscontainer {
 	display: -webkit-box;
 	display: -ms-flexbox;
@@ -310,8 +314,8 @@ div.select-wrapper * {
 }
 
 .likes-count {
-	position: relative;
-	top: -7px;
+	display: inline-flex;
+	align-items: center;
 }
 
 #search-close {

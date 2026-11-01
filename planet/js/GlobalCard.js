@@ -66,8 +66,7 @@ class GlobalCard {
                             )}" id="global-project-merge-{ID}"><i class="material-icons">merge_type</i></a> 
                             <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${`${
                                 Planet.ProjectStorage.isLiked(this.id) ? "Unlike" : "Like"
-                            } project`}"><i class="material-icons" id="global-like-icon-{ID}"></i><span class="likes-count" id="global-project-likes-{ID}"></span></a>
-
+                            } project`}"><i class="material-icons" id="global-like-icon-{ID}"></i><span class="likes-count" id="global-project-likes-{ID}"></span></a> 
                             <div id="global-share-{ID}"> 
                                 <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_(
                                     "Share project"
@@ -371,7 +370,11 @@ class GlobalCard {
             // GitServerInterface.likeProject uses repoName (this.id) directly
             Planet.ServerInterface.likeProject(this.id, like, data => {
                 this.likePending = false;
-                if (!data.success) {
+                if (data.success && Number.isFinite(data.likes)) {
+                    this.ProjectData.ProjectLikes = data.likes;
+                    const currentLikes = document.getElementById(`global-project-likes-${this.id}`);
+                    if (currentLikes) currentLikes.textContent = data.likes.toString();
+                } else if (!data.success) {
                     // Roll back optimistic update on failure
                     if (document.getElementById(`global-project-likes-${this.id}`)) {
                         this.setLike(!like);
