@@ -433,8 +433,13 @@ describe("Chord Builder widget", () => {
             expect(firstChord, "first chordinterval must follow the start block").to.exist;
 
             const roots = [];
+            const visitedChords = new Set();
             let currentChord = firstChord;
             while (currentChord) {
+                expect(visitedChords.has(currentChord), "flow chain must not contain a cycle").to.be
+                    .false;
+                visitedChords.add(currentChord);
+
                 expect(currentChord.name, "flow block must be a chordinterval").to.equal(
                     "chordinterval"
                 );
@@ -444,7 +449,12 @@ describe("Chord Builder widget", () => {
                 expect(rootBlock, "pitch root block must exist").to.exist;
                 expect(rootBlock.name, "pitch root block must be a notename").to.equal("notename");
                 roots.push(rootBlock.value);
-                currentChord = blocks.blockList[currentChord.connections[3]];
+
+                const nextChordIndex = currentChord.connections[3];
+                currentChord =
+                    nextChordIndex !== null && nextChordIndex !== undefined
+                        ? blocks.blockList[nextChordIndex]
+                        : null;
             }
 
             expect(
