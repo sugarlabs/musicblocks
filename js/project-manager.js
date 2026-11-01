@@ -25,6 +25,7 @@
    isSafeUrl,
    getTemperament,
    getOctaveRatio,
+   getSavedCustomModes,
    debugLog,
    platformColor,
    transcribeMidi,
@@ -718,6 +719,7 @@ class ProjectManager {
 
         const restored = activity.logo.getRestoredConnections();
         const data = [];
+        let customModes = null;
         for (let blk = 0; blk < activity.blocks.blockList.length; blk++) {
             const myBlock = activity.blocks.blockList[blk];
             if (!myBlock || myBlock.trash) {
@@ -755,6 +757,17 @@ class ProjectManager {
                             myBlock.manualAccidental !== null
                         ) {
                             args.manualAccidental = myBlock.manualAccidental;
+                        }
+                        if (myBlock.name === "modename") {
+                            customModes ??= getSavedCustomModes();
+                            const mode = customModes.find(m => m.name === myBlock.value);
+                            if (mode) {
+                                args.customMode = {
+                                    pattern: mode.pattern,
+                                    edo: mode.edo,
+                                    temperamentKey: mode.temperamentKey
+                                };
+                            }
                         }
                 }
             } else {

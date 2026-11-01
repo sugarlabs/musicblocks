@@ -28,7 +28,8 @@
     docById, define, BlocksDependencies, deepClone, pubsub,
     MINIMUMDOCKDISTANCE, LONGSTACK, SPATIAL_GRID_CELL_SIZE,
     CAMERAVALUE, VIDEOVALUE, setupBlockDragController,
-    announceToScreenReader
+    announceToScreenReader, MUSICALMODES, getSavedCustomModes,
+    isUnsafeObjectKey
 */
 
 /* global showZoomOverlay, ManagedTimer */
@@ -60,7 +61,9 @@
         getDrumSynthName, getNoiseName, getNoiseSynthName,
         getTemperamentsList, getVoiceSynthName, i18nSolfege,
         setOctaveRatio, splitScaleDegree, splitSolfege,
-        updateTemperaments
+        updateTemperaments, MUSICALMODES, getSavedCustomModes
+   - js/utils/utils-logic.js
+        isUnsafeObjectKey
 */
 // Constants moved to js/block-constants.js
 
@@ -5320,6 +5323,77 @@ class Blocks {
         };
 
         /**
+         * Registers the custom modes saved with a project's mode name blocks.
+         * The project's definition replaces a saved mode of the same name,
+         * but never a built-in mode.
+         * @param - blockObjs - Block Objects
+         * @private
+         * @returns {void}
+         */
+        this._restoreCustomModes = blockObjs => {
+            let saved = null;
+            let changed = false;
+            for (const blkData of blockObjs) {
+                if (!Array.isArray(blkData[1]) || blkData[1][0] !== "modename") continue;
+
+                const { value: name, customMode } = blkData[1][1] ?? {};
+                const pattern = customMode?.pattern;
+                if (
+                    typeof name !== "string" ||
+                    !name ||
+                    isUnsafeObjectKey(name) ||
+                    !Array.isArray(pattern) ||
+                    pattern.length === 0 ||
+                    !pattern.every(step => Number.isInteger(step) && step > 0)
+                ) {
+                    continue;
+                }
+
+                const edo = pattern.reduce((a, b) => a + b, 0);
+                if (
+                    edo < 5 ||
+                    edo > 55 ||
+                    (customMode.edo !== undefined && customMode.edo !== edo)
+                ) {
+                    continue;
+                }
+
+                saved ??= getSavedCustomModes();
+                const lower = name.toLowerCase();
+                if (
+                    lower !== "custom" &&
+                    !saved.some(m => m.name.toLowerCase() === lower) &&
+                    Object.keys(MUSICALMODES).some(k => k.toLowerCase() === lower)
+                ) {
+                    continue;
+                }
+
+                const mode = { name, pattern, edo };
+                if (typeof customMode.temperamentKey === "string") {
+                    mode.temperamentKey = customMode.temperamentKey;
+                }
+                const i = saved.findIndex(m => m.name.toLowerCase() === lower);
+                if (i < 0 || JSON.stringify(saved[i]) !== JSON.stringify(mode)) {
+                    saved[i < 0 ? saved.length : i] = mode;
+                    changed = true;
+                }
+
+                MUSICALMODES[name] = pattern;
+                MUSICALMODES[lower] = pattern;
+            }
+
+            if (changed) {
+                try {
+                    localStorage.setItem("customModes", JSON.stringify(saved));
+                } catch (e) {
+                    this.activity.errorMsg(
+                        _("Could not save the custom mode. Local storage is full or unavailable.")
+                    );
+                }
+            }
+        };
+
+        /**
          * Load new blocks. Queues the call instead of running it immediately
          * if another load is still in progress, so the two loads' bookkeeping
          * never overlaps (issue #8392).
@@ -6188,6 +6262,8 @@ class Blocks {
                 if (this.activity && this.activity.logo && this.activity.logo.synth) {
                     this.activity.logo.synth.preloadProjectSamples(blockObjs);
                 }
+
+                this._restoreCustomModes(blockObjs);
 
                 /** We add new blocks to the end of the block list. */
                 const blockOffset = this.blockList.length;
