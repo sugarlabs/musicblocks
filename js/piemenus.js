@@ -1531,7 +1531,10 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
 
     if (hasOctaveWheel) {
         // Use the octave associated with the block, if available.
-        const pitchOctave = block.blocks.findPitchOctave(block.connections[0]);
+        const pitchOctave =
+            typeof block.blocks.findPitchOctave === "function"
+                ? block.blocks.findPitchOctave(block.connections[0])
+                : 4;
 
         // Navigate to current octave
         block._octavesWheel.navigateWheel(8 - pitchOctave);
@@ -1613,17 +1616,25 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
         hideWheelDiv();
     };
 
+    let previewRequestId = 0;
+
     const __selectionChanged = async () => {
+        const currentRequestId = ++previewRequestId;
         const label = that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
         that.customID = label;
         const rawNote = that._cusNoteWheel.navItems[that._cusNoteWheel.selectedNavItemIndex].title;
-        const centsMatch = (that.value || "").match(/\([+-]?\d+¢\)/);
+        const centsMatch = (rawNote || "").match(/\([+-]?\d+¢\)/);
         const note = (rawNote || "").replace(/\([+-]?\d+¢\)/g, "");
         that.value = centsMatch ? note + centsMatch[0] : note;
-        that.text.text = centsMatch ? note + centsMatch[0] : note;
+        that.text.text = that.value;
 
         let octave = 4;
-        if (hasOctaveWheel) {
+        if (
+            hasOctaveWheel &&
+            that._octavesWheel &&
+            that._octavesWheel.selectedNavItemIndex !== undefined &&
+            that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex]
+        ) {
             octave = Number(
                 that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
             );
@@ -1660,62 +1671,105 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
             octave = 8;
         }
 
-        if (hasOctaveWheel && deltaOctave !== 0) {
-            that._octavesWheel.navigateWheel(8 - octave);
-            that.blocks.setPitchOctave(that.connections[0], octave);
+        if (hasOctaveWheel) {
+            if (deltaOctave !== 0) {
+                that._octavesWheel.navigateWheel(8 - octave);
+                that.blocks.setPitchOctave(that.connections[0], octave);
+            }
+        } else if (that.connections[0] !== null) {
+            octave =
+                typeof that.blocks.findPitchOctave === "function"
+                    ? that.blocks.findPitchOctave(that.connections[0])
+                    : 4;
+        }
+        if (typeof octave !== "number" || isNaN(octave)) {
+            octave = 4;
         }
 
         // Make sure text is on top.
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
 
-        try {
-            await Tone.start();
-        } catch (e) {
-            console.debug("Tone.start() skipped or failed", e);
+        if (typeof Tone !== "undefined" && Tone.start) {
+            try {
+                Tone.start().catch(() => {});
+            } catch (e) {
+                console.debug("Tone.start() skipped or failed", e);
+            }
         }
 
+        const customID = that.customID || label;
+
+        // Create and load synth if needed
         if (!instruments[0] || !instruments[0][DEFAULTVOICE]) {
             try {
                 that.activity.logo.synth.createDefaultSynth(0);
                 await that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
             } catch (e) {
-                console.debug(e);
+                return;
+            }
+            if (currentRequestId !== previewRequestId) {
+                return;
             }
         }
 
+        // Ensure synth is properly initialized
         if (!that.activity.logo.synth.tone) {
             that.activity.logo.synth.newTone();
         }
 
+        // Set volume
         try {
             that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
             that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
         } catch (e) {
-            console.debug(e);
+            return;
         }
 
         if (!that._triggerLock) {
             that._triggerLock = true;
-            try {
-                const customID = that.customID || label || selectedCustom;
-                const no = that.activity.logo.synth.getCustomFrequency([note + octave], customID);
-                await that.activity.logo.synth.trigger(
-                    0,
-                    no !== undefined && no !== "undefined" ? no : [note + octave],
-                    1 / 8,
-                    DEFAULTVOICE,
-                    null,
-                    null,
-                    false
-                );
-                announceToScreenReader(_("played") + " " + note + octave);
-            } catch (e) {
-                console.error("Synth trigger error:", e);
+            // Format custom note with octave for frequency calculation
+            const baseNote = (rawNote || note).replace(/(?<=[a-zA-Z\)])(-?\d+)$/, "");
+            const noteWithOctave = baseNote + octave;
+            const freqs = that.activity.logo.synth.getCustomFrequency([noteWithOctave], customID);
+            const freq = Array.isArray(freqs) ? freqs[0] : freqs;
+            const validFreq = Number.isFinite(freq) && freq > 0;
+
+            if (validFreq || (freqs !== undefined && freqs !== "undefined")) {
+                if (typeof that.activity.logo.synth.trigger === "function") {
+                    try {
+                        await that.activity.logo.synth.trigger(
+                            0,
+                            validFreq ? freqs : [noteWithOctave],
+                            1 / 8,
+                            DEFAULTVOICE,
+                            null,
+                            null,
+                            false
+                        );
+                    } catch (e) {
+                        console.error("Synth trigger error:", e);
+                    }
+                }
+                if (
+                    validFreq &&
+                    instruments[0] &&
+                    instruments[0][DEFAULTVOICE] &&
+                    typeof instruments[0][DEFAULTVOICE].triggerAttackRelease === "function"
+                ) {
+                    try {
+                        instruments[0][DEFAULTVOICE].triggerAttackRelease(freq, 1 / 8);
+                    } catch (e) {
+                        console.debug("triggerAttackRelease error:", e);
+                    }
+                }
+                if (typeof announceToScreenReader === "function") {
+                    announceToScreenReader(_("played") + " " + note + octave);
+                }
             }
             setTimeout(() => {
                 that._triggerLock = false;
-            }, 125);
+            }, 125); // 1/8 second in milliseconds
         }
     };
 
