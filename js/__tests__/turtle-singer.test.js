@@ -75,6 +75,8 @@ global.getSavedCustomModes = musicUtils.getSavedCustomModes;
 global.SOLFEGENAMES1 = musicUtils.SOLFEGENAMES1;
 global.NOTENAMES1 = musicUtils.NOTENAMES1;
 global.getInterval = musicUtils.getInterval;
+global.edoTransposition = musicUtils.edoTransposition;
+global.edoTranspositionCents = musicUtils.edoTranspositionCents;
 global.noteIsSolfege = musicUtils.noteIsSolfege;
 global.getSolfege = musicUtils.getSolfege;
 global.last = array => (array && array.length > 0 ? array[array.length - 1] : null);
@@ -1210,6 +1212,134 @@ describe("processPitch — note block execution path", () => {
         expect(turtleMock.singer.noteOctaves[0].length).toBe(1);
         expect(turtleMock.singer.noteBeatValues[0].length).toBe(1);
         expect(turtleMock.singer.pushedNote).toBe(true);
+    });
+});
+
+describe("processPitch intervals, chords and register by temperament", () => {
+    let turtleMock;
+    let activityMock;
+    const saved = {};
+
+    beforeEach(() => {
+        for (const name of ["getNote", "getCurrentEDO", "getTemperament", "pitchToFrequency"]) {
+            saved[name] = global[name];
+            global[name] = musicUtils[name];
+        }
+
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.singer.keySignature = "C major";
+        turtleMock.singer.inNoteBlock = [0];
+        for (const key of ["notePitches", "noteOctaves", "noteCents", "noteHertz"]) {
+            turtleMock.singer[key] = { 0: [] };
+        }
+        turtleMock.singer.noteBeatValues = { 0: [] };
+
+        activityMock = createActivityMock(turtleMock);
+        activityMock.logo.synth.inTemperament = "equal19";
+        activityMock.logo.clearNoteParams = jest.fn((tur, blk) => {
+            for (const key of [
+                "notePitches",
+                "noteOctaves",
+                "noteCents",
+                "noteHertz",
+                "noteBeatValues"
+            ]) {
+                tur.singer[key][blk] = [];
+            }
+        });
+        jest.spyOn(Singer, "processNote").mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        Object.assign(global, saved);
+        jest.restoreAllMocks();
+    });
+
+    const played = blk =>
+        turtleMock.singer.notePitches[blk].map(
+            (pitch, i) => pitch + turtleMock.singer.noteOctaves[blk][i]
+        );
+
+    test("an interval of a third above C4 adds E4 in 19 EDO", () => {
+        turtleMock.singer.intervals = [2];
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 0);
+        expect(played(0)).toEqual(["C4", "E4"]);
+    });
+
+    test("a root position triad on C4 adds E4 and G4 in 19 EDO", () => {
+        turtleMock.singer.chordIntervals = [
+            [2, 0],
+            [4, 0]
+        ];
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 0);
+        expect(played(0)).toEqual(["C4", "E4", "G4"]);
+    });
+
+    test("an arpeggio step of a third plays E4 for C4 in 19 EDO", () => {
+        turtleMock.singer.arpeggio = [[2, 0]];
+        turtleMock.singer.arpeggioIndex = 0;
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 0);
+        expect(played(0)).toEqual(["E4"]);
+    });
+
+    test("half a semitone sounds 50 cents above C4 in 19 EDO", () => {
+        turtleMock.singer.transposition = 0.5;
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 0);
+        const base = musicUtils.pitchToFrequency("C", 4, 0, "C major", "equal19");
+        expect(1200 * Math.log2(turtleMock.singer.noteHertz[0][0] / base)).toBeCloseTo(50, 6);
+    });
+
+    test("a whole semitone stays on its step in 19 EDO", () => {
+        turtleMock.singer.transposition = 1;
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 0);
+        expect(turtleMock.singer.noteCents[0]).toEqual([0]);
+    });
+
+    test("a note's own cents still win over a fractional transposition", () => {
+        turtleMock.singer.transposition = 0.5;
+        Singer.processPitch(activityMock, "C", 4, 10, 0, 0);
+        expect(turtleMock.singer.noteCents[0]).toEqual([10]);
+    });
+
+    test("a rest gets no cents from a fractional transposition", () => {
+        turtleMock.singer.transposition = 0.5;
+        Singer.processPitch(activityMock, "rest", 4, 0, 0, 0);
+        expect(turtleMock.singer.noteCents[0]).toEqual([0]);
+    });
+
+    test("register 1 plays C4 as C5 in 19 EDO", () => {
+        turtleMock.singer.register = 1;
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 0);
+        expect(played(0)).toEqual(["C5"]);
+    });
+
+    test("a pitch block on its own with an interval of a third adds E4 in 19 EDO", () => {
+        turtleMock.singer.inNoteBlock = [];
+        turtleMock.singer.intervals = [2];
+        Singer.processPitch(activityMock, "C", 4, 0, 0, "pitchBlk");
+        expect(played("pitchBlk")).toEqual(["C4", "E4"]);
+    });
+
+    test("a pitch block on its own with register -1 plays C3 in 19 EDO", () => {
+        turtleMock.singer.inNoteBlock = [];
+        turtleMock.singer.register = -1;
+        Singer.processPitch(activityMock, "C", 4, 0, 0, "pitchBlk");
+        expect(played("pitchBlk")).toEqual(["C3"]);
+    });
+
+    test("an interval of a third above C4 adds E4 in 12 EDO", () => {
+        activityMock.logo.synth.inTemperament = "equal";
+        turtleMock.singer.intervals = [2];
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 0);
+        expect(played(0)).toEqual(["C4", "E4"]);
+    });
+
+    test("a semitone interval of 4 above C4 adds E4 in 12 EDO", () => {
+        activityMock.logo.synth.inTemperament = "equal";
+        turtleMock.singer.semitoneIntervals = [[4, 0]];
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 0);
+        expect(played(0)).toEqual(["C4", "E4"]);
     });
 });
 
@@ -3065,7 +3195,7 @@ describe("Issue #9379 — Arpeggio Transposition and Widget Pitch Capture", () =
             turtleMock.singer.arpeggioIndex = 0;
 
             const res = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res).toEqual({ arpeggioTrans: 0, anote: "C" });
+            expect(res).toEqual({ arpeggioSteps: 0, arpeggioSemitones: 0, anote: "C" });
             expect(turtleMock.singer.arpeggioIndex).toBe(0);
         });
 
@@ -3079,22 +3209,22 @@ describe("Issue #9379 — Arpeggio Transposition and Widget Pitch Capture", () =
 
             // Visit 1: [0, 0] -> 0 semitones
             const res1 = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res1).toEqual({ arpeggioTrans: 0, anote: "C" });
+            expect(res1).toEqual({ arpeggioSteps: 0, arpeggioSemitones: 0, anote: "C" });
             expect(turtleMock.singer.arpeggioIndex).toBe(1);
 
             // Visit 2: [2, 0] -> 4 semitones (E)
             const res2 = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res2).toEqual({ arpeggioTrans: 4, anote: "C" });
+            expect(res2).toEqual({ arpeggioSteps: 4, arpeggioSemitones: 0, anote: "C" });
             expect(turtleMock.singer.arpeggioIndex).toBe(2);
 
             // Visit 3: [4, 0] -> 7 semitones (G), wraps index to 0
             const res3 = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res3).toEqual({ arpeggioTrans: 7, anote: "C" });
+            expect(res3).toEqual({ arpeggioSteps: 7, arpeggioSemitones: 0, anote: "C" });
             expect(turtleMock.singer.arpeggioIndex).toBe(0);
 
             // Visit 4: wraps back to [0, 0] -> 0 semitones
             const res4 = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res4).toEqual({ arpeggioTrans: 0, anote: "C" });
+            expect(res4).toEqual({ arpeggioSteps: 0, arpeggioSemitones: 0, anote: "C" });
             expect(turtleMock.singer.arpeggioIndex).toBe(1);
         });
 
@@ -3107,11 +3237,11 @@ describe("Issue #9379 — Arpeggio Transposition and Widget Pitch Capture", () =
 
             // Scalar step 2 (4 semitones) + 1 semitone = 5 semitones (F)
             const res1 = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res1).toEqual({ arpeggioTrans: 5, anote: "C" });
+            expect(res1).toEqual({ arpeggioSteps: 4, arpeggioSemitones: 1, anote: "C" });
 
             // Scalar step 2 (4 semitones) - 1 semitone = 3 semitones (Eb)
             const res2 = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res2).toEqual({ arpeggioTrans: 3, anote: "C" });
+            expect(res2).toEqual({ arpeggioSteps: 4, arpeggioSemitones: -1, anote: "C" });
         });
 
         test("decodes negative scalar steps", () => {
@@ -3120,7 +3250,7 @@ describe("Issue #9379 — Arpeggio Transposition and Widget Pitch Capture", () =
 
             // 3 scale steps down from C in C major is G3 (-5 semitones)
             const res = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res.arpeggioTrans).toBe(-5);
+            expect(res.arpeggioSteps).toBe(-5);
         });
 
         test("handles key signature context correctly (e.g. C minor)", () => {
@@ -3129,7 +3259,7 @@ describe("Issue #9379 — Arpeggio Transposition and Widget Pitch Capture", () =
             turtleMock.singer.arpeggioIndex = 0;
 
             const res = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res.arpeggioTrans).toBe(3);
+            expect(res.arpeggioSteps).toBe(3);
         });
 
         test("handles array keySignature representation gracefully", () => {
@@ -3138,7 +3268,7 @@ describe("Issue #9379 — Arpeggio Transposition and Widget Pitch Capture", () =
             turtleMock.singer.arpeggioIndex = 0;
 
             const res = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res.arpeggioTrans).toBe(4);
+            expect(res.arpeggioSteps).toBe(4);
         });
 
         test("handles rest sentinel [NaN, 0] by returning anote = 'rest'", () => {
@@ -3146,7 +3276,7 @@ describe("Issue #9379 — Arpeggio Transposition and Widget Pitch Capture", () =
             turtleMock.singer.arpeggioIndex = 0;
 
             const res = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res).toEqual({ arpeggioTrans: 0, anote: "rest" });
+            expect(res).toEqual({ arpeggioSteps: 0, arpeggioSemitones: 0, anote: "rest" });
             expect(turtleMock.singer.arpeggioIndex).toBe(0);
         });
 
@@ -3158,8 +3288,23 @@ describe("Issue #9379 — Arpeggio Transposition and Widget Pitch Capture", () =
             turtleMock.singer.arpeggioIndex = 99;
 
             const res = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 12);
-            expect(res).toEqual({ arpeggioTrans: 0, anote: "C" });
+            expect(res).toEqual({ arpeggioSteps: 0, arpeggioSemitones: 0, anote: "C" });
             expect(turtleMock.singer.arpeggioIndex).toBe(1);
+        });
+
+        test("counts scalar steps in steps of the temperament outside 12 EDO", () => {
+            turtleMock.singer.keySignature = "C major";
+            turtleMock.singer.arpeggio = [
+                [2, 0],
+                [4, 0]
+            ];
+            turtleMock.singer.arpeggioIndex = 0;
+
+            // In 19 EDO a major third is 6 steps and a fifth is 11.
+            const res1 = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 19);
+            expect(res1).toEqual({ arpeggioSteps: 6, arpeggioSemitones: 0, anote: "C" });
+            const res2 = Singer.resolveArpeggio(activityMock, turtleMock, "C", 4, null, 19);
+            expect(res2).toEqual({ arpeggioSteps: 11, arpeggioSemitones: 0, anote: "C" });
         });
     });
 
