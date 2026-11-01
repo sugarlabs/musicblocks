@@ -107,6 +107,9 @@ function setupProgramBlocks(activity) {
                 .then(responseText => {
                     try {
                         const data = JSON.parse(responseText);
+                        if (!Array.isArray(data)) {
+                            throw new Error("is not array");
+                        }
                         logo.turtleHeaps[name] = data;
                     } catch (e) {
                         activity.errorMsg(`${_("Error parsing JSON data:")} ${e}`, blk);

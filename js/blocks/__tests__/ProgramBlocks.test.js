@@ -21,6 +21,7 @@
  */
 
 const { setupProgramBlocks } = jest.requireActual("../ProgramBlocks");
+const { setupHeapBlocks } = jest.requireActual("../HeapBlocks");
 const { isUnsafeObjectKey } = jest.requireActual("../../utils/utils-logic");
 
 global._ = s => s;
@@ -81,6 +82,10 @@ class BaseBlock {
     formBlock(defn) {
         this.formDefn = defn;
     }
+
+    beginnerBlock() {}
+
+    makeMacro() {}
 
     setup(activity) {
         activity.registeredBlocks = activity.registeredBlocks || {};
@@ -223,6 +228,67 @@ describe("ProgramBlocks", () => {
 
             expect(global.fetch).toHaveBeenCalledWith("http://test.com");
             expect(logo.turtleHeaps.testHeap).toEqual(["item1", "item2"]);
+        });
+
+        describe("downloaded heap validation", () => {
+            beforeEach(() => {
+                global.ValueBlock = BaseBlock;
+                setupHeapBlocks(activity);
+            });
+
+            describe.each([
+                ["populated", [7]],
+                ["empty", []],
+                ["missing", undefined]
+            ])("with a %s heap", (description, contents) => {
+                test.each(["null", "{}", "17", '"text"', "true"])(
+                    "rejects %s and leaves the heap usable",
+                    async responseText => {
+                        const previousHeap = contents === undefined ? undefined : [...contents];
+                        if (previousHeap !== undefined) {
+                            logo.turtleHeaps[0] = previousHeap;
+                        }
+                        logo.turtleHeaps.otherHeap = [42];
+                        global.fetch = jest.fn().mockResolvedValue({
+                            ok: true,
+                            text: jest.fn().mockResolvedValue(responseText)
+                        });
+
+                        getBlock("loadHeapFromApp").flow(["0", "http://test.com"], logo, 0, 1);
+                        await new Promise(resolve => setTimeout(resolve, 0));
+
+                        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+                        expect(activity.errorMsg).toHaveBeenCalledWith(
+                            expect.stringContaining("Error parsing JSON data:"),
+                            1
+                        );
+                        expect(logo.turtleHeaps[0]).toEqual(contents || []);
+                        if (previousHeap !== undefined) {
+                            expect(logo.turtleHeaps[0]).toBe(previousHeap);
+                        }
+                        expect(logo.turtleHeaps.otherHeap).toEqual([42]);
+
+                        expect(() => getBlock("push").flow([9], logo, 0, 2)).not.toThrow();
+                        expect(logo.turtleHeaps[0]).toEqual([...(contents || []), 9]);
+                    }
+                );
+            });
+
+            test.each(["[]", "[1,2]"])("accepts %s and supports Push", async responseText => {
+                logo.turtleHeaps[0] = [7];
+                global.fetch = jest.fn().mockResolvedValue({
+                    ok: true,
+                    text: jest.fn().mockResolvedValue(responseText)
+                });
+
+                getBlock("loadHeapFromApp").flow(["0", "http://test.com"], logo, 0, 1);
+                await new Promise(resolve => setTimeout(resolve, 0));
+
+                expect(activity.errorMsg).not.toHaveBeenCalled();
+                expect(logo.turtleHeaps[0]).toEqual(JSON.parse(responseText));
+                getBlock("push").flow([3], logo, 0, 2);
+                expect(logo.turtleHeaps[0]).toEqual([...JSON.parse(responseText), 3]);
+            });
         });
 
         test("handles 404 error", async () => {
