@@ -1505,9 +1505,9 @@ describe("Chords", () => {
 describe("Key and meter changes inside a tune", () => {
     const parse = abc => parseAndCapture(ABCJS.parseOnly(abc)[0]);
 
-    // What one voice plays, in order, with repeats played twice: each note as
-    // name and octave, each key change as K:root mode and each meter change as
-    // M:num/den.
+    // What one voice plays, in order, with each repeat played its count: each
+    // note as name and octave, each key change as K:root mode and each meter
+    // change as M:num/den.
     const scoreOrder = (blocks, voice = 0) => {
         const byId = new Map(blocks.map(b => [b[0], b]));
         const type = b => (Array.isArray(b[1]) ? b[1][0] : b[1]);
@@ -1519,8 +1519,9 @@ describe("Key and meter changes inside a tune", () => {
         const run = block => {
             for (; block; block = byId.get(block[4][block[4].length - 1])) {
                 if (type(block) === "repeat") {
-                    run(byId.get(block[4][2]));
-                    run(byId.get(block[4][2]));
+                    for (let i = 0; i < value(block[4][1]); i++) {
+                        run(byId.get(block[4][2]));
+                    }
                 } else if (type(block) === "nameddo") {
                     run(byId.get(actions.get(value(block[0]))[4][1]));
                 } else if (type(block) === "newnote") {
@@ -1599,6 +1600,31 @@ describe("Key and meter changes inside a tune", () => {
 
         expect(blocksOfType(blocks, "setkey2")).toHaveLength(1);
         expect(scoreOrder(blocks)).toContain("F♯5");
+    });
+
+    test("K:none is imported as C major", async () => {
+        const blocks = await parse("X:1\nM:4/4\nL:1/4\nK:D\nF c d F | [K:none] F c d F |]\n");
+
+        expect(scoreOrder(blocks)).toEqual([
+            "F♯4",
+            "C♯5",
+            "D5",
+            "F♯4",
+            "K:C major",
+            "F4",
+            "C5",
+            "D5",
+            "F4"
+        ]);
+    });
+
+    test("a K:none header starts the tune in C major", async () => {
+        const blocks = await parse("X:1\nM:4/4\nL:1/4\nK:none\nF c d F |]\n");
+        const byId = new Map(blocks.map(b => [b[0], b]));
+        const key = blocksOfType(blocks, "setkey2")[0];
+
+        expect(byId.get(key[4][1])[1][1].value).toBe("C");
+        expect(byId.get(key[4][2])[1][1].value).toBe("major");
     });
 
     test("an inline [M:] becomes a meter block where it is written", async () => {

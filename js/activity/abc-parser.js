@@ -240,6 +240,10 @@ function _tempoOf(tempo) {
 
 // An abcjs key as the root notename and modename a setkey2 block takes.
 function _keyNamesOf(key) {
+    // K:none has no key signature, which reads the same as C major.
+    if (key.root === "none") {
+        return { root: "C", mode: "major" };
+    }
     return {
         root: key.root + (_ABC_KEY_ACC_SUFFIX[key.acc] || ""),
         mode: _ABC_MODE_MAP[key.mode] || "major"
