@@ -1363,6 +1363,61 @@ describe("Logo doStopTurtles", () => {
         expect(turtle.endOfClampSignals).toEqual({});
     });
 
+    test("full Stop-to-new-Tie lifecycle resets tie state and allows clean independent restart", () => {
+        // 1. Turtle in middle of outer tie with pending note state
+        turtle.singer.tie = true;
+        turtle.singer.tieCarryOver = 4;
+        turtle.singer.tieNotePitches = [["C", 4, 0, 261.63]];
+        turtle.singer.tieNoteExtras = [5, ["sine"], 1, [1], [], undefined, false, 4];
+        turtle.singer.tieFirstDrums = ["snare"];
+        turtle.endOfClampSignals = { 10: ["_tie_0"] };
+
+        const mockListener = jest.fn();
+        turtle.listeners = { _tie_0: mockListener };
+
+        // 2. Stop using real Logo.prototype.doStopTurtles
+        logo.doStopTurtles();
+
+        // 3. Verify all tie state has been reset to clean defaults
+        expect(turtle.singer.tie).toBe(false);
+        expect(turtle.singer.tieCarryOver).toBe(0);
+        expect(turtle.singer.tieNotePitches).toEqual([]);
+        expect(turtle.singer.tieNoteExtras).toEqual([]);
+        expect(turtle.singer.tieFirstDrums).toEqual([]);
+        expect(turtle.endOfClampSignals).toEqual({});
+        expect(turtle.listeners).toEqual({});
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "_tie_0",
+            mockListener,
+            false
+        );
+
+        // 4. Start another Tie independently (block 30)
+        turtle.singer.tie = true;
+        turtle.singer.tieCarryOver = 0;
+        turtle.endOfClampSignals[30] = ["_tie_0"];
+        const newListener = jest.fn();
+        turtle.listeners._tie_0 = newListener;
+
+        // 5. Accumulate notes in the new Tie
+        turtle.singer.tieCarryOver = 4;
+        turtle.singer.tieNotePitches = [["E", 4, 0, 329.63]];
+
+        expect(turtle.singer.tie).toBe(true);
+        expect(turtle.singer.tieCarryOver).toBe(4);
+        expect(turtle.singer.tieNotePitches).toEqual([["E", 4, 0, 329.63]]);
+
+        // 6. Complete the new Tie via its cleanup listener
+        turtle.singer.tie = false;
+        turtle.singer.tieCarryOver = 0;
+        turtle.singer.tieNotePitches = [];
+        delete turtle.listeners._tie_0;
+
+        expect(turtle.singer.tie).toBe(false);
+        expect(turtle.singer.tieCarryOver).toBe(0);
+        expect(turtle.singer.tieNotePitches).toEqual([]);
+    });
+
     test("unhighlights all blocks on stop when blocks are visible", () => {
         mockActivity.blocks.visible = true;
         mockActivity.blocks.unhighlightAll = jest.fn();
@@ -1614,6 +1669,89 @@ describe("Logo doStopTurtles", () => {
         expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalled();
         expect(turtle.endOfClampSignals[10]).toEqual(["_tie_0"]);
         expect(logo._cleanupAfterCompletion).not.toHaveBeenCalled();
+    });
+
+    test("asynchronous multi-turtle completion: Turtle A defers signals while Turtle B is active, both flush when Turtle B finishes", () => {
+        const scheduledTimeouts = [];
+        jest.spyOn(logo._timerManager, "setTimeout").mockImplementation(cb => {
+            scheduledTimeouts.push(cb);
+            return scheduledTimeouts.length;
+        });
+
+        const turtleB = createMockTurtle();
+        turtleB.singer.runningFromEvent = true;
+        turtleB.endOfClampSignals = { 20: ["_tie_1"] };
+        turtleB.running = true;
+
+        turtle.endOfClampSignals = { 10: ["_tie_0"] };
+        turtle.singer.runningFromEvent = true;
+        turtle.running = false; // Turtle A has finished
+
+        let bIsRunning = true;
+        logo.turtles.running = jest.fn(() => bIsRunning);
+        logo.turtles.turtleList = [turtle, turtleB];
+        logo.turtles.getTurtleCount = () => 2;
+        logo.turtles.getTurtle = i => (i === 0 ? turtle : turtleB);
+        logo.turtles.ithTurtle = i => (i === 0 ? turtle : turtleB);
+        logo._cleanupAfterCompletion = jest.fn();
+        logo.blockList = [makeFlowBlock("print")];
+
+        // 1. Turtle A calls dispatchUnissuedSignals while runningFromEvent: deferred!
+        logo.dispatchUnissuedSignals(turtle);
+        expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalled();
+        expect(turtle.endOfClampSignals[10]).toEqual(["_tie_0"]);
+
+        // 2. Turtle B completes now:
+        bIsRunning = false;
+        turtleB.running = false;
+
+        // Turtle B triggers terminal flow in runFromBlockNow
+        logo.runFromBlockNow(logo, 1, 0, 0, null, 0);
+
+        // Run __checkCompletionState (100ms)
+        expect(scheduledTimeouts.length).toBeGreaterThanOrEqual(1);
+        scheduledTimeouts[0]();
+
+        // Run _lastNoteTimeout (1000ms)
+        expect(scheduledTimeouts.length).toBeGreaterThanOrEqual(2);
+        scheduledTimeouts[1]();
+
+        // Both turtles' deferred signals must have flushed now that all turtles finished
+        expect(turtle.singer.runningFromEvent).toBe(false);
+        expect(turtleB.singer.runningFromEvent).toBe(false);
+        expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_tie_0");
+        expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_tie_1");
+        expect(turtle.endOfClampSignals[10][0]).toBeNull();
+        expect(turtleB.endOfClampSignals[20][0]).toBeNull();
+        expect(logo._cleanupAfterCompletion).toHaveBeenCalled();
+    });
+
+    test("cancels pending _lastNoteTimeout when a new execution begins via runFromBlockNow", () => {
+        const scheduledTimeouts = [];
+        jest.spyOn(logo._timerManager, "setTimeout").mockImplementation(cb => {
+            scheduledTimeouts.push(cb);
+            return scheduledTimeouts.length;
+        });
+        const clearTimeoutSpy = jest.spyOn(logo._timerManager, "clearTimeout");
+
+        turtle.endOfClampSignals = { 10: ["_tie_0"] };
+        turtle.singer.runningFromEvent = true;
+        turtle.running = true;
+        logo.turtles.running = jest.fn().mockReturnValue(false);
+        logo.turtles.turtleList = [turtle];
+        logo.turtles.ithTurtle = () => turtle;
+        logo.blockList = [makeFlowBlock("print")];
+
+        // Step 1: Run terminal block to schedule completion timers
+        logo.runFromBlockNow(logo, 0, 0, 0, null, 0);
+        scheduledTimeouts[0](); // __checkCompletionState schedules _lastNoteTimeout
+        expect(logo._lastNoteTimeout).not.toBeNull();
+
+        // Step 2: New execution starts before _lastNoteTimeout fires
+        logo.runFromBlockNow(logo, 0, 0, 0, null, 0);
+
+        // Pending timeout was cancelled on entry
+        expect(clearTimeoutSpy).toHaveBeenCalled();
     });
 
     describe("with Transport and audio streams", () => {

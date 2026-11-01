@@ -2226,6 +2226,11 @@ class Logo {
         // Sometimes we don't want to unwind the entire queue.
         if (queueStart === undefined) queueStart = 0;
 
+        if (queueStart === 0 && logo._lastNoteTimeout !== null) {
+            logo._timerManager.clearTimeout(logo._lastNoteTimeout);
+            logo._lastNoteTimeout = null;
+        }
+
         while (blk !== null && blk !== undefined && !logo.stopTurtle) {
             const tracker = getPerformanceTracker();
             const profilingEnabled =
@@ -2860,10 +2865,10 @@ class Logo {
                             }
                             if (logo.turtles && logo.turtles.turtleList) {
                                 for (const t of logo.turtles.turtleList) {
-                                    if (t && t.singer) {
-                                        t.singer.runningFromEvent = false;
-                                    }
-                                    if (t) {
+                                    if (t && !t.running) {
+                                        if (t.singer) {
+                                            t.singer.runningFromEvent = false;
+                                        }
                                         logo.dispatchUnissuedSignals(t);
                                     }
                                 }

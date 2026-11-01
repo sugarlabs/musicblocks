@@ -231,4 +231,45 @@ describe("nested clamps of the same kind", () => {
         // With defensive runtime fix: outer tie remains active across inner clamp exit -> [true, true, false].
         expect(tieSnapshots).toEqual([true, true, false]);
     });
+
+    test("tie: three levels of nested tie clamps preserve outer state until outermost exit", () => {
+        const tieSnapshots = [];
+        const probe = (parent, next) =>
+            flowBlock("probe", [parent, next], () => {
+                tieSnapshots.push(turtle.singer.tie);
+                return null;
+            });
+        const tieClamp = (parent, child, next) =>
+            flowBlock(
+                "tie",
+                [parent, child, next],
+                (args, l, t, blk) => {
+                    Singer.RhythmActions.doTie(t, blk);
+                    return [args[0], 1];
+                },
+                1
+            );
+
+        // Level 1 (outer: 0) -> Level 2 (mid: 1) -> Level 3 (inner: 2) -> probe (3)
+        // -> inner hidden (4) -> probe (5) -> mid hidden (6) -> probe (7) -> outer hidden (8) -> probe (9)
+        const blocks = [
+            tieClamp(null, 1, 8), // 0: outer tie (child 1, next 8)
+            tieClamp(0, 2, 6), // 1: mid tie (child 2, next 6)
+            tieClamp(1, 3, 4), // 2: inner tie (child 3, next 4)
+            probe(2, null), // 3: probe inside inner tie
+            flowBlock("hidden", [2, 5]), // 4: inner hidden exit -> next 5
+            probe(4, null), // 5: probe after inner exit
+            flowBlock("hidden", [1, 7]), // 6: mid hidden exit -> next 7
+            probe(6, null), // 7: probe after mid exit
+            flowBlock("hidden", [0, 9]), // 8: outer hidden exit -> next 9
+            probe(8, null) // 9: probe after outer exit
+        ];
+
+        logo.blockList = blocks;
+        logo.activity.blocks.blockList = blocks;
+        logo.runFromBlockNow(logo, 0, 0, 1, null);
+
+        // Tie must remain true inside inner, after inner exits, after mid exits, and only become false after outer exits
+        expect(tieSnapshots).toEqual([true, true, true, false]);
+    });
 });

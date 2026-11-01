@@ -2139,6 +2139,8 @@ describe("processNote — nested tie note pairing and duration semantics (MB-010
         expect(getScheduledEvents()).toHaveLength(2);
         expect(getScheduledEvents()[1].note).toBe("D4");
         expect(getScheduledEvents()[1].beatValue).toBe(0.25);
+        expect(singer.lastNotePlayed).toEqual(["D4", 4]);
+        expect(singer.previousNotePlayed).toEqual(["D4", 0]);
 
         // Neither note was lost, both played at full quarter-note duration
         const totalDuration = getScheduledEvents().reduce((sum, e) => sum + e.beatValue, 0);
