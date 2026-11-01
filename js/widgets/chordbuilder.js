@@ -590,6 +590,7 @@ class ChordBuilderWidget {
             const rootId = idCounter++;
             const octaveId = idCounter++;
             const noteEndId = idCounter++;
+            const chordEndId = idCounter++;
 
             // Map chord quality to MusicBlocks chord type
             let chordType = "major";
@@ -602,7 +603,7 @@ class ChordBuilderWidget {
                 ["chordinterval", {}],
                 0,
                 0,
-                [lastFlowId, chordNameId, noteBlockId, null]
+                [lastFlowId, chordNameId, noteBlockId, chordEndId]
             ]);
             newStack.push([chordNameId, ["chordname", { value: chordType }], 0, 0, [chordBlockId]]);
             // Connect newnote body slot directly to pitch — no vspace needed
@@ -632,11 +633,12 @@ class ChordBuilderWidget {
             newStack.push([rootId, ["notename", { value: chord.root }], 0, 0, [pitchBlockId]]);
             newStack.push([octaveId, ["number", { value: this.octave }], 0, 0, [pitchBlockId]]);
             newStack.push([noteEndId, ["hidden", {}], 0, 0, [noteBlockId, null]]);
+            newStack.push([chordEndId, ["hidden", {}], 0, 0, [chordBlockId, null]]);
 
             // Link previous block's flow slot to this chord block
             newStack[lastFlowId][4][lastFlowConnIndex] = chordBlockId;
-            lastFlowId = chordBlockId;
-            lastFlowConnIndex = 3;
+            lastFlowId = chordEndId;
+            lastFlowConnIndex = 1;
         });
 
         this.blocks.loadNewBlocks(newStack);
