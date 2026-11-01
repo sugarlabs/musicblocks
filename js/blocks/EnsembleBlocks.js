@@ -798,6 +798,7 @@ function setupEnsembleBlocks(activity) {
                     tur.singer.pitchNumberOffset;
                 activity.blocks.blockList[blk].value = value;
             }
+            return activity.blocks.blockList[blk].value;
         }
     }
 
@@ -872,6 +873,7 @@ function setupEnsembleBlocks(activity) {
                 }
                 activity.blocks.blockList[blk].value = -1;
             }
+            return activity.blocks.blockList[blk].value;
         }
     }
 
