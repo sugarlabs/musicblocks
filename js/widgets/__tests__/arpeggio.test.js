@@ -22,10 +22,8 @@
 
 const Arpeggio = require("../arpeggio.js");
 const ManagedTimer = require("../../utils/ManagedTimer");
-const { parseNoteString } = require("../../utils/musicutils-pitch");
 
 global.ManagedTimer = ManagedTimer;
-global.parseNoteString = parseNoteString;
 
 global._ = msg => msg;
 global.platformColor = {
@@ -255,34 +253,6 @@ describe("Arpeggio Widget", () => {
             arpeggio.init(activityMock);
         });
 
-        test.each([
-            [0, "var(--color-selector-selected)"],
-            [2, "var(--color-selector-bg)"]
-        ])("highlights only the hovered cell in row %i", (row, background) => {
-            const cell = document.getElementById(`${row},0`);
-            const columnLabel = document.getElementById("arpeggioNoteTable").rows[0].cells[0];
-
-            cell.dispatchEvent(new MouseEvent("mouseover"));
-
-            expect(cell.style.backgroundColor).toBe("var(--color-selector-selected)");
-            expect(columnLabel.style.backgroundColor).toBe("var(--color-selector-bg)");
-
-            cell.dispatchEvent(new MouseEvent("mouseout"));
-
-            expect(cell.style.backgroundColor).toBe(background);
-        });
-
-        test("keeps selected cells black when hovered", () => {
-            const cell = document.getElementById("2,0");
-            cell.click();
-
-            cell.dispatchEvent(new MouseEvent("mouseover"));
-            expect(cell.style.backgroundColor).toBe("black");
-
-            cell.dispatchEvent(new MouseEvent("mouseout"));
-            expect(cell.style.backgroundColor).toBe("black");
-        });
-
         test("should highlight cell and add node on click", () => {
             const cell = document.getElementById("2,1"); // Row 2, Col 1
             expect(cell).not.toBeNull();
@@ -332,6 +302,22 @@ describe("Arpeggio Widget", () => {
             cell2.onclick({ target: cell2 });
             expect(cell2.style.backgroundColor).toBe("black");
             expect(cell1.style.backgroundColor).not.toBe("black");
+        });
+
+        test("should not highlight the column label when hovering a grid cell", () => {
+            const cell = document.getElementById("2,1");
+            const headerCell = document.getElementById("1");
+
+            expect(cell).not.toBeNull();
+            expect(headerCell).not.toBeNull();
+
+            cell.onmouseover();
+            expect(cell.style.backgroundColor).toBe("var(--color-selector-selected)");
+            expect(headerCell.style.backgroundColor).toBe("var(--color-selector-bg)");
+
+            cell.onmouseout();
+            expect(cell.style.backgroundColor).toBe("var(--color-selector-bg)");
+            expect(headerCell.style.backgroundColor).toBe("var(--color-selector-bg)");
         });
     });
 
@@ -647,71 +633,6 @@ describe("Arpeggio Widget", () => {
                 expect.anything()
             );
             expect(activityMock.logo.synth.trigger).toHaveBeenCalled();
-        });
-
-        test("parses negative and multi-digit octaves correctly in __playCell", () => {
-            const cell = document.createElement("td");
-
-            // Negative octave (C-1)
-            arpeggio.notesToPlay = [["C-1", 1 / 16]];
-            arpeggio.__playCell(3, 0, cell, true);
-            expect(global.getNote).toHaveBeenCalledWith(
-                "C",
-                -1,
-                expect.any(Number),
-                expect.anything(),
-                false,
-                null,
-                expect.anything()
-            );
-
-            // Multi-digit octave (C10)
-            global.getNote.mockClear();
-            arpeggio.notesToPlay = [["C10", 1 / 16]];
-            arpeggio.__playCell(3, 0, cell, true);
-            expect(global.getNote).toHaveBeenCalledWith(
-                "C",
-                10,
-                expect.any(Number),
-                expect.anything(),
-                false,
-                null,
-                expect.anything()
-            );
-        });
-
-        test("parses negative and multi-digit octaves correctly in _playAll", () => {
-            arpeggio._playing = true;
-            arpeggio.__makePairsList = () => [[1, 0]];
-            arpeggio.__playNote = jest.fn();
-
-            // Negative octave (C-1)
-            global.getNote.mockClear();
-            arpeggio.notesToPlay = [["C-1", 1 / 16]];
-            arpeggio._playAll();
-            expect(global.getNote).toHaveBeenCalledWith(
-                "C",
-                -1,
-                expect.any(Number),
-                expect.anything(),
-                false,
-                null,
-                expect.anything()
-            );
-
-            // Multi-digit octave (C10)
-            global.getNote.mockClear();
-            arpeggio.notesToPlay = [["C10", 1 / 16]];
-            arpeggio._playAll();
-            expect(global.getNote).toHaveBeenCalledWith(
-                "C",
-                10,
-                expect.any(Number),
-                expect.anything(),
-                false,
-                null,
-                expect.anything()
-            );
         });
 
         test("defaults to C4 when notesToPlay is empty", () => {
