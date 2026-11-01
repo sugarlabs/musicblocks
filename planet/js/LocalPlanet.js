@@ -111,13 +111,15 @@ class LocalPlanet {
 
     async openProject(id) {
         const Planet = this.Planet;
-        try {
-            await Planet.ProjectStorage.setCurrentProjectID(id);
-        } catch (e) {
-            // Persisting the selection is best-effort: a storage failure (e.g. a
-            // quota error) must not stop the project from opening.
-            console.error("[Planet] Failed to persist current project selection:", e);
-        }
+        await Planet.ProjectStorage.setCurrentProjectID(id);
+
+        // Guard against overlapping opens: if a newer selection changed the
+        // current project while this open was awaiting its save, this open is
+        // stale. Loading here would show one project's data while
+        // CurrentProject points at another, and later edits (saved via
+        // saveLocally without an explicit id) would be written to the wrong project.
+        if (Planet.ProjectStorage.getCurrentProjectID() !== id) return;
+
         // Notify the parent window of the new project's git state so that
         // the "My Project" toolbar menu (gitDropdownUI) shows Time Travel
         // when the opened project has a GitHub save spot.

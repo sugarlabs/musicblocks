@@ -865,6 +865,26 @@ describe("ProjectStorage", () => {
             expect(persisted.CurrentProject).toBe("proj2");
         });
 
+        it("setCurrentProjectID should restore the previous project ID when saving fails", async () => {
+            jest.spyOn(storage, "save").mockRejectedValueOnce(new Error("quota exceeded"));
+
+            await expect(storage.setCurrentProjectID("proj2")).rejects.toThrow("quota exceeded");
+
+            expect(storage.data.CurrentProject).toBe("proj1");
+        });
+
+        it("setCurrentProjectID should not clobber a newer selection when an older save fails", async () => {
+            jest.spyOn(storage, "save").mockImplementationOnce(async () => {
+                // A newer selection wins while this save is still pending.
+                storage.data.CurrentProject = "proj3";
+                throw new Error("quota exceeded");
+            });
+
+            await expect(storage.setCurrentProjectID("proj2")).rejects.toThrow("quota exceeded");
+
+            expect(storage.data.CurrentProject).toBe("proj3");
+        });
+
         it("removeSyncedDrafts should drop only synced drafts matched by a commit", async () => {
             const saveSpy = jest.spyOn(storage, "save").mockResolvedValue();
             storage.data.Projects.proj1.commitDrafts = [

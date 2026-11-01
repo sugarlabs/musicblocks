@@ -237,18 +237,40 @@ describe("LocalPlanet", () => {
             expect(mockPlanet.loadProjectFromData).toHaveBeenCalledWith("data1");
         });
 
-        it("should still load the project when persisting the selection fails", async () => {
+        it("should not load the project when persisting the selection fails", async () => {
             localPlanet.ProjectTable = mockPlanet.ProjectStorage.data.Projects;
             mockPlanet.ProjectStorage.setCurrentProjectID.mockRejectedValueOnce(
                 new Error("quota exceeded")
             );
-            const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
-            await localPlanet.openProject("testProj1");
+            await expect(localPlanet.openProject("testProj1")).rejects.toThrow("quota exceeded");
+            expect(mockPlanet.loadProjectFromData).not.toHaveBeenCalled();
+        });
 
-            expect(mockPlanet.loadProjectFromData).toHaveBeenCalledWith("data1");
-            expect(errorSpy).toHaveBeenCalled();
-            errorSpy.mockRestore();
+        it("should not load an older project after a newer open changes the selection", async () => {
+            localPlanet.ProjectTable = mockPlanet.ProjectStorage.data.Projects;
+
+            let resolveFirstSave;
+            mockPlanet.ProjectStorage.setCurrentProjectID
+                .mockImplementationOnce(
+                    () =>
+                        new Promise(resolve => {
+                            resolveFirstSave = resolve;
+                        })
+                )
+                .mockImplementationOnce(() => {
+                    // A newer selection wins while the first open is still pending.
+                    mockPlanet.ProjectStorage.getCurrentProjectID.mockReturnValue("testProj2");
+                    return Promise.resolve();
+                });
+
+            const firstOpen = localPlanet.openProject("testProj1");
+            await localPlanet.openProject("testProj2");
+            resolveFirstSave();
+            await firstOpen;
+
+            expect(mockPlanet.loadProjectFromData).toHaveBeenCalledTimes(1);
+            expect(mockPlanet.loadProjectFromData).toHaveBeenCalledWith("data2");
         });
     });
 

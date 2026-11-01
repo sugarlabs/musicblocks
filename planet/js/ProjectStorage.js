@@ -409,8 +409,20 @@ class ProjectStorage {
     }
 
     async setCurrentProjectID(id) {
+        const previousID = this.data.CurrentProject;
         this.data.CurrentProject = id;
-        await this.save();
+        try {
+            await this.save();
+        } catch (e) {
+            // Restore the previous selection only if nothing else changed it
+            // in the meantime (e.g. a newer open); otherwise we would clobber a
+            // later, valid selection. In-memory state then stays consistent with
+            // what is persisted when the save fails.
+            if (this.data.CurrentProject === id) {
+                this.data.CurrentProject = previousID;
+            }
+            throw e;
+        }
     }
 
     encodeTB(tb) {
