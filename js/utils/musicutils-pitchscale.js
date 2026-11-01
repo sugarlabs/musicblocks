@@ -760,6 +760,13 @@ var getNoteFromInterval = (pitch, interval, temperament) => {
 var numberToPitch = (i, temperament, startPitch, offset, activity) => {
     // Calculate the pitch and octave based on index.
     // We start at A0.
+    // A non-finite pitch number has no pitch: return the A0 default (the
+    // fallback #9126 specified for this hang class) instead of letting
+    // -Infinity spin the normalisation below forever or NaN/Infinity
+    // fall through to an undefined note name.
+    if (!Number.isFinite(i)) {
+        return ["A", 0];
+    }
     if (temperament === undefined) {
         temperament = "equal";
     }
@@ -768,10 +775,12 @@ var numberToPitch = (i, temperament, startPitch, offset, activity) => {
     let n = 0;
     let pitchNumber;
     if (i < 0) {
-        while (i < 0) {
-            i += currentEDO;
-            n += 1; // Count octave bump ups.
-        }
+        // Bump up by whole octaves in one step, the way numberToPitchSharp
+        // converts with modulo arithmetic: adding one octave per loop
+        // iteration needs ~10^306 iterations for a finite input like
+        // -1e308, which freezes the main thread just the same.
+        n = Math.ceil(-i / currentEDO); // Count octave bump ups.
+        i += n * currentEDO;
 
         if (isTrueEDO(temperament)) {
             if (currentEDO === 12) {

@@ -204,6 +204,43 @@ describe("musicutils-pitchscale", () => {
         });
     });
 
+    describe("numberToPitch non-finite and large-magnitude inputs", () => {
+        // Regression: the negative branch used to bump the pitch number up
+        // one octave per loop iteration, so -Infinity never terminated and
+        // a finite -1e308 effectively never did; NaN/Infinity fell through
+        // to [undefined, NaN/Infinity]. #9126 fixed the same hang class in
+        // numberToPitchSharp and specified the ["A", 0] default.
+        it("returns the A0 default for non-finite pitch numbers instead of hanging", () => {
+            expect(pitchscale.numberToPitch(-Infinity, "equal")).toEqual(["A", 0]);
+            expect(pitchscale.numberToPitch(Infinity, "equal")).toEqual(["A", 0]);
+            expect(pitchscale.numberToPitch(NaN, "equal")).toEqual(["A", 0]);
+            expect(pitchscale.numberToPitch(-Infinity, "equal19")).toEqual(["A", 0]);
+        });
+
+        it("converts a very large finite negative pitch number in constant time", () => {
+            expect(pitchscale.numberToPitch(-1e308, "equal")).toEqual([
+                "A",
+                -8.333333333333333e306
+            ]);
+            expect(pitchscale.numberToPitch(-1e308, "equal19")).toEqual([
+                "A",
+                -5.263157894736842e306
+            ]);
+        });
+
+        it("leaves ordinary pitch numbers unchanged", () => {
+            expect(pitchscale.numberToPitch(0, "equal")).toEqual(["A", 0]);
+            expect(pitchscale.numberToPitch(-1, "equal")).toEqual(["A♭", 0]);
+            expect(pitchscale.numberToPitch(-5, "equal")).toEqual(["E", 0]);
+            expect(pitchscale.numberToPitch(-12, "equal")).toEqual(["A", -1]);
+            expect(pitchscale.numberToPitch(-13, "equal")).toEqual(["A♭", -1]);
+            expect(pitchscale.numberToPitch(-24, "equal")).toEqual(["A", -2]);
+            expect(pitchscale.numberToPitch(-100, "equal")).toEqual(["F", -8]);
+            expect(pitchscale.numberToPitch(-19, "equal19")).toEqual(["A", -1]);
+            expect(pitchscale.numberToPitch(-20, "equal19")).toEqual(["A♭", -1]);
+        });
+    });
+
     it("is still reachable through musicutils.js for callers that require it", () => {
         for (const name of [
             "keySignatureToMode",
