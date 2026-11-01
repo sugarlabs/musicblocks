@@ -314,6 +314,69 @@ describe("Publisher", () => {
     });
 
     describe("publishProject validation", () => {
+        it("queues publication for the selected project while offline", () => {
+            document.getElementById("publish-id").value = "proj-1";
+            document.getElementById("publish-title").value = "Queued song";
+            document.getElementById("publish-description").value = "My description";
+            publisher.getTags = jest.fn(() => ["music"]);
+            publisher.close = jest.fn();
+            mockPlanet.SaveInterface = { showToast: jest.fn() };
+            mockPlanet._postGitState = jest.fn();
+            mockPlanet.ProjectStorage.addGitRepoData = jest.fn().mockResolvedValue();
+            mockPlanet.ServerInterface.offlineManager = { isOnline: false };
+            mockPlanet.ServerInterface.addProject.mockImplementation((payload, callback) => {
+                callback({ success: true, offline: true, repository: "queued-song" });
+            });
+            mockPlanet.ServerInterface.publishProject = jest.fn((repo, key, callback) => {
+                callback({ success: true, offline: true });
+            });
+
+            publisher.publishProject();
+
+            expect(mockPlanet.ServerInterface.publishProject).toHaveBeenCalledWith(
+                "queued-song",
+                undefined,
+                expect.any(Function),
+                "Queued song",
+                "My description",
+                ["music"],
+                "song.png",
+                "proj-1"
+            );
+            expect(mockPlanet.ProjectStorage.addPublishedData).not.toHaveBeenCalled();
+            expect(publisher.close).toHaveBeenCalled();
+        });
+
+        it("queues publication of an existing repository without creating another", () => {
+            document.getElementById("publish-id").value = "proj-1";
+            document.getElementById("publish-title").value = "Queued song";
+            document.getElementById("publish-description").value = "My description";
+            mockPlanet.LocalPlanet.ProjectTable["proj-1"].GitRepoData = {
+                repoName: "existing-repo"
+            };
+            mockPlanet.ServerInterface.getKey = jest.fn(() => "owner-key");
+            mockPlanet.ServerInterface.offlineManager = { isOnline: false };
+            mockPlanet.ServerInterface.publishProject = jest.fn((repo, key, callback) => {
+                callback({ success: true, offline: true });
+            });
+            publisher.getTags = jest.fn(() => ["music"]);
+            publisher.close = jest.fn();
+
+            publisher.publishProject();
+
+            expect(mockPlanet.ServerInterface.addProject).not.toHaveBeenCalled();
+            expect(mockPlanet.ServerInterface.publishProject).toHaveBeenCalledWith(
+                "existing-repo",
+                "owner-key",
+                expect.any(Function),
+                "Queued song",
+                "My description",
+                ["music"],
+                "song.png",
+                "proj-1"
+            );
+        });
+
         it("should show error when title is empty", () => {
             document.getElementById("publish-title").value = "";
             document.getElementById("publish-description").value = "A description";
@@ -370,6 +433,23 @@ describe("Publisher", () => {
     });
 
     describe("afterPublishProject", () => {
+        it("keeps an offline publication pending without marking it published", () => {
+            publisher.close = jest.fn();
+            mockPlanet.SaveInterface = { showToast: jest.fn() };
+
+            publisher.afterPublishProject(
+                { success: true, offline: true },
+                "proj-1",
+                "My Song",
+                {}
+            );
+
+            expect(mockPlanet.ProjectStorage.addPublishedData).not.toHaveBeenCalled();
+            expect(mockPlanet.LocalPlanet.updateProjects).not.toHaveBeenCalled();
+            expect(publisher.close).toHaveBeenCalled();
+            expect(mockPlanet.SaveInterface.showToast).toHaveBeenCalled();
+        });
+
         it("should update storage and refresh on success", () => {
             publisher.close = jest.fn();
             publisher.afterPublishProject({ success: true }, "proj-1", "New Name", {
