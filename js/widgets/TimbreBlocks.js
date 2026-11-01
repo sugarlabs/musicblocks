@@ -380,22 +380,27 @@ class TimbreBlocks {
                 this.vibratoParams[0] = vals[0];
                 this._update(blockValue, vals[0], 0);
 
-                const obj = oneHundredToFraction(parseFloat(vals[1]));
+                const rateVal = parseFloat(vals[1]);
+                const obj = rationalToFraction(rateVal > 0 ? 1 / rateVal : 1 / 16);
                 if (isPanelActive) {
                     const span = docById("myspanFx1");
                     const range1 = docById("myRangeFx1");
-                    if (range1) range1.value = parseFloat(vals[1]);
+                    if (range1) range1.value = rateVal > 0 ? 100 / rateVal : 100 / 16;
                     if (span) span.textContent = obj[0] + "/" + obj[1];
                 }
-                this.vibratoParams[1] = vals[1];
+                this.vibratoParams[1] = rateVal || 16;
                 this._update(blockValue, obj[1], 1);
                 this._update(blockValue, obj[0], 2);
 
                 if (instrumentsEffects[0] && instrumentsEffects[0][this.instrumentName]) {
+                    const undoFreq = parseFloat(obj[0]) / parseFloat(obj[1]);
+                    instrumentsEffects[0][this.instrumentName]["vibratoActive"] = true;
+                    const undoIntensity = parseFloat(vals[0]);
                     instrumentsEffects[0][this.instrumentName]["vibratoIntensity"] =
-                        parseFloat(vals[0]) / 100;
-                    instrumentsEffects[0][this.instrumentName]["vibratoFrequency"] =
-                        parseFloat(obj[0]) / parseFloat(obj[1]);
+                        !isNaN(undoIntensity) && undoIntensity >= 0 ? undoIntensity / 100 : 0.05;
+                    instrumentsEffects[0][this.instrumentName]["vibratoFrequency"] = undoFreq;
+                    instrumentsEffects[0][this.instrumentName]["vibratoRate"] =
+                        undoFreq > 0 ? 1 / undoFreq : 16;
                 }
             } else if (effect === "phaser") {
                 for (let i = 0; i < 3; i++) {

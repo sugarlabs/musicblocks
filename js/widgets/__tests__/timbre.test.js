@@ -35,8 +35,9 @@ global.platformColor = {
     selectorBackground: "#f0f0f0",
     selectorBackgroundHOVER: "#e0e0e0"
 };
-global.rationalToFraction = jest.fn(n => [n, 1]);
-global.oneHundredToFraction = jest.fn(n => n / 100);
+const { oneHundredToFraction, rationalToFraction } = require("../../utils/utils-logic.js");
+global.rationalToFraction = jest.fn((...args) => rationalToFraction(...args));
+global.oneHundredToFraction = jest.fn((...args) => oneHundredToFraction(...args));
 global.last = arr => arr[arr.length - 1];
 global.Singer = { RhythmActions: { getNoteValue: jest.fn(() => 0.25) } };
 global.delayExecution = jest.fn(ms => new Promise(r => setTimeout(r, ms)));
@@ -2200,16 +2201,23 @@ describe("TimbreWidget", () => {
                 jsdomDocument.body.appendChild(range1);
                 jsdomDocument.body.appendChild(span1);
 
-                timbre._recordUndo("vibrato", [8, 25], 0);
+                timbre._recordUndo("vibrato", [8, 4], 0);
                 timbre._undo();
 
-                expect(timbre.vibratoParams).toEqual([8, 25]);
+                expect(timbre.vibratoParams).toEqual([8, 4]);
                 expect(timbre._update).toHaveBeenCalledWith(0, 8, 0);
+                expect(timbre._update).toHaveBeenCalledWith(0, 4, 1);
+                expect(timbre._update).toHaveBeenCalledWith(0, 1, 2);
                 expect(range0.value).toBe("8");
                 expect(range1.value).toBe("25");
+                expect(span1.textContent).toBe("1/4");
                 expect(
                     global.instrumentsEffects[0][timbre.instrumentName]["vibratoIntensity"]
                 ).toBe(0.08);
+                expect(global.instrumentsEffects[0][timbre.instrumentName]["vibratoRate"]).toBe(4);
+                expect(
+                    global.instrumentsEffects[0][timbre.instrumentName]["vibratoFrequency"]
+                ).toBe(0.25);
                 range0.remove();
                 span0.remove();
                 range1.remove();
@@ -2652,7 +2660,32 @@ describe("TimbreWidget", () => {
                 slider1.dispatchEvent(
                     new jsdomDocument.defaultView.Event("change", { bubbles: true })
                 );
-                expect(global.instrumentsEffects[0]["custom"]["vibratoFrequency"]).toBeDefined();
+                expect(global.instrumentsEffects[0]["custom"]["vibratoFrequency"]).toBe(1 / 16);
+                expect(global.instrumentsEffects[0]["custom"]["vibratoRate"]).toBe(16);
+                expect(global.instrumentsEffects[0]["custom"]["vibratoIntensity"]).toBe(0.1);
+                expect(timbre.vibratoParams[1]).toBe(16);
+            });
+
+            test("reopening existing vibrato restores slider values and instrumentsEffects", async () => {
+                timbre._update = jest.fn();
+                timbre.vibratoEffect = [99];
+                timbre.vibratoParams = [8, 16];
+                timbre._effects();
+                const vibratoRadio = jsdomDocument.querySelector('input[value="Vibrato"]');
+                vibratoRadio.checked = true;
+                await vibratoRadio.onclick({ target: vibratoRadio });
+
+                const slider0 = jsdomDocument.getElementById("myRangeFx0");
+                const slider1 = jsdomDocument.getElementById("myRangeFx1");
+                const span1 = jsdomDocument.getElementById("myspanFx1");
+
+                expect(slider0.value).toBe("8");
+                expect(slider1.value).toBe(String(100 / 16));
+                expect(span1.textContent).toBe("1/16");
+                expect(global.instrumentsEffects[0]["custom"]["vibratoActive"]).toBe(true);
+                expect(global.instrumentsEffects[0]["custom"]["vibratoIntensity"]).toBe(0.08);
+                expect(global.instrumentsEffects[0]["custom"]["vibratoFrequency"]).toBe(1 / 16);
+                expect(global.instrumentsEffects[0]["custom"]["vibratoRate"]).toBe(16);
             });
 
             test("Chorus effect creation and slider changes", async () => {
