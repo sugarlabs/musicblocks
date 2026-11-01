@@ -270,6 +270,9 @@ class GlobalPlanet {
                 toDownload,
                 function () {
                     this.render(data);
+
+                    if (requestId !== this._requestId) return;
+
                     this.showLoadMore();
                 }.bind(this),
                 requestId
@@ -279,6 +282,9 @@ class GlobalPlanet {
                 toDownload,
                 function () {
                     this.render(data);
+
+                    if (requestId !== this._requestId) return;
+
                     this.hideLoadMore();
                 }.bind(this),
                 requestId
