@@ -1564,6 +1564,70 @@ describe("AST2BlockList Class", () => {
         expect(blockList).toEqual(expectedBlockList);
     });
 
+    test("should convert a Dictionary block back from getDict", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.print(await mouse.getDict("mydict"));
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+
+        expect(blockList.map(([, block]) => (Array.isArray(block) ? block[0] : block))).toEqual([
+            "start",
+            "print",
+            "dictionary",
+            "text"
+        ]);
+        expect(blockList[3][1][1]).toEqual({ value: "mydict" });
+    });
+
+    test("should preserve a nested Dictionary block in setValue", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.setValue("key", await mouse.getDict("mydict"), 2);
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+
+        expect(blockList.map(([, block]) => (Array.isArray(block) ? block[0] : block))).toEqual([
+            "start",
+            "setDict",
+            "number",
+            "text",
+            "dictionary",
+            "text"
+        ]);
+        expect(blockList[5][1][1]).toEqual({ value: "mydict" });
+    });
+
+    test("should preserve a nested Dictionary name in setValue", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.setValue("key", 2, await mouse.getDict("names"));
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+
+        expect(blockList.map(([, block]) => (Array.isArray(block) ? block[0] : block))).toEqual([
+            "start",
+            "setDict",
+            "dictionary",
+            "text",
+            "text",
+            "number"
+        ]);
+        expect(blockList[3][1][1]).toEqual({ value: "names" });
+    });
+
     // Test all Rhythm Blocks.
     test("should generate correct blockList for all rhythm blocks", () => {
         const code = `
