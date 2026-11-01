@@ -12,7 +12,8 @@
 /*
    global
 
-   LeftBlock, FlowBlock, NOINPUTERRORMSG, getTargetTurtle, Turtle, isSafeUrl, isUnsafeObjectKey
+   LeftBlock, FlowBlock, NOINPUTERRORMSG, getTargetTurtle, Turtle, isSafeUrl, isUnsafeObjectKey,
+   i18next
  */
 
 /* exported setupProgramBlocks */
@@ -815,15 +816,60 @@ function setupProgramBlocks(activity) {
          * @param {number} blk - The block identifier.
          */
         flow(args, logo, turtle, blk) {
-            if (args.length < 1) {
+            if (!args || args.length < 1 || args[0] === null || args[0] === undefined) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
+            if (!activity.blocks || !activity.blocks.palettes || !activity.blocks.palettes.dict) {
+                return;
+            }
+
+            let input;
+            try {
+                input = String(args[0]).trim();
+            } catch {
+                return;
+            }
+            if (input === "") {
+                return;
+            }
+
+            const locale =
+                typeof i18next !== "undefined" && typeof i18next.language === "string"
+                    ? i18next.language.replace(/_/g, "-")
+                    : typeof window !== "undefined" &&
+                        window.i18next &&
+                        typeof window.i18next.language === "string"
+                      ? window.i18next.language.replace(/_/g, "-")
+                      : undefined;
+            const target = input.toLowerCase();
+            const targetLocale = input.toLocaleLowerCase(locale);
+
             for (const p in activity.blocks.palettes.dict) {
-                if (_(activity.blocks.palettes.dict[p].name) === args[0].toLowerCase()) {
+                const palette = activity.blocks.palettes.dict[p];
+                if (!palette) {
+                    continue;
+                }
+                const paletteName = palette.name || p;
+                const localizedName = typeof _ === "function" ? _(paletteName) : paletteName;
+
+                const matches = value =>
+                    typeof value === "string" &&
+                    (value.toLowerCase() === target ||
+                        value.toLocaleLowerCase(locale) === targetLocale);
+
+                const matchLocalized = matches(localizedName);
+                const matchRaw = matches(paletteName);
+                const matchKey = matches(p);
+
+                if (matchLocalized || matchRaw || matchKey) {
                     activity.blocks.palettes.hide();
-                    activity.blocks.palettes.dict[p].show();
+                    if (typeof palette.show === "function") {
+                        palette.show();
+                    } else if (typeof activity.blocks.palettes.dict[p].show === "function") {
+                        activity.blocks.palettes.dict[p].show();
+                    }
                     activity.blocks.palettes.show();
                     return;
                 }
