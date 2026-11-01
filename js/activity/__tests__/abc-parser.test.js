@@ -1501,3 +1501,256 @@ describe("Chords", () => {
         ]);
     });
 });
+
+describe("Key and meter changes inside a tune", () => {
+    const parse = abc => parseAndCapture(ABCJS.parseOnly(abc)[0]);
+
+    // What one voice plays, in order, with each repeat played its count: each
+    // note as name and octave, each key change as K:root mode and each meter
+    // change as M:num/den.
+    const scoreOrder = (blocks, voice = 0) => {
+        const byId = new Map(blocks.map(b => [b[0], b]));
+        const type = b => (Array.isArray(b[1]) ? b[1][0] : b[1]);
+        const value = id => byId.get(id)[1][1].value;
+        const actions = new Map(
+            blocksOfType(blocks, "action").map(a => [value(a[4][1]), byId.get(a[4][2])])
+        );
+        const out = [];
+        const run = block => {
+            for (; block; block = byId.get(block[4][block[4].length - 1])) {
+                if (type(block) === "repeat") {
+                    for (let i = 0; i < value(block[4][1]); i++) {
+                        run(byId.get(block[4][2]));
+                    }
+                } else if (type(block) === "nameddo") {
+                    run(byId.get(actions.get(value(block[0]))[4][1]));
+                } else if (type(block) === "newnote") {
+                    const pitch = byId.get(byId.get(block[4][2])[4][1]);
+                    out.push(value(pitch[4][1]) + value(pitch[4][2]));
+                } else if (type(block) === "setkey2") {
+                    out.push(`K:${value(block[4][1])} ${value(block[4][2])}`);
+                } else if (type(block) === "meter") {
+                    const divide = byId.get(block[4][2]);
+                    out.push(`M:${value(block[4][1])}/${value(divide[4][2])}`);
+                }
+            }
+        };
+        run(byId.get(blocksOfType(blocks, "settimbre")[voice][4][2]));
+        return out;
+    };
+
+    // Every block id is unique and every connection is returned by the block
+    // it points to, so the new blocks sit in the stack like the notes do.
+    const expectLinked = blocks => {
+        const byId = new Map(blocks.map(b => [b[0], b]));
+        expect(byId.size).toBe(blocks.length);
+        blocks.forEach(block => {
+            block[4].forEach(id => {
+                if (id !== null) {
+                    expect(byId.get(id)[4]).toContain(block[0]);
+                }
+            });
+        });
+    };
+
+    test("notes after an inline [K:] take the new key", async () => {
+        const blocks = await parse("X:1\nM:4/4\nL:1/4\nK:C\nC F c F | [K:D] F c d F |]\n");
+
+        expect(scoreOrder(blocks)).toEqual([
+            "C4",
+            "F4",
+            "C5",
+            "F4",
+            "K:D major",
+            "F♯4",
+            "C♯5",
+            "D5",
+            "F♯4"
+        ]);
+        expect(blocksOfType(blocks, "setkey2")).toHaveLength(2);
+        expectLinked(blocks);
+    });
+
+    test("a K: line between staff lines becomes a key change", async () => {
+        const blocks = await parse("X:1\nM:4/4\nL:1/4\nK:C\nC F c F |\nK:Bb\nB E F B |]\n");
+
+        expect(scoreOrder(blocks)).toEqual([
+            "C4",
+            "F4",
+            "C5",
+            "F4",
+            "K:B♭ major",
+            "B♭4",
+            "E♭4",
+            "F4",
+            "B♭4"
+        ]);
+        expectLinked(blocks);
+    });
+
+    // abcjs reports no key element for these, only the new key on the next line.
+    test.each([
+        [
+            "a K: line inside a voice's music",
+            "V:1\nC F c F |\nV:2\nC F c F |\nV:1\nK:D\nF c d F |\nV:2\nF c d F |]\n"
+        ],
+        [
+            "a K: line between the voices",
+            "V:1\nC F c F |\nV:2\nC F c F |\nK:D\nV:1\nF c d F |\nV:2\nF c d F |]\n"
+        ]
+    ])("%s becomes a key change in each voice", async (_name, body) => {
+        const blocks = await parse(`X:1\nM:4/4\nL:1/4\nK:C\n${body}`);
+        const expected = ["C4", "F4", "C5", "F4", "K:D major", "F♯4", "C♯5", "D5", "F♯4"];
+
+        expect(scoreOrder(blocks, 0)).toEqual(expected);
+        expect(scoreOrder(blocks, 1)).toEqual(expected);
+        expectLinked(blocks);
+    });
+
+    test("a key change keeps its mode", async () => {
+        const blocks = await parse("X:1\nM:4/4\nL:1/4\nK:C\nC D E F | [K:Ador] F G A B |]\n");
+
+        expect(scoreOrder(blocks)).toContain("K:A dorian");
+        expect(scoreOrder(blocks).slice(-4)).toEqual(["F♯4", "G4", "A4", "B4"]);
+    });
+
+    test("restating the current key adds no block", async () => {
+        const blocks = await parse("X:1\nM:4/4\nL:1/4\nK:G\nG A B c | [K:G] d e f g |]\n");
+
+        expect(blocksOfType(blocks, "setkey2")).toHaveLength(1);
+        expect(scoreOrder(blocks)).toContain("F♯5");
+    });
+
+    test("K:none is imported as C major", async () => {
+        const blocks = await parse("X:1\nM:4/4\nL:1/4\nK:D\nF c d F | [K:none] F c d F |]\n");
+
+        expect(scoreOrder(blocks)).toEqual([
+            "F♯4",
+            "C♯5",
+            "D5",
+            "F♯4",
+            "K:C major",
+            "F4",
+            "C5",
+            "D5",
+            "F4"
+        ]);
+    });
+
+    // An empty K: is the same as K:none, and K:none ^F keeps the explicit sharp.
+    test.each([
+        ["K:none", ["F4", "C5", "D5", "F4"]],
+        ["K:", ["F4", "C5", "D5", "F4"]],
+        ["K:none ^F", ["F♯4", "C5", "D5", "F♯4"]]
+    ])("a %s header starts the tune in C major", async (header, notes) => {
+        const blocks = await parse(`X:1\nM:4/4\nL:1/4\n${header}\nF c d F |]\n`);
+        const byId = new Map(blocks.map(b => [b[0], b]));
+        const key = blocksOfType(blocks, "setkey2")[0];
+
+        expect(byId.get(key[4][1])[1][1].value).toBe("C");
+        expect(byId.get(key[4][2])[1][1].value).toBe("major");
+        expect(scoreOrder(blocks)).toEqual(notes);
+    });
+
+    test("an inline [M:] becomes a meter block where it is written", async () => {
+        const blocks = await parse("X:1\nM:4/4\nL:1/4\nK:C\nC D E F | [M:3/4] G A B |]\n");
+
+        expect(scoreOrder(blocks)).toEqual(["C4", "D4", "E4", "F4", "M:3/4", "G4", "A4", "B4"]);
+        expectLinked(blocks);
+    });
+
+    test("an M: line between staff lines becomes a meter block", async () => {
+        const blocks = await parse(
+            "X:1\nM:4/4\nL:1/4\nK:C\nC D E F |\nM:3/4\nG A B |\nc d e |\nM:6/8\nf3 g3 |]\n"
+        );
+
+        expect(scoreOrder(blocks)).toEqual([
+            "C4",
+            "D4",
+            "E4",
+            "F4",
+            "M:3/4",
+            "G4",
+            "A4",
+            "B4",
+            "C5",
+            "D5",
+            "E5",
+            "M:6/8",
+            "F5",
+            "G5"
+        ]);
+        expectLinked(blocks);
+    });
+
+    test("restating the current meter adds no block", async () => {
+        const blocks = await parse(
+            "X:1\nM:3/4\nL:1/4\nK:C\nC D E |\nM:3/4\nF G A | [M:3/4] B c d |]\n"
+        );
+
+        expect(blocksOfType(blocks, "meter")).toHaveLength(1);
+    });
+
+    test("the issue's tune imports its key and meter changes", async () => {
+        const blocks = await parse(
+            "X:1\nT:Key and meter change\nM:4/4\nL:1/4\nK:C\n" +
+                "C D E F | G F E D | [K:D] D E F G | A G F E |\n" +
+                "M:3/4\nD E F | A F D | [M:2/4] F A | d2 |]\n"
+        );
+
+        expect(scoreOrder(blocks)).toEqual([
+            "C4",
+            "D4",
+            "E4",
+            "F4",
+            "G4",
+            "F4",
+            "E4",
+            "D4",
+            "K:D major",
+            "D4",
+            "E4",
+            "F♯4",
+            "G4",
+            "A4",
+            "G4",
+            "F♯4",
+            "E4",
+            "M:3/4",
+            "D4",
+            "E4",
+            "F♯4",
+            "A4",
+            "F♯4",
+            "D4",
+            "M:2/4",
+            "F♯4",
+            "A4",
+            "D5"
+        ]);
+        expectLinked(blocks);
+    });
+
+    test("a key change that starts a repeated section plays inside the repeat", async () => {
+        const blocks = await parse("X:1\nM:4/4\nL:1/4\nK:C\nC D E F |: [K:D] F G A B :|]\n");
+
+        // The key block plays on both passes, not just once before the repeat.
+        expect(scoreOrder(blocks)).toEqual([
+            "C4",
+            "D4",
+            "E4",
+            "F4",
+            "K:D major",
+            "F♯4",
+            "G4",
+            "A4",
+            "B4",
+            "K:D major",
+            "F♯4",
+            "G4",
+            "A4",
+            "B4"
+        ]);
+        expectLinked(blocks);
+    });
+});

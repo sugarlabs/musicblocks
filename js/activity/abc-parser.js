@@ -238,9 +238,57 @@ function _tempoOf(tempo) {
     return { bpm: tempo.bpm, duration: toFraction(beatValue) };
 }
 
+// An abcjs key as the root notename and modename a setkey2 block takes.
+function _keyNamesOf(key) {
+    // K:none has no key signature, which reads the same as C major.
+    if (key.root === "none") {
+        return { root: "C", mode: "major" };
+    }
+    return {
+        root: key.root + (_ABC_KEY_ACC_SUFFIX[key.acc] || ""),
+        mode: _ABC_MODE_MAP[key.mode] || "major"
+    };
+}
+
+// Makes key the voice's key and adds a setkey2 block to a segment, followed by a
+// hidden block like a note, so it chains into the segment the same way notes do.
+// Meter blocks do the same. Adds nothing when the root and mode are unchanged.
+function _createKeyBlocks(key, blockId, actionBlock, staffRecord) {
+    const previous = _keyNamesOf(staffRecord.keySignature);
+    staffRecord.keySignature = key;
+    const { root, mode } = _keyNamesOf(key);
+    if (root === previous.root && mode === previous.mode) {
+        return 0;
+    }
+    actionBlock.push(
+        [blockId, "setkey2", 0, 0, [blockId - 1, blockId + 1, blockId + 2, blockId + 3]],
+        [blockId + 1, ["notename", { value: root }], 0, 0, [blockId]],
+        [blockId + 2, ["modename", { value: mode }], 0, 0, [blockId]],
+        [blockId + 3, "hidden", 0, 0, [blockId, blockId + 4]]
+    );
+    return 4;
+}
+
+// Adds nothing when the voice is already in this meter.
+function _createMeterBlocks(meter, blockId, actionBlock, staffRecord) {
+    if (meter.num === staffRecord.meterNum && meter.den === staffRecord.meterDen) {
+        return 0;
+    }
+    staffRecord.meterNum = meter.num;
+    staffRecord.meterDen = meter.den;
+    actionBlock.push(
+        [blockId, "meter", 0, 0, [blockId - 1, blockId + 1, blockId + 2, blockId + 5]],
+        [blockId + 1, ["number", { value: meter.num }], 0, 0, [blockId]],
+        [blockId + 2, "divide", 0, 0, [blockId, blockId + 3, blockId + 4]],
+        [blockId + 3, ["number", { value: 1 }], 0, 0, [blockId + 2]],
+        [blockId + 4, ["number", { value: meter.den }], 0, 0, [blockId + 2]],
+        [blockId + 5, "hidden", 0, 0, [blockId, blockId + 6]]
+    );
+    return 6;
+}
+
 function _buildStartBlock(blockId, staff, title, instruction, voiceNumber, tempo) {
-    const keyRoot = staff.key.root + (_ABC_KEY_ACC_SUFFIX[staff.key.acc] || "");
-    const keyMode = _ABC_MODE_MAP[staff.key.mode] || "major";
+    const { root: keyRoot, mode: keyMode } = _keyNamesOf(staff.key);
     const meter = _meterOf(staff);
     const tempoId = blockId + 14;
     const timbreId = tempoId + (tempo ? 6 : 0);
@@ -348,8 +396,9 @@ function _closeSegment(actionBlock, blockId, voiceNumber, staffRecord) {
 }
 
 /**
- * Processes one voice: iterates all elements, builds pitch blocks for notes
- * and updates repeat markers for bars. The notes become one action block per
+ * Processes one voice: iterates all elements, builds pitch blocks for notes,
+ * setkey2 and meter blocks for key and meter changes, and updates repeat
+ * markers for bars. The notes become one action block per
  * stretch between repeat bars, so a repeat can start or end mid-line.
  * Voices that produced no note blocks add nothing.
  *
@@ -373,6 +422,15 @@ function _processVoice(voice, blockId, staff, voiceNumber, staffRecord, voiceIdx
         barAccidentals[voiceIdx] = {};
     }
     let actionBlock = [];
+    // abcjs gives each line the key it starts in, and a [K:] inside the line
+    // as a key element that holds from there on. A K: line inside one voice's
+    // music changes the line's key without a key element, so compare it here.
+    blockId += _createKeyBlocks(staff.key, blockId, actionBlock, staffRecord);
+
+    // A line that starts in a new meter carries it on the staff, not as an element.
+    if (staff.meter) {
+        blockId += _createMeterBlocks(_meterOf(staff), blockId, actionBlock, staffRecord);
+    }
 
     voice.forEach(element => {
         if (element.el_type === "note") {
@@ -401,7 +459,7 @@ function _processVoice(voice, blockId, staff, voiceNumber, staffRecord, voiceIdx
                 chord,
                 blockId,
                 element.duration * (isSpacerRest ? 1 : (tuplets[voiceIdx]?.multiplier ?? 1)),
-                staff.key,
+                staffRecord.keySignature,
                 actionBlock,
                 accidentals
             );
@@ -420,6 +478,15 @@ function _processVoice(voice, blockId, staff, voiceNumber, staffRecord, voiceIdx
                 actionBlock = [];
                 _handleRepeatBar(element.type, staffRecord);
             }
+        } else if (element.el_type === "key") {
+            blockId += _createKeyBlocks(element, blockId, actionBlock, staffRecord);
+        } else if (element.el_type === "meter") {
+            blockId += _createMeterBlocks(
+                _meterOf({ meter: element }),
+                blockId,
+                actionBlock,
+                staffRecord
+            );
         }
     });
 
