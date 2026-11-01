@@ -171,10 +171,10 @@ $(document).ready(() => {
     });
 
     document.getElementById("view-more-chips").addEventListener("click", evt => {
-        const showMore = _("Show more tags") + " ▼";
+        const showAll = _("Show all tags") + " ▼";
         const showLess = _("Show fewer tags") + " ▲";
         toggleExpandable("morechips", "flexchips");
-        toggleText("view-more-chips", showMore, showLess);
+        toggleText("view-more-chips", showAll, showLess);
     });
 });
 
