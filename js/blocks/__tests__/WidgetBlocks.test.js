@@ -622,6 +622,95 @@ describe("setupWidgetBlocks", () => {
             expect(logo.setDispatchBlock).toHaveBeenCalledWith("meterBlk", 0, "_meterwidget_0");
             expect(logo.setTurtleListener).toHaveBeenCalled();
         });
+
+        // Meter 3 beats with the beat value 1 / 4, or as one number block.
+        const openMeterWidget = beatValueBlocks => {
+            activity.blocks.blockList = {
+                1: { name: "meter", connections: [null, 2, 3] },
+                2: { name: "number", value: 3 },
+                ...beatValueBlocks
+            };
+            global.MeterWidget.mockClear();
+            getBlock("meterwidget").flow(["childBlk"], logo, 0, "meterBlk");
+            logo._meterBlock = 1;
+            logo.setTurtleListener.mock.calls[0][2]();
+        };
+
+        it("opens the widget for a beat value of 1 / 4", () => {
+            openMeterWidget({
+                3: { name: "divide", value: 0.25, connections: [1, 4, 5] },
+                4: { name: "number", value: 1 },
+                5: { name: "number", value: 4 }
+            });
+
+            expect(global.MeterWidget).toHaveBeenCalledTimes(1);
+        });
+
+        it("opens the widget for a beat value given as one number", () => {
+            openMeterWidget({ 3: { name: "number", value: 0.25, connections: [1] } });
+
+            expect(global.MeterWidget).toHaveBeenCalledTimes(1);
+            expect(logo.insideMeterWidget).toBe(false);
+        });
+
+        it("opens the widget for a beat value of 0 + 0.25", () => {
+            openMeterWidget({
+                3: { name: "plus", value: 0.25, connections: [1, 4, 5] },
+                4: { name: "number", value: 0 },
+                5: { name: "number", value: 0.25 }
+            });
+
+            expect(global.MeterWidget).toHaveBeenCalledTimes(1);
+        });
+
+        it.each([
+            ["is 0", { 3: { name: "number", value: 0, connections: [1] } }],
+            [
+                "is 1 - 1",
+                {
+                    3: { name: "minus", value: 0, connections: [1, 4, 5] },
+                    4: { name: "number", value: 1 },
+                    5: { name: "number", value: 1 }
+                }
+            ],
+            [
+                "is 0 / 4",
+                {
+                    3: { name: "divide", value: 0 / 4, connections: [1, 4, 5] },
+                    4: { name: "number", value: 0 },
+                    5: { name: "number", value: 4 }
+                }
+            ],
+            [
+                "is -1 / 4",
+                {
+                    3: { name: "divide", value: -1 / 4, connections: [1, 4, 5] },
+                    4: { name: "number", value: -1 },
+                    5: { name: "number", value: 4 }
+                }
+            ],
+            [
+                "is 1 / -4",
+                {
+                    3: { name: "divide", value: 1 / -4, connections: [1, 4, 5] },
+                    4: { name: "number", value: 1 },
+                    5: { name: "number", value: -4 }
+                }
+            ],
+            [
+                "has no denominator",
+                {
+                    3: { name: "divide", value: 0, connections: [1, 4, null] },
+                    4: { name: "number", value: 1 }
+                }
+            ],
+            ["is missing", {}]
+        ])("does not open the widget when the beat value %s", (_label, beatValueBlocks) => {
+            openMeterWidget(beatValueBlocks);
+
+            expect(global.MeterWidget).not.toHaveBeenCalled();
+            expect(logo.insideMeterWidget).toBe(false);
+        });
     });
 
     describe("ModeWidgetBlock", () => {
@@ -1392,7 +1481,7 @@ describe("setupWidgetBlocks", () => {
                 activity.blocks.blockList = {
                     1: { connections: [null, 2, 3] },
                     2: { value: 4 },
-                    3: { connections: [null, 4, 5] },
+                    3: { name: "divide", connections: [null, 4, 5] },
                     4: { value: 1 },
                     5: { value: 4 }
                 };
@@ -1415,7 +1504,7 @@ describe("setupWidgetBlocks", () => {
             activity.blocks.blockList = {
                 1: { connections: [null, 2, 3] },
                 2: { value: 4 },
-                3: { connections: [null, 4, 5] },
+                3: { name: "divide", connections: [null, 4, 5] },
                 4: { value: 1 },
                 5: { value: 4 }
             };
@@ -1449,7 +1538,7 @@ describe("setupWidgetBlocks", () => {
             activity.blocks.blockList = {
                 1: { connections: [null, 2, 3] },
                 2: { value: 4 },
-                3: { connections: [null, 4, 5] },
+                3: { name: "divide", connections: [null, 4, 5] },
                 4: { value: 1 },
                 5: { value: 4 }
             };
