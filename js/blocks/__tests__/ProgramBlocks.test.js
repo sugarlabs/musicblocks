@@ -430,6 +430,19 @@ describe("ProgramBlocks", () => {
     });
 
     describe("SaveHeapBlock", () => {
+        test.each(["C#4", "%41", "100%", "♯ café 日本語"])(
+            "preserves %s in the downloaded heap",
+            value => {
+                logo.turtleHeaps[0] = [value];
+                getBlock("saveHeap").flow(["heap.json"], logo, 0);
+                const url = new URL(activity.save.download.mock.calls[0][1]);
+                expect(url.hash).toBe("");
+                expect(
+                    JSON.parse(decodeURIComponent(url.pathname.split(",").slice(1).join(",")))
+                ).toEqual([value]);
+            }
+        );
+
         test("saves heap to file", () => {
             logo.turtleHeaps[0] = ["data1", "data2"];
 
@@ -438,7 +451,7 @@ describe("ProgramBlocks", () => {
 
             expect(activity.save.download).toHaveBeenCalledWith(
                 "json",
-                'data:text/json;charset-utf-8,["data1","data2"]',
+                "data:text/json;charset-utf-8," + encodeURIComponent('["data1","data2"]'),
                 "test.json"
             );
         });
@@ -770,6 +783,19 @@ describe("ProgramBlocks", () => {
     });
 
     describe("SaveDictBlock", () => {
+        test.each([null, 5])("preserves special characters for dictionary target %p", target => {
+            const data = { "C#4": "%41, 100% café 日本語" };
+            logo.turtleDicts[0] = { MyDict: data };
+            global.getTargetTurtle.mockReturnValue(target);
+            global.Turtle.DictActions.SerializeDict.mockReturnValue(JSON.stringify(data));
+            getBlock("saveDict").flow(["MyDict", "dict.json"], logo, 0, 10);
+            const url = new URL(activity.save.download.mock.calls[0][1]);
+            expect(url.hash).toBe("");
+            expect(
+                JSON.parse(decodeURIComponent(url.pathname.split(",").slice(1).join(",")))
+            ).toEqual(data);
+        });
+
         test("saves dictionary to file", () => {
             const turtle = 0;
             logo.turtleDicts[turtle] = {
@@ -782,7 +808,7 @@ describe("ProgramBlocks", () => {
 
             expect(activity.save.download).toHaveBeenCalledWith(
                 "json",
-                'data:text/json;charset-utf-8,{"key":"value"}',
+                "data:text/json;charset-utf-8," + encodeURIComponent('{"key":"value"}'),
                 "dict.json"
             );
         });
@@ -797,7 +823,7 @@ describe("ProgramBlocks", () => {
 
             expect(activity.save.download).toHaveBeenCalledWith(
                 "json",
-                "data:text/json;charset-utf-8,{}",
+                "data:text/json;charset-utf-8," + encodeURIComponent("{}"),
                 "dict.json"
             );
         });
@@ -812,7 +838,7 @@ describe("ProgramBlocks", () => {
 
             expect(activity.save.download).toHaveBeenCalledWith(
                 "json",
-                "data:text/json;charset-utf-8,{}",
+                "data:text/json;charset-utf-8," + encodeURIComponent("{}"),
                 "dict.json"
             );
         });
@@ -835,7 +861,7 @@ describe("ProgramBlocks", () => {
 
             expect(activity.save.download).toHaveBeenCalledWith(
                 "json",
-                'data:text/json;charset-utf-8,{"turtle":"dict"}',
+                "data:text/json;charset-utf-8," + encodeURIComponent('{"turtle":"dict"}'),
                 "dict.json"
             );
         });
