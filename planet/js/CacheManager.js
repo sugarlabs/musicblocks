@@ -408,7 +408,6 @@ class CacheManager {
                 const count = countRequest.result;
 
                 if (count <= this.maxCacheSize) {
-                    resolve();
                     return;
                 }
 
@@ -430,6 +429,8 @@ class CacheManager {
 
             transaction.oncomplete = () => resolve();
             transaction.onerror = () => reject(transaction.error);
+            transaction.onabort = () =>
+                reject(transaction.error || new Error("Transaction aborted"));
         });
     }
 
@@ -456,10 +457,12 @@ class CacheManager {
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction([storeName], "readwrite");
             const store = transaction.objectStore(storeName);
-            const request = store.put(data);
+            store.put(data);
 
-            request.onsuccess = () => resolve();
-            request.onerror = () => reject(request.error);
+            transaction.oncomplete = () => resolve();
+            transaction.onerror = event => reject(event.target.error || transaction.error);
+            transaction.onabort = () =>
+                reject(transaction.error || new Error("Transaction aborted"));
         });
     }
 
@@ -499,10 +502,12 @@ class CacheManager {
                 await new Promise((resolve, reject) => {
                     const transaction = this.db.transaction([storeName], "readwrite");
                     const store = transaction.objectStore(storeName);
-                    const request = store.clear();
+                    store.clear();
 
-                    request.onsuccess = () => resolve();
-                    request.onerror = () => reject(request.error);
+                    transaction.oncomplete = () => resolve();
+                    transaction.onerror = event => reject(event.target.error || transaction.error);
+                    transaction.onabort = () =>
+                        reject(transaction.error || new Error("Transaction aborted"));
                 });
             }
 
