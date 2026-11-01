@@ -611,6 +611,7 @@ describe("Activity Toolbar Integration", () => {
                 _beginDeferCheckBounds: jest.fn(),
                 _endDeferCheckBounds: jest.fn(),
                 captureStackPreview: jest.fn(() => "preview"),
+                trimTrashHistory: jest.fn(),
                 trashPreviews: {},
                 trashStacks: [],
                 moveBlockRelative: jest.fn(),
@@ -634,6 +635,7 @@ describe("Activity Toolbar Integration", () => {
             expect(mockBlock.container.uncache).toHaveBeenCalled();
             expect(activity.blocks.trashStacks).toContain("0");
             expect(activity.blocks.trashPreviews["0"]).toBe("preview");
+            expect(activity.blocks.trimTrashHistory).toHaveBeenCalledTimes(1);
         });
 
         test("sendAllToTrash does not record blocks that are already in the trash again", () => {
@@ -653,6 +655,7 @@ describe("Activity Toolbar Integration", () => {
                 _beginDeferCheckBounds: jest.fn(),
                 _endDeferCheckBounds: jest.fn(),
                 captureStackPreview: jest.fn(() => "preview"),
+                trimTrashHistory: jest.fn(),
                 trashPreviews: {},
                 trashStacks: ["0"],
                 moveBlockRelative: jest.fn(),
@@ -692,6 +695,7 @@ describe("Activity Toolbar Integration", () => {
                 _beginDeferCheckBounds: jest.fn(),
                 _endDeferCheckBounds: jest.fn(),
                 captureStackPreview: jest.fn(),
+                trimTrashHistory: jest.fn(),
                 deleteActionBlock: jest.fn(),
                 trashPreviews: {},
                 trashStacks: [],

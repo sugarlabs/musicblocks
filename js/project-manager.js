@@ -1240,16 +1240,6 @@ class ProjectManager {
 
                 await Promise.all([trashComplete, initialization]);
 
-                if (!that.planet) {
-                    if (typeof that.blocks.disposeTrashedBlocks === "function") {
-                        that.blocks.disposeTrashedBlocks();
-                    }
-
-                    that.blocks.trashStacks = [];
-                    that.blocks.actionHistory = [];
-                    that.blocks.redoActionHistory = [];
-                }
-
                 loadImportedBlocks(obj, errorOperation);
             } catch (error) {
                 that.stage.removeAllEventListeners("trashsignal");

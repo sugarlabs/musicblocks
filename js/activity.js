@@ -2111,6 +2111,7 @@ class Activity {
             }
 
             this.blocks._endDeferCheckBounds();
+            this.blocks.trimTrashHistory();
 
             if (addStartBlock) {
                 this.blocks.loadNewBlocks(DATAOBJS);

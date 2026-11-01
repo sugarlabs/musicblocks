@@ -172,7 +172,6 @@ class PlanetInterface {
             this.closePlanet();
             if (!merge) {
                 this.activity.sendAllToTrash(false, true);
-                this._resetTrashHistory();
             }
 
             if (data === undefined) {
@@ -261,27 +260,11 @@ class PlanetInterface {
                 this.activity.sendAllToTrash();
                 this.activity.refreshCanvas();
             }
-            this._resetTrashHistory();
+
             return initialization.then(projectID => {
                 document.title = this.getCurrentProjectName();
                 return projectID;
             });
-        };
-
-        /**
-         * Forgets the trash and undo history of the project being replaced, so
-         * it cannot be restored into the next one or grow across project switches.
-         */
-        this._resetTrashHistory = () => {
-            const blocks = this.activity.blocks;
-
-            if (typeof blocks.disposeTrashedBlocks === "function") {
-                blocks.disposeTrashedBlocks();
-            }
-
-            blocks.trashStacks = [];
-            blocks.actionHistory = [];
-            blocks.redoActionHistory = [];
         };
 
         /**

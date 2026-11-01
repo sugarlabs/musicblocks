@@ -7706,16 +7706,30 @@ class Blocks {
         };
 
         /**
-         * Permanently dispose blocks that have already been moved to trash.
-         * Live blocks are left untouched.
+         * Keep only the newest 100 trashed stacks and permanently dispose
+         * stacks that fall outside the restorable trash-history window.
          * @public
          * @returns {void}
          */
-        this.disposeTrashedBlocks = () => {
-            for (let i = 0; i < this.blockList.length; i++) {
-                const block = this.blockList[i];
-                if (block && block.trash) {
-                    this.disposeBlock(i);
+        this.trimTrashHistory = () => {
+            const MAX_TRASH_UNDO = 100;
+
+            while (this.trashStacks.length > MAX_TRASH_UNDO) {
+                const removed = this.trashStacks.shift();
+
+                if (removed === undefined) {
+                    continue;
+                }
+
+                if (this.trashPreviews[removed]) {
+                    delete this.trashPreviews[removed];
+                }
+
+                this.findDragGroup(removed);
+                const evictedGroup = Array.from(this.dragGroup);
+
+                for (let i = 0; i < evictedGroup.length; i++) {
+                    this.disposeBlock(evictedGroup[i]);
                 }
             }
         };
@@ -7846,22 +7860,7 @@ class Blocks {
                 this.redoActionHistory = [];
             }
 
-            // Cap the undo history to prevent unbounded memory growth.
-            // Keep the 100 most recent trashed stacks.
-            const MAX_TRASH_UNDO = 100;
-            if (this.trashStacks.length > MAX_TRASH_UNDO) {
-                const removed = this.trashStacks.shift();
-                if (removed !== undefined) {
-                    if (this.trashPreviews[removed]) {
-                        delete this.trashPreviews[removed];
-                    }
-                    this.findDragGroup(removed);
-                    const evictedGroup = Array.from(this.dragGroup);
-                    for (let i = 0; i < evictedGroup.length; i++) {
-                        this.disposeBlock(evictedGroup[i]);
-                    }
-                }
-            }
+            this.trimTrashHistory();
 
             /** Disconnect block. */
             const parentBlock = myBlock.connections[0];
