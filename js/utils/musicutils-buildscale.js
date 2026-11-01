@@ -54,7 +54,8 @@ if (typeof module !== "undefined" && module.exports) {
         SOLFEGENAMES,
         FIXEDSOLFEGE,
         A0,
-        CHROMATIC_SOLFEGE
+        CHROMATIC_SOLFEGE,
+        EXTRATRANSPOSITIONS
     } = MusicUtilsConstants;
     var MusicUtilsI18n =
         (typeof window !== "undefined" && window.MusicUtilsI18n) ||
@@ -156,40 +157,6 @@ var _notePitchClass = name => {
  * @returns {Array} An array containing the scale and the corresponding intervals.
  */
 var buildScale = (keySignature, edo) => {
-    // FIX ME: temporary hard-coded fix to avoid errors in pitch preview
-    if (keySignature === "C♭ major") {
-        const scale = [
-            "C" + FLAT,
-            "D" + FLAT,
-            "E" + FLAT,
-            "F" + FLAT,
-            "G" + FLAT,
-            "A" + FLAT,
-            "B" + FLAT,
-            "C" + FLAT
-        ];
-        return [scale, [2, 2, 1, 2, 2, 2, 1]];
-    } else if (keySignature === "F♭ major") {
-        const scale = [
-            "F" + FLAT,
-            "G" + FLAT,
-            "A" + FLAT,
-            "B" + DOUBLEFLAT,
-            "C" + FLAT,
-            "D" + FLAT,
-            "E" + FLAT,
-            "F" + FLAT
-        ];
-        return [scale, [2, 2, 1, 2, 2, 2, 1]];
-    }
-
-    let obj = keySignatureToMode(keySignature);
-    let myKeySignature = obj[0];
-    if (myKeySignature === "C" + FLAT) {
-        obj = keySignatureToMode("B " + obj[1]);
-        myKeySignature = obj[0];
-    }
-
     // Determine active EDO: an explicit parameter wins; otherwise fall back to
     // the global temperament state so existing callers keep working unchanged.
     // Guard on falsy (not just undefined) so null/0/NaN never leak into the
@@ -202,11 +169,61 @@ var buildScale = (keySignature, edo) => {
         }
     }
 
+    if (currentEDO === 12) {
+        // FIX ME: temporary hard-coded fix to avoid errors in pitch preview
+        if (keySignature === "C♭ major") {
+            const scale = [
+                "C" + FLAT,
+                "D" + FLAT,
+                "E" + FLAT,
+                "F" + FLAT,
+                "G" + FLAT,
+                "A" + FLAT,
+                "B" + FLAT,
+                "C" + FLAT
+            ];
+            return [scale, [2, 2, 1, 2, 2, 2, 1]];
+        } else if (keySignature === "F♭ major") {
+            const scale = [
+                "F" + FLAT,
+                "G" + FLAT,
+                "A" + FLAT,
+                "B" + DOUBLEFLAT,
+                "C" + FLAT,
+                "D" + FLAT,
+                "E" + FLAT,
+                "F" + FLAT
+            ];
+            return [scale, [2, 2, 1, 2, 2, 2, 1]];
+        }
+    }
+
+    let obj = keySignatureToMode(keySignature);
+    let myKeySignature = obj[0];
+    if (currentEDO === 12 && myKeySignature === "C" + FLAT) {
+        obj = keySignatureToMode("B " + obj[1]);
+        myKeySignature = obj[0];
+    }
+
     // For non-12 EDO: convert 12-EDO semitone intervals to EDO step counts
     // using cumulative positions to preserve the total interval sum.
     if (currentEDO !== 12) {
         const edoNames = generateNoteNames(currentEDO);
         let idx = edoNames.indexOf(myKeySignature);
+        if (idx === -1) {
+            idx = getEdoNoteNamePosition(myKeySignature, currentEDO);
+        }
+        if (
+            idx === -1 &&
+            typeof EXTRATRANSPOSITIONS !== "undefined" &&
+            myKeySignature in EXTRATRANSPOSITIONS
+        ) {
+            const normalized = EXTRATRANSPOSITIONS[myKeySignature][0];
+            idx = getEdoNoteNamePosition(normalized, currentEDO);
+            if (idx === -1) {
+                idx = edoNames.indexOf(normalized);
+            }
+        }
         if (idx === -1) {
             idx = 0;
         }
@@ -216,7 +233,8 @@ var buildScale = (keySignature, edo) => {
         // pitch class, so no pitch class is left unreachable.
         const edoHalfSteps = getModePattern(obj[1], currentEDO);
 
-        const scale = [myKeySignature];
+        const startNote = edoNames[idx];
+        const scale = [startNote];
         let ii = idx;
         for (let i = 0; i < edoHalfSteps.length; i++) {
             ii = (ii + edoHalfSteps[i] + edoNames.length) % edoNames.length;

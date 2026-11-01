@@ -131,6 +131,7 @@ const {
     PITCH_COLLECTIONS_EDO_OVERRIDES,
     getModePattern,
     generateNoteNames,
+    getEdoNoteNamePosition,
     isNonEDO,
     getNonEDOModeSteps,
     getSavedCustomModes,
@@ -2639,6 +2640,150 @@ describe("buildScale with explicit EDO", () => {
             [2, 2, 1, 2, 2, 2, 1]
         ]);
     });
+
+    describe("C♭ and F♭ major across 12, 19, and 31 EDO", () => {
+        it("preserves exact byte-for-byte 12-EDO output for C♭ major and F♭ major", () => {
+            expect(buildScale("C♭ major", 12)).toEqual([
+                ["C♭", "D♭", "E♭", "F♭", "G♭", "A♭", "B♭", "C♭"],
+                [2, 2, 1, 2, 2, 2, 1]
+            ]);
+            expect(buildScale("F♭ major", 12)).toEqual([
+                ["F♭", "G♭", "A♭", "B𝄫", "C♭", "D♭", "E♭", "F♭"],
+                [2, 2, 1, 2, 2, 2, 1]
+            ]);
+        });
+
+        it.each([
+            [
+                "C♭ major",
+                19,
+                "B",
+                [3, 3, 2, 3, 3, 3, 2],
+                ["B", "C♯", "D♯", "E", "F♯", "G♯", "A♯", "B"]
+            ],
+            [
+                "F♭ major",
+                19,
+                "E",
+                [3, 3, 2, 3, 3, 3, 2],
+                ["E", "F♯", "G♯", "A", "B", "C♯", "D♯", "E"]
+            ],
+            [
+                "C♭ major",
+                31,
+                "C♭",
+                [5, 5, 3, 5, 5, 5, 3],
+                ["C♭", "D♭", "E♭", "F♭", "G♭", "A♭", "B♭", "C♭"]
+            ],
+            [
+                "F♭ major",
+                31,
+                "F♭",
+                [5, 5, 3, 5, 5, 5, 3],
+                ["F♭", "G♭", "A♭", "A♯♯", "C♭", "D♭", "E♭", "F♭"]
+            ]
+        ])(
+            "builds %s in %i-EDO with native intervals and resolved tonic %s",
+            (key, edo, expectedTonic, expectedSteps, expectedScale) => {
+                const [scale, steps] = buildScale(key, edo);
+                const edoNames = generateNoteNames(edo);
+                const expectedPattern = getModePattern("major", edo);
+
+                // 1. Interval pattern equals active getModePattern("major", edo)
+                expect(steps).toEqual(expectedPattern);
+                expect(steps).toEqual(expectedSteps);
+
+                // 2. Interval sum equals requested EDO
+                expect(steps.reduce((a, b) => a + b, 0)).toBe(edo);
+
+                // 3. Scale length is interval pattern length + 1
+                expect(scale.length).toBe(steps.length + 1);
+
+                // 4. First note corresponds to expected tonic position returned by getEdoNoteNamePosition
+                const tonicPos = getEdoNoteNamePosition(expectedTonic, edo);
+                expect(tonicPos).toBeGreaterThanOrEqual(0);
+                expect(scale[0]).toBe(edoNames[tonicPos]);
+                expect(scale[0]).toBe(expectedTonic);
+
+                // 5. Scale is generated using valid names from generateNoteNames(edo)
+                expect(scale.every(name => edoNames.includes(name))).toBe(true);
+
+                // 6. Final note returns to starting pitch position
+                expect(scale[scale.length - 1]).toBe(scale[0]);
+
+                // 7. No invalid idx = 0 fallback silently changes requested tonic (C is index 0)
+                expect(scale[0]).not.toBe("C");
+
+                // Exact scale match
+                expect(scale).toEqual(expectedScale);
+            }
+        );
+
+        it("uses active temperament fallback when edo argument is omitted", () => {
+            try {
+                global.globalActivity = {
+                    logo: {
+                        synth: {
+                            inTemperament: "equal19"
+                        }
+                    }
+                };
+                const [scale19, steps19] = buildScale("C♭ major");
+                expect(steps19).toEqual(getModePattern("major", 19));
+                expect(steps19.reduce((a, b) => a + b, 0)).toBe(19);
+                expect(scale19[0]).toBe("B");
+                expect(scale19[scale19.length - 1]).toBe("B");
+
+                const [fScale19, fSteps19] = buildScale("F♭ major");
+                expect(fSteps19).toEqual(getModePattern("major", 19));
+                expect(fSteps19.reduce((a, b) => a + b, 0)).toBe(19);
+                expect(fScale19[0]).toBe("E");
+                expect(fScale19[fScale19.length - 1]).toBe("E");
+
+                global.globalActivity.logo.synth.inTemperament = "equal31";
+                const [scale31, steps31] = buildScale("C♭ major");
+                expect(steps31).toEqual(getModePattern("major", 31));
+                expect(steps31.reduce((a, b) => a + b, 0)).toBe(31);
+                expect(scale31[0]).toBe("C♭");
+                expect(scale31[scale31.length - 1]).toBe("C♭");
+
+                const [fScale31, fSteps31] = buildScale("F♭ major");
+                expect(fSteps31).toEqual(getModePattern("major", 31));
+                expect(fSteps31.reduce((a, b) => a + b, 0)).toBe(31);
+                expect(fScale31[0]).toBe("F♭");
+                expect(fScale31[fScale31.length - 1]).toBe("F♭");
+            } finally {
+                delete global.globalActivity;
+            }
+        });
+
+        it("preserves standard scale generation for C, D, G major and A minor in 12, 19, and 31 EDO", () => {
+            [12, 19, 31].forEach(edo => {
+                const majorPattern = getModePattern("major", edo);
+                const minorPattern = getModePattern("minor", edo);
+
+                const [cScale, cSteps] = buildScale("C major", edo);
+                expect(cSteps).toEqual(majorPattern);
+                expect(cScale[0]).toBe("C");
+                expect(cScale[cScale.length - 1]).toBe("C");
+
+                const [dScale, dSteps] = buildScale("D major", edo);
+                expect(dSteps).toEqual(majorPattern);
+                expect(dScale[0]).toBe("D");
+                expect(dScale[dScale.length - 1]).toBe("D");
+
+                const [gScale, gSteps] = buildScale("G major", edo);
+                expect(gSteps).toEqual(majorPattern);
+                expect(gScale[0]).toBe("G");
+                expect(gScale[gScale.length - 1]).toBe("G");
+
+                const [aScale, aSteps] = buildScale("A minor", edo);
+                expect(aSteps).toEqual(minorPattern);
+                expect(aScale[0]).toBe("A");
+                expect(aScale[aScale.length - 1]).toBe("A");
+            });
+        });
+    });
 });
 
 //Both getStepSizeUp and getStepSizeDown function uses _getStepSize
@@ -2815,15 +2960,15 @@ describe("getInterval", () => {
         expect(getInterval(1, "C major", "D♭", 19)).toBe(3);
         expect(getInterval(1, "C major", "E♯", 19)).toBe(3);
         expect(getInterval(1, "C major", "C♭", 19)).toBe(2);
-        // C♭ major's scale has 12-EDO steps even in 19-EDO, but B is still matched by name.
-        expect(getInterval(2, "C♭ major", "B", 19)).toBe(3);
+        // In 19-EDO C♭ major generates 19-EDO steps [3, 3, 2, 3, 3, 3, 2] with tonic B.
+        expect(getInterval(2, "C♭ major", "B", 19)).toBe(6);
     });
 
     it("should use the current temperament's EDO when none is given", () => {
         const savedActivity = global.globalActivity;
         global.globalActivity = { logo: { synth: { inTemperament: "equal19" } } };
         try {
-            expect(getInterval(2, "C♭ major", "B")).toBe(3);
+            expect(getInterval(2, "C♭ major", "B")).toBe(6);
         } finally {
             global.globalActivity = savedActivity;
         }
