@@ -62,6 +62,10 @@ describe("Boundary Class", () => {
         expect(stage.setChildIndex).toHaveBeenCalledWith(boundary._container, 0);
     });
 
+    it("should initialize with container hidden", () => {
+        expect(boundary._container.visible).toBe(false);
+    });
+
     it("should call create and destroy methods when setting scale", () => {
         const createSpy = jest.spyOn(boundary, "create");
         const destroySpy = jest.spyOn(boundary, "destroy");
