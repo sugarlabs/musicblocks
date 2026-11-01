@@ -393,6 +393,24 @@ describe("GlobalPlanet", () => {
 
             expect(hideLoadMore).not.toHaveBeenCalled();
         });
+
+        it("does not update cached-result pagination after a newer request starts", () => {
+            gp.cache.proj1 = {
+                ProjectLastUpdated: 123
+            };
+
+            gp._requestId = 1;
+
+            const hideLoadMore = jest.spyOn(gp, "hideLoadMore");
+
+            jest.spyOn(gp, "render").mockImplementation(() => {
+                gp._requestId = 2;
+            });
+
+            gp.addProjects([["proj1", 123]], 1);
+
+            expect(hideLoadMore).not.toHaveBeenCalled();
+        });
     });
     describe("addProjectToCache", () => {
         it("should add project data to cache on success", () => {
@@ -909,6 +927,23 @@ describe("GlobalPlanet", () => {
             expect(gp.oldSearchString).toBe("");
             expect(document.getElementById("tagscontainer").style.display).not.toBe("none");
             expect(refreshSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("should cancel a pending debounce when IME composition starts", () => {
+            const input = document.getElementById("global-search");
+
+            input.value = "p";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            expect(gp.search).not.toHaveBeenCalled();
+
+            input.dispatchEvent(new CompositionEvent("compositionstart", { bubbles: true }));
+
+            expect(gp.searchDebounce).toBeNull();
+
+            jest.advanceTimersByTime(300);
+
+            expect(gp.search).not.toHaveBeenCalled();
         });
     });
 

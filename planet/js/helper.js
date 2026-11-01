@@ -175,7 +175,14 @@ $(document).ready(() => {
             const titleRow = section.querySelector(".projects-title-row");
             const search = section.querySelector(".project-search-preview");
 
-            return titleRow && search ? { section, titleRow, search } : null;
+            return titleRow && search
+                ? {
+                      section,
+                      titleRow,
+                      search,
+                      isComposing: false
+                  }
+                : null;
         })
         .filter(Boolean);
 
@@ -235,6 +242,7 @@ $(document).ready(() => {
 
     const updateSearchDocking = () => {
         if (!navbar || !searchSlot || searchStates.length === 0) return;
+        if (searchStates.some(state => state.isComposing)) return;
 
         const activeState = searchStates.find(
             state => getComputedStyle(state.section).display !== "none"
@@ -270,6 +278,21 @@ $(document).ready(() => {
             updateSearchDocking();
         });
     };
+
+    searchStates.forEach(state => {
+        const input = state.search.querySelector("input");
+
+        if (!input) return;
+
+        input.addEventListener("compositionstart", () => {
+            state.isComposing = true;
+        });
+
+        input.addEventListener("compositionend", () => {
+            state.isComposing = false;
+            scheduleSearchDocking();
+        });
+    });
 
     window.addEventListener("scroll", scheduleSearchDocking, { passive: true });
     window.addEventListener("resize", scheduleSearchDocking, { passive: true });

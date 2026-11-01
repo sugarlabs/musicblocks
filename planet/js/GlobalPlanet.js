@@ -264,6 +264,9 @@ class GlobalPlanet {
             this.afterAddProjects();
         } else if (this.loadCount === 0) {
             this.render(data);
+
+            if (requestId !== this._requestId) return;
+
             hasMore ? this.showLoadMore() : this.hideLoadMore();
         } else if (hasMore) {
             this.downloadProjectsToCache(
@@ -825,6 +828,11 @@ class GlobalPlanet {
                     this.search();
                 }, 300);
             };
+
+            register("global-search", "compositionstart", function () {
+                clearTimeout(this.searchDebounce);
+                this.searchDebounce = null;
+            });
 
             register("global-search", "input", function (evt) {
                 if (evt.isComposing) return;

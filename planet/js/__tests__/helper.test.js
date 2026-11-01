@@ -470,5 +470,33 @@ describe("helper.js", () => {
 
             expect(titleRow.contains(search)).toBe(true);
         });
+
+        it("should defer docking while IME composition is active", () => {
+            const slot = document.getElementById("planet-search-slot");
+            const titleRow = document.querySelector("#local .projects-title-row");
+            const input = document.getElementById("local-search");
+            const search = input.parentElement;
+
+            // Start with the search restored in its title row.
+            localTitleTop = 100;
+            window.dispatchEvent(new Event("scroll"));
+
+            expect(titleRow.contains(search)).toBe(true);
+
+            input.dispatchEvent(new CompositionEvent("compositionstart", { bubbles: true }));
+
+            // Crossing the threshold should not move the composing input.
+            localTitleTop = 20;
+            window.dispatchEvent(new Event("scroll"));
+
+            expect(titleRow.contains(search)).toBe(true);
+            expect(slot.contains(search)).toBe(false);
+
+            // Once composition finishes, docking is retried.
+            input.dispatchEvent(new CompositionEvent("compositionend", { bubbles: true }));
+
+            expect(slot.contains(search)).toBe(true);
+            expect(search.classList.contains("project-search-docked")).toBe(true);
+        });
     });
 });
