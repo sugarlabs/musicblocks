@@ -1410,6 +1410,27 @@ describe("setupRhythmActions", () => {
 
         expect(value).toBe(0);
     });
+    it("returns a beat value (duration), not a denominator, for an active rhythm2 note", () => {
+        // Post-fix rhythm2 state: noteValue holds the duration (0.25 = quarter note) while
+        // lastNotePlayed holds the denominator (4). noteValue takes priority.
+        targetTurtle.singer.inNoteBlock = [4];
+        targetTurtle.singer.noteValue = { 4: 0.25 };
+        targetTurtle.singer.lastNotePlayed = [null, 4];
+
+        const value = Singer.RhythmActions.getNoteValue(0);
+
+        expect(value).toBe(0.25);
+    });
+    it("returns a beat value (duration) from lastNotePlayed after a rhythm2 note completes", () => {
+        // After the rhythm2 note, inNoteBlock is empty so noteValue is not consulted;
+        // lastNotePlayed holds the denominator (4 = quarter note) and is inverted.
+        targetTurtle.singer.inNoteBlock = [];
+        targetTurtle.singer.lastNotePlayed = [null, 4];
+
+        const value = Singer.RhythmActions.getNoteValue(0);
+
+        expect(value).toBe(0.25);
+    });
 
     describe("dispatch-block and mouse-listener registration", () => {
         // playNote, doRhythmicDot, multiplyNoteValue, and addSwing all share the
