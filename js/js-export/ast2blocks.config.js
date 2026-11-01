@@ -749,7 +749,11 @@
         {
             name: "setDict",
             comment: "Set value block for dictionary, with specific dictionary",
-            arguments: [{ type: "text" }, { type: "text" }, { type: "NumberExpression" }],
+            arguments: [
+                { type: "text" },
+                { type: "ValueExpression" },
+                { type: "NumberExpression" }
+            ],
             ast: {
                 identifiers: [
                     { property: "type", value: "ExpressionStatement" },
@@ -777,7 +781,7 @@
         {
             name: "setDict2",
             comment: "Dictionary blocks, the set functions",
-            arguments: [{ type: "text" }, { type: "NumberExpression" }],
+            arguments: [{ type: "ValueExpression" }, { type: "NumberExpression" }],
             ast: {
                 identifiers: [
                     { property: "type", value: "ExpressionStatement" },

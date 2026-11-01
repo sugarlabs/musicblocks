@@ -1579,7 +1579,7 @@
                     "type": "text"
                 },
                 {
-                    "type": "text"
+                    "type": "ValueExpression"
                 },
                 {
                     "type": "NumberExpression"
@@ -1634,7 +1634,7 @@
             "comment": "Dictionary blocks, the set functions",
             "arguments": [
                 {
-                    "type": "text"
+                    "type": "ValueExpression"
                 },
                 {
                     "type": "NumberExpression"
