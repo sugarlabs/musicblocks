@@ -4499,5 +4499,97 @@ describe("DRUMNAMES Lilypond symbols", () => {
         for (let i = 1; i < cymbalIndices.length; i++) {
             expect(cymbalIndices[i]).toBe(cymbalIndices[i - 1] + 1);
         }
+
+        const electronicDrums = [
+            "electronic soft kick",
+            "electronic hollow kick",
+            "electronic snare",
+            "electronic hi snare",
+            "electronic cymbal",
+            "electronic triangle",
+            "electronic blip",
+            "electronic tick"
+        ];
+        const electronicIndices = electronicDrums.map(name => drumNames.indexOf(name));
+        for (let i = 1; i < electronicIndices.length; i++) {
+            expect(electronicIndices[i]).toBe(electronicIndices[i - 1] + 1);
+        }
+    });
+
+    it("registers all 8 Sonic Pi electronic percussion samples with correct metadata and symbols", () => {
+        const expectedElectronics = [
+            {
+                name: "electronic soft kick",
+                symbol: "bd",
+                category: "electronic",
+                global: "ELECTRONIC_SOFT_KICK_SAMPLE",
+                file: "electronic_soft_kick"
+            },
+            {
+                name: "electronic hollow kick",
+                symbol: "bd",
+                category: "electronic",
+                global: "ELECTRONIC_HOLLOW_KICK_SAMPLE",
+                file: "electronic_hollow_kick"
+            },
+            {
+                name: "electronic snare",
+                symbol: "sn",
+                category: "electronic",
+                global: "ELECTRONIC_SNARE_SAMPLE",
+                file: "electronic_snare"
+            },
+            {
+                name: "electronic hi snare",
+                symbol: "sn",
+                category: "electronic",
+                global: "ELECTRONIC_HI_SNARE_SAMPLE",
+                file: "electronic_hi_snare"
+            },
+            {
+                name: "electronic cymbal",
+                symbol: "hh",
+                category: "electronic",
+                global: "ELECTRONIC_CYMBAL_SAMPLE",
+                file: "electronic_cymbal"
+            },
+            {
+                name: "electronic triangle",
+                symbol: "tri",
+                category: "electronic",
+                global: "ELECTRONIC_TRIANGLE_SAMPLE",
+                file: "electronic_triangle"
+            },
+            {
+                name: "electronic blip",
+                symbol: "hh",
+                category: "electronic",
+                global: "ELECTRONIC_BLIP_SAMPLE",
+                file: "electronic_blip"
+            },
+            {
+                name: "electronic tick",
+                symbol: "hh",
+                category: "electronic",
+                global: "ELECTRONIC_TICK_SAMPLE",
+                file: "electronic_tick"
+            }
+        ];
+
+        const { SAMPLE_INFO, DEFAULTSYNTHVOLUME } = synthutilsModule;
+
+        expectedElectronics.forEach(({ name, symbol, category, global: globalVar, file }) => {
+            const entry = DRUMNAMES.find(d => d[1] === name);
+            expect(entry).toBeDefined();
+            expect(entry[3]).toBe(symbol);
+            expect(entry[4]).toBe(category);
+
+            expect(SAMPLE_INFO.drum[name]).toEqual({
+                path: `samples/${file}`,
+                global: globalVar
+            });
+
+            expect(DEFAULTSYNTHVOLUME[name]).toBeGreaterThan(0);
+        });
     });
 });
