@@ -2485,6 +2485,16 @@ describe("buildScale", () => {
         expect(buildScale("F bebop")[0].join(" ")).toBe("F G A B♭ C D E♭ E F");
     });
 
+    it("should build the major bebop scale as major with a passing note after the fifth", () => {
+        expect(buildScale("C major bebop")[0].join(" ")).toBe("C D E F G A♭ A B C");
+        expect(buildScale("F major bebop")[0].join(" ")).toBe("F G A B♭ C D♭ D E F");
+    });
+
+    it("should build the minor bebop scale as dorian with a passing major third", () => {
+        expect(buildScale("C minor bebop")[0].join(" ")).toBe("C D E♭ E F G A B♭ C");
+        expect(buildScale("F minor bebop")[0].join(" ")).toBe("F G A♭ A B♭ C D E♭ F");
+    });
+
     it("should keep the old spelling when a degree needs more than a double accidental", () => {
         // Its sixth note, G♯, would need a triple sharp to be spelled as an F, so the scale is
         // left as it was.
