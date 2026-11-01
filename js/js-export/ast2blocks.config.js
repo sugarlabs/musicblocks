@@ -750,8 +750,8 @@
             name: "setDict",
             comment: "Set value block for dictionary, with specific dictionary",
             arguments: [
-                { type: "text" },
                 { type: "ValueExpression" },
+                { type: "text" },
                 { type: "NumberExpression" }
             ],
             ast: {
