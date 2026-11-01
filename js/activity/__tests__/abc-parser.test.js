@@ -1618,13 +1618,19 @@ describe("Key and meter changes inside a tune", () => {
         ]);
     });
 
-    test("a K:none header starts the tune in C major", async () => {
-        const blocks = await parse("X:1\nM:4/4\nL:1/4\nK:none\nF c d F |]\n");
+    // An empty K: is the same as K:none, and K:none ^F keeps the explicit sharp.
+    test.each([
+        ["K:none", ["F4", "C5", "D5", "F4"]],
+        ["K:", ["F4", "C5", "D5", "F4"]],
+        ["K:none ^F", ["F♯4", "C5", "D5", "F♯4"]]
+    ])("a %s header starts the tune in C major", async (header, notes) => {
+        const blocks = await parse(`X:1\nM:4/4\nL:1/4\n${header}\nF c d F |]\n`);
         const byId = new Map(blocks.map(b => [b[0], b]));
         const key = blocksOfType(blocks, "setkey2")[0];
 
         expect(byId.get(key[4][1])[1][1].value).toBe("C");
         expect(byId.get(key[4][2])[1][1].value).toBe("major");
+        expect(scoreOrder(blocks)).toEqual(notes);
     });
 
     test("an inline [M:] becomes a meter block where it is written", async () => {
