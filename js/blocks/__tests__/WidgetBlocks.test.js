@@ -913,6 +913,159 @@ describe("setupWidgetBlocks", () => {
         });
     });
 
+    describe("Loading widget modules with RequireJS", () => {
+        let loads;
+        const failLoad = load => load.ids.forEach(id => load.onError({ requireModules: [id] }));
+
+        beforeEach(() => {
+            loads = [];
+            global.define = Object.assign(jest.fn(), { amd: {} });
+            global.requirejs = Object.assign(
+                jest.fn((ids, done, onError) => loads.push({ ids, done, onError })),
+                { undef: jest.fn() }
+            );
+            logo.runGeneration = 0;
+            logo.doStopTurtles = jest.fn(() => (logo.runGeneration += 1));
+            global.Oscilloscope.mockClear();
+            global.ChordBuilderWidget.mockClear();
+        });
+
+        afterEach(() => {
+            delete global.define;
+            delete global.requirejs;
+        });
+
+        const runTemperament = receivedArg =>
+            getBlock("temperament").flow([0, "childBlk"], logo, 0, "tempBlk", receivedArg);
+
+        it("resumes the block once the modules arrive", () => {
+            expect(runTemperament("received")).toEqual([null, 0, true]);
+            expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+
+            loads[0].done();
+
+            expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, "tempBlk", true, "received");
+        });
+
+        it("reports a failed load once, stops the run and fetches again on the next try", () => {
+            runTemperament("received");
+            failLoad(loads[0]);
+
+            expect(global.requirejs.undef.mock.calls).toEqual(loads[0].ids.map(id => [id]));
+            expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+            expect(logo.doStopTurtles).toHaveBeenCalledTimes(1);
+            expect(logo.temperament).toBeNull();
+
+            runTemperament("received");
+            // RequireJS also calls back the failed request once the retry loads the modules.
+            loads[0].done();
+            loads[1].done();
+
+            expect(logo.runFromBlockNow).toHaveBeenCalledTimes(1);
+            expect(logo.temperament).not.toBe("loading");
+        });
+
+        it("does not resume a block from a run that was stopped while loading", () => {
+            runTemperament("received");
+            logo.runGeneration += 2;
+
+            loads[0].done();
+
+            expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+            expect(logo.temperament).not.toBe("loading");
+        });
+
+        it("resumes only the block run again after a stop while loading", () => {
+            runTemperament("first run");
+            logo.runGeneration += 2;
+            runTemperament("second run");
+
+            expect(loads).toHaveLength(1);
+            loads[0].done();
+
+            expect(logo.runFromBlockNow).toHaveBeenCalledTimes(1);
+            expect(logo.runFromBlockNow).toHaveBeenCalledWith(
+                logo,
+                0,
+                "tempBlk",
+                true,
+                "second run"
+            );
+        });
+
+        it("does not resume the next waiting block once a resumed one stops the run", () => {
+            const temperament = getBlock("temperament");
+            temperament.flow([0, "childBlk"], logo, 0, "tempBlk1", "received");
+            temperament.flow([0, "childBlk"], logo, 1, "tempBlk2", "received");
+            logo.runFromBlockNow.mockImplementation(() => logo.doStopTurtles());
+
+            loads[0].done();
+
+            expect(logo.runFromBlockNow).toHaveBeenCalledTimes(1);
+            expect(logo.runFromBlockNow).toHaveBeenCalledWith(
+                logo,
+                0,
+                "tempBlk1",
+                true,
+                "received"
+            );
+        });
+
+        it("stays quiet about a failed load from a run that was stopped", () => {
+            runTemperament("received");
+            logo.runGeneration += 2;
+
+            failLoad(loads[0]);
+
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(logo.doStopTurtles).not.toHaveBeenCalled();
+            expect(logo.temperament).toBeNull();
+        });
+
+        describe("from a clamp listener", () => {
+            const runOscilloscopeListener = () => {
+                getBlock("oscilloscope").flow(["childBlk"], logo, 0, "oscBlk");
+                logo.setTurtleListener.mock.calls[0][2]();
+            };
+
+            it("opens the widget once the modules arrive", () => {
+                runOscilloscopeListener();
+                loads[0].done();
+
+                expect(global.Oscilloscope).toHaveBeenCalledTimes(1);
+                expect(logo.inOscilloscope).toBe(false);
+            });
+
+            it("does not open the widget for a run that was stopped while loading", () => {
+                runOscilloscopeListener();
+                logo.runGeneration += 1;
+                loads[0].done();
+
+                expect(global.Oscilloscope).not.toHaveBeenCalled();
+                expect(logo.Oscilloscope).toBeNull();
+            });
+
+            it("reports a failed load and leaves the oscilloscope mode", () => {
+                runOscilloscopeListener();
+                failLoad(loads[0]);
+
+                expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+                expect(logo.inOscilloscope).toBe(false);
+                expect(global.Oscilloscope).not.toHaveBeenCalled();
+            });
+
+            it("lets the Chord Builder load again after a load from a stopped run", () => {
+                getBlock("chordbuilder").flow(["childBlk"], logo, 0, "chordBlk");
+                logo.setTurtleListener.mock.calls[0][2]();
+                logo.runGeneration += 1;
+                loads[0].done();
+
+                expect(global.ChordBuilderWidget).not.toHaveBeenCalled();
+                expect(logo.chordBuilderWidget).toBeNull();
+            });
+        });
+    });
+
     describe("TemperamentBlock", () => {
         let temperament;
 

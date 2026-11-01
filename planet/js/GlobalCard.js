@@ -66,8 +66,7 @@ class GlobalCard {
                             )}" id="global-project-merge-{ID}"><i class="material-icons">merge_type</i></a> 
                             <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${`${
                                 Planet.ProjectStorage.isLiked(this.id) ? "Unlike" : "Like"
-                            } project`}"><i class="material-icons" id="global-like-icon-{ID}"></i><span class="likes-count" id="global-project-likes-{ID}"></span></a>
-
+                            } project`}"><i class="material-icons" id="global-like-icon-{ID}"></i><span class="likes-count" id="global-project-likes-{ID}"></span></a> 
                             <div id="global-share-{ID}"> 
                                 <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_(
                                     "Share project"
@@ -157,8 +156,11 @@ class GlobalCard {
         const tagcontainer = frag.getElementById(`global-project-tags-${this.id}`);
         tagcontainer.classList.add("global-tags-container");
 
-        for (let i = 0; i < this.ProjectData.ProjectTags.length; i++) {
-            const tag = this.ProjectData.ProjectTags[i];
+        const projectTags = this.ProjectData.ProjectTags || [];
+        const visibleTagCount = 3;
+
+        for (let i = 0; i < Math.min(projectTags.length, visibleTagCount); i++) {
+            const tag = projectTags[i];
             const chip = document.createElement("div");
             chip.classList.add("chipselect");
             const entry = Planet.TagsManifest && Planet.TagsManifest[tag];
@@ -166,6 +168,20 @@ class GlobalCard {
                 ? _(entry.TagName)
                 : _(tag.charAt(0).toUpperCase() + tag.slice(1));
             tagcontainer.appendChild(chip);
+        }
+
+        if (projectTags.length > visibleTagCount) {
+            const remainingTagCount = projectTags.length - visibleTagCount;
+            const moreTags = document.createElement("button");
+            moreTags.type = "button";
+            moreTags.classList.add("chipselect", "global-tags-more");
+            moreTags.textContent = `+${remainingTagCount}`;
+            moreTags.title = _("Show all tags");
+            moreTags.setAttribute("aria-label", `${_("Show all tags")}: ${remainingTagCount}`);
+            moreTags.addEventListener("click", () => {
+                Planet.GlobalPlanet.ProjectViewer.open(this.id);
+            });
+            tagcontainer.appendChild(moreTags);
         }
 
         // set project title text and tooltip
@@ -354,7 +370,11 @@ class GlobalCard {
             // GitServerInterface.likeProject uses repoName (this.id) directly
             Planet.ServerInterface.likeProject(this.id, like, data => {
                 this.likePending = false;
-                if (!data.success) {
+                if (data.success && Number.isFinite(data.likes)) {
+                    this.ProjectData.ProjectLikes = data.likes;
+                    const currentLikes = document.getElementById(`global-project-likes-${this.id}`);
+                    if (currentLikes) currentLikes.textContent = data.likes.toString();
+                } else if (!data.success) {
                     // Roll back optimistic update on failure
                     if (document.getElementById(`global-project-likes-${this.id}`)) {
                         this.setLike(!like);
