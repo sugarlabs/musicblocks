@@ -550,7 +550,11 @@ class SaveInterface {
                             duration: duration,
                             velocity: 0.9
                         });
-                    } else {
+                    }
+
+                    // A note can play pitches together with a drum: write those as well.
+                    const pitches = noteData.note.filter(pitch => !pitch.includes("R"));
+                    if (!noteData.drum || pitches.length > 0) {
                         if (!trackMap.has(instrument)) {
                             const instrumentTrack = midi.addTrack();
                             instrumentTrack.name = `Track ${
@@ -565,15 +569,13 @@ class SaveInterface {
 
                         const instrumentTrack = trackMap.get(instrument);
 
-                        noteData.note.forEach(pitch => {
-                            if (!pitch.includes("R")) {
-                                instrumentTrack.addNote({
-                                    name: normalizeNoteAccidentals(pitch),
-                                    time: globalTime,
-                                    duration: duration,
-                                    velocity: 0.8
-                                });
-                            }
+                        pitches.forEach(pitch => {
+                            instrumentTrack.addNote({
+                                name: normalizeNoteAccidentals(pitch),
+                                time: globalTime,
+                                duration: duration,
+                                velocity: 0.8
+                            });
                         });
                     }
                     globalTime += duration;
