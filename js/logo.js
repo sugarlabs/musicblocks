@@ -2855,6 +2855,9 @@ class Logo {
                         }
                         logo._lastNoteTimeout = logo._timerManager.setTimeout(() => {
                             logo._lastNoteTimeout = null;
+                            if (logo.turtles && logo.turtles.running && logo.turtles.running()) {
+                                return;
+                            }
                             if (logo.turtles && logo.turtles.turtleList) {
                                 for (const t of logo.turtles.turtleList) {
                                     if (t && t.singer) {
@@ -2864,22 +2867,11 @@ class Logo {
                                         logo.dispatchUnissuedSignals(t);
                                     }
                                 }
-                            } else {
-                                if (tur && tur.singer) {
-                                    tur.singer.runningFromEvent = false;
-                                }
-                                if (tur) {
-                                    logo.dispatchUnissuedSignals(tur);
-                                }
                             }
-                            if (tur.singer.suppressOutput && logo.recording) {
+                            if (tur && tur.singer && tur.singer.suppressOutput && logo.recording) {
                                 tur.singer.suppressOutput = false;
                             }
-                            // Skip if a new run already started or another
-                            // turtle's callback already cleaned up.
-                            if (!logo.turtles.running()) {
-                                logo._cleanupAfterCompletion();
-                            }
+                            logo._cleanupAfterCompletion();
                         }, 1000);
                     }
                 };

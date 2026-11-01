@@ -1574,6 +1574,48 @@ describe("Logo doStopTurtles", () => {
         expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_tie_1");
     });
 
+    test("does not flush signals or clear runningFromEvent if a turtle resumed running before _lastNoteTimeout fires", () => {
+        const scheduledTimeouts = [];
+        jest.spyOn(logo._timerManager, "setTimeout").mockImplementation(cb => {
+            scheduledTimeouts.push(cb);
+            return scheduledTimeouts.length;
+        });
+
+        turtle.endOfClampSignals = { 10: ["_tie_0"] };
+        turtle.butNotThese = {};
+        turtle.queue = [];
+        turtle.parentFlowQueue = [];
+        turtle.running = true;
+        turtle.singer.runningFromEvent = true;
+        turtle.singer.suppressOutput = false;
+        turtle.singer.justCounting = [];
+
+        logo.turtles.running = jest.fn().mockReturnValue(false);
+        logo.turtles.turtleList = [turtle];
+        logo.turtles.getTurtleCount = () => 1;
+        logo.turtles.getTurtle = () => turtle;
+        logo.turtles.ithTurtle = () => turtle;
+        logo._cleanupAfterCompletion = jest.fn();
+        logo.blockList = [makeFlowBlock("print")];
+
+        logo.runFromBlockNow(logo, 0, 0, 0, null, 0);
+
+        // Run __checkCompletionState (100ms) to schedule _lastNoteTimeout
+        scheduledTimeouts[0]();
+
+        // Simulate an event starting or a turtle resuming execution before _lastNoteTimeout fires
+        logo.turtles.running.mockReturnValue(true);
+
+        // Fire _lastNoteTimeout (1000ms)
+        scheduledTimeouts[1]();
+
+        // Must not clear runningFromEvent, must not flush deferred signals, and must not clean up
+        expect(turtle.singer.runningFromEvent).toBe(true);
+        expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalled();
+        expect(turtle.endOfClampSignals[10]).toEqual(["_tie_0"]);
+        expect(logo._cleanupAfterCompletion).not.toHaveBeenCalled();
+    });
+
     describe("with Transport and audio streams", () => {
         let turtle0;
         let turtle1;
