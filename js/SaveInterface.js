@@ -213,9 +213,10 @@ class SaveInterface {
      * @param {string} extension - The file extension (including the dot).
      * @param {string} dataurl - The base64 data url of the file.
      * @param {string} defaultfilename - The default filename to be used.
+     * @param {Function} [onSuccess] - Called after the user confirms the download.
      * @returns {void}
      */
-    download(extension, dataurl, defaultfilename) {
+    download(extension, dataurl, defaultfilename, onSuccess = null) {
         let message = _("Enter a filename to save your project:");
         let filename = null;
         //const self = this;
@@ -242,6 +243,9 @@ class SaveInterface {
                 message = _("File saved! Check Downloads.");
             }
             this.showToast(message);
+            if (typeof onSuccess === "function") {
+                onSuccess();
+            }
         };
 
         if (defaultfilename === undefined || defaultfilename === null) {
@@ -772,12 +776,22 @@ class SaveInterface {
         _lazyRequire(["activity/abc"], () => {
             try {
                 const abc = encodeURIComponent(saveAbcOutput(this.activity));
-                this.activity.save.download("abc", "data:text;utf8," + abc, filename || null);
                 if (this.activity.logo?.abcExportWarnings?.length > 0) {
-                    this.activity.textMsg(
-                        _("ABC export rounded one or more Hertz pitches to the nearest note."),
-                        5000
+                    this.activity.save.download(
+                        "abc",
+                        "data:text;utf8," + abc,
+                        filename || null,
+                        () => {
+                            this.activity.textMsg(
+                                _(
+                                    "ABC export rounded one or more Hertz pitches to the nearest note."
+                                ),
+                                5000
+                            );
+                        }
                     );
+                } else {
+                    this.activity.save.download("abc", "data:text;utf8," + abc, filename || null);
                 }
             } catch (e) {
                 console.error("Error in ABC output generation: ", e);

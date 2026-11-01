@@ -32,6 +32,9 @@ global.frequencyToPitch = jest.fn(freq => {
 });
 
 global.toFraction = jest.fn(num => [1, 1]);
+global._ = jest.fn(str => str);
+
+const { frequencyToPitch: realFrequencyToPitch } = require("../utils/musicutils-pitch");
 
 const {
     getABCHeader,
@@ -496,7 +499,7 @@ describe("saveAbcOutput", () => {
     });
 
     it("warns when a Hertz pitch has cents that ABC cannot preserve", () => {
-        global.frequencyToPitch.mockReturnValueOnce(["A", 4, 19.6]);
+        global.frequencyToPitch = realFrequencyToPitch;
         activity.logo.notation.notationStaging[0] = [[[445], 4, 0, null, null, -1, false]];
 
         const result = saveAbcOutput(activity);
@@ -505,6 +508,44 @@ describe("saveAbcOutput", () => {
             "% WARNING: Music Blocks 445 Hz was rounded to A4 (+19.6 cents); the cents offset was not exported."
         );
         expect(activity.logo.abcExportWarnings).toEqual(["445 Hz was rounded to A4 (+19.6 cents)"]);
+    });
+
+    it("warns only when a Hertz pitch is at least half a cent from its ABC note", () => {
+        global.frequencyToPitch = jest.fn(frequency => {
+            const centsByFrequency = {
+                440: 0,
+                441: 0.49,
+                442: -0.49,
+                443: 0.5,
+                444: -0.5
+            };
+            return ["A", 4, centsByFrequency[frequency]];
+        });
+        activity.logo.notation.notationStaging[0] = [440, 441, 442, 443, 444].map(frequency => [
+            [frequency],
+            4,
+            0,
+            null,
+            null,
+            -1,
+            false
+        ]);
+
+        const result = saveAbcOutput(activity);
+
+        expect(result).toContain("443 Hz was rounded to A4 (+0.5 cents)");
+        expect(result).toContain("444 Hz was rounded to A4 (-0.5 cents)");
+        expect(result).not.toContain("440 Hz was rounded");
+        expect(result).not.toContain("441 Hz was rounded");
+        expect(result).not.toContain("442 Hz was rounded");
+    });
+
+    it("does not warn when the score is empty", () => {
+        activity.logo.notation.notationStaging[0] = [];
+
+        saveAbcOutput(activity);
+
+        expect(activity.logo.abcExportWarnings).toEqual([]);
     });
 
     const note = pitch => [[pitch], 4, 0, null, null, -1, false];

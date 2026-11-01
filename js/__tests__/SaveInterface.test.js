@@ -190,6 +190,24 @@ describe("download", () => {
         expect(spy).not.toHaveBeenCalled();
     });
 
+    it("calls the success callback only after a download completes", () => {
+        const onSuccess = jest.fn();
+
+        instance.download("abc", "data", "My Project", onSuccess);
+
+        expect(mockDownloadURL).toHaveBeenCalled();
+        expect(onSuccess).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not call the success callback when the user cancels", () => {
+        const onSuccess = jest.fn();
+        window.prompt = jest.fn(() => null);
+
+        instance.download("abc", "data", null, onSuccess);
+
+        expect(onSuccess).not.toHaveBeenCalled();
+    });
+
     it("should revoke the Blob URL when the user cancels the prompt", () => {
         global.URL.revokeObjectURL = jest.fn();
         window.prompt = jest.fn(() => null);
@@ -1253,8 +1271,9 @@ describe("saveWAV & saveABC methods", () => {
     });
 
     it("shows a warning when ABC export rounds a Hertz pitch", () => {
+        const download = jest.fn((extension, dataurl, filename, onSuccess) => onSuccess());
         const activity = {
-            save: { download: mockDownload },
+            save: { download },
             textMsg: jest.fn(),
             logo: { abcExportWarnings: ["445 Hz was rounded to A4 (+19.6 cents)"] }
         };
@@ -1266,6 +1285,19 @@ describe("saveWAV & saveABC methods", () => {
             "ABC export rounded one or more Hertz pitches to the nearest note.",
             5000
         );
+    });
+
+    it("does not show a warning when the ABC download is cancelled", () => {
+        const activity = {
+            save: { download: jest.fn() },
+            textMsg: jest.fn(),
+            logo: { abcExportWarnings: ["445 Hz was rounded to A4 (+19.6 cents)"] }
+        };
+        global.saveAbcOutput = jest.fn(() => "mock_abc_data");
+
+        instance.afterSaveAbc.call({ activity });
+
+        expect(activity.textMsg).not.toHaveBeenCalled();
     });
 
     it("should save ABC notation under the file name it is given", () => {

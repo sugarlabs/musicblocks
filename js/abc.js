@@ -359,7 +359,7 @@ class AbcExporter {
             if (Number.isFinite(cents) && Math.abs(cents) >= 0.5) {
                 const sign = cents > 0 ? "+" : "";
                 this.roundedFrequencyWarnings.push(
-                    `${note} Hz was rounded to ${pitchObj[0]}${pitchObj[1]} (${sign}${cents} cents)`
+                    `${note} Hz was rounded to ${pitchObj[0]}${pitchObj[1]} (${sign}${cents.toFixed(1)} cents)`
                 );
             }
             note = pitchObj[0] + pitchObj[1];
