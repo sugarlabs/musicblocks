@@ -102,28 +102,23 @@ describe("Chord Builder widget", () => {
         cy.waitForAppReady();
 
         // Dismiss first-run tours so that .windowFrame selectors are unambiguous.
-        cy.get("body").then($body => {
-            const closeButtons = $body.find(".windowFrame .wftButton.close");
-            if (closeButtons.length) {
-                cy.wrap(closeButtons).each($btn => {
-                    cy.wrap($btn).click({ force: true });
-                });
-            }
+        cy.document().then(doc => {
+            if (!doc || !doc.body) return;
+            const closeButtons = doc.querySelectorAll(".windowFrame .wftButton.close");
+            closeButtons.forEach(btn => btn.click());
         });
     });
 
     afterEach(() => {
         // Stop audio playback cleanly before the next test loads.
-        cy.get("body").then($body => {
-            if ($body.find("#stop").length) {
-                cy.get("#stop").click({ force: true });
+        cy.document().then(doc => {
+            if (!doc || !doc.body) return;
+            const stopBtn = doc.querySelector("#stop");
+            if (stopBtn) {
+                stopBtn.click();
             }
-            const closeButtons = $body.find(".windowFrame .wftButton.close");
-            if (closeButtons.length) {
-                cy.wrap(closeButtons).each($btn => {
-                    cy.wrap($btn).click({ force: true });
-                });
-            }
+            const closeButtons = doc.querySelectorAll(".windowFrame .wftButton.close");
+            closeButtons.forEach(btn => btn.click());
         });
     });
 
@@ -160,7 +155,7 @@ describe("Chord Builder widget", () => {
             { roman: "IV", name: "F" },
             { roman: "V", name: "G" },
             { roman: "vi", name: "Am" },
-            { roman: "vii°", name: "Bdim" }
+            { roman: "vii°", name: "B°" }
         ];
 
         chordBuilderFrame().find("#diatonicChordsGrid").should("be.visible");
