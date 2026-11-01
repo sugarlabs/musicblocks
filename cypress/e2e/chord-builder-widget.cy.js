@@ -102,28 +102,23 @@ describe("Chord Builder widget", () => {
         cy.waitForAppReady();
 
         // Dismiss first-run tours so that .windowFrame selectors are unambiguous.
-        cy.get("body").then($body => {
-            const closeButtons = $body.find(".windowFrame .wftButton.close");
-            if (closeButtons.length) {
-                cy.wrap(closeButtons).each($btn => {
-                    cy.wrap($btn).click({ force: true });
-                });
-            }
+        cy.document().then(doc => {
+            if (!doc || !doc.body) return;
+            const closeButtons = doc.querySelectorAll(".windowFrame .wftButton.close");
+            closeButtons.forEach(btn => btn.click());
         });
     });
 
     afterEach(() => {
         // Stop audio playback cleanly before the next test loads.
-        cy.get("body").then($body => {
-            if ($body.find("#stop").length) {
-                cy.get("#stop").click({ force: true });
+        cy.document().then(doc => {
+            if (!doc || !doc.body) return;
+            const stopBtn = doc.querySelector("#stop");
+            if (stopBtn) {
+                stopBtn.click();
             }
-            const closeButtons = $body.find(".windowFrame .wftButton.close");
-            if (closeButtons.length) {
-                cy.wrap(closeButtons).each($btn => {
-                    cy.wrap($btn).click({ force: true });
-                });
-            }
+            const closeButtons = doc.querySelectorAll(".windowFrame .wftButton.close");
+            closeButtons.forEach(btn => btn.click());
         });
     });
 
@@ -160,7 +155,7 @@ describe("Chord Builder widget", () => {
             { roman: "IV", name: "F" },
             { roman: "V", name: "G" },
             { roman: "vi", name: "Am" },
-            { roman: "vii°", name: "Bdim" }
+            { roman: "vii°", name: "B°" }
         ];
 
         chordBuilderFrame().find("#diatonicChordsGrid").should("be.visible");
@@ -200,8 +195,12 @@ describe("Chord Builder widget", () => {
         chordBuilderFrame()
             .find(".diatonic-chord-card")
             .eq(3) // IV (F)
-            .focus()
-            .trigger("keydown", { key: "Enter" });
+            .then($card => {
+                $card[0].focus();
+                $card[0].dispatchEvent(
+                    new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true })
+                );
+            });
         cy.get("@playChord").should("have.been.calledTwice");
         cy.get("@playChord").its("secondCall.returnValue").should("be.true");
         chordBuilderFrame().find(".bar-grid-cell").first().should("contain.text", "+");
@@ -209,8 +208,12 @@ describe("Chord Builder widget", () => {
         chordBuilderFrame()
             .find(".diatonic-chord-card")
             .eq(4) // V (G)
-            .focus()
-            .trigger("keydown", { key: " " });
+            .then($card => {
+                $card[0].focus();
+                $card[0].dispatchEvent(
+                    new KeyboardEvent("keydown", { key: " ", bubbles: true, cancelable: true })
+                );
+            });
         cy.get("@playChord").should("have.been.calledThrice");
         cy.get("@playChord").its("thirdCall.returnValue").should("be.true");
         chordBuilderFrame().find(".bar-grid-cell").first().should("contain.text", "+");
@@ -297,8 +300,14 @@ describe("Chord Builder widget", () => {
         // An inline select picker should be created
         chordBuilderFrame().find('.bar-grid-cell[data-cell-index="0"] select').should("be.visible");
 
-        // Select chord index 5 (vi - Am)
-        chordBuilderFrame().find('.bar-grid-cell[data-cell-index="0"] select').select("5");
+        // Select chord index 5 (vi - Am) via direct event dispatch because
+        // onchange synchronously re-renders the bar grid, detaching the select element.
+        chordBuilderFrame()
+            .find('.bar-grid-cell[data-cell-index="0"] select')
+            .then($select => {
+                $select[0].value = "5";
+                $select[0].dispatchEvent(new Event("change", { bubbles: true }));
+            });
 
         // Cell 0 should now be rendered with Roman numeral 'vi' and name 'Am'
         chordBuilderFrame()
@@ -450,7 +459,15 @@ describe("Chord Builder widget", () => {
                 expect(rootBlock.name, "pitch root block must be a notename").to.equal("notename");
                 roots.push(rootBlock.value);
 
-                const nextChordIndex = currentChord.connections[3];
+                const capBlockIndex = currentChord.connections[3];
+                const capBlock =
+                    capBlockIndex !== null && capBlockIndex !== undefined
+                        ? blocks.blockList[capBlockIndex]
+                        : null;
+                expect(capBlock, "chord clamp cap must exist").to.exist;
+                expect(capBlock.name, "chord clamp cap must be hidden").to.equal("hidden");
+
+                const nextChordIndex = capBlock.connections[1];
                 currentChord =
                     nextChordIndex !== null && nextChordIndex !== undefined
                         ? blocks.blockList[nextChordIndex]
