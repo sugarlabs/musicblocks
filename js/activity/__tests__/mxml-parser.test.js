@@ -365,17 +365,114 @@ describe("Test 6: Multiple notes chain correctly", () => {
     });
 });
 
-describe("Test 7: Chords and a second voice are skipped, not misread", () => {
-    it("keeps only the first note of a chord", async () => {
+describe("Test 7: Chords join their note, a second voice is skipped", () => {
+    const CHORD_NOTE = (step, octave, opts = "") =>
+        `<note><chord/><pitch><step>${step}</step><octave>${octave}</octave></pitch><duration>1</duration>${opts}<type>quarter</type></note>`;
+
+    it("imports every note of a chord into one note block", async () => {
         const { blocks } = await parseAndCapture(
             scorePartwise(
                 SIMPLE_NOTE("C", 4, "quarter") +
-                    "<note><chord/><pitch><step>E</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note>" +
-                    "<note><chord/><pitch><step>G</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note>"
+                    CHORD_NOTE("E", 4) +
+                    CHORD_NOTE("G", 4) +
+                    SIMPLE_NOTE("D", 4, "quarter")
             )
         );
 
-        expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
+        expect(noteValues(blocks)).toEqual([
+            [1, 4],
+            [1, 4]
+        ]);
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "E", octave: 4 },
+            { name: "G", octave: 4 },
+            { name: "D", octave: 4 }
+        ]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+
+        // The chord's pitches are chained inside the first newnote's clamp.
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const [c, e, g] = blocks.filter(b => blockName(b) === "pitch");
+        expect(byId.get(c[4][0])[1]).toBe("vspace");
+        expect([c[4][3], e[4][0], e[4][3], g[4][0], g[4][3]]).toEqual([
+            e[0],
+            c[0],
+            g[0],
+            e[0],
+            null
+        ]);
+    });
+
+    it("plays drums struck together as one note with a playdrum each", async () => {
+        const { blocks } = await parseAndCapture(
+            '<score-partwise><part-list><score-part id="D1">' +
+                '<score-instrument id="D1-K"><instrument-name>kick drum</instrument-name></score-instrument>' +
+                '<score-instrument id="D1-H"><instrument-name>hi hat</instrument-name></score-instrument>' +
+                "</score-part></part-list>" +
+                '<part id="D1"><measure number="1"><attributes><divisions>1</divisions></attributes>' +
+                '<note><unpitched><display-step>F</display-step><display-octave>4</display-octave></unpitched><duration>1</duration><instrument id="D1-K"/><type>quarter</type></note>' +
+                '<note><chord/><unpitched><display-step>G</display-step><display-octave>5</display-octave></unpitched><duration>1</duration><instrument id="D1-H"/><type>quarter</type></note>' +
+                "</measure></part></score-partwise>"
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 4]]);
+        expect(drumNames(blocks)).toEqual(["kick drum", "hi hat"]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("ties a chord to the same chord, and not to a different one", async () => {
+        const TIE_START = '<tie type="start"/>';
+        const TIE_STOP = '<tie type="stop"/>';
+        const note = (step, tie) =>
+            `<note><pitch><step>${step}</step><octave>4</octave></pitch><duration>1</duration>${tie}<type>quarter</type></note>`;
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                note("C", TIE_START) +
+                    CHORD_NOTE("E", 4, TIE_START) +
+                    note("C", TIE_STOP) +
+                    CHORD_NOTE("E", 4, TIE_STOP) +
+                    note("C", TIE_START) +
+                    CHORD_NOTE("E", 4, TIE_START) +
+                    note("C", TIE_STOP) +
+                    CHORD_NOTE("F", 4, TIE_STOP)
+            )
+        );
+
+        // C+E tied to C+E is one half note; C+E "tied" to C+F is two notes.
+        expect(noteValues(blocks)).toEqual([
+            [1, 2],
+            [1, 4],
+            [1, 4]
+        ]);
+    });
+
+    it("ties a chord to the same chord written in another order", async () => {
+        const note = (step, tie) =>
+            `<note><pitch><step>${step}</step><octave>4</octave></pitch><duration>1</duration>${tie}<type>quarter</type></note>`;
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                note("C", '<tie type="start"/>') +
+                    CHORD_NOTE("E", 4, '<tie type="start"/>') +
+                    note("E", '<tie type="stop"/>') +
+                    CHORD_NOTE("C", 4, '<tie type="stop"/>')
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 2]]);
+    });
+
+    it("keeps one of a pitch doubled inside a chord, wherever it repeats", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(SIMPLE_NOTE("C", 4, "quarter") + CHORD_NOTE("E", 4) + CHORD_NOTE("C", 4))
+        );
+
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "E", octave: 4 }
+        ]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
     it("stops a measure at <backup>, taking only the first voice", async () => {
