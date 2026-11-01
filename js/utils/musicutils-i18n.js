@@ -183,6 +183,10 @@ var SELECTORSTRINGS = [
     _("jazz minor"),
     //.TRANS: bebop scale for music
     _("bebop"),
+    //.TRANS: major bebop scale for music
+    _("major bebop"),
+    //.TRANS: minor bebop scale for music, also known as the bebop dorian scale
+    _("minor bebop"),
     _("arabic"),
     _("byzantine"),
     //.TRANS: musical scale for music by Verdi

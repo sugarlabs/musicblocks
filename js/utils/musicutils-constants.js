@@ -1034,9 +1034,9 @@ var MODE_PIE_MENUS = {
         "octatonic",
         " ",
         "spanish",
-        " ",
+        "major bebop",
         "bebop",
-        " ",
+        "minor bebop",
         "diminished",
         " ",
         " ",
@@ -1074,11 +1074,13 @@ var PITCH_COLLECTIONS = {
         chromatic: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     },
     8: {
-        algerian: [2, 1, 2, 1, 1, 1, 3, 1],
-        diminished: [2, 1, 2, 1, 2, 1, 2, 1],
-        spanish: [1, 2, 1, 1, 1, 2, 2, 2],
-        octatonic: [1, 2, 1, 2, 1, 2, 1, 2],
-        bebop: [2, 2, 1, 2, 2, 1, 1, 1]
+        "algerian": [2, 1, 2, 1, 1, 1, 3, 1],
+        "diminished": [2, 1, 2, 1, 2, 1, 2, 1],
+        "spanish": [1, 2, 1, 1, 1, 2, 2, 2],
+        "octatonic": [1, 2, 1, 2, 1, 2, 1, 2],
+        "bebop": [2, 2, 1, 2, 2, 1, 1, 1],
+        "major bebop": [2, 2, 1, 2, 1, 1, 2, 1],
+        "minor bebop": [2, 1, 1, 1, 2, 2, 1, 2]
     },
     7: {
         "major": [2, 2, 1, 2, 2, 2, 1],
