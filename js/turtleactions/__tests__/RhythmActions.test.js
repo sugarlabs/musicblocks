@@ -18,6 +18,7 @@
  */
 
 const setupRhythmActions = require("../RhythmActions");
+const { Logo } = require("../../logo");
 const { getMeasurePosition, getMeterAnchor } = require("../../utils/musicutils-rhythm");
 
 describe("setupRhythmActions", () => {
@@ -1975,6 +1976,391 @@ describe("setupRhythmActions", () => {
 
             expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
             expect(global.Mouse.getMouseFromTurtle).not.toHaveBeenCalled();
+        });
+
+        it("preserves outer tie state and listeners when re-entrant inner doTie is executed (nested tie defense)", () => {
+            let outerListener;
+            activity.logo.setTurtleListener = jest.fn((_, __, cb) => {
+                outerListener = cb;
+            });
+
+            // Outer Tie enters (block 10)
+            activity.blocks.blockList[10] = { name: "tie" };
+            activity.blocks.blockList[20] = { name: "tie" };
+            Singer.RhythmActions.doTie(0, 10);
+
+            expect(targetTurtle.singer.tie).toBe(true);
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(10, 0, "_tie_0");
+            expect(activity.logo.setTurtleListener).toHaveBeenCalledTimes(1);
+
+            // Seed representative pending note state in outer tie (e.g., C4 duration 4)
+            targetTurtle.singer.tieCarryOver = 4;
+            targetTurtle.singer.tieNotePitches = [["C", 4, 0, 261.63]];
+            targetTurtle.singer.tieNoteExtras = [5, ["sine"], 1, [1], [], undefined, false, 4];
+            targetTurtle.singer.tieFirstDrums = ["snare"];
+
+            // Re-entrant inner Tie enters (block 20)
+            Singer.RhythmActions.doTie(0, 20);
+
+            // Outer state must NOT be reset by inner doTie entry
+            expect(targetTurtle.singer.tie).toBe(true);
+            expect(targetTurtle.singer.tieCarryOver).toBe(4);
+            expect(targetTurtle.singer.tieNotePitches).toEqual([["C", 4, 0, 261.63]]);
+            expect(targetTurtle.singer.tieNoteExtras).toEqual([
+                5,
+                ["sine"],
+                1,
+                [1],
+                [],
+                undefined,
+                false,
+                4
+            ]);
+            expect(targetTurtle.singer.tieFirstDrums).toEqual(["snare"]);
+
+            // Inner block 20 must NOT register a dispatch block or overwrite the listener
+            expect(activity.logo.setDispatchBlock).not.toHaveBeenCalledWith(
+                20,
+                0,
+                expect.anything()
+            );
+            expect(activity.logo.setTurtleListener).toHaveBeenCalledTimes(1);
+
+            // Outer listener must still be attached and functioning
+            expect(typeof outerListener).toBe("function");
+
+            // When outer listener executes on outer clamp exit, it flushes carryover and cleans up
+            targetTurtle.singer.inNoteBlock = [];
+            targetTurtle.singer.justCounting = [];
+            targetTurtle.singer.bpm = [];
+            targetTurtle.doWait = jest.fn();
+            activity.blocks.blockList[5] = { name: "note" };
+
+            outerListener();
+
+            expect(targetTurtle.singer.tie).toBe(false);
+            expect(targetTurtle.singer.tieCarryOver).toBe(0);
+            expect(targetTurtle.singer.tieNotePitches).toEqual([]);
+            expect(targetTurtle.singer.tieNoteExtras).toEqual([]);
+            expect(Singer.processNote).toHaveBeenCalled();
+        });
+
+        it("handles sequential sibling ties independently without cross-talk", () => {
+            const listeners = [];
+            activity.logo.setTurtleListener = jest.fn((_, __, cb) => {
+                listeners.push(cb);
+            });
+
+            activity.blocks.blockList[1] = { name: "tie" };
+            activity.blocks.blockList[2] = { name: "tie" };
+
+            // Tie 1 starts
+            Singer.RhythmActions.doTie(0, 1);
+            expect(targetTurtle.singer.tie).toBe(true);
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_tie_0");
+
+            // Tie 1 finishes
+            listeners[0]();
+            expect(targetTurtle.singer.tie).toBe(false);
+
+            // Tie 2 starts
+            Singer.RhythmActions.doTie(0, 2);
+            expect(targetTurtle.singer.tie).toBe(true);
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(2, 0, "_tie_0");
+
+            // Tie 2 finishes
+            listeners[1]();
+            expect(targetTurtle.singer.tie).toBe(false);
+        });
+
+        it("maintains multi-turtle isolation during concurrent ties", () => {
+            const turtle0 = targetTurtle;
+            const turtle1 = {
+                singer: {
+                    tie: false,
+                    tieNotePitches: [],
+                    tieNoteExtras: [],
+                    tieCarryOver: 0,
+                    tieFirstDrums: [],
+                    inNoteBlock: [],
+                    justCounting: [],
+                    bpm: []
+                },
+                doWait: jest.fn()
+            };
+
+            activity.turtles.ithTurtle = jest.fn(id => (id === 0 ? turtle0 : turtle1));
+            activity.blocks.blockList[1] = { name: "tie" };
+            activity.blocks.blockList[2] = { name: "tie" };
+
+            // Turtle 0 enters tie
+            Singer.RhythmActions.doTie(0, 1);
+            expect(turtle0.singer.tie).toBe(true);
+            expect(turtle1.singer.tie).toBe(false);
+
+            // Turtle 1 enters tie
+            Singer.RhythmActions.doTie(1, 2);
+            expect(turtle1.singer.tie).toBe(true);
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_tie_0");
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(2, 1, "_tie_1");
+
+            // Turtle 0 exits tie, Turtle 1 remains in tie
+            const turtle0Listener = activity.logo.setTurtleListener.mock.calls.find(
+                call => call[0] === 0
+            )[2];
+            turtle0Listener();
+            expect(turtle0.singer.tie).toBe(false);
+            expect(turtle1.singer.tie).toBe(true);
+        });
+
+        it("does not push duplicate mouse listener when inner tie executes in isRun mode", () => {
+            const mockMouse = { MB: { listeners: [] } };
+            global.MusicBlocks.isRun = true;
+            global.Mouse.getMouseFromTurtle = jest.fn(() => mockMouse);
+
+            // Outer tie
+            Singer.RhythmActions.doTie(0, undefined);
+            expect(mockMouse.MB.listeners).toEqual(["_tie_0"]);
+
+            // Inner tie
+            Singer.RhythmActions.doTie(0, undefined);
+            // Should not add a second listener
+            expect(mockMouse.MB.listeners).toEqual(["_tie_0"]);
+        });
+
+        describe("real Logo.doStopTurtles lifecycle and restart", () => {
+            const setupRealLogoEnvironment = () => {
+                targetTurtle.listeners = {};
+                targetTurtle.endOfClampSignals = {};
+                targetTurtle.unhighlightQueue = [];
+                targetTurtle.delayTimeout = null;
+
+                const stageListeners = {};
+                activity.stage = {
+                    addEventListener: jest.fn((name, fn) => {
+                        stageListeners[name] = fn;
+                    }),
+                    removeEventListener: jest.fn(name => {
+                        delete stageListeners[name];
+                    }),
+                    dispatchEvent: jest.fn(name => {
+                        if (stageListeners[name]) stageListeners[name]();
+                    })
+                };
+
+                activity.logo.stage = activity.stage;
+                activity.logo.activity = activity;
+                activity.logo.turtles = {
+                    turtleList: [targetTurtle],
+                    ithTurtle: () => targetTurtle,
+                    markAllAsStopped: jest.fn()
+                };
+                activity.logo._timerManager = { clearAll: jest.fn(() => 0) };
+                activity.logo._cancelSpeech = jest.fn();
+                activity.logo.blocks = {
+                    clearLongPressTimeout: jest.fn(),
+                    unhighlightAll: jest.fn(),
+                    bringToTop: jest.fn(),
+                    showBlocks: jest.fn(),
+                    visible: false
+                };
+                activity.logo.clearTurtleListeners = Logo.prototype.clearTurtleListeners.bind(
+                    activity.logo
+                );
+                activity.logo.doStopTurtles = Logo.prototype.doStopTurtles.bind(activity.logo);
+                activity.logo.dispatchUnissuedSignals = Logo.prototype.dispatchUnissuedSignals.bind(
+                    activity.logo
+                );
+                activity.logo._cleanupAfterCompletion = jest.fn();
+                activity.logo.evalOnStopList = {};
+                activity.logo.synth = { recorder: null };
+                activity.logo.onStopTurtle = jest.fn();
+                activity.logo.stepQueue = {};
+                activity.logo._restoreConnections = jest.fn();
+                activity.logo.deps = { config: { showBlocksAfterRun: false } };
+
+                // Real setTurtleListener wiring into targetTurtle.listeners and activity.stage
+                activity.logo.setTurtleListener = jest.fn(
+                    (turtle, listenerName, cb, persistent = false) => {
+                        cb.persistent = persistent;
+                        targetTurtle.listeners[listenerName] = cb;
+                        activity.stage.addEventListener(listenerName, cb, false);
+                    }
+                );
+
+                // Real setDispatchBlock registration
+                activity.logo.setDispatchBlock = jest.fn((blk, turtle, listenerName) => {
+                    if (!targetTurtle.endOfClampSignals[blk]) {
+                        targetTurtle.endOfClampSignals[blk] = [];
+                    }
+                    targetTurtle.endOfClampSignals[blk].push(listenerName);
+                });
+            };
+
+            it("executes the full lifecycle: outer tie -> pending note -> nested tie -> real doStopTurtles() -> clean restart", () => {
+                setupRealLogoEnvironment();
+
+                activity.blocks.blockList[10] = { name: "tie" };
+                activity.blocks.blockList[20] = { name: "tie" };
+                activity.blocks.blockList[30] = { name: "tie" };
+
+                // 1. Start outer Tie via actual Singer.RhythmActions.doTie()
+                Singer.RhythmActions.doTie(0, 10);
+                expect(targetTurtle.singer.tie).toBe(true);
+                expect(targetTurtle.listeners["_tie_0"]).toBeDefined();
+                expect(targetTurtle.endOfClampSignals[10]).toEqual(["_tie_0"]);
+                expect(activity.stage.addEventListener).toHaveBeenCalledWith(
+                    "_tie_0",
+                    expect.any(Function),
+                    false
+                );
+
+                // 2. Pending note state (as populated by processNote)
+                targetTurtle.singer.tieCarryOver = 4;
+                targetTurtle.singer.tieNotePitches = [["C", 4, 0, 261.63]];
+                targetTurtle.singer.tieNoteExtras = [5, ["sine"], 1, [1], [], undefined, false, 4];
+                targetTurtle.singer.tieFirstDrums = ["snare"];
+
+                // 3. Enter inner Tie (defensive guard preserves outer state)
+                Singer.RhythmActions.doTie(0, 20);
+                expect(targetTurtle.singer.tie).toBe(true);
+                expect(targetTurtle.singer.tieCarryOver).toBe(4);
+                expect(targetTurtle.endOfClampSignals[20]).toBeUndefined();
+
+                // 4. Stop execution through the REAL Logo.doStopTurtles()
+                activity.logo.doStopTurtles();
+
+                // 5. Inspect turtle's Singer state and listener registry after real stop
+                expect(targetTurtle.singer.tie).toBe(false);
+                expect(targetTurtle.singer.tieCarryOver).toBe(0);
+                expect(targetTurtle.singer.tieNotePitches).toEqual([]);
+                expect(targetTurtle.singer.tieNoteExtras).toEqual([]);
+                expect(targetTurtle.singer.tieFirstDrums).toEqual([]);
+                expect(targetTurtle.endOfClampSignals).toEqual({});
+                expect(targetTurtle.listeners).toEqual({});
+                expect(activity.stage.removeEventListener).toHaveBeenCalledWith(
+                    "_tie_0",
+                    expect.any(Function),
+                    false
+                );
+
+                // 6. Start a new independent Tie on the same turtle
+                Singer.RhythmActions.doTie(0, 30);
+
+                // Subsequent Tie must NOT be ignored and must register its own cleanup
+                expect(targetTurtle.singer.tie).toBe(true);
+                expect(targetTurtle.listeners["_tie_0"]).toBeDefined();
+                expect(targetTurtle.endOfClampSignals[30]).toEqual(["_tie_0"]);
+                expect(targetTurtle.singer.tieNotePitches).toEqual([]);
+                expect(targetTurtle.singer.tieCarryOver).toBe(0);
+
+                // 7. Complete the new Tie normally
+                targetTurtle.listeners["_tie_0"]();
+                expect(targetTurtle.singer.tie).toBe(false);
+                expect(targetTurtle.singer.tieCarryOver).toBe(0);
+            });
+
+            it("handles Stop while a note is pending in outer tie", () => {
+                setupRealLogoEnvironment();
+
+                Singer.RhythmActions.doTie(0, 10);
+                targetTurtle.singer.tieCarryOver = 8;
+                targetTurtle.singer.tieNotePitches = [["E", 4, 0, 329.63]];
+
+                activity.logo.doStopTurtles();
+
+                expect(targetTurtle.singer.tie).toBe(false);
+                expect(targetTurtle.singer.tieCarryOver).toBe(0);
+                expect(targetTurtle.singer.tieNotePitches).toEqual([]);
+                expect(targetTurtle.endOfClampSignals).toEqual({});
+            });
+
+            it("handles Stop immediately before outer clamp finishes", () => {
+                setupRealLogoEnvironment();
+
+                Singer.RhythmActions.doTie(0, 10);
+                Singer.RhythmActions.doTie(0, 20); // nested
+                // notes paired, carryover back to 0
+                targetTurtle.singer.tieCarryOver = 0;
+
+                activity.logo.doStopTurtles();
+
+                expect(targetTurtle.singer.tie).toBe(false);
+                expect(targetTurtle.listeners["_tie_0"]).toBeUndefined();
+            });
+
+            it("repeated calls to real doStopTurtles() execute safely without errors", () => {
+                setupRealLogoEnvironment();
+
+                Singer.RhythmActions.doTie(0, 10);
+                targetTurtle.singer.tieCarryOver = 4;
+
+                expect(() => {
+                    activity.logo.doStopTurtles();
+                    activity.logo.doStopTurtles();
+                    activity.logo.doStopTurtles();
+                }).not.toThrow();
+
+                expect(targetTurtle.singer.tie).toBe(false);
+                expect(targetTurtle.singer.tieCarryOver).toBe(0);
+                expect(targetTurtle.endOfClampSignals).toEqual({});
+            });
+
+            it("event-driven Tie execution defers signal while runningFromEvent and completes cleanly when timer fires", () => {
+                setupRealLogoEnvironment();
+
+                activity.blocks.blockList[10] = { name: "tie" };
+                activity.blocks.blockList[20] = { name: "tie" };
+                targetTurtle.butNotThese = {};
+
+                // 1. Turtle executes Tie from an event handler
+                targetTurtle.singer.runningFromEvent = true;
+                Singer.RhythmActions.doTie(0, 10);
+                expect(targetTurtle.singer.tie).toBe(true);
+                expect(targetTurtle.endOfClampSignals[10]).toEqual(["_tie_0"]);
+
+                // 2. Program reaches end of block stack while runningFromEvent is still true
+                activity.logo.dispatchUnissuedSignals(targetTurtle);
+                // Dispatch is deferred because runningFromEvent is true
+                expect(targetTurtle.singer.tie).toBe(true);
+                expect(targetTurtle.endOfClampSignals[10]).toEqual(["_tie_0"]);
+
+                // 3. Natural completion timeout fires: clears runningFromEvent, then dispatches unissued signals
+                targetTurtle.singer.runningFromEvent = false;
+                activity.logo.dispatchUnissuedSignals(targetTurtle);
+
+                // Stage event dispatched the listener, which clears tie state
+                expect(targetTurtle.singer.tie).toBe(false);
+                expect(targetTurtle.singer.tieCarryOver).toBe(0);
+                expect(targetTurtle.endOfClampSignals[10][0]).toBeNull();
+
+                // 4. Subsequent Tie runs cleanly without being blocked by the guard
+                Singer.RhythmActions.doTie(0, 20);
+                expect(targetTurtle.singer.tie).toBe(true);
+                expect(targetTurtle.endOfClampSignals[20]).toEqual(["_tie_0"]);
+            });
+        });
+
+        it("handles normal completion followed by repeated execution cleanly", () => {
+            let capturedListener;
+            activity.logo.setTurtleListener = jest.fn((_, __, cb) => {
+                capturedListener = cb;
+            });
+            activity.blocks.blockList[1] = { name: "tie" };
+            activity.blocks.blockList[2] = { name: "tie" };
+
+            // Run 1
+            Singer.RhythmActions.doTie(0, 1);
+            expect(targetTurtle.singer.tie).toBe(true);
+            capturedListener(); // normal clamp completion
+            expect(targetTurtle.singer.tie).toBe(false);
+
+            // Run 2 (repeated execution)
+            Singer.RhythmActions.doTie(0, 2);
+            expect(targetTurtle.singer.tie).toBe(true);
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(2, 0, "_tie_0");
+            capturedListener();
+            expect(targetTurtle.singer.tie).toBe(false);
         });
     });
 

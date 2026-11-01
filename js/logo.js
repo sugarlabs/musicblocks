@@ -1639,7 +1639,13 @@ class Logo {
             turtle.unhighlightQueue = [];
             if (turtle.singer) {
                 turtle.singer._unhighlightTimers = {};
+                turtle.singer.tie = false;
+                turtle.singer.tieCarryOver = 0;
+                turtle.singer.tieNotePitches = [];
+                turtle.singer.tieNoteExtras = [];
+                turtle.singer.tieFirstDrums = [];
             }
+            turtle.endOfClampSignals = {};
             if (turtle.delayTimeout !== null) {
                 clearTimeout(turtle.delayTimeout);
                 turtle.delayTimeout = null;
@@ -2219,6 +2225,11 @@ class Logo {
     runFromBlockNow(logo, turtle, blk, isflow, receivedArg, queueStart) {
         // Sometimes we don't want to unwind the entire queue.
         if (queueStart === undefined) queueStart = 0;
+
+        if (queueStart === 0 && logo._lastNoteTimeout !== null) {
+            logo._timerManager.clearTimeout(logo._lastNoteTimeout);
+            logo._lastNoteTimeout = null;
+        }
 
         while (blk !== null && blk !== undefined && !logo.stopTurtle) {
             const tracker = getPerformanceTracker();
@@ -2849,15 +2860,23 @@ class Logo {
                         }
                         logo._lastNoteTimeout = logo._timerManager.setTimeout(() => {
                             logo._lastNoteTimeout = null;
-                            tur.singer.runningFromEvent = false;
-                            if (tur.singer.suppressOutput && logo.recording) {
+                            if (logo.turtles && logo.turtles.running && logo.turtles.running()) {
+                                return;
+                            }
+                            if (logo.turtles && logo.turtles.turtleList) {
+                                for (const t of logo.turtles.turtleList) {
+                                    if (t && !t.running) {
+                                        if (t.singer) {
+                                            t.singer.runningFromEvent = false;
+                                        }
+                                        logo.dispatchUnissuedSignals(t);
+                                    }
+                                }
+                            }
+                            if (tur && tur.singer && tur.singer.suppressOutput && logo.recording) {
                                 tur.singer.suppressOutput = false;
                             }
-                            // Skip if a new run already started or another
-                            // turtle's callback already cleaned up.
-                            if (!logo.turtles.running()) {
-                                logo._cleanupAfterCompletion();
-                            }
+                            logo._cleanupAfterCompletion();
                         }, 1000);
                     }
                 };
