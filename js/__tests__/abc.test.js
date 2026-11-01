@@ -30,6 +30,7 @@ global.frequencyToPitch = jest.fn(freq => {
     if (freq === 440) return ["A", "4"];
     return ["G♯", "4"];
 });
+const mockFrequencyToPitch = global.frequencyToPitch;
 
 global.toFraction = jest.fn(num => [1, 1]);
 global._ = jest.fn(str => str);
@@ -467,6 +468,7 @@ describe("saveAbcOutput", () => {
     let activity;
 
     beforeEach(() => {
+        global.frequencyToPitch = mockFrequencyToPitch;
         activity = {
             logo: {
                 notationOutput: "",
@@ -485,6 +487,10 @@ describe("saveAbcOutput", () => {
                 })
             }
         };
+    });
+
+    afterEach(() => {
+        global.frequencyToPitch = mockFrequencyToPitch;
     });
 
     it("should generate the correct ABC notation output with key signature replacements", () => {
