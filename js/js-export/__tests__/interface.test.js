@@ -150,6 +150,13 @@ describe("JSInterface", () => {
         it("should return null when no method exists for the given block", () => {
             expect(JSInterface.getMethodName("pickup")).toBeNull();
         });
+
+        it("should return the correct method name for math blocks", () => {
+            expect(JSInterface.getMethodName("lerp")).toBe("MathUtility.doLerp");
+            expect(JSInterface.getMethodName("gcd")).toBe("MathUtility.doGcd");
+            expect(JSInterface.getMethodName("lcm")).toBe("MathUtility.doLcm");
+            expect(JSInterface.getMethodName("map")).toBe("MathUtility.doMap");
+        });
     });
 
     describe("rearrangeMethodArgs", () => {
