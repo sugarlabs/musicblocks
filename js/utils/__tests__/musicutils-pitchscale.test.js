@@ -236,6 +236,14 @@ describe("musicutils-pitchscale", () => {
             ]);
         });
 
+        it("keeps a sub-octave negative remainder in its own octave", () => {
+            // -Number.EPSILON sits a hair below A0: the remainder rounds up
+            // to exactly one octave, so a second modulo would push it into
+            // octave -1; it must stay ["A", 0] as before.
+            expect(pitchscale.numberToPitch(-Number.EPSILON, "equal")).toEqual(["A", 0]);
+            expect(pitchscale.numberToPitch(-Number.EPSILON, "equal19")).toEqual(["A", 0]);
+        });
+
         it("leaves ordinary pitch numbers unchanged", () => {
             expect(pitchscale.numberToPitch(0, "equal")).toEqual(["A", 0]);
             expect(pitchscale.numberToPitch(-1, "equal")).toEqual(["A♭", 0]);

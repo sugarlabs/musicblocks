@@ -785,7 +785,13 @@ var numberToPitch = (i, temperament, startPitch, offset, activity) => {
         // value at that magnitude (returning the wrong note for -1e308) and
         // overflows to Infinity for -Number.MAX_VALUE (returning an
         // undefined note). The octave count n is applied separately below.
-        i = ((i % currentEDO) + currentEDO) % currentEDO;
+        // Keep the sub-octave remainder as-is: a second modulo would turn a
+        // remainder that rounds up to exactly currentEDO (e.g. for
+        // -Number.EPSILON) into 0 and shift the octave by one.
+        i %= currentEDO;
+        if (i < 0) {
+            i += currentEDO;
+        }
 
         if (isTrueEDO(temperament)) {
             if (currentEDO === 12) {
