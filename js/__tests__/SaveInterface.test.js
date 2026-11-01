@@ -79,7 +79,11 @@ global.mockDownload = jest.fn();
 // Since SaveInterface.js uses this pattern for lazy-loaded exports,
 // we load it manually with a custom require that detects array arguments
 // and immediately invokes the callback (globals are already mocked above).
-const { SaveInterface } = require("../SaveInterface");
+const {
+    SaveInterface,
+    restoreRecordedNotation,
+    prepareFreshNotation
+} = require("../SaveInterface");
 const { escapeHTML } = require("../utils/utils");
 global.escapeHTML = escapeHTML;
 const util = require("util");
@@ -1778,5 +1782,250 @@ describe("MXML Methods", () => {
             "data:text;utf8," + encodeURIComponent(""),
             "empty.xml"
         );
+    });
+});
+
+describe("Notation-state preparation across exporters", () => {
+    let mockActivity, turtlesList, saveInterface;
+
+    beforeEach(() => {
+        turtlesList = [
+            { painter: { doClear: jest.fn() } },
+            { painter: { doClear: jest.fn() } },
+            { painter: { doClear: jest.fn() } }
+        ];
+
+        mockActivity = {
+            turtles: {
+                turtleList: turtlesList,
+                getTurtleCount: jest.fn(() => turtlesList.length),
+                getTurtle: jest.fn(idx => turtlesList[idx])
+            },
+            logo: {
+                runningAbc: false,
+                runningLilypond: false,
+                runningMxml: false,
+                notationOutput: "",
+                notationNotes: {},
+                notation: {
+                    notationStaging: {},
+                    notationDrumStaging: {}
+                },
+                recordingBuffer: {
+                    hasData: true,
+                    notationOutput: "X:1\nT:Buffered",
+                    notationNotes: { 0: "c4", 1: "e4" },
+                    notationStaging: {
+                        0: ["c4", "d4"],
+                        2: ["g4", "a4"]
+                    },
+                    notationDrumStaging: {
+                        0: ["snare"],
+                        2: ["bass"]
+                    }
+                },
+                runLogoCommands: jest.fn()
+            },
+            save: {
+                afterSaveAbc: jest.fn()
+            },
+            errorMsg: jest.fn()
+        };
+
+        saveInterface = new SaveInterface(mockActivity);
+    });
+
+    describe("restoreRecordedNotation", () => {
+        it("should restore notation state across multiple turtles", () => {
+            mockActivity.logo.recordingBuffer.notationStaging[1] = ["e4", "f4"];
+            mockActivity.logo.recordingBuffer.notationDrumStaging[1] = ["hihat"];
+
+            restoreRecordedNotation(mockActivity);
+
+            expect(mockActivity.logo.notationOutput).toBe("X:1\nT:Buffered");
+            expect(mockActivity.logo.notationNotes).toEqual({ 0: "c4", 1: "e4" });
+            expect(mockActivity.logo.notation.notationStaging[0]).toEqual(["c4", "d4"]);
+            expect(mockActivity.logo.notation.notationStaging[1]).toEqual(["e4", "f4"]);
+            expect(mockActivity.logo.notation.notationStaging[2]).toEqual(["g4", "a4"]);
+            expect(mockActivity.logo.notation.notationDrumStaging[0]).toEqual(["snare"]);
+            expect(mockActivity.logo.notation.notationDrumStaging[1]).toEqual(["hihat"]);
+            expect(mockActivity.logo.notation.notationDrumStaging[2]).toEqual(["bass"]);
+        });
+
+        it("should handle missing buffered entries and preserve existing staging for those turtles", () => {
+            // Turtle 1 is missing in recordingBuffer, but has existing staging in logo.notation
+            mockActivity.logo.notation.notationStaging[1] = ["existing_note"];
+            mockActivity.logo.notation.notationDrumStaging[1] = ["existing_drum"];
+
+            restoreRecordedNotation(mockActivity);
+
+            // Turtles 0 and 2 are restored from buffer
+            expect(mockActivity.logo.notation.notationStaging[0]).toEqual(["c4", "d4"]);
+            expect(mockActivity.logo.notation.notationStaging[2]).toEqual(["g4", "a4"]);
+            expect(mockActivity.logo.notation.notationDrumStaging[0]).toEqual(["snare"]);
+            expect(mockActivity.logo.notation.notationDrumStaging[2]).toEqual(["bass"]);
+
+            // Turtle 1 is untouched
+            expect(mockActivity.logo.notation.notationStaging[1]).toEqual(["existing_note"]);
+            expect(mockActivity.logo.notation.notationDrumStaging[1]).toEqual(["existing_drum"]);
+        });
+
+        it("should preserve existing buffered data in recordingBuffer without mutating it", () => {
+            const originalBufferStaging0 = mockActivity.logo.recordingBuffer.notationStaging[0];
+            const originalBufferDrumStaging0 =
+                mockActivity.logo.recordingBuffer.notationDrumStaging[0];
+            const originalNotes = mockActivity.logo.recordingBuffer.notationNotes;
+            const originalOutput = mockActivity.logo.recordingBuffer.notationOutput;
+
+            restoreRecordedNotation(mockActivity);
+
+            expect(mockActivity.logo.recordingBuffer.hasData).toBe(true);
+            expect(mockActivity.logo.recordingBuffer.notationOutput).toBe(originalOutput);
+            expect(mockActivity.logo.recordingBuffer.notationNotes).toBe(originalNotes);
+            expect(mockActivity.logo.recordingBuffer.notationStaging[0]).toBe(
+                originalBufferStaging0
+            );
+            expect(mockActivity.logo.recordingBuffer.notationDrumStaging[0]).toBe(
+                originalBufferDrumStaging0
+            );
+        });
+
+        it("should handle null or incomplete activity gracefully", () => {
+            expect(() => restoreRecordedNotation(null)).not.toThrow();
+            expect(() => restoreRecordedNotation({})).not.toThrow();
+            expect(() => restoreRecordedNotation({ logo: {} })).not.toThrow();
+        });
+
+        it("should be callable via SaveInterface instance method", () => {
+            saveInterface.restoreRecordedNotation(mockActivity);
+            expect(mockActivity.logo.notationOutput).toBe("X:1\nT:Buffered");
+            expect(mockActivity.logo.notation.notationStaging[0]).toEqual(["c4", "d4"]);
+        });
+    });
+
+    describe("prepareFreshNotation", () => {
+        it("should create separate arrays for each turtle and clear canvases across multiple turtles", () => {
+            prepareFreshNotation(mockActivity);
+
+            expect(mockActivity.logo.notationNotes).toEqual({});
+
+            // Verify separate arrays for each turtle (distinct references)
+            expect(mockActivity.logo.notation.notationStaging[0]).toEqual([]);
+            expect(mockActivity.logo.notation.notationStaging[1]).toEqual([]);
+            expect(mockActivity.logo.notation.notationStaging[2]).toEqual([]);
+            expect(mockActivity.logo.notation.notationStaging[0]).not.toBe(
+                mockActivity.logo.notation.notationStaging[1]
+            );
+            expect(mockActivity.logo.notation.notationStaging[1]).not.toBe(
+                mockActivity.logo.notation.notationStaging[2]
+            );
+
+            expect(mockActivity.logo.notation.notationDrumStaging[0]).toEqual([]);
+            expect(mockActivity.logo.notation.notationDrumStaging[1]).toEqual([]);
+            expect(mockActivity.logo.notation.notationDrumStaging[2]).toEqual([]);
+            expect(mockActivity.logo.notation.notationDrumStaging[0]).not.toBe(
+                mockActivity.logo.notation.notationDrumStaging[1]
+            );
+            expect(mockActivity.logo.notation.notationDrumStaging[1]).not.toBe(
+                mockActivity.logo.notation.notationDrumStaging[2]
+            );
+
+            // Mutating one turtle's staging does not affect others
+            mockActivity.logo.notation.notationStaging[0].push("c4");
+            expect(mockActivity.logo.notation.notationStaging[1]).toHaveLength(0);
+
+            // Check painters cleared
+            turtlesList.forEach(t => {
+                expect(t.painter.doClear).toHaveBeenCalledWith(true, true, true);
+            });
+        });
+
+        it("should handle missing turtles gracefully", () => {
+            expect(() => prepareFreshNotation(null)).not.toThrow();
+            expect(() => prepareFreshNotation({ logo: {} })).not.toThrow();
+        });
+
+        it("should be callable via SaveInterface instance method", () => {
+            saveInterface.prepareFreshNotation(mockActivity);
+            expect(mockActivity.logo.notation.notationStaging[0]).toEqual([]);
+            expect(turtlesList[0].painter.doClear).toHaveBeenCalled();
+        });
+    });
+
+    describe("Exporter integration with notation-state preparation", () => {
+        it("saveAbc should restore notation when buffered data is present", done => {
+            saveInterface.saveAbc(mockActivity);
+
+            expect(mockActivity.logo.notationOutput).toBe("X:1\nT:Buffered");
+            expect(mockActivity.logo.notation.notationStaging[0]).toEqual(["c4", "d4"]);
+
+            setTimeout(() => {
+                expect(mockActivity.save.afterSaveAbc).toHaveBeenCalled();
+                done();
+            }, 150);
+        });
+
+        it("saveAbc should prepare fresh notation when no buffered data is present", () => {
+            mockActivity.logo.recordingBuffer.hasData = false;
+
+            saveInterface.saveAbc(mockActivity);
+
+            expect(mockActivity.logo.runningAbc).toBe(true);
+            expect(mockActivity.logo.notationOutput).toBe(ABCHEADER);
+            expect(mockActivity.logo.notation.notationStaging[0]).toEqual([]);
+            expect(mockActivity.logo.notation.notationStaging[1]).toEqual([]);
+            expect(turtlesList[0].painter.doClear).toHaveBeenCalledWith(true, true, true);
+            expect(mockActivity.logo.runLogoCommands).toHaveBeenCalled();
+        });
+
+        it("saveLilypond should restore notation when buffered data is present", () => {
+            document.body.innerHTML = `
+                <div id="lilypondModal" style="display: none;">
+                    <div class="close"></div>
+                    <div id="fileNameText"></div>
+                    <input id="fileName" value="">
+                    <div id="titleText"></div>
+                    <input id="title" value="">
+                    <div id="authorText"></div>
+                    <input id="author" value="">
+                    <div id="MIDIText"></div>
+                    <div id="guitarText"></div>
+                    <button id="submitLilypond"></button>
+                </div>
+            `;
+            mockActivity.storage = { getItem: jest.fn(() => null) };
+
+            saveInterface.saveLilypond(mockActivity);
+
+            expect(mockActivity.logo.notationOutput).toBe("X:1\nT:Buffered");
+            expect(mockActivity.logo.notation.notationStaging[0]).toEqual(["c4", "d4"]);
+            expect(mockActivity.logo.notation.notationStaging[2]).toEqual(["g4", "a4"]);
+        });
+
+        it("saveMxml should always generate fresh notation even when buffered data is present", () => {
+            mockActivity.logo.recordingBuffer.hasData = true;
+            mockActivity.logo.notation.notationStaging[0] = ["stale_data"];
+
+            saveInterface.saveMxml("test.mxml");
+
+            // runningMxml must be set to true
+            expect(mockActivity.logo.runningMxml).toBe(true);
+
+            // Fresh notation state must be prepared (empty arrays, not restored from recordingBuffer)
+            expect(mockActivity.logo.notation.notationStaging[0]).toEqual([]);
+            expect(mockActivity.logo.notation.notationStaging[1]).toEqual([]);
+            expect(mockActivity.logo.notation.notationStaging[2]).toEqual([]);
+            expect(mockActivity.logo.notation.notationStaging[0]).not.toBe(
+                mockActivity.logo.recordingBuffer.notationStaging[0]
+            );
+
+            // Turtle canvases cleared
+            turtlesList.forEach(t => {
+                expect(t.painter.doClear).toHaveBeenCalledWith(true, true, true);
+            });
+
+            // Logo commands executed
+            expect(mockActivity.logo.runLogoCommands).toHaveBeenCalled();
+        });
     });
 });
