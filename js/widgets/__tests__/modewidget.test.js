@@ -1218,6 +1218,34 @@ describe("ModeWidget", () => {
         expect(wholeTone).toEqual({ edo: 6, pattern: [1, 1, 1, 1, 1, 1] });
     });
 
+    test("points a ratio-based .scl file to the temperament widget", () => {
+        global.readTextFile = jest.fn((_inputId, cb) => {
+            // 5-limit just major: no equal division up to 55 fits it within 0.5 cents.
+            const content = [
+                "! ji.scl",
+                "Just major",
+                "7",
+                "9/8",
+                "5/4",
+                "4/3",
+                "3/2",
+                "5/3",
+                "15/8",
+                "2/1"
+            ].join("\n");
+            cb(null, { text: content, file: { name: "ji.scl", size: 100 } });
+        });
+
+        modeWidget._importFile();
+
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+            expect.stringContaining("Not a valid EDO mode.")
+        );
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+            expect.stringContaining("import the file in the temperament widget")
+        );
+    });
+
     test("_findEdoSteps rejects multi-octave .scl files", () => {
         const pitches = [200, 400, 1200, 1400].map(c => ({
             cents: c,
