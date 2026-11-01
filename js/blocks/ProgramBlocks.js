@@ -815,15 +815,41 @@ function setupProgramBlocks(activity) {
          * @param {number} blk - The block identifier.
          */
         flow(args, logo, turtle, blk) {
-            if (args.length < 1) {
+            if (!args || args.length < 1 || args[0] === null || args[0] === undefined) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
+            if (!activity.blocks || !activity.blocks.palettes || !activity.blocks.palettes.dict) {
+                return;
+            }
+
+            const target = String(args[0]).trim().toLowerCase();
+            if (target === "") {
+                return;
+            }
+
             for (const p in activity.blocks.palettes.dict) {
-                if (_(activity.blocks.palettes.dict[p].name) === args[0].toLowerCase()) {
+                const palette = activity.blocks.palettes.dict[p];
+                if (!palette) {
+                    continue;
+                }
+                const paletteName = palette.name || p;
+                const localizedName = typeof _ === "function" ? _(paletteName) : paletteName;
+
+                const matchLocalized =
+                    typeof localizedName === "string" && localizedName.toLowerCase() === target;
+                const matchRaw =
+                    typeof paletteName === "string" && paletteName.toLowerCase() === target;
+                const matchKey = typeof p === "string" && p.toLowerCase() === target;
+
+                if (matchLocalized || matchRaw || matchKey) {
                     activity.blocks.palettes.hide();
-                    activity.blocks.palettes.dict[p].show();
+                    if (typeof palette.show === "function") {
+                        palette.show();
+                    } else if (typeof activity.blocks.palettes.dict[p].show === "function") {
+                        activity.blocks.palettes.dict[p].show();
+                    }
                     activity.blocks.palettes.show();
                     return;
                 }

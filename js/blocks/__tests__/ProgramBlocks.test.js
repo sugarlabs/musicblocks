@@ -858,11 +858,157 @@ describe("ProgramBlocks", () => {
             expect(activity.blocks.palettes.show).toHaveBeenCalled();
         });
 
-        test("handles missing arguments", () => {
+        test("opens specified palette case-insensitively and with trimmed whitespace", () => {
+            activity.blocks.palettes.dict = {
+                rhythm: {
+                    name: "rhythm",
+                    show: jest.fn()
+                }
+            };
+
+            const block = getBlock("openpalette");
+            block.flow(["  RHYTHM  "], logo, 0, 10);
+
+            expect(activity.blocks.palettes.hide).toHaveBeenCalled();
+            expect(activity.blocks.palettes.dict.rhythm.show).toHaveBeenCalled();
+            expect(activity.blocks.palettes.show).toHaveBeenCalled();
+        });
+
+        test("opens palette when localized name is capitalized (e.g. German 'Rhythmus')", () => {
+            activity.blocks.palettes.dict = {
+                rhythm: {
+                    name: "rhythm",
+                    show: jest.fn()
+                }
+            };
+
+            const originalTranslate = global._;
+            global._ = s => (s === "rhythm" ? "Rhythmus" : s);
+            try {
+                const block = getBlock("openpalette");
+                block.flow(["Rhythmus"], logo, 0, 10);
+
+                expect(activity.blocks.palettes.hide).toHaveBeenCalled();
+                expect(activity.blocks.palettes.dict.rhythm.show).toHaveBeenCalled();
+                expect(activity.blocks.palettes.show).toHaveBeenCalled();
+            } finally {
+                global._ = originalTranslate;
+            }
+        });
+
+        test("opens palette when user passes lowercase input for capitalized localized name", () => {
+            activity.blocks.palettes.dict = {
+                rhythm: {
+                    name: "rhythm",
+                    show: jest.fn()
+                }
+            };
+
+            const originalTranslate = global._;
+            global._ = s => (s === "rhythm" ? "Rhythmus" : s);
+            try {
+                const block = getBlock("openpalette");
+                block.flow(["rhythmus"], logo, 0, 10);
+
+                expect(activity.blocks.palettes.hide).toHaveBeenCalled();
+                expect(activity.blocks.palettes.dict.rhythm.show).toHaveBeenCalled();
+                expect(activity.blocks.palettes.show).toHaveBeenCalled();
+            } finally {
+                global._ = originalTranslate;
+            }
+        });
+
+        test("opens palette when non-English locale is active but canonical English name is passed", () => {
+            activity.blocks.palettes.dict = {
+                rhythm: {
+                    name: "rhythm",
+                    show: jest.fn()
+                }
+            };
+
+            const originalTranslate = global._;
+            global._ = s => (s === "rhythm" ? "Rhythmus" : s);
+            try {
+                const block = getBlock("openpalette");
+                block.flow(["rhythm"], logo, 0, 10);
+
+                expect(activity.blocks.palettes.hide).toHaveBeenCalled();
+                expect(activity.blocks.palettes.dict.rhythm.show).toHaveBeenCalled();
+                expect(activity.blocks.palettes.show).toHaveBeenCalled();
+            } finally {
+                global._ = originalTranslate;
+            }
+        });
+
+        test("handles missing arguments (empty array)", () => {
             const block = getBlock("openpalette");
             block.flow([], logo, 0, 10);
 
             expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+        });
+
+        test("handles missing arguments (null or undefined input) without throwing", () => {
+            const block = getBlock("openpalette");
+            expect(() => block.flow([null], logo, 0, 10)).not.toThrow();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+
+            activity.errorMsg.mockClear();
+            expect(() => block.flow([undefined], logo, 0, 11)).not.toThrow();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 11);
+
+            activity.errorMsg.mockClear();
+            expect(() => block.flow(null, logo, 0, 12)).not.toThrow();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 12);
+        });
+
+        test("handles non-string number input without throwing", () => {
+            activity.blocks.palettes.dict = {
+                rhythm: {
+                    name: "rhythm",
+                    show: jest.fn()
+                }
+            };
+
+            const block = getBlock("openpalette");
+            expect(() => block.flow([5], logo, 0, 10)).not.toThrow();
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(activity.blocks.palettes.dict.rhythm.show).not.toHaveBeenCalled();
+        });
+
+        test("handles other non-string inputs (boolean, object) without throwing", () => {
+            activity.blocks.palettes.dict = {
+                rhythm: {
+                    name: "rhythm",
+                    show: jest.fn()
+                }
+            };
+
+            const block = getBlock("openpalette");
+            expect(() => block.flow([true], logo, 0, 10)).not.toThrow();
+            expect(() => block.flow([{}], logo, 0, 10)).not.toThrow();
+            expect(activity.blocks.palettes.dict.rhythm.show).not.toHaveBeenCalled();
+        });
+
+        test("safely ignores empty string and non-matching palette names", () => {
+            activity.blocks.palettes.dict = {
+                rhythm: {
+                    name: "rhythm",
+                    show: jest.fn()
+                }
+            };
+
+            const block = getBlock("openpalette");
+            block.flow([""], logo, 0, 10);
+            block.flow(["nonexistent_palette"], logo, 0, 10);
+
+            expect(activity.blocks.palettes.dict.rhythm.show).not.toHaveBeenCalled();
+        });
+
+        test("handles missing activity.blocks.palettes gracefully", () => {
+            delete activity.blocks.palettes;
+            const block = getBlock("openpalette");
+
+            expect(() => block.flow(["rhythm"], logo, 0, 10)).not.toThrow();
         });
     });
 
