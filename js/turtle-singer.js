@@ -644,18 +644,20 @@ class Singer {
      * @param {Object} turtle
      * @param {String} note
      * @param {Number} octave
+     * @param {Number} [cents=0]
      * @returns {Number} inverted value
      */
     static calculateInvert(logo, turtle, note, octave, cents = 0) {
         const activity = logo.activity;
         const tur = activity.turtles.ithTurtle(turtle);
         const temperament = activity.logo.synth.inTemperament;
+        const edo = getCurrentEDO(temperament);
 
         let delta = 0;
         const note1 = getNote(
             note,
             octave,
-            cents,
+            0,
             tur.singer.keySignature,
             tur.singer.movable,
             null,
@@ -664,13 +666,15 @@ class Singer {
         );
         let num1 =
             pitchToNumber(note1[0], note1[1], tur.singer.keySignature, temperament) -
-            tur.singer.pitchNumberOffset;
+            tur.singer.pitchNumberOffset +
+            (cents / 1200) * edo;
 
         for (let i = tur.singer.invertList.length - 1; i >= 0; i--) {
+            const axisCents = tur.singer.invertList[i][3] || 0;
             const note2 = getNote(
                 tur.singer.invertList[i][0],
                 tur.singer.invertList[i][1],
-                -cents,
+                axisCents / 100,
                 tur.singer.keySignature,
                 tur.singer.movable,
                 null,
@@ -679,14 +683,17 @@ class Singer {
             );
             const num2 =
                 pitchToNumber(note2[0], note2[1], tur.singer.keySignature, temperament) -
-                tur.singer.pitchNumberOffset;
+                tur.singer.pitchNumberOffset +
+                ((note2[2] || 0) / 1200) * edo;
 
             if (tur.singer.invertList[i][2] === "even") {
-                delta += num2 - num1;
-                num1 += 2 * delta;
+                const stepDelta = num2 - num1;
+                delta += stepDelta;
+                num1 += 2 * stepDelta;
             } else if (tur.singer.invertList[i][2] === "odd") {
-                delta += num2 - num1 + 0.5;
-                num1 += 2 * delta;
+                const stepDelta = num2 - num1 + 0.5;
+                delta += stepDelta;
+                num1 += 2 * stepDelta;
             } else {
                 // We need to calculate the scalar difference
                 const scalarSteps = Singer.scalarDistance(logo, turtle, num2, num1);
@@ -1159,7 +1166,7 @@ class Singer {
 
         const delta =
             tur.singer.invertList.length > 0
-                ? Singer.calculateInvert(activity.logo, turtle, note, octave)
+                ? Singer.calculateInvert(activity.logo, turtle, note, octave, cents)
                 : 0;
 
         if (tur.singer.justMeasuring.length > 0) {
