@@ -760,6 +760,13 @@ var getNoteFromInterval = (pitch, interval, temperament) => {
 var numberToPitch = (i, temperament, startPitch, offset, activity) => {
     // Calculate the pitch and octave based on index.
     // We start at A0.
+    // A non-finite pitch number has no pitch: return the A0 default (the
+    // fallback #9126 specified for this hang class) instead of letting
+    // -Infinity spin the normalisation below forever or NaN/Infinity
+    // fall through to an undefined note name.
+    if (!Number.isFinite(i)) {
+        return ["A", 0];
+    }
     if (temperament === undefined) {
         temperament = "equal";
     }
@@ -768,9 +775,22 @@ var numberToPitch = (i, temperament, startPitch, offset, activity) => {
     let n = 0;
     let pitchNumber;
     if (i < 0) {
-        while (i < 0) {
+        // Bump up by whole octaves in one step, the way numberToPitchSharp
+        // converts with modulo arithmetic: adding one octave per loop
+        // iteration needs ~10^306 iterations for a finite input like
+        // -1e308, which freezes the main thread just the same.
+        n = Math.ceil(-i / currentEDO); // Count octave bump ups.
+        // Normalise with remainder arithmetic instead of i += n * currentEDO:
+        // the remainder is exact, while the addition rounds the adjusted
+        // value at that magnitude (returning the wrong note for -1e308) and
+        // overflows to Infinity for -Number.MAX_VALUE (returning an
+        // undefined note). The octave count n is applied separately below.
+        // Keep the sub-octave remainder as-is: a second modulo would turn a
+        // remainder that rounds up to exactly currentEDO (e.g. for
+        // -Number.EPSILON) into 0 and shift the octave by one.
+        i %= currentEDO;
+        if (i < 0) {
             i += currentEDO;
-            n += 1; // Count octave bump ups.
         }
 
         if (isTrueEDO(temperament)) {
