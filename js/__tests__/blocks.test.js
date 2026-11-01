@@ -4900,6 +4900,17 @@ describe("Spatial grid indexing", () => {
             const trimBlocks = new Blocks(mockActivity);
 
             trimBlocks.trashStacks = Array.from({ length: 102 }, (_, index) => index);
+            trimBlocks.actionHistory = [
+                { type: "trash", blockId: 0 },
+                { type: "trash", blockId: 1 },
+                { type: "trash", blockId: 2 },
+                { type: "move", blockId: 0 }
+            ];
+
+            trimBlocks.redoActionHistory = [
+                { type: "trash", blockId: 0 },
+                { type: "trash", blockId: 2 }
+            ];
             trimBlocks.trashPreviews = {
                 0: "oldest-preview",
                 1: "second-oldest-preview",
@@ -4916,6 +4927,12 @@ describe("Spatial grid indexing", () => {
             expect(trimBlocks.trashStacks).toHaveLength(100);
             expect(trimBlocks.trashStacks[0]).toBe(2);
             expect(trimBlocks.trashStacks[99]).toBe(101);
+            expect(trimBlocks.actionHistory).toEqual([
+                { type: "trash", blockId: 2 },
+                { type: "move", blockId: 0 }
+            ]);
+
+            expect(trimBlocks.redoActionHistory).toEqual([{ type: "trash", blockId: 2 }]);
 
             expect(trimBlocks.trashPreviews[0]).toBeUndefined();
             expect(trimBlocks.trashPreviews[1]).toBeUndefined();

@@ -7725,6 +7725,13 @@ class Blocks {
                     delete this.trashPreviews[removed];
                 }
 
+                this.actionHistory = this.actionHistory.filter(
+                    action => action.type !== "trash" || action.blockId !== removed
+                );
+                this.redoActionHistory = this.redoActionHistory.filter(
+                    action => action.type !== "trash" || action.blockId !== removed
+                );
+
                 this.findDragGroup(removed);
                 const evictedGroup = Array.from(this.dragGroup);
 

@@ -714,6 +714,56 @@ describe("Activity Toolbar Integration", () => {
             expect(activity.blocks.deleteActionBlock).toHaveBeenCalledWith(action);
         });
 
+        test("sendAllToTrash processes action-call roots trashed during bulk deletion", () => {
+            activity.palettes = { dict: {} };
+
+            const action = {
+                connections: [null],
+                name: "action",
+                trash: false,
+                hide: jest.fn(),
+                container: { uncache: jest.fn() }
+            };
+
+            const actionCall = {
+                connections: [null],
+                name: "nameddo",
+                trash: false,
+                hide: jest.fn(),
+                container: { uncache: jest.fn() }
+            };
+
+            activity.blocks = {
+                palettes: activity.palettes,
+                blockList: [action, actionCall],
+                _beginDeferCheckBounds: jest.fn(),
+                _endDeferCheckBounds: jest.fn(),
+                captureStackPreview: jest.fn(() => "preview"),
+                trimTrashHistory: jest.fn(),
+                deleteActionBlock: jest.fn(() => {
+                    actionCall.trash = true;
+                }),
+                trashPreviews: {},
+                trashStacks: [],
+                moveBlockRelative: jest.fn(),
+                blockArt: {},
+                blockCollapseArt: {}
+            };
+
+            activity.blocksContainer = { x: 0, y: 0 };
+            activity.refreshCanvas = jest.fn();
+            activity.stage = { dispatchEvent: jest.fn() };
+
+            activity.sendAllToTrash(false, true, false);
+
+            expect(activity.blocks.deleteActionBlock).toHaveBeenCalledWith(action);
+            expect(activity.blocks.trashStacks).toEqual(["0", "1"]);
+            expect(actionCall.hide).toHaveBeenCalled();
+            expect(actionCall.container.uncache).toHaveBeenCalled();
+            expect(activity.blocks.moveBlockRelative).toHaveBeenCalledTimes(2);
+            expect(activity.blocks.trimTrashHistory).toHaveBeenCalledTimes(1);
+        });
+
         test("clearCache skips empty and trashed slots in blockList", () => {
             const makeBlock = trash => ({
                 trash,
