@@ -218,12 +218,20 @@ describe("musicutils-pitchscale", () => {
         });
 
         it("converts a very large finite negative pitch number in constant time", () => {
+            // The step within the octave comes from exact remainder
+            // arithmetic: -1e308 mod 12 normalises to step 4 (D♭), and the
+            // largest finite double must still produce a defined note
+            // instead of overflowing to [undefined, Infinity].
             expect(pitchscale.numberToPitch(-1e308, "equal")).toEqual([
-                "A",
+                "D♭",
                 -8.333333333333333e306
             ]);
+            expect(pitchscale.numberToPitch(-Number.MAX_VALUE, "equal")).toEqual([
+                "D♭",
+                -1.4980776123852632e307
+            ]);
             expect(pitchscale.numberToPitch(-1e308, "equal19")).toEqual([
-                "A",
+                "C♯",
                 -5.263157894736842e306
             ]);
         });

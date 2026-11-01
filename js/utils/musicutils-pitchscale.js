@@ -780,7 +780,12 @@ var numberToPitch = (i, temperament, startPitch, offset, activity) => {
         // iteration needs ~10^306 iterations for a finite input like
         // -1e308, which freezes the main thread just the same.
         n = Math.ceil(-i / currentEDO); // Count octave bump ups.
-        i += n * currentEDO;
+        // Normalise with remainder arithmetic instead of i += n * currentEDO:
+        // the remainder is exact, while the addition rounds the adjusted
+        // value at that magnitude (returning the wrong note for -1e308) and
+        // overflows to Infinity for -Number.MAX_VALUE (returning an
+        // undefined note). The octave count n is applied separately below.
+        i = ((i % currentEDO) + currentEDO) % currentEDO;
 
         if (isTrueEDO(temperament)) {
             if (currentEDO === 12) {
