@@ -292,6 +292,12 @@ describe("setupEnsembleBlocks", () => {
             const result = getTargetTurtle(turtles, "Yertle");
             expect(result).toBeNull();
         });
+
+        it("should return null when targetTurtle is null or undefined without throwing", () => {
+            expect(getTargetTurtle(turtles, null)).toBeNull();
+            expect(getTargetTurtle(turtles, undefined)).toBeNull();
+            expect(getTargetTurtle(null, "Yertle")).toBeNull();
+        });
     });
 
     describe("_blockFindTurtle", () => {
