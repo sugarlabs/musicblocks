@@ -1588,6 +1588,25 @@ describe("Key and meter changes inside a tune", () => {
         expectLinked(blocks);
     });
 
+    // abcjs reports no key element for these, only the new key on the next line.
+    test.each([
+        [
+            "a K: line inside a voice's music",
+            "V:1\nC F c F |\nV:2\nC F c F |\nV:1\nK:D\nF c d F |\nV:2\nF c d F |]\n"
+        ],
+        [
+            "a K: line between the voices",
+            "V:1\nC F c F |\nV:2\nC F c F |\nK:D\nV:1\nF c d F |\nV:2\nF c d F |]\n"
+        ]
+    ])("%s becomes a key change in each voice", async (_name, body) => {
+        const blocks = await parse(`X:1\nM:4/4\nL:1/4\nK:C\n${body}`);
+        const expected = ["C4", "F4", "C5", "F4", "K:D major", "F♯4", "C♯5", "D5", "F♯4"];
+
+        expect(scoreOrder(blocks, 0)).toEqual(expected);
+        expect(scoreOrder(blocks, 1)).toEqual(expected);
+        expectLinked(blocks);
+    });
+
     test("a key change keeps its mode", async () => {
         const blocks = await parse("X:1\nM:4/4\nL:1/4\nK:C\nC D E F | [K:Ador] F G A B |]\n");
 

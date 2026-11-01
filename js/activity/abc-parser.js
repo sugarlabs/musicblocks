@@ -250,10 +250,16 @@ function _keyNamesOf(key) {
     };
 }
 
-// Adds a setkey2 block to a segment, followed by a hidden block like a note, so
-// it chains into the segment the same way notes do. Meter blocks do the same.
-function _createKeyBlocks(key, blockId, actionBlock) {
+// Makes key the voice's key and adds a setkey2 block to a segment, followed by a
+// hidden block like a note, so it chains into the segment the same way notes do.
+// Meter blocks do the same. Adds nothing when the root and mode are unchanged.
+function _createKeyBlocks(key, blockId, actionBlock, staffRecord) {
+    const previous = _keyNamesOf(staffRecord.keySignature);
+    staffRecord.keySignature = key;
     const { root, mode } = _keyNamesOf(key);
+    if (root === previous.root && mode === previous.mode) {
+        return 0;
+    }
     actionBlock.push(
         [blockId, "setkey2", 0, 0, [blockId - 1, blockId + 1, blockId + 2, blockId + 3]],
         [blockId + 1, ["notename", { value: root }], 0, 0, [blockId]],
@@ -417,8 +423,9 @@ function _processVoice(voice, blockId, staff, voiceNumber, staffRecord, voiceIdx
     }
     let actionBlock = [];
     // abcjs gives each line the key it starts in, and a [K:] inside the line
-    // as a key element that holds from there on.
-    let key = staff.key;
+    // as a key element that holds from there on. A K: line inside one voice's
+    // music changes the line's key without a key element, so compare it here.
+    blockId += _createKeyBlocks(staff.key, blockId, actionBlock, staffRecord);
 
     // A line that starts in a new meter carries it on the staff, not as an element.
     if (staff.meter) {
@@ -452,7 +459,7 @@ function _processVoice(voice, blockId, staff, voiceNumber, staffRecord, voiceIdx
                 chord,
                 blockId,
                 element.duration * (isSpacerRest ? 1 : (tuplets[voiceIdx]?.multiplier ?? 1)),
-                key,
+                staffRecord.keySignature,
                 actionBlock,
                 accidentals
             );
@@ -472,12 +479,7 @@ function _processVoice(voice, blockId, staff, voiceNumber, staffRecord, voiceIdx
                 _handleRepeatBar(element.type, staffRecord);
             }
         } else if (element.el_type === "key") {
-            const names = _keyNamesOf(element);
-            const current = _keyNamesOf(key);
-            key = element;
-            if (names.root !== current.root || names.mode !== current.mode) {
-                blockId += _createKeyBlocks(element, blockId, actionBlock);
-            }
+            blockId += _createKeyBlocks(element, blockId, actionBlock, staffRecord);
         } else if (element.el_type === "meter") {
             blockId += _createMeterBlocks(
                 _meterOf({ meter: element }),
