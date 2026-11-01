@@ -249,7 +249,7 @@ class RhythmRulerSave {
         }
 
         this.activity.blocks.loadNewBlocks(newStack);
-        activity.textMsg(_("New action block generated."), 3000);
+        this.activity.textMsg(_("New action block generated."), 3000);
     }
 
     /**
@@ -407,26 +407,13 @@ class RhythmRulerSave {
                         newStack.push([idx + 1, ["number", { value: sameNoteValue }], 0, 0, [idx]]);
                         newStack.push([idx + 2, "newnote", 0, 0, [idx, idx + 3, idx + 6, idx + 9]]);
                         newStack.push([idx + 3, "divide", 0, 0, [idx + 2, idx + 4, idx + 5]]);
-                        newStack.push([idx + 4, ["number", { value: 1 }], 0, 0, [idx + 3]]);
+                        newStack.push([idx + 4, ["number", { value: obj[0] }], 0, 0, [idx + 3]]);
+                        newStack.push([idx + 5, ["number", { value: obj[1] }], 0, 0, [idx + 3]]);
                         if (noteValue < 0) {
-                            newStack.push([
-                                idx + 5,
-                                ["number", { value: -noteValue }],
-                                0,
-                                0,
-                                [idx + 3]
-                            ]);
                             newStack.push([idx + 6, "vspace", 0, 0, [idx + 2, idx + 7]]);
                             newStack.push([idx + 7, "rest2", 0, 0, [idx + 6, idx + 8]]);
                             newStack.push([idx + 8, "hidden", 0, 0, [idx + 7, null]]);
                         } else {
-                            newStack.push([
-                                idx + 5,
-                                ["number", { value: noteValue }],
-                                0,
-                                0,
-                                [idx + 3]
-                            ]);
                             newStack.push([idx + 6, "vspace", 0, 0, [idx + 2, idx + 7]]);
                             newStack.push([idx + 7, "playdrum", 0, 0, [idx + 6, idx + 8, null]]);
                             if (effect) {
@@ -455,7 +442,7 @@ class RhythmRulerSave {
             }
 
             this.activity.blocks.loadNewBlocks(newStack);
-            activity.textMsg(_("New action block generated."), 3000);
+            this.activity.textMsg(_("New action block generated."), 3000);
             if (selectedRuler > this.Rulers.length - 2) {
                 return;
             } else {
@@ -622,10 +609,16 @@ class RhythmRulerSave {
                                 [idx, idx + 3, idx + 6, idx + 9]
                             ]);
                             newStack.push([idx + 3, "divide", 0, 0, [idx + 2, idx + 4, idx + 5]]);
-                            newStack.push([idx + 4, ["number", { value: 1 }], 0, 0, [idx + 3]]);
+                            newStack.push([
+                                idx + 4,
+                                ["number", { value: obj[0] }],
+                                0,
+                                0,
+                                [idx + 3]
+                            ]);
                             newStack.push([
                                 idx + 5,
-                                ["number", { value: -noteValue }],
+                                ["number", { value: obj[1] }],
                                 0,
                                 0,
                                 [idx + 3]
@@ -643,10 +636,16 @@ class RhythmRulerSave {
                                 [idx, idx + 3, idx + 6, idx + 10]
                             ]);
                             newStack.push([idx + 3, "divide", 0, 0, [idx + 2, idx + 4, idx + 5]]);
-                            newStack.push([idx + 4, ["number", { value: 1 }], 0, 0, [idx + 3]]);
+                            newStack.push([
+                                idx + 4,
+                                ["number", { value: obj[0] }],
+                                0,
+                                0,
+                                [idx + 3]
+                            ]);
                             newStack.push([
                                 idx + 5,
-                                ["number", { value: noteValue }],
+                                ["number", { value: obj[1] }],
                                 0,
                                 0,
                                 [idx + 3]
@@ -670,6 +669,7 @@ class RhythmRulerSave {
             }
 
             this.activity.blocks.loadNewBlocks(newStack);
+            this.activity.textMsg(_("New action block generated."), 3000);
             if (selectedRuler > this.Rulers.length - 2) {
                 return;
             } else {
