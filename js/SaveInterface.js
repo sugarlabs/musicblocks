@@ -521,7 +521,8 @@ class SaveInterface {
                 const mainTrack = midi.addTrack();
                 mainTrack.name = `Track ${parseInt(blockIndex, 10) + 1}`;
 
-                const trackMap = new Map();
+                const instrumentTracks = new Map();
+                const drumTracks = new Map();
                 let globalTime = 0;
 
                 notes.forEach(noteData => {
@@ -529,29 +530,33 @@ class SaveInterface {
                     if (duration === null) return;
                     const instrument = noteData.instrument || "default";
 
-                    if (noteData.drum) {
-                        const drum = noteData.drum || false;
-                        if (!trackMap.has(drum)) {
-                            const drumTrack = midi.addTrack();
-                            drumTrack.name = `Track ${parseInt(blockIndex, 10) + 1} - ${drum}`;
-                            drumTrack.channel = 9; // Drums must be on Channel 10
-                            trackMap.set(drum, drumTrack);
+                    if (noteData.drum && noteData.drum.length > 0) {
+                        for (const drum of noteData.drum) {
+                            if (!drumTracks.has(drum)) {
+                                const drumTrack = midi.addTrack();
+                                drumTrack.name = `Track ${parseInt(blockIndex, 10) + 1} - ${drum}`;
+                                drumTrack.channel = 9; // Drums must be on Channel 10
+                                drumTracks.set(drum, drumTrack);
+                            }
+
+                            const drumTrack = drumTracks.get(drum);
+                            const midiNumber =
+                                Object.prototype.hasOwnProperty.call(drumMIDI, drum) &&
+                                drumMIDI[drum]
+                                    ? drumMIDI[drum]
+                                    : 36; // default to Bass Drum
+                            drumTrack.addNote({
+                                midi: midiNumber,
+                                time: globalTime,
+                                duration: duration,
+                                velocity: 0.9
+                            });
                         }
+                    }
 
-                        const drumTrack = trackMap.get(drum);
-
-                        const midiNumber =
-                            Object.prototype.hasOwnProperty.call(drumMIDI, drum) && drumMIDI[drum]
-                                ? drumMIDI[drum]
-                                : 36; // default to Bass Drum
-                        drumTrack.addNote({
-                            midi: midiNumber,
-                            time: globalTime,
-                            duration: duration,
-                            velocity: 0.9
-                        });
-                    } else {
-                        if (!trackMap.has(instrument)) {
+                    // A Note can hold pitch and drum blocks at once; write both.
+                    if (noteData.note.some(pitch => !pitch.includes("R"))) {
+                        if (!instrumentTracks.has(instrument)) {
                             const instrumentTrack = midi.addTrack();
                             instrumentTrack.name = `Track ${
                                 parseInt(blockIndex, 10) + 1
@@ -560,10 +565,10 @@ class SaveInterface {
                                 Object.prototype.hasOwnProperty.call(instrumentMIDI, instrument)
                                     ? instrumentMIDI[instrument]
                                     : instrumentMIDI["default"];
-                            trackMap.set(instrument, instrumentTrack);
+                            instrumentTracks.set(instrument, instrumentTrack);
                         }
 
-                        const instrumentTrack = trackMap.get(instrument);
+                        const instrumentTrack = instrumentTracks.get(instrument);
 
                         noteData.note.forEach(pitch => {
                             if (!pitch.includes("R")) {
