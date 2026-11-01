@@ -1468,6 +1468,51 @@ describe("Logo doStopTurtles", () => {
         expect(turtle.endOfClampSignals[10][0]).toBeNull();
     });
 
+    test("dispatchUnissuedSignals defers dispatching while turtle is running from event", () => {
+        turtle.endOfClampSignals = { 10: ["_tie_0"] };
+        turtle.butNotThese = {};
+        turtle.singer = { runningFromEvent: true };
+
+        logo.dispatchUnissuedSignals(turtle);
+
+        expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalled();
+        expect(turtle.endOfClampSignals[10][0]).toBe("_tie_0");
+    });
+
+    test("event completion path dispatches deferred clamp signals once runningFromEvent is cleared", () => {
+        let timerCallback;
+        jest.spyOn(logo._timerManager, "setTimeout").mockImplementation(cb => {
+            timerCallback = cb;
+            return 1234;
+        });
+
+        turtle.endOfClampSignals = { 10: ["_tie_0"] };
+        turtle.butNotThese = {};
+        turtle.singer = { runningFromEvent: true, suppressOutput: false };
+        logo.turtles.running = jest.fn().mockReturnValue(false);
+        logo._cleanupAfterCompletion = jest.fn();
+
+        // Simulate natural completion block path that schedules _lastNoteTimeout
+        logo._lastNoteTimeout = logo._timerManager.setTimeout(() => {
+            logo._lastNoteTimeout = null;
+            turtle.singer.runningFromEvent = false;
+            logo.dispatchUnissuedSignals(turtle);
+            if (!logo.turtles.running()) {
+                logo._cleanupAfterCompletion();
+            }
+        }, 1000);
+
+        expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalled();
+
+        // When the timer fires, runningFromEvent is cleared and deferred signals dispatch
+        timerCallback();
+
+        expect(turtle.singer.runningFromEvent).toBe(false);
+        expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_tie_0");
+        expect(turtle.endOfClampSignals[10][0]).toBeNull();
+        expect(logo._cleanupAfterCompletion).toHaveBeenCalled();
+    });
+
     describe("with Transport and audio streams", () => {
         let turtle0;
         let turtle1;

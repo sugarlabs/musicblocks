@@ -2856,6 +2856,7 @@ class Logo {
                         logo._lastNoteTimeout = logo._timerManager.setTimeout(() => {
                             logo._lastNoteTimeout = null;
                             tur.singer.runningFromEvent = false;
+                            logo.dispatchUnissuedSignals(tur);
                             if (tur.singer.suppressOutput && logo.recording) {
                                 tur.singer.suppressOutput = false;
                             }

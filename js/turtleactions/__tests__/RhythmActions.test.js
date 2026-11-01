@@ -2168,6 +2168,9 @@ describe("setupRhythmActions", () => {
                     activity.logo
                 );
                 activity.logo.doStopTurtles = Logo.prototype.doStopTurtles.bind(activity.logo);
+                activity.logo.dispatchUnissuedSignals = Logo.prototype.dispatchUnissuedSignals.bind(
+                    activity.logo
+                );
                 activity.logo._cleanupAfterCompletion = jest.fn();
                 activity.logo.evalOnStopList = {};
                 activity.logo.synth = { recorder: null };
@@ -2301,6 +2304,40 @@ describe("setupRhythmActions", () => {
                 expect(targetTurtle.singer.tie).toBe(false);
                 expect(targetTurtle.singer.tieCarryOver).toBe(0);
                 expect(targetTurtle.endOfClampSignals).toEqual({});
+            });
+
+            it("event-driven Tie execution defers signal while runningFromEvent and completes cleanly when timer fires", () => {
+                setupRealLogoEnvironment();
+
+                activity.blocks.blockList[10] = { name: "tie" };
+                activity.blocks.blockList[20] = { name: "tie" };
+                targetTurtle.butNotThese = {};
+
+                // 1. Turtle executes Tie from an event handler
+                targetTurtle.singer.runningFromEvent = true;
+                Singer.RhythmActions.doTie(0, 10);
+                expect(targetTurtle.singer.tie).toBe(true);
+                expect(targetTurtle.endOfClampSignals[10]).toEqual(["_tie_0"]);
+
+                // 2. Program reaches end of block stack while runningFromEvent is still true
+                activity.logo.dispatchUnissuedSignals(targetTurtle);
+                // Dispatch is deferred because runningFromEvent is true
+                expect(targetTurtle.singer.tie).toBe(true);
+                expect(targetTurtle.endOfClampSignals[10]).toEqual(["_tie_0"]);
+
+                // 3. Natural completion timeout fires: clears runningFromEvent, then dispatches unissued signals
+                targetTurtle.singer.runningFromEvent = false;
+                activity.logo.dispatchUnissuedSignals(targetTurtle);
+
+                // Stage event dispatched the listener, which clears tie state
+                expect(targetTurtle.singer.tie).toBe(false);
+                expect(targetTurtle.singer.tieCarryOver).toBe(0);
+                expect(targetTurtle.endOfClampSignals[10][0]).toBeNull();
+
+                // 4. Subsequent Tie runs cleanly without being blocked by the guard
+                Singer.RhythmActions.doTie(0, 20);
+                expect(targetTurtle.singer.tie).toBe(true);
+                expect(targetTurtle.endOfClampSignals[20]).toEqual(["_tie_0"]);
             });
         });
 
