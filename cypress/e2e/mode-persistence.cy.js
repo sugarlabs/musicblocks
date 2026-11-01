@@ -34,7 +34,9 @@ const waitForProjectLoaded = (expectedNames, opts = {}) => {
     let stableObservations = 0;
     cy.window(opts).should(win => {
         const blocks = win.ActivityContext.getActivity().blocks;
-        const live = blocks.blockList.filter(block => !block.trash).map(block => block.name);
+        const live = blocks.blockList
+            .filter(block => block && !block.trash)
+            .map(block => block.name);
         const ready = blocks._loadCounter === 0 && expectedNames.every(name => live.includes(name));
         stableObservations = ready ? stableObservations + 1 : 0;
         expect(

@@ -305,6 +305,8 @@ class Blocks {
         this._loadInProgress = false;
         /** Callbacks waiting for the load queue to drain, see runAfterLoad(). */
         this._afterLoadCallbacks = new Set();
+        /** Optional failure callbacks paired with runAfterLoad() callbacks. */
+        this._afterLoadFailureCallbacks = new Map();
         /**
          * Set while the most recent loadNewBlocks() attempt ended in a
          * chunk-processing failure and cleared at the start of the next
@@ -5348,20 +5350,43 @@ class Blocks {
         };
 
         /**
+         * Drops callbacks waiting for a successful load and notifies callers that
+         * supplied a failure callback.
+         * @private
+         * @param {Error} error
+         * @returns {void}
+         */
+        this._failAfterLoadCallbacks = error => {
+            const failureCallbacks = [...this._afterLoadFailureCallbacks.values()];
+
+            this._afterLoadCallbacks.clear();
+            this._afterLoadFailureCallbacks.clear();
+
+            for (const callback of failureCallbacks) {
+                try {
+                    callback(error);
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        };
+
+        /**
          * Marks the current load as finished and, if another load was
          * queued while it ran, starts that one. Otherwise runs whatever
          * was waiting on runAfterLoad().
          * @private
+         * @param {Error} [loadError]
          * @returns {void}
          */
-        this._advanceLoadQueue = () => {
+        this._advanceLoadQueue = loadError => {
             this._loadInProgress = false;
 
             // A failed load leaves only part of the project behind, which is
             // exactly what the waiting callbacks were held back from seeing.
             // Drop them now, since a queued load clears _lastLoadFailed.
             if (this._lastLoadFailed) {
-                this._afterLoadCallbacks.clear();
+                this._failAfterLoadCallbacks(loadError);
             }
 
             if (this._loadQueue.length > 0) {
@@ -5373,6 +5398,7 @@ class Blocks {
 
             const callbacks = [...this._afterLoadCallbacks];
             this._afterLoadCallbacks.clear();
+            this._afterLoadFailureCallbacks.clear();
 
             for (const callback of callbacks) {
                 try {
@@ -5398,15 +5424,20 @@ class Blocks {
          * waiting does not queue it twice.
          * @public
          * @param {Function} callback
+         * @param {Function} [onFailure]
          * @returns {void}
          */
-        this.runAfterLoad = callback => {
+        this.runAfterLoad = (callback, onFailure) => {
             if (!this._loadInProgress) {
                 callback();
                 return;
             }
 
             this._afterLoadCallbacks.add(callback);
+
+            if (typeof onFailure === "function") {
+                this._afterLoadFailureCallbacks.set(callback, onFailure);
+            }
         };
 
         /**
@@ -5572,7 +5603,7 @@ class Blocks {
                     }
                     // Nothing was loaded, so a waiting save would only store
                     // the cleared workspace over the project.
-                    this._afterLoadCallbacks.clear();
+                    this._failAfterLoadCallbacks(new Error(warning));
                     this._advanceLoadQueue();
                 };
 
@@ -6255,7 +6286,7 @@ class Blocks {
                             } catch (e) {
                                 this.activity._suppressRefresh = false;
                                 this._lastLoadFailed = true;
-                                this._advanceLoadQueue();
+                                this._advanceLoadQueue(e);
                                 pubsub.emit("loadFailed", {
                                     token: loadToken,
                                     error: e
@@ -6279,7 +6310,7 @@ class Blocks {
             } catch (e) {
                 this.activity._suppressRefresh = false;
                 this._lastLoadFailed = true;
-                this._advanceLoadQueue();
+                this._advanceLoadQueue(e);
                 // Not emitting "loadFailed" here: this catch only ever runs
                 // for the first, synchronous chunk, so the throw below
                 // already reaches whatever try/catch called loadNewBlocks()
@@ -7675,6 +7706,42 @@ class Blocks {
         };
 
         /**
+         * Keep only the newest 100 trashed stacks and permanently dispose
+         * stacks that fall outside the restorable trash-history window.
+         * @public
+         * @returns {void}
+         */
+        this.trimTrashHistory = () => {
+            const MAX_TRASH_UNDO = 100;
+
+            while (this.trashStacks.length > MAX_TRASH_UNDO) {
+                const removed = this.trashStacks.shift();
+
+                if (removed === undefined) {
+                    continue;
+                }
+
+                if (this.trashPreviews[removed]) {
+                    delete this.trashPreviews[removed];
+                }
+
+                this.actionHistory = this.actionHistory.filter(
+                    action => action.type !== "trash" || action.blockId !== removed
+                );
+                this.redoActionHistory = this.redoActionHistory.filter(
+                    action => action.type !== "trash" || action.blockId !== removed
+                );
+
+                this.findDragGroup(removed);
+                const evictedGroup = Array.from(this.dragGroup);
+
+                for (let i = 0; i < evictedGroup.length; i++) {
+                    this.disposeBlock(evictedGroup[i]);
+                }
+            }
+        };
+
+        /**
          * Send a stack of blocks to the trash.
          * @param - myBlock
          * @public
@@ -7800,22 +7867,7 @@ class Blocks {
                 this.redoActionHistory = [];
             }
 
-            // Cap the undo history to prevent unbounded memory growth.
-            // Keep the 100 most recent trashed stacks.
-            const MAX_TRASH_UNDO = 100;
-            if (this.trashStacks.length > MAX_TRASH_UNDO) {
-                const removed = this.trashStacks.shift();
-                if (removed !== undefined) {
-                    if (this.trashPreviews[removed]) {
-                        delete this.trashPreviews[removed];
-                    }
-                    this.findDragGroup(removed);
-                    const evictedGroup = Array.from(this.dragGroup);
-                    for (let i = 0; i < evictedGroup.length; i++) {
-                        this.disposeBlock(evictedGroup[i]);
-                    }
-                }
-            }
+            this.trimTrashHistory();
 
             /** Disconnect block. */
             const parentBlock = myBlock.connections[0];

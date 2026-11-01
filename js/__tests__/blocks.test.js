@@ -3133,6 +3133,46 @@ describe("Blocks Foundation", () => {
             expect(callback).not.toHaveBeenCalled();
         });
 
+        it("runAfterLoad calls the failure callback when the load fails partway", async () => {
+            let callCount = 0;
+            const loadError = new Error("deferred chunk failure");
+
+            blocks._processOneBlock = jest.fn((b, blockObjs, blockOffset) => {
+                callCount++;
+
+                if (callCount === 21) {
+                    throw loadError;
+                }
+
+                blocks.blockList[blockOffset + b] = {
+                    connections: null,
+                    trash: false
+                };
+
+                setTimeout(() => blocks.cleanupAfterLoad(), 0);
+            });
+
+            const onWindowError = event => event.preventDefault();
+            window.addEventListener("error", onWindowError);
+
+            const onSuccess = jest.fn();
+            const onFailure = jest.fn();
+
+            try {
+                blocks.loadNewBlocks(makeBatch(25));
+
+                blocks.runAfterLoad(onSuccess, onFailure);
+
+                await new Promise(resolve => setTimeout(resolve, 50));
+            } finally {
+                window.removeEventListener("error", onWindowError);
+            }
+
+            expect(onSuccess).not.toHaveBeenCalled();
+            expect(onFailure).toHaveBeenCalledTimes(1);
+            expect(onFailure).toHaveBeenCalledWith(loadError);
+        });
+
         it("runAfterLoad drops its callbacks when a load fails and a queued one then succeeds", async () => {
             let callCount = 0;
             blocks._processOneBlock = jest.fn((b, blockObjs, blockOffset) => {
@@ -4854,6 +4894,80 @@ describe("Spatial grid indexing", () => {
 
             expect(cellsHolding(0)).toEqual(["0,0"]);
             expect(blocks._getNearbyBlocks(0, 0)).toEqual([0]);
+        });
+
+        it("trims trash history to the newest 100 stacks and disposes evicted stacks", () => {
+            const trimBlocks = new Blocks(mockActivity);
+
+            trimBlocks.trashStacks = Array.from({ length: 102 }, (_, index) => index);
+            trimBlocks.actionHistory = [
+                { type: "trash", blockId: 0 },
+                { type: "trash", blockId: 1 },
+                { type: "trash", blockId: 2 },
+                { type: "move", blockId: 0 }
+            ];
+
+            trimBlocks.redoActionHistory = [
+                { type: "trash", blockId: 0 },
+                { type: "trash", blockId: 2 }
+            ];
+            trimBlocks.trashPreviews = {
+                0: "oldest-preview",
+                1: "second-oldest-preview",
+                2: "retained-preview"
+            };
+
+            trimBlocks.findDragGroup = jest.fn(root => {
+                trimBlocks.dragGroup = [root, root + 1000];
+            });
+            trimBlocks.disposeBlock = jest.fn();
+
+            trimBlocks.trimTrashHistory();
+
+            expect(trimBlocks.trashStacks).toHaveLength(100);
+            expect(trimBlocks.trashStacks[0]).toBe(2);
+            expect(trimBlocks.trashStacks[99]).toBe(101);
+            expect(trimBlocks.actionHistory).toEqual([
+                { type: "trash", blockId: 2 },
+                { type: "move", blockId: 0 }
+            ]);
+
+            expect(trimBlocks.redoActionHistory).toEqual([{ type: "trash", blockId: 2 }]);
+
+            expect(trimBlocks.trashPreviews[0]).toBeUndefined();
+            expect(trimBlocks.trashPreviews[1]).toBeUndefined();
+            expect(trimBlocks.trashPreviews[2]).toBe("retained-preview");
+
+            expect(trimBlocks.findDragGroup).toHaveBeenNthCalledWith(1, 0);
+            expect(trimBlocks.findDragGroup).toHaveBeenNthCalledWith(2, 1);
+
+            expect(trimBlocks.disposeBlock).toHaveBeenCalledWith(0);
+            expect(trimBlocks.disposeBlock).toHaveBeenCalledWith(1000);
+            expect(trimBlocks.disposeBlock).toHaveBeenCalledWith(1);
+            expect(trimBlocks.disposeBlock).toHaveBeenCalledWith(1001);
+        });
+
+        it("keeps retained trash history restorable after trimming", () => {
+            const trimBlocks = new Blocks(mockActivity);
+
+            trimBlocks.trashStacks = Array.from({ length: 101 }, (_, index) => index);
+            trimBlocks.actionHistory = [{ type: "trash", blockId: 100 }];
+
+            trimBlocks.findDragGroup = jest.fn(root => {
+                trimBlocks.dragGroup = [root];
+            });
+            trimBlocks.disposeBlock = jest.fn();
+            trimBlocks.activity._restoreTrashById = jest.fn();
+
+            trimBlocks.trimTrashHistory();
+
+            expect(trimBlocks.trashStacks).toHaveLength(100);
+            expect(trimBlocks.trashStacks).toContain(100);
+
+            trimBlocks.undoAction();
+
+            expect(trimBlocks.activity._restoreTrashById).toHaveBeenCalledWith(100);
+            expect(trimBlocks.redoActionHistory).toEqual([{ type: "trash", blockId: 100 }]);
         });
 
         it("empty-grid fallback also skips an undefined slot, not just a disposed (null) one", () => {

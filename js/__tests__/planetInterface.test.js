@@ -295,7 +295,59 @@ describe("PlanetInterface", () => {
         expect(document.body.style.cursor).toBe("default");
     });
 
-    test("loadProjectFromData forgets the trash and undo history of the replaced project", () => {
+    test("loadProjectFromData defers project replacement while blocks are loading", () => {
+        planetInterface.closePlanet = jest.fn();
+
+        mockActivity.sendAllToTrash.mockClear();
+        mockActivity.blocks.loadNewBlocks.mockClear();
+        mockActivity.blocks.runAfterLoad.mockClear();
+
+        mockActivity.blocks.isLoading.mockReturnValueOnce(true);
+
+        planetInterface.loadProjectFromData(JSON.stringify({ whatever: 1 }), false);
+
+        expect(mockActivity.blocks.runAfterLoad).toHaveBeenCalledTimes(1);
+
+        expect(planetInterface.closePlanet).not.toHaveBeenCalled();
+        expect(mockActivity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(mockActivity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+
+        const [replaceAfterLoad] = mockActivity.blocks.runAfterLoad.mock.calls[0];
+        replaceAfterLoad();
+
+        expect(planetInterface.closePlanet).toHaveBeenCalledTimes(1);
+        expect(mockActivity.sendAllToTrash).toHaveBeenCalledWith(false, true);
+        expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalledWith({ whatever: 1 });
+    });
+
+    test("loadProjectFromData reports failure when a deferred active load fails", () => {
+        planetInterface.closePlanet = jest.fn();
+
+        mockActivity.sendAllToTrash.mockClear();
+        mockActivity.blocks.loadNewBlocks.mockClear();
+        mockActivity.blocks.runAfterLoad.mockClear();
+        mockActivity.errorMsg.mockClear();
+
+        mockActivity.blocks.isLoading.mockReturnValueOnce(true);
+
+        planetInterface.loadProjectFromData(JSON.stringify({ whatever: 1 }), false);
+
+        expect(mockActivity.blocks.runAfterLoad).toHaveBeenCalledTimes(1);
+        expect(mockActivity.sendAllToTrash).not.toHaveBeenCalled();
+
+        const loadError = new Error("active project load failed");
+
+        const [, failAfterLoad] = mockActivity.blocks.runAfterLoad.mock.calls[0];
+
+        failAfterLoad(loadError);
+
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(loadError);
+        expect(planetInterface.closePlanet).not.toHaveBeenCalled();
+        expect(mockActivity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(mockActivity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+    });
+
+    test("loadProjectFromData preserves retained trash and undo history", () => {
         planetInterface.closePlanet = jest.fn();
         mockActivity.blocks.trashStacks = ["3", "7"];
         mockActivity.blocks.actionHistory = [{ type: "trash", blockId: 3 }];
@@ -303,9 +355,9 @@ describe("PlanetInterface", () => {
 
         planetInterface.loadProjectFromData(JSON.stringify([]));
 
-        expect(mockActivity.blocks.trashStacks).toEqual([]);
-        expect(mockActivity.blocks.actionHistory).toEqual([]);
-        expect(mockActivity.blocks.redoActionHistory).toEqual([]);
+        expect(mockActivity.blocks.trashStacks).toEqual(["3", "7"]);
+        expect(mockActivity.blocks.actionHistory).toEqual([{ type: "trash", blockId: 3 }]);
+        expect(mockActivity.blocks.redoActionHistory).toEqual([{ type: "trash", blockId: 7 }]);
     });
 
     test("loadProjectFromData keeps the trash history when merging", () => {

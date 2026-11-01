@@ -1184,7 +1184,19 @@ class ProjectManager {
             }
         };
 
-        const replaceProjectFromFile = async (obj, file, errorOperation, clearCanvas) => {
+        let projectReplacementQueue = Promise.resolve();
+        const performProjectReplacementFromFile = async (
+            obj,
+            file,
+            errorOperation,
+            clearCanvas
+        ) => {
+            if (that.blocks.isLoading()) {
+                await new Promise((resolve, reject) => {
+                    that.blocks.runAfterLoad(resolve, reject);
+                });
+            }
+
             if (that.planet) {
                 try {
                     await that.planet.saveLocally({ rejectOnProjectSaveError: true });
@@ -1225,7 +1237,9 @@ class ProjectManager {
                 const initialization = that.planet
                     ? that.planet.initialiseNewProject(getProjectName(file), false)
                     : null;
+
                 await Promise.all([trashComplete, initialization]);
+
                 loadImportedBlocks(obj, errorOperation);
             } catch (error) {
                 that.stage.removeAllEventListeners("trashsignal");
@@ -1233,6 +1247,16 @@ class ProjectManager {
                 that.errorMsg(_("Cannot load project from the file. Please check the file type."));
                 finishLoading();
             }
+        };
+
+        const replaceProjectFromFile = (obj, file, errorOperation, clearCanvas) => {
+            const replacement = projectReplacementQueue.then(() =>
+                performProjectReplacementFromFile(obj, file, errorOperation, clearCanvas)
+            );
+
+            projectReplacementQueue = replacement.catch(() => {});
+
+            return replacement;
         };
 
         that.fileChooser.addEventListener("click", event => {
@@ -1281,8 +1305,6 @@ class ProjectManager {
                                 for (const name in that.palettes.dict) {
                                     that.palettes.dict[name].hideMenu(true);
                                 }
-
-                                that.stage.removeAllEventListeners("trashsignal");
 
                                 if (!that.merging) {
                                     await replaceProjectFromFile(

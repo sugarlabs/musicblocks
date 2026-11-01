@@ -2038,25 +2038,32 @@ class Activity {
             const dx = 0;
             const dy = this.cellSize * 3;
 
-            // Defer checkBounds during bulk block moves to avoid O(N²)
-            // overhead: each moveBlockRelative call triggers checkBounds()
-            // which scans all blocks, so N moves × N blocks = O(N²).
-            this.blocks._beginDeferCheckBounds();
+            // Snapshot active blocks before deleteActionBlock() can mark related
+            // top-level action-call blocks as trashed during this bulk operation.
+            const activeBlockIds = Object.keys(this.blocks.blockList).filter(blk => {
+                const block = this.blocks.blockList[blk];
+                return block && !block.trash;
+            });
 
-            for (const blk of Object.keys(this.blocks.blockList)) {
-                const myBlock = this.blocks.blockList[blk];
-                // Blocks already in the trash were recorded when they were trashed.
-                if (!myBlock || myBlock.trash) continue;
+            for (const blk of activeBlockIds) {
+                const block = this.blocks.blockList[blk];
 
-                // If this block is at the top of a stack, push it
-                // onto the trashStacks list.
-                if (this.blocks.blockList[blk].connections[0] === null) {
+                if (block.connections[0] === null) {
                     const preview = this.blocks.captureStackPreview(blk);
                     if (preview) {
                         this.blocks.trashPreviews[blk] = preview;
                     }
                     this.blocks.trashStacks.push(blk);
                 }
+            }
+
+            // Defer checkBounds during bulk block moves to avoid O(N²)
+            // overhead: each moveBlockRelative call triggers checkBounds()
+            // which scans all blocks, so N moves × N blocks = O(N²).
+            this.blocks._beginDeferCheckBounds();
+            for (const blk of activeBlockIds) {
+                const myBlock = this.blocks.blockList[blk];
+                if (!myBlock) continue;
 
                 if (
                     this.blocks.blockList[blk].name === "start" ||
@@ -2111,6 +2118,7 @@ class Activity {
             }
 
             this.blocks._endDeferCheckBounds();
+            this.blocks.trimTrashHistory();
 
             if (addStartBlock) {
                 this.blocks.loadNewBlocks(DATAOBJS);

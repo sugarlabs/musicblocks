@@ -25,7 +25,7 @@ const openTimbre = () => {
         const { blocks } = win.ActivityContext.getActivity();
         const fullyLoaded =
             blocks._loadCounter === 0 &&
-            blocks.blockList.some(block => !block.trash && block.name === "timbre");
+            blocks.blockList.some(block => block && !block.trash && block.name === "timbre");
         stableObservations = fullyLoaded ? stableObservations + 1 : 0;
         expect(
             stableObservations,
@@ -113,14 +113,14 @@ describe("Timbre widget", { testIsolation: true }, () => {
                 const { blocks } = win.ActivityContext.getActivity();
                 expect(blocks._loadCounter).to.equal(0);
                 const synthIndex = blocks.blockList.findIndex(
-                    block => !block.trash && block.name === value.toLowerCase()
+                    block => block && !block.trash && block.name === value.toLowerCase()
                 );
                 expect(synthIndex, "selected synth block exists").to.be.at.least(0);
                 const parentIndex = blocks.blockList[synthIndex].connections[0];
                 expect(parentIndex, "synth is connected inside the timbre clamp").not.to.be.null;
                 expect(blocks.blockList[parentIndex].connections).to.include(synthIndex);
                 const timbreIndex = blocks.blockList.findIndex(
-                    block => !block.trash && block.name === "timbre"
+                    block => block && !block.trash && block.name === "timbre"
                 );
                 expect(timbreIndex, "fixture timbre block exists").to.be.at.least(0);
                 const clampFlow = new Set();

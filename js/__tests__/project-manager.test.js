@@ -2764,6 +2764,7 @@ describe("_setupFileHandlers inner callbacks", () => {
             )
         };
         let projectData = "latest original data";
+        const replacementOrder = [];
         const saveLocally = jest.fn(() => {
             storage["SESSION" + storage.currentProject] = projectData;
         });
@@ -2774,6 +2775,7 @@ describe("_setupFileHandlers inner callbacks", () => {
         const blocks = {
             ...makeActivity().blocks,
             loadNewBlocks: jest.fn(() => {
+                replacementOrder.push("load-import");
                 projectData = "new imported data";
                 return 7;
             })
@@ -2786,7 +2788,13 @@ describe("_setupFileHandlers inner callbacks", () => {
             saveSessionAsync,
             sessionStorageManager
         });
-        activity.sendAllToTrash = jest.fn(() => stage.dispatchEvent("trashsignal"));
+        activity.blocks.trashStacks = ["0"];
+        activity.blocks.actionHistory = [{ type: "trash", blockId: 0 }];
+        activity.blocks.redoActionHistory = [{ type: "restore", blockId: 0 }];
+        activity.sendAllToTrash = jest.fn(() => {
+            replacementOrder.push("send-to-trash");
+            stage.dispatchEvent("trashsignal");
+        });
         const handlers = captureHandlers(activity);
         const pm = new ProjectManager(activity);
         pm._setupFileHandlers();
@@ -2794,6 +2802,11 @@ describe("_setupFileHandlers inner callbacks", () => {
         activity.fileChooser.files = [{ name: "student-song.tb" }];
         handlers.change();
         await jest.advanceTimersByTimeAsync(200);
+        expect(replacementOrder).toEqual(["send-to-trash", "load-import"]);
+
+        expect(activity.blocks.trashStacks).toEqual(["0"]);
+        expect(activity.blocks.actionHistory).toEqual([{ type: "trash", blockId: 0 }]);
+        expect(activity.blocks.redoActionHistory).toEqual([{ type: "restore", blockId: 0 }]);
 
         expect(storage["SESSIONOriginal Project"]).toBe("latest original data");
         expect(storage.currentProject).toBe("student-song 3");
@@ -2808,6 +2821,478 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(saveSessionAsync).toHaveBeenCalledTimes(2);
         expect(saveLocally).not.toHaveBeenCalled();
         expect(activity.loading).toBe(false);
+    });
+
+    it("defers local project replacement while blocks are loading", async () => {
+        origFileReader = global.FileReader;
+
+        class MockFR {
+            constructor() {
+                this.result = '[[0,"start",0,0,[]]]';
+                this.onload = null;
+            }
+
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+
+            readAsArrayBuffer() {}
+        }
+
+        global.FileReader = MockFR;
+
+        const listeners = {};
+        const stage = {
+            update: jest.fn(),
+            addEventListener: jest.fn((event, listener) => {
+                listeners[event] = listener;
+            }),
+            removeAllEventListeners: jest.fn(event => {
+                delete listeners[event];
+            }),
+            dispatchEvent: jest.fn(event => listeners[event]?.())
+        };
+
+        const replacementOrder = [];
+
+        const storage = {
+            "currentProject": "Original Project",
+            "SESSIONOriginal Project": "original data"
+        };
+
+        const sessionStorageManager = {
+            loadSession: jest.fn(() => Promise.resolve(null))
+        };
+
+        const blocks = {
+            ...makeActivity().blocks,
+            isLoading: jest.fn(() => true),
+            runAfterLoad: jest.fn(),
+            loadNewBlocks: jest.fn(() => {
+                replacementOrder.push("load-import");
+                return 7;
+            })
+        };
+
+        const activity = makeActivity({
+            stage,
+            storage,
+            blocks,
+            saveLocally: jest.fn(),
+            saveSessionAsync: jest.fn().mockResolvedValue(),
+            sessionStorageManager
+        });
+
+        activity.sendAllToTrash = jest.fn(() => {
+            replacementOrder.push("send-to-trash");
+            stage.dispatchEvent("trashsignal");
+        });
+
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "student-song.tb" }];
+
+        handlers.change();
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(activity.blocks.runAfterLoad).toHaveBeenCalledTimes(1);
+
+        expect(activity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+        expect(replacementOrder).toEqual([]);
+
+        const [replaceAfterLoad] = activity.blocks.runAfterLoad.mock.calls[0];
+
+        activity.blocks.isLoading.mockReturnValue(false);
+
+        replaceAfterLoad();
+
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(replacementOrder).toEqual(["send-to-trash", "load-import"]);
+    });
+
+    it("settles deferred local project replacement when the active load fails", async () => {
+        origFileReader = global.FileReader;
+
+        class MockFR {
+            constructor() {
+                this.result = '[[0,"start",0,0,[]]]';
+                this.onload = null;
+            }
+
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+
+            readAsArrayBuffer() {}
+        }
+
+        global.FileReader = MockFR;
+
+        const stage = {
+            update: jest.fn(),
+            addEventListener: jest.fn(),
+            removeAllEventListeners: jest.fn()
+        };
+
+        const storage = {
+            "currentProject": "Original Project",
+            "SESSIONOriginal Project": "original data"
+        };
+
+        const sessionStorageManager = {
+            loadSession: jest.fn(() => Promise.resolve(null))
+        };
+
+        const blocks = {
+            ...makeActivity().blocks,
+            isLoading: jest.fn(() => true),
+            runAfterLoad: jest.fn(),
+            loadNewBlocks: jest.fn()
+        };
+
+        const activity = makeActivity({
+            stage,
+            storage,
+            blocks,
+            saveLocally: jest.fn(),
+            saveSessionAsync: jest.fn().mockResolvedValue(),
+            sessionStorageManager
+        });
+
+        activity.sendAllToTrash = jest.fn();
+        activity.errorMsg = jest.fn();
+
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "student-song.tb" }];
+
+        handlers.change();
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(activity.blocks.runAfterLoad).toHaveBeenCalledTimes(1);
+
+        const [, failAfterLoad] = activity.blocks.runAfterLoad.mock.calls[0];
+
+        expect(typeof failAfterLoad).toBe("function");
+
+        const loadError = new Error("active project load failed");
+
+        failAfterLoad(loadError);
+
+        await jest.advanceTimersByTimeAsync(0);
+
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Cannot load project from the file. Please check the file type."
+        );
+
+        expect(activity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+        expect(activity.loading).toBe(false);
+    });
+
+    it("serializes multiple local project replacements deferred during block loading", async () => {
+        origFileReader = global.FileReader;
+
+        class MockFR {
+            constructor() {
+                this.result = '[[0,"start",0,0,[]]]';
+                this.onload = null;
+            }
+
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+
+            readAsArrayBuffer() {}
+        }
+
+        global.FileReader = MockFR;
+
+        const listeners = {};
+        const stage = {
+            update: jest.fn(),
+            addEventListener: jest.fn((event, listener) => {
+                listeners[event] = listener;
+            }),
+            removeAllEventListeners: jest.fn(event => {
+                delete listeners[event];
+            }),
+            dispatchEvent: jest.fn(event => listeners[event]?.())
+        };
+
+        const storage = {
+            "currentProject": "Original Project",
+            "SESSIONOriginal Project": "original data"
+        };
+
+        const sessionStorageManager = {
+            loadSession: jest.fn(() => Promise.resolve(null))
+        };
+
+        const replacementOrder = [];
+
+        const blocks = {
+            ...makeActivity().blocks,
+            isLoading: jest.fn(() => true),
+            runAfterLoad: jest.fn(),
+            loadNewBlocks: jest.fn(() => {
+                replacementOrder.push("load-import");
+                return 7;
+            })
+        };
+
+        let resolveFirstSave;
+        const firstSave = new Promise(resolve => {
+            resolveFirstSave = resolve;
+        });
+
+        const saveSessionAsync = jest
+            .fn()
+            .mockImplementationOnce(() => firstSave)
+            .mockResolvedValue(undefined);
+
+        const activity = makeActivity({
+            stage,
+            storage,
+            blocks,
+            saveLocally: jest.fn(),
+            saveSessionAsync,
+            sessionStorageManager
+        });
+
+        activity.sendAllToTrash = jest.fn(() => {
+            replacementOrder.push("send-to-trash");
+            stage.dispatchEvent("trashsignal");
+        });
+
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "first-project.tb" }];
+        handlers.change();
+        await jest.advanceTimersByTimeAsync(200);
+
+        activity.fileChooser.files = [{ name: "second-project.tb" }];
+        handlers.change();
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(activity.blocks.runAfterLoad).toHaveBeenCalledTimes(1);
+
+        const [firstAfterLoad] = activity.blocks.runAfterLoad.mock.calls[0];
+
+        activity.blocks.isLoading.mockReturnValue(false);
+
+        firstAfterLoad();
+        await Promise.resolve();
+
+        expect(saveSessionAsync).toHaveBeenCalledTimes(1);
+
+        // The second replacement must remain queued while the first one's save
+        // is still pending.
+        expect(activity.blocks.runAfterLoad).toHaveBeenCalledTimes(1);
+
+        resolveFirstSave();
+
+        await Promise.resolve();
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(saveSessionAsync).toHaveBeenCalledTimes(2);
+        expect(replacementOrder).toEqual([
+            "send-to-trash",
+            "load-import",
+            "send-to-trash",
+            "load-import"
+        ]);
+    });
+
+    it("continues queued local project replacement after the first save fails", async () => {
+        origFileReader = global.FileReader;
+
+        class MockFR {
+            constructor() {
+                this.result = '[[0,"start",0,0,[]]]';
+                this.onload = null;
+            }
+
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+
+            readAsArrayBuffer() {}
+        }
+
+        global.FileReader = MockFR;
+
+        const listeners = {};
+        const stage = {
+            update: jest.fn(),
+            addEventListener: jest.fn((event, listener) => {
+                listeners[event] = listener;
+            }),
+            removeAllEventListeners: jest.fn(event => {
+                delete listeners[event];
+            }),
+            dispatchEvent: jest.fn(event => listeners[event]?.())
+        };
+
+        const storage = {
+            "currentProject": "Original Project",
+            "SESSIONOriginal Project": "original data"
+        };
+
+        const sessionStorageManager = {
+            loadSession: jest.fn(() => Promise.resolve(null))
+        };
+
+        const replacementOrder = [];
+
+        const blocks = {
+            ...makeActivity().blocks,
+            isLoading: jest.fn(() => true),
+            runAfterLoad: jest.fn(),
+            loadNewBlocks: jest.fn(() => {
+                replacementOrder.push("load-import");
+                return 7;
+            })
+        };
+
+        let rejectFirstSave;
+        const firstSave = new Promise((resolve, reject) => {
+            rejectFirstSave = reject;
+        });
+
+        const saveSessionAsync = jest
+            .fn()
+            .mockImplementationOnce(() => firstSave)
+            .mockResolvedValue(undefined);
+
+        const activity = makeActivity({
+            stage,
+            storage,
+            blocks,
+            saveLocally: jest.fn(),
+            saveSessionAsync,
+            sessionStorageManager
+        });
+
+        activity.sendAllToTrash = jest.fn(() => {
+            replacementOrder.push("send-to-trash");
+            stage.dispatchEvent("trashsignal");
+        });
+
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "first-project.tb" }];
+        handlers.change();
+        await jest.advanceTimersByTimeAsync(200);
+
+        activity.fileChooser.files = [{ name: "second-project.tb" }];
+        handlers.change();
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(activity.blocks.runAfterLoad).toHaveBeenCalledTimes(1);
+
+        const [firstAfterLoad] = activity.blocks.runAfterLoad.mock.calls[0];
+
+        activity.blocks.isLoading.mockReturnValue(false);
+
+        firstAfterLoad();
+        await Promise.resolve();
+
+        expect(saveSessionAsync).toHaveBeenCalledTimes(1);
+
+        const saveError = new Error("first save failed");
+        rejectFirstSave(saveError);
+
+        await Promise.resolve();
+        await Promise.resolve();
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(saveSessionAsync).toHaveBeenCalledTimes(2);
+        expect(replacementOrder).toEqual(["send-to-trash", "load-import"]);
+    });
+
+    it("preserves the active trashsignal listener when another replacement is queued", async () => {
+        origFileReader = global.FileReader;
+
+        class MockFR {
+            constructor() {
+                this.result = '[[0,"start",0,0,[]]]';
+                this.onload = null;
+            }
+
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+
+            readAsArrayBuffer() {}
+        }
+
+        global.FileReader = MockFR;
+
+        const listeners = {};
+        const stage = {
+            update: jest.fn(),
+            addEventListener: jest.fn((event, listener) => {
+                listeners[event] = listener;
+            }),
+            removeAllEventListeners: jest.fn(event => {
+                delete listeners[event];
+            }),
+            dispatchEvent: jest.fn(event => listeners[event]?.())
+        };
+
+        const blocks = {
+            ...makeActivity().blocks,
+            isLoading: jest.fn(() => false),
+            loadNewBlocks: jest.fn(() => 7)
+        };
+
+        const activity = makeActivity({
+            stage,
+            blocks,
+            saveLocally: jest.fn(),
+            saveSessionAsync: jest.fn().mockResolvedValue(),
+            sessionStorageManager: {
+                loadSession: jest.fn(() => Promise.resolve(null))
+            }
+        });
+
+        activity.sendAllToTrash = jest.fn();
+
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "first-project.tb" }];
+        handlers.change();
+
+        await jest.advanceTimersByTimeAsync(200);
+        await Promise.resolve();
+
+        expect(activity.sendAllToTrash).toHaveBeenCalledTimes(1);
+
+        const firstTrashListener = listeners.trashsignal;
+
+        expect(typeof firstTrashListener).toBe("function");
+
+        activity.fileChooser.files = [{ name: "second-project.tb" }];
+        handlers.change();
+
+        await jest.advanceTimersByTimeAsync(200);
+        await Promise.resolve();
+
+        expect(listeners.trashsignal).toBe(firstTrashListener);
     });
 
     it("change handler aborts local replacement when the IndexedDB save fails", async () => {
