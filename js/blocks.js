@@ -2041,17 +2041,81 @@ class Blocks {
             const start = window.__ENABLE_REFRESH_PROFILING__ ? performance.now() : 0;
 
             let onScreen = true;
+            const stackRectangles = [];
             for (const block of this.blockList) {
                 if (!block || block.trash) continue;
+
                 if (block.connections[0] === null) {
-                    if (block.offScreen(this.boundary)) {
-                        this.activity.setHomeContainers(true);
-                        /** Just highlight the button. */
-                        /** this.boundary.show(); */
-                        onScreen = false;
-                        break;
+                    const stackBlocks = [block];
+                    const visited = new Set([this.blockList.indexOf(block)]);
+                    for (let i = 0; i < stackBlocks.length; i++) {
+                        for (const connection of stackBlocks[i].connections) {
+                            if (connection === null || visited.has(connection)) continue;
+                            const connectedBlock = this.blockList[connection];
+                            if (!connectedBlock || connectedBlock.trash) continue;
+                            visited.add(connection);
+                            stackBlocks.push(connectedBlock);
+                        }
+                    }
+
+                    const bounds = stackBlocks
+                        .map(stackBlock => {
+                            if (
+                                !stackBlock.container ||
+                                typeof stackBlock.container.getBounds !== "function"
+                            ) {
+                                return null;
+                            }
+                            const blockBounds = stackBlock.container.getBounds();
+                            const width =
+                                blockBounds.width || stackBlock.width || stackBlock.hitWidth || 0;
+                            const height =
+                                blockBounds.height ||
+                                stackBlock.height ||
+                                stackBlock.hitHeight ||
+                                0;
+                            return {
+                                left: stackBlock.container.x + blockBounds.x,
+                                top: stackBlock.container.y + blockBounds.y,
+                                right: stackBlock.container.x + blockBounds.x + width,
+                                bottom: stackBlock.container.y + blockBounds.y + height
+                            };
+                        })
+                        .filter(Boolean)
+                        .reduce(
+                            (stackBounds, blockBounds) => ({
+                                left: Math.min(stackBounds.left, blockBounds.left),
+                                top: Math.min(stackBounds.top, blockBounds.top),
+                                right: Math.max(stackBounds.right, blockBounds.right),
+                                bottom: Math.max(stackBounds.bottom, blockBounds.bottom)
+                            }),
+                            {
+                                left: Infinity,
+                                top: Infinity,
+                                right: -Infinity,
+                                bottom: -Infinity
+                            }
+                        );
+
+                    if (bounds.left !== Infinity) {
+                        stackRectangles.push({
+                            x: bounds.left - 4,
+                            y: bounds.top - 4,
+                            width: bounds.right - bounds.left + 8,
+                            height: bounds.bottom - bounds.top + 8
+                        });
                     }
                 }
+
+                if (block.offScreen(this.boundary)) {
+                    this.activity.setHomeContainers(true);
+                    this.boundary.show();
+                    onScreen = false;
+                }
+            }
+
+            if (typeof this.boundary.showBlockHighlights === "function") {
+                this.boundary.showBlockHighlights(stackRectangles);
             }
 
             if (onScreen) {
