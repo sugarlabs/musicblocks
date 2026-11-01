@@ -656,6 +656,43 @@ describe("PracticeValidator pitch octaves", () => {
         expect(PracticeValidator.hasChangedPitchOctave([4, 4])).toBe(true);
     });
 
+    test("adding a note in an octave the starter already uses is not a move", () => {
+        useBlocks({
+            ...pitchAtOctave("p1", 4),
+            ...pitchAtOctave("p2", 4),
+            ...pitchAtOctave("p3", 4)
+        });
+
+        expect(PracticeValidator.hasChangedPitchOctave([4, 4])).toBe(false);
+    });
+
+    test("deleting a note is not a move", () => {
+        useBlocks(pitchAtOctave("p1", 4));
+
+        expect(PracticeValidator.hasChangedPitchOctave([4, 4])).toBe(false);
+    });
+
+    test("a note added in an octave the starter never used counts", () => {
+        useBlocks({
+            ...pitchAtOctave("p1", 4),
+            ...pitchAtOctave("p2", 4),
+            ...pitchAtOctave("p3", 5)
+        });
+
+        expect(PracticeValidator.hasChangedPitchOctave([4, 4])).toBe(true);
+    });
+
+    test("moving a note between octaves the starter already uses counts", () => {
+        useBlocks({
+            ...pitchAtOctave("p1", 3),
+            ...pitchAtOctave("p2", 4),
+            ...pitchAtOctave("p3", 5),
+            ...pitchAtOctave("p4", 5)
+        });
+
+        expect(PracticeValidator.hasChangedPitchOctave([3, 4, 4, 5])).toBe(true);
+    });
+
     test("without a baseline, anything other than octave four counts", () => {
         useBlocks(pitchAtOctave("p1", 5));
 
