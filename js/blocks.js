@@ -1599,7 +1599,10 @@ class Blocks {
                         oldBlock
                     ]);
                 }
-            } else if (this.blockList[parentblk].name === "pitch") {
+            } else if (
+                this.blockList[parentblk].name === "pitch" ||
+                this.blockList[parentblk].name === "custompitch"
+            ) {
                 cblk = this.blockList[parentblk].connections[2];
                 if (cblk === null) {
                     /**
@@ -1639,10 +1642,18 @@ class Blocks {
                     ]);
                 }
 
+                // Only standard "pitch" blocks automatically restore a solfege/notename
+                // placeholder when their note slot is disconnected. Other blocks such as
+                // "custompitch" intentionally leave an open dock so users can drop arbitrary
+                // expressions or custom note blocks into slot 1.
+                if (this.blockList[parentblk].name !== "pitch") {
+                    return;
+                }
+
                 const oblk = this.blockList[parentblk].connections[1];
                 if (oblk === null) {
                     /**
-                     * Restore the name (solfege/notename/etc.) placeholder for the
+                     * Restore the name (solfege/notename/customNote/etc.) placeholder for the
                      * pitch block's first argument slot. Capture the future block index
                      * now so the postProcess closure is immune to the list growing
                      * further before execution.
@@ -1652,11 +1663,15 @@ class Blocks {
                         const parentblk = args[0];
                         const value = args[1];
                         const blk = args[2];
+                        const customID = args[3];
 
                         this.blockList[parentblk].connections[1] = blk;
 
                         const pitch = value;
                         this.blockList[blk].value = pitch;
+                        if (customID) {
+                            this.blockList[blk].customID = customID;
+                        }
                         if (this.blockList[blk].name === "eastindiansolfege") {
                             const obj = splitSolfege(pitch);
                             let label = WESTERN2EISOLFEGENAMES[obj[0]];
@@ -1678,8 +1693,9 @@ class Blocks {
 
                     // When the removed block was itself in the name slot, mirror its
                     // type in the replacement placeholder (e.g. notename → notename,
-                    // eastindiansolfege → eastindiansolfege). When the block came from
-                    // the octave slot (a number), fall back to the default "solfege".
+                    // eastindiansolfege → eastindiansolfege, customNote → customNote).
+                    // When the block came from the octave slot (a number), fall back
+                    // to the default "solfege".
                     let newBlockName = "solfege";
                     let newBlockValue = "sol";
                     switch (this.blockList[oldBlock].name) {
@@ -1695,6 +1711,10 @@ class Blocks {
                             newBlockName = this.blockList[oldBlock].name;
                             newBlockValue = "G";
                             break;
+                        case "customNote":
+                            newBlockName = this.blockList[oldBlock].name;
+                            newBlockValue = this.blockList[oldBlock].value || "C(+0¢)";
+                            break;
                         default:
                             break;
                     }
@@ -1702,7 +1722,8 @@ class Blocks {
                     this._makeNewBlockWithConnections(newBlockName, 0, [parentblk], postProcess, [
                         parentblk,
                         newBlockValue,
-                        nameBlkIdx
+                        nameBlkIdx,
+                        this.blockList[oldBlock].customID
                     ]);
                 }
             } else if (this.blockList[parentblk].name === "storein") {
@@ -5240,6 +5261,9 @@ class Blocks {
                             ) {
                                 valObj.manualAccidental = myBlock.manualAccidental;
                             }
+                            if (myBlock.customID !== undefined && myBlock.customID !== null) {
+                                valObj.customID = myBlock.customID;
+                            }
                             blockItem = [b, [myBlock.name, valObj], x, y, []];
                             break;
                         }
@@ -6772,6 +6796,9 @@ class Blocks {
                             if (info && info.manualAccidental !== undefined) {
                                 that.blockList[thisBlock].manualAccidental = info.manualAccidental;
                             }
+                            if (info && info.customID !== undefined) {
+                                that.blockList[thisBlock].customID = info.customID;
+                            }
                             that.updateBlockText(thisBlock);
                         };
 
@@ -7708,6 +7735,9 @@ class Blocks {
                     }
 
                     block.value = action.oldValue;
+                    if (action.oldCustomID !== undefined) {
+                        block.customID = action.oldCustomID;
+                    }
                     if (action.oldText !== null && block.text) {
                         block.text.text = action.oldText;
                     }
@@ -7760,6 +7790,9 @@ class Blocks {
                     }
 
                     block.value = action.newValue;
+                    if (action.newCustomID !== undefined) {
+                        block.customID = action.newCustomID;
+                    }
                     if (action.newText !== null && block.text) {
                         block.text.text = action.newText;
                     }
