@@ -261,15 +261,16 @@ function setupWidgetBlocks(activity) {
         const numeratorBlock = blockList[beatValueConnections?.[1]];
         const denominatorBlock = blockList[beatValueConnections?.[2]];
 
-        // A plain number beat value, such as 0.25, is as good as 1 / 4. A beat value of 0 or
-        // less would schedule the beats 0 ms apart.
+        // A divide needs both operands. Any other beat value, such as 0.25 or 0 + 0.25, is
+        // checked by the value it evaluated to. A beat value of 0 or less would schedule the
+        // beats 0 ms apart.
         const hasBeatValue =
-            beatValueBlock?.name === "number"
-                ? typeof beatValueBlock.value === "number" && beatValueBlock.value > 0
-                : typeof numeratorBlock?.value === "number" &&
+            beatValueBlock?.name === "divide"
+                ? typeof numeratorBlock?.value === "number" &&
                   numeratorBlock.value > 0 &&
                   typeof denominatorBlock?.value === "number" &&
-                  denominatorBlock.value > 0;
+                  denominatorBlock.value > 0
+                : typeof beatValueBlock?.value === "number" && beatValueBlock.value > 0;
 
         return meterBlock && typeof beatCountBlock?.value === "number" && hasBeatValue;
     }

@@ -651,8 +651,26 @@ describe("setupWidgetBlocks", () => {
             expect(logo.insideMeterWidget).toBe(false);
         });
 
+        it("opens the widget for a beat value of 0 + 0.25", () => {
+            openMeterWidget({
+                3: { name: "plus", value: 0.25, connections: [1, 4, 5] },
+                4: { name: "number", value: 0 },
+                5: { name: "number", value: 0.25 }
+            });
+
+            expect(global.MeterWidget).toHaveBeenCalledTimes(1);
+        });
+
         it.each([
             ["is 0", { 3: { name: "number", value: 0, connections: [1] } }],
+            [
+                "is 1 - 1",
+                {
+                    3: { name: "minus", value: 0, connections: [1, 4, 5] },
+                    4: { name: "number", value: 1 },
+                    5: { name: "number", value: 1 }
+                }
+            ],
             [
                 "is 0 / 4",
                 {
@@ -1461,7 +1479,7 @@ describe("setupWidgetBlocks", () => {
                 activity.blocks.blockList = {
                     1: { connections: [null, 2, 3] },
                     2: { value: 4 },
-                    3: { connections: [null, 4, 5] },
+                    3: { name: "divide", connections: [null, 4, 5] },
                     4: { value: 1 },
                     5: { value: 4 }
                 };
@@ -1484,7 +1502,7 @@ describe("setupWidgetBlocks", () => {
             activity.blocks.blockList = {
                 1: { connections: [null, 2, 3] },
                 2: { value: 4 },
-                3: { connections: [null, 4, 5] },
+                3: { name: "divide", connections: [null, 4, 5] },
                 4: { value: 1 },
                 5: { value: 4 }
             };
@@ -1518,7 +1536,7 @@ describe("setupWidgetBlocks", () => {
             activity.blocks.blockList = {
                 1: { connections: [null, 2, 3] },
                 2: { value: 4 },
-                3: { connections: [null, 4, 5] },
+                3: { name: "divide", connections: [null, 4, 5] },
                 4: { value: 1 },
                 5: { value: 4 }
             };
