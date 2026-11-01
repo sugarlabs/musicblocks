@@ -926,4 +926,153 @@ describe("MathUtility", () => {
             expect(MathUtility.doNegate("abc")).toBe("cba");
         });
     });
+
+    describe("doLerp", () => {
+        test("returns start value when amt is 0", () => {
+            expect(MathUtility.doLerp(10, 20, 0)).toBe(10);
+        });
+
+        test("returns stop value when amt is 1", () => {
+            expect(MathUtility.doLerp(10, 20, 1)).toBe(20);
+        });
+
+        test("returns midpoint when amt is 0.5", () => {
+            expect(MathUtility.doLerp(10, 20, 0.5)).toBe(15);
+        });
+
+        test("supports extrapolation when amt is outside [0, 1]", () => {
+            expect(MathUtility.doLerp(0, 10, 1.5)).toBe(15);
+            expect(MathUtility.doLerp(0, 10, -0.5)).toBe(-5);
+        });
+
+        test("handles negative ranges", () => {
+            expect(MathUtility.doLerp(-10, 10, 0.5)).toBe(0);
+            expect(MathUtility.doLerp(-20, -10, 0.5)).toBe(-15);
+        });
+
+        test("throws NanError for invalid or NaN inputs", () => {
+            expect(() => MathUtility.doLerp(NaN, 10, 0.5)).toThrow("NanError");
+            expect(() => MathUtility.doLerp(0, NaN, 0.5)).toThrow("NanError");
+            expect(() => MathUtility.doLerp(0, 10, NaN)).toThrow("NanError");
+            expect(() => MathUtility.doLerp("0", 10, 0.5)).toThrow("NanError");
+        });
+    });
+
+    describe("doMap", () => {
+        test("maps value from one range to another", () => {
+            expect(MathUtility.doMap(5, 0, 10, 0, 100)).toBe(50);
+            expect(MathUtility.doMap(0, 0, 10, 100, 200)).toBe(100);
+            expect(MathUtility.doMap(10, 0, 10, 100, 200)).toBe(200);
+        });
+
+        test("handles negative and inverted ranges", () => {
+            expect(MathUtility.doMap(0, -10, 10, 0, 100)).toBe(50);
+            expect(MathUtility.doMap(5, 0, 10, 100, 0)).toBe(50);
+        });
+
+        test("throws DivByZeroError when inMin equals inMax", () => {
+            expect(() => MathUtility.doMap(5, 10, 10, 0, 100)).toThrow("DivByZeroError");
+        });
+
+        test("throws NanError for invalid or NaN inputs", () => {
+            expect(() => MathUtility.doMap(NaN, 0, 10, 0, 100)).toThrow("NanError");
+            expect(() => MathUtility.doMap(5, NaN, 10, 0, 100)).toThrow("NanError");
+            expect(() => MathUtility.doMap(5, 0, NaN, 0, 100)).toThrow("NanError");
+            expect(() => MathUtility.doMap(5, 0, 10, NaN, 100)).toThrow("NanError");
+            expect(() => MathUtility.doMap(5, 0, 10, 0, NaN)).toThrow("NanError");
+            expect(() => MathUtility.doMap("5", 0, 10, 0, 100)).toThrow("NanError");
+        });
+    });
+
+    describe("doGcd", () => {
+        test("computes greatest common divisor of positive integers", () => {
+            expect(MathUtility.doGcd(12, 18)).toBe(6);
+            expect(MathUtility.doGcd(17, 13)).toBe(1);
+            expect(MathUtility.doGcd(24, 60)).toBe(12);
+        });
+
+        test("handles zero values", () => {
+            expect(MathUtility.doGcd(0, 5)).toBe(5);
+            expect(MathUtility.doGcd(5, 0)).toBe(5);
+            expect(MathUtility.doGcd(0, 0)).toBe(0);
+        });
+
+        test("handles negative integers and decimals", () => {
+            expect(MathUtility.doGcd(-12, 18)).toBe(6);
+            expect(MathUtility.doGcd(-12, -18)).toBe(6);
+            expect(MathUtility.doGcd(12.8, 18.2)).toBe(6);
+        });
+
+        test("throws NanError for invalid or NaN inputs", () => {
+            expect(() => MathUtility.doGcd(NaN, 12)).toThrow("NanError");
+            expect(() => MathUtility.doGcd(12, NaN)).toThrow("NanError");
+            expect(() => MathUtility.doGcd("12", 18)).toThrow("NanError");
+            expect(() => MathUtility.doGcd(null, 18)).toThrow("NanError");
+            expect(() => MathUtility.doGcd(Infinity, 12)).toThrow("NanError");
+            expect(() => MathUtility.doGcd(12, Infinity)).toThrow("NanError");
+            expect(() => MathUtility.doGcd(-Infinity, 12)).toThrow("NanError");
+            expect(() => MathUtility.doGcd(12, -Infinity)).toThrow("NanError");
+        });
+    });
+
+    describe("doLcm", () => {
+        test("computes least common multiple of positive integers", () => {
+            expect(MathUtility.doLcm(4, 6)).toBe(12);
+            expect(MathUtility.doLcm(3, 5)).toBe(15);
+            expect(MathUtility.doLcm(7, 7)).toBe(7);
+        });
+
+        test("returns 0 if either input is 0", () => {
+            expect(MathUtility.doLcm(0, 5)).toBe(0);
+            expect(MathUtility.doLcm(5, 0)).toBe(0);
+            expect(MathUtility.doLcm(0, 0)).toBe(0);
+        });
+
+        test("handles negative integers and decimals", () => {
+            expect(MathUtility.doLcm(-4, 6)).toBe(12);
+            expect(MathUtility.doLcm(-4, -6)).toBe(12);
+            expect(MathUtility.doLcm(4.9, 6.1)).toBe(12);
+        });
+
+        test("avoids intermediate overflow for large numbers", () => {
+            expect(MathUtility.doLcm(1e155, 1e155)).toBe(1e155);
+        });
+
+        test("throws NanError for invalid or NaN inputs", () => {
+            expect(() => MathUtility.doLcm(NaN, 6)).toThrow("NanError");
+            expect(() => MathUtility.doLcm(4, NaN)).toThrow("NanError");
+            expect(() => MathUtility.doLcm("4", 6)).toThrow("NanError");
+            expect(() => MathUtility.doLcm(null, 6)).toThrow("NanError");
+            expect(() => MathUtility.doLcm(Infinity, 6)).toThrow("NanError");
+            expect(() => MathUtility.doLcm(4, Infinity)).toThrow("NanError");
+            expect(() => MathUtility.doLcm(-Infinity, 6)).toThrow("NanError");
+            expect(() => MathUtility.doLcm(4, -Infinity)).toThrow("NanError");
+        });
+    });
+
+    describe("fallback when GCD is not available", () => {
+        let isolatedMathUtility;
+
+        beforeAll(() => {
+            jest.isolateModules(() => {
+                const origGCD = global.GCD;
+                delete global.GCD;
+                jest.doMock("../utils-logic", () => ({}), { virtual: true });
+                isolatedMathUtility = require("../mathutils");
+                if (origGCD !== undefined) global.GCD = origGCD;
+            });
+        });
+
+        test("doGcd computes GCD via local Euclidean algorithm when _GCD is unavailable", () => {
+            expect(isolatedMathUtility.doGcd(12, 18)).toBe(6);
+            expect(isolatedMathUtility.doGcd(0, 5)).toBe(5);
+            expect(isolatedMathUtility.doGcd(5, 0)).toBe(5);
+            expect(isolatedMathUtility.doGcd(0, 0)).toBe(0);
+        });
+
+        test("doLcm computes LCM when _GCD is unavailable", () => {
+            expect(isolatedMathUtility.doLcm(4, 6)).toBe(12);
+            expect(isolatedMathUtility.doLcm(0, 5)).toBe(0);
+        });
+    });
 });
