@@ -76,6 +76,7 @@ global.SOLFEGENAMES1 = musicUtils.SOLFEGENAMES1;
 global.NOTENAMES1 = musicUtils.NOTENAMES1;
 global.getInterval = musicUtils.getInterval;
 global.edoTransposition = musicUtils.edoTransposition;
+global.edoTranspositionCents = musicUtils.edoTranspositionCents;
 global.noteIsSolfege = musicUtils.noteIsSolfege;
 global.getSolfege = musicUtils.getSolfege;
 global.last = array => (array && array.length > 0 ? array[array.length - 1] : null);
@@ -1220,7 +1221,7 @@ describe("processPitch intervals, chords and register by temperament", () => {
     const saved = {};
 
     beforeEach(() => {
-        for (const name of ["getNote", "getCurrentEDO", "getTemperament"]) {
+        for (const name of ["getNote", "getCurrentEDO", "getTemperament", "pitchToFrequency"]) {
             saved[name] = global[name];
             global[name] = musicUtils[name];
         }
@@ -1280,6 +1281,31 @@ describe("processPitch intervals, chords and register by temperament", () => {
         turtleMock.singer.arpeggioIndex = 0;
         Singer.processPitch(activityMock, "C", 4, 0, 0, 0);
         expect(played(0)).toEqual(["E4"]);
+    });
+
+    test("half a semitone sounds 50 cents above C4 in 19 EDO", () => {
+        turtleMock.singer.transposition = 0.5;
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 0);
+        const base = musicUtils.pitchToFrequency("C", 4, 0, "C major", "equal19");
+        expect(1200 * Math.log2(turtleMock.singer.noteHertz[0][0] / base)).toBeCloseTo(50, 6);
+    });
+
+    test("a whole semitone stays on its step in 19 EDO", () => {
+        turtleMock.singer.transposition = 1;
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 0);
+        expect(turtleMock.singer.noteCents[0]).toEqual([0]);
+    });
+
+    test("a note's own cents still win over a fractional transposition", () => {
+        turtleMock.singer.transposition = 0.5;
+        Singer.processPitch(activityMock, "C", 4, 10, 0, 0);
+        expect(turtleMock.singer.noteCents[0]).toEqual([10]);
+    });
+
+    test("a rest gets no cents from a fractional transposition", () => {
+        turtleMock.singer.transposition = 0.5;
+        Singer.processPitch(activityMock, "rest", 4, 0, 0, 0);
+        expect(turtleMock.singer.noteCents[0]).toEqual([0]);
     });
 
     test("register 1 plays C4 as C5 in 19 EDO", () => {

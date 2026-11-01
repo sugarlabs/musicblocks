@@ -26,7 +26,7 @@
    deleteTemperamentFromList, addTemperamentToDictionary, updateTemperaments,
    isCustomTemperament, temperamentHasRatios, isTrueEDO, isEquallyTempered,
    isNonEDO, getTemperamentRatio, getTemperamentCents, getTemperamentName,
-   getEffectiveOctaveRatio, edoTransposition,
+   getEffectiveOctaveRatio, edoTransposition, edoTranspositionCents,
    MusicUtilsTemperament
  */
 
@@ -1442,6 +1442,23 @@ var edoTransposition = (semitones, steps, edo) => {
     return [Math.round((semitones * edo) / 12) + steps, true];
 };
 
+/**
+ * A fraction of a semitone rarely lands on a step outside 12 EDO, so edoTransposition
+ * rounds it to the nearest step. This is the part that rounding lost, in the cents
+ * pitchToFrequency takes outside 12 EDO: hundredths of a step. Whole semitones stay on
+ * the nearest step, so they have nothing to add.
+ * @param {Number} semitones - the transposition in semitones
+ * @param {Number} edo - the number of steps per octave
+ * @returns {Number} the cents to add to the rounded step
+ */
+var edoTranspositionCents = (semitones, edo) => {
+    if (edo === 12 || Number.isInteger(semitones)) {
+        return 0;
+    }
+    const steps = (semitones * edo) / 12;
+    return (steps - Math.round(steps)) * 100;
+};
+
 var MusicUtilsTemperament = {
     getCurrentEDO,
     EDO_NOTE_NAMES,
@@ -1473,7 +1490,8 @@ var MusicUtilsTemperament = {
     getTemperamentRatio,
     getTemperamentCents,
     getTemperamentName,
-    edoTransposition
+    edoTransposition,
+    edoTranspositionCents
 };
 
 if (typeof module !== "undefined" && module.exports) {

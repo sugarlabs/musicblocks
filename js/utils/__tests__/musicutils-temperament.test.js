@@ -253,6 +253,47 @@ describe("musicutils-temperament", () => {
         });
     });
 
+    describe("edoTranspositionCents", () => {
+        const { edoTransposition, edoTranspositionCents } = temperament;
+
+        test("adds nothing in 12 EDO or for whole semitones", () => {
+            expect(edoTranspositionCents(0.5, 12)).toBe(0);
+            expect(edoTranspositionCents(4, 19)).toBe(0);
+            expect(edoTranspositionCents(0, 19)).toBe(0);
+        });
+
+        test.each([
+            ["equal19", 19, 0.5],
+            ["equal19", 19, 1.5],
+            ["equal19", 19, -0.5],
+            ["equal19", 19, 0.25],
+            ["equal31", 31, 0.25],
+            ["equal31", 31, -1.5]
+        ])("%s (%i EDO): the note sounds exactly %d semitones above C4", (name, edo, semitones) => {
+            const [steps, inSteps] = edoTransposition(semitones, 0, edo);
+            const [note, octave] = musicutils.getNote(
+                "C",
+                4,
+                steps,
+                "C major",
+                false,
+                null,
+                null,
+                name,
+                inSteps
+            );
+            const hertz = musicutils.pitchToFrequency(
+                note,
+                octave,
+                edoTranspositionCents(semitones, edo),
+                "C major",
+                name
+            );
+            const base = musicutils.pitchToFrequency("C", 4, 0, "C major", name);
+            expect(1200 * Math.log2(hertz / base)).toBeCloseTo(semitones * 100, 6);
+        });
+    });
+
     describe("what musicutils.js still exports", () => {
         it("re-exports the same tables and functions", () => {
             for (const name of [

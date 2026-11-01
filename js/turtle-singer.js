@@ -26,6 +26,7 @@
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
    noteToFrequency, getTemperament,
    SEMITONES, normalizeNoteAccidentals, parseNoteString, getCurrentEDO, edoTransposition,
+   edoTranspositionCents,
    keySignatureToMode, getSavedCustomModes,
    clampNumber, saveMeterState, restoreMeterState
  */
@@ -38,7 +39,7 @@
         frequencyToPitch, pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp, getStepSizeDown,
         numberToPitch, pitchToNumber, noteIsSolfege, getSolfege, SOLFEGENAMES1, NOTENAMES1,
         SOLFEGECONVERSIONTABLE, getInterval, noteToFrequency, getTemperament,
-        getCurrentEDO, isEquallyTempered, edoTransposition
+        getCurrentEDO, isEquallyTempered, edoTransposition, edoTranspositionCents
     js/utils/musicutils-rhythm.js
         saveMeterState, restoreMeterState
     js/utils/utils.js
@@ -1460,6 +1461,12 @@ class Singer {
                     activity.logo.synth.inTemperament,
                     pitchTransformInSteps
                 );
+
+                // Keep the part of a fractional transposition lost to rounding.
+                const transformCents = edoTranspositionCents(atrans, edo);
+                if (transformCents !== 0 && noteObj[0] !== "R") {
+                    noteObj = [noteObj[0], noteObj[1], noteObj[2] + transformCents];
+                }
 
                 // Apply ratio transposition:
                 // (1) convert note to Hertz
