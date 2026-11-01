@@ -64,6 +64,7 @@
                     { property: "type", value: "AwaitExpression" },
                     { property: "argument.type", value: "CallExpression" },
                     { property: "argument.callee.type", value: "MemberExpression" },
+                    { property: "argument.callee.object.name", value: "mouse" },
                     { property: "argument.callee.property.name", value: "getDict" },
                     { property: "argument.arguments", size: 1 }
                 ],
