@@ -2473,6 +2473,32 @@ describe("Blocks Foundation", () => {
                 expect(savedModes()).toEqual([other, { name: "Zelda", ...zelda }]);
             });
 
+            it("replaces a saved mode whose name differs only in case", () => {
+                localStorage.setItem(
+                    "customModes",
+                    JSON.stringify([{ name: "zelda", pattern: [2, 2, 1, 2, 2, 2, 1], edo: 12 }])
+                );
+
+                open(setKey("Zelda", zelda));
+
+                expect(MUSICALMODES.zelda).toEqual(zelda.pattern);
+                expect(savedModes()).toEqual([{ name: "Zelda", ...zelda }]);
+            });
+
+            it("tells the user when storage is full but still plays the mode", () => {
+                const setItem = jest.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+                    throw new Error("QuotaExceededError");
+                });
+
+                open(setKey("Zelda", zelda));
+
+                expect(MUSICALMODES.Zelda).toEqual(zelda.pattern);
+                expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                    "Could not save the custom mode. Local storage is full or unavailable."
+                );
+                setItem.mockRestore();
+            });
+
             it("does not write storage again when the mode is already saved", () => {
                 localStorage.setItem("customModes", JSON.stringify([{ name: "Zelda", ...zelda }]));
                 const setItem = jest.spyOn(Storage.prototype, "setItem");
@@ -2502,9 +2528,13 @@ describe("Blocks Foundation", () => {
                 open(setKey("Zelda", { pattern: [1, 3, 1, 2, 1, 2, 2], edo: 19 }));
                 open(setKey("Odd", { pattern: [1.5, 10.5] }));
                 open(setKey("__proto__", { pattern: [12] }));
+                open(setKey("Huge", { pattern: [1000000], edo: 1000000 }));
+                open(setKey("Tiny", { pattern: [1, 1, 1], edo: 3 }));
 
                 expect(MUSICALMODES.Zelda).toBeUndefined();
                 expect(MUSICALMODES.Odd).toBeUndefined();
+                expect(MUSICALMODES.Huge).toBeUndefined();
+                expect(MUSICALMODES.Tiny).toBeUndefined();
                 expect(Object.getPrototypeOf(MUSICALMODES)).toBe(Object.prototype);
                 expect(savedModes()).toEqual([]);
             });

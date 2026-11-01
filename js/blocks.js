@@ -5350,7 +5350,13 @@ class Blocks {
                 }
 
                 const edo = pattern.reduce((a, b) => a + b, 0);
-                if (customMode.edo !== undefined && customMode.edo !== edo) continue;
+                if (
+                    edo < 5 ||
+                    edo > 55 ||
+                    (customMode.edo !== undefined && customMode.edo !== edo)
+                ) {
+                    continue;
+                }
 
                 saved ??= getSavedCustomModes();
                 const lower = name.toLowerCase();
@@ -5366,7 +5372,7 @@ class Blocks {
                 if (typeof customMode.temperamentKey === "string") {
                     mode.temperamentKey = customMode.temperamentKey;
                 }
-                const i = saved.findIndex(m => m.name === name);
+                const i = saved.findIndex(m => m.name.toLowerCase() === lower);
                 if (i < 0 || JSON.stringify(saved[i]) !== JSON.stringify(mode)) {
                     saved[i < 0 ? saved.length : i] = mode;
                     changed = true;
@@ -5380,7 +5386,9 @@ class Blocks {
                 try {
                     localStorage.setItem("customModes", JSON.stringify(saved));
                 } catch (e) {
-                    console.debug("Could not save custom modes:", e);
+                    this.activity.errorMsg(
+                        _("Could not save the custom mode. Local storage is full or unavailable.")
+                    );
                 }
             }
         };
