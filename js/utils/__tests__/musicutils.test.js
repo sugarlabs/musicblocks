@@ -2169,6 +2169,18 @@ describe("GetNotesForInterval", () => {
             octave: 0
         });
     });
+
+    it("falls back to the octave number difference for names that are not letters", () => {
+        const tur = {
+            singer: {
+                noteStatus: null,
+                notePitches: { 1: ["sol", "do"] },
+                noteOctaves: { 1: [4, 5] },
+                inNoteBlock: [1]
+            }
+        };
+        expect(GetNotesForInterval(tur).octave).toBe(1);
+    });
 });
 
 describe("base64Encode", () => {
