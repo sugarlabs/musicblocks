@@ -175,7 +175,7 @@ jobs:
               run: npm run build --if-present
 
     # ----------------------------------------------------------------------
-    # Jest unit tests + coverage threshold + Codecov upload
+    # Jest unit tests + coverage + Codecov upload
     # ----------------------------------------------------------------------
     test:
         name: Jest tests & coverage
@@ -202,15 +202,14 @@ jobs:
                   fi
               shell: bash
 
-            # Coverage thresholds are enforced inside Jest (coverageThreshold in
-            # your Jest config), so this step fails the job if coverage drops
-            # below the configured minimums.
+            # There is no fixed coverage minimum here. coverage-delta.yml fails the
+            # pull request if coverage drops by more than 0.1 percentage points.
             - name: Run Jest with coverage
               run: npm test -- --coverage --ci
 
             # Upload to Codecov for the PR-vs-base coverage diff + status check.
             # NOTE: secrets (CODECOV_TOKEN) are NOT available to pull_request runs
-            # originating from forks. The threshold enforcement above still runs
+            # originating from forks. The Jest step above still runs
             # on every PR; only the upload is skipped on forks. fail_ci_if_error
             # is false so a flaky/absent upload never blocks the PR.
             - name: Upload coverage to Codecov

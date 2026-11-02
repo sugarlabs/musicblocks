@@ -138,29 +138,21 @@ Open `coverage/lcov-report/index.html` in a browser to explore line-by-line cove
 
 > **Note:** The `coverage/` directory is listed in `.gitignore` and should never be committed.
 
-### Current Threshold Policy
+### Coverage Policy
 
-The `coverageThreshold` in `jest.config.js` enforces minimum global coverage. If any metric drops below its threshold, `jest --coverage` exits with a non-zero code and the CI build fails.
+There is no fixed coverage minimum in `jest.config.js`. Instead, the Coverage delta workflow (`.github/workflows/coverage-delta.yml`) runs on pull requests to `master`, except Renovate's:
 
-| Metric     | Minimum |
-| ---------- | ------- |
-| Statements | 34 %    |
-| Branches   | 29 %    |
-| Functions  | 41 %    |
-| Lines      | 34 %    |
+1. It measures coverage on the base commit and on the pull request merged with the base, in separate jobs.
+2. It compares statements, branches, functions and lines between the two.
+3. The **Coverage delta vs base** check fails if any of them drops by more than 0.1 percentage points. The comparison table is printed in that job's log.
 
-These thresholds are intentionally kept as a ratchet — they should only go **up** as new tests are added, never down.
+The check also fails if either measurement job fails, for example because of a failing Jest test. If it fails, look at those jobs before assuming that coverage dropped.
 
-### How CI Posts Coverage on PRs
+So a pull request that adds code should also add tests for it, or overall coverage will drop.
 
-The GitHub Actions workflow (`.github/workflows/pr-jest-tests.yml`) runs on every pull request:
+### How CI Reports Coverage on PRs
 
-1. Checks out the PR head commit and runs `npm test -- --coverage`.
-2. Reads `coverage/coverage-summary.json` to extract per-metric percentages.
-3. Posts a comment on the PR with the coverage summary and pass/fail status.
-4. If any test fails, the comment lists the failing test files.
-
-You can check the latest coverage numbers directly in the PR comment without downloading the CI logs.
+The main CI workflow (`.github/workflows/ci.yml`) runs `npm test -- --coverage --ci` and uploads the result to Codecov, which posts a coverage report on the pull request. A failed upload does not fail the job.
 
 ## 🎯 Contribution Guidelines
 
