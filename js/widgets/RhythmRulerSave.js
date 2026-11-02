@@ -692,7 +692,7 @@ class RhythmRulerSave {
             const selectedRuler = this.Rulers[r];
             noteValues = selectedRuler[0];
             for (let i = 0; i < noteValues.length; i++) {
-                t += 1 / noteValues[i];
+                t += 1 / Math.abs(noteValues[i]);
                 if (!rList.includes(t)) {
                     rList.push(t);
                 }

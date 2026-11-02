@@ -56,6 +56,30 @@ describe("RhythmRulerSave", () => {
         }
     });
 
+    describe("_mergeRulers", () => {
+        test.each([
+            ["a leading rest", [[-4, 4, 4, 4]]],
+            ["a middle rest", [[4, -4, 4, 4]]],
+            ["a trailing rest", [[4, 4, 4, -4]]],
+            ["only rests", [[-4, -4, -4, -4]]],
+            [
+                "overlapping notes and rests",
+                [
+                    [-2, 2],
+                    [4, -4, 4, 4]
+                ]
+            ],
+            ["notes without rests", [[4, 4, 4, 4]]]
+        ])("preserves beat boundaries with %s", (_description, rulers) => {
+            const widget = { Rulers: rulers.map(values => [values, []]) };
+
+            const merged = RhythmRulerSave.prototype._mergeRulers.call(widget);
+
+            expect(merged).toEqual([4, 4, 4, 4]);
+            expect(merged.reduce((duration, value) => duration + 1 / value, 0)).toBe(1);
+        });
+    });
+
     describe("_saveTupletsMerged", () => {
         beforeEach(() => {
             global._ = text => text;
@@ -88,6 +112,33 @@ describe("RhythmRulerSave", () => {
             expect(stack[rhythms[1][0] + 1][1]).toEqual(["number", { value: 1 }]);
             expect(stack[rhythms[1][0] + 4][1]).toEqual(["number", { value: 8 }]);
             expect(global.activity.textMsg).toHaveBeenCalled();
+        });
+
+        test("exports the full duration of a ruler containing a rest", () => {
+            const loadNewBlocks = jest.fn();
+            const widget = {
+                activity: {
+                    palettes: { dict: {} },
+                    refreshCanvas: jest.fn(),
+                    blocks: { loadNewBlocks }
+                },
+                Rulers: [[[4, -4, 4, 4], []]]
+            };
+
+            const merged = RhythmRulerSave.prototype._mergeRulers.call(widget);
+            RhythmRulerSave.prototype._saveTupletsMerged.call(widget, merged);
+
+            const stack = loadNewBlocks.mock.calls[0][0];
+            const rhythms = stack.filter(block => block[1] === "rhythm2");
+            const duration = rhythms.reduce((total, block) => {
+                const count = stack[block[4][1]][1][1].value;
+                const fraction = stack[block[4][2]][4];
+                const numerator = stack[fraction[1]][1][1].value;
+                const denominator = stack[fraction[2]][1][1].value;
+                return total + (count * numerator) / denominator;
+            }, 0);
+            expect(duration).toBe(1);
+            expect(rhythms).toHaveLength(1);
         });
     });
 
