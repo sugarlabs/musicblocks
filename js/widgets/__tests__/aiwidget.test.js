@@ -277,6 +277,41 @@ describe("AIWidget Instance", () => {
         expect(mockActivity.logo.synth.loadSynth).toHaveBeenCalled();
     });
 
+    it("connects the meter block to the first generated note block", async () => {
+        const tune = {
+            lines: [
+                {
+                    staff: [
+                        {
+                            meter: { value: [{ num: 4, den: 4 }] },
+                            key: { root: "C", mode: "", accidentals: [] },
+                            voices: [
+                                [
+                                    {
+                                        el_type: "note",
+                                        duration: 0.25,
+                                        pitches: [{ name: "C", pitch: 0 }]
+                                    }
+                                ]
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        aiWidget.activity = mockActivity;
+        await aiWidget._parseABC(tune);
+
+        const generatedBlocks = mockActivity.blocks.loadNewBlocks.mock.calls[0][0];
+        const meterBlock = generatedBlocks.find(block => block[1] === "meter");
+        const firstNoteBlock = generatedBlocks.find(
+            block => Array.isArray(block[1]) && block[1][0] === "newnote"
+        );
+
+        expect(meterBlock[4][3]).toBe(firstNoteBlock[0]);
+    });
+
     it("should retain both pitch analysers after initialization", () => {
         aiWidget.init(mockActivity);
 

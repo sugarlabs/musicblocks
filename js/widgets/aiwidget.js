@@ -480,7 +480,7 @@ function AIWidget() {
                 continue;
             }
 
-            const firstNoteBlockId = baseBlocks[0][0][0];
+            const firstNoteBlockId = baseBlocks[0][0][0][0];
 
             // Find the meter block to connect it to the first note
             const meterBlock = startBlockArray.find(b => b[1] === "meter" || b[1][0] === "meter");
