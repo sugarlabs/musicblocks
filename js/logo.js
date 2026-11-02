@@ -1415,33 +1415,69 @@ class Logo {
      * @returns {void}
      */
     doBreak(turtle) {
+        if (!turtle || !Array.isArray(turtle.queue)) {
+            return;
+        }
+
         // Look for a parent loopBlock in queue and set its count to 1
         let parentLoopBlock = null;
         let loopBlkIdx = -1;
 
         const queueLength = turtle.queue.length;
         for (let i = queueLength - 1; i > -1; i--) {
-            if (
-                ["forever", "repeat", "while", "until"].includes(
-                    this.blockList[turtle.queue[i].blk].name
-                )
-            ) {
+            const queueEntry = turtle.queue[i];
+            if (!queueEntry) {
+                continue;
+            }
+
+            const blkName =
+                queueEntry.blk !== null &&
+                queueEntry.blk !== undefined &&
+                this.blockList &&
+                this.blockList[queueEntry.blk] !== undefined &&
+                this.blockList[queueEntry.blk] !== null
+                    ? this.blockList[queueEntry.blk].name
+                    : null;
+            const parentBlkName =
+                queueEntry.parentBlk !== null &&
+                queueEntry.parentBlk !== undefined &&
+                this.blockList &&
+                this.blockList[queueEntry.parentBlk] !== undefined &&
+                this.blockList[queueEntry.parentBlk] !== null
+                    ? this.blockList[queueEntry.parentBlk].name
+                    : null;
+
+            if (["forever", "repeat", "while", "until"].includes(blkName)) {
                 // while or until
-                loopBlkIdx = turtle.queue[i].blk;
+                loopBlkIdx = queueEntry.blk;
                 parentLoopBlock = this.blockList[loopBlkIdx];
-                // Flush the parent from the queue
-                turtle.queue.splice(i, 1);
-                break;
-            } else if (
-                ["forever", "repeat", "while", "until"].includes(
-                    this.blockList[turtle.queue[i].parentBlk].name
-                )
-            ) {
+            } else if (["forever", "repeat", "while", "until"].includes(parentBlkName)) {
                 // repeat or forever
-                loopBlkIdx = turtle.queue[i].parentBlk;
+                loopBlkIdx = queueEntry.parentBlk;
                 parentLoopBlock = this.blockList[loopBlkIdx];
-                // Flush the parent from the queue
-                turtle.queue.splice(i, 1);
+            }
+
+            if (parentLoopBlock) {
+                // Flush the parent from the queue and any downstream blocks in this loop
+                // to stop the loop immediately without executing remaining iteration blocks.
+                while (turtle.queue.length > i) {
+                    const popped = turtle.queue.pop();
+                    if (
+                        popped &&
+                        turtle.endOfClampSignals &&
+                        popped.blk in turtle.endOfClampSignals
+                    ) {
+                        while (turtle.endOfClampSignals[popped.blk].length > 0) {
+                            const signal = turtle.endOfClampSignals[popped.blk].pop();
+                            if (signal !== null && signal !== undefined && this.stage) {
+                                this.stage.dispatchEvent(signal);
+                            }
+                        }
+                    }
+                    if (typeof Queue !== "undefined" && typeof Queue.recycle === "function") {
+                        Queue.recycle(popped);
+                    }
+                }
                 break;
             }
         }
@@ -1449,19 +1485,37 @@ class Logo {
         // eslint-disable-next-line eqeqeq
         if (parentLoopBlock == null) {
             // Flush the child flow
-            turtle.queue.pop();
+            if (turtle.queue.length > 0) {
+                const popped = turtle.queue.pop();
+                if (typeof Queue !== "undefined" && typeof Queue.recycle === "function") {
+                    Queue.recycle(popped);
+                }
+            }
             return;
+        }
+
+        if (turtle.parentFlowQueue && Array.isArray(turtle.parentFlowQueue)) {
+            const pIdx = turtle.parentFlowQueue.lastIndexOf(loopBlkIdx);
+            if (pIdx !== -1) {
+                turtle.parentFlowQueue.splice(pIdx);
+            }
+        }
+        if (turtle.unhighlightQueue && loopBlkIdx !== -1) {
+            turtle.unhighlightQueue.push(loopBlkIdx);
         }
 
         // For while and until, we need to add any childflow from the parent to the queue
         if (parentLoopBlock.name === "while" || parentLoopBlock.name === "until") {
-            const childFlow = this.deps.utils.last(parentLoopBlock.connections);
+            const connections = parentLoopBlock.connections;
+            const childFlow = connections ? this.deps.utils.last(connections) : null;
             // eslint-disable-next-line eqeqeq
             if (childFlow != null) {
                 const queueBlock = new Queue(childFlow, 1, loopBlkIdx);
                 // We need to keep track of the parent block to the child flow so we can
-                // unlightlight the parent block after the child flow completes
-                turtle.parentFlowQueue.push(loopBlkIdx);
+                // unhighlight the parent block after the child flow completes
+                if (turtle.parentFlowQueue) {
+                    turtle.parentFlowQueue.push(loopBlkIdx);
+                }
                 turtle.queue.push(queueBlock);
             }
         }
