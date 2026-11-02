@@ -198,6 +198,32 @@ describe("musicutils-temperament", () => {
         });
     });
 
+    describe("generateNoteNames with an invalid EDO", () => {
+        it("falls back to the 12-EDO names instead of hanging", () => {
+            for (const edo of [Infinity, -Infinity, NaN, 12.5, 0, -3, 10000, "19"]) {
+                expect(temperament.generateNoteNames(edo)).toEqual(temperament.SHARP_NAMES);
+                expect(temperament.generateNoteNames(edo)).toHaveLength(12);
+            }
+        });
+
+        it("does not cache the fallback under the invalid key", () => {
+            temperament.generateNoteNames(Infinity);
+            expect(temperament.EDO_NOTE_NAMES[Infinity]).toBeUndefined();
+        });
+
+        it("keeps ordinary EDO tables unchanged", () => {
+            expect(temperament.generateNoteNames(12)).toHaveLength(12);
+            expect(temperament.generateNoteNames(19)).toHaveLength(19);
+            expect(temperament.generateNoteNames(5)).toEqual(["C", "D", "E", "G", "A"]);
+        });
+
+        it("keeps delegates returning promptly for a non-finite EDO", () => {
+            expect(temperament.getEdoNoteNamePosition("C", Infinity)).toBe(0);
+            expect(temperament.getEdoNoteNamePosition("C♯", Infinity)).toBe(1);
+            expect(temperament.getEdoNoteNamePosition("C4", Infinity)).toBe(-1);
+        });
+    });
+
     describe("what musicutils.js still exports", () => {
         it("re-exports the same tables and functions", () => {
             for (const name of [
