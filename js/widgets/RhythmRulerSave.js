@@ -608,7 +608,7 @@ class RhythmRulerSave {
                                 "repeat",
                                 0,
                                 0,
-                                [previousBlock, idx + 1, idx + 2, idx + 11]
+                                [previousBlock, idx + 1, idx + 2, idx + (noteValue < 0 ? 10 : 11)]
                             ]);
                             previousBlock = idx;
                         }
