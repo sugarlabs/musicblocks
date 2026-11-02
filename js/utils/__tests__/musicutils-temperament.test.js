@@ -222,6 +222,29 @@ describe("musicutils-temperament", () => {
             expect(temperament.getEdoNoteNamePosition("C♯", Infinity)).toBe(1);
             expect(temperament.getEdoNoteNamePosition("C4", Infinity)).toBe(-1);
         });
+
+        it("normalises an invalid EDO to 12 and leaves valid ones alone", () => {
+            for (const edo of [Infinity, -Infinity, NaN, 12.5, 0, -3, 257, "19", undefined]) {
+                expect(temperament.normalizeEDO(edo)).toBe(12);
+            }
+            for (const edo of [1, 5, 12, 19, 256]) {
+                expect(temperament.normalizeEDO(edo)).toBe(edo);
+            }
+        });
+
+        it("resolves flat spellings through the 12-EDO fallback for an invalid EDO", () => {
+            // D♭ is not in the sharp name table, so this only resolves
+            // when the enharmonic/proportional fallbacks also see the
+            // normalised 12; with the raw bad EDO it returned NaN.
+            for (const edo of [Infinity, NaN, 0, 12.5, 257]) {
+                expect(temperament.getEdoNoteNamePosition("D♭", edo)).toBe(1);
+                expect(temperament.getEdoNoteNamePosition("D♭", edo)).toBe(
+                    temperament.getEdoNoteNamePosition("D♭", 12)
+                );
+            }
+            // A valid non-12 EDO keeps its own table.
+            expect(temperament.getEdoNoteNamePosition("D♭", 19)).toBe(2);
+        });
     });
 
     describe("what musicutils.js still exports", () => {

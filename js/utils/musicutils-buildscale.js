@@ -68,6 +68,7 @@ if (typeof module !== "undefined" && module.exports) {
         TEMPERAMENT,
         isEquallyTempered,
         getCurrentEDO,
+        normalizeEDO,
         generateNoteNames,
         getEdoNoteNamePosition,
         getTemperament,
@@ -168,6 +169,12 @@ var buildScale = (keySignature, edo) => {
             currentEDO = getCurrentEDO(globalActivity.logo.synth.inTemperament);
         }
     }
+    // A truthy but invalid EDO (Infinity, 257, 12.5, ...) slips past the
+    // falsy guard above: generateNoteNames would fall back to the 12-EDO
+    // names while getModePattern still scaled the steps for the bad EDO,
+    // producing undefined notes and NaN steps. Normalise the resolved
+    // value so the name table and the step pattern always agree.
+    currentEDO = normalizeEDO(currentEDO);
 
     if (currentEDO === 12) {
         // FIX ME: temporary hard-coded fix to avoid errors in pitch preview

@@ -18,7 +18,7 @@
 /*
    exported
 
-   getCurrentEDO, EDO_NOTE_NAMES, SHARP_NAMES, generateNoteNames,
+   getCurrentEDO, EDO_NOTE_NAMES, SHARP_NAMES, normalizeEDO, generateNoteNames,
    getEdoNoteNamePosition, octaveRatio, INITIALTEMPERAMENTS, TEMPERAMENTS,
    PreDefinedTemperaments, INTERVAL_CENTS, INTERVAL_ORDER, TEMPERAMENT,
    setOctaveRatio, getOctaveRatio, ratioToWheelAngle, getTemperamentsList,
@@ -62,6 +62,24 @@ var getCurrentEDO = temperament => {
     return t && t.pitchNumber ? t.pitchNumber : 12;
 };
 
+/**
+ * Normalises an EDO value to one the note/scale math can use.
+ *
+ * Valid EDOs (integers from 1 to 256) pass through unchanged. Anything
+ * else — non-finite, non-integer, below 1, or above 256 — falls back to
+ * the standard 12, the same fallback getCurrentEDO uses for an unknown
+ * temperament. Every entry point that accepts an EDO from a caller
+ * (generateNoteNames, getEdoNoteNamePosition, getModePattern and
+ * buildScale) runs its value through here first, so a single bad value
+ * cannot hang a loop, throw on an array length, or leak NaN steps into
+ * a scale downstream.
+ * @param {number} edo - number of steps per octave
+ * @returns {number} a valid EDO, or 12 for an invalid one
+ */
+var normalizeEDO = edo => {
+    return Number.isInteger(edo) && edo >= 1 && edo <= 256 ? edo : 12;
+};
+
 var EDO_NOTE_NAMES = {};
 
 var SHARP_NAMES = [
@@ -99,19 +117,15 @@ var SHARP_NAMES = [
  * @returns {string[]} array of note names, length = edo
  */
 function generateNoteNames(edo) {
-    // An EDO with no note table must not reach the step distribution
-    // below: Infinity yields an infinite sharp count and the
-    // name-building loop never terminates, and an absurdly large
-    // finite value would allocate a huge table with ever-longer
-    // accidental strings (built-in temperaments top out at 31
-    // divisions, so 256 leaves ample headroom). Fall back to the
-    // standard 12-EDO names, the same fallback getCurrentEDO uses
-    // for an unknown temperament, so every caller keeps a usable
-    // table. The fallback is deliberately not cached under the bad
-    // key.
-    if (!Number.isInteger(edo) || edo < 1 || edo > 256) {
-        return SHARP_NAMES;
-    }
+    // An invalid EDO must not reach the step distribution below:
+    // Infinity yields an infinite sharp count and the name-building
+    // loop never terminates, and an absurdly large finite value would
+    // allocate a huge table with ever-longer accidental strings
+    // (built-in temperaments top out at 31 divisions, so 256 leaves
+    // ample headroom). Normalising first gives every caller the
+    // standard 12-EDO table instead, and the fallback is never cached
+    // under the bad key — only under 12.
+    edo = normalizeEDO(edo);
 
     if (EDO_NOTE_NAMES[edo]) {
         return EDO_NOTE_NAMES[edo];
@@ -209,6 +223,12 @@ function generateNoteNames(edo) {
  * @returns {number} position in the EDO name table, or -1 if not found
  */
 function getEdoNoteNamePosition(name, edo) {
+    // Normalise first: generateNoteNames already falls back to the
+    // 12-EDO table for a bad EDO, but the enharmonic checks below key
+    // off `edo === 12` and the proportional fallback divides by the
+    // EDO, so an unnormalised Infinity or NaN would still return NaN.
+    edo = normalizeEDO(edo);
+
     const normalizedName = name
         .replaceAll("#", SHARP)
         .replaceAll("b", FLAT)
@@ -1442,6 +1462,7 @@ var MusicUtilsTemperament = {
     getCurrentEDO,
     EDO_NOTE_NAMES,
     SHARP_NAMES,
+    normalizeEDO,
     generateNoteNames,
     getEdoNoteNamePosition,
     INITIALTEMPERAMENTS,

@@ -45,7 +45,7 @@ if (typeof module !== "undefined" && module.exports) {
     var MusicUtilsTemperament =
         (typeof window !== "undefined" && window.MusicUtilsTemperament) ||
         (typeof require !== "undefined" ? require("./musicutils-temperament") : {});
-    var { getTemperament } = MusicUtilsTemperament;
+    var { getTemperament, normalizeEDO } = MusicUtilsTemperament;
     var MusicUtilsPitch =
         (typeof window !== "undefined" && window.MusicUtilsPitch) ||
         (typeof require !== "undefined" ? require("./musicutils-pitch") : {});
@@ -956,6 +956,11 @@ var PITCH_COLLECTIONS_EDO_OVERRIDES = {};
  * @returns {Array} Integer step pattern.
  */
 var getModePattern = (mode, edo = 12) => {
+    // Normalise first: scalePatternToEDO turns a bad EDO into NaN
+    // steps, and the custom branch below sizes an array with it, so
+    // an invalid EDO passed straight here (bypassing generateNoteNames)
+    // would still break or throw. A bad value means the 12-EDO pattern.
+    edo = normalizeEDO(edo);
     if (typeof mode !== "string") {
         return scalePatternToEDO(MUSICALMODES.major, edo);
     }

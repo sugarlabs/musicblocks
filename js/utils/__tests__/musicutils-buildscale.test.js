@@ -99,6 +99,25 @@ describe("musicutils-buildscale", () => {
         // it must now return promptly through the 12-EDO fallback.
         expect(buildscale.getModeLength("C major", Infinity)).toBe(7);
         expect(buildscale.buildScale("C major", Infinity)[0][0]).toBe("C");
+        // Downstream of generateNoteNames, a bad EDO must give the full
+        // 12-EDO scale and steps: previously "C major" with Infinity
+        // returned undefined notes with NaN steps, and "C custom" threw
+        // a RangeError from getModePattern.
+        for (const edo of [Infinity, -Infinity, NaN, 12.5, 0, 257]) {
+            expect(buildscale.buildScale("C major", edo)).toEqual(
+                buildscale.buildScale("C major", 12)
+            );
+            expect(buildscale.buildScale("C custom", edo)).toEqual(
+                buildscale.buildScale("C custom", 12)
+            );
+            expect(buildscale.getModeLength("C major", edo)).toBe(7);
+        }
+        // Valid EDOs are unchanged, boundaries included.
+        expect(buildscale.buildScale("C major", 19)).toEqual([
+            ["C", "D", "E", "F", "G", "A", "B", "C"],
+            [3, 3, 2, 3, 3, 3, 2]
+        ]);
+        expect(buildscale.buildScale("C major", 256)[1].reduce((a, b) => a + b, 0)).toBe(256);
         expect(buildscale.scaleDegreeToPitchMapping("C major", 2, false, null)).toBe("D");
         expect(buildscale.scaleDegreeToPitchMapping("C major", 1, true, null)).toBe("C");
         expect(buildscale.nthDegreeToPitch("C major", 3)).toEqual(["E", 0]);
