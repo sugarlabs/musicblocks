@@ -48,6 +48,18 @@ describe("munsell", () => {
             expect(interpColor(undefined, "#123456", 0.5)).toBe("rgba(18, 52, 86, 1)");
             expect(interpColor("#123456", undefined, 0.5)).toBe("rgba(18, 52, 86, 1)");
         });
+
+        it("should return undefined when both colors are undefined or null", () => {
+            expect(interpColor(undefined, undefined, 0.5)).toBeUndefined();
+            expect(interpColor(null, null, 0.5)).toBeUndefined();
+            expect(interpColor(undefined, undefined, 0)).toBeUndefined();
+            expect(interpColor(undefined, undefined, 1)).toBeUndefined();
+        });
+
+        it("should handle null color inputs gracefully", () => {
+            expect(interpColor(null, "#ff0000", 0.5)).toBe("rgba(255, 0, 0, 1)");
+            expect(interpColor("#00ff00", null, 0.5)).toBe("rgba(0, 255, 0, 1)");
+        });
     });
 
     describe("getMunsellColor", () => {

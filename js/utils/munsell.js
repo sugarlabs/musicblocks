@@ -6724,11 +6724,11 @@ const MUNSELL = [
  * @returns {string} The interpolated color as a CSS rgba() string (e.g., "rgba(255, 0, 0, 1)").
  */
 const interpColor = (hex1, hex2, p) => {
-    if (hex1 === undefined && hex2 === undefined) {
-        null;
-    } else if (hex1 === undefined) {
+    if ((hex1 === undefined || hex1 === null) && (hex2 === undefined || hex2 === null)) {
+        return undefined;
+    } else if (hex1 === undefined || hex1 === null) {
         hex1 = hex2;
-    } else if (hex2 === undefined) {
+    } else if (hex2 === undefined || hex2 === null) {
         hex2 = hex1;
     }
 
