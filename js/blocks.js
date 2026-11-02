@@ -412,6 +412,84 @@ class Blocks {
         // Throttle timestamp for edge-scroll calls
         this._lastEdgeScrollTime = 0;
 
+        this._getWorkspaceViewport = () => {
+            const { canvas, blocksContainer, stage, turtleBlocksScale } = this.activity;
+            if (
+                !canvas ||
+                !canvas.width ||
+                !canvas.height ||
+                !blocksContainer ||
+                typeof blocksContainer.x !== "number" ||
+                typeof blocksContainer.y !== "number"
+            ) {
+                return null;
+            }
+
+            const stageScaleX = stage?.scaleX || turtleBlocksScale || 1;
+            const stageScaleY = stage?.scaleY || turtleBlocksScale || 1;
+            const containerScaleX = blocksContainer.scaleX || 1;
+            const containerScaleY = blocksContainer.scaleY || 1;
+            const scaleX = stageScaleX * containerScaleX;
+            const scaleY = stageScaleY * containerScaleY;
+            if (scaleX <= 0 || scaleY <= 0) {
+                return null;
+            }
+
+            const left = -blocksContainer.x / containerScaleX;
+            const top = -blocksContainer.y / containerScaleY;
+            return {
+                left,
+                top,
+                right: left + canvas.width / scaleX,
+                bottom: top + canvas.height / scaleY
+            };
+        };
+
+        this._getBlockBounds = block => {
+            const scaleX = Math.abs(block.container.scaleX || 1);
+            const scaleY = Math.abs(block.container.scaleY || 1);
+            return {
+                left: block.container.x,
+                top: block.container.y,
+                right: block.container.x + block.width * scaleX,
+                bottom: block.container.y + block.height * scaleY
+            };
+        };
+
+        this._getViewportHomeBounds = () => {
+            if (!this._viewportHomeBoundsDirty) {
+                return this._viewportHomeBounds;
+            }
+
+            let homeBounds = null;
+            for (const block of this.blockList) {
+                if (
+                    !block ||
+                    block.trash ||
+                    block.inCollapsed ||
+                    !block.container ||
+                    !block.width ||
+                    !block.height
+                ) {
+                    continue;
+                }
+
+                const bounds = this._getBlockBounds(block);
+                if (!homeBounds) {
+                    homeBounds = { ...bounds };
+                    continue;
+                }
+                homeBounds.left = Math.min(homeBounds.left, bounds.left);
+                homeBounds.top = Math.min(homeBounds.top, bounds.top);
+                homeBounds.right = Math.max(homeBounds.right, bounds.right);
+                homeBounds.bottom = Math.max(homeBounds.bottom, bounds.bottom);
+            }
+
+            this._viewportHomeBounds = homeBounds;
+            this._viewportHomeBoundsDirty = false;
+            return homeBounds;
+        };
+
         // --- Performance: spatial grid for O(1) nearest-dock lookup ---
         // Maps "cellX,cellY" -> Set of block indices in that cell
         this._spatialGrid = new Map();
@@ -423,6 +501,8 @@ class Blocks {
         this._viewportFallback = new Set();
         this._viewportVisibleBlocks = new Set();
         this._viewportCullingInitialized = false;
+        this._viewportHomeBounds = null;
+        this._viewportHomeBoundsDirty = true;
 
         /**
          * We stage deletion of prototype action blocks on the palette so
@@ -470,6 +550,7 @@ class Blocks {
         };
 
         this._updateViewportGrid = blkIdx => {
+            this._viewportHomeBoundsDirty = true;
             const idx = Number(blkIdx);
             const block = this.blockList[idx];
             if (!block) return;
@@ -2160,19 +2241,35 @@ class Blocks {
         this.checkBounds = () => {
             if (this._deferCheckBounds) return;
             const start = window.__ENABLE_REFRESH_PROFILING__ ? performance.now() : 0;
+            const viewport = this._getWorkspaceViewport();
+            const homeIndicators = { left: false, right: false, above: false, below: false };
 
             let onScreen = true;
             for (const block of this.blockList) {
                 if (!block || block.trash) continue;
-                if (block.connections[0] === null) {
+                if (viewport && block.container && block.width && block.height) {
+                    const bounds = this._getBlockBounds(block);
+                    homeIndicators.left = homeIndicators.left || bounds.left < viewport.left;
+                    homeIndicators.right = homeIndicators.right || bounds.right > viewport.right;
+                    homeIndicators.above = homeIndicators.above || bounds.top < viewport.top;
+                    homeIndicators.below = homeIndicators.below || bounds.bottom > viewport.bottom;
+                }
+                if (onScreen && block.connections[0] === null) {
                     if (block.offScreen(this.boundary)) {
                         this.activity.setHomeContainers(true);
                         /** Just highlight the button. */
                         /** this.boundary.show(); */
                         onScreen = false;
-                        break;
                     }
                 }
+            }
+
+            if (
+                viewport &&
+                this.activity.workspaceLayoutController &&
+                typeof this.activity.workspaceLayoutController.setHomeIndicators === "function"
+            ) {
+                this.activity.workspaceLayoutController.setHomeIndicators(homeIndicators);
             }
 
             if (onScreen) {
@@ -8237,22 +8334,21 @@ class Blocks {
          * Recompute after scroll, pan, resize, or project load.
          */
         this._updateViewportCulling = () => {
-            const canvas = this.activity.canvas;
-            // Skip culling until the canvas has been initialized with valid dimensions.
-            // Calling culling too early (e.g. during project load before layout is final)
-            // would mark on-screen blocks as off-screen, and since the viewport never
-            // moves afterward, they'd stay invisible.
-            if (!canvas || !canvas.width || !canvas.height) return;
-
-            const container = this.activity.blocksContainer;
-            if (!container) return;
-
-            // Viewport rect in container-space
-            const vpLeft = -container.x;
-            const vpTop = -container.y;
-            const vpRight = vpLeft + canvas.width;
-            const vpBottom = vpTop + canvas.height;
-            const candidates = this._getViewportCandidates(vpLeft, vpTop, vpRight, vpBottom);
+            const viewport = this._getWorkspaceViewport();
+            if (!viewport) return;
+            const homeBounds = this._getViewportHomeBounds();
+            const homeIndicators = {
+                left: homeBounds ? homeBounds.left < viewport.left : false,
+                right: homeBounds ? homeBounds.right > viewport.right : false,
+                above: homeBounds ? homeBounds.top < viewport.top : false,
+                below: homeBounds ? homeBounds.bottom > viewport.bottom : false
+            };
+            const candidates = this._getViewportCandidates(
+                viewport.left,
+                viewport.top,
+                viewport.right,
+                viewport.bottom
+            );
             const blocksToCheck = !this._viewportCullingInitialized
                 ? this.blockList.map((_, i) => i)
                 : candidates;
@@ -8282,11 +8378,12 @@ class Blocks {
                     continue;
                 }
                 const wasViewportVisible = block._viewportVisible;
+                const bounds = this._getBlockBounds(block);
                 block._viewportVisible = !(
-                    c.x + block.width <= vpLeft ||
-                    c.x >= vpRight ||
-                    c.y + block.height <= vpTop ||
-                    c.y >= vpBottom
+                    bounds.right <= viewport.left ||
+                    bounds.left >= viewport.right ||
+                    bounds.bottom <= viewport.top ||
+                    bounds.top >= viewport.bottom
                 );
                 if (block._viewportVisible) nextVisibleBlocks.add(i);
                 if (wasViewportVisible === false && block._viewportVisible && c.bitmapCache) {
@@ -8297,9 +8394,17 @@ class Blocks {
                     c.updateCache();
                 }
             }
+
             this._viewportVisibleBlocks = nextVisibleBlocks;
             if (this.blockList.length > 0) {
                 this._viewportCullingInitialized = true;
+            }
+
+            if (
+                this.activity.workspaceLayoutController &&
+                typeof this.activity.workspaceLayoutController.setHomeIndicators === "function"
+            ) {
+                this.activity.workspaceLayoutController.setHomeIndicators(homeIndicators);
             }
         };
 

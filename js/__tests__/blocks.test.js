@@ -18,6 +18,7 @@
 
 const Blocks = require("../blocks");
 const ManagedTimer = require("../utils/ManagedTimer");
+const { WorkspaceLayoutController } = require("../activity/workspace-layout-controller");
 
 // blocks.js references these constants (MINIMUMDOCKDISTANCE, ALLOWED_CONNECTIONS, etc.) as
 // bare globals at runtime. In the browser they're provided by loader.js's RequireJS shim
@@ -323,6 +324,204 @@ describe("Viewport Culling", () => {
         expect(blocks.blockList[0]._viewportVisible).toBe(false);
         expect(blocks.blockList[1]._viewportVisible).toBe(true);
         expect(blocks.blockList[2]._viewportVisible).toBe(false);
+    });
+
+    it("should show directional Home indicators for off-screen blocks", () => {
+        const homeButton = document.createElement("div");
+        homeButton.appendChild(document.createElement("img"));
+        mockActivity.homeButtonContainer = homeButton;
+        mockActivity.workspaceLayoutController = new WorkspaceLayoutController(mockActivity);
+        mockActivity.blocksContainer.x = -100;
+        mockActivity.blocksContainer.y = -50;
+        blocks.blockList = [
+            { trash: false, container: { x: 20, y: 100 }, width: 50, height: 30 },
+            { trash: false, container: { x: 910, y: 100 }, width: 50, height: 30 },
+            { trash: false, container: { x: 300, y: 700 }, width: 50, height: 30 },
+            { trash: false, container: { x: 300, y: -100 }, width: 50, height: 30 },
+            { trash: false, container: { x: 300, y: 100 }, width: 50, height: 30 }
+        ];
+
+        blocks._updateViewportCulling();
+
+        expect(homeButton.querySelector('[data-home-indicator="left"]').hidden).toBe(false);
+        expect(homeButton.querySelector('[data-home-indicator="right"]').hidden).toBe(false);
+        expect(homeButton.querySelector('[data-home-indicator="above"]').hidden).toBe(false);
+        expect(homeButton.querySelector('[data-home-indicator="below"]').hidden).toBe(false);
+
+        const recreatedHomeButton = document.createElement("div");
+        recreatedHomeButton.appendChild(document.createElement("img"));
+        mockActivity.homeButtonContainer = recreatedHomeButton;
+        mockActivity.workspaceLayoutController.refreshHomeIndicators();
+
+        expect(recreatedHomeButton.querySelector('[data-home-indicator="left"]').hidden).toBe(
+            false
+        );
+        expect(recreatedHomeButton.querySelector('[data-home-indicator="right"]').hidden).toBe(
+            false
+        );
+        expect(recreatedHomeButton.querySelector('[data-home-indicator="above"]').hidden).toBe(
+            false
+        );
+        expect(recreatedHomeButton.querySelector('[data-home-indicator="below"]').hidden).toBe(
+            false
+        );
+    });
+
+    it.each([
+        ["left", { x: -10, y: 100 }],
+        ["right", { x: 780, y: 100 }],
+        ["above", { x: 100, y: -10 }],
+        ["below", { x: 100, y: 580 }]
+    ])("should indicate a block partially crossing the %s edge", (direction, position) => {
+        const homeButton = document.createElement("div");
+        mockActivity.homeButtonContainer = homeButton;
+        mockActivity.workspaceLayoutController = new WorkspaceLayoutController(mockActivity);
+        blocks.blockList = [
+            {
+                trash: false,
+                container: { x: position.x, y: position.y },
+                width: 50,
+                height: 30
+            }
+        ];
+
+        blocks._updateViewportCulling();
+
+        ["left", "right", "above", "below"].forEach(indicator => {
+            expect(homeButton.querySelector(`[data-home-indicator="${indicator}"]`).hidden).toBe(
+                indicator !== direction
+            );
+        });
+    });
+
+    it("should show multiple indicators for blocks beyond different corners", () => {
+        const homeButton = document.createElement("div");
+        mockActivity.homeButtonContainer = homeButton;
+        mockActivity.workspaceLayoutController = new WorkspaceLayoutController(mockActivity);
+        blocks.blockList = [
+            { trash: false, container: { x: -60, y: -40 }, width: 50, height: 30 },
+            { trash: false, container: { x: 780, y: 580 }, width: 50, height: 30 }
+        ];
+
+        blocks._updateViewportCulling();
+
+        ["left", "right", "above", "below"].forEach(indicator => {
+            expect(homeButton.querySelector(`[data-home-indicator="${indicator}"]`).hidden).toBe(
+                false
+            );
+        });
+    });
+
+    it("should account for stage, workspace, and block scaling", () => {
+        const homeButton = document.createElement("div");
+        mockActivity.homeButtonContainer = homeButton;
+        mockActivity.workspaceLayoutController = new WorkspaceLayoutController(mockActivity);
+        mockActivity.stage = { scaleX: 2, scaleY: 2 };
+        mockActivity.blocksContainer.scaleX = 2;
+        mockActivity.blocksContainer.scaleY = 2;
+        blocks.blockList = [
+            {
+                trash: false,
+                container: { x: 185, y: 20, scaleX: 2, scaleY: 2 },
+                width: 10,
+                height: 10
+            }
+        ];
+
+        blocks._updateViewportCulling();
+
+        expect(homeButton.querySelector('[data-home-indicator="right"]').hidden).toBe(false);
+        expect(homeButton.querySelector('[data-home-indicator="left"]').hidden).toBe(true);
+        expect(homeButton.querySelector('[data-home-indicator="above"]').hidden).toBe(true);
+        expect(homeButton.querySelector('[data-home-indicator="below"]').hidden).toBe(true);
+    });
+
+    it("should hide directional indicators when blocks return inside the viewport", () => {
+        const homeButton = document.createElement("div");
+        homeButton.appendChild(document.createElement("img"));
+        mockActivity.homeButtonContainer = homeButton;
+        mockActivity.workspaceLayoutController = new WorkspaceLayoutController(mockActivity);
+        blocks.blockList = [
+            { trash: false, container: { x: -100, y: 10 }, width: 50, height: 30 },
+            { trash: false, container: { x: 900, y: 10 }, width: 50, height: 30 },
+            { trash: false, container: { x: 10, y: 700 }, width: 50, height: 30 }
+        ];
+
+        blocks._updateViewportCulling();
+        blocks.blockList.forEach(block => {
+            block.container.x = 100;
+            block.container.y = 100;
+        });
+        blocks._updateViewportCulling();
+
+        expect(homeButton.querySelector('[data-home-indicator="left"]').hidden).toBe(true);
+        expect(homeButton.querySelector('[data-home-indicator="right"]').hidden).toBe(true);
+        expect(homeButton.querySelector('[data-home-indicator="above"]').hidden).toBe(true);
+        expect(homeButton.querySelector('[data-home-indicator="below"]').hidden).toBe(true);
+    });
+
+    it("should recalculate directional indicators when the viewport is resized", () => {
+        const homeButton = document.createElement("div");
+        homeButton.appendChild(document.createElement("img"));
+        mockActivity.homeButtonContainer = homeButton;
+        mockActivity.workspaceLayoutController = new WorkspaceLayoutController(mockActivity);
+        blocks.blockList = [{ trash: false, container: { x: 850, y: 610 }, width: 50, height: 30 }];
+
+        blocks._updateViewportCulling();
+        expect(homeButton.querySelector('[data-home-indicator="right"]').hidden).toBe(false);
+        expect(homeButton.querySelector('[data-home-indicator="below"]').hidden).toBe(false);
+
+        mockActivity.canvas.width = 1000;
+        mockActivity.canvas.height = 700;
+        blocks._updateViewportCulling();
+
+        expect(homeButton.querySelector('[data-home-indicator="right"]').hidden).toBe(true);
+        expect(homeButton.querySelector('[data-home-indicator="below"]').hidden).toBe(true);
+    });
+
+    it("should update all four indicators when the workspace pans", () => {
+        const homeButton = document.createElement("div");
+        mockActivity.homeButtonContainer = homeButton;
+        mockActivity.workspaceLayoutController = new WorkspaceLayoutController(mockActivity);
+        mockActivity.blocksContainer.x = -100;
+        mockActivity.blocksContainer.y = -100;
+        blocks.blockList = [{ trash: false, container: { x: 95, y: 95 }, width: 50, height: 30 }];
+
+        blocks._updateViewportCulling();
+        expect(homeButton.querySelector('[data-home-indicator="left"]').hidden).toBe(false);
+        expect(homeButton.querySelector('[data-home-indicator="above"]').hidden).toBe(false);
+
+        mockActivity.blocksContainer.x = 0;
+        mockActivity.blocksContainer.y = 0;
+        blocks._updateViewportCulling();
+
+        expect(homeButton.querySelector('[data-home-indicator="left"]').hidden).toBe(true);
+        expect(homeButton.querySelector('[data-home-indicator="above"]').hidden).toBe(true);
+    });
+
+    it("should refresh directional indicators when blocks move", () => {
+        const homeButton = document.createElement("div");
+        homeButton.appendChild(document.createElement("img"));
+        mockActivity.homeButtonContainer = homeButton;
+        mockActivity.workspaceLayoutController = new WorkspaceLayoutController(mockActivity);
+        blocks.boundary = { hide: jest.fn() };
+        const block = {
+            trash: false,
+            connections: [null],
+            container: { x: 850, y: 100 },
+            width: 50,
+            height: 30,
+            offScreen: jest.fn().mockReturnValue(false)
+        };
+        blocks.blockList = [block];
+
+        blocks.checkBounds();
+        expect(homeButton.querySelector('[data-home-indicator="right"]').hidden).toBe(false);
+
+        block.container.x = 100;
+        blocks.checkBounds();
+
+        expect(homeButton.querySelector('[data-home-indicator="right"]').hidden).toBe(true);
     });
 
     it("should refresh a stale highlight cache when a block re-enters the viewport", () => {
