@@ -27,6 +27,8 @@ const jQueryMock = {
 
 global.jQuery = jest.fn(() => jQueryMock);
 
+global._ = jest.fn(str => str);
+
 global.LocalCard = jest.fn().mockImplementation(() => {
     return {
         init: jest.fn(),
@@ -237,14 +239,14 @@ describe("LocalPlanet", () => {
             expect(mockPlanet.loadProjectFromData).toHaveBeenCalledWith("data1");
         });
 
-        it("should not load the project when persisting the selection fails", async () => {
+        it("should still load the project when persisting the selection fails", async () => {
             localPlanet.ProjectTable = mockPlanet.ProjectStorage.data.Projects;
             mockPlanet.ProjectStorage.setCurrentProjectID.mockRejectedValueOnce(
                 new Error("quota exceeded")
             );
 
-            await expect(localPlanet.openProject("testProj1")).rejects.toThrow("quota exceeded");
-            expect(mockPlanet.loadProjectFromData).not.toHaveBeenCalled();
+            await expect(localPlanet.openProject("testProj1")).resolves.toBeUndefined();
+            expect(mockPlanet.loadProjectFromData).toHaveBeenCalledWith("data1");
         });
 
         it("should not load an older project after a newer open changes the selection", async () => {

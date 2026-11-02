@@ -12,7 +12,7 @@
 /*
    global
 
-   jQuery, LocalCard, Publisher
+   jQuery, LocalCard, Publisher, _
 */
 /*
    exported
@@ -111,7 +111,21 @@ class LocalPlanet {
 
     async openProject(id) {
         const Planet = this.Planet;
-        await Planet.ProjectStorage.setCurrentProjectID(id);
+
+        try {
+            await Planet.ProjectStorage.setCurrentProjectID(id);
+        } catch (e) {
+            // Best-effort: if the selection cannot be persisted (e.g. storage is
+            // full), keep it in memory so edits still target `id` and open the
+            // project anyway. Only the persisted pointer stays stale.
+            console.error("[LocalPlanet] Failed to persist the current project selection:", e);
+            if (Planet.SaveInterface && Planet.SaveInterface.showToast) {
+                Planet.SaveInterface.showToast(
+                    _("Project opened, but the current selection could not be saved."),
+                    true
+                );
+            }
+        }
 
         // Guard against overlapping opens: if a newer selection changed the
         // current project while this open was awaiting its save, this open is
