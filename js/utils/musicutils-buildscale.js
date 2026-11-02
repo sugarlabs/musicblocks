@@ -1263,6 +1263,10 @@ var getSolfege = (note, keySignature, movable, temperament, edo) => {
         return note;
     }
 
+    if (typeof note === "string") {
+        note = note.replace("#", SHARP).replace("b", FLAT);
+    }
+
     if (movable && keySignature) {
         let currentEDO = edo;
         if (!currentEDO) {

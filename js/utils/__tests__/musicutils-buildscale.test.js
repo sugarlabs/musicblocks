@@ -261,6 +261,14 @@ describe("musicutils-buildscale", () => {
         expect(buildscale.getSolfege("C", "C major", true, "equal")).toBe("do");
     });
 
+    it("resolves solfege for notes with ASCII accidentals in fixed and non-movable modes", () => {
+        expect(buildscale.getSolfege("C#")).toBe("do" + SHARP);
+        expect(buildscale.getSolfege("Db")).toBe("re" + FLAT);
+        expect(buildscale.getSolfege("F#")).toBe("fa" + SHARP);
+        expect(buildscale.getSolfege("Bb")).toBe("ti" + FLAT);
+        expect(buildscale.getSolfege("G#", "C major", false, "equal")).toBe("sol" + SHARP);
+    });
+
     it("is still reachable through musicutils.js for callers that require it", () => {
         for (const name of [
             "buildScale",

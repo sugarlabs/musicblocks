@@ -3359,6 +3359,13 @@ describe("getSolfege", () => {
         expect(getSolfege("A♯")).toBe("la" + SHARP);
     });
 
+    it("should return the correct solfege for ASCII sharp and flat notes", () => {
+        expect(getSolfege("C#")).toBe("do" + SHARP);
+        expect(getSolfege("Db")).toBe("re" + FLAT);
+        expect(getSolfege("F#")).toBe("fa" + SHARP);
+        expect(getSolfege("Bb")).toBe("ti" + FLAT);
+    });
+
     it("should return undefined for invalid notes not present in the conversion table", () => {
         expect(getSolfege("X")).toBe("X");
     });
