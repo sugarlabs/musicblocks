@@ -37,8 +37,10 @@ jobs:
                         return Number.isFinite(time) ? time : null;
                       }
 
-                      function activityTime(record) {
-                        return parseTime(record && record.pushedAt);
+                      function activityTime(record, createdAt) {
+                        const recorded = parseTime(record && record.pushedAt);
+                        if (recorded !== null) return recorded;
+                        return parseTime(createdAt);
                       }
 
                       function latestStaleLabelTime(events) {
@@ -142,7 +144,10 @@ jobs:
                           core.setFailed(`Could not load push state: ${err.message}`);
                           return "stop";
                         }
-                        const latestPush = activityTime(latestState[String(pr.number)]);
+                        const latestPush = activityTime(
+                          latestState[String(pr.number)],
+                          pr.created_at
+                        );
                         return decideStaleAction({
                           now: Date.now(),
                           lastPush: latestPush,
@@ -153,7 +158,7 @@ jobs:
 
                       async function processPR(pr, state) {
                         const record = state[String(pr.number)];
-                        const lastPush = activityTime(record);
+                        const lastPush = activityTime(record, pr.created_at);
                         const hasStaleLabel =
                           Array.isArray(pr.labels) &&
                           pr.labels.some(label => label.name === STALE_LABEL);

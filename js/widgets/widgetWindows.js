@@ -330,7 +330,14 @@ window.widgetWindows = {
             }
         }
 
+        const previous = this.focused;
         this.focused = clickedWindow;
+        if (clickedWindow && typeof clickedWindow.onfocused === "function") {
+            clickedWindow.onfocused();
+        }
+        if (previous && previous !== clickedWindow && typeof previous.onblurred === "function") {
+            previous.onblurred();
+        }
     }
 };
 
@@ -355,8 +362,11 @@ class WidgetWindow {
 
         // Drag offset for correct positioning
         this._dx = this._dy = 0;
-        // RAF throttle flag for mousemove performance
         this._rafTicking = false;
+        this._previouslyFocused =
+            document.activeElement && document.activeElement !== document.body
+                ? document.activeElement
+                : null;
 
         this._createUIelements();
         this._setupLanguage();
@@ -443,15 +453,21 @@ class WidgetWindow {
             };
         }
         const closeButton = this._create("div", "wftButton close", this._drag);
+        this._closeButton = closeButton;
         closeButton.title = _("Close");
         closeButton.setAttribute("role", "button");
         closeButton.setAttribute("aria-label", _("Close window"));
         closeButton.setAttribute("tabindex", "0");
         closeButton.onclick = e => {
             this.onclose();
-            e.preventDefault();
-            e.stopPropagation();
+            if (e && typeof e.preventDefault === "function") {
+                e.preventDefault();
+            }
+            if (e && typeof e.stopPropagation === "function") {
+                e.stopPropagation();
+            }
         };
+        makeKeyboardAccessible(closeButton, _("Close window"));
 
         this._nonclose = this._create("div", "nonclose", this._drag);
         this._nonclose.style.display = "flex";
@@ -497,9 +513,14 @@ class WidgetWindow {
             this._frame.style.width = "auto";
             this._frame.style.height = "auto";
             this._frame.style.minHeight = "0px";
-            e.preventDefault();
-            e.stopPropagation();
+            if (e && typeof e.preventDefault === "function") {
+                e.preventDefault();
+            }
+            if (e && typeof e.stopPropagation === "function") {
+                e.stopPropagation();
+            }
         };
+        makeKeyboardAccessible(rollButton, _("Roll up window"));
 
         if (this._fullscreenEnabled) {
             const maxminButton = this._create("div", "wftButton wftMaxmin", this._nonclosebuttons);
@@ -517,9 +538,14 @@ class WidgetWindow {
                 }
                 this.takeFocus();
                 this.onmaximize();
-                e.preventDefault();
-                e.stopImmediatePropagation();
+                if (e && typeof e.preventDefault === "function") {
+                    e.preventDefault();
+                }
+                if (e && typeof e.stopImmediatePropagation === "function") {
+                    e.stopImmediatePropagation();
+                }
             };
+            makeKeyboardAccessible(maxminButton, _("Maximize window"));
             this._maxminIcon = this._create("img", undefined, maxminButton);
             this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
         }
@@ -816,6 +842,9 @@ class WidgetWindow {
      */
     takeFocus() {
         window.widgetWindows.focused = this;
+        if (typeof this.onfocused === "function") {
+            this.onfocused();
+        }
         const windows = docById("floatingWindows");
         if (windows && windows.children) {
             const siblings = windows.children;
@@ -972,6 +1001,11 @@ class WidgetWindow {
      * @returns {void}
      */
     destroy() {
+        const isFocusInside =
+            this._frame &&
+            document.activeElement &&
+            (this._frame === document.activeElement ||
+                this._frame.contains(document.activeElement));
         if (this._widget && this._widgetWheelHandler) {
             this._widget.removeEventListener("wheel", this._widgetWheelHandler, false);
             this._widget.removeEventListener("DOMMouseScroll", this._widgetWheelHandler, false);
@@ -989,6 +1023,30 @@ class WidgetWindow {
             this.timerManager.clearAll();
         }
         delete window.widgetWindows.openWindows[this._key];
+
+        if (isFocusInside) {
+            const remainingWindows = Object.values(window.widgetWindows.openWindows).filter(
+                win => win && win._visible
+            );
+            if (remainingWindows.length > 0) {
+                const nextWin = remainingWindows[remainingWindows.length - 1];
+                nextWin.takeFocus();
+                if (nextWin._frame && typeof nextWin._frame.focus === "function") {
+                    nextWin._frame.focus();
+                }
+            } else if (
+                this._previouslyFocused &&
+                typeof this._previouslyFocused.focus === "function" &&
+                document.contains(this._previouslyFocused)
+            ) {
+                this._previouslyFocused.focus();
+            } else {
+                const canvas = docById("myCanvas");
+                if (canvas && typeof canvas.focus === "function") {
+                    canvas.focus();
+                }
+            }
+        }
     }
 
     /**

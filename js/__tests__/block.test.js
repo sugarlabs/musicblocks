@@ -3013,4 +3013,50 @@ describe("Block Foundation", () => {
             }
         });
     });
+
+    describe("isClampBlock()", () => {
+        /**
+         * isClampBlock() is a composite predicate:
+         *   protoblock.style === "clamp"  ||  isDoubleClampBlock()  ||  isArgFlowClampBlock()
+         *
+         * Each of the three branches is exercised independently so we know every
+         * path through the OR chain is covered.
+         */
+
+        it("returns true when protoblock style is 'clamp'", () => {
+            const block = new Block({ ...mockProtoBlock, style: "clamp" }, mockBlocks);
+            expect(block.isClampBlock()).toBe(true);
+        });
+
+        it("returns true when protoblock style is 'doubleclamp' (via isDoubleClampBlock)", () => {
+            const block = new Block({ ...mockProtoBlock, style: "doubleclamp" }, mockBlocks);
+            // isDoubleClampBlock is the second OR-branch, isClampBlock must delegate to it
+            expect(block.isDoubleClampBlock()).toBe(true);
+            expect(block.isClampBlock()).toBe(true);
+        });
+
+        it("returns true when protoblock style is 'argflowclamp' (via isArgFlowClampBlock)", () => {
+            const block = new Block({ ...mockProtoBlock, style: "argflowclamp" }, mockBlocks);
+            // isArgFlowClampBlock is the third OR-branch
+            expect(block.isArgFlowClampBlock()).toBe(true);
+            expect(block.isClampBlock()).toBe(true);
+        });
+
+        it("returns false for a plain value block (no clamp style)", () => {
+            const block = new Block({ ...mockProtoBlock, style: "value" }, mockBlocks);
+            expect(block.isClampBlock()).toBe(false);
+        });
+
+        it("returns false for a twoarg block (not a clamp variant)", () => {
+            const block = new Block({ ...mockProtoBlock, style: "twoarg" }, mockBlocks);
+            expect(block.isClampBlock()).toBe(false);
+        });
+
+        it("returns false for an argclamp block (argclamp is not a clamp-style block)", () => {
+            // argclamp is its own category — isArgClamp() is true but isClampBlock() should be false
+            const block = new Block({ ...mockProtoBlock, style: "argclamp" }, mockBlocks);
+            expect(block.isArgClamp()).toBe(true);
+            expect(block.isClampBlock()).toBe(false);
+        });
+    });
 });

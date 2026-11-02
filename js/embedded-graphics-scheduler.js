@@ -389,19 +389,19 @@ class EmbeddedGraphicsScheduler {
                 const deltaArg = arg / (NOTEDIV / tur.singer.dispatchFactor);
                 if (t === 0) {
                     logo._timerManager.setGuardedTimeout(
-                        () => tur.painter.doForward(deltaArg, "first"),
+                        () => tur.painter.doForward(deltaArg, "first", arg),
                         deltaTime,
                         () => logo.stopTurtle
                     );
                 } else if (t === Math.ceil(NOTEDIV / tur.singer.dispatchFactor) - 1) {
                     logo._timerManager.setGuardedTimeout(
-                        () => tur.painter.doForward(deltaArg, "last"),
+                        () => tur.painter.doForward(deltaArg, "last", arg),
                         deltaTime,
                         () => logo.stopTurtle
                     );
                 } else {
                     logo._timerManager.setGuardedTimeout(
-                        () => tur.painter.doForward(deltaArg, "middle"),
+                        () => tur.painter.doForward(deltaArg, "middle", arg),
                         deltaTime,
                         () => logo.stopTurtle
                     );

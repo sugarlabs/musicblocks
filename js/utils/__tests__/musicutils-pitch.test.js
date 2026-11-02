@@ -38,6 +38,15 @@ describe("musicutils-pitch", () => {
         expect(pitch.calcOctaveInterval("5")).toBe(0);
     });
 
+    it("resolves ASCII double accidentals in solfege pitch strings", () => {
+        expect(pitch._calculate_pitch_number("sol##", 4, 0, "equal")).toBe(
+            pitch._calculate_pitch_number("A", 4, 0, "equal")
+        );
+        expect(pitch._calculate_pitch_number("dobb", 4, 0, "equal")).toBe(
+            pitch._calculate_pitch_number("B♭", 3, 0, "equal")
+        );
+    });
+
     it("keeps naming pitches by number across octaves, below zero, and in other tunings", () => {
         const names = [0, 3, 11, 12, 14, 25, -1, -12, -13].map(i =>
             pitch.numberToPitchSharp(i, "equal")
@@ -167,6 +176,20 @@ describe("musicutils-pitch", () => {
             expect(pitch.normalizeNoteAccidentals("C𝄫𝄪")).toBe("Cbbx");
             expect(pitch.normalizeNoteAccidentals("C♭ D♯ E𝄫 F𝄪")).toBe("Cb D# Ebb Fx");
             expect(pitch.normalizeNoteAccidentals("Sol♭")).toBe("Solb");
+        });
+
+        it("handles nullish, empty, and non-string inputs safely", () => {
+            expect(pitch.stripMicrotonalPrefix(null)).toBe("");
+            expect(pitch.stripMicrotonalPrefix(undefined)).toBe("");
+            expect(pitch.stripMicrotonalPrefix(123)).toBe("");
+            expect(pitch.stripMicrotonalPrefix({})).toBe("");
+            expect(pitch.stripMicrotonalPrefix([])).toBe("");
+
+            expect(pitch.normalizeNoteAccidentals(null)).toBe("");
+            expect(pitch.normalizeNoteAccidentals(undefined)).toBe("");
+            expect(pitch.normalizeNoteAccidentals(123)).toBe("");
+            expect(pitch.normalizeNoteAccidentals({})).toBe("");
+            expect(pitch.normalizeNoteAccidentals([])).toBe("");
         });
     });
 

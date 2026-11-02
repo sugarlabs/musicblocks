@@ -2190,6 +2190,19 @@ describe("prepareExport additional block types", () => {
         expect(result[0][1]).toEqual(["pluginvalue", { value: 7 }]);
     });
 
+    it("preserves legacy matrixData through an unknown-block stand-in", () => {
+        const activity = makeActivity();
+        activity.blocks.blockList = [
+            makeStandIn("nopZeroArgBlock", ["matrixData", { notes: [["C4"]], count: [4] }], false, [
+                null,
+                null
+            ])
+        ];
+        const pm = new ProjectManager(activity);
+        const result = JSON.parse(pm.prepareExport());
+        expect(result[0][1]).toEqual(["matrixData", { notes: [["C4"]], count: [4] }]);
+    });
+
     it("never exports a null block name for a stand-in", () => {
         const activity = makeActivity();
         activity.blocks.blockList = [
@@ -2206,30 +2219,6 @@ describe("prepareExport additional block types", () => {
         const pm = new ProjectManager(activity);
         const result = JSON.parse(pm.prepareExport());
         expect(result[0][1]).toBe("nopOneArgBlock");
-    });
-
-    it("exports matrixData block with notes and count", () => {
-        window.savedMatricesNotes = [["C4"]];
-        window.savedMatricesCount = [4];
-        const activity = makeActivity();
-        activity.blocks.blockList = [
-            {
-                name: "matrixData",
-                trash: false,
-                value: null,
-                collapsed: false,
-                container: { x: 0, y: 0 },
-                connections: [null],
-                isValueBlock: () => false
-            }
-        ];
-        const pm = new ProjectManager(activity);
-        const result = JSON.parse(pm.prepareExport());
-        expect(result[0][1][1]).toMatchObject({
-            notes: [["C4"]],
-            count: [4]
-        });
-        expect(activity.hasMatrixDataBlock).toBe(true);
     });
 
     it("exports wrapmode block with value", () => {

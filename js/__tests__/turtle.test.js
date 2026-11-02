@@ -497,6 +497,27 @@ describe("Turtle stopBlink()", () => {
         expect(turtle.container.visible).toBe(true);
         expect(mockActivity.refreshCanvas).toHaveBeenCalledTimes(2);
     });
+
+    it("shows the turtle after the Logo timer manager clears all timers (Stop)", () => {
+        jest.useFakeTimers();
+        const ManagedTimer = require("../utils/ManagedTimer");
+        const timers = new ManagedTimer();
+        mockActivity.logo = { _timerManager: timers };
+        turtle.listeners = {};
+
+        turtle.blink(16, 50);
+        jest.advanceTimersByTime(40);
+        timers.clearAll(); // what Stop does: the blink's "show again" timer never runs
+
+        expect(turtle.container.visible).toBe(false);
+        expect(turtle.blinking()).toBe(true);
+
+        turtle.stopBlink(); // what markAllAsStopped() now calls for every turtle
+
+        expect(turtle.container.visible).toBe(true);
+        expect(turtle.blinking()).toBe(false);
+        expect(turtle._blinkTimeout).toBeNull();
+    });
     it("leaves a turtle that is not blinking untouched", () => {
         turtle._blinkTimeout = null;
         turtle._blinkFinished = true;
@@ -544,6 +565,7 @@ describe("Turtle accessors", () => {
             ["parentFlowQueue", "_parentFlowQueue", [7]],
             ["unhighlightQueue", "_unhighlightQueue", [8]],
             ["parameterQueue", "_parameterQueue", [9]],
+            ["actionBoundaries", "_actionBoundaries", [0]],
             ["listeners", "_listeners", { CursorOver0: () => {} }],
             ["media", "_media", [{ type: "gif" }]],
             ["x", "_x", 42],
@@ -681,6 +703,7 @@ describe("Turtle.TurtleModel", () => {
             expect(model._parentFlowQueue).toEqual([]);
             expect(model._unhighlightQueue).toEqual([]);
             expect(model._parameterQueue).toEqual([]);
+            expect(model._actionBoundaries).toEqual([]);
             expect(model._media).toEqual([]);
         });
 
@@ -976,6 +999,20 @@ describe("Turtle.TurtleView", () => {
             expect(view._decorationBitmap.x).toBe(100);
             expect(view._decorationBitmap.y).toBe(0);
             expect(view._decorationBitmap.scale).toBe(0);
+        });
+
+        it("safely returns without error when _decorationBitmap is null or undefined (e.g. drum start blocks)", () => {
+            const view = makeView();
+            view._decorationBitmap = null;
+
+            expect(() => {
+                view.resizeDecoration(2, 200);
+            }).not.toThrow();
+
+            view._decorationBitmap = undefined;
+            expect(() => {
+                view.resizeDecoration(1.5, 150);
+            }).not.toThrow();
         });
     });
 

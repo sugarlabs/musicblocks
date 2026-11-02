@@ -185,9 +185,9 @@ describe("markAllAsStopped", () => {
     });
 
     test("should set running to false for all turtles", () => {
-        const turtle1 = { running: true };
-        const turtle2 = { running: true };
-        const turtle3 = { running: true };
+        const turtle1 = { running: true, stopBlink: jest.fn() };
+        const turtle2 = { running: true, stopBlink: jest.fn() };
+        const turtle3 = { running: true, stopBlink: jest.fn() };
 
         turtles._turtleList = [turtle1, turtle2, turtle3];
         turtles.getTurtleCount = jest.fn().mockReturnValue(3);
@@ -198,6 +198,20 @@ describe("markAllAsStopped", () => {
         expect(turtle1.running).toBe(false);
         expect(turtle2.running).toBe(false);
         expect(turtle3.running).toBe(false);
+    });
+
+    test("should stop any pending blink on every turtle", () => {
+        const turtle1 = { running: true, stopBlink: jest.fn() };
+        const turtle2 = { running: false, stopBlink: jest.fn() };
+
+        turtles._turtleList = [turtle1, turtle2];
+        turtles.getTurtleCount = jest.fn().mockReturnValue(2);
+        turtles.getTurtle = jest.fn(i => turtles._turtleList[i]);
+
+        turtles.markAllAsStopped();
+
+        expect(turtle1.stopBlink).toHaveBeenCalledTimes(1);
+        expect(turtle2.stopBlink).toHaveBeenCalledTimes(1);
     });
 
     test("should call refreshCanvas after stopping all turtles", () => {
@@ -217,8 +231,8 @@ describe("markAllAsStopped", () => {
     });
 
     test("should stop turtles that are already stopped without error", () => {
-        const turtle1 = { running: false };
-        const turtle2 = { running: true };
+        const turtle1 = { running: false, stopBlink: jest.fn() };
+        const turtle2 = { running: true, stopBlink: jest.fn() };
 
         turtles._turtleList = [turtle1, turtle2];
         turtles.getTurtleCount = jest.fn().mockReturnValue(2);
@@ -1048,6 +1062,41 @@ describe("TurtlesModel.removeTurtle", () => {
         model.removeTurtle(0);
 
         expect(model._turtleList).toEqual([b]);
+    });
+
+    it("keeps a companion reference valid when an earlier turtle is removed", () => {
+        const a = makeTurtle();
+        const b = makeTurtle();
+        const c = makeTurtle();
+        b.companionTurtle = 2;
+        model._turtleList = [a, b, c];
+
+        model.removeTurtle(0);
+
+        const companionIndex = model._turtleList[0].companionTurtle;
+        expect(model._turtleList[companionIndex]).toBe(c);
+    });
+
+    it("clears a companion reference when its target is removed", () => {
+        const owner = makeTurtle();
+        const target = makeTurtle();
+        owner.companionTurtle = 1;
+        model._turtleList = [owner, target];
+
+        model.removeTurtle(1);
+
+        expect(owner.companionTurtle).toBeUndefined();
+    });
+
+    it("preserves a companion reference when a later turtle is removed", () => {
+        const target = makeTurtle();
+        const owner = makeTurtle({ companionTurtle: 0 });
+        const third = makeTurtle();
+        model._turtleList = [target, owner, third];
+
+        model.removeTurtle(2);
+
+        expect(model._turtleList[owner.companionTurtle]).toBe(target);
     });
 
     it("still clears a pending interval", () => {

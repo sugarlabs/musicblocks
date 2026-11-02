@@ -56,6 +56,17 @@ describe("musicutils-pitchscale", () => {
         expect(pitchscale.getSharpFlatPreference("G major")).toBe("sharp");
     });
 
+    it("handles nullish, empty, and non-string inputs safely in keySignatureToMode", () => {
+        expect(pitchscale.keySignatureToMode("")).toEqual(["C", "major"]);
+        expect(pitchscale.keySignatureToMode("   ")).toEqual(["C", "major"]);
+        expect(pitchscale.keySignatureToMode(null)).toEqual(["C", "major"]);
+        expect(pitchscale.keySignatureToMode(undefined)).toEqual(["C", "major"]);
+        expect(pitchscale.keySignatureToMode(42)).toEqual(["C", "major"]);
+        expect(pitchscale.keySignatureToMode(true)).toEqual(["C", "major"]);
+        expect(pitchscale.keySignatureToMode({})).toEqual(["C", "major"]);
+        expect(pitchscale.keySignatureToMode([])).toEqual(["C", "major"]);
+    });
+
     it("calculates pitch numbers accurately for enharmonic notes and boundary shifts in 12-EDO", () => {
         expect(pitchscale.pitchToNumber("B♯", 4, "C major", "equal")).toBe(
             pitchscale.pitchToNumber("C", 5, "C major", "equal")
@@ -91,6 +102,43 @@ describe("musicutils-pitchscale", () => {
         expect(pitchscale.pitchToNumber("dobb", 4, "C major", "equal")).toBe(37);
         expect(pitchscale.pitchToNumber("do♭♭", 4, "C major", "equal")).toBe(37);
         expect(pitchscale.pitchToNumber("do♯♯", 4, "C major", "equal")).toBe(41);
+        expect(pitchscale.pitchToNumber("C#b", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("C", 4, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("Cb#", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("C", 4, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("C#♭", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("C", 4, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("C♯b", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("C", 4, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("Cb♯", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("C", 4, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("C♭#", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("C", 4, "C major", "equal")
+        );
+    });
+
+    it("keeps the full solfege root when parsing double accidentals", () => {
+        expect(pitchscale.pitchToNumber("sol##", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("A", 4, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("do𝄫", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("B♭", 3, "C major", "equal")
+        );
+        expect(pitchscale.getNoteFromSolfege("sol##", "C major", false, 12, 4, 0)).toEqual([
+            "A",
+            4,
+            0
+        ]);
+        expect(pitchscale.getNoteFromSolfege("do𝄫", "C major", false, 12, 4, 0)).toEqual([
+            "B♭",
+            3,
+            0
+        ]);
     });
 
     it("resolves a solfege note argument to a note name, or null if unresolvable", () => {
@@ -100,6 +148,18 @@ describe("musicutils-pitchscale", () => {
             0
         ]);
         expect(pitchscale.getNoteFromSolfege("xyz", "C major", true, 12, 4, 0)).toBeNull();
+    });
+
+    it("spells ASCII and Unicode double accidentals the same way in non-12 EDO", () => {
+        // Regression: the downstream spelling branch must use the already-parsed
+        // doubleSharp flag, not re-check the raw noteArg, so "mi##" and its
+        // Unicode equivalent pick the same enharmonic spelling in e.g. 19-EDO.
+        expect(pitchscale.getNoteFromSolfege("mi##", "C major", true, 19, 4, 0)).toEqual(
+            pitchscale.getNoteFromSolfege("mi𝄪", "C major", true, 19, 4, 0)
+        );
+        expect(pitchscale.getNoteFromSolfege("mibb", "C major", true, 19, 4, 0)).toEqual(
+            pitchscale.getNoteFromSolfege("mi𝄫", "C major", true, 19, 4, 0)
+        );
     });
 
     it("gives a key signature's scale, solfege slots, tonic and mode together", () => {

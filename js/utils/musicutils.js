@@ -181,7 +181,6 @@ if (typeof module !== "undefined" && module.exports) {
         (typeof require !== "undefined" ? require("./musicutils-modecore") : {});
     var {
         MUSICALMODES,
-        customMode,
         getModeNumbers,
         getNonEDOModeSteps,
         getArticulation,
@@ -351,7 +350,6 @@ if (typeof module !== "undefined" && module.exports) {
         addTemperamentToDictionary,
         DEFAULTINVERT,
         DEFAULTMODE,
-        customMode,
         getInvertMode,
         getIntervalNumber,
         getIntervalDirection,

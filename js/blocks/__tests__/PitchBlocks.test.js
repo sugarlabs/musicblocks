@@ -617,6 +617,26 @@ describe("setupPitchBlocks", () => {
             block.flow([440], logo, 0, 10);
             expect(global.Singer.PitchActions.playHertz).toHaveBeenCalled();
         });
+
+        it("routes hertz rows to the turtle's own keyboard", () => {
+            const block = createdBlocks["hertz"];
+            const lastActive = {
+                instruments: [],
+                noteNames: [],
+                octaves: [],
+                addRowBlock: jest.fn()
+            };
+            const own = { instruments: [], noteNames: [], octaves: [], addRowBlock: jest.fn() };
+            global.frequencyToPitch.mockReturnValue(["A", 4, 0]);
+            logo.inMusicKeyboard = true;
+            logo.musicKeyboard = lastActive;
+            logo.musicKeyboardByTurtle = { 1: own };
+
+            block.flow([440], logo, 1, 10);
+
+            expect(own.noteNames).toEqual(["hertz"]);
+            expect(lastActive.noteNames).toEqual([]);
+        });
     });
 
     describe("HertzBlock in the Pitch-Drum Matrix", () => {

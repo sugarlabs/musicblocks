@@ -714,6 +714,134 @@ describe("Blocks Foundation", () => {
         };
     });
 
+    describe("bringToTop", () => {
+        let blocks;
+        let container;
+
+        beforeEach(() => {
+            blocks = new Blocks(mockActivity);
+            container = mockActivity.blocksContainer;
+            container.sortChildren = jest.fn(compare => container.children.sort(compare));
+            container.setChildIndex.mockImplementation((child, index) => {
+                const oldIndex = container.children.indexOf(child);
+                if (
+                    child.parent !== container ||
+                    oldIndex === -1 ||
+                    index < 0 ||
+                    index >= container.children.length
+                ) {
+                    return;
+                }
+                container.children.splice(oldIndex, 1);
+                container.children.splice(index, 0, child);
+            });
+        });
+
+        function makeBlock(connections) {
+            return { connections, trash: false, container: { parent: container } };
+        }
+
+        function expectChildren(expected) {
+            expect(container.children).toHaveLength(expected.length);
+            expected.forEach((child, index) => expect(container.children[index]).toBe(child));
+        }
+
+        it("batches stack ordering while preserving other display children", () => {
+            const first = makeBlock([null, 1]);
+            const firstChild = makeBlock([0, null]);
+            const second = makeBlock([null, 3]);
+            const secondChild = makeBlock([2, null]);
+            const overlay = { parent: container };
+            const collapseButton = { parent: container };
+            blocks.blockList = [first, firstChild, second, secondChild];
+            container.children = [
+                firstChild.container,
+                overlay,
+                second.container,
+                first.container,
+                collapseButton,
+                secondChild.container
+            ];
+
+            blocks.bringToTop();
+
+            const expected = [
+                overlay,
+                collapseButton,
+                firstChild.container,
+                first.container,
+                secondChild.container,
+                second.container
+            ];
+            expectChildren(expected);
+            expect(container.sortChildren).toHaveBeenCalledTimes(1);
+            expect(container.setChildIndex).not.toHaveBeenCalled();
+            expect(blocks._adjustTheseStacks).toEqual([0, 2]);
+            expect(blocks.dragGroup).toEqual([2, 3]);
+            expect(mockActivity.refreshCanvas).toHaveBeenCalledTimes(1);
+
+            blocks.bringToTop();
+            expectChildren(expected);
+        });
+
+        it("skips trashed roots and empty block slots", () => {
+            const root = makeBlock([null, 1]);
+            const child = makeBlock([0, null]);
+            const trashed = makeBlock([null]);
+            trashed.trash = true;
+            blocks.blockList = [root, child, null];
+            blocks.blockList[4] = trashed;
+            container.children = [root.container, trashed.container, child.container];
+
+            blocks.bringToTop();
+
+            expectChildren([trashed.container, child.container, root.container]);
+            expect(blocks._adjustTheseStacks).toEqual([0]);
+            expect(container.setChildIndex).not.toHaveBeenCalled();
+        });
+
+        it("leaves display children alone when there are no stacks", () => {
+            const overlay = { parent: container };
+            container.children = [overlay];
+
+            blocks.bringToTop();
+
+            expectChildren([overlay]);
+            expect(container.sortChildren).not.toHaveBeenCalled();
+            expect(container.setChildIndex).not.toHaveBeenCalled();
+            expect(mockActivity.refreshCanvas).toHaveBeenCalledTimes(1);
+        });
+
+        it("keeps the existing order when a stack contains a detached container", () => {
+            const root = makeBlock([null, 1, 2]);
+            const detached = makeBlock([0, null]);
+            const child = makeBlock([0, null]);
+            detached.container.parent = null;
+            const firstOverlay = { parent: container };
+            const secondOverlay = { parent: container };
+            blocks.blockList = [root, detached, child];
+            container.children = [root.container, firstOverlay, child.container, secondOverlay];
+
+            blocks.bringToTop();
+
+            expectChildren([firstOverlay, child.container, secondOverlay, root.container]);
+            expect(container.sortChildren).not.toHaveBeenCalled();
+        });
+
+        it("keeps the existing order when a connection visits a child twice", () => {
+            const root = makeBlock([null, 1, 1]);
+            const child = makeBlock([0, null]);
+            const orphan = makeBlock([99]);
+            blocks.blockList = [root, child, orphan];
+            container.children = [root.container, child.container, orphan.container];
+
+            blocks.bringToTop();
+
+            expectChildren([child.container, orphan.container, root.container]);
+            expect(container.sortChildren).not.toHaveBeenCalled();
+        });
+    });
+
     describe("Constructor", () => {
         it("_getStackSize does not throw on an out-of-range block index", () => {
             const blocks = new Blocks(mockActivity);
@@ -3899,6 +4027,101 @@ describe("Blocks Foundation", () => {
 
             expect(mockBlock.text.text).toBe("project.mb");
             expect(mockBlock.container.updateCache).toHaveBeenCalled();
+        });
+
+        it.each([
+            [
+                "throwing toString method",
+                [
+                    {
+                        toString: () => {
+                            throw new Error("Invalid");
+                        }
+                    }
+                ]
+            ],
+            ["empty array", []],
+            ["empty string element", [""]],
+            ["whitespace-only string element", ["   "]],
+            ["null value", null],
+            ["undefined value", undefined],
+            ["array with null element", [null]],
+            ["array with undefined element", [undefined]]
+        ])("falls back to 'audio file' when audiofile value is %s", (_, invalidValue) => {
+            const mockBlock = createMockBlock({
+                name: "audiofile",
+                value: invalidValue
+            });
+
+            blocks.blockList = [mockBlock];
+            blocks.updateBlockText(0);
+
+            expect(mockBlock.text.text).toBe("audio file");
+            expect(global._).toHaveBeenCalledWith("audio file");
+            expect(mockBlock.container.setChildIndex).toHaveBeenCalledWith(mockBlock.text, 0);
+            expect(mockBlock.container.updateCache).toHaveBeenCalled();
+        });
+
+        it("displays formatted file name on valid audiofile value", () => {
+            const mockBlock = createMockBlock({
+                name: "audiofile",
+                value: ["beat.wav"]
+            });
+
+            blocks.blockList = [mockBlock];
+            blocks.updateBlockText(0);
+
+            expect(mockBlock.text.text).toBe("beat.wav");
+            expect(mockBlock.container.updateCache).toHaveBeenCalled();
+        });
+
+        it("truncates non-empty audiofile filename exceeding default maxLength", () => {
+            const mockBlock = createMockBlock({
+                name: "audiofile",
+                value: ["recording.wav"]
+            });
+
+            blocks.blockList = [mockBlock];
+            blocks.updateBlockText(0);
+
+            expect(mockBlock.text.text).toBe("recordi...");
+            expect(mockBlock.container.updateCache).toHaveBeenCalled();
+        });
+
+        it("never truncates localized fallback label even when exceeding default maxLength", () => {
+            global._ = jest.fn(() => "archivo de audio");
+
+            const mockBlock = createMockBlock({
+                name: "audiofile",
+                value: null
+            });
+
+            blocks.blockList = [mockBlock];
+            blocks.updateBlockText(0);
+
+            expect(mockBlock.text.text).toBe("archivo de audio");
+            expect(mockBlock.container.updateCache).toHaveBeenCalled();
+        });
+
+        it("truncates long audiofile label when exceeding TEXTWIDTH", () => {
+            const originalGetTextWidth = global.getTextWidth;
+            global.getTextWidth = jest.fn(() => TEXTWIDTH + 1);
+
+            try {
+                const mockBlock = createMockBlock({
+                    name: "audiofile",
+                    value: ["verylongaudiofilename.wav"]
+                });
+
+                blocks.blockList = [mockBlock];
+                blocks.updateBlockText(0);
+
+                expect(mockBlock.text.text.endsWith("...")).toBe(true);
+                expect(mockBlock.text.text).toBe("verylon...");
+                expect(mockBlock.container.updateCache).toHaveBeenCalled();
+            } finally {
+                global.getTextWidth = originalGetTextWidth;
+            }
         });
     });
 

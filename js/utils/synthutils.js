@@ -799,6 +799,15 @@ function Synth() {
     this.tone = null;
     this.transport = transport;
 
+    // Expose the audio-context unlock so the play button can call it while
+    // the browser still considers the click a user gesture.
+    this.startAudio = () => {
+        if (Tone.context.state !== "running") {
+            return Tone.start();
+        }
+        return Promise.resolve();
+    };
+
     Tone.Buffer.onload = () => {
         console.debug("sample loaded");
     };
@@ -2102,10 +2111,20 @@ function Synth() {
                 let neighbor = null;
                 if (paramsEffects !== null && paramsEffects !== undefined) {
                     if (paramsEffects.doVibrato) {
-                        vibrato = new Tone.Vibrato(
-                            1 / paramsEffects.vibratoFrequency,
-                            paramsEffects.vibratoIntensity
-                        );
+                        const vibFreq =
+                            paramsEffects.vibratoFrequency &&
+                            isFinite(paramsEffects.vibratoFrequency) &&
+                            paramsEffects.vibratoFrequency > 0
+                                ? 1 / paramsEffects.vibratoFrequency
+                                : 16;
+                        const vibIntensity =
+                            paramsEffects.vibratoIntensity !== undefined &&
+                            isFinite(paramsEffects.vibratoIntensity) &&
+                            paramsEffects.vibratoIntensity >= 0
+                                ? paramsEffects.vibratoIntensity
+                                : 0.05;
+
+                        vibrato = new Tone.Vibrato(vibFreq, vibIntensity);
                         chainNodes.push(vibrato);
                         effectsToDispose.push(vibrato);
                     }

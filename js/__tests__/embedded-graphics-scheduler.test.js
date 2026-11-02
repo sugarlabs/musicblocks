@@ -258,6 +258,21 @@ describe("EmbeddedGraphicsScheduler", () => {
         expect(turtle0.painter.doStartHollowLine).toHaveBeenCalled();
     });
 
+    test("animated forward passes the whole move to every part", async () => {
+        mockLogo.parseArg = jest.fn(() => 2000000);
+        mockLogo.blockList = [null, { name: "forward", connections: [null, 9] }];
+        turtle0.singer.embeddedGraphics = { 3: [1] };
+
+        await scheduler.schedule(0, 0.5, 3, 0);
+
+        const calls = turtle0.painter.doForward.mock.calls;
+        expect(calls.length).toBeGreaterThan(1);
+        for (const [steps, , totalSteps] of calls) {
+            expect(steps).toBeLessThan(2000000);
+            expect(totalSteps).toBe(2000000);
+        }
+    });
+
     test("schedule adjusts dispatchFactor for large stepTime", async () => {
         mockLogo.deps.utils.delayExecution = jest.fn(() => Promise.resolve());
         turtle0.singer.suppressOutput = false;

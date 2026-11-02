@@ -175,6 +175,30 @@ describe("GlobalCard", () => {
             expect(chips[1].textContent).toBe("Art");
         });
 
+        it("should show three full tags and the remaining tag count", () => {
+            mockPlanet.GlobalPlanet.cache["test-id-1"].ProjectTags = [
+                "1",
+                "2",
+                "long-tag-full-name",
+                "4",
+                "5"
+            ];
+            card.init("test-id-1");
+            card.render();
+
+            const tagContainer = document.getElementById("global-project-tags-test-id-1");
+            expect(
+                tagContainer.querySelectorAll(".chipselect:not(.global-tags-more)")
+            ).toHaveLength(3);
+            const visibleTags = tagContainer.querySelectorAll(".chipselect:not(.global-tags-more)");
+            expect(visibleTags[2].textContent).toBe("Long-tag-full-name");
+
+            const moreTags = tagContainer.querySelector(".global-tags-more");
+            expect(moreTags.textContent).toBe("+2");
+            moreTags.click();
+            expect(mockPlanet.GlobalPlanet.ProjectViewer.open).toHaveBeenCalledWith("test-id-1");
+        });
+
         it("should use placeholder image when ProjectImage is null", () => {
             mockPlanet.GlobalPlanet.cache["test-id-1"].ProjectImage = null;
             card.init("test-id-1");
@@ -298,6 +322,34 @@ describe("GlobalCard", () => {
                 true,
                 expect.any(Function)
             );
+        });
+
+        it("should replace the optimistic count with the server count", () => {
+            card.init("test-id-1");
+            card.render();
+            mockPlanet.ServerInterface.likeProject.mockImplementation((id, like, callback) => {
+                callback({ success: true, likes: 1 });
+            });
+
+            card.like();
+            jest.advanceTimersByTime(500);
+
+            expect(document.getElementById("global-project-likes-test-id-1").textContent).toBe("1");
+            expect(card.ProjectData.ProjectLikes).toBe(1);
+        });
+
+        it("should restore the previous liked state and count when the request fails", () => {
+            card.init("test-id-1");
+            card.render();
+            mockPlanet.ServerInterface.likeProject.mockImplementation((id, like, callback) => {
+                callback({ success: false });
+            });
+
+            card.like();
+            jest.advanceTimersByTime(500);
+
+            expect(document.getElementById("global-project-likes-test-id-1").textContent).toBe("5");
+            expect(mockPlanet.ProjectStorage.like).toHaveBeenLastCalledWith("test-id-1", false);
         });
 
         it("should unlike when project is already liked", () => {

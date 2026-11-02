@@ -819,53 +819,56 @@ describe("PitchSlider Widget", () => {
             expect(activityMock.refreshCanvas).toHaveBeenCalled();
         });
 
-        test("creates 5-element block stack", () => {
+        test("creates 8-element block stack", () => {
             slider._save(440);
             const stack = activityMock.blocks.loadNewBlocks.mock.calls[0][0];
 
-            expect(stack).toHaveLength(5);
+            expect(stack).toHaveLength(8);
         });
 
-        test("first block is note block", () => {
+        test("first block is newnote clamp block with correct connections", () => {
             slider._save(440);
             const stack = activityMock.blocks.loadNewBlocks.mock.calls[0][0];
 
-            expect(stack[0][1]).toBe("note");
+            expect(stack[0][1]).toBe("newnote");
+            expect(stack[0][4]).toEqual([null, 1, 4, 7]);
         });
 
-        test("second block is number 8 (eighth note)", () => {
+        test("second block is divide duration block with 1/4 quarter note", () => {
             slider._save(440);
             const stack = activityMock.blocks.loadNewBlocks.mock.calls[0][0];
 
-            expect(stack[1][1]).toEqual(["number", { value: 8 }]);
+            expect(stack[1][1]).toBe("divide");
+            expect(stack[1][4]).toEqual([0, 2, 3]);
+            expect(stack[2][1]).toEqual(["number", { value: 1 }]);
+            expect(stack[3][1]).toEqual(["number", { value: 4 }]);
         });
 
-        test("third block is hertz block", () => {
+        test("interior flow connects vspace to hertz block with frequency", () => {
             slider._save(440);
             const stack = activityMock.blocks.loadNewBlocks.mock.calls[0][0];
 
-            expect(stack[2][1]).toBe("hertz");
+            expect(stack[4][1]).toBe("vspace");
+            expect(stack[4][4]).toEqual([0, 5]);
+            expect(stack[5][1]).toBe("hertz");
+            expect(stack[5][4]).toEqual([4, 6, null]);
+            expect(stack[6][1]).toEqual(["number", { value: 440 }]);
+            expect(stack[6][4]).toEqual([5]);
         });
 
-        test("fourth block contains frequency value", () => {
+        test("closing block terminates newnote clamp with hidden block", () => {
             slider._save(440);
             const stack = activityMock.blocks.loadNewBlocks.mock.calls[0][0];
 
-            expect(stack[3][1]).toEqual(["number", { value: 440 }]);
-        });
-
-        test("fifth block is hidden block", () => {
-            slider._save(440);
-            const stack = activityMock.blocks.loadNewBlocks.mock.calls[0][0];
-
-            expect(stack[4][1]).toBe("hidden");
+            expect(stack[7][1]).toBe("hidden");
+            expect(stack[7][4]).toEqual([0, null]);
         });
 
         test("uses different frequency values correctly", () => {
             slider._save(523.25);
             const stack = activityMock.blocks.loadNewBlocks.mock.calls[0][0];
 
-            expect(stack[3][1]).toEqual(["number", { value: 523.25 }]);
+            expect(stack[6][1]).toEqual(["number", { value: 523.25 }]);
         });
 
         test("increments _delta by 21 for each save", () => {
@@ -893,12 +896,22 @@ describe("PitchSlider Widget", () => {
             slider._save(440);
             const stack = activityMock.blocks.loadNewBlocks.mock.calls[0][0];
 
-            // Note block: [null, 1, 2, null] - connects to number and hertz
-            expect(stack[0][4]).toEqual([null, 1, 2, null]);
-            // Number block: [0] - connects back to note
-            expect(stack[1][4]).toEqual([0]);
-            // Hertz block: [0, freq, hidden] - connects to note, frequency, hidden
-            expect(stack[2][4]).toEqual([0, 3, 4]);
+            // newnote: [null, divide, vspace, hidden]
+            expect(stack[0][4]).toEqual([null, 1, 4, 7]);
+            // divide: [newnote, num1, num4]
+            expect(stack[1][4]).toEqual([0, 2, 3]);
+            // number 1: [divide]
+            expect(stack[2][4]).toEqual([1]);
+            // number 4: [divide]
+            expect(stack[3][4]).toEqual([1]);
+            // vspace: [newnote, hertz]
+            expect(stack[4][4]).toEqual([0, 5]);
+            // hertz: [vspace, frequencyNumber, null]
+            expect(stack[5][4]).toEqual([4, 6, null]);
+            // frequency number: [hertz]
+            expect(stack[6][4]).toEqual([5]);
+            // hidden: [newnote, null]
+            expect(stack[7][4]).toEqual([0, null]);
         });
     });
 

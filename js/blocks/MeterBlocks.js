@@ -1481,7 +1481,10 @@ function setupMeterBlocks(activity) {
             }
 
             if (logo.insideMeterWidget) logo._meterBlock = blk;
-            if (logo.inMusicKeyboard) logo.musicKeyboard.meterArgs = args;
+            if (logo.inMusicKeyboard) {
+                const musicKeyboard = logo.musicKeyboardByTurtle?.[turtle] || logo.musicKeyboard;
+                musicKeyboard.meterArgs = args;
+            }
 
             Singer.MeterActions.setMeter(arg0, arg1, turtle);
         }

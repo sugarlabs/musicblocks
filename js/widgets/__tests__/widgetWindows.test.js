@@ -968,6 +968,15 @@ describe("widgetWindows", () => {
             expect(win1._frame.style.zIndex).toBe("0");
             expect(win2._frame.style.zIndex).toBe("10000");
         });
+
+        test("notifies the window via onfocused", () => {
+            const win = createTestWindow();
+            win.onfocused = jest.fn();
+
+            win.takeFocus();
+
+            expect(win.onfocused).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe("isMaximized", () => {
@@ -1275,6 +1284,39 @@ describe("widgetWindows", () => {
             expect(win2._frame.style.zIndex).toBe("10000");
             expect(win1._frame.style.opacity).toBe("0.7");
             expect(win1._frame.style.zIndex).toBe("0");
+        });
+
+        test("notifies the clicked window via onfocused", () => {
+            const win1 = createTestWindow("Window 1");
+            const win2 = createTestWindow("Window 2");
+            win1.onfocused = jest.fn();
+            win2.onfocused = jest.fn();
+
+            win1._frame.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+            expect(win1.onfocused).toHaveBeenCalledTimes(1);
+            expect(win2.onfocused).not.toHaveBeenCalled();
+        });
+
+        test("notifies the window that loses focus via onblurred", () => {
+            const win1 = createTestWindow("Window 1");
+            const win2 = createTestWindow("Window 2");
+            win1.onblurred = jest.fn();
+            win2.onblurred = jest.fn();
+
+            win1._frame.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+            expect(win2.onblurred).toHaveBeenCalledTimes(1);
+            expect(win1.onblurred).not.toHaveBeenCalled();
+        });
+
+        test("notifies the focused window when clicking outside all windows", () => {
+            const win1 = createTestWindow("Window 1");
+            win1.onblurred = jest.fn();
+
+            canvas.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+            expect(win1.onblurred).toHaveBeenCalledTimes(1);
         });
 
         test("clears focus and dims all windows when clicking outside all windows", () => {
@@ -2046,6 +2088,143 @@ describe("widgetWindows", () => {
             expect(win._restore).toHaveBeenCalledTimes(1);
             expect(win.sendToCenter).toHaveBeenCalledTimes(1);
             expect(win.onmaximize).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("Window Control Button Keyboard Accessibility", () => {
+        test("closes window when Enter or Space is pressed on closeButton", () => {
+            const win = createTestWindow();
+            win.onclose = jest.fn();
+
+            expect(win._closeButton).toBeDefined();
+            expect(win._closeButton.getAttribute("role")).toBe("button");
+            expect(win._closeButton.getAttribute("tabindex")).toBe("0");
+
+            const enterEvent = new KeyboardEvent("keydown", {
+                key: "Enter",
+                bubbles: true,
+                cancelable: true
+            });
+            win._closeButton.dispatchEvent(enterEvent);
+            expect(win.onclose).toHaveBeenCalledTimes(1);
+
+            const spaceEvent = new KeyboardEvent("keydown", {
+                key: " ",
+                bubbles: true,
+                cancelable: true
+            });
+            win._closeButton.dispatchEvent(spaceEvent);
+            expect(win.onclose).toHaveBeenCalledTimes(2);
+
+            const arrowEvent = new KeyboardEvent("keydown", {
+                key: "ArrowDown",
+                bubbles: true,
+                cancelable: true
+            });
+            win._closeButton.dispatchEvent(arrowEvent);
+            expect(win.onclose).toHaveBeenCalledTimes(2);
+        });
+
+        test("toggles rollup/unroll when Enter or Space is pressed on rollButton", () => {
+            const win = createTestWindow();
+            expect(win._rollButton).toBeDefined();
+            expect(win._rollButton.getAttribute("role")).toBe("button");
+            expect(win._rollButton.getAttribute("tabindex")).toBe("0");
+
+            expect(win._rolled).toBe(false);
+
+            // Press Enter to roll up
+            const enterEvent = new KeyboardEvent("keydown", {
+                key: "Enter",
+                bubbles: true,
+                cancelable: true
+            });
+            win._rollButton.dispatchEvent(enterEvent);
+
+            expect(win._rolled).toBe(true);
+            expect(win._body.style.display).toBe("none");
+
+            // Press Space to unroll
+            const spaceEvent = new KeyboardEvent("keydown", {
+                key: " ",
+                bubbles: true,
+                cancelable: true
+            });
+            win._rollButton.dispatchEvent(spaceEvent);
+
+            expect(win._rolled).toBe(false);
+            expect(win._body.style.display).toBe("flex");
+        });
+
+        test("toggles maximize/restore when Enter or Space is pressed on maxminButton", () => {
+            const win = createTestWindow("Fullscreen Window", true);
+            expect(win._maxminButton).toBeDefined();
+            expect(win._maxminButton.getAttribute("role")).toBe("button");
+            expect(win._maxminButton.getAttribute("tabindex")).toBe("0");
+
+            expect(win._maximized).toBe(false);
+
+            // Press Enter to maximize
+            const enterEvent = new KeyboardEvent("keydown", {
+                key: "Enter",
+                bubbles: true,
+                cancelable: true
+            });
+            win._maxminButton.dispatchEvent(enterEvent);
+
+            expect(win._maximized).toBe(true);
+
+            // Press Space to restore
+            const spaceEvent = new KeyboardEvent("keydown", {
+                key: " ",
+                bubbles: true,
+                cancelable: true
+            });
+            win._maxminButton.dispatchEvent(spaceEvent);
+
+            expect(win._maximized).toBe(false);
+        });
+
+        test("ignores repeated keydown events when activation key is held down", () => {
+            const win = createTestWindow();
+            win.onclose = jest.fn();
+
+            const repeatEvent = new KeyboardEvent("keydown", {
+                key: "Enter",
+                repeat: true,
+                bubbles: true,
+                cancelable: true
+            });
+            win._closeButton.dispatchEvent(repeatEvent);
+
+            expect(win.onclose).not.toHaveBeenCalled();
+        });
+
+        test("restores focus to previously focused element when window closes", () => {
+            const externalButton = document.createElement("button");
+            document.body.appendChild(externalButton);
+            externalButton.focus();
+
+            const win = createTestWindow();
+            win._closeButton.focus();
+            expect(document.activeElement).toBe(win._closeButton);
+
+            win.destroy();
+
+            expect(document.activeElement).toBe(externalButton);
+            document.body.removeChild(externalButton);
+        });
+
+        test("transfers focus to remaining open window when closed with multiple open windows", () => {
+            const win1 = createTestWindow("First Window");
+            const win2 = createTestWindow("Second Window");
+
+            win2._closeButton.focus();
+            expect(document.activeElement).toBe(win2._closeButton);
+
+            win2.destroy();
+
+            expect(window.widgetWindows.focused).toBe(win1);
         });
     });
 });

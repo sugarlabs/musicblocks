@@ -900,7 +900,7 @@ class Block {
                 this.container.setChildIndex(this.imageBitmap, zIndex);
             }
 
-            if (this.name === "start" || this.name === "drum") {
+            if (this.name === "start") {
                 // Rescale the decoration on the start blocks.
                 for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
                     if (this.activity.turtles.getTurtle(t).startBlock === this) {

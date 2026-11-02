@@ -210,30 +210,90 @@ describe("processLilypondNotes", () => {
         logo.notation.notationStaging[turtle] = [
             "begin slur",
             [["G4"], 4, 0, null, 0, -1, false],
+            [["A4"], 4, 0, null, 0, -1, false],
             "end slur"
         ];
         processLilypondNotes(lilypond, logo, turtle);
-        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "g'4 (  )  ");
+        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "g'4 (  a'4 )  ");
     });
 
     test("should process a crescendo correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "begin crescendo",
             [["G4"], 4, 0, null, 0, -1, false],
+            [["A4"], 4, 0, null, 0, -1, false],
             "end crescendo"
         ];
         processLilypondNotes(lilypond, logo, turtle);
-        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "  g'4 \\< \\! ");
+        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "  g'4 \\< a'4 \\! ");
     });
 
     test("should process a decrescendo correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "begin decrescendo",
             [["G4"], 4, 0, null, 0, -1, false],
+            [["A4"], 4, 0, null, 0, -1, false],
             "end decrescendo"
         ];
         processLilypondNotes(lilypond, logo, turtle);
-        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "  g'4 \\> \\! ");
+        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "  g'4 \\> a'4 \\! ");
+    });
+
+    // Lilypond cannot end a slur or hairpin on the note it starts on, so these
+    // are left out rather than written as "g'4 (  )" or "g'4 \< \!".
+    describe("a slur or hairpin that covers fewer than two notes", () => {
+        test.each([
+            ["begin slur", "end slur"],
+            ["begin crescendo", "end crescendo"],
+            ["begin decrescendo", "end decrescendo"]
+        ])("should leave out %s / %s around a single note", (begin, end) => {
+            logo.notation.notationStaging[turtle] = [
+                begin,
+                [["G4"], 4, 0, null, 0, -1, false],
+                end,
+                [["A4"], 4, 0, null, 0, -1, false]
+            ];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).toBe("\\meter\n" + "g'4 a'4 ");
+        });
+
+        test("should not open an empty slur on the note after it", () => {
+            logo.notation.notationStaging[turtle] = [
+                "begin slur",
+                "end slur",
+                [["A4"], 4, 0, null, 0, -1, false]
+            ];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).toBe("\\meter\n" + "a'4 ");
+        });
+
+        test("should keep a following slur that covers two notes", () => {
+            logo.notation.notationStaging[turtle] = [
+                "begin slur",
+                [["C4"], 4, 0, null, 0, -1, false],
+                "end slur",
+                "begin slur",
+                [["D4"], 4, 0, null, 0, -1, false],
+                [["E4"], 4, 0, null, 0, -1, false],
+                "end slur"
+            ];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).toBe("\\meter\n" + "c'4 d'4 (  e'4 )  ");
+        });
+
+        test("should not treat markup text that reads 'end slur' as a marker", () => {
+            logo.notation.notationStaging[turtle] = [
+                "begin slur",
+                [["C4"], 4, 0, null, 0, -1, false],
+                "markup",
+                "end slur",
+                [["D4"], 4, 0, null, 0, -1, false],
+                "end slur"
+            ];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).toContain("c'4 (  ");
+            expect(logo.notationNotes[turtle]).toContain("d'4 )  ");
+        });
     });
 
     test("should process a tuplet correctly", () => {
@@ -307,6 +367,21 @@ describe("processLilypondNotes", () => {
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("{ c' 8(  d' 8e' 8)  } f'4 ");
+    });
+
+    test("should leave out a single-note slur that ends on the last note of a tuplet", () => {
+        logo.notation.notationStaging[turtle] = [
+            tripletNote("C4"),
+            tripletNote("D4"),
+            "begin slur",
+            tripletNote("E4"),
+            "end slur",
+            [["F4"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).not.toContain("(");
+        expect(logo.notationNotes[turtle]).not.toContain(")");
+        expect(logo.notationNotes[turtle]).toContain("f'4 ");
     });
 
     test("should wrap a forever loop in repeat bars that run to the end of the voice", () => {
@@ -945,6 +1020,29 @@ describe("saveLilypondOutput", () => {
         };
         const result = saveLilypondOutput(activity);
         expect(result).toContain('\\clef "bass_8"');
+    });
+    test("should select bass_8 clef for negative octave sub-bass notes", () => {
+        activity.logo.notation.notationStaging = {
+            0: [[["C-1"], 4, 0, null, 0, -1, false]]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain('\\clef "bass_8"');
+    });
+    test("should select bass_8 clef for numeric frequency in negative octave", () => {
+        frequencyToPitch.mockReturnValue(["C", -1]);
+        activity.logo.notation.notationStaging = {
+            0: [[[16.35], 4, 0, null, 0, -1, false]]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain('\\clef "bass_8"');
+        expect(frequencyToPitch).toHaveBeenCalledWith(16.35, "equal");
+    });
+    test("should parse signed and multi-digit octaves in octave calculation", () => {
+        activity.logo.notation.notationStaging = {
+            0: [[["C10", "C4"], 4, 0, null, 0, -1, false]]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain('\\clef "treble"');
     });
     test("should select bass clef for mid-low notes", () => {
         frequencyToPitch.mockReturnValue(["C", 3]);

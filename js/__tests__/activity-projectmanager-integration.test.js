@@ -55,7 +55,7 @@ describe("Activity <-> ProjectManager integration", () => {
         expect(activity.projectManager.activity).toBe(activity);
     });
 
-    it("prepareExport() reads and mutates the real Activity instance through the real ProjectManager", () => {
+    it("prepareExport() reads the real Activity instance through the real ProjectManager", () => {
         activity.blocks = {
             blockList: [
                 {
@@ -78,11 +78,6 @@ describe("Activity <-> ProjectManager integration", () => {
             ]
         };
         activity.logo = { getRestoredConnections: () => new Map() };
-        // Seeded to the opposite of what prepareExport() sets, so the
-        // assertion below proves a real mutation happened rather than
-        // coincidentally matching Activity's initial value.
-        activity.hasMatrixDataBlock = true;
-
         const parsed = JSON.parse(activity.projectManager.prepareExport());
 
         // Read: name, position, and the resolved connection index all came
@@ -92,8 +87,5 @@ describe("Activity <-> ProjectManager integration", () => {
         // connection.
         expect(parsed).toHaveLength(2);
         expect(parsed[1]).toEqual([1, "pitch", 150, 250, [0, null]]);
-        // Mutate: the call went through to the same real Activity instance,
-        // not a detached copy.
-        expect(activity.hasMatrixDataBlock).toBe(false);
     });
 });

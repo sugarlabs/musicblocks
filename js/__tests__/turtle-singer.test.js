@@ -2251,6 +2251,28 @@ describe("processPitch music keyboard with movable Do", () => {
         expect(activityMock.logo.musicKeyboard.noteNames).toEqual([name]);
         expect(activityMock.logo.musicKeyboard.octaves).toEqual([oct]);
     });
+
+    test("routes the row to the turtle's own keyboard", () => {
+        const turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        const activityMock = createActivityMock(turtleMock);
+        activityMock.logo.synth = { inTemperament: "equal" };
+        activityMock.logo.inMusicKeyboard = true;
+        const lastActive = {
+            instruments: [],
+            noteNames: [],
+            octaves: [],
+            addRowBlock: jest.fn()
+        };
+        const own = { instruments: [], noteNames: [], octaves: [], addRowBlock: jest.fn() };
+        activityMock.logo.musicKeyboard = lastActive;
+        activityMock.logo.musicKeyboardByTurtle = { 0: own };
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, "blk");
+
+        expect(own.noteNames).toEqual(["C"]);
+        expect(lastActive.noteNames).toEqual([]);
+    });
 });
 
 describe("processPitch in the pitch-drum matrix", () => {
@@ -3859,6 +3881,43 @@ describe("Singer.resolveNoteEffects — isolate note effect resolution from play
             expect(resolved.delayTime).toBe(2.2);
             expect(resolved.chorusDepth).toBe(0.6);
             expect(resolved.doDistortion).toBe(false);
+        });
+
+        it("resolves vibratoRate and vibratoIntensity fallback when only vibratoFrequency is present", () => {
+            const turtleState = {
+                singer: {
+                    vibratoRate: [],
+                    vibratoIntensity: []
+                }
+            };
+            const instrumentSettings = {
+                vibratoActive: true,
+                vibratoFrequency: 0.0625
+            };
+
+            const resolved = Singer.resolveNoteEffects(turtleState, instrumentSettings);
+            expect(resolved.doVibrato).toBe(true);
+            expect(resolved.vibratoRate).toBe(16);
+            expect(resolved.vibratoIntensity).toBe(0.05);
+        });
+
+        it("preserves finite zero vibratoIntensity without overriding with fallback", () => {
+            const turtleState = {
+                singer: {
+                    vibratoRate: [],
+                    vibratoIntensity: []
+                }
+            };
+            const instrumentSettings = {
+                vibratoActive: true,
+                vibratoFrequency: 0.0625,
+                vibratoIntensity: 0
+            };
+
+            const resolved = Singer.resolveNoteEffects(turtleState, instrumentSettings);
+            expect(resolved.doVibrato).toBe(true);
+            expect(resolved.vibratoRate).toBe(16);
+            expect(resolved.vibratoIntensity).toBe(0);
         });
     });
 

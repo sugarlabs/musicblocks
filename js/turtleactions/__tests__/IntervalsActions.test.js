@@ -1237,10 +1237,68 @@ describe("setupIntervalsActions", () => {
     test("setTemperament leaves the custom mode untouched when the EDO is unchanged", () => {
         global.getCurrentEDO = jest.fn(() => 12);
         // A sentinel value distinct from what a rebuild would produce (Array(12).fill(1))
-        // so an unwanted rebuild is observable.
-        MUSICALMODES.custom = new Array(12).fill(9);
+        // so an unwanted rebuild is observable. Its steps sum to 12.
+        MUSICALMODES.custom = [2, 2, 1, 2, 2, 2, 1];
         Singer.IntervalsActions.setTemperament("equal", "C", 4);
-        expect(MUSICALMODES.custom).toEqual(new Array(12).fill(9));
+        expect(MUSICALMODES.custom).toEqual([2, 2, 1, 2, 2, 2, 1]);
+    });
+
+    test("setTemperament keeps a defined custom mode with fewer steps than the EDO", () => {
+        // define mode stores steps that sum to the EDO, not one step per pitch.
+        global.getCurrentEDO = jest.fn(() => 12);
+        MUSICALMODES.custom = [2, 2, 3, 2, 3];
+        Singer.IntervalsActions.setTemperament("equal", "C", 4);
+        expect(MUSICALMODES.custom).toEqual([2, 2, 3, 2, 3]);
+    });
+
+    test("setTemperament rebuilds a custom mode whose steps don't fit the new EDO", () => {
+        global.getCurrentEDO = jest.fn(() => 19);
+        MUSICALMODES.custom = [2, 2, 3, 2, 3]; // sums to 12
+        Singer.IntervalsActions.setTemperament("equal19", "C", 4);
+        expect(MUSICALMODES.custom).toEqual(new Array(19).fill(1));
+    });
+
+    test("setTemperament tells the user when it drops a defined custom mode", () => {
+        global.getCurrentEDO = jest.fn(() => 19);
+        MUSICALMODES.custom = [2, 2, 3, 2, 3];
+        Singer.IntervalsActions.setTemperament("equal19", "C", 4);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "The custom mode does not fit the new tuning, so it was reset."
+        );
+    });
+
+    test("setTemperament warns only once for the same mode and tuning", () => {
+        global.getCurrentEDO = jest.fn(() => 19);
+        const warning = "The custom mode does not fit the new tuning, so it was reset.";
+        const countWarnings = () =>
+            activity.errorMsg.mock.calls.filter(c => c[0] === warning).length;
+
+        // the same saved 12-EDO mode comes back (e.g. after a reload) and is run in 19-EDO again
+        MUSICALMODES.custom = [2, 2, 3, 2, 3];
+        Singer.IntervalsActions.setTemperament("equal19", "C", 4);
+        MUSICALMODES.custom = [2, 2, 3, 2, 3];
+        Singer.IntervalsActions.setTemperament("equal19", "C", 4);
+        expect(countWarnings()).toBe(1);
+
+        // a different mode still gets its own warning
+        MUSICALMODES.custom = [3, 4, 5];
+        Singer.IntervalsActions.setTemperament("equal19", "C", 4);
+        expect(countWarnings()).toBe(2);
+    });
+
+    test("setTemperament stays quiet when it only resizes the default chromatic mode", () => {
+        global.getCurrentEDO = jest.fn(() => 19);
+        MUSICALMODES.custom = new Array(12).fill(1);
+        Singer.IntervalsActions.setTemperament("equal19", "C", 4);
+        expect(MUSICALMODES.custom).toEqual(new Array(19).fill(1));
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+    });
+
+    test("setTemperament rebuilds a custom mode with a 0 step even if the sum fits", () => {
+        global.getCurrentEDO = jest.fn(() => 12);
+        MUSICALMODES.custom = [5, 0, 7]; // sums to 12
+        Singer.IntervalsActions.setTemperament("equal", "C", 4);
+        expect(MUSICALMODES.custom).toEqual(new Array(12).fill(1));
     });
 
     describe("getTemperamentLength", () => {

@@ -326,29 +326,45 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
     const originalPitch = pitch;
     // Check for flat, sharp, double flat, or double sharp.
     let transposition = 0;
-    const len = pitch.length;
-    let lastOne, lastTwo;
-    if (len > 1) {
-        if (len > 2) {
-            lastTwo = pitch.slice(-2);
-            if (lastTwo === "bb" || lastTwo === FLAT + FLAT || lastTwo === DOUBLEFLAT) {
-                pitch = pitch.slice(0, -2);
-                transposition -= 2;
-            } else if (lastTwo === "##" || lastTwo === SHARP + SHARP || lastTwo === DOUBLESHARP) {
-                pitch = pitch.slice(0, -2);
-                transposition += 2;
-            } else if (
-                lastTwo === "#b" ||
-                lastTwo === SHARP + FLAT ||
-                lastTwo === "b#" ||
-                lastTwo === FLAT + SHARP
-            ) {
-                pitch = pitch.slice(0, -2);
-            }
-        }
+    if (pitch.length > 1) {
+        const doubleFlat = pitch.endsWith("bb")
+            ? "bb"
+            : pitch.endsWith(FLAT + FLAT)
+              ? FLAT + FLAT
+              : pitch.endsWith(DOUBLEFLAT)
+                ? DOUBLEFLAT
+                : null;
+        const doubleSharp = pitch.endsWith("##")
+            ? "##"
+            : pitch.endsWith(SHARP + SHARP)
+              ? SHARP + SHARP
+              : pitch.endsWith(DOUBLESHARP)
+                ? DOUBLESHARP
+                : null;
 
-        if (transposition === 0 && pitch.length > 1) {
-            lastOne = pitch.slice(-1);
+        if (doubleFlat) {
+            pitch = pitch.slice(0, -doubleFlat.length);
+            transposition -= 2;
+        } else if (doubleSharp) {
+            pitch = pitch.slice(0, -doubleSharp.length);
+            transposition += 2;
+        } else if (
+            pitch.endsWith("#b") ||
+            pitch.endsWith(SHARP + FLAT) ||
+            pitch.endsWith("#" + FLAT) ||
+            pitch.endsWith(SHARP + "b") ||
+            pitch.endsWith("b#") ||
+            pitch.endsWith(FLAT + SHARP) ||
+            pitch.endsWith("b" + SHARP) ||
+            pitch.endsWith(FLAT + "#")
+        ) {
+            // Mixed sharp+flat cancels out to a natural; this must be checked
+            // before the single-accidental checks below, since a mixed suffix
+            // also ends in "b" or "#" and would otherwise be caught by those
+            // first, stripping only one character instead of both.
+            pitch = pitch.slice(0, -2);
+        } else {
+            const lastOne = pitch.slice(-1);
             if (lastOne === "b" || lastOne === FLAT) {
                 pitch = pitch.slice(0, -1);
                 transposition -= 1;
@@ -900,10 +916,15 @@ var getNoteFromSolfege = (
     if (typeof noteArg !== "string" || noteArg.length === 0) {
         return null;
     }
-    let sharpFlat = false;
-    if (["#", SHARP, FLAT, "b"].includes(noteArg.slice(-1))) {
-        sharpFlat = true;
-    }
+    const normalizedNoteArg = noteArg.replace(/##$/g, DOUBLESHARP).replace(/bb$/g, DOUBLEFLAT);
+    const doubleSharp = normalizedNoteArg.endsWith(DOUBLESHARP);
+    const doubleFlat = normalizedNoteArg.endsWith(DOUBLEFLAT);
+    const accidentalLength = doubleSharp || doubleFlat ? DOUBLESHARP.length : 0;
+    const solfegeRoot = accidentalLength
+        ? normalizedNoteArg.slice(0, -accidentalLength)
+        : normalizedNoteArg;
+    const sharpFlat =
+        doubleSharp || doubleFlat || ["#", SHARP, FLAT, "b"].includes(normalizedNoteArg.slice(-1));
 
     if (!keySignature) {
         keySignature = "C major";
@@ -950,24 +971,28 @@ var getNoteFromSolfege = (
     }
 
     if (sharpFlat) {
-        if (noteArg.slice(-1) === "#") {
+        if (doubleSharp) {
+            offset += 2;
+        } else if (doubleFlat) {
+            offset -= 2;
+        } else if (normalizedNoteArg.slice(-1) === "#") {
             offset += 1;
-        } else if (noteArg.slice(-1) === SHARP) {
+        } else if (normalizedNoteArg.slice(-1) === SHARP) {
             offset += 1;
-        } else if (noteArg.slice(-1) === FLAT) {
+        } else if (normalizedNoteArg.slice(-1) === FLAT) {
             offset -= 1;
-        } else if (noteArg.slice(-1) === "b") {
+        } else if (normalizedNoteArg.slice(-1) === "b") {
             offset -= 1;
         }
     }
 
     let solfegePart;
-    if (halfSteps.includes(noteArg.slice(0, 1).toLowerCase())) {
-        solfegePart = noteArg.slice(0, 1).toLowerCase();
-    } else if (halfSteps.includes(noteArg.slice(0, 2).toLowerCase())) {
-        solfegePart = noteArg.slice(0, 2).toLowerCase();
-    } else if (halfSteps.includes(noteArg.slice(0, 3).toLowerCase())) {
-        solfegePart = noteArg.slice(0, 3).toLowerCase();
+    if (halfSteps.includes(solfegeRoot.slice(0, 1).toLowerCase())) {
+        solfegePart = solfegeRoot.slice(0, 1).toLowerCase();
+    } else if (halfSteps.includes(solfegeRoot.slice(0, 2).toLowerCase())) {
+        solfegePart = solfegeRoot.slice(0, 2).toLowerCase();
+    } else if (halfSteps.includes(solfegeRoot.slice(0, 3).toLowerCase())) {
+        solfegePart = solfegeRoot.slice(0, 3).toLowerCase();
     } else {
         // The note should already be translated, but just in case...
         // Reverse any i18n
@@ -1009,8 +1034,15 @@ var getNoteFromSolfege = (
         let note = thisScale[index];
         // In non-12 EDO temperaments, enharmonic spellings are distinct
         // pitches, so the resolved note must honor the input's accidental.
+        // Use the already-parsed doubleSharp/normalizedNoteArg values rather
+        // than re-checking the raw noteArg, so ASCII ("##") and Unicode
+        // (DOUBLESHARP) double-sharp spellings resolve the same way.
         if (octaveLength !== 12 && sharpFlat) {
-            if (noteArg.slice(-1) === "#" || noteArg.slice(-1) === SHARP) {
+            if (
+                doubleSharp ||
+                normalizedNoteArg.slice(-1) === "#" ||
+                normalizedNoteArg.slice(-1) === SHARP
+            ) {
                 note = NOTESSHARP[index];
             } else {
                 note = NOTESFLAT[index];

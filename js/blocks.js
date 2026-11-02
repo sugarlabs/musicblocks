@@ -1993,8 +1993,34 @@ class Blocks {
                 }
             }
 
-            for (let blk = 0; blk < this._adjustTheseStacks.length; blk++) {
-                this.raiseStackToTop(this._adjustTheseStacks[blk]);
+            if (this._adjustTheseStacks.length > 0) {
+                const container = this.activity.blocksContainer;
+                const order = new Map(container.children.map((child, index) => [child, index]));
+                let nextIndex = container.children.length;
+                let canBatch = true;
+
+                for (const blk of this._adjustTheseStacks) {
+                    this.findDragGroup(this.findTopBlock(blk));
+                    const seen = new Set();
+                    for (let b = this.dragGroup.length - 1; b >= 0; b--) {
+                        const child = this.blockList[this.dragGroup[b]].container;
+                        if (seen.has(child) || child?.parent !== container || !order.has(child)) {
+                            canBatch = false;
+                            break;
+                        }
+                        seen.add(child);
+                        order.set(child, nextIndex++);
+                    }
+                    if (!canBatch) break;
+                }
+
+                if (canBatch) {
+                    container.sortChildren((a, b) => order.get(a) - order.get(b));
+                } else {
+                    for (const blk of this._adjustTheseStacks) {
+                        this.raiseStackToTop(blk);
+                    }
+                }
             }
 
             this.activity.refreshCanvas();
@@ -2178,12 +2204,17 @@ class Blocks {
                             label = _("audio file");
                         } else {
                             label = myBlock.value[0].toString();
-                            if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+                            if (label.trim() === "") {
+                                label = _("audio file");
+                            } else if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
                                 label = label.slice(0, STRINGLEN) + "...";
                             }
                         }
                     } catch (e) {
                         label = _("audio file");
+                    }
+                    if (label === _("audio file")) {
+                        maxLength = label.length;
                     }
                     break;
                 case "solfege":

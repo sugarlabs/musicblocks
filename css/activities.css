@@ -23,6 +23,11 @@
     outline-offset: 2px;
 }
 
+.mode-temperament-control:focus-within {
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: 2px;
+}
+
 body:not(.dark):not(.highcontrast) #helpfulSearch,
 body:not(.dark):not(.highcontrast) .ui-autocomplete {
     background-color: var(--color-bg-primary) !important;

@@ -158,8 +158,18 @@ const resolveNoteEffects = (turtleState, instrumentSettings) => {
     if (instEffects && typeof instEffects === "object") {
         if (instEffects.vibratoActive) {
             resolved.doVibrato = true;
-            resolved.vibratoRate = instEffects.vibratoRate ?? 0;
-            resolved.vibratoIntensity = instEffects.vibratoIntensity ?? 0;
+            resolved.vibratoRate =
+                instEffects.vibratoRate !== undefined && instEffects.vibratoRate > 0
+                    ? instEffects.vibratoRate
+                    : instEffects.vibratoFrequency && instEffects.vibratoFrequency > 0
+                      ? 1 / instEffects.vibratoFrequency
+                      : 16;
+            resolved.vibratoIntensity =
+                instEffects.vibratoIntensity !== undefined &&
+                Number.isFinite(instEffects.vibratoIntensity) &&
+                instEffects.vibratoIntensity >= 0
+                    ? instEffects.vibratoIntensity
+                    : 0.05;
         }
 
         if (instEffects.distortionActive) {
@@ -1632,10 +1642,12 @@ class Singer {
                 : nnote[0];
 
             if (tur.singer.drumStyle.length === 0) {
-                activity.logo.musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
-                activity.logo.musicKeyboard.noteNames.push(nnote[0]);
-                activity.logo.musicKeyboard.octaves.push(nnote[1]);
-                activity.logo.musicKeyboard.addRowBlock(blk);
+                const musicKeyboard =
+                    activity.logo.musicKeyboardByTurtle?.[turtle] || activity.logo.musicKeyboard;
+                musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
+                musicKeyboard.noteNames.push(nnote[0]);
+                musicKeyboard.octaves.push(nnote[1]);
+                musicKeyboard.addRowBlock(blk);
                 tur.singer.lastNotePlayed = [noteObj[0] + noteObj[1], 4];
             }
         } else {

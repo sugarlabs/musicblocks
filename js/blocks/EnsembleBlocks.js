@@ -26,6 +26,10 @@
  * @returns {number|null}
  */
 function getTargetTurtle(turtles, targetTurtle) {
+    if (!turtles || !turtles.turtleList || targetTurtle === null || targetTurtle === undefined) {
+        return null;
+    }
+
     // We'll compare the names as strings so convert to "string" if "number".
     targetTurtle = targetTurtle.toString();
 

@@ -224,7 +224,8 @@ function setupMeterActions(activity) {
             const orgTurtle = turtle;
 
             // Create a companion turtle if it doesn't exist
-            if (!activity.turtles.getTurtle(orgTurtle).companionTurtle) {
+            const companionTurtle = activity.turtles.getTurtle(orgTurtle).companionTurtle;
+            if (companionTurtle === undefined || companionTurtle === null) {
                 turtle = activity.turtles.getTurtleCount();
                 activity.turtles.getTurtle(orgTurtle).companionTurtle = turtle;
                 activity.turtles.addTurtle(activity.blocks.blockList[blk], {});

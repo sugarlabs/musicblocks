@@ -14,15 +14,15 @@
 /*
    global
 
-   docById, platformColor, FIXEDSOLFEGE, FIXEDSOLFEGE1, SHARP, FLAT,
-   last, ManagedTimer, Singer, noteToFrequency, i18nSolfege, toFraction,
-   DEFAULTVOICE, SOLFEGECONVERSIONTABLE, NOTESSHARP, NOTESFLAT, PITCHES,
-   PITCHES2, convertFromSolfege, announceToScreenReader, MusicKeyboardEditing,
-   MusicKeyboardRendering, getCurrentEDO, generateNoteNames */
+   platformColor, FIXEDSOLFEGE, FIXEDSOLFEGE1, SHARP, FLAT, last, ManagedTimer,
+   Singer, noteToFrequency, i18nSolfege, toFraction, DEFAULTVOICE,
+   SOLFEGECONVERSIONTABLE, PITCHES, PITCHES2, convertFromSolfege,
+   announceToScreenReader, MusicKeyboardEditing, MusicKeyboardRendering,
+   MusicKeyboardPlayback, MusicKeyboardInput */
 /*
    Global Locations
     - js/utils/utils.js
-        _, docById, last, debugLog
+        _, last, debugLog
     - js/utils/ManagedTimer.js
         ManagedTimer
     - js/turtle-singer.js
@@ -30,14 +30,17 @@
     - js/utils/musicutils.js
         noteToFrequency, FIXEDSOLFEGE, FIXEDSOLFEGE1, SHARP, FLAT,
         i18nSolfege, toFraction, DEFAULTVOICE, PITCHES, PITCHES2,
-        SOLFEGECONVERSIONTABLE, NOTESSHARP, NOTESFLAT, convertFromSolfege,
-        getCurrentEDO, generateNoteNames
+        SOLFEGECONVERSIONTABLE, convertFromSolfege
     - js/utils/platformstyle.js
         platformColor
     - js/widgets/MusicKeyboardEditing.js
         MusicKeyboardEditing
     - js/widgets/MusicKeyboardRendering.js
         MusicKeyboardRendering
+    - js/widgets/MusicKeyboardPlayback.js
+        MusicKeyboardPlayback
+    - js/widgets/MusicKeyboardInput.js
+        MusicKeyboardInput
 */
 /* exported MusicKeyboard */
 
@@ -45,6 +48,8 @@
 MusicKeyboard.dependencies = [
     "widgets/MusicKeyboardEditing",
     "widgets/MusicKeyboardRendering",
+    "widgets/MusicKeyboardPlayback",
+    "widgets/MusicKeyboardInput",
     "widgets/musickeyboard"
 ];
 
@@ -101,10 +106,18 @@ function MusicKeyboard(activity) {
     const unit = beginnerMode === "true" ? 8 : 16;
 
     /**
-     * Rounds a raw note duration (in seconds) to the nearest beginner-mode
-     * eighth or normal-mode sixteenth, then clamps it to a positive,
-     * non-zero value.
-     * @param {number} rawDuration - The raw duration in seconds.
+     * Converts how long a key was held into the note value it is recorded as, at the
+     * keyboard's tempo. A whole note lasts 240 / bpm seconds (bpm counts quarter notes),
+     * which is also how playAll and playOne turn the note value back into seconds.
+     * @param {number} seconds - How long the key was held.
+     * @returns {number} The note value, e.g. 0.25 for a quarter note.
+     */
+    this._secondsToNoteValue = seconds => (seconds * this.bpm) / 240;
+
+    /**
+     * Rounds a note value to the nearest beginner-mode eighth or normal-mode
+     * sixteenth, then clamps it to a positive, non-zero value.
+     * @param {number} rawDuration - The note value, from _secondsToNoteValue.
      * @returns {number} The rounded, clamped duration.
      */
     this._roundNoteDuration = rawDuration => {
@@ -130,8 +143,8 @@ function MusicKeyboard(activity) {
      */
     this._stopOrCloseClicked = false;
 
-    this._savedDocumentOnKeyDown = undefined;
-    this._savedDocumentOnKeyUp = undefined;
+    this._boundKeyDown = null;
+    this._boundKeyUp = null;
     if (typeof ManagedTimer !== "undefined") {
         this._timerManager = new ManagedTimer();
     } else if (typeof require !== "undefined") {
@@ -155,30 +168,73 @@ function MusicKeyboard(activity) {
      */
     this.playingNow = false;
 
-    this._cacheDocumentKeyHandlers = function () {
-        if (
-            this._savedDocumentOnKeyDown !== undefined ||
-            this._savedDocumentOnKeyUp !== undefined
-        ) {
-            return;
+    // document.onkeydown/up ownership across the open keyboards.
+    this._registerDocumentKeyHandlers = function (keyDown, keyUp) {
+        const stack = MusicKeyboard._keyHandlerStack;
+        if (stack.indexOf(this) === -1) {
+            // Capture the base handler only on the first registration.
+            if (stack.length === 0) {
+                MusicKeyboard._baseKeyDown = document.onkeydown;
+                MusicKeyboard._baseKeyUp = document.onkeyup;
+            } else {
+                // Opening a new keyboard takes input from the previous owner;
+                // finish any note it is still holding.
+                const previous = stack[stack.length - 1];
+                if (typeof previous._releaseActiveNotes === "function") {
+                    previous._releaseActiveNotes();
+                }
+            }
+            stack.push(this);
         }
-
-        this._savedDocumentOnKeyDown = document.onkeydown;
-        this._savedDocumentOnKeyUp = document.onkeyup;
+        this._boundKeyDown = keyDown;
+        this._boundKeyUp = keyUp;
+        // Only the newest open keyboard drives the document handlers.
+        if (stack[stack.length - 1] === this) {
+            document.onkeydown = keyDown;
+            document.onkeyup = keyUp;
+        }
     };
 
-    this._restoreDocumentKeyHandlers = function () {
-        if (
-            this._savedDocumentOnKeyDown === undefined &&
-            this._savedDocumentOnKeyUp === undefined
-        ) {
+    this._releaseDocumentKeyHandlers = function () {
+        const stack = MusicKeyboard._keyHandlerStack;
+        const existing = stack.indexOf(this);
+        if (existing === -1) {
             return;
         }
+        // If another window (or the canvas) already took input, leave it alone.
+        const wasActive =
+            document.onkeydown === this._boundKeyDown && document.onkeyup === this._boundKeyUp;
+        stack.splice(existing, 1);
+        if (!wasActive) return;
+        const owner = stack[stack.length - 1];
+        document.onkeydown = owner ? owner._boundKeyDown : MusicKeyboard._baseKeyDown;
+        document.onkeyup = owner ? owner._boundKeyUp : MusicKeyboard._baseKeyUp;
+    };
 
-        document.onkeydown = this._savedDocumentOnKeyDown;
-        document.onkeyup = this._savedDocumentOnKeyUp;
-        this._savedDocumentOnKeyDown = undefined;
-        this._savedDocumentOnKeyUp = undefined;
+    // Clicking this window hands it the document key handlers.
+    this._focusKeyboardInput = function () {
+        const stack = MusicKeyboard._keyHandlerStack;
+        const existing = stack.indexOf(this);
+        if (existing === -1) {
+            return; // not open
+        }
+        const previous = stack[stack.length - 1];
+        if (previous !== this && typeof previous._releaseActiveNotes === "function") {
+            previous._releaseActiveNotes();
+        }
+        stack.splice(existing, 1);
+        stack.push(this);
+        document.onkeydown = this._boundKeyDown;
+        document.onkeyup = this._boundKeyUp;
+    };
+
+    // Clicking another window or the canvas releases this keyboard's key input.
+    this._blurKeyboardInput = function () {
+        const stack = MusicKeyboard._keyHandlerStack;
+        if (stack[stack.length - 1] !== this) return;
+        if (typeof this._releaseActiveNotes === "function") this._releaseActiveNotes();
+        document.onkeydown = MusicKeyboard._baseKeyDown;
+        document.onkeyup = MusicKeyboard._baseKeyUp;
     };
 
     this._setWidgetInterval = function (callback, interval) {
@@ -354,27 +410,6 @@ function MusicKeyboard(activity) {
      */
     this.firstNote = false;
 
-    // Turn off metronome and release timer/audio resources owned by it.
-    this.stopMetronome = () => {
-        if (this.tickButton) {
-            this.tickButton.style.removeProperty("background");
-        }
-        if (this.tick && this.loopTick) {
-            this.loopTick.stop();
-        }
-        this.tick = false;
-        this.firstNote = false;
-        this.metronomeON = false;
-        const countdownContainer = docById("countdownContainer");
-        if (countdownContainer) {
-            countdownContainer.remove();
-        }
-        if (this.metronomeInterval) {
-            this._clearWidgetInterval(this.metronomeInterval);
-            this.metronomeInterval = null;
-        }
-    };
-
     /**
      * Array of selected notes.
      * @type {Array}
@@ -408,32 +443,6 @@ function MusicKeyboard(activity) {
         }
 
         this._rowBlocks.push(rowBlock);
-    };
-
-    /**
-     * Rebuilds the play button's icon/label to reflect whether playback is
-     * currently active.
-     * @param {HTMLElement} playButtonCell - The play button element.
-     * @param {boolean} isPlaying - Whether playback is currently active.
-     */
-    this._updatePlayButtonIcon = (playButtonCell, isPlaying) => {
-        playButtonCell.replaceChildren(
-            document.createTextNode("\u00a0\u00a0"),
-            (() => {
-                const img = document.createElement("img");
-                img.src = isPlaying
-                    ? "header-icons/stop-button.svg"
-                    : "header-icons/play-button.svg";
-                img.title = isPlaying ? _("Stop") : _("Play");
-                img.alt = isPlaying ? _("Stop") : _("Play");
-                img.height = ICONSIZE;
-                img.width = ICONSIZE;
-                img.style.verticalAlign = "middle";
-                img.style.alignContent = "center";
-                return img;
-            })(),
-            document.createTextNode("\u00a0\u00a0")
-        );
     };
 
     /**
@@ -491,240 +500,6 @@ function MusicKeyboard(activity) {
                 });
             }
         }
-    };
-
-    /**
-     * Adds keyboard shortcuts for triggering musical notes.
-     */
-    this.addKeyboardShortcuts = function () {
-        let duration = 0;
-        const startTime = {};
-        const temp1 = {};
-        const temp2 = {};
-        const current = new Set();
-        let chordBuffer = {};
-        let extraNoteCount = 0;
-        let startTimeNotes = 0;
-
-        const isTextEntryActive = () => {
-            const activeElement = document.activeElement;
-            return (
-                activeElement &&
-                (activeElement.tagName === "INPUT" ||
-                    activeElement.tagName === "TEXTAREA" ||
-                    activeElement.isContentEditable)
-            );
-        };
-
-        /**
-         * Gets the ID of the musical note associated with a keyboard event.
-         * @param {KeyboardEvent} event - The keyboard event.
-         * @returns {string} The ID of the musical note.
-         */
-        const __getNoteId = event => {
-            let id;
-            const key = event.keyCode;
-
-            if (WHITEKEYS.includes(key)) {
-                id = `whiteRow${WHITEKEYS.indexOf(key)}`;
-            } else if (BLACKKEYS.includes(key)) {
-                const i = BLACKKEYS.indexOf(key);
-                if ([2, 6, 9, 13, 16, 20].includes(i)) return null;
-                id = `blackRow${i}`;
-            } else if (HERTZKEYS.includes(key)) {
-                id = `hertzRow${HERTZKEYS.indexOf(key)}`;
-            } else if (key === SPACE) {
-                id = "rest";
-            }
-
-            return id;
-        };
-
-        /**
-         * Handles the start of a musical note when a keyboard key is pressed.
-         * @param {KeyboardEvent} event - The keyboard event.
-         */
-        const __startNote = event => {
-            const id = __getNoteId(event);
-
-            const ele = docById(id);
-            if (!(id in startTime)) {
-                startTime[id] = new Date().getTime();
-            }
-
-            if (ele !== null && ele !== undefined) {
-                ele.style.backgroundColor = platformColor.orange;
-                temp1[id] = ele.getAttribute("alt").split("__")[0];
-                if (temp1[id] === "hertz") {
-                    temp2[id] = parseInt(ele.getAttribute("alt").split("__")[1], 10);
-                } else {
-                    temp2[id] = resolveSynthNoteName(
-                        temp1[id],
-                        ele.getAttribute("alt").split("__")[1]
-                    );
-                }
-
-                if (id === "rest") {
-                    return;
-                }
-
-                // Check if it is a chord
-                if (Object.keys(chordBuffer).length === 0) {
-                    chordBuffer[id] = temp2[id];
-                    startTimeNotes = Math.floor(startTime[id] / 100);
-                } else if (startTimeNotes === Math.floor(startTime[id] / 100)) {
-                    chordBuffer[id] = temp2[id];
-                    extraNoteCount++;
-                } else {
-                    extraNoteCount = 0;
-                    chordBuffer = {};
-                }
-
-                this.activity.logo.synth.trigger(
-                    0,
-                    temp2[id],
-                    1,
-                    this.instrumentMapper[id],
-                    null,
-                    null
-                );
-
-                if (this.tick && this.endTime !== undefined && this.firstNote) {
-                    let restDuration = (startTime[id] - this.endTime) / 1000.0;
-                    restDuration /= 60; // Convert time to minutes
-                    restDuration *= this.bpm;
-                    restDuration *= this.meterArgs[1];
-                    restDuration = parseFloat((Math.round(restDuration * unit) / unit).toFixed(4));
-                    const EPSILON = 0.06;
-
-                    if (restDuration > EPSILON && current.size === 0) {
-                        this._notesPlayed.push({
-                            startTime: this.endTime,
-                            noteOctave: "R",
-                            objId: null,
-                            duration: parseFloat(restDuration)
-                        });
-                    }
-                }
-                this.firstNote = true;
-            }
-        };
-
-        /**
-         * Handles the keyboard key down event to start playing musical notes.
-         * @param {KeyboardEvent} event - The keyboard event triggered when a key is pressed down.
-         */
-        const __keyboarddown = event => {
-            if (isTextEntryActive()) return;
-
-            if (event.shiftKey && (event.key === "ArrowUp" || event.code === "ArrowUp")) {
-                event.preventDefault();
-                this.shiftOctave(1);
-                return;
-            }
-            if (event.shiftKey && (event.key === "ArrowDown" || event.code === "ArrowDown")) {
-                event.preventDefault();
-                this.shiftOctave(-1);
-                return;
-            }
-            if (current.has(event.keyCode)) return;
-
-            __startNote(event);
-            current.add(event.keyCode);
-        };
-
-        /**
-         * Handles the keyboard key up event to stop playing musical notes.
-         * @param {KeyboardEvent} event - The keyboard event triggered when a key is released.
-         */
-        const __endNote = event => {
-            const id = __getNoteId(event);
-            const ele = docById(id);
-            const newDate = new Date();
-            const noteEndTime = newDate.getTime();
-            duration = (noteEndTime - startTime[id]) / 1000.0;
-
-            if (ele !== null && ele !== undefined) {
-                if (id.includes("blackRow")) {
-                    ele.style.backgroundColor = "black";
-                } else {
-                    ele.style.backgroundColor = "white";
-                }
-
-                let processedDuration = duration / 60;
-                processedDuration *= this.bpm;
-                processedDuration *= this.meterArgs[1];
-                processedDuration = parseFloat(
-                    (Math.round(processedDuration * unit) / unit).toFixed(4)
-                );
-
-                if (processedDuration <= 0) {
-                    processedDuration = 1 / unit;
-                }
-
-                if (id === "rest") {
-                    this._notesPlayed.push({
-                        startTime: startTime[id],
-                        noteOctave: "R",
-                        objId: null,
-                        duration: parseFloat(processedDuration)
-                    });
-                } else {
-                    this.activity.logo.synth.stopSound(0, this.instrumentMapper[id], temp2[id]);
-                    // Handle Chord
-                    if (id in chordBuffer) {
-                        Object.entries(chordBuffer).forEach(([id, noteOctave]) => {
-                            this._notesPlayed.push({
-                                startTime: startTimeNotes * 100,
-                                noteOctave: noteOctave,
-                                objId: id,
-                                duration: processedDuration,
-                                voice: this.instrumentMapper[id],
-                                blockNumber: this.blockNumberMapper[id]
-                            });
-                            delete chordBuffer[id];
-                        });
-                    } else if (extraNoteCount > 0) {
-                        extraNoteCount--;
-                    }
-                    // Handle Single Notes
-                    else {
-                        this._notesPlayed.push({
-                            startTime: startTime[id],
-                            noteOctave: temp2[id],
-                            objId: id,
-                            duration: processedDuration,
-                            voice: this.instrumentMapper[id],
-                            blockNumber: this.blockNumberMapper[id]
-                        });
-                        chordBuffer = {};
-                    }
-                }
-
-                this._createTable();
-                this._updateWidgetWindowSize();
-                this.endTime = noteEndTime;
-                startTimeNotes = 0;
-                delete startTime[id];
-                delete temp1[id];
-                delete temp2[id];
-            }
-        };
-
-        /**
-         * Handles the end of a musical note when a key is released.
-         * @param {KeyboardEvent} event - The keyboard event.
-         */
-        const __keyboardup = function (event) {
-            if (isTextEntryActive() && !current.has(event.keyCode)) return;
-
-            current.delete(event.keyCode);
-            __endNote(event);
-        };
-
-        this._cacheDocumentKeyHandlers();
-        document.onkeydown = __keyboarddown;
-        document.onkeyup = __keyboardup;
     };
 
     /**
@@ -788,7 +563,7 @@ function MusicKeyboard(activity) {
                 this.instrumentMapper[element.id],
                 this.noteMapper[element.id]
             );
-            duration = this._roundNoteDuration(duration);
+            duration = this._roundNoteDuration(this._secondsToNoteValue(duration));
 
             this._notesPlayed.push({
                 startTime: startTime,
@@ -820,7 +595,9 @@ function MusicKeyboard(activity) {
 
         const __endRest = element => {
             element.style.backgroundColor = "white";
-            const duration = this._roundNoteDuration((new Date().getTime() - startTime) / 1000);
+            const duration = this._roundNoteDuration(
+                this._secondsToNoteValue((new Date().getTime() - startTime) / 1000)
+            );
             this._notesPlayed.push({
                 startTime: startTime,
                 noteOctave: "R",
@@ -888,10 +665,18 @@ function MusicKeyboard(activity) {
          * @type {Window}
          */
         const widgetWindow = window.widgetWindows.windowFor(this, "music keyboard");
+        this._midiClosed = false;
         announceToScreenReader(_("Music Keyboard opened"));
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
+        // Scope _mkbEl to this window's body.
+        this._widgetBody = widgetWindow.getWidgetBody();
+        // Focus routes physical-key input to this keyboard.
+        widgetWindow.onfocused = () => this._focusKeyboardInput();
+        widgetWindow.onblurred = () => this._blurKeyboardInput();
+        // Opening or re-opening an existing window must also take focus and raise it.
+        if (typeof widgetWindow.takeFocus === "function") widgetWindow.takeFocus();
         this.displayLayout = this._keysLayout();
         /**
          * Beats per minute (BPM) for the MusicKeyboard.
@@ -914,19 +699,20 @@ function MusicKeyboard(activity) {
          */
         widgetWindow.onclose = () => {
             let myNode;
-            this._restoreDocumentKeyHandlers();
+            this._releaseDocumentKeyHandlers();
 
-            if (document.getElementById("keyboardHolder2")) {
-                document.getElementById("keyboardHolder2").style.display = "none";
+            const keyboardHolder = this._mkbEl("keyboardHolder2");
+            if (keyboardHolder && keyboardHolder.style) {
+                keyboardHolder.style.display = "none";
             }
 
-            myNode = document.getElementById("myrow");
-            if (myNode !== null) {
+            myNode = this._mkbEl("myrow");
+            if (myNode && typeof myNode.replaceChildren === "function") {
                 myNode.replaceChildren();
             }
 
-            myNode = document.getElementById("myrow2");
-            if (myNode !== null) {
+            myNode = this._mkbEl("myrow2");
+            if (myNode && typeof myNode.replaceChildren === "function") {
                 myNode.replaceChildren();
             }
 
@@ -967,28 +753,23 @@ function MusicKeyboard(activity) {
             this._stopOrCloseClicked = true;
             this.playingNow = false;
 
-            // Clear any active Web MIDI input handlers to prevent background notes & audio leaks
-            if (this.midiAccess && this.midiAccess.inputs) {
-                this.midiAccess.inputs.forEach(input => {
-                    input.onmidimessage = null;
+            // Detach only the MIDI listeners this keyboard attached so other
+            // keyboards sharing the same input keep receiving messages.
+            if (this._midiInputs && this._midiHandler) {
+                this._midiInputs.forEach(input => {
+                    input.removeEventListener("midimessage", this._midiHandler);
                 });
+                this._midiInputs.clear();
             }
+            this._midiHandler = null;
+            this._midiClosed = true;
             this.midiON = false;
             // Don't hold on to the turtle once the keyboard is closed.
             this.turtle = null;
 
             selectedNotes = [];
-            const wheelDiv = docById("wheelDivptm");
-            if (wheelDiv && wheelDiv.style) {
-                wheelDiv.style.display = "none";
-            }
-            if (this._menuWheel) this._menuWheel.removeWheel();
-            if (this._pitchWheel) this._pitchWheel.removeWheel();
-            if (this._tabsWheel) this._tabsWheel.removeWheel();
-            if (this._exitWheel) this._exitWheel.removeWheel();
-            if (this._durationWheel) this._durationWheel.removeWheel();
-            if (this._accidentalsWheel) this._accidentalsWheel.removeWheel();
-            if (this._octavesWheel) this._octavesWheel.removeWheel();
+            // Only tear down the shared menu if this keyboard still owns it.
+            if (typeof this._closeWheelMenu === "function") this._closeWheelMenu();
             announceToScreenReader(_("Music Keyboard closed"));
             widgetWindow.destroy();
         };
@@ -1041,6 +822,8 @@ function MusicKeyboard(activity) {
          */
         const addNoteButton = widgetWindow.addButton("add2.svg", ICONSIZE, _("Add note"));
         addNoteButton.setAttribute("id", "addnotes");
+        // Toolbar button lives outside _widgetBody, so keep the reference.
+        this._addNoteButton = addNoteButton;
         addNoteButton.onclick = () => {
             this._createAddRowPieSubmenu();
         };
@@ -1068,7 +851,7 @@ function MusicKeyboard(activity) {
                 this.metronomeON = true;
                 this.tickButton.style.background = platformColor.orange;
 
-                const winBody = document.getElementsByClassName("wfbWidget")[0];
+                const winBody = this.widgetWindow.getWidgetBody();
                 const countdownContainer = document.createElement("div");
                 countdownContainer.id = "countdownContainer";
 
@@ -1146,6 +929,11 @@ function MusicKeyboard(activity) {
         this.keyTable.addEventListener("wheel", this._stopPropagationHandler);
         this.keyTable.addEventListener("DOMMouseScroll", this._stopPropagationHandler);
 
+        // Focus this window explicitly so physical-key input follows the keyboard being played.
+        this.keyboardDiv.addEventListener("pointerdown", () => {
+            this.widgetWindow.takeFocus();
+        });
+
         /**
          * Appends keyboard and table divs to the widget window body.
          */
@@ -1178,189 +966,6 @@ function MusicKeyboard(activity) {
         );
 
         this.widgetWindow.sendToCenter();
-    };
-
-    /**
-     * Plays the selected musical notes.
-     * If no notes are selected, the function returns early.
-     */
-    this.playAll = function () {
-        if (selectedNotes.length <= 0) {
-            return;
-        }
-
-        this.playingNow = !this.playingNow;
-        const playButtonCell = this.playButton;
-
-        if (this.playingNow) {
-            this._updatePlayButtonIcon(playButtonCell, true);
-
-            if (selectedNotes.length < 1) {
-                return;
-            }
-
-            const notes = [];
-            let ele, zx, res, cell;
-            for (let i = 0; i < selectedNotes[0].noteOctave.length; i++) {
-                if (this.keyboardShown && selectedNotes[0].objId[0] !== null) {
-                    ele = docById(selectedNotes[0].objId[i]);
-                    if (ele !== null) {
-                        ele.style.backgroundColor = "lightgrey";
-                    }
-                }
-
-                zx = selectedNotes[0].noteOctave[i];
-                res = zx;
-                if (typeof zx === "string") {
-                    res = zx.replace(SHARP, "#").replace(FLAT, "b");
-                }
-
-                notes.push(res);
-            }
-
-            if (!this.keyboardShown) {
-                cell = docById("cells-0");
-                cell.style.backgroundColor = platformColor.selectorBackground;
-            }
-
-            this._stopOrCloseClicked = false;
-            this._clearPlaybackTimers();
-
-            // Convert durations to seconds based on BPM
-            const durationInSeconds = selectedNotes[0].duration.map(
-                beatDuration => (beatDuration * 60 * 4) / this.bpm
-            );
-            this._playChord(notes, durationInSeconds, selectedNotes[0].voice);
-            const maxDuration = Math.max(...durationInSeconds);
-            this.playOne(1, maxDuration, playButtonCell);
-        } else {
-            if (!this.keyboardShown) {
-                this._createTable();
-            } else {
-                this._createKeyboard();
-            }
-
-            this._stopOrCloseClicked = true;
-            this._clearPlaybackTimers();
-            this._updatePlayButtonIcon(playButtonCell, false);
-        }
-    };
-
-    /**
-     * Plays a sequence of musical notes recursively with a specified time delay.
-     *
-     * @param {number} counter - The index of the current note in the sequence.
-     * @param {number} time - The time duration of the current note.
-     * @param {HTMLElement} playButtonCell - The HTML element representing the play button.
-     */
-    this.playOne = function (counter, time, playButtonCell) {
-        if (this._playOneTimeout) {
-            this._clearWidgetTimeout(this._playOneTimeout);
-            this._playOneTimeout = null;
-        }
-        this._playOneTimeout = this._setWidgetTimeout(() => {
-            this._playOneTimeout = null;
-            let cell, eleid, ele, notes, zx, res, maxDuration;
-            if (counter < selectedNotes.length) {
-                if (this._stopOrCloseClicked) {
-                    return;
-                }
-
-                if (!this.keyboardShown) {
-                    cell = docById("cells-" + counter);
-                    cell.style.backgroundColor = platformColor.selectorBackground;
-                }
-
-                if (this.keyboardShown && selectedNotes[counter - 1].objId[0] !== null) {
-                    for (let i = 0; i < selectedNotes[counter - 1].noteOctave.length; i++) {
-                        eleid = selectedNotes[counter - 1].objId[i];
-                        ele = docById(eleid);
-                        if (eleid.includes("blackRow")) {
-                            ele.style.backgroundColor = "black";
-                        } else {
-                            ele.style.backgroundColor = "white";
-                        }
-                    }
-                }
-
-                notes = [];
-                for (let i = 0; i < selectedNotes[counter].noteOctave.length; i++) {
-                    if (this.keyboardShown && selectedNotes[counter].objId[0] !== null) {
-                        /*
-                        id = this.idContainer.findIndex((ele) => {
-                            return ele[1] === selectedNotes[counter].objId[i];
-                        });
-                        */
-
-                        ele = docById(selectedNotes[counter].objId[i]);
-                        if (ele !== null) {
-                            ele.style.backgroundColor = "lightgrey";
-                        }
-                    }
-
-                    zx = selectedNotes[counter].noteOctave[i];
-                    res = zx;
-                    if (typeof zx === "string") {
-                        res = zx.replace(SHARP, "#").replace(FLAT, "b");
-                    }
-                    notes.push(res);
-                }
-
-                if (this.playingNow) {
-                    const durationInSeconds = selectedNotes[counter].duration.map(
-                        beatDuration => (beatDuration * 60 * 4) / this.bpm
-                    );
-
-                    this._playChord(notes, durationInSeconds, selectedNotes[counter].voice);
-                }
-
-                maxDuration = Math.max(
-                    ...selectedNotes[counter].duration.map(
-                        beatDuration => (beatDuration * 60 * 4) / this.bpm
-                    )
-                );
-
-                this.playOne(counter + 1, maxDuration, playButtonCell);
-            } else {
-                this._updatePlayButtonIcon(playButtonCell, false);
-                this.playingNow = false;
-                if (!this.keyboardShown) {
-                    this._createTable();
-                } else {
-                    this._createKeyboard();
-                }
-                this._updateWidgetWindowSize();
-            }
-        }, time * 1000);
-    };
-
-    /**
-     * Plays a chord (multiple notes simultaneously) using a synthesizer.
-     *
-     * @param {string[]} notes - Array of note names to be played as a chord.
-     * @param {number[]} noteValue - Array of note values (durations) for each note in the chord.
-     * @param {string[]} instruments - Array of instrument names or identifiers for each note.
-     */
-    this._playChord = (notes, noteValue, instruments) => {
-        if (notes[0] === "R") {
-            return;
-        }
-
-        for (let i = 0; i < notes.length; i++) {
-            const id = this._setWidgetTimeout(() => {
-                this.activity.logo.synth.trigger(
-                    0,
-                    notes[i],
-                    noteValue[0],
-                    instruments[i],
-                    null,
-                    null
-                );
-            }, 1);
-            if (id) {
-                this._chordTimeouts.push(id);
-            }
-        }
     };
 
     /**
@@ -1597,14 +1202,10 @@ function MusicKeyboard(activity) {
             return false;
         });
 
-        function removeBlock(that, i) {
-            that._setWidgetTimeout(() => {
-                that._removePitchBlock(that.remove[i]);
+        for (const blockNumber of this.remove) {
+            this._setWidgetTimeout(() => {
+                this._removePitchBlock(blockNumber);
             }, 200);
-        }
-
-        for (let i = 0; i < this.remove.length; i++) {
-            removeBlock(this, i);
         }
 
         const sortedHertzList = sortedList.filter(note => note.noteName === "hertz");
@@ -1661,6 +1262,24 @@ function MusicKeyboard(activity) {
         beginnerMode,
         resolveSynthNoteName,
         fillChromaticGaps
+    });
+
+    // Playback lives in MusicKeyboardPlayback.js: the Play button, highlighting the
+    // keys as the recorded notes play, and stopping the metronome.
+    MusicKeyboardPlayback.install.call(this, {
+        ICONSIZE,
+        getSelectedNotes: () => selectedNotes
+    });
+
+    // Live input lives in MusicKeyboardInput.js: the computer keyboard, Shift + Arrow
+    // octave shifts, and MIDI devices.
+    MusicKeyboardInput.install.call(this, {
+        BLACKKEYS,
+        WHITEKEYS,
+        HERTZKEYS,
+        SPACE,
+        unit,
+        resolveSynthNoteName
     });
 
     this._save = function () {
@@ -1731,8 +1350,14 @@ function MusicKeyboard(activity) {
             }
             return ans;
         };
+
         const actionGroupInterval = 50;
-        const actionGroups = parseInt(selectedNotes.length / actionGroupInterval, 10) + 1;
+        const actionGroups = Math.ceil(selectedNotes.length / actionGroupInterval);
+
+        if (actionGroups === 0) {
+            activity.textMsg(_("No notes to save."), 3000);
+            return;
+        }
 
         for (let actionGroup = 0; actionGroup < actionGroups; actionGroup++) {
             const currentSelectedNotes = selectedNotes.slice(
@@ -1764,12 +1389,14 @@ function MusicKeyboard(activity) {
                 const selectedNotesGrp = newNotes[noteGrp];
                 const isLast = noteGrp === newNotes.length - 1;
                 id = newStack.length;
-                let voice = selectedNotes[selectedNotesGrp[0]].voice[0] || DEFAULTVOICE;
+                let voice = currentSelectedNotes[selectedNotesGrp[0]].voice[0] || DEFAULTVOICE;
                 // Don't use a drum name with set timbre.
-                if (selectedNotes[selectedNotesGrp[0]].noteOctave[0] === "drumnull") {
+                if (currentSelectedNotes[selectedNotesGrp[0]].noteOctave[0] === "drumnull") {
                     voice = DEFAULTVOICE;
                 }
-                const next = isLast ? null : id + 3 + this.findLen(selectedNotesGrp, selectedNotes);
+                const next = isLast
+                    ? null
+                    : id + 3 + this.findLen(selectedNotesGrp, currentSelectedNotes);
 
                 newStack.push(
                     [id, "settimbre", 0, 0, [prevId, id + 1, id + 3, id + 2]],
@@ -1781,7 +1408,7 @@ function MusicKeyboard(activity) {
                 endOfStackIdx = id;
 
                 for (let i = 0; i < selectedNotesGrp.length; i++) {
-                    const note = selectedNotes[selectedNotesGrp[i]];
+                    const note = currentSelectedNotes[selectedNotesGrp[i]];
 
                     // Add the Note block and its value
                     const idx = newStack.length;
@@ -1958,251 +1585,12 @@ function MusicKeyboard(activity) {
         this.noteNames = [];
         this.octaves = [];
     };
-
-    /**
-     * Initiates MIDI functionality, allowing notes to be triggered by user interaction.
-     * @memberof MusicKeyboard
-     */
-    this.doMIDI = () => {
-        let duration = 0;
-        let startTime = 0;
-
-        this.noteToKeyMap = {};
-
-        for (let idx = 0; idx < this.layout.length; idx++) {
-            const key = this.layout[idx];
-            if (key) {
-                this.noteToKeyMap[key.noteName.toString() + key.noteOctave.toString()] = key.objId;
-                if (FIXEDSOLFEGE1 && FIXEDSOLFEGE1[key.noteName.toString()]) {
-                    this.noteToKeyMap[
-                        FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave
-                    ] = key.objId; //convet solfege to alphabetic.
-                }
-            }
-        }
-
-        /**
-         * Handler for starting a note on MIDI interaction.
-         * @param {MouseEvent} event - The mouse event triggering the note start.
-         * @param {HTMLElement} element - The HTML element representing the note.
-         */
-        const __startNote = (event, element) => {
-            if (!element) return;
-            startTime = event.timeStamp; // Milliseconds();
-            element.style.backgroundColor = platformColor.orange;
-            this.activity.logo.synth.trigger(
-                0,
-                this.noteMapper[element.id],
-                1,
-                this.instrumentMapper[element.id],
-                null,
-                null
-            );
-        };
-
-        /**
-         * Handler for ending a note on MIDI interaction.
-         * @param {MouseEvent} event - The mouse event triggering the note end.
-         * @param {HTMLElement} element - The HTML element representing the note.
-         */
-        const __endNote = (event, element) => {
-            if (!element) return;
-
-            const id = element.id;
-            if (id.includes("blackRow")) {
-                element.style.backgroundColor = "black";
-            } else {
-                element.style.backgroundColor = "white";
-            }
-
-            const now = event.timeStamp;
-            duration = now - startTime;
-            duration /= 1000;
-            this.activity.logo.synth.stopSound(
-                0,
-                this.instrumentMapper[element.id],
-                this.noteMapper[element.id]
-            );
-            duration = this._roundNoteDuration(duration);
-
-            this._notesPlayed.push({
-                startTime: startTime,
-                noteOctave: this.noteMapper[element.id],
-                objId: element.id,
-                duration: duration,
-                voice: this.instrumentMapper[element.id],
-                blockNumber: this.blockNumberMapper[element.id]
-            });
-            this._createTable();
-        };
-
-        /**
-         * Converts a MIDI note number to a pitch and octave.
-         * @param {number} num - The MIDI note number.
-         * @returns {Array<string>} An array containing two possible pitch names and the octave.
-         * @memberof MusicKeyboard
-         */
-        const numberToPitch = num => {
-            const offset = 4;
-            const currentEDO = getCurrentEDO(this.activity.logo.synth.inTemperament);
-            const octave = offset + Math.floor((num - 60) / currentEDO);
-            const noteNames = generateNoteNames(currentEDO);
-            const pitch1 = noteNames[num % currentEDO];
-            return [pitch1, pitch1, octave];
-        };
-
-        //event attributes : timeStamp , data
-        //data : length -3 [0] : 144/128 : noteOn/NoteOff
-        //                 [1] : noteNumber : middle C always 60
-        //                 [2] : velocity ,(currently not used).
-
-        /**
-         * Handles MIDI messages, triggering note start or end events based on the MIDI data.
-         * @param {MIDIMessageEvent} event - The MIDI message event containing note information.
-         * @memberof MusicKeyboard
-         */
-        const onMIDIMessage = event => {
-            const pitchOctave = numberToPitch(event.data[1]);
-            const pitch1 = pitchOctave[0];
-            const pitch2 = pitchOctave[1];
-            const octave = pitchOctave[2];
-            const key =
-                this.noteToKeyMap[pitch1 + "" + octave] || this.noteToKeyMap[pitch2 + "" + octave];
-            if (event.data[0] === 144 && event.data[2] !== 0) {
-                __startNote(event, docById(key));
-            } else {
-                __endNote(event, docById(key));
-            }
-        };
-
-        /**
-         * Success callback function triggered upon receiving MIDI access.
-         * Initializes MIDI widget and sets up MIDI event handlers.
-         * @param {MIDIAccess} midiAccess - The MIDI access object containing MIDI inputs and outputs.
-         * @memberof MusicKeyboard
-         */
-        const onMIDISuccess = midiAccess => {
-            this.midiAccess = midiAccess;
-            // re-init widget
-            if (this.midiON) {
-                this.midiButton.style.background = "#00FF00";
-                activity.textMsg(_("MIDI device present."), 3000);
-                return;
-            }
-            midiAccess.inputs.forEach(input => {
-                input.onmidimessage = onMIDIMessage;
-            });
-            if (midiAccess.inputs.size) {
-                this.midiButton.style.background = "#00FF00";
-                activity.textMsg(_("MIDI device present."), 3000);
-                this.midiON = true;
-            } else {
-                activity.textMsg(_("No MIDI device found."), 3000);
-            }
-        };
-
-        /**
-         * Failure callback function triggered upon failing to get MIDI access in the browser.
-         * Displays an error message and updates MIDI state accordingly.
-         * @memberof MusicKeyboard
-         */
-        const onMIDIFailure = () => {
-            activity.errorMsg(_("Failed to get MIDI access in browser."), 3000);
-            this.midiON = false;
-        };
-
-        /**
-         * Requests MIDI access from the browser and initializes MIDI-related functionality.
-         * Calls success or failure callback functions based on the result of the request.
-         * @memberof MusicKeyboard
-         */
-        navigator.requestMIDIAccess({ sysex: true }).then(onMIDISuccess, onMIDIFailure);
-    };
-
-    /**
-     * Shifts keyboard octaves higher (+1) or lower (-1).
-     * @param {number} delta
-     */
-    this.shiftOctave = function (delta) {
-        if (!this.octaves || this.octaves.length === 0) return;
-
-        // Filter octaves for pitched notes only (exclude "hertz")
-        const pitchedOctaves = [];
-        for (let i = 0; i < this.octaves.length; i++) {
-            if (this.noteNames && this.noteNames[i] !== "hertz") {
-                pitchedOctaves.push(this.octaves[i]);
-            }
-        }
-        if (pitchedOctaves.length === 0) return;
-
-        const minOct = Math.min(...pitchedOctaves);
-        const maxOct = Math.max(...pitchedOctaves);
-
-        if (delta > 0 && maxOct >= 8) return;
-        if (delta < 0 && minOct <= 1) return;
-
-        for (let i = 0; i < this.octaves.length; i++) {
-            if (this.noteNames && this.noteNames[i] !== "hertz") {
-                this.octaves[i] += delta;
-            }
-        }
-
-        if (this.displayLayout) {
-            for (let i = 0; i < this.displayLayout.length; i++) {
-                if (
-                    this.displayLayout[i].noteName !== "hertz" &&
-                    this.displayLayout[i].noteOctave !== undefined
-                ) {
-                    this.displayLayout[i].noteOctave += delta;
-                }
-            }
-        }
-
-        if (this.layout) {
-            for (let i = 0; i < this.layout.length; i++) {
-                if (
-                    this.layout[i].noteName !== "hertz" &&
-                    this.layout[i].noteOctave !== undefined
-                ) {
-                    this.layout[i].noteOctave += delta;
-                }
-            }
-        }
-
-        // Update note mappings and key element labels
-        if (this.displayLayout && typeof docById === "function") {
-            for (let i = 0; i < this.displayLayout.length; i++) {
-                const item = this.displayLayout[i];
-                if (item.noteName !== "hertz") {
-                    const elem = docById("cell-" + i) || docById("blackRow" + i);
-                    if (elem) {
-                        const newSynthName = resolveSynthNoteName(item.noteName, item.noteOctave);
-                        if (this.noteMapper && elem.id) {
-                            this.noteMapper[elem.id] = newSynthName;
-                        }
-                        if (typeof elem.setAttribute === "function") {
-                            elem.setAttribute("alt", newSynthName);
-                            elem.setAttribute("title", newSynthName);
-                        }
-
-                        if (elem.childNodes && elem.childNodes.length > 0) {
-                            for (let j = 0; j < elem.childNodes.length; j++) {
-                                const node = elem.childNodes[j];
-                                if (node.nodeType === 3) {
-                                    node.textContent = `${item.noteName}${item.noteOctave}`;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (typeof this._createTable === "function") {
-            this._createTable();
-        }
-    };
 }
+
+// Open keyboards, oldest first; the last one owns document.onkeydown/up.
+MusicKeyboard._keyHandlerStack = [];
+MusicKeyboard._baseKeyDown = undefined;
+MusicKeyboard._baseKeyUp = undefined;
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = MusicKeyboard;
