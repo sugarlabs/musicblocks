@@ -301,6 +301,37 @@ describe("musicutils-buildscale", () => {
         expect(buildscale.getSolfege("")).toBe("");
     });
 
+    it("distinguishes an omitted EDO from an explicitly invalid one", () => {
+        // With an ambient equal19 temperament, an omitted EDO keeps
+        // the ambient 19-EDO scale, but an explicitly passed invalid
+        // value (0, NaN, Infinity, ...) falls back to 12 instead of
+        // silently picking up the ambient temperament.
+        const savedActivity = global.globalActivity;
+        global.globalActivity = { logo: { synth: { inTemperament: "equal19" } } };
+        try {
+            expect(buildscale.buildScale("C major")).toEqual(buildscale.buildScale("C major", 19));
+            for (const edo of [0, NaN, Infinity, -Infinity, 12.5, 257]) {
+                expect(buildscale.buildScale("C major", edo)).toEqual(
+                    buildscale.buildScale("C major", 12)
+                );
+            }
+        } finally {
+            global.globalActivity = savedActivity;
+        }
+    });
+
+    it("normalises an invalid EDO in getSolfege instead of throwing", () => {
+        // A chromatic note with a non-finite EDO previously built a
+        // 12-EDO scale but did its chromatic math with Infinity,
+        // producing NaN and throwing on the missing solfege entry.
+        for (const edo of [Infinity, -Infinity, NaN, 0, 12.5, 257]) {
+            expect(() => buildscale.getSolfege("C♯", "C major", true, "equal", edo)).not.toThrow();
+            expect(buildscale.getSolfege("C♯", "C major", true, "equal", edo)).toBe(
+                buildscale.getSolfege("C♯", "C major", true, "equal", 12)
+            );
+        }
+    });
+
     it("is still reachable through musicutils.js for callers that require it", () => {
         for (const name of [
             "buildScale",
