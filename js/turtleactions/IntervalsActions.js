@@ -122,12 +122,22 @@ function setupIntervalsActions(activity) {
 
             // Octave numbers change at C, so the second note sits in a later
             // (or earlier) octave whenever the letter steps cross a C.
-            const index1 = NOTENAMES.indexOf(firstNote.substring(0, 1));
-            const octaveShift = Math.floor(
-                (index1 + this.getLetterSteps(firstNote, secondNote, octave)) / NOTENAMES.length
-            );
+            const letterSteps = this.getLetterSteps(firstNote, secondNote, octave);
+            const octaveShift =
+                letterSteps === null
+                    ? octave
+                    : Math.floor((this.getLetterIndex(firstNote) + letterSteps) / NOTENAMES.length);
 
             return Math.abs(secondStep - firstStep + octaveShift * temperamentLength);
+        }
+
+        /**
+         * @static
+         * @param {String} note - Note name, e.g. "A" or "c#".
+         * @returns {Number} Index of the note's letter in NOTENAMES, or -1.
+         */
+        static getLetterIndex(note) {
+            return NOTENAMES.indexOf(String(note).charAt(0).toUpperCase());
         }
 
         /**
@@ -140,12 +150,15 @@ function setupIntervalsActions(activity) {
          * @param {String} firstNote
          * @param {String} secondNote
          * @param {Number} octave
-         * @returns {Number}
+         * @returns {Number|null} Null if either name does not start with a letter.
          */
         static getLetterSteps(firstNote, secondNote, octave) {
             const length = NOTENAMES.length;
-            const index1 = NOTENAMES.indexOf(firstNote.substring(0, 1));
-            const index2 = NOTENAMES.indexOf(secondNote.substring(0, 1));
+            const index1 = this.getLetterIndex(firstNote);
+            const index2 = this.getLetterIndex(secondNote);
+            if (index1 === -1 || index2 === -1) {
+                return null;
+            }
             return length * octave + ((((index2 - index1) % length) + length) % length);
         }
 
@@ -162,7 +175,8 @@ function setupIntervalsActions(activity) {
 
             let lastWord = "";
             const letterGap =
-                Math.abs(this.getLetterSteps(firstNote, secondNote, octave)) % NOTENAMES.length;
+                Math.abs(this.getLetterSteps(firstNote, secondNote, octave) ?? 0) %
+                NOTENAMES.length;
 
             // Use dynamic temperament length for custom tunings
             const temperamentLength = this.getTemperamentLength();

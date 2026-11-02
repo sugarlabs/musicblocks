@@ -2170,6 +2170,22 @@ describe("GetNotesForInterval", () => {
         });
     });
 
+    it("ignores microtonal prefixes when counting letter steps", () => {
+        const tur = {
+            singer: {
+                noteStatus: null,
+                notePitches: { 1: ["^A", "vC"] },
+                noteOctaves: { 1: [4, 5] },
+                inNoteBlock: [1]
+            }
+        };
+        expect(GetNotesForInterval(tur)).toEqual({
+            firstNote: "A",
+            secondNote: "C",
+            octave: 0
+        });
+    });
+
     it("falls back to the octave number difference for names that are not letters", () => {
         const tur = {
             singer: {

@@ -769,8 +769,11 @@ var GetNotesForInterval = (tur, temperament) => {
      * @returns {number}
      */
     const octavesBetween = (firstNote, firstOctave, secondNote, secondOctave) => {
-        const index1 = NOTENAMES.indexOf(String(firstNote).charAt(0).toUpperCase());
-        const index2 = NOTENAMES.indexOf(String(secondNote).charAt(0).toUpperCase());
+        // Drop microtonal prefixes such as "^" and "v" so "^C" counts as C.
+        const letterIndex = note =>
+            NOTENAMES.indexOf(normalizeNoteAccidentals(String(note)).charAt(0).toUpperCase());
+        const index1 = letterIndex(firstNote);
+        const index2 = letterIndex(secondNote);
         if (index1 === -1 || index2 === -1) {
             return secondOctave - firstOctave;
         }

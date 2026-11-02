@@ -452,6 +452,23 @@ describe("setupIntervalsActions", () => {
             expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(9);
         });
 
+        test("reads lowercase note letters", () => {
+            // Like the real pitchToNumber, accept lowercase names.
+            pitchToNumber.mockImplementation(note => ALLNOTESTEP[note.toUpperCase()] || 0);
+            GetNotesForInterval.mockReturnValueOnce({ firstNote: "a", secondNote: "c", octave: 0 });
+            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(3);
+        });
+
+        test("adds no octave shift for names that do not start with a letter", () => {
+            // Without a letter to count, a unison must stay 0 steps, not 12.
+            GetNotesForInterval.mockReturnValueOnce({
+                firstNote: "do",
+                secondNote: "do",
+                octave: 0
+            });
+            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(0);
+        });
+
         test("octave === -1 counts down from the first note", () => {
             // G down to E (G4 -> E4) is a minor third.
             GetNotesForInterval.mockReturnValueOnce({
