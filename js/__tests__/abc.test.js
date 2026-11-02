@@ -34,6 +34,7 @@ const mockFrequencyToPitch = global.frequencyToPitch;
 
 global.toFraction = jest.fn(num => [1, 1]);
 global._ = jest.fn(str => str);
+global.plainUnwritableTuplets = require("../utils/musicutils-rhythm").plainUnwritableTuplets;
 
 const { frequencyToPitch: realFrequencyToPitch } = require("../utils/musicutils-pitch");
 
@@ -1757,5 +1758,44 @@ describe("processABCNotes - bar lines", () => {
         ];
         const body = exportBody(staged);
         expect(body).toContain("[V:2]\nM:3/4\nc4 d4 e4 |");
+    });
+});
+
+describe("processABCNotes - fractional tuplets", () => {
+    const abcjs = require("abcjs");
+
+    const exportParsed = staged => {
+        const logo = { notationNotes: { 0: "" }, notation: { notationStaging: { 0: staged } } };
+        processABCNotes(logo, "0");
+        const body = logo.notationNotes["0"];
+        const [tune] = abcjs.parseOnly(`${getABCHeader()}K:C\n${body}\n`);
+        expect((tune.warnings || []).map(w => w.replace(/<[^>]*>/g, ""))).toEqual([]);
+        return body;
+    };
+
+    it("writes the rows examples/test-suite.html stages as plain notes", () => {
+        const body = exportParsed([
+            [["G4"], 4, 0, null, 0, -1, false, null],
+            [["G4"], 1, 0, [4.012036108324975, 0.5], 2, -1, false, null],
+            [["A4"], 1, 0, [3.988035892323031, 0.5], 1, -1, false, null]
+        ]);
+        expect(body).not.toContain("(");
+        expect(body).toContain("G8");
+        expect(body).toContain("A8");
+    });
+
+    it("writes a rest for a pitchless fractional tuplet", () => {
+        expect(exportParsed([[[], 1, 0, [4.012036108324975, 0.5], 2, -1, false, null]])).toContain(
+            "z8"
+        );
+    });
+
+    it("writes what is left of a note at a bar line as a plain note", () => {
+        expect(exportParsed([[["A4"], 1, 0, [27, 1], 16, -1, false, null]])).not.toContain("(");
+    });
+
+    it("leaves a whole tuplet alone", () => {
+        const triplet = [["G4"], 1, 0, [3, 0.5], 1, -1, false, null];
+        expect(exportParsed([triplet, triplet, triplet])).toContain("(3:2");
     });
 });
