@@ -95,6 +95,10 @@ describe("musicutils-buildscale", () => {
 
     it("still resolves scale degrees, step sizes and intervals", () => {
         expect(buildscale.getModeLength("C major")).toBe(7);
+        // A non-finite EDO previously hung inside generateNoteNames;
+        // it must now return promptly through the 12-EDO fallback.
+        expect(buildscale.getModeLength("C major", Infinity)).toBe(7);
+        expect(buildscale.buildScale("C major", Infinity)[0][0]).toBe("C");
         expect(buildscale.scaleDegreeToPitchMapping("C major", 2, false, null)).toBe("D");
         expect(buildscale.scaleDegreeToPitchMapping("C major", 1, true, null)).toBe("C");
         expect(buildscale.nthDegreeToPitch("C major", 3)).toEqual(["E", 0]);

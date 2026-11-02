@@ -92,10 +92,27 @@ var SHARP_NAMES = [
  * For small EDOs (5, 7): returns the subset of natural letters without accidentals.
  * For EDO > 12: interleaves sharp and flat accidentals between naturals.
  * Results are cached in EDO_NOTE_NAMES.
+ * Invalid EDOs (non-finite, non-integer, below 1, or above 256) fall
+ * back to the standard 12-EDO names instead of hanging or allocating
+ * a table no temperament uses.
  * @param {number} edo - number of steps per octave
  * @returns {string[]} array of note names, length = edo
  */
 function generateNoteNames(edo) {
+    // An EDO with no note table must not reach the step distribution
+    // below: Infinity yields an infinite sharp count and the
+    // name-building loop never terminates, and an absurdly large
+    // finite value would allocate a huge table with ever-longer
+    // accidental strings (built-in temperaments top out at 31
+    // divisions, so 256 leaves ample headroom). Fall back to the
+    // standard 12-EDO names, the same fallback getCurrentEDO uses
+    // for an unknown temperament, so every caller keeps a usable
+    // table. The fallback is deliberately not cached under the bad
+    // key.
+    if (!Number.isInteger(edo) || edo < 1 || edo > 256) {
+        return SHARP_NAMES;
+    }
+
     if (EDO_NOTE_NAMES[edo]) {
         return EDO_NOTE_NAMES[edo];
     }
