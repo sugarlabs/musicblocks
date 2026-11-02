@@ -723,6 +723,10 @@ describe("AIWidget Instance", () => {
         const realABCJS = require("../../../lib/abc.min.js");
         global.ABCJS = mockABCJS;
 
+        afterEach(() => {
+            global.ABCJS = mockABCJS;
+        });
+
         it("imports each tune with the activity's ABC importer", async () => {
             aiWidget = new AIWidget();
             mockActivity.parseABC = jest.fn(() => Promise.resolve(null));
