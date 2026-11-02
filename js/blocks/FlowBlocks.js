@@ -800,14 +800,10 @@ function setupFlowBlocks(activity) {
                 // and queue the interior child flow.
                 return [args[1], 1];
             } else {
-                // Since an until block was requeued each
-                // time, we need to flush the queue of all but
-                // the last one, otherwise the child of the
-                // until block is executed multiple times.
-                const queueLength = queue.length;
-                for (let i = queueLength - 1; i > 0; i--) {
+                // Preserve the newly scheduled outflow.
+                for (let i = queue.length - 2; i >= 0; i--) {
                     if (queue[i].parentBlk === blk) {
-                        queue.pop();
+                        queue.splice(i, 1);
                     }
                 }
             }
@@ -889,14 +885,10 @@ function setupFlowBlocks(activity) {
                 // and queue the interior child flow.
                 return [args[1], 1];
             } else {
-                // Since a while block was requeued each time,
-                // we need to flush the queue of all but the
-                // last one, otherwise the child of the while
-                // block is executed multiple times.
-                const queueLength = queue.length;
-                for (let i = queueLength - 1; i > 0; i--) {
+                // Preserve the newly scheduled outflow.
+                for (let i = queue.length - 2; i >= 0; i--) {
                     if (queue[i].parentBlk === blk) {
-                        queue.pop();
+                        queue.splice(i, 1);
                     }
                 }
             }
