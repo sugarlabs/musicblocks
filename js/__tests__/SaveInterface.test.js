@@ -219,6 +219,16 @@ describe("download", () => {
         expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:mock-html");
     });
 
+    it.each([
+        ["empty", ""],
+        ["only spaces", "   "]
+    ])("should not download when the export passes a filename that is %s", (_label, name) => {
+        global.URL.revokeObjectURL = jest.fn();
+        instance.download("ly", "blob:mock-ly", name);
+        expect(mockDownloadURL).not.toHaveBeenCalled();
+        expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:mock-ly");
+    });
+
     it("should not download when the MBDialog filename is left empty", async () => {
         global.URL.revokeObjectURL = jest.fn();
         let entered;

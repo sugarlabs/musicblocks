@@ -273,9 +273,6 @@ class SaveInterface {
                 filename = prompt(_("Filename:"), defaultfilename);
             }
         } else {
-            if (fileExt(defaultfilename) !== extension) {
-                defaultfilename += "." + extension;
-            }
             filename = defaultfilename;
         }
 
