@@ -108,10 +108,11 @@ clicking the notes icon. The report includes:
 
 ## Keyboard Shortcuts
 
-| Key             | Action                         |
-| --------------- | ------------------------------ |
-| `Enter`         | Send message                   |
-| `Shift + Enter` | Add a new line without sending |
+| Key     | Action       |
+| ------- | ------------ |
+| `Enter` | Send message |
+
+The message box is a single line, so `Shift + Enter` sends the message too.
 
 ---
 
@@ -127,7 +128,9 @@ clicking the notes icon. The report includes:
 
 - Check your internet connection, as the widget requires an active
   connection to communicate with AI mentors.
-- Try refreshing your browser and reopening the widget.
+- If the first message from your mentor never arrived, click the
+  refresh icon, or close the widget and run the Reflection block
+  again. Either one asks for it again.
 
 **I cannot find the Reflection block in the palette.**
 
