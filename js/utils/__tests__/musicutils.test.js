@@ -2783,11 +2783,43 @@ describe("buildScale with explicit EDO", () => {
                 expect(aScale[aScale.length - 1]).toBe("A");
             });
         });
+
+        it("returns null when tonic cannot be represented in non-12 EDO", () => {
+            // In 5-EDO note names are [C, D, E, G, A].
+            // Neither C♭ nor normalized B exists in 5-EDO; should return null rather
+            // than silently projecting to C (index 0).
+            expect(buildScale("C♭ major", 5)).toBeNull();
+            expect(buildScale("B major", 5)).toBeNull();
+            expect(buildScale("F♯ major", 5)).toBeNull();
+        });
+
+        it("safely handles null scale return across callers when tonic is unavailable", () => {
+            expect(_getStepSize("C♭ major", "C", "up", 0, "equal", 5)).toBe(0);
+            expect(getInterval(2, "C♭ major", "C", 5)).toBe(0);
+            expect(getModeLength("C♭ major", 5)).toBe(0);
+            expect(nthDegreeToPitch("C♭ major", 1, 5)).toEqual(["", 0]);
+            expect(scaleDegreeToPitchMapping("C♭ major", 1, false, null, 5)).toBeNull();
+            expect(scaleDegreeToPitchMapping("C♭ major", 1, true, null, 5)).toBeNull();
+        });
     });
 });
 
 //Both getStepSizeUp and getStepSizeDown function uses _getStepSize
 describe("getStepSize", () => {
+    it("respects microtonal B and C♭ distinction in 31-EDO and enharmonics in 12-EDO", () => {
+        // In 31-EDO B (pos 28) and C♭ (pos 30) are distinct pitch classes separated by 2 steps.
+        // Walking up from B to C♭ major's tonic (C♭) requires 2 steps.
+        expect(_getStepSize("C♭ major", "B", "up", 0, "equal", 31)).toBe(2);
+        expect(_getStepSize("C♭ major", "B", "down", 0, "equal", 31)).toBe(-1);
+        expect(_getStepSize("B major", "C♭", "up", 0, "equal", 31)).toBe(3);
+        expect(_getStepSize("B major", "C♭", "down", 0, "equal", 31)).toBe(-2);
+
+        // In 12-EDO B and C♭ are enharmonically equivalent.
+        expect(_getStepSize("C♭ major", "B", "up", 0, "equal", 12)).toBe(2);
+
+        // In 19-EDO C♭ normalizes to B, so B is the tonic.
+        expect(_getStepSize("C♭ major", "B", "up", 0, "equal", 19)).toBe(3);
+    });
     it('should return the correct step size for "C" in "C major" going up', () => {
         const result = _getStepSize("C major", "C", "up", 0, "equal");
         expect(result).toBe(2);

@@ -210,22 +210,16 @@ var buildScale = (keySignature, edo) => {
     if (currentEDO !== 12) {
         const edoNames = generateNoteNames(currentEDO);
         let idx = edoNames.indexOf(myKeySignature);
-        if (idx === -1) {
-            idx = getEdoNoteNamePosition(myKeySignature, currentEDO);
-        }
         if (
             idx === -1 &&
             typeof EXTRATRANSPOSITIONS !== "undefined" &&
             myKeySignature in EXTRATRANSPOSITIONS
         ) {
             const normalized = EXTRATRANSPOSITIONS[myKeySignature][0];
-            idx = getEdoNoteNamePosition(normalized, currentEDO);
-            if (idx === -1) {
-                idx = edoNames.indexOf(normalized);
-            }
+            idx = edoNames.indexOf(normalized);
         }
         if (idx === -1) {
-            idx = 0;
+            return null;
         }
 
         // For "custom" mode in non-12 EDO, getModePattern returns the current
@@ -411,6 +405,9 @@ var _getStepSize = (keySignature, pitch, direction, transposition, temperament, 
     // matches the temperament being measured instead of the global
     // temperament state (12-EDO stays byte-for-byte identical).
     const obj = buildScale(keySignature, currentEDO);
+    if (!obj) {
+        return 0;
+    }
     const scale = obj[0];
     const halfSteps = obj[1];
 
@@ -450,12 +447,10 @@ var _getStepSize = (keySignature, pitch, direction, transposition, temperament, 
             return true;
         } else if (s1 === "B" + SHARP && s2 === "C") {
             return true;
-        } else if (s1 === "B" && s2 === "C" + FLAT) {
-            return true;
-        } else if (s1 === "C" && s2 === "B♯") {
-            return true;
-        } else if (s1 === "C" + FLAT && s2 === "B") {
-            return true;
+        } else if ((s1 === "B" && s2 === "C" + FLAT) || (s1 === "C" + FLAT && s2 === "B")) {
+            const pos1 = getEdoNoteNamePosition(s1, currentEDO);
+            const pos2 = getEdoNoteNamePosition(s2, currentEDO);
+            return pos1 !== -1 && pos2 !== -1 && pos1 === pos2;
         } else if (s1 === "B" + DOUBLEFLAT && s2 === "A") {
             return true;
         } else if (s1 === "F" + DOUBLESHARP && s2 === "G") {
@@ -614,7 +609,8 @@ var _getStepSize = (keySignature, pitch, direction, transposition, temperament, 
  * getModeLength("C chromatic", 19)  // 19 (19-note chromatic)
  */
 var getModeLength = (keySignature, edo) => {
-    return buildScale(keySignature, edo)[1].length;
+    const scaleObj = buildScale(keySignature, edo);
+    return scaleObj ? scaleObj[1].length : 0;
 };
 
 /**
@@ -644,6 +640,9 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
     // Info variables according to chosen mode
     const chosenMode = keySignatureToMode(keySignature);
     const obj1 = buildScale(keySignature, edo);
+    if (!obj1) {
+        return null;
+    }
     const chosenModeScale = obj1[0];
     const chosenModePattern = obj1[1];
 
@@ -948,7 +947,11 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
 var nthDegreeToPitch = (keySignature, scaleDegree, edo) => {
     // Returns note corresponding to scale degree in current key
     // signature. Used for movable solfege.
-    const scale = buildScale(keySignature, edo)[0];
+    const scaleObj = buildScale(keySignature, edo);
+    if (!scaleObj) {
+        return ["", 0];
+    }
+    const scale = scaleObj[0];
     const modeLength = scale.length - 1;
 
     // Scale degree is specified as do === 1, re === 2, etc., so we need
@@ -983,6 +986,9 @@ var nthDegreeToPitch = (keySignature, scaleDegree, edo) => {
 var getInterval = (interval, keySignature, pitch, edo) => {
     // Step size interval based on the position (pitch) in the scale
     const obj = buildScale(keySignature, edo);
+    if (!obj) {
+        return 0;
+    }
     const scale = obj[0];
     const halfSteps = obj[1];
 
