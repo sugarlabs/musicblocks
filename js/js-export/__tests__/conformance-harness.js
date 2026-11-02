@@ -78,7 +78,9 @@ function resolveProtoBlock(name, connectionsLength = 0) {
             ? 0
             : name === "newswing2"
               ? 2
-              : 1;
+              : connectionsLength >= 3
+                ? connectionsLength - 3
+                : 1;
         return { style: "clamp", args: numArgs + 1 };
     }
     if (
