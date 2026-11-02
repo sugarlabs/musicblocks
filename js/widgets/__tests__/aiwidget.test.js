@@ -11,15 +11,7 @@
 
 /* global jest, describe, it, expect, beforeEach, afterEach */
 
-const {
-    AIWidget,
-    adjustPitch,
-    abcToStandardValue,
-    createPitchBlocks,
-    searchIndexForMusicBlock,
-    getGroqApiKey,
-    setGroqApiKey
-} = require("../aiwidget");
+const { AIWidget, getGroqApiKey, setGroqApiKey } = require("../aiwidget");
 
 // Mock globals
 global._ = jest.fn(str => str);
@@ -45,145 +37,6 @@ global.platformColor = jest.fn(() => "#000000");
 global.slicePath = jest.fn(p => p);
 global.instruments = [{}];
 global.REFERENCESAMPLE = "electronic synth";
-
-describe("AIWidget Utilities", () => {
-    describe("adjustPitch", () => {
-        it("should return the note name unchanged if no accidental matches in key signature", () => {
-            const keySignature = { accidentals: [] };
-            expect(adjustPitch("C", keySignature)).toBe("C");
-        });
-
-        it("should append sharp if note is in key signature as sharp", () => {
-            const keySignature = {
-                accidentals: [{ note: "F", acc: "sharp" }]
-            };
-            expect(adjustPitch("F", keySignature)).toBe("F♯");
-        });
-
-        it("should append flat if note is in key signature as flat", () => {
-            const keySignature = {
-                accidentals: [{ note: "B", acc: "flat" }]
-            };
-            expect(adjustPitch("B", keySignature)).toBe("B♭");
-        });
-
-        it("should be case-insensitive for note matching", () => {
-            const keySignature = {
-                accidentals: [{ note: "f", acc: "sharp" }]
-            };
-            expect(adjustPitch("F", keySignature)).toBe("F♯");
-        });
-
-        it("should return note unchanged for unsupported accidental types", () => {
-            const keySignature = {
-                accidentals: [{ note: "C", acc: "natural" }]
-            };
-            expect(adjustPitch("C", keySignature)).toBe("C");
-        });
-    });
-
-    describe("abcToStandardValue", () => {
-        it("should map pitch value to octave (Math.floor(p/7) + 4)", () => {
-            expect(abcToStandardValue(0)).toBe(4);
-            expect(abcToStandardValue(7)).toBe(5);
-            expect(abcToStandardValue(14)).toBe(6);
-            expect(abcToStandardValue(-7)).toBe(3);
-        });
-    });
-
-    describe("searchIndexForMusicBlock", () => {
-        it("should find the index of a block by its ID", () => {
-            const array = [
-                [10, "start"],
-                [20, "pitch"],
-                [30, "hidden"]
-            ];
-            expect(searchIndexForMusicBlock(array, 20)).toBe(1);
-            expect(searchIndexForMusicBlock(array, 30)).toBe(2);
-            expect(searchIndexForMusicBlock(array, 40)).toBe(-1);
-        });
-
-        it("should handle empty or malformed arrays", () => {
-            expect(searchIndexForMusicBlock([], 10)).toBe(-1);
-            expect(searchIndexForMusicBlock([null, [10]], 10)).toBe(1);
-        });
-
-        it("should refresh cached indexes when block IDs change without changing array length", () => {
-            const array = [
-                [10, "start"],
-                [20, "pitch"]
-            ];
-
-            expect(searchIndexForMusicBlock(array, 20)).toBe(1);
-
-            array[1] = [30, "duration"];
-
-            expect(searchIndexForMusicBlock(array, 20)).toBe(-1);
-            expect(searchIndexForMusicBlock(array, 30)).toBe(1);
-
-            array.reverse();
-
-            expect(searchIndexForMusicBlock(array, 30)).toBe(0);
-            expect(searchIndexForMusicBlock(array, 10)).toBe(1);
-        });
-
-        it("should handle null elements during stale cache rebuild", () => {
-            const array = [
-                [10, "start"],
-                [20, "pitch"]
-            ];
-
-            // Prime the cache
-            expect(searchIndexForMusicBlock(array, 20)).toBe(1);
-
-            // Stale: replace with null element
-            array[1] = null;
-
-            // Should handle null gracefully during rebuild
-            expect(searchIndexForMusicBlock(array, 20)).toBe(-1);
-            expect(searchIndexForMusicBlock(array, 10)).toBe(0);
-        });
-    });
-
-    describe("createPitchBlocks", () => {
-        it("should push the correct block structure to actionBlock", () => {
-            const actionBlock = [];
-            const pitches = { name: "C", pitch: 0 };
-            const keySignature = { accidentals: [] };
-
-            createPitchBlocks(pitches, 100, 4, keySignature, actionBlock, null, 4);
-
-            // Should add 9 blocks based on the implementation
-            expect(actionBlock.length).toBe(9);
-
-            // Check newnote block
-            expect(actionBlock[0][0]).toBe(100);
-            expect(actionBlock[0][1][0]).toBe("newnote");
-
-            // Check pitch block and its values
-            const pitchBlock = actionBlock.find(b => b[1] === "pitch");
-            expect(pitchBlock).toBeDefined();
-
-            const notenameBlock = actionBlock.find(b => b[1].length && b[1][0] === "notename");
-            expect(notenameBlock[1][1].value).toBe("C");
-        });
-
-        it("should handle triplets correctly", () => {
-            const actionBlock = [];
-            const pitches = { name: "C", pitch: 0 };
-            const keySignature = { accidentals: [] };
-
-            // triplet = 3, meterDen = 4. Duration becomes [1, 4 * 3]
-            createPitchBlocks(pitches, 100, 4, keySignature, actionBlock, 3, 4);
-
-            const divideBlock = actionBlock.find(b => b[1] === "divide");
-            const denominatorBlockId = divideBlock[4][2];
-            const denominatorBlock = actionBlock.find(b => b[0] === denominatorBlockId);
-
-            expect(denominatorBlock[1][1].value).toBe(12); // 4 * 3
-        });
-    });
-});
 
 describe("AIWidget Instance", () => {
     let aiWidget;
@@ -862,92 +715,59 @@ describe("AIWidget Instance", () => {
         global.window.innerHeight = originalHeight;
     });
 
-    describe("_parseABC", () => {
-        it("should organize staffs by staff index across multiple lines", async () => {
+    describe("Generate blocks", () => {
+        const { setupActivityAbcParser } = require("../../activity/abc-parser.js");
+        const { toFraction } = require("../../utils/utils-logic.js");
+        // Loading abcjs publishes window.ABCJS, so put the file's mock back.
+        const mockABCJS = global.ABCJS;
+        const realABCJS = require("../../../lib/abc.min.js");
+        global.ABCJS = mockABCJS;
+
+        it("imports each tune with the activity's ABC importer", async () => {
             aiWidget = new AIWidget();
+            mockActivity.parseABC = jest.fn(() => Promise.resolve(null));
             aiWidget.activity = mockActivity;
-            const tune = {
-                lines: [
-                    {
-                        staff: [
-                            {
-                                voices: [
-                                    [
-                                        {
-                                            el_type: "note",
-                                            pitches: [
-                                                {
-                                                    name: "C",
-                                                    pitch: 0
-                                                }
-                                            ],
-                                            duration: 0.25
-                                        }
-                                    ]
-                                ],
-                                key: {
-                                    accidentals: []
-                                },
-                                meter: {
-                                    value: [
-                                        {
-                                            num: 4,
-                                            den: 4
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        staff: [
-                            {
-                                voices: [
-                                    [
-                                        {
-                                            el_type: "note",
-                                            pitches: [
-                                                {
-                                                    name: "C",
-                                                    pitch: 0
-                                                }
-                                            ],
-                                            duration: 0.25
-                                        }
-                                    ]
-                                ],
-                                key: {
-                                    accidentals: []
-                                },
-                                meter: {
-                                    value: [
-                                        {
-                                            num: 4,
-                                            den: 4
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    }
-                ],
-                metaText: {
-                    title: "Test Tune"
-                }
-            };
+            const tunes = [{ lines: [] }, { lines: [] }];
+            global.ABCJS = { parseOnly: jest.fn(() => tunes) };
 
-            await aiWidget._parseABC(tune);
-            expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalledTimes(1);
-            const generatedBlocks = mockActivity.blocks.loadNewBlocks.mock.calls[0][0];
-            const labels = generatedBlocks
-                .filter(
-                    block =>
-                        Array.isArray(block) && Array.isArray(block[1]) && block[1][0] === "text"
-                )
-                .map(block => block[1][1]?.value);
+            await aiWidget.__save();
 
-            expect(labels).toContain("V: 1 Line 1");
-            expect(labels).toContain("V: 1 Line 2");
+            expect(mockActivity.parseABC.mock.calls).toEqual([[tunes[0]], [tunes[1]]]);
+            expect(mockActivity.textMsg).toHaveBeenCalledWith("New start block generated.");
+        });
+
+        it("generates a tune that has a rest", async () => {
+            const mockToFraction = global.toFraction;
+            global.toFraction = toFraction;
+            global.ABCJS = { parseOnly: jest.fn(abc => realABCJS.parseOnly(abc)) };
+            try {
+                const body = document.createElement("div");
+                body.getBoundingClientRect = jest.fn(() => ({ width: 800, height: 600 }));
+                const windowFor = global.window.widgetWindows.windowFor;
+                global.window.widgetWindows.windowFor = jest.fn((...args) => ({
+                    ...windowFor(...args),
+                    getWidgetBody: jest.fn(() => body)
+                }));
+                aiWidget = new AIWidget();
+                setupActivityAbcParser(mockActivity);
+                aiWidget.init(mockActivity);
+                // The tune as the user types it, or the AI returns it, in the text box.
+                const textarea = body.querySelector("textarea");
+                textarea.value = "X:1\nT:Rest\nM:4/4\nL:1/4\nK:C\nC D z E |]\n";
+                textarea.dispatchEvent(new Event("input"));
+
+                await aiWidget.__save();
+
+                const blocks = mockActivity.blocks.loadNewBlocks.mock.calls[0][0];
+                const names = blocks.map(b => (Array.isArray(b[1]) ? b[1][0] : b[1]));
+                const notes = blocks
+                    .filter(b => Array.isArray(b[1]) && b[1][0] === "notename")
+                    .map(b => b[1][1].value);
+                expect(names.filter(n => n === "rest2")).toHaveLength(1);
+                expect(notes).toEqual(["C", "C", "D", "E"]);
+            } finally {
+                global.toFraction = mockToFraction;
+            }
         });
     });
 
