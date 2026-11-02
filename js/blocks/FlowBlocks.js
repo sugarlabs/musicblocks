@@ -796,6 +796,9 @@ function setupFlowBlocks(activity) {
                 const queueBlock = new Queue(blk, 1, parentBlk, receivedArg);
                 parentFlowQueue.push(parentBlk);
                 queue.push(queueBlock);
+
+                // and queue the interior child flow.
+                return [args[1], 1];
             } else {
                 // Since an until block was requeued each
                 // time, we need to flush the queue of all but
@@ -808,9 +811,6 @@ function setupFlowBlocks(activity) {
                     }
                 }
             }
-
-            // Queue the child flow.
-            return [args[1], 1];
         }
     }
 
@@ -900,9 +900,6 @@ function setupFlowBlocks(activity) {
                     }
                 }
             }
-
-            // Queue the child flow.
-            return [args[1], 1];
         }
     }
 
