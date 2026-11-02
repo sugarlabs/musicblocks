@@ -228,12 +228,14 @@ function AIWidget() {
     };
 
     /**
-     * Saves the sample.
+     * Saves the sample, telling the user when the blocks cannot be generated.
      * @private
-     * @returns {void}
+     * @returns {Promise<void>}
      */
     this._saveSample = function () {
-        this.__save();
+        return this.__save().catch(() => {
+            this.activity.errorMsg(_("Unable to generate blocks."));
+        });
     };
 
     /**

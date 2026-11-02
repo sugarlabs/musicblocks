@@ -740,6 +740,17 @@ describe("AIWidget Instance", () => {
             expect(mockActivity.textMsg).toHaveBeenCalledWith("New start block generated.");
         });
 
+        it("tells the user when the blocks cannot be generated", async () => {
+            aiWidget = new AIWidget();
+            aiWidget.activity = mockActivity;
+            global.ensureABCJS.mockReturnValueOnce(Promise.reject(new Error("load failed")));
+
+            await aiWidget._saveSample();
+
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith("Unable to generate blocks.");
+            expect(mockActivity.textMsg).not.toHaveBeenCalledWith("New start block generated.");
+        });
+
         it("generates a tune that has a rest", async () => {
             const mockToFraction = global.toFraction;
             global.toFraction = toFraction;
