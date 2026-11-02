@@ -1408,8 +1408,16 @@ var getSolfege = (note, keySignature, movable, temperament, edo) => {
 
         // 4) chromatic fallback (interval based)
         const tonic = scale[0];
-        const tonicPitch = pitchToNumber(tonic, 4, keySignature, temperament);
-        const notePitch = pitchToNumber(note, 4, keySignature, temperament);
+        // pitchToNumber measures in the temperament's EDO, so when an
+        // explicitly invalid EDO fell back to 12 above while the
+        // temperament still names a non-12 EDO (e.g. "equal19"), the
+        // interval must still be measured in the resolved 12-EDO —
+        // otherwise D-flat is counted as two steps above the tonic
+        // instead of one and maps to the wrong syllable.
+        const pitchTemperament =
+            currentEDO === 12 && getCurrentEDO(temperament) !== 12 ? "equal" : temperament;
+        const tonicPitch = pitchToNumber(tonic, 4, keySignature, pitchTemperament);
+        const notePitch = pitchToNumber(note, 4, keySignature, pitchTemperament);
 
         // semitones from tonic (EDO-aware)
         let semitones = (((notePitch - tonicPitch) % currentEDO) + currentEDO) % currentEDO;

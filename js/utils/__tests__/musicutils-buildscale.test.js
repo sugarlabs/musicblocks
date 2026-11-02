@@ -320,6 +320,19 @@ describe("musicutils-buildscale", () => {
         }
     });
 
+    it("measures the chromatic fallback in the fallback EDO, not the temperament's", () => {
+        // With temperament "equal19" and an explicitly invalid EDO, the
+        // scale falls back to 12-EDO, so the chromatic interval must be
+        // measured in 12-EDO too: D-flat is one step above the tonic
+        // ("di"), not two as the 19-EDO name table would count it.
+        expect(buildscale.getSolfege("D♭", "C major", true, "equal19", Infinity)).toBe(
+            buildscale.getSolfege("D♭", "C major", true, "equal", 12)
+        );
+        expect(buildscale.getSolfege("D♭", "C major", true, "equal19", Infinity)).toBe("di");
+        // A genuine 19-EDO call is unchanged.
+        expect(buildscale.getSolfege("D♭", "C major", true, "equal19", 19)).toBe("di");
+    });
+
     it("normalises an invalid EDO in getSolfege instead of throwing", () => {
         // A chromatic note with a non-finite EDO previously built a
         // 12-EDO scale but did its chromatic math with Infinity,
