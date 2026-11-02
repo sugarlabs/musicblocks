@@ -6721,11 +6721,11 @@ const MUNSELL = [
  * @param {string} hex1 - The first hex color value.
  * @param {string} hex2 - The second hex color value.
  * @param {number} p - The interpolation parameter (between 0 and 1).
- * @returns {string} The interpolated color as a CSS rgba() string (e.g., "rgba(255, 0, 0, 1)").
+ * @returns {string|null} The interpolated color as a CSS rgba() string (e.g., "rgba(255, 0, 0, 1)"), or null if both colors are missing.
  */
 const interpColor = (hex1, hex2, p) => {
     if ((hex1 === undefined || hex1 === null) && (hex2 === undefined || hex2 === null)) {
-        return undefined;
+        return null;
     } else if (hex1 === undefined || hex1 === null) {
         hex1 = hex2;
     } else if (hex2 === undefined || hex2 === null) {
@@ -6767,6 +6767,9 @@ let getMunsellColor = (hue, value, chroma) => {
     // We linear-interpret value.
     // A modulo, not a loop that adds 40: -Infinity would never get out of the loop.
     const h = ((Math.round(hue / 2.5) % 40) + 40) % 40;
+    if (isNaN(h)) {
+        return undefined;
+    }
 
     let v1 = Math.floor(value / 10);
     let v2 = v1 + 1;
