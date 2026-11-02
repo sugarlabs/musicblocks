@@ -46,11 +46,11 @@
 /**
  * Bounds (in scalar steps) on the value accepted by setScalarInterval().
  * GetNotesForInterval() derives an octave count as `Math.floor(intervals[0] / 7)`,
- * which GetIntervalNumber() then walks with a `while (octave > 0)` loop that runs
- * once per octave. These line up with the existing octave range convention used
- * elsewhere for pitch (see PitchBlocks.js's "Octave must be an integer in [0, 9]"):
- * 69 is the largest value for which Math.floor(69 / 7) is still 9, and -63 is the
- * smallest (Math.floor rounds toward -Infinity, so -64 already overshoots to -10).
+ * which GetIntervalNumber() then turns into whole octaves of steps. These line up
+ * with the existing octave range convention used elsewhere for pitch (see
+ * PitchBlocks.js's "Octave must be an integer in [0, 9]"): 69 is the largest
+ * value for which Math.floor(69 / 7) is still 9, and -63 is the smallest
+ * (Math.floor rounds toward -Infinity, so -64 already overshoots to -10).
  * Anything outside this range corresponds to an octave shift no Pitch block could
  * represent, rather than an arbitrary cap.
  */
@@ -112,37 +112,41 @@ function setupIntervalsActions(activity) {
         static GetIntervalNumber(turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
             const temperament = activity.logo.synth.inTemperament;
-            let { firstNote, secondNote, octave } = GetNotesForInterval(tur, temperament);
+            const { firstNote, secondNote, octave } = GetNotesForInterval(tur, temperament);
             const keySig = tur.singer.keySignature;
             const firstStep = pitchToNumber(firstNote, 0, keySig, temperament);
             const secondStep = pitchToNumber(secondNote, 0, keySig, temperament);
-            let totalIntervals = Math.abs(firstStep - secondStep);
 
             // Use dynamic temperament length for custom tunings
             const temperamentLength = this.getTemperamentLength();
 
-            // Handle octave boundary wrap-around for enharmonic equivalents
-            // For cases like B (12) to B#/Cb (0), the raw difference is 12 but should be 1
-            // Calculate forward distance across octave boundary using modular arithmetic
-            if (totalIntervals !== 0) {
-                const forwardDiff =
-                    (secondStep - firstStep + temperamentLength) % temperamentLength;
-                // When notes are at octave boundary (forwardDiff === 0), use 1 semitone
-                // Otherwise use the shorter of raw difference or forward distance
-                totalIntervals = forwardDiff === 0 ? 1 : Math.min(totalIntervals, forwardDiff);
-            }
+            // Octave numbers change at C, so the second note sits in a later
+            // (or earlier) octave whenever the letter steps cross a C.
+            const index1 = NOTENAMES.indexOf(firstNote.substring(0, 1));
+            const octaveShift = Math.floor(
+                (index1 + this.getLetterSteps(firstNote, secondNote, octave)) / NOTENAMES.length
+            );
 
-            if (octave < 0 && totalIntervals !== 0 && totalIntervals !== temperamentLength)
-                totalIntervals = temperamentLength - totalIntervals;
+            return Math.abs(secondStep - firstStep + octaveShift * temperamentLength);
+        }
 
-            if (octave < -1 || totalIntervals === 0) octave = Math.abs(octave);
-
-            while (octave > 0) {
-                totalIntervals += temperamentLength;
-                octave--;
-            }
-
-            return totalIntervals;
+        /**
+         * Letter steps from the first note to the second, e.g. 2 for A up to C
+         * and -4 for G down to C. `octave` follows the scalar-interval convention
+         * of GetNotesForInterval (0 is up by less than an octave, -1 is down by
+         * up to an octave).
+         *
+         * @static
+         * @param {String} firstNote
+         * @param {String} secondNote
+         * @param {Number} octave
+         * @returns {Number}
+         */
+        static getLetterSteps(firstNote, secondNote, octave) {
+            const length = NOTENAMES.length;
+            const index1 = NOTENAMES.indexOf(firstNote.substring(0, 1));
+            const index2 = NOTENAMES.indexOf(secondNote.substring(0, 1));
+            return length * octave + ((((index2 - index1) % length) + length) % length);
         }
 
         /**
@@ -156,15 +160,12 @@ function setupIntervalsActions(activity) {
             const temperament = activity.logo.synth.inTemperament;
             const { firstNote, secondNote, octave } = GetNotesForInterval(tur, temperament);
 
-            const index1 = NOTENAMES.indexOf(firstNote.substring(0, 1));
-            const index2 = NOTENAMES.indexOf(secondNote.substring(0, 1));
             let lastWord = "";
-            let letterGap = Math.abs(index2 - index1);
+            const letterGap =
+                Math.abs(this.getLetterSteps(firstNote, secondNote, octave)) % NOTENAMES.length;
 
             // Use dynamic temperament length for custom tunings
             const temperamentLength = this.getTemperamentLength();
-
-            if (index1 > index2 && octave !== 0) letterGap = NOTENAMES.length - letterGap;
 
             let totalIntervals = this.GetIntervalNumber(turtle);
 
@@ -205,7 +206,6 @@ function setupIntervalsActions(activity) {
             }
 
             if (octave < 0) {
-                letterGap = letterGap !== 0 ? NOTENAMES.length - letterGap : letterGap;
                 if (octave < -1) lastWord = `,  ${os} ${plural}`;
                 lastWord += ` ${_("below")}`;
             }

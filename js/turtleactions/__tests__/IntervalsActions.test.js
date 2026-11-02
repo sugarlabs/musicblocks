@@ -66,7 +66,8 @@ describe("setupIntervalsActions", () => {
             "A#": 11,
             "Bb": 11,
             "B": 12,
-            "B#": 0
+            // B# is spelled in the octave of its letter but sounds as the next C.
+            "B#": 13
         };
 
         global.pitchToNumber = jest.fn((note, octave, keySig, temperament) => {
@@ -209,8 +210,8 @@ describe("setupIntervalsActions", () => {
         expect(typeof Singer.IntervalsActions.GetIntervalNumber(0)).toBe("number");
     });
 
-    test("GetIntervalNumber handles B to B# enharmonic (same octave)", () => {
-        // B (12) to B# (0) should be 1 semitone (minor second), not 12
+    test("GetIntervalNumber handles B to B# (same octave)", () => {
+        // B (12) to B# (13) is an augmented unison: 1 semitone
         GetNotesForInterval.mockReturnValueOnce({
             firstNote: "B",
             secondNote: "B#",
@@ -219,14 +220,14 @@ describe("setupIntervalsActions", () => {
         expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(1);
     });
 
-    test("GetIntervalNumber handles B to Cb enharmonic (same octave)", () => {
-        // B (12) to Cb (0) should be 1 semitone (minor second), not 12
+    test("GetIntervalNumber handles B up to Cb as the same pitch", () => {
+        // B4 up to Cb5 is a diminished second: Cb5 sounds as B4, so 0 semitones
         GetNotesForInterval.mockReturnValueOnce({
             firstNote: "B",
             secondNote: "Cb",
             octave: 0
         });
-        expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(1);
+        expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(0);
     });
 
     test("GetIntervalNumber handles C to Cb (same octave)", () => {
@@ -239,14 +240,24 @@ describe("setupIntervalsActions", () => {
         expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(1);
     });
 
-    test("GetIntervalNumber handles Cb to B (same octave)", () => {
-        // Cb (0) to B (12) should be 1 semitone (wrap-around)
+    test("GetIntervalNumber handles Cb up to B in the same octave", () => {
+        // Cb4 sounds as B3, so Cb4 up to B4 is an augmented seventh: 12 semitones
         GetNotesForInterval.mockReturnValueOnce({
             firstNote: "Cb",
             secondNote: "B",
             octave: 0
         });
-        expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(1);
+        expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(12);
+    });
+
+    test("GetIntervalNumber handles Cb down to B as the same pitch", () => {
+        // Cb4 down to B3 is a diminished second below: 0 semitones
+        GetNotesForInterval.mockReturnValueOnce({
+            firstNote: "Cb",
+            secondNote: "B",
+            octave: -1
+        });
+        expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(0);
     });
 
     test("GetIntervalNumber handles normal interval correctly", () => {
@@ -435,12 +446,35 @@ describe("setupIntervalsActions", () => {
             expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(22);
         });
 
-        test("uses the absolute step difference, not the sum, when the forward (wrap-around) distance is larger", () => {
-            // G (8) -> E (5): |8-5| = 3, but the forward distance (8 -> ... -> E going up)
-            // is 9. The smaller of the two (3) is correct; the raw sum (13) is not,
-            // and would incorrectly lose out to the forward distance in the min().
+        test("octave === 0 counts up from the first note, across C when needed", () => {
+            // G up to E (G4 -> E5) is a major sixth, not the minor third G4 -> E4.
             GetNotesForInterval.mockReturnValueOnce({ firstNote: "G", secondNote: "E", octave: 0 });
+            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(9);
+        });
+
+        test("octave === -1 counts down from the first note", () => {
+            // G down to E (G4 -> E4) is a minor third.
+            GetNotesForInterval.mockReturnValueOnce({
+                firstNote: "G",
+                secondNote: "E",
+                octave: -1
+            });
             expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(3);
+        });
+
+        test.each([
+            ["A", "C", 3],
+            ["A", "E", 7],
+            ["B", "F", 6],
+            ["G", "D", 7],
+            ["E", "C", 8]
+        ])("%s up to %s across C (octave === 0) is %i semitones", (first, second, steps) => {
+            GetNotesForInterval.mockReturnValueOnce({
+                firstNote: first,
+                secondNote: second,
+                octave: 0
+            });
+            expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(steps);
         });
     });
 
@@ -521,9 +555,9 @@ describe("setupIntervalsActions", () => {
                 1: { 0: "augmented unison", 1: "minor second" }
             };
 
-            // B -> C, octave 0: a natural half-step (totalIntervals 1), but spelled with
-            // letters 6 apart (B is index 6, C is index 0), which isn't one of row 1's keys.
-            const notes = { firstNote: "B", secondNote: "C", octave: 0 };
+            // B# up to Db: one half-step (totalIntervals 1), but spelled two letters
+            // apart (a doubly diminished third), which isn't one of row 1's keys.
+            const notes = { firstNote: "B#", secondNote: "Db", octave: 0 };
             GetNotesForInterval.mockReturnValueOnce(notes);
             GetNotesForInterval.mockReturnValueOnce(notes);
 
@@ -557,12 +591,13 @@ describe("setupIntervalsActions", () => {
                 expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("lg3");
             });
 
-            test("does not wrap the letter gap when octave === 0, even if the first index exceeds the second", () => {
+            test("wraps the letter gap when octave === 0 and the interval crosses C", () => {
+                // G up to C (G4 -> C5) is a fourth: letter gap 3, not 4.
                 const notes = { firstNote: "G", secondNote: "C", octave: 0 };
                 GetNotesForInterval.mockReturnValueOnce(notes);
                 GetNotesForInterval.mockReturnValueOnce(notes);
 
-                expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("lg4");
+                expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("lg3");
             });
 
             test("computes an asymmetric letter gap correctly (D -> G, no wrap needed)", () => {

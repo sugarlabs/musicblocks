@@ -2132,6 +2132,43 @@ describe("GetNotesForInterval", () => {
             octave: 11
         });
     });
+
+    // Octave numbers change at C, so the octave count follows letter steps
+    // (like a scalar interval) instead of the difference of octave numbers.
+    it.each([
+        ["A4", "C5", "A", "C", 0],
+        ["A4", "E5", "A", "E", 0],
+        ["B3", "F4", "B", "F", 0],
+        ["A4", "C6", "A", "C", 1],
+        ["C4", "C5", "C", "C", 1],
+        ["B4", "C♭5", "B", "Cb", 0],
+        ["G4", "E4", "G", "E", -1],
+        ["E5", "A4", "E", "A", -1],
+        ["C5", "C4", "C", "C", -1],
+        ["C5", "A3", "C", "A", -2]
+    ])("counts %s to %s by letter steps", (from, to, firstNote, secondNote, octave) => {
+        expect(GetNotesForInterval({ singer: { noteStatus: [[from, to]] } })).toEqual({
+            firstNote,
+            secondNote,
+            octave
+        });
+    });
+
+    it("counts octaves by letter steps for the pitches of the current note", () => {
+        const tur = {
+            singer: {
+                noteStatus: null,
+                notePitches: { 1: ["A", "C"] },
+                noteOctaves: { 1: [4, 5] },
+                inNoteBlock: [1]
+            }
+        };
+        expect(GetNotesForInterval(tur)).toEqual({
+            firstNote: "A",
+            secondNote: "C",
+            octave: 0
+        });
+    });
 });
 
 describe("base64Encode", () => {
