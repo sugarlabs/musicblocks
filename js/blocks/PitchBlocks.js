@@ -793,7 +793,8 @@ function setupPitchBlocks(activity) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
             const obj = keySignatureToMode(tur.singer.keySignature);
             const modeLength = MUSICALMODES[obj[1]].length;
-            const thisScale = buildScale(tur.singer.keySignature)[0];
+            const scaleObj = buildScale(tur.singer.keySignature);
+            const thisScale = scaleObj ? scaleObj[0] : null;
 
             let arg1 = 0;
             if (cblk1 !== null) {
@@ -828,7 +829,13 @@ function setupPitchBlocks(activity) {
                     lc += modeLength;
                 }
 
-                const thisNote = thisScale[lc];
+                let thisNote = thisScale ? thisScale[lc] : null;
+                if (!thisNote) {
+                    while (noteIdx < 0) {
+                        noteIdx += NOTENAMES.length;
+                    }
+                    thisNote = NOTENAMES[noteIdx % NOTENAMES.length];
+                }
 
                 // Now that we have the note, look for its pitch number.
                 lc = NOTESSHARP.indexOf(thisNote);
@@ -867,12 +874,27 @@ function setupPitchBlocks(activity) {
                     return ["sol", 4];
                 }
 
+                if (!thisScale) {
+                    while (noteIdx < 0) {
+                        noteIdx += NOTENAMES.length;
+                    }
+                    const note = NOTENAMES[noteIdx % NOTENAMES.length];
+                    return [note, o2];
+                }
+
                 // Calculate the offset relative to the current key.
                 let lc = noteIdx - NOTENAMES.indexOf(obj[0][0]);
                 if (lc < 0) {
                     lc += modeLength;
                 }
-                return [thisScale[lc], o2];
+                const note = thisScale[lc];
+                if (!note) {
+                    while (noteIdx < 0) {
+                        noteIdx += NOTENAMES.length;
+                    }
+                    return [NOTENAMES[noteIdx % NOTENAMES.length], o2];
+                }
+                return [note, o2];
             } else {
                 if (cblk1 === null) {
                     return "G4";

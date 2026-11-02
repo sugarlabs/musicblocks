@@ -831,6 +831,41 @@ describe("setupPitchBlocks", () => {
             block.arg(logo, 0, 10);
             expect(logo.statusFields).toContainEqual([10, "ytopitch"]);
         });
+
+        it("safely handles unavailable tonics when buildScale returns null", () => {
+            const block = createdBlocks["ytopitch"];
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(0));
+            const origKey = tur.singer.keySignature;
+            tur.singer.keySignature = "C♭ major";
+            global.buildScale = jest.fn().mockReturnValue(null);
+
+            try {
+                // Default connection (cblk0 === null)
+                activity.blocks.blockList[10].connections = [null, null];
+                expect(block.arg(logo, 0, 10)).toBe("G4");
+
+                activity.blocks.blockList[30] = { value: 0 };
+                activity.blocks.blockList[10].connections = [null, 30];
+                logo.parseArg.mockReturnValue(0);
+                expect(() => block.arg(logo, 0, 10)).not.toThrow();
+
+                // Connected to "pitch" with null scale
+                activity.blocks.blockList[20] = { name: "pitch" };
+                activity.blocks.blockList[10].connections = [20, 30];
+                const pitchResult = block.arg(logo, 0, 10);
+                expect(Array.isArray(pitchResult)).toBe(true);
+                expect(pitchResult.length).toBe(2);
+
+                // Connected to "pitchnumber" with null scale
+                activity.blocks.blockList[20].name = "pitchnumber";
+                activity.blocks.blockList[10].connections = [20, 30];
+                const numResult = block.arg(logo, 0, 10);
+                expect(typeof numResult).toBe("number");
+            } finally {
+                tur.singer.keySignature = origKey;
+                global.buildScale = jest.fn(() => [["C", "D", "E", "F", "G", "A", "B"], []]);
+            }
+        });
     });
 
     describe("PitchBlock Complex Branches", () => {
