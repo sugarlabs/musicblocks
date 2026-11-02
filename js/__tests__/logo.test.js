@@ -3480,6 +3480,15 @@ describe("Logo updateNotation", () => {
             expect(ties).toBe(1000);
         });
 
+        test("splits a note at exactly 1000 barlines despite rounding", () => {
+            // A 1/11 note in a 1/11011 measure crosses 1000 barlines, but the
+            // ratio rounds to 1000.0000000000001.
+            Object.assign(singer, { beatsPerMeasure: 1, noteValuePerBeat: 11011 });
+            const { pieces, ties } = stage(["C4"], 0, 1 / 11);
+            expect(pieces).toHaveLength(1001);
+            expect(ties).toBe(1000);
+        });
+
         test("writes a note across more than 1000 barlines without splitting it", () => {
             Object.assign(singer, { beatsPerMeasure: 4, noteValuePerBeat: 4 });
             const { pieces, ties } = stage(["C4"], 0, 1002);

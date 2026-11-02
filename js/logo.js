@@ -1272,10 +1272,11 @@ class Logo {
         // measureDuration: the total duration of one full measure.
         const measureDuration = tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat;
 
+        // The tolerance keeps float error from pushing a note at the limit over it.
         if (
             split &&
             durationTime > timeLeftInMeasure &&
-            (durationTime - timeLeftInMeasure) / measureDuration <= MAX_NOTATION_BARLINES
+            (durationTime - timeLeftInMeasure) / measureDuration - MAX_NOTATION_BARLINES <= 1e-9
         ) {
             // Cut the note at every barline it crosses: the portion that fits in
             // the current measure, one full measure for each measure it spans,
