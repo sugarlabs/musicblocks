@@ -462,8 +462,8 @@ describe("setupIntervalsActions", () => {
         test("adds no octave shift for names that do not start with a letter", () => {
             // Without a letter to count, a unison must stay 0 steps, not 12.
             GetNotesForInterval.mockReturnValueOnce({
-                firstNote: "do",
-                secondNote: "do",
+                firstNote: "sol",
+                secondNote: "sol",
                 octave: 0
             });
             expect(Singer.IntervalsActions.GetIntervalNumber(0)).toBe(0);
