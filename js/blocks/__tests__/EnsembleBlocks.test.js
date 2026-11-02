@@ -700,7 +700,7 @@ describe("setupEnsembleBlocks", () => {
         it("should return pitch number from lastNotePlayed", () => {
             logo.parseArg.mockReturnValue("Yertle");
             const result = turtlePitchBlock.arg(logo, 0, blk, null);
-            expect(result).toBeUndefined(); // Missing return in implementation
+            expect(result).toBe(40);
             expect(activity.blocks.blockList[blk].value).toBeDefined();
         });
 
@@ -745,7 +745,7 @@ describe("setupEnsembleBlocks", () => {
         it("should return note value from inNoteBlock", () => {
             logo.parseArg.mockReturnValue("Yertle");
             const result = turtleNoteBlock.arg(logo, 0, blk, null);
-            expect(result).toBeUndefined(); // Missing return in implementation
+            expect(result).toBe(0.25);
             expect(activity.blocks.blockList[blk].value).toBe(1 / 4);
         });
 
@@ -763,7 +763,7 @@ describe("setupEnsembleBlocks", () => {
             tur.singer.lastNotePlayed = null;
             logo.parseArg.mockReturnValue("Yertle");
             const result = turtleNoteBlock.arg(logo, 0, blk, null);
-            expect(result).toBeUndefined(); // Missing return in implementation
+            expect(result).toBe(0.25);
             expect(activity.blocks.blockList[blk].value).toBe(0.25);
         });
 
@@ -791,6 +791,51 @@ describe("setupEnsembleBlocks", () => {
             expect(turtleNote2Block).toBeDefined();
             expect(turtleNote2Block.hidden).toBe(true);
             expect(turtleNote2Block.deprecated).toBe(true);
+        });
+    });
+
+    describe("legacy ensemble reporters through Logo.parseArg", () => {
+        const { Logo } = require("../../logo");
+
+        it.each([
+            ["turtlepitch", "Yertle", 40],
+            ["turtlepitch", "Missing", 40],
+            ["turtlenote", "Yertle", 0.25],
+            ["turtlenote2", "Yertle", 4],
+            ["turtlenote", "Missing", -1],
+            ["turtlenote2", "Missing", -1]
+        ])("evaluates %s for %s as %p", (name, target, expected) => {
+            const blk = 50;
+            activity.blocks.blockList[blk] = {
+                name,
+                connections: [null, 100],
+                protoblock: createdBlocks[name],
+                value: null
+            };
+            logo.turtles = turtles;
+            logo.blockList = activity.blocks.blockList;
+            logo.parseArg.mockReturnValue(target);
+
+            expect(Logo.prototype.parseArg(logo, 0, blk, null, null)).toBe(expected);
+            expect(activity.blocks.blockList[blk].value).toBe(expected);
+        });
+
+        it("returns zero for a zero-valued reciprocal note reporter", () => {
+            const blk = 50;
+            activity.blocks.blockList[blk] = {
+                name: "turtlenote2",
+                connections: [null, 100],
+                protoblock: createdBlocks.turtlenote2
+            };
+            const tur = turtles.ithTurtle(0);
+            tur.singer.inNoteBlock = [];
+            tur.singer.lastNotePlayed = ["C4", 0];
+            logo.turtles = turtles;
+            logo.blockList = activity.blocks.blockList;
+            logo.parseArg.mockReturnValue("Yertle");
+
+            expect(Logo.prototype.parseArg(logo, 0, blk, null, null)).toBe(0);
+            expect(activity.blocks.blockList[blk].value).toBe(0);
         });
     });
 
