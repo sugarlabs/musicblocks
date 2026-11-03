@@ -841,6 +841,35 @@ describe("afterSaveMIDI", () => {
         ]);
     });
 
+    it("writes the drum and every pitch of a chord with a rest in it, but not the rest", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                {
+                    note: ["R", "G4", "B4"],
+                    drum: "kick drum",
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "guitar"
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const track = name => tracks.find(t => t.name === name);
+        const beat = 0.6666666666666666;
+
+        expect(track("Track 1 - kick drum").addNote.mock.calls).toEqual([
+            [{ midi: 36, time: 0, duration: beat, velocity: 0.9 }]
+        ]);
+        expect(track("Track 1 - guitar").addNote.mock.calls).toEqual([
+            [{ name: "G4", time: 0, duration: beat, velocity: 0.8 }],
+            [{ name: "B4", time: 0, duration: beat, velocity: 0.8 }]
+        ]);
+    });
+
     it("adds no instrument track for notes that only play drums", () => {
         mockActivity.logo._midiData = {
             0: [{ note: ["R"], drum: "snare drum", duration: 4, bpm: 90, instrument: "guitar" }]
