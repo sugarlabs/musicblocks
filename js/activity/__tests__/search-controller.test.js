@@ -78,18 +78,22 @@ function makeActivity(protoBlocks = {}) {
         },
         blocksContainer: { x: 0, y: 0 },
         getStageScale: jest.fn(() => 1),
-        addEventListener: jest.fn((target, event, handler) => {
+        addEventListener: jest.fn((target, event, handler, options) => {
             if (target === document && event === "mousedown") {
                 // Store so tests can trigger it.
                 target._mousedownHandler = handler;
             }
 
             if (target === document && event === "keydown") {
-                // Store so tests can trigger it.
+                // Store so tests can inspect it.
                 target._keydownHandler = handler;
             }
+
+            target.addEventListener(event, handler, options);
         }),
-        removeEventListener: jest.fn(),
+        removeEventListener: jest.fn((target, event, handler, options) => {
+            target.removeEventListener(event, handler, options);
+        }),
         errorMsg: jest.fn(),
         __tick: jest.fn(),
         closeHelpfulWheel: jest.fn(() => {
@@ -595,7 +599,7 @@ describe("SearchController.showSearchWidget", () => {
         );
         jest.useRealTimers();
     });
-    test("closes the search when Escape is pressed", () => {
+    test("closes the search when Escape is pressed and removes the document listener", () => {
         jest.useFakeTimers();
 
         const activity = makeActivity();
@@ -605,15 +609,33 @@ describe("SearchController.showSearchWidget", () => {
 
         expect(activity.searchWidget.style.visibility).toBe("visible");
 
-        document._keydownHandler({
+        const escapeListener = activity.searchController._searchEscapeListener;
+        const removeEventListenerSpy = jest.spyOn(document, "removeEventListener");
+        const escapeEvent = new KeyboardEvent("keydown", {
             key: "Escape",
-            preventDefault: jest.fn(),
-            stopPropagation: jest.fn()
+            bubbles: true,
+            cancelable: true
         });
+
+        document.dispatchEvent(escapeEvent);
 
         expect(activity.searchWidget.style.visibility).toBe("hidden");
         expect(activity.searchController._searchEscapeListener).toBeNull();
+        expect(removeEventListenerSpy).toHaveBeenCalledWith(
+            "keydown",
+            escapeListener,
+            undefined
+        );
 
+        const secondEscapeEvent = new KeyboardEvent("keydown", {
+            key: "Escape",
+            bubbles: true,
+            cancelable: true
+        });
+        document.dispatchEvent(secondEscapeEvent);
+        expect(secondEscapeEvent.defaultPrevented).toBe(false);
+
+        removeEventListenerSpy.mockRestore();
         jest.useRealTimers();
     });
 });
