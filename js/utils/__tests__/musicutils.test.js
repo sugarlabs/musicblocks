@@ -4817,6 +4817,16 @@ describe("numberToPitch additional temperament paths", () => {
         expect(numberToPitch(-1200000)).toEqual(["A", -100000]);
     });
 
+    it("preserves the pitch class for very large negative equal-temperament inputs", () => {
+        expect(numberToPitch(-1e20)[0]).toBe("F");
+    });
+
+    it("returns a defined pitch for the largest finite negative input", () => {
+        const [note, octave] = numberToPitch(-Number.MAX_VALUE);
+        expect(typeof note).toBe("string");
+        expect(Number.isFinite(octave)).toBe(true);
+    });
+
     it("reports and falls back when a custom temperament is missing", () => {
         const activity = { errorMsg: jest.fn() };
 

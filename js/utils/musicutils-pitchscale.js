@@ -769,52 +769,27 @@ var numberToPitch = (i, temperament, startPitch, offset, activity) => {
     }
     const currentEDO = getCurrentEDO(temperament);
 
-    let n = 0;
     let pitchNumber;
-    if (i < 0) {
-        n = Math.max(1, Math.ceil(-i / currentEDO));
-        i += n * currentEDO;
+    if (isTrueEDO(temperament)) {
+        if (currentEDO === 12) {
+            const normalizedIndex = ((i % currentEDO) + currentEDO) % currentEDO;
+            const nameIndex = Math.round((normalizedIndex / currentEDO) * 12);
+            return [
+                PITCHES[(nameIndex + PITCHES.indexOf("A")) % 12],
+                Math.floor((i + PITCHES.indexOf("A")) / currentEDO)
+            ];
+        }
 
-        if (isTrueEDO(temperament)) {
-            if (currentEDO === 12) {
-                const nameIndex = Math.round(((i % currentEDO) / currentEDO) * 12);
-                return [
-                    PITCHES[(nameIndex + PITCHES.indexOf("A")) % 12],
-                    Math.floor((i + PITCHES.indexOf("A")) / currentEDO) - n
-                ];
-            } else {
-                const edoNames = generateNoteNames(currentEDO);
-                let aIndex = edoNames.indexOf("A");
-                if (aIndex === -1) {
-                    aIndex = Math.round((9 / 12) * currentEDO);
-                }
-                const nameIndex = (((i + aIndex) % currentEDO) + currentEDO) % currentEDO;
-                return [edoNames[nameIndex], Math.floor((i + aIndex) / currentEDO) - n];
-            }
-        } else {
-            pitchNumber = Math.floor(i - offset);
+        const edoNames = generateNoteNames(currentEDO);
+        let aIndex = edoNames.indexOf("A");
+        if (aIndex === -1) {
+            aIndex = Math.round((9 / 12) * currentEDO);
         }
-    } else {
-        if (isTrueEDO(temperament)) {
-            if (currentEDO === 12) {
-                const nameIndex = Math.round(((i % currentEDO) / currentEDO) * 12);
-                return [
-                    PITCHES[(nameIndex + PITCHES.indexOf("A")) % 12],
-                    Math.floor((i + PITCHES.indexOf("A")) / currentEDO)
-                ];
-            } else {
-                const edoNames = generateNoteNames(currentEDO);
-                let aIndex = edoNames.indexOf("A");
-                if (aIndex === -1) {
-                    aIndex = Math.round((9 / 12) * currentEDO);
-                }
-                const nameIndex = (((i + aIndex) % currentEDO) + currentEDO) % currentEDO;
-                return [edoNames[nameIndex], Math.floor((i + aIndex) / currentEDO)];
-            }
-        } else {
-            pitchNumber = Math.floor(i - offset);
-        }
+        const nameIndex = (((i % currentEDO) + currentEDO + aIndex) % currentEDO) % currentEDO;
+        return [edoNames[nameIndex], Math.floor((i + aIndex) / currentEDO)];
     }
+
+    pitchNumber = Math.floor(i - offset);
 
     let interval;
     if (isCustomTemperament(temperament)) {
@@ -831,7 +806,7 @@ var numberToPitch = (i, temperament, startPitch, offset, activity) => {
             temperament = "equal";
         }
         const octaveLength = TEMPERAMENT[temperament]["pitchNumber"];
-        const pitchIdx = pitchNumber % octaveLength;
+        const pitchIdx = ((pitchNumber % octaveLength) + octaveLength) % octaveLength;
         const octaveFactor = Math.floor(pitchNumber / octaveLength);
 
         pitchNumber = pitchIdx + "";
