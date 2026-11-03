@@ -1034,9 +1034,11 @@ function setupMeterBlocks(activity) {
             }
 
             if (args.length === 2 && typeof args[0] === "number" && typeof args[1] === "number") {
-                Singer.MeterActions.setMasterBPM(args[0], args[1], blk);
-
-                logo.notation.notationTempo(turtle, args[0], args[1]);
+                // Notate the tempo that plays, which is clamped to 30-1000 quarter notes.
+                const bpm = Singer.MeterActions.setMasterBPM(args[0], args[1], blk);
+                if (bpm !== null) {
+                    logo.notation.notationTempo(turtle, bpm, args[1]);
+                }
             }
 
             if (logo.inTempo) {
@@ -1181,9 +1183,11 @@ function setupMeterBlocks(activity) {
             }
 
             if (args.length === 2 && typeof args[0] === "number" && typeof args[1] === "number") {
-                Singer.MeterActions.setBPM(args[0], args[1], turtle, blk);
-
-                logo.notation.notationTempo(turtle, args[0], args[1]);
+                // Notate the tempo that plays, which is clamped to 30-1000 quarter notes.
+                const bpm = Singer.MeterActions.setBPM(args[0], args[1], turtle, blk);
+                if (bpm !== null) {
+                    logo.notation.notationTempo(turtle, bpm, args[1]);
+                }
             }
 
             if (logo.inTempo) {
@@ -1246,6 +1250,18 @@ function setupMeterBlocks(activity) {
             const tur = activity.turtles.ithTurtle(turtle);
 
             if (args.length === 3 && typeof args[0] === "number" && typeof args[1] === "number") {
+                // Same guard as Singer.MeterActions.setBPM: zero would make the
+                // notated tempo Infinity, and negatives give a nonsense tempo.
+                if (!Number.isFinite(args[0]) || args[0] <= 0) {
+                    activity.errorMsg(_("BPM must be a positive number."), blk);
+                    return [args[2], 1];
+                }
+
+                if (!Number.isFinite(args[1]) || args[1] <= 0) {
+                    activity.errorMsg(_("Beat value must be a positive number."), blk);
+                    return [args[2], 1];
+                }
+
                 let bpm = (args[0] * args[1]) / 0.25;
                 if (bpm < 30) {
                     activity.errorMsg(_("Beats per minute must be > 30."));
@@ -1255,7 +1271,7 @@ function setupMeterBlocks(activity) {
                     bpm = 1000;
                 }
 
-                logo.notation.notationTempo(turtle, args[0], args[1]);
+                logo.notation.notationTempo(turtle, (bpm * 0.25) / args[1], args[1]);
                 tur.singer.bpm.push(bpm);
 
                 const listenerName = "_bpm_" + turtle;
