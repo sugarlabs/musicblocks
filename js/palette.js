@@ -397,7 +397,7 @@ class Palettes {
      * @param {KeyboardEvent} event
      */
     _handleSearchKeydown(event) {
-        const exitKeys = ["Escape", "ArrowLeft", "ArrowRight"];
+        const exitKeys = ["Escape"];
         if (exitKeys.includes(event.key)) {
             event.preventDefault();
             event.stopPropagation();

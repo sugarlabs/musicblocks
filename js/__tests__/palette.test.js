@@ -211,6 +211,38 @@ describe("Palettes Class", () => {
         });
     });
 
+    describe("search keyboard navigation", () => {
+        test.each(["ArrowLeft", "ArrowRight"])("does not consume %s", key => {
+            global.docById = jest.fn(() => null);
+            const event = {
+                key,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+
+            palettes._handleSearchKeydown(event);
+
+            expect(event.preventDefault).not.toHaveBeenCalled();
+            expect(event.stopPropagation).not.toHaveBeenCalled();
+            expect(mockActivity.hideSearchWidget).not.toHaveBeenCalled();
+        });
+
+        test("consumes Escape and closes search", () => {
+            global.docById = jest.fn(() => null);
+            const event = {
+                key: "Escape",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+
+            palettes._handleSearchKeydown(event);
+
+            expect(event.preventDefault).toHaveBeenCalled();
+            expect(event.stopPropagation).toHaveBeenCalled();
+            expect(mockActivity.hideSearchWidget).toHaveBeenCalled();
+        });
+    });
+
     describe("_makeSelectorButton method", () => {
         test("creates a selector cell and hooks hover handlers", () => {
             const tdMock = { style: {}, appendChild: jest.fn(), setAttribute: jest.fn() };
