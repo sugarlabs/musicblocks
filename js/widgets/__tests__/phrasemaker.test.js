@@ -3243,6 +3243,68 @@ describe("PhraseMaker Widget", () => {
             expect(phraseMaker.pitchBlockAdded).toHaveBeenCalledWith(12, "mi", 5);
         });
 
+        test("pitchBlockAdded does not clear matrix and opens pie submenu without deselecting cells", () => {
+            jest.useFakeTimers();
+            phraseMaker.columnBlocksMap = [[12, "pitch", 4]];
+            phraseMaker._createColumnPieSubmenu = jest.fn();
+            phraseMaker.init = jest.fn();
+
+            phraseMaker.pitchBlockAdded(12);
+            jest.advanceTimersByTime(300);
+
+            expect(phraseMaker.init).not.toHaveBeenCalled();
+            expect(phraseMaker._createColumnPieSubmenu).toHaveBeenCalledWith(
+                0,
+                "pitchblocks",
+                true
+            );
+            jest.useRealTimers();
+        });
+
+        test("pitchBlockAdded falls back to _rowBlocks when columnBlocksMap does not have the block", () => {
+            jest.useFakeTimers();
+            phraseMaker.columnBlocksMap = [];
+            phraseMaker._rowBlocks = [10, 12];
+            phraseMaker._createColumnPieSubmenu = jest.fn();
+            phraseMaker.init = jest.fn();
+
+            phraseMaker.pitchBlockAdded(12);
+            jest.advanceTimersByTime(300);
+
+            expect(phraseMaker.init).not.toHaveBeenCalled();
+            expect(phraseMaker._createColumnPieSubmenu).toHaveBeenCalledWith(
+                1,
+                "pitchblocks",
+                true
+            );
+            jest.useRealTimers();
+        });
+
+        test("_sort preserves marked black cells across all rows", () => {
+            const cell1 = { style: { backgroundColor: "black" } };
+            const cell2 = { style: { backgroundColor: "green" } };
+            const cell3 = { style: { backgroundColor: "black" } };
+            phraseMaker._rows = [{ cells: [cell1, cell2] }, { cells: [cell2, cell3] }];
+            phraseMaker.rowLabels = ["sol", "mi"];
+            phraseMaker.rowArgs = [4, 4];
+            phraseMaker._noteStored = ["sol4", "mi4"];
+            phraseMaker._deps.getDrumName = jest.fn(() => null);
+            phraseMaker._deps.noteToFrequency = jest.fn(note => (note === "sol4" ? 392 : 329));
+            phraseMaker._deps.last = arr => arr[arr.length - 1];
+            phraseMaker.activity.turtles = {
+                ithTurtle: jest.fn(() => ({ singer: { keySignature: "C" } }))
+            };
+            phraseMaker.activity.logo = { tupletRhythms: [] };
+            phraseMaker.init = jest.fn();
+            phraseMaker.stylePhraseMaker = jest.fn();
+            phraseMaker.makeClickable = jest.fn();
+
+            phraseMaker._sort();
+
+            expect(phraseMaker._markedColsInRow[0]).toEqual([0]);
+            expect(phraseMaker._markedColsInRow[1]).toEqual([1]);
+        });
+
         test("_blockReplace replaces block index and updates matrix references", () => {
             phraseMaker._blockReplace = jest.fn();
 

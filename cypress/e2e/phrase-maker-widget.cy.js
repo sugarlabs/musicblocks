@@ -296,4 +296,32 @@ describe("Phrase Maker widget", () => {
             expect(black.length, "only the selected cells are black").to.equal(selected.length);
         });
     });
+
+    // 9. Adding a new note does not deselect previously selected cells (#10104)
+
+    it("keeps previously selected cells selected after adding a new note", () => {
+        openPhraseMaker();
+        cy.get(`${PM} [data-i="0"]`, { timeout: 15000 }).should("have.length.at.least", 1);
+
+        // Select the first cell in row 0
+        cy.get(`${PM} [data-i="0"][data-j="0"]`)
+            .first()
+            .trigger("mousedown", { force: true })
+            .trigger("mouseup", { force: true });
+        cy.get(`${PM} [data-i="0"][data-j="0"]`)
+            .first()
+            .should($cell => {
+                expect($cell[0].style.backgroundColor).to.equal("black");
+            });
+
+        // Click Add note button to open the row-addition pie menu
+        cy.get(`${PM} [role="button"][aria-label="Add note"]`).click();
+
+        // The previously selected cell must remain black
+        cy.get(`${PM} [data-i="0"][data-j="0"]`)
+            .first()
+            .should($cell => {
+                expect($cell[0].style.backgroundColor, "cell remains selected").to.equal("black");
+            });
+    });
 });

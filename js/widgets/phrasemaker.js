@@ -1472,13 +1472,11 @@ class PhraseMaker {
                 }
             }
 
+            let insertIndex;
             if (aboveBlock === this.blockNo) {
-                setTimeout(() => this._addNotesBlockBetween(aboveBlock, newBlock, true), 500);
-                this.rowLabels.splice(0, 0, rLabel);
-                this.rowArgs.splice(0, 0, rArg);
-                this._rowBlocks.splice(0, 0, newBlock);
+                insertIndex = 0;
+                this._addNotesBlockBetween(aboveBlock, newBlock, true);
             } else {
-                setTimeout(() => this._addNotesBlockBetween(aboveBlock, newBlock, false), 500);
                 let i;
                 for (i = 0; i < this.columnBlocksMap.length; i++) {
                     if (this.columnBlocksMap[i] && this.columnBlocksMap[i][0] === aboveBlock) {
@@ -1486,11 +1484,15 @@ class PhraseMaker {
                     }
                 }
 
-                const insertIndex = i < this.columnBlocksMap.length ? i + 1 : this.rowLabels.length;
-                this.rowLabels.splice(insertIndex, 0, rLabel);
-                this.rowArgs.splice(insertIndex, 0, rArg);
-                this._rowBlocks.splice(insertIndex, 0, newBlock);
+                insertIndex = i < this.columnBlocksMap.length ? i + 1 : this.rowLabels.length;
+                this._addNotesBlockBetween(aboveBlock, newBlock, false);
             }
+
+            this.rowLabels.splice(insertIndex, 0, rLabel);
+            this.rowArgs.splice(insertIndex, 0, rArg);
+            this._rowBlocks.splice(insertIndex, 0, newBlock);
+            this._rowMap = this._rowBlocks.map((_, idx) => idx);
+            this._rowOffset = this._rowBlocks.map(() => 0);
 
             this.sorted = false;
             this.init(this.activity);
@@ -1541,20 +1543,21 @@ class PhraseMaker {
      */
     pitchBlockAdded(blockN, retryCount = 0) {
         setTimeout(() => {
-            this.init(this.activity);
-            let i;
-            for (i = 0; i < this.columnBlocksMap.length; i++) {
-                if (this.columnBlocksMap[i] && this.columnBlocksMap[i][0] === blockN) {
-                    break;
-                }
+            let i = -1;
+            if (this.columnBlocksMap) {
+                i = this.columnBlocksMap.findIndex(entry => entry && entry[0] === blockN);
             }
-            if (i === this.columnBlocksMap.length) {
+            if (i === -1 && this._rowBlocks) {
+                i = this._rowBlocks.indexOf(blockN);
+            }
+            if (i === -1) {
                 if (retryCount < 5) {
                     this.pitchBlockAdded(blockN, retryCount + 1);
                     return;
                 }
+            } else {
+                this._createColumnPieSubmenu(i, "pitchblocks", true);
             }
-            this._createColumnPieSubmenu(i, "pitchblocks", true);
         }, 300);
     }
 
@@ -2628,7 +2631,13 @@ class PhraseMaker {
             ] = block;
         }
 
-        this.activity.blocks.blockList[belowBlock].connections[0] = block;
+        if (
+            belowBlock !== null &&
+            belowBlock !== undefined &&
+            this.activity.blocks.blockList[belowBlock]
+        ) {
+            this.activity.blocks.blockList[belowBlock].connections[0] = block;
+        }
         this.activity.blocks.blockList[block].connections[0] = aboveBlock;
         this.activity.blocks.blockList[block].connections[
             this.activity.blocks.blockList[block].connections.length - 1
@@ -2661,11 +2670,13 @@ class PhraseMaker {
         for (let r = 0; r < this.rowLabels.length; r++) {
             thisRow = [];
             row = this._rows[r];
-            n = row.cells.length;
-            for (let i = 0; i < n; i++) {
-                cell = row.cells[i];
-                if (cell.style.backgroundColor === "black") {
-                    thisRow.push(i);
+            if (row && row.cells) {
+                n = row.cells.length;
+                for (let i = 0; i < n; i++) {
+                    cell = row.cells[i];
+                    if (cell && cell.style.backgroundColor === "black") {
+                        thisRow.push(i);
+                    }
                 }
             }
             this._markedColsInRow.push(thisRow);
