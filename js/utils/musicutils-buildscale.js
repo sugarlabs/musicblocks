@@ -444,24 +444,23 @@ var _getStepSize = (keySignature, pitch, direction, transposition, temperament, 
                 return pc1 === pc2;
             }
         }
-        if (s1 === "E" + SHARP && s2 === "F") {
-            return true;
-        } else if (s1 === "E" && s2 === "F" + FLAT) {
-            return true;
-        } else if (s1 === "F" && s2 === "E♯") {
-            return true;
-        } else if (s1 === "F" + FLAT && s2 === "E") {
-            return true;
-        } else if (s1 === "B" + SHARP && s2 === "C") {
-            return true;
-        } else if ((s1 === "B" && s2 === "C" + FLAT) || (s1 === "C" + FLAT && s2 === "B")) {
+        if (
+            (s1 === "E" + SHARP && s2 === "F") ||
+            (s1 === "F" && s2 === "E" + SHARP) ||
+            (s1 === "E" && s2 === "F" + FLAT) ||
+            (s1 === "F" + FLAT && s2 === "E") ||
+            (s1 === "B" + SHARP && s2 === "C") ||
+            (s1 === "C" && s2 === "B" + SHARP) ||
+            (s1 === "B" && s2 === "C" + FLAT) ||
+            (s1 === "C" + FLAT && s2 === "B") ||
+            (s1 === "B" + DOUBLEFLAT && s2 === "A") ||
+            (s1 === "A" && s2 === "B" + DOUBLEFLAT) ||
+            (s1 === "F" + DOUBLESHARP && s2 === "G") ||
+            (s1 === "G" && s2 === "F" + DOUBLESHARP)
+        ) {
             const pos1 = getEdoNoteNamePosition(s1, currentEDO);
             const pos2 = getEdoNoteNamePosition(s2, currentEDO);
             return pos1 !== -1 && pos2 !== -1 && pos1 === pos2;
-        } else if (s1 === "B" + DOUBLEFLAT && s2 === "A") {
-            return true;
-        } else if (s1 === "F" + DOUBLESHARP && s2 === "G") {
-            return true;
         }
         return false;
     };

@@ -2847,9 +2847,15 @@ describe("getStepSize", () => {
         expect(_getStepSize("C♭ major", "B", "up", 0, "equal", 19)).toBe(1);
         // From B♯ (the tonic) to next scale degree (D♭) is 3 steps.
         expect(_getStepSize("C♭ major", "B♯", "up", 0, "equal", 19)).toBe(3);
+        // From C (pos 0) in C♭ major (tonic B♯ at pos 18), next note is D♭ (pos 2), which is 2 steps up.
+        expect(_getStepSize("C♭ major", "C", "up", 0, "equal", 19)).toBe(2);
+        expect(_getStepSize("C♭ major", "C", "down", 0, "equal", 19)).toBe(-1);
         // In 19-EDO F♭ maps to E♯, which is 1 step above E (index 6 -> 7).
         expect(_getStepSize("F♭ major", "E", "up", 0, "equal", 19)).toBe(1);
         expect(_getStepSize("F♭ major", "E♯", "up", 0, "equal", 19)).toBe(3);
+        // From F (pos 8) in F♭ major (tonic E♯ at pos 7), next note is G♭ (pos 10), which is 2 steps up.
+        expect(_getStepSize("F♭ major", "F", "up", 0, "equal", 19)).toBe(2);
+        expect(_getStepSize("F♭ major", "F", "down", 0, "equal", 19)).toBe(-1);
     });
     it('should return the correct step size for "C" in "C major" going up', () => {
         const result = _getStepSize("C major", "C", "up", 0, "equal");
@@ -2915,12 +2921,18 @@ describe("getStepSize", () => {
         }
     });
 
-    it("should keep the named enharmonic rules in other temperaments", () => {
-        // In 19-EDO E♯ is still matched to the scale's F by name.
-        expect(_getStepSize("C major", "E♯", "up", 0, "equal", 19)).toBe(3);
-        expect(_getStepSize("C major", "E♯", "down", 0, "equal", 19)).toBe(-2);
-        // ...and an F is matched to F♯ major's E♯.
-        expect(_getStepSize("F♯ major", "F", "up", 0, "equal", 19)).toBe(2);
+    it("respects microtonal enharmonics distinction in non-12 EDO and maintains 12-EDO equivalence", () => {
+        // In 19-EDO E♯ (pos 7) and F (pos 8) are distinct:
+        // Stepping up from E♯ to the next note in C major (F) is 1 step.
+        expect(_getStepSize("C major", "E♯", "up", 0, "equal", 19)).toBe(1);
+        // Stepping down from E♯ to the previous note in C major (E, pos 6) is -1 step.
+        expect(_getStepSize("C major", "E♯", "down", 0, "equal", 19)).toBe(-1);
+        // Stepping up from F (pos 8) to the next note in F♯ major (F♯, pos 9) is 1 step.
+        expect(_getStepSize("F♯ major", "F", "up", 0, "equal", 19)).toBe(1);
+
+        // In 12-EDO E♯ and F are enharmonically equivalent.
+        expect(_getStepSize("C major", "E♯", "up", 0, "equal", 12)).toBe(2);
+        expect(_getStepSize("C major", "E♯", "down", 0, "equal", 12)).toBe(-1);
     });
 
     it('should return 0 for "C" going down in a key without a lower note', () => {
