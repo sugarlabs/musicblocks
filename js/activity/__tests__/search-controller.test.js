@@ -624,11 +624,7 @@ describe("SearchController.showSearchWidget", () => {
 
         expect(activity.searchWidget.style.visibility).toBe("hidden");
         expect(activity.searchController._searchEscapeListener).toBeNull();
-        expect(removeEventListenerSpy).toHaveBeenCalledWith(
-            "keydown",
-            escapeListener,
-            undefined
-        );
+        expect(removeEventListenerSpy).toHaveBeenCalledWith("keydown", escapeListener, undefined);
 
         const secondEscapeEvent = new KeyboardEvent("keydown", {
             key: "Escape",
