@@ -57,7 +57,7 @@
    exported
 
    piemenuModes, piemenuPitches, piemenuCustomNotes, piemenuGrid,
-   piemenuIntervals, piemenuVoices, piemenuBoolean,
+   piemenuIntervals, piemenuVoices, piemenuVoicesGrid, piemenuBoolean,
    piemenuBasic, piemenuColor, piemenuNumber,
    piemenuNoteValue, piemenuAccidentals, piemenuKey, piemenuChords,
    piemenuDissectNumber, getTemperamentSliceFont,
@@ -3319,6 +3319,196 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
 };
 
 /**
+ * Builds the grid-style voice/instrument picker, grouped by instrument type.
+ *
+ * @param {Object} block Block instance invoking the menu
+ * @param {string[]} voiceLabels Labels shown on the tiles
+ * @param {Array} voiceValues Values mapped to labels
+ * @param {number[]} categories Category index per voice (index into categoriesList)
+ * @param {string[]} categoriesList Type names, in the order the indices refer to
+ * @param {*} voice Currently selected voice value
+ * @returns {void}
+ */
+const piemenuVoicesGrid = (block, voiceLabels, voiceValues, categories, categoriesList, voice) => {
+    if (block.blocks.stageClick) {
+        return;
+    }
+
+    const that = block;
+    const COLORS = platformColor.piemenuVoicesColors;
+    const HEADINGS = { precussion: "percussion" }; // source list misspells this type
+    let voicePreviewTimeout = null;
+
+    const old = document.getElementById("voiceGrid");
+    if (old) {
+        if (typeof old.__closeVoiceGrid === "function") {
+            old.__closeVoiceGrid();
+        } else {
+            old.remove();
+        }
+    }
+
+    const __select = i => {
+        that.value = voiceValues[i];
+        that.text.text = voiceLabels[i];
+
+        if (getDrumName(that.value) === null) {
+            that.activity.logo.synth.loadSynth(0, getVoiceSynthName(that.value));
+        } else {
+            that.activity.logo.synth.loadSynth(0, getDrumSynthName(that.value));
+        }
+
+        // Make sure text is on top.
+        that.container.setChildIndex(that.text, that.container.children.length - 1);
+        that.updateCache();
+    };
+
+    const __preview = i => {
+        const v = voiceValues[i];
+        let timeout = 0;
+        const tur = that.activity.turtles.ithTurtle(0);
+
+        if (!tur.singer.instrumentNames.includes(v)) {
+            tur.singer.instrumentNames.push(v);
+            if (v === DEFAULTVOICE) {
+                that.activity.logo.synth.createDefaultSynth(0);
+            }
+            that.activity.logo.synth.loadSynth(0, v);
+            timeout = 500; // give the synth time to load
+        }
+
+        clearTimeout(voicePreviewTimeout);
+        voicePreviewTimeout = setTimeout(() => {
+            voicePreviewTimeout = null;
+            Singer.setSynthVolume(that.activity.logo, 0, v, DEFAULTVOLUME);
+            that.activity.logo.synth.trigger(0, "G4", 1 / 4, v, null, null, false);
+            that.activity.logo.synth.start();
+        }, timeout);
+
+        __select(i);
+    };
+
+    // Panel
+    const panel = document.createElement("div");
+    panel.id = "voiceGrid";
+    panel.style.cssText =
+        "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);" +
+        "width:min(640px,92vw);max-height:80vh;overflow-y:auto;box-sizing:border-box;" +
+        "padding:16px;border-radius:12px;background:#fff;" +
+        "box-shadow:0 8px 32px rgba(0,0,0,0.35);z-index:9999;";
+
+    const closeButton = document.createElement("button");
+    closeButton.textContent = "×";
+    closeButton.setAttribute("aria-label", _("close"));
+    closeButton.style.cssText =
+        "position:sticky;top:0;float:right;width:36px;height:36px;border:none;" +
+        "border-radius:50%;font-size:24px;line-height:1;cursor:pointer;";
+    panel.appendChild(closeButton);
+
+    const tiles = [];
+
+    const __textColor = hex => {
+        const m = /^#?([0-9a-f]{6})$/i.exec(hex);
+        if (!m) {
+            return "#fff";
+        }
+        const n = parseInt(m[1], 16);
+        const lum = 0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255);
+        return lum > 150 ? "#000" : "#fff";
+    };
+
+    // One section per type, using the same color index as the pie menu.
+    for (let k = 0; k < categoriesList.length; k++) {
+        const members = [];
+        for (let i = 0; i < voiceValues.length; i++) {
+            if (categories[i] === k) {
+                members.push(i);
+            }
+        }
+        if (members.length === 0) {
+            continue;
+        }
+
+        const heading = document.createElement("div");
+        const typeName = categoriesList[k];
+        heading.textContent = _(HEADINGS[typeName] || typeName);
+        heading.style.cssText =
+            "clear:both;margin:12px 0 6px;font:bold 14px sans-serif;" +
+            "text-transform:capitalize;color:#333;";
+        panel.appendChild(heading);
+
+        const grid = document.createElement("div");
+        grid.style.cssText =
+            "display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));";
+
+        for (const i of members) {
+            const tile = document.createElement("button");
+            tile.textContent = voiceLabels[i];
+            tile.style.cssText =
+                "padding:12px 6px;border:none;border-radius:8px;cursor:pointer;" +
+                "font:16px sans-serif;color:" +
+                __textColor(COLORS[k % COLORS.length]) +
+                ";background:" +
+                COLORS[k % COLORS.length] +
+                ";";
+            if (voiceValues[i] === voice) {
+                tile.style.outline = "3px solid #000";
+                tile.style.outlineOffset = "2px";
+            }
+            tile.addEventListener("click", () => {
+                for (const t of tiles) {
+                    t.style.outline = "none";
+                }
+                tile.style.outline = "3px solid #000";
+                tile.style.outlineOffset = "2px";
+                __preview(i);
+            });
+            tiles.push(tile);
+            grid.appendChild(tile);
+        }
+        panel.appendChild(grid);
+    }
+
+    let closed = false;
+    const __close = () => {
+        if (closed) {
+            return;
+        }
+        closed = true;
+        that._piemenuExitTime = new Date().getTime();
+        clearTimeout(voicePreviewTimeout);
+        voicePreviewTimeout = null;
+        document.removeEventListener("keydown", __onKey);
+        document.removeEventListener("mousedown", __onOutsideClick);
+        closeButton.removeEventListener("click", __close);
+        panel.__closeVoiceGrid = null;
+        panel.remove();
+        // The menu covers the canvas, so the block never gets the mouseout
+        // that would normally clear this.
+        that.blocks.activeBlock = null;
+    };
+
+    const __onKey = e => {
+        if (e.key === "Escape") {
+            __close();
+        }
+    };
+
+    const __onOutsideClick = e => {
+        if (!panel.contains(e.target)) {
+            __close();
+        }
+    };
+
+    panel.__closeVoiceGrid = __close;
+    closeButton.addEventListener("click", __close);
+    document.addEventListener("keydown", __onKey);
+    document.addEventListener("mousedown", __onOutsideClick);
+
+    document.body.appendChild(panel);
+};
+
+/**
  * Builds the interval selection pie menu.
  * @param {Object} block Block instance invoking the menu
  * @param {string} selectedInterval Currently selected interval value
@@ -4633,6 +4823,7 @@ if (typeof module !== "undefined" && module.exports) {
         piemenuBoolean,
         piemenuModes,
         piemenuVoices,
+        piemenuVoicesGrid,
         piemenuBasic,
         piemenuDissectNumber,
         getTemperamentSliceFont,

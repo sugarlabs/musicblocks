@@ -2412,16 +2412,25 @@ describe("Block Foundation", () => {
         it("_changeLabel voiceLabels truncation", () => {
             global.getTextWidth.mockReturnValue(500); // Forces > 400
             global.piemenuVoices = jest.fn();
+            global.piemenuVoicesGrid = jest.fn();
             global.VOICENAMES = [["1", "voice1", "label", "cat"]];
             block.name = "voicename";
+            block.value = "voice1";
             block.activity = { canvas: { offsetLeft: 0, offsetTop: 0 }, blocksContainer: { y: 0 } };
             block.blocks = { blockScale: 1 };
             block.container = { x: 0, y: 0 };
             block.piemenuOKtoLaunch = jest.fn().mockReturnValue(true);
             block._usePiemenu = jest.fn().mockReturnValue(true);
             block._changeLabel();
-            expect(global.piemenuVoices).toHaveBeenCalled();
-            expect(global.piemenuVoices.mock.calls[0][1]).toEqual(["voice1..."]);
+            expect(global.piemenuVoicesGrid).toHaveBeenCalledWith(
+                block,
+                ["voice1..."],
+                ["voice1"],
+                [0],
+                ["cat"],
+                "voice1"
+            );
+            expect(global.piemenuVoices).not.toHaveBeenCalled();
         });
 
         it("_changeLabel noiseLabels truncation", () => {

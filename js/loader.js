@@ -129,7 +129,7 @@ requirejs.config({
             exports: "createDefaultStack"
         },
         "activity/block": {
-            deps: ["activity/turtledefs", "utils/retryWithBackoff"],
+            deps: ["activity/turtledefs", "utils/retryWithBackoff", "activity/piemenus"],
             exports: "Block"
         },
         "activity/connection-validator": {

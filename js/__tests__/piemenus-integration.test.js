@@ -26,6 +26,8 @@
 const fs = require("fs");
 const path = require("path");
 
+let piemenuVoicesGrid;
+
 const loadVendored = file => {
     window.eval(fs.readFileSync(path.join(__dirname, "../../lib", file), "utf8"));
 };
@@ -52,11 +54,20 @@ beforeAll(() => {
     loadVendored("wheelnav.js");
 
     global.docById = id => document.getElementById(id);
-    require("../piemenus");
+    global._ = text => text;
+    global.DEFAULTVOICE = "voice-one";
+    global.DEFAULTVOLUME = 0.5;
+    global.platformColor = { piemenuVoicesColors: ["#123456", "#654321"] };
+    global.getDrumName = jest.fn().mockReturnValue(null);
+    global.getVoiceSynthName = jest.fn(value => `synth-${value}`);
+    global.getDrumSynthName = jest.fn(value => `drum-${value}`);
+    global.Singer = { setSynthVolume: jest.fn() };
+    ({ piemenuVoicesGrid } = require("../piemenus"));
 });
 
 afterEach(() => {
     document.body.replaceChildren();
+    jest.useRealTimers();
 });
 
 let menuCount = 0;
@@ -187,6 +198,138 @@ describe("selected item hover in pie menus", () => {
 
             expect(closed).toHaveBeenCalledTimes(1);
             expect(picked).not.toHaveBeenCalled();
+        });
+    });
+
+    const makeVoiceBlock = () => ({
+        blocks: { stageClick: false, activeBlock: {} },
+        value: "voice-one",
+        text: { text: "One" },
+        container: { children: [], setChildIndex: jest.fn() },
+        updateCache: jest.fn(),
+        activity: {
+            logo: {
+                synth: {
+                    loadSynth: jest.fn(),
+                    createDefaultSynth: jest.fn(),
+                    trigger: jest.fn(),
+                    start: jest.fn()
+                }
+            },
+            turtles: {
+                ithTurtle: jest.fn(() => ({ singer: { instrumentNames: [] } }))
+            }
+        }
+    });
+
+    const openVoiceGrid = block => {
+        piemenuVoicesGrid(
+            block,
+            ["One", "Two"],
+            ["voice-one", "voice-two"],
+            [0, 1],
+            ["voices", "other"],
+            "voice-one"
+        );
+    };
+
+    test("uses dark text for light instrument category colors", () => {
+        const colors = global.platformColor.piemenuVoicesColors;
+        global.platformColor.piemenuVoicesColors = ["#123456", "#60bfbc"];
+        try {
+            openVoiceGrid(makeVoiceBlock());
+
+            const tiles = [...document.querySelectorAll("#voiceGrid button")];
+            expect(tiles.find(tile => tile.textContent === "One").style.color).toBe(
+                "rgb(255, 255, 255)"
+            );
+            expect(tiles.find(tile => tile.textContent === "Two").style.color).toBe("rgb(0, 0, 0)");
+        } finally {
+            document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+            global.platformColor.piemenuVoicesColors = colors;
+        }
+    });
+
+    describe("voice grid lifecycle", () => {
+        test("selects and previews a tile without closing the grid", () => {
+            jest.useFakeTimers();
+            const block = makeVoiceBlock();
+            openVoiceGrid(block);
+
+            const tile = [...document.querySelectorAll("#voiceGrid button")].find(
+                button => button.textContent === "Two"
+            );
+            tile.click();
+
+            expect(block.value).toBe("voice-two");
+            expect(block.text.text).toBe("Two");
+            expect(tile.style.outline).toBe("3px solid #000");
+            expect(document.getElementById("voiceGrid")).not.toBeNull();
+            expect(block.activity.logo.synth.loadSynth).toHaveBeenCalledWith(0, "synth-voice-two");
+
+            jest.advanceTimersByTime(499);
+            expect(block.activity.logo.synth.trigger).not.toHaveBeenCalled();
+            jest.advanceTimersByTime(1);
+            expect(block.activity.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                "G4",
+                1 / 4,
+                "voice-two",
+                null,
+                null,
+                false
+            );
+            document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+        });
+
+        test.each([
+            [
+                "Escape",
+                () => document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
+            ],
+            ["close button", () => document.querySelector("#voiceGrid button").click()],
+            [
+                "outside click",
+                () => document.body.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }))
+            ]
+        ])("%s closes the grid and clears the active block", (dismiss, dismissGrid) => {
+            const block = makeVoiceBlock();
+            openVoiceGrid(block);
+
+            dismissGrid();
+
+            expect(document.getElementById("voiceGrid")).toBeNull();
+            expect(block._piemenuExitTime).toEqual(expect.any(Number));
+            expect(block.blocks.activeBlock).toBeNull();
+        });
+
+        test("opening click does not immediately dismiss the grid", () => {
+            const block = makeVoiceBlock();
+            const opener = document.createElement("button");
+            opener.addEventListener("click", () => openVoiceGrid(block));
+            document.body.appendChild(opener);
+
+            opener.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+            expect(document.getElementById("voiceGrid")).not.toBeNull();
+            document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+        });
+
+        test("reopening closes the prior grid and cancels its pending preview", () => {
+            jest.useFakeTimers();
+            const previousBlock = makeVoiceBlock();
+            openVoiceGrid(previousBlock);
+            document.querySelectorAll("#voiceGrid button")[1].click();
+
+            const nextBlock = makeVoiceBlock();
+            openVoiceGrid(nextBlock);
+            jest.advanceTimersByTime(500);
+
+            expect(document.querySelectorAll("#voiceGrid")).toHaveLength(1);
+            expect(previousBlock._piemenuExitTime).toEqual(expect.any(Number));
+            expect(previousBlock.blocks.activeBlock).toBeNull();
+            expect(previousBlock.activity.logo.synth.trigger).not.toHaveBeenCalled();
+            document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
         });
     });
 });
