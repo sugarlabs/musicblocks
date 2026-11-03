@@ -216,5 +216,73 @@ describe("RhythmRulerSave", () => {
             expect(stack[repeat[0] + 1][1]).toEqual(["number", { value: 2 }]);
             expect(widget._saveMachine).not.toHaveBeenCalled();
         });
+
+        test.each([
+            {
+                label: "repeated rests followed by a note",
+                noteValues: [-4, -4, 4],
+                continuations: ["newnote"]
+            },
+            {
+                label: "repeated rests followed by repeated notes",
+                noteValues: [-4, -4, 8, 8],
+                continuations: ["repeat", null]
+            },
+            {
+                label: "repeated rests between notes",
+                noteValues: [8, -4, -4, 4],
+                continuations: ["newnote"]
+            },
+            {
+                label: "two groups of repeated rests followed by a note",
+                noteValues: [-4, -4, -8, -8, 4],
+                continuations: ["repeat", "newnote"]
+            },
+            {
+                label: "terminal repeated rests after a note",
+                noteValues: [4, -8, -8],
+                continuations: [null]
+            },
+            {
+                label: "a ruler containing only repeated rests",
+                noteValues: [-4, -4],
+                continuations: [null]
+            },
+            {
+                label: "repeated notes followed by a rest",
+                noteValues: [4, 4, -8],
+                continuations: ["newnote"]
+            }
+        ])("a voice machine connects $label", ({ noteValues, continuations }) => {
+            const widget = makeWidget([noteValues], "guitar");
+
+            RhythmRulerSave.prototype._saveVoiceMachine.call(widget, 0, "guitar");
+            jest.advanceTimersByTime(500);
+
+            const stack = loadNewBlocks.mock.calls[0][0];
+            const repeats = stack.filter(block => block[1] === "repeat");
+            expect(repeats).toHaveLength(continuations.length);
+            repeats.forEach((repeat, i) => {
+                const next = repeat[4][3];
+                if (continuations[i] === null) {
+                    expect(next).toBeNull();
+                } else {
+                    expect(stack[next][1]).toBe(continuations[i]);
+                    expect(stack[next][4][0]).toBe(repeat[0]);
+                }
+            });
+
+            for (const block of stack) {
+                const parent = block[4][0];
+                if (parent !== null) {
+                    expect(stack[parent][4].slice(1)).toContain(block[0]);
+                }
+                for (const child of block[4].slice(1)) {
+                    if (child !== null) {
+                        expect(stack[child][4][0]).toBe(block[0]);
+                    }
+                }
+            }
+        });
     });
 });
