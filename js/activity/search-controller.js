@@ -19,7 +19,7 @@ class SearchController {
         this.searchUI = searchUI || activity.searchUI || null;
 
         this.searchSuggestions = [];
-        this._searchCache = {};
+        this._searchCache = Object.create(null);
         this._searchCloseListener = null;
         this.isHelpfulSearchWidgetOn = false;
         this.searchBlockPosition = [100, 100];
@@ -35,7 +35,7 @@ class SearchController {
     prepSearchWidget() {
         this.searchBlockPosition = [100, 100];
         this.searchSuggestions = [];
-        this._searchCache = {};
+        this._searchCache = Object.create(null);
         this.deprecatedBlockNames = [];
 
         const activity = this.activity;
