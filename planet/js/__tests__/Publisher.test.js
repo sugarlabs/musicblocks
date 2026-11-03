@@ -448,11 +448,22 @@ describe("Publisher", () => {
                 123,
                 undefined,
                 [1, null, 0, 0, []],
-                [2, "newnote", 0, 0, [0, 2, 3, null]],
+                [2, [], 0, 0, []],
+                [3, [null], 0, 0, []],
+                [4, [123], 0, 0, []],
+                [5, "newnote", 0, 0, [0, 2, 3, null]],
                 {}
             ];
             const result = publisher.parseProject(projectBlocks);
             expect(result).toBe("start newnote");
+        });
+
+        it("should skip array entries without a string block name and return empty string", () => {
+            expect(publisher.parseProject([[0, []]])).toBe("");
+            expect(publisher.parseProject([[0, [null]]])).toBe("");
+            expect(publisher.parseProject([[0, [123]]])).toBe("");
+            expect(publisher.parseProject([[0, null]])).toBe("");
+            expect(publisher.parseProject([[0, undefined]])).toBe("");
         });
     });
 

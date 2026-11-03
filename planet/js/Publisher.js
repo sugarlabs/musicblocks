@@ -491,13 +491,15 @@ class Publisher {
 
             if (typeof block[1] === "string") {
                 name = block[1];
-            } else if (Array.isArray(block[1])) {
+            } else if (Array.isArray(block[1]) && typeof block[1][0] === "string") {
                 name = block[1][0];
             } else if (typeof block[1] === "number") {
                 break;
             }
 
-            if (name === null) continue;
+            if (!name || typeof name !== "string") {
+                continue;
+            }
 
             // Resolve proto name to display name using the lookup map provided
             // by the parent via postMessage, instead of directly accessing
