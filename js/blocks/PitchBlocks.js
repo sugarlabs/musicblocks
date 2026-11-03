@@ -544,13 +544,17 @@ function setupPitchBlocks(activity) {
                         notePlayed = arg1;
                     }
                 } else if (activity.blocks.blockList[cblk1].name === "scaledegree2") {
-                    notePlayed = scaleDegreeToPitchMapping(
+                    const mappedPitch = scaleDegreeToPitchMapping(
                         tur.singer.keySignature,
                         activity.blocks.blockList[cblk1].value,
                         tur.singer.movable,
                         null
                     );
-                    notePlayed += tur.singer.currentOctave ? tur.singer.currentOctave : 4;
+                    if (mappedPitch === null) {
+                        return INVALIDPITCH;
+                    }
+                    notePlayed =
+                        mappedPitch + (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
                 } else {
                     if (typeof arg1 === "string") {
                         // Is it a number encoded as a string?
@@ -793,7 +797,8 @@ function setupPitchBlocks(activity) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
             const obj = keySignatureToMode(tur.singer.keySignature);
             const modeLength = MUSICALMODES[obj[1]].length;
-            const thisScale = buildScale(tur.singer.keySignature)[0];
+            const scaleObj = buildScale(tur.singer.keySignature);
+            const thisScale = scaleObj ? scaleObj[0] : null;
 
             let arg1 = 0;
             if (cblk1 !== null) {
@@ -828,17 +833,37 @@ function setupPitchBlocks(activity) {
                     lc += modeLength;
                 }
 
-                const thisNote = thisScale[lc];
-
-                // Now that we have the note, look for its pitch number.
-                lc = NOTESSHARP.indexOf(thisNote);
-                if (lc === -1) {
-                    lc = NOTESFLAT.indexOf(thisNote);
+                let thisNote = thisScale ? thisScale[lc] : null;
+                if (!thisNote) {
+                    while (noteIdx < 0) {
+                        noteIdx += NOTENAMES.length;
+                    }
+                    thisNote = NOTENAMES[noteIdx % NOTENAMES.length];
                 }
 
-                // Since we are using the staff, it is OK to assume 12
-                // half-steps per octave.
-                return lc + 12 * o;
+                // Now that we have the note, look for its pitch number.
+                const temperament = logo?.synth?.inTemperament || "equal";
+                const currentEDO = getCurrentEDO(temperament);
+                if (currentEDO === 12) {
+                    lc = NOTESSHARP.indexOf(thisNote);
+                    if (lc === -1) {
+                        lc = NOTESFLAT.indexOf(thisNote);
+                    }
+                    return lc + 12 * o;
+                } else {
+                    const edoNames = generateNoteNames(currentEDO);
+                    lc = edoNames.indexOf(thisNote);
+                    if (lc === -1) {
+                        lc = NOTESSHARP.indexOf(thisNote);
+                        if (lc === -1) {
+                            lc = NOTESFLAT.indexOf(thisNote);
+                        }
+                        if (lc !== -1) {
+                            lc = Math.round((lc / 12) * currentEDO);
+                        }
+                    }
+                    return (lc !== -1 ? lc : 0) + currentEDO * o;
+                }
             } else if (activity.blocks.blockList[cblk0].name === "nthmodalpitch") {
                 if (cblk1 === null) {
                     return 5;
@@ -867,12 +892,27 @@ function setupPitchBlocks(activity) {
                     return ["sol", 4];
                 }
 
+                if (!thisScale) {
+                    while (noteIdx < 0) {
+                        noteIdx += NOTENAMES.length;
+                    }
+                    const note = NOTENAMES[noteIdx % NOTENAMES.length];
+                    return [note, o2];
+                }
+
                 // Calculate the offset relative to the current key.
                 let lc = noteIdx - NOTENAMES.indexOf(obj[0][0]);
                 if (lc < 0) {
                     lc += modeLength;
                 }
-                return [thisScale[lc], o2];
+                const note = thisScale[lc];
+                if (!note) {
+                    while (noteIdx < 0) {
+                        noteIdx += NOTENAMES.length;
+                    }
+                    return [NOTENAMES[noteIdx % NOTENAMES.length], o2];
+                }
+                return [note, o2];
             } else {
                 if (cblk1 === null) {
                     return "G4";
@@ -2045,6 +2085,11 @@ function setupPitchBlocks(activity) {
                         tur.singer.movable,
                         null
                     );
+                    if (note === null) {
+                        activity.errorMsg(INVALIDPITCH, blk);
+                        logo.stopTurtle = true;
+                        return;
+                    }
                     if (attr !== NATURAL) {
                         // A sharp on a flat note of the key, or a flat on a sharp
                         // one, cancels it (7♭ in G major is F, not F♯♭).

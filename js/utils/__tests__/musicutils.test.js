@@ -131,6 +131,7 @@ const {
     PITCH_COLLECTIONS_EDO_OVERRIDES,
     getModePattern,
     generateNoteNames,
+    getEdoNoteNamePosition,
     isNonEDO,
     getNonEDOModeSteps,
     getSavedCustomModes,
@@ -2649,10 +2650,225 @@ describe("buildScale with explicit EDO", () => {
             [2, 2, 1, 2, 2, 2, 1]
         ]);
     });
+
+    describe("C♭ and F♭ major across 12, 19, and 31 EDO", () => {
+        it("preserves exact byte-for-byte 12-EDO output for C♭ major and F♭ major", () => {
+            expect(buildScale("C♭ major", 12)).toEqual([
+                ["C♭", "D♭", "E♭", "F♭", "G♭", "A♭", "B♭", "C♭"],
+                [2, 2, 1, 2, 2, 2, 1]
+            ]);
+            expect(buildScale("F♭ major", 12)).toEqual([
+                ["F♭", "G♭", "A♭", "B𝄫", "C♭", "D♭", "E♭", "F♭"],
+                [2, 2, 1, 2, 2, 2, 1]
+            ]);
+        });
+
+        it.each([
+            [
+                "C♭ major",
+                19,
+                "B♯",
+                [3, 3, 2, 3, 3, 3, 2],
+                ["B♯", "D♭", "E♭", "E♯", "G♭", "A♭", "B♭", "B♯"]
+            ],
+            [
+                "F♭ major",
+                19,
+                "E♯",
+                [3, 3, 2, 3, 3, 3, 2],
+                ["E♯", "G♭", "A♭", "A♯", "B♯", "D♭", "E♭", "E♯"]
+            ],
+            [
+                "C♭ major",
+                31,
+                "C♭",
+                [5, 5, 3, 5, 5, 5, 3],
+                ["C♭", "D♭", "E♭", "F♭", "G♭", "A♭", "B♭", "C♭"]
+            ],
+            [
+                "F♭ major",
+                31,
+                "F♭",
+                [5, 5, 3, 5, 5, 5, 3],
+                ["F♭", "G♭", "A♭", "A♯♯", "C♭", "D♭", "E♭", "F♭"]
+            ],
+            ["C♭ major", 7, "B", [1, 1, 1, 1, 1, 1, 1], ["B", "C", "D", "E", "F", "G", "A", "B"]],
+            ["F♭ major", 7, "E", [1, 1, 1, 1, 1, 1, 1], ["E", "F", "G", "A", "B", "C", "D", "E"]]
+        ])(
+            "builds %s in %i-EDO with native intervals and resolved tonic %s",
+            (key, edo, expectedTonic, expectedSteps, expectedScale) => {
+                const [scale, steps] = buildScale(key, edo);
+                const edoNames = generateNoteNames(edo);
+                const expectedPattern = getModePattern("major", edo);
+
+                // 1. Interval pattern equals active getModePattern("major", edo)
+                expect(steps).toEqual(expectedPattern);
+                expect(steps).toEqual(expectedSteps);
+
+                // 2. Interval sum equals requested EDO
+                expect(steps.reduce((a, b) => a + b, 0)).toBe(edo);
+
+                // 3. Scale length is interval pattern length + 1
+                expect(scale.length).toBe(steps.length + 1);
+
+                // 4. First note corresponds to expected tonic position returned by getEdoNoteNamePosition
+                const tonicPos = getEdoNoteNamePosition(expectedTonic, edo);
+                expect(tonicPos).toBeGreaterThanOrEqual(0);
+                expect(scale[0]).toBe(edoNames[tonicPos]);
+                expect(scale[0]).toBe(expectedTonic);
+
+                // 5. Scale is generated using valid names from generateNoteNames(edo)
+                expect(scale.every(name => edoNames.includes(name))).toBe(true);
+
+                // 6. Final note returns to starting pitch position
+                expect(scale[scale.length - 1]).toBe(scale[0]);
+
+                // 7. No invalid idx = 0 fallback silently changes requested tonic (C is index 0)
+                expect(scale[0]).not.toBe("C");
+
+                // Exact scale match
+                expect(scale).toEqual(expectedScale);
+            }
+        );
+
+        it("uses active temperament fallback when edo argument is omitted", () => {
+            try {
+                global.globalActivity = {
+                    logo: {
+                        synth: {
+                            inTemperament: "equal19"
+                        }
+                    }
+                };
+                const [scale19, steps19] = buildScale("C♭ major");
+                expect(steps19).toEqual(getModePattern("major", 19));
+                expect(steps19.reduce((a, b) => a + b, 0)).toBe(19);
+                expect(scale19[0]).toBe("B♯");
+                expect(scale19[scale19.length - 1]).toBe("B♯");
+
+                const [fScale19, fSteps19] = buildScale("F♭ major");
+                expect(fSteps19).toEqual(getModePattern("major", 19));
+                expect(fSteps19.reduce((a, b) => a + b, 0)).toBe(19);
+                expect(fScale19[0]).toBe("E♯");
+                expect(fScale19[fScale19.length - 1]).toBe("E♯");
+
+                global.globalActivity.logo.synth.inTemperament = "equal31";
+                const [scale31, steps31] = buildScale("C♭ major");
+                expect(steps31).toEqual(getModePattern("major", 31));
+                expect(steps31.reduce((a, b) => a + b, 0)).toBe(31);
+                expect(scale31[0]).toBe("C♭");
+                expect(scale31[scale31.length - 1]).toBe("C♭");
+
+                const [fScale31, fSteps31] = buildScale("F♭ major");
+                expect(fSteps31).toEqual(getModePattern("major", 31));
+                expect(fSteps31.reduce((a, b) => a + b, 0)).toBe(31);
+                expect(fScale31[0]).toBe("F♭");
+                expect(fScale31[fScale31.length - 1]).toBe("F♭");
+            } finally {
+                delete global.globalActivity;
+            }
+        });
+
+        it("preserves standard scale generation for C, D, G major and A minor in 12, 19, and 31 EDO", () => {
+            [12, 19, 31].forEach(edo => {
+                const majorPattern = getModePattern("major", edo);
+                const minorPattern = getModePattern("minor", edo);
+
+                const [cScale, cSteps] = buildScale("C major", edo);
+                expect(cSteps).toEqual(majorPattern);
+                expect(cScale[0]).toBe("C");
+                expect(cScale[cScale.length - 1]).toBe("C");
+
+                const [dScale, dSteps] = buildScale("D major", edo);
+                expect(dSteps).toEqual(majorPattern);
+                expect(dScale[0]).toBe("D");
+                expect(dScale[dScale.length - 1]).toBe("D");
+
+                const [gScale, gSteps] = buildScale("G major", edo);
+                expect(gSteps).toEqual(majorPattern);
+                expect(gScale[0]).toBe("G");
+                expect(gScale[gScale.length - 1]).toBe("G");
+
+                const [aScale, aSteps] = buildScale("A minor", edo);
+                expect(aSteps).toEqual(minorPattern);
+                expect(aScale[0]).toBe("A");
+                expect(aScale[aScale.length - 1]).toBe("A");
+            });
+        });
+
+        it("falls back to default root when tonic cannot be represented in non-12 EDO", () => {
+            // In 5-EDO note names are [C, D, E, G, A].
+            // Neither C♭ nor normalized B exists in 5-EDO.
+            // Falls back to the default root (index 0, "C") to preserve the return contract
+            // and prevent runtime TypeErrors in direct-indexing callers.
+            const [cScale5, cSteps5] = buildScale("C major", 5);
+
+            for (const key of ["C♭ major", "B major", "F♯ major"]) {
+                const result = buildScale(key, 5);
+                expect(Array.isArray(result)).toBe(true);
+                const [scale, steps] = result;
+                expect(scale[0]).toBe("C");
+                expect(steps).toEqual(cSteps5);
+                expect(scale).toEqual(cScale5);
+            }
+        });
+
+        it("safely handles unsupported tonics in 5-EDO across scale utility callers", () => {
+            // Verifies that callers indexing buildScale(...)[0] or [1] do not throw TypeError
+            expect(() => _getStepSize("C♭ major", "C", "up", 0, "equal", 5)).not.toThrow();
+            expect(_getStepSize("C♭ major", "C", "up", 0, "equal", 5)).toBe(1);
+            expect(getInterval(2, "C♭ major", "C", 5)).toBe(2);
+            expect(getModeLength("C♭ major", 5)).toBe(getModePattern("major", 5).length);
+            expect(getModeLength("C♭ major", 5)).toBe(7);
+            expect(nthDegreeToPitch("C♭ major", 1, 5)).toEqual(["C", 0]);
+            expect(scaleDegreeToPitchMapping("C♭ major", 1, false, null, 5)).toBe("C");
+        });
+
+        it("does not crash temperament widget scale initialization pattern with unsupported 5-EDO tonics", () => {
+            // Temperament widget evaluates that.scaleNotes = buildScale(that.scale)[0]
+            const widgetPatternEval = key => {
+                const scaleNotes = buildScale(key, 5)[0];
+                return scaleNotes[0];
+            };
+            expect(() => widgetPatternEval("C♭ major")).not.toThrow();
+            expect(widgetPatternEval("C♭ major")).toBe("C");
+            expect(() => widgetPatternEval("B major")).not.toThrow();
+            expect(widgetPatternEval("B major")).toBe("C");
+            expect(() => widgetPatternEval("F♯ major")).not.toThrow();
+            expect(widgetPatternEval("F♯ major")).toBe("C");
+        });
+    });
 });
 
 //Both getStepSizeUp and getStepSizeDown function uses _getStepSize
 describe("getStepSize", () => {
+    it("respects microtonal B and C♭ distinction in 31-EDO and enharmonics in 12-EDO", () => {
+        // In 31-EDO B (pos 28) and C♭ (pos 30) are distinct pitch classes separated by 2 steps.
+        // Walking up from B to C♭ major's tonic (C♭) requires 2 steps.
+        expect(_getStepSize("C♭ major", "B", "up", 0, "equal", 31)).toBe(2);
+        expect(_getStepSize("C♭ major", "B", "down", 0, "equal", 31)).toBe(-1);
+        expect(_getStepSize("B major", "C♭", "up", 0, "equal", 31)).toBe(3);
+        expect(_getStepSize("B major", "C♭", "down", 0, "equal", 31)).toBe(-2);
+
+        // In 12-EDO B and C♭ are enharmonically equivalent.
+        expect(_getStepSize("C♭ major", "B", "up", 0, "equal", 12)).toBe(2);
+
+        // In 19-EDO C♭ maps to B♯, which is 1 step above B (index 17 -> 18).
+        expect(_getStepSize("C♭ major", "B", "up", 0, "equal", 19)).toBe(1);
+        // From B♯ (the tonic) to next scale degree (D♭) is 3 steps.
+        expect(_getStepSize("C♭ major", "B♯", "up", 0, "equal", 19)).toBe(3);
+        expect(_getStepSize("C♭ major", "C♭", "up", 0, "equal", 19)).toBe(3);
+        // From C (pos 0) in C♭ major (tonic B♯ at pos 18), next note is D♭ (pos 2), which is 2 steps up.
+        expect(_getStepSize("C♭ major", "C", "up", 0, "equal", 19)).toBe(2);
+        expect(_getStepSize("C♭ major", "C", "down", 0, "equal", 19)).toBe(-1);
+        // In 19-EDO F♭ maps to E♯, which is 1 step above E (index 6 -> 7).
+        expect(_getStepSize("F♭ major", "E", "up", 0, "equal", 19)).toBe(1);
+        expect(_getStepSize("F♭ major", "E♯", "up", 0, "equal", 19)).toBe(3);
+        expect(_getStepSize("F♭ major", "F♭", "up", 0, "equal", 19)).toBe(3);
+        // From F (pos 8) in F♭ major (tonic E♯ at pos 7), next note is G♭ (pos 10), which is 2 steps up.
+        expect(_getStepSize("F♭ major", "F", "up", 0, "equal", 19)).toBe(2);
+        expect(_getStepSize("F♭ major", "F", "down", 0, "equal", 19)).toBe(-1);
+    });
     it('should return the correct step size for "C" in "C major" going up', () => {
         const result = _getStepSize("C major", "C", "up", 0, "equal");
         expect(result).toBe(2);
@@ -2717,12 +2933,18 @@ describe("getStepSize", () => {
         }
     });
 
-    it("should keep the named enharmonic rules in other temperaments", () => {
-        // In 19-EDO E♯ is still matched to the scale's F by name.
-        expect(_getStepSize("C major", "E♯", "up", 0, "equal", 19)).toBe(3);
-        expect(_getStepSize("C major", "E♯", "down", 0, "equal", 19)).toBe(-2);
-        // ...and an F is matched to F♯ major's E♯.
-        expect(_getStepSize("F♯ major", "F", "up", 0, "equal", 19)).toBe(2);
+    it("respects microtonal enharmonics distinction in non-12 EDO and maintains 12-EDO equivalence", () => {
+        // In 19-EDO E♯ (pos 7) and F (pos 8) are distinct:
+        // Stepping up from E♯ to the next note in C major (F) is 1 step.
+        expect(_getStepSize("C major", "E♯", "up", 0, "equal", 19)).toBe(1);
+        // Stepping down from E♯ to the previous note in C major (E, pos 6) is -1 step.
+        expect(_getStepSize("C major", "E♯", "down", 0, "equal", 19)).toBe(-1);
+        // Stepping up from F (pos 8) to the next note in F♯ major (F♯, pos 9) is 1 step.
+        expect(_getStepSize("F♯ major", "F", "up", 0, "equal", 19)).toBe(1);
+
+        // In 12-EDO E♯ and F are enharmonically equivalent.
+        expect(_getStepSize("C major", "E♯", "up", 0, "equal", 12)).toBe(2);
+        expect(_getStepSize("C major", "E♯", "down", 0, "equal", 12)).toBe(-1);
     });
 
     it('should return 0 for "C" going down in a key without a lower note', () => {
@@ -2825,15 +3047,17 @@ describe("getInterval", () => {
         expect(getInterval(1, "C major", "D♭", 19)).toBe(3);
         expect(getInterval(1, "C major", "E♯", 19)).toBe(3);
         expect(getInterval(1, "C major", "C♭", 19)).toBe(2);
-        // C♭ major's scale has 12-EDO steps even in 19-EDO, but B is still matched by name.
-        expect(getInterval(2, "C♭ major", "B", 19)).toBe(3);
+        // In 19-EDO C♭ major generates 19-EDO steps [3, 3, 2, 3, 3, 3, 2] with tonic B♯.
+        expect(getInterval(2, "C♭ major", "B♯", 19)).toBe(6);
+        expect(getInterval(2, "C♭ major", "C♭", 19)).toBe(6);
+        expect(getInterval(2, "F♭ major", "F♭", 19)).toBe(6);
     });
 
     it("should use the current temperament's EDO when none is given", () => {
         const savedActivity = global.globalActivity;
         global.globalActivity = { logo: { synth: { inTemperament: "equal19" } } };
         try {
-            expect(getInterval(2, "C♭ major", "B")).toBe(3);
+            expect(getInterval(2, "C♭ major", "B♯")).toBe(6);
         } finally {
             global.globalActivity = savedActivity;
         }
@@ -4605,6 +4829,44 @@ describe("getNote additional paths", () => {
             0
         ]);
         expect(errorMsg).toHaveBeenCalledWith(global.INVALIDPITCH, null);
+    });
+
+    it("resolves C♭ and F♭ in non-12 EDO only when matching key tonic", () => {
+        // In 19-EDO, C♭ tonic maps to B♯ (with octave - 1) and F♭ tonic maps to E♯
+        expect(getNote("C♭", 4, 0, "C♭ major", false, undefined, undefined, "equal19")).toEqual([
+            "B♯",
+            3,
+            0
+        ]);
+        expect(getNote("F♭", 4, 0, "F♭ major", false, undefined, undefined, "equal19")).toEqual([
+            "E♯",
+            4,
+            0
+        ]);
+
+        // When key tonic is not C♭ / F♭, falls back to standard EXTRATRANSPOSITIONS (B and E)
+        expect(getNote("C♭", 4, 0, "G major", false, undefined, undefined, "equal19")).toEqual([
+            "B",
+            3,
+            0
+        ]);
+        expect(getNote("F♭", 4, 0, "G major", false, undefined, undefined, "equal19")).toEqual([
+            "E",
+            4,
+            0
+        ]);
+
+        // In 31-EDO, C♭ and F♭ are native EDO note names and resolve directly
+        expect(getNote("C♭", 4, 0, "C♭ major", false, undefined, undefined, "equal31")).toEqual([
+            "C♭",
+            4,
+            0
+        ]);
+        expect(getNote("F♭", 4, 0, "F♭ major", false, undefined, undefined, "equal31")).toEqual([
+            "F♭",
+            4,
+            0
+        ]);
     });
 
     it("uses key preference and direction to choose enharmonic spelling", () => {

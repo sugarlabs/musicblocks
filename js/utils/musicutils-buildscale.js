@@ -54,7 +54,8 @@ if (typeof module !== "undefined" && module.exports) {
         SOLFEGENAMES,
         FIXEDSOLFEGE,
         A0,
-        CHROMATIC_SOLFEGE
+        CHROMATIC_SOLFEGE,
+        EXTRATRANSPOSITIONS
     } = MusicUtilsConstants;
     var MusicUtilsI18n =
         (typeof window !== "undefined" && window.MusicUtilsI18n) ||
@@ -156,40 +157,6 @@ var _notePitchClass = name => {
  * @returns {Array} An array containing the scale and the corresponding intervals.
  */
 var buildScale = (keySignature, edo) => {
-    // FIX ME: temporary hard-coded fix to avoid errors in pitch preview
-    if (keySignature === "C♭ major") {
-        const scale = [
-            "C" + FLAT,
-            "D" + FLAT,
-            "E" + FLAT,
-            "F" + FLAT,
-            "G" + FLAT,
-            "A" + FLAT,
-            "B" + FLAT,
-            "C" + FLAT
-        ];
-        return [scale, [2, 2, 1, 2, 2, 2, 1]];
-    } else if (keySignature === "F♭ major") {
-        const scale = [
-            "F" + FLAT,
-            "G" + FLAT,
-            "A" + FLAT,
-            "B" + DOUBLEFLAT,
-            "C" + FLAT,
-            "D" + FLAT,
-            "E" + FLAT,
-            "F" + FLAT
-        ];
-        return [scale, [2, 2, 1, 2, 2, 2, 1]];
-    }
-
-    let obj = keySignatureToMode(keySignature);
-    let myKeySignature = obj[0];
-    if (myKeySignature === "C" + FLAT) {
-        obj = keySignatureToMode("B " + obj[1]);
-        myKeySignature = obj[0];
-    }
-
     // Determine active EDO: an explicit parameter wins; otherwise fall back to
     // the global temperament state so existing callers keep working unchanged.
     // Guard on falsy (not just undefined) so null/0/NaN never leak into the
@@ -202,11 +169,65 @@ var buildScale = (keySignature, edo) => {
         }
     }
 
+    if (currentEDO === 12) {
+        // FIX ME: temporary hard-coded fix to avoid errors in pitch preview
+        if (keySignature === "C♭ major") {
+            const scale = [
+                "C" + FLAT,
+                "D" + FLAT,
+                "E" + FLAT,
+                "F" + FLAT,
+                "G" + FLAT,
+                "A" + FLAT,
+                "B" + FLAT,
+                "C" + FLAT
+            ];
+            return [scale, [2, 2, 1, 2, 2, 2, 1]];
+        } else if (keySignature === "F♭ major") {
+            const scale = [
+                "F" + FLAT,
+                "G" + FLAT,
+                "A" + FLAT,
+                "B" + DOUBLEFLAT,
+                "C" + FLAT,
+                "D" + FLAT,
+                "E" + FLAT,
+                "F" + FLAT
+            ];
+            return [scale, [2, 2, 1, 2, 2, 2, 1]];
+        }
+    }
+
+    let obj = keySignatureToMode(keySignature);
+    let myKeySignature = obj[0];
+    if (currentEDO === 12 && myKeySignature === "C" + FLAT) {
+        obj = keySignatureToMode("B " + obj[1]);
+        myKeySignature = obj[0];
+    }
+
     // For non-12 EDO: convert 12-EDO semitone intervals to EDO step counts
     // using cumulative positions to preserve the total interval sum.
     if (currentEDO !== 12) {
         const edoNames = generateNoteNames(currentEDO);
         let idx = edoNames.indexOf(myKeySignature);
+        if (
+            idx === -1 &&
+            typeof EXTRATRANSPOSITIONS !== "undefined" &&
+            myKeySignature in EXTRATRANSPOSITIONS
+        ) {
+            // Outside 12-EDO, C♭ and F♭ are not enharmonic with B and E.
+            // Use the sharp-side name when the table has it. Where the table
+            // has no C♭ or F♭, that name occupies the same slot.
+            const sharpSide = {
+                ["C" + FLAT]: "B" + SHARP,
+                ["F" + FLAT]: "E" + SHARP
+            }[myKeySignature];
+            idx = sharpSide ? edoNames.indexOf(sharpSide) : -1;
+            if (idx === -1) {
+                const normalized = EXTRATRANSPOSITIONS[myKeySignature][0];
+                idx = edoNames.indexOf(normalized);
+            }
+        }
         if (idx === -1) {
             idx = 0;
         }
@@ -216,7 +237,8 @@ var buildScale = (keySignature, edo) => {
         // pitch class, so no pitch class is left unreachable.
         const edoHalfSteps = getModePattern(obj[1], currentEDO);
 
-        const scale = [myKeySignature];
+        const startNote = edoNames[idx];
+        const scale = [startNote];
         let ii = idx;
         for (let i = 0; i < edoHalfSteps.length; i++) {
             ii = (ii + edoHalfSteps[i] + edoNames.length) % edoNames.length;
@@ -407,6 +429,23 @@ var _getStepSize = (keySignature, pitch, direction, transposition, temperament, 
     const scale = obj[0];
     const halfSteps = obj[1];
 
+    const keyTonic = keySignature ? keySignatureToMode(keySignature)[0] : null;
+    if (currentEDO !== 12 && keyTonic) {
+        if (
+            (thisPitch === "C" + FLAT || thisPitch === "Cb") &&
+            keyTonic === "C" + FLAT &&
+            scale[0] === "B" + SHARP
+        ) {
+            thisPitch = "B" + SHARP;
+        } else if (
+            (thisPitch === "F" + FLAT || thisPitch === "Fb") &&
+            keyTonic === "F" + FLAT &&
+            scale[0] === "E" + SHARP
+        ) {
+            thisPitch = "E" + SHARP;
+        }
+    }
+
     if (thisPitch in BTOFLAT) {
         thisPitch = BTOFLAT[thisPitch];
     } else if (thisPitch in STOSHARP) {
@@ -433,26 +472,37 @@ var _getStepSize = (keySignature, pitch, direction, transposition, temperament, 
                 return pc1 === pc2;
             }
         }
-        if (s1 === "E" + SHARP && s2 === "F") {
+        if (
+            keyTonic === "C" + FLAT &&
+            scale[0] === "B" + SHARP &&
+            ((s1 === "C" + FLAT && s2 === "B" + SHARP) || (s1 === "B" + SHARP && s2 === "C" + FLAT))
+        ) {
             return true;
-        } else if (s1 === "E" && s2 === "F" + FLAT) {
+        }
+        if (
+            keyTonic === "F" + FLAT &&
+            scale[0] === "E" + SHARP &&
+            ((s1 === "F" + FLAT && s2 === "E" + SHARP) || (s1 === "E" + SHARP && s2 === "F" + FLAT))
+        ) {
             return true;
-        } else if (s1 === "F" && s2 === "E♯") {
-            return true;
-        } else if (s1 === "F" + FLAT && s2 === "E") {
-            return true;
-        } else if (s1 === "B" + SHARP && s2 === "C") {
-            return true;
-        } else if (s1 === "B" && s2 === "C" + FLAT) {
-            return true;
-        } else if (s1 === "C" && s2 === "B♯") {
-            return true;
-        } else if (s1 === "C" + FLAT && s2 === "B") {
-            return true;
-        } else if (s1 === "B" + DOUBLEFLAT && s2 === "A") {
-            return true;
-        } else if (s1 === "F" + DOUBLESHARP && s2 === "G") {
-            return true;
+        }
+        if (
+            (s1 === "E" + SHARP && s2 === "F") ||
+            (s1 === "F" && s2 === "E" + SHARP) ||
+            (s1 === "E" && s2 === "F" + FLAT) ||
+            (s1 === "F" + FLAT && s2 === "E") ||
+            (s1 === "B" + SHARP && s2 === "C") ||
+            (s1 === "C" && s2 === "B" + SHARP) ||
+            (s1 === "B" && s2 === "C" + FLAT) ||
+            (s1 === "C" + FLAT && s2 === "B") ||
+            (s1 === "B" + DOUBLEFLAT && s2 === "A") ||
+            (s1 === "A" && s2 === "B" + DOUBLEFLAT) ||
+            (s1 === "F" + DOUBLESHARP && s2 === "G") ||
+            (s1 === "G" && s2 === "F" + DOUBLESHARP)
+        ) {
+            const pos1 = getEdoNoteNamePosition(s1, currentEDO);
+            const pos2 = getEdoNoteNamePosition(s2, currentEDO);
+            return pos1 !== -1 && pos2 !== -1 && pos1 === pos2;
         }
         return false;
     };
@@ -990,6 +1040,23 @@ var getInterval = (interval, keySignature, pitch, edo) => {
         }
     }
     const is12EDO = currentEDO === 12;
+
+    const keyTonic = keySignature ? keySignatureToMode(keySignature)[0] : null;
+    if (currentEDO !== 12 && keyTonic) {
+        if (
+            (pitch === "C" + FLAT || pitch === "Cb") &&
+            keyTonic === "C" + FLAT &&
+            scale[0] === "B" + SHARP
+        ) {
+            pitch = "B" + SHARP;
+        } else if (
+            (pitch === "F" + FLAT || pitch === "Fb") &&
+            keyTonic === "F" + FLAT &&
+            scale[0] === "E" + SHARP
+        ) {
+            pitch = "E" + SHARP;
+        }
+    }
     const indexInScale = name => {
         const pitchClass = is12EDO ? _notePitchClass(name) : NaN;
         if (Number.isNaN(pitchClass)) {
