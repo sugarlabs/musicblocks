@@ -242,6 +242,11 @@ describe("musicutils-pitchscale", () => {
             // octave -1; it must stay ["A", 0] as before.
             expect(pitchscale.numberToPitch(-Number.EPSILON, "equal")).toEqual(["A", 0]);
             expect(pitchscale.numberToPitch(-Number.EPSILON, "equal19")).toEqual(["A", 0]);
+            // -Number.MIN_VALUE is smaller still: -i / currentEDO underflows
+            // to 0, so without a floor of one octave bump it used to come
+            // out as ["A", 1] instead of ["A", 0].
+            expect(pitchscale.numberToPitch(-Number.MIN_VALUE, "equal")).toEqual(["A", 0]);
+            expect(pitchscale.numberToPitch(-Number.MIN_VALUE, "equal19")).toEqual(["A", 0]);
         });
 
         it("leaves ordinary pitch numbers unchanged", () => {

@@ -779,7 +779,11 @@ var numberToPitch = (i, temperament, startPitch, offset, activity) => {
         // converts with modulo arithmetic: adding one octave per loop
         // iteration needs ~10^306 iterations for a finite input like
         // -1e308, which freezes the main thread just the same.
-        n = Math.ceil(-i / currentEDO); // Count octave bump ups.
+        // A negative input always needs at least one octave bump: for a
+        // subnormal like -Number.MIN_VALUE, -i / currentEDO underflows to
+        // 0, so Math.ceil alone gives n = 0 and the rounded-up remainder
+        // then lands one octave too high (["A", 1] instead of ["A", 0]).
+        n = Math.max(1, Math.ceil(-i / currentEDO)); // Count octave bump ups.
         // Normalise with remainder arithmetic instead of i += n * currentEDO:
         // the remainder is exact, while the addition rounds the adjusted
         // value at that magnitude (returning the wrong note for -1e308) and
