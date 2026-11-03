@@ -692,6 +692,8 @@ describe("Planet", () => {
         let mockStringHelper;
         let mockProjectStorage;
         let mockServerInterface;
+        let mockOfflineCommitManager;
+        let reconnectCallback;
 
         beforeEach(() => {
             planet = new Planet(true, {});
@@ -703,11 +705,22 @@ describe("Planet", () => {
 
             mockStringHelper = { init: jest.fn() };
             mockProjectStorage = { init: jest.fn().mockResolvedValue() };
-            mockServerInterface = { init: jest.fn(), getTagManifest: jest.fn() };
+            mockServerInterface = {
+                init: jest.fn(),
+                getTagManifest: jest.fn(),
+                attachOfflineManager: jest.fn()
+            };
+            mockOfflineCommitManager = {};
+            reconnectCallback = null;
 
             global.StringHelper = jest.fn().mockReturnValue(mockStringHelper);
             global.ProjectStorage = jest.fn().mockReturnValue(mockProjectStorage);
             global.ServerInterface = jest.fn().mockReturnValue(mockServerInterface);
+            global.NetworkMonitor = jest.fn();
+            global.OfflineCommitManager = jest.fn((storage, server, onReconnect) => {
+                reconnectCallback = onReconnect;
+                return mockOfflineCommitManager;
+            });
 
             document.body.innerHTML = `
                 <button id="close-planet"></button>
@@ -720,6 +733,8 @@ describe("Planet", () => {
             delete global.StringHelper;
             delete global.ProjectStorage;
             delete global.ServerInterface;
+            delete global.NetworkMonitor;
+            delete global.OfflineCommitManager;
             document.body.innerHTML = "";
         });
 
@@ -785,6 +800,28 @@ describe("Planet", () => {
                 "guitar-key"
             );
             expect(planet._postGitState).toHaveBeenCalledWith("guitar");
+        });
+
+        it("should recover Global Planet when connectivity is restored", async () => {
+            const recoverFromOffline = jest.fn();
+            planet.GlobalPlanet = { recoverFromOffline };
+
+            await planet.init();
+
+            expect(global.OfflineCommitManager).toHaveBeenCalledWith(
+                mockProjectStorage,
+                mockServerInterface,
+                expect.any(Function)
+            );
+
+            expect(mockServerInterface.attachOfflineManager).toHaveBeenCalledWith(
+                mockOfflineCommitManager
+            );
+
+            reconnectCallback();
+
+            expect(recoverFromOffline).toHaveBeenCalledTimes(1);
+        });
         });
     });
 
