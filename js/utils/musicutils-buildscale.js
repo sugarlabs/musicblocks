@@ -215,8 +215,18 @@ var buildScale = (keySignature, edo) => {
             typeof EXTRATRANSPOSITIONS !== "undefined" &&
             myKeySignature in EXTRATRANSPOSITIONS
         ) {
-            const normalized = EXTRATRANSPOSITIONS[myKeySignature][0];
-            idx = edoNames.indexOf(normalized);
+            // Outside 12-EDO, C♭ and F♭ are not enharmonic with B and E.
+            // Use the sharp-side name when the table has it. Where the table
+            // has no C♭ or F♭, that name occupies the same slot.
+            const sharpSide = {
+                ["C" + FLAT]: "B" + SHARP,
+                ["F" + FLAT]: "E" + SHARP
+            }[myKeySignature];
+            idx = sharpSide ? edoNames.indexOf(sharpSide) : -1;
+            if (idx === -1) {
+                const normalized = EXTRATRANSPOSITIONS[myKeySignature][0];
+                idx = edoNames.indexOf(normalized);
+            }
         }
         if (idx === -1) {
             idx = 0;
@@ -405,9 +415,6 @@ var _getStepSize = (keySignature, pitch, direction, transposition, temperament, 
     // matches the temperament being measured instead of the global
     // temperament state (12-EDO stays byte-for-byte identical).
     const obj = buildScale(keySignature, currentEDO);
-    if (!obj) {
-        return 0;
-    }
     const scale = obj[0];
     const halfSteps = obj[1];
 
@@ -609,8 +616,7 @@ var _getStepSize = (keySignature, pitch, direction, transposition, temperament, 
  * getModeLength("C chromatic", 19)  // 19 (19-note chromatic)
  */
 var getModeLength = (keySignature, edo) => {
-    const scaleObj = buildScale(keySignature, edo);
-    return scaleObj ? scaleObj[1].length : 0;
+    return buildScale(keySignature, edo)[1].length;
 };
 
 /**
@@ -640,9 +646,6 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
     // Info variables according to chosen mode
     const chosenMode = keySignatureToMode(keySignature);
     const obj1 = buildScale(keySignature, edo);
-    if (!obj1) {
-        return null;
-    }
     const chosenModeScale = obj1[0];
     const chosenModePattern = obj1[1];
 
@@ -947,11 +950,7 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
 var nthDegreeToPitch = (keySignature, scaleDegree, edo) => {
     // Returns note corresponding to scale degree in current key
     // signature. Used for movable solfege.
-    const scaleObj = buildScale(keySignature, edo);
-    if (!scaleObj) {
-        return ["", 0];
-    }
-    const scale = scaleObj[0];
+    const scale = buildScale(keySignature, edo)[0];
     const modeLength = scale.length - 1;
 
     // Scale degree is specified as do === 1, re === 2, etc., so we need
@@ -986,9 +985,6 @@ var nthDegreeToPitch = (keySignature, scaleDegree, edo) => {
 var getInterval = (interval, keySignature, pitch, edo) => {
     // Step size interval based on the position (pitch) in the scale
     const obj = buildScale(keySignature, edo);
-    if (!obj) {
-        return 0;
-    }
     const scale = obj[0];
     const halfSteps = obj[1];
 

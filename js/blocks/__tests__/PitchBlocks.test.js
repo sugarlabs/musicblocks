@@ -847,20 +847,74 @@ describe("setupPitchBlocks", () => {
                 activity.blocks.blockList[30] = { value: 0 };
                 activity.blocks.blockList[10].connections = [null, 30];
                 logo.parseArg.mockReturnValue(0);
-                expect(() => block.arg(logo, 0, 10)).not.toThrow();
+                expect(block.arg(logo, 0, 10)).toBe("C4");
+
+                logo.parseArg.mockReturnValue(-50);
+                expect(block.arg(logo, 0, 10)).toBe("E3");
 
                 // Connected to "pitch" with null scale
                 activity.blocks.blockList[20] = { name: "pitch" };
+                activity.blocks.blockList[10].connections = [20, null];
+                expect(block.arg(logo, 0, 10)).toEqual(["sol", 4]);
+
                 activity.blocks.blockList[10].connections = [20, 30];
-                const pitchResult = block.arg(logo, 0, 10);
-                expect(Array.isArray(pitchResult)).toBe(true);
-                expect(pitchResult.length).toBe(2);
+                logo.parseArg.mockReturnValue(0);
+                expect(block.arg(logo, 0, 10)).toEqual(["C", 4]);
+
+                // Negative staff position (exercises noteIdx < 0 loop)
+                logo.parseArg.mockReturnValue(-50);
+                expect(block.arg(logo, 0, 10)).toEqual(["E", 3]);
+
+                // Octave boundary positions
+                logo.parseArg.mockReturnValue(70);
+                expect(block.arg(logo, 0, 10)).toEqual(["C", 5]);
+
+                logo.parseArg.mockReturnValue(-70);
+                expect(block.arg(logo, 0, 10)).toEqual(["C", 3]);
 
                 // Connected to "pitchnumber" with null scale
                 activity.blocks.blockList[20].name = "pitchnumber";
+                activity.blocks.blockList[10].connections = [20, null];
+                expect(block.arg(logo, 0, 10)).toBe(7);
+
                 activity.blocks.blockList[10].connections = [20, 30];
-                const numResult = block.arg(logo, 0, 10);
-                expect(typeof numResult).toBe("number");
+                logo.parseArg.mockReturnValue(0);
+                expect(block.arg(logo, 0, 10)).toBe(0);
+
+                // Negative staff position for pitchnumber
+                logo.parseArg.mockReturnValue(-50);
+                expect(block.arg(logo, 0, 10)).toBe(-8);
+
+                logo.parseArg.mockReturnValue(70);
+                expect(block.arg(logo, 0, 10)).toBe(12);
+
+                logo.parseArg.mockReturnValue(-70);
+                expect(block.arg(logo, 0, 10)).toBe(-12);
+            } finally {
+                tur.singer.keySignature = origKey;
+                global.buildScale = jest.fn(() => [["C", "D", "E", "F", "G", "A", "B"], []]);
+            }
+        });
+
+        it("falls back to NOTENAMES when note is missing from scale in StaffYToPitch", () => {
+            const block = createdBlocks["ytopitch"];
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(0));
+            const origKey = tur.singer.keySignature;
+            tur.singer.keySignature = "C♭ major";
+            global.buildScale = jest.fn().mockReturnValue([[], []]);
+
+            try {
+                activity.blocks.blockList[30] = { value: 0 };
+                activity.blocks.blockList[20] = { name: "pitch" };
+                activity.blocks.blockList[10].connections = [20, 30];
+
+                // Non-negative staff position (noteIdx >= 0)
+                logo.parseArg.mockReturnValue(0);
+                expect(block.arg(logo, 0, 10)).toEqual(["C", 4]);
+
+                // Negative staff position (noteIdx < 0)
+                logo.parseArg.mockReturnValue(-50);
+                expect(block.arg(logo, 0, 10)).toEqual(["E", 3]);
             } finally {
                 tur.singer.keySignature = origKey;
                 global.buildScale = jest.fn(() => [["C", "D", "E", "F", "G", "A", "B"], []]);
@@ -871,6 +925,10 @@ describe("setupPitchBlocks", () => {
             const block = createdBlocks["ytopitch"];
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(0));
             const origKey = tur.singer.keySignature;
+            const origBuildScale = global.buildScale;
+
+            const { buildScale: nativeBuildScale } = require("../../utils/musicutils");
+            global.buildScale = (key, edo = 5) => nativeBuildScale(key, edo);
             tur.singer.keySignature = "C♭ major";
 
             try {
@@ -878,22 +936,44 @@ describe("setupPitchBlocks", () => {
                 activity.blocks.blockList[10].connections = [null, null];
                 expect(block.arg(logo, 0, 10)).toBe("G4");
 
-                // Connected to "pitch"
                 activity.blocks.blockList[30] = { value: 0 };
+                activity.blocks.blockList[10].connections = [null, 30];
+                logo.parseArg.mockReturnValue(0);
+                expect(block.arg(logo, 0, 10)).toBe("C4");
+
+                logo.parseArg.mockReturnValue(-50);
+                expect(block.arg(logo, 0, 10)).toBe("E3");
+
+                // Connected to "pitch"
                 activity.blocks.blockList[20] = { name: "pitch" };
+                activity.blocks.blockList[10].connections = [20, null];
+                expect(block.arg(logo, 0, 10)).toEqual(["sol", 4]);
+
                 activity.blocks.blockList[10].connections = [20, 30];
                 logo.parseArg.mockReturnValue(0);
                 const pitchResult = block.arg(logo, 0, 10);
                 expect(Array.isArray(pitchResult)).toBe(true);
-                expect(pitchResult.length).toBe(2);
+                expect(pitchResult).toEqual(["C", 4]);
+
+                logo.parseArg.mockReturnValue(-50);
+                expect(block.arg(logo, 0, 10)).toEqual(["E", 3]);
 
                 // Connected to "pitchnumber"
                 activity.blocks.blockList[20].name = "pitchnumber";
+                activity.blocks.blockList[10].connections = [20, null];
+                expect(block.arg(logo, 0, 10)).toBe(7);
+
                 activity.blocks.blockList[10].connections = [20, 30];
+                logo.parseArg.mockReturnValue(0);
                 const numResult = block.arg(logo, 0, 10);
                 expect(typeof numResult).toBe("number");
+                expect(numResult).toBe(0);
+
+                logo.parseArg.mockReturnValue(-50);
+                expect(block.arg(logo, 0, 10)).toBe(-8);
             } finally {
                 tur.singer.keySignature = origKey;
+                global.buildScale = origBuildScale;
             }
         });
     });
