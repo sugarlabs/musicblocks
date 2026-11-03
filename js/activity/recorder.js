@@ -216,6 +216,7 @@ const setupActivityRecorder = activityInstance => {
             };
 
             if (!recordedChunks || recordedChunks.length === 0) {
+                cleanupStreams();
                 showAlert(_("Recorded file is empty. File not saved."));
                 flag = 0;
                 isExecuting = false;
@@ -227,6 +228,7 @@ const setupActivityRecorder = activityInstance => {
             const blob = new Blob(recordedChunks, { type: "video/webm" });
 
             if (blob.size === 0) {
+                cleanupStreams();
                 showAlert(_("Recorded file is empty. File not saved."));
                 flag = 0;
                 isExecuting = false;

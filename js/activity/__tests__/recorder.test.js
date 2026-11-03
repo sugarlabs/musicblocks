@@ -519,6 +519,7 @@ describe("recorder", () => {
         let dest;
         let audioTrack;
         let Tone;
+        let canvasStream;
 
         const startCanvasRecording = async () => {
             const { doRecordButton, setupActivityRecorder } = require("../recorder");
@@ -549,7 +550,7 @@ describe("recorder", () => {
             };
 
             const videoTrack = { stop: jest.fn(), addEventListener: jest.fn() };
-            const canvasStream = { addTrack: jest.fn(), getTracks: () => [videoTrack] };
+            canvasStream = { addTrack: jest.fn(), getTracks: () => [videoTrack] };
             document.getElementById.mockImplementation(id => {
                 if (id === "record") return mockStart;
                 if (id === "myCanvas") return { width: 800, height: 600 };
@@ -575,6 +576,17 @@ describe("recorder", () => {
             expect(Tone.Destination.connect).toHaveBeenCalledWith(dest);
 
             stopHandler();
+
+            expect(Tone.Destination.disconnect).toHaveBeenCalledWith(dest);
+            expect(audioTrack.stop).toHaveBeenCalled();
+        });
+
+        it("also disconnects when the stream ends on its own with nothing recorded", async () => {
+            await startCanvasRecording();
+
+            // the stream going inactive stops the recorder, which saves an
+            // empty recording and takes the early "file is empty" return
+            canvasStream.oninactive();
 
             expect(Tone.Destination.disconnect).toHaveBeenCalledWith(dest);
             expect(audioTrack.stop).toHaveBeenCalled();
