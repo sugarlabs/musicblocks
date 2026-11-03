@@ -1092,6 +1092,17 @@ class BlockDragController {
 
         blocks.addDefaultBlock(parentblk, thisBlock, actionCheck);
 
+        const dragGroup = blocks._cachedDragGroup || [];
+        if (c !== null && newBlock === null) {
+            for (const blockIndex of dragGroup) {
+                blocks._detachedBlockGroup.add(blockIndex);
+            }
+        } else if (newBlock !== null) {
+            for (const blockIndex of dragGroup) {
+                blocks._detachedBlockGroup.delete(blockIndex);
+            }
+        }
+
         /**
          * Put block adjustments inside a slight delay to make the
          * addition/subtraction of vspace and changes of block shape

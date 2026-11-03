@@ -451,7 +451,6 @@ describe("Boundary visibility", () => {
     it("shows the boundary when a block is off-screen", () => {
         blocks.blockList = [
             {
-                name: "start",
                 trash: false,
                 connections: [null],
                 offScreen: jest.fn().mockReturnValue(true)
@@ -476,7 +475,6 @@ describe("Boundary visibility", () => {
         };
         blocks.blockList = [
             {
-                name: "start",
                 trash: false,
                 connections: [null],
                 offScreen: jest.fn(() => false)
@@ -500,7 +498,6 @@ describe("Boundary visibility", () => {
     it("hides the boundary when all top-level blocks are on-screen", () => {
         blocks.blockList = [
             {
-                name: "start",
                 trash: false,
                 connections: [null],
                 offScreen: jest.fn().mockReturnValue(false)
@@ -517,9 +514,9 @@ describe("Boundary visibility", () => {
 
     it("highlights only a stack detached from the main song stack", () => {
         const getBounds = () => ({ x: 0, y: 0, width: 100, height: 50 });
+        blocks._detachedBlockGroup = new Set([1]);
         blocks.blockList = [
             {
-                name: "start",
                 trash: false,
                 connections: [null],
                 container: { x: 10, y: 10, getBounds },

@@ -349,6 +349,8 @@ class Blocks {
         // during the drag to avoid "pop-in" when off-screen siblings are
         // dragged into view. Cleared on pressup/mouseout.
         this._dragActiveGroup = null;
+        // Blocks that were detached from a connected stack and remain free.
+        this._detachedBlockGroup = new Set();
         // Cached top-block map for moveAllBlocksExcept edge-scroll
         this._topBlockCache = null;
         // Throttle timestamp for edge-scroll calls
@@ -1958,7 +1960,10 @@ class Blocks {
                             }
                         );
 
-                    if (block.name !== "start" && bounds.left !== Infinity) {
+                    if (
+                        this._detachedBlockGroup.has(this.blockList.indexOf(block)) &&
+                        bounds.left !== Infinity
+                    ) {
                         stackRectangles.push({
                             x: bounds.left - 4,
                             y: bounds.top - 4,
