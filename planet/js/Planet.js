@@ -33,6 +33,7 @@ class Planet {
         this.LocalStorage = storage;
         this.ConnectedToServer = null;
         this.TagsManifest = null;
+        this._manifestRequestId = 0;
         this.IsMusicBlocks = isMusicBlocks;
         this.UserIDCookie = "UserID";
         this.UserID = null;
@@ -275,8 +276,16 @@ class Planet {
 
                     if (recovered || this.ConnectedToServer) return;
 
+                    const requestId = ++this._manifestRequestId;
+
                     this.ServerInterface.getTagManifest(data => {
+                        if (requestId !== this._manifestRequestId) return;
                         if (!data || !data.success) return;
+
+                        if (!this.LocalPlanet) {
+                            this.initPlanets(data);
+                            return;
+                        }
 
                         this.ConnectedToServer = true;
                         this.TagsManifest = data.data;
@@ -462,11 +471,13 @@ class Planet {
             }
         });
 
-        this.ServerInterface.getTagManifest(
-            function (data) {
-                this.initPlanets(data);
-            }.bind(this)
-        );
+        const requestId = ++this._manifestRequestId;
+
+        this.ServerInterface.getTagManifest(data => {
+            if (requestId !== this._manifestRequestId) return;
+
+            this.initPlanets(data);
+        });
     }
 
     async closeButton() {

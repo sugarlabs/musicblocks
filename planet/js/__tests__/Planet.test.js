@@ -840,6 +840,7 @@ describe("Planet", () => {
 
             planet.ConnectedToServer = false;
             planet.GlobalPlanet = offlineGlobalPlanet;
+            planet.LocalPlanet = {};
 
             mockServerInterface.getTagManifest.mockImplementationOnce(callback => {
                 callback({
@@ -862,6 +863,47 @@ describe("Planet", () => {
             expect(offlineGlobalPlanet.destroy).toHaveBeenCalledTimes(1);
             expect(global.GlobalPlanet).toHaveBeenCalledWith(planet);
             expect(mockGlobalPlanet.init).toHaveBeenCalledTimes(1);
+        });
+
+        it("ignores a late startup manifest failure after reconnect succeeds", async () => {
+            const callbacks = [];
+
+            mockServerInterface.getTagManifest.mockImplementation(callback => {
+                callbacks.push(callback);
+            });
+
+            planet.initPlanets.mockImplementation(data => {
+                planet.ConnectedToServer = data.success;
+                planet.LocalPlanet = {};
+            });
+
+            await planet.init();
+
+            expect(callbacks).toHaveLength(1);
+
+            // Start the reconnect request while startup is still pending.
+            reconnectCallback();
+
+            expect(callbacks).toHaveLength(2);
+
+            const manifest = {
+                success: true,
+                data: { music: { TagName: "Music" } }
+            };
+
+            // Newer reconnect request succeeds first.
+            callbacks[1](manifest);
+
+            expect(planet.initPlanets).toHaveBeenCalledTimes(1);
+            expect(planet.initPlanets).toHaveBeenCalledWith(manifest);
+            expect(planet.ConnectedToServer).toBe(true);
+
+            // Original startup request fails afterward.
+            callbacks[0]({ success: false });
+
+            // Stale failure must be ignored.
+            expect(planet.initPlanets).toHaveBeenCalledTimes(1);
+            expect(planet.ConnectedToServer).toBe(true);
         });
     });
 
