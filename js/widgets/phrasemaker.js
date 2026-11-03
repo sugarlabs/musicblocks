@@ -2414,8 +2414,57 @@ class PhraseMaker {
                     label += attr;
                     flag = true;
                 }
-                // Allow sorting since sorted order might be lost
+                octave = Number(
+                    this._octavesWheel.navItems[this._octavesWheel.selectedNavItemIndex].title
+                );
+
+                noteObj = [label, octave];
+                if (flag) {
+                    noteObj = this._deps.getNote(
+                        label,
+                        octave,
+                        0,
+                        this.activity.turtles.ithTurtle(0).singer.keySignature,
+                        false,
+                        null,
+                        this.activity.errorMsg,
+                        this.activity.logo.synth.inTemperament
+                    );
+                }
+
+                const keySignature = this.activity.turtles.ithTurtle(0).singer.keySignature;
+                const frequency = this._deps.noteToFrequency(noteObj[0] + noteObj[1], keySignature);
+                const hasDuplicatePitch = this.rowLabels.some((rowLabel, rowIndex) => {
+                    if (
+                        rowIndex === index ||
+                        rowLabel.toLowerCase() === "rest" ||
+                        this._deps.getDrumName(rowLabel) !== null ||
+                        PhraseMakerUtils.MATRIXGRAPHICS.includes(rowLabel) ||
+                        PhraseMakerUtils.MATRIXGRAPHICS2.includes(rowLabel) ||
+                        PhraseMakerUtils.MATRIXSYNTHS.includes(rowLabel)
+                    ) {
+                        return false;
+                    }
+
+                    return (
+                        this._deps.noteToFrequency(
+                            rowLabel + this.rowArgs[rowIndex],
+                            keySignature
+                        ) === frequency
+                    );
+                });
+                if (hasDuplicatePitch) {
+                    this.activity.errorMsg(this._("Ignoring duplicate pitch numbers."));
+                    return;
+                }
+
+                // Allow sorting since sorted order might be lost.
                 this.sorted = false;
+
+                this.rowLabels[index] = noteObj[0];
+                this.rowArgs[index] = noteObj[1];
+            } else if (condition === "drumblocks") {
+                this.rowLabels[index] = label;
             }
 
             if (!this._noteBlocks) {
@@ -2434,38 +2483,14 @@ class PhraseMaker {
                 }
             }
 
-            if (condition === "pitchblocks") {
-                octave = Number(
-                    this._octavesWheel.navItems[this._octavesWheel.selectedNavItemIndex].title
-                );
-
-                if (!this._noteBlocks && noteLabelBlock) {
-                    const noteLabelBlockObj = this.activity.blocks.blockList[noteLabelBlock];
-                    if (noteLabelBlockObj && noteLabelBlockObj.blocks) {
-                        noteLabelBlockObj.blocks.setPitchOctave(
-                            noteLabelBlockObj.connections[0],
-                            octave
-                        );
-                    }
-                }
-
-                noteObj = [label, octave];
-                if (flag) {
-                    noteObj = this._deps.getNote(
-                        label,
-                        octave,
-                        0,
-                        this.activity.turtles.ithTurtle(0).singer.keySignature,
-                        false,
-                        null,
-                        this.activity.errorMsg,
-                        this.activity.logo.synth.inTemperament
+            if (condition === "pitchblocks" && !this._noteBlocks && noteLabelBlock) {
+                const noteLabelBlockObj = this.activity.blocks.blockList[noteLabelBlock];
+                if (noteLabelBlockObj && noteLabelBlockObj.blocks) {
+                    noteLabelBlockObj.blocks.setPitchOctave(
+                        noteLabelBlockObj.connections[0],
+                        octave
                     );
                 }
-                this.rowLabels[index] = noteObj[0];
-                this.rowArgs[index] = noteObj[1];
-            } else if (condition === "drumblocks") {
-                this.rowLabels[index] = label;
             }
 
             this._repaintRowCells(index, condition);
