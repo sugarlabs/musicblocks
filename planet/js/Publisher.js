@@ -431,23 +431,14 @@ class Publisher {
      * names using the palettes API (getProtoNameAndPalette). If palettes are not
      * available fall back to the raw proto names.
      *
-     * @param {string|Array} tb - JSON string of project blocks or parsed block array
+     * @param {string} tb - JSON string of project blocks
      * @returns {string} space-separated block names
      */
     parseProject(tb) {
-        if (typeof tb === "string") {
-            try {
-                tb = JSON.parse(tb);
-            } catch (error) {
-                console.error(
-                    "Publisher: Failed to parse project data for keyword extraction.",
-                    error
-                );
-                return "";
-            }
-        }
-
-        if (!Array.isArray(tb)) {
+        try {
+            tb = JSON.parse(tb);
+        } catch (error) {
+            console.error("Publisher: Failed to parse project data for keyword extraction.", error);
             return "";
         }
 
@@ -455,10 +446,6 @@ class Publisher {
 
         for (let i = 0; i < tb.length; i++) {
             const block = tb[i];
-
-            if (!Array.isArray(block)) {
-                continue;
-            }
 
             let name = null;
 
