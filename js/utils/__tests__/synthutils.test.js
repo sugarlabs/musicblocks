@@ -4501,3 +4501,33 @@ describe("DRUMNAMES Lilypond symbols", () => {
         }
     });
 });
+
+describe("DRUMNAMES MIDI notes", () => {
+    const { DRUMNAMES } = synthutilsModule;
+    const { DRUM_MIDI_MAP } = require("../musicutils-constants");
+
+    // Save as MIDI writes a drum with no entry as a kick drum (36).
+    it("gives every drum and bell its own General MIDI note", () => {
+        const unmapped = DRUMNAMES.filter(
+            ([, name, , , category]) =>
+                ["drum", "bell"].includes(category) && !(name in DRUM_MIDI_MAP)
+        ).map(([, name]) => name);
+
+        expect(unmapped).toEqual([]);
+    });
+
+    it.each([
+        ["snare roll", 38],
+        ["snare hard", 40],
+        ["heavy kick", 35],
+        ["tom hi", 50],
+        ["tom mid", 47],
+        ["tom lo", 45],
+        ["floor tom", 43],
+        ["cymbal open", 46],
+        ["cymbal pedal", 44],
+        ["splash", 55]
+    ])("writes the %s as MIDI note %i", (name, note) => {
+        expect(DRUM_MIDI_MAP[name]).toBe(note);
+    });
+});
