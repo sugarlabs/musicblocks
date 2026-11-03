@@ -993,6 +993,15 @@ describe("setupEnsembleBlocks", () => {
             expect(result).toBe("Yertle");
         });
 
+        it.each([
+            [1.2, "Yertle"],
+            [1.99, "Yertle"],
+            [2.5, "Turtle1"]
+        ])("uses the turtle at the floored one-based index %p", (index, expected) => {
+            logo.parseArg.mockReturnValue(index);
+            expect(nthTurtleNameBlock.arg(logo, 0, blk, null)).toBe(expected);
+        });
+
         it("should return error if index is out of range", () => {
             logo.parseArg.mockReturnValue(10);
             const result = nthTurtleNameBlock.arg(logo, 0, blk, null);
