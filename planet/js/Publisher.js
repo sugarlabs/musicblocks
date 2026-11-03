@@ -72,11 +72,15 @@ class Publisher {
             let name = null;
             if (typeof i[1] === "string") {
                 name = i[1];
-            } else if (Array.isArray(i[1])) {
+            } else if (Array.isArray(i[1]) && typeof i[1][0] === "string") {
                 name = i[1][0];
             }
 
             if (!name || typeof name !== "string") {
+                continue;
+            }
+
+            if (!Array.isArray(i[4])) {
                 continue;
             }
 

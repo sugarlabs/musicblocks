@@ -237,7 +237,7 @@ describe("Publisher", () => {
             consoleSpy.mockRestore();
         });
 
-        it("safely skips malformed block entries without crashing tag extraction", () => {
+        it("safely skips malformed block entries and missing or malformed connections", () => {
             mockPlanet.TagsManifest = LIVE_MANIFEST;
             mockPlanet.analyzeProject.mockReturnValue([0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0]);
             const malformedData = [
@@ -248,8 +248,14 @@ describe("Publisher", () => {
                 [0, null, 0, 0, []],
                 [1, 999, 0, 0, []],
                 [2, [null], 0, 0, []],
-                [3, "pitch", 100, 100, [null, 4]],
-                [4, ["tone", 1], 0, 0, [3]]
+                [3, []],
+                [4, "start"],
+                [5, "start", 100, 100, null],
+                [6, "start", 100, 100, "not-an-array"],
+                [7, "start", 100, 100, 123],
+                [8, "start", 100, 100, {}],
+                [9, "pitch", 100, 100, [null, 4]],
+                [10, ["tone", 1], 0, 0, [3]]
             ];
 
             const tags = publisher.dataToTags(malformedData);
@@ -661,9 +667,34 @@ describe("Publisher", () => {
             ]);
         });
 
-        it("retains priority of existing saved tags (PublishedData.ProjectTags) over auto-detected tags", () => {
-            mockPlanet.LocalPlanet.ProjectTable["proj-saved-tags"] = {
-                ProjectName: "Saved Tags Project",
+        it("pre-selects automatic tag suggestions when ProjectData is a JSON string", () => {
+            mockPlanet.TagsManifest = LIVE_MANIFEST;
+            mockPlanet.analyzeProject.mockReturnValue([0, 1, 1, 0, 0, 4, 0, 0, 0, 0, 0]);
+            mockPlanet.LocalPlanet.ProjectTable["proj-json-tags"] = {
+                ProjectName: "JSON Tags Project",
+                ProjectImage: "json.png",
+                ProjectData: '[[0,"start",100,100,[null,1,null]],[1,"newnote",0,0,[0,2,3,null]]]',
+                PublishedData: null,
+                GitRepoData: null
+            };
+
+            const setTagsSpy = jest.spyOn(publisher, "setTags");
+            const setTagInputSpy = jest
+                .spyOn(publisher, "setTagInput")
+                .mockImplementation(() => {});
+
+            publisher.open("proj-json-tags");
+
+            expect(setTagsSpy).toHaveBeenCalledWith(["music", "math"]);
+            expect(setTagInputSpy).toHaveBeenCalledWith([
+                { tag: "Music", id: "music" },
+                { tag: "Math", id: "math" }
+            ]);
+        });
+
+        it("retains priority of existing saved tags (PublishedData.ProjectTags) over auto-detected tags with parsed array ProjectData", () => {
+            mockPlanet.LocalPlanet.ProjectTable["proj-saved-tags-parsed"] = {
+                ProjectName: "Saved Tags Project Parsed",
                 ProjectImage: "saved.png",
                 ProjectData: [[0, "start", 100, 100, [null, 1, null]]],
                 PublishedData: {
@@ -680,15 +711,40 @@ describe("Publisher", () => {
                 .spyOn(publisher, "setTagInput")
                 .mockImplementation(() => {});
 
-            publisher.open("proj-saved-tags");
+            publisher.open("proj-saved-tags-parsed");
 
             expect(setTagsSpy).toHaveBeenCalledWith(["1"]);
             expect(setTagInputSpy).toHaveBeenCalledWith([{ tag: "Music", id: "1" }]);
         });
 
-        it("retains priority of Git repository tags over auto-detected tags when no published tags exist", () => {
-            mockPlanet.LocalPlanet.ProjectTable["proj-git-tags"] = {
-                ProjectName: "Git Tags Project",
+        it("retains priority of existing saved tags (PublishedData.ProjectTags) over auto-detected tags with JSON string ProjectData", () => {
+            mockPlanet.LocalPlanet.ProjectTable["proj-saved-tags-json"] = {
+                ProjectName: "Saved Tags Project JSON",
+                ProjectImage: "saved.png",
+                ProjectData: '[[0,"start",100,100,[null,1,null]]]',
+                PublishedData: {
+                    ProjectDescription: "Saved description",
+                    ProjectTags: ["1"]
+                },
+                GitRepoData: {
+                    tags: ["2"]
+                }
+            };
+
+            const setTagsSpy = jest.spyOn(publisher, "setTags");
+            const setTagInputSpy = jest
+                .spyOn(publisher, "setTagInput")
+                .mockImplementation(() => {});
+
+            publisher.open("proj-saved-tags-json");
+
+            expect(setTagsSpy).toHaveBeenCalledWith(["1"]);
+            expect(setTagInputSpy).toHaveBeenCalledWith([{ tag: "Music", id: "1" }]);
+        });
+
+        it("retains priority of Git repository tags over auto-detected tags when no published tags exist with parsed array ProjectData", () => {
+            mockPlanet.LocalPlanet.ProjectTable["proj-git-tags-parsed"] = {
+                ProjectName: "Git Tags Project Parsed",
                 ProjectImage: "git.png",
                 ProjectData: [[0, "start", 100, 100, [null, 1, null]]],
                 PublishedData: null,
@@ -702,7 +758,29 @@ describe("Publisher", () => {
                 .spyOn(publisher, "setTagInput")
                 .mockImplementation(() => {});
 
-            publisher.open("proj-git-tags");
+            publisher.open("proj-git-tags-parsed");
+
+            expect(setTagsSpy).toHaveBeenCalledWith(["2"]);
+            expect(setTagInputSpy).toHaveBeenCalledWith([{ tag: "Art", id: "2" }]);
+        });
+
+        it("retains priority of Git repository tags over auto-detected tags when no published tags exist with JSON string ProjectData", () => {
+            mockPlanet.LocalPlanet.ProjectTable["proj-git-tags-json"] = {
+                ProjectName: "Git Tags Project JSON",
+                ProjectImage: "git.png",
+                ProjectData: '[[0,"start",100,100,[null,1,null]]]',
+                PublishedData: null,
+                GitRepoData: {
+                    tags: ["2"]
+                }
+            };
+
+            const setTagsSpy = jest.spyOn(publisher, "setTags");
+            const setTagInputSpy = jest
+                .spyOn(publisher, "setTagInput")
+                .mockImplementation(() => {});
+
+            publisher.open("proj-git-tags-json");
 
             expect(setTagsSpy).toHaveBeenCalledWith(["2"]);
             expect(setTagInputSpy).toHaveBeenCalledWith([{ tag: "Art", id: "2" }]);
