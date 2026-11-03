@@ -26,8 +26,9 @@
 /**
  * @file HarmonyUtils.js
  * @description Pure helpers for the Harmony row of the Status widget: name the
- * intervals and chord formed by the notes sounding at one moment, and compare
- * each played frequency ratio with its just-intonation ideal.
+ * intervals and chord formed by the notes sounding at one moment, compare
+ * each played frequency ratio with its just-intonation ideal, and find
+ * parallel fifths and octaves between voices.
  */
 
 const HarmonyUtils = {
@@ -49,6 +50,14 @@ const HarmonyUtils = {
         "minor 7",
         "major 7"
     ],
+
+    /**
+     * Cents an interval may be off a perfect fifth, octave or unison and still
+     * count as one in findParallels(): tempered fifths such as 19-EDO (695) or
+     * 5-EDO (720) count, other steps such as 31-EDO 658 and 735 do not.
+     * @type {number}
+     */
+    PERFECT_TOLERANCE: 25,
 
     /**
      * Describes the interval between two frequencies.
@@ -164,6 +173,77 @@ const HarmonyUtils = {
         }
 
         return { voices: sorted, intervals, chord };
+    },
+
+    /**
+     * Finds voices that move in parallel fifths, octaves or unisons from one
+     * moment to the next: both voices change pitch in the same direction, and
+     * they form the same perfect interval (compound intervals included) before
+     * and after the move.
+     * @param {Array<{voice: *, label: string, frequency: number}>} before - One
+     *     note per voice, e.g. { voice: 1, label: "C4", frequency: 261.63 }.
+     * @param {Array<{voice: *, label: string, frequency: number}>} after - The
+     *     next note of the same voices.
+     * @returns {Array<Object>} { kind, voices, from, to } for each pair of voices,
+     *     where `kind` is "fifths", "octaves" or "unisons", `voices` holds the two
+     *     voice ids, and `from` and `to` their labels before and after the move.
+     */
+    findParallels(before, after) {
+        const isValid = note => note && note.frequency > 0 && isFinite(note.frequency);
+        const cents = (low, high) => 1200 * Math.log2(high / low);
+        // "unison", "octave" (compound included), "fifth" or null.
+        const perfect = (low, high) => {
+            const tolerance = HarmonyUtils.PERFECT_TOLERANCE;
+            const size = Math.abs(cents(low, high));
+            const simple = size % 1200;
+            if (size < tolerance) {
+                return "unison";
+            }
+            if (simple < tolerance || simple > 1200 - tolerance) {
+                return "octave";
+            }
+            return Math.abs(simple - 700) < tolerance ? "fifth" : null;
+        };
+
+        const moves = (before || [])
+            .filter(isValid)
+            .map(note => [note, (after || []).find(next => next && next.voice === note.voice)])
+            .filter(([, next]) => isValid(next));
+
+        const parallels = [];
+        for (let i = 0; i < moves.length; i++) {
+            for (let j = i + 1; j < moves.length; j++) {
+                const [from1, to1] = moves[i];
+                const [from2, to2] = moves[j];
+                // A change of less than a cent is the same note.
+                const move1 = cents(from1.frequency, to1.frequency);
+                const move2 = cents(from2.frequency, to2.frequency);
+                if (Math.abs(move1) < 1 || Math.abs(move2) < 1 || move1 * move2 < 0) {
+                    continue;
+                }
+
+                const was = perfect(from1.frequency, from2.frequency);
+                const now = perfect(to1.frequency, to2.frequency);
+                let kind = null;
+                if (was === "unison" && now === "unison") {
+                    kind = "unisons";
+                } else if (was && now && was !== "fifth" && now !== "fifth") {
+                    kind = "octaves";
+                } else if (was === "fifth" && now === "fifth") {
+                    kind = "fifths";
+                }
+
+                if (kind) {
+                    parallels.push({
+                        kind,
+                        voices: [from1.voice, from2.voice],
+                        from: [from1.label, from2.label],
+                        to: [to1.label, to2.label]
+                    });
+                }
+            }
+        }
+        return parallels;
     }
 };
 

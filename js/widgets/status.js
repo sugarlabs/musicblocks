@@ -30,6 +30,8 @@ class StatusMatrix {
     // Milliseconds a note is listed in the Harmony row before it starts and
     // after it stops sounding, so the row does not flicker between notes.
     static HARMONY_GRACE = 100;
+    // Note groups kept per mouse to find parallel motion between the mice.
+    static VOICE_MOMENTS = 8;
 
     /**
      * Initializes the status matrix. First removes the
@@ -44,6 +46,8 @@ class StatusMatrix {
         let iconSize = StatusMatrix.ICONSIZE * this._cellScale;
         this._clearHarmonyTimer();
         this._harmonyCell = null;
+        this._voices = new Map();
+        this._parallels = [];
 
         this.widgetWindow = window.widgetWindows.windowFor(this, "status", "status");
         this.widgetWindow.clear();
@@ -546,9 +550,10 @@ class StatusMatrix {
      */
     _soundingNotes() {
         const notes = [];
+        const starts = [];
         let nextChange = Infinity;
         if (this.activity?.logo?.stopTurtle) {
-            return { notes, nextChange };
+            return { notes, starts, nextChange };
         }
 
         const now = Date.now();
@@ -573,11 +578,125 @@ class StatusMatrix {
                     nextChange = Math.min(nextChange, sound.startsAt - grace);
                 } else if (now <= sound.endsAt + grace) {
                     notes.push(...sound.notes);
+                    starts.push(sound.start);
                     nextChange = Math.min(nextChange, sound.endsAt + grace);
                 }
             }
         }
-        return { notes, nextChange };
+        return { notes, starts, nextChange };
+    }
+
+    /**
+     * Label and frequency of a sounding note, as shown in the Harmony row.
+     * @private
+     * @param {string|number} note - A note name (e.g. "E4") or a frequency.
+     * @returns {{label: string, frequency: number}}
+     */
+    _voiceNote(note) {
+        const synth = this.activity.logo.synth;
+        return {
+            label: typeof note === "number" ? toFixed2(note) + "Hz" : note,
+            frequency: synth.getFrequency(note, synth.changeInTemperament)
+        };
+    }
+
+    /**
+     * Records each mouse's latest note group and finds the parallel fifths,
+     * octaves and unisons between the mice. Note groups are matched by their
+     * start in turtle time, because the interpreter moves the mice on one block
+     * at a time, so two mice that change notes together are seen one by one.
+     * @private
+     * @returns {void}
+     */
+    _trackVoices() {
+        const turtleList = this.activity?.turtles?.turtleList || [];
+        const latest = [];
+        let column = 0;
+        let restarted = false;
+        for (let t = 0; t < turtleList.length; t++) {
+            if (turtleList[t]?.inTrash) {
+                continue;
+            }
+            // Mice are numbered as in the columns of the table.
+            column += 1;
+            const tur = this.activity.turtles.ithTurtle
+                ? this.activity.turtles.ithTurtle(t)
+                : turtleList[t];
+            const singer = tur?.singer;
+            if (!singer) {
+                continue;
+            }
+
+            // A rest or a drum-only note starts a group with no pitches.
+            const start = singer.previousTurtleTime;
+            const notes = (singer.pitchStatus || [])
+                .filter(sound => sound.start === start)
+                .flatMap(sound => sound.notes);
+            const moments = this._voices.get(t)?.moments || [];
+            if (moments.length > 0 && start < moments[moments.length - 1].start) {
+                restarted = true;
+            }
+            latest.push({ t, column, start, notes });
+        }
+
+        // Turtle time starts again from 0 when the project is played again.
+        if (restarted) {
+            this._voices.clear();
+        }
+
+        const synth = this.activity?.logo?.synth;
+        const canMeasure = Boolean(synth) && typeof synth.getFrequency === "function";
+        for (const { t, column, start, notes } of latest) {
+            const voice = this._voices.get(t) || { column, moments: [] };
+            voice.column = column;
+            let moment = voice.moments[voice.moments.length - 1];
+            if (!moment || moment.start !== start) {
+                moment = { start, notes: [], note: null };
+                voice.moments.push(moment);
+                if (voice.moments.length > StatusMatrix.VOICE_MOMENTS) {
+                    voice.moments.shift();
+                }
+            }
+
+            // Notes nested in a note join the group that starts with it. A voice
+            // is a mouse that plays one note at a time, so `note` is only set
+            // for a single note: a chord has no single line to follow, and a
+            // rest breaks the line. Each note is measured once, as it is played.
+            if (moment.notes.join() !== notes.join()) {
+                moment.notes = notes;
+                moment.note = canMeasure && notes.length === 1 ? this._voiceNote(notes[0]) : null;
+            }
+            this._voices.set(t, voice);
+        }
+
+        this._parallels = [];
+        const voices = [...this._voices.values()];
+        const note = (voice, moment) => Object.assign({ voice: voice.column }, moment.note);
+        for (let i = 0; i < voices.length; i++) {
+            for (let j = i + 1; j < voices.length; j++) {
+                const [a, b] = [voices[i], voices[j]];
+                for (let k = 1; k < a.moments.length; k++) {
+                    const start = a.moments[k].start;
+                    const m = b.moments.findIndex(
+                        (moment, index) => index > 0 && Math.abs(moment.start - start) < 1e-6
+                    );
+                    if (m === -1) {
+                        continue;
+                    }
+
+                    const steps = [a.moments[k - 1], a.moments[k], b.moments[m - 1], b.moments[m]];
+                    if (steps.some(moment => !moment.note)) {
+                        continue;
+                    }
+
+                    const before = [note(a, steps[0]), note(b, steps[2])];
+                    const after = [note(a, steps[1]), note(b, steps[3])];
+                    for (const parallel of HarmonyUtils.findParallels(before, after)) {
+                        this._parallels.push(Object.assign({ start }, parallel));
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -614,8 +733,13 @@ class StatusMatrix {
             return;
         }
 
+        this._trackVoices();
         const synth = this.activity?.logo?.synth;
-        const { notes, nextChange } = this._soundingNotes();
+        const { notes, starts, nextChange } = this._soundingNotes();
+        // Show parallel motion while the notes it leads to are sounding.
+        const parallels = this._parallels.filter(parallel =>
+            starts.some(start => Math.abs(start - parallel.start) < 1e-6)
+        );
 
         // The interpreter only refreshes the Status between blocks, so refresh
         // again when a note starts or stops in between (e.g. a staccato note).
@@ -627,7 +751,13 @@ class StatusMatrix {
             );
         }
 
-        const key = (synth?.inTemperament || "") + "|" + notes.join("|");
+        const key = [
+            synth?.inTemperament || "",
+            notes.join("|"),
+            parallels
+                .map(parallel => [parallel.kind, parallel.voices, parallel.to].join())
+                .join(";")
+        ].join("|");
         if (key === this._shownHarmony) {
             return;
         }
@@ -638,12 +768,7 @@ class StatusMatrix {
             return;
         }
 
-        const analysis = HarmonyUtils.analyze(
-            notes.map(note => ({
-                label: typeof note === "number" ? toFixed2(note) + "Hz" : note,
-                frequency: synth.getFrequency(note, synth.changeInTemperament)
-            }))
-        );
+        const analysis = HarmonyUtils.analyze(notes.map(note => this._voiceNote(note)));
         if (analysis.intervals.length === 0) {
             return;
         }
@@ -702,6 +827,24 @@ class StatusMatrix {
             table.appendChild(row);
         }
         this._harmonyCell.appendChild(table);
+
+        const kinds = {
+            //.TRANS: two voices moving in the same direction a perfect fifth apart
+            fifths: _("parallel fifths"),
+            //.TRANS: two voices moving in the same direction an octave apart
+            octaves: _("parallel octaves"),
+            //.TRANS: two voices moving in the same direction on the same note
+            unisons: _("parallel unisons")
+        };
+        for (const parallel of parallels) {
+            const moves = [0, 1].map(
+                i => `${_("mouse")} ${parallel.voices[i]} ${parallel.from[i]} → ${parallel.to[i]}`
+            );
+            const warning = document.createElement("div");
+            warning.style.fontWeight = "bold";
+            warning.textContent = kinds[parallel.kind] + ": " + moves.join(", ");
+            this._harmonyCell.appendChild(warning);
+        }
     }
 }
 if (typeof module !== "undefined") {
