@@ -1034,9 +1034,11 @@ function setupMeterBlocks(activity) {
             }
 
             if (args.length === 2 && typeof args[0] === "number" && typeof args[1] === "number") {
-                Singer.MeterActions.setMasterBPM(args[0], args[1], blk);
-
-                logo.notation.notationTempo(turtle, args[0], args[1]);
+                // Notate the tempo that plays, which is clamped to 30-1000 quarter notes.
+                const bpm = Singer.MeterActions.setMasterBPM(args[0], args[1], blk);
+                if (bpm !== null) {
+                    logo.notation.notationTempo(turtle, bpm, args[1]);
+                }
             }
 
             if (logo.inTempo) {
@@ -1181,9 +1183,11 @@ function setupMeterBlocks(activity) {
             }
 
             if (args.length === 2 && typeof args[0] === "number" && typeof args[1] === "number") {
-                Singer.MeterActions.setBPM(args[0], args[1], turtle, blk);
-
-                logo.notation.notationTempo(turtle, args[0], args[1]);
+                // Notate the tempo that plays, which is clamped to 30-1000 quarter notes.
+                const bpm = Singer.MeterActions.setBPM(args[0], args[1], turtle, blk);
+                if (bpm !== null) {
+                    logo.notation.notationTempo(turtle, bpm, args[1]);
+                }
             }
 
             if (logo.inTempo) {
@@ -1255,7 +1259,7 @@ function setupMeterBlocks(activity) {
                     bpm = 1000;
                 }
 
-                logo.notation.notationTempo(turtle, args[0], args[1]);
+                logo.notation.notationTempo(turtle, (bpm * 0.25) / args[1], args[1]);
                 tur.singer.bpm.push(bpm);
 
                 const listenerName = "_bpm_" + turtle;

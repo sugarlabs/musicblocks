@@ -120,8 +120,12 @@ describe("MeterBlocks setup", () => {
                 onStrongBeatDo: jest.fn(),
                 onEveryBeatDo: jest.fn(),
                 onEveryNoteDo: jest.fn(),
-                setMasterBPM: jest.fn(),
-                setBPM: jest.fn(),
+                setMasterBPM: jest.fn(
+                    (bpm, beat) => Math.min(Math.max((bpm * beat) / 0.25, 30), 1000) * (0.25 / beat)
+                ),
+                setBPM: jest.fn(
+                    (bpm, beat) => Math.min(Math.max((bpm * beat) / 0.25, 30), 1000) * (0.25 / beat)
+                ),
                 setPickup: jest.fn(),
                 setMeter: jest.fn()
             },
@@ -497,6 +501,27 @@ describe("MeterBlocks setup", () => {
         expect(logo.tempo.BPMs).toEqual([100]);
     });
 
+    it.each([
+        ["setmasterbpm2", "setMasterBPM"],
+        ["setbpm3", "setBPM"]
+    ])("%s notates the clamped tempo that plays, not the raw bpm", (name, action) => {
+        const block = getBlock(name);
+        activity.blocks.blockList.clamped = { connections: [null, "clampedText"] };
+        activity.blocks.blockList.clampedText = { text: { text: "2000" } };
+
+        block.flow([2000, 0.25], logo, 0, "clamped");
+        expect(logo.notation.notationTempo).toHaveBeenLastCalledWith(0, 1000, 0.25);
+
+        block.flow([10, 0.5], logo, 0, "clamped");
+        expect(logo.notation.notationTempo).toHaveBeenLastCalledWith(0, 15, 0.5);
+
+        // A tempo the setter rejects is not notated.
+        logo.notation.notationTempo.mockClear();
+        Singer.MeterActions[action].mockReturnValueOnce(null);
+        block.flow([0, 0.25], logo, 0, "clamped");
+        expect(logo.notation.notationTempo).not.toHaveBeenCalled();
+    });
+
     describe("the BPM given to the Tempo widget", () => {
         beforeEach(() => {
             logo.inTempo = true;
@@ -621,9 +646,11 @@ describe("MeterBlocks setup", () => {
         response = block.flow([2000, 0.25, "next"], logo, 0, "flow");
         expect(activity.errorMsg).toHaveBeenCalledWith("Maximum beats per minute is 1000.");
         expect(turtle.singer.bpm[turtle.singer.bpm.length - 1]).toBe(1000);
+        expect(logo.notation.notationTempo).toHaveBeenLastCalledWith(0, 1000, 0.25);
 
         response = block.flow([120, 0.5, "next"], logo, 0, "flow");
         expect(turtle.singer.bpm[turtle.singer.bpm.length - 1]).toBe((120 * 0.5) / 0.25);
+        expect(logo.notation.notationTempo).toHaveBeenLastCalledWith(0, 120, 0.5);
         expect(logo.setDispatchBlock).toHaveBeenCalledWith("flow", 0, "_bpm_0");
         expect(listenerCalls).toHaveLength(3);
         listenerCalls.forEach(handler => handler());
