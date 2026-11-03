@@ -2781,8 +2781,65 @@ describe("Utility Functions (logic-only)", () => {
         });
     });
 
+    describe("audioBufferToWav", () => {
+        const { audioBufferToWav } = synthutilsModule;
+        const makeBuffer = (channels, sampleRate) => ({
+            numberOfChannels: channels.length,
+            length: channels[0].length,
+            sampleRate,
+            getChannelData: c => Float32Array.from(channels[c])
+        });
+
+        it("writes a 16-bit PCM WAV header", () => {
+            const wav = audioBufferToWav(makeBuffer([[0, 0, 0]], 44100));
+            const view = new DataView(wav);
+            const text = (offset, length) =>
+                String.fromCharCode(...new Uint8Array(wav, offset, length));
+
+            expect(wav.byteLength).toBe(44 + 3 * 2);
+            expect(text(0, 4)).toBe("RIFF");
+            expect(view.getUint32(4, true)).toBe(36 + 6);
+            expect(text(8, 4)).toBe("WAVE");
+            expect(text(12, 4)).toBe("fmt ");
+            expect(view.getUint16(20, true)).toBe(1); // PCM
+            expect(view.getUint16(22, true)).toBe(1); // mono
+            expect(view.getUint32(24, true)).toBe(44100);
+            expect(view.getUint32(28, true)).toBe(44100 * 2);
+            expect(view.getUint16(32, true)).toBe(2);
+            expect(view.getUint16(34, true)).toBe(16);
+            expect(text(36, 4)).toBe("data");
+            expect(view.getUint32(40, true)).toBe(6);
+        });
+
+        it("converts samples to 16-bit and clamps values outside -1..1", () => {
+            const view = new DataView(audioBufferToWav(makeBuffer([[1, -1, 0, 2, -2]], 8000)));
+            const samples = [0, 1, 2, 3, 4].map(i => view.getInt16(44 + i * 2, true));
+            expect(samples).toEqual([32767, -32768, 0, 32767, -32768]);
+        });
+
+        it("interleaves stereo channels", () => {
+            const view = new DataView(
+                audioBufferToWav(
+                    makeBuffer(
+                        [
+                            [1, 0],
+                            [-1, 0.5]
+                        ],
+                        8000
+                    )
+                )
+            );
+            expect(view.getUint16(22, true)).toBe(2);
+            const samples = [0, 1, 2, 3].map(i => view.getInt16(44 + i * 2, true));
+            expect(samples).toEqual([32767, -32768, 0, Math.trunc(0.5 * 0x7fff)]);
+        });
+    });
+
     describe("recorder setup and recording download flow", () => {
-        let savedFF, savedMBDialog, savedCreateObjectURL, savedAlert;
+        let savedMBDialog, savedCreateObjectURL, savedRevokeObjectURL, savedAlert, savedBlob;
+        let savedGetContext;
+        let decodeAudioData;
+        let recorderMimeType;
 
         // setupRecorder connects every live instrument to the media-stream
         // destination, and the Tone mocks do not implement connect(), so run
@@ -2800,169 +2857,206 @@ describe("Utility Functions (logic-only)", () => {
             }
         };
 
+        // onstop is async (it decodes the recording), so let it finish.
+        const flush = () => new Promise(resolve => setTimeout(resolve, 0));
+
+        // jsdom's Blob has no arrayBuffer(), which the WAV conversion needs.
+        class FakeBlob {
+            constructor(parts, options = {}) {
+                this.parts = parts;
+                this.type = options.type || "";
+            }
+            arrayBuffer() {
+                return Promise.resolve(new ArrayBuffer(8));
+            }
+        }
+
+        const fakeAudioBuffer = {
+            numberOfChannels: 1,
+            length: 2,
+            sampleRate: 8000,
+            getChannelData: () => new Float32Array([0.5, -0.5])
+        };
+
         beforeEach(() => {
-            savedFF = platform.FF;
             savedMBDialog = window.MBDialog;
             savedCreateObjectURL = global.URL.createObjectURL;
+            savedRevokeObjectURL = global.URL.revokeObjectURL;
             savedAlert = global.alert;
+            savedBlob = global.Blob;
+            savedGetContext = global.Tone.getContext;
             global.URL.createObjectURL = jest.fn(() => "blob:recording");
+            global.URL.revokeObjectURL = jest.fn();
             global.alert = jest.fn();
+            global.Blob = FakeBlob;
+            recorderMimeType = "audio/webm;codecs=opus";
             global.MediaRecorder = jest.fn(function () {
+                this.mimeType = recorderMimeType;
                 return this;
             });
+            decodeAudioData = jest.fn(() => Promise.resolve(fakeAudioBuffer));
+            global.Tone.getContext = jest.fn(() => ({
+                createMediaStreamDestination: () => ({ stream: {} }),
+                decodeAudioData
+            }));
         });
 
         afterEach(() => {
-            platform.FF = savedFF;
             window.MBDialog = savedMBDialog;
             global.URL.createObjectURL = savedCreateObjectURL;
+            global.URL.revokeObjectURL = savedRevokeObjectURL;
             global.alert = savedAlert;
+            global.Blob = savedBlob;
+            global.Tone.getContext = savedGetContext;
             delete window.prompt;
+            jest.restoreAllMocks();
         });
 
         const setup = () => withNoInstruments(() => Synth.setupRecorder());
 
-        it("requests a wav recorder on Firefox", () => {
-            platform.FF = true;
+        const captureDownloads = () => {
+            const clicked = [];
+            jest.spyOn(document.body, "appendChild").mockImplementation(node => {
+                if (node.tagName === "A") clicked.push(node);
+                return node;
+            });
+            jest.spyOn(document.body, "removeChild").mockImplementation(node => node);
+            return clicked;
+        };
+
+        const recordAndStop = async () => {
+            Synth.recorder.ondataavailable({ data: { size: 12 } });
+            Synth.recorder.onstop();
+            await flush();
+            await flush();
+        };
+
+        it("records in the browser's own format instead of asking for wav", () => {
             setup();
-            expect(global.MediaRecorder.mock.calls[0][1]).toEqual({ type: "audio/wav" });
+            // Browsers can't record WAV, and { type } isn't a MediaRecorder option.
+            expect(global.MediaRecorder.mock.calls[0]).toHaveLength(1);
         });
 
-        it("requests a webm recorder on other browsers", () => {
-            platform.FF = false;
-            setup();
-            expect(global.MediaRecorder.mock.calls[0][1]).toEqual({ mimeType: "audio/webm" });
-        });
-
-        it("ignores data events with no payload", () => {
-            platform.FF = false;
+        it("ignores data events with no payload", async () => {
             setup();
 
             expect(() => Synth.recorder.ondataavailable({})).not.toThrow();
-            Synth.recorder.onstop();
+            await Synth.recorder.onstop();
 
             // No chunks were collected, so no object URL is ever minted.
             expect(global.URL.createObjectURL).not.toHaveBeenCalled();
         });
 
-        it("ignores zero-length data chunks", () => {
-            platform.FF = false;
+        it("ignores zero-length data chunks", async () => {
             setup();
 
             Synth.recorder.ondataavailable({ data: { size: 0 } });
-            Synth.recorder.onstop();
+            await Synth.recorder.onstop();
 
             expect(global.URL.createObjectURL).not.toHaveBeenCalled();
         });
 
-        it("does nothing on stop when nothing was recorded", () => {
-            platform.FF = false;
+        it("does nothing on stop when nothing was recorded", async () => {
             setup();
 
-            expect(() => Synth.recorder.onstop()).not.toThrow();
+            await expect(Synth.recorder.onstop()).resolves.toBeUndefined();
             expect(global.URL.createObjectURL).not.toHaveBeenCalled();
         });
 
-        it("prompts through MBDialog and downloads an ogg file off Firefox", async () => {
-            platform.FF = false;
+        it("converts the recording and saves a real .wav file", async () => {
             window.MBDialog = {
                 prompt: jest.fn(() => Promise.resolve("my song")),
                 alert: jest.fn()
             };
-            const clicked = [];
-            jest.spyOn(document.body, "appendChild").mockImplementation(node => {
-                if (node.tagName === "A") clicked.push(node);
-                return node;
-            });
-            jest.spyOn(document.body, "removeChild").mockImplementation(node => node);
+            const clicked = captureDownloads();
 
             setup();
-            Synth.recorder.ondataavailable({ data: { size: 12 } });
-            Synth.recorder.onstop();
-            await Promise.resolve();
+            await recordAndStop();
 
-            expect(window.MBDialog.prompt).toHaveBeenCalled();
-            expect(global.URL.createObjectURL).toHaveBeenCalled();
+            expect(decodeAudioData).toHaveBeenCalled();
+            const saved = global.URL.createObjectURL.mock.calls[0][0];
+            expect(saved.type).toBe("audio/wav");
+            const header = new Uint8Array(saved.parts[0]);
+            expect(String.fromCharCode(...header.slice(0, 4))).toBe("RIFF");
+            expect(String.fromCharCode(...header.slice(8, 12))).toBe("WAVE");
             expect(clicked).toHaveLength(1);
-            expect(clicked[0].download).toBe("my song.ogg");
-            jest.restoreAllMocks();
+            expect(clicked[0].download).toBe("my song.wav");
+            expect(global.URL.revokeObjectURL).toHaveBeenCalledWith("blob:recording");
         });
 
-        it("uses a wav extension on Firefox", async () => {
-            platform.FF = true;
+        it("saves a webm file named .webm when Chrome's recording can't be converted", async () => {
+            decodeAudioData.mockImplementation(() => Promise.reject(new Error("cannot decode")));
+            window.MBDialog = {
+                prompt: jest.fn(() => Promise.resolve("my song")),
+                alert: jest.fn()
+            };
+            const clicked = captureDownloads();
+
+            setup();
+            await recordAndStop();
+
+            expect(global.URL.createObjectURL.mock.calls[0][0].type).toBe("audio/webm;codecs=opus");
+            expect(clicked[0].download).toBe("my song.webm");
+        });
+
+        it("saves an ogg file named .ogg when Firefox's recording can't be converted", async () => {
+            recorderMimeType = "audio/ogg; codecs=opus";
+            decodeAudioData.mockImplementation(() => Promise.reject(new Error("cannot decode")));
             window.MBDialog = {
                 prompt: jest.fn(() => Promise.resolve("take one")),
                 alert: jest.fn()
             };
-            const clicked = [];
-            jest.spyOn(document.body, "appendChild").mockImplementation(node => {
-                if (node.tagName === "A") clicked.push(node);
-                return node;
-            });
-            jest.spyOn(document.body, "removeChild").mockImplementation(node => node);
+            const clicked = captureDownloads();
 
             setup();
-            Synth.recorder.ondataavailable({ data: { size: 12 } });
-            Synth.recorder.onstop();
-            await Promise.resolve();
+            await recordAndStop();
 
-            expect(clicked[0].download).toBe("take one.wav");
-            jest.restoreAllMocks();
+            expect(clicked[0].download).toBe("take one.ogg");
         });
 
-        it("falls back to the browser prompt when MBDialog is unavailable", () => {
-            platform.FF = false;
+        it("falls back to the browser prompt when MBDialog is unavailable", async () => {
             delete window.MBDialog;
             window.prompt = jest.fn(() => "fallback");
-            jest.spyOn(document.body, "appendChild").mockImplementation(node => node);
-            jest.spyOn(document.body, "removeChild").mockImplementation(node => node);
+            const clicked = captureDownloads();
 
             setup();
-            Synth.recorder.ondataavailable({ data: { size: 12 } });
-            Synth.recorder.onstop();
+            await recordAndStop();
 
             expect(window.prompt).toHaveBeenCalled();
-            jest.restoreAllMocks();
+            expect(clicked[0].download).toBe("fallback.wav");
         });
 
         it("reports a cancelled download when the name is null", async () => {
-            platform.FF = false;
             window.MBDialog = {
                 prompt: jest.fn(() => Promise.resolve(null)),
                 alert: jest.fn()
             };
 
             setup();
-            Synth.recorder.ondataavailable({ data: { size: 12 } });
-            Synth.recorder.onstop();
-            await Promise.resolve();
+            await recordAndStop();
 
             expect(window.MBDialog.alert).toHaveBeenCalled();
+            expect(global.URL.revokeObjectURL).toHaveBeenCalled();
         });
 
         it("treats a whitespace-only name as a cancelled download", async () => {
-            platform.FF = false;
             window.MBDialog = {
                 prompt: jest.fn(() => Promise.resolve("   ")),
                 alert: jest.fn()
             };
 
             setup();
-            Synth.recorder.ondataavailable({ data: { size: 12 } });
-            Synth.recorder.onstop();
-            await Promise.resolve();
+            await recordAndStop();
 
             expect(window.MBDialog.alert).toHaveBeenCalled();
         });
 
-        it("falls back to a plain alert when MBDialog cannot report the cancel", () => {
-            platform.FF = false;
+        it("falls back to a plain alert when MBDialog cannot report the cancel", async () => {
             delete window.MBDialog;
             window.prompt = jest.fn(() => null);
 
             setup();
-            Synth.recorder.ondataavailable({ data: { size: 12 } });
-            Synth.recorder.onstop();
+            await recordAndStop();
 
             expect(global.alert).toHaveBeenCalled();
         });
