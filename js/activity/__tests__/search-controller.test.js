@@ -602,7 +602,7 @@ describe("SearchController.showSearchWidget", () => {
         activity.searchController.hideSearchWidget();
         jest.useRealTimers();
     });
-    test("closes the search when Escape is pressed and removes the document listener", () => {
+    test("closes on Escape and removes its listener", () => {
         jest.useFakeTimers();
 
         const activity = makeActivity();
