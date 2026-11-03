@@ -2865,6 +2865,13 @@ class Logo {
                             }
                             if (logo.turtles && logo.turtles.turtleList) {
                                 for (const t of logo.turtles.turtleList) {
+                                    if (
+                                        logo.turtles &&
+                                        logo.turtles.running &&
+                                        logo.turtles.running()
+                                    ) {
+                                        return;
+                                    }
                                     if (t && !t.running) {
                                         if (t.singer) {
                                             t.singer.runningFromEvent = false;
@@ -2872,6 +2879,9 @@ class Logo {
                                         logo.dispatchUnissuedSignals(t);
                                     }
                                 }
+                            }
+                            if (logo.turtles && logo.turtles.running && logo.turtles.running()) {
+                                return;
                             }
                             if (tur && tur.singer && tur.singer.suppressOutput && logo.recording) {
                                 tur.singer.suppressOutput = false;

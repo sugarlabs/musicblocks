@@ -2310,6 +2310,58 @@ describe("processNote — nested tie note pairing and duration semantics (MB-010
         expect(singer.tieNoteExtras).toEqual([]);
         expect(singer.tieFirstDrums).toEqual([]);
     });
+
+    test("sequential sibling Ties execute independently with correct note pairing and duration calculation", () => {
+        let currentListener;
+        activityMock.logo.setTurtleListener = jest.fn((_, __, cb) => {
+            currentListener = cb;
+        });
+
+        // --- Sibling Tie 1: Pair two C4 quarter notes -> half note (0.5s) ---
+        Singer.RhythmActions.doTie(0, "tie1");
+        expect(singer.tie).toBe(true);
+        const tie1Cleanup = currentListener;
+
+        seedNoteBlock(singer, "tie1_n1", "C", 4, 4);
+        singer.inNoteBlock = ["tie1_n1"];
+        Singer.processNote(activityMock, 4, false, "tie1_n1", 0, jest.fn());
+        expect(singer.tieCarryOver).toBe(4);
+
+        seedNoteBlock(singer, "tie1_n2", "C", 4, 4);
+        singer.inNoteBlock = ["tie1_n2"];
+        Singer.processNote(activityMock, 4, false, "tie1_n2", 0, jest.fn());
+        expect(singer.tieCarryOver).toBe(0);
+
+        tie1Cleanup();
+        expect(singer.tie).toBe(false);
+        expect(singer.tieCarryOver).toBe(0);
+        expect(getScheduledEvents()).toHaveLength(1);
+        expect(getScheduledEvents()[0].note).toBe("C4");
+        expect(getScheduledEvents()[0].beatValue).toBe(0.5);
+
+        // --- Sibling Tie 2: Pair two D4 eighth notes -> quarter note (0.25s) ---
+        Singer.RhythmActions.doTie(0, "tie2");
+        expect(singer.tie).toBe(true);
+        const tie2Cleanup = currentListener;
+
+        seedNoteBlock(singer, "tie2_n1", "D", 4, 8);
+        singer.inNoteBlock = ["tie2_n1"];
+        Singer.processNote(activityMock, 8, false, "tie2_n1", 0, jest.fn());
+        expect(singer.tieCarryOver).toBe(8);
+
+        seedNoteBlock(singer, "tie2_n2", "D", 4, 8);
+        singer.inNoteBlock = ["tie2_n2"];
+        Singer.processNote(activityMock, 8, false, "tie2_n2", 0, jest.fn());
+        expect(singer.tieCarryOver).toBe(0);
+
+        tie2Cleanup();
+        expect(singer.tie).toBe(false);
+        expect(singer.tieCarryOver).toBe(0);
+
+        expect(getScheduledEvents()).toHaveLength(2);
+        expect(getScheduledEvents()[1].note).toBe("D4");
+        expect(getScheduledEvents()[1].beatValue).toBe(0.25);
+    });
 });
 
 describe("processNote notation and MIDI emission guards against non-positive durations", () => {
