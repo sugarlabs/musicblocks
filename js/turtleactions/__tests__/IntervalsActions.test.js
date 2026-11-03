@@ -553,6 +553,29 @@ describe("setupIntervalsActions", () => {
             expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe("perfect, plus one octave");
         });
 
+        // Octaves are from GetNotesForInterval for each pair, e.g. C5 -> A3 is
+        // 9 letter steps down, so octave is Math.floor(-9 / 7) = -2.
+        test.each([
+            ["C5 -> A3", "C", "A", -2, "s15g2 below"],
+            ["G5 -> C4", "G", "C", -2, "s19g4 below"],
+            ["C6 -> A3", "C", "A", -3, "s3g2,  two octaves below"],
+            ["C6 -> D4", "C", "D", -2, "s10g6,  one octave below"]
+        ])(
+            "%s counts only the octaves taken off the name",
+            (_pair, first, second, octave, name) => {
+                global.SEMITONETOINTERVALMAP = Array(22)
+                    .fill(null)
+                    .map((row, steps) =>
+                        Array.from({ length: 7 }, (cell, gap) => `s${steps}g${gap}`)
+                    );
+                const notes = { firstNote: first, secondNote: second, octave };
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                GetNotesForInterval.mockReturnValueOnce(notes);
+
+                expect(Singer.IntervalsActions.GetCurrentInterval(0)).toBe(name);
+            }
+        );
+
         test("falls back to 'N steps' when SEMITONETOINTERVALMAP has no entry for the interval", () => {
             // G -> C, octave 1: letter-gap wraps and totalIntervals (17) has no
             // corresponding row in the default 13-row SEMITONETOINTERVALMAP mock.
