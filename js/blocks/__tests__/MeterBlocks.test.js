@@ -524,6 +524,17 @@ describe("MeterBlocks setup", () => {
             block.flow([0, 0.25], logo, 0, "clamped");
             block.flow([-60, 0.25], logo, 0, "clamped");
             block.flow([120, 0], logo, 0, "clamped");
+            block.flow([NaN, 0.25], logo, 0, "clamped");
+            block.flow([Infinity, 0.25], logo, 0, "clamped");
+            block.flow([-Infinity, 0.25], logo, 0, "clamped");
+            block.flow([120, NaN], logo, 0, "clamped");
+            block.flow([120, Infinity], logo, 0, "clamped");
+            block.flow([120, -Infinity], logo, 0, "clamped");
+            expect(logo.notation.notationTempo).not.toHaveBeenCalled();
+
+            // Nor is a block with missing arguments.
+            block.flow([], logo, 0, "clamped");
+            block.flow([120], logo, 0, "clamped");
             expect(logo.notation.notationTempo).not.toHaveBeenCalled();
         }
     );
