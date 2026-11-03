@@ -22,8 +22,10 @@
 
 const Arpeggio = require("../arpeggio.js");
 const ManagedTimer = require("../../utils/ManagedTimer");
+const { parseNoteString } = require("../../utils/musicutils-pitch");
 
 global.ManagedTimer = ManagedTimer;
+global.parseNoteString = parseNoteString;
 
 global._ = msg => msg;
 global.platformColor = {
@@ -253,6 +255,38 @@ describe("Arpeggio Widget", () => {
             arpeggio.init(activityMock);
         });
 
+        test.each([
+            [0, "var(--color-selector-selected)"],
+            [2, "var(--color-selector-bg)"]
+        ])("hovering row %i is temporary and preserves its scale color", (row, background) => {
+            const cell = document.getElementById(`${row},0`);
+            const selectedNodes = arpeggio._blockMap.map(node => [...node]);
+
+            cell.dispatchEvent(new MouseEvent("mouseover"));
+            expect(cell.style.backgroundColor).toBe("var(--color-selector-selected)");
+            expect(arpeggio._blockMap).toEqual(selectedNodes);
+
+            cell.dispatchEvent(new MouseEvent("mouseout"));
+            expect(cell.style.backgroundColor).toBe(background);
+            expect(arpeggio._blockMap).toEqual(selectedNodes);
+
+            cell.dispatchEvent(new MouseEvent("mouseover"));
+            cell.dispatchEvent(new MouseEvent("mouseout"));
+            expect(cell.style.backgroundColor).toBe(background);
+            expect(arpeggio._blockMap).toEqual(selectedNodes);
+        });
+
+        test("keeps selected cells black when hovered", () => {
+            const cell = document.getElementById("2,0");
+            cell.click();
+
+            cell.dispatchEvent(new MouseEvent("mouseover"));
+            expect(cell.style.backgroundColor).toBe("black");
+
+            cell.dispatchEvent(new MouseEvent("mouseout"));
+            expect(cell.style.backgroundColor).toBe("black");
+        });
+
         test("should highlight cell and add node on click", () => {
             const cell = document.getElementById("2,1"); // Row 2, Col 1
             expect(cell).not.toBeNull();
@@ -342,6 +376,29 @@ describe("Arpeggio Widget", () => {
             // Click again to stop
             arpeggio.playButton.onclick();
             expect(arpeggio._playing).toBe(false);
+        });
+
+        test.each([
+            ["C-1", "C", -1],
+            ["C10", "C", 10],
+            ["Db-1", "Db", -1]
+        ])("playback parses %s with its full octave", (note, letter, octave) => {
+            const cell = document.getElementById("2,0");
+            cell.onclick({ target: cell });
+            arpeggio.notesToPlay = [[note, 1 / 16]];
+            global.getNote.mockClear();
+
+            arpeggio.playButton.onclick();
+
+            expect(global.getNote).toHaveBeenCalledWith(
+                letter,
+                octave,
+                expect.any(Number),
+                expect.anything(),
+                false,
+                null,
+                expect.anything()
+            );
         });
 
         test("play button uses a C4 sixteenth-note fallback when notesToPlay is empty", () => {
@@ -633,6 +690,25 @@ describe("Arpeggio Widget", () => {
                 expect.anything()
             );
             expect(activityMock.logo.synth.trigger).toHaveBeenCalled();
+        });
+
+        test.each([
+            ["C-1", "C", -1],
+            ["C10", "C", 10],
+            ["Db-1", "Db", -1]
+        ])("parses %s with its full octave", (note, letter, octave) => {
+            arpeggio.notesToPlay = [[note, 1 / 16]];
+            arpeggio.__playCell(3, 0, document.createElement("td"), true);
+
+            expect(global.getNote).toHaveBeenCalledWith(
+                letter,
+                octave,
+                expect.any(Number),
+                expect.anything(),
+                false,
+                null,
+                expect.anything()
+            );
         });
 
         test("defaults to C4 when notesToPlay is empty", () => {
