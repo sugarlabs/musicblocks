@@ -25,26 +25,44 @@ const PhraseMakerUI = {
         const screenWidth = window.innerWidth;
         const screenHeight = window.innerHeight;
         const floatingWindowsDiv = document.getElementById("floatingWindows");
-        const windowFrameElements = floatingWindowsDiv.querySelectorAll(".windowFrame");
+        if (!floatingWindowsDiv) return;
+
+        const targetFrame = pm && pm.widgetWindow && pm.widgetWindow._frame;
+        const windowFrameElements = targetFrame
+            ? [targetFrame]
+            : floatingWindowsDiv.getElementsByClassName("windowFrame");
+
+        const maxWidth = screenWidth * 0.8;
+        const maxHeight = screenHeight * 0.8;
 
         for (let i = 0; i < windowFrameElements.length; i++) {
             const windowFrame = windowFrameElements[i];
-            const wfWinBody = windowFrame.querySelector(".wfWinBody");
-            const wfbWidget = windowFrame.querySelector(".wfbWidget");
-            const totalWidth = parseFloat(window.getComputedStyle(windowFrame).width);
-            const totalHeight = parseFloat(window.getComputedStyle(windowFrame).height);
-            const maxWidth = screenWidth * 0.8;
-            const maxHeight = screenHeight * 0.8;
+            const totalWidth =
+                windowFrame.offsetWidth ||
+                parseFloat(window.getComputedStyle(windowFrame).width) ||
+                0;
+            const totalHeight =
+                windowFrame.offsetHeight ||
+                parseFloat(window.getComputedStyle(windowFrame).height) ||
+                0;
 
             if (totalWidth > screenWidth || totalHeight > screenHeight) {
+                const wfWinBody = windowFrame.getElementsByClassName("wfWinBody")[0];
+                const wfbWidget = windowFrame.getElementsByClassName("wfbWidget")[0];
+
                 windowFrame.style.height = Math.min(totalHeight, maxHeight) + "px";
                 windowFrame.style.width = Math.min(totalWidth, maxWidth) + "px";
-                wfbWidget.style.overflowY = totalHeight > maxHeight ? "auto" : "hidden";
-                wfbWidget.style.overflowX = totalWidth > maxWidth ? "auto" : "hidden";
-                wfbWidget.classList.add("pm-widget-container");
-                wfWinBody.classList.add("pm-win-body");
-                wfWinBody.style.overflowY = totalHeight > maxHeight ? "auto" : "hidden";
-                wfWinBody.style.overflowX = totalWidth > maxWidth ? "auto" : "hidden";
+
+                if (wfbWidget) {
+                    wfbWidget.style.overflowY = totalHeight > maxHeight ? "auto" : "hidden";
+                    wfbWidget.style.overflowX = totalWidth > maxWidth ? "auto" : "hidden";
+                    wfbWidget.classList.add("pm-widget-container");
+                }
+                if (wfWinBody) {
+                    wfWinBody.classList.add("pm-win-body");
+                    wfWinBody.style.overflowY = totalHeight > maxHeight ? "auto" : "hidden";
+                    wfWinBody.style.overflowX = totalWidth > maxWidth ? "auto" : "hidden";
+                }
             }
         }
     },
