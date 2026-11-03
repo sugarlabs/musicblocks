@@ -1013,15 +1013,11 @@ describe("afterSaveMIDI instrument channels", () => {
         instance.activity.logo._midiData = data;
         instance.afterSaveMIDI();
         jest.runAllTimers();
-        new ToneMidi(bytes).tracks
-            .filter(t => t.notes.length > 0)
-            .forEach(t => {
-                const built = written.tracks.find(b => b.name === t.name);
-                expect([t.channel, t.instrument.number]).toEqual([
-                    built.channel,
-                    built.instrument.number
-                ]);
-            });
+        const noteTracks = midi =>
+            midi.tracks
+                .filter(t => t.notes.length > 0)
+                .map(t => [t.name, t.channel, t.instrument.number, t.notes.length]);
+        expect(noteTracks(new ToneMidi(bytes))).toEqual(noteTracks(written));
         return written;
     };
 
