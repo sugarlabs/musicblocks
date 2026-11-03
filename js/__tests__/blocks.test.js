@@ -17,6 +17,7 @@
 /* global jest, describe, it, expect, beforeEach, afterEach, beforeAll, afterAll */
 
 const Blocks = require("../blocks");
+const RealBlock = require("../block");
 const ManagedTimer = require("../utils/ManagedTimer");
 
 // blocks.js references these constants (MINIMUMDOCKDISTANCE, ALLOWED_CONNECTIONS, etc.) as
@@ -905,6 +906,51 @@ describe("Blocks Foundation", () => {
     });
 
     describe("Basic State Management", () => {
+        it("saves custom stacks using the macro dictionary initialized after Blocks", () => {
+            mockActivity.macroDict = undefined;
+            const blocks = new Blocks(mockActivity);
+            mockActivity.macroDict = {};
+            blocks.selectedStack = 0;
+            blocks._copyBlocksToObj = jest.fn(() => [[0, "settimbre", 0, 0, [null]]]);
+            blocks.addToMyPalette = jest.fn();
+            mockActivity.palettes.updatePalettes = jest.fn();
+            const macroUtils = require("../utils/macro-utils");
+            global.prepareMacroExports.mockImplementation(macroUtils.prepareMacroExports);
+            blocks.saveStack();
+            expect(JSON.parse(mockActivity.storage.macros)).toEqual({
+                "---": [[0, "settimbre", 0, 0, [null]]]
+            });
+            expect(mockActivity.macroDict["---"]).toEqual([[0, "settimbre", 0, 0, [null]]]);
+            global.prepareMacroExports.mockReset();
+        });
+
+        it("restores opaque instrument JSON and independent labels through history", () => {
+            const blocks = new Blocks(mockActivity);
+            const block = new RealBlock(
+                { name: "multisample", scale: 1, capabilities: { wideLabel: true } },
+                blocks
+            );
+            block.blockIndex = 0;
+            block.text = { text: "" };
+            block.container = new createjs.Container();
+            block.updateCache = jest.fn();
+            blocks.blockList = [block];
+            const oldValue = { type: "multisample", version: 9, name: "<old>", extra: [1] };
+            const newValue = { type: "multisample", version: 10, name: "<new>", extra: [2] };
+            block.setMultisampleValue(oldValue);
+            block.setMultisampleValue(newValue, true);
+            expect(block.text.text).toBe("Unsupported instrument: <new>");
+            blocks.undoAction();
+            expect(block.value).toEqual(oldValue);
+            expect(block.text.text).toBe("Unsupported instrument: <old>");
+            block.value.extra.push(3);
+            blocks.redoAction();
+            expect(block.value).toEqual(newValue);
+            blocks.undoAction();
+            expect(block.value).toEqual(oldValue);
+            expect(block.label).toBeNull();
+        });
+
         it("should correctly handle long press status", () => {
             const blocks = new Blocks(mockActivity);
 
@@ -2030,6 +2076,34 @@ describe("Blocks Foundation", () => {
             expect(blocks.blockList[0].value).toBe("F");
             expect(blocks.blockList[0].manualAccidental).toBe("♮");
             expect(blocks.updateBlockText).toHaveBeenCalledWith(0);
+        });
+
+        it("loads independent opaque instrument values without dropping extra JSON", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.protoBlockDict = { multisample: { hasCapability: () => false, dockTypes: [] } };
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks._updateSpatialGrid = jest.fn();
+            blocks.updateBlockText = jest.fn();
+            blocks._makeNewBlockWithConnections = jest.fn(
+                (name, offset, conns, postProcess, args) => {
+                    const block = new RealBlock({ name, scale: 1 }, blocks);
+                    block.blockIndex = args[0];
+                    block.connections = [null];
+                    block.container = { x: 0, y: 0 };
+                    blocks.blockList[args[0]] = block;
+                    postProcess(args);
+                }
+            );
+            const value = { type: "multisample", version: 99, name: "same", extra: { rows: [1] } };
+            blocks.loadNewBlocks([
+                [0, ["multisample", { value }], 0, 0, [null]],
+                [1, ["multisample", { value }], 0, 0, [null]]
+            ]);
+            expect(blocks.blockList[0].value).toEqual(value);
+            expect(blocks.blockList[1].value).toEqual(value);
+            blocks.blockList[0].value.extra.rows.push(2);
+            expect(blocks.blockList[1].value.extra.rows).toEqual([1]);
+            expect(value.extra.rows).toEqual([1]);
         });
 
         it("keeps the cent adjustment of a loaded customsample block", () => {

@@ -51,7 +51,7 @@ class JSEditor {
         /** stores CodeJar object for the editor */
         this._jar = null;
         /** code to be displayed in the editor */
-        this._code = null;
+        this._code = "";
         /** actual code backup up when help is shown */
         this._codeBck = null;
         /** trashsignal listener registered while converting code to blocks */
@@ -1116,7 +1116,7 @@ class JSEditor {
      * @returns {void}
      */
     _generateCode() {
-        JSGenerate.run(true);
+        if (JSGenerate.run(true) === false) return;
         this._code = JSGenerate.code;
         this._jar.updateCode(this._code);
         this._setLinesCount(this._code);

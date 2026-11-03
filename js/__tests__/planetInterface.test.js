@@ -1105,6 +1105,31 @@ describe("PlanetInterface", () => {
         // 3. Verify saveThumbnail safely returned null without calling storage.saveThumbnail with undefined
         expect(realStorage.saveThumbnail).not.toHaveBeenCalled();
     });
+
+    test("a failed instrument save retains exact export data for native export and retry", async () => {
+        doSVG.mockReturnValue("");
+        const value = {
+            type: "multisample",
+            version: 99,
+            name: "saved",
+            recordings: ["exact bytes"]
+        };
+        const data = JSON.stringify([[0, ["multisample", { value }], 0, 0, [null]]]);
+        mockActivity.prepareExport.mockReturnValue(data);
+        const save = jest
+            .fn()
+            .mockRejectedValueOnce(new DOMException("full", "QuotaExceededError"))
+            .mockResolvedValueOnce(true);
+        planetInterface.planet = { ProjectStorage: { saveLocally: save } };
+        expect(await planetInterface.saveLocally()).toBe(false);
+        expect(mockActivity.textMsg).toHaveBeenCalledTimes(1);
+        expect(mockActivity.textMsg).toHaveBeenCalledWith(
+            expect.stringContaining("Retry saving or export")
+        );
+        expect(mockActivity.prepareExport()).toBe(data);
+        expect(await planetInterface.saveLocally()).toBe(true);
+        expect(save).toHaveBeenNthCalledWith(2, data, null);
+    });
     test("getCurrentProjectDescription/Image/TimeLastSaved", () => {
         const D = new Date(2020, 1, 1);
         planetInterface.planet = {
@@ -1496,7 +1521,7 @@ describe("PlanetInterface", () => {
         };
         planetInterface.saveLocally();
         expect(mockActivity.textMsg).toHaveBeenCalledWith(
-            "Error: Unable to save because you ran out of local storage. Try deleting some saved projects."
+            "Unable to save because local storage is full. Try deleting some saved projects. Retry saving or export a Music Blocks project to keep your work."
         );
         global._ = saved_;
     });
@@ -1514,7 +1539,7 @@ describe("PlanetInterface", () => {
         await planetInterface.saveLocally();
 
         expect(mockActivity.textMsg).toHaveBeenCalledWith(
-            "Error: Unable to save because you ran out of local storage. Try deleting some saved projects."
+            "Unable to save because local storage is full. Try deleting some saved projects. Retry saving or export a Music Blocks project to keep your work."
         );
         global._ = saved_;
     });
@@ -1531,7 +1556,10 @@ describe("PlanetInterface", () => {
 
         const result = await planetInterface.saveLocally();
 
-        expect(mockActivity.textMsg).toHaveBeenCalledWith("Could not save your project.");
+        expect(mockActivity.textMsg).toHaveBeenCalledTimes(1);
+        expect(mockActivity.textMsg).toHaveBeenCalledWith(
+            "Could not save your project. Retry saving or export a Music Blocks project to keep your work."
+        );
         expect(result).toBe(false);
         expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error));
         consoleSpy.mockRestore();
@@ -1553,10 +1581,24 @@ describe("PlanetInterface", () => {
             saveError
         );
 
-        expect(mockActivity.textMsg).toHaveBeenCalledWith("Could not save your project.");
+        expect(mockActivity.textMsg).toHaveBeenCalledWith(
+            "Could not save your project. Retry saving or export a Music Blocks project to keep your work."
+        );
         expect(consoleSpy).toHaveBeenCalledWith(saveError);
         consoleSpy.mockRestore();
         global._ = saved_;
+    });
+
+    test("lets a recovery caller report a rejected save without a duplicate notification", async () => {
+        doSVG.mockReturnValue("");
+        const error = new DOMException("full", "QuotaExceededError");
+        planetInterface.planet = {
+            ProjectStorage: { saveLocally: jest.fn().mockRejectedValue(error) }
+        };
+        await expect(
+            planetInterface.saveLocally({ rejectOnProjectSaveError: true, reportSaveErrors: false })
+        ).rejects.toBe(error);
+        expect(mockActivity.textMsg).not.toHaveBeenCalled();
     });
 
     it("saveLocally rethrows unexpected errors and logs them", () => {

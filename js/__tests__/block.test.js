@@ -302,6 +302,36 @@ describe("Block Foundation", () => {
             expect(block.hasValueDrivenLabel()).toBe(true);
         });
 
+        it("opens the multisample editor through the no-click touch fallback", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.name = "multisample";
+            block.protoblock.capabilities.valueDrivenLabel = true;
+            block.value = { type: "multisample", name: "Touch instrument" };
+            block.activity.trashcan = { hide: jest.fn() };
+            block.accessibleElement = {};
+            mockBlocks.longPressTimeout = null;
+            mockBlocks.mouseDownTime = Date.now();
+            const previousEditor = global.MultisampleEditor;
+            global.MultisampleEditor = { open: jest.fn() };
+            try {
+                block._mouseoutCallback({}, false, false, false);
+                expect(global.MultisampleEditor.open).toHaveBeenCalledWith(
+                    block.activity,
+                    block,
+                    block.accessibleElement
+                );
+                expect(block.value.name).toBe("Touch instrument");
+                global.MultisampleEditor.open.mockClear();
+                block._mouseoutCallback({}, false, true, false);
+                block.trash = true;
+                block._mouseoutCallback({}, false, false, false);
+                expect(global.MultisampleEditor.open).not.toHaveBeenCalled();
+            } finally {
+                if (previousEditor === undefined) delete global.MultisampleEditor;
+                else global.MultisampleEditor = previousEditor;
+            }
+        });
+
         it("hasValueDrivenLabel() should respect explicit false metadata", () => {
             mockProtoBlock.name = "number";
             mockProtoBlock.capabilities.valueDrivenLabel = false;
@@ -2192,6 +2222,56 @@ describe("Block Foundation", () => {
     });
 
     describe("value change undo/redo tracking", () => {
+        it("owns independent whole multisample values and history snapshots", () => {
+            const workspace = {
+                ...mockBlocks,
+                activity: { logo: { invalidateMultisampleRun: jest.fn() } },
+                actionHistory: [],
+                redoActionHistory: [],
+                updateBlockText: jest.fn()
+            };
+            const block = new Block({ ...mockProtoBlock, name: "multisample" }, workspace);
+            block.blockIndex = 0;
+            const original = { type: "multisample", version: 2, name: "same", extra: { a: [1] } };
+            block.setMultisampleValue(original);
+            original.extra.a.push(2);
+            expect(block.value.extra.a).toEqual([1]);
+            const replacement = { ...original, name: "edited" };
+            block.setMultisampleValue(replacement, true);
+            replacement.extra.a.push(3);
+            block.value.extra.a.push(4);
+            expect(workspace.actionHistory).toHaveLength(1);
+            expect(workspace.actionHistory[0].oldValue.extra.a).toEqual([1]);
+            expect(workspace.actionHistory[0].newValue.extra.a).toEqual([1, 2]);
+            block.setMultisampleValue(JSON.parse(JSON.stringify(block.value)), true);
+            expect(workspace.actionHistory).toHaveLength(1);
+            expect(workspace.activity.logo.invalidateMultisampleRun).toHaveBeenCalledTimes(3);
+            expect(workspace.activity.logo.invalidateMultisampleRun).toHaveBeenLastCalledWith(
+                block
+            );
+        });
+
+        it("never sends a structured instrument to the text editor", () => {
+            const block = new Block({ ...mockProtoBlock, name: "multisample" }, mockBlocks);
+            const value = { type: "multisample", version: 99, extra: [1] };
+            block.value = value;
+            const previousEditor = global.MultisampleEditor;
+            global.MultisampleEditor = { open: jest.fn() };
+            try {
+                block._changeLabel();
+                expect(block.label).toBeNull();
+                expect(block.value).toBe(value);
+                expect(global.MultisampleEditor.open).toHaveBeenCalledWith(
+                    block.activity,
+                    block,
+                    block.accessibleElement
+                );
+            } finally {
+                if (previousEditor === undefined) delete global.MultisampleEditor;
+                else global.MultisampleEditor = previousEditor;
+            }
+        });
+
         it("does not record runtime value assignments", () => {
             const mockBlocksObj = {
                 ...mockBlocks,

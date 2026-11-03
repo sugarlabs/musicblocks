@@ -74,11 +74,15 @@ describe("setupToneActions", () => {
                 blockList: { 1: {}, 2: {} }
             },
             logo: {
+                doStopTurtles: jest.fn(() => {
+                    activity.logo.stopTurtle = true;
+                }),
                 setDispatchBlock: jest.fn(_name => {}),
                 setTurtleListener: jest.fn((_, _name, callback) => {
                     listenerCallbacks[_name] = callback;
                 }),
                 synth: {
+                    getMultisampleName: jest.fn(() => null),
                     loadSynth: jest.fn(),
                     createSynth: jest.fn()
                 },
@@ -234,9 +238,153 @@ describe("setupToneActions", () => {
             expect(targetTurtle.singer.instrumentNames).toContain("customsample_custom1");
         });
 
+        const multisampleValue = () => ({
+            type: "multisample",
+            version: 1,
+            name: "Cello",
+            samples: [
+                { name: "C4.wav", root: "C4", data: "data:audio/wav;base64,UklGRgQAAABXQVZF" }
+            ]
+        });
+
+        it("translates a complete capture refusal with reorderable literal names", () => {
+            const previousTranslate = global._;
+            const message = "Multisample instrument “%1” is not supported in %2.";
+            global._ = jest.fn(text => (text === message ? "%2 cannot capture %1." : text));
+            try {
+                const instrument = { ...multisampleValue(), name: "Cello $& $1 %2" };
+                expect(
+                    Singer.ToneActions.rejectMultisampleCapture(
+                        instrument,
+                        0,
+                        1,
+                        "Phrase Maker $& %1"
+                    )
+                ).toBe(true);
+                expect(global._).toHaveBeenCalledWith(message);
+                expect(activity.errorMsg).toHaveBeenCalledWith(
+                    "Phrase Maker $& %1 cannot capture Cello $& $1 %2.",
+                    1
+                );
+            } finally {
+                global._ = previousTranslate;
+            }
+        });
+
+        it("consumes a prepared pair without loading or changing the legacy registry", () => {
+            activity.logo.inTimbre = false;
+            const descriptor = multisampleValue();
+            const previous = { ...CUSTOMSAMPLES };
+            activity.logo.synth.getPreparedMultisample = jest.fn().mockReturnValue("multisample_1");
+            Singer.ToneActions.setTimbre(descriptor, 0, 1);
+            expect(activity.logo.synth.getPreparedMultisample).toHaveBeenCalledWith(0, descriptor);
+            expect(activity.logo.synth.loadSynth).not.toHaveBeenCalled();
+            expect(targetTurtle.singer.instrumentNames).toEqual(["multisample_1"]);
+            expect(targetTurtle.singer.synthVolume.multisample_1).toEqual([1]);
+            expect(CUSTOMSAMPLES).toEqual(previous);
+            listenerCallbacks._settimbre_0_1();
+            expect(targetTurtle.singer.instrumentNames).toEqual([]);
+            expect(targetTurtle.inSetTimbre).toBe(false);
+        });
+
+        it.each([multisampleValue(), { type: "multisample", version: 2, name: "Future" }])(
+            "aborts unprepared or unsupported values before timbre/listener mutation: %p",
+            descriptor => {
+                activity.logo.inTimbre = false;
+                activity.logo.synth.getPreparedMultisample = jest.fn().mockReturnValue(null);
+                const result = Singer.ToneActions.setTimbre(descriptor, 0, 1);
+                expect(result).toBe(false);
+                expect(activity.errorMsg).toHaveBeenCalledWith(
+                    expect.stringContaining(descriptor.name),
+                    1
+                );
+                expect(activity.logo.stopTurtle).toBe(true);
+                expect(targetTurtle.inSetTimbre).toBe(false);
+                expect(targetTurtle.singer.instrumentNames).toEqual([]);
+                expect(activity.logo.setTurtleListener).not.toHaveBeenCalled();
+                expect(activity.logo.synth.loadSynth).not.toHaveBeenCalled();
+            }
+        );
+
+        it.each([
+            ["inMatrix", "Phrase Maker"],
+            ["inMusicKeyboard", "Music Keyboard"],
+            ["inSample", "Sampler"],
+            ["inRhythmRuler", "Rhythm Ruler"],
+            ["inTimbre", "Timbre"]
+        ])("refuses %s before consuming or capturing a prepared alias", (flag, destination) => {
+            activity.logo.inTimbre = false;
+            activity.logo[flag] = true;
+            activity.logo.phraseMaker._instrumentName = "violin";
+            activity.logo.synth.getPreparedMultisample = jest.fn().mockReturnValue("multisample_1");
+            expect(Singer.ToneActions.setTimbre(multisampleValue(), 0, 1)).toBe(false);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                expect.stringMatching(new RegExp("Cello.*" + destination)),
+                1
+            );
+            expect(activity.logo.phraseMaker._instrumentName).toBe("violin");
+            expect(activity.logo.synth.getPreparedMultisample).not.toHaveBeenCalled();
+            expect(activity.logo.synth.loadSynth).not.toHaveBeenCalled();
+            expect(activity.logo.setTurtleListener).not.toHaveBeenCalled();
+            expect(targetTurtle.singer.instrumentNames).toEqual([]);
+        });
+
         it("should keep the cent adjustment of a custom sample", () => {
             Singer.ToneActions.setTimbre(["tuned", "data", "la", 4, 50], 0, 1);
             expect(global.CUSTOMSAMPLES["customsample_tuned"]).toEqual(["data", "la", 4, 50]);
+        });
+
+        it.each(["notation", "suppressed", "counting"])(
+            "validates actual %s use without a prepared alias or audio",
+            mode => {
+                activity.logo.inTimbre = false;
+                activity.logo._exportingNotation = mode === "notation";
+                targetTurtle.singer.suppressOutput = mode === "suppressed";
+                targetTurtle.singer.justCounting = mode === "counting" ? [true] : [];
+                const { validateMultisample } = require("../../utils/synthutils");
+                const savedValidator = global.validateMultisample;
+                const savedNormalize = global.normalizeNoteAccidentals;
+                const savedTone = global.Tone;
+                global.validateMultisample = validateMultisample;
+                global.normalizeNoteAccidentals =
+                    require("../../utils/musicutils").normalizeNoteAccidentals;
+                global.Tone = { Frequency: () => ({ toMidi: () => 60 }) };
+                activity.logo.synth.getPreparedMultisample = jest.fn(() => null);
+                try {
+                    expect(Singer.ToneActions.setTimbre(multisampleValue(), 0, 1)).not.toBe(false);
+                    expect(activity.errorMsg).not.toHaveBeenCalled();
+                    expect(activity.logo.synth.getPreparedMultisample).not.toHaveBeenCalled();
+                    expect(activity.logo.synth.loadSynth).not.toHaveBeenCalled();
+                    expect(targetTurtle.singer.instrumentNames).toEqual([]);
+                    expect(
+                        Singer.ToneActions.setTimbre(
+                            { type: "multisample", version: 2, name: "Future" },
+                            0,
+                            1
+                        )
+                    ).toBe(false);
+                    expect(activity.logo.doStopTurtles).toHaveBeenCalledTimes(1);
+                    expect(activity.errorMsg).toHaveBeenCalledWith(
+                        expect.stringContaining("Future"),
+                        1
+                    );
+                } finally {
+                    global.validateMultisample = savedValidator;
+                    global.normalizeNoteAccidentals = savedNormalize;
+                    global.Tone = savedTone;
+                }
+            }
+        );
+
+        it("does not classify silent notation or counting as widget capture", () => {
+            activity.logo.inTimbre = false;
+            activity.logo.runningLilypond = true;
+            activity.logo.runningAbc = true;
+            targetTurtle.singer.justCounting = [true];
+            expect(Singer.ToneActions.rejectMultisampleCapture(multisampleValue(), 0, 1)).toBe(
+                false
+            );
+            expect(activity.errorMsg).not.toHaveBeenCalled();
         });
 
         it("should handle empty custom sample name", () => {

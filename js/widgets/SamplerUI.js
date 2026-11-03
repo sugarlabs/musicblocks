@@ -13,7 +13,7 @@
 /*
    global
 
-   _, docById, instruments, platformColor, resolveBackendURL
+   _, docById, instruments, platformColor, resolveBackendURL, MultisampleEditor
 */
 /*
     Globals location
@@ -217,6 +217,41 @@ const SamplerUI = {
                     this.tunerSegments = [];
                 }
             };
+
+            this.pauseForMultisample = () => {
+                this._multisamplePauseGeneration = (this._multisamplePauseGeneration || 0) + 1;
+                this.pause();
+                this._clearWidgetTimeout(this._restartPitchTimeout);
+                this._restartPitchTimeout = null;
+                stopTuner();
+                this.tuner.stopTuner();
+                this.stopPitchDetection();
+                if (this.audioPreview) this.audioPreview.pause();
+                if (this.is_recording) {
+                    activity.logo.synth.stopRecording();
+                    this.is_recording = false;
+                    this._recordBtn.querySelector("img").src = "header-icons/mic.svg";
+                }
+                if (this.playback) {
+                    activity.logo.synth.stopPlayBackRecording();
+                    this.playback = false;
+                    this._playbackBtn.querySelector("img").src = "header-icons/playback.svg";
+                }
+                for (const name of [
+                    "electronic synth",
+                    "customsample_" + this.originalSampleName
+                ]) {
+                    const voice = instruments[0]?.[name];
+                    if (voice?.releaseAll) voice.releaseAll();
+                    else voice?.triggerRelease?.();
+                }
+                widgetWindow.getWidgetFrame().inert = true;
+            };
+            const newInstrument = document.createElement("button");
+            newInstrument.type = "button";
+            newInstrument.textContent = _("New multisample instrument…");
+            newInstrument.onclick = () => MultisampleEditor.open(activity, null, newInstrument);
+            widgetWindow._toolbar.append(newInstrument);
 
             this.playBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
             this.playBtn.onclick = () => {
@@ -523,8 +558,13 @@ const SamplerUI = {
             this._recordBtn.onclick = async () => {
                 stopTuner();
                 if (!this.is_recording) {
+                    const generation = this._multisamplePauseGeneration || 0;
                     try {
                         await this.activity.logo.synth.startRecording();
+                        if (generation !== (this._multisamplePauseGeneration || 0)) {
+                            this.activity.logo.synth.stopRecording();
+                            return;
+                        }
                         this.is_recording = true;
                         this._recordBtn.getElementsByTagName("img")[0].src =
                             "header-icons/record.svg";
@@ -544,6 +584,7 @@ const SamplerUI = {
             };
 
             this._playbackBtn.onclick = () => {
+                const generation = this._multisamplePauseGeneration || 0;
                 stopTuner();
                 const img = this._playbackBtn.getElementsByTagName("img")[0];
                 if (!this.playback) {
@@ -553,12 +594,15 @@ const SamplerUI = {
                     if (img) {
                         img.src = "header-icons/stop-button.svg";
                     }
-                    this.activity.logo.synth.playRecording(() => {
-                        this.playback = false;
-                        if (img) {
-                            img.src = "header-icons/playback.svg";
-                        }
-                    });
+                    this.activity.logo.synth.playRecording(
+                        () => {
+                            this.playback = false;
+                            if (img) {
+                                img.src = "header-icons/playback.svg";
+                            }
+                        },
+                        () => generation === (this._multisamplePauseGeneration || 0)
+                    );
                     this.playback = true;
                 } else {
                     this.activity.logo.synth.stopPlayBackRecording();
