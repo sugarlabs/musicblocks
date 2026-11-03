@@ -2209,6 +2209,82 @@ describe("processNote notation and MIDI emission guards against non-positive dur
             );
         }
     );
+
+    describe("inside Set Drum", () => {
+        const blk = "setDrumNoteBlk";
+        const recordNote = ({ pitches, drums = [], osc = [] }) => {
+            Object.assign(turtleMock.singer, {
+                inNoteBlock: [blk],
+                notePitches: { [blk]: pitches },
+                noteOctaves: { [blk]: pitches.map(() => 4) },
+                noteCents: { [blk]: pitches.map(() => 0) },
+                noteHertz: { [blk]: pitches.map(() => 0) },
+                noteDrums: { [blk]: drums },
+                noteBeatValues: { [blk]: [1] },
+                instrumentNames: ["piano"],
+                oscList: { [blk]: osc },
+                drumStyle: ["snare drum"],
+                bpm: [90]
+            });
+            Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+            return activityMock.logo.notationMIDI.mock.calls[0].slice(0, 2);
+        };
+
+        // The note sits in the clamp of a setdrum block, with a settimbre block
+        // between them when setTimbre is true.
+        const nest = setTimbre => {
+            const blockList = activityMock.blocks.blockList;
+            blockList[blk] = { name: "newnote", connections: ["parentBlk"] };
+            blockList.parentBlk = {
+                name: setTimbre ? "settimbre" : "setdrum",
+                connections: [setTimbre ? "setDrumBlk" : null]
+            };
+            blockList.setDrumBlk = { name: "setdrum", connections: [null] };
+        };
+
+        test("records the drum it plays instead of the pitch", () => {
+            nest(false);
+            expect(recordNote({ pitches: ["C"] })).toEqual([["R"], ["snare drum"]]);
+        });
+
+        test("records only the drum when the note has a drum of its own", () => {
+            nest(false);
+            expect(recordNote({ pitches: ["C"], drums: ["snare drum"] })).toEqual([
+                ["R"],
+                ["snare drum"]
+            ]);
+        });
+
+        test("keeps the pitch that a Set Instrument inside it plays", () => {
+            nest(true);
+            expect(recordNote({ pitches: ["C"] })).toEqual([["C4"], []]);
+        });
+
+        test("keeps the pitch that an oscillator plays", () => {
+            nest(false);
+            expect(recordNote({ pitches: ["C"], osc: ["sine"] })).toEqual([["C4"], []]);
+        });
+
+        test.each([
+            ["has no connections", { [blk]: { name: "newnote" } }],
+            ["has a parent that is gone", { [blk]: { name: "newnote", connections: ["goneBlk"] } }],
+            [
+                "has a parent with no connections",
+                {
+                    [blk]: { name: "newnote", connections: ["vspaceBlk"] },
+                    vspaceBlk: { name: "vspace" }
+                }
+            ]
+        ])("records the drum when the note %s", (_case, blocks) => {
+            Object.assign(activityMock.blocks.blockList, blocks);
+            expect(recordNote({ pitches: ["C"] })).toEqual([["R"], ["snare drum"]]);
+        });
+
+        test("records a rest as a rest, with no drum", () => {
+            nest(false);
+            expect(recordNote({ pitches: ["rest"] })).toEqual([["R"], []]);
+        });
+    });
 });
 
 describe("processNote playback path avoids discarded ratio computation", () => {

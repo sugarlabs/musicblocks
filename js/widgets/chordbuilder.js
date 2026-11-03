@@ -815,6 +815,8 @@ class ChordBuilderWidget {
                 this.numBars = n;
                 this._renderBarGrid();
             }
+            // Show the bar count in use, so a rejected or decimal entry doesn't stay in the box.
+            e.target.value = String(this.numBars);
         };
 
         const beatsLabel = document.createElement("span");

@@ -663,6 +663,21 @@ describe("ChordBuilderWidget", () => {
             expect(widget.beatsPerBar).toBe(3);
         });
 
+        it.each([
+            ["0", "4"],
+            ["20", "4"],
+            ["", "4"],
+            ["2.5", "2"]
+        ])("shows the bar count in use after Bars is set to %p", (typed, shown) => {
+            const barsInput = body.querySelector("#chordNumBarsInput");
+            widget.numBars = 4;
+            barsInput.value = typed;
+            barsInput.onchange({ target: barsInput });
+
+            expect(barsInput.value).toBe(shown);
+            expect(String(widget.numBars)).toBe(shown);
+        });
+
         it("handles play/stop button toggling and progression playback callbacks", () => {
             widget.progression = [{ name: "C", roman: "I", notes: ["C", "E", "G"] }];
 

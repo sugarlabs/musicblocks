@@ -1469,6 +1469,24 @@ describe("Logo doStopTurtles", () => {
 
             clearIntervalSpy.mockRestore();
         });
+
+        test("stops companion turtle and clears interval when companion index is zero", () => {
+            const clearIntervalSpy = jest
+                .spyOn(global, "clearInterval")
+                .mockImplementation(() => {});
+            turtle0.companionTurtle = null;
+            turtle1.companionTurtle = 0;
+            turtle0.interval = 888;
+            turtle0.running = true;
+
+            logo.doStopTurtles();
+
+            expect(turtle0.running).toBe(false);
+            expect(clearIntervalSpy).toHaveBeenCalledWith(888);
+            expect(turtle0.interval).toBeUndefined();
+
+            clearIntervalSpy.mockRestore();
+        });
     });
 });
 
@@ -2769,6 +2787,28 @@ describe("Logo runFromBlockNow", () => {
             expect(turtle0.painter.doClear).not.toHaveBeenCalled();
         });
 
+        test("stops companion turtle and clears interval on natural completion when companion index is zero", () => {
+            const turtle1 = createMockTurtle();
+            const twoTurtleActivity = createTwoTurtleActivity(turtle0, turtle1);
+            logo = new Logo(twoTurtleActivity);
+            logo.blockList = [makeFlowBlock()];
+            const clearIntervalSpy = jest
+                .spyOn(global, "clearInterval")
+                .mockImplementation(() => {});
+
+            turtle1.companionTurtle = 0;
+            turtle0.interval = 888;
+            turtle0.running = true;
+
+            logo.runFromBlockNow(logo, 1, 0, 0, null);
+
+            expect(turtle0.running).toBe(false);
+            expect(clearIntervalSpy).toHaveBeenCalledWith(888);
+            expect(turtle0.interval).toBeUndefined();
+
+            clearIntervalSpy.mockRestore();
+        });
+
         test("!logo.turtles.running() guard skips cleanup during active run", () => {
             timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
                 fn();
@@ -3545,6 +3585,37 @@ describe("Logo updateNotation", () => {
         test("does not tie rests", () => {
             Object.assign(singer, { beatsPerMeasure: 2, noteValuePerBeat: 4 });
             expect(stage(["R"], 0.25, 1)).toEqual({ pieces: [0.25, 0.5, 0.25], ties: 0 });
+        });
+
+        test("splits a note at up to 1000 barlines", () => {
+            // 4/4, a note of 1001 whole notes from a downbeat
+            Object.assign(singer, { beatsPerMeasure: 4, noteValuePerBeat: 4 });
+            const { pieces, ties } = stage(["C4"], 0, 1001);
+            expect(pieces).toHaveLength(1001);
+            expect(ties).toBe(1000);
+        });
+
+        test("splits a note at exactly 1000 barlines despite rounding", () => {
+            // A 1/11 note in a 1/11011 measure crosses 1000 barlines, but the
+            // ratio rounds to 1000.0000000000001.
+            Object.assign(singer, { beatsPerMeasure: 1, noteValuePerBeat: 11011 });
+            const { pieces, ties } = stage(["C4"], 0, 1 / 11);
+            expect(pieces).toHaveLength(1001);
+            expect(ties).toBe(1000);
+        });
+
+        test("writes a note across more than 1000 barlines without splitting it", () => {
+            Object.assign(singer, { beatsPerMeasure: 4, noteValuePerBeat: 4 });
+            const { pieces, ties } = stage(["C4"], 0, 1002);
+            expect(pieces).toHaveLength(1);
+            expect(pieces[0]).toBeCloseTo(1002);
+            expect(ties).toBe(0);
+        });
+
+        test("does not hang on a very small meter", () => {
+            // Each measure is too short to change the remaining time when subtracted.
+            Object.assign(singer, { beatsPerMeasure: 1e-20, noteValuePerBeat: 4 });
+            expect(stage(["C4"], 0, 0.25)).toEqual({ pieces: [0.25], ties: 0 });
         });
     });
 });
