@@ -428,7 +428,7 @@ function setupIntervalsActions(activity) {
             const i = arg > 0 ? Math.floor(arg) : Math.ceil(arg);
             tur.singer.intervals.push(i);
 
-            const listenerName = "_interval_" + turtle;
+            const listenerName = "_interval_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -462,7 +462,7 @@ function setupIntervalsActions(activity) {
 
             tur.singer.chordIntervals.push(arg);
 
-            const listenerName = "_chord_interval_" + turtle;
+            const listenerName = "_chord_interval_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -499,7 +499,7 @@ function setupIntervalsActions(activity) {
                 tur.singer.semitoneIntervals.push([i, tur.singer.noteDirection]);
                 tur.singer.noteDirection = 0;
 
-                const listenerName = "_semitone_interval_" + turtle;
+                const listenerName = "_semitone_interval_" + turtle + "_" + blk;
                 if (blk !== undefined && blk in activity.blocks.blockList) {
                     activity.logo.setDispatchBlock(blk, turtle, listenerName);
                 } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -532,7 +532,7 @@ function setupIntervalsActions(activity) {
 
             const tur = activity.turtles.ithTurtle(turtle);
             tur.singer.ratioIntervals.push(arg);
-            const listenerName = "_ratio_interval_" + turtle;
+            const listenerName = "_ratio_interval_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
