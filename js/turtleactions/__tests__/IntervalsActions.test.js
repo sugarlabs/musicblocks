@@ -559,7 +559,8 @@ describe("setupIntervalsActions", () => {
             ["C5 -> A3", "C", "A", -2, "s15g2 below"],
             ["G5 -> C4", "G", "C", -2, "s19g4 below"],
             ["C6 -> A3", "C", "A", -3, "s3g2,  two octaves below"],
-            ["C6 -> D4", "C", "D", -2, "s10g6,  one octave below"]
+            ["C6 -> D4", "C", "D", -2, "s10g6,  one octave below"],
+            ["C2 -> Cb4", "C", "Cb", 2, "s11g0, plus one octave"]
         ])(
             "%s counts only the octaves taken off the name",
             (_pair, first, second, octave, name) => {

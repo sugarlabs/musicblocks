@@ -214,23 +214,21 @@ function setupIntervalsActions(activity) {
             // suffix. Same offset scales proportionally for all EDOs.
             let octavesRemoved = 0;
             if (totalIntervals > temperamentLength + 9) {
-                if (octave >= 1) {
-                    lastWord = `, ${_("plus")} ${os} ${plural}`;
-                }
                 while (totalIntervals > temperamentLength) {
                     totalIntervals -= temperamentLength;
                     octavesRemoved += 1;
                 }
             }
 
+            // Count only the octaves taken off above: smaller intervals already
+            // have a compound name (e.g. tenth), and so does "diminished octave".
+            if (octavesRemoved > 0) {
+                const count = numberToStringMap[octavesRemoved - 1] || octavesRemoved;
+                const unit = octavesRemoved > 1 ? _("octaves") : _("octave");
+                lastWord = octave < 0 ? `,  ${count} ${unit}` : `, ${_("plus")} ${count} ${unit}`;
+            }
+
             if (octave < 0) {
-                // Smaller intervals already have a compound name (e.g. tenth),
-                // so only count the octaves taken off above.
-                if (octavesRemoved > 0) {
-                    const count = numberToStringMap[octavesRemoved - 1] || octavesRemoved;
-                    const unit = octavesRemoved > 1 ? _("octaves") : _("octave");
-                    lastWord = `,  ${count} ${unit}`;
-                }
                 lastWord += ` ${_("below")}`;
             }
 

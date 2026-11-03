@@ -36,7 +36,7 @@ describe("Current interval block", () => {
         cy.window({ timeout: 20000 }).should(win => {
             const blocks = win.ActivityContext.getActivity().blocks;
             const printBlocks = blocks.blockList.filter(blk => blk.name === "print");
-            expect(printBlocks, "all print blocks loaded").to.have.length(12);
+            expect(printBlocks, "all print blocks loaded").to.have.length(13);
         });
         cy.get("#play").click();
 
@@ -52,7 +52,8 @@ describe("Current interval block", () => {
             "Minor third below", // G4 -> E4
             "Minor tenth below", // C5 -> A3
             "Perfect twelfth below", // G5 -> C4
-            "Minor third,  two octaves below" // C6 -> A3
+            "Minor third,  two octaves below", // C6 -> A3
+            "Diminished octave, plus one octave" // C♯2 -> C4
         ];
         cy.wrap(printed, { timeout: 20000 }).should(messages => {
             const intervals = messages.filter(msg => !msg.startsWith("Start by"));
