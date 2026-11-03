@@ -152,10 +152,41 @@ function updateCheckboxes(id) {
     urlel.value = url;
 }
 
+function setupBackToTopButton() {
+    const backToTopBtn = document.getElementById("backToTopBtn");
+
+    if (!backToTopBtn) return;
+
+    const scrollThreshold = 250;
+    const scrollStopDelay = 200;
+    let scrollStopTimer = null;
+
+    const hideButton = () => {
+        backToTopBtn.classList.remove("is-visible");
+    };
+
+    const handleScroll = () => {
+        clearTimeout(scrollStopTimer);
+        hideButton();
+
+        if (window.scrollY <= scrollThreshold) return;
+
+        scrollStopTimer = setTimeout(() => {
+            if (window.scrollY > scrollThreshold) {
+                backToTopBtn.classList.add("is-visible");
+            }
+        }, scrollStopDelay);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+}
+
 $(document).ready(() => {
     $("#publisher").modal();
     $("#deleter").modal();
     $("#projectviewer").modal();
+
+    setupBackToTopButton();
 
     document.getElementById("global-search").addEventListener("input", evt => {
         document.getElementById("search-close").style.display =
@@ -186,6 +217,7 @@ if (typeof module !== "undefined" && module.exports) {
         toggleText,
         toggleExpandable,
         hideOnClickOutside,
-        updateCheckboxes
+        updateCheckboxes,
+        setupBackToTopButton
     };
 }

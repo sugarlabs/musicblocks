@@ -596,17 +596,61 @@ a {
 
 
 #backToTopBtn {
-	position: fixed;
-	bottom: 20px;
-	right: 20px;
-	background-color: #007BFF;
-	color: #fff;
-	border: none;
-	padding: 10px 15px;
-	border-radius: 5px;
-	cursor: pointer;
-	font-size: 16px;
-	outline: none;
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 10;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    outline: none;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(8px);
+    transition:
+        opacity 150ms ease,
+        transform 150ms ease,
+        visibility 150ms;
+}
+
+#backToTopBtn.is-visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+#backToTopBtn .material-icons {
+    font-size: 22px;
+}
+
+@media only screen and (max-width: 600px) {
+    #backToTopBtn {
+        right: 12px;
+        bottom: 12px;
+        width: 40px;
+        height: 40px;
+    }
+
+    #backToTopBtn .material-icons {
+        font-size: 20px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #backToTopBtn {
+        transition: none;
+    }
 }
 
 /* ── Fork button ───────────────────────────────────────────────────────── */
