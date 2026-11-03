@@ -694,6 +694,7 @@ describe("Planet", () => {
         let mockServerInterface;
         let mockOfflineCommitManager;
         let reconnectCallback;
+        let mockGlobalPlanet;
 
         beforeEach(() => {
             planet = new Planet(true, {});
@@ -712,6 +713,11 @@ describe("Planet", () => {
             };
             mockOfflineCommitManager = {};
             reconnectCallback = null;
+            mockGlobalPlanet = {
+                init: jest.fn()
+            };
+
+            global.GlobalPlanet = jest.fn().mockReturnValue(mockGlobalPlanet);
 
             global.StringHelper = jest.fn().mockReturnValue(mockStringHelper);
             global.ProjectStorage = jest.fn().mockReturnValue(mockProjectStorage);
@@ -735,6 +741,7 @@ describe("Planet", () => {
             delete global.ServerInterface;
             delete global.NetworkMonitor;
             delete global.OfflineCommitManager;
+            delete global.GlobalPlanet;
             document.body.innerHTML = "";
         });
 
@@ -822,6 +829,39 @@ describe("Planet", () => {
 
             expect(recoverFromOffline).toHaveBeenCalledTimes(1);
         });
+
+        it("should retry the tag manifest when startup failed before Global Planet initialized", async () => {
+            const offlineGlobalPlanet = {
+                recoverFromOffline: jest.fn().mockReturnValue(false),
+                destroy: jest.fn()
+            };
+
+            await planet.init();
+
+            planet.ConnectedToServer = false;
+            planet.GlobalPlanet = offlineGlobalPlanet;
+
+            mockServerInterface.getTagManifest.mockImplementationOnce(callback => {
+                callback({
+                    success: true,
+                    data: { music: { TagName: "Music" } }
+                });
+            });
+
+            reconnectCallback();
+
+            expect(offlineGlobalPlanet.recoverFromOffline).toHaveBeenCalledTimes(1);
+
+            expect(mockServerInterface.getTagManifest).toHaveBeenCalledTimes(2);
+
+            expect(planet.ConnectedToServer).toBe(true);
+            expect(planet.TagsManifest).toEqual({
+                music: { TagName: "Music" }
+            });
+
+            expect(offlineGlobalPlanet.destroy).toHaveBeenCalledTimes(1);
+            expect(global.GlobalPlanet).toHaveBeenCalledWith(planet);
+            expect(mockGlobalPlanet.init).toHaveBeenCalledTimes(1);
         });
     });
 

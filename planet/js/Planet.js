@@ -264,12 +264,28 @@ class Planet {
                 this.ProjectStorage,
                 this.ServerInterface,
                 () => {
+                    let recovered = false;
+
                     if (
                         this.GlobalPlanet &&
                         typeof this.GlobalPlanet.recoverFromOffline === "function"
                     ) {
-                        this.GlobalPlanet.recoverFromOffline();
+                        recovered = this.GlobalPlanet.recoverFromOffline();
                     }
+
+                    if (recovered || this.ConnectedToServer) return;
+
+                    this.ServerInterface.getTagManifest(data => {
+                        if (!data || !data.success) return;
+
+                        this.ConnectedToServer = true;
+                        this.TagsManifest = data.data;
+
+                        if (this.GlobalPlanet) this.GlobalPlanet.destroy();
+
+                        this.GlobalPlanet = new GlobalPlanet(this);
+                        this.GlobalPlanet.init();
+                    });
                 }
             );
             this.ServerInterface.attachOfflineManager(this.OfflineCommitManager);

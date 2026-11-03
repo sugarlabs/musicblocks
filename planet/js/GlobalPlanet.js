@@ -747,13 +747,25 @@ class GlobalPlanet {
             this.listenerRefs.push({ el, type, bound });
         };
 
+        const globalTitle = document.getElementById("globaltitle");
+        const globalContents = document.getElementById("globalcontents");
+        const startupOffline = document.getElementById("global-startup-offline");
+
         if (!Planet.ConnectedToServer) {
-            document.getElementById("globaltitle").textContent = _("Cannot connect to server");
-            document.getElementById("globalcontents").innerHTML = "";
-            document
-                .getElementById("globalcontents")
-                .insertAdjacentHTML("afterbegin", this.offlineHTML);
+            globalTitle.textContent = _("Cannot connect to server");
+            globalContents.style.display = "none";
+
+            if (!startupOffline) {
+                const offline = document.createElement("div");
+                offline.id = "global-startup-offline";
+                offline.insertAdjacentHTML("afterbegin", this.offlineHTML);
+                globalContents.insertAdjacentElement("afterend", offline);
+            }
         } else {
+            globalTitle.textContent = _("Explore Projects");
+            globalContents.style.display = "";
+
+            if (startupOffline) startupOffline.remove();
             jQuery("#sort-select").material_select(evt => {
                 this.sortBy = document.getElementById("sort-select").value;
                 this.refreshProjects();

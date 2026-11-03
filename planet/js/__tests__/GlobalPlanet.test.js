@@ -126,6 +126,35 @@ describe("GlobalPlanet", () => {
         });
     });
 
+    describe("init startup recovery", () => {
+        it("preserves Global Planet controls when startup is offline and restores them later", () => {
+            const globalContents = document.getElementById("globalcontents");
+            globalContents.innerHTML = '<div id="preserved-control"></div>';
+
+            mockPlanet.ConnectedToServer = false;
+
+            gp.init();
+
+            expect(globalContents.style.display).toBe("none");
+            expect(document.getElementById("preserved-control")).not.toBeNull();
+            expect(document.getElementById("global-startup-offline")).not.toBeNull();
+            expect(document.getElementById("globaltitle").textContent).toBe(
+                "Cannot connect to server"
+            );
+
+            mockPlanet.ConnectedToServer = true;
+
+            jest.spyOn(gp, "initTagList").mockImplementation(() => {});
+
+            gp.init();
+
+            expect(globalContents.style.display).toBe("");
+            expect(document.getElementById("global-startup-offline")).toBeNull();
+            expect(document.getElementById("preserved-control")).not.toBeNull();
+            expect(document.getElementById("globaltitle").textContent).toBe("Explore Projects");
+        });
+    });
+
     describe("recoverFromOffline", () => {
         it("refreshes projects when recovering from the offline state", () => {
             const refreshSpy = jest.spyOn(gp, "refreshProjects").mockImplementation(() => {});
