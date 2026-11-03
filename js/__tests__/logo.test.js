@@ -3586,6 +3586,37 @@ describe("Logo updateNotation", () => {
             Object.assign(singer, { beatsPerMeasure: 2, noteValuePerBeat: 4 });
             expect(stage(["R"], 0.25, 1)).toEqual({ pieces: [0.25, 0.5, 0.25], ties: 0 });
         });
+
+        test("splits a note at up to 1000 barlines", () => {
+            // 4/4, a note of 1001 whole notes from a downbeat
+            Object.assign(singer, { beatsPerMeasure: 4, noteValuePerBeat: 4 });
+            const { pieces, ties } = stage(["C4"], 0, 1001);
+            expect(pieces).toHaveLength(1001);
+            expect(ties).toBe(1000);
+        });
+
+        test("splits a note at exactly 1000 barlines despite rounding", () => {
+            // A 1/11 note in a 1/11011 measure crosses 1000 barlines, but the
+            // ratio rounds to 1000.0000000000001.
+            Object.assign(singer, { beatsPerMeasure: 1, noteValuePerBeat: 11011 });
+            const { pieces, ties } = stage(["C4"], 0, 1 / 11);
+            expect(pieces).toHaveLength(1001);
+            expect(ties).toBe(1000);
+        });
+
+        test("writes a note across more than 1000 barlines without splitting it", () => {
+            Object.assign(singer, { beatsPerMeasure: 4, noteValuePerBeat: 4 });
+            const { pieces, ties } = stage(["C4"], 0, 1002);
+            expect(pieces).toHaveLength(1);
+            expect(pieces[0]).toBeCloseTo(1002);
+            expect(ties).toBe(0);
+        });
+
+        test("does not hang on a very small meter", () => {
+            // Each measure is too short to change the remaining time when subtracted.
+            Object.assign(singer, { beatsPerMeasure: 1e-20, noteValuePerBeat: 4 });
+            expect(stage(["C4"], 0, 0.25)).toEqual({ pieces: [0.25], ties: 0 });
+        });
     });
 });
 
