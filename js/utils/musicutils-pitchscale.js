@@ -1268,8 +1268,22 @@ function getNote(
             const edoNames = generateNoteNames(octaveLength);
             const normalizedName = noteArg.replaceAll("#", SHARP).replaceAll("b", FLAT);
             const edoIdx = edoNames.indexOf(normalizedName);
+            const keyTonic = keySignature ? keySignatureToMode(keySignature)[0] : null;
             if (edoIdx !== -1) {
                 note = edoNames[edoIdx];
+            } else if (
+                normalizedName === "C" + FLAT &&
+                keyTonic === "C" + FLAT &&
+                edoNames.includes("B" + SHARP)
+            ) {
+                note = "B" + SHARP;
+                octave -= 1;
+            } else if (
+                normalizedName === "F" + FLAT &&
+                keyTonic === "F" + FLAT &&
+                edoNames.includes("E" + SHARP)
+            ) {
+                note = "E" + SHARP;
             } else if (noteArg in EXTRATRANSPOSITIONS) {
                 octave += EXTRATRANSPOSITIONS[noteArg][1];
                 note = EXTRATRANSPOSITIONS[noteArg][0];

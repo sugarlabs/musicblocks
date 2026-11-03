@@ -429,6 +429,23 @@ var _getStepSize = (keySignature, pitch, direction, transposition, temperament, 
     const scale = obj[0];
     const halfSteps = obj[1];
 
+    const keyTonic = keySignature ? keySignatureToMode(keySignature)[0] : null;
+    if (currentEDO !== 12 && keyTonic) {
+        if (
+            (thisPitch === "C" + FLAT || thisPitch === "Cb") &&
+            keyTonic === "C" + FLAT &&
+            scale[0] === "B" + SHARP
+        ) {
+            thisPitch = "B" + SHARP;
+        } else if (
+            (thisPitch === "F" + FLAT || thisPitch === "Fb") &&
+            keyTonic === "F" + FLAT &&
+            scale[0] === "E" + SHARP
+        ) {
+            thisPitch = "E" + SHARP;
+        }
+    }
+
     if (thisPitch in BTOFLAT) {
         thisPitch = BTOFLAT[thisPitch];
     } else if (thisPitch in STOSHARP) {
@@ -454,6 +471,22 @@ var _getStepSize = (keySignature, pitch, direction, transposition, temperament, 
             if (!Number.isNaN(pc1) && !Number.isNaN(pc2)) {
                 return pc1 === pc2;
             }
+        }
+        if (
+            keyTonic === "C" + FLAT &&
+            scale[0] === "B" + SHARP &&
+            ((s1 === "C" + FLAT && s2 === "B" + SHARP) ||
+                (s1 === "B" + SHARP && s2 === "C" + FLAT))
+        ) {
+            return true;
+        }
+        if (
+            keyTonic === "F" + FLAT &&
+            scale[0] === "E" + SHARP &&
+            ((s1 === "F" + FLAT && s2 === "E" + SHARP) ||
+                (s1 === "E" + SHARP && s2 === "F" + FLAT))
+        ) {
+            return true;
         }
         if (
             (s1 === "E" + SHARP && s2 === "F") ||
@@ -1009,6 +1042,23 @@ var getInterval = (interval, keySignature, pitch, edo) => {
         }
     }
     const is12EDO = currentEDO === 12;
+
+    const keyTonic = keySignature ? keySignatureToMode(keySignature)[0] : null;
+    if (currentEDO !== 12 && keyTonic) {
+        if (
+            (pitch === "C" + FLAT || pitch === "Cb") &&
+            keyTonic === "C" + FLAT &&
+            scale[0] === "B" + SHARP
+        ) {
+            pitch = "B" + SHARP;
+        } else if (
+            (pitch === "F" + FLAT || pitch === "Fb") &&
+            keyTonic === "F" + FLAT &&
+            scale[0] === "E" + SHARP
+        ) {
+            pitch = "E" + SHARP;
+        }
+    }
     const indexInScale = name => {
         const pitchClass = is12EDO ? _notePitchClass(name) : NaN;
         if (Number.isNaN(pitchClass)) {

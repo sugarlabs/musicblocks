@@ -544,13 +544,18 @@ function setupPitchBlocks(activity) {
                         notePlayed = arg1;
                     }
                 } else if (activity.blocks.blockList[cblk1].name === "scaledegree2") {
-                    notePlayed = scaleDegreeToPitchMapping(
+                    const mappedPitch = scaleDegreeToPitchMapping(
                         tur.singer.keySignature,
                         activity.blocks.blockList[cblk1].value,
                         tur.singer.movable,
                         null
                     );
-                    notePlayed += tur.singer.currentOctave ? tur.singer.currentOctave : 4;
+                    if (mappedPitch === null) {
+                        return INVALIDPITCH;
+                    }
+                    notePlayed =
+                        mappedPitch +
+                        (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
                 } else {
                     if (typeof arg1 === "string") {
                         // Is it a number encoded as a string?
@@ -838,14 +843,28 @@ function setupPitchBlocks(activity) {
                 }
 
                 // Now that we have the note, look for its pitch number.
-                lc = NOTESSHARP.indexOf(thisNote);
-                if (lc === -1) {
-                    lc = NOTESFLAT.indexOf(thisNote);
+                const temperament = logo?.synth?.inTemperament || "equal";
+                const currentEDO = getCurrentEDO(temperament);
+                if (currentEDO === 12) {
+                    lc = NOTESSHARP.indexOf(thisNote);
+                    if (lc === -1) {
+                        lc = NOTESFLAT.indexOf(thisNote);
+                    }
+                    return lc + 12 * o;
+                } else {
+                    const edoNames = generateNoteNames(currentEDO);
+                    lc = edoNames.indexOf(thisNote);
+                    if (lc === -1) {
+                        lc = NOTESSHARP.indexOf(thisNote);
+                        if (lc === -1) {
+                            lc = NOTESFLAT.indexOf(thisNote);
+                        }
+                        if (lc !== -1) {
+                            lc = Math.round((lc / 12) * currentEDO);
+                        }
+                    }
+                    return (lc !== -1 ? lc : 0) + currentEDO * o;
                 }
-
-                // Since we are using the staff, it is OK to assume 12
-                // half-steps per octave.
-                return lc + 12 * o;
             } else if (activity.blocks.blockList[cblk0].name === "nthmodalpitch") {
                 if (cblk1 === null) {
                     return 5;
@@ -2067,6 +2086,11 @@ function setupPitchBlocks(activity) {
                         tur.singer.movable,
                         null
                     );
+                    if (note === null) {
+                        activity.errorMsg(INVALIDPITCH, blk);
+                        logo.stopTurtle = true;
+                        return;
+                    }
                     if (attr !== NATURAL) {
                         // A sharp on a flat note of the key, or a flat on a sharp
                         // one, cancels it (7♭ in G major is F, not F♯♭).

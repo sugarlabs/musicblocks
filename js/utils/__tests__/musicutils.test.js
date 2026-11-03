@@ -2847,12 +2847,14 @@ describe("getStepSize", () => {
         expect(_getStepSize("C♭ major", "B", "up", 0, "equal", 19)).toBe(1);
         // From B♯ (the tonic) to next scale degree (D♭) is 3 steps.
         expect(_getStepSize("C♭ major", "B♯", "up", 0, "equal", 19)).toBe(3);
+        expect(_getStepSize("C♭ major", "C♭", "up", 0, "equal", 19)).toBe(3);
         // From C (pos 0) in C♭ major (tonic B♯ at pos 18), next note is D♭ (pos 2), which is 2 steps up.
         expect(_getStepSize("C♭ major", "C", "up", 0, "equal", 19)).toBe(2);
         expect(_getStepSize("C♭ major", "C", "down", 0, "equal", 19)).toBe(-1);
         // In 19-EDO F♭ maps to E♯, which is 1 step above E (index 6 -> 7).
         expect(_getStepSize("F♭ major", "E", "up", 0, "equal", 19)).toBe(1);
         expect(_getStepSize("F♭ major", "E♯", "up", 0, "equal", 19)).toBe(3);
+        expect(_getStepSize("F♭ major", "F♭", "up", 0, "equal", 19)).toBe(3);
         // From F (pos 8) in F♭ major (tonic E♯ at pos 7), next note is G♭ (pos 10), which is 2 steps up.
         expect(_getStepSize("F♭ major", "F", "up", 0, "equal", 19)).toBe(2);
         expect(_getStepSize("F♭ major", "F", "down", 0, "equal", 19)).toBe(-1);
@@ -3037,6 +3039,8 @@ describe("getInterval", () => {
         expect(getInterval(1, "C major", "C♭", 19)).toBe(2);
         // In 19-EDO C♭ major generates 19-EDO steps [3, 3, 2, 3, 3, 3, 2] with tonic B♯.
         expect(getInterval(2, "C♭ major", "B♯", 19)).toBe(6);
+        expect(getInterval(2, "C♭ major", "C♭", 19)).toBe(6);
+        expect(getInterval(2, "F♭ major", "F♭", 19)).toBe(6);
     });
 
     it("should use the current temperament's EDO when none is given", () => {
@@ -4815,6 +4819,44 @@ describe("getNote additional paths", () => {
             0
         ]);
         expect(errorMsg).toHaveBeenCalledWith(global.INVALIDPITCH, null);
+    });
+
+    it("resolves C♭ and F♭ in non-12 EDO only when matching key tonic", () => {
+        // In 19-EDO, C♭ tonic maps to B♯ (with octave - 1) and F♭ tonic maps to E♯
+        expect(getNote("C♭", 4, 0, "C♭ major", false, undefined, undefined, "equal19")).toEqual([
+            "B♯",
+            3,
+            0
+        ]);
+        expect(getNote("F♭", 4, 0, "F♭ major", false, undefined, undefined, "equal19")).toEqual([
+            "E♯",
+            4,
+            0
+        ]);
+
+        // When key tonic is not C♭ / F♭, falls back to standard EXTRATRANSPOSITIONS (B and E)
+        expect(getNote("C♭", 4, 0, "G major", false, undefined, undefined, "equal19")).toEqual([
+            "B",
+            3,
+            0
+        ]);
+        expect(getNote("F♭", 4, 0, "G major", false, undefined, undefined, "equal19")).toEqual([
+            "E",
+            4,
+            0
+        ]);
+
+        // In 31-EDO, C♭ and F♭ are native EDO note names and resolve directly
+        expect(getNote("C♭", 4, 0, "C♭ major", false, undefined, undefined, "equal31")).toEqual([
+            "C♭",
+            4,
+            0
+        ]);
+        expect(getNote("F♭", 4, 0, "F♭ major", false, undefined, undefined, "equal31")).toEqual([
+            "F♭",
+            4,
+            0
+        ]);
     });
 
     it("uses key preference and direction to choose enharmonic spelling", () => {
