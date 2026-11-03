@@ -3583,8 +3583,23 @@ describe("getSolfege", () => {
         expect(getSolfege("A♯")).toBe("la" + SHARP);
     });
 
-    it("should return undefined for invalid notes not present in the conversion table", () => {
+    it("should return the correct solfege for ASCII sharp and flat notes", () => {
+        expect(getSolfege("C#")).toBe("do" + SHARP);
+        expect(getSolfege("Db")).toBe("re" + FLAT);
+        expect(getSolfege("F#")).toBe("fa" + SHARP);
+        expect(getSolfege("Bb")).toBe("ti" + FLAT);
+        expect(getSolfege("c#")).toBe("do" + SHARP);
+        expect(getSolfege("db")).toBe("re" + FLAT);
+        expect(getSolfege("c")).toBe("do");
+        expect(getSolfege("bb")).toBe("ti" + FLAT);
+        expect(getSolfege("b#")).toBe("ti" + SHARP);
+        expect(getSolfege("bbb")).toBe("bbb");
+        expect(getSolfege("b##")).toBe("b##");
+    });
+
+    it("should return the note itself for invalid notes not present in the conversion table", () => {
         expect(getSolfege("X")).toBe("X");
+        expect(getSolfege("Hb")).toBe("Hb");
     });
 
     it("should return correct movable solfege", () => {
