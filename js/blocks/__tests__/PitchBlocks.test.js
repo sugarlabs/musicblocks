@@ -747,6 +747,28 @@ describe("setupPitchBlocks", () => {
 
             spy.mockRestore();
         });
+
+        it.each([
+            ["number2pitch", Infinity, "A"],
+            ["number2pitch", -Infinity, "A"],
+            ["number2pitch", NaN, "A"],
+            ["number2octave", Infinity, 0],
+            ["number2octave", -Infinity, 0],
+            ["number2octave", NaN, 0]
+        ])("stops on non-finite input for %s", (name, value, fallback) => {
+            const blk = 30;
+            const block = createdBlocks[name];
+            activity.blocks.blockList[blk] = { name, connections: [null, 31] };
+            logo.parseArg = jest.fn(() => value);
+            logo.stopTurtle = false;
+            activity.errorMsg.mockClear();
+            global.Singer.PitchActions.numToPitch.mockClear();
+
+            expect(block.arg(logo, 0, blk, null)).toBe(fallback);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG, blk);
+            expect(logo.stopTurtle).toBe(true);
+            expect(global.Singer.PitchActions.numToPitch).not.toHaveBeenCalled();
+        });
     });
 
     describe("OutputToolsBlocks Extensive", () => {

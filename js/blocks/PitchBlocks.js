@@ -742,9 +742,15 @@ function setupPitchBlocks(activity) {
             const cblk = activity.blocks.blockList[blk].connections[1];
             const num = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
 
+            const outType =
+                activity.blocks.blockList[blk].name === "number2pitch" ? "pitch" : "octave";
+            if (typeof num === "number" && !Number.isFinite(num)) {
+                activity.errorMsg(NANERRORMSG, blk);
+                logo.stopTurtle = true;
+                return outType === "pitch" ? "A" : 0;
+            }
+
             try {
-                const outType =
-                    activity.blocks.blockList[blk].name === "number2pitch" ? "pitch" : "octave";
                 return Singer.PitchActions.numToPitch(num, outType, turtle);
             } catch (e) {
                 if (e === "NoArgError") {

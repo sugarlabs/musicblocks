@@ -4804,6 +4804,19 @@ describe("numberToPitch additional temperament paths", () => {
         expect(numberToPitch(-12)).toEqual(["A", -1]);
     });
 
+    it.each([NaN, Infinity, -Infinity])(
+        "returns an invalid pitch for non-finite input %p",
+        value => {
+            const [note, octave] = numberToPitch(value);
+            expect(note).toBeUndefined();
+            expect(Number.isNaN(octave)).toBe(true);
+        }
+    );
+
+    it("converts large negative pitch numbers without iterating once per octave", () => {
+        expect(numberToPitch(-1200000)).toEqual(["A", -100000]);
+    });
+
     it("reports and falls back when a custom temperament is missing", () => {
         const activity = { errorMsg: jest.fn() };
 

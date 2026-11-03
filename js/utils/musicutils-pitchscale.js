@@ -760,6 +760,10 @@ var getNoteFromInterval = (pitch, interval, temperament) => {
 var numberToPitch = (i, temperament, startPitch, offset, activity) => {
     // Calculate the pitch and octave based on index.
     // We start at A0.
+    if (!Number.isFinite(i)) {
+        return [undefined, NaN];
+    }
+
     if (temperament === undefined) {
         temperament = "equal";
     }
@@ -768,10 +772,8 @@ var numberToPitch = (i, temperament, startPitch, offset, activity) => {
     let n = 0;
     let pitchNumber;
     if (i < 0) {
-        while (i < 0) {
-            i += currentEDO;
-            n += 1; // Count octave bump ups.
-        }
+        n = Math.max(1, Math.ceil(-i / currentEDO));
+        i += n * currentEDO;
 
         if (isTrueEDO(temperament)) {
             if (currentEDO === 12) {
