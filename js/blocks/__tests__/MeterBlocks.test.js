@@ -698,6 +698,34 @@ describe("MeterBlocks setup", () => {
         expect(turtle.singer.bpm[turtle.singer.bpm.length - 1]).toBe(1000);
     });
 
+    it("rejects non-positive and non-finite setbpm2 inputs but still runs the clamp", () => {
+        const block = getBlock("setbpm2");
+        const turtle = { singer: { bpm: [] } };
+        activity.turtles.ithTurtle.mockReturnValue(turtle);
+
+        [0, -2, NaN, Infinity].forEach(beatValue => {
+            activity.errorMsg.mockClear();
+            expect(block.flow([90, beatValue, "next"], logo, 0, "flow")).toEqual(["next", 1]);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Beat value must be a positive number.",
+                "flow"
+            );
+        });
+
+        [0, -90, NaN, Infinity].forEach(bpm => {
+            activity.errorMsg.mockClear();
+            expect(block.flow([bpm, 0.25, "next"], logo, 0, "flow")).toEqual(["next", 1]);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "BPM must be a positive number.",
+                "flow"
+            );
+        });
+
+        expect(logo.notation.notationTempo).not.toHaveBeenCalled();
+        expect(turtle.singer.bpm).toEqual([]);
+        expect(logo.setTurtleListener).not.toHaveBeenCalled();
+    });
+
     it("pushes and pops BPM values with the older setbpm block", () => {
         const block = getBlock("setbpm");
         const turtle = { singer: { bpm: [] } };

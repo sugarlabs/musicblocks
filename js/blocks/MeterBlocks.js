@@ -1250,6 +1250,18 @@ function setupMeterBlocks(activity) {
             const tur = activity.turtles.ithTurtle(turtle);
 
             if (args.length === 3 && typeof args[0] === "number" && typeof args[1] === "number") {
+                // Same guard as Singer.MeterActions.setBPM: zero would make the
+                // notated tempo Infinity, and negatives give a nonsense tempo.
+                if (!Number.isFinite(args[0]) || args[0] <= 0) {
+                    activity.errorMsg(_("BPM must be a positive number."), blk);
+                    return [args[2], 1];
+                }
+
+                if (!Number.isFinite(args[1]) || args[1] <= 0) {
+                    activity.errorMsg(_("Beat value must be a positive number."), blk);
+                    return [args[2], 1];
+                }
+
                 let bpm = (args[0] * args[1]) / 0.25;
                 if (bpm < 30) {
                     activity.errorMsg(_("Beats per minute must be > 30."));
