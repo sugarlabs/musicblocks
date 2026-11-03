@@ -1004,12 +1004,24 @@ describe("afterSaveMIDI instrument channels", () => {
     let mockMidi;
     let instance;
     let written;
+    let bytes;
 
-    // The file as it is written: a track read back without notes loses its channel.
+    // Exports the notes and returns the tracks as they were built. Reading the file back
+    // drops the channel of a track with no notes, so the file is checked against the
+    // built tracks only for the tracks that have notes.
     const exportMidi = data => {
         instance.activity.logo._midiData = data;
         instance.afterSaveMIDI();
         jest.runAllTimers();
+        new ToneMidi(bytes).tracks
+            .filter(t => t.notes.length > 0)
+            .forEach(t => {
+                const built = written.tracks.find(b => b.name === t.name);
+                expect([t.channel, t.instrument.number]).toEqual([
+                    built.channel,
+                    built.instrument.number
+                ]);
+            });
         return written;
     };
 
@@ -1021,7 +1033,8 @@ describe("afterSaveMIDI instrument channels", () => {
         drum
     });
 
-    // Every program change a track writes, as [channel, program], in track order.
+    // The channel and instrument of every track, as [channel, program], in track order.
+    // The encoder writes one program change per track with these.
     const programs = midi => midi.tracks.map(t => [t.channel, t.instrument.number]);
 
     // A channel plays one instrument at a time, so no channel may carry two.
@@ -1042,7 +1055,8 @@ describe("afterSaveMIDI instrument channels", () => {
         global.Midi = class extends ToneMidi {
             toArray() {
                 written = this;
-                return super.toArray();
+                bytes = super.toArray();
+                return bytes;
             }
         };
         const activity = { logo: {}, save: { download: jest.fn() } };
