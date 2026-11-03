@@ -1042,10 +1042,26 @@ function setupProgramBlocks(activity) {
             if (typeof args[0] === "string") {
                 // Look for a block with logo name
                 for (let i = 0; i < activity.blocks.blockList.length; i++) {
-                    if (
-                        activity.blocks.blockList[i]?.protoblock.staticLabels.length > 0 &&
-                        activity.blocks.blockList[i].protoblock.staticLabels[0] === args[0]
-                    ) {
+                    const candidate = activity.blocks.blockList[i];
+                    let matchesName;
+
+                    if (candidate.name === "action") {
+                        const nameConnection = candidate.connections[1];
+                        const nameBlock =
+                            nameConnection === null
+                                ? null
+                                : activity.blocks.blockList[nameConnection];
+                        matchesName =
+                            nameBlock !== null &&
+                            nameBlock !== undefined &&
+                            nameBlock.value === args[0];
+                    } else {
+                        matchesName =
+                            candidate.protoblock.staticLabels.length > 0 &&
+                            candidate.protoblock.staticLabels[0] === args[0];
+                    }
+
+                    if (matchesName) {
                         args[0] = i;
                         break;
                     }

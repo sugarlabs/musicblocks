@@ -972,6 +972,33 @@ describe("ProgramBlocks", () => {
             expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 5);
             expect(logo.runFromBlock).not.toHaveBeenCalled();
         });
+
+        test.each([
+            ["renamed", [0, 1]],
+            ["action", undefined]
+        ])("matches the actual name of an action block: %s", (targetName, expectedFlow) => {
+            const block = getBlock("runblock");
+            activity.blocks.blockList = [
+                {
+                    name: "action",
+                    protoblock: { staticLabels: ["action"] },
+                    connections: [null, 1]
+                },
+                { name: "text", value: "renamed", protoblock: { staticLabels: [] } }
+            ];
+
+            const args = [targetName];
+            const flow = block.flow(args, logo, 0, 5);
+
+            if (expectedFlow === undefined) {
+                expect(args[0]).toBe(-1);
+                expect(flow).toBeUndefined();
+                expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 5);
+            } else {
+                expect(args[0]).toBe(0);
+                expect(flow).toEqual(expectedFlow);
+            }
+        });
     });
 
     describe("DockBlock", () => {
