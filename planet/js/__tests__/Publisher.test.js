@@ -150,11 +150,40 @@ describe("Publisher", () => {
             interactive: { TagName: "Interactive", IsTagUserAddable: "1" }
         };
 
-        it("suggests every tag its score earns, by manifest id", () => {
+        it("suggests every tag its score earns, by manifest id (JSON string input)", () => {
             mockPlanet.TagsManifest = LIVE_MANIFEST;
             // mock score: pitch+tone, mouse+pen, number and sensors are all set
             const tags = publisher.dataToTags('[[0,"start",100,100,[null,1]]]');
             expect(tags).toEqual(["music", "art", "interactive", "math"]);
+        });
+
+        it("suggests every tag its score earns with already-parsed array input", () => {
+            mockPlanet.TagsManifest = LIVE_MANIFEST;
+            const projectBlocks = [
+                [0, "start", 100, 100, [null, 1]],
+                [1, ["number", 4], 0, 0, [0]]
+            ];
+            const tags = publisher.dataToTags(projectBlocks);
+            expect(tags).toEqual(["music", "art", "interactive", "math"]);
+            expect(mockPlanet.analyzeProject).toHaveBeenCalledWith({
+                blockList: [
+                    { name: "start", connections: [null, 1] },
+                    { name: "number", connections: [0] }
+                ]
+            });
+        });
+
+        it("produces identical tag suggestions for JSON string and parsed array representations", () => {
+            mockPlanet.TagsManifest = LIVE_MANIFEST;
+            mockPlanet.analyzeProject.mockReturnValue([0, 1, 1, 0, 0, 4, 0, 0, 0, 0, 0]);
+            const projectBlocks = [
+                [0, "start", 100, 100, [null, 1]],
+                [1, ["number", 4], 0, 0, [0]]
+            ];
+            const jsonTags = publisher.dataToTags(JSON.stringify(projectBlocks));
+            const arrayTags = publisher.dataToTags(projectBlocks);
+            expect(arrayTags).toEqual(jsonTags);
+            expect(arrayTags).toEqual(["music", "math"]);
         });
 
         it("suggests only the tags the score earns", () => {
@@ -194,11 +223,54 @@ describe("Publisher", () => {
             ]);
         });
 
-        it("should return empty array for invalid JSON", () => {
+        it("fails safely and returns empty tag list for invalid JSON and unsupported data types", () => {
             const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-            const tags = publisher.dataToTags("not json");
-            expect(tags).toEqual([]);
+            expect(publisher.dataToTags("not valid json")).toEqual([]);
+            expect(publisher.dataToTags(null)).toEqual([]);
+            expect(publisher.dataToTags(undefined)).toEqual([]);
+            expect(publisher.dataToTags(123)).toEqual([]);
+            expect(publisher.dataToTags(true)).toEqual([]);
+            expect(publisher.dataToTags({})).toEqual([]);
+            expect(publisher.dataToTags({ blocks: [] })).toEqual([]);
+            expect(publisher.dataToTags('{"not": "an array"}')).toEqual([]);
+            expect(consoleSpy).toHaveBeenCalled();
             consoleSpy.mockRestore();
+        });
+
+        it("safely skips malformed block entries without crashing tag extraction", () => {
+            mockPlanet.TagsManifest = LIVE_MANIFEST;
+            mockPlanet.analyzeProject.mockReturnValue([0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0]);
+            const malformedData = [
+                null,
+                "not an array",
+                123,
+                [],
+                [0, null, 0, 0, []],
+                [1, 999, 0, 0, []],
+                [2, [null], 0, 0, []],
+                [3, "pitch", 100, 100, [null, 4]],
+                [4, ["tone", 1], 0, 0, [3]]
+            ];
+
+            const tags = publisher.dataToTags(malformedData);
+            expect(tags).toEqual(["music"]);
+            expect(mockPlanet.analyzeProject).toHaveBeenCalledWith({
+                blockList: [
+                    { name: "pitch", connections: [null, 4] },
+                    { name: "tone", connections: [3] }
+                ]
+            });
+        });
+
+        it("does not mutate the input project data array or its block objects", () => {
+            const projectBlocks = [
+                [0, "start", 100, 100, [null, 1, null]],
+                [1, ["number", 4], 0, 0, [0]],
+                [2, "newnote", 0, 0, [1, null]]
+            ];
+            const clone = JSON.parse(JSON.stringify(projectBlocks));
+            publisher.dataToTags(projectBlocks);
+            expect(projectBlocks).toEqual(clone);
         });
 
         it("should handle empty array data", () => {
@@ -367,6 +439,21 @@ describe("Publisher", () => {
             expect(publisher.parseProject({ blocks: [] })).toBe("");
             expect(publisher.parseProject('{"not": "an array"}')).toBe("");
         });
+
+        it("should skip malformed or non-array block entries safely", () => {
+            const projectBlocks = [
+                null,
+                "not-a-block",
+                [0, "start", 100, 100, [null, 1, null]],
+                123,
+                undefined,
+                [1, null, 0, 0, []],
+                [2, "newnote", 0, 0, [0, 2, 3, null]],
+                {}
+            ];
+            const result = publisher.parseProject(projectBlocks);
+            expect(result).toBe("start newnote");
+        });
     });
 
     describe("publishProject with already-parsed ProjectData", () => {
@@ -514,6 +601,12 @@ describe("Publisher", () => {
     });
 
     describe("open", () => {
+        const LIVE_MANIFEST = {
+            music: { TagName: "Music", IsTagUserAddable: "1" },
+            math: { TagName: "Math", IsTagUserAddable: "1" },
+            art: { TagName: "Art", IsTagUserAddable: "1" }
+        };
+
         it("titles the dialog with the translated publish string", () => {
             publisher.open("proj-1");
             expect(global._).toHaveBeenCalledWith("Publish project");
@@ -526,6 +619,82 @@ describe("Publisher", () => {
             expect(document.getElementById("publisher-ptitle").textContent).toBe(
                 "Republish project"
             );
+        });
+
+        it("pre-selects automatic tag suggestions when ProjectData is an already-parsed array", () => {
+            mockPlanet.TagsManifest = LIVE_MANIFEST;
+            mockPlanet.analyzeProject.mockReturnValue([0, 1, 1, 0, 0, 4, 0, 0, 0, 0, 0]);
+            const parsedBlocks = [
+                [0, "start", 100, 100, [null, 1, null]],
+                [1, "newnote", 0, 0, [0, 2, 3, null]]
+            ];
+            mockPlanet.LocalPlanet.ProjectTable["proj-parsed-tags"] = {
+                ProjectName: "Parsed Tags Project",
+                ProjectImage: "parsed.png",
+                ProjectData: parsedBlocks,
+                PublishedData: null,
+                GitRepoData: null
+            };
+
+            const setTagsSpy = jest.spyOn(publisher, "setTags");
+            const setTagInputSpy = jest
+                .spyOn(publisher, "setTagInput")
+                .mockImplementation(() => {});
+
+            publisher.open("proj-parsed-tags");
+
+            expect(setTagsSpy).toHaveBeenCalledWith(["music", "math"]);
+            expect(setTagInputSpy).toHaveBeenCalledWith([
+                { tag: "Music", id: "music" },
+                { tag: "Math", id: "math" }
+            ]);
+        });
+
+        it("retains priority of existing saved tags (PublishedData.ProjectTags) over auto-detected tags", () => {
+            mockPlanet.LocalPlanet.ProjectTable["proj-saved-tags"] = {
+                ProjectName: "Saved Tags Project",
+                ProjectImage: "saved.png",
+                ProjectData: [[0, "start", 100, 100, [null, 1, null]]],
+                PublishedData: {
+                    ProjectDescription: "Saved description",
+                    ProjectTags: ["1"]
+                },
+                GitRepoData: {
+                    tags: ["2"]
+                }
+            };
+
+            const setTagsSpy = jest.spyOn(publisher, "setTags");
+            const setTagInputSpy = jest
+                .spyOn(publisher, "setTagInput")
+                .mockImplementation(() => {});
+
+            publisher.open("proj-saved-tags");
+
+            expect(setTagsSpy).toHaveBeenCalledWith(["1"]);
+            expect(setTagInputSpy).toHaveBeenCalledWith([{ tag: "Music", id: "1" }]);
+        });
+
+        it("retains priority of Git repository tags over auto-detected tags when no published tags exist", () => {
+            mockPlanet.LocalPlanet.ProjectTable["proj-git-tags"] = {
+                ProjectName: "Git Tags Project",
+                ProjectImage: "git.png",
+                ProjectData: [[0, "start", 100, 100, [null, 1, null]]],
+                PublishedData: null,
+                GitRepoData: {
+                    tags: ["2"]
+                }
+            };
+
+            const setTagsSpy = jest.spyOn(publisher, "setTags");
+            const setTagInputSpy = jest
+                .spyOn(publisher, "setTagInput")
+                .mockImplementation(() => {});
+
+            publisher.open("proj-git-tags");
+
+            expect(setTagsSpy).toHaveBeenCalledWith(["2"]);
+            expect(setTagInputSpy).toHaveBeenCalledWith([{ tag: "Art", id: "2" }]);
         });
     });
 

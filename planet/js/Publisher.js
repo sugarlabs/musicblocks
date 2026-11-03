@@ -38,13 +38,25 @@ class Publisher {
         this.IsShareLink = false;
     }
 
+    /**
+     * Convert project data (JSON string or parsed block array) to tag suggestions.
+     *
+     * @param {string|Array} DATA - JSON string of project blocks or parsed block array
+     * @returns {Array<string>} list of suggested tag IDs
+     */
     dataToTags(DATA) {
         // convert to blocks like structure.
-        let parsed;
-        try {
-            parsed = JSON.parse(DATA);
-        } catch (e) {
-            console.error("Publisher.dataToTags: Invalid JSON data", e);
+        let parsed = DATA;
+        if (typeof DATA === "string") {
+            try {
+                parsed = JSON.parse(DATA);
+            } catch (e) {
+                console.error("Publisher.dataToTags: Invalid JSON data", e);
+                return [];
+            }
+        }
+
+        if (!Array.isArray(parsed)) {
             return [];
         }
 
@@ -53,8 +65,23 @@ class Publisher {
         };
 
         for (const i of parsed) {
+            if (!Array.isArray(i)) {
+                continue;
+            }
+
+            let name = null;
+            if (typeof i[1] === "string") {
+                name = i[1];
+            } else if (Array.isArray(i[1])) {
+                name = i[1][0];
+            }
+
+            if (!name || typeof name !== "string") {
+                continue;
+            }
+
             const block = {};
-            block.name = typeof i[1] === "string" ? i[1] : i[1][0];
+            block.name = name;
             block.connections = i[4];
             blocks.blockList.push(block);
         }
