@@ -330,8 +330,18 @@ describe("setupBackToTopButton", () => {
 
         expect(button.classList.contains("is-visible")).toBe(false);
 
-        // After scrolling stops, the button should appear.
-        jest.advanceTimersByTime(200);
+        // Another scroll before the delay expires should reset the timer.
+        jest.advanceTimersByTime(100);
+
+        window.scrollY = 350;
+        window.dispatchEvent(new Event("scroll"));
+
+        jest.advanceTimersByTime(100);
+
+        expect(button.classList.contains("is-visible")).toBe(false);
+
+        // It should appear only after scrolling has stopped for the full delay.
+        jest.advanceTimersByTime(100);
 
         expect(button.classList.contains("is-visible")).toBe(true);
 
@@ -340,6 +350,29 @@ describe("setupBackToTopButton", () => {
         window.dispatchEvent(new Event("scroll"));
 
         expect(button.classList.contains("is-visible")).toBe(false);
+
+        jest.useRealTimers();
+    });
+
+    it("initializes the button state when the page loads past the threshold", () => {
+        jest.useFakeTimers();
+
+        document.body.innerHTML = '<button id="backToTopBtn"></button>';
+        const button = document.getElementById("backToTopBtn");
+
+        Object.defineProperty(window, "scrollY", {
+            value: 300,
+            writable: true,
+            configurable: true
+        });
+
+        setupBackToTopButton();
+
+        expect(button.classList.contains("is-visible")).toBe(false);
+
+        jest.advanceTimersByTime(200);
+
+        expect(button.classList.contains("is-visible")).toBe(true);
 
         jest.useRealTimers();
     });

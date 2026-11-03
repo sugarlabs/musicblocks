@@ -179,6 +179,7 @@ function setupBackToTopButton() {
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
 }
 
 $(document).ready(() => {
