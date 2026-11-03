@@ -12,6 +12,7 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const { createInstrumenter } = require("istanbul-lib-instrument");
 
 // Captures every wheelnav instance created by displayHelpfulWheel so tests
 // can assert on the labels passed to initWheel.
@@ -41,6 +42,13 @@ const loadActivityClass = () => {
     if (splitPoint !== -1) {
         code = code.substring(0, splitPoint);
     }
+
+    const instrumenter = createInstrumenter({
+        coverageVariable: "__coverage__",
+        esModules: false,
+        compact: true
+    });
+    code = instrumenter.instrumentSync(code, activityPath);
 
     // ContextMenuController now owns _setupPaletteMenu/_displayHelpfulWheel.
     // Concatenate its source (minus the AMD/CommonJS export tail) ahead of
@@ -114,6 +122,7 @@ const loadActivityClass = () => {
         hideDOMLabel: jest.fn(),
         setupActivityRecorder: jest.fn(),
         setupActivityAbcParser: jest.fn(),
+        setupActivityMxmlParser: jest.fn(),
         AlertController: {
             MSG_TIMEOUT: 60000,
             ERROR_MSG_TIMEOUT: 15000
@@ -121,6 +130,7 @@ const loadActivityClass = () => {
         performance: global.performance || { now: () => Date.now() },
         platformColor: { stopIconcolor: "red", wheelcolors: [] },
         globalActivity: null,
+        __coverage__: global.__coverage__ || (global.__coverage__ = {}),
         LEADING: 0,
         MYDEFINES: [],
 
@@ -151,16 +161,17 @@ const loadActivityClass = () => {
 
     vm.createContext(sandbox);
     vm.runInContext(code, sandbox);
-    return sandbox.Activity;
+    return { Activity: sandbox.Activity, sandbox };
 };
 
 describe("Helpful wheel bulk actions (issue #7794)", () => {
     let Activity;
+    let activitySandbox;
     let activity;
     let mockElement;
 
     beforeAll(() => {
-        Activity = loadActivityClass();
+        ({ Activity, sandbox: activitySandbox } = loadActivityClass());
     });
 
     beforeEach(() => {
@@ -189,6 +200,7 @@ describe("Helpful wheel bulk actions (issue #7794)", () => {
         window.jQuery = jest.fn(() => ({ tooltip: jest.fn() }));
 
         activity = new Activity();
+        activitySandbox.activity = activity;
 
         activity.cellSize = 40;
         activity.contextMenuController.makeButton = jest.fn(() => mockElement);
@@ -225,6 +237,60 @@ describe("Helpful wheel bulk actions (issue #7794)", () => {
             expect(dup).toBeDefined();
             expect(dup.display).toBe(false);
             expect(dup.fn).toBe(activity.copyMultipleBlocks);
+        });
+    });
+
+    describe("horizontal scrolling in beginner mode", () => {
+        test("updates the enabled state and helpful-wheel actions consistently", () => {
+            const enableIcon = { style: {} };
+            const disableIcon = { style: {} };
+            document.getElementById = jest.fn(id =>
+                id === "enableHorizScrollIcon" ? enableIcon : disableIcon
+            );
+            activity.beginnerMode = true;
+            activity.scrollBlockContainer = false;
+            activity.blocks = { activeBlock: 7 };
+            activity.helpfulWheelItems = [
+                { label: "Enable horizontal scrolling", display: true },
+                { label: "Disable horizontal scrolling", display: false }
+            ];
+            activity.textMsg = jest.fn();
+
+            activity._setScroller();
+
+            expect(activity.scrollBlockContainer).toBe(true);
+            expect(activity.blocks.activeBlock).toBeNull();
+            expect(enableIcon.style.display).toBe("none");
+            expect(disableIcon.style.display).toBe("block");
+            expect(activity.helpfulWheelItems[0].display).toBe(false);
+            expect(activity.helpfulWheelItems[1].display).toBe(true);
+            expect(activity.textMsg).toHaveBeenCalledWith("Horizontal scrolling enabled.", 3000);
+        });
+
+        test("updates the enabled state and helpful-wheel actions when scrolling is disabled", () => {
+            const enableIcon = { style: {} };
+            const disableIcon = { style: {} };
+            document.getElementById = jest.fn(id =>
+                id === "enableHorizScrollIcon" ? enableIcon : disableIcon
+            );
+            activity.beginnerMode = false;
+            activity.scrollBlockContainer = true;
+            activity.blocks = { activeBlock: 7 };
+            activity.helpfulWheelItems = [
+                { label: "Enable horizontal scrolling", display: false },
+                { label: "Disable horizontal scrolling", display: true }
+            ];
+            activity.textMsg = jest.fn();
+
+            activity._setScroller();
+
+            expect(activity.scrollBlockContainer).toBe(false);
+            expect(activity.blocks.activeBlock).toBeNull();
+            expect(enableIcon.style.display).toBe("block");
+            expect(disableIcon.style.display).toBe("none");
+            expect(activity.helpfulWheelItems[0].display).toBe(true);
+            expect(activity.helpfulWheelItems[1].display).toBe(false);
+            expect(activity.textMsg).toHaveBeenCalledWith("Horizontal scrolling disabled.", 3000);
         });
     });
 

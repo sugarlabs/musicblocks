@@ -1,0 +1,11 @@
+X:1
+T:Quarter-note triplets
+M:4/4
+L:1/4
+Q:1/4=120
+K:C
+% Each group of three quarter notes lasts two beats, followed by two normal beats.
+(3CDE F G |
+% The second triplet crosses a source line; d and e must remain quarter notes.
+(3A
+Bc d e |]

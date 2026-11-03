@@ -162,11 +162,13 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
         // Turn the note into pitch and octave.
         [pitch, octave] = _parse_pitch_string(currentNote);
     }
-    // Remap double sharps/double flats.
+    // Remap double sharps/double flats. B𝄪 and C𝄫 cross the B/C boundary, so the octave
+    // moves with the name (B𝄪4 is C♯5, C𝄫4 is B♭3).
     if (pitch.includes(DOUBLESHARP)) {
         pitch = pitch.replace(DOUBLESHARP, "");
         if (pitch === "B") {
             pitch = "C" + SHARP;
+            octave = Number(octave) + 1;
         } else {
             pitch = NOTESSHARP[NOTESSHARP.indexOf(pitch) + 2];
         }
@@ -174,6 +176,7 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
         pitch = pitch.replace(DOUBLEFLAT, "");
         if (pitch === "C") {
             pitch = "B" + FLAT;
+            octave = Number(octave) - 1;
         } else {
             pitch = NOTESFLAT[NOTESFLAT.indexOf(pitch) - 2];
         }
@@ -201,15 +204,60 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
             case "letter class":
                 return pitch[0];
             case "solfege syllable":
-            case "solfege class":
-                if (type === "solfege class") {
-                    // Remove sharps and flats.
-                    pitch = pitch.replace(SHARP, "").replace(FLAT, "");
-                }
+            case "solfege class": {
+                let syllable;
                 if (tur.singer.movable === false) {
-                    return SOLFEGECONVERSIONTABLE[pitch];
+                    syllable = SOLFEGECONVERSIONTABLE[pitch];
+                    // The table has no E♯ or F♭, so build those from the letter.
+                    if (
+                        syllable === undefined &&
+                        "CDEFGAB".includes(pitch[0]) &&
+                        [SHARP, FLAT].includes(pitch.slice(1))
+                    ) {
+                        syllable = SOLFEGECONVERSIONTABLE[pitch[0]] + pitch.slice(1);
+                    }
+                } else {
+                    const index = buildScale(tur.singer.keySignature)[0].indexOf(pitch);
+                    if (index !== -1 && index < SOLFEGENAMES.length) {
+                        syllable = SOLFEGENAMES[index];
+                    } else {
+                        // A note outside the key, or past the seventh note of a longer scale,
+                        // takes its scale degree plus the accidental. Modes without that
+                        // letter fall back to the major scale of the tonic.
+                        let degree = scaleDegreeToPitchMapping(
+                            tur.singer.keySignature,
+                            null,
+                            false,
+                            pitch
+                        );
+                        if (degree.length === 0) {
+                            degree = scaleDegreeToPitchMapping(
+                                tur.singer.keySignature,
+                                null,
+                                true,
+                                pitch
+                            );
+                        }
+                        if (degree.length > 0) {
+                            const accidental = [SHARP, FLAT, DOUBLESHARP, DOUBLEFLAT].includes(
+                                degree[1]
+                            )
+                                ? degree[1]
+                                : "";
+                            syllable = SOLFEGENAMES[degree[0] - 1] + accidental;
+                        }
+                    }
                 }
-                return SOLFEGENAMES[buildScale(tur.singer.keySignature)[0].indexOf(pitch)];
+                if (syllable !== undefined && type === "solfege class") {
+                    // Remove sharps and flats.
+                    return syllable
+                        .replace(DOUBLESHARP, "")
+                        .replace(DOUBLEFLAT, "")
+                        .replace(SHARP, "")
+                        .replace(FLAT, "");
+                }
+                return syllable;
+            }
             case "pitch class":
                 return (
                     (pitchToNumber(pitch, octave, tur.singer.keySignature) - 3) %
@@ -229,15 +277,26 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
                     tur.singer.movable,
                     pitch
                 );
-                return obj[0] + obj[1];
+                return (obj[0] ?? "") + (obj[1] ?? "");
             case "nth degree":
                 return buildScale(tur.singer.keySignature)[0].indexOf(pitch);
-            case "staff y":
+            case "staff y": {
+                // B♯ and C♭ sit where they sound, on the C above and the B below.
+                let letter = pitch[0];
+                let staffOctave = Number(octave);
+                if (pitch === "B" + SHARP) {
+                    letter = "C";
+                    staffOctave += 1;
+                } else if (pitch === "C" + FLAT) {
+                    letter = "B";
+                    staffOctave -= 1;
+                }
                 // These numbers are in relation to the staff artwork.
                 return (
-                    ["C", "D", "E", "F", "G", "A", "B"].indexOf(pitch[0]) * YSTAFFNOTEHEIGHT +
-                    (octave - 4) * YSTAFFOCTAVEHEIGHT
+                    ["C", "D", "E", "F", "G", "A", "B"].indexOf(letter) * YSTAFFNOTEHEIGHT +
+                    (staffOctave - 4) * YSTAFFOCTAVEHEIGHT
                 );
+            }
             case "pitch number":
                 return _calculate_pitch_number(
                     pitch,
@@ -261,6 +320,12 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
                 console.debug("Pitch not found: " + pitch);
                 return 0;
             case "pitch to shade":
+                // B♯ and C♭ sound in the next and previous octave (B♯4 is C5, C♭4 is B3).
+                if (pitch === "B" + SHARP) {
+                    return (Number(octave) + 1) * 12.5;
+                } else if (pitch === "C" + FLAT) {
+                    return (Number(octave) - 1) * 12.5;
+                }
                 return octave * 12.5;
             default:
                 return "__INVALID_INPUT__";

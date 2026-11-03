@@ -322,6 +322,16 @@ describe("LanguageBox Class", () => {
             expect(hideSpy).toHaveBeenCalled();
         });
 
+        it("should reset kana cache when ja_onclick is called and _resetKanaCache exists on window", () => {
+            window._resetKanaCache = jest.fn();
+            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
+
+            languageBox.ja_onclick();
+
+            expect(window._resetKanaCache).toHaveBeenCalledTimes(1);
+            delete window._resetKanaCache;
+        });
+
         it("should set language to ja, set kana preference, and call hide when kana_onclick is called", () => {
             const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
 
@@ -330,6 +340,16 @@ describe("LanguageBox Class", () => {
             expect(languageBox._language).toBe("ja-kana");
             expect(mockActivity.storage.kanaPreference).toBe("kana");
             expect(hideSpy).toHaveBeenCalled();
+        });
+
+        it("should reset kana cache when kana_onclick is called and _resetKanaCache exists on window", () => {
+            window._resetKanaCache = jest.fn();
+            const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
+
+            languageBox.kana_onclick();
+
+            expect(window._resetKanaCache).toHaveBeenCalledTimes(1);
+            delete window._resetKanaCache;
         });
 
         it("should set language to es and call hide when es_onclick is called", () => {

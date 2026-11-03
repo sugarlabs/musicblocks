@@ -238,7 +238,7 @@ describe("GlobalPlanet", () => {
         it("should call addProjects on success", () => {
             const spy = jest.spyOn(gp, "addProjects").mockImplementation(() => {});
             gp.afterRefreshProjects({ success: true, data: [] });
-            expect(spy).toHaveBeenCalledWith([]);
+            expect(spy).toHaveBeenCalledWith([], gp._requestId);
             spy.mockRestore();
         });
 
@@ -247,6 +247,89 @@ describe("GlobalPlanet", () => {
             gp.afterRefreshProjects({ success: false });
             expect(spy).toHaveBeenCalled();
             spy.mockRestore();
+        });
+
+        it("should ignore an older tag response that arrives last", () => {
+            const addProjects = jest.spyOn(gp, "addProjects").mockImplementation(() => {});
+            gp.searchAllProjects();
+            const firstResponse = mockPlanet.ServerInterface.downloadProjectList.mock.calls[0][4];
+            gp.searchTags(["1"]);
+            const secondResponse = mockPlanet.ServerInterface.downloadProjectList.mock.calls[1][4];
+
+            secondResponse({ success: true, data: [["music", 2]] });
+            firstResponse({ success: true, data: [["all", 1]] });
+
+            expect(addProjects).toHaveBeenCalledTimes(1);
+            expect(addProjects).toHaveBeenCalledWith([["music", 2]], gp._requestId);
+        });
+
+        it("should ignore a search response after the view refreshes", () => {
+            const addProjects = jest.spyOn(gp, "addProjects").mockImplementation(() => {});
+            gp.searchString = "drum";
+            gp.search();
+            const oldResponse = mockPlanet.ServerInterface.searchProjects.mock.calls[0][4];
+
+            gp.refreshProjects();
+            const currentResponse = mockPlanet.ServerInterface.searchProjects.mock.calls[1][4];
+            oldResponse({ success: true, data: [["old", 1]] });
+            currentResponse({ success: true, data: [["current", 2]] });
+
+            expect(addProjects).toHaveBeenCalledTimes(1);
+            expect(addProjects).toHaveBeenCalledWith([["current", 2]], gp._requestId);
+        });
+
+        it("should ignore an old Load More response after changing tags", () => {
+            const addProjects = jest.spyOn(gp, "addProjects").mockImplementation(() => {});
+            gp.searchAllProjects();
+            gp.loadMoreProjects();
+            const oldResponse = mockPlanet.ServerInterface.downloadProjectList.mock.calls[1][4];
+
+            gp.searchTags(["1"]);
+            const currentResponse = mockPlanet.ServerInterface.downloadProjectList.mock.calls[2][4];
+            oldResponse({ success: true, data: [["old", 1]] });
+            currentResponse({ success: true, data: [["current", 2]] });
+
+            expect(addProjects).toHaveBeenCalledTimes(1);
+            expect(addProjects).toHaveBeenCalledWith([["current", 2]], gp._requestId);
+        });
+
+        it("should ignore an old search Load More response after refreshing", () => {
+            const addProjects = jest.spyOn(gp, "addProjects").mockImplementation(() => {});
+            gp.oldSearchString = "drum";
+            gp.loadMoreProjects();
+            const oldResponse = mockPlanet.ServerInterface.searchProjects.mock.calls[0][4];
+
+            gp.refreshProjects();
+            const currentResponse = mockPlanet.ServerInterface.searchProjects.mock.calls[1][4];
+            oldResponse({ success: true, data: [["old", 1]] });
+            currentResponse({ success: true, data: [["current", 2]] });
+
+            expect(addProjects).toHaveBeenCalledTimes(1);
+            expect(addProjects).toHaveBeenCalledWith([["current", 2]], gp._requestId);
+        });
+
+        it("should ignore project details from an older tag response", () => {
+            const render = jest.spyOn(gp, "render").mockImplementation(() => {});
+            gp.searchAllProjects();
+            mockPlanet.ServerInterface.downloadProjectList.mock.calls[0][4]({
+                success: true,
+                data: [["old", 1]]
+            });
+            const oldDetails = mockPlanet.ServerInterface.getProjectDetails.mock.calls[0][1];
+
+            gp.searchTags(["1"]);
+            mockPlanet.ServerInterface.downloadProjectList.mock.calls[1][4]({
+                success: true,
+                data: [["new", 2]]
+            });
+            const newDetails = mockPlanet.ServerInterface.getProjectDetails.mock.calls[1][1];
+            oldDetails({ success: true, data: { ProjectName: "Old" } });
+            newDetails({ success: true, data: { ProjectName: "New" } });
+
+            expect(gp.cache.old).toBeUndefined();
+            expect(gp.cache.new.ProjectName).toBe("New");
+            expect(render).toHaveBeenCalledTimes(1);
+            expect(render).toHaveBeenCalledWith([["new", 2]]);
         });
     });
 
@@ -449,6 +532,53 @@ describe("GlobalPlanet", () => {
             gp.afterSearch();
             expect(spy).toHaveBeenCalled();
             spy.mockRestore();
+        });
+    });
+
+    describe("search after an error", () => {
+        it("runs the next search after a failed one", () => {
+            gp.searchString = "drums";
+            gp.search();
+            mockPlanet.ServerInterface.searchProjects.mock.calls[0][4]({
+                success: false,
+                error: "ERROR_CONNECTION_FAILURE"
+            });
+
+            gp.searchString = "piano";
+            gp.search();
+
+            expect(mockPlanet.ServerInterface.searchProjects).toHaveBeenCalledTimes(2);
+            expect(mockPlanet.ServerInterface.searchProjects.mock.calls[1][0]).toBe("piano");
+        });
+
+        it("clears a failed search back to the tag view", () => {
+            gp.searchMode = "ALL_PROJECTS";
+            gp.searchString = "drums";
+            gp.search();
+            mockPlanet.ServerInterface.searchProjects.mock.calls[0][4]({ success: false });
+
+            gp.searchString = "";
+            gp.search();
+
+            expect(mockPlanet.ServerInterface.downloadProjectList).toHaveBeenCalledTimes(1);
+            expect(document.getElementById("tagscontainer").style.display).not.toBe("none");
+        });
+
+        it("runs the next search when no result of a search could be loaded", () => {
+            mockPlanet.ServerInterface.getProjectDetails.mockImplementation((id, cb) =>
+                cb({ success: false })
+            );
+            gp.searchString = "drums";
+            gp.search();
+            mockPlanet.ServerInterface.searchProjects.mock.calls[0][4]({
+                success: true,
+                data: [["proj1", 123]]
+            });
+
+            gp.searchString = "piano";
+            gp.search();
+
+            expect(mockPlanet.ServerInterface.searchProjects).toHaveBeenCalledTimes(2);
         });
     });
 

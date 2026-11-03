@@ -63,6 +63,7 @@ function makeKeyboardAccessible(element, label, onActivate) {
     }
 
     const keydownHandler = event => {
+        if (event.repeat) return;
         if (event.key !== "Enter" && event.key !== " " && event.key !== "Spacebar") return;
 
         event.preventDefault();

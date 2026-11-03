@@ -617,6 +617,26 @@ describe("setupPitchBlocks", () => {
             block.flow([440], logo, 0, 10);
             expect(global.Singer.PitchActions.playHertz).toHaveBeenCalled();
         });
+
+        it("routes hertz rows to the turtle's own keyboard", () => {
+            const block = createdBlocks["hertz"];
+            const lastActive = {
+                instruments: [],
+                noteNames: [],
+                octaves: [],
+                addRowBlock: jest.fn()
+            };
+            const own = { instruments: [], noteNames: [], octaves: [], addRowBlock: jest.fn() };
+            global.frequencyToPitch.mockReturnValue(["A", 4, 0]);
+            logo.inMusicKeyboard = true;
+            logo.musicKeyboard = lastActive;
+            logo.musicKeyboardByTurtle = { 1: own };
+
+            block.flow([440], logo, 1, 10);
+
+            expect(own.noteNames).toEqual(["hertz"]);
+            expect(lastActive.noteNames).toEqual([]);
+        });
     });
 
     describe("HertzBlock in the Pitch-Drum Matrix", () => {
@@ -842,6 +862,60 @@ describe("setupPitchBlocks", () => {
             activity.blocks.blockList[20] = { name: "scaledegree2", value: "5n" };
             block.flow(["1", 4], logo, 0, 10);
             expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith("G", 4, 0, 0, 10);
+        });
+
+        it("cancels the key's accidental with the opposite one on a scale degree", () => {
+            const block = createdBlocks["pitch"];
+            activity.blocks.blockList[10].connections[1] = 20;
+            activity.blocks.blockList[20] = { name: "plus" };
+
+            global.scaleDegreeToPitchMapping.mockReturnValue("F#");
+            block.flow(["7b", 4], logo, 0, 10);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith(
+                "F",
+                expect.anything(),
+                0,
+                0,
+                10
+            );
+
+            global.scaleDegreeToPitchMapping.mockReturnValue("Bb");
+            block.flow(["4#", 4], logo, 0, 10);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith(
+                "B",
+                expect.anything(),
+                0,
+                0,
+                10
+            );
+        });
+
+        it("treats a computed number with an accidental as a scale degree", () => {
+            const block = createdBlocks["pitch"];
+            activity.blocks.blockList[10].connections[1] = 20;
+            activity.blocks.blockList[20] = { name: "plus" };
+            global.scaleDegreeToPitchMapping.mockReturnValue("G");
+
+            [
+                ["5#", "G#"],
+                ["5b", "Gb"],
+                ["5n", "G"]
+            ].forEach(([degree, note]) => {
+                block.flow([degree, 4], logo, 0, 10);
+                expect(global.scaleDegreeToPitchMapping).toHaveBeenLastCalledWith(
+                    "C",
+                    5,
+                    expect.anything(),
+                    null
+                );
+                expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith(
+                    note,
+                    4,
+                    0,
+                    0,
+                    10
+                );
+            });
         });
 
         it("flow", () => {

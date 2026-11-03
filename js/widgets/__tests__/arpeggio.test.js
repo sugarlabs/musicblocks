@@ -22,8 +22,10 @@
 
 const Arpeggio = require("../arpeggio.js");
 const ManagedTimer = require("../../utils/ManagedTimer");
+const { parseNoteString } = require("../../utils/musicutils-pitch");
 
 global.ManagedTimer = ManagedTimer;
+global.parseNoteString = parseNoteString;
 
 global._ = msg => msg;
 global.platformColor = {
@@ -645,6 +647,71 @@ describe("Arpeggio Widget", () => {
                 expect.anything()
             );
             expect(activityMock.logo.synth.trigger).toHaveBeenCalled();
+        });
+
+        test("parses negative and multi-digit octaves correctly in __playCell", () => {
+            const cell = document.createElement("td");
+
+            // Negative octave (C-1)
+            arpeggio.notesToPlay = [["C-1", 1 / 16]];
+            arpeggio.__playCell(3, 0, cell, true);
+            expect(global.getNote).toHaveBeenCalledWith(
+                "C",
+                -1,
+                expect.any(Number),
+                expect.anything(),
+                false,
+                null,
+                expect.anything()
+            );
+
+            // Multi-digit octave (C10)
+            global.getNote.mockClear();
+            arpeggio.notesToPlay = [["C10", 1 / 16]];
+            arpeggio.__playCell(3, 0, cell, true);
+            expect(global.getNote).toHaveBeenCalledWith(
+                "C",
+                10,
+                expect.any(Number),
+                expect.anything(),
+                false,
+                null,
+                expect.anything()
+            );
+        });
+
+        test("parses negative and multi-digit octaves correctly in _playAll", () => {
+            arpeggio._playing = true;
+            arpeggio.__makePairsList = () => [[1, 0]];
+            arpeggio.__playNote = jest.fn();
+
+            // Negative octave (C-1)
+            global.getNote.mockClear();
+            arpeggio.notesToPlay = [["C-1", 1 / 16]];
+            arpeggio._playAll();
+            expect(global.getNote).toHaveBeenCalledWith(
+                "C",
+                -1,
+                expect.any(Number),
+                expect.anything(),
+                false,
+                null,
+                expect.anything()
+            );
+
+            // Multi-digit octave (C10)
+            global.getNote.mockClear();
+            arpeggio.notesToPlay = [["C10", 1 / 16]];
+            arpeggio._playAll();
+            expect(global.getNote).toHaveBeenCalledWith(
+                "C",
+                10,
+                expect.any(Number),
+                expect.anything(),
+                false,
+                null,
+                expect.anything()
+            );
         });
 
         test("defaults to C4 when notesToPlay is empty", () => {

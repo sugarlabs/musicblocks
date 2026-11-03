@@ -85,18 +85,20 @@ const SamplerTuner = {
                 );
             };
 
-            // Autocorrelation Function
-            const autocorrelation = buffer =>
-                buffer.map((_, lag) =>
-                    buffer
-                        .slice(0, buffer.length - lag)
-                        .reduce((sum, value, index) => sum + value * buffer[index + lag], 0)
-                );
-
-            // Difference Function
+            // Difference Function: squared difference between the first half of the
+            // buffer and the same window shifted by tau
             const difference = buffer => {
-                const autocorr = autocorrelation(buffer);
-                return autocorr.map((_, tau) => autocorr[0] + autocorr[tau] - 2 * autocorr[tau]);
+                const windowSize = Math.floor(buffer.length / 2);
+                const diff = new Float32Array(windowSize);
+                for (let tau = 0; tau < windowSize; tau++) {
+                    let sum = 0;
+                    for (let i = 0; i < windowSize; i++) {
+                        const delta = buffer[i] - buffer[i + tau];
+                        sum += delta * delta;
+                    }
+                    diff[tau] = sum;
+                }
+                return diff;
             };
 
             // Cumulative Mean Normalized Difference Function
@@ -132,7 +134,7 @@ const SamplerTuner = {
                 const s0 = cmnDiff[x0],
                     s1 = cmnDiff[tau],
                     s2 = cmnDiff[x2];
-                const adjustment = ((x2 - x0) * (s0 - s2)) / (2 * (s0 - 2 * s1 + s2));
+                const adjustment = (s0 - s2) / (2 * (s0 - 2 * s1 + s2));
 
                 return tau + adjustment;
             };

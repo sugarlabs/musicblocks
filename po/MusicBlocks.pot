@@ -7560,6 +7560,10 @@ msgstr ""
 msgid "Ignoring duplicate pitch numbers."
 msgstr ""
 
+#: js/turtleactions/IntervalsActions.js
+msgid "The custom mode does not fit the new tuning, so it was reset."
+msgstr ""
+
 #: js/turtleactions/PitchActions.js:288
 msgid "Scalar transpositions are equal to Semitone transpositions for custom temperament."
 msgstr ""
@@ -8511,7 +8515,12 @@ msgstr ""
 
 #: planet/js/LocalCard.js:44
 #: planet/js/StringHelper.js:37
+#: planet/js/Publisher.js:203
 msgid "Publish project"
+msgstr ""
+
+#: planet/js/Publisher.js:203
+msgid "Republish project"
 msgstr ""
 
 #: planet/js/LocalCard.js:55

@@ -469,6 +469,34 @@ describe("HelpController.saveHelpBlocks", () => {
         expect(activity.blocks.loadNewBlocks).toHaveBeenCalled();
     });
 
+    test("still loads a hidden block, which getProtoNameAndPalette skips", () => {
+        const activity = makeActivity();
+        activity.blocks.protoBlockDict = {
+            temperamentname: {
+                name: "temperamentname",
+                helpString: ["a", "documentation", ""],
+                palette: { name: "paletteName" }
+            }
+        };
+        activity.palettes.getProtoNameAndPalette = jest.fn(() => [null, null, null]);
+        const controller = new HelpController(activity);
+
+        controller.saveHelpBlocks();
+        jest.advanceTimersByTime(1000 + 500 + 500);
+
+        expect(activity.palettes.dict.paletteName.makeBlockFromSearch).toHaveBeenCalledWith(
+            "temperamentname",
+            "temperamentname",
+            expect.any(Function)
+        );
+        expect(activity.blocks.moveBlock).toHaveBeenCalledWith("newBlockId", 0, 0);
+        expect(activity.save.download).toHaveBeenCalledWith(
+            "svg",
+            expect.any(String),
+            "temperamentname_block.svg"
+        );
+    });
+
     test("showKeyboardShortcuts opens keyboard shortcuts widget window containing shortcut entries", () => {
         const activity = makeActivity();
         const controller = new HelpController(activity);

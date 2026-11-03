@@ -126,6 +126,12 @@ describe("Design Tokens Single Source of Truth", () => {
         );
     });
 
+    it("does not apply an inverse background to tour icons in dark mode", () => {
+        expect(darkmodeCss).not.toMatch(
+            /\.dark\s+#helpBodyDiv\s+\.help-tour-icon\s*\{[^}]*background(?:-color)?\s*:\s*var\(--color-bg-inverse\)/i
+        );
+    });
+
     it("verifies themes.css declares no custom properties", () => {
         const declared = readTokenBlock(themesCss);
         expect(Object.keys(declared)).toEqual([]);
@@ -425,6 +431,19 @@ describe("Theme Switching & Inline Styles Purity", () => {
         // Strip comments before checking for raw hex values
         const strippedCss = windowsCss.replace(/\/\*[\s\S]*?\*\//g, "");
         expect(strippedCss).not.toMatch(/#[0-9a-fA-F]{3,6}/);
+    });
+
+    it("allows inline toolbar offsets to override mobile window positioning", () => {
+        const windowsCss = fs.readFileSync(
+            path.join(ROOT_DIR, "dist", "css", "windows.css"),
+            "utf8"
+        );
+
+        const strippedWindowsCss = windowsCss.replace(/\/\*[\s\S]*?\*\//g, "");
+
+        expect(strippedWindowsCss).not.toMatch(
+            /[^{}]*\.windowFrame\s*\{[^}]*\btop:\s*0\s*!important;/
+        );
     });
 
     it("ensures body element in index.html and activities stylesheets uses tokens without inline styles or !important", () => {

@@ -72,6 +72,15 @@ describe("PitchStaircaseSave", () => {
         }
     });
 
+    test("does not save when there are no stairs", () => {
+        psc._save();
+
+        expect(psc.activity.palettes.dict.pitch.hideMenu).not.toHaveBeenCalled();
+        expect(psc.activity.refreshCanvas).not.toHaveBeenCalled();
+        expect(psc.activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+        expect(psc.activity.textMsg).not.toHaveBeenCalled();
+    });
+
     test("hides the palettes and starts the stack with an action named stair", () => {
         psc.addStair("A", 3, 220, 1);
 

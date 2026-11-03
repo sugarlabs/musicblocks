@@ -20,9 +20,37 @@ _, docById
 window.widgetWindows = {
     openWindows: {},
     _posCache: {},
+    _maximizedCache: {},
     focused: null,
     draggingWindow: null,
     _globalListenersInitialized: false,
+    /**
+     * Returns the bottom edge of the visible toolbar area.
+     *
+     * @returns {number} Toolbar bottom position in viewport pixels.
+     */
+    _getToolbarBottom() {
+        const mainToolbar = document.querySelector("#toolbars .main-nav-container");
+        const auxToolbar = docById("aux-toolbar");
+
+        let bottom = 64;
+
+        if (mainToolbar) {
+            const mainRect = mainToolbar.getBoundingClientRect();
+            if (mainRect.bottom > 0) {
+                bottom = mainRect.bottom;
+            }
+        }
+
+        if (auxToolbar && window.getComputedStyle(auxToolbar).display !== "none") {
+            const auxRect = auxToolbar.getBoundingClientRect();
+            if (auxRect.bottom > bottom) {
+                bottom = auxRect.bottom;
+            }
+        }
+
+        return bottom;
+    },
 
     // NOTE: This mapping only works for widgets that never set their own
     // `blockNo` property (e.g. ModeWidget). window.widgetWindows.windowFor()
@@ -49,7 +77,8 @@ window.widgetWindows = {
         "pitch slider": "slider",
         "pitch staircase": "pitch staircase",
         "music keyboard": "music keyboard",
-        "status": "status"
+        "status": "status",
+        "chord progression": "chord progression"
     },
 
     /**
@@ -79,7 +108,8 @@ window.widgetWindows = {
         "meter",
         "temperament",
         "mode",
-        "timbre"
+        "timbre",
+        "chord progression"
     ]),
 
     /**
@@ -199,19 +229,36 @@ window.widgetWindows = {
             }
         }
     },
+    /**
+     * Repositions open widget windows to respect the visible toolbar and viewport bounds.
+     *
+     * @returns {void}
+     */
     _handleResize() {
-        if (window.innerWidth <= 600) return;
+        const toolbarBottom = this._getToolbarBottom();
 
         for (const win of Object.values(this.openWindows)) {
-            if (!win || win._maximized || win._frame.style.display === "none") continue;
+            if (!win || win._frame.style.display === "none") continue;
+
+            if (win._maximized) {
+                win._frame.style.top = `${toolbarBottom}px`;
+                win._frame.style.height = `calc(100vh - ${toolbarBottom}px)`;
+                continue;
+            }
+
+            // Preserve the existing small-screen behavior for floating windows.
+            if (window.innerWidth <= 600) continue;
 
             const rect = win._frame.getBoundingClientRect();
             const x = Math.min(Math.max(rect.left, 0), Math.max(0, window.innerWidth - rect.width));
             const y = Math.min(
-                Math.max(rect.top, 64),
-                Math.max(64, window.innerHeight - rect.height)
+                Math.max(rect.top, toolbarBottom),
+                Math.max(toolbarBottom, window.innerHeight - rect.height)
             );
-            if (x !== rect.left || y !== rect.top) win.setPosition(x, y);
+
+            if (x !== rect.left || y !== rect.top) {
+                win.setPosition(x, y);
+            }
         }
     },
     _initGlobalListeners() {
@@ -283,7 +330,14 @@ window.widgetWindows = {
             }
         }
 
+        const previous = this.focused;
         this.focused = clickedWindow;
+        if (clickedWindow && typeof clickedWindow.onfocused === "function") {
+            clickedWindow.onfocused();
+        }
+        if (previous && previous !== clickedWindow && typeof previous.onblurred === "function") {
+            previous.onblurred();
+        }
     }
 };
 
@@ -308,17 +362,35 @@ class WidgetWindow {
 
         // Drag offset for correct positioning
         this._dx = this._dy = 0;
-        // RAF throttle flag for mousemove performance
         this._rafTicking = false;
+        this._previouslyFocused =
+            document.activeElement && document.activeElement !== document.body
+                ? document.activeElement
+                : null;
 
         this._createUIelements();
         this._setupLanguage();
 
         window.widgetWindows._initGlobalListeners();
 
+        this._restorePending = false;
         if (window.widgetWindows._posCache[this._key]) {
             const _pos = window.widgetWindows._posCache[this._key];
-            this.setPosition(_pos[0], _pos[1]);
+            const x = Number(_pos[0]);
+            const y = Number(_pos[1]);
+            if (
+                !Number.isNaN(x) &&
+                !Number.isNaN(y) &&
+                !window.widgetWindows._maximizedCache[this._key]
+            ) {
+                const clamped = this._clampToViewport(x, y);
+                this.setPosition(clamped[0], clamped[1]);
+                this._restorePending = true;
+            } else {
+                if (Number.isNaN(x) || Number.isNaN(y)) {
+                    delete window.widgetWindows._posCache[this._key];
+                }
+            }
         }
 
         this.takeFocus();
@@ -381,15 +453,21 @@ class WidgetWindow {
             };
         }
         const closeButton = this._create("div", "wftButton close", this._drag);
+        this._closeButton = closeButton;
         closeButton.title = _("Close");
         closeButton.setAttribute("role", "button");
         closeButton.setAttribute("aria-label", _("Close window"));
         closeButton.setAttribute("tabindex", "0");
         closeButton.onclick = e => {
             this.onclose();
-            e.preventDefault();
-            e.stopPropagation();
+            if (e && typeof e.preventDefault === "function") {
+                e.preventDefault();
+            }
+            if (e && typeof e.stopPropagation === "function") {
+                e.stopPropagation();
+            }
         };
+        makeKeyboardAccessible(closeButton, _("Close window"));
 
         this._nonclose = this._create("div", "nonclose", this._drag);
         this._nonclose.style.display = "flex";
@@ -403,6 +481,9 @@ class WidgetWindow {
         this._frame.setAttribute("aria-labelledby", titleEl.id);
 
         this._nonclose.onmousedown = e => {
+            // Once the user interacts with the window, later explicit centering
+            // calls are intentional and should not be suppressed.
+            this._restorePending = false;
             window.widgetWindows.draggingWindow = this;
 
             this.takeFocus();
@@ -432,9 +513,14 @@ class WidgetWindow {
             this._frame.style.width = "auto";
             this._frame.style.height = "auto";
             this._frame.style.minHeight = "0px";
-            e.preventDefault();
-            e.stopPropagation();
+            if (e && typeof e.preventDefault === "function") {
+                e.preventDefault();
+            }
+            if (e && typeof e.stopPropagation === "function") {
+                e.stopPropagation();
+            }
         };
+        makeKeyboardAccessible(rollButton, _("Roll up window"));
 
         if (this._fullscreenEnabled) {
             const maxminButton = this._create("div", "wftButton wftMaxmin", this._nonclosebuttons);
@@ -452,9 +538,14 @@ class WidgetWindow {
                 }
                 this.takeFocus();
                 this.onmaximize();
-                e.preventDefault();
-                e.stopImmediatePropagation();
+                if (e && typeof e.preventDefault === "function") {
+                    e.preventDefault();
+                }
+                if (e && typeof e.stopImmediatePropagation === "function") {
+                    e.stopImmediatePropagation();
+                }
             };
+            makeKeyboardAccessible(maxminButton, _("Maximize window"));
             this._maxminIcon = this._create("img", undefined, maxminButton);
             this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
         }
@@ -465,6 +556,47 @@ class WidgetWindow {
         this._toolbar.setAttribute("aria-label", _("Widget toolbar"));
 
         this._widget = this._create("div", "wfbWidget", this._body);
+
+        /**
+         * The innermost element under the pointer that can still scroll in
+         * the wheel's direction, or the widget itself.
+         * @param {EventTarget} target
+         * @param {number} deltaX
+         * @param {number} deltaY
+         * @returns {HTMLElement}
+         */
+        this._scrollTargetFor = (target, deltaX, deltaY) => {
+            const canScroll = (overflow, position, size, view, delta) =>
+                /(auto|scroll)/.test(overflow) &&
+                size > view &&
+                ((delta < 0 && position > 0) || (delta > 0 && position + view < size));
+
+            let node = target instanceof Element ? target : null;
+            while (node && node !== this._widget && this._widget.contains(node)) {
+                const style = window.getComputedStyle(node);
+                if (
+                    canScroll(
+                        style.overflowY,
+                        node.scrollTop,
+                        node.scrollHeight,
+                        node.clientHeight,
+                        deltaY
+                    ) ||
+                    canScroll(
+                        style.overflowX,
+                        node.scrollLeft,
+                        node.scrollWidth,
+                        node.clientWidth,
+                        deltaX
+                    )
+                ) {
+                    return node;
+                }
+                node = node.parentElement;
+            }
+            return this._widget;
+        };
+
         this._widgetWheelHandler = event => {
             const deltaY =
                 typeof event.deltaY === "number"
@@ -474,8 +606,11 @@ class WidgetWindow {
                       : 0;
             const deltaX = typeof event.deltaX === "number" ? event.deltaX : 0;
 
-            this._widget.scrollTop += deltaY;
-            this._widget.scrollLeft += deltaX;
+            // Scrolling only this._widget left inner scroll areas, such as the
+            // AI Debugger's chat log, unable to scroll at all.
+            const scroller = this._scrollTargetFor(event.target, deltaX, deltaY);
+            scroller.scrollTop += deltaY;
+            scroller.scrollLeft += deltaX;
 
             if (event.cancelable) {
                 event.preventDefault();
@@ -519,7 +654,9 @@ class WidgetWindow {
         this._rafTicking = true;
 
         requestAnimationFrame(() => {
-            if (this._fullscreenEnabled && this._frame.style.top === "64px") {
+            const toolbarBottom = window.widgetWindows._getToolbarBottom();
+
+            if (this._fullscreenEnabled && this._frame.style.top === `${toolbarBottom}px`) {
                 this._overlay(true);
             } else {
                 this._overlay(false);
@@ -537,9 +674,11 @@ class WidgetWindow {
             this._frame.style.zIndex = "10";
             this._overlayframe.style.left = "0";
             this._overlayframe.style.zIndex = "1";
-            this._overlayframe.style.top = "64px";
+            const toolbarBottom = window.widgetWindows._getToolbarBottom();
+
+            this._overlayframe.style.top = `${toolbarBottom}px`;
             this._overlayframe.style.width = "100vw";
-            this._overlayframe.style.height = "calc(100vh - 64px)";
+            this._overlayframe.style.height = `calc(100vh - ${toolbarBottom}px)`;
             this._overlayframe.style.border = "0.25vw solid black";
             this._overlayframe.style.backgroundColor = "var(--color-overlay-backdrop)";
         } else {
@@ -556,7 +695,13 @@ class WidgetWindow {
      * @returns {void}
      */
     _dragTopHandler(e) {
-        if (this._fullscreenEnabled && this._frame.style.top === "64px" && !this._maximized) {
+        const toolbarBottom = window.widgetWindows._getToolbarBottom();
+
+        if (
+            this._fullscreenEnabled &&
+            this._frame.style.top === `${toolbarBottom}px` &&
+            !this._maximized
+        ) {
             this._maximize();
             this.takeFocus();
             this.onmaximize();
@@ -697,6 +842,9 @@ class WidgetWindow {
      */
     takeFocus() {
         window.widgetWindows.focused = this;
+        if (typeof this.onfocused === "function") {
+            this.onfocused();
+        }
         const windows = docById("floatingWindows");
         if (windows && windows.children) {
             const siblings = windows.children;
@@ -738,6 +886,11 @@ class WidgetWindow {
      * @returns {WidgetWindow} this
      */
     sendToCenter() {
+        // Some widgets call sendToCenter() more than once while opening, so the
+        // flag must stay set until the user interacts with the window.
+        if (this._restorePending) {
+            return this;
+        }
         const canvas = docById("myCanvas");
         if (!canvas) {
             this.setPosition(200, 140);
@@ -766,6 +919,8 @@ class WidgetWindow {
      * @returns {void}
      */
     _restore() {
+        this._restorePending = false;
+        window.widgetWindows._maximizedCache[this._key] = false;
         this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
         if (this._maxminButton) {
             this._maxminButton.title = _("Maximize window");
@@ -790,6 +945,7 @@ class WidgetWindow {
      * @returns {void}
      */
     _maximize() {
+        window.widgetWindows._maximizedCache[this._key] = true;
         this._maxminIcon.setAttribute("src", "header-icons/icon-contract.svg");
         if (this._maxminButton) {
             this._maxminButton.title = _("Restore");
@@ -800,10 +956,13 @@ class WidgetWindow {
         this.takeFocus();
 
         this._savedPos = [this._frame.style.left, this._frame.style.top];
+
+        const toolbarBottom = window.widgetWindows._getToolbarBottom();
+
         this._frame.style.width = "100vw";
-        this._frame.style.height = "calc(100vh - 64px)";
+        this._frame.style.height = `calc(100vh - ${toolbarBottom}px)`;
         this._frame.style.left = "0";
-        this._frame.style.top = "64px";
+        this._frame.style.top = `${toolbarBottom}px`;
     }
 
     /**
@@ -842,6 +1001,11 @@ class WidgetWindow {
      * @returns {void}
      */
     destroy() {
+        const isFocusInside =
+            this._frame &&
+            document.activeElement &&
+            (this._frame === document.activeElement ||
+                this._frame.contains(document.activeElement));
         if (this._widget && this._widgetWheelHandler) {
             this._widget.removeEventListener("wheel", this._widgetWheelHandler, false);
             this._widget.removeEventListener("DOMMouseScroll", this._widgetWheelHandler, false);
@@ -859,6 +1023,30 @@ class WidgetWindow {
             this.timerManager.clearAll();
         }
         delete window.widgetWindows.openWindows[this._key];
+
+        if (isFocusInside) {
+            const remainingWindows = Object.values(window.widgetWindows.openWindows).filter(
+                win => win && win._visible
+            );
+            if (remainingWindows.length > 0) {
+                const nextWin = remainingWindows[remainingWindows.length - 1];
+                nextWin.takeFocus();
+                if (nextWin._frame && typeof nextWin._frame.focus === "function") {
+                    nextWin._frame.focus();
+                }
+            } else if (
+                this._previouslyFocused &&
+                typeof this._previouslyFocused.focus === "function" &&
+                document.contains(this._previouslyFocused)
+            ) {
+                this._previouslyFocused.focus();
+            } else {
+                const canvas = docById("myCanvas");
+                if (canvas && typeof canvas.focus === "function") {
+                    canvas.focus();
+                }
+            }
+        }
     }
 
     /**
@@ -887,15 +1075,43 @@ class WidgetWindow {
     }
 
     /**
+     * Keeps a restored position inside the current viewport so that a widget
+     * closed before a browser resize does not reopen off-screen.
+     * @private
+     * @param {number} x
+     * @param {number} y
+     * @returns {[number, number]}
+     */
+    _clampToViewport(x, y) {
+        const toolbarBottom = window.widgetWindows._getToolbarBottom();
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        if (!viewportWidth || !viewportHeight) return [x, y];
+
+        const fRect = this._frame ? this._frame.getBoundingClientRect() : { width: 0, height: 0 };
+        const width = fRect.width || 470;
+        const height = fRect.height || 420;
+
+        const maxX = Math.max(0, viewportWidth - width);
+        const maxY = Math.max(toolbarBottom, viewportHeight - height);
+
+        return [Math.min(Math.max(x, 0), maxX), Math.min(Math.max(y, toolbarBottom), maxY)];
+    }
+
+    /**
      * @public
      * @param {number} x
      * @param {number} y
      * @returns {WidgetWindow} this
      */
     setPosition(x, y) {
+        const toolbarBottom = window.widgetWindows._getToolbarBottom();
+        const top = Math.max(y, toolbarBottom);
+
         this._frame.style.left = `${x}px`;
-        this._frame.style.top = `${Math.max(y, 64)}px`;
-        window.widgetWindows._posCache[this._key] = [x, Math.max(y, 64)];
+        this._frame.style.top = `${top}px`;
+        window.widgetWindows._posCache[this._key] = [x, top];
+        window.widgetWindows._maximizedCache[this._key] = false;
         return this;
     }
 
@@ -982,7 +1198,13 @@ window.widgetWindows.windowFor = (widget, title, saveAs, fullscreen) => {
     else key = saveAs || title;
 
     if (typeof window.widgetWindows.openWindows[key] === "undefined") {
-        const win = new WidgetWindow(key, title, fullscreen).sendToCenter();
+        const win = new WidgetWindow(key, title, fullscreen);
+        // The constructor restores a previously saved position, so only center
+        // the window the first time it is opened.
+        if (!window.widgetWindows._posCache[key] || window.widgetWindows._maximizedCache[key]) {
+            win.sendToCenter();
+        }
+        window.widgetWindows._maximizedCache[key] = false;
         window.widgetWindows.openWindows[key] = win;
     }
 

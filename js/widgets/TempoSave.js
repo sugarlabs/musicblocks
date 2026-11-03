@@ -39,25 +39,17 @@ class TempoSave {
     __save(i) {
         // Keep the beat value of the row's BPM block, so the new block plays at the same tempo.
         const beatValue = rationalToFraction(this._beatValue(i));
-        const callback = () => {
-            const delta = i * 42;
-            const newStack = [
-                [0, ["setbpm3", {}], 100 + delta, 100 + delta, [null, 1, 2, 5]],
-                [1, ["number", { value: this.BPMs[i] }], 0, 0, [0]],
-                [2, ["divide", {}], 0, 0, [0, 3, 4]],
-                [3, ["number", { value: beatValue[0] }], 0, 0, [2]],
-                [4, ["number", { value: beatValue[1] }], 0, 0, [2]],
-                [5, ["vspace", {}], 0, 0, [0, null]]
-            ];
-            this.activity.blocks.loadNewBlocks(newStack);
-            this.activity.textMsg(_("New action block generated."), 3000);
-        };
-
-        if (this.widgetWindow && this.widgetWindow.timerManager) {
-            this.widgetWindow.timerManager.setTimeout(callback, 200 * i);
-        } else {
-            setTimeout(callback, 200 * i);
-        }
+        const delta = i * 42;
+        const newStack = [
+            [0, ["setbpm3", {}], 100 + delta, 100 + delta, [null, 1, 2, 5]],
+            [1, ["number", { value: this.BPMs[i] }], 0, 0, [0]],
+            [2, ["divide", {}], 0, 0, [0, 3, 4]],
+            [3, ["number", { value: beatValue[0] }], 0, 0, [2]],
+            [4, ["number", { value: beatValue[1] }], 0, 0, [2]],
+            [5, ["vspace", {}], 0, 0, [0, null]]
+        ];
+        this.activity.blocks.loadNewBlocks(newStack);
+        this.activity.textMsg(_("New action block generated."), 3000);
     }
 
     /**

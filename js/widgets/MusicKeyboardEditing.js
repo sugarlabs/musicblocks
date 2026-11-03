@@ -61,6 +61,44 @@ const MusicKeyboardEditing = {
     install(deps) {
         const { FAKEBLOCKNUMBER, beginnerMode, resolveSynthNoteName, fillChromaticGaps } = deps;
 
+        // Scoped element lookup. the ids repeat across keyboard windows.
+        if (typeof this._mkbEl !== "function") {
+            this._mkbEl = id => {
+                if (this._widgetBody && typeof this._widgetBody.querySelector === "function") {
+                    return this._widgetBody.querySelector(`[id="${id}"]`);
+                }
+                return docById(id);
+            };
+        }
+
+        // Only one keyboard can own the shared #wheelDivptm menu at a time.
+        this._claimWheelMenu = () => {
+            const previous = MusicKeyboardEditing._wheelMenuOwner;
+            if (previous && previous !== this && typeof previous._closeWheelMenu === "function") {
+                previous._closeWheelMenu();
+            }
+            MusicKeyboardEditing._wheelMenuOwner = this;
+        };
+
+        this._closeWheelMenu = () => {
+            if (MusicKeyboardEditing._wheelMenuOwner !== this) return;
+            const wheelDiv = docById("wheelDivptm");
+            if (wheelDiv && wheelDiv.style) wheelDiv.style.display = "none";
+            const wheels = [
+                this._menuWheel,
+                this._pitchWheel,
+                this._tabsWheel,
+                this._exitWheel,
+                this._durationWheel,
+                this._accidentalsWheel,
+                this._octavesWheel
+            ];
+            for (const wheel of wheels) {
+                if (wheel && typeof wheel.removeWheel === "function") wheel.removeWheel();
+            }
+            MusicKeyboardEditing._wheelMenuOwner = null;
+        };
+
         // Semitones for the pitch rows Add Note can create: C1 to B8.
         const LOWESTSTEP = 1 * 12;
         const HIGHESTSTEP = 8 * 12 + 11;
@@ -139,6 +177,7 @@ const MusicKeyboardEditing = {
          * @param {string} start - The start attribute of the cell.
          */
         this._createpiesubmenu = function (cellId, start) {
+            this._claimWheelMenu();
             docById("wheelDivptm").style.display = "";
             docById("wheelDivptm").style.zIndex = "10001";
 
@@ -228,8 +267,8 @@ const MusicKeyboardEditing = {
             docById("wheelDivptm").style.height = "250px";
             docById("wheelDivptm").style.width = "250px";
 
-            const x = docById(cellId).getBoundingClientRect().x;
-            const y = docById(cellId).getBoundingClientRect().y;
+            const x = this._mkbEl(cellId).getBoundingClientRect().x;
+            const y = this._mkbEl(cellId).getBoundingClientRect().y;
 
             docById("wheelDivptm").style.left =
                 Math.min(
@@ -243,9 +282,7 @@ const MusicKeyboardEditing = {
                 ) + "px";
 
             this._exitWheel.navItems[0].navigateFunction = () => {
-                docById("wheelDivptm").style.display = "none";
-                this._menuWheel.removeWheel();
-                this._exitWheel.removeWheel();
+                this._closeWheelMenu();
             };
 
             let flag = 0;
@@ -328,7 +365,7 @@ const MusicKeyboardEditing = {
          */
         this._addNotes = function (cellId, start, divideNoteBy) {
             start = parseInt(start, 10);
-            const cell = docById(cellId);
+            const cell = this._mkbEl(cellId);
             const dur = cell.getAttribute("dur");
 
             this._notesPlayed = this._notesPlayed.reduce(function (prevValue, curValue) {
@@ -418,6 +455,7 @@ const MusicKeyboardEditing = {
          * The submenu allows selection between pitch and hertz options.
          */
         this._createAddRowPieSubmenu = function () {
+            this._claimWheelMenu();
             docById("wheelDivptm").style.display = "";
             docById("wheelDivptm").style.zIndex = "10001";
             const pitchLabels = [
@@ -480,8 +518,11 @@ const MusicKeyboardEditing = {
             }
             this._configureExitWheel(this._exitWheel);
 
-            const x = docById("addnotes").getBoundingClientRect().x;
-            const y = docById("addnotes").getBoundingClientRect().y;
+            // The toolbar button lives outside the widget body, so _mkbEl can't see
+            // it; keep the direct reference and fall back to the document lookup.
+            const addNoteButton = this._addNoteButton || docById("addnotes");
+            const x = addNoteButton.getBoundingClientRect().x;
+            const y = addNoteButton.getBoundingClientRect().y;
 
             docById("wheelDivptm").style.position = "absolute";
             docById("wheelDivptm").style.height = "300px";
@@ -498,9 +539,7 @@ const MusicKeyboardEditing = {
                 ) + "px";
 
             this._exitWheel.navItems[0].navigateFunction = () => {
-                docById("wheelDivptm").style.display = "none";
-                this._menuWheel.removeWheel();
-                this._exitWheel.removeWheel();
+                this._closeWheelMenu();
             };
 
             let rLabel;
@@ -738,6 +777,14 @@ const MusicKeyboardEditing = {
             }
         };
 
+        const syncRowSources = () => {
+            const rows = this.layout.filter(item => item.blockNumber < FAKEBLOCKNUMBER);
+            this.noteNames = rows.map(item => item.noteName);
+            this.octaves = rows.map(item => item.noteOctave);
+            this.instruments = rows.map(item => item.voice);
+            this._rowBlocks = rows.map(item => item.blockNumber);
+        };
+
         /**
          * Synchronizes this.layout and this.displayLayout, ensuring all notes
          * are aligned, gap-filled, and that real note blocks preserve their
@@ -781,6 +828,7 @@ const MusicKeyboardEditing = {
                 }
                 return { ...note };
             });
+            syncRowSources();
         };
 
         /**
@@ -859,6 +907,7 @@ const MusicKeyboardEditing = {
          * @param {string} condition - The condition that determines the type of submenu to create ('synthsblocks' or 'pitchblocks').
          */
         this._createColumnPieSubmenu = function (index, condition) {
+            this._claimWheelMenu();
             index = parseInt(index, 10);
             const displayLayout = this.displayLayout || this.layout;
             const layoutItem = displayLayout[displayLayout.length - index - 1];
@@ -1005,8 +1054,8 @@ const MusicKeyboardEditing = {
                 }
             }
 
-            const x = docById("labelcol" + index).getBoundingClientRect().x;
-            const y = docById("labelcol" + index).getBoundingClientRect().y;
+            const x = this._mkbEl("labelcol" + index).getBoundingClientRect().x;
+            const y = this._mkbEl("labelcol" + index).getBoundingClientRect().y;
 
             docById("wheelDivptm").style.position = "absolute";
             docById("wheelDivptm").style.height = "300px";
@@ -1024,6 +1073,27 @@ const MusicKeyboardEditing = {
 
             index = displayLayout.length - index - 1;
             const block = displayLayout[index].blockNumber;
+            let changed = false;
+
+            const updateRow = (noteName, noteOctave) => {
+                const sourceIndex = this._rowBlocks.indexOf(block);
+                if (sourceIndex !== -1) {
+                    this.noteNames[sourceIndex] = noteName;
+                    this.octaves[sourceIndex] = noteOctave;
+                }
+                this._mkbEl("labelcol" + (displayLayout.length - index - 1)).textContent =
+                    i18nSolfege(noteName) + noteOctave;
+                const synthNote =
+                    noteName === "hertz"
+                        ? noteOctave
+                        : resolveSynthNoteName(convertFromSolfege(noteName), noteOctave);
+                for (const note of this._notesPlayed) {
+                    if (note.blockNumber === block) {
+                        note.noteOctave = synthNote;
+                    }
+                }
+                changed = true;
+            };
 
             let noteValue =
                 this.activity.blocks.blockList[this.activity.blocks.blockList[block].connections[1]]
@@ -1063,12 +1133,32 @@ const MusicKeyboardEditing = {
             }
 
             this._exitWheel.navItems[0].navigateFunction = () => {
-                docById("wheelDivptm").style.display = "none";
-                this._pitchWheel.removeWheel();
-                this._exitWheel.removeWheel();
-                if (condition === "pitchblocks") {
-                    this._accidentalsWheel.removeWheel();
-                    this._octavesWheel.removeWheel();
+                this._closeWheelMenu();
+                if (changed) {
+                    this.displayLayout = this._keysLayout();
+                    syncRowSources();
+                    this._createKeyboard();
+                    this._refreshNoteToKeyMap();
+                    for (const note of this._notesPlayed) {
+                        const row =
+                            this.displayLayout.find(
+                                item =>
+                                    note.blockNumber < FAKEBLOCKNUMBER &&
+                                    item.blockNumber === note.blockNumber
+                            ) ||
+                            this.displayLayout.find(
+                                item =>
+                                    (item.noteName === "hertz"
+                                        ? item.noteOctave
+                                        : resolveSynthNoteName(item.noteName, item.noteOctave)) ===
+                                    note.noteOctave
+                            );
+                        note.objId = row ? row.objId : null;
+                        if (row) {
+                            note.blockNumber = row.blockNumber;
+                        }
+                    }
+                    this._createTable();
                 }
             };
 
@@ -1089,19 +1179,7 @@ const MusicKeyboardEditing = {
                 );
                 this.activity.blocks.blockList[argBlock].updateCache();
 
-                const cell = docById("labelcol" + (displayLayout.length - index - 1));
-                displayLayout[index].noteOctave = parseInt(blockValue, 10);
-                if (this.layout[index]) {
-                    this.layout[index].noteOctave = parseInt(blockValue, 10);
-                }
-                cell.textContent =
-                    displayLayout[index].noteName + displayLayout[index].noteOctave.toString();
-                this._notesPlayed.map(item => {
-                    if (item.objId === displayLayout[index].blockNumber) {
-                        item.noteOctave = parseInt(blockValue, 10);
-                    }
-                    return item;
-                });
+                updateRow("hertz", parseInt(blockValue, 10));
             };
 
             if (condition === "synthsblocks") {
@@ -1125,6 +1203,7 @@ const MusicKeyboardEditing = {
                             .title;
                     if (attr !== "♮") {
                         label += attr;
+                        labelValue += attr;
                     }
                 } else {
                     i = noteLabels.indexOf(label);
@@ -1154,24 +1233,7 @@ const MusicKeyboardEditing = {
                     );
                 }
 
-                const cell = docById("labelcol" + (displayLayout.length - index - 1));
-                displayLayout[index].noteName = label;
-                displayLayout[index].noteOctave = octave;
-                if (this.layout[index]) {
-                    this.layout[index].noteName = label;
-                    this.layout[index].noteOctave = octave;
-                }
-                cell.textContent =
-                    displayLayout[index].noteName + displayLayout[index].noteOctave.toString();
-                const temp1 = label;
-                const temp2 = resolveSynthNoteName(temp1, octave);
-
-                this._notesPlayed.map(item => {
-                    if (item.objId === displayLayout[index].blockNumber) {
-                        item.noteOctave = temp2;
-                    }
-                    return item;
-                });
+                updateRow(labelValue, octave);
             };
 
             /**

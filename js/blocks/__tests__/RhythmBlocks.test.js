@@ -439,6 +439,83 @@ describe("RhythmBlocks", () => {
             listeners._skip_0_10();
             expect(turtle.singer.skipFactor).toBe(1);
         });
+
+        // Mirrors the skip check in Singer.processNote (js/turtle-singer.js).
+        const playNotes = count => {
+            const silenced = [];
+            for (let i = 0; i < count; i++) {
+                let forceSilence = false;
+                if (turtle.singer.skipFactor > 1) {
+                    if (turtle.singer.skipIndex % turtle.singer.skipFactor > 0) {
+                        forceSilence = true;
+                    }
+                    turtle.singer.skipIndex += 1;
+                }
+                silenced.push(forceSilence);
+            }
+            return silenced;
+        };
+
+        const runClamp = (skip, noteCount) => {
+            let listener;
+            logo.setTurtleListener.mockImplementationOnce((t, name, fn) => {
+                listener = fn;
+            });
+            getBlock("skipnotes").flow([skip, true], logo, 0, 10);
+            const silenced = playNotes(noteCount);
+            listener();
+            return silenced;
+        };
+
+        test("starts counting notes from zero for each clamp", () => {
+            turtle.singer.skipFactor = 1;
+            turtle.singer.skipIndex = 3;
+            getBlock("skipnotes").flow([1, true], logo, 0, 10);
+
+            expect(turtle.singer.skipIndex).toBe(0);
+        });
+
+        test("identical clamps in a row skip the same notes", () => {
+            turtle.singer.skipFactor = 1;
+            turtle.singer.skipIndex = 0;
+
+            const first = runClamp(1, 3);
+            const second = runClamp(1, 3);
+
+            expect(first).toEqual([false, true, false]);
+            expect(second).toEqual([false, true, false]);
+            expect(turtle.singer.skipFactor).toBe(1);
+        });
+
+        test("larger skip values restart their pattern for each clamp", () => {
+            turtle.singer.skipFactor = 1;
+            turtle.singer.skipIndex = 0;
+
+            const first = runClamp(2, 4);
+            const second = runClamp(2, 4);
+
+            expect(first).toEqual([false, true, true, false]);
+            expect(second).toEqual([false, true, true, false]);
+        });
+
+        test("resumes the enclosing count, including notes counted inside the clamp", () => {
+            turtle.singer.skipFactor = 2;
+            turtle.singer.skipIndex = 5;
+
+            runClamp(1, 3);
+
+            expect(turtle.singer.skipIndex).toBe(8);
+            expect(turtle.singer.skipFactor).toBe(2);
+        });
+
+        test("does not reset the count when the skip value is rejected", () => {
+            turtle.singer.skipFactor = 1;
+            turtle.singer.skipIndex = 4;
+            getBlock("skipnotes").flow([0, true], logo, 0, 10);
+
+            expect(turtle.singer.skipIndex).toBe(4);
+            expect(logo.setTurtleListener).not.toHaveBeenCalled();
+        });
     });
 
     describe("MultiplyBeatFactorBlock", () => {

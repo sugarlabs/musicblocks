@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global DOMParser */
+/* global DOMParser, DRUM_MIDI_MAP, GCD, REVERSE_DRUM_MIDI_MAP */
 
 /* exported setupActivityMxmlParser */
 
@@ -45,12 +45,192 @@ const _MXML_TYPE_DENOMINATOR = {
 
 const _text = (parent, tag) => parent.querySelector(`:scope > ${tag}`)?.textContent ?? null;
 
-// Adds two [numerator, denominator] fractions without reducing the result --
-// same choice as js/utils/utils-logic.js's rationalSum, whose own doc comment
-// explains why: the "divide" block computes the reduction at runtime anyway,
-// so there's nothing to gain from doing it here, and an unreduced result is
-// just as correct.
-const _addFractions = ([n1, d1], [n2, d2]) => [n1 * d2 + n2 * d1, d1 * d2];
+const _isUsableFraction = fraction => {
+    if (!Array.isArray(fraction) || fraction.length !== 2) {
+        return false;
+    }
+
+    const [numerator, denominator] = fraction;
+    const value = numerator / denominator;
+
+    return (
+        Number.isFinite(numerator) &&
+        Number.isFinite(denominator) &&
+        numerator > 0 &&
+        denominator > 0 &&
+        Number.isFinite(value) &&
+        value > 0
+    );
+};
+
+const _decimalToFraction = value => {
+    if (!Number.isFinite(value) || value <= 0) {
+        return null;
+    }
+
+    if (Number.isInteger(value)) {
+        return [value, 1];
+    }
+
+    const [mantissa, exponentText] = value.toString().toLowerCase().split("e");
+    const exponent = Number(exponentText ?? 0);
+    const decimalPlaces = (mantissa.split(".")[1] ?? "").length;
+    const scale = 10 ** Math.max(0, decimalPlaces - exponent);
+
+    if (!Number.isFinite(scale) || scale <= 0) {
+        return null;
+    }
+
+    const numerator = Math.round(value * scale);
+
+    if (!Number.isFinite(numerator) || numerator <= 0) {
+        return null;
+    }
+
+    const divisor = GCD(numerator, scale);
+
+    if (!Number.isFinite(divisor) || divisor <= 0) {
+        return null;
+    }
+
+    const result = [numerator / divisor, scale / divisor];
+
+    return _isUsableFraction(result) ? result : null;
+};
+
+const _toIntegerFraction = ([numerator, denominator]) => {
+    const numeratorFraction = _decimalToFraction(numerator);
+    const denominatorFraction = _decimalToFraction(denominator);
+
+    if (numeratorFraction === null || denominatorFraction === null) {
+        return null;
+    }
+
+    const [numeratorValue, numeratorScale] = numeratorFraction;
+    const [denominatorValue, denominatorScale] = denominatorFraction;
+
+    const top = numeratorValue * denominatorScale;
+    const bottom = numeratorScale * denominatorValue;
+
+    if (!_isUsableFraction([top, bottom])) {
+        return null;
+    }
+
+    const divisor = GCD(top, bottom);
+
+    if (!Number.isFinite(divisor) || divisor <= 0) {
+        return null;
+    }
+
+    const result = [top / divisor, bottom / divisor];
+
+    return result.every(Number.isInteger) && _isUsableFraction(result) ? result : null;
+};
+
+const _addFractionsWithoutCrossMultiplication = ([n1, d1], [n2, d2]) => {
+    const left = [n1, d1];
+    const right = [n2, d2];
+
+    if (!_isUsableFraction(left) || !_isUsableFraction(right)) {
+        return [1, 4];
+    }
+
+    // Keep the smaller denominator and scale the other numerator down toward it.
+    // This avoids multiplying the two denominators together.
+    const useFirstDenominator = d1 <= d2;
+    const denominator = useFirstDenominator ? d1 : d2;
+    const numerator = useFirstDenominator ? n1 + n2 * (d1 / d2) : n1 * (d2 / d1) + n2;
+
+    const value = n1 / d1 + n2 / d2;
+    const directResult = [numerator, denominator];
+
+    if (
+        _isUsableFraction(directResult) &&
+        Number.isFinite(value) &&
+        numerator / denominator === value
+    ) {
+        return directResult;
+    }
+
+    // If retaining either original scale would overflow, preserve the numeric
+    // duration using the largest denominator that still keeps the pair finite.
+
+    if (!Number.isFinite(value) || value <= 0) {
+        return [1, 4];
+    }
+
+    // Exact fraction scaling is no longer safe here.
+    // Preserve the finite numeric duration instead.
+    return [value, 1];
+};
+
+// Keep tie durations reduced as they accumulate. Multiplying denominators on
+// every note can overflow before the resulting divide block is ever evaluated.
+const _addFractions = ([n1, d1], [n2, d2]) => {
+    const left = [n1, d1];
+    const right = [n2, d2];
+
+    if (!_isUsableFraction(left) || !_isUsableFraction(right)) {
+        return [1, 4];
+    }
+
+    // Convert decimal MusicXML components into integer fractions when the
+    // conversion stays finite. Otherwise use the safe numeric fallback below.
+    if (![n1, d1, n2, d2].every(Number.isInteger)) {
+        const integerLeft = _toIntegerFraction(left);
+        const integerRight = _toIntegerFraction(right);
+
+        if (integerLeft !== null && integerRight !== null) {
+            return _addFractions(integerLeft, integerRight);
+        }
+
+        return _addFractionsWithoutCrossMultiplication(left, right);
+    }
+
+    // Reduce both fractions before any cross-multiplication. This keeps very
+    // large but reducible operands from overflowing during the addition itself.
+    const firstDivisor = GCD(n1, d1);
+    const secondDivisor = GCD(n2, d2);
+
+    if (
+        !Number.isFinite(firstDivisor) ||
+        firstDivisor <= 0 ||
+        !Number.isFinite(secondDivisor) ||
+        secondDivisor <= 0
+    ) {
+        return _addFractionsWithoutCrossMultiplication(left, right);
+    }
+
+    n1 /= firstDivisor;
+    d1 /= firstDivisor;
+    n2 /= secondDivisor;
+    d2 /= secondDivisor;
+
+    const common = GCD(d1, d2);
+
+    if (!Number.isFinite(common) || common <= 0) {
+        return _addFractionsWithoutCrossMultiplication(left, right);
+    }
+
+    const numerator = n1 * (d2 / common) + n2 * (d1 / common);
+    const denominator = (d1 / common) * d2;
+
+    if (!_isUsableFraction([numerator, denominator])) {
+        return _addFractionsWithoutCrossMultiplication(left, right);
+    }
+
+    const divisor = GCD(numerator, denominator);
+
+    if (!Number.isFinite(divisor) || divisor <= 0) {
+        return _addFractionsWithoutCrossMultiplication(left, right);
+    }
+
+    const result = [numerator / divisor, denominator / divisor];
+
+    return _isUsableFraction(result)
+        ? result
+        : _addFractionsWithoutCrossMultiplication(left, right);
+};
 
 // Whether two note "content" values (pitch/drum/rest, as built in
 // _processPart) are the same. A real tie is always same-pitch; used to
@@ -71,7 +251,11 @@ const _timeModification = noteEl => {
     if (el === null) return [1, 1];
     const actual = Number(_text(el, "actual-notes"));
     const normal = Number(_text(el, "normal-notes"));
-    if (!(actual > 0) || !(normal > 0)) return [1, 1];
+
+    if (!Number.isFinite(actual) || !Number.isFinite(normal) || actual <= 0 || normal <= 0) {
+        return [1, 1];
+    }
+
     return [actual, normal];
 };
 
@@ -95,6 +279,7 @@ const _timeModification = noteEl => {
 function _noteDuration(noteEl, divisions) {
     const typeName = _text(noteEl, "type");
     const durationText = _text(noteEl, "duration");
+    const hasValidDivisions = Number.isFinite(divisions) && divisions > 0;
     // A whole-measure rest lasts the measure whatever <type> it is drawn
     // with: PhotoScore writes a 3/4 bar's rest as <type>whole</type> over a
     // three-beat <duration> (musescore.org/en/node/51611, the same bug in
@@ -102,28 +287,46 @@ function _noteDuration(noteEl, divisions) {
     // beat late. Its <duration> is the length that counts.
     // An empty or non-numeric <duration> says nothing, so it doesn't outrank
     // <type> (Number("") is 0, not "missing").
+    // A cue note is imported as a rest that holds its place in time, and
+    // <duration> is what advances the position; its <type> only says how the
+    // small cue is drawn.
     const measureRestLength = durationText?.trim() ? Number(durationText) : NaN;
-    const isMeasureRest =
-        noteEl.querySelector(":scope > rest")?.getAttribute("measure") === "yes" &&
+    const isMeasureRest = noteEl.querySelector(":scope > rest")?.getAttribute("measure") === "yes";
+    const isCue = noteEl.querySelector(":scope > cue") !== null;
+    const durationWins =
+        (isMeasureRest || isCue) &&
         Number.isFinite(measureRestLength) &&
         measureRestLength > 0 &&
-        divisions > 0;
-    if (!isMeasureRest && typeName !== null && typeName in _MXML_TYPE_DENOMINATOR) {
+        hasValidDivisions;
+
+    if (!durationWins && typeName !== null && typeName in _MXML_TYPE_DENOMINATOR) {
         const dots = noteEl.querySelectorAll(":scope > dot").length;
         const denominator = _MXML_TYPE_DENOMINATOR[typeName];
         // <type> is the note as written, so a tuplet note has to be shortened by
         // its ratio. <duration> below needs no such adjustment, having it already.
         const [actual, normal] = _timeModification(noteEl);
-        return [(2 ** (dots + 1) - 1) * normal, denominator * 2 ** dots * actual];
+        const computedDuration = [(2 ** (dots + 1) - 1) * normal, denominator * 2 ** dots * actual];
+
+        if (_isUsableFraction(computedDuration)) {
+            return computedDuration;
+        }
     }
 
-    if (durationText !== null && divisions > 0) {
+    if (durationText !== null && hasValidDivisions) {
         // duration is in divisions; a quarter note is `divisions` divisions long.
-        return [Number(durationText), divisions * 4];
+        const duration = Number(durationText);
+
+        if (durationText.trim() !== "" && Number.isFinite(duration) && duration > 0) {
+            const computedDuration = [duration, divisions * 4];
+
+            if (_isUsableFraction(computedDuration)) {
+                return computedDuration;
+            }
+        }
     }
 
-    // Malformed note with neither <type> nor <duration>: treat as a quarter note
-    // rather than producing a zero/NaN-length block.
+    // Fall back rather than producing a zero, negative, underflowed, or
+    // non-finite-length block.
     return [1, 4];
 }
 
@@ -146,34 +349,114 @@ function _pitchToNoteName(pitchEl) {
     return { name: step + suffix, octave };
 }
 
+// General MIDI kit pieces that REVERSE_DRUM_MIDI_MAP leaves out, each paired
+// with the nearest Music Blocks drum so a standard kit part doesn't send
+// them all to the kick.
+const _MXML_GM_DRUM_FALLBACK = {
+    35: "kick drum", // Acoustic Bass Drum
+    44: "hi hat", // Pedal Hi-Hat
+    46: "hi hat", // Open Hi-Hat
+    45: "tom tom", // Low Tom
+    48: "tom tom", // Hi-Mid Tom
+    51: "ride bell", // Ride Cymbal 1
+    57: "crash", // Crash Cymbal 2
+    59: "ride bell" // Ride Cymbal 2
+};
+
+// "Hi-Hat", "hi hat" and "HiHat" all name the same drum.
+const _drumKey = name => name.toLowerCase().replace(/[^a-z]/g, "");
+
 /**
- * The Music Blocks drum name for an unpitched <note>, from the
- * <score-instrument><instrument-name> its <instrument id> references.
+ * Builds a lookup map from score-instrument and midi-instrument ids to the
+ * resolved Music Blocks drum name.
  *
- * js/mxml.js writes <instrument-name> as the drum name directly (e.g. "snare
- * drum") for any drum it recognizes, so no MIDI-number round trip is needed --
- * the text is already what a drumname block's value should be. Falls back to
- * "kick drum" when the note has no <instrument> reference or the id doesn't
- * resolve, the same default js/midi.js's own importer uses for the same reason.
+ * js/mxml.js writes <instrument-name> as the drum name itself ("snare drum"),
+ * but other programs write their own names: the MusicXML tutorial's drum kit
+ * has "Snare Drum", "Kick Drum", "Crash Cymbal", "Hi-Hat Closed" and
+ * "Cowbell". Singer.DrumActions.GetDrumname matches names exactly and plays
+ * anything else as the default drum, so that kit came in as five kick drums.
+ * So: a name that is a Music Blocks drum up to case and punctuation is used;
+ * otherwise the <midi-unpitched> key on the matching <midi-instrument>
+ * (1-based, so GM key + 1, as js/mxml.js writes it) picks the drum through
+ * the reverse map js/midi.js's importer uses, with the name settling a key
+ * two drums share (56 is both "japanese drum" and "cow bell"). Falls back to
+ * "kick drum" when nothing resolves, as js/midi.js does.
  *
- * @param {Element} noteEl - a MusicXML <note> element with an <unpitched> child
- * @param {Document} doc - the whole document, since <score-instrument> lives in
- *     <part-list>, not inside the part being walked
- * @returns {string}
+ * Caching these resolutions in a Map before walking parts avoids calling
+ * querySelectorAll and performing repeat name/GM lookups for every drum note.
+ *
+ * @param {Document} doc - the whole document
+ * @returns {Map<string, string>}
  */
-function _drumName(noteEl, doc) {
-    const instrumentId = noteEl.querySelector(":scope > instrument")?.getAttribute("id");
-    if (!instrumentId) return "kick drum";
-    // Matched by comparing the id in JS, not interpolated into a CSS attribute
-    // selector -- an id containing a quote or other selector-special character
-    // would otherwise produce a malformed (or, worse, unintended) selector.
-    for (const scoreInstrument of doc.querySelectorAll("score-instrument")) {
-        if (scoreInstrument.getAttribute("id") === instrumentId) {
-            const name = _text(scoreInstrument, "instrument-name")?.trim();
-            return name || "kick drum";
+function _buildInstrumentMap(doc) {
+    const scoreInstruments = new Map();
+    for (const el of doc.querySelectorAll("score-instrument")) {
+        const id = el.getAttribute("id");
+        if (id && !scoreInstruments.has(id)) {
+            scoreInstruments.set(id, el);
         }
     }
-    return "kick drum";
+
+    const midiInstruments = new Map();
+    for (const el of doc.querySelectorAll("midi-instrument")) {
+        const id = el.getAttribute("id");
+        if (id && !midiInstruments.has(id)) {
+            midiInstruments.set(id, el);
+        }
+    }
+
+    const drums = typeof DRUM_MIDI_MAP !== "undefined" ? Object.keys(DRUM_MIDI_MAP) : [];
+    const allIds = new Set([...scoreInstruments.keys(), ...midiInstruments.keys()]);
+    const map = new Map();
+
+    for (const id of allIds) {
+        const scoreInstrument = scoreInstruments.get(id);
+        const name = scoreInstrument ? _text(scoreInstrument, "instrument-name")?.trim() : null;
+        const key = name ? _drumKey(name) : "";
+        const named = drums.find(drum => _drumKey(drum) === key);
+        if (named) {
+            map.set(id, named);
+            continue;
+        }
+
+        const midiInstrument = midiInstruments.get(id);
+        const gmKey = midiInstrument ? Number(_text(midiInstrument, "midi-unpitched")) - 1 : NaN;
+        if (Number.isInteger(gmKey)) {
+            const candidates =
+                typeof REVERSE_DRUM_MIDI_MAP !== "undefined"
+                    ? (REVERSE_DRUM_MIDI_MAP[gmKey] ?? [])
+                    : [];
+            const mapped =
+                candidates.find(drum => _drumKey(drum) === key) ??
+                candidates[0] ??
+                _MXML_GM_DRUM_FALLBACK[gmKey];
+            if (mapped) {
+                map.set(id, mapped);
+                continue;
+            }
+        }
+
+        map.set(id, name || "kick drum");
+    }
+
+    return map;
+}
+
+/**
+ * The Music Blocks drum name for an unpitched <note>, from the instrument its
+ * <instrument id> references in <part-list>.
+ *
+ * Falls back to "kick drum" when the note has no <instrument> reference or its
+ * id does not resolve, the same default js/midi.js's own importer uses.
+ *
+ * @param {Element} noteEl - a MusicXML <note> element with an <unpitched> child
+ * @param {Map<string, string>} instrumentMap - lookup map from instrument id to drum name
+ * @returns {string}
+ */
+function _drumName(noteEl, instrumentMap) {
+    const instrumentId = noteEl.querySelector(":scope > instrument")?.getAttribute("id");
+    if (!instrumentId) return "kick drum";
+    return instrumentMap.get(instrumentId) ?? "kick drum";
 }
 
 // Inverse of js/mxml.js's _MAJOR_FIFTHS: a <fifths> count -> the major-key tonic
@@ -536,11 +819,11 @@ function _applyRepeats(repeats, noteBlocks, noteStartIds, noteEndIds, blockId) {
  * @param {Element} partEl - a MusicXML <part> element
  * @param {number} blockId - the next free block id (the preamble's last id + 1)
  * @param {number} chainPrevId - the block id the first note should connect from
- * @param {Document} doc - the whole document, for drum-name lookups
+ * @param {Map<string, string>} instrumentMap - lookup map for drum names
  * @returns {{noteBlocks: Array, lastBlockId: number, producedNotes: boolean,
  *     firstBlockId: number}}
  */
-function _processPart(partEl, blockId, chainPrevId, doc) {
+function _processPart(partEl, blockId, chainPrevId, instrumentMap) {
     const noteBlocks = [];
     const noteStartIds = [];
     const noteEndIds = [];
@@ -577,6 +860,22 @@ function _processPart(partEl, blockId, chainPrevId, doc) {
         for (const child of measureEl.children) {
             if (child.tagName === "backup") break;
 
+            // <forward> moves this voice on by its <duration> with no note
+            // written. Skipping it brought every later note in early.
+            if (child.tagName === "forward") {
+                const durationText = _text(child, "duration");
+                const length = durationText?.trim() ? Number(durationText) : NaN;
+                if (Number.isFinite(length) && length > 0 && divisions > 0) {
+                    if (tieDuration !== null) {
+                        emitNote(tieDuration, tieContent);
+                        tieDuration = null;
+                        tieContent = null;
+                    }
+                    emitNote([length, divisions * 4], null);
+                }
+                continue;
+            }
+
             if (child.tagName === "barline") {
                 const repeatEl = child.querySelector(":scope > repeat");
                 const direction = repeatEl?.getAttribute("direction");
@@ -602,15 +901,18 @@ function _processPart(partEl, blockId, chainPrevId, doc) {
             const duration = _noteDuration(child, divisions);
             const unpitchedEl = child.querySelector(":scope > unpitched");
             const pitchEl = child.querySelector(":scope > pitch");
+            // A cue note shows another part's line during this one's rest
+            // and MusicXML says it isn't played, but it still fills the time.
             const isRest =
                 child.querySelector(":scope > rest") !== null ||
+                child.querySelector(":scope > cue") !== null ||
                 (pitchEl === null && unpitchedEl === null);
 
             let content;
             if (isRest) {
                 content = null;
             } else if (unpitchedEl !== null) {
-                content = { type: "drum", name: _drumName(child, doc) };
+                content = { type: "drum", name: _drumName(child, instrumentMap) };
             } else {
                 content = { type: "pitch", ..._pitchToNoteName(pitchEl) };
             }
@@ -692,9 +994,10 @@ function _processPart(partEl, blockId, chainPrevId, doc) {
  * @param {string} voiceLabel - this part's turtle name, e.g. "Voice 1"
  * @param {number|null} tempoBpm - shared across every part, same as a MIDI
  *     file's tempo applies to every track
+ * @param {Map<string, string>} instrumentMap - lookup map for drum names
  * @returns {{blocks: Array, nextBlockId: number}}
  */
-function _buildPartBlocks(partEl, startId, title, voiceLabel, tempoBpm, doc) {
+function _buildPartBlocks(partEl, startId, title, voiceLabel, tempoBpm, instrumentMap) {
     const timeSignature = _initialTimeSignature(partEl);
     const keySignature = _keySignature(partEl);
     const { preamble, settimbreId, nextBlockId } = _buildPreamble(
@@ -709,7 +1012,7 @@ function _buildPartBlocks(partEl, startId, title, voiceLabel, tempoBpm, doc) {
         partEl,
         nextBlockId,
         settimbreId,
-        doc
+        instrumentMap
     );
 
     if (producedNotes) {
@@ -755,6 +1058,7 @@ const setupActivityMxmlParser = activityInstance => {
             doc.querySelector("movement-title")?.textContent ??
             "title";
         const tempoBpm = _findTempo(doc);
+        const instrumentMap = _buildInstrumentMap(doc);
 
         let blockId = 0;
         const allBlocks = [];
@@ -765,7 +1069,7 @@ const setupActivityMxmlParser = activityInstance => {
                 title,
                 `Voice ${index + 1}`,
                 tempoBpm,
-                doc
+                instrumentMap
             );
             allBlocks.push(...blocks);
             blockId = nextBlockId;
@@ -781,8 +1085,12 @@ const setupActivityMxmlParser = activityInstance => {
         // settimbre/voicename/hidden despite having lower ids).
         allBlocks.sort((a, b) => a[0] - b[0]);
 
-        this.blocks.loadNewBlocks(allBlocks);
-        return null;
+        // Returned so callers (js/project-manager.js) can tell this load's
+        // "finishedLoading"/"loadFailed" pubsub events apart from any other
+        // in-flight load -- loadNewBlocks() finishes asynchronously, so a
+        // null return (the early-exit paths above) is the only way to tell
+        // "never started a load" apart from "started one".
+        return this.blocks.loadNewBlocks(allBlocks);
     };
 };
 

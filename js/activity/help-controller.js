@@ -392,7 +392,15 @@ class HelpController {
                 const message = that.blocks.protoBlockDict[name].helpString;
                 if (message.length < 4) {
                     // If there is nothing specified, just load the block.
-                    const obj = that.palettes.getProtoNameAndPalette(name);
+                    let obj = that.palettes.getProtoNameAndPalette(name);
+                    if (obj[0] === null && that.blocks.protoBlockDict[name].palette) {
+                        // getProtoNameAndPalette() skips hidden blocks, but a
+                        // hidden block such as temperamentname still has help
+                        // artwork, so load it directly instead of saving an
+                        // empty image.
+                        const proto = that.blocks.protoBlockDict[name];
+                        obj = [name, proto.palette.name, proto.name];
+                    }
                     const protoblk = obj[0];
                     const paletteName = obj[1];
                     const protoName = obj[2];

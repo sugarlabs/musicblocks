@@ -11,7 +11,11 @@
 
 "use strict";
 
+const fs = require("fs");
+const path = require("path");
 const { setupActivityAbcParser } = require("../abc-parser.js");
+const ABCJS = require("../../../lib/abc.min.js");
+const { toFraction } = require("../../utils/utils-logic.js");
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -50,6 +54,7 @@ function makeNote(name, pitch, duration = 0.25, opts = {}) {
         pitches: [pitchObj],
         duration,
         startTriplet: opts.startTriplet ?? null,
+        tripletMultiplier: opts.tripletMultiplier,
         endTriplet: opts.endTriplet ?? null
     };
 }
@@ -90,20 +95,10 @@ function blocksOfType(blocks, type) {
 }
 
 // ---------------------------------------------------------------------------
-// Mock toFraction globally (musicutils.js is not loaded in this unit context)
+// Use the same fraction conversion as the importer at runtime.
 // ---------------------------------------------------------------------------
 beforeAll(() => {
-    global.toFraction = duration => {
-        // Simplified: return [numerator, denominator] for common durations
-        const map = {
-            0.0625: [1, 16],
-            0.125: [1, 8],
-            0.25: [1, 4],
-            0.5: [1, 2],
-            1: [1, 1]
-        };
-        return map[duration] ?? [Math.round(duration * 8), 8];
-    };
+    global.toFraction = toFraction;
 });
 
 afterEach(() => {
@@ -113,6 +108,66 @@ afterEach(() => {
 // ---------------------------------------------------------------------------
 // Test 1 — Simple melody (single voice, G major, 4/4)
 // ---------------------------------------------------------------------------
+describe("Header tempo", () => {
+    test.each([
+        ["1/4=120", 120, 1 / 4],
+        ["3/8=60", 60, 3 / 8],
+        ["1/4 1/8=60", 60, 3 / 8],
+        ["120", 120, 1 / 8],
+        ['"Allegro" 1/4=120', 120, 1 / 4]
+    ])("imports Q:%s with its own beat unit", async (header, bpm, beatValue) => {
+        const tune = ABCJS.parseOnly(`X:1\nM:6/8\nL:1/8\nQ:${header}\nK:C\nCDE|`)[0];
+        const blocks = await parseAndCapture(tune);
+        const tempos = blocksOfType(blocks, "setbpm3");
+        expect(tempos).toHaveLength(1);
+
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const tempo = tempos[0];
+        const beat = byId.get(tempo[4][2]);
+        expect(byId.get(tempo[4][1])[1][1].value).toBe(bpm);
+        expect(byId.get(beat[4][1])[1][1].value / byId.get(beat[4][2])[1][1].value).toBe(beatValue);
+
+        const key = blocksOfType(blocks, "setkey2")[0];
+        const spacer = byId.get(tempo[4][3]);
+        const timbre = blocksOfType(blocks, "settimbre")[0];
+        expect(key[4][3]).toBe(tempo[0]);
+        expect(tempo[4][0]).toBe(key[0]);
+        expect(spacer[4]).toEqual([tempo[0], timbre[0]]);
+        expect(timbre[4][0]).toBe(spacer[0]);
+        expect(byId.get(timbre[4][2])[1][0]).toBe("nameddo");
+        expect(new Set(blocks.map(block => block[0])).size).toBe(blocks.length);
+    });
+
+    test.each(["", 'Q:"Allegro"\n'])("does not invent a numeric tempo from %j", async header => {
+        const tune = ABCJS.parseOnly(`X:1\nM:4/4\nL:1/4\n${header}K:C\nCDE|`)[0];
+        expect(blocksOfType(await parseAndCapture(tune), "setbpm3")).toHaveLength(0);
+    });
+
+    test("sets the header tempo for every staff", async () => {
+        const staff = {
+            meter: { value: [{ num: 4, den: 4 }] },
+            key: { root: "C", mode: "major", accidentals: [] },
+            voices: [[makeNote("C", 0)]]
+        };
+        const tune = makeTune({ staves: [staff, staff] });
+        tune.metaText.tempo = { bpm: 120, duration: [0.25] };
+        const blocks = await parseAndCapture(tune);
+        expect(blocksOfType(blocks, "setbpm3")).toHaveLength(2);
+        expect(new Set(blocks.map(block => block[0])).size).toBe(blocks.length);
+    });
+
+    test.each([
+        { bpm: 0, duration: [0.25] },
+        { bpm: Infinity, duration: [0.25] },
+        { bpm: 120, duration: [] },
+        { bpm: 120, duration: [NaN] }
+    ])("ignores an invalid tempo %j", async tempo => {
+        const tune = makeTune();
+        tune.metaText.tempo = tempo;
+        expect(blocksOfType(await parseAndCapture(tune), "setbpm3")).toHaveLength(0);
+    });
+});
+
 describe("Test 1: Simple melody", () => {
     const tune = makeTune({
         title: "Twinkle",
@@ -225,6 +280,53 @@ describe("Test 2: Multiple voices", () => {
     });
 });
 
+describe("ABC voices sharing one staff", () => {
+    const staff = voices => ({
+        meter: { value: [{ num: 4, den: 4 }] },
+        key: { root: "C", mode: "major", accidentals: [] },
+        voices
+    });
+
+    test("imports simultaneous voices as separate Start stacks", async () => {
+        const abcjs = require("abcjs");
+        const tune = abcjs.parseOnly(
+            "X:1\nT:Two voices\nM:4/4\nL:1/4\n%%score (1 2)\nV:1\nV:2\nK:C\n[V:1] C4|\n[V:2] E4|"
+        )[0];
+        expect(tune.lines[0].staff[0].voices).toHaveLength(2);
+
+        const blocks = await parseAndCapture(tune);
+        expect(blocksOfType(blocks, "start")).toHaveLength(2);
+
+        const calls = blocksOfType(blocks, "nameddo");
+        expect(calls.map(block => block[1][1].value)).toEqual(["V: 1 Line 1", "V: 2 Line 1"]);
+        expect(calls.every(block => block[4][1] === null)).toBe(true);
+    });
+
+    test("keeps each voice's segments together across staff lines", async () => {
+        const tune = {
+            metaText: { title: "Two voices", instruction: "guitar" },
+            lines: [
+                { staff: [staff([[makeNote("C", 0)], [makeNote("E", 2)]])] },
+                { staff: [staff([[makeNote("D", 1)], [makeNote("F", 3)]])] }
+            ]
+        };
+
+        const blocks = await parseAndCapture(tune);
+        expect(blocksOfType(blocks, "start")).toHaveLength(2);
+
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const firstCalls = blocksOfType(blocks, "nameddo").filter(block => {
+            const previous = byId.get(block[4][0]);
+            return previous && previous[1] === "settimbre";
+        });
+        expect(firstCalls.map(block => block[1][1].value)).toEqual(["V: 1 Line 1", "V: 2 Line 1"]);
+        expect(firstCalls.map(block => byId.get(block[4][1])[1][1].value)).toEqual([
+            "V: 1 Line 2",
+            "V: 2 Line 2"
+        ]);
+    });
+});
+
 // ---------------------------------------------------------------------------
 // Test 3 — Repeat bars
 // ---------------------------------------------------------------------------
@@ -263,12 +365,126 @@ describe("Test 3: Repeat bars", () => {
         );
         expect(repeatCount).toBeDefined();
     });
+
+    test("a repeat in one voice does not wrap the other voice", async () => {
+        const twoVoiceTune = makeTune({
+            staves: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "C", mode: "major", accidentals: [] },
+                    voices: [
+                        [
+                            makeBar("bar_left_repeat"),
+                            makeNote("C", 0),
+                            makeBar("bar_right_repeat"),
+                            makeNote("D", 1)
+                        ],
+                        [makeNote("E", 2), makeNote("F", 3)]
+                    ]
+                }
+            ]
+        });
+
+        const blocks = await parseAndCapture(twoVoiceTune);
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const repeats = blocksOfType(blocks, "repeat");
+        expect(repeats).toHaveLength(1);
+        expect(byId.get(repeats[0][4][2])[1][1].value).toBe("V: 1 Line 1");
+        expect(blocksOfType(blocks, "start")).toHaveLength(2);
+        expect(
+            blocks.find(
+                block =>
+                    Array.isArray(block[1]) &&
+                    block[1][0] === "nameddo" &&
+                    block[1][1].value === "V: 2 Line 1"
+            )
+        ).toBeDefined();
+    });
 });
 
 // ---------------------------------------------------------------------------
 // Test 4 — Triplets
 // ---------------------------------------------------------------------------
 describe("Test 4: Triplets", () => {
+    test("imports the downloadable quarter-note triplet example", async () => {
+        const abc = fs.readFileSync(
+            path.join(__dirname, "fixtures", "quarter-note-triplets.abc"),
+            "utf8"
+        );
+        const tune = ABCJS.parseOnly(abc)[0];
+        expect(tune.warnings).toBeUndefined();
+        const blocks = await parseAndCapture(tune);
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const durations = blocksOfType(blocks, "newnote").map(note => {
+            const divide = byId.get(note[4][1]);
+            return byId.get(divide[4][1])[1][1].value / byId.get(divide[4][2])[1][1].value;
+        });
+        expect(durations).toEqual([
+            1 / 6,
+            1 / 6,
+            1 / 6,
+            1 / 4,
+            1 / 4,
+            1 / 6,
+            1 / 6,
+            1 / 6,
+            1 / 4,
+            1 / 4
+        ]);
+    });
+
+    test.each([
+        ["quarter-note triplets", "4/4", "1/4", "(3CDE F|", [1 / 6, 1 / 6, 1 / 6, 1 / 4]],
+        ["sixteenth-note triplets", "4/4", "1/16", "(3CDE F|", [1 / 24, 1 / 24, 1 / 24, 1 / 16]],
+        ["triplets in cut time", "2/2", "1/8", "(3CDE F|", [1 / 12, 1 / 12, 1 / 12, 1 / 8]],
+        ["duplets in compound time", "6/8", "1/8", "(2CD E|", [3 / 16, 3 / 16, 1 / 8]],
+        [
+            "an explicit tuplet ratio",
+            "4/4",
+            "1/8",
+            "(5:4:5CDEFG A|",
+            [0.1, 0.1, 0.1, 0.1, 0.1, 1 / 8]
+        ],
+        ["a rest in a tuplet", "4/4", "1/4", "(3CzE F|", [1 / 6, 1 / 6, 1 / 6, 1 / 4]],
+        [
+            "a spacer within a tuplet",
+            "4/4",
+            "1/4",
+            "(3CyDE F|",
+            [1 / 6, 1 / 4, 1 / 6, 1 / 6, 1 / 4]
+        ],
+        [
+            "a spacer across tuplet staff lines",
+            "4/4",
+            "1/4",
+            "(3C\nyDE F|",
+            [1 / 6, 1 / 4, 1 / 6, 1 / 6, 1 / 4]
+        ],
+        [
+            "unequal note lengths in a tuplet",
+            "4/4",
+            "1/8",
+            "(3C>D E F|",
+            [1 / 8, 1 / 24, 1 / 12, 1 / 8]
+        ],
+        [
+            "a tuplet spanning staff lines",
+            "4/4",
+            "1/8",
+            "(3C\nDE F|",
+            [1 / 12, 1 / 12, 1 / 12, 1 / 8]
+        ]
+    ])("preserves %s from parsed ABC", async (_name, meter, unit, music, expected) => {
+        const tune = ABCJS.parseOnly(`X:1\nM:${meter}\nL:${unit}\nK:C\n${music}`)[0];
+        const blocks = await parseAndCapture(tune);
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const durations = blocksOfType(blocks, "newnote").map(note => {
+            const divide = byId.get(note[4][1]);
+            return byId.get(divide[4][1])[1][1].value / byId.get(divide[4][2])[1][1].value;
+        });
+        expect(durations).toEqual(expected);
+    });
+
     const tune = makeTune({
         title: "Triplet Test",
         staves: [
@@ -277,7 +493,7 @@ describe("Test 4: Triplets", () => {
                 key: { root: "C", mode: "major", accidentals: [] },
                 voices: [
                     [
-                        makeNote("C", 0, 0.125, { startTriplet: 3 }),
+                        makeNote("C", 0, 0.125, { startTriplet: 3, tripletMultiplier: 2 / 3 }),
                         makeNote("D", 1, 0.125),
                         makeNote("E", 2, 0.125, { endTriplet: 3 }),
                         makeNote("F", 3, 0.25)
@@ -324,7 +540,7 @@ describe("Test 4: Triplets", () => {
                     key: { root: "C", mode: "major", accidentals: [] },
                     voices: [
                         [
-                            makeNote("C", 0, 0.125, { startTriplet: 3 }),
+                            makeNote("C", 0, 0.125, { startTriplet: 3, tripletMultiplier: 2 / 3 }),
                             makeNote("D", 1, 0.125),
                             makeNote("E", 2, 0.125, { endTriplet: 3 })
                         ],
@@ -353,10 +569,10 @@ describe("Test 4: Triplets", () => {
         expect(denomWith4.length).toBeGreaterThanOrEqual(3);
     });
 
-    test("tripletFinder does not bleed across voice boundaries even if triplet is unclosed", async () => {
-        // Voice 1: triplet C D E (no endTriplet, i.e., unclosed triplet).
+    test("tripletFinder does not bleed across voice boundaries while a triplet is still open", async () => {
+        // Voice 1: only C D of a three-note triplet, leaving one note outstanding.
         // Voice 2: plain quarter notes only — must NOT inherit the triplet state
-        // and must produce standard denominator (4).
+        // and must produce standard denominator (4). Voice 1 resumes on the next line.
         const twoVoiceTune = makeTune({
             title: "Unclosed Triplet Bleed Test",
             staves: [
@@ -365,11 +581,22 @@ describe("Test 4: Triplets", () => {
                     key: { root: "C", mode: "major", accidentals: [] },
                     voices: [
                         [
-                            makeNote("C", 0, 0.125, { startTriplet: 3 }),
-                            makeNote("D", 1, 0.125),
-                            makeNote("E", 2, 0.125)
+                            makeNote("C", 0, 0.125, { startTriplet: 3, tripletMultiplier: 2 / 3 }),
+                            makeNote("D", 1, 0.125)
                         ],
                         [makeNote("G", 4, 0.25), makeNote("A", 5, 0.25)]
+                    ]
+                }
+            ]
+        });
+        twoVoiceTune.lines.push({
+            staff: [
+                {
+                    meter: { value: [{ num: 4, den: 4 }] },
+                    key: { root: "C", mode: "major", accidentals: [] },
+                    voices: [
+                        [makeNote("E", 2, 0.125, { endTriplet: 3 }), makeNote("F", 3, 0.25)],
+                        [makeNote("B", 6, 0.25)]
                     ]
                 }
             ]
@@ -377,18 +604,14 @@ describe("Test 4: Triplets", () => {
 
         const blocks = await parseAndCapture(twoVoiceTune);
 
-        // Voice 1 notes will all be processed under triplet state because it started and never closed,
-        // so all 3 notes get denominator 12.
-        const denomWith12 = blocks.filter(
-            b => Array.isArray(b[1]) && b[1][0] === "number" && b[1][1]?.value === 12
-        );
-        expect(denomWith12).toHaveLength(3);
-
-        // Voice 2 notes must not be affected. They must have standard denominator 4.
-        const denomWith4 = blocks.filter(
-            b => Array.isArray(b[1]) && b[1][0] === "number" && b[1][1]?.value === 4
-        );
-        expect(denomWith4.length).toBeGreaterThanOrEqual(3);
+        // Follow each note's duration connection, excluding meter and pitch numbers.
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const durations = blocksOfType(blocks, "newnote").map(note => {
+            const divide = byId.get(note[4][1]);
+            return byId.get(divide[4][1])[1][1].value / byId.get(divide[4][2])[1][1].value;
+        });
+        // Each voice now has its own start stack, so its notes are grouped together.
+        expect(durations).toEqual([1 / 12, 1 / 12, 1 / 12, 1 / 4, 1 / 4, 1 / 4, 1 / 4]);
     });
 });
 
@@ -1207,5 +1430,327 @@ describe("Meters abcjs reports by name rather than by number", () => {
         );
 
         expect(blocksOfType(blocks, "newnote")).toHaveLength(3);
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Chords ([CEG]) — abcjs puts every note of the chord in pitches[]
+// ---------------------------------------------------------------------------
+describe("Chords", () => {
+    const cMajor = { root: "C", acc: "", mode: "", accidentals: [] };
+    const chord = (pitches, duration = 0.25) => ({
+        el_type: "note",
+        pitches,
+        duration,
+        startTriplet: null,
+        endTriplet: null
+    });
+
+    test("imports every note of a chord into one note block", async () => {
+        const blocks = await parseAndCapture(
+            makeVoiceTune(cMajor, [
+                chord([
+                    { name: "C", pitch: 0 },
+                    { name: "E", pitch: 2 },
+                    { name: "G", pitch: 4 }
+                ])
+            ])
+        );
+
+        expect(blocksOfType(blocks, "newnote")).toHaveLength(1);
+        expect(pitchNames(blocks)).toEqual([
+            ["C", 4],
+            ["E", 4],
+            ["G", 4]
+        ]);
+
+        // Chained inside the note's clamp, and the note still reaches its
+        // trailing hidden block.
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const [c, e, g] = blocksOfType(blocks, "pitch");
+        const newnote = blocksOfType(blocks, "newnote")[0];
+        expect(byId.get(c[4][0])[1]).toBe("vspace");
+        expect([c[4][3], e[4][0], e[4][3], g[4][0], g[4][3]]).toEqual([
+            e[0],
+            c[0],
+            g[0],
+            e[0],
+            null
+        ]);
+        expect(byId.get(newnote[4][3])[1]).toBe("hidden");
+    });
+
+    test("an accidental inside a chord carries to the end of the bar", async () => {
+        const blocks = await parseAndCapture(
+            makeVoiceTune(cMajor, [
+                chord([
+                    { name: "^F", pitch: 3, accidental: "sharp" },
+                    { name: "A", pitch: 5 }
+                ]),
+                makeNote("F", 3),
+                makeBar(),
+                makeNote("F", 3)
+            ])
+        );
+
+        expect(pitchNames(blocks)).toEqual([
+            ["F♯", 4],
+            ["A", 4],
+            ["F♯", 4],
+            ["F", 4]
+        ]);
+    });
+});
+
+describe("Key and meter changes inside a tune", () => {
+    const parse = abc => parseAndCapture(ABCJS.parseOnly(abc)[0]);
+
+    // What one voice plays, in order, with each repeat played its count: each
+    // note as name and octave, each key change as K:root mode and each meter
+    // change as M:num/den.
+    const scoreOrder = (blocks, voice = 0) => {
+        const byId = new Map(blocks.map(b => [b[0], b]));
+        const type = b => (Array.isArray(b[1]) ? b[1][0] : b[1]);
+        const value = id => byId.get(id)[1][1].value;
+        const actions = new Map(
+            blocksOfType(blocks, "action").map(a => [value(a[4][1]), byId.get(a[4][2])])
+        );
+        const out = [];
+        const run = block => {
+            for (; block; block = byId.get(block[4][block[4].length - 1])) {
+                if (type(block) === "repeat") {
+                    for (let i = 0; i < value(block[4][1]); i++) {
+                        run(byId.get(block[4][2]));
+                    }
+                } else if (type(block) === "nameddo") {
+                    run(byId.get(actions.get(value(block[0]))[4][1]));
+                } else if (type(block) === "newnote") {
+                    const pitch = byId.get(byId.get(block[4][2])[4][1]);
+                    out.push(value(pitch[4][1]) + value(pitch[4][2]));
+                } else if (type(block) === "setkey2") {
+                    out.push(`K:${value(block[4][1])} ${value(block[4][2])}`);
+                } else if (type(block) === "meter") {
+                    const divide = byId.get(block[4][2]);
+                    out.push(`M:${value(block[4][1])}/${value(divide[4][2])}`);
+                }
+            }
+        };
+        run(byId.get(blocksOfType(blocks, "settimbre")[voice][4][2]));
+        return out;
+    };
+
+    // Every block id is unique and every connection is returned by the block
+    // it points to, so the new blocks sit in the stack like the notes do.
+    const expectLinked = blocks => {
+        const byId = new Map(blocks.map(b => [b[0], b]));
+        expect(byId.size).toBe(blocks.length);
+        blocks.forEach(block => {
+            block[4].forEach(id => {
+                if (id !== null) {
+                    expect(byId.get(id)[4]).toContain(block[0]);
+                }
+            });
+        });
+    };
+
+    test("notes after an inline [K:] take the new key", async () => {
+        const blocks = await parse("X:1\nM:4/4\nL:1/4\nK:C\nC F c F | [K:D] F c d F |]\n");
+
+        expect(scoreOrder(blocks)).toEqual([
+            "C4",
+            "F4",
+            "C5",
+            "F4",
+            "K:D major",
+            "F♯4",
+            "C♯5",
+            "D5",
+            "F♯4"
+        ]);
+        expect(blocksOfType(blocks, "setkey2")).toHaveLength(2);
+        expectLinked(blocks);
+    });
+
+    test("a K: line between staff lines becomes a key change", async () => {
+        const blocks = await parse("X:1\nM:4/4\nL:1/4\nK:C\nC F c F |\nK:Bb\nB E F B |]\n");
+
+        expect(scoreOrder(blocks)).toEqual([
+            "C4",
+            "F4",
+            "C5",
+            "F4",
+            "K:B♭ major",
+            "B♭4",
+            "E♭4",
+            "F4",
+            "B♭4"
+        ]);
+        expectLinked(blocks);
+    });
+
+    // abcjs reports no key element for these, only the new key on the next line.
+    test.each([
+        [
+            "a K: line inside a voice's music",
+            "V:1\nC F c F |\nV:2\nC F c F |\nV:1\nK:D\nF c d F |\nV:2\nF c d F |]\n"
+        ],
+        [
+            "a K: line between the voices",
+            "V:1\nC F c F |\nV:2\nC F c F |\nK:D\nV:1\nF c d F |\nV:2\nF c d F |]\n"
+        ]
+    ])("%s becomes a key change in each voice", async (_name, body) => {
+        const blocks = await parse(`X:1\nM:4/4\nL:1/4\nK:C\n${body}`);
+        const expected = ["C4", "F4", "C5", "F4", "K:D major", "F♯4", "C♯5", "D5", "F♯4"];
+
+        expect(scoreOrder(blocks, 0)).toEqual(expected);
+        expect(scoreOrder(blocks, 1)).toEqual(expected);
+        expectLinked(blocks);
+    });
+
+    test("a key change keeps its mode", async () => {
+        const blocks = await parse("X:1\nM:4/4\nL:1/4\nK:C\nC D E F | [K:Ador] F G A B |]\n");
+
+        expect(scoreOrder(blocks)).toContain("K:A dorian");
+        expect(scoreOrder(blocks).slice(-4)).toEqual(["F♯4", "G4", "A4", "B4"]);
+    });
+
+    test("restating the current key adds no block", async () => {
+        const blocks = await parse("X:1\nM:4/4\nL:1/4\nK:G\nG A B c | [K:G] d e f g |]\n");
+
+        expect(blocksOfType(blocks, "setkey2")).toHaveLength(1);
+        expect(scoreOrder(blocks)).toContain("F♯5");
+    });
+
+    test("K:none is imported as C major", async () => {
+        const blocks = await parse("X:1\nM:4/4\nL:1/4\nK:D\nF c d F | [K:none] F c d F |]\n");
+
+        expect(scoreOrder(blocks)).toEqual([
+            "F♯4",
+            "C♯5",
+            "D5",
+            "F♯4",
+            "K:C major",
+            "F4",
+            "C5",
+            "D5",
+            "F4"
+        ]);
+    });
+
+    // An empty K: is the same as K:none, and K:none ^F keeps the explicit sharp.
+    test.each([
+        ["K:none", ["F4", "C5", "D5", "F4"]],
+        ["K:", ["F4", "C5", "D5", "F4"]],
+        ["K:none ^F", ["F♯4", "C5", "D5", "F♯4"]]
+    ])("a %s header starts the tune in C major", async (header, notes) => {
+        const blocks = await parse(`X:1\nM:4/4\nL:1/4\n${header}\nF c d F |]\n`);
+        const byId = new Map(blocks.map(b => [b[0], b]));
+        const key = blocksOfType(blocks, "setkey2")[0];
+
+        expect(byId.get(key[4][1])[1][1].value).toBe("C");
+        expect(byId.get(key[4][2])[1][1].value).toBe("major");
+        expect(scoreOrder(blocks)).toEqual(notes);
+    });
+
+    test("an inline [M:] becomes a meter block where it is written", async () => {
+        const blocks = await parse("X:1\nM:4/4\nL:1/4\nK:C\nC D E F | [M:3/4] G A B |]\n");
+
+        expect(scoreOrder(blocks)).toEqual(["C4", "D4", "E4", "F4", "M:3/4", "G4", "A4", "B4"]);
+        expectLinked(blocks);
+    });
+
+    test("an M: line between staff lines becomes a meter block", async () => {
+        const blocks = await parse(
+            "X:1\nM:4/4\nL:1/4\nK:C\nC D E F |\nM:3/4\nG A B |\nc d e |\nM:6/8\nf3 g3 |]\n"
+        );
+
+        expect(scoreOrder(blocks)).toEqual([
+            "C4",
+            "D4",
+            "E4",
+            "F4",
+            "M:3/4",
+            "G4",
+            "A4",
+            "B4",
+            "C5",
+            "D5",
+            "E5",
+            "M:6/8",
+            "F5",
+            "G5"
+        ]);
+        expectLinked(blocks);
+    });
+
+    test("restating the current meter adds no block", async () => {
+        const blocks = await parse(
+            "X:1\nM:3/4\nL:1/4\nK:C\nC D E |\nM:3/4\nF G A | [M:3/4] B c d |]\n"
+        );
+
+        expect(blocksOfType(blocks, "meter")).toHaveLength(1);
+    });
+
+    test("the issue's tune imports its key and meter changes", async () => {
+        const blocks = await parse(
+            "X:1\nT:Key and meter change\nM:4/4\nL:1/4\nK:C\n" +
+                "C D E F | G F E D | [K:D] D E F G | A G F E |\n" +
+                "M:3/4\nD E F | A F D | [M:2/4] F A | d2 |]\n"
+        );
+
+        expect(scoreOrder(blocks)).toEqual([
+            "C4",
+            "D4",
+            "E4",
+            "F4",
+            "G4",
+            "F4",
+            "E4",
+            "D4",
+            "K:D major",
+            "D4",
+            "E4",
+            "F♯4",
+            "G4",
+            "A4",
+            "G4",
+            "F♯4",
+            "E4",
+            "M:3/4",
+            "D4",
+            "E4",
+            "F♯4",
+            "A4",
+            "F♯4",
+            "D4",
+            "M:2/4",
+            "F♯4",
+            "A4",
+            "D5"
+        ]);
+        expectLinked(blocks);
+    });
+
+    test("a key change that starts a repeated section plays inside the repeat", async () => {
+        const blocks = await parse("X:1\nM:4/4\nL:1/4\nK:C\nC D E F |: [K:D] F G A B :|]\n");
+
+        // The key block plays on both passes, not just once before the repeat.
+        expect(scoreOrder(blocks)).toEqual([
+            "C4",
+            "D4",
+            "E4",
+            "F4",
+            "K:D major",
+            "F♯4",
+            "G4",
+            "A4",
+            "B4",
+            "K:D major",
+            "F♯4",
+            "G4",
+            "A4",
+            "B4"
+        ]);
+        expectLinked(blocks);
     });
 });

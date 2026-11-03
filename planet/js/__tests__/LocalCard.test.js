@@ -328,7 +328,9 @@ describe("LocalCard", () => {
             expect(planet.ProjectStorage.initialiseNewProject).toHaveBeenCalledWith(
                 "My Project (Copy)",
                 "<xml/>",
-                "img.png"
+                "img.png",
+                null,
+                { makeCurrent: false }
             );
             expect(planet.LocalPlanet.updateProjects).toHaveBeenCalled();
         });
@@ -357,6 +359,50 @@ describe("LocalCard", () => {
             document.getElementById("local-project-duplicate-dup3").click();
             expect(planet.ProjectStorage.initialiseNewProject).toHaveBeenCalled();
             expect(planet.LocalPlanet.updateProjects).toHaveBeenCalled();
+        });
+    });
+
+    // ─── duplicate() then closing the Planet, with the real classes ──────────────
+
+    describe("duplicate() and Planet.closeButton()", () => {
+        it("keeps the open project after duplicating another one", async () => {
+            const ProjectStorage = require("../ProjectStorage");
+            const { Planet } = require("../Planet");
+            const store = {};
+            const realPlanet = new Planet(true, {});
+            realPlanet.planetClose = jest.fn();
+            realPlanet.loadNewProject = jest.fn();
+            realPlanet.loadProjectFromData = jest.fn();
+            realPlanet.ProjectStorage = new ProjectStorage(realPlanet);
+            realPlanet.ProjectStorage.LocalStorage = {
+                setItem: async (k, v) => {
+                    store[k] = v;
+                },
+                getItem: async k => store[k] ?? null
+            };
+            realPlanet.ProjectStorage.data = {
+                CurrentProject: "editing",
+                Projects: {
+                    editing: { ProjectName: "Editing", ProjectData: "[EDITING]" },
+                    other: { ProjectName: "Other", ProjectData: "[OTHER]" }
+                }
+            };
+            realPlanet.ProjectStorage.fireDataLoaded();
+            realPlanet.LocalPlanet = {
+                ProjectTable: realPlanet.ProjectStorage.data.Projects,
+                updateProjects: jest.fn()
+            };
+            realPlanet.oldCurrentProjectID = "editing";
+
+            const card = new LocalCard(realPlanet);
+            card.init("other");
+            card.duplicate();
+            await realPlanet.closeButton();
+
+            expect(realPlanet.ProjectStorage.getCurrentProjectID()).toBe("editing");
+            expect(realPlanet.loadProjectFromData).not.toHaveBeenCalled();
+            expect(realPlanet.planetClose).toHaveBeenCalled();
+            expect(Object.keys(realPlanet.ProjectStorage.data.Projects)).toHaveLength(3);
         });
     });
 });

@@ -40,7 +40,7 @@ try {
    setupBlockScaleController,
    setupContextMenuController,
    requestClear,
-   setupActivityAbcParser, setupActivityIdleWatcher, SessionStorageManager,
+   setupActivityAbcParser, setupActivityMxmlParser, setupActivityIdleWatcher, SessionStorageManager,
    COLLAPSEBLOCKSBUTTON, COLLAPSEBUTTON, createDefaultStack,
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
    DEFAULTDELAY, define, doBrowserCheck, docByClass,
@@ -114,6 +114,7 @@ let MYDEFINES = [
     "utils/error-handler",
     "utils/debugLog",
     "activity/artwork",
+    "widgets/HarmonyUtils",
     "widgets/status",
     "utils/munsell",
     "activity/toolbar",
@@ -249,11 +250,12 @@ function lazyLoad(modulePaths) {
 let globalActivity;
 
 /**
- * Performs analysis on the project using the global activity.
+ * Performs analysis on a project: the given blocks, or the open workspace if none.
+ * @param {{blockList: Array}} [blocks] - blocks parsed from a saved project.
  * @returns {object} - The analysis result.
  */
-const doAnalyzeProject = function () {
-    return analyzeProject(globalActivity);
+const doAnalyzeProject = function (blocks) {
+    return analyzeProject(blocks ? { blocks } : globalActivity);
 };
 
 /**
@@ -855,41 +857,58 @@ class Activity {
                 return;
             }
 
-            this._onResize();
-            this.blocks.activeBlock = null;
-            hideDOMLabel();
+            // The rest of the Play action starts the Transport, which touches
+            // the Web Audio context synchronously. Tone.start()/context.resume()
+            // are async, so running that logic in parallel (fire-and-forget)
+            // still hits Tone's suspended-context check before the context has
+            // actually resumed, logging a warning every time. Wait for the
+            // unlock to settle first so the Transport only starts once the
+            // context is (or is as close as it will get to) running.
+            const runPlayAction = () => {
+                this._onResize();
+                this.blocks.activeBlock = null;
+                hideDOMLabel();
 
-            // If music is currently playing, stop it first
-            if (this.turtles.running()) {
-                this.logo.doStopTurtles();
-            }
-
-            const currentDelay = this.logo.turtleDelay;
-
-            // Delegate logic / execution control to the ToolbarController
-            this.toolbarController.runFast(env, currentDelay);
-
-            // Keep DOM queries, colors, and block visibilities in activity.js
-            const tempoTitle = document.getElementById("tempoWidgetID");
-            if (tempoTitle) {
-                if (this.logo.tempo.isMoving) {
-                    this.logo.tempo.pause();
+                // If music is currently playing, stop it first
+                if (this.turtles.running()) {
+                    this.logo.doStopTurtles();
                 }
 
-                this.logo.tempo.resume();
-            }
+                const currentDelay = this.logo.turtleDelay;
 
-            if (!this.turtles.running()) {
-                if (!this.turtles.isShrunk()) {
-                    this.blocks.hideBlocks();
-                    this.showBlocksAfterRun = true;
+                // Delegate logic / execution control to the ToolbarController
+                this.toolbarController.runFast(env, currentDelay);
+
+                // Keep DOM queries, colors, and block visibilities in activity.js
+                const tempoTitle = document.getElementById("tempoWidgetID");
+                if (tempoTitle) {
+                    if (this.logo.tempo.isMoving) {
+                        this.logo.tempo.pause();
+                    }
+
+                    this.logo.tempo.resume();
                 }
 
-                this.toolbar.highlightStop(window.platformColor.stopIconcolor);
+                if (!this.turtles.running()) {
+                    if (!this.turtles.isShrunk()) {
+                        this.blocks.hideBlocks();
+                        this.showBlocksAfterRun = true;
+                    }
+
+                    this.toolbar.highlightStop(window.platformColor.stopIconcolor);
+                } else {
+                    if (currentDelay === 0) {
+                        this.toolbar.dimThenRestoreStop(window.platformColor.stopIconcolor);
+                    }
+                }
+            };
+
+            // Unlock the Web Audio context while the play click is still a user
+            // gesture, then run the rest of the Play action once that settles.
+            if (this.logo.synth && typeof this.logo.synth.startAudio === "function") {
+                this.logo.synth.startAudio().then(runPlayAction, runPlayAction);
             } else {
-                if (currentDelay === 0) {
-                    this.toolbar.dimThenRestoreStop(window.platformColor.stopIconcolor);
-                }
+                runPlayAction();
             }
         };
 
@@ -1032,7 +1051,7 @@ class Activity {
             this.scrollBlockContainer = !this.scrollBlockContainer;
             const enableHorizScrollIcon = document.getElementById("enableHorizScrollIcon");
             const disableHorizScrollIcon = document.getElementById("disableHorizScrollIcon");
-            if (this.scrollBlockContainer && !this.beginnerMode) {
+            if (this.scrollBlockContainer) {
                 enableHorizScrollIcon.style.display = "none";
                 disableHorizScrollIcon.style.display = "block";
 
@@ -2309,6 +2328,7 @@ class Activity {
 
         this._loadProject = (...args) => this.projectManager._loadProject(...args);
         setupActivityAbcParser(this);
+        setupActivityMxmlParser(this);
         this.loadStartWrapper = (...args) => this.projectManager.loadStartWrapper(...args);
 
         this.showContents = (...args) => this.projectManager.showContents(...args);
@@ -3234,8 +3254,7 @@ define(["domReady!", "activity/exporters"].concat(MYDEFINES), (doc, exportersMod
 
         if (globalsReady) {
             activity.setupDependencies();
-            activity.domReady(doc);
-            activity.doContextMenus();
+            activity.domReady(doc).then(() => activity.doContextMenus());
             activity.doPluginsAndPaletteCols();
         } else {
             // Race condition in Firefox: non-AMD scripts might not have
@@ -3245,8 +3264,7 @@ define(["domReady!", "activity/exporters"].concat(MYDEFINES), (doc, exportersMod
                 waitForReadiness(
                     () => {
                         activity.setupDependencies();
-                        activity.domReady(doc);
-                        activity.doContextMenus();
+                        activity.domReady(doc).then(() => activity.doContextMenus());
                         activity.doPluginsAndPaletteCols();
                     },
                     {

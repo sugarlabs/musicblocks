@@ -185,9 +185,9 @@ describe("markAllAsStopped", () => {
     });
 
     test("should set running to false for all turtles", () => {
-        const turtle1 = { running: true };
-        const turtle2 = { running: true };
-        const turtle3 = { running: true };
+        const turtle1 = { running: true, stopBlink: jest.fn() };
+        const turtle2 = { running: true, stopBlink: jest.fn() };
+        const turtle3 = { running: true, stopBlink: jest.fn() };
 
         turtles._turtleList = [turtle1, turtle2, turtle3];
         turtles.getTurtleCount = jest.fn().mockReturnValue(3);
@@ -198,6 +198,20 @@ describe("markAllAsStopped", () => {
         expect(turtle1.running).toBe(false);
         expect(turtle2.running).toBe(false);
         expect(turtle3.running).toBe(false);
+    });
+
+    test("should stop any pending blink on every turtle", () => {
+        const turtle1 = { running: true, stopBlink: jest.fn() };
+        const turtle2 = { running: false, stopBlink: jest.fn() };
+
+        turtles._turtleList = [turtle1, turtle2];
+        turtles.getTurtleCount = jest.fn().mockReturnValue(2);
+        turtles.getTurtle = jest.fn(i => turtles._turtleList[i]);
+
+        turtles.markAllAsStopped();
+
+        expect(turtle1.stopBlink).toHaveBeenCalledTimes(1);
+        expect(turtle2.stopBlink).toHaveBeenCalledTimes(1);
     });
 
     test("should call refreshCanvas after stopping all turtles", () => {
@@ -217,8 +231,8 @@ describe("markAllAsStopped", () => {
     });
 
     test("should stop turtles that are already stopped without error", () => {
-        const turtle1 = { running: false };
-        const turtle2 = { running: true };
+        const turtle1 = { running: false, stopBlink: jest.fn() };
+        const turtle2 = { running: true, stopBlink: jest.fn() };
 
         turtles._turtleList = [turtle1, turtle2];
         turtles.getTurtleCount = jest.fn().mockReturnValue(2);
@@ -603,6 +617,10 @@ describe("aux toolbar collapse and expand", () => {
             <div id="buttoncontainerTOP"></div>
         `;
 
+        global.window.widgetWindows = {
+            _handleResize: jest.fn()
+        };
+
         turtles = new Turtles(activityMock);
         turtles.activity = activityMock;
         mixinPrototypes(turtles);
@@ -654,6 +672,7 @@ describe("aux toolbar collapse and expand", () => {
     afterEach(() => {
         global.Image = originalImage;
         global.docById = originalDocById;
+        delete global.window.widgetWindows;
     });
 
     test("collapse removes highlight classes from auxiliary toolbar button", () => {
@@ -662,6 +681,7 @@ describe("aux toolbar collapse and expand", () => {
 
         turtles.collapse();
 
+        expect(global.window.widgetWindows._handleResize).toHaveBeenCalledTimes(1);
         expect(btn.classList.contains("blue")).toBe(false);
         expect(btn.classList.contains("darken-1")).toBe(false);
         expect(turtles.hideMenu).toHaveBeenCalled();
@@ -670,12 +690,22 @@ describe("aux toolbar collapse and expand", () => {
         expect(activityMock.__tick).toHaveBeenCalled();
     });
 
+    test("collapse does not resize widget windows when auxiliary toolbar is already hidden", () => {
+        const auxToolbar = document.getElementById("aux-toolbar");
+        auxToolbar.style.display = "none";
+
+        turtles.collapse();
+
+        expect(global.window.widgetWindows._handleResize).not.toHaveBeenCalled();
+    });
+
     test("expand removes highlight classes from auxiliary toolbar button", () => {
         const btn = document.getElementById("toggleAuxBtn");
         btn.className = "blue darken-1";
 
         turtles.expand();
 
+        expect(global.window.widgetWindows._handleResize).toHaveBeenCalledTimes(1);
         expect(btn.classList.contains("blue")).toBe(false);
         expect(btn.classList.contains("darken-1")).toBe(false);
         expect(turtles.hideMenu).toHaveBeenCalled();
@@ -1032,6 +1062,41 @@ describe("TurtlesModel.removeTurtle", () => {
         model.removeTurtle(0);
 
         expect(model._turtleList).toEqual([b]);
+    });
+
+    it("keeps a companion reference valid when an earlier turtle is removed", () => {
+        const a = makeTurtle();
+        const b = makeTurtle();
+        const c = makeTurtle();
+        b.companionTurtle = 2;
+        model._turtleList = [a, b, c];
+
+        model.removeTurtle(0);
+
+        const companionIndex = model._turtleList[0].companionTurtle;
+        expect(model._turtleList[companionIndex]).toBe(c);
+    });
+
+    it("clears a companion reference when its target is removed", () => {
+        const owner = makeTurtle();
+        const target = makeTurtle();
+        owner.companionTurtle = 1;
+        model._turtleList = [owner, target];
+
+        model.removeTurtle(1);
+
+        expect(owner.companionTurtle).toBeUndefined();
+    });
+
+    it("preserves a companion reference when a later turtle is removed", () => {
+        const target = makeTurtle();
+        const owner = makeTurtle({ companionTurtle: 0 });
+        const third = makeTurtle();
+        model._turtleList = [target, owner, third];
+
+        model.removeTurtle(2);
+
+        expect(model._turtleList[owner.companionTurtle]).toBe(target);
     });
 
     it("still clears a pending interval", () => {

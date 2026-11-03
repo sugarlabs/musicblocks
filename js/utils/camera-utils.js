@@ -18,6 +18,7 @@ const CameraManager = {
     isSetup: false,
     canPlayHandler: null,
     intervalId: null,
+    captureDraw: null,
     // Tracks the exact element a listener was attached to, so cleanup always
     // targets the right node even if #camVideo is ever replaced in the DOM.
     listenerVideoElement: null,
@@ -38,10 +39,11 @@ const CameraManager = {
      * @returns {number} the active interval id
      */
     startCapture(draw, periodMs = 100) {
+        this.captureDraw = draw;
         if (this.intervalId !== null) {
             return this.intervalId;
         }
-        this.intervalId = window.setInterval(draw, periodMs);
+        this.intervalId = window.setInterval(() => this.captureDraw(), periodMs);
         return this.intervalId;
     },
 
@@ -54,6 +56,7 @@ const CameraManager = {
             window.clearInterval(this.intervalId);
             this.intervalId = null;
         }
+        this.captureDraw = null;
     },
 
     /**

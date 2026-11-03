@@ -743,6 +743,12 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
         expect(activity.textMsg).toHaveBeenCalledWith("hello");
     });
 
+    test("real PrintBlock flow() skips an undefined value instead of throwing", () => {
+        activity.textMsg.mockClear();
+        expect(() => instances["PrintBlock"].flow([undefined], logo, 0, "blk2")).not.toThrow();
+        expect(activity.textMsg).not.toHaveBeenCalled();
+    });
+
     test("real CommentBlock flow() calls textMsg", () => {
         instances["CommentBlock"].flow(["a comment"], logo, turtle, blk);
         expect(activity.textMsg).toHaveBeenCalledWith("a comment");

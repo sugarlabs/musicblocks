@@ -92,6 +92,7 @@ function setupActionBlocks(activity) {
             if (args.length === 1) {
                 logo.returns[turtle].push(args[0]);
             }
+            return [null, null, true];
         }
     }
     /**
@@ -356,7 +357,7 @@ function setupActionBlocks(activity) {
                     actionArgs,
                     activity.turtles.getTurtle(turtle).queue.length
                 );
-                return logo.returns[turtle].shift();
+                return logo.returns[turtle].pop();
             } else {
                 activity.errorMsg(NOACTIONERRORMSG, blk, name);
                 return 0;

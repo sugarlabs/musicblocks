@@ -1114,13 +1114,15 @@ var getEffectiveOctaveRatio = temperament => {
             : typeof getTemperament === "function"
               ? getTemperament(temperament)
               : undefined;
-    if (t && Number.isFinite(Number(t.octaveRatio))) {
-        return Number(t.octaveRatio);
+    const temperamentRatio = Number(t?.octaveRatio);
+    if (Number.isFinite(temperamentRatio) && temperamentRatio > 1) {
+        return temperamentRatio;
     }
     if (typeof getOctaveRatio === "function") {
         const gr = getOctaveRatio();
-        if (Number.isFinite(Number(gr))) {
-            return Number(gr);
+        const globalRatio = Number(gr);
+        if (Number.isFinite(globalRatio) && globalRatio > 1) {
+            return globalRatio;
         }
     }
     return 2;

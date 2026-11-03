@@ -19,7 +19,7 @@
    RhythmRuler, FILTERTYPES, instrumentsFilters, DEFAULTFILTERTYPE,
    TemperamentWidget, TimbreWidget, ModeWidget, PitchSlider,
    MusicKeyboard, PitchStaircase, SampleWidget, _THIS_IS_MUSIC_BLOCKS_,
-   AIWidget, AIDebuggerWidget, Arpeggio, LegoWidget
+   AIWidget, AIDebuggerWidget, Arpeggio, LegoWidget, ChordBuilderWidget, requirejs
  */
 
 /*
@@ -76,13 +76,79 @@ function setupWidgetBlocks(activity) {
     /**
      * Environment-aware lazy module loader.
      * Uses AMD require() in the browser; calls callback synchronously in Node/Jest.
+     * RequireJS reports every module that failed, so onError runs once, and the
+     * failed modules are undefined so that the next request fetches them again.
+     * A failed request still gets its callback once a retry loads the modules,
+     * so that callback is ignored.
+     *
+     * @param {string|string[]} modules - The AMD module ids to load.
+     * @param {Function} callback - Run once all the modules are loaded.
+     * @param {Function} onError - Run with the RequireJS error if a module fails to load.
+     * @returns {void}
      */
-    function _lazyRequire(modules, callback) {
+    function _lazyRequire(modules, callback, onError) {
         if (typeof define === "function" && define.amd) {
-            require(Array.isArray(modules) ? modules : [modules], callback);
+            let failed = false;
+            requirejs(
+                Array.isArray(modules) ? modules : [modules],
+                () => {
+                    if (!failed) callback();
+                },
+                err => {
+                    err.requireModules?.forEach(id => requirejs.undef(id));
+                    if (!failed) {
+                        failed = true;
+                        onError(err);
+                    }
+                }
+            );
         } else {
             callback();
         }
+    }
+
+    /**
+     * Tells the user that a widget could not be loaded, so they can retry once
+     * their connection is back.
+     *
+     * @returns {void}
+     */
+    function _widgetLoadFailed() {
+        activity.errorMsg(
+            _("The widget could not be loaded. Check your connection and try again.")
+        );
+    }
+
+    /**
+     * Blocks waiting for each widget to load, by widget key. Each entry holds the
+     * run that asked for the widget and a function that resumes its block.
+     *
+     * @type {Object.<string, Array<{run: number, resume: Function}>>}
+     */
+    const _widgetRequests = {};
+
+    /**
+     * Removes and returns the blocks waiting for a widget.
+     *
+     * @param {string} widgetKey - The key for the widget in the logo object.
+     * @returns {Array<{run: number, resume: Function}>} The waiting blocks.
+     */
+    function _takeWidgetRequests(widgetKey) {
+        const requests = _widgetRequests[widgetKey];
+        delete _widgetRequests[widgetKey];
+        return requests;
+    }
+
+    /**
+     * Checks whether a run is still playing, so a widget that finishes loading
+     * late does not resume a block from a run that was stopped or replaced.
+     *
+     * @param {object} logo - The logo object.
+     * @param {number} run - The run generation recorded when the load started.
+     * @returns {boolean} True if that run is still playing.
+     */
+    function _isCurrentRun(logo, run) {
+        return run === logo.runGeneration && !logo.stopTurtle;
     }
 
     /**
@@ -111,19 +177,38 @@ function setupWidgetBlocks(activity) {
      * @returns {[null, number, boolean]|null} - Interruption signal or null if already loaded.
      */
     function _ensureWidget(logo, widgetKey, modules, initFn, turtle, blk, receivedArg) {
-        if (logo[widgetKey] === null || logo[widgetKey] === undefined) {
-            logo[widgetKey] = "loading"; // Guard against multiple simultaneous loads
-            _lazyRequire(modules, () => {
-                logo[widgetKey] = initFn();
-                if (typeof logo.runFromBlockNow === "function") {
-                    logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
-                }
-            });
-            return [null, 0, true];
-        } else if (logo[widgetKey] === "loading") {
-            return [null, 0, true]; // Still loading, continue to interrupt
+        if ((logo[widgetKey] ?? "loading") !== "loading") {
+            return null;
         }
-        return null;
+
+        (_widgetRequests[widgetKey] ??= []).push({
+            run: logo.runGeneration,
+            resume: () => logo.runFromBlockNow(logo, turtle, blk, true, receivedArg)
+        });
+        if (logo[widgetKey] !== "loading") {
+            logo[widgetKey] = "loading";
+            _lazyRequire(
+                modules,
+                () => {
+                    logo[widgetKey] = initFn();
+                    for (const request of _takeWidgetRequests(widgetKey)) {
+                        if (_isCurrentRun(logo, request.run)) request.resume();
+                    }
+                },
+                () => {
+                    logo[widgetKey] = null;
+                    if (
+                        _takeWidgetRequests(widgetKey).some(request =>
+                            _isCurrentRun(logo, request.run)
+                        )
+                    ) {
+                        logo.doStopTurtles();
+                        _widgetLoadFailed();
+                    }
+                }
+            );
+        }
+        return [null, 0, true];
     }
 
     /**
@@ -140,12 +225,30 @@ function setupWidgetBlocks(activity) {
      * @param {string[]} modules - The modules to require.
      * @param {Function} factory - Builds the widget instance.
      * @param {Function} [onReady] - Optional callback run after assignment.
+     * @param {Function} [onError] - Optional callback run when the widget could not be built.
      */
-    function _lazyLoadWidget(logo, widgetKey, modules, factory, onReady) {
-        _lazyRequire(modules, () => {
-            logo[widgetKey] = factory();
-            onReady?.();
-        });
+    function _lazyLoadWidget(logo, widgetKey, modules, factory, onReady, onError) {
+        const run = logo.runGeneration;
+        _lazyRequire(
+            modules,
+            () => {
+                if (logo[widgetKey] === "loading") logo[widgetKey] = null;
+                if (!_isCurrentRun(logo, run)) return;
+                try {
+                    logo[widgetKey] = factory();
+                    onReady?.();
+                } catch (e) {
+                    onError?.(e);
+                }
+            },
+            err => {
+                if (logo[widgetKey] === "loading") logo[widgetKey] = null;
+                if (_isCurrentRun(logo, run)) {
+                    onError?.(err);
+                    _widgetLoadFailed();
+                }
+            }
+        );
     }
 
     function _hasValidMeterWidgetInput(logo) {
@@ -158,12 +261,18 @@ function setupWidgetBlocks(activity) {
         const numeratorBlock = blockList[beatValueConnections?.[1]];
         const denominatorBlock = blockList[beatValueConnections?.[2]];
 
-        return (
-            meterBlock &&
-            typeof beatCountBlock?.value === "number" &&
-            typeof numeratorBlock?.value === "number" &&
-            typeof denominatorBlock?.value === "number"
-        );
+        // A divide needs both operands. Any other beat value, such as 0.25 or 0 + 0.25, is
+        // checked by the value it evaluated to. A beat value of 0 or less would schedule the
+        // beats 0 ms apart.
+        const hasBeatValue =
+            beatValueBlock?.name === "divide"
+                ? typeof numeratorBlock?.value === "number" &&
+                  numeratorBlock.value > 0 &&
+                  typeof denominatorBlock?.value === "number" &&
+                  denominatorBlock.value > 0
+                : typeof beatValueBlock?.value === "number" && beatValueBlock.value > 0;
+
+        return meterBlock && typeof beatCountBlock?.value === "number" && hasBeatValue;
     }
 
     /**
@@ -693,6 +802,10 @@ function setupWidgetBlocks(activity) {
             const listenerName = "_meterwidget_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
+            const resetFlag = () => {
+                logo.insideMeterWidget = false;
+            };
+
             const __listener = () => {
                 if (!_hasValidMeterWidgetInput(logo)) {
                     logo.insideMeterWidget = false;
@@ -704,12 +817,18 @@ function setupWidgetBlocks(activity) {
                     "meterWidget",
                     _getWidgetDependencies(
                         typeof MeterWidget !== "undefined" ? MeterWidget : null,
-                        ["widgets/meterwidget"]
+                        [
+                            "widgets/MeterWidgetWindow",
+                            "widgets/MeterWidgetMeter",
+                            "widgets/MeterWidgetPlayback",
+                            "widgets/MeterWidgetWheel",
+                            "widgets/MeterWidgetSave",
+                            "widgets/meterwidget"
+                        ]
                     ),
                     () => new MeterWidget(activity, blk, turtle),
-                    () => {
-                        logo.insideMeterWidget = false;
-                    }
+                    resetFlag,
+                    resetFlag
                 );
             };
 
@@ -778,6 +897,10 @@ function setupWidgetBlocks(activity) {
             const listenerName = "_oscilloscope_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
+            const resetFlag = () => {
+                logo.inOscilloscope = false;
+            };
+
             const __listener = () => {
                 _lazyLoadWidget(
                     logo,
@@ -787,9 +910,8 @@ function setupWidgetBlocks(activity) {
                         ["widgets/oscilloscope"]
                     ),
                     () => new Oscilloscope(activity),
-                    () => {
-                        logo.inOscilloscope = false;
-                    }
+                    resetFlag,
+                    resetFlag
                 );
             };
 
@@ -865,6 +987,95 @@ function setupWidgetBlocks(activity) {
                         "widgets/modewidget"
                     ]),
                     () => new ModeWidget(activity)
+                );
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            if (args.length === 1) return [args[0], 1];
+        }
+    }
+
+    /**
+     * Represents a block for creating and exploring chord progressions.
+     * @extends StackClampBlock
+     */
+    class ChordBuilderBlock extends StackClampBlock {
+        /**
+         * Creates a ChordBuilderBlock instance.
+         */
+        constructor() {
+            super("chordbuilder");
+            this.setCapability("collapsible");
+            this.setPalette("widgets", activity);
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _(
+                    "The Chord progression block opens a tool to explore diatonic chords and build musical progressions."
+                ),
+                "documentation",
+                ""
+            ]);
+
+            //.TRANS: musical chord progression builder
+            this.formBlock({ name: _("chord progression"), canCollapse: true });
+            this.makeMacro((x, y) => [
+                [0, "chordbuilder", x, y, [null, 1, 4]],
+                [1, "setkey2", 0, 0, [0, 2, 3, null]],
+                [2, ["notename", { value: "C" }], 0, 0, [1]],
+                [3, ["modename", { value: DEFAULTMODE }], 0, 0, [1]],
+                [4, "hiddennoflow", 0, 0, [0, null]]
+            ]);
+        }
+
+        /**
+         * Handles the flow of data for the ChordBuilder block.
+         * @param {number[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         * @returns {number[]} - The output values.
+         */
+        flow(args, logo, turtle, blk) {
+            logo.insideChordBuilder = true;
+
+            const listenerName = "_chordbuilder_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            const resetFlag = () => {
+                logo.insideChordBuilder = false;
+            };
+
+            const cleanupOnError = () => {
+                logo.chordBuilderWidget = null;
+                resetFlag();
+            };
+
+            const __listener = () => {
+                if (logo.chordBuilderWidget && logo.chordBuilderWidget !== "loading") {
+                    if (typeof logo.chordBuilderWidget.syncKeyAndModeFromTurtle === "function") {
+                        logo.chordBuilderWidget.syncKeyAndModeFromTurtle(turtle);
+                    }
+                    logo.chordBuilderWidget.widgetWindow.show();
+                    resetFlag();
+                    return;
+                }
+                if (logo.chordBuilderWidget === "loading") {
+                    resetFlag();
+                    return;
+                }
+                logo.chordBuilderWidget = "loading";
+                _lazyLoadWidget(
+                    logo,
+                    "chordBuilderWidget",
+                    _getWidgetDependencies(
+                        typeof ChordBuilderWidget !== "undefined" ? ChordBuilderWidget : null,
+                        ["widgets/ChordBuilderAudio", "widgets/chordbuilder"]
+                    ),
+                    () => new ChordBuilderWidget(activity, { turtle }),
+                    () => resetFlag(),
+                    cleanupOnError
                 );
             };
 
@@ -1339,32 +1550,49 @@ function setupWidgetBlocks(activity) {
          * @returns {any[]} - Returns an array of arguments.
          */
         flow(args, logo, turtle, blk, receivedArg) {
-            const interruption = _ensureWidget(
-                logo,
-                "musicKeyboard",
-                _getWidgetDependencies(
-                    typeof MusicKeyboard !== "undefined" ? MusicKeyboard : null,
-                    [
-                        "widgets/MusicKeyboardEditing",
-                        "widgets/MusicKeyboardRendering",
-                        "widgets/musickeyboard"
-                    ]
-                ),
-                () => new MusicKeyboard(activity),
-                turtle,
-                blk,
-                receivedArg
-            );
-            if (interruption) return interruption;
+            // One MusicKeyboard per block.
+            const keyboards = (logo.musicKeyboards = logo.musicKeyboards || {});
+
+            if (keyboards[blk] === undefined) {
+                keyboards[blk] = "loading"; // Guard against multiple simultaneous loads
+                _lazyRequire(
+                    _getWidgetDependencies(
+                        typeof MusicKeyboard !== "undefined" ? MusicKeyboard : null,
+                        [
+                            "widgets/MusicKeyboardEditing",
+                            "widgets/MusicKeyboardRendering",
+                            "widgets/MusicKeyboardPlayback",
+                            "widgets/MusicKeyboardInput",
+                            "widgets/musickeyboard"
+                        ]
+                    ),
+                    () => {
+                        keyboards[blk] = new MusicKeyboard(activity);
+                        if (typeof logo.runFromBlockNow === "function") {
+                            logo.runFromBlockNow(logo, turtle, blk, true, receivedArg);
+                        }
+                    }
+                );
+                return [null, 0, true];
+            } else if (keyboards[blk] === "loading") {
+                return [null, 0, true];
+            }
+
+            // Active instance, so this clamp's pitch/drum/meter rows land here.
+            const keyboard = keyboards[blk];
+            logo.musicKeyboard = keyboard;
+            logo.musicKeyboardByTurtle = logo.musicKeyboardByTurtle || {};
+            logo.musicKeyboardByTurtle[turtle] = keyboard;
 
             logo.inMusicKeyboard = true;
-            logo.musicKeyboard.blockNo = blk;
-            logo.musicKeyboard.instruments = [];
-            logo.musicKeyboard.noteNames = [];
-            logo.musicKeyboard.octaves = [];
-            logo.musicKeyboard._rowBlocks = [];
+            keyboard.blockNo = blk;
+            keyboard.instruments = [];
+            keyboard.noteNames = [];
+            keyboard.octaves = [];
+            keyboard._rowBlocks = [];
 
-            const listenerName = "_musickeyboard_" + turtle;
+            // Include blk so keyboards on one turtle don't overwrite one listener.
+            const listenerName = "_musickeyboard_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // The keyboard plays and saves at this turtle's tempo (the turtle itself, not its
@@ -1372,8 +1600,8 @@ function setupWidgetBlocks(activity) {
             // another turtle's Music Keyboard block running in between can't swap it.
             const keyboardTurtle = activity.turtles.ithTurtle(turtle);
             const __listener = () => {
-                logo.musicKeyboard.turtle = keyboardTurtle;
-                logo.musicKeyboard.init(logo);
+                keyboard.turtle = keyboardTurtle;
+                keyboard.init(logo);
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -2134,14 +2362,15 @@ function setupWidgetBlocks(activity) {
 
             this.formBlock({ name: _("reflection"), canCollapse: true });
             this.makeMacro((x, y) => [
-                [0, "reflection", x, y, [null, 1]],
+                [0, "reflection", x, y, [null, 1, 3]],
                 [1, "print", 0, 0, [0, 2, null]],
-                [2, ["text", { value: "Reflective Learning" }], 0, 0, [1]]
+                [2, ["text", { value: "Reflective Learning" }], 0, 0, [1]],
+                [3, "hiddennoflow", 0, 0, [0, null]]
             ]);
         }
 
         /**
-         * Handles the flow of data for the status block.
+         * Handles the flow of data for the reflection block.
          * @param {any[]} args - The arguments passed to the block.
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
@@ -2154,7 +2383,18 @@ function setupWidgetBlocks(activity) {
                 "reflection",
                 _getWidgetDependencies(
                     typeof ReflectionMatrix !== "undefined" ? ReflectionMatrix : null,
-                    ["utils/ai-widget-lifecycle", "widgets/reflection"]
+                    [
+                        "utils/ai-widget-lifecycle",
+                        "utils/ai-markdown",
+                        "widgets/ReflectionLifecycle",
+                        "widgets/ReflectionWindow",
+                        "widgets/ReflectionChatLog",
+                        "widgets/ReflectionSession",
+                        "widgets/ReflectionBackend",
+                        "widgets/ReflectionReport",
+                        "widgets/ReflectionMarkdown",
+                        "widgets/reflection"
+                    ]
                 ),
                 () => new ReflectionMatrix(),
                 turtle,
@@ -2162,8 +2402,6 @@ function setupWidgetBlocks(activity) {
                 receivedArg
             );
             if (interruption) return interruption;
-
-            logo.statusFields = [];
 
             logo.inReflectionMatrix = true;
 
@@ -2303,9 +2541,10 @@ function setupWidgetBlocks(activity) {
 
             this.formBlock({ name: _("debugger"), canCollapse: true });
             this.makeMacro((x, y) => [
-                [0, "aidebugger", x, y, [null, 1]],
+                [0, "aidebugger", x, y, [null, 1, 3]],
                 [1, "print", 0, 0, [0, 2, null]],
-                [2, ["text", { value: "Debugger Initiated" }], 0, 0, [1]]
+                [2, ["text", { value: "Debugger Initiated" }], 0, 0, [1]],
+                [3, "hiddennoflow", 0, 0, [0, null]]
             ]);
         }
 
@@ -2323,7 +2562,7 @@ function setupWidgetBlocks(activity) {
                 "aiDebugger",
                 _getWidgetDependencies(
                     typeof AIDebuggerWidget !== "undefined" ? AIDebuggerWidget : null,
-                    ["utils/ai-widget-lifecycle", "widgets/aidebugger"]
+                    ["utils/ai-widget-lifecycle", "utils/ai-markdown", "widgets/aidebugger"]
                 ),
                 () => new AIDebuggerWidget(),
                 turtle,
@@ -2356,6 +2595,7 @@ function setupWidgetBlocks(activity) {
         new TimbreBlock().setup(activity);
         new TemperamentBlock().setup(activity);
         new ModeWidgetBlock().setup(activity);
+        new ChordBuilderBlock().setup(activity);
         new MeterWidgetBlock().setup(activity);
         new TempoBlock().setup(activity);
         new SamplerBlock().setup(activity);

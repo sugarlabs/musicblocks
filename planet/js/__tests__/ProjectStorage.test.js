@@ -309,6 +309,30 @@ describe("ProjectStorage", () => {
             expect(version).toBe(storage.Version);
         });
 
+        it("should keep saved projects when the version key is missing", async () => {
+            const savedProjects = { Projects: { saved: { ProjectName: "Saved Project" } } };
+            await storage.set(storage.LocalStorageKey, savedProjects);
+            const setSpy = jest.spyOn(storage, "set");
+
+            await storage.port();
+
+            expect(await storage.get(storage.LocalStorageKey)).toEqual(savedProjects);
+            expect(setSpy).not.toHaveBeenCalledWith(storage.LocalStorageKey, expect.anything());
+            expect(await storage.get(storage.VersionKey)).toBe(storage.Version);
+        });
+
+        it("should keep IndexedDB projects over older localStorage data", async () => {
+            const savedProjects = { Projects: { saved: { ProjectName: "Saved Project" } } };
+            await storage.set(storage.LocalStorageKey, savedProjects);
+            jest.spyOn(Storage.prototype, "getItem").mockReturnValueOnce(
+                JSON.stringify({ Projects: { legacy: { ProjectName: "Old Project" } } })
+            );
+
+            await storage.port();
+
+            expect(await storage.get(storage.LocalStorageKey)).toEqual(savedProjects);
+        });
+
         it("should not re-port if already at current version", async () => {
             await storage.set(storage.VersionKey, storage.Version);
             const setSpy = jest.spyOn(storage, "set");
@@ -536,6 +560,268 @@ describe("ProjectStorage", () => {
             await storage.saveLocally("data", "img");
             expect(initSpy).toHaveBeenCalled();
         });
+
+        it("should preserve ProjectData when data is undefined", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+            storage.data = {
+                CurrentProject: "proj1",
+                Projects: {
+                    proj1: {
+                        ProjectName: "Song 1",
+                        ProjectData: "original-data",
+                        ProjectImage: "old-thumb",
+                        DateLastModified: 1000
+                    }
+                }
+            };
+
+            await storage.saveLocally(undefined, "new-thumb", "proj1");
+
+            expect(storage.data.Projects["proj1"].ProjectData).toBe("original-data");
+            expect(storage.data.Projects["proj1"].ProjectImage).toBe("new-thumb");
+        });
+    });
+
+    describe("saveThumbnail", () => {
+        it("should update ProjectImage without modifying ProjectData", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+            storage.data = {
+                CurrentProject: "proj1",
+                Projects: {
+                    proj1: {
+                        ProjectName: "Song 1",
+                        ProjectData: "original-data",
+                        ProjectImage: "old-thumb",
+                        DateLastModified: 1000
+                    }
+                }
+            };
+
+            await storage.saveThumbnail("new-thumb", "proj1");
+
+            expect(storage.data.Projects["proj1"].ProjectData).toBe("original-data");
+            expect(storage.data.Projects["proj1"].ProjectImage).toBe("new-thumb");
+        });
+
+        it("should update explicit projectId without modifying CurrentProject", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+            storage.data = {
+                CurrentProject: "proj2",
+                Projects: {
+                    proj1: {
+                        ProjectName: "Song 1",
+                        ProjectData: "data-1",
+                        ProjectImage: "img-1",
+                        DateLastModified: 1000
+                    },
+                    proj2: {
+                        ProjectName: "Song 2",
+                        ProjectData: "data-2",
+                        ProjectImage: "img-2",
+                        DateLastModified: 2000
+                    }
+                }
+            };
+
+            await storage.saveThumbnail("updated-thumb-1", "proj1");
+
+            expect(storage.data.CurrentProject).toBe("proj2");
+            expect(storage.data.Projects["proj1"].ProjectImage).toBe("updated-thumb-1");
+            expect(storage.data.Projects["proj1"].ProjectData).toBe("data-1");
+            expect(storage.data.Projects["proj2"].ProjectImage).toBe("img-2");
+            expect(storage.data.Projects["proj2"].ProjectData).toBe("data-2");
+        });
+
+        it("should ignore non-existent or deleted project without creating phantom project", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+            const initSpy = jest.spyOn(storage, "initialiseNewProject");
+            storage.data = {
+                CurrentProject: "proj2",
+                Projects: {
+                    proj2: {
+                        ProjectName: "Song 2",
+                        ProjectData: "data-2",
+                        ProjectImage: "img-2",
+                        DateLastModified: 2000
+                    }
+                }
+            };
+
+            await storage.saveThumbnail("orphan-thumb", "deleted-proj-1");
+
+            expect(initSpy).not.toHaveBeenCalled();
+            expect(storage.data.Projects["deleted-proj-1"]).toBeUndefined();
+            expect(Object.keys(storage.data.Projects)).toEqual(["proj2"]);
+            expect(storage.data.Projects["proj2"].ProjectImage).toBe("img-2");
+        });
+
+        it("should ignore thumbnail save with undefined project ID without modifying CurrentProject image or timestamp", async () => {
+            const saveSpy = jest.spyOn(storage, "save").mockResolvedValue();
+            storage.data = {
+                CurrentProject: "proj1",
+                Projects: {
+                    proj1: {
+                        ProjectName: "Active Song",
+                        ProjectData: "data-1",
+                        ProjectImage: "img-1-original",
+                        DateLastModified: 1000
+                    }
+                }
+            };
+
+            await storage.saveThumbnail("stray-thumb", undefined);
+
+            expect(saveSpy).not.toHaveBeenCalled();
+            expect(storage.data.Projects["proj1"].ProjectImage).toBe("img-1-original");
+            expect(storage.data.Projects["proj1"].DateLastModified).toBe(1000);
+            expect(storage.data.CurrentProject).toBe("proj1");
+        });
+
+        it("older saveThumbnail resolving after newer saveLocally does not overwrite newer ProjectData", async () => {
+            const persistedStorage = {};
+            storage.LocalStorage = {
+                setItem: jest.fn(async (key, val) => {
+                    persistedStorage[key] = val;
+                }),
+                getItem: jest.fn(async key => persistedStorage[key] || null)
+            };
+
+            storage.data = {
+                CurrentProject: "proj1",
+                Projects: {
+                    proj1: {
+                        ProjectName: "Song 1",
+                        ProjectData: "snapshot-A",
+                        ProjectImage: "img-fallback",
+                        DateLastModified: 1000
+                    }
+                },
+                LikedProjects: {},
+                ReportedProjects: {},
+                DefaultCreatorName: "anonymous"
+            };
+
+            await storage.save();
+
+            // 1. Save newer snapshot B
+            await storage.saveLocally("snapshot-B", "img-fallback-B", "proj1");
+            expect(storage.data.Projects["proj1"].ProjectData).toBe("snapshot-B");
+
+            // 2. Resolve older deferred thumbnail callback for proj1
+            await storage.saveThumbnail("thumbnail-A", "proj1");
+
+            // 3. Inspect both in-memory and persisted data
+            expect(storage.data.Projects["proj1"].ProjectData).toBe("snapshot-B");
+            expect(storage.data.Projects["proj1"].ProjectImage).toBe("thumbnail-A");
+
+            const persisted = JSON.parse(persistedStorage[storage.LocalStorageKey]);
+            expect(persisted.Projects["proj1"].ProjectData).toBe("snapshot-B");
+            expect(persisted.Projects["proj1"].ProjectImage).toBe("thumbnail-A");
+        });
+
+        it("delayed saveThumbnail for proj1 while user is on proj2 does not corrupt either project", async () => {
+            const persistedStorage = {};
+            storage.LocalStorage = {
+                setItem: jest.fn(async (key, val) => {
+                    persistedStorage[key] = val;
+                }),
+                getItem: jest.fn(async key => persistedStorage[key] || null)
+            };
+
+            storage.data = {
+                CurrentProject: "proj1",
+                Projects: {
+                    proj1: {
+                        ProjectName: "Song 1",
+                        ProjectData: "data-proj1",
+                        ProjectImage: "img-proj1-old",
+                        DateLastModified: 1000
+                    },
+                    proj2: {
+                        ProjectName: "Song 2",
+                        ProjectData: "data-proj2",
+                        ProjectImage: "img-proj2",
+                        DateLastModified: 2000
+                    }
+                },
+                LikedProjects: {},
+                ReportedProjects: {},
+                DefaultCreatorName: "anonymous"
+            };
+
+            await storage.save();
+
+            // User switches to proj2
+            storage.data.CurrentProject = "proj2";
+
+            // Delayed thumbnail callback arrives for proj1
+            await storage.saveThumbnail("thumbnail-proj1-new", "proj1");
+
+            // Verify proj1 updated its thumbnail, retained its data
+            expect(storage.data.Projects["proj1"].ProjectData).toBe("data-proj1");
+            expect(storage.data.Projects["proj1"].ProjectImage).toBe("thumbnail-proj1-new");
+
+            // Verify proj2 is completely untouched
+            expect(storage.data.CurrentProject).toBe("proj2");
+            expect(storage.data.Projects["proj2"].ProjectData).toBe("data-proj2");
+            expect(storage.data.Projects["proj2"].ProjectImage).toBe("img-proj2");
+
+            const persisted = JSON.parse(persistedStorage[storage.LocalStorageKey]);
+            expect(persisted.Projects["proj1"].ProjectData).toBe("data-proj1");
+            expect(persisted.Projects["proj1"].ProjectImage).toBe("thumbnail-proj1-new");
+            expect(persisted.Projects["proj2"].ProjectData).toBe("data-proj2");
+            expect(persisted.Projects["proj2"].ProjectImage).toBe("img-proj2");
+        });
+
+        it("Check A: resolving older saveThumbnail must not alter DateLastModified or corrupt replacement project selection", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+            storage.data = {
+                CurrentProject: "proj3",
+                Projects: {
+                    proj1: {
+                        ProjectName: "Older Song",
+                        ProjectData: "data-1",
+                        ProjectImage: "img-1-fallback",
+                        DateLastModified: 1000
+                    },
+                    proj2: {
+                        ProjectName: "Middle Song",
+                        ProjectData: "data-2",
+                        ProjectImage: "img-2",
+                        DateLastModified: 2000
+                    },
+                    proj3: {
+                        ProjectName: "Active Song",
+                        ProjectData: "data-3",
+                        ProjectImage: "img-3",
+                        DateLastModified: 3000
+                    }
+                },
+                LikedProjects: {},
+                ReportedProjects: {},
+                DefaultCreatorName: "anonymous"
+            };
+
+            // 1. proj1 (1000), proj2 (2000), proj3 (3000, active)
+            // 2. Start a thumbnail operation for older proj1 (deferred)
+            // 3. Complete a newer project save (done for proj3 at 3000)
+            // 4. Resolve the older thumbnail operation for proj1 at a later timestamp
+            const nowSpy = jest.spyOn(Date, "now").mockReturnValue(5000);
+            await storage.saveThumbnail("img-1-rendered", "proj1");
+            nowSpy.mockRestore();
+
+            // DateLastModified for proj1 MUST remain 1000 (thumbnail rendering is not content modification)
+            expect(storage.data.Projects["proj1"].DateLastModified).toBe(1000);
+            expect(storage.data.Projects["proj1"].ProjectImage).toBe("img-1-rendered");
+
+            // 5. Delete active project (proj3) and inspect which replacement is selected
+            await storage.deleteProject("proj3");
+
+            // proj2 was modified at 2000, whereas proj1 was modified at 1000.
+            // Next project selected MUST be proj2, NOT proj1!
+            expect(storage.getCurrentProjectID()).toBe("proj2");
+            expect(storage.data.Projects["proj3"]).toBeUndefined();
+        });
     });
 
     describe("project CRUD operations", () => {
@@ -669,6 +955,319 @@ describe("ProjectStorage", () => {
             expect(saveSpy).toHaveBeenCalled();
         });
 
+        it("deleteProject should switch CurrentProject to the most recently modified remaining project", async () => {
+            const saveSpy = jest.spyOn(storage, "save").mockResolvedValue();
+            storage.data = {
+                CurrentProject: "proj1",
+                Projects: {
+                    proj1: {
+                        ProjectName: "Song A",
+                        ProjectData: "data-A",
+                        ProjectImage: "img-A",
+                        DateLastModified: 1000
+                    },
+                    proj2: {
+                        ProjectName: "Song B",
+                        ProjectData: "data-B",
+                        ProjectImage: "img-B",
+                        DateLastModified: 3000
+                    },
+                    proj3: {
+                        ProjectName: "Song C",
+                        ProjectData: "data-C",
+                        ProjectImage: "img-C",
+                        DateLastModified: 2000
+                    }
+                },
+                LikedProjects: {},
+                ReportedProjects: {},
+                DefaultCreatorName: "anonymous"
+            };
+
+            await storage.deleteProject("proj1");
+
+            expect(storage.data.Projects["proj1"]).toBeUndefined();
+            expect(storage.getCurrentProjectID()).toBe("proj2");
+            expect(storage.data.Projects["proj2"].ProjectData).toBe("data-B");
+            expect(saveSpy).toHaveBeenCalled();
+        });
+
+        it("deleteProject should tie-break deterministically when DateLastModified is equal or missing", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+            storage.data = {
+                CurrentProject: "proj1",
+                Projects: {
+                    proj1: { ProjectName: "Song A", DateLastModified: 1000 },
+                    projA: { ProjectName: "Song Alpha", DateLastModified: 2000 },
+                    projZ: { ProjectName: "Song Zeta", DateLastModified: 2000 }
+                },
+                LikedProjects: {},
+                ReportedProjects: {},
+                DefaultCreatorName: "anonymous"
+            };
+
+            await storage.deleteProject("proj1");
+
+            expect(storage.getCurrentProjectID()).toBe("projZ");
+        });
+
+        it("getLatestProjectID should ignore null or undefined project entries", () => {
+            storage.data = {
+                Projects: {
+                    projA: null,
+                    projB: undefined,
+                    projValid: { ProjectName: "Valid", DateLastModified: 1000 }
+                }
+            };
+
+            expect(storage.getLatestProjectID()).toBe("projValid");
+        });
+
+        it("deleteProject should clear CurrentProject when the last project is deleted", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+            storage.data = {
+                CurrentProject: "proj1",
+                Projects: {
+                    proj1: { ProjectName: "Only Song", DateLastModified: 1000 }
+                },
+                LikedProjects: {},
+                ReportedProjects: {},
+                DefaultCreatorName: "anonymous"
+            };
+
+            await storage.deleteProject("proj1");
+
+            expect(storage.data.Projects["proj1"]).toBeUndefined();
+            expect(storage.getCurrentProjectID()).toBeUndefined();
+        });
+
+        it("deleteProject should not change CurrentProject when deleting an inactive project", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+            storage.data = {
+                CurrentProject: "proj1",
+                Projects: {
+                    proj1: { ProjectName: "Song A", DateLastModified: 1000 },
+                    proj2: { ProjectName: "Song B", DateLastModified: 2000 }
+                },
+                LikedProjects: {},
+                ReportedProjects: {},
+                DefaultCreatorName: "anonymous"
+            };
+
+            await storage.deleteProject("proj2");
+
+            expect(storage.data.Projects["proj2"]).toBeUndefined();
+            expect(storage.getCurrentProjectID()).toBe("proj1");
+            expect(storage.data.Projects["proj1"]).toBeDefined();
+        });
+
+        it("deleteProject should handle unknown or repeated deletion without corrupting state", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+            storage.data = {
+                CurrentProject: "proj1",
+                Projects: {
+                    proj1: { ProjectName: "Song A", DateLastModified: 1000 }
+                },
+                LikedProjects: {},
+                ReportedProjects: {},
+                DefaultCreatorName: "anonymous"
+            };
+
+            await storage.deleteProject("nonexistent");
+            expect(storage.getCurrentProjectID()).toBe("proj1");
+
+            await storage.deleteProject("proj1");
+            expect(storage.getCurrentProjectID()).toBeUndefined();
+
+            await storage.deleteProject("proj1");
+            expect(storage.getCurrentProjectID()).toBeUndefined();
+        });
+
+        it("saveLocally should NOT resurrect a deleted project when active project was deleted and others remain", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+            storage.data = {
+                CurrentProject: "proj1",
+                Projects: {
+                    proj1: {
+                        ProjectName: "Deleted Song",
+                        ProjectData: "data-old",
+                        DateLastModified: 1000
+                    },
+                    proj2: {
+                        ProjectName: "Remaining Song",
+                        ProjectData: "data-keep",
+                        DateLastModified: 2000
+                    }
+                },
+                LikedProjects: {},
+                ReportedProjects: {},
+                DefaultCreatorName: "anonymous"
+            };
+
+            await storage.deleteProject("proj1");
+            expect(storage.getCurrentProjectID()).toBe("proj2");
+
+            await storage.saveLocally("stale-data", "stale-img", "proj1");
+            expect(storage.data.Projects["proj1"]).toBeUndefined();
+            expect(storage.data.Projects["proj2"].ProjectData).toBe("data-keep");
+        });
+
+        it("saveLocally should NOT create a phantom project when last project was deleted and delayed save targets deleted ID", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+            storage.data = {
+                CurrentProject: "proj1",
+                Projects: {
+                    proj1: {
+                        ProjectName: "Only Song",
+                        ProjectData: "data-1",
+                        DateLastModified: 1000
+                    }
+                },
+                LikedProjects: {},
+                ReportedProjects: {},
+                DefaultCreatorName: "anonymous"
+            };
+
+            await storage.deleteProject("proj1");
+            expect(storage.getCurrentProjectID()).toBeUndefined();
+            expect(Object.keys(storage.data.Projects).length).toBe(0);
+
+            // Delayed save arriving with explicit deleted ID must be ignored
+            await storage.saveLocally("stale-data", "stale-img", "proj1");
+            expect(storage.data.Projects["proj1"]).toBeUndefined();
+            expect(Object.keys(storage.data.Projects).length).toBe(0);
+            expect(storage.getCurrentProjectID()).toBeUndefined();
+
+            // Normal save without explicit ID initializes a valid new project
+            await storage.saveLocally("new-data", "new-img");
+            const newId = storage.getCurrentProjectID();
+            expect(newId).toBeDefined();
+            expect(newId).not.toBe("proj1");
+            expect(Object.keys(storage.data.Projects).length).toBe(1);
+            expect(storage.data.Projects[newId].ProjectData).toBe("new-data");
+        });
+
+        it("saveLocally should save to explicit existing project without creating phantom project even if CurrentProject is missing", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+            const initSpy = jest.spyOn(storage, "initialiseNewProject");
+            storage.data = {
+                CurrentProject: undefined,
+                Projects: {
+                    projExisting: {
+                        ProjectName: "Existing Song",
+                        ProjectData: "data-orig",
+                        ProjectImage: "img-orig",
+                        DateLastModified: 1000
+                    }
+                },
+                LikedProjects: {},
+                ReportedProjects: {},
+                DefaultCreatorName: "anonymous"
+            };
+
+            await storage.saveLocally("data-updated", "img-updated", "projExisting");
+
+            expect(initSpy).not.toHaveBeenCalled();
+            expect(Object.keys(storage.data.Projects).length).toBe(1);
+            expect(storage.data.Projects["projExisting"].ProjectData).toBe("data-updated");
+            expect(storage.data.Projects["projExisting"].ProjectImage).toBe("img-updated");
+        });
+
+        it("saveLocally should ignore explicit save targeting non-existent project without creating phantom project", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+            const initSpy = jest.spyOn(storage, "initialiseNewProject");
+            storage.data = {
+                CurrentProject: "proj1",
+                Projects: {
+                    proj1: {
+                        ProjectName: "Song 1",
+                        ProjectData: "data-1",
+                        DateLastModified: 1000
+                    }
+                },
+                LikedProjects: {},
+                ReportedProjects: {},
+                DefaultCreatorName: "anonymous"
+            };
+
+            await storage.saveLocally("phantom-data", "phantom-img", "nonexistent-id");
+
+            expect(initSpy).not.toHaveBeenCalled();
+            expect(storage.data.Projects["nonexistent-id"]).toBeUndefined();
+            expect(Object.keys(storage.data.Projects).length).toBe(1);
+            expect(storage.data.Projects["proj1"].ProjectData).toBe("data-1");
+            expect(storage.getCurrentProjectID()).toBe("proj1");
+        });
+
+        it("in-flight save paused during active project deletion should not resurrect deleted project or corrupt replacement project", async () => {
+            let resolveStorageSet;
+            const deferredPromise = new Promise(resolve => {
+                resolveStorageSet = resolve;
+            });
+
+            const persistedStorage = {};
+            storage.LocalStorage = {
+                setItem: jest.fn(async (key, val) => {
+                    persistedStorage[key] = val;
+                }),
+                getItem: jest.fn(async key => persistedStorage[key] || null)
+            };
+
+            storage.data = {
+                CurrentProject: "proj1",
+                Projects: {
+                    proj1: {
+                        ProjectName: "Active Song",
+                        ProjectData: "data-A-orig",
+                        ProjectImage: "img-A",
+                        DateLastModified: 1000
+                    },
+                    proj2: {
+                        ProjectName: "Replacement Song",
+                        ProjectData: "data-B-orig",
+                        ProjectImage: "img-B",
+                        DateLastModified: 2000
+                    }
+                },
+                LikedProjects: {},
+                ReportedProjects: {},
+                DefaultCreatorName: "anonymous"
+            };
+
+            await storage.save();
+
+            let pauseHit = false;
+            storage.LocalStorage.setItem = jest.fn(async (key, val) => {
+                persistedStorage[key] = val;
+                if (!pauseHit && key === storage.LocalStorageKey) {
+                    pauseHit = true;
+                    await deferredPromise;
+                }
+            });
+
+            // 1. Begin a workspace save for the active project
+            const inFlightSave = storage.saveLocally("data-A-modified", "img-A-new", "proj1");
+
+            // 2. Delete active project and transition state while save is in-flight
+            const deletePromise = storage.deleteProject("proj1");
+
+            // 3. Resolve the paused in-flight operation
+            resolveStorageSet();
+
+            await inFlightSave;
+            await deletePromise;
+
+            // 4. Inspect in-memory state and persisted state
+            expect(storage.data.Projects["proj1"]).toBeUndefined();
+            expect(storage.getCurrentProjectID()).toBe("proj2");
+            expect(storage.data.Projects["proj2"].ProjectData).toBe("data-B-orig");
+
+            const persisted = JSON.parse(persistedStorage[storage.LocalStorageKey]);
+            expect(persisted.Projects["proj1"]).toBeUndefined();
+            expect(persisted.CurrentProject).toBe("proj2");
+            expect(persisted.Projects["proj2"].ProjectData).toBe("data-B-orig");
+        });
+
         it("renameProject should update project name", async () => {
             const saveSpy = jest.spyOn(storage, "save").mockResolvedValue();
             await storage.renameProject("proj1", "New Name");
@@ -710,6 +1309,19 @@ describe("ProjectStorage", () => {
             expect(storage.data.Projects[id].ProjectName).toBe("My Song");
             expect(storage.data.Projects[id].ProjectData).toBe("data");
             expect(storage.data.Projects[id].ProjectImage).toBe("img");
+            expect(saveSpy).toHaveBeenCalled();
+        });
+
+        it("adds a project without switching to it when makeCurrent is false", async () => {
+            const saveSpy = jest.spyOn(storage, "save").mockResolvedValue();
+            storage.data.CurrentProject = "open";
+
+            const id = await storage.initialiseNewProject("Copy", "data", "img", null, {
+                makeCurrent: false
+            });
+
+            expect(storage.data.CurrentProject).toBe("open");
+            expect(storage.data.Projects[id].ProjectName).toBe("Copy");
             expect(saveSpy).toHaveBeenCalled();
         });
 

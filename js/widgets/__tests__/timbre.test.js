@@ -35,8 +35,9 @@ global.platformColor = {
     selectorBackground: "#f0f0f0",
     selectorBackgroundHOVER: "#e0e0e0"
 };
-global.rationalToFraction = jest.fn(n => [n, 1]);
-global.oneHundredToFraction = jest.fn(n => n / 100);
+const { oneHundredToFraction, rationalToFraction } = require("../../utils/utils-logic.js");
+global.rationalToFraction = jest.fn((...args) => rationalToFraction(...args));
+global.oneHundredToFraction = jest.fn((...args) => oneHundredToFraction(...args));
 global.last = arr => arr[arr.length - 1];
 global.Singer = { RhythmActions: { getNoteValue: jest.fn(() => 0.25) } };
 global.delayExecution = jest.fn(ms => new Promise(r => setTimeout(r, ms)));
@@ -2200,16 +2201,23 @@ describe("TimbreWidget", () => {
                 jsdomDocument.body.appendChild(range1);
                 jsdomDocument.body.appendChild(span1);
 
-                timbre._recordUndo("vibrato", [8, 25], 0);
+                timbre._recordUndo("vibrato", [8, 4], 0);
                 timbre._undo();
 
-                expect(timbre.vibratoParams).toEqual([8, 25]);
+                expect(timbre.vibratoParams).toEqual([8, 4]);
                 expect(timbre._update).toHaveBeenCalledWith(0, 8, 0);
+                expect(timbre._update).toHaveBeenCalledWith(0, 4, 1);
+                expect(timbre._update).toHaveBeenCalledWith(0, 1, 2);
                 expect(range0.value).toBe("8");
                 expect(range1.value).toBe("25");
+                expect(span1.textContent).toBe("1/4");
                 expect(
                     global.instrumentsEffects[0][timbre.instrumentName]["vibratoIntensity"]
                 ).toBe(0.08);
+                expect(global.instrumentsEffects[0][timbre.instrumentName]["vibratoRate"]).toBe(4);
+                expect(
+                    global.instrumentsEffects[0][timbre.instrumentName]["vibratoFrequency"]
+                ).toBe(0.25);
                 range0.remove();
                 span0.remove();
                 range1.remove();
@@ -2652,7 +2660,32 @@ describe("TimbreWidget", () => {
                 slider1.dispatchEvent(
                     new jsdomDocument.defaultView.Event("change", { bubbles: true })
                 );
-                expect(global.instrumentsEffects[0]["custom"]["vibratoFrequency"]).toBeDefined();
+                expect(global.instrumentsEffects[0]["custom"]["vibratoFrequency"]).toBe(1 / 16);
+                expect(global.instrumentsEffects[0]["custom"]["vibratoRate"]).toBe(16);
+                expect(global.instrumentsEffects[0]["custom"]["vibratoIntensity"]).toBe(0.1);
+                expect(timbre.vibratoParams[1]).toBe(16);
+            });
+
+            test("reopening existing vibrato restores slider values and instrumentsEffects", async () => {
+                timbre._update = jest.fn();
+                timbre.vibratoEffect = [99];
+                timbre.vibratoParams = [8, 16];
+                timbre._effects();
+                const vibratoRadio = jsdomDocument.querySelector('input[value="Vibrato"]');
+                vibratoRadio.checked = true;
+                await vibratoRadio.onclick({ target: vibratoRadio });
+
+                const slider0 = jsdomDocument.getElementById("myRangeFx0");
+                const slider1 = jsdomDocument.getElementById("myRangeFx1");
+                const span1 = jsdomDocument.getElementById("myspanFx1");
+
+                expect(slider0.value).toBe("8");
+                expect(slider1.value).toBe(String(100 / 16));
+                expect(span1.textContent).toBe("1/16");
+                expect(global.instrumentsEffects[0]["custom"]["vibratoActive"]).toBe(true);
+                expect(global.instrumentsEffects[0]["custom"]["vibratoIntensity"]).toBe(0.08);
+                expect(global.instrumentsEffects[0]["custom"]["vibratoFrequency"]).toBe(1 / 16);
+                expect(global.instrumentsEffects[0]["custom"]["vibratoRate"]).toBe(16);
             });
 
             test("Chorus effect creation and slider changes", async () => {
@@ -3117,6 +3150,53 @@ describe("TimbreWidget with a real DOM", () => {
 
         expect(blockList[blockList[1].connections[2]].name).toBe("divide");
         expect(blockList[2].connections[2]).toBe(6);
+    });
+
+    test.each([1, 2])("reopening the panel keeps edited frequencies for %i filters", count => {
+        for (let f = 0; f < count; f++) {
+            const index = blockList.length;
+            timbre.activity.blocks.loadNewBlocks([
+                [0, "filter", 0, 0, [null, 1, 2, 3, null]],
+                [1, ["filtertype", { value: DEFAULTFILTERTYPE }], 0, 0, [0]],
+                [2, ["number", { value: -12 }], 0, 0, [0]],
+                [3, ["number", { value: 392 }], 0, 0, [0]]
+            ]);
+            timbre.fil.push(index);
+            timbre.filterParams.push(DEFAULTFILTERTYPE, -12, 392);
+            instrumentsFilters[0].custom.push({
+                filterType: DEFAULTFILTERTYPE,
+                filterRolloff: -12,
+                filterFrequency: 392
+            });
+        }
+        timbre._setActiveExclusive("filter");
+        timbre._filter();
+        for (let f = 0; f < count; f++) {
+            slide("myRangeF" + f, String(1000 + f), "input");
+        }
+
+        timbre._setActiveExclusive("effects");
+        timbre._effects();
+        timbre._setActiveExclusive("filter");
+        timbre._filter();
+
+        for (let f = 0; f < count; f++) {
+            expect(jsdomDocument.getElementById("myRangeF" + f).value).toBe(String(1000 + f));
+            expect(jsdomDocument.getElementById("myspanF" + f).textContent).toBe(String(1000 + f));
+            const frequencyBlock = blockList[timbre.fil[f]].connections[3];
+            expect(Number(blockList[frequencyBlock].value)).toBe(1000 + f);
+        }
+
+        timbre._undo();
+        timbre._filter();
+
+        for (let f = 0; f < count; f++) {
+            expect(jsdomDocument.getElementById("myRangeF" + f).value).toBe("392");
+            expect(jsdomDocument.getElementById("myspanF" + f).textContent).toBe("392");
+            expect(instrumentsFilters[0].custom[f].filterFrequency).toBe(392);
+            const frequencyBlock = blockList[timbre.fil[f]].connections[3];
+            expect(Number(blockList[frequencyBlock].value)).toBe(392);
+        }
     });
 
     test("the 11th filter's controls edit the 11th filter", () => {

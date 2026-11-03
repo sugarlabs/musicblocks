@@ -132,8 +132,20 @@ const PhraseMakerGrid = {
      */
     mapNotesBlocks(pm, blockName, withName) {
         const notesBlockMap = [];
-        let blk = pm.activity.blocks.blockList[pm.blockNo].connections[1];
+        const startBlock = pm.activity.blocks.blockList[pm.blockNo];
+        if (!startBlock || !startBlock.connections) {
+            return notesBlockMap;
+        }
+
+        let blk = startBlock.connections[1];
+        if (blk === null || blk === undefined) {
+            return notesBlockMap;
+        }
+
         let myBlock = pm.activity.blocks.blockList[blk];
+        if (!myBlock) {
+            return notesBlockMap;
+        }
 
         let bottomBlockLoop = 0;
         if (
@@ -150,7 +162,7 @@ const PhraseMakerGrid = {
             }
         }
 
-        while (pm._deps.last(myBlock.connections) !== null) {
+        while (myBlock.connections && pm._deps.last(myBlock.connections) !== null) {
             bottomBlockLoop += 1;
             if (bottomBlockLoop > 2 * pm.activity.blocks.blockList.length) {
                 // Could happen if the block data is malformed.
@@ -158,7 +170,15 @@ const PhraseMakerGrid = {
             }
 
             blk = pm._deps.last(myBlock.connections);
+            if (blk === null || blk === undefined) {
+                break;
+            }
+
             myBlock = pm.activity.blocks.blockList[blk];
+            if (!myBlock) {
+                break;
+            }
+
             if (
                 myBlock.name === blockName ||
                 (blockName === "all" &&

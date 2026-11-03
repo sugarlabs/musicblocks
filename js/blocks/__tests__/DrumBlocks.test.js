@@ -742,4 +742,28 @@ describe("real DrumBlocks instances - direct method coverage", () => {
         instances["playdrum"].flow(["snare"], logo, 0, "blk1");
         expect(logo.musicKeyboard.instruments).toContain("snare");
     });
+
+    test("real PlayDrumBlock flow() prefers the turtle's own keyboard", () => {
+        const lastActive = {
+            instruments: [],
+            noteNames: [],
+            octaves: [],
+            addRowBlock: jest.fn()
+        };
+        const own = { instruments: [], noteNames: [], octaves: [], addRowBlock: jest.fn() };
+        const logo = {
+            inPitchDrumMatrix: false,
+            inMatrix: false,
+            inMusicKeyboard: true,
+            drumBlocks: [],
+            pitchDrumMatrix: { drums: [], addColBlock: jest.fn() },
+            phraseMaker: { rowLabels: [], rowArgs: [], addRowBlock: jest.fn() },
+            musicKeyboard: lastActive,
+            musicKeyboardByTurtle: { 1: own }
+        };
+        instances["playdrum"].flow(["snare"], logo, 1, "blk1");
+
+        expect(own.instruments).toContain("snare");
+        expect(lastActive.instruments).not.toContain("snare");
+    });
 });

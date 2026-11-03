@@ -224,7 +224,8 @@ function setupMeterActions(activity) {
             const orgTurtle = turtle;
 
             // Create a companion turtle if it doesn't exist
-            if (!activity.turtles.getTurtle(orgTurtle).companionTurtle) {
+            const companionTurtle = activity.turtles.getTurtle(orgTurtle).companionTurtle;
+            if (companionTurtle === undefined || companionTurtle === null) {
                 turtle = activity.turtles.getTurtleCount();
                 activity.turtles.getTurtle(orgTurtle).companionTurtle = turtle;
                 activity.turtles.addTurtle(activity.blocks.blockList[blk], {});
@@ -348,7 +349,7 @@ function setupMeterActions(activity) {
         }
 
         static getNotesPlayed(noteValue, turtle) {
-            if (noteValue === null || noteValue === 0) return 0;
+            if (!Number.isFinite(noteValue) || noteValue <= 0) return 0;
 
             const tur = activity.turtles.ithTurtle(turtle);
             return tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] / noteValue;

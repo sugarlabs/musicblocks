@@ -44,6 +44,38 @@
  * @returns {void}
  */
 function setupVolumeActions(activity) {
+    const resolveSynthName = synthname => {
+        if (synthname === DEFAULTVOICE || synthname === _(DEFAULTVOICE)) return DEFAULTVOICE;
+        if (synthname === "custom" || synthname === _("custom")) return "custom";
+        if (typeof synthname !== "string") return null;
+
+        const normalizedSynthName = synthname.toLowerCase();
+
+        for (const voice in VOICENAMES) {
+            if (VOICENAMES[voice][0].toLowerCase() === normalizedSynthName) {
+                return VOICENAMES[voice][1];
+            }
+            if (VOICENAMES[voice][1].toLowerCase() === normalizedSynthName) {
+                return VOICENAMES[voice][1];
+            }
+        }
+
+        for (const drum in DRUMNAMES) {
+            const displayName = DRUMNAMES[drum][0];
+            const technicalName = DRUMNAMES[drum][1];
+
+            if (displayName.replace("-", " ") === synthname) {
+                return technicalName;
+            }
+
+            if (technicalName.replace("-", " ") === synthname) {
+                return synthname;
+            }
+        }
+
+        return null;
+    };
+
     Singer.VolumeActions = class {
         /**
          * Increases/decreases the volume of the contained notes by a specified amount for every note played.
@@ -230,43 +262,13 @@ function setupVolumeActions(activity) {
          */
         static setSynthVolume(synthname, volume, turtle, blk) {
             if (!Number.isFinite(volume)) return;
-            let synth = null;
+            let synth = resolveSynthName(synthname);
             let firstConnection = null;
             let lastConnection = null;
 
             if (activity.logo.blockList && activity.logo.blockList[blk]) {
                 firstConnection = activity.logo.blockList[blk].connections[0];
                 lastConnection = last(activity.logo.blockList[blk].connections);
-            }
-
-            if (synthname === DEFAULTVOICE || synthname === _(DEFAULTVOICE)) {
-                synth = DEFAULTVOICE;
-            } else if (synthname === "custom" || synthname === _("custom")) {
-                synth = "custom";
-            }
-
-            if (synth === null) {
-                for (const voice in VOICENAMES) {
-                    if (VOICENAMES[voice][0] === synthname) {
-                        synth = VOICENAMES[voice][1];
-                        break;
-                    } else if (VOICENAMES[voice][1] === synthname) {
-                        synth = synthname;
-                        break;
-                    }
-                }
-            }
-
-            if (synth === null) {
-                for (const drum in DRUMNAMES) {
-                    if (DRUMNAMES[drum][0].replace("-", " ") === synthname) {
-                        synth = DRUMNAMES[drum][1];
-                        break;
-                    } else if (DRUMNAMES[drum][1].replace("-", " ") === synthname) {
-                        synth = synthname;
-                        break;
-                    }
-                }
             }
 
             if (synth === null) {
@@ -295,7 +297,15 @@ function setupVolumeActions(activity) {
                 if (firstConnection === null && lastConnection === null) {
                     activity.logo._timerManager.setGuardedTimeout(
                         () => {
-                            activity.logo.synth.trigger(0, "G4", 1 / 4, synth, null, null, false);
+                            activity.logo.synth.trigger(
+                                turtle,
+                                "G4",
+                                1 / 4,
+                                synth,
+                                null,
+                                null,
+                                false
+                            );
                         },
                         250,
                         () => activity.logo.stopTurtle
@@ -322,9 +332,13 @@ function setupVolumeActions(activity) {
          */
         static getSynthVolume(targetSynth, turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
+            const synth = resolveSynthName(targetSynth) || targetSynth;
 
-            if (Object.prototype.hasOwnProperty.call(tur.singer.synthVolume, targetSynth)) {
-                return last(tur.singer.synthVolume[targetSynth]);
+            if (
+                synth !== null &&
+                Object.prototype.hasOwnProperty.call(tur.singer.synthVolume, synth)
+            ) {
+                return last(tur.singer.synthVolume[synth]);
             }
 
             return 50;

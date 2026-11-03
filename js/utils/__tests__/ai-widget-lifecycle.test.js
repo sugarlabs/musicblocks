@@ -1,4 +1,4 @@
-const { createWidgetLifecycle } = require("../ai-widget-lifecycle");
+const { createWidgetLifecycle, aiWidgetConsent } = require("../ai-widget-lifecycle");
 
 describe("ai-widget-lifecycle", () => {
     let lifecycle;
@@ -181,5 +181,85 @@ describe("ai-widget-lifecycle", () => {
         await expect(
             lifecycle.postJSON("http://localhost/api", {}, null, null, true)
         ).rejects.toThrow("HTTP 500: Internal Server Error");
+    });
+
+    it("keeps the server's reply on the error thrown for an HTTP error", async () => {
+        global.fetch.mockResolvedValue({
+            ok: false,
+            status: 429,
+            statusText: "Too Many Requests",
+            json: async () => ({ error: "Please wait a little." })
+        });
+
+        await expect(
+            lifecycle.postJSON("http://localhost/api", {}, null, null, true)
+        ).rejects.toMatchObject({ reply: { error: "Please wait a little." } });
+    });
+
+    it("reads the open project's id, or undefined before Planet loads", () => {
+        const widget = {};
+        const tracker = createWidgetLifecycle(widget, () => true);
+        expect(tracker.projectId()).toBeUndefined();
+
+        widget.activity = { planet: { getCurrentProjectID: () => "1234" } };
+        expect(tracker.projectId()).toBe("1234");
+    });
+
+    describe("consent", () => {
+        let container;
+
+        beforeEach(() => {
+            global._ = text => text;
+            aiWidgetConsent.given = false;
+            container = document.createElement("div");
+        });
+
+        it("counts consent given in one widget for the other", () => {
+            const other = createWidgetLifecycle({}, () => true);
+            expect(other.hasConsent()).toBe(false);
+
+            lifecycle.giveConsent();
+
+            expect(other.hasConsent()).toBe(true);
+        });
+
+        it("gives consent and runs the waiting request when the child agrees", () => {
+            const onAgree = jest.fn();
+            const onDecline = jest.fn();
+            lifecycle.showConsentBanner(container, {
+                classPrefix: "reflection",
+                text: "Reflection will send your project to: ",
+                url: "http://localhost:8000",
+                onAgree,
+                onDecline
+            });
+            const banner = container.querySelector(".reflection-consent-banner");
+            expect(banner.textContent).toContain("Before we start");
+            expect(banner.textContent).toContain("http://localhost:8000");
+
+            banner.querySelectorAll("button")[0].onclick();
+
+            expect(lifecycle.hasConsent()).toBe(true);
+            expect(onAgree).toHaveBeenCalledTimes(1);
+            expect(onDecline).not.toHaveBeenCalled();
+            expect(container.querySelector(".reflection-consent-banner")).toBeNull();
+        });
+
+        it("gives no consent when the child declines", () => {
+            const onAgree = jest.fn();
+            const onDecline = jest.fn();
+            const options = { classPrefix: "reflection", text: "", url: "", onAgree, onDecline };
+            lifecycle.showConsentBanner(container, options);
+            // Asking again replaces the banner instead of stacking a second one.
+            lifecycle.showConsentBanner(container, options);
+            expect(container.querySelectorAll(".reflection-consent-banner").length).toBe(1);
+
+            container.querySelector(".reflection-cancel-btn").onclick();
+
+            expect(lifecycle.hasConsent()).toBe(false);
+            expect(onDecline).toHaveBeenCalledTimes(1);
+            expect(onAgree).not.toHaveBeenCalled();
+            expect(container.querySelector(".reflection-consent-banner")).toBeNull();
+        });
     });
 });

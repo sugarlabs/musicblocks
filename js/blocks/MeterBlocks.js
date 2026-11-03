@@ -784,7 +784,7 @@ function setupMeterBlocks(activity) {
          */
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
             if (!(args[0] in logo.actions)) {
-                activity.errorMsg(NOACTIONERRORMSG, blk, args[1]);
+                activity.errorMsg(NOACTIONERRORMSG, blk, args[0]);
             } else {
                 Singer.MeterActions.onWeakBeatDo(args[0], isflow, receivedArg, turtle, blk);
             }
@@ -908,7 +908,7 @@ function setupMeterBlocks(activity) {
          */
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
             if (!(args[0] in logo.actions)) {
-                activity.errorMsg(NOACTIONERRORMSG, blk, args[1]);
+                activity.errorMsg(NOACTIONERRORMSG, blk, args[0]);
             } else {
                 Singer.MeterActions.onEveryBeatDo(args[0], isflow, receivedArg, turtle, blk);
             }
@@ -962,7 +962,7 @@ function setupMeterBlocks(activity) {
         flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow) {
             // Set up a listener for every beat for this turtle.
             if (!(args[0] in logo.actions)) {
-                activity.errorMsg(NOACTIONERRORMSG, blk, args[1]);
+                activity.errorMsg(NOACTIONERRORMSG, blk, args[0]);
             } else {
                 Singer.MeterActions.onEveryNoteDo(args[0], isflow, receivedArg, turtle, blk);
             }
@@ -1481,7 +1481,10 @@ function setupMeterBlocks(activity) {
             }
 
             if (logo.insideMeterWidget) logo._meterBlock = blk;
-            if (logo.inMusicKeyboard) logo.musicKeyboard.meterArgs = args;
+            if (logo.inMusicKeyboard) {
+                const musicKeyboard = logo.musicKeyboardByTurtle?.[turtle] || logo.musicKeyboard;
+                musicKeyboard.meterArgs = args;
+            }
 
             Singer.MeterActions.setMeter(arg0, arg1, turtle);
         }

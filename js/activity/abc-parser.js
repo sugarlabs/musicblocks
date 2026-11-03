@@ -106,23 +106,19 @@ function _abcToStandardValue(pitchValue) {
     return octave;
 }
 
-// Creates pitch which consist of note pitch notename you could
-// see them in the function.
+// Creates the newnote block for one ABC note, rest or chord: a pitch block
+// (pitch, notename, octave) for each note of the chord, chained inside the
+// newnote's clamp, or a rest2 when there are none.
 function _createPitchBlocks(
-    pitches,
+    chord,
     blockId,
     pitchDuration,
     keySignature,
     actionBlock,
-    triplet,
-    meterDen,
-    inlineAccidental
+    inlineAccidentals
 ) {
     const duration = toFraction(pitchDuration);
-    const hiddenBlockId = blockId + (pitches ? 8 : 6);
-    if (triplet !== null) {
-        duration[1] = meterDen * triplet;
-    }
+    const hiddenBlockId = blockId + 5 + (chord.length ? 3 * chord.length : 1);
 
     const noteBlocks = [
         [
@@ -138,24 +134,31 @@ function _createPitchBlocks(
         [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]]
     ];
 
-    if (pitches) {
+    chord.forEach((pitch, i) => {
+        const id = blockId + 5 + 3 * i;
         const adjustedNote = _adjustPitch(
-            pitches.name,
+            pitch.name,
             keySignature,
-            inlineAccidental
+            inlineAccidentals[i]
         ).toUpperCase();
         noteBlocks.push(
-            [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
-            [blockId + 6, ["notename", { value: adjustedNote }], 0, 0, [blockId + 5]],
             [
-                blockId + 7,
-                ["number", { value: _abcToStandardValue(pitches.pitch) }],
+                id,
+                "pitch",
                 0,
                 0,
-                [blockId + 5]
-            ]
+                [
+                    i === 0 ? blockId + 4 : id - 3,
+                    id + 1,
+                    id + 2,
+                    i === chord.length - 1 ? null : id + 3
+                ]
+            ],
+            [id + 1, ["notename", { value: adjustedNote }], 0, 0, [id]],
+            [id + 2, ["number", { value: _abcToStandardValue(pitch.pitch) }], 0, 0, [id]]
         );
-    } else {
+    });
+    if (chord.length === 0) {
         noteBlocks.push([blockId + 5, "rest2", 0, 0, [blockId + 4, null]]);
     }
 
@@ -208,7 +211,7 @@ function _organizeStaffs(lines) {
  * @param {object} staff - The staff object from the parsed tune.
  * @param {string} title - The tune title (lowercased).
  * @param {string} instruction - The instrument name (lowercased).
- * @param {string} staffIdx - The staff index key.
+ * @param {number} voiceNumber - The voice number shown on the imported turtle.
  * @returns {{ startBlock: Array, newBlockId: number }}
  */
 // A staff's meter as a numerator and denominator. abcjs spells M:C and M:C| as
@@ -227,23 +230,76 @@ function _meterOf(staff) {
     return { num: Number(value?.num) || 4, den: Number(value?.den) || 4 };
 }
 
-function _buildStartBlock(blockId, staff, title, instruction, staffIdx) {
-    const keyRoot = staff.key.root + (_ABC_KEY_ACC_SUFFIX[staff.key.acc] || "");
-    const keyMode = _ABC_MODE_MAP[staff.key.mode] || "major";
+function _tempoOf(tempo) {
+    if (!Number.isFinite(tempo?.bpm) || tempo.bpm <= 0 || tempo.suppressBpm) return null;
+    // An ABC tempo may define its beat as a sum, such as Q:1/4 1/8=60.
+    const beatValue = tempo.duration?.reduce((total, value) => total + value, 0);
+    if (!Number.isFinite(beatValue) || beatValue <= 0) return null;
+    return { bpm: tempo.bpm, duration: toFraction(beatValue) };
+}
+
+// An abcjs key as the root notename and modename a setkey2 block takes.
+function _keyNamesOf(key) {
+    // K:none has no key signature, which reads the same as C major.
+    if (key.root === "none") {
+        return { root: "C", mode: "major" };
+    }
+    return {
+        root: key.root + (_ABC_KEY_ACC_SUFFIX[key.acc] || ""),
+        mode: _ABC_MODE_MAP[key.mode] || "major"
+    };
+}
+
+// Makes key the voice's key and adds a setkey2 block to a segment, followed by a
+// hidden block like a note, so it chains into the segment the same way notes do.
+// Meter blocks do the same. Adds nothing when the root and mode are unchanged.
+function _createKeyBlocks(key, blockId, actionBlock, staffRecord) {
+    const previous = _keyNamesOf(staffRecord.keySignature);
+    staffRecord.keySignature = key;
+    const { root, mode } = _keyNamesOf(key);
+    if (root === previous.root && mode === previous.mode) {
+        return 0;
+    }
+    actionBlock.push(
+        [blockId, "setkey2", 0, 0, [blockId - 1, blockId + 1, blockId + 2, blockId + 3]],
+        [blockId + 1, ["notename", { value: root }], 0, 0, [blockId]],
+        [blockId + 2, ["modename", { value: mode }], 0, 0, [blockId]],
+        [blockId + 3, "hidden", 0, 0, [blockId, blockId + 4]]
+    );
+    return 4;
+}
+
+// Adds nothing when the voice is already in this meter.
+function _createMeterBlocks(meter, blockId, actionBlock, staffRecord) {
+    if (meter.num === staffRecord.meterNum && meter.den === staffRecord.meterDen) {
+        return 0;
+    }
+    staffRecord.meterNum = meter.num;
+    staffRecord.meterDen = meter.den;
+    actionBlock.push(
+        [blockId, "meter", 0, 0, [blockId - 1, blockId + 1, blockId + 2, blockId + 5]],
+        [blockId + 1, ["number", { value: meter.num }], 0, 0, [blockId]],
+        [blockId + 2, "divide", 0, 0, [blockId, blockId + 3, blockId + 4]],
+        [blockId + 3, ["number", { value: 1 }], 0, 0, [blockId + 2]],
+        [blockId + 4, ["number", { value: meter.den }], 0, 0, [blockId + 2]],
+        [blockId + 5, "hidden", 0, 0, [blockId, blockId + 6]]
+    );
+    return 6;
+}
+
+function _buildStartBlock(blockId, staff, title, instruction, voiceNumber, tempo) {
+    const { root: keyRoot, mode: keyMode } = _keyNamesOf(staff.key);
     const meter = _meterOf(staff);
+    const tempoId = blockId + 14;
+    const timbreId = tempoId + (tempo ? 6 : 0);
+    const beforeTimbreId = tempo ? tempoId + 5 : blockId + 11;
 
     const startBlock = [
         [blockId, ["start", { collapsed: false }], 100, 100, [null, blockId + 1, null]],
         [blockId + 1, "print", 0, 0, [blockId, blockId + 2, blockId + 3]],
         [blockId + 2, ["text", { value: title }], 0, 0, [blockId + 1]],
         [blockId + 3, "setturtlename2", 0, 0, [blockId + 1, blockId + 4, blockId + 5]],
-        [
-            blockId + 4,
-            ["text", { value: `Voice ${parseInt(staffIdx, 10) + 1} ` }],
-            0,
-            0,
-            [blockId + 3]
-        ],
+        [blockId + 4, ["text", { value: `Voice ${voiceNumber} ` }], 0, 0, [blockId + 3]],
         [blockId + 5, "meter", 0, 0, [blockId + 3, blockId + 6, blockId + 7, blockId + 10]],
         [blockId + 6, ["number", { value: meter.num }], 0, 0, [blockId + 5]],
         [blockId + 7, "divide", 0, 0, [blockId + 5, blockId + 8, blockId + 9]],
@@ -254,10 +310,23 @@ function _buildStartBlock(blockId, staff, title, instruction, staffIdx) {
         [blockId + 12, ["notename", { value: keyRoot }], 0, 0, [blockId + 11]],
         [blockId + 13, ["modename", { value: keyMode }], 0, 0, [blockId + 11]],
         // Connection to first nameddo is resolved during finalization.
-        [blockId + 14, "settimbre", 0, 0, [blockId + 11, blockId + 15, null, blockId + 16]],
-        [blockId + 15, ["voicename", { value: instruction }], 0, 0, [blockId + 14]],
-        [blockId + 16, "hidden", 0, 0, [blockId + 14, null]]
+        [timbreId, "settimbre", 0, 0, [beforeTimbreId, timbreId + 1, null, timbreId + 2]],
+        [timbreId + 1, ["voicename", { value: instruction }], 0, 0, [timbreId]],
+        [timbreId + 2, "hidden", 0, 0, [timbreId, null]]
     ];
+
+    if (tempo) {
+        startBlock.splice(
+            14,
+            0,
+            [tempoId, "setbpm3", 0, 0, [blockId + 11, tempoId + 1, tempoId + 2, tempoId + 5]],
+            [tempoId + 1, ["number", { value: tempo.bpm }], 0, 0, [tempoId]],
+            [tempoId + 2, "divide", 0, 0, [tempoId, tempoId + 3, tempoId + 4]],
+            [tempoId + 3, ["number", { value: tempo.duration[0] }], 0, 0, [tempoId + 2]],
+            [tempoId + 4, ["number", { value: tempo.duration[1] }], 0, 0, [tempoId + 2]],
+            [tempoId + 5, "vspace", 0, 0, [tempoId, timbreId]]
+        );
+    }
 
     return { startBlock, newBlockId: blockId + startBlock.length };
 }
@@ -291,11 +360,11 @@ function _handleRepeatBar(type, staffRecord) {
  *
  * @param {Array} actionBlock - Note blocks of the segment (mutated in place).
  * @param {number} blockId - Current block ID counter.
- * @param {string} staffIdx - The staff index key.
+ * @param {number} voiceNumber - The voice number shown on the imported turtle.
  * @param {object} staffRecord - The localized staff record (mutated in place).
  * @returns {number} newBlockId
  */
-function _closeSegment(actionBlock, blockId, staffIdx, staffRecord) {
+function _closeSegment(actionBlock, blockId, voiceNumber, staffRecord) {
     if (actionBlock.length === 0) {
         return blockId;
     }
@@ -304,7 +373,7 @@ function _closeSegment(actionBlock, blockId, staffIdx, staffRecord) {
     actionBlock[0][4][0] = blockId + 3;
     actionBlock[actionBlock.length - 1][4][1] = null;
 
-    const lineLabel = `V: ${parseInt(staffIdx, 10) + 1} Line ${staffRecord.baseBlocks.length + 1}`;
+    const lineLabel = `V: ${voiceNumber} Line ${staffRecord.baseBlocks.length + 1}`;
 
     // Add the nameddo action text and hidden block for each line
     actionBlock.push(
@@ -327,26 +396,24 @@ function _closeSegment(actionBlock, blockId, staffIdx, staffRecord) {
 }
 
 /**
- * Processes one voice: iterates all elements, builds pitch blocks for notes
- * and updates repeat markers for bars. The notes become one action block per
+ * Processes one voice: iterates all elements, builds pitch blocks for notes,
+ * setkey2 and meter blocks for key and meter changes, and updates repeat
+ * markers for bars. The notes become one action block per
  * stretch between repeat bars, so a repeat can start or end mid-line.
  * Voices that produced no note blocks add nothing.
  *
- * tripletFinder is initialized fresh for each voice so that triplet state
- * never bleeds from one voice into the next.
+ * Tuplet ratios are tracked per voice and retained across staff lines.
  *
  * @param {Array} voice - The voice element array.
  * @param {number} blockId - Current block ID counter.
  * @param {object} staff - The staff object.
- * @param {string} staffIdx - The staff index key.
+ * @param {number} voiceNumber - The voice number shown on the imported turtle.
  * @param {object} staffRecord - The localized staff record (mutated in place).
  * @param {number} voiceIdx - The voice's index within the staff.
  * @returns {number} newBlockId
  */
-function _processVoice(voice, blockId, staff, staffIdx, staffRecord, voiceIdx) {
-    // Reset triplet state at every voice boundary so that an unclosed
-    // triplet in one voice cannot affect timing in subsequent voices.
-    let tripletFinder = null;
+function _processVoice(voice, blockId, staff, voiceNumber, staffRecord, voiceIdx) {
+    const tuplets = staffRecord.tuplets;
     // An inline accidental holds for the same pitch until the next bar line,
     // but abcjs only sets it on the note that carries the mark. A bar can run
     // across staff lines, so the state lives on the staff record per voice.
@@ -355,50 +422,75 @@ function _processVoice(voice, blockId, staff, staffIdx, staffRecord, voiceIdx) {
         barAccidentals[voiceIdx] = {};
     }
     let actionBlock = [];
+    // abcjs gives each line the key it starts in, and a [K:] inside the line
+    // as a key element that holds from there on. A K: line inside one voice's
+    // music changes the line's key without a key element, so compare it here.
+    blockId += _createKeyBlocks(staff.key, blockId, actionBlock, staffRecord);
+
+    // A line that starts in a new meter carries it on the staff, not as an element.
+    if (staff.meter) {
+        blockId += _createMeterBlocks(_meterOf(staff), blockId, actionBlock, staffRecord);
+    }
 
     voice.forEach(element => {
         if (element.el_type === "note") {
-            //check if triplet exists
+            const isSpacerRest = element.rest?.type === "spacer";
             if (element?.startTriplet !== null && element?.startTriplet !== undefined) {
-                tripletFinder = element.startTriplet;
+                // abcjs supplies the ratio, including explicit p:q:r tuplets.
+                // Apply it to each written duration, independently of the meter.
+                tuplets[voiceIdx] = {
+                    multiplier: element.tripletMultiplier ?? 1,
+                    remaining: element.tripletR ?? element.startTriplet
+                };
             }
 
-            const pitch = element.pitches?.[0];
-            let accidental = pitch?.accidental;
-            if (pitch) {
-                if (accidental) {
-                    barAccidentals[voiceIdx][pitch.pitch] = accidental;
-                } else {
-                    accidental = barAccidentals[voiceIdx][pitch.pitch];
+            // Every note of a chord ([CEG]) is played, each with its own
+            // carried accidental; reading pitches[0] alone kept just the first.
+            const chord = element.pitches ?? [];
+            const accidentals = chord.map(pitch => {
+                if (pitch.accidental) {
+                    barAccidentals[voiceIdx][pitch.pitch] = pitch.accidental;
+                    return pitch.accidental;
                 }
-            }
+                return barAccidentals[voiceIdx][pitch.pitch];
+            });
 
             blockId += _createPitchBlocks(
-                pitch,
+                chord,
                 blockId,
-                element.duration,
-                staff.key,
+                element.duration * (isSpacerRest ? 1 : (tuplets[voiceIdx]?.multiplier ?? 1)),
+                staffRecord.keySignature,
                 actionBlock,
-                tripletFinder,
-                staffRecord.meterDen,
-                accidental
+                accidentals
             );
 
-            // Check and set tripletFinder to null if element?.endTriplet exists.
-            if (element?.endTriplet !== null && element?.endTriplet !== undefined) {
-                tripletFinder = null;
+            if (tuplets[voiceIdx] && !isSpacerRest) {
+                // abcjs can omit endTriplet when the group crosses a staff line.
+                tuplets[voiceIdx].remaining--;
+                if (element.endTriplet || tuplets[voiceIdx].remaining === 0) {
+                    tuplets[voiceIdx] = null;
+                }
             }
         } else if (element.el_type === "bar") {
             barAccidentals[voiceIdx] = {};
             if (_ABC_REPEAT_BARS.includes(element.type)) {
-                blockId = _closeSegment(actionBlock, blockId, staffIdx, staffRecord);
+                blockId = _closeSegment(actionBlock, blockId, voiceNumber, staffRecord);
                 actionBlock = [];
                 _handleRepeatBar(element.type, staffRecord);
             }
+        } else if (element.el_type === "key") {
+            blockId += _createKeyBlocks(element, blockId, actionBlock, staffRecord);
+        } else if (element.el_type === "meter") {
+            blockId += _createMeterBlocks(
+                _meterOf({ meter: element }),
+                blockId,
+                actionBlock,
+                staffRecord
+            );
         }
     });
 
-    return _closeSegment(actionBlock, blockId, staffIdx, staffRecord);
+    return _closeSegment(actionBlock, blockId, voiceNumber, staffRecord);
 }
 
 /**
@@ -475,46 +567,55 @@ function _finalizeStaffBlocks(staffRecord, blockId, finalBlock) {
  */
 const setupActivityAbcParser = activityInstance => {
     activityInstance.parseABC = async function (tune) {
-        const staffBlocksMap = {};
+        const voiceBlocks = [];
         let blockId = 0;
+        let voiceNumber = 0;
         const title = (tune.metaText?.title ?? "title").toString().toLowerCase();
         const instruction = (tune.metaText?.instruction ?? "guitar").toString().toLowerCase();
+        const tempo = _tempoOf(tune.metaText?.tempo);
 
         const organizedStaffs = _organizeStaffs(tune.lines ?? []);
         Object.keys(organizedStaffs).forEach(staffIdx => {
+            const staffVoices = new Map();
             organizedStaffs[staffIdx].arrangedBlocks?.forEach(staff => {
-                if (!Object.prototype.hasOwnProperty.call(staffBlocksMap, staffIdx)) {
-                    const { startBlock, newBlockId } = _buildStartBlock(
-                        blockId,
-                        staff,
-                        title,
-                        instruction,
-                        staffIdx
-                    );
-                    const staffMeter = _meterOf(staff);
-                    staffBlocksMap[staffIdx] = {
-                        meterNum: staffMeter.num,
-                        meterDen: staffMeter.den,
-                        keySignature: staff.key,
-                        baseBlocks: [],
-                        startBlock,
-                        repeatBlock: [],
-                        repeatArray: [],
-                        repeatStart: null,
-                        repeatFrom: 0,
-                        nameddoIds: [],
-                        barAccidentals: []
-                    };
-                    blockId = newBlockId;
-                }
-
                 staff.voices.forEach((voice, voiceIdx) => {
+                    if (!staffVoices.has(voiceIdx)) {
+                        voiceNumber += 1;
+                        const { startBlock, newBlockId } = _buildStartBlock(
+                            blockId,
+                            staff,
+                            title,
+                            instruction,
+                            voiceNumber,
+                            tempo
+                        );
+                        const staffMeter = _meterOf(staff);
+                        staffVoices.set(voiceIdx, {
+                            voiceNumber,
+                            meterNum: staffMeter.num,
+                            meterDen: staffMeter.den,
+                            keySignature: staff.key,
+                            baseBlocks: [],
+                            startBlock,
+                            repeatBlock: [],
+                            repeatArray: [],
+                            repeatStart: null,
+                            repeatFrom: 0,
+                            nameddoIds: [],
+                            barAccidentals: [],
+                            tuplets: []
+                        });
+                        voiceBlocks.push(staffVoices.get(voiceIdx));
+                        blockId = newBlockId;
+                    }
+
+                    const voiceRecord = staffVoices.get(voiceIdx);
                     blockId = _processVoice(
                         voice,
                         blockId,
                         staff,
-                        staffIdx,
-                        staffBlocksMap[staffIdx],
+                        voiceRecord.voiceNumber,
+                        voiceRecord,
                         voiceIdx
                     );
                 });
@@ -522,8 +623,8 @@ const setupActivityAbcParser = activityInstance => {
         });
 
         const finalBlock = [];
-        Object.keys(staffBlocksMap).forEach(staffIndex => {
-            blockId = _finalizeStaffBlocks(staffBlocksMap[staffIndex], blockId, finalBlock);
+        voiceBlocks.forEach(voiceRecord => {
+            blockId = _finalizeStaffBlocks(voiceRecord, blockId, finalBlock);
         });
 
         this.blocks.loadNewBlocks(finalBlock);
