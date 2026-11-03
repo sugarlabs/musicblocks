@@ -552,7 +552,7 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
                     })
             });
 
-            await gitDropdown._doCommit("my-repo", "my-key", "Added baseline melody");
+            const saved = await gitDropdown._doCommit("my-repo", "my-key", "Added baseline melody");
 
             expect(global.fetch).toHaveBeenCalledWith(
                 expect.stringContaining("/api/github/edit"),
@@ -564,12 +564,13 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
 
             expect(localStorage.getItem("mbGitLastSavedHash")).toBeTruthy();
             expect(localStorage.getItem("mbGitCurrentSha")).toBeNull();
+            expect(saved).toBe(true);
         });
 
         test("saves commit draft via MB_OFFLINE_COMMIT when offline", async () => {
             jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(true);
 
-            await gitDropdown._doCommit("my-repo", "my-key", "Offline snapshot 1");
+            const saved = await gitDropdown._doCommit("my-repo", "my-key", "Offline snapshot 1");
 
             expect(global.fetch).not.toHaveBeenCalled();
             expect(mockIframe.contentWindow.postMessage).toHaveBeenCalledWith(
@@ -580,11 +581,143 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
                 }),
                 "*"
             );
+            expect(saved).toBe(true);
+        });
+
+        test("reports a failed offline draft when the five-draft limit is reached", async () => {
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(true);
+            jest.spyOn(gitDropdown, "_waitForMessage").mockResolvedValue({
+                success: false,
+                error: "OFFLINE_DRAFT_CAP_REACHED"
+            });
+
+            const saved = await gitDropdown._doCommit("my-repo", "my-key", "Sixth snapshot");
+
+            expect(saved).toBe(false);
+            expect(localStorage.getItem("mbGitLastSavedHash")).toBeNull();
+        });
+
+        test("falls back to an offline draft when the network drops mid-commit", async () => {
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);
+            global.fetch.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+
+            const saved = await gitDropdown._doCommit("my-repo", "my-key", "Network drop");
+
+            expect(mockIframe.contentWindow.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    type: "MB_OFFLINE_COMMIT",
+                    commitMessage: "Network drop"
+                }),
+                "*"
+            );
+            expect(saved).toBe(true);
+        });
+
+        test("reports a permission failure when the server rejects the commit", async () => {
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);
+            global.fetch.mockResolvedValueOnce({
+                ok: false,
+                status: 401,
+                json: () => Promise.resolve({ message: "Unauthorized" })
+            });
+            const showToast = jest.spyOn(gitDropdown, "_showToast");
+
+            const saved = await gitDropdown._doCommit("my-repo", "my-key", "Denied moment");
+
+            expect(saved).toBe(false);
+            expect(showToast).toHaveBeenCalledWith(
+                "You don't have permission to save this project.",
+                "error"
+            );
+        });
+
+        test("reports a server failure when the commit returns an error status", async () => {
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);
+            global.fetch.mockResolvedValueOnce({
+                ok: false,
+                status: 500,
+                json: () => Promise.resolve({ message: "Server exploded" })
+            });
+            const showToast = jest.spyOn(gitDropdown, "_showToast");
+
+            const saved = await gitDropdown._doCommit("my-repo", "my-key", "Broken moment");
+
+            expect(saved).toBe(false);
+            expect(showToast).toHaveBeenCalledWith(
+                "Could not save this moment — the server returned an error.",
+                "error"
+            );
+        });
+
+        test("reports a failed offline draft when the planet frame is unavailable", async () => {
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(true);
+            const showToast = jest.spyOn(gitDropdown, "_showToast").mockImplementation(() => {});
+            document.getElementById.mockReturnValueOnce(null);
+
+            const saved = await gitDropdown._doCommit("my-repo", "my-key", "No frame");
+
+            expect(saved).toBe(false);
+            expect(showToast).toHaveBeenCalledWith(
+                "Could not save offline — planet frame unavailable.",
+                "error"
+            );
         });
     });
 
     // ── 4. Time Travel / Restore Commit ─────────────────────────────────────
     describe("Time Travel & Restore Commit", () => {
+        test("keeps current blocks when saving before time travel fails", async () => {
+            localStorage.setItem("mbGitRepoName", "my-repo");
+            jest.spyOn(gitDropdown, "_hasUnsavedChanges").mockReturnValue(true);
+            let saveFirst;
+            jest.spyOn(gitDropdown, "_showUnsavedGuard").mockImplementation(onSave => {
+                saveFirst = onSave;
+            });
+            jest.spyOn(gitDropdown, "_doCommit").mockResolvedValue(false);
+            const restore = jest.spyOn(gitDropdown, "_restoreCommit").mockResolvedValue();
+
+            await gitDropdown._confirmTimeTravel({ sha: "old-sha" }, "Old moment");
+            await saveFirst();
+
+            expect(restore).not.toHaveBeenCalled();
+        });
+
+        test("restores after saving before time travel succeeds", async () => {
+            localStorage.setItem("mbGitRepoName", "my-repo");
+            jest.spyOn(gitDropdown, "_hasUnsavedChanges").mockReturnValue(true);
+            let saveFirst;
+            jest.spyOn(gitDropdown, "_showUnsavedGuard").mockImplementation(onSave => {
+                saveFirst = onSave;
+            });
+            jest.spyOn(gitDropdown, "_doCommit").mockResolvedValue(true);
+            const restore = jest.spyOn(gitDropdown, "_restoreCommit").mockResolvedValue();
+            const target = { sha: "old-sha" };
+
+            await gitDropdown._confirmTimeTravel(target, "Old moment");
+            await saveFirst();
+
+            expect(restore).toHaveBeenCalledWith(target, "Old moment");
+        });
+
+        test("keeps current blocks when saving before undo fails", async () => {
+            localStorage.setItem("mbGitRepoName", "my-repo");
+            const widget = document.createElement("div");
+            jest.spyOn(gitDropdown, "_buildSystemDialog").mockReturnValue({
+                frame: document.createElement("div"),
+                widget,
+                cleanup: jest.fn()
+            });
+            jest.spyOn(gitDropdown, "_centerFrame").mockImplementation(() => {});
+            jest.spyOn(gitDropdown, "_doCommit").mockResolvedValue(false);
+            const restore = jest.spyOn(gitDropdown, "_restoreCommit").mockResolvedValue();
+
+            await gitDropdown._clearChanges({ sha: "old-sha" }, "Old moment");
+            widget.querySelector(".confirm-button").click();
+            await new Promise(resolve => setTimeout(resolve, 0));
+
+            expect(restore).not.toHaveBeenCalled();
+        });
+
         test("_restoreCommit loads project blocks into workspace", async () => {
             const projectData = { blocks: [["start", [0, 0], null]] };
 
