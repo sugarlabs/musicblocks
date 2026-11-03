@@ -1121,6 +1121,53 @@ describe("widgetWindows", () => {
             expect(win._body.style.display).toBe("flex");
         });
 
+        test("unroll restores maximized viewport dimensions when _maximized is true", () => {
+            const win = createTestWindow("testMaximizedRollup");
+            const toolbarBottom = window.widgetWindows._getToolbarBottom();
+            win._maximize();
+
+            expect(win._maximized).toBe(true);
+            expect(win._frame.style.width).toBe("100vw");
+
+            win._rollup();
+            expect(win._rolled).toBe(true);
+            expect(win._frame.style.width).toBe("auto");
+            expect(win._frame.style.height).toBe("auto");
+            expect(win._frame.style.minHeight).toBe("0px");
+
+            win.unroll();
+            expect(win._rolled).toBe(false);
+            expect(win._maximized).toBe(true);
+            expect(win._frame.style.width).toBe("100vw");
+            expect(win._frame.style.height).toBe(`calc(100vh - ${toolbarBottom}px)`);
+            expect(win._frame.style.left).toBe("0px");
+            expect(win._frame.style.top).toBe(`${toolbarBottom}px`);
+            expect(win._maxminButton.title).toBe("Restore");
+        });
+
+        test("unroll restores minHeight and minWidth when window is floating", () => {
+            const win = createTestWindow("testFloatingRollup");
+            win._rollup();
+            expect(win._frame.style.minHeight).toBe("0px");
+
+            win.unroll();
+            expect(win._frame.style.minHeight).toBe("420px");
+            expect(win._frame.style.minWidth).toBe("470px");
+        });
+
+        test("_handleResize does not stretch maximized window height while rolled up", () => {
+            const win = createTestWindow("testResizeRolledMax");
+            const toolbarBottom = window.widgetWindows._getToolbarBottom();
+            win._maximize();
+            win._rollup();
+
+            window.widgetWindows._handleResize();
+            expect(win._frame.style.height).toBe("auto");
+
+            win.unroll();
+            expect(win._frame.style.height).toBe(`calc(100vh - ${toolbarBottom}px)`);
+        });
+
         test("destroy removes window elements and deletes key from openWindows", () => {
             const win = createTestWindow("testDestroyKey");
             const key = win._key;
