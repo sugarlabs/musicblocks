@@ -2784,22 +2784,45 @@ describe("buildScale with explicit EDO", () => {
             });
         });
 
-        it("returns null when tonic cannot be represented in non-12 EDO", () => {
+        it("falls back to default root when tonic cannot be represented in non-12 EDO", () => {
             // In 5-EDO note names are [C, D, E, G, A].
-            // Neither C♭ nor normalized B exists in 5-EDO; should return null rather
-            // than silently projecting to C (index 0).
-            expect(buildScale("C♭ major", 5)).toBeNull();
-            expect(buildScale("B major", 5)).toBeNull();
-            expect(buildScale("F♯ major", 5)).toBeNull();
+            // Neither C♭ nor normalized B exists in 5-EDO.
+            // Falls back to the default root (index 0, "C") to preserve the return contract
+            // and prevent runtime TypeErrors in direct-indexing callers.
+            const [cScale5, cSteps5] = buildScale("C major", 5);
+
+            for (const key of ["C♭ major", "B major", "F♯ major"]) {
+                const result = buildScale(key, 5);
+                expect(Array.isArray(result)).toBe(true);
+                const [scale, steps] = result;
+                expect(scale[0]).toBe("C");
+                expect(steps).toEqual(cSteps5);
+                expect(scale).toEqual(cScale5);
+            }
         });
 
-        it("safely handles null scale return across callers when tonic is unavailable", () => {
-            expect(_getStepSize("C♭ major", "C", "up", 0, "equal", 5)).toBe(0);
-            expect(getInterval(2, "C♭ major", "C", 5)).toBe(0);
-            expect(getModeLength("C♭ major", 5)).toBe(0);
-            expect(nthDegreeToPitch("C♭ major", 1, 5)).toEqual(["", 0]);
-            expect(scaleDegreeToPitchMapping("C♭ major", 1, false, null, 5)).toBeNull();
-            expect(scaleDegreeToPitchMapping("C♭ major", 1, true, null, 5)).toBeNull();
+        it("safely handles unsupported tonics in 5-EDO across scale utility callers", () => {
+            // Verifies that callers indexing buildScale(...)[0] or [1] do not throw TypeError
+            expect(() => _getStepSize("C♭ major", "C", "up", 0, "equal", 5)).not.toThrow();
+            expect(typeof _getStepSize("C♭ major", "C", "up", 0, "equal", 5)).toBe("number");
+            expect(typeof getInterval(2, "C♭ major", "C", 5)).toBe("number");
+            expect(getModeLength("C♭ major", 5)).toBe(getModePattern("major", 5).length);
+            expect(Array.isArray(nthDegreeToPitch("C♭ major", 1, 5))).toBe(true);
+            expect(scaleDegreeToPitchMapping("C♭ major", 1, false, null, 5)).not.toBeNull();
+        });
+
+        it("does not crash temperament widget scale initialization pattern with unsupported 5-EDO tonics", () => {
+            // Temperament widget evaluates that.scaleNotes = buildScale(that.scale)[0]
+            const widgetPatternEval = key => {
+                const scaleNotes = buildScale(key, 5)[0];
+                return scaleNotes[0];
+            };
+            expect(() => widgetPatternEval("C♭ major")).not.toThrow();
+            expect(widgetPatternEval("C♭ major")).toBe("C");
+            expect(() => widgetPatternEval("B major")).not.toThrow();
+            expect(widgetPatternEval("B major")).toBe("C");
+            expect(() => widgetPatternEval("F♯ major")).not.toThrow();
+            expect(widgetPatternEval("F♯ major")).toBe("C");
         });
     });
 });

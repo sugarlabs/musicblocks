@@ -866,6 +866,36 @@ describe("setupPitchBlocks", () => {
                 global.buildScale = jest.fn(() => [["C", "D", "E", "F", "G", "A", "B"], []]);
             }
         });
+
+        it("safely handles unsupported 5-EDO tonics with native buildScale in StaffYToPitch", () => {
+            const block = createdBlocks["ytopitch"];
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(0));
+            const origKey = tur.singer.keySignature;
+            tur.singer.keySignature = "C♭ major";
+
+            try {
+                // Default connection (cblk0 === null)
+                activity.blocks.blockList[10].connections = [null, null];
+                expect(block.arg(logo, 0, 10)).toBe("G4");
+
+                // Connected to "pitch"
+                activity.blocks.blockList[30] = { value: 0 };
+                activity.blocks.blockList[20] = { name: "pitch" };
+                activity.blocks.blockList[10].connections = [20, 30];
+                logo.parseArg.mockReturnValue(0);
+                const pitchResult = block.arg(logo, 0, 10);
+                expect(Array.isArray(pitchResult)).toBe(true);
+                expect(pitchResult.length).toBe(2);
+
+                // Connected to "pitchnumber"
+                activity.blocks.blockList[20].name = "pitchnumber";
+                activity.blocks.blockList[10].connections = [20, 30];
+                const numResult = block.arg(logo, 0, 10);
+                expect(typeof numResult).toBe("number");
+            } finally {
+                tur.singer.keySignature = origKey;
+            }
+        });
     });
 
     describe("PitchBlock Complex Branches", () => {

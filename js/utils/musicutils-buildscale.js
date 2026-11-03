@@ -219,7 +219,7 @@ var buildScale = (keySignature, edo) => {
             idx = edoNames.indexOf(normalized);
         }
         if (idx === -1) {
-            return null;
+            idx = 0;
         }
 
         // For "custom" mode in non-12 EDO, getModePattern returns the current
