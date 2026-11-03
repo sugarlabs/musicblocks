@@ -602,6 +602,7 @@ describe("SearchController.showSearchWidget", () => {
         activity.searchController.hideSearchWidget();
         jest.useRealTimers();
     });
+
     test("closes on Escape and removes its listener", () => {
         jest.useFakeTimers();
 
@@ -635,6 +636,29 @@ describe("SearchController.showSearchWidget", () => {
         expect(secondEscapeEvent.defaultPrevented).toBe(false);
 
         removeEventListenerSpy.mockRestore();
+        jest.useRealTimers();
+    });
+
+    test("keeps the widget open and does not prevent non-Escape keys", () => {
+        jest.useFakeTimers();
+
+        const activity = makeActivity();
+        setupSearchController(activity);
+
+        activity.searchController.showSearchWidget();
+
+        const keyEvent = new KeyboardEvent("keydown", {
+            key: "a",
+            bubbles: true,
+            cancelable: true
+        });
+
+        document.dispatchEvent(keyEvent);
+
+        expect(activity.searchWidget.style.visibility).toBe("visible");
+        expect(keyEvent.defaultPrevented).toBe(false);
+
+        activity.searchController.hideSearchWidget();
         jest.useRealTimers();
     });
 });
