@@ -119,6 +119,8 @@ class Planet {
             const hashedKey = repoName
                 ? gitData.hashedKey || localStorage.getItem("mb_git_key_" + repoName) || ""
                 : "";
+            // Our own origin, not "*": this message carries the repo key, and "*"
+            // would hand it to whatever page the planet frame is embedded in.
             window.parent.postMessage(
                 {
                     type: "MB_GIT_STATE",
@@ -130,7 +132,7 @@ class Planet {
                     // rather than the sanitised repo slug.
                     projectName: project ? project.ProjectName || "" : ""
                 },
-                "*"
+                window.location.origin
             );
         } catch (e) {
             console.debug("[Planet] Could not post git state:", e);
@@ -213,7 +215,7 @@ class Planet {
             // Tell the parent window (gitDropdown) that git state is being cleared
             // so it can reset its repo/key tracking and prefetch cache immediately.
             try {
-                window.parent.postMessage({ type: "MB_NEW_PROJECT" }, "*");
+                window.parent.postMessage({ type: "MB_NEW_PROJECT" }, window.location.origin);
             } catch (e) {
                 /* ignore cross-origin */
             }
@@ -326,7 +328,7 @@ class Planet {
                             success: false,
                             error: "NO_PROJECT_ID"
                         },
-                        "*"
+                        window.location.origin
                     );
                     return;
                 }
@@ -340,7 +342,7 @@ class Planet {
                         try {
                             e.source?.postMessage(
                                 { type: "MB_OFFLINE_COMMIT_RESULT", ...result },
-                                "*"
+                                window.location.origin
                             );
                         } catch (_) {
                             /* cross-origin guard */
@@ -364,7 +366,7 @@ class Planet {
                             success: false,
                             error: "NO_PROJECT_OR_MANAGER"
                         },
-                        "*"
+                        window.location.origin
                     );
                     return;
                 }
@@ -389,11 +391,14 @@ class Planet {
                         this._postGitState(id);
                         if (this.LocalPlanet) this.LocalPlanet.updateProjects();
                     }
-                    e.source?.postMessage({ type: "MB_OFFLINE_CREATE_RESULT", ...result }, "*");
+                    e.source?.postMessage(
+                        { type: "MB_OFFLINE_CREATE_RESULT", ...result },
+                        window.location.origin
+                    );
                 } catch (err) {
                     e.source?.postMessage(
                         { type: "MB_OFFLINE_CREATE_RESULT", success: false, error: String(err) },
-                        "*"
+                        window.location.origin
                     );
                 }
                 return;
@@ -412,7 +417,7 @@ class Planet {
                             data: [],
                             isOffline: true
                         },
-                        "*"
+                        window.location.origin
                     );
                     return;
                 }
@@ -424,7 +429,7 @@ class Planet {
                         data: history,
                         isOffline: true
                     },
-                    "*"
+                    window.location.origin
                 );
                 return;
             }
@@ -455,7 +460,7 @@ class Planet {
 
         if (projectMissing) {
             try {
-                window.parent.postMessage({ type: "MB_NEW_PROJECT" }, "*");
+                window.parent.postMessage({ type: "MB_NEW_PROJECT" }, window.location.origin);
             } catch (e) {
                 /* ignore cross-origin */
             }

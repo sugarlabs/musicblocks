@@ -356,7 +356,10 @@ describe("Planet", () => {
 
             await planet.closeButton();
 
-            expect(parentPostMessage).toHaveBeenCalledWith({ type: "MB_NEW_PROJECT" }, "*");
+            expect(parentPostMessage).toHaveBeenCalledWith(
+                { type: "MB_NEW_PROJECT" },
+                window.location.origin
+            );
             expect(planet.loadNewProject).toHaveBeenCalled();
             expect(planet.planetClose).not.toHaveBeenCalled();
             expect(planet.loadProjectFromData).not.toHaveBeenCalled();
@@ -375,7 +378,10 @@ describe("Planet", () => {
 
             await planet.closeButton();
 
-            expect(parentPostMessage).toHaveBeenCalledWith({ type: "MB_NEW_PROJECT" }, "*");
+            expect(parentPostMessage).toHaveBeenCalledWith(
+                { type: "MB_NEW_PROJECT" },
+                window.location.origin
+            );
             expect(planet.loadNewProject).toHaveBeenCalled();
             expect(planet.planetClose).not.toHaveBeenCalled();
         });
@@ -428,7 +434,10 @@ describe("Planet", () => {
             await planet.closeButton();
 
             // Verifies MB_NEW_PROJECT was posted and loadNewProject called
-            expect(parentPostMessage).toHaveBeenCalledWith({ type: "MB_NEW_PROJECT" }, "*");
+            expect(parentPostMessage).toHaveBeenCalledWith(
+                { type: "MB_NEW_PROJECT" },
+                window.location.origin
+            );
             expect(planet.loadNewProject).toHaveBeenCalled();
             expect(currentGitRepo).toBeNull();
             expect(currentGitKey).toBeNull();
@@ -553,13 +562,13 @@ describe("Planet", () => {
                     projectId: proj2Id,
                     projectName: "Project Beta"
                 },
-                "*"
+                window.location.origin
             );
             expect(parentPostMessage).not.toHaveBeenCalledWith(
                 expect.objectContaining({
                     repoName: proj1Git.repoName
                 }),
-                "*"
+                window.location.origin
             );
 
             // Git menu receives project B's repository/key state rather than retaining project A's
@@ -628,7 +637,7 @@ describe("Planet", () => {
                     projectId: proj2Id,
                     projectName: "Remaining Untracked Project"
                 },
-                "*"
+                window.location.origin
             );
 
             // Git menu clears active project's credentials rather than retaining them
@@ -836,6 +845,58 @@ describe("Planet", () => {
             expect(document.body.classList.contains("dark")).toBe(true);
             expect(document.body.classList.contains("light")).toBe(false);
             expect(document.body.classList.contains("highcontrast")).toBe(false);
+        });
+    });
+
+    describe("messages sent back to the parent page", () => {
+        let planet;
+        let mockProjectStorage;
+
+        beforeEach(() => {
+            planet = new Planet(true, {});
+            planet.prepareUserID = jest.fn();
+            planet.initPlanets = jest.fn();
+            mockProjectStorage = {
+                init: jest.fn().mockResolvedValue(),
+                getCurrentProjectID: () => null
+            };
+            global.StringHelper = jest.fn().mockReturnValue({ init: jest.fn() });
+            global.ProjectStorage = jest.fn().mockReturnValue(mockProjectStorage);
+            global.ServerInterface = jest
+                .fn()
+                .mockReturnValue({ init: jest.fn(), getTagManifest: jest.fn() });
+            document.body.innerHTML = `
+                <button id="close-planet"></button>
+                <button id="planet-open-file"></button>
+                <button id="planet-new-project"></button>
+            `;
+        });
+
+        afterEach(() => {
+            delete global.StringHelper;
+            delete global.ProjectStorage;
+            delete global.ServerInterface;
+            document.body.innerHTML = "";
+        });
+
+        it("replies to the parent page's own origin instead of any origin", async () => {
+            const addListener = jest.spyOn(window, "addEventListener");
+            await planet.init();
+            const onMessage = addListener.mock.calls.filter(c => c[0] === "message").pop()[1];
+            addListener.mockRestore();
+            const source = { postMessage: jest.fn() };
+
+            await onMessage({
+                data: { type: "MB_GET_LOCAL_HISTORY" },
+                origin: window.location.origin,
+                source
+            });
+
+            expect(source.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({ type: "MB_LOCAL_HISTORY_RESULT" }),
+                window.location.origin
+            );
+            expect(source.postMessage).not.toHaveBeenCalledWith(expect.anything(), "*");
         });
     });
 });
