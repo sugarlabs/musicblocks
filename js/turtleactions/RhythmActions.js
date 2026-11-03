@@ -458,7 +458,7 @@ function setupRhythmActions(activity) {
          * @param {Number} noteValue - target note value
          * @param {Object} turtle - Turtle object
          * @param {Object} blk - corresponding Block object index in blocks.blockList or custom block number
-         * @returns {void}
+         * @returns {boolean} whether a swing listener was set up for the end of the clamp
          */
         static addSwing(swingValue, noteValue, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
@@ -467,10 +467,10 @@ function setupRhythmActions(activity) {
                 activity.logo.notation.notationSwing(turtle);
             } else {
                 if (!Number.isFinite(swingValue) || swingValue === 0) {
-                    return;
+                    return false;
                 }
                 if (!Number.isFinite(noteValue) || noteValue === 0) {
-                    return;
+                    return false;
                 }
                 tur.singer.swing.push(1 / swingValue);
                 tur.singer.swingTarget.push(1 / noteValue);
@@ -496,6 +496,7 @@ function setupRhythmActions(activity) {
             };
 
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
+            return true;
         }
 
         /**

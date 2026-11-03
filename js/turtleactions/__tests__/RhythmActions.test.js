@@ -1313,10 +1313,10 @@ describe("setupRhythmActions", () => {
             targetTurtle.singer.swing = [];
             targetTurtle.singer.swingTarget = [];
 
-            Singer.RhythmActions.addSwing(val, 4, 0, 1);
+            expect(Singer.RhythmActions.addSwing(val, 4, 0, 1)).toBe(false);
             expect(targetTurtle.singer.swing.length).toBe(0);
 
-            Singer.RhythmActions.addSwing(2, val, 0, 1);
+            expect(Singer.RhythmActions.addSwing(2, val, 0, 1)).toBe(false);
             expect(targetTurtle.singer.swing.length).toBe(0);
         });
     });
