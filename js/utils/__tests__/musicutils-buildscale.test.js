@@ -267,6 +267,15 @@ describe("musicutils-buildscale", () => {
         expect(buildscale.getSolfege("F#")).toBe("fa" + SHARP);
         expect(buildscale.getSolfege("Bb")).toBe("ti" + FLAT);
         expect(buildscale.getSolfege("G#", "C major", false, "equal")).toBe("sol" + SHARP);
+        expect(buildscale.getSolfege("c#")).toBe("do" + SHARP);
+        expect(buildscale.getSolfege("db")).toBe("re" + FLAT);
+        expect(buildscale.getSolfege("f#", "G major", true, "equal")).toBe("ti");
+        expect(buildscale.getSolfege("bb")).toBe("ti" + FLAT);
+        expect(buildscale.getSolfege("b#")).toBe("ti" + SHARP);
+        expect(buildscale.getSolfege("bbb")).toBe("bbb");
+        expect(buildscale.getSolfege("b##")).toBe("b##");
+        expect(buildscale.getSolfege("Hb")).toBe("Hb");
+        expect(buildscale.getSolfege("")).toBe("");
     });
 
     it("is still reachable through musicutils.js for callers that require it", () => {

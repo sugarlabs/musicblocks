@@ -1259,12 +1259,16 @@ var computeTargetPitchFrequency = (noteWithOctave, temperament) => {
  * getSolfege("G", "C major", true, "equal", 31) // "sol"
  */
 var getSolfege = (note, keySignature, movable, temperament, edo) => {
-    if (noteIsSolfege(note)) {
-        return note;
+    if (typeof note === "string" && note.length > 0) {
+        const cap = note.charAt(0).toUpperCase() + note.slice(1);
+        const normalized = cap.replaceAll("#", SHARP).replaceAll("b", FLAT);
+        if (SOLFEGECONVERSIONTABLE[normalized] !== undefined) {
+            note = normalized;
+        }
     }
 
-    if (typeof note === "string") {
-        note = note.replace("#", SHARP).replace("b", FLAT);
+    if (noteIsSolfege(note)) {
+        return note;
     }
 
     if (movable && keySignature) {
@@ -1276,24 +1280,15 @@ var getSolfege = (note, keySignature, movable, temperament, edo) => {
         if (!scaleResult) return SOLFEGECONVERSIONTABLE[note];
 
         const scale = scaleResult[0];
-
-        // 1) exact match
         let index = scale.indexOf(note);
 
-        // 2) normalized accidental match
-        if (index === -1) {
-            const altNote = note.replace("#", SHARP).replace("b", FLAT);
-            index = scale.indexOf(altNote);
-        }
-
-        // 3) in 12-EDO, an enharmonic spelling of a scale note (D♯ for E♭).
+        // 2) in 12-EDO, an enharmonic spelling of a scale note (D♯ for E♭).
         // Not for modes with more than 7 notes (chromatic, octatonic): there a
         // match would map onto the 7 diatonic syllables and give a wrong pitch.
         if (index === -1 && currentEDO === 12 && scale.length - 1 <= 7) {
             const pitchClass = _notePitchClass(note);
             index = scale.slice(0, -1).findIndex(n => _notePitchClass(n) === pitchClass);
         }
-
         // Modes with fewer than 7 notes: use the same solfege that
         // getNoteFromSolfege resolves, so display and input agree.
         if (index !== -1 && currentEDO === 12 && scale.length - 1 < 7) {
