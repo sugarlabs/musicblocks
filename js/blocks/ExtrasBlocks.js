@@ -12,8 +12,8 @@
 /*
    global
    _, last, FlowBlock, ValueBlock, LeftBlock, NOINPUTERRORMSG,
-   NANERRORMSG, mixedNumber, TONEBPM, DEFAULTDELAY, Singer,
-   StackClampBlock, StatusMatrix
+   NANERRORMSG, mixedNumber, DEFAULTDELAY, StackClampBlock,
+   StatusMatrix
 */
 
 /* exported setupExtrasBlocks */
@@ -491,12 +491,10 @@ function setupExtrasBlocks(activity) {
             const tur = activity.turtles.ithTurtle(turtle);
 
             if (args.length === 1) {
-                const bpmFactor =
-                    TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
-
-                const noteBeatValue = bpmFactor / (1 / args[0]);
+                // The wait is in seconds, not beats, so the music clock moves on by
+                // the same time the turtle waits, whatever the tempo.
                 tur.singer.previousTurtleTime = tur.singer.turtleTime;
-                tur.singer.turtleTime += noteBeatValue;
+                tur.singer.turtleTime += args[0];
                 tur.doWait(args[0]);
             }
         }

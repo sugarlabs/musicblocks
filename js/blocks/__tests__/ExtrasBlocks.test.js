@@ -654,6 +654,21 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
         expect(tur.singer.recordingNotation).toBe(true);
     });
 
+    test.each([[[]], [[120]], [[30]], [[1000]]])(
+        "real WaitBlock flow() moves the music clock by the seconds waited (bpm stack %j)",
+        bpm => {
+            const tur = {
+                singer: { bpm, turtleTime: 2, previousTurtleTime: 0 },
+                doWait: jest.fn()
+            };
+            activity.turtles.ithTurtle.mockReturnValueOnce(tur);
+            instances["WaitBlock"].flow([1.5], logo, turtle, blk);
+            expect(tur.doWait).toHaveBeenCalledWith(1.5);
+            expect(tur.singer.previousTurtleTime).toBe(2);
+            expect(tur.singer.turtleTime).toBe(3.5);
+        }
+    );
+
     test("real save blocks are shown in the palette", () => {
         ["SaveABCBlock", "SaveLilypondBlock", "SaveSVGBlock", "SaveMxmlBlock"].forEach(name => {
             expect(instances[name].hidden).toBeFalsy();
