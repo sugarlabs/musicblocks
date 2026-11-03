@@ -118,12 +118,39 @@ describe("GlobalPlanet", () => {
             expect(gp.searching).toBe(false);
             expect(gp.searchString).toBe("");
             expect(gp.oldSearchString).toBe("");
+            expect(gp._offline).toBe(false);
         });
 
         it("should set remixPrefix from translation", () => {
             expect(gp.remixPrefix).toBe("Remix of");
         });
     });
+
+    describe("recoverFromOffline", () => {
+        it("refreshes projects when recovering from the offline state", () => {
+            const refreshSpy = jest.spyOn(gp, "refreshProjects").mockImplementation(() => {});
+
+            gp.throwOfflineError();
+
+            expect(gp._offline).toBe(true);
+
+            const recovered = gp.recoverFromOffline();
+
+            expect(recovered).toBe(true);
+            expect(gp._offline).toBe(false);
+            expect(refreshSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("does not refresh projects when not in the offline state", () => {
+            const refreshSpy = jest.spyOn(gp, "refreshProjects").mockImplementation(() => {});
+
+            const recovered = gp.recoverFromOffline();
+
+            expect(recovered).toBe(false);
+            expect(refreshSpy).not.toHaveBeenCalled();
+        });
+    });
+
     describe("initTagList", () => {
         it("should read the selected sort option", () => {
             const sortSelect = document.getElementById("sort-select");

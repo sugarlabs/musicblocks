@@ -50,6 +50,7 @@ class GlobalPlanet {
         this.searching = false;
         this.searchString = "";
         this.oldSearchString = "";
+        this._offline = false;
         this._requestId = 0;
         this.remixPrefix = _("Remix of");
 
@@ -232,7 +233,13 @@ class GlobalPlanet {
 
     afterRefreshProjects(data, requestId = this._requestId) {
         if (requestId !== this._requestId) return;
-        data.success ? this.addProjects(data.data, requestId) : this.throwOfflineError();
+
+        if (data.success) {
+            this._offline = false;
+            this.addProjects(data.data, requestId);
+        } else {
+            this.throwOfflineError();
+        }
     }
 
     addProjects(data, requestId = this._requestId) {
@@ -439,10 +446,19 @@ class GlobalPlanet {
         if (this.oldSearchString !== "") this.afterSearch();
     }
 
+    recoverFromOffline() {
+        if (!this._offline) return false;
+
+        this._offline = false;
+        this.refreshProjects();
+        return true;
+    }
+
     // Both error screens end whatever list was loading. A search that ends here never
     // reaches afterSearch(), so clear the flag too, or search() ignores every later
     // query (and the clear button) until reload.
     throwOfflineError() {
+        this._offline = true;
         this.searching = false;
         this.hideLoading();
         this.hideLoadMore();

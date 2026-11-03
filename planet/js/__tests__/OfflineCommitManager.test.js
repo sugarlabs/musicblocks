@@ -170,6 +170,19 @@ describe("OfflineCommitManager", () => {
         });
     });
 
+    describe("Reconnect handling", () => {
+        test("calls the reconnect callback when NetworkMonitor reports online", () => {
+            const onReconnect = jest.fn();
+
+            manager.destroy();
+            manager = new OfflineCommitManager(storage, server, onReconnect);
+
+            manager._monitor.onOnline();
+
+            expect(onReconnect).toHaveBeenCalledTimes(1);
+        });
+    });
+
     describe("Offline Repo Creation", () => {
         test("queueRepoCreation stores pendingRepoCreation and assigns placeholder GitRepoData", async () => {
             storage.data.Projects.p2 = {

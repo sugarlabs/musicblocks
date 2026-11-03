@@ -262,7 +262,15 @@ class Planet {
         if (typeof OfflineCommitManager !== "undefined" && typeof NetworkMonitor !== "undefined") {
             this.OfflineCommitManager = new OfflineCommitManager(
                 this.ProjectStorage,
-                this.ServerInterface
+                this.ServerInterface,
+                () => {
+                    if (
+                        this.GlobalPlanet &&
+                        typeof this.GlobalPlanet.recoverFromOffline === "function"
+                    ) {
+                        this.GlobalPlanet.recoverFromOffline();
+                    }
+                }
             );
             this.ServerInterface.attachOfflineManager(this.OfflineCommitManager);
         } else {
