@@ -475,16 +475,14 @@ var _getStepSize = (keySignature, pitch, direction, transposition, temperament, 
         if (
             keyTonic === "C" + FLAT &&
             scale[0] === "B" + SHARP &&
-            ((s1 === "C" + FLAT && s2 === "B" + SHARP) ||
-                (s1 === "B" + SHARP && s2 === "C" + FLAT))
+            ((s1 === "C" + FLAT && s2 === "B" + SHARP) || (s1 === "B" + SHARP && s2 === "C" + FLAT))
         ) {
             return true;
         }
         if (
             keyTonic === "F" + FLAT &&
             scale[0] === "E" + SHARP &&
-            ((s1 === "F" + FLAT && s2 === "E" + SHARP) ||
-                (s1 === "E" + SHARP && s2 === "F" + FLAT))
+            ((s1 === "F" + FLAT && s2 === "E" + SHARP) || (s1 === "E" + SHARP && s2 === "F" + FLAT))
         ) {
             return true;
         }

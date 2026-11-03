@@ -554,8 +554,7 @@ function setupPitchBlocks(activity) {
                         return INVALIDPITCH;
                     }
                     notePlayed =
-                        mappedPitch +
-                        (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
+                        mappedPitch + (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
                 } else {
                     if (typeof arg1 === "string") {
                         // Is it a number encoded as a string?

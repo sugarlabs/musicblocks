@@ -1020,10 +1020,29 @@ describe("setupPitchBlocks", () => {
                 // 2) Non-12 EDO (19-EDO) note found in edoNames
                 logo.synth = { inTemperament: "equal19" };
                 global.getCurrentEDO = jest.fn().mockReturnValue(19);
-                global.generateNoteNames = jest.fn().mockReturnValue([
-                    "C", "C#", "Db", "D", "D#", "Eb", "E", "E#", "F", "F#",
-                    "Gb", "G", "G#", "Ab", "A", "A#", "Bb", "B", "B#"
-                ]);
+                global.generateNoteNames = jest
+                    .fn()
+                    .mockReturnValue([
+                        "C",
+                        "C#",
+                        "Db",
+                        "D",
+                        "D#",
+                        "Eb",
+                        "E",
+                        "E#",
+                        "F",
+                        "F#",
+                        "Gb",
+                        "G",
+                        "G#",
+                        "Ab",
+                        "A",
+                        "A#",
+                        "Bb",
+                        "B",
+                        "B#"
+                    ]);
                 global.buildScale = jest
                     .fn()
                     .mockReturnValue([["E#", "F#", "G#", "A#", "B#", "C#", "D#"], []]);
