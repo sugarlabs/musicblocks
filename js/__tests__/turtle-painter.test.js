@@ -404,6 +404,58 @@ describe("Pen operations", () => {
         expect(painter.canvasAlpha).toBe(1);
     });
 
+    test("doSetPenAlpha should close active SVG path and update canvas styles", () => {
+        painter.doSetColor(0);
+        painter.doForward(50);
+        expect(painter._svgPath).toBe(true);
+
+        painter.doSetPenAlpha(0.5);
+
+        expect(painter._svgPath).toBe(false);
+        expect(mockTurtle.ctx.strokeStyle).toContain("0.5");
+        expect(mockTurtle.ctx.fillStyle).toContain("0.5");
+    });
+
+    test("doSetPenAlpha should reject non-finite values and retain canvas alpha", () => {
+        painter.doSetPenAlpha(0.7);
+        mockTurtle.turtles.activity.errorMsg.mockClear();
+
+        painter.doSetPenAlpha(NaN);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.canvasAlpha).toBe(0.7);
+
+        mockTurtle.turtles.activity.errorMsg.mockClear();
+        painter.doSetPenAlpha("not-a-number");
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.canvasAlpha).toBe(0.7);
+
+        mockTurtle.turtles.activity.errorMsg.mockClear();
+        painter.doSetPenAlpha(Infinity);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.canvasAlpha).toBe(0.7);
+    });
+
+    test("doSetPenAlpha should clamp values below 0 or above 1", () => {
+        painter.doSetPenAlpha(-0.5);
+        expect(painter.canvasAlpha).toBe(0);
+
+        painter.doSetPenAlpha(1.5);
+        expect(painter.canvasAlpha).toBe(1);
+    });
+
+    test("doEndFill should fill with updated translucency", () => {
+        painter.doSetColor(0);
+        painter.doSetTranslucency(0);
+        painter.doStartFill();
+        painter.doForward(50);
+
+        painter.doSetTranslucency(50);
+        painter.doEndFill();
+
+        expect(mockTurtle.ctx.fill).toHaveBeenCalled();
+        expect(mockTurtle.ctx.fillStyle).toContain("0.5");
+    });
+
     test.each([
         [0, 1],
         [25, 0.75],
