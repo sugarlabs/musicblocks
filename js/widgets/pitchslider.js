@@ -47,7 +47,10 @@ class PitchSlider {
         this.activity = activity;
         const edo = getCurrentEDO(activity.logo.synth.inTemperament);
         const semitone = Math.pow(2, 1 / edo);
-        if (window.widgetWindows.openWindows["slider"]) return;
+        const openWindow = window.widgetWindows.openWindows["slider"];
+        if (openWindow) openWindow.onclose();
+        this.sliders = {};
+        this.activeSlider = null;
         if (!this.frequencies || !this.frequencies.length) this.frequencies = [392];
         this.initialFrequencies = [...this.frequencies];
 
