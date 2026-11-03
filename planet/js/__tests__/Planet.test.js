@@ -831,9 +831,13 @@ describe("Planet", () => {
             expect(mockServerInterface.getTagManifest).toHaveBeenCalledTimes(1);
         });
 
-        it("does not retry the manifest when Planet is already connected", async () => {
+        it("refreshes Global Planet on reconnect when already connected", async () => {
+            const refreshProjects = jest.fn();
+            const recoverFromOffline = jest.fn().mockReturnValue(false);
+
             planet.GlobalPlanet = {
-                recoverFromOffline: jest.fn().mockReturnValue(false)
+                recoverFromOffline,
+                refreshProjects
             };
 
             await planet.init();
@@ -842,6 +846,10 @@ describe("Planet", () => {
 
             reconnectCallback();
 
+            expect(recoverFromOffline).toHaveBeenCalledTimes(1);
+            expect(refreshProjects).toHaveBeenCalledTimes(1);
+
+            // No unnecessary manifest request.
             expect(mockServerInterface.getTagManifest).toHaveBeenCalledTimes(1);
         });
 

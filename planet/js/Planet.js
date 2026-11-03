@@ -274,7 +274,17 @@ class Planet {
                         recovered = this.GlobalPlanet.recoverFromOffline();
                     }
 
-                    if (recovered || this.ConnectedToServer) return;
+                    if (recovered) return;
+
+                    if (this.ConnectedToServer) {
+                        if (
+                            this.GlobalPlanet &&
+                            typeof this.GlobalPlanet.refreshProjects === "function"
+                        ) {
+                            this.GlobalPlanet.refreshProjects();
+                        }
+                        return;
+                    }
 
                     this.ServerInterface.getTagManifest(data => {
                         if (!data || !data.success || this.ConnectedToServer) return;

@@ -263,6 +263,46 @@ describe("GlobalPlanet", () => {
                 expect.any(Function)
             );
         });
+
+        it("ignores a delayed search failure after a reconnect refresh", () => {
+            const callbacks = [];
+
+            mockPlanet.ServerInterface.searchProjects.mockImplementation(
+                (_query, _sort, _start, _end, callback) => {
+                    callbacks.push(callback);
+                }
+            );
+
+            gp.oldSearchString = "hello";
+            gp.searchString = "hello";
+            gp.sortBy = "RECENT";
+
+            // Original request starts before reconnect.
+            gp.refreshProjects();
+            const firstRequestId = gp._requestId;
+
+            // Reconnect triggers a fresh request.
+            gp.refreshProjects();
+
+            expect(gp._requestId).toBe(firstRequestId + 1);
+            expect(callbacks).toHaveLength(2);
+
+            // Original request reports failure after reconnect.
+            callbacks[0]({ success: false });
+
+            expect(gp._offline).toBe(false);
+            expect(document.getElementById("global-projects").textContent).not.toContain(
+                "Feature unavailable"
+            );
+
+            // The new request completes successfully.
+            callbacks[1]({ success: true, data: [] });
+
+            expect(gp._offline).toBe(false);
+            expect(document.getElementById("global-projects").textContent).toContain(
+                "No results found."
+            );
+        });
     });
 
     describe("_cleanupCards", () => {
