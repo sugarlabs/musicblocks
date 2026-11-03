@@ -10,7 +10,15 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 const path = require("path");
+const { Blob } = require("node:buffer");
+const { DecompressionStream } = require("node:stream/web");
+const { TextDecoder } = require("node:util");
 const { PubSub } = require("../pubsub");
+const { makeMXL } = require("./helpers/mxl.js");
+
+const originalBlob = global.Blob;
+const originalDecompressionStream = global.DecompressionStream;
+const originalTextDecoder = global.TextDecoder;
 
 // ---------------------------------------------------------------------------
 // Globals required by project-manager.js at call time (not load time)
@@ -21,6 +29,9 @@ let pubsubInstance;
 beforeAll(() => {
     pubsubInstance = new PubSub();
 
+    global.Blob = Blob;
+    global.DecompressionStream = DecompressionStream;
+    global.TextDecoder = TextDecoder;
     global._ = key => key;
     global.pubsub = pubsubInstance;
     global.DATAOBJS = [{ name: "start" }];
@@ -54,6 +65,12 @@ beforeAll(() => {
     global.amdRequire = jest.fn((deps, cb) => cb && cb());
 });
 
+afterAll(() => {
+    global.Blob = originalBlob;
+    global.DecompressionStream = originalDecompressionStream;
+    global.TextDecoder = originalTextDecoder;
+});
+
 afterEach(() => {
     jest.clearAllMocks();
     pubsubInstance = new PubSub();
@@ -72,6 +89,7 @@ beforeAll(() => {
         path.resolve(__dirname, "../project-manager.js")
     ));
 });
+const { MAX_MXL_ARCHIVE_SIZE } = require("../project-manager.js");
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -3125,6 +3143,73 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(activity.stopLoadAnimation).toHaveBeenCalled();
     });
 
+    it("change handler imports a compressed MusicXML archive", async () => {
+        origFileReader = global.FileReader;
+        const score = "<score-partwise/>";
+        const archive = makeMXL(score);
+        const archiveBuffer = archive.buffer.slice(
+            archive.byteOffset,
+            archive.byteOffset + archive.byteLength
+        );
+        const readers = [];
+        class MockFR {
+            constructor() {
+                this.result = archiveBuffer;
+                this.onload = null;
+                this.readAsArrayBuffer = jest.fn(() => {
+                    this.promise = this.onload({ target: { result: this.result } });
+                    return this.promise;
+                });
+                readers.push(this);
+            }
+            readAsText() {}
+        }
+        global.FileReader = MockFR;
+
+        const activity = makeActivity();
+        activity.parseMXML.mockResolvedValueOnce(null);
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "song.mxl", size: archive.byteLength }];
+        handlers.change();
+        await readers[3].promise;
+
+        expect(readers[3].readAsArrayBuffer).toHaveBeenCalledWith(activity.fileChooser.files[0]);
+        expect(activity.parseMXML).toHaveBeenCalledWith(score);
+        expect(global.ErrorHandler.capture).not.toHaveBeenCalled();
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(activity.loading).toBe(false);
+    });
+
+    it("change handler rejects compressed MusicXML archives above the size limit", () => {
+        origFileReader = global.FileReader;
+        const readers = [];
+        class MockFR {
+            constructor() {
+                this.readAsArrayBuffer = jest.fn();
+                readers.push(this);
+            }
+            readAsText() {}
+        }
+        global.FileReader = MockFR;
+
+        const activity = makeActivity();
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "too-large.mxl", size: MAX_MXL_ARCHIVE_SIZE + 1 }];
+        handlers.change();
+
+        expect(readers[3].readAsArrayBuffer).not.toHaveBeenCalled();
+        expect(global.ErrorHandler.capture).toHaveBeenCalledWith(expect.any(Error), {
+            operation: "mxmlImport"
+        });
+        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+    });
+
     it("change handler reports a rejected parseMXML call and restores state", async () => {
         origFileReader = global.FileReader;
         const readers = [];
@@ -3595,6 +3680,51 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(activity.loading).toBe(false);
         expect(document.body.style.cursor).toBe("default");
         expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
+    it("drop handler imports a compressed MusicXML archive", async () => {
+        origFileReader = global.FileReader;
+        const score = "<score-partwise/>";
+        const archive = makeMXL(score);
+        const archiveBuffer = archive.buffer.slice(
+            archive.byteOffset,
+            archive.byteOffset + archive.byteLength
+        );
+        const readers = [];
+        class MockFR {
+            constructor() {
+                this.result = archiveBuffer;
+                this.onload = null;
+                this.readAsArrayBuffer = jest.fn(() => {
+                    this.promise = this.onload({ target: { result: this.result } });
+                    return this.promise;
+                });
+                readers.push(this);
+            }
+            readAsText() {}
+        }
+        global.FileReader = MockFR;
+        jest.spyOn(window, "scroll").mockImplementation(() => {});
+
+        const activity = makeActivity();
+        activity.parseMXML.mockResolvedValueOnce(null);
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+        const file = { name: "song.mxl", size: archive.byteLength };
+
+        handlers.drop({
+            stopPropagation: jest.fn(),
+            preventDefault: jest.fn(),
+            dataTransfer: { files: [file] }
+        });
+        await readers[3].promise;
+
+        expect(readers[3].readAsArrayBuffer).toHaveBeenCalledWith(file);
+        expect(activity.parseMXML).toHaveBeenCalledWith(score);
+        expect(global.ErrorHandler.capture).not.toHaveBeenCalled();
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(activity.loading).toBe(false);
     });
 
     it("drop handler reports a rejected parseMXML call and restores state", async () => {

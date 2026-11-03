@@ -75,6 +75,229 @@ const _KNOWN_URL_PARAMS = new Set([
 // up on it and loading the project without an initial argument.
 const _ENV_ARG_TIMEOUT = 10000;
 
+const MAX_MXL_ARCHIVE_SIZE = 20 * 1024 * 1024;
+const _MAX_MXL_SCORE_SIZE = 20 * 1024 * 1024;
+const _MAX_MXL_CONTAINER_SIZE = 1024 * 1024;
+const _ZIP_EOCD_SIGNATURE = 0x06054b50;
+const _ZIP_CENTRAL_SIGNATURE = 0x02014b50;
+const _ZIP_LOCAL_SIGNATURE = 0x04034b50;
+const _isArrayBuffer = value => Object.prototype.toString.call(value) === "[object ArrayBuffer]";
+
+const _CRC32_TABLE = Array.from({ length: 256 }, (_, index) => {
+    let value = index;
+    for (let bit = 0; bit < 8; bit++) {
+        value = value & 1 ? (value >>> 1) ^ 0xedb88320 : value >>> 1;
+    }
+    return value >>> 0;
+});
+
+const _crc32 = bytes => {
+    let crc = 0xffffffff;
+    for (const byte of bytes) {
+        crc = _CRC32_TABLE[(crc ^ byte) & 0xff] ^ (crc >>> 8);
+    }
+    return (crc ^ 0xffffffff) >>> 0;
+};
+
+const _findZipEntries = bytes => {
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    const minimumEOCDOffset = Math.max(0, bytes.length - 22 - 0xffff);
+    let eocdOffset = -1;
+
+    for (let offset = bytes.length - 22; offset >= minimumEOCDOffset; offset--) {
+        if (
+            view.getUint32(offset, true) === _ZIP_EOCD_SIGNATURE &&
+            offset + 22 + view.getUint16(offset + 20, true) === bytes.length
+        ) {
+            eocdOffset = offset;
+            break;
+        }
+    }
+    if (eocdOffset < 0) {
+        throw new Error("Invalid compressed MusicXML archive.");
+    }
+
+    const diskNumber = view.getUint16(eocdOffset + 4, true);
+    const centralDiskNumber = view.getUint16(eocdOffset + 6, true);
+    const entriesOnDisk = view.getUint16(eocdOffset + 8, true);
+    const entryCount = view.getUint16(eocdOffset + 10, true);
+    const centralSize = view.getUint32(eocdOffset + 12, true);
+    const centralOffset = view.getUint32(eocdOffset + 16, true);
+
+    if (
+        diskNumber !== 0 ||
+        centralDiskNumber !== 0 ||
+        entriesOnDisk !== entryCount ||
+        entryCount === 0xffff ||
+        centralSize === 0xffffffff ||
+        centralOffset === 0xffffffff ||
+        centralOffset + centralSize > eocdOffset
+    ) {
+        throw new Error("Unsupported compressed MusicXML archive.");
+    }
+
+    const decoder = new TextDecoder("utf-8", { fatal: true });
+    const entries = [];
+    const centralEnd = centralOffset + centralSize;
+    let offset = centralOffset;
+
+    for (let index = 0; index < entryCount; index++) {
+        if (offset + 46 > centralEnd || view.getUint32(offset, true) !== _ZIP_CENTRAL_SIGNATURE) {
+            throw new Error("Invalid compressed MusicXML archive.");
+        }
+
+        const flags = view.getUint16(offset + 8, true);
+        const method = view.getUint16(offset + 10, true);
+        const crc = view.getUint32(offset + 16, true);
+        const compressedSize = view.getUint32(offset + 20, true);
+        const uncompressedSize = view.getUint32(offset + 24, true);
+        const nameLength = view.getUint16(offset + 28, true);
+        const extraLength = view.getUint16(offset + 30, true);
+        const commentLength = view.getUint16(offset + 32, true);
+        const diskStart = view.getUint16(offset + 34, true);
+        const localHeaderOffset = view.getUint32(offset + 42, true);
+        const entryEnd = offset + 46 + nameLength + extraLength + commentLength;
+
+        if (
+            entryEnd > centralEnd ||
+            diskStart !== 0 ||
+            compressedSize === 0xffffffff ||
+            uncompressedSize === 0xffffffff ||
+            localHeaderOffset === 0xffffffff
+        ) {
+            throw new Error("Unsupported compressed MusicXML archive.");
+        }
+
+        const name = decoder.decode(bytes.subarray(offset + 46, offset + 46 + nameLength));
+        entries.push({
+            name,
+            flags,
+            method,
+            crc,
+            compressedSize,
+            uncompressedSize,
+            localHeaderOffset
+        });
+        offset = entryEnd;
+    }
+
+    return { entries, view };
+};
+
+const _readZipEntry = async (bytes, view, entry, maxSize) => {
+    if (entry.flags & 1 || entry.uncompressedSize > maxSize) {
+        throw new Error("Compressed MusicXML entry is encrypted or too large.");
+    }
+    if (entry.method !== 0 && entry.method !== 8) {
+        throw new Error("Unsupported compression in MusicXML archive.");
+    }
+
+    const localOffset = entry.localHeaderOffset;
+    if (
+        localOffset + 30 > bytes.length ||
+        view.getUint32(localOffset, true) !== _ZIP_LOCAL_SIGNATURE
+    ) {
+        throw new Error("Invalid compressed MusicXML archive.");
+    }
+
+    const localFlags = view.getUint16(localOffset + 6, true);
+    const localMethod = view.getUint16(localOffset + 8, true);
+    const nameLength = view.getUint16(localOffset + 26, true);
+    const extraLength = view.getUint16(localOffset + 28, true);
+    const dataOffset = localOffset + 30 + nameLength + extraLength;
+    const dataEnd = dataOffset + entry.compressedSize;
+
+    if (localFlags !== entry.flags || localMethod !== entry.method || dataEnd > bytes.length) {
+        throw new Error("Invalid compressed MusicXML archive.");
+    }
+
+    const compressed = bytes.subarray(dataOffset, dataEnd);
+    let output;
+    if (entry.method === 0) {
+        if (entry.compressedSize !== entry.uncompressedSize) {
+            throw new Error("Invalid compressed MusicXML archive.");
+        }
+        output = compressed;
+    } else {
+        if (typeof DecompressionStream !== "function") {
+            throw new Error("This browser cannot decompress MusicXML archives.");
+        }
+        const stream = new Blob([compressed])
+            .stream()
+            .pipeThrough(new DecompressionStream("deflate-raw"));
+        const reader = stream.getReader();
+        const chunks = [];
+        let totalSize = 0;
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            totalSize += value.byteLength;
+            if (totalSize > maxSize || totalSize > entry.uncompressedSize) {
+                throw new Error("Compressed MusicXML entry is too large.");
+            }
+            chunks.push(value);
+        }
+
+        output = new Uint8Array(totalSize);
+        let outputOffset = 0;
+        for (const chunk of chunks) {
+            output.set(chunk, outputOffset);
+            outputOffset += chunk.byteLength;
+        }
+    }
+
+    if (output.byteLength !== entry.uncompressedSize || _crc32(output) !== entry.crc) {
+        throw new Error("Corrupt compressed MusicXML entry.");
+    }
+    return output;
+};
+
+const extractMXMLFromMXL = async archive => {
+    const bytes = _isArrayBuffer(archive)
+        ? new Uint8Array(archive)
+        : ArrayBuffer.isView(archive)
+          ? new Uint8Array(archive.buffer, archive.byteOffset, archive.byteLength)
+          : null;
+    if (!bytes || bytes.byteLength === 0 || bytes.byteLength > MAX_MXL_ARCHIVE_SIZE) {
+        throw new Error("Compressed MusicXML archive is empty or exceeds the 20 MiB limit.");
+    }
+
+    const { entries, view } = _findZipEntries(bytes);
+    const containerEntry = entries.find(entry => entry.name === "META-INF/container.xml");
+    if (!containerEntry) {
+        throw new Error("MusicXML archive is missing META-INF/container.xml.");
+    }
+
+    const containerBytes = await _readZipEntry(
+        bytes,
+        view,
+        containerEntry,
+        _MAX_MXL_CONTAINER_SIZE
+    );
+    const containerXML = new TextDecoder("utf-8", { fatal: true }).decode(containerBytes);
+    const containerDocument = new DOMParser().parseFromString(containerXML, "application/xml");
+    if (containerDocument.getElementsByTagName("parsererror").length > 0) {
+        throw new Error("Invalid MusicXML archive container.");
+    }
+
+    const rootfiles = containerDocument.getElementsByTagNameNS("*", "rootfile");
+    const rootfile = rootfiles.length
+        ? rootfiles[0]
+        : containerDocument.getElementsByTagName("rootfile")[0];
+    const scorePath = rootfile && rootfile.getAttribute("full-path");
+    if (!scorePath || scorePath.startsWith("/") || scorePath.split("/").includes("..")) {
+        throw new Error("MusicXML archive does not identify a valid score file.");
+    }
+
+    const scoreEntry = entries.find(entry => entry.name === scorePath);
+    if (!scoreEntry) {
+        throw new Error("MusicXML score file is missing from the archive.");
+    }
+    const scoreBytes = await _readZipEntry(bytes, view, scoreEntry, _MAX_MXL_SCORE_SIZE);
+    return new TextDecoder("utf-8", { fatal: true }).decode(scoreBytes);
+};
+
 class ProjectManager {
     constructor(activity) {
         this.activity = activity;
@@ -1103,6 +1326,20 @@ class ProjectManager {
             return extensionIndex === -1 ? file.name : file.name.slice(0, extensionIndex);
         };
 
+        const readMXMLFile = (file, reader) => {
+            if (file.name.split(".").pop().toLowerCase() !== "mxl") {
+                reader.readAsText(file);
+                return;
+            }
+            if (file.size > MAX_MXL_ARCHIVE_SIZE) {
+                const error = new Error("Compressed MusicXML file exceeds the 20 MiB limit.");
+                ErrorHandler.capture(error, { operation: "mxmlImport" });
+                that.errorMsg(_("Cannot load project from the file. Please check the file type."));
+                return;
+            }
+            reader.readAsArrayBuffer(file);
+        };
+
         const initialiseLocalImportedProject = async file => {
             const baseName = getProjectName(file) || _("My Project");
             let projectName = baseName;
@@ -1395,8 +1632,11 @@ class ProjectManager {
                     pubsub.on("loadFailed", onFailed);
 
                     try {
-                        const mxmlData =
+                        const result =
                             (event && event.target && event.target.result) || mxmlReader.result;
+                        const mxmlData = _isArrayBuffer(result)
+                            ? await extractMXMLFromMXL(result)
+                            : result;
 
                         loadToken = await that.parseMXML(mxmlData);
 
@@ -1427,13 +1667,14 @@ class ProjectManager {
                     const extension = file.name.split(".").pop().toLowerCase();
                     const isMidi = extension === "mid" || extension === "midi";
                     const isABC = extension === "abc";
-                    const isMXML = extension === "xml" || extension === "musicxml";
+                    const isMXML =
+                        extension === "xml" || extension === "musicxml" || extension === "mxl";
                     if (isMidi) {
                         midiReader.readAsArrayBuffer(file);
                     } else if (isABC) {
                         abcReader.readAsText(file);
                     } else if (isMXML) {
-                        mxmlReader.readAsText(file);
+                        readMXMLFile(file, mxmlReader);
                     } else {
                         reader.readAsText(file);
                     }
@@ -1571,7 +1812,9 @@ class ProjectManager {
                 pubsub.on("loadFailed", onFailed);
 
                 try {
-                    const mxmlData = event.target.result;
+                    const mxmlData = _isArrayBuffer(event.target.result)
+                        ? await extractMXMLFromMXL(event.target.result)
+                        : event.target.result;
 
                     loadToken = await that.parseMXML(mxmlData);
 
@@ -1608,9 +1851,10 @@ class ProjectManager {
                     return;
                 }
 
-                const isMXML = extension === "xml" || extension === "musicxml";
+                const isMXML =
+                    extension === "xml" || extension === "musicxml" || extension === "mxl";
                 if (isMXML) {
-                    mxmlReader.readAsText(files[0]);
+                    readMXMLFile(files[0], mxmlReader);
                     return;
                 }
                 reader.readAsText(files[0]);
@@ -1760,8 +2004,13 @@ const setupProjectManager = activity => {
 if (typeof define === "function" && define.amd) {
     define(function () {
         window.setupProjectManager = setupProjectManager;
-        return { setupProjectManager, ProjectManager };
+        return { setupProjectManager, ProjectManager, extractMXMLFromMXL };
     });
 } else if (typeof module !== "undefined" && module.exports) {
-    module.exports = { setupProjectManager, ProjectManager };
+    module.exports = {
+        setupProjectManager,
+        ProjectManager,
+        extractMXMLFromMXL,
+        MAX_MXL_ARCHIVE_SIZE
+    };
 }
