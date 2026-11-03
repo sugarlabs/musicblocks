@@ -1178,21 +1178,35 @@ var MIDI_INSTRUMENTS = {
 
 var DRUM_MIDI_MAP = {
     "snare drum": 38,
+    "snare hard": 40, // Electric Snare
+    "snare soft": 38,
+    "snare roll": 38,
     "kick drum": 36,
+    "heavy kick": 35, // Acoustic Bass Drum
+    "bass drum": 36,
+    "tom hi": 50, // High Tom
+    "tom mid": 47, // Low-Mid Tom
+    "tom lo": 45, // Low Tom
+    "floor tom": 43, // High Floor Tom
     "tom tom": 41,
     "floor tom tom": 43,
     "cup drum": 47, // Closest: Low-Mid Tom
     "darbuka drum": 50, // Closest: High Tom
     "japanese drum": 56, // Closest: Cowbell or Tambourine
     "hi hat": 42,
+    "cymbal closed": 42, // Closed Hi-Hat
+    "cymbal open": 46, // Open Hi-Hat
+    "cymbal pedal": 44, // Pedal Hi-Hat
     "ride bell": 53,
     "cow bell": 56,
+    "sonic cowbell": 56,
     "triangle bell": 81,
     "finger cymbals": 69, // Closest: Open Hi-Hat
     "chime": 82, // Closest: Shaker
     "gong": 52, // Closest: Chinese Cymbal
     "clang": 55, // Closest: Splash Cymbal
     "crash": 49,
+    "splash": 55, // Splash Cymbal
     "clap": 39,
     "slap": 40,
     "raindrop": 88 // Custom mapping (not in GM), can use melodic notes
