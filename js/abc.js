@@ -14,13 +14,15 @@
 
    frequencyToPitch, NOTATIONNOTE, NOTATIONTUPLETVALUE, NOTATIONDURATION,
    NOTATIONROUNDDOWN, NOTATIONINSIDECHORD, NOTATIONDOTCOUNT,
-   NOTATIONSTACCATO
+   NOTATIONSTACCATO, plainUnwritableTuplets
 */
 
 /* exported saveAbcOutput */
 
 // This header is prepended to the Abc output.
 const ABCHEADER = "X:1\nT:Music Blocks composition\nC:Mr. Mouse\nL:1/16\nM:C\n";
+// abcjs, which this exporter is tested against, reads no larger a tuplet count.
+const ABC_MAX_TUPLET = 9;
 const OCTAVE_NOTATION_MAP = {
     "10": "'''''",
     "9": "''''",
@@ -227,7 +229,10 @@ class AbcExporter {
         this.turtle = turtle;
         this.keySignature = keySignature;
         this.voiceId = voiceId;
-        this.staging = logo.notation.notationStaging[turtle] || [];
+        this.staging = plainUnwritableTuplets(
+            logo.notation.notationStaging[turtle] || [],
+            ABC_MAX_TUPLET
+        );
         // With nested forevers, only the innermost one ever repeats, and a
         // forever with no notes after it has nothing to repeat.
         const repeatStart = this.staging.lastIndexOf("begin repeat");
