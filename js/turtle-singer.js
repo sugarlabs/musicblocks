@@ -2372,7 +2372,32 @@ class Singer {
 
                 const notes = [];
                 const drums = [];
+                // For case when note block is inside a settimbre block, which in turn is inside a setdrum block
                 let hasSetTimbreInSetDrum = false;
+                // This case is only applicable if the note block is at all inside a setdrum block
+                if (tur.singer.drumStyle.length > 0 && blk in activity.blocks.blockList) {
+                    // Start from the note block's parent
+                    let parentId = activity.blocks.blockList[blk].connections
+                        ? activity.blocks.blockList[blk].connections[0]
+                        : null;
+                    const visited = new Set();
+                    // Keep looking for all parents up in order
+                    while (parentId !== null && parentId !== undefined && !visited.has(parentId)) {
+                        visited.add(parentId);
+                        const parentBlock = activity.blocks.blockList[parentId];
+                        if (!parentBlock) {
+                            break;
+                        }
+                        if (parentBlock.name === "settimbre") {
+                            hasSetTimbreInSetDrum = true;
+                            break;
+                        }
+                        if (parentBlock.name === "setdrum") {
+                            break;
+                        }
+                        parentId = parentBlock.connections ? parentBlock.connections[0] : null;
+                    }
+                }
                 // let insideChord = -1;
                 // if (
                 //     tur.singer.notePitches[thisBlk].length + tur.singer.oscList[thisBlk].length >
@@ -2576,17 +2601,29 @@ class Singer {
                                 activity.logo.runningMIDI;
                             if (typeof d === "number" && d > 0 && isFinite(d)) {
                                 if (exporting) {
+                                    // Set Drum plays the note's pitches as its drum, unless an
+                                    // oscillator or a Set Instrument inside it plays them, so
+                                    // MIDI gets that drum and no pitches.
+                                    const playedBySetDrum =
+                                        tur.singer.drumStyle.length > 0 &&
+                                        !hasSetTimbreInSetDrum &&
+                                        tur.singer.oscList[thisBlk].length === 0 &&
+                                        chordNotes.some(
+                                            note => typeof note === "number" || !note.includes("R")
+                                        );
                                     // A note with cents or set in hertz is a frequency; MIDI
                                     // takes the nearest 12-EDO note name.
                                     activity.logo.notationMIDI(
-                                        chordNotes.map(note => {
-                                            if (typeof note !== "number") {
-                                                return note;
-                                            }
-                                            const [name, octave] = frequencyToPitch(note);
-                                            return name + octave;
-                                        }),
-                                        chordDrums,
+                                        playedBySetDrum
+                                            ? ["R"]
+                                            : chordNotes.map(note => {
+                                                  if (typeof note !== "number") {
+                                                      return note;
+                                                  }
+                                                  const [name, octave] = frequencyToPitch(note);
+                                                  return name + octave;
+                                              }),
+                                        playedBySetDrum ? [last(tur.singer.drumStyle)] : chordDrums,
                                         d,
                                         turtle,
                                         bpmValue || 90,
@@ -2665,42 +2702,6 @@ class Singer {
                                     neighborArgBeat: neighborArgBeat,
                                     neighborArgCurrentBeat: neighborArgCurrentBeat
                                 };
-
-                                // For case when note block is inside a settimbre block, which in turn is inside a setdrum block
-                                hasSetTimbreInSetDrum = false;
-                                // This case is only applicable if the note block is at all inside a setdrum block
-                                if (
-                                    tur.singer.drumStyle.length > 0 &&
-                                    blk in activity.blocks.blockList
-                                ) {
-                                    // Start from the note block's parent
-                                    let parentId = activity.blocks.blockList[blk].connections
-                                        ? activity.blocks.blockList[blk].connections[0]
-                                        : null;
-                                    const visited = new Set();
-                                    // Keep looking for all parents up in order
-                                    while (
-                                        parentId !== null &&
-                                        parentId !== undefined &&
-                                        !visited.has(parentId)
-                                    ) {
-                                        visited.add(parentId);
-                                        const parentBlock = activity.blocks.blockList[parentId];
-                                        if (!parentBlock) {
-                                            break;
-                                        }
-                                        if (parentBlock.name === "settimbre") {
-                                            hasSetTimbreInSetDrum = true;
-                                            break;
-                                        }
-                                        if (parentBlock.name === "setdrum") {
-                                            break;
-                                        }
-                                        parentId = parentBlock.connections
-                                            ? parentBlock.connections[0]
-                                            : null;
-                                    }
-                                }
 
                                 if (tur.singer.oscList[thisBlk].length > 0) {
                                     if (notes.length > 1) {
