@@ -411,7 +411,7 @@ var mixedNumber = d => {
  * This preserves original musical division context where explicit denominators matter.
  */
 var rationalSum = (a, b) => {
-    // Rejects non-array, wrong-length, or non-number inputs.
+    // Reject non-array, wrong-length, or non-finite number inputs.
     // A zero numerator ([0, n]) is valid and passes through — only the
     // denominator (index 1) must be non-zero.
     if (
@@ -419,10 +419,10 @@ var rationalSum = (a, b) => {
         a.length < 2 ||
         !Array.isArray(b) ||
         b.length < 2 ||
-        typeof a[0] !== "number" ||
-        typeof a[1] !== "number" ||
-        typeof b[0] !== "number" ||
-        typeof b[1] !== "number"
+        !Number.isFinite(a[0]) ||
+        !Number.isFinite(a[1]) ||
+        !Number.isFinite(b[0]) ||
+        !Number.isFinite(b[1])
     ) {
         if (typeof console !== "undefined") {
             console.warn("Invalid input passed to rationalSum:", a, b);

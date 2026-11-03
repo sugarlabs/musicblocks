@@ -351,6 +351,64 @@ describe("Utility Logic Functions", () => {
             expect(result).toEqual([0, 1]);
         });
 
+        it.each([
+            [
+                [1, NaN],
+                [1, 4]
+            ],
+            [
+                [1, Infinity],
+                [1, 4]
+            ],
+            [
+                [1, -Infinity],
+                [1, 4]
+            ],
+            [
+                [NaN, 2],
+                [1, 4]
+            ],
+            [
+                [Infinity, 2],
+                [1, 4]
+            ],
+            [
+                [-Infinity, 2],
+                [1, 4]
+            ],
+            [
+                [1, 4],
+                [1, NaN]
+            ],
+            [
+                [1, 4],
+                [1, Infinity]
+            ],
+            [
+                [1, 4],
+                [1, -Infinity]
+            ],
+            [
+                [1, 4],
+                [NaN, 2]
+            ],
+            [
+                [1, 4],
+                [Infinity, 2]
+            ],
+            [
+                [1, 4],
+                [-Infinity, 2]
+            ]
+        ])("rejects non-finite fraction components: %p + %p", (a, b) => {
+            const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+
+            expect(rationalSum(a, b)).toEqual([[0, 1], "Invalid input passed to rational sum"]);
+            expect(warnSpy).toHaveBeenCalledWith("Invalid input passed to rationalSum:", a, b);
+
+            warnSpy.mockRestore();
+        });
+
         it("handles zero values", () => {
             expect(rationalSum([0, 1], [1, 2])).toEqual([[1, 2], null]);
             expect(rationalSum([1, 2], [0, 1])).toEqual([[1, 2], null]);
