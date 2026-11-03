@@ -85,14 +85,15 @@ function makeActivity(protoBlocks = {}) {
             }
 
             if (target === document && event === "keydown") {
-                // Store so tests can inspect it.
+                // Register the keydown listener so cleanup can be verified.
                 target._keydownHandler = handler;
+                target.addEventListener(event, handler, options);
             }
-
-            target.addEventListener(event, handler, options);
         }),
         removeEventListener: jest.fn((target, event, handler, options) => {
-            target.removeEventListener(event, handler, options);
+            if (target === document && event === "keydown") {
+                target.removeEventListener(event, handler, options);
+            }
         }),
         errorMsg: jest.fn(),
         __tick: jest.fn(),
@@ -582,6 +583,7 @@ describe("SearchController.showSearchWidget", () => {
         expect(activity.searchWidget.style.visibility).toBe("visible");
         expect(activity.searchWidget.style.left).toBe("10px");
         expect(activity.searchWidget.style.top).toBe("20px");
+        activity.searchController.hideSearchWidget();
         jest.useRealTimers();
     });
 
@@ -597,6 +599,7 @@ describe("SearchController.showSearchWidget", () => {
             "mousedown",
             expect.any(Function)
         );
+        activity.searchController.hideSearchWidget();
         jest.useRealTimers();
     });
     test("closes the search when Escape is pressed and removes the document listener", () => {
