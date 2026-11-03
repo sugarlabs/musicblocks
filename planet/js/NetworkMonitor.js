@@ -78,19 +78,20 @@ class NetworkMonitor {
      */
     async _probe() {
         let nowOnline;
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 4000);
         try {
-            const controller = new AbortController();
-            const timer = setTimeout(() => controller.abort(), 4000);
-            await fetch(this._probeUrl, {
+            const response = await fetch(this._probeUrl, {
                 method: "HEAD",
                 cache: "no-store",
                 signal: controller.signal
             });
-            clearTimeout(timer);
-            nowOnline = true;
+            nowOnline = response.ok;
         } catch (_) {
             // fetch throws on network error OR abort (timeout) → offline
             nowOnline = false;
+        } finally {
+            clearTimeout(timer);
         }
 
         if (nowOnline !== this._online) {
