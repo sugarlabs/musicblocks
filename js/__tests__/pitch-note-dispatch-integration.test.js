@@ -145,6 +145,8 @@ Object.assign(global, {
     SHARP: musicUtils.SHARP,
     FLAT: musicUtils.FLAT,
     getCurrentEDO: musicUtils.getCurrentEDO,
+    edoTransposition: musicUtils.edoTransposition,
+    edoTranspositionCents: musicUtils.edoTranspositionCents,
     getModeLength: musicUtils.getModeLength,
     getInterval: musicUtils.getInterval,
     getTemperament: musicUtils.getTemperament,

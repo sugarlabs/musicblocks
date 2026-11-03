@@ -198,6 +198,102 @@ describe("musicutils-temperament", () => {
         });
     });
 
+    describe("edoTransposition", () => {
+        const { edoTransposition } = temperament;
+        const play = (note, octave, [transposition, inSteps], temperamentName) =>
+            musicutils
+                .getNote(
+                    note,
+                    octave,
+                    transposition,
+                    "C major",
+                    false,
+                    null,
+                    null,
+                    temperamentName,
+                    inSteps
+                )
+                .slice(0, 2);
+
+        test("is the plain sum in 12 EDO", () => {
+            expect(edoTransposition(4, 3, 12)).toEqual([7, false]);
+            expect(edoTransposition(0.5, 2, 12)).toEqual([2.5, false]);
+        });
+
+        test("keeps steps as they are and rounds semitones to steps outside 12 EDO", () => {
+            expect(edoTransposition(0, 6, 19)).toEqual([6, true]);
+            expect(edoTransposition(4, 0, 19)).toEqual([6, true]);
+            expect(edoTransposition(1, 19, 19)).toEqual([21, true]);
+        });
+
+        test.each([
+            ["equal19", 19, 2, ["E", 4]],
+            ["equal19", 19, 4, ["G", 4]],
+            ["equal19", 19, -2, ["A", 3]],
+            ["equal31", 31, 2, ["E", 4]],
+            ["equal31", 31, 4, ["G", 4]],
+            ["equal17", 17, 2, ["E", 4]]
+        ])(
+            "%s (%i EDO): scalar interval %i from C4 lands on %j",
+            (temperamentName, edo, interval, expected) => {
+                const steps = musicutils.getInterval(interval, "C major", "C", edo);
+                expect(play("C", 4, edoTransposition(0, steps, edo), temperamentName)).toEqual(
+                    expected
+                );
+            }
+        );
+
+        test("a register of one octave moves C4 to C5 and C3 in 19 EDO", () => {
+            expect(play("C", 4, edoTransposition(0, 19, 19), "equal19")).toEqual(["C", 5]);
+            expect(play("C", 4, edoTransposition(0, -19, 19), "equal19")).toEqual(["C", 3]);
+        });
+
+        test("a semitone interval still converts to steps in 19 EDO", () => {
+            expect(play("C", 4, edoTransposition(4, 0, 19), "equal19")).toEqual(["E", 4]);
+        });
+    });
+
+    describe("edoTranspositionCents", () => {
+        const { edoTransposition, edoTranspositionCents } = temperament;
+
+        test("adds nothing in 12 EDO or for whole semitones", () => {
+            expect(edoTranspositionCents(0.5, 12)).toBe(0);
+            expect(edoTranspositionCents(4, 19)).toBe(0);
+            expect(edoTranspositionCents(0, 19)).toBe(0);
+        });
+
+        test.each([
+            ["equal19", 19, 0.5],
+            ["equal19", 19, 1.5],
+            ["equal19", 19, -0.5],
+            ["equal19", 19, 0.25],
+            ["equal31", 31, 0.25],
+            ["equal31", 31, -1.5]
+        ])("%s (%i EDO): the note sounds exactly %d semitones above C4", (name, edo, semitones) => {
+            const [steps, inSteps] = edoTransposition(semitones, 0, edo);
+            const [note, octave] = musicutils.getNote(
+                "C",
+                4,
+                steps,
+                "C major",
+                false,
+                null,
+                null,
+                name,
+                inSteps
+            );
+            const hertz = musicutils.pitchToFrequency(
+                note,
+                octave,
+                edoTranspositionCents(semitones, edo),
+                "C major",
+                name
+            );
+            const base = musicutils.pitchToFrequency("C", 4, 0, "C major", name);
+            expect(1200 * Math.log2(hertz / base)).toBeCloseTo(semitones * 100, 6);
+        });
+    });
+
     describe("what musicutils.js still exports", () => {
         it("re-exports the same tables and functions", () => {
             for (const name of [
@@ -208,7 +304,8 @@ describe("musicutils-temperament", () => {
                 "addTemperamentToDictionary",
                 "setOctaveRatio",
                 "getEffectiveOctaveRatio",
-                "isEquallyTempered"
+                "isEquallyTempered",
+                "edoTransposition"
             ]) {
                 expect(musicutils[name]).toBe(temperament[name]);
             }
