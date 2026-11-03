@@ -239,6 +239,7 @@ class GlobalPlanet {
             this.addProjects(data.data, requestId);
         } else {
             this.throwOfflineError();
+            this.Planet._scheduleReconnectRetry?.();
         }
     }
 
@@ -429,6 +430,7 @@ class GlobalPlanet {
         if (rendered === 0 && data.length > 0) {
             if (this.batchHasOfflineError) {
                 this.throwOfflineError();
+                this.Planet._scheduleReconnectRetry?.();
             } else {
                 this.throwNoProjectsError();
             }
@@ -442,6 +444,7 @@ class GlobalPlanet {
     afterAddProjects() {
         this.index += this.page;
         this.hideLoading();
+        this.Planet._finishReconnectRecovery?.();
 
         if (this.oldSearchString !== "") this.afterSearch();
     }
@@ -476,6 +479,8 @@ class GlobalPlanet {
         const element = document.getElementById("global-projects");
         element.innerHTML = "";
         element.insertAdjacentHTML("afterbegin", this.noProjects);
+
+        this.Planet._finishReconnectRecovery?.();
     }
 
     hideLoading() {

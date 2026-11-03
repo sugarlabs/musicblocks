@@ -303,6 +303,20 @@ describe("GlobalPlanet", () => {
                 "No results found."
             );
         });
+
+        it("requests another recovery attempt when the project list fails", () => {
+            const scheduleRetry = jest.fn();
+            mockPlanet._scheduleReconnectRetry = scheduleRetry;
+
+            gp.refreshProjects();
+
+            const callback = mockPlanet.ServerInterface.downloadProjectList.mock.calls[0][4];
+
+            callback({ success: false });
+
+            expect(gp._offline).toBe(true);
+            expect(scheduleRetry).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe("_cleanupCards", () => {

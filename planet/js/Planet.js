@@ -34,6 +34,8 @@ class Planet {
         this.ConnectedToServer = null;
         this.TagsManifest = null;
         this._manifestRequestId = 0;
+        this._reconnectRetriesLeft = 0;
+        this._reconnectRetryTimer = null;
         this.IsMusicBlocks = isMusicBlocks;
         this.UserIDCookie = "UserID";
         this.UserID = null;
@@ -250,6 +252,84 @@ class Planet {
         document.body.appendChild(overlay);
     }
 
+    _startReconnectRecovery() {
+        this._finishReconnectRecovery();
+        this._reconnectRetriesLeft = 2;
+        this._attemptReconnectRecovery();
+    }
+
+    _finishReconnectRecovery() {
+        this._reconnectRetriesLeft = 0;
+
+        if (this._reconnectRetryTimer !== null) {
+            clearTimeout(this._reconnectRetryTimer);
+            this._reconnectRetryTimer = null;
+        }
+    }
+
+    _scheduleReconnectRetry() {
+        if (this._reconnectRetriesLeft <= 0 || this._reconnectRetryTimer !== null) {
+            return;
+        }
+
+        const delay = 2000 * (3 - this._reconnectRetriesLeft);
+        this._reconnectRetriesLeft--;
+
+        this._reconnectRetryTimer = setTimeout(() => {
+            this._reconnectRetryTimer = null;
+
+            // A future online transition will start a new recovery cycle.
+            if (this.OfflineCommitManager?.isOnline === false) {
+                this._reconnectRetriesLeft = 0;
+                return;
+            }
+
+            this._attemptReconnectRecovery();
+        }, delay);
+    }
+
+    _attemptReconnectRecovery() {
+        let recovered = false;
+
+        if (this.GlobalPlanet && typeof this.GlobalPlanet.recoverFromOffline === "function") {
+            recovered = this.GlobalPlanet.recoverFromOffline();
+        }
+
+        if (recovered) return;
+
+        if (this.ConnectedToServer) {
+            if (this.GlobalPlanet && typeof this.GlobalPlanet.refreshProjects === "function") {
+                this.GlobalPlanet.refreshProjects();
+            }
+            return;
+        }
+
+        this.ServerInterface.getTagManifest(data => {
+            if (!data || !data.success) {
+                if (!this.ConnectedToServer) this._scheduleReconnectRetry();
+                return;
+            }
+
+            if (this.ConnectedToServer) return;
+
+            // A successful recovery invalidates older startup responses.
+            ++this._manifestRequestId;
+
+            if (!this.LocalPlanet) {
+                this.initPlanets(data);
+                return;
+            }
+
+            this.ConnectedToServer = true;
+            this.TagsManifest = data.data;
+
+            if (this.GlobalPlanet) this.GlobalPlanet.destroy();
+
+            this.GlobalPlanet = new GlobalPlanet(this);
+            this.GlobalPlanet.init();
+        });
+    }
+
     async init() {
         this.StringHelper = new StringHelper(this);
         this.StringHelper.init();
@@ -264,48 +344,7 @@ class Planet {
             this.OfflineCommitManager = new OfflineCommitManager(
                 this.ProjectStorage,
                 this.ServerInterface,
-                () => {
-                    let recovered = false;
-
-                    if (
-                        this.GlobalPlanet &&
-                        typeof this.GlobalPlanet.recoverFromOffline === "function"
-                    ) {
-                        recovered = this.GlobalPlanet.recoverFromOffline();
-                    }
-
-                    if (recovered) return;
-
-                    if (this.ConnectedToServer) {
-                        if (
-                            this.GlobalPlanet &&
-                            typeof this.GlobalPlanet.refreshProjects === "function"
-                        ) {
-                            this.GlobalPlanet.refreshProjects();
-                        }
-                        return;
-                    }
-
-                    this.ServerInterface.getTagManifest(data => {
-                        if (!data || !data.success || this.ConnectedToServer) return;
-
-                        // Invalidate older responses only after successful recovery.
-                        ++this._manifestRequestId;
-
-                        if (!this.LocalPlanet) {
-                            this.initPlanets(data);
-                            return;
-                        }
-
-                        this.ConnectedToServer = true;
-                        this.TagsManifest = data.data;
-
-                        if (this.GlobalPlanet) this.GlobalPlanet.destroy();
-
-                        this.GlobalPlanet = new GlobalPlanet(this);
-                        this.GlobalPlanet.init();
-                    });
-                }
+                () => this._startReconnectRecovery()
             );
             this.ServerInterface.attachOfflineManager(this.OfflineCommitManager);
         } else {
