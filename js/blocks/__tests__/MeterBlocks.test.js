@@ -20,6 +20,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+// What MeterActions.setBPM and setMasterBPM return: null for a bpm or beat value they
+// reject, otherwise the tempo clamped to 30-1000 quarter notes, counted in the beat value.
+const tempoInUse = (bpm, beat) => {
+    if (!Number.isFinite(bpm) || bpm <= 0 || !Number.isFinite(beat) || beat <= 0) {
+        return null;
+    }
+    return Math.min(Math.max((bpm * beat) / 0.25, 30), 1000) * (0.25 / beat);
+};
+
 describe("MeterBlocks setup", () => {
     let activity;
     let logo;
@@ -120,12 +129,8 @@ describe("MeterBlocks setup", () => {
                 onStrongBeatDo: jest.fn(),
                 onEveryBeatDo: jest.fn(),
                 onEveryNoteDo: jest.fn(),
-                setMasterBPM: jest.fn(
-                    (bpm, beat) => Math.min(Math.max((bpm * beat) / 0.25, 30), 1000) * (0.25 / beat)
-                ),
-                setBPM: jest.fn(
-                    (bpm, beat) => Math.min(Math.max((bpm * beat) / 0.25, 30), 1000) * (0.25 / beat)
-                ),
+                setMasterBPM: jest.fn(tempoInUse),
+                setBPM: jest.fn(tempoInUse),
                 setPickup: jest.fn(),
                 setMeter: jest.fn()
             },
@@ -501,26 +506,27 @@ describe("MeterBlocks setup", () => {
         expect(logo.tempo.BPMs).toEqual([100]);
     });
 
-    it.each([
-        ["setmasterbpm2", "setMasterBPM"],
-        ["setbpm3", "setBPM"]
-    ])("%s notates the clamped tempo that plays, not the raw bpm", (name, action) => {
-        const block = getBlock(name);
-        activity.blocks.blockList.clamped = { connections: [null, "clampedText"] };
-        activity.blocks.blockList.clampedText = { text: { text: "2000" } };
+    it.each(["setmasterbpm2", "setbpm3"])(
+        "%s notates the clamped tempo that plays, not the raw bpm",
+        name => {
+            const block = getBlock(name);
+            activity.blocks.blockList.clamped = { connections: [null, "clampedText"] };
+            activity.blocks.blockList.clampedText = { text: { text: "2000" } };
 
-        block.flow([2000, 0.25], logo, 0, "clamped");
-        expect(logo.notation.notationTempo).toHaveBeenLastCalledWith(0, 1000, 0.25);
+            block.flow([2000, 0.25], logo, 0, "clamped");
+            expect(logo.notation.notationTempo).toHaveBeenLastCalledWith(0, 1000, 0.25);
 
-        block.flow([10, 0.5], logo, 0, "clamped");
-        expect(logo.notation.notationTempo).toHaveBeenLastCalledWith(0, 15, 0.5);
+            block.flow([10, 0.5], logo, 0, "clamped");
+            expect(logo.notation.notationTempo).toHaveBeenLastCalledWith(0, 15, 0.5);
 
-        // A tempo the setter rejects is not notated.
-        logo.notation.notationTempo.mockClear();
-        Singer.MeterActions[action].mockReturnValueOnce(null);
-        block.flow([0, 0.25], logo, 0, "clamped");
-        expect(logo.notation.notationTempo).not.toHaveBeenCalled();
-    });
+            // A tempo the setter rejects is not notated.
+            logo.notation.notationTempo.mockClear();
+            block.flow([0, 0.25], logo, 0, "clamped");
+            block.flow([-60, 0.25], logo, 0, "clamped");
+            block.flow([120, 0], logo, 0, "clamped");
+            expect(logo.notation.notationTempo).not.toHaveBeenCalled();
+        }
+    );
 
     describe("the BPM given to the Tempo widget", () => {
         beforeEach(() => {
