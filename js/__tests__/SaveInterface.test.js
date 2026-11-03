@@ -999,6 +999,144 @@ describe("afterSaveMIDI tempo and time signatures", () => {
     });
 });
 
+describe("afterSaveMIDI instrument channels", () => {
+    const { Midi: ToneMidi } = require("@tonejs/midi");
+    let mockMidi;
+    let instance;
+    let written;
+
+    // The file as it is written: a track read back without notes loses its channel.
+    const exportMidi = data => {
+        instance.activity.logo._midiData = data;
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+        return written;
+    };
+
+    const note = (name, instrument, drum) => ({
+        note: [name],
+        duration: 4,
+        bpm: 90,
+        instrument,
+        drum
+    });
+
+    // Every program change a track writes, as [channel, program], in track order.
+    const programs = midi => midi.tracks.map(t => [t.channel, t.instrument.number]);
+
+    // A channel plays one instrument at a time, so no channel may carry two.
+    const expectOneProgramPerChannel = midi => {
+        const byChannel = new Map();
+        programs(midi).forEach(([channel, program]) => {
+            if (!byChannel.has(channel)) byChannel.set(channel, new Set());
+            byChannel.get(channel).add(program);
+        });
+        byChannel.forEach(set => expect(set.size).toBe(1));
+    };
+
+    const track = (midi, name) => midi.tracks.find(t => t.name === name);
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        mockMidi = global.Midi;
+        global.Midi = class extends ToneMidi {
+            toArray() {
+                written = this;
+                return super.toArray();
+            }
+        };
+        const activity = { logo: {}, save: { download: jest.fn() } };
+        instance = new SaveInterface(activity);
+        instance.activity = activity;
+        global.URL.createObjectURL = jest.fn(() => "mockURL");
+        global.getMidiInstrument = jest.fn(() => ({
+            default: 0,
+            piano: 0,
+            guitar: 24,
+            flute: 73
+        }));
+        global.getMidiDrum = jest.fn(() => ({ "snare drum": 38 }));
+    });
+
+    afterEach(() => {
+        global.Midi = mockMidi;
+        jest.useRealTimers();
+    });
+
+    it("gives two mice playing different instruments their own channels", () => {
+        const midi = exportMidi({
+            0: [note("C4", "guitar"), note("E4", "guitar")],
+            1: [note("G4", "flute"), note("A4", "flute")]
+        });
+
+        const guitar = track(midi, "Track 1 - guitar");
+        const flute = track(midi, "Track 2 - flute");
+        expect(guitar.channel).not.toBe(flute.channel);
+        expect([guitar.instrument.number, flute.instrument.number]).toEqual([24, 73]);
+        expect([guitar.channel, flute.channel]).not.toContain(9);
+        expectOneProgramPerChannel(midi);
+    });
+
+    it("gives each instrument of one mouse its own channel", () => {
+        const midi = exportMidi({ 0: [note("C4", "guitar"), note("D4", "flute")] });
+
+        expect(track(midi, "Track 1 - guitar").channel).not.toBe(
+            track(midi, "Track 1 - flute").channel
+        );
+        expectOneProgramPerChannel(midi);
+    });
+
+    it("lets the empty track of each mouse repeat its first part's instrument", () => {
+        const midi = exportMidi({
+            0: [note("C4", "guitar")],
+            1: [note("R", "flute", "snare drum")]
+        });
+
+        expect([track(midi, "Track 1").channel, track(midi, "Track 1").instrument.number]).toEqual([
+            track(midi, "Track 1 - guitar").channel,
+            24
+        ]);
+        expect(track(midi, "Track 2").channel).toBe(9);
+        expect(track(midi, "Track 2 - snare drum").channel).toBe(9);
+        expectOneProgramPerChannel(midi);
+    });
+
+    it("puts the empty track of a mouse with no notes on the drum channel", () => {
+        const midi = exportMidi({ 0: [note("C4", "flute")], 1: [] });
+
+        expect(track(midi, "Track 2").channel).toBe(9);
+        expectOneProgramPerChannel(midi);
+    });
+
+    it("shares a channel between parts that play the same instrument", () => {
+        const midi = exportMidi({
+            0: [note("C4", "guitar")],
+            1: [note("E4", "guitar")]
+        });
+
+        expect(track(midi, "Track 1 - guitar").channel).toBe(
+            track(midi, "Track 2 - guitar").channel
+        );
+    });
+
+    it("reuses the melodic channels after 15 instruments, never the drum channel", () => {
+        const instruments = {};
+        const data = {};
+        for (let i = 0; i < 16; i++) {
+            instruments[`instrument ${i}`] = i + 1;
+            data[i] = [note("C4", `instrument ${i}`)];
+        }
+        global.getMidiInstrument = jest.fn(() => ({ default: 0, ...instruments }));
+
+        const midi = exportMidi(data);
+        const channels = [...Array(16).keys()].map(
+            i => track(midi, `Track ${i + 1} - instrument ${i}`).channel
+        );
+
+        expect(channels).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 0]);
+    });
+});
+
 describe("save artwork methods", () => {
     let instance;
     const mockActivity = { PlanetInterface: { getCurrentProjectName: jest.fn(() => "Test") } };

@@ -521,6 +521,19 @@ class SaveInterface {
                 writeTempoAndMeter(midi.header, firstTrack);
             }
 
+            // A MIDI channel plays one instrument at a time, whichever track set it last, so
+            // each instrument in the file gets its own channel. Channel 9 is for drums; past
+            // 15 instruments the other channels are shared.
+            const melodicChannels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15];
+            const programChannels = new Map();
+            const channelFor = program => {
+                if (!programChannels.has(program)) {
+                    const next = programChannels.size % melodicChannels.length;
+                    programChannels.set(program, melodicChannels[next]);
+                }
+                return programChannels.get(program);
+            };
+
             Object.entries(data).forEach(([blockIndex, notes]) => {
                 const mainTrack = midi.addTrack();
                 mainTrack.name = `Track ${parseInt(blockIndex, 10) + 1}`;
@@ -564,6 +577,7 @@ class SaveInterface {
                                 Object.prototype.hasOwnProperty.call(instrumentMIDI, instrument)
                                     ? instrumentMIDI[instrument]
                                     : instrumentMIDI["default"];
+                            instrumentTrack.channel = channelFor(instrumentTrack.instrument.number);
                             trackMap.set(instrument, instrumentTrack);
                         }
 
@@ -583,6 +597,12 @@ class SaveInterface {
                     globalTime += duration;
                 });
                 globalTime = 0;
+
+                // The empty track still writes a program change: give it the one its first
+                // part writes, or the drum channel's, so it changes no instrument.
+                const firstPart = trackMap.values().next().value;
+                mainTrack.channel = firstPart ? firstPart.channel : 9;
+                mainTrack.instrument.number = firstPart ? firstPart.instrument.number : 0;
             });
 
             // Generate the MIDI file and trigger download.
