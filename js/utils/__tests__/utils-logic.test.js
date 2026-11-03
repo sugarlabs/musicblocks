@@ -367,6 +367,24 @@ describe("Utility Logic Functions", () => {
             const [result2] = rationalSum([1, 2], [1, 0]);
             expect(result2).toEqual([0, 1]);
         });
+
+        it("rejects non-finite and NaN values", () => {
+            const [res1, err1] = rationalSum([1, NaN], [1, 4]);
+            expect(res1).toEqual([0, 1]);
+            expect(err1).not.toBeNull();
+
+            const [res2, err2] = rationalSum([1, 4], [1, NaN]);
+            expect(res2).toEqual([0, 1]);
+            expect(err2).not.toBeNull();
+
+            const [res3, err3] = rationalSum([NaN, 2], [1, 4]);
+            expect(res3).toEqual([0, 1]);
+            expect(err3).not.toBeNull();
+
+            const [res4, err4] = rationalSum([1, Infinity], [1, 4]);
+            expect(res4).toEqual([0, 1]);
+            expect(err4).not.toBeNull();
+        });
     });
 
     describe("clampNumber()", () => {
