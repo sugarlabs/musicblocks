@@ -107,7 +107,7 @@ class RhythmBlocksAPI {
      * @returns {string} ENDFLOWCOMMAND
      */
     async swing(swingValue, noteValue, flow) {
-        const args = JSInterface.validateArgs("multiplyNoteValue", [swingValue, noteValue, flow]);
+        const args = JSInterface.validateArgs("swing", [swingValue, noteValue, flow]);
         await this.runCommand("addSwing", [args[0], args[1], this.turIndex]);
         await args[2]();
         return this.ENDFLOWCOMMAND;

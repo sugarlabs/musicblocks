@@ -124,11 +124,7 @@ describe("RhythmBlocksAPI", () => {
 
         const result = await rhythmBlocksAPI.swing(1, 4, mockFlow);
 
-        expect(JSInterface.validateArgs).toHaveBeenCalledWith("multiplyNoteValue", [
-            1,
-            4,
-            mockFlow
-        ]); // Keep original validation method
+        expect(JSInterface.validateArgs).toHaveBeenCalledWith("swing", [1, 4, mockFlow]);
         expect(rhythmBlocksAPI.runCommand).toHaveBeenCalledWith("addSwing", [1, 4, 0]);
         expect(mockFlow).toHaveBeenCalled();
         expect(result).toBe("END");
@@ -162,5 +158,28 @@ describe("RhythmBlocksAPI", () => {
             "Command failed"
         );
         await expect(rhythmBlocksAPI.swing(1, 4, jest.fn())).rejects.toThrow("Command failed");
+    });
+
+    test("swing passes the real argument validation", async () => {
+        const mockedJSInterface = global.JSInterface;
+        global.JSEditor = { logConsole: jest.fn() };
+        // constraints.js attaches to an existing JSInterface, so load it before the real one.
+        delete global.JSInterface;
+        jest.isolateModules(() => {
+            require("../../constraints.js");
+            global.JSInterface = require("../../interface");
+        });
+
+        try {
+            const mockFlow = jest.fn();
+            const result = await rhythmBlocksAPI.swing(1 / 24, 1 / 8, async () => mockFlow());
+
+            expect(rhythmBlocksAPI.runCommand).toHaveBeenCalledWith("addSwing", [1 / 24, 1 / 8, 0]);
+            expect(mockFlow).toHaveBeenCalled();
+            expect(result).toBe("END");
+        } finally {
+            global.JSInterface = mockedJSInterface;
+            delete global.JSEditor;
+        }
     });
 });
