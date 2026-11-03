@@ -31,6 +31,7 @@ class Boundary {
         this._stage.addChild(this._container);
         this._stage.addChild(this._highlightContainer);
         this._stage.setChildIndex(this._container, 0);
+        this._container.visible = false;
         this._highlightContainer.visible = false;
     }
 

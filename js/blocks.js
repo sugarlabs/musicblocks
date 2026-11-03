@@ -1975,7 +1975,6 @@ class Blocks {
 
                 if (block.offScreen(this.boundary)) {
                     this.activity.setHomeContainers(true);
-                    this.boundary.show();
                     onScreen = false;
                 }
             }
@@ -1986,7 +1985,6 @@ class Blocks {
 
             if (onScreen) {
                 this.activity.setHomeContainers(false);
-                this.boundary.hide();
             }
 
             if (start > 0) {

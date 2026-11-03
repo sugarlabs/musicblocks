@@ -448,7 +448,7 @@ describe("Boundary visibility", () => {
         blocks = new Blocks(mockActivity);
     });
 
-    it("shows the boundary when a block is off-screen", () => {
+    it("enables home controls when a block is off-screen", () => {
         blocks.blockList = [
             {
                 trash: false,
@@ -459,12 +459,10 @@ describe("Boundary visibility", () => {
 
         blocks.checkBounds();
 
-        expect(mockActivity.boundary.show).toHaveBeenCalledTimes(1);
-        expect(mockActivity.boundary.hide).not.toHaveBeenCalled();
         expect(mockActivity.setHomeContainers).toHaveBeenCalledWith(true);
     });
 
-    it("shows the boundary when a connected block crosses the viewport edge", () => {
+    it("enables home controls when a connected block crosses the viewport edge", () => {
         mockActivity.boundary.x = 68;
         mockActivity.boundary.y = 68;
         mockActivity.boundary.dx = 732;
@@ -490,12 +488,10 @@ describe("Boundary visibility", () => {
 
         blocks.checkBounds();
 
-        expect(mockActivity.boundary.show).toHaveBeenCalledTimes(1);
-        expect(mockActivity.boundary.hide).not.toHaveBeenCalled();
         expect(mockActivity.setHomeContainers).toHaveBeenCalledWith(true);
     });
 
-    it("hides the boundary when all top-level blocks are on-screen", () => {
+    it("disables home controls when all top-level blocks are on-screen", () => {
         blocks.blockList = [
             {
                 trash: false,
@@ -506,8 +502,6 @@ describe("Boundary visibility", () => {
 
         blocks.checkBounds();
 
-        expect(mockActivity.boundary.hide).toHaveBeenCalledTimes(1);
-        expect(mockActivity.boundary.show).not.toHaveBeenCalled();
         expect(mockActivity.setHomeContainers).toHaveBeenCalledWith(false);
         expect(mockActivity.boundary.showBlockHighlights).toHaveBeenCalledWith([]);
     });
