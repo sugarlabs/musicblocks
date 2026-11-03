@@ -21,6 +21,10 @@
    exported PlanetInterface
  */
 
+// A project thumbnail only needs to be rebuilt when the artwork could have
+// changed, so a freshly generated one is reused for a short window.
+const THUMBNAIL_REFRESH_INTERVAL = 5000;
+
 /**
  * Represents an interface for interacting with a planet.
  * @param {object} activity - The activity object associated with the interface.
@@ -31,6 +35,8 @@ class PlanetInterface {
         this.iframe = null;
         this.mainCanvas = null;
         this.activity = activity;
+        // Last generated thumbnail, so it can be reused for the same project.
+        this._thumbnailCache = { projectId: undefined, url: null, time: 0 };
         this._getProjectStorage = () => {
             if (!this.planet || !this.planet.ProjectStorage) {
                 return null;
@@ -136,7 +142,7 @@ class PlanetInterface {
                 return;
             }
 
-            this.saveLocally();
+            this.saveLocally({ forceThumbnail: true });
             this.hideMusicBlocks();
             this.showPlanet();
         };
@@ -273,10 +279,12 @@ class PlanetInterface {
          * Prepares project data for export, generates SVG data, and saves the project data locally.
          * @param {Object} [options] - Save behavior options.
          * @param {boolean} [options.rejectOnProjectSaveError=false] - Reject when project data cannot be saved.
+         * @param {boolean} [options.forceThumbnail=false] - Rebuild the thumbnail even if it is still fresh.
          * @returns {Promise|boolean} False if project data could not be saved.
          */
         this.saveLocally = (options = {}) => {
             const rejectOnProjectSaveError = options.rejectOnProjectSaveError === true;
+            const forceThumbnail = options.forceThumbnail === true;
             if (!this.planet || !this.planet.ProjectStorage) {
                 const error = new Error(
                     "[PlanetInterface] saveLocally called before Planet storage is ready."
@@ -302,14 +310,28 @@ class PlanetInterface {
 
             this.activity.stage.update();
             const data = this.activity.prepareExport();
-            const svgData = doSVG(
-                this.activity.canvas,
-                this.activity.logo,
-                this.activity.turtles,
-                320,
-                240,
-                320 / this.activity.canvas.width
-            );
+            const projectStorage = this.planet.ProjectStorage;
+            const currentProjectId =
+                typeof projectStorage.getCurrentProjectID === "function"
+                    ? projectStorage.getCurrentProjectID()
+                    : undefined;
+            const cachedThumbnail = this._thumbnailCache;
+            const reuseThumbnail =
+                !forceThumbnail &&
+                currentProjectId !== undefined &&
+                cachedThumbnail.projectId === currentProjectId &&
+                cachedThumbnail.url !== null &&
+                Date.now() - cachedThumbnail.time < THUMBNAIL_REFRESH_INTERVAL;
+            const svgData = reuseThumbnail
+                ? null
+                : doSVG(
+                      this.activity.canvas,
+                      this.activity.logo,
+                      this.activity.turtles,
+                      320,
+                      240,
+                      320 / this.activity.canvas.width
+                  );
             const isQuotaError = e =>
                 e?.name === "QuotaExceededError" ||
                 e?.code === DOMException.QUOTA_EXCEEDED_ERR ||
@@ -333,7 +355,6 @@ class PlanetInterface {
                 return result;
             };
             try {
-                const projectStorage = this.planet.ProjectStorage;
                 let projectId =
                     typeof projectStorage.getCurrentProjectID === "function"
                         ? projectStorage.getCurrentProjectID()
@@ -385,7 +406,14 @@ class PlanetInterface {
                     }
                     return projectStorage.saveLocally(data, image);
                 };
-                if (svgData === null || svgData === undefined || svgData === "") {
+                if (reuseThumbnail) {
+                    return Promise.resolve(saveProject(cachedThumbnail.url)).catch(
+                        handleProjectSaveError
+                    );
+                } else if (svgData === null || svgData === undefined || svgData === "") {
+                    // No image to save, so drop any cached thumbnail to avoid
+                    // reusing a stale URL on a subsequent save.
+                    this._thumbnailCache = { projectId: undefined, url: null, time: 0 };
                     return Promise.resolve(saveProject(null)).catch(handleProjectSaveError);
                 } else {
                     const fallbackImage =
@@ -402,6 +430,13 @@ class PlanetInterface {
                             const bounds = bitmap.getBounds();
                             bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
                             const thumbUrl = bitmap.bitmapCache.getCacheDataURL();
+                            if (projectId !== undefined) {
+                                this._thumbnailCache = {
+                                    projectId: projectId,
+                                    url: thumbUrl,
+                                    time: Date.now()
+                                };
+                            }
                             const commitThumbnail = () => {
                                 if (
                                     projectId === undefined &&
