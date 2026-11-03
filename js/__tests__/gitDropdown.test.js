@@ -599,7 +599,247 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
         });
     });
 
-    // ── 5. Iframe Message Handlers ──────────────────────────────────────────
+    // ── 5. Open Project Binding ─────────────────────────────────────────────
+    describe("Open Project Binding", () => {
+        const useProject = gitData => {
+            mockActivity.planet.getCurrentGitRepoData = jest.fn(() => gitData);
+        };
+        const guitar = {
+            projectId: "guitar",
+            repoName: "guitar-song",
+            hashedKey: "guitar-key",
+            displayName: "Guitar Song"
+        };
+        const copy = {
+            projectId: "copy",
+            repoName: "",
+            hashedKey: "",
+            displayName: "Guitar Song (Copy)"
+        };
+
+        test("commits to the repo of the open project, not one left in storage", async () => {
+            localStorage.setItem("mbGitRepoName", "drum-beat");
+            localStorage.setItem("mbGitHashedKey", "drum-key");
+            useProject(guitar);
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);
+
+            await gitDropdown._showCommitFlow();
+
+            const edit = global.fetch.mock.calls.find(call => call[0].includes("/edit"));
+            const body = JSON.parse(edit[1].body);
+            expect(body.repoName).toBe("guitar-song");
+            expect(body.key).toBe("guitar-key");
+        });
+
+        test("an untracked copy cannot commit to the repo it was copied from", async () => {
+            localStorage.setItem("mbGitRepoName", "guitar-song");
+            localStorage.setItem("mbGitHashedKey", "guitar-key");
+            useProject(copy);
+
+            gitDropdown._syncMenuState();
+            await gitDropdown._showCommitFlow();
+
+            expect(mockItemCreate.style.display).toBe("list-item");
+            expect(mockItemCommit.style.display).toBe("none");
+            expect(global.fetch).not.toHaveBeenCalled();
+            expect(window.MBDialog.alert).toHaveBeenCalledWith(
+                expect.any(String),
+                "Not Tracking Yet"
+            );
+        });
+
+        test("an untracked copy can start its own tracking", async () => {
+            localStorage.setItem("mbGitRepoName", "guitar-song");
+            useProject(copy);
+            const doCreate = jest.spyOn(gitDropdown, "_doCreate").mockResolvedValue();
+
+            await gitDropdown._showCreateFlow();
+
+            expect(window.MBDialog.alert).not.toHaveBeenCalled();
+            expect(doCreate).toHaveBeenCalled();
+        });
+
+        test("links the new repo to the project tracking started in", async () => {
+            useProject({ ...copy, projectId: "guitar" });
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);
+
+            await gitDropdown._doCreate("guitar-song", "Guitar Song", "");
+
+            expect(mockIframe.contentWindow.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({ type: "MB_GIT_CREATED", projectId: "guitar" }),
+                "*"
+            );
+        });
+
+        test("queues offline tracking for the open project", async () => {
+            useProject({ ...copy, projectId: "guitar" });
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(true);
+
+            await gitDropdown._doCreate("guitar-song", "Guitar Song", "");
+
+            expect(mockIframe.contentWindow.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({ type: "MB_OFFLINE_CREATE", projectId: "guitar" }),
+                "*"
+            );
+        });
+
+        test("saves an offline draft under the open project", async () => {
+            localStorage.setItem("mbGitCurrentProjectId", "drums");
+            useProject(guitar);
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(true);
+
+            await gitDropdown._doCommit("guitar-song", "guitar-key", "Offline snapshot");
+
+            expect(mockIframe.contentWindow.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({ type: "MB_OFFLINE_COMMIT", projectId: "guitar" }),
+                "*"
+            );
+        });
+
+        test("keeps tracking on the project it started in when the project changes during the save", async () => {
+            useProject({ ...copy, projectId: "guitar" });
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);
+            mockActivity.saveLocally.mockImplementation(async () => useProject(copy));
+
+            await gitDropdown._doCreate("guitar-song", "Guitar Song", "");
+
+            expect(mockIframe.contentWindow.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({ type: "MB_GIT_CREATED", projectId: "guitar" }),
+                "*"
+            );
+        });
+
+        test("keeps a draft on the project it started in when the project changes mid-commit", async () => {
+            useProject(guitar);
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);
+            global.fetch.mockImplementationOnce(async () => {
+                useProject(copy);
+                throw new TypeError("Failed to fetch");
+            });
+
+            await gitDropdown._doCommit("guitar-song", "guitar-key", "Lost connection");
+
+            expect(mockIframe.contentWindow.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({ type: "MB_OFFLINE_COMMIT", projectId: "guitar" }),
+                "*"
+            );
+        });
+
+        test("keeps the Time Travel position of each project", async () => {
+            const drums = { ...guitar, projectId: "drums", repoName: "drum-beat" };
+            useProject(guitar);
+            await gitDropdown._restoreCommit({ sha: "riff-sha", message: "Riff", projectData: {} });
+            useProject(drums);
+            await gitDropdown._restoreCommit({
+                sha: "groove-sha",
+                message: "Groove",
+                projectData: {}
+            });
+            useProject(guitar);
+
+            gitDropdown._renderHistoryPanel([
+                { sha: "chorus-sha", message: "Chorus", date: "2026-10-24T10:00:00Z" },
+                { sha: "riff-sha", message: "Riff", date: "2026-10-23T10:00:00Z" }
+            ]);
+
+            const here = document.querySelector(".git-tt-stop.now-stop .git-tt-msg");
+            expect(here.textContent).toBe("Riff");
+            gitDropdown._closeHistoryPanel();
+        });
+
+        test("does not report unsaved changes saved by another project", () => {
+            useProject(guitar);
+            mockActivity.prepareExport.mockReturnValue("guitar blocks");
+            gitDropdown.onSaveLocally();
+            useProject({ ...guitar, projectId: "drums" });
+            mockActivity.prepareExport.mockReturnValue("drum blocks");
+            gitDropdown.onSaveLocally();
+            useProject(guitar);
+            mockActivity.prepareExport.mockReturnValue("guitar blocks");
+
+            expect(gitDropdown._hasUnsavedChanges()).toBe(false);
+        });
+
+        test("shows the new repo before Planet links it to the project", async () => {
+            useProject({ ...copy, projectId: "guitar" });
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);
+            global.fetch.mockResolvedValueOnce({
+                ok: true,
+                status: 201,
+                json: () => Promise.resolve({ repository: "guitar-song", key: "guitar-key" })
+            });
+
+            await gitDropdown._doCreate("guitar-song", "Guitar Song", "");
+
+            expect(mockItemCommit.style.display).toBe("list-item");
+            expect(global.fetch).toHaveBeenLastCalledWith(
+                expect.stringContaining("commitHistory?repoName=guitar-song")
+            );
+        });
+
+        test("finishes a commit on its own project after a switch", async () => {
+            localStorage.setItem("mbGitCurrentSha:guitar", "riff-sha");
+            localStorage.setItem("mbGitCurrentSha:drums", "groove-sha");
+            useProject(guitar);
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);
+            global.fetch.mockImplementationOnce(async () => {
+                useProject({ ...guitar, projectId: "drums", repoName: "drum-beat" });
+                return { ok: true, status: 200, json: () => Promise.resolve({ success: true }) };
+            });
+
+            await gitDropdown._doCommit("guitar-song", "guitar-key", "Chorus");
+
+            expect(localStorage.getItem("mbGitCurrentSha:guitar")).toBeNull();
+            expect(localStorage.getItem("mbGitCurrentSha:drums")).toBe("groove-sha");
+            expect(localStorage.getItem("mbGitLastSavedHash:drums")).toBeNull();
+        });
+
+        test("does not show a new repo on a project opened while tracking started", async () => {
+            useProject({ ...copy, projectId: "guitar" });
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(false);
+            global.fetch.mockImplementationOnce(async () => {
+                useProject(copy);
+                return {
+                    ok: true,
+                    status: 201,
+                    json: () => Promise.resolve({ repository: "guitar-song", key: "guitar-key" })
+                };
+            });
+
+            await gitDropdown._doCreate("guitar-song", "Guitar Song", "");
+
+            expect(mockItemCommit.style.display).toBe("none");
+            expect(localStorage.getItem("mbGitLastSavedHash:copy")).toBeNull();
+        });
+
+        test("finishes an offline draft on its own project after a switch", async () => {
+            useProject(guitar);
+            jest.spyOn(gitDropdown, "_isOffline").mockReturnValue(true);
+            jest.spyOn(gitDropdown, "_waitForMessage").mockImplementation(async () => {
+                useProject(copy);
+                return { success: true };
+            });
+
+            await gitDropdown._doCommit("guitar-song", "guitar-key", "Offline snapshot");
+
+            expect(localStorage.getItem("mbGitLastSavedHash:copy")).toBeNull();
+        });
+
+        test("Time Travel loads the history of the open project's repo", async () => {
+            useProject(guitar);
+            gitDropdown._prefetchCommits();
+            useProject({ ...guitar, projectId: "drums", repoName: "drum-beat" });
+            jest.spyOn(gitDropdown, "_waitForMessage").mockResolvedValue({ data: [] });
+
+            await gitDropdown._showHistoryPanel();
+
+            expect(global.fetch).toHaveBeenLastCalledWith(
+                expect.stringContaining("commitHistory?repoName=drum-beat")
+            );
+        });
+    });
+
+    // ── 6. Iframe Message Handlers ──────────────────────────────────────────
     describe("Iframe Message Listeners", () => {
         test("MB_GIT_STATE updates active repo credentials and syncs menu", () => {
             window.dispatchEvent(
