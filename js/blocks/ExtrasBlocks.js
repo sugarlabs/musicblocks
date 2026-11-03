@@ -492,10 +492,12 @@ function setupExtrasBlocks(activity) {
 
             if (args.length === 1) {
                 // The wait is in seconds, not beats, so the music clock moves on by
-                // the same time the turtle waits, whatever the tempo.
+                // the same time the turtle waits, whatever the tempo. A box can hold
+                // the seconds as text, so read them as a number for both.
+                const seconds = Number(args[0]);
                 tur.singer.previousTurtleTime = tur.singer.turtleTime;
-                tur.singer.turtleTime += args[0];
-                tur.doWait(args[0]);
+                tur.singer.turtleTime += seconds;
+                tur.doWait(seconds);
             }
         }
     }

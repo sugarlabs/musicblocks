@@ -669,6 +669,23 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
         }
     );
 
+    // A missing input reaches flow() as null; logo.parseArg has already reported it.
+    test.each([
+        ["seconds given as text", "1.5", 1.5],
+        ["zero seconds", 0, 0],
+        ["a missing input", null, 0]
+    ])("real WaitBlock flow() handles %s", (_label, seconds, expected) => {
+        const tur = {
+            singer: { bpm: [], turtleTime: 2, previousTurtleTime: 0 },
+            doWait: jest.fn()
+        };
+        activity.turtles.ithTurtle.mockReturnValueOnce(tur);
+        instances["WaitBlock"].flow([seconds], logo, turtle, blk);
+        expect(tur.doWait).toHaveBeenCalledWith(expected);
+        expect(tur.singer.previousTurtleTime).toBe(2);
+        expect(tur.singer.turtleTime).toBe(2 + expected);
+    });
+
     test("real save blocks are shown in the palette", () => {
         ["SaveABCBlock", "SaveLilypondBlock", "SaveSVGBlock", "SaveMxmlBlock"].forEach(name => {
             expect(instances[name].hidden).toBeFalsy();
