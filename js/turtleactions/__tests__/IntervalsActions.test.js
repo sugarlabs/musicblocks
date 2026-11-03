@@ -809,7 +809,7 @@ describe("setupIntervalsActions", () => {
     test("setScalarInterval dispatches to setDispatchBlock when blk is registered", () => {
         activity.blocks.blockList.blk = {};
         Singer.IntervalsActions.setScalarInterval(2, 0, "blk");
-        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_interval_0");
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_interval_0_blk");
     });
 
     test("setScalarInterval does not dispatch when blk is not registered", () => {
@@ -841,7 +841,7 @@ describe("setupIntervalsActions", () => {
 
         Singer.IntervalsActions.setScalarInterval(2, 0, undefined);
 
-        expect(mockMouse.MB.listeners).toContain("_interval_0");
+        expect(mockMouse.MB.listeners).toContain("_interval_0_undefined");
     });
 
     test("setChordInterval push + pop", () => {
@@ -885,7 +885,7 @@ describe("setupIntervalsActions", () => {
     test("setChordInterval dispatches to setDispatchBlock when blk is registered", () => {
         activity.blocks.blockList.blk = {};
         Singer.IntervalsActions.setChordInterval([1, 0], 0, "blk");
-        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_chord_interval_0");
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_chord_interval_0_blk");
     });
 
     test("setChordInterval MusicBlocks.isRun adds to mouse listeners", () => {
@@ -895,7 +895,7 @@ describe("setupIntervalsActions", () => {
 
         Singer.IntervalsActions.setChordInterval([2, 1], 0, undefined);
 
-        expect(mockMouse.MB.listeners).toContain("_chord_interval_0");
+        expect(mockMouse.MB.listeners).toContain("_chord_interval_0_undefined");
     });
 
     test("setSemitoneInterval zero ignored", () => {
@@ -958,7 +958,7 @@ describe("setupIntervalsActions", () => {
     test("setSemitoneInterval dispatches to setDispatchBlock when blk is registered", () => {
         activity.blocks.blockList.blk = {};
         Singer.IntervalsActions.setSemitoneInterval(2, 0, "blk");
-        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_semitone_interval_0");
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_semitone_interval_0_blk");
     });
 
     test("setSemitoneInterval MusicBlocks.isRun adds to mouse listeners", () => {
@@ -968,7 +968,7 @@ describe("setupIntervalsActions", () => {
 
         Singer.IntervalsActions.setSemitoneInterval(3, 0, undefined);
 
-        expect(mockMouse.MB.listeners).toContain("_semitone_interval_0");
+        expect(mockMouse.MB.listeners).toContain("_semitone_interval_0_undefined");
     });
 
     test("setRatioInterval push + pop", () => {
@@ -1019,7 +1019,7 @@ describe("setupIntervalsActions", () => {
     test("setRatioInterval dispatches to setDispatchBlock when blk is registered", () => {
         activity.blocks.blockList.blk = {};
         Singer.IntervalsActions.setRatioInterval(1.5, 0, "blk");
-        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_ratio_interval_0");
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("blk", 0, "_ratio_interval_0_blk");
     });
 
     test("setRatioInterval MusicBlocks.isRun adds to mouse listeners", () => {
@@ -1029,7 +1029,7 @@ describe("setupIntervalsActions", () => {
 
         Singer.IntervalsActions.setRatioInterval(2.0, 0, undefined);
 
-        expect(mockMouse.MB.listeners).toContain("_ratio_interval_0");
+        expect(mockMouse.MB.listeners).toContain("_ratio_interval_0_undefined");
     });
 
     test("defineMode success path", () => {
@@ -1417,6 +1417,118 @@ describe("setupIntervalsActions", () => {
         test("falls back to 12 when no temperament is set", () => {
             logo.synth.inTemperament = undefined;
             expect(Singer.IntervalsActions.getTemperamentLength()).toBe(12);
+        });
+    });
+
+    describe("nested clamp isolation", () => {
+        let callbacks;
+
+        beforeEach(() => {
+            callbacks = {};
+            logo.setTurtleListener.mockImplementation((t, name, cb) => {
+                callbacks[name] = cb;
+            });
+        });
+
+        test("nested setScalarInterval blocks have isolated listeners and pop in order", () => {
+            Singer.IntervalsActions.setScalarInterval(3, 0, 1);
+            Singer.IntervalsActions.setScalarInterval(5, 0, 2);
+            expect(turtle.singer.intervals).toEqual([3, 5]);
+
+            callbacks["_interval_0_2"]();
+            expect(turtle.singer.intervals).toEqual([3]);
+
+            callbacks["_interval_0_1"]();
+            expect(turtle.singer.intervals).toEqual([]);
+        });
+
+        test("nested setChordInterval blocks have isolated listeners and pop in order", () => {
+            Singer.IntervalsActions.setChordInterval([3, 0], 0, 1);
+            Singer.IntervalsActions.setChordInterval([5, 1], 0, 2);
+            expect(turtle.singer.chordIntervals).toEqual([
+                [3, 0],
+                [5, 1]
+            ]);
+
+            callbacks["_chord_interval_0_2"]();
+            expect(turtle.singer.chordIntervals).toEqual([[3, 0]]);
+
+            callbacks["_chord_interval_0_1"]();
+            expect(turtle.singer.chordIntervals).toEqual([]);
+        });
+
+        test("nested setSemitoneInterval blocks have isolated listeners and pop in order", () => {
+            Singer.IntervalsActions.setSemitoneInterval(4, 0, 1);
+            Singer.IntervalsActions.setSemitoneInterval(7, 0, 2);
+            expect(turtle.singer.semitoneIntervals).toEqual([
+                [4, 1],
+                [7, 0]
+            ]);
+
+            callbacks["_semitone_interval_0_2"]();
+            expect(turtle.singer.semitoneIntervals).toEqual([[4, 1]]);
+
+            callbacks["_semitone_interval_0_1"]();
+            expect(turtle.singer.semitoneIntervals).toEqual([]);
+        });
+
+        test("nested setRatioInterval blocks have isolated listeners and pop in order", () => {
+            Singer.IntervalsActions.setRatioInterval(1.5, 0, 1);
+            Singer.IntervalsActions.setRatioInterval(2.0, 0, 2);
+            expect(turtle.singer.ratioIntervals).toEqual([1.5, 2.0]);
+
+            callbacks["_ratio_interval_0_2"]();
+            expect(turtle.singer.ratioIntervals).toEqual([1.5]);
+
+            callbacks["_ratio_interval_0_1"]();
+            expect(turtle.singer.ratioIntervals).toEqual([]);
+        });
+    });
+
+    describe("nested clamp isolation (real setTurtleListener)", () => {
+        beforeEach(() => {
+            turtle.listeners = {};
+            activity.stage = {
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn()
+            };
+            activity.logo.stage = activity.stage;
+            activity.logo.turtles = activity.turtles;
+            activity.logo.setTurtleListener = (t, name, cb) => {
+                const tur = activity.turtles.ithTurtle(t);
+                if (name in tur.listeners) {
+                    activity.stage.removeEventListener(name, tur.listeners[name], false);
+                }
+                tur.listeners[name] = cb;
+                activity.stage.addEventListener(name, cb, false);
+            };
+        });
+
+        test("nested clamps register distinct listeners so inner clamp does not overwrite outer clamp on stage", () => {
+            Singer.IntervalsActions.setScalarInterval(3, 0, 1);
+            expect(activity.stage.addEventListener).toHaveBeenCalledWith(
+                "_interval_0_1",
+                expect.any(Function),
+                false
+            );
+
+            Singer.IntervalsActions.setScalarInterval(5, 0, 2);
+            expect(activity.stage.addEventListener).toHaveBeenCalledWith(
+                "_interval_0_2",
+                expect.any(Function),
+                false
+            );
+
+            // Outer listener was not overwritten or removed when inner registered
+            expect(activity.stage.removeEventListener).not.toHaveBeenCalled();
+
+            // Inner completes
+            turtle.listeners["_interval_0_2"]();
+            expect(turtle.singer.intervals).toEqual([3]);
+
+            // Outer completes
+            turtle.listeners["_interval_0_1"]();
+            expect(turtle.singer.intervals).toEqual([]);
         });
     });
 });
