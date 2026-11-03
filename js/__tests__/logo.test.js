@@ -1363,7 +1363,7 @@ describe("Logo doStopTurtles", () => {
         expect(turtle.endOfClampSignals).toEqual({});
     });
 
-    test("full Stop-to-new-Tie lifecycle resets tie state and allows clean independent restart", () => {
+    test("Stop resets pending tie state, clamp signals, and tie listeners", () => {
         // 1. Turtle in middle of outer tie with pending note state
         turtle.singer.tie = true;
         turtle.singer.tieCarryOver = 4;
@@ -1391,31 +1391,6 @@ describe("Logo doStopTurtles", () => {
             mockListener,
             false
         );
-
-        // 4. Start another Tie independently (block 30)
-        turtle.singer.tie = true;
-        turtle.singer.tieCarryOver = 0;
-        turtle.endOfClampSignals[30] = ["_tie_0"];
-        const newListener = jest.fn();
-        turtle.listeners._tie_0 = newListener;
-
-        // 5. Accumulate notes in the new Tie
-        turtle.singer.tieCarryOver = 4;
-        turtle.singer.tieNotePitches = [["E", 4, 0, 329.63]];
-
-        expect(turtle.singer.tie).toBe(true);
-        expect(turtle.singer.tieCarryOver).toBe(4);
-        expect(turtle.singer.tieNotePitches).toEqual([["E", 4, 0, 329.63]]);
-
-        // 6. Complete the new Tie via its cleanup listener
-        turtle.singer.tie = false;
-        turtle.singer.tieCarryOver = 0;
-        turtle.singer.tieNotePitches = [];
-        delete turtle.listeners._tie_0;
-
-        expect(turtle.singer.tie).toBe(false);
-        expect(turtle.singer.tieCarryOver).toBe(0);
-        expect(turtle.singer.tieNotePitches).toEqual([]);
     });
 
     test("unhighlights all blocks on stop when blocks are visible", () => {
