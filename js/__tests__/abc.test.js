@@ -1794,6 +1794,10 @@ describe("processABCNotes - fractional tuplets", () => {
         expect(exportParsed([[["A4"], 1, 0, [27, 1], 16, -1, false, null]])).not.toContain("(");
     });
 
+    it("writes a note of two whole notes as a breve", () => {
+        expect(exportParsed([[["G4"], 1, 0, [1, 0.5], 1, -1, false, null]])).toContain("G32");
+    });
+
     it("leaves a whole tuplet alone", () => {
         const triplet = [["G4"], 1, 0, [3, 0.5], 1, -1, false, null];
         expect(exportParsed([triplet, triplet, triplet])).toContain("(3:2");

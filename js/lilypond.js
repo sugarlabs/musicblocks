@@ -752,7 +752,8 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                         logo.notationNotes[turtle] += ">";
                     }
 
-                    logo.notationNotes[turtle] += obj[NOTATIONDURATION];
+                    logo.notationNotes[turtle] +=
+                        obj[NOTATIONDURATION] === 0.5 ? "\\breve" : obj[NOTATIONDURATION];
                     for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
                         logo.notationNotes[turtle] += ".";
                     }

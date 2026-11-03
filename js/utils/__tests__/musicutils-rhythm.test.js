@@ -61,14 +61,16 @@ describe("musicutils-rhythm", () => {
             expect(plain(2.7).slice(1, 4)).toEqual([4, 1, null]);
         });
 
-        it("replaces a tuplet of one note", () => {
-            expect(plain(0.5)[3]).toBeNull();
+        it("writes a note of two whole notes as a breve", () => {
+            expect(plain(0.5).slice(1, 4)).toEqual([0.5, 0, null]);
         });
 
         it("replaces a tuplet above the exporter's limit", () => {
             expect(plain(625, 32).slice(1, 4)).toEqual([128, 0, null]);
+            expect(plain(9, 9)[3]).toEqual([9, 1]);
             expect(plain(11, 9)[3]).toBeNull();
             expect(plain(11, 32)[3]).toEqual([11, 1]);
+            expect(plain(33, 32)[3]).toBeNull();
         });
 
         it("keeps whole tuplets and everything else as they are", () => {

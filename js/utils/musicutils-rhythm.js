@@ -182,7 +182,8 @@ var plainUnwritableTuplets = (staging, maxCount) =>
         const plainNote = row.slice();
         let closest = Infinity;
         plainNote[NOTATIONTUPLETVALUE] = null;
-        for (const noteValue of POWER2) {
+        // 0.5 is a breve, two whole notes, which a note longer than a whole note can be.
+        for (const noteValue of [0.5, ...POWER2]) {
             for (let dotCount = 0; dotCount < 3; dotCount++) {
                 const dotFactor = 2 - 1 / Math.pow(2, dotCount);
                 const distance = Math.abs(Math.log(noteValue / dotFactor / duration));

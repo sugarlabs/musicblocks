@@ -1277,6 +1277,12 @@ describe("processLilypondNotes - fractional tuplets", () => {
         expect(notes).not.toContain("\\tuplet");
     });
 
+    it("writes a note of two whole notes as a breve", () => {
+        const notes = exportNotes([[["G4"], 1, 0, [1, 0.5], 1, -1, false, null]]);
+        expect(notes).toContain("\\breve");
+        expect(notes).not.toContain("\\tuplet");
+    });
+
     it("leaves a whole tuplet alone", () => {
         const triplet = [["G4"], 1, 0, [3, 1], 2, -1, false, null];
         expect(exportNotes([triplet, triplet, triplet])).toContain("\\tuplet");
