@@ -451,6 +451,7 @@ describe("Boundary visibility", () => {
     it("shows the boundary when a block is off-screen", () => {
         blocks.blockList = [
             {
+                name: "start",
                 trash: false,
                 connections: [null],
                 offScreen: jest.fn().mockReturnValue(true)
@@ -475,6 +476,7 @@ describe("Boundary visibility", () => {
         };
         blocks.blockList = [
             {
+                name: "start",
                 trash: false,
                 connections: [null],
                 offScreen: jest.fn(() => false)
@@ -498,6 +500,7 @@ describe("Boundary visibility", () => {
     it("hides the boundary when all top-level blocks are on-screen", () => {
         blocks.blockList = [
             {
+                name: "start",
                 trash: false,
                 connections: [null],
                 offScreen: jest.fn().mockReturnValue(false)
@@ -509,6 +512,39 @@ describe("Boundary visibility", () => {
         expect(mockActivity.boundary.hide).toHaveBeenCalledTimes(1);
         expect(mockActivity.boundary.show).not.toHaveBeenCalled();
         expect(mockActivity.setHomeContainers).toHaveBeenCalledWith(false);
+        expect(mockActivity.boundary.showBlockHighlights).toHaveBeenCalledWith([]);
+    });
+
+    it("highlights only a stack detached from the main song stack", () => {
+        const getBounds = () => ({ x: 0, y: 0, width: 100, height: 50 });
+        blocks.blockList = [
+            {
+                name: "start",
+                trash: false,
+                connections: [null],
+                container: { x: 10, y: 10, getBounds },
+                offScreen: jest.fn().mockReturnValue(false)
+            },
+            {
+                name: "print",
+                trash: false,
+                connections: [null, 2],
+                container: { x: 200, y: 100, getBounds },
+                offScreen: jest.fn().mockReturnValue(false)
+            },
+            {
+                trash: false,
+                connections: [1],
+                container: { x: 200, y: 160, getBounds },
+                offScreen: jest.fn().mockReturnValue(false)
+            }
+        ];
+
+        blocks.checkBounds();
+
+        expect(mockActivity.boundary.showBlockHighlights).toHaveBeenCalledWith([
+            { x: 196, y: 96, width: 108, height: 118 }
+        ]);
     });
 });
 

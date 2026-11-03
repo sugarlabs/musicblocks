@@ -1958,7 +1958,7 @@ class Blocks {
                             }
                         );
 
-                    if (bounds.left !== Infinity) {
+                    if (block.name !== "start" && bounds.left !== Infinity) {
                         stackRectangles.push({
                             x: bounds.left - 4,
                             y: bounds.top - 4,

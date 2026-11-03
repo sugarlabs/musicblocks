@@ -3632,8 +3632,15 @@ class Block {
             // so off-screen stack siblings remain visible while being dragged
             // into view (avoids "pop-in" on release).
             const group = that.blocks._cachedDragGroup;
-            if (group && group.length > 0) {
+            if (
+                group &&
+                group.length > 0 &&
+                that.connections[0] !== null &&
+                that.connections[0] !== undefined
+            ) {
                 that.blocks._dragActiveGroup = new Set(group);
+            } else {
+                that.blocks._dragActiveGroup = null;
             }
             // Invalidate the top-block cache since a drag may
             // disconnect blocks, changing the topology.
