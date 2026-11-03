@@ -604,8 +604,9 @@ describe("createSharePopup()", () => {
         const items = popup.children;
         expect(items.length).toBe(1);
         expect(items[0].textContent).toBe("Export ABC");
-        expect(items[0].getAttribute("role")).toBe("button");
+        expect(items[0].getAttribute("role")).toBe("menuitem");
         expect(items[0].getAttribute("tabindex")).toBe("0");
+        expect(popup.getAttribute("role")).toBe("menu");
     });
 
     it("toggles closed when called again with the same popup ID", () => {
@@ -680,9 +681,37 @@ describe("createSharePopup()", () => {
         });
     });
 
-    it("does not execute handler on unrelated keys like Escape or Tab", () => {
+    it("does not execute handler on non-activation character keys", () => {
         const itemHandler = jest.fn();
         const popup = createSharePopup("unrelatedKeyTest", [["Action", itemHandler]], anchor);
+        const item = popup.children[0];
+
+        const event = {
+            key: "a",
+            preventDefault: jest.fn()
+        };
+        item.onkeydown(event);
+
+        expect(event.preventDefault).not.toHaveBeenCalled();
+        expect(itemHandler).not.toHaveBeenCalled();
+        expect(document.getElementById("unrelatedKeyTest")).not.toBeNull();
+    });
+
+    it("closes popup, prevents default, and restores focus to anchor on Escape keydown", () => {
+        const mockAnchor = {
+            getBoundingClientRect: () => ({ left: 50, bottom: 100 }),
+            focus: jest.fn(),
+            setAttribute: jest.fn()
+        };
+        const itemHandler = jest.fn();
+        const popup = createSharePopup(
+            "escapeKeyTest",
+            [
+                ["Action 1", itemHandler],
+                ["Action 2", jest.fn()]
+            ],
+            mockAnchor
+        );
         const item = popup.children[0];
 
         const event = {
@@ -691,9 +720,112 @@ describe("createSharePopup()", () => {
         };
         item.onkeydown(event);
 
-        expect(event.preventDefault).not.toHaveBeenCalled();
+        expect(event.preventDefault).toHaveBeenCalled();
         expect(itemHandler).not.toHaveBeenCalled();
-        expect(document.getElementById("unrelatedKeyTest")).not.toBeNull();
+        expect(document.getElementById("escapeKeyTest")).toBeNull();
+        expect(mockAnchor.focus).toHaveBeenCalledTimes(1);
+        expect(mockAnchor.setAttribute).toHaveBeenCalledWith("aria-expanded", "false");
+    });
+
+    it("closes popup when document receives Escape keydown", () => {
+        const mockAnchor = {
+            getBoundingClientRect: () => ({ left: 50, bottom: 100 }),
+            focus: jest.fn(),
+            setAttribute: jest.fn()
+        };
+        createSharePopup("docEscapeTest", [["Item", jest.fn()]], mockAnchor);
+        expect(document.getElementById("docEscapeTest")).not.toBeNull();
+
+        const escapeEvent = new KeyboardEvent("keydown", { key: "Escape", bubbles: true });
+        document.dispatchEvent(escapeEvent);
+
+        expect(document.getElementById("docEscapeTest")).toBeNull();
+        expect(mockAnchor.focus).toHaveBeenCalledTimes(1);
+    });
+
+    it("cycles focus through items with ArrowDown and wraps to first item", () => {
+        const item1 = ["Option 1", jest.fn()];
+        const item2 = ["Option 2", jest.fn()];
+        const item3 = ["Option 3", jest.fn()];
+        const popup = createSharePopup("arrowDownTest", [item1, item2, item3], anchor);
+
+        const items = popup.children;
+        items[0].focus = jest.fn();
+        items[1].focus = jest.fn();
+        items[2].focus = jest.fn();
+
+        const event1 = { key: "ArrowDown", preventDefault: jest.fn() };
+        items[0].onkeydown(event1);
+        expect(event1.preventDefault).toHaveBeenCalled();
+        expect(items[1].focus).toHaveBeenCalled();
+
+        const event2 = { key: "ArrowDown", preventDefault: jest.fn() };
+        items[2].onkeydown(event2);
+        expect(event2.preventDefault).toHaveBeenCalled();
+        expect(items[0].focus).toHaveBeenCalled();
+    });
+
+    it("cycles focus through items with ArrowUp and wraps to last item", () => {
+        const item1 = ["Option 1", jest.fn()];
+        const item2 = ["Option 2", jest.fn()];
+        const item3 = ["Option 3", jest.fn()];
+        const popup = createSharePopup("arrowUpTest", [item1, item2, item3], anchor);
+
+        const items = popup.children;
+        items[0].focus = jest.fn();
+        items[1].focus = jest.fn();
+        items[2].focus = jest.fn();
+
+        const event1 = { key: "ArrowUp", preventDefault: jest.fn() };
+        items[0].onkeydown(event1);
+        expect(event1.preventDefault).toHaveBeenCalled();
+        expect(items[2].focus).toHaveBeenCalled();
+
+        const event2 = { key: "ArrowUp", preventDefault: jest.fn() };
+        items[2].onkeydown(event2);
+        expect(event2.preventDefault).toHaveBeenCalled();
+        expect(items[1].focus).toHaveBeenCalled();
+    });
+
+    it("moves focus to first item on Home and last item on End", () => {
+        const popup = createSharePopup(
+            "homeEndTest",
+            [
+                ["A", jest.fn()],
+                ["B", jest.fn()],
+                ["C", jest.fn()]
+            ],
+            anchor
+        );
+        const items = popup.children;
+        items[0].focus = jest.fn();
+        items[2].focus = jest.fn();
+
+        const homeEvent = { key: "Home", preventDefault: jest.fn() };
+        items[1].onkeydown(homeEvent);
+        expect(homeEvent.preventDefault).toHaveBeenCalled();
+        expect(items[0].focus).toHaveBeenCalled();
+
+        const endEvent = { key: "End", preventDefault: jest.fn() };
+        items[0].onkeydown(endEvent);
+        expect(endEvent.preventDefault).toHaveBeenCalled();
+        expect(items[2].focus).toHaveBeenCalled();
+    });
+
+    it("toggles aria-haspopup and aria-expanded on anchor when opening and closing", () => {
+        const mockAnchor = {
+            getBoundingClientRect: () => ({ left: 20, bottom: 40 }),
+            setAttribute: jest.fn(),
+            getAttribute: jest.fn().mockReturnValue("Share Options")
+        };
+
+        const popup = createSharePopup("ariaTest", [["Download", jest.fn()]], mockAnchor);
+        expect(mockAnchor.setAttribute).toHaveBeenCalledWith("aria-haspopup", "menu");
+        expect(mockAnchor.setAttribute).toHaveBeenCalledWith("aria-expanded", "true");
+        expect(popup.getAttribute("aria-label")).toBe("Share Options");
+
+        popup._cleanup(false);
+        expect(mockAnchor.setAttribute).toHaveBeenCalledWith("aria-expanded", "false");
     });
 
     it("closes popup when clicking outside the popup", () => {
