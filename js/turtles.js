@@ -690,6 +690,8 @@ Turtles.TurtlesView = class {
 
         this._locked = false; // whether the canvas is locked
         this._queue = []; // temporarily stores [w, h, scale]
+        this._boundaryBuildId = 0; // generation counter to invalidate superseded builds
+        this._resizeTimeout = null; // debounce timer for canvas resize boundary rebuilds
 
         this.currentGrid = null; // currently selected grid
 
@@ -764,6 +766,7 @@ Turtles.TurtlesView = class {
         if (this._locked) {
             this._queue = [w, h, scale];
         } else {
+            this._queue = [];
             this._scale = scale;
             this._w = w / scale;
             this._h = h / scale;
@@ -1055,6 +1058,9 @@ Turtles.TurtlesView = class {
                 this._w - 10 - 3 * 55,
                 getTopButtonY()
             );
+            if (this.gridButton !== null) {
+                this.gridButton.style.visibility = this._isShrunk ? "hidden" : "visible";
+            }
             const that = this;
             this.gridButton.onclick = () => {
                 piemenuGrid(that.activity);
@@ -1093,6 +1099,9 @@ Turtles.TurtlesView = class {
                 this._w - 55,
                 getTopButtonY()
             );
+            if (this._collapseButton !== null) {
+                this._collapseButton.style.visibility = this._isShrunk ? "hidden" : "visible";
+            }
 
             this._collapseButton.onclick = () => {
                 __hideAuxToolbar();
@@ -1148,7 +1157,7 @@ Turtles.TurtlesView = class {
                 getTopButtonY()
             );
             if (this._expandButton !== null) {
-                this._expandButton.style.visibility = "hidden";
+                this._expandButton.style.visibility = this._isShrunk ? "visible" : "hidden";
             }
 
             this._expandButton.onclick = () => {
@@ -1250,6 +1259,11 @@ Turtles.TurtlesView = class {
                     });
                 });
             this._locked = false;
+            if (this._queue && this._queue.length === 3 && typeof this.doScale === "function") {
+                const [w, h, scale] = this._queue;
+                this._queue = [];
+                this.doScale(w, h, scale);
+            }
         };
 
         /**
@@ -1271,10 +1285,16 @@ Turtles.TurtlesView = class {
             this.activity.refreshCanvas();
         };
 
-        const __makeBoundary2 = () => {
+        const __makeBoundary2 = buildId => {
             const img = new Image();
             img.onload = () => {
+                if (buildId !== this._boundaryBuildId) {
+                    return;
+                }
                 if (this._collapsedBoundary !== null) {
+                    if (typeof borderContainer.removeChild === "function") {
+                        borderContainer.removeChild(this._collapsedBoundary);
+                    }
                     this._collapsedBoundary.visible = false;
                 }
 
@@ -1282,7 +1302,16 @@ Turtles.TurtlesView = class {
                 this._collapsedBoundary.x = 0;
                 this._collapsedBoundary.y = 55 + LEADING;
                 borderContainer.addChild(this._collapsedBoundary);
-                this._collapsedBoundary.visible = false;
+                this._collapsedBoundary.visible = this._isShrunk;
+                if (
+                    this._expandedBoundary !== null &&
+                    borderContainer.children &&
+                    borderContainer.children.indexOf(this._expandedBoundary) === -1
+                ) {
+                    borderContainer.addChild(this._expandedBoundary);
+                    this._expandedBoundary.visible = !this._isShrunk;
+                }
+                __makeAllButtons();
             };
 
             const dx = this._w - 20;
@@ -1302,7 +1331,6 @@ Turtles.TurtlesView = class {
                             .replace("STROKE", 20)
                     )
                 );
-            __makeAllButtons();
         };
         // Call the __makeBoundary2 function once the document is loaded
         /**
@@ -1311,17 +1339,25 @@ Turtles.TurtlesView = class {
          */
         const __makeBoundary = () => {
             this._locked = true;
+            const currentBuildId = (this._boundaryBuildId = (this._boundaryBuildId || 0) + 1);
             const img = new Image();
             img.onload = () => {
+                if (currentBuildId !== this._boundaryBuildId) {
+                    return;
+                }
                 if (this._expandedBoundary !== null) {
+                    if (typeof borderContainer.removeChild === "function") {
+                        borderContainer.removeChild(this._expandedBoundary);
+                    }
                     this._expandedBoundary.visible = false;
                 }
 
                 this._expandedBoundary = new createjs.Bitmap(img);
                 this._expandedBoundary.x = 0;
                 this._expandedBoundary.y = 55 + LEADING;
+                this._expandedBoundary.visible = !this._isShrunk;
                 borderContainer.addChild(this._expandedBoundary);
-                __makeBoundary2();
+                __makeBoundary2(currentBuildId);
             };
 
             const dx = this._w - 5;
@@ -1347,32 +1383,42 @@ Turtles.TurtlesView = class {
             __makeBoundary();
         }
 
-        // Debounce or throttle the resize event based on device capability
-        let resizeTimeout;
+        // Debounce expensive boundary and button rebuilds during resize
+        // to prevent DOM layout thrashing and tooltip teardown on every frame.
+        if (this._resizeTimeout) {
+            clearTimeout(this._resizeTimeout);
+            this._resizeTimeout = null;
+        }
         let ticking = false;
 
         const resizeHandler = () => {
-            const isHighEndDevice =
-                navigator.hardwareConcurrency && navigator.hardwareConcurrency >= 4;
+            const scheduleRaf =
+                typeof window !== "undefined" && typeof window.requestAnimationFrame === "function"
+                    ? window.requestAnimationFrame
+                    : typeof requestAnimationFrame === "function"
+                      ? requestAnimationFrame
+                      : null;
 
-            if (isHighEndDevice) {
+            if (scheduleRaf) {
                 if (!ticking) {
-                    window.requestAnimationFrame(() => {
+                    scheduleRaf(() => {
                         handleCanvasResize();
-                        __makeBoundary();
-                        __makeBoundary2();
                         ticking = false;
                     });
                     ticking = true;
                 }
             } else {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(() => {
-                    handleCanvasResize();
-                    __makeBoundary();
-                    __makeBoundary2();
-                }, 150); // Wait 150ms after the last resize event to execute
+                handleCanvasResize();
             }
+
+            if (this._resizeTimeout) {
+                clearTimeout(this._resizeTimeout);
+            }
+            this._resizeTimeout = setTimeout(() => {
+                this._resizeTimeout = null;
+                handleCanvasResize();
+                __makeBoundary();
+            }, 150); // Wait 150ms after the last resize event to execute
         };
 
         if (this._resizeHandler) {
