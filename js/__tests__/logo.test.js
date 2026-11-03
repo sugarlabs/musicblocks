@@ -1342,6 +1342,57 @@ describe("Logo doStopTurtles", () => {
         expect(turtle.singer._unhighlightTimers).toEqual({});
     });
 
+    test("resets tie state and pending carryover on turtle.singer and clears endOfClampSignals on stop", () => {
+        turtle.singer = {
+            _unhighlightTimers: {},
+            tie: true,
+            tieCarryOver: 4,
+            tieNotePitches: [["C", 4, 0, 261.63]],
+            tieNoteExtras: [5, ["sine"], 1, [1], [], undefined, false, 4],
+            tieFirstDrums: ["snare"]
+        };
+        turtle.endOfClampSignals = { 5: ["_tie_0"] };
+
+        logo.doStopTurtles();
+
+        expect(turtle.singer.tie).toBe(false);
+        expect(turtle.singer.tieCarryOver).toBe(0);
+        expect(turtle.singer.tieNotePitches).toEqual([]);
+        expect(turtle.singer.tieNoteExtras).toEqual([]);
+        expect(turtle.singer.tieFirstDrums).toEqual([]);
+        expect(turtle.endOfClampSignals).toEqual({});
+    });
+
+    test("Stop resets pending tie state, clamp signals, and tie listeners", () => {
+        // 1. Turtle in middle of outer tie with pending note state
+        turtle.singer.tie = true;
+        turtle.singer.tieCarryOver = 4;
+        turtle.singer.tieNotePitches = [["C", 4, 0, 261.63]];
+        turtle.singer.tieNoteExtras = [5, ["sine"], 1, [1], [], undefined, false, 4];
+        turtle.singer.tieFirstDrums = ["snare"];
+        turtle.endOfClampSignals = { 10: ["_tie_0"] };
+
+        const mockListener = jest.fn();
+        turtle.listeners = { _tie_0: mockListener };
+
+        // 2. Stop using real Logo.prototype.doStopTurtles
+        logo.doStopTurtles();
+
+        // 3. Verify all tie state has been reset to clean defaults
+        expect(turtle.singer.tie).toBe(false);
+        expect(turtle.singer.tieCarryOver).toBe(0);
+        expect(turtle.singer.tieNotePitches).toEqual([]);
+        expect(turtle.singer.tieNoteExtras).toEqual([]);
+        expect(turtle.singer.tieFirstDrums).toEqual([]);
+        expect(turtle.endOfClampSignals).toEqual({});
+        expect(turtle.listeners).toEqual({});
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "_tie_0",
+            mockListener,
+            false
+        );
+    });
+
     test("unhighlights all blocks on stop when blocks are visible", () => {
         mockActivity.blocks.visible = true;
         mockActivity.blocks.unhighlightAll = jest.fn();
@@ -1390,6 +1441,582 @@ describe("Logo doStopTurtles", () => {
             false
         );
         expect(turtle.listeners).toEqual({ clickListener: persistentListener });
+    });
+
+    test("clears endOfClampSignals across representative non-Tie clamp actions (intervals, volume, articulation) on stop", () => {
+        const intervalListener = jest.fn();
+        const volumeListener = jest.fn();
+        const articulationListener = jest.fn();
+
+        turtle.listeners = {
+            _interval_0: intervalListener,
+            _volume_0: volumeListener,
+            _articulation_0_20: articulationListener
+        };
+        turtle.endOfClampSignals = {
+            10: ["_interval_0"],
+            20: ["_volume_0", "_articulation_0_20"]
+        };
+
+        logo.doStopTurtles();
+
+        // Stale listeners removed from stage
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "_interval_0",
+            intervalListener,
+            false
+        );
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "_volume_0",
+            volumeListener,
+            false
+        );
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "_articulation_0_20",
+            articulationListener,
+            false
+        );
+        expect(turtle.listeners).toEqual({});
+
+        // All pending clamp signals purged on stop
+        expect(turtle.endOfClampSignals).toEqual({});
+
+        // Stale signals cannot be dispatched later by dispatchUnissuedSignals
+        mockActivity.stage.dispatchEvent.mockClear();
+        logo.dispatchUnissuedSignals(turtle);
+        expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalled();
+    });
+
+    test("normal clamp completion preserves dispatchUnissuedSignals and cleans up normally", () => {
+        turtle.endOfClampSignals = { 10: ["_interval_0"] };
+        turtle.butNotThese = {};
+        turtle.singer = { runningFromEvent: false };
+
+        logo.dispatchUnissuedSignals(turtle);
+
+        expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_interval_0");
+        expect(turtle.endOfClampSignals[10][0]).toBeNull();
+    });
+
+    test("dispatchUnissuedSignals defers dispatching while turtle is running from event", () => {
+        turtle.endOfClampSignals = { 10: ["_tie_0"] };
+        turtle.butNotThese = {};
+        turtle.singer = { runningFromEvent: true };
+
+        logo.dispatchUnissuedSignals(turtle);
+
+        expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalled();
+        expect(turtle.endOfClampSignals[10][0]).toBe("_tie_0");
+    });
+
+    test("event completion path dispatches deferred clamp signals once runningFromEvent is cleared via production runFromBlockNow", () => {
+        const scheduledTimeouts = [];
+        jest.spyOn(logo._timerManager, "setTimeout").mockImplementation(cb => {
+            scheduledTimeouts.push(cb);
+            return scheduledTimeouts.length;
+        });
+
+        turtle.endOfClampSignals = { 10: ["_tie_0"] };
+        turtle.butNotThese = {};
+        turtle.queue = [];
+        turtle.parentFlowQueue = [];
+        turtle.running = true;
+        turtle.singer.runningFromEvent = true;
+        turtle.singer.suppressOutput = false;
+        turtle.singer.justCounting = [];
+        logo.turtles.running = jest.fn().mockReturnValue(false);
+        logo.turtles.turtleList = [turtle];
+        logo.turtles.getTurtleCount = () => 1;
+        logo.turtles.getTurtle = () => turtle;
+        logo.turtles.ithTurtle = () => turtle;
+        logo._cleanupAfterCompletion = jest.fn();
+        logo.blockList = [makeFlowBlock("print")];
+
+        // 1. Run through production Logo.prototype.runFromBlockNow on terminal block (0)
+        logo.runFromBlockNow(logo, 0, 0, 0, null, 0);
+
+        // dispatchUnissuedSignals was called during runFromBlockNow, but deferred because runningFromEvent is true
+        expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalled();
+        expect(turtle.endOfClampSignals[10]).toEqual(["_tie_0"]);
+
+        // First timer scheduled is __checkCompletionState (100ms)
+        expect(scheduledTimeouts.length).toBeGreaterThanOrEqual(1);
+        const checkCompletionState = scheduledTimeouts[0];
+        checkCompletionState();
+
+        // checkCompletionState scheduled _lastNoteTimeout (1000ms)
+        expect(scheduledTimeouts.length).toBeGreaterThanOrEqual(2);
+        const lastNoteCallback = scheduledTimeouts[1];
+
+        // 2. Fire the production _lastNoteTimeout callback
+        lastNoteCallback();
+
+        // Verified: runningFromEvent cleared and deferred clamp signals dispatched through production path
+        expect(turtle.singer.runningFromEvent).toBe(false);
+        expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_tie_0");
+        expect(turtle.endOfClampSignals[10][0]).toBeNull();
+        expect(logo._cleanupAfterCompletion).toHaveBeenCalled();
+    });
+
+    test("clears runningFromEvent and dispatches deferred signals for all finished turtles on event completion", () => {
+        const scheduledTimeouts = [];
+        jest.spyOn(logo._timerManager, "setTimeout").mockImplementation(cb => {
+            scheduledTimeouts.push(cb);
+            return scheduledTimeouts.length;
+        });
+
+        const turtle2 = createMockTurtle();
+        turtle2.singer.runningFromEvent = true;
+        turtle2.singer.suppressOutput = false;
+        turtle2.singer.justCounting = [];
+        turtle2.endOfClampSignals = { 20: ["_tie_1"] };
+        turtle2.butNotThese = {};
+        turtle2.queue = [];
+        turtle2.parentFlowQueue = [];
+        turtle2.running = false;
+
+        turtle.endOfClampSignals = { 10: ["_tie_0"] };
+        turtle.butNotThese = {};
+        turtle.queue = [];
+        turtle.parentFlowQueue = [];
+        turtle.running = true;
+        turtle.singer.runningFromEvent = true;
+        turtle.singer.suppressOutput = false;
+        turtle.singer.justCounting = [];
+
+        logo.turtles.turtleList = [turtle, turtle2];
+        logo.turtles.running = jest.fn().mockReturnValue(false);
+        logo.turtles.getTurtle = i => (i === 0 ? turtle : turtle2);
+        logo.turtles.ithTurtle = i => (i === 0 ? turtle : turtle2);
+        logo.turtles.getTurtleCount = () => 2;
+        logo._cleanupAfterCompletion = jest.fn();
+        logo.blockList = [makeFlowBlock("print")];
+
+        logo.runFromBlockNow(logo, 0, 0, 0, null, 0);
+
+        // Run check completion, then last note timeout
+        scheduledTimeouts[0]();
+        scheduledTimeouts[1]();
+
+        expect(turtle.singer.runningFromEvent).toBe(false);
+        expect(turtle2.singer.runningFromEvent).toBe(false);
+        expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_tie_0");
+        expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_tie_1");
+    });
+
+    test("does not flush signals or clear runningFromEvent if a turtle resumed running before _lastNoteTimeout fires", () => {
+        const scheduledTimeouts = [];
+        jest.spyOn(logo._timerManager, "setTimeout").mockImplementation(cb => {
+            scheduledTimeouts.push(cb);
+            return scheduledTimeouts.length;
+        });
+
+        turtle.endOfClampSignals = { 10: ["_tie_0"] };
+        turtle.butNotThese = {};
+        turtle.queue = [];
+        turtle.parentFlowQueue = [];
+        turtle.running = true;
+        turtle.singer.runningFromEvent = true;
+        turtle.singer.suppressOutput = false;
+        turtle.singer.justCounting = [];
+
+        logo.turtles.running = jest.fn().mockReturnValue(false);
+        logo.turtles.turtleList = [turtle];
+        logo.turtles.getTurtleCount = () => 1;
+        logo.turtles.getTurtle = () => turtle;
+        logo.turtles.ithTurtle = () => turtle;
+        logo._cleanupAfterCompletion = jest.fn();
+        logo.blockList = [makeFlowBlock("print")];
+
+        logo.runFromBlockNow(logo, 0, 0, 0, null, 0);
+
+        // Run __checkCompletionState (100ms) to schedule _lastNoteTimeout
+        scheduledTimeouts[0]();
+
+        // Simulate an event starting or a turtle resuming execution before _lastNoteTimeout fires
+        logo.turtles.running.mockReturnValue(true);
+
+        // Fire _lastNoteTimeout (1000ms)
+        scheduledTimeouts[1]();
+
+        // Must not clear runningFromEvent, must not flush deferred signals, and must not clean up
+        expect(turtle.singer.runningFromEvent).toBe(true);
+        expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalled();
+        expect(turtle.endOfClampSignals[10]).toEqual(["_tie_0"]);
+        expect(logo._cleanupAfterCompletion).not.toHaveBeenCalled();
+    });
+
+    test("asynchronous multi-turtle completion: Turtle A defers signals while Turtle B is active, both flush when Turtle B finishes", () => {
+        const scheduledTimeouts = [];
+        jest.spyOn(logo._timerManager, "setTimeout").mockImplementation(cb => {
+            scheduledTimeouts.push(cb);
+            return scheduledTimeouts.length;
+        });
+
+        const turtleB = createMockTurtle();
+        turtleB.singer.runningFromEvent = true;
+        turtleB.endOfClampSignals = { 20: ["_tie_1"] };
+        turtleB.running = true;
+
+        turtle.endOfClampSignals = { 10: ["_tie_0"] };
+        turtle.singer.runningFromEvent = true;
+        turtle.running = false; // Turtle A has finished
+
+        let bIsRunning = true;
+        logo.turtles.running = jest.fn(() => bIsRunning);
+        logo.turtles.turtleList = [turtle, turtleB];
+        logo.turtles.getTurtleCount = () => 2;
+        logo.turtles.getTurtle = i => (i === 0 ? turtle : turtleB);
+        logo.turtles.ithTurtle = i => (i === 0 ? turtle : turtleB);
+        logo._cleanupAfterCompletion = jest.fn();
+        logo.blockList = [makeFlowBlock("print")];
+
+        // 1. Turtle A calls dispatchUnissuedSignals while runningFromEvent: deferred!
+        logo.dispatchUnissuedSignals(turtle);
+        expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalled();
+        expect(turtle.endOfClampSignals[10]).toEqual(["_tie_0"]);
+
+        // 2. Turtle B completes now:
+        bIsRunning = false;
+        turtleB.running = false;
+
+        // Turtle B triggers terminal flow in runFromBlockNow
+        logo.runFromBlockNow(logo, 1, 0, 0, null, 0);
+
+        // Run __checkCompletionState (100ms)
+        expect(scheduledTimeouts.length).toBeGreaterThanOrEqual(1);
+        scheduledTimeouts[0]();
+
+        // Run _lastNoteTimeout (1000ms)
+        expect(scheduledTimeouts.length).toBeGreaterThanOrEqual(2);
+        scheduledTimeouts[1]();
+
+        // Both turtles' deferred signals must have flushed now that all turtles finished
+        expect(turtle.singer.runningFromEvent).toBe(false);
+        expect(turtleB.singer.runningFromEvent).toBe(false);
+        expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_tie_0");
+        expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_tie_1");
+        expect(turtle.endOfClampSignals[10][0]).toBeNull();
+        expect(turtleB.endOfClampSignals[20][0]).toBeNull();
+        expect(logo._cleanupAfterCompletion).toHaveBeenCalled();
+    });
+
+    test("cancels pending _lastNoteTimeout when a new execution begins via runFromBlockNow", () => {
+        const scheduledTimeouts = [];
+        jest.spyOn(logo._timerManager, "setTimeout").mockImplementation(cb => {
+            scheduledTimeouts.push(cb);
+            return scheduledTimeouts.length;
+        });
+        const clearTimeoutSpy = jest.spyOn(logo._timerManager, "clearTimeout");
+
+        turtle.endOfClampSignals = { 10: ["_tie_0"] };
+        turtle.singer.runningFromEvent = true;
+        turtle.running = true;
+        logo.turtles.running = jest.fn().mockReturnValue(false);
+        logo.turtles.turtleList = [turtle];
+        logo.turtles.ithTurtle = () => turtle;
+        logo.blockList = [makeFlowBlock("print")];
+
+        // Step 1: Run terminal block to schedule completion timers
+        logo.runFromBlockNow(logo, 0, 0, 0, null, 0);
+        scheduledTimeouts[0](); // __checkCompletionState schedules _lastNoteTimeout
+        expect(logo._lastNoteTimeout).not.toBeNull();
+
+        // Step 2: New execution starts before _lastNoteTimeout fires
+        logo.runFromBlockNow(logo, 0, 0, 0, null, 0);
+
+        // Pending timeout was cancelled on entry
+        expect(clearTimeoutSpy).toHaveBeenCalled();
+    });
+
+    test("resets tur.singer.suppressOutput when logo.recording is active on event completion", () => {
+        const scheduledTimeouts = [];
+        jest.spyOn(logo._timerManager, "setTimeout").mockImplementation(cb => {
+            scheduledTimeouts.push(cb);
+            return scheduledTimeouts.length;
+        });
+
+        turtle.endOfClampSignals = { 10: ["_tie_0"] };
+        turtle.butNotThese = {};
+        turtle.queue = [];
+        turtle.parentFlowQueue = [];
+        turtle.running = true;
+        turtle.singer.runningFromEvent = true;
+        turtle.singer.suppressOutput = true;
+        turtle.singer.justCounting = [];
+        logo.recording = true;
+
+        logo.turtles.running = jest.fn().mockReturnValue(false);
+        logo.turtles.turtleList = [turtle];
+        logo.turtles.getTurtleCount = () => 1;
+        logo.turtles.getTurtle = () => turtle;
+        logo.turtles.ithTurtle = () => turtle;
+        logo._cleanupAfterCompletion = jest.fn();
+        logo.blockList = [makeFlowBlock("print")];
+
+        logo.runFromBlockNow(logo, 0, 0, 0, null, 0);
+        scheduledTimeouts[0](); // __checkCompletionState schedules _lastNoteTimeout
+        scheduledTimeouts[1](); // _lastNoteTimeout fires
+
+        expect(turtle.singer.suppressOutput).toBe(false);
+        expect(logo._cleanupAfterCompletion).toHaveBeenCalled();
+    });
+
+    test("cancels previous pending _lastNoteTimeout when a second turtle finishes and schedules completion", () => {
+        const scheduledTimeouts = [];
+        jest.spyOn(logo._timerManager, "setTimeout").mockImplementation(cb => {
+            scheduledTimeouts.push(cb);
+            return scheduledTimeouts.length;
+        });
+        const clearTimeoutSpy = jest.spyOn(logo._timerManager, "clearTimeout");
+
+        const turtle2 = createMockTurtle();
+        turtle2.singer.runningFromEvent = true;
+        turtle2.singer.suppressOutput = false;
+        turtle2.singer.justCounting = [];
+        turtle2.endOfClampSignals = { 20: ["_tie_1"] };
+        turtle2.butNotThese = {};
+        turtle2.queue = [];
+        turtle2.parentFlowQueue = [];
+        turtle2.running = true;
+
+        turtle.endOfClampSignals = { 10: ["_tie_0"] };
+        turtle.butNotThese = {};
+        turtle.queue = [];
+        turtle.parentFlowQueue = [];
+        turtle.running = true;
+        turtle.singer.runningFromEvent = true;
+        turtle.singer.suppressOutput = false;
+        turtle.singer.justCounting = [];
+
+        logo.turtles.turtleList = [turtle, turtle2];
+        logo.turtles.running = jest.fn().mockReturnValue(false);
+        logo.turtles.getTurtle = i => (i === 0 ? turtle : turtle2);
+        logo.turtles.ithTurtle = i => (i === 0 ? turtle : turtle2);
+        logo.turtles.getTurtleCount = () => 2;
+        logo._cleanupAfterCompletion = jest.fn();
+        logo.blockList = [makeFlowBlock("print")];
+
+        // Both turtles finish and queue __checkCompletionState before any timeout runs
+        logo.runFromBlockNow(logo, 0, 0, 0, null, 0);
+        logo.runFromBlockNow(logo, 1, 0, 0, null, 0);
+
+        // First turtle's __checkCompletionState runs -> schedules _lastNoteTimeout
+        scheduledTimeouts[0]();
+        const firstTimeoutId = logo._lastNoteTimeout;
+        expect(firstTimeoutId).not.toBeNull();
+
+        // Second turtle's __checkCompletionState runs while first timeout is active -> cancels it and reschedules
+        scheduledTimeouts[1]();
+        expect(clearTimeoutSpy).toHaveBeenCalledWith(firstTimeoutId);
+    });
+
+    test("aborts signal dispatch and completion cleanup if an event resumed a turtle during the dispatch loop", () => {
+        const scheduledTimeouts = [];
+        jest.spyOn(logo._timerManager, "setTimeout").mockImplementation(cb => {
+            scheduledTimeouts.push(cb);
+            return scheduledTimeouts.length;
+        });
+
+        const turtleB = createMockTurtle();
+        turtleB.singer.runningFromEvent = true;
+        turtleB.endOfClampSignals = { 20: ["_tie_1"] };
+        turtleB.running = false;
+
+        turtle.endOfClampSignals = { 10: ["_tie_0"] };
+        turtle.singer.runningFromEvent = true;
+        turtle.running = false;
+
+        let resumedRunning = false;
+        logo.turtles.running = jest.fn(() => resumedRunning);
+        logo.turtles.turtleList = [turtle, turtleB];
+        logo.turtles.getTurtleCount = () => 2;
+        logo.turtles.getTurtle = i => (i === 0 ? turtle : turtleB);
+        logo.turtles.ithTurtle = i => (i === 0 ? turtle : turtleB);
+        logo._cleanupAfterCompletion = jest.fn();
+        logo.blockList = [makeFlowBlock("print")];
+
+        // Simulate Turtle A's signal triggering an event listener that resumes execution
+        mockActivity.stage.dispatchEvent.mockImplementation(signal => {
+            if (signal === "_tie_0") {
+                resumedRunning = true;
+                turtleB.running = true;
+            }
+        });
+
+        logo.runFromBlockNow(logo, 0, 0, 0, null, 0);
+        scheduledTimeouts[0](); // __checkCompletionState
+        scheduledTimeouts[1](); // _lastNoteTimeout fires
+
+        // Turtle A's signals dispatched
+        expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_tie_0");
+        expect(turtle.singer.runningFromEvent).toBe(false);
+
+        // Resumed flow: Turtle B's deferred signals MUST NOT be dispatched, runningFromEvent kept
+        expect(mockActivity.stage.dispatchEvent).not.toHaveBeenCalledWith("_tie_1");
+        expect(turtleB.singer.runningFromEvent).toBe(true);
+        expect(turtleB.endOfClampSignals[20]).toEqual(["_tie_1"]);
+
+        // Cleanup after completion MUST NOT be called because execution resumed
+        expect(logo._cleanupAfterCompletion).not.toHaveBeenCalled();
+    });
+
+    test("aborts completion cleanup if the last turtle's signal resumes execution", () => {
+        const scheduledTimeouts = [];
+        jest.spyOn(logo._timerManager, "setTimeout").mockImplementation(cb => {
+            scheduledTimeouts.push(cb);
+            return scheduledTimeouts.length;
+        });
+
+        const turtleB = createMockTurtle();
+        turtleB.singer.runningFromEvent = true;
+        turtleB.endOfClampSignals = { 20: ["_tie_1"] };
+        turtleB.running = false;
+
+        turtle.endOfClampSignals = { 10: ["_tie_0"] };
+        turtle.singer.runningFromEvent = true;
+        turtle.running = false;
+
+        let resumedRunning = false;
+        logo.turtles.running = jest.fn(() => resumedRunning);
+        logo.turtles.turtleList = [turtle, turtleB];
+        logo.turtles.getTurtleCount = () => 2;
+        logo.turtles.getTurtle = i => (i === 0 ? turtle : turtleB);
+        logo.turtles.ithTurtle = i => (i === 0 ? turtle : turtleB);
+        logo._cleanupAfterCompletion = jest.fn();
+        logo.blockList = [makeFlowBlock("print")];
+
+        // Simulate the last turtle's signal resuming execution
+        mockActivity.stage.dispatchEvent.mockImplementation(signal => {
+            if (signal === "_tie_1") {
+                resumedRunning = true;
+            }
+        });
+
+        logo.runFromBlockNow(logo, 0, 0, 0, null, 0);
+        scheduledTimeouts[0](); // __checkCompletionState
+        scheduledTimeouts[1](); // _lastNoteTimeout fires
+
+        expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_tie_0");
+        expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_tie_1");
+        expect(turtle.singer.runningFromEvent).toBe(false);
+        expect(turtleB.singer.runningFromEvent).toBe(false);
+
+        // Cleanup after completion MUST NOT be called because execution resumed after the loop
+        expect(logo._cleanupAfterCompletion).not.toHaveBeenCalled();
+    });
+
+    test("multi-turtle cleanup on stop: resets tie state and clamp signals across all turtles", () => {
+        const turtleB = createMockTurtle();
+        turtleB.singer = {
+            _unhighlightTimers: {},
+            tie: true,
+            tieCarryOver: 8,
+            tieNotePitches: [["G", 4, 0, 392.0]],
+            tieNoteExtras: [6, ["sawtooth"], 1, [2], [], undefined, false, 8],
+            tieFirstDrums: ["kick"]
+        };
+        turtleB.endOfClampSignals = { 20: ["_tie_1"] };
+        const mockListenerB = jest.fn();
+        turtleB.listeners = { _tie_1: mockListenerB };
+
+        turtle.singer = {
+            _unhighlightTimers: {},
+            tie: true,
+            tieCarryOver: 4,
+            tieNotePitches: [["C", 4, 0, 261.63]],
+            tieNoteExtras: [5, ["sine"], 1, [1], [], undefined, false, 4],
+            tieFirstDrums: ["snare"]
+        };
+        turtle.endOfClampSignals = { 10: ["_tie_0"] };
+        const mockListenerA = jest.fn();
+        turtle.listeners = { _tie_0: mockListenerA };
+
+        logo.turtles.turtleList = [turtle, turtleB];
+
+        logo.doStopTurtles();
+
+        // Turtle A verified reset
+        expect(turtle.singer.tie).toBe(false);
+        expect(turtle.singer.tieCarryOver).toBe(0);
+        expect(turtle.singer.tieNotePitches).toEqual([]);
+        expect(turtle.singer.tieNoteExtras).toEqual([]);
+        expect(turtle.singer.tieFirstDrums).toEqual([]);
+        expect(turtle.endOfClampSignals).toEqual({});
+        expect(turtle.listeners).toEqual({});
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "_tie_0",
+            mockListenerA,
+            false
+        );
+
+        // Turtle B verified reset
+        expect(turtleB.singer.tie).toBe(false);
+        expect(turtleB.singer.tieCarryOver).toBe(0);
+        expect(turtleB.singer.tieNotePitches).toEqual([]);
+        expect(turtleB.singer.tieNoteExtras).toEqual([]);
+        expect(turtleB.singer.tieFirstDrums).toEqual([]);
+        expect(turtleB.endOfClampSignals).toEqual({});
+        expect(turtleB.listeners).toEqual({});
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "_tie_1",
+            mockListenerB,
+            false
+        );
+    });
+
+    test("setTurtleListener replaces existing listener and detaches previous listener from stage", () => {
+        const oldListener = jest.fn();
+        const newListener = jest.fn();
+
+        logo.setTurtleListener(0, "_tie_0", oldListener);
+        expect(turtle.listeners["_tie_0"]).toBe(oldListener);
+        expect(mockActivity.stage.addEventListener).toHaveBeenCalledWith(
+            "_tie_0",
+            oldListener,
+            false
+        );
+
+        // Replace with new listener under same name
+        logo.setTurtleListener(0, "_tie_0", newListener);
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "_tie_0",
+            oldListener,
+            false
+        );
+        expect(mockActivity.stage.addEventListener).toHaveBeenCalledWith(
+            "_tie_0",
+            newListener,
+            false
+        );
+        expect(turtle.listeners["_tie_0"]).toBe(newListener);
+    });
+
+    test("clearTurtleListeners preserves persistent listeners when flag is true and removes all when false", () => {
+        const standardListener = jest.fn();
+        const persistentListener = jest.fn();
+
+        logo.setTurtleListener(0, "standard", standardListener, false);
+        logo.setTurtleListener(0, "persistent", persistentListener, true);
+
+        // Preserve persistent
+        logo.clearTurtleListeners(true);
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "standard",
+            standardListener,
+            false
+        );
+        expect(turtle.listeners["standard"]).toBeUndefined();
+        expect(turtle.listeners["persistent"]).toBe(persistentListener);
+
+        // Clear all
+        logo.clearTurtleListeners(false);
+        expect(mockActivity.stage.removeEventListener).toHaveBeenCalledWith(
+            "persistent",
+            persistentListener,
+            false
+        );
+        expect(turtle.listeners["persistent"]).toBeUndefined();
     });
 
     describe("with Transport and audio streams", () => {

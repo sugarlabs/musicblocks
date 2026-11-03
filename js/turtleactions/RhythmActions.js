@@ -303,6 +303,13 @@ function setupRhythmActions(activity) {
         static doTie(turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
+            // If a Tie clamp is already active on this turtle, treat the inner Tie
+            // as a non-owning nested scope. Do not wipe the enclosing Tie's pending state,
+            // do not overwrite its cleanup listener, and do not deactivate tie mode on exit.
+            if (tur && tur.singer && tur.singer.tie) {
+                return;
+            }
+
             // Tie notes together in pairs
             tur.singer.tie = true;
             tur.singer.tieNotePitches = [];
