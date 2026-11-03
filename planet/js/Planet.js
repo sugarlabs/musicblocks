@@ -276,11 +276,11 @@ class Planet {
 
                     if (recovered || this.ConnectedToServer) return;
 
-                    const requestId = ++this._manifestRequestId;
-
                     this.ServerInterface.getTagManifest(data => {
-                        if (requestId !== this._manifestRequestId) return;
-                        if (!data || !data.success) return;
+                        if (!data || !data.success || this.ConnectedToServer) return;
+
+                        // Invalidate older responses only after successful recovery.
+                        ++this._manifestRequestId;
 
                         if (!this.LocalPlanet) {
                             this.initPlanets(data);
@@ -474,7 +474,7 @@ class Planet {
         const requestId = ++this._manifestRequestId;
 
         this.ServerInterface.getTagManifest(data => {
-            if (requestId !== this._manifestRequestId) return;
+            if (requestId !== this._manifestRequestId || this.ConnectedToServer) return;
 
             this.initPlanets(data);
         });

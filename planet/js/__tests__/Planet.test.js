@@ -810,7 +810,7 @@ describe("Planet", () => {
         });
 
         it("should recover Global Planet when connectivity is restored", async () => {
-            const recoverFromOffline = jest.fn();
+            const recoverFromOffline = jest.fn().mockReturnValue(true);
             planet.GlobalPlanet = { recoverFromOffline };
 
             await planet.init();
@@ -828,6 +828,21 @@ describe("Planet", () => {
             reconnectCallback();
 
             expect(recoverFromOffline).toHaveBeenCalledTimes(1);
+            expect(mockServerInterface.getTagManifest).toHaveBeenCalledTimes(1);
+        });
+
+        it("does not retry the manifest when Planet is already connected", async () => {
+            planet.GlobalPlanet = {
+                recoverFromOffline: jest.fn().mockReturnValue(false)
+            };
+
+            await planet.init();
+
+            planet.ConnectedToServer = true;
+
+            reconnectCallback();
+
+            expect(mockServerInterface.getTagManifest).toHaveBeenCalledTimes(1);
         });
 
         it("should retry the tag manifest when startup failed before Global Planet initialized", async () => {
@@ -903,6 +918,43 @@ describe("Planet", () => {
 
             // Stale failure must be ignored.
             expect(planet.initPlanets).toHaveBeenCalledTimes(1);
+            expect(planet.ConnectedToServer).toBe(true);
+        });
+
+        it("accepts a pending startup success when the reconnect request fails", async () => {
+            const callbacks = [];
+
+            mockServerInterface.getTagManifest.mockImplementation(callback => {
+                callbacks.push(callback);
+            });
+
+            planet.initPlanets.mockImplementation(data => {
+                planet.ConnectedToServer = data.success;
+                planet.LocalPlanet = {};
+            });
+
+            await planet.init();
+
+            expect(callbacks).toHaveLength(1);
+
+            // Reconnect starts another request.
+            reconnectCallback();
+
+            expect(callbacks).toHaveLength(2);
+
+            // The reconnect request fails first.
+            callbacks[1]({ success: false });
+
+            // The original startup request succeeds later.
+            const manifest = {
+                success: true,
+                data: { music: { TagName: "Music" } }
+            };
+
+            callbacks[0](manifest);
+
+            expect(planet.initPlanets).toHaveBeenCalledTimes(1);
+            expect(planet.initPlanets).toHaveBeenCalledWith(manifest);
             expect(planet.ConnectedToServer).toBe(true);
         });
     });
