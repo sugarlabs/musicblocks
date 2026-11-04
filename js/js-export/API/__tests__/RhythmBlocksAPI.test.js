@@ -172,6 +172,17 @@ describe("RhythmBlocksAPI", () => {
         expect(result).toBe("ENDFLOW");
     });
 
+    test("tie does not end an outer tie when doTie sets up no listener", async () => {
+        const mockFlow = jest.fn();
+        JSInterface.validateArgs.mockReturnValue([mockFlow]);
+        rhythmBlocksAPI.runCommand.mockResolvedValue(false);
+
+        const result = await rhythmBlocksAPI.tie(mockFlow);
+
+        expect(mockFlow).toHaveBeenCalled();
+        expect(result).toBe("ENDFLOW");
+    });
+
     describe("swing with the real argument validation", () => {
         let mockedJSInterface;
 
