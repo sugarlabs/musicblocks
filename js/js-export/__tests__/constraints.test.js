@@ -209,6 +209,7 @@ describe("JSInterface._methodArgConstraints", () => {
 
     it("should validate setKey arguments", () => {
         expect(() => validateConstraints("setKey", ["C", "major"])).not.toThrow();
+        expect(() => validateConstraints("setKey", ["C", "mixolydian"])).not.toThrow();
         expect(() => validateConstraints("setKey", [123, "major"])).toThrow();
         expect(() => validateConstraints("setKey", ["C", "invalid"])).toThrow();
     });
