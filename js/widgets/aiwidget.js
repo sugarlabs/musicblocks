@@ -221,9 +221,23 @@ function AIWidget() {
     this.__save = async function () {
         await ensureABCJS();
         const tunebook = new ABCJS.parseOnly(abcNotationSong);
+        const playableTunes = tunebook.filter(tune =>
+            tune.lines?.some(line =>
+                line.staff?.some(staff =>
+                    staff.voices?.some(voice =>
+                        voice.some(element => element.el_type === "note")
+                    )
+                )
+            )
+        );
+
+        if (playableTunes.length === 0) {
+            this.activity.errorMsg(_("Enter ABC notation containing at least one note."));
+            return;
+        }
 
         // Generate the blocks the way Load project imports an .abc file.
-        await Promise.all(tunebook.map(tune => this.activity.parseABC(tune)));
+        await Promise.all(playableTunes.map(tune => this.activity.parseABC(tune)));
         this.activity.textMsg(_("New start block generated."));
     };
 

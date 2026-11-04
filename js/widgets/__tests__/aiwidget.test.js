@@ -731,13 +731,31 @@ describe("AIWidget Instance", () => {
             aiWidget = new AIWidget();
             mockActivity.parseABC = jest.fn(() => Promise.resolve(null));
             aiWidget.activity = mockActivity;
-            const tunes = [{ lines: [] }, { lines: [] }];
+            const tunes = [
+                { lines: [{ staff: [{ voices: [[{ el_type: "note" }]] }] }] },
+                { lines: [{ staff: [{ voices: [[{ el_type: "note" }]] }] }] }
+            ];
             global.ABCJS = { parseOnly: jest.fn(() => tunes) };
 
             await aiWidget.__save();
 
             expect(mockActivity.parseABC.mock.calls).toEqual([[tunes[0]], [tunes[1]]]);
             expect(mockActivity.textMsg).toHaveBeenCalledWith("New start block generated.");
+        });
+
+        it("does not report success when ABC contains no notes", async () => {
+            aiWidget = new AIWidget();
+            mockActivity.parseABC = jest.fn(() => Promise.resolve(null));
+            aiWidget.activity = mockActivity;
+            global.ABCJS = { parseOnly: jest.fn(() => [{ lines: [] }]) };
+
+            await aiWidget.__save();
+
+            expect(mockActivity.parseABC).not.toHaveBeenCalled();
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Enter ABC notation containing at least one note."
+            );
+            expect(mockActivity.textMsg).not.toHaveBeenCalledWith("New start block generated.");
         });
 
         it("tells the user when the blocks cannot be generated", async () => {
