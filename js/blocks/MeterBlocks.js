@@ -1274,7 +1274,7 @@ function setupMeterBlocks(activity) {
                 logo.notation.notationTempo(turtle, (bpm * 0.25) / args[1], args[1]);
                 tur.singer.bpm.push(bpm);
 
-                const listenerName = "_bpm_" + turtle;
+                const listenerName = "_bpm_" + turtle + "_" + blk;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
                 const __listener = event => {
@@ -1348,7 +1348,7 @@ function setupMeterBlocks(activity) {
 
                 tur.singer.bpm.push(bpm);
 
-                const listenerName = "_bpm_" + turtle;
+                const listenerName = "_bpm_" + turtle + "_" + blk;
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
                 const __listener = event => {

@@ -668,7 +668,7 @@ describe("MeterBlocks setup", () => {
         response = block.flow([120, 0.5, "next"], logo, 0, "flow");
         expect(turtle.singer.bpm[turtle.singer.bpm.length - 1]).toBe((120 * 0.5) / 0.25);
         expect(logo.notation.notationTempo).toHaveBeenLastCalledWith(0, 120, 0.5);
-        expect(logo.setDispatchBlock).toHaveBeenCalledWith("flow", 0, "_bpm_0");
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("flow", 0, "_bpm_0_flow");
         expect(listenerCalls).toHaveLength(3);
         listenerCalls.forEach(handler => handler());
         expect(turtle.singer.bpm).toEqual([]);
@@ -751,7 +751,7 @@ describe("MeterBlocks setup", () => {
 
         const response = block.flow([180, "next"], logo, 0, "legacyBpm");
         expect(response).toEqual(["next", 1]);
-        expect(logo.setDispatchBlock).toHaveBeenCalledWith("legacyBpm", 0, "_bpm_0");
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("legacyBpm", 0, "_bpm_0_legacyBpm");
         listeners.forEach(handler => handler());
         expect(turtle.singer.bpm).toEqual([]);
     });
@@ -908,5 +908,118 @@ describe("MeterBlocks setup", () => {
         activity.turtles.ithTurtle.mockReturnValue(tur);
         block.setter(logo, 120, 0);
         expect(tur.singer.bpm[0]).toBe(120);
+    });
+
+    describe("nested tempo clamp isolation", () => {
+        it("nested setbpm2 clamps register distinct block-scoped listeners and pop in order", () => {
+            const block = getBlock("setbpm2");
+            const turtle = { singer: { bpm: [] } };
+            activity.turtles.ithTurtle.mockReturnValue(turtle);
+
+            const callbacks = {};
+            logo.setTurtleListener.mockImplementation((turtleId, name, cb) => {
+                callbacks[name] = cb;
+            });
+
+            // Outer clamp: 60 BPM with 1/4 note value (blk 1)
+            block.flow([60, 0.25, "outerChild"], logo, 0, 1);
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_bpm_0_1");
+            expect(logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                "_bpm_0_1",
+                expect.any(Function)
+            );
+            expect(turtle.singer.bpm).toEqual([60]);
+
+            // Inner clamp: 120 BPM with 1/4 note value (blk 2)
+            block.flow([120, 0.25, "innerChild"], logo, 0, 2);
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith(2, 0, "_bpm_0_2");
+            expect(logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                "_bpm_0_2",
+                expect.any(Function)
+            );
+            expect(turtle.singer.bpm).toEqual([60, 120]);
+
+            // Inner completes first
+            callbacks["_bpm_0_2"]();
+            expect(turtle.singer.bpm).toEqual([60]);
+
+            // Outer completes
+            callbacks["_bpm_0_1"]();
+            expect(turtle.singer.bpm).toEqual([]);
+        });
+
+        it("nested setbpm legacy clamps register distinct block-scoped listeners and pop in order", () => {
+            const block = getBlock("setbpm");
+            const turtle = { singer: { bpm: [] } };
+            activity.turtles.ithTurtle.mockReturnValue(turtle);
+
+            const callbacks = {};
+            logo.setTurtleListener.mockImplementation((turtleId, name, cb) => {
+                callbacks[name] = cb;
+            });
+
+            // Outer clamp: 80 BPM (blk 10)
+            block.flow([80, "outerChild"], logo, 0, 10);
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith(10, 0, "_bpm_0_10");
+            expect(turtle.singer.bpm).toEqual([80]);
+
+            // Inner clamp: 140 BPM (blk 20)
+            block.flow([140, "innerChild"], logo, 0, 20);
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith(20, 0, "_bpm_0_20");
+            expect(turtle.singer.bpm).toEqual([80, 140]);
+
+            // Inner completes
+            callbacks["_bpm_0_20"]();
+            expect(turtle.singer.bpm).toEqual([80]);
+
+            // Outer completes
+            callbacks["_bpm_0_10"]();
+            expect(turtle.singer.bpm).toEqual([]);
+        });
+
+        it("nested tempo clamps preserve outer stage event listener with real setTurtleListener", () => {
+            const block = getBlock("setbpm2");
+            const stageListeners = {};
+            activity.stage = {
+                addEventListener: jest.fn((name, fn) => {
+                    stageListeners[name] = stageListeners[name] || [];
+                    stageListeners[name].push(fn);
+                }),
+                removeEventListener: jest.fn((name, fn) => {
+                    if (stageListeners[name]) {
+                        stageListeners[name] = stageListeners[name].filter(f => f !== fn);
+                    }
+                })
+            };
+            const turtle = { singer: { bpm: [] }, listeners: {} };
+            activity.turtles.ithTurtle.mockReturnValue(turtle);
+            logo.setTurtleListener = (turtleId, listenerName, listener) => {
+                const tur = activity.turtles.ithTurtle(turtleId);
+                if (listenerName in tur.listeners) {
+                    activity.stage.removeEventListener(
+                        listenerName,
+                        tur.listeners[listenerName],
+                        false
+                    );
+                }
+                tur.listeners[listenerName] = listener;
+                activity.stage.addEventListener(listenerName, listener, false);
+            };
+
+            // Outer clamp (blk 1)
+            block.flow([60, 0.25, "outerChild"], logo, 0, 1);
+            expect(turtle.listeners["_bpm_0_1"]).toBeDefined();
+            expect(stageListeners["_bpm_0_1"]).toHaveLength(1);
+
+            // Inner clamp (blk 2)
+            block.flow([120, 0.25, "innerChild"], logo, 0, 2);
+            expect(turtle.listeners["_bpm_0_2"]).toBeDefined();
+            expect(stageListeners["_bpm_0_2"]).toHaveLength(1);
+
+            // Verify outer stage listener was NOT detached when inner clamp registered
+            expect(stageListeners["_bpm_0_1"]).toHaveLength(1);
+        });
     });
 });
