@@ -310,6 +310,159 @@ describe("ServerInterface", () => {
             expect(console.error).toHaveBeenCalled();
             expect(callback).toHaveBeenCalledWith(server.ConnectionFailureData);
         });
+
+        it("notifies the caller when RequestManager times out", async () => {
+            const timeoutResult = {
+                success: false,
+                error: "REQUEST_TIMEOUT"
+            };
+
+            mockRequestManager.throttledRequest.mockResolvedValueOnce(timeoutResult);
+
+            const callback = jest.fn();
+
+            await server.throttledRequest({ action: "convertFile" }, callback);
+
+            expect(callback).toHaveBeenCalledTimes(1);
+            expect(callback).toHaveBeenCalledWith(timeoutResult);
+        });
+
+        it("ignores late responses after RequestManager times out", async () => {
+            const timeoutResult = {
+                success: false,
+                error: "REQUEST_TIMEOUT"
+            };
+
+            let lateResponse;
+
+            // Capture the callback that a pending network request would invoke.
+            jest.spyOn(server, "request").mockImplementation((data, callback) => {
+                lateResponse = callback;
+            });
+
+            // Simulate RequestManager finishing with a timeout.
+            mockRequestManager.throttledRequest.mockImplementationOnce((data, requestFn) => {
+                requestFn(jest.fn());
+                return Promise.resolve(timeoutResult);
+            });
+
+            const callback = jest.fn();
+
+            await server.throttledRequest({ action: "convertFile" }, callback);
+
+            expect(callback).toHaveBeenCalledTimes(1);
+            expect(callback).toHaveBeenCalledWith(timeoutResult);
+
+            // Simulate the original network request responding after timeout.
+            lateResponse({
+                success: true,
+                data: "late response"
+            });
+
+            // The caller must not receive a second notification.
+            expect(callback).toHaveBeenCalledTimes(1);
+        });
+
+        it("delivers real RequestManager timeouts without duplicate callbacks", async () => {
+            const RealRequestManager = require("../RequestManager");
+
+            server.requestManager = new RealRequestManager({
+                timeoutMs: 15,
+                maxRetries: 1,
+                baseRetryDelay: 1,
+                minDelay: 1
+            });
+
+            const pendingResponses = [];
+
+            jest.spyOn(server, "request").mockImplementation((data, respond) => {
+                pendingResponses.push(respond);
+            });
+
+            const callback = jest.fn();
+
+            await server.throttledRequest(
+                {
+                    action: "convertFile",
+                    From: "ly",
+                    To: "pdf",
+                    Data: "test"
+                },
+                callback
+            );
+
+            // Initial request and one retry both timed out.
+            expect(pendingResponses).toHaveLength(2);
+
+            expect(callback).toHaveBeenCalledTimes(1);
+            expect(callback).toHaveBeenCalledWith({
+                success: false,
+                error: "REQUEST_TIMEOUT"
+            });
+
+            // Both timed-out requests respond unexpectedly late.
+            pendingResponses.forEach(respond => {
+                respond({ success: true, data: "late response" });
+            });
+
+            await Promise.resolve();
+
+            expect(callback).toHaveBeenCalledTimes(1);
+            expect(server.requestManager.hasPendingRequests()).toBe(false);
+        });
+
+        it("notifies both callers when identical requests are deduplicated", async () => {
+            const RealRequestManager = require("../RequestManager");
+
+            server.requestManager = new RealRequestManager({
+                timeoutMs: 1000,
+                maxRetries: 1,
+                baseRetryDelay: 1,
+                minDelay: 1
+            });
+
+            let completeRequest;
+
+            const requestSpy = jest.spyOn(server, "request").mockImplementation((data, resolve) => {
+                completeRequest = resolve;
+            });
+
+            const data = {
+                action: "convertFile",
+                From: "ly",
+                To: "pdf",
+                Data: "same"
+            };
+
+            const firstCallback = jest.fn();
+            const secondCallback = jest.fn();
+
+            const firstRequest = server.throttledRequest(data, firstCallback);
+            const secondRequest = server.throttledRequest(data, secondCallback);
+
+            // Only one underlying network request should be made.
+            expect(requestSpy).toHaveBeenCalledTimes(1);
+
+            completeRequest({
+                success: true,
+                data: "pdf"
+            });
+
+            await Promise.all([firstRequest, secondRequest]);
+
+            expect(firstCallback).toHaveBeenCalledTimes(1);
+            expect(secondCallback).toHaveBeenCalledTimes(1);
+
+            expect(firstCallback).toHaveBeenCalledWith({
+                success: true,
+                data: "pdf"
+            });
+
+            expect(secondCallback).toHaveBeenCalledWith({
+                success: true,
+                data: "pdf"
+            });
+        });
     });
 
     describe("downloadProject (project data caching)", () => {
