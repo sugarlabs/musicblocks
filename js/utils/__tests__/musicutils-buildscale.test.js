@@ -95,6 +95,29 @@ describe("musicutils-buildscale", () => {
 
     it("still resolves scale degrees, step sizes and intervals", () => {
         expect(buildscale.getModeLength("C major")).toBe(7);
+        // A non-finite EDO previously hung inside generateNoteNames;
+        // it must now return promptly through the 12-EDO fallback.
+        expect(buildscale.getModeLength("C major", Infinity)).toBe(7);
+        expect(buildscale.buildScale("C major", Infinity)[0][0]).toBe("C");
+        // Downstream of generateNoteNames, a bad EDO must give the full
+        // 12-EDO scale and steps: previously "C major" with Infinity
+        // returned undefined notes with NaN steps, and "C custom" threw
+        // a RangeError from getModePattern.
+        for (const edo of [Infinity, -Infinity, NaN, 12.5, 0, 257]) {
+            expect(buildscale.buildScale("C major", edo)).toEqual(
+                buildscale.buildScale("C major", 12)
+            );
+            expect(buildscale.buildScale("C custom", edo)).toEqual(
+                buildscale.buildScale("C custom", 12)
+            );
+            expect(buildscale.getModeLength("C major", edo)).toBe(7);
+        }
+        // Valid EDOs are unchanged, boundaries included.
+        expect(buildscale.buildScale("C major", 19)).toEqual([
+            ["C", "D", "E", "F", "G", "A", "B", "C"],
+            [3, 3, 2, 3, 3, 3, 2]
+        ]);
+        expect(buildscale.buildScale("C major", 256)[1].reduce((a, b) => a + b, 0)).toBe(256);
         expect(buildscale.scaleDegreeToPitchMapping("C major", 2, false, null)).toBe("D");
         expect(buildscale.scaleDegreeToPitchMapping("C major", 1, true, null)).toBe("C");
         expect(buildscale.nthDegreeToPitch("C major", 3)).toEqual(["E", 0]);
@@ -276,6 +299,50 @@ describe("musicutils-buildscale", () => {
         expect(buildscale.getSolfege("b##")).toBe("b##");
         expect(buildscale.getSolfege("Hb")).toBe("Hb");
         expect(buildscale.getSolfege("")).toBe("");
+    });
+
+    it("distinguishes an omitted EDO from an explicitly invalid one", () => {
+        // With an ambient equal19 temperament, an omitted EDO keeps
+        // the ambient 19-EDO scale, but an explicitly passed invalid
+        // value (0, NaN, Infinity, ...) falls back to 12 instead of
+        // silently picking up the ambient temperament.
+        const savedActivity = global.globalActivity;
+        global.globalActivity = { logo: { synth: { inTemperament: "equal19" } } };
+        try {
+            expect(buildscale.buildScale("C major")).toEqual(buildscale.buildScale("C major", 19));
+            for (const edo of [0, NaN, Infinity, -Infinity, 12.5, 257]) {
+                expect(buildscale.buildScale("C major", edo)).toEqual(
+                    buildscale.buildScale("C major", 12)
+                );
+            }
+        } finally {
+            global.globalActivity = savedActivity;
+        }
+    });
+
+    it("measures the chromatic fallback in the fallback EDO, not the temperament's", () => {
+        // With temperament "equal19" and an explicitly invalid EDO, the
+        // scale falls back to 12-EDO, so the chromatic interval must be
+        // measured in 12-EDO too: D-flat is one step above the tonic
+        // ("di"), not two as the 19-EDO name table would count it.
+        expect(buildscale.getSolfege("D♭", "C major", true, "equal19", Infinity)).toBe(
+            buildscale.getSolfege("D♭", "C major", true, "equal", 12)
+        );
+        expect(buildscale.getSolfege("D♭", "C major", true, "equal19", Infinity)).toBe("di");
+        // A genuine 19-EDO call is unchanged.
+        expect(buildscale.getSolfege("D♭", "C major", true, "equal19", 19)).toBe("di");
+    });
+
+    it("normalises an invalid EDO in getSolfege instead of throwing", () => {
+        // A chromatic note with a non-finite EDO previously built a
+        // 12-EDO scale but did its chromatic math with Infinity,
+        // producing NaN and throwing on the missing solfege entry.
+        for (const edo of [Infinity, -Infinity, NaN, 0, 12.5, 257]) {
+            expect(() => buildscale.getSolfege("C♯", "C major", true, "equal", edo)).not.toThrow();
+            expect(buildscale.getSolfege("C♯", "C major", true, "equal", edo)).toBe(
+                buildscale.getSolfege("C♯", "C major", true, "equal", 12)
+            );
+        }
     });
 
     it("is still reachable through musicutils.js for callers that require it", () => {

@@ -68,6 +68,7 @@ if (typeof module !== "undefined" && module.exports) {
         TEMPERAMENT,
         isEquallyTempered,
         getCurrentEDO,
+        normalizeEDO,
         generateNoteNames,
         getEdoNoteNamePosition,
         getTemperament,
@@ -157,17 +158,25 @@ var _notePitchClass = name => {
  * @returns {Array} An array containing the scale and the corresponding intervals.
  */
 var buildScale = (keySignature, edo) => {
-    // Determine active EDO: an explicit parameter wins; otherwise fall back to
-    // the global temperament state so existing callers keep working unchanged.
-    // Guard on falsy (not just undefined) so null/0/NaN never leak into the
-    // non-12 EDO branch and produce a degenerate step pattern.
+    // Determine active EDO: only an omitted parameter falls back to the
+    // global temperament state, so existing callers keep working
+    // unchanged. An explicitly passed value — including a falsy one
+    // such as 0 or NaN — is a provided-but-invalid EDO, not an omitted
+    // one: it must fall back to the documented 12, never silently pick
+    // up the ambient temperament (e.g. equal19) instead.
     let currentEDO = edo;
-    if (!currentEDO) {
+    if (currentEDO === undefined) {
         currentEDO = 12;
         if (typeof globalActivity !== "undefined" && globalActivity?.logo?.synth?.inTemperament) {
             currentEDO = getCurrentEDO(globalActivity.logo.synth.inTemperament);
         }
     }
+    // Normalise the resolved value so the name table and the step
+    // pattern always agree: a truthy but invalid EDO (Infinity, 257,
+    // 12.5, ...) previously let generateNoteNames fall back to the
+    // 12-EDO names while getModePattern still scaled the steps for
+    // the bad EDO, producing undefined notes and NaN steps.
+    currentEDO = normalizeEDO(currentEDO);
 
     if (currentEDO === 12) {
         // FIX ME: temporary hard-coded fix to avoid errors in pitch preview
@@ -416,9 +425,14 @@ var _getStepSize = (keySignature, pitch, direction, transposition, temperament, 
     if (temperament === undefined) {
         temperament = "equal";
     }
+    // As in buildScale: only an omitted EDO takes the temperament's
+    // EDO; an explicitly passed invalid value normalises to 12, so
+    // the 12-EDO checks below agree with the scale buildScale returns.
     let currentEDO = edo;
-    if (!currentEDO) {
+    if (currentEDO === undefined) {
         currentEDO = getCurrentEDO(temperament);
+    } else {
+        currentEDO = normalizeEDO(currentEDO);
     }
 
     let thisPitch = pitch;
@@ -1031,13 +1045,17 @@ var getInterval = (interval, keySignature, pitch, edo) => {
 
     // In 12-EDO, find a pitch by how it sounds, so a scale that spells a note
     // G♯ still matches the A♭ in PITCHES. Other EDOs keep matching by name. The
-    // EDO is worked out as buildScale() does, not from the steps it returns.
+    // EDO is worked out as buildScale() does, not from the steps it returns:
+    // only an omitted EDO takes the ambient temperament; an explicitly
+    // passed invalid value normalises to 12.
     let currentEDO = edo;
-    if (!currentEDO) {
+    if (currentEDO === undefined) {
         currentEDO = 12;
         if (typeof globalActivity !== "undefined" && globalActivity?.logo?.synth?.inTemperament) {
             currentEDO = getCurrentEDO(globalActivity.logo.synth.inTemperament);
         }
+    } else {
+        currentEDO = normalizeEDO(currentEDO);
     }
     const is12EDO = currentEDO === 12;
 
@@ -1339,9 +1357,18 @@ var getSolfege = (note, keySignature, movable, temperament, edo) => {
     }
 
     if (movable && keySignature) {
+        // Normalise before any chromatic math: buildScale already
+        // falls back to a 12-EDO scale for a bad EDO, but an
+        // unnormalised Infinity here made the chromatic modulo below
+        // produce NaN and then throw on the missing solfege entry.
+        // Only an omitted EDO takes the temperament's EDO; an
+        // explicitly passed invalid value (0, NaN, Infinity, ...) is
+        // the documented 12 fallback, not the ambient temperament.
         let currentEDO = edo;
-        if (!currentEDO) {
+        if (currentEDO === undefined) {
             currentEDO = getCurrentEDO(temperament);
+        } else {
+            currentEDO = normalizeEDO(currentEDO);
         }
         const scaleResult = buildScale(keySignature, currentEDO);
         if (!scaleResult) return SOLFEGECONVERSIONTABLE[note];
@@ -1381,8 +1408,16 @@ var getSolfege = (note, keySignature, movable, temperament, edo) => {
 
         // 4) chromatic fallback (interval based)
         const tonic = scale[0];
-        const tonicPitch = pitchToNumber(tonic, 4, keySignature, temperament);
-        const notePitch = pitchToNumber(note, 4, keySignature, temperament);
+        // pitchToNumber measures in the temperament's EDO, so when an
+        // explicitly invalid EDO fell back to 12 above while the
+        // temperament still names a non-12 EDO (e.g. "equal19"), the
+        // interval must still be measured in the resolved 12-EDO —
+        // otherwise D-flat is counted as two steps above the tonic
+        // instead of one and maps to the wrong syllable.
+        const pitchTemperament =
+            currentEDO === 12 && getCurrentEDO(temperament) !== 12 ? "equal" : temperament;
+        const tonicPitch = pitchToNumber(tonic, 4, keySignature, pitchTemperament);
+        const notePitch = pitchToNumber(note, 4, keySignature, pitchTemperament);
 
         // semitones from tonic (EDO-aware)
         let semitones = (((notePitch - tonicPitch) % currentEDO) + currentEDO) % currentEDO;

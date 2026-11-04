@@ -170,6 +170,20 @@ describe("musicutils-pitchscale", () => {
         expect(mode).toBe("major");
     });
 
+    it("takes the 12-EDO path for an invalid EDO in getScaleAndHalfSteps", () => {
+        // Before normalising here, Infinity or NaN returned the EDO
+        // name table in the scale slot where the 12-EDO path returns
+        // solfege slots, so the result shape disagreed with 12-EDO.
+        const twelve = pitchscale.getScaleAndHalfSteps("C major", 12);
+        for (const edo of [Infinity, -Infinity, NaN, 0, 12.5, 257]) {
+            expect(pitchscale.getScaleAndHalfSteps("C major", edo)).toEqual(twelve);
+        }
+        // Valid EDOs are unchanged.
+        const nineteen = pitchscale.getScaleAndHalfSteps("C major", 19);
+        expect(nineteen[0]).toHaveLength(19);
+        expect(nineteen[1].reduce((a, b) => a + b, 0)).toBe(19);
+    });
+
     describe("input validation and type guards (#9900)", () => {
         it("returns ['C', 'major'] for nullish, non-string, or empty key signatures in keySignatureToMode", () => {
             expect(pitchscale.keySignatureToMode(undefined)).toEqual(["C", "major"]);

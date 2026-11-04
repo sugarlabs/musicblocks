@@ -66,6 +66,7 @@ if (typeof module !== "undefined" && module.exports) {
     var {
         generateNoteNames,
         getCurrentEDO,
+        normalizeEDO,
         getEdoNoteNamePosition,
         isTrueEDO,
         isCustomTemperament,
@@ -216,6 +217,12 @@ var keySignatureToMode = keySignature => {
  * @returns {Array} An array containing the scale notes, solfege with half-steps, key signature, and mode.
  */
 var getScaleAndHalfSteps = (keySignature, edo = 12) => {
+    // Normalise before branching: getModePattern already falls back to
+    // the 12-EDO pattern for a bad EDO, but the branch below keys off
+    // the raw value, so Infinity or NaN returned the EDO name table
+    // where the 12-EDO path returns solfege slots. After normalising,
+    // a bad EDO takes exactly the 12-EDO path.
+    edo = normalizeEDO(edo);
     // Determine scale and half-step pattern from key signature
     const obj = keySignatureToMode(keySignature);
     let myKeySignature = obj[0];
