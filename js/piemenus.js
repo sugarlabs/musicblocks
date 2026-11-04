@@ -3404,7 +3404,7 @@ const piemenuVoicesGrid = (block, voiceLabels, voiceValues, categories, categori
     // Keys pressed inside the grid shouldn't trigger workspace shortcuts.
     // Escape closes the grid, and Alt+S is the global stop shortcut.
     panel.addEventListener("keydown", e => {
-        if (e.key !== "Escape" && !(e.altKey && e.code === "KeyS")) {
+        if (e.key !== "Escape" && !(e.altKey && e.keyCode === 83)) {
             e.stopPropagation();
         }
     });

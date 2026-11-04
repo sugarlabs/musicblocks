@@ -340,7 +340,8 @@ describe("selected item hover in pie menus", () => {
             document.querySelector("#voiceGrid button").dispatchEvent(
                 new KeyboardEvent("keydown", {
                     key: "s",
-                    code: "KeyS",
+                    code: "KeyD",
+                    keyCode: 83,
                     altKey: true,
                     bubbles: true
                 })
