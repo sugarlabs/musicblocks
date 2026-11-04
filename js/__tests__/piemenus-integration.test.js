@@ -315,6 +315,20 @@ describe("selected item hover in pie menus", () => {
             document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
         });
 
+        test("keys pressed inside the grid do not reach document shortcuts", () => {
+            const spy = jest.fn();
+            document.addEventListener("keydown", spy);
+            openVoiceGrid(makeVoiceBlock());
+
+            document
+                .querySelector("#voiceGrid button")
+                .dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+
+            expect(spy).not.toHaveBeenCalled();
+            document.removeEventListener("keydown", spy);
+            document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+        });
+
         test("reopening closes the prior grid and cancels its pending preview", () => {
             jest.useFakeTimers();
             const previousBlock = makeVoiceBlock();

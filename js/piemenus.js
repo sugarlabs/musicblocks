@@ -3335,6 +3335,7 @@ const piemenuVoicesGrid = (block, voiceLabels, voiceValues, categories, categori
     }
 
     const that = block;
+    const opener = document.activeElement;
     const COLORS = platformColor.piemenuVoicesColors;
     const HEADINGS = { precussion: "percussion" }; // source list misspells this type
     let voicePreviewTimeout = null;
@@ -3396,6 +3397,12 @@ const piemenuVoicesGrid = (block, voiceLabels, voiceValues, categories, categori
         "width:min(640px,92vw);max-height:80vh;overflow-y:auto;box-sizing:border-box;" +
         "padding:16px;border-radius:12px;background:#fff;" +
         "box-shadow:0 8px 32px rgba(0,0,0,0.35);z-index:9999;";
+
+    panel.addEventListener("keydown", e => {
+        if (e.key !== "Escape") {
+            e.stopPropagation();
+        }
+    });
 
     const closeButton = document.createElement("button");
     closeButton.textContent = "×";
@@ -3483,6 +3490,9 @@ const piemenuVoicesGrid = (block, voiceLabels, voiceValues, categories, categori
         closeButton.removeEventListener("click", __close);
         panel.__closeVoiceGrid = null;
         panel.remove();
+        if (opener && typeof opener.focus === "function" && document.body.contains(opener)) {
+            opener.focus();
+        }
         // The menu covers the canvas, so the block never gets the mouseout
         // that would normally clear this.
         that.blocks.activeBlock = null;
@@ -3506,6 +3516,7 @@ const piemenuVoicesGrid = (block, voiceLabels, voiceValues, categories, categori
     document.addEventListener("mousedown", __onOutsideClick);
 
     document.body.appendChild(panel);
+    closeButton.focus();
 };
 
 /**
