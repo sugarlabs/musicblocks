@@ -319,11 +319,24 @@ div.select-wrapper * {
 }
 
 #search-close {
-	display: none;
-	position: absolute;
-	top: 50%;
-	transform: translateY(-50%);
-	cursor: pointer;
+    display: none;
+    flex: 0 0 28px;
+    height: 28px;
+    margin: 0 4px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #333;
+    text-align: center;
+    line-height: 28px;
+    cursor: pointer;
+}
+
+#search-close .material-icons {
+    display: block;
+    height: 28px;
+    line-height: 28px;
+    font-size: 20px;
 }
 
 #localglobal {

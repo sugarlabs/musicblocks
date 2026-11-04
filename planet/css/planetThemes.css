@@ -548,6 +548,11 @@
     -webkit-text-fill-color: #000000 !important;
 }
 
+.project-search-preview #search-close .material-icons {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+}
+
 .project-search-preview input::placeholder {
     color: #000000 !important;
     -webkit-text-fill-color: #000000 !important;
