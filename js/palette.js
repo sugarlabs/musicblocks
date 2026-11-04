@@ -397,6 +397,12 @@ class Palettes {
      * @param {KeyboardEvent} event
      */
     _handleSearchKeydown(event) {
+        if (["ArrowLeft", "ArrowRight"].includes(event.key)) {
+            // Preserve native caret movement without triggering document shortcuts.
+            event.stopPropagation();
+            return;
+        }
+
         const exitKeys = ["Escape"];
         if (exitKeys.includes(event.key)) {
             event.preventDefault();
