@@ -945,6 +945,52 @@ describe("GlobalPlanet", () => {
 
             expect(gp.search).not.toHaveBeenCalled();
         });
+
+        it("should discard a queued query when composition starts during an active search", () => {
+            const input = document.getElementById("global-search");
+
+            gp.search.mockRestore();
+
+            // Search A is still running.
+            gp.searchString = "drums";
+            gp.search();
+
+            expect(mockPlanet.ServerInterface.searchProjects).toHaveBeenCalledTimes(1);
+
+            // Search B finishes debouncing but must wait for A.
+            input.value = "piano";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            jest.advanceTimersByTime(300);
+
+            expect(gp.searchString).toBe("piano");
+            expect(gp.searching).toBe(true);
+            expect(mockPlanet.ServerInterface.searchProjects).toHaveBeenCalledTimes(1);
+
+            // Composition begins: discard queued search B.
+            input.dispatchEvent(new CompositionEvent("compositionstart", { bubbles: true }));
+
+            expect(gp.searchString).toBe("drums");
+            expect(gp.searchDebounce).toBeNull();
+
+            // Search A finishes during composition.
+            mockPlanet.ServerInterface.searchProjects.mock.calls[0][4]({
+                success: true,
+                data: []
+            });
+
+            // Search B must not start.
+            expect(mockPlanet.ServerInterface.searchProjects).toHaveBeenCalledTimes(1);
+
+            // The final composed query should be the next search.
+            input.value = "ピアノ";
+            input.dispatchEvent(new CompositionEvent("compositionend", { bubbles: true }));
+
+            jest.advanceTimersByTime(300);
+
+            expect(mockPlanet.ServerInterface.searchProjects).toHaveBeenCalledTimes(2);
+            expect(mockPlanet.ServerInterface.searchProjects.mock.calls[1][0]).toBe("ピアノ");
+        });
     });
 
     describe("destroy", () => {
