@@ -509,6 +509,23 @@ class SearchController {
                 };
             }
             $search.data("autocomplete-init", true);
+
+            // Restore suggestions when refocusing a populated search input.
+            if (activity.searchWidget.addEventListener) {
+                activity.searchWidget.addEventListener("focus", () => {
+                    const input = activity.searchWidget;
+
+                    if (
+                        input.style.visibility !== "visible" ||
+                        !input.value?.trim() ||
+                        input.idInput_custom
+                    ) {
+                        return;
+                    }
+
+                    $search.autocomplete("search", input.value);
+                });
+            }
         }
 
         const searchInput = activity.searchWidget.idInput_custom;

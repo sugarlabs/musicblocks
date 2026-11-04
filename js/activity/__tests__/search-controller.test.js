@@ -784,6 +784,102 @@ describe("SearchController.doSearch - autocomplete initialization", () => {
         delete global.window.jQuery;
     });
 
+    test("restores autocomplete suggestions when refocusing a populated search", () => {
+        const input = document.createElement("input");
+        input.id = "search";
+        input.value = "pitch";
+        input.style.visibility = "visible";
+        document.body.appendChild(input);
+
+        const activity = makeActivity({
+            pitch: makeProtoBlock("pitch", "pitch")
+        });
+        activity.searchWidget = input;
+
+        setupSearchController(activity);
+        activity.searchController.doSearch();
+
+        // Simulate losing focus after interacting with the drag handle.
+        input.focus();
+        input.blur();
+
+        // Ignore earlier autocomplete calls.
+        $elem.autocomplete.mockClear();
+
+        // Refocusing should restore the existing suggestions.
+        input.focus();
+
+        expect($elem.autocomplete).toHaveBeenCalledWith("search", "pitch");
+
+        input.remove();
+    });
+
+    test("does not restore suggestions for hidden, empty, or selected searches", () => {
+        const input = document.createElement("input");
+        input.id = "search";
+        input.value = "pitch";
+        input.style.visibility = "visible";
+        document.body.appendChild(input);
+
+        const activity = makeActivity({
+            pitch: makeProtoBlock("pitch", "pitch")
+        });
+        activity.searchWidget = input;
+
+        setupSearchController(activity);
+        activity.searchController.doSearch();
+
+        $elem.autocomplete.mockClear();
+
+        // Hidden search must not reopen suggestions.
+        input.style.visibility = "hidden";
+        input.dispatchEvent(new Event("focus"));
+        expect($elem.autocomplete).not.toHaveBeenCalled();
+
+        // Empty query must not display suggestions.
+        input.style.visibility = "visible";
+        input.value = "";
+        input.dispatchEvent(new Event("focus"));
+        expect($elem.autocomplete).not.toHaveBeenCalled();
+
+        // An already selected block must not trigger another search.
+        input.value = "pitch";
+        input.idInput_custom = "pitch";
+        input.dispatchEvent(new Event("focus"));
+        expect($elem.autocomplete).not.toHaveBeenCalled();
+
+        input.remove();
+    });
+
+    test("registers only one refocus listener after repeated doSearch calls", () => {
+        const input = document.createElement("input");
+        input.id = "search";
+        input.value = "pitch";
+        input.style.visibility = "visible";
+        document.body.appendChild(input);
+
+        const activity = makeActivity({
+            pitch: makeProtoBlock("pitch", "pitch")
+        });
+        activity.searchWidget = input;
+
+        setupSearchController(activity);
+
+        // Repeated searches must not create duplicate focus listeners.
+        activity.searchController.doSearch();
+        activity.searchController.doSearch();
+        activity.searchController.doSearch();
+
+        $elem.autocomplete.mockClear();
+
+        input.dispatchEvent(new Event("focus"));
+
+        expect($elem.autocomplete).toHaveBeenCalledTimes(1);
+        expect($elem.autocomplete).toHaveBeenCalledWith("search", "pitch");
+
+        input.remove();
+    });
+
     test("skips autocomplete setup when already initialised", () => {
         $elem = makeJQueryElem(true);
         global.window.jQuery = jest.fn(() => $elem);
