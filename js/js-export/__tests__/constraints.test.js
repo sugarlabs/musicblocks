@@ -17,7 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-global.JSInterface = { _methodArgConstraints: {} };
+global.JSEditor = { logConsole: jest.fn() };
+global.JSInterface = require("../interface");
 require("../constraints.js");
 
 describe("JSInterface._methodArgConstraints", () => {
@@ -209,7 +210,11 @@ describe("JSInterface._methodArgConstraints", () => {
 
     it("should validate setKey arguments", () => {
         expect(() => validateConstraints("setKey", ["C", "major"])).not.toThrow();
-        expect(() => validateConstraints("setKey", ["C", "mixolydian"])).not.toThrow();
+        expect(JSInterface.validateArgs("setKey", ["C", "mixolydian"])).toEqual([
+            "C",
+            "mixolydian"
+        ]);
+        expect(JSInterface.validateArgs("setKey", ["C", "myxolydian"])).toEqual(["C", "major"]);
         expect(() => validateConstraints("setKey", [123, "major"])).toThrow();
         expect(() => validateConstraints("setKey", ["C", "invalid"])).toThrow();
     });
