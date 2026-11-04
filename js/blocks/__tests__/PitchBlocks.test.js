@@ -856,6 +856,24 @@ describe("setupPitchBlocks", () => {
             logo.parseArg.mockReturnValue("F#");
             expect(block.arg(logo, 0, 10)).toBe("F#0");
         });
+
+        it("returns normalized non-negative pitch class through OutputToolsBlock.arg for octave 0", () => {
+            const block = createdBlocks["outputtools"];
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(0));
+            activity.blocks.blockList[10].connections[1] = 20;
+            activity.blocks.blockList[10].privateData = "pitch class";
+            activity.blocks.blockList[20] = { name: "notename" };
+            logo.parseArg.mockReturnValue("A");
+
+            // A0 has pitchToNumber 0; (0 - 3) % 12 should normalize to 9, not -3
+            const realGetPitchInfo = require("../../utils/musicutils-pitchinfo").getPitchInfo;
+            global.getPitchInfo.mockImplementation(realGetPitchInfo);
+            global.pitchToNumber.mockReturnValue(0);
+            global.getCurrentEDO.mockReturnValue(12);
+
+            tur.singer.currentOctave = 0;
+            expect(block.arg(logo, 0, 10)).toBe(9);
+        });
     });
 
     describe("StaffYToPitch", () => {

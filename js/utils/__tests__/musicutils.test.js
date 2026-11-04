@@ -4338,7 +4338,9 @@ describe("getPitchInfo", () => {
 
     it("returns correct pitch class", () => {
         const pClass = getPitchInfo(activity, "pitch class", "C4", tur);
-        expect(typeof pClass).toBe("number");
+        expect(pClass).toBe(0);
+        expect(getPitchInfo(activity, "pitch class", "A0", tur)).toBe(9);
+        expect(getPitchInfo(activity, "pitch class", "A4", tur)).toBe(9);
     });
 
     it("returns correct scalar class", () => {

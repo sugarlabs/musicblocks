@@ -258,11 +258,13 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
                 }
                 return syllable;
             }
-            case "pitch class":
+            case "pitch class": {
+                const edo = getCurrentEDO(temperament);
                 return (
-                    (pitchToNumber(pitch, octave, tur.singer.keySignature) - 3) %
-                    getCurrentEDO(temperament)
+                    (((pitchToNumber(pitch, octave, tur.singer.keySignature) - 3) % edo) + edo) %
+                    edo
                 );
+            }
             case "scalar class":
                 return scaleDegreeToPitchMapping(
                     tur.singer.keySignature,
