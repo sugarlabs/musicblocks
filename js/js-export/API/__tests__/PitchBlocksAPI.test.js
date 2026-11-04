@@ -204,4 +204,38 @@ describe("PitchBlocksAPI", () => {
         expect(Singer.PitchActions.numToPitch).toHaveBeenCalledWith(5, "octave", 1);
         expect(result).toBe(4);
     });
+
+    describe("invert with the real argument validation", () => {
+        let mockedJSInterface;
+
+        beforeEach(() => {
+            mockedJSInterface = global.JSInterface;
+            global.JSEditor = { logConsole: jest.fn() };
+            // constraints.js attaches to an existing JSInterface, so load it before the real one.
+            delete global.JSInterface;
+            jest.isolateModules(() => {
+                require("../../constraints.js");
+                global.JSInterface = require("../../interface");
+            });
+        });
+
+        afterEach(() => {
+            global.JSInterface = mockedJSInterface;
+            delete global.JSEditor;
+        });
+
+        test("keeps the flow and runs it", async () => {
+            const mockFlow = jest.fn();
+            const result = await pitchBlocksAPI.invert("sol", 4, "even", async () => mockFlow());
+
+            expect(pitchBlocksAPI.runCommand).toHaveBeenCalledWith("invert", ["sol", 4, "even", 1]);
+            expect(mockFlow).toHaveBeenCalled();
+            expect(result).toBe("end");
+        });
+
+        test("rejects a flow that is not an async function before inverting", async () => {
+            await expect(pitchBlocksAPI.invert("sol", 4, "even", () => {})).rejects.toBeDefined();
+            expect(pitchBlocksAPI.runCommand).not.toHaveBeenCalled();
+        });
+    });
 });
