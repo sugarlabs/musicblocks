@@ -979,8 +979,11 @@ describe("getDrumIcon", () => {
         expect(getDrumIcon("HI HAT")).toBe("images/hihat.svg");
     });
     it("should return default drum icon for invalid drum names", () => {
-        expect(getDrumIcon("invalid drum")).toBe("images/drum.svg");
-        expect(getDrumIcon("123")).toBe("images/drum.svg");
+        expect(getDrumIcon("invalid drum")).toBe("images/snaredrum.svg");
+        expect(getDrumIcon("123")).toBe("images/snaredrum.svg");
+    });
+    it("should return default drum icon for a drum loaded from a URL", () => {
+        expect(getDrumIcon("https://example.com/custom-drum.wav")).toBe("images/snaredrum.svg");
     });
 });
 
@@ -1072,6 +1075,9 @@ describe("getNoiseIcon", () => {
     });
     it("should return default synth.svg for non-existent noise names", () => {
         expect(getNoiseIcon("nonexistent")).toBe("images/synth.svg");
+    });
+    it("should return synth.svg for a noise loaded from a URL", () => {
+        expect(getNoiseIcon("https://example.com/custom-noise.wav")).toBe("images/synth.svg");
     });
     it("should be case sensitive for noise names", () => {
         expect(getNoiseIcon("WHITE NOISE")).toBe("images/synth.svg");

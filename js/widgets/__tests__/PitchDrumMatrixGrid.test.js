@@ -35,7 +35,8 @@ global.platformColor = {
 };
 global.docById = id => document.getElementById(id);
 global.getDrumName = name => (DRUMS.includes(name) ? name : null);
-global.getDrumIcon = name => (DRUMS.includes(name) ? "images/" + name + ".svg" : "images/drum.svg");
+global.getDrumIcon = name =>
+    DRUMS.includes(name) ? "images/" + name + ".svg" : "images/snaredrum.svg";
 global.MATRIXSOLFEHEIGHT = 30;
 global.MATRIXSOLFEWIDTH = 80;
 
@@ -151,6 +152,6 @@ describe("PitchDrumMatrixGrid", () => {
         const img = drumImages()[1];
         expect(img.title).toBe(url);
         expect(img.alt).toBe(url);
-        expect(img.getAttribute("src")).toBe("images/drum.svg");
+        expect(img.getAttribute("src")).toBe("images/snaredrum.svg");
     });
 });

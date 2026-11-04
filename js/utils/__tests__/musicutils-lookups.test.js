@@ -128,7 +128,7 @@ describe("musicutils-lookups", () => {
         expect(lookups.getDrumName(undefined)).toBeNull();
         expect(lookups.getDrumIndex(123)).toBe(-1);
         expect(lookups.getDrumSymbol(null)).toBe("hh");
-        expect(lookups.getDrumIcon({})).toBe("images/drum.svg");
+        expect(lookups.getDrumIcon({})).toBe("images/snaredrum.svg");
         expect(lookups.getDrumSynthName(undefined)).toBeNull();
 
         expect(lookups.getNoiseName(123)).toBe("noise1");

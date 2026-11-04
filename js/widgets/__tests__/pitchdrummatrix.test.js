@@ -1622,7 +1622,7 @@ describe("PitchDrumMatrix with a real DOM", () => {
             expect(drumImage(pdm, 0).title).toBe("kick drum");
             expect(drumImage(pdm, 1).title).toBe(url);
             expect(drumImage(pdm, 1).alt).toBe(url);
-            expect(drumImage(pdm, 1).getAttribute("src")).toBe("images/drum.svg");
+            expect(drumImage(pdm, 1).getAttribute("src")).toBe("images/snaredrum.svg");
         });
 
         test("clicking a cell plays the URL drum, not the default drum", () => {
