@@ -35,7 +35,9 @@ const METHODS = [
     "addNode",
     "removeNode",
     "_rowRepeat",
-    "_rowOf"
+    "_rowOf",
+    "selectBlockMap",
+    "_storeCells"
 ];
 
 describe("PitchDrumMatrixBlocks", () => {
@@ -161,5 +163,89 @@ describe("PitchDrumMatrixBlocks", () => {
 
         expect(pdm._rowOf(10, 2)).toBe(-1);
         expect(pdm._rowOf(12, 0)).toBe(-1);
+    });
+
+    describe("cells saved with the project", () => {
+        let blockList;
+
+        // Opens the matrix of a block, with rows for pitch blocks 10 and 11 and drums 20 and 21.
+        const open = blockNo => {
+            pdm.blockNo = blockNo;
+            pdm.clearBlocks();
+            [10, 11].forEach(blk => pdm.addRowBlock(blk));
+            [20, 21].forEach(blk => pdm.addColBlock(blk));
+            pdm.selectBlockMap();
+        };
+
+        beforeEach(() => {
+            blockList = { 5: {}, 6: {} };
+            pdm.activity = { blocks: { blockList } };
+        });
+
+        test("addNode and removeNode keep the cells on the block that opened the matrix", () => {
+            open(5);
+
+            pdm.addNode(10, 20);
+            pdm.addNode(11, 21, 1);
+            expect(blockList[5].drumCells).toEqual([
+                [10, 20, 0],
+                [11, 21, 1]
+            ]);
+
+            pdm.removeNode(10, 20);
+            expect(blockList[5].drumCells).toEqual([[11, 21, 1]]);
+        });
+
+        test("starts from the cells saved with the project", () => {
+            blockList[5].drumCells = [[11, 21, 1]];
+
+            open(5);
+
+            expect(pdm._blockMap).toEqual([[11, 21, 1]]);
+            expect(pdm._blockMap[0]).not.toBe(blockList[5].drumCells[0]);
+        });
+
+        test("keeps the saved cells of pitches and drums this run didn't reach", () => {
+            blockList[5].drumCells = [[12, 22, 0]];
+            open(5);
+
+            pdm.addNode(10, 20);
+
+            expect(blockList[5].drumCells).toEqual([
+                [12, 22, 0],
+                [10, 20, 0]
+            ]);
+        });
+
+        test("a cell cleared in this session stays cleared when the matrix opens again", () => {
+            blockList[5].drumCells = [[10, 20, 0]];
+            open(5);
+            pdm.removeNode(10, 20);
+
+            open(5);
+
+            expect(pdm._blockMap).toEqual([]);
+        });
+
+        test("two matrices sharing pitch and drum blocks keep their own cells", () => {
+            open(5);
+            pdm.addNode(10, 20);
+            open(6);
+            pdm.addNode(11, 21);
+
+            open(5);
+
+            expect(pdm._blockMap).toEqual([[10, 20, 0]]);
+            expect(blockList[5].drumCells).toEqual([[10, 20, 0]]);
+            expect(blockList[6].drumCells).toEqual([[11, 21, 0]]);
+        });
+
+        test("does nothing when the block that opened the matrix is gone", () => {
+            open(7);
+
+            pdm.addNode(10, 20);
+
+            expect(pdm._blockMap).toEqual([[10, 20, 0]]);
+        });
     });
 });

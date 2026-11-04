@@ -1328,6 +1328,7 @@ function setupWidgetBlocks(activity) {
             if (interruption) return interruption;
 
             logo.inPitchDrumMatrix = true;
+            logo.pitchDrumMatrix.blockNo = blk;
             logo.pitchDrumMatrix.rowLabels = [];
             logo.pitchDrumMatrix.rowArgs = [];
             logo.pitchDrumMatrix.drums = [];

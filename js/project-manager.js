@@ -812,7 +812,6 @@ class ProjectManager {
                     case "interval":
                     case "newnote":
                     case "action":
-                    case "pitchdrummatrix":
                     case "timbre":
                     case "pitchstaircase":
                     case "tempo":
@@ -858,6 +857,21 @@ class ProjectManager {
                         }
                         break;
                     }
+                    case "pitchdrummatrix":
+                        args = { collapsed: myBlock.collapsed };
+                        if (Array.isArray(myBlock.drumCells)) {
+                            args.drumCells = myBlock.drumCells
+                                .filter(
+                                    ([pitch, drum]) =>
+                                        blockIndexById.has(pitch) && blockIndexById.has(drum)
+                                )
+                                .map(([pitch, drum, repeat]) => [
+                                    blockIndexById.get(pitch),
+                                    blockIndexById.get(drum),
+                                    repeat
+                                ]);
+                        }
+                        break;
                     case "storein2":
                     case "nameddo":
                     case "nameddoArg":

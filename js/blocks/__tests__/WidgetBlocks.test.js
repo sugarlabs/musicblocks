@@ -560,6 +560,8 @@ describe("setupWidgetBlocks", () => {
             runBlock(widget([], []));
 
             expect(logo.inPitchDrumMatrix).toBe(true);
+            // So the selected cells are saved on this block.
+            expect(logo.pitchDrumMatrix.blockNo).toBe("pdmBlk");
             expect(logo.setDispatchBlock).toHaveBeenCalledWith("pdmBlk", 0, "_pitchdrummatrix_0");
         });
 

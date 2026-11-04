@@ -5276,6 +5276,21 @@ class Blocks {
                         blockObjs[b][4].push(blockMap[connection]);
                     }
                 }
+
+                if (Array.isArray(myBlock.drumCells)) {
+                    blockObjs[b][1] = [
+                        myBlock.name,
+                        {
+                            drumCells: myBlock.drumCells
+                                .filter(([pitch, drum]) => pitch in blockMap && drum in blockMap)
+                                .map(([pitch, drum, repeat]) => [
+                                    blockMap[pitch],
+                                    blockMap[drum],
+                                    repeat
+                                ])
+                        }
+                    ];
+                }
             }
 
             return blockObjs;
@@ -6468,6 +6483,32 @@ class Blocks {
                                         cell[0] + blockOffset,
                                         [cell[1][0] + blockOffset, cell[1][1]],
                                         cell[2]
+                                    ]);
+                            }
+                        };
+                        this._makeNewBlockWithConnections(
+                            name,
+                            blockOffset,
+                            blkData[4],
+                            postProcess,
+                            [thisBlock, blkInfo[1]]
+                        );
+                        break;
+                    case "pitchdrummatrix":
+                        postProcess = args => {
+                            const drumCells = args[1]?.drumCells;
+                            if (Array.isArray(drumCells)) {
+                                that.blockList[args[0]].drumCells = drumCells
+                                    .filter(
+                                        cell =>
+                                            Array.isArray(cell) &&
+                                            cell.length === 3 &&
+                                            cell.every(n => Number.isInteger(n) && n >= 0)
+                                    )
+                                    .map(([pitch, drum, repeat]) => [
+                                        pitch + blockOffset,
+                                        drum + blockOffset,
+                                        repeat
                                     ]);
                             }
                         };

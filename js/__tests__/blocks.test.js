@@ -1401,6 +1401,48 @@ describe("Blocks Foundation", () => {
                 [1, ["apple", { value: 2 }], 0, 0, [0]]
             ]);
         });
+
+        it("copies the Pitch-Drum Matrix cells, moving the block ids like connections", () => {
+            const blocks = new Blocks(mockActivity);
+            mockActivity.blocksContainer.x = 0;
+            mockActivity.blocksContainer.y = 0;
+            const makeBlock = (name, connections, extra) => ({
+                name,
+                connections,
+                isValueBlock: jest.fn().mockReturnValue(false),
+                ...extra
+            });
+            blocks.blockList = [
+                makeBlock("start", [null, 1, null]),
+                makeBlock("pitchdrummatrix", [0, 2, null], {
+                    // The last cell is for a pitch block outside the copy.
+                    drumCells: [
+                        [2, 3, 0],
+                        [2, 3, 1],
+                        [9, 3, 0]
+                    ]
+                }),
+                makeBlock("pitch", [1, null, null, 3]),
+                makeBlock("playdrum", [2, null, null])
+            ];
+            blocks.selectedStack = 1;
+
+            expect(blocks._copyBlocksToObj(false)[0]).toEqual([
+                0,
+                [
+                    "pitchdrummatrix",
+                    {
+                        drumCells: [
+                            [1, 2, 0],
+                            [1, 2, 1]
+                        ]
+                    }
+                ],
+                75,
+                75,
+                [null, 1, null]
+            ]);
+        });
     });
 
     describe("Unknown Blocks", () => {
@@ -2133,6 +2175,45 @@ describe("Blocks Foundation", () => {
             expect(blocks.blockList[2].matrixCells).toEqual([
                 [3, [4, 0], 0],
                 [1000003, [4, 1], 1]
+            ]);
+        });
+
+        it("restores the Pitch-Drum Matrix cells, moving the block ids like connections", () => {
+            const blocks = new Blocks(mockActivity);
+            // Two blocks already in the workspace, so the loaded blocks start at 2.
+            blocks.blockList = [null, null];
+            blocks.protoBlockDict = {
+                pitchdrummatrix: { hasCapability: () => false, dockTypes: [] }
+            };
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks._updateSpatialGrid = jest.fn();
+            blocks._makeNewBlockWithConnections = jest.fn(
+                (name, offset, conns, postProcess, args) => {
+                    blocks.blockList[args[0]] = {
+                        name,
+                        connections: [null, null, null],
+                        container: { x: 0, y: 0 }
+                    };
+                    postProcess(args);
+                }
+            );
+
+            const drumCells = [
+                [1, 2, 0],
+                // The second row of a repeated pitch block.
+                [1, 2, 1],
+                "not a cell",
+                [-1, 2, 0],
+                [1, null, 0],
+                [1, 2, "0"]
+            ];
+            blocks.loadNewBlocks([
+                [0, ["pitchdrummatrix", { collapsed: false, drumCells }], 0, 0, [null, null, null]]
+            ]);
+
+            expect(blocks.blockList[2].drumCells).toEqual([
+                [3, 4, 0],
+                [3, 4, 1]
             ]);
         });
 

@@ -1079,6 +1079,7 @@ describe("PitchDrumMatrix Widget", () => {
             // Setup _rowBlocks, _colBlocks, and _blockMap
             pdm._rowBlocks = [101, 102];
             pdm._colBlocks = [201];
+            pdm.selectBlockMap();
             pdm.addNode(101, 201);
 
             pdm.makeClickable();
@@ -1292,7 +1293,7 @@ describe("PitchDrumMatrix with a real DOM", () => {
         pdm.clearBlocks();
         rowBlocks.forEach(blk => pdm.addRowBlock(blk));
         colBlocks.forEach(blk => pdm.addColBlock(blk));
-        pdm._blockMap = blockMap;
+        pdm._blockMaps[pdm.blockNo] = blockMap;
         pdm.init(activity);
         pdm.makeClickable();
         return { pdm, activity };

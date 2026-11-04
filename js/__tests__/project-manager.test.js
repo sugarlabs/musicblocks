@@ -1144,6 +1144,58 @@ describe("prepareExport", () => {
         });
     });
 
+    describe("Pitch-Drum Matrix cells", () => {
+        const block = (name, extra = {}) => ({
+            name,
+            trash: false,
+            value: null,
+            collapsed: false,
+            container: { x: 0, y: 0 },
+            connections: [null],
+            isValueBlock: () => false,
+            ...extra
+        });
+
+        // Block 0 is in the trash, so the matrix (1), pitch (2) and drum (3) become 0, 1 and 2.
+        const exportMatrix = drumCells => {
+            const activity = makeActivity();
+            activity.blocks.blockList = [
+                block("pitch", { trash: true }),
+                block("pitchdrummatrix", { drumCells }),
+                block("pitch"),
+                block("playdrum")
+            ];
+            const pm = new ProjectManager(activity);
+            return JSON.parse(pm.prepareExport())[0][1];
+        };
+
+        it("exports the selected cells with the block ids renumbered like connections", () => {
+            expect(
+                exportMatrix([
+                    [2, 3, 0],
+                    // The second row of a repeated pitch block.
+                    [2, 3, 1],
+                    // A pitch in the trash, and a drum no longer in the project.
+                    [0, 3, 0],
+                    [2, 9, 0]
+                ])
+            ).toEqual([
+                "pitchdrummatrix",
+                {
+                    collapsed: false,
+                    drumCells: [
+                        [1, 2, 0],
+                        [1, 2, 1]
+                    ]
+                }
+            ]);
+        });
+
+        it("exports only the collapsed state when there are no cells", () => {
+            expect(exportMatrix()).toEqual(["pitchdrummatrix", { collapsed: false }]);
+        });
+    });
+
     describe("while a duplicate notes clamp plays", () => {
         const block = (name, connections, trash = false) => ({
             name,
