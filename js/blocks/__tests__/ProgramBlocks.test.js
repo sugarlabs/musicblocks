@@ -267,6 +267,20 @@ describe("ProgramBlocks", () => {
             // Should not throw, error is handled gracefully
             expect(global.fetch).toHaveBeenCalled();
         });
+
+        test.each(["__proto__", "constructor", "prototype"])(
+            "rejects unsafe heap name %s when loading from app",
+            heapName => {
+                const block = getBlock("loadHeapFromApp");
+                const initialProto = Object.getPrototypeOf(logo.turtleHeaps);
+
+                block.flow([heapName, "http://test.com"], logo, 0, 1);
+
+                expect(activity.errorMsg).toHaveBeenCalledWith("The heap name is reserved.", 1);
+                expect(Object.hasOwn(logo.turtleHeaps, heapName)).toBe(false);
+                expect(Object.getPrototypeOf(logo.turtleHeaps)).toBe(initialProto);
+            }
+        );
     });
 
     describe("SaveHeapToAppBlock", () => {
@@ -303,6 +317,28 @@ describe("ProgramBlocks", () => {
 
             expect(activity.errorMsg).toHaveBeenCalledWith(
                 "Cannot find a valid heap for nonexistent",
+                1
+            );
+        });
+
+        test.each(["__proto__", "constructor", "prototype"])(
+            "rejects unsafe heap name %s when saving to app",
+            heapName => {
+                const block = getBlock("saveHeapToApp");
+
+                block.flow([heapName, "http://test.com"], logo, 0, 1);
+
+                expect(activity.errorMsg).toHaveBeenCalledWith("The heap name is reserved.", 1);
+            }
+        );
+
+        test("does not treat inherited Object prototype properties as valid heaps", () => {
+            const block = getBlock("saveHeapToApp");
+
+            block.flow(["toString", "http://test.com"], logo, 0, 1);
+
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Cannot find a valid heap for toString",
                 1
             );
         });
@@ -543,6 +579,28 @@ describe("ProgramBlocks", () => {
             expect(logo.turtleDicts[turtle][targetTurtleIndex]).toEqual({ custom: "value" });
         });
 
+        test("ignores unsafe keys when copying dictionary file to target turtle", () => {
+            const blk = 10;
+            const turtle = 0;
+            const targetTurtleIndex = 5;
+            logo.turtleDicts[turtle] = {};
+            global.getTargetTurtle.mockReturnValue(targetTurtleIndex);
+
+            activity.blocks.blockList[blk] = {
+                connections: [null, null, 20]
+            };
+            activity.blocks.blockList[20] = {
+                name: "loadFile",
+                value: ["filename", '{"custom": "value", "__proto__": {"polluted": true}}']
+            };
+
+            const block = getBlock("loadDict");
+            block.flow(["target", [null, null]], logo, turtle, blk);
+
+            expect(logo.turtleDicts[turtle][targetTurtleIndex]).toEqual({ custom: "value" });
+            expect({}.polluted).toBeUndefined();
+        });
+
         test("treats English and translated status keys the same in another language", () => {
             const blk = 10;
             const turtle = 0;
@@ -717,6 +775,27 @@ describe("ProgramBlocks", () => {
                 "value"
             );
             expect(logo.turtleDicts[turtle][targetTurtleIndex]).toEqual({ custom: "value" });
+        });
+
+        test("ignores unsafe keys when setting dictionary from string on target turtle", () => {
+            const blk = 10;
+            const turtle = 0;
+            const targetTurtleIndex = 5;
+            logo.turtleDicts[turtle] = {};
+            global.getTargetTurtle.mockReturnValue(targetTurtleIndex);
+
+            activity.blocks.blockList[blk] = {
+                connections: [null, null, 20]
+            };
+            activity.blocks.blockList[20] = {
+                value: '{"custom": "value", "__proto__": {"polluted": true}}'
+            };
+
+            const block = getBlock("setDictionary");
+            block.flow(["target", {}], logo, turtle, blk);
+
+            expect(logo.turtleDicts[turtle][targetTurtleIndex]).toEqual({ custom: "value" });
+            expect({}.polluted).toBeUndefined();
         });
 
         test("rejects non-object JSON array", () => {

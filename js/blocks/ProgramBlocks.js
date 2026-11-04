@@ -88,7 +88,14 @@ function setupProgramBlocks(activity) {
 
             const url = args[1];
             const name = args[0];
-            const oldHeap = name in logo.turtleHeaps ? logo.turtleHeaps[name] : [];
+            if (isUnsafeObjectKey(name)) {
+                activity.errorMsg(_("The heap name is reserved."), blk);
+                return;
+            }
+
+            const oldHeap = Object.prototype.hasOwnProperty.call(logo.turtleHeaps, name)
+                ? logo.turtleHeaps[name]
+                : [];
 
             // Use async fetch to avoid blocking the UI
             if (!isSafeUrl(url)) {
@@ -180,8 +187,12 @@ function setupProgramBlocks(activity) {
 
             const name = args[0];
             const url = args[1];
+            if (isUnsafeObjectKey(name)) {
+                activity.errorMsg(_("The heap name is reserved."), blk);
+                return;
+            }
 
-            if (name in logo.turtleHeaps) {
+            if (Object.prototype.hasOwnProperty.call(logo.turtleHeaps, name)) {
                 const data = JSON.stringify(logo.turtleHeaps[name]);
                 if (!isSafeUrl(url)) {
                     activity.errorMsg(_("Invalid URL"), blk);
@@ -451,6 +462,9 @@ function setupProgramBlocks(activity) {
                             // Copy any internal entries now.
                             const k = Object.keys(d);
                             for (let i = 0; i < k.length; i++) {
+                                if (isUnsafeObjectKey(k[i])) {
+                                    continue;
+                                }
                                 Turtle.DictActions.SetDictValue(target, turtle, k[i], d[k[i]]);
                                 if (!isTurtleStatusKey(k[i])) {
                                     if (
@@ -572,6 +586,9 @@ function setupProgramBlocks(activity) {
                         // Copy any internal entries now.
                         const k = Object.keys(d);
                         for (let i = 0; i < k.length; i++) {
+                            if (isUnsafeObjectKey(k[i])) {
+                                continue;
+                            }
                             Turtle.DictActions.SetDictValue(target, turtle, k[i], d[k[i]]);
                             if (!isTurtleStatusKey(k[i])) {
                                 if (
