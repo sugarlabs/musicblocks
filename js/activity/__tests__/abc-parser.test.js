@@ -327,6 +327,33 @@ describe("ABC voices sharing one staff", () => {
     });
 });
 
+describe("Block positions for loadNewBlocks", () => {
+    // loadNewBlocks reads each connection as a position in the array, so every block has to
+    // sit at the position of its own id, and every connection has to point back.
+    const expectLoadable = blocks => {
+        blocks.forEach((block, position) => {
+            expect(block[0]).toBe(position);
+            block[4].forEach(connection => {
+                if (connection !== null) {
+                    expect(blocks[connection][4]).toContain(position);
+                }
+            });
+        });
+    };
+
+    test("a repeat in a voice before the last one", async () => {
+        const tune = ABCJS.parseOnly("X:1\nL:1/4\nK:C\nV:1\n|:CDEF:|\nV:2\n|:C,D,E,F,:|\n")[0];
+        expectLoadable(await parseAndCapture(tune));
+    });
+
+    test("two voices sharing a staff over two lines", async () => {
+        const tune = ABCJS.parseOnly(
+            "X:1\nL:1/4\n%%score (1 2)\nK:C\nV:1\nCDEF|\nV:2\nC,D,E,F,|\nV:1\nGABc|]\nV:2\nG,A,B,C|]\n"
+        )[0];
+        expectLoadable(await parseAndCapture(tune));
+    });
+});
+
 // ---------------------------------------------------------------------------
 // Test 3 — Repeat bars
 // ---------------------------------------------------------------------------
@@ -604,14 +631,28 @@ describe("Test 4: Triplets", () => {
 
         const blocks = await parseAndCapture(twoVoiceTune);
 
-        // Follow each note's duration connection, excluding meter and pitch numbers.
+        // Follow each note's duration and pitch connections, excluding meter and pitch numbers.
         const byId = new Map(blocks.map(block => [block[0], block]));
-        const durations = blocksOfType(blocks, "newnote").map(note => {
-            const divide = byId.get(note[4][1]);
-            return byId.get(divide[4][1])[1][1].value / byId.get(divide[4][2])[1][1].value;
+        const durations = Object.fromEntries(
+            blocksOfType(blocks, "newnote").map(note => {
+                const divide = byId.get(note[4][1]);
+                const pitch = byId.get(byId.get(note[4][2])[4][1]);
+                return [
+                    byId.get(pitch[4][1])[1][1].value,
+                    byId.get(divide[4][1])[1][1].value / byId.get(divide[4][2])[1][1].value
+                ];
+            })
+        );
+        // Only voice 1's C D E are triplet notes; voice 2's G A B stay quarter notes.
+        expect(durations).toEqual({
+            C: 1 / 12,
+            D: 1 / 12,
+            E: 1 / 12,
+            F: 1 / 4,
+            G: 1 / 4,
+            A: 1 / 4,
+            B: 1 / 4
         });
-        // Each voice now has its own start stack, so its notes are grouped together.
-        expect(durations).toEqual([1 / 12, 1 / 12, 1 / 12, 1 / 4, 1 / 4, 1 / 4, 1 / 4]);
     });
 });
 
