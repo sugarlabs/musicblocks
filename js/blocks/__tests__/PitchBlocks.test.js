@@ -815,6 +815,47 @@ describe("setupPitchBlocks", () => {
             global.scaleDegreeToPitchMapping.mockReturnValue(null);
             expect(block.arg(logo, 0, 10)).toBe(global.INVALIDPITCH);
         });
+
+        it("preserves octave 0 correctly for notename, solfege, scaledegree2, and string fallbacks", () => {
+            const block = createdBlocks["outputtools"];
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(0));
+            activity.blocks.blockList[10].connections[1] = 20;
+
+            tur.singer.currentOctave = 0;
+
+            // notename block preserves octave 0
+            activity.blocks.blockList[20] = { name: "notename" };
+            logo.parseArg.mockReturnValue("C");
+            expect(block.arg(logo, 0, 10)).toBe("C0");
+
+            // solfege block preserves octave 0
+            activity.blocks.blockList[20] = { name: "solfege" };
+            logo.parseArg.mockReturnValue("do");
+            expect(block.arg(logo, 0, 10)).toBe("C0");
+
+            // solfege block preserves octave 0 with accidentals
+            activity.blocks.blockList[20] = { name: "solfege" };
+            logo.parseArg.mockReturnValue("re#");
+            expect(block.arg(logo, 0, 10)).toBe("D#0");
+
+            // scaledegree2 block preserves octave 0
+            activity.blocks.blockList[20] = { name: "scaledegree2", value: 3 };
+            global.scaleDegreeToPitchMapping.mockReturnValue("E");
+            expect(block.arg(logo, 0, 10)).toBe("E0");
+
+            // string fallback matching SOLFEGENAMES1 preserves octave 0
+            activity.blocks.blockList[20] = { name: "text" };
+            logo.parseArg.mockReturnValue("re");
+            expect(block.arg(logo, 0, 10)).toBe("D0");
+
+            // string fallback matching NOTENAMES1 preserves octave 0
+            logo.parseArg.mockReturnValue("F");
+            expect(block.arg(logo, 0, 10)).toBe("F0");
+
+            // string fallback matching ALLNOTENAMES preserves octave 0
+            logo.parseArg.mockReturnValue("F#");
+            expect(block.arg(logo, 0, 10)).toBe("F#0");
+        });
     });
 
     describe("StaffYToPitch", () => {

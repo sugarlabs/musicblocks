@@ -27,7 +27,7 @@
    noteToFrequency, getTemperament,
    SEMITONES, normalizeNoteAccidentals, parseNoteString, getCurrentEDO,
    keySignatureToMode, getSavedCustomModes,
-   clampNumber, saveMeterState, restoreMeterState
+   clampNumber, saveMeterState, restoreMeterState, noteToObj
  */
 
 /*
@@ -38,7 +38,7 @@
         frequencyToPitch, pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp, getStepSizeDown,
         numberToPitch, pitchToNumber, noteIsSolfege, getSolfege, SOLFEGENAMES1, NOTENAMES1,
         SOLFEGECONVERSIONTABLE, getInterval, noteToFrequency, getTemperament,
-        getCurrentEDO, isEquallyTempered
+        getCurrentEDO, isEquallyTempered, noteToObj
     js/utils/musicutils-rhythm.js
         saveMeterState, restoreMeterState
     js/utils/utils.js
@@ -2658,11 +2658,10 @@ class Singer {
                                 stopBtn.style.color = "#ea174c";
                             }
                         }
-                        const len = notes[0].length;
                         if (typeof notes[0] === "number") {
                             tur.singer.currentOctave = frequencyToPitch(notes[0])[1];
                         } else {
-                            tur.singer.currentOctave = parseInt(notes[0].slice(len - 1), 10);
+                            tur.singer.currentOctave = noteToObj(notes[0])[1];
                         }
                         tur.singer.currentCalculatedOctave = tur.singer.currentOctave;
 

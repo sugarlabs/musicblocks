@@ -78,6 +78,8 @@ global.NOTENAMES1 = musicUtils.NOTENAMES1;
 global.getInterval = musicUtils.getInterval;
 global.noteIsSolfege = musicUtils.noteIsSolfege;
 global.getSolfege = musicUtils.getSolfege;
+global.noteToObj = musicUtils.noteToObj;
+global.frequencyToPitch = musicUtils.frequencyToPitch;
 global.last = array => (array && array.length > 0 ? array[array.length - 1] : null);
 global.deepClone = value => {
     if (typeof structuredClone === "function") {
@@ -1920,6 +1922,99 @@ describe("processNote regression behavior", () => {
         singer.partials = [[0, 1, 0]];
         Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
         expect(activityMock.errorMsg).not.toHaveBeenCalled();
+    });
+});
+
+describe("Singer.processNote octave parsing and propagation", () => {
+    let turtleMock;
+    let activityMock;
+    let singer;
+
+    const seedNoteBlockState = (singer, blk, pitch = "C", octave = 4) => {
+        singer.inNoteBlock = [blk];
+        singer.notePitches[blk] = [pitch];
+        singer.noteOctaves[blk] = [octave];
+        singer.noteCents[blk] = [0];
+        singer.noteHertz[blk] = [0];
+        singer.oscList[blk] = false;
+        singer.noteBeat[blk] = 1;
+        singer.noteBeatValues[blk] = 4;
+        singer.noteDrums[blk] = [];
+        singer.embeddedGraphics[blk] = [];
+    };
+
+    beforeEach(() => {
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        activityMock = createActivityMock(turtleMock);
+        activityMock.logo.specialArgs = [];
+        activityMock.logo.dispatchTurtleSignals = jest.fn();
+        activityMock.stage = { update: jest.fn() };
+        turtleMock.doWait = jest.fn();
+        turtleMock.blink = jest.fn();
+        singer = turtleMock.singer;
+        singer.suppressOutput = true;
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    test("correctly parses multi-digit octaves (e.g. C10) instead of truncating to single-digit", () => {
+        const blk = "blk1";
+        seedNoteBlockState(singer, blk, "C", 10);
+        jest.spyOn(global, "getNote").mockImplementation((pitch, octave) => [pitch, octave]);
+
+        Singer.processNote(activityMock, 0, false, blk, 0, jest.fn());
+
+        expect(singer.currentOctave).toBe(10);
+        expect(singer.currentCalculatedOctave).toBe(10);
+    });
+
+    test("correctly parses negative octaves (e.g. D-1) instead of stripping the minus sign", () => {
+        const blk = "blk2";
+        seedNoteBlockState(singer, blk, "D", -1);
+        jest.spyOn(global, "getNote").mockImplementation((pitch, octave) => [pitch, octave]);
+
+        Singer.processNote(activityMock, 0, false, blk, 0, jest.fn());
+
+        expect(singer.currentOctave).toBe(-1);
+        expect(singer.currentCalculatedOctave).toBe(-1);
+    });
+
+    test("correctly parses negative multi-digit / accidental notes (e.g. F#-2)", () => {
+        const blk = "blk3";
+        seedNoteBlockState(singer, blk, "F#", -2);
+        jest.spyOn(global, "getNote").mockImplementation((pitch, octave) => [pitch, octave]);
+
+        Singer.processNote(activityMock, 0, false, blk, 0, jest.fn());
+
+        expect(singer.currentOctave).toBe(-2);
+        expect(singer.currentCalculatedOctave).toBe(-2);
+    });
+
+    test("correctly parses octave 0 (e.g. A0)", () => {
+        const blk = "blk4";
+        seedNoteBlockState(singer, blk, "A", 0);
+        jest.spyOn(global, "getNote").mockImplementation((pitch, octave) => [pitch, octave]);
+
+        Singer.processNote(activityMock, 0, false, blk, 0, jest.fn());
+
+        expect(singer.currentOctave).toBe(0);
+        expect(singer.currentCalculatedOctave).toBe(0);
+    });
+
+    test("correctly resolves frequency number notes via frequencyToPitch", () => {
+        const blk = "blk5";
+        seedNoteBlockState(singer, blk, "A", 4);
+        singer.noteCents[blk] = [10];
+        singer.noteHertz[blk] = [440];
+        jest.spyOn(global, "frequencyToPitch").mockReturnValue(["A", 5, 0]);
+
+        Singer.processNote(activityMock, 0, false, blk, 0, jest.fn());
+
+        expect(singer.currentOctave).toBe(5);
+        expect(singer.currentCalculatedOctave).toBe(5);
     });
 });
 
