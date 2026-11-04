@@ -40,6 +40,8 @@ describe("musicutils-rhythm", () => {
         expect(() => rhythm.reducedFraction(Infinity, 2)).not.toThrow();
         expect(() => rhythm.reducedFraction(2, Infinity)).not.toThrow();
         expect(rhythm.reducedFraction(3, NaN)).toBe("0<br>&mdash;<br>1<br><br>");
+        expect(rhythm.reducedFraction(Infinity, 2)).toBe("0<br>&mdash;<br>1<br><br>");
+        expect(rhythm.reducedFraction(2, Infinity)).toBe("0<br>&mdash;<br>1<br><br>");
         expect(rhythm.reducedFraction(0, 0)).toBe("0<br>&mdash;<br>1<br><br>");
         expect(rhythm.calcNoteValueToDisplay(NaN, 2)).not.toContain("NaN");
         expect(rhythm.calcNoteValueToDisplay(2, NaN)).not.toContain("NaN");
