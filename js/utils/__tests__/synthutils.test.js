@@ -3014,6 +3014,21 @@ describe("Utility Functions (logic-only)", () => {
             expect(clicked[0].download).toBe("take one.ogg");
         });
 
+        it("saves an mp4 file named .m4a when Safari's recording can't be converted", async () => {
+            recorderMimeType = "audio/mp4";
+            decodeAudioData.mockImplementation(() => Promise.reject(new Error("cannot decode")));
+            window.MBDialog = {
+                prompt: jest.fn(() => Promise.resolve("safari take")),
+                alert: jest.fn()
+            };
+            const clicked = captureDownloads();
+
+            setup();
+            await recordAndStop();
+
+            expect(clicked[0].download).toBe("safari take.m4a");
+        });
+
         it("falls back to the browser prompt when MBDialog is unavailable", async () => {
             delete window.MBDialog;
             window.prompt = jest.fn(() => "fallback");

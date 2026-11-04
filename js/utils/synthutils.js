@@ -1340,7 +1340,15 @@ function Synth() {
                 // Couldn't convert, so save what was recorded, named by its real format.
                 console.debug("Could not convert the recording to WAV:", e);
                 blob = recorded;
-                ext = (recorder.mimeType || "").includes("ogg") ? ".ogg" : ".webm";
+                const mime = (recorder.mimeType || "").toLowerCase();
+                if (mime.includes("ogg")) {
+                    ext = ".ogg";
+                } else if (mime.includes("mp4")) {
+                    // Safari records mp4 (aac).
+                    ext = ".m4a";
+                } else {
+                    ext = ".webm";
+                }
             }
             const url = URL.createObjectURL(blob);
             const t = text => (typeof window._ === "function" ? window._(text) : text);
