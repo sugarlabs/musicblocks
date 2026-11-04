@@ -303,6 +303,13 @@ function setupRhythmActions(activity) {
         static doTie(turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
+            // If a Tie clamp is already active on this turtle, treat the inner Tie
+            // as a non-owning nested scope. Do not wipe the enclosing Tie's pending state,
+            // do not overwrite its cleanup listener, and do not deactivate tie mode on exit.
+            if (tur && tur.singer && tur.singer.tie) {
+                return;
+            }
+
             // Tie notes together in pairs
             tur.singer.tie = true;
             tur.singer.tieNotePitches = [];
@@ -458,7 +465,7 @@ function setupRhythmActions(activity) {
          * @param {Number} noteValue - target note value
          * @param {Object} turtle - Turtle object
          * @param {Object} blk - corresponding Block object index in blocks.blockList or custom block number
-         * @returns {void}
+         * @returns {boolean} whether a swing listener was set up for the end of the clamp
          */
         static addSwing(swingValue, noteValue, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
@@ -467,10 +474,10 @@ function setupRhythmActions(activity) {
                 activity.logo.notation.notationSwing(turtle);
             } else {
                 if (!Number.isFinite(swingValue) || swingValue === 0) {
-                    return;
+                    return false;
                 }
                 if (!Number.isFinite(noteValue) || noteValue === 0) {
-                    return;
+                    return false;
                 }
                 tur.singer.swing.push(1 / swingValue);
                 tur.singer.swingTarget.push(1 / noteValue);
@@ -496,6 +503,7 @@ function setupRhythmActions(activity) {
             };
 
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
+            return true;
         }
 
         /**

@@ -525,7 +525,9 @@ class SaveInterface {
                 const mainTrack = midi.addTrack();
                 mainTrack.name = `Track ${parseInt(blockIndex, 10) + 1}`;
 
-                const trackMap = new Map();
+                // Kept apart, so an instrument named like a drum gets its own track.
+                const drumTracks = new Map();
+                const instrumentTracks = new Map();
                 let globalTime = 0;
 
                 notes.forEach(noteData => {
@@ -535,14 +537,14 @@ class SaveInterface {
 
                     if (noteData.drum) {
                         const drum = noteData.drum || false;
-                        if (!trackMap.has(drum)) {
+                        if (!drumTracks.has(drum)) {
                             const drumTrack = midi.addTrack();
                             drumTrack.name = `Track ${parseInt(blockIndex, 10) + 1} - ${drum}`;
                             drumTrack.channel = 9; // Drums must be on Channel 10
-                            trackMap.set(drum, drumTrack);
+                            drumTracks.set(drum, drumTrack);
                         }
 
-                        const drumTrack = trackMap.get(drum);
+                        const drumTrack = drumTracks.get(drum);
 
                         const midiNumber =
                             Object.prototype.hasOwnProperty.call(drumMIDI, drum) && drumMIDI[drum]
@@ -554,8 +556,12 @@ class SaveInterface {
                             duration: duration,
                             velocity: 0.9
                         });
-                    } else {
-                        if (!trackMap.has(instrument)) {
+                    }
+
+                    // A note can play pitches together with a drum: write those as well.
+                    const pitches = noteData.note.filter(pitch => !pitch.includes("R"));
+                    if (!noteData.drum || pitches.length > 0) {
+                        if (!instrumentTracks.has(instrument)) {
                             const instrumentTrack = midi.addTrack();
                             instrumentTrack.name = `Track ${
                                 parseInt(blockIndex, 10) + 1
@@ -564,20 +570,18 @@ class SaveInterface {
                                 Object.prototype.hasOwnProperty.call(instrumentMIDI, instrument)
                                     ? instrumentMIDI[instrument]
                                     : instrumentMIDI["default"];
-                            trackMap.set(instrument, instrumentTrack);
+                            instrumentTracks.set(instrument, instrumentTrack);
                         }
 
-                        const instrumentTrack = trackMap.get(instrument);
+                        const instrumentTrack = instrumentTracks.get(instrument);
 
-                        noteData.note.forEach(pitch => {
-                            if (!pitch.includes("R")) {
-                                instrumentTrack.addNote({
-                                    name: normalizeNoteAccidentals(pitch),
-                                    time: globalTime,
-                                    duration: duration,
-                                    velocity: 0.8
-                                });
-                            }
+                        pitches.forEach(pitch => {
+                            instrumentTrack.addNote({
+                                name: normalizeNoteAccidentals(pitch),
+                                time: globalTime,
+                                duration: duration,
+                                velocity: 0.8
+                            });
                         });
                     }
                     globalTime += duration;

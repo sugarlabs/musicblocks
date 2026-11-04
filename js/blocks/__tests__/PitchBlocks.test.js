@@ -795,6 +795,26 @@ describe("setupPitchBlocks", () => {
             activity.blocks.blockList[10].connections[1] = null;
             expect(block.arg(logo, 0, 10)).toBe("G4");
         });
+
+        it("maps scaledegree2 input and handles null mapping safely", () => {
+            const block = createdBlocks["outputtools"];
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(0));
+            activity.blocks.blockList[10].connections[1] = 20;
+            activity.blocks.blockList[20] = { name: "scaledegree2", value: 3 };
+
+            // Successful mapping with turtle currentOctave
+            tur.singer.currentOctave = 5;
+            global.scaleDegreeToPitchMapping.mockReturnValue("E");
+            expect(block.arg(logo, 0, 10)).toBe("E5");
+
+            // Successful mapping with fallback octave 4
+            tur.singer.currentOctave = null;
+            expect(block.arg(logo, 0, 10)).toBe("E4");
+
+            // Null mapping returns INVALIDPITCH
+            global.scaleDegreeToPitchMapping.mockReturnValue(null);
+            expect(block.arg(logo, 0, 10)).toBe(global.INVALIDPITCH);
+        });
     });
 
     describe("StaffYToPitch", () => {
@@ -831,9 +851,236 @@ describe("setupPitchBlocks", () => {
             block.arg(logo, 0, 10);
             expect(logo.statusFields).toContainEqual([10, "ytopitch"]);
         });
+
+        it("safely handles unavailable tonics when buildScale returns null", () => {
+            const block = createdBlocks["ytopitch"];
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(0));
+            const origKey = tur.singer.keySignature;
+            tur.singer.keySignature = "C♭ major";
+            global.buildScale = jest.fn().mockReturnValue(null);
+
+            try {
+                // Default connection (cblk0 === null)
+                activity.blocks.blockList[10].connections = [null, null];
+                expect(block.arg(logo, 0, 10)).toBe("G4");
+
+                activity.blocks.blockList[30] = { value: 0 };
+                activity.blocks.blockList[10].connections = [null, 30];
+                logo.parseArg.mockReturnValue(0);
+                expect(block.arg(logo, 0, 10)).toBe("C4");
+
+                logo.parseArg.mockReturnValue(-50);
+                expect(block.arg(logo, 0, 10)).toBe("E3");
+
+                // Connected to "pitch" with null scale
+                activity.blocks.blockList[20] = { name: "pitch" };
+                activity.blocks.blockList[10].connections = [20, null];
+                expect(block.arg(logo, 0, 10)).toEqual(["sol", 4]);
+
+                activity.blocks.blockList[10].connections = [20, 30];
+                logo.parseArg.mockReturnValue(0);
+                expect(block.arg(logo, 0, 10)).toEqual(["C", 4]);
+
+                // Negative staff position (exercises noteIdx < 0 loop)
+                logo.parseArg.mockReturnValue(-50);
+                expect(block.arg(logo, 0, 10)).toEqual(["E", 3]);
+
+                // Octave boundary positions
+                logo.parseArg.mockReturnValue(70);
+                expect(block.arg(logo, 0, 10)).toEqual(["C", 5]);
+
+                logo.parseArg.mockReturnValue(-70);
+                expect(block.arg(logo, 0, 10)).toEqual(["C", 3]);
+
+                // Connected to "pitchnumber" with null scale
+                activity.blocks.blockList[20].name = "pitchnumber";
+                activity.blocks.blockList[10].connections = [20, null];
+                expect(block.arg(logo, 0, 10)).toBe(7);
+
+                activity.blocks.blockList[10].connections = [20, 30];
+                logo.parseArg.mockReturnValue(0);
+                expect(block.arg(logo, 0, 10)).toBe(0);
+
+                // Negative staff position for pitchnumber
+                logo.parseArg.mockReturnValue(-50);
+                expect(block.arg(logo, 0, 10)).toBe(-8);
+
+                logo.parseArg.mockReturnValue(70);
+                expect(block.arg(logo, 0, 10)).toBe(12);
+
+                logo.parseArg.mockReturnValue(-70);
+                expect(block.arg(logo, 0, 10)).toBe(-12);
+            } finally {
+                tur.singer.keySignature = origKey;
+                global.buildScale = jest.fn(() => [["C", "D", "E", "F", "G", "A", "B"], []]);
+            }
+        });
+
+        it("falls back to NOTENAMES when note is missing from scale in StaffYToPitch", () => {
+            const block = createdBlocks["ytopitch"];
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(0));
+            const origKey = tur.singer.keySignature;
+            tur.singer.keySignature = "C♭ major";
+            global.buildScale = jest.fn().mockReturnValue([[], []]);
+
+            try {
+                activity.blocks.blockList[30] = { value: 0 };
+                activity.blocks.blockList[20] = { name: "pitch" };
+                activity.blocks.blockList[10].connections = [20, 30];
+
+                // Non-negative staff position (noteIdx >= 0)
+                logo.parseArg.mockReturnValue(0);
+                expect(block.arg(logo, 0, 10)).toEqual(["C", 4]);
+
+                // Negative staff position (noteIdx < 0)
+                logo.parseArg.mockReturnValue(-50);
+                expect(block.arg(logo, 0, 10)).toEqual(["E", 3]);
+            } finally {
+                tur.singer.keySignature = origKey;
+                global.buildScale = jest.fn(() => [["C", "D", "E", "F", "G", "A", "B"], []]);
+            }
+        });
+
+        it("safely handles unsupported 5-EDO tonics with native buildScale in StaffYToPitch", () => {
+            const block = createdBlocks["ytopitch"];
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(0));
+            const origKey = tur.singer.keySignature;
+            const origBuildScale = global.buildScale;
+
+            const { buildScale: nativeBuildScale } = require("../../utils/musicutils");
+            global.buildScale = (key, edo = 5) => nativeBuildScale(key, edo);
+            tur.singer.keySignature = "C♭ major";
+
+            try {
+                // Default connection (cblk0 === null)
+                activity.blocks.blockList[10].connections = [null, null];
+                expect(block.arg(logo, 0, 10)).toBe("G4");
+
+                activity.blocks.blockList[30] = { value: 0 };
+                activity.blocks.blockList[10].connections = [null, 30];
+                logo.parseArg.mockReturnValue(0);
+                expect(block.arg(logo, 0, 10)).toBe("C4");
+
+                logo.parseArg.mockReturnValue(-50);
+                expect(block.arg(logo, 0, 10)).toBe("E3");
+
+                // Connected to "pitch"
+                activity.blocks.blockList[20] = { name: "pitch" };
+                activity.blocks.blockList[10].connections = [20, null];
+                expect(block.arg(logo, 0, 10)).toEqual(["sol", 4]);
+
+                activity.blocks.blockList[10].connections = [20, 30];
+                logo.parseArg.mockReturnValue(0);
+                const pitchResult = block.arg(logo, 0, 10);
+                expect(Array.isArray(pitchResult)).toBe(true);
+                expect(pitchResult).toEqual(["C", 4]);
+
+                logo.parseArg.mockReturnValue(-50);
+                expect(block.arg(logo, 0, 10)).toEqual(["E", 3]);
+
+                // Connected to "pitchnumber"
+                activity.blocks.blockList[20].name = "pitchnumber";
+                activity.blocks.blockList[10].connections = [20, null];
+                expect(block.arg(logo, 0, 10)).toBe(7);
+
+                activity.blocks.blockList[10].connections = [20, 30];
+                logo.parseArg.mockReturnValue(0);
+                const numResult = block.arg(logo, 0, 10);
+                expect(typeof numResult).toBe("number");
+                expect(numResult).toBe(0);
+
+                logo.parseArg.mockReturnValue(-50);
+                expect(block.arg(logo, 0, 10)).toBe(-8);
+            } finally {
+                tur.singer.keySignature = origKey;
+                global.buildScale = origBuildScale;
+            }
+        });
+
+        it("handles flat notes in 12-EDO and non-12 EDO conversions for pitchnumber", () => {
+            const block = createdBlocks["ytopitch"];
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(0));
+            const origKey = tur.singer.keySignature;
+            const origBuildScale = global.buildScale;
+            const origGetCurrentEDO = global.getCurrentEDO;
+            const origGenerateNoteNames = global.generateNoteNames;
+
+            try {
+                activity.blocks.blockList[20] = { name: "pitchnumber" };
+                activity.blocks.blockList[30] = { value: 0 };
+                activity.blocks.blockList[10].connections = [20, 30];
+                logo.parseArg.mockReturnValue(0);
+
+                // 1) 12-EDO flat note lookup (NOTESSHARP has no Eb, NOTESFLAT has Eb at index 3)
+                global.buildScale = jest
+                    .fn()
+                    .mockReturnValue([["Eb", "F", "G", "Ab", "Bb", "C", "D"], []]);
+                expect(block.arg(logo, 0, 10)).toBe(3);
+
+                // 2) Non-12 EDO (19-EDO) note found in edoNames
+                logo.synth = { inTemperament: "equal19" };
+                global.getCurrentEDO = jest.fn().mockReturnValue(19);
+                global.generateNoteNames = jest
+                    .fn()
+                    .mockReturnValue([
+                        "C",
+                        "C#",
+                        "Db",
+                        "D",
+                        "D#",
+                        "Eb",
+                        "E",
+                        "E#",
+                        "F",
+                        "F#",
+                        "Gb",
+                        "G",
+                        "G#",
+                        "Ab",
+                        "A",
+                        "A#",
+                        "Bb",
+                        "B",
+                        "B#"
+                    ]);
+                global.buildScale = jest
+                    .fn()
+                    .mockReturnValue([["E#", "F#", "G#", "A#", "B#", "C#", "D#"], []]);
+                expect(block.arg(logo, 0, 10)).toBe(7);
+
+                // 3) Non-12 EDO (5-EDO) note not in edoNames, but found in NOTESSHARP
+                global.getCurrentEDO = jest.fn().mockReturnValue(5);
+                global.generateNoteNames = jest.fn().mockReturnValue(["C", "D", "E", "G", "A"]);
+                global.buildScale = jest.fn().mockReturnValue([["C#"], []]);
+                expect(block.arg(logo, 0, 10)).toBe(0);
+
+                // 4) Non-12 EDO (5-EDO) note not in edoNames or NOTESSHARP, but found in NOTESFLAT
+                global.buildScale = jest.fn().mockReturnValue([["Db"], []]);
+                expect(block.arg(logo, 0, 10)).toBe(0);
+
+                // 5) Non-12 EDO note not in any note table
+                global.buildScale = jest.fn().mockReturnValue([["UnknownNote"], []]);
+                expect(block.arg(logo, 0, 10)).toBe(0);
+            } finally {
+                tur.singer.keySignature = origKey;
+                global.buildScale = origBuildScale;
+                global.getCurrentEDO = origGetCurrentEDO;
+                global.generateNoteNames = origGenerateNoteNames;
+                delete logo.synth;
+            }
+        });
     });
 
     describe("PitchBlock Complex Branches", () => {
+        it("handles null scaleDegreeToPitchMapping by reporting INVALIDPITCH and stopping turtle", () => {
+            const block = createdBlocks["pitch"];
+            activity.blocks.blockList[10].connections[1] = 20;
+            activity.blocks.blockList[20] = { name: "scaledegree2", value: "5#" };
+            global.scaleDegreeToPitchMapping.mockReturnValue(null);
+            block.flow(["1", 4], logo, 0, 10);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.INVALIDPITCH, 10);
+            expect(logo.stopTurtle).toBe(true);
+        });
         it("applies the accidental from a scale degree block to the played pitch", () => {
             const block = createdBlocks["pitch"];
             activity.blocks.blockList[10].connections[1] = 20;

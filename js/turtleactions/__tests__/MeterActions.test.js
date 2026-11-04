@@ -234,6 +234,16 @@ describe("setupMeterActions", () => {
             expect(targetTurtle.singer.bpm).toContain(expected);
         });
 
+        test.each([
+            [5000, 0.25, 1000],
+            [10, 0.25, 30],
+            [120, 0.5, 120],
+            [600, 0.5, 500],
+            [10, 0.5, 15]
+        ])("setBPM(%s, %s) returns the tempo in use, %s, in its beat value", (bpm, beat, used) => {
+            expect(Singer.MeterActions.setBPM(bpm, beat, 0, 1)).toBe(used);
+        });
+
         // --- NaN / zero / negative / Infinity guard ---
         // These inputs must be rejected before any arithmetic so that a zero
         // or NaN value never enters singer.bpm and hangs the audio scheduler.
@@ -246,7 +256,7 @@ describe("setupMeterActions", () => {
         ])("setBPM(%s) shows an error and does not push to bpm", (label, badBpm) => {
             activity.errorMsg.mockClear();
             const bpmBefore = [...targetTurtle.singer.bpm];
-            Singer.MeterActions.setBPM(badBpm, 0.25, 0, 1);
+            expect(Singer.MeterActions.setBPM(badBpm, 0.25, 0, 1)).toBeNull();
             expect(activity.errorMsg).toHaveBeenCalledWith("BPM must be a positive number.", 1);
             // bpm stack must be unchanged — no bad value was stored
             expect(targetTurtle.singer.bpm).toEqual(bpmBefore);
@@ -263,7 +273,7 @@ describe("setupMeterActions", () => {
             (label, badBeatVal) => {
                 activity.errorMsg.mockClear();
                 const bpmBefore = [...targetTurtle.singer.bpm];
-                Singer.MeterActions.setBPM(120, badBeatVal, 0, 1);
+                expect(Singer.MeterActions.setBPM(120, badBeatVal, 0, 1)).toBeNull();
                 expect(activity.errorMsg).toHaveBeenCalledWith(
                     "Beat value must be a positive number.",
                     1
@@ -294,6 +304,18 @@ describe("setupMeterActions", () => {
         });
 
         test.each([
+            [5000, 0.25, 1000],
+            [10, 0.25, 30],
+            [120, 0.5, 120],
+            [600, 0.5, 500]
+        ])(
+            "setMasterBPM(%s, %s) returns the tempo in use, %s, in its beat value",
+            (bpm, beat, used) => {
+                expect(Singer.MeterActions.setMasterBPM(bpm, beat, 1)).toBe(used);
+            }
+        );
+
+        test.each([
             ["NaN", NaN],
             ["zero", 0],
             ["negative", -60],
@@ -304,7 +326,7 @@ describe("setupMeterActions", () => {
             const masterBpmBefore = Singer.masterBPM;
             const factorBefore = Singer.defaultBPMFactor;
 
-            Singer.MeterActions.setMasterBPM(badBpm, 0.25, 1);
+            expect(Singer.MeterActions.setMasterBPM(badBpm, 0.25, 1)).toBeNull();
 
             expect(activity.errorMsg).toHaveBeenCalledWith("BPM must be a positive number.", 1);
             expect(Singer.masterBPM).toBe(masterBpmBefore);
@@ -324,7 +346,7 @@ describe("setupMeterActions", () => {
                 const masterBpmBefore = Singer.masterBPM;
                 const factorBefore = Singer.defaultBPMFactor;
 
-                Singer.MeterActions.setMasterBPM(120, badBeatValue, 1);
+                expect(Singer.MeterActions.setMasterBPM(120, badBeatValue, 1)).toBeNull();
 
                 expect(activity.errorMsg).toHaveBeenCalledWith(
                     "Beat value must be a positive number.",

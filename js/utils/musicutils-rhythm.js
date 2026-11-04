@@ -10,10 +10,16 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /*
+   global
+
+   NOTATIONDURATION, NOTATIONDOTCOUNT, NOTATIONTUPLETVALUE
+ */
+
+/*
    exported
 
-   reducedFraction, calcNoteValueToDisplay, durationToNoteValue, convertFactor,
-   getMeasurePosition, getMeterAnchor, saveMeterState, restoreMeterState, MusicUtilsRhythm
+   reducedFraction, calcNoteValueToDisplay, durationToNoteValue, plainUnwritableTuplets,
+   convertFactor, getMeasurePosition, getMeterAnchor, saveMeterState, restoreMeterState, MusicUtilsRhythm
  */
 
 // var, not const or let: a hoisted var in musicutils.js cannot redeclare a top-level const or let.
@@ -106,6 +112,12 @@ var calcNoteValueToDisplay = (a, b) => {
 var durationToNoteValue = duration => {
     // returns [note value, no. of dots, tuplet factor]
 
+    // Floating-point noise should not turn a triplet into a fractional tuplet.
+    const nearestHalf = Math.round(duration * 2) / 2;
+    if (Math.abs(duration - nearestHalf) < 1e-6) {
+        duration = nearestHalf;
+    }
+
     let currentDotFactor;
     let d;
     // Try to find a match or a dotted match.
@@ -145,6 +157,46 @@ var durationToNoteValue = duration => {
 
     return [1, 0, [duration / j, j], roundDown];
 };
+
+/**
+ * Replace the tuplets an exporter cannot write with the nearest plain note. durationToNoteValue()
+ * keeps any duration that is not a power of two as a tuplet, which mxml.js uses to give the note
+ * its true length, but a tuplet needs a whole count above 1, and the part of a note left over at
+ * a bar line can have a count far past anything playable, such as 625.
+ * @function
+ * @param {Array} staging - The notation staging of a turtle.
+ * @param {number} maxCount - The most notes the exporter can write in a tuplet.
+ * @returns {Array} The staging with those notes written as plain notes.
+ */
+var plainUnwritableTuplets = (staging, maxCount) =>
+    staging.map(row => {
+        const tuplet = Array.isArray(row) ? row[NOTATIONTUPLETVALUE] : null;
+        if (
+            !Array.isArray(tuplet) ||
+            (Number.isInteger(tuplet[0]) && tuplet[0] > 1 && tuplet[0] <= maxCount)
+        ) {
+            return row;
+        }
+
+        const duration = tuplet[0] * tuplet[1];
+        const plainNote = row.slice();
+        let closest = Infinity;
+        plainNote[NOTATIONTUPLETVALUE] = null;
+        // 0.5 is a breve, two whole notes, which a note longer than a whole note can be.
+        for (const noteValue of [0.5, ...POWER2]) {
+            for (let dotCount = 0; dotCount < 3; dotCount++) {
+                const dotFactor = 2 - 1 / Math.pow(2, dotCount);
+                const distance = Math.abs(Math.log(noteValue / dotFactor / duration));
+                if (distance < closest) {
+                    closest = distance;
+                    plainNote[NOTATIONDURATION] = noteValue;
+                    plainNote[NOTATIONDOTCOUNT] = dotCount;
+                }
+            }
+        }
+
+        return plainNote;
+    });
 
 /**
  * Convert a duration factor to a string representation.
@@ -281,6 +333,7 @@ var MusicUtilsRhythm = {
     reducedFraction,
     calcNoteValueToDisplay,
     durationToNoteValue,
+    plainUnwritableTuplets,
     convertFactor,
     getMeasurePosition,
     getMeterAnchor,

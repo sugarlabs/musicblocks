@@ -107,10 +107,11 @@ class RhythmBlocksAPI {
      * @returns {string} ENDFLOWCOMMAND
      */
     async swing(swingValue, noteValue, flow) {
-        const args = JSInterface.validateArgs("multiplyNoteValue", [swingValue, noteValue, flow]);
-        await this.runCommand("addSwing", [args[0], args[1], this.turIndex]);
+        const args = JSInterface.validateArgs("swing", [swingValue, noteValue, flow]);
+        const listening = await this.runCommand("addSwing", [args[0], args[1], this.turIndex]);
         await args[2]();
-        return this.ENDFLOWCOMMAND;
+        // ENDFLOWCOMMAND pops a listener, so without one of our own it would end an outer swing.
+        return listening === false ? this.ENDFLOW : this.ENDFLOWCOMMAND;
     }
 }
 if (typeof module !== "undefined" && module.exports) {

@@ -36,6 +36,7 @@ describe("RhythmBlocksAPI", () => {
         rhythmBlocksAPI.turIndex = 0;
         rhythmBlocksAPI.runCommand = jest.fn();
         rhythmBlocksAPI.ENDFLOWCOMMAND = "END";
+        rhythmBlocksAPI.ENDFLOW = "ENDFLOW";
     });
 
     afterEach(() => {
@@ -124,11 +125,7 @@ describe("RhythmBlocksAPI", () => {
 
         const result = await rhythmBlocksAPI.swing(1, 4, mockFlow);
 
-        expect(JSInterface.validateArgs).toHaveBeenCalledWith("multiplyNoteValue", [
-            1,
-            4,
-            mockFlow
-        ]); // Keep original validation method
+        expect(JSInterface.validateArgs).toHaveBeenCalledWith("swing", [1, 4, mockFlow]);
         expect(rhythmBlocksAPI.runCommand).toHaveBeenCalledWith("addSwing", [1, 4, 0]);
         expect(mockFlow).toHaveBeenCalled();
         expect(result).toBe("END");
@@ -162,5 +159,62 @@ describe("RhythmBlocksAPI", () => {
             "Command failed"
         );
         await expect(rhythmBlocksAPI.swing(1, 4, jest.fn())).rejects.toThrow("Command failed");
+    });
+
+    test("swing does not end an outer swing when addSwing sets up no listener", async () => {
+        const mockFlow = jest.fn();
+        JSInterface.validateArgs.mockReturnValue([0, 1 / 8, mockFlow]);
+        rhythmBlocksAPI.runCommand.mockResolvedValue(false);
+
+        const result = await rhythmBlocksAPI.swing(0, 1 / 8, mockFlow);
+
+        expect(mockFlow).toHaveBeenCalled();
+        expect(result).toBe("ENDFLOW");
+    });
+
+    describe("swing with the real argument validation", () => {
+        let mockedJSInterface;
+
+        beforeEach(() => {
+            mockedJSInterface = global.JSInterface;
+            global.JSEditor = { logConsole: jest.fn() };
+            // constraints.js attaches to an existing JSInterface, so load it before the real one.
+            delete global.JSInterface;
+            jest.isolateModules(() => {
+                require("../../constraints.js");
+                global.JSInterface = require("../../interface");
+            });
+        });
+
+        afterEach(() => {
+            global.JSInterface = mockedJSInterface;
+            delete global.JSEditor;
+        });
+
+        test("accepts a swing value and a note value", async () => {
+            const mockFlow = jest.fn();
+            const result = await rhythmBlocksAPI.swing(1 / 24, 1 / 8, async () => mockFlow());
+
+            expect(rhythmBlocksAPI.runCommand).toHaveBeenCalledWith("addSwing", [1 / 24, 1 / 8, 0]);
+            expect(mockFlow).toHaveBeenCalled();
+            expect(result).toBe("END");
+        });
+
+        test.each([
+            [0, 1000, 0, 1000],
+            [-5, 2000, 0, 1000]
+        ])("clamps swing(%p, %p) to [%p, %p]", async (swingValue, noteValue, ...expected) => {
+            await rhythmBlocksAPI.swing(swingValue, noteValue, async () => {});
+
+            expect(rhythmBlocksAPI.runCommand).toHaveBeenCalledWith("addSwing", [...expected, 0]);
+        });
+
+        test.each([
+            ["a non-async flow", () => {}],
+            ["a missing flow", undefined]
+        ])("rejects %s without adding swing", async (_label, flow) => {
+            await expect(rhythmBlocksAPI.swing(1 / 24, 1 / 8, flow)).rejects.toBeDefined();
+            expect(rhythmBlocksAPI.runCommand).not.toHaveBeenCalled();
+        });
     });
 });

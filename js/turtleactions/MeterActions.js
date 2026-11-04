@@ -134,12 +134,12 @@ function setupMeterActions(activity) {
             // effect. Infinity would set an impossibly fast tempo.
             if (!Number.isFinite(bpm) || bpm <= 0) {
                 activity.errorMsg(_("BPM must be a positive number."), blk);
-                return;
+                return null;
             }
 
             if (!Number.isFinite(beatValue) || beatValue <= 0) {
                 activity.errorMsg(_("Beat value must be a positive number."), blk);
-                return;
+                return null;
             }
 
             let _bpm = (bpm * beatValue) / 0.25;
@@ -164,17 +164,19 @@ function setupMeterActions(activity) {
             }
 
             activity.turtles.ithTurtle(turtle).singer.bpm.push(_bpm);
+            // The tempo in use, counted in the given beat value, for the notation.
+            return (_bpm * 0.25) / beatValue;
         }
 
         static setMasterBPM(bpm, beatValue, blk) {
             if (!Number.isFinite(bpm) || bpm <= 0) {
                 activity.errorMsg(_("BPM must be a positive number."), blk);
-                return;
+                return null;
             }
 
             if (!Number.isFinite(beatValue) || beatValue <= 0) {
                 activity.errorMsg(_("Beat value must be a positive number."), blk);
-                return;
+                return null;
             }
 
             const _bpm = (bpm * beatValue) / 0.25;
@@ -201,6 +203,7 @@ function setupMeterActions(activity) {
             }
 
             Singer.defaultBPMFactor = TONEBPM / Singer.masterBPM;
+            return (Singer.masterBPM * 0.25) / beatValue;
         }
 
         static onEveryNoteDo(action, isflow, receivedArg, turtle, blk) {

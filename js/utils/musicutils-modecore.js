@@ -38,6 +38,7 @@ if (typeof module !== "undefined" && module.exports) {
         FLAT,
         DOUBLEFLAT,
         DOUBLESHARP,
+        NOTENAMES,
         PITCH_COLLECTIONS,
         PITCH_COLLECTION_ALIASES
     } = MusicUtilsConstants;
@@ -755,6 +756,31 @@ var getCustomNote = note => {
 };
 
 var GetNotesForInterval = (tur, temperament) => {
+    /**
+     * Counts whole octaves between two notes the same way a scalar interval does
+     * (Math.floor(steps / 7)), so 0 means up by less than an octave and -1 means
+     * down by up to an octave. Octave numbers change at C, so their plain
+     * difference is wrong for intervals that cross a C (A4 to C5 is a third, not
+     * an octave and a third).
+     * @param {string} firstNote - Note name, e.g. "A" or "C#".
+     * @param {number} firstOctave
+     * @param {string} secondNote
+     * @param {number} secondOctave
+     * @returns {number}
+     */
+    const octavesBetween = (firstNote, firstOctave, secondNote, secondOctave) => {
+        // Drop microtonal prefixes such as "^" and "v" so "^C" counts as C.
+        const letterIndex = note =>
+            NOTENAMES.indexOf(normalizeNoteAccidentals(String(note)).charAt(0).toUpperCase());
+        const index1 = letterIndex(firstNote);
+        const index2 = letterIndex(secondNote);
+        if (index1 === -1 || index2 === -1) {
+            return secondOctave - firstOctave;
+        }
+        const letterSteps = index2 + 7 * secondOctave - (index1 + 7 * firstOctave);
+        return Math.floor(letterSteps / 7);
+    };
+
     const parseFn =
         typeof parseNoteString !== "undefined"
             ? parseNoteString
@@ -798,7 +824,7 @@ var GetNotesForInterval = (tur, temperament) => {
             : ["C", NaN];
         secondNote = parsedSecondNote || "C";
         if (!Number.isNaN(parsedOctaveA) && !Number.isNaN(parsedOctaveB)) {
-            octave = parsedOctaveB - parsedOctaveA;
+            octave = octavesBetween(firstNote, parsedOctaveA, secondNote, parsedOctaveB);
         }
     } else if (notePitches && notePitches[last(tur?.singer?.inNoteBlock)]?.length) {
         // Outside a note block there is no pitch list to read from, so keep
@@ -812,7 +838,12 @@ var GetNotesForInterval = (tur, temperament) => {
         octave = Math.floor(intervals[0] / 7);
     } else if (noteOctave && noteOctave[last(tur?.singer?.inNoteBlock)]) {
         const octaveblk = noteOctave[last(tur.singer.inNoteBlock)];
-        octave = octaveblk[octaveblk.length - 1] - octaveblk[0];
+        octave = octavesBetween(
+            firstNote,
+            octaveblk[0],
+            secondNote,
+            octaveblk[octaveblk.length - 1]
+        );
     }
 
     firstNote = normalizeNoteAccidentals(firstNote);

@@ -21,6 +21,7 @@ class SearchController {
         this.searchSuggestions = [];
         this._searchCache = {};
         this._searchCloseListener = null;
+        this._searchEscapeListener = null;
         this.isHelpfulSearchWidgetOn = false;
         this.searchBlockPosition = [100, 100];
         this.deprecatedBlockNames = [];
@@ -225,9 +226,18 @@ class SearchController {
             this._searchCloseListener = null;
         }
 
+        if (this._searchEscapeListener) {
+            this.activity.removeEventListener(document, "keydown", this._searchEscapeListener);
+            this._searchEscapeListener = null;
+        }
+
         this.activity.searchWidget.style.visibility = "hidden";
         this.activity.searchWidget.idInput_custom = "";
         this._hideSearchDragHandle();
+        const closeButton = document.getElementById("searchCloseButton");
+        if (closeButton) {
+            closeButton.style.display = "none";
+        }
     }
 
     /**
@@ -255,6 +265,7 @@ class SearchController {
                 activity.searchWidget.style.left = searchPos.x + "px";
                 activity.searchWidget.style.top = searchPos.y + "px";
                 this._addSearchDragHandle();
+                this._addSearchCloseButton();
             }
 
             this.searchBlockPosition = [100, 100];
@@ -266,11 +277,14 @@ class SearchController {
                 const menuEl = document.getElementById("ui-id-1");
                 const dragHandleEl = document.getElementById("searchDragHandle");
                 const paletteRowEl = document.querySelector("#palette tbody tr");
+                const closeButtonEl = document.getElementById("searchCloseButton");
 
                 if (
                     (searchEl && (e.target === searchEl || searchEl.contains(e.target))) ||
                     (dragHandleEl &&
                         (e.target === dragHandleEl || dragHandleEl.contains(e.target))) ||
+                    (closeButtonEl &&
+                        (e.target === closeButtonEl || closeButtonEl.contains(e.target))) ||
                     (menuEl &&
                         menuEl.style.display !== "none" &&
                         (e.target === menuEl || menuEl.contains(e.target))) ||
@@ -284,6 +298,17 @@ class SearchController {
 
             this._searchCloseListener = closeListener;
             activity.addEventListener(document, "mousedown", closeListener);
+
+            const escapeListener = event => {
+                if (event.key === "Escape") {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.hideSearchWidget();
+                }
+            };
+
+            this._searchEscapeListener = escapeListener;
+            activity.addEventListener(document, "keydown", escapeListener);
 
             setTimeout(() => {
                 activity.searchWidget.focus();
@@ -524,6 +549,55 @@ class SearchController {
     }
 
     /**
+     * Creates and positions a close button for the main search input.
+     */
+    _addSearchCloseButton() {
+        const searchWidget = this.activity.searchWidget;
+        if (!searchWidget) return;
+
+        let closeButton = document.getElementById("searchCloseButton");
+
+        if (!closeButton) {
+            closeButton = document.createElement("button");
+            closeButton.id = "searchCloseButton";
+            closeButton.type = "button";
+            closeButton.textContent = "×";
+            closeButton.setAttribute("aria-label", _("Close search"));
+            closeButton.style.cssText =
+                "position:absolute;width:28px;height:28px;border:0;" +
+                "border-radius:50%;background:transparent;color:inherit;" +
+                "font-size:22px;line-height:28px;cursor:pointer;" +
+                "z-index:2002;display:flex;align-items:center;" +
+                "justify-content:center;padding:0;";
+
+            closeButton.addEventListener("click", () => {
+                this.hideSearchWidget();
+            });
+
+            document.body.appendChild(closeButton);
+        }
+
+        closeButton.style.display = "flex";
+        this._positionSearchCloseButton();
+    }
+
+    /**
+     * Keeps the close button aligned with the right edge of #search.
+     */
+    _positionSearchCloseButton() {
+        const searchWidget = this.activity.searchWidget;
+        const closeButton = document.getElementById("searchCloseButton");
+
+        if (!searchWidget || !closeButton) return;
+        if (typeof searchWidget.getBoundingClientRect !== "function") return;
+
+        const rect = searchWidget.getBoundingClientRect();
+
+        closeButton.style.left = rect.right - 36 + "px";
+        closeButton.style.top = rect.top + (rect.height - 28) / 2 + "px";
+    }
+
+    /**
      * Creates (once) and positions a drag handle for the classic #search
      * input, so it can be dragged the same way helpfulSearchDiv can.
      */
@@ -560,6 +634,7 @@ class SearchController {
                 activity.searchWidget.style.left = newLeft + "px";
                 activity.searchWidget.style.top = newTop + "px";
                 this._positionSearchDragHandle();
+                this._positionSearchCloseButton();
             });
 
             handle.addEventListener("pointerup", e => {
