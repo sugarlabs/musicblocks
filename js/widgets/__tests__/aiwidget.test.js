@@ -727,26 +727,27 @@ describe("AIWidget Instance", () => {
             global.ABCJS = mockABCJS;
         });
 
-        it("imports each tune with the activity's ABC importer", async () => {
+        it("imports each playable tune with the activity's ABC importer", async () => {
             aiWidget = new AIWidget();
             mockActivity.parseABC = jest.fn(() => Promise.resolve(null));
             aiWidget.activity = mockActivity;
             const tunes = [
                 { lines: [{ staff: [{ voices: [[{ el_type: "note" }]] }] }] },
+                { lines: [{ staff: [{ voices: [[{ el_type: "bar" }]] }] }] },
                 { lines: [{ staff: [{ voices: [[{ el_type: "note" }]] }] }] }
             ];
             global.ABCJS = { parseOnly: jest.fn(() => tunes) };
 
             await aiWidget.__save();
 
-            expect(mockActivity.parseABC.mock.calls).toEqual([[tunes[0]], [tunes[1]]]);
+            expect(mockActivity.parseABC.mock.calls).toEqual([[tunes[0]], [tunes[2]]]);
             expect(mockActivity.textMsg).toHaveBeenCalledWith("New start block generated.");
         });
 
         it.each([
             ["empty ABC input", ""],
             ["bar-only ABC input", "X:1\nM:4/4\nL:1/4\nK:C\n|\n"],
-            ["spacer-only ABC input", "X:1\nM:4/4\nL:1/4\nK:C\nx |\n"]
+            ["spacer-only ABC input", "X:1\nM:4/4\nL:1/4\nK:C\ny |\n"]
         ])("does not report success for %s", async (_description, abcNotation) => {
             global.ABCJS = { parseOnly: jest.fn(abc => realABCJS.parseOnly(abc)) };
             const body = document.createElement("div");
@@ -770,6 +771,28 @@ describe("AIWidget Instance", () => {
                 "Enter ABC notation containing at least one note."
             );
             expect(mockActivity.textMsg).not.toHaveBeenCalledWith("New start block generated.");
+        });
+
+        it("imports ABC containing an invisible rest", async () => {
+            global.ABCJS = { parseOnly: jest.fn(abc => realABCJS.parseOnly(abc)) };
+            const body = document.createElement("div");
+            body.getBoundingClientRect = jest.fn(() => ({ width: 800, height: 600 }));
+            const windowFor = global.window.widgetWindows.windowFor;
+            global.window.widgetWindows.windowFor = jest.fn((...args) => ({
+                ...windowFor(...args),
+                getWidgetBody: jest.fn(() => body)
+            }));
+            aiWidget = new AIWidget();
+            mockActivity.parseABC = jest.fn(() => Promise.resolve(null));
+            aiWidget.init(mockActivity);
+            const textarea = body.querySelector("textarea");
+            textarea.value = "X:1\nM:4/4\nL:1/4\nK:C\nx |\n";
+            textarea.dispatchEvent(new Event("input"));
+
+            await aiWidget.__save();
+
+            expect(mockActivity.parseABC).toHaveBeenCalledTimes(1);
+            expect(mockActivity.textMsg).toHaveBeenCalledWith("New start block generated.");
         });
 
         it("tells the user when the blocks cannot be generated", async () => {
