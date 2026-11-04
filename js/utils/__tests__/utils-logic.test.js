@@ -399,8 +399,28 @@ describe("Utility Logic Functions", () => {
             [
                 [1, 4],
                 [-Infinity, 2]
+            ],
+            [[], [1, 4]],
+            [[1], [1, 4]],
+            [[1, 4], []],
+            [[1, 4], [1]],
+            [
+                ["1", 4],
+                [1, 4]
+            ],
+            [
+                [1, "4"],
+                [1, 4]
+            ],
+            [
+                [1, 4],
+                ["1", 4]
+            ],
+            [
+                [1, 4],
+                [1, "4"]
             ]
-        ])("rejects non-finite fraction components: %p + %p", (a, b) => {
+        ])("rejects invalid fraction components: %p + %p", (a, b) => {
             const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
 
             expect(rationalSum(a, b)).toEqual([[0, 1], "Invalid input passed to rational sum"]);
