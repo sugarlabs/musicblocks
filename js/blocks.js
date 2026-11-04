@@ -5276,6 +5276,21 @@ class Blocks {
                         blockObjs[b][4].push(blockMap[connection]);
                     }
                 }
+
+                if (Array.isArray(myBlock.drumCells)) {
+                    blockObjs[b][1] = [
+                        myBlock.name,
+                        {
+                            drumCells: myBlock.drumCells
+                                .filter(([pitch, drum]) => pitch in blockMap && drum in blockMap)
+                                .map(([pitch, drum, repeat]) => [
+                                    blockMap[pitch],
+                                    blockMap[drum],
+                                    repeat
+                                ])
+                        }
+                    ];
+                }
             }
 
             return blockObjs;

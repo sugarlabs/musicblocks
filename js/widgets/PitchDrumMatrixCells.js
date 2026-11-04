@@ -72,7 +72,7 @@ class PitchDrumMatrixCells {
             }
         }
 
-        this.restoreSavedCells();
+        this.selectBlockMap();
 
         // Mark any cells found in the blockMap from previous
         // instances of the matrix.

@@ -51,7 +51,7 @@ describe("PitchDrumMatrixCells", () => {
     let trigger;
 
     // A grid with a row per pitch block in `rowBlocks` and a column per drum.
-    const grid = (rowBlocks, blockMap = [], matrixBlock = undefined) => {
+    const grid = (rowBlocks, blockMap, matrixBlock) => {
         document.body.innerHTML = "";
         trigger = jest.fn();
         pdm = new PitchDrumMatrix();
@@ -72,7 +72,9 @@ describe("PitchDrumMatrixCells", () => {
         rowBlocks.forEach(blk => pdm.addRowBlock(blk));
         pdm.addColBlock(30);
         pdm.addColBlock(31);
-        pdm._blockMap = blockMap;
+        if (blockMap) {
+            pdm._blockMaps[5] = blockMap;
+        }
         const table = document.createElement("table");
         table.id = "pdmTable";
         document.body.appendChild(table);
@@ -202,7 +204,7 @@ describe("PitchDrumMatrixCells", () => {
     });
 
     test("marks the cells saved with the project, without playing them", () => {
-        grid([20, 21], [], { drumCells: [[21, 31, 0]] });
+        grid([20, 21], undefined, { drumCells: [[21, 31, 0]] });
 
         expect(selected()).toEqual(["00", "01"]);
         expect(pdm._blockMap).toEqual([[21, 31, 0]]);
@@ -211,7 +213,7 @@ describe("PitchDrumMatrixCells", () => {
 
     test("clicking a cell keeps it on the block, so it is saved with the project", () => {
         const matrixBlock = { drumCells: [[20, 30, 0]] };
-        grid([20, 21], [], matrixBlock);
+        grid([20, 21], undefined, matrixBlock);
 
         click(0, 1);
         click(1, 0);

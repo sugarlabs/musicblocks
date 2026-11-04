@@ -110,43 +110,30 @@ class PitchDrumMatrixBlocks {
     }
 
     /**
-     * Adds the cells saved with the project to the block map.
+     * Uses the block map of the block that opened the matrix, starting from the cells saved
+     * with the project.
      *
      * @public
      * @returns {void}
      */
-    restoreSavedCells() {
-        const savedCells = this.activity?.blocks?.blockList?.[this.blockNo]?.drumCells ?? [];
-        for (const [pitchBlock, drumBlock, repeat] of savedCells) {
-            if (
-                !this._blockMap.some(
-                    obj => obj[0] === pitchBlock && obj[1] === drumBlock && (obj[2] || 0) === repeat
-                )
-            ) {
-                this._blockMap.push([pitchBlock, drumBlock, repeat]);
-            }
-        }
+    selectBlockMap() {
+        this._blockMap = this._blockMaps[this.blockNo] ??= (
+            this.activity?.blocks?.blockList?.[this.blockNo]?.drumCells ?? []
+        ).map(cell => cell.slice());
     }
 
     /**
      * Copies the selected cells to the block that opened the matrix, so they are saved with the
-     * project. Cells of pitches or drums this run didn't reach are kept.
+     * project.
      *
      * @private
      * @returns {void}
      */
     _storeCells() {
         const block = this.activity?.blocks?.blockList?.[this.blockNo];
-        if (!block) {
-            return;
+        if (block) {
+            block.drumCells = this._blockMap.map(cell => [cell[0], cell[1], cell[2] || 0]);
         }
-
-        const rows = new Set(this._rowBlocks);
-        const cols = new Set(this._colBlocks);
-        const shown = cell => rows.has(cell[0]) && cols.has(cell[1]);
-        block.drumCells = (block.drumCells || [])
-            .filter(cell => !shown(cell))
-            .concat(this._blockMap.filter(shown).map(cell => [cell[0], cell[1], cell[2] || 0]));
     }
 
     /**
