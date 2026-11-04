@@ -1753,6 +1753,7 @@ describe("Block Foundation", () => {
             mockBlocks.invalidateTopBlockCache = jest.fn();
             mockBlocks.unhighlight = jest.fn();
             mockBlocks.syncDragGroupSpatialGrid = jest.fn();
+            mockBlocks._updateViewportCulling = jest.fn();
 
             block.activity.getStageScale = jest.fn().mockReturnValue(1);
             block.activity.blocksContainer = { y: 0 };
@@ -1836,12 +1837,20 @@ describe("Block Foundation", () => {
             };
             mockBlocks.longPressTimeout = null;
             mockBlocks.syncDragGroupSpatialGrid = jest.fn(() => order.push("sync-grid"));
+            mockBlocks._updateViewportCulling = jest.fn(() => order.push("cull"));
             mockBlocks.blockMoved = jest.fn(() => order.push("dock"));
             mockBlocks.adjustDocks = jest.fn(() => order.push("adjust"));
 
             block._mouseoutCallback({ stageX: 100, stageY: 100 }, true, false, false, true, true);
 
-            expect(order).toEqual(["restore", "sync-grid", "query-trash", "dock", "adjust"]);
+            expect(order).toEqual([
+                "restore",
+                "sync-grid",
+                "cull",
+                "query-trash",
+                "dock",
+                "adjust"
+            ]);
         });
 
         it("waits for asynchronous blockMoved resolution before adjusting docks at stack top", async () => {
@@ -1857,6 +1866,7 @@ describe("Block Foundation", () => {
             };
             mockBlocks.longPressTimeout = null;
             mockBlocks.syncDragGroupSpatialGrid = jest.fn();
+            mockBlocks._updateViewportCulling = jest.fn();
             mockBlocks.findTopBlock = jest.fn().mockReturnValue(0);
             mockBlocks.adjustDocks = jest.fn();
 
@@ -1956,10 +1966,12 @@ describe("Block Foundation", () => {
             block.activity.trashcan = { hide: jest.fn() };
             mockBlocks.longPressTimeout = null;
             mockBlocks.syncDragGroupSpatialGrid = jest.fn();
+            mockBlocks._updateViewportCulling = jest.fn();
 
             block._mouseoutCallback({}, false, false, false, true, false);
 
             expect(mockBlocks.syncDragGroupSpatialGrid).not.toHaveBeenCalled();
+            expect(mockBlocks._updateViewportCulling).not.toHaveBeenCalled();
         });
     });
 

@@ -8202,6 +8202,10 @@ class Blocks {
             const vpRight = vpLeft + canvas.width;
             const vpBottom = vpTop + canvas.height;
             const candidates = this._getViewportCandidates(vpLeft, vpTop, vpRight, vpBottom);
+            const blocksToCheck =
+                this._viewportVisibleBlocks.size === 0
+                    ? this.blockList.map((_, i) => i)
+                    : candidates;
 
             for (const i of this._viewportVisibleBlocks) {
                 if (!candidates.has(i)) {
@@ -8213,7 +8217,7 @@ class Blocks {
             }
 
             const nextVisibleBlocks = new Set();
-            for (const i of candidates) {
+            for (const i of blocksToCheck) {
                 const block = this.blockList[i];
                 if (!block || block.trash || !block.container) {
                     continue;

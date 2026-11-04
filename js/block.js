@@ -3987,6 +3987,7 @@ class Block {
 
         if (spatialGridDirty) {
             this.blocks.syncDragGroupSpatialGrid();
+            this.blocks._updateViewportCulling();
         }
 
         // Always hide the trash when there is no block selected.
