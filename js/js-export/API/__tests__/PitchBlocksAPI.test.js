@@ -237,5 +237,15 @@ describe("PitchBlocksAPI", () => {
             await expect(pitchBlocksAPI.invert("sol", 4, "even", () => {})).rejects.toBeDefined();
             expect(pitchBlocksAPI.runCommand).not.toHaveBeenCalled();
         });
+
+        test("rejects a missing flow before inverting", async () => {
+            await expect(pitchBlocksAPI.invert("sol", 4, "even")).rejects.toBeDefined();
+            expect(pitchBlocksAPI.runCommand).not.toHaveBeenCalled();
+        });
+
+        test("rejects a null flow before inverting", async () => {
+            await expect(pitchBlocksAPI.invert("sol", 4, "even", null)).rejects.toBeDefined();
+            expect(pitchBlocksAPI.runCommand).not.toHaveBeenCalled();
+        });
     });
 });
