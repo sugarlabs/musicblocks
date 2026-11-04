@@ -97,7 +97,7 @@ describe("RhythmBlocksAPI", () => {
 
     test("tie calls runCommand with correct arguments", async () => {
         const mockFlow = jest.fn();
-        JSInterface.validateArgs.mockReturnValue([undefined, mockFlow]); // Changed to match implementation
+        JSInterface.validateArgs.mockReturnValue([mockFlow]);
 
         const result = await rhythmBlocksAPI.tie(mockFlow);
 
@@ -214,6 +214,43 @@ describe("RhythmBlocksAPI", () => {
             ["a missing flow", undefined]
         ])("rejects %s without adding swing", async (_label, flow) => {
             await expect(rhythmBlocksAPI.swing(1 / 24, 1 / 8, flow)).rejects.toBeDefined();
+            expect(rhythmBlocksAPI.runCommand).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("tie with the real argument validation", () => {
+        let mockedJSInterface;
+
+        beforeEach(() => {
+            mockedJSInterface = global.JSInterface;
+            global.JSEditor = { logConsole: jest.fn() };
+            // constraints.js attaches to an existing JSInterface, so load it before the real one.
+            delete global.JSInterface;
+            jest.isolateModules(() => {
+                require("../../constraints.js");
+                global.JSInterface = require("../../interface");
+            });
+        });
+
+        afterEach(() => {
+            global.JSInterface = mockedJSInterface;
+            delete global.JSEditor;
+        });
+
+        test("keeps the flow and runs it", async () => {
+            const mockFlow = jest.fn();
+            const result = await rhythmBlocksAPI.tie(async () => mockFlow());
+
+            expect(rhythmBlocksAPI.runCommand).toHaveBeenCalledWith("doTie", [0]);
+            expect(mockFlow).toHaveBeenCalled();
+            expect(result).toBe("END");
+        });
+
+        test.each([
+            ["a non-async flow", () => {}],
+            ["a missing flow", undefined]
+        ])("rejects %s without tying", async (_label, flow) => {
+            await expect(rhythmBlocksAPI.tie(flow)).rejects.toBeDefined();
             expect(rhythmBlocksAPI.runCommand).not.toHaveBeenCalled();
         });
     });

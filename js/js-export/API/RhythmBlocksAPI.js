@@ -82,7 +82,7 @@ class RhythmBlocksAPI {
     async tie(flow) {
         const args = JSInterface.validateArgs("tie", [flow]);
         await this.runCommand("doTie", [this.turIndex]);
-        await args[1]();
+        await args[0]();
         return this.ENDFLOWCOMMAND;
     }
 
