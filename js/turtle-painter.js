@@ -269,6 +269,8 @@ class Painter {
      * @private
      */
     _scheduleCanvasUpdate() {
+        this.activity.artworkRevision = (this.activity.artworkRevision || 0) + 1;
+
         if (this._pendingCanvasUpdate) {
             return; // Already scheduled
         }
@@ -1371,6 +1373,7 @@ class Painter {
         if (!this.turtle.media || this.turtle.media.length === 0) {
             return;
         }
+        this.activity.artworkRevision = (this.activity.artworkRevision || 0) + 1;
         const gifAnimator = this.activity.gifAnimator;
         // Clear all media
         for (let i = 0; i < this.turtle.media.length; i++) {

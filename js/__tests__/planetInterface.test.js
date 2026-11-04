@@ -48,7 +48,8 @@ const mockActivity = {
     turtles: {},
     loading: false,
     prepareExport: jest.fn(),
-    _allClear: jest.fn()
+    _allClear: jest.fn(),
+    artworkRevision: 0
 };
 
 document.body.innerHTML = `
@@ -85,6 +86,7 @@ describe("PlanetInterface", () => {
     beforeEach(() => {
         planetInterface = new PlanetInterface(mockActivity);
         mockActivity.errorMsg.mockClear();
+        mockActivity.artworkRevision = 0;
     });
 
     test("hideMusicBlocks hides relevant elements and disables DOM events", () => {
@@ -1783,14 +1785,59 @@ describe("PlanetInterface", () => {
         expect(saveLocally).toHaveBeenNthCalledWith(3, "EXPORT", "DATAURL", "proj-1");
     });
 
-    test("saveLocally: rebuilds the thumbnail once the refresh interval elapses", async () => {
-        const nowSpy = jest.spyOn(Date, "now").mockReturnValue(1000);
+    test("saveLocally: rebuilds the thumbnail once the artwork revision changes", async () => {
         setupThumbnailHarness(() => "proj-1");
 
         await planetInterface.saveLocally();
         expect(doSVG).toHaveBeenCalledTimes(1);
 
-        nowSpy.mockReturnValue(1000 + 5000);
+        mockActivity.artworkRevision += 1;
+        await planetInterface.saveLocally();
+        expect(doSVG).toHaveBeenCalledTimes(2);
+    });
+
+    test("saveLocally: invalidates a thumbnail whose artwork changed while it was rendering", async () => {
+        doSVG.mockReturnValue("<svg/>");
+        mockActivity.prepareExport.mockReturnValue("EXPORT");
+        global.base64Encode = jest.fn(s => s);
+
+        let pendingImage;
+        global.Image = class {
+            constructor() {
+                pendingImage = this;
+            }
+            set src(_value) {}
+        };
+        global.createjs = {
+            Bitmap: class {
+                getBounds() {
+                    return { x: 0, y: 0, width: 1, height: 1 };
+                }
+                cache() {
+                    this.bitmapCache = { getCacheDataURL: () => "DATAURL" };
+                }
+            }
+        };
+        const saveLocally = jest.fn(async () => {});
+        planetInterface.planet = {
+            ProjectStorage: {
+                getCurrentProjectID: jest.fn(() => "proj-1"),
+                getCurrentProjectImage: jest.fn(() => "OLD_IMAGE"),
+                saveLocally
+            }
+        };
+
+        // The thumbnail renders against the artwork revision at this moment.
+        await planetInterface.saveLocally();
+        expect(doSVG).toHaveBeenCalledTimes(1);
+
+        // Drawing continues before the deferred onload commits the thumbnail,
+        // which records the revision captured at render time.
+        mockActivity.artworkRevision += 1;
+        pendingImage.onload();
+        await Promise.resolve();
+
+        // The recorded revision no longer matches, so the next save rebuilds.
         await planetInterface.saveLocally();
         expect(doSVG).toHaveBeenCalledTimes(2);
     });

@@ -65,7 +65,12 @@ const createMockTurtle = () => {
             getTurtleCount: jest.fn(() => 0),
             getTurtle: jest.fn()
         },
-        activity: { refreshCanvas: jest.fn(), errorMsg: jest.fn(), gifAnimator: {} },
+        activity: {
+            refreshCanvas: jest.fn(),
+            errorMsg: jest.fn(),
+            gifAnimator: {},
+            artworkRevision: 0
+        },
         canvas: { width: 800, height: 600 },
         container: { x: 0, y: 0, rotation: 0 },
         x: 0,
@@ -264,6 +269,23 @@ describe("Painter Class", () => {
             const refreshSpy = jest.spyOn(painter.activity, "refreshCanvas");
             painter._scheduleCanvasUpdate();
             expect(refreshSpy).not.toHaveBeenCalled();
+            expect(window.requestAnimationFrame).not.toHaveBeenCalled();
+        });
+
+        test("should advance the artwork revision on every update request", () => {
+            painter._scheduleCanvasUpdate();
+            expect(painter.activity.artworkRevision).toBe(1);
+
+            painter._scheduleCanvasUpdate();
+            expect(painter.activity.artworkRevision).toBe(2);
+        });
+
+        test("should advance the artwork revision even when an update is already scheduled", () => {
+            painter._pendingCanvasUpdate = true;
+
+            painter._scheduleCanvasUpdate();
+
+            expect(painter.activity.artworkRevision).toBe(1);
             expect(window.requestAnimationFrame).not.toHaveBeenCalled();
         });
 
@@ -1401,6 +1423,24 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
         expect(painter.turtles.stage.removeChild).toHaveBeenCalledWith(mockGif);
         expect(painter.turtles.stage.removeChild).toHaveBeenCalledWith(mockImg);
         expect(painter.turtle.media).toEqual([]);
+    });
+
+    test("doClearMedia should advance the artwork revision when it clears media", () => {
+        painter.turtle.media = [{ type: "image" }];
+        painter.turtle.imageContainer = { removeChild: jest.fn() };
+        painter.turtles.stage = { removeChild: jest.fn() };
+
+        painter.doClearMedia();
+
+        expect(painter.activity.artworkRevision).toBe(1);
+    });
+
+    test("doClearMedia should not advance the artwork revision when there is no media", () => {
+        painter.turtle.media = [];
+
+        painter.doClearMedia();
+
+        expect(painter.activity.artworkRevision).toBe(0);
     });
 
     test("doClear should reset properties based on flags", () => {

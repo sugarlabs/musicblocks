@@ -21,10 +21,6 @@
    exported PlanetInterface
  */
 
-// A project thumbnail only needs to be rebuilt when the artwork could have
-// changed, so a freshly generated one is reused for a short window.
-const THUMBNAIL_REFRESH_INTERVAL = 5000;
-
 /**
  * Represents an interface for interacting with a planet.
  * @param {object} activity - The activity object associated with the interface.
@@ -36,7 +32,7 @@ class PlanetInterface {
         this.mainCanvas = null;
         this.activity = activity;
         // Last generated thumbnail, so it can be reused for the same project.
-        this._thumbnailCache = { projectId: undefined, url: null, time: 0 };
+        this._thumbnailCache = { projectId: undefined, url: null, revision: -1 };
         this._getProjectStorage = () => {
             if (!this.planet || !this.planet.ProjectStorage) {
                 return null;
@@ -315,13 +311,14 @@ class PlanetInterface {
                 typeof projectStorage.getCurrentProjectID === "function"
                     ? projectStorage.getCurrentProjectID()
                     : undefined;
+            const artworkRevision = this.activity.artworkRevision;
             const cachedThumbnail = this._thumbnailCache;
             const reuseThumbnail =
                 !forceThumbnail &&
                 currentProjectId !== undefined &&
                 cachedThumbnail.projectId === currentProjectId &&
                 cachedThumbnail.url !== null &&
-                Date.now() - cachedThumbnail.time < THUMBNAIL_REFRESH_INTERVAL;
+                cachedThumbnail.revision === artworkRevision;
             const svgData = reuseThumbnail
                 ? null
                 : doSVG(
@@ -413,7 +410,7 @@ class PlanetInterface {
                 } else if (svgData === null || svgData === undefined || svgData === "") {
                     // No image to save, so drop any cached thumbnail to avoid
                     // reusing a stale URL on a subsequent save.
-                    this._thumbnailCache = { projectId: undefined, url: null, time: 0 };
+                    this._thumbnailCache = { projectId: undefined, url: null, revision: -1 };
                     return Promise.resolve(saveProject(null)).catch(handleProjectSaveError);
                 } else {
                     const fallbackImage =
@@ -434,7 +431,7 @@ class PlanetInterface {
                                 this._thumbnailCache = {
                                     projectId: projectId,
                                     url: thumbUrl,
-                                    time: Date.now()
+                                    revision: artworkRevision
                                 };
                             }
                             const commitThumbnail = () => {
