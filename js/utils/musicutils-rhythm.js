@@ -45,10 +45,22 @@ if (typeof module !== "undefined" && module.exports) {
 var reducedFraction = (a, b) => {
     // Not GCD from utils-logic.js: that takes the absolute value of both arguments, but
     // callers rely on a negative b (or a) surviving into the displayed denominator here.
+    // A NaN or non-finite operand never satisfies the Euclid stop condition
+    // (NaN === 0 is false, and x % NaN stays NaN), so it recursed until the
+    // stack overflowed. Fall back the way toFraction does for invalid input
+    // ([0, 1]); 0/0 needs the same fallback, since its GCD is 0 and dividing
+    // by it would otherwise render as "NaN".
+    if (!Number.isFinite(a) || !Number.isFinite(b)) {
+        return "0<br>&mdash;<br>1<br><br>";
+    }
     const greatestCommonMultiple = (a, b) => {
         return b === 0 ? a : greatestCommonMultiple(b, a % b);
     };
     const gcm = greatestCommonMultiple(a, b);
+
+    if (gcm === 0) {
+        return "0<br>&mdash;<br>1<br><br>";
+    }
 
     if ([1, 2, 4, 8, 16].includes(b / gcm)) {
         return a / gcm + "<br>&mdash;<br>" + b / gcm + "<br>" + NSYMBOLS[b / gcm];

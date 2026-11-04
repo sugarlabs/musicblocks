@@ -32,6 +32,23 @@ describe("musicutils-rhythm", () => {
         expect(rhythm.reducedFraction(3, 9)).toContain("3");
     });
 
+    it("falls back instead of crashing on a non-finite or zero note-value pair", () => {
+        // The Euclid loop inside reducedFraction never terminates on a NaN
+        // operand, so Phrase Maker / Rhythm Ruler renders hit a RangeError.
+        expect(() => rhythm.reducedFraction(3, NaN)).not.toThrow();
+        expect(() => rhythm.reducedFraction(NaN, 2)).not.toThrow();
+        expect(() => rhythm.reducedFraction(Infinity, 2)).not.toThrow();
+        expect(() => rhythm.reducedFraction(2, Infinity)).not.toThrow();
+        expect(rhythm.reducedFraction(3, NaN)).toBe("0<br>&mdash;<br>1<br><br>");
+        expect(rhythm.reducedFraction(0, 0)).toBe("0<br>&mdash;<br>1<br><br>");
+        expect(rhythm.calcNoteValueToDisplay(NaN, 2)).not.toContain("NaN");
+        expect(rhythm.calcNoteValueToDisplay(2, NaN)).not.toContain("NaN");
+        expect(rhythm.calcNoteValueToDisplay(0, 0)).not.toContain("NaN");
+        // Ordinary values are unchanged.
+        expect(rhythm.reducedFraction(4, 8)).toContain("2");
+        expect(rhythm.calcNoteValueToDisplay(4, 2)).toContain("2");
+    });
+
     it("ignores floating-point noise in a duration", () => {
         expect(rhythm.durationToNoteValue(6.0000000000001)).toEqual([1, 0, [3, 2], 4]);
         expect(rhythm.durationToNoteValue(1.5000000000001)).toEqual([1, 0, [3, 0.5], 1]);
