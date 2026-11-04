@@ -97,6 +97,22 @@ const ACTION_NAME_SLOTS = {
  * that sustained more than one highlight per frame would drift without this.
  */
 const MAXPENDINGHIGHLIGHTS = 24;
+const MAX_VIEWPORT_GRID_CELLS = 4096;
+
+const isSafeViewportGridRange = (minX, minY, maxX, maxY) => {
+    if (
+        !Number.isSafeInteger(minX) ||
+        !Number.isSafeInteger(minY) ||
+        !Number.isSafeInteger(maxX) ||
+        !Number.isSafeInteger(maxY)
+    ) {
+        return false;
+    }
+
+    const width = maxX - minX + 1;
+    const height = maxY - minY + 1;
+    return width > 0 && height > 0 && width * height <= MAX_VIEWPORT_GRID_CELLS;
+};
 
 /**
  * Maximum number of unrendered transitions retained for any single block. A block
@@ -401,6 +417,11 @@ class Blocks {
         this._spatialGrid = new Map();
         // Tracks each block's current grid cell to avoid redundant updates
         this._blockGridCell = new Map();
+        this._viewportGrid = new Map();
+        this._blockViewportCells = new Map();
+        this._viewportAlwaysVisible = new Set();
+        this._viewportFallback = new Set();
+        this._viewportVisibleBlocks = new Set();
 
         /**
          * We stage deletion of prototype action blocks on the palette so
@@ -445,6 +466,89 @@ class Blocks {
                     if (oldSet.size === 0) this._spatialGrid.delete(oldKey);
                 }
             }
+        };
+
+        this._updateViewportGrid = blkIdx => {
+            const idx = Number(blkIdx);
+            const block = this.blockList[idx];
+            if (!block || !block.container) return;
+
+            const oldKeys = this._blockViewportCells.get(idx);
+            if (oldKeys) {
+                for (const key of oldKeys) {
+                    const cell = this._viewportGrid.get(key);
+                    if (cell) {
+                        cell.delete(idx);
+                        if (cell.size === 0) this._viewportGrid.delete(key);
+                    }
+                }
+            }
+
+            this._viewportFallback.delete(idx);
+            if (block._viewportVisible === false) {
+                this._viewportVisibleBlocks.delete(idx);
+            } else {
+                this._viewportVisibleBlocks.add(idx);
+            }
+            this._viewportAlwaysVisible.delete(idx);
+            if (!block.width || !block.height) {
+                this._blockViewportCells.delete(idx);
+                this._viewportAlwaysVisible.add(idx);
+                return;
+            }
+
+            const left = Math.floor(block.container.x / SPATIAL_GRID_CELL_SIZE);
+            const top = Math.floor(block.container.y / SPATIAL_GRID_CELL_SIZE);
+            const right = Math.floor((block.container.x + block.width) / SPATIAL_GRID_CELL_SIZE);
+            const bottom = Math.floor((block.container.y + block.height) / SPATIAL_GRID_CELL_SIZE);
+            if (!isSafeViewportGridRange(left, top, right, bottom)) {
+                this._blockViewportCells.delete(idx);
+                this._viewportFallback.add(idx);
+                return;
+            }
+
+            const keys = new Set();
+            for (let x = left; x <= right; x++) {
+                for (let y = top; y <= bottom; y++) {
+                    const key = x + "," + y;
+                    keys.add(key);
+                    let cell = this._viewportGrid.get(key);
+                    if (!cell) {
+                        cell = new Set();
+                        this._viewportGrid.set(key, cell);
+                    }
+                    cell.add(idx);
+                }
+            }
+            this._blockViewportCells.set(idx, keys);
+        };
+
+        this._getViewportCandidates = (left, top, right, bottom) => {
+            const minX = Math.floor(left / SPATIAL_GRID_CELL_SIZE);
+            const minY = Math.floor(top / SPATIAL_GRID_CELL_SIZE);
+            const maxX = Math.floor(right / SPATIAL_GRID_CELL_SIZE);
+            const maxY = Math.floor(bottom / SPATIAL_GRID_CELL_SIZE);
+            if (
+                (this._viewportGrid.size === 0 &&
+                    this._viewportAlwaysVisible.size === 0 &&
+                    this._viewportFallback.size === 0) ||
+                !isSafeViewportGridRange(minX, minY, maxX, maxY)
+            ) {
+                return new Set(
+                    this.blockList.map((block, idx) => (block ? idx : -1)).filter(idx => idx >= 0)
+                );
+            }
+
+            const candidates = new Set([...this._viewportAlwaysVisible, ...this._viewportFallback]);
+            for (let x = minX; x <= maxX; x++) {
+                for (let y = minY; y <= maxY; y++) {
+                    const cell = this._viewportGrid.get(x + "," + y);
+                    if (cell) {
+                        for (const idx of cell) candidates.add(idx);
+                    }
+                }
+            }
+            return candidates;
         };
 
         /**
@@ -492,7 +596,10 @@ class Blocks {
                         break;
                     }
                 }
-                if (same) return;
+                if (same) {
+                    this._updateViewportGrid(idx);
+                    return;
+                }
             }
 
             this._removeFromSpatialGrid(idx);
@@ -507,6 +614,7 @@ class Blocks {
                 cellSet.add(idx);
             }
             this._blockGridCell.set(idx, newKeys);
+            this._updateViewportGrid(idx);
         };
 
         /**
@@ -557,6 +665,10 @@ class Blocks {
         this._rebuildSpatialGrid = () => {
             this._spatialGrid.clear();
             this._blockGridCell.clear();
+            this._viewportGrid.clear();
+            this._blockViewportCells.clear();
+            this._viewportAlwaysVisible.clear();
+            this._viewportFallback.clear();
             for (let i = 0; i < this.blockList.length; i++) {
                 this._updateSpatialGrid(i);
             }
@@ -7671,6 +7783,20 @@ class Blocks {
             const idx = Number(blkIdx);
             this._removeFromSpatialGrid(idx);
             this._blockGridCell.delete(idx);
+            const viewportKeys = this._blockViewportCells.get(idx);
+            if (viewportKeys) {
+                for (const key of viewportKeys) {
+                    const cell = this._viewportGrid.get(key);
+                    if (cell) {
+                        cell.delete(idx);
+                        if (cell.size === 0) this._viewportGrid.delete(key);
+                    }
+                }
+                this._blockViewportCells.delete(idx);
+            }
+            this._viewportAlwaysVisible.delete(idx);
+            this._viewportFallback.delete(idx);
+            this._viewportVisibleBlocks.delete(idx);
             this.blockList[blkIdx] = null;
         };
 
@@ -8075,8 +8201,19 @@ class Blocks {
             const vpTop = -container.y;
             const vpRight = vpLeft + canvas.width;
             const vpBottom = vpTop + canvas.height;
+            const candidates = this._getViewportCandidates(vpLeft, vpTop, vpRight, vpBottom);
 
-            for (let i = 0; i < this.blockList.length; i++) {
+            for (const i of this._viewportVisibleBlocks) {
+                if (!candidates.has(i)) {
+                    const block = this.blockList[i];
+                    if (block && !block.trash && block.container && block.width && block.height) {
+                        block._viewportVisible = false;
+                    }
+                }
+            }
+
+            const nextVisibleBlocks = new Set();
+            for (const i of candidates) {
                 const block = this.blockList[i];
                 if (!block || block.trash || !block.container) {
                     continue;
@@ -8087,6 +8224,7 @@ class Blocks {
                 // to avoid culling them before their size is known.
                 if (!block.width || !block.height) {
                     block._viewportVisible = true;
+                    nextVisibleBlocks.add(i);
                     continue;
                 }
                 const wasViewportVisible = block._viewportVisible;
@@ -8096,6 +8234,7 @@ class Blocks {
                     c.y + block.height <= vpTop ||
                     c.y >= vpBottom
                 );
+                if (block._viewportVisible) nextVisibleBlocks.add(i);
                 if (wasViewportVisible === false && block._viewportVisible && c.bitmapCache) {
                     // Visual state may have changed while its cache update was culled.
                     // The bitmap cache can legitimately be missing here: regenerating a
@@ -8104,6 +8243,7 @@ class Blocks {
                     c.updateCache();
                 }
             }
+            this._viewportVisibleBlocks = nextVisibleBlocks;
         };
 
         /***

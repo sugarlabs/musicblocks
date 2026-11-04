@@ -1069,6 +1069,9 @@ class Block {
         this.width = obj[2];
         this.height = obj[3];
         this.hitHeight = obj[4];
+        if (this.blockIndex >= 0 && this.blocks._updateViewportGrid) {
+            this.blocks._updateViewportGrid(this.blockIndex);
+        }
     }
 
     /**
@@ -1436,6 +1439,9 @@ class Block {
             this.width = obj[2];
             this.height = obj[3];
             this.hitHeight = obj[4];
+            if (this.blockIndex >= 0 && this.blocks._updateViewportGrid) {
+                this.blocks._updateViewportGrid(this.blockIndex);
+            }
         }
         let artwork;
         if (this.protoblock.disabled) {
@@ -2047,6 +2053,9 @@ class Block {
         if (!this.trash && !this.inCollapsed && this.container) {
             this.container.visible = true;
             this._viewportVisible = true;
+            if (this.blockIndex >= 0 && this.blocks._updateViewportGrid) {
+                this.blocks._updateViewportGrid(this.blockIndex);
+            }
             if (this.isCollapsible()) {
                 if (this.collapsed) {
                     if (this.bitmap !== null) {

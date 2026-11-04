@@ -182,6 +182,75 @@ describe("Viewport Culling", () => {
         expect(blocks.blockList[2]._viewportVisible).toBe(true);
     });
 
+    it("only checks blocks whose bounds overlap viewport grid cells", () => {
+        blocks.blockList = [
+            { trash: false, container: { x: 100, y: 100 }, width: 50, height: 30 },
+            { trash: false, container: { x: 2000, y: 2000 }, width: 50, height: 30 },
+            { trash: false, container: { x: 790, y: 100 }, width: 40, height: 30 }
+        ];
+        blocks._rebuildSpatialGrid();
+
+        const candidates = blocks._getViewportCandidates(0, 0, 800, 600);
+
+        expect([...candidates].sort()).toEqual([0, 2]);
+    });
+
+    it("culls initially visible blocks outside the viewport", () => {
+        blocks.blockList = [
+            { trash: false, container: { x: 2000, y: 2000 }, width: 50, height: 30 }
+        ];
+        blocks._rebuildSpatialGrid();
+
+        blocks._updateViewportCulling();
+
+        expect(blocks.blockList[0]._viewportVisible).toBe(false);
+    });
+
+    it("updates viewport grid membership when a block moves", () => {
+        blocks.blockList = [
+            { trash: false, container: { x: 100, y: 100 }, width: 50, height: 30, docks: [[0, 0]] }
+        ];
+        blocks._rebuildSpatialGrid();
+        blocks.blockList[0].container.x = 2000;
+        blocks._updateSpatialGrid(0);
+
+        expect(blocks._getViewportCandidates(0, 0, 800, 600).has(0)).toBe(false);
+        expect(blocks._getViewportCandidates(2000, 100, 2800, 700).has(0)).toBe(true);
+    });
+
+    it("falls back for block coordinates outside the safe integer range", () => {
+        blocks.blockList = [
+            {
+                trash: false,
+                container: { x: 1e18, y: 1e18 },
+                width: 50,
+                height: 30,
+                docks: [[0, 0]]
+            }
+        ];
+
+        expect(() => blocks._updateSpatialGrid(0)).not.toThrow();
+        expect(blocks._viewportFallback.has(0)).toBe(true);
+        expect(blocks._getViewportCandidates(0, 0, 800, 600).has(0)).toBe(true);
+    });
+
+    it("falls back when block bounds span too many grid cells", () => {
+        blocks.blockList = [
+            { trash: false, container: { x: 0, y: 0 }, width: 1e9, height: 30, docks: [[0, 0]] }
+        ];
+
+        blocks._updateSpatialGrid(0);
+
+        expect(blocks._viewportFallback.has(0)).toBe(true);
+    });
+
+    it("falls back to a block scan for a viewport outside the safe integer range", () => {
+        blocks.blockList = [{ trash: false, container: { x: 100, y: 100 }, width: 50, height: 30 }];
+        blocks._rebuildSpatialGrid();
+
+        expect([...blocks._getViewportCandidates(1e18, 0, 1e18 + 800, 600)]).toEqual([0]);
+    });
+
     it("should mark blocks outside the viewport as not visible", () => {
         blocks.blockList = [
             { trash: false, container: { x: -200, y: 100 }, width: 50, height: 30 },

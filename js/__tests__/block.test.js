@@ -1559,6 +1559,25 @@ describe("Block Foundation", () => {
     });
 
     describe("show", () => {
+        it("updates viewport tracking when showing a block", () => {
+            mockBlocks._updateViewportGrid = jest.fn();
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.blockIndex = 7;
+            b._viewportVisible = false;
+            b.container = { visible: false };
+            b.bitmap = { visible: false };
+            b.highlightBitmap = { visible: false };
+            b.disconnectedBitmap = null;
+            b.disconnectedHighlightBitmap = null;
+            b.updateCache = jest.fn();
+            b._setupAccessibleElement = jest.fn();
+
+            b.show();
+
+            expect(b._viewportVisible).toBe(true);
+            expect(mockBlocks._updateViewportGrid).toHaveBeenCalledWith(7);
+        });
+
         it("should not throw when container is null and not trashed", () => {
             const b = new Block(mockProtoBlock, mockBlocks);
             b.container = null;
