@@ -285,6 +285,10 @@ function createSharePopup(popupId, items, anchor) {
 
     const cleanup = (restoreFocus = true) => {
         if (popup._keydownHandler) {
+            if (typeof window !== "undefined" && typeof window.removeEventListener === "function") {
+                window.removeEventListener("keydown", popup._keydownHandler, true);
+            }
+            document.removeEventListener("keydown", popup._keydownHandler, true);
             document.removeEventListener("keydown", popup._keydownHandler);
         }
         if (popup._closeHandler) {
@@ -323,6 +327,11 @@ function createSharePopup(popupId, items, anchor) {
                 handler();
             } else if (e.key === "Escape") {
                 e.preventDefault();
+                if (typeof e.stopImmediatePropagation === "function") {
+                    e.stopImmediatePropagation();
+                } else if (typeof e.stopPropagation === "function") {
+                    e.stopPropagation();
+                }
                 cleanup(true);
             } else if (e.key === "ArrowDown") {
                 e.preventDefault();
@@ -372,12 +381,25 @@ function createSharePopup(popupId, items, anchor) {
     document.addEventListener("mousedown", closeHandler);
 
     const keydownHandler = e => {
+        if (!document.body.contains(popup)) {
+            cleanup(false);
+            return;
+        }
         if (e.key === "Escape") {
             e.preventDefault();
+            if (typeof e.stopImmediatePropagation === "function") {
+                e.stopImmediatePropagation();
+            } else if (typeof e.stopPropagation === "function") {
+                e.stopPropagation();
+            }
             cleanup(true);
         }
     };
     popup._keydownHandler = keydownHandler;
+    if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+        window.addEventListener("keydown", keydownHandler, true);
+    }
+    document.addEventListener("keydown", keydownHandler, true);
     document.addEventListener("keydown", keydownHandler);
 
     if (itemElements.length > 0 && typeof itemElements[0].focus === "function") {
@@ -408,6 +430,10 @@ function closeSharePopup(popupId) {
         document.removeEventListener("mousedown", existing._closeHandler);
     }
     if (existing._keydownHandler) {
+        if (typeof window !== "undefined" && typeof window.removeEventListener === "function") {
+            window.removeEventListener("keydown", existing._keydownHandler, true);
+        }
+        document.removeEventListener("keydown", existing._keydownHandler, true);
         document.removeEventListener("keydown", existing._keydownHandler);
     }
     existing.remove();

@@ -587,6 +587,9 @@ describe("createSharePopup()", () => {
     };
 
     afterEach(() => {
+        document.querySelectorAll("[role='menu']").forEach(p => {
+            if (typeof p._cleanup === "function") p._cleanup(false);
+        });
         document.body.innerHTML = "";
         jest.restoreAllMocks();
     });
@@ -743,6 +746,34 @@ describe("createSharePopup()", () => {
         expect(mockAnchor.focus).toHaveBeenCalledTimes(1);
     });
 
+    it("intercepts Escape on window capture phase to prevent parent document capture handlers from closing parent windows", () => {
+        const mockAnchor = {
+            getBoundingClientRect: () => ({ left: 50, bottom: 100 }),
+            focus: jest.fn(),
+            setAttribute: jest.fn()
+        };
+        const parentWindowCloseHandler = jest.fn();
+        document.addEventListener("keydown", parentWindowCloseHandler, true);
+
+        try {
+            createSharePopup("interceptEscapeTest", [["Option 1", jest.fn()]], mockAnchor);
+            expect(document.getElementById("interceptEscapeTest")).not.toBeNull();
+
+            const escapeEvent = new KeyboardEvent("keydown", {
+                key: "Escape",
+                bubbles: true,
+                cancelable: true
+            });
+            window.dispatchEvent(escapeEvent);
+
+            expect(document.getElementById("interceptEscapeTest")).toBeNull();
+            expect(mockAnchor.focus).toHaveBeenCalledTimes(1);
+            expect(parentWindowCloseHandler).not.toHaveBeenCalled();
+        } finally {
+            document.removeEventListener("keydown", parentWindowCloseHandler, true);
+        }
+    });
+
     it("cycles focus through items with ArrowDown and wraps to first item", () => {
         const item1 = ["Option 1", jest.fn()];
         const item2 = ["Option 2", jest.fn()];
@@ -858,6 +889,9 @@ describe("closeSharePopup()", () => {
     const anchor = { getBoundingClientRect: () => ({ left: 0, bottom: 0 }) };
 
     afterEach(() => {
+        document.querySelectorAll("[role='menu']").forEach(p => {
+            if (typeof p._cleanup === "function") p._cleanup(false);
+        });
         document.body.innerHTML = "";
         jest.restoreAllMocks();
     });
