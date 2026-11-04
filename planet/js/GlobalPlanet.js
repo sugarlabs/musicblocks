@@ -832,6 +832,7 @@ class GlobalPlanet {
             register("global-search", "compositionstart", function () {
                 clearTimeout(this.searchDebounce);
                 this.searchDebounce = null;
+                this.searchString = this.oldSearchString;
             });
 
             register("global-search", "input", function (evt) {
