@@ -226,11 +226,17 @@ describe("PitchBlocksAPI", () => {
 
         test("keeps the flow and runs it", async () => {
             const mockFlow = jest.fn();
+            const endFlowGetter = jest.fn(() => Promise.resolve());
+            Object.defineProperty(pitchBlocksAPI, "ENDFLOWCOMMAND", {
+                get: endFlowGetter,
+                configurable: true
+            });
             const result = await pitchBlocksAPI.invert("sol", 4, "even", async () => mockFlow());
 
             expect(pitchBlocksAPI.runCommand).toHaveBeenCalledWith("invert", ["sol", 4, "even", 1]);
             expect(mockFlow).toHaveBeenCalled();
-            expect(result).toBe("end");
+            expect(endFlowGetter).toHaveBeenCalled();
+            expect(result).toBeUndefined();
         });
 
         test("rejects a flow that is not an async function before inverting", async () => {
