@@ -4341,10 +4341,17 @@ describe("getPitchInfo", () => {
         expect(pClass).toBe(0);
         expect(getPitchInfo(activity, "pitch class", "A0", tur)).toBe(9);
         expect(getPitchInfo(activity, "pitch class", "A4", tur)).toBe(9);
+        expect(getPitchInfo(activity, "pitch class", "C" + DOUBLESHARP + "4", tur)).toBe(2);
+        expect(getPitchInfo(activity, "pitch class", "D" + DOUBLEFLAT + "4", tur)).toBe(0);
 
         activity.logo.synth.inTemperament = "equal19";
         expect(getPitchInfo(activity, "pitch class", "C4", tur)).toBe(0);
         expect(getPitchInfo(activity, "pitch class", "A4", tur)).toBe(14);
+        expect(getPitchInfo(activity, "pitch class", 270, tur)).toBe(1);
+
+        activity.logo.synth.inTemperament = "equal31";
+        expect(getPitchInfo(activity, "pitch class", "C" + DOUBLESHARP + "4", tur)).toBe(2);
+        expect(getPitchInfo(activity, "pitch class", "D" + DOUBLEFLAT + "4", tur)).toBe(3);
         activity.logo.synth.inTemperament = "equal";
     });
 

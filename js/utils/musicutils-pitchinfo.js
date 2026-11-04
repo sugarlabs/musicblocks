@@ -154,7 +154,7 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
     let cents;
     if (Number(currentNote)) {
         // If it is a frequency, convert it to a pitch/octave.
-        obj = frequencyToPitch(currentNote);
+        obj = frequencyToPitch(currentNote, temperament);
         pitch = obj[0];
         octave = obj[1];
         cents = obj[2];
@@ -164,21 +164,32 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
     }
     // Remap double sharps/double flats. B𝄪 and C𝄫 cross the B/C boundary, so the octave
     // moves with the name (B𝄪4 is C♯5, C𝄫4 is B♭3).
-    if (pitch.includes(DOUBLESHARP)) {
-        pitch = pitch.replace(DOUBLESHARP, "");
-        if (pitch === "B") {
-            pitch = "C" + SHARP;
-            octave = Number(octave) + 1;
-        } else {
-            pitch = NOTESSHARP[NOTESSHARP.indexOf(pitch) + 2];
+    if (getCurrentEDO(temperament) === 12) {
+        if (pitch.includes(DOUBLESHARP)) {
+            pitch = pitch.replace(DOUBLESHARP, "");
+            if (pitch === "B") {
+                pitch = "C" + SHARP;
+                octave = Number(octave) + 1;
+            } else {
+                pitch = NOTESSHARP[NOTESSHARP.indexOf(pitch) + 2];
+            }
+        } else if (pitch.includes(DOUBLEFLAT)) {
+            pitch = pitch.replace(DOUBLEFLAT, "");
+            if (pitch === "C") {
+                pitch = "B" + FLAT;
+                octave = Number(octave) - 1;
+            } else {
+                pitch = NOTESFLAT[NOTESFLAT.indexOf(pitch) - 2];
+            }
         }
-    } else if (pitch.includes(DOUBLEFLAT)) {
-        pitch = pitch.replace(DOUBLEFLAT, "");
-        if (pitch === "C") {
-            pitch = "B" + FLAT;
-            octave = Number(octave) - 1;
-        } else {
-            pitch = NOTESFLAT[NOTESFLAT.indexOf(pitch) - 2];
+    } else {
+        const edo = getCurrentEDO(temperament);
+        const names = generateNoteNames(edo);
+        const normalizedAccidental = pitch
+            .replaceAll(DOUBLESHARP, SHARP + SHARP)
+            .replaceAll(DOUBLEFLAT, FLAT + FLAT);
+        if (names.includes(normalizedAccidental)) {
+            pitch = normalizedAccidental;
         }
     }
     // Map the pitch to the current scale: an off-scale spelling whose enharmonic is in the
