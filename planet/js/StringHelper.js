@@ -36,6 +36,7 @@ class StringHelper {
             ["global-search", _("Search for projects"), "placeholder"],
             ["local-search", _("Search for projects"), "aria-label"],
             ["global-search", _("Search for projects"), "aria-label"],
+            ["search-close", _("Clear search"), "aria-label"],
             ["local-search-empty", _("No projects match your search.")],
             ["localtitle", _("My Projects")],
             ["publisher-ptitle", _("Publish project")],
