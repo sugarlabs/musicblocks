@@ -865,10 +865,12 @@ describe("setupPitchBlocks", () => {
             activity.blocks.blockList[20] = { name: "notename" };
             logo.parseArg.mockReturnValue("A");
 
-            // A0 has pitchToNumber 0; (0 - 3) % 12 should normalize to 9, not -3
+            // In 12-EDO, A0 has pitchToNumber 0 and C0 has cOffset 3; (0 - 3) % 12 = 9
             const realGetPitchInfo = require("../../utils/musicutils-pitchinfo").getPitchInfo;
             global.getPitchInfo.mockImplementation(realGetPitchInfo);
-            global.pitchToNumber.mockReturnValue(0);
+            global.pitchToNumber.mockImplementation((pitch, octave, key, temp) =>
+                pitch === "C" ? 3 : 0
+            );
             global.getCurrentEDO.mockReturnValue(12);
 
             tur.singer.currentOctave = 0;

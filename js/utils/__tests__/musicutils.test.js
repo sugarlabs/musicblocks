@@ -4336,11 +4336,16 @@ describe("getPitchInfo", () => {
         expect(getPitchInfo(activity, "solfege syllable", "G4", tur)).toBe("do");
     });
 
-    it("returns correct pitch class", () => {
+    it("returns correct pitch class across temperaments", () => {
         const pClass = getPitchInfo(activity, "pitch class", "C4", tur);
         expect(pClass).toBe(0);
         expect(getPitchInfo(activity, "pitch class", "A0", tur)).toBe(9);
         expect(getPitchInfo(activity, "pitch class", "A4", tur)).toBe(9);
+
+        activity.logo.synth.inTemperament = "equal19";
+        expect(getPitchInfo(activity, "pitch class", "C4", tur)).toBe(0);
+        expect(getPitchInfo(activity, "pitch class", "A4", tur)).toBe(14);
+        activity.logo.synth.inTemperament = "equal";
     });
 
     it("returns correct scalar class", () => {

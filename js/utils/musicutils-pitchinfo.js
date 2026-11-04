@@ -260,8 +260,15 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
             }
             case "pitch class": {
                 const edo = getCurrentEDO(temperament);
+                const cOffset =
+                    ((pitchToNumber("C", octave, tur.singer.keySignature, temperament) % edo) +
+                        edo) %
+                    edo;
                 return (
-                    (((pitchToNumber(pitch, octave, tur.singer.keySignature) - 3) % edo) + edo) %
+                    (((pitchToNumber(pitch, octave, tur.singer.keySignature, temperament) -
+                        cOffset) %
+                        edo) +
+                        edo) %
                     edo
                 );
             }
