@@ -268,7 +268,7 @@ describe("ProgramBlocks", () => {
             expect(global.fetch).toHaveBeenCalled();
         });
 
-        test.each(["__proto__", "constructor", "prototype"])(
+        test.each(["__proto__", "constructor", "prototype", ["__proto__"]])(
             "rejects unsafe heap name %s when loading from app",
             heapName => {
                 const block = getBlock("loadHeapFromApp");
@@ -277,7 +277,7 @@ describe("ProgramBlocks", () => {
                 block.flow([heapName, "http://test.com"], logo, 0, 1);
 
                 expect(activity.errorMsg).toHaveBeenCalledWith("The heap name is reserved.", 1);
-                expect(Object.hasOwn(logo.turtleHeaps, heapName)).toBe(false);
+                expect(Object.hasOwn(logo.turtleHeaps, String(heapName))).toBe(false);
                 expect(Object.getPrototypeOf(logo.turtleHeaps)).toBe(initialProto);
             }
         );
@@ -321,7 +321,7 @@ describe("ProgramBlocks", () => {
             );
         });
 
-        test.each(["__proto__", "constructor", "prototype"])(
+        test.each(["__proto__", "constructor", "prototype", ["__proto__"]])(
             "rejects unsafe heap name %s when saving to app",
             heapName => {
                 const block = getBlock("saveHeapToApp");
@@ -598,6 +598,9 @@ describe("ProgramBlocks", () => {
             block.flow(["target", [null, null]], logo, turtle, blk);
 
             expect(logo.turtleDicts[turtle][targetTurtleIndex]).toEqual({ custom: "value" });
+            expect(Object.getPrototypeOf(logo.turtleDicts[turtle][targetTurtleIndex])).toBe(
+                Object.prototype
+            );
             expect({}.polluted).toBeUndefined();
         });
 
@@ -795,6 +798,9 @@ describe("ProgramBlocks", () => {
             block.flow(["target", {}], logo, turtle, blk);
 
             expect(logo.turtleDicts[turtle][targetTurtleIndex]).toEqual({ custom: "value" });
+            expect(Object.getPrototypeOf(logo.turtleDicts[turtle][targetTurtleIndex])).toBe(
+                Object.prototype
+            );
             expect({}.polluted).toBeUndefined();
         });
 

@@ -87,7 +87,7 @@ function setupProgramBlocks(activity) {
             }
 
             const url = args[1];
-            const name = args[0];
+            const name = String(args[0]);
             if (isUnsafeObjectKey(name)) {
                 activity.errorMsg(_("The heap name is reserved."), blk);
                 return;
@@ -185,7 +185,7 @@ function setupProgramBlocks(activity) {
                 return;
             }
 
-            const name = args[0];
+            const name = String(args[0]);
             const url = args[1];
             if (isUnsafeObjectKey(name)) {
                 activity.errorMsg(_("The heap name is reserved."), blk);
