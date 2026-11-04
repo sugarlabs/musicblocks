@@ -1340,7 +1340,7 @@ describe("Blocks Foundation", () => {
             ];
             blocks.selectedStack = 1;
 
-            const copiedBlocks = blocks._copyBlocksToObj(false);
+            const copiedBlocks = blocks._copyBlocksToObj();
 
             expect(copiedBlocks).toEqual([
                 [0, "forward", 75, 75, [null, 1]],
@@ -1366,11 +1366,11 @@ describe("Blocks Foundation", () => {
             ];
             blocks.selectedStack = 0;
 
-            const copiedBlocks = blocks._copyBlocksToObj(false);
+            const copiedBlocks = blocks._copyBlocksToObj();
             expect(copiedBlocks[0][1]).toEqual(["notename", { value: "F", manualAccidental: "♮" }]);
 
             blocks.selectedStack = 1;
-            const copiedSolfege = blocks._copyBlocksToObj(false);
+            const copiedSolfege = blocks._copyBlocksToObj();
             expect(copiedSolfege[0][1]).toEqual(["solfege", { value: "Fa" }]);
         });
 
@@ -1396,10 +1396,138 @@ describe("Blocks Foundation", () => {
             ];
             blocks.selectedStack = 0;
 
-            expect(blocks._copyBlocksToObj(false)).toEqual([
+            expect(blocks._copyBlocksToObj()).toEqual([
                 [0, "eat", 75, 75, [null, 1, null]],
                 [1, ["apple", { value: 2 }], 0, 0, [0]]
             ]);
+        });
+
+        describe("sound and image data", () => {
+            const sound = "data:audio/wav;base64,UklGRg==";
+            const image = "data:image/png;base64,iVBORw0KGgo=";
+            const makeBlock = (name, value, connections, isValue) => ({
+                name,
+                value,
+                connections,
+                isValueBlock: jest.fn().mockReturnValue(isValue)
+            });
+            const sampleStack = () => [
+                makeBlock("settimbre", null, [null, 1, null, 5], false),
+                makeBlock("customsample", ["mysound", sound, "do", 4, 25], [0, 2, 3, 4], false),
+                makeBlock("audiofile", ["mysound", sound], [1], true),
+                makeBlock("solfege", "do", [1], true),
+                makeBlock("number", 4, [1], true),
+                makeBlock("hidden", null, [0, null], false)
+            ];
+
+            let blocks;
+            beforeEach(() => {
+                blocks = new Blocks(mockActivity);
+                mockActivity.blocksContainer.x = 0;
+                mockActivity.blocksContainer.y = 0;
+            });
+
+            it("copies a sampler instrument with its sound and tuning", () => {
+                blocks.blockList = sampleStack();
+                blocks.selectedStack = 0;
+
+                expect(blocks._copyBlocksToObj()).toEqual([
+                    [0, "settimbre", 75, 75, [null, 1, null, 5]],
+                    [
+                        1,
+                        ["customsample", { value: ["mysound", "", "do", 4, 25] }],
+                        0,
+                        0,
+                        [0, 2, 3, 4]
+                    ],
+                    [2, ["audiofile", { value: ["mysound", sound] }], 0, 0, [1]],
+                    [3, ["solfege", { value: "do" }], 0, 0, [1]],
+                    [4, ["number", { value: 4 }], 0, 0, [1]],
+                    [5, "hidden", 0, 0, [0, null]]
+                ]);
+            });
+
+            it("keeps the sound on a sample block with no file block", () => {
+                blocks.blockList = [
+                    makeBlock(
+                        "customsample",
+                        ["mysound", sound, "do", 4, 25],
+                        [null, null, null, null],
+                        false
+                    )
+                ];
+                blocks.selectedStack = 0;
+
+                expect(blocks._copyBlocksToObj()[0][1]).toEqual([
+                    "customsample",
+                    { value: ["mysound", sound, "do", 4, 25] }
+                ]);
+            });
+
+            it("does not change the copied sample block", () => {
+                blocks.blockList = sampleStack();
+                blocks.selectedStack = 0;
+
+                blocks._copyBlocksToObj();
+
+                expect(blocks.blockList[1].value).toEqual(["mysound", sound, "do", 4, 25]);
+            });
+
+            it("copies an image with its picture", () => {
+                blocks.blockList = [
+                    makeBlock("show", null, [null, 1, 2, null], false),
+                    makeBlock("number", 24, [0], true),
+                    makeBlock("media", image, [0], true)
+                ];
+                blocks.selectedStack = 0;
+
+                expect(blocks._copyBlocksToObj()[2]).toEqual([
+                    2,
+                    ["media", { value: image }],
+                    0,
+                    0,
+                    [0]
+                ]);
+            });
+
+            it("pastes a duplicated sampler instrument with its sound", () => {
+                global.deepClone = require("../utils/utils-logic").deepClone;
+                global.docById = jest.fn(() => ({ style: { display: "none" } }));
+                blocks.blockList = sampleStack();
+                blocks.activeBlock = 0;
+                blocks.loadNewBlocks = jest.fn();
+
+                blocks.prepareStackForCopy();
+                blocks.blockList[2].value = null;
+                blocks.pasteStack();
+
+                const pasted = blocks.loadNewBlocks.mock.calls[0][0];
+                expect(pasted[1][1]).toEqual([
+                    "customsample",
+                    { value: ["mysound", "", "do", 4, 25] }
+                ]);
+                expect(pasted[2][1]).toEqual(["audiofile", { value: ["mysound", sound] }]);
+            });
+
+            it("saves a sampler instrument to My Blocks with its sound and tuning", () => {
+                global.MathUtility = { doRandom: jest.fn(() => 7) };
+                global.prepareMacroExports = require("../utils/macro-utils").prepareMacroExports;
+                mockActivity.palettes.updatePalettes = jest.fn();
+                blocks.addToMyPalette = jest.fn();
+                blocks.storage = {};
+                blocks.blockList = sampleStack();
+                blocks.selectedStack = 0;
+
+                blocks.saveStack();
+
+                const macro = JSON.parse(blocks.storage.macros)["customsample-7"];
+                expect(macro[1][1]).toEqual([
+                    "customsample",
+                    { value: ["mysound", "", "do", 4, 25] }
+                ]);
+                expect(macro[2][1]).toEqual(["audiofile", { value: ["mysound", sound] }]);
+                expect(blocks.addToMyPalette).toHaveBeenCalledWith("customsample-7");
+            });
         });
     });
 
