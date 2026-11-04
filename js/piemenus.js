@@ -3335,7 +3335,6 @@ const piemenuVoicesGrid = (block, voiceLabels, voiceValues, categories, categori
     }
 
     const that = block;
-    const opener = document.activeElement;
     const COLORS = platformColor.piemenuVoicesColors;
     const HEADINGS = { precussion: "percussion" }; // source list misspells this type
     let voicePreviewTimeout = null;
@@ -3348,6 +3347,10 @@ const piemenuVoicesGrid = (block, voiceLabels, voiceValues, categories, categori
             old.remove();
         }
     }
+
+    // Captured after closing any previous grid, so focus goes back to the
+    // real opener and not to a button that was just removed.
+    const opener = document.activeElement;
 
     const __select = i => {
         that.value = voiceValues[i];
@@ -3398,8 +3401,10 @@ const piemenuVoicesGrid = (block, voiceLabels, voiceValues, categories, categori
         "padding:16px;border-radius:12px;background:#fff;" +
         "box-shadow:0 8px 32px rgba(0,0,0,0.35);z-index:9999;";
 
+    // Keys pressed inside the grid shouldn't trigger workspace shortcuts.
+    // Escape closes the grid, and Alt+S is the global stop shortcut.
     panel.addEventListener("keydown", e => {
-        if (e.key !== "Escape") {
+        if (e.key !== "Escape" && !(e.altKey && e.code === "KeyS")) {
             e.stopPropagation();
         }
     });

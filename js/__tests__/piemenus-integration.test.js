@@ -201,26 +201,29 @@ describe("selected item hover in pie menus", () => {
         });
     });
 
-    const makeVoiceBlock = () => ({
-        blocks: { stageClick: false, activeBlock: {} },
-        value: "voice-one",
-        text: { text: "One" },
-        container: { children: [], setChildIndex: jest.fn() },
-        updateCache: jest.fn(),
-        activity: {
-            logo: {
-                synth: {
-                    loadSynth: jest.fn(),
-                    createDefaultSynth: jest.fn(),
-                    trigger: jest.fn(),
-                    start: jest.fn()
+    const makeVoiceBlock = () => {
+        const turtle = { singer: { instrumentNames: [] } };
+        return {
+            blocks: { stageClick: false, activeBlock: {} },
+            value: "voice-one",
+            text: { text: "One" },
+            container: { children: [], setChildIndex: jest.fn() },
+            updateCache: jest.fn(),
+            activity: {
+                logo: {
+                    synth: {
+                        loadSynth: jest.fn(),
+                        createDefaultSynth: jest.fn(),
+                        trigger: jest.fn(),
+                        start: jest.fn()
+                    }
+                },
+                turtles: {
+                    ithTurtle: jest.fn(() => turtle)
                 }
-            },
-            turtles: {
-                ithTurtle: jest.fn(() => ({ singer: { instrumentNames: [] } }))
             }
-        }
-    });
+        };
+    };
 
     const openVoiceGrid = block => {
         piemenuVoicesGrid(
@@ -325,6 +328,25 @@ describe("selected item hover in pie menus", () => {
                 .dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
 
             expect(spy).not.toHaveBeenCalled();
+            document.removeEventListener("keydown", spy);
+            document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+        });
+
+        test("Alt+S inside the grid still reaches the global stop shortcut", () => {
+            const spy = jest.fn();
+            document.addEventListener("keydown", spy);
+            openVoiceGrid(makeVoiceBlock());
+
+            document.querySelector("#voiceGrid button").dispatchEvent(
+                new KeyboardEvent("keydown", {
+                    key: "s",
+                    code: "KeyS",
+                    altKey: true,
+                    bubbles: true
+                })
+            );
+
+            expect(spy).toHaveBeenCalled();
             document.removeEventListener("keydown", spy);
             document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
         });
