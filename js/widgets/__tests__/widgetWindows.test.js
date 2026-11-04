@@ -1155,6 +1155,41 @@ describe("widgetWindows", () => {
             expect(win._frame.style.minWidth).toBe("470px");
         });
 
+        test("unroll on narrow screens (<= 600px) does not force minWidth 470px", () => {
+            const originalInnerWidth = window.innerWidth;
+            window.innerWidth = 390;
+            const win = createTestWindow("testNarrowScreenRollup");
+            win._rollup();
+            win.unroll();
+
+            expect(win._frame.style.minWidth).toBe("0px");
+            expect(win._frame.style.maxWidth).toBe("100vw");
+
+            window.innerWidth = originalInnerWidth;
+        });
+
+        test("unroll clamps floating window position so it does not extend below viewport", () => {
+            const originalInnerHeight = window.innerHeight;
+            const originalInnerWidth = window.innerWidth;
+            window.innerHeight = 500;
+            window.innerWidth = 1024;
+
+            const win = createTestWindow("testUnrollClamp");
+            win.setPosition(100, 400);
+            expect(win._frame.style.top).toBe("400px");
+
+            win._rollup();
+            // Window is rolled up at top: 400px. Now unroll in a 500px tall viewport.
+            win.unroll();
+
+            // 500 (innerHeight) - 420 (height) = 80px maxY.
+            expect(parseFloat(win._frame.style.top)).toBeLessThanOrEqual(80);
+            expect(win._frame.style.top).toBe("80px");
+
+            window.innerHeight = originalInnerHeight;
+            window.innerWidth = originalInnerWidth;
+        });
+
         test("_handleResize does not stretch maximized window height while rolled up", () => {
             const win = createTestWindow("testResizeRolledMax");
             const toolbarBottom = window.widgetWindows._getToolbarBottom();

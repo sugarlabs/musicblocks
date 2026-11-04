@@ -935,7 +935,9 @@ class WidgetWindow {
         this._frame.style.width = "auto";
         this._frame.style.height = "auto";
         this._frame.style.minHeight = this._rolled ? "0px" : "420px";
-        this._frame.style.minWidth = "470px";
+        this._frame.style.maxWidth = "100vw";
+        this._frame.style.minWidth =
+            window.innerWidth && window.innerWidth <= 600 ? "0px" : "470px";
     }
 
     /**
@@ -1183,7 +1185,20 @@ class WidgetWindow {
             this._frame.style.width = "auto";
             this._frame.style.height = "auto";
             this._frame.style.minHeight = "420px";
-            this._frame.style.minWidth = "470px";
+            this._frame.style.maxWidth = "100vw";
+            if (window.innerWidth && window.innerWidth <= 600) {
+                this._frame.style.minWidth = "0px";
+            } else {
+                this._frame.style.minWidth = "470px";
+            }
+
+            // Ensure expanding a rolled-up window does not leave it extending below or outside the viewport.
+            const curX = parseFloat(this._frame.style.left) || 0;
+            const curY = parseFloat(this._frame.style.top) || 0;
+            const clamped = this._clampToViewport(curX, curY);
+            if (clamped[0] !== curX || clamped[1] !== curY) {
+                this.setPosition(clamped[0], clamped[1]);
+            }
         }
         if (this._rollButton) {
             if (this._rollButton.classList.contains("plus")) {
