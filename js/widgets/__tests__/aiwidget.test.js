@@ -743,11 +743,25 @@ describe("AIWidget Instance", () => {
             expect(mockActivity.textMsg).toHaveBeenCalledWith("New start block generated.");
         });
 
-        it("does not report success when ABC contains no notes", async () => {
+        it.each([
+            ["empty ABC input", ""],
+            ["bar-only ABC input", "X:1\nM:4/4\nL:1/4\nK:C\n|\n"],
+            ["spacer-only ABC input", "X:1\nM:4/4\nL:1/4\nK:C\nx |\n"]
+        ])("does not report success for %s", async (_description, abcNotation) => {
+            global.ABCJS = { parseOnly: jest.fn(abc => realABCJS.parseOnly(abc)) };
+            const body = document.createElement("div");
+            body.getBoundingClientRect = jest.fn(() => ({ width: 800, height: 600 }));
+            const windowFor = global.window.widgetWindows.windowFor;
+            global.window.widgetWindows.windowFor = jest.fn((...args) => ({
+                ...windowFor(...args),
+                getWidgetBody: jest.fn(() => body)
+            }));
             aiWidget = new AIWidget();
             mockActivity.parseABC = jest.fn(() => Promise.resolve(null));
-            aiWidget.activity = mockActivity;
-            global.ABCJS = { parseOnly: jest.fn(() => [{ lines: [] }]) };
+            aiWidget.init(mockActivity);
+            const textarea = body.querySelector("textarea");
+            textarea.value = abcNotation;
+            textarea.dispatchEvent(new Event("input"));
 
             await aiWidget.__save();
 

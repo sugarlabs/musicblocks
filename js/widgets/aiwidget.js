@@ -224,7 +224,13 @@ function AIWidget() {
         const playableTunes = tunebook.filter(tune =>
             tune.lines?.some(line =>
                 line.staff?.some(staff =>
-                    staff.voices?.some(voice => voice.some(element => element.el_type === "note"))
+                    staff.voices?.some(voice =>
+                        voice.some(
+                            element =>
+                                element.el_type === "note" &&
+                                (!element.rest || element.rest.type === "rest")
+                        )
+                    )
                 )
             )
         );
@@ -634,6 +640,7 @@ function AIWidget() {
             "font-size:20px;" +
             "padding:10px";
         textarea.className = "samplerTextarea";
+        textarea.value = abcNotationSong;
         scrollContainer.appendChild(textarea); // Append textarea to scroll container
 
         // Create hint text elements
