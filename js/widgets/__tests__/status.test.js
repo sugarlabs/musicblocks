@@ -1632,7 +1632,18 @@ describe("StatusMatrix Widget", () => {
         });
 
         describe("parallel motion", () => {
-            const MIDI = { C3: 48, D3: 50, C4: 60, D4: 62, E4: 64, F4: 65, G4: 67, A4: 69, B4: 71 };
+            const MIDI = {
+                C3: 48,
+                D3: 50,
+                E3: 52,
+                C4: 60,
+                D4: 62,
+                E4: 64,
+                F4: 65,
+                G4: 67,
+                A4: 69,
+                B4: 71
+            };
             let mice;
 
             // Moves a mouse to a note group (or a rest, with no notes) that starts
@@ -1684,6 +1695,23 @@ describe("StatusMatrix Widget", () => {
 
                 Date.now.mockReturnValue(11200);
                 statusMatrix.updateAll();
+
+                expect(warnings()).toEqual([]);
+            });
+
+            test("hides the warning once one of the two mice moves on", () => {
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["G4"], 0);
+                play(2, ["C3"], 0);
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+                play(2, ["E3"], 1);
+                expect(warnings()).toEqual(["parallel fifths: mouse 1 C4 → D4, mouse 2 G4 → A4"]);
+
+                // Mouse 1 moves on while mice 2 and 3 hold the notes that started at 1.
+                play(0, ["E4"], 2);
 
                 expect(warnings()).toEqual([]);
             });

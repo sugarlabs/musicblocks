@@ -545,12 +545,14 @@ class StatusMatrix {
     /**
      * Collects the pitches the mice are sounding now.
      * @private
-     * @returns {{notes: Array<string|number>, nextChange: number}} The note names
-     *     (e.g. "E4") or frequencies, and the time (ms) at which that set next changes.
+     * @returns {{notes: Array<string|number>, starts: Map<number, number>, nextChange: number}}
+     *     The note names (e.g. "E4") or frequencies, the start in turtle time of
+     *     the notes each mouse is sounding (by column number), and the time (ms)
+     *     at which that set next changes.
      */
     _soundingNotes() {
         const notes = [];
-        const starts = [];
+        const starts = new Map();
         let nextChange = Infinity;
         if (this.activity?.logo?.stopTurtle) {
             return { notes, starts, nextChange };
@@ -559,12 +561,18 @@ class StatusMatrix {
         const now = Date.now();
         const grace = StatusMatrix.HARMONY_GRACE;
         const turtleList = this.activity?.turtles?.turtleList || [];
+        let column = 0;
         for (let t = 0; t < turtleList.length; t++) {
+            if (turtleList[t]?.inTrash) {
+                continue;
+            }
+            // Mice are numbered as in the columns of the table.
+            column += 1;
             const tur = this.activity.turtles.ithTurtle
                 ? this.activity.turtles.ithTurtle(t)
                 : turtleList[t];
             const singer = tur?.singer;
-            if (turtleList[t]?.inTrash || !singer?.pitchStatus) {
+            if (!singer?.pitchStatus) {
                 continue;
             }
 
@@ -578,7 +586,7 @@ class StatusMatrix {
                     nextChange = Math.min(nextChange, sound.startsAt - grace);
                 } else if (now <= sound.endsAt + grace) {
                     notes.push(...sound.notes);
-                    starts.push(sound.start);
+                    starts.set(column, sound.start);
                     nextChange = Math.min(nextChange, sound.endsAt + grace);
                 }
             }
@@ -736,9 +744,12 @@ class StatusMatrix {
         this._trackVoices();
         const synth = this.activity?.logo?.synth;
         const { notes, starts, nextChange } = this._soundingNotes();
-        // Show parallel motion while the notes it leads to are sounding.
+        // Show parallel motion while both mice are still sounding the notes it
+        // leads to.
         const parallels = this._parallels.filter(parallel =>
-            starts.some(start => Math.abs(start - parallel.start) < 1e-6)
+            parallel.voices.every(
+                column => starts.has(column) && Math.abs(starts.get(column) - parallel.start) < 1e-6
+            )
         );
 
         // The interpreter only refreshes the Status between blocks, so refresh
