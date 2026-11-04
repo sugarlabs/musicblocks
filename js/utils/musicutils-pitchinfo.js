@@ -47,7 +47,7 @@ if (typeof module !== "undefined" && module.exports) {
     var MusicUtilsTemperament =
         (typeof window !== "undefined" && window.MusicUtilsTemperament) ||
         (typeof require !== "undefined" ? require("./musicutils-temperament") : {});
-    var { getCurrentEDO, generateNoteNames } = MusicUtilsTemperament;
+    var { getCurrentEDO, generateNoteNames, getTemperament } = MusicUtilsTemperament;
     var MusicUtilsPitch =
         (typeof window !== "undefined" && window.MusicUtilsPitch) ||
         (typeof require !== "undefined" ? require("./musicutils-pitch") : {});
@@ -223,7 +223,7 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
                     if (
                         syllable === undefined &&
                         "CDEFGAB".includes(pitch[0]) &&
-                        [SHARP, FLAT].includes(pitch.slice(1))
+                        [SHARP, FLAT, SHARP + SHARP, FLAT + FLAT].includes(pitch.slice(1))
                     ) {
                         syllable = SOLFEGECONVERSIONTABLE[pitch[0]] + pitch.slice(1);
                     }
@@ -250,9 +250,14 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
                             );
                         }
                         if (degree.length > 0) {
-                            const accidental = [SHARP, FLAT, DOUBLESHARP, DOUBLEFLAT].includes(
-                                degree[1]
-                            )
+                            const accidental = [
+                                SHARP,
+                                FLAT,
+                                DOUBLESHARP,
+                                DOUBLEFLAT,
+                                SHARP + SHARP,
+                                FLAT + FLAT
+                            ].includes(degree[1])
                                 ? degree[1]
                                 : "";
                             syllable = SOLFEGENAMES[degree[0] - 1] + accidental;
@@ -262,14 +267,23 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
                 if (syllable !== undefined && type === "solfege class") {
                     // Remove sharps and flats.
                     return syllable
-                        .replace(DOUBLESHARP, "")
-                        .replace(DOUBLEFLAT, "")
-                        .replace(SHARP, "")
-                        .replace(FLAT, "");
+                        .replaceAll(DOUBLESHARP, "")
+                        .replaceAll(DOUBLEFLAT, "")
+                        .replaceAll(SHARP, "")
+                        .replaceAll(FLAT, "");
                 }
                 return syllable;
             }
             case "pitch class": {
+                const t = getTemperament(temperament);
+                if (t && !t.isEDO && t.noteLabels && t.noteLabels.includes(pitch)) {
+                    const cIdx = Math.max(0, t.noteLabels.indexOf("C"));
+                    const pIdx = t.noteLabels.indexOf(pitch);
+                    return (
+                        (((pIdx - cIdx) % t.noteLabels.length) + t.noteLabels.length) %
+                        t.noteLabels.length
+                    );
+                }
                 const edo = getCurrentEDO(temperament);
                 const cOffset =
                     ((pitchToNumber("C", octave, tur.singer.keySignature, temperament) % edo) +
@@ -301,15 +315,17 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
             case "nth degree":
                 return buildScale(tur.singer.keySignature)[0].indexOf(pitch);
             case "staff y": {
-                // B♯ and C♭ sit where they sound, on the C above and the B below.
+                // B♯ and C♭ sit where they sound, on the C above and the B below (12-EDO only).
                 let letter = pitch[0];
                 let staffOctave = Number(octave);
-                if (pitch === "B" + SHARP) {
-                    letter = "C";
-                    staffOctave += 1;
-                } else if (pitch === "C" + FLAT) {
-                    letter = "B";
-                    staffOctave -= 1;
+                if (getCurrentEDO(temperament) === 12) {
+                    if (pitch === "B" + SHARP) {
+                        letter = "C";
+                        staffOctave += 1;
+                    } else if (pitch === "C" + FLAT) {
+                        letter = "B";
+                        staffOctave -= 1;
+                    }
                 }
                 // These numbers are in relation to the staff artwork.
                 return (
@@ -340,11 +356,13 @@ var getPitchInfo = function (activity, type, currentNote, tur) {
                 console.debug("Pitch not found: " + pitch);
                 return 0;
             case "pitch to shade":
-                // B♯ and C♭ sound in the next and previous octave (B♯4 is C5, C♭4 is B3).
-                if (pitch === "B" + SHARP) {
-                    return (Number(octave) + 1) * 12.5;
-                } else if (pitch === "C" + FLAT) {
-                    return (Number(octave) - 1) * 12.5;
+                // B♯ and C♭ sound in the next and previous octave (B♯4 is C5, C♭4 is B3) in 12-EDO.
+                if (getCurrentEDO(temperament) === 12) {
+                    if (pitch === "B" + SHARP) {
+                        return (Number(octave) + 1) * 12.5;
+                    } else if (pitch === "C" + FLAT) {
+                        return (Number(octave) - 1) * 12.5;
+                    }
                 }
                 return octave * 12.5;
             default:
