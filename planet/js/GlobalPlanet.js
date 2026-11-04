@@ -853,11 +853,15 @@ class GlobalPlanet {
                 }
             });
 
-            register("search-close", "click", function (evt) {
+            register("search-close", "click", function () {
                 clearTimeout(this.searchDebounce);
 
-                document.getElementById("global-search").value = "";
+                const input = document.getElementById("global-search");
+                input.value = "";
                 this.searchString = "";
+
+                input.focus({ preventScroll: true });
+
                 document.getElementById("search-close").style.display = "none";
                 this.search();
             });

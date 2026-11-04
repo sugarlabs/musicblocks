@@ -63,7 +63,7 @@ describe("GlobalPlanet", () => {
             <div id="tagscontainer" style="display:block;"></div>
             <select id="sort-select"><option value="RECENT">Recent</option></select>
             <input id="global-search" value="" />
-            <div id="search-close" style="display:none;"></div>
+            <button type="button" id="search-close" style="display:none;"></button>
             <div id="global-tab"></div>
             <div id="local-tab"></div>
             <div id="globaltitle"></div>
@@ -903,6 +903,24 @@ describe("GlobalPlanet", () => {
 
             jest.advanceTimersByTime(300);
 
+            expect(gp.search).toHaveBeenCalledTimes(1);
+        });
+
+        it("should return focus to global search after clearing", () => {
+            const input = document.getElementById("global-search");
+            const close = document.getElementById("search-close");
+
+            input.value = "hello";
+            close.style.display = "block";
+            close.focus();
+
+            expect(document.activeElement).toBe(close);
+
+            close.click();
+
+            expect(input.value).toBe("");
+            expect(document.activeElement).toBe(input);
+            expect(close.style.display).toBe("none");
             expect(gp.search).toHaveBeenCalledTimes(1);
         });
 
