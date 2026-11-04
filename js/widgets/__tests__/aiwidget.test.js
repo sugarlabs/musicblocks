@@ -746,8 +746,7 @@ describe("AIWidget Instance", () => {
 
         it.each([
             ["empty ABC input", ""],
-            ["bar-only ABC input", "X:1\nM:4/4\nL:1/4\nK:C\n|\n"],
-            ["spacer-only ABC input", "X:1\nM:4/4\nL:1/4\nK:C\ny |\n"]
+            ["bar-only ABC input", "X:1\nM:4/4\nL:1/4\nK:C\n|\n"]
         ])("does not report success for %s", async (_description, abcNotation) => {
             global.ABCJS = { parseOnly: jest.fn(abc => realABCJS.parseOnly(abc)) };
             const body = document.createElement("div");
@@ -773,7 +772,10 @@ describe("AIWidget Instance", () => {
             expect(mockActivity.textMsg).not.toHaveBeenCalledWith("New start block generated.");
         });
 
-        it("imports ABC containing an invisible rest", async () => {
+        it.each([
+            ["an invisible rest", "X:1\nM:4/4\nL:1/4\nK:C\nx |\n"],
+            ["a spacer", "X:1\nM:4/4\nL:1/4\nK:C\ny |\n"]
+        ])("imports ABC containing %s", async (_description, abcNotation) => {
             global.ABCJS = { parseOnly: jest.fn(abc => realABCJS.parseOnly(abc)) };
             const body = document.createElement("div");
             body.getBoundingClientRect = jest.fn(() => ({ width: 800, height: 600 }));
@@ -786,7 +788,7 @@ describe("AIWidget Instance", () => {
             mockActivity.parseABC = jest.fn(() => Promise.resolve(null));
             aiWidget.init(mockActivity);
             const textarea = body.querySelector("textarea");
-            textarea.value = "X:1\nM:4/4\nL:1/4\nK:C\nx |\n";
+            textarea.value = abcNotation;
             textarea.dispatchEvent(new Event("input"));
 
             await aiWidget.__save();

@@ -224,11 +224,7 @@ function AIWidget() {
         const playableTunes = tunebook.filter(tune =>
             tune.lines?.some(line =>
                 line.staff?.some(staff =>
-                    staff.voices?.some(voice =>
-                        voice.some(
-                            element => element.el_type === "note" && element.rest?.type !== "spacer"
-                        )
-                    )
+                    staff.voices?.some(voice => voice.some(element => element.el_type === "note"))
                 )
             )
         );
