@@ -162,6 +162,7 @@ class Block {
         this.collapsed = false; // Is this collapsible block collapsed?
         this.inCollapsed = false; // Is this block in a collapsed stack?
         this.trash = false; // Is this block in the trash?
+        this.disabled = false; // Is this block disabled?
         this._viewportVisible = true; // Is this block within the current viewport?
         this.loadComplete = false; // Has the block finished loading?
         this.label = null; // Editable textview in DOM.
@@ -1083,6 +1084,9 @@ class Block {
         const fontSize = 10 * this.protoblock.scale;
         this.text = new createjs.Text("", fontSize + "px Sans", platformColor.blockText);
         this.generateArtwork(true, []);
+        if (this.disabled) {
+            this.updateDisabledAppearance();
+        }
     }
 
     /**
@@ -2150,6 +2154,50 @@ class Block {
             this.updateCache();
             this.activity.refreshCanvas();
             this._setupAccessibleElement();
+        }
+    }
+
+    /**
+     * Checks if the block is disabled.
+     * @public
+     * @returns {boolean} - True if the block is disabled, false otherwise.
+     */
+    isDisabled() {
+        return !!this.disabled;
+    }
+
+    /**
+     * Sets the disabled state of the block and updates appearance.
+     * @public
+     * @param {boolean} disabled
+     * @returns {void}
+     */
+    setDisabled(disabled) {
+        this.disabled = !!disabled;
+        this.updateDisabledAppearance();
+    }
+
+    /**
+     * Toggles the disabled state of the block and updates appearance.
+     * @public
+     * @returns {void}
+     */
+    toggleDisabled() {
+        this.disabled = !this.disabled;
+        this.updateDisabledAppearance();
+    }
+
+    /**
+     * Updates the visual opacity of the block container based on its disabled state.
+     * @public
+     * @returns {void}
+     */
+    updateDisabledAppearance() {
+        if (this.container) {
+            this.container.alpha = this.disabled ? 0.5 : 1.0;
+        }
+        if (this.activity && typeof this.activity.refreshCanvas === "function") {
+            this.activity.refreshCanvas();
         }
     }
 

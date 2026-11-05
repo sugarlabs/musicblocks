@@ -1374,6 +1374,32 @@ describe("Blocks Foundation", () => {
             expect(copiedSolfege[0][1]).toEqual(["solfege", { value: "Fa" }]);
         });
 
+        it("preserves disabled state on copied blocks", () => {
+            const blocks = new Blocks(mockActivity);
+            mockActivity.blocksContainer.x = 0;
+            mockActivity.blocksContainer.y = 0;
+            blocks.blockList = [
+                {
+                    name: "forward",
+                    disabled: true,
+                    connections: [null, 1],
+                    isValueBlock: jest.fn().mockReturnValue(false)
+                },
+                {
+                    name: "number",
+                    value: 50,
+                    disabled: true,
+                    connections: [0],
+                    isValueBlock: jest.fn().mockReturnValue(true)
+                }
+            ];
+            blocks.selectedStack = 0;
+
+            const copiedBlocks = blocks._copyBlocksToObj(false);
+            expect(copiedBlocks[0][1]).toEqual(["forward", { value: null, disabled: true }]);
+            expect(copiedBlocks[1][1]).toEqual(["number", { value: 50, disabled: true }]);
+        });
+
         it("copies a stand-in as the block it was loaded from", () => {
             const blocks = new Blocks(mockActivity);
             mockActivity.blocksContainer.x = 0;

@@ -3199,6 +3199,9 @@ class Blocks {
             myBlock.container.snapToPixelEnabled = true;
             myBlock.container.x = 0;
             myBlock.container.y = 0;
+            if (myBlock.disabled) {
+                myBlock.container.alpha = 0.5;
+            }
 
             // Support viewport culling via _viewportVisible (eye icon takes priority).
             myBlock.container._origIsVisible = myBlock.container.isVisible;
@@ -5259,6 +5262,18 @@ class Blocks {
                     blockItem = [b, myBlock.name, x, y, []];
                 }
 
+                if (myBlock.disabled) {
+                    if (typeof blockItem[1] === "string") {
+                        blockItem[1] = [blockItem[1], { value: null, disabled: true }];
+                    } else if (Array.isArray(blockItem[1])) {
+                        if (blockItem[1][1] && typeof blockItem[1][1] === "object") {
+                            blockItem[1][1].disabled = true;
+                        } else {
+                            blockItem[1][1] = { value: blockItem[1][1], disabled: true };
+                        }
+                    }
+                }
+
                 blockMap[this.dragGroup[b]] = b;
                 blockObjs.push(blockItem);
             }
@@ -7197,6 +7212,11 @@ class Blocks {
                             this._makeNewBlockWithConnections(name, blockOffset, blkData[4], null);
                         }
                         break;
+                }
+
+                if (blkInfo[1] && blkInfo[1].disabled) {
+                    this.blockList[thisBlock].disabled = true;
+                    this.blockList[thisBlock].updateDisabledAppearance();
                 }
 
                 if (thisBlock === this.blockList.length - 1) {

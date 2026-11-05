@@ -398,6 +398,8 @@
   "bottom (screen)": "bottom (screen)",
   "Playback is ready.": "Playback is ready.",
   "Duplicate": "Duplicate",
+  "Disable": "Disable",
+  "Enable": "Enable",
   "Move to trash": "Move to trash",
   "Save stack": "Save stack",
   "In order to copy a sample, you must reload the widget, import the sample again, and export it.": "In order to copy a sample, you must reload the widget, import the sample again, and export it.",

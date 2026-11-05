@@ -161,13 +161,15 @@ describe("piemenuBlockContext", () => {
             "imgsrc:header-icons/copy-button.svg",
             "imgsrc:header-icons/extract-button.svg",
             "imgsrc:header-icons/empty-trash-button.svg",
-            "imgsrc:header-icons/cancel-button.svg"
+            "imgsrc:header-icons/cancel-button.svg",
+            "Disable"
         ]);
         expect(wheel.navItems[0].setTooltip).toHaveBeenCalledWith("Duplicate");
         expect(wheel.navItems[1].setTooltip).toHaveBeenCalledWith("Extract");
         expect(wheel.navItems[2].setTooltip).toHaveBeenCalledWith("Move to trash");
         expect(wheel.navItems[3].setTooltip).toHaveBeenCalledWith("Close");
-        expect(wheel.navItems[4].setTooltip).not.toHaveBeenCalled();
+        expect(wheel.navItems[4].setTooltip).toHaveBeenCalledWith("Disable");
+        expect(wheel.navItems[5].setTooltip).not.toHaveBeenCalled();
         expect(wheel.navItems[0].selected).toBe(false);
         expect(wheel.clickModeRotate).toBe(false);
         expect(document.body.removeEventListener).not.toHaveBeenCalled();
@@ -255,7 +257,46 @@ describe("piemenuBlockContext", () => {
         expect(wheel.initWheel).toHaveBeenCalledWith(
             expect.not.arrayContaining(["imgsrc:header-icons/save-blocks-button.svg"])
         );
-        expect(wheel.navItems[4].navigateFunction).toBeUndefined();
+        const saveIndex = wheel.initWheel.mock.calls[0][0].indexOf(
+            "imgsrc:header-icons/save-blocks-button.svg"
+        );
+        expect(saveIndex).toBe(-1);
+    });
+
+    test("shows 'Disable' when block is enabled, and clicking it toggles disabled", () => {
+        const block = makeBlock();
+        block.isDisabled = jest.fn(() => false);
+        block.toggleDisabled = jest.fn();
+
+        piemenuBlockContext(block);
+
+        const wheel = global.wheelnav.mock.instances[0];
+        expect(wheel.initWheel).toHaveBeenCalledWith(expect.arrayContaining(["Disable"]));
+        const disableIndex = wheel.initWheel.mock.calls[0][0].indexOf("Disable");
+        expect(wheel.navItems[disableIndex].setTooltip).toHaveBeenCalledWith("Disable");
+
+        wheel.navItems[disableIndex].navigateFunction();
+
+        expect(block.toggleDisabled).toHaveBeenCalled();
+        expect(getDomElement("contextWheelDiv").style.display).toBe("none");
+    });
+
+    test("shows 'Enable' when block is disabled, and clicking it toggles disabled", () => {
+        const block = makeBlock();
+        block.isDisabled = jest.fn(() => true);
+        block.toggleDisabled = jest.fn();
+
+        piemenuBlockContext(block);
+
+        const wheel = global.wheelnav.mock.instances[0];
+        expect(wheel.initWheel).toHaveBeenCalledWith(expect.arrayContaining(["Enable"]));
+        const enableIndex = wheel.initWheel.mock.calls[0][0].indexOf("Enable");
+        expect(wheel.navItems[enableIndex].setTooltip).toHaveBeenCalledWith("Enable");
+
+        wheel.navItems[enableIndex].navigateFunction();
+
+        expect(block.toggleDisabled).toHaveBeenCalled();
+        expect(getDomElement("contextWheelDiv").style.display).toBe("none");
     });
 
     test("adds a help menu item that opens HelpWidget directly when already loaded", () => {

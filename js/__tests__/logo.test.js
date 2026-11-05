@@ -4767,4 +4767,132 @@ describe("Logo.processSpeak", () => {
             expect(tur.queue).toEqual([]);
         });
     });
+
+    describe("Disabled blocks execution", () => {
+        let logo;
+        let mockActivity;
+        let turtle0;
+
+        beforeEach(() => {
+            setupLogoEnv({ withFlute: true });
+            turtle0 = createMockTurtle();
+            mockActivity = createMockActivity(turtle0);
+            logo = new Logo(mockActivity);
+            mockActivity.logo = logo;
+        });
+
+        test("disabled flow block skips execution and highlight but continues to next flow block", () => {
+            const block0 = {
+                ...makeFlowBlock("forward"),
+                connections: [null, 1],
+                disabled: true,
+                isDisabled: () => true
+            };
+            const block1 = {
+                ...makeFlowBlock("forward"),
+                connections: [0, null],
+                disabled: false,
+                isDisabled: () => false
+            };
+            logo.blockList = [block0, block1];
+            logo.blocks.highlight = jest.fn();
+
+            logo.runFromBlockNow(logo, 0, 0, 1, null, 0);
+
+            expect(block0.protoblock.flow).not.toHaveBeenCalled();
+            expect(logo.blocks.highlight).not.toHaveBeenCalledWith(0, false);
+            expect(block1.protoblock.flow).toHaveBeenCalled();
+            expect(logo.blocks.highlight).toHaveBeenCalledWith(1, false);
+        });
+
+        test("disabled clamp block skips itself and its children, continuing to the following block", () => {
+            const childBlock = {
+                ...makeFlowBlock("forward"),
+                connections: [0, null],
+                disabled: false
+            };
+            const clampBlock = {
+                ...makeFlowBlock("repeat", [1, 2]),
+                connections: [null, null, 1, 2],
+                disabled: true,
+                isDisabled: () => true
+            };
+            const nextBlock = {
+                ...makeFlowBlock("forward"),
+                connections: [0, null],
+                disabled: false
+            };
+            logo.blockList = [clampBlock, childBlock, nextBlock];
+
+            logo.runFromBlockNow(logo, 0, 0, 1, null, 0);
+
+            // Clamp and child block are skipped
+            expect(clampBlock.protoblock.flow).not.toHaveBeenCalled();
+            expect(childBlock.protoblock.flow).not.toHaveBeenCalled();
+            // Block after clamp executes
+            expect(nextBlock.protoblock.flow).toHaveBeenCalled();
+            const tur = logo.turtles.ithTurtle(0);
+            expect(tur.queue).toEqual([]);
+        });
+
+        test("disabled argument blocks return safe defaults in parseArg without throwing", () => {
+            const numBlock = {
+                name: "number",
+                value: 42,
+                disabled: true,
+                isDisabled: () => true,
+                protoblock: { parameter: false, dockTypes: ["numberout"] },
+                isValueBlock: () => true
+            };
+            const textBlock = {
+                name: "text",
+                value: "hello",
+                disabled: true,
+                isDisabled: () => true,
+                protoblock: { parameter: false, dockTypes: ["textout"] },
+                isValueBlock: () => true
+            };
+            const boolBlock = {
+                name: "boolean",
+                value: true,
+                disabled: true,
+                isDisabled: () => true,
+                protoblock: { parameter: false, dockTypes: ["booleanout"] },
+                isValueBlock: () => true
+            };
+            logo.blockList = [numBlock, textBlock, boolBlock];
+
+            expect(logo.parseArg(logo, 0, 0, null, null)).toBe(0);
+            expect(logo.parseArg(logo, 0, 1, null, null)).toBe("");
+            expect(logo.parseArg(logo, 0, 2, null, null)).toBe(false);
+        });
+
+        test("parent block consuming disabled argument receives safe default", () => {
+            const parentBlock = {
+                ...makeFlowBlock("forward"),
+                protoblock: { args: 1, dockTypes: ["flow", "numberin"], flow: jest.fn() },
+                connections: [null, 1, null]
+            };
+            const numArgBlock = {
+                name: "number",
+                value: 100,
+                disabled: true,
+                isDisabled: () => true,
+                protoblock: { parameter: false, dockTypes: ["numberout"] },
+                isValueBlock: () => true
+            };
+            logo.blockList = [parentBlock, numArgBlock];
+
+            expect(() => logo.runFromBlockNow(logo, 0, 0, 1, null, 0)).not.toThrow();
+            expect(parentBlock.protoblock.flow).toHaveBeenCalledWith(
+                [0],
+                logo,
+                0,
+                0,
+                null,
+                expect.any(Array),
+                1
+            );
+        });
+    });
 });
