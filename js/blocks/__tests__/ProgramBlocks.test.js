@@ -982,13 +982,13 @@ describe("ProgramBlocks", () => {
                 {
                     name: "action",
                     protoblock: { staticLabels: ["action"] },
-                    connections: [null, 1]
+                    connections: [null, 1, 2, 3]
                 },
-                { name: "text", value: "renamed", protoblock: { staticLabels: [] } }
+                { name: "text", value: "renamed", protoblock: { staticLabels: [] } },
+                { name: "hidden", protoblock: { staticLabels: [] } },
+                { name: "hidden", protoblock: { staticLabels: [] } }
             ];
-            logo.parseArg = jest.fn((_, __, nameConnection) => {
-                return activity.blocks.blockList[nameConnection].value;
-            });
+            logo.actions = { renamed: 2 };
 
             const args = [targetName];
             const flow = block.flow(args, logo, 0, 5);
@@ -1010,15 +1010,16 @@ describe("ProgramBlocks", () => {
                     name: "action",
                     connections: [null, 1, 2]
                 },
-                { name: "computedname", value: "computed action" },
-                { name: "hidden" }
+                { name: "computedname", value: "changed after registration" },
+                { name: "hidden", protoblock: { staticLabels: [] } }
             ];
-            logo.parseArg = jest.fn(() => "computed action");
+            logo.actions = { "computed action": 2 };
+            logo.parseArg = jest.fn(() => "side effect");
 
             const args = ["computed action"];
             const flow = block.flow(args, logo, 1, 5, "received");
 
-            expect(logo.parseArg).toHaveBeenCalledWith(logo, 1, 1, 0, "received");
+            expect(logo.parseArg).not.toHaveBeenCalled();
             expect(args[0]).toBe(0);
             expect(flow).toEqual([0, 1]);
         });
@@ -1029,9 +1030,9 @@ describe("ProgramBlocks", () => {
                 { name: "start", value: 0, protoblock: { staticLabels: ["start"] } },
                 { name: "action", connections: [null, 2, 3] },
                 { name: "text", value: "start" },
-                { name: "hidden" }
+                { name: "hidden", protoblock: { staticLabels: [] } }
             ];
-            logo.parseArg = jest.fn(() => "start");
+            logo.actions = { start: 3 };
 
             const args = ["start"];
             const flow = block.flow(args, logo, 0, 5);

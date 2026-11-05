@@ -1051,11 +1051,10 @@ function setupProgramBlocks(activity) {
                     let matchesName;
 
                     if (candidate.name === "action") {
-                        const nameConnection = candidate.connections[1];
                         matchesName =
-                            nameConnection !== null &&
-                            nameConnection !== undefined &&
-                            logo.parseArg(logo, turtle, nameConnection, i, receivedArg) === args[0];
+                            logo.actions &&
+                            Object.prototype.hasOwnProperty.call(logo.actions, args[0]) &&
+                            candidate.connections[2] === logo.actions[args[0]];
                     } else {
                         matchesName =
                             candidate.protoblock.staticLabels.length > 0 &&
