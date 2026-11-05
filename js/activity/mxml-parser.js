@@ -589,14 +589,21 @@ function _tempoChanges(partEls) {
             for (const child of measureEl.children) {
                 if (child.tagName === "backup") break;
                 if (child.tagName === "direction" || child.tagName === "sound") {
-                    const tempoBpm = Number(
-                        (child.tagName === "sound"
+                    const soundEl =
+                        child.tagName === "sound"
                             ? child
-                            : child.querySelector(":scope > sound[tempo]")
-                        )?.getAttribute("tempo")
-                    );
+                            : child.querySelector(":scope > sound[tempo]");
+                    const tempoBpm = Number(soundEl?.getAttribute("tempo"));
+                    const soundOffset = Number(_text(soundEl, "offset"));
                     if (Number.isFinite(tempoBpm) && tempoBpm > 0) {
-                        changes.push({ measureIndex, offset, tempoBpm });
+                        changes.push({
+                            measureIndex,
+                            offset:
+                                Number.isFinite(soundOffset) && divisions > 0
+                                    ? offset + soundOffset / divisions
+                                    : offset,
+                            tempoBpm
+                        });
                     }
                     continue;
                 }
@@ -685,6 +692,19 @@ function _createNoteBlocks(blockId, duration, content, prevId) {
 
     blocks.push([hiddenId, "hidden", 0, 0, [blockId, hiddenId + 1]]);
     return blocks;
+}
+
+/** Builds one setbpm3 flow segment and its argument blocks. */
+function _createTempoBlocks(blockId, tempoBpm, timeSignature, prevId, nextFlowId = blockId + 6) {
+    const bpmValue = (tempoBpm * timeSignature.beatType) / 4;
+    return [
+        [blockId, ["setbpm3"], 0, 0, [prevId, blockId + 1, blockId + 2, blockId + 5]],
+        [blockId + 1, ["number", { value: bpmValue }], 0, 0, [blockId]],
+        [blockId + 2, "divide", 0, 0, [blockId, blockId + 3, blockId + 4]],
+        [blockId + 3, ["number", { value: 1 }], 0, 0, [blockId + 2]],
+        [blockId + 4, ["number", { value: timeSignature.beatType }], 0, 0, [blockId + 2]],
+        [blockId + 5, "vspace", 0, 0, [blockId, nextFlowId]]
+    ];
 }
 
 /**
@@ -803,13 +823,23 @@ function _buildPreamble(startId, title, voiceLabel, timeSignature, keySignature,
  *     the order notes were emitted
  * @param {Array<number>} noteEndIds - each note's own trailing hidden
  *     spacer's id, parallel to noteStartIds
+ * @param {Array<number|null>} noteTempoBpms - active tempo at each note start
+ * @param {{beats: number, beatType: number}} timeSignature
  * @param {number} blockId - the next free block id
  * @returns {{blocks: Array, nextBlockId: number, firstBlockId: number}}
  *     firstBlockId is noteStartIds[0] unless a repeat covers index 0, in
  *     which case it's that repeat block's own id -- the caller's settimbre
  *     link must point to whichever one actually starts the flow now.
  */
-function _applyRepeats(repeats, noteBlocks, noteStartIds, noteEndIds, blockId) {
+function _applyRepeats(
+    repeats,
+    noteBlocks,
+    noteStartIds,
+    noteEndIds,
+    noteTempoBpms,
+    timeSignature,
+    blockId
+) {
     let firstBlockId = noteStartIds[0];
     if (repeats.length === 0) return { blocks: [], nextBlockId: blockId, firstBlockId };
 
@@ -826,14 +856,34 @@ function _applyRepeats(repeats, noteBlocks, noteStartIds, noteEndIds, blockId) {
         const prevId = startNote[4][0];
         const prevBlock = byId.get(prevId);
         const nextFlowId = endHidden[4][1];
+        const startTempoBpm = noteTempoBpms[startIndex];
 
         const repeatId = blockId;
         const countId = blockId + 1;
-        blockId += 2;
+        const resetTempoId = Number.isFinite(startTempoBpm) ? blockId + 2 : null;
+        blockId += resetTempoId === null ? 2 : 8;
 
-        const repeatBlock = [repeatId, "repeat", 0, 0, [prevId, countId, startNote[0], nextFlowId]];
+        const repeatBlock = [
+            repeatId,
+            "repeat",
+            0,
+            0,
+            [prevId, countId, resetTempoId ?? startNote[0], nextFlowId]
+        ];
         repeatBlocks.push(repeatBlock, [countId, ["number", { value: times }], 0, 0, [repeatId]]);
         byId.set(repeatId, repeatBlock);
+
+        if (resetTempoId !== null) {
+            repeatBlocks.push(
+                ..._createTempoBlocks(
+                    resetTempoId,
+                    startTempoBpm,
+                    timeSignature,
+                    repeatId,
+                    startNote[0]
+                )
+            );
+        }
 
         if (startIndex === 0) {
             firstBlockId = repeatId;
@@ -849,7 +899,7 @@ function _applyRepeats(repeats, noteBlocks, noteStartIds, noteEndIds, blockId) {
             const prevSlot = prevBlock[4].indexOf(startNote[0]);
             prevBlock[4][prevSlot] = repeatId;
         }
-        startNote[4][0] = repeatId;
+        startNote[4][0] = resetTempoId === null ? repeatId : resetTempoId + 5;
         endHidden[4][1] = null;
         if (nextFlowId !== null) {
             byId.get(nextFlowId)[4][0] = repeatId;
@@ -901,6 +951,7 @@ function _processPart(
     const noteBlocks = [];
     const noteStartIds = [];
     const noteEndIds = [];
+    const noteTempoBpms = [];
     const repeats = [];
     let repeatPendingStart = null;
     // The last note index any repeat range (explicit or implicit) has
@@ -922,21 +973,14 @@ function _processPart(
         noteBlocks.push(...blocks);
         noteStartIds.push(blockId);
         noteEndIds.push(blocks[blocks.length - 1][0]);
+        noteTempoBpms.push(currentTempoBpm);
         producedNotes = true;
         prevId = blocks[blocks.length - 1][0];
         blockId = prevId + 1;
     };
 
     const emitTempo = tempoBpm => {
-        const bpmValue = (tempoBpm * timeSignature.beatType) / 4;
-        noteBlocks.push(
-            [blockId, ["setbpm3"], 0, 0, [prevId, blockId + 1, blockId + 2, blockId + 5]],
-            [blockId + 1, ["number", { value: bpmValue }], 0, 0, [blockId]],
-            [blockId + 2, "divide", 0, 0, [blockId, blockId + 3, blockId + 4]],
-            [blockId + 3, ["number", { value: 1 }], 0, 0, [blockId + 2]],
-            [blockId + 4, ["number", { value: timeSignature.beatType }], 0, 0, [blockId + 2]],
-            [blockId + 5, "vspace", 0, 0, [blockId, blockId + 6]]
-        );
+        noteBlocks.push(..._createTempoBlocks(blockId, tempoBpm, timeSignature, prevId));
         prevId = blockId + 5;
         blockId += 6;
         currentTempoBpm = tempoBpm;
@@ -1096,7 +1140,15 @@ function _processPart(
         blocks: repeatBlocks,
         nextBlockId,
         firstBlockId
-    } = _applyRepeats(repeats, noteBlocks, noteStartIds, noteEndIds, blockId);
+    } = _applyRepeats(
+        repeats,
+        noteBlocks,
+        noteStartIds,
+        noteEndIds,
+        noteTempoBpms,
+        timeSignature,
+        blockId
+    );
 
     return {
         noteBlocks: [...noteBlocks, ...repeatBlocks],

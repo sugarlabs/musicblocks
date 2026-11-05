@@ -755,6 +755,25 @@ describe("Test 12: Tempo", () => {
         expect(findPositionMismatches(blocks)).toEqual([]);
     });
 
+    it("applies a sound offset before inserting a later tempo change", async () => {
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1">' +
+            "<attributes><divisions>8</divisions></attributes>" +
+            '<sound tempo="120"><offset>8</offset></sound>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        const [cNote, dNote] = blocks.filter(b => blockName(b) === "newnote");
+        const tempo = blocks.find(b => blockName(b) === "setbpm3");
+
+        expect(tempos(blocks)).toEqual([120]);
+        expect(tempo[4][0]).toBe(cNote[4][3]);
+        expect(dNote[4][0]).toBe(tempo[0] + 5);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
     it("applies a tempo change from one part to every part", async () => {
         const xml =
             '<score-partwise><part id="P1">' +
@@ -1649,6 +1668,33 @@ describe("Test 17: Repeats", () => {
 
         expect(repeat[4][3]).toBe(secondTempo[0]);
         expect(secondTempo[4][0]).toBe(repeat[0]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("restores the repeat's starting tempo on every loop", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                '<direction><sound tempo="60"/></direction>' +
+                    SIMPLE_NOTE("C", 4, "quarter") +
+                    barlineBackward(null) +
+                    '<direction><sound tempo="120"/></direction>' +
+                    SIMPLE_NOTE("D", 4, "quarter")
+            )
+        );
+
+        const repeat = blocks.find(b => blockName(b) === "repeat");
+        const initialTempo = blocks.filter(b => blockName(b) === "setbpm3")[0];
+        const repeatedTempo = blocks.find(b => b[0] === repeat[4][2]);
+        const laterTempo = blocks.find(b => b[0] === repeat[4][3]);
+        const cNote = blocks.find(b => blockName(b) === "newnote");
+
+        expect(tempos(blocks)).toEqual([60, 120, 60]);
+        expect(repeat[4][2]).toBe(repeatedTempo[0]);
+        expect(repeatedTempo[4][0]).toBe(repeat[0]);
+        expect(cNote[4][0]).toBe(repeatedTempo[0] + 5);
+        expect(initialTempo[4][0]).not.toBe(repeat[0]);
+        expect(laterTempo[4][0]).toBe(repeat[0]);
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
         expect(findPositionMismatches(blocks)).toEqual([]);
     });
