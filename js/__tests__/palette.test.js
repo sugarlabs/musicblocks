@@ -2322,7 +2322,9 @@ describe("Palettes Class", () => {
                     [3, ["number", { value: "7" }], 0, 0, [2]],
                     [4, ["number", "3"], 0, 0, [3]],
                     [5, ["number", 8], 0, 0, [4]],
-                    [6, ["text", { value: "bye" }], 0, 0, [5]]
+                    [6, ["text", { value: "bye" }], 0, 0, [5]],
+                    [7, ["number", { value: "9", disabled: true }], 0, 0, [6]],
+                    [8, ["text", { value: "disabledText", disabled: true }], 0, 0, [7]]
                 ]
             };
 
@@ -2349,6 +2351,11 @@ describe("Palettes Class", () => {
             expect(capturedBlocks[4][1]).toEqual(["number", 3]);
             expect(capturedBlocks[5][1]).toEqual(["number", 8]);
             expect(capturedBlocks[6][1]).toEqual(["text", { value: "bye" }]);
+            expect(capturedBlocks[7][1]).toEqual(["number", { value: 9, disabled: true }]);
+            expect(capturedBlocks[8][1]).toEqual([
+                "text",
+                { value: "disabledText", disabled: true }
+            ]);
 
             expect(collapseToggle).toHaveBeenCalled();
             expect(mockActivity.blocks.blockList.length).toBeGreaterThan(0);

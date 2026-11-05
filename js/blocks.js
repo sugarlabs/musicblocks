@@ -5798,7 +5798,11 @@ class Blocks {
                         /** Change the name of the action... */
 
                         console.debug("action " + oldName + " is being renamed " + name);
-                        blkData[1][1] = { value: name };
+                        if (typeof blkData[1][1] === "object" && blkData[1][1] !== null) {
+                            blkData[1][1].value = name;
+                        } else {
+                            blkData[1][1] = { value: name };
+                        }
                         if (!renamedActions.has(oldName)) {
                             renamedActions.set(oldName, name);
                         }
@@ -5825,7 +5829,14 @@ class Blocks {
                         ) {
                             const oldName = thisBlkData[1][1]["value"];
                             if (renamedActions.has(oldName)) {
-                                thisBlkData[1][1] = { value: renamedActions.get(oldName) };
+                                if (
+                                    typeof thisBlkData[1][1] === "object" &&
+                                    thisBlkData[1][1] !== null
+                                ) {
+                                    thisBlkData[1][1].value = renamedActions.get(oldName);
+                                } else {
+                                    thisBlkData[1][1] = { value: renamedActions.get(oldName) };
+                                }
                             }
                         } else {
                             const doBlkData = blockObjs[doNames[d]];
@@ -5836,7 +5847,14 @@ class Blocks {
                             } else {
                                 const oldName = doBlkData[1][1]["value"];
                                 if (renamedActions.has(oldName)) {
-                                    doBlkData[1][1] = { value: renamedActions.get(oldName) };
+                                    if (
+                                        typeof doBlkData[1][1] === "object" &&
+                                        doBlkData[1][1] !== null
+                                    ) {
+                                        doBlkData[1][1].value = renamedActions.get(oldName);
+                                    } else {
+                                        doBlkData[1][1] = { value: renamedActions.get(oldName) };
+                                    }
                                 }
                             }
                         }

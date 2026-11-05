@@ -1505,7 +1505,12 @@ class Logo {
         // A temperament only carries over to the next run while the project
         // still sets one; otherwise it would leak into other projects.
         const setsTemperament = this.blockList.some(
-            blk => blk && !blk.trash && blk.name === "settemperament"
+            blk =>
+                blk &&
+                !blk.trash &&
+                !blk.disabled &&
+                !(typeof blk.isDisabled === "function" && blk.isDisabled()) &&
+                blk.name === "settemperament"
         );
         if (!setsTemperament) {
             this._userTemperament = null;
@@ -1992,15 +1997,12 @@ class Logo {
                 }
             } else if (this.blockList[this.blocks.stackList[blk]].name === "action") {
                 const actionBlock = this.blockList[this.blocks.stackList[blk]];
-                const isActionDisabled =
-                    actionBlock.disabled ||
-                    (typeof actionBlock.isDisabled === "function" && actionBlock.isDisabled());
                 // Does the action stack have a name?
                 const c = actionBlock.connections[1];
                 // Is there a block in the action clamp?
                 const b = actionBlock.connections[2];
                 // eslint-disable-next-line eqeqeq
-                if (c != null && b != null && !actionBlock.trash && !isActionDisabled) {
+                if (c != null && b != null && !actionBlock.trash) {
                     // We need to calculate the value of block c.
                     // this.actions[this.blockList[c].value] = b;
                     const name = this.parseArg(this, 0, c, null);

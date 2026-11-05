@@ -1471,6 +1471,63 @@ describe("Blocks Foundation", () => {
             expect(blocks.addToMyPalette).toHaveBeenCalledWith(expect.stringMatching(/^show-\d+$/));
         });
 
+        it("preserves disabled state when renaming a copied action", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.protoBlockDict = {
+                action: { style: "clamp", hasCapability: () => false },
+                text: { style: "basic", hasCapability: () => false },
+                nameddo: { style: "basic", hasCapability: () => false }
+            };
+            const blockObjs = [
+                [0, "action", 0, 0, [null, 1, null]],
+                [1, ["text", { value: "myAction", disabled: true }], 0, 0, [0]],
+                [2, ["nameddo", { value: "myAction", disabled: true }], 0, 0, [null]]
+            ];
+            blocks.blockList = [
+                { name: "action", trash: false, connections: [null, 1, null] },
+                { name: "text", trash: false, value: "myAction", connections: [0] }
+            ];
+            blocks.activity.logo = { synth: { preloadProjectSamples: jest.fn() } };
+            blocks._processOneBlock = jest.fn();
+            blocks._chunkLoad = jest.fn();
+            blocks.loadNewBlocks(blockObjs);
+            expect(blockObjs[1][1][1].value).toBe("myAction1");
+            expect(blockObjs[1][1][1].disabled).toBe(true);
+            expect(blockObjs[2][1][1].value).toBe("myAction1");
+            expect(blockObjs[2][1][1].disabled).toBe(true);
+        });
+
+        it("handles primitive and object block data when renaming a copied action", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.protoBlockDict = {
+                action: { style: "clamp", hasCapability: () => false },
+                text: { style: "basic", hasCapability: () => false },
+                nameddo: { style: "basic", hasCapability: () => false },
+                do: { style: "basic", hasCapability: () => false }
+            };
+            const blockObjs = [
+                [0, "action", 0, 0, [null, 1, null]],
+                [1, ["text", "myAction"], 0, 0, [0]],
+                [2, ["nameddo", { value: "myAction" }], 0, 0, [null]],
+                [3, "do", 0, 0, [null, 4]],
+                [4, ["text", "myAction"], 0, 0, [3]],
+                [5, "do", 0, 0, [null, 6]],
+                [6, ["text", { value: "myAction" }], 0, 0, [5]]
+            ];
+            blocks.blockList = [
+                { name: "action", trash: false, connections: [null, 1, null] },
+                { name: "text", trash: false, value: "myAction", connections: [0] }
+            ];
+            blocks.activity.logo = { synth: { preloadProjectSamples: jest.fn() } };
+            blocks._processOneBlock = jest.fn();
+            blocks._chunkLoad = jest.fn();
+            blocks.loadNewBlocks(blockObjs);
+            expect(blockObjs[1][1][1]).toEqual({ value: "myAction1" });
+            expect(blockObjs[2][1][1]).toEqual({ value: "myAction1" });
+            expect(blockObjs[4][1][1]).toBe("myAction1");
+            expect(blockObjs[6][1][1]).toEqual({ value: "myAction1" });
+        });
+
         it("sets disabled state and alpha when loading a block with disabled property", () => {
             const blocks = new Blocks(mockActivity);
             const mockBlk = {

@@ -24,6 +24,21 @@ Queue, NOACTIONERRORMSG, NOINPUTERRORMSG, isSafeUrl
  * @param {string} activity - The activity associated with the action blocks.
  */
 function setupActionBlocks(activity) {
+    const isActionDisabled = actionChild => {
+        if (actionChild === null || actionChild === undefined) return false;
+        if (!activity || !activity.blocks || typeof activity.blocks.findTopBlock !== "function") {
+            return false;
+        }
+        const actionRoot = activity.blocks.findTopBlock(actionChild);
+        if (actionRoot === null || actionRoot === undefined) return false;
+        const actionBlock = activity.blocks.blockList && activity.blocks.blockList[actionRoot];
+        return !!(
+            actionBlock &&
+            (actionBlock.disabled ||
+                (typeof actionBlock.isDisabled === "function" && actionBlock.isDisabled()))
+        );
+    };
+
     /**
      * Represents a Return block that returns a value from an action.
      *
@@ -261,6 +276,9 @@ function setupActionBlocks(activity) {
             } else {
                 const name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (name in logo.actions) {
+                    if (isActionDisabled(logo.actions[name])) {
+                        return 0;
+                    }
                     activity.turtles.getTurtle(turtle).running = true;
                     logo.runFromBlockNow(
                         logo,
@@ -348,6 +366,9 @@ function setupActionBlocks(activity) {
             actionArgs = receivedArg;
 
             if (name in logo.actions) {
+                if (isActionDisabled(logo.actions[name])) {
+                    return 0;
+                }
                 activity.turtles.getTurtle(turtle).running = true;
                 logo.runFromBlockNow(
                     logo,
@@ -457,6 +478,9 @@ function setupActionBlocks(activity) {
             const tur = activity.turtles.ithTurtle(turtle);
 
             if (name in logo.actions) {
+                if (isActionDisabled(logo.actions[name])) {
+                    return;
+                }
                 if (tur.singer.justCounting.length === 0) {
                     logo.notation.notationLineBreak(turtle);
                 }
@@ -572,6 +596,9 @@ function setupActionBlocks(activity) {
             }
 
             if (name in logo.actions) {
+                if (isActionDisabled(logo.actions[name])) {
+                    return 0;
+                }
                 // Just run the stack.
                 activity.turtles.getTurtle(turtle).running = true;
                 logo.runFromBlockNow(
@@ -675,6 +702,9 @@ function setupActionBlocks(activity) {
 
             if (args.length >= 1) {
                 if (args[0] in logo.actions) {
+                    if (isActionDisabled(logo.actions[args[0]])) {
+                        return;
+                    }
                     if (activity.turtles.ithTurtle(turtle).singer.justCounting.length === 0) {
                         logo.notation.notationLineBreak(turtle);
                     }
@@ -772,6 +802,9 @@ function setupActionBlocks(activity) {
             } else {
                 const name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (name in logo.actions) {
+                    if (isActionDisabled(logo.actions[name])) {
+                        return 0;
+                    }
                     activity.turtles.getTurtle(turtle).running = true;
                     logo.runFromBlockNow(
                         logo,
@@ -999,6 +1032,9 @@ function setupActionBlocks(activity) {
             if (args.length === 0) return;
 
             if (args[0] in logo.actions) {
+                if (isActionDisabled(logo.actions[args[0]])) {
+                    return;
+                }
                 if (activity.turtles.ithTurtle(turtle).singer.justCounting.length === 0) {
                     logo.notation.notationLineBreak(turtle);
                 }
@@ -1089,7 +1125,7 @@ function setupActionBlocks(activity) {
                 const tur = activity.turtles.ithTurtle(turtle);
 
                 const __listener = event => {
-                    if (logo.stopTurtle) {
+                    if (logo.stopTurtle || isActionDisabled(logo.actions[args[1]])) {
                         return;
                     }
 
@@ -1384,6 +1420,9 @@ function setupActionBlocks(activity) {
             if (args.length === 0) return;
 
             if (args[0] in logo.actions) {
+                if (isActionDisabled(logo.actions[args[0]])) {
+                    return;
+                }
                 if (activity.turtles.ithTurtle(turtle).singer.justCounting.length === 0) {
                     logo.notation.notationLineBreak(turtle);
                 }
@@ -1453,6 +1492,11 @@ function setupActionBlocks(activity) {
 
             if (!(name in logo.actions)) {
                 activity.errorMsg(NOACTIONERRORMSG, blk, name);
+                return;
+            }
+
+            if (isActionDisabled(logo.actions[name])) {
+                return;
             }
 
             const tur = activity.turtles.ithTurtle(turtle);

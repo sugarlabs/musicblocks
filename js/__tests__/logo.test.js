@@ -2394,6 +2394,26 @@ describe("Logo runLogoCommands", () => {
             expect(logo._userTemperament).toBeNull();
             expect(logo.temperamentSelected).toEqual([]);
         });
+
+        test("is dropped when the only set temperament block is disabled", () => {
+            logo.blockList = [
+                { name: "start", value: 0, trash: false, connections: [] },
+                {
+                    name: "settemperament",
+                    trash: false,
+                    disabled: true,
+                    isDisabled: () => true,
+                    connections: []
+                }
+            ];
+
+            logo.runLogoCommands(null, null);
+
+            expect(logo.synth.inTemperament).toBe("equal");
+            expect(logo.synth.startingPitch).toBe("C4");
+            expect(logo._userTemperament).toBeNull();
+            expect(logo.temperamentSelected).toEqual([]);
+        });
     });
 
     test("executes each evalOnStartList plugin at run startup", () => {
@@ -2496,7 +2516,7 @@ describe("Logo runLogoCommands", () => {
         expect(logo.actions["my-action"]).toBe(2);
     });
 
-    test("does not register disabled action stack in actions dictionary", () => {
+    test("registers disabled action stack in actions dictionary so callers can resolve it", () => {
         mockActivity.blocks.stackList = [0];
         logo.blockList = [
             {
@@ -2517,7 +2537,7 @@ describe("Logo runLogoCommands", () => {
 
         logo.runLogoCommands(null, null);
 
-        expect(logo.actions["disabled-action"]).toBeUndefined();
+        expect(logo.actions["disabled-action"]).toBe(2);
     });
 
     test("fires _cleanupAfterCompletion when _lastNoteTimeout is cancelled on re-run", () => {
