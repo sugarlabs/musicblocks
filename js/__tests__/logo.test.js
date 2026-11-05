@@ -3706,7 +3706,7 @@ describe("Logo stopTurtleRun", () => {
     test("drops the clamp signals it had not reached", () => {
         logo._finishTurtle = Logo.prototype._finishTurtle;
         turtle0.running = true;
-        turtle0.endOfClampSignals = { 5: ["_playnote_0"] };
+        turtle0.endOfClampSignals = { 5: ["_playnote_0", "_playnote_1"] };
         turtle0.butNotThese = { 5: [0] };
 
         logo.stopTurtleRun(0);
@@ -3714,6 +3714,27 @@ describe("Logo stopTurtleRun", () => {
         expect(logo.stage.dispatchEvent).not.toHaveBeenCalled();
         expect(turtle0.endOfClampSignals).toEqual({});
         expect(turtle0.butNotThese).toEqual({});
+    });
+
+    test("puts back the blocks of a duplicate clamp it was playing", () => {
+        logo.blockList = [{ connections: [null, null] }, null, { connections: [null] }];
+        logo.connectionStore = { 0: { 5: [[0, 1, 2]] }, 1: {} };
+
+        logo.stopTurtleRun(0);
+
+        expect(logo.blockList[0].connections[1]).toBe(2);
+        expect(logo.blockList[2].connections[0]).toBe(0);
+        expect(logo.connectionStore[0]).toEqual({});
+    });
+
+    test("leaves a duplicate clamp another mouse is still playing", () => {
+        logo.blockList = [{ connections: [null, null] }, null, { connections: [null] }];
+        logo.connectionStore = { 0: { 5: [[0, 1, 2]] }, 1: { 5: [[0, 1, 2]] } };
+
+        logo.stopTurtleRun(0);
+
+        expect(logo.blockList[0].connections[1]).toBeNull();
+        expect(logo.connectionStore).toEqual({ 0: {}, 1: { 5: [[0, 1, 2]] } });
     });
 
     test("finishes a running turtle once", () => {

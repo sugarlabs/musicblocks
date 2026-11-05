@@ -536,6 +536,32 @@ class Logo {
     }
 
     /**
+     * Restores the connections broken by the duplicate notes clamps a turtle
+     * is playing, except the ones another turtle is still playing.
+     *
+     * @param {number} turtle - Index of the turtle.
+     * @returns {void}
+     */
+    _restoreTurtleConnections(turtle) {
+        const store = this.connectionStore[turtle];
+        for (const blk in store) {
+            const playedByOther = Object.keys(this.connectionStore).some(
+                t => t !== String(turtle) && blk in this.connectionStore[t]
+            );
+            if (playedByOther) continue;
+
+            while (store[blk].length > 0) {
+                const [child, c, next] = store[blk].pop();
+                this.blockList[child].connections[c] = next;
+                if (next !== null && next !== undefined) {
+                    this.blockList[next].connections[0] = child;
+                }
+            }
+        }
+        this.connectionStore[turtle] = {};
+    }
+
+    /**
      * Gets the connections of the blocks a duplicate notes clamp has broken,
      * as _restoreConnections() will leave them, without restoring them.
      *
@@ -1484,6 +1510,7 @@ class Logo {
         tur.actionBoundaries = [];
         tur.endOfClampSignals = {};
         tur.butNotThese = {};
+        this._restoreTurtleConnections(turtle);
 
         tur.runGeneration += 1;
         if (tur.delayTimeout !== null) {
