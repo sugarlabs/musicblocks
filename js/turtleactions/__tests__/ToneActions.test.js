@@ -44,7 +44,7 @@ describe("setupToneActions", () => {
         global.CUSTOMSAMPLES = {};
         global.DEFAULTVOICE = "default-voice";
         global.safeNumber = require("../../utils/utils-logic").safeNumber;
-        global.last = array => array[array.length - 1];
+        global.last = require("../../utils/utils-logic").last;
         global._ = msg => msg;
         global.NOINPUTERRORMSG = "Missing input";
         global.MusicBlocks = { isRun: true };
@@ -332,7 +332,7 @@ describe("setupToneActions", () => {
                     });
                     for (let i = seq.length - 1; i >= 0; i--) {
                         listenerCallbacks["_settimbre_0_" + (i + 1)]();
-                        const outer = i > 0 ? synths[seq[i - 1]] : undefined;
+                        const outer = i > 0 ? synths[seq[i - 1]] : null;
                         expect(last(targetTurtle.singer.instrumentNames)).toBe(outer);
                     }
                     expect(targetTurtle.singer.instrumentNames).toEqual([]);
