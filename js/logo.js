@@ -1174,11 +1174,7 @@ class Logo {
             if (proto && Array.isArray(proto.dockTypes) && proto.dockTypes.length > 0) {
                 dockType = proto.dockTypes[0];
             }
-            if (
-                parentBlk !== null &&
-                parentBlk !== undefined &&
-                logo.blockList[parentBlk]
-            ) {
+            if (parentBlk !== null && parentBlk !== undefined && logo.blockList[parentBlk]) {
                 const parentBlock = logo.blockList[parentBlk];
                 if (parentBlock.protoblock && Array.isArray(parentBlock.protoblock.dockTypes)) {
                     const connIdx = parentBlock.connections
@@ -2511,7 +2507,9 @@ class Logo {
                     if (
                         // If it's an arg block, print its value.
                         currentBlock.isArgBlock() ||
-                        ["anyout", "numberout", "textout", "booleanout"].includes(proto.dockTypes[0])
+                        ["anyout", "numberout", "textout", "booleanout"].includes(
+                            proto.dockTypes[0]
+                        )
                     ) {
                         args.push(logo.parseArg(logo, turtle, blk, blk, receivedArg));
 

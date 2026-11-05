@@ -3109,5 +3109,22 @@ describe("Block Foundation", () => {
             block.container = null;
             expect(() => block.updateDisabledAppearance()).not.toThrow();
         });
+
+        it("updates appearance on imageLoad when disabled is true", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.disabled = true;
+            block.container = { alpha: 1.0 };
+            block.generateArtwork = jest.fn();
+            block.imageLoad();
+            expect(block.container.alpha).toBe(0.5);
+        });
+
+        it("handles updateDisabledAppearance when activity or refreshCanvas is missing", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.activity = null;
+            block.container = { alpha: 1.0 };
+            expect(() => block.setDisabled(true)).not.toThrow();
+            expect(block.container.alpha).toBe(0.5);
+        });
     });
 });

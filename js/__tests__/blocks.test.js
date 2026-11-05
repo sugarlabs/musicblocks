@@ -1400,6 +1400,58 @@ describe("Blocks Foundation", () => {
             expect(copiedBlocks[1][1]).toEqual(["number", { value: 50, disabled: true }]);
         });
 
+        it("preserves disabled state on array blockItem with null value object", () => {
+            const blocks = new Blocks(mockActivity);
+            mockActivity.blocksContainer.x = 0;
+            mockActivity.blocksContainer.y = 0;
+            blocks.blockList = [
+                {
+                    name: "media",
+                    value: null,
+                    disabled: true,
+                    connections: [null],
+                    isValueBlock: jest.fn().mockReturnValue(true)
+                }
+            ];
+            blocks.selectedStack = 0;
+            const copied = blocks._copyBlocksToObj(false);
+            expect(copied[0][1]).toEqual(["media", { value: null, disabled: true }]);
+        });
+
+        it("sets disabled state and alpha when loading a block with disabled property", () => {
+            const blocks = new Blocks(mockActivity);
+            const mockBlk = {
+                name: "forward",
+                connections: [null],
+                disabled: false,
+                updateDisabledAppearance: jest.fn(),
+                container: { alpha: 1.0, x: 0, y: 0 }
+            };
+            blocks.blockList = [mockBlk];
+            blocks._adjustTheseDocks = [];
+            blocks._adjustTheseStacks = [];
+            blocks._updateSpatialGrid = jest.fn();
+            blocks._makeNewBlockWithConnections = jest.fn();
+            blocks._processOneBlock(0, [[0, ["forward", { disabled: true }], 0, 0, [null]]], 0, 0);
+            expect(blocks.blockList[0].disabled).toBe(true);
+            expect(blocks.blockList[0].updateDisabledAppearance).toHaveBeenCalled();
+        });
+
+        it("sets container alpha to 0.5 in makeNewBlock when block is disabled", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.protoBlockDict["forward"] = { name: "forward", scale: 1 };
+            const originalPush = blocks.blockList.push.bind(blocks.blockList);
+            blocks.blockList.push = jest.fn(blk => {
+                blk.disabled = true;
+                blk.copySize = jest.fn();
+                blk.imageLoad = jest.fn();
+                return originalPush(blk);
+            });
+            blocks.makeNewBlock("forward");
+            const createdBlock = blocks.blockList[blocks.blockList.length - 1];
+            expect(createdBlock.container.alpha).toBe(0.5);
+        });
+
         it("copies a stand-in as the block it was loaded from", () => {
             const blocks = new Blocks(mockActivity);
             mockActivity.blocksContainer.x = 0;

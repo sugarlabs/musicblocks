@@ -299,6 +299,36 @@ describe("piemenuBlockContext", () => {
         expect(getDomElement("contextWheelDiv").style.display).toBe("none");
     });
 
+    test("toggles disabled and calls updateDisabledAppearance when block lacks toggleDisabled helper", () => {
+        const block = makeBlock();
+        block.disabled = false;
+        block.updateDisabledAppearance = jest.fn();
+
+        piemenuBlockContext(block);
+
+        const wheel = global.wheelnav.mock.instances[0];
+        const disableIndex = wheel.initWheel.mock.calls[0][0].indexOf("Disable");
+        wheel.navItems[disableIndex].navigateFunction();
+
+        expect(block.disabled).toBe(true);
+        expect(block.updateDisabledAppearance).toHaveBeenCalled();
+        expect(getDomElement("contextWheelDiv").style.display).toBe("none");
+    });
+
+    test("toggles disabled when block lacks both toggleDisabled and updateDisabledAppearance", () => {
+        const block = makeBlock();
+        block.disabled = true;
+
+        piemenuBlockContext(block);
+
+        const wheel = global.wheelnav.mock.instances[0];
+        const enableIndex = wheel.initWheel.mock.calls[0][0].indexOf("Enable");
+        wheel.navItems[enableIndex].navigateFunction();
+
+        expect(block.disabled).toBe(false);
+        expect(getDomElement("contextWheelDiv").style.display).toBe("none");
+    });
+
     test("adds a help menu item that opens HelpWidget directly when already loaded", () => {
         const block = makeBlock();
         block.blocks.blockList["active-id"].protoblock.helpString = "Some help text";

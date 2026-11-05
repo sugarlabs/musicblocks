@@ -4894,5 +4894,73 @@ describe("Logo.processSpeak", () => {
                 1
             );
         });
+
+        test("directly running a disabled value block stops execution without error", () => {
+            const valBlock = {
+                name: "number",
+                value: 123,
+                disabled: true,
+                isDisabled: () => true,
+                connections: [null],
+                protoblock: { args: 0, dockTypes: ["numberout"] },
+                isValueBlock: () => true,
+                isArgBlock: () => false
+            };
+            logo.blockList = [valBlock];
+            logo.runFromBlockNow(logo, 0, 0, 0, null, 0);
+            expect(logo.stopTurtle).toBe(true);
+        });
+
+        test("parent block expecting textin or booleanin dock receives safe defaults when argument is disabled", () => {
+            const parentBlockText = {
+                ...makeFlowBlock("print"),
+                protoblock: { args: 1, dockTypes: ["flow", "textin"], flow: jest.fn() },
+                connections: [null, 1, null]
+            };
+            const textArgBlock = {
+                name: "text",
+                value: "hello",
+                disabled: true,
+                isDisabled: () => true,
+                protoblock: { parameter: false, dockTypes: ["textout"] },
+                isValueBlock: () => true
+            };
+            logo.blockList = [parentBlockText, textArgBlock];
+            logo.runFromBlockNow(logo, 0, 0, 1, null, 0);
+            expect(parentBlockText.protoblock.flow).toHaveBeenCalledWith(
+                [""],
+                logo,
+                0,
+                0,
+                null,
+                expect.any(Array),
+                1
+            );
+
+            const parentBlockBool = {
+                ...makeFlowBlock("if"),
+                protoblock: { args: 1, dockTypes: ["flow", "booleanin"], flow: jest.fn() },
+                connections: [null, 1, null]
+            };
+            const boolArgBlock = {
+                name: "boolean",
+                value: true,
+                disabled: true,
+                isDisabled: () => true,
+                protoblock: { parameter: false, dockTypes: ["booleanout"] },
+                isValueBlock: () => true
+            };
+            logo.blockList = [parentBlockBool, boolArgBlock];
+            logo.runFromBlockNow(logo, 0, 0, 1, null, 0);
+            expect(parentBlockBool.protoblock.flow).toHaveBeenCalledWith(
+                [false],
+                logo,
+                0,
+                0,
+                null,
+                expect.any(Array),
+                1
+            );
+        });
     });
 });
