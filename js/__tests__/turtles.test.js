@@ -1256,7 +1256,7 @@ describe("Mute and Solo", () => {
     const mouse = (muted = false, inTrash = false) => ({
         muted,
         inTrash,
-        startBlock: { container: { alpha: muted ? 0.5 : 1 } }
+        startBlock: { name: "start", container: { alpha: muted ? 0.5 : 1 } }
     });
 
     beforeEach(() => {
@@ -1271,6 +1271,8 @@ describe("Mute and Solo", () => {
         };
         turtles = new Turtles(activityMock);
         turtles.activity = activityMock;
+        // The model's getTurtle(), which importMembers adds in the app.
+        turtles.getTurtle = jest.fn(i => turtles._turtleList[i]);
     });
 
     test("mutes a mouse and fades its Start block, then unmutes it", () => {
@@ -1388,6 +1390,85 @@ describe("Mute and Solo", () => {
         );
         turtles.add({ name: "start", value: 3, container: { alpha: 1 } }, {});
         expect(later.muted).toBe(false);
+    });
+
+    describe("on every beat companions", () => {
+        // The mouse that plays another mouse's "on every beat" action.
+        const companion = (muted = false) => ({
+            muted,
+            inTrash: false,
+            startBlock: { name: "everybeatdonew", container: { alpha: 1 } }
+        });
+
+        // Turtles.add() for a companion, as onEveryBeatDo calls it: the owner
+        // already points to the index the new mouse is about to get.
+        const addCompanion = made => {
+            global.Turtle = jest.fn().mockImplementation(() =>
+                Object.assign(made, {
+                    container: { on: jest.fn(), removeAllEventListeners: jest.fn() }
+                })
+            );
+            turtles.getTurtleCount = jest.fn(() => turtles._turtleList.length);
+            turtles.pushTurtle = jest.fn(tur => turtles._turtleList.push(tur));
+            turtles.addTurtleStageProps = jest.fn();
+            turtles.createArtwork = jest.fn();
+            turtles.createHitArea = jest.fn();
+            turtles.addTurtleGraphicProps = jest.fn();
+            document.body.innerHTML = '<div id="loader"></div>';
+            turtles.add({ name: "everybeatdonew", value: null, container: { alpha: 1 } }, {});
+        };
+
+        test("are muted and unmuted with their mouse, without fading their block", () => {
+            const owner = mouse();
+            const comp = companion();
+            owner.companionTurtle = 1;
+            turtles._turtleList = [owner, comp];
+
+            turtles.setMuted(owner, true);
+            expect(comp.muted).toBe(true);
+            expect(comp.startBlock.container.alpha).toBe(1);
+
+            turtles.setMuted(owner, false);
+            expect(comp.muted).toBe(false);
+        });
+
+        test("follow their mouse in a solo instead of being muted as other mice", () => {
+            const [a, b] = [mouse(), mouse()];
+            const [compA, compB] = [companion(), companion()];
+            a.companionTurtle = 2;
+            b.companionTurtle = 3;
+            turtles._turtleList = [a, b, compA, compB];
+
+            turtles.toggleSolo(a);
+            expect([a, b, compA, compB].map(tur => tur.muted)).toEqual([false, true, false, true]);
+
+            turtles.toggleSolo(a);
+            expect([a, b, compA, compB].map(tur => tur.muted)).toEqual([
+                false,
+                false,
+                false,
+                false
+            ]);
+        });
+
+        test("start muted for a muted mouse and heard for a soloed one", () => {
+            const muted = mouse(true);
+            muted.companionTurtle = 1;
+            turtles._turtleList = [muted];
+            const comp = companion();
+            addCompanion(comp);
+            expect(comp.muted).toBe(true);
+
+            const soloed = mouse();
+            const other = mouse();
+            turtles._turtleList = [soloed, other];
+            turtles.toggleSolo(soloed);
+            soloed.companionTurtle = 2;
+            const soloComp = companion();
+            addCompanion(soloComp);
+            expect(soloComp.muted).toBe(false);
+            expect(soloComp.startBlock.container.alpha).toBe(1);
+        });
     });
 
     test("a mouse saved as muted loads muted, and other mice load unmuted", () => {
