@@ -1719,4 +1719,98 @@ describe("ModeWidget", () => {
             expect(modeWidget._modeWheel.navAngle).toBe(-90);
         });
     });
+
+    describe("_save", () => {
+        test("returns early when no notes are selected without throwing or creating blocks", () => {
+            modeWidget.blocks = { loadNewBlocks: jest.fn() };
+            modeWidget.textMsg = jest.fn();
+            modeWidget._setTimeout = jest.fn();
+            modeWidget._selectedNotes = [
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+            ];
+
+            expect(() => modeWidget._save()).not.toThrow();
+
+            expect(modeWidget.blocks.loadNewBlocks).not.toHaveBeenCalled();
+            expect(modeWidget.textMsg).not.toHaveBeenCalled();
+            expect(modeWidget._setTimeout).not.toHaveBeenCalled();
+        });
+
+        test("returns early when _selectedNotes is empty or undefined", () => {
+            modeWidget.blocks = { loadNewBlocks: jest.fn() };
+            modeWidget.textMsg = jest.fn();
+            modeWidget._setTimeout = jest.fn();
+            modeWidget._selectedNotes = [];
+
+            expect(() => modeWidget._save()).not.toThrow();
+
+            expect(modeWidget.blocks.loadNewBlocks).not.toHaveBeenCalled();
+            expect(modeWidget.textMsg).not.toHaveBeenCalled();
+            expect(modeWidget._setTimeout).not.toHaveBeenCalled();
+        });
+
+        test("saves action stack and schedules definemode stack when notes are selected", () => {
+            modeWidget.blocks = { loadNewBlocks: jest.fn() };
+            modeWidget.textMsg = jest.fn();
+            modeWidget._setTimeout = jest.fn((cb, delay) => cb());
+            modeWidget._activeEDO = 12;
+            modeWidget._selectedNotes = [
+                true,
+                false,
+                true,
+                false,
+                true,
+                true,
+                false,
+                true,
+                false,
+                true,
+                false,
+                true
+            ];
+            modeWidget._pitchNameAndOctave = jest.fn(idx => ["C", 4]);
+            modeWidget._modeLabelCell = { textContent: "myMajor" };
+
+            expect(() => modeWidget._save()).not.toThrow();
+
+            expect(modeWidget.blocks.loadNewBlocks).toHaveBeenCalledTimes(2);
+            expect(modeWidget.textMsg).toHaveBeenCalledWith("New action block generated.", 3000);
+        });
+
+        test("terminates both block chains when the tonic is unselected", () => {
+            modeWidget.blocks = { loadNewBlocks: jest.fn() };
+            modeWidget.textMsg = jest.fn();
+            modeWidget._setTimeout = jest.fn((cb, delay) => cb());
+            modeWidget._activeEDO = 12;
+            modeWidget._selectedNotes = Array(12).fill(false);
+            [2, 4, 7, 9].forEach(i => {
+                modeWidget._selectedNotes[i] = true;
+            });
+            modeWidget._pitchNameAndOctave = jest.fn(() => ["C", 4]);
+            modeWidget._modeLabelCell = { textContent: "myMode" };
+
+            expect(() => modeWidget._save()).not.toThrow();
+
+            const actionStack = modeWidget.blocks.loadNewBlocks.mock.calls[0][0];
+            const pitchBlocks = actionStack.filter(block => block[1] === "pitch");
+            expect(pitchBlocks).toHaveLength(4);
+            expect(pitchBlocks[pitchBlocks.length - 1][4][3]).toBeNull();
+
+            const defineStack = modeWidget.blocks.loadNewBlocks.mock.calls[1][0];
+            const pitchnumberBlocks = defineStack.filter(block => block[1] === "pitchnumber");
+            expect(pitchnumberBlocks).toHaveLength(4);
+            expect(pitchnumberBlocks[pitchnumberBlocks.length - 1][4][2]).toBeNull();
+        });
+    });
 });

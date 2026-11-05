@@ -818,6 +818,11 @@ class ModeWidget {
                 this.errorMsg(_("Please enter a mode name."));
                 return;
             }
+            const modeLength = this._selectedNotes ? this._selectedNotes.filter(Boolean).length : 0;
+            if (modeLength === 0) {
+                this.errorMsg(_("Please select at least one note."));
+                return;
+            }
             const pattern = this._calculateMode();
             if (!this._saveCustomMode(name, pattern)) {
                 return;
@@ -1736,6 +1741,11 @@ class ModeWidget {
     }
 
     _save() {
+        const modeLength = this._selectedNotes ? this._selectedNotes.filter(Boolean).length : 0;
+        if (modeLength === 0) {
+            return;
+        }
+
         const n = this._activeEDO;
         const label = this._modeLabelCell.textContent;
         const modeName = label && label !== "\u00a0" ? label : _("custom");
@@ -1746,7 +1756,6 @@ class ModeWidget {
             [1, ["text", { value: modeName }], 0, 0, [0]]
         ];
         let previousBlock = 0;
-        const modeLength = this._calculateMode().length;
         let p = 0;
 
         for (let i = 0; i < n; i++) {

@@ -30,6 +30,7 @@ describe("ModeWidget control bar keyboard access", () => {
         // Exercise the real control builder without constructing the SVG wheels.
         widget = Object.create(ModeWidget.prototype);
         Object.assign(widget, {
+            _selectedNotes: [true],
             _selectedModeName: "test mode",
             _modeBlock: null,
             _onModePieButtonClick: jest.fn(),
@@ -111,6 +112,14 @@ describe("ModeWidget control bar keyboard access", () => {
         widget._nameInput.value = "   ";
         button("Save").dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
         expect(widget.errorMsg).toHaveBeenCalledWith("Please enter a mode name.");
+        expect(widget._saveCustomMode).not.toHaveBeenCalled();
+        expect(widget._save).not.toHaveBeenCalled();
+    });
+
+    test("keeps note validation when Save is activated with no notes selected", () => {
+        widget._selectedNotes = Array(12).fill(false);
+        button("Save").click();
+        expect(widget.errorMsg).toHaveBeenCalledWith("Please select at least one note.");
         expect(widget._saveCustomMode).not.toHaveBeenCalled();
         expect(widget._save).not.toHaveBeenCalled();
     });
