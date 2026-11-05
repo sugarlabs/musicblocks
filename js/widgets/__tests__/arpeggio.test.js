@@ -256,25 +256,28 @@ describe("Arpeggio Widget", () => {
         });
 
         test.each([
-            [0, "var(--color-selector-selected)"],
-            [2, "var(--color-selector-bg)"]
-        ])("hovering row %i is temporary and preserves its scale color", (row, background) => {
-            const cell = document.getElementById(`${row},0`);
-            const selectedNodes = arpeggio._blockMap.map(node => [...node]);
+            [0, "var(--color-brand-primary-hover)", "var(--color-selector-selected)"],
+            [2, "var(--color-selector-selected)", "var(--color-selector-bg)"]
+        ])(
+            "hovering row %i is temporary and preserves its scale color",
+            (row, hoverColor, background) => {
+                const cell = document.getElementById(`${row},0`);
+                const selectedNodes = arpeggio._blockMap.map(node => [...node]);
 
-            cell.dispatchEvent(new MouseEvent("mouseover"));
-            expect(cell.style.backgroundColor).toBe("var(--color-selector-selected)");
-            expect(arpeggio._blockMap).toEqual(selectedNodes);
+                cell.dispatchEvent(new MouseEvent("mouseover"));
+                expect(cell.style.backgroundColor).toBe(hoverColor);
+                expect(arpeggio._blockMap).toEqual(selectedNodes);
 
-            cell.dispatchEvent(new MouseEvent("mouseout"));
-            expect(cell.style.backgroundColor).toBe(background);
-            expect(arpeggio._blockMap).toEqual(selectedNodes);
+                cell.dispatchEvent(new MouseEvent("mouseout"));
+                expect(cell.style.backgroundColor).toBe(background);
+                expect(arpeggio._blockMap).toEqual(selectedNodes);
 
-            cell.dispatchEvent(new MouseEvent("mouseover"));
-            cell.dispatchEvent(new MouseEvent("mouseout"));
-            expect(cell.style.backgroundColor).toBe(background);
-            expect(arpeggio._blockMap).toEqual(selectedNodes);
-        });
+                cell.dispatchEvent(new MouseEvent("mouseover"));
+                cell.dispatchEvent(new MouseEvent("mouseout"));
+                expect(cell.style.backgroundColor).toBe(background);
+                expect(arpeggio._blockMap).toEqual(selectedNodes);
+            }
+        );
 
         test("keeps selected cells black when hovered", () => {
             const cell = document.getElementById("2,0");
@@ -520,6 +523,16 @@ describe("Arpeggio Widget", () => {
             // row 2 maps to ii = (13 - 2 - 1) % 12 = 10, which is NOT in mode
             const color = arpeggio._getBackgroundColor(2);
             expect(color).toBe("var(--color-selector-bg)");
+        });
+
+        test("_getHoverColor returns brandPrimaryHover for a mode row", () => {
+            const color = arpeggio._getHoverColor(0);
+            expect(color).toBe("var(--color-brand-primary-hover)");
+        });
+
+        test("_getHoverColor returns selectorSelected for a non-mode row", () => {
+            const color = arpeggio._getHoverColor(2);
+            expect(color).toBe("var(--color-selector-selected)");
         });
     });
 

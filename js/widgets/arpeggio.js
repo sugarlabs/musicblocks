@@ -485,6 +485,18 @@ class Arpeggio {
 
     /**
      * @private
+     * @param {number} row index
+     * @returns {string} color, e.g. "var(--color-brand-primary-hover)"
+     */
+    _getHoverColor(i) {
+        if (this._rowInMode(i)) {
+            return "var(--color-brand-primary-hover)";
+        }
+        return "var(--color-selector-selected)";
+    }
+
+    /**
+     * @private
      * @param {number} arpeggioIdx
      * @returns {void}
      */
@@ -511,7 +523,7 @@ class Arpeggio {
 
             cell.onmouseover = () => {
                 if (cell.style.backgroundColor !== "black") {
-                    cell.style.backgroundColor = "var(--color-selector-selected)";
+                    cell.style.backgroundColor = this._getHoverColor(i);
                 }
             };
             cell.onmouseout = () => {
