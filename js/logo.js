@@ -1482,6 +1482,8 @@ class Logo {
         tur.unhighlightQueue = [];
         tur.parameterQueue = [];
         tur.actionBoundaries = [];
+        tur.endOfClampSignals = {};
+        tur.butNotThese = {};
 
         tur.runGeneration += 1;
         if (tur.delayTimeout !== null) {

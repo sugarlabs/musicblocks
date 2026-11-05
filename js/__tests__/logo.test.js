@@ -3703,6 +3703,19 @@ describe("Logo stopTurtleRun", () => {
         expect(logo.stepQueue[0]).toBeUndefined();
     });
 
+    test("drops the clamp signals it had not reached", () => {
+        logo._finishTurtle = Logo.prototype._finishTurtle;
+        turtle0.running = true;
+        turtle0.endOfClampSignals = { 5: ["_playnote_0"] };
+        turtle0.butNotThese = { 5: [0] };
+
+        logo.stopTurtleRun(0);
+
+        expect(logo.stage.dispatchEvent).not.toHaveBeenCalled();
+        expect(turtle0.endOfClampSignals).toEqual({});
+        expect(turtle0.butNotThese).toEqual({});
+    });
+
     test("finishes a running turtle once", () => {
         turtle0.running = true;
         logo.stopTurtleRun(0);
