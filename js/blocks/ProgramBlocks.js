@@ -1041,20 +1041,21 @@ function setupProgramBlocks(activity) {
 
             if (typeof args[0] === "string") {
                 // Look for a block with logo name
+                let staticMatch = -1;
                 for (let i = 0; i < activity.blocks.blockList.length; i++) {
                     const candidate = activity.blocks.blockList[i];
+                    if (!candidate || candidate.trash) {
+                        continue;
+                    }
+
                     let matchesName;
 
                     if (candidate.name === "action") {
                         const nameConnection = candidate.connections[1];
-                        const nameBlock =
-                            nameConnection === null
-                                ? null
-                                : activity.blocks.blockList[nameConnection];
                         matchesName =
-                            nameBlock !== null &&
-                            nameBlock !== undefined &&
-                            nameBlock.value === args[0];
+                            nameConnection !== null &&
+                            nameConnection !== undefined &&
+                            logo.parseArg(logo, turtle, nameConnection, i, receivedArg) === args[0];
                     } else {
                         matchesName =
                             candidate.protoblock.staticLabels.length > 0 &&
@@ -1062,9 +1063,18 @@ function setupProgramBlocks(activity) {
                     }
 
                     if (matchesName) {
-                        args[0] = i;
-                        break;
+                        if (candidate.name === "action") {
+                            args[0] = i;
+                            break;
+                        }
+                        if (staticMatch === -1) {
+                            staticMatch = i;
+                        }
                     }
+                }
+
+                if (typeof args[0] === "string" && staticMatch !== -1) {
+                    args[0] = staticMatch;
                 }
             }
 

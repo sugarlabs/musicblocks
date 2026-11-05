@@ -986,6 +986,9 @@ describe("ProgramBlocks", () => {
                 },
                 { name: "text", value: "renamed", protoblock: { staticLabels: [] } }
             ];
+            logo.parseArg = jest.fn((_, __, nameConnection) => {
+                return activity.blocks.blockList[nameConnection].value;
+            });
 
             const args = [targetName];
             const flow = block.flow(args, logo, 0, 5);
@@ -998,6 +1001,58 @@ describe("ProgramBlocks", () => {
                 expect(args[0]).toBe(0);
                 expect(flow).toEqual(expectedFlow);
             }
+        });
+
+        test("resolves an action name from its connected reporter", () => {
+            const block = getBlock("runblock");
+            activity.blocks.blockList = [
+                {
+                    name: "action",
+                    connections: [null, 1, 2]
+                },
+                { name: "computedname", value: "computed action" },
+                { name: "hidden" }
+            ];
+            logo.parseArg = jest.fn(() => "computed action");
+
+            const args = ["computed action"];
+            const flow = block.flow(args, logo, 1, 5, "received");
+
+            expect(logo.parseArg).toHaveBeenCalledWith(logo, 1, 1, 0, "received");
+            expect(args[0]).toBe(0);
+            expect(flow).toEqual([0, 1]);
+        });
+
+        test("prefers a matching action over an earlier static label", () => {
+            const block = getBlock("runblock");
+            activity.blocks.blockList = [
+                { name: "start", value: 0, protoblock: { staticLabels: ["start"] } },
+                { name: "action", connections: [null, 2, 3] },
+                { name: "text", value: "start" },
+                { name: "hidden" }
+            ];
+            logo.parseArg = jest.fn(() => "start");
+
+            const args = ["start"];
+            const flow = block.flow(args, logo, 0, 5);
+
+            expect(args[0]).toBe(1);
+            expect(flow).toEqual([1, 1]);
+        });
+
+        test("skips null and trashed blocks when resolving a name", () => {
+            const block = getBlock("runblock");
+            activity.blocks.blockList = [
+                null,
+                { name: "old", trash: true, protoblock: { staticLabels: ["target"] } },
+                { name: "live", protoblock: { staticLabels: ["target"] } }
+            ];
+
+            const args = ["target"];
+            const flow = block.flow(args, logo, 0, 5);
+
+            expect(args[0]).toBe(2);
+            expect(flow).toEqual([2, 1]);
         });
     });
 
