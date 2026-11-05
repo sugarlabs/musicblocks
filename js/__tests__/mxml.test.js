@@ -21,8 +21,24 @@ const saveMxmlOutput = require("../mxml");
 const { frequencyToPitch } = require("../utils/musicutils");
 global.frequencyToPitch = frequencyToPitch;
 global.getMidiDrum = () => ({ "snare drum": 38, "kick drum": 36 });
+global.MIDI_INSTRUMENTS = require("../utils/musicutils-constants").MIDI_INSTRUMENTS;
 
 describe("saveMxmlOutput", () => {
+    it("preserves the violin instrument in pitched MusicXML", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [[["C4"], 4, 0, null, null, false, false, null, "violin"]]
+                }
+            }
+        });
+
+        expect(output).toContain("<instrument-name>violin</instrument-name>");
+        expect(output).toContain("<midi-program>41</midi-program>");
+        expect(output).toContain('<instrument id="P1-I1"/>');
+        expect(output).toContain("<step>C</step>");
+    });
+
     it("exports a drum-only note as unpitched percussion rather than only a rest", () => {
         const output = saveMxmlOutput({
             notation: {

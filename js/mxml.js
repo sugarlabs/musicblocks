@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global frequencyToPitch,getMidiDrum,saveMxmlOutput:writable */
+/* global frequencyToPitch,getMidiDrum,MIDI_INSTRUMENTS,saveMxmlOutput:writable */
 /* exported saveMxmlOutput */
 
 // Indices into a notationStaging entry that this file cares about beyond the note-value
@@ -19,6 +19,7 @@
 const MXML_TUPLETVALUE = 3;
 const MXML_ROUNDDOWN = 4;
 const MXML_DRUM = 7;
+const MXML_VOICE = 8;
 
 // Iterative, and only defined for finite numbers: Infinity % b is NaN, which never reaches
 // the b === 0 base case, so the recursive form ran until the stack overflowed.
@@ -437,7 +438,25 @@ class MusicXMLExporter {
                     entry => Array.isArray(entry) && entry[0].some(pitch => pitch[0] !== "R")
                 )
             ) {
-                parts.push({ id: `P${partNum}`, notes, isPercussion: false });
+                const voices = [
+                    ...new Set(
+                        notes
+                            .filter(Array.isArray)
+                            .map(entry => entry[MXML_VOICE])
+                            .filter(name => typeof name === "string" && name.trim() !== "")
+                    )
+                ];
+
+                const instruments = new Map(
+                    voices.map((name, index) => [name, `P${partNum}-I${index + 1}`])
+                );
+
+                parts.push({
+                    id: `P${partNum}`,
+                    notes,
+                    isPercussion: false,
+                    instruments
+                });
             }
             if (drums.length === 0) return;
             const instruments = new Map(
@@ -494,6 +513,29 @@ class MusicXMLExporter {
                             this.indent++;
                             this.add("<midi-channel>10</midi-channel>");
                             this.add(`<midi-unpitched>${midiNote + 1}</midi-unpitched>`);
+                            this.indent--;
+                            this.add("</midi-instrument>");
+                        }
+                    });
+                } else {
+                    part.instruments.forEach((id, name) => {
+                        this.add(`<score-instrument id="${id}">`);
+                        this.indent++;
+                        this.add(`<instrument-name>${_escapeWords(name)}</instrument-name>`);
+                        this.indent--;
+                        this.add("</score-instrument>");
+                    });
+
+                    part.instruments.forEach((id, name) => {
+                        const program =
+                            typeof MIDI_INSTRUMENTS !== "undefined"
+                                ? MIDI_INSTRUMENTS[name]
+                                : undefined;
+
+                        if (Number.isInteger(program) && program >= 0 && program <= 127) {
+                            this.add(`<midi-instrument id="${id}">`);
+                            this.indent++;
+                            this.add(`<midi-program>${program + 1}</midi-program>`);
                             this.indent--;
                             this.add("</midi-instrument>");
                         }
@@ -913,6 +955,12 @@ class MusicXMLExporter {
                         if (tieStart) this.add('<tie type="start"/>');
                         if (part.isPercussion && obj[MXML_DRUM]) {
                             this.add(`<instrument id="${part.instruments.get(p)}"/>`);
+                        } else if (!part.isPercussion && p[0] !== "R") {
+                            const instrumentId = part.instruments.get(obj[MXML_VOICE]);
+
+                            if (instrumentId) {
+                                this.add(`<instrument id="${instrumentId}"/>`);
+                            }
                         }
                         // A tuplet note's duration is scaled by its ratio, so the written
                         // note only survives in <type>; Lilypond's importer stops without

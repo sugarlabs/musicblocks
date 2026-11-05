@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global DOMParser, DRUM_MIDI_MAP, GCD, REVERSE_DRUM_MIDI_MAP */
+/* global DOMParser, DRUM_MIDI_MAP, GCD, REVERSE_DRUM_MIDI_MAP, MIDI_INSTRUMENTS, VOICENAMES */
 
 /* exported setupActivityMxmlParser */
 
@@ -650,6 +650,60 @@ function _initialTimeSignature(partEl) {
     };
 }
 
+function _pitchedInstrumentName(doc, partEl) {
+    const partId = partEl.getAttribute("id");
+
+    const scorePart = Array.from(doc.querySelectorAll("part-list > score-part")).find(
+        part => part.getAttribute("id") === partId
+    );
+
+    if (!scorePart) return "electronic synth";
+
+    const scoreInstrument = scorePart.querySelector(":scope > score-instrument");
+    const name = scoreInstrument
+        ?.querySelector(":scope > instrument-name")
+        ?.textContent?.trim()
+        .toLowerCase();
+
+    // Prefer a recognized Music Blocks instrument name.
+    if (name) {
+        const knownVoice =
+            typeof VOICENAMES !== "undefined" && VOICENAMES.some(voice => voice[1] === name);
+
+        const knownMidiVoice =
+            typeof MIDI_INSTRUMENTS !== "undefined" &&
+            name !== "default" &&
+            Object.hasOwn(MIDI_INSTRUMENTS, name);
+
+        if (knownVoice || knownMidiVoice) return name;
+    }
+
+    // If the name is unknown, try the corresponding MIDI program.
+    const instrumentId = scoreInstrument?.getAttribute("id");
+    const midiInstrument = Array.from(scorePart.querySelectorAll(":scope > midi-instrument")).find(
+        instrument => !instrumentId || instrument.getAttribute("id") === instrumentId
+    );
+
+    const programText = midiInstrument?.querySelector(":scope > midi-program")?.textContent?.trim();
+
+    const program = programText ? Number(programText) : NaN;
+
+    if (
+        typeof MIDI_INSTRUMENTS !== "undefined" &&
+        Number.isInteger(program) &&
+        program >= 1 &&
+        program <= 128
+    ) {
+        const matchedVoice = Object.entries(MIDI_INSTRUMENTS).find(
+            ([voice, number]) => voice !== "default" && number === program - 1
+        );
+
+        if (matchedVoice) return matchedVoice[0];
+    }
+
+    return "electronic synth";
+}
+
 /**
  * Builds the start/turtlename/meter/setkey2/[tempo]/settimbre preamble for one
  * part, in the same spirit js/activity/abc-parser.js's _buildStartBlock uses --
@@ -667,7 +721,15 @@ function _initialTimeSignature(partEl) {
  *     the tempo block entirely (MusicXML tempo is optional)
  * @returns {{preamble: Array, settimbreId: number, nextBlockId: number}}
  */
-function _buildPreamble(startId, title, voiceLabel, timeSignature, keySignature, tempoBpm) {
+function _buildPreamble(
+    startId,
+    title,
+    voiceLabel,
+    timeSignature,
+    keySignature,
+    tempoBpm,
+    instrumentName
+) {
     const startSeg = startId; // start, print, text, setturtlename2, text -- 5 blocks
     const meterSeg = startSeg + 5; // meter, number, divide, number, number, vspace -- 6 blocks
     const keySeg = meterSeg + 6; // setkey2, notename, modename -- 3 blocks
@@ -698,7 +760,7 @@ function _buildPreamble(startId, title, voiceLabel, timeSignature, keySignature,
         // Connection to the first note/rest is resolved by the caller, once it
         // knows whether the part produced any note blocks at all.
         [timbreSeg, "settimbre", 0, 0, [beforeTimbreSeg, timbreSeg + 1, null, timbreSeg + 2]],
-        [timbreSeg + 1, ["voicename", { value: "guitar" }], 0, 0, [timbreSeg]],
+        [timbreSeg + 1, ["voicename", { value: instrumentName }], 0, 0, [timbreSeg]],
         [timbreSeg + 2, "hidden", 0, 0, [timbreSeg, null]]
     ];
 
@@ -997,7 +1059,15 @@ function _processPart(partEl, blockId, chainPrevId, instrumentMap) {
  * @param {Map<string, string>} instrumentMap - lookup map for drum names
  * @returns {{blocks: Array, nextBlockId: number}}
  */
-function _buildPartBlocks(partEl, startId, title, voiceLabel, tempoBpm, instrumentMap) {
+function _buildPartBlocks(
+    partEl,
+    startId,
+    title,
+    voiceLabel,
+    tempoBpm,
+    instrumentMap,
+    instrumentName
+) {
     const timeSignature = _initialTimeSignature(partEl);
     const keySignature = _keySignature(partEl);
     const { preamble, settimbreId, nextBlockId } = _buildPreamble(
@@ -1006,7 +1076,8 @@ function _buildPartBlocks(partEl, startId, title, voiceLabel, tempoBpm, instrume
         voiceLabel,
         timeSignature,
         keySignature,
-        tempoBpm
+        tempoBpm,
+        instrumentName
     );
     const { noteBlocks, producedNotes, lastBlockId, firstBlockId } = _processPart(
         partEl,
@@ -1063,14 +1134,18 @@ const setupActivityMxmlParser = activityInstance => {
         let blockId = 0;
         const allBlocks = [];
         partEls.forEach((partEl, index) => {
+            const instrumentName = _pitchedInstrumentName(doc, partEl);
+
             const { blocks, nextBlockId } = _buildPartBlocks(
                 partEl,
                 blockId,
                 title,
                 `Voice ${index + 1}`,
                 tempoBpm,
-                instrumentMap
+                instrumentMap,
+                instrumentName
             );
+
             allBlocks.push(...blocks);
             blockId = nextBlockId;
         });

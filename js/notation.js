@@ -145,6 +145,9 @@ class Notation {
         const tur = this.activity.turtles.ithTurtle(turtle);
         const drumName = drum[0];
         const isNotatedDrum = drumName && !["noise1", "noise2", "noise3"].includes(drumName);
+        const instrumentName = tur.singer.instrumentNames?.length
+            ? last(tur.singer.instrumentNames)
+            : "electronic synth";
 
         this._notationStaging[turtle].push([
             note,
@@ -154,7 +157,8 @@ class Notation {
             obj[3],
             insideChord,
             tur.singer.staccato.length > 0 && last(tur.singer.staccato) > 0,
-            isNotatedDrum ? drumName : null
+            isNotatedDrum ? drumName : null,
+            instrumentName
         ]);
 
         // If an identifiable drum is specified, add the drum.

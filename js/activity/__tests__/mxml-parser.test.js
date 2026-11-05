@@ -17,10 +17,15 @@ const { setupActivityMxmlParser } = require("../mxml-parser.js");
 
 // Globals in the browser (js/utils/musicutils-constants.js); the drum-name
 // lookup reads them.
-const { DRUM_MIDI_MAP, REVERSE_DRUM_MIDI_MAP } = require("../../utils/musicutils-constants.js");
+const {
+    DRUM_MIDI_MAP,
+    REVERSE_DRUM_MIDI_MAP,
+    MIDI_INSTRUMENTS
+} = require("../../utils/musicutils-constants.js");
 
 global.DRUM_MIDI_MAP = DRUM_MIDI_MAP;
 global.REVERSE_DRUM_MIDI_MAP = REVERSE_DRUM_MIDI_MAP;
+global.MIDI_INSTRUMENTS = MIDI_INSTRUMENTS;
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -1742,5 +1747,168 @@ describe("Test 19: Cue notes", () => {
         ]);
         expect(blocks.filter(b => blockName(b) === "rest2")).toHaveLength(1);
         expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
+    });
+});
+
+describe("MusicXML pitched instrument preservation", () => {
+    it("restores an explicitly specified violin instrument", async () => {
+        const xml = `
+            <score-partwise>
+                <part-list>
+                    <score-part id="P1">
+                        <part-name>Violin</part-name>
+                        <score-instrument id="P1-I1">
+                            <instrument-name>violin</instrument-name>
+                        </score-instrument>
+                        <midi-instrument id="P1-I1">
+                            <midi-program>41</midi-program>
+                        </midi-instrument>
+                    </score-part>
+                </part-list>
+                <part id="P1">
+                    <measure number="1">
+                        <attributes>
+                            <divisions>8</divisions>
+                        </attributes>
+                        <note>
+                            <pitch>
+                                <step>C</step>
+                                <octave>4</octave>
+                            </pitch>
+                            <duration>8</duration>
+                            <type>quarter</type>
+                        </note>
+                    </measure>
+                </part>
+            </score-partwise>
+        `;
+
+        const { blocks } = await parseAndCapture(xml);
+
+        const setInstrument = blocks.find(block => blockName(block) === "settimbre");
+
+        const instrument = blocks.find(block => block[0] === setInstrument[4][1]);
+
+        expect(instrument[1][1].value).toBe("violin");
+    });
+});
+
+describe("MusicXML instrument import edge cases", () => {
+    const importedVoice = blocks => {
+        const setInstrument = blocks.find(block => blockName(block) === "settimbre");
+
+        const voice = blocks.find(block => block[0] === setInstrument[4][1]);
+
+        return voice[1][1].value;
+    };
+
+    it("does not select a drum name as a pitched instrument", async () => {
+        const xml = `
+            <score-partwise>
+                <part-list>
+                    <score-part id="D1">
+                        <part-name>Percussion</part-name>
+                        <score-instrument id="D1-X1">
+                            <instrument-name>snare drum</instrument-name>
+                        </score-instrument>
+                    </score-part>
+                </part-list>
+                <part id="D1">
+                    <measure number="1">
+                        <attributes>
+                            <divisions>8</divisions>
+                        </attributes>
+                        <note>
+                            <unpitched>
+                                <display-step>C</display-step>
+                                <display-octave>5</display-octave>
+                            </unpitched>
+                            <duration>8</duration>
+                            <type>quarter</type>
+                            <instrument id="D1-X1"/>
+                        </note>
+                    </measure>
+                </part>
+            </score-partwise>
+        `;
+
+        const { blocks } = await parseAndCapture(xml);
+
+        expect(importedVoice(blocks)).toBe("electronic synth");
+        expect(drumNames(blocks)).toEqual(["snare drum"]);
+    });
+
+    it("falls back safely for an unsupported pitched instrument", async () => {
+        const xml = `
+            <score-partwise>
+                <part-list>
+                    <score-part id="P1">
+                        <part-name>Unknown Voice</part-name>
+                        <score-instrument id="P1-I1">
+                            <instrument-name>Unknown Orchestra Preset</instrument-name>
+                        </score-instrument>
+                    </score-part>
+                </part-list>
+                <part id="P1">
+                    <measure number="1">
+                        <attributes>
+                            <divisions>8</divisions>
+                        </attributes>
+                        <note>
+                            <pitch>
+                                <step>C</step>
+                                <octave>4</octave>
+                            </pitch>
+                            <duration>8</duration>
+                            <type>quarter</type>
+                        </note>
+                    </measure>
+                </part>
+            </score-partwise>
+        `;
+
+        const { blocks } = await parseAndCapture(xml);
+
+        expect(importedVoice(blocks)).toBe("electronic synth");
+    });
+});
+
+describe("MusicXML MIDI program instrument fallback", () => {
+    it("recognizes violin from MIDI program 41", async () => {
+        const xml = `
+            <score-partwise>
+                <part-list>
+                    <score-part id="P1">
+                        <part-name>Strings</part-name>
+                        <score-instrument id="P1-I1">
+                            <instrument-name>Unrecognized Strings</instrument-name>
+                        </score-instrument>
+                        <midi-instrument id="P1-I1">
+                            <midi-program>41</midi-program>
+                        </midi-instrument>
+                    </score-part>
+                </part-list>
+                <part id="P1">
+                    <measure number="1">
+                        <attributes><divisions>8</divisions></attributes>
+                        <note>
+                            <pitch>
+                                <step>C</step>
+                                <octave>4</octave>
+                            </pitch>
+                            <duration>8</duration>
+                            <type>quarter</type>
+                            <instrument id="P1-I1"/>
+                        </note>
+                    </measure>
+                </part>
+            </score-partwise>
+        `;
+
+        const { blocks } = await parseAndCapture(xml);
+        const setInstrument = blocks.find(block => blockName(block) === "settimbre");
+        const voice = blocks.find(block => block[0] === setInstrument[4][1]);
+
+        expect(voice[1][1].value).toBe("violin");
     });
 });
