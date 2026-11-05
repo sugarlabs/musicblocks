@@ -25,6 +25,23 @@
 global._ = msg => msg;
 global.announceToScreenReader = jest.fn();
 global.last = arr => arr[arr.length - 1];
+global.pubsub = {
+    listeners: {},
+    on(event, listener) {
+        this.listeners[event] = this.listeners[event] || [];
+        this.listeners[event].push(listener);
+    },
+    off(event, listener) {
+        this.listeners[event] = (this.listeners[event] || []).filter(
+            registered => registered !== listener
+        );
+    },
+    emit(event, payload) {
+        for (const listener of this.listeners[event] || []) {
+            listener(payload);
+        }
+    }
+};
 global.LCD = (a, b) => (a * b) / gcd(a, b);
 function gcd(a, b) {
     return b === 0 ? a : gcd(b, a % b);
@@ -2956,11 +2973,50 @@ describe("PhraseMaker Widget", () => {
             expect(phraseMaker._colBlocks.length).toBe(2);
         });
 
-        test("_addNotesBlockBetween updates block tracking indices", () => {
-            phraseMaker._notesBlocks = [100, 101];
-            phraseMaker._colBlocks = [[1, 4]];
+        test("_addNotesBlockBetween reconnects the following row", () => {
+            phraseMaker.blockNo = 0;
+            phraseMaker.activity.blocks.blockList = [
+                { connections: [null, 1] },
+                { connections: [0, 2] },
+                { connections: [1, null] },
+                { connections: [null, null, null, null] }
+            ];
+            phraseMaker.activity.blocks.adjustDocks = jest.fn();
+            phraseMaker.activity.blocks.clampBlocksToCheck = [];
+            phraseMaker.activity.refreshCanvas = jest.fn();
 
-            expect(phraseMaker._notesBlocks.length).toBe(2);
+            phraseMaker._addNotesBlockBetween(1, 3, false);
+
+            expect(phraseMaker.activity.blocks.blockList[1].connections[1]).toBe(3);
+            expect(phraseMaker.activity.blocks.blockList[2].connections[0]).toBe(3);
+            expect(phraseMaker.activity.blocks.blockList[3].connections).toEqual([
+                1,
+                null,
+                null,
+                2
+            ]);
+        });
+
+        test("_addNotesBlockBetween accepts an empty lower connection", () => {
+            phraseMaker.blockNo = 0;
+            phraseMaker.activity.blocks.blockList = [
+                { connections: [null, 1] },
+                { connections: [0, null] },
+                { connections: [null, null, null, null] }
+            ];
+            phraseMaker.activity.blocks.adjustDocks = jest.fn();
+            phraseMaker.activity.blocks.clampBlocksToCheck = [];
+            phraseMaker.activity.refreshCanvas = jest.fn();
+
+            phraseMaker._addNotesBlockBetween(1, 2, false);
+
+            expect(phraseMaker.activity.blocks.blockList[1].connections[1]).toBe(2);
+            expect(phraseMaker.activity.blocks.blockList[2].connections).toEqual([
+                1,
+                null,
+                null,
+                null
+            ]);
         });
 
         test("_deleteRhythmBlock and _addRhythmBlock manage rhythm stack", () => {
@@ -3337,6 +3393,106 @@ describe("PhraseMaker Widget", () => {
             phraseMaker.pitchBlockAdded(12, "mi", 5);
 
             expect(phraseMaker.pitchBlockAdded).toHaveBeenCalledWith(12, "mi", 5);
+        });
+
+        test("_getAvailablePitch skips a duplicate default pitch", () => {
+            phraseMaker.rowLabels = ["sol"];
+            phraseMaker.rowArgs = [4];
+            phraseMaker._deps.getDrumName = jest.fn(() => null);
+            phraseMaker._deps.noteToFrequency = jest.fn(note => note);
+            phraseMaker.activity = {
+                turtles: {
+                    ithTurtle: () => ({ singer: { keySignature: "C" } })
+                }
+            };
+
+            expect(phraseMaker._getAvailablePitch()).toEqual(["do", 4]);
+        });
+
+        test("_loadAddedRow handles a synchronous load completion", () => {
+            global.pubsub.listeners = {};
+            const blockList = [];
+            const onLoaded = jest.fn();
+            phraseMaker.activity = {
+                blocks: {
+                    blockList,
+                    _activeLoadGeneration: 3,
+                    loadNewBlocks: jest.fn(() => {
+                        blockList.push({ name: "pitch", _loadGeneration: 3 });
+                        global.pubsub.emit("finishedLoading", { token: 7 });
+                        return 7;
+                    })
+                },
+                errorMsg: jest.fn()
+            };
+
+            phraseMaker._loadAddedRow("pitch", [], onLoaded);
+
+            expect(onLoaded).toHaveBeenCalledWith(0);
+            expect(global.pubsub.listeners.finishedLoading).toEqual([]);
+            expect(global.pubsub.listeners.loadFailed).toEqual([]);
+        });
+
+        test("_loadAddedRow waits for its own queued load completion", () => {
+            global.pubsub.listeners = {};
+            const blockList = [];
+            const onLoaded = jest.fn();
+            phraseMaker.activity = {
+                blocks: {
+                    blockList,
+                    _activeLoadGeneration: 4,
+                    loadNewBlocks: jest.fn(() => 8)
+                },
+                errorMsg: jest.fn()
+            };
+
+            phraseMaker._loadAddedRow("pitch", [], onLoaded);
+            global.pubsub.emit("finishedLoading", { token: 7 });
+
+            expect(onLoaded).not.toHaveBeenCalled();
+
+            phraseMaker.activity.blocks._activeLoadGeneration = 5;
+            blockList.push({ name: "pitch", _loadGeneration: 5 });
+            global.pubsub.emit("finishedLoading", { token: 8 });
+
+            expect(onLoaded).toHaveBeenCalledWith(0);
+            expect(global.pubsub.listeners.finishedLoading).toEqual([]);
+            expect(global.pubsub.listeners.loadFailed).toEqual([]);
+        });
+
+        test("_insertAddedRow preserves the mapping after sorted insertion", () => {
+            phraseMaker.blockNo = 90;
+            phraseMaker._rowBlocks = [41, 42];
+            phraseMaker._rowMap = [1, 0];
+            phraseMaker._rowOffset = [0, 0];
+            phraseMaker.rowLabels = ["sol", "re"];
+            phraseMaker.rowArgs = [4, 4];
+            phraseMaker.columnBlocksMap = [
+                [42, "pitch"],
+                [41, "pitch"]
+            ];
+            phraseMaker._deps.last = arr => arr[arr.length - 1];
+            phraseMaker._mapNotesBlocks = jest.fn(type => (type === "pitch" ? [42] : []));
+            phraseMaker._addNotesBlockBetween = jest.fn();
+            phraseMaker.init = jest.fn();
+            phraseMaker.makeClickable = jest.fn();
+            phraseMaker.pitchBlockAdded = jest.fn();
+            phraseMaker.activity = {
+                errorMsg: jest.fn(),
+                logo: { tupletRhythms: [] }
+            };
+
+            phraseMaker._insertAddedRow("pitch", "pitch", "do", 4, 43, []);
+
+            expect(phraseMaker.rowLabels).toEqual(["sol", "do", "re"]);
+            expect(phraseMaker._rowBlocks).toEqual([41, 42, 43]);
+            expect(phraseMaker._rowMap).toEqual([2, 0, 1]);
+            expect(phraseMaker.columnBlocksMap).toEqual([
+                [42, "pitch"],
+                [43, "pitch"],
+                [41, "pitch"]
+            ]);
+            expect(phraseMaker.pitchBlockAdded).toHaveBeenCalledWith(43);
         });
 
         test("pitchBlockAdded does not clear matrix and opens pie submenu without deselecting cells", () => {

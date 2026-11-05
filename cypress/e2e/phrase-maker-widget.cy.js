@@ -303,25 +303,69 @@ describe("Phrase Maker widget", () => {
         openPhraseMaker();
         cy.get(`${PM} [data-i="0"]`, { timeout: 15000 }).should("have.length.at.least", 1);
 
-        // Select the first cell in row 0
-        cy.get(`${PM} [data-i="0"][data-j="0"]`)
-            .first()
-            .trigger("mousedown", { force: true })
-            .trigger("mouseup", { force: true });
-        cy.get(`${PM} [data-i="0"][data-j="0"]`)
-            .first()
-            .should($cell => {
-                expect($cell[0].style.backgroundColor).to.equal("black");
+        let originalLabels;
+        let selectedLabel;
+        cy.get(`${PM} .labelcol`).then($labels => {
+            originalLabels = Array.from($labels, label => label.textContent.replace(/\s/g, ""));
+            selectedLabel = originalLabels[0];
+
+            cy.get(`${PM} [data-i="0"][data-j="0"]`)
+                .first()
+                .trigger("mousedown", { force: true })
+                .trigger("mouseup", { force: true })
+                .should($cell => {
+                    expect($cell[0].style.backgroundColor).to.equal("black");
+                });
+
+            cy.get(`${PM} [role="button"][aria-label="Add note"]`).click();
+            cy.window().then(win => {
+                const phraseMaker = win.ActivityContext.getActivity().logo.phraseMaker;
+                phraseMaker._menuWheel.selectedNavItemIndex = 0;
+                phraseMaker._menuWheel.navItems[0].navigateFunction();
             });
 
-        // Click Add note button to open the row-addition pie menu
-        cy.get(`${PM} [role="button"][aria-label="Add note"]`).click();
+            cy.get("#wheelDivptm svg", { timeout: 15000 }).should("exist");
+            cy.get(`${PM} .labelcol`, { timeout: 15000 }).should($nextLabels =>
+                expect($nextLabels).to.have.length(originalLabels.length + 1)
+            );
+            cy.get(`${PM} [data-i="0"][data-j="0"]`)
+                .first()
+                .should($cell => {
+                    expect($cell[0].style.backgroundColor, "cell remains selected").to.equal(
+                        "black"
+                    );
+                });
 
-        // The previously selected cell must remain black
-        cy.get(`${PM} [data-i="0"][data-j="0"]`)
-            .first()
-            .should($cell => {
-                expect($cell[0].style.backgroundColor, "cell remains selected").to.equal("black");
+            cy.window().then(win => {
+                const phraseMaker = win.ActivityContext.getActivity().logo.phraseMaker;
+                const faIndex = phraseMaker._pitchWheel.navItems.findIndex(
+                    item => item.title === "fa"
+                );
+                phraseMaker._pitchWheel.selectedNavItemIndex = faIndex;
+                phraseMaker._pitchWheel.navItems[faIndex].navigateFunction();
+                phraseMaker._exitWheel.navItems[0].navigateFunction();
             });
+
+            cy.get(`${PM} .labelcol`, { timeout: 15000 }).should($nextLabels => {
+                const labels = Array.from($nextLabels, label =>
+                    label.textContent.replace(/\s/g, "")
+                );
+                expect(labels).to.have.length(originalLabels.length + 1);
+                expect(labels).to.include("fa4");
+                expect(labels).to.include.members(originalLabels);
+            });
+
+            cy.get(`${PM} .labelcol`).then($nextLabels => {
+                const selectedRow = Array.from($nextLabels).find(
+                    label => label.textContent.replace(/\s/g, "") === selectedLabel
+                );
+                const rowIndex = selectedRow.getAttribute("alt").split("__")[0];
+                cy.get(`${PM} [data-i="${rowIndex}"][data-j="0"]`)
+                    .first()
+                    .should($cell => {
+                        expect($cell[0].style.backgroundColor).to.equal("black");
+                    });
+            });
+        });
     });
 });

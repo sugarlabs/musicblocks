@@ -28,7 +28,7 @@ Globals location
     slicePath, wheelnav
 
 - js/utils/musicutils.js
-    EIGHTHNOTEWIDTH, NOTESYMBOLS, calcNoteValueToDisplay, getDrumIndex, noteToFrequency,
+    EIGHTHNOTEWIDTH, NOTESYMBOLS, calcNoteValueToDisplay, getDrumIndex, noteToFrequency, pubsub,
     FLAT, SHARP, DRUMS, MATRIXSOLFEHEIGHT, toFraction, SOLFEGECONVERSIONTABLE, DEFAULTVOICE,
     getDrumName, MATRIXSOLFEWIDTH, getDrumIcon, noteIsSolfege, isCustomTemperament, i18nSolfege,
     getNote, DEFAULTDRUM, getTemperament
@@ -1377,155 +1377,65 @@ class PhraseMaker {
             label = VALUESLABEL[this._menuWheel.selectedNavItemIndex];
             let rLabel = null;
             let rArg = null;
-            const blockLabel = "";
-            const newBlock = this.activity.blocks.blockList.length;
+            let blockName;
+            let blocksToLoad;
             switch (label) {
                 case "pitch":
-                    this.activity.blocks.loadNewBlocks([
+                    blockName = "pitch";
+                    [rLabel, rArg] = this._getAvailablePitch();
+                    if (rLabel === null) {
+                        this.activity.errorMsg(this._("No unique pitch is available."));
+                        return;
+                    }
+                    blocksToLoad = [
                         [0, ["pitch", {}], 0, 0, [null, 1, 2, null]],
-                        [1, ["solfege", { value: "sol" }], 0, 0, [0]],
-                        [2, ["number", { value: 4 }], 0, 0, [0]]
-                    ]);
-                    rLabel = "sol";
-                    rArg = 4;
+                        [1, ["solfege", { value: rLabel }], 0, 0, [0]],
+                        [2, ["number", { value: rArg }], 0, 0, [0]]
+                    ];
                     break;
                 case "hertz":
-                    this.activity.blocks.loadNewBlocks([
-                        [0, ["hertz", {}], 0, 0, [null, 1, null]],
-                        [1, ["number", { value: 392 }], 0, 0, [0]]
-                    ]);
+                    blockName = "hertz";
                     rLabel = "hertz";
                     rArg = 392;
+                    blocksToLoad = [
+                        [0, ["hertz", {}], 0, 0, [null, 1, null]],
+                        [1, ["number", { value: 392 }], 0, 0, [0]]
+                    ];
                     break;
                 case "drum":
-                    this.activity.blocks.loadNewBlocks([
+                    blockName = "playdrum";
+                    rLabel = "";
+                    rArg = -1;
+                    blocksToLoad = [
                         [0, ["playdrum", {}], 0, 0, [null, 1, null]],
                         [1, ["drumname", { value: DEFAULTDRUM }], 0, 0, [0]]
-                    ]);
-                    rLabel = blockLabel;
-                    rArg = -1;
+                    ];
                     break;
                 case "graphics":
-                    this.activity.blocks.loadNewBlocks([
-                        [0, ["forward", {}], 0, 0, [null, 1, null]],
-                        [1, ["number", { value: 100 }], 0, 0, [0]]
-                    ]);
+                    blockName = "forward";
                     rLabel = "forward";
                     rArg = 100;
+                    blocksToLoad = [
+                        [0, ["forward", {}], 0, 0, [null, 1, null]],
+                        [1, ["number", { value: 100 }], 0, 0, [0]]
+                    ];
                     break;
                 case "pen":
-                    this.activity.blocks.loadNewBlocks([
-                        [0, ["setcolor", {}], 0, 0, [null, 1, null]],
-                        [1, ["number", { value: 0 }], 0, 0, [0]]
-                    ]);
+                    blockName = "setcolor";
                     rLabel = "setcolor";
                     rArg = 0;
+                    blocksToLoad = [
+                        [0, ["setcolor", {}], 0, 0, [null, 1, null]],
+                        [1, ["number", { value: 0 }], 0, 0, [0]]
+                    ];
                     break;
                 default:
-                    break;
+                    return;
             }
 
-            let blocksNo = null;
-            let aboveBlock = null;
-
-            switch (label) {
-                case "graphics":
-                case "pen":
-                    for (let i = graphicLabels.length - 1; i >= 0; i--) {
-                        blocksNo = this._mapNotesBlocks(graphicLabels[i]);
-                        if (blocksNo.length >= 1) {
-                            aboveBlock = this._deps.last(blocksNo);
-                            break;
-                        }
-                    }
-                    break;
-                case "drum":
-                    blocksNo = this._mapNotesBlocks("playdrum");
-                    if (blocksNo.length >= 1) {
-                        aboveBlock = this._deps.last(blocksNo);
-                    }
-                    break;
-                case "hertz":
-                    blocksNo = this._mapNotesBlocks("hertz");
-                    if (blocksNo.length >= 1) {
-                        aboveBlock = this._deps.last(blocksNo);
-                    }
-                    break;
-                case "pitch":
-                    blocksNo = this._mapNotesBlocks("pitch");
-                    if (blocksNo.length >= 1) {
-                        aboveBlock = this._deps.last(blocksNo);
-                    }
-                    break;
-            }
-
-            if (aboveBlock === null) {
-                // Look for a pitch block.
-                blocksNo = this._mapNotesBlocks("pitch");
-                if (blocksNo.length >= 1) {
-                    aboveBlock = this._deps.last(blocksNo);
-                }
-
-                // The top?
-                if (aboveBlock === null) {
-                    aboveBlock = this.blockNo;
-                }
-            }
-
-            let insertIndex;
-            if (aboveBlock === this.blockNo) {
-                insertIndex = 0;
-                this._addNotesBlockBetween(aboveBlock, newBlock, true);
-            } else {
-                let i;
-                for (i = 0; i < this.columnBlocksMap.length; i++) {
-                    if (this.columnBlocksMap[i] && this.columnBlocksMap[i][0] === aboveBlock) {
-                        break;
-                    }
-                }
-
-                insertIndex = i < this.columnBlocksMap.length ? i + 1 : this.rowLabels.length;
-                this._addNotesBlockBetween(aboveBlock, newBlock, false);
-            }
-
-            this.rowLabels.splice(insertIndex, 0, rLabel);
-            this.rowArgs.splice(insertIndex, 0, rArg);
-            this._rowBlocks.splice(insertIndex, 0, newBlock);
-            this._rowMap = this._rowBlocks.map((_, idx) => idx);
-            this._rowOffset = this._rowBlocks.map(() => 0);
-
-            this.sorted = false;
-            this.init(this.activity);
-            let tupletParam;
-            for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
-                switch (this.activity.logo.tupletRhythms[i][0]) {
-                    case "simple":
-                    case "notes":
-                        tupletParam = [
-                            this.activity.logo.tupletParams[this.activity.logo.tupletRhythms[i][1]]
-                        ];
-                        tupletParam.push([]);
-                        for (let j = 2; j < this.activity.logo.tupletRhythms[i].length; j++) {
-                            tupletParam[1].push(this.activity.logo.tupletRhythms[i][j]);
-                        }
-
-                        this.addTuplet(tupletParam);
-                        break;
-                    default:
-                        this.addNotes(
-                            this.activity.logo.tupletRhythms[i][1],
-                            this.activity.logo.tupletRhythms[i][2]
-                        );
-                        break;
-                }
-            }
-
-            this.makeClickable();
-            if (label === "pitch") {
-                setTimeout(() => {
-                    this.pitchBlockAdded(newBlock);
-                }, 200);
-            }
+            this._loadAddedRow(blockName, blocksToLoad, newBlock =>
+                this._insertAddedRow(label, blockName, rLabel, rArg, newBlock, graphicLabels)
+            );
         };
 
         const __subMenuChanged = () => {
@@ -1538,27 +1448,251 @@ class PhraseMaker {
     }
 
     /**
-     * Executes actions related to adding a new pitch block.
-     * @param {number} blockN - The index of the block being added.
+     * Finds an initial pitch that does not duplicate an existing pitch row.
+     * @returns {Array<string | number | null>} The pitch label and octave, or null values.
      */
-    pitchBlockAdded(blockN, retryCount = 0) {
-        setTimeout(() => {
-            let i = -1;
-            if (this.columnBlocksMap) {
-                i = this.columnBlocksMap.findIndex(entry => entry && entry[0] === blockN);
+    _getAvailablePitch() {
+        const keySignature = this.activity.turtles.ithTurtle(0).singer.keySignature;
+        const existingFrequencies = new Set();
+        for (let i = 0; i < this.rowLabels.length; i++) {
+            const rowLabel = this.rowLabels[i];
+            if (
+                rowLabel.toLowerCase() === "rest" ||
+                this._deps.getDrumName(rowLabel) !== null ||
+                PhraseMakerUtils.MATRIXGRAPHICS.includes(rowLabel) ||
+                PhraseMakerUtils.MATRIXGRAPHICS2.includes(rowLabel) ||
+                PhraseMakerUtils.MATRIXSYNTHS.includes(rowLabel)
+            ) {
+                continue;
             }
-            if (i === -1 && this._rowBlocks) {
-                i = this._rowBlocks.indexOf(blockN);
-            }
-            if (i === -1) {
-                if (retryCount < 5) {
-                    this.pitchBlockAdded(blockN, retryCount + 1);
-                    return;
+
+            existingFrequencies.add(
+                this._deps.noteToFrequency(rowLabel + this.rowArgs[i], keySignature)
+            );
+        }
+
+        const pitches = ["sol", "do", "re", "mi", "fa", "la", "ti"];
+        const octaves = [4, 3, 5, 2, 6, 1, 7, 8];
+        for (const octave of octaves) {
+            for (const pitch of pitches) {
+                const frequency = this._deps.noteToFrequency(pitch + octave, keySignature);
+                if (!existingFrequencies.has(frequency)) {
+                    return [pitch, octave];
                 }
-            } else {
-                this._createColumnPieSubmenu(i, "pitchblocks", true);
             }
-        }, 300);
+        }
+
+        return [null, null];
+    }
+
+    _loadAddedRow(blockName, blocksToLoad, onLoaded) {
+        const blocks = this.activity.blocks;
+        const earlyEvents = [];
+        let loadToken;
+
+        const cleanup = () => {
+            pubsub.off("finishedLoading", onLoadEvent);
+            pubsub.off("loadFailed", onLoadEvent);
+        };
+
+        const onLoadEvent = event => {
+            if (loadToken === undefined) {
+                earlyEvents.push(event);
+                return;
+            }
+            if (!event || event.token !== loadToken) {
+                return;
+            }
+
+            cleanup();
+            if (event.error) {
+                console.error("Phrase Maker row block failed to load.", event.error);
+                this.activity.errorMsg(this._("Unable to add the row."));
+                return;
+            }
+
+            const newBlock = blocks.blockList.findIndex(
+                block =>
+                    block &&
+                    block._loadGeneration === blocks._activeLoadGeneration &&
+                    block.name === blockName
+            );
+            if (newBlock === -1) {
+                console.error("Phrase Maker row block was not created.", {
+                    token: loadToken,
+                    blockName
+                });
+                this.activity.errorMsg(this._("Unable to add the row."));
+                return;
+            }
+
+            onLoaded(newBlock);
+        };
+
+        pubsub.on("finishedLoading", onLoadEvent);
+        pubsub.on("loadFailed", onLoadEvent);
+        try {
+            loadToken = blocks.loadNewBlocks(blocksToLoad);
+        } catch (error) {
+            cleanup();
+            throw error;
+        }
+
+        const earlyEvent = earlyEvents.find(event => event && event.token === loadToken);
+        if (earlyEvent) {
+            onLoadEvent(earlyEvent);
+        }
+    }
+
+    _insertAddedRow(label, blockName, rowLabel, rowArg, newBlock, graphicLabels) {
+        let blocksNo = null;
+        let aboveBlock = null;
+
+        switch (label) {
+            case "graphics":
+            case "pen":
+                for (let i = graphicLabels.length - 1; i >= 0; i--) {
+                    blocksNo = this._mapNotesBlocks(graphicLabels[i]);
+                    if (blocksNo.length >= 1) {
+                        aboveBlock = this._deps.last(blocksNo);
+                        break;
+                    }
+                }
+                break;
+            case "drum":
+                blocksNo = this._mapNotesBlocks("playdrum");
+                if (blocksNo.length >= 1) {
+                    aboveBlock = this._deps.last(blocksNo);
+                }
+                break;
+            case "hertz":
+                blocksNo = this._mapNotesBlocks("hertz");
+                if (blocksNo.length >= 1) {
+                    aboveBlock = this._deps.last(blocksNo);
+                }
+                break;
+            case "pitch":
+                blocksNo = this._mapNotesBlocks("pitch");
+                if (blocksNo.length >= 1) {
+                    aboveBlock = this._deps.last(blocksNo);
+                }
+                break;
+            default:
+                break;
+        }
+
+        if (aboveBlock === null) {
+            blocksNo = this._mapNotesBlocks("pitch");
+            if (blocksNo.length >= 1) {
+                aboveBlock = this._deps.last(blocksNo);
+            }
+            if (aboveBlock === null) {
+                aboveBlock = this.blockNo;
+            }
+        }
+
+        const topBlock = aboveBlock === this.blockNo;
+        let insertIndex = this.rowLabels.length;
+        if (topBlock) {
+            insertIndex = 0;
+        } else {
+            const aboveRowIndex = this.columnBlocksMap.findIndex(
+                entry => entry && entry[0] === aboveBlock
+            );
+            if (aboveRowIndex !== -1) {
+                insertIndex = aboveRowIndex + 1;
+            }
+        }
+
+        const previousRowBlocks = this._rowBlocks.slice();
+        const previousRowMap =
+            this._rowMap.length === previousRowBlocks.length
+                ? this._rowMap.slice()
+                : previousRowBlocks.map((_, index) => index);
+        const previousRowOffset = this._rowOffset.slice();
+        let originalInsertIndex = topBlock
+            ? 0
+            : previousRowBlocks.findIndex(
+                  (rowBlock, index) =>
+                      (rowBlock === aboveBlock ||
+                          rowBlock.toString().endsWith(aboveBlock.toString())) &&
+                      (previousRowMap[index] === insertIndex - 1 || rowBlock === aboveBlock)
+              );
+        if (originalInsertIndex === -1) {
+            originalInsertIndex = previousRowBlocks.length;
+        } else if (!topBlock) {
+            originalInsertIndex += 1;
+        }
+
+        this._addNotesBlockBetween(aboveBlock, newBlock, topBlock);
+
+        let trackedBlock = newBlock;
+        while (previousRowBlocks.includes(trackedBlock)) {
+            trackedBlock += 1000000;
+        }
+        this._rowBlocks.splice(originalInsertIndex, 0, trackedBlock);
+        this.rowLabels.splice(insertIndex, 0, rowLabel);
+        this.rowArgs.splice(insertIndex, 0, rowArg);
+        this.columnBlocksMap.splice(insertIndex, 0, [newBlock, blockName]);
+
+        const nextRowMap = new Array(previousRowBlocks.length + 1);
+        for (let i = 0; i < previousRowMap.length; i++) {
+            const nextOriginalIndex = i >= originalInsertIndex ? i + 1 : i;
+            const displayIndex = previousRowMap[i];
+            nextRowMap[nextOriginalIndex] =
+                displayIndex >= insertIndex ? displayIndex + 1 : displayIndex;
+        }
+        nextRowMap[originalInsertIndex] = insertIndex;
+        this._rowMap = nextRowMap;
+
+        const nextRowOffset = new Array(this.rowLabels.length).fill(0);
+        for (let i = 0; i < this.rowLabels.length - 1; i++) {
+            const nextDisplayIndex = i >= insertIndex ? i + 1 : i;
+            nextRowOffset[nextDisplayIndex] = previousRowOffset[i] || 0;
+        }
+        this._rowOffset = nextRowOffset;
+
+        this.sorted = true;
+        this.init(this.activity);
+        for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
+            const rhythm = this.activity.logo.tupletRhythms[i];
+            if (rhythm[0] === "simple" || rhythm[0] === "notes") {
+                const tupletParam = [this.activity.logo.tupletParams[rhythm[1]], rhythm.slice(2)];
+                this.addTuplet(tupletParam);
+            } else {
+                this.addNotes(rhythm[1], rhythm[2]);
+            }
+        }
+        this.makeClickable();
+
+        if (label === "pitch") {
+            this.pitchBlockAdded(newBlock);
+        } else {
+            setTimeout(() => this._sort(), 1000);
+        }
+    }
+
+    pitchBlockAdded(blockN) {
+        let rowIndex = this.columnBlocksMap.findIndex(entry => entry && entry[0] === blockN);
+        if (rowIndex === -1) {
+            const originalRowIndex = this._rowBlocks.findIndex(
+                rowBlock => rowBlock === blockN || rowBlock.toString().endsWith(blockN.toString())
+            );
+            rowIndex =
+                originalRowIndex === -1
+                    ? -1
+                    : ((this._rowMap && this._rowMap[originalRowIndex]) ?? originalRowIndex);
+        }
+        if (rowIndex === undefined || rowIndex === -1) {
+            if (this.activity && typeof this.activity.errorMsg === "function") {
+                this.activity.errorMsg(this._("Unable to open the pitch menu."));
+            } else {
+                console.error("Phrase Maker could not find the added pitch row.", blockN);
+            }
+            return;
+        }
+
+        this._createColumnPieSubmenu(rowIndex, "pitchblocks", true);
     }
 
     /**
@@ -2645,28 +2779,33 @@ class PhraseMaker {
      * @param {boolean} topBlock - Determines if the new block is added on top (true) or below (false).
      */
     _addNotesBlockBetween(aboveBlock, block, topBlock) {
-        let belowBlock;
-        if (topBlock) {
-            belowBlock = this.activity.blocks.blockList[aboveBlock].connections[1];
-            this.activity.blocks.blockList[aboveBlock].connections[1] = block;
-        } else {
-            belowBlock = this._deps.last(this.activity.blocks.blockList[aboveBlock].connections);
-            this.activity.blocks.blockList[aboveBlock].connections[
-                this.activity.blocks.blockList[aboveBlock].connections.length - 1
-            ] = block;
+        const blockList = this.activity.blocks.blockList;
+        const aboveBlockObj = blockList[aboveBlock];
+        const blockObj = blockList[block];
+        if (!aboveBlockObj || !aboveBlockObj.connections || !blockObj || !blockObj.connections) {
+            throw new Error("Cannot insert a Phrase Maker row into an incomplete block stack.");
         }
 
-        if (
-            belowBlock !== null &&
-            belowBlock !== undefined &&
-            this.activity.blocks.blockList[belowBlock]
-        ) {
-            this.activity.blocks.blockList[belowBlock].connections[0] = block;
+        const aboveConnection = topBlock ? 1 : aboveBlockObj.connections.length - 1;
+        if (aboveConnection < 0 || !blockObj.connections.length) {
+            throw new Error("Cannot insert a Phrase Maker row into a block without flow docks.");
         }
-        this.activity.blocks.blockList[block].connections[0] = aboveBlock;
-        this.activity.blocks.blockList[block].connections[
-            this.activity.blocks.blockList[block].connections.length - 1
-        ] = belowBlock;
+
+        const belowBlock = aboveBlockObj.connections[aboveConnection];
+        const belowBlockObj =
+            belowBlock === null || belowBlock === undefined ? null : blockList[belowBlock];
+        if (belowBlock !== null && belowBlock !== undefined && !belowBlockObj?.connections) {
+            throw new Error(
+                "Cannot reconnect a missing block below the inserted Phrase Maker row."
+            );
+        }
+
+        aboveBlockObj.connections[aboveConnection] = block;
+        if (belowBlockObj) {
+            belowBlockObj.connections[0] = block;
+        }
+        blockObj.connections[0] = aboveBlock;
+        blockObj.connections[blockObj.connections.length - 1] = belowBlock;
         this.activity.blocks.adjustDocks(this.blockNo, true);
         this.activity.blocks.clampBlocksToCheck.push([this.blockNo, 0]);
         this.activity.refreshCanvas();
