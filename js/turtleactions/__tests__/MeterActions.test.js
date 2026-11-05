@@ -1153,4 +1153,38 @@ describe("setupMeterActions", () => {
             expect(targetTurtle.singer.drift).toBe(0);
         });
     });
+
+    describe("Euclidean actions in MeterActions", () => {
+        it("evaluates explicit Euclidean steps correctly", () => {
+            // Cuban Tresillo: E(3, 8) -> [1, 0, 0, 1, 0, 0, 1, 0]
+            expect(Singer.MeterActions.getEuclideanStep(3, 8, 0, 0, 0)).toBe(1);
+            expect(Singer.MeterActions.getEuclideanStep(3, 8, 1, 0, 0)).toBe(0);
+            expect(Singer.MeterActions.getEuclideanStep(3, 8, 2, 0, 0)).toBe(0);
+            expect(Singer.MeterActions.getEuclideanStep(3, 8, 3, 0, 0)).toBe(1);
+            expect(Singer.MeterActions.getEuclideanStep(3, 8, 4, 0, 0)).toBe(0);
+            expect(Singer.MeterActions.getEuclideanStep(3, 8, 5, 0, 0)).toBe(0);
+            expect(Singer.MeterActions.getEuclideanStep(3, 8, 6, 0, 0)).toBe(1);
+            expect(Singer.MeterActions.getEuclideanStep(3, 8, 7, 0, 0)).toBe(0);
+        });
+
+        it("uses turtle tallyNotes when step is null or omitted", () => {
+            targetTurtle.singer.tallyNotes = 3;
+            // E(3, 8) at step 3 is 1
+            expect(Singer.MeterActions.getEuclideanStep(3, 8, null, 0, 0)).toBe(1);
+            targetTurtle.singer.tallyNotes = 4;
+            // E(3, 8) at step 4 is 0
+            expect(Singer.MeterActions.getEuclideanStep(3, 8, undefined, 0, 0)).toBe(0);
+            // Blank and whitespace-only steps fall back to tallyNotes.
+            expect(Singer.MeterActions.getEuclideanStep(3, 8, "", 0, 0)).toBe(0);
+            expect(Singer.MeterActions.getEuclideanStep(3, 8, "   ", 0, 0)).toBe(0);
+            // An omitted turtle falls back to step 0, which is an active pulse for E(3, 8).
+            expect(Singer.MeterActions.getEuclideanStep(3, 8, null, 0, undefined)).toBe(1);
+        });
+
+        it("returns duration fractions via getEuclideanDurations", () => {
+            // E(3, 8) with total duration 1 -> [3/8, 3/8, 2/8] -> [0.375, 0.375, 0.25]
+            const durations = Singer.MeterActions.getEuclideanDurations(3, 8, 1, 0);
+            expect(durations).toEqual([0.375, 0.375, 0.25]);
+        });
+    });
 });

@@ -152,7 +152,10 @@ if (typeof module !== "undefined" && module.exports) {
         getMeasurePosition,
         getMeterAnchor,
         saveMeterState,
-        restoreMeterState
+        restoreMeterState,
+        computeEuclideanRhythm,
+        isEuclideanStep,
+        euclideanToDurations
     } = MusicUtilsRhythm;
     var MusicUtilsSolfege =
         (typeof window !== "undefined" && window.MusicUtilsSolfege) ||
@@ -449,6 +452,9 @@ if (typeof module !== "undefined" && module.exports) {
         rotateSliceAngles,
         enforceMinSliceAngles,
         applySliceAngles,
-        getNonEDOFrequency
+        getNonEDOFrequency,
+        computeEuclideanRhythm,
+        isEuclideanStep,
+        euclideanToDurations
     };
 }

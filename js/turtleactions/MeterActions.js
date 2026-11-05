@@ -18,7 +18,7 @@
 
 /*
    global _, Singer, rationalToFraction, TONEBPM, Queue, last, MusicBlocks, Mouse,
-   getMeasurePosition, getMeterAnchor
+   getMeasurePosition, getMeterAnchor, isEuclideanStep, euclideanToDurations
 */
 
 /*
@@ -40,6 +40,13 @@
 */
 
 /* exported setupMeterActions */
+
+var MusicUtilsRhythm =
+    typeof window !== "undefined" && window.MusicUtilsRhythm
+        ? window.MusicUtilsRhythm
+        : typeof module !== "undefined" && module.exports && typeof require === "function"
+          ? require("../utils/musicutils-rhythm")
+          : {};
 
 /**
  * Sets up all the methods related to different actions for each block in Meter palette.
@@ -401,6 +408,54 @@ function setupMeterActions(activity) {
         static getCurrentMeter(turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
             return tur.singer.beatsPerMeasure + ":" + tur.singer.noteValuePerBeat;
+        }
+
+        /**
+         * "euclidean" block.
+         * Evaluates whether a given step in a Euclidean rhythm is an active pulse (1) or rest (0).
+         *
+         * @static
+         * @param {Number|String} pulses - Number of active pulses (k)
+         * @param {Number|String} steps - Total number of steps in cycle (n)
+         * @param {Number|String} [step] - Current step index (defaults to notes played count)
+         * @param {Number|String} [rotation=0] - Offset rotation
+         * @param {Number} [turtle] - Turtle index in turtles.turtleList
+         * @returns {Number} 1 if active pulse, 0 otherwise
+         */
+        static getEuclideanStep(pulses, steps, step, rotation, turtle) {
+            let s = step;
+            if (s === null || s === undefined || (typeof s === "string" && s.trim() === "")) {
+                const tur =
+                    turtle !== undefined && activity && activity.turtles
+                        ? activity.turtles.ithTurtle(turtle)
+                        : null;
+                s =
+                    tur && tur.singer && tur.singer.tallyNotes !== undefined
+                        ? tur.singer.tallyNotes
+                        : 0;
+            }
+            const fn =
+                (typeof isEuclideanStep !== "undefined" ? isEuclideanStep : null) ||
+                (MusicUtilsRhythm && MusicUtilsRhythm.isEuclideanStep);
+            return fn ? fn(pulses, steps, s, rotation) : 0;
+        }
+
+        /**
+         * "euclidean durations" block.
+         * Returns an array of inter-onset durations for a Euclidean rhythm.
+         *
+         * @static
+         * @param {Number|String} pulses - Number of active pulses (k)
+         * @param {Number|String} steps - Total steps in cycle (n)
+         * @param {Number|String} [totalDuration=1] - Total duration of the cycle
+         * @param {Number|String} [rotation=0] - Offset rotation
+         * @returns {Array<Number>} List of duration fractions
+         */
+        static getEuclideanDurations(pulses, steps, totalDuration, rotation) {
+            const fn =
+                (typeof euclideanToDurations !== "undefined" ? euclideanToDurations : null) ||
+                (MusicUtilsRhythm && MusicUtilsRhythm.euclideanToDurations);
+            return fn ? fn(pulses, steps, totalDuration, rotation) : [];
         }
     };
 }
