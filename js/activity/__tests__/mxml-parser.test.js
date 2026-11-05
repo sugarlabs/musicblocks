@@ -740,6 +740,47 @@ describe("Test 12: Tempo", () => {
         expect(findPositionMismatches(blocks)).toEqual([]);
     });
 
+    it("applies a tempo change from one part to every part", async () => {
+        const xml =
+            '<score-partwise><part id="P1">' +
+            '<measure number="1"><attributes><divisions>8</divisions></attributes>' +
+            '<direction><sound tempo="60"/></direction>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure>" +
+            '<measure number="2"><direction><sound tempo="120"/></direction>' +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            "</measure></part>" +
+            '<part id="P2">' +
+            '<measure number="1"><attributes><divisions>8</divisions></attributes>' +
+            SIMPLE_NOTE("E", 4, "quarter") +
+            "</measure>" +
+            '<measure number="2">' +
+            SIMPLE_NOTE("F", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        const [, , , fNote] = blocks.filter(b => blockName(b) === "newnote");
+        const [, , , secondPartTempo] = blocks.filter(b => blockName(b) === "setbpm3");
+
+        expect(tempos(blocks)).toEqual([60, 120, 60, 120]);
+        expect(fNote[4][0]).toBe(secondPartTempo[0] + 5);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("uses the last tempo direction before the first note", async () => {
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1">' +
+            "<attributes><divisions>8</divisions></attributes>" +
+            '<direction><sound tempo="60"/></direction>' +
+            '<direction><sound tempo="80"/></direction>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+
+        expect(tempos(blocks)).toEqual([80]);
+    });
+
     it("ignores a non-positive or non-numeric tempo rather than staging a bad value", async () => {
         const xml =
             '<score-partwise><part id="P1"><measure number="1">' +
@@ -1553,6 +1594,26 @@ describe("Test 17: Repeats", () => {
         const repeat = blocks.find(b => blockName(b) === "repeat");
         const countBlock = blocks.find(b => b[0] === repeat[4][1]);
         expect(countBlock[1][1].value).toBe(2);
+    });
+
+    it("keeps a tempo after a repeat on the repeat's outgoing flow", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                '<direction><sound tempo="60"/></direction>' +
+                    SIMPLE_NOTE("C", 4, "quarter") +
+                    barlineBackward(null) +
+                    '<direction><sound tempo="120"/></direction>' +
+                    SIMPLE_NOTE("D", 4, "quarter")
+            )
+        );
+
+        const repeat = blocks.find(b => blockName(b) === "repeat");
+        const [, secondTempo] = blocks.filter(b => blockName(b) === "setbpm3");
+
+        expect(repeat[4][3]).toBe(secondTempo[0]);
+        expect(secondTempo[4][0]).toBe(repeat[0]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
     });
 
     it("wraps only a middle section, leaving notes before and after it outside the clamp", async () => {

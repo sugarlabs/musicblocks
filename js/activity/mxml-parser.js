@@ -555,25 +555,77 @@ function _keySignature(partEl) {
 }
 
 /**
- * The tempo that appears before the first note or time-consuming forward move
- * in a part, in MusicXML's own quarter-notes-per-minute units. A later tempo
- * belongs in the note flow, not in the part's preamble.
- * @param {Element} partEl
+ * The score-wide tempo that appears at the very beginning, before any musical
+ * time has elapsed. Later tempos belong in the note flow.
+ * @param {Array<{measureIndex: number, offset: number, tempoBpm: number}>} tempoChanges
  * @returns {number|null}
  */
-function _initialTempo(partEl) {
-    let tempoBpm = null;
-    for (const measureEl of partEl.querySelectorAll(":scope > measure")) {
-        for (const child of measureEl.children) {
-            if (child.tagName === "note" || child.tagName === "forward") return tempoBpm;
-            if (child.tagName !== "direction") continue;
-            const tempo = Number(
-                child.querySelector(":scope > sound[tempo]")?.getAttribute("tempo")
-            );
-            if (Number.isFinite(tempo) && tempo > 0) tempoBpm = tempo;
-        }
-    }
-    return tempoBpm;
+function _initialTempo(tempoChanges) {
+    const initialChanges = tempoChanges.filter(
+        change => change.measureIndex === 0 && change.offset === 0
+    );
+    return initialChanges.length > 0 ? initialChanges[initialChanges.length - 1].tempoBpm : null;
+}
+
+/**
+ * Collects valid MusicXML tempo directions into a score-wide timeline. Offsets
+ * are measured in quarter notes, so the same change can be placed correctly in
+ * every part even when their <divisions> values differ.
+ * @param {NodeListOf<Element>} partEls
+ * @returns {Array<{measureIndex: number, offset: number, tempoBpm: number}>}
+ */
+function _tempoChanges(partEls) {
+    const changes = [];
+
+    partEls.forEach(partEl => {
+        let divisions = 1;
+        partEl.querySelectorAll(":scope > measure").forEach((measureEl, measureIndex) => {
+            const divisionsText = measureEl.querySelector(
+                ":scope > attributes > divisions"
+            )?.textContent;
+            if (divisionsText !== undefined) divisions = Number(divisionsText);
+
+            let offset = 0;
+            for (const child of measureEl.children) {
+                if (child.tagName === "backup") break;
+                if (child.tagName === "direction") {
+                    const tempoBpm = Number(
+                        child.querySelector(":scope > sound[tempo]")?.getAttribute("tempo")
+                    );
+                    if (Number.isFinite(tempoBpm) && tempoBpm > 0) {
+                        changes.push({ measureIndex, offset, tempoBpm });
+                    }
+                    continue;
+                }
+
+                if (child.tagName === "forward") {
+                    const length = Number(_text(child, "duration"));
+                    if (Number.isFinite(length) && length > 0 && divisions > 0) {
+                        offset += length / divisions;
+                    }
+                    continue;
+                }
+
+                if (
+                    child.tagName === "note" &&
+                    child.querySelector(":scope > chord, :scope > grace") === null
+                ) {
+                    const [numerator, denominator] = _noteDuration(child, divisions);
+                    offset += (numerator * 4) / denominator;
+                }
+            }
+        });
+    });
+
+    return changes
+        .sort((a, b) => a.measureIndex - b.measureIndex || a.offset - b.offset)
+        .filter(
+            (change, index) =>
+                index === 0 ||
+                change.measureIndex !== changes[index - 1].measureIndex ||
+                change.offset !== changes[index - 1].offset ||
+                change.tempoBpm !== changes[index - 1].tempoBpm
+        );
 }
 
 /**
@@ -770,13 +822,13 @@ function _applyRepeats(repeats, noteBlocks, noteStartIds, noteEndIds, blockId) {
         const endHidden = byId.get(noteEndIds[endIndex]);
         const prevId = startNote[4][0];
         const prevBlock = byId.get(prevId);
-        const nextNoteId = endIndex + 1 < noteStartIds.length ? noteStartIds[endIndex + 1] : null;
+        const nextFlowId = endHidden[4][1];
 
         const repeatId = blockId;
         const countId = blockId + 1;
         blockId += 2;
 
-        const repeatBlock = [repeatId, "repeat", 0, 0, [prevId, countId, startNote[0], nextNoteId]];
+        const repeatBlock = [repeatId, "repeat", 0, 0, [prevId, countId, startNote[0], nextFlowId]];
         repeatBlocks.push(repeatBlock, [countId, ["number", { value: times }], 0, 0, [repeatId]]);
         byId.set(repeatId, repeatBlock);
 
@@ -796,8 +848,8 @@ function _applyRepeats(repeats, noteBlocks, noteStartIds, noteEndIds, blockId) {
         }
         startNote[4][0] = repeatId;
         endHidden[4][1] = null;
-        if (nextNoteId !== null) {
-            byId.get(nextNoteId)[4][0] = repeatId;
+        if (nextFlowId !== null) {
+            byId.get(nextFlowId)[4][0] = repeatId;
         }
     }
 
@@ -828,11 +880,20 @@ function _applyRepeats(repeats, noteBlocks, noteStartIds, noteEndIds, blockId) {
  * @param {number} chainPrevId - the block id the first note should connect from
  * @param {{beats: number, beatType: number}} timeSignature
  * @param {number|null} initialTempoBpm
+ * @param {Array<{measureIndex: number, offset: number, tempoBpm: number}>} tempoChanges
  * @param {Map<string, string>} instrumentMap - lookup map for drum names
  * @returns {{noteBlocks: Array, lastBlockId: number, producedNotes: boolean,
  *     firstBlockId: number}}
  */
-function _processPart(partEl, blockId, chainPrevId, timeSignature, initialTempoBpm, instrumentMap) {
+function _processPart(
+    partEl,
+    blockId,
+    chainPrevId,
+    timeSignature,
+    initialTempoBpm,
+    tempoChanges,
+    instrumentMap
+) {
     const noteBlocks = [];
     const noteStartIds = [];
     const noteEndIds = [];
@@ -850,6 +911,7 @@ function _processPart(partEl, blockId, chainPrevId, timeSignature, initialTempoB
     let tieDuration = null;
     let tieContent = null;
     let currentTempoBpm = initialTempoBpm;
+    let nextTempoIndex = 0;
 
     const emitNote = (duration, content) => {
         const blocks = _createNoteBlocks(blockId, duration, content, prevId);
@@ -876,29 +938,36 @@ function _processPart(partEl, blockId, chainPrevId, timeSignature, initialTempoB
         currentTempoBpm = tempoBpm;
     };
 
-    for (const measureEl of partEl.querySelectorAll(":scope > measure")) {
+    const emitDueTempoChanges = (measureIndex, offset) => {
+        while (
+            nextTempoIndex < tempoChanges.length &&
+            (tempoChanges[nextTempoIndex].measureIndex < measureIndex ||
+                (tempoChanges[nextTempoIndex].measureIndex === measureIndex &&
+                    tempoChanges[nextTempoIndex].offset <= offset))
+        ) {
+            const change = tempoChanges[nextTempoIndex++];
+            const { tempoBpm } = change;
+            if (change.measureIndex === 0 && change.offset === 0) continue;
+            if (tempoBpm === currentTempoBpm) continue;
+            if (tieDuration !== null) {
+                emitNote(tieDuration, tieContent);
+                tieDuration = null;
+                tieContent = null;
+            }
+            emitTempo(tempoBpm);
+        }
+    };
+
+    for (const [measureIndex, measureEl] of partEl.querySelectorAll(":scope > measure").entries()) {
         const divisionsText = measureEl.querySelector(
             ":scope > attributes > divisions"
         )?.textContent;
         if (divisionsText !== undefined) divisions = Number(divisionsText);
 
+        let offset = 0;
         for (const child of measureEl.children) {
+            emitDueTempoChanges(measureIndex, offset);
             if (child.tagName === "backup") break;
-
-            if (child.tagName === "direction") {
-                const tempoBpm = Number(
-                    child.querySelector(":scope > sound[tempo]")?.getAttribute("tempo")
-                );
-                if (Number.isFinite(tempoBpm) && tempoBpm > 0 && tempoBpm !== currentTempoBpm) {
-                    if (tieDuration !== null) {
-                        emitNote(tieDuration, tieContent);
-                        tieDuration = null;
-                        tieContent = null;
-                    }
-                    emitTempo(tempoBpm);
-                }
-                continue;
-            }
 
             // <forward> moves this voice on by its <duration> with no note
             // written. Skipping it brought every later note in early.
@@ -912,6 +981,7 @@ function _processPart(partEl, blockId, chainPrevId, timeSignature, initialTempoB
                         tieContent = null;
                     }
                     emitNote([length, divisions * 4], null);
+                    offset += length / divisions;
                 }
                 continue;
             }
@@ -996,7 +1066,10 @@ function _processPart(partEl, blockId, chainPrevId, timeSignature, initialTempoB
             } else {
                 emitNote(duration, content);
             }
+
+            offset += (duration[0] * 4) / duration[1];
         }
+        emitDueTempoChanges(measureIndex, Infinity);
     }
 
     // A file that ends mid-tie (a <tie type="start"/> with no matching stop)
@@ -1032,12 +1105,20 @@ function _processPart(partEl, blockId, chainPrevId, timeSignature, initialTempoB
  * @param {number} startId - the first free block id
  * @param {string} title - the score's shared title
  * @param {string} voiceLabel - this part's turtle name, e.g. "Voice 1"
- * @param {number|null} tempoBpm - shared across every part, same as a MIDI
- *     file's tempo applies to every track
+ * @param {number|null} tempoBpm - initial score-wide tempo, if present
+ * @param {Array<{measureIndex: number, offset: number, tempoBpm: number}>} tempoChanges
  * @param {Map<string, string>} instrumentMap - lookup map for drum names
  * @returns {{blocks: Array, nextBlockId: number}}
  */
-function _buildPartBlocks(partEl, startId, title, voiceLabel, tempoBpm, instrumentMap) {
+function _buildPartBlocks(
+    partEl,
+    startId,
+    title,
+    voiceLabel,
+    tempoBpm,
+    tempoChanges,
+    instrumentMap
+) {
     const timeSignature = _initialTimeSignature(partEl);
     const keySignature = _keySignature(partEl);
     const { preamble, settimbreId, nextBlockId } = _buildPreamble(
@@ -1054,6 +1135,7 @@ function _buildPartBlocks(partEl, startId, title, voiceLabel, tempoBpm, instrume
         settimbreId,
         timeSignature,
         tempoBpm,
+        tempoChanges,
         instrumentMap
     );
 
@@ -1099,7 +1181,8 @@ const setupActivityMxmlParser = activityInstance => {
             doc.querySelector("work > work-title")?.textContent ??
             doc.querySelector("movement-title")?.textContent ??
             "title";
-        const tempoBpm = _initialTempo(partEls[0]);
+        const tempoChanges = _tempoChanges(partEls);
+        const tempoBpm = _initialTempo(tempoChanges);
         const instrumentMap = _buildInstrumentMap(doc);
 
         let blockId = 0;
@@ -1111,6 +1194,7 @@ const setupActivityMxmlParser = activityInstance => {
                 title,
                 `Voice ${index + 1}`,
                 tempoBpm,
+                tempoChanges,
                 instrumentMap
             );
             allBlocks.push(...blocks);
