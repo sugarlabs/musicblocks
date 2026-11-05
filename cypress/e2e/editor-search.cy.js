@@ -1,4 +1,4 @@
-/* global cy, beforeEach, describe, it */
+/* global Cypress, cy, beforeEach, describe, expect, it */
 
 describe("JavaScript editor and block search", () => {
     beforeEach(() => {
@@ -91,6 +91,50 @@ describe("JavaScript editor and block search", () => {
             } else {
                 cy.log("highlight.js did not load (offline?) - skipping syntax highlighting check");
             }
+        });
+    });
+
+    it("preserves native search caret movement for both arrows and at boundaries", () => {
+        cy.contains("#palette tbody tr", "Search").click();
+        cy.get("#search").should("be.visible").and("have.focus");
+
+        const cases = [
+            { query: "", caret: 0, left: 0, right: 0 },
+            { query: "pitch", caret: 0, left: 0, right: 1 },
+            { query: "pitch", caret: 2, left: 1, right: 3 },
+            { query: "pitch", caret: 5, left: 4, right: 5 }
+        ];
+
+        cases.forEach(({ query, caret, left, right }) => {
+            [
+                { key: "ArrowLeft", keyCode: 37, expected: left },
+                { key: "ArrowRight", keyCode: 39, expected: right }
+            ].forEach(({ key, keyCode, expected }) => {
+                cy.get("#search").clear();
+                if (query) cy.get("#search").type(query);
+                cy.get("#search").then($input => {
+                    $input[0].setSelectionRange(caret, caret);
+                });
+                // Native events exercise the browser's default caret movement.
+                cy.then(async () => {
+                    for (const type of ["keyDown", "keyUp"]) {
+                        await Cypress.automation("remote:debugger:protocol", {
+                            command: "Input.dispatchKeyEvent",
+                            params: { type, key, code: key, windowsVirtualKeyCode: keyCode }
+                        });
+                    }
+                });
+                cy.get("#search")
+                    .should("be.visible")
+                    .and("have.focus")
+                    .and("have.value", query)
+                    .should($input => {
+                        expect($input[0].selectionStart, `${key} selectionStart`).to.equal(
+                            expected
+                        );
+                        expect($input[0].selectionEnd, `${key} selectionEnd`).to.equal(expected);
+                    });
+            });
         });
     });
 

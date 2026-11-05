@@ -238,7 +238,7 @@ describe("Palettes Class", () => {
         });
 
         test.each(["ArrowLeft", "ArrowRight"])(
-            "preserves native %s behavior without reaching document shortcuts",
+            "leaves %s uncancelled without reaching document shortcuts",
             key => {
                 const event = new KeyboardEvent("keydown", {
                     key,
@@ -255,7 +255,7 @@ describe("Palettes Class", () => {
         );
 
         test.each(["ArrowLeft", "ArrowRight"])(
-            "preserves native %s behavior with the pitch slider open",
+            "leaves %s uncancelled with the pitch slider open",
             key => {
                 const { KeyboardController } = require("../activity/keyboard-controller");
                 const controller = new KeyboardController(mockActivity);
