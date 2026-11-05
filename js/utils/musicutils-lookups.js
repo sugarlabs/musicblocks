@@ -86,15 +86,22 @@ var getInvertMode = name => {
         return name;
     }
 
+    const trimmed = name.trim();
+    const lower = trimmed.toLowerCase();
+
     for (const interval in INVERTMODES) {
+        const localized = INVERTMODES[interval][0];
+        const english = INVERTMODES[interval][1];
+
         if (
-            INVERTMODES[interval][0] === name ||
-            INVERTMODES[interval][1].toLowerCase() === name.toLowerCase()
+            localized === trimmed ||
+            (typeof localized === "string" && localized.toLowerCase() === lower) ||
+            (typeof english === "string" && english.toLowerCase() === lower)
         ) {
-            if (INVERTMODES[interval][0] !== "") {
-                return INVERTMODES[interval][0];
+            if (localized !== "") {
+                return localized;
             } else {
-                return INVERTMODES[interval][1];
+                return english;
             }
         }
     }

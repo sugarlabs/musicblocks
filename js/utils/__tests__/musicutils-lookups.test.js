@@ -139,6 +139,11 @@ describe("musicutils-lookups", () => {
         expect(lookups.getVoiceIcon({})).toBe("images/voices.svg");
         expect(lookups.getVoiceSynthName(undefined)).toBeNull();
 
+        expect(lookups.getInvertMode(null)).toBeNull();
+        expect(lookups.getInvertMode(undefined)).toBeUndefined();
+        expect(lookups.getInvertMode(123)).toBe(123);
+        expect(lookups.getInvertMode({})).toEqual({});
+
         expect(lookups.getOscillatorTypes("")).toBeNull();
         expect(lookups.getOscillatorTypes(null)).toBeNull();
         expect(lookups.getOscillatorTypes(undefined)).toBeNull();
@@ -177,6 +182,8 @@ describe("musicutils-lookups", () => {
 
     it("looks up invert modes, intervals, filters and oscillators", () => {
         expect(lookups.getInvertMode("even")).toBe("even");
+        expect(lookups.getInvertMode("  EVEN  ")).toBe("even");
+        expect(lookups.getInvertMode("SCALAR")).toBe("scalar");
         expect(lookups.getInvertMode(null)).toBeNull();
         expect(lookups.getInvertMode(undefined)).toBeUndefined();
         expect(lookups.getInvertMode(123)).toBe(123);
