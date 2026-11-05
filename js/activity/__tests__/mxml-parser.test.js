@@ -1533,6 +1533,53 @@ describe("Test 17: Repeats", () => {
         expect(countBlock[1][1].value).toBe(2);
     });
 
+    it("flattens first and second MusicXML repeat endings into the correct playback order", async () => {
+        const xml =
+            '<score-partwise><part id="P1">' +
+            '<measure number="1"><attributes><divisions>1</divisions></attributes>' +
+            '<barline location="left"><repeat direction="forward"/></barline>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure>" +
+            '<measure number="2">' +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            "</measure>" +
+            '<measure number="3"><barline location="left"><ending number="1" type="start"/></barline>' +
+            SIMPLE_NOTE("E", 4, "quarter") +
+            '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+            "</measure>" +
+            '<measure number="4"><barline location="left"><ending number="2" type="start"/></barline>' +
+            SIMPLE_NOTE("F", 4, "quarter") +
+            '<barline location="right"><ending number="2" type="stop"/></barline>' +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const settimbre = blocks.find(block => blockName(block) === "settimbre");
+        const playedPitches = [];
+        let note = byId.get(settimbre[4][2]);
+        while (note !== undefined && note !== null) {
+            const vspace = byId.get(note[4][2]);
+            const pitch = byId.get(vspace[4][1]);
+            playedPitches.push({
+                name: byId.get(pitch[4][1])[1][1].value,
+                octave: byId.get(pitch[4][2])[1][1].value
+            });
+            note = byId.get(byId.get(note[4][3])[4][1]);
+        }
+
+        expect(playedPitches).toEqual([
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 },
+            { name: "E", octave: 4 },
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 },
+            { name: "F", octave: 4 }
+        ]);
+        expect(blocks.filter(b => blockName(b) === "repeat")).toHaveLength(0);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
     it("wraps only a middle section, leaving notes before and after it outside the clamp", async () => {
         const { blocks } = await parseAndCapture(
             scorePartwise(
