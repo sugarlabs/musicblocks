@@ -515,11 +515,7 @@ class SearchController {
                 activity.searchWidget.addEventListener("focus", () => {
                     const input = activity.searchWidget;
 
-                    if (
-                        input.style.visibility !== "visible" ||
-                        !input.value?.trim() ||
-                        input.idInput_custom
-                    ) {
+                    if (input.style.visibility !== "visible" || !input.value?.trim()) {
                         return;
                     }
 
@@ -562,6 +558,7 @@ class SearchController {
         }
 
         activity.searchWidget.value = "";
+        activity.searchWidget.idInput_custom = "";
         activity.update = true;
     }
 
@@ -913,6 +910,7 @@ class SearchController {
         }
 
         activity.helpfulSearchWidget.value = "";
+        activity.helpfulSearchWidget.idInput_custom = "";
         document.getElementById("helpfulSearchDiv").style.display = "none";
         activity.update = true;
     }

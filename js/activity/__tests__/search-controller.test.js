@@ -814,7 +814,7 @@ describe("SearchController.doSearch - autocomplete initialization", () => {
         input.remove();
     });
 
-    test("does not restore suggestions for hidden, empty, or selected searches", () => {
+    test("restores new queries but ignores hidden or empty searches", () => {
         const input = document.createElement("input");
         input.id = "search";
         input.value = "pitch";
@@ -842,11 +842,13 @@ describe("SearchController.doSearch - autocomplete initialization", () => {
         input.dispatchEvent(new Event("focus"));
         expect($elem.autocomplete).not.toHaveBeenCalled();
 
-        // An already selected block must not trigger another search.
+        // A previous block selection must not block a new search query.
         input.value = "pitch";
-        input.idInput_custom = "pitch";
+        input.idInput_custom = "drum";
         input.dispatchEvent(new Event("focus"));
-        expect($elem.autocomplete).not.toHaveBeenCalled();
+
+        expect($elem.autocomplete).toHaveBeenCalledTimes(1);
+        expect($elem.autocomplete).toHaveBeenCalledWith("search", "pitch");
 
         input.remove();
     });
@@ -875,6 +877,52 @@ describe("SearchController.doSearch - autocomplete initialization", () => {
         input.dispatchEvent(new Event("focus"));
 
         expect($elem.autocomplete).toHaveBeenCalledTimes(1);
+        expect($elem.autocomplete).toHaveBeenCalledWith("search", "pitch");
+
+        input.remove();
+    });
+
+    test("restores suggestions for a new query after selecting a block", () => {
+        const input = document.createElement("input");
+        input.id = "search";
+        input.style.visibility = "visible";
+        document.body.appendChild(input);
+
+        const drum = makeProtoBlock("drum", "drum");
+        const pitch = makeProtoBlock("pitch", "pitch");
+
+        const activity = makeActivity({ drum, pitch });
+        activity.searchWidget = input;
+
+        setupSearchController(activity);
+        activity.searchController.doSearch();
+
+        // Select a drum suggestion through the actual autocomplete callback.
+        const select = $elem.getOpts().select;
+        select(
+            { preventDefault: jest.fn(), key: "" },
+            {
+                item: {
+                    label: "drum",
+                    value: "drum",
+                    specialDict: drum
+                }
+            }
+        );
+
+        // Confirm that the block was placed.
+        expect(activity.palettes.dict["test-palette"].makeBlockFromSearch).toHaveBeenCalled();
+
+        // Block placement must clear the previous selection.
+        expect(input.idInput_custom).toBe("");
+
+        // User enters a different query.
+        input.value = "pitch";
+        $elem.autocomplete.mockClear();
+
+        // Refocusing should restore suggestions for the new query.
+        input.dispatchEvent(new Event("focus"));
+
         expect($elem.autocomplete).toHaveBeenCalledWith("search", "pitch");
 
         input.remove();
@@ -1119,9 +1167,8 @@ describe("SearchController.doSearch - autocomplete initialization", () => {
         $elem.getOpts().select(event, ui);
 
         expect(event.preventDefault).toHaveBeenCalled();
-        // The nested doSearch() that select triggers places the block and then
-        // clears value back to ""; idInput_custom is not cleared.
-        expect(activity.searchWidget.idInput_custom).toBe("drum");
+        // The nested doSearch() places the block and clears the selection state.
+        expect(activity.searchWidget.idInput_custom).toBe("");
         expect(activity.searchWidget.protoblk).toBe(block);
         expect(activity.palettes.dict["test-palette"].makeBlockFromSearch).toHaveBeenCalled();
     });
@@ -1411,9 +1458,8 @@ describe("SearchController.doHelpfulSearch - autocomplete initialization", () =>
         $elem.getOpts().select(event, ui);
 
         expect(event.preventDefault).toHaveBeenCalled();
-        // The nested doHelpfulSearch() that select triggers places the block and
-        // then clears value; idInput_custom is not cleared.
-        expect(activity.helpfulSearchWidget.idInput_custom).toBe("drum");
+        // The nested doHelpfulSearch() clears the selection state after placement.
+        expect(activity.helpfulSearchWidget.idInput_custom).toBe("");
         expect(activity.helpfulSearchWidget.protoblk).toBe(block);
         expect(activity.palettes.dict["test-palette"].makeBlockFromSearch).toHaveBeenCalled();
     });
