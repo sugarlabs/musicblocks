@@ -166,6 +166,11 @@ $(document).ready(() => {
             evt.target.value === "" ? "none" : "initial";
     });
 
+    document.getElementById("global-search-2").addEventListener("input", evt => {
+        document.getElementById("search-close-2").style.display =
+            evt.target.value === "" ? "none" : "initial";
+    });
+
     document.getElementById("local-tab").addEventListener("click", evt => {
         toggleSearch(false);
     });
