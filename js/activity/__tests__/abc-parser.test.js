@@ -630,6 +630,7 @@ describe("Test 4: Triplets", () => {
         });
 
         const blocks = await parseAndCapture(twoVoiceTune);
+        expect(blocksOfType(blocks, "newnote")).toHaveLength(7);
 
         // Follow each note's duration and pitch connections, excluding meter and pitch numbers.
         const byId = new Map(blocks.map(block => [block[0], block]));
