@@ -419,6 +419,19 @@ describe("setupNumberBlocks", () => {
             expect(result).toEqual(0);
             global.MathUtility.doPower = (a, b) => Math.pow(Number(a), Number(b));
         });
+
+        it("should call errorMsg with ZERODIVIDEERRORMSG when MathUtility.doPower throws DivByZeroError", () => {
+            activity.blocks.blockList[120] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn(() => 0);
+            global.MathUtility.doPower = () => {
+                throw new Error("DivByZeroError");
+            };
+            const powerBlock = createdBlocks["power"];
+            const result = powerBlock.arg(logo, 0, 120, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.ZERODIVIDEERRORMSG, 120);
+            expect(result).toEqual(0);
+            global.MathUtility.doPower = (a, b) => Math.pow(Number(a), Number(b));
+        });
     });
 
     describe("SqrtBlock - error branches", () => {

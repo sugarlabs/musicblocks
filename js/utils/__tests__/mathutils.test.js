@@ -613,6 +613,16 @@ describe("MathUtility", () => {
             expect(MathUtility.doPower(4, 0.5)).toBe(2);
         });
 
+        it("throws NanError when base is negative with fractional exponent", () => {
+            expect(() => MathUtility.doPower(-4, 0.5)).toThrow("NanError");
+            expect(() => MathUtility.doPower(-2, 1.5)).toThrow("NanError");
+        });
+
+        it("throws DivByZeroError when raising zero to a negative power", () => {
+            expect(() => MathUtility.doPower(0, -1)).toThrow("DivByZeroError");
+            expect(() => MathUtility.doPower(0, -5)).toThrow("DivByZeroError");
+        });
+
         test("throws NanError for string base", () => {
             expect(() => MathUtility.doPower("2", 3)).toThrow("NanError");
         });
