@@ -5615,9 +5615,8 @@ class Blocks {
 
                     if (this.blockList[b].name === "action") {
                         if (this.blockList[b].connections[1] !== null) {
-                            currentActionNames.push(
-                                this.blockList[this.blockList[b].connections[1]].value
-                            );
+                            const val = this.blockList[this.blockList[b].connections[1]].value;
+                            currentActionNames.push(typeof val === "number" ? val.toString() : val);
                         }
                     } else if (this.blockList[b].name === "storein") {
                         if (this.blockList[b].connections[1] !== null) {
@@ -5831,7 +5830,10 @@ class Blocks {
                         if (
                             ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].includes(blkName)
                         ) {
-                            const oldName = thisBlkData[1][1]["value"];
+                            let oldName = thisBlkData[1][1]["value"];
+                            if (typeof oldName === "number") {
+                                oldName = oldName.toString();
+                            }
                             if (renamedActions.has(oldName)) {
                                 if (
                                     typeof thisBlkData[1][1] === "object" &&
@@ -5848,8 +5850,16 @@ class Blocks {
                                 if (renamedActions.has(doBlkData[1][1])) {
                                     doBlkData[1][1] = renamedActions.get(doBlkData[1][1]);
                                 }
+                            } else if (typeof doBlkData[1][1] === "number") {
+                                const oldName = doBlkData[1][1].toString();
+                                if (renamedActions.has(oldName)) {
+                                    doBlkData[1][1] = renamedActions.get(oldName);
+                                }
                             } else {
-                                const oldName = doBlkData[1][1]["value"];
+                                let oldName = doBlkData[1][1]["value"];
+                                if (typeof oldName === "number") {
+                                    oldName = oldName.toString();
+                                }
                                 if (renamedActions.has(oldName)) {
                                     if (
                                         typeof doBlkData[1][1] === "object" &&

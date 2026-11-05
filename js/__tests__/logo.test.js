@@ -5035,5 +5035,39 @@ describe("Logo.processSpeak", () => {
             expect(actionChild.protoblock.flow).not.toHaveBeenCalled();
             expect(tur.queue.length).toBe(0);
         });
+
+        test("executes downstream block connected below a disabled action", () => {
+            const actionClamp = {
+                name: "action",
+                disabled: true,
+                isDisabled: () => true,
+                connections: [null, null, 1, 2],
+                protoblock: { args: 0, flow: jest.fn() },
+                isValueBlock: () => false,
+                isArgBlock: () => false
+            };
+            const actionChild = {
+                ...makeFlowBlock("forward"),
+                connections: [0, null],
+                protoblock: { args: 0, flow: jest.fn() }
+            };
+            const downstreamBlock = {
+                ...makeFlowBlock("forward"),
+                connections: [0, null],
+                protoblock: { args: 0, flow: jest.fn() }
+            };
+            logo.blockList = [actionClamp, actionChild, downstreamBlock];
+            mockActivity.blocks.findTopBlock = jest.fn(blk => 0);
+            mockActivity.blocks.sameGeneration = jest.fn((first, child) => first === child);
+
+            const tur = logo.turtles.ithTurtle(0);
+            tur.parentFlowQueue = [];
+
+            logo.runFromBlockNow(logo, 0, 0, 1, null, 0);
+
+            expect(actionClamp.protoblock.flow).not.toHaveBeenCalled();
+            expect(actionChild.protoblock.flow).not.toHaveBeenCalled();
+            expect(downstreamBlock.protoblock.flow).toHaveBeenCalled();
+        });
     });
 });

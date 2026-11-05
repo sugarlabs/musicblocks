@@ -2618,6 +2618,15 @@ class Logo {
             }
 
             // Run the last flow in the queue.
+            const hasDisabledAction =
+                logo.blockList &&
+                logo.blockList.some(
+                    b =>
+                        b &&
+                        b.name === "action" &&
+                        (b.disabled || (typeof b.isDisabled === "function" && b.isDisabled()))
+                );
+
             while (tur.queue.length > queueStart) {
                 const lastQueue = logo.deps.utils.last(tur.queue);
 
@@ -2633,6 +2642,7 @@ class Logo {
                 }
 
                 if (
+                    hasDisabledAction &&
                     nextBlock !== null &&
                     nextBlock !== undefined &&
                     logo.blocks &&
@@ -2648,8 +2658,19 @@ class Logo {
                             (typeof topBlockObj.isDisabled === "function" &&
                                 topBlockObj.isDisabled()))
                     ) {
-                        nextBlock = null;
-                        continue;
+                        const childConn = topBlockObj.connections
+                            ? topBlockObj.connections[2]
+                            : null;
+                        const isChildFlow =
+                            childConn !== null &&
+                            childConn !== undefined &&
+                            (nextBlock === childConn ||
+                                (typeof logo.blocks.sameGeneration === "function" &&
+                                    logo.blocks.sameGeneration(childConn, nextBlock)));
+                        if (isChildFlow) {
+                            nextBlock = null;
+                            continue;
+                        }
                     }
                 }
                 break;

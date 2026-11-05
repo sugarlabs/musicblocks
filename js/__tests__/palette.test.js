@@ -2327,7 +2327,7 @@ describe("Palettes Class", () => {
                     [8, ["text", { value: "disabledText", disabled: true }], 0, 0, [7]],
                     [
                         9,
-                        ["pitch", { value: "G4", manualAccidental: "natural", disabled: true }],
+                        ["notename", { value: "F", manualAccidental: "♮", disabled: true }],
                         0,
                         0,
                         [8]
@@ -2364,8 +2364,8 @@ describe("Palettes Class", () => {
                 { value: "disabledText", disabled: true }
             ]);
             expect(capturedBlocks[9][1]).toEqual([
-                "pitch",
-                { value: "G4", manualAccidental: "natural", disabled: true }
+                "notename",
+                { value: "F", manualAccidental: "♮", disabled: true }
             ]);
 
             expect(collapseToggle).toHaveBeenCalled();

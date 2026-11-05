@@ -1550,6 +1550,30 @@ describe("Blocks Foundation", () => {
             expect(blockObjs[1][1][1].disabled).toBe(true);
         });
 
+        it("normalizes numeric existing action names and references during rename", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.protoBlockDict = {
+                action: { style: "clamp", hasCapability: () => false },
+                nameddo: { style: "basic", hasCapability: () => false },
+                text: { style: "basic", hasCapability: () => false }
+            };
+            const blockObjs = [
+                [0, "action", 0, 0, [null, 1, null]],
+                [1, ["text", "42"], 0, 0, [0]],
+                [2, ["nameddo", { value: 42 }], 0, 0, [null]]
+            ];
+            blocks.blockList = [
+                { name: "action", trash: false, connections: [null, 1, null] },
+                { name: "number", trash: false, value: 42, connections: [0] }
+            ];
+            blocks.activity.logo = { synth: { preloadProjectSamples: jest.fn() } };
+            blocks._processOneBlock = jest.fn();
+            blocks._chunkLoad = jest.fn();
+            blocks.loadNewBlocks(blockObjs);
+            expect(blockObjs[1][1]).toEqual(["text", { value: "421" }]);
+            expect(blockObjs[2][1][1].value).toBe("421");
+        });
+
         it("sets disabled state and alpha when loading a block with disabled property", () => {
             const blocks = new Blocks(mockActivity);
             const mockBlk = {
