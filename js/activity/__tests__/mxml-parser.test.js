@@ -702,6 +702,21 @@ describe("Test 12: Tempo", () => {
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
+    it("reads a measure-level <sound tempo> into a setbpm3 block", async () => {
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1">' +
+            "<attributes><divisions>8</divisions></attributes>" +
+            '<sound tempo="96"/>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+
+        expect(tempos(blocks)).toEqual([96]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
     it("scales the setbpm3 value by the time signature's beat type", async () => {
         // MusicXML tempo is always quarter notes per minute; the setbpm3 block
         // counts beats of the project's own time signature (see
@@ -765,6 +780,28 @@ describe("Test 12: Tempo", () => {
         expect(tempos(blocks)).toEqual([60, 120, 60, 120]);
         expect(fNote[4][0]).toBe(secondPartTempo[0] + 5);
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("does not leave tempo-only blocks for a part with no notes", async () => {
+        const xml =
+            '<score-partwise><part id="P1">' +
+            '<measure number="1"><attributes><divisions>8</divisions></attributes>' +
+            '<direction><sound tempo="60"/></direction>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure>" +
+            '<measure number="2"><direction><sound tempo="120"/></direction>' +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            "</measure></part>" +
+            '<part id="P2"><measure number="1"><attributes><divisions>8</divisions></attributes></measure>' +
+            '<measure number="2"></measure></part></score-partwise>';
+
+        const { blocks } = await parseAndCapture(xml);
+
+        // The empty part still has the shared initial tempo in its preamble,
+        // but it must not receive the later, unreachable tempo change.
+        expect(tempos(blocks)).toEqual([60, 120, 60]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
     });
 
     it("uses the last tempo direction before the first note", async () => {

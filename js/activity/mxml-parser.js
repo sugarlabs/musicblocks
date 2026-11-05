@@ -588,9 +588,12 @@ function _tempoChanges(partEls) {
             let offset = 0;
             for (const child of measureEl.children) {
                 if (child.tagName === "backup") break;
-                if (child.tagName === "direction") {
+                if (child.tagName === "direction" || child.tagName === "sound") {
                     const tempoBpm = Number(
-                        child.querySelector(":scope > sound[tempo]")?.getAttribute("tempo")
+                        (child.tagName === "sound"
+                            ? child
+                            : child.querySelector(":scope > sound[tempo]")
+                        )?.getAttribute("tempo")
                     );
                     if (Number.isFinite(tempoBpm) && tempoBpm > 0) {
                         changes.push({ measureIndex, offset, tempoBpm });
@@ -894,6 +897,7 @@ function _processPart(
     tempoChanges,
     instrumentMap
 ) {
+    const startingBlockId = blockId;
     const noteBlocks = [];
     const noteStartIds = [];
     const noteEndIds = [];
@@ -1079,8 +1083,11 @@ function _processPart(
         emitNote(tieDuration, tieContent);
     }
 
-    if (noteBlocks.length === 0) {
-        return { noteBlocks, lastBlockId: blockId, producedNotes, firstBlockId: null };
+    if (!producedNotes) {
+        // A part with no notes must not leave behind tempo-only blocks. They
+        // have no flow from its preamble, and would consume ids needed by the
+        // following part.
+        return { noteBlocks: [], lastBlockId: startingBlockId, producedNotes, firstBlockId: null };
     }
 
     noteBlocks[noteBlocks.length - 1][4][1] = null;
