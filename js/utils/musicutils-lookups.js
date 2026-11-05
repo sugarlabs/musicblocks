@@ -302,11 +302,11 @@ var getOscillatorTypes = name => {
  */
 var getDrumIcon = name => {
     if (typeof name !== "string") {
-        return "images/drum.svg";
+        return "images/snaredrum.svg";
     } else if (name === "") {
         name = DEFAULTDRUM;
     } else if (name.slice(0, 4) === "http") {
-        return "images/drum.svg";
+        return "images/snaredrum.svg";
     }
 
     for (let i = 0; i < DRUMNAMES.length; i++) {
@@ -316,7 +316,7 @@ var getDrumIcon = name => {
     }
 
     // console.debug(name + " not found in DRUMNAMES");
-    return "images/drum.svg";
+    return "images/snaredrum.svg";
 };
 
 /**
@@ -388,7 +388,7 @@ var getNoiseIcon = name => {
     } else if (name === "") {
         name = DEFAULTNOISE;
     } else if (name.slice(0, 4) === "http") {
-        return "images/noises.svg";
+        return "images/synth.svg";
     }
 
     for (let i = 0; i < NOISENAMES.length; i++) {
