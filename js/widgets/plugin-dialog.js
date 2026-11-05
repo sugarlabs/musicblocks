@@ -73,12 +73,7 @@ class PluginDialog {
         const backdrop = document.createElement("div");
         backdrop.classList.add("plugin-modal-backdrop");
         backdrop.addEventListener("click", () => {
-            if (backdrop.parentNode) {
-                backdrop.parentNode.removeChild(backdrop);
-            }
-            if (modal.parentNode) {
-                modal.parentNode.removeChild(modal);
-            }
+            this._closeModal(modal);
         });
         return backdrop;
     }
@@ -95,16 +90,100 @@ class PluginDialog {
     }
 
     /**
-     * Removes a modal and its backdrop from the DOM.
+     * Mounts a modal and its backdrop to the document body, captures the previously
+     * focused element for restoration on close, attaches an accessible keyboard trap,
+     * and shifts initial focus to the specified interactive element.
+     * @param {HTMLElement} modal - The modal element to mount.
+     * @param {HTMLElement} backdrop - The backdrop overlay behind the modal.
+     * @param {HTMLElement} [focusTarget] - The initial element to focus inside the modal.
+     */
+    _openModal(modal, backdrop, focusTarget) {
+        modal._previouslyFocused =
+            document.activeElement && typeof document.activeElement.focus === "function"
+                ? document.activeElement
+                : null;
+
+        const onKeyDown = event => {
+            if (!document.body.contains(modal)) {
+                return;
+            }
+
+            if (event.key === "Escape") {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                this._closeModal(modal);
+                return;
+            }
+
+            if (event.key !== "Tab") {
+                return;
+            }
+
+            const focusable = Array.from(
+                modal.querySelectorAll(
+                    'button:not([disabled]), select:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+                )
+            );
+            if (focusable.length === 0) {
+                event.preventDefault();
+                return;
+            }
+
+            const index = focusable.indexOf(document.activeElement);
+            if (event.shiftKey) {
+                if (index <= 0) {
+                    event.preventDefault();
+                    focusable[focusable.length - 1].focus();
+                }
+            } else {
+                if (index === focusable.length - 1 || index === -1) {
+                    event.preventDefault();
+                    focusable[0].focus();
+                }
+            }
+        };
+
+        modal._onKeyDown = onKeyDown;
+        document.addEventListener("keydown", onKeyDown, true);
+
+        document.body.appendChild(backdrop);
+        document.body.appendChild(modal);
+
+        if (focusTarget && typeof focusTarget.focus === "function") {
+            focusTarget.focus();
+        } else if (typeof modal.focus === "function") {
+            modal.focus();
+        }
+    }
+
+    /**
+     * Removes a modal and its backdrop from the DOM, detaches keyboard listeners,
+     * and restores focus to the previously active element.
      * @param {HTMLElement} modal - The modal element.
      */
     _closeModal(modal) {
+        if (!modal) return;
+
+        if (modal._onKeyDown) {
+            document.removeEventListener("keydown", modal._onKeyDown, true);
+            modal._onKeyDown = null;
+        }
+
         const backdrop = modal._backdrop;
         if (backdrop && backdrop.parentNode) {
             backdrop.parentNode.removeChild(backdrop);
         }
         if (modal.parentNode) {
             modal.parentNode.removeChild(modal);
+        }
+
+        if (
+            modal._previouslyFocused &&
+            typeof modal._previouslyFocused.focus === "function" &&
+            document.contains(modal._previouslyFocused)
+        ) {
+            modal._previouslyFocused.focus();
+            modal._previouslyFocused = null;
         }
     }
 
@@ -117,16 +196,23 @@ class PluginDialog {
         const modal = document.createElement("div");
         modal.classList.add("modalBox");
         modal.id = "open-plugin-modal";
+        modal.tabIndex = -1;
+        modal.setAttribute("role", "dialog");
+        modal.setAttribute("aria-modal", "true");
+        modal.setAttribute("aria-labelledby", "open-plugin-title");
+        modal.setAttribute("aria-describedby", "open-plugin-message");
 
         const backdrop = this._createBackdrop(modal);
         modal._backdrop = backdrop;
 
         const title = document.createElement("h2");
+        title.id = "open-plugin-title";
         title.textContent = _("Load Plugin");
         title.classList.add("modal-title");
         modal.appendChild(title);
 
         const message = document.createElement("p");
+        message.id = "open-plugin-message";
         message.textContent = _("Select a built-in plugin to load, or upload a local file.");
         message.classList.add("modal-message");
         modal.appendChild(message);
@@ -187,8 +273,7 @@ class PluginDialog {
         buttonContainer.appendChild(rightGroup);
 
         modal.appendChild(buttonContainer);
-        document.body.appendChild(backdrop);
-        document.body.appendChild(modal);
+        this._openModal(modal, backdrop, select);
     }
 
     deletePlugin() {
@@ -206,16 +291,23 @@ class PluginDialog {
         const modal = document.createElement("div");
         modal.classList.add("modalBox");
         modal.id = "delete-plugin-confirm";
+        modal.tabIndex = -1;
+        modal.setAttribute("role", "dialog");
+        modal.setAttribute("aria-modal", "true");
+        modal.setAttribute("aria-labelledby", "delete-plugin-title");
+        modal.setAttribute("aria-describedby", "delete-plugin-message");
 
         const backdrop = this._createBackdrop(modal);
         modal._backdrop = backdrop;
 
         const title = document.createElement("h2");
+        title.id = "delete-plugin-title";
         title.textContent = _("Delete Plugin");
         title.classList.add("modal-title");
         modal.appendChild(title);
 
         const message = document.createElement("p");
+        message.id = "delete-plugin-message";
         message.textContent = _("Select the plugin you want to delete:");
         message.classList.add("modal-message");
         modal.appendChild(message);
@@ -261,8 +353,7 @@ class PluginDialog {
         buttonContainer.appendChild(confirmBtn);
         buttonContainer.appendChild(cancelBtn);
         modal.appendChild(buttonContainer);
-        document.body.appendChild(backdrop);
-        document.body.appendChild(modal);
+        this._openModal(modal, backdrop, select);
     }
 
     /**
@@ -274,16 +365,23 @@ class PluginDialog {
         const modal = document.createElement("div");
         modal.classList.add("modalBox");
         modal.id = "no-plugins-msg";
+        modal.tabIndex = -1;
+        modal.setAttribute("role", "alertdialog");
+        modal.setAttribute("aria-modal", "true");
+        modal.setAttribute("aria-labelledby", "no-plugins-title");
+        modal.setAttribute("aria-describedby", "no-plugins-message");
 
         const backdrop = this._createBackdrop(modal);
         modal._backdrop = backdrop;
 
         const title = document.createElement("h2");
+        title.id = "no-plugins-title";
         title.textContent = _("Delete Plugin");
         title.classList.add("modal-title");
         modal.appendChild(title);
 
         const message = document.createElement("p");
+        message.id = "no-plugins-message";
         message.textContent = _("No custom plugins are currently loaded.");
         message.classList.add("modal-message");
         modal.appendChild(message);
@@ -300,8 +398,7 @@ class PluginDialog {
 
         buttonContainer.appendChild(okBtn);
         modal.appendChild(buttonContainer);
-        document.body.appendChild(backdrop);
-        document.body.appendChild(modal);
+        this._openModal(modal, backdrop, okBtn);
     }
 }
 
