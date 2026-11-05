@@ -286,4 +286,155 @@ describe("MBDialog", () => {
             expect(frame.style.left).toBe("150px");
         });
     });
+
+    describe("Accessibility and Keyboard Navigation", () => {
+        test("sets W3C ARIA semantics, aria-modal, and labelledby/describedby IDs for alert and prompt", () => {
+            window.MBDialog.alert("Alert Message", "Alert Title");
+            const alertFrame = document.querySelector(".windowFrame");
+            const alertTitle = document.querySelector(".wftTitle");
+            const alertMessage = alertFrame.querySelector(".wfbWidget > div");
+
+            expect(alertFrame.getAttribute("role")).toBe("alertdialog");
+            expect(alertFrame.getAttribute("aria-modal")).toBe("true");
+            expect(alertFrame.getAttribute("aria-labelledby")).toBe(alertTitle.id);
+            expect(alertFrame.getAttribute("aria-describedby")).toBe(alertMessage.id);
+            expect(alertTitle.id).toMatch(/^mb-dialog-\d+-\d+-title$/);
+            expect(alertMessage.id).toMatch(/^mb-dialog-\d+-\d+-message$/);
+
+            // Opening prompt replaces alert
+            window.MBDialog.prompt({ title: "Prompt Title", message: "Prompt Message" });
+            const promptFrame = document.querySelector(".windowFrame");
+            const promptTitle = document.querySelector(".wftTitle");
+            const promptMessage = promptFrame.querySelector(".wfbWidget > div");
+
+            expect(promptFrame.getAttribute("role")).toBe("dialog");
+            expect(promptFrame.getAttribute("aria-modal")).toBe("true");
+            expect(promptFrame.getAttribute("aria-labelledby")).toBe(promptTitle.id);
+            expect(promptFrame.getAttribute("aria-describedby")).toBe(promptMessage.id);
+        });
+
+        test("moves initial focus to okButton on alert and restores focus on close", () => {
+            const triggerButton = document.createElement("button");
+            triggerButton.id = "triggerBtn";
+            document.body.appendChild(triggerButton);
+            triggerButton.focus();
+            expect(document.activeElement).toBe(triggerButton);
+
+            window.MBDialog.alert("Focus Alert");
+            const okButton = document.querySelector(".confirm-button");
+            expect(document.activeElement).toBe(okButton);
+
+            okButton.click();
+            expect(document.querySelector(".windowFrame")).toBeNull();
+            expect(document.activeElement).toBe(triggerButton);
+        });
+
+        test("makes top-bar close button keyboard-accessible with role, tabindex, and Enter/Space activation", () => {
+            const onCloseMock = jest.fn();
+            window.MBDialog.alert("Accessible Close", "Title", { onClose: onCloseMock });
+
+            const closeBtn = document.querySelector(".wftButton.close");
+            expect(closeBtn.getAttribute("role")).toBe("button");
+            expect(closeBtn.getAttribute("tabindex")).toBe("0");
+
+            // Enter key activation
+            const enterEvent = new KeyboardEvent("keydown", { key: "Enter", bubbles: true });
+            closeBtn.dispatchEvent(enterEvent);
+
+            expect(document.querySelector(".windowFrame")).toBeNull();
+            expect(onCloseMock).toHaveBeenCalledTimes(1);
+
+            // Re-open and test Space key activation
+            window.MBDialog.alert("Space Close");
+            const closeBtn2 = document.querySelector(".wftButton.close");
+            const spaceEvent = new KeyboardEvent("keydown", { key: " ", bubbles: true });
+            closeBtn2.dispatchEvent(spaceEvent);
+
+            expect(document.querySelector(".windowFrame")).toBeNull();
+        });
+
+        test("intercepts Escape and stops immediate propagation so document capture handlers are not triggered", () => {
+            const parentCaptureHandler = jest.fn();
+            document.addEventListener("keydown", parentCaptureHandler, true);
+
+            try {
+                window.MBDialog.alert("Escape Intercept");
+                expect(document.querySelector(".windowFrame")).toBeTruthy();
+
+                const escapeEvent = new KeyboardEvent("keydown", {
+                    key: "Escape",
+                    bubbles: true,
+                    cancelable: true
+                });
+                const stopImmediateSpy = jest.spyOn(escapeEvent, "stopImmediatePropagation");
+
+                window.dispatchEvent(escapeEvent);
+
+                expect(stopImmediateSpy).toHaveBeenCalled();
+                expect(document.querySelector(".windowFrame")).toBeNull();
+                expect(parentCaptureHandler).not.toHaveBeenCalled();
+            } finally {
+                document.removeEventListener("keydown", parentCaptureHandler, true);
+            }
+        });
+
+        test("traps focus cyclically inside alert dialog on Tab and Shift+Tab", () => {
+            window.MBDialog.alert("Tab Trap Alert");
+            const closeBtn = document.querySelector(".wftButton.close");
+            const okButton = document.querySelector(".confirm-button");
+
+            // Initial focus is on okButton (the last focusable element in alert)
+            expect(document.activeElement).toBe(okButton);
+
+            // Tab forward from last element wraps to first element (closeBtn)
+            const forwardTab = new KeyboardEvent("keydown", {
+                key: "Tab",
+                bubbles: true,
+                cancelable: true
+            });
+            document.dispatchEvent(forwardTab);
+            expect(document.activeElement).toBe(closeBtn);
+
+            // Shift+Tab backward from first element wraps to last element (okButton)
+            const backwardTab = new KeyboardEvent("keydown", {
+                key: "Tab",
+                shiftKey: true,
+                bubbles: true,
+                cancelable: true
+            });
+            document.dispatchEvent(backwardTab);
+            expect(document.activeElement).toBe(okButton);
+        });
+
+        test("traps focus cyclically inside prompt dialog across input, buttons, and close button", () => {
+            window.MBDialog.prompt({ title: "Prompt Trap", message: "Enter value" });
+            const closeBtn = document.querySelector(".wftButton.close");
+            const input = document.querySelector("input[type='text']");
+            const cancelBtn = document.querySelector(".cancel-button");
+            const confirmBtn = document.querySelector(".confirm-button");
+
+            // Focus on confirmBtn (last element)
+            confirmBtn.focus();
+            expect(document.activeElement).toBe(confirmBtn);
+
+            // Tab from last element wraps to closeBtn (first element)
+            const tabEvent = new KeyboardEvent("keydown", {
+                key: "Tab",
+                bubbles: true,
+                cancelable: true
+            });
+            document.dispatchEvent(tabEvent);
+            expect(document.activeElement).toBe(closeBtn);
+
+            // Shift+Tab from closeBtn wraps to confirmBtn (last element)
+            const shiftTabEvent = new KeyboardEvent("keydown", {
+                key: "Tab",
+                shiftKey: true,
+                bubbles: true,
+                cancelable: true
+            });
+            document.dispatchEvent(shiftTabEvent);
+            expect(document.activeElement).toBe(confirmBtn);
+        });
+    });
 });
