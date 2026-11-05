@@ -242,7 +242,9 @@ window.widgetWindows = {
 
             if (win._maximized) {
                 win._frame.style.top = `${toolbarBottom}px`;
-                win._frame.style.height = `calc(100vh - ${toolbarBottom}px)`;
+                if (!win._rolled) {
+                    win._frame.style.height = `calc(100vh - ${toolbarBottom}px)`;
+                }
                 continue;
             }
 
@@ -507,12 +509,8 @@ class WidgetWindow {
                 this.unroll();
             } else {
                 this._rollup();
-                this._toggleClass(rollButton, "plus");
             }
             this.takeFocus();
-            this._frame.style.width = "auto";
-            this._frame.style.height = "auto";
-            this._frame.style.minHeight = "0px";
             if (e && typeof e.preventDefault === "function") {
                 e.preventDefault();
             }
@@ -936,8 +934,10 @@ class WidgetWindow {
         this._overlay(false);
         this._frame.style.width = "auto";
         this._frame.style.height = "auto";
-        this._frame.style.minHeight = "420px";
-        this._frame.style.minWidth = "470px";
+        this._frame.style.minHeight = this._rolled ? "0px" : "420px";
+        this._frame.style.maxWidth = "100vw";
+        this._frame.style.minWidth =
+            window.innerWidth && window.innerWidth <= 600 ? "0px" : "470px";
     }
 
     /**
@@ -945,6 +945,7 @@ class WidgetWindow {
      * @returns {void}
      */
     _maximize() {
+        this._savedPos = [this._frame.style.left, this._frame.style.top];
         window.widgetWindows._maximizedCache[this._key] = true;
         this._maxminIcon.setAttribute("src", "header-icons/icon-contract.svg");
         if (this._maxminButton) {
@@ -954,8 +955,6 @@ class WidgetWindow {
         this._maximized = true;
         this.unroll();
         this.takeFocus();
-
-        this._savedPos = [this._frame.style.left, this._frame.style.top];
 
         const toolbarBottom = window.widgetWindows._getToolbarBottom();
 
@@ -1156,7 +1155,11 @@ class WidgetWindow {
     _rollup() {
         this._rolled = true;
         this._body.style.display = "none";
+        this._frame.style.width = "auto";
+        this._frame.style.height = "auto";
+        this._frame.style.minHeight = "0px";
         if (this._rollButton) {
+            this._rollButton.classList.add("plus");
             this._rollButton.setAttribute("aria-expanded", "false");
             this._rollButton.setAttribute("aria-label", _("Expand window"));
             this._rollButton.title = _("Expand");
@@ -1171,6 +1174,32 @@ class WidgetWindow {
     unroll() {
         this._rolled = false;
         this._body.style.display = "flex";
+        if (this._maximized) {
+            const toolbarBottom = window.widgetWindows._getToolbarBottom();
+            this._frame.style.width = "100vw";
+            this._frame.style.height = `calc(100vh - ${toolbarBottom}px)`;
+            this._frame.style.left = "0";
+            this._frame.style.top = `${toolbarBottom}px`;
+            this._frame.style.minHeight = "0px";
+        } else {
+            this._frame.style.width = "auto";
+            this._frame.style.height = "auto";
+            this._frame.style.minHeight = "420px";
+            this._frame.style.maxWidth = "100vw";
+            if (window.innerWidth && window.innerWidth <= 600) {
+                this._frame.style.minWidth = "0px";
+            } else {
+                this._frame.style.minWidth = "470px";
+            }
+
+            // Ensure expanding a rolled-up window does not leave it extending below or outside the viewport.
+            const curX = parseFloat(this._frame.style.left) || 0;
+            const curY = parseFloat(this._frame.style.top) || 0;
+            const clamped = this._clampToViewport(curX, curY);
+            if (clamped[0] !== curX || clamped[1] !== curY) {
+                this.setPosition(clamped[0], clamped[1]);
+            }
+        }
         if (this._rollButton) {
             if (this._rollButton.classList.contains("plus")) {
                 this._rollButton.classList.remove("plus");
