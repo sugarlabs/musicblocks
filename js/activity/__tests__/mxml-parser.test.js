@@ -1912,3 +1912,52 @@ describe("MusicXML MIDI program instrument fallback", () => {
         expect(voice[1][1].value).toBe("violin");
     });
 });
+
+describe("MusicXML pitched-note instrument selection", () => {
+    it("uses the instrument referenced after a leading rest", async () => {
+        const xml = `
+            <score-partwise>
+                <part-list>
+                    <score-part id="P1">
+                        <part-name>Voice 1</part-name>
+                        <score-instrument id="P1-I1">
+                            <instrument-name>electronic synth</instrument-name>
+                        </score-instrument>
+                        <score-instrument id="P1-I2">
+                            <instrument-name>violin</instrument-name>
+                        </score-instrument>
+                        <midi-instrument id="P1-I2">
+                            <midi-program>41</midi-program>
+                        </midi-instrument>
+                    </score-part>
+                </part-list>
+                <part id="P1">
+                    <measure number="1">
+                        <attributes><divisions>8</divisions></attributes>
+                        <note>
+                            <rest/>
+                            <duration>8</duration>
+                            <type>quarter</type>
+                        </note>
+                        <note>
+                            <pitch>
+                                <step>C</step>
+                                <octave>4</octave>
+                            </pitch>
+                            <duration>8</duration>
+                            <instrument id="P1-I2"/>
+                            <type>quarter</type>
+                        </note>
+                    </measure>
+                </part>
+            </score-partwise>
+        `;
+
+        const { blocks } = await parseAndCapture(xml);
+        const settimbre = blocks.find(block => blockName(block) === "settimbre");
+        const voice = blocks.find(block => block[0] === settimbre[4][1]);
+
+        expect(voice[1][1].value).toBe("violin");
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+});

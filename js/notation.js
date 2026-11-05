@@ -147,8 +147,9 @@ class Notation {
         const isNotatedDrum = drumName && !["noise1", "noise2", "noise3"].includes(drumName);
         const instrumentName = tur.singer.instrumentNames?.length
             ? last(tur.singer.instrumentNames)
-            : "electronic synth";
-
+            : tur.singer.voices?.length
+              ? last(tur.singer.voices)
+              : "electronic synth";
         this._notationStaging[turtle].push([
             note,
             obj[0],

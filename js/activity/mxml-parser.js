@@ -659,7 +659,25 @@ function _pitchedInstrumentName(doc, partEl) {
 
     if (!scorePart) return "electronic synth";
 
-    const scoreInstrument = scorePart.querySelector(":scope > score-instrument");
+    // Use the first playable pitched note, not the first listed instrument.
+    const firstPitchedNote = Array.from(partEl.querySelectorAll(":scope > measure > note")).find(
+        note =>
+            note.querySelector(":scope > pitch") !== null &&
+            note.querySelector(":scope > cue") === null &&
+            note.querySelector(":scope > grace") === null &&
+            note.querySelector(":scope > chord") === null
+    );
+
+    if (!firstPitchedNote) return "electronic synth";
+
+    const referencedId = firstPitchedNote.querySelector(":scope > instrument")?.getAttribute("id");
+
+    const scoreInstruments = Array.from(scorePart.querySelectorAll(":scope > score-instrument"));
+
+    const scoreInstrument = referencedId
+        ? scoreInstruments.find(instrument => instrument.getAttribute("id") === referencedId)
+        : scoreInstruments[0];
+
     const name = scoreInstrument
         ?.querySelector(":scope > instrument-name")
         ?.textContent?.trim()
@@ -679,10 +697,13 @@ function _pitchedInstrumentName(doc, partEl) {
     }
 
     // If the name is unknown, try the corresponding MIDI program.
-    const instrumentId = scoreInstrument?.getAttribute("id");
-    const midiInstrument = Array.from(scorePart.querySelectorAll(":scope > midi-instrument")).find(
-        instrument => !instrumentId || instrument.getAttribute("id") === instrumentId
-    );
+    const instrumentId = referencedId ?? scoreInstrument?.getAttribute("id");
+
+    const midiInstruments = Array.from(scorePart.querySelectorAll(":scope > midi-instrument"));
+
+    const midiInstrument = instrumentId
+        ? midiInstruments.find(instrument => instrument.getAttribute("id") === instrumentId)
+        : midiInstruments[0];
 
     const programText = midiInstrument?.querySelector(":scope > midi-program")?.textContent?.trim();
 
