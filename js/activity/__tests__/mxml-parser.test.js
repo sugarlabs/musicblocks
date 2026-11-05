@@ -841,6 +841,47 @@ describe("Test 13: Multi-part scores", () => {
     });
 });
 
+describe("Timewise score layout", () => {
+    it("imports multiple parts across multiple measures in part-list order", async () => {
+        const durationNote = (step, octave, duration) =>
+            `<note><pitch><step>${step}</step><octave>${octave}</octave></pitch><duration>${duration}</duration></note>`;
+        const xml =
+            '<score-timewise xmlns="http://www.musicxml.org/ns/musicxml"><movement-title>Timewise Tune</movement-title>' +
+            '<part-list><score-part id="P1"/><score-part id="P2"/></part-list>' +
+            '<measure number="1">' +
+            `<part id="P2"><attributes><divisions>4</divisions></attributes>${durationNote("D", 3, 4)}</part>` +
+            `<part id="P1"><attributes><divisions>8</divisions></attributes>${durationNote("C", 4, 8)}</part>` +
+            "</measure>" +
+            '<measure number="2">' +
+            `<part id="P1">${durationNote("G", 4, 4)}</part>` +
+            `<part id="P2">${durationNote("A", 3, 2)}</part>` +
+            "</measure></score-timewise>";
+
+        const { blocks } = await parseAndCapture(xml);
+
+        expect(blocks.find(b => b[0] === 2)[1][1].value).toBe("Timewise Tune");
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "G", octave: 4 },
+            { name: "D", octave: 3 },
+            { name: "A", octave: 3 }
+        ]);
+        expect(noteValues(blocks)).toEqual([
+            [8, 32],
+            [4, 32],
+            [4, 16],
+            [2, 16]
+        ]);
+        expect(
+            blocks
+                .filter(b => blockName(b) === "text")
+                .map(b => b[1][1].value)
+                .filter(value => value.startsWith("Voice"))
+        ).toEqual(["Voice 1", "Voice 2"]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+});
+
 describe("Test 14: Grace notes", () => {
     it("skips a grace note rather than importing it as a full-length note", async () => {
         // A grace note has a <type> (quarter here) but no <duration> -- it

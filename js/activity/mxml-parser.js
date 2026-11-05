@@ -1032,6 +1032,68 @@ function _buildPartBlocks(partEl, startId, title, voiceLabel, tempoBpm, instrume
 }
 
 /**
+ * Returns score parts in the partwise layout used by the importer. For a
+ * timewise score, transposes each measure's part contents into per-part
+ * measures while preserving the part-list order.
+ * @param {Document} doc
+ * @returns {Element[]}
+ */
+function _scoreParts(doc) {
+    const partwiseScore = doc.querySelector("score-partwise");
+    if (partwiseScore) {
+        return Array.from(partwiseScore.querySelectorAll(":scope > part"));
+    }
+
+    const timewiseScore = doc.querySelector("score-timewise");
+    if (!timewiseScore) return [];
+
+    const measures = Array.from(timewiseScore.querySelectorAll(":scope > measure"));
+    const partIds = new Set(
+        Array.from(timewiseScore.querySelectorAll(":scope > part-list > score-part"))
+            .map(part => part.getAttribute("id"))
+            .filter(Boolean)
+    );
+    for (const measure of measures) {
+        for (const part of measure.querySelectorAll(":scope > part")) {
+            const id = part.getAttribute("id");
+            if (id) partIds.add(id);
+        }
+    }
+
+    const parts = new Map(
+        Array.from(partIds, id => {
+            const part = doc.createElementNS(timewiseScore.namespaceURI, "part");
+            part.setAttribute("id", id);
+            return [id, part];
+        })
+    );
+
+    for (const measure of measures) {
+        const measureParts = new Map(
+            Array.from(measure.querySelectorAll(":scope > part"), part => [
+                part.getAttribute("id"),
+                part
+            ])
+        );
+        for (const [id, part] of parts) {
+            const normalizedMeasure = doc.createElementNS(timewiseScore.namespaceURI, "measure");
+            for (const attribute of measure.attributes) {
+                normalizedMeasure.setAttribute(attribute.name, attribute.value);
+            }
+            const sourcePart = measureParts.get(id);
+            if (sourcePart) {
+                for (const child of sourcePart.children) {
+                    normalizedMeasure.appendChild(child.cloneNode(true));
+                }
+            }
+            part.appendChild(normalizedMeasure);
+        }
+    }
+
+    return Array.from(parts.values());
+}
+
+/**
  * Attaches parseMXML to the activity instance, mirroring how
  * js/activity/abc-parser.js attaches parseABC. See the file header for what
  * this PR covers and what's deferred to follow-ups.
@@ -1047,7 +1109,7 @@ const setupActivityMxmlParser = activityInstance => {
             return null;
         }
 
-        const partEls = doc.querySelectorAll("score-partwise > part");
+        const partEls = _scoreParts(doc);
         if (partEls.length === 0) {
             this.errorMsg("Could not find a part to import in this MusicXML file.");
             return null;
