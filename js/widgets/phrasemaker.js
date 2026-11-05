@@ -2566,32 +2566,6 @@ class PhraseMaker {
                     );
                 }
 
-                const keySignature = this.activity.turtles.ithTurtle(0).singer.keySignature;
-                const frequency = this._deps.noteToFrequency(noteObj[0] + noteObj[1], keySignature);
-                const hasDuplicatePitch = this.rowLabels.some((rowLabel, rowIndex) => {
-                    if (
-                        rowIndex === index ||
-                        rowLabel.toLowerCase() === "rest" ||
-                        this._deps.getDrumName(rowLabel) !== null ||
-                        PhraseMakerUtils.MATRIXGRAPHICS.includes(rowLabel) ||
-                        PhraseMakerUtils.MATRIXGRAPHICS2.includes(rowLabel) ||
-                        PhraseMakerUtils.MATRIXSYNTHS.includes(rowLabel)
-                    ) {
-                        return false;
-                    }
-
-                    return (
-                        this._deps.noteToFrequency(
-                            rowLabel + this.rowArgs[rowIndex],
-                            keySignature
-                        ) === frequency
-                    );
-                });
-                if (hasDuplicatePitch) {
-                    this.activity.errorMsg(this._("Ignoring duplicate pitch numbers."));
-                    return;
-                }
-
                 // Allow sorting since sorted order might be lost.
                 this.sorted = false;
 

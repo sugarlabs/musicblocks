@@ -303,13 +303,17 @@ describe("Phrase Maker widget", () => {
         openPhraseMaker();
         cy.get(`${PM} [data-i="0"]`, { timeout: 15000 }).should("have.length.at.least", 1);
 
+        const selectedLabel = "mi4";
         let originalLabels;
-        let selectedLabel;
         cy.get(`${PM} .labelcol`).then($labels => {
             originalLabels = Array.from($labels, label => label.textContent.replace(/\s/g, ""));
-            selectedLabel = originalLabels[0];
+            const selectedRow = Array.from($labels).find(
+                label => label.textContent.replace(/\s/g, "") === selectedLabel
+            );
+            expect(selectedRow, "mi4 row exists before insertion").to.exist;
+            const selectedRowIndex = selectedRow.getAttribute("alt").split("__")[0];
 
-            cy.get(`${PM} [data-i="0"][data-j="0"]`)
+            cy.get(`${PM} [data-i="${selectedRowIndex}"][data-j="0"]`)
                 .first()
                 .trigger("mousedown", { force: true })
                 .trigger("mouseup", { force: true })
@@ -328,13 +332,20 @@ describe("Phrase Maker widget", () => {
             cy.get(`${PM} .labelcol`, { timeout: 15000 }).should($nextLabels =>
                 expect($nextLabels).to.have.length(originalLabels.length + 1)
             );
-            cy.get(`${PM} [data-i="0"][data-j="0"]`)
-                .first()
-                .should($cell => {
-                    expect($cell[0].style.backgroundColor, "cell remains selected").to.equal(
-                        "black"
-                    );
-                });
+            cy.get(`${PM} .labelcol`).then($nextLabels => {
+                const selectedRow = Array.from($nextLabels).find(
+                    label => label.textContent.replace(/\s/g, "") === selectedLabel
+                );
+                const rowIndex = selectedRow.getAttribute("alt").split("__")[0];
+                cy.get(`${PM} [data-i="${rowIndex}"][data-j="0"]`)
+                    .first()
+                    .should($cell => {
+                        expect(
+                            $cell[0].style.backgroundColor,
+                            "mi4 cell remains selected"
+                        ).to.equal("black");
+                    });
+            });
 
             cy.window().then(win => {
                 const phraseMaker = win.ActivityContext.getActivity().logo.phraseMaker;
@@ -363,7 +374,10 @@ describe("Phrase Maker widget", () => {
                 cy.get(`${PM} [data-i="${rowIndex}"][data-j="0"]`)
                     .first()
                     .should($cell => {
-                        expect($cell[0].style.backgroundColor).to.equal("black");
+                        expect(
+                            $cell[0].style.backgroundColor,
+                            "mi4 remains selected after sorting"
+                        ).to.equal("black");
                     });
             });
         });
