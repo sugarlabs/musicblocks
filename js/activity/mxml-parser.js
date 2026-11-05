@@ -1175,19 +1175,32 @@ function _processPart(
                 const repeatEl = child.querySelector(":scope > repeat");
                 const endingEl = child.querySelector(":scope > ending");
                 const direction = repeatEl?.getAttribute("direction");
-                if (
+                const startsFirstEnding =
                     endingEl?.getAttribute("type") === "start" &&
                     endingEl
                         .getAttribute("number")
                         ?.split(",")
                         .map(number => number.trim())
-                        .includes("1")
-                ) {
+                        .includes("1");
+                if (startsFirstEnding) {
+                    // The first ending does not run immediately before the
+                    // second ending. A tie cannot cross that alternate path,
+                    // so close it before placing the ending boundary.
+                    if (tieDuration !== null) {
+                        emitNote(tieDuration, tieContent);
+                        tieDuration = null;
+                        tieContent = null;
+                    }
                     firstEndingStartIndex = noteStartIds.length;
                 }
                 if (direction === "forward") {
                     repeatPendingStart = noteStartIds.length;
                 } else if (direction === "backward") {
+                    if (firstEndingStartIndex !== null && tieDuration !== null) {
+                        emitNote(tieDuration, tieContent);
+                        tieDuration = null;
+                        tieContent = null;
+                    }
                     const times = Number(repeatEl.getAttribute("times")) || 2;
                     const startIndex = repeatPendingStart ?? lastRepeatEnd + 1;
                     const endIndex = noteStartIds.length - 1;

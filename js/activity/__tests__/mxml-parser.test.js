@@ -1976,6 +1976,45 @@ describe("Test 17: Repeats", () => {
         expect(findPositionMismatches(blocks)).toEqual([]);
     });
 
+    it("does not merge a tie from the first ending into the second ending", async () => {
+        const tiedEndingNote = (step, tie) =>
+            `<note><pitch><step>${step}</step><octave>4</octave></pitch>` +
+            `<duration>1</duration><type>quarter</type>${tie}</note>`;
+        const xml =
+            '<score-partwise><part id="P1">' +
+            '<measure number="1"><attributes><divisions>1</divisions></attributes>' +
+            '<barline location="left"><repeat direction="forward"/></barline>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure>" +
+            '<measure number="2">' +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            "</measure>" +
+            '<measure number="3"><barline location="left"><ending number="1" type="start"/></barline>' +
+            tiedEndingNote("E", '<tie type="start"/>') +
+            '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+            "</measure>" +
+            '<measure number="4"><barline location="left"><ending number="2" type="start"/></barline>' +
+            tiedEndingNote("E", '<tie type="stop"/>') +
+            '<barline location="right"><ending number="2" type="stop"/></barline>' +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const settimbre = blocks.find(block => blockName(block) === "settimbre");
+        const playedPitches = [];
+        let note = byId.get(settimbre[4][2]);
+        while (note !== undefined && note !== null) {
+            const vspace = byId.get(note[4][2]);
+            const pitch = byId.get(vspace[4][1]);
+            playedPitches.push(byId.get(pitch[4][1])[1][1].value);
+            note = byId.get(byId.get(note[4][3])[4][1]);
+        }
+
+        expect(playedPitches).toEqual(["C", "D", "E", "C", "D", "E"]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
     it("wraps only a middle section, leaving notes before and after it outside the clamp", async () => {
         const { blocks } = await parseAndCapture(
             scorePartwise(
