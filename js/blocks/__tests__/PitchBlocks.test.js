@@ -565,6 +565,28 @@ describe("setupPitchBlocks", () => {
             block.setter(logo, 60, 0);
             expect(turtles.ithTurtle(0).singer.lastNotePlayed).toEqual(["C5", 4]);
         });
+
+        it("MyPitchBlock reads the innermost note being built in nested notes", () => {
+            const block = createdBlocks["mypitch"];
+            const singer = turtles.ithTurtle(0).singer;
+            logo.inStatusMatrix = false;
+            singer.lastNotePlayed = null;
+            singer.inNoteBlock = [32, 40];
+            singer.notePitches = { 32: ["E"], 40: ["A"] };
+            singer.noteOctaves = { 32: [4], 40: [5] };
+
+            block.arg(logo, 0, 10);
+
+            expect(global.getNote).toHaveBeenCalledWith(
+                "A",
+                5,
+                0,
+                singer.keySignature,
+                singer.movable,
+                null,
+                activity.errorMsg
+            );
+        });
     });
 
     describe("HertzBlock All Branches", () => {
