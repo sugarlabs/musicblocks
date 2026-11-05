@@ -2496,6 +2496,30 @@ describe("Logo runLogoCommands", () => {
         expect(logo.actions["my-action"]).toBe(2);
     });
 
+    test("does not register disabled action stack in actions dictionary", () => {
+        mockActivity.blocks.stackList = [0];
+        logo.blockList = [
+            {
+                name: "action",
+                connections: [null, 1, 2],
+                trash: false,
+                disabled: true,
+                isDisabled: () => true
+            },
+            {
+                name: "number",
+                value: "disabled-action",
+                protoblock: { parameter: false },
+                isValueBlock: () => true
+            },
+            { name: "print", connections: [null] }
+        ];
+
+        logo.runLogoCommands(null, null);
+
+        expect(logo.actions["disabled-action"]).toBeUndefined();
+    });
+
     test("fires _cleanupAfterCompletion when _lastNoteTimeout is cancelled on re-run", () => {
         logo._lastNoteTimeout = 42;
         logo._cleanupAfterCompletion = jest.fn();

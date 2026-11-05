@@ -1991,19 +1991,20 @@ class Logo {
                     startBlocks.push(this.blocks.stackList[blk]);
                 }
             } else if (this.blockList[this.blocks.stackList[blk]].name === "action") {
+                const actionBlock = this.blockList[this.blocks.stackList[blk]];
+                const isActionDisabled =
+                    actionBlock.disabled ||
+                    (typeof actionBlock.isDisabled === "function" && actionBlock.isDisabled());
                 // Does the action stack have a name?
-                const c = this.blockList[this.blocks.stackList[blk]].connections[1];
+                const c = actionBlock.connections[1];
                 // Is there a block in the action clamp?
-                const b = this.blockList[this.blocks.stackList[blk]].connections[2];
+                const b = actionBlock.connections[2];
                 // eslint-disable-next-line eqeqeq
-                if (c != null && b != null) {
-                    // Don't use an action block in the trash
-                    if (!this.blockList[this.blocks.stackList[blk]].trash) {
-                        // We need to calculate the value of block c.
-                        // this.actions[this.blockList[c].value] = b;
-                        const name = this.parseArg(this, 0, c, null);
-                        this.actions[name] = b;
-                    }
+                if (c != null && b != null && !actionBlock.trash && !isActionDisabled) {
+                    // We need to calculate the value of block c.
+                    // this.actions[this.blockList[c].value] = b;
+                    const name = this.parseArg(this, 0, c, null);
+                    this.actions[name] = b;
                 }
             }
         }

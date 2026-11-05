@@ -125,7 +125,8 @@ global.getTemperamentsList = jest.fn();
 global.getVoiceSynthName = jest.fn();
 global.i18nSolfege = jest.fn();
 global.MathUtility = {
-    isNumber: jest.fn()
+    isNumber: jest.fn(),
+    doRandom: jest.fn((min, max) => min || 42)
 };
 global.mixedNumber = jest.fn();
 global.piemenuBlockContext = jest.fn();
@@ -1416,6 +1417,58 @@ describe("Blocks Foundation", () => {
             blocks.selectedStack = 0;
             const copied = blocks._copyBlocksToObj(false);
             expect(copied[0][1]).toEqual(["media", { value: null, disabled: true }]);
+        });
+
+        it("saves disabled action stack with action name instead of '---'", () => {
+            const blocks = new Blocks(mockActivity);
+            mockActivity.blocksContainer.x = 0;
+            mockActivity.blocksContainer.y = 0;
+            blocks.storage = { macros: "" };
+            blocks.macroDict = {};
+            blocks.addToMyPalette = jest.fn();
+            blocks.activity.palettes = { updatePalettes: jest.fn() };
+            blocks.blockList = [
+                {
+                    name: "action",
+                    disabled: true,
+                    connections: [null, 1],
+                    isValueBlock: () => false,
+                    isArgBlock: () => false
+                },
+                {
+                    name: "text",
+                    value: "myAction",
+                    disabled: true,
+                    connections: [0],
+                    isValueBlock: () => true,
+                    isArgBlock: () => false
+                }
+            ];
+            blocks.selectedStack = 0;
+            blocks.saveStack();
+            expect(blocks.addToMyPalette).toHaveBeenCalledWith("myAction");
+        });
+
+        it("saves disabled show stack with generated name instead of '---'", () => {
+            const blocks = new Blocks(mockActivity);
+            mockActivity.blocksContainer.x = 0;
+            mockActivity.blocksContainer.y = 0;
+            blocks.storage = { macros: "" };
+            blocks.macroDict = {};
+            blocks.addToMyPalette = jest.fn();
+            blocks.activity.palettes = { updatePalettes: jest.fn() };
+            blocks.blockList = [
+                {
+                    name: "show",
+                    disabled: true,
+                    connections: [null],
+                    isValueBlock: () => false,
+                    isArgBlock: () => false
+                }
+            ];
+            blocks.selectedStack = 0;
+            blocks.saveStack();
+            expect(blocks.addToMyPalette).toHaveBeenCalledWith(expect.stringMatching(/^show-\d+$/));
         });
 
         it("sets disabled state and alpha when loading a block with disabled property", () => {

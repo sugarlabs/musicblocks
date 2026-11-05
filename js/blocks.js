@@ -5144,25 +5144,30 @@ class Blocks {
              * If the first block is an action block, the its first
              * connection is the block containing its label.
              */
+            const blockNameOf = item => (Array.isArray(item?.[1]) ? item[1][0] : item?.[1]);
             let name = "---";
-            if (["temperament1", "definemode", "action"].includes(blockObjs[0][1])) {
+            const firstName = blockNameOf(blockObjs[0]);
+            if (["temperament1", "definemode", "action"].includes(firstName)) {
                 const nameBlk = blockObjs[0][4][1];
                 if (nameBlk === null) {
                     console.debug("action not named... skipping");
                 } else {
-                    if (typeof blockObjs[nameBlk][1][1] === "string") {
-                        name = blockObjs[nameBlk][1][1];
-                    } else if (typeof blockObjs[nameBlk][1][1] === "number") {
-                        name = blockObjs[nameBlk][1][1].toString();
-                    } else {
-                        name = blockObjs[nameBlk][1][1]["value"];
+                    const blkData = blockObjs[nameBlk][1];
+                    const valData = Array.isArray(blkData) ? blkData[1] : blkData;
+                    if (typeof valData === "string") {
+                        name = valData;
+                    } else if (typeof valData === "number") {
+                        name = valData.toString();
+                    } else if (valData && typeof valData === "object") {
+                        name = valData["value"];
                     }
                 }
             } else {
                 /** Look for "show", "turtleshell", or "customsample". */
                 for (let i = 0; i < blockObjs.length; i++) {
-                    if (["show", "turtleshell", "customsample"].includes(blockObjs[i][1])) {
-                        switch (blockObjs[i][1]) {
+                    const blkName = blockNameOf(blockObjs[i]);
+                    if (["show", "turtleshell", "customsample"].includes(blkName)) {
+                        switch (blkName) {
                             case "show":
                                 name = `${_("Show").toLowerCase()}-${MathUtility.doRandom(
                                     0,
@@ -5173,10 +5178,11 @@ class Blocks {
                                 name = `${_("avatar")}-${MathUtility.doRandom(0, 1000)}`;
                                 break;
                             case "sample":
+                            case "customsample":
                                 name = `${_("sample")}-${MathUtility.doRandom(0, 1000)}`;
                                 break;
                             default:
-                                name = `${blockObjs[i][1]}-${MathUtility.doRandom(0, 1000)}`;
+                                name = `${blkName}-${MathUtility.doRandom(0, 1000)}`;
                                 break;
                         }
                         break;
