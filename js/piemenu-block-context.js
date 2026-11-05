@@ -149,8 +149,10 @@ const piemenuBlockContext = block => {
     if (mouse) {
         //.TRANS: play this mouse silently, or hear it again
         wheel.navItems[muteButton].setTooltip(mouse.muted ? _("Unmute") : _("Mute"));
-        //.TRANS: hear only this mouse (again: hear all the mice)
-        wheel.navItems[soloButton].setTooltip(_("Solo"));
+        //.TRANS: hear only this mouse, or hear all the mice again
+        wheel.navItems[soloButton].setTooltip(
+            block.activity.turtles.isSoloed(mouse) ? _("Unsolo") : _("Solo")
+        );
         wheel.navItems[muteButton].navigateFunction = () => {
             block.activity.turtles.setMuted(mouse, !mouse.muted);
             docById("contextWheelDiv").style.display = "none";

@@ -42,9 +42,19 @@ describe("Mute a mouse", () => {
             activity.blocks.activeBlock = start.blockIndex;
             win.piemenuBlockContext(start);
         });
-        cy.get("#contextWheelDiv").should("be.visible");
-        cy.get("#wheelnav-contextWheelDiv-title-4").should("contain.text", "Mute");
-        cy.get("#wheelnav-contextWheelDiv-slice-4").click({ force: true });
+        // Find the item by its tooltip, not by its place in the wheel.
+        cy.get("#contextWheelDiv")
+            .should("be.visible")
+            .then($wheel => {
+                const slices = [
+                    ...$wheel[0].querySelectorAll("[id^='wheelnav-contextWheelDiv-slice-']")
+                ];
+                const mute = slices.find(
+                    slice => slice.querySelector("title")?.textContent === "Mute"
+                );
+                expect(mute, "Mute item").to.exist;
+                cy.wrap(mute).click({ force: true });
+            });
 
         const played = [];
         cy.window().then(win => {

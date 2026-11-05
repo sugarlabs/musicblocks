@@ -538,8 +538,7 @@ class EmbeddedGraphicsScheduler {
 
     _speak(suppressOutput, turtle, b, timeout) {
         const logo = this._logo;
-        // A muted mouse is not heard, so it does not speak either.
-        if (suppressOutput || logo.turtles.ithTurtle(turtle)?.muted) return;
+        if (suppressOutput) return;
         const arg = logo.parseArg(
             logo,
             turtle,
@@ -548,7 +547,13 @@ class EmbeddedGraphicsScheduler {
             logo.receivedArg
         );
         logo._timerManager.setGuardedTimeout(
-            () => logo.processSpeak(arg),
+            () => {
+                // A muted mouse is not heard, so it does not speak either. Check
+                // when the speech is due, in case the mouse was muted meanwhile.
+                if (!logo.turtles.ithTurtle(turtle)?.muted) {
+                    logo.processSpeak(arg);
+                }
+            },
             timeout,
             this._stopped(logo.turtles.ithTurtle(turtle))
         );
