@@ -3583,6 +3583,8 @@ describe("noteIsSolfege", () => {
         "D♯": "re" + SHARP,
         "E♭": "mi" + FLAT,
         "E": "mi",
+        "E♯": "mi" + SHARP,
+        "F♭": "fa" + FLAT,
         "F": "fa",
         "F♯": "fa" + SHARP,
         "G♭": "sol" + FLAT,
@@ -3605,8 +3607,13 @@ describe("noteIsSolfege", () => {
         expect(noteIsSolfege("R")).toBe(false);
     });
 
-    it("should return true for a note with an unrecognized sharp (e.g., E♯)", () => {
-        expect(noteIsSolfege("E♯")).toBe(true);
+    it("should return false for E♯ and F♭, which are letter names too", () => {
+        expect(noteIsSolfege("E♯")).toBe(false);
+        expect(noteIsSolfege("F♭")).toBe(false);
+    });
+
+    it("should return true for a solfege name", () => {
+        expect(noteIsSolfege("mi")).toBe(true);
     });
 });
 
@@ -3625,6 +3632,8 @@ describe("getSolfege", () => {
         "D♯": "re" + SHARP,
         "E♭": "mi" + FLAT,
         "E": "mi",
+        "E♯": "mi" + SHARP,
+        "F♭": "fa" + FLAT,
         "F": "fa",
         "F♯": "fa" + SHARP,
         "G♭": "sol" + FLAT,
