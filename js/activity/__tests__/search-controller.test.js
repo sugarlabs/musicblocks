@@ -310,6 +310,23 @@ describe("setupSearchController", () => {
         expect(sc.helpfulSearchDiv).toBeNull();
         expect(sc.searchUI).toBe(activity.searchUI);
     });
+
+    test.each(["constructor", "__proto__"])("handles search term %s safely", term => {
+        const activity = makeActivity();
+        setupSearchController(activity);
+        const sc = activity.searchController;
+
+        const initialResults = sc.filterSuggestions(term);
+        expect(initialResults).toEqual([]);
+        expect(sc.filterSuggestions(term)).toBe(initialResults);
+
+        sc.prepSearchWidget();
+
+        const resetResults = sc.filterSuggestions(term);
+        expect(resetResults).toEqual([]);
+        expect(resetResults).not.toBe(initialResults);
+        expect(sc.filterSuggestions(term)).toBe(resetResults);
+    });
 });
 
 // ---------------------------------------------------------------------------
