@@ -117,10 +117,21 @@ class Turtles {
 
         // Instantiate a new Turtle object
         const turtle = new Turtle(this.activity, id, turtleName, this, startBlock);
-        // A mouse saved as muted loads muted, and a mouse added while
-        // another one is soloed is muted, so the solo goes on.
+        // The companion that plays a mouse's "on every beat" action follows
+        // that mouse (which already points to the index it is about to get).
+        // Otherwise, a mouse saved as muted loads muted, and a mouse added
+        // while another one is soloed is muted, so the solo goes on.
+        let owner = null;
+        for (let j = 0; j < this.getTurtleCount(); j++) {
+            if (this.getTurtle(j).companionTurtle === this.getTurtleCount()) {
+                owner = this.getTurtle(j);
+                break;
+            }
+        }
         const soloed = this._soloTurtle;
-        if (
+        if (owner) {
+            turtle.muted = owner.muted;
+        } else if (
             (blkInfoAvailable && infoDict["muted"] === true) ||
             (soloed && !soloed.inTrash && this.turtleList.includes(soloed))
         ) {
@@ -270,11 +281,28 @@ class Turtles {
      */
     _mute(turtle, muted) {
         turtle.muted = muted;
-        const container = turtle.startBlock?.container;
-        if (container) {
-            container.alpha = muted ? 0.5 : 1;
+        // The companion that plays this mouse's "on every beat" action follows
+        // it. Read the list directly, since getTurtle() throws for a bad index.
+        const companion = this.turtleList?.[turtle.companionTurtle];
+        if (companion) {
+            companion.muted = muted;
+        }
+        const startBlock = turtle.startBlock;
+        if (startBlock?.container && ["start", "drum"].includes(startBlock.name)) {
+            startBlock.container.alpha = muted ? 0.5 : 1;
         }
         this.activity.refreshCanvas();
+    }
+
+    /**
+     * @private
+     * @param {Object} turtle - Turtle object
+     * @returns {Boolean} Whether this is the companion that plays another
+     *     mouse's "on every beat" action.
+     */
+    _isCompanion(turtle) {
+        const index = this.turtleList.indexOf(turtle);
+        return index !== -1 && this.turtleList.some(other => other.companionTurtle === index);
     }
 
     /**
@@ -295,8 +323,9 @@ class Turtles {
     toggleSolo(turtle) {
         const unsolo = this.isSoloed(turtle);
         this._mute(turtle, false);
+        // Companions are muted and unmuted with their mouse.
         for (const other of this.turtleList) {
-            if (other !== turtle && !other.inTrash) {
+            if (other !== turtle && !other.inTrash && !this._isCompanion(other)) {
                 this._mute(other, !unsolo);
             }
         }
