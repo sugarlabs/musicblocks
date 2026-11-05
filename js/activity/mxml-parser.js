@@ -555,18 +555,25 @@ function _keySignature(partEl) {
 }
 
 /**
- * The first <sound tempo="..."> found anywhere in the document, in MusicXML's
- * own units (quarter notes per minute, the format's fixed convention regardless
- * of the project's actual beat unit), or null when the file stages no tempo at
- * all -- it's genuinely optional in MusicXML, so nothing is forced here.
- * @param {Document} doc
+ * The tempo that appears before the first note or time-consuming forward move
+ * in a part, in MusicXML's own quarter-notes-per-minute units. A later tempo
+ * belongs in the note flow, not in the part's preamble.
+ * @param {Element} partEl
  * @returns {number|null}
  */
-function _findTempo(doc) {
-    const soundEl = doc.querySelector("sound[tempo]");
-    if (!soundEl) return null;
-    const tempo = Number(soundEl.getAttribute("tempo"));
-    return Number.isFinite(tempo) && tempo > 0 ? tempo : null;
+function _initialTempo(partEl) {
+    let tempoBpm = null;
+    for (const measureEl of partEl.querySelectorAll(":scope > measure")) {
+        for (const child of measureEl.children) {
+            if (child.tagName === "note" || child.tagName === "forward") return tempoBpm;
+            if (child.tagName !== "direction") continue;
+            const tempo = Number(
+                child.querySelector(":scope > sound[tempo]")?.getAttribute("tempo")
+            );
+            if (Number.isFinite(tempo) && tempo > 0) tempoBpm = tempo;
+        }
+    }
+    return tempoBpm;
 }
 
 /**
@@ -819,11 +826,13 @@ function _applyRepeats(repeats, noteBlocks, noteStartIds, noteEndIds, blockId) {
  * @param {Element} partEl - a MusicXML <part> element
  * @param {number} blockId - the next free block id (the preamble's last id + 1)
  * @param {number} chainPrevId - the block id the first note should connect from
+ * @param {{beats: number, beatType: number}} timeSignature
+ * @param {number|null} initialTempoBpm
  * @param {Map<string, string>} instrumentMap - lookup map for drum names
  * @returns {{noteBlocks: Array, lastBlockId: number, producedNotes: boolean,
  *     firstBlockId: number}}
  */
-function _processPart(partEl, blockId, chainPrevId, instrumentMap) {
+function _processPart(partEl, blockId, chainPrevId, timeSignature, initialTempoBpm, instrumentMap) {
     const noteBlocks = [];
     const noteStartIds = [];
     const noteEndIds = [];
@@ -840,6 +849,7 @@ function _processPart(partEl, blockId, chainPrevId, instrumentMap) {
     let producedNotes = false;
     let tieDuration = null;
     let tieContent = null;
+    let currentTempoBpm = initialTempoBpm;
 
     const emitNote = (duration, content) => {
         const blocks = _createNoteBlocks(blockId, duration, content, prevId);
@@ -851,6 +861,21 @@ function _processPart(partEl, blockId, chainPrevId, instrumentMap) {
         blockId = prevId + 1;
     };
 
+    const emitTempo = tempoBpm => {
+        const bpmValue = (tempoBpm * timeSignature.beatType) / 4;
+        noteBlocks.push(
+            [blockId, ["setbpm3"], 0, 0, [prevId, blockId + 1, blockId + 2, blockId + 5]],
+            [blockId + 1, ["number", { value: bpmValue }], 0, 0, [blockId]],
+            [blockId + 2, "divide", 0, 0, [blockId, blockId + 3, blockId + 4]],
+            [blockId + 3, ["number", { value: 1 }], 0, 0, [blockId + 2]],
+            [blockId + 4, ["number", { value: timeSignature.beatType }], 0, 0, [blockId + 2]],
+            [blockId + 5, "vspace", 0, 0, [blockId, blockId + 6]]
+        );
+        prevId = blockId + 5;
+        blockId += 6;
+        currentTempoBpm = tempoBpm;
+    };
+
     for (const measureEl of partEl.querySelectorAll(":scope > measure")) {
         const divisionsText = measureEl.querySelector(
             ":scope > attributes > divisions"
@@ -859,6 +884,21 @@ function _processPart(partEl, blockId, chainPrevId, instrumentMap) {
 
         for (const child of measureEl.children) {
             if (child.tagName === "backup") break;
+
+            if (child.tagName === "direction") {
+                const tempoBpm = Number(
+                    child.querySelector(":scope > sound[tempo]")?.getAttribute("tempo")
+                );
+                if (Number.isFinite(tempoBpm) && tempoBpm > 0 && tempoBpm !== currentTempoBpm) {
+                    if (tieDuration !== null) {
+                        emitNote(tieDuration, tieContent);
+                        tieDuration = null;
+                        tieContent = null;
+                    }
+                    emitTempo(tempoBpm);
+                }
+                continue;
+            }
 
             // <forward> moves this voice on by its <duration> with no note
             // written. Skipping it brought every later note in early.
@@ -1012,6 +1052,8 @@ function _buildPartBlocks(partEl, startId, title, voiceLabel, tempoBpm, instrume
         partEl,
         nextBlockId,
         settimbreId,
+        timeSignature,
+        tempoBpm,
         instrumentMap
     );
 
@@ -1057,7 +1099,7 @@ const setupActivityMxmlParser = activityInstance => {
             doc.querySelector("work > work-title")?.textContent ??
             doc.querySelector("movement-title")?.textContent ??
             "title";
-        const tempoBpm = _findTempo(doc);
+        const tempoBpm = _initialTempo(partEls[0]);
         const instrumentMap = _buildInstrumentMap(doc);
 
         let blockId = 0;

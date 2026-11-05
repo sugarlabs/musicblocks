@@ -718,6 +718,28 @@ describe("Test 12: Tempo", () => {
         expect(tempos(blocks)).toEqual([240]);
     });
 
+    it("inserts a later tempo change before the following note", async () => {
+        const xml =
+            '<score-partwise><part id="P1">' +
+            '<measure number="1"><attributes><divisions>8</divisions></attributes>' +
+            '<direction><sound tempo="60"/></direction>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure>" +
+            '<measure number="2"><direction><sound tempo="120"/></direction>' +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        const [cNote, dNote] = blocks.filter(b => blockName(b) === "newnote");
+        const [, secondTempo] = blocks.filter(b => blockName(b) === "setbpm3");
+
+        expect(tempos(blocks)).toEqual([60, 120]);
+        expect(secondTempo[4][0]).toBe(cNote[4][3]);
+        expect(dNote[4][0]).toBe(secondTempo[0] + 5);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
     it("ignores a non-positive or non-numeric tempo rather than staging a bad value", async () => {
         const xml =
             '<score-partwise><part id="P1"><measure number="1">' +
