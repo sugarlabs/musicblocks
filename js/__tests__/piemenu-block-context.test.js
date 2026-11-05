@@ -486,12 +486,13 @@ describe("piemenuBlockContext", () => {
 });
 
 describe("piemenuBlockContext Mute and Solo", () => {
-    const startBlock = mouse => {
+    const startBlock = (mouse, soloed = false) => {
         const block = makeBlock({ name: "start", value: 0 });
         block.activity.turtles = {
             getTurtle: jest.fn(() => mouse),
             setMuted: jest.fn(),
-            toggleSolo: jest.fn()
+            toggleSolo: jest.fn(),
+            isSoloed: jest.fn(() => soloed)
         };
         return block;
     };
@@ -523,6 +524,17 @@ describe("piemenuBlockContext Mute and Solo", () => {
 
         wheel.navItems[5].navigateFunction();
         expect(block.activity.turtles.toggleSolo).toHaveBeenCalledWith(mouse);
+    });
+
+    test("offers Unsolo for the soloed mouse", () => {
+        global._THIS_IS_MUSIC_BLOCKS_ = true;
+        const block = startBlock({ muted: false }, true);
+
+        piemenuBlockContext(block);
+
+        expect(global.wheelnav.mock.instances[0].navItems[5].setTooltip).toHaveBeenCalledWith(
+            "Unsolo"
+        );
     });
 
     test("offers Unmute for a muted mouse", () => {

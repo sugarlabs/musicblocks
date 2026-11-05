@@ -2768,40 +2768,46 @@ class Singer {
                                                 );
                                             }
                                         } else if (last(tur.singer.instrumentNames)) {
-                                            if (!tur.singer.suppressOutput && !tur.muted) {
+                                            // A muted mouse still moves through a glide, so
+                                            // its glide state is right if it is unmuted.
+                                            if (!tur.singer.suppressOutput) {
                                                 // If we are in a glide, use setNote after the first note
                                                 if (tur.singer.glide.length > 0) {
                                                     if (tur.singer.glideOverride === 0) {
-                                                        activity.logo.synth.trigger(
-                                                            turtle,
-                                                            notes[d],
-                                                            beatValue,
-                                                            last(tur.singer.instrumentNames),
-                                                            paramsEffects,
-                                                            filters,
-                                                            true,
-                                                            future,
-                                                            tur.singer.panner
-                                                        );
+                                                        if (!tur.muted) {
+                                                            activity.logo.synth.trigger(
+                                                                turtle,
+                                                                notes[d],
+                                                                beatValue,
+                                                                last(tur.singer.instrumentNames),
+                                                                paramsEffects,
+                                                                filters,
+                                                                true,
+                                                                future,
+                                                                tur.singer.panner
+                                                            );
+                                                        }
                                                     } else {
                                                         // trigger first note for entire duration of the glissando
                                                         const beatValueOverride =
                                                             bpmFactor * tur.singer.glideOverride;
                                                         pitchStatusBeatValue = beatValueOverride;
-                                                        activity.logo.synth.trigger(
-                                                            turtle,
-                                                            notes[d],
-                                                            beatValueOverride,
-                                                            last(tur.singer.instrumentNames),
-                                                            paramsEffects,
-                                                            filters,
-                                                            false,
-                                                            future,
-                                                            tur.singer.panner
-                                                        );
+                                                        if (!tur.muted) {
+                                                            activity.logo.synth.trigger(
+                                                                turtle,
+                                                                notes[d],
+                                                                beatValueOverride,
+                                                                last(tur.singer.instrumentNames),
+                                                                paramsEffects,
+                                                                filters,
+                                                                false,
+                                                                future,
+                                                                tur.singer.panner
+                                                            );
+                                                        }
                                                         tur.singer.glideOverride = 0;
                                                     }
-                                                } else {
+                                                } else if (!tur.muted) {
                                                     activity.logo.synth.trigger(
                                                         turtle,
                                                         notes[d],

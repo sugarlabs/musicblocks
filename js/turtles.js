@@ -251,6 +251,18 @@ class Turtles {
      * @returns {void}
      */
     setMuted(turtle, muted) {
+        this._mute(turtle, muted);
+        // Muting by hand ends a solo, so the next Solo solos again.
+        this._soloTurtle = null;
+    }
+
+    /**
+     * @private
+     * @param {Object} turtle - Turtle object
+     * @param {Boolean} muted
+     * @returns {void}
+     */
+    _mute(turtle, muted) {
         turtle.muted = muted;
         const container = turtle.startBlock?.container;
         if (container) {
@@ -260,19 +272,29 @@ class Turtles {
     }
 
     /**
-     * Solo: hears only this mouse by muting every other one. On a mouse that
-     * is already the only one heard, it unmutes them all again.
+     * @param {Object} turtle - Turtle object
+     * @returns {Boolean} Whether this mouse was soloed and nothing was muted by hand since.
+     */
+    isSoloed(turtle) {
+        return this._soloTurtle === turtle;
+    }
+
+    /**
+     * Solo: hears only this mouse by muting every other one. Soloing the same
+     * mouse again unmutes them all.
      *
      * @param {Object} turtle - Turtle object
      * @returns {void}
      */
     toggleSolo(turtle) {
-        const others = this.turtleList.filter(other => other !== turtle && !other.inTrash);
-        const soloed = !turtle.muted && others.length > 0 && others.every(other => other.muted);
-        this.setMuted(turtle, false);
-        for (const other of others) {
-            this.setMuted(other, !soloed);
+        const unsolo = this.isSoloed(turtle);
+        this._mute(turtle, false);
+        for (const other of this.turtleList) {
+            if (other !== turtle && !other.inTrash) {
+                this._mute(other, !unsolo);
+            }
         }
+        this._soloTurtle = unsolo ? null : turtle;
     }
 
     // ================================ MODEL =================================

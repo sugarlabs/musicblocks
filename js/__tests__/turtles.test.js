@@ -1312,11 +1312,36 @@ describe("Mute and Solo", () => {
     });
 
     test("solo moves from one mouse to another", () => {
-        const mice = [mouse(), mouse(true), mouse(true)];
+        const mice = [mouse(), mouse(), mouse()];
         turtles._turtleList = mice;
 
+        turtles.toggleSolo(mice[0]);
         turtles.toggleSolo(mice[2]);
         expect(mice.map(tur => tur.muted)).toEqual([true, true, false]);
+        expect(turtles.isSoloed(mice[2])).toBe(true);
+        expect(turtles.isSoloed(mice[0])).toBe(false);
+    });
+
+    test("solo still solos when the other mice were muted by hand", () => {
+        const mice = [mouse(), mouse(), mouse()];
+        turtles._turtleList = mice;
+        turtles.setMuted(mice[1], true);
+        turtles.setMuted(mice[2], true);
+
+        turtles.toggleSolo(mice[0]);
+        expect(mice.map(tur => tur.muted)).toEqual([false, true, true]);
+        expect(turtles.isSoloed(mice[0])).toBe(true);
+    });
+
+    test("muting by hand ends a solo, so the next Solo solos again", () => {
+        const mice = [mouse(), mouse(), mouse()];
+        turtles._turtleList = mice;
+        turtles.toggleSolo(mice[0]);
+        turtles.setMuted(mice[1], false);
+        expect(turtles.isSoloed(mice[0])).toBe(false);
+
+        turtles.toggleSolo(mice[0]);
+        expect(mice.map(tur => tur.muted)).toEqual([false, true, true]);
     });
 
     test("solo leaves mice in the trash alone", () => {

@@ -2241,6 +2241,21 @@ describe("processNote — nested tie note pairing and duration semantics (MB-010
         expect(turtleMock.doWait).toHaveBeenCalledTimes(4);
     });
 
+    test("a muted mouse still moves through a glide", () => {
+        // The first note of a glide holds for the whole glissando and clears
+        // glideOverride, so the next notes of the glide use setNote.
+        seedNoteBlock(singer, "note1", "C", 4, 4);
+        singer.inNoteBlock = ["note1"];
+        singer.glide = [0.5];
+        singer.glideOverride = 2;
+        turtleMock.muted = true;
+
+        Singer.processNote(activityMock, 4, false, "note1", 0, jest.fn());
+
+        expect(getScheduledEvents()).toHaveLength(0);
+        expect(singer.glideOverride).toBe(0);
+    });
+
     test("4-note nested arrangement: verifies exact effective half-note durations at synth scheduling boundary", () => {
         let outerCleanupListener;
         activityMock.logo.setTurtleListener = jest.fn((_, __, cb) => {
