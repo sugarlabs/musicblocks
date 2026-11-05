@@ -1268,7 +1268,7 @@ describe("Test 11: Inline accidentals last for the rest of the bar", () => {
  * letters in play order: repeat blocks play their clamp twice and nameddo
  * blocks run their action.
  */
-function playOrder(blocks) {
+function playOrder(blocks, voiceIndex = 0) {
     const byId = new Map(blocks.map(b => [b[0], b]));
     const type = b => (Array.isArray(b[1]) ? b[1][0] : b[1]);
     const value = id => byId.get(id)[1][1].value;
@@ -1289,7 +1289,7 @@ function playOrder(blocks) {
             }
         }
     };
-    const settimbre = blocksOfType(blocks, "settimbre")[0];
+    const settimbre = blocksOfType(blocks, "settimbre")[voiceIndex];
     run(byId.get(settimbre[4][2]));
     return notes.join("");
 }
@@ -1307,6 +1307,77 @@ describe("Test 12: Repeat bars wrap only their own bars", () => {
                 staff: [{ meter: { value: [{ num: 4, den: 4 }] }, key, voices: [voice] }]
             }))
         });
+
+    test("plays first and second endings on their respective passes", async () => {
+        const abc = [
+            "X:1",
+            "T:Alternate Endings Test",
+            "M:2/4",
+            "L:1/4",
+            "K:C",
+            "|: C D |1 E F :|2 G A |]"
+        ].join("\n");
+
+        const tune = ABCJS.parseOnly(abc)[0];
+        const blocks = await parseAndCapture(tune);
+
+        // First pass: C D E F
+        // Second pass: C D G A
+        expect(playOrder(blocks)).toBe("CDEFCDGA");
+    });
+
+    test("handles a first ending with no shared notes", async () => {
+        const abc = ["X:1", "M:2/4", "L:1/4", "K:C", "|: |1 C D :|2 E F |]"].join("\n");
+
+        const tune = ABCJS.parseOnly(abc)[0];
+        const blocks = await parseAndCapture(tune);
+
+        expect(playOrder(blocks)).toBe("CDEF");
+    });
+
+    test("keeps alternate endings independent across two voices", async () => {
+        const abc = [
+            "X:1",
+            "T:Multiple Voice Alternate Endings",
+            "M:2/4",
+            "L:1/4",
+            "K:C",
+            "V:1",
+            "|: C D |1 E F :|2 G A |]",
+            "V:2",
+            "|: G, A, |1 B, C :|2 D E |]"
+        ].join("\n");
+
+        const tune = ABCJS.parseOnly(abc)[0];
+        const blocks = await parseAndCapture(tune);
+
+        expect(blocksOfType(blocks, "start")).toHaveLength(2);
+        expect(blocksOfType(blocks, "settimbre")).toHaveLength(2);
+
+        // Each voice must follow its own alternate endings.
+        expect(playOrder(blocks, 0)).toBe("CDEFCDGA");
+        expect(playOrder(blocks, 1)).toBe("GABCGADE");
+
+        // Verify block ID ordering and reciprocal connections.
+        blocks.forEach((block, position) => {
+            expect(block[0]).toBe(position);
+
+            for (const target of block[4] || []) {
+                if (target === null) continue;
+
+                expect(blocks[target]).toBeDefined();
+                expect(blocks[target][4]).toContain(block[0]);
+            }
+        });
+    });
+
+    test("supports separate first and second ending markers", async () => {
+        const abc = ["X:1", "M:2/4", "L:1/4", "K:C", "|: C D | [1 E F :| [2 G A |]"].join("\n");
+
+        const blocks = await parseAndCapture(ABCJS.parseOnly(abc)[0]);
+
+        expect(playOrder(blocks)).toBe("CDEFCDGA");
+    });
 
     test("a repeat that ends mid-line repeats only its own bars", async () => {
         const blocks = await parseLines([
@@ -1357,6 +1428,63 @@ describe("Test 12: Repeat bars wrap only their own bars", () => {
             [...melody("EF", 2), makeBar("bar_right_repeat"), ...melody("G", 4), makeBar()]
         ]);
         expect(playOrder(blocks)).toBe("CDEFCDEFG");
+    });
+
+    test("plays notes after the second ending only once", async () => {
+        const abc = [
+            "X:1",
+            "T:Alternate Endings With Following Notes",
+            "M:2/4",
+            "L:1/4",
+            "K:C",
+            "|: C D |1 E F :|2 G A | B c |]"
+        ].join("\n");
+
+        const tune = ABCJS.parseOnly(abc)[0];
+        const blocks = await parseAndCapture(tune);
+
+        // First pass: C D E F
+        // Second pass: C D G A
+        // Following notes: B C (played once)
+        expect(playOrder(blocks)).toBe("CDEFCDGABC");
+
+        // Every block must occupy its own ID position for loading.
+        blocks.forEach((block, position) => {
+            expect(block[0]).toBe(position);
+        });
+    });
+
+    test("handles consecutive alternate-ending repeats with valid block connections", async () => {
+        const abc = [
+            "X:1",
+            "T:Consecutive Alternate Endings",
+            "M:2/4",
+            "L:1/4",
+            "K:C",
+            "|: C D |1 E F :|2 G A |",
+            "|: A B |1 C D :|2 E F |]"
+        ].join("\n");
+
+        const tune = ABCJS.parseOnly(abc)[0];
+        const blocks = await parseAndCapture(tune);
+
+        // First section: CDEF -> CDGA
+        // Second section: ABCD -> ABEF
+        expect(playOrder(blocks)).toBe("CDEFCDGAABCDABEF");
+
+        // loadNewBlocks expects every block at its ID position.
+        blocks.forEach((block, position) => {
+            expect(block[0]).toBe(position);
+
+            // Every connection must point to an existing block,
+            // which must also reference this block.
+            for (const target of block[4] || []) {
+                if (target === null) continue;
+
+                expect(blocks[target]).toBeDefined();
+                expect(blocks[target][4]).toContain(block[0]);
+            }
+        });
     });
 });
 
