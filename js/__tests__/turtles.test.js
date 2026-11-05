@@ -19,6 +19,8 @@
 
 const Turtles = require("../turtles");
 const { setupGridController } = require("../activity/grid-controller.js");
+const ManagedTimer = require("../utils/ManagedTimer");
+global.ManagedTimer = ManagedTimer;
 
 global.createjs = {
     Container: jest.fn().mockImplementation(() => ({
@@ -792,13 +794,10 @@ describe("aux toolbar collapse and expand", () => {
         }
     });
 
-    test("debounces canvas button rebuild during rapid resize events on multicore systems", () => {
+    test("debounces canvas button rebuild during rapid resize events", () => {
         const originalPlatformColor = global.platformColor;
         const originalMakeKeyboardAccessible = global.makeKeyboardAccessible;
-        const hardwareConcurrency = Object.getOwnPropertyDescriptor(
-            navigator,
-            "hardwareConcurrency"
-        );
+        const originalWindowWidth = window.innerWidth;
 
         global.platformColor = { ruleColor: "#000" };
         global.makeKeyboardAccessible = jest.fn();
@@ -813,7 +812,6 @@ describe("aux toolbar collapse and expand", () => {
                 });
             }
         };
-        Object.defineProperty(navigator, "hardwareConcurrency", { configurable: true, value: 8 });
         jest.useFakeTimers();
 
         try {
@@ -821,6 +819,8 @@ describe("aux toolbar collapse and expand", () => {
             turtles.makeBackground();
 
             const initialGrid = document.getElementById("Grid");
+            const initialWidth = turtles._w;
+            window.innerWidth = initialWidth + 100;
 
             // Fire multiple resize events in rapid succession (simulating window drag)
             turtles._resizeHandler();
@@ -829,6 +829,8 @@ describe("aux toolbar collapse and expand", () => {
 
             // Several animation frames pass, but the debounce has not settled
             jest.advanceTimersByTime(100);
+            expect(turtles._w).toBe(window.innerWidth);
+            expect(turtles._w).not.toBe(initialWidth);
             expect(document.getElementById("Grid")).toBe(initialGrid);
 
             // Once debounce timer settles, button rebuild should have executed
@@ -838,11 +840,7 @@ describe("aux toolbar collapse and expand", () => {
             jest.useRealTimers();
             global.platformColor = originalPlatformColor;
             global.makeKeyboardAccessible = originalMakeKeyboardAccessible;
-            if (hardwareConcurrency) {
-                Object.defineProperty(navigator, "hardwareConcurrency", hardwareConcurrency);
-            } else {
-                delete navigator.hardwareConcurrency;
-            }
+            window.innerWidth = originalWindowWidth;
         }
     });
 
@@ -1019,6 +1017,9 @@ describe("aux toolbar collapse and expand", () => {
             // Fire resize to schedule 150ms timeout
             turtles._resizeHandler();
             expect(turtles._resizeTimeout).not.toBeNull();
+            if (turtles._timerManager) {
+                expect(turtles._timerManager.activeTimeoutCount).toBe(1);
+            }
 
             // Re-render occurs within debounce window (e.g. via setBackgroundColor or doScale)
             turtles._locked = false;
@@ -1026,6 +1027,50 @@ describe("aux toolbar collapse and expand", () => {
 
             // The pending timeout must have been cancelled and cleared
             expect(turtles._resizeTimeout).toBeNull();
+            if (turtles._timerManager) {
+                expect(turtles._timerManager.activeTimeoutCount).toBe(0);
+            }
+        } finally {
+            jest.useRealTimers();
+            global.platformColor = originalPlatformColor;
+            global.makeKeyboardAccessible = originalMakeKeyboardAccessible;
+        }
+    });
+
+    test("tracks debounced resize through ManagedTimer when available", () => {
+        const originalPlatformColor = global.platformColor;
+        const originalMakeKeyboardAccessible = global.makeKeyboardAccessible;
+
+        global.platformColor = { ruleColor: "#000" };
+        global.makeKeyboardAccessible = jest.fn();
+        global.Image = class extends originalImage {
+            constructor() {
+                super();
+                Object.defineProperty(this, "src", {
+                    configurable: true,
+                    set: () => {
+                        this.onload?.();
+                    }
+                });
+            }
+        };
+        jest.useFakeTimers();
+
+        try {
+            turtles._locked = false;
+            turtles.makeBackground();
+
+            expect(turtles._timerManager).toBeInstanceOf(ManagedTimer);
+
+            turtles._resizeHandler();
+            expect(turtles._timerManager.activeTimeoutCount).toBe(1);
+
+            // A second rapid resize clears previous timer and schedules a new one
+            turtles._resizeHandler();
+            expect(turtles._timerManager.activeTimeoutCount).toBe(1);
+
+            jest.advanceTimersByTime(150);
+            expect(turtles._timerManager.activeTimeoutCount).toBe(0);
         } finally {
             jest.useRealTimers();
             global.platformColor = originalPlatformColor;

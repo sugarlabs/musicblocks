@@ -22,7 +22,7 @@
    setupVolumeActions, setupDrumActions, setupDictActions, _, Turtle, TURTLESVG, METRONOMESVG,
    FILLCOLORS, STROKECOLORS, getMunsellColor, DEFAULTVALUE, DEFAULTCHROMA,
    jQuery, docById, LEADING, CARTESIANBUTTON, piemenuGrid, CLEARBUTTON, COLLAPSEBUTTON,
-   EXPANDBUTTON, MBOUNDARY, makeKeyboardAccessible
+   EXPANDBUTTON, MBOUNDARY, makeKeyboardAccessible, ManagedTimer
  */
 
 /* exported Turtles */
@@ -692,6 +692,18 @@ Turtles.TurtlesView = class {
         this._queue = []; // temporarily stores [w, h, scale]
         this._boundaryBuildId = 0; // generation counter to invalidate superseded builds
         this._resizeTimeout = null; // debounce timer for canvas resize boundary rebuilds
+        if (typeof ManagedTimer !== "undefined") {
+            this._timerManager = new ManagedTimer();
+        } else if (typeof require !== "undefined") {
+            try {
+                const ManagedTimerCtor = require("./utils/ManagedTimer");
+                this._timerManager = new ManagedTimerCtor();
+            } catch (e) {
+                this._timerManager = null;
+            }
+        } else {
+            this._timerManager = null;
+        }
 
         this.currentGrid = null; // currently selected grid
 
@@ -1383,10 +1395,29 @@ Turtles.TurtlesView = class {
             __makeBoundary();
         }
 
+        if (this._timerManager === undefined) {
+            if (typeof ManagedTimer !== "undefined") {
+                this._timerManager = new ManagedTimer();
+            } else if (typeof require !== "undefined") {
+                try {
+                    const ManagedTimerCtor = require("./utils/ManagedTimer");
+                    this._timerManager = new ManagedTimerCtor();
+                } catch (e) {
+                    this._timerManager = null;
+                }
+            } else {
+                this._timerManager = null;
+            }
+        }
+
         // Debounce expensive boundary and button rebuilds during resize
         // to prevent DOM layout thrashing and tooltip teardown on every frame.
         if (this._resizeTimeout) {
-            clearTimeout(this._resizeTimeout);
+            if (this._timerManager !== null) {
+                this._timerManager.clearTimeout(this._resizeTimeout);
+            } else {
+                clearTimeout(this._resizeTimeout);
+            }
             this._resizeTimeout = null;
         }
         let ticking = false;
@@ -1411,14 +1442,25 @@ Turtles.TurtlesView = class {
                 handleCanvasResize();
             }
 
-            if (this._resizeTimeout) {
-                clearTimeout(this._resizeTimeout);
+            if (this._timerManager !== null) {
+                if (this._resizeTimeout) {
+                    this._timerManager.clearTimeout(this._resizeTimeout);
+                }
+                this._resizeTimeout = this._timerManager.setTimeout(() => {
+                    this._resizeTimeout = null;
+                    handleCanvasResize();
+                    __makeBoundary();
+                }, 150);
+            } else {
+                if (this._resizeTimeout) {
+                    clearTimeout(this._resizeTimeout);
+                }
+                this._resizeTimeout = setTimeout(() => {
+                    this._resizeTimeout = null;
+                    handleCanvasResize();
+                    __makeBoundary();
+                }, 150); // Wait 150ms after the last resize event to execute
             }
-            this._resizeTimeout = setTimeout(() => {
-                this._resizeTimeout = null;
-                handleCanvasResize();
-                __makeBoundary();
-            }, 150); // Wait 150ms after the last resize event to execute
         };
 
         if (this._resizeHandler) {
