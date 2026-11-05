@@ -717,6 +717,20 @@ describe("Test 12: Tempo", () => {
         expect(findPositionMismatches(blocks)).toEqual([]);
     });
 
+    it("ignores a direction with no tempo sound element", async () => {
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1">' +
+            "<attributes><divisions>8</divisions></attributes>" +
+            "<direction><direction-type><words>dolce</words></direction-type></direction>" +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+
+        expect(tempos(blocks)).toEqual([]);
+        expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
+    });
+
     it("scales the setbpm3 value by the time signature's beat type", async () => {
         // MusicXML tempo is always quarter notes per minute; the setbpm3 block
         // counts beats of the project's own time signature (see

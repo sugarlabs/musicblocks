@@ -594,7 +594,7 @@ function _tempoChanges(partEls) {
                             ? child
                             : child.querySelector(":scope > sound[tempo]");
                     const tempoBpm = Number(soundEl?.getAttribute("tempo"));
-                    const soundOffset = Number(_text(soundEl, "offset"));
+                    const soundOffset = Number(soundEl ? _text(soundEl, "offset") : 0);
                     if (Number.isFinite(tempoBpm) && tempoBpm > 0) {
                         changes.push({
                             measureIndex,
