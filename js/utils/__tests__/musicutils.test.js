@@ -672,6 +672,13 @@ describe("getInvertMode", () => {
         expect(getInvertMode("scalar")).toBe("scalar");
         expect(getInvertMode("nonexistent")).toBe("nonexistent");
     });
+
+    it("should handle null, undefined, and non-string inputs safely without throwing", () => {
+        expect(getInvertMode(null)).toBe(null);
+        expect(getInvertMode(undefined)).toBe(undefined);
+        expect(getInvertMode(123)).toBe(123);
+        expect(getInvertMode("  EVEN  ")).toBe("even");
+    });
 });
 
 describe("getIntervalNumber", () => {
