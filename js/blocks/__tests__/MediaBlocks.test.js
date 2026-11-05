@@ -379,6 +379,16 @@ describe("setupMediaBlocks", () => {
             expect(logo.processSpeak).not.toHaveBeenCalled();
             turtle.singer.suppressOutput = false;
         });
+        it("should stay silent for a muted mouse", () => {
+            const turtle = activity.turtles.ithTurtle(turtleIndex);
+            turtle.singer.inNoteBlock = [];
+            turtle.muted = true;
+            logo.processSpeak = jest.fn();
+            const speakBlock = createdBlocks["speak"];
+            speakBlock.flow(["Hello world"], logo, turtleIndex, 400);
+            expect(logo.processSpeak).not.toHaveBeenCalled();
+            turtle.muted = false;
+        });
         it("should do nothing when no text is connected", () => {
             logo.processSpeak = jest.fn();
             const speakBlock = createdBlocks["speak"];

@@ -1247,3 +1247,117 @@ describe("Turtle hover scaling and lifecycle", () => {
         expect(mockTurtle.container.scaleX).toBe(1);
     });
 });
+
+describe("Mute and Solo", () => {
+    let activityMock;
+    let turtles;
+
+    // A mouse with a Start block, as Turtles.add() makes it.
+    const mouse = (muted = false, inTrash = false) => ({
+        muted,
+        inTrash,
+        startBlock: { container: { alpha: muted ? 0.5 : 1 } }
+    });
+
+    beforeEach(() => {
+        activityMock = {
+            stage: { addChild: jest.fn(), removeChild: jest.fn(), dispatchEvent: jest.fn() },
+            refreshCanvas: jest.fn(),
+            turtleContainer: new createjs.Container(),
+            hideAuxMenu: jest.fn(),
+            hideGrids: jest.fn(),
+            _doCartesianPolar: jest.fn(),
+            closeHelpfulWheel
+        };
+        turtles = new Turtles(activityMock);
+        turtles.activity = activityMock;
+    });
+
+    test("mutes a mouse and fades its Start block, then unmutes it", () => {
+        const tur = mouse();
+        turtles.setMuted(tur, true);
+        expect(tur.muted).toBe(true);
+        expect(tur.startBlock.container.alpha).toBe(0.5);
+        expect(activityMock.refreshCanvas).toHaveBeenCalled();
+
+        turtles.setMuted(tur, false);
+        expect(tur.muted).toBe(false);
+        expect(tur.startBlock.container.alpha).toBe(1);
+    });
+
+    test("mutes a mouse that has no Start block artwork", () => {
+        const tur = { muted: false, startBlock: null };
+        turtles.setMuted(tur, true);
+        expect(tur.muted).toBe(true);
+    });
+
+    test("solo mutes every other mouse, and soloing it again unmutes them all", () => {
+        const mice = [mouse(), mouse(), mouse(true)];
+        turtles._turtleList = mice;
+
+        turtles.toggleSolo(mice[1]);
+        expect(mice.map(tur => tur.muted)).toEqual([true, false, true]);
+
+        turtles.toggleSolo(mice[1]);
+        expect(mice.map(tur => tur.muted)).toEqual([false, false, false]);
+        expect(mice.map(tur => tur.startBlock.container.alpha)).toEqual([1, 1, 1]);
+    });
+
+    test("solo on a muted mouse unmutes it and keeps the others muted", () => {
+        const mice = [mouse(true), mouse(true)];
+        turtles._turtleList = mice;
+
+        turtles.toggleSolo(mice[0]);
+        expect(mice.map(tur => tur.muted)).toEqual([false, true]);
+    });
+
+    test("solo moves from one mouse to another", () => {
+        const mice = [mouse(), mouse(true), mouse(true)];
+        turtles._turtleList = mice;
+
+        turtles.toggleSolo(mice[2]);
+        expect(mice.map(tur => tur.muted)).toEqual([true, true, false]);
+    });
+
+    test("solo leaves mice in the trash alone", () => {
+        const mice = [mouse(), mouse(false, true), mouse()];
+        turtles._turtleList = mice;
+
+        turtles.toggleSolo(mice[0]);
+        expect(mice.map(tur => tur.muted)).toEqual([false, false, true]);
+
+        turtles.toggleSolo(mice[0]);
+        expect(mice.map(tur => tur.muted)).toEqual([false, false, false]);
+    });
+
+    test("a mouse saved as muted loads muted, and other mice load unmuted", () => {
+        const made = [];
+        global.Turtle = jest.fn().mockImplementation((activity, id, name, owner, startBlock) => {
+            const tur = {
+                id,
+                name,
+                muted: false,
+                startBlock,
+                container: { on: jest.fn(), removeAllEventListeners: jest.fn() }
+            };
+            made.push(tur);
+            return tur;
+        });
+        turtles.getTurtleCount = jest.fn().mockReturnValue(0);
+        turtles.pushTurtle = jest.fn();
+        turtles.addTurtleStageProps = jest.fn();
+        turtles.createArtwork = jest.fn();
+        turtles.createHitArea = jest.fn();
+        turtles.addTurtleGraphicProps = jest.fn();
+        document.body.innerHTML = '<div id="loader"></div>';
+
+        const mutedBlock = { name: "start", value: 0, container: { alpha: 1 } };
+        turtles.add(mutedBlock, { id: 1, name: "start", muted: true });
+        const plainBlock = { name: "start", value: 0, container: { alpha: 1 } };
+        turtles.add(plainBlock, { id: 2, name: "start" });
+
+        expect(made.map(tur => tur.muted)).toEqual([true, false]);
+        expect(mutedBlock.container.alpha).toBe(0.5);
+        expect(plainBlock.container.alpha).toBe(1);
+    });
+});

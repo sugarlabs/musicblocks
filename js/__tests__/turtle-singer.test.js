@@ -2215,6 +2215,32 @@ describe("processNote — nested tie note pairing and duration semantics (MB-010
         global.TONEBPM = 60;
     });
 
+    test("a muted mouse keeps time and its Status but sends nothing to the synth", () => {
+        const play = (blk, mute, drums = []) => {
+            turtleMock.muted = mute;
+            seedNoteBlock(singer, blk, "C", 4, 4, drums);
+            singer.inNoteBlock = [blk];
+            const before = singer.turtleTime;
+            Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+            return singer.turtleTime - before;
+        };
+
+        const mutedStep = play("note1", true);
+        expect(getScheduledEvents()).toHaveLength(0);
+        expect(singer.pitchStatus.map(sound => sound.notes)).toEqual([["C4"]]);
+        play("note2", true, ["snare drum"]);
+        expect(getScheduledEvents()).toHaveLength(0);
+
+        const heardStep = play("note3", false);
+        expect(getScheduledEvents()).toHaveLength(1);
+        expect(mutedStep).toBeGreaterThan(0);
+        expect(mutedStep).toBe(heardStep);
+        // The same drum note is heard once the mouse is unmuted.
+        play("note4", false, ["snare drum"]);
+        expect(getScheduledEvents().length).toBeGreaterThan(1);
+        expect(turtleMock.doWait).toHaveBeenCalledTimes(4);
+    });
+
     test("4-note nested arrangement: verifies exact effective half-note durations at synth scheduling boundary", () => {
         let outerCleanupListener;
         activityMock.logo.setTurtleListener = jest.fn((_, __, cb) => {

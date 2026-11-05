@@ -117,6 +117,9 @@ class Turtles {
 
         // Instantiate a new Turtle object
         const turtle = new Turtle(this.activity, id, turtleName, this, startBlock);
+        if (blkInfoAvailable && infoDict["muted"] === true) {
+            this.setMuted(turtle, true);
+        }
 
         // Add turtle model properties and store color index for turtle
         this.addTurtleStageProps(turtle, blkInfoAvailable, infoDict);
@@ -236,6 +239,40 @@ class Turtles {
         }
 
         this.activity.refreshCanvas();
+    }
+
+    /**
+     * Mutes or unmutes a mouse. A muted mouse still runs and keeps time, so it
+     * stays in step with the others, but its notes and drums are not heard.
+     * Its Start block is drawn faded.
+     *
+     * @param {Object} turtle - Turtle object
+     * @param {Boolean} muted
+     * @returns {void}
+     */
+    setMuted(turtle, muted) {
+        turtle.muted = muted;
+        const container = turtle.startBlock?.container;
+        if (container) {
+            container.alpha = muted ? 0.5 : 1;
+        }
+        this.activity.refreshCanvas();
+    }
+
+    /**
+     * Solo: hears only this mouse by muting every other one. On a mouse that
+     * is already the only one heard, it unmutes them all again.
+     *
+     * @param {Object} turtle - Turtle object
+     * @returns {void}
+     */
+    toggleSolo(turtle) {
+        const others = this.turtleList.filter(other => other !== turtle && !other.inTrash);
+        const soloed = !turtle.muted && others.length > 0 && others.every(other => other.muted);
+        this.setMuted(turtle, false);
+        for (const other of others) {
+            this.setMuted(other, !soloed);
+        }
     }
 
     // ================================ MODEL =================================

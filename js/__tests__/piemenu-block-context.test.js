@@ -484,3 +484,85 @@ describe("piemenuBlockContext", () => {
         jest.useRealTimers();
     });
 });
+
+describe("piemenuBlockContext Mute and Solo", () => {
+    const startBlock = mouse => {
+        const block = makeBlock({ name: "start", value: 0 });
+        block.activity.turtles = {
+            getTurtle: jest.fn(() => mouse),
+            setMuted: jest.fn(),
+            toggleSolo: jest.fn()
+        };
+        return block;
+    };
+
+    afterEach(() => {
+        delete global._THIS_IS_MUSIC_BLOCKS_;
+    });
+
+    test("adds Mute and Solo for a Start block in Music Blocks", () => {
+        global._THIS_IS_MUSIC_BLOCKS_ = true;
+        const mouse = { muted: false };
+        const block = startBlock(mouse);
+
+        piemenuBlockContext(block);
+
+        const wheel = global.wheelnav.mock.instances[0];
+        expect(wheel.initWheel).toHaveBeenCalledWith(
+            expect.arrayContaining([
+                "imgsrc:header-icons/volume-off.svg",
+                "imgsrc:header-icons/headphones.svg"
+            ])
+        );
+        expect(wheel.navItems[4].setTooltip).toHaveBeenCalledWith("Mute");
+        expect(wheel.navItems[5].setTooltip).toHaveBeenCalledWith("Solo");
+
+        wheel.navItems[4].navigateFunction();
+        expect(block.activity.turtles.setMuted).toHaveBeenCalledWith(mouse, true);
+        expect(getDomElement("contextWheelDiv").style.display).toBe("none");
+
+        wheel.navItems[5].navigateFunction();
+        expect(block.activity.turtles.toggleSolo).toHaveBeenCalledWith(mouse);
+    });
+
+    test("offers Unmute for a muted mouse", () => {
+        global._THIS_IS_MUSIC_BLOCKS_ = true;
+        const mouse = { muted: true };
+        const block = startBlock(mouse);
+
+        piemenuBlockContext(block);
+
+        const wheel = global.wheelnav.mock.instances[0];
+        expect(wheel.initWheel).toHaveBeenCalledWith(
+            expect.arrayContaining(["imgsrc:header-icons/volume-up.svg"])
+        );
+        expect(wheel.navItems[4].setTooltip).toHaveBeenCalledWith("Unmute");
+        wheel.navItems[4].navigateFunction();
+        expect(block.activity.turtles.setMuted).toHaveBeenCalledWith(mouse, false);
+    });
+
+    test("adds them for a drum Start block too", () => {
+        global._THIS_IS_MUSIC_BLOCKS_ = true;
+        const block = startBlock({ muted: false });
+        block.name = "drum";
+
+        piemenuBlockContext(block);
+
+        expect(global.wheelnav.mock.instances[0].initWheel).toHaveBeenCalledWith(
+            expect.arrayContaining(["imgsrc:header-icons/headphones.svg"])
+        );
+    });
+
+    test("does not add them for other blocks or in Turtle Blocks", () => {
+        global._THIS_IS_MUSIC_BLOCKS_ = true;
+        piemenuBlockContext(makeBlock());
+        global._THIS_IS_MUSIC_BLOCKS_ = false;
+        piemenuBlockContext(startBlock({ muted: false }));
+
+        for (const wheel of global.wheelnav.mock.instances) {
+            expect(wheel.initWheel).toHaveBeenCalledWith(
+                expect.not.arrayContaining(["imgsrc:header-icons/headphones.svg"])
+            );
+        }
+    });
+});
