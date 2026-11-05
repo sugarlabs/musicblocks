@@ -117,8 +117,14 @@ class Turtles {
 
         // Instantiate a new Turtle object
         const turtle = new Turtle(this.activity, id, turtleName, this, startBlock);
-        if (blkInfoAvailable && infoDict["muted"] === true) {
-            this.setMuted(turtle, true);
+        // A mouse saved as muted loads muted, and a mouse added while
+        // another one is soloed is muted, so the solo goes on.
+        const soloed = this._soloTurtle;
+        if (
+            (blkInfoAvailable && infoDict["muted"] === true) ||
+            (soloed && !soloed.inTrash && this.turtleList.includes(soloed))
+        ) {
+            this._mute(turtle, true);
         }
 
         // Add turtle model properties and store color index for turtle

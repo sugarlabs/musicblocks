@@ -1355,6 +1355,41 @@ describe("Mute and Solo", () => {
         expect(mice.map(tur => tur.muted)).toEqual([false, false, false]);
     });
 
+    test("a mouse added during a solo is muted, and the solo goes on", () => {
+        const mice = [mouse(), mouse()];
+        turtles._turtleList = mice;
+        turtles.toggleSolo(mice[0]);
+
+        const added = mouse();
+        global.Turtle = jest.fn().mockImplementation(() =>
+            Object.assign(added, {
+                container: { on: jest.fn(), removeAllEventListeners: jest.fn() }
+            })
+        );
+        turtles.getTurtleCount = jest.fn().mockReturnValue(2);
+        turtles.pushTurtle = jest.fn(tur => turtles._turtleList.push(tur));
+        turtles.addTurtleStageProps = jest.fn();
+        turtles.createArtwork = jest.fn();
+        turtles.createHitArea = jest.fn();
+        turtles.addTurtleGraphicProps = jest.fn();
+        document.body.innerHTML = '<div id="loader"></div>';
+        turtles.add({ name: "start", value: 2, container: { alpha: 1 } }, {});
+
+        expect(added.muted).toBe(true);
+        expect(turtles.isSoloed(mice[0])).toBe(true);
+
+        // Once the soloed mouse is in the trash, new mice are heard.
+        mice[0].inTrash = true;
+        const later = mouse();
+        global.Turtle = jest.fn().mockImplementation(() =>
+            Object.assign(later, {
+                container: { on: jest.fn(), removeAllEventListeners: jest.fn() }
+            })
+        );
+        turtles.add({ name: "start", value: 3, container: { alpha: 1 } }, {});
+        expect(later.muted).toBe(false);
+    });
+
     test("a mouse saved as muted loads muted, and other mice load unmuted", () => {
         const made = [];
         global.Turtle = jest.fn().mockImplementation((activity, id, name, owner, startBlock) => {
