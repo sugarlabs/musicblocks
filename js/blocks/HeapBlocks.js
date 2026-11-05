@@ -471,7 +471,7 @@ function setupHeapBlocks(activity) {
                 return 0;
             }
             let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-            if (typeof a === "number") {
+            if (typeof a === "number" && !Number.isNaN(a)) {
                 if (!(turtle in logo.turtleHeaps)) {
                     logo.turtleHeaps[turtle] = [];
                 }
@@ -579,7 +579,7 @@ function setupHeapBlocks(activity) {
                 return;
             }
 
-            if (typeof args[0] !== "number") {
+            if (typeof args[0] !== "number" || Number.isNaN(args[0])) {
                 activity.errorMsg(NANERRORMSG, blk);
                 return;
             }
