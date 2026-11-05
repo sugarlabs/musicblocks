@@ -2324,7 +2324,14 @@ describe("Palettes Class", () => {
                     [5, ["number", 8], 0, 0, [4]],
                     [6, ["text", { value: "bye" }], 0, 0, [5]],
                     [7, ["number", { value: "9", disabled: true }], 0, 0, [6]],
-                    [8, ["text", { value: "disabledText", disabled: true }], 0, 0, [7]]
+                    [8, ["text", { value: "disabledText", disabled: true }], 0, 0, [7]],
+                    [
+                        9,
+                        ["pitch", { value: "G4", manualAccidental: "natural", disabled: true }],
+                        0,
+                        0,
+                        [8]
+                    ]
                 ]
             };
 
@@ -2355,6 +2362,10 @@ describe("Palettes Class", () => {
             expect(capturedBlocks[8][1]).toEqual([
                 "text",
                 { value: "disabledText", disabled: true }
+            ]);
+            expect(capturedBlocks[9][1]).toEqual([
+                "pitch",
+                { value: "G4", manualAccidental: "natural", disabled: true }
             ]);
 
             expect(collapseToggle).toHaveBeenCalled();

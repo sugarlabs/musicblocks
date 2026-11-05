@@ -5772,6 +5772,10 @@ class Blocks {
                         blkData[1][1] = { value: name };
                     } else {
                         name = blkData[1][1]["value"];
+                        if (typeof name === "number") {
+                            name = name.toString();
+                            blkData[1][1]["value"] = name;
+                        }
                     }
 
                     /** If we have a stack named 'action', make the protoblock visible. */

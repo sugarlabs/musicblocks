@@ -1241,5 +1241,92 @@ describe("ActionBlocks", () => {
             expect(tur.queue.length).toBe(0);
             expect(logo.runFromBlockNow).not.toHaveBeenCalled();
         });
+
+        test("NamedDoArgBlock does not evaluate connected argument when action is disabled", () => {
+            const block = activity.registeredBlocks["nameddoArg"];
+            activity.blocks.blockList[10] = {
+                privateData: "myAction",
+                argClampSlots: [1],
+                connections: [null, 12]
+            };
+            const sideEffectFn = jest.fn();
+            logo.parseArg = sideEffectFn;
+
+            const res = block.flow([], logo, 0, 10, null, []);
+
+            expect(res).toBeUndefined();
+            expect(sideEffectFn).not.toHaveBeenCalled();
+        });
+
+        test("NamedCalcArgBlock does not evaluate connected argument when action is disabled", () => {
+            const block = activity.registeredBlocks["namedcalcArg"];
+            activity.blocks.blockList[10] = {
+                privateData: "myAction",
+                argClampSlots: [1],
+                connections: [null, 12]
+            };
+            const sideEffectFn = jest.fn();
+            logo.parseArg = sideEffectFn;
+
+            const res = block.arg(logo, 0, 10, null);
+
+            expect(res).toBe(0);
+            expect(sideEffectFn).not.toHaveBeenCalled();
+        });
+
+        test("DoArgBlock does not evaluate connected argument when action is disabled", () => {
+            const block = activity.registeredBlocks["doArg"];
+            activity.blocks.blockList[10] = {
+                argClampSlots: [1],
+                connections: [null, null, 12]
+            };
+            const sideEffectFn = jest.fn();
+            logo.parseArg = sideEffectFn;
+
+            const res = block.flow(["myAction"], logo, 0, 10, null, []);
+
+            expect(res).toBeUndefined();
+            expect(sideEffectFn).not.toHaveBeenCalled();
+        });
+
+        test("CalcArgBlock does not evaluate connected clamp arguments when action is disabled", () => {
+            const block = activity.registeredBlocks["calcArg"];
+            activity.blocks.blockList[10] = {
+                connections: [null, 11, 12],
+                argClampSlots: [1]
+            };
+            logo.parseArg.mockImplementation((lg, tur, targetBlk) => {
+                if (targetBlk === 11) return "myAction";
+                throw new Error("Clamp argument should not be parsed when action is disabled");
+            });
+
+            const result = block.arg(logo, 0, 10, null);
+
+            expect(result).toBe(0);
+            expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+        });
+
+        test("ListenBlock listener does not run queued action if action is disabled after queueing", () => {
+            const block = activity.registeredBlocks["listen"];
+            const tur = {
+                running: true,
+                queue: [],
+                parentFlowQueue: [],
+                singer: { justCounting: [], runningFromEvent: false, turtleTime: 0 }
+            };
+            activity.turtles.ithTurtle = jest.fn(() => tur);
+
+            activity.blocks.blockList[actionBlk].disabled = false;
+            block.flow(["event1", "myAction"], logo, 0, 10);
+            const listenerFn = logo.setTurtleListener.mock.calls[0][2];
+
+            listenerFn({});
+            expect(tur.queue.length).toBe(1);
+
+            activity.blocks.blockList[actionBlk].disabled = true;
+            tur.running = false;
+            listenerFn({});
+            expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+        });
     });
 });

@@ -1528,6 +1528,28 @@ describe("Blocks Foundation", () => {
             expect(blockObjs[6][1][1]).toEqual({ value: "myAction1" });
         });
 
+        it("normalizes numeric action names to strings for disabled actions when loading", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.protoBlockDict = {
+                action: { style: "clamp", hasCapability: () => false },
+                number: { style: "basic", hasCapability: () => false }
+            };
+            const blockObjs = [
+                [0, "action", 0, 0, [null, 1, null]],
+                [1, ["number", { value: 42, disabled: true }], 0, 0, [0]]
+            ];
+            blocks.blockList = [
+                { name: "action", trash: false, connections: [null, 1, null] },
+                { name: "number", trash: false, value: "42", connections: [0] }
+            ];
+            blocks.activity.logo = { synth: { preloadProjectSamples: jest.fn() } };
+            blocks._processOneBlock = jest.fn();
+            blocks._chunkLoad = jest.fn();
+            blocks.loadNewBlocks(blockObjs);
+            expect(blockObjs[1][1][1].value).toBe("421");
+            expect(blockObjs[1][1][1].disabled).toBe(true);
+        });
+
         it("sets disabled state and alpha when loading a block with disabled property", () => {
             const blocks = new Blocks(mockActivity);
             const mockBlk = {

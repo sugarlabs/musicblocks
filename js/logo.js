@@ -2618,7 +2618,7 @@ class Logo {
             }
 
             // Run the last flow in the queue.
-            if (tur.queue.length > queueStart) {
+            while (tur.queue.length > queueStart) {
                 const lastQueue = logo.deps.utils.last(tur.queue);
 
                 nextBlock = lastQueue.blk;
@@ -2631,6 +2631,28 @@ class Logo {
                 } else {
                     lastQueue.count--;
                 }
+
+                if (
+                    nextBlock !== null &&
+                    nextBlock !== undefined &&
+                    logo.blocks &&
+                    typeof logo.blocks.findTopBlock === "function"
+                ) {
+                    const topBlk = logo.blocks.findTopBlock(nextBlock);
+                    const topBlockObj =
+                        topBlk !== null && topBlk !== undefined ? logo.blockList[topBlk] : null;
+                    if (
+                        topBlockObj &&
+                        topBlockObj.name === "action" &&
+                        (topBlockObj.disabled ||
+                            (typeof topBlockObj.isDisabled === "function" &&
+                                topBlockObj.isDisabled()))
+                    ) {
+                        nextBlock = null;
+                        continue;
+                    }
+                }
+                break;
             }
 
             // eslint-disable-next-line eqeqeq

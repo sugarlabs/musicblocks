@@ -2274,12 +2274,9 @@ class Palette {
                         }
                     } else {
                         if (valueEntry[1] && valueEntry[1]["disabled"]) {
-                            const metadata = { disabled: true };
-                            if (valueEntry[1]["value"] !== undefined) {
-                                metadata.value =
-                                    valueEntry[0] === "number"
-                                        ? Number(valueEntry[1]["value"])
-                                        : valueEntry[1]["value"];
+                            const metadata = Object.assign({}, valueEntry[1], { disabled: true });
+                            if (valueEntry[0] === "number" && metadata.value !== undefined) {
+                                metadata.value = Number(metadata.value);
                             }
                             newValue = [valueEntry[0], metadata];
                         } else if (valueEntry[0] === "number") {

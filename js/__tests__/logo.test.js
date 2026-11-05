@@ -5006,5 +5006,34 @@ describe("Logo.processSpeak", () => {
                 1
             );
         });
+
+        test("skips queued actions when their action root block is disabled before dispatch", () => {
+            const startBlock = {
+                ...makeFlowBlock("start"),
+                connections: [null],
+                protoblock: { args: 0, flow: jest.fn() }
+            };
+            const actionClamp = {
+                name: "action",
+                disabled: true,
+                isDisabled: () => true,
+                connections: [null, null, 2]
+            };
+            const actionChild = {
+                ...makeFlowBlock("forward"),
+                connections: [1, null],
+                protoblock: { args: 0, flow: jest.fn() }
+            };
+            logo.blockList = [startBlock, actionClamp, actionChild];
+            mockActivity.blocks.findTopBlock = jest.fn(blk => (blk === 2 ? 1 : blk));
+
+            const tur = logo.turtles.ithTurtle(0);
+            tur.queue = [new Queue(2, 1, 1)];
+
+            logo.runFromBlockNow(logo, 0, 0, 1, null, 0);
+
+            expect(actionChild.protoblock.flow).not.toHaveBeenCalled();
+            expect(tur.queue.length).toBe(0);
+        });
     });
 });
