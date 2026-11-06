@@ -346,3 +346,184 @@ describe("HarmonyUtils.findParallels", () => {
         expect(checked).toBe(25 ** 4);
     });
 });
+
+describe("HarmonyUtils.classifyConsonance", () => {
+    const midi = number => edo(number - 69);
+    const classify = (low, high) =>
+        HarmonyUtils.classifyConsonance(HarmonyUtils.describeInterval(low, high));
+
+    it("follows the counterpoint table for every 12-EDO interval up to three octaves", () => {
+        const table = {
+            0: "perfect",
+            1: "dissonant",
+            2: "dissonant",
+            3: "imperfect",
+            4: "imperfect",
+            5: "dissonant", // a fourth above the bass
+            6: "dissonant",
+            7: "perfect",
+            8: "imperfect",
+            9: "imperfect",
+            10: "dissonant",
+            11: "dissonant"
+        };
+        for (let semitones = 0; semitones <= 36; semitones++) {
+            expect([semitones, classify(midi(60), midi(60 + semitones))]).toEqual([
+                semitones,
+                table[semitones % 12]
+            ]);
+        }
+    });
+
+    it("classifies just intervals the same way", () => {
+        expect(classify(200, 300)).toBe("perfect"); // 3:2
+        expect(classify(200, 250)).toBe("imperfect"); // 5:4
+        expect(classify(200, 320)).toBe("imperfect"); // 8:5
+        expect(classify(300, 400)).toBe("dissonant"); // 4:3
+        expect(classify(200, 400)).toBe("perfect"); // 2:1
+    });
+
+    it("counts tempered fifths but not the neighbouring steps of 31-EDO", () => {
+        const step = (n, size) => classify(200, 200 * Math.pow(2, size / n));
+        expect(step(19, 11)).toBe("perfect"); // 695 cents
+        expect(step(31, 18)).toBe("perfect"); // 697 cents
+        expect(step(31, 17)).toBe("dissonant"); // 658 cents, nearest semitone a fifth
+        expect(step(31, 19)).toBe("dissonant"); // 735 cents
+        expect(step(31, 1)).toBe("dissonant"); // 39 cents, nearest semitone a unison
+    });
+
+    it("returns null for an invalid interval", () => {
+        expect(HarmonyUtils.classifyConsonance(null)).toBeNull();
+        expect(HarmonyUtils.classifyConsonance({ played: NaN, semitones: 7 })).toBeNull();
+    });
+});
+
+describe("HarmonyUtils.findHiddenPerfects", () => {
+    const midi = number => edo(number - 69);
+    const voice = (id, number, label = String(number)) => ({
+        voice: id,
+        label,
+        frequency: midi(number)
+    });
+    const kinds = (before, after) =>
+        HarmonyUtils.findHiddenPerfects(before, after).map(hidden => hidden.kind);
+
+    it("finds hidden fifths when the upper voice leaps", () => {
+        // C4/E4 to D4/A4: both up, into a fifth, the upper voice by a fourth.
+        const result = HarmonyUtils.findHiddenPerfects(
+            [voice(2, 64, "E4"), voice(1, 60, "C4")],
+            [voice(1, 62, "D4"), voice(2, 69, "A4")]
+        );
+        expect(result).toEqual([
+            {
+                kind: "fifths",
+                voices: [1, 2],
+                from: ["C4", "E4"],
+                to: ["D4", "A4"],
+                frequencies: [midi(62), midi(69)]
+            }
+        ]);
+    });
+
+    it("finds hidden octaves, and fifths from an octave or as a twelfth", () => {
+        // A3/F4 to C4/C5: into an octave, the upper voice by a fifth.
+        expect(kinds([voice(1, 57), voice(2, 65)], [voice(1, 60), voice(2, 72)])).toEqual([
+            "octaves"
+        ]);
+        // D3/E4 to E3/B4: a twelfth reached the same way is a hidden fifth.
+        expect(kinds([voice(1, 50), voice(2, 64)], [voice(1, 52), voice(2, 71)])).toEqual([
+            "fifths"
+        ]);
+        // G3/G4 to A3/E5: from an octave into a twelfth.
+        expect(kinds([voice(1, 55), voice(2, 67)], [voice(1, 57), voice(2, 76)])).toEqual([
+            "fifths"
+        ]);
+    });
+
+    it("allows the upper voice to move by step", () => {
+        // A3/B4 to C4/C5 (a semitone), G3/Bb4 to A3/C5 (a whole tone).
+        expect(kinds([voice(1, 57), voice(2, 71)], [voice(1, 60), voice(2, 72)])).toEqual([]);
+        expect(kinds([voice(1, 55), voice(2, 70)], [voice(1, 57), voice(2, 72)])).toEqual([]);
+    });
+
+    it("ignores contrary, oblique and parallel motion and crossing voices", () => {
+        // Contrary motion into a fifth: C4/E5 to E4/B4.
+        expect(kinds([voice(1, 60), voice(2, 76)], [voice(1, 64), voice(2, 71)])).toEqual([]);
+        // The lower voice holds.
+        expect(kinds([voice(1, 62), voice(2, 64)], [voice(1, 62), voice(2, 69)])).toEqual([]);
+        // Already a fifth: parallel fifths, which findParallels() reports.
+        expect(kinds([voice(1, 60), voice(2, 67)], [voice(1, 64), voice(2, 71)])).toEqual([]);
+        // Unison to octave: parallel octaves.
+        expect(kinds([voice(1, 60), voice(2, 60)], [voice(1, 62), voice(2, 74)])).toEqual([]);
+        // The voices cross.
+        expect(kinds([voice(1, 60), voice(2, 62)], [voice(1, 74), voice(2, 67)])).toEqual([]);
+    });
+
+    it("does not count a 31-EDO step near a fifth as a fifth", () => {
+        const cents = (id, size) => ({
+            voice: id,
+            label: "",
+            frequency: 200 * Math.pow(2, size / 1200)
+        });
+        // Both voices up, the upper by 358 cents, into a 658-cent interval.
+        expect(kinds([cents(1, 0), cents(2, 400)], [cents(1, 100), cents(2, 758)])).toEqual([]);
+        // The same move into a 697-cent 31-EDO fifth is a hidden fifth.
+        expect(kinds([cents(1, 0), cents(2, 400)], [cents(1, 100), cents(2, 797)])).toEqual([
+            "fifths"
+        ]);
+    });
+
+    it("needs exactly two valid voices", () => {
+        expect(HarmonyUtils.findHiddenPerfects(null, [])).toEqual([]);
+        expect(kinds([voice(1, 60)], [voice(1, 62)])).toEqual([]);
+        expect(kinds([voice(1, 60), voice(2, 64)], [voice(1, 62)])).toEqual([]);
+        expect(
+            kinds([voice(1, 60), voice(2, 64)], [voice(1, 62), { voice: 2, frequency: NaN }])
+        ).toEqual([]);
+    });
+
+    it("agrees with the textbook rule for every two-voice move within two octaves", () => {
+        // In semitones: both voices move the same way without crossing, into a
+        // fifth or octave (compound included) they did not form before, and
+        // the upper voice leaps (three semitones or more).
+        const perfect = size => {
+            if (size === 0) return "unison";
+            if (size % 12 === 0) return "octave";
+            return size % 12 === 7 ? "fifth" : null;
+        };
+        const expected = (a1, b1, a2, b2) => {
+            const [low1, high1, low2, high2] = a1 < b1 ? [a1, b1, a2, b2] : [b1, a1, b2, a2];
+            if (low2 >= high2) return null;
+            const lowMove = low2 - low1;
+            const highMove = high2 - high1;
+            if (lowMove * highMove <= 0 || Math.abs(highMove) < 3) return null;
+            const was = perfect(high1 - low1);
+            const now = perfect(high2 - low2);
+            if (now === "fifth" && was !== "fifth") return "fifths";
+            if (now === "octave" && was !== "octave" && was !== "unison") return "octaves";
+            return null;
+        };
+
+        // Voices start on different notes, so "lower" and "upper" are defined.
+        let checked = 0;
+        for (let a1 = 48; a1 <= 72; a1++) {
+            for (let b1 = 48; b1 <= 72; b1++) {
+                if (a1 === b1) continue;
+                for (let a2 = 48; a2 <= 72; a2++) {
+                    for (let b2 = 48; b2 <= 72; b2++) {
+                        const want = expected(a1, b1, a2, b2);
+                        const got = kinds(
+                            [voice(1, a1), voice(2, b1)],
+                            [voice(1, a2), voice(2, b2)]
+                        );
+                        if (got.length !== (want ? 1 : 0) || (want && got[0] !== want)) {
+                            throw new Error(`${a1} ${b1} -> ${a2} ${b2}: ${got} != ${want}`);
+                        }
+                        checked++;
+                    }
+                }
+            }
+        }
+        expect(checked).toBe(25 * 24 * 25 * 25);
+    });
+});
