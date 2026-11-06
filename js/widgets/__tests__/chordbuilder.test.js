@@ -248,6 +248,14 @@ describe("ChordBuilderWidget", () => {
                 3000
             );
         });
+
+        it("stops playback and clears progression when setKeyAndMode is called", () => {
+            widget.loadPreset("pop");
+            widget.playProgression();
+            widget.setKeyAndMode("G", "major");
+            expect(mockAudio.stop).toHaveBeenCalled();
+            expect(widget.progression).toEqual([]);
+        });
     });
 
     describe("Progression Management", () => {
@@ -281,14 +289,19 @@ describe("ChordBuilderWidget", () => {
             expect(mockAudio.playChord).toHaveBeenCalledWith(chord, 0.4, { octave: 4 });
         });
 
-        it("removes chord at index", () => {
+        it("removes chord at index without shifting subsequent chord positions", () => {
             widget.addChord(widget.diatonicChords[0]); // C
             widget.addChord(widget.diatonicChords[4]); // G
             expect(widget.progression).toHaveLength(2);
 
             widget.removeChord(0);
-            expect(widget.progression).toHaveLength(1);
-            expect(widget.progression[0].name).toBe("G");
+            expect(widget.progression).toHaveLength(2);
+            expect(widget.progression[0]).toBeNull();
+            expect(widget.progression[1].name).toBe("G");
+
+            // Removing the trailing chord trims trailing null entries
+            widget.removeChord(1);
+            expect(widget.progression).toEqual([]);
         });
 
         it("clears entire progression and stops audio", () => {
@@ -338,7 +351,7 @@ describe("ChordBuilderWidget", () => {
                 widget.tempo,
                 expect.any(Function),
                 expect.any(Function),
-                { octave: 4 }
+                { octave: 4, beatsPerChord: 1 }
             );
         });
 
