@@ -2117,6 +2117,135 @@ describe("Logo doStopTurtles", () => {
     });
 });
 
+// ─── Logo stopTurtle set by a block ──────────────────────────────────────────
+
+describe("Logo stopTurtle set by a block", () => {
+    let logo;
+    let turtle;
+    let mockActivity;
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        setupLogoEnv();
+        turtle = createMockTurtle();
+        mockActivity = createMockActivity(turtle);
+        logo = new Logo(mockActivity);
+        mockActivity.logo = logo;
+        logo.sounds = [];
+        logo.synth = makeSynth();
+        logo._restoreConnections = jest.fn();
+        logo.deps.instruments = { 0: {} };
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+        jest.restoreAllMocks();
+    });
+
+    const startRun = () => {
+        logo.stopTurtle = false;
+        logo._alreadyRunning = true;
+        turtle.running = true;
+        mockActivity.turtles.running.mockReturnValue(true);
+    };
+
+    test("ends the run the way Stop does once the block returns", () => {
+        startRun();
+        const stop = jest.spyOn(logo, "doStopTurtles");
+
+        logo.stopTurtle = true;
+        expect(stop).not.toHaveBeenCalled();
+
+        jest.runOnlyPendingTimers();
+
+        expect(stop).toHaveBeenCalledTimes(1);
+        expect(logo._alreadyRunning).toBe(false);
+        expect(mockActivity.turtles.markAllAsStopped).toHaveBeenCalled();
+        expect(mockActivity.onStopTurtle).toHaveBeenCalled();
+    });
+
+    test("ends the run once when several blocks stop it", () => {
+        startRun();
+        const stop = jest.spyOn(logo, "doStopTurtles");
+
+        logo.stopTurtle = true;
+        logo.stopTurtle = true;
+        logo.stopTurtle = true;
+        jest.runOnlyPendingTimers();
+
+        expect(stop).toHaveBeenCalledTimes(1);
+    });
+
+    test("ends a run whose turtles are still running after Play was released", () => {
+        startRun();
+        logo._alreadyRunning = false;
+        const stop = jest.spyOn(logo, "doStopTurtles");
+
+        logo.stopTurtle = true;
+        jest.runOnlyPendingTimers();
+
+        expect(stop).toHaveBeenCalledTimes(1);
+    });
+
+    test("does nothing when the run already ended", () => {
+        logo.stopTurtle = false;
+        const stop = jest.spyOn(logo, "doStopTurtles");
+
+        logo.stopTurtle = true;
+        jest.runOnlyPendingTimers();
+
+        expect(stop).not.toHaveBeenCalled();
+    });
+
+    test("leaves a new run alone if Play starts one before the stop is handled", () => {
+        startRun();
+        const stop = jest.spyOn(logo, "doStopTurtles");
+
+        logo.stopTurtle = true;
+        logo.stopTurtle = false;
+        jest.runOnlyPendingTimers();
+
+        expect(stop).not.toHaveBeenCalled();
+        expect(logo._alreadyRunning).toBe(true);
+    });
+
+    test("does not stop a second time after the Stop button", () => {
+        startRun();
+        mockActivity.turtles.markAllAsStopped.mockImplementation(() => {
+            turtle.running = false;
+            mockActivity.turtles.running.mockReturnValue(false);
+        });
+        const stop = jest.spyOn(logo, "doStopTurtles");
+
+        logo.doStopTurtles();
+        jest.runOnlyPendingTimers();
+
+        expect(stop).toHaveBeenCalledTimes(1);
+        expect(logo.stopTurtle).toBe(true);
+    });
+
+    test("frees Play and shows the blocks after a block reports an error", () => {
+        const next = makeFlowBlock("print");
+        const failing = makeFlowBlock("broken");
+        failing.connections = [null, 1];
+        failing.protoblock.flow = jest.fn(() => {
+            mockActivity.errorMsg("Cannot divide by zero.", 0);
+            logo.stopTurtle = true;
+        });
+        logo.blockList = [failing, next];
+        logo.deps.config.showBlocksAfterRun = true;
+        startRun();
+
+        logo.runFromBlockNow(logo, 0, 0, 1, null);
+        jest.runOnlyPendingTimers();
+
+        expect(next.protoblock.flow).not.toHaveBeenCalled();
+        expect(logo._alreadyRunning).toBe(false);
+        expect(mockActivity.turtles.markAllAsStopped).toHaveBeenCalled();
+        expect(mockActivity.blocks.showBlocks).toHaveBeenCalled();
+    });
+});
+
 // ─── Logo runLogoCommands ─────────────────────────────────────────────────────
 
 describe("Logo runLogoCommands", () => {

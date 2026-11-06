@@ -498,6 +498,28 @@ class Logo {
     }
 
     /**
+     * A block that stops the run on an error leaves it running, so end it as Stop does.
+     * @param {boolean} stopTurtle
+     */
+    set stopTurtle(stopTurtle) {
+        if (stopTurtle && !this._stopTurtle) {
+            setTimeout(() => {
+                if (this._stopTurtle && (this._alreadyRunning || this.turtles.running())) {
+                    this.doStopTurtles();
+                }
+            }, 0);
+        }
+        this._stopTurtle = stopTurtle;
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    get stopTurtle() {
+        return this._stopTurtle;
+    }
+
+    /**
      * @returns {Object} object of Notation
      */
     get notation() {
@@ -1597,7 +1619,7 @@ class Logo {
      * @returns {void}
      */
     doStopTurtles() {
-        this.stopTurtle = true;
+        this._stopTurtle = true;
         this.runGeneration += 1;
         this.turtles.markAllAsStopped();
         this._cancelSpeech();
