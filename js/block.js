@@ -904,9 +904,7 @@ class Block {
                 // Rescale the decoration on the start blocks.
                 for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
                     if (this.activity.turtles.getTurtle(t).startBlock === this) {
-                        this.activity.turtles
-                            .getTurtle(t)
-                            .resizeDecoration(scale, this.bitmap.image.width);
+                        this.activity.turtles.getTurtle(t).resizeDecoration(scale, this.width);
                         this._ensureDecorationOnTop();
                         break;
                     }
