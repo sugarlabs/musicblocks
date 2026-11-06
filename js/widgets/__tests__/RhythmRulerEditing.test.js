@@ -101,6 +101,87 @@ describe("RhythmRulerEditing", () => {
         expect(widget._refreshCircularView).toHaveBeenCalled();
     });
 
+    describe("cell event handlers", () => {
+        let widget;
+        let row;
+        const elementFromPoint = document.elementFromPoint;
+
+        beforeEach(() => {
+            jest.useFakeTimers();
+            global.platformColor = { selectorBackground: "#aaa" };
+            global.last = list => list[list.length - 1];
+            global.rationalToFraction = require("../../utils/utils-logic.js").rationalToFraction;
+            const table = document.createElement("table");
+            row = table.insertRow();
+            row.setAttribute("data-row", "0");
+            document.body.append(table);
+            widget = Object.assign(Object.create(RhythmRuler.prototype), {
+                activity: {
+                    logo: { synth: { stop: jest.fn() } },
+                    hideMsgs: jest.fn(),
+                    errorMsg: jest.fn()
+                },
+                _rulers: [row],
+                Rulers: [[[2, 2], []]],
+                _undoList: [],
+                _rulerSelected: 0,
+                _dissectNumber: { value: "2" },
+                _noteWidth: value => 200 / Math.abs(value),
+                __setNoteValueDisplay: jest.fn(),
+                _calculateZebraStripes: jest.fn(),
+                _refreshCircularView: jest.fn(),
+                saveDissectHistory: jest.fn(),
+                _setWidgetTimeout: (callback, delay) => setTimeout(callback, delay),
+                _clearWidgetTimeout: id => clearTimeout(id)
+            });
+            jest.spyOn(widget, "_dissectRuler");
+            for (const value of widget.Rulers[0][0]) {
+                widget.__addCellEventHandlers(row.insertCell(), widget._noteWidth(value), value);
+            }
+        });
+
+        afterEach(() => {
+            jest.clearAllTimers();
+            jest.useRealTimers();
+            document.elementFromPoint = elementFromPoint;
+            document.body.replaceChildren();
+        });
+
+        const tie = () => {
+            widget._mouseDownCell = row.cells[0];
+            widget._mouseUpCell = row.cells[1];
+            widget.__tie(true);
+            widget._mouseDownCell = null;
+            widget._mouseUpCell = null;
+        };
+
+        test.each([false, true])("long press toggles a rest after tying (undo: %s)", undo => {
+            tie();
+            if (undo) widget._undo();
+            const cell = row.cells[0];
+            const originalValues = widget.Rulers[0][0].slice();
+            document.elementFromPoint = jest.fn(() => cell);
+
+            cell.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
+            jest.advanceTimersByTime(1750);
+            cell.dispatchEvent(new MouseEvent("pointerup", { bubbles: true }));
+            cell.click();
+
+            originalValues[0] *= -1;
+            expect(widget.Rulers[0][0]).toEqual(originalValues);
+            expect(widget._dissectRuler).not.toHaveBeenCalled();
+            expect(widget._undoList.filter(entry => entry[0] === "rest")).toHaveLength(1);
+            expect(jest.getTimerCount()).toBe(0);
+        });
+
+        test("a normal click still subdivides once after tying", () => {
+            tie();
+            row.cells[0].click();
+            expect(widget.Rulers[0][0]).toEqual([2, 2]);
+            expect(widget._dissectRuler).toHaveBeenCalledTimes(1);
+        });
+    });
+
     describe("_undo", () => {
         beforeEach(() => {
             global.platformColor = { selectorBackground: "#aaa" };
