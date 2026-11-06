@@ -2924,8 +2924,8 @@ describe("Utility Functions (logic-only)", () => {
             return clicked;
         };
 
-        const recordAndStop = async () => {
-            Synth.recorder.ondataavailable({ data: { size: 12 } });
+        const recordAndStop = async (data = { size: 12 }) => {
+            Synth.recorder.ondataavailable({ data });
             Synth.recorder.onstop();
             await flush();
             await flush();
@@ -3012,6 +3012,22 @@ describe("Utility Functions (logic-only)", () => {
             await recordAndStop();
 
             expect(clicked[0].download).toBe("take one.ogg");
+        });
+
+        it("names a Firefox recording .ogg from its data when mimeType was cleared on stop", async () => {
+            recorderMimeType = "";
+            decodeAudioData.mockImplementation(() => Promise.reject(new Error("cannot decode")));
+            window.MBDialog = {
+                prompt: jest.fn(() => Promise.resolve("take two")),
+                alert: jest.fn()
+            };
+            const clicked = captureDownloads();
+
+            setup();
+            await recordAndStop({ size: 12, type: "audio/ogg; codecs=opus" });
+
+            expect(global.URL.createObjectURL.mock.calls[0][0].type).toBe("audio/ogg; codecs=opus");
+            expect(clicked[0].download).toBe("take two.ogg");
         });
 
         it("saves an mp4 file named .m4a when Safari's recording can't be converted", async () => {

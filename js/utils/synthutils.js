@@ -1328,7 +1328,9 @@ function Synth() {
         };
         this.recorder.onstop = async () => {
             if (!chunks.length) return;
-            const recorded = new Blob(chunks, { type: recorder.mimeType || "" });
+            // Firefox clears recorder.mimeType on stop, so take the type from the data.
+            const type = chunks[0].type || recorder.mimeType || "";
+            const recorded = new Blob(chunks, { type });
             chunks = [];
             let blob;
             let ext;
@@ -1340,7 +1342,7 @@ function Synth() {
                 // Couldn't convert, so save what was recorded, named by its real format.
                 console.debug("Could not convert the recording to WAV:", e);
                 blob = recorded;
-                const mime = (recorder.mimeType || "").toLowerCase();
+                const mime = type.toLowerCase();
                 if (mime.includes("ogg")) {
                     ext = ".ogg";
                 } else if (mime.includes("mp4")) {
