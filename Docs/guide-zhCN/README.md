@@ -171,20 +171,20 @@
 这代表每当其中一个开始按钮按下之后，*Start* 拼块里面的程序 (*Chunk* 拼块) 会被执行。
 之后，你可以在 *Start* 加更多拼块, 顺序的执行拼块里的程序。
 
-![alt tag](../guide/chunk-2.svg "usage of multiple Chunk blocks")
+![alt tag](../guide/chunk-3.svg "usage of multiple Chunk blocks")
 
-![alt tag](../guide/chunk-3.svg "usage of Repeat block")
+![alt tag](../guide/chunk-4.svg "usage of Repeat block")
 
 你可以使用更多 *Chunk* 拼块或使用 *Repeat* 拼块 [重复](#REPETITION) 程序。
 
-![alt tag](../guide/chunk-4.svg "multiple action stacks")
+![alt tag](../guide/chunk-6.svg "multiple action stacks")
 
 ![alt tag](../guide/chunk-5.svg "mixing and matching chunks")
 
 你也可以混合不同的拼块。
 在上面的程序例子， 我们执行 "chunk" 的行动拼块, 接着我们两次执行 "chunk1" , 然后又执行 "chunk".
 
-![alt tag](../guide/chunk-6.svg "creating a song using chunks")
+![alt tag](../guide/chunk-8.svg "creating a song using chunks")
 
 ![alt tag](../guide/chunk-7.svg "usage of Repeat block in a song")
 

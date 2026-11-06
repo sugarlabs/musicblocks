@@ -132,7 +132,7 @@ http://127.0.0.1:3000/` and `Compression enabled`.
 
 6. Open your favorite browser and visit `localhost:3000` or `127.0.0.1:3000`.
 
-**NOTE:** Press `Ctrl + C` (or `Cmd + C` on macOS) to stop the server.
+**NOTE:** Press `Ctrl + C` to stop the server, including on macOS.
 
 For Turtle Blocks, use `localhost:3000?turtle=true` or `http://127.0.0.1:3000?turtle=true`.
 

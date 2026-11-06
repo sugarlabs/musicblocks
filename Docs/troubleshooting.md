@@ -49,8 +49,10 @@ Docker build fails or the container does not start correctly.
 Solution:
 Build and run the Docker image from the project root:
 
+```bash
 docker build -f dockerfile -t musicblocks .
 docker run -p 3000:3000 musicblocks
+```
 
 Then open http://localhost:3000 in your browser. The repository does not
 include a Docker Compose file.
