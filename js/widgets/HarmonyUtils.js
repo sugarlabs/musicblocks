@@ -27,8 +27,9 @@
  * @file HarmonyUtils.js
  * @description Pure helpers for the Harmony row of the Status widget: name the
  * intervals and chord formed by the notes sounding at one moment, compare
- * each played frequency ratio with its just-intonation ideal, and find
- * parallel fifths and octaves between voices.
+ * each played frequency ratio with its just-intonation ideal, sort intervals
+ * into consonances and dissonances, and find parallel and hidden fifths and
+ * octaves between voices.
  */
 
 const HarmonyUtils = {
@@ -58,6 +59,35 @@ const HarmonyUtils = {
      * @type {number}
      */
     PERFECT_TOLERANCE: 25,
+
+    /**
+     * Cents a voice moves by and still moves "by step" in hidden fifths and
+     * octaves: a whole tone is 200 cents (189 in 19-EDO, 194 in 31-EDO), an
+     * augmented second 300.
+     * @type {number}
+     */
+    STEP_LIMIT: 250,
+
+    /**
+     * Names the perfect interval between two frequencies, within
+     * PERFECT_TOLERANCE cents.
+     * @param {number} lowFreq
+     * @param {number} highFreq
+     * @returns {string|null} "unison", "octave" (compound included), "fifth"
+     *     (compound included) or null.
+     */
+    perfectKind(lowFreq, highFreq) {
+        const tolerance = HarmonyUtils.PERFECT_TOLERANCE;
+        const size = Math.abs(1200 * Math.log2(highFreq / lowFreq));
+        const simple = size % 1200;
+        if (size < tolerance) {
+            return "unison";
+        }
+        if (simple < tolerance || simple > 1200 - tolerance) {
+            return "octave";
+        }
+        return Math.abs(simple - 700) < tolerance ? "fifth" : null;
+    },
 
     /**
      * Describes the interval between two frequencies.
@@ -191,19 +221,7 @@ const HarmonyUtils = {
     findParallels(before, after) {
         const isValid = note => note && note.frequency > 0 && isFinite(note.frequency);
         const cents = (low, high) => 1200 * Math.log2(high / low);
-        // "unison", "octave" (compound included), "fifth" or null.
-        const perfect = (low, high) => {
-            const tolerance = HarmonyUtils.PERFECT_TOLERANCE;
-            const size = Math.abs(cents(low, high));
-            const simple = size % 1200;
-            if (size < tolerance) {
-                return "unison";
-            }
-            if (simple < tolerance || simple > 1200 - tolerance) {
-                return "octave";
-            }
-            return Math.abs(simple - 700) < tolerance ? "fifth" : null;
-        };
+        const perfect = HarmonyUtils.perfectKind;
 
         const moves = (before || [])
             .filter(isValid)
@@ -244,6 +262,98 @@ const HarmonyUtils = {
             }
         }
         return parallels;
+    },
+
+    /**
+     * Sorts an interval above the bass into the classes of counterpoint:
+     * perfect consonances (unison, fifth and octave, compound included),
+     * imperfect consonances (thirds and sixths) and dissonances (seconds,
+     * sevenths, the tritone, and the fourth, which is dissonant above the
+     * bass). A unison, fifth or octave must be within PERFECT_TOLERANCE cents,
+     * so a 658-cent 31-EDO step, named a fifth by its nearest semitone, is
+     * dissonant.
+     * @param {Object} interval - An entry of analyze().intervals or a
+     *     describeInterval() result.
+     * @returns {string|null} "perfect", "imperfect", "dissonant", or null if
+     *     the interval is not valid.
+     */
+    classifyConsonance(interval) {
+        if (!interval || !(interval.played > 0) || !isFinite(interval.played)) {
+            return null;
+        }
+        if (HarmonyUtils.perfectKind(1, interval.played)) {
+            return "perfect";
+        }
+        const simple = ((interval.semitones % 12) + 12) % 12;
+        return [3, 4, 8, 9].includes(simple) ? "imperfect" : "dissonant";
+    },
+
+    /**
+     * Finds hidden (direct) fifths or octaves between two voices: both move
+     * the same way, without crossing, into a perfect fifth or octave
+     * (compound included) that they did not already form, and the upper voice
+     * leaps. Counterpoint allows this between the outer voices only when the
+     * upper voice moves by step, so callers check the outer voices.
+     * @param {Array<{voice: *, label: string, frequency: number}>} before - The
+     *     two voices at one moment.
+     * @param {Array<{voice: *, label: string, frequency: number}>} after - The
+     *     same two voices at the next moment.
+     * @returns {Array<Object>} At most one { kind, voices, from, to }, where
+     *     `kind` is "fifths" or "octaves" and the voices are listed low to high.
+     */
+    findHiddenPerfects(before, after) {
+        const isValid = note => note && note.frequency > 0 && isFinite(note.frequency);
+        const cents = (low, high) => 1200 * Math.log2(high / low);
+        if (!Array.isArray(before) || !Array.isArray(after) || before.length !== 2) {
+            return [];
+        }
+
+        const pairs = before
+            .filter(isValid)
+            .map(note => [note, after.find(next => next && next.voice === note.voice)])
+            .filter(([, next]) => isValid(next));
+        if (pairs.length !== 2) {
+            return [];
+        }
+
+        // Low to high before the move; the same order after it, or they cross.
+        pairs.sort((a, b) => a[0].frequency - b[0].frequency);
+        const [[lowFrom, lowTo], [highFrom, highTo]] = pairs;
+        if (lowTo.frequency >= highTo.frequency) {
+            return [];
+        }
+
+        const lowMove = cents(lowFrom.frequency, lowTo.frequency);
+        const highMove = cents(highFrom.frequency, highTo.frequency);
+        if (Math.abs(lowMove) < 1 || Math.abs(highMove) < 1 || lowMove * highMove < 0) {
+            return [];
+        }
+        if (Math.abs(highMove) <= HarmonyUtils.STEP_LIMIT) {
+            return [];
+        }
+
+        const was = HarmonyUtils.perfectKind(lowFrom.frequency, highFrom.frequency);
+        const now = HarmonyUtils.perfectKind(lowTo.frequency, highTo.frequency);
+        let kind = null;
+        // Moving from the same perfect interval is parallel motion, not hidden.
+        if (now === "fifth" && was !== "fifth") {
+            kind = "fifths";
+        } else if (now === "octave" && was !== "octave" && was !== "unison") {
+            kind = "octaves";
+        }
+        if (!kind) {
+            return [];
+        }
+
+        return [
+            {
+                kind,
+                voices: [lowFrom.voice, highFrom.voice],
+                from: [lowFrom.label, highFrom.label],
+                to: [lowTo.label, highTo.label],
+                frequencies: [lowTo.frequency, highTo.frequency]
+            }
+        ];
     }
 };
 

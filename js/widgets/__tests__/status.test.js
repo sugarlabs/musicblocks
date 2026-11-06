@@ -1574,8 +1574,8 @@ describe("StatusMatrix Widget", () => {
 
             expect(statusMatrix._harmonyCell.textContent).toContain("C major");
             expect(harmonyText()).toEqual([
-                ["C4 → E4", "major 3", "5:4", "1.260", "+13.7"],
-                ["C4 → G4", "perfect 5", "3:2", "1.498", "-2.0"]
+                ["C4 → E4", "major 3", "5:4", "1.260", "+13.7", "imperfect"],
+                ["C4 → G4", "perfect 5", "3:2", "1.498", "-2.0", "perfect"]
             ]);
         });
 
@@ -1647,18 +1647,20 @@ describe("StatusMatrix Widget", () => {
             let mice;
 
             // Moves a mouse to a note group (or a rest, with no notes) that starts
-            // at `start` in turtle time and is sounding now.
-            const play = (i, notes, start) => {
+            // at `start` in turtle time, lasts `length` seconds and is sounding now.
+            const play = (i, notes, start, length = 1) => {
                 mice[i].singer.previousTurtleTime = start;
                 mice[i].singer.pitchStatus =
-                    notes.length > 0 ? [{ notes, start, startsAt: 10000, endsAt: 11000 }] : [];
+                    notes.length > 0
+                        ? [{ notes, start, startsAt: 10000, endsAt: 10000 + length * 1000 }]
+                        : [];
                 statusMatrix.updateAll();
             };
 
             const warnings = () =>
                 Array.from(statusMatrix._harmonyCell.children)
                     .map(child => child.textContent)
-                    .filter(text => text.startsWith("parallel"));
+                    .filter(text => /^(parallel|hidden) /.test(text));
 
             beforeEach(() => {
                 mockActivity.logo.synth.getFrequency.mockImplementation(
@@ -1759,6 +1761,61 @@ describe("StatusMatrix Widget", () => {
                     "parallel octaves: mouse 1 C3 → D3, mouse 2 C4 → D4",
                     "parallel fifths: mouse 1 C3 → D3, mouse 3 G4 → A4",
                     "parallel fifths: mouse 2 C4 → D4, mouse 3 G4 → A4"
+                ]);
+            });
+
+            test("shows hidden fifths between the outer voices", () => {
+                useMice(mice.slice(0, 2));
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["E4"], 0);
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+
+                expect(warnings()).toEqual(["hidden fifths: mouse 1 C4 → D4, mouse 2 E4 → A4"]);
+            });
+
+            test("checks hidden fifths only between the lowest and highest notes", () => {
+                // A third mouse holds C3, below the two that move into a fifth.
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                play(2, ["C3"], 0, 2);
+                play(0, ["C4"], 0);
+                play(1, ["E4"], 0);
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+                expect(warnings()).toEqual([]);
+
+                // Between them, it leaves them the outer voices.
+                play(2, ["F4"], 2, 3);
+                play(0, ["C4"], 3);
+                play(1, ["E4"], 3);
+                play(0, ["D4"], 4);
+                play(1, ["A4"], 4);
+                expect(warnings()).toEqual(["hidden fifths: mouse 1 C4 → D4, mouse 2 E4 → A4"]);
+            });
+
+            test("does not count a note that ended before the move", () => {
+                // The low C3 lasts one second, so it has ended when the others move.
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                play(2, ["C3"], 0, 1);
+                play(0, ["C4"], 0);
+                play(1, ["E4"], 0);
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+
+                expect(warnings()).toEqual(["hidden fifths: mouse 1 C4 → D4, mouse 2 E4 → A4"]);
+            });
+
+            test("marks each interval above the bass as consonant or dissonant", () => {
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                ["C4", "F4", "A4"].forEach((note, i) => play(i, [note], 0));
+
+                expect(harmonyText().map(row => [row[0], row[5]])).toEqual([
+                    ["C4 → F4", "dissonant"],
+                    ["C4 → A4", "imperfect"]
                 ]);
             });
 
