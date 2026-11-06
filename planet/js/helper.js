@@ -156,23 +156,24 @@ function updateCheckboxes(id) {
     urlel.value = url;
 }
 
+function bindSearchClearButton(inputId, clearId) {
+    const input = document.getElementById(inputId);
+    const clearButton = document.getElementById(clearId);
+
+    if (!input || !clearButton) return;
+
+    input.addEventListener("input", evt => {
+        clearButton.style.display = evt.target.value === "" ? "none" : "initial";
+    });
+}
+
 $(document).ready(() => {
     $("#publisher").modal();
     $("#deleter").modal();
     $("#projectviewer").modal();
 
-    document.getElementById("global-search").addEventListener("input", evt => {
-        document.getElementById("search-close").style.display =
-            evt.target.value === "" ? "none" : "initial";
-    });
-
-    const mobileSearchInput = document.getElementById("global-search-2");
-    const mobileSearchClose = document.getElementById("search-close-2");
-    if (mobileSearchInput && mobileSearchClose) {
-        mobileSearchInput.addEventListener("input", evt => {
-            mobileSearchClose.style.display = evt.target.value === "" ? "none" : "initial";
-        });
-    }
+    bindSearchClearButton("global-search", "search-close");
+    bindSearchClearButton("global-search-2", "search-close-2");
 
     document.getElementById("local-tab").addEventListener("click", evt => {
         toggleSearch(false);
