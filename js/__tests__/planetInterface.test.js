@@ -1796,6 +1796,46 @@ describe("PlanetInterface", () => {
         expect(doSVG).toHaveBeenCalledTimes(2);
     });
 
+    test("saveLocally: a text-only edit after a save does not reuse the old thumbnail", async () => {
+        require("../turtle");
+        const Turtle = global.Turtle;
+        const saveLocally = setupThumbnailHarness(() => "proj-1");
+
+        await planetInterface.saveLocally();
+        expect(doSVG).toHaveBeenCalledTimes(1);
+        expect(saveLocally).toHaveBeenNthCalledWith(2, "EXPORT", "DATAURL", "proj-1");
+
+        // Render text through the real doShowText so the artwork revision is
+        // advanced by the production code rather than by the test.
+        global.createjs.Text = class {
+            constructor(text, font, color) {
+                this.text = text;
+                this.font = font;
+                this.color = color;
+            }
+            getMeasuredWidth() {
+                return 10;
+            }
+            getMeasuredHeight() {
+                return 10;
+            }
+        };
+        const view = new Turtle.TurtleView();
+        view.activity = mockActivity;
+        view.container = { x: 0, y: 0 };
+        view.orientation = 0;
+        view._media = [];
+        view.painter = { font: "sans-serif", canvasColor: "#00f", svgOutput: "" };
+        view.turtles = { scale: 1, stage: { addChild: jest.fn() } };
+
+        view.doShowText(20, "hi");
+        expect(mockActivity.artworkRevision).toBe(1);
+
+        await planetInterface.saveLocally();
+        expect(doSVG).toHaveBeenCalledTimes(2);
+        expect(saveLocally).toHaveBeenLastCalledWith("EXPORT", "DATAURL", "proj-1");
+    });
+
     test("saveLocally: invalidates a thumbnail whose artwork changed while it was rendering", async () => {
         doSVG.mockReturnValue("<svg/>");
         mockActivity.prepareExport.mockReturnValue("EXPORT");

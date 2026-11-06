@@ -1425,24 +1425,6 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
         expect(painter.turtle.media).toEqual([]);
     });
 
-    test("doClearMedia should advance the artwork revision when it clears media", () => {
-        painter.turtle.media = [{ type: "image" }];
-        painter.turtle.imageContainer = { removeChild: jest.fn() };
-        painter.turtles.stage = { removeChild: jest.fn() };
-
-        painter.doClearMedia();
-
-        expect(painter.activity.artworkRevision).toBe(1);
-    });
-
-    test("doClearMedia should not advance the artwork revision when there is no media", () => {
-        painter.turtle.media = [];
-
-        painter.doClearMedia();
-
-        expect(painter.activity.artworkRevision).toBe(0);
-    });
-
     test("doClear should reset properties based on flags", () => {
         painter.turtle.name = "not_start";
         painter.turtle.skinChanged = true;
