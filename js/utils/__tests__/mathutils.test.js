@@ -623,6 +623,10 @@ describe("MathUtility", () => {
             expect(() => MathUtility.doPower(0, -5)).toThrow("DivByZeroError");
         });
 
+        it("returns 1 for zero raised to the power of zero", () => {
+            expect(MathUtility.doPower(0, 0)).toBe(1);
+        });
+
         test("throws NanError for string base", () => {
             expect(() => MathUtility.doPower("2", 3)).toThrow("NanError");
         });
