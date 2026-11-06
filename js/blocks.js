@@ -422,6 +422,7 @@ class Blocks {
         this._viewportAlwaysVisible = new Set();
         this._viewportFallback = new Set();
         this._viewportVisibleBlocks = new Set();
+        this._viewportCullingInitialized = false;
 
         /**
          * We stage deletion of prototype action blocks on the palette so
@@ -471,7 +472,7 @@ class Blocks {
         this._updateViewportGrid = blkIdx => {
             const idx = Number(blkIdx);
             const block = this.blockList[idx];
-            if (!block || !block.container) return;
+            if (!block) return;
 
             const oldKeys = this._blockViewportCells.get(idx);
             if (oldKeys) {
@@ -485,12 +486,18 @@ class Blocks {
             }
 
             this._viewportFallback.delete(idx);
+            this._viewportAlwaysVisible.delete(idx);
+            if (block.trash || !block.container) {
+                this._blockViewportCells.delete(idx);
+                this._viewportVisibleBlocks.delete(idx);
+                return;
+            }
+
             if (block._viewportVisible === false) {
                 this._viewportVisibleBlocks.delete(idx);
             } else {
                 this._viewportVisibleBlocks.add(idx);
             }
-            this._viewportAlwaysVisible.delete(idx);
             if (!block.width || !block.height) {
                 this._blockViewportCells.delete(idx);
                 this._viewportAlwaysVisible.add(idx);
@@ -535,7 +542,9 @@ class Blocks {
                 !isSafeViewportGridRange(minX, minY, maxX, maxY)
             ) {
                 return new Set(
-                    this.blockList.map((block, idx) => (block ? idx : -1)).filter(idx => idx >= 0)
+                    this.blockList
+                        .map((block, idx) => (block && !block.trash ? idx : -1))
+                        .filter(idx => idx >= 0)
                 );
             }
 
@@ -7987,6 +7996,7 @@ class Blocks {
             for (let b = 0; b < this.dragGroup.length; b++) {
                 const blk = this.dragGroup[b];
                 this.blockList[blk].trash = true;
+                this._updateViewportGrid(blk);
                 this.blockList[blk].hide();
 
                 // Free the backing canvas memory for trashed blocks.
@@ -8202,10 +8212,9 @@ class Blocks {
             const vpRight = vpLeft + canvas.width;
             const vpBottom = vpTop + canvas.height;
             const candidates = this._getViewportCandidates(vpLeft, vpTop, vpRight, vpBottom);
-            const blocksToCheck =
-                this._viewportVisibleBlocks.size === 0
-                    ? this.blockList.map((_, i) => i)
-                    : candidates;
+            const blocksToCheck = !this._viewportCullingInitialized
+                ? this.blockList.map((_, i) => i)
+                : candidates;
 
             for (const i of this._viewportVisibleBlocks) {
                 if (!candidates.has(i)) {
@@ -8248,6 +8257,9 @@ class Blocks {
                 }
             }
             this._viewportVisibleBlocks = nextVisibleBlocks;
+            if (this.blockList.length > 0) {
+                this._viewportCullingInitialized = true;
+            }
         };
 
         /***

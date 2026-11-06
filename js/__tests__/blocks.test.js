@@ -206,6 +206,33 @@ describe("Viewport Culling", () => {
         expect(blocks.blockList[0]._viewportVisible).toBe(false);
     });
 
+    it("does not rescan all blocks on later culls when none are visible", () => {
+        let xReads = 0;
+        const block = {
+            container: {
+                get x() {
+                    xReads++;
+                    return 2000;
+                },
+                y: 2000
+            },
+            width: 50,
+            height: 30,
+            trash: false
+        };
+        blocks.blockList = [block];
+        blocks._rebuildSpatialGrid();
+        xReads = 0;
+
+        blocks._updateViewportCulling();
+        const firstPassReads = xReads;
+        blocks._updateViewportCulling();
+
+        expect(block._viewportVisible).toBe(false);
+        expect(firstPassReads).toBeGreaterThan(0);
+        expect(xReads).toBe(firstPassReads);
+    });
+
     it("updates viewport grid membership when a block moves", () => {
         blocks.blockList = [
             { trash: false, container: { x: 100, y: 100 }, width: 50, height: 30, docks: [[0, 0]] }
@@ -216,6 +243,18 @@ describe("Viewport Culling", () => {
 
         expect(blocks._getViewportCandidates(0, 0, 800, 600).has(0)).toBe(false);
         expect(blocks._getViewportCandidates(2000, 100, 2800, 700).has(0)).toBe(true);
+    });
+
+    it("keeps trashed blocks out of viewport candidates after updates and rebuilds", () => {
+        blocks.blockList = [{ trash: false, container: { x: 100, y: 100 }, width: 50, height: 30 }];
+        blocks._rebuildSpatialGrid();
+        blocks.blockList[0].trash = true;
+
+        blocks._updateSpatialGrid(0);
+        expect(blocks._getViewportCandidates(0, 0, 800, 600).has(0)).toBe(false);
+
+        blocks._rebuildSpatialGrid();
+        expect(blocks._getViewportCandidates(0, 0, 800, 600).has(0)).toBe(false);
     });
 
     it("falls back for block coordinates outside the safe integer range", () => {
