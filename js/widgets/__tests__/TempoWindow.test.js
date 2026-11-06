@@ -66,6 +66,7 @@ describe("TempoWindow", () => {
     });
 
     afterEach(() => {
+        jest.restoreAllMocks();
         jest.useRealTimers();
     });
 
@@ -199,6 +200,7 @@ describe("TempoWindow", () => {
             expect(beat).not.toHaveBeenCalled();
             expect(tempo._tapTimeout).toBeNull();
             expect(tempo._tapButtonTimeout).toBeNull();
+            expect(tempo._intervalID).toBeNull();
             expect(tempo._tapTimes).toEqual([]);
             expect(tempo._lastTapIndex).toBeNull();
             expect(widgetWindow.destroy).toHaveBeenCalledTimes(1);
@@ -227,6 +229,111 @@ describe("TempoWindow", () => {
 
             expect(tapReset).not.toHaveBeenCalled();
             expect(widgetWindow.destroy).toHaveBeenCalled();
+        });
+
+        test("clears the interval with native clearInterval and destroys the window when timerManager is null", () => {
+            const beat = jest.fn();
+            tempo._intervalID = setInterval(beat, 100);
+            widgetWindow.timerManager = null;
+            const clearSpy = jest.spyOn(global, "clearInterval");
+
+            tempo._closeWindow(widgetWindow);
+            jest.advanceTimersByTime(500);
+
+            expect(clearSpy).toHaveBeenCalled();
+            expect(beat).not.toHaveBeenCalled();
+            expect(tempo._intervalID).toBeNull();
+            expect(widgetWindow.destroy).toHaveBeenCalledTimes(1);
+        });
+
+        test("clears the interval with native clearInterval when timerManager is undefined", () => {
+            const beat = jest.fn();
+            tempo._intervalID = setInterval(beat, 100);
+            widgetWindow.timerManager = undefined;
+            const clearSpy = jest.spyOn(global, "clearInterval");
+
+            tempo._closeWindow(widgetWindow);
+            jest.advanceTimersByTime(500);
+
+            expect(clearSpy).toHaveBeenCalled();
+            expect(beat).not.toHaveBeenCalled();
+            expect(tempo._intervalID).toBeNull();
+            expect(widgetWindow.destroy).toHaveBeenCalledTimes(1);
+        });
+
+        test("falls back to native clearInterval when timerManager lacks clearInterval function", () => {
+            const beat = jest.fn();
+            tempo._intervalID = setInterval(beat, 100);
+            widgetWindow.timerManager = {};
+            const clearSpy = jest.spyOn(global, "clearInterval");
+
+            tempo._closeWindow(widgetWindow);
+            jest.advanceTimersByTime(500);
+
+            expect(clearSpy).toHaveBeenCalled();
+            expect(beat).not.toHaveBeenCalled();
+            expect(tempo._intervalID).toBeNull();
+            expect(widgetWindow.destroy).toHaveBeenCalledTimes(1);
+        });
+
+        test("clears interval when _intervalID is 0", () => {
+            tempo._intervalID = 0;
+            const timerClearSpy = jest.spyOn(widgetWindow.timerManager, "clearInterval");
+
+            tempo._closeWindow(widgetWindow);
+
+            expect(timerClearSpy).toHaveBeenCalledWith(0);
+            expect(tempo._intervalID).toBeNull();
+            expect(widgetWindow.destroy).toHaveBeenCalledTimes(1);
+        });
+
+        test("clears interval via native clearInterval when _intervalID is 0 and timerManager is null", () => {
+            tempo._intervalID = 0;
+            widgetWindow.timerManager = null;
+            const clearSpy = jest.spyOn(global, "clearInterval");
+
+            tempo._closeWindow(widgetWindow);
+
+            expect(clearSpy).toHaveBeenCalledWith(0);
+            expect(tempo._intervalID).toBeNull();
+            expect(widgetWindow.destroy).toHaveBeenCalledTimes(1);
+        });
+
+        test("does not attempt to clear interval when _intervalID is null or undefined", () => {
+            tempo._intervalID = null;
+            const clearSpy = jest.spyOn(global, "clearInterval");
+            const timerClearSpy = jest.spyOn(widgetWindow.timerManager, "clearInterval");
+
+            tempo._closeWindow(widgetWindow);
+
+            expect(clearSpy).not.toHaveBeenCalled();
+            expect(timerClearSpy).not.toHaveBeenCalled();
+            expect(tempo._intervalID).toBeNull();
+            expect(widgetWindow.destroy).toHaveBeenCalledTimes(1);
+
+            tempo._intervalID = undefined;
+            tempo._closeWindow(widgetWindow);
+
+            expect(clearSpy).not.toHaveBeenCalled();
+            expect(timerClearSpy).not.toHaveBeenCalled();
+            expect(tempo._intervalID).toBeUndefined();
+            expect(widgetWindow.destroy).toHaveBeenCalledTimes(2);
+        });
+
+        test("interval cleanup is idempotent when _closeWindow is called repeatedly", () => {
+            const beat = jest.fn();
+            tempo._intervalID = widgetWindow.timerManager.setInterval(beat, 50);
+            const timerClearSpy = jest.spyOn(widgetWindow.timerManager, "clearInterval");
+
+            tempo._closeWindow(widgetWindow);
+            expect(timerClearSpy).toHaveBeenCalledTimes(1);
+            expect(tempo._intervalID).toBeNull();
+            expect(widgetWindow.destroy).toHaveBeenCalledTimes(1);
+
+            tempo._closeWindow(widgetWindow);
+            expect(timerClearSpy).toHaveBeenCalledTimes(1);
+            expect(tempo._intervalID).toBeNull();
+            expect(widgetWindow.destroy).toHaveBeenCalledTimes(2);
         });
     });
 
