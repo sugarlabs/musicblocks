@@ -1099,7 +1099,7 @@ class JSInterface {
                         "dorian",
                         "phrygian",
                         "lydian",
-                        "myxolydian",
+                        "mixolydian",
                         "minor",
                         "aeolian"
                     ],

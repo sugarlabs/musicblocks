@@ -442,7 +442,7 @@ var __MB_methodArgConstraints = {
                     "dorian",
                     "phrygian",
                     "lydian",
-                    "myxolydian",
+                    "mixolydian",
                     "minor",
                     "aeolian"
                 ],
