@@ -44,7 +44,7 @@ describe("setupToneActions", () => {
         global.CUSTOMSAMPLES = {};
         global.DEFAULTVOICE = "default-voice";
         global.safeNumber = require("../../utils/utils-logic").safeNumber;
-        global.last = array => array[array.length - 1];
+        global.last = require("../../utils/utils-logic").last;
         global._ = msg => msg;
         global.NOINPUTERRORMSG = "Missing input";
         global.MusicBlocks = { isRun: true };
@@ -323,14 +323,49 @@ describe("setupToneActions", () => {
             expect(targetTurtle.singer.instrumentNames).toEqual([]);
         });
 
-        it("should not leave the middle instrument behind after piano > violin > piano", () => {
+        it("should play the innermost instrument at every depth of any nesting", () => {
+            const synths = { piano: "grand-piano", violin: "acoustic-violin" };
+            let sequences = [[]];
+            let checked = 0;
+            for (let depth = 1; depth <= 5; depth++) {
+                sequences = sequences.flatMap(seq => [seq.concat("piano"), seq.concat("violin")]);
+                for (const seq of sequences) {
+                    targetTurtle.singer.instrumentNames = [];
+                    targetTurtle.inSetTimbre = false;
+                    seq.forEach((name, i) => {
+                        activity.blocks.blockList[i + 1] = {};
+                        Singer.ToneActions.setTimbre(name, 0, i + 1);
+                        expect(last(targetTurtle.singer.instrumentNames)).toBe(synths[name]);
+                    });
+                    for (let i = seq.length - 1; i >= 0; i--) {
+                        listenerCallbacks["_settimbre_0_" + (i + 1)]();
+                        const outer = i > 0 ? synths[seq[i - 1]] : null;
+                        expect(last(targetTurtle.singer.instrumentNames)).toBe(outer);
+                    }
+                    expect(targetTurtle.singer.instrumentNames).toEqual([]);
+                    expect(targetTurtle.inSetTimbre).toBe(false);
+                    checked++;
+                }
+            }
+            expect(checked).toBe(62);
+        });
+
+        it("should play piano again inside piano > violin > piano and unwind the stack", () => {
             activity.blocks.blockList[3] = {};
             Singer.ToneActions.setTimbre("piano", 0, 1);
             Singer.ToneActions.setTimbre("violin", 0, 2);
+            activity.logo.synth.loadSynth.mockClear();
             Singer.ToneActions.setTimbre("piano", 0, 3);
-            expect(targetTurtle.singer.instrumentNames).toEqual(["grand-piano", "acoustic-violin"]);
+            // Notes play the last entry; piano is already loaded.
+            expect(targetTurtle.singer.instrumentNames).toEqual([
+                "grand-piano",
+                "acoustic-violin",
+                "grand-piano"
+            ]);
+            expect(activity.logo.synth.loadSynth).not.toHaveBeenCalled();
 
             listenerCallbacks["_settimbre_0_3"]();
+            expect(targetTurtle.singer.instrumentNames).toEqual(["grand-piano", "acoustic-violin"]);
             listenerCallbacks["_settimbre_0_2"]();
             expect(targetTurtle.singer.instrumentNames).toEqual(["grand-piano"]);
             expect(targetTurtle.inSetTimbre).toBe(true);
