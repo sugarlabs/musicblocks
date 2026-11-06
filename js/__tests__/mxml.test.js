@@ -26,7 +26,7 @@ describe("saveMxmlOutput", () => {
     it("exports a drum-only note as unpitched percussion rather than only a rest", () => {
         const output = saveMxmlOutput({
             notation: {
-                notationStaging: { 0: [[["R"], 4, 0, null, null, false, false, "snare drum"]] }
+                notationStaging: { 0: [[["R"], 4, 0, null, null, false, false, ["snare drum"]]] }
             }
         });
 
@@ -48,9 +48,9 @@ describe("saveMxmlOutput", () => {
                     0: [
                         [["C4"], 4, 0, null, null, false, false, null],
                         [["C4"], 4, 0, null, null, false, false, null],
-                        [["C4"], 2, 0, null, null, false, false, "snare drum"],
+                        [["C4"], 2, 0, null, null, false, false, ["snare drum"]],
                         "tie",
-                        [["C4"], 2, 0, null, null, false, false, "snare drum"]
+                        [["C4"], 2, 0, null, null, false, false, ["snare drum"]]
                     ]
                 }
             }
@@ -71,8 +71,8 @@ describe("saveMxmlOutput", () => {
             notation: {
                 notationStaging: {
                     0: [
-                        [["C4"], 4, 0, null, null, false, false, "snare drum"],
-                        [["D4"], 4, 0, null, null, false, false, "kick drum"]
+                        [["C4"], 4, 0, null, null, false, false, ["snare drum"]],
+                        [["D4"], 4, 0, null, null, false, false, ["kick drum"]]
                     ]
                 }
             }
@@ -92,13 +92,35 @@ describe("saveMxmlOutput", () => {
         );
     });
 
+    it("writes every drum in a note as one chord in the percussion part", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [
+                        [["R"], 4, 0, null, null, false, false, ["kick drum", "snare drum"]],
+                        [["R"], 4, 0, null, null, false, false, ["kick drum"]]
+                    ]
+                }
+            }
+        });
+        const percussion = output.split('<part id="D1">')[1].split("</part>")[0];
+
+        expect(output).toContain("<instrument-name>kick drum</instrument-name>");
+        expect(output).toContain("<instrument-name>snare drum</instrument-name>");
+        expect(percussion.match(/<unpitched>/g)).toHaveLength(3);
+        expect(percussion.match(/<chord\/>/g)).toHaveLength(1);
+        expect(percussion).toMatch(
+            /<chord\/>\s*<unpitched>[\s\S]*?<\/unpitched>\s*<duration>8<\/duration>\s*<instrument id="D1-X2"\/>/
+        );
+    });
+
     it("keeps a silent interval before a later drum hit", () => {
         const output = saveMxmlOutput({
             notation: {
                 notationStaging: {
                     0: [
                         [["R"], 4, 0, null, null, false, false, null],
-                        [["R"], 4, 0, null, null, false, false, "snare drum"]
+                        [["R"], 4, 0, null, null, false, false, ["snare drum"]]
                     ]
                 }
             }
@@ -113,7 +135,7 @@ describe("saveMxmlOutput", () => {
         const output = saveMxmlOutput({
             notation: {
                 notationStaging: {
-                    0: [[["R"], 4, 0, null, null, false, false, "https://example.org/#12&x"]]
+                    0: [[["R"], 4, 0, null, null, false, false, ["https://example.org/#12&x"]]]
                 }
             }
         });
@@ -1319,7 +1341,7 @@ describe("saveMxmlOutput notation markers", () => {
 });
 
 describe("saveMxmlOutput - unpitched notes carry a staff position", () => {
-    const drumNote = drum => [["R"], 4, 0, null, null, false, false, drum];
+    const drumNote = drum => [["R"], 4, 0, null, null, false, false, [drum]];
 
     it("gives every unpitched note a display step and octave", () => {
         const output = saveMxmlOutput({
@@ -1704,7 +1726,7 @@ describe("saveMxmlOutput - key mode", () => {
             notation: {
                 notationStaging: { 0: ["key", "A", "minor", note("C4")] },
                 notationDrumStaging: {
-                    0: [[["snare drum"], 4, 0, null, null, false, false, "snare drum"]]
+                    0: [[["snare drum"], 4, 0, null, null, false, false, ["snare drum"]]]
                 }
             }
         });
