@@ -282,6 +282,13 @@ describe("setupToneActions", () => {
             expect(targetTurtle.singer.instrumentNames).toContain("default-voice");
         });
 
+        it("should fallback to default-voice when instrument is null", () => {
+            Singer.ToneActions.setTimbre(null, 0, 1);
+            expect(targetTurtle.singer.instrumentNames).toContain("default-voice");
+            listenerCallbacks["_settimbre_0_1"]();
+            expect(targetTurtle.inSetTimbre).toBe(false);
+        });
+
         it("should NOT register a mouse listener when blk is undefined", () => {
             MusicBlocks.isRun = false;
             const mouse = Mouse.getMouseFromTurtle(targetTurtle);

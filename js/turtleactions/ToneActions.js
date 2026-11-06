@@ -82,7 +82,7 @@ function setupToneActions(activity) {
                 }
             }
 
-            if (!accounted && typeof instrument === "object") {
+            if (!accounted && typeof instrument === "object" && instrument !== null) {
                 if (instrument[0] !== "") {
                     synth = "customsample_" + instrument[0];
                     // data, pitch, octave and the cent adjustment from the sampler
