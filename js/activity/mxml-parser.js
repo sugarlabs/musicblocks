@@ -962,7 +962,7 @@ function _applyRepeats(
 
         if (
             firstEndingStartIndex !== null &&
-            firstEndingStartIndex > startIndex &&
+            firstEndingStartIndex >= startIndex &&
             nextNoteId !== null &&
             Number.isSafeInteger(times) &&
             times >= 2 &&
@@ -979,15 +979,17 @@ function _applyRepeats(
                 copies.push(...copy.blocks);
                 previousEnd = copy.blocks.find(block => block[0] === copy.lastId);
             }
-            const finalPass = cloneNotes(
-                startIndex,
-                firstEndingStartIndex - 1,
-                previousEnd[0],
-                bodyTieDurations
-            );
-            previousEnd[4][1] = finalPass.firstId;
-            copies.push(...finalPass.blocks);
-            previousEnd = finalPass.blocks.find(block => block[0] === finalPass.lastId);
+            if (firstEndingStartIndex > startIndex) {
+                const finalPass = cloneNotes(
+                    startIndex,
+                    firstEndingStartIndex - 1,
+                    previousEnd[0],
+                    bodyTieDurations
+                );
+                previousEnd[4][1] = finalPass.firstId;
+                copies.push(...finalPass.blocks);
+                previousEnd = finalPass.blocks.find(block => block[0] === finalPass.lastId);
+            }
             previousEnd[4][1] = nextNoteId;
             byId.get(nextNoteId)[4][0] = previousEnd[0];
             copies.forEach(block => byId.set(block[0], block));

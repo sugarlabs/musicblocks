@@ -1978,6 +1978,25 @@ describe("Test 17: Repeats", () => {
         expect(findPositionMismatches(blocks)).toEqual([]);
     });
 
+    it("flattens a first ending with no shared repeat-body notes", async () => {
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1"><attributes><divisions>1</divisions></attributes>' +
+            SIMPLE_NOTE("G", 4, "quarter") +
+            '<barline location="left"><repeat direction="forward"/><ending number="1" type="start"/></barline>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+            '<barline location="left"><ending number="2" type="start"/></barline>' +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+
+        expect(playedPitches(blocks).map(pitch => pitch.name)).toEqual(["G", "C", "D"]);
+        expect(blocks.filter(block => blockName(block) === "repeat")).toHaveLength(0);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
     it("flattens a three-pass first and second ending", async () => {
         const xml =
             '<score-partwise><part id="P1">' +
