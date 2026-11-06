@@ -6,7 +6,7 @@ subdirectory.
 
 ## Testing
 
-For writing unit tests for block files, see [docs/TESTING.md](../docs/TESTING.md).
+For writing unit tests for block files, see [Docs/TESTING.md](../Docs/TESTING.md).
 
 * `activity.js` -- where the menus are defined
 
@@ -626,7 +626,7 @@ only need to worry about the position of the first block in a stack of
 blocks. Everything else is calculated for you.)
 
 ![alt
- tag](../documentation/block-connections-diagram.svg
+ tag](../Docs/documentation/block-connections-diagram.svg
  "Blocks maintain a list of connections to other blocks.")
 
 In the figure about and in the code example above, the `divide` block

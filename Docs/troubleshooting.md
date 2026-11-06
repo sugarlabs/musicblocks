@@ -23,12 +23,12 @@ Problem:
 Dependency installation fails due to permission issues or corrupted files.
 
 Solution:
-Run the following commands from the project root:
+Run a clean install from the project root:
 
-rm -rf node_modules package-lock.json  
-npm install
+npm ci
 
-On Windows, use PowerShell or Git Bash.
+`npm ci` removes the existing `node_modules` directory and reinstalls the
+dependencies from `package-lock.json`, leaving the lockfile in place.
 
 ## npm run lint Fails with Formatting Errors
 
@@ -47,10 +47,13 @@ Problem:
 Docker build fails or the container does not start correctly.
 
 Solution:
-Clean Docker state and rebuild:
+Build and run the Docker image from the project root:
 
-docker system prune  
-docker-compose up --build
+docker build -f dockerfile -t musicblocks .
+docker run -p 3000:3000 musicblocks
+
+Then open http://localhost:3000 in your browser. The repository does not
+include a Docker Compose file.
 
 ## Port Already in Use (EADDRINUSE)
 
@@ -85,10 +88,9 @@ Problem:
 Errors such as "Cannot find module" appear during runtime or build.
 
 Solution:
-Reinstall dependencies:
+Run a clean install from the project root:
 
-rm -rf node_modules package-lock.json  
-npm install
+npm ci
 
 ## Still Having Issues?
 
