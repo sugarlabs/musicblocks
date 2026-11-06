@@ -1045,8 +1045,9 @@ describe("ProgramBlocks", () => {
             ];
 
             const args = ["myBlock"];
-            block.flow(args, logo, 0, 5);
+            const flow = block.flow(args, logo, 0, 5);
             expect(args[0]).toBe(0);
+            expect(flow).toEqual([0, 1]);
         });
 
         test("reports an error instead of throwing when the slot is empty", () => {
@@ -1055,6 +1056,89 @@ describe("ProgramBlocks", () => {
             expect(() => block.flow([null], logo, 0, 5)).not.toThrow();
             expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 5);
             expect(logo.runFromBlock).not.toHaveBeenCalled();
+        });
+
+        test.each([
+            ["renamed", [0, 1]],
+            ["action", undefined]
+        ])("matches the actual name of an action block: %s", (targetName, expectedFlow) => {
+            const block = getBlock("runblock");
+            activity.blocks.blockList = [
+                {
+                    name: "action",
+                    protoblock: { staticLabels: ["action"] },
+                    connections: [null, 1, 2, 3]
+                },
+                { name: "text", value: "renamed", protoblock: { staticLabels: [] } },
+                { name: "hidden", protoblock: { staticLabels: [] } },
+                { name: "hidden", protoblock: { staticLabels: [] } }
+            ];
+            logo.actions = { renamed: 2 };
+
+            const args = [targetName];
+            const flow = block.flow(args, logo, 0, 5);
+
+            if (expectedFlow === undefined) {
+                expect(args[0]).toBe(-1);
+                expect(flow).toBeUndefined();
+                expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 5);
+            } else {
+                expect(args[0]).toBe(0);
+                expect(flow).toEqual(expectedFlow);
+            }
+        });
+
+        test("resolves an action name from its connected reporter", () => {
+            const block = getBlock("runblock");
+            activity.blocks.blockList = [
+                {
+                    name: "action",
+                    connections: [null, 1, 2]
+                },
+                { name: "computedname", value: "changed after registration" },
+                { name: "hidden", protoblock: { staticLabels: [] } }
+            ];
+            logo.actions = { "computed action": 2 };
+            logo.parseArg = jest.fn(() => "side effect");
+
+            const args = ["computed action"];
+            const flow = block.flow(args, logo, 1, 5, "received");
+
+            expect(logo.parseArg).not.toHaveBeenCalled();
+            expect(args[0]).toBe(0);
+            expect(flow).toEqual([0, 1]);
+        });
+
+        test("prefers a matching action over an earlier static label", () => {
+            const block = getBlock("runblock");
+            activity.blocks.blockList = [
+                { name: "start", value: 0, protoblock: { staticLabels: ["start"] } },
+                { name: "action", connections: [null, 2, 3] },
+                { name: "text", value: "start" },
+                { name: "hidden", protoblock: { staticLabels: [] } }
+            ];
+            logo.actions = { start: 3 };
+
+            const args = ["start"];
+            const flow = block.flow(args, logo, 0, 5);
+
+            expect(args[0]).toBe(1);
+            expect(flow).toEqual([1, 1]);
+        });
+
+        test("skips null and trashed blocks when resolving a name", () => {
+            const block = getBlock("runblock");
+            activity.blocks.blockList = [
+                null,
+                { name: "old", trash: true, protoblock: { staticLabels: ["target"] } },
+                { name: "live", protoblock: { staticLabels: ["target"] } }
+            ];
+
+            const args = ["target"];
+            const flow = block.flow(args, logo, 0, 5);
+
+            expect(args[0]).toBe(2);
+            expect(flow).toEqual([2, 1]);
         });
     });
 

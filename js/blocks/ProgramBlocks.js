@@ -1058,14 +1058,39 @@ function setupProgramBlocks(activity) {
 
             if (typeof args[0] === "string") {
                 // Look for a block with logo name
+                let staticMatch = -1;
                 for (let i = 0; i < activity.blocks.blockList.length; i++) {
-                    if (
-                        activity.blocks.blockList[i]?.protoblock.staticLabels.length > 0 &&
-                        activity.blocks.blockList[i].protoblock.staticLabels[0] === args[0]
-                    ) {
-                        args[0] = i;
-                        return;
+                    const candidate = activity.blocks.blockList[i];
+                    if (!candidate || candidate.trash) {
+                        continue;
                     }
+
+                    let matchesName;
+
+                    if (candidate.name === "action") {
+                        matchesName =
+                            logo.actions &&
+                            Object.prototype.hasOwnProperty.call(logo.actions, args[0]) &&
+                            candidate.connections[2] === logo.actions[args[0]];
+                    } else {
+                        matchesName =
+                            candidate.protoblock.staticLabels.length > 0 &&
+                            candidate.protoblock.staticLabels[0] === args[0];
+                    }
+
+                    if (matchesName) {
+                        if (candidate.name === "action") {
+                            args[0] = i;
+                            break;
+                        }
+                        if (staticMatch === -1) {
+                            staticMatch = i;
+                        }
+                    }
+                }
+
+                if (typeof args[0] === "string" && staticMatch !== -1) {
+                    args[0] = staticMatch;
                 }
             }
 
