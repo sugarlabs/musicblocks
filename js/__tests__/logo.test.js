@@ -202,7 +202,7 @@ function createMockTurtle(overrides = {}) {
             embeddedGraphics: {},
             runningFromEvent: false,
             killAllVoices: jest.fn(),
-            resetClampState: jest.fn(),
+            dropPendingNotes: jest.fn(),
             noteDirection: 0
         },
         painter: {
@@ -3704,44 +3704,40 @@ describe("Logo stopTurtleRun", () => {
         expect(logo.stepQueue[0]).toBeUndefined();
     });
 
-    test("drops the clamp signals it had not reached", () => {
+    test("does not play the notes it had not reached", () => {
         logo._finishTurtle = Logo.prototype._finishTurtle;
         turtle0.running = true;
-        turtle0.endOfClampSignals = { 5: ["_playnote_0", "_playnote_1"] };
+        turtle0.endOfClampSignals = { 5: ["_playnote_0_5", "_playnote_0_6"] };
         turtle0.butNotThese = { 5: [0] };
 
         logo.stopTurtleRun(0);
 
         expect(logo.stage.dispatchEvent).not.toHaveBeenCalled();
+        expect(turtle0.singer.dropPendingNotes).toHaveBeenCalledTimes(1);
         expect(turtle0.endOfClampSignals).toEqual({});
         expect(turtle0.butNotThese).toEqual({});
     });
 
-    test("puts back the blocks of a duplicate clamp it was playing", () => {
-        logo.blockList = [{ connections: [null, null] }, null, { connections: [null] }];
-        logo.connectionStore = { 0: { 5: [[0, 1, 2]] }, 1: {} };
+    test("ends the clamps it was inside", () => {
+        logo._finishTurtle = Logo.prototype._finishTurtle;
+        turtle0.running = true;
+        turtle0.endOfClampSignals = {
+            3: ["_settimbre_0_3"],
+            5: ["_volume_0_5", "_playnote_0_6", "_duplicate_0_7"]
+        };
+        turtle0.butNotThese = { 5: [2] };
 
         logo.stopTurtleRun(0);
 
-        expect(logo.blockList[0].connections[1]).toBe(2);
-        expect(logo.blockList[2].connections[0]).toBe(0);
-        expect(logo.connectionStore[0]).toEqual({});
+        expect(logo.stage.dispatchEvent.mock.calls).toEqual([["_settimbre_0_3"], ["_volume_0_5"]]);
     });
 
-    test("leaves a duplicate clamp another mouse is still playing", () => {
-        logo.blockList = [{ connections: [null, null] }, null, { connections: [null] }];
-        logo.connectionStore = { 0: { 5: [[0, 1, 2]] }, 1: { 5: [[0, 1, 2]] } };
+    test("does not play the rest of a tied note", () => {
+        turtle0.singer.tieCarryOver = 0.25;
 
         logo.stopTurtleRun(0);
 
-        expect(logo.blockList[0].connections[1]).toBeNull();
-        expect(logo.connectionStore).toEqual({ 0: {}, 1: { 5: [[0, 1, 2]] } });
-    });
-
-    test("clears the state of the clamps it was inside", () => {
-        logo.stopTurtleRun(0);
-
-        expect(turtle0.singer.resetClampState).toHaveBeenCalledTimes(1);
+        expect(turtle0.singer.tieCarryOver).toBe(0);
     });
 
     test("finishes a running turtle once", () => {

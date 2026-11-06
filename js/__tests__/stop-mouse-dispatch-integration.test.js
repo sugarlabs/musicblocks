@@ -111,7 +111,7 @@ function createTurtle(name) {
             suppressOutput: false,
             justCounting: [],
             killAllVoices: jest.fn(),
-            resetClampState: jest.fn()
+            dropPendingNotes: jest.fn()
         },
         painter: { closeSVG: jest.fn() },
         queue: [],

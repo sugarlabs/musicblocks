@@ -289,44 +289,20 @@ describe("Singer Class", () => {
         });
     });
 
-    describe("resetClampState()", () => {
-        test("clears the state of open clamps", () => {
-            singer.backward = [7];
-            singer.inDuplicate = true;
-            singer.duplicateFactor = 4;
-            singer.inNoteBlock = [12];
-            singer.noteValue = { 12: 4 };
-            singer.transpositionValues = [2];
-            singer.transposition = 2;
-            singer.beatFactor = 1.5;
+    test("dropPendingNotes() forgets the notes it had started", () => {
+        singer.inNoteBlock = [12, 14];
+        singer.multipleVoices = true;
+        singer.noteValue = { 12: 4, 14: 8 };
+        singer.notePitches = { 12: ["G"], 14: ["A"] };
+        singer.turtleTime = 3;
 
-            singer.resetClampState();
+        singer.dropPendingNotes();
 
-            expect(singer.backward).toEqual([]);
-            expect(singer.inDuplicate).toBe(false);
-            expect(singer.duplicateFactor).toBe(1);
-            expect(singer.inNoteBlock).toEqual([]);
-            expect(singer.noteValue).toEqual({});
-            expect(singer.transpositionValues).toEqual([]);
-            expect(singer.transposition).toBe(0);
-            expect(singer.beatFactor).toBe(1);
-        });
-
-        test("keeps the state of the run", () => {
-            singer.turtleTime = 3;
-            singer.suppressOutput = true;
-            singer.keySignature = "D minor";
-            singer.instrumentNames = ["guitar"];
-            singer.bpm = [120];
-
-            singer.resetClampState();
-
-            expect(singer.turtleTime).toBe(3);
-            expect(singer.suppressOutput).toBe(true);
-            expect(singer.keySignature).toBe("D minor");
-            expect(singer.instrumentNames).toEqual(["guitar"]);
-            expect(singer.bpm).toEqual([120]);
-        });
+        expect(singer.inNoteBlock).toEqual([]);
+        expect(singer.multipleVoices).toBe(false);
+        expect(singer.noteValue).toEqual({});
+        expect(singer.notePitches).toEqual({});
+        expect(singer.turtleTime).toBe(3);
     });
 
     test("should correctly add scalar transposition", () => {
