@@ -328,7 +328,9 @@ class StatusMatrix {
         }
 
         const turtle = this.activity?.turtles?.turtleList?.[Number(watch.turtleId)];
-        return _("Heap") + ": " + (turtle?.name || _("Turtle") + " " + (Number(watch.turtleId) + 1));
+        return (
+            _("Heap") + ": " + (turtle?.name || _("Turtle") + " " + (Number(watch.turtleId) + 1))
+        );
     }
 
     _collectBoxNames() {
