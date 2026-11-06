@@ -785,9 +785,12 @@ describe("Block Foundation", () => {
                 mockBlocks.blockList[2].value = 99;
                 expect(block._getPitch(1)).toBe("99 4");
 
-                // fractional value: 2.5 truncates to idx=2, so degrees[2] ("3rd") is used
-                mockBlocks.blockList[2].value = 2.5;
+                // fractional value: rounds to nearest integer index
+                mockBlocks.blockList[2].value = 2.4;
                 expect(block._getPitch(1)).toBe("3rd 4");
+
+                mockBlocks.blockList[2].value = 2.6;
+                expect(block._getPitch(1)).toBe("4th 4");
             });
 
             it("should format hertz via connection 0 in _getPitch", () => {

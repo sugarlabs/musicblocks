@@ -3120,7 +3120,7 @@ class Block {
                 b2 = c2 !== null ? this.blocks.blockList[c2] : null;
                 if (b1 && b2 && b1.name === "number" && b2.name === "number") {
                     const degrees = DEGREES.split(" ");
-                    const idx = Math.trunc(Number(b1.value));
+                    const idx = Math.round(Number(b1.value));
                     if (idx >= 0 && idx < degrees.length) {
                         return degrees[idx] + " " + b2.value;
                     } else {
