@@ -1686,10 +1686,33 @@ describe("Turtle.TurtleView", () => {
             expect(view._bitmap.clone).toHaveBeenCalled();
             expect(startBlock.container.addChild).toHaveBeenCalledWith(view._decorationBitmap);
             expect(view._decorationBitmap.name).toBe("decoration");
-            // x = width - (40 * scale) / 2, y = (35 * scale) / 2, scale 2
-            expect(view._decorationBitmap.x).toBe(160);
-            expect(view._decorationBitmap.y).toBe(35);
+            expect(view._decorationBitmap.regX).toBe(0);
+            expect(view._decorationBitmap.regY).toBe(0);
+            expect(view._decorationBitmap.rotation).toBe(0);
+            // x = width - (30 * scale) / 2, y = (20 * scale) / 2, scale 2
+            expect(view._decorationBitmap.x).toBe(170);
+            expect(view._decorationBitmap.y).toBe(20);
             expect(view._decorationBitmap.scale).toBe(0.5);
+        });
+
+        it("places the decoration consistently with resizeDecoration to prevent position jump on zoom", () => {
+            const view = makeView();
+            const startBlock = makeStartBlock();
+            view._startBlock = startBlock;
+            const activity = { refreshCanvas: jest.fn() };
+
+            view.makeTurtleBitmap("<svg/>", activity, true);
+            images[0].onload();
+
+            const initialX = view._decorationBitmap.x;
+            const initialY = view._decorationBitmap.y;
+            const initialScale = view._decorationBitmap.scale;
+
+            view.resizeDecoration(startBlock.protoblock.scale, startBlock.width);
+
+            expect(view._decorationBitmap.x).toBe(initialX);
+            expect(view._decorationBitmap.y).toBe(initialY);
+            expect(view._decorationBitmap.scale).toBe(initialScale);
         });
 
         it("leaves the start block undecorated when turtle artwork is not used", () => {

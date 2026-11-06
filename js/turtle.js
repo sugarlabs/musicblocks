@@ -1014,17 +1014,20 @@ Turtle.TurtleView = class {
             if (useTurtleArtwork && startBlock != null) {
                 startBlock.updateCache();
                 this._decorationBitmap = this._bitmap.clone();
+                this._decorationBitmap.regX = 0;
+                this._decorationBitmap.regY = 0;
+                this._decorationBitmap.rotation = 0;
                 startBlock.container.addChild(this._decorationBitmap);
                 this._decorationBitmap.name = "decoration";
                 const width = startBlock.width;
-                const offset = 40;
+                const offset = 30;
 
                 this._decorationBitmap.x = width - (offset * startBlock.protoblock.scale) / 2;
-                this._decorationBitmap.y = (35 * startBlock.protoblock.scale) / 2;
+                this._decorationBitmap.y = (20 * startBlock.protoblock.scale) / 2;
                 this._decorationBitmap.scaleX =
                     this._decorationBitmap.scaleY =
                     this._decorationBitmap.scale =
-                        (0.5 * startBlock.protoblock.scale) / 2;
+                        (this._decorationBaseScale * startBlock.protoblock.scale) / 2;
                 startBlock.updateCache();
             }
 
