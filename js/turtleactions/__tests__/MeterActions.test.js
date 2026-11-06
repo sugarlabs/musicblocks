@@ -718,7 +718,7 @@ describe("setupMeterActions", () => {
         Singer.MeterActions.setNoClock(0, 1);
 
         expect(targetTurtle.singer.drift).toBe(1);
-        expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_drift_0");
+        expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_drift_0_1");
         const listenerFunc = activity.logo.setTurtleListener.mock.calls[0][2];
         targetTurtle.singer.drift = 2;
         listenerFunc();
@@ -767,7 +767,7 @@ describe("setupMeterActions", () => {
 
         Singer.MeterActions.setNoClock(0);
 
-        expect(mockMouse.MB.listeners).toContain("_drift_0");
+        expect(mockMouse.MB.listeners).toContain("_drift_0_undefined");
     });
 
     test.each([
@@ -979,7 +979,7 @@ describe("setupMeterActions", () => {
             expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
             expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
                 0,
-                "_drift_0",
+                "_drift_0_undefined",
                 expect.any(Function)
             );
         });
@@ -1064,7 +1064,7 @@ describe("setupMeterActions", () => {
         Singer.MeterActions.setNoClock(0);
         expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
             0,
-            "_drift_0",
+            "_drift_0_undefined",
             expect.any(Function)
         );
     });
@@ -1085,5 +1085,72 @@ describe("setupMeterActions", () => {
             expect.any(Function)
         );
         expect(targetTurtle.listeners[eventName]).toEqual(expect.any(Function));
+    });
+
+    describe("nested drift clamp isolation", () => {
+        it("nested setNoClock clamps register distinct block-scoped listeners and decrement drift on listener invocation", () => {
+            activity.blocks.blockList["outer"] = {};
+            activity.blocks.blockList["inner"] = {};
+            targetTurtle.singer.drift = 0;
+
+            Singer.MeterActions.setNoClock(0, "outer");
+            expect(targetTurtle.singer.drift).toBe(1);
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(
+                "outer",
+                0,
+                "_drift_0_outer"
+            );
+            expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                "_drift_0_outer",
+                expect.any(Function)
+            );
+
+            Singer.MeterActions.setNoClock(0, "inner");
+            expect(targetTurtle.singer.drift).toBe(2);
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(
+                "inner",
+                0,
+                "_drift_0_inner"
+            );
+            expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                "_drift_0_inner",
+                expect.any(Function)
+            );
+
+            const calls = activity.logo.setTurtleListener.mock.calls;
+            const outerListener = calls.find(c => c[1] === "_drift_0_outer")[2];
+            const innerListener = calls.find(c => c[1] === "_drift_0_inner")[2];
+
+            innerListener();
+            expect(targetTurtle.singer.drift).toBe(1);
+
+            outerListener();
+            expect(targetTurtle.singer.drift).toBe(0);
+        });
+
+        it("nested setNoClock clamps preserve both listeners in turtle listeners dictionary", () => {
+            targetTurtle.listeners = {};
+            activity.logo.setTurtleListener = jest.fn((tur, name, fn) => {
+                targetTurtle.listeners[name] = fn;
+            });
+            activity.blocks.blockList["clamp1"] = {};
+            activity.blocks.blockList["clamp2"] = {};
+            targetTurtle.singer.drift = 0;
+
+            Singer.MeterActions.setNoClock(0, "clamp1");
+            Singer.MeterActions.setNoClock(0, "clamp2");
+
+            expect(typeof targetTurtle.listeners["_drift_0_clamp1"]).toBe("function");
+            expect(typeof targetTurtle.listeners["_drift_0_clamp2"]).toBe("function");
+            expect(targetTurtle.singer.drift).toBe(2);
+
+            targetTurtle.listeners["_drift_0_clamp2"]();
+            expect(targetTurtle.singer.drift).toBe(1);
+
+            targetTurtle.listeners["_drift_0_clamp1"]();
+            expect(targetTurtle.singer.drift).toBe(0);
+        });
     });
 });
