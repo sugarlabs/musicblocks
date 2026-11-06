@@ -1,4 +1,4 @@
-<a href="https://github.com//sugarlabs/musicblocks/graphs/contributors" alt="Contributors">
+<a href="https://github.com/sugarlabs/musicblocks/graphs/contributors" alt="Contributors">
     <img src="https://img.shields.io/github/contributors/sugarlabs/musicblocks" />
 </a>
 
