@@ -14,12 +14,21 @@ describe("Status widget parallel fifths", () => {
         cy.visit("http://127.0.0.1:3000");
         cy.waitForAppReady();
 
+        // Listen before loading: a fast load can hide the indicator before
+        // Cypress would see it.
+        let loaded = false;
+        cy.window().then(win => {
+            win.pubsub.once("finishedLoading", () => {
+                loaded = true;
+            });
+        });
         cy.get("#load").click();
         cy.get("#myOpenFile").selectFile("cypress/fixtures/status-parallel-fifths.tb", {
             force: true
         });
-        cy.get("#load-container").should("be.visible");
-        cy.get("#load-container", { timeout: 30000 }).should("not.be.visible");
+        cy.wrap(null, { timeout: 30000 }).should(() => {
+            expect(loaded, "project loaded").to.equal(true);
+        });
         cy.get("#errorText").should("not.be.visible");
         cy.window({ timeout: 20000 }).should(win => {
             const turtles = win.ActivityContext.getActivity().turtles.turtleList;
