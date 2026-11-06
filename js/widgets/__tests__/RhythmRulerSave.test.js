@@ -121,7 +121,8 @@ describe("RhythmRulerSave", () => {
                 activity: {
                     palettes: { dict: {} },
                     refreshCanvas: jest.fn(),
-                    blocks: { loadNewBlocks }
+                    blocks: { loadNewBlocks },
+                    textMsg: jest.fn()
                 },
                 Rulers: [[[4, -4, 4, 4], []]]
             };
