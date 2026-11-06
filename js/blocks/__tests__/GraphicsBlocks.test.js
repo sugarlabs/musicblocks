@@ -405,7 +405,81 @@ describe("GraphicsBlocks", () => {
             turtleObj.painter.wrap = false;
             const block = new activity.blocks.forward();
             block.flow([6000], logo, turtle, 1);
-            expect(activity.errorMsg).toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -5000 to 5000 when Wrap Mode is off.",
+                1
+            );
+            expect(turtleObj.painter.doForward).not.toHaveBeenCalled();
+        });
+        test("ForwardBlock allows boundary distance ±5000 with wrap off", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.forward();
+            block.flow([5000], logo, turtle, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(turtleObj.painter.doForward).toHaveBeenCalledWith(5000);
+
+            block.flow([-5000], logo, turtle, 1);
+            expect(turtleObj.painter.doForward).toHaveBeenCalledWith(-5000);
+        });
+        test("ForwardBlock reports error when distance < -5000 with wrap off", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.forward();
+            block.flow([-5001], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -5000 to 5000 when Wrap Mode is off.",
+                1
+            );
+            expect(turtleObj.painter.doForward).not.toHaveBeenCalled();
+        });
+        test("ForwardBlock reports error when distance > 20000 with wrap on", () => {
+            turtleObj.painter.wrap = true;
+            const block = new activity.blocks.forward();
+            block.flow([20001], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -20000 to 20000 when Wrap Mode is on.",
+                1
+            );
+            expect(turtleObj.painter.doForward).not.toHaveBeenCalled();
+        });
+        test("ForwardBlock reports error when distance < -20000 with wrap on", () => {
+            turtleObj.painter.wrap = true;
+            const block = new activity.blocks.forward();
+            block.flow([-20001], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -20000 to 20000 when Wrap Mode is on.",
+                1
+            );
+            expect(turtleObj.painter.doForward).not.toHaveBeenCalled();
+        });
+        test("ForwardBlock allows distance > 5000 and boundary ±20000 with wrap on", () => {
+            turtleObj.painter.wrap = true;
+            const block = new activity.blocks.forward();
+            block.flow([6000], logo, turtle, 1);
+            expect(turtleObj.painter.doForward).toHaveBeenCalledWith(6000);
+
+            block.flow([20000], logo, turtle, 1);
+            expect(turtleObj.painter.doForward).toHaveBeenCalledWith(20000);
+
+            block.flow([-20000], logo, turtle, 1);
+            expect(turtleObj.painter.doForward).toHaveBeenCalledWith(-20000);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+        test("ForwardBlock treats wrap null as wrap off", () => {
+            turtleObj.painter.wrap = null;
+            const block = new activity.blocks.forward();
+            block.flow([5001], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -5000 to 5000 when Wrap Mode is off.",
+                1
+            );
+            expect(turtleObj.painter.doForward).not.toHaveBeenCalled();
+        });
+        test("ForwardBlock does not enforce wrap bounds when wrap is undefined", () => {
+            turtleObj.painter.wrap = undefined;
+            const block = new activity.blocks.forward();
+            block.flow([25000], logo, turtle, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(turtleObj.painter.doForward).toHaveBeenCalledWith(25000);
         });
         test("ForwardBlock reports NaN error on string argument", () => {
             const block = new activity.blocks.forward();
@@ -416,7 +490,74 @@ describe("GraphicsBlocks", () => {
             turtleObj.painter.wrap = false;
             const block = new activity.blocks.back();
             block.flow([-6000], logo, turtle, 1);
-            expect(activity.errorMsg).toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -5000 to 5000 when Wrap Mode is off.",
+                1
+            );
+            expect(turtleObj.painter.doForward).not.toHaveBeenCalled();
+        });
+        test("BackBlock reports error when distance > 5000 with wrap off", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.back();
+            block.flow([5001], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -5000 to 5000 when Wrap Mode is off.",
+                1
+            );
+            expect(turtleObj.painter.doForward).not.toHaveBeenCalled();
+        });
+        test("BackBlock allows boundary distance ±5000 with wrap off", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.back();
+            block.flow([5000], logo, turtle, 1);
+            expect(turtleObj.painter.doForward).toHaveBeenCalledWith(-5000);
+
+            block.flow([-5000], logo, turtle, 1);
+            expect(turtleObj.painter.doForward).toHaveBeenCalledWith(5000);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+        test("BackBlock reports error when distance > 20000 or < -20000 with wrap on", () => {
+            turtleObj.painter.wrap = true;
+            const block = new activity.blocks.back();
+            block.flow([20001], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -20000 to 20000 when Wrap Mode is on.",
+                1
+            );
+
+            block.flow([-20001], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -20000 to 20000 when Wrap Mode is on.",
+                1
+            );
+            expect(turtleObj.painter.doForward).not.toHaveBeenCalled();
+        });
+        test("BackBlock allows boundary distance ±20000 with wrap on", () => {
+            turtleObj.painter.wrap = true;
+            const block = new activity.blocks.back();
+            block.flow([20000], logo, turtle, 1);
+            expect(turtleObj.painter.doForward).toHaveBeenCalledWith(-20000);
+
+            block.flow([-20000], logo, turtle, 1);
+            expect(turtleObj.painter.doForward).toHaveBeenCalledWith(20000);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+        test("BackBlock treats wrap null as wrap off", () => {
+            turtleObj.painter.wrap = null;
+            const block = new activity.blocks.back();
+            block.flow([-5001], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -5000 to 5000 when Wrap Mode is off.",
+                1
+            );
+            expect(turtleObj.painter.doForward).not.toHaveBeenCalled();
+        });
+        test("BackBlock does not enforce wrap bounds when wrap is undefined", () => {
+            turtleObj.painter.wrap = undefined;
+            const block = new activity.blocks.back();
+            block.flow([-25000], logo, turtle, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(turtleObj.painter.doForward).toHaveBeenCalledWith(25000);
         });
         test("BackBlock reports NaN error on string argument", () => {
             const block = new activity.blocks.back();
@@ -437,6 +578,26 @@ describe("GraphicsBlocks", () => {
             );
             expect(turtleObj.painter.doArc).not.toHaveBeenCalled();
         });
+        test("ArcBlock reports error when radius < -5000 with wrap off", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.arc();
+            block.flow([90, -5001], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -5000 to 5000 when Wrap Mode is off.",
+                1
+            );
+            expect(turtleObj.painter.doArc).not.toHaveBeenCalled();
+        });
+        test("ArcBlock allows radius boundary ±5000 with wrap off", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.arc();
+            block.flow([90, 5000], logo, turtle, 1);
+            expect(turtleObj.painter.doArc).toHaveBeenCalledWith(90, 5000);
+
+            block.flow([90, -5000], logo, turtle, 1);
+            expect(turtleObj.painter.doArc).toHaveBeenCalledWith(90, -5000);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
         test("ArcBlock reports error when radius > 20000 with wrap on", () => {
             turtleObj.painter.wrap = true;
             const block = new activity.blocks.arc();
@@ -446,6 +607,46 @@ describe("GraphicsBlocks", () => {
                 1
             );
             expect(turtleObj.painter.doArc).not.toHaveBeenCalled();
+        });
+        test("ArcBlock reports error when radius < -20000 with wrap on", () => {
+            turtleObj.painter.wrap = true;
+            const block = new activity.blocks.arc();
+            block.flow([90, -20001], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -20000 to 20000 when Wrap Mode is on.",
+                1
+            );
+            expect(turtleObj.painter.doArc).not.toHaveBeenCalled();
+        });
+        test("ArcBlock allows radius boundary ±20000 and > 5000 with wrap on", () => {
+            turtleObj.painter.wrap = true;
+            const block = new activity.blocks.arc();
+            block.flow([90, 6000], logo, turtle, 1);
+            expect(turtleObj.painter.doArc).toHaveBeenCalledWith(90, 6000);
+
+            block.flow([90, 20000], logo, turtle, 1);
+            expect(turtleObj.painter.doArc).toHaveBeenCalledWith(90, 20000);
+
+            block.flow([90, -20000], logo, turtle, 1);
+            expect(turtleObj.painter.doArc).toHaveBeenCalledWith(90, -20000);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+        test("ArcBlock treats wrap null as wrap off for radius", () => {
+            turtleObj.painter.wrap = null;
+            const block = new activity.blocks.arc();
+            block.flow([90, 5001], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -5000 to 5000 when Wrap Mode is off.",
+                1
+            );
+            expect(turtleObj.painter.doArc).not.toHaveBeenCalled();
+        });
+        test("ArcBlock does not enforce wrap bounds when wrap is undefined", () => {
+            turtleObj.painter.wrap = undefined;
+            const block = new activity.blocks.arc();
+            block.flow([90, 30000], logo, turtle, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(turtleObj.painter.doArc).toHaveBeenCalledWith(90, 30000);
         });
         test("ArcBlock forwards a large angle to doArc() unmodified — bounding it is doArc()'s responsibility", () => {
             // The angle argument is not validated at the block-dispatch level: an
@@ -458,6 +659,170 @@ describe("GraphicsBlocks", () => {
             block.flow([9000000, 100], logo, turtle, 1);
             expect(activity.errorMsg).not.toHaveBeenCalled();
             expect(turtleObj.painter.doArc).toHaveBeenCalledWith(9000000, 100);
+        });
+        test("ArcBlock validates radius but allows negative large angle", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.arc();
+            block.flow([-9000000, 100], logo, turtle, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(turtleObj.painter.doArc).toHaveBeenCalledWith(-9000000, 100);
+        });
+        test("ArcBlock checks wrap range before NaN check", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.arc();
+            block.flow(["not-a-number", 6000], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -5000 to 5000 when Wrap Mode is off.",
+                1
+            );
+            expect(activity.errorMsg).not.toHaveBeenCalledWith(NANERRORMSG, 1);
+        });
+    });
+
+    // ── SetXYBlock Out of Bounds & Error Handling ──────
+    describe("SetXYBlock Out of Bounds & Error Handling", () => {
+        test("SetXYBlock reports error when X > 5000 with wrap off", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.setxy();
+            block.flow([5001, 100], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -5000 to 5000 when Wrap Mode is off.",
+                1
+            );
+            expect(turtleObj.painter.doSetXY).not.toHaveBeenCalled();
+        });
+        test("SetXYBlock reports error when X < -5000 with wrap off", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.setxy();
+            block.flow([-5001, 100], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -5000 to 5000 when Wrap Mode is off.",
+                1
+            );
+            expect(turtleObj.painter.doSetXY).not.toHaveBeenCalled();
+        });
+        test("SetXYBlock reports error when Y > 5000 with wrap off", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.setxy();
+            block.flow([100, 5001], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -5000 to 5000 when Wrap Mode is off.",
+                1
+            );
+            expect(turtleObj.painter.doSetXY).not.toHaveBeenCalled();
+        });
+        test("SetXYBlock reports error when Y < -5000 with wrap off", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.setxy();
+            block.flow([100, -5001], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -5000 to 5000 when Wrap Mode is off.",
+                1
+            );
+            expect(turtleObj.painter.doSetXY).not.toHaveBeenCalled();
+        });
+        test("SetXYBlock reports error when both X and Y are out of bounds with wrap off", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.setxy();
+            block.flow([6000, -7000], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -5000 to 5000 when Wrap Mode is off.",
+                1
+            );
+            expect(turtleObj.painter.doSetXY).not.toHaveBeenCalled();
+        });
+        test("SetXYBlock allows boundary coordinates ±5000 with wrap off", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.setxy();
+            block.flow([5000, -5000], logo, turtle, 1);
+            expect(turtleObj.painter.doSetXY).toHaveBeenCalledWith(5000, -5000);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+        test("SetXYBlock reports error when X > 20000 with wrap on", () => {
+            turtleObj.painter.wrap = true;
+            const block = new activity.blocks.setxy();
+            block.flow([20001, 0], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -20000 to 20000 when Wrap Mode is on.",
+                1
+            );
+            expect(turtleObj.painter.doSetXY).not.toHaveBeenCalled();
+        });
+        test("SetXYBlock reports error when X < -20000 with wrap on", () => {
+            turtleObj.painter.wrap = true;
+            const block = new activity.blocks.setxy();
+            block.flow([-20001, 0], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -20000 to 20000 when Wrap Mode is on.",
+                1
+            );
+            expect(turtleObj.painter.doSetXY).not.toHaveBeenCalled();
+        });
+        test("SetXYBlock reports error when Y > 20000 with wrap on", () => {
+            turtleObj.painter.wrap = true;
+            const block = new activity.blocks.setxy();
+            block.flow([0, 20001], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -20000 to 20000 when Wrap Mode is on.",
+                1
+            );
+            expect(turtleObj.painter.doSetXY).not.toHaveBeenCalled();
+        });
+        test("SetXYBlock reports error when Y < -20000 with wrap on", () => {
+            turtleObj.painter.wrap = true;
+            const block = new activity.blocks.setxy();
+            block.flow([0, -20001], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -20000 to 20000 when Wrap Mode is on.",
+                1
+            );
+            expect(turtleObj.painter.doSetXY).not.toHaveBeenCalled();
+        });
+        test("SetXYBlock allows coordinates > 5000 and boundary ±20000 with wrap on", () => {
+            turtleObj.painter.wrap = true;
+            const block = new activity.blocks.setxy();
+            block.flow([6000, -7000], logo, turtle, 1);
+            expect(turtleObj.painter.doSetXY).toHaveBeenCalledWith(6000, -7000);
+
+            block.flow([20000, -20000], logo, turtle, 1);
+            expect(turtleObj.painter.doSetXY).toHaveBeenCalledWith(20000, -20000);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+        test("SetXYBlock treats wrap null as wrap off", () => {
+            turtleObj.painter.wrap = null;
+            const block = new activity.blocks.setxy();
+            block.flow([5001, 0], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -5000 to 5000 when Wrap Mode is off.",
+                1
+            );
+            expect(turtleObj.painter.doSetXY).not.toHaveBeenCalled();
+        });
+        test("SetXYBlock does not enforce wrap bounds when wrap is undefined", () => {
+            turtleObj.painter.wrap = undefined;
+            const block = new activity.blocks.setxy();
+            block.flow([25000, 30000], logo, turtle, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(turtleObj.painter.doSetXY).toHaveBeenCalledWith(25000, 30000);
+        });
+        test("SetXYBlock reports NaN error on string argument", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.setxy();
+            block.flow(["x", 10], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG, 1);
+
+            block.flow([10, "y"], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG, 1);
+        });
+        test("SetXYBlock checks wrap range before NaN check", () => {
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.setxy();
+            block.flow([6000, "not-a-number"], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Value must be within -5000 to 5000 when Wrap Mode is off.",
+                1
+            );
+            expect(activity.errorMsg).not.toHaveBeenCalledWith(NANERRORMSG, 1);
         });
     });
 
@@ -473,6 +838,45 @@ describe("GraphicsBlocks", () => {
             const block = new activity.blocks.forward();
             block.flow([50], logo, turtle, 1);
             expect(turtleObj.painter.doForward).toHaveBeenCalledWith(50);
+            expect(penStateDuringCall).toBe(false);
+            expect(turtleObj.painter.penState).toBe(true);
+        });
+        test("BackBlock suppresses output by lifting pen temporarily during execution", () => {
+            turtleObj.singer.suppressOutput = true;
+            turtleObj.painter.penState = true;
+            let penStateDuringCall;
+            turtleObj.painter.doForward = jest.fn(() => {
+                penStateDuringCall = turtleObj.painter.penState;
+            });
+            const block = new activity.blocks.back();
+            block.flow([40], logo, turtle, 1);
+            expect(turtleObj.painter.doForward).toHaveBeenCalledWith(-40);
+            expect(penStateDuringCall).toBe(false);
+            expect(turtleObj.painter.penState).toBe(true);
+        });
+        test("ArcBlock suppresses output by lifting pen temporarily during execution", () => {
+            turtleObj.singer.suppressOutput = true;
+            turtleObj.painter.penState = true;
+            let penStateDuringCall;
+            turtleObj.painter.doArc = jest.fn(() => {
+                penStateDuringCall = turtleObj.painter.penState;
+            });
+            const block = new activity.blocks.arc();
+            block.flow([90, 100], logo, turtle, 1);
+            expect(turtleObj.painter.doArc).toHaveBeenCalledWith(90, 100);
+            expect(penStateDuringCall).toBe(false);
+            expect(turtleObj.painter.penState).toBe(true);
+        });
+        test("SetXYBlock suppresses output by lifting pen temporarily during execution", () => {
+            turtleObj.singer.suppressOutput = true;
+            turtleObj.painter.penState = true;
+            let penStateDuringCall;
+            turtleObj.painter.doSetXY = jest.fn(() => {
+                penStateDuringCall = turtleObj.painter.penState;
+            });
+            const block = new activity.blocks.setxy();
+            block.flow([50, 60], logo, turtle, 1);
+            expect(turtleObj.painter.doSetXY).toHaveBeenCalledWith(50, 60);
             expect(penStateDuringCall).toBe(false);
             expect(turtleObj.painter.penState).toBe(true);
         });
@@ -513,6 +917,27 @@ describe("GraphicsBlocks", () => {
             const block = new activity.blocks.forward();
             block.flow([100], logo, turtle, 42);
             expect(turtleObj.singer.embeddedGraphics[0]).toContain(42);
+        });
+        test("BackBlock pushes block ID to embeddedGraphics when in note block", () => {
+            turtleObj.singer.inNoteBlock = [0];
+            turtleObj.singer.embeddedGraphics = [[]];
+            const block = new activity.blocks.back();
+            block.flow([60], logo, turtle, 88);
+            expect(turtleObj.singer.embeddedGraphics[0]).toContain(88);
+        });
+        test("ArcBlock pushes block ID to embeddedGraphics when in note block", () => {
+            turtleObj.singer.inNoteBlock = [0];
+            turtleObj.singer.embeddedGraphics = [[]];
+            const block = new activity.blocks.arc();
+            block.flow([90, 50], logo, turtle, 55);
+            expect(turtleObj.singer.embeddedGraphics[0]).toContain(55);
+        });
+        test("SetXYBlock pushes block ID to embeddedGraphics when in note block", () => {
+            turtleObj.singer.inNoteBlock = [0];
+            turtleObj.singer.embeddedGraphics = [[]];
+            const block = new activity.blocks.setxy();
+            block.flow([20, 30], logo, turtle, 77);
+            expect(turtleObj.singer.embeddedGraphics[0]).toContain(77);
         });
         test("RightBlock pushes block ID to embeddedGraphics when in note block", () => {
             turtleObj.singer.inNoteBlock = [0];
