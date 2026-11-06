@@ -1827,6 +1827,21 @@ describe("StatusMatrix Widget", () => {
                 expect(warnings()).toEqual([]);
             });
 
+            test("forgets a mouse that is put in the trash during a run", () => {
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["E4"], 0);
+                play(2, ["C5"], 0);
+                // Mouse 3 is still running when it goes in the trash.
+                mockActivity.turtles.turtleList[2].inTrash = true;
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+
+                expect(warnings()).toEqual(["hidden fifths: mouse 1 C4 → D4, mouse 2 E4 → A4"]);
+                expect([...statusMatrix._voices.keys()]).toEqual([0, 1]);
+            });
+
             test("does not wait for a mouse that has finished", () => {
                 useMice(mice);
                 statusMatrix.init(mockActivity);

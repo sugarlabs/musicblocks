@@ -663,6 +663,13 @@ class StatusMatrix {
         if (restarted) {
             this._voices.clear();
         }
+        // Forget mice that are gone or in the trash, so they do not hold up
+        // hidden fifths or keep an old column number.
+        for (const t of [...this._voices.keys()]) {
+            if (!latest.some(entry => entry.t === t)) {
+                this._voices.delete(t);
+            }
+        }
 
         const synth = this.activity?.logo?.synth;
         const canMeasure = Boolean(synth) && typeof synth.getFrequency === "function";
