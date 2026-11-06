@@ -96,19 +96,14 @@ class RhythmRulerEditing {
                 // Play a count off before starting tapping.
                 const interval = this._bpmFactor / Math.abs(noteValues[this._tapCell.cellIndex]);
 
-                let drum;
-                if (this.Drums[this._rulerSelected] === null) {
-                    drum = "snare drum";
-                } else {
-                    const drumBlockNo =
-                        this.activity.blocks.blockList[this.Drums[this._rulerSelected]]
-                            .connections[1];
-                    drum = this.activity.blocks.blockList[drumBlockNo].value;
-                }
+                const drum =
+                    typeof this._getDrumName === "function"
+                        ? this._getDrumName(this._rulerSelected)
+                        : "snare drum";
 
                 // Get the meter from the current turtle's singer
                 const turtle = this.activity.turtles.ithTurtle(0);
-                const beatsPerMeasure = turtle.singer.beatsPerMeasure || 4;
+                const beatsPerMeasure = turtle?.singer?.beatsPerMeasure || 4;
 
                 // Play count-off based on meter (e.g., 4 beats for 4/4, 3 beats for 3/4)
                 for (let i = 0; i < beatsPerMeasure; i++) {
