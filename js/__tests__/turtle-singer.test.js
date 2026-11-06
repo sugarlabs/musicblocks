@@ -1451,6 +1451,97 @@ describe("processPitch — note block execution path", () => {
     });
 });
 
+describe("processPitch — neighbor ornament step resolution", () => {
+    let turtleMock;
+    let activityMock;
+    let savedGlobals;
+
+    beforeEach(() => {
+        savedGlobals = {
+            getNote: global.getNote,
+            getStepSizeUp: global.getStepSizeUp,
+            getStepSizeDown: global.getStepSizeDown
+        };
+        global.getNote = musicUtils.getNote;
+        global.getStepSizeUp = musicUtils.getStepSizeUp;
+        global.getStepSizeDown = musicUtils.getStepSizeDown;
+
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.singer.inNoteBlock = [0];
+        turtleMock.singer.notePitches = { 0: [] };
+        turtleMock.singer.noteOctaves = { 0: [] };
+        turtleMock.singer.noteCents = { 0: [] };
+        turtleMock.singer.noteHertz = { 0: [] };
+        turtleMock.singer.noteBeatValues = { 0: [] };
+        turtleMock.singer.beatFactor = 1;
+        turtleMock.singer.transposition = 0;
+        turtleMock.singer.keySignature = "C major";
+        turtleMock.singer.movable = false;
+
+        activityMock = createActivityMock(turtleMock);
+        activityMock.errorMsg = jest.fn();
+        activityMock.logo = createLogoMock(activityMock);
+        activityMock.logo.synth.inTemperament = false;
+    });
+
+    afterEach(() => {
+        global.getNote = savedGlobals.getNote;
+        global.getStepSizeUp = savedGlobals.getStepSizeUp;
+        global.getStepSizeDown = savedGlobals.getStepSizeDown;
+    });
+
+    test("resolves neighbor pitch with active inner clamp interval when chromatic neighbor clamps are nested", () => {
+        activityMock.blocks.blockList[10] = { name: "neighbor" };
+        activityMock.blocks.blockList[20] = { name: "neighbor" };
+        turtleMock.singer.inNeighbor = [10, 20];
+        turtleMock.singer.neighborStepPitch = [1, 3];
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(turtleMock.singer.neighborArgNote1).toEqual(["C4"]);
+        // Inner clamp interval 3 produces D♯4, resolving the active interval rather than outer clamp 1 (C♯4)
+        expect(turtleMock.singer.neighborArgNote2).toEqual(["D♯4"]);
+    });
+
+    test("resolves neighbor pitch with active inner clamp interval when scalar neighbor2 clamps are nested", () => {
+        activityMock.blocks.blockList[10] = { name: "neighbor2" };
+        activityMock.blocks.blockList[20] = { name: "neighbor2" };
+        turtleMock.singer.inNeighbor = [10, 20];
+        turtleMock.singer.neighborStepPitch = [1, 2];
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(turtleMock.singer.neighborArgNote1).toEqual(["C4"]);
+        // In C major, inner scalar step 2 from C4 produces E4, resolving active step rather than outer step 1 (D4)
+        expect(turtleMock.singer.neighborArgNote2).toEqual(["E4"]);
+    });
+
+    test("resolves negative interval from active inner clamp", () => {
+        activityMock.blocks.blockList[10] = { name: "neighbor" };
+        activityMock.blocks.blockList[20] = { name: "neighbor" };
+        turtleMock.singer.inNeighbor = [10, 20];
+        turtleMock.singer.neighborStepPitch = [2, -1];
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(turtleMock.singer.neighborArgNote1).toEqual(["C4"]);
+        // Inner clamp interval -1 produces B3, rather than outer clamp 2 (D4)
+        expect(turtleMock.singer.neighborArgNote2).toEqual(["B3"]);
+    });
+
+    test("resolves neighbor pitch correctly for a single non-nested neighbor clamp", () => {
+        activityMock.blocks.blockList[10] = { name: "neighbor" };
+        turtleMock.singer.inNeighbor = [10];
+        turtleMock.singer.neighborStepPitch = [2];
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(turtleMock.singer.neighborArgNote1).toEqual(["C4"]);
+        expect(turtleMock.singer.neighborArgNote2).toEqual(["D4"]);
+    });
+});
+
 describe("processPitch widget-row definition adds one row per visit", () => {
     // The Duplicate block re-queues each block in its clamp `factor` times
     // (see DuplicateBlock.flow), so a pitch block is already visited once per
