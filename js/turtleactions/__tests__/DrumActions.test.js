@@ -30,8 +30,17 @@ describe("setupDrumActions", () => {
             processNote: jest.fn()
         };
         global.DEFAULTDRUM = "defaultDrum";
-        global.DRUMNAMES = { drum1: ["d1", "drum1"], drum2: ["d2", "drum2"] };
-        global.NOISENAMES = { noise1: ["n1", "noise1"], noise2: ["n2", "noise2"] };
+        global.DRUMNAMES = {
+            drum1: ["d1", "drum1"],
+            drum2: ["d2", "drum2"],
+            snaredrum: ["snare drum", "snare drum"],
+            kickdrum: ["kick drum", "kick drum"]
+        };
+        global.NOISENAMES = {
+            noise1: ["n1", "noise1"],
+            noise2: ["n2", "noise2"],
+            noiseWhite: ["white noise", "noise1"]
+        };
         global.DEFAULTVOLUME = 100;
         global.last = jest.fn(array => array[array.length - 1]);
         global._ = jest.fn(msg => msg);
@@ -102,6 +111,14 @@ describe("setupDrumActions", () => {
         it("should handle direct drum names", () => {
             const result = Singer.DrumActions.GetDrumname("drum1");
             expect(result).toBe("drum1");
+        });
+
+        it("resolves drum names case-insensitively, with trimmed whitespace, or omitted spaces", () => {
+            expect(Singer.DrumActions.GetDrumname("  Snare Drum  ")).toBe("snare drum");
+            expect(Singer.DrumActions.GetDrumname("KICK DRUM")).toBe("kick drum");
+            expect(Singer.DrumActions.GetDrumname("snaredrum")).toBe("snare drum");
+            expect(Singer.DrumActions.GetDrumname("KICKDRUM")).toBe("kick drum");
+            expect(Singer.DrumActions.GetDrumname(null)).toBe(global.DEFAULTDRUM);
         });
     });
 
@@ -209,6 +226,17 @@ describe("setupDrumActions", () => {
         it("handles direct drum name input", () => {
             Singer.DrumActions[actionName]("drum2", 0, 1);
             expect(targetTurtle.singer.drumStyle).toContain("drum2");
+        });
+
+        it("resolves drum name case-insensitively, with trimmed whitespace, or omitted spaces", () => {
+            Singer.DrumActions[actionName]("  Snare Drum  ", 0, 1);
+            expect(targetTurtle.singer.drumStyle).toContain("snare drum");
+
+            Singer.DrumActions[actionName]("snaredrum", 0, 1);
+            expect(targetTurtle.singer.drumStyle).toContain("snare drum");
+
+            Singer.DrumActions[actionName]("kickdrum", 0, 1);
+            expect(targetTurtle.singer.drumStyle).toContain("kick drum");
         });
 
         it("uses default drum for unknown drum name", () => {
@@ -424,12 +452,41 @@ describe("setupDrumActions", () => {
             expect(targetTurtle.singer.crescendoInitialVolume["noise1"]).toEqual([DEFAULTVOLUME]);
         });
 
-        it("should push unknown noise names directly", () => {
+        it("guards against unmapped noise names and does not push them into noteDrums", () => {
             targetTurtle.singer.inNoteBlock.push(3);
             targetTurtle.singer.noteDrums[3] = [];
             targetTurtle.singer.noteBeatValues[3] = [];
             Singer.DrumActions.playNoise("foo", 0, 3);
-            expect(targetTurtle.singer.noteDrums[3]).toContain("foo");
+            expect(targetTurtle.singer.noteDrums[3]).not.toContain("foo");
+            expect(targetTurtle.singer.noteDrums[3]).toHaveLength(0);
+            expect(targetTurtle.singer.pushedNote).toBe(false);
+        });
+
+        it("resolves noise names case-insensitively, with trimmed whitespace, or omitted spaces", () => {
+            targetTurtle.singer.inNoteBlock.push(2);
+            targetTurtle.singer.noteDrums[2] = [];
+            targetTurtle.singer.noteBeatValues[2] = [];
+            Singer.DrumActions.playNoise("  White  ", 0, 1);
+            expect(targetTurtle.singer.noteDrums[2]).toContain("noise1");
+
+            Singer.DrumActions.playNoise("WHITE NOISE", 0, 1);
+            expect(targetTurtle.singer.noteDrums[2]).toContain("noise1");
+
+            Singer.DrumActions.playNoise("whitenoise", 0, 1);
+            expect(targetTurtle.singer.noteDrums[2]).toContain("noise1");
+
+            Singer.DrumActions.playNoise("  N2  ", 0, 1);
+            expect(targetTurtle.singer.noteDrums[2]).toContain("noise2");
+        });
+
+        it("guards against non-string and empty noise inputs", () => {
+            targetTurtle.singer.inNoteBlock.push(5);
+            targetTurtle.singer.noteDrums[5] = [];
+            targetTurtle.singer.noteBeatValues[5] = [];
+            Singer.DrumActions.playNoise(null, 0, 5);
+            Singer.DrumActions.playNoise(123, 0, 5);
+            Singer.DrumActions.playNoise("   ", 0, 5);
+            expect(targetTurtle.singer.noteDrums[5]).toHaveLength(0);
         });
 
         it("should not reinitialize synthVolume if already defined", () => {
