@@ -446,6 +446,7 @@ class Singer {
         this.noteHertz = {};
         this.noteBeatValues = {};
         this.embeddedGraphics = {};
+        this.delayedNotes = [];
         this.inNoteBlock = [];
         this.multipleVoices = false;
     }

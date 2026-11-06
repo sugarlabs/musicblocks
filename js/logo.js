@@ -1484,6 +1484,7 @@ class Logo {
         tur.actionBoundaries = [];
 
         tur.singer.tieCarryOver = 0;
+        tur.singer.runningFromEvent = false;
         for (const b in tur.endOfClampSignals) {
             tur.endOfClampSignals[b] = tur.endOfClampSignals[b].map(signal =>
                 signal && signal.startsWith("_playnote_") ? null : signal

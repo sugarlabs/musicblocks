@@ -3732,6 +3732,17 @@ describe("Logo stopTurtleRun", () => {
         expect(logo.stage.dispatchEvent.mock.calls).toEqual([["_settimbre_0_3"], ["_volume_0_5"]]);
     });
 
+    test("ends the clamps of a mouse started by an event", () => {
+        turtle0.running = true;
+        turtle0.singer.runningFromEvent = true;
+        turtle0.endOfClampSignals = { 5: ["_volume_0_5"] };
+
+        logo.stopTurtleRun(0);
+
+        expect(logo.stage.dispatchEvent).toHaveBeenCalledWith("_volume_0_5");
+        expect(turtle0.singer.runningFromEvent).toBe(false);
+    });
+
     test("does not play the rest of a tied note", () => {
         turtle0.singer.tieCarryOver = 0.25;
 

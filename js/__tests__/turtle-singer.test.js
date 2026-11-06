@@ -294,6 +294,7 @@ describe("Singer Class", () => {
         singer.multipleVoices = true;
         singer.noteValue = { 12: 4, 14: 8 };
         singer.notePitches = { 12: ["G"], 14: ["A"] };
+        singer.delayedNotes = [[14, 8]];
         singer.turtleTime = 3;
 
         singer.dropPendingNotes();
@@ -302,6 +303,7 @@ describe("Singer Class", () => {
         expect(singer.multipleVoices).toBe(false);
         expect(singer.noteValue).toEqual({});
         expect(singer.notePitches).toEqual({});
+        expect(singer.delayedNotes).toEqual([]);
         expect(singer.turtleTime).toBe(3);
     });
 
