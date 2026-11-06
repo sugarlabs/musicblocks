@@ -419,10 +419,10 @@ var rationalSum = (a, b) => {
         a.length < 2 ||
         !Array.isArray(b) ||
         b.length < 2 ||
-        typeof a[0] !== "number" ||
-        typeof a[1] !== "number" ||
-        typeof b[0] !== "number" ||
-        typeof b[1] !== "number"
+        !Number.isFinite(a[0]) ||
+        !Number.isFinite(a[1]) ||
+        !Number.isFinite(b[0]) ||
+        !Number.isFinite(b[1])
     ) {
         if (typeof console !== "undefined") {
             console.warn("Invalid input passed to rationalSum:", a, b);
