@@ -3005,15 +3005,22 @@ class Block {
                 if (c1 !== null && c2 !== null && this.blocks.blockList[c2].name === "divide") {
                     const ci = this.blocks.blockList[c2].connections[1];
                     const cii = this.blocks.blockList[c2].connections[2];
+                    const b1 = c1 !== null ? this.blocks.blockList[c1] : null;
+                    const bi = ci !== null ? this.blocks.blockList[ci] : null;
+                    const bii = cii !== null ? this.blocks.blockList[cii] : null;
                     if (
-                        ci !== null &&
-                        cii !== null &&
-                        this.blocks.blockList[ci].name === "number" &&
-                        this.blocks.blockList[cii].name === "number"
+                        b1 &&
+                        bi &&
+                        bii &&
+                        b1.name === "number" &&
+                        bi.name === "number" &&
+                        bii.name === "number" &&
+                        bi.value !== 0
                     ) {
-                        v =
-                            (this.blocks.blockList[c1].value / this.blocks.blockList[ci].value) *
-                            this.blocks.blockList[cii].value;
+                        const calculated = (b1.value / bi.value) * bii.value;
+                        if (Number.isFinite(calculated)) {
+                            v = calculated;
+                        }
                     }
                 }
             }
@@ -3022,16 +3029,19 @@ class Block {
         c = this.connections[2];
         c = this.blocks.findFirstPitchBlock(c);
         const p = this._getPitch(c);
+        const hasValidTime = typeof v === "number" && Number.isFinite(v);
         if (c === null) {
-            this.collapseText.text = `${_("silence")} | ${v}`;
-        } else if (p === "" && v === "") {
+            this.collapseText.text = hasValidTime
+                ? `${_("silence")} | ${v.toFixed(0)}`
+                : _("silence");
+        } else if (p === "" && !hasValidTime) {
             this.collapseText.text = _("note value");
         } else {
             // Are there more pitch blocks in this note?
             c = this.blocks.findFirstPitchBlock(last(this.blocks.blockList[c].connections));
             // Update the collapsed-block label.
             const pitchLabel = c === null ? p : p + "...";
-            if (v !== "") {
+            if (hasValidTime) {
                 const formattedTime = v.toFixed(0);
                 if (p === "") {
                     this.collapseText.text = formattedTime;

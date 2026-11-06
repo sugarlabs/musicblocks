@@ -881,6 +881,64 @@ describe("Block Foundation", () => {
                 expect(block.collapseText.text).toBe("500");
             });
 
+            it("should omit non-finite oscillator time when division by zero occurs in _oscTimeLabel", () => {
+                block.name = "osctime";
+                block.connections = [null, 1, 6];
+                mockBlocks.blockList = [
+                    block,
+                    { name: "divide", connections: [0, 2, 3] },
+                    { name: "number", value: 1000, connections: [1] },
+                    { name: "divide", connections: [1, 4, 5] },
+                    { name: "number", value: 0, connections: [3] }, // division by zero
+                    { name: "number", value: 1, connections: [3] },
+                    { name: "pitch", connections: [0, 7, 8] },
+                    { name: "notename", value: "C", connections: [6] },
+                    { name: "number", value: 4, connections: [6] }
+                ];
+                mockBlocks.findFirstPitchBlock = jest.fn(c => (c === 6 ? 6 : null));
+
+                block._oscTimeLabel();
+                // Non-finite time must be omitted; only pitch should be shown
+                expect(block.collapseText.text).toBe("C 4");
+            });
+
+            it("should omit non-finite oscillator time in silence display in _oscTimeLabel", () => {
+                block.name = "osctime";
+                block.connections = [null, 1, null];
+                mockBlocks.blockList = [
+                    block,
+                    { name: "divide", connections: [0, 2, 3] },
+                    { name: "number", value: 1000, connections: [1] },
+                    { name: "divide", connections: [1, 4, 5] },
+                    { name: "number", value: 0, connections: [3] },
+                    { name: "number", value: 1, connections: [3] }
+                ];
+                mockBlocks.findFirstPitchBlock = jest.fn(() => null);
+
+                block._oscTimeLabel();
+                expect(block.collapseText.text).toBe("silence");
+            });
+
+            it("should format combined pitch and finite time in _oscTimeLabel", () => {
+                block.name = "osctime";
+                block.connections = [null, 1, 6];
+                mockBlocks.blockList = [
+                    block,
+                    { name: "divide", connections: [0, 2, 3] },
+                    { name: "number", value: 1000, connections: [1] },
+                    { name: "divide", connections: [1, 4, 5] },
+                    { name: "number", value: 4, connections: [3] },
+                    { name: "number", value: 1, connections: [3] },
+                    { name: "pitch", connections: [0, 7, 8] },
+                    { name: "notename", value: "A", connections: [6] },
+                    { name: "number", value: 4, connections: [6] }
+                ];
+                mockBlocks.findFirstPitchBlock = jest.fn(c => (c === 6 ? 6 : null));
+
+                block._oscTimeLabel();
+                expect(block.collapseText.text).toBe("A 4 | 250");
+            });
+
             it("should not throw in _newNoteLabel when child pitch block has empty slot", () => {
                 block.name = "newnote";
                 block.connections = [null, null, 1];
