@@ -507,14 +507,17 @@ describe("FlowBlocks integration", () => {
         const block = getBlock("until");
         const blk = 7;
         activity.blocks.blockList[blk] = { connections: [70] };
-        block.flow([false, 71], logo, 0, blk);
+        const res = block.flow([false, 71], logo, 0, blk);
+        expect(res).toEqual([71, 1]);
         expect(activity.turtles.ithTurtle(0).queue.pop().parentBlk).toBe(70);
 
         const turtle = activity.turtles.ithTurtle(0);
         turtle.queue.push(new Queue(99, 1, blk));
         turtle.queue.push(new Queue(98, 1, blk));
-        block.flow([true, 72], logo, 0, blk);
+        const resClean = block.flow([true, 72], logo, 0, blk);
+        expect(resClean).toBeUndefined();
         expect(turtle.queue).toHaveLength(1);
+        expect(turtle.queue[0].blk).toBe(98);
     });
 
     test("WhileBlock requeues when true and flushes when false", () => {
@@ -529,8 +532,10 @@ describe("FlowBlocks integration", () => {
 
         turtle.queue.push(new Queue(99, 1, blk));
         turtle.queue.push(new Queue(98, 1, blk));
-        block.flow([false, 82], logo, 0, blk);
+        const resFlush = block.flow([false, 82], logo, 0, blk);
+        expect(resFlush).toBeUndefined();
         expect(turtle.queue).toHaveLength(1);
+        expect(turtle.queue[0].blk).toBe(98);
     });
 
     test("WaitForBlock's requeue carries receivedArg forward so a later re-check can still resolve an arg block (#8696)", () => {
@@ -590,6 +595,54 @@ describe("FlowBlocks integration", () => {
         const block = getBlock("if");
         expect(block.flow([true, 10])).toEqual([10, 1]);
         expect(block.flow([false, 10])).toBeUndefined();
+    });
+
+    test("WhileBlock does not flow when condition is false", () => {
+        const block = getBlock("while");
+        const blk = 8;
+        activity.blocks.blockList[blk] = { connections: [80] };
+        expect(block.flow([false, 10], logo, 0, blk)).toBeUndefined();
+    });
+
+    test("WhileBlock preserves outflow block connected below when condition is false", () => {
+        const block = getBlock("while");
+        const blk = 8;
+        activity.blocks.blockList[blk] = { connections: [80] };
+        const turtle = activity.turtles.ithTurtle(0);
+        turtle.queue = [];
+
+        turtle.queue.push(new Queue(50, 1, 999));
+        turtle.queue.push(new Queue(85, 1, blk));
+
+        const res = block.flow([false, 10], logo, 0, blk);
+        expect(res).toBeUndefined();
+        expect(turtle.queue).toHaveLength(2);
+        expect(turtle.queue[0].blk).toBe(50);
+        expect(turtle.queue[1].blk).toBe(85);
+    });
+
+    test("UntilBlock does not flow when condition is true", () => {
+        const block = getBlock("until");
+        const blk = 7;
+        activity.blocks.blockList[blk] = { connections: [70] };
+        expect(block.flow([true, 10], logo, 0, blk)).toBeUndefined();
+    });
+
+    test("UntilBlock preserves outflow block connected below when condition is true", () => {
+        const block = getBlock("until");
+        const blk = 7;
+        activity.blocks.blockList[blk] = { connections: [70] };
+        const turtle = activity.turtles.ithTurtle(0);
+        turtle.queue = [];
+
+        turtle.queue.push(new Queue(50, 1, 999));
+        turtle.queue.push(new Queue(75, 1, blk));
+
+        const res = block.flow([true, 10], logo, 0, blk);
+        expect(res).toBeUndefined();
+        expect(turtle.queue).toHaveLength(2);
+        expect(turtle.queue[0].blk).toBe(50);
+        expect(turtle.queue[1].blk).toBe(75);
     });
 
     test("ForeverBlock returns continuous or limited flow", () => {
