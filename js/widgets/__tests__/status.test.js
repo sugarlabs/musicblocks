@@ -38,33 +38,49 @@ if (typeof global.TextDecoder === "undefined") {
     global.TextDecoder = TextDecoder;
 }
 
-const createMockElement = tagName => ({
-    tagName,
-    style: {},
-    append: jest.fn(),
-    innerHTML: "",
-    textContent: "",
-    appendChild: jest.fn(),
-    setAttribute: jest.fn(),
-    querySelectorAll: jest.fn().mockReturnValue([]),
-    addEventListener: jest.fn(),
-    className: "",
-    insertCell: jest.fn().mockImplementation(() => createMockElement("TD")),
-    insertRow: jest.fn().mockImplementation(() => ({
-        insertCell: jest.fn().mockImplementation(() => createMockElement("TD"))
-    })),
-    createTHead: jest.fn().mockImplementation(() => ({
+const createMockElement = tagName => {
+    const children = [];
+    const listeners = {};
+    const element = {
+        tagName,
+        style: {},
+        children,
+        append: jest.fn((...elements) => children.push(...elements)),
+        innerHTML: "",
+        textContent: "",
+        appendChild: jest.fn(child => {
+            children.push(child);
+            return child;
+        }),
+        replaceChildren: jest.fn((...elements) => {
+            children.length = 0;
+            children.push(...elements);
+        }),
+        setAttribute: jest.fn(),
+        querySelectorAll: jest.fn().mockReturnValue([]),
+        addEventListener: jest.fn((event, listener) => {
+            listeners[event] = listener;
+        }),
+        click: jest.fn(() => listeners.click?.()),
+        className: "",
+        insertCell: jest.fn().mockImplementation(() => createMockElement("TD")),
         insertRow: jest.fn().mockImplementation(() => ({
             insertCell: jest.fn().mockImplementation(() => createMockElement("TD"))
-        }))
-    })),
-    createTBody: jest.fn().mockImplementation(() => ({
-        insertRow: jest.fn().mockImplementation(() => ({
-            insertCell: jest.fn().mockImplementation(() => createMockElement("TD"))
-        }))
-    })),
-    rows: []
-});
+        })),
+        createTHead: jest.fn().mockImplementation(() => ({
+            insertRow: jest.fn().mockImplementation(() => ({
+                insertCell: jest.fn().mockImplementation(() => createMockElement("TD"))
+            }))
+        })),
+        createTBody: jest.fn().mockImplementation(() => ({
+            insertRow: jest.fn().mockImplementation(() => ({
+                insertCell: jest.fn().mockImplementation(() => createMockElement("TD"))
+            }))
+        })),
+        rows: []
+    };
+    return element;
+};
 
 global.document = {
     createElement: jest.fn().mockImplementation(createMockElement)
@@ -205,6 +221,86 @@ describe("StatusMatrix Widget", () => {
             expect(statusMatrix.isMaximized).toBe(true);
             statusMatrix.widgetWindow.onmaximize();
             expect(statusMatrix.isMaximized).toBe(false);
+        });
+    });
+
+    describe("Variable watch panel", () => {
+        beforeEach(() => {
+            mockActivity.logo.boxes = { score: 3 };
+            mockActivity.logo.turtleHeaps = { 0: ["C4", 2] };
+            mockActivity.blocks.blockList = {
+                0: { name: "namedbox", privateData: "nextNote" },
+                1: { name: "storein2", privateData: "counter" },
+                2: { name: "text", value: "computedName" },
+                3: { name: "storein", connections: [null, 2] }
+            };
+            statusMatrix.init(mockActivity);
+        });
+
+        test("offers box names and the heap for each active turtle", () => {
+            const optionLabels = statusMatrix._watchSelect.children.map(
+                option => option.textContent
+            );
+
+            expect(optionLabels).toEqual([
+                "Select a box or heap",
+                "Box: computedName",
+                "Box: counter",
+                "Box: nextNote",
+                "Box: score",
+                "Heap: Mouse1"
+            ]);
+        });
+
+        test("adds selected boxes and updates values during status renders", () => {
+            statusMatrix._watchSelect.value = JSON.stringify(["box", "score"]);
+            statusMatrix._watchAddButton.click();
+
+            expect(statusMatrix._watches).toHaveLength(1);
+            expect(statusMatrix._watches[0].valueElement.textContent).toBe("3");
+
+            mockActivity.logo.boxes.score = 8;
+            statusMatrix.updateAll();
+
+            expect(statusMatrix._watches[0].valueElement.textContent).toBe("8");
+        });
+
+        test("adds newly initialized boxes to the watch selector", () => {
+            mockActivity.logo.boxes.runtimeBox = 12;
+
+            statusMatrix.updateAll();
+
+            expect(
+                statusMatrix._watchSelect.children.map(option => option.textContent)
+            ).toContain("Box: runtimeBox");
+        });
+
+        test("watches the selected turtle heap and supports removing a watch", () => {
+            statusMatrix._watchSelect.value = JSON.stringify(["heap", "0"]);
+            statusMatrix._watchAddButton.click();
+
+            const heapWatch = statusMatrix._watches[0];
+            expect(heapWatch.valueElement.textContent).toBe('["C4",2]');
+
+            mockActivity.logo.turtleHeaps[0].push(5);
+            statusMatrix.updateAll();
+            expect(heapWatch.valueElement.textContent).toBe('["C4",2,5]');
+
+            statusMatrix._watchList.children[0].children[2].click();
+            expect(statusMatrix._watches).toHaveLength(0);
+            expect(statusMatrix._watchList.children[0].textContent).toBe(
+                "No variables are being watched."
+            );
+        });
+
+        test("retains selected watches when the status widget is initialized again", () => {
+            statusMatrix._watchSelect.value = JSON.stringify(["box", "score"]);
+            statusMatrix._watchAddButton.click();
+
+            statusMatrix.init(mockActivity);
+
+            expect(statusMatrix._watches).toHaveLength(1);
+            expect(statusMatrix._watches[0].valueElement.textContent).toBe("3");
         });
     });
 

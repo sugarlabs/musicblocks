@@ -40,6 +40,7 @@ class StatusMatrix {
         this.activity = activity;
         this.isOpen = true;
         this.isMaximized = false;
+        this._watches = this._watches || [];
         this._cellScale = window.innerWidth / 1200;
         let iconSize = StatusMatrix.ICONSIZE * this._cellScale;
         this._clearHarmonyTimer();
@@ -48,12 +49,14 @@ class StatusMatrix {
         this.widgetWindow = window.widgetWindows.windowFor(this, "status", "status");
         this.widgetWindow.clear();
         this.widgetWindow.show();
+        this._createWatchPanel();
         // For the button callbacks
         let cell;
 
         // The status table
         this._statusTable = document.createElement("table");
-        this.widgetWindow.getWidgetBody().append(this._statusTable);
+        const widgetBody = this.widgetWindow.getWidgetBody();
+        widgetBody.append(this._watchPanel, this._statusTable);
         this.widgetWindow.onclose = () => {
             this.isOpen = false;
             this._clearHarmonyTimer();
@@ -282,6 +285,220 @@ class StatusMatrix {
             this._shownHarmony = null;
         }
         this.widgetWindow.sendToCenter();
+    }
+
+    _createWatchPanel() {
+        this._watchPanel = document.createElement("section");
+        this._watchPanel.className = "status-watch-panel";
+
+        const heading = document.createElement("h3");
+        heading.textContent = _("Variable watch");
+
+        this._watchSelect = document.createElement("select");
+        this._watchSelect.setAttribute("aria-label", _("Select a box or heap to watch"));
+
+        this._watchAddButton = document.createElement("button");
+        this._watchAddButton.type = "button";
+        this._watchAddButton.textContent = _("Add");
+        this._watchAddButton.addEventListener("click", () => this._addSelectedWatch());
+
+        const controls = document.createElement("div");
+        controls.className = "status-watch-controls";
+        controls.append(this._watchSelect, this._watchAddButton);
+
+        this._watchList = document.createElement("div");
+        this._watchList.className = "status-watch-list";
+
+        this._watchPanel.append(heading, controls, this._watchList);
+        this._watchOptions = new Map();
+        this._watchOptionsSignature = null;
+        this._knownBoxNames = this._collectBoxNames();
+        this._refreshWatchOptions();
+        this._renderWatchList();
+        this._renderWatchValues();
+    }
+
+    _watchLabel(watch) {
+        if (watch.type === "box") {
+            return _("Box") + ": " + watch.name;
+        }
+
+        const turtle = this.activity?.turtles?.turtleList?.[Number(watch.turtleId)];
+        return _("Heap") + ": " + (turtle?.name || _("Turtle") + " " + (Number(watch.turtleId) + 1));
+    }
+
+    _collectBoxNames() {
+        const names = new Set(Object.keys(this.activity?.logo?.boxes || {}));
+        const blockList = this.activity?.blocks?.blockList || {};
+
+        for (const block of Object.values(blockList)) {
+            if (
+                (block?.name === "namedbox" || block?.name === "storein2") &&
+                typeof block.privateData === "string"
+            ) {
+                names.add(block.privateData);
+            } else if (block?.name === "storein") {
+                const nameBlock = blockList[block.connections?.[1]];
+                if (nameBlock?.name === "text" && typeof nameBlock.value === "string") {
+                    names.add(nameBlock.value);
+                }
+            } else if (block?.name === "box1" || block?.name === "storebox1") {
+                names.add("box1");
+            } else if (block?.name === "box2" || block?.name === "storebox2") {
+                names.add("box2");
+            }
+        }
+
+        return names;
+    }
+
+    _refreshWatchOptions() {
+        if (!this._watchSelect) {
+            return;
+        }
+
+        const logo = this.activity?.logo;
+        for (const name of Object.keys(logo?.boxes || {})) {
+            this._knownBoxNames.add(name);
+        }
+
+        const options = Array.from(this._knownBoxNames)
+            .sort((a, b) => a.localeCompare(b))
+            .map(name => ({
+                value: JSON.stringify(["box", name]),
+                label: this._watchLabel({ type: "box", name }),
+                watch: { type: "box", name }
+            }));
+
+        const turtles = this.activity?.turtles?.turtleList || [];
+        for (let index = 0; index < turtles.length; index++) {
+            if (turtles[index]?.inTrash) {
+                continue;
+            }
+
+            const watch = { type: "heap", turtleId: String(index) };
+            options.push({
+                value: JSON.stringify(["heap", watch.turtleId]),
+                label: this._watchLabel(watch),
+                watch
+            });
+        }
+
+        const signature = JSON.stringify(options.map(({ value, label }) => [value, label]));
+        if (signature === this._watchOptionsSignature) {
+            return;
+        }
+
+        const selectedValue = this._watchSelect.value;
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = _("Select a box or heap");
+        this._watchSelect.replaceChildren(placeholder);
+        this._watchOptions.clear();
+
+        for (const optionData of options) {
+            const option = document.createElement("option");
+            option.value = optionData.value;
+            option.textContent = optionData.label;
+            this._watchSelect.append(option);
+            this._watchOptions.set(optionData.value, optionData.watch);
+        }
+
+        this._watchSelect.value = this._watchOptions.has(selectedValue) ? selectedValue : "";
+        this._watchOptionsSignature = signature;
+        this._watchAddButton.disabled = this._watchOptions.size === 0;
+    }
+
+    _addSelectedWatch() {
+        this._refreshWatchOptions();
+        const value = this._watchSelect.value;
+        const watch = this._watchOptions.get(value);
+        if (!watch || this._watches.some(item => item.value === value)) {
+            return;
+        }
+
+        this._watches.push({ ...watch, value });
+        this._watchSelect.value = "";
+        this._renderWatchList();
+        this._renderWatchValues();
+    }
+
+    _removeWatch(value) {
+        this._watches = this._watches.filter(watch => watch.value !== value);
+        this._renderWatchList();
+    }
+
+    _renderWatchList() {
+        if (!this._watchList) {
+            return;
+        }
+
+        this._watchList.replaceChildren();
+        if (this._watches.length === 0) {
+            const emptyMessage = document.createElement("p");
+            emptyMessage.textContent = _("No variables are being watched.");
+            this._watchList.append(emptyMessage);
+            return;
+        }
+
+        for (const watch of this._watches) {
+            const row = document.createElement("div");
+            row.className = "status-watch-row";
+
+            const label = document.createElement("span");
+            label.textContent = this._watchLabel(watch);
+
+            watch.valueElement = document.createElement("output");
+            watch.valueElement.className = "status-watch-value";
+
+            const removeButton = document.createElement("button");
+            removeButton.type = "button";
+            removeButton.textContent = _("Remove");
+            removeButton.setAttribute("aria-label", _("Remove") + " " + this._watchLabel(watch));
+            removeButton.addEventListener("click", () => this._removeWatch(watch.value));
+
+            row.append(label, watch.valueElement, removeButton);
+            this._watchList.append(row);
+        }
+    }
+
+    _formatWatchValue(value) {
+        if (value === undefined) {
+            return _("undefined");
+        }
+        if (typeof value === "string" || value === null || typeof value !== "object") {
+            return String(value);
+        }
+
+        try {
+            return JSON.stringify(value);
+        } catch (error) {
+            if (error instanceof TypeError) {
+                return String(value);
+            }
+            throw error;
+        }
+    }
+
+    _renderWatchValues() {
+        const logo = this.activity?.logo;
+        const boxes = logo?.boxes || {};
+        const heaps = logo?.turtleHeaps || {};
+
+        for (const watch of this._watches) {
+            let value;
+            if (watch.type === "box") {
+                value = Object.prototype.hasOwnProperty.call(boxes, watch.name)
+                    ? boxes[watch.name]
+                    : undefined;
+            } else {
+                value = heaps[watch.turtleId] || [];
+            }
+
+            if (watch.valueElement) {
+                watch.valueElement.textContent = this._formatWatchValue(value);
+            }
+        }
     }
 
     /**
@@ -525,6 +742,9 @@ class StatusMatrix {
         if (this.activity?.logo) {
             this.activity.logo.updatingStatusMatrix = false;
         }
+
+        this._refreshWatchOptions();
+        this._renderWatchValues();
     }
 
     /**

@@ -97,6 +97,12 @@ skip, [staccato](#MORE-TRANSFORMATIONS),
 [slur](#MORE-TRANSFORMATIONS), and [graphics](#GRAPHICS) factors,
 e.g., x, y, heading, color, shade, grey, and pensize.
 
+The *Variable watch* controls in the Status widget let you select a box
+or a voice's heap and monitor its current value while the program runs.
+Choose a variable from the list and select *Add*; select *Remove* to
+stop watching it. Boxes created during execution become available in
+the list as they are initialized.
+
 ![Additional Programming within the Status Widget Block](./images/Status_Widget_additional_programming_DebuggingMd.svg "Additional Programming within the Status Widget Block")
 
 You can do additional programming within the status block. In the
