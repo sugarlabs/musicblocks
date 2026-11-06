@@ -281,14 +281,75 @@ describe("ChordBuilderWidget", () => {
             expect(mockAudio.playChord).toHaveBeenCalledWith(chord, 0.4, { octave: 4 });
         });
 
-        it("removes chord at index", () => {
-            widget.addChord(widget.diatonicChords[0]); // C
-            widget.addChord(widget.diatonicChords[4]); // G
-            expect(widget.progression).toHaveLength(2);
+        it("removes chord from middle of progression preserving later positions", () => {
+            widget.addChord(widget.diatonicChords[0]); // C at index 0
+            widget.addChord(widget.diatonicChords[1]); // Dm at index 1
+            widget.addChord(widget.diatonicChords[2]); // Em at index 2
+            widget.addChord(widget.diatonicChords[3]); // F at index 3
+            expect(widget.progression).toHaveLength(4);
 
-            widget.removeChord(0);
+            widget.removeChord(1); // Remove Dm from middle
+            expect(widget.progression).toHaveLength(4);
+            expect(widget.progression[0].name).toBe("C");
+            expect(widget.progression[1]).toBeNull();
+            expect(widget.progression[2].name).toBe("Em");
+            expect(widget.progression[3].name).toBe("F");
+        });
+
+        it("preserves later chords across multiple bars when removing an earlier chord", () => {
+            // Walter Bender reproduction:
+            // 4 bars, 4 beats per bar.
+            // Bar 1, Beat 1 (cell 0): C
+            // Bar 1, Beat 2 (cell 1): Dm
+            // Bar 3, Beat 1 (cell 8 = 2 * 4 + 0): B°
+            const C = widget.diatonicChords[0];
+            const Dm = widget.diatonicChords[1];
+            const Bdim = widget.diatonicChords[6];
+            widget.progression = [C, Dm, null, null, null, null, null, null, Bdim];
+            expect(widget.progression).toHaveLength(9);
+
+            // Removing Dm at Bar 1 Beat 2 must NOT shift B° to Bar 2 Beat 4 (cell 7)
+            widget.removeChord(1);
+            expect(widget.progression).toHaveLength(9);
+            expect(widget.progression[0].name).toBe("C");
+            expect(widget.progression[1]).toBeNull();
+            expect(widget.progression[8].name).toBe("B°");
+        });
+
+        it("removes the first chord while preserving subsequent chord positions", () => {
+            widget.progression = [widget.diatonicChords[0], null, widget.diatonicChords[4]]; // C at 0, gap at 1, G at 2
+            widget.removeChord(0); // Remove C
+
+            expect(widget.progression).toHaveLength(3);
+            expect(widget.progression[0]).toBeNull();
+            expect(widget.progression[1]).toBeNull();
+            expect(widget.progression[2].name).toBe("G");
+        });
+
+        it("removes the last chord and trims trailing null entries", () => {
+            widget.progression = [widget.diatonicChords[0], null, widget.diatonicChords[4]]; // C at 0, gap at 1, G at 2
+            widget.removeChord(2); // Remove G (trailing chord)
+
+            // Trailing null at index 1 is trimmed along with index 2
             expect(widget.progression).toHaveLength(1);
-            expect(widget.progression[0].name).toBe("G");
+            expect(widget.progression[0].name).toBe("C");
+        });
+
+        it("handles repeatedly removing chords until progression is empty", () => {
+            widget.addChord(widget.diatonicChords[0]); // C (0)
+            widget.addChord(widget.diatonicChords[1]); // Dm (1)
+            widget.addChord(widget.diatonicChords[2]); // Em (2)
+
+            widget.removeChord(1); // Remove middle: [C, null, Em]
+            expect(widget.progression).toHaveLength(3);
+            expect(widget.progression[1]).toBeNull();
+
+            widget.removeChord(2); // Remove last: [C] (trims index 2 and index 1)
+            expect(widget.progression).toHaveLength(1);
+            expect(widget.progression[0].name).toBe("C");
+
+            widget.removeChord(0); // Remove remaining: []
+            expect(widget.progression).toEqual([]);
         });
 
         it("clears entire progression and stops audio", () => {
@@ -439,6 +500,45 @@ describe("ChordBuilderWidget", () => {
                 );
             }
         );
+
+        it("preserves chord positions and exports rests after removing a chord from progression", () => {
+            widget.addChord(widget.diatonicChords[0]); // C at beat 0
+            widget.addChord(widget.diatonicChords[1]); // Dm at beat 1
+            widget.addChord(widget.diatonicChords[4]); // G at beat 2
+            expect(widget.progression).toHaveLength(3);
+
+            // Removing Dm at beat 1 leaves an empty beat slot: [C, null, G]
+            widget.removeChord(1);
+            expect(widget.progression).toHaveLength(3);
+            expect(widget.progression[1]).toBeNull();
+
+            widget.saveToBlocks();
+
+            expect(mockBlocks.loadNewBlocks).toHaveBeenCalledTimes(1);
+            const stack = mockBlocks.loadNewBlocks.mock.calls[0][0];
+
+            // 3 note events generated: C chord, rest2, G chord
+            const noteBlocks = stack.filter(b => b[1][0] === "newnote");
+            expect(noteBlocks).toHaveLength(3);
+
+            // Beat 0: C chord (pitch with note name C)
+            const firstNotePitch = stack[noteBlocks[0][4][2]];
+            expect(firstNotePitch[1][0]).toBe("pitch");
+            expect(stack[firstNotePitch[4][1]][1][1].value).toBe("C");
+
+            // Beat 1: timed rest block (rest2) preserving the gap
+            const secondNoteRest = stack[noteBlocks[1][4][2]];
+            expect(secondNoteRest[1][0]).toBe("rest2");
+
+            // Beat 2: G chord (pitch with note name G)
+            const thirdNotePitch = stack[noteBlocks[2][4][2]];
+            expect(thirdNotePitch[1][0]).toBe("pitch");
+            expect(stack[thirdNotePitch[4][1]][1][1].value).toBe("G");
+
+            // Exactly 2 chordinterval blocks exist for C and G
+            const chordBlocks = stack.filter(b => b[1][0] === "chordinterval");
+            expect(chordBlocks).toHaveLength(2);
+        });
 
         it("generates and loads block stack for chord progression", () => {
             widget.loadPreset("pop"); // 4 chords: C, G, Am, F
