@@ -1043,6 +1043,12 @@ class JSInterface {
                     values: ["even", "odd", "scalar"],
                     defaultIndex: 0
                 }
+            },
+            {
+                type: "function",
+                constraints: {
+                    async: true
+                }
             }
         ],
         setPitchNumberOffset: [

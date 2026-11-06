@@ -298,7 +298,7 @@ function setupRhythmActions(activity) {
          *
          * @param {Object} turtle - Turtle object
          * @param {Object} blk - corresponding Block object index in blocks.blockList or custom block number
-         * @returns {void}
+         * @returns {boolean} whether a tie listener was set up for the end of the clamp
          */
         static doTie(turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
@@ -307,7 +307,7 @@ function setupRhythmActions(activity) {
             // as a non-owning nested scope. Do not wipe the enclosing Tie's pending state,
             // do not overwrite its cleanup listener, and do not deactivate tie mode on exit.
             if (tur && tur.singer && tur.singer.tie) {
-                return;
+                return false;
             }
 
             // Tie notes together in pairs
@@ -421,6 +421,7 @@ function setupRhythmActions(activity) {
             };
 
             activity.logo.setTurtleListener(turtle, listenerName, __listener);
+            return true;
         }
 
         /**

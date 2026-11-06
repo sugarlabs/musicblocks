@@ -81,9 +81,10 @@ class RhythmBlocksAPI {
      */
     async tie(flow) {
         const args = JSInterface.validateArgs("tie", [flow]);
-        await this.runCommand("doTie", [this.turIndex]);
-        await args[1]();
-        return this.ENDFLOWCOMMAND;
+        const listening = await this.runCommand("doTie", [this.turIndex]);
+        await args[0]();
+        // ENDFLOWCOMMAND pops a listener, so without one of our own it would end an outer tie.
+        return listening === false ? this.ENDFLOW : this.ENDFLOWCOMMAND;
     }
 
     /**
