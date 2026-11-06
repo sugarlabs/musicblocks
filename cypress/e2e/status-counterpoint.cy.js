@@ -35,20 +35,25 @@ describe("Status widget counterpoint", () => {
             expect(turtles.filter(turtle => !turtle.inTrash)).to.have.length(2);
         });
 
-        // Record every warning and consonance the Harmony row shows, even if
-        // the Status window rebuilds its table.
+        // Record every warning and consonance the Harmony row shows. Watch the
+        // whole page from before Play, so nothing is missed while the Status
+        // window opens or rebuilds its table.
         const shown = [];
         const consonances = [];
-        cy.get("#play").click();
-        cy.get('.windowFrame[aria-label="status"]', { timeout: 30000 }).then($frame => {
+        let observer;
+        cy.document().then(doc => {
             const record = () => {
-                for (const div of $frame[0].querySelectorAll("td > div")) {
+                const frame = doc.querySelector('.windowFrame[aria-label="status"]');
+                if (!frame) {
+                    return;
+                }
+                for (const div of frame.querySelectorAll("td > div")) {
                     const text = div.textContent;
                     if (/^(parallel|hidden) /.test(text) && !shown.includes(text)) {
                         shown.push(text);
                     }
                 }
-                for (const row of $frame[0].querySelectorAll("td table tr")) {
+                for (const row of frame.querySelectorAll("td table tr")) {
                     const cells = [...row.cells].map(cell => cell.textContent);
                     const entry = cells[0] + " " + cells[cells.length - 1];
                     if (
@@ -60,14 +65,16 @@ describe("Status widget counterpoint", () => {
                     }
                 }
             };
-            record();
-            new MutationObserver(record).observe($frame[0], { childList: true, subtree: true });
+            observer = new MutationObserver(record);
+            observer.observe(doc.body, { childList: true, subtree: true });
         });
+        cy.get("#play").click();
 
         cy.wrap(shown, { timeout: 20000 }).should("deep.equal", [
             "hidden fifths: mouse 1 C4 → D4, mouse 2 E4 → A4"
         ]);
         cy.wrap(consonances, { timeout: 20000 }).should("include", "D4 → A4 perfect");
         cy.wrap(consonances).should("include", "C4 → E4 imperfect");
+        cy.then(() => observer.disconnect());
     });
 });
