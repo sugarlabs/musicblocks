@@ -1642,14 +1642,17 @@ describe("StatusMatrix Widget", () => {
                 F4: 65,
                 G4: 67,
                 A4: 69,
-                B4: 71
+                B4: 71,
+                C5: 72
             };
             let mice;
 
             // Moves a mouse to a note group (or a rest, with no notes) that starts
             // at `start` in turtle time, lasts `length` seconds and is sounding now.
             const play = (i, notes, start, length = 1) => {
+                mice[i].running = true;
                 mice[i].singer.previousTurtleTime = start;
+                mice[i].singer.turtleTime = start + length;
                 mice[i].singer.pitchStatus =
                     notes.length > 0
                         ? [{ notes, start, startsAt: 10000, endsAt: 10000 + length * 1000 }]
@@ -1795,13 +1798,42 @@ describe("StatusMatrix Widget", () => {
                 expect(warnings()).toEqual(["hidden fifths: mouse 1 C4 → D4, mouse 2 E4 → A4"]);
             });
 
-            test("does not count a note that ended before the move", () => {
-                // The low C3 lasts one second, so it has ended when the others move.
+            test("does not count a mouse that rests when the others move", () => {
                 useMice(mice);
                 statusMatrix.init(mockActivity);
                 play(2, ["C3"], 0, 1);
                 play(0, ["C4"], 0);
                 play(1, ["E4"], 0);
+                play(2, [], 1);
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+
+                expect(warnings()).toEqual(["hidden fifths: mouse 1 C4 → D4, mouse 2 E4 → A4"]);
+            });
+
+            test("waits for a mouse that has not reached the move yet", () => {
+                // Mouse 3 plays C5 twice, above the others, but the interpreter
+                // moves it on after them.
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["E4"], 0);
+                play(2, ["C5"], 0);
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+                expect(warnings()).toEqual([]);
+
+                play(2, ["C5"], 1);
+                expect(warnings()).toEqual([]);
+            });
+
+            test("does not wait for a mouse that has finished", () => {
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["E4"], 0);
+                play(2, ["C5"], 0);
+                mice[2].running = false;
                 play(0, ["D4"], 1);
                 play(1, ["A4"], 1);
 

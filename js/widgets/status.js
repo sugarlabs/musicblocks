@@ -646,7 +646,17 @@ class StatusMatrix {
             if (moments.length > 0 && start < moments[moments.length - 1].start) {
                 restarted = true;
             }
-            latest.push({ t, column, start, end, notes });
+            // busyUntil: when the mouse's latest note or rest ends, so whether
+            // it has reached a later time yet.
+            latest.push({
+                t,
+                column,
+                start,
+                end,
+                notes,
+                busyUntil: singer.turtleTime,
+                running: tur.running === true
+            });
         }
 
         // Turtle time starts again from 0 when the project is played again.
@@ -656,9 +666,11 @@ class StatusMatrix {
 
         const synth = this.activity?.logo?.synth;
         const canMeasure = Boolean(synth) && typeof synth.getFrequency === "function";
-        for (const { t, column, start, end, notes } of latest) {
+        for (const { t, column, start, end, notes, busyUntil, running } of latest) {
             const voice = this._voices.get(t) || { column, moments: [] };
             voice.column = column;
+            voice.busyUntil = busyUntil;
+            voice.running = running;
             let moment = voice.moments[voice.moments.length - 1];
             if (!moment || moment.start !== start) {
                 moment = { start, end, notes: [], note: null, frequencies: [] };
@@ -700,6 +712,16 @@ class StatusMatrix {
             return frequencies;
         };
         const same = (a, b) => Math.abs(a - b) <= 1e-9 * Math.max(a, b);
+        // The interpreter moves the mice on one at a time, so a running mouse
+        // whose last note or rest ends at this time may not have started its
+        // next one yet. The outer voices are not known until it has.
+        const waiting = time =>
+            voices.some(
+                voice =>
+                    voice.running &&
+                    !(voice.busyUntil > time + 1e-6) &&
+                    !voice.moments.some(moment => Math.abs(moment.start - time) < 1e-6)
+            );
         for (let i = 0; i < voices.length; i++) {
             for (let j = i + 1; j < voices.length; j++) {
                 const [a, b] = [voices[i], voices[j]];
@@ -725,6 +747,9 @@ class StatusMatrix {
                     // Hidden fifths and octaves only count between the outer
                     // voices: the lowest and highest notes sounding then.
                     for (const hidden of HarmonyUtils.findHiddenPerfects(before, after)) {
+                        if (waiting(start)) {
+                            continue;
+                        }
                         const sounding = soundingAt(start);
                         if (
                             same(hidden.frequencies[0], Math.min(...sounding)) &&

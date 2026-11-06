@@ -316,8 +316,9 @@ const HarmonyUtils = {
             return [];
         }
 
-        // Low to high before the move; the same order after it, or they cross.
-        pairs.sort((a, b) => a[0].frequency - b[0].frequency);
+        // Low to high before the move (from a unison, by where they go); the
+        // same order after it, or they cross.
+        pairs.sort((a, b) => a[0].frequency - b[0].frequency || a[1].frequency - b[1].frequency);
         const [[lowFrom, lowTo], [highFrom, highTo]] = pairs;
         if (lowTo.frequency >= highTo.frequency) {
             return [];

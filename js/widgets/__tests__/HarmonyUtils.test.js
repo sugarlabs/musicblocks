@@ -473,6 +473,13 @@ describe("HarmonyUtils.findHiddenPerfects", () => {
         ]);
     });
 
+    it("finds the same hidden fifth from a unison whichever voice is listed first", () => {
+        // C4/C4 to D4/A4: both up, into a fifth, the upper voice by a sixth.
+        const up = [voice(1, 60), voice(2, 60)];
+        expect(kinds(up, [voice(1, 62), voice(2, 69)])).toEqual(["fifths"]);
+        expect(kinds(up, [voice(1, 69), voice(2, 62)])).toEqual(["fifths"]);
+    });
+
     it("needs exactly two valid voices", () => {
         expect(HarmonyUtils.findHiddenPerfects(null, [])).toEqual([]);
         expect(kinds([voice(1, 60)], [voice(1, 62)])).toEqual([]);
@@ -492,7 +499,9 @@ describe("HarmonyUtils.findHiddenPerfects", () => {
             return size % 12 === 7 ? "fifth" : null;
         };
         const expected = (a1, b1, a2, b2) => {
-            const [low1, high1, low2, high2] = a1 < b1 ? [a1, b1, a2, b2] : [b1, a1, b2, a2];
+            // From a unison, the lower voice is the one that ends lower.
+            const [low1, high1, low2, high2] =
+                a1 < b1 || (a1 === b1 && a2 <= b2) ? [a1, b1, a2, b2] : [b1, a1, b2, a2];
             if (low2 >= high2) return null;
             const lowMove = low2 - low1;
             const highMove = high2 - high1;
@@ -504,11 +513,9 @@ describe("HarmonyUtils.findHiddenPerfects", () => {
             return null;
         };
 
-        // Voices start on different notes, so "lower" and "upper" are defined.
         let checked = 0;
         for (let a1 = 48; a1 <= 72; a1++) {
             for (let b1 = 48; b1 <= 72; b1++) {
-                if (a1 === b1) continue;
                 for (let a2 = 48; a2 <= 72; a2++) {
                     for (let b2 = 48; b2 <= 72; b2++) {
                         const want = expected(a1, b1, a2, b2);
@@ -524,6 +531,6 @@ describe("HarmonyUtils.findHiddenPerfects", () => {
                 }
             }
         }
-        expect(checked).toBe(25 * 24 * 25 * 25);
+        expect(checked).toBe(25 ** 4);
     });
 });
