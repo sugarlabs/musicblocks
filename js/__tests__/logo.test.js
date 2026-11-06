@@ -1511,6 +1511,25 @@ describe("Logo runLogoCommands", () => {
         logo.initTurtle = jest.fn();
     });
 
+    test("clears export flags when no start block exists", () => {
+        mockActivity.blocks.stackList = [];
+        logo.blockList = [];
+        logo.runningMIDI = true;
+        logo.runningLilypond = true;
+        logo.runningAbc = true;
+        logo.runningMxml = true;
+
+        document.body.style.cursor = "wait";
+        logo.runLogoCommands(null, null);
+
+        expect(logo.runningMIDI).toBe(false);
+        expect(logo.runningLilypond).toBe(false);
+        expect(logo.runningAbc).toBe(false);
+        expect(logo.runningMxml).toBe(false);
+        expect(logo._exportingNotation).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+    });
+
     afterEach(() => {
         if (timeoutSpy) {
             timeoutSpy.mockRestore();

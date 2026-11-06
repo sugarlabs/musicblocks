@@ -421,9 +421,9 @@ class SaveInterface {
      */
     saveMIDI(activity) {
         // Suppress music and turtle output when generating
+        document.body.style.cursor = "wait";
         activity.logo.runningMIDI = true;
         activity.logo.runLogoCommands();
-        document.body.style.cursor = "wait";
     }
 
     /**

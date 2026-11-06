@@ -2089,6 +2089,12 @@ class Logo {
             );
         } else {
             document.body.style.cursor = "default";
+            if (this._exportingNotation) {
+                this.runningLilypond = false;
+                this.runningAbc = false;
+                this.runningMxml = false;
+                this.runningMIDI = false;
+            }
         }
 
         this.deps.refreshCanvas();

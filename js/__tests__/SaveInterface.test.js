@@ -626,6 +626,23 @@ describe("saveMIDI Method", () => {
         jest.restoreAllMocks();
     });
 
+    it("sets cursor to wait before running the logo commands", () => {
+        const originalCursor = document.body.style.cursor;
+        let cursorWhileRunning;
+
+        mockLogo.runLogoCommands.mockImplementation(() => {
+            cursorWhileRunning = document.body.style.cursor;
+        });
+
+        instance.saveMIDI(activity);
+
+        expect(cursorWhileRunning).toBe("wait");
+        expect(mockLogo.runningMIDI).toBe(true);
+        expect(mockLogo.runLogoCommands).toHaveBeenCalledTimes(1);
+
+        document.body.style.cursor = originalCursor;
+    });
+
     it("should set runningMIDI to true and run logo commands", () => {
         instance.saveMIDI(activity);
         expect(activity.logo.runningMIDI).toBe(true);
