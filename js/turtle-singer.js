@@ -431,6 +431,93 @@ class Singer {
     }
 
     /**
+     * Clears the state that the clamps a stopped turtle was inside would
+     * have undone at their end, so it starts again outside of them.
+     *
+     * @returns {void}
+     */
+    resetClampState() {
+        this.scalarTransposition = 0;
+        this.scalarTranspositionValues = [];
+        this.transposition = 0;
+        this.transpositionValues = [];
+        this.transpositionRatios = [];
+
+        this.beatFactor = 1;
+        this.beatFactorValues = [];
+        this.dotCount = 0;
+        this.oscList = {};
+        this.noteBeat = {};
+        this.noteValue = {};
+        this.noteDrums = {};
+        this.notePitches = {};
+        this.noteOctaves = {};
+        this.noteCents = {};
+        this.noteHertz = {};
+        this.noteBeatValues = {};
+        this.embeddedGraphics = {};
+        this.inNoteBlock = [];
+        this.multipleVoices = false;
+
+        this.inHarmonic = [];
+        this.partials = [];
+        this.inNeighbor = [];
+        this.neighborStepPitch = [];
+        this.neighborNoteValue = [];
+        this.neighborArgNote1 = [];
+        this.neighborArgNote2 = [];
+        this.neighborArgBeat = [];
+        this.neighborArgCurrentBeat = [];
+        this.inDefineMode = false;
+        this.defineMode = [];
+
+        this.duplicateFactor = 1;
+        this.inDuplicate = false;
+        this.arpeggio = [];
+        this.arpeggioIndex = 0;
+        this.skipFactor = 1;
+        this.skipIndex = 0;
+        this.backward = [];
+        this.invertList = [];
+
+        this.inCrescendo = [];
+        this.crescendoDelta = [];
+        this.intervals = [];
+        this.semitoneIntervals = [];
+        this.chordIntervals = [];
+        this.ratioIntervals = [];
+        this.staccato = [];
+        this.glide = [];
+        this.swing = [];
+        this.swingTarget = [];
+        this.swingCarryOver = 0;
+        this.tie = false;
+        this.tieNotePitches = [];
+        this.tieNoteExtras = [];
+        this.tieCarryOver = 0;
+        this.tieFirstDrums = [];
+        this.drumStyle = [];
+        this.voices = [];
+
+        this.vibratoIntensity = [];
+        this.vibratoRate = [];
+        this.distortionAmount = [];
+        this.tremoloFrequency = [];
+        this.tremoloDepth = [];
+        this.rate = [];
+        this.octaves = [];
+        this.baseFrequency = [];
+        this.chorusRate = [];
+        this.delayTime = [];
+        this.chorusDepth = [];
+
+        this.justCounting = [];
+        this.justMeasuring = [];
+        this.firstPitch = [];
+        this.lastPitch = [];
+    }
+
+    /**
      * Kills all active audio voices for this turtle.
      * Called during stop/halt to prevent "zombie audio" that continues playing.
      * Uses try/catch to handle nodes that may have already stopped.

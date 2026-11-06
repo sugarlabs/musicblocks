@@ -289,6 +289,46 @@ describe("Singer Class", () => {
         });
     });
 
+    describe("resetClampState()", () => {
+        test("clears the state of open clamps", () => {
+            singer.backward = [7];
+            singer.inDuplicate = true;
+            singer.duplicateFactor = 4;
+            singer.inNoteBlock = [12];
+            singer.noteValue = { 12: 4 };
+            singer.transpositionValues = [2];
+            singer.transposition = 2;
+            singer.beatFactor = 1.5;
+
+            singer.resetClampState();
+
+            expect(singer.backward).toEqual([]);
+            expect(singer.inDuplicate).toBe(false);
+            expect(singer.duplicateFactor).toBe(1);
+            expect(singer.inNoteBlock).toEqual([]);
+            expect(singer.noteValue).toEqual({});
+            expect(singer.transpositionValues).toEqual([]);
+            expect(singer.transposition).toBe(0);
+            expect(singer.beatFactor).toBe(1);
+        });
+
+        test("keeps the state of the run", () => {
+            singer.turtleTime = 3;
+            singer.suppressOutput = true;
+            singer.keySignature = "D minor";
+            singer.instrumentNames = ["guitar"];
+            singer.bpm = [120];
+
+            singer.resetClampState();
+
+            expect(singer.turtleTime).toBe(3);
+            expect(singer.suppressOutput).toBe(true);
+            expect(singer.keySignature).toBe("D minor");
+            expect(singer.instrumentNames).toEqual(["guitar"]);
+            expect(singer.bpm).toEqual([120]);
+        });
+    });
+
     test("should correctly add scalar transposition", () => {
         const result = Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, 2);
         expect(result).toEqual(["C", 4]);

@@ -1511,6 +1511,7 @@ class Logo {
         tur.endOfClampSignals = {};
         tur.butNotThese = {};
         this._restoreTurtleConnections(turtle);
+        tur.singer.resetClampState();
 
         tur.runGeneration += 1;
         if (tur.delayTimeout !== null) {

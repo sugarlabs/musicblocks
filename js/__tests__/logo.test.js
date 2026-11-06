@@ -202,6 +202,7 @@ function createMockTurtle(overrides = {}) {
             embeddedGraphics: {},
             runningFromEvent: false,
             killAllVoices: jest.fn(),
+            resetClampState: jest.fn(),
             noteDirection: 0
         },
         painter: {
@@ -3735,6 +3736,12 @@ describe("Logo stopTurtleRun", () => {
 
         expect(logo.blockList[0].connections[1]).toBeNull();
         expect(logo.connectionStore).toEqual({ 0: {}, 1: { 5: [[0, 1, 2]] } });
+    });
+
+    test("clears the state of the clamps it was inside", () => {
+        logo.stopTurtleRun(0);
+
+        expect(turtle0.singer.resetClampState).toHaveBeenCalledTimes(1);
     });
 
     test("finishes a running turtle once", () => {
