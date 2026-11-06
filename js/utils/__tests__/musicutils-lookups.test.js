@@ -52,6 +52,28 @@ describe("musicutils-lookups", () => {
         expect(lookups.getVoiceSynthName("electronic synth")).toBe("electronic synth");
     });
 
+    it("matches localized drum display names case-insensitively", () => {
+        const originalDrums = global.DRUMNAMES;
+
+        global.DRUMNAMES = [
+            ["caja", "snare drum", "images/snaredrum.svg", "sn", "drum"],
+            ["bombo", "kick drum", "images/kick.svg", "bd", "drum"],
+            ["tambor", "tom tom", "images/tom.svg", "tom", "drum"]
+        ];
+
+        try {
+            expect(lookups.getDrumName("BOMBO")).toBe("bombo");
+            expect(lookups.getDrumIcon("BOMBO")).toBe("images/kick.svg");
+            expect(lookups.getDrumSynthName("BOMBO")).toBe("kick drum");
+
+            expect(lookups.getDrumName("TAMBOR")).toBe("tambor");
+            expect(lookups.getDrumIcon("TAMBOR")).toBe("images/tom.svg");
+            expect(lookups.getDrumSynthName("TAMBOR")).toBe("tom tom");
+        } finally {
+            global.DRUMNAMES = originalDrums;
+        }
+    });
+
     it("looks up voice names by identifier when display names differ or are empty", () => {
         const originalVoices = global.VOICENAMES;
         global.VOICENAMES = [
