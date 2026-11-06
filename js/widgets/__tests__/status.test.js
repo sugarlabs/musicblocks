@@ -270,9 +270,9 @@ describe("StatusMatrix Widget", () => {
 
             statusMatrix.updateAll();
 
-            expect(
-                statusMatrix._watchSelect.children.map(option => option.textContent)
-            ).toContain("Box: runtimeBox");
+            expect(statusMatrix._watchSelect.children.map(option => option.textContent)).toContain(
+                "Box: runtimeBox"
+            );
         });
 
         test("watches the selected turtle heap and supports removing a watch", () => {
