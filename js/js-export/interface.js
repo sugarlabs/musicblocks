@@ -226,6 +226,10 @@ class JSInterface {
         oneOf: "MathUtility.doOneOf",
         distance: "MathUtility.doCalculateDistance",
         int: "MathUtility.doInt",
+        lerp: "MathUtility.doLerp",
+        gcd: "MathUtility.doGcd",
+        lcm: "MathUtility.doLcm",
+        map: "MathUtility.doMap",
         // Graphics blocks
         forward: "goForward",
         back: "goBackward",
