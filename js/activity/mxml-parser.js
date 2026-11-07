@@ -798,11 +798,114 @@ function _applyRepeats(repeats, noteBlocks, noteStartIds, noteEndIds, blockId) {
 }
 
 /**
- * Walks one <part>'s <measure> elements in document order, building a
- * note/rest/drum block chain. Stops processing a measure at the first
- * <backup> (a second voice sharing the part): multi-voice parts are a
- * follow-up PR, and taking only the first voice is the safe reading rather
- * than misinterpreting the backed-up time as forward motion. <chord/>-marked
+ * Separates a part with <backup> into one timed stream per voice. Each stream
+ * keeps the original measure attributes and barlines; gaps become <forward>
+ * elements so _processPart can make rests without changing its note builder.
+ * @param {Element} partEl - a MusicXML <part> element
+ * @returns {Element[]} one part per voice, or the original part if unsplit
+ */
+function _splitPartVoices(partEl) {
+    const measures = [...partEl.querySelectorAll(":scope > measure")];
+    if (!measures.some(measure => measure.querySelector(":scope > backup"))) return [partEl];
+
+    const appendForward = (measure, duration) => {
+        if (duration <= 0) return;
+        const forward = measure.ownerDocument.createElementNS(measure.namespaceURI, "forward");
+        const length = measure.ownerDocument.createElementNS(measure.namespaceURI, "duration");
+        length.textContent = String(duration);
+        forward.appendChild(length);
+        measure.appendChild(forward);
+    };
+
+    const voices = new Set();
+    let divisions = 1;
+    const timelines = measures.map(measure => {
+        const divisionsText = measure.querySelector(":scope > attributes > divisions")?.textContent;
+        if (divisionsText !== undefined) divisions = Number(divisionsText);
+        const events = new Map();
+        let cursor = 0;
+        let measureLength = 0;
+        let implicitVoice = 1;
+        let lastNoteStart = 0;
+
+        for (const child of measure.children) {
+            if (child.tagName === "backup") {
+                cursor -= Number(_text(child, "duration")) || 0;
+                implicitVoice++;
+                lastNoteStart = cursor;
+            } else if (child.tagName === "forward") {
+                cursor += Number(_text(child, "duration")) || 0;
+                measureLength = Math.max(measureLength, cursor);
+            } else if (child.tagName === "note") {
+                const voice = _text(child, "voice") || String(implicitVoice);
+                const chord = child.querySelector(":scope > chord") !== null;
+                const grace = child.querySelector(":scope > grace") !== null;
+                const position = chord ? lastNoteStart : cursor;
+                const durationText = _text(child, "duration");
+                const fraction = _noteDuration(child, divisions);
+                const writtenDuration = durationText?.trim()
+                    ? Number(durationText)
+                    : (fraction[0] / fraction[1]) * divisions * 4;
+                const fallbackDuration = (fraction[0] / fraction[1]) * divisions * 4;
+                const duration = grace
+                    ? 0
+                    : Number.isFinite(writtenDuration) && writtenDuration > 0
+                      ? writtenDuration
+                      : fallbackDuration;
+                voices.add(voice);
+                if (!events.has(voice)) events.set(voice, []);
+                events.get(voice).push({ note: child, position, duration, chord });
+                if (!chord) {
+                    lastNoteStart = position;
+                    cursor += duration;
+                    measureLength = Math.max(measureLength, cursor);
+                }
+            }
+        }
+
+        return { measure, events, measureLength };
+    });
+
+    if (voices.size === 0) return [partEl];
+
+    return [...voices].map(voice => {
+        const part = partEl.cloneNode(false);
+        for (const { measure, events, measureLength } of timelines) {
+            const voiceMeasure = measure.cloneNode(false);
+            const attributes = measure.querySelector(":scope > attributes");
+            if (attributes) voiceMeasure.appendChild(attributes.cloneNode(true));
+
+            const barlines = [...measure.querySelectorAll(":scope > barline")];
+            for (const barline of barlines) {
+                if (barline.querySelector(':scope > repeat[direction="forward"]')) {
+                    voiceMeasure.appendChild(barline.cloneNode(true));
+                }
+            }
+
+            let position = 0;
+            for (const event of events.get(voice) || []) {
+                if (event.position > position) {
+                    appendForward(voiceMeasure, event.position - position);
+                }
+                voiceMeasure.appendChild(event.note.cloneNode(true));
+                if (!event.chord) position = Math.max(position, event.position + event.duration);
+            }
+            appendForward(voiceMeasure, measureLength - position);
+
+            for (const barline of barlines) {
+                if (!barline.querySelector(':scope > repeat[direction="forward"]')) {
+                    voiceMeasure.appendChild(barline.cloneNode(true));
+                }
+            }
+            part.appendChild(voiceMeasure);
+        }
+        return part;
+    });
+}
+
+/**
+ * Walks one voice's <measure> elements in document order, building a
+ * note/rest/drum block chain. <chord/>-marked
  * notes (chord members after the first) are skipped for the same reason --
  * melody-only is correct-but-incomplete, where including them without chord
  * support would just be wrong. A grace note (<grace/>, a <type> but no
@@ -858,8 +961,6 @@ function _processPart(partEl, blockId, chainPrevId, instrumentMap) {
         if (divisionsText !== undefined) divisions = Number(divisionsText);
 
         for (const child of measureEl.children) {
-            if (child.tagName === "backup") break;
-
             // <forward> moves this voice on by its <duration> with no note
             // written. Skipping it brought every later note in early.
             if (child.tagName === "forward") {
@@ -1062,17 +1163,20 @@ const setupActivityMxmlParser = activityInstance => {
 
         let blockId = 0;
         const allBlocks = [];
-        partEls.forEach((partEl, index) => {
-            const { blocks, nextBlockId } = _buildPartBlocks(
-                partEl,
-                blockId,
-                title,
-                `Voice ${index + 1}`,
-                tempoBpm,
-                instrumentMap
-            );
-            allBlocks.push(...blocks);
-            blockId = nextBlockId;
+        let voiceIndex = 0;
+        partEls.forEach(partEl => {
+            for (const voicePart of _splitPartVoices(partEl)) {
+                const { blocks, nextBlockId } = _buildPartBlocks(
+                    voicePart,
+                    blockId,
+                    title,
+                    `Voice ${++voiceIndex}`,
+                    tempoBpm,
+                    instrumentMap
+                );
+                allBlocks.push(...blocks);
+                blockId = nextBlockId;
+            }
         });
 
         // Blocks.loadNewBlocks() resolves every connection by adding it to the
