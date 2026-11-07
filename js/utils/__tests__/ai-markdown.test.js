@@ -64,9 +64,19 @@ describe("ai-markdown", () => {
         expect(html).toContain("and <em>try</em> it");
     });
 
-    it("does not leak the code span marker when a link address holds a code span", () => {
-        expect(renderChatMarkdown("[x](https://a.com/`b`)")).not.toContain(
-            String.fromCharCode(0xe000)
+    it("keeps backticks inside a link address and still links it", () => {
+        const html = renderChatMarkdown("see [x](https://a.com/`b`) and `code`");
+        expect(html).toContain('<a href="https://a.com/`b`" target="_blank"');
+        expect(html).toContain("<code>code</code>");
+        expect(html).not.toContain(String.fromCharCode(0xe000));
+    });
+
+    it("leaves a link inside a code span as code and formats code in a link label", () => {
+        expect(renderChatMarkdown("`[x](https://a.com)`")).toBe(
+            "<p><code>[x](https://a.com)</code></p>"
+        );
+        expect(renderChatMarkdown("[`fn`](https://a.com/x)")).toContain(
+            '<a href="https://a.com/x" target="_blank" rel="noopener noreferrer"><code>fn</code></a>'
         );
     });
 
