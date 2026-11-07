@@ -55,6 +55,7 @@ class NetworkMonitor {
 
         // Cached state — start optimistic so the first real probe decides
         this._online = navigator.onLine;
+        this._probeSequence = 0;
 
         // Browser online/offline events — re-probe immediately on change
         this._handleOnline = () => this._probe();
@@ -77,6 +78,7 @@ class NetworkMonitor {
      * @returns {Promise<boolean>}
      */
     async _probe() {
+        const sequence = ++this._probeSequence;
         let nowOnline;
         try {
             const controller = new AbortController();
@@ -92,6 +94,8 @@ class NetworkMonitor {
             // fetch throws on network error OR abort (timeout) → offline
             nowOnline = false;
         }
+
+        if (sequence !== this._probeSequence) return nowOnline;
 
         if (nowOnline !== this._online) {
             this._online = nowOnline;
