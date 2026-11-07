@@ -69,7 +69,23 @@ class Planet {
     }
 
     saveThumbnail(image, projectId) {
-        return this.ProjectStorage.saveThumbnail(image, projectId);
+        return Promise.resolve(this.ProjectStorage.saveThumbnail(image, projectId)).then(res => {
+            if (
+                this.LocalPlanet &&
+                typeof document !== "undefined" &&
+                this.ProjectStorage.data?.Projects?.[projectId] !== undefined
+            ) {
+                const cardimg = document.getElementById(`local-project-image-${projectId}`);
+                if (cardimg) {
+                    if (typeof image === "string" && image.trim().length > 0) {
+                        cardimg.src = image;
+                    } else if (image === null) {
+                        cardimg.src = this.ProjectStorage.ImageDataURL;
+                    }
+                }
+            }
+            return res;
+        });
     }
 
     setAnalyzeProject(func) {
