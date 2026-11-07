@@ -549,6 +549,28 @@ describe("setupSensorsBlocks", () => {
             expect(activity.errorMsg).toHaveBeenCalledWith("Not a number", "blkASCII2");
             expect(ret).toEqual(0);
         });
+        it("should push to statusFields when inStatusMatrix and parent is print", () => {
+            activity.blocks.blockList["blkPrint"] = { name: "print" };
+            activity.blocks.blockList["blkASCII_print"] = { connections: ["blkPrint", null] };
+            logo.inStatusMatrix = true;
+            logo.statusFields = [];
+            const asciiBlock = DummyFlowBlock.createdBlocks["toascii"];
+            asciiBlock.arg(logo, turtleIndex, "blkASCII_print", null);
+            expect(logo.statusFields).toContainEqual(["blkASCII_print", "toascii"]);
+            logo.inStatusMatrix = false;
+        });
+        it("should handle detached toascii block in status matrix without throwing", () => {
+            activity.blocks.blockList["blkASCII_detached"] = { connections: [null, null] };
+            logo.inStatusMatrix = true;
+            logo.statusFields = [];
+            const asciiBlock = DummyFlowBlock.createdBlocks["toascii"];
+            let ret;
+            expect(() => {
+                ret = asciiBlock.arg(logo, turtleIndex, "blkASCII_detached", null);
+            }).not.toThrow();
+            expect(ret).toBe("A");
+            logo.inStatusMatrix = false;
+        });
     });
 
     describe("KeyboardBlock", () => {

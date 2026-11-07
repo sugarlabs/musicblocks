@@ -155,6 +155,19 @@ describe("setupHeapBlocks", () => {
             expect(logo.statusFields).toContainEqual([blk, "heap"]);
         });
 
+        it("should safely handle detached block in status matrix without throwing", () => {
+            const turtle = 0;
+            setTurtleHeap(turtle, [4, 5]);
+            const heapBlock = createdBlocks["heap"];
+            logo.inStatusMatrix = true;
+            activity.blocks.blockList[10] = { connections: [null] };
+            let result;
+            expect(() => {
+                result = heapBlock.arg(logo, turtle, 10);
+            }).not.toThrow();
+            expect(result).toBe(JSON.stringify([4, 5]));
+        });
+
         it("should create an empty heap and return '[]' if the turtle heap is undefined", () => {
             const turtle = 1;
             delete logo.turtleHeaps[turtle];
@@ -204,6 +217,19 @@ describe("setupHeapBlocks", () => {
             const result = heapLengthBlock.arg(logo, turtle, blk);
             expect(result).toBe(0);
             expect(logo.statusFields).toContainEqual([blk, "heapLength"]);
+        });
+
+        it("should safely handle detached heapLength block in status matrix without throwing", () => {
+            const turtle = 0;
+            setTurtleHeap(turtle, [1, 2]);
+            const heapLengthBlock = createdBlocks["heapLength"];
+            logo.inStatusMatrix = true;
+            activity.blocks.blockList[10] = { connections: [null] };
+            let result;
+            expect(() => {
+                result = heapLengthBlock.arg(logo, turtle, 10);
+            }).not.toThrow();
+            expect(result).toBe(2);
         });
     });
 
