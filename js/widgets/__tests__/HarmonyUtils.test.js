@@ -172,3 +172,177 @@ describe("HarmonyUtils.analyze", () => {
         expect(result.chord).toBeNull();
     });
 });
+
+describe("HarmonyUtils.findParallels", () => {
+    // 12-EDO frequency of a MIDI note number.
+    const midi = number => edo(number - 69);
+    const voice = (id, number, label = String(number)) => ({
+        voice: id,
+        label,
+        frequency: midi(number)
+    });
+    const kinds = (before, after) =>
+        HarmonyUtils.findParallels(before, after).map(parallel => parallel.kind);
+
+    it("finds parallel fifths when both voices move up", () => {
+        const result = HarmonyUtils.findParallels(
+            [voice(1, 60, "C4"), voice(2, 67, "G4")],
+            [voice(1, 62, "D4"), voice(2, 69, "A4")]
+        );
+        expect(result).toEqual([
+            { kind: "fifths", voices: [1, 2], from: ["C4", "G4"], to: ["D4", "A4"] }
+        ]);
+    });
+
+    it("finds parallel octaves and unisons, compound intervals included", () => {
+        expect(kinds([voice(1, 48), voice(2, 60)], [voice(1, 50), voice(2, 62)])).toEqual([
+            "octaves"
+        ]);
+        expect(kinds([voice(1, 48), voice(2, 72)], [voice(1, 47), voice(2, 71)])).toEqual([
+            "octaves"
+        ]);
+        expect(kinds([voice(1, 60), voice(2, 60)], [voice(1, 62), voice(2, 62)])).toEqual([
+            "unisons"
+        ]);
+        // A twelfth moving to a twelfth is a compound fifth.
+        expect(kinds([voice(1, 48), voice(2, 67)], [voice(1, 50), voice(2, 69)])).toEqual([
+            "fifths"
+        ]);
+        // Unison to octave: both are octaves of each other.
+        expect(kinds([voice(1, 60), voice(2, 60)], [voice(1, 62), voice(2, 74)])).toEqual([
+            "octaves"
+        ]);
+    });
+
+    it("ignores contrary and oblique motion", () => {
+        // C4/G4 to D4/G3: a fifth to a fifth, but the voices move apart.
+        expect(kinds([voice(1, 60), voice(2, 67)], [voice(1, 62), voice(2, 55)])).toEqual([]);
+        // The upper voice holds its note.
+        expect(kinds([voice(1, 60), voice(2, 67)], [voice(1, 55), voice(2, 67)])).toEqual([]);
+    });
+
+    it("ignores other intervals and unequal fifths", () => {
+        // Fourths, thirds, and a diminished fifth moving to a perfect fifth.
+        expect(kinds([voice(1, 60), voice(2, 65)], [voice(1, 62), voice(2, 67)])).toEqual([]);
+        expect(kinds([voice(1, 60), voice(2, 64)], [voice(1, 62), voice(2, 65)])).toEqual([]);
+        expect(kinds([voice(1, 71), voice(2, 77)], [voice(1, 72), voice(2, 79)])).toEqual([]);
+    });
+
+    it("counts just-tuned fifths as fifths", () => {
+        const before = [
+            { voice: 1, label: "a", frequency: 200 },
+            { voice: 2, label: "b", frequency: 300 }
+        ];
+        const after = [
+            { voice: 1, label: "c", frequency: 225 },
+            { voice: 2, label: "d", frequency: 337.5 }
+        ];
+        expect(kinds(before, after)).toEqual(["fifths"]);
+    });
+
+    it("counts tempered fifths but not the neighbouring steps of finer temperaments", () => {
+        // Voice 1 moves up one step of an n-EDO; voice 2 sits `size` steps above.
+        const moveInEdo = (n, size, step = 1) => {
+            const pitch = steps => ({
+                voice: 0,
+                label: "",
+                frequency: 200 * Math.pow(2, steps / n)
+            });
+            return kinds(
+                [Object.assign(pitch(0), { voice: 1 }), Object.assign(pitch(size), { voice: 2 })],
+                [
+                    Object.assign(pitch(step), { voice: 1 }),
+                    Object.assign(pitch(size + step), { voice: 2 })
+                ]
+            );
+        };
+        expect(moveInEdo(19, 11)).toEqual(["fifths"]); // 695 cents
+        expect(moveInEdo(31, 18)).toEqual(["fifths"]); // 697 cents
+        expect(moveInEdo(5, 3)).toEqual(["fifths"]); // 720 cents
+        expect(moveInEdo(7, 4)).toEqual(["fifths"]); // 686 cents
+        expect(moveInEdo(31, 17)).toEqual([]); // 658 cents
+        expect(moveInEdo(31, 19)).toEqual([]); // 735 cents
+        // One 31-EDO step (39 cents) is a move; both voices make it.
+        expect(moveInEdo(31, 31)).toEqual(["octaves"]);
+        // The meantone wolf fifth (737 cents) is not a fifth.
+        expect(
+            kinds(
+                [
+                    { voice: 1, label: "", frequency: 200 },
+                    { voice: 2, label: "", frequency: 200 * Math.pow(2, 737 / 1200) }
+                ],
+                [
+                    { voice: 1, label: "", frequency: 210 },
+                    { voice: 2, label: "", frequency: 210 * Math.pow(2, 737 / 1200) }
+                ]
+            )
+        ).toEqual([]);
+    });
+
+    it("matches voices by id and skips voices without a valid next note", () => {
+        expect(
+            kinds([voice(2, 67), voice(1, 60)], [voice(1, 62), voice(2, 69), voice(3, 40)])
+        ).toEqual(["fifths"]);
+        expect(kinds([voice(1, 60), voice(2, 67)], [voice(1, 62)])).toEqual([]);
+        expect(
+            kinds(
+                [voice(1, 60), voice(2, 67)],
+                [voice(1, 62), { voice: 2, label: "x", frequency: NaN }]
+            )
+        ).toEqual([]);
+        expect(HarmonyUtils.findParallels(null, undefined)).toEqual([]);
+    });
+
+    it("checks every pair of voices", () => {
+        const result = HarmonyUtils.findParallels(
+            [voice(1, 48), voice(2, 60), voice(3, 67)],
+            [voice(1, 50), voice(2, 62), voice(3, 69)]
+        );
+        expect(result.map(parallel => [parallel.kind, parallel.voices])).toEqual([
+            ["octaves", [1, 2]],
+            ["fifths", [1, 3]],
+            ["fifths", [2, 3]]
+        ]);
+    });
+
+    it("agrees with the textbook rule for every two-voice move within two octaves", () => {
+        // Parallel when both voices move the same way and the interval between
+        // them is a perfect fifth, octave or unison (plus octaves) both times.
+        const perfect = semitones => {
+            const size = Math.abs(semitones);
+            if (size === 0) return "unison";
+            if (size % 12 === 0) return "octave";
+            return size % 12 === 7 ? "fifth" : null;
+        };
+        const expected = (a1, b1, a2, b2) => {
+            const sameWay = (a2 - a1) * (b2 - b1) > 0;
+            const was = perfect(b1 - a1);
+            const now = perfect(b2 - a2);
+            if (!sameWay || !was || !now) return null;
+            if (was === "unison" && now === "unison") return "unisons";
+            if (was === "fifth" && now === "fifth") return "fifths";
+            if (was !== "fifth" && now !== "fifth") return "octaves";
+            return null;
+        };
+
+        let checked = 0;
+        for (let a1 = 48; a1 <= 72; a1++) {
+            for (let b1 = 48; b1 <= 72; b1++) {
+                for (let a2 = 48; a2 <= 72; a2++) {
+                    for (let b2 = 48; b2 <= 72; b2++) {
+                        const want = expected(a1, b1, a2, b2);
+                        const got = kinds(
+                            [voice(1, a1), voice(2, b1)],
+                            [voice(1, a2), voice(2, b2)]
+                        );
+                        if (got.length !== (want ? 1 : 0) || (want && got[0] !== want)) {
+                            throw new Error(`${a1} ${b1} -> ${a2} ${b2}: ${got} != ${want}`);
+                        }
+                        checked++;
+                    }
+                }
+            }
+        }
+        expect(checked).toBe(25 ** 4);
+    });
+});
