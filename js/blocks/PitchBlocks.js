@@ -2150,7 +2150,19 @@ function setupPitchBlocks(activity) {
 
                 const currentEDO = getCurrentEDO(logo.synth.inTemperament);
 
-                if (arg0 <= currentEDO) {
+                if (!Number.isFinite(arg0)) {
+                    // Non-finite values fit neither interpretation below:
+                    // NaN fails every comparison (so frequencyToPitch(NaN)
+                    // returns [null, null, null] and the null note then
+                    // throws inside processPitch), and -Infinity satisfies
+                    // arg0 <= currentEDO, so it would be misread as a
+                    // movable solfege scale degree. Send all of them to
+                    // the 392 hertz (G4) fallback instead.
+                    activity.errorMsg(INVALIDPITCH, blk);
+                    arg0 = 392; // set default to 392 hertz (G4)
+
+                    [note, octave, cents] = frequencyToPitch(arg0);
+                } else if (arg0 <= currentEDO) {
                     // movable solfege
                     if (arg0 < 1) {
                         activity.errorMsg(INVALIDPITCH, blk);
