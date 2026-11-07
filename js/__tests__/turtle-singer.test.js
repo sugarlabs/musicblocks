@@ -1449,6 +1449,53 @@ describe("processPitch — note block execution path", () => {
         expect(turtleMock.singer.noteBeatValues[0].length).toBe(1);
         expect(turtleMock.singer.pushedNote).toBe(true);
     });
+
+    test.each(["neighbor", "neighbor2"])(
+        "should use the active nested %s interval",
+        neighborName => {
+            turtleMock.singer.inNeighbor = [10, 20];
+            turtleMock.singer.neighborStepPitch = [1, 3];
+            activityMock.blocks = {
+                blockList: {
+                    20: { name: neighborName }
+                }
+            };
+            activityMock.errorMsg = jest.fn();
+
+            const addScalarTranspositionSpy = jest
+                .spyOn(Singer, "addScalarTransposition")
+                .mockImplementation((logo, turtle, note, octave) => [note, octave]);
+
+            try {
+                Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+                if (neighborName === "neighbor2") {
+                    expect(addScalarTranspositionSpy).toHaveBeenNthCalledWith(
+                        2,
+                        activityMock.logo,
+                        0,
+                        "C",
+                        4,
+                        3
+                    );
+                } else {
+                    expect(global.getNote).toHaveBeenNthCalledWith(
+                        2,
+                        "C",
+                        4,
+                        3,
+                        turtleMock.singer.keySignature,
+                        turtleMock.singer.movable,
+                        null,
+                        activityMock.errorMsg,
+                        activityMock.logo.synth.inTemperament
+                    );
+                }
+            } finally {
+                addScalarTranspositionSpy.mockRestore();
+            }
+        }
+    );
 });
 
 describe("processPitch widget-row definition adds one row per visit", () => {
