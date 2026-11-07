@@ -105,20 +105,40 @@ describe("PenBlocksAPI", () => {
 
     test("fillShape calls commands and refreshCanvas", async () => {
         const flow = jest.fn();
+        JSInterface.validateArgs.mockReturnValue([flow]);
         await penBlocksAPI.fillShape(flow);
+        expect(JSInterface.validateArgs).toHaveBeenCalledWith("fillShape", [flow]);
         expect(penBlocksAPI.runCommand).toHaveBeenCalledWith("doStartFill");
         expect(flow).toHaveBeenCalled();
         expect(penBlocksAPI.runCommand).toHaveBeenCalledWith("doEndFill");
         expect(global.globalActivity.turtles.refreshCanvas).toHaveBeenCalled();
     });
 
+    test("fillShape does not start when its flow is missing", async () => {
+        JSInterface.validateArgs.mockImplementationOnce(() => {
+            throw 'TypeMismatch error: expected "function" but found "undefined"';
+        });
+        await expect(penBlocksAPI.fillShape()).rejects.toMatch("TypeMismatch");
+        expect(penBlocksAPI.runCommand).not.toHaveBeenCalledWith("doStartFill");
+    });
+
     test("hollowLine calls commands and refreshCanvas", async () => {
         const flow = jest.fn();
+        JSInterface.validateArgs.mockReturnValue([flow]);
         await penBlocksAPI.hollowLine(flow);
+        expect(JSInterface.validateArgs).toHaveBeenCalledWith("hollowLine", [flow]);
         expect(penBlocksAPI.runCommand).toHaveBeenCalledWith("doStartHollowLine");
         expect(flow).toHaveBeenCalled();
         expect(penBlocksAPI.runCommand).toHaveBeenCalledWith("doEndHollowLine");
         expect(global.globalActivity.turtles.refreshCanvas).toHaveBeenCalled();
+    });
+
+    test("hollowLine does not start when its flow is missing", async () => {
+        JSInterface.validateArgs.mockImplementationOnce(() => {
+            throw 'TypeMismatch error: expected "function" but found "undefined"';
+        });
+        await expect(penBlocksAPI.hollowLine()).rejects.toMatch("TypeMismatch");
+        expect(penBlocksAPI.runCommand).not.toHaveBeenCalledWith("doStartHollowLine");
     });
 
     test("fillBackground calls setBackgroundColor", () => {
