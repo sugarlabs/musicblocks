@@ -17,6 +17,7 @@
 /* global jest, describe, it, expect, beforeEach, afterEach, beforeAll, afterAll */
 
 const Blocks = require("../blocks");
+const Boundary = require("../boundary");
 const ManagedTimer = require("../utils/ManagedTimer");
 
 // blocks.js references these constants (MINIMUMDOCKDISTANCE, ALLOWED_CONNECTIONS, etc.) as
@@ -408,6 +409,135 @@ describe("Viewport Culling", () => {
 // action-name argument of an onbeatdo or listen block. Both need the index to
 // be a number.
 // ---------------------------------------------------------------------------
+
+describe("Boundary visibility", () => {
+    let mockActivity;
+    let blocks;
+
+    beforeEach(() => {
+        mockActivity = {
+            storage: {},
+            trashcan: {},
+            turtles: {},
+            boundary: {
+                hide: jest.fn(),
+                show: jest.fn(),
+                showBlockHighlights: jest.fn(),
+                clearBlockHighlights: jest.fn(),
+                offScreen: Boundary.prototype.offScreen
+            },
+            macroDict: {},
+            palettes: { dict: {}, show: jest.fn() },
+            logo: { synth: { loadSynth: jest.fn() } },
+            blocksContainer: {
+                x: 0,
+                y: 0,
+                addChild: jest.fn(),
+                removeChild: jest.fn(),
+                setChildIndex: jest.fn(),
+                children: []
+            },
+            canvas: { width: 800, height: 600 },
+            refreshCanvas: jest.fn(),
+            errorMsg: jest.fn(),
+            setSelectionMode: jest.fn(),
+            stopLoadAnimation: jest.fn(),
+            setHomeContainers: jest.fn(),
+            __tick: jest.fn()
+        };
+        blocks = new Blocks(mockActivity);
+    });
+
+    it("enables home controls when a block is off-screen", () => {
+        blocks.blockList = [
+            {
+                trash: false,
+                connections: [null],
+                offScreen: jest.fn().mockReturnValue(true)
+            }
+        ];
+
+        blocks.checkBounds();
+
+        expect(mockActivity.setHomeContainers).toHaveBeenCalledWith(true);
+    });
+
+    it("enables home controls when a connected block crosses the viewport edge", () => {
+        mockActivity.boundary.x = 68;
+        mockActivity.boundary.y = 68;
+        mockActivity.boundary.dx = 732;
+        mockActivity.boundary.dy = 464;
+        const connectedBlockPosition = {
+            x: mockActivity.boundary.x + mockActivity.boundary.dx + 1,
+            y: 100
+        };
+        blocks.blockList = [
+            {
+                trash: false,
+                connections: [null],
+                offScreen: jest.fn(() => false)
+            },
+            {
+                trash: false,
+                connections: [0],
+                container: connectedBlockPosition,
+                offScreen: boundary =>
+                    boundary.offScreen(connectedBlockPosition.x, connectedBlockPosition.y)
+            }
+        ];
+
+        blocks.checkBounds();
+
+        expect(mockActivity.setHomeContainers).toHaveBeenCalledWith(true);
+    });
+
+    it("disables home controls when all top-level blocks are on-screen", () => {
+        blocks.blockList = [
+            {
+                trash: false,
+                connections: [null],
+                offScreen: jest.fn().mockReturnValue(false)
+            }
+        ];
+
+        blocks.checkBounds();
+
+        expect(mockActivity.setHomeContainers).toHaveBeenCalledWith(false);
+        expect(mockActivity.boundary.showBlockHighlights).toHaveBeenCalledWith([]);
+    });
+
+    it("highlights only a stack detached from the main song stack", () => {
+        const getBounds = () => ({ x: 0, y: 0, width: 100, height: 50 });
+        blocks._detachedBlockGroup = new Set([1]);
+        blocks.blockList = [
+            {
+                trash: false,
+                connections: [null],
+                container: { x: 10, y: 10, getBounds },
+                offScreen: jest.fn().mockReturnValue(false)
+            },
+            {
+                name: "print",
+                trash: false,
+                connections: [null, 2],
+                container: { x: 200, y: 100, getBounds },
+                offScreen: jest.fn().mockReturnValue(false)
+            },
+            {
+                trash: false,
+                connections: [1],
+                container: { x: 200, y: 160, getBounds },
+                offScreen: jest.fn().mockReturnValue(false)
+            }
+        ];
+
+        blocks.checkBounds();
+
+        expect(mockActivity.boundary.showBlockHighlights).toHaveBeenCalledWith([
+            { x: 196, y: 96, width: 108, height: 118 }
+        ]);
+    });
+});
 
 describe("renameDos", () => {
     let blocks;
