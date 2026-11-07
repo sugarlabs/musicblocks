@@ -151,10 +151,14 @@ function setupPitchBlocks(activity) {
         }
 
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId !== null &&
+                parentId !== undefined &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "transposition"]);
             } else {
@@ -233,10 +237,14 @@ function setupPitchBlocks(activity) {
         }
 
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId !== null &&
+                parentId !== undefined &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "mypitch"]);
             }
@@ -297,10 +305,14 @@ function setupPitchBlocks(activity) {
         }
 
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId !== null &&
+                parentId !== undefined &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "mypitch"]);
             } else {
@@ -366,10 +378,14 @@ function setupPitchBlocks(activity) {
         }
 
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId !== null &&
+                parentId !== undefined &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "pitchinhertz"]);
             } else {
@@ -408,10 +424,14 @@ function setupPitchBlocks(activity) {
 
         arg(logo, turtle, blk) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 !logo.inStatusMatrix ||
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name !==
-                    "outputtools"
+                parentId === null ||
+                parentId === undefined ||
+                !(parentId in activity.blocks.blockList) ||
+                activity.blocks.blockList[parentId]?.name !== "outputtools"
             ) {
                 if (tur.singer.lastNotePlayed !== null) {
                     return tur.singer.lastNotePlayed[0];
@@ -486,10 +506,14 @@ function setupPitchBlocks(activity) {
         }
 
         arg(logo, turtle, blk, receivedArg) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId !== null &&
+                parentId !== undefined &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "outputtools"]);
             } else {
