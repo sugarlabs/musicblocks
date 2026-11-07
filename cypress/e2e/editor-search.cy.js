@@ -6,9 +6,11 @@ describe("JavaScript editor and block search", () => {
         // touch global singletons (window.jsEditor, activity.searchWidget)
         // that persist across interactions, so tests are isolated the same
         // way cypress/e2e/maker-widgets.cy.js resets between widget tests.
-        cy.visit("http://127.0.0.1:3000");
-        cy.clearLocalStorage();
-        cy.visit("http://127.0.0.1:3000");
+        cy.visit("http://127.0.0.1:3000", {
+            onBeforeLoad(win) {
+                win.localStorage.clear();
+            }
+        });
         cy.waitForAppReady();
 
         // Native key events activate the page, which can make Chrome open the
