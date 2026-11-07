@@ -411,10 +411,24 @@ describe("Tuner Widget", () => {
                 expect(display.cents).toBe(0);
             });
 
+            test("initializes with default rawCents and displayedCents as null", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+
+                expect(display.rawCents).toBeNull();
+                expect(display.displayedCents).toBeNull();
+            });
+
             test("initializes with default frequency 440", () => {
                 const display = new TunerDisplay(mockCanvas, 400, 300);
 
                 expect(display.frequency).toBe(440);
+            });
+        });
+
+        describe("constants", () => {
+            test("defines smoothing and snap constants", () => {
+                expect(TunerDisplay.SMOOTHING_FACTOR).toBe(0.35);
+                expect(TunerDisplay.SNAP_THRESHOLD_CENTS).toBe(15);
             });
         });
 
@@ -466,6 +480,106 @@ describe("Tuner Widget", () => {
                 display.update("C#", 0, 277.18);
 
                 expect(display.note).toBe("C#");
+            });
+
+            test("stores raw cents in rawCents", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+
+                display.update("A", 10, 440);
+
+                expect(display.rawCents).toBe(10);
+            });
+
+            test("snaps first valid reading directly without smoothing against unmeasured zero", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+
+                display.update("A", 10, 440);
+
+                expect(display.rawCents).toBe(10);
+                expect(display.displayedCents).toBe(10);
+                expect(display.cents).toBe(10);
+            });
+
+            test("applies exponential smoothing when note is unchanged and delta is small", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+
+                // Frame 1: First reading snaps directly to measured value
+                display.update("A", 10, 440);
+                expect(display.displayedCents).toBe(10);
+                expect(display.cents).toBe(10);
+
+                // Frame 2: delta = 14 - 10 = 4 <= 15
+                // displayedCents = 10 + (14 - 10) * 0.35 = 11.4
+                display.update("A", 14, 440);
+                expect(display.displayedCents).toBeCloseTo(11.4, 4);
+                expect(display.cents).toBeCloseTo(11.4, 4);
+
+                // Frame 3: delta = 14 - 11.4 = 2.6 <= 15
+                // displayedCents = 11.4 + (14 - 11.4) * 0.35 = 12.31
+                display.update("A", 14, 440);
+                expect(display.displayedCents).toBeCloseTo(12.31, 4);
+                expect(display.cents).toBeCloseTo(12.31, 4);
+            });
+
+            test("snaps immediately to raw cents when note changes", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+
+                display.update("C", 8, 261.63);
+
+                expect(display.displayedCents).toBe(8);
+                expect(display.cents).toBe(8);
+            });
+
+            test("snaps immediately when cents shift exceeds snap threshold", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+
+                display.update("A", 20, 445);
+
+                expect(display.displayedCents).toBe(20);
+                expect(display.cents).toBe(20);
+            });
+
+            test("snaps immediately when consecutive raw readings jump past snap threshold even if display lag is small", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+
+                // Frame 1: first reading snaps to 10
+                display.update("A", 10, 440);
+                expect(display.displayedCents).toBe(10);
+
+                // Frame 2: raw jumps from 10 to -6 (shift = |-6 - 10| = 16 > 15) -> snaps to -6
+                display.update("A", -6, 440);
+                expect(display.displayedCents).toBe(-6);
+                expect(display.cents).toBe(-6);
+            });
+
+            test("handles non-finite or non-number cents by preserving invalid-measurement state", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+
+                display.update("A", NaN, 440);
+                expect(display.rawCents).toBeNull();
+                expect(display.displayedCents).toBeNull();
+                expect(display.cents).toBeNull();
+
+                display.update("A", null, 440);
+                expect(display.rawCents).toBeNull();
+                expect(display.displayedCents).toBeNull();
+                expect(display.cents).toBeNull();
+
+                display.update("A", "invalid", 440);
+                expect(display.rawCents).toBeNull();
+                expect(display.displayedCents).toBeNull();
+                expect(display.cents).toBeNull();
+            });
+
+            test("snaps directly to valid cents after an invalid measurement state", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+
+                display.update("A", NaN, 440);
+                display.update("A", 12, 440);
+
+                expect(display.rawCents).toBe(12);
+                expect(display.displayedCents).toBe(12);
+                expect(display.cents).toBe(12);
             });
         });
 
@@ -597,6 +711,47 @@ describe("Tuner Widget", () => {
                 display.draw();
                 expect(fillStyles[2]).toBe("#ef4444");
             });
+
+            test("suppresses needle and in-tune feedback when cents is invalid or non-finite", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+                const fillStyles = [];
+                mockCtx.fillRect = jest.fn(function () {
+                    fillStyles.push(mockCtx.fillStyle);
+                });
+
+                display.cents = null;
+                display.draw();
+
+                // Only background and center line are drawn (2 rects), needle is suppressed
+                expect(mockCtx.fillRect).toHaveBeenCalledTimes(2);
+                expect(fillStyles).not.toContain("#10b981");
+            });
+
+            test("displays placeholder '--' when cents is invalid or non-finite", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+                display.cents = null;
+
+                display.draw();
+
+                expect(mockCtx.fillText).toHaveBeenCalledWith(
+                    "--",
+                    expect.any(Number),
+                    expect.any(Number)
+                );
+            });
+
+            test("handles non-finite frequency gracefully in draw", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+                display.frequency = NaN;
+
+                display.draw();
+
+                expect(mockCtx.fillText).toHaveBeenCalledWith(
+                    "-- Hz",
+                    expect.any(Number),
+                    expect.any(Number)
+                );
+            });
         });
 
         describe("_getCanvasColors", () => {
@@ -680,6 +835,18 @@ describe("Tuner Widget", () => {
                 expect(display._indicatorColor(6, colors)).toBe("#ef4444");
                 expect(display._indicatorColor(-6, colors)).toBe("#ef4444");
                 expect(display._indicatorColor(15, colors)).toBe("#ef4444");
+            });
+
+            test("returns error color when cents is invalid or non-finite", () => {
+                const display = new TunerDisplay(mockCanvas, 400, 300);
+                const colors = {
+                    successColor: "#10b981",
+                    errorColor: "#ef4444"
+                };
+
+                expect(display._indicatorColor(NaN, colors)).toBe("#ef4444");
+                expect(display._indicatorColor(null, colors)).toBe("#ef4444");
+                expect(display._indicatorColor(undefined, colors)).toBe("#ef4444");
             });
 
             test("reads success and error colors from the token cache when omitted", () => {
