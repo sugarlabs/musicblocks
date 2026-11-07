@@ -367,6 +367,21 @@ describe("Viewport Culling", () => {
         );
     });
 
+    it("should refresh home indicators safely before any block state is recorded", () => {
+        const homeButton = document.createElement("div");
+        homeButton.appendChild(document.createElement("img"));
+        mockActivity.homeButtonContainer = homeButton;
+        const controller = new WorkspaceLayoutController(mockActivity);
+        controller._homeIndicatorState = null;
+
+        expect(() => controller.refreshHomeIndicators()).not.toThrow();
+        ["left", "right", "above", "below"].forEach(indicator => {
+            expect(homeButton.querySelector(`[data-home-indicator="${indicator}"]`).hidden).toBe(
+                true
+            );
+        });
+    });
+
     it("should use collapsed artwork bounds and ignore collapsed descendants for Home indicators", () => {
         const homeButton = document.createElement("div");
         mockActivity.homeButtonContainer = homeButton;

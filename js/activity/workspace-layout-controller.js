@@ -696,13 +696,14 @@ class WorkspaceLayoutController {
      * @param {{left: boolean, right: boolean, above: boolean, below: boolean}} directions
      * @returns {void}
      */
-    setHomeIndicators(directions) {
-        this._homeIndicatorState = {
+    setHomeIndicators(directions = {}) {
+        const indicatorState = {
             left: Boolean(directions.left),
             right: Boolean(directions.right),
             above: Boolean(directions.above),
             below: Boolean(directions.below)
         };
+        this._homeIndicatorState = indicatorState;
         const container = this.activity.homeButtonContainer;
         if (
             !container ||
@@ -743,7 +744,14 @@ class WorkspaceLayoutController {
      * @returns {void}
      */
     refreshHomeIndicators() {
-        this.setHomeIndicators(this._homeIndicatorState);
+        this.setHomeIndicators(
+            this._homeIndicatorState || {
+                left: false,
+                right: false,
+                above: false,
+                below: false
+            }
+        );
     }
 }
 
