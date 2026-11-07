@@ -94,10 +94,10 @@ function MusicKeyboard(activity) {
     this._cellScale = w / 1200;
 
     /**
-     * Indicates whether the keyboard is in beginner mode.
-     * @type {boolean}
+     * Whether the keyboard is in beginner mode, as the string "true" or "false".
+     * @type {string}
      */
-    const beginnerMode = localStorage.beginnerMode;
+    const beginnerMode = this.activity.beginnerMode ? "true" : "false";
 
     /**
      * Number of units in beginner mode.
