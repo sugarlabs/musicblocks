@@ -2834,6 +2834,9 @@ class Block {
 
         this.updateCache();
         this.unhighlight();
+        if (typeof this.blocks._updateViewportGrid === "function") {
+            this.blocks._updateViewportGrid(thisBlock);
+        }
         this.activity.refreshCanvas();
     }
 

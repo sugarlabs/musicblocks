@@ -7962,6 +7962,7 @@ class Blocks {
             // The block is gone for good, so drop it from the spatial grid too --
             // otherwise _getNearbyBlocks keeps handing out this index after
             // blockList[blkIdx] has been nulled out below (issue #8610).
+            this._viewportHomeBoundsDirty = true;
             const idx = Number(blkIdx);
             this._removeFromSpatialGrid(idx);
             this._blockGridCell.delete(idx);

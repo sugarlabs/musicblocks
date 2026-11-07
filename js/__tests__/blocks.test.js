@@ -427,6 +427,34 @@ describe("Viewport Culling", () => {
         });
     });
 
+    it("should refresh Home bounds when a block collapses", () => {
+        const homeButton = document.createElement("div");
+        mockActivity.homeButtonContainer = homeButton;
+        mockActivity.workspaceLayoutController = new WorkspaceLayoutController(mockActivity);
+        blocks.blockList = [
+            {
+                trash: false,
+                collapsed: false,
+                inCollapsed: false,
+                container: { x: 770, y: 100 },
+                width: 100,
+                height: 60,
+                collapseBlockBitmap: {
+                    getBounds: jest.fn().mockReturnValue({ x: 0, y: 0, width: 20, height: 20 })
+                }
+            }
+        ];
+
+        blocks._updateViewportCulling();
+        expect(homeButton.querySelector('[data-home-indicator="right"]').hidden).toBe(false);
+
+        blocks.blockList[0].collapsed = true;
+        blocks._updateViewportGrid(0);
+        blocks._updateViewportCulling();
+
+        expect(homeButton.querySelector('[data-home-indicator="right"]').hidden).toBe(true);
+    });
+
     it.each([
         ["left", { x: -10, y: 100 }],
         ["right", { x: 780, y: 100 }],
@@ -511,6 +539,9 @@ describe("Viewport Culling", () => {
         blocks.blockList.forEach(block => {
             block.container.x = 100;
             block.container.y = 100;
+        });
+        blocks.blockList.forEach((block, index) => {
+            blocks._updateSpatialGrid(index);
         });
         blocks._updateViewportCulling();
 

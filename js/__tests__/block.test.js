@@ -602,9 +602,12 @@ describe("Block Foundation", () => {
                 block.collapseText = null;
                 mockBlocks.findDragGroup = jest.fn();
                 mockBlocks.dragGroup = [0];
+                mockBlocks._updateViewportGrid = jest.fn();
+                block.blockIndex = 7;
 
                 expect(() => block.collapseToggle()).not.toThrow();
                 expect(block.collapsed).toBe(true);
+                expect(mockBlocks._updateViewportGrid).toHaveBeenCalledWith(7);
             });
         });
 
