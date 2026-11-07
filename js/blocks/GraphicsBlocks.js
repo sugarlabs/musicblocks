@@ -43,6 +43,29 @@ function setupGraphicsBlocks(activity) {
     }
 
     /**
+     * Validates that values fall within acceptable ranges depending on wrap mode.
+     * Reports an error via activity.errorMsg if validation fails.
+     * @param {number|number[]} values - The numeric value or array of values to validate.
+     * @param {boolean|null} isWrap - The wrap state (true, false, or null).
+     * @param {number} blk - The block number reporting the error.
+     * @returns {boolean} True if all values are within range, false otherwise.
+     */
+    function validateWrapRange(values, isWrap, blk) {
+        const valList = Array.isArray(values) ? values : [values];
+        if (
+            valList.some(val => val > 5000 || val < -5000) &&
+            (isWrap === false || isWrap === null)
+        ) {
+            activity.errorMsg(_("Value must be within -5000 to 5000 when Wrap Mode is off."), blk);
+            return false;
+        } else if (valList.some(val => val > 20000 || val < -20000) && isWrap === true) {
+            activity.errorMsg(_("Value must be within -20000 to 20000 when Wrap Mode is on."), blk);
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Represents a block for retrieving the orientation or compass direction.
      * @extends {ValueBlock}
      */
@@ -625,32 +648,23 @@ function setupGraphicsBlocks(activity) {
             const isWrap = activity.turtles.ithTurtle(turtle).painter.wrap;
 
             if (args.length === 2) {
-                if ((args[1] > 5000 || args[1] < -5000) && (isWrap === false || isWrap === null)) {
-                    activity.errorMsg(
-                        _("Value must be within -5000 to 5000 when Wrap Mode is off."),
-                        blk
-                    );
-                } else if ((args[1] > 20000 || args[1] < -20000) && isWrap === true) {
-                    activity.errorMsg(
-                        _("Value must be within -20000 to 20000 when Wrap Mode is on."),
-                        blk
-                    );
+                if (!validateWrapRange(args[1], isWrap, blk)) {
+                    return;
+                }
+                if (typeof args[0] === "string" || typeof args[1] === "string") {
+                    activity.errorMsg(NANERRORMSG, blk);
+                } else if (logo.inMatrix) {
+                    recordMatrixRow(logo, blk, [args[0], args[1]]);
+                } else if (tur.singer.inNoteBlock.length > 0) {
+                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
-                    if (typeof args[0] === "string" || typeof args[1] === "string") {
-                        activity.errorMsg(NANERRORMSG, blk);
-                    } else if (logo.inMatrix) {
-                        recordMatrixRow(logo, blk, [args[0], args[1]]);
-                    } else if (tur.singer.inNoteBlock.length > 0) {
-                        tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
+                    if (tur.singer.suppressOutput) {
+                        const savedPenState = tur.painter.penState;
+                        tur.painter.penState = false;
+                        tur.painter.doArc(args[0], args[1]);
+                        tur.painter.penState = savedPenState;
                     } else {
-                        if (tur.singer.suppressOutput) {
-                            const savedPenState = tur.painter.penState;
-                            tur.painter.penState = false;
-                            tur.painter.doArc(args[0], args[1]);
-                            tur.painter.penState = savedPenState;
-                        } else {
-                            tur.painter.doArc(args[0], args[1]);
-                        }
+                        tur.painter.doArc(args[0], args[1]);
                     }
                 }
             }
@@ -768,38 +782,23 @@ function setupGraphicsBlocks(activity) {
             const isWrap = activity.turtles.ithTurtle(turtle).painter.wrap;
 
             if (args.length === 2) {
-                if (
-                    (args[0] > 5000 || args[1] > 5000 || args[0] < -5000 || args[1] < -5000) &&
-                    (isWrap === false || isWrap === null)
-                ) {
-                    activity.errorMsg(
-                        _("Value must be within -5000 to 5000 when Wrap Mode is off."),
-                        blk
-                    );
-                } else if (
-                    (args[0] > 20000 || args[1] > 20000 || args[0] < -20000 || args[1] < -20000) &&
-                    isWrap === true
-                ) {
-                    activity.errorMsg(
-                        _("Value must be within -20000 to 20000 when Wrap Mode is on."),
-                        blk
-                    );
+                if (!validateWrapRange([args[0], args[1]], isWrap, blk)) {
+                    return;
+                }
+                if (typeof args[0] === "string" || typeof args[1] === "string") {
+                    activity.errorMsg(NANERRORMSG, blk);
+                } else if (logo.inMatrix) {
+                    recordMatrixRow(logo, blk, [args[0], args[1]]);
+                } else if (tur.singer.inNoteBlock.length > 0) {
+                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
-                    if (typeof args[0] === "string" || typeof args[1] === "string") {
-                        activity.errorMsg(NANERRORMSG, blk);
-                    } else if (logo.inMatrix) {
-                        recordMatrixRow(logo, blk, [args[0], args[1]]);
-                    } else if (tur.singer.inNoteBlock.length > 0) {
-                        tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
+                    if (tur.singer.suppressOutput) {
+                        const savedPenState = tur.painter.penState;
+                        tur.painter.penState = false;
+                        tur.painter.doSetXY(args[0], args[1]);
+                        tur.painter.penState = savedPenState;
                     } else {
-                        if (tur.singer.suppressOutput) {
-                            const savedPenState = tur.painter.penState;
-                            tur.painter.penState = false;
-                            tur.painter.doSetXY(args[0], args[1]);
-                            tur.painter.penState = savedPenState;
-                        } else {
-                            tur.painter.doSetXY(args[0], args[1]);
-                        }
+                        tur.painter.doSetXY(args[0], args[1]);
                     }
                 }
             }
@@ -1008,32 +1007,23 @@ function setupGraphicsBlocks(activity) {
             const isWrap = activity.turtles.ithTurtle(turtle).painter.wrap;
 
             if (args.length === 1) {
-                if ((args[0] > 5000 || args[0] < -5000) && (isWrap === false || isWrap === null)) {
-                    activity.errorMsg(
-                        _("Value must be within -5000 to 5000 when Wrap Mode is off."),
-                        blk
-                    );
-                } else if ((args[0] > 20000 || args[0] < -20000) && isWrap === true) {
-                    activity.errorMsg(
-                        _("Value must be within -20000 to 20000 when Wrap Mode is on."),
-                        blk
-                    );
+                if (!validateWrapRange(args[0], isWrap, blk)) {
+                    return;
+                }
+                if (typeof args[0] === "string") {
+                    activity.errorMsg(NANERRORMSG, blk);
+                } else if (logo.inMatrix) {
+                    recordMatrixRow(logo, blk, args[0]);
+                } else if (tur.singer.inNoteBlock.length > 0) {
+                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
-                    if (typeof args[0] === "string") {
-                        activity.errorMsg(NANERRORMSG, blk);
-                    } else if (logo.inMatrix) {
-                        recordMatrixRow(logo, blk, args[0]);
-                    } else if (tur.singer.inNoteBlock.length > 0) {
-                        tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
+                    if (tur.singer.suppressOutput) {
+                        const savedPenState = tur.painter.penState;
+                        tur.painter.penState = false;
+                        tur.painter.doForward(-args[0]);
+                        tur.painter.penState = savedPenState;
                     } else {
-                        if (tur.singer.suppressOutput) {
-                            const savedPenState = tur.painter.penState;
-                            tur.painter.penState = false;
-                            tur.painter.doForward(-args[0]);
-                            tur.painter.penState = savedPenState;
-                        } else {
-                            tur.painter.doForward(-args[0]);
-                        }
+                        tur.painter.doForward(-args[0]);
                     }
                 }
             }
@@ -1092,32 +1082,23 @@ function setupGraphicsBlocks(activity) {
             const isWrap = activity.turtles.ithTurtle(turtle).painter.wrap;
 
             if (args.length === 1) {
-                if ((args[0] > 5000 || args[0] < -5000) && (isWrap === false || isWrap === null)) {
-                    activity.errorMsg(
-                        _("Value must be within -5000 to 5000 when Wrap Mode is off."),
-                        blk
-                    );
-                } else if ((args[0] > 20000 || args[0] < -20000) && isWrap === true) {
-                    activity.errorMsg(
-                        _("Value must be within -20000 to 20000 when Wrap Mode is on."),
-                        blk
-                    );
+                if (!validateWrapRange(args[0], isWrap, blk)) {
+                    return;
+                }
+                if (typeof args[0] === "string") {
+                    activity.errorMsg(NANERRORMSG, blk);
+                } else if (logo.inMatrix) {
+                    recordMatrixRow(logo, blk, args[0]);
+                } else if (tur.singer.inNoteBlock.length > 0) {
+                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
-                    if (typeof args[0] === "string") {
-                        activity.errorMsg(NANERRORMSG, blk);
-                    } else if (logo.inMatrix) {
-                        recordMatrixRow(logo, blk, args[0]);
-                    } else if (tur.singer.inNoteBlock.length > 0) {
-                        tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
+                    if (tur.singer.suppressOutput) {
+                        const savedPenState = tur.painter.penState;
+                        tur.painter.penState = false;
+                        tur.painter.doForward(args[0]);
+                        tur.painter.penState = savedPenState;
                     } else {
-                        if (tur.singer.suppressOutput) {
-                            const savedPenState = tur.painter.penState;
-                            tur.painter.penState = false;
-                            tur.painter.doForward(args[0]);
-                            tur.painter.penState = savedPenState;
-                        } else {
-                            tur.painter.doForward(args[0]);
-                        }
+                        tur.painter.doForward(args[0]);
                     }
                 }
             }
