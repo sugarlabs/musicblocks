@@ -376,6 +376,16 @@ describe("setupSensorsBlocks", () => {
                 const pixelData = [100, 150]; // Invalid length
                 expect(() => block.pixelToRGB(pixelData)).toThrow("Invalid pixel data");
             });
+
+            it("should keep a translucent pixel's own values unless asked to composite", () => {
+                expect(block.pixelToRGB([0, 51, 255, 128])).toEqual([0, 51, 255]);
+            });
+
+            it("should blend a translucent pixel over the background when compositing", () => {
+                expect(block.pixelToRGB([0, 51, 255, 128], true)).toEqual([100, 125, 228]);
+                expect(block.pixelToRGB([0, 51, 255, 255], true)).toEqual([0, 51, 255]);
+                expect(block.pixelToRGB([0, 51, 255, 0], true)).toEqual([200, 200, 200]);
+            });
         });
 
         describe("getBackgroundRGB", () => {
@@ -445,6 +455,13 @@ describe("setupSensorsBlocks", () => {
             expect(DummyFlowBlock.createdBlocks["getred"].arg(logo, turtleIndex)).toBe(20);
             expect(DummyFlowBlock.createdBlocks["getgreen"].arg(logo, turtleIndex)).toBe(40);
             expect(DummyFlowBlock.createdBlocks["getblue"].arg(logo, turtleIndex)).toBe(60);
+        });
+
+        it("should return the components shown on screen for a translucent pixel", () => {
+            mockCanvasPixel([0, 51, 255, 128]);
+            expect(DummyFlowBlock.createdBlocks["getred"].arg(logo, turtleIndex)).toBe(39);
+            expect(DummyFlowBlock.createdBlocks["getgreen"].arg(logo, turtleIndex)).toBe(49);
+            expect(DummyFlowBlock.createdBlocks["getblue"].arg(logo, turtleIndex)).toBe(89);
         });
 
         it("should return the background block's color for a transparent pixel", () => {

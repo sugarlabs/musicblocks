@@ -569,7 +569,7 @@ function setupSensorsBlocks(activity) {
         arg(logo, turtle) {
             let rgb;
             try {
-                rgb = this.pixelBlock.getPixelRGB(turtle);
+                rgb = this.pixelBlock.getPixelRGB(turtle, true);
             } catch (error) {
                 rgb = GetColorPixelBlock.FALLBACKRGB;
             }
@@ -634,11 +634,13 @@ function setupSensorsBlocks(activity) {
          * Reads the pixel under the turtle, hiding the turtle while reading so that it does not
          * cover the pixel.
          * @param {number} turtle - The identifier of the turtle.
+         * @param {boolean} [composite=false] - Whether to blend a translucent pixel over the
+         *     background, giving the color shown on screen.
          * @returns {number[]} - The red, green and blue values (0 to 255) of the pixel, or of the
          *     background if the pixel is transparent.
          * @throws {Error} - If the turtle, its container or the canvas context cannot be accessed.
          */
-        getPixelRGB(turtle) {
+        getPixelRGB(turtle, composite = false) {
             const requiredTurtle = activity.turtles.getTurtle(turtle);
             if (!requiredTurtle.container) {
                 throw new Error("Turtle container unavailable");
@@ -650,7 +652,7 @@ function setupSensorsBlocks(activity) {
             try {
                 requiredTurtle.container.visible = false;
                 activity.refreshCanvas();
-                return this.pixelToRGB(this.getPixelData(x, y));
+                return this.pixelToRGB(this.getPixelData(x, y), composite);
             } finally {
                 requiredTurtle.container.visible = originalVisibility;
             }
@@ -675,15 +677,28 @@ function setupSensorsBlocks(activity) {
         /**
          * Determines the red, green and blue values based on pixel data.
          * @param {Uint8ClampedArray} pixelData - The RGBA values of the pixel.
+         * @param {boolean} [composite=false] - Whether to blend a translucent pixel over the
+         *     background, giving the color shown on screen.
          * @returns {number[]} - The red, green and blue values, those of the background for a
          *     transparent pixel.
          */
-        pixelToRGB(pixelData) {
+        pixelToRGB(pixelData, composite = false) {
             if (pixelData.length !== 4) {
                 throw new Error("Invalid pixel data");
             }
             const [r, g, b, a] = pixelData;
-            return a === 0 ? this.getBackgroundRGB() : [r, g, b];
+            if (a === 0) {
+                return this.getBackgroundRGB();
+            }
+            if (!composite || a === 255) {
+                return [r, g, b];
+            }
+
+            const alpha = a / 255;
+            const background = this.getBackgroundRGB();
+            return [r, g, b].map((value, i) =>
+                Math.round(value * alpha + background[i] * (1 - alpha))
+            );
         }
 
         /**
