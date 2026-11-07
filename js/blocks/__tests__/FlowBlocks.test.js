@@ -503,6 +503,27 @@ describe("FlowBlocks integration", () => {
         expect(remaining).toHaveLength(1);
     });
 
+    test("WaitForBlock flushes older duplicate requeues while preserving unrelated trailing queue items", () => {
+        const block = getBlock("waitFor");
+        const blk = 6;
+        activity.blocks.blockList[blk] = { connections: [60] };
+        const turtle = activity.turtles.ithTurtle(0);
+        turtle.queue = [];
+
+        turtle.queue.push(new Queue(blk, 1, blk));
+        turtle.queue.push(new Queue(blk, 1, blk));
+        turtle.queue.push(new Queue(blk, 1, blk));
+        turtle.queue.push(new Queue(99, 1, 999));
+
+        block.flow([true], logo, 0, blk);
+
+        expect(turtle.queue).toHaveLength(2);
+        expect(turtle.queue[0].blk).toBe(blk);
+        expect(turtle.queue[0].parentBlk).toBe(blk);
+        expect(turtle.queue[1].blk).toBe(99);
+        expect(turtle.queue[1].parentBlk).toBe(999);
+    });
+
     test("UntilBlock requeues when false and cleans when true", () => {
         const block = getBlock("until");
         const blk = 7;

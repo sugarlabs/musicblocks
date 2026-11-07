@@ -700,17 +700,14 @@ function setupFlowBlocks(activity) {
                 tur.doWait(0.05);
             } else {
                 // Since a wait-for block was requeued each
-                // time, we need to flush the queue of all but
-                // the last one, otherwise the child of the
-                // while block is executed multiple times.
-                const queueLength = queue.length;
-                let kept_one = false;
-                for (let i = queueLength - 1; i > 0; i--) {
+                // time, flush the queue of all but the last one.
+                let keptOne = false;
+                for (let i = queue.length - 1; i >= 0; i--) {
                     if (queue[i].parentBlk === blk) {
-                        if (kept_one) {
-                            queue.pop();
+                        if (keptOne) {
+                            queue.splice(i, 1);
                         } else {
-                            kept_one = true;
+                            keptOne = true;
                         }
                     }
                 }
