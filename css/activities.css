@@ -3484,3 +3484,161 @@ table {
 .pitch-staircase-step.active {
     background-color: var(--color-selector-selected);
 }
+
+/* ======================================================
+   Code Map Widget CSS
+   ====================================================== */
+.codemap-widget-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--color-bg-primary);
+}
+
+.codemap-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background-color: var(--color-bg-secondary);
+    border-bottom: 1px solid var(--color-border-primary);
+    gap: 12px;
+}
+
+.codemap-search-container {
+    flex: 1;
+    max-width: 280px;
+}
+
+.codemap-search-input {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid var(--color-border-primary);
+    border-radius: 6px;
+    font-size: 13px;
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    box-sizing: border-box;
+}
+
+.codemap-summary-badge {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 12px;
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+    white-space: nowrap;
+}
+
+.codemap-summary-warning {
+    background-color: var(--color-error-bg);
+    color: var(--color-error);
+    border: 1px solid var(--color-error);
+}
+
+.codemap-viewport {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--color-bg-primary);
+    min-height: 280px;
+}
+
+.codemap-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: grab;
+    user-select: none;
+}
+
+.codemap-empty-text {
+    font-size: 14px;
+    fill: var(--color-text-secondary);
+}
+
+.codemap-edge {
+    fill: none;
+    stroke: #94a3b8;
+    stroke-width: 2px;
+    transition: stroke 0.15s ease;
+}
+
+.codemap-edge-recursive {
+    stroke: var(--color-error);
+    stroke-width: 2.5px;
+    stroke-dasharray: 6 3;
+}
+
+.codemap-node {
+    cursor: pointer;
+    outline: none;
+}
+
+.codemap-node-rect {
+    stroke-width: 2px;
+    transition:
+        transform 0.15s ease,
+        filter 0.15s ease;
+}
+
+.codemap-node-start .codemap-node-rect {
+    fill: #dcfce7;
+    stroke: #16a34a;
+}
+
+.codemap-node-action .codemap-node-rect {
+    fill: #e0f2fe;
+    stroke: #0284c7;
+}
+
+.codemap-node-recursive .codemap-node-rect {
+    fill: #fee2e2;
+    stroke: #dc2626;
+    stroke-width: 2.5px;
+}
+
+.codemap-node-missing .codemap-node-rect {
+    fill: #fef3c7;
+    stroke: #d97706;
+    stroke-dasharray: 4 3;
+}
+
+.codemap-node-dynamic .codemap-node-rect {
+    fill: #f3e8ff;
+    stroke: #9333ea;
+    stroke-dasharray: 4 3;
+}
+
+.codemap-node-text {
+    font-size: 13px;
+    font-weight: 600;
+    fill: #1f2937;
+    pointer-events: none;
+}
+
+.codemap-node:hover .codemap-node-rect {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+}
+
+.codemap-node:focus-visible .codemap-node-rect {
+    stroke: var(--color-brand-primary);
+    stroke-width: 3px;
+}
+
+.codemap-node-dimmed {
+    opacity: 0.2;
+}
+
+.codemap-badge-bg {
+    fill: var(--color-brand-primary);
+}
+
+.codemap-badge-text {
+    font-size: 10px;
+    font-weight: 700;
+    fill: #ffffff;
+    pointer-events: none;
+}
