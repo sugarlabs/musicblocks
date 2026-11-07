@@ -129,6 +129,7 @@ class GlobalPlanet {
         const Planet = this.Planet;
         const requestId = ++this._requestId;
 
+        this.hideBadgeError();
         this.index = 0;
         this._cleanupCards();
         document.getElementById("global-projects").innerHTML = "";
@@ -197,6 +198,7 @@ class GlobalPlanet {
         // A real search query — go into search mode.
         const requestId = ++this._requestId;
         this.searching = true;
+        this.hideBadgeError();
         this.hideTags();
         this.oldSearchString = this.searchString;
         this.index = 0;
@@ -320,10 +322,11 @@ class GlobalPlanet {
     }
 
     forceAddToCache(id, callback) {
+        this.hideBadgeError();
         this.Planet.ServerInterface.getProjectDetails(
             id,
             function (d) {
-                this.addProjectToCache(id, d, callback);
+                this.afterForceAddToCache(id, d, callback);
             }.bind(this),
             true
         );
@@ -333,8 +336,32 @@ class GlobalPlanet {
         if (data.success) {
             this.cache[id] = data.data;
             this.cache[id].ProjectData = null;
+            this.hideBadgeError();
             callback();
-        } else this.throwOfflineError();
+        } else if (data.error === "PROJECT_NOT_FOUND") {
+            delete this.cache[id];
+            this.showBadgeError(_("This project is no longer available."));
+        } else {
+            this.showBadgeError(_("Could not load the published project. Try again."));
+        }
+    }
+
+    showBadgeError(message) {
+        this.hideBadgeError();
+
+        const list = document.getElementById("global-projects");
+        if (!list || !list.parentNode) return;
+
+        const error = document.createElement("div");
+        error.id = "global-badge-error";
+        error.className = "container center-align";
+        error.textContent = message;
+        list.parentNode.insertBefore(error, list);
+    }
+
+    hideBadgeError() {
+        const error = document.getElementById("global-badge-error");
+        if (error) error.remove();
     }
 
     getData(id, callback, error) {
