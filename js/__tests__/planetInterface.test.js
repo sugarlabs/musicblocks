@@ -163,6 +163,20 @@ describe("PlanetInterface", () => {
         expect(planetInterface.showMusicBlocks).toHaveBeenCalled();
     });
 
+    test("_resetTrashHistory also releases saved stack previews", () => {
+        mockActivity.blocks.trashStacks = [1];
+        mockActivity.blocks.actionHistory = [{ type: "trash", blockId: 1 }];
+        mockActivity.blocks.redoActionHistory = [{ type: "restore", blockId: 1 }];
+        mockActivity.blocks.trashPreviews = { 1: { canvas: {} } };
+
+        planetInterface._resetTrashHistory();
+
+        expect(mockActivity.blocks.trashStacks).toEqual([]);
+        expect(mockActivity.blocks.actionHistory).toEqual([]);
+        expect(mockActivity.blocks.redoActionHistory).toEqual([]);
+        expect(mockActivity.blocks.trashPreviews).toEqual({});
+    });
+
     test("newProject calls closePlanet, initialiseNewProject, justLoadStart, and saveLocally", () => {
         jest.spyOn(planetInterface, "closePlanet").mockImplementation(() => {});
         jest.spyOn(planetInterface, "initialiseNewProject").mockImplementation(() => {});
