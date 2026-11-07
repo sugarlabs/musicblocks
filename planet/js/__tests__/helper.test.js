@@ -56,7 +56,8 @@ const {
     toggleText,
     toggleExpandable,
     hideOnClickOutside,
-    updateCheckboxes
+    updateCheckboxes,
+    setupBackToTopButton
 } = require("../helper");
 
 describe("helper.js", () => {
@@ -318,5 +319,81 @@ describe("helper.js", () => {
             const urlInput = document.querySelector("#sharebox input[type=text]");
             expect(urlInput.value).toBe("https://example.com&a=True&b=True&c=True");
         });
+    });
+});
+
+describe("setupBackToTopButton", () => {
+    it("shows the button after scrolling stops past the threshold and hides it while scrolling", () => {
+        jest.useFakeTimers();
+
+        document.body.innerHTML = '<button id="backToTopBtn"></button>';
+        const button = document.getElementById("backToTopBtn");
+
+        Object.defineProperty(window, "scrollY", {
+            value: 0,
+            writable: true,
+            configurable: true
+        });
+
+        setupBackToTopButton();
+
+        // Near the top: button should remain hidden.
+        window.scrollY = 100;
+        window.dispatchEvent(new Event("scroll"));
+        jest.advanceTimersByTime(200);
+
+        expect(button.classList.contains("is-visible")).toBe(false);
+
+        // Farther down: button should stay hidden while scrolling.
+        window.scrollY = 300;
+        window.dispatchEvent(new Event("scroll"));
+
+        expect(button.classList.contains("is-visible")).toBe(false);
+
+        // Another scroll before the delay expires should reset the timer.
+        jest.advanceTimersByTime(100);
+
+        window.scrollY = 350;
+        window.dispatchEvent(new Event("scroll"));
+
+        jest.advanceTimersByTime(100);
+
+        expect(button.classList.contains("is-visible")).toBe(false);
+
+        // It should appear only after scrolling has stopped for the full delay.
+        jest.advanceTimersByTime(100);
+
+        expect(button.classList.contains("is-visible")).toBe(true);
+
+        // Starting to scroll again should hide it immediately.
+        window.scrollY = 400;
+        window.dispatchEvent(new Event("scroll"));
+
+        expect(button.classList.contains("is-visible")).toBe(false);
+
+        jest.useRealTimers();
+    });
+
+    it("initializes the button state when the page loads past the threshold", () => {
+        jest.useFakeTimers();
+
+        document.body.innerHTML = '<button id="backToTopBtn"></button>';
+        const button = document.getElementById("backToTopBtn");
+
+        Object.defineProperty(window, "scrollY", {
+            value: 300,
+            writable: true,
+            configurable: true
+        });
+
+        setupBackToTopButton();
+
+        expect(button.classList.contains("is-visible")).toBe(false);
+
+        jest.advanceTimersByTime(200);
+
+        expect(button.classList.contains("is-visible")).toBe(true);
+
+        jest.useRealTimers();
     });
 });
