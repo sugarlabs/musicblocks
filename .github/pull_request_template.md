@@ -1,37 +1,55 @@
 <!--
 Thank you for contributing to our project!
-Please complete the sections below to help us review your changes efficiently.
+Sections marked [CI] are validated automatically. Sections marked [Required] are checked by reviewers.
+Sections marked [Optional] can be skipped. In any section that does not apply, write "N/A" rather than deleting it.
 -->
+
+<!-- Required -->
 
 ## Description
 
-<!-- Describe the changes introduced by this pull request. Explain what problem it solves or what feature/fix it adds. -->
+<!-- Describe what this PR changes and what problem it solves. -->
+
+<!-- Required -->
 
 ## Related Issue
 
-<!-- Reference the specific issue using #issue_number (e.g., "Fixes #123"). -->
+<!--
+Use ONE of the following. "Closes" and "Fixes" auto-close the issue on merge.
+Use "Related to" if this PR only partly addresses the issue.
+-->
 
-Fixes #
+Closes #
+<!-- or: Related to #<number> | or: No issue (explain why) -->
 
 ---
+
+<!-- CI: first-time contributors only -->
 
 ## MusicBlocks Project Link
 
-<!-- First-time contributors (CI enforced): create and publish/share your MusicBlocks project, then paste the generated share link here (e.g., https://musicblocks.sugarlabs.org/index.html?repo=my-project-from-production-3&run=True). Existing contributors can leave this blank. -->
+<!--
+First-time contributors: create and publish/share a MusicBlocks project, then paste the share link
+(e.g., https://musicblocks.sugarlabs.org/index.html?repo=my-project-from-production-3&run=True).
+Existing contributors: write "N/A".
+-->
 
 **Project Link:**
 
----
+<!-- CI: first-time contributors only -->
 
 ## MusicBlocks Project Screenshot or Screen-Recording
 
-<!-- First-time contributors (CI enforced): attach a screenshot or a screen-recording of your published MusicBlocks project here. Existing contributors can leave this blank. -->
+<!-- First-time contributors: attach a screenshot or screen-recording of the project above.
+Existing contributors: write "N/A". This is NOT the before/after section for UI changes (see "Visual Changes"). -->
 
 ---
 
+<!-- CI -->
+
 ## Category
 
-<!-- NOTE: CI ENFORCED. You MUST check at least ONE category below or the CI will fail. -->
+<!-- Check at least ONE or the CI will fail. If nothing fits, check "Other" and explain in Changes Made. -->
 
 - [ ] Bug Fix — Fixes a bug or incorrect behavior
 - [ ] Feature — Adds new functionality
@@ -41,56 +59,76 @@ Fixes #
 - [ ] Documentation — Updates to docs, comments, or README
 - [ ] Chore / Refactor — Maintenance, cleanup, or refactoring with no behavior change
 - [ ] CI/CD — Changes to workflows and automation
+- [ ] Other — Dependency updates, localization, accessibility, etc. (explain below)
 
 ---
+
+<!-- Required -->
 
 ## Changes Made
 
-<!-- Provide a summary of the technical details, architecture changes, or key modifications. -->
+<!-- Summarize the technical details, architecture changes, or key modifications. -->
 
----
+<!-- Optional: bug fixes -->
 
-## Steps to Reproduce
+## Expected vs. Actual Behavior
 
-<!-- For bug fixes, please provide clear steps and relevant details to reproduce the issue. Leave blank if not applicable. -->
+<!-- Before this PR: what happened? After this PR: what happens? -->
+
+<!-- Optional: UI changes -->
 
 ## Visual Changes
 
-<!-- If this PR introduces visual or UI changes, please provide before and after screenshots or videos. Remove this entire section if not applicable. -->
+<!-- Provide before/after screenshots or videos for visual changes. -->
 
 ### Before
 
-<!-- Paste/drop before screenshot here -->
-
 ### After
-
-<!-- Paste/drop after screenshot here -->
 
 ---
 
+<!-- Required -->
+
 ## Testing Performed
 
-<!-- Describe the testing that you have performed to validate these changes (e.g., test cases, environments). -->
+<!-- Describe how you validated this (test cases, browsers, devices). -->
+
+**Browser/environment tested:** <!-- e.g., Chrome 130 on Linux; Firefox on Android -->
+
+<!-- Required -->
+
+## Impact
+
+- **Breaking change?** <!-- Yes/No. If yes, describe the migration. -->
+- **i18n / accessibility affected?** <!-- Yes/No. e.g., new user-facing strings, keyboard navigation, screen readers -->
+
+<!-- Required -->
+
+## AI Assistance Disclosure
+
+<!-- Did you use AI tools (code generation, PR text, etc.)? State "No" or describe which tool and for what.
+You are responsible for understanding and being able to explain every line you submit. -->
 
 ---
 
 ## Checklist
 
-<!-- Please check the boxes that apply. Add or remove items as needed. -->
+<!-- Check what applies. Where an item does not apply, check it and write N/A beside it. -->
 
 - [ ] I have tested these changes locally and they work as expected.
-- [ ] I have added/updated tests that prove the effectiveness of these changes.
-- [ ] I have updated the documentation to reflect these changes, if applicable.
+- [ ] I have added/updated tests for these changes (or N/A: docs-only/no testable behavior).
+- [ ] I have updated the documentation, if applicable (or N/A).
 - [ ] I have followed the project's coding style guidelines.
-- [ ] I have run `npm run lint` and `npx prettier --check .` with no errors.
-- [ ] I have addressed the code review feedback from the previous submission, if applicable.
-- [ ] I have enabled **"Allow edits from maintainers"** (allows maintainers to assist with rebases or edits; affects PR branch only).
+- [ ] I have addressed code review feedback from a previous submission (or N/A: first submission).
+- [ ] I have enabled **"Allow edits from maintainers"** (lets maintainers assist with rebases or edits; affects the PR branch only).
 
 ---
 
+<!-- Optional -->
+
 ## Additional Notes
 
-<!-- Provide any additional context for the reviewers (e.g., design decisions, potential concerns). -->
+<!-- Design decisions, potential concerns, or anything else reviewers should know. -->
 
 ---
 
@@ -98,7 +136,7 @@ Fixes #
 <summary><b>Contributor Resources</b></summary>
 <br>
 
-- **Guidelines:** [Music Blocks Contributing Guide](https://github.com/sugarlabs/musicblocks/blob/master/README.md)
+- **Guidelines:** [Music Blocks Contributing Guide](https://github.com/sugarlabs/musicblocks/blob/master/CONTRIBUTING.md)
 - **Chat:** [Community Matrix Server](https://matrix.to/#/#sugar:matrix.org)
 
 </details>
