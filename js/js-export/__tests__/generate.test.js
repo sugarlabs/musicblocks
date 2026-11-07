@@ -38,6 +38,7 @@ const ASTUtils = {
     getMouseAST: jest.fn(),
     setActionNames: jest.fn(),
     setStoppingActions: jest.fn(),
+    setSharedBoxes: jest.fn(),
     getBoxNames: jest.fn(() => [])
 };
 const astring = {
@@ -215,6 +216,7 @@ describe("JSGenerate Class", () => {
             JSGenerate.generateCode();
 
             expect(ASTUtils.setActionNames).toHaveBeenCalledWith(["first", "second"], []);
+            expect(ASTUtils.setSharedBoxes).toHaveBeenCalledWith(JSGenerate.actionTrees);
             expect(ASTUtils.getMethodAST).toHaveBeenCalledTimes(2);
             expect(JSGenerate.generateFailed).toBe(false);
         });
