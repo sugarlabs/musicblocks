@@ -229,7 +229,7 @@ class CallGraphWidget {
         this._onWheel = e => {
             e.preventDefault();
             const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
-            const newScale = Math.max(0.2, Math.min(3.0, this.transform.scale * zoomFactor));
+            const newScale = Math.max(0.05, Math.min(3.0, this.transform.scale * zoomFactor));
 
             // Zoom towards mouse position
             const rect = this.viewport.getBoundingClientRect();
@@ -506,10 +506,19 @@ class CallGraphWidget {
         }
 
         let block = this.activity.blocks.blockList[node.blockId];
-        if (!block || block.id !== node.blockId) {
-            if (Array.isArray(this.activity.blocks.blockList)) {
-                block = this.activity.blocks.blockList.find(b => b && b.id === node.blockId);
-            }
+        const isTargetBlock = b =>
+            b &&
+            (b.blockIndex === node.blockId ||
+                b.id === node.blockId ||
+                (b === this.activity.blocks.blockList[node.blockId] &&
+                    b.id === undefined &&
+                    b.blockIndex === undefined));
+
+        if (!isTargetBlock(block)) {
+            const list = Array.isArray(this.activity.blocks.blockList)
+                ? this.activity.blocks.blockList
+                : Object.values(this.activity.blocks.blockList);
+            block = list.find(b => b && (b.blockIndex === node.blockId || b.id === node.blockId));
         }
 
         if (!block || block.trash || !block.container) {
@@ -567,7 +576,7 @@ class CallGraphWidget {
 
         const scaleX = (vWidth - 40) / bounds.width;
         const scaleY = (vHeight - 40) / bounds.height;
-        const scale = Math.max(0.2, Math.min(1.2, Math.min(scaleX, scaleY)));
+        const scale = Math.max(0.05, Math.min(1.2, Math.min(scaleX, scaleY)));
 
         const tx = Math.round((vWidth - bounds.width * scale) / 2 - bounds.minX * scale);
         const ty = Math.round((vHeight - bounds.height * scale) / 2 - bounds.minY * scale);
