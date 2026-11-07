@@ -83,6 +83,10 @@ const _ZIP_CENTRAL_SIGNATURE = 0x02014b50;
 const _ZIP_LOCAL_SIGNATURE = 0x04034b50;
 const _isArrayBuffer = value => Object.prototype.toString.call(value) === "[object ArrayBuffer]";
 
+// A project is a list of blocks, each itself a list. An empty list is an empty project.
+const _isProjectData = data =>
+    Array.isArray(data) && (data.length === 0 || data.some(Array.isArray));
+
 const _CRC32_TABLE = Array.from({ length: 256 }, (_, index) => {
     let value = index;
     for (let bit = 0; bit < 8; bit++) {
@@ -1436,6 +1440,11 @@ class ProjectManager {
         };
 
         const replaceProjectFromFile = async (obj, file, errorOperation, clearCanvas) => {
+            // Checked first: the steps below replace the project that is open.
+            if (!_isProjectData(obj)) {
+                throw new Error("The file does not contain a Music Blocks project.");
+            }
+
             if (that.planet) {
                 try {
                     await that.planet.saveLocally({ rejectOnProjectSaveError: true });

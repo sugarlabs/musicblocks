@@ -5348,8 +5348,14 @@ class Blocks {
          * @param - blockObj - Block Objects
          * @public
          * @returns {number} this request's load token
+         * @throws {TypeError} if blockObjs is not a list
          */
         this.loadNewBlocks = blockObjs => {
+            // Anything else has no blocks to finish on, so the load would never end.
+            if (!Array.isArray(blockObjs)) {
+                throw new TypeError("loadNewBlocks expects a list of blocks.");
+            }
+
             const loadToken = ++this._nextLoadToken;
 
             if (this._loadInProgress) {
