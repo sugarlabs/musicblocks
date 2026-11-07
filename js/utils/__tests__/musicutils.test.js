@@ -5966,6 +5966,20 @@ describe("generateNoteNames EDO length contract", () => {
         expect(generateNoteNames(7)).toEqual(["C", "D", "E", "F", "G", "A", "B"]);
     });
 
+    it.each([Infinity, NaN, 0, -1, 1.5])(
+        "falls back to the 12-EDO table for invalid EDO %p",
+        edo => {
+            expect(generateNoteNames(edo)).toEqual(generateNoteNames(12));
+        }
+    );
+
+    it.each([-5, Infinity])(
+        "uses 12-EDO for invalid EDO %p when resolving fallback note positions",
+        edo => {
+            expect(getEdoNoteNamePosition("D♭", edo)).toBe(getEdoNoteNamePosition("D♭", 12));
+        }
+    );
+
     it.each([3, 6, 12, 19, 31])("produces no duplicate names for %i-EDO", edo => {
         const names = generateNoteNames(edo);
         expect(new Set(names).size).toBe(names.length);
