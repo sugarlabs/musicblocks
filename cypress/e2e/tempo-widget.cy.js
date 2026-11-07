@@ -13,7 +13,7 @@ const loadFixtureProject = fixtureName => {
         const { blocks } = win.ActivityContext.getActivity();
         const fullyLoaded =
             blocks._loadCounter === 0 &&
-            blocks.blockList.some(block => !block.trash && block.name === "tempo");
+            blocks.blockList.some(block => block && !block.trash && block.name === "tempo");
         stableObservations = fullyLoaded ? stableObservations + 1 : 0;
         expect(stableObservations, "fixture tempo block should remain fully loaded").to.be.at.least(
             5
@@ -30,7 +30,9 @@ const helpDialog = '[role="dialog"][aria-label="help"]';
 // sync by Tempo._updateBPM() whenever a BPM edit is applied through the widget.
 const getMasterBpmValue = win => {
     const { blocks } = win.ActivityContext.getActivity();
-    const bpmBlock = blocks.blockList.find(block => !block.trash && block.name === "setmasterbpm2");
+    const bpmBlock = blocks.blockList.find(
+        block => block && !block.trash && block.name === "setmasterbpm2"
+    );
     return blocks.blockList[bpmBlock.connections[1]].value;
 };
 
