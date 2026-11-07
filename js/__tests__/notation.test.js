@@ -130,10 +130,40 @@ describe("Notation Class", () => {
             const insideChord = false;
             const drum = ["kick"];
             notation.doUpdateNotation(note, duration, turtle, insideChord, drum);
-            expect(notation._notationStaging[turtle][0][7]).toBe("kick");
+            expect(notation._notationStaging[turtle][0][7]).toEqual(["kick"]);
             expect(notation._notationDrumStaging[turtle]).toContainEqual(
                 expect.arrayContaining([["drums"], expect.any(Number), expect.any(Number)])
             );
+        });
+
+        it("should stage every drum in a note", () => {
+            getDrumSymbol.mockReturnValueOnce("bd").mockReturnValueOnce("sn");
+            notation.doUpdateNotation(["R"], 4, "turtle1", false, ["kick drum", "snare drum"]);
+            expect(notation._notationStaging.turtle1[0][7]).toEqual(["kick drum", "snare drum"]);
+            expect(notation._notationDrumStaging.turtle1[0][0]).toEqual(["bd", "sn"]);
+        });
+
+        it("should write drums that share a symbol once on the drum line", () => {
+            notation.doUpdateNotation(["R"], 4, "turtle1", false, ["kick drum", "bass drum"]);
+            expect(notation._notationDrumStaging.turtle1[0][0]).toEqual(["drums"]);
+        });
+
+        it("should write each symbol once when only some drums share one", () => {
+            getDrumSymbol
+                .mockReturnValueOnce("bd")
+                .mockReturnValueOnce("bd")
+                .mockReturnValueOnce("sn");
+            notation.doUpdateNotation(["R"], 4, "turtle1", false, [
+                "kick drum",
+                "bass drum",
+                "snare drum"
+            ]);
+            expect(notation._notationDrumStaging.turtle1[0][0]).toEqual(["bd", "sn"]);
+        });
+
+        it("should keep the drum when a note also holds noise", () => {
+            notation.doUpdateNotation(["R"], 4, "turtle1", false, ["noise1", "snare drum"]);
+            expect(notation._notationStaging.turtle1[0][7]).toEqual(["snare drum"]);
         });
 
         it.each(["noise1", "noise2", "noise3"])(
