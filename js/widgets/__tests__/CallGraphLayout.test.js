@@ -116,6 +116,39 @@ describe("CallGraphLayout", () => {
         expect(layout.routedEdges[1].pathD).toContain("C");
     });
 
+    test("propagates ranks correctly through multi-path DAG so forward calls flow downward", () => {
+        // Start -> A, Start -> B, B -> A, A -> C
+        const graph = {
+            nodes: [
+                { id: "start:0", type: "start", label: "Start" },
+                { id: "action:A", type: "action", label: "A" },
+                { id: "action:B", type: "action", label: "B" },
+                { id: "action:C", type: "action", label: "C" }
+            ],
+            edges: [
+                { source: "start:0", target: "action:A", isRecursive: false },
+                { source: "start:0", target: "action:B", isRecursive: false },
+                { source: "action:B", target: "action:A", isRecursive: false },
+                { source: "action:A", target: "action:C", isRecursive: false }
+            ]
+        };
+
+        const layout = CallGraphLayout.compute(graph);
+        const start = layout.positionedNodes.find(n => n.id === "start:0");
+        const b = layout.positionedNodes.find(n => n.id === "action:B");
+        const a = layout.positionedNodes.find(n => n.id === "action:A");
+        const c = layout.positionedNodes.find(n => n.id === "action:C");
+
+        expect(start.rank).toBe(0);
+        expect(b.rank).toBe(1);
+        expect(a.rank).toBe(2);
+        expect(c.rank).toBe(3);
+
+        expect(start.y).toBeLessThan(b.y);
+        expect(b.y).toBeLessThan(a.y);
+        expect(a.y).toBeLessThan(c.y);
+    });
+
     test("exercises AMD define branch when define is available", () => {
         const origDefine = global.define;
         let registeredFactory;

@@ -23,13 +23,17 @@ class CallGraphAnalyzer {
      * @param {Array<Object>|Object} blockList - Workspace blocks (e.g. activity.blocks.blockList).
      * @param {Object} [options] - Optional analyzer settings.
      * @param {boolean} [options.includeRoots=true] - Whether to include Start stacks as root nodes.
-     * @param {number} [options.maxTraversalDepth=1000] - Safety limit against malformed cyclic block connections.
+     * @param {number} [options.maxTraversalDepth=Infinity] - Safety limit against malformed cyclic block connections.
      */
     constructor(blockList, options = {}) {
         this.blockList = blockList || [];
         this.options = {
             includeRoots: options.includeRoots !== false,
-            maxTraversalDepth: options.maxTraversalDepth || 1000
+            maxTraversalDepth:
+                typeof options.maxTraversalDepth === "number" &&
+                Number.isFinite(options.maxTraversalDepth)
+                    ? options.maxTraversalDepth
+                    : Infinity
         };
     }
 
@@ -252,28 +256,29 @@ class CallGraphAnalyzer {
         }
 
         // 7. Cycle & Recursion Analysis (Tarjan SCC on Action subgraph)
-        const cycles = this._detectCycles(nodesMap, edges);
-        const cycleNodeSet = new Set();
-        const cycleEdgeSet = new Set();
+        const { cycles, cyclicSccs } = this._detectCycles(nodesMap, edges);
 
-        for (const cycle of cycles) {
-            for (let i = 0; i < cycle.length; i++) {
-                cycleNodeSet.add(cycle[i]);
-                const next = cycle[(i + 1) % cycle.length];
-                cycleEdgeSet.add(`${cycle[i]}->${next}`);
-            }
-        }
-
-        // Update nodes and edges with recursion flags
-        for (const node of nodesMap.values()) {
-            if (cycleNodeSet.has(node.id)) {
-                node.isRecursive = true;
+        for (const sccSet of cyclicSccs) {
+            for (const nodeId of sccSet) {
+                const node = nodesMap.get(nodeId);
+                if (node) {
+                    node.isRecursive = true;
+                }
             }
         }
 
         for (const edge of edges) {
-            if (cycleEdgeSet.has(`${edge.source}->${edge.target}`)) {
-                edge.isRecursive = true;
+            if (edge.source === edge.target && nodesMap.has(edge.source)) {
+                const node = nodesMap.get(edge.source);
+                if (node && node.type === "action") {
+                    edge.isRecursive = true;
+                }
+            }
+            for (const sccSet of cyclicSccs) {
+                if (sccSet.has(edge.source) && sccSet.has(edge.target)) {
+                    edge.isRecursive = true;
+                    break;
+                }
             }
         }
 
@@ -550,65 +555,154 @@ class CallGraphAnalyzer {
     }
 
     /**
-     * Detects cycles in the Action dependency graph using Tarjan's SCC and DFS cycle paths.
+     * Detects cycles and strongly connected components among Action nodes in linear time using Tarjan's SCC.
      *
      * @private
      * @param {Map<string, Object>} nodesMap
      * @param {Array<Object>} edges
-     * @returns {Array<Array<string>>} List of detected cycle paths (e.g. [["action:A", "action:B", "action:A"]]).
+     * @returns {Object} { cycles: Array<Array<string>>, cyclicSccs: Array<Set<string>> }
      */
     _detectCycles(nodesMap, edges) {
-        // Build adjacency list for Action nodes only
+        // Build deduplicated adjacency list for Action nodes only
         const adj = new Map();
+        const selfLoops = new Set();
+
         for (const [id, node] of nodesMap.entries()) {
             if (node.type === "action") {
-                adj.set(id, []);
+                adj.set(id, new Set());
             }
         }
 
         for (const edge of edges) {
-            if (adj.has(edge.source) && adj.has(edge.target)) {
-                adj.get(edge.source).push(edge.target);
+            if (edge.source === edge.target && adj.has(edge.source)) {
+                selfLoops.add(edge.source);
+            } else if (adj.has(edge.source) && adj.has(edge.target)) {
+                adj.get(edge.source).add(edge.target);
             }
         }
 
+        let index = 0;
+        const indices = new Map();
+        const lowlinks = new Map();
+        const onStack = new Set();
+        const stack = [];
+        const cyclicSccs = [];
         const cycles = [];
-        const visitedGlobal = new Set();
+        const seenCycleKeys = new Set();
 
-        // Find elementary cycles using DFS with recursion stack tracking
-        for (const startNode of adj.keys()) {
-            const path = [];
-            const onPath = new Set();
+        const strongconnect = u => {
+            indices.set(u, index);
+            lowlinks.set(u, index);
+            index++;
+            stack.push(u);
+            onStack.add(u);
 
-            const dfs = curr => {
-                path.push(curr);
-                onPath.add(curr);
+            const neighbors = adj.get(u) || new Set();
+            for (const v of neighbors) {
+                if (!indices.has(v)) {
+                    strongconnect(v);
+                    lowlinks.set(u, Math.min(lowlinks.get(u), lowlinks.get(v)));
+                } else if (onStack.has(v)) {
+                    lowlinks.set(u, Math.min(lowlinks.get(u), indices.get(v)));
+                }
+            }
 
-                const neighbors = adj.get(curr) || [];
-                for (const next of neighbors) {
-                    if (next === startNode) {
-                        // Found a directed cycle back to startNode!
-                        const fullCycle = [...path, startNode];
-                        // Normalize cycle to avoid duplicate rotations
-                        const cycleKey = this._getCanonicalCycleKey(fullCycle);
-                        if (!visitedGlobal.has(cycleKey)) {
-                            visitedGlobal.add(cycleKey);
-                            cycles.push(fullCycle);
+            if (lowlinks.get(u) === indices.get(u)) {
+                const scc = [];
+                let w;
+                do {
+                    w = stack.pop();
+                    onStack.delete(w);
+                    scc.push(w);
+                } while (w !== u);
+
+                const hasSelfLoop = scc.length === 1 && selfLoops.has(u);
+                const isCyclic = scc.length > 1 || hasSelfLoop;
+
+                if (isCyclic) {
+                    const sccSet = new Set(scc);
+                    cyclicSccs.push(sccSet);
+
+                    if (hasSelfLoop) {
+                        const selfCycle = [u, u];
+                        const key = this._getCanonicalCycleKey(selfCycle);
+                        if (!seenCycleKeys.has(key)) {
+                            seenCycleKeys.add(key);
+                            cycles.push(selfCycle);
                         }
-                    } else if (!onPath.has(next) && next > startNode) {
-                        // Only explore nodes lexicographically greater than startNode to avoid rotation duplicates
-                        dfs(next);
+                    }
+
+                    if (scc.length > 1) {
+                        const cyclePath = this._extractRepresentativeCycle(scc[0], sccSet, adj);
+                        if (cyclePath) {
+                            const key = this._getCanonicalCycleKey(cyclePath);
+                            if (!seenCycleKeys.has(key)) {
+                                seenCycleKeys.add(key);
+                                cycles.push(cyclePath);
+                            }
+                        }
                     }
                 }
+            }
+        };
 
-                path.pop();
-                onPath.delete(curr);
-            };
-
-            dfs(startNode);
+        const sortedNodeIds = Array.from(adj.keys()).sort();
+        for (const node of sortedNodeIds) {
+            if (!indices.has(node)) {
+                strongconnect(node);
+            }
         }
 
-        return cycles;
+        return { cycles, cyclicSccs };
+    }
+
+    /**
+     * Extracts a representative simple cycle within a strongly connected component using DFS.
+     *
+     * @private
+     * @param {string} startNode
+     * @param {Set<string>} sccSet
+     * @param {Map<string, Set<string>>} adj
+     * @returns {Array<string>|null}
+     */
+    _extractRepresentativeCycle(startNode, sccSet, adj) {
+        const visited = new Set();
+        const path = [];
+        const onPath = new Set();
+        let foundCycle = null;
+
+        const dfs = curr => {
+            if (foundCycle !== null) {
+                return;
+            }
+            path.push(curr);
+            onPath.add(curr);
+            visited.add(curr);
+
+            const neighbors = Array.from(adj.get(curr) || []).sort();
+            for (const next of neighbors) {
+                if (!sccSet.has(next)) {
+                    continue;
+                }
+                if (onPath.has(next)) {
+                    const cycleStartIdx = path.indexOf(next);
+                    foundCycle = path.slice(cycleStartIdx).concat([next]);
+                    return;
+                }
+                if (!visited.has(next)) {
+                    dfs(next);
+                    if (foundCycle !== null) {
+                        return;
+                    }
+                }
+            }
+
+            path.pop();
+            onPath.delete(curr);
+        };
+
+        dfs(startNode);
+        return foundCycle;
     }
 
     /**

@@ -3615,7 +3615,7 @@ table {
 .codemap-node-text {
     font-size: 13px;
     font-weight: 600;
-    fill: var(--color-text-primary);
+    fill: #1f2937;
     pointer-events: none;
 }
 
