@@ -46,7 +46,9 @@ global.Singer = {
         multiplyNoteValue: jest.fn(),
         doTie: jest.fn(),
         doRhythmicDot: jest.fn(),
-        playRest: jest.fn()
+        playRest: jest.fn(),
+        getEuclideanStep: jest.fn(),
+        getEuclideanDurations: jest.fn()
     }
 };
 global.Queue = class Queue {
@@ -135,6 +137,16 @@ global.BaseBlock = BaseBlock;
 global.FlowBlock = FlowBlock;
 global.FlowClampBlock = FlowClampBlock;
 global.ValueBlock = ValueBlock;
+
+class LeftBlock extends BaseBlock {
+    constructor(name, label) {
+        super(name);
+        this.label = label;
+    }
+
+    arg() {}
+}
+global.LeftBlock = LeftBlock;
 
 const createBlocksHarness = () => {
     const blocks = new Blocks({
@@ -239,7 +251,7 @@ describe("RhythmBlocks", () => {
     const getBlock = name => activity.registeredBlocks[name];
 
     describe("Block Registration", () => {
-        test("registers all 24 rhythm blocks", () => {
+        test("registers all 26 rhythm blocks", () => {
             const expectedBlocks = [
                 "mynotevalue",
                 "skipfactor",

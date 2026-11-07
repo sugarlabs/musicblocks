@@ -2532,4 +2532,36 @@ describe("setupRhythmActions", () => {
 
         expect(targetTurtle.singer.multipleVoices).toBe(true);
     });
+
+    describe("Euclidean rhythm actions", () => {
+        it("evaluates getEuclideanStep with explicit step", () => {
+            // Tresillo E(3, 8) -> hits at 0, 3, 6
+            expect(Singer.RhythmActions.getEuclideanStep(3, 8, 0, 0, 0)).toBe(1);
+            expect(Singer.RhythmActions.getEuclideanStep(3, 8, 1, 0, 0)).toBe(0);
+            expect(Singer.RhythmActions.getEuclideanStep(3, 8, 3, 0, 0)).toBe(1);
+            expect(Singer.RhythmActions.getEuclideanStep(3, 8, 6, 0, 0)).toBe(1);
+            expect(Singer.RhythmActions.getEuclideanStep(3, 8, 7, 0, 0)).toBe(0);
+        });
+
+        it("auto-steps using turtle tallyNotes when step is null or omitted", () => {
+            targetTurtle.singer.tallyNotes = 3; // Step 3
+            expect(Singer.RhythmActions.getEuclideanStep(3, 8, null, 0, 0)).toBe(1);
+
+            targetTurtle.singer.tallyNotes = 4; // Step 4
+            expect(Singer.RhythmActions.getEuclideanStep(3, 8, null, 0, 0)).toBe(0);
+
+            // Mixed note duration test: tallyNotes accurately tracks count regardless of fractional notesPlayed
+            targetTurtle.singer.tallyNotes = 6;
+            targetTurtle.singer.notesPlayed = [7, 8]; // mixed rational duration
+            expect(Singer.RhythmActions.getEuclideanStep(3, 8, null, 0, 0)).toBe(1);
+        });
+
+        it("evaluates getEuclideanDurations for rhythm patterns", () => {
+            const durations = Singer.RhythmActions.getEuclideanDurations(3, 8, 1, 0);
+            expect(durations).toEqual([0.375, 0.375, 0.25]);
+
+            const cinquillo = Singer.RhythmActions.getEuclideanDurations(5, 8, 1, 0);
+            expect(cinquillo).toEqual([0.25, 0.125, 0.25, 0.125, 0.25]);
+        });
+    });
 });
