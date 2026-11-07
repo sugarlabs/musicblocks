@@ -1712,6 +1712,7 @@
   "Report description required": "Report description required",
   "Report description too long": "Report description too long",
   "Feature unavailable - cannot connect to server. Reload Music Blocks to try again.": "Feature unavailable - cannot connect to server. Reload Music Blocks to try again.",
+  "Project opened, but the current selection could not be saved.": "Project opened, but the current selection could not be saved.",
   "This field is required": "This field is required",
   "Title too long": "Title too long",
   "Description too long": "Description too long",
