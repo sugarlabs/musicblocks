@@ -119,14 +119,7 @@ function setupDrumActions(activity) {
          * @param {Number} blk - corresponding Block object in blocks.blockList
          */
         static setDrum(drum, turtle, blk) {
-            let drumname = DEFAULTDRUM;
-            for (const d in DRUMNAMES) {
-                if (DRUMNAMES[d][0] === drum) {
-                    drumname = DRUMNAMES[d][1];
-                } else if (DRUMNAMES[d][1] === drum) {
-                    drumname = drum;
-                }
-            }
+            const drumname = Singer.DrumActions.GetDrumname(drum);
 
             const tur = activity.turtles.ithTurtle(turtle);
 
@@ -173,18 +166,7 @@ function setupDrumActions(activity) {
          * @param {Number} blk - corresponding Block object in blocks.blockList
          */
         static mapPitchToDrum(drum, turtle, blk) {
-            let drumname = DEFAULTDRUM;
-            for (const d in DRUMNAMES) {
-                if (DRUMNAMES[d][0] === drum) {
-                    drumname = DRUMNAMES[d][1];
-                } else if (DRUMNAMES[d][1] === drum) {
-                    drumname = drum;
-                }
-            }
-            // A drum played from a URL, as Play Drum allows.
-            if (typeof drum === "string" && drum.slice(0, 4) === "http") {
-                drumname = drum;
-            }
+            const drumname = Singer.DrumActions.GetDrumname(drum);
 
             const tur = activity.turtles.ithTurtle(turtle);
 

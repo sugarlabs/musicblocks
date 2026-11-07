@@ -58,8 +58,17 @@ class TempoWindow {
         }
         this._tapTimes = [];
         this._lastTapIndex = null;
-        if (this._intervalID !== null) {
-            widgetWindow.timerManager.clearInterval(this._intervalID);
+        if (this._intervalID !== null && this._intervalID !== undefined) {
+            if (
+                widgetWindow &&
+                widgetWindow.timerManager &&
+                typeof widgetWindow.timerManager.clearInterval === "function"
+            ) {
+                widgetWindow.timerManager.clearInterval(this._intervalID);
+            } else {
+                clearInterval(this._intervalID);
+            }
+            this._intervalID = null;
         }
         widgetWindow.destroy();
     }

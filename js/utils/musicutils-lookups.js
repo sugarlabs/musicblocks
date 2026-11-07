@@ -310,7 +310,10 @@ var getDrumIcon = name => {
     }
 
     for (let i = 0; i < DRUMNAMES.length; i++) {
-        if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1].toLowerCase() === name.toLowerCase()) {
+        if (
+            DRUMNAMES[i][0].toLowerCase() === name.toLowerCase() ||
+            DRUMNAMES[i][1].toLowerCase() === name.toLowerCase()
+        ) {
             return DRUMNAMES[i][2];
         }
     }
@@ -336,7 +339,10 @@ var getDrumSynthName = name => {
     }
 
     for (let i = 0; i < DRUMNAMES.length; i++) {
-        if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1].toLowerCase() === name.toLowerCase()) {
+        if (
+            DRUMNAMES[i][0].toLowerCase() === name.toLowerCase() ||
+            DRUMNAMES[i][1].toLowerCase() === name.toLowerCase()
+        ) {
             return DRUMNAMES[i][1];
         }
     }

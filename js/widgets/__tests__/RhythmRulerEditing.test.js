@@ -216,4 +216,106 @@ describe("RhythmRulerEditing", () => {
             expect(widget.Rulers[0][1]).toEqual([]);
         });
     });
+
+    describe("_dissectRuler tapping count-off", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+            global.Singer = { defaultBPMFactor: 1000 };
+            global._ = text => text;
+        });
+
+        afterEach(() => {
+            jest.clearAllTimers();
+            jest.useRealTimers();
+            document.body.replaceChildren();
+        });
+
+        const makeTapWidget = (rulerIndex, drumId, blockList, singer) => {
+            const table = document.createElement("table");
+            const row = table.insertRow();
+            const cell = row.insertCell();
+            cell.cellIndex = 0;
+            document.body.append(table);
+
+            const widget = Object.assign(Object.create(RhythmRuler.prototype), {
+                activity: {
+                    blocks: { blockList: blockList || {} },
+                    logo: { synth: { trigger: jest.fn() } },
+                    turtles: {
+                        ithTurtle: () => ({
+                            singer: singer !== undefined ? singer : { beatsPerMeasure: 4 }
+                        })
+                    }
+                },
+                Drums: [drumId],
+                Rulers: [[[2], []]],
+                _rulers: [row],
+                _rulerSelected: rulerIndex,
+                _playing: false,
+                _tapMode: true,
+                _tapCell: null,
+                _tapTimes: [],
+                _bpmFactor: 1000,
+                _setWidgetTimeout: (fn, delay) => setTimeout(fn, delay),
+                saveDissectHistory: jest.fn(),
+                __startTapping: jest.fn()
+            });
+
+            return { widget, cell };
+        };
+
+        test("plays count-off and falls back to snare drum when drum socket is empty", () => {
+            // setdrum block at index 10 with connections[1] === null (empty drum socket)
+            const blockList = {
+                10: { name: "setdrum", connections: [null, null] }
+            };
+            const { widget, cell } = makeTapWidget(0, 10, blockList);
+
+            expect(() => {
+                RhythmRulerEditing.prototype._dissectRuler.call(widget, { target: cell }, 0);
+            }).not.toThrow();
+
+            jest.advanceTimersByTime(500);
+            expect(widget.activity.logo.synth.trigger).toHaveBeenCalledTimes(4);
+            expect(widget.activity.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                "C4",
+                expect.any(Number),
+                "snare drum",
+                null,
+                null
+            );
+        });
+
+        test("plays count-off using configured drum when drum block has valid argument", () => {
+            const blockList = {
+                10: { name: "setdrum", connections: [null, 11] },
+                11: { name: "drumname", value: "bass drum" }
+            };
+            const { widget, cell } = makeTapWidget(0, 10, blockList);
+
+            RhythmRulerEditing.prototype._dissectRuler.call(widget, { target: cell }, 0);
+            jest.advanceTimersByTime(500);
+
+            expect(widget.activity.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                "C4",
+                expect.any(Number),
+                "bass drum",
+                null,
+                null
+            );
+        });
+
+        test("safely defaults beatsPerMeasure to 4 if turtle has no singer", () => {
+            const { widget, cell } = makeTapWidget(0, null, {}, null);
+
+            expect(() => {
+                RhythmRulerEditing.prototype._dissectRuler.call(widget, { target: cell }, 0);
+            }).not.toThrow();
+
+            jest.advanceTimersByTime(500);
+            expect(widget.activity.logo.synth.trigger).toHaveBeenCalledTimes(4);
+        });
+    });
 });

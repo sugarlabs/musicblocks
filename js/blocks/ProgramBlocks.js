@@ -87,8 +87,15 @@ function setupProgramBlocks(activity) {
             }
 
             const url = args[1];
-            const name = args[0];
-            const oldHeap = name in logo.turtleHeaps ? logo.turtleHeaps[name] : [];
+            const name = String(args[0]);
+            if (isUnsafeObjectKey(name)) {
+                activity.errorMsg(_("The heap name is reserved."), blk);
+                return;
+            }
+
+            const oldHeap = Object.prototype.hasOwnProperty.call(logo.turtleHeaps, name)
+                ? logo.turtleHeaps[name]
+                : [];
 
             // Use async fetch to avoid blocking the UI
             if (!isSafeUrl(url)) {
@@ -178,10 +185,14 @@ function setupProgramBlocks(activity) {
                 return;
             }
 
-            const name = args[0];
+            const name = String(args[0]);
             const url = args[1];
+            if (isUnsafeObjectKey(name)) {
+                activity.errorMsg(_("The heap name is reserved."), blk);
+                return;
+            }
 
-            if (name in logo.turtleHeaps) {
+            if (Object.prototype.hasOwnProperty.call(logo.turtleHeaps, name)) {
                 const data = JSON.stringify(logo.turtleHeaps[name]);
                 if (!isSafeUrl(url)) {
                     activity.errorMsg(_("Invalid URL"), blk);
@@ -451,6 +462,9 @@ function setupProgramBlocks(activity) {
                             // Copy any internal entries now.
                             const k = Object.keys(d);
                             for (let i = 0; i < k.length; i++) {
+                                if (isUnsafeObjectKey(k[i])) {
+                                    continue;
+                                }
                                 Turtle.DictActions.SetDictValue(target, turtle, k[i], d[k[i]]);
                                 if (!isTurtleStatusKey(k[i])) {
                                     if (
@@ -572,6 +586,9 @@ function setupProgramBlocks(activity) {
                         // Copy any internal entries now.
                         const k = Object.keys(d);
                         for (let i = 0; i < k.length; i++) {
+                            if (isUnsafeObjectKey(k[i])) {
+                                continue;
+                            }
                             Turtle.DictActions.SetDictValue(target, turtle, k[i], d[k[i]]);
                             if (!isTurtleStatusKey(k[i])) {
                                 if (
@@ -1041,14 +1058,39 @@ function setupProgramBlocks(activity) {
 
             if (typeof args[0] === "string") {
                 // Look for a block with logo name
+                let staticMatch = -1;
                 for (let i = 0; i < activity.blocks.blockList.length; i++) {
-                    if (
-                        activity.blocks.blockList[i]?.protoblock.staticLabels.length > 0 &&
-                        activity.blocks.blockList[i].protoblock.staticLabels[0] === args[0]
-                    ) {
-                        args[0] = i;
-                        return;
+                    const candidate = activity.blocks.blockList[i];
+                    if (!candidate || candidate.trash) {
+                        continue;
                     }
+
+                    let matchesName;
+
+                    if (candidate.name === "action") {
+                        matchesName =
+                            logo.actions &&
+                            Object.prototype.hasOwnProperty.call(logo.actions, args[0]) &&
+                            candidate.connections[2] === logo.actions[args[0]];
+                    } else {
+                        matchesName =
+                            candidate.protoblock.staticLabels.length > 0 &&
+                            candidate.protoblock.staticLabels[0] === args[0];
+                    }
+
+                    if (matchesName) {
+                        if (candidate.name === "action") {
+                            args[0] = i;
+                            break;
+                        }
+                        if (staticMatch === -1) {
+                            staticMatch = i;
+                        }
+                    }
+                }
+
+                if (typeof args[0] === "string" && staticMatch !== -1) {
+                    args[0] = staticMatch;
                 }
             }
 

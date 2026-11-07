@@ -678,6 +678,91 @@ describe("ChordBuilderWidget", () => {
             expect(String(widget.numBars)).toBe(shown);
         });
 
+        it("reveals an appended chord and preserves the exported progression", () => {
+            const barsInput = body.querySelector("#chordNumBarsInput");
+            barsInput.value = "1";
+            barsInput.dispatchEvent(new Event("change"));
+            widget.loadPreset("pop");
+            body.querySelector(".chord-card-add-btn").click();
+
+            expect(widget.numBars).toBe(2);
+            expect(barsInput.value).toBe("2");
+            expect(body.querySelectorAll(".bar-grid-remove-btn")).toHaveLength(5);
+            expect(body.querySelectorAll(".bar-grid-cell")[4].textContent).toContain("C");
+            widget.saveToBlocks();
+            const stack = mockBlocks.loadNewBlocks.mock.calls[0][0];
+            expect(
+                stack.filter(block => block[1][0] === "notename").map(block => block[1][1].value)
+            ).toEqual(["C", "G", "A", "F", "C"]);
+        });
+
+        it.each([
+            [2, 4],
+            [3, 3],
+            [4, 2],
+            [6, 2]
+        ])("shows the entire Canon preset with %i beats per bar", (beats, bars) => {
+            const beatsSelect = body.querySelector("#chordBeatsSelect");
+            beatsSelect.value = String(beats);
+            beatsSelect.dispatchEvent(new Event("change"));
+            const barsInput = body.querySelector("#chordNumBarsInput");
+            barsInput.value = "1";
+            barsInput.dispatchEvent(new Event("change"));
+            widget.loadPreset("canon");
+
+            expect(widget.numBars).toBe(bars);
+            expect(barsInput.value).toBe(String(bars));
+            expect(body.querySelectorAll(".bar-grid-remove-btn")).toHaveLength(8);
+        });
+
+        it("keeps existing chords visible when fewer bars or beats are requested", () => {
+            widget.loadPreset("canon");
+            const original = [...widget.progression];
+            const barsInput = body.querySelector("#chordNumBarsInput");
+            barsInput.value = "1";
+            barsInput.dispatchEvent(new Event("change"));
+            expect(barsInput.value).toBe("2");
+            const beatsSelect = body.querySelector("#chordBeatsSelect");
+            beatsSelect.value = "2";
+            beatsSelect.dispatchEvent(new Event("change"));
+
+            expect(barsInput.value).toBe("4");
+            expect(widget.progression).toEqual(original);
+            expect(body.querySelectorAll(".bar-grid-remove-btn")).toHaveLength(8);
+        });
+
+        it("rejects an extra chord at the bar limit without changing existing work", () => {
+            const beatsSelect = body.querySelector("#chordBeatsSelect");
+            beatsSelect.value = "2";
+            beatsSelect.dispatchEvent(new Event("change"));
+            for (let i = 0; i < 32; i++) widget.addChord(widget.diatonicChords[0]);
+            const original = [...widget.progression];
+            mockAudio.playChord.mockClear();
+            body.querySelector(".chord-card-add-btn").click();
+
+            expect(widget.numBars).toBe(16);
+            expect(widget.progression).toEqual(original);
+            expect(body.querySelectorAll(".bar-grid-remove-btn")).toHaveLength(32);
+            expect(mockActivity.errorMsg).toHaveBeenCalled();
+            expect(mockAudio.playChord).not.toHaveBeenCalled();
+        });
+
+        it("rejects a beat reduction that cannot fit within the bar limit", () => {
+            const beatsSelect = body.querySelector("#chordBeatsSelect");
+            beatsSelect.value = "6";
+            beatsSelect.dispatchEvent(new Event("change"));
+            for (let i = 0; i < 33; i++) widget.addChord(widget.diatonicChords[0]);
+            const original = [...widget.progression];
+            beatsSelect.value = "2";
+            beatsSelect.dispatchEvent(new Event("change"));
+
+            expect(widget.beatsPerBar).toBe(6);
+            expect(beatsSelect.value).toBe("6");
+            expect(widget.progression).toEqual(original);
+            expect(body.querySelectorAll(".bar-grid-remove-btn")).toHaveLength(33);
+            expect(mockActivity.errorMsg).toHaveBeenCalled();
+        });
+
         it("handles play/stop button toggling and progression playback callbacks", () => {
             widget.progression = [{ name: "C", roman: "I", notes: ["C", "E", "G"] }];
 

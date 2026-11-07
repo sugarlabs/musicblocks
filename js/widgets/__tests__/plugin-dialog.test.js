@@ -380,4 +380,180 @@ describe("PluginDialog", () => {
             expect(select.value).toBe("rodi");
         });
     });
+
+    describe("accessibility and keyboard interaction", () => {
+        let triggerButton;
+
+        beforeEach(() => {
+            triggerButton = document.createElement("button");
+            triggerButton.id = "trigger-plugin-btn";
+            document.body.appendChild(triggerButton);
+            triggerButton.focus();
+        });
+
+        it("applies W3C ARIA dialog attributes and labels to openPlugin modal", () => {
+            const dialog = new PluginDialog();
+            dialog.openPlugin();
+
+            const modal = document.getElementById("open-plugin-modal");
+            expect(modal.getAttribute("role")).toBe("dialog");
+            expect(modal.getAttribute("aria-modal")).toBe("true");
+            expect(modal.getAttribute("aria-labelledby")).toBe("open-plugin-title");
+            expect(modal.getAttribute("aria-describedby")).toBe("open-plugin-message");
+            expect(modal.tabIndex).toBe(-1);
+
+            const title = document.getElementById("open-plugin-title");
+            const message = document.getElementById("open-plugin-message");
+            expect(title).toBeTruthy();
+            expect(message).toBeTruthy();
+        });
+
+        it("applies W3C ARIA dialog attributes and labels to deletePlugin modal", () => {
+            const dialog = new PluginDialog({ getLoadedPlugins: () => ["weather"] });
+            dialog.deletePlugin();
+
+            const modal = document.getElementById("delete-plugin-confirm");
+            expect(modal.getAttribute("role")).toBe("dialog");
+            expect(modal.getAttribute("aria-modal")).toBe("true");
+            expect(modal.getAttribute("aria-labelledby")).toBe("delete-plugin-title");
+            expect(modal.getAttribute("aria-describedby")).toBe("delete-plugin-message");
+            expect(modal.tabIndex).toBe(-1);
+
+            const title = document.getElementById("delete-plugin-title");
+            const message = document.getElementById("delete-plugin-message");
+            expect(title).toBeTruthy();
+            expect(message).toBeTruthy();
+        });
+
+        it("applies W3C ARIA alertdialog attributes and labels to no-plugins modal", () => {
+            const dialog = new PluginDialog({ getLoadedPlugins: () => [] });
+            dialog.deletePlugin();
+
+            const modal = document.getElementById("no-plugins-msg");
+            expect(modal.getAttribute("role")).toBe("alertdialog");
+            expect(modal.getAttribute("aria-modal")).toBe("true");
+            expect(modal.getAttribute("aria-labelledby")).toBe("no-plugins-title");
+            expect(modal.getAttribute("aria-describedby")).toBe("no-plugins-message");
+            expect(modal.tabIndex).toBe(-1);
+
+            const title = document.getElementById("no-plugins-title");
+            const message = document.getElementById("no-plugins-message");
+            expect(title).toBeTruthy();
+            expect(message).toBeTruthy();
+        });
+
+        it("auto-focuses primary interactive control when opening modals", () => {
+            const dialog = new PluginDialog({ getLoadedPlugins: () => ["weather"] });
+
+            dialog.openPlugin();
+            const openModal = document.getElementById("open-plugin-modal");
+            const openSelect = openModal.querySelector("select");
+            expect(document.activeElement).toBe(openSelect);
+            dialog._closeModal(openModal);
+
+            dialog.deletePlugin();
+            const deleteModal = document.getElementById("delete-plugin-confirm");
+            const deleteSelect = deleteModal.querySelector("select");
+            expect(document.activeElement).toBe(deleteSelect);
+            dialog._closeModal(deleteModal);
+
+            const emptyDialog = new PluginDialog({ getLoadedPlugins: () => [] });
+            emptyDialog.deletePlugin();
+            const noPluginsModal = document.getElementById("no-plugins-msg");
+            const okBtn = noPluginsModal.querySelector("button");
+            expect(document.activeElement).toBe(okBtn);
+        });
+
+        it("pressing Escape closes openPlugin modal and restores focus", () => {
+            const dialog = new PluginDialog();
+            dialog.openPlugin();
+
+            expect(document.getElementById("open-plugin-modal")).toBeTruthy();
+            expect(document.querySelector(".plugin-modal-backdrop")).toBeTruthy();
+
+            const escapeEvent = new KeyboardEvent("keydown", { key: "Escape", bubbles: true });
+            document.dispatchEvent(escapeEvent);
+
+            expect(document.getElementById("open-plugin-modal")).toBeNull();
+            expect(document.querySelector(".plugin-modal-backdrop")).toBeNull();
+            expect(document.activeElement).toBe(triggerButton);
+        });
+
+        it("pressing Escape closes deletePlugin modal and restores focus", () => {
+            const dialog = new PluginDialog({ getLoadedPlugins: () => ["weather"] });
+            dialog.deletePlugin();
+
+            expect(document.getElementById("delete-plugin-confirm")).toBeTruthy();
+
+            const escapeEvent = new KeyboardEvent("keydown", { key: "Escape", bubbles: true });
+            document.dispatchEvent(escapeEvent);
+
+            expect(document.getElementById("delete-plugin-confirm")).toBeNull();
+            expect(document.querySelector(".plugin-modal-backdrop")).toBeNull();
+            expect(document.activeElement).toBe(triggerButton);
+        });
+
+        it("pressing Escape closes no-plugins-msg modal and restores focus", () => {
+            const dialog = new PluginDialog({ getLoadedPlugins: () => [] });
+            dialog.deletePlugin();
+
+            expect(document.getElementById("no-plugins-msg")).toBeTruthy();
+
+            const escapeEvent = new KeyboardEvent("keydown", { key: "Escape", bubbles: true });
+            document.dispatchEvent(escapeEvent);
+
+            expect(document.getElementById("no-plugins-msg")).toBeNull();
+            expect(document.querySelector(".plugin-modal-backdrop")).toBeNull();
+            expect(document.activeElement).toBe(triggerButton);
+        });
+
+        it("clicking backdrop restores focus to invoking element", () => {
+            const dialog = new PluginDialog();
+            dialog.openPlugin();
+
+            const backdrop = document.querySelector(".plugin-modal-backdrop");
+            backdrop.click();
+
+            expect(document.getElementById("open-plugin-modal")).toBeNull();
+            expect(document.activeElement).toBe(triggerButton);
+        });
+
+        it("traps focus inside the modal with cyclic Tab navigation", () => {
+            const dialog = new PluginDialog();
+            dialog.openPlugin();
+
+            const modal = document.getElementById("open-plugin-modal");
+            const focusable = Array.from(
+                modal.querySelectorAll(
+                    "button:not([disabled]), select:not([disabled]), input:not([disabled])"
+                )
+            );
+            const firstEl = focusable[0];
+            const lastEl = focusable[focusable.length - 1];
+
+            lastEl.focus();
+            expect(document.activeElement).toBe(lastEl);
+
+            const tabEvent = new KeyboardEvent("keydown", {
+                key: "Tab",
+                bubbles: true,
+                cancelable: true
+            });
+            const defaultPrevented = !document.dispatchEvent(tabEvent);
+
+            expect(defaultPrevented).toBe(true);
+            expect(document.activeElement).toBe(firstEl);
+
+            const shiftTabEvent = new KeyboardEvent("keydown", {
+                key: "Tab",
+                shiftKey: true,
+                bubbles: true,
+                cancelable: true
+            });
+            const shiftDefaultPrevented = !document.dispatchEvent(shiftTabEvent);
+
+            expect(shiftDefaultPrevented).toBe(true);
+            expect(document.activeElement).toBe(lastEl);
+        });
+    });
 });
