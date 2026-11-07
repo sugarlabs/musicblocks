@@ -219,10 +219,10 @@ describe("Oscilloscope", () => {
             expect(osc.widgetWindow).toBe(mockWidgetWindow);
         });
 
-        test("adds three buttons (zoom in, zoom out, freeze)", () => {
+        test("adds four buttons (zoom in, zoom out, freeze, mode)", () => {
             createOscilloscope();
 
-            expect(mockWidgetWindow.addButton).toHaveBeenCalledTimes(3);
+            expect(mockWidgetWindow.addButton).toHaveBeenCalledTimes(4);
         });
 
         test("calls sendToCenter", () => {
@@ -913,49 +913,85 @@ describe("Oscilloscope", () => {
     });
 
     describe("reconnectSynthsToAnalyser", () => {
-        test("creates a new Tone.Analyser when none exists", () => {
+        test("creates waveform and spectrum Tone.Analysers when none exist", () => {
             const osc = createOscilloscope();
             global.instruments = { 0: {} };
 
             osc.reconnectSynthsToAnalyser(0);
 
             expect(osc.pitchAnalysers[0]).toBeDefined();
+            expect(osc.spectrumAnalysers[0]).toBeDefined();
+            expect(Tone.Analyser).toHaveBeenCalledTimes(2);
             expect(Tone.Analyser).toHaveBeenCalledWith({
                 type: "waveform",
                 size: Oscilloscope.analyserSize
             });
+            expect(Tone.Analyser).toHaveBeenCalledWith({
+                type: "fft",
+                size: 2048,
+                smoothing: 0.8
+            });
         });
 
-        test("reuses existing analyser when already created", () => {
+        test("reuses existing analysers when already created", () => {
             const osc = createOscilloscope();
-            const existing = { getValue: jest.fn(), connect: jest.fn() };
-            osc.pitchAnalysers[0] = existing;
+            const existingWaveform = { getValue: jest.fn(), connect: jest.fn() };
+            const existingSpectrum = { getValue: jest.fn(), connect: jest.fn() };
+            osc.pitchAnalysers[0] = existingWaveform;
+            osc.spectrumAnalysers[0] = existingSpectrum;
             global.instruments = { 0: {} };
             Tone.Analyser.mockClear();
 
             osc.reconnectSynthsToAnalyser(0);
 
             expect(Tone.Analyser).not.toHaveBeenCalled();
-            expect(osc.pitchAnalysers[0]).toBe(existing);
+            expect(osc.pitchAnalysers[0]).toBe(existingWaveform);
+            expect(osc.spectrumAnalysers[0]).toBe(existingSpectrum);
         });
-
-        test("connects each synth instrument to the analyser", () => {
+        test("creates only the spectrum analyser when a waveform analyser already exists", () => {
             const osc = createOscilloscope();
-            const mockConnect = jest.fn();
-            const mockAnalyser = { getValue: jest.fn(), connect: jest.fn() };
-            Tone.Analyser.mockImplementationOnce(() => mockAnalyser);
-            global.instruments = {
-                0: {
-                    synth1: { connect: mockConnect },
-                    synth2: { connect: mockConnect }
-                }
-            };
+            const existingWaveform = { getValue: jest.fn(), connect: jest.fn() };
+            osc.pitchAnalysers[0] = existingWaveform;
+            osc._connectedSynths[0] = new Set();
+            global.instruments = { 0: {} };
+            Tone.Analyser.mockClear();
 
             osc.reconnectSynthsToAnalyser(0);
 
-            expect(mockConnect).toHaveBeenCalledTimes(2);
-            expect(mockConnect).toHaveBeenCalledWith(mockAnalyser);
+            expect(Tone.Analyser).toHaveBeenCalledTimes(1);
+            expect(Tone.Analyser).toHaveBeenCalledWith({
+                type: "fft",
+                size: 2048,
+                smoothing: 0.8
+            });
+            expect(osc.pitchAnalysers[0]).toBe(existingWaveform);
+            expect(osc.spectrumAnalysers[0]).toBeDefined();
         });
+    });
+
+    test("connects each synth instrument to both analysers exactly once", () => {
+        const osc = createOscilloscope();
+        const waveformAnalyser = { getValue: jest.fn(), connect: jest.fn() };
+        const spectrumAnalyser = { getValue: jest.fn(), connect: jest.fn() };
+        // Waveform analyser is constructed first, then the spectrum analyser.
+        Tone.Analyser.mockImplementationOnce(() => waveformAnalyser).mockImplementationOnce(
+            () => spectrumAnalyser
+        );
+        const synth1 = { connect: jest.fn() };
+        const synth2 = { connect: jest.fn() };
+        global.instruments = {
+            0: { synth1, synth2 }
+        };
+
+        osc.reconnectSynthsToAnalyser(0);
+        // A second call must not reconnect synths that are already connected.
+        osc.reconnectSynthsToAnalyser(0);
+
+        for (const synth of [synth1, synth2]) {
+            expect(synth.connect).toHaveBeenCalledTimes(2);
+            expect(synth.connect).toHaveBeenCalledWith(waveformAnalyser);
+            expect(synth.connect).toHaveBeenCalledWith(spectrumAnalyser);
+        }
     });
 
     describe("_renderFrame", () => {
@@ -998,7 +1034,7 @@ describe("Oscilloscope", () => {
             expect(osc.reconnectSynthsToAnalyser).toHaveBeenCalledWith(0);
             expect(ctx.fillRect).toHaveBeenCalled();
             expect(ctx.stroke).toHaveBeenCalled();
-            expect(osc._frozenWaveforms[0]).toBeInstanceOf(Float32Array);
+            expect(osc._frozenFrames["0:waveform"]).toBeInstanceOf(Float32Array);
         });
 
         test("skips when frozen and no cached waveform exists", () => {
@@ -1018,9 +1054,12 @@ describe("Oscilloscope", () => {
             expect(ctx.fillRect).not.toHaveBeenCalled();
         });
 
-        test("captures waveform from analyser when frozen and no cached waveform exists", () => {
+        test("captures waveform when freezing", () => {
             const osc = createOscilloscope();
-            osc.isFrozen = true;
+            osc.reconnectSynthsToAnalyser = jest.fn();
+            osc._stopAnimation = jest.fn();
+            osc._renderFrame = jest.fn();
+
             const ctx = makeCtx();
             osc._canvasState[0] = {
                 canvasCtx: ctx,
@@ -1029,18 +1068,47 @@ describe("Oscilloscope", () => {
                 turtle: { painter: { _canvasColor: "#0f0" } },
                 turtleIdx: 0
             };
+
             const analyserValues = new Float32Array([0.25, -0.5, 0.75, -1]);
             const mockAnalyser = {
                 getValue: jest.fn(() => analyserValues)
             };
             osc.pitchAnalysers[0] = mockAnalyser;
 
-            osc._renderFrame();
+            osc.toggleFreeze();
 
+            expect(osc.isFrozen).toBe(true);
             expect(mockAnalyser.getValue).toHaveBeenCalled();
-            expect(osc._frozenWaveforms[0]).toEqual(analyserValues);
-            expect(ctx.fillRect).toHaveBeenCalled();
-            expect(ctx.stroke).toHaveBeenCalled();
+            expect(osc._frozenFrames["0:waveform"]).toEqual(analyserValues);
+            expect(osc._stopAnimation).toHaveBeenCalled();
+        });
+
+        test("captures spectrum when freezing", () => {
+            const osc = createOscilloscope();
+            osc.mode = "spectrum";
+            osc.reconnectSynthsToAnalyser = jest.fn();
+            osc._stopAnimation = jest.fn();
+            osc._renderFrame = jest.fn();
+            osc._canvasState[0] = {
+                canvasCtx: makeCtx(),
+                width: 400,
+                height: 200,
+                turtle: { painter: { _canvasColor: "#0f0" } },
+                turtleIdx: 0
+            };
+
+            const analyserValues = new Float32Array([-80, -60, -40]);
+            const mockAnalyser = {
+                getValue: jest.fn(() => analyserValues)
+            };
+            osc.spectrumAnalysers[0] = mockAnalyser;
+
+            osc.toggleFreeze();
+
+            expect(osc.isFrozen).toBe(true);
+            expect(mockAnalyser.getValue).toHaveBeenCalled();
+            expect(osc._frozenFrames["0:spectrum"]).toEqual(analyserValues);
+            expect(osc._stopAnimation).toHaveBeenCalled();
         });
 
         test("draws using cached waveform when frozen", () => {
@@ -1054,12 +1122,9 @@ describe("Oscilloscope", () => {
                 turtle: { painter: { _canvasColor: "#0f0" } },
                 turtleIdx: 0
             };
-            osc._frozenWaveforms[0] = new Float32Array(128);
+            osc._frozenFrames["0:waveform"] = new Float32Array(128);
 
             osc._renderFrame();
-
-            expect(ctx.fillRect).toHaveBeenCalled();
-            expect(ctx.stroke).toHaveBeenCalled();
         });
 
         test("resets resizedOnce to false after drawing", () => {

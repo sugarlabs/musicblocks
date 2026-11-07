@@ -13,3 +13,7 @@ Docs/architecture/dev_architecture.html
 # Stryker mutation testing
 .stryker-tmp/
 reports/
+
+# Cypress test artifacts
+/cypress/downloads/
+/cypress/screenshots/
