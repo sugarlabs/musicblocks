@@ -392,6 +392,14 @@ describe("setupSensorsBlocks", () => {
                 global.platformColor.background = "#abc";
                 expect(block.getBackgroundRGB()).toEqual([170, 187, 204]);
             });
+
+            it("should return the color set by the background block over the theme's", () => {
+                activity.turtles._backgroundColor = "rgba(0,0,255,1)";
+                expect(block.getBackgroundRGB()).toEqual([0, 0, 255]);
+
+                activity.turtles._backgroundColor = "#00ff00";
+                expect(block.getBackgroundRGB()).toEqual([0, 255, 0]);
+            });
         });
 
         describe("getFallbackColor", () => {
@@ -437,6 +445,13 @@ describe("setupSensorsBlocks", () => {
             expect(DummyFlowBlock.createdBlocks["getred"].arg(logo, turtleIndex)).toBe(20);
             expect(DummyFlowBlock.createdBlocks["getgreen"].arg(logo, turtleIndex)).toBe(40);
             expect(DummyFlowBlock.createdBlocks["getblue"].arg(logo, turtleIndex)).toBe(60);
+        });
+
+        it("should return the background block's color for a transparent pixel", () => {
+            activity.turtles._backgroundColor = "rgba(0,0,255,1)";
+            mockCanvasPixel([255, 0, 0, 0]);
+            expect(DummyFlowBlock.createdBlocks["getred"].arg(logo, turtleIndex)).toBe(0);
+            expect(DummyFlowBlock.createdBlocks["getblue"].arg(logo, turtleIndex)).toBe(100);
         });
 
         it("should return the fallback gray if the canvas cannot be read", () => {

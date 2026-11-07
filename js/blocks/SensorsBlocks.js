@@ -687,14 +687,15 @@ function setupSensorsBlocks(activity) {
         }
 
         /**
-         * Retrieves the red, green and blue values of the background.
+         * Retrieves the red, green and blue values of the background, the one set by the
+         * background block if any, otherwise the theme's.
          * @returns {number[]} - The red, green and blue values of the background.
          */
         getBackgroundRGB() {
             let r;
             let g;
             let b;
-            const background = platformColor.background;
+            const background = activity.turtles?._backgroundColor || platformColor.background;
 
             if (isValidHex(background)) {
                 const rgb = hexToRGB(background);
