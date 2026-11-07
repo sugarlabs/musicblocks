@@ -509,6 +509,19 @@ class SearchController {
                 };
             }
             $search.data("autocomplete-init", true);
+
+            // Restore suggestions when refocusing a populated search input.
+            if (activity.searchWidget.addEventListener) {
+                activity.searchWidget.addEventListener("focus", () => {
+                    const input = activity.searchWidget;
+
+                    if (input.style.visibility !== "visible" || !input.value?.trim()) {
+                        return;
+                    }
+
+                    $search.autocomplete("search", input.value);
+                });
+            }
         }
 
         const searchInput = activity.searchWidget.idInput_custom;
@@ -545,6 +558,7 @@ class SearchController {
         }
 
         activity.searchWidget.value = "";
+        activity.searchWidget.idInput_custom = "";
         activity.update = true;
     }
 
@@ -896,6 +910,7 @@ class SearchController {
         }
 
         activity.helpfulSearchWidget.value = "";
+        activity.helpfulSearchWidget.idInput_custom = "";
         document.getElementById("helpfulSearchDiv").style.display = "none";
         activity.update = true;
     }
