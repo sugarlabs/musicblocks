@@ -1125,6 +1125,22 @@ describe("Turtle.TurtleView", () => {
             expect(view.container.addChild).toHaveBeenCalledWith(view._bitmap);
         });
 
+        it("does not let an older shell request replace the latest shell", () => {
+            const view = makeView();
+            view._bitmap = new createjs.Bitmap("old.png");
+
+            view.doTurtleShell(55, "older-shell.png");
+            view.doTurtleShell(55, "newer-shell.png");
+            images[1].onload();
+            const latestBitmap = view._bitmap;
+            view.container.removeChild.mockClear();
+
+            images[0].onload();
+
+            expect(view._bitmap).toBe(latestBitmap);
+            expect(view.container.removeChild).not.toHaveBeenCalledWith(latestBitmap);
+        });
+
         it("scales the shell to the requested size and centres it on the turtle", () => {
             const view = makeView();
             view.orientation = 30;
