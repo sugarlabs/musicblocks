@@ -963,7 +963,7 @@ function _applyRepeats(
         if (
             firstEndingStartIndex !== null &&
             firstEndingStartIndex >= startIndex &&
-            nextNoteId !== null &&
+            nextFlowId !== null &&
             Number.isSafeInteger(times) &&
             times >= 2 &&
             times <= _MAX_FLATTENED_ENDING_REPETITIONS
@@ -990,8 +990,8 @@ function _applyRepeats(
                 copies.push(...finalPass.blocks);
                 previousEnd = finalPass.blocks.find(block => block[0] === finalPass.lastId);
             }
-            previousEnd[4][1] = nextNoteId;
-            byId.get(nextNoteId)[4][0] = previousEnd[0];
+            previousEnd[4][1] = nextFlowId;
+            byId.get(nextFlowId)[4][0] = previousEnd[0];
             copies.forEach(block => byId.set(block[0], block));
             noteBlocks.push(...copies);
             continue;
