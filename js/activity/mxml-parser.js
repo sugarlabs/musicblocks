@@ -43,6 +43,11 @@ const _MXML_TYPE_DENOMINATOR = {
     "256th": 256
 };
 
+// Alternate endings are expanded into individual blocks because a Music
+// Blocks repeat clamp has no final-pass branch. Keep that expansion bounded;
+// larger repeat counts retain the existing repeat-clamp representation.
+const _MAX_FLATTENED_ENDING_REPETITIONS = 16;
+
 const _text = (parent, tag) => parent.querySelector(`:scope > ${tag}`)?.textContent ?? null;
 
 const _isUsableFraction = fraction => {
@@ -626,6 +631,22 @@ function _createNoteBlocks(blockId, duration, content, prevId) {
 }
 
 /**
+ * Replaces a generated note block's duration fraction.
+ *
+ * @param {Array} blocks - the block literals that contain the note
+ * @param {number} noteId - the newnote block id
+ * @param {[number, number]} duration - replacement [numerator, denominator]
+ * @returns {void}
+ */
+function _setNoteDuration(blocks, noteId, duration) {
+    const byId = new Map(blocks.map(block => [block[0], block]));
+    const note = byId.get(noteId);
+    const divide = byId.get(note[4][1]);
+    byId.get(divide[4][1])[1][1].value = duration[0];
+    byId.get(divide[4][2])[1][1].value = duration[1];
+}
+
+/**
  * The time signature in force at the start of the first part, from its first
  * <attributes><time>, defaulting to 4/4 when absent.
  * @param {Element} partEl - a MusicXML <part> element
@@ -729,11 +750,13 @@ function _buildPreamble(startId, title, voiceLabel, timeSignature, keySignature,
  *
  * Deliberately simple: ranges are assumed non-overlapping and non-nested (a
  * second forward repeat seen before a backward one just moves the pending
- * start forward, rather than stacking); MusicXML's multiple-ending ("volta")
- * repeats are not handled, the same gap js/activity/abc-parser.js's own
- * header comment already documents for ABC's alternate endings.
+ * start forward, rather than stacking). A simple first/second ending is
+ * flattened into its playable note sequence because a Music Blocks repeat
+ * clamp has no conditional final-iteration branch.
  *
- * @param {Array<{startIndex: number, endIndex: number, times: number}>} repeats
+ * @param {Array<{startIndex: number, endIndex: number, times: number,
+ *     firstEndingStartIndex: number|null,
+ *     bodyTieDurations: Array<{index: number, duration: [number, number]}>}>} repeats
  * @param {Array} noteBlocks - every note/rest/drum block literal for this
  *     part, already with the final note's trailing connection nulled
  *     (mutated in place: connections are redirected around each range)
@@ -758,12 +781,80 @@ function _applyRepeats(repeats, noteBlocks, noteStartIds, noteEndIds, blockId) {
     const byId = new Map(noteBlocks.map(block => [block[0], block]));
     const repeatBlocks = [];
 
-    for (const { startIndex, endIndex, times } of repeats) {
+    const cloneNotes = (startIndex, endIndex, prevId, durationOverrides = []) => {
+        const firstId = noteStartIds[startIndex];
+        const lastId = noteEndIds[endIndex];
+        const sourceBlocks = noteBlocks.filter(block => block[0] >= firstId && block[0] <= lastId);
+        const idMap = new Map(sourceBlocks.map((block, index) => [block[0], blockId + index]));
+        const blocks = sourceBlocks.map(block => [
+            idMap.get(block[0]),
+            Array.isArray(block[1]) ? [block[1][0], { ...block[1][1] }] : block[1],
+            block[2],
+            block[3],
+            block[4].map(connection => idMap.get(connection) ?? connection)
+        ]);
+        const firstBlock = blocks.find(block => block[0] === idMap.get(firstId));
+        const lastBlock = blocks.find(block => block[0] === idMap.get(lastId));
+        firstBlock[4][0] = prevId;
+        lastBlock[4][1] = null;
+        durationOverrides.forEach(({ index, duration }) => {
+            if (index >= startIndex && index <= endIndex) {
+                _setNoteDuration(blocks, idMap.get(noteStartIds[index]), duration);
+            }
+        });
+        blockId += blocks.length;
+        return { blocks, firstId: firstBlock[0], lastId: lastBlock[0] };
+    };
+
+    for (const {
+        startIndex,
+        endIndex,
+        times,
+        firstEndingStartIndex = null,
+        bodyTieDurations = []
+    } of repeats) {
         const startNote = byId.get(noteStartIds[startIndex]);
         const endHidden = byId.get(noteEndIds[endIndex]);
         const prevId = startNote[4][0];
         const prevBlock = byId.get(prevId);
         const nextNoteId = endIndex + 1 < noteStartIds.length ? noteStartIds[endIndex + 1] : null;
+
+        if (
+            firstEndingStartIndex !== null &&
+            firstEndingStartIndex >= startIndex &&
+            nextNoteId !== null &&
+            Number.isSafeInteger(times) &&
+            times >= 2 &&
+            times <= _MAX_FLATTENED_ENDING_REPETITIONS
+        ) {
+            // The original flow already plays the first ending once. Replay
+            // its body and first ending for every extra non-final pass, then
+            // replay only the body before falling through to the second ending.
+            let previousEnd = endHidden;
+            const copies = [];
+            for (let pass = 2; pass < times; pass++) {
+                const copy = cloneNotes(startIndex, endIndex, previousEnd[0]);
+                previousEnd[4][1] = copy.firstId;
+                copies.push(...copy.blocks);
+                previousEnd = copy.blocks.find(block => block[0] === copy.lastId);
+            }
+            if (firstEndingStartIndex > startIndex) {
+                const finalPass = cloneNotes(
+                    startIndex,
+                    firstEndingStartIndex - 1,
+                    previousEnd[0],
+                    bodyTieDurations
+                );
+                previousEnd[4][1] = finalPass.firstId;
+                copies.push(...finalPass.blocks);
+                previousEnd = finalPass.blocks.find(block => block[0] === finalPass.lastId);
+            }
+            previousEnd[4][1] = nextNoteId;
+            byId.get(nextNoteId)[4][0] = previousEnd[0];
+            copies.forEach(block => byId.set(block[0], block));
+            noteBlocks.push(...copies);
+            continue;
+        }
 
         const repeatId = blockId;
         const countId = blockId + 1;
@@ -829,6 +920,9 @@ function _processPart(partEl, blockId, chainPrevId, instrumentMap) {
     const noteEndIds = [];
     const repeats = [];
     let repeatPendingStart = null;
+    let firstEndingStartIndex = null;
+    let firstEndingBodyTie = null;
+    let bodyTieDurations = [];
     // The last note index any repeat range (explicit or implicit) has
     // already covered, so a second unpaired backward repeat starts right
     // after the first one instead of both claiming to start from 0 --
@@ -878,18 +972,65 @@ function _processPart(partEl, blockId, chainPrevId, instrumentMap) {
 
             if (child.tagName === "barline") {
                 const repeatEl = child.querySelector(":scope > repeat");
+                const endingEl = child.querySelector(":scope > ending");
                 const direction = repeatEl?.getAttribute("direction");
+                const startsFirstEnding =
+                    endingEl?.getAttribute("type") === "start" &&
+                    endingEl.getAttribute("number")?.trim() === "1";
+                if (startsFirstEnding) {
+                    // A tie may legitimately continue from the repeat body
+                    // into the first ending. Emit its body note now so it is
+                    // part of the final-pass clone, then extend that note if
+                    // the first ending supplies the matching tie stop.
+                    if (tieDuration !== null) {
+                        const index = noteStartIds.length;
+                        const duration = tieDuration;
+                        const content = tieContent;
+                        emitNote(tieDuration, tieContent);
+                        firstEndingBodyTie = { index, duration, content };
+                        bodyTieDurations.push({ index, duration });
+                        tieDuration = null;
+                        tieContent = null;
+                    }
+                    firstEndingStartIndex = noteStartIds.length;
+                }
                 if (direction === "forward") {
                     repeatPendingStart = noteStartIds.length;
                 } else if (direction === "backward") {
-                    const times = Number(repeatEl.getAttribute("times")) || 2;
+                    if (firstEndingStartIndex !== null && tieDuration !== null) {
+                        emitNote(tieDuration, tieContent);
+                        tieDuration = null;
+                        tieContent = null;
+                    }
+                    const parsedTimes = Number(repeatEl.getAttribute("times"));
+                    const times =
+                        Number.isSafeInteger(parsedTimes) && parsedTimes > 0 ? parsedTimes : 2;
                     const startIndex = repeatPendingStart ?? lastRepeatEnd + 1;
                     const endIndex = noteStartIds.length - 1;
                     if (endIndex >= startIndex) {
-                        repeats.push({ startIndex, endIndex, times });
+                        repeats.push({
+                            startIndex,
+                            endIndex,
+                            times,
+                            firstEndingStartIndex,
+                            bodyTieDurations
+                        });
                         lastRepeatEnd = endIndex;
                     }
                     repeatPendingStart = null;
+                    firstEndingStartIndex = null;
+                    firstEndingBodyTie = null;
+                    bodyTieDurations = [];
+                } else if (
+                    firstEndingStartIndex !== null &&
+                    (endingEl?.getAttribute("type") === "stop" ||
+                        endingEl?.getAttribute("type") === "discontinue")
+                ) {
+                    // An ending can close without a backward repeat. Do not
+                    // let that unrelated marker affect a later repeat.
+                    firstEndingStartIndex = null;
+                    firstEndingBodyTie = null;
+                    bodyTieDurations = [];
                 }
                 continue;
             }
@@ -923,6 +1064,19 @@ function _processPart(partEl, blockId, chainPrevId, instrumentMap) {
                 const type = tieEl.getAttribute("type");
                 if (type === "start") hasTieStart = true;
                 if (type === "stop") hasTieStop = true;
+            }
+
+            if (firstEndingBodyTie !== null) {
+                if (hasTieStop && _contentsEqual(content, firstEndingBodyTie.content)) {
+                    _setNoteDuration(
+                        noteBlocks,
+                        noteStartIds[firstEndingBodyTie.index],
+                        _addFractions(firstEndingBodyTie.duration, duration)
+                    );
+                    firstEndingBodyTie = null;
+                    continue;
+                }
+                firstEndingBodyTie = null;
             }
 
             // Only a note that both has a tie stop and shares the open tie's
