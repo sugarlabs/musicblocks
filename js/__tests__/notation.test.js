@@ -148,6 +148,19 @@ describe("Notation Class", () => {
             expect(notation._notationDrumStaging.turtle1[0][0]).toEqual(["drums"]);
         });
 
+        it("should write each symbol once when only some drums share one", () => {
+            getDrumSymbol
+                .mockReturnValueOnce("bd")
+                .mockReturnValueOnce("bd")
+                .mockReturnValueOnce("sn");
+            notation.doUpdateNotation(["R"], 4, "turtle1", false, [
+                "kick drum",
+                "bass drum",
+                "snare drum"
+            ]);
+            expect(notation._notationDrumStaging.turtle1[0][0]).toEqual(["bd", "sn"]);
+        });
+
         it("should keep the drum when a note also holds noise", () => {
             notation.doUpdateNotation(["R"], 4, "turtle1", false, ["noise1", "snare drum"]);
             expect(notation._notationStaging.turtle1[0][7]).toEqual(["snare drum"]);

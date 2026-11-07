@@ -1516,7 +1516,7 @@ describe("saveMxmlOutput - short notes keep whole-number durations", () => {
 
 describe("saveMxmlOutput - forever repeats", () => {
     const note = (pitch, noteValue = 4) => [[pitch], noteValue, 0, null, null, false, false];
-    const drum = (name, noteValue = 4) => [[], noteValue, 0, null, null, false, false, name];
+    const drum = (name, noteValue = 4) => [[], noteValue, 0, null, null, false, false, [name]];
 
     const exportVoice = staged => {
         const xml = saveMxmlOutput({ notation: { notationStaging: { 0: staged } } });
@@ -1587,6 +1587,11 @@ describe("saveMxmlOutput - forever repeats", () => {
 
     it("gives a drum part the same repeat", () => {
         const doc = exportVoice(["begin repeat", drum("snare drum"), drum("kick drum")]);
+        const instruments = [...doc.querySelectorAll("note > instrument")].map(el =>
+            el.getAttribute("id")
+        );
+
+        expect(instruments).toEqual(["D1-X1", "D1-X2"]);
         const part = doc.getElementsByTagName("part")[0];
 
         expect(part.getAttribute("id")).toBe("D1");
