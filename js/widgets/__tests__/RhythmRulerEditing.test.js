@@ -318,4 +318,67 @@ describe("RhythmRulerEditing", () => {
             expect(widget.activity.logo.synth.trigger).toHaveBeenCalledTimes(4);
         });
     });
+
+    describe("__dissectByNumber subdivision validation", () => {
+        const makeDissectWidget = () => {
+            const table = document.createElement("table");
+            const row = table.insertRow();
+            const cell = row.insertCell();
+            cell.cellIndex = 0;
+            document.body.append(table);
+
+            const widget = Object.assign(Object.create(RhythmRuler.prototype), {
+                activity: {
+                    errorMsg: jest.fn(),
+                    hideMsgs: jest.fn()
+                },
+                Rulers: [[[4], []]],
+                _rulers: [row],
+                _rulerSelected: 0,
+                _undoList: [],
+                _noteWidth: jest.fn(() => 100),
+                _calculateZebraStripes: jest.fn(),
+                _refreshCircularView: jest.fn(),
+                __addCellEventHandlers: jest.fn()
+            });
+
+            return { widget, cell, row };
+        };
+
+        afterEach(() => {
+            document.body.replaceChildren();
+        });
+
+        test.each([0, 1, 2.5, -1, -5, NaN, Infinity, -Infinity])(
+            "rejects invalid subdivision %s without mutating the ruler",
+            subdivision => {
+                const { widget, cell, row } = makeDissectWidget();
+                const initialCellCount = row.cells.length;
+                const initialNotes = [...widget.Rulers[0][0]];
+
+                RhythmRulerEditing.prototype.__dissectByNumber.call(
+                    widget,
+                    cell,
+                    subdivision,
+                    true
+                );
+
+                expect(row.cells).toHaveLength(initialCellCount);
+                expect(widget.Rulers[0][0]).toEqual(initialNotes);
+                expect(widget._undoList).toHaveLength(0);
+                expect(widget.Rulers[0][1]).toHaveLength(0);
+            }
+        );
+
+        test("splits cell and updates noteValues when subdivision is valid (>= 2)", () => {
+            const { widget, cell, row } = makeDissectWidget();
+
+            RhythmRulerEditing.prototype.__dissectByNumber.call(widget, cell, 2, true);
+
+            expect(row.cells).toHaveLength(2);
+            expect(widget.Rulers[0][0]).toEqual([8, 8]);
+            expect(widget._undoList).toEqual([["dissect", 0]]);
+            expect(widget.Rulers[0][1]).toEqual([[0, 2]]);
+        });
+    });
 });

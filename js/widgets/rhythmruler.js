@@ -18,7 +18,8 @@
    global
 
    TONEBPM, Singer, _, ManagedTimer, RhythmRulerLayout, RhythmRulerHistory,
-   RhythmRulerEditing, RhythmRulerPlayback, RhythmRulerSave, RhythmRulerCircular
+   RhythmRulerEditing, RhythmRulerPlayback, RhythmRulerSave, RhythmRulerCircular,
+   clampNumber
 */
 /*
     Globals location
@@ -28,6 +29,8 @@
         Singer
     - js/utils/utils.js
         _
+    - js/utils/utils-logic.js
+        clampNumber
     - js/utils/ManagedTimer.js
         ManagedTimer
     - js/widgets/RhythmRulerLayout.js, RhythmRulerHistory.js, RhythmRulerEditing.js,
@@ -560,6 +563,23 @@ class RhythmRuler {
     }
 
     /**
+     * Validates and returns the dissection subdivision count from the input element.
+     * Ensures an integer clamped between 2 and 128, defaulting to 2 on invalid or < 2 input.
+     * Keeps the input element display synchronized with the normalized count.
+     * @private
+     * @returns {number} The validated subdivision count (>= 2).
+     */
+    _getDissectNumber() {
+        const rawValue = this._dissectNumber ? this._dissectNumber.value : "";
+        const parsed = parseInt(rawValue, 10);
+        const validated = clampNumber(parsed, 2, 128);
+        if (this._dissectNumber) {
+            this._dissectNumber.value = validated;
+        }
+        return validated;
+    }
+
+    /**
      * Replaces a button/cell's contents with a single header-icon <img>.
      * Centralizes the icon markup shared by the toolbar and per-ruler play buttons.
      * @private
@@ -570,6 +590,9 @@ class RhythmRuler {
      * @returns {HTMLImageElement} The created image element.
      */
     _setButtonIcon(container, iconFile, title, verticalAlign = true) {
+        if (!container || typeof container.replaceChildren !== "function") {
+            return null;
+        }
         container.replaceChildren();
         const img = document.createElement("img");
         img.src = "header-icons/" + iconFile;
