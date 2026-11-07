@@ -596,9 +596,9 @@ describe("setupPitchBlocks", () => {
             singer.inNoteBlock = [];
             singer.notePitches = {};
             singer.noteOctaves = {};
+            global.pitchToNumber.mockReturnValueOnce(7);
 
-            block.arg(logo, 0, 10);
-
+            expect(block.arg(logo, 0, 10)).toBe(7);
             expect(global.getNote).not.toHaveBeenCalled();
             expect(global.pitchToNumber).toHaveBeenCalledWith("G", 4, singer.keySignature);
         });
