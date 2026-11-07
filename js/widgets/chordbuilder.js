@@ -394,6 +394,7 @@ class ChordBuilderWidget {
         }
         this.diatonicChords = this._buildDiatonicChords(this.rootKey, this.mode);
         // Clear progression when key changes — chords from old key are no longer valid
+        this._stopPlayback();
         this.progression = [];
         this._updateKeyModeDisplay();
         this._renderDiatonicChords();
@@ -445,11 +446,19 @@ class ChordBuilderWidget {
 
     /**
      * Removes a chord at a specific index from the progression sequence.
+     * Sets the slot to null so subsequent chords maintain their beat positions,
+     * then trims trailing null entries.
      * @param {number} index
      */
     removeChord(index) {
         if (index >= 0 && index < this.progression.length) {
-            this.progression.splice(index, 1);
+            this.progression[index] = null;
+            while (
+                this.progression.length > 0 &&
+                this.progression[this.progression.length - 1] === null
+            ) {
+                this.progression.pop();
+            }
             this._renderBarGrid();
         }
     }
@@ -500,7 +509,7 @@ class ChordBuilderWidget {
                 this._highlightActiveStep(-1);
                 this._updatePlayButtonState(false);
             },
-            { octave: this.octave }
+            { octave: this.octave, beatsPerChord: 1 }
         );
     }
 
