@@ -53,6 +53,29 @@ describe("ai-markdown", () => {
         expect(renderChatMarkdown("[bad](javascript:alert(1))")).not.toContain("<a");
     });
 
+    it("keeps asterisks inside a link address as written", () => {
+        expect(renderChatMarkdown("[x](https://example.com/a**b**c)")).toContain(
+            '<a href="https://example.com/a**b**c" target="_blank"'
+        );
+        const html = renderChatMarkdown(
+            "[old copies](https://web.archive.org/web/*/musicblocks.sugarlabs.org) and *try* it"
+        );
+        expect(html).toContain('href="https://web.archive.org/web/*/musicblocks.sugarlabs.org"');
+        expect(html).toContain("and <em>try</em> it");
+    });
+
+    it("does not leak the code span marker when a link address holds a code span", () => {
+        expect(renderChatMarkdown("[x](https://a.com/`b`)")).not.toContain(
+            String.fromCharCode(0xe000)
+        );
+    });
+
+    it("still formats bold and italic text inside a link label", () => {
+        const html = renderChatMarkdown("[**guide** and *tips*](https://example.com/a)");
+        expect(html).toContain('<a href="https://example.com/a" target="_blank"');
+        expect(html).toContain("<strong>guide</strong> and <em>tips</em></a>");
+    });
+
     it("keeps a reply that contains the code span marker readable", () => {
         const marker = String.fromCharCode(0xe000);
         expect(renderChatMarkdown(`${marker}0${marker} and \`start\``)).toBe(

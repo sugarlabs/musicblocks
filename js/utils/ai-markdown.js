@@ -51,13 +51,15 @@ function renderInline(text) {
             codes.push(`<code>${code}</code>`);
             return `${marker}${codes.length - 1}${marker}`;
         });
+    // Link addresses are set aside the same way, so * in an address is not
+    // read as bold or italic. The link text is still formatted.
     html = html
+        .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)\uE000]+)\)/g, (_match, label, url) => {
+            codes.push(url);
+            return `<a href="${marker}${codes.length - 1}${marker}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+        })
         .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-        .replace(/(^|[^*\w])\*(?!\s)(.+?)\*(?!\w)/g, "$1<em>$2</em>")
-        .replace(
-            /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
-            '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
-        );
+        .replace(/(^|[^*\w])\*(?!\s)(.+?)\*(?!\w)/g, "$1<em>$2</em>");
     return html.replace(
         new RegExp(`${marker}(\\d+)${marker}`, "g"),
         (_match, index) => codes[Number(index)]
