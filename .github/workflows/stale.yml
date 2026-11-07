@@ -29,11 +29,13 @@ jobs:
                       const MAX_OPERATIONS = 150;
                       const STALE_LABEL = "stale";
                       const WORKFLOW_ACTOR = "github-actions[bot]";
+                      const PUSH_TRACKING_START = Date.parse("2026-10-29T00:00:00Z");
                       const STALE_MS = STALE_DAYS * 86400000;
                       const CLOSE_MS = CLOSE_DAYS * 86400000;
                       const STALE_MESSAGE =
-                        `This PR has had no recorded human code push for ${STALE_DAYS} days. ` +
-                        `It will be closed after ${CLOSE_DAYS} additional days without a new push.`;
+                        `This PR has had no qualifying human activity for ${STALE_DAYS} days. ` +
+                        `A human code push or moving it from Draft to Ready for Review resets the clock. ` +
+                        `It will be closed after ${CLOSE_DAYS} additional days without new activity.`;
 
                       function parseTime(value) {
                         if (typeof value !== "string" || value.length === 0) return null;
@@ -45,6 +47,22 @@ jobs:
                         const recorded = parseTime(record && record.pushedAt);
                         if (recorded !== null) return recorded;
                         return parseTime(createdAt);
+                      }
+
+                      function hasUnresolvedHistoricalActivity(record, createdAt) {
+                        const created = parseTime(createdAt);
+                        return (
+                          created !== null &&
+                          created < PUSH_TRACKING_START &&
+                          parseTime(record && record.pushedAt) === null
+                        );
+                      }
+
+                      function isBotAuthor(pr) {
+                        const user = pr && pr.user;
+                        const login = user && typeof user.login === "string" ? user.login : "";
+                        const type = user && typeof user.type === "string" ? user.type : "";
+                        return type.toLowerCase() === "bot" || login.toLowerCase().endsWith("[bot]");
                       }
 
                       function findLabel(labels, labelName) {
@@ -83,6 +101,7 @@ jobs:
                         const lastPush = input && input.lastPush;
                         const hasStaleLabel = input && input.hasStaleLabel;
                         const staleSince = input && input.staleSince;
+                        if (input && input.historicalActivityUnknown) return "skip";
                         if (!Number.isFinite(now) || !Number.isFinite(lastPush)) return "skip";
 
                         if (hasStaleLabel) {
@@ -165,26 +184,67 @@ jobs:
                             per_page: 100
                           }
                         );
-                        const warning = comments.find(comment => {
-                          if (!comment || typeof comment.body !== "string") return false;
+                        for (let i = comments.length - 1; i >= 0; i--) {
+                          const comment = comments[i];
+                          if (!comment || typeof comment.body !== "string") continue;
                           if (
                             !comment.user ||
                             comment.user.login !== WORKFLOW_ACTOR
                           ) {
-                            return false;
+                            continue;
                           }
-                          if (!comment.body.includes(STALE_MESSAGE)) return false;
+                          if (!comment.body.includes(STALE_MESSAGE)) continue;
                           const createdAt = parseTime(comment.created_at);
-                          return (
+                          if (
                             Number.isFinite(staleSince) &&
                             createdAt !== null &&
                             createdAt >= staleSince
-                          );
-                        });
-                        return warning ? parseTime(warning.created_at) : null;
+                          ) {
+                            return createdAt;
+                          }
+                        }
+                        return null;
                       }
 
-                      async function confirmedDecision(pr, hasStaleLabel, staleSince) {
+                      async function addStaleWarning(prNumber, staleSince) {
+                        const warningSince = await getStaleWarningComment(prNumber, staleSince);
+                        if (warningSince !== null) {
+                          core.info(
+                            `Stale warning comment already exists on PR #${prNumber}; skipping comment.`
+                          );
+                          return true;
+                        }
+                        return mutate(`Adding stale notice to PR #${prNumber}`, async () => {
+                          await github.rest.issues.createComment({
+                            owner,
+                            repo,
+                            issue_number: prNumber,
+                            body: STALE_MESSAGE
+                          });
+                        });
+                      }
+
+                      async function hasClosureComment(prNumber) {
+                        const comments = await github.paginate(
+                          github.rest.issues.listComments,
+                          {
+                            owner,
+                            repo,
+                            issue_number: prNumber,
+                            per_page: 100
+                          }
+                        );
+                        return comments.some(
+                          comment =>
+                            comment &&
+                            comment.user &&
+                            comment.user.login === WORKFLOW_ACTOR &&
+                            comment.body ===
+                              "Closed due to inactivity after the stale grace period."
+                        );
+                      }
+
+                      async function confirmedDecision(pr, staleSince) {
                         let currentPR;
                         try {
                           const response = await github.rest.pulls.get({
@@ -200,6 +260,11 @@ jobs:
 
                         if (!currentPR || currentPR.state !== "open") {
                           core.info(`Skipping PR #${pr.number}; it is no longer open.`);
+                          return "skip";
+                        }
+
+                        if (isBotAuthor(currentPR)) {
+                          core.info(`Skipping bot-authored PR #${pr.number}.`);
                           return "skip";
                         }
 
@@ -223,22 +288,81 @@ jobs:
                           latestState[String(pr.number)],
                           pr.created_at
                         );
+                        const historicalActivityUnknown = hasUnresolvedHistoricalActivity(
+                          latestState[String(pr.number)],
+                          currentPR.created_at
+                        );
+                        if (historicalActivityUnknown) {
+                          core.info(
+                            `Skipping PR #${pr.number}; historical push activity is unresolved.`
+                          );
+                          return "skip";
+                        }
                         return decideStaleAction({
                           now: Date.now(),
                           lastPush: latestPush,
                           hasStaleLabel: refreshedHasStaleLabel,
-                          staleSince: refreshedHasStaleLabel ? staleSince : null
+                          staleSince: refreshedHasStaleLabel ? staleSince : null,
+                          historicalActivityUnknown
+                        });
+                      }
+
+                      async function removeDraftStaleLabel(pr) {
+                        const staleLabel = findLabel(pr.labels, STALE_LABEL);
+                        if (!staleLabel) return;
+                        let latestState;
+                        try {
+                          latestState = await loadState();
+                        } catch (err) {
+                          core.warning(
+                            `Could not load push state while checking draft PR #${pr.number}: ${err.message}`
+                          );
+                          return;
+                        }
+                        const pushedAt = parseTime(
+                          latestState[String(pr.number)] && latestState[String(pr.number)].pushedAt
+                        );
+                        const staleSince = await getStaleLabelTime(pr.number);
+                        if (
+                          pushedAt === null ||
+                          staleSince === null ||
+                          pushedAt <= staleSince
+                        ) {
+                          return;
+                        }
+                        await mutate(`Removing stale label from draft PR #${pr.number}`, async () => {
+                          await github.rest.issues.removeLabel({
+                            owner,
+                            repo,
+                            issue_number: pr.number,
+                            name: staleLabel.name
+                          });
                         });
                       }
 
                       async function processPR(pr, state) {
+                        if (isBotAuthor(pr)) {
+                          core.info(`Skipping bot-authored PR #${pr.number}.`);
+                          return;
+                        }
                         if (pr.draft) {
+                          await removeDraftStaleLabel(pr);
                           core.info(`Skipping draft PR #${pr.number}.`);
                           return;
                         }
 
                         const record = state[String(pr.number)];
                         const lastPush = activityTime(record, pr.created_at);
+                        const historicalActivityUnknown = hasUnresolvedHistoricalActivity(
+                          record,
+                          pr.created_at
+                        );
+                        if (historicalActivityUnknown) {
+                          core.info(
+                            `Skipping PR #${pr.number}; historical push activity is unresolved.`
+                          );
+                          return;
+                        }
                         const hasStaleLabel = hasLabel(pr.labels, STALE_LABEL);
                         const staleSince = hasStaleLabel ? await getStaleLabelTime(pr.number) : null;
                         const warningSince = hasStaleLabel
@@ -248,7 +372,8 @@ jobs:
                           now: Date.now(),
                           lastPush,
                           hasStaleLabel,
-                          staleSince: warningSince || staleSince
+                          staleSince: warningSince || staleSince,
+                          historicalActivityUnknown
                         });
 
                         if (decision === "skip") {
@@ -260,7 +385,7 @@ jobs:
                         if (decision === "fresh") return;
 
                         if (decision === "remove-label") {
-                          const latestDecision = await confirmedDecision(pr, true, staleSince);
+                          const latestDecision = await confirmedDecision(pr, staleSince);
                           if (latestDecision === "stop") return "stop";
                           if (latestDecision === "draft") return;
                           if (latestDecision !== "remove-label") {
@@ -287,27 +412,13 @@ jobs:
 
                         if (decision === "grace") {
                           if (warningSince === null) {
-                            const latestDecision = await confirmedDecision(
-                              pr,
-                              true,
-                              staleSince
-                            );
+                            const latestDecision = await confirmedDecision(pr, staleSince);
                             if (latestDecision === "stop") return "stop";
                             if (
                               latestDecision === "grace" ||
                               latestDecision === "close"
                             ) {
-                              await mutate(
-                                `Adding stale notice to PR #${pr.number}`,
-                                async () => {
-                                  await github.rest.issues.createComment({
-                                    owner,
-                                    repo,
-                                    issue_number: pr.number,
-                                    body: STALE_MESSAGE
-                                  });
-                                }
-                              );
+                              await addStaleWarning(pr.number, staleSince);
                             }
                           }
                           core.info(`PR #${pr.number} is in its grace period.`);
@@ -315,7 +426,7 @@ jobs:
                         }
 
                         if (decision === "label") {
-                          const latestDecision = await confirmedDecision(pr, false, null);
+                          const latestDecision = await confirmedDecision(pr, null);
                           if (latestDecision === "stop") return "stop";
                           if (latestDecision === "draft") return;
                           if (latestDecision === "skip") return;
@@ -353,30 +464,12 @@ jobs:
                             return;
                           }
 
-                          const warningSince = await getStaleWarningComment(
-                            pr.number,
-                            staleSince
-                          );
-                          if (warningSince !== null) {
-                            core.info(
-                              `Stale warning comment already exists on PR #${pr.number}; skipping comment.`
-                            );
-                            return;
-                          }
-
-                          await mutate(`Adding stale notice to PR #${pr.number}`, async () => {
-                            await github.rest.issues.createComment({
-                              owner,
-                              repo,
-                              issue_number: pr.number,
-                              body: STALE_MESSAGE
-                            });
-                          });
+                          await addStaleWarning(pr.number, staleSince);
                           return;
                         }
 
                         if (warningSince === null) {
-                          const latestDecision = await confirmedDecision(pr, true, staleSince);
+                          const latestDecision = await confirmedDecision(pr, staleSince);
                           if (latestDecision === "stop") return "stop";
                           if (latestDecision === "draft") return;
                           if (latestDecision === "skip") return;
@@ -384,26 +477,12 @@ jobs:
                             latestDecision === "grace" ||
                             latestDecision === "close"
                           ) {
-                            await mutate(
-                              `Adding stale notice to PR #${pr.number}`,
-                              async () => {
-                                await github.rest.issues.createComment({
-                                  owner,
-                                  repo,
-                                  issue_number: pr.number,
-                                  body: STALE_MESSAGE
-                                });
-                              }
-                            );
+                            await addStaleWarning(pr.number, staleSince);
                           }
                           return;
                         }
 
-                        const latestDecision = await confirmedDecision(
-                          pr,
-                          true,
-                          warningSince
-                        );
+                        const latestDecision = await confirmedDecision(pr, warningSince);
                         if (latestDecision === "stop") return "stop";
                         if (latestDecision === "draft") return;
                         if (latestDecision === "skip") return;
@@ -412,25 +491,28 @@ jobs:
                           return;
                         }
 
-                        if (operations > MAX_OPERATIONS - 2) {
+                        const closureCommentExists = await hasClosureComment(pr.number);
+                        if (!closureCommentExists && operations > MAX_OPERATIONS - 2) {
                           core.warning(
                             `Operation limit reached before closing PR #${pr.number}.`
                           );
                           return;
                         }
 
-                        const commentAdded = await mutate(
-                          `Adding closure comment to PR #${pr.number}`,
-                          async () => {
-                            await github.rest.issues.createComment({
-                              owner,
-                              repo,
-                              issue_number: pr.number,
-                              body: "Closed due to inactivity after the stale grace period."
-                            });
-                          }
-                        );
-                        if (!commentAdded) return;
+                        if (!closureCommentExists) {
+                          const commentAdded = await mutate(
+                            `Adding closure comment to PR #${pr.number}`,
+                            async () => {
+                              await github.rest.issues.createComment({
+                                owner,
+                                repo,
+                                issue_number: pr.number,
+                                body: "Closed due to inactivity after the stale grace period."
+                              });
+                            }
+                          );
+                          if (!commentAdded) return;
+                        }
 
                         await mutate(`Closing PR #${pr.number}`, async () => {
                           await github.rest.pulls.update({
