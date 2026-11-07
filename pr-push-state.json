@@ -2063,5 +2063,12 @@
     "actor": "whyankush07",
     "branch": "test/theme-dropdown-real-ui-path",
     "headRepo": "whyankush07/musicblocks"
+  },
+  "10286": {
+    "pushedAt": "2026-11-07T23:50:34.853Z",
+    "sha": "705e300c266803f29eaafaa681c39e0bf7bec0a4",
+    "actor": "BarbieRajput",
+    "branch": "chore/10285-ignore-usermanual-in-lint",
+    "headRepo": "BarbieRajput/musicblocks"
   }
 }
