@@ -348,6 +348,14 @@ describe("setupHeapBlocks", () => {
             expect(activity.errorMsg).toHaveBeenCalledWith("Not a number", blk);
             expect(result).toEqual(0);
         });
+
+        it("should call errorMsg and return 0 if the index is NaN", () => {
+            logo.parseArg.mockReturnValue(NaN);
+            const result = indexHeapBlock.arg(logo, 0, blk, NaN);
+            expect(activity.errorMsg).toHaveBeenCalledWith("Not a number", blk);
+            expect(result).toEqual(0);
+            expect(logo.turtleHeaps[0]).toEqual([10, 20, 30]);
+        });
     });
 
     describe("SetHeapEntryBlock", () => {
@@ -366,6 +374,13 @@ describe("setupHeapBlocks", () => {
         it("should call errorMsg if index is not a number", () => {
             setHeapEntryBlock.flow(["a", 99], logo, 0, blk);
             expect(activity.errorMsg).toHaveBeenCalledWith("Not a number", blk);
+        });
+
+        it("should call errorMsg and leave the heap alone if index is NaN", () => {
+            setHeapEntryBlock.flow([NaN, 99], logo, 0, blk);
+            expect(activity.errorMsg).toHaveBeenCalledWith("Not a number", blk);
+            expect(logo.turtleHeaps[0]).toEqual([1, 2, 3]);
+            expect(Object.keys(logo.turtleHeaps[0])).toEqual(["0", "1", "2"]);
         });
 
         it("should allow string values", () => {
