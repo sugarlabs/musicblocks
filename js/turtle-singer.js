@@ -1841,9 +1841,11 @@ class Singer {
                 neighborArgNote2.push(tur.singer.neighborArgNote2.pop());
             }
 
-            neighborArgBeat = bpmFactor / last(tur.singer.neighborArgBeat);
-            neighborArgCurrentBeat = bpmFactor / last(tur.singer.neighborArgCurrentBeat);
-            doNeighbor = true;
+            if (last(tur.singer.neighborArgCurrentBeat) !== null) {
+                neighborArgBeat = bpmFactor / last(tur.singer.neighborArgBeat);
+                neighborArgCurrentBeat = bpmFactor / last(tur.singer.neighborArgCurrentBeat);
+                doNeighbor = true;
+            }
         }
 
         let carry = 0;

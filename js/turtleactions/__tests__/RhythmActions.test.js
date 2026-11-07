@@ -377,7 +377,7 @@ describe("setupRhythmActions", () => {
         expect(targetTurtle.singer.neighborArgCurrentBeat).toEqual([2]);
     });
 
-    it("pushes to neighborArgBeat but leaves neighborArgCurrentBeat unset when nextBeat is invalid", () => {
+    it("keeps the neighbor beat arrays in sync when nextBeat is invalid", () => {
         targetTurtle.singer.inNeighbor = [1];
         targetTurtle.singer.neighborNoteValue = [1];
         targetTurtle.singer.beatFactor = 1;
@@ -392,7 +392,7 @@ describe("setupRhythmActions", () => {
             1
         );
         expect(targetTurtle.singer.neighborArgBeat).toEqual([1]);
-        expect(targetTurtle.singer.neighborArgCurrentBeat).toEqual([]);
+        expect(targetTurtle.singer.neighborArgCurrentBeat).toEqual([null]);
     });
 
     it("divides (not multiplies) by noteBeatValue when computing nextBeat", () => {
@@ -420,7 +420,7 @@ describe("setupRhythmActions", () => {
         listener();
 
         expect(activity.errorMsg).toHaveBeenCalled();
-        expect(targetTurtle.singer.neighborArgCurrentBeat).toEqual([]);
+        expect(targetTurtle.singer.neighborArgCurrentBeat).toEqual([null]);
     });
 
     it("skips the neighbor block and processNote when inNoteBlock is unwound before the listener fires", () => {
