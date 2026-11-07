@@ -36,6 +36,16 @@ if (typeof module !== "undefined" && module.exports) {
 }
 
 /**
+ * Whether a value is a finite number, or a string holding one.
+ * @private
+ * @param {*} value - The value to check.
+ * @returns {boolean} True for finite numbers and numeric strings.
+ */
+const isFiniteNumeric = value =>
+    (typeof value === "number" || (typeof value === "string" && value.trim() !== "")) &&
+    Number.isFinite(Number(value));
+
+/**
  * Get the reduced fraction representation of a fraction.
  * @function
  * @param {number} a - The numerator.
@@ -43,6 +53,12 @@ if (typeof module !== "undefined" && module.exports) {
  * @returns {string} The reduced fraction as a string.
  */
 var reducedFraction = (a, b) => {
+    // NaN, Infinity and undefined never satisfy the Euclid loop's `b === 0` exit, so the
+    // loop below recursed until the stack overflowed. There is nothing sensible to show.
+    if (!isFiniteNumeric(a) || !isFiniteNumeric(b)) {
+        return "";
+    }
+
     // Not GCD from utils-logic.js: that takes the absolute value of both arguments, but
     // callers rely on a negative b (or a) surviving into the displayed denominator here.
     const greatestCommonMultiple = (a, b) => {
@@ -65,6 +81,11 @@ var reducedFraction = (a, b) => {
  * @returns {string} The note value to display.
  */
 var calcNoteValueToDisplay = (a, b) => {
+    // See reducedFraction: a non-finite or missing value cannot be displayed.
+    if (!isFiniteNumeric(a) || !isFiniteNumeric(b)) {
+        return "";
+    }
+
     const noteValue = a / b;
     let noteValueToDisplay = null;
 
