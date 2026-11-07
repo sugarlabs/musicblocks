@@ -507,6 +507,148 @@ describe("CallGraphAnalyzer", () => {
         expect(result.nodes[0].actionName).toBe("customName");
     });
 
+    test("26. handles a large layered chain of 25 actions with duplicate calls quickly without false cycles", () => {
+        // A_0 -> A_1 (twice), A_1 -> A_2 (twice) ... A_24
+        const blocks = [];
+        let idCounter = 1;
+
+        for (let i = 0; i < 25; i++) {
+            const actionId = idCounter++;
+            const textId = idCounter++;
+            const actionName = `action_${i}`;
+
+            // Name block
+            blocks.push({
+                id: textId,
+                name: "text",
+                value: actionName,
+                connections: [actionId],
+                trash: false
+            });
+
+            if (i < 24) {
+                const nextActionName = `action_${i + 1}`;
+                const call1Id = idCounter++;
+                const call2Id = idCounter++;
+
+                blocks.push({
+                    id: actionId,
+                    name: "action",
+                    connections: [null, textId, call1Id],
+                    trash: false
+                });
+
+                blocks.push({
+                    id: call1Id,
+                    name: "nameddo",
+                    privateData: nextActionName,
+                    connections: [actionId, call2Id],
+                    trash: false
+                });
+
+                blocks.push({
+                    id: call2Id,
+                    name: "nameddo",
+                    privateData: nextActionName,
+                    connections: [call1Id],
+                    trash: false
+                });
+            } else {
+                blocks.push({
+                    id: actionId,
+                    name: "action",
+                    connections: [null, textId, null],
+                    trash: false
+                });
+            }
+        }
+
+        const startTime = Date.now();
+        const result = CallGraphAnalyzer.analyze(blocks, { includeRoots: false });
+        const duration = Date.now() - startTime;
+
+        expect(duration).toBeLessThan(500);
+        expect(result.hasCycles).toBe(false);
+        expect(result.summary.recursiveActionsCount).toBe(0);
+        expect(result.cycles).toHaveLength(0);
+        expect(result.nodes).toHaveLength(25);
+    });
+
+    test("27. traverses large stacks (> 1000 blocks) without dropping calls when maxTraversalDepth is Infinity", () => {
+        const blocks = [];
+        let idCounter = 1;
+
+        // Action definition
+        const actionDefId = idCounter++;
+        const nameBlockId = idCounter++;
+        blocks.push({
+            id: nameBlockId,
+            name: "text",
+            value: "largeStackAction",
+            connections: [actionDefId],
+            trash: false
+        });
+
+        // Target action definition
+        const targetActionId = idCounter++;
+        const targetNameId = idCounter++;
+        blocks.push({
+            id: targetNameId,
+            name: "text",
+            value: "targetAction",
+            connections: [targetActionId],
+            trash: false
+        });
+        blocks.push({
+            id: targetActionId,
+            name: "action",
+            connections: [null, targetNameId, null],
+            trash: false
+        });
+
+        // Build a long chain of 1200 dummy flow blocks, with a call to targetAction at position 1100
+        let prevId = actionDefId;
+        const totalBlocks = 1200;
+        const callPosition = 1100;
+
+        for (let i = 0; i < totalBlocks; i++) {
+            const currId = idCounter++;
+            if (i === callPosition) {
+                blocks.push({
+                    id: currId,
+                    name: "nameddo",
+                    privateData: "targetAction",
+                    connections: [prevId],
+                    trash: false
+                });
+            } else {
+                blocks.push({
+                    id: currId,
+                    name: "forward",
+                    connections: [prevId],
+                    trash: false
+                });
+            }
+            if (i === 0) {
+                blocks.push({
+                    id: actionDefId,
+                    name: "action",
+                    connections: [null, nameBlockId, currId],
+                    trash: false
+                });
+            } else {
+                const prevBlock = blocks.find(b => b.id === prevId);
+                if (prevBlock && prevBlock.name !== "action") {
+                    prevBlock.connections.push(currId);
+                }
+            }
+            prevId = currId;
+        }
+
+        const result = CallGraphAnalyzer.analyze(blocks, { includeRoots: false });
+        expect(result.edges.some(e => e.target === "action:targetAction")).toBe(true);
+    });
+
     test("exercises AMD define branch when define is available", () => {
         const origDefine = global.define;
         let registeredFactory;
