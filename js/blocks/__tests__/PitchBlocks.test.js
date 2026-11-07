@@ -1234,6 +1234,26 @@ describe("setupPitchBlocks", () => {
             // Restore default
             global.getCurrentEDO.mockReturnValue(12);
         });
+
+        it("falls back to 392 Hz for a NaN pitch input instead of passing nulls on", () => {
+            const block = createdBlocks["pitch"];
+
+            // NaN slips past both sides of the old range check
+            // (NaN < A0 and NaN > C8 are both false), so the real
+            // frequencyToPitch(NaN) returns [null, null, null] and the
+            // null note throws inside processPitch (getNote reads
+            // .slice of null; widget paths call note.toLowerCase()).
+            // A NaN pitch is reachable from ordinary math blocks,
+            // e.g. a power block computing (-1) ^ 0.5.
+            block.flow([NaN, 4], logo, 0, 10);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.INVALIDPITCH, 10);
+            expect(global.frequencyToPitch).toHaveBeenCalledWith(392);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith("A", 4, 0, 0, 10);
+
+            // Infinity takes the same fallback path.
+            block.flow([Infinity, 4], logo, 0, 10);
+            expect(global.frequencyToPitch).toHaveBeenLastCalledWith(392);
+        });
     });
 
     describe("Macro Execution", () => {

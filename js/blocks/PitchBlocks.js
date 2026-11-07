@@ -2174,7 +2174,12 @@ function setupPitchBlocks(activity) {
                         ) + offset;
                     cents = 0;
                 } else {
-                    if (arg0 < A0 || arg0 > C8) {
+                    // NaN slips past both comparisons below (NaN < A0 and
+                    // NaN > C8 are both false), so check finiteness first:
+                    // frequencyToPitch(NaN) returns [null, null, null] and
+                    // the null note then throws inside processPitch
+                    // (getNote / note.toLowerCase on null).
+                    if (!Number.isFinite(arg0) || arg0 < A0 || arg0 > C8) {
                         activity.errorMsg(INVALIDPITCH, blk);
                         arg0 = 392; // set default to 392 hertz (G4)
                     }
