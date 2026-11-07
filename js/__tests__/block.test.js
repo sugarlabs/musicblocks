@@ -609,7 +609,7 @@ describe("Block Foundation", () => {
         });
 
         describe("collapsed block labels", () => {
-            it("should use a meaningful label for the chord progression widget", () => {
+            it("should translate the chord progression widget label", () => {
                 const globalNames = [
                     "Image",
                     "COLLAPSEBUTTON",
@@ -629,9 +629,6 @@ describe("Block Foundation", () => {
                 const originalTranslate = global._;
                 const originalBase64Encode = global.window.base64Encode;
                 const originalBlockTextColor = global.platformColor.blockText;
-                const spanishTranslations = JSON.parse(
-                    fs.readFileSync(path.join(__dirname, "../../locales/es.json"), "utf8")
-                );
                 const block = new Block(
                     {
                         ...mockProtoBlock,
@@ -657,7 +654,7 @@ describe("Block Foundation", () => {
                 global.COLLAPSETEXTY = 0;
                 global.safeSVG = text => text;
                 global.platformColor.blockText = "#000000";
-                global._ = key => spanishTranslations[key] || key;
+                global._ = jest.fn(key => (key === "chords" ? "translated chords" : key));
                 global.window.base64Encode = text => text;
                 global.createjs.Text = jest.fn(text => ({ text, visible: true }));
                 block.blockIndex = 0;
@@ -670,7 +667,8 @@ describe("Block Foundation", () => {
                 try {
                     block._generateCollapseArtwork(null);
 
-                    expect(block.collapseText.text).toBe("acordes");
+                    expect(block.collapseText.text).toBe("translated chords");
+                    expect(global._).toHaveBeenCalledWith("chords");
                 } finally {
                     Object.assign(global, savedGlobals);
                     global.createjs.Text = originalText;
