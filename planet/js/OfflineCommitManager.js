@@ -374,6 +374,47 @@ class OfflineCommitManager {
                 }
             }
 
+            // Publish projects whose form was submitted while offline. Keep the
+            // intent until /publish succeeds so a failed reconnect can retry.
+            for (const id of Object.keys(projects)) {
+                const pending = projects[id].pendingPublication;
+                if (!pending || this._hasPendingRepo(id)) continue;
+
+                const gitData = projects[id].GitRepoData;
+                if (!gitData?.repoName || !gitData?.hashedKey) continue;
+
+                try {
+                    const result = await new Promise(resolve => {
+                        this.server.publishProject(
+                            gitData.repoName,
+                            gitData.hashedKey,
+                            resolve,
+                            pending.projectName,
+                            pending.description,
+                            pending.tags,
+                            pending.thumbnail,
+                            id
+                        );
+                    });
+                    if (!result?.success || result.offline) continue;
+
+                    await this.storage.addPublishedData(id, {
+                        ProjectDescription: pending.description,
+                        ProjectTags: pending.tags,
+                        repoName: gitData.repoName
+                    });
+                    await this.storage.renameProject(id, pending.projectName);
+                    await this.storage.clearPendingPublication(id);
+                    this.server.Planet?.LocalPlanet?.updateProjects?.();
+                    this.server.Planet?.GlobalPlanet?.refreshProjects?.();
+                } catch (err) {
+                    console.error(
+                        `[OfflineCommitManager] Pending publication failed for ${id}:`,
+                        err
+                    );
+                }
+            }
+
             // Notify the parent window (gitDropdown.js) so the Time Travel panel
             // can auto-refresh and remove "Sync Pending" badges from synced commits.
             if (syncedCount > 0) {
