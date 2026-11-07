@@ -686,7 +686,7 @@ class PhraseMaker {
         widgetWindow.addButton("erase-button.svg", PhraseMaker.ICONSIZE, this._("Clear")).onclick =
             this._clear.bind(this);
 
-        if (!localStorage.beginnerMode) {
+        if (!this.activity.beginnerMode) {
             widgetWindow.addButton(
                 "export-button.svg",
                 PhraseMaker.ICONSIZE,
