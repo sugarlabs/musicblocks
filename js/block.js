@@ -2489,7 +2489,14 @@ class Block {
      * @param {string|null} oldText - Displayed text before the edit.
      * @param {string|null} newText - Displayed text after the edit.
      */
-    _recordValueChange(oldValue, newValue, oldText = null, newText = null) {
+    _recordValueChange(
+        oldValue,
+        newValue,
+        oldText = null,
+        newText = null,
+        oldCustomID = undefined,
+        newCustomID = undefined
+    ) {
         const valuesMatch =
             oldValue === newValue ||
             (Array.isArray(oldValue) &&
@@ -2497,8 +2504,11 @@ class Block {
                 oldValue.length === newValue.length &&
                 oldValue.every((value, index) => value === newValue[index]));
 
+        const customIDChanged =
+            oldCustomID !== undefined && newCustomID !== undefined && oldCustomID !== newCustomID;
+
         if (
-            valuesMatch ||
+            (valuesMatch && !customIDChanged) ||
             !this.blocks.actionHistory ||
             this.blocks.isUndoingOrRedoing ||
             this.blockIndex < 0
@@ -2506,14 +2516,22 @@ class Block {
             return;
         }
 
-        this.blocks.actionHistory.push({
+        const action = {
             type: "value_change",
             blockId: this.blockIndex,
             oldValue,
             newValue,
             oldText,
             newText
-        });
+        };
+        if (
+            this.name === "customNote" &&
+            (oldCustomID !== undefined || newCustomID !== undefined)
+        ) {
+            action.oldCustomID = oldCustomID;
+            action.newCustomID = newCustomID;
+        }
+        this.blocks.actionHistory.push(action);
         this.blocks.redoActionHistory = [];
     }
 
@@ -4373,8 +4391,15 @@ class Block {
                 }
             }
             let selectedCustom;
+            const activeTemperament =
+                this.activity &&
+                this.activity.logo &&
+                this.activity.logo.synth &&
+                this.activity.logo.synth.inTemperament;
             if (this.customID !== null && customLabels.includes(this.customID)) {
                 selectedCustom = this.customID;
+            } else if (activeTemperament && customLabels.includes(activeTemperament)) {
+                selectedCustom = activeTemperament;
             } else {
                 selectedCustom = customLabels[0];
             }
@@ -5116,6 +5141,13 @@ class Block {
             : this.text
               ? this.text.text
               : null;
+        if (this._capturedInitialCustomID === undefined && this.customID !== undefined) {
+            this._capturedInitialCustomID = this.customID;
+        }
+        const oldCustomID =
+            this._capturedInitialCustomID !== undefined
+                ? this._capturedInitialCustomID
+                : this.customID;
         const commitLabelEdit = closeInput || notPieMenu === false;
 
         if (closeInput) {
@@ -5125,6 +5157,7 @@ class Block {
             }
             docById("wheelDiv").style.display = "none";
             delete this._capturedInitialValue;
+            delete this._capturedInitialCustomID;
         }
 
         // The pie menu may be visible too, so hide it.
@@ -5163,6 +5196,7 @@ class Block {
                 if (commitLabelEdit) {
                     delete this._capturedInitialValue;
                     delete this._capturedInitialText;
+                    delete this._capturedInitialCustomID;
                 }
                 return;
             }
@@ -5459,10 +5493,13 @@ class Block {
                 oldValue,
                 this.value,
                 oldText,
-                this.text ? this.text.text : null
+                this.text ? this.text.text : null,
+                oldCustomID,
+                this.customID
             );
             delete this._capturedInitialValue;
             delete this._capturedInitialText;
+            delete this._capturedInitialCustomID;
         }
         this._updateAccessibleElement();
     }
