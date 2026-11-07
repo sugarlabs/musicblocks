@@ -59,6 +59,11 @@ var reducedFraction = (a, b) => {
         return "";
     }
 
+    // Numeric strings pass the check above, but the Euclid loop exits on `b === 0`, which a
+    // string "0" never satisfies, so work with real numbers from here on.
+    a = Number(a);
+    b = Number(b);
+
     // Not GCD from utils-logic.js: that takes the absolute value of both arguments, but
     // callers rely on a negative b (or a) surviving into the displayed denominator here.
     const greatestCommonMultiple = (a, b) => {
@@ -85,6 +90,10 @@ var calcNoteValueToDisplay = (a, b) => {
     if (!isFiniteNumeric(a) || !isFiniteNumeric(b)) {
         return "";
     }
+
+    // Accepted numeric strings are converted so they behave exactly like numbers.
+    a = Number(a);
+    b = Number(b);
 
     const noteValue = a / b;
     let noteValueToDisplay = null;
