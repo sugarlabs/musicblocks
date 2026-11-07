@@ -533,7 +533,7 @@ describe("ThemeBox", () => {
         });
 
         test("does not throw when the planet iframe cannot be messaged", () => {
-            const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+            const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
             const iframe = document.createElement("iframe");
             iframe.id = "planet-iframe";
             document.body.appendChild(iframe);
@@ -542,7 +542,7 @@ describe("ThemeBox", () => {
             });
 
             expect(() => themeBox.refreshUIComponents()).not.toThrow();
-            expect(debugSpy).toHaveBeenCalledWith(
+            expect(errorSpy).toHaveBeenCalledWith(
                 "Could not update planet iframe theme:",
                 expect.any(Error)
             );
@@ -561,7 +561,7 @@ describe("ThemeBox", () => {
         });
 
         test("logs instead of throwing when palette refresh fails", () => {
-            const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+            const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
             mockActivity.palettes = {
                 activePalette: "rhythm",
                 dict: {
@@ -574,7 +574,7 @@ describe("ThemeBox", () => {
                 showPalette: jest.fn()
             };
             expect(() => themeBox.refreshUIComponents()).not.toThrow();
-            expect(debugSpy).toHaveBeenCalledWith("Could not refresh palette:", expect.any(Error));
+            expect(errorSpy).toHaveBeenCalledWith("Could not refresh palette:", expect.any(Error));
         });
     });
 });
