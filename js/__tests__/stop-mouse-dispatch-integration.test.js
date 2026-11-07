@@ -29,6 +29,7 @@ global.Notation = jest.fn().mockImplementation(() => ({}));
 global.Synth = jest.fn().mockImplementation(() => ({}));
 global.Singer = {};
 global.last = arr => arr[arr.length - 1];
+global.clampNumber = require("../utils/utils-logic").clampNumber;
 global.instruments = { 0: {}, 1: {} };
 
 jest.mock("tone", () => ({
@@ -61,6 +62,7 @@ global.FlowClampBlock = StubBlock;
 
 const { Logo } = require("../logo");
 const { setupEnsembleBlocks } = require("../blocks/EnsembleBlocks");
+const setupVolumeActions = require("../turtleactions/VolumeActions");
 
 function createTransport() {
     const events = new Map();
@@ -279,6 +281,36 @@ describe("Stop mouse between two mice", () => {
         expect(activity.errorMsg).not.toHaveBeenCalled();
         expect(played.filter(n => n === "a1")).toHaveLength(2);
         expect(played.filter(n => n === "a2")).toHaveLength(1);
+    });
+
+    test("a mouse started by an event gets its volume back and leaves the other mouse alone", () => {
+        const listeners = {};
+        activity.stage.addEventListener.mockImplementation((name, fn) => (listeners[name] = fn));
+        activity.stage.dispatchEvent.mockImplementation(name => listeners[name]());
+        Singer.setSynthVolume = jest.fn();
+        setupVolumeActions(activity);
+        logo.notation.notationBeginArticulation = jest.fn();
+        logo.notation.notationEndArticulation = jest.fn();
+        load([
+            ["a1:1", "a2:1"],
+            ["b1:1", "b2:1"]
+        ]);
+
+        turtles.forEach((tur, i) => {
+            tur.running = true;
+            tur.singer.synthVolume = { piano: [50] };
+            Singer.VolumeActions.setRelativeVolume(-50, i, i * 2);
+        });
+        turtles[0].singer.runningFromEvent = true;
+        Singer.setSynthVolume.mockClear();
+
+        logo.stopTurtleRun(0);
+
+        expect(turtles[0].singer.synthVolume.piano).toEqual([50]);
+        expect(Singer.setSynthVolume.mock.calls).toEqual([[logo, 0, "piano", 50]]);
+        expect(turtles[1].singer.synthVolume.piano).toEqual([50, 25]);
+        expect(turtles[1].endOfClampSignals).toEqual({ 3: ["_articulation_1_2"] });
+        expect(turtles[1].running).toBe(true);
     });
 
     test("a mouse that stops itself ends its own flow", () => {
