@@ -367,6 +367,51 @@ describe("Viewport Culling", () => {
         );
     });
 
+    it("should use collapsed artwork bounds and ignore collapsed descendants for Home indicators", () => {
+        const homeButton = document.createElement("div");
+        mockActivity.homeButtonContainer = homeButton;
+        mockActivity.workspaceLayoutController = new WorkspaceLayoutController(mockActivity);
+        blocks.boundary = { hide: jest.fn() };
+        const collapsedRoot = {
+            trash: false,
+            collapsed: true,
+            inCollapsed: false,
+            container: { x: 770, y: 100 },
+            width: 100,
+            height: 60,
+            collapseBlockBitmap: {
+                visible: true,
+                getBounds: jest.fn().mockReturnValue({ x: 0, y: 0, width: 20, height: 20 })
+            },
+            connections: [null],
+            offScreen: jest.fn().mockReturnValue(false)
+        };
+        const collapsedDescendant = {
+            trash: false,
+            inCollapsed: true,
+            container: { x: -100, y: 100 },
+            width: 50,
+            height: 30,
+            connections: [null],
+            offScreen: jest.fn().mockReturnValue(false)
+        };
+        blocks.blockList = [collapsedRoot, collapsedDescendant];
+
+        blocks._updateViewportCulling();
+        ["left", "right", "above", "below"].forEach(indicator => {
+            expect(homeButton.querySelector(`[data-home-indicator="${indicator}"]`).hidden).toBe(
+                true
+            );
+        });
+
+        blocks.checkBounds();
+        ["left", "right", "above", "below"].forEach(indicator => {
+            expect(homeButton.querySelector(`[data-home-indicator="${indicator}"]`).hidden).toBe(
+                true
+            );
+        });
+    });
+
     it.each([
         ["left", { x: -10, y: 100 }],
         ["right", { x: 780, y: 100 }],

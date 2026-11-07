@@ -474,7 +474,7 @@ class Blocks {
                     continue;
                 }
 
-                const bounds = this._getBlockBounds(block);
+                const bounds = this._getHomeIndicatorBounds(block);
                 if (!homeBounds) {
                     homeBounds = { ...bounds };
                     continue;
@@ -488,6 +488,35 @@ class Blocks {
             this._viewportHomeBounds = homeBounds;
             this._viewportHomeBoundsDirty = false;
             return homeBounds;
+        };
+
+        this._getHomeIndicatorBounds = block => {
+            const bitmap = block.collapsed && block.collapseBlockBitmap;
+            const bitmapBounds =
+                bitmap && typeof bitmap.getBounds === "function" ? bitmap.getBounds() : null;
+            if (!bitmapBounds || !bitmapBounds.width || !bitmapBounds.height) {
+                return this._getBlockBounds(block);
+            }
+
+            const containerScaleX = Math.abs(block.container.scaleX || 1);
+            const containerScaleY = Math.abs(block.container.scaleY || 1);
+            const bitmapScaleX = Math.abs(bitmap.scaleX || bitmap.scale || 1);
+            const bitmapScaleY = Math.abs(bitmap.scaleY || bitmap.scale || 1);
+            const left =
+                block.container.x +
+                (bitmap.x || 0) * containerScaleX +
+                (bitmapBounds.x || 0) * containerScaleX * bitmapScaleX;
+            const top =
+                block.container.y +
+                (bitmap.y || 0) * containerScaleY +
+                (bitmapBounds.y || 0) * containerScaleY * bitmapScaleY;
+
+            return {
+                left,
+                top,
+                right: left + bitmapBounds.width * containerScaleX * bitmapScaleX,
+                bottom: top + bitmapBounds.height * containerScaleY * bitmapScaleY
+            };
         };
 
         // --- Performance: spatial grid for O(1) nearest-dock lookup ---
@@ -2247,8 +2276,14 @@ class Blocks {
             let onScreen = true;
             for (const block of this.blockList) {
                 if (!block || block.trash) continue;
-                if (viewport && block.container && block.width && block.height) {
-                    const bounds = this._getBlockBounds(block);
+                if (
+                    viewport &&
+                    !block.inCollapsed &&
+                    block.container &&
+                    block.width &&
+                    block.height
+                ) {
+                    const bounds = this._getHomeIndicatorBounds(block);
                     homeIndicators.left = homeIndicators.left || bounds.left < viewport.left;
                     homeIndicators.right = homeIndicators.right || bounds.right > viewport.right;
                     homeIndicators.above = homeIndicators.above || bounds.top < viewport.top;
