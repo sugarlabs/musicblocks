@@ -162,7 +162,7 @@ describe("piemenuBlockContext", () => {
             "imgsrc:header-icons/extract-button.svg",
             "imgsrc:header-icons/empty-trash-button.svg",
             "imgsrc:header-icons/cancel-button.svg",
-            "Disable"
+            "imgsrc:header-icons/disable-button.svg"
         ]);
         expect(wheel.navItems[0].setTooltip).toHaveBeenCalledWith("Duplicate");
         expect(wheel.navItems[1].setTooltip).toHaveBeenCalledWith("Extract");
@@ -271,8 +271,12 @@ describe("piemenuBlockContext", () => {
         piemenuBlockContext(block);
 
         const wheel = global.wheelnav.mock.instances[0];
-        expect(wheel.initWheel).toHaveBeenCalledWith(expect.arrayContaining(["Disable"]));
-        const disableIndex = wheel.initWheel.mock.calls[0][0].indexOf("Disable");
+        expect(wheel.initWheel).toHaveBeenCalledWith(
+            expect.arrayContaining(["imgsrc:header-icons/disable-button.svg"])
+        );
+        const disableIndex = wheel.initWheel.mock.calls[0][0].indexOf(
+            "imgsrc:header-icons/disable-button.svg"
+        );
         expect(wheel.navItems[disableIndex].setTooltip).toHaveBeenCalledWith("Disable");
 
         wheel.navItems[disableIndex].navigateFunction();
@@ -289,8 +293,12 @@ describe("piemenuBlockContext", () => {
         piemenuBlockContext(block);
 
         const wheel = global.wheelnav.mock.instances[0];
-        expect(wheel.initWheel).toHaveBeenCalledWith(expect.arrayContaining(["Enable"]));
-        const enableIndex = wheel.initWheel.mock.calls[0][0].indexOf("Enable");
+        expect(wheel.initWheel).toHaveBeenCalledWith(
+            expect.arrayContaining(["imgsrc:header-icons/enable-button.svg"])
+        );
+        const enableIndex = wheel.initWheel.mock.calls[0][0].indexOf(
+            "imgsrc:header-icons/enable-button.svg"
+        );
         expect(wheel.navItems[enableIndex].setTooltip).toHaveBeenCalledWith("Enable");
 
         wheel.navItems[enableIndex].navigateFunction();
@@ -307,7 +315,9 @@ describe("piemenuBlockContext", () => {
         piemenuBlockContext(block);
 
         const wheel = global.wheelnav.mock.instances[0];
-        const disableIndex = wheel.initWheel.mock.calls[0][0].indexOf("Disable");
+        const disableIndex = wheel.initWheel.mock.calls[0][0].indexOf(
+            "imgsrc:header-icons/disable-button.svg"
+        );
         wheel.navItems[disableIndex].navigateFunction();
 
         expect(block.disabled).toBe(true);
@@ -322,7 +332,9 @@ describe("piemenuBlockContext", () => {
         piemenuBlockContext(block);
 
         const wheel = global.wheelnav.mock.instances[0];
-        const enableIndex = wheel.initWheel.mock.calls[0][0].indexOf("Enable");
+        const enableIndex = wheel.initWheel.mock.calls[0][0].indexOf(
+            "imgsrc:header-icons/enable-button.svg"
+        );
         wheel.navItems[enableIndex].navigateFunction();
 
         expect(block.disabled).toBe(false);

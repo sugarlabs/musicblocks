@@ -104,7 +104,10 @@ const piemenuBlockContext = block => {
     const isBlockDisabled =
         typeof block.isDisabled === "function" ? block.isDisabled() : !!block.disabled;
     const toggleDisableLabel = isBlockDisabled ? _("Enable") : _("Disable");
-    labels.push(toggleDisableLabel);
+    const toggleDisableIcon = isBlockDisabled
+        ? "imgsrc:header-icons/enable-button.svg"
+        : "imgsrc:header-icons/disable-button.svg";
+    labels.push(toggleDisableIcon);
 
     const wheel = new wheelnav("contextWheelDiv", null, 250, 250);
     wheel.colors = platformColor.wheelcolors;
