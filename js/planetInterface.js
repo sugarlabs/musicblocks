@@ -425,6 +425,13 @@ class PlanetInterface {
                     ) {
                         projectId = projectStorage.getCurrentProjectID();
                     }
+                    if (
+                        this.planet &&
+                        typeof this.planet.saveThumbnail === "function" &&
+                        projectId !== undefined
+                    ) {
+                        return this.planet.saveThumbnail(image, projectId);
+                    }
                     if (typeof projectStorage.saveThumbnail === "function") {
                         if (projectId === undefined) {
                             return Promise.resolve(null);
