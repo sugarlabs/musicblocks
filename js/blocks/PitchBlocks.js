@@ -503,7 +503,9 @@ function setupPitchBlocks(activity) {
                 if (cblk1 === null) {
                     notePlayed = "G4";
                 } else if (activity.blocks.blockList[cblk1].name === "notename") {
-                    notePlayed = arg1 + (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
+                    notePlayed =
+                        arg1 +
+                        (Number.isFinite(tur.singer.currentOctave) ? tur.singer.currentOctave : 4);
                 } else if (
                     activity.blocks.blockList[cblk1].name === "solfege" ||
                     activity.blocks.blockList[cblk1].name === "eastindiansolfege"
@@ -528,7 +530,9 @@ function setupPitchBlocks(activity) {
                     if (attr !== NATURAL) {
                         notePlayed += attr;
                     }
-                    notePlayed += tur.singer.currentOctave ? tur.singer.currentOctave : 4;
+                    notePlayed += Number.isFinite(tur.singer.currentOctave)
+                        ? tur.singer.currentOctave
+                        : 4;
                 } else if (activity.blocks.blockList[cblk1].name === "number") {
                     // less than 55 hertz (A1)
                     if (activity.blocks.blockList[cblk1].value < 55) {
@@ -554,7 +558,8 @@ function setupPitchBlocks(activity) {
                         return INVALIDPITCH;
                     }
                     notePlayed =
-                        mappedPitch + (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
+                        mappedPitch +
+                        (Number.isFinite(tur.singer.currentOctave) ? tur.singer.currentOctave : 4);
                 } else {
                     if (typeof arg1 === "string") {
                         // Is it a number encoded as a string?
@@ -589,7 +594,7 @@ function setupPitchBlocks(activity) {
                                     notePlayed += attr;
                                 }
                                 if (foundOctave.length === 0) {
-                                    notePlayed += tur.singer.currentOctave
+                                    notePlayed += Number.isFinite(tur.singer.currentOctave)
                                         ? tur.singer.currentOctave
                                         : 4;
                                 } else {
@@ -599,7 +604,9 @@ function setupPitchBlocks(activity) {
                                 if (foundOctave.length === 0) {
                                     notePlayed =
                                         arg1 +
-                                        (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
+                                        (Number.isFinite(tur.singer.currentOctave)
+                                            ? tur.singer.currentOctave
+                                            : 4);
                                 } else {
                                     notePlayed = arg1 + foundOctave;
                                 }
@@ -608,7 +615,9 @@ function setupPitchBlocks(activity) {
                                 if (foundOctave.length === 0) {
                                     notePlayed =
                                         arg1 +
-                                        (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
+                                        (Number.isFinite(tur.singer.currentOctave)
+                                            ? tur.singer.currentOctave
+                                            : 4);
                                 } else {
                                     notePlayed = arg1 + foundOctave;
                                 }

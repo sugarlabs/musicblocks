@@ -4342,9 +4342,27 @@ describe("getPitchInfo", () => {
         expect(getPitchInfo(activity, "solfege syllable", "G4", tur)).toBe("do");
     });
 
-    it("returns correct pitch class", () => {
+    it("returns correct pitch class across temperaments", () => {
         const pClass = getPitchInfo(activity, "pitch class", "C4", tur);
-        expect(typeof pClass).toBe("number");
+        expect(pClass).toBe(0);
+        expect(getPitchInfo(activity, "pitch class", "A0", tur)).toBe(9);
+        expect(getPitchInfo(activity, "pitch class", "A4", tur)).toBe(9);
+        expect(getPitchInfo(activity, "pitch class", "C" + DOUBLESHARP + "4", tur)).toBe(2);
+        expect(getPitchInfo(activity, "pitch class", "D" + DOUBLEFLAT + "4", tur)).toBe(0);
+
+        activity.logo.synth.inTemperament = "equal19";
+        expect(getPitchInfo(activity, "pitch class", "C4", tur)).toBe(0);
+        expect(getPitchInfo(activity, "pitch class", "A4", tur)).toBe(14);
+        expect(getPitchInfo(activity, "pitch class", 270, tur)).toBe(1);
+
+        activity.logo.synth.inTemperament = "equal31";
+        expect(getPitchInfo(activity, "pitch class", "C" + DOUBLESHARP + "4", tur)).toBe(2);
+        expect(getPitchInfo(activity, "pitch class", "D" + DOUBLEFLAT + "4", tur)).toBe(3);
+
+        activity.logo.synth.inTemperament = "1/4 comma meantone";
+        expect(getPitchInfo(activity, "pitch class", 281.6, tur)).toBe(2);
+        expect(getPitchInfo(activity, "pitch class", "D♭4", tur)).toBe(2);
+        activity.logo.synth.inTemperament = "equal";
     });
 
     it("returns correct scalar class", () => {
@@ -4367,6 +4385,15 @@ describe("getPitchInfo", () => {
         const y = getPitchInfo(activity, "staff y", "C4", tur);
         // 0 * ... + 0 = 0
         expect(y).toBe(0);
+
+        // In 12-EDO, B♯4 shifts to C5 (87.5)
+        expect(getPitchInfo(activity, "staff y", "B#4", tur)).toBe(87.5);
+
+        // In equal19, B♯4 does not cross to C5 octave (B4 is 75)
+        activity.logo.synth.inTemperament = "equal19";
+        const y19 = getPitchInfo(activity, "staff y", "B#4", tur);
+        expect(y19).toBe(75);
+        activity.logo.synth.inTemperament = "equal";
     });
 
     it("returns pitch in hertz", () => {
@@ -4400,6 +4427,14 @@ describe("getPitchInfo", () => {
         // octave * 12.5 -> 4 * 12.5 = 50
         const shade = getPitchInfo(activity, "pitch to shade", "C4", tur);
         expect(shade).toBe(50);
+
+        // In 12-EDO, B♯4 sounds as C5 and returns 62.5
+        expect(getPitchInfo(activity, "pitch to shade", "B#4", tur)).toBe(62.5);
+
+        // In equal19, B♯4 is not enharmonically shifted to octave 5
+        activity.logo.synth.inTemperament = "equal19";
+        expect(getPitchInfo(activity, "pitch to shade", "B#4", tur)).toBe(50);
+        activity.logo.synth.inTemperament = "equal";
     });
 
     it("handles solfege class with accidental", () => {
@@ -4416,6 +4451,15 @@ describe("getPitchInfo", () => {
             expect(solfege("solfege syllable", "F♭4", "C major", false)).toBe("fa♭");
             expect(solfege("solfege class", "E♯4", "C major", false)).toBe("mi");
             expect(solfege("solfege class", "F♭4", "C major", false)).toBe("fa");
+        });
+
+        it("handles fixed Do syllables and classes for repeated accidentals in equal31", () => {
+            activity.logo.synth.inTemperament = "equal31";
+            expect(solfege("solfege syllable", "C" + DOUBLESHARP + "4", "C major", false)).toBe(
+                "do♯♯"
+            );
+            expect(solfege("solfege class", "C" + DOUBLESHARP + "4", "C major", false)).toBe("do");
+            activity.logo.synth.inTemperament = "equal";
         });
 
         it("keeps the fixed Do syllables the table already had", () => {
