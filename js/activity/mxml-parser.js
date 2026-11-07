@@ -236,10 +236,13 @@ const _addFractions = ([n1, d1], [n2, d2]) => {
 // _processPart) are the same. A real tie is always same-pitch; used to
 // decide whether a <tie type="stop"/> note genuinely continues the open
 // chain, or just happens to carry a tie tag that doesn't actually apply to it.
+// A chord is compared as a set: MusicXML doesn't fix the order its <chord/>
+// notes are written in, so C-E tied to E-C is still the same chord.
 const _contentsEqual = (a, b) => {
     if (a === null || b === null) return a === b;
     if (a.type !== b.type) return false;
-    return a.type === "pitch" ? a.name === b.name && a.octave === b.octave : a.name === b.name;
+    const membersOf = c => [c, ...(c.chord ?? [])].map(m => `${m.name}/${m.octave ?? ""}`).sort();
+    return membersOf(a).join(" ") === membersOf(b).join(" ");
 };
 
 // A note's <time-modification> as [actual-notes, normal-notes], the ratio a
@@ -590,7 +593,11 @@ function _findTempo(doc) {
  * @returns {Array} the pushed block literals
  */
 function _createNoteBlocks(blockId, duration, content, prevId) {
-    const contentBlockCount = content === null ? 1 : content.type === "pitch" ? 3 : 2;
+    // A chord is the note itself plus content.chord, each its own pitch (or
+    // playdrum) block chained inside the newnote's clamp.
+    const members = content === null ? [] : [content, ...(content.chord ?? [])];
+    const perMember = content !== null && content.type === "pitch" ? 3 : 2;
+    const contentBlockCount = content === null ? 1 : perMember * members.length;
     const hiddenId = blockId + 5 + contentBlockCount;
     const blocks = [
         [
@@ -608,17 +615,24 @@ function _createNoteBlocks(blockId, duration, content, prevId) {
 
     if (content === null) {
         blocks.push([blockId + 5, "rest2", 0, 0, [blockId + 4, null]]);
-    } else if (content.type === "pitch") {
-        blocks.push(
-            [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
-            [blockId + 6, ["notename", { value: content.name }], 0, 0, [blockId + 5]],
-            [blockId + 7, ["number", { value: content.octave }], 0, 0, [blockId + 5]]
-        );
     } else {
-        blocks.push(
-            [blockId + 5, "playdrum", 0, 0, [blockId + 4, blockId + 6, null]],
-            [blockId + 6, ["drumname", { value: content.name }], 0, 0, [blockId + 5]]
-        );
+        members.forEach((member, i) => {
+            const id = blockId + 5 + perMember * i;
+            const prev = i === 0 ? blockId + 4 : id - perMember;
+            const next = i === members.length - 1 ? null : id + perMember;
+            if (content.type === "pitch") {
+                blocks.push(
+                    [id, "pitch", 0, 0, [prev, id + 1, id + 2, next]],
+                    [id + 1, ["notename", { value: member.name }], 0, 0, [id]],
+                    [id + 2, ["number", { value: member.octave }], 0, 0, [id]]
+                );
+            } else {
+                blocks.push(
+                    [id, "playdrum", 0, 0, [prev, id + 1, next]],
+                    [id + 1, ["drumname", { value: member.name }], 0, 0, [id]]
+                );
+            }
+        });
     }
 
     blocks.push([hiddenId, "hidden", 0, 0, [blockId, hiddenId + 1]]);
@@ -803,9 +817,9 @@ function _applyRepeats(repeats, noteBlocks, noteStartIds, noteEndIds, blockId) {
  * <backup> (a second voice sharing the part): multi-voice parts are a
  * follow-up PR, and taking only the first voice is the safe reading rather
  * than misinterpreting the backed-up time as forward motion. <chord/>-marked
- * notes (chord members after the first) are skipped for the same reason --
- * melody-only is correct-but-incomplete, where including them without chord
- * support would just be wrong. A grace note (<grace/>, a <type> but no
+ * notes (chord members after the first) join the note they sound with, one
+ * pitch or playdrum block each inside its clamp, the same shape js/midi.js and
+ * the ABC importer give a chord. A grace note (<grace/>, a <type> but no
  * <duration>) is skipped outright: it doesn't take up measure time, and
  * importing it as a full-length note would make every later note start late.
  *
@@ -915,6 +929,39 @@ function _processPart(partEl, blockId, chainPrevId, instrumentMap) {
                 content = { type: "drum", name: _drumName(child, instrumentMap) };
             } else {
                 content = { type: "pitch", ..._pitchToNoteName(pitchEl) };
+            }
+
+            // The <chord/> notes that follow sound with this one (a triad, or a
+            // kick and hi-hat on the same beat), so they join its content
+            // rather than being dropped.
+            if (content !== null) {
+                content.chord = [];
+                for (
+                    let next = child.nextElementSibling;
+                    next !== null &&
+                    next.tagName === "note" &&
+                    next.querySelector(":scope > chord") !== null;
+                    next = next.nextElementSibling
+                ) {
+                    const nextPitch = next.querySelector(":scope > pitch");
+                    const nextUnpitched = next.querySelector(":scope > unpitched");
+                    const member =
+                        content.type === "pitch" && nextPitch !== null
+                            ? _pitchToNoteName(nextPitch)
+                            : content.type === "drum" && nextUnpitched !== null
+                              ? { name: _drumName(next, doc) }
+                              : null;
+                    // Each sounding note on its own: the lead's content.chord
+                    // already holds the members pushed so far, and comparing
+                    // the whole chord against one note would keep a doubled C.
+                    const sounding = [content, ...content.chord];
+                    if (
+                        member !== null &&
+                        !sounding.some(m => m.name === member.name && m.octave === member.octave)
+                    ) {
+                        content.chord.push(member);
+                    }
+                }
             }
 
             let hasTieStart = false;
