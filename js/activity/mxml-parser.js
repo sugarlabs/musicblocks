@@ -973,22 +973,39 @@ function _applyRepeats(
             // replay only the body before falling through to the second ending.
             let previousEnd = endHidden;
             const copies = [];
-            for (let pass = 2; pass < times; pass++) {
-                const copy = cloneNotes(startIndex, endIndex, previousEnd[0]);
-                previousEnd[4][1] = copy.firstId;
-                copies.push(...copy.blocks);
+            const clonePass = (cloneStartIndex, cloneEndIndex, durationOverrides = []) => {
+                let clonePrevId = previousEnd[0];
+                let resetTempoBlocks = [];
+                if (Number.isFinite(startTempoBpm)) {
+                    resetTempoBlocks = _createTempoBlocks(
+                        blockId,
+                        startTempoBpm,
+                        timeSignature,
+                        clonePrevId
+                    );
+                    blockId += resetTempoBlocks.length;
+                    previousEnd[4][1] = resetTempoBlocks[0][0];
+                    clonePrevId = resetTempoBlocks[5][0];
+                }
+                const copy = cloneNotes(
+                    cloneStartIndex,
+                    cloneEndIndex,
+                    clonePrevId,
+                    durationOverrides
+                );
+                if (resetTempoBlocks.length === 0) {
+                    previousEnd[4][1] = copy.firstId;
+                } else {
+                    resetTempoBlocks[5][4][1] = copy.firstId;
+                }
+                copies.push(...resetTempoBlocks, ...copy.blocks);
                 previousEnd = copy.blocks.find(block => block[0] === copy.lastId);
+            };
+            for (let pass = 2; pass < times; pass++) {
+                clonePass(startIndex, endIndex);
             }
             if (firstEndingStartIndex > startIndex) {
-                const finalPass = cloneNotes(
-                    startIndex,
-                    firstEndingStartIndex - 1,
-                    previousEnd[0],
-                    bodyTieDurations
-                );
-                previousEnd[4][1] = finalPass.firstId;
-                copies.push(...finalPass.blocks);
-                previousEnd = finalPass.blocks.find(block => block[0] === finalPass.lastId);
+                clonePass(startIndex, firstEndingStartIndex - 1, bodyTieDurations);
             }
             previousEnd[4][1] = nextFlowId;
             byId.get(nextFlowId)[4][0] = previousEnd[0];
@@ -1313,12 +1330,16 @@ function _processPart(
 
             if (firstEndingBodyTie !== null) {
                 if (hasTieStop && _contentsEqual(content, firstEndingBodyTie.content)) {
+                    const combinedDuration = _addFractions(firstEndingBodyTie.duration, duration);
                     _setNoteDuration(
                         noteBlocks,
                         noteStartIds[firstEndingBodyTie.index],
-                        _addFractions(firstEndingBodyTie.duration, duration)
+                        combinedDuration
                     );
-                    firstEndingBodyTie = null;
+                    firstEndingBodyTie = hasTieStart
+                        ? { ...firstEndingBodyTie, duration: combinedDuration }
+                        : null;
+                    offset += (duration[0] * 4) / duration[1];
                     continue;
                 }
                 firstEndingBodyTie = null;
