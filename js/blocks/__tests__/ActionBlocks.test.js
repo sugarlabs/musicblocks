@@ -1079,4 +1079,254 @@ describe("ActionBlocks", () => {
             expect(logo.runFromBlockNow).not.toHaveBeenCalled();
         });
     });
+
+    describe("Disabled action handling", () => {
+        const actionBlk = 99;
+        const actionChildBlk = 101;
+
+        beforeEach(() => {
+            activity.blocks.blockList[actionBlk] = {
+                name: "action",
+                disabled: true,
+                connections: [null, null, actionChildBlk]
+            };
+            activity.blocks.blockList[actionChildBlk] = {
+                name: "note",
+                connections: [actionBlk]
+            };
+            activity.blocks.findTopBlock = jest.fn(blk =>
+                blk === actionChildBlk ? actionBlk : blk
+            );
+            logo.actions["myAction"] = actionChildBlk;
+        });
+
+        test("CalcBlock skips execution and returns 0 when action is disabled", () => {
+            const block = activity.registeredBlocks["calc"];
+            activity.blocks.blockList[10] = { connections: [null, 11] };
+            logo.parseArg.mockReturnValue("myAction");
+
+            const result = block.arg(logo, 0, 10, null);
+
+            expect(result).toBe(0);
+            expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        test("NamedCalcBlock skips execution and returns 0 when action is disabled", () => {
+            const block = activity.registeredBlocks["namedcalc"];
+            activity.blocks.blockList[10] = { privateData: "myAction" };
+
+            const result = block.arg(logo, 0, 10, null);
+
+            expect(result).toBe(0);
+            expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        test("NamedCalcArgBlock skips execution and returns 0 when action is disabled", () => {
+            const block = activity.registeredBlocks["namedcalcArg"];
+            activity.blocks.blockList[10] = {
+                privateData: "myAction",
+                argClampSlots: [],
+                connections: [null]
+            };
+
+            const result = block.arg(logo, 0, 10, null);
+
+            expect(result).toBe(0);
+            expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        test("CalcArgBlock skips execution and returns 0 when action is disabled", () => {
+            const block = activity.registeredBlocks["calcArg"];
+            activity.blocks.blockList[10] = {
+                connections: [null, 11],
+                argClampSlots: []
+            };
+            logo.parseArg.mockReturnValue("myAction");
+
+            const result = block.arg(logo, 0, 10, null);
+
+            expect(result).toBe(0);
+            expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        test("DoBlock skips execution and returns undefined when action is disabled", () => {
+            const block = activity.registeredBlocks["do"];
+            const res = block.flow(["myAction"], logo, 0, 10);
+
+            expect(res).toBeUndefined();
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        test("NamedDoBlock skips execution and returns undefined when action is disabled", () => {
+            const block = activity.registeredBlocks["nameddo"];
+            activity.blocks.blockList[10] = { privateData: "myAction" };
+
+            const res = block.flow([], logo, 0, 10);
+
+            expect(res).toBeUndefined();
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        test("NamedDoBlock returns early on missing action without calling findBottomBlock", () => {
+            const block = activity.registeredBlocks["nameddo"];
+            activity.blocks.blockList[10] = { privateData: "missingAction" };
+            activity.blocks.findBottomBlock = jest.fn();
+            activity.turtles.ithTurtle = jest.fn(() => ({
+                singer: { justCounting: [], backward: [1] }
+            }));
+
+            const res = block.flow([], logo, 0, 10);
+
+            expect(res).toBeUndefined();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, 10, "missingAction");
+            expect(activity.blocks.findBottomBlock).not.toHaveBeenCalled();
+        });
+
+        test("NamedDoArgBlock skips execution and returns undefined when action is disabled", () => {
+            const block = activity.registeredBlocks["nameddoArg"];
+            activity.blocks.blockList[10] = {
+                privateData: "myAction",
+                argClampSlots: [],
+                connections: [null]
+            };
+
+            const res = block.flow([], logo, 0, 10, null, []);
+
+            expect(res).toBeUndefined();
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        test("DoArgBlock skips execution and returns undefined when action is disabled", () => {
+            const block = activity.registeredBlocks["doArg"];
+            activity.blocks.blockList[10] = {
+                argClampSlots: [],
+                connections: [null, null]
+            };
+
+            const res = block.flow(["myAction"], logo, 0, 10, null, []);
+
+            expect(res).toBeUndefined();
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        test("ActionBlock flow skips execution when action is disabled", () => {
+            const block = activity.registeredBlocks["action"];
+            const res = block.flow(["myAction"], logo, 0, 10);
+
+            expect(res).toBeUndefined();
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        test("ListenBlock listener ignores events when action is disabled", () => {
+            const block = activity.registeredBlocks["listen"];
+            activity.logo = { firstNoteTime: Date.now() };
+            const tur = {
+                running: false,
+                queue: [],
+                parentFlowQueue: [],
+                singer: { justCounting: [], runningFromEvent: false, turtleTime: 0 }
+            };
+            activity.turtles.ithTurtle = jest.fn(() => tur);
+
+            block.flow(["event1", "myAction"], logo, 0, 10);
+            const listenerCall = logo.setTurtleListener.mock.calls[0];
+            const listenerFn = listenerCall[2];
+
+            listenerFn({});
+
+            expect(tur.queue.length).toBe(0);
+            expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+        });
+
+        test("NamedDoArgBlock does not evaluate connected argument when action is disabled", () => {
+            const block = activity.registeredBlocks["nameddoArg"];
+            activity.blocks.blockList[10] = {
+                privateData: "myAction",
+                argClampSlots: [1],
+                connections: [null, 12]
+            };
+            const sideEffectFn = jest.fn();
+            logo.parseArg = sideEffectFn;
+
+            const res = block.flow([], logo, 0, 10, null, []);
+
+            expect(res).toBeUndefined();
+            expect(sideEffectFn).not.toHaveBeenCalled();
+        });
+
+        test("NamedCalcArgBlock does not evaluate connected argument when action is disabled", () => {
+            const block = activity.registeredBlocks["namedcalcArg"];
+            activity.blocks.blockList[10] = {
+                privateData: "myAction",
+                argClampSlots: [1],
+                connections: [null, 12]
+            };
+            const sideEffectFn = jest.fn();
+            logo.parseArg = sideEffectFn;
+
+            const res = block.arg(logo, 0, 10, null);
+
+            expect(res).toBe(0);
+            expect(sideEffectFn).not.toHaveBeenCalled();
+        });
+
+        test("DoArgBlock does not evaluate connected argument when action is disabled", () => {
+            const block = activity.registeredBlocks["doArg"];
+            activity.blocks.blockList[10] = {
+                argClampSlots: [1],
+                connections: [null, null, 12]
+            };
+            const sideEffectFn = jest.fn();
+            logo.parseArg = sideEffectFn;
+
+            const res = block.flow(["myAction"], logo, 0, 10, null, []);
+
+            expect(res).toBeUndefined();
+            expect(sideEffectFn).not.toHaveBeenCalled();
+        });
+
+        test("CalcArgBlock does not evaluate connected clamp arguments when action is disabled", () => {
+            const block = activity.registeredBlocks["calcArg"];
+            activity.blocks.blockList[10] = {
+                connections: [null, 11, 12],
+                argClampSlots: [1]
+            };
+            logo.parseArg.mockImplementation((lg, tur, targetBlk) => {
+                if (targetBlk === 11) return "myAction";
+                throw new Error("Clamp argument should not be parsed when action is disabled");
+            });
+
+            const result = block.arg(logo, 0, 10, null);
+
+            expect(result).toBe(0);
+            expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+        });
+
+        test("ListenBlock listener does not run queued action if action is disabled after queueing", () => {
+            const block = activity.registeredBlocks["listen"];
+            const tur = {
+                running: true,
+                queue: [],
+                parentFlowQueue: [],
+                singer: { justCounting: [], runningFromEvent: false, turtleTime: 0 }
+            };
+            activity.turtles.ithTurtle = jest.fn(() => tur);
+
+            activity.blocks.blockList[actionBlk].disabled = false;
+            block.flow(["event1", "myAction"], logo, 0, 10);
+            const listenerFn = logo.setTurtleListener.mock.calls[0][2];
+
+            listenerFn({});
+            expect(tur.queue.length).toBe(1);
+
+            activity.blocks.blockList[actionBlk].disabled = true;
+            tur.running = false;
+            listenerFn({});
+            expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+        });
+    });
 });

@@ -3320,6 +3320,9 @@ class Blocks {
             myBlock.container.snapToPixelEnabled = true;
             myBlock.container.x = 0;
             myBlock.container.y = 0;
+            if (myBlock.disabled) {
+                myBlock.container.alpha = 0.5;
+            }
 
             // Support viewport culling via _viewportVisible (eye icon takes priority).
             myBlock.container._origIsVisible = myBlock.container.isVisible;
@@ -5262,25 +5265,30 @@ class Blocks {
              * If the first block is an action block, the its first
              * connection is the block containing its label.
              */
+            const blockNameOf = item => (Array.isArray(item?.[1]) ? item[1][0] : item?.[1]);
             let name = "---";
-            if (["temperament1", "definemode", "action"].includes(blockObjs[0][1])) {
+            const firstName = blockNameOf(blockObjs[0]);
+            if (["temperament1", "definemode", "action"].includes(firstName)) {
                 const nameBlk = blockObjs[0][4][1];
                 if (nameBlk === null) {
                     console.debug("action not named... skipping");
                 } else {
-                    if (typeof blockObjs[nameBlk][1][1] === "string") {
-                        name = blockObjs[nameBlk][1][1];
-                    } else if (typeof blockObjs[nameBlk][1][1] === "number") {
-                        name = blockObjs[nameBlk][1][1].toString();
-                    } else {
-                        name = blockObjs[nameBlk][1][1]["value"];
+                    const blkData = blockObjs[nameBlk][1];
+                    const valData = Array.isArray(blkData) ? blkData[1] : blkData;
+                    if (typeof valData === "string") {
+                        name = valData;
+                    } else if (typeof valData === "number") {
+                        name = valData.toString();
+                    } else if (valData && typeof valData === "object") {
+                        name = valData["value"];
                     }
                 }
             } else {
                 /** Look for "show", "turtleshell", or "customsample". */
                 for (let i = 0; i < blockObjs.length; i++) {
-                    if (["show", "turtleshell", "customsample"].includes(blockObjs[i][1])) {
-                        switch (blockObjs[i][1]) {
+                    const blkName = blockNameOf(blockObjs[i]);
+                    if (["show", "turtleshell", "customsample"].includes(blkName)) {
+                        switch (blkName) {
                             case "show":
                                 name = `${_("Show").toLowerCase()}-${MathUtility.doRandom(
                                     0,
@@ -5291,10 +5299,11 @@ class Blocks {
                                 name = `${_("avatar")}-${MathUtility.doRandom(0, 1000)}`;
                                 break;
                             case "sample":
+                            case "customsample":
                                 name = `${_("sample")}-${MathUtility.doRandom(0, 1000)}`;
                                 break;
                             default:
-                                name = `${blockObjs[i][1]}-${MathUtility.doRandom(0, 1000)}`;
+                                name = `${blkName}-${MathUtility.doRandom(0, 1000)}`;
                                 break;
                         }
                         break;
@@ -5378,6 +5387,18 @@ class Blocks {
                     blockItem = [b, [myBlock.name, { value: myBlock.privateData }], x, y, []];
                 } else {
                     blockItem = [b, myBlock.name, x, y, []];
+                }
+
+                if (myBlock.disabled) {
+                    if (typeof blockItem[1] === "string") {
+                        blockItem[1] = [blockItem[1], { value: null, disabled: true }];
+                    } else if (Array.isArray(blockItem[1])) {
+                        if (blockItem[1][1] && typeof blockItem[1][1] === "object") {
+                            blockItem[1][1].disabled = true;
+                        } else {
+                            blockItem[1][1] = { value: blockItem[1][1], disabled: true };
+                        }
+                    }
                 }
 
                 blockMap[this.dragGroup[b]] = b;
@@ -5730,9 +5751,8 @@ class Blocks {
 
                     if (this.blockList[b].name === "action") {
                         if (this.blockList[b].connections[1] !== null) {
-                            currentActionNames.push(
-                                this.blockList[this.blockList[b].connections[1]].value
-                            );
+                            const val = this.blockList[this.blockList[b].connections[1]].value;
+                            currentActionNames.push(typeof val === "number" ? val.toString() : val);
                         }
                     } else if (this.blockList[b].name === "storein") {
                         if (this.blockList[b].connections[1] !== null) {
@@ -5887,6 +5907,10 @@ class Blocks {
                         blkData[1][1] = { value: name };
                     } else {
                         name = blkData[1][1]["value"];
+                        if (typeof name === "number") {
+                            name = name.toString();
+                            blkData[1][1]["value"] = name;
+                        }
                     }
 
                     /** If we have a stack named 'action', make the protoblock visible. */
@@ -5913,7 +5937,11 @@ class Blocks {
                         /** Change the name of the action... */
 
                         console.debug("action " + oldName + " is being renamed " + name);
-                        blkData[1][1] = { value: name };
+                        if (typeof blkData[1][1] === "object" && blkData[1][1] !== null) {
+                            blkData[1][1].value = name;
+                        } else {
+                            blkData[1][1] = { value: name };
+                        }
                         if (!renamedActions.has(oldName)) {
                             renamedActions.set(oldName, name);
                         }
@@ -5938,9 +5966,19 @@ class Blocks {
                         if (
                             ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].includes(blkName)
                         ) {
-                            const oldName = thisBlkData[1][1]["value"];
+                            let oldName = thisBlkData[1][1]["value"];
+                            if (typeof oldName === "number") {
+                                oldName = oldName.toString();
+                            }
                             if (renamedActions.has(oldName)) {
-                                thisBlkData[1][1] = { value: renamedActions.get(oldName) };
+                                if (
+                                    typeof thisBlkData[1][1] === "object" &&
+                                    thisBlkData[1][1] !== null
+                                ) {
+                                    thisBlkData[1][1].value = renamedActions.get(oldName);
+                                } else {
+                                    thisBlkData[1][1] = { value: renamedActions.get(oldName) };
+                                }
                             }
                         } else {
                             const doBlkData = blockObjs[doNames[d]];
@@ -5948,10 +5986,25 @@ class Blocks {
                                 if (renamedActions.has(doBlkData[1][1])) {
                                     doBlkData[1][1] = renamedActions.get(doBlkData[1][1]);
                                 }
-                            } else {
-                                const oldName = doBlkData[1][1]["value"];
+                            } else if (typeof doBlkData[1][1] === "number") {
+                                const oldName = doBlkData[1][1].toString();
                                 if (renamedActions.has(oldName)) {
-                                    doBlkData[1][1] = { value: renamedActions.get(oldName) };
+                                    doBlkData[1][1] = renamedActions.get(oldName);
+                                }
+                            } else {
+                                let oldName = doBlkData[1][1]["value"];
+                                if (typeof oldName === "number") {
+                                    oldName = oldName.toString();
+                                }
+                                if (renamedActions.has(oldName)) {
+                                    if (
+                                        typeof doBlkData[1][1] === "object" &&
+                                        doBlkData[1][1] !== null
+                                    ) {
+                                        doBlkData[1][1].value = renamedActions.get(oldName);
+                                    } else {
+                                        doBlkData[1][1] = { value: renamedActions.get(oldName) };
+                                    }
                                 }
                             }
                         }
@@ -7359,6 +7412,11 @@ class Blocks {
                             this._makeNewBlockWithConnections(name, blockOffset, blkData[4], null);
                         }
                         break;
+                }
+
+                if (blkInfo[1] && blkInfo[1].disabled) {
+                    this.blockList[thisBlock].disabled = true;
+                    this.blockList[thisBlock].updateDisabledAppearance();
                 }
 
                 if (thisBlock === this.blockList.length - 1) {

@@ -100,6 +100,15 @@ const piemenuBlockContext = block => {
         helpButton = null;
     }
 
+    const toggleDisableIndex = labels.length;
+    const isBlockDisabled =
+        typeof block.isDisabled === "function" ? block.isDisabled() : !!block.disabled;
+    const toggleDisableLabel = isBlockDisabled ? _("Enable") : _("Disable");
+    const toggleDisableIcon = isBlockDisabled
+        ? "imgsrc:header-icons/enable-button.svg"
+        : "imgsrc:header-icons/disable-button.svg";
+    labels.push(toggleDisableIcon);
+
     const wheel = new wheelnav("contextWheelDiv", null, 250, 250);
     wheel.colors = platformColor.wheelcolors;
     wheel.slicePathFunction = slicePath().DonutSlice;
@@ -125,6 +134,8 @@ const piemenuBlockContext = block => {
     if (helpButton !== null) {
         wheel.navItems[helpButton].setTooltip(_("Help"));
     }
+
+    wheel.navItems[toggleDisableIndex].setTooltip(toggleDisableLabel);
 
     wheel.navItems[0].selected = false;
 
@@ -177,6 +188,18 @@ const piemenuBlockContext = block => {
     };
 
     wheel.navItems[3].navigateFunction = () => {
+        docById("contextWheelDiv").style.display = "none";
+    };
+
+    wheel.navItems[toggleDisableIndex].navigateFunction = () => {
+        if (typeof block.toggleDisabled === "function") {
+            block.toggleDisabled();
+        } else {
+            block.disabled = !block.disabled;
+            if (typeof block.updateDisabledAppearance === "function") {
+                block.updateDisabledAppearance();
+            }
+        }
         docById("contextWheelDiv").style.display = "none";
     };
 

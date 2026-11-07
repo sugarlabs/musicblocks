@@ -1163,7 +1163,39 @@ class Logo {
         }
 
         const currentBlock = logo.blockList[blk];
-        const proto = currentBlock.protoblock;
+        const proto = currentBlock ? currentBlock.protoblock : null;
+
+        if (
+            currentBlock &&
+            (currentBlock.disabled ||
+                (typeof currentBlock.isDisabled === "function" && currentBlock.isDisabled()))
+        ) {
+            let dockType = null;
+            if (proto && Array.isArray(proto.dockTypes) && proto.dockTypes.length > 0) {
+                dockType = proto.dockTypes[0];
+            }
+            if (parentBlk !== null && parentBlk !== undefined && logo.blockList[parentBlk]) {
+                const parentBlock = logo.blockList[parentBlk];
+                if (parentBlock.protoblock && Array.isArray(parentBlock.protoblock.dockTypes)) {
+                    const connIdx = parentBlock.connections
+                        ? parentBlock.connections.indexOf(blk)
+                        : -1;
+                    if (connIdx !== -1 && parentBlock.protoblock.dockTypes[connIdx]) {
+                        const inDock = parentBlock.protoblock.dockTypes[connIdx];
+                        if (inDock === "textin") return "";
+                        if (inDock === "booleanin") return false;
+                        if (inDock === "numberin") return 0;
+                    }
+                }
+            }
+            if (dockType === "textout" || currentBlock.name === "text") {
+                return "";
+            }
+            if (dockType === "booleanout" || currentBlock.name === "boolean") {
+                return false;
+            }
+            return 0;
+        }
 
         // Retrieve the value of a block
         if (proto.parameter) {
@@ -1473,7 +1505,12 @@ class Logo {
         // A temperament only carries over to the next run while the project
         // still sets one; otherwise it would leak into other projects.
         const setsTemperament = this.blockList.some(
-            blk => blk && !blk.trash && blk.name === "settemperament"
+            blk =>
+                blk &&
+                !blk.trash &&
+                !blk.disabled &&
+                !(typeof blk.isDisabled === "function" && blk.isDisabled()) &&
+                blk.name === "settemperament"
         );
         if (!setsTemperament) {
             this._userTemperament = null;
@@ -1959,19 +1996,17 @@ class Logo {
                     startBlocks.push(this.blocks.stackList[blk]);
                 }
             } else if (this.blockList[this.blocks.stackList[blk]].name === "action") {
+                const actionBlock = this.blockList[this.blocks.stackList[blk]];
                 // Does the action stack have a name?
-                const c = this.blockList[this.blocks.stackList[blk]].connections[1];
+                const c = actionBlock.connections[1];
                 // Is there a block in the action clamp?
-                const b = this.blockList[this.blocks.stackList[blk]].connections[2];
+                const b = actionBlock.connections[2];
                 // eslint-disable-next-line eqeqeq
-                if (c != null && b != null) {
-                    // Don't use an action block in the trash
-                    if (!this.blockList[this.blocks.stackList[blk]].trash) {
-                        // We need to calculate the value of block c.
-                        // this.actions[this.blockList[c].value] = b;
-                        const name = this.parseArg(this, 0, c, null);
-                        this.actions[name] = b;
-                    }
+                if (c != null && b != null && !actionBlock.trash) {
+                    // We need to calculate the value of block c.
+                    // this.actions[this.blockList[c].value] = b;
+                    const name = this.parseArg(this, 0, c, null);
+                    this.actions[name] = b;
                 }
             }
         }
@@ -2286,6 +2321,10 @@ class Logo {
             const proto = currentBlock.protoblock;
             const connections = currentBlock.connections;
             const lastConnection = logo.deps.utils.last(connections);
+            const isBlockDisabled =
+                currentBlock &&
+                (currentBlock.disabled ||
+                    (typeof currentBlock.isDisabled === "function" && currentBlock.isDisabled()));
 
             /*
 ===========================================================================
@@ -2296,7 +2335,7 @@ class Logo {
             if (tur && !tur.actionBoundaries) tur.actionBoundaries = [];
             const args = [];
 
-            if (proto.args > 0) {
+            if (!isBlockDisabled && proto.args > 0) {
                 for (let i = 1; i <= proto.args; i++) {
                     if (proto.dockTypes[i] === "in") {
                         if (connections[i] !== null) {
@@ -2387,7 +2426,7 @@ class Logo {
             const actionArgs = [];
 
             // Highlight only the current executing block
-            if (logo.blocks.visible) {
+            if (logo.blocks.visible && !isBlockDisabled) {
                 if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
                     // Unhighlight any previously highlighted block
                     if (
@@ -2414,102 +2453,108 @@ class Logo {
                 currentBlock.isArgBlock() ||
                 (!(currentBlock.name in logo.evalFlowDict) && typeof proto.flow !== "function");
 
-            if (!returnsValue) {
-                let res = null;
-                // Is it a plugin?
-                if (currentBlock.name in logo.evalFlowDict) {
-                    logo.pluginReturnValue = null;
-                    logo.safePluginExecute(
-                        logo.evalFlowDict[currentBlock.name],
-                        logo,
-                        turtle,
-                        blk,
-                        receivedArg,
-                        actionArgs,
-                        args,
-                        isflow
-                    );
-                    // Clamp blocks will return the child flow.
-                    res = logo.pluginReturnValue;
-                } else {
-                    res = proto.flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow);
-                }
+            if (!isBlockDisabled) {
+                if (!returnsValue) {
+                    let res = null;
+                    // Is it a plugin?
+                    if (currentBlock.name in logo.evalFlowDict) {
+                        logo.pluginReturnValue = null;
+                        logo.safePluginExecute(
+                            logo.evalFlowDict[currentBlock.name],
+                            logo,
+                            turtle,
+                            blk,
+                            receivedArg,
+                            actionArgs,
+                            args,
+                            isflow
+                        );
+                        // Clamp blocks will return the child flow.
+                        res = logo.pluginReturnValue;
+                    } else {
+                        res = proto.flow(args, logo, turtle, blk, receivedArg, actionArgs, isflow);
+                    }
 
-                if (res) {
-                    const [cf, cfc, ret] = res;
-                    if (cf !== undefined) childFlow = cf;
-                    if (cfc !== undefined) childFlowCount = cfc;
-                    if (ret) {
-                        if (currentBlock.name === "return") {
-                            const boundary =
-                                tur.actionBoundaries && tur.actionBoundaries.length > 0
-                                    ? tur.actionBoundaries.pop()
-                                    : queueStart;
-                            while (tur.queue.length > boundary) {
-                                const popped = tur.queue.pop();
-                                if (popped && popped.blk in tur.endOfClampSignals) {
-                                    while (tur.endOfClampSignals[popped.blk].length > 0) {
-                                        const signal = tur.endOfClampSignals[popped.blk].pop();
-                                        if (signal !== null && signal !== undefined) {
-                                            logo.stage.dispatchEvent(signal);
+                    if (res) {
+                        const [cf, cfc, ret] = res;
+                        if (cf !== undefined) childFlow = cf;
+                        if (cfc !== undefined) childFlowCount = cfc;
+                        if (ret) {
+                            if (currentBlock.name === "return") {
+                                const boundary =
+                                    tur.actionBoundaries && tur.actionBoundaries.length > 0
+                                        ? tur.actionBoundaries.pop()
+                                        : queueStart;
+                                while (tur.queue.length > boundary) {
+                                    const popped = tur.queue.pop();
+                                    if (popped && popped.blk in tur.endOfClampSignals) {
+                                        while (tur.endOfClampSignals[popped.blk].length > 0) {
+                                            const signal = tur.endOfClampSignals[popped.blk].pop();
+                                            if (signal !== null && signal !== undefined) {
+                                                logo.stage.dispatchEvent(signal);
+                                            }
                                         }
                                     }
+                                    Queue.recycle(popped);
                                 }
-                                Queue.recycle(popped);
+                            } else {
+                                if (profilingEnabled) {
+                                    Logo._recordBlockTiming(logo, blk, profilingStart);
+                                    tracker.exitBlock();
+                                }
+                                return ret;
                             }
-                        } else {
-                            if (profilingEnabled) {
-                                Logo._recordBlockTiming(logo, blk, profilingStart);
-                                tracker.exitBlock();
-                            }
-                            return ret;
                         }
-                    }
-                }
-            } else {
-                if (
-                    // If it's an arg block, print its value.
-                    currentBlock.isArgBlock() ||
-                    ["anyout", "numberout", "textout", "booleanout"].includes(proto.dockTypes[0])
-                ) {
-                    args.push(logo.parseArg(logo, turtle, blk, blk, receivedArg));
-
-                    const blockLabels = {
-                        width: _("width"),
-                        height: _("height"),
-                        rightpos: _("right (screen)"),
-                        leftpos: _("left (screen)"),
-                        toppos: _("top (screen)"),
-                        bottompos: _("bottom (screen)")
-                    };
-
-                    const label = blockLabels[blockName];
-                    const blockValue = currentBlock.value;
-
-                    if (blockValue === null || blockValue === undefined) {
-                        logo.deps.textMsg("null block value");
-                    } else {
-                        const value = blockValue.toString();
-                        const displayText = label ? label + ": " + value : value;
-                        logo.deps.textMsg(displayText);
-                    }
-                    // Briefly block hotkeys so a hotkey press right after clicking
-                    // this value display can't accidentally spawn a new block
-                    // (#4931). Scoped to just this case, not every status message.
-                    if (logo.activity) {
-                        logo.activity.valueBarVisible = true;
-                        if (logo._valueBarTimeout !== null) {
-                            logo._timerManager.clearTimeout(logo._valueBarTimeout);
-                        }
-                        logo._valueBarTimeout = logo._timerManager.setTimeout(() => {
-                            logo._valueBarTimeout = null;
-                            if (logo.activity) logo.activity.valueBarVisible = false;
-                        }, 3000);
                     }
                 } else {
-                    logo.deps.errorHandler("I do not know how to " + blockName + ".", blk);
-                }
+                    if (
+                        // If it's an arg block, print its value.
+                        currentBlock.isArgBlock() ||
+                        ["anyout", "numberout", "textout", "booleanout"].includes(
+                            proto.dockTypes[0]
+                        )
+                    ) {
+                        args.push(logo.parseArg(logo, turtle, blk, blk, receivedArg));
 
+                        const blockLabels = {
+                            width: _("width"),
+                            height: _("height"),
+                            rightpos: _("right (screen)"),
+                            leftpos: _("left (screen)"),
+                            toppos: _("top (screen)"),
+                            bottompos: _("bottom (screen)")
+                        };
+
+                        const label = blockLabels[blockName];
+                        const blockValue = currentBlock.value;
+
+                        if (blockValue === null || blockValue === undefined) {
+                            logo.deps.textMsg("null block value");
+                        } else {
+                            const value = blockValue.toString();
+                            const displayText = label ? label + ": " + value : value;
+                            logo.deps.textMsg(displayText);
+                        }
+                        // Briefly block hotkeys so a hotkey press right after clicking
+                        // this value display can't accidentally spawn a new block
+                        // (#4931). Scoped to just this case, not every status message.
+                        if (logo.activity) {
+                            logo.activity.valueBarVisible = true;
+                            if (logo._valueBarTimeout !== null) {
+                                logo._timerManager.clearTimeout(logo._valueBarTimeout);
+                            }
+                            logo._valueBarTimeout = logo._timerManager.setTimeout(() => {
+                                logo._valueBarTimeout = null;
+                                if (logo.activity) logo.activity.valueBarVisible = false;
+                            }, 3000);
+                        }
+                    } else {
+                        logo.deps.errorHandler("I do not know how to " + blockName + ".", blk);
+                    }
+
+                    logo.stopTurtle = true;
+                }
+            } else if (returnsValue) {
                 logo.stopTurtle = true;
             }
 
@@ -2573,7 +2618,16 @@ class Logo {
             }
 
             // Run the last flow in the queue.
-            if (tur.queue.length > queueStart) {
+            const hasDisabledAction =
+                logo.blockList &&
+                logo.blockList.some(
+                    b =>
+                        b &&
+                        b.name === "action" &&
+                        (b.disabled || (typeof b.isDisabled === "function" && b.isDisabled()))
+                );
+
+            while (tur.queue.length > queueStart) {
                 const lastQueue = logo.deps.utils.last(tur.queue);
 
                 nextBlock = lastQueue.blk;
@@ -2586,6 +2640,40 @@ class Logo {
                 } else {
                     lastQueue.count--;
                 }
+
+                if (
+                    hasDisabledAction &&
+                    nextBlock !== null &&
+                    nextBlock !== undefined &&
+                    logo.blocks &&
+                    typeof logo.blocks.findTopBlock === "function"
+                ) {
+                    const topBlk = logo.blocks.findTopBlock(nextBlock);
+                    const topBlockObj =
+                        topBlk !== null && topBlk !== undefined ? logo.blockList[topBlk] : null;
+                    if (
+                        topBlockObj &&
+                        topBlockObj.name === "action" &&
+                        (topBlockObj.disabled ||
+                            (typeof topBlockObj.isDisabled === "function" &&
+                                topBlockObj.isDisabled()))
+                    ) {
+                        const childConn = topBlockObj.connections
+                            ? topBlockObj.connections[2]
+                            : null;
+                        const isChildFlow =
+                            childConn !== null &&
+                            childConn !== undefined &&
+                            (nextBlock === childConn ||
+                                (typeof logo.blocks.sameGeneration === "function" &&
+                                    logo.blocks.sameGeneration(childConn, nextBlock)));
+                        if (isChildFlow) {
+                            nextBlock = null;
+                            continue;
+                        }
+                    }
+                }
+                break;
             }
 
             // eslint-disable-next-line eqeqeq

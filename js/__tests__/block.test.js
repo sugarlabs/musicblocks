@@ -3428,4 +3428,72 @@ describe("Block Foundation", () => {
             expect(block.isClampBlock()).toBe(false);
         });
     });
+
+    describe("disabled state and appearance", () => {
+        it("initializes disabled to false by default", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            expect(block.disabled).toBe(false);
+            expect(block.isDisabled()).toBe(false);
+        });
+
+        it("toggles disabled state and queries isDisabled()", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.toggleDisabled();
+            expect(block.disabled).toBe(true);
+            expect(block.isDisabled()).toBe(true);
+
+            block.toggleDisabled();
+            expect(block.disabled).toBe(false);
+            expect(block.isDisabled()).toBe(false);
+        });
+
+        it("setDisabled() sets disabled property explicitly", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.setDisabled(true);
+            expect(block.disabled).toBe(true);
+            expect(block.isDisabled()).toBe(true);
+
+            block.setDisabled(false);
+            expect(block.disabled).toBe(false);
+            expect(block.isDisabled()).toBe(false);
+        });
+
+        it("updates container alpha to 0.5 when disabled and 1.0 when enabled", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.container = { alpha: 1.0 };
+            const refreshSpy = jest.fn();
+            block.activity = { refreshCanvas: refreshSpy };
+
+            block.setDisabled(true);
+            expect(block.container.alpha).toBe(0.5);
+            expect(refreshSpy).toHaveBeenCalled();
+
+            block.setDisabled(false);
+            expect(block.container.alpha).toBe(1.0);
+            expect(refreshSpy).toHaveBeenCalledTimes(2);
+        });
+
+        it("handles updateDisabledAppearance when container is null", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.container = null;
+            expect(() => block.updateDisabledAppearance()).not.toThrow();
+        });
+
+        it("updates appearance on imageLoad when disabled is true", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.disabled = true;
+            block.container = { alpha: 1.0 };
+            block.generateArtwork = jest.fn();
+            block.imageLoad();
+            expect(block.container.alpha).toBe(0.5);
+        });
+
+        it("handles updateDisabledAppearance when activity or refreshCanvas is missing", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.activity = null;
+            block.container = { alpha: 1.0 };
+            expect(() => block.setDisabled(true)).not.toThrow();
+            expect(block.container.alpha).toBe(0.5);
+        });
+    });
 });

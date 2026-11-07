@@ -24,6 +24,21 @@ Queue, NOACTIONERRORMSG, NOINPUTERRORMSG, isSafeUrl
  * @param {string} activity - The activity associated with the action blocks.
  */
 function setupActionBlocks(activity) {
+    const isActionDisabled = actionChild => {
+        if (actionChild === null || actionChild === undefined) return false;
+        if (!activity || !activity.blocks || typeof activity.blocks.findTopBlock !== "function") {
+            return false;
+        }
+        const actionRoot = activity.blocks.findTopBlock(actionChild);
+        if (actionRoot === null || actionRoot === undefined) return false;
+        const actionBlock = activity.blocks.blockList && activity.blocks.blockList[actionRoot];
+        return !!(
+            actionBlock &&
+            (actionBlock.disabled ||
+                (typeof actionBlock.isDisabled === "function" && actionBlock.isDisabled()))
+        );
+    };
+
     /**
      * Represents a Return block that returns a value from an action.
      *
@@ -261,6 +276,9 @@ function setupActionBlocks(activity) {
             } else {
                 const name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (name in logo.actions) {
+                    if (isActionDisabled(logo.actions[name])) {
+                        return 0;
+                    }
                     activity.turtles.getTurtle(turtle).running = true;
                     logo.runFromBlockNow(
                         logo,
@@ -348,6 +366,9 @@ function setupActionBlocks(activity) {
             actionArgs = receivedArg;
 
             if (name in logo.actions) {
+                if (isActionDisabled(logo.actions[name])) {
+                    return 0;
+                }
                 activity.turtles.getTurtle(turtle).running = true;
                 logo.runFromBlockNow(
                     logo,
@@ -433,6 +454,15 @@ function setupActionBlocks(activity) {
         flow(args, logo, turtle, blk, receivedArg, actionArgs) {
             const name = activity.blocks.blockList[blk].privateData;
 
+            if (!(name in logo.actions)) {
+                activity.errorMsg(NOACTIONERRORMSG, blk, name);
+                return;
+            }
+
+            if (isActionDisabled(logo.actions[name])) {
+                return;
+            }
+
             while (actionArgs.length > 0) {
                 actionArgs.pop();
             }
@@ -456,44 +486,40 @@ function setupActionBlocks(activity) {
 
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (name in logo.actions) {
-                if (tur.singer.justCounting.length === 0) {
-                    logo.notation.notationLineBreak(turtle);
-                }
-
-                let childFlow;
-
-                if (tur.singer.backward.length > 0) {
-                    childFlow = activity.blocks.findBottomBlock(logo.actions[name]);
-                    const actionBlk = activity.blocks.findTopBlock(logo.actions[name]);
-                    tur.singer.backward.push(actionBlk);
-
-                    const listenerName = "_backward_action_" + turtle + "_" + blk;
-                    logo.setDispatchBlock(blk, turtle, listenerName);
-
-                    const nextBlock = activity.blocks.blockList[actionBlk].connections[2];
-
-                    if (nextBlock === null) {
-                        tur.singer.backward.pop();
-                    } else {
-                        if (nextBlock in tur.endOfClampSignals) {
-                            tur.endOfClampSignals[nextBlock].push(listenerName);
-                        } else {
-                            tur.endOfClampSignals[nextBlock] = [listenerName];
-                        }
-                    }
-
-                    const __listener = event => tur.singer.backward.pop();
-
-                    logo.setTurtleListener(turtle, listenerName, __listener);
-                } else {
-                    childFlow = logo.actions[name];
-                }
-
-                return [childFlow, 1];
-            } else {
-                activity.errorMsg(NOACTIONERRORMSG, blk, name);
+            if (tur.singer.justCounting.length === 0) {
+                logo.notation.notationLineBreak(turtle);
             }
+
+            let childFlow;
+
+            if (tur.singer.backward.length > 0) {
+                childFlow = activity.blocks.findBottomBlock(logo.actions[name]);
+                const actionBlk = activity.blocks.findTopBlock(logo.actions[name]);
+                tur.singer.backward.push(actionBlk);
+
+                const listenerName = "_backward_action_" + turtle + "_" + blk;
+                logo.setDispatchBlock(blk, turtle, listenerName);
+
+                const nextBlock = activity.blocks.blockList[actionBlk].connections[2];
+
+                if (nextBlock === null) {
+                    tur.singer.backward.pop();
+                } else {
+                    if (nextBlock in tur.endOfClampSignals) {
+                        tur.endOfClampSignals[nextBlock].push(listenerName);
+                    } else {
+                        tur.endOfClampSignals[nextBlock] = [listenerName];
+                    }
+                }
+
+                const __listener = event => tur.singer.backward.pop();
+
+                logo.setTurtleListener(turtle, listenerName, __listener);
+            } else {
+                childFlow = logo.actions[name];
+            }
+
+            return [childFlow, 1];
         }
     }
     /**
@@ -556,6 +582,16 @@ function setupActionBlocks(activity) {
          */
         arg(logo, turtle, blk, receivedArg) {
             const name = activity.blocks.blockList[blk].privateData;
+
+            if (!(name in logo.actions)) {
+                activity.errorMsg(NOACTIONERRORMSG, blk, name);
+                return 0;
+            }
+
+            if (isActionDisabled(logo.actions[name])) {
+                return 0;
+            }
+
             const actionArgs = [];
 
             if (activity.blocks.blockList[blk].argClampSlots.length > 0) {
@@ -571,22 +607,17 @@ function setupActionBlocks(activity) {
                 }
             }
 
-            if (name in logo.actions) {
-                // Just run the stack.
-                activity.turtles.getTurtle(turtle).running = true;
-                logo.runFromBlockNow(
-                    logo,
-                    turtle,
-                    logo.actions[name],
-                    true,
-                    actionArgs,
-                    activity.turtles.getTurtle(turtle).queue.length
-                );
-                return logo.returns[turtle].pop();
-            } else {
-                activity.errorMsg(NOACTIONERRORMSG, blk, name);
-                return 0;
-            }
+            // Just run the stack.
+            activity.turtles.getTurtle(turtle).running = true;
+            logo.runFromBlockNow(
+                logo,
+                turtle,
+                logo.actions[name],
+                true,
+                actionArgs,
+                activity.turtles.getTurtle(turtle).queue.length
+            );
+            return logo.returns[turtle].pop();
         }
     }
     /**
@@ -656,6 +687,17 @@ function setupActionBlocks(activity) {
                 actionArgs.pop();
             }
 
+            if (args.length < 1) return;
+
+            if (!(args[0] in logo.actions)) {
+                activity.errorMsg(NOACTIONERRORMSG, blk, args[0]);
+                return;
+            }
+
+            if (isActionDisabled(logo.actions[args[0]])) {
+                return;
+            }
+
             if (activity.blocks.blockList[blk].argClampSlots.length > 0) {
                 for (let i = 0; i < activity.blocks.blockList[blk].argClampSlots.length; i++) {
                     if (activity.blocks.blockList[blk].connections[i + 2] !== null) {
@@ -673,16 +715,10 @@ function setupActionBlocks(activity) {
                 }
             }
 
-            if (args.length >= 1) {
-                if (args[0] in logo.actions) {
-                    if (activity.turtles.ithTurtle(turtle).singer.justCounting.length === 0) {
-                        logo.notation.notationLineBreak(turtle);
-                    }
-                    return [logo.actions[args[0]], 1];
-                } else {
-                    activity.errorMsg(NOACTIONERRORMSG, blk, args[0]);
-                }
+            if (activity.turtles.ithTurtle(turtle).singer.justCounting.length === 0) {
+                logo.notation.notationLineBreak(turtle);
             }
+            return [logo.actions[args[0]], 1];
         }
     }
     /**
@@ -750,6 +786,22 @@ function setupActionBlocks(activity) {
          * @returns {any} - The result of the argument handling.
          */
         arg(logo, turtle, blk, receivedArg) {
+            const cblk = activity.blocks.blockList[blk].connections[1];
+            if (cblk === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return 0;
+            }
+
+            const name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+            if (!(name in logo.actions)) {
+                activity.errorMsg(NOACTIONERRORMSG, blk, name);
+                return 0;
+            }
+
+            if (isActionDisabled(logo.actions[name])) {
+                return 0;
+            }
+
             const actionArgs = [];
 
             if (activity.blocks.blockList[blk].argClampSlots.length > 0) {
@@ -765,28 +817,16 @@ function setupActionBlocks(activity) {
                 }
             }
 
-            const cblk = activity.blocks.blockList[blk].connections[1];
-            if (cblk === null) {
-                activity.errorMsg(NOINPUTERRORMSG, blk);
-                return 0;
-            } else {
-                const name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-                if (name in logo.actions) {
-                    activity.turtles.getTurtle(turtle).running = true;
-                    logo.runFromBlockNow(
-                        logo,
-                        turtle,
-                        logo.actions[name],
-                        true,
-                        actionArgs,
-                        activity.turtles.getTurtle(turtle).queue.length
-                    );
-                    return logo.returns[turtle].pop();
-                } else {
-                    activity.errorMsg(NOACTIONERRORMSG, blk, name);
-                    return 0;
-                }
-            }
+            activity.turtles.getTurtle(turtle).running = true;
+            logo.runFromBlockNow(
+                logo,
+                turtle,
+                logo.actions[name],
+                true,
+                actionArgs,
+                activity.turtles.getTurtle(turtle).queue.length
+            );
+            return logo.returns[turtle].pop();
         }
     }
     /**
@@ -999,6 +1039,9 @@ function setupActionBlocks(activity) {
             if (args.length === 0) return;
 
             if (args[0] in logo.actions) {
+                if (isActionDisabled(logo.actions[args[0]])) {
+                    return;
+                }
                 if (activity.turtles.ithTurtle(turtle).singer.justCounting.length === 0) {
                     logo.notation.notationLineBreak(turtle);
                 }
@@ -1089,7 +1132,7 @@ function setupActionBlocks(activity) {
                 const tur = activity.turtles.ithTurtle(turtle);
 
                 const __listener = event => {
-                    if (logo.stopTurtle) {
+                    if (logo.stopTurtle || isActionDisabled(logo.actions[args[1]])) {
                         return;
                     }
 
@@ -1098,6 +1141,9 @@ function setupActionBlocks(activity) {
                         tur.parentFlowQueue.push(blk);
                         tur.queue.push(queueBlock);
                     } else {
+                        if (isActionDisabled(logo.actions[args[1]])) {
+                            return;
+                        }
                         // Since the turtle has stopped running, we
                         // must run the stack from here.
                         tur.singer.runningFromEvent = true;
@@ -1384,6 +1430,9 @@ function setupActionBlocks(activity) {
             if (args.length === 0) return;
 
             if (args[0] in logo.actions) {
+                if (isActionDisabled(logo.actions[args[0]])) {
+                    return;
+                }
                 if (activity.turtles.ithTurtle(turtle).singer.justCounting.length === 0) {
                     logo.notation.notationLineBreak(turtle);
                 }
@@ -1453,6 +1502,11 @@ function setupActionBlocks(activity) {
 
             if (!(name in logo.actions)) {
                 activity.errorMsg(NOACTIONERRORMSG, blk, name);
+                return;
+            }
+
+            if (isActionDisabled(logo.actions[name])) {
+                return;
             }
 
             const tur = activity.turtles.ithTurtle(turtle);

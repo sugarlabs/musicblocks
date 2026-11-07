@@ -2394,6 +2394,26 @@ describe("Logo runLogoCommands", () => {
             expect(logo._userTemperament).toBeNull();
             expect(logo.temperamentSelected).toEqual([]);
         });
+
+        test("is dropped when the only set temperament block is disabled", () => {
+            logo.blockList = [
+                { name: "start", value: 0, trash: false, connections: [] },
+                {
+                    name: "settemperament",
+                    trash: false,
+                    disabled: true,
+                    isDisabled: () => true,
+                    connections: []
+                }
+            ];
+
+            logo.runLogoCommands(null, null);
+
+            expect(logo.synth.inTemperament).toBe("equal");
+            expect(logo.synth.startingPitch).toBe("C4");
+            expect(logo._userTemperament).toBeNull();
+            expect(logo.temperamentSelected).toEqual([]);
+        });
     });
 
     test("executes each evalOnStartList plugin at run startup", () => {
@@ -2494,6 +2514,30 @@ describe("Logo runLogoCommands", () => {
         logo.runLogoCommands(null, null);
 
         expect(logo.actions["my-action"]).toBe(2);
+    });
+
+    test("registers disabled action stack in actions dictionary so callers can resolve it", () => {
+        mockActivity.blocks.stackList = [0];
+        logo.blockList = [
+            {
+                name: "action",
+                connections: [null, 1, 2],
+                trash: false,
+                disabled: true,
+                isDisabled: () => true
+            },
+            {
+                name: "number",
+                value: "disabled-action",
+                protoblock: { parameter: false },
+                isValueBlock: () => true
+            },
+            { name: "print", connections: [null] }
+        ];
+
+        logo.runLogoCommands(null, null);
+
+        expect(logo.actions["disabled-action"]).toBe(2);
     });
 
     test("fires _cleanupAfterCompletion when _lastNoteTimeout is cancelled on re-run", () => {
@@ -4765,6 +4809,265 @@ describe("Logo.processSpeak", () => {
 
             expect(logo.stage.dispatchEvent).toHaveBeenCalledWith("restore_volume_signal");
             expect(tur.queue).toEqual([]);
+        });
+    });
+
+    describe("Disabled blocks execution", () => {
+        let logo;
+        let mockActivity;
+        let turtle0;
+
+        beforeEach(() => {
+            setupLogoEnv({ withFlute: true });
+            turtle0 = createMockTurtle();
+            mockActivity = createMockActivity(turtle0);
+            logo = new Logo(mockActivity);
+            mockActivity.logo = logo;
+        });
+
+        test("disabled flow block skips execution and highlight but continues to next flow block", () => {
+            const block0 = {
+                ...makeFlowBlock("forward"),
+                connections: [null, 1],
+                disabled: true,
+                isDisabled: () => true
+            };
+            const block1 = {
+                ...makeFlowBlock("forward"),
+                connections: [0, null],
+                disabled: false,
+                isDisabled: () => false
+            };
+            logo.blockList = [block0, block1];
+            logo.blocks.highlight = jest.fn();
+
+            logo.runFromBlockNow(logo, 0, 0, 1, null, 0);
+
+            expect(block0.protoblock.flow).not.toHaveBeenCalled();
+            expect(logo.blocks.highlight).not.toHaveBeenCalledWith(0, false);
+            expect(block1.protoblock.flow).toHaveBeenCalled();
+            expect(logo.blocks.highlight).toHaveBeenCalledWith(1, false);
+        });
+
+        test("disabled clamp block skips itself and its children, continuing to the following block", () => {
+            const childBlock = {
+                ...makeFlowBlock("forward"),
+                connections: [0, null],
+                disabled: false
+            };
+            const clampBlock = {
+                ...makeFlowBlock("repeat", [1, 2]),
+                connections: [null, null, 1, 2],
+                disabled: true,
+                isDisabled: () => true
+            };
+            const nextBlock = {
+                ...makeFlowBlock("forward"),
+                connections: [0, null],
+                disabled: false
+            };
+            logo.blockList = [clampBlock, childBlock, nextBlock];
+
+            logo.runFromBlockNow(logo, 0, 0, 1, null, 0);
+
+            // Clamp and child block are skipped
+            expect(clampBlock.protoblock.flow).not.toHaveBeenCalled();
+            expect(childBlock.protoblock.flow).not.toHaveBeenCalled();
+            // Block after clamp executes
+            expect(nextBlock.protoblock.flow).toHaveBeenCalled();
+            const tur = logo.turtles.ithTurtle(0);
+            expect(tur.queue).toEqual([]);
+        });
+
+        test("disabled argument blocks return safe defaults in parseArg without throwing", () => {
+            const numBlock = {
+                name: "number",
+                value: 42,
+                disabled: true,
+                isDisabled: () => true,
+                protoblock: { parameter: false, dockTypes: ["numberout"] },
+                isValueBlock: () => true
+            };
+            const textBlock = {
+                name: "text",
+                value: "hello",
+                disabled: true,
+                isDisabled: () => true,
+                protoblock: { parameter: false, dockTypes: ["textout"] },
+                isValueBlock: () => true
+            };
+            const boolBlock = {
+                name: "boolean",
+                value: true,
+                disabled: true,
+                isDisabled: () => true,
+                protoblock: { parameter: false, dockTypes: ["booleanout"] },
+                isValueBlock: () => true
+            };
+            logo.blockList = [numBlock, textBlock, boolBlock];
+
+            expect(logo.parseArg(logo, 0, 0, null, null)).toBe(0);
+            expect(logo.parseArg(logo, 0, 1, null, null)).toBe("");
+            expect(logo.parseArg(logo, 0, 2, null, null)).toBe(false);
+        });
+
+        test("parent block consuming disabled argument receives safe default", () => {
+            const parentBlock = {
+                ...makeFlowBlock("forward"),
+                protoblock: { args: 1, dockTypes: ["flow", "numberin"], flow: jest.fn() },
+                connections: [null, 1, null]
+            };
+            const numArgBlock = {
+                name: "number",
+                value: 100,
+                disabled: true,
+                isDisabled: () => true,
+                protoblock: { parameter: false, dockTypes: ["numberout"] },
+                isValueBlock: () => true
+            };
+            logo.blockList = [parentBlock, numArgBlock];
+
+            expect(() => logo.runFromBlockNow(logo, 0, 0, 1, null, 0)).not.toThrow();
+            expect(parentBlock.protoblock.flow).toHaveBeenCalledWith(
+                [0],
+                logo,
+                0,
+                0,
+                null,
+                expect.any(Array),
+                1
+            );
+        });
+
+        test("directly running a disabled value block stops execution without error", () => {
+            const valBlock = {
+                name: "number",
+                value: 123,
+                disabled: true,
+                isDisabled: () => true,
+                connections: [null],
+                protoblock: { args: 0, dockTypes: ["numberout"] },
+                isValueBlock: () => true,
+                isArgBlock: () => false
+            };
+            logo.blockList = [valBlock];
+            logo.runFromBlockNow(logo, 0, 0, 0, null, 0);
+            expect(logo.stopTurtle).toBe(true);
+        });
+
+        test("parent block expecting textin or booleanin dock receives safe defaults when argument is disabled", () => {
+            const parentBlockText = {
+                ...makeFlowBlock("print"),
+                protoblock: { args: 1, dockTypes: ["flow", "textin"], flow: jest.fn() },
+                connections: [null, 1, null]
+            };
+            const textArgBlock = {
+                name: "text",
+                value: "hello",
+                disabled: true,
+                isDisabled: () => true,
+                protoblock: { parameter: false, dockTypes: ["textout"] },
+                isValueBlock: () => true
+            };
+            logo.blockList = [parentBlockText, textArgBlock];
+            logo.runFromBlockNow(logo, 0, 0, 1, null, 0);
+            expect(parentBlockText.protoblock.flow).toHaveBeenCalledWith(
+                [""],
+                logo,
+                0,
+                0,
+                null,
+                expect.any(Array),
+                1
+            );
+
+            const parentBlockBool = {
+                ...makeFlowBlock("if"),
+                protoblock: { args: 1, dockTypes: ["flow", "booleanin"], flow: jest.fn() },
+                connections: [null, 1, null]
+            };
+            const boolArgBlock = {
+                name: "boolean",
+                value: true,
+                disabled: true,
+                isDisabled: () => true,
+                protoblock: { parameter: false, dockTypes: ["booleanout"] },
+                isValueBlock: () => true
+            };
+            logo.blockList = [parentBlockBool, boolArgBlock];
+            logo.runFromBlockNow(logo, 0, 0, 1, null, 0);
+            expect(parentBlockBool.protoblock.flow).toHaveBeenCalledWith(
+                [false],
+                logo,
+                0,
+                0,
+                null,
+                expect.any(Array),
+                1
+            );
+        });
+
+        test("skips queued actions when their action root block is disabled before dispatch", () => {
+            const startBlock = {
+                ...makeFlowBlock("start"),
+                connections: [null],
+                protoblock: { args: 0, flow: jest.fn() }
+            };
+            const actionClamp = {
+                name: "action",
+                disabled: true,
+                isDisabled: () => true,
+                connections: [null, null, 2]
+            };
+            const actionChild = {
+                ...makeFlowBlock("forward"),
+                connections: [1, null],
+                protoblock: { args: 0, flow: jest.fn() }
+            };
+            logo.blockList = [startBlock, actionClamp, actionChild];
+            mockActivity.blocks.findTopBlock = jest.fn(blk => (blk === 2 ? 1 : blk));
+
+            const tur = logo.turtles.ithTurtle(0);
+            tur.queue = [new Queue(2, 1, 1)];
+
+            logo.runFromBlockNow(logo, 0, 0, 1, null, 0);
+
+            expect(actionChild.protoblock.flow).not.toHaveBeenCalled();
+            expect(tur.queue.length).toBe(0);
+        });
+
+        test("executes downstream block connected below a disabled action", () => {
+            const actionClamp = {
+                name: "action",
+                disabled: true,
+                isDisabled: () => true,
+                connections: [null, null, 1, 2],
+                protoblock: { args: 0, flow: jest.fn() },
+                isValueBlock: () => false,
+                isArgBlock: () => false
+            };
+            const actionChild = {
+                ...makeFlowBlock("forward"),
+                connections: [0, null],
+                protoblock: { args: 0, flow: jest.fn() }
+            };
+            const downstreamBlock = {
+                ...makeFlowBlock("forward"),
+                connections: [0, null],
+                protoblock: { args: 0, flow: jest.fn() }
+            };
+            logo.blockList = [actionClamp, actionChild, downstreamBlock];
+            mockActivity.blocks.findTopBlock = jest.fn(blk => 0);
+            mockActivity.blocks.sameGeneration = jest.fn((first, child) => first === child);
+
+            const tur = logo.turtles.ithTurtle(0);
+            tur.parentFlowQueue = [];
+
+            logo.runFromBlockNow(logo, 0, 0, 1, null, 0);
+
+            expect(actionClamp.protoblock.flow).not.toHaveBeenCalled();
+            expect(actionChild.protoblock.flow).not.toHaveBeenCalled();
+            expect(downstreamBlock.protoblock.flow).toHaveBeenCalled();
         });
     });
 });

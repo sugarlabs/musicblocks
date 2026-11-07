@@ -125,7 +125,8 @@ global.getTemperamentsList = jest.fn();
 global.getVoiceSynthName = jest.fn();
 global.i18nSolfege = jest.fn();
 global.MathUtility = {
-    isNumber: jest.fn()
+    isNumber: jest.fn(),
+    doRandom: jest.fn((min, max) => min || 42)
 };
 global.mixedNumber = jest.fn();
 global.piemenuBlockContext = jest.fn();
@@ -1480,6 +1481,239 @@ describe("Blocks Foundation", () => {
             blocks.selectedStack = 1;
             const copiedSolfege = blocks._copyBlocksToObj(false);
             expect(copiedSolfege[0][1]).toEqual(["solfege", { value: "Fa" }]);
+        });
+
+        it("preserves disabled state on copied blocks", () => {
+            const blocks = new Blocks(mockActivity);
+            mockActivity.blocksContainer.x = 0;
+            mockActivity.blocksContainer.y = 0;
+            blocks.blockList = [
+                {
+                    name: "forward",
+                    disabled: true,
+                    connections: [null, 1],
+                    isValueBlock: jest.fn().mockReturnValue(false)
+                },
+                {
+                    name: "number",
+                    value: 50,
+                    disabled: true,
+                    connections: [0],
+                    isValueBlock: jest.fn().mockReturnValue(true)
+                }
+            ];
+            blocks.selectedStack = 0;
+
+            const copiedBlocks = blocks._copyBlocksToObj(false);
+            expect(copiedBlocks[0][1]).toEqual(["forward", { value: null, disabled: true }]);
+            expect(copiedBlocks[1][1]).toEqual(["number", { value: 50, disabled: true }]);
+        });
+
+        it("preserves disabled state on array blockItem with null value object", () => {
+            const blocks = new Blocks(mockActivity);
+            mockActivity.blocksContainer.x = 0;
+            mockActivity.blocksContainer.y = 0;
+            blocks.blockList = [
+                {
+                    name: "media",
+                    value: null,
+                    disabled: true,
+                    connections: [null],
+                    isValueBlock: jest.fn().mockReturnValue(true)
+                }
+            ];
+            blocks.selectedStack = 0;
+            const copied = blocks._copyBlocksToObj(false);
+            expect(copied[0][1]).toEqual(["media", { value: null, disabled: true }]);
+        });
+
+        it("saves disabled action stack with action name instead of '---'", () => {
+            const blocks = new Blocks(mockActivity);
+            mockActivity.blocksContainer.x = 0;
+            mockActivity.blocksContainer.y = 0;
+            blocks.storage = { macros: "" };
+            blocks.macroDict = {};
+            blocks.addToMyPalette = jest.fn();
+            blocks.activity.palettes = { updatePalettes: jest.fn() };
+            blocks.blockList = [
+                {
+                    name: "action",
+                    disabled: true,
+                    connections: [null, 1],
+                    isValueBlock: () => false,
+                    isArgBlock: () => false
+                },
+                {
+                    name: "text",
+                    value: "myAction",
+                    disabled: true,
+                    connections: [0],
+                    isValueBlock: () => true,
+                    isArgBlock: () => false
+                }
+            ];
+            blocks.selectedStack = 0;
+            blocks.saveStack();
+            expect(blocks.addToMyPalette).toHaveBeenCalledWith("myAction");
+        });
+
+        it("saves disabled show stack with generated name instead of '---'", () => {
+            const blocks = new Blocks(mockActivity);
+            mockActivity.blocksContainer.x = 0;
+            mockActivity.blocksContainer.y = 0;
+            blocks.storage = { macros: "" };
+            blocks.macroDict = {};
+            blocks.addToMyPalette = jest.fn();
+            blocks.activity.palettes = { updatePalettes: jest.fn() };
+            blocks.blockList = [
+                {
+                    name: "show",
+                    disabled: true,
+                    connections: [null],
+                    isValueBlock: () => false,
+                    isArgBlock: () => false
+                }
+            ];
+            blocks.selectedStack = 0;
+            blocks.saveStack();
+            expect(blocks.addToMyPalette).toHaveBeenCalledWith(expect.stringMatching(/^show-\d+$/));
+        });
+
+        it("preserves disabled state when renaming a copied action", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.protoBlockDict = {
+                action: { style: "clamp", hasCapability: () => false },
+                text: { style: "basic", hasCapability: () => false },
+                nameddo: { style: "basic", hasCapability: () => false }
+            };
+            const blockObjs = [
+                [0, "action", 0, 0, [null, 1, null]],
+                [1, ["text", { value: "myAction", disabled: true }], 0, 0, [0]],
+                [2, ["nameddo", { value: "myAction", disabled: true }], 0, 0, [null]]
+            ];
+            blocks.blockList = [
+                { name: "action", trash: false, connections: [null, 1, null] },
+                { name: "text", trash: false, value: "myAction", connections: [0] }
+            ];
+            blocks.activity.logo = { synth: { preloadProjectSamples: jest.fn() } };
+            blocks._processOneBlock = jest.fn();
+            blocks._chunkLoad = jest.fn();
+            blocks.loadNewBlocks(blockObjs);
+            expect(blockObjs[1][1][1].value).toBe("myAction1");
+            expect(blockObjs[1][1][1].disabled).toBe(true);
+            expect(blockObjs[2][1][1].value).toBe("myAction1");
+            expect(blockObjs[2][1][1].disabled).toBe(true);
+        });
+
+        it("handles primitive and object block data when renaming a copied action", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.protoBlockDict = {
+                action: { style: "clamp", hasCapability: () => false },
+                text: { style: "basic", hasCapability: () => false },
+                nameddo: { style: "basic", hasCapability: () => false },
+                do: { style: "basic", hasCapability: () => false }
+            };
+            const blockObjs = [
+                [0, "action", 0, 0, [null, 1, null]],
+                [1, ["text", "myAction"], 0, 0, [0]],
+                [2, ["nameddo", { value: "myAction" }], 0, 0, [null]],
+                [3, "do", 0, 0, [null, 4]],
+                [4, ["text", "myAction"], 0, 0, [3]],
+                [5, "do", 0, 0, [null, 6]],
+                [6, ["text", { value: "myAction" }], 0, 0, [5]]
+            ];
+            blocks.blockList = [
+                { name: "action", trash: false, connections: [null, 1, null] },
+                { name: "text", trash: false, value: "myAction", connections: [0] }
+            ];
+            blocks.activity.logo = { synth: { preloadProjectSamples: jest.fn() } };
+            blocks._processOneBlock = jest.fn();
+            blocks._chunkLoad = jest.fn();
+            blocks.loadNewBlocks(blockObjs);
+            expect(blockObjs[1][1][1]).toEqual({ value: "myAction1" });
+            expect(blockObjs[2][1][1]).toEqual({ value: "myAction1" });
+            expect(blockObjs[4][1][1]).toBe("myAction1");
+            expect(blockObjs[6][1][1]).toEqual({ value: "myAction1" });
+        });
+
+        it("normalizes numeric action names to strings for disabled actions when loading", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.protoBlockDict = {
+                action: { style: "clamp", hasCapability: () => false },
+                number: { style: "basic", hasCapability: () => false }
+            };
+            const blockObjs = [
+                [0, "action", 0, 0, [null, 1, null]],
+                [1, ["number", { value: 42, disabled: true }], 0, 0, [0]]
+            ];
+            blocks.blockList = [
+                { name: "action", trash: false, connections: [null, 1, null] },
+                { name: "number", trash: false, value: "42", connections: [0] }
+            ];
+            blocks.activity.logo = { synth: { preloadProjectSamples: jest.fn() } };
+            blocks._processOneBlock = jest.fn();
+            blocks._chunkLoad = jest.fn();
+            blocks.loadNewBlocks(blockObjs);
+            expect(blockObjs[1][1][1].value).toBe("421");
+            expect(blockObjs[1][1][1].disabled).toBe(true);
+        });
+
+        it("normalizes numeric existing action names and references during rename", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.protoBlockDict = {
+                action: { style: "clamp", hasCapability: () => false },
+                nameddo: { style: "basic", hasCapability: () => false },
+                text: { style: "basic", hasCapability: () => false }
+            };
+            const blockObjs = [
+                [0, "action", 0, 0, [null, 1, null]],
+                [1, ["text", "42"], 0, 0, [0]],
+                [2, ["nameddo", { value: 42 }], 0, 0, [null]]
+            ];
+            blocks.blockList = [
+                { name: "action", trash: false, connections: [null, 1, null] },
+                { name: "number", trash: false, value: 42, connections: [0] }
+            ];
+            blocks.activity.logo = { synth: { preloadProjectSamples: jest.fn() } };
+            blocks._processOneBlock = jest.fn();
+            blocks._chunkLoad = jest.fn();
+            blocks.loadNewBlocks(blockObjs);
+            expect(blockObjs[1][1]).toEqual(["text", { value: "421" }]);
+            expect(blockObjs[2][1][1].value).toBe("421");
+        });
+
+        it("sets disabled state and alpha when loading a block with disabled property", () => {
+            const blocks = new Blocks(mockActivity);
+            const mockBlk = {
+                name: "forward",
+                connections: [null],
+                disabled: false,
+                updateDisabledAppearance: jest.fn(),
+                container: { alpha: 1.0, x: 0, y: 0 }
+            };
+            blocks.blockList = [mockBlk];
+            blocks._adjustTheseDocks = [];
+            blocks._adjustTheseStacks = [];
+            blocks._updateSpatialGrid = jest.fn();
+            blocks._makeNewBlockWithConnections = jest.fn();
+            blocks._processOneBlock(0, [[0, ["forward", { disabled: true }], 0, 0, [null]]], 0, 0);
+            expect(blocks.blockList[0].disabled).toBe(true);
+            expect(blocks.blockList[0].updateDisabledAppearance).toHaveBeenCalled();
+        });
+
+        it("sets container alpha to 0.5 in makeNewBlock when block is disabled", () => {
+            const blocks = new Blocks(mockActivity);
+            blocks.protoBlockDict["forward"] = { name: "forward", scale: 1 };
+            const originalPush = blocks.blockList.push.bind(blocks.blockList);
+            blocks.blockList.push = jest.fn(blk => {
+                blk.disabled = true;
+                blk.copySize = jest.fn();
+                blk.imageLoad = jest.fn();
+                return originalPush(blk);
+            });
+            blocks.makeNewBlock("forward");
+            const createdBlock = blocks.blockList[blocks.blockList.length - 1];
+            expect(createdBlock.container.alpha).toBe(0.5);
         });
 
         it("copies a stand-in as the block it was loaded from", () => {

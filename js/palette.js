@@ -2279,7 +2279,13 @@ class Palette {
                             newValue = [valueEntry[0], valueEntry[1].toString()];
                         }
                     } else {
-                        if (valueEntry[0] === "number") {
+                        if (valueEntry[1] && valueEntry[1]["disabled"]) {
+                            const metadata = Object.assign({}, valueEntry[1], { disabled: true });
+                            if (valueEntry[0] === "number" && metadata.value !== undefined) {
+                                metadata.value = Number(metadata.value);
+                            }
+                            newValue = [valueEntry[0], metadata];
+                        } else if (valueEntry[0] === "number") {
                             newValue = [valueEntry[0], Number(valueEntry[1]["value"])];
                         } else {
                             newValue = [valueEntry[0], { value: valueEntry[1]["value"] }];
