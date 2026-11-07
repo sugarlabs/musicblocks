@@ -134,7 +134,7 @@ describe("GraphicsBlocksAPI", () => {
         graphicsBlocksAPI.setBezierControlPoint1(x, y);
 
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("setBezierControlPoint1", [x, y]);
-        expect(graphicsBlocksAPI.runCommand).toHaveBeenCalledWith("setControlPoint1", [x, y]);
+        expect(graphicsBlocksAPI.runCommand).toHaveBeenCalledWith("setControlPoint1", [[x, y]]);
     });
 
     test("setBezierControlPoint2 calls runCommand with correct arguments", () => {
@@ -145,7 +145,20 @@ describe("GraphicsBlocksAPI", () => {
         graphicsBlocksAPI.setBezierControlPoint2(x, y);
 
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("setBezierControlPoint2", [x, y]);
-        expect(graphicsBlocksAPI.runCommand).toHaveBeenCalledWith("setControlPoint2", [x, y]);
+        expect(graphicsBlocksAPI.runCommand).toHaveBeenCalledWith("setControlPoint2", [[x, y]]);
+    });
+
+    test("passes both Bezier control points to the painter as [x, y]", () => {
+        const Painter = require("../../../turtle-painter");
+        const painter = Object.create(Painter.prototype);
+        // runCommand spreads the argument list into the painter method, as in export.js.
+        graphicsBlocksAPI.runCommand = (command, args) => painter[command](...args);
+        JSInterface.validateArgs.mockImplementation((name, args) => args);
+
+        graphicsBlocksAPI.setBezierControlPoint1(5, 10);
+        graphicsBlocksAPI.setBezierControlPoint2(20, 30);
+
+        expect([painter.cp1x, painter.cp1y, painter.cp2x, painter.cp2y]).toEqual([5, 10, 20, 30]);
     });
 
     test("clear calls runCommand with correct arguments", () => {
