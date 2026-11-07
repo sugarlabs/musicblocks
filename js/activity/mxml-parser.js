@@ -43,6 +43,17 @@ const _MXML_TYPE_DENOMINATOR = {
     "256th": 256
 };
 
+// MusicXML leaves dynamic playback levels to the application. Keep mp at the
+// Music Blocks default synth volume and space the other common markings around it.
+const _MXML_DYNAMIC_VOLUMES = {
+    pp: 20,
+    p: 35,
+    mp: 50,
+    mf: 65,
+    f: 80,
+    ff: 100
+};
+
 const _text = (parent, tag) => parent.querySelector(`:scope > ${tag}`)?.textContent ?? null;
 
 const _isUsableFraction = fraction => {
@@ -524,6 +535,24 @@ const _MXML_MODE_NAME = {
 const _MXML_ASCII_ACCIDENTAL_SUFFIX = { "#": "♯", "b": "♭", "": "" };
 
 /**
+ * Returns the Music Blocks volume for a supported dynamic marking in a
+ * MusicXML <direction>, or null when there is no supported marking.
+ * @param {Element} directionEl - a MusicXML <direction> element
+ * @returns {number|null}
+ */
+function _dynamicVolume(directionEl) {
+    const dynamicsEl = directionEl.querySelector(":scope > direction-type > dynamics");
+    if (dynamicsEl === null) return null;
+
+    for (const marking of dynamicsEl.children) {
+        const volume = _MXML_DYNAMIC_VOLUMES[marking.tagName];
+        if (volume !== undefined) return volume;
+    }
+
+    return null;
+}
+
+/**
  * A part's key signature as a Music Blocks {root, mode} pair, from its first
  * <attributes><key><fifths> (+ optional <mode>), defaulting to C major when
  * absent, unparseable, or outside the range a reasonable key signature covers.
@@ -704,6 +733,21 @@ function _createTempoBlocks(blockId, tempoBpm, timeSignature, prevId, nextFlowId
         [blockId + 3, ["number", { value: 1 }], 0, 0, [blockId + 2]],
         [blockId + 4, ["number", { value: timeSignature.beatType }], 0, 0, [blockId + 2]],
         [blockId + 5, "vspace", 0, 0, [blockId, nextFlowId]]
+    ];
+}
+
+/**
+ * Builds a set-synth-volume block for the imported voice's guitar timbre.
+ * @param {number} blockId - this volume block's starting id
+ * @param {number} volume - volume in Music Blocks' 0..100 range
+ * @param {number} prevId - the previous flow block's id
+ * @returns {Array} the block literals
+ */
+function _createVolumeBlocks(blockId, volume, prevId) {
+    return [
+        [blockId, "setsynthvolume", 0, 0, [prevId, blockId + 1, blockId + 2, null]],
+        [blockId + 1, ["voicename", { value: "guitar" }], 0, 0, [blockId]],
+        [blockId + 2, ["number", { value: volume }], 0, 0, [blockId]]
     ];
 }
 
@@ -967,16 +1011,36 @@ function _processPart(
     let tieContent = null;
     let currentTempoBpm = initialTempoBpm;
     let nextTempoIndex = 0;
+    let pendingVolume = null;
 
     const emitNote = (duration, content) => {
+        let startId = blockId;
+        let volumeBlocks = null;
+        if (pendingVolume !== null) {
+            volumeBlocks = _createVolumeBlocks(blockId, pendingVolume, prevId);
+            noteBlocks.push(...volumeBlocks);
+            prevId = blockId;
+            blockId += volumeBlocks.length;
+            startId = prevId;
+            pendingVolume = null;
+        }
         const blocks = _createNoteBlocks(blockId, duration, content, prevId);
+        if (volumeBlocks !== null) volumeBlocks[0][4][3] = blockId;
         noteBlocks.push(...blocks);
-        noteStartIds.push(blockId);
+        noteStartIds.push(startId);
         noteEndIds.push(blocks[blocks.length - 1][0]);
         noteTempoBpms.push(currentTempoBpm);
         producedNotes = true;
         prevId = blocks[blocks.length - 1][0];
         blockId = prevId + 1;
+    };
+
+    const flushTie = () => {
+        if (tieDuration !== null) {
+            emitNote(tieDuration, tieContent);
+            tieDuration = null;
+            tieContent = null;
+        }
     };
 
     const emitTempo = tempoBpm => {
@@ -997,11 +1061,7 @@ function _processPart(
             const { tempoBpm } = change;
             if (change.measureIndex === 0 && change.offset === 0) continue;
             if (tempoBpm === currentTempoBpm) continue;
-            if (tieDuration !== null) {
-                emitNote(tieDuration, tieContent);
-                tieDuration = null;
-                tieContent = null;
-            }
+            flushTie();
             emitTempo(tempoBpm);
         }
     };
@@ -1017,17 +1077,22 @@ function _processPart(
             emitDueTempoChanges(measureIndex, offset);
             if (child.tagName === "backup") break;
 
+            if (child.tagName === "direction") {
+                const volume = _dynamicVolume(child);
+                if (volume !== null) {
+                    flushTie();
+                    pendingVolume = volume;
+                }
+                continue;
+            }
+
             // <forward> moves this voice on by its <duration> with no note
             // written. Skipping it brought every later note in early.
             if (child.tagName === "forward") {
                 const durationText = _text(child, "duration");
                 const length = durationText?.trim() ? Number(durationText) : NaN;
                 if (Number.isFinite(length) && length > 0 && divisions > 0) {
-                    if (tieDuration !== null) {
-                        emitNote(tieDuration, tieContent);
-                        tieDuration = null;
-                        tieContent = null;
-                    }
+                    flushTie();
                     emitNote([length, divisions * 4], null);
                     offset += length / divisions;
                 }
@@ -1093,11 +1158,7 @@ function _processPart(
             const continuesTie =
                 tieDuration !== null && hasTieStop && _contentsEqual(content, tieContent);
 
-            if (tieDuration !== null && !continuesTie) {
-                emitNote(tieDuration, tieContent);
-                tieDuration = null;
-                tieContent = null;
-            }
+            if (tieDuration !== null && !continuesTie) flushTie();
 
             if (continuesTie) {
                 const combined = _addFractions(tieDuration, duration);
@@ -1123,9 +1184,7 @@ function _processPart(
     // A file that ends mid-tie (a <tie type="start"/> with no matching stop)
     // is malformed, but the accumulated duration is still real music: emit it
     // rather than silently dropping it.
-    if (tieDuration !== null) {
-        emitNote(tieDuration, tieContent);
-    }
+    flushTie();
 
     if (!producedNotes) {
         // A part with no notes must not leave behind tempo-only blocks. They

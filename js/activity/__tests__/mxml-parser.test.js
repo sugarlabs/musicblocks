@@ -572,6 +572,14 @@ function tempos(blocks) {
         .map(b => byIndex.get(b[4][1])[1][1].value);
 }
 
+/** Every set-synth-volume block's numeric value, in block-array order. */
+function synthVolumes(blocks) {
+    const byIndex = new Map(blocks.map(block => [block[0], block]));
+    return blocks
+        .filter(block => blockName(block) === "setsynthvolume")
+        .map(block => byIndex.get(block[4][2])[1][1].value);
+}
+
 const withKey = (fifths, mode) =>
     `<key><fifths>${fifths}</fifths>${mode ? `<mode>${mode}</mode>` : ""}</key>`;
 
@@ -864,7 +872,70 @@ describe("Test 12: Tempo", () => {
     });
 });
 
-describe("Test 13: Multi-part scores", () => {
+describe("Test 13: Dynamic markings", () => {
+    const dynamic = marking =>
+        `<direction><direction-type><dynamics><${marking}/></dynamics></direction-type></direction>`;
+
+    it("places each supported dynamic's synth-volume block before its following note", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                dynamic("p") +
+                    SIMPLE_NOTE("C", 4, "quarter") +
+                    dynamic("f") +
+                    SIMPLE_NOTE("D", 4, "quarter")
+            )
+        );
+
+        expect(synthVolumes(blocks)).toEqual([35, 80]);
+        const volumeBlocks = blocks.filter(block => blockName(block) === "setsynthvolume");
+        const byIndex = new Map(blocks.map(block => [block[0], block]));
+        expect(blockName(byIndex.get(volumeBlocks[0][4][3]))).toBe("newnote");
+        expect(blockName(byIndex.get(volumeBlocks[1][4][3]))).toBe("newnote");
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it.each([
+        ["pp", 20],
+        ["p", 35],
+        ["mp", 50],
+        ["mf", 65],
+        ["f", 80],
+        ["ff", 100]
+    ])("maps %s to synth volume %i", async (marking, volume) => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(dynamic(marking) + SIMPLE_NOTE("C", 4, "quarter"))
+        );
+
+        expect(synthVolumes(blocks)).toEqual([volume]);
+    });
+
+    it("ignores an unsupported dynamic marking without creating a volume block", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(dynamic("sfz") + SIMPLE_NOTE("C", 4, "quarter"))
+        );
+
+        expect(synthVolumes(blocks)).toEqual([]);
+    });
+
+    it("keeps a dynamic marking inside a repeated section connected to its note", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                '<barline><repeat direction="forward"/></barline>' +
+                    dynamic("mf") +
+                    SIMPLE_NOTE("C", 4, "quarter") +
+                    '<barline><repeat direction="backward"/></barline>'
+            )
+        );
+
+        expect(synthVolumes(blocks)).toEqual([65]);
+        expect(blocks.filter(block => blockName(block) === "repeat")).toHaveLength(1);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+});
+
+describe("Test 14: Multi-part scores", () => {
     const twoPartScore = (part1Measures, part2Measures) =>
         "<score-partwise>" +
         '<part-list><score-part id="P1"/><score-part id="P2"/></part-list>' +
@@ -900,6 +971,25 @@ describe("Test 13: Multi-part scores", () => {
         expect(newnotes).toHaveLength(2);
         expect(newnotes[0][4][0]).toBe(settimbres[0][0]);
         expect(newnotes[1][4][0]).toBe(settimbres[1][0]);
+    });
+
+    it("keeps dynamic markings in their own imported voice", async () => {
+        const quiet =
+            "<direction><direction-type><dynamics><p/></dynamics></direction-type></direction>";
+        const loud =
+            "<direction><direction-type><dynamics><f/></dynamics></direction-type></direction>";
+        const { blocks } = await parseAndCapture(
+            twoPartScore(
+                quiet + SIMPLE_NOTE("C", 4, "quarter"),
+                loud + SIMPLE_NOTE("E", 3, "quarter")
+            )
+        );
+
+        const settimbres = blocks.filter(block => blockName(block) === "settimbre");
+        const volumeBlocks = blocks.filter(block => blockName(block) === "setsynthvolume");
+        expect(synthVolumes(blocks)).toEqual([35, 80]);
+        expect(volumeBlocks.map(block => block[4][0])).toEqual(settimbres.map(block => block[0]));
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
     it("extracts each part's own key signature independently", async () => {
