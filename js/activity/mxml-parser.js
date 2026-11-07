@@ -1016,6 +1016,18 @@ function _processPart(
     let currentTempoBpm = initialTempoBpm;
     let nextTempoIndex = 0;
     let pendingVolumes = [];
+    let importedVoice = "1";
+
+    outer: for (const measureEl of partEl.querySelectorAll(":scope > measure")) {
+        for (const child of measureEl.children) {
+            if (child.tagName === "backup") break;
+            if (child.tagName !== "note") continue;
+            if (child.querySelector(":scope > chord, :scope > grace") !== null) continue;
+
+            importedVoice = _text(child, "voice")?.trim() || "1";
+            break outer;
+        }
+    }
 
     const emitNote = (duration, content) => {
         let startId = blockId;
@@ -1023,7 +1035,6 @@ function _processPart(
         pendingVolumes.forEach(volume => {
             const volumeBlocks = _createVolumeBlocks(blockId, volume, prevId);
             noteBlocks.push(...volumeBlocks);
-            if (previousVolumeBlock === null) startId = blockId;
             if (previousVolumeBlock !== null) previousVolumeBlock[4][3] = blockId;
             previousVolumeBlock = volumeBlocks[0];
             prevId = blockId;
@@ -1085,6 +1096,9 @@ function _processPart(
             if (child.tagName === "backup") break;
 
             if (child.tagName === "direction") {
+                const directionVoice = _text(child, "voice")?.trim();
+                if (directionVoice && directionVoice !== importedVoice) continue;
+
                 const volume = _dynamicVolume(child);
                 if (volume !== null) {
                     // A tied note is emitted as one block. Keep it open so a
