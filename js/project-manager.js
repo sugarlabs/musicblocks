@@ -825,12 +825,23 @@ class ProjectManager {
             that.planet.planet !== null &&
             that.planet.getCurrentProjectName() !== _("My Project");
 
-        // saveLocally() snapshots the workspace before it writes. Edits made
-        // while the write is pending are not captured and are cleared below.
+        if (that.blocks.isLoading()) {
+            that.errorMsg(
+                _(
+                    "Please wait for the current project to finish loading before creating a new one."
+                )
+            );
+            return;
+        }
+
         if (hasNamedPlanetProject) {
             try {
-                const saved = await that.planet.saveLocally({ rejectOnProjectSaveError: true });
-                if (saved === false || saved === null) return;
+                let snapshot;
+                do {
+                    snapshot = that.prepareExport();
+                    const saved = await that.planet.saveLocally({ rejectOnProjectSaveError: true });
+                    if (saved === false || saved === null) return;
+                } while (that.prepareExport() !== snapshot);
             } catch (error) {
                 ErrorHandler.recoverable(error, { operation: "saveProjectBeforeNewProject" });
                 that.errorMsg(
@@ -871,30 +882,28 @@ class ProjectManager {
 
         if (hasNamedPlanetProject) {
             // Create the new project slot and clear the canvas synchronously.
-            that.planet.initialiseNewProject();
+            await that.planet.initialiseNewProject();
             // _loadStart is async: it fires loadNewBlocks and then emits
             // "finishedLoading". We save the NEW project only after that
             // event fires so we capture the fresh start blocks, not stale data.
-            const loadPromise = pm._loadStart(that);
-            if (loadPromise && typeof loadPromise.then === "function") {
-                loadPromise
-                    .then(() => {
-                        that.planet.saveLocally();
-                    })
-                    .catch(() => {
-                        // Best-effort — ignore if _loadStart rejects unexpectedly.
-                        that.planet.saveLocally();
-                    });
-            } else {
-                that.planet.saveLocally();
+            await pm._loadStart(that);
+            if (that.blocks.isLoading()) {
+                await new Promise(resolve => that.blocks.runAfterLoad(resolve));
             }
+            await that.planet.saveLocally();
         } else {
             that.toolbar.closeAuxToolbar((act, resize) => act._showHideAuxMenu(resize));
 
-            setTimeout(() => {
-                that.sendAllToTrash(false, false);
-                that.blocks.loadNewBlocks(DATAOBJS);
-            }, 1000);
+            await new Promise(resolve => {
+                setTimeout(() => {
+                    that.sendAllToTrash(false, false);
+                    that.blocks.loadNewBlocks(DATAOBJS);
+                    resolve();
+                }, 1000);
+            });
+            if (that.blocks.isLoading()) {
+                await new Promise(resolve => that.blocks.runAfterLoad(resolve));
+            }
         }
     }
 
