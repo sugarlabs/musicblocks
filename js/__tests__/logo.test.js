@@ -1108,6 +1108,110 @@ describe("Logo doBreak", () => {
         expect(tur.parentFlowQueue).toEqual([0]);
         expect(tur.queue[0].blk).toBe(3);
     });
+
+    test("handles queue entries with null parentBlk or null blk without throwing TypeError", () => {
+        const tur = {
+            queue: [
+                { blk: 0, parentBlk: null },
+                { blk: null, parentBlk: 0 },
+                { blk: null, parentBlk: null },
+                null
+            ],
+            parentFlowQueue: []
+        };
+        logo.blockList = [{ name: "print" }];
+
+        expect(() => logo.doBreak(tur)).not.toThrow();
+    });
+
+    test("handles out-of-bounds or missing block indices without throwing", () => {
+        const tur = {
+            queue: [{ blk: 999, parentBlk: 888 }],
+            parentFlowQueue: []
+        };
+        logo.blockList = [{ name: "print" }];
+
+        expect(() => logo.doBreak(tur)).not.toThrow();
+    });
+
+    test("breaks repeat loop immediately, preserving post-loop blocks and dropping pending iteration blocks", () => {
+        const tur = {
+            queue: [
+                { blk: 9, parentBlk: 99 },
+                { blk: 1, parentBlk: 0 },
+                { blk: 2, parentBlk: 1 }
+            ],
+            parentFlowQueue: [0, 1]
+        };
+        logo.blockList = [
+            { name: "repeat", connections: [null, 1, 2] },
+            { name: "if", connections: [0, 2] },
+            { name: "note" }
+        ];
+
+        logo.doBreak(tur);
+
+        expect(tur.queue).toEqual([{ blk: 9, parentBlk: 99 }]);
+        expect(tur.parentFlowQueue).toEqual([]);
+    });
+
+    test("dispatches endOfClampSignals for blocks dropped by immediate loop break", () => {
+        const signalSpy = jest.fn();
+        logo.stage = { dispatchEvent: signalSpy };
+        const tur = {
+            queue: [
+                { blk: 1, parentBlk: 0 },
+                { blk: 2, parentBlk: 1 }
+            ],
+            endOfClampSignals: {
+                2: ["end-of-clamp-signal"]
+            },
+            parentFlowQueue: []
+        };
+        logo.blockList = [
+            { name: "repeat", connections: [null, 1, 2] },
+            { name: "if" },
+            { name: "note" }
+        ];
+
+        logo.doBreak(tur);
+
+        expect(tur.queue).toEqual([]);
+        expect(signalSpy).toHaveBeenCalledWith("end-of-clamp-signal");
+    });
+
+    test("breaks forever loop identified by parentBlk and flushes from queue", () => {
+        const tur = {
+            queue: [{ blk: 1, parentBlk: 0 }],
+            parentFlowQueue: []
+        };
+        logo.blockList = [{ name: "forever", connections: [null, 1] }, { name: "print" }];
+
+        logo.doBreak(tur);
+
+        expect(tur.queue.length).toBe(0);
+    });
+
+    test("handles until-loop parent and enqueues child flow", () => {
+        const tur = { queue: [{ blk: 0, parentBlk: null }], parentFlowQueue: [] };
+        logo.blockList = [
+            { name: "until", connections: [null, 1, 2, 3] },
+            { name: "boolean" },
+            { name: "print" },
+            { name: "forward" }
+        ];
+
+        logo.doBreak(tur);
+
+        expect(tur.parentFlowQueue).toEqual([0]);
+        expect(tur.queue[0].blk).toBe(3);
+    });
+
+    test("returns safely when turtle or turtle.queue is null or undefined", () => {
+        expect(() => logo.doBreak(null)).not.toThrow();
+        expect(() => logo.doBreak({})).not.toThrow();
+        expect(() => logo.doBreak({ queue: null })).not.toThrow();
+    });
 });
 
 // ─── Logo setDispatchBlock ────────────────────────────────────────────────────
