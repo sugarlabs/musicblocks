@@ -68,7 +68,11 @@ class ProjectStorage {
                 this.data.Projects[projectId].ProjectData = data;
                 this.data.Projects[projectId].DateLastModified = Date.now();
             }
-            this.data.Projects[projectId].ProjectImage = image;
+            if (image === null) {
+                this.data.Projects[projectId].ProjectImage = null;
+            } else if (typeof image === "string" && image.trim().length > 0) {
+                this.data.Projects[projectId].ProjectImage = image;
+            }
             await this.save();
             return;
         }
@@ -94,7 +98,11 @@ class ProjectStorage {
             this.data.Projects[c].ProjectData = data;
             this.data.Projects[c].DateLastModified = Date.now();
         }
-        this.data.Projects[c].ProjectImage = image;
+        if (image === null) {
+            this.data.Projects[c].ProjectImage = null;
+        } else if (typeof image === "string" && image.trim().length > 0) {
+            this.data.Projects[c].ProjectImage = image;
+        }
         await this.save();
     }
 
@@ -105,8 +113,13 @@ class ProjectStorage {
             return;
         }
 
-        this.data.Projects[projectId].ProjectImage = image;
-        await this.save();
+        if (image === null) {
+            this.data.Projects[projectId].ProjectImage = null;
+            await this.save();
+        } else if (typeof image === "string" && image.trim().length > 0) {
+            this.data.Projects[projectId].ProjectImage = image;
+            await this.save();
+        }
     }
 
     async getCurrentProjectData() {

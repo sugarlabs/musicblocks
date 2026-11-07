@@ -119,7 +119,7 @@ describe("Planet", () => {
     describe("saveThumbnail", () => {
         it("should call ProjectStorage.saveThumbnail", () => {
             const planet = new Planet(true, {});
-            const mockStorage = { saveThumbnail: jest.fn() };
+            const mockStorage = { saveThumbnail: jest.fn().mockResolvedValue() };
             planet.ProjectStorage = mockStorage;
             planet.saveThumbnail("image", "proj1");
             expect(mockStorage.saveThumbnail).toHaveBeenCalledWith("image", "proj1");
@@ -127,10 +127,79 @@ describe("Planet", () => {
 
         it("should pass undefined projectId safely", () => {
             const planet = new Planet(true, {});
-            const mockStorage = { saveThumbnail: jest.fn() };
+            const mockStorage = { saveThumbnail: jest.fn().mockResolvedValue() };
             planet.ProjectStorage = mockStorage;
             planet.saveThumbnail("image", undefined);
             expect(mockStorage.saveThumbnail).toHaveBeenCalledWith("image", undefined);
+        });
+
+        it("updates DOM image when persistence succeeds and project exists", async () => {
+            const planet = new Planet(true, {});
+            planet.LocalPlanet = {};
+            planet.ProjectStorage = {
+                data: { Projects: { proj1: { ProjectName: "Test" } } },
+                saveThumbnail: jest.fn().mockResolvedValue()
+            };
+            const cardImg = document.createElement("img");
+            cardImg.id = "local-project-image-proj1";
+            cardImg.src = "old-thumb";
+            document.body.appendChild(cardImg);
+
+            await planet.saveThumbnail("data:image/png;base64,new", "proj1");
+            expect(cardImg.src).toBe("data:image/png;base64,new");
+            cardImg.remove();
+        });
+
+        it("falls back to ImageDataURL in DOM when image is null", async () => {
+            const planet = new Planet(true, {});
+            planet.LocalPlanet = {};
+            planet.ProjectStorage = {
+                ImageDataURL: "fallback-default",
+                data: { Projects: { proj1: { ProjectName: "Test" } } },
+                saveThumbnail: jest.fn().mockResolvedValue()
+            };
+            const cardImg = document.createElement("img");
+            cardImg.id = "local-project-image-proj1";
+            cardImg.src = "old-thumb";
+            document.body.appendChild(cardImg);
+
+            await planet.saveThumbnail(null, "proj1");
+            expect(cardImg.src).toBe("http://localhost/fallback-default");
+            cardImg.remove();
+        });
+
+        it("does not update DOM if ProjectStorage.saveThumbnail rejects", async () => {
+            const planet = new Planet(true, {});
+            planet.LocalPlanet = {};
+            planet.ProjectStorage = {
+                data: { Projects: { proj1: { ProjectName: "Test" } } },
+                saveThumbnail: jest.fn().mockRejectedValue(new Error("Disk full"))
+            };
+            const cardImg = document.createElement("img");
+            cardImg.id = "local-project-image-proj1";
+            cardImg.src = "initial-thumb";
+            document.body.appendChild(cardImg);
+
+            await expect(planet.saveThumbnail("new-thumb", "proj1")).rejects.toThrow("Disk full");
+            expect(cardImg.src).toBe("http://localhost/initial-thumb");
+            cardImg.remove();
+        });
+
+        it("does not update DOM if project does not exist in storage", async () => {
+            const planet = new Planet(true, {});
+            planet.LocalPlanet = {};
+            planet.ProjectStorage = {
+                data: { Projects: {} },
+                saveThumbnail: jest.fn().mockResolvedValue()
+            };
+            const cardImg = document.createElement("img");
+            cardImg.id = "local-project-image-deleted";
+            cardImg.src = "initial-thumb";
+            document.body.appendChild(cardImg);
+
+            await planet.saveThumbnail("new-thumb", "deleted");
+            expect(cardImg.src).toBe("http://localhost/initial-thumb");
+            cardImg.remove();
         });
     });
 

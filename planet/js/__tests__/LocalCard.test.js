@@ -180,6 +180,32 @@ describe("LocalCard", () => {
             expect(img.src).toBe("data:image/png;base64,abc");
         });
 
+        it("should use placeholder when ProjectImage is undefined or empty string", () => {
+            const cardUndefined = prepareCard("p-undef", { ProjectImage: undefined });
+            cardUndefined.render();
+            const imgUndef = document.getElementById("local-project-image-p-undef");
+            expect(imgUndef.src).toContain("mbgraphic.png");
+
+            const cardEmpty = prepareCard("p-empty", { ProjectImage: "" });
+            cardEmpty.render();
+            const imgEmpty = document.getElementById("local-project-image-p-empty");
+            expect(imgEmpty.src).toContain("mbgraphic.png");
+        });
+
+        it("should fall back to placeholder when malformed nonempty image triggers onerror", () => {
+            const cardMalformed = prepareCard("p-malformed", {
+                ProjectImage: "malformed-invalid-data-uri"
+            });
+            cardMalformed.render();
+            const img = document.getElementById("local-project-image-p-malformed");
+            expect(img.src).toContain("malformed-invalid-data-uri");
+
+            // Simulate browser failing to decode/load the malformed image
+            expect(typeof img.onerror).toBe("function");
+            img.onerror();
+            expect(img.src).toContain("mbgraphic.png");
+        });
+
         it("should set input value to the project name", () => {
             const card = prepareCard("p5", { ProjectName: "Cool Song" });
             card.render();
@@ -303,6 +329,22 @@ describe("LocalCard", () => {
 
             const card = new LocalCard(planet);
             card.init("dl2");
+            card.download();
+
+            expect(planet.SaveInterface.saveHTML).toHaveBeenCalledWith(
+                "My Project",
+                "<xml/>",
+                "images/default.png",
+                null
+            );
+        });
+
+        it("should fall back to ImageDataURL when ProjectImage is empty string or whitespace", () => {
+            const data = makeProjectData({ ProjectImage: "   ", PublishedData: null });
+            planet.LocalPlanet.ProjectTable["dl3"] = data;
+
+            const card = new LocalCard(planet);
+            card.init("dl3");
             card.download();
 
             expect(planet.SaveInterface.saveHTML).toHaveBeenCalledWith(

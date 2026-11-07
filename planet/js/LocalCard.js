@@ -93,7 +93,12 @@ class LocalCard {
         const Planet = this.Planet;
 
         let image = Planet.ProjectStorage.ImageDataURL;
-        if (this.ProjectData.ProjectImage !== null) image = this.ProjectData.ProjectImage;
+        if (
+            typeof this.ProjectData.ProjectImage === "string" &&
+            this.ProjectData.ProjectImage.trim().length > 0
+        ) {
+            image = this.ProjectData.ProjectImage;
+        }
 
         let description = null;
         if (this.ProjectData.PublishedData !== null)
@@ -130,13 +135,25 @@ class LocalCard {
         // set image
         let imageSrc;
 
-        if (this.ProjectData.ProjectImage !== null) imageSrc = this.ProjectData.ProjectImage;
-        else {
+        if (
+            typeof this.ProjectData.ProjectImage === "string" &&
+            this.ProjectData.ProjectImage.trim().length > 0
+        ) {
+            imageSrc = this.ProjectData.ProjectImage;
+        } else {
             imageSrc = Planet.IsMusicBlocks ? this.PlaceholderMBImage : this.PlaceholderTBImage;
         }
 
         const imageId = `local-project-image-${this.id}`;
-        frag.getElementById(imageId).src = imageSrc;
+        const imgElem = frag.getElementById(imageId);
+        imgElem.src = imageSrc;
+        const placeholder = Planet.IsMusicBlocks
+            ? this.PlaceholderMBImage
+            : this.PlaceholderTBImage;
+        imgElem.onerror = () => {
+            imgElem.onerror = null;
+            imgElem.src = placeholder;
+        };
 
         // set input text
         frag.getElementById(`local-project-input-${this.id}`).value = this.ProjectData.ProjectName;
