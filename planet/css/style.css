@@ -480,8 +480,10 @@ a {
 	.input-field-2 {
        display: flex;
 	}
-	#two-header.nav-extended.light-green.lighten-1{
+	#two_header.nav-extended.light-green.lighten-1{
 		position: relative;
+		top: 0;
+		z-index: 99;
 	}
 	.input-field-2.search{
 		position: absolute;
