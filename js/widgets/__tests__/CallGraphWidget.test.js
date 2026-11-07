@@ -223,6 +223,50 @@ describe("CallGraphWidget", () => {
         expect(widget.focusNode({ blockId: 50 })).toBe(false);
     });
 
+    test("focusNode resolves live Block instances by blockIndex without explicit id", () => {
+        const widget = new CallGraphWidget(activity);
+        const liveBlock = {
+            blockIndex: 4,
+            name: "action",
+            trash: false,
+            container: { x: 350, y: 220 },
+            highlight: jest.fn(),
+            unhighlight: jest.fn()
+        };
+        // live Block instances in workspace do not have an .id property
+        activity.blocks.blockList[4] = liveBlock;
+
+        const success = widget.focusNode({ blockId: 4 });
+        expect(success).toBe(true);
+        expect(activity.blocksContainer.x).toBe(Math.round(800 / 2 - 350));
+        expect(activity.blocksContainer.y).toBe(Math.round(600 / 2 - 220));
+        expect(liveBlock.highlight).toHaveBeenCalled();
+    });
+
+    test("fitToView allows scales below 0.2 for large graphs and wheel zoom supports lower fit scale", () => {
+        const widget = new CallGraphWidget(activity);
+        widget.currentLayout = {
+            bounds: { minX: 0, minY: 0, maxX: 4000, maxY: 3000, width: 4000, height: 3000 }
+        };
+        widget.viewport.getBoundingClientRect = () => ({
+            width: 450,
+            height: 300,
+            left: 0,
+            top: 0
+        });
+
+        widget.fitToView();
+        // (300 - 40) / 3000 = 260 / 3000 = 0.08666... (< 0.2)
+        expect(widget.transform.scale).toBeLessThan(0.2);
+        expect(widget.transform.scale).toBeGreaterThanOrEqual(0.05);
+
+        const currentScale = widget.transform.scale;
+        // Wheel zoom out should decrease scale below 0.2 without being clamped to 0.2
+        widget.viewport.dispatchEvent(new WheelEvent("wheel", { deltaY: 100, bubbles: true }));
+        expect(widget.transform.scale).toBeLessThan(currentScale);
+        expect(widget.transform.scale).toBeGreaterThanOrEqual(0.05);
+    });
+
     test("triggers fitToView on window maximize", () => {
         jest.useFakeTimers();
         const widget = new CallGraphWidget(activity);
