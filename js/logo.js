@@ -1626,6 +1626,9 @@ class Logo {
         this._valueBarTimeout = null;
         if (this.activity) this.activity.valueBarVisible = false;
 
+        this.runningMIDI = false;
+        document.body.style.cursor = "default";
+
         this._cleanupAfterCompletion();
 
         for (const arg in this.evalOnStopList) {
@@ -2009,6 +2012,8 @@ class Logo {
         */
         if (this.turtles.turtleCount() === 0) {
             this.deps.errorHandler(NOACTIONERRORMSG, null, _("start"));
+            this.runningMIDI = false;
+            document.body.style.cursor = "default";
             // eslint-disable-next-line eqeqeq
         } else if (startHere != null) {
             // If a block to start from was passed, find its associated
@@ -2094,6 +2099,7 @@ class Logo {
                 () => this.stopTurtle
             );
         } else {
+            this.runningMIDI = false;
             document.body.style.cursor = "default";
         }
 
