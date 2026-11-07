@@ -316,7 +316,8 @@ function setupPitchBlocks(activity) {
                         obj = frequencyToPitch(tur.singer.lastNotePlayed[0]);
                     }
                 } else if (
-                    tur.singer.inNoteBlock in tur.singer.notePitches &&
+                    tur.singer.inNoteBlock.length > 0 &&
+                    last(tur.singer.inNoteBlock) in tur.singer.notePitches &&
                     tur.singer.notePitches[last(tur.singer.inNoteBlock)].length > 0
                 ) {
                     obj = getNote(
