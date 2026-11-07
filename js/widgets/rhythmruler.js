@@ -570,6 +570,9 @@ class RhythmRuler {
      * @returns {HTMLImageElement} The created image element.
      */
     _setButtonIcon(container, iconFile, title, verticalAlign = true) {
+        if (!container || typeof container.replaceChildren !== "function") {
+            return null;
+        }
         container.replaceChildren();
         const img = document.createElement("img");
         img.src = "header-icons/" + iconFile;

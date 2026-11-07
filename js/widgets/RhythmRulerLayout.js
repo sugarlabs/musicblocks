@@ -189,10 +189,12 @@ class RhythmRulerLayout {
                 event.preventDefault();
                 event.stopPropagation();
                 const inputValue = parseInt(this._dissectNumber.value, 10);
-                if (!isNaN(inputValue) && inputValue > 0) {
+                if (!isNaN(inputValue)) {
                     // Validate the input value - allow any number from 2 to 128
                     const validatedValue = clampNumber(inputValue, 2, 128);
                     this._dissectNumber.value = validatedValue;
+                } else {
+                    this._dissectNumber.value = 2;
                 }
                 this._dissectNumber.blur();
             }
