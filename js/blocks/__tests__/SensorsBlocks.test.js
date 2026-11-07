@@ -327,48 +327,70 @@ describe("setupSensorsBlocks", () => {
             });
         });
 
-        describe("detectColor", () => {
-            it("should return color index for opaque pixel", () => {
-                const pixelData = [100, 150, 200, 255];
-                const color = block.detectColor(pixelData);
-                expect(color).toBe("rgb(100,150,200)");
+        describe("getPixelRGB", () => {
+            it("should hide the turtle while reading the pixel and then show it again", () => {
+                const turtleObj = createDummyTurtle();
+                turtleObj.container = { x: 50, y: 100, visible: true };
+                activity.turtles.getTurtle = jest.fn(() => turtleObj);
+                const visibleWhileRefreshing = [];
+                activity.refreshCanvas = jest.fn(() =>
+                    visibleWhileRefreshing.push(turtleObj.container.visible)
+                );
+
+                expect(block.getPixelRGB(turtle)).toEqual([100, 150, 200]);
+                expect(visibleWhileRefreshing).toEqual([false]);
+                expect(turtleObj.container.visible).toBe(true);
             });
 
-            it("should return background color for transparent pixel", () => {
-                const pixelData = [100, 150, 200, 0];
-                const color = block.detectColor(pixelData);
-                expect(color).toBe("rgb(200,200,200)");
+            it("should show the turtle again if the canvas cannot be read", () => {
+                const turtleObj = createDummyTurtle();
+                turtleObj.container = { x: 50, y: 100, visible: true };
+                activity.turtles.getTurtle = jest.fn(() => turtleObj);
+                global.docById = jest.fn(() => null);
+
+                expect(() => block.getPixelRGB(turtle)).toThrow("Canvas context unavailable");
+                expect(turtleObj.container.visible).toBe(true);
             });
 
-            it("should return hex background color for transparent pixel", () => {
+            it("should throw if the turtle has no container", () => {
+                activity.turtles.getTurtle = jest.fn(() => ({ container: null }));
+                expect(() => block.getPixelRGB(turtle)).toThrow("Turtle container unavailable");
+            });
+        });
+
+        describe("pixelToRGB", () => {
+            it("should return the red, green and blue values of an opaque pixel", () => {
+                expect(block.pixelToRGB([100, 150, 200, 255])).toEqual([100, 150, 200]);
+            });
+
+            it("should return the background for a transparent pixel", () => {
+                expect(block.pixelToRGB([100, 150, 200, 0])).toEqual([200, 200, 200]);
+            });
+
+            it("should return a hex background for a transparent pixel", () => {
                 global.platformColor.background = "#303030";
-                const pixelData = [100, 150, 200, 0];
-                const color = block.detectColor(pixelData);
-                expect(color).toBe("rgb(48,48,48)");
+                expect(block.pixelToRGB([100, 150, 200, 0])).toEqual([48, 48, 48]);
             });
 
             it("should throw an error for invalid pixel data", () => {
                 const pixelData = [100, 150]; // Invalid length
-                expect(() => block.detectColor(pixelData)).toThrow("Invalid pixel data");
+                expect(() => block.pixelToRGB(pixelData)).toThrow("Invalid pixel data");
             });
         });
 
-        describe("getBackgroundColor", () => {
+        describe("getBackgroundRGB", () => {
             it("should parse and return background color", () => {
-                const color = block.getBackgroundColor();
-                expect(color).toBe("rgb(200,200,200)");
+                expect(block.getBackgroundRGB()).toEqual([200, 200, 200]);
             });
 
             it("should parse and return full hex background color", () => {
                 global.platformColor.background = "#F9F9F9";
-                const color = block.getBackgroundColor();
-                expect(color).toBe("rgb(249,249,249)");
+                expect(block.getBackgroundRGB()).toEqual([249, 249, 249]);
             });
 
             it("should parse and return shorthand hex background color", () => {
                 global.platformColor.background = "#abc";
-                const color = block.getBackgroundColor();
-                expect(color).toBe("rgb(170,187,204)");
+                expect(block.getBackgroundRGB()).toEqual([170, 187, 204]);
             });
         });
 
@@ -377,6 +399,57 @@ describe("setupSensorsBlocks", () => {
                 const color = block.getFallbackColor();
                 expect(color).toBe("rgb(128,128,128)");
             });
+        });
+    });
+
+    describe("GetColorComponentBlock", () => {
+        let originalDocById;
+
+        const mockCanvasPixel = pixel => {
+            global.docById = jest.fn(id =>
+                id === "overlayCanvas"
+                    ? { getContext: () => ({ getImageData: () => ({ data: pixel }) }) }
+                    : null
+            );
+        };
+
+        beforeEach(() => {
+            global.platformColor.background = "rgb(200,200,200)";
+            originalDocById = global.docById;
+            // The pen is red, so a result taken from the pen would be 100, 0, 0.
+            activity.turtles.getTurtle = jest.fn(() => createDummyTurtle());
+        });
+
+        afterEach(() => {
+            global.docById = originalDocById;
+        });
+
+        it("should return the components of the pixel under the turtle, not the pen color", () => {
+            mockCanvasPixel([0, 51, 255, 255]);
+            expect(DummyFlowBlock.createdBlocks["getred"].arg(logo, turtleIndex)).toBe(0);
+            expect(DummyFlowBlock.createdBlocks["getgreen"].arg(logo, turtleIndex)).toBe(20);
+            expect(DummyFlowBlock.createdBlocks["getblue"].arg(logo, turtleIndex)).toBe(100);
+        });
+
+        it("should return the background components for a transparent pixel", () => {
+            global.platformColor.background = "#336699";
+            mockCanvasPixel([255, 0, 0, 0]);
+            expect(DummyFlowBlock.createdBlocks["getred"].arg(logo, turtleIndex)).toBe(20);
+            expect(DummyFlowBlock.createdBlocks["getgreen"].arg(logo, turtleIndex)).toBe(40);
+            expect(DummyFlowBlock.createdBlocks["getblue"].arg(logo, turtleIndex)).toBe(60);
+        });
+
+        it("should return the fallback gray if the canvas cannot be read", () => {
+            global.docById = jest.fn(() => null);
+            expect(DummyFlowBlock.createdBlocks["getred"].arg(logo, turtleIndex)).toBe(50);
+            expect(DummyFlowBlock.createdBlocks["getblue"].arg(logo, turtleIndex)).toBe(50);
+        });
+
+        it("should return the fallback gray if the turtle is not found", () => {
+            activity.turtles.getTurtle = jest.fn(() => {
+                throw new Error("Turtle not found");
+            });
+            expect(DummyFlowBlock.createdBlocks["getgreen"].arg(logo, turtleIndex)).toBe(50);
         });
     });
 
