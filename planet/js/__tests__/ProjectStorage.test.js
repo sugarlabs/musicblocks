@@ -969,8 +969,8 @@ describe("ProjectStorage", () => {
             expect(storage.data.CurrentProject).toBe("projB");
         });
 
-        // Test 7 — Reverse callback ordering
-        it("Test 7 — Reverse callback ordering: start two thumbnail operations and resolve them in reverse order; verify final result maintains integrity", async () => {
+        // Test 7 — Sequential thumbnail operations
+        it("Test 7 — Sequential thumbnail operations: start two thumbnail operations on projA; verify final result maintains integrity and latest thumbnail is saved", async () => {
             const saveOrder = [];
             jest.spyOn(storage, "save").mockImplementation(async () => {
                 saveOrder.push(storage.data.Projects["projA"].ProjectImage);
@@ -980,9 +980,10 @@ describe("ProjectStorage", () => {
             const op1 = storage.saveThumbnail("thumb-early", "projA");
             const op2 = storage.saveThumbnail("thumb-late", "projA");
 
-            await Promise.all([op2, op1]);
+            await Promise.all([op1, op2]);
 
-            // Both saves complete in order through the save queue
+            // Both saves complete through the save queue in sequence
+            expect(saveOrder).toEqual(["thumb-early", "thumb-late"]);
             expect(storage.data.Projects["projA"].ProjectImage).toBe("thumb-late");
             expect(storage.data.Projects["projB"].ProjectImage).toBe("thumbnail-B");
         });

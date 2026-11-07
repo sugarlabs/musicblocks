@@ -2071,6 +2071,54 @@ describe("PlanetInterface", () => {
         expect(doSVG).toHaveBeenCalledTimes(3);
     });
 
+    test("saveLocally: delegates thumbnail save to planet.saveThumbnail when available to refresh card", async () => {
+        doSVG.mockReturnValue("<svg/>");
+        mockActivity.prepareExport.mockReturnValue({ blocks: [] });
+        global.base64Encode = jest.fn(s => s);
+
+        let pendingImage;
+        global.Image = class {
+            constructor() {
+                pendingImage = this;
+            }
+            set src(_value) {}
+        };
+        global.createjs = {
+            Bitmap: class {
+                getBounds() {
+                    return { x: 0, y: 0, width: 10, height: 10 };
+                }
+                cache() {
+                    this.bitmapCache = {
+                        getCacheDataURL: () => "data:image/png;base64,renderedThumb"
+                    };
+                }
+            }
+        };
+
+        const storageData = { CurrentProject: "proj-card", Projects: { "proj-card": {} } };
+        const planetSaveThumbSpy = jest.fn(async () => {});
+        planetInterface.planet = {
+            saveThumbnail: planetSaveThumbSpy,
+            ProjectStorage: {
+                data: storageData,
+                getCurrentProjectID: () => "proj-card",
+                saveLocally: jest.fn(async () => {})
+            }
+        };
+        planetInterface.iframe = { style: { display: "none" } };
+
+        await planetInterface.saveLocally();
+        expect(pendingImage).toBeDefined();
+        await pendingImage.onload();
+
+        expect(planetSaveThumbSpy).toHaveBeenCalledWith(
+            "data:image/png;base64,renderedThumb",
+            "proj-card"
+        );
+    });
+    });
+
     describe("_isCanvasBlank", () => {
         test("returns true for null, undefined, or 0-dimension canvas", () => {
             expect(planetInterface._isCanvasBlank(null)).toBe(true);
