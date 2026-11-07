@@ -4882,3 +4882,94 @@ describe("Singer.resolveNoteEffects — isolate note effect resolution from play
         });
     });
 });
+
+describe("processNote neighbor effect when the neighbor note value was rejected", () => {
+    const blk = "mockBlk";
+    let turtleMock;
+    let activityMock;
+    let savedGlobals;
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        savedGlobals = {
+            rationalToFraction: global.rationalToFraction,
+            getOctaveRatio: global.getOctaveRatio
+        };
+        global.rationalToFraction = jest.fn(() => [3, 2]);
+        global.getOctaveRatio = jest.fn(() => 2);
+
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.blink = jest.fn();
+        turtleMock.doWait = jest.fn();
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["C"] };
+        turtleMock.singer.noteOctaves = { [blk]: [4] };
+        turtleMock.singer.noteCents = { [blk]: [0] };
+        turtleMock.singer.noteHertz = { [blk]: [0] };
+        turtleMock.singer.noteDrums = { [blk]: [] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1] };
+        turtleMock.singer.keySignature = "C major";
+        turtleMock.singer.suppressOutput = false;
+        turtleMock.singer.justCounting = [];
+        turtleMock.singer.oscList = { [blk]: [] };
+        turtleMock.singer.inNeighbor = ["neighborBlk"];
+        turtleMock.singer.neighborArgNote1 = ["C4"];
+        turtleMock.singer.neighborArgNote2 = ["D4"];
+        turtleMock.singer.neighborArgBeat = [1];
+
+        activityMock = createActivityMock(turtleMock);
+        activityMock.errorMsg = jest.fn();
+        Object.assign(activityMock.logo, {
+            runningLilypond: false,
+            runningMxml: false,
+            runningAbc: false,
+            runningMIDI: false,
+            specialArgs: [],
+            dispatchTurtleSignals: jest.fn()
+        });
+        Object.assign(activityMock.logo.synth, {
+            start: jest.fn(),
+            inTemperament: "equal",
+            changeInTemperament: false,
+            startingPitch: "A0",
+            getFrequency: jest.fn(() => [261.63]),
+            getCustomFrequency: jest.fn(() => [261.63])
+        });
+        activityMock.stage = { update: jest.fn() };
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+        global.rationalToFraction = savedGlobals.rationalToFraction;
+        global.getOctaveRatio = savedGlobals.getOctaveRatio;
+    });
+
+    const effectsSentToSynth = () => {
+        for (const call of activityMock.logo.synth.trigger.mock.calls) {
+            const effects = call.find(arg => arg && typeof arg === "object" && "doNeighbor" in arg);
+            if (effects) {
+                return effects;
+            }
+        }
+        return null;
+    };
+
+    test("plays the neighbor effect when the neighbor beats are valid", () => {
+        turtleMock.singer.neighborArgCurrentBeat = [2];
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+        jest.runAllTimers();
+
+        expect(effectsSentToSynth().doNeighbor).toBe(true);
+    });
+
+    test("plays the plain note when the neighbor note value was rejected", () => {
+        turtleMock.singer.neighborArgCurrentBeat = [null];
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+        jest.runAllTimers();
+
+        expect(effectsSentToSynth().doNeighbor).toBe(false);
+    });
+});
