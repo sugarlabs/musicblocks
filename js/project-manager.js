@@ -1012,6 +1012,10 @@ class ProjectManager {
                                 pensize: turtle.painter.stroke,
                                 grey: turtle.painter.chroma
                             };
+                            // Only muted mice store it, so other projects save as before.
+                            if (turtle.muted) {
+                                args.muted = true;
+                            }
                         }
                         break;
                     }

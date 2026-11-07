@@ -608,7 +608,7 @@ function setupMediaBlocks(activity) {
             // as long as we're not silently pre-running the project, speak now.
             if (tur.singer.inNoteBlock.length > 0) {
                 tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
-            } else if (!tur.singer.suppressOutput) {
+            } else if (!tur.singer.suppressOutput && !tur.muted) {
                 logo.processSpeak(args[0]);
             }
         }
