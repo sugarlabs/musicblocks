@@ -1,4 +1,4 @@
-/* global cy, describe, it, beforeEach, expect */
+/* global cy, describe, it, beforeEach */
 
 describe("Dark Mode E2E Integration", () => {
     beforeEach(() => {
@@ -13,47 +13,33 @@ describe("Dark Mode E2E Integration", () => {
         cy.waitForAppReady();
     });
 
-    it("switches theme preference to dark mode using application theme switcher", () => {
+    // Drives the theme selector through the same UI path a user takes: open the
+    // #themedropdown from #themeSelectIcon and click an option. Calling
+    // themeBox.dark_onclick() directly would bypass the dropdown wiring in
+    // ToolbarUI.renderThemeSelectIcon, so a broken dropdown would still pass.
+    const selectThemeFromDropdown = theme => {
+        cy.get("#aux-toolbar").invoke("show");
+        cy.get("#themeSelectIcon").click();
+        cy.get("#themedropdown").should("be.visible");
+        cy.get(`#${theme}`).click();
+        // renderThemeSelectIcon closes the dropdown after a selection.
+        cy.get("#themedropdown").should("not.be.visible");
+    };
+
+    it("switches to dark mode by selecting it from the theme dropdown", () => {
         // Verify default state does not have dark mode enabled before toggling
         cy.get("body").should("not.have.class", "dark");
 
-        cy.window().should(win => {
-            const activity = win.ActivityContext
-                ? win.ActivityContext.getActivity()
-                : win.globalActivity;
-            expect(activity, "Activity instance should be initialized").to.exist;
-            expect(activity.themeBox, "ThemeBox instance should be initialized").to.exist;
-        });
-
-        cy.window().then(win => {
-            const activity = win.ActivityContext
-                ? win.ActivityContext.getActivity()
-                : win.globalActivity;
-            activity.themeBox.dark_onclick();
-        });
+        selectThemeFromDropdown("dark");
 
         cy.get("body").should("have.class", "dark");
     });
 
-    it("verifies dark mode theme preference persists across reloads via application storage", () => {
+    it("persists the dropdown-selected dark mode preference across reloads", () => {
         // Verify default state does not have dark mode enabled before toggling
         cy.get("body").should("not.have.class", "dark");
 
-        cy.window().should(win => {
-            const activity = win.ActivityContext
-                ? win.ActivityContext.getActivity()
-                : win.globalActivity;
-            expect(activity, "Activity instance should be initialized").to.exist;
-            expect(activity.themeBox, "ThemeBox instance should be initialized").to.exist;
-        });
-
-        cy.window().then(win => {
-            const activity = win.ActivityContext
-                ? win.ActivityContext.getActivity()
-                : win.globalActivity;
-            activity.themeBox.dark_onclick();
-        });
-
+        selectThemeFromDropdown("dark");
         cy.get("body").should("have.class", "dark");
 
         cy.reload();
