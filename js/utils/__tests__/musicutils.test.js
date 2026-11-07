@@ -672,6 +672,7 @@ describe("getInvertMode", () => {
         expect(getInvertMode(123)).toBe(123);
         expect(getInvertMode({})).toEqual({});
         expect(getInvertMode("")).toBe("");
+        expect(getInvertMode("  EVEN  ")).toBe("even");
     });
 });
 
