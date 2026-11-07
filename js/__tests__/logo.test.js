@@ -202,6 +202,7 @@ function createMockTurtle(overrides = {}) {
             embeddedGraphics: {},
             runningFromEvent: false,
             killAllVoices: jest.fn(),
+            dropPendingNotes: jest.fn(),
             noteDirection: 0
         },
         painter: {
@@ -3647,6 +3648,153 @@ describe("Logo clearTurtleRun", () => {
         logo.clearTurtleRun(0);
 
         expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+    });
+});
+
+// ─── Logo stopTurtleRun ───────────────────────────────────────────────────────
+
+describe("Logo stopTurtleRun", () => {
+    let logo;
+    let turtle0;
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        setupLogoEnv();
+        turtle0 = createMockTurtle({ runGeneration: 0 });
+        logo = new Logo(createMockActivity(turtle0));
+        logo.runFromBlockNow = jest.fn();
+        logo._finishTurtle = jest.fn();
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+        jest.restoreAllMocks();
+    });
+
+    test("cancels the pending timeout so the next block never runs", () => {
+        logo.turtleDelay = 50;
+        turtle0.queue = [{ blk: 9 }];
+        logo.runFromBlock(logo, 0, 4, 0, null);
+
+        logo.stopTurtleRun(0);
+        jest.runAllTimers();
+
+        expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+        expect(turtle0.delayTimeout).toBeNull();
+        expect(turtle0.queue).toEqual([]);
+        expect(logo.timerManager.activeTimeoutCount).toBe(0);
+    });
+
+    test("drops a wake-up the turtle had already queued to yield", () => {
+        logo.runningMIDI = true;
+        logo._syncCounter = logo._EXPORT_YIELD_AFTER_SYNC_RUNS - 1;
+        logo.runFromBlock(logo, 0, 4, 0, null);
+
+        logo.stopTurtleRun(0);
+        jest.runAllTimers();
+
+        expect(logo.runFromBlockNow).not.toHaveBeenCalled();
+    });
+
+    test("drops its step-mode block", () => {
+        logo.stepQueue = { 0: [{ blk: 4 }] };
+
+        logo.stopTurtleRun(0);
+
+        expect(logo.stepQueue[0]).toBeUndefined();
+    });
+
+    test("does not play the notes it had not reached", () => {
+        logo._finishTurtle = Logo.prototype._finishTurtle;
+        turtle0.running = true;
+        turtle0.endOfClampSignals = { 5: ["_playnote_0_5", "_playnote_0_6"] };
+        turtle0.butNotThese = { 5: [0] };
+
+        logo.stopTurtleRun(0);
+
+        expect(logo.stage.dispatchEvent).not.toHaveBeenCalled();
+        expect(turtle0.singer.dropPendingNotes).toHaveBeenCalledTimes(1);
+        expect(turtle0.endOfClampSignals).toEqual({});
+        expect(turtle0.butNotThese).toEqual({});
+    });
+
+    test("ends the clamps it was inside", () => {
+        logo._finishTurtle = Logo.prototype._finishTurtle;
+        turtle0.running = true;
+        turtle0.endOfClampSignals = {
+            3: ["_settimbre_0_3"],
+            5: ["_volume_0_5", "_playnote_0_6", "_duplicate_0_7"]
+        };
+        turtle0.butNotThese = { 5: [2] };
+
+        logo.stopTurtleRun(0);
+
+        expect(logo.stage.dispatchEvent.mock.calls).toEqual([["_settimbre_0_3"], ["_volume_0_5"]]);
+    });
+
+    test("ends the clamps of a mouse started by an event", () => {
+        turtle0.running = true;
+        turtle0.singer.runningFromEvent = true;
+        turtle0.endOfClampSignals = { 5: ["_volume_0_5"] };
+
+        logo.stopTurtleRun(0);
+
+        expect(logo.stage.dispatchEvent).toHaveBeenCalledWith("_volume_0_5");
+        expect(turtle0.singer.runningFromEvent).toBe(false);
+    });
+
+    test("does not play the rest of a tied note", () => {
+        turtle0.singer.tieCarryOver = 0.25;
+
+        logo.stopTurtleRun(0);
+
+        expect(turtle0.singer.tieCarryOver).toBe(0);
+    });
+
+    test("finishes a running turtle once", () => {
+        turtle0.running = true;
+        logo.stopTurtleRun(0);
+        expect(logo._finishTurtle).toHaveBeenCalledWith(logo, 0, 0);
+
+        turtle0.running = false;
+        logo.stopTurtleRun(0);
+        expect(logo._finishTurtle).toHaveBeenCalledTimes(1);
+    });
+
+    describe("with Transport", () => {
+        let savedTone;
+
+        beforeEach(() => {
+            savedTone = global.Tone;
+        });
+
+        afterEach(() => {
+            global.Tone = savedTone;
+        });
+
+        test("clears its Transport-scheduled event", () => {
+            const clearSpy = jest.fn();
+            global.Tone = {
+                ...savedTone,
+                Transport: {
+                    start: jest.fn(),
+                    stop: jest.fn(),
+                    cancel: jest.fn(),
+                    clear: clearSpy,
+                    getSecondsAtTime: jest.fn(() => 42),
+                    get seconds() {
+                        return 42;
+                    },
+                    set seconds(v) {}
+                }
+            };
+            turtle0._transportEventId = "evt-5";
+
+            logo.stopTurtleRun(0);
+
+            expect(clearSpy).toHaveBeenCalledWith("evt-5");
+            expect(turtle0._transportEventId).toBeNull();
+        });
     });
 });
 
