@@ -1807,6 +1807,13 @@ class Block {
                             platformColor.blockText
                         );
                         break;
+                    case "chordbuilder":
+                        that.collapseText = new createjs.Text(
+                            _("chords"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
                     case "status":
                         that.collapseText = new createjs.Text(
                             _("status"),
