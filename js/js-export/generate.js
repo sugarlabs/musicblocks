@@ -14,7 +14,7 @@
  * MA 02110-1335 USA.
  */
 
-/* global globalActivity, JSInterface, last, ASTUtils, astring, deepClone */
+/* global globalActivity, JSInterface, last, ASTUtils, astring, deepClone, BooleanBlock */
 
 /* exported JSGenerate */
 
@@ -132,8 +132,11 @@ class JSGenerate {
                         if (JSInterface.isGetter(arg.name)) {
                             args.push([arg.name, null]);
                         } else if (
-                            window.BooleanBlock &&
-                            arg.protoblock instanceof window.BooleanBlock
+                            (typeof BooleanBlock !== "undefined" &&
+                                arg.protoblock instanceof BooleanBlock) ||
+                            (typeof window !== "undefined" &&
+                                window.BooleanBlock &&
+                                arg.protoblock instanceof window.BooleanBlock)
                         ) {
                             if (arg.name === "boolean") {
                                 args.push("bool_" + arg.value);
