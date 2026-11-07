@@ -11,9 +11,11 @@
 
 describe("Current interval block", () => {
     it("names intervals that cross a C", () => {
-        cy.visit("http://127.0.0.1:3000");
-        cy.clearLocalStorage();
-        cy.visit("http://127.0.0.1:3000");
+        cy.visit("http://127.0.0.1:3000", {
+            onBeforeLoad(win) {
+                win.localStorage.clear();
+            }
+        });
         cy.waitForAppReady();
 
         cy.get("#load").click();

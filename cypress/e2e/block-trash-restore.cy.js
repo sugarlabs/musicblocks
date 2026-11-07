@@ -4,9 +4,11 @@ describe("Block trash and restore", () => {
     beforeEach(() => {
         // Music Blocks restores its last workspace from localStorage, so each
         // run starts from the known starter project instead of test leftovers.
-        cy.visit("http://127.0.0.1:3000");
-        cy.clearLocalStorage();
-        cy.reload();
+        cy.visit("http://127.0.0.1:3000", {
+            onBeforeLoad(win) {
+                win.localStorage.clear();
+            }
+        });
         cy.waitForAppReady();
 
         // The first-run tour is also a windowFrame and would make the widget
