@@ -1792,6 +1792,13 @@ describe("Test 20: Lyrics", () => {
         expect(findPositionMismatches(blocks)).toEqual([]);
     });
 
+    it("joins text fragments within one syllable in document order", async () => {
+        const lyric = '<lyric><text>hel</text><text font-style="italic">lo</text></lyric>';
+        const { blocks } = await parseAndCapture(scorePartwise(sungNote("C", lyric)));
+
+        expect(lyricTexts(blocks)).toEqual(["hello"]);
+    });
+
     it("writes <syllabic> as the hyphen a singer reads", async () => {
         const { blocks } = await parseAndCapture(
             scorePartwise(

@@ -599,7 +599,12 @@ const _byVerseNumber = (a, b) => a.number.localeCompare(b.number, undefined, { n
 function _lyricTexts(noteEl) {
     const lines = [];
     for (const lyricEl of noteEl.querySelectorAll(":scope > lyric")) {
-        const raw = (_text(lyricEl, "text") ?? "").trim();
+        const raw = Array.from(
+            lyricEl.querySelectorAll(":scope > text"),
+            textEl => textEl.textContent
+        )
+            .join("")
+            .trim();
         if (raw === "") continue;
         const syllabic = (_text(lyricEl, "syllabic") ?? "").trim();
         const text = _MXML_SYLLABIC_HYPHEN.has(syllabic) && !raw.endsWith("-") ? `${raw}-` : raw;
