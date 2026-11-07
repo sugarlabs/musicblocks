@@ -322,9 +322,12 @@ class RhythmRulerEditing {
             cell.textContent = "";
         };
 
+        let backgroundColorBeforePress = "";
+
         const __mouseDownHandler = event => {
             const cell = event.currentTarget;
             this._mouseDownCell = cell;
+            backgroundColorBeforePress = cell.style.backgroundColor;
 
             const d = new Date();
             this._longPressStartTime = d.getTime();
@@ -361,6 +364,17 @@ class RhythmRulerEditing {
             // would never fire on mobile. elementFromPoint resolves the actual
             // element under the finger at release time for both mouse and touch.
             const cell = document.elementFromPoint(event.clientX, event.clientY) || event.target;
+            if (
+                !cell ||
+                !cell.parentNode ||
+                !this._rulers.includes(cell.parentNode) ||
+                !Number.isInteger(cell.cellIndex) ||
+                cell.cellIndex < 0
+            ) {
+                __pointerCancelHandler();
+                return;
+            }
+
             this._mouseUpCell = cell;
             if (this._mouseDownCell !== this._mouseUpCell) {
                 this._tieRuler(event, cell.parentNode.getAttribute("data-row"));
@@ -376,6 +390,18 @@ class RhythmRulerEditing {
             this._mouseDownCell = null;
             this._mouseUpCell = null;
             this._longPressStartTime = null;
+        };
+
+        const __pointerCancelHandler = () => {
+            this._clearWidgetTimeout(this._longPressBeep);
+            this._longPressBeep = null;
+            if (this._mouseDownCell) {
+                this._mouseDownCell.style.backgroundColor = backgroundColorBeforePress;
+            }
+            this._mouseDownCell = null;
+            this._mouseUpCell = null;
+            this._longPressStartTime = null;
+            this._inLongPress = false;
         };
 
         /**
@@ -419,6 +445,7 @@ class RhythmRulerEditing {
         const handlers = {
             pointerdown: __mouseDownHandler,
             pointerup: __mouseUpHandler,
+            pointercancel: __pointerCancelHandler,
             click: __clickHandler
         };
         for (const [type, handler] of Object.entries(handlers)) {
