@@ -985,6 +985,7 @@ Turtle.TurtleView = class {
                     "</text>";
             }
         }
+        this.activity.artworkRevision = (this.activity.artworkRevision || 0) + 1;
         this.activity.refreshCanvas();
     }
 
