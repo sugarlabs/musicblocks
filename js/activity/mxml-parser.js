@@ -541,6 +541,10 @@ const _MXML_ASCII_ACCIDENTAL_SUFFIX = { "#": "♯", "b": "♭", "": "" };
  * @returns {number|null}
  */
 function _dynamicVolume(directionEl) {
+    // Positioning an offset direction requires timeline-aware placement. Until
+    // that is supported, skip it rather than attaching it to the next note.
+    if (directionEl.querySelector(":scope > offset") !== null) return null;
+
     const dynamicsEl = directionEl.querySelector(":scope > direction-type > dynamics");
     if (dynamicsEl === null) return null;
 
@@ -1011,21 +1015,24 @@ function _processPart(
     let tieContent = null;
     let currentTempoBpm = initialTempoBpm;
     let nextTempoIndex = 0;
-    let pendingVolume = null;
+    let pendingVolumes = [];
 
     const emitNote = (duration, content) => {
         let startId = blockId;
-        let volumeBlocks = null;
-        if (pendingVolume !== null) {
-            volumeBlocks = _createVolumeBlocks(blockId, pendingVolume, prevId);
+        let previousVolumeBlock = null;
+        pendingVolumes.forEach(volume => {
+            const volumeBlocks = _createVolumeBlocks(blockId, volume, prevId);
             noteBlocks.push(...volumeBlocks);
+            if (previousVolumeBlock === null) startId = blockId;
+            if (previousVolumeBlock !== null) previousVolumeBlock[4][3] = blockId;
+            previousVolumeBlock = volumeBlocks[0];
             prevId = blockId;
             blockId += volumeBlocks.length;
-            startId = prevId;
-            pendingVolume = null;
-        }
+        });
+        pendingVolumes = [];
+
         const blocks = _createNoteBlocks(blockId, duration, content, prevId);
-        if (volumeBlocks !== null) volumeBlocks[0][4][3] = blockId;
+        if (previousVolumeBlock !== null) previousVolumeBlock[4][3] = blockId;
         noteBlocks.push(...blocks);
         noteStartIds.push(startId);
         noteEndIds.push(blocks[blocks.length - 1][0]);
@@ -1080,8 +1087,9 @@ function _processPart(
             if (child.tagName === "direction") {
                 const volume = _dynamicVolume(child);
                 if (volume !== null) {
-                    flushTie();
-                    pendingVolume = volume;
+                    // A tied note is emitted as one block. Keep it open so a
+                    // dynamic between its start and stop cannot split it.
+                    pendingVolumes.push(volume);
                 }
                 continue;
             }

@@ -11,6 +11,9 @@
 
 "use strict";
 
+const fs = require("fs");
+const path = require("path");
+
 global.GCD = require("../../utils/utils-logic.js").GCD;
 
 const { setupActivityMxmlParser } = require("../mxml-parser.js");
@@ -895,6 +898,17 @@ describe("Test 13: Dynamic markings", () => {
         expect(findPositionMismatches(blocks)).toEqual([]);
     });
 
+    it("imports common dynamics from the committed MusicXML fixture", async () => {
+        const fixturePath = path.join(__dirname, "fixtures", "dynamics.musicxml");
+        const { blocks } = await parseAndCapture(fs.readFileSync(fixturePath, "utf8"));
+
+        expect(synthVolumes(blocks)).toEqual([35, 80]);
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 }
+        ]);
+    });
+
     it.each([
         ["pp", 20],
         ["p", 35],
@@ -929,9 +943,34 @@ describe("Test 13: Dynamic markings", () => {
         );
 
         expect(synthVolumes(blocks)).toEqual([65]);
-        expect(blocks.filter(block => blockName(block) === "repeat")).toHaveLength(1);
+        const byIndex = new Map(blocks.map(block => [block[0], block]));
+        const repeat = blocks.find(block => blockName(block) === "repeat");
+        expect(repeat).toBeDefined();
+        expect(blockName(byIndex.get(repeat[4][2]))).toBe("setsynthvolume");
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
         expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("keeps consecutive dynamic markings in document order", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(dynamic("p") + dynamic("f") + SIMPLE_NOTE("C", 4, "quarter"))
+        );
+
+        const volumeBlocks = blocks.filter(block => blockName(block) === "setsynthvolume");
+        const byIndex = new Map(blocks.map(block => [block[0], block]));
+        expect(synthVolumes(blocks)).toEqual([35, 80]);
+        expect(volumeBlocks[0][4][3]).toBe(volumeBlocks[1][0]);
+        expect(blockName(byIndex.get(volumeBlocks[1][4][3]))).toBe("newnote");
+    });
+
+    it("ignores a dynamic direction with an explicit offset", async () => {
+        const offsetDynamic =
+            "<direction><offset>1</offset><direction-type><dynamics><p/></dynamics></direction-type></direction>";
+        const { blocks } = await parseAndCapture(
+            scorePartwise(offsetDynamic + SIMPLE_NOTE("C", 4, "quarter"))
+        );
+
+        expect(synthVolumes(blocks)).toEqual([]);
     });
 });
 
@@ -1314,6 +1353,24 @@ describe("Test 16: Ties", () => {
         // Two tied quarter notes become one half note.
         expect(noteValues(blocks)).toEqual([[1, 2]]);
         expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("keeps a tie intact when a dynamic occurs between its start and stop", async () => {
+        const dynamic =
+            "<direction><direction-type><dynamics><mf/></dynamics></direction-type></direction>";
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                tiedNote("C", 4, '<tie type="start"/>') +
+                    dynamic +
+                    tiedNote("C", 4, '<tie type="stop"/>')
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 2]]);
+        expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
+        expect(synthVolumes(blocks)).toEqual([65]);
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
         expect(findPositionMismatches(blocks)).toEqual([]);
     });
