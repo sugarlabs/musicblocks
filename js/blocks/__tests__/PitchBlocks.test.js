@@ -1235,8 +1235,12 @@ describe("setupPitchBlocks", () => {
             global.getCurrentEDO.mockReturnValue(12);
         });
 
-        it("falls back to 392 Hz for a NaN pitch input instead of passing nulls on", () => {
+        it("falls back to 392 Hz for non-finite pitch inputs instead of passing nulls on", () => {
             const block = createdBlocks["pitch"];
+
+            // 392 Hz is G4: make the mock return the real conversion
+            // result for the fallback frequency.
+            global.frequencyToPitch.mockImplementation(() => ["G", 4, 0]);
 
             // NaN slips past both sides of the old range check
             // (NaN < A0 and NaN > C8 are both false), so the real
@@ -1248,11 +1252,28 @@ describe("setupPitchBlocks", () => {
             block.flow([NaN, 4], logo, 0, 10);
             expect(activity.errorMsg).toHaveBeenCalledWith(global.INVALIDPITCH, 10);
             expect(global.frequencyToPitch).toHaveBeenCalledWith(392);
-            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith("A", 4, 0, 0, 10);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith("G", 4, 0, 0, 10);
+
+            // Clear the mocks so the Infinity assertions verify the
+            // Infinity call itself, not calls left over from the NaN case.
+            jest.clearAllMocks();
 
             // Infinity takes the same fallback path.
             block.flow([Infinity, 4], logo, 0, 10);
-            expect(global.frequencyToPitch).toHaveBeenLastCalledWith(392);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.INVALIDPITCH, 10);
+            expect(global.frequencyToPitch).toHaveBeenCalledWith(392);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith("G", 4, 0, 0, 10);
+
+            jest.clearAllMocks();
+
+            // -Infinity satisfies arg0 <= currentEDO, so without the
+            // finiteness check it is misread as a movable solfege scale
+            // degree and plays degree 7 instead of the fallback.
+            block.flow([-Infinity, 4], logo, 0, 10);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.INVALIDPITCH, 10);
+            expect(global.frequencyToPitch).toHaveBeenCalledWith(392);
+            expect(global.nthDegreeToPitch).not.toHaveBeenCalled();
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith("G", 4, 0, 0, 10);
         });
     });
 
