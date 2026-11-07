@@ -136,6 +136,8 @@ class Tempo {
         this._tapTimes = [];
         this._lastTapIndex = null;
         this._lastCanvasIndex = null;
+        // This object is reused when the widget reopens, possibly with fewer rows.
+        this.activeBPMIndex = 0;
         if (this._tapTimeout) {
             if (this.widgetWindow && this.widgetWindow.timerManager) {
                 this.widgetWindow.timerManager.clearTimeout(this._tapTimeout);

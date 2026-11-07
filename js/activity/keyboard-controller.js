@@ -380,7 +380,7 @@ class KeyboardController {
                         break;
                     case KEYCODE_UP:
                         if (activity.inTempoWidget) {
-                            activity.logo.tempo.speedUp(0);
+                            activity.logo.tempo.speedUp(activity.logo.tempo.activeBPMIndex, 1);
                         } else {
                             if (activity.blocks.activeBlock !== null) {
                                 activity.textMsg("UP ARROW " + _("Moving block up."));
@@ -401,7 +401,7 @@ class KeyboardController {
                         break;
                     case KEYCODE_DOWN:
                         if (activity.inTempoWidget) {
-                            activity.logo.tempo.slowDown(0);
+                            activity.logo.tempo.slowDown(activity.logo.tempo.activeBPMIndex, 1);
                         } else {
                             if (activity.blocks.activeBlock !== null) {
                                 activity.textMsg(`DOWN ARROW ${_("Moving block down.")}`);
