@@ -342,6 +342,11 @@ class Blocks {
         /** The loadToken of whichever load is currently running, if any — see _loadNewBlocksNow. */
         this._activeLoadToken = null;
         /**
+         * Unsupported block names encountered during active load session.
+         * Used to notify the user upon load completion.
+         */
+        this._unsupportedBlocksInCurrentLoad = new Set();
+        /**
          * Stacks of blocks that need adjusting as blocks are repositioned
          * due to expanding and contracting or insertion into the flow.
          */
@@ -5450,8 +5455,50 @@ class Blocks {
             // "finishedLoading" with the token of whichever load is
             // current when it fires.
             this._activeLoadToken = loadToken;
+            this._unsupportedBlocksInCurrentLoad = new Set();
 
             try {
+                /**
+                 * Abandon a project we cannot load safely, telling the user
+                 * rather than crashing partway through the load.
+                 * @param - warning - console warning describing the problem
+                 * @param - data - the offending block data
+                 * @param - [userMessage] - optional user-facing error message
+                 * @returns {void}
+                 */
+                const abortLoad = (warning, data, userMessage) => {
+                    console.warn(warning);
+                    console.debug(data);
+                    if (this.activity && typeof this.activity.errorMsg === "function") {
+                        this.activity.errorMsg(
+                            userMessage ||
+                                _("Something went wrong reading JSON-encoded project data.")
+                        );
+                    }
+                    this.activity._suppressRefresh = false;
+                    /**
+                     * The load queue cleared the workspace and started the
+                     * loading animation, so put the UI back the way the
+                     * successful path leaves it.
+                     */
+                    document.body.style.cursor = "default";
+                    if (this.activity && typeof this.activity.stopLoadAnimation === "function") {
+                        this.activity.stopLoadAnimation();
+                    }
+                    // Nothing was loaded, so a waiting save would only store
+                    // the cleared workspace over the project.
+                    this._afterLoadCallbacks.clear();
+                    this._advanceLoadQueue();
+                };
+
+                if (!Array.isArray(blockObjs)) {
+                    abortLoad(
+                        "Invalid block data: expected an array of blocks.",
+                        blockObjs,
+                        _("Cannot load project: invalid project structure.")
+                    );
+                    return;
+                }
                 /**
                  * Playback Queue has been deprecated, but some old projects
                  * may still have playback blocks appended, which we will
@@ -5560,41 +5607,11 @@ class Blocks {
                     return false;
                 };
 
-                /**
-                 * Abandon a project we cannot load safely, telling the user
-                 * rather than crashing partway through the load.
-                 * @param - warning - console warning describing the problem
-                 * @param - data - the offending block data
-                 * @returns {void}
-                 */
-                const abortLoad = (warning, data) => {
-                    console.warn(warning);
-                    console.debug(data);
-                    if (this.activity && typeof this.activity.errorMsg === "function") {
-                        this.activity.errorMsg(
-                            _("Something went wrong reading JSON-encoded project data.")
-                        );
-                    }
-                    this.activity._suppressRefresh = false;
-                    /**
-                     * The load queue cleared the workspace and started the
-                     * loading animation, so put the UI back the way the
-                     * successful path leaves it.
-                     */
-                    document.body.style.cursor = "default";
-                    if (this.activity && typeof this.activity.stopLoadAnimation === "function") {
-                        this.activity.stopLoadAnimation();
-                    }
-                    // Nothing was loaded, so a waiting save would only store
-                    // the cleared workspace over the project.
-                    this._afterLoadCallbacks.clear();
-                    this._advanceLoadQueue();
-                };
-
                 if (hasCycle()) {
                     abortLoad(
                         "Circular connection detected in block data. Punting loading of new blocks!",
-                        blockObjs
+                        blockObjs,
+                        _("Cannot load project: circular block connection detected.")
                     );
                     return;
                 }
@@ -5911,7 +5928,8 @@ class Blocks {
                                     "Too few connections for " +
                                         name +
                                         ": punting loading of new blocks!",
-                                    blockObjs[b]
+                                    blockObjs[b],
+                                    _("Cannot load project: malformed block structure detected.")
                                 );
                                 return;
                             }
@@ -5940,7 +5958,8 @@ class Blocks {
                                         "Last connection of " +
                                             name +
                                             " is not a block in this project: punting loading of new blocks!",
-                                        blockObjs[b]
+                                        blockObjs[b],
+                                        _("Cannot load project: invalid block connection detected.")
                                     );
                                     return;
                                 }
@@ -5985,7 +6004,10 @@ class Blocks {
                                         "Too few connections to convert " +
                                             name +
                                             " to newnote style: punting loading of new blocks!",
-                                        blockObjs[b]
+                                        blockObjs[b],
+                                        _(
+                                            "Cannot load project: malformed block structure detected."
+                                        )
                                     );
                                     return;
                                 }
@@ -6187,7 +6209,8 @@ class Blocks {
                                     " in block " +
                                     b +
                                     ": punting loading of new blocks!",
-                                blkData
+                                blkData,
+                                _("Cannot load project: invalid block connection detected.")
                             );
                             return;
                         }
@@ -7123,6 +7146,9 @@ class Blocks {
                     default:
                         /** Check that name is in the proto list */
                         if (!(name in this.protoBlockDict) || this.protoBlockDict[name] === null) {
+                            if (this._unsupportedBlocksInCurrentLoad) {
+                                this._unsupportedBlocksInCurrentLoad.add(name);
+                            }
                             const postProcessUnknownBlock = args => {
                                 /** save original block name */
                                 that.blockList[args[0]].privateData = args[1];
@@ -7361,6 +7387,23 @@ class Blocks {
                 if (this.activity.stopLoadAnimation) {
                     this.activity.stopLoadAnimation();
                 }
+                if (
+                    this._unsupportedBlocksInCurrentLoad &&
+                    this._unsupportedBlocksInCurrentLoad.size > 0
+                ) {
+                    const unsupportedList = Array.from(this._unsupportedBlocksInCurrentLoad).join(
+                        ", "
+                    );
+                    if (this.activity && typeof this.activity.errorMsg === "function") {
+                        this.activity.errorMsg(
+                            _(
+                                "Some blocks in this project are unsupported and were replaced with placeholders: %s"
+                            ).replace(/%s/g, unsupportedList)
+                        );
+                    }
+                    this._unsupportedBlocksInCurrentLoad.clear();
+                }
+
                 // Tagged with the request token loadNewBlocks() returned for
                 // the load that just finished, the same way "loadFailed" is
                 // tagged, so a listener scoped to one particular
