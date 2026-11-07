@@ -101,6 +101,44 @@ describe("musicutils-rhythm", () => {
         expect(rhythm.calcNoteValueToDisplay(4, 1)).toContain("4");
     });
 
+    describe("non-finite and missing values", () => {
+        const invalid = [NaN, Infinity, -Infinity, undefined, null, "", "abc", {}, []];
+
+        it("reducedFraction returns an empty string instead of overflowing the stack", () => {
+            for (const value of invalid) {
+                expect(() => rhythm.reducedFraction(value, 4)).not.toThrow();
+                expect(rhythm.reducedFraction(value, 4)).toBe("");
+                expect(rhythm.reducedFraction(4, value)).toBe("");
+            }
+        });
+
+        it("calcNoteValueToDisplay returns an empty string instead of overflowing the stack", () => {
+            for (const value of invalid) {
+                expect(() => rhythm.calcNoteValueToDisplay(value, 4)).not.toThrow();
+                expect(rhythm.calcNoteValueToDisplay(value, 4)).toBe("");
+                expect(rhythm.calcNoteValueToDisplay(1, value)).toBe("");
+            }
+        });
+
+        it("treats a numeric string zero like the number zero", () => {
+            expect(() => rhythm.reducedFraction(5, "0")).not.toThrow();
+            expect(rhythm.reducedFraction(5, "0")).toBe(rhythm.reducedFraction(5, 0));
+            expect(rhythm.reducedFraction("0", 5)).toBe(rhythm.reducedFraction(0, 5));
+
+            expect(() => rhythm.calcNoteValueToDisplay("0", 1)).not.toThrow();
+            expect(rhythm.calcNoteValueToDisplay("0", 1)).toBe(rhythm.calcNoteValueToDisplay(0, 1));
+            expect(rhythm.calcNoteValueToDisplay(1, "0")).toBe(rhythm.calcNoteValueToDisplay(1, 0));
+        });
+
+        it("still displays ordinary and numeric-string values", () => {
+            expect(rhythm.reducedFraction(4, 8)).toContain("2");
+            expect(rhythm.calcNoteValueToDisplay(4, 1)).toContain("4");
+            expect(rhythm.calcNoteValueToDisplay("4", "1")).toBe(
+                rhythm.calcNoteValueToDisplay(4, 1)
+            );
+        });
+    });
+
     describe("calcNoteValueToDisplay dotted notes", () => {
         // The symbol and its dots describe the whole fraction shown beside them:
         // a dotted quarter lasts 3/8, a double-dotted half 7/8.
