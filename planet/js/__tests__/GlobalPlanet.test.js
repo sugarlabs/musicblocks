@@ -234,6 +234,17 @@ describe("GlobalPlanet", () => {
         });
     });
 
+    describe("render", () => {
+        it("should not initialize document-wide tooltips", () => {
+            gp.cache.project1 = { ProjectName: "Project 1" };
+            jest.spyOn(gp, "afterAddProjects").mockImplementation(() => {});
+
+            gp.render([["project1", 1]]);
+
+            expect(global.jQuery).not.toHaveBeenCalledWith(".tooltipped");
+        });
+    });
+
     describe("afterRefreshProjects", () => {
         it("should call addProjects on success", () => {
             const spy = jest.spyOn(gp, "addProjects").mockImplementation(() => {});

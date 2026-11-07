@@ -28,6 +28,9 @@ global.ClipboardJS = jest.fn().mockImplementation(() => ({
     on: jest.fn(),
     destroy: jest.fn()
 }));
+global.jQuery = jest.fn(() => ({
+    tooltip: jest.fn()
+}));
 
 const { GlobalCard } = require("../GlobalCard");
 
@@ -138,6 +141,27 @@ describe("GlobalCard", () => {
 
             const container = document.getElementById("global-projects");
             expect(container.children.length).toBeGreaterThan(0);
+        });
+
+        it("should initialize tooltips only for the newly rendered card", () => {
+            const tooltip = jest.fn();
+            const previousJQuery = global.jQuery;
+            global.jQuery = jest.fn(() => ({ tooltip }));
+
+            try {
+                card.init("test-id-1");
+                card.render();
+
+                const initializedElements = global.jQuery.mock.calls[0][0];
+                expect(initializedElements).toBeInstanceOf(NodeList);
+                expect(initializedElements.length).toBeGreaterThan(0);
+                expect(Array.from(initializedElements).every(element => element.isConnected)).toBe(
+                    true
+                );
+                expect(tooltip).toHaveBeenCalledWith({ delay: 50 });
+            } finally {
+                global.jQuery = previousJQuery;
+            }
         });
 
         it("should set the project image from ProjectData", () => {

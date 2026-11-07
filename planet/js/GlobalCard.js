@@ -373,7 +373,9 @@ class GlobalCard {
             this.like();
         });
 
+        const tooltipped = frag.querySelectorAll(".tooltipped");
         document.getElementById("global-projects").appendChild(frag);
+        jQuery(tooltipped).tooltip({ delay: 50 });
         updateCheckboxes(`global-sharebox-${this.id}`);
 
         if (this.clipboard) {
