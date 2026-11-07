@@ -2694,6 +2694,27 @@ describe("getModePattern", () => {
     });
 });
 
+describe("buildScale keeps the tonic named as the key", () => {
+    // The final double-accidental pass of buildScale used to respell the tonic itself when
+    // the next degree landed on the same letter, so C♯ fibonacci began on B𝄪.
+    test.each([
+        ["C♯ fibonacci", ["C♯", "C𝄪", "D♯", "F", "G♯", "C♯"]],
+        ["F♯ fibonacci", ["F♯", "F𝄪", "G♯", "A♯", "C♯", "F♯"]]
+    ])("%s starts and ends on the key's own name", (keySignature, expected) => {
+        const [scale, halfSteps] = buildScale(keySignature);
+        expect(scale).toEqual(expected);
+        expect(halfSteps).toEqual([1, 1, 2, 3, 5]);
+    });
+
+    test("every sharp key starts every mode on its own tonic", () => {
+        for (const key of ["C♯", "D♯", "F♯", "G♯", "A♯"]) {
+            for (const mode of Object.keys(MUSICALMODES)) {
+                expect(buildScale(`${key} ${mode}`)[0][0]).toBe(key);
+            }
+        }
+    });
+});
+
 describe("buildScale with explicit EDO", () => {
     it.each([
         [19, [3, 3, 2, 3, 3, 3, 2]],
