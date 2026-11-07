@@ -29,6 +29,7 @@ class Boundary {
         this._stage = stage;
         this._stage.addChild(this._container);
         this._stage.setChildIndex(this._container, 0);
+        this.hide();
     }
 
     // resizeEvent(scale) {};
