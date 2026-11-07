@@ -261,6 +261,29 @@ describe("Notation Class", () => {
             notation.notationTempo(turtle, bpm, beatValue);
             expect(notation._notationStaging[turtle]).toEqual(["tempo", bpm, 4]);
         });
+
+        it("records the active instrument with each note", () => {
+            const turtle = "turtle1";
+            const tur = notation.activity.turtles.ithTurtle(turtle);
+
+            tur.singer.instrumentNames = ["violin"];
+
+            notation.doUpdateNotation(["C4"], 4, turtle, false, []);
+
+            expect(notation.notationStaging[turtle][0][8]).toBe("violin");
+        });
+
+        it("records the selected setvoice when no instrument stack is active", () => {
+            const turtle = "turtle1";
+            const tur = notation.activity.turtles.ithTurtle(turtle);
+
+            tur.singer.instrumentNames = [];
+            tur.singer.voices = ["flute"];
+
+            notation.doUpdateNotation(["C4"], 4, turtle, false, []);
+
+            expect(notation.notationStaging[turtle][0][8]).toBe("flute");
+        });
     });
 
     describe("Line Breaks and Harmonics", () => {
