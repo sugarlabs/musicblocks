@@ -60,9 +60,35 @@ describe("DrumBlocksAPI", () => {
         const result = await drumBlocksAPI.setDrum("kick", mockFlow);
 
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("setDrum", ["kick", mockFlow]);
-        expect(drumBlocksAPI.runCommand).toHaveBeenCalledWith("setDrum", ["kick", 0]);
+        expect(drumBlocksAPI.runCommand).toHaveBeenCalledWith("setDrum", [
+            "kick",
+            0,
+            global.MusicBlocks.BLK
+        ]);
         expect(mockFlow).toHaveBeenCalled();
         expect(result).toBe(drumBlocksAPI.ENDFLOWCOMMAND);
+    });
+
+    test("nested setDrum calls get their own block number", async () => {
+        let blockNo = 0;
+        const savedMusicBlocks = global.MusicBlocks;
+        global.MusicBlocks = {
+            get BLK() {
+                return "B" + blockNo++;
+            }
+        };
+        JSInterface.validateArgs.mockImplementation((_name, args) => args);
+
+        await drumBlocksAPI.setDrum("kick", async () => {
+            await drumBlocksAPI.setDrum("snare", async () => {});
+        });
+
+        expect(drumBlocksAPI.runCommand.mock.calls).toEqual([
+            ["setDrum", ["kick", 0, "B0"]],
+            ["setDrum", ["snare", 0, "B1"]]
+        ]);
+        global.MusicBlocks = savedMusicBlocks;
+        JSInterface.validateArgs.mockReset();
     });
 
     test("mapPitchToDrum calls runCommand and executes flow function", async () => {
