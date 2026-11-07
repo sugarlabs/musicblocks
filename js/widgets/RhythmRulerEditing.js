@@ -416,14 +416,18 @@ class RhythmRulerEditing {
         // cells respond to touchscreen taps and stylus input as well as mouse
         // clicks.  The Pointer Events spec guarantees these fire for all input
         // device types on modern browsers.
-        cell.removeEventListener("pointerdown", __mouseDownHandler);
-        cell.addEventListener("pointerdown", __mouseDownHandler);
-
-        cell.removeEventListener("pointerup", __mouseUpHandler);
-        cell.addEventListener("pointerup", __mouseUpHandler);
-
-        cell.removeEventListener("click", __clickHandler);
-        cell.addEventListener("click", __clickHandler);
+        const handlers = {
+            pointerdown: __mouseDownHandler,
+            pointerup: __mouseUpHandler,
+            click: __clickHandler
+        };
+        for (const [type, handler] of Object.entries(handlers)) {
+            if (cell._rhythmRulerHandlers) {
+                cell.removeEventListener(type, cell._rhythmRulerHandlers[type]);
+            }
+            cell.addEventListener(type, handler);
+        }
+        cell._rhythmRulerHandlers = handlers;
     }
 
     /**
