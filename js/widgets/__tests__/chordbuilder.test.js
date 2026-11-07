@@ -790,6 +790,67 @@ describe("ChordBuilderWidget", () => {
             expect(mockAudio.stop).toHaveBeenCalled();
         });
 
+        it.each([0, 3])(
+            "keeps the chord picker usable after mouse clicks in cell %i",
+            cellIndex => {
+                document.body.appendChild(body);
+                try {
+                    const cell = body.querySelectorAll(".bar-grid-cell")[cellIndex];
+                    cell.click();
+                    const picker = cell.querySelector("select");
+                    expect(document.activeElement).toBe(picker);
+
+                    picker.click();
+                    picker.click();
+                    expect(cell.querySelector("select")).toBe(picker);
+                    expect(document.activeElement).toBe(picker);
+                    expect(widget.progression).toEqual([]);
+
+                    picker.value = "4";
+                    picker.dispatchEvent(new Event("change", { bubbles: true }));
+
+                    expect(widget.progression).toEqual([
+                        ...Array(cellIndex).fill(null),
+                        widget.diatonicChords[4]
+                    ]);
+                    expect(mockAudio.playChord).toHaveBeenCalledTimes(1);
+                    expect(mockAudio.playChord).toHaveBeenCalledWith(
+                        widget.diatonicChords[4],
+                        0.4,
+                        {
+                            octave: 4
+                        }
+                    );
+                    expect(
+                        body.querySelectorAll(".bar-grid-cell")[cellIndex].textContent
+                    ).toContain("G");
+                    expect(body.querySelector(".bar-grid-cell select")).toBeNull();
+                } finally {
+                    body.remove();
+                }
+            }
+        );
+
+        it("cancels the chord picker on blur and allows it to reopen", () => {
+            document.body.appendChild(body);
+            try {
+                body.querySelector(".bar-grid-cell").click();
+                const picker = body.querySelector(".bar-grid-cell select");
+                picker.blur();
+
+                expect(body.querySelector(".bar-grid-cell select")).toBeNull();
+                expect(widget.progression).toEqual([]);
+                expect(mockAudio.playChord).not.toHaveBeenCalled();
+
+                body.querySelector(".bar-grid-cell").click();
+                const reopenedPicker = body.querySelector(".bar-grid-cell select");
+                expect(reopenedPicker).not.toBe(picker);
+                expect(document.activeElement).toBe(reopenedPicker);
+            } finally {
+                body.remove();
+            }
+        });
+
         it("handles table cell remove button and empty cell chord picker", () => {
             widget.progression = [{ name: "C", roman: "I", notes: ["C", "E", "G"] }];
             widget._renderBarGrid();
