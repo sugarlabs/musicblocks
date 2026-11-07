@@ -11,6 +11,14 @@ describe("JavaScript editor and block search", () => {
         cy.visit("http://127.0.0.1:3000");
         cy.waitForAppReady();
 
+        // Native key events activate the page, which can make Chrome open the
+        // SaveInterface leave-page prompt on the next visit or at spec teardown.
+        // This spec checks search and editing, so remove that jQuery warning
+        // from its test pages. The native autosave listener still runs.
+        cy.window().then(win => {
+            win.jQuery(win).off("beforeunload");
+        });
+
         // Dismiss the first-run "Take a Tour" guide, which is itself a
         // widget window (js/widgets/widgetWindows.js) and would otherwise
         // collide with the ".windowFrame" selectors used below.
