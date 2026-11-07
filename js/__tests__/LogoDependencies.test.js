@@ -130,6 +130,24 @@ describe("LogoDependencies", () => {
                 "LogoDependencies: 'errorHandler' is required"
             );
         });
+
+        test("throws when dependencies argument is not an object", () => {
+            expect(() => new LogoDependencies(null)).toThrow(
+                "LogoDependencies: dependencies must be an object"
+            );
+            expect(() => new LogoDependencies("invalid")).toThrow(
+                "LogoDependencies: dependencies must be an object"
+            );
+            expect(() => new LogoDependencies([1, 2, 3])).toThrow(
+                "LogoDependencies: dependencies must be an object"
+            );
+        });
+
+        test("throws when errorHandler is not a function", () => {
+            expect(
+                () => new LogoDependencies(makeDeps({ errorHandler: "not a function" }))
+            ).toThrow("LogoDependencies: 'errorHandler' must be a function");
+        });
     });
 
     describe("isLogoDependencies", () => {
@@ -218,5 +236,68 @@ describe("LogoDependencies.fromActivity", () => {
         const deps = LogoDependencies.fromActivity(activity);
         expect(deps.callbacks.onStopTurtle).toBe(activity.onStopTurtle);
         expect(deps.callbacks.onRunTurtle).toBe(activity.onRunTurtle);
+    });
+
+    test("throws when activity is not an object", () => {
+        expect(() => LogoDependencies.fromActivity(null)).toThrow(
+            "LogoDependencies: 'activity' must be an object"
+        );
+        expect(() => LogoDependencies.fromActivity("invalid")).toThrow(
+            "LogoDependencies: 'activity' must be an object"
+        );
+        expect(() => LogoDependencies.fromActivity([1, 2, 3])).toThrow(
+            "LogoDependencies: 'activity' must be an object"
+        );
+    });
+
+    test("throws when required properties are missing from activity", () => {
+        expect(() => LogoDependencies.fromActivity({ ...activity, blocks: null })).toThrow(
+            "LogoDependencies: 'blocks' is required"
+        );
+        expect(() => LogoDependencies.fromActivity({ ...activity, turtles: null })).toThrow(
+            "LogoDependencies: 'turtles' is required"
+        );
+        expect(() => LogoDependencies.fromActivity({ ...activity, stage: null })).toThrow(
+            "LogoDependencies: 'stage' is required"
+        );
+        expect(() => LogoDependencies.fromActivity({ ...activity, errorMsg: "not a fn" })).toThrow(
+            "LogoDependencies: 'errorMsg' must be a function"
+        );
+    });
+});
+
+describe("LogoDependencies.validate", () => {
+    test("passes with valid dependencies", () => {
+        expect(() => LogoDependencies.validate(makeDeps())).not.toThrow();
+    });
+
+    test("throws when deps is not an object", () => {
+        expect(() => LogoDependencies.validate(null)).toThrow(
+            "LogoDependencies: dependencies must be an object"
+        );
+        expect(() => LogoDependencies.validate(undefined)).toThrow(
+            "LogoDependencies: dependencies must be an object"
+        );
+        expect(() => LogoDependencies.validate("string")).toThrow(
+            "LogoDependencies: dependencies must be an object"
+        );
+    });
+
+    test("throws when required fields are missing", () => {
+        expect(() => LogoDependencies.validate(makeDeps({ blocks: null }))).toThrow(
+            "LogoDependencies: 'blocks' is required"
+        );
+        expect(() => LogoDependencies.validate(makeDeps({ turtles: null }))).toThrow(
+            "LogoDependencies: 'turtles' is required"
+        );
+        expect(() => LogoDependencies.validate(makeDeps({ stage: null }))).toThrow(
+            "LogoDependencies: 'stage' is required"
+        );
+        expect(() => LogoDependencies.validate(makeDeps({ errorHandler: null }))).toThrow(
+            "LogoDependencies: 'errorHandler' is required"
+        );
+        expect(() => LogoDependencies.validate(makeDeps({ errorHandler: 123 }))).toThrow(
+            "LogoDependencies: 'errorHandler' must be a function"
+        );
     });
 });

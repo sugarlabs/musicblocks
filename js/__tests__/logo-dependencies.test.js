@@ -690,3 +690,102 @@ describe("Logo with LogoDependencies", () => {
         expect(logo.deps.Singer).toBe(mockDeps.Singer);
     });
 });
+
+describe("Logo constructor dependency validation", () => {
+    test("throws when input is not an object", () => {
+        expect(() => new Logo(null)).toThrow("Logo: dependencies must be an object");
+        expect(() => new Logo(undefined)).toThrow("Logo: dependencies must be an object");
+        expect(() => new Logo("invalid")).toThrow("Logo: dependencies must be an object");
+        expect(() => new Logo(42)).toThrow("Logo: dependencies must be an object");
+        expect(() => new Logo([1, 2])).toThrow("Logo: dependencies must be an object");
+    });
+
+    test("throws early on incomplete dependencies instead of deferring to runtime", () => {
+        expect(() => new Logo({ blocks: {}, turtles: {} })).toThrow(
+            "LogoDependencies: 'stage' is required"
+        );
+        expect(
+            () =>
+                new Logo({
+                    blocks: createMockBlocks(),
+                    turtles: createMockTurtles(),
+                    stage: createMockStage(),
+                    errorMsg: "not a function"
+                })
+        ).toThrow("LogoDependencies: 'errorMsg' must be a function");
+    });
+
+    test("validates explicit dependencies container", () => {
+        expect(
+            () =>
+                new Logo({
+                    blocks: null,
+                    turtles: createMockTurtles(),
+                    stage: createMockStage(),
+                    errorHandler: () => {}
+                })
+        ).toThrow("LogoDependencies: 'blocks' is required");
+
+        expect(
+            () =>
+                new Logo({
+                    blocks: createMockBlocks(),
+                    turtles: null,
+                    stage: createMockStage(),
+                    errorHandler: () => {}
+                })
+        ).toThrow("LogoDependencies: 'turtles' is required");
+
+        expect(
+            () =>
+                new Logo({
+                    blocks: createMockBlocks(),
+                    turtles: createMockTurtles(),
+                    stage: null,
+                    errorHandler: () => {}
+                })
+        ).toThrow("LogoDependencies: 'stage' is required");
+
+        expect(
+            () =>
+                new Logo({
+                    blocks: createMockBlocks(),
+                    turtles: createMockTurtles(),
+                    stage: createMockStage(),
+                    errorHandler: null
+                })
+        ).toThrow("LogoDependencies: 'errorHandler' is required");
+
+        expect(
+            () =>
+                new Logo({
+                    blocks: createMockBlocks(),
+                    turtles: createMockTurtles(),
+                    stage: createMockStage(),
+                    errorHandler: "not a function"
+                })
+        ).toThrow("LogoDependencies: 'errorHandler' must be a function");
+    });
+
+    test("validates legacy activity object", () => {
+        const validActivity = {
+            blocks: createMockBlocks(),
+            turtles: createMockTurtles(),
+            stage: createMockStage(),
+            errorMsg: jest.fn()
+        };
+
+        expect(() => new Logo({ ...validActivity, blocks: null })).toThrow(
+            "LogoDependencies: 'blocks' is required"
+        );
+        expect(() => new Logo({ ...validActivity, turtles: null })).toThrow(
+            "LogoDependencies: 'turtles' is required"
+        );
+        expect(() => new Logo({ ...validActivity, stage: null })).toThrow(
+            "LogoDependencies: 'stage' is required"
+        );
+        expect(() => new Logo({ ...validActivity, errorMsg: "not a function" })).toThrow(
+            "LogoDependencies: 'errorMsg' must be a function"
+        );
+    });
+});
