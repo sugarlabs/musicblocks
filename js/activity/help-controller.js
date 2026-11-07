@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global _, lazyLoad, HelpWidget, StatsWindow, JSEditor, getMacroExpansion, debugLog */
+/* global _, lazyLoad, HelpWidget, StatsWindow, CallGraphWidget, JSEditor, getMacroExpansion, debugLog */
 
 /* exported setupHelpController, HelpController */
 
@@ -79,6 +79,19 @@ class HelpController {
         if (!this.activity.statsWindow || !this.activity.statsWindow.isOpen) {
             await lazyLoad("widgets/statistics");
             this.activity.statsWindow = new StatsWindow(this.activity);
+        }
+    }
+
+    async showCodeMap() {
+        if (!this.activity.codeMapWidget || !this.activity.codeMapWidget.isOpen) {
+            await lazyLoad([
+                "widgets/CallGraphAnalyzer",
+                "widgets/CallGraphLayout",
+                "widgets/CallGraphWidget"
+            ]);
+            this.activity.codeMapWidget = new CallGraphWidget(this.activity);
+        } else {
+            this.activity.codeMapWidget.refresh();
         }
     }
 
@@ -450,6 +463,7 @@ const setupHelpController = activity => {
     activity.showKeyboardShortcuts = (...args) => controller.showKeyboardShortcuts(...args);
     activity.toggleJSWindow = (...args) => controller.toggleJSEditor(...args);
     activity.doAnalytics = (...args) => controller.showStats(...args);
+    activity.showCodeMap = (...args) => controller.showCodeMap(...args);
     activity._saveHelpBlocks = (...args) => controller.saveHelpBlocks(...args);
 
     return controller;
