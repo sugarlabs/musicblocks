@@ -157,10 +157,12 @@ class ASTUtils {
     }
 
     /**
-     * Records which actions have a Stop block directly in their own stack (not inside a
-     * loop or other clamp). In Music Blocks such a Stop also ends the loop the action was
-     * called from (Logo.doBreak), so these actions report it to their callers: the action
-     * returns STOPFLOW instead of ENDFLOW and each call checks for it.
+     * Records which actions have a Stop block in their own stack, directly or inside a
+     * non-loop clamp (If, Switch). In Music Blocks such a Stop also ends the loop the
+     * action was called from (Logo.doBreak walks the queue for the nearest loop whatever
+     * the nesting), so these actions report it to their callers: the action returns
+     * STOPFLOW instead of ENDFLOW and each call checks for it. A Stop inside a nested
+     * loop belongs to that loop, not to the caller's.
      *
      * @static
      * @param {String[]} names - every action name in the program
@@ -168,12 +170,26 @@ class ASTUtils {
      * @returns {void}
      */
     static setStoppingActions(names, trees) {
+        // Clamps whose inner blocks stay in the same execution as the blocks around
+        // them, unlike a loop or a note-like clamp with its own callback.
+        const SAME_FLOW_CLAMPS = ["if", "ifthenelse", "switch", "case", "defaultcase"];
+        const hasStop = flows =>
+            flows.some(
+                flow =>
+                    Array.isArray(flow) &&
+                    (flow[0] === "break" ||
+                        (SAME_FLOW_CLAMPS.includes(flow[0]) &&
+                            flow
+                                .slice(1)
+                                .some(
+                                    part =>
+                                        Array.isArray(part) &&
+                                        Array.isArray(part[0]) &&
+                                        hasStop(part)
+                                )))
+            );
         ASTUtils._stoppingActions = new Set(
-            names.filter(
-                (name, i) =>
-                    Array.isArray(trees[i]) &&
-                    trees[i].some(flow => Array.isArray(flow) && flow[0] === "break")
-            )
+            names.filter((name, i) => Array.isArray(trees[i]) && hasStop(trees[i]))
         );
     }
 
@@ -1249,8 +1265,37 @@ class ASTUtils {
                     } else if (outer === null) {
                         replace(statement, returnEnd(stack.end));
                     } else if (stack.end === null) {
-                        // No function in between: leave the outer stack directly.
-                        replace(statement, exitStatement(outer.stack));
+                        // No function in between: leave the outer stack directly. When
+                        // the action reports a Stop to its caller, a Stop nested in a
+                        // clamp reports it too: called from a loop, the rest of the
+                        // round still runs and the loop then ends (Logo.doBreak).
+                        replace(
+                            statement,
+                            reportStop
+                                ? {
+                                      type: "IfStatement",
+                                      test: identifier(inLoopParam),
+                                      consequent: {
+                                          type: "BlockStatement",
+                                          body: [
+                                              {
+                                                  type: "ExpressionStatement",
+                                                  expression: {
+                                                      type: "AssignmentExpression",
+                                                      operator: "=",
+                                                      left: identifier(reportFlag),
+                                                      right: { type: "Literal", value: true }
+                                                  }
+                                              }
+                                          ]
+                                      },
+                                      alternate: {
+                                          type: "BlockStatement",
+                                          body: [exitStatement(outer.stack)]
+                                      }
+                                  }
+                                : exitStatement(outer.stack)
+                        );
                     } else {
                         // Inside a clamp callback: set a flag the outer stack checks.
                         if (!outer.flag) {
