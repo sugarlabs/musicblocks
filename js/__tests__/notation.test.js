@@ -144,8 +144,9 @@ describe("Notation Class", () => {
         });
 
         it("should write drums that share a symbol once on the drum line", () => {
+            getDrumSymbol.mockReturnValueOnce("bd").mockReturnValueOnce("bd");
             notation.doUpdateNotation(["R"], 4, "turtle1", false, ["kick drum", "bass drum"]);
-            expect(notation._notationDrumStaging.turtle1[0][0]).toEqual(["drums"]);
+            expect(notation._notationDrumStaging.turtle1[0][0]).toEqual(["bd"]);
         });
 
         it("should write each symbol once when only some drums share one", () => {
