@@ -608,6 +608,79 @@ describe("Block Foundation", () => {
             });
         });
 
+        describe("collapsed block labels", () => {
+            it("should use a meaningful label for the chord progression widget", () => {
+                const globalNames = [
+                    "Image",
+                    "COLLAPSEBUTTON",
+                    "EXPANDBUTTON",
+                    "PALETTEFILLCOLORS",
+                    "PALETTESTROKECOLORS",
+                    "PALETTEHIGHLIGHTCOLORS",
+                    "HIGHLIGHTSTROKECOLORS",
+                    "COLLAPSETEXTX",
+                    "COLLAPSETEXTY",
+                    "safeSVG"
+                ];
+                const savedGlobals = Object.fromEntries(
+                    globalNames.map(name => [name, global[name]])
+                );
+                const originalText = global.createjs.Text;
+                const originalTranslate = global._;
+                const originalBase64Encode = global.window.base64Encode;
+                const originalBlockTextColor = global.platformColor.blockText;
+                const spanishTranslations = JSON.parse(
+                    fs.readFileSync(path.join(__dirname, "../../locales/es.json"), "utf8")
+                );
+                const block = new Block(
+                    {
+                        ...mockProtoBlock,
+                        name: "chordbuilder",
+                        scale: 1,
+                        palette: { name: "test" }
+                    },
+                    mockBlocks
+                );
+
+                global.Image = class {
+                    set src(value) {
+                        if (this.onload) this.onload();
+                    }
+                };
+                global.COLLAPSEBUTTON = "collapse";
+                global.EXPANDBUTTON = "expand";
+                global.PALETTEFILLCOLORS = { test: "fill" };
+                global.PALETTESTROKECOLORS = { test: "stroke" };
+                global.PALETTEHIGHLIGHTCOLORS = { test: "highlight" };
+                global.HIGHLIGHTSTROKECOLORS = { test: "highlight-stroke" };
+                global.COLLAPSETEXTX = 0;
+                global.COLLAPSETEXTY = 0;
+                global.safeSVG = text => text;
+                global.platformColor.blockText = "#000000";
+                global._ = key => spanishTranslations[key] || key;
+                global.window.base64Encode = text => text;
+                global.createjs.Text = jest.fn(text => ({ text, visible: true }));
+                block.blockIndex = 0;
+                block.collapseArtwork =
+                    "<svg>fill_color stroke_color block_text_color block_label</svg>";
+                block.container = new global.createjs.Container();
+                block.blocks.blockCollapseArt = {};
+                block.blocks.cleanupAfterLoad = jest.fn();
+
+                try {
+                    block._generateCollapseArtwork(null);
+
+                    expect(block.collapseText.text).toBe("acordes");
+                } finally {
+                    Object.assign(global, savedGlobals);
+                    global.createjs.Text = originalText;
+                    global._ = originalTranslate;
+                    global.window.base64Encode = originalBase64Encode;
+                    global.platformColor.blockText = originalBlockTextColor;
+                }
+            });
+        });
+
         describe("collapsed labels with an empty slot", () => {
             beforeEach(() => {
                 block.collapseText = { text: "" };
