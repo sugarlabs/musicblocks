@@ -58,13 +58,21 @@ function setupDrumActions(activity) {
          * @returns {String}
          */
         static GetDrumname(drum) {
-            if (typeof drum === "string" && drum.slice(0, 4) === "http") return drum;
+            if (typeof drum !== "string") return DEFAULTDRUM;
+            const trimmed = drum.trim();
+            if (trimmed.slice(0, 4) === "http") return trimmed;
 
-            for (const [, value] of Object.entries(DRUMNAMES)) {
-                if (value[0] === drum) {
-                    return value[1];
-                } else if (value[1] === drum) {
-                    return drum;
+            const target = trimmed.toLowerCase();
+            if (!target) return DEFAULTDRUM;
+
+            if (typeof DRUMNAMES === "object" && DRUMNAMES !== null) {
+                for (const [, value] of Object.entries(DRUMNAMES)) {
+                    if (!value) continue;
+                    const localized = typeof value[0] === "string" ? value[0].toLowerCase() : "";
+                    const english = typeof value[1] === "string" ? value[1].toLowerCase() : "";
+                    if (localized === target || english === target) {
+                        return value[1];
+                    }
                 }
             }
 
@@ -198,16 +206,45 @@ function setupDrumActions(activity) {
          * @param {Number} blk - corresponding Block index in blocks.blockList
          */
         static playNoise(noise, turtle, blk) {
-            let noisename = noise;
-            for (const n in NOISENAMES) {
-                if (NOISENAMES[n][0] === noise) {
-                    noisename = NOISENAMES[n][1];
-                    break;
-                } else if (NOISENAMES[n][1] === noise) {
-                    noisename = noise;
-                    break;
+            if (typeof noise !== "string") return;
+            const target = noise.trim().toLowerCase();
+            if (!target) return;
+
+            let noisename = null;
+            if (typeof NOISENAMES === "object" && NOISENAMES !== null) {
+                for (const [, value] of Object.entries(NOISENAMES)) {
+                    if (!value) continue;
+                    const localized =
+                        typeof value[0] === "string" ? value[0].trim().toLowerCase() : "";
+                    const english =
+                        typeof value[1] === "string" ? value[1].trim().toLowerCase() : "";
+                    if (
+                        localized === target ||
+                        english === target ||
+                        (localized &&
+                            (localized.startsWith(target + " ") ||
+                                localized.endsWith(" " + target))) ||
+                        (english &&
+                            (english.startsWith(target + " ") || english.endsWith(" " + target)))
+                    ) {
+                        noisename = value[1];
+                        break;
+                    }
                 }
             }
+
+            if (!noisename) {
+                const colorMap = {
+                    white: "noise1",
+                    brown: "noise2",
+                    pink: "noise3"
+                };
+                if (colorMap[target]) {
+                    noisename = colorMap[target];
+                }
+            }
+
+            if (!noisename) return;
 
             const tur = activity.turtles.ithTurtle(turtle);
 
