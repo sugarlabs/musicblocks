@@ -335,11 +335,13 @@ function setupDictActions(activity) {
                 activity.logo.turtleDicts[turtle] = {};
             }
 
+            const keyName = String(key);
+
             // Is the dictionary the same as a turtle name?
             const target = getTargetTurtle(activity.turtles, dict);
             if (target !== null) {
-                if (Turtle.DictActions.IsTurtleKey(key)) {
-                    Turtle.DictActions.SetDictValue(target, turtle, key, value);
+                if (Turtle.DictActions.IsTurtleKey(keyName)) {
+                    Turtle.DictActions.SetDictValue(target, turtle, keyName, value);
                     return;
                 }
                 // Other keys are stored where SerializeDict reads them.
@@ -347,7 +349,6 @@ function setupDictActions(activity) {
             }
 
             const dictName = String(dict);
-            const keyName = String(key);
 
             // Assigning these names on a plain object reaches Object.prototype.
             if (isUnsafeObjectKey(dictName)) {
@@ -382,13 +383,14 @@ function setupDictActions(activity) {
                 activity.logo.turtleDicts[turtle] = {};
             }
 
+            const keyName = String(key);
+
             // Is the dictionary the same as a turtle name?
             const target = getTargetTurtle(activity.turtles, dict);
             if (target !== null) {
-                if (Turtle.DictActions.IsTurtleKey(key)) {
-                    return Turtle.DictActions._GetDict(target, turtle, key, blk);
+                if (Turtle.DictActions.IsTurtleKey(keyName)) {
+                    return Turtle.DictActions._GetDict(target, turtle, keyName, blk);
                 }
-                const keyName = String(key);
                 const turtleDict = activity.logo.turtleDicts[turtle][target];
                 if (
                     turtleDict === undefined ||
@@ -405,7 +407,6 @@ function setupDictActions(activity) {
             }
 
             const dictName = String(dict);
-            const keyName = String(key);
             const dicts = activity.logo.turtleDicts[turtle];
             if (!Object.prototype.hasOwnProperty.call(dicts, dictName)) {
                 const msg = _("Dictionary with this name does not exist");

@@ -656,6 +656,12 @@ describe("setupDictActions", () => {
             expect(Turtle.DictActions.getValue("testDict", "123", turtle, 3)).toBe("numberKey");
             expect(Turtle.DictActions.getDict("testDict", turtle)).toBe('{"123":"numberKey"}');
         });
+
+        it("should route non-string turtle keys correctly to turtle status", () => {
+            Turtle.DictActions.setValue("target", ["heading"], 180, turtle);
+            expect(targetTurtle.painter.doSetHeading).toHaveBeenCalledWith(180);
+            expect(Turtle.DictActions.getValue("target", ["heading"], turtle, 3)).toBe(90);
+        });
     });
 
     // Text blocks keep their English value and only translate their label, so in another
