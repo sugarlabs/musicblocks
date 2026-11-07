@@ -38,7 +38,8 @@ const ASTUtils = {
     getMouseAST: jest.fn(),
     setActionNames: jest.fn(),
     setStoppingActions: jest.fn(),
-    getBoxNames: jest.fn(() => [])
+    getBoxNames: jest.fn(() => []),
+    unsupportedArgBlocks: new Set()
 };
 const astring = {
     generate: jest.fn()
@@ -494,6 +495,59 @@ describe("JSGenerate Class", () => {
         expect(tree[0]).toEqual(["nameddo_chorus", null, null]);
         // A name read from a box is only known at run time, so it stays a "do" block.
         expect(tree[1][0]).toBe("do");
+    });
+
+    test("should not export a computed value block's last result as a literal", () => {
+        const computed = { style: "value", arg: jest.fn(), hasCapability: jest.fn(() => false) };
+        const literal = {
+            style: "value",
+            arg: jest.fn(),
+            hasCapability: jest.fn(name => name === "valueDrivenLabel")
+        };
+        globalActivity.blocks.stackList = [1];
+        globalActivity.blocks.blockList = {
+            1: {
+                name: "start",
+                trash: false,
+                connections: [null, 2, null],
+                protoblock: { style: "hat" }
+            },
+            2: {
+                name: "print",
+                connections: [1, 3, 4],
+                protoblock: { style: "command", args: 1 }
+            },
+            // Logo leaves the time from the last run in value
+            3: { name: "time", value: 12.34, connections: [2], protoblock: computed },
+            4: {
+                name: "print",
+                connections: [2, 5, null],
+                protoblock: { style: "command", args: 1 }
+            },
+            5: { name: "number", value: 7, connections: [4], protoblock: literal }
+        };
+
+        JSGenerate.generateStacksTree();
+
+        const tree = JSGenerate.startTrees[0];
+        expect(tree[0]).toEqual(["print", [["time", []]], null]);
+        expect(tree[1]).toEqual(["print", [7], null]);
+    });
+
+    test("should warn once about blocks exported as undefined", () => {
+        JSGenerate.startTrees = [[["start", null, null]]];
+        ASTUtils.getMouseAST.mockImplementationOnce(() => {
+            ASTUtils.unsupportedArgBlocks.add("time");
+            ASTUtils.unsupportedArgBlocks.add("clampNumber");
+            return { type: "Mouse" };
+        });
+
+        JSGenerate.generateCode();
+
+        expect(console.warn).toHaveBeenCalledTimes(1);
+        expect(console.warn).toHaveBeenCalledWith(
+            "No JavaScript equivalent for these blocks; exported as undefined: time, clampNumber"
+        );
     });
 
     test("should warn when clamp block flows left", () => {
