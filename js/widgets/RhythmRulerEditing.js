@@ -127,11 +127,9 @@ class RhythmRulerEditing {
                 }, interval);
             }
         } else {
-            let inputNum = this._dissectNumber.value;
-            if (inputNum === "" || isNaN(inputNum)) {
+            let inputNum = Math.floor(Number(this._dissectNumber.value));
+            if (!Number.isFinite(inputNum) || inputNum < 2) {
                 inputNum = 2;
-            } else {
-                inputNum = Math.abs(Math.floor(inputNum));
             }
 
             this._dissectNumber.value = inputNum;
@@ -584,11 +582,11 @@ class RhythmRulerEditing {
      * @returns {void}
      */
     __dissectByNumber(cell, inputNum, addToUndoList) {
-        if (typeof cell !== "object") {
+        if (typeof cell !== "object" || cell === null) {
             return;
         }
 
-        if (typeof inputNum !== "number") {
+        if (typeof inputNum !== "number" || !Number.isFinite(inputNum) || inputNum < 2) {
             return;
         }
 

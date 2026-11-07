@@ -1354,6 +1354,21 @@ describe("RhythmRuler _getDrumName safety and _saveMachine coverage", () => {
             expect(rhythmRuler.Rulers[0][0]).toEqual(initialRulerValues);
             expect(rhythmRuler._undoList).toHaveLength(0);
             expect(mockRuler.deleteCell).not.toHaveBeenCalled();
+
+            rhythmRuler.__dissectByNumber(cell, 0, true);
+            expect(rhythmRuler.Rulers[0][0]).toEqual(initialRulerValues);
+            expect(rhythmRuler._undoList).toHaveLength(0);
+            expect(mockRuler.deleteCell).not.toHaveBeenCalled();
+
+            rhythmRuler.__dissectByNumber(cell, 1, true);
+            expect(rhythmRuler.Rulers[0][0]).toEqual(initialRulerValues);
+            expect(rhythmRuler._undoList).toHaveLength(0);
+            expect(mockRuler.deleteCell).not.toHaveBeenCalled();
+
+            rhythmRuler.__dissectByNumber(cell, -2, true);
+            expect(rhythmRuler.Rulers[0][0]).toEqual(initialRulerValues);
+            expect(rhythmRuler._undoList).toHaveLength(0);
+            expect(mockRuler.deleteCell).not.toHaveBeenCalled();
         });
 
         test("__divideFromList does not save the history while replaying a tap", () => {
@@ -2335,6 +2350,26 @@ describe("RhythmRuler _getDrumName safety and _saveMachine coverage", () => {
             expect(rhythmRuler._drawCircularView).toHaveBeenCalled();
         });
 
+        test("_onCircularMouseUp defaults subdivision to 2 when dissect number is less than 2", () => {
+            const mockCell = { style: {} };
+            rhythmRuler._rulers = [{ cells: [mockCell] }];
+            rhythmRuler._circularDownHit = { rulerIndex: 0, cellIndex: 0 };
+            rhythmRuler._hitTestCircular = jest.fn(() => ({ rulerIndex: 0, cellIndex: 0 }));
+            rhythmRuler._dissectNumber = {
+                value: "0",
+                classList: { add: jest.fn(), remove: jest.fn() }
+            };
+            rhythmRuler.__dissectByNumber = jest.fn();
+            rhythmRuler.saveDissectHistory = jest.fn();
+            rhythmRuler._drawCircularView = jest.fn();
+
+            rhythmRuler._onCircularMouseUp({ clientX: 200, clientY: 100 });
+
+            expect(rhythmRuler.__dissectByNumber).toHaveBeenCalledWith(mockCell, 2, true);
+            expect(rhythmRuler.saveDissectHistory).toHaveBeenCalled();
+            expect(rhythmRuler._drawCircularView).toHaveBeenCalled();
+        });
+
         test("_tieCircular configures linear tie cells and triggers tie operation", () => {
             const cell1 = { style: {} };
             const cell2 = { style: {} };
@@ -2500,6 +2535,20 @@ describe("RhythmRuler _getDrumName safety and _saveMachine coverage", () => {
             rhythmRuler._dissectRuler(fakeEvent, "0");
 
             expect(rhythmRuler.__dissectByNumber).toHaveBeenCalledWith(mockCell, 2, true);
+        });
+
+        test("_dissectRuler defaults subdivision count to 2 when input is less than 2", () => {
+            const fakeEvent = { currentTarget: mockCell };
+
+            rhythmRuler._dissectNumber.value = "0";
+            rhythmRuler._dissectRuler(fakeEvent, "0");
+            expect(rhythmRuler.__dissectByNumber).toHaveBeenCalledWith(mockCell, 2, true);
+            expect(rhythmRuler._dissectNumber.value).toBe(2);
+
+            rhythmRuler._dissectNumber.value = "1";
+            rhythmRuler._dissectRuler(fakeEvent, "0");
+            expect(rhythmRuler.__dissectByNumber).toHaveBeenCalledWith(mockCell, 2, true);
+            expect(rhythmRuler._dissectNumber.value).toBe(2);
         });
 
         test("_dissectRuler ignores clicks when playback is active", () => {
@@ -2839,6 +2888,11 @@ describe("RhythmRuler _getDrumName safety and _saveMachine coverage", () => {
     });
 
     describe("Helper and Calculation Methods", () => {
+        it("gracefully returns null when container is invalid or missing replaceChildren", () => {
+            expect(rhythmRuler._setButtonIcon(null, "play-button.svg", "Play Note")).toBeNull();
+            expect(rhythmRuler._setButtonIcon({}, "play-button.svg", "Play Note")).toBeNull();
+        });
+
         it("creates button icon image correctly via _setButtonIcon", () => {
             const container = {
                 replaceChildren: jest.fn(),
@@ -2963,12 +3017,19 @@ describe("RhythmRuler _getDrumName safety and _saveMachine coverage", () => {
                     title: title,
                     onclick: null
                 })),
-                addInputButton: jest.fn().mockImplementation(val => ({
-                    value: val,
-                    addEventListener: jest.fn(),
-                    classList: { add: jest.fn(), remove: jest.fn() },
-                    style: {}
-                })),
+                addInputButton: jest.fn().mockImplementation(val => {
+                    const listeners = {};
+                    return {
+                        value: val,
+                        addEventListener: jest.fn((type, fn) => {
+                            listeners[type] = fn;
+                        }),
+                        _listeners: listeners,
+                        blur: jest.fn(),
+                        classList: { add: jest.fn(), remove: jest.fn() },
+                        style: {}
+                    };
+                }),
                 getWidgetBody: jest.fn().mockReturnValue({
                     append: jest.fn()
                 }),
@@ -3163,6 +3224,29 @@ describe("RhythmRuler _getDrumName safety and _saveMachine coverage", () => {
                 expect(rhythmRuler._playAllCell.onclick).not.toHaveBeenCalled();
                 activeSpy.mockRestore();
             }
+        });
+
+        test("_dissectNumber Enter key validates bounds and defaults invalid input to 2", () => {
+            const keydownHandler = rhythmRuler._dissectNumber._listeners["keydown"];
+            expect(typeof keydownHandler).toBe("function");
+
+            const makeEvent = () => ({
+                key: "Enter",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            });
+
+            rhythmRuler._dissectNumber.value = "0";
+            keydownHandler(makeEvent());
+            expect(rhythmRuler._dissectNumber.value).toBe(2);
+
+            rhythmRuler._dissectNumber.value = "invalid";
+            keydownHandler(makeEvent());
+            expect(rhythmRuler._dissectNumber.value).toBe(2);
+
+            rhythmRuler._dissectNumber.value = "16";
+            keydownHandler(makeEvent());
+            expect(rhythmRuler._dissectNumber.value).toBe(16);
         });
 
         test("widgetWindow.onclose cleanly removes the keydown listener and nulls _keyHandler", () => {
