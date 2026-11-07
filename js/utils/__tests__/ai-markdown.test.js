@@ -86,6 +86,14 @@ describe("ai-markdown", () => {
         expect(html).toContain("<strong>guide</strong> and <em>tips</em></a>");
     });
 
+    it("keeps a link inside bold and italic text", () => {
+        const link = '<a href="https://a.com" target="_blank" rel="noopener noreferrer">guide</a>';
+        expect(renderChatMarkdown("**[guide](https://a.com)**")).toBe(
+            `<p><strong>${link}</strong></p>`
+        );
+        expect(renderChatMarkdown("*[guide](https://a.com)*")).toBe(`<p><em>${link}</em></p>`);
+    });
+
     it("keeps a reply that contains the code span marker readable", () => {
         const marker = String.fromCharCode(0xe000);
         expect(renderChatMarkdown(`${marker}0${marker} and \`start\``)).toBe(
