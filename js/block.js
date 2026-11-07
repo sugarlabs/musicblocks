@@ -29,7 +29,7 @@
    piemenuAccidentals, piemenuBasic, piemenuBlockContext,
    piemenuBoolean, piemenuColor, piemenuCustomNotes, piemenuIntervals,
    piemenuModes, piemenuNoteValue, piemenuNumber, piemenuPitches,
-   piemenuVoices, piemenuChords, platformColor, ProtoBlock, RSYMBOLS,
+   piemenuVoices, piemenuVoicesGrid, piemenuChords, platformColor, ProtoBlock, RSYMBOLS,
    retryWithBackoff, safeSVG, SCALENOTES, SHARP, SOLFATTRS, SOLFNOTES, splitScaleDegree,
    splitSolfege, STANDARDBLOCKHEIGHT, TEXTX, TEXTY,
     updateTemperaments, VALUETEXTX, DEFAULTCHORD, base64Encode,
@@ -65,6 +65,7 @@
    - js/logo.js
    - js/piemenus.js
         piemenuNumber, piemenuColor, piemenuNoteValue, piemenuBasic, piemenuBoolean, piemenuVoices,
+        piemenuVoicesGrid,
         piemenuIntervals, piemenuAccidentals, piemenuModes, piemenuPitches, piemenuCustomNotes
    - js/piemenu-block-context.js
         piemenuBlockContext
@@ -4616,7 +4617,14 @@ class Block {
                 categories.push(categoriesList.indexOf(VOICENAMES[i][3]));
             }
 
-            piemenuVoices(this, voiceLabels, voiceValues, categories, selectedVoice);
+            piemenuVoicesGrid(
+                this,
+                voiceLabels,
+                voiceValues,
+                categories,
+                categoriesList,
+                selectedVoice
+            );
         } else if (this.name === "noisename") {
             if (this.value !== null) {
                 selectedNoise = this.value;
