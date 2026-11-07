@@ -690,21 +690,23 @@ class GlobalPlanet {
 
         this.getData(
             id,
-            data => {
-                let remixedName;
-                if (id in this.cache) {
-                    remixedName = Planet.ProjectStorage.getCurrentProjectName();
-                    Planet.ProjectStorage.initialiseNewProject(
+            async data => {
+                const currentData = await Planet.ProjectStorage.getCurrentProjectData();
+                if (currentData === null) {
+                    const remixedName =
+                        id in this.cache
+                            ? Planet.ProjectStorage.getCurrentProjectName()
+                            : `${this.remixPrefix}  ${_("My Project")}`;
+                    const projectImage = id in this.cache ? this.cache[id].ProjectImage : null;
+                    await Planet.ProjectStorage.initialiseNewProject(
                         remixedName,
                         data,
-                        this.cache[id].ProjectImage
+                        projectImage
                     );
+                    Planet.loadProjectFromData(data);
                 } else {
-                    remixedName = `${this.remixPrefix}  ${_("My Project")}`;
-                    Planet.ProjectStorage.initialiseNewProject(remixedName, data, null);
+                    Planet.loadProjectFromData(data, true);
                 }
-
-                Planet.loadProjectFromData(data, true);
             },
             error
         );
