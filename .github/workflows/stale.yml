@@ -482,7 +482,30 @@ jobs:
                           return;
                         }
 
-                        const latestDecision = await confirmedDecision(pr, warningSince);
+                        const currentStaleSince = await getStaleLabelTime(pr.number);
+                        if (
+                          !Number.isFinite(currentStaleSince) ||
+                          currentStaleSince !== staleSince
+                        ) {
+                          core.info(
+                            `Skipping closure for PR #${pr.number}; stale-label cycle changed.`
+                          );
+                          return;
+                        }
+                        const currentWarningSince = await getStaleWarningComment(
+                          pr.number,
+                          currentStaleSince
+                        );
+                        if (currentWarningSince === null) {
+                          core.info(
+                            `Skipping closure for PR #${pr.number}; current-cycle warning is unavailable.`
+                          );
+                          return;
+                        }
+                        const latestDecision = await confirmedDecision(
+                          pr,
+                          currentWarningSince
+                        );
                         if (latestDecision === "stop") return "stop";
                         if (latestDecision === "draft") return;
                         if (latestDecision === "skip") return;
