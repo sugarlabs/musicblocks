@@ -208,6 +208,22 @@ const DRUMNAMES = [
     [_("chime"), "chime", "images/chime.svg", "cymca", "bell"],
     //.TRANS: a musical instrument
     [_("gong"), "gong", "images/gong.svg", "cymca", "bell"],
+    //.TRANS: electronic drum
+    [_("electronic soft kick"), "electronic soft kick", "images/synth.svg", "bd", "electronic"],
+    //.TRANS: electronic drum
+    [_("electronic hollow kick"), "electronic hollow kick", "images/synth.svg", "bd", "electronic"],
+    //.TRANS: electronic drum
+    [_("electronic snare"), "electronic snare", "images/synth.svg", "sn", "electronic"],
+    //.TRANS: electronic drum
+    [_("electronic hi snare"), "electronic hi snare", "images/synth.svg", "sn", "electronic"],
+    //.TRANS: electronic percussion
+    [_("electronic cymbal"), "electronic cymbal", "images/synth.svg", "hh", "electronic"],
+    //.TRANS: electronic percussion
+    [_("electronic triangle"), "electronic triangle", "images/synth.svg", "tri", "electronic"],
+    //.TRANS: electronic percussion sound
+    [_("electronic blip"), "electronic blip", "images/synth.svg", "hh", "electronic"],
+    //.TRANS: electronic percussion sound
+    [_("electronic tick"), "electronic tick", "images/synth.svg", "hh", "electronic"],
     //.TRANS: sound effect
     [_("clang"), "clang", "images/clang.svg", "cymca", "effect"],
     //.TRANS: sound effect
@@ -313,6 +329,29 @@ const SAMPLE_INFO = {
         "cymbal pedal": { path: "samples/cymbal_pedal", global: "CYMBAL_PEDAL_SAMPLE" },
         "ride bell": { path: "samples/ridebell", global: "RIDEBELL_SAMPLE" },
         "sonic cowbell": { path: "samples/sonic_cowbell", global: "SONIC_COWBELL_SAMPLE" },
+        "electronic soft kick": {
+            path: "samples/electronic_soft_kick",
+            global: "ELECTRONIC_SOFT_KICK_SAMPLE"
+        },
+        "electronic hollow kick": {
+            path: "samples/electronic_hollow_kick",
+            global: "ELECTRONIC_HOLLOW_KICK_SAMPLE"
+        },
+        "electronic snare": { path: "samples/electronic_snare", global: "ELECTRONIC_SNARE_SAMPLE" },
+        "electronic hi snare": {
+            path: "samples/electronic_hi_snare",
+            global: "ELECTRONIC_HI_SNARE_SAMPLE"
+        },
+        "electronic cymbal": {
+            path: "samples/electronic_cymbal",
+            global: "ELECTRONIC_CYMBAL_SAMPLE"
+        },
+        "electronic triangle": {
+            path: "samples/electronic_triangle",
+            global: "ELECTRONIC_TRIANGLE_SAMPLE"
+        },
+        "electronic blip": { path: "samples/electronic_blip", global: "ELECTRONIC_BLIP_SAMPLE" },
+        "electronic tick": { path: "samples/electronic_tick", global: "ELECTRONIC_TICK_SAMPLE" },
         "triangle bell": { path: "samples/triangle", global: "TRIANGLE_SAMPLE" },
         "chime": { path: "samples/chime", global: "CHIME_SAMPLE" },
         "gong": { path: "samples/gong", global: "GONG_SAMPLE" },
@@ -378,7 +417,15 @@ const DEFAULTSYNTHVOLUME = {
     "cymbal closed": 100,
     "cymbal open": 90,
     "cymbal pedal": 90,
-    "sonic cowbell": 100
+    "sonic cowbell": 100,
+    "electronic soft kick": 100,
+    "electronic hollow kick": 100,
+    "electronic snare": 100,
+    "electronic hi snare": 100,
+    "electronic cymbal": 90,
+    "electronic triangle": 100,
+    "electronic blip": 100,
+    "electronic tick": 100
 };
 
 /**
