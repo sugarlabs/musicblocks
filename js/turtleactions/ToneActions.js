@@ -154,7 +154,12 @@ function setupToneActions(activity) {
                 }
             }
 
-            if (!accounted && typeof instrument === "object" && instrument !== null && !multisample) {
+            if (
+                !accounted &&
+                typeof instrument === "object" &&
+                instrument !== null &&
+                !multisample
+            ) {
                 if (instrument[0] !== "") {
                     synth = "customsample_" + instrument[0];
                     // data, pitch, octave and the cent adjustment from the sampler
@@ -188,7 +193,6 @@ function setupToneActions(activity) {
 
             if (!loaded) {
                 if (!multisample) activity.logo.synth.loadSynth(turtle, synth);
-
 
                 if (tur.singer.synthVolume[synth] === undefined) {
                     // The electronic synthvolume will track any
