@@ -839,6 +839,34 @@ describe("Test 13: Dynamic markings", () => {
 
         expect(synthVolumes(blocks)).toEqual([]);
     });
+
+    it("ignores a dynamic that explicitly targets another voice", async () => {
+        const voiceTwoDynamic =
+            "<direction><voice>2</voice><direction-type><dynamics><f/></dynamics></direction-type></direction>";
+        const voiceOneNote =
+            "<note><voice>1</voice><pitch><step>C</step><octave>4</octave></pitch>" +
+            "<duration>1</duration><type>quarter</type></note>";
+        const voiceTwoNote =
+            "<note><voice>2</voice><pitch><step>D</step><octave>4</octave></pitch>" +
+            "<duration>1</duration><type>quarter</type></note>";
+        const { blocks } = await parseAndCapture(
+            scorePartwise(voiceTwoDynamic + voiceOneNote + "<backup/>" + voiceTwoNote)
+        );
+
+        expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
+        expect(synthVolumes(blocks)).toEqual([]);
+    });
+
+    it("keeps a dynamic that explicitly targets the imported voice", async () => {
+        const voiceOneDynamic =
+            "<direction><voice>1</voice><direction-type><dynamics><f/></dynamics></direction-type></direction>";
+        const voiceOneNote =
+            "<note><voice>1</voice><pitch><step>C</step><octave>4</octave></pitch>" +
+            "<duration>1</duration><type>quarter</type></note>";
+        const { blocks } = await parseAndCapture(scorePartwise(voiceOneDynamic + voiceOneNote));
+
+        expect(synthVolumes(blocks)).toEqual([80]);
+    });
 });
 
 describe("Test 14: Multi-part scores", () => {
