@@ -1239,6 +1239,7 @@
   "The Chord block calculates common chords.": "The Chord block calculates common chords.",
   "In the figure, we generate a C-major chord.": "In the figure, we generate a C-major chord.",
   "chord": "chord",
+  "chords": "chords",
   "The Ratio Interval block calculates an interval based on a ratio.": "The Ratio Interval block calculates an interval based on a ratio.",
   "ratio interval": "ratio interval",
   "The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode.": "The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode.",

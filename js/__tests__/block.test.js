@@ -626,8 +626,12 @@ describe("Block Foundation", () => {
                     globalNames.map(name => [name, global[name]])
                 );
                 const originalText = global.createjs.Text;
+                const originalTranslate = global._;
                 const originalBase64Encode = global.window.base64Encode;
                 const originalBlockTextColor = global.platformColor.blockText;
+                const spanishTranslations = JSON.parse(
+                    fs.readFileSync(path.join(__dirname, "../../locales/es.json"), "utf8")
+                );
                 const block = new Block(
                     {
                         ...mockProtoBlock,
@@ -653,6 +657,7 @@ describe("Block Foundation", () => {
                 global.COLLAPSETEXTY = 0;
                 global.safeSVG = text => text;
                 global.platformColor.blockText = "#000000";
+                global._ = key => spanishTranslations[key] || key;
                 global.window.base64Encode = text => text;
                 global.createjs.Text = jest.fn(text => ({ text, visible: true }));
                 block.blockIndex = 0;
@@ -665,11 +670,11 @@ describe("Block Foundation", () => {
                 try {
                     block._generateCollapseArtwork(null);
 
-                    expect(block.collapseText.text).toBe("chords");
-                    expect(block.collapseText.text).not.toBe("foobar");
+                    expect(block.collapseText.text).toBe("acordes");
                 } finally {
                     Object.assign(global, savedGlobals);
                     global.createjs.Text = originalText;
+                    global._ = originalTranslate;
                     global.window.base64Encode = originalBase64Encode;
                     global.platformColor.blockText = originalBlockTextColor;
                 }
