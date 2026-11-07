@@ -1233,7 +1233,13 @@ function setupWidgetBlocks(activity) {
             );
             if (interruption) return interruption;
 
+            if (logo.inArpeggio) {
+                // Reject overlapping Arpeggio clamps to protect shared collection state
+                return [null, 0];
+            }
+
             logo.inArpeggio = true;
+            logo.arpeggioTurtle = turtle;
 
             if (args.length > 0) {
                 if (args[0] > 1 && args[0] < 21) {
@@ -1247,7 +1253,11 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
-                logo.arpeggio.init(activity);
+                if (logo.inArpeggio && logo.arpeggioTurtle === turtle) {
+                    logo.arpeggio.init(activity);
+                    logo.inArpeggio = false;
+                    logo.arpeggioTurtle = null;
+                }
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);

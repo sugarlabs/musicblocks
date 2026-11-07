@@ -1669,6 +1669,34 @@ describe("processPitch widget-row definition adds one row per visit", () => {
         expect(global.getSolfege).toHaveBeenCalled();
         expect(activityMock.logo.phraseMaker.rowLabels).toEqual(["do"]);
     });
+
+    test("phrase maker records lastNotePlayed, lastNoteTransposition, and lastNoteScalarTransposition", () => {
+        activityMock.logo.activity = activityMock;
+        activityMock.logo.inMatrix = true;
+        turtleMock.singer.transposition = 2;
+        turtleMock.singer.scalarTransposition = 1;
+        global.getNote = jest.fn().mockReturnValue(["D", 4]);
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(turtleMock.singer.lastNotePlayed).toEqual(["D4", 4]);
+        expect(turtleMock.singer.lastNoteTransposition).toBe(2);
+        expect(turtleMock.singer.lastNoteScalarTransposition).toBe(1);
+    });
+
+    test("lego widget records lastNotePlayed, lastNoteTransposition, and lastNoteScalarTransposition", () => {
+        activityMock.logo.activity = activityMock;
+        activityMock.logo.inLegoWidget = true;
+        turtleMock.singer.transposition = -2;
+        turtleMock.singer.scalarTransposition = 0;
+        global.getNote = jest.fn().mockReturnValue(["A#", 3]);
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(turtleMock.singer.lastNotePlayed).toEqual(["A#3", 4]);
+        expect(turtleMock.singer.lastNoteTransposition).toBe(-2);
+        expect(turtleMock.singer.lastNoteScalarTransposition).toBe(0);
+    });
 });
 
 describe("noteCounter regression behavior", () => {
@@ -1912,6 +1940,74 @@ describe("processNote regression behavior", () => {
         expect(activityMock.errorMsg).toHaveBeenCalledWith(
             "You must have at least one Partial block inside of a Weighted-partial block"
         );
+    });
+
+    test("inTimbre records lastNotePlayed, lastNoteTransposition, and lastNoteScalarTransposition", () => {
+        singer.inNoteBlock = ["mockBlk"];
+        singer.notePitches = { mockBlk: ["C"] };
+        singer.noteOctaves = { mockBlk: [4] };
+        singer.transposition = 2;
+        singer.scalarTransposition = 1;
+        activityMock.logo.inTimbre = true;
+        activityMock.logo.timbre = { notesToPlay: [] };
+        global.getNote = jest.fn().mockReturnValue(["C", 4]);
+
+        Singer.processNote(activityMock, 4, false, "mockBlk", 0, jest.fn());
+
+        expect(activityMock.logo.timbre.notesToPlay).toEqual([["C4", 0.25]]);
+        expect(singer.lastNotePlayed).toEqual(["C4", 4]);
+        expect(singer.lastNoteTransposition).toBe(2);
+        expect(singer.lastNoteScalarTransposition).toBe(1);
+    });
+
+    test("inArpeggio collects notes only for the owning turtle and lets other turtles bypass", () => {
+        const turtle0 = turtleMock;
+        const turtle1 = createTurtleMock();
+        turtle1.singer = new Singer(turtle1);
+        turtle1.doWait = jest.fn();
+        turtle1.blink = jest.fn();
+        activityMock.turtles.turtleList = { 0: turtle0, 1: turtle1 };
+        activityMock.turtles.ithTurtle = jest.fn(i => (i === 0 ? turtle0 : turtle1));
+
+        activityMock.logo.inArpeggio = true;
+        activityMock.logo.arpeggioTurtle = 0;
+        activityMock.logo.arpeggio = { notesToPlay: [] };
+        activityMock.logo.synth.start = jest.fn();
+        activityMock.logo.dispatchTurtleSignals = jest.fn();
+
+        turtle0.singer.inNoteBlock = ["blk0"];
+        turtle0.singer.notePitches = { blk0: ["C"] };
+        turtle0.singer.noteOctaves = { blk0: [4] };
+        turtle0.singer.transposition = 1;
+        turtle0.singer.scalarTransposition = 2;
+
+        turtle1.singer.inNoteBlock = ["blk1"];
+        turtle1.singer.notePitches = { blk1: ["E"] };
+        turtle1.singer.noteOctaves = { blk1: [4] };
+        turtle1.singer.noteCents = { blk1: [0] };
+        turtle1.singer.noteHertz = { blk1: [0] };
+        turtle1.singer.oscList = { blk1: false };
+        turtle1.singer.noteBeat = { blk1: 1 };
+        turtle1.singer.noteBeatValues = { blk1: 1 };
+        turtle1.singer.noteDrums = { blk1: [] };
+        turtle1.singer.embeddedGraphics = { blk1: [] };
+        activityMock.blocks.blockList = {
+            blk1: { name: "note", connections: [null] }
+        };
+
+        global.getNote = jest.fn().mockReturnValue(["C", 4]);
+
+        // Turtle 0 (owner) plays a note -> collected into arpeggio.notesToPlay
+        Singer.processNote(activityMock, 4, false, "blk0", 0, jest.fn());
+        expect(activityMock.logo.arpeggio.notesToPlay).toEqual([["C4", 0.25]]);
+        expect(turtle0.singer.lastNotePlayed).toEqual(["C4", 4]);
+        expect(turtle0.singer.lastNoteTransposition).toBe(1);
+        expect(turtle0.singer.lastNoteScalarTransposition).toBe(2);
+
+        // Turtle 1 (non-owner) plays a note -> bypasses arpeggio.notesToPlay and plays through normal synth
+        Singer.processNote(activityMock, 4, false, "blk1", 1, jest.fn());
+        expect(activityMock.logo.arpeggio.notesToPlay).toHaveLength(1); // Still only turtle 0's note
+        expect(activityMock.logo.synth.trigger).toHaveBeenCalled();
     });
 
     test("does not show the partials error when the clamp has Partial blocks", () => {
@@ -3149,6 +3245,29 @@ describe("processPitch music keyboard with movable Do", () => {
         expect(own.noteNames).toEqual(["C"]);
         expect(lastActive.noteNames).toEqual([]);
     });
+
+    test("inMusicKeyboard records transposed note in lastNotePlayed and saves lastNoteTransposition", () => {
+        const turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.singer.transposition = 2;
+        turtleMock.singer.scalarTransposition = 0;
+        const activityMock = createActivityMock(turtleMock);
+        activityMock.logo.synth = { inTemperament: "equal" };
+        activityMock.logo.inMusicKeyboard = true;
+        activityMock.logo.musicKeyboard = {
+            instruments: [],
+            noteNames: [],
+            octaves: [],
+            addRowBlock: jest.fn()
+        };
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, "blk");
+
+        // C4 + 2 semitones is D4; lastNotePlayed must record "D4", not untransposed "C4"
+        expect(turtleMock.singer.lastNotePlayed).toEqual(["D4", 4]);
+        expect(turtleMock.singer.lastNoteTransposition).toBe(2);
+        expect(turtleMock.singer.lastNoteScalarTransposition).toBe(0);
+    });
 });
 
 describe("processPitch in the pitch-drum matrix", () => {
@@ -3214,6 +3333,20 @@ describe("processPitch in the pitch-drum matrix", () => {
         expect(pdm.rowLabels).toEqual([]);
         expect(pdm.addColBlock).toHaveBeenCalledWith("blk");
         expect(pdm.addRowBlock).not.toHaveBeenCalled();
+    });
+
+    test("records lastNotePlayed, lastNoteTransposition, and lastNoteScalarTransposition in pitch-drum matrix", () => {
+        const activityMock = setup([]);
+        activityMock.logo.activity = activityMock;
+        const tur = activityMock.turtles.ithTurtle(0);
+        tur.singer.transposition = 3;
+        tur.singer.scalarTransposition = 1;
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, "blk");
+
+        expect(tur.singer.lastNotePlayed).toEqual(["E4", 4]);
+        expect(tur.singer.lastNoteTransposition).toBe(3);
+        expect(tur.singer.lastNoteScalarTransposition).toBe(1);
     });
 });
 
