@@ -50,6 +50,8 @@ describe("LocalPlanet", () => {
         // Setup DOM for LocalPlanet
         document.body.innerHTML = `
             <div id="local-projects"></div>
+            <p id="local-search-empty" hidden></p>
+            <input id="local-search" />
             <button id="deleter-button"></button>
             <span id="deleter-title"></span>
             <span id="deleter-name"></span>
@@ -117,6 +119,18 @@ describe("LocalPlanet", () => {
             expect(initDeleteModalSpy).toHaveBeenCalled();
             expect(global.Publisher).toHaveBeenCalledWith(mockPlanet);
             expect(localPlanet.Publisher.init).toHaveBeenCalled();
+        });
+
+        it("should filter projects when local search input changes", () => {
+            const filterSpy = jest.spyOn(localPlanet, "filterProjects");
+
+            localPlanet.init();
+
+            const input = document.getElementById("local-search");
+            input.value = "Project 2";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+
+            expect(filterSpy).toHaveBeenLastCalledWith("Project 2");
         });
     });
 
@@ -189,6 +203,80 @@ describe("LocalPlanet", () => {
             expect(refreshSpy).toHaveBeenCalled();
             expect(initCardsSpy).toHaveBeenCalled();
             expect(renderSpy).toHaveBeenCalled();
+        });
+    });
+
+    describe("filterProjects", () => {
+        beforeEach(() => {
+            localPlanet.ProjectTable = mockPlanet.ProjectStorage.data.Projects;
+
+            localPlanet.projects = [
+                ["testProj1", {}],
+                ["testProj2", {}]
+            ];
+
+            document.body.insertAdjacentHTML(
+                "beforeend",
+                `
+                    <div class="col">
+                        <input id="local-project-input-testProj1" />
+                    </div>
+                    <div class="col">
+                        <input id="local-project-input-testProj2" />
+                    </div>
+                `
+            );
+        });
+
+        it("should filter projects by name case-insensitively", () => {
+            localPlanet.filterProjects(" PROJECT 1 ");
+
+            const project1 = document
+                .getElementById("local-project-input-testProj1")
+                .closest(".col");
+
+            const project2 = document
+                .getElementById("local-project-input-testProj2")
+                .closest(".col");
+
+            expect(localPlanet.searchString).toBe("project 1");
+            expect(project1.style.display).toBe("");
+            expect(project2.style.display).toBe("none");
+        });
+
+        it("should show an empty state when no projects match", () => {
+            localPlanet.filterProjects("does not exist");
+
+            const emptyState = document.getElementById("local-search-empty");
+
+            expect(emptyState.hidden).toBe(false);
+        });
+
+        it("should hide the empty state when a project matches", () => {
+            localPlanet.filterProjects("Project 1");
+
+            const emptyState = document.getElementById("local-search-empty");
+
+            expect(emptyState.hidden).toBe(true);
+        });
+
+        it("should show all projects and hide the empty state when search is cleared", () => {
+            localPlanet.filterProjects("does not exist");
+            localPlanet.filterProjects("");
+
+            const project1 = document
+                .getElementById("local-project-input-testProj1")
+                .closest(".col");
+
+            const project2 = document
+                .getElementById("local-project-input-testProj2")
+                .closest(".col");
+
+            const emptyState = document.getElementById("local-search-empty");
+
+            expect(project1.style.display).toBe("");
+            expect(project2.style.display).toBe("");
+            expect(emptyState.hidden).toBe(true);
         });
     });
 
