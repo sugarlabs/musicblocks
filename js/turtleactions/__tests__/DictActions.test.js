@@ -631,6 +631,31 @@ describe("setupDictActions", () => {
             activity.logo.turtleDicts[turtle] = {};
             expect(Turtle.DictActions.getDict("constructor", turtle)).toBe("{}");
         });
+
+        it("should reject non-string reserved dictionary names such as ['__proto__']", () => {
+            activity.logo.turtleDicts[turtle] = {};
+            const initialProto = Object.getPrototypeOf(activity.logo.turtleDicts[turtle]);
+            Turtle.DictActions.setValue(["__proto__"], "polluted", 42, turtle);
+            expect({}.polluted).toBeUndefined();
+            expect(Object.getPrototypeOf(activity.logo.turtleDicts[turtle])).toBe(initialProto);
+            expect(activity.errorMsg).toHaveBeenCalledWith("The dictionary name is reserved.");
+        });
+
+        it("should reject non-string reserved keys such as ['__proto__']", () => {
+            activity.logo.turtleDicts[turtle] = {};
+            Turtle.DictActions.setValue("testDict", ["__proto__"], { polluted: 1 }, turtle);
+            expect({}.polluted).toBeUndefined();
+            expect(activity.logo.turtleDicts[turtle].testDict).toBeUndefined();
+            expect(activity.errorMsg).toHaveBeenCalledWith("The key name is reserved.");
+        });
+
+        it("should normalize numeric and non-string keys when getting and setting values", () => {
+            activity.logo.turtleDicts[turtle] = {};
+            Turtle.DictActions.setValue("testDict", 123, "numberKey", turtle);
+            expect(Turtle.DictActions.getValue("testDict", 123, turtle, 3)).toBe("numberKey");
+            expect(Turtle.DictActions.getValue("testDict", "123", turtle, 3)).toBe("numberKey");
+            expect(Turtle.DictActions.getDict("testDict", turtle)).toBe('{"123":"numberKey"}');
+        });
     });
 
     // Text blocks keep their English value and only translate their label, so in another
