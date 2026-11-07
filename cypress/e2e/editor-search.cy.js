@@ -6,9 +6,11 @@ describe("JavaScript editor and block search", () => {
         // touch global singletons (window.jsEditor, activity.searchWidget)
         // that persist across interactions, so tests are isolated the same
         // way cypress/e2e/maker-widgets.cy.js resets between widget tests.
-        cy.visit("http://127.0.0.1:3000");
-        cy.clearLocalStorage();
-        cy.visit("http://127.0.0.1:3000");
+        cy.visit("http://127.0.0.1:3000", {
+            onBeforeLoad(win) {
+                win.localStorage.clear();
+            }
+        });
         cy.waitForAppReady();
 
         // Dismiss the first-run "Take a Tour" guide, which is itself a
@@ -144,14 +146,7 @@ describe("JavaScript editor and block search", () => {
         // makeSearchButton() before the per-category makeButton() calls), so
         // it is reliably identified by its rendered label.
         cy.contains("#palette tbody tr", "Search").click();
-        cy.get("#search").should("be.visible");
-
-        // SearchController.showSearchWidget() focuses #search and calls
-        // doSearch() (which lazily binds jQuery-UI autocomplete) back to
-        // back inside the same setTimeout callback, so waiting for real
-        // focus to land on #search also guarantees autocomplete is bound -
-        // no arbitrary wait needed.
-        cy.focused().should("have.id", "search").type("forward");
+        cy.get("#search").should("be.visible").and("have.focus").type("forward");
 
         // "forward" (js/blocks/GraphicsBlocks.js ForwardBlock) is a core,
         // always-present block, so its label is guaranteed to appear in the

@@ -7,9 +7,11 @@ describe("Block palette drag-and-drop", () => {
         // the next load, so without clearing storage this test could inherit
         // whatever an earlier spec left on the canvas instead of the app's
         // known default starter project.
-        cy.visit("http://127.0.0.1:3000");
-        cy.clearLocalStorage();
-        cy.reload();
+        cy.visit("http://127.0.0.1:3000", {
+            onBeforeLoad(win) {
+                win.localStorage.clear();
+            }
+        });
         cy.waitForAppReady();
 
         cy.get("body").then($body => {

@@ -96,9 +96,11 @@ describe("Chord Builder widget", () => {
     beforeEach(() => {
         // Each test gets a fresh app load to prevent Music Blocks localStorage
         // auto-save from re-triggering the widget on subsequent test runs.
-        cy.visit("http://127.0.0.1:3000");
-        cy.clearLocalStorage();
-        cy.reload();
+        cy.visit("http://127.0.0.1:3000", {
+            onBeforeLoad(win) {
+                win.localStorage.clear();
+            }
+        });
         cy.waitForAppReady();
 
         // Dismiss first-run tours so that .windowFrame selectors are unambiguous.

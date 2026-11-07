@@ -511,8 +511,7 @@ describe("Browser-Level CSS Cascade Tests for Async Stylesheet Loading", () => {
     it("verifies search suggestion cascade rules consume design tokens without specificity leakage", () => {
         // Open search through palette
         cy.contains("#palette tbody tr", "Search").click({ force: true });
-        cy.get("#search").should("be.visible");
-        cy.focused().should("have.id", "search").type("forward");
+        cy.get("#search").should("be.visible").and("have.focus").type("forward");
         cy.get("ul.ui-autocomplete", { timeout: 10000 }).should("be.visible");
 
         // Verify Light Mode autocomplete suggestion dropdown computed styles against design tokens
