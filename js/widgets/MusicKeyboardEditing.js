@@ -53,7 +53,7 @@ const MusicKeyboardEditing = {
      *
      * @param {Object} deps - Values from the MusicKeyboard constructor's scope.
      * @param {number} deps.FAKEBLOCKNUMBER - Block numbers at or above this are padding keys.
-     * @param {string} deps.beginnerMode - localStorage.beginnerMode when the widget was made.
+     * @param {string} deps.beginnerMode - "true" in beginner mode, else "false", when the widget was made.
      * @param {Function} deps.resolveSynthNoteName - Maps a note name and octave to a synth note.
      * @param {Function} deps.fillChromaticGaps - Pads a note list out to a chromatic layout.
      * @returns {void}
