@@ -333,11 +333,15 @@ div.select-wrapper * {
 	align-items: center;
 }
 
-#search-close {
+#search-close,
+#search-close-2 {
 	display: none;
+	cursor: pointer;
+}
+
+#search-close {
 	position: absolute;
 	top: -4px;
-	cursor: pointer;
 }
 
 #localglobal {
