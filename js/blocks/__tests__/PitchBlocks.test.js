@@ -587,6 +587,21 @@ describe("setupPitchBlocks", () => {
                 activity.errorMsg
             );
         });
+
+        it("MyPitchBlock gives G4 outside any note before a note has played", () => {
+            const block = createdBlocks["mypitch"];
+            const singer = turtles.ithTurtle(0).singer;
+            logo.inStatusMatrix = false;
+            singer.lastNotePlayed = null;
+            singer.inNoteBlock = [];
+            singer.notePitches = {};
+            singer.noteOctaves = {};
+
+            block.arg(logo, 0, 10);
+
+            expect(global.getNote).not.toHaveBeenCalled();
+            expect(global.pitchToNumber).toHaveBeenCalledWith("G", 4, singer.keySignature);
+        });
     });
 
     describe("HertzBlock All Branches", () => {
