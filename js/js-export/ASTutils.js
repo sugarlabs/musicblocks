@@ -178,6 +178,13 @@ class ASTUtils {
     }
 
     /**
+     * Names of blocks the exporter has no mapping for, collected while building the current
+     * program's ASTs. Reset by JSGenerate.generateCode before each run, and reported once the
+     * run finishes so the user knows the export is partial rather than complete.
+     */
+    static skippedBlocks = new Set();
+
+    /**
      * Returns the names of every identifier used in the given ASTs.
      *
      * @static
@@ -1495,6 +1502,15 @@ class ASTUtils {
                     ASTs.push(ASTUtils._getActionCallAST(idName, flow[1]));
                 } else if (instruction === "nameddoArg") {
                     ASTs.push(ASTUtils._getActionCallAST(idName, flow[1]));
+                } else {
+                    ASTUtils.skippedBlocks.add(String(flow[0]));
+                    if (Array.isArray(flow[2])) {
+                        ASTs.push(...ASTUtils._getBlockAST(flow[2], iterMax));
+                    }
+                    if (Array.isArray(flow[3])) {
+                        ASTs.push(...ASTUtils._getBlockAST(flow[3], iterMax));
+                    }
+                    continue;
                 }
             } else {
                 if (JSInterface.isSetter(flow[0])) {
@@ -1508,7 +1524,21 @@ class ASTUtils {
                         ASTs.push(ASTUtils._getMethodCallAST(...flow));
                     }
                 } else {
-                    throw `CANNOT PROCESS "${flow[0]}" BLOCK`;
+                    // No mapping for this block. Skipping it keeps the rest of the program in
+                    // the export; throwing here used to discard every other block as well.
+                    // The name is reported once the run finishes.
+                    ASTUtils.skippedBlocks.add(String(flow[0]));
+                    // A clamp holds its inner flow in flow[2], the same slot the mapped clamps
+                    // above read. Exporting that flow keeps the blocks the user put inside an
+                    // unsupported clamp, which would otherwise go with it. For double clamps,
+                    // flow[3] holds the secondary flow.
+                    if (Array.isArray(flow[2])) {
+                        ASTs.push(...ASTUtils._getBlockAST(flow[2], iterMax));
+                    }
+                    if (Array.isArray(flow[3])) {
+                        ASTs.push(...ASTUtils._getBlockAST(flow[3], iterMax));
+                    }
+                    continue;
                 }
             }
         }
