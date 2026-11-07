@@ -329,7 +329,11 @@ class MathUtility {
      */
     static doPower(a, b) {
         if (MathUtility._isNumber(a) && MathUtility._isNumber(b)) {
-            return Math.pow(a, b);
+            const result = Math.pow(a, b);
+            if (Number.isNaN(result)) {
+                throw new Error("NanError");
+            }
+            return result;
         } else {
             throw new Error("NanError");
         }
