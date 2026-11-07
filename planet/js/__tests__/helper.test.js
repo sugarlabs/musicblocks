@@ -51,6 +51,7 @@ function setupHelperDOM() {
 setupHelperDOM();
 
 const {
+    debounce,
     getCookie,
     setCookie,
     toggleText,
@@ -58,6 +59,66 @@ const {
     hideOnClickOutside,
     updateCheckboxes
 } = require("../helper");
+
+describe("debounce", () => {
+    beforeEach(() => {
+        jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    it("passes the call's arguments to the wrapped function", () => {
+        const fn = jest.fn();
+        const debounced = debounce(fn, 100);
+
+        debounced("hello", 42);
+        jest.advanceTimersByTime(100);
+
+        expect(fn).toHaveBeenCalledTimes(1);
+        expect(fn).toHaveBeenCalledWith("hello", 42);
+    });
+
+    it("preserves this for the wrapped function", () => {
+        const fn = jest.fn();
+        const obj = { run: debounce(fn, 100) };
+
+        obj.run();
+        jest.advanceTimersByTime(100);
+
+        expect(fn.mock.instances[0]).toBe(obj);
+    });
+
+    it("collapses rapid calls into one call with the last arguments", () => {
+        const fn = jest.fn();
+        const debounced = debounce(fn, 100);
+
+        debounced(1);
+        debounced(2);
+        debounced(3);
+        jest.advanceTimersByTime(100);
+
+        expect(fn).toHaveBeenCalledTimes(1);
+        expect(fn).toHaveBeenCalledWith(3);
+    });
+
+    it("calls at once when immediate is true and not again until the wait passes", () => {
+        const fn = jest.fn();
+        const debounced = debounce(fn, 100, true);
+
+        debounced("now");
+        expect(fn).toHaveBeenCalledWith("now");
+
+        debounced("again");
+        jest.advanceTimersByTime(100);
+        expect(fn).toHaveBeenCalledTimes(1);
+
+        debounced("later");
+        expect(fn).toHaveBeenCalledTimes(2);
+        expect(fn).toHaveBeenLastCalledWith("later");
+    });
+});
 
 describe("helper.js", () => {
     beforeEach(() => {
