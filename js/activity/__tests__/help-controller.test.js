@@ -45,6 +45,17 @@ class JSEditorMock {
 JSEditorMock.instances = [];
 global.JSEditor = JSEditorMock;
 
+class CallGraphWidgetMock {
+    constructor(activity) {
+        this.activity = activity;
+        this.isOpen = true;
+        this.refresh = jest.fn();
+        CallGraphWidgetMock.instances.push(this);
+    }
+}
+CallGraphWidgetMock.instances = [];
+global.CallGraphWidget = CallGraphWidgetMock;
+
 const { setupHelpController, HelpController } = require("../help-controller.js");
 
 /**
@@ -81,6 +92,7 @@ beforeEach(() => {
     HelpWidgetMock.instances = [];
     StatsWindowMock.instances = [];
     JSEditorMock.instances = [];
+    CallGraphWidgetMock.instances = [];
     window.widgetWindows = {
         openWindows: {},
         isOpen: jest.fn(() => false),
@@ -119,6 +131,7 @@ describe("setupHelpController", () => {
         expect(typeof activity.showKeyboardShortcuts).toBe("function");
         expect(typeof activity.toggleJSWindow).toBe("function");
         expect(typeof activity.doAnalytics).toBe("function");
+        expect(typeof activity.showCodeMap).toBe("function");
         expect(typeof activity._saveHelpBlocks).toBe("function");
     });
 
@@ -132,6 +145,7 @@ describe("setupHelpController", () => {
         jest.spyOn(controller, "showKeyboardShortcuts").mockReturnValue();
         jest.spyOn(controller, "toggleJSEditor").mockResolvedValue();
         jest.spyOn(controller, "showStats").mockResolvedValue();
+        jest.spyOn(controller, "showCodeMap").mockResolvedValue();
         jest.spyOn(controller, "saveHelpBlocks").mockReturnValue();
 
         await activity.showHelp();
@@ -139,6 +153,7 @@ describe("setupHelpController", () => {
         activity.showKeyboardShortcuts();
         await activity.toggleJSWindow();
         await activity.doAnalytics();
+        await activity.showCodeMap();
         activity._saveHelpBlocks();
 
         expect(controller.showHelp).toHaveBeenCalledTimes(1);
@@ -146,6 +161,7 @@ describe("setupHelpController", () => {
         expect(controller.showKeyboardShortcuts).toHaveBeenCalledTimes(1);
         expect(controller.toggleJSEditor).toHaveBeenCalledTimes(1);
         expect(controller.showStats).toHaveBeenCalledTimes(1);
+        expect(controller.showCodeMap).toHaveBeenCalledTimes(1);
         expect(controller.saveHelpBlocks).toHaveBeenCalledTimes(1);
     });
 });
@@ -410,6 +426,34 @@ describe("HelpController.showStats", () => {
 
         expect(global.lazyLoad).not.toHaveBeenCalled();
         expect(activity.statsWindow).toBe(existing);
+    });
+});
+
+describe("HelpController.showCodeMap", () => {
+    test("lazy-loads Code Map bundle and creates a CallGraphWidget when none is open", async () => {
+        const activity = makeActivity();
+        const controller = new HelpController(activity);
+
+        await controller.showCodeMap();
+
+        expect(global.lazyLoad).toHaveBeenCalledWith([
+            "widgets/CallGraphAnalyzer",
+            "widgets/CallGraphLayout",
+            "widgets/CallGraphWidget"
+        ]);
+        expect(activity.codeMapWidget).toBeInstanceOf(CallGraphWidgetMock);
+    });
+
+    test("refreshes existing CallGraphWidget when already open", async () => {
+        const activity = makeActivity();
+        const controller = new HelpController(activity);
+        const existing = { isOpen: true, refresh: jest.fn() };
+        activity.codeMapWidget = existing;
+
+        await controller.showCodeMap();
+
+        expect(global.lazyLoad).not.toHaveBeenCalled();
+        expect(existing.refresh).toHaveBeenCalledTimes(1);
     });
 });
 
