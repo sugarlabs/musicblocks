@@ -2477,7 +2477,7 @@ describe("Blocks Foundation", () => {
 
             expect(mockActivity._suppressRefresh).toBe(false);
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
-                "Something went wrong reading JSON-encoded project data."
+                "Cannot load project: circular block connection detected."
             );
         });
 
@@ -2495,7 +2495,7 @@ describe("Blocks Foundation", () => {
             blocks.loadNewBlocks(twoBlockCycle);
             expect(mockActivity._suppressRefresh).toBe(false);
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
-                "Something went wrong reading JSON-encoded project data."
+                "Cannot load project: circular block connection detected."
             );
 
             // Three-block cycle: 0 -> 1 -> 2 -> 0
@@ -2510,7 +2510,7 @@ describe("Blocks Foundation", () => {
             blocks.loadNewBlocks(threeBlockCycle);
             expect(mockActivity._suppressRefresh).toBe(false);
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
-                "Something went wrong reading JSON-encoded project data."
+                "Cannot load project: circular block connection detected."
             );
         });
 
@@ -2534,7 +2534,7 @@ describe("Blocks Foundation", () => {
                 expect(() => blocks.loadNewBlocks(truncated)).not.toThrow();
                 expect(mockActivity._suppressRefresh).toBe(false);
                 expect(mockActivity.errorMsg).toHaveBeenCalledWith(
-                    "Something went wrong reading JSON-encoded project data."
+                    "Cannot load project: malformed block structure detected."
                 );
                 // The load is abandoned before any block is built.
                 expect(blocks._makeNewBlockWithConnections).not.toHaveBeenCalled();
@@ -2556,7 +2556,7 @@ describe("Blocks Foundation", () => {
             expect(() => blocks.loadNewBlocks(danglingNext)).not.toThrow();
             expect(mockActivity._suppressRefresh).toBe(false);
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
-                "Something went wrong reading JSON-encoded project data."
+                "Cannot load project: invalid block connection detected."
             );
         });
 
@@ -3285,6 +3285,234 @@ describe("Blocks Foundation", () => {
 
             expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
             expect(blocks._loadInProgress).toBe(false);
+        });
+    });
+
+    describe("validation feedback on project load (#10256)", () => {
+        const { PubSub } = require("../pubsub");
+        let loadContainer;
+
+        function makeActivity() {
+            return {
+                storage: {},
+                trashcan: {},
+                turtles: { getTurtleCount: jest.fn(() => 0), addTurtle: jest.fn() },
+                boundary: {},
+                macroDict: {},
+                palettes: {
+                    dict: {},
+                    show: jest.fn(),
+                    updatePalettes: jest.fn(),
+                    showPalette: jest.fn()
+                },
+                logo: {
+                    synth: {
+                        loadSynth: jest.fn(),
+                        preloadProjectSamples: jest.fn()
+                    },
+                    customTemperamentDefined: false
+                },
+                blocksContainer: { x: 0, y: 0, addChild: jest.fn(), children: [] },
+                canvas: { width: 800, height: 600 },
+                refreshCanvas: jest.fn(),
+                errorMsg: jest.fn(),
+                setSelectionMode: jest.fn(),
+                stopLoadAnimation: jest.fn(),
+                setHomeContainers: jest.fn(),
+                __tick: jest.fn(),
+                _suppressRefresh: false
+            };
+        }
+
+        function makeBlocks(activity, protoNames) {
+            const b = new Blocks(activity);
+            b.blockList = [];
+            b.protoBlockDict = {};
+            for (const name of protoNames || []) {
+                b.protoBlockDict[name] = {
+                    hasCapability: () => false,
+                    dockTypes: ["in", "out"],
+                    style: "flow"
+                };
+            }
+            for (const nop of [
+                "nopValueBlock",
+                "nopZeroArgBlock",
+                "nopOneArgBlock",
+                "nopTwoArgBlock",
+                "nopThreeArgBlock"
+            ]) {
+                b.protoBlockDict[nop] = {
+                    hasCapability: () => false,
+                    dockTypes: ["in", "out"],
+                    style: "flow"
+                };
+            }
+            b.setActionProtoVisibility = jest.fn();
+            b.customTemperamentDefined = true;
+            b._findDrumURLs = jest.fn();
+            b.updateBlockPositions = jest.fn();
+            b._rebuildSpatialGrid = jest.fn();
+            b._cleanupStacks = jest.fn();
+            b.newNameddoBlock = jest.fn(() => false);
+            b.newStorein2Block = jest.fn();
+            b.newNamedboxBlock = jest.fn();
+            b.actionMetadata = jest.fn(() => ({ hasReturn: false, hasArgs: false }));
+            b._updateSpatialGrid = jest.fn();
+            b._makeNewBlockWithConnections = jest.fn((name, offset, conns, post, arg) => {
+                b.blockList.push({
+                    name,
+                    connections: conns || [],
+                    container: { x: 0, y: 0 },
+                    privateData: null,
+                    unknownBlock: null
+                });
+                if (typeof post === "function") {
+                    post(arg !== undefined ? arg : b.blockList.length - 1);
+                }
+                b.cleanupAfterLoad(b._activeLoadGeneration);
+            });
+            return b;
+        }
+
+        beforeEach(() => {
+            global.pubsub = new PubSub();
+            loadContainer = document.createElement("div");
+            loadContainer.id = "load-container";
+            document.body.appendChild(loadContainer);
+        });
+
+        afterEach(() => {
+            loadContainer.remove();
+            delete global.pubsub;
+        });
+
+        it("notifies user when an unsupported block is substituted with a placeholder", () => {
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, ["forward"]);
+            const blockObjs = [
+                [0, "forward", 100, 100, [null, 1]],
+                [1, "unsupportedCustomBlock", 100, 120, [0, null]]
+            ];
+
+            blocks.loadNewBlocks(blockObjs);
+
+            expect(blocks.blockList.length).toBe(2);
+            expect(blocks.blockList[1].name).toBe("nopOneArgMathBlock");
+            expect(blocks.blockList[1].privateData).toBe("unsupportedCustomBlock");
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Some blocks in this project are unsupported and were replaced with placeholders: unsupportedCustomBlock"
+            );
+        });
+
+        it("lists multiple distinct unsupported blocks in the notification", () => {
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, ["forward"]);
+            const blockObjs = [
+                [0, "forward", 100, 100, [null, 1]],
+                [1, "customSynthBlock", 100, 120, [0, 2]],
+                [2, "customFilterBlock", 100, 140, [1, 3]],
+                [3, "customSynthBlock", 100, 160, [2, null]]
+            ];
+
+            blocks.loadNewBlocks(blockObjs);
+
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Some blocks in this project are unsupported and were replaced with placeholders: customSynthBlock, customFilterBlock"
+            );
+        });
+
+        it("displays unsupported block names containing special replacement patterns literally", () => {
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, ["forward"]);
+            const blockObjs = [
+                [0, "forward", 100, 100, [null, 1]],
+                [1, "custom$&block", 100, 120, [0, 2]],
+                [2, "custom$$block", 100, 140, [1, 3]],
+                [3, "custom$1block", 100, 160, [2, null]]
+            ];
+
+            blocks.loadNewBlocks(blockObjs);
+
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Some blocks in this project are unsupported and were replaced with placeholders: custom$&block, custom$$block, custom$1block"
+            );
+        });
+
+        it("does not emit an error notification when all blocks are supported", () => {
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, ["forward", "back"]);
+            const blockObjs = [
+                [0, "forward", 100, 100, [null, 1]],
+                [1, "back", 100, 120, [0, null]]
+            ];
+
+            blocks.loadNewBlocks(blockObjs);
+
+            expect(blocks.blockList.length).toBe(2);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("aborts cleanly with actionable message when blockObjs is not an array", () => {
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, ["forward"]);
+
+            expect(() => blocks.loadNewBlocks({ invalid: "data" })).not.toThrow();
+            expect(blocks._loadInProgress).toBe(false);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Cannot load project: invalid project structure."
+            );
+        });
+
+        it("aborts with actionable message when block has out-of-range connection", () => {
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, ["forward"]);
+            const blockObjs = [[0, "forward", 100, 100, [null, 999]]];
+
+            blocks.loadNewBlocks(blockObjs);
+
+            expect(blocks.blockList.length).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Cannot load project: invalid block connection detected."
+            );
+        });
+
+        it("aborts cleanly with actionable message when blockObjs contains a null entry", () => {
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, ["forward"]);
+            const blockObjs = [
+                [0, "forward", 100, 100, [null, null]],
+                null,
+                [2, "forward", 100, 150, [null, null]]
+            ];
+
+            expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
+            expect(blocks._loadInProgress).toBe(false);
+            expect(activity._suppressRefresh).toBe(false);
+            expect(activity.stopLoadAnimation).toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Cannot load project: malformed block structure detected."
+            );
+            expect(blocks.blockList.length).toBe(0);
+        });
+
+        it("aborts cleanly with actionable message when blockObjs contains a non-array entry", () => {
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, ["forward"]);
+            const blockObjs = [
+                [0, "forward", 100, 100, [null, null]],
+                { invalid: "blockObject" },
+                [2, "forward", 100, 150, [null, null]]
+            ];
+
+            expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
+            expect(blocks._loadInProgress).toBe(false);
+            expect(activity._suppressRefresh).toBe(false);
+            expect(activity.stopLoadAnimation).toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Cannot load project: malformed block structure detected."
+            );
+            expect(blocks.blockList.length).toBe(0);
         });
     });
 
