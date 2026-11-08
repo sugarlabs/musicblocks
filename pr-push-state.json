@@ -2119,5 +2119,12 @@
     "actor": "IamShreshth",
     "branch": "fix/10295-edo-flat-enharmonics",
     "headRepo": "IamShreshth/musicblocks"
+  },
+  "10297": {
+    "pushedAt": "2026-11-08T12:39:00.139Z",
+    "sha": "fad43d609cb2ae9994a3ee138096d1b80a20d537",
+    "actor": "SuspiciousChip",
+    "branch": "feat/10269-compact-screen-editing",
+    "headRepo": "SuspiciousChip/musicblocks"
   }
 }
