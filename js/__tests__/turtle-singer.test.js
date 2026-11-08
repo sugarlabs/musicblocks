@@ -2760,6 +2760,27 @@ describe("processNote notation and MIDI emission guards against non-positive dur
         expect(activityMock.logo.updateNotation).toHaveBeenCalledWith(["C4"], 4, 0, -1, []);
     });
 
+    test("passes every drum in a note to the notation", () => {
+        const blk = "twoDrumsNoteBlk";
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["C", "C"] };
+        turtleMock.singer.noteOctaves = { [blk]: [2, 2] };
+        turtleMock.singer.noteCents = { [blk]: [0, 0] };
+        turtleMock.singer.noteHertz = { [blk]: [0, 0] };
+        turtleMock.singer.noteDrums = { [blk]: ["kick drum", "snare drum"] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1, 1] };
+        turtleMock.singer.instrumentNames = ["piano"];
+        turtleMock.singer.oscList = { [blk]: [] };
+        turtleMock.singer.bpm = [90];
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+        expect(activityMock.logo.updateNotation.mock.calls[0][4]).toEqual([
+            "kick drum",
+            "snare drum"
+        ]);
+    });
+
     test("passes a hertz note to notationMIDI as its nearest note name", () => {
         const blk = "hertzNoteBlk";
         turtleMock.singer.inNoteBlock = [blk];
