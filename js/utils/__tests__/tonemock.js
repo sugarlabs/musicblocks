@@ -297,7 +297,7 @@ const Tone = {
         toDestination: jest.fn()
     })),
     doNeighbor: jest.fn().mockReturnThis(),
-    Destination: { volume: { rampTo: jest.fn() } },
+    Destination: { volume: { rampTo: jest.fn() }, connect: jest.fn(), disconnect: jest.fn() },
     console: { debug: jest.fn() },
     Vibrato: jest.fn().mockImplementation(() => ({
         toDestination: jest.fn().mockReturnThis(),

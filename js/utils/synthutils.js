@@ -1302,17 +1302,14 @@ function Synth() {
     this.setupRecorder = () => {
         const cont = Tone.getContext();
         const dest = cont.createMediaStreamDestination();
+        this.recorderDest = dest;
         let chunks = [];
         const stream = dest.stream;
         // Browsers can't record WAV, so record in their own format (WebM in
         // Chrome, Ogg in Firefox) and convert to WAV when recording stops.
         const recorder = new MediaRecorder(stream);
         this.recorder = recorder;
-        for (const tur in instruments) {
-            for (const synth in instruments[tur]) {
-                instruments[tur][synth].connect(dest);
-            }
-        }
+        Tone.Destination.connect(dest);
         this.recorder.ondataavailable = evt => {
             // console.debug(evt.data);
             if (typeof evt.data === "undefined" || evt.data.size === 0) return;
@@ -1327,6 +1324,12 @@ function Synth() {
             document.body.removeChild(link);
         };
         this.recorder.onstop = async () => {
+            document.body.style.cursor = "default";
+            try {
+                Tone.Destination.disconnect(dest);
+            } catch (e) {
+                console.debug("Could not disconnect recorder destination:", e);
+            }
             if (!chunks.length) return;
             // Firefox clears recorder.mimeType on stop, so take the type from the data.
             const type = chunks[0].type || recorder.mimeType || "";
@@ -1388,6 +1391,25 @@ function Synth() {
         };
         // this.recorder.start();
         // setTimeout(()=>{this.recorder.stop();},5000);
+    };
+
+    /**
+     * Aborts an active recording without triggering the save prompt,
+     * resets the cursor, and disconnects Tone.Destination.
+     * @function
+     * @memberof Synth
+     */
+    this.abortRecorder = () => {
+        const rec = this.recorder;
+        if (!rec) return;
+        rec.onstop = null;
+        if (rec.state === "recording") rec.stop();
+        try {
+            Tone.Destination.disconnect(this.recorderDest);
+        } catch (e) {
+            console.debug("Could not disconnect recorder destination:", e);
+        }
+        document.body.style.cursor = "default";
     };
 
     /**

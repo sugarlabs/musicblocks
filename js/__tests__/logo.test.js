@@ -1604,6 +1604,43 @@ describe("Logo doStopTurtles", () => {
         expect(mockActivity.stage.dispatchEvent).toHaveBeenCalledWith("_tie_1");
     });
 
+    test("stops recorder and resets recording flag when _lastNoteTimeout fires on completion", () => {
+        const scheduledTimeouts = [];
+        jest.spyOn(logo._timerManager, "setTimeout").mockImplementation(cb => {
+            scheduledTimeouts.push(cb);
+            return scheduledTimeouts.length;
+        });
+
+        const recorderStop = jest.fn();
+        logo.synth = makeSynth();
+        logo.synth.recorder = { state: "recording", stop: recorderStop };
+        logo.recording = true;
+
+        turtle.butNotThese = {};
+        turtle.queue = [];
+        turtle.parentFlowQueue = [];
+        turtle.running = true;
+        turtle.singer.runningFromEvent = false;
+        turtle.singer.suppressOutput = true;
+        turtle.singer.justCounting = [];
+        logo.turtles.running = jest.fn().mockReturnValue(false);
+        logo.turtles.turtleList = [turtle];
+        logo.turtles.getTurtleCount = () => 1;
+        logo.turtles.getTurtle = () => turtle;
+        logo.turtles.ithTurtle = () => turtle;
+        logo._cleanupAfterCompletion = jest.fn();
+        logo.blockList = [makeFlowBlock("print")];
+
+        logo.runFromBlockNow(logo, 0, 0, 0, null, 0);
+
+        scheduledTimeouts[0]();
+        scheduledTimeouts[1]();
+
+        expect(recorderStop).toHaveBeenCalled();
+        expect(logo.recording).toBe(false);
+        expect(turtle.singer.suppressOutput).toBe(false);
+    });
+
     test("does not flush signals or clear runningFromEvent if a turtle resumed running before _lastNoteTimeout fires", () => {
         const scheduledTimeouts = [];
         jest.spyOn(logo._timerManager, "setTimeout").mockImplementation(cb => {
@@ -2080,6 +2117,7 @@ describe("Logo doStopTurtles", () => {
             turtle1._transportTime = 25;
             turtle0._transportEventId = "evt-1";
             turtle1._transportEventId = "evt-2";
+            logo.recording = true;
 
             logo.doStopTurtles();
 
@@ -2090,6 +2128,7 @@ describe("Logo doStopTurtles", () => {
             expect(logo.synth.stopSound).toHaveBeenCalledWith("1", "piano");
             expect(clearIntervalSpy).toHaveBeenCalledWith(888);
             expect(logo.synth.recorder.stop).toHaveBeenCalled();
+            expect(logo.recording).toBe(false);
             expect(doStopVideoCam).toHaveBeenCalledWith("cam-1", logo.setCameraID);
             expect(twoTurtleActivity.blocks.showBlocks).toHaveBeenCalled();
             expect(document.getElementById).toHaveBeenCalledWith("stop");
@@ -2444,6 +2483,20 @@ describe("Logo runLogoCommands", () => {
         logo.runLogoCommands(null, null);
 
         expect(Singer.resetMasterVolume).toHaveBeenCalledWith(logo);
+    });
+
+    test("aborts recorder and resets recording flag when startBlocks is empty", () => {
+        const abortRecorder = jest.fn();
+        logo.synth.abortRecorder = abortRecorder;
+        logo.synth.recorder = { state: "recording" };
+        logo.recording = true;
+        logo.blockList = [];
+        mockActivity.blocks.stackList = [];
+
+        logo.runLogoCommands(null, null);
+
+        expect(abortRecorder).toHaveBeenCalled();
+        expect(logo.recording).toBe(false);
     });
 
     test("drum block is included in startBlocks", () => {
