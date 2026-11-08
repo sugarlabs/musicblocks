@@ -590,6 +590,18 @@ describe("GlobalCard", () => {
             expect(card.Planet).toBeNull();
         });
 
+        it("should remove tooltips initialized for the card", () => {
+            card.init("test-id-1");
+            card.render();
+            const tooltipped = card._tooltipped;
+
+            card.cleanup();
+
+            expect(global.jQuery).toHaveBeenLastCalledWith(tooltipped);
+            expect(global.jQuery.mock.results.at(-1).value.tooltip).toHaveBeenCalledWith("remove");
+            expect(card._tooltipped).toBeNull();
+        });
+
         it("should handle cleanup when no clipboard or timeout exist", () => {
             expect(() => card.cleanup()).not.toThrow();
             expect(card.ProjectData).toBeNull();
