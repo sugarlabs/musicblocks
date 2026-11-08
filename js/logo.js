@@ -73,6 +73,14 @@ const _performanceRequestedInURL = () => {
 };
 
 /**
+ * Most barlines one note is split at when writing notation. Splitting takes one
+ * step per measure, so without a limit a tiny meter makes millions of tied
+ * pieces, and a small enough measure never finishes. Saving as ABC slows down
+ * sharply with more tied pieces, so the limit is kept low.
+ */
+const MAX_NOTATION_BARLINES = 1000;
+
+/**
  * @class
  * @classdesc Queue entry for managing running blocks.
  */
@@ -1267,7 +1275,8 @@ class Logo {
      * the note is split at every barline it crosses: the portion that fits
      * within the current measure, one full measure for each intermediate
      * measure, and the remainder in the last measure, joined by ties (rests
-     * are not tied).  Recursion stops when
+     * are not tied).  A note that would cross more than MAX_NOTATION_BARLINES
+     * barlines is written whole instead.  Recursion stops when
      * `split` is false, which all recursive calls pass explicitly.
      *
      * @param {string[]} note - Pitch names (e.g. `["G4"]`), or `["R"]` for a
@@ -1298,10 +1307,15 @@ class Logo {
             tur.singer.notesPlayed[0] / tur.singer.notesPlayed[1] - durationTime
         );
 
-        if (split && durationTime > timeLeftInMeasure) {
-            // measureDuration: the total duration of one full measure.
-            const measureDuration = tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat;
+        // measureDuration: the total duration of one full measure.
+        const measureDuration = tur.singer.beatsPerMeasure / tur.singer.noteValuePerBeat;
 
+        // The tolerance keeps float error from pushing a note at the limit over it.
+        if (
+            split &&
+            durationTime > timeLeftInMeasure &&
+            (durationTime - timeLeftInMeasure) / measureDuration - MAX_NOTATION_BARLINES <= 1e-9
+        ) {
             // Cut the note at every barline it crosses: the portion that fits in
             // the current measure, one full measure for each measure it spans,
             // then the remainder that spills into the last measure.
@@ -1538,7 +1552,7 @@ class Logo {
                 }
             }
             const comp = this.turtles.getTurtle(turtle).companionTurtle;
-            if (comp) {
+            if (comp !== null && comp !== undefined) {
                 const compTurtle = this.turtles.getTurtle(comp);
                 compTurtle.running = false;
                 if (compTurtle.interval !== undefined) {
@@ -1639,7 +1653,13 @@ class Logo {
             turtle.unhighlightQueue = [];
             if (turtle.singer) {
                 turtle.singer._unhighlightTimers = {};
+                turtle.singer.tie = false;
+                turtle.singer.tieCarryOver = 0;
+                turtle.singer.tieNotePitches = [];
+                turtle.singer.tieNoteExtras = [];
+                turtle.singer.tieFirstDrums = [];
             }
+            turtle.endOfClampSignals = {};
             if (turtle.delayTimeout !== null) {
                 clearTimeout(turtle.delayTimeout);
                 turtle.delayTimeout = null;
@@ -2220,6 +2240,11 @@ class Logo {
         // Sometimes we don't want to unwind the entire queue.
         if (queueStart === undefined) queueStart = 0;
 
+        if (queueStart === 0 && logo._lastNoteTimeout !== null) {
+            logo._timerManager.clearTimeout(logo._lastNoteTimeout);
+            logo._lastNoteTimeout = null;
+        }
+
         while (blk !== null && blk !== undefined && !logo.stopTurtle) {
             const tracker = getPerformanceTracker();
             const profilingEnabled =
@@ -2725,7 +2750,7 @@ class Logo {
                 }
 
                 const comp = logo.turtles.getTurtle(turtle).companionTurtle;
-                if (comp) {
+                if (comp !== null && comp !== undefined) {
                     const compTurtle = logo.turtles.getTurtle(comp);
                     compTurtle.running = false;
                     // Null tur.interval after cancel — mirrors fix at doStopTurtles
@@ -2849,15 +2874,33 @@ class Logo {
                         }
                         logo._lastNoteTimeout = logo._timerManager.setTimeout(() => {
                             logo._lastNoteTimeout = null;
-                            tur.singer.runningFromEvent = false;
-                            if (tur.singer.suppressOutput && logo.recording) {
+                            if (logo.turtles && logo.turtles.running && logo.turtles.running()) {
+                                return;
+                            }
+                            if (logo.turtles && logo.turtles.turtleList) {
+                                for (const t of logo.turtles.turtleList) {
+                                    if (
+                                        logo.turtles &&
+                                        logo.turtles.running &&
+                                        logo.turtles.running()
+                                    ) {
+                                        return;
+                                    }
+                                    if (t && !t.running) {
+                                        if (t.singer) {
+                                            t.singer.runningFromEvent = false;
+                                        }
+                                        logo.dispatchUnissuedSignals(t);
+                                    }
+                                }
+                            }
+                            if (logo.turtles && logo.turtles.running && logo.turtles.running()) {
+                                return;
+                            }
+                            if (tur && tur.singer && tur.singer.suppressOutput && logo.recording) {
                                 tur.singer.suppressOutput = false;
                             }
-                            // Skip if a new run already started or another
-                            // turtle's callback already cleaned up.
-                            if (!logo.turtles.running()) {
-                                logo._cleanupAfterCompletion();
-                            }
+                            logo._cleanupAfterCompletion();
                         }, 1000);
                     }
                 };

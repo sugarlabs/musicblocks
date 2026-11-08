@@ -1221,6 +1221,14 @@ const ExplorerJournalUI = {
                 const noteId = button.dataset.noteId;
                 const textarea = container.querySelector(`textarea[data-note-id="${noteId}"]`);
                 if (!textarea) return;
+                if (!textarea.value.trim()) {
+                    PracticeUI.showQuestNotice(
+                        _("Blank Page Waiting"),
+                        _("Write a small memory first, or come back when you are ready."),
+                        "hint"
+                    );
+                    return;
+                }
 
                 onSaveNote(textarea.value, noteId);
                 onRefresh();

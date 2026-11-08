@@ -15,7 +15,7 @@
    _, toFraction, last, SHARP, FLAT, frequencyToPitch, NATURAL,
    DOUBLESHARP, DOUBLEFLAT, getScaleAndHalfSteps, NOTATIONTUPLETVALUE,
    NOTATIONNOTE, NOTATIONDURATION, NOTATIONROUNDDOWN, NOTATIONSTACCATO,
-   NOTATIONDOTCOUNT, getCurrentEDO
+   NOTATIONDOTCOUNT, getCurrentEDO, plainUnwritableTuplets
  */
 
 /*
@@ -25,7 +25,7 @@
      
       - js/utils/musicutils.js
           toFraction, frequencyToPitch, NATURAL, DOUBLESHARP, DOUBLEFLAT, getScaleAndHalfSteps,
-          getCurrentEDO
+          getCurrentEDO, plainUnwritableTuplets
      
      - js/utils/utils.js
          _, last
@@ -36,6 +36,9 @@
  */
 
 /* exported saveLilypondOutput, escapeLilypondString */
+
+// Lilypond has no limit, but a larger count is what is left of a note at a bar line.
+const LILYPOND_MAX_TUPLET = 32;
 
 // This header is prepended to the Lilypond output.
 const LILYPONDHEADER =
@@ -100,6 +103,10 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
     // obj = [note, duration, dotCount, tupletValue, roundDown, insideChord, staccato]
 
     logo.notationNotes[turtle] = "\\meter\n";
+    logo.notation.notationStaging[turtle] = plainUnwritableTuplets(
+        logo.notation.notationStaging[turtle],
+        LILYPOND_MAX_TUPLET
+    );
 
     const __toLilynote = note => {
         // Lilypond notes use is for sharp, es for flat,
@@ -745,7 +752,8 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                         logo.notationNotes[turtle] += ">";
                     }
 
-                    logo.notationNotes[turtle] += obj[NOTATIONDURATION];
+                    logo.notationNotes[turtle] +=
+                        obj[NOTATIONDURATION] === 0.5 ? "\\breve" : obj[NOTATIONDURATION];
                     for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
                         logo.notationNotes[turtle] += ".";
                     }

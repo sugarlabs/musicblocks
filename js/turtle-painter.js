@@ -1657,7 +1657,14 @@ class Painter {
      * @param alpha - alpha value
      */
     doSetPenAlpha(alpha) {
-        this.canvasAlpha = alpha;
+        alpha = Number(alpha);
+        if (!Number.isFinite(alpha)) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+        this.closeSVG();
+        this.canvasAlpha = clampNumber(alpha, 0, 1);
+        this._processColor();
     }
 
     /**

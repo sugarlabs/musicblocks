@@ -97,6 +97,121 @@ describe("PhraseMakerUI", () => {
         });
     });
 
+    describe("stylePhraseMaker", () => {
+        let floatingWindows;
+
+        afterEach(() => {
+            if (floatingWindows && floatingWindows.parentNode) {
+                floatingWindows.parentNode.removeChild(floatingWindows);
+            }
+            floatingWindows = null;
+        });
+
+        test("returns early if floatingWindows div does not exist", () => {
+            expect(() => PhraseMakerUI.stylePhraseMaker({})).not.toThrow();
+        });
+
+        test("does not modify styles when within screen dimensions", () => {
+            floatingWindows = document.createElement("div");
+            floatingWindows.id = "floatingWindows";
+            const windowFrame = document.createElement("div");
+            windowFrame.className = "windowFrame";
+            windowFrame.style.width = "500px";
+            windowFrame.style.height = "400px";
+            floatingWindows.appendChild(windowFrame);
+            document.body.appendChild(floatingWindows);
+
+            PhraseMakerUI.stylePhraseMaker({});
+            expect(windowFrame.style.width).toBe("500px");
+            expect(windowFrame.style.height).toBe("400px");
+        });
+
+        test("clamps dimensions and sets overflow when exceeding screen bounds", () => {
+            floatingWindows = document.createElement("div");
+            floatingWindows.id = "floatingWindows";
+            document.body.appendChild(floatingWindows);
+
+            const windowFrame = document.createElement("div");
+            windowFrame.className = "windowFrame";
+            windowFrame.style.width = "2000px";
+            windowFrame.style.height = "2000px";
+
+            const wfWinBody = document.createElement("div");
+            wfWinBody.className = "wfWinBody";
+
+            const wfbWidget = document.createElement("div");
+            wfbWidget.className = "wfbWidget";
+
+            windowFrame.appendChild(wfWinBody);
+            windowFrame.appendChild(wfbWidget);
+            floatingWindows.appendChild(windowFrame);
+
+            PhraseMakerUI.stylePhraseMaker({});
+
+            const expectedMaxWidth = `${window.innerWidth * 0.8}px`;
+            const expectedMaxHeight = `${window.innerHeight * 0.8}px`;
+
+            expect(windowFrame.style.width).toBe(expectedMaxWidth);
+            expect(windowFrame.style.height).toBe(expectedMaxHeight);
+            expect(wfWinBody.classList.contains("pm-win-body")).toBe(true);
+            expect(wfbWidget.classList.contains("pm-widget-container")).toBe(true);
+            expect(wfbWidget.style.overflowX).toBe("auto");
+            expect(wfbWidget.style.overflowY).toBe("auto");
+            expect(wfWinBody.style.overflowX).toBe("auto");
+            expect(wfWinBody.style.overflowY).toBe("auto");
+        });
+
+        test("targets specific frame when pm.widgetWindow._frame is provided", () => {
+            floatingWindows = document.createElement("div");
+            floatingWindows.id = "floatingWindows";
+            document.body.appendChild(floatingWindows);
+
+            const otherFrame = document.createElement("div");
+            otherFrame.className = "windowFrame";
+            otherFrame.style.width = "2000px";
+            otherFrame.style.height = "2000px";
+
+            const targetFrame = document.createElement("div");
+            targetFrame.className = "windowFrame";
+            targetFrame.style.width = "2000px";
+            targetFrame.style.height = "2000px";
+
+            const targetBody = document.createElement("div");
+            targetBody.className = "wfWinBody";
+            targetFrame.appendChild(targetBody);
+
+            floatingWindows.appendChild(otherFrame);
+            floatingWindows.appendChild(targetFrame);
+
+            const mockPm = {
+                widgetWindow: {
+                    _frame: targetFrame
+                }
+            };
+
+            PhraseMakerUI.stylePhraseMaker(mockPm);
+
+            expect(targetFrame.style.width).toBe(`${window.innerWidth * 0.8}px`);
+            expect(targetBody.classList.contains("pm-win-body")).toBe(true);
+            expect(otherFrame.style.width).toBe("2000px");
+        });
+
+        test("gracefully handles missing child elements without throwing", () => {
+            floatingWindows = document.createElement("div");
+            floatingWindows.id = "floatingWindows";
+            document.body.appendChild(floatingWindows);
+
+            const windowFrame = document.createElement("div");
+            windowFrame.className = "windowFrame";
+            windowFrame.style.width = "2000px";
+            windowFrame.style.height = "2000px";
+            floatingWindows.appendChild(windowFrame);
+
+            expect(() => PhraseMakerUI.stylePhraseMaker({})).not.toThrow();
+            expect(windowFrame.style.width).toBe(`${window.innerWidth * 0.8}px`);
+        });
+    });
+
     describe("calculateNoteWidth", () => {
         test("returns correct width for eighth note (noteValue=8)", () => {
             const pm = createMockPM();

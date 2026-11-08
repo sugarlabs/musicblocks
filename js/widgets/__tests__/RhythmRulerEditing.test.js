@@ -101,6 +101,87 @@ describe("RhythmRulerEditing", () => {
         expect(widget._refreshCircularView).toHaveBeenCalled();
     });
 
+    describe("cell event handlers", () => {
+        let widget;
+        let row;
+        const elementFromPoint = document.elementFromPoint;
+
+        beforeEach(() => {
+            jest.useFakeTimers();
+            global.platformColor = { selectorBackground: "#aaa" };
+            global.last = list => list[list.length - 1];
+            global.rationalToFraction = require("../../utils/utils-logic.js").rationalToFraction;
+            const table = document.createElement("table");
+            row = table.insertRow();
+            row.setAttribute("data-row", "0");
+            document.body.append(table);
+            widget = Object.assign(Object.create(RhythmRuler.prototype), {
+                activity: {
+                    logo: { synth: { stop: jest.fn() } },
+                    hideMsgs: jest.fn(),
+                    errorMsg: jest.fn()
+                },
+                _rulers: [row],
+                Rulers: [[[2, 2], []]],
+                _undoList: [],
+                _rulerSelected: 0,
+                _dissectNumber: { value: "2" },
+                _noteWidth: value => 200 / Math.abs(value),
+                __setNoteValueDisplay: jest.fn(),
+                _calculateZebraStripes: jest.fn(),
+                _refreshCircularView: jest.fn(),
+                saveDissectHistory: jest.fn(),
+                _setWidgetTimeout: (callback, delay) => setTimeout(callback, delay),
+                _clearWidgetTimeout: id => clearTimeout(id)
+            });
+            jest.spyOn(widget, "_dissectRuler");
+            for (const value of widget.Rulers[0][0]) {
+                widget.__addCellEventHandlers(row.insertCell(), widget._noteWidth(value), value);
+            }
+        });
+
+        afterEach(() => {
+            jest.clearAllTimers();
+            jest.useRealTimers();
+            document.elementFromPoint = elementFromPoint;
+            document.body.replaceChildren();
+        });
+
+        const tie = () => {
+            widget._mouseDownCell = row.cells[0];
+            widget._mouseUpCell = row.cells[1];
+            widget.__tie(true);
+            widget._mouseDownCell = null;
+            widget._mouseUpCell = null;
+        };
+
+        test.each([false, true])("long press toggles a rest after tying (undo: %s)", undo => {
+            tie();
+            if (undo) widget._undo();
+            const cell = row.cells[0];
+            const originalValues = widget.Rulers[0][0].slice();
+            document.elementFromPoint = jest.fn(() => cell);
+
+            cell.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
+            jest.advanceTimersByTime(1750);
+            cell.dispatchEvent(new MouseEvent("pointerup", { bubbles: true }));
+            cell.click();
+
+            originalValues[0] *= -1;
+            expect(widget.Rulers[0][0]).toEqual(originalValues);
+            expect(widget._dissectRuler).not.toHaveBeenCalled();
+            expect(widget._undoList.filter(entry => entry[0] === "rest")).toHaveLength(1);
+            expect(jest.getTimerCount()).toBe(0);
+        });
+
+        test("a normal click still subdivides once after tying", () => {
+            tie();
+            row.cells[0].click();
+            expect(widget.Rulers[0][0]).toEqual([2, 2]);
+            expect(widget._dissectRuler).toHaveBeenCalledTimes(1);
+        });
+    });
+
     describe("_undo", () => {
         beforeEach(() => {
             global.platformColor = { selectorBackground: "#aaa" };
@@ -214,6 +295,108 @@ describe("RhythmRulerEditing", () => {
                 false
             );
             expect(widget.Rulers[0][1]).toEqual([]);
+        });
+    });
+
+    describe("_dissectRuler tapping count-off", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+            global.Singer = { defaultBPMFactor: 1000 };
+            global._ = text => text;
+        });
+
+        afterEach(() => {
+            jest.clearAllTimers();
+            jest.useRealTimers();
+            document.body.replaceChildren();
+        });
+
+        const makeTapWidget = (rulerIndex, drumId, blockList, singer) => {
+            const table = document.createElement("table");
+            const row = table.insertRow();
+            const cell = row.insertCell();
+            cell.cellIndex = 0;
+            document.body.append(table);
+
+            const widget = Object.assign(Object.create(RhythmRuler.prototype), {
+                activity: {
+                    blocks: { blockList: blockList || {} },
+                    logo: { synth: { trigger: jest.fn() } },
+                    turtles: {
+                        ithTurtle: () => ({
+                            singer: singer !== undefined ? singer : { beatsPerMeasure: 4 }
+                        })
+                    }
+                },
+                Drums: [drumId],
+                Rulers: [[[2], []]],
+                _rulers: [row],
+                _rulerSelected: rulerIndex,
+                _playing: false,
+                _tapMode: true,
+                _tapCell: null,
+                _tapTimes: [],
+                _bpmFactor: 1000,
+                _setWidgetTimeout: (fn, delay) => setTimeout(fn, delay),
+                saveDissectHistory: jest.fn(),
+                __startTapping: jest.fn()
+            });
+
+            return { widget, cell };
+        };
+
+        test("plays count-off and falls back to snare drum when drum socket is empty", () => {
+            // setdrum block at index 10 with connections[1] === null (empty drum socket)
+            const blockList = {
+                10: { name: "setdrum", connections: [null, null] }
+            };
+            const { widget, cell } = makeTapWidget(0, 10, blockList);
+
+            expect(() => {
+                RhythmRulerEditing.prototype._dissectRuler.call(widget, { target: cell }, 0);
+            }).not.toThrow();
+
+            jest.advanceTimersByTime(500);
+            expect(widget.activity.logo.synth.trigger).toHaveBeenCalledTimes(4);
+            expect(widget.activity.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                "C4",
+                expect.any(Number),
+                "snare drum",
+                null,
+                null
+            );
+        });
+
+        test("plays count-off using configured drum when drum block has valid argument", () => {
+            const blockList = {
+                10: { name: "setdrum", connections: [null, 11] },
+                11: { name: "drumname", value: "bass drum" }
+            };
+            const { widget, cell } = makeTapWidget(0, 10, blockList);
+
+            RhythmRulerEditing.prototype._dissectRuler.call(widget, { target: cell }, 0);
+            jest.advanceTimersByTime(500);
+
+            expect(widget.activity.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                "C4",
+                expect.any(Number),
+                "bass drum",
+                null,
+                null
+            );
+        });
+
+        test("safely defaults beatsPerMeasure to 4 if turtle has no singer", () => {
+            const { widget, cell } = makeTapWidget(0, null, {}, null);
+
+            expect(() => {
+                RhythmRulerEditing.prototype._dissectRuler.call(widget, { target: cell }, 0);
+            }).not.toThrow();
+
+            jest.advanceTimersByTime(500);
+            expect(widget.activity.logo.synth.trigger).toHaveBeenCalledTimes(4);
         });
     });
 });

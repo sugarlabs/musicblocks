@@ -213,9 +213,10 @@ class SaveInterface {
      * @param {string} extension - The file extension (including the dot).
      * @param {string} dataurl - The base64 data url of the file.
      * @param {string} defaultfilename - The default filename to be used.
+     * @param {Function} [onSuccess] - Called after the user confirms the download.
      * @returns {void}
      */
-    download(extension, dataurl, defaultfilename) {
+    download(extension, dataurl, defaultfilename, onSuccess = null) {
         let message = _("Enter a filename to save your project:");
         let filename = null;
         //const self = this;
@@ -242,6 +243,9 @@ class SaveInterface {
                 message = _("File saved! Check Downloads.");
             }
             this.showToast(message);
+            if (typeof onSuccess === "function") {
+                onSuccess();
+            }
         };
 
         if (defaultfilename === undefined || defaultfilename === null) {
@@ -521,7 +525,9 @@ class SaveInterface {
                 const mainTrack = midi.addTrack();
                 mainTrack.name = `Track ${parseInt(blockIndex, 10) + 1}`;
 
-                const trackMap = new Map();
+                // Kept apart, so an instrument named like a drum gets its own track.
+                const drumTracks = new Map();
+                const instrumentTracks = new Map();
                 let globalTime = 0;
 
                 notes.forEach(noteData => {
@@ -531,14 +537,14 @@ class SaveInterface {
 
                     if (noteData.drum) {
                         const drum = noteData.drum || false;
-                        if (!trackMap.has(drum)) {
+                        if (!drumTracks.has(drum)) {
                             const drumTrack = midi.addTrack();
                             drumTrack.name = `Track ${parseInt(blockIndex, 10) + 1} - ${drum}`;
                             drumTrack.channel = 9; // Drums must be on Channel 10
-                            trackMap.set(drum, drumTrack);
+                            drumTracks.set(drum, drumTrack);
                         }
 
-                        const drumTrack = trackMap.get(drum);
+                        const drumTrack = drumTracks.get(drum);
 
                         const midiNumber =
                             Object.prototype.hasOwnProperty.call(drumMIDI, drum) && drumMIDI[drum]
@@ -550,8 +556,12 @@ class SaveInterface {
                             duration: duration,
                             velocity: 0.9
                         });
-                    } else {
-                        if (!trackMap.has(instrument)) {
+                    }
+
+                    // A note can play pitches together with a drum: write those as well.
+                    const pitches = noteData.note.filter(pitch => !pitch.includes("R"));
+                    if (!noteData.drum || pitches.length > 0) {
+                        if (!instrumentTracks.has(instrument)) {
                             const instrumentTrack = midi.addTrack();
                             instrumentTrack.name = `Track ${
                                 parseInt(blockIndex, 10) + 1
@@ -560,20 +570,18 @@ class SaveInterface {
                                 Object.prototype.hasOwnProperty.call(instrumentMIDI, instrument)
                                     ? instrumentMIDI[instrument]
                                     : instrumentMIDI["default"];
-                            trackMap.set(instrument, instrumentTrack);
+                            instrumentTracks.set(instrument, instrumentTrack);
                         }
 
-                        const instrumentTrack = trackMap.get(instrument);
+                        const instrumentTrack = instrumentTracks.get(instrument);
 
-                        noteData.note.forEach(pitch => {
-                            if (!pitch.includes("R")) {
-                                instrumentTrack.addNote({
-                                    name: normalizeNoteAccidentals(pitch),
-                                    time: globalTime,
-                                    duration: duration,
-                                    velocity: 0.8
-                                });
-                            }
+                        pitches.forEach(pitch => {
+                            instrumentTrack.addNote({
+                                name: normalizeNoteAccidentals(pitch),
+                                time: globalTime,
+                                duration: duration,
+                                velocity: 0.8
+                            });
                         });
                     }
                     globalTime += duration;
@@ -772,7 +780,23 @@ class SaveInterface {
         _lazyRequire(["activity/abc"], () => {
             try {
                 const abc = encodeURIComponent(saveAbcOutput(this.activity));
-                this.activity.save.download("abc", "data:text;utf8," + abc, filename || null);
+                if (this.activity.logo?.abcExportWarnings?.length > 0) {
+                    this.activity.save.download(
+                        "abc",
+                        "data:text;utf8," + abc,
+                        filename || null,
+                        () => {
+                            this.activity.textMsg(
+                                _(
+                                    "ABC export rounded one or more Hertz pitches to the nearest note."
+                                ),
+                                5000
+                            );
+                        }
+                    );
+                } else {
+                    this.activity.save.download("abc", "data:text;utf8," + abc, filename || null);
+                }
             } catch (e) {
                 console.error("Error in ABC output generation: ", e);
                 this.activity.errorMsg(`${_("Error generating ABC output.")} ${e.message}`);

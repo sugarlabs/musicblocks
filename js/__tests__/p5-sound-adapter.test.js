@@ -111,8 +111,13 @@ describe("p5-sound-adapter", () => {
         adapterFunction();
 
         expect(window.AudioNode.prototype.connect).toBe(patchedConnect);
-        expect(console.log).toHaveBeenCalledWith(
-            "p5-sound-adapter: AudioNode.prototype.connect already patched"
-        );
+    });
+
+    it("does not log to the console on a normal load", () => {
+        require("../p5-sound-adapter");
+        adapterFunction();
+        adapterFunction();
+
+        expect(console.log).not.toHaveBeenCalled();
     });
 });

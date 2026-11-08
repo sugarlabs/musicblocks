@@ -515,4 +515,91 @@ describe("recorder", () => {
             expect(mockTrack.stop).toHaveBeenCalled();
         });
     });
+    describe("canvas-only recording audio", () => {
+        let dest;
+        let audioTrack;
+        let Tone;
+        let canvasStream;
+
+        const startCanvasRecording = async () => {
+            const { doRecordButton, setupActivityRecorder } = require("../recorder");
+            const instance = {
+                textMsg: jest.fn(),
+                canvas: { height: 600 },
+                _onResize: jest.fn(),
+                logo: { synth: { tone: Tone } }
+            };
+            setupActivityRecorder(instance);
+            doRecordButton(instance);
+            await mockStart._recordHandler();
+            // the stop handler is armed once recording begins
+            return mockStart.addEventListener.mock.calls.filter(c => c[0] === "click").pop()[1];
+        };
+
+        beforeEach(() => {
+            audioTrack = { stop: jest.fn() };
+            dest = {
+                stream: {
+                    getAudioTracks: () => [audioTrack],
+                    getTracks: () => [audioTrack]
+                }
+            };
+            Tone = {
+                context: { createMediaStreamDestination: jest.fn(() => dest) },
+                Destination: { connect: jest.fn(), disconnect: jest.fn() }
+            };
+
+            const videoTrack = { stop: jest.fn(), addEventListener: jest.fn() };
+            canvasStream = { addTrack: jest.fn(), getTracks: () => [videoTrack] };
+            document.getElementById.mockImplementation(id => {
+                if (id === "record") return mockStart;
+                if (id === "myCanvas") return { width: 800, height: 600 };
+                return null;
+            });
+            document.createElement.mockImplementation(() => ({
+                getContext: () => ({ fillRect: jest.fn(), drawImage: jest.fn() }),
+                captureStream: () => canvasStream
+            }));
+            global.requestAnimationFrame = jest.fn();
+            global.cancelAnimationFrame = jest.fn();
+            global.localStorage = { getItem: jest.fn(() => "canvas") };
+        });
+
+        afterEach(() => {
+            delete global.localStorage;
+            delete global.requestAnimationFrame;
+            delete global.cancelAnimationFrame;
+        });
+
+        it("disconnects its audio node from Tone.Destination when recording stops", async () => {
+            const stopHandler = await startCanvasRecording();
+            expect(Tone.Destination.connect).toHaveBeenCalledWith(dest);
+
+            stopHandler();
+
+            expect(Tone.Destination.disconnect).toHaveBeenCalledWith(dest);
+            expect(audioTrack.stop).toHaveBeenCalled();
+        });
+
+        it("also disconnects when the stream ends on its own with nothing recorded", async () => {
+            await startCanvasRecording();
+
+            // the stream going inactive stops the recorder, which saves an
+            // empty recording and takes the early "file is empty" return
+            canvasStream.oninactive();
+
+            expect(Tone.Destination.disconnect).toHaveBeenCalledWith(dest);
+            expect(audioTrack.stop).toHaveBeenCalled();
+        });
+
+        it("still stops the audio track if the node was already disconnected", async () => {
+            Tone.Destination.disconnect.mockImplementation(() => {
+                throw new Error("not connected");
+            });
+            const stopHandler = await startCanvasRecording();
+
+            expect(() => stopHandler()).not.toThrow();
+            expect(audioTrack.stop).toHaveBeenCalled();
+        });
+    });
 });

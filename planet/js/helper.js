@@ -94,7 +94,7 @@ function toggleExpandable(id, c) {
 
 const outsideClickListeners = new WeakMap();
 
-function hideOnClickOutside(eles, other) {
+function hideOnClickOutside(eles, other, onHide) {
     const validEles = (Array.isArray(eles) ? eles : [eles]).filter(Boolean);
     if (validEles.length === 0) return;
 
@@ -122,6 +122,10 @@ function hideOnClickOutside(eles, other) {
             const otherEl = document.getElementById(other);
             if (otherEl) {
                 otherEl.style.display = "none";
+            }
+
+            if (typeof onHide === "function") {
+                onHide();
             }
 
             removeClickListener();
@@ -152,15 +156,24 @@ function updateCheckboxes(id) {
     urlel.value = url;
 }
 
+function bindSearchClearButton(inputId, clearId) {
+    const input = document.getElementById(inputId);
+    const clearButton = document.getElementById(clearId);
+
+    if (!input || !clearButton) return;
+
+    input.addEventListener("input", evt => {
+        clearButton.style.display = evt.target.value === "" ? "none" : "initial";
+    });
+}
+
 $(document).ready(() => {
     $("#publisher").modal();
     $("#deleter").modal();
     $("#projectviewer").modal();
 
-    document.getElementById("global-search").addEventListener("input", evt => {
-        document.getElementById("search-close").style.display =
-            evt.target.value === "" ? "none" : "initial";
-    });
+    bindSearchClearButton("global-search", "search-close");
+    bindSearchClearButton("global-search-2", "search-close-2");
 
     document.getElementById("local-tab").addEventListener("click", evt => {
         toggleSearch(false);
@@ -171,10 +184,10 @@ $(document).ready(() => {
     });
 
     document.getElementById("view-more-chips").addEventListener("click", evt => {
-        const showMore = _("Show more tags") + " ▼";
+        const showAll = _("Show all tags") + " ▼";
         const showLess = _("Show fewer tags") + " ▲";
         toggleExpandable("morechips", "flexchips");
-        toggleText("view-more-chips", showMore, showLess);
+        toggleText("view-more-chips", showAll, showLess);
     });
 });
 

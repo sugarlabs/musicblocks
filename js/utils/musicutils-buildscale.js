@@ -54,7 +54,8 @@ if (typeof module !== "undefined" && module.exports) {
         SOLFEGENAMES,
         FIXEDSOLFEGE,
         A0,
-        CHROMATIC_SOLFEGE
+        CHROMATIC_SOLFEGE,
+        EXTRATRANSPOSITIONS
     } = MusicUtilsConstants;
     var MusicUtilsI18n =
         (typeof window !== "undefined" && window.MusicUtilsI18n) ||
@@ -67,6 +68,7 @@ if (typeof module !== "undefined" && module.exports) {
         TEMPERAMENT,
         isEquallyTempered,
         getCurrentEDO,
+        normalizeEDO,
         generateNoteNames,
         getEdoNoteNamePosition,
         getTemperament,
@@ -156,50 +158,60 @@ var _notePitchClass = name => {
  * @returns {Array} An array containing the scale and the corresponding intervals.
  */
 var buildScale = (keySignature, edo) => {
-    // FIX ME: temporary hard-coded fix to avoid errors in pitch preview
-    if (keySignature === "C♭ major") {
-        const scale = [
-            "C" + FLAT,
-            "D" + FLAT,
-            "E" + FLAT,
-            "F" + FLAT,
-            "G" + FLAT,
-            "A" + FLAT,
-            "B" + FLAT,
-            "C" + FLAT
-        ];
-        return [scale, [2, 2, 1, 2, 2, 2, 1]];
-    } else if (keySignature === "F♭ major") {
-        const scale = [
-            "F" + FLAT,
-            "G" + FLAT,
-            "A" + FLAT,
-            "B" + DOUBLEFLAT,
-            "C" + FLAT,
-            "D" + FLAT,
-            "E" + FLAT,
-            "F" + FLAT
-        ];
-        return [scale, [2, 2, 1, 2, 2, 2, 1]];
-    }
-
-    let obj = keySignatureToMode(keySignature);
-    let myKeySignature = obj[0];
-    if (myKeySignature === "C" + FLAT) {
-        obj = keySignatureToMode("B " + obj[1]);
-        myKeySignature = obj[0];
-    }
-
-    // Determine active EDO: an explicit parameter wins; otherwise fall back to
-    // the global temperament state so existing callers keep working unchanged.
-    // Guard on falsy (not just undefined) so null/0/NaN never leak into the
-    // non-12 EDO branch and produce a degenerate step pattern.
+    // Determine active EDO: only an omitted parameter falls back to the
+    // global temperament state, so existing callers keep working
+    // unchanged. An explicitly passed value — including a falsy one
+    // such as 0 or NaN — is a provided-but-invalid EDO, not an omitted
+    // one: it must fall back to the documented 12, never silently pick
+    // up the ambient temperament (e.g. equal19) instead.
     let currentEDO = edo;
-    if (!currentEDO) {
+    if (currentEDO === undefined) {
         currentEDO = 12;
         if (typeof globalActivity !== "undefined" && globalActivity?.logo?.synth?.inTemperament) {
             currentEDO = getCurrentEDO(globalActivity.logo.synth.inTemperament);
         }
+    }
+    // Normalise the resolved value so the name table and the step
+    // pattern always agree: a truthy but invalid EDO (Infinity, 257,
+    // 12.5, ...) previously let generateNoteNames fall back to the
+    // 12-EDO names while getModePattern still scaled the steps for
+    // the bad EDO, producing undefined notes and NaN steps.
+    currentEDO = normalizeEDO(currentEDO);
+
+    if (currentEDO === 12) {
+        // FIX ME: temporary hard-coded fix to avoid errors in pitch preview
+        if (keySignature === "C♭ major") {
+            const scale = [
+                "C" + FLAT,
+                "D" + FLAT,
+                "E" + FLAT,
+                "F" + FLAT,
+                "G" + FLAT,
+                "A" + FLAT,
+                "B" + FLAT,
+                "C" + FLAT
+            ];
+            return [scale, [2, 2, 1, 2, 2, 2, 1]];
+        } else if (keySignature === "F♭ major") {
+            const scale = [
+                "F" + FLAT,
+                "G" + FLAT,
+                "A" + FLAT,
+                "B" + DOUBLEFLAT,
+                "C" + FLAT,
+                "D" + FLAT,
+                "E" + FLAT,
+                "F" + FLAT
+            ];
+            return [scale, [2, 2, 1, 2, 2, 2, 1]];
+        }
+    }
+
+    let obj = keySignatureToMode(keySignature);
+    let myKeySignature = obj[0];
+    if (currentEDO === 12 && myKeySignature === "C" + FLAT) {
+        obj = keySignatureToMode("B " + obj[1]);
+        myKeySignature = obj[0];
     }
 
     // For non-12 EDO: convert 12-EDO semitone intervals to EDO step counts
@@ -207,6 +219,24 @@ var buildScale = (keySignature, edo) => {
     if (currentEDO !== 12) {
         const edoNames = generateNoteNames(currentEDO);
         let idx = edoNames.indexOf(myKeySignature);
+        if (
+            idx === -1 &&
+            typeof EXTRATRANSPOSITIONS !== "undefined" &&
+            myKeySignature in EXTRATRANSPOSITIONS
+        ) {
+            // Outside 12-EDO, C♭ and F♭ are not enharmonic with B and E.
+            // Use the sharp-side name when the table has it. Where the table
+            // has no C♭ or F♭, that name occupies the same slot.
+            const sharpSide = {
+                ["C" + FLAT]: "B" + SHARP,
+                ["F" + FLAT]: "E" + SHARP
+            }[myKeySignature];
+            idx = sharpSide ? edoNames.indexOf(sharpSide) : -1;
+            if (idx === -1) {
+                const normalized = EXTRATRANSPOSITIONS[myKeySignature][0];
+                idx = edoNames.indexOf(normalized);
+            }
+        }
         if (idx === -1) {
             idx = 0;
         }
@@ -216,7 +246,8 @@ var buildScale = (keySignature, edo) => {
         // pitch class, so no pitch class is left unreachable.
         const edoHalfSteps = getModePattern(obj[1], currentEDO);
 
-        const scale = [myKeySignature];
+        const startNote = edoNames[idx];
+        const scale = [startNote];
         let ii = idx;
         for (let i = 0; i < edoHalfSteps.length; i++) {
             ii = (ii + edoHalfSteps[i] + edoNames.length) % edoNames.length;
@@ -317,7 +348,18 @@ var buildScale = (keySignature, edo) => {
         // A scale that needs both sharps and flats (harmonic or melodic minor,
         // for example) can still repeat a letter here: A harmonic minor came
         // out as A B C D E F A♭. Spell such a scale with one letter per degree.
+        // A blues scale repeats a letter on purpose: its blue note is the
+        // flattened neighbour of a scale note (A C D E♭ E G), which the passes
+        // above respelled as F♭. Give each of its notes the degree it belongs to.
+        let letterDegrees = null;
         if (halfSteps.length === 7 && new Set(scale.slice(0, 7).map(note => note[0])).size < 7) {
+            letterDegrees = [0, 1, 2, 3, 4, 5, 6];
+        } else if (obj[1] === "minor blues" && halfSteps.length === 6) {
+            letterDegrees = [0, 2, 3, 4, 4, 6];
+        } else if (obj[1] === "major blues" && halfSteps.length === 6) {
+            letterDegrees = [0, 1, 2, 2, 4, 5];
+        }
+        if (letterDegrees !== null) {
             const letters = "CDEFGAB";
             const naturalPitches = [0, 2, 4, 5, 7, 9, 11];
             const accidentalNames = {
@@ -335,9 +377,9 @@ var buildScale = (keySignature, edo) => {
 
             let spellable = true;
             const letterScale = [myKeySignature];
-            for (let degree = 1; spellable && degree < 7; degree++) {
-                pitch += halfSteps[degree - 1];
-                const letter = (tonicLetter + degree) % 7;
+            for (let i = 1; spellable && i < letterDegrees.length; i++) {
+                pitch += halfSteps[i - 1];
+                const letter = (tonicLetter + letterDegrees[i]) % 7;
                 // How far the pitch is from the natural letter, in -6..5 semitones.
                 const offset = ((((pitch - naturalPitches[letter]) % 12) + 18) % 12) - 6;
                 if (!(offset in accidentalNames)) {
@@ -383,9 +425,14 @@ var _getStepSize = (keySignature, pitch, direction, transposition, temperament, 
     if (temperament === undefined) {
         temperament = "equal";
     }
+    // As in buildScale: only an omitted EDO takes the temperament's
+    // EDO; an explicitly passed invalid value normalises to 12, so
+    // the 12-EDO checks below agree with the scale buildScale returns.
     let currentEDO = edo;
-    if (!currentEDO) {
+    if (currentEDO === undefined) {
         currentEDO = getCurrentEDO(temperament);
+    } else {
+        currentEDO = normalizeEDO(currentEDO);
     }
 
     let thisPitch = pitch;
@@ -395,6 +442,23 @@ var _getStepSize = (keySignature, pitch, direction, transposition, temperament, 
     const obj = buildScale(keySignature, currentEDO);
     const scale = obj[0];
     const halfSteps = obj[1];
+
+    const keyTonic = keySignature ? keySignatureToMode(keySignature)[0] : null;
+    if (currentEDO !== 12 && keyTonic) {
+        if (
+            (thisPitch === "C" + FLAT || thisPitch === "Cb") &&
+            keyTonic === "C" + FLAT &&
+            scale[0] === "B" + SHARP
+        ) {
+            thisPitch = "B" + SHARP;
+        } else if (
+            (thisPitch === "F" + FLAT || thisPitch === "Fb") &&
+            keyTonic === "F" + FLAT &&
+            scale[0] === "E" + SHARP
+        ) {
+            thisPitch = "E" + SHARP;
+        }
+    }
 
     if (thisPitch in BTOFLAT) {
         thisPitch = BTOFLAT[thisPitch];
@@ -422,26 +486,37 @@ var _getStepSize = (keySignature, pitch, direction, transposition, temperament, 
                 return pc1 === pc2;
             }
         }
-        if (s1 === "E" + SHARP && s2 === "F") {
+        if (
+            keyTonic === "C" + FLAT &&
+            scale[0] === "B" + SHARP &&
+            ((s1 === "C" + FLAT && s2 === "B" + SHARP) || (s1 === "B" + SHARP && s2 === "C" + FLAT))
+        ) {
             return true;
-        } else if (s1 === "E" && s2 === "F" + FLAT) {
+        }
+        if (
+            keyTonic === "F" + FLAT &&
+            scale[0] === "E" + SHARP &&
+            ((s1 === "F" + FLAT && s2 === "E" + SHARP) || (s1 === "E" + SHARP && s2 === "F" + FLAT))
+        ) {
             return true;
-        } else if (s1 === "F" && s2 === "E♯") {
-            return true;
-        } else if (s1 === "F" + FLAT && s2 === "E") {
-            return true;
-        } else if (s1 === "B" + SHARP && s2 === "C") {
-            return true;
-        } else if (s1 === "B" && s2 === "C" + FLAT) {
-            return true;
-        } else if (s1 === "C" && s2 === "B♯") {
-            return true;
-        } else if (s1 === "C" + FLAT && s2 === "B") {
-            return true;
-        } else if (s1 === "B" + DOUBLEFLAT && s2 === "A") {
-            return true;
-        } else if (s1 === "F" + DOUBLESHARP && s2 === "G") {
-            return true;
+        }
+        if (
+            (s1 === "E" + SHARP && s2 === "F") ||
+            (s1 === "F" && s2 === "E" + SHARP) ||
+            (s1 === "E" && s2 === "F" + FLAT) ||
+            (s1 === "F" + FLAT && s2 === "E") ||
+            (s1 === "B" + SHARP && s2 === "C") ||
+            (s1 === "C" && s2 === "B" + SHARP) ||
+            (s1 === "B" && s2 === "C" + FLAT) ||
+            (s1 === "C" + FLAT && s2 === "B") ||
+            (s1 === "B" + DOUBLEFLAT && s2 === "A") ||
+            (s1 === "A" && s2 === "B" + DOUBLEFLAT) ||
+            (s1 === "F" + DOUBLESHARP && s2 === "G") ||
+            (s1 === "G" && s2 === "F" + DOUBLESHARP)
+        ) {
+            const pos1 = getEdoNoteNamePosition(s1, currentEDO);
+            const pos2 = getEdoNoteNamePosition(s2, currentEDO);
+            return pos1 !== -1 && pos2 !== -1 && pos1 === pos2;
         }
         return false;
     };
@@ -970,15 +1045,36 @@ var getInterval = (interval, keySignature, pitch, edo) => {
 
     // In 12-EDO, find a pitch by how it sounds, so a scale that spells a note
     // G♯ still matches the A♭ in PITCHES. Other EDOs keep matching by name. The
-    // EDO is worked out as buildScale() does, not from the steps it returns.
+    // EDO is worked out as buildScale() does, not from the steps it returns:
+    // only an omitted EDO takes the ambient temperament; an explicitly
+    // passed invalid value normalises to 12.
     let currentEDO = edo;
-    if (!currentEDO) {
+    if (currentEDO === undefined) {
         currentEDO = 12;
         if (typeof globalActivity !== "undefined" && globalActivity?.logo?.synth?.inTemperament) {
             currentEDO = getCurrentEDO(globalActivity.logo.synth.inTemperament);
         }
+    } else {
+        currentEDO = normalizeEDO(currentEDO);
     }
     const is12EDO = currentEDO === 12;
+
+    const keyTonic = keySignature ? keySignatureToMode(keySignature)[0] : null;
+    if (currentEDO !== 12 && keyTonic) {
+        if (
+            (pitch === "C" + FLAT || pitch === "Cb") &&
+            keyTonic === "C" + FLAT &&
+            scale[0] === "B" + SHARP
+        ) {
+            pitch = "B" + SHARP;
+        } else if (
+            (pitch === "F" + FLAT || pitch === "Fb") &&
+            keyTonic === "F" + FLAT &&
+            scale[0] === "E" + SHARP
+        ) {
+            pitch = "E" + SHARP;
+        }
+    }
     const indexInScale = name => {
         const pitchClass = is12EDO ? _notePitchClass(name) : NaN;
         if (Number.isNaN(pitchClass)) {
@@ -1248,29 +1344,45 @@ var computeTargetPitchFrequency = (noteWithOctave, temperament) => {
  * getSolfege("G", "C major", true, "equal", 31) // "sol"
  */
 var getSolfege = (note, keySignature, movable, temperament, edo) => {
+    if (typeof note === "string" && note.length > 0) {
+        const cap = note.charAt(0).toUpperCase() + note.slice(1);
+        const normalized = cap.replaceAll("#", SHARP).replaceAll("b", FLAT);
+        if (SOLFEGECONVERSIONTABLE[normalized] !== undefined) {
+            note = normalized;
+        }
+    }
+
     if (noteIsSolfege(note)) {
         return note;
     }
 
     if (movable && keySignature) {
+        // Normalise before any chromatic math: buildScale already
+        // falls back to a 12-EDO scale for a bad EDO, but an
+        // unnormalised Infinity here made the chromatic modulo below
+        // produce NaN and then throw on the missing solfege entry.
+        // Only an omitted EDO takes the temperament's EDO; an
+        // explicitly passed invalid value (0, NaN, Infinity, ...) is
+        // the documented 12 fallback, not the ambient temperament.
         let currentEDO = edo;
-        if (!currentEDO) {
+        if (currentEDO === undefined) {
             currentEDO = getCurrentEDO(temperament);
+        } else {
+            currentEDO = normalizeEDO(currentEDO);
         }
         const scaleResult = buildScale(keySignature, currentEDO);
         if (!scaleResult) return SOLFEGECONVERSIONTABLE[note];
 
         const scale = scaleResult[0];
-
-        // 1) exact match
         let index = scale.indexOf(note);
 
-        // 2) normalized accidental match
-        if (index === -1) {
-            const altNote = note.replace("#", SHARP).replace("b", FLAT);
-            index = scale.indexOf(altNote);
+        // 2) in 12-EDO, an enharmonic spelling of a scale note (D♯ for E♭).
+        // Not for modes with more than 7 notes (chromatic, octatonic): there a
+        // match would map onto the 7 diatonic syllables and give a wrong pitch.
+        if (index === -1 && currentEDO === 12 && scale.length - 1 <= 7) {
+            const pitchClass = _notePitchClass(note);
+            index = scale.slice(0, -1).findIndex(n => _notePitchClass(n) === pitchClass);
         }
-
         // Modes with fewer than 7 notes: use the same solfege that
         // getNoteFromSolfege resolves, so display and input agree.
         if (index !== -1 && currentEDO === 12 && scale.length - 1 < 7) {
@@ -1294,10 +1406,18 @@ var getSolfege = (note, keySignature, movable, temperament, edo) => {
             return SOLFEGENAMES[(index + tonicDegree) % 7].toLowerCase();
         }
 
-        // 3) chromatic fallback (interval based)
+        // 4) chromatic fallback (interval based)
         const tonic = scale[0];
-        const tonicPitch = pitchToNumber(tonic, 4, keySignature, temperament);
-        const notePitch = pitchToNumber(note, 4, keySignature, temperament);
+        // pitchToNumber measures in the temperament's EDO, so when an
+        // explicitly invalid EDO fell back to 12 above while the
+        // temperament still names a non-12 EDO (e.g. "equal19"), the
+        // interval must still be measured in the resolved 12-EDO —
+        // otherwise D-flat is counted as two steps above the tonic
+        // instead of one and maps to the wrong syllable.
+        const pitchTemperament =
+            currentEDO === 12 && getCurrentEDO(temperament) !== 12 ? "equal" : temperament;
+        const tonicPitch = pitchToNumber(tonic, 4, keySignature, pitchTemperament);
+        const notePitch = pitchToNumber(note, 4, keySignature, pitchTemperament);
 
         // semitones from tonic (EDO-aware)
         let semitones = (((notePitch - tonicPitch) % currentEDO) + currentEDO) % currentEDO;

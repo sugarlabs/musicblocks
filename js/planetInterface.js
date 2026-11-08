@@ -505,6 +505,31 @@ class PlanetInterface {
         };
 
         /**
+         * Retrieves the GitHub repo linked to the current project.
+         * @returns {Object|null} - The project ID, repo name, key and project name, or null
+         * when Planet storage is not ready.
+         */
+        this.getCurrentGitRepoData = () => {
+            const projectStorage = this._getProjectStorage();
+            if (!projectStorage || !projectStorage.data || !projectStorage.data.Projects) {
+                return null;
+            }
+
+            const projectId = projectStorage.getCurrentProjectID();
+            const project = projectStorage.data.Projects[projectId];
+            const gitData = project && project.GitRepoData;
+            const repoName = (gitData && gitData.repoName) || "";
+            return {
+                projectId,
+                repoName,
+                hashedKey: repoName
+                    ? gitData.hashedKey || localStorage.getItem("mb_git_key_" + repoName) || ""
+                    : "",
+                displayName: project ? project.ProjectName : ""
+            };
+        };
+
+        /**
          * Retrieves the description of the current project.
          * @returns {string} - The description of the current project.
          */

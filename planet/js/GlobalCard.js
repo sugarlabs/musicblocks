@@ -28,6 +28,8 @@ class GlobalCard {
         this.likeTimeout = null;
         this.likePending = false;
         this.clipboard = null;
+        this._shareRepositionHandler = null;
+        this._shareRepositionFrame = null;
         this.PlaceholderMBImage = "images/mbgraphic.png";
         this.PlaceholderTBImage = "images/tbgraphic.png";
 
@@ -66,8 +68,9 @@ class GlobalCard {
                             )}" id="global-project-merge-{ID}"><i class="material-icons">merge_type</i></a> 
                             <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${`${
                                 Planet.ProjectStorage.isLiked(this.id) ? "Unlike" : "Like"
-                            } project`}"><i class="material-icons" id="global-like-icon-{ID}"></i><span class="likes-count" id="global-project-likes-{ID}"></span></a> 
-                            <div id="global-share-{ID}"> 
+                            } project`}"><i class="material-icons" id="global-like-icon-{ID}"></i><span class="likes-count" id="global-project-likes-{ID}"></span></a>
+
+                            <div class="global-share-container" id="global-share-{ID}">
                                 <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_(
                                     "Share project"
                                 )}" id="global-project-share-{ID}"><i class="material-icons">share</i></a> 
@@ -111,6 +114,42 @@ class GlobalCard {
     showToast(message, isError = false) {
         if (this.Planet?.SaveInterface?.showToast) {
             this.Planet.SaveInterface.showToast(message, isError);
+        }
+    }
+
+    _positionShareCard(shareBox, trigger) {
+        const gap = 8;
+        const viewportPadding = 12;
+
+        shareBox.classList.remove("share-card-above", "share-card-below");
+
+        // Reset previous constraints before measuring the popup again.
+        shareBox.style.maxHeight = "";
+        shareBox.style.left = "";
+        shareBox.style.right = "";
+
+        const triggerRect = trigger.getBoundingClientRect();
+        const shareRect = shareBox.getBoundingClientRect();
+        const container = shareBox.offsetParent || shareBox.parentElement;
+        const containerRect = container ? container.getBoundingClientRect() : { left: 0 };
+
+        // Keep the popup horizontally inside the viewport.
+        const minLeft = viewportPadding;
+        const maxLeft = window.innerWidth - viewportPadding - shareRect.width;
+        const left = Math.min(Math.max(minLeft, shareRect.left), maxLeft);
+
+        shareBox.style.left = `${left - containerRect.left}px`;
+        shareBox.style.right = "auto";
+
+        const spaceBelow = Math.max(0, window.innerHeight - triggerRect.bottom - gap);
+        const spaceAbove = Math.max(0, triggerRect.top - gap);
+
+        if (spaceBelow < shareRect.height && spaceAbove > spaceBelow) {
+            shareBox.classList.add("share-card-above");
+            shareBox.style.maxHeight = `${spaceAbove}px`;
+        } else {
+            shareBox.classList.add("share-card-below");
+            shareBox.style.maxHeight = `${spaceBelow}px`;
         }
     }
 
@@ -228,14 +267,70 @@ class GlobalCard {
 
         frag.getElementById(`global-project-share-${this.id}`).addEventListener("click", evt => {
             const s = document.getElementById(`global-sharebox-${this.id}`);
+            const trigger = evt.currentTarget;
+            const card = trigger.closest(".card");
+
+            const stopRepositioning = () => {
+                if (this._shareRepositionHandler) {
+                    window.removeEventListener("resize", this._shareRepositionHandler);
+                    window.removeEventListener("scroll", this._shareRepositionHandler, true);
+                    this._shareRepositionHandler = null;
+                }
+
+                if (this._shareRepositionFrame !== null) {
+                    window.cancelAnimationFrame(this._shareRepositionFrame);
+                    this._shareRepositionFrame = null;
+                }
+            };
 
             if (s.style.display === "none") {
                 s.style.display = "initial";
+
+                if (card) {
+                    card.classList.add("share-popup-open");
+                }
+
+                this._positionShareCard(s, trigger);
+
+                stopRepositioning();
+
+                this._shareRepositionHandler = () => {
+                    if (s.style.display === "none" || this._shareRepositionFrame !== null) {
+                        return;
+                    }
+
+                    this._shareRepositionFrame = window.requestAnimationFrame(() => {
+                        this._shareRepositionFrame = null;
+
+                        if (s.style.display !== "none") {
+                            this._positionShareCard(s, trigger);
+                        }
+                    });
+                };
+
+                window.addEventListener("resize", this._shareRepositionHandler);
+                window.addEventListener("scroll", this._shareRepositionHandler, true);
+
                 hideOnClickOutside(
                     [document.getElementById(`global-share-${this.id}`)],
-                    `global-sharebox-${this.id}`
+                    `global-sharebox-${this.id}`,
+                    () => {
+                        if (card) {
+                            card.classList.remove("share-popup-open");
+                        }
+
+                        stopRepositioning();
+                    }
                 );
-            } else s.style.display = "none";
+            } else {
+                s.style.display = "none";
+
+                if (card) {
+                    card.classList.remove("share-popup-open");
+                }
+
+                stopRepositioning();
+            }
         });
 
         // set share checkbox listener
@@ -257,6 +352,13 @@ class GlobalCard {
         if (advancedToggle) {
             advancedToggle.addEventListener("click", () => {
                 toggleExpandable(`global-advanced-${this.id}`, "shareurl-advanced");
+
+                const shareBox = document.getElementById(`global-sharebox-${this.id}`);
+                const shareTrigger = document.getElementById(`global-project-share-${this.id}`);
+
+                if (shareBox && shareTrigger) {
+                    this._positionShareCard(shareBox, shareTrigger);
+                }
             });
         }
 
@@ -341,6 +443,17 @@ class GlobalCard {
         if (this._thumbObserver) {
             this._thumbObserver.disconnect();
             this._thumbObserver = null;
+        }
+
+        if (this._shareRepositionHandler) {
+            window.removeEventListener("resize", this._shareRepositionHandler);
+            window.removeEventListener("scroll", this._shareRepositionHandler, true);
+            this._shareRepositionHandler = null;
+        }
+
+        if (this._shareRepositionFrame !== null) {
+            window.cancelAnimationFrame(this._shareRepositionFrame);
+            this._shareRepositionFrame = null;
         }
 
         if (this.likeTimeout) {

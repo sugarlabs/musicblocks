@@ -24,6 +24,7 @@ Changes to this file should follow the role-change process in
 | Blocks & Runtime | [@ssz2605](https://github.com/ssz2605), [@vanshika2720](https://github.com/vanshika2720) | General block definitions, JavaScript export, and activity runtime |
 | Tests & CI | [@omsuneri](https://github.com/omsuneri), [@Ashutoshx7](https://github.com/Ashutoshx7), [@vanshika2720](https://github.com/vanshika2720) | Shared test infrastructure, CI workflows, and test suites |
 | Planet & Project Sharing | [@zealot-zew](https://github.com/zealot-zew) | Planet, publishing, and project-sharing flow |
+| Release, Security & Infrastructure | [@kunalKumar-13](https://github.com/kunalKumar-13) | Releases, deployment config, the server and service worker |
 
 Music and UI paths request Walter and Devin together. This keeps Devin close to
 changes where music behavior, child-facing UX, and real classroom use matter,
@@ -40,7 +41,6 @@ project's test practice.
 | Blocks & Runtime | [@kunalKumar-13](https://github.com/kunalKumar-13), [@rakshityadav1868](https://github.com/rakshityadav1868), [@Chaitu7032](https://github.com/Chaitu7032), [@kartikktripathi](https://github.com/kartikktripathi) |
 | Tests & CI | [@Jetshree](https://github.com/Jetshree), [@mahesh-09-12](https://github.com/mahesh-09-12) |
 | Docs, Lessons & i18n | [@stutijain2006](https://github.com/stutijain2006) |
-| Release, Security & Infrastructure | [@kunalKumar-13](https://github.com/kunalKumar-13) |
 
 Areas show where each Reviewer has the most experience. Any Reviewer may
 review any pull request.
@@ -59,7 +59,6 @@ Project Maintainers currently handle:
 
 - Docs, Lessons & i18n
 - Plugins, Media & Assets
-- Release, Security & Infrastructure
 
 The project may add Area Approvers as contributors gain experience in these
 parts of the repository.

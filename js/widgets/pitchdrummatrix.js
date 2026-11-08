@@ -177,6 +177,7 @@ class PitchDrumMatrix {
         // We populate the blockMap whenever a node is selected and
         // restore any nodes that might be present.
         this._blockMap = [];
+        this._blockMaps = {};
     }
 
     /**

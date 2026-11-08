@@ -261,12 +261,18 @@ function setupWidgetBlocks(activity) {
         const numeratorBlock = blockList[beatValueConnections?.[1]];
         const denominatorBlock = blockList[beatValueConnections?.[2]];
 
-        return (
-            meterBlock &&
-            typeof beatCountBlock?.value === "number" &&
-            typeof numeratorBlock?.value === "number" &&
-            typeof denominatorBlock?.value === "number"
-        );
+        // A divide needs both operands. Any other beat value, such as 0.25 or 0 + 0.25, is
+        // checked by the value it evaluated to. A beat value of 0 or less would schedule the
+        // beats 0 ms apart.
+        const hasBeatValue =
+            beatValueBlock?.name === "divide"
+                ? typeof numeratorBlock?.value === "number" &&
+                  numeratorBlock.value > 0 &&
+                  typeof denominatorBlock?.value === "number" &&
+                  denominatorBlock.value > 0
+                : typeof beatValueBlock?.value === "number" && beatValueBlock.value > 0;
+
+        return meterBlock && typeof beatCountBlock?.value === "number" && hasBeatValue;
     }
 
     /**
@@ -811,7 +817,14 @@ function setupWidgetBlocks(activity) {
                     "meterWidget",
                     _getWidgetDependencies(
                         typeof MeterWidget !== "undefined" ? MeterWidget : null,
-                        ["widgets/meterwidget"]
+                        [
+                            "widgets/MeterWidgetWindow",
+                            "widgets/MeterWidgetMeter",
+                            "widgets/MeterWidgetPlayback",
+                            "widgets/MeterWidgetWheel",
+                            "widgets/MeterWidgetSave",
+                            "widgets/meterwidget"
+                        ]
                     ),
                     () => new MeterWidget(activity, blk, turtle),
                     resetFlag,
@@ -1315,6 +1328,7 @@ function setupWidgetBlocks(activity) {
             if (interruption) return interruption;
 
             logo.inPitchDrumMatrix = true;
+            logo.pitchDrumMatrix.blockNo = blk;
             logo.pitchDrumMatrix.rowLabels = [];
             logo.pitchDrumMatrix.rowArgs = [];
             logo.pitchDrumMatrix.drums = [];
@@ -1548,6 +1562,8 @@ function setupWidgetBlocks(activity) {
                         [
                             "widgets/MusicKeyboardEditing",
                             "widgets/MusicKeyboardRendering",
+                            "widgets/MusicKeyboardPlayback",
+                            "widgets/MusicKeyboardInput",
                             "widgets/musickeyboard"
                         ]
                     ),
@@ -2355,7 +2371,7 @@ function setupWidgetBlocks(activity) {
         }
 
         /**
-         * Handles the flow of data for the status block.
+         * Handles the flow of data for the reflection block.
          * @param {any[]} args - The arguments passed to the block.
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
@@ -2368,7 +2384,18 @@ function setupWidgetBlocks(activity) {
                 "reflection",
                 _getWidgetDependencies(
                     typeof ReflectionMatrix !== "undefined" ? ReflectionMatrix : null,
-                    ["utils/ai-widget-lifecycle", "utils/ai-markdown", "widgets/reflection"]
+                    [
+                        "utils/ai-widget-lifecycle",
+                        "utils/ai-markdown",
+                        "widgets/ReflectionLifecycle",
+                        "widgets/ReflectionWindow",
+                        "widgets/ReflectionChatLog",
+                        "widgets/ReflectionSession",
+                        "widgets/ReflectionBackend",
+                        "widgets/ReflectionReport",
+                        "widgets/ReflectionMarkdown",
+                        "widgets/reflection"
+                    ]
                 ),
                 () => new ReflectionMatrix(),
                 turtle,
@@ -2376,8 +2403,6 @@ function setupWidgetBlocks(activity) {
                 receivedArg
             );
             if (interruption) return interruption;
-
-            logo.statusFields = [];
 
             logo.inReflectionMatrix = true;
 

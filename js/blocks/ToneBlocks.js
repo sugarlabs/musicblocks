@@ -755,9 +755,10 @@ function setupToneBlocks(activity) {
                     tur.singer.vibratoIntensity
                 );
                 logo.timbre.vibratoParams.push(last(tur.singer.vibratoRate));
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["vibratoRate"] = last(
-                    tur.singer.vibratoRate
-                );
+                const vibRate = last(tur.singer.vibratoRate);
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["vibratoRate"] = vibRate;
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["vibratoFrequency"] =
+                    vibRate > 0 ? 1 / vibRate : 1 / 16;
             }
 
             return [args[2], 1];

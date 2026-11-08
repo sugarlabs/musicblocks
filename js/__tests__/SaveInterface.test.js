@@ -190,6 +190,24 @@ describe("download", () => {
         expect(spy).not.toHaveBeenCalled();
     });
 
+    it("calls the success callback only after a download completes", () => {
+        const onSuccess = jest.fn();
+
+        instance.download("abc", "data", "My Project", onSuccess);
+
+        expect(mockDownloadURL).toHaveBeenCalled();
+        expect(onSuccess).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not call the success callback when the user cancels", () => {
+        const onSuccess = jest.fn();
+        window.prompt = jest.fn(() => null);
+
+        instance.download("abc", "data", null, onSuccess);
+
+        expect(onSuccess).not.toHaveBeenCalled();
+    });
+
     it("should revoke the Blob URL when the user cancels the prompt", () => {
         global.URL.revokeObjectURL = jest.fn();
         window.prompt = jest.fn(() => null);
@@ -793,6 +811,98 @@ describe("afterSaveMIDI", () => {
             velocity: 0.9
         });
     });
+
+    it("writes both the pitch and the drum of a note that plays both", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                // A note with only a drum is recorded with a rest for its pitch.
+                { note: ["R"], drum: "snare drum", duration: 4, bpm: 90, instrument: "guitar" },
+                { note: ["G4"], drum: "kick drum", duration: 4, bpm: 90, instrument: "guitar" },
+                { note: ["A4"], duration: 4, bpm: 90, instrument: "guitar" }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const track = name => tracks.find(t => t.name === name);
+        const beat = 0.6666666666666666;
+
+        expect(track("Track 1 - snare drum").addNote.mock.calls).toEqual([
+            [{ midi: 38, time: 0, duration: beat, velocity: 0.9 }]
+        ]);
+        expect(track("Track 1 - kick drum").addNote.mock.calls).toEqual([
+            [{ midi: 36, time: beat, duration: beat, velocity: 0.9 }]
+        ]);
+        expect(track("Track 1 - guitar").addNote.mock.calls).toEqual([
+            [{ name: "G4", time: beat, duration: beat, velocity: 0.8 }],
+            [{ name: "A4", time: 2 * beat, duration: beat, velocity: 0.8 }]
+        ]);
+    });
+
+    it("writes the drum and every pitch of a chord with a rest in it, but not the rest", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                {
+                    note: ["R", "G4", "B4"],
+                    drum: "kick drum",
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "guitar"
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const track = name => tracks.find(t => t.name === name);
+        const beat = 0.6666666666666666;
+
+        expect(track("Track 1 - kick drum").addNote.mock.calls).toEqual([
+            [{ midi: 36, time: 0, duration: beat, velocity: 0.9 }]
+        ]);
+        expect(track("Track 1 - guitar").addNote.mock.calls).toEqual([
+            [{ name: "G4", time: 0, duration: beat, velocity: 0.8 }],
+            [{ name: "B4", time: 0, duration: beat, velocity: 0.8 }]
+        ]);
+    });
+
+    it("keeps the pitch off the drum track when the instrument is named like the drum", () => {
+        mockActivity.logo._midiData = {
+            0: [{ note: ["G4"], drum: "kick drum", duration: 4, bpm: 90, instrument: "kick drum" }]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const [drumTrack, instrumentTrack] = tracks.filter(t => t.name === "Track 1 - kick drum");
+        const beat = 0.6666666666666666;
+
+        expect(drumTrack.channel).toBe(9);
+        expect(drumTrack.addNote.mock.calls).toEqual([
+            [{ midi: 36, time: 0, duration: beat, velocity: 0.9 }]
+        ]);
+        expect(instrumentTrack.channel).not.toBe(9);
+        expect(instrumentTrack.addNote.mock.calls).toEqual([
+            [{ name: "G4", time: 0, duration: beat, velocity: 0.8 }]
+        ]);
+    });
+
+    it("adds no instrument track for notes that only play drums", () => {
+        mockActivity.logo._midiData = {
+            0: [{ note: ["R"], drum: "snare drum", duration: 4, bpm: 90, instrument: "guitar" }]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const names = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value.name);
+        expect(names).toEqual(["Track 1", "Track 1 - snare drum"]);
+    });
 });
 
 describe("afterSaveMIDI tempo and time signatures", () => {
@@ -1252,6 +1362,36 @@ describe("saveWAV & saveABC methods", () => {
         expect(activity.logo.recordingBuffer.hasData).toBe(false);
     });
 
+    it("shows a warning when ABC export rounds a Hertz pitch", () => {
+        const download = jest.fn((extension, dataurl, filename, onSuccess) => onSuccess());
+        const activity = {
+            save: { download },
+            textMsg: jest.fn(),
+            logo: { abcExportWarnings: ["445 Hz was rounded to A4 (+19.6 cents)"] }
+        };
+        global.saveAbcOutput = jest.fn(() => "mock_abc_data");
+
+        instance.afterSaveAbc.call({ activity });
+
+        expect(activity.textMsg).toHaveBeenCalledWith(
+            "ABC export rounded one or more Hertz pitches to the nearest note.",
+            5000
+        );
+    });
+
+    it("does not show a warning when the ABC download is cancelled", () => {
+        const activity = {
+            save: { download: jest.fn() },
+            textMsg: jest.fn(),
+            logo: { abcExportWarnings: ["445 Hz was rounded to A4 (+19.6 cents)"] }
+        };
+        global.saveAbcOutput = jest.fn(() => "mock_abc_data");
+
+        instance.afterSaveAbc.call({ activity });
+
+        expect(activity.textMsg).not.toHaveBeenCalled();
+    });
+
     it("should save ABC notation under the file name it is given", () => {
         global.saveAbcOutput = jest.fn(() => "mock_abc_data");
         const activity = { save: { download: mockDownload } };
@@ -1609,19 +1749,23 @@ describe("saveLilypond Methods", () => {
             callback(false, errorMessage);
         });
 
-        // Mock console.debug to verify the error message
-        console.debug = jest.fn();
+        // Mock console.debug to verify the error message without mutating global console
+        const consoleSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
 
-        instance.afterSaveLilypondPDF(lydata, filename);
+        try {
+            instance.afterSaveLilypondPDF(lydata, filename);
 
-        expect(document.body.style.cursor).toBe("default");
-        expect(console.debug).toHaveBeenCalledWith("Error: " + errorMessage);
-        expect(activity.errorMsg).toHaveBeenCalledWith(
-            "Failed to convert Lilypond to PDF. Please try saving as .ly file instead.",
-            5000
-        );
-        // Verify activity.save.download is not called
-        expect(activity.save.download).not.toHaveBeenCalled();
+            expect(document.body.style.cursor).toBe("default");
+            expect(consoleSpy).toHaveBeenCalledWith("Error: " + errorMessage);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Failed to convert Lilypond to PDF. Please try saving as .ly file instead.",
+                5000
+            );
+            // Verify activity.save.download is not called
+            expect(activity.save.download).not.toHaveBeenCalled();
+        } finally {
+            consoleSpy.mockRestore();
+        }
     });
 
     it("should show copied message when Clipboard API succeeds", async () => {

@@ -42,6 +42,7 @@ describe("setupDictActions", () => {
         global.frequencyToPitch = jest.fn().mockReturnValue(["A", 4]);
         global.noteToObj = require("../../utils/musicutils").noteToObj;
         global.isUnsafeObjectKey = require("../../utils/utils-logic").isUnsafeObjectKey;
+        global.last = require("../../utils/utils").last;
     });
 
     beforeEach(() => {
@@ -87,8 +88,10 @@ describe("setupDictActions", () => {
             singer: {
                 notesPlayed: [1, 2],
                 lastNotePlayed: ["C4"],
-                notePitches: ["C"],
-                noteOctaves: [4],
+                // Keyed by note block, as in Singer.
+                inNoteBlock: [],
+                notePitches: {},
+                noteOctaves: {},
                 keySignature: "C",
                 movable: true,
                 pitchNumberOffset: 0
@@ -146,18 +149,59 @@ describe("setupDictActions", () => {
             expect(pitchToNumber).toHaveBeenCalledWith("C", 4, "C");
         });
 
-        it("should get the pitch number correctly using notePitches when lastNotePlayed is null", () => {
+        it("should get the pitch number from the note being built when lastNotePlayed is null", () => {
             targetTurtle.singer.lastNotePlayed = null;
+            targetTurtle.singer.inNoteBlock = [32];
+            targetTurtle.singer.notePitches = { 32: ["E"] };
+            targetTurtle.singer.noteOctaves = { 32: [4] };
+            getNote.mockReturnValueOnce(["E", 4]);
+
             const pitchNumber = Turtle.DictActions._GetDict(0, turtle, "pitch number", 1);
+
             expect(pitchNumber).toBe(60);
-            expect(getNote).toHaveBeenCalled();
+            expect(getNote).toHaveBeenCalledWith(
+                "E",
+                4,
+                0,
+                "C",
+                true,
+                null,
+                activity.errorMsg,
+                "equal"
+            );
+            expect(pitchToNumber).toHaveBeenCalledWith("E", 4, "C");
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("should read the innermost note when notes are nested", () => {
+            targetTurtle.singer.lastNotePlayed = null;
+            targetTurtle.singer.inNoteBlock = [10, 20];
+            targetTurtle.singer.notePitches = { 10: ["C"], 20: ["A"] };
+            targetTurtle.singer.noteOctaves = { 10: [4], 20: [5] };
+
+            Turtle.DictActions._GetDict(0, turtle, "pitch number", 1);
+
+            expect(getNote.mock.calls[0].slice(0, 2)).toEqual(["A", 5]);
         });
 
         it("should handle error when getting pitch number with no notes", () => {
             targetTurtle.singer.lastNotePlayed = null;
-            targetTurtle.singer.notePitches = [];
             const pitchNumber = Turtle.DictActions._GetDict(0, turtle, "pitch number", 1);
             expect(pitchNumber).toBe(60);
+            expect(getNote).not.toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith(INVALIDPITCH, 1);
+            expect(pitchToNumber).toHaveBeenCalledWith("G", 4, "C");
+        });
+
+        it("should handle error when the note being built has no pitch yet", () => {
+            targetTurtle.singer.lastNotePlayed = null;
+            targetTurtle.singer.inNoteBlock = [32];
+            targetTurtle.singer.notePitches = { 32: [] };
+            targetTurtle.singer.noteOctaves = { 32: [] };
+
+            Turtle.DictActions._GetDict(0, turtle, "pitch number", 1);
+
+            expect(getNote).not.toHaveBeenCalled();
             expect(activity.errorMsg).toHaveBeenCalledWith(INVALIDPITCH, 1);
             expect(pitchToNumber).toHaveBeenCalledWith("G", 4, "C");
         });

@@ -52,6 +52,28 @@ describe("musicutils-lookups", () => {
         expect(lookups.getVoiceSynthName("electronic synth")).toBe("electronic synth");
     });
 
+    it("matches localized drum display names case-insensitively", () => {
+        const originalDrums = global.DRUMNAMES;
+
+        global.DRUMNAMES = [
+            ["caja", "snare drum", "images/snaredrum.svg", "sn", "drum"],
+            ["bombo", "kick drum", "images/kick.svg", "bd", "drum"],
+            ["tambor", "tom tom", "images/tom.svg", "tom", "drum"]
+        ];
+
+        try {
+            expect(lookups.getDrumName("BOMBO")).toBe("bombo");
+            expect(lookups.getDrumIcon("BOMBO")).toBe("images/kick.svg");
+            expect(lookups.getDrumSynthName("BOMBO")).toBe("kick drum");
+
+            expect(lookups.getDrumName("TAMBOR")).toBe("tambor");
+            expect(lookups.getDrumIcon("TAMBOR")).toBe("images/tom.svg");
+            expect(lookups.getDrumSynthName("TAMBOR")).toBe("tom tom");
+        } finally {
+            global.DRUMNAMES = originalDrums;
+        }
+    });
+
     it("looks up voice names by identifier when display names differ or are empty", () => {
         const originalVoices = global.VOICENAMES;
         global.VOICENAMES = [
@@ -128,7 +150,7 @@ describe("musicutils-lookups", () => {
         expect(lookups.getDrumName(undefined)).toBeNull();
         expect(lookups.getDrumIndex(123)).toBe(-1);
         expect(lookups.getDrumSymbol(null)).toBe("hh");
-        expect(lookups.getDrumIcon({})).toBe("images/drum.svg");
+        expect(lookups.getDrumIcon({})).toBe("images/snaredrum.svg");
         expect(lookups.getDrumSynthName(undefined)).toBeNull();
 
         expect(lookups.getNoiseName(123)).toBe("noise1");
@@ -138,6 +160,11 @@ describe("musicutils-lookups", () => {
         expect(lookups.getVoiceName(123)).toBe("electronic synth");
         expect(lookups.getVoiceIcon({})).toBe("images/voices.svg");
         expect(lookups.getVoiceSynthName(undefined)).toBeNull();
+
+        expect(lookups.getInvertMode(null)).toBeNull();
+        expect(lookups.getInvertMode(undefined)).toBeUndefined();
+        expect(lookups.getInvertMode(123)).toBe(123);
+        expect(lookups.getInvertMode({})).toEqual({});
 
         expect(lookups.getOscillatorTypes("")).toBeNull();
         expect(lookups.getOscillatorTypes(null)).toBeNull();
@@ -177,6 +204,8 @@ describe("musicutils-lookups", () => {
 
     it("looks up invert modes, intervals, filters and oscillators", () => {
         expect(lookups.getInvertMode("even")).toBe("even");
+        expect(lookups.getInvertMode("  EVEN  ")).toBe("even");
+        expect(lookups.getInvertMode("SCALAR")).toBe("scalar");
         expect(lookups.getInvertMode(null)).toBeNull();
         expect(lookups.getInvertMode(undefined)).toBeUndefined();
         expect(lookups.getInvertMode(123)).toBe(123);

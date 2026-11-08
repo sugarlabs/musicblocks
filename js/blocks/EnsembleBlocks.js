@@ -798,6 +798,7 @@ function setupEnsembleBlocks(activity) {
                     tur.singer.pitchNumberOffset;
                 activity.blocks.blockList[blk].value = value;
             }
+            return activity.blocks.blockList[blk].value;
         }
     }
 
@@ -872,6 +873,7 @@ function setupEnsembleBlocks(activity) {
                 }
                 activity.blocks.blockList[blk].value = -1;
             }
+            return activity.blocks.blockList[blk].value;
         }
     }
 
@@ -1249,7 +1251,7 @@ function setupEnsembleBlocks(activity) {
             }
             let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
             if (typeof a === "number") {
-                a -= 1; // Internally, we count from 0
+                a = Math.floor(a) - 1; // Internally, we count from 0
                 if (a >= 0 && a < activity.turtles.getTurtleCount()) {
                     return activity.turtles.getTurtle(a).name;
                 } else {

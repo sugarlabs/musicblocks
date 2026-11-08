@@ -23,13 +23,13 @@
    global
 
    _, Turtle, Singer, getNote, INVALIDPITCH, pitchToNumber,
-   getTargetTurtle, frequencyToPitch, noteToObj, isUnsafeObjectKey
+   getTargetTurtle, frequencyToPitch, noteToObj, isUnsafeObjectKey, last
  */
 
 /*
    Global Locations
     js/utils/utils.js
-        _
+        _, last
     js/turtle.js
         Turtle
     js/turtle-singer.js
@@ -157,10 +157,16 @@ function setupDictActions(activity) {
                     } else {
                         obj = noteToObj(targetTur.singer.lastNotePlayed[0]);
                     }
-                } else if (targetTur.singer.notePitches.length > 0) {
+                } else if (
+                    targetTur.singer.inNoteBlock.length > 0 &&
+                    targetTur.singer.notePitches[last(targetTur.singer.inNoteBlock)]?.length > 0
+                ) {
+                    // Before any note has played, read the note being built. notePitches is
+                    // keyed by note block, like in the pitch number block.
+                    const noteBlock = last(targetTur.singer.inNoteBlock);
                     obj = getNote(
-                        targetTur.singer.notePitches[0],
-                        targetTur.singer.noteOctaves[0],
+                        targetTur.singer.notePitches[noteBlock][0],
+                        targetTur.singer.noteOctaves[noteBlock][0],
                         0,
                         targetTur.singer.keySignature,
                         targetTur.singer.movable,

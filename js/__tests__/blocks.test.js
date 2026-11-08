@@ -182,6 +182,114 @@ describe("Viewport Culling", () => {
         expect(blocks.blockList[2]._viewportVisible).toBe(true);
     });
 
+    it("only checks blocks whose bounds overlap viewport grid cells", () => {
+        blocks.blockList = [
+            { trash: false, container: { x: 100, y: 100 }, width: 50, height: 30 },
+            { trash: false, container: { x: 2000, y: 2000 }, width: 50, height: 30 },
+            { trash: false, container: { x: 790, y: 100 }, width: 40, height: 30 }
+        ];
+        blocks._rebuildSpatialGrid();
+
+        const candidates = blocks._getViewportCandidates(0, 0, 800, 600);
+
+        expect([...candidates].sort()).toEqual([0, 2]);
+    });
+
+    it("culls initially visible blocks outside the viewport", () => {
+        blocks.blockList = [
+            { trash: false, container: { x: 2000, y: 2000 }, width: 50, height: 30 }
+        ];
+        blocks._rebuildSpatialGrid();
+
+        blocks._updateViewportCulling();
+
+        expect(blocks.blockList[0]._viewportVisible).toBe(false);
+    });
+
+    it("does not rescan all blocks on later culls when none are visible", () => {
+        let xReads = 0;
+        const block = {
+            container: {
+                get x() {
+                    xReads++;
+                    return 2000;
+                },
+                y: 2000
+            },
+            width: 50,
+            height: 30,
+            trash: false
+        };
+        blocks.blockList = [block];
+        blocks._rebuildSpatialGrid();
+        xReads = 0;
+
+        blocks._updateViewportCulling();
+        const firstPassReads = xReads;
+        blocks._updateViewportCulling();
+
+        expect(block._viewportVisible).toBe(false);
+        expect(firstPassReads).toBeGreaterThan(0);
+        expect(xReads).toBe(firstPassReads);
+    });
+
+    it("updates viewport grid membership when a block moves", () => {
+        blocks.blockList = [
+            { trash: false, container: { x: 100, y: 100 }, width: 50, height: 30, docks: [[0, 0]] }
+        ];
+        blocks._rebuildSpatialGrid();
+        blocks.blockList[0].container.x = 2000;
+        blocks._updateSpatialGrid(0);
+
+        expect(blocks._getViewportCandidates(0, 0, 800, 600).has(0)).toBe(false);
+        expect(blocks._getViewportCandidates(2000, 100, 2800, 700).has(0)).toBe(true);
+    });
+
+    it("keeps trashed blocks out of viewport candidates after updates and rebuilds", () => {
+        blocks.blockList = [{ trash: false, container: { x: 100, y: 100 }, width: 50, height: 30 }];
+        blocks._rebuildSpatialGrid();
+        blocks.blockList[0].trash = true;
+
+        blocks._updateSpatialGrid(0);
+        expect(blocks._getViewportCandidates(0, 0, 800, 600).has(0)).toBe(false);
+
+        blocks._rebuildSpatialGrid();
+        expect(blocks._getViewportCandidates(0, 0, 800, 600).has(0)).toBe(false);
+    });
+
+    it("falls back for block coordinates outside the safe integer range", () => {
+        blocks.blockList = [
+            {
+                trash: false,
+                container: { x: 1e18, y: 1e18 },
+                width: 50,
+                height: 30,
+                docks: [[0, 0]]
+            }
+        ];
+
+        expect(() => blocks._updateSpatialGrid(0)).not.toThrow();
+        expect(blocks._viewportFallback.has(0)).toBe(true);
+        expect(blocks._getViewportCandidates(0, 0, 800, 600).has(0)).toBe(true);
+    });
+
+    it("falls back when block bounds span too many grid cells", () => {
+        blocks.blockList = [
+            { trash: false, container: { x: 0, y: 0 }, width: 1e9, height: 30, docks: [[0, 0]] }
+        ];
+
+        blocks._updateSpatialGrid(0);
+
+        expect(blocks._viewportFallback.has(0)).toBe(true);
+    });
+
+    it("falls back to a block scan for a viewport outside the safe integer range", () => {
+        blocks.blockList = [{ trash: false, container: { x: 100, y: 100 }, width: 50, height: 30 }];
+        blocks._rebuildSpatialGrid();
+
+        expect([...blocks._getViewportCandidates(1e18, 0, 1e18 + 800, 600)]).toEqual([0]);
+    });
+
     it("should mark blocks outside the viewport as not visible", () => {
         blocks.blockList = [
             { trash: false, container: { x: -200, y: 100 }, width: 50, height: 30 },
@@ -1401,6 +1509,48 @@ describe("Blocks Foundation", () => {
                 [1, ["apple", { value: 2 }], 0, 0, [0]]
             ]);
         });
+
+        it("copies the Pitch-Drum Matrix cells, moving the block ids like connections", () => {
+            const blocks = new Blocks(mockActivity);
+            mockActivity.blocksContainer.x = 0;
+            mockActivity.blocksContainer.y = 0;
+            const makeBlock = (name, connections, extra) => ({
+                name,
+                connections,
+                isValueBlock: jest.fn().mockReturnValue(false),
+                ...extra
+            });
+            blocks.blockList = [
+                makeBlock("start", [null, 1, null]),
+                makeBlock("pitchdrummatrix", [0, 2, null], {
+                    // The last cell is for a pitch block outside the copy.
+                    drumCells: [
+                        [2, 3, 0],
+                        [2, 3, 1],
+                        [9, 3, 0]
+                    ]
+                }),
+                makeBlock("pitch", [1, null, null, 3]),
+                makeBlock("playdrum", [2, null, null])
+            ];
+            blocks.selectedStack = 1;
+
+            expect(blocks._copyBlocksToObj(false)[0]).toEqual([
+                0,
+                [
+                    "pitchdrummatrix",
+                    {
+                        drumCells: [
+                            [1, 2, 0],
+                            [1, 2, 1]
+                        ]
+                    }
+                ],
+                75,
+                75,
+                [null, 1, null]
+            ]);
+        });
     });
 
     describe("Unknown Blocks", () => {
@@ -2136,6 +2286,45 @@ describe("Blocks Foundation", () => {
             ]);
         });
 
+        it("restores the Pitch-Drum Matrix cells, moving the block ids like connections", () => {
+            const blocks = new Blocks(mockActivity);
+            // Two blocks already in the workspace, so the loaded blocks start at 2.
+            blocks.blockList = [null, null];
+            blocks.protoBlockDict = {
+                pitchdrummatrix: { hasCapability: () => false, dockTypes: [] }
+            };
+            blocks.setActionProtoVisibility = jest.fn();
+            blocks._updateSpatialGrid = jest.fn();
+            blocks._makeNewBlockWithConnections = jest.fn(
+                (name, offset, conns, postProcess, args) => {
+                    blocks.blockList[args[0]] = {
+                        name,
+                        connections: [null, null, null],
+                        container: { x: 0, y: 0 }
+                    };
+                    postProcess(args);
+                }
+            );
+
+            const drumCells = [
+                [1, 2, 0],
+                // The second row of a repeated pitch block.
+                [1, 2, 1],
+                "not a cell",
+                [-1, 2, 0],
+                [1, null, 0],
+                [1, 2, "0"]
+            ];
+            blocks.loadNewBlocks([
+                [0, ["pitchdrummatrix", { collapsed: false, drumCells }], 0, 0, [null, null, null]]
+            ]);
+
+            expect(blocks.blockList[2].drumCells).toEqual([
+                [3, 4, 0],
+                [3, 4, 1]
+            ]);
+        });
+
         // SwitchBlock.flow hooks its case onto the block after the switch
         // (Logo.setDispatchBlock). Without the hidden block the switch macro
         // adds, the case runs after that block, or never when the switch is
@@ -2680,6 +2869,11 @@ describe("Blocks Foundation", () => {
         const makeBatch = n =>
             Array.from({ length: n }, (_, i) => [i, "forward", 0, 0, [null, null, null]]);
 
+        // Subscribe before starting a load so even synchronous events are captured.
+        // Jest's test timeout bounds the wait if the expected event never arrives.
+        const nextLoadEvent = eventName =>
+            new Promise(resolve => global.pubsub.once(eventName, resolve));
+
         // Stands in for the real path: block.js calls cleanupAfterLoad()
         // once a block's own artwork generation finishes, asynchronously,
         // after _processOneBlock has already recorded the block for the
@@ -3116,20 +3310,26 @@ describe("Blocks Foundation", () => {
             const callback = jest.fn();
 
             try {
-                blocks.loadNewBlocks(makeBatch(25));
+                const loadFailed = nextLoadEvent("loadFailed");
+                const failedToken = blocks.loadNewBlocks(makeBatch(25));
                 blocks.runAfterLoad(callback);
-                await new Promise(r => setTimeout(r, 50));
+                expect(callback).not.toHaveBeenCalled();
+                expect((await loadFailed).token).toBe(failedToken);
             } finally {
                 window.removeEventListener("error", onWindowError);
             }
 
             expect(blocks._lastLoadFailed).toBe(true);
+            expect(blocks.isLoading()).toBe(false);
             expect(callback).not.toHaveBeenCalled();
 
             blocks._processOneBlock = stubProcessOneBlock();
-            blocks.loadNewBlocks(makeBatch(2));
-            await new Promise(r => setTimeout(r, 50));
+            const recovered = nextLoadEvent("finishedLoading");
+            const recoveryToken = blocks.loadNewBlocks(makeBatch(2));
+            expect((await recovered).token).toBe(recoveryToken);
 
+            expect(blocks.isLoading()).toBe(false);
+            expect(blocks._lastLoadFailed).toBe(false);
             expect(callback).not.toHaveBeenCalled();
         });
 
@@ -3148,16 +3348,21 @@ describe("Blocks Foundation", () => {
             const callback = jest.fn();
 
             try {
-                blocks.loadNewBlocks(makeBatch(25));
-                blocks.loadNewBlocks(makeBatch(2));
+                const loadFailed = nextLoadEvent("loadFailed");
+                const queuedLoadFinished = nextLoadEvent("finishedLoading");
+                const failedToken = blocks.loadNewBlocks(makeBatch(25));
+                const queuedToken = blocks.loadNewBlocks(makeBatch(2));
                 blocks.runAfterLoad(callback);
-                await new Promise(r => setTimeout(r, 50));
+                expect(callback).not.toHaveBeenCalled();
+                expect((await loadFailed).token).toBe(failedToken);
+                expect((await queuedLoadFinished).token).toBe(queuedToken);
             } finally {
                 window.removeEventListener("error", onWindowError);
             }
 
             expect(blocks._lastLoadFailed).toBe(false);
             expect(blocks.isLoading()).toBe(false);
+            expect(blocks._loadQueue).toHaveLength(0);
             expect(callback).not.toHaveBeenCalled();
         });
 
@@ -3165,12 +3370,15 @@ describe("Blocks Foundation", () => {
             const callback = jest.fn();
             const circularBatch = [[0, "forward", 0, 0, [0, null, null]]];
 
-            blocks.loadNewBlocks(makeBatch(25));
+            const firstLoadFinished = nextLoadEvent("finishedLoading");
+            const firstToken = blocks.loadNewBlocks(makeBatch(25));
             blocks.loadNewBlocks(circularBatch);
             blocks.runAfterLoad(callback);
-            await new Promise(r => setTimeout(r, 50));
+            expect(callback).not.toHaveBeenCalled();
+            expect((await firstLoadFinished).token).toBe(firstToken);
 
             expect(blocks.isLoading()).toBe(false);
+            expect(blocks._loadQueue).toHaveLength(0);
             expect(mockActivity.errorMsg).toHaveBeenCalled();
             expect(callback).not.toHaveBeenCalled();
         });
@@ -5613,6 +5821,36 @@ describe("sendStackToTrash – turtle container guard", () => {
         expect(container1.visible).toBe(false);
         expect(mockTurtleList[0].inTrash).toBe(true);
         expect(mockTurtleList[1].inTrash).toBe(true);
+    });
+
+    it("should trash companion turtle and hide container when companion is index 0", () => {
+        const container0 = { visible: true, uncache: jest.fn() };
+        const container1 = { visible: true, uncache: jest.fn() };
+        const myBlock = makeStartBlock(1);
+        blocks.blockList = [myBlock];
+
+        mockTurtleList[0] = { container: container0, inTrash: false };
+        mockTurtleList[1] = { container: container1, inTrash: false, companionTurtle: 0 };
+
+        blocks.sendStackToTrash(myBlock);
+
+        expect(container0.visible).toBe(false);
+        expect(container1.visible).toBe(false);
+        expect(mockTurtleList[0].inTrash).toBe(true);
+        expect(mockTurtleList[1].inTrash).toBe(true);
+    });
+
+    it("should hide container when turtle has no companionTurtle", () => {
+        const mockContainer = { visible: true, uncache: jest.fn() };
+        const myBlock = makeStartBlock(0);
+        blocks.blockList = [myBlock];
+
+        mockTurtleList[0] = { container: mockContainer, inTrash: false };
+
+        blocks.sendStackToTrash(myBlock);
+
+        expect(mockContainer.visible).toBe(false);
+        expect(mockTurtleList[0].inTrash).toBe(true);
     });
 
     describe("_adjustExpandableTwoArgBlock", () => {

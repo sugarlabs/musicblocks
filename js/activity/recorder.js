@@ -177,8 +177,21 @@ const setupActivityRecorder = activityInstance => {
                 currentStream.getTracks().forEach(track => track.stop());
                 currentStream = null;
             }
-            if (audioDestination && audioDestination.stream) {
-                audioDestination.stream.getTracks().forEach(track => track.stop());
+            if (audioDestination) {
+                // Stopping the tracks doesn't take the node out of the audio
+                // graph, so disconnect it too. Otherwise every canvas recording
+                // leaves one more node connected for the rest of the session.
+                const Tone = that.logo && that.logo.synth && that.logo.synth.tone;
+                try {
+                    if (Tone && Tone.Destination) {
+                        Tone.Destination.disconnect(audioDestination);
+                    }
+                } catch (e) {
+                    // already disconnected
+                }
+                if (audioDestination.stream) {
+                    audioDestination.stream.getTracks().forEach(track => track.stop());
+                }
                 audioDestination = null;
             }
             mediaRecorder = null;
@@ -203,6 +216,7 @@ const setupActivityRecorder = activityInstance => {
             };
 
             if (!recordedChunks || recordedChunks.length === 0) {
+                cleanupStreams();
                 showAlert(_("Recorded file is empty. File not saved."));
                 flag = 0;
                 isExecuting = false;
@@ -214,6 +228,7 @@ const setupActivityRecorder = activityInstance => {
             const blob = new Blob(recordedChunks, { type: "video/webm" });
 
             if (blob.size === 0) {
+                cleanupStreams();
                 showAlert(_("Recorded file is empty. File not saved."));
                 flag = 0;
                 isExecuting = false;

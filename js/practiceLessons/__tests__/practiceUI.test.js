@@ -1068,6 +1068,17 @@ describe("ExplorerJournalUI general note page", () => {
         expect(notes[0].text).toBe("rewritten");
     });
 
+    test("will not save an entry edited down to blank", () => {
+        const { page, container } = openNote();
+        const noteId = page.artifacts.notes[0].id;
+        container.querySelector(`textarea[data-note-id="${noteId}"]`).value = "   ";
+
+        container.querySelector(`.journal-update-note[data-note-id="${noteId}"]`).onclick();
+
+        expect(PracticeManager.getGeneralNote(page.id).artifacts.notes[0].text).toBe("first");
+        expect(document.getElementById("practice-quest-notice").className).toContain("hint");
+    });
+
     test("removes an entry", () => {
         const { page, container } = openNote();
         const noteId = page.artifacts.notes[0].id;
@@ -1140,6 +1151,19 @@ describe("ExplorerJournalUI lesson page notes", () => {
         container.querySelector(`.journal-delete-note[data-note-id="${noteId}"]`).onclick();
 
         expect(PracticeManager.getJournalPage(1).artifacts.notes).toEqual([]);
+    });
+
+    test("will not save a memory edited down to blank", () => {
+        PracticeManager.saveJournalNote(PracticeProblems[0], "first", "Why?");
+        const noteId = PracticeManager.getJournalPage(1).artifacts.notes[0].id;
+        const container = mountJournalContent();
+        ExplorerJournalUI.renderLessonPage(1);
+
+        container.querySelector(`textarea[data-note-id="${noteId}"]`).value = "";
+        container.querySelector(`.journal-update-note[data-note-id="${noteId}"]`).onclick();
+
+        expect(PracticeManager.getJournalPage(1).artifacts.notes[0].text).toBe("first");
+        expect(document.getElementById("practice-quest-notice").className).toContain("hint");
     });
 });
 

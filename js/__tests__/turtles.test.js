@@ -185,9 +185,9 @@ describe("markAllAsStopped", () => {
     });
 
     test("should set running to false for all turtles", () => {
-        const turtle1 = { running: true };
-        const turtle2 = { running: true };
-        const turtle3 = { running: true };
+        const turtle1 = { running: true, stopBlink: jest.fn() };
+        const turtle2 = { running: true, stopBlink: jest.fn() };
+        const turtle3 = { running: true, stopBlink: jest.fn() };
 
         turtles._turtleList = [turtle1, turtle2, turtle3];
         turtles.getTurtleCount = jest.fn().mockReturnValue(3);
@@ -198,6 +198,20 @@ describe("markAllAsStopped", () => {
         expect(turtle1.running).toBe(false);
         expect(turtle2.running).toBe(false);
         expect(turtle3.running).toBe(false);
+    });
+
+    test("should stop any pending blink on every turtle", () => {
+        const turtle1 = { running: true, stopBlink: jest.fn() };
+        const turtle2 = { running: false, stopBlink: jest.fn() };
+
+        turtles._turtleList = [turtle1, turtle2];
+        turtles.getTurtleCount = jest.fn().mockReturnValue(2);
+        turtles.getTurtle = jest.fn(i => turtles._turtleList[i]);
+
+        turtles.markAllAsStopped();
+
+        expect(turtle1.stopBlink).toHaveBeenCalledTimes(1);
+        expect(turtle2.stopBlink).toHaveBeenCalledTimes(1);
     });
 
     test("should call refreshCanvas after stopping all turtles", () => {
@@ -217,8 +231,8 @@ describe("markAllAsStopped", () => {
     });
 
     test("should stop turtles that are already stopped without error", () => {
-        const turtle1 = { running: false };
-        const turtle2 = { running: true };
+        const turtle1 = { running: false, stopBlink: jest.fn() };
+        const turtle2 = { running: true, stopBlink: jest.fn() };
 
         turtles._turtleList = [turtle1, turtle2];
         turtles.getTurtleCount = jest.fn().mockReturnValue(2);
