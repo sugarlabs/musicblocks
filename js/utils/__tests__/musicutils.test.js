@@ -1767,9 +1767,14 @@ describe("pitchToNumber", () => {
     });
 
     it("should place C-flat below C in 31-EDO", () => {
-        expect(pitchToNumber("C♭", 4, "C major", "equal31")).toBe(
-            pitchToNumber("C", 4, "C major", "equal31") - 1
-        );
+        const cFlat = pitchToNumber("C♭", 4, "C major", "equal31");
+        expect(cFlat).toBe(pitchToNumber("C", 4, "C major", "equal31") - 1);
+        expect(numberToPitch(cFlat, "equal31")).toEqual(["C♭", 4]);
+    });
+
+    it("should map quarter-comma meantone notes using temperament labels", () => {
+        expect(pitchToNumber("F♭", 4, "C major", "1/4 comma meantone")).toBe(76);
+        expect(pitchToNumber("E♯", 4, "C major", "1/4 comma meantone")).toBe(77);
     });
 
     it("should handle lowercase pitches in alternate tunings (equal19)", () => {
