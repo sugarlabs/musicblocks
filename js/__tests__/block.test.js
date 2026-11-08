@@ -614,6 +614,17 @@ describe("Block Foundation", () => {
                 global.NSYMBOLS = global.NSYMBOLS || {};
                 global.RSYMBOLS = global.RSYMBOLS || {};
                 global.DEGREES = global.DEGREES || "unison 2nd 3rd 4th 5th 6th 7th octave";
+                global.SHARP = "♯";
+                global.FLAT = "♭";
+                global.DOUBLESHARP = "𝄪";
+                global.DOUBLEFLAT = "𝄫";
+                global.NATURAL = "♮";
+                global.splitScaleDegree = jest.fn(val => {
+                    if (val && val.includes("♯")) {
+                        return [val.replace("♯", ""), "♯"];
+                    }
+                    return [val, global.NATURAL];
+                });
             });
 
             it("should not throw for a note whose divide has an empty slot", () => {
@@ -639,6 +650,333 @@ describe("Block Foundation", () => {
                 mockBlocks.findNoteBlock = jest.fn(() => null);
 
                 expect(() => block._intervalLabel()).not.toThrow();
+            });
+
+            it("should return empty string from _getPitch when connection is null or missing", () => {
+                mockBlocks.blockList = [block];
+                expect(block._getPitch(null)).toBe("");
+                expect(block._getPitch(999)).toBe("");
+            });
+
+            it("should return empty string from _getPitch when pitch block has disconnected octave slot", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "pitch", connections: [0, 2, null] },
+                    { name: "notename", value: "C" }
+                ];
+                expect(block._getPitch(1)).toBe("");
+            });
+
+            it("should return empty string from _getPitch when pitch block has disconnected note name slot", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "pitch", connections: [0, null, 2] },
+                    { name: "number", value: 4 }
+                ];
+                expect(block._getPitch(1)).toBe("");
+            });
+
+            it("should return empty string from _getPitch when nthmodalpitch has an empty slot", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "nthmodalpitch", connections: [0, null, 2] },
+                    { name: "number", value: 4 }
+                ];
+                expect(block._getPitch(1)).toBe("");
+
+                mockBlocks.blockList[1].connections = [0, 2, null];
+                expect(block._getPitch(1)).toBe("");
+            });
+
+            it("should return empty string from _getPitch when hertz, steppitch, or pitchnumber has an empty slot", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "hertz", connections: [null, null] },
+                    { name: "steppitch", connections: [0, null] },
+                    { name: "pitchnumber", connections: [0, null] }
+                ];
+                expect(block._getPitch(1)).toBe("");
+                expect(block._getPitch(2)).toBe("");
+                expect(block._getPitch(3)).toBe("");
+            });
+
+            it("should resolve valid pitches correctly in _getPitch", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "pitch", connections: [0, 2, 3] },
+                    { name: "notename", value: "A" },
+                    { name: "number", value: 4 },
+                    { name: "hertz", connections: [null, 5] },
+                    { name: "number", value: 440 },
+                    { name: "steppitch", connections: [0, 7] },
+                    { name: "number", value: -2 },
+                    { name: "pitchnumber", connections: [0, 9] },
+                    { name: "number", value: 60 }
+                ];
+                expect(block._getPitch(1)).toBe("A 4");
+                expect(block._getPitch(4)).toBe("440HZ");
+                expect(block._getPitch(6)).toBe("down 2");
+                expect(block._getPitch(8)).toBe("pitch 60");
+            });
+
+            it("should format solfege pitches with various accidentals and fallbacks in _getPitch", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "pitch", connections: [0, 2, 8] },
+                    { name: "solfege", value: "do" },
+                    { name: "solfege", value: "fa" + global.SHARP },
+                    { name: "solfege", value: "la" + global.FLAT },
+                    { name: "solfege", value: "sol" + global.DOUBLESHARP },
+                    { name: "solfege", value: "mi" + global.DOUBLEFLAT },
+                    { name: "solfege", value: "unknown" },
+                    { name: "number", value: 4 }
+                ];
+
+                // uninflected solfege
+                expect(block._getPitch(1)).toBe("do 4");
+
+                // sharp
+                mockBlocks.blockList[1].connections[1] = 3;
+                expect(block._getPitch(1)).toBe("fa" + global.SHARP + " 4");
+
+                // flat
+                mockBlocks.blockList[1].connections[1] = 4;
+                expect(block._getPitch(1)).toBe("la" + global.FLAT + " 4");
+
+                // double sharp
+                mockBlocks.blockList[1].connections[1] = 5;
+                expect(block._getPitch(1)).toBe("sol" + global.DOUBLESHARP + " 4");
+
+                // double flat
+                mockBlocks.blockList[1].connections[1] = 6;
+                expect(block._getPitch(1)).toBe("mi" + global.DOUBLEFLAT + " 4");
+
+                // unknown note fallback
+                mockBlocks.blockList[1].connections[1] = 7;
+                expect(block._getPitch(1)).toBe("unknown 4");
+            });
+
+            it("should format scaledegree2 pitches in _getPitch", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "pitch", connections: [0, 2, 4] },
+                    { name: "scaledegree2", value: "1" },
+                    { name: "scaledegree2", value: "3♯" },
+                    { name: "number", value: 4 }
+                ];
+
+                // natural degree
+                expect(block._getPitch(1)).toBe("1 4");
+
+                // accidental degree
+                mockBlocks.blockList[1].connections[1] = 3;
+                expect(block._getPitch(1)).toBe("3♯ 4");
+            });
+
+            it("should format nthmodalpitch both in-range and out-of-range in _getPitch", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "nthmodalpitch", connections: [0, 2, 3] },
+                    { name: "number", value: 2 },
+                    { name: "number", value: 4 }
+                ];
+                expect(block._getPitch(1)).toBe("3rd 4");
+
+                mockBlocks.blockList[2].value = 99;
+                expect(block._getPitch(1)).toBe("99 4");
+
+                // fractional value: rounds to nearest integer index
+                mockBlocks.blockList[2].value = 2.4;
+                expect(block._getPitch(1)).toBe("3rd 4");
+
+                mockBlocks.blockList[2].value = 2.6;
+                expect(block._getPitch(1)).toBe("4th 4");
+            });
+
+            it("should format hertz via connection 0 in _getPitch", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "hertz", connections: [2, null] },
+                    { name: "number", value: 220 }
+                ];
+                expect(block._getPitch(1)).toBe("220HZ");
+            });
+
+            it("should format steppitch positive (up) in _getPitch", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "steppitch", connections: [0, 2] },
+                    { name: "number", value: 5 }
+                ];
+                expect(block._getPitch(1)).toBe("up 5");
+            });
+
+            it("should return expected labels for playdrum, rest2, and unknown in _getPitch", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "playdrum" },
+                    { name: "rest2" },
+                    { name: "unknown" }
+                ];
+                expect(block._getPitch(1)).toBe("drum");
+                expect(block._getPitch(2)).toBe("silence");
+                expect(block._getPitch(3)).toBe("");
+            });
+
+            it("should return empty string from _getPitch when connection points to out-of-range index", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "pitch", connections: [0, 999, 2] },
+                    { name: "number", value: 4 }
+                ];
+                expect(block._getPitch(1)).toBe("");
+
+                mockBlocks.blockList[1].connections = [0, 2, 999];
+                expect(block._getPitch(1)).toBe("");
+            });
+
+            it("should format collapsed newnote label cleanly when pitch is empty but duration is present", () => {
+                block.name = "newnote";
+                block.connections = [null, 1, 4];
+                mockBlocks.blockList = [
+                    block,
+                    { name: "divide", connections: [0, 2, 3] },
+                    { name: "number", value: 1, connections: [1] },
+                    { name: "number", value: 4, connections: [1] },
+                    { name: "pitch", connections: [0, null, null] }
+                ];
+                mockBlocks.findFirstPitchBlock = jest.fn(c => (c === 4 ? 4 : null));
+
+                block._newNoteLabel();
+                expect(block.collapseText.text).toBe("1/4");
+            });
+
+            it("should format collapsed newnote label cleanly when duration is empty but pitch is present", () => {
+                block.name = "newnote";
+                block.connections = [null, null, 1];
+                mockBlocks.blockList = [
+                    block,
+                    { name: "pitch", connections: [0, 2, 3] },
+                    { name: "notename", value: "C", connections: [1] },
+                    { name: "number", value: 4, connections: [1] }
+                ];
+                mockBlocks.findFirstPitchBlock = jest.fn(c => (c === 1 ? 1 : null));
+
+                block._newNoteLabel();
+                expect(block.collapseText.text).toBe("C 4");
+            });
+
+            it("should format collapsed osctime label cleanly when pitch is empty but time is present", () => {
+                block.name = "osctime";
+                block.connections = [null, 1, 6];
+                mockBlocks.blockList = [
+                    block,
+                    { name: "divide", connections: [0, 2, 3] },
+                    { name: "number", value: 1000, connections: [1] },
+                    { name: "divide", connections: [1, 4, 5] },
+                    { name: "number", value: 2, connections: [3] },
+                    { name: "number", value: 1, connections: [3] },
+                    { name: "pitch", connections: [0, null, null] }
+                ];
+                mockBlocks.findFirstPitchBlock = jest.fn(c => (c === 6 ? 6 : null));
+
+                block._oscTimeLabel();
+                expect(block.collapseText.text).toBe("500");
+            });
+
+            it("should omit non-finite oscillator time when division by zero occurs in _oscTimeLabel", () => {
+                block.name = "osctime";
+                block.connections = [null, 1, 6];
+                mockBlocks.blockList = [
+                    block,
+                    { name: "divide", connections: [0, 2, 3] },
+                    { name: "number", value: 1000, connections: [1] },
+                    { name: "divide", connections: [1, 4, 5] },
+                    { name: "number", value: 0, connections: [3] }, // division by zero
+                    { name: "number", value: 1, connections: [3] },
+                    { name: "pitch", connections: [0, 7, 8] },
+                    { name: "notename", value: "C", connections: [6] },
+                    { name: "number", value: 4, connections: [6] }
+                ];
+                mockBlocks.findFirstPitchBlock = jest.fn(c => (c === 6 ? 6 : null));
+
+                block._oscTimeLabel();
+                // Non-finite time must be omitted; only pitch should be shown
+                expect(block.collapseText.text).toBe("C 4");
+            });
+
+            it("should omit non-finite oscillator time in silence display in _oscTimeLabel", () => {
+                block.name = "osctime";
+                block.connections = [null, 1, null];
+                mockBlocks.blockList = [
+                    block,
+                    { name: "divide", connections: [0, 2, 3] },
+                    { name: "number", value: 1000, connections: [1] },
+                    { name: "divide", connections: [1, 4, 5] },
+                    { name: "number", value: 0, connections: [3] },
+                    { name: "number", value: 1, connections: [3] }
+                ];
+                mockBlocks.findFirstPitchBlock = jest.fn(() => null);
+
+                block._oscTimeLabel();
+                expect(block.collapseText.text).toBe("silence");
+            });
+
+            it("should format combined pitch and finite time in _oscTimeLabel", () => {
+                block.name = "osctime";
+                block.connections = [null, 1, 6];
+                mockBlocks.blockList = [
+                    block,
+                    { name: "divide", connections: [0, 2, 3] },
+                    { name: "number", value: 1000, connections: [1] },
+                    { name: "divide", connections: [1, 4, 5] },
+                    { name: "number", value: 4, connections: [3] },
+                    { name: "number", value: 1, connections: [3] },
+                    { name: "pitch", connections: [0, 7, 8] },
+                    { name: "notename", value: "A", connections: [6] },
+                    { name: "number", value: 4, connections: [6] }
+                ];
+                mockBlocks.findFirstPitchBlock = jest.fn(c => (c === 6 ? 6 : null));
+
+                block._oscTimeLabel();
+                expect(block.collapseText.text).toBe("A 4 | 250");
+            });
+
+            it("should not throw in _newNoteLabel when child pitch block has empty slot", () => {
+                block.name = "newnote";
+                block.connections = [null, null, 1];
+                mockBlocks.blockList = [block, { name: "pitch", connections: [0, null, null] }];
+                mockBlocks.findFirstPitchBlock = jest.fn(c => (c === 1 ? 1 : null));
+
+                expect(() => block._newNoteLabel()).not.toThrow();
+                expect(block.collapseText.text).toBe("note value");
+            });
+
+            it("should not throw in _intervalLabel when child pitch block has empty slot", () => {
+                block.name = "interval";
+                block.blockIndex = 0;
+                block.connections = [null, null, null];
+                mockBlocks.blockList = [
+                    block,
+                    { name: "note", connections: [0, null, 2] },
+                    { name: "pitch", connections: [1, null, null] }
+                ];
+                mockBlocks.findNestedIntervalBlock = jest.fn(() => null);
+                mockBlocks.findNoteBlock = jest.fn(() => 1);
+                mockBlocks.findFirstPitchBlock = jest.fn(c => (c === 2 ? 2 : null));
+
+                expect(() => block._intervalLabel()).not.toThrow();
+                expect(block.collapseText.text).toContain("scalar interval");
+            });
+
+            it("should not throw in _oscTimeLabel when child pitch block has empty slot", () => {
+                block.name = "osctime";
+                block.connections = [null, null, 1];
+                mockBlocks.blockList = [block, { name: "pitch", connections: [0, null, null] }];
+                mockBlocks.findFirstPitchBlock = jest.fn(c => (c === 1 ? 1 : null));
+
+                expect(() => block._oscTimeLabel()).not.toThrow();
+                expect(block.collapseText.text).toBe("note value");
             });
         });
 
@@ -1559,6 +1897,25 @@ describe("Block Foundation", () => {
     });
 
     describe("show", () => {
+        it("updates viewport tracking when showing a block", () => {
+            mockBlocks._updateViewportGrid = jest.fn();
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.blockIndex = 7;
+            b._viewportVisible = false;
+            b.container = { visible: false };
+            b.bitmap = { visible: false };
+            b.highlightBitmap = { visible: false };
+            b.disconnectedBitmap = null;
+            b.disconnectedHighlightBitmap = null;
+            b.updateCache = jest.fn();
+            b._setupAccessibleElement = jest.fn();
+
+            b.show();
+
+            expect(b._viewportVisible).toBe(true);
+            expect(mockBlocks._updateViewportGrid).toHaveBeenCalledWith(7);
+        });
+
         it("should not throw when container is null and not trashed", () => {
             const b = new Block(mockProtoBlock, mockBlocks);
             b.container = null;
@@ -1734,6 +2091,7 @@ describe("Block Foundation", () => {
             mockBlocks.invalidateTopBlockCache = jest.fn();
             mockBlocks.unhighlight = jest.fn();
             mockBlocks.syncDragGroupSpatialGrid = jest.fn();
+            mockBlocks._updateViewportCulling = jest.fn();
 
             block.activity.getStageScale = jest.fn().mockReturnValue(1);
             block.activity.blocksContainer = { y: 0 };
@@ -1817,12 +2175,20 @@ describe("Block Foundation", () => {
             };
             mockBlocks.longPressTimeout = null;
             mockBlocks.syncDragGroupSpatialGrid = jest.fn(() => order.push("sync-grid"));
+            mockBlocks._updateViewportCulling = jest.fn(() => order.push("cull"));
             mockBlocks.blockMoved = jest.fn(() => order.push("dock"));
             mockBlocks.adjustDocks = jest.fn(() => order.push("adjust"));
 
             block._mouseoutCallback({ stageX: 100, stageY: 100 }, true, false, false, true, true);
 
-            expect(order).toEqual(["restore", "sync-grid", "query-trash", "dock", "adjust"]);
+            expect(order).toEqual([
+                "restore",
+                "sync-grid",
+                "cull",
+                "query-trash",
+                "dock",
+                "adjust"
+            ]);
         });
 
         it("waits for asynchronous blockMoved resolution before adjusting docks at stack top", async () => {
@@ -1838,6 +2204,7 @@ describe("Block Foundation", () => {
             };
             mockBlocks.longPressTimeout = null;
             mockBlocks.syncDragGroupSpatialGrid = jest.fn();
+            mockBlocks._updateViewportCulling = jest.fn();
             mockBlocks.findTopBlock = jest.fn().mockReturnValue(0);
             mockBlocks.adjustDocks = jest.fn();
 
@@ -1937,10 +2304,12 @@ describe("Block Foundation", () => {
             block.activity.trashcan = { hide: jest.fn() };
             mockBlocks.longPressTimeout = null;
             mockBlocks.syncDragGroupSpatialGrid = jest.fn();
+            mockBlocks._updateViewportCulling = jest.fn();
 
             block._mouseoutCallback({}, false, false, false, true, false);
 
             expect(mockBlocks.syncDragGroupSpatialGrid).not.toHaveBeenCalled();
+            expect(mockBlocks._updateViewportCulling).not.toHaveBeenCalled();
         });
     });
 

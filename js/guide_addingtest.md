@@ -1,6 +1,6 @@
 # Test Suite Guidelines
 
-The Music Blocks repository follows a structured approach for testing using **Jest**. All tests should be placed inside the `_tests_` directory to ensure consistency and maintainability.
+The Music Blocks repository follows a structured approach for testing using **Jest**. All tests should be placed inside the `__tests__` directory to ensure consistency and maintainability.
 
 ## 🛠 Setting Up the Test Environment
 
@@ -27,18 +27,18 @@ npm test -- --verbose
 ```
 /musicblocks
 │── js/                 # Source code
-│── js/_tests_/         # Test directory
-│── js/utils/_tests_/   # Tests for the utils subdirectory (same format is followed for each directory)
+│── js/__tests__/       # Test directory
+│── js/utils/__tests__/ # Tests for the utils subdirectory (same format is followed for each directory)
 │── jest.config.js      # Jest configuration (try not to edit this)
 │── package.json        # Project dependencies
-│── js/guide_test.md    # This guide
+│── js/guide_addingtest.md # This guide
 ```
 
 ## 📌 Key Guidelines Before Writing Tests
 
 ### ✅ General Rules
 
-- All test files **must be placed inside the `_tests_` folder of the respective directory**.
+- All test files **must be placed inside the `__tests__` folder of the respective directory**.
 - Follow the naming convention: **`<filename>.test.js`**.
 - Ensure **100% function coverage** when adding tests.
 - **Mock dependencies** where necessary to isolate unit tests.
@@ -83,7 +83,7 @@ describe("My Function Tests", () => {
 
 ❌ Making changes in the root file.  
 ❌ Modifying `jest.config.js` unnecessarily.  
-❌ Placing test files **outside** `_tests_` (always keep them inside).  
+❌ Placing test files **outside** `__tests__` (always keep them inside).  
 ❌ Using `var` or `let` for imports (always use `const`).  
 ❌ Forgetting to mock dependencies when needed.  
 ❌ Not handling async tests properly (use `async/await` or `done`).
@@ -94,7 +94,7 @@ describe("My Function Tests", () => {
 To run a specific test file:
 
 ```sh
-npm test _tests_/filename.test.js
+npm test __tests__/filename.test.js
 ```
 
 To watch tests while coding:

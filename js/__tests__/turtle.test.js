@@ -1686,10 +1686,104 @@ describe("Turtle.TurtleView", () => {
             expect(view._bitmap.clone).toHaveBeenCalled();
             expect(startBlock.container.addChild).toHaveBeenCalledWith(view._decorationBitmap);
             expect(view._decorationBitmap.name).toBe("decoration");
-            // x = width - (40 * scale) / 2, y = (35 * scale) / 2, scale 2
-            expect(view._decorationBitmap.x).toBe(160);
-            expect(view._decorationBitmap.y).toBe(35);
+            expect(view._decorationBitmap.regX).toBe(0);
+            expect(view._decorationBitmap.regY).toBe(0);
+            expect(view._decorationBitmap.rotation).toBe(0);
+            // x = width - (30 * scale) / 2, y = (20 * scale) / 2, scale 2
+            expect(view._decorationBitmap.x).toBe(170);
+            expect(view._decorationBitmap.y).toBe(20);
             expect(view._decorationBitmap.scale).toBe(0.5);
+        });
+
+        it("places the decoration consistently with resizeDecoration to prevent position jump on zoom", () => {
+            const view = makeView();
+            const startBlock = makeStartBlock();
+            view._startBlock = startBlock;
+            const activity = { refreshCanvas: jest.fn() };
+
+            view.makeTurtleBitmap("<svg/>", activity, true);
+            images[0].onload();
+
+            const initialX = view._decorationBitmap.x;
+            const initialY = view._decorationBitmap.y;
+            const initialScale = view._decorationBitmap.scale;
+
+            // Initial dimensions and reset transforms check
+            expect(initialX).toBe(170);
+            expect(initialY).toBe(20);
+            expect(initialScale).toBe(0.5);
+            expect(view._decorationBitmap.regX).toBe(0);
+            expect(view._decorationBitmap.regY).toBe(0);
+            expect(view._decorationBitmap.rotation).toBe(0);
+
+            // Resizing with current scale and width does not jump and preserves zero rotation/registration
+            view.resizeDecoration(startBlock.protoblock.scale, startBlock.width);
+
+            expect(view._decorationBitmap.x).toBe(initialX);
+            expect(view._decorationBitmap.y).toBe(initialY);
+            expect(view._decorationBitmap.scale).toBe(initialScale);
+            expect(view._decorationBitmap.regX).toBe(0);
+            expect(view._decorationBitmap.regY).toBe(0);
+            expect(view._decorationBitmap.rotation).toBe(0);
+
+            // Resizing with changed zoom (scale = 3, width = 300) updates placement consistently
+            view.resizeDecoration(3, 300);
+
+            expect(view._decorationBitmap.x).toBe(255);
+            expect(view._decorationBitmap.y).toBe(30);
+            expect(view._decorationBitmap.scale).toBe(0.75);
+            expect(view._decorationBitmap.scaleX).toBe(0.75);
+            expect(view._decorationBitmap.scaleY).toBe(0.75);
+            expect(view._decorationBitmap.regX).toBe(0);
+            expect(view._decorationBitmap.regY).toBe(0);
+            expect(view._decorationBitmap.rotation).toBe(0);
+        });
+
+        it("does not overwrite a custom shell if skin changed before makeTurtleBitmap loads", () => {
+            const view = makeView();
+            const startBlock = makeStartBlock();
+            view._startBlock = startBlock;
+            const activity = { refreshCanvas: jest.fn() };
+
+            // Start pending SVG artwork load (images[0])
+            view.makeTurtleBitmap("<svg/>", activity, true);
+
+            // Apply and complete a custom shell before images[0] finishes loading (images[1])
+            view.doTurtleShell(55, "shell.png");
+            images[1].onload();
+
+            const customBitmap = view._bitmap;
+            const customDecoration = view._decorationBitmap;
+            expect(customBitmap).not.toBeNull();
+            expect(customDecoration).not.toBeNull();
+            expect(view._skinChanged).toBe(true);
+
+            view.container.removeChild.mockClear();
+            startBlock.container.removeChild.mockClear();
+
+            // Run pending makeTurtleBitmap callback
+            images[0].onload();
+
+            // Assert custom shell bitmap and decoration identities remain unchanged
+            expect(view._bitmap).toBe(customBitmap);
+            expect(view._decorationBitmap).toBe(customDecoration);
+            expect(view.container.removeChild).not.toHaveBeenCalledWith(customBitmap);
+            expect(startBlock.container.removeChild).not.toHaveBeenCalledWith(customDecoration);
+        });
+
+        it("derives its base scale directly from the loaded image in makeTurtleBitmap", () => {
+            const view = makeView();
+            const startBlock = makeStartBlock();
+            view._startBlock = startBlock;
+            view._decorationBaseScale = 0.1; // Stale scale from earlier custom shell
+            const activity = { refreshCanvas: jest.fn() };
+
+            view.makeTurtleBitmap("<svg/>", activity, true);
+            images[0].width = 110; // 27.5 / 110 = 0.25
+            images[0].onload();
+
+            expect(view._decorationBaseScale).toBe(0.25);
+            expect(view._decorationBitmap.scale).toBe((0.25 * startBlock.protoblock.scale) / 2);
         });
 
         it("leaves the start block undecorated when turtle artwork is not used", () => {

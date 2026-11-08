@@ -106,6 +106,7 @@ class TrashController {
             const blk = activity.blocks.dragGroup[b];
             activity.blocks.blockList[blk].trash = false;
             activity.blocks.moveBlockRelative(blk, dx, dy);
+            activity.blocks._updateViewportGrid(blk);
 
             const block = activity.blocks.blockList[blk];
 

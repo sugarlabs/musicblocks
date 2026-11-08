@@ -1128,13 +1128,14 @@ class Singer {
             tur.singer.neighborArgNote1.push(noteObj[0] + noteObj[1]);
 
             let noteObj2;
+            const neighborStep = last(tur.singer.neighborStepPitch);
             if (activity.blocks.blockList[last(tur.singer.inNeighbor)].name === "neighbor2") {
                 noteObj2 = Singer.addScalarTransposition(
                     activity.logo,
                     turtle,
                     note,
                     octave,
-                    parseInt(tur.singer.neighborStepPitch, 10)
+                    parseInt(neighborStep, 10)
                 );
                 if (tur.singer.transposition !== 0) {
                     noteObj2 = getNote(
@@ -1152,7 +1153,7 @@ class Singer {
                 noteObj2 = getNote(
                     note,
                     octave,
-                    tur.singer.transposition + parseInt(tur.singer.neighborStepPitch, 10),
+                    tur.singer.transposition + parseInt(neighborStep, 10),
                     tur.singer.keySignature,
                     tur.singer.movable,
                     null,
@@ -1841,9 +1842,11 @@ class Singer {
                 neighborArgNote2.push(tur.singer.neighborArgNote2.pop());
             }
 
-            neighborArgBeat = bpmFactor / last(tur.singer.neighborArgBeat);
-            neighborArgCurrentBeat = bpmFactor / last(tur.singer.neighborArgCurrentBeat);
-            doNeighbor = true;
+            if (last(tur.singer.neighborArgCurrentBeat) !== null) {
+                neighborArgBeat = bpmFactor / last(tur.singer.neighborArgBeat);
+                neighborArgCurrentBeat = bpmFactor / last(tur.singer.neighborArgCurrentBeat);
+                doNeighbor = true;
+            }
         }
 
         let carry = 0;
