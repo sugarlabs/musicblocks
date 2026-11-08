@@ -2308,6 +2308,9 @@ class Blocks {
             let obj;
             let attr;
             switch (myBlock.name) {
+                case "multisample":
+                    label = myBlock.getMultisampleLabel();
+                    break;
                 case "loadFile":
                     try {
                         label = myBlock.value[0].toString();
@@ -5302,7 +5305,7 @@ class Blocks {
                 }
             }
 
-            this.storage.macros = prepareMacroExports(name, blockObjs, this.macroDict);
+            this.storage.macros = prepareMacroExports(name, blockObjs, this.activity.macroDict);
             this.addToMyPalette(name);
             this.activity.palettes.updatePalettes("myblocks");
         };
@@ -6876,6 +6879,18 @@ class Blocks {
                             [thisBlock, blkData[4]]
                         );
                         break;
+                    case "multisample":
+                        postProcess = args => {
+                            that.blockList[args[0]].setMultisampleValue(args[1]);
+                        };
+                        this._makeNewBlockWithConnections(
+                            name,
+                            blockOffset,
+                            blkData[4],
+                            postProcess,
+                            [thisBlock, value]
+                        );
+                        break;
                     /** Value blocks need a default value set. */
                     case "number":
                         postProcess = args => {
@@ -7818,6 +7833,7 @@ class Blocks {
                 return;
             }
             const block = this.blockList[blkIdx];
+            this.activity.multisampleEditor?.invalidateOwner(block);
             if (typeof block.dispose === "function") {
                 block.dispose();
             }
@@ -7877,20 +7893,24 @@ class Blocks {
             } else if (action.type === "value_change") {
                 const block = this.blockList[action.blockId];
                 if (block) {
-                    if (!["media", "audiofile", "loadFile"].includes(block.name)) {
-                        if (!block.label) block.label = { value: action.oldValue, style: {} };
-                        block.label.value = action.oldValue;
-                        block._labelChanged(true, true);
-                    }
+                    if (block.name === "multisample") {
+                        block.setMultisampleValue(action.oldValue);
+                    } else {
+                        if (!["media", "audiofile", "loadFile"].includes(block.name)) {
+                            if (!block.label) block.label = { value: action.oldValue, style: {} };
+                            block.label.value = action.oldValue;
+                            block._labelChanged(true, true);
+                        }
 
-                    block.value = action.oldValue;
-                    if (action.oldText !== null && block.text) {
-                        block.text.text = action.oldText;
-                    }
-                    if (block.name === "media" && typeof block.loadThumbnail === "function") {
-                        block.loadThumbnail(null);
-                    } else if (["audiofile", "loadFile"].includes(block.name)) {
-                        this.updateBlockText(action.blockId);
+                        block.value = action.oldValue;
+                        if (action.oldText !== null && block.text) {
+                            block.text.text = action.oldText;
+                        }
+                        if (block.name === "media" && typeof block.loadThumbnail === "function") {
+                            block.loadThumbnail(null);
+                        } else if (["audiofile", "loadFile"].includes(block.name)) {
+                            this.updateBlockText(action.blockId);
+                        }
                     }
                     block.updateCache();
                     this.activity.refreshCanvas();
@@ -7929,20 +7949,24 @@ class Blocks {
             } else if (action.type === "value_change") {
                 const block = this.blockList[action.blockId];
                 if (block) {
-                    if (!["media", "audiofile", "loadFile"].includes(block.name)) {
-                        if (!block.label) block.label = { value: action.newValue, style: {} };
-                        block.label.value = action.newValue;
-                        block._labelChanged(true, true);
-                    }
+                    if (block.name === "multisample") {
+                        block.setMultisampleValue(action.newValue);
+                    } else {
+                        if (!["media", "audiofile", "loadFile"].includes(block.name)) {
+                            if (!block.label) block.label = { value: action.newValue, style: {} };
+                            block.label.value = action.newValue;
+                            block._labelChanged(true, true);
+                        }
 
-                    block.value = action.newValue;
-                    if (action.newText !== null && block.text) {
-                        block.text.text = action.newText;
-                    }
-                    if (block.name === "media" && typeof block.loadThumbnail === "function") {
-                        block.loadThumbnail(null);
-                    } else if (["audiofile", "loadFile"].includes(block.name)) {
-                        this.updateBlockText(action.blockId);
+                        block.value = action.newValue;
+                        if (action.newText !== null && block.text) {
+                            block.text.text = action.newText;
+                        }
+                        if (block.name === "media" && typeof block.loadThumbnail === "function") {
+                            block.loadThumbnail(null);
+                        } else if (["audiofile", "loadFile"].includes(block.name)) {
+                            this.updateBlockText(action.blockId);
+                        }
                     }
                     block.updateCache();
                     this.activity.refreshCanvas();
@@ -8036,6 +8060,8 @@ class Blocks {
             this.findDragGroup(thisBlock);
             for (let b = 0; b < this.dragGroup.length; b++) {
                 const blk = this.dragGroup[b];
+                this.activity.multisampleEditor?.invalidateOwner(this.blockList[blk]);
+                this.activity.logo?.invalidateMultisampleRun?.(this.blockList[blk]);
                 this.blockList[blk].trash = true;
                 this._updateViewportGrid(blk);
                 this.blockList[blk].hide();

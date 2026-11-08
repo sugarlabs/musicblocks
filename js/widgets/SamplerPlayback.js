@@ -117,6 +117,7 @@ const SamplerPlayback = {
          * @returns {void}
          */
         this._playReferencePitch = function (edo) {
+            const generation = this._multisamplePauseGeneration || 0;
             const currentEDO = edo || 12;
             this._updateSamplePitchValues();
             this._updateBlocks();
@@ -137,7 +138,10 @@ const SamplerPlayback = {
                 REFERENCESAMPLE,
                 null,
                 null,
-                false
+                false,
+                undefined,
+                undefined,
+                () => generation === (this._multisamplePauseGeneration || 0)
             );
 
             this.setTimbre();
@@ -149,6 +153,7 @@ const SamplerPlayback = {
          * @returns {void}
          */
         this._playSample = function () {
+            const generation = this._multisamplePauseGeneration || 0;
             if (this.sampleName !== null && this.sampleName !== "") {
                 this.reconnectSynthsToAnalyser();
 
@@ -183,7 +188,10 @@ const SamplerPlayback = {
                     instrumentName,
                     null,
                     null,
-                    false
+                    false,
+                    undefined,
+                    undefined,
+                    () => generation === (this._multisamplePauseGeneration || 0)
                 );
             }
         };

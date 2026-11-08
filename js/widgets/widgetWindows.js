@@ -186,6 +186,11 @@ window.widgetWindows = {
         const focused = window.widgetWindows.focused;
         if (!focused || e.repeat) return; // Guard against no focus or rapid-fire repeat
 
+        if (focused.multisampleEditor && e.key === "Escape") {
+            focused.multisampleEditor.handleKeyDown(e);
+            return;
+        }
+
         // Ignore shortcuts when focus is inside an input, textarea, or contenteditable element
         const activeElement = document.activeElement;
         const isInput =

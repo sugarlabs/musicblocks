@@ -206,6 +206,73 @@ describe("setupToneBlocks", () => {
 
     const getBlock = type => activity.blockInstances[type];
 
+    describe("MultisampleBlock", () => {
+        const { validateMultisample } = require("../../utils/synthutils");
+        const Block = require("../../block");
+        const music = require("../../utils/musicutils");
+        const previous = {};
+        beforeAll(() => {
+            for (const key of ["validateMultisample", "Tone", "normalizeNoteAccidentals"]) {
+                previous[key] = global[key];
+            }
+            global.validateMultisample = validateMultisample;
+            global.normalizeNoteAccidentals = music.normalizeNoteAccidentals;
+            global.Tone = { Frequency: () => ({ toMidi: () => 48 }) };
+        });
+        afterAll(() => {
+            for (const [key, value] of Object.entries(previous)) {
+                if (value === undefined) delete global[key];
+                else global[key] = value;
+            }
+        });
+
+        const instrument = () => ({
+            type: "multisample",
+            version: 1,
+            name: "<strings> & 弦",
+            samples: [
+                { name: "same.wav", root: "C3", data: "data:audio/wav;base64,UklGRgQAAABXQVZF" }
+            ]
+        });
+        const owner = value => {
+            const block = Object.create(Block.prototype);
+            block.value = value;
+            activity.blocks.blockList[0] = block;
+            return block;
+        };
+
+        it("returns the owned supported value without deriving persistent runtime state", () => {
+            const block = owner(instrument());
+            expect(getBlock("multisample").arg(logo, 0, 0)).toBe(block.value);
+            expect(block.getMultisampleLabel()).toBe("<strings> & 弦");
+            expect(block.value).toEqual(instrument());
+            expect(logo.stopTurtle).toBe(false);
+        });
+
+        it.each([
+            { ...instrument(), version: 2, extra: { future: [1] } },
+            { ...instrument(), samples: [], extra: ["damaged"] },
+            null
+        ])("retains an opaque payload while reporting actual use: %p", value => {
+            const block = owner(value);
+            expect(getBlock("multisample").arg(logo, 0, 0)).toBe(value);
+            expect(block.value).toEqual(value);
+            expect(logo.stopTurtle).toBe(true);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                expect.stringMatching(/Invalid|Unsupported/),
+                0
+            );
+            expect(logo.synth.createSynth).not.toHaveBeenCalled();
+        });
+    });
+
+    it("aborts Set Instrument after argument validation has stopped execution", () => {
+        logo.stopTurtle = true;
+        Singer.ToneActions.setTimbre.mockClear();
+        expect(getBlock("settimbre").flow([{ samples: [] }, 88], logo, 0, 0)).toEqual([null, 0]);
+        expect(Singer.ToneActions.setTimbre).not.toHaveBeenCalled();
+    });
+
     describe("OscillatorBlock", () => {
         it("should create synth if no oscillator exists", () => {
             const oscBlock = getBlock("oscillator");
@@ -595,6 +662,20 @@ describe("setupToneBlocks", () => {
     });
 
     describe("SetTimbreBlock", () => {
+        it("aborts before child flow or specialized capture when selection refuses", () => {
+            logo.inSample = true;
+            logo.sample = { sampleName: "kept", sampleData: "audio", timbreBlock: 12 };
+            Singer.ToneActions.setTimbre.mockReturnValueOnce(false);
+            expect(getBlock("settimbre").flow([{ type: "multisample" }, 88], logo, 0, 9)).toEqual([
+                null,
+                0
+            ]);
+            expect(logo.sample).toEqual({
+                sampleName: "kept",
+                sampleData: "audio",
+                timbreBlock: 12
+            });
+        });
         it("should error if argument is null", () => {
             const setTimbre = getBlock("settimbre");
             setTimbre.flow([null, 66], logo, 0, "setTimbreBlk");

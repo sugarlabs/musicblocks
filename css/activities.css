@@ -219,6 +219,181 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     background-color: var(--color-border-primary);
 }
 
+/* Multisample authoring uses the shared widget frame and native form controls. */
+[data-multisample-editor] {
+    display: flex;
+    flex-direction: column;
+    width: 600px;
+    max-width: 100%;
+    max-height: calc(100dvh - 150px);
+    padding: var(--spacing-md);
+    color: var(--color-text-primary);
+    background: var(--color-panel-bg);
+    font-size: var(--font-size-md);
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+[data-multisample-editor] .multisample-content {
+    min-height: 0;
+    overflow-y: auto;
+    padding: 4px;
+}
+
+[data-multisample-editor] p {
+    margin: var(--spacing-sm) 0;
+}
+
+[data-multisample-editor] label {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    min-width: 0;
+}
+
+[data-multisample-editor] input:not([type="file"]),
+[data-multisample-editor] select,
+[data-multisample-editor] button {
+    min-height: 44px;
+    max-width: 100%;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-text-secondary);
+    border-radius: 4px;
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font: inherit;
+}
+
+[data-multisample-editor] select {
+    width: 10em;
+    /* Override the global legacy select rule while retaining the native control. */
+    padding: var(--spacing-sm) !important;
+    border: 1px solid var(--color-text-secondary) !important;
+}
+
+[data-multisample-editor] button {
+    cursor: pointer;
+}
+
+[data-multisample-editor] button:hover:not(:disabled) {
+    background: var(--color-bg-tertiary);
+}
+
+[data-multisample-editor] .confirm-button {
+    background: var(--color-notification-bg);
+    color: var(--color-notification-text);
+}
+
+[data-multisample-editor] .confirm-button:hover:not(:disabled) {
+    background: var(--color-notification-bg);
+    text-decoration: underline;
+}
+
+[data-multisample-editor] .cancel-button,
+[data-multisample-editor] :disabled {
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-secondary);
+}
+
+[data-multisample-editor] :disabled {
+    border-style: dashed;
+    cursor: default;
+}
+
+[data-multisample-editor] .multisample-recording-header,
+[data-multisample-editor] .multisample-row-controls,
+[data-multisample-editor] .multisample-preview,
+[data-multisample-editor] .multisample-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--spacing-sm);
+}
+
+[data-multisample-editor] .multisample-recording-header {
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--spacing-md);
+}
+
+[data-multisample-editor] h3 {
+    margin: 0;
+    font-size: var(--font-size-md);
+}
+
+[data-multisample-editor] .multisample-help {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+[data-multisample-editor] .multisample-recording {
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--color-border-primary);
+}
+
+[data-multisample-editor] .multisample-filename {
+    margin: 0 0 var(--spacing-sm);
+    font-weight: bold;
+}
+
+[data-multisample-editor] .multisample-error {
+    padding: var(--spacing-sm);
+    background: var(--color-error-bg);
+}
+
+[data-multisample-editor] p:empty {
+    display: none;
+}
+
+[data-multisample-editor] .multisample-footer {
+    flex-shrink: 0;
+    padding: var(--spacing-sm) 4px 4px;
+    border-top: 1px solid var(--color-border-primary);
+}
+
+[data-multisample-editor] .multisample-preview input {
+    width: 8em;
+}
+
+[data-multisample-editor] .multisample-actions {
+    justify-content: flex-end;
+    margin-top: var(--spacing-sm);
+}
+
+[data-multisample-editor] .multisample-close-choice {
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-text-primary);
+    background: var(--color-bg-primary);
+}
+
+[data-multisample-editor] .multisample-close-choice button {
+    margin: 0 var(--spacing-sm) var(--spacing-sm) 0;
+}
+
+@media (max-width: 600px) {
+    [data-multisample-editor] {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    [data-multisample-editor] .multisample-row-controls label {
+        flex-basis: 100%;
+    }
+}
+
+/* At short heights (including zoom), let content and actions share one scroll. */
+@media (max-height: 600px) {
+    [data-multisample-editor] {
+        display: block;
+        overflow-y: auto;
+    }
+
+    [data-multisample-editor] .multisample-content {
+        overflow: visible;
+    }
+}
+
 /* Modal backdrop styles */
 .modal-backdrop,
 .plugin-modal-backdrop {
@@ -3102,7 +3277,7 @@ table {
 
 #printText {
     border: 2px solid rgb(150, 150, 150);
-    z-index: 100;
+    z-index: 10001;
     width: auto;
     word-wrap: break-word;
     overflow: auto;

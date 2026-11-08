@@ -149,6 +149,7 @@ beforeEach(() => {
     // Reset mocks
     jest.clearAllMocks();
     global.JSGenerate.code = 'console.log("hello");';
+    global.JSGenerate.run.mockReset();
     global.acorn.parse = jest.fn();
     global.AST2BlockList.toBlockList.mockReset();
     global.AST2BlockList.toBlockList.mockReturnValue(["blocks"]);
@@ -415,6 +416,29 @@ describe("JSEditor", () => {
             editor._generateCode();
 
             expect(JSGenerate.run).toHaveBeenCalledWith(true);
+        });
+
+        test("refused export preserves editor and help text without publishing output", () => {
+            const editor = createEditor();
+            editor._code = "my existing JavaScript";
+            editor._codeBck = "my original code";
+            editor._showingHelp = true;
+            editor._jar.updateCode.mockClear();
+            JSGenerate.run.mockReturnValue(false);
+            JSGenerate.code = "";
+            editor._generateCode();
+            expect(editor._code).toBe("my existing JavaScript");
+            expect(editor._codeBck).toBe("my original code");
+            expect(editor._showingHelp).toBe(true);
+            expect(editor._jar.updateCode).not.toHaveBeenCalled();
+        });
+
+        test("opening with unsupported blocks still creates an editable empty editor", () => {
+            JSGenerate.run.mockReturnValue(false);
+            JSGenerate.code = "";
+            const editor = createEditor();
+            expect(editor._code).toBe("");
+            expect(editor._jar.updateCode).toHaveBeenCalledWith("");
         });
 
         test("_generateCode updates _code from JSGenerate", () => {

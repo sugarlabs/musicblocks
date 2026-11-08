@@ -98,6 +98,8 @@ class ToolbarController {
      * @returns {string|null} "started", "stopped", or null.
      */
     runStep() {
+        const request = this.activity.logo._executionRequest;
+        if (request && !request.queuesReady) return null;
         this.runMode = "step";
         const turtleCount = Object.keys(this.activity.logo.stepQueue).length;
         if (this.activity.logo?.synth?.resume) {

@@ -215,7 +215,8 @@ let MYDEFINES = [
     "activity/blocks/MediaBlocks",
     "activity/blocks/SensorsBlocks",
     "activity/blocks/EnsembleBlocks",
-    "widgets/widgetWindows"
+    "widgets/widgetWindows",
+    "widgets/multisample"
 ];
 
 // Optional widget implementations are loaded by WidgetBlocks on first use.
@@ -857,6 +858,11 @@ class Activity {
                 return;
             }
 
+            const request = {};
+            this.logo._pendingPlayRequest = request;
+            const executionRequest = this.logo._executionRequest;
+            const projectGeneration = this.multisampleProjectGeneration;
+
             // The rest of the Play action starts the Transport, which touches
             // the Web Audio context synchronously. Tone.start()/context.resume()
             // are async, so running that logic in parallel (fire-and-forget)
@@ -865,6 +871,17 @@ class Activity {
             // unlock to settle first so the Transport only starts once the
             // context is (or is as close as it will get to) running.
             const runPlayAction = () => {
+                if (this.logo._pendingPlayRequest !== request) return;
+                this.logo._pendingPlayRequest = null;
+                if (
+                    this.logo._executionRequest !== executionRequest ||
+                    this.multisampleProjectGeneration !== projectGeneration
+                )
+                    return;
+                if (this.multisampleEditor) {
+                    this.errorMsg(_("Finish or cancel instrument editing first."));
+                    return;
+                }
                 this._onResize();
                 this.blocks.activeBlock = null;
                 hideDOMLabel();
@@ -2024,6 +2041,12 @@ class Activity {
          * @param {boolean} closeAllWidgets  {if true close all open widgets}
          */
         this.sendAllToTrash = (addStartBlock, doNotSave, closeAllWidgets = true) => {
+            this.multisampleProjectGeneration = (this.multisampleProjectGeneration || 0) + 1;
+            if (this.multisampleEditor) {
+                this.multisampleEditor.close(false);
+                this.textMsg(_("Unapplied instrument edits were discarded."));
+            }
+            this.logo.invalidateMultisampleRun();
             // Return to home position after loading new blocks.
             this.blocksContainer.x = 0;
             this.blocksContainer.y = 0;
@@ -2291,6 +2314,10 @@ class Activity {
         };
 
         this._doOpenSamples = () => {
+            if (this.multisampleEditor) {
+                this.multisampleEditor.requestClose(() => this._doOpenSamples());
+                return;
+            }
             if (document.getElementById("palette").style.display !== "none")
                 document.getElementById("palette").style.display = "none";
             this.toolbar.closeAuxToolbar(this.showHideAuxMenu);
@@ -2305,6 +2332,10 @@ class Activity {
          * Uploads MB file to Planet
          */
         this.doUploadToPlanet = () => {
+            if (this.multisampleEditor) {
+                this.multisampleEditor.requestClose(() => this.doUploadToPlanet());
+                return;
+            }
             this.planet.openPlanet();
         };
 
@@ -2596,10 +2627,9 @@ class Activity {
         };
 
         this.saveSessionAsync = async () => {
-            // First, trigger __saveLocally for the image thumb and fallback.
-            // If the payload is huge, it will quota exceed but fail silently, which is fine!
+            // A localStorage failure is recoverable while IndexedDB is still available.
             if (typeof this.__saveLocally === "function") {
-                this.__saveLocally();
+                this.__saveLocally({ reportSaveErrors: !this.sessionStorageManager });
             }
             // Second, save the massive payload safely to IndexedDB.
             if (this.sessionStorageManager) {
@@ -2639,6 +2669,11 @@ class Activity {
                     }
                 } catch (e) {
                     console.error("Failed to save session to IndexedDB:", e);
+                    this.textMsg(
+                        _(
+                            "Could not save the session to IndexedDB. Retry saving or export a Music Blocks project to keep your work."
+                        )
+                    );
                     throw e;
                 }
             }
@@ -3005,6 +3040,7 @@ class Activity {
                 document,
                 "keydown",
                 event => {
+                    if (event.target.closest?.("[data-multisample-editor]")) return;
                     if ((event.ctrlKey || event.metaKey) && event.code === "Space") {
                         event.preventDefault();
                         event.stopImmediatePropagation();
