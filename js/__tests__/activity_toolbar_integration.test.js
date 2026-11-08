@@ -611,6 +611,7 @@ describe("Activity Toolbar Integration", () => {
                 _beginDeferCheckBounds: jest.fn(),
                 _endDeferCheckBounds: jest.fn(),
                 captureStackPreview: jest.fn(() => "preview"),
+                trimTrashHistory: jest.fn(),
                 trashPreviews: {},
                 trashStacks: [],
                 moveBlockRelative: jest.fn(),
@@ -634,6 +635,7 @@ describe("Activity Toolbar Integration", () => {
             expect(mockBlock.container.uncache).toHaveBeenCalled();
             expect(activity.blocks.trashStacks).toContain("0");
             expect(activity.blocks.trashPreviews["0"]).toBe("preview");
+            expect(activity.blocks.trimTrashHistory).toHaveBeenCalledTimes(1);
         });
 
         test("sendAllToTrash does not record blocks that are already in the trash again", () => {
@@ -653,6 +655,7 @@ describe("Activity Toolbar Integration", () => {
                 _beginDeferCheckBounds: jest.fn(),
                 _endDeferCheckBounds: jest.fn(),
                 captureStackPreview: jest.fn(() => "preview"),
+                trimTrashHistory: jest.fn(),
                 trashPreviews: {},
                 trashStacks: ["0"],
                 moveBlockRelative: jest.fn(),
@@ -692,6 +695,7 @@ describe("Activity Toolbar Integration", () => {
                 _beginDeferCheckBounds: jest.fn(),
                 _endDeferCheckBounds: jest.fn(),
                 captureStackPreview: jest.fn(),
+                trimTrashHistory: jest.fn(),
                 deleteActionBlock: jest.fn(),
                 trashPreviews: {},
                 trashStacks: [],
@@ -708,6 +712,56 @@ describe("Activity Toolbar Integration", () => {
             expect(turtle.inTrash).toBe(true);
             expect(turtle.container.visible).toBe(false);
             expect(activity.blocks.deleteActionBlock).toHaveBeenCalledWith(action);
+        });
+
+        test("sendAllToTrash processes action-call roots trashed during bulk deletion", () => {
+            activity.palettes = { dict: {} };
+
+            const action = {
+                connections: [null],
+                name: "action",
+                trash: false,
+                hide: jest.fn(),
+                container: { uncache: jest.fn() }
+            };
+
+            const actionCall = {
+                connections: [null],
+                name: "nameddo",
+                trash: false,
+                hide: jest.fn(),
+                container: { uncache: jest.fn() }
+            };
+
+            activity.blocks = {
+                palettes: activity.palettes,
+                blockList: [action, actionCall],
+                _beginDeferCheckBounds: jest.fn(),
+                _endDeferCheckBounds: jest.fn(),
+                captureStackPreview: jest.fn(() => "preview"),
+                trimTrashHistory: jest.fn(),
+                deleteActionBlock: jest.fn(() => {
+                    actionCall.trash = true;
+                }),
+                trashPreviews: {},
+                trashStacks: [],
+                moveBlockRelative: jest.fn(),
+                blockArt: {},
+                blockCollapseArt: {}
+            };
+
+            activity.blocksContainer = { x: 0, y: 0 };
+            activity.refreshCanvas = jest.fn();
+            activity.stage = { dispatchEvent: jest.fn() };
+
+            activity.sendAllToTrash(false, true, false);
+
+            expect(activity.blocks.deleteActionBlock).toHaveBeenCalledWith(action);
+            expect(activity.blocks.trashStacks).toEqual(["0", "1"]);
+            expect(actionCall.hide).toHaveBeenCalled();
+            expect(actionCall.container.uncache).toHaveBeenCalled();
+            expect(activity.blocks.moveBlockRelative).toHaveBeenCalledTimes(2);
+            expect(activity.blocks.trimTrashHistory).toHaveBeenCalledTimes(1);
         });
 
         test("clearCache skips empty and trashed slots in blockList", () => {

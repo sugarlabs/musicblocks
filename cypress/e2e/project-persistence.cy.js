@@ -16,7 +16,7 @@ describe("Project persistence", () => {
         let stableObservations = 0;
         cy.window({ timeout: 60000 }).should(win => {
             const { blocks } = win.ActivityContext.getActivity();
-            const nonTrash = blocks.blockList.filter(block => !block.trash);
+            const nonTrash = blocks.blockList.filter(block => block && !block.trash);
             const fullyLoaded =
                 blocks._loadCounter === 0 && nonTrash.some(block => block.name === "loadFile");
             stableObservations = fullyLoaded ? stableObservations + 1 : 0;
@@ -36,7 +36,7 @@ describe("Project persistence", () => {
     const captureBlockState = win => {
         const { blockList } = win.ActivityContext.getActivity().blocks;
         return blockList
-            .filter(block => !block.trash)
+            .filter(block => block && !block.trash)
             .map(block => ({
                 name: block.name,
                 value: ["start", "drum"].includes(block.name) ? null : block.value
@@ -95,7 +95,7 @@ describe("Project persistence", () => {
     const clampedNotes = win => {
         const { blockList } = win.ActivityContext.getActivity().blocks;
         const notes = [];
-        let blk = blockList.find(block => !block.trash && block.name === "duplicatenotes")
+        let blk = blockList.find(block => block && !block.trash && block.name === "duplicatenotes")
             ?.connections[2];
         while (blk !== null && blk !== undefined) {
             const block = blockList[blk];

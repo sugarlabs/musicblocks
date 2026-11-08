@@ -159,10 +159,19 @@ class PlanetInterface {
                 merge = false;
             }
 
+            if (!merge && this.activity.blocks.isLoading()) {
+                this.activity.blocks.runAfterLoad(
+                    () => this.loadProjectFromData(data, merge),
+                    error => {
+                        this.activity.errorMsg(error);
+                    }
+                );
+                return;
+            }
+
             this.closePlanet();
             if (!merge) {
                 this.activity.sendAllToTrash(false, true);
-                this._resetTrashHistory();
             }
 
             if (data === undefined) {
@@ -251,21 +260,11 @@ class PlanetInterface {
                 this.activity.sendAllToTrash();
                 this.activity.refreshCanvas();
             }
-            this._resetTrashHistory();
+
             return initialization.then(projectID => {
                 document.title = this.getCurrentProjectName();
                 return projectID;
             });
-        };
-
-        /**
-         * Forgets the trash and undo history of the project being replaced, so
-         * it cannot be restored into the next one or grow across project switches.
-         */
-        this._resetTrashHistory = () => {
-            this.activity.blocks.trashStacks = [];
-            this.activity.blocks.actionHistory = [];
-            this.activity.blocks.redoActionHistory = [];
         };
 
         /**
