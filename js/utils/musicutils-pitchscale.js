@@ -396,6 +396,14 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
             // Use its proportional position from 12-EDO (A is at index 9).
             aIndex = Math.round((9 / 12) * currentEDO);
         }
+        const naturalPos = names.indexOf(pitch.toUpperCase());
+        if (naturalPos !== -1) {
+            const unwrappedPos = naturalPos + transposition;
+            const octaveShift = Math.floor(unwrappedPos / currentEDO);
+            const edoPos = ((unwrappedPos % currentEDO) + currentEDO) % currentEDO;
+            return (octave + octaveShift) * currentEDO + edoPos - aIndex;
+        }
+
         const normalizedPitch = originalPitch
             .replace(/^([a-g])/, (_, letter) => letter.toUpperCase())
             .replaceAll("#", SHARP)

@@ -1758,6 +1758,20 @@ describe("pitchToNumber", () => {
         expect(result).toBe(62);
     });
 
+    it("should map 19-EDO enharmonic flats to their EDO pitch positions", () => {
+        expect(pitchToNumber("F♭", 4, "C major", "equal19")).toBe(69);
+        expect(pitchToNumber("C♭", 4, "C major", "equal19")).toBe(61);
+        expect(pitchToNumber("C♭", 4, "C major", "equal19")).toBe(
+            pitchToNumber("B♯", 3, "C major", "equal19")
+        );
+    });
+
+    it("should place C-flat below C in 31-EDO", () => {
+        expect(pitchToNumber("C♭", 4, "C major", "equal31")).toBe(
+            pitchToNumber("C", 4, "C major", "equal31") - 1
+        );
+    });
+
     it("should handle lowercase pitches in alternate tunings (equal19)", () => {
         // Verifies that lowercase 'c' and uppercase 'C' resolve identically in equal19
         const upperCaseResult = pitchToNumber("C", 4, "C major", "equal19");
@@ -5230,6 +5244,11 @@ describe("getSolfege with temperament", () => {
     it("should fall back to fixed-do when movable is false", () => {
         expect(getSolfege("C", "C major", false, "equal")).toBe("do");
         expect(getSolfege("A", "C major", false, "equal")).toBe("la");
+    });
+
+    it("should give EDO enharmonic flats the same movable solfege as their matching pitches", () => {
+        expect(getSolfege("F♭", "C major", true, "equal19")).toBe("mi");
+        expect(getSolfege("C♭", "C major", true, "equal19")).toBe("ti");
     });
 });
 
