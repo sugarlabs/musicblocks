@@ -606,13 +606,19 @@ describe("widgetWindows", () => {
     });
 
     describe("touch dragging", () => {
-        function makeTouchEvent(type, x, y, id = 0) {
+        // `changed` is the finger this event is about. `others` are fingers that
+        // stay down and appear in `touches` but not in `changedTouches`, like a
+        // real TouchEvent for a multi-finger gesture.
+        function makeTouchEvent(type, x, y, id = 0, others = []) {
             const event = new Event(type, { bubbles: true, cancelable: true });
             const touch = { clientX: x, clientY: y, identifier: id };
-            event.touches = [touch];
+            event.touches =
+                type === "touchend" || type === "touchcancel" ? others : [touch, ...others];
             event.changedTouches = [touch];
             return event;
         }
+
+        const dragRect = () => ({ left: 50, top: 60, right: 250, bottom: 260 });
 
         test("registers touch listeners alongside mouse listeners on init", () => {
             const spy = jest.spyOn(document, "addEventListener");
@@ -643,20 +649,17 @@ describe("widgetWindows", () => {
             expect(win._dy).toBe(40);
         });
 
-        test("touchstart while maximized restores the window and repositions from the touch point", () => {
+        test("touchstart while maximized does not restore; the first touchmove does", () => {
             const win = createTestWindow();
             win._maximize();
-            win._drag.getBoundingClientRect = jest.fn(() => ({
-                left: 50,
-                top: 60,
-                right: 250,
-                bottom: 260
-            }));
+            win._drag.getBoundingClientRect = jest.fn(dragRect);
 
             win._nonclose.dispatchEvent(makeTouchEvent("touchstart", 80, 100));
-
-            expect(win._maximized).toBe(false);
+            expect(win._maximized).toBe(true);
             expect(window.widgetWindows.draggingWindow).toBe(win);
+
+            document.dispatchEvent(makeTouchEvent("touchmove", 90, 110));
+            expect(win._maximized).toBe(false);
         });
 
         test("touchmove on the document repositions the dragging window", () => {
@@ -737,6 +740,126 @@ describe("widgetWindows", () => {
             // A different finger (identifier 1) lifts — the drag driven by
             // finger 0 must keep going.
             document.dispatchEvent(makeTouchEvent("touchend", 500, 500, 1));
+
+            expect(window.widgetWindows.draggingWindow).toBe(win);
+        });
+
+        test("another finger's touchmove is ignored even though the drag finger is still in touches", () => {
+            const win = createTestWindow();
+            win._drag.getBoundingClientRect = jest.fn(dragRect);
+            const rafSpy = jest.spyOn(window, "requestAnimationFrame");
+
+            win._nonclose.dispatchEvent(makeTouchEvent("touchstart", 80, 100, 0));
+            rafSpy.mockClear();
+            // Finger 1 moves; finger 0 is still down so it is listed in touches.
+            document.dispatchEvent(
+                makeTouchEvent("touchmove", 500, 500, 1, [
+                    { clientX: 80, clientY: 100, identifier: 0 }
+                ])
+            );
+
+            expect(rafSpy).not.toHaveBeenCalled();
+            expect(win._frame.style.left).toBe("200px");
+            rafSpy.mockRestore();
+        });
+
+        test("touchcancel at the top edge ends the drag without maximizing", () => {
+            const win = createTestWindow();
+            win._drag.getBoundingClientRect = jest.fn(dragRect);
+            win._frame.style.top = `${window.widgetWindows._getToolbarBottom()}px`;
+
+            win._nonclose.dispatchEvent(makeTouchEvent("touchstart", 80, 100));
+            document.dispatchEvent(makeTouchEvent("touchcancel", 80, 100));
+
+            expect(window.widgetWindows.draggingWindow).toBe(null);
+            expect(win._maximized).toBe(false);
+        });
+
+        test("touchend at the top edge maximizes like a mouse release", () => {
+            const win = createTestWindow();
+            win._drag.getBoundingClientRect = jest.fn(dragRect);
+            win._frame.style.top = `${window.widgetWindows._getToolbarBottom()}px`;
+
+            win._nonclose.dispatchEvent(makeTouchEvent("touchstart", 80, 100));
+            document.dispatchEvent(makeTouchEvent("touchend", 80, 100));
+
+            expect(window.widgetWindows.draggingWindow).toBe(null);
+            expect(win._maximized).toBe(true);
+        });
+
+        test("a second finger on the title bar does not take over the drag", () => {
+            const win = createTestWindow();
+            win._drag.getBoundingClientRect = jest.fn(dragRect);
+
+            win._nonclose.dispatchEvent(makeTouchEvent("touchstart", 80, 100, 0));
+            win._nonclose.dispatchEvent(
+                makeTouchEvent("touchstart", 200, 220, 1, [
+                    { clientX: 80, clientY: 100, identifier: 0 }
+                ])
+            );
+
+            expect(win._activeTouchId).toBe(0);
+            expect(win._dx).toBe(30);
+            expect(win._dy).toBe(40);
+
+            // Lifting the first finger still ends the drag.
+            document.dispatchEvent(
+                makeTouchEvent("touchend", 80, 100, 0, [
+                    { clientX: 200, clientY: 220, identifier: 1 }
+                ])
+            );
+            expect(window.widgetWindows.draggingWindow).toBe(null);
+        });
+
+        test("touchstart on the title bar buttons does not start a drag or block the click", () => {
+            const win = createTestWindow();
+            win._drag.getBoundingClientRect = jest.fn(dragRect);
+            const event = makeTouchEvent("touchstart", 80, 100);
+
+            win._maxminButton.dispatchEvent(event);
+
+            expect(window.widgetWindows.draggingWindow).toBe(null);
+            expect(event.defaultPrevented).toBe(false);
+        });
+
+        test("mousedown on the maximize button does not restore or start a drag", () => {
+            const win = createTestWindow();
+            win._maximize();
+            win._drag.getBoundingClientRect = jest.fn(dragRect);
+
+            win._maxminButton.dispatchEvent(
+                new MouseEvent("mousedown", { bubbles: true, cancelable: true })
+            );
+
+            expect(win._maximized).toBe(true);
+            expect(window.widgetWindows.draggingWindow).toBe(null);
+        });
+
+        test("touch events do not move or end a mouse-initiated drag", () => {
+            const win = createTestWindow();
+            win._drag.getBoundingClientRect = jest.fn(dragRect);
+
+            win._nonclose.dispatchEvent(
+                new MouseEvent("mousedown", {
+                    bubbles: true,
+                    cancelable: true,
+                    clientX: 80,
+                    clientY: 100
+                })
+            );
+            document.dispatchEvent(makeTouchEvent("touchmove", 500, 500));
+            document.dispatchEvent(makeTouchEvent("touchend", 500, 500));
+
+            expect(window.widgetWindows.draggingWindow).toBe(win);
+            expect(win._frame.style.left).toBe("200px");
+        });
+
+        test("mouse events do not end a touch-initiated drag", () => {
+            const win = createTestWindow();
+            win._drag.getBoundingClientRect = jest.fn(dragRect);
+
+            win._nonclose.dispatchEvent(makeTouchEvent("touchstart", 80, 100));
+            document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true, cancelable: true }));
 
             expect(window.widgetWindows.draggingWindow).toBe(win);
         });

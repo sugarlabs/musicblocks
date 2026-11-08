@@ -64,7 +64,10 @@ function _startingTouch(e) {
 function _pointFromEvent(e, touchId) {
     if (!_isTouchEvent(e)) return e;
     if (touchId === null) return _startingTouch(e);
-    return _touchWithId(e.touches, touchId) || _touchWithId(e.changedTouches, touchId);
+    // `touches` lists every active finger, so a different finger's event would
+    // still contain the drag finger. Only `changedTouches` says which fingers
+    // actually moved or lifted in this event.
+    return _touchWithId(e.changedTouches, touchId);
 }
 
 window.widgetWindows = {
@@ -343,32 +346,37 @@ window.widgetWindows = {
         this._globalListenersInitialized = true;
     },
     _handleGlobalMouseMove(e) {
-        if (this.draggingWindow) {
+        if (this.draggingWindow && this.draggingWindow._activeTouchId === null) {
             this.draggingWindow._docMouseMoveHandler(e);
         }
     },
     _handleGlobalTouchMove(e) {
-        if (this.draggingWindow) {
+        // Only a touch-initiated drag reacts to touch events.
+        if (this.draggingWindow && this.draggingWindow._activeTouchId !== null) {
             this.draggingWindow._docMouseMoveHandler(e);
         }
     },
     _handleGlobalMouseUp(e) {
-        if (this.draggingWindow) {
+        // A touch-initiated drag ends only through its own touchend/touchcancel.
+        if (this.draggingWindow && this.draggingWindow._activeTouchId === null) {
             this.draggingWindow._dragTopHandler(e);
             this.draggingWindow = null;
         }
     },
     _handleGlobalTouchEnd(e) {
         const win = this.draggingWindow;
-        if (!win) return;
+        // Ignore touch events during a mouse-initiated drag.
+        if (!win || win._activeTouchId === null) return;
 
-        // Ignore touchend/touchcancel from an unrelated finger — only end
-        // the drag when the touch that started it has actually lifted.
-        if (win._activeTouchId !== null && !_touchWithId(e.changedTouches, win._activeTouchId)) {
-            return;
+        // Ignore touchend/touchcancel from an unrelated finger: only end the
+        // drag when the touch that started it has actually lifted.
+        if (!_touchWithId(e.changedTouches, win._activeTouchId)) return;
+
+        // A cancelled gesture was never released, so it must not trigger the
+        // drag-to-top maximize. Only a real touchend does.
+        if (e.type !== "touchcancel") {
+            win._dragTopHandler(e);
         }
-
-        win._dragTopHandler(e);
         win._activeTouchId = null;
         this.draggingWindow = null;
     },
@@ -455,6 +463,7 @@ class WidgetWindow {
         window.widgetWindows._initGlobalListeners();
 
         this._restorePending = false;
+        this._activeTouchId = null;
         if (window.widgetWindows._posCache[this._key]) {
             const _pos = window.widgetWindows._posCache[this._key];
             const x = Number(_pos[0]);
@@ -561,27 +570,22 @@ class WidgetWindow {
         titleEl.id = `${this._key}WidgetID`;
         this._frame.setAttribute("aria-labelledby", titleEl.id);
 
-        this._nonclose.onmousedown = e => {
+        const startDrag = (point, e) => {
+            // The title bar also holds the roll-up and maximize buttons. Dragging
+            // from them would swallow their click (touchstart preventDefault) and
+            // restore a maximized window right before the button re-maximizes it.
+            if (e.target?.closest && e.target.closest(".nonclosebuttons")) return;
+
+            // While a touch owns a drag, ignore any further touchstart so a second
+            // finger cannot take over the drag or change its offsets.
+            const active = window.widgetWindows.draggingWindow;
+            if (active && active._activeTouchId !== null) return;
+
             // Once the user interacts with the window, later explicit centering
             // calls are intentional and should not be suppressed.
             this._restorePending = false;
             window.widgetWindows.draggingWindow = this;
             this._activeTouchId = _isTouchEvent(e) ? point.identifier : null;
-
-            if (this._maximized) {
-                // Perform special repositioning to make the drag feel right when
-                // restoring a window from maximized.
-                let bcr = this._drag.getBoundingClientRect();
-                let dx = (bcr.left - point.clientX) / (bcr.right - bcr.left);
-                const dy = bcr.top - point.clientY;
-
-                this._restore();
-                this.onmaximize();
-
-                bcr = this._drag.getBoundingClientRect();
-                dx *= bcr.right - bcr.left;
-                this.setPosition(point.clientX + dx, point.clientY + dy);
-            }
 
             this.takeFocus();
 
@@ -736,30 +740,33 @@ class WidgetWindow {
      * @returns {void}
      */
     _docMouseMoveHandler(e) {
+        // For touch, only react to the finger that started this drag: an
+        // unrelated second finger moving elsewhere must not jump the window.
+        const point = _pointFromEvent(e, this._activeTouchId);
+        if (!point) return;
+
         if (this._maximized) {
             const bcr = this._drag.getBoundingClientRect();
-            const dxRatio = (bcr.left - e.clientX) / (bcr.right - bcr.left);
-            const dy = bcr.top - e.clientY;
+            const dxRatio = (bcr.left - point.clientX) / (bcr.right - bcr.left);
+            const dy = bcr.top - point.clientY;
 
             this._restore();
             this.onmaximize();
 
             const newBcr = this._drag.getBoundingClientRect();
-            this.setPosition(e.clientX + dxRatio * (newBcr.right - newBcr.left), e.clientY + dy);
+            this.setPosition(
+                point.clientX + dxRatio * (newBcr.right - newBcr.left),
+                point.clientY + dy
+            );
 
             // Recalculate drag offsets from the restored frame so the rAF
             // callback below does not overwrite the position with stale values.
             const restoredBcr = this._drag.getBoundingClientRect();
-            this._dx = e.clientX - restoredBcr.left;
-            this._dy = e.clientY - restoredBcr.top;
+            this._dx = point.clientX - restoredBcr.left;
+            this._dy = point.clientY - restoredBcr.top;
         }
         // Throttle using requestAnimationFrame to prevent layout thrashing
         if (this._rafTicking) return;
-
-        // For touch, only react to the finger that started this drag — an
-        // unrelated second finger moving elsewhere must not jump the window.
-        const point = _pointFromEvent(e, this._activeTouchId);
-        if (!point) return;
 
         this._rafTicking = true;
 
