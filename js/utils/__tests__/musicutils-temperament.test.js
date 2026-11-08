@@ -140,9 +140,23 @@ describe("musicutils-temperament", () => {
             expect(keys).not.toContain("constructor");
             expect(keys).not.toContain("__proto__");
 
-            expect(() => temperament.deleteTemperamentFromList("__proto__")).not.toThrow();
-            expect(() => temperament.deleteTemperamentFromList("constructor")).not.toThrow();
-            expect(() => temperament.deleteTemperamentFromList("prototype")).not.toThrow();
+            for (const key of ["__proto__", "constructor", "prototype"]) {
+                const descriptor = {
+                    value: custom,
+                    configurable: true,
+                    enumerable: true,
+                    writable: true
+                };
+                Object.defineProperty(temperament.TEMPERAMENT, key, descriptor);
+                try {
+                    temperament.deleteTemperamentFromList(key);
+                    expect(Object.getOwnPropertyDescriptor(temperament.TEMPERAMENT, key)).toEqual(
+                        descriptor
+                    );
+                } finally {
+                    delete temperament.TEMPERAMENT[key];
+                }
+            }
 
             temperament.updateTemperaments();
             const listNames = temperament.getTemperamentsList().map(e => e[1]);

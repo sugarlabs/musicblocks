@@ -12,7 +12,7 @@
 /*
    global
 
-   _, isUnsafeObjectKey
+   _
  */
 
 /*
@@ -33,6 +33,10 @@
 // var, not const or let: a hoisted var in musicutils.js cannot redeclare a top-level const or let.
 
 if (typeof module !== "undefined" && module.exports) {
+    var UtilsLogic =
+        (typeof window !== "undefined" && window.UtilsLogic) ||
+        (typeof require !== "undefined" ? require("./utils-logic") : {});
+    var { isUnsafeObjectKey } = UtilsLogic;
     var MusicUtilsConstants =
         (typeof window !== "undefined" && window.MusicUtilsConstants) ||
         (typeof require !== "undefined" ? require("./musicutils-constants") : {});
