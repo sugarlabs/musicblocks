@@ -8,7 +8,7 @@
 }
 
 /* Floating controls container at bottom-right */
-.play-only #buttoncontainerBOTTOM {
+.play-only #buttoncontainerBOTTOM:not([style*="display: none"]) {
     display: flex !important;
     flex-direction: column-reverse !important;
     align-items: flex-end !important;
@@ -135,6 +135,12 @@
 
 /* Narrowly scoped hiding of editor-only elements */
 .play-only #palette,
+.play-only #palette.flex-palette,
+.play-only #contextWheelDiv,
+.play-only #buttoncontainerBOTTOM #showHideBlocksButton,
+.play-only #buttoncontainerBOTTOM #expandCollapseBlocksButton,
+.play-only #buttoncontainerBOTTOM #decreaseBlockSizeButton,
+.play-only #buttoncontainerBOTTOM #increaseBlockSizeButton,
 .play-only #Grid,
 .play-only #grid,
 .play-only #searchBar,
@@ -142,6 +148,79 @@
 .play-only #labelDiv,
 .play-only #textLabel {
     display: none !important;
+}
+
+#compactModeToggle {
+    display: none;
+}
+
+.compact-screen #compactModeToggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 6px;
+    border: 0;
+    border-radius: var(--radius-md, 6px);
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #ffffff !important;
+    font-size: 14px;
+    line-height: 1;
+    text-transform: capitalize;
+    cursor: pointer;
+}
+
+.compact-screen #compactModeToggle:hover {
+    background-color: rgba(255, 255, 255, 0.22) !important;
+}
+
+.compact-screen.dark #compactModeToggle:hover {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.compact-screen #compactModeToggle:focus-visible {
+    outline: 2px solid #ffffff !important;
+    outline-offset: 2px !important;
+}
+
+.compact-edit #palette {
+    position: fixed !important;
+    top: 55vh !important;
+    max-height: 45vh;
+    overflow: visible;
+}
+
+.compact-edit #palette > div:first-child {
+    max-height: 45vh;
+    overflow-y: auto;
+}
+
+.compact-edit #PaletteBody {
+    top: 55vh !important;
+}
+
+.compact-edit #PaletteBody_items {
+    height: calc(45vh - 50px) !important;
+    max-height: calc(45vh - 50px) !important;
+}
+
+.compact-edit #buttoncontainerBOTTOM:not([style*="display: none"]) {
+    display: flex !important;
+    flex-direction: column;
+    position: fixed !important;
+    top: 72px;
+    right: 8px;
+    bottom: auto !important;
+    width: auto;
+    z-index: 1002;
+}
+
+.compact-edit #buttoncontainerBOTTOM > div {
+    position: static !important;
+    width: 44px;
+    height: 44px;
 }
 
 /* Responsive adjustments */

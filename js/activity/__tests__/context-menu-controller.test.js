@@ -557,6 +557,30 @@ describe("ContextMenuController", () => {
             expect(home.fn).toBe(activity.findBlocks);
         });
 
+        test("keeps editor button IDs stable when labels are translated", () => {
+            const originalTranslate = global._;
+            global._ = label => `translated: ${label}`;
+
+            try {
+                controller.setupPaletteMenu();
+
+                [
+                    [activity.hideBlocksContainer, "showHideBlocksButton"],
+                    [activity.collapseBlocksContainer, "expandCollapseBlocksButton"],
+                    [activity.smallerContainer, "decreaseBlockSizeButton"],
+                    [activity.largerContainer, "increaseBlockSizeButton"]
+                ].forEach(([button, id]) => {
+                    expect(button.setAttribute).toHaveBeenCalledWith("id", id);
+                    expect(button.setAttribute).toHaveBeenCalledWith(
+                        "data-tooltip",
+                        expect.stringContaining("translated:")
+                    );
+                });
+            } finally {
+                global._ = originalTranslate;
+            }
+        });
+
         test("wires 'Show/hide blocks', 'Expand/collapse blocks' and 'Restore' to the controller's own methods", () => {
             controller.setupPaletteMenu();
             const showHide = activity.helpfulWheelItems.find(

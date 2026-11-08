@@ -2662,6 +2662,18 @@ describe("Palettes Class", () => {
     });
 
     describe("resetKeyboardNavigation method", () => {
+        test("remembers the active palette without replacing it on a later reset", () => {
+            palettes.activePalette = "rhythm";
+            palettes.lastActivePalette = "pitch";
+
+            palettes.resetKeyboardNavigation();
+            expect(palettes.activePalette).toBeNull();
+            expect(palettes.lastActivePalette).toBe("rhythm");
+
+            palettes.resetKeyboardNavigation();
+            expect(palettes.lastActivePalette).toBe("rhythm");
+        });
+
         test("closes menus, clears keyboard focus, and cancels pending submenu opens", () => {
             jest.useFakeTimers();
 

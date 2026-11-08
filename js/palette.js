@@ -562,6 +562,9 @@ class Palettes {
         this._navTypeIndex = 0;
         this._navBlockIndex = 0;
         this._navPaletteBlockIndex = 0;
+        if (this.activePalette !== null) {
+            this.lastActivePalette = this.activePalette;
+        }
         this.activePalette = null;
         this._clearPendingMenuOpen();
         this._clearKeyboardFocus();
