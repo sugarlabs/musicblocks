@@ -2602,7 +2602,9 @@ describe("_setupFileHandlers inner callbacks", () => {
 
     it.each([
         ["an object", '{"name":"equal","pitchNumber":12}'],
-        ["a list of numbers", "[1,2,3]"]
+        ["a list of numbers", "[1,2,3]"],
+        ["a list with one empty list", "[[]]"],
+        ["a list of lists that are not blocks", '[["name","age"],["a",1]]']
     ])("change handler rejects %s and leaves the project alone", async (_label, rawData) => {
         origFileReader = global.FileReader;
         class MockFR {
@@ -3604,7 +3606,9 @@ describe("_setupFileHandlers inner callbacks", () => {
 
     it.each([
         ["an object", '{"name":"equal","pitchNumber":12}'],
-        ["a list of numbers", "[1,2,3]"]
+        ["a list of numbers", "[1,2,3]"],
+        ["a list with one empty list", "[[]]"],
+        ["a list of lists that are not blocks", '[["name","age"],["a",1]]']
     ])("drop handler rejects %s and leaves the project alone", async (_label, rawData) => {
         origFileReader = global.FileReader;
         class MockFR {
