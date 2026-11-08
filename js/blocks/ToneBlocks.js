@@ -866,10 +866,14 @@ function setupToneBlocks(activity) {
          * @returns {*} - The result of the argument.
          */
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId !== null &&
+                parentId !== undefined &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "synthname"]);
             } else {
@@ -1106,33 +1110,40 @@ function setupToneBlocks(activity) {
          * @returns {Array} - The argument values.
          */
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId !== null &&
+                parentId !== undefined &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "customsample"]);
             } else {
                 if (activity.blocks.blockList[blk].value === null) {
                     activity.blocks.blockList[blk].value = ["", "", "do", 4];
                 }
-                const cblk1 = activity.blocks.blockList[blk].connections[1];
-                if (cblk1 !== null) {
-                    if (activity.blocks.blockList[cblk1].value !== null) {
+                const cblk1 = activity.blocks.blockList[blk]?.connections?.[1];
+                if (cblk1 !== null && cblk1 !== undefined) {
+                    if (
+                        activity.blocks.blockList[cblk1]?.value !== null &&
+                        activity.blocks.blockList[cblk1]?.value !== undefined
+                    ) {
                         const namevalue = activity.blocks.blockList[cblk1].value[0];
                         const datavalue = activity.blocks.blockList[cblk1].value[1];
                         activity.blocks.blockList[blk].value[0] = namevalue;
                         activity.blocks.blockList[blk].value[1] = datavalue;
                     }
                 }
-                const cblk2 = activity.blocks.blockList[blk].connections[2];
-                if (cblk2 !== null) {
-                    const svalue = activity.blocks.blockList[cblk2].value;
+                const cblk2 = activity.blocks.blockList[blk]?.connections?.[2];
+                if (cblk2 !== null && cblk2 !== undefined) {
+                    const svalue = activity.blocks.blockList[cblk2]?.value;
                     activity.blocks.blockList[blk].value[2] = svalue;
                 }
-                const cblk3 = activity.blocks.blockList[blk].connections[3];
-                if (cblk3 !== null) {
-                    const ovalue = activity.blocks.blockList[cblk3].value;
+                const cblk3 = activity.blocks.blockList[blk]?.connections?.[3];
+                if (cblk3 !== null && cblk3 !== undefined) {
+                    const ovalue = activity.blocks.blockList[cblk3]?.value;
                     activity.blocks.blockList[blk].value[3] = ovalue;
                 }
                 return activity.blocks.blockList[blk].value;

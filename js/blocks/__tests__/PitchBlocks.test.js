@@ -406,6 +406,9 @@ describe("setupPitchBlocks", () => {
             activity.blocks.blockList[20] = { name: "print" };
             block.arg(logo, 0, 10);
             expect(logo.statusFields).toContainEqual([10, "transposition"]);
+
+            activity.blocks.blockList[10].connections[0] = null;
+            expect(() => block.arg(logo, 0, 10)).not.toThrow();
         });
     });
 
@@ -429,6 +432,9 @@ describe("setupPitchBlocks", () => {
             activity.blocks.blockList[20] = { name: "print", connections: [null] };
             block.arg(logo, 0, 10);
             expect(logo.statusFields).toContainEqual([10, "mypitch"]);
+
+            activity.blocks.blockList[10].connections[0] = null;
+            expect(() => block.arg(logo, 0, 10)).not.toThrow();
         });
         it("Scalar change in pitch has its own help text and example", () => {
             const half = createdBlocks["deltapitch"].helpString;
@@ -526,6 +532,9 @@ describe("setupPitchBlocks", () => {
             activity.blocks.blockList[30] = { name: "print", connections: [null] };
             block.arg(logo, 0, 10);
             expect(logo.statusFields).toContainEqual([10, "mypitch"]);
+
+            activity.blocks.blockList[10].connections[0] = null;
+            expect(() => block.arg(logo, 0, 10)).not.toThrow();
 
             logo.inStatusMatrix = false;
 
@@ -1702,6 +1711,9 @@ describe("setupPitchBlocks", () => {
                     block.arg(logo, 0, 10);
                     expect(logo.statusFields).toContainEqual([10, "pitchinhertz"]);
 
+                    activity.blocks.blockList[10].connections[0] = null;
+                    expect(() => block.arg(logo, 0, 10)).not.toThrow();
+
                     // Test normal case
                     logo.inStatusMatrix = false;
                     turtles.ithTurtle(0).singer.lastNotePlayed = ["C4", 0.5];
@@ -1735,6 +1747,11 @@ describe("setupPitchBlocks", () => {
                     turtles.ithTurtle(0).singer.lastNotePlayed = ["A4", 0.5];
                     result = block.arg(logo, 0, 10);
                     expect(result).toBe("A4");
+
+                    // Test detached currentpitch in status matrix
+                    activity.blocks.blockList[10].connections[0] = null;
+                    expect(() => block.arg(logo, 0, 10)).not.toThrow();
+                    expect(block.arg(logo, 0, 10)).toBe("A4");
                 }
             });
         });
@@ -1806,6 +1823,9 @@ describe("setupPitchBlocks", () => {
                     activity.blocks.blockList[30] = { name: "print" };
                     block.arg(logo, 0, 10);
                     expect(logo.statusFields).toContainEqual([10, "outputtools"]);
+
+                    activity.blocks.blockList[10].connections[0] = null;
+                    expect(() => block.arg(logo, 0, 10)).not.toThrow();
                 }
             });
         });

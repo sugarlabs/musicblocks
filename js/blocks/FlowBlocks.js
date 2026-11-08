@@ -1229,7 +1229,15 @@ function setupFlowBlocks(activity) {
          */
         arg(logo, turtle, blk) {
             const blockList = activity.blocks.blockList;
-            if (logo.inStatusMatrix && blockList[blockList[blk].connections[0]].name === "print") {
+            const connections = blockList[blk]?.connections;
+            const parentId = connections?.[0];
+            if (
+                logo.inStatusMatrix &&
+                parentId !== null &&
+                parentId !== undefined &&
+                parentId in blockList &&
+                blockList[parentId]?.name === "print"
+            ) {
                 logo.statusFields.push([blk, "duplicate"]);
             } else {
                 return (blockList[blk].value =

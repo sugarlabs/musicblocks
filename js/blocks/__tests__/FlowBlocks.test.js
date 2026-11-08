@@ -1063,6 +1063,28 @@ describe("FlowBlocks integration", () => {
             expect(res).toBe(7);
             expect(activity.blocks.blockList[blk].value).toBe(7);
         });
+
+        test("status-matrix with detached block does not throw TypeError", () => {
+            const block = getBlock("duplicatefactor");
+            const blk = 11;
+            activity.blocks.blockList[blk] = {
+                protoblock: block,
+                connections: [null],
+                value: undefined
+            };
+            activity.turtles.ithTurtle(0).singer.duplicateFactor = 7;
+
+            logo.inStatusMatrix = true;
+            logo.statusFields = [];
+            let res;
+            expect(() => {
+                res = block.arg(logo, 0, blk);
+            }).not.toThrow();
+
+            expect(logo.statusFields).toHaveLength(0);
+            expect(res).toBe(7);
+            expect(activity.blocks.blockList[blk].value).toBe(7);
+        });
     });
 
     test("Hidden block variants simply no-op", () => {
