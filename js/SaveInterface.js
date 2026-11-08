@@ -45,6 +45,152 @@ function _lazyRequire(modules, callback) {
     }
 }
 
+// Sharps in the key signature of each major key, flats as negative numbers. The last four are
+// no one's major key but are the tonics of ordinary modes, such as G♯ minor.
+const MIDI_MAJOR_KEY_SHARPS = new Map([
+    ["C", 0],
+    ["G", 1],
+    ["D", 2],
+    ["A", 3],
+    ["E", 4],
+    ["B", 5],
+    ["F#", 6],
+    ["C#", 7],
+    ["F", -1],
+    ["Bb", -2],
+    ["Eb", -3],
+    ["Ab", -4],
+    ["Db", -5],
+    ["Gb", -6],
+    ["Cb", -7],
+    ["G#", 8],
+    ["D#", 9],
+    ["A#", 10],
+    ["Fb", -8]
+]);
+
+// How far the key signature of each mode that has one sits from the major key on its tonic.
+const MIDI_MODE_SHARPS = new Map([
+    ["major", 0],
+    ["ionian", 0],
+    ["lydian", 1],
+    ["mixolydian", -1],
+    ["dorian", -2],
+    ["minor", -3],
+    ["aeolian", -3],
+    ["harmonic minor", -3],
+    ["melodic minor", -3],
+    ["phrygian", -4],
+    ["locrian", -5]
+]);
+
+// MIDI marks a key signature only as major or minor.
+const MIDI_MINOR_MODES = new Set(["minor", "aeolian", "harmonic minor", "melodic minor"]);
+
+/**
+ * A Music Blocks key as a MIDI key signature.
+ * @param {string} key - e.g. "F major" or "B♭ minor"
+ * @returns {{sharps: number, minor: boolean}|null} sharps counts flats as negative; null for a
+ *     mode with no key signature, or one that needs more than seven sharps or flats.
+ */
+const keySignatureForMidi = key => {
+    const match = /^\s*(\S+)\s+(.+?)\s*$/.exec(String(key ?? ""));
+    if (!match) return null;
+    const tonic = match[1].replace(/♯/g, "#").replace(/♭/g, "b");
+    const major = MIDI_MAJOR_KEY_SHARPS.get(tonic.charAt(0).toUpperCase() + tonic.slice(1));
+    const mode = match[2].toLowerCase();
+    const offset = MIDI_MODE_SHARPS.get(mode);
+    if (major === undefined || offset === undefined) return null;
+    const sharps = major + offset;
+    if (sharps < -7 || sharps > 7) return null;
+    return { sharps, minor: MIDI_MINOR_MODES.has(mode) };
+};
+
+/**
+ * Writes key signature events into the first track of a MIDI file. The bundled MIDI library
+ * writes a key signature's sharps as its index in a list of key names plus seven, which readers
+ * take for a different key, so key signatures are added to its output instead.
+ * @param {Uint8Array} bytes - a MIDI file written by Midi.toArray(), whose first track holds
+ *     only meta events
+ * @param {Array<{ticks: number, sharps: number, minor: boolean}>} keySignatures
+ * @returns {Uint8Array} the file with the key signatures, or unchanged if its first track is
+ *     not as expected
+ */
+const addMidiKeySignatures = (bytes, keySignatures) => {
+    if (keySignatures.length === 0) return bytes;
+
+    const readUint32 = pos =>
+        ((bytes[pos] << 24) | (bytes[pos + 1] << 16) | (bytes[pos + 2] << 8) | bytes[pos + 3]) >>>
+        0;
+    const readVarLen = pos => {
+        let value = 0;
+        let byte;
+        do {
+            byte = bytes[pos++];
+            value = value * 128 + (byte & 0x7f);
+        } while (byte & 0x80);
+        return [value, pos];
+    };
+    const writeVarLen = value => {
+        const out = [value & 0x7f];
+        while ((value = Math.floor(value / 128)) > 0) out.unshift((value & 0x7f) | 0x80);
+        return out;
+    };
+
+    const trackStart = 8 + readUint32(4);
+    if (String.fromCharCode(...bytes.subarray(trackStart, trackStart + 4)) !== "MTrk") {
+        return bytes;
+    }
+    const dataStart = trackStart + 8;
+    const dataEnd = dataStart + readUint32(trackStart + 4);
+
+    const events = [];
+    let ticks = 0;
+    let pos = dataStart;
+    while (pos < dataEnd) {
+        let delta;
+        [delta, pos] = readVarLen(pos);
+        ticks += delta;
+        if (bytes[pos] !== 0xff) return bytes;
+        const start = pos;
+        let length;
+        [length, pos] = readVarLen(pos + 2);
+        pos += length;
+        // End of track: written again after the last event.
+        if (bytes[start + 1] === 0x2f) continue;
+        events.push({ ticks, data: Array.from(bytes.subarray(start, pos)) });
+    }
+
+    keySignatures.forEach(({ ticks, sharps, minor }) => {
+        events.push({ ticks, data: [0xff, 0x59, 0x02, sharps & 0xff, minor ? 1 : 0] });
+    });
+    // A stable sort keeps events at the same tick in the order they were written.
+    events.sort((a, b) => a.ticks - b.ticks);
+
+    const data = [];
+    let lastTicks = 0;
+    events.forEach(event => {
+        data.push(...writeVarLen(event.ticks - lastTicks), ...event.data);
+        lastTicks = event.ticks;
+    });
+    data.push(0, 0xff, 0x2f, 0);
+
+    const result = new Uint8Array(bytes.length - (dataEnd - dataStart) + data.length);
+    result.set(bytes.subarray(0, trackStart + 4));
+    result.set(
+        [
+            data.length >>> 24,
+            (data.length >>> 16) & 0xff,
+            (data.length >>> 8) & 0xff,
+            data.length & 0xff
+        ],
+        trackStart + 4
+    );
+    result.set(data, dataStart);
+    result.set(bytes.subarray(dataEnd), dataStart + data.length);
+    return result;
+};
+
 class SaveInterface {
     /**
      * Creates an instance of SaveInterface.
@@ -472,11 +618,13 @@ class SaveInterface {
 
         // Without a tempo and a time signature a MIDI file is read at 120 bpm in 4/4, so
         // notes played at any other tempo fall off the beat grid. A MIDI file has one tempo
-        // map and one set of time signatures for all its tracks: take them from the first
-        // track. Notes are placed by the time they play, so every track keeps its timing.
-        const writeTempoAndMeter = (header, notes) => {
+        // map and one set of time and key signatures for all its tracks: take them from the
+        // first track. Notes are placed by the time they play, so every track keeps its timing.
+        // Returns the key signatures, which addMidiKeySignatures() writes into the file.
+        const writeHeaderEvents = (header, notes) => {
             let time = 0;
             let lastMeter = null;
+            const keySignatures = [];
             notes.forEach(noteData => {
                 const duration = noteSeconds(noteData);
                 if (duration === null) return;
@@ -501,8 +649,20 @@ class SaveInterface {
                     lastMeter = meter;
                 }
 
+                const key = keySignatureForMidi(noteData.key);
+                const lastKey = keySignatures[keySignatures.length - 1];
+                if (
+                    key !== null &&
+                    (lastKey === undefined ||
+                        key.sharps !== lastKey.sharps ||
+                        key.minor !== lastKey.minor)
+                ) {
+                    keySignatures.push({ ticks: header.secondsToTicks(time), ...key });
+                }
+
                 time += duration;
             });
+            return keySignatures;
         };
 
         const generateMidi = data => {
@@ -517,9 +677,7 @@ class SaveInterface {
                         (noteData.drum || noteData.note.some(pitch => !pitch.includes("R")))
                 )
             );
-            if (firstTrack) {
-                writeTempoAndMeter(midi.header, firstTrack);
-            }
+            const keySignatures = firstTrack ? writeHeaderEvents(midi.header, firstTrack) : [];
 
             Object.entries(data).forEach(([blockIndex, notes]) => {
                 const mainTrack = midi.addTrack();
@@ -590,7 +748,7 @@ class SaveInterface {
             });
 
             // Generate the MIDI file and trigger download.
-            const midiData = midi.toArray();
+            const midiData = addMidiKeySignatures(midi.toArray(), keySignatures);
             const blob = new Blob([midiData], { type: "audio/midi" });
             const url = URL.createObjectURL(blob);
             this.activity.save.download("midi", url, null);
@@ -1230,5 +1388,5 @@ class SaveInterface {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { SaveInterface };
+    module.exports = { SaveInterface, keySignatureForMidi, addMidiKeySignatures };
 }

@@ -2631,7 +2631,8 @@ class Singer {
                                         turtle,
                                         bpmValue || 90,
                                         last(tur.singer.instrumentNames),
-                                        [tur.singer.beatsPerMeasure, tur.singer.noteValuePerBeat]
+                                        [tur.singer.beatsPerMeasure, tur.singer.noteValuePerBeat],
+                                        tur.singer.keySignature
                                     );
                                 }
                                 if (exporting || tur.singer.recordingNotation) {

@@ -79,7 +79,7 @@ global.mockDownload = jest.fn();
 // Since SaveInterface.js uses this pattern for lazy-loaded exports,
 // we load it manually with a custom require that detects array arguments
 // and immediately invokes the callback (globals are already mocked above).
-const { SaveInterface } = require("../SaveInterface");
+const { SaveInterface, keySignatureForMidi, addMidiKeySignatures } = require("../SaveInterface");
 const { escapeHTML } = require("../utils/utils");
 global.escapeHTML = escapeHTML;
 const util = require("util");
@@ -1088,6 +1088,178 @@ describe("afterSaveMIDI tempo and time signatures", () => {
         expect(midi.header.tempos).toEqual([]);
         expect(midi.header.timeSignatures).toEqual([]);
         expect(midi.tracks.every(track => track.notes.length === 0)).toBe(true);
+    });
+});
+
+describe("afterSaveMIDI key signatures", () => {
+    const { Midi: ToneMidi } = require("@tonejs/midi");
+    const { parseMidi } = require("midi-file");
+    let mockMidi;
+    let mockBlob;
+    let instance;
+    let written;
+    let saved;
+
+    // Exports the notes through the real MIDI library and returns the file that is saved.
+    const exportMidi = data => {
+        instance.activity.logo._midiData = data;
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+        return saved;
+    };
+
+    const note = (name, key, meter = [4, 4]) => ({
+        note: [name],
+        duration: 4,
+        bpm: 90,
+        instrument: "guitar",
+        meter,
+        key
+    });
+
+    // The key signature events in the first track, as [ticks, sharps, minor].
+    const keyEvents = file => {
+        let ticks = 0;
+        return parseMidi(file)
+            .tracks[0].map(event => {
+                ticks += event.deltaTime;
+                return { ...event, ticks };
+            })
+            .filter(event => event.type === "keySignature")
+            .map(event => [event.ticks, event.key, event.scale === 1]);
+    };
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        mockMidi = global.Midi;
+        mockBlob = global.Blob;
+        global.Midi = class extends ToneMidi {
+            toArray() {
+                written = super.toArray();
+                return written;
+            }
+        };
+        global.Blob = class {
+            constructor(parts) {
+                saved = parts[0];
+            }
+        };
+        const activity = { logo: {}, save: { download: jest.fn() } };
+        instance = new SaveInterface(activity);
+        instance.activity = activity;
+        global.URL.createObjectURL = jest.fn(() => "mockURL");
+        global.getMidiInstrument = jest.fn(() => ({ default: 0, guitar: 25 }));
+        global.getMidiDrum = jest.fn(() => ({}));
+    });
+
+    afterEach(() => {
+        global.Midi = mockMidi;
+        global.Blob = mockBlob;
+        jest.useRealTimers();
+    });
+
+    it("writes the key, so the file reads back in F major", () => {
+        const file = exportMidi({ 0: [note("A4", "F major"), note("B♭4", "F major")] });
+
+        expect(keyEvents(file)).toEqual([[0, -1, false]]);
+        expect(new ToneMidi(file).header.keySignatures).toEqual([
+            { key: "F", scale: "major", ticks: 0 }
+        ]);
+    });
+
+    it("writes a key change where it happens", () => {
+        const file = exportMidi({
+            0: [
+                note("C4", "C major"),
+                note("D4", "C major"),
+                note("D♭4", "B♭ minor"),
+                note("F4", "B♭ minor")
+            ]
+        });
+
+        expect(keyEvents(file)).toEqual([
+            [0, 0, false],
+            [960, -5, true]
+        ]);
+    });
+
+    it("keeps the notes, tempo and meter of the file", () => {
+        const file = exportMidi({
+            0: [note("A4", "A major", [3, 4]), note("C#5", "A major", [3, 4])]
+        });
+        const midi = new ToneMidi(file);
+
+        expect(keyEvents(file)).toEqual([[0, 3, false]]);
+        expect(midi.header.tempos.map(t => Math.round(t.bpm))).toEqual([90]);
+        expect(midi.header.timeSignatures.map(t => t.timeSignature)).toEqual([[3, 4]]);
+        expect(midi.tracks.find(t => t.name === "Track 1 - guitar").notes.map(n => n.name)).toEqual(
+            ["A4", "C#5"]
+        );
+        // Only the first track changed.
+        expect(parseMidi(file).tracks.slice(1)).toEqual(parseMidi(written).tracks.slice(1));
+    });
+
+    it("writes the file unchanged when no note has a key", () => {
+        const file = exportMidi({ 0: [note("A4", undefined), note("B4", undefined)] });
+
+        expect(file).toBe(written);
+        expect(keyEvents(file)).toEqual([]);
+    });
+
+    it("writes no key signature for a mode that has none", () => {
+        const file = exportMidi({
+            0: [note("C4", "C chromatic"), note("D4", "D dorian"), note("E4", "C chromatic")]
+        });
+
+        expect(keyEvents(file)).toEqual([[480, 0, false]]);
+    });
+});
+
+describe("keySignatureForMidi", () => {
+    it.each([
+        ["C major", { sharps: 0, minor: false }],
+        ["G major", { sharps: 1, minor: false }],
+        ["C♯ major", { sharps: 7, minor: false }],
+        ["Bb major", { sharps: -2, minor: false }],
+        ["E♭ minor", { sharps: -6, minor: true }],
+        ["G♯ minor", { sharps: 5, minor: true }],
+        ["A harmonic minor", { sharps: 0, minor: true }],
+        ["D dorian", { sharps: 0, minor: false }],
+        ["F lydian", { sharps: 0, minor: false }],
+        ["E phrygian", { sharps: 0, minor: false }]
+    ])("reads %s", (key, signature) => {
+        expect(keySignatureForMidi(key)).toEqual(signature);
+    });
+
+    it.each([["C chromatic"], ["G# major"], ["H major"], ["major"], [""], [undefined]])(
+        "gives no key signature for %p",
+        key => {
+            expect(keySignatureForMidi(key)).toBeNull();
+        }
+    );
+});
+
+describe("addMidiKeySignatures", () => {
+    const header = [0x4d, 0x54, 0x68, 0x64, 0, 0, 0, 6, 0, 1, 0, 1, 1, 0xe0];
+    const track = data => [0x4d, 0x54, 0x72, 0x6b, 0, 0, 0, data.length, ...data];
+
+    it("leaves a file whose first track has a channel event unchanged", () => {
+        const bytes = new Uint8Array([...header, ...track([0, 0x90, 60, 100, 0, 0xff, 0x2f, 0])]);
+        expect(addMidiKeySignatures(bytes, [{ ticks: 0, sharps: 1, minor: false }])).toBe(bytes);
+    });
+
+    it("leaves a file with no track after the header unchanged", () => {
+        const bytes = new Uint8Array([...header, 0x4d, 0x54, 0x68, 0x64]);
+        expect(addMidiKeySignatures(bytes, [{ ticks: 0, sharps: 1, minor: false }])).toBe(bytes);
+    });
+
+    it("writes a key signature after a long delta time", () => {
+        const bytes = new Uint8Array([...header, ...track([0, 0xff, 0x2f, 0])]);
+        const result = addMidiKeySignatures(bytes, [{ ticks: 200000, sharps: -3, minor: true }]);
+
+        expect(Array.from(result.subarray(header.length))).toEqual(
+            track([0x8c, 0x9a, 0x40, 0xff, 0x59, 2, 0xfd, 1, 0, 0xff, 0x2f, 0])
+        );
     });
 });
 

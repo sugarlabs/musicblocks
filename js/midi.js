@@ -109,6 +109,81 @@ const midiTicksToSeconds = (ticks, tempos, ppq) => {
     return seconds + ((ticks - lastTicks) / ppq) * (60 / bpm);
 };
 
+// @tonejs/midi names a key signature by the major key with its sharps or flats, in this order
+// from seven flats to seven sharps, whether the file marks it major or minor.
+const midiKeyNames = [
+    "Cb",
+    "Gb",
+    "Db",
+    "Ab",
+    "Eb",
+    "Bb",
+    "F",
+    "C",
+    "G",
+    "D",
+    "A",
+    "E",
+    "B",
+    "F#",
+    "C#"
+];
+
+// The tonic of each key signature, from seven flats to seven sharps.
+const majorTonics = [
+    "C♭",
+    "G♭",
+    "D♭",
+    "A♭",
+    "E♭",
+    "B♭",
+    "F",
+    "C",
+    "G",
+    "D",
+    "A",
+    "E",
+    "B",
+    "F♯",
+    "C♯"
+];
+const minorTonics = [
+    "A♭",
+    "E♭",
+    "B♭",
+    "F",
+    "C",
+    "G",
+    "D",
+    "A",
+    "E",
+    "B",
+    "F♯",
+    "C♯",
+    "G♯",
+    "D♯",
+    "A♯"
+];
+
+// MIDI note names use sharps; in a key with flats the black keys are spelled as flats.
+const flatSpellings = { "C#": "D♭", "D#": "E♭", "F#": "G♭", "G#": "A♭", "A#": "B♭" };
+
+/**
+ * A MIDI key signature as a Music Blocks key, or null for one @tonejs/midi could not name.
+ * @param {{key: string, scale: string}} keySignature - from midi.header.keySignatures
+ * @returns {{root: string, mode: string, flats: boolean}|null}
+ */
+const midiKeySignature = keySignature => {
+    const index = midiKeyNames.indexOf(keySignature.key);
+    if (index === -1) return null;
+    const minor = keySignature.scale === "minor";
+    return {
+        root: (minor ? minorTonics : majorTonics)[index],
+        mode: minor ? "minor" : "major",
+        flats: index < 7
+    };
+};
+
 class MidiTranscriber {
     constructor(midi, maxNoteBlocks) {
         this.midi = midi;
@@ -149,6 +224,104 @@ class MidiTranscriber {
         // be notated against the tempo actually in force when it plays, instead of always the
         // file's starting tempo; see tempoSegmentIndexAt().
         this.tempoSegments = this.buildTempoSegments();
+
+        // Meter and key segments in the same form. The starting meter is written on each
+        // track's start block, so only later meters need blocks in the note flow. The key is
+        // null until the file's first key signature.
+        this.meterSegments = this.buildMeterSegments();
+        this.keySegments = this.buildKeySegments();
+    }
+
+    // Seconds a tick plays at, rounded like note times (see buildSchedules()).
+    tickSeconds(ticks) {
+        return Math.round(midiTicksToSeconds(ticks, this.tempos, this.midi.header.ppq) * 100) / 100;
+    }
+
+    buildMeterSegments() {
+        const segments = [{ start: 0, timeSignature: this.currentMidiTimeSignature }];
+        const timeSignatures = [...(this.midi.header.timeSignatures || [])].sort(
+            (a, b) => a.ticks - b.ticks
+        );
+        for (const { ticks, timeSignature } of timeSignatures.slice(1)) {
+            const previous = segments[segments.length - 1].timeSignature;
+            if (timeSignature[0] === previous[0] && timeSignature[1] === previous[1]) continue;
+            segments.push({ start: this.tickSeconds(ticks), timeSignature });
+        }
+        return segments;
+    }
+
+    buildKeySegments() {
+        const segments = [{ start: 0, key: null }];
+        const keySignatures = [...(this.midi.header.keySignatures || [])].sort(
+            (a, b) => a.ticks - b.ticks
+        );
+        for (const keySignature of keySignatures) {
+            const key = midiKeySignature(keySignature);
+            const previous = segments[segments.length - 1].key;
+            if (
+                key === null ||
+                (previous && previous.root === key.root && previous.mode === key.mode)
+            ) {
+                continue;
+            }
+            const start = this.tickSeconds(keySignature.ticks);
+            // A key signature at the start replaces the absence of one.
+            if (start === 0) segments.pop();
+            segments.push({ start, key });
+        }
+        return segments;
+    }
+
+    // Index into segments of the one in force at a given point in the file.
+    segmentIndexAt(segments, seconds) {
+        let idx = 0;
+        for (let i = 0; i < segments.length; i++) {
+            if (segments[i].start > seconds + 1e-9) break;
+            idx = i;
+        }
+        return idx;
+    }
+
+    // Blocks for a tempo change: a setbpm3 block and its arguments, ending with a vspace.
+    tempoBlocks(base, bpm) {
+        return [
+            [base, ["setbpm3"], 0, 0, [null, base + 1, base + 2, base + 5]],
+            // A MIDI tempo counts quarter notes per minute, while this block counts beats of the
+            // time signature's note value (see MeterActions.setBPM).
+            [
+                base + 1,
+                ["number", { value: (bpm * this.currentMidiTimeSignature[1]) / 4 }],
+                0,
+                0,
+                [base]
+            ],
+            [base + 2, "divide", 0, 0, [base, base + 3, base + 4]],
+            [base + 3, ["number", { value: 1 }], 0, 0, [base + 2]],
+            [base + 4, ["number", { value: this.currentMidiTimeSignature[1] }], 0, 0, [base + 2]],
+            [base + 5, "vspace", 0, 0, [base, null]]
+        ];
+    }
+
+    // Blocks for a meter change: a meter block and its arguments, ending with a vspace.
+    meterBlocks(base, [beats, noteValue]) {
+        return [
+            [base, "meter", 0, 0, [null, base + 1, base + 2, base + 5]],
+            [base + 1, ["number", { value: beats }], 0, 0, [base]],
+            [base + 2, "divide", 0, 0, [base, base + 3, base + 4]],
+            [base + 3, ["number", { value: 1 }], 0, 0, [base + 2]],
+            [base + 4, ["number", { value: noteValue }], 0, 0, [base + 2]],
+            [base + 5, "vspace", 0, 0, [base, null]]
+        ];
+    }
+
+    // Blocks for a key change: a setkey2 block and its arguments, ending with a vspace.
+    keyBlocks(base, { root, mode }) {
+        return [
+            [base, "setkey2", 0, 0, [null, base + 1, base + 2, base + 3]],
+            [base + 1, ["notename", { value: root }], 0, 0, [base]],
+            [base + 2, ["modename", { value: mode }], 0, 0, [base]],
+            [base + 3, "vspace", 0, 0, [base, null]]
+        ];
     }
 
     buildTempoSegments() {
@@ -172,12 +345,7 @@ class MidiTranscriber {
 
     // Index into this.tempoSegments of the tempo in force at a given point in the file.
     tempoSegmentIndexAt(seconds) {
-        let idx = 0;
-        for (let i = 0; i < this.tempoSegments.length; i++) {
-            if (this.tempoSegments[i].start > seconds + 1e-9) break;
-            idx = i;
-        }
-        return idx;
+        return this.segmentIndexAt(this.tempoSegments, seconds);
     }
 
     // Every note and rest is written relative to the tempo passed in, which the caller picks
@@ -266,7 +434,7 @@ class MidiTranscriber {
         return true;
     }
 
-    getPitch(x, notes, prev, isPercussionTrack) {
+    getPitch(x, notes, prev, isPercussionTrack, flats = false) {
         const ar = [];
         if (notes[0].name === "R") {
             ar.push([x, "rest2", 0, 0, [prev, null]]);
@@ -287,7 +455,8 @@ class MidiTranscriber {
             }
         } else {
             for (let na = 0; na < notes.length; na++) {
-                const [pitchName, octave] = splitNoteName(notes[na].name);
+                const [sharpName, octave] = splitNoteName(notes[na].name);
+                const pitchName = (flats && flatSpellings[sharpName]) || sharpName;
                 const first = na === 0;
                 const last = na === notes.length - 1;
                 ar.push(
@@ -337,6 +506,10 @@ class MidiTranscriber {
         // at 0: finalizeTracks() always writes one setbpm3 for the file's starting tempo,
         // shared by every track, before any of this runs.
         let appliedTempoIndex = 0;
+        // Likewise for meters (the starting one is on the start block) and keys (none until the
+        // first key signature). Drums have no key.
+        let appliedMeterIndex = 0;
+        let appliedKeyIndex = this.keySegments[0].key === null ? 0 : -1;
         // Seconds the written notes play for. Each note runs up to where the file's note ends,
         // at the tempo it plays at, so rounding never adds up.
         let written = 0;
@@ -406,54 +579,49 @@ class MidiTranscriber {
             if (k !== 0) baseIdx = baseIdx + 2;
             let prevForNote = first ? baseIdx - 2 : baseIdx - 1;
 
-            // Splice a setbpm3 chunk in before this note if the tempo changed since the last
-            // one, so notation reads at the tempo actually in force (playback timing already
-            // follows the file's own tempo map via noteSeconds()/buildSchedules(), unaffected
-            // by this). jsONON is append-only, so later indices just shift to make room; no
-            // renumbering of already-pushed blocks is needed.
+            // Splice tempo, meter and key blocks in before this note wherever they changed since
+            // the last note, so notation reads at the tempo, in the meter and in the key actually
+            // in force (playback timing already follows the file's own tempo map via
+            // noteSeconds()/buildSchedules(), unaffected by this). jsONON is append-only, so
+            // later indices just shift to make room; no renumbering of already-pushed blocks is
+            // needed.
             const segIndex = this.tempoSegmentIndexAt(start);
-            let tempoVspaceEntry = null;
+            const meterIndex = this.segmentIndexAt(this.meterSegments, start);
+            const keyIndex = isPercussionTrack
+                ? appliedKeyIndex
+                : this.segmentIndexAt(this.keySegments, start);
+            const changes = [];
             if (segIndex !== appliedTempoIndex) {
-                const tempoBase = baseIdx;
-                const tempoBpm = this.tempoSegments[segIndex].bpm;
-                currentActionBlock.push(
-                    [
-                        tempoBase,
-                        ["setbpm3"],
-                        0,
-                        0,
-                        [prevForNote, tempoBase + 1, tempoBase + 2, tempoBase + 5]
-                    ],
-                    // A MIDI tempo counts quarter notes per minute, while this block counts
-                    // beats of the time signature's note value (see MeterActions.setBPM).
-                    [
-                        tempoBase + 1,
-                        ["number", { value: (tempoBpm * this.currentMidiTimeSignature[1]) / 4 }],
-                        0,
-                        0,
-                        [tempoBase]
-                    ],
-                    [tempoBase + 2, "divide", 0, 0, [tempoBase, tempoBase + 3, tempoBase + 4]],
-                    [tempoBase + 3, ["number", { value: 1 }], 0, 0, [tempoBase + 2]],
-                    [
-                        tempoBase + 4,
-                        ["number", { value: this.currentMidiTimeSignature[1] }],
-                        0,
-                        0,
-                        [tempoBase + 2]
-                    ],
-                    [tempoBase + 5, "vspace", 0, 0, [tempoBase, null]]
-                );
-                tempoVspaceEntry = currentActionBlock[currentActionBlock.length - 1];
-                prevForNote = tempoBase + 5;
+                changes.push(base => this.tempoBlocks(base, this.tempoSegments[segIndex].bpm));
                 appliedTempoIndex = segIndex;
             }
+            if (meterIndex !== appliedMeterIndex) {
+                const { timeSignature } = this.meterSegments[meterIndex];
+                changes.push(base => this.meterBlocks(base, timeSignature));
+                appliedMeterIndex = meterIndex;
+            }
+            if (keyIndex !== appliedKeyIndex) {
+                const { key } = this.keySegments[keyIndex];
+                changes.push(base => this.keyBlocks(base, key));
+                appliedKeyIndex = keyIndex;
+            }
 
-            // currentActionBlock may have just grown by the tempo chunk above, so this note's
-            // own index is computed fresh here rather than reusing baseIdx.
+            let lastVspaceEntry = null;
+            for (const makeBlocks of changes) {
+                const blocks = makeBlocks(baseIdx);
+                blocks[0][4][0] = prevForNote;
+                if (lastVspaceEntry) lastVspaceEntry[4][1] = baseIdx;
+                currentActionBlock.push(...blocks);
+                lastVspaceEntry = blocks[blocks.length - 1];
+                prevForNote = lastVspaceEntry[0];
+                baseIdx += blocks.length;
+            }
+
+            // currentActionBlock may have just grown by the blocks above, so this note's own
+            // index is computed fresh here rather than reusing baseIdx.
             let val = this.jsONON.length + currentActionBlock.length;
             if (k !== 0) val = val + 2;
-            if (tempoVspaceEntry) tempoVspaceEntry[4][1] = val;
+            if (lastVspaceEntry) lastVspaceEntry[4][1] = val;
 
             const bpm = this.tempoSegments[segIndex].bpm;
             const obj = preserveDuration
@@ -461,7 +629,14 @@ class MidiTranscriber {
                 : getNoteValue(this.wholeNotesAt(end - written, bpm));
             if (!preserveDuration) written += (obj[0] / obj[1]) * (240 / bpm);
 
-            const pitches = this.getPitch(val + 5, notes, val, isPercussionTrack);
+            const key = isPercussionTrack ? null : this.keySegments[appliedKeyIndex].key;
+            const pitches = this.getPitch(
+                val + 5,
+                notes,
+                val,
+                isPercussionTrack,
+                key !== null && key.flats
+            );
             currentActionBlock.push(
                 [
                     val,
