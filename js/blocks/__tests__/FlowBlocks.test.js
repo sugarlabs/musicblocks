@@ -524,6 +524,30 @@ describe("FlowBlocks integration", () => {
         expect(turtle.queue[1].parentBlk).toBe(999);
     });
 
+    test("WaitForBlock cleanup respects actionBoundaries and does not remove entries below nested action boundary", () => {
+        const block = getBlock("waitFor");
+        const blk = 6;
+        activity.blocks.blockList[blk] = { connections: [60] };
+        const turtle = activity.turtles.ithTurtle(0);
+
+        turtle.queue = [];
+        turtle.queue.push(new Queue(50, 1, 500));
+        turtle.queue.push(new Queue(51, 1, 501));
+        turtle.queue.push(new Queue(blk, 1, blk));
+        turtle.queue.push(new Queue(blk, 1, blk));
+        turtle.queue.push(new Queue(99, 1, 999));
+
+        turtle.actionBoundaries = [2];
+
+        block.flow([true], logo, 0, blk);
+
+        expect(turtle.queue).toHaveLength(4);
+        expect(turtle.queue[0].blk).toBe(50);
+        expect(turtle.queue[1].blk).toBe(51);
+        expect(turtle.queue[2].parentBlk).toBe(blk);
+        expect(turtle.queue[3].blk).toBe(99);
+    });
+
     test("UntilBlock requeues when false and cleans when true", () => {
         const block = getBlock("until");
         const blk = 7;
