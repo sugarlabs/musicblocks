@@ -2704,6 +2704,10 @@ describe("buildScale keeps the tonic named as the key", () => {
         const [scale, halfSteps] = buildScale(keySignature);
         expect(scale).toEqual(expected);
         expect(halfSteps).toEqual([1, 1, 2, 3, 5]);
+
+        // The user-facing lookup must also report the key note, in octaves 0 and 1.
+        expect(nthDegreeToPitch(keySignature, 1)).toEqual([expected[0], 0]);
+        expect(nthDegreeToPitch(keySignature, 6)).toEqual([expected[0], 1]);
     });
 
     test("every sharp key starts every mode on its own tonic", () => {
