@@ -5320,7 +5320,7 @@ class Blocks {
             this.selectedStack = this.activeBlock;
 
             /** Copy the selectedStack. */
-            this.selectedBlocksObj = deepClone(this._copyBlocksToObj(false));
+            this.selectedBlocksObj = deepClone(this._copyBlocksToObj());
 
             /** Reset paste offset. */
             this.pasteDx = 0;
@@ -5389,7 +5389,7 @@ class Blocks {
                 return;
             }
 
-            const blockObjs = this._copyBlocksToObj(true);
+            const blockObjs = this._copyBlocksToObj();
             /**
              * If the first block is an action block, the its first
              * connection is the block containing its label.
@@ -5411,8 +5411,9 @@ class Blocks {
             } else {
                 /** Look for "show", "turtleshell", or "customsample". */
                 for (let i = 0; i < blockObjs.length; i++) {
-                    if (["show", "turtleshell", "customsample"].includes(blockObjs[i][1])) {
-                        switch (blockObjs[i][1]) {
+                    const blockName = [].concat(blockObjs[i][1])[0];
+                    if (["show", "turtleshell", "customsample"].includes(blockName)) {
+                        switch (blockName) {
                             case "show":
                                 name = `${_("Show").toLowerCase()}-${MathUtility.doRandom(
                                     0,
@@ -5426,7 +5427,7 @@ class Blocks {
                                 name = `${_("sample")}-${MathUtility.doRandom(0, 1000)}`;
                                 break;
                             default:
-                                name = `${blockObjs[i][1]}-${MathUtility.doRandom(0, 1000)}`;
+                                name = `${blockName}-${MathUtility.doRandom(0, 1000)}`;
                                 break;
                         }
                         break;
@@ -5444,8 +5445,7 @@ class Blocks {
          * @public
          * @returns blockObj
          */
-        this._copyBlocksToObj = saveStack => {
-            /** If saveStack then don't override media or audiofile blocks. */
+        this._copyBlocksToObj = () => {
             const blockObjs = [];
             const blockMap = {};
             let x;
@@ -5467,14 +5467,6 @@ class Blocks {
                     blockItem = [b, myBlock.unknownBlock, x, y, []];
                 } else if (myBlock.isValueBlock()) {
                     switch (myBlock.name) {
-                        case "media":
-                        case "audiofile":
-                            if (saveStack) {
-                                blockItem = [b, [myBlock.name, { value: myBlock.value }], x, y, []];
-                            } else {
-                                blockItem = [b, [myBlock.name, null], x, y, []];
-                            }
-                            break;
                         case "namedbox":
                         case "namedarg":
                             blockItem = [
@@ -5508,6 +5500,13 @@ class Blocks {
                     ].includes(myBlock.name)
                 ) {
                     blockItem = [b, [myBlock.name, { value: myBlock.privateData }], x, y, []];
+                } else if (myBlock.name === "customsample" && Array.isArray(myBlock.value)) {
+                    const value = myBlock.value.slice();
+                    const fileBlock = this.blockList[myBlock.connections[1]];
+                    if (fileBlock?.name === "audiofile" && fileBlock.value !== null) {
+                        value[1] = "";
+                    }
+                    blockItem = [b, [myBlock.name, { value: value }], x, y, []];
                 } else {
                     blockItem = [b, myBlock.name, x, y, []];
                 }
