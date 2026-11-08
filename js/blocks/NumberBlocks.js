@@ -54,6 +54,28 @@ function setupNumberBlocks(activity) {
     };
 
     /**
+     * Safely convert string to number with error handling
+     */
+    const toNumber = (logo, value, blk, allowWhitespace = false) => {
+        let numberValue = value;
+        if (typeof value === "string") {
+            const str = allowWhitespace ? value.trim() : value;
+            if (str === "" || !/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(str)) {
+                logo.stopTurtle = true;
+                activity.errorMsg(NANERRORMSG, blk);
+                return null;
+            }
+            numberValue = Number(str);
+        }
+        if (typeof numberValue === "number" && !Number.isFinite(numberValue)) {
+            logo.stopTurtle = true;
+            activity.errorMsg(NANERRORMSG, blk);
+            return null;
+        }
+        return numberValue;
+    };
+
+    /**
      * Handle math operation errors with standardized response
      */
     const handleMathError = (logo, error, blk, onError = NANERRORMSG) => {
@@ -993,35 +1015,16 @@ function setupNumberBlocks(activity) {
 
             if (!validateConnections([cblk1, cblk2, cblk3], blk)) return 0;
 
-            const toNumber = value => {
-                if (typeof value === "string") {
-                    const str = value.trim();
-                    if (str === "") {
-                        logo.stopTurtle = true;
-                        activity.errorMsg(NANERRORMSG, blk);
-                        return null;
-                    }
-                    const num = Number(str);
-                    if (isNaN(num)) {
-                        logo.stopTurtle = true;
-                        activity.errorMsg(NANERRORMSG, blk);
-                        return null;
-                    }
-                    return num;
-                }
-                return value;
-            };
-
             let val = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-            val = toNumber(val);
+            val = toNumber(logo, val, blk, true);
             if (val === null) return 0;
 
             let min = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-            min = toNumber(min);
+            min = toNumber(logo, min, blk, true);
             if (min === null) return 0;
 
             let max = logo.parseArg(logo, turtle, cblk3, blk, receivedArg);
-            max = toNumber(max);
+            max = toNumber(logo, max, blk, true);
             if (max === null) return 0;
 
             try {
@@ -1033,8 +1036,232 @@ function setupNumberBlocks(activity) {
         }
     }
 
+    class LerpBlock extends LeftBlock {
+        constructor() {
+            super("lerp");
+            this.setPalette("number", activity);
+            this.setHelpString([
+                _("The Lerp block calculates a linear interpolation between two values."),
+                "documentation",
+                ""
+            ]);
+
+            this.formBlock({
+                name: _("lerp"),
+                args: 3,
+                argLabels: [_("start"), _("stop"), _("amt")],
+                argTypes: ["anyin", "anyin", "anyin"],
+                defaults: [0, 100, 0.5]
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            if (typeof activity.blocks.blockList[blk].value === "string") {
+                return activity.blocks.blockList[blk].value;
+            } else {
+                return toFixed2(activity.blocks.blockList[blk].value);
+            }
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            if (isInStatusMatrix(logo, blk, "lerp")) return 0;
+
+            const cblk1 = activity.blocks.blockList[blk].connections[1];
+            const cblk2 = activity.blocks.blockList[blk].connections[2];
+            const cblk3 = activity.blocks.blockList[blk].connections[3];
+
+            if (!validateConnections([cblk1, cblk2, cblk3], blk)) return 0;
+
+            let start = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            start = toNumber(logo, start, blk);
+            if (start === null) return 0;
+
+            let stop = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+            stop = toNumber(logo, stop, blk);
+            if (stop === null) return 0;
+
+            let amt = logo.parseArg(logo, turtle, cblk3, blk, receivedArg);
+            amt = toNumber(logo, amt, blk);
+            if (amt === null) return 0;
+
+            try {
+                return MathUtility.doLerp(start, stop, amt);
+            } catch (e) {
+                handleMathError(logo, e, blk);
+                return 0;
+            }
+        }
+    }
+
+    class GcdBlock extends LeftBlock {
+        constructor() {
+            super("gcd");
+            this.setPalette("number", activity);
+            this.setHelpString([
+                _("The GCD block returns the greatest common divisor of two integers."),
+                "documentation",
+                ""
+            ]);
+
+            this.formBlock({
+                name: _("gcd"),
+                args: 2,
+                argLabels: [_("a"), _("b")],
+                argTypes: ["anyin", "anyin"],
+                defaults: [12, 18]
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return toFixed2(activity.blocks.blockList[blk].value);
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            if (isInStatusMatrix(logo, blk, "gcd")) return 0;
+
+            const cblk1 = activity.blocks.blockList[blk].connections[1];
+            const cblk2 = activity.blocks.blockList[blk].connections[2];
+
+            if (!validateConnections([cblk1, cblk2], blk)) return 0;
+
+            let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            a = toNumber(logo, a, blk);
+            if (a === null) return 0;
+
+            let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+            b = toNumber(logo, b, blk);
+            if (b === null) return 0;
+
+            try {
+                return MathUtility.doGcd(a, b);
+            } catch (e) {
+                handleMathError(logo, e, blk);
+                return 0;
+            }
+        }
+    }
+
+    class LcmBlock extends LeftBlock {
+        constructor() {
+            super("lcm");
+            this.setPalette("number", activity);
+            this.setHelpString([
+                _("The LCM block returns the least common multiple of two integers."),
+                "documentation",
+                ""
+            ]);
+
+            this.formBlock({
+                name: _("lcm"),
+                args: 2,
+                argLabels: [_("a"), _("b")],
+                argTypes: ["anyin", "anyin"],
+                defaults: [4, 6]
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return toFixed2(activity.blocks.blockList[blk].value);
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            if (isInStatusMatrix(logo, blk, "lcm")) return 0;
+
+            const cblk1 = activity.blocks.blockList[blk].connections[1];
+            const cblk2 = activity.blocks.blockList[blk].connections[2];
+
+            if (!validateConnections([cblk1, cblk2], blk)) return 0;
+
+            let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            a = toNumber(logo, a, blk);
+            if (a === null) return 0;
+
+            let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+            b = toNumber(logo, b, blk);
+            if (b === null) return 0;
+
+            try {
+                return MathUtility.doLcm(a, b);
+            } catch (e) {
+                handleMathError(logo, e, blk);
+                return 0;
+            }
+        }
+    }
+
+    class MapBlock extends LeftBlock {
+        constructor() {
+            super("map");
+            this.setPalette("number", activity);
+            this.setHelpString([
+                _("The Map block re-maps a number from one range to another."),
+                "documentation",
+                ""
+            ]);
+
+            this.formBlock({
+                name: _("map"),
+                args: 5,
+                argLabels: [_("value"), _("in min"), _("in max"), _("out min"), _("out max")],
+                argTypes: ["anyin", "anyin", "anyin", "anyin", "anyin"],
+                defaults: [5, 0, 10, 0, 100]
+            });
+        }
+
+        updateParameter(logo, turtle, blk) {
+            if (typeof activity.blocks.blockList[blk].value === "string") {
+                return activity.blocks.blockList[blk].value;
+            } else {
+                return toFixed2(activity.blocks.blockList[blk].value);
+            }
+        }
+
+        arg(logo, turtle, blk, receivedArg) {
+            if (isInStatusMatrix(logo, blk, "map")) return 0;
+
+            const cblk1 = activity.blocks.blockList[blk].connections[1];
+            const cblk2 = activity.blocks.blockList[blk].connections[2];
+            const cblk3 = activity.blocks.blockList[blk].connections[3];
+            const cblk4 = activity.blocks.blockList[blk].connections[4];
+            const cblk5 = activity.blocks.blockList[blk].connections[5];
+
+            if (!validateConnections([cblk1, cblk2, cblk3, cblk4, cblk5], blk)) return 0;
+
+            let val = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            val = toNumber(logo, val, blk);
+            if (val === null) return 0;
+
+            let inMin = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+            inMin = toNumber(logo, inMin, blk);
+            if (inMin === null) return 0;
+
+            let inMax = logo.parseArg(logo, turtle, cblk3, blk, receivedArg);
+            inMax = toNumber(logo, inMax, blk);
+            if (inMax === null) return 0;
+
+            let outMin = logo.parseArg(logo, turtle, cblk4, blk, receivedArg);
+            outMin = toNumber(logo, outMin, blk);
+            if (outMin === null) return 0;
+
+            let outMax = logo.parseArg(logo, turtle, cblk5, blk, receivedArg);
+            outMax = toNumber(logo, outMax, blk);
+            if (outMax === null) return 0;
+
+            try {
+                return MathUtility.doMap(val, inMin, inMax, outMin, outMax);
+            } catch (e) {
+                handleMathError(logo, e, blk);
+                return 0;
+            }
+        }
+    }
+
     new DistanceBlock().setup(activity);
     new ClampBlock().setup(activity);
+    new LerpBlock().setup(activity);
+    new GcdBlock().setup(activity);
+    new LcmBlock().setup(activity);
+    new MapBlock().setup(activity);
     new IntBlock().setup(activity);
     new ModBlock().setup(activity);
     new PowerBlock().setup(activity);

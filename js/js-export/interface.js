@@ -226,6 +226,10 @@ class JSInterface {
         oneOf: "MathUtility.doOneOf",
         distance: "MathUtility.doCalculateDistance",
         int: "MathUtility.doInt",
+        lerp: "MathUtility.doLerp",
+        gcd: "MathUtility.doGcd",
+        lcm: "MathUtility.doLcm",
+        map: "MathUtility.doMap",
         // Graphics blocks
         forward: "goForward",
         back: "goBackward",
@@ -1043,12 +1047,6 @@ class JSInterface {
                     values: ["even", "odd", "scalar"],
                     defaultIndex: 0
                 }
-            },
-            {
-                type: "function",
-                constraints: {
-                    async: true
-                }
             }
         ],
         setPitchNumberOffset: [
@@ -1105,7 +1103,7 @@ class JSInterface {
                         "dorian",
                         "phrygian",
                         "lydian",
-                        "mixolydian",
+                        "myxolydian",
                         "minor",
                         "aeolian"
                     ],
