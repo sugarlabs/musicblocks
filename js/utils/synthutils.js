@@ -1300,6 +1300,9 @@ function Synth() {
      * @memberof Synth
      */
     this.setupRecorder = () => {
+        if (this.recorderDest && this.recorder && this.recorder.state === "recording") {
+            this.abortRecorder();
+        }
         const cont = Tone.getContext();
         const dest = cont.createMediaStreamDestination();
         this.recorderDest = dest;
@@ -1409,6 +1412,7 @@ function Synth() {
         } catch (e) {
             console.debug("Could not disconnect recorder destination:", e);
         }
+        this.recorderDest = null;
         document.body.style.cursor = "default";
     };
 
