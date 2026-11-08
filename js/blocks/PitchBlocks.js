@@ -747,12 +747,21 @@ function setupPitchBlocks(activity) {
             const cblk = activity.blocks.blockList[blk].connections[1];
             const num = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
 
+            // eslint-disable-next-line eqeqeq
+            if (cblk == null && receivedArg === undefined) {
+                logo.stopTurtle = true;
+                return;
+            }
+
             try {
+                if (Number.isNaN(num)) {
+                    throw new Error("NoArgError");
+                }
                 const outType =
                     activity.blocks.blockList[blk].name === "number2pitch" ? "pitch" : "octave";
                 return Singer.PitchActions.numToPitch(num, outType, turtle);
             } catch (e) {
-                if (e === "NoArgError") {
+                if (e.message === "NoArgError" || e === "NoArgError") {
                     activity.errorMsg(NOINPUTERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else {
