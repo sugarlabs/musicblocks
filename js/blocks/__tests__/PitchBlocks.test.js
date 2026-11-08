@@ -565,6 +565,44 @@ describe("setupPitchBlocks", () => {
             block.setter(logo, 60, 0);
             expect(turtles.ithTurtle(0).singer.lastNotePlayed).toEqual(["C5", 4]);
         });
+
+        it("MyPitchBlock reads the innermost note being built in nested notes", () => {
+            const block = createdBlocks["mypitch"];
+            const singer = turtles.ithTurtle(0).singer;
+            logo.inStatusMatrix = false;
+            singer.lastNotePlayed = null;
+            singer.inNoteBlock = [32, 40];
+            singer.notePitches = { 32: ["E"], 40: ["A"] };
+            singer.noteOctaves = { 32: [4], 40: [5] };
+
+            block.arg(logo, 0, 10);
+
+            expect(global.getNote).toHaveBeenCalledWith(
+                "A",
+                5,
+                0,
+                singer.keySignature,
+                singer.movable,
+                null,
+                activity.errorMsg
+            );
+        });
+
+        it("MyPitchBlock gives G4 outside any note before a note has played", () => {
+            const block = createdBlocks["mypitch"];
+            const singer = turtles.ithTurtle(0).singer;
+            logo.inStatusMatrix = false;
+            singer.lastNotePlayed = null;
+            singer.inNoteBlock = [];
+            singer.notePitches = {};
+            singer.noteOctaves = {};
+            singer.pitchNumberOffset = 39;
+            global.pitchToNumber.mockReturnValueOnce(46);
+
+            expect(block.arg(logo, 0, 10)).toBe(7);
+            expect(global.getNote).not.toHaveBeenCalled();
+            expect(global.pitchToNumber).toHaveBeenCalledWith("G", 4, singer.keySignature);
+        });
     });
 
     describe("HertzBlock All Branches", () => {
@@ -1233,6 +1271,47 @@ describe("setupPitchBlocks", () => {
 
             // Restore default
             global.getCurrentEDO.mockReturnValue(12);
+        });
+
+        it("falls back to 392 Hz for non-finite pitch inputs instead of passing nulls on", () => {
+            const block = createdBlocks["pitch"];
+
+            // 392 Hz is G4: make the mock return the real conversion
+            // result for the fallback frequency.
+            global.frequencyToPitch.mockImplementation(() => ["G", 4, 0]);
+
+            // NaN slips past both sides of the old range check
+            // (NaN < A0 and NaN > C8 are both false), so the real
+            // frequencyToPitch(NaN) returns [null, null, null] and the
+            // null note throws inside processPitch (getNote reads
+            // .slice of null; widget paths call note.toLowerCase()).
+            // A NaN pitch is reachable from ordinary math blocks,
+            // e.g. a power block computing (-1) ^ 0.5.
+            block.flow([NaN, 4], logo, 0, 10);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.INVALIDPITCH, 10);
+            expect(global.frequencyToPitch).toHaveBeenCalledWith(392);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith("G", 4, 0, 0, 10);
+
+            // Clear the mocks so the Infinity assertions verify the
+            // Infinity call itself, not calls left over from the NaN case.
+            jest.clearAllMocks();
+
+            // Infinity takes the same fallback path.
+            block.flow([Infinity, 4], logo, 0, 10);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.INVALIDPITCH, 10);
+            expect(global.frequencyToPitch).toHaveBeenCalledWith(392);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith("G", 4, 0, 0, 10);
+
+            jest.clearAllMocks();
+
+            // -Infinity satisfies arg0 <= currentEDO, so without the
+            // finiteness check it is misread as a movable solfege scale
+            // degree and plays degree 7 instead of the fallback.
+            block.flow([-Infinity, 4], logo, 0, 10);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.INVALIDPITCH, 10);
+            expect(global.frequencyToPitch).toHaveBeenCalledWith(392);
+            expect(global.nthDegreeToPitch).not.toHaveBeenCalled();
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith("G", 4, 0, 0, 10);
         });
     });
 

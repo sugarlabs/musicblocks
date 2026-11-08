@@ -727,6 +727,56 @@ class SampleLoader {
 }
 
 /**
+ * Encodes decoded audio as a 16-bit PCM WAV file. Browsers can't record WAV
+ * directly (MediaRecorder gives WebM or Ogg), so "Save as WAV" records in the
+ * browser's own format, decodes it, and writes the samples out with this.
+ * @param {AudioBuffer} audioBuffer - Decoded audio (numberOfChannels, length,
+ *     sampleRate, getChannelData).
+ * @returns {ArrayBuffer} The bytes of the WAV file.
+ */
+function audioBufferToWav(audioBuffer) {
+    const channels = audioBuffer.numberOfChannels;
+    const frames = audioBuffer.length;
+    const sampleRate = audioBuffer.sampleRate;
+    const dataSize = frames * channels * 2;
+    const buffer = new ArrayBuffer(44 + dataSize);
+    const view = new DataView(buffer);
+    const writeString = (offset, text) => {
+        for (let i = 0; i < text.length; i++) {
+            view.setUint8(offset + i, text.charCodeAt(i));
+        }
+    };
+
+    writeString(0, "RIFF");
+    view.setUint32(4, 36 + dataSize, true);
+    writeString(8, "WAVE");
+    writeString(12, "fmt ");
+    view.setUint32(16, 16, true); // fmt chunk size
+    view.setUint16(20, 1, true); // PCM
+    view.setUint16(22, channels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * channels * 2, true); // byte rate
+    view.setUint16(32, channels * 2, true); // block align
+    view.setUint16(34, 16, true); // bits per sample
+    writeString(36, "data");
+    view.setUint32(40, dataSize, true);
+
+    const channelData = [];
+    for (let c = 0; c < channels; c++) {
+        channelData.push(audioBuffer.getChannelData(c));
+    }
+    let offset = 44;
+    for (let i = 0; i < frames; i++) {
+        for (let c = 0; c < channels; c++) {
+            const sample = Math.max(-1, Math.min(1, channelData[c][i]));
+            view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
+            offset += 2;
+        }
+    }
+    return buffer;
+}
+
+/**
  * Calculates the calibrated volume in decibels for a given instrument and volume level.
  * As per #1697, adjusts the volume for instruments defined in DEFAULTSYNTHVOLUME.
  * @param {string} instrumentName - The name of the instrument.
@@ -1254,11 +1304,10 @@ function Synth() {
         const dest = cont.createMediaStreamDestination();
         let chunks = [];
         const stream = dest.stream;
-        if (platform.FF) {
-            this.recorder = new MediaRecorder(stream, { type: "audio/wav" });
-        } else {
-            this.recorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
-        }
+        // Browsers can't record WAV, so record in their own format (WebM in
+        // Chrome, Ogg in Firefox) and convert to WAV when recording stops.
+        const recorder = new MediaRecorder(stream);
+        this.recorder = recorder;
         for (const tur in instruments) {
             for (const synth in instruments[tur]) {
                 instruments[tur][synth].connect(dest);
@@ -1277,18 +1326,34 @@ function Synth() {
             link.click();
             document.body.removeChild(link);
         };
-        this.recorder.onstop = () => {
+        this.recorder.onstop = async () => {
             if (!chunks.length) return;
-            let blob;
-            if (platform.FF) {
-                blob = new Blob(chunks, { type: "audio/wav" });
-            } else {
-                blob = new Blob(chunks, { type: "audio/ogg" });
-            }
+            // Firefox clears recorder.mimeType on stop, so take the type from the data.
+            const type = chunks[0].type || recorder.mimeType || "";
+            const recorded = new Blob(chunks, { type });
             chunks = [];
+            let blob;
+            let ext;
+            try {
+                const audioBuffer = await cont.decodeAudioData(await recorded.arrayBuffer());
+                blob = new Blob([audioBufferToWav(audioBuffer)], { type: "audio/wav" });
+                ext = ".wav";
+            } catch (e) {
+                // Couldn't convert, so save what was recorded, named by its real format.
+                console.debug("Could not convert the recording to WAV:", e);
+                blob = recorded;
+                const mime = type.toLowerCase();
+                if (mime.includes("ogg")) {
+                    ext = ".ogg";
+                } else if (mime.includes("mp4")) {
+                    // Safari records mp4 (aac).
+                    ext = ".m4a";
+                } else {
+                    ext = ".webm";
+                }
+            }
             const url = URL.createObjectURL(blob);
             const t = text => (typeof window._ === "function" ? window._(text) : text);
-            const ext = platform.FF ? ".wav" : ".ogg";
             const showCancelMessage = () => {
                 if (window.MBDialog && typeof window.MBDialog.alert === "function") {
                     window.MBDialog.alert(t("Download cancelled."), t("Save recording"));
@@ -1298,11 +1363,13 @@ function Synth() {
             };
             const finishDownload = name => {
                 if (name === null || name.trim() === "") {
+                    URL.revokeObjectURL(url);
                     showCancelMessage();
                     return;
                 }
 
                 download(url, name + ext);
+                URL.revokeObjectURL(url);
             };
 
             if (window.MBDialog && typeof window.MBDialog.prompt === "function") {
@@ -3079,6 +3146,7 @@ if (typeof module !== "undefined" && module.exports) {
         instrumentsSource,
         DEFAULTSYNTHVOLUME,
         SAMPLE_INFO,
-        calculateInstrumentVolumeDb
+        calculateInstrumentVolumeDb,
+        audioBufferToWav
     };
 }
