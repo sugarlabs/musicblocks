@@ -786,9 +786,21 @@ describe("setupPitchBlocks", () => {
             spy.mockRestore();
         });
 
+        it("handles disconnected input by stopping turtle", () => {
+            const block = createdBlocks["number2pitch"];
+            activity.blocks.blockList[10].name = "number2pitch";
+            activity.blocks.blockList[10].connections[1] = null;
+            logo.stopTurtle = false;
+
+            const result = block.arg(logo, 0, 10);
+            expect(result).toBeUndefined();
+            expect(logo.stopTurtle).toBe(true);
+        });
+
         it("handles NoArgError by calling activity.errorMsg and stopping turtle", () => {
             const block = createdBlocks["number2pitch"];
             activity.blocks.blockList[10].name = "number2pitch";
+            activity.blocks.blockList[10].connections[1] = 15;
             logo.stopTurtle = false;
 
             global.Singer.PitchActions.numToPitch.mockImplementation(() => {
@@ -804,13 +816,25 @@ describe("setupPitchBlocks", () => {
             const blockOct = createdBlocks["number2octave"];
             activity.blocks.blockList[20] = {
                 name: "number2octave",
-                connections: [null, null, null, null, null]
+                connections: [null, 25, null, null, null]
             };
             logo.stopTurtle = false;
 
             const resultOct = blockOct.arg(logo, 0, 20, null);
             expect(resultOct).toBeUndefined();
             expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 20);
+            expect(logo.stopTurtle).toBe(true);
+        });
+
+        it("handles NaN input by calling activity.errorMsg and stopping turtle", () => {
+            const block = createdBlocks["number2pitch"];
+            activity.blocks.blockList[10].name = "number2pitch";
+            activity.blocks.blockList[10].connections[1] = 15;
+            logo.stopTurtle = false;
+
+            const result = block.arg(logo, 0, 10, NaN);
+            expect(result).toBeUndefined();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
             expect(logo.stopTurtle).toBe(true);
         });
     });
