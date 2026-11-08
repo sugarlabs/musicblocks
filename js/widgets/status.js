@@ -432,6 +432,7 @@ class StatusMatrix {
     _removeWatch(value) {
         this._watches = this._watches.filter(watch => watch.value !== value);
         this._renderWatchList();
+        this._renderWatchValues();
     }
 
     _renderWatchList() {

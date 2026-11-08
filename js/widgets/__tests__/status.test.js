@@ -293,6 +293,20 @@ describe("StatusMatrix Widget", () => {
             );
         });
 
+        test("keeps remaining watch values after removing another watch", () => {
+            statusMatrix._watchSelect.value = JSON.stringify(["box", "score"]);
+            statusMatrix._watchAddButton.click();
+            statusMatrix._watchSelect.value = JSON.stringify(["heap", "0"]);
+            statusMatrix._watchAddButton.click();
+
+            expect(statusMatrix._watches).toHaveLength(2);
+
+            statusMatrix._watchList.children[0].children[2].click();
+
+            expect(statusMatrix._watches).toHaveLength(1);
+            expect(statusMatrix._watchList.children[0].children[1].textContent).toBe('["C4",2]');
+        });
+
         test("retains selected watches when the status widget is initialized again", () => {
             statusMatrix._watchSelect.value = JSON.stringify(["box", "score"]);
             statusMatrix._watchAddButton.click();
