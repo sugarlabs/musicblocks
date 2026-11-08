@@ -5433,8 +5433,8 @@ class Blocks {
          * Does the actual work of loading new blocks. Only ever runs for one
          * call to loadNewBlocks at a time, see _advanceLoadQueue above.
          * @private
-         * @param - blockObj - Block Objects
-         * @param - loadToken - this request's token, as returned by
+         * @param {Array} blockObjs - Block Objects.
+         * @param {number} loadToken - this request's token, as returned by
          *   loadNewBlocks() (see there for why it's distinct from
          *   _activeLoadGeneration)
          * @returns {void}
@@ -5461,9 +5461,9 @@ class Blocks {
                 /**
                  * Abandon a project we cannot load safely, telling the user
                  * rather than crashing partway through the load.
-                 * @param - warning - console warning describing the problem
-                 * @param - data - the offending block data
-                 * @param - [userMessage] - optional user-facing error message
+                 * @param {string} warning - Console warning describing the problem.
+                 * @param {*} data - The offending block data.
+                 * @param {string} [userMessage] - Optional user-facing error message.
                  * @returns {void}
                  */
                 const abortLoad = (warning, data, userMessage) => {
