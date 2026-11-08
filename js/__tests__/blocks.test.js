@@ -2937,6 +2937,44 @@ describe("Blocks Foundation", () => {
                 "Cannot load project: invalid block connection detected."
             );
         });
+
+        it("aborts cleanly with actionable message when blockObjs contains a null entry", () => {
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, ["forward"]);
+            const blockObjs = [
+                [0, "forward", 100, 100, [null, null]],
+                null,
+                [2, "forward", 100, 150, [null, null]]
+            ];
+
+            expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
+            expect(blocks._loadInProgress).toBe(false);
+            expect(activity._suppressRefresh).toBe(false);
+            expect(activity.stopLoadAnimation).toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Cannot load project: malformed block structure detected."
+            );
+            expect(blocks.blockList.length).toBe(0);
+        });
+
+        it("aborts cleanly with actionable message when blockObjs contains a non-array entry", () => {
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, ["forward"]);
+            const blockObjs = [
+                [0, "forward", 100, 100, [null, null]],
+                { invalid: "blockObject" },
+                [2, "forward", 100, 150, [null, null]]
+            ];
+
+            expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
+            expect(blocks._loadInProgress).toBe(false);
+            expect(activity._suppressRefresh).toBe(false);
+            expect(activity.stopLoadAnimation).toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Cannot load project: malformed block structure detected."
+            );
+            expect(blocks.blockList.length).toBe(0);
+        });
     });
 
     describe("loadNewBlocks re-entrancy (#8392)", () => {

@@ -5499,6 +5499,17 @@ class Blocks {
                     );
                     return;
                 }
+
+                for (let b = 0; b < blockObjs.length; b++) {
+                    if (!blockObjs[b] || !Array.isArray(blockObjs[b])) {
+                        abortLoad(
+                            "Invalid block data: expected an array for block at index " + b + ".",
+                            blockObjs[b],
+                            _("Cannot load project: malformed block structure detected.")
+                        );
+                        return;
+                    }
+                }
                 /**
                  * Playback Queue has been deprecated, but some old projects
                  * may still have playback blocks appended, which we will
