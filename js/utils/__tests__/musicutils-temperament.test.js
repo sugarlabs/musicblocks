@@ -120,6 +120,37 @@ describe("musicutils-temperament", () => {
             expect(temperament.getTemperamentKeys()).not.toContain("pitchNumber");
         });
 
+        it("safely ignores inherited Object prototype properties and reserved keys (#10308)", () => {
+            expect(temperament.getTemperament("toString")).toBeUndefined();
+            expect(temperament.getTemperament("valueOf")).toBeUndefined();
+            expect(temperament.getTemperament("constructor")).toBeUndefined();
+            expect(temperament.getTemperament("__proto__")).toBeUndefined();
+            expect(temperament.getTemperament("prototype")).toBeUndefined();
+            expect(temperament.getTemperament("hasOwnProperty")).toBeUndefined();
+
+            expect(temperament.isCustomTemperament("toString")).toBe(true);
+            expect(temperament.isCustomTemperament("valueOf")).toBe(true);
+            expect(temperament.isCustomTemperament("constructor")).toBe(true);
+            expect(temperament.isCustomTemperament("__proto__")).toBe(true);
+            expect(temperament.isCustomTemperament("prototype")).toBe(true);
+
+            const keys = temperament.getTemperamentKeys();
+            expect(keys).not.toContain("toString");
+            expect(keys).not.toContain("valueOf");
+            expect(keys).not.toContain("constructor");
+            expect(keys).not.toContain("__proto__");
+
+            expect(() => temperament.deleteTemperamentFromList("__proto__")).not.toThrow();
+            expect(() => temperament.deleteTemperamentFromList("constructor")).not.toThrow();
+            expect(() => temperament.deleteTemperamentFromList("prototype")).not.toThrow();
+
+            temperament.updateTemperaments();
+            const listNames = temperament.getTemperamentsList().map(e => e[1]);
+            expect(listNames).not.toContain("toString");
+            expect(listNames).not.toContain("constructor");
+            expect(listNames).not.toContain("__proto__");
+        });
+
         it("picks up a new dictionary entry when the list is rebuilt", () => {
             const before = temperament.getTemperamentsList();
             temperament.addTemperamentToDictionary("myTemperament", custom);

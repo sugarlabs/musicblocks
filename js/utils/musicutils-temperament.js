@@ -1193,16 +1193,20 @@ var getTemperament = entry => {
     if (typeof entry === "object" && entry !== null) {
         return entry;
     }
-    if (TEMPERAMENT[entry]) {
+    if (
+        typeof entry !== "string" ||
+        (typeof isUnsafeObjectKey === "function" && isUnsafeObjectKey(entry))
+    ) {
+        return undefined;
+    }
+    if (Object.prototype.hasOwnProperty.call(TEMPERAMENT, entry)) {
         return TEMPERAMENT[entry];
     }
-    if (typeof entry === "string") {
-        const edoMatch = entry.match(/^(\d+)-?[eE][dD][oO]$/i);
-        if (edoMatch) {
-            const key = edoMatch[1] === "12" ? "equal" : "equal" + edoMatch[1];
-            if (TEMPERAMENT[key]) {
-                return TEMPERAMENT[key];
-            }
+    const edoMatch = entry.match(/^(\d+)-?[eE][dD][oO]$/i);
+    if (edoMatch) {
+        const key = edoMatch[1] === "12" ? "equal" : "equal" + edoMatch[1];
+        if (Object.prototype.hasOwnProperty.call(TEMPERAMENT, key)) {
+            return TEMPERAMENT[key];
         }
     }
     return undefined;
@@ -1214,12 +1218,7 @@ var getTemperament = entry => {
  * @returns {Array<string>} The keys of the temperament dictionary.
  */
 var getTemperamentKeys = () => {
-    const keys = [];
-    for (const k in TEMPERAMENT) {
-        keys.push(k);
-    }
-
-    return keys;
+    return Object.keys(TEMPERAMENT);
 };
 
 /**
@@ -1247,6 +1246,7 @@ var addTemperamentToList = newEntry => {
  * @returns {void}
  */
 var deleteTemperamentFromList = oldEntry => {
+    if (typeof isUnsafeObjectKey === "function" && isUnsafeObjectKey(oldEntry)) return;
     delete TEMPERAMENT[oldEntry];
 };
 
@@ -1258,7 +1258,7 @@ var deleteTemperamentFromList = oldEntry => {
  * @returns {void}
  */
 var addTemperamentToDictionary = (entryName, entryValue) => {
-    if (isUnsafeObjectKey(entryName)) return;
+    if (typeof isUnsafeObjectKey === "function" && isUnsafeObjectKey(entryName)) return;
     TEMPERAMENT[entryName] = entryValue;
 };
 
@@ -1270,7 +1270,11 @@ var addTemperamentToDictionary = (entryName, entryValue) => {
 var updateTemperaments = () => {
     TEMPERAMENTS = [...INITIALTEMPERAMENTS];
     for (const i in TEMPERAMENT) {
-        if (!(i in PreDefinedTemperaments)) {
+        if (
+            Object.prototype.hasOwnProperty.call(TEMPERAMENT, i) &&
+            !Object.prototype.hasOwnProperty.call(PreDefinedTemperaments, i) &&
+            !(typeof isUnsafeObjectKey === "function" && isUnsafeObjectKey(i))
+        ) {
             TEMPERAMENTS.push([_(i), i, i]);
         }
     }
@@ -1287,7 +1291,10 @@ var isCustomTemperament = temperament => {
     if (!temperament || typeof temperament !== "string") {
         return true;
     }
-    return !(temperament in PreDefinedTemperaments);
+    if (typeof isUnsafeObjectKey === "function" && isUnsafeObjectKey(temperament)) {
+        return true;
+    }
+    return !Object.prototype.hasOwnProperty.call(PreDefinedTemperaments, temperament);
 };
 
 /**
