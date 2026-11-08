@@ -2937,6 +2937,40 @@ describe("Utility Functions (logic-only)", () => {
             expect(global.MediaRecorder.mock.calls[0]).toHaveLength(1);
         });
 
+        it("connects Tone.Destination to the recorder dest so audio is not silence", () => {
+            setup();
+            expect(global.Tone.Destination.connect).toHaveBeenCalled();
+        });
+
+        it("disconnects Tone.Destination from the recorder dest when recording stops", async () => {
+            setup();
+            Synth.recorder.ondataavailable({ data: { size: 12 } });
+            window.prompt = jest.fn(() => "recording");
+            captureDownloads();
+            await Synth.recorder.onstop();
+            await flush();
+            await flush();
+            expect(global.Tone.Destination.disconnect).toHaveBeenCalled();
+        });
+
+        it("abortRecorder disconnects Tone.Destination and skips onstop", () => {
+            setup();
+            Synth.abortRecorder();
+            expect(global.Tone.Destination.disconnect).toHaveBeenCalled();
+            expect(Synth.recorder.onstop).toBeNull();
+        });
+
+        it("setupRecorder aborts an active WAV recording before starting a new one", () => {
+            setup();
+            const firstStop = jest.fn();
+            Synth.recorder.stop = firstStop;
+            Synth.recorder.state = "recording";
+            global.Tone.Destination.disconnect.mockClear();
+            Synth.setupRecorder();
+            expect(firstStop).toHaveBeenCalled();
+            expect(global.Tone.Destination.disconnect).toHaveBeenCalled();
+        });
+
         it("ignores data events with no payload", async () => {
             setup();
 

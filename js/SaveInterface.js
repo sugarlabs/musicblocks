@@ -688,7 +688,9 @@ class SaveInterface {
         activity.logo.synth.setupRecorder();
         activity.logo.synth.recorder.start();
         activity.logo.runLogoCommands();
-        activity.textMsg(_("Your recording is in progress."));
+        if (activity.logo.recording) {
+            activity.textMsg(_("Your recording is in progress."));
+        }
     }
 
     /**

@@ -1316,6 +1316,44 @@ describe("saveWAV & saveABC methods", () => {
         expect(activity.logo.recording).toBe(true);
     });
 
+    it("should show progress toast in saveWAV when recording continues", () => {
+        const activity = {
+            logo: {
+                recording: false,
+                synth: {
+                    setupRecorder: jest.fn(),
+                    recorder: { start: jest.fn() }
+                },
+                runLogoCommands: jest.fn()
+            },
+            textMsg: jest.fn()
+        };
+
+        instance.saveWAV(activity);
+        expect(activity.logo.recording).toBe(true);
+        expect(activity.textMsg).toHaveBeenCalled();
+    });
+
+    it("should not show progress toast in saveWAV when runLogoCommands cancels recording", () => {
+        const activity = {
+            logo: {
+                recording: false,
+                synth: {
+                    setupRecorder: jest.fn(),
+                    recorder: { start: jest.fn() }
+                },
+                runLogoCommands: jest.fn(() => {
+                    activity.logo.recording = false;
+                })
+            },
+            textMsg: jest.fn()
+        };
+
+        instance.saveWAV(activity);
+        expect(activity.logo.recording).toBe(false);
+        expect(activity.textMsg).not.toHaveBeenCalled();
+    });
+
     it("should handle empty turtle list in saveAbc", () => {
         const activity = {
             logo: {
