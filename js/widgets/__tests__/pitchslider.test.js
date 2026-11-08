@@ -248,6 +248,51 @@ describe("PitchSlider Widget", () => {
             expect(slider.frequencies).toEqual([440, 880]);
         });
 
+        test("uses this.frequency when frequencies array is empty", () => {
+            slider.frequency = 440;
+            slider.frequencies = [];
+            slider.init(activityMock);
+            expect(slider.frequencies).toEqual([440]);
+        });
+
+        test("normalizes string frequencies to numeric values", () => {
+            slider.frequencies = ["440", "880"];
+            slider.init(activityMock);
+            expect(slider.frequencies).toEqual([440, 880]);
+        });
+
+        test("filters out non-positive and NaN frequencies", () => {
+            slider.frequencies = [0, -100, NaN, null, 500];
+            slider.init(activityMock);
+            expect(slider.frequencies).toEqual([500]);
+        });
+
+        test("falls back to [392] when all frequencies are invalid", () => {
+            slider.frequencies = [0, -50, "invalid"];
+            slider.init(activityMock);
+            expect(slider.frequencies).toEqual([392]);
+        });
+
+        test("handles missing window.widgetWindows or openWindows safely", () => {
+            const savedWidgetWindows = global.window.widgetWindows;
+            global.window.widgetWindows = {
+                windowFor: jest.fn().mockImplementation(() => createMockWidgetWindow())
+            };
+            expect(() => slider.init(activityMock)).not.toThrow();
+            global.window.widgetWindows = savedWidgetWindows;
+        });
+
+        test("does not create extra sliders for non-numeric Array.prototype properties", () => {
+            Array.prototype.customProp = "custom";
+            try {
+                slider.frequencies = [440];
+                slider.init(activityMock);
+                expect(Object.keys(slider.sliders)).toEqual(["0"]);
+            } finally {
+                delete Array.prototype.customProp;
+            }
+        });
+
         test("creates one oscillator per frequency", () => {
             slider.frequencies = [440, 880, 220];
             slider.init(activityMock);

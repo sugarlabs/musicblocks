@@ -47,11 +47,30 @@ class PitchSlider {
         this.activity = activity;
         const edo = getCurrentEDO(activity.logo.synth.inTemperament);
         const semitone = Math.pow(2, 1 / edo);
-        const openWindow = window.widgetWindows.openWindows["slider"];
-        if (openWindow) openWindow.onclose();
+        const openWindow =
+            typeof window !== "undefined" &&
+            window.widgetWindows &&
+            window.widgetWindows.openWindows
+                ? window.widgetWindows.openWindows["slider"]
+                : null;
+        if (openWindow && typeof openWindow.onclose === "function") openWindow.onclose();
         this.sliders = {};
         this.activeSlider = null;
-        if (!this.frequencies || !this.frequencies.length) this.frequencies = [392];
+        if (!this.frequencies || !this.frequencies.length) {
+            if (typeof this.frequency !== "undefined" && this.frequency !== null) {
+                const f = parseFloat(this.frequency);
+                this.frequencies = !isNaN(f) && f > 0 ? [f] : [392];
+            } else {
+                this.frequencies = [392];
+            }
+        } else {
+            this.frequencies = this.frequencies
+                .map(f => parseFloat(f))
+                .filter(f => !isNaN(f) && f > 0);
+            if (!this.frequencies.length) {
+                this.frequencies = [392];
+            }
+        }
         this.initialFrequencies = [...this.frequencies];
 
         const oscillators = [];
@@ -184,7 +203,7 @@ class PitchSlider {
             );
 
             // Set the leftmost slider as active by default
-            if (id === "0") {
+            if (id === 0 || id === "0") {
                 this.activeSlider = id;
             }
 
@@ -210,7 +229,7 @@ class PitchSlider {
             const freqLabel = document.createElement("div");
             freqLabel.className = "wfbtItem";
             toolBarDiv.appendChild(freqLabel);
-            freqLabel.textContent = parseFloat(this.frequencies[id].toFixed(2));
+            freqLabel.textContent = parseFloat(Number(this.frequencies[id]).toFixed(2));
 
             this.sliders[id] = slider;
             const changeFreq = () => {
@@ -283,8 +302,8 @@ class PitchSlider {
             };
         };
 
-        for (const id in this.frequencies) {
-            MakeToolbar(id);
+        for (let i = 0; i < this.frequencies.length; i++) {
+            MakeToolbar(String(i));
         }
 
         activity.textMsg(_("Use the up/down buttons or arrow keys to change pitch."), 3000);
