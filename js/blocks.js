@@ -7398,7 +7398,7 @@ class Blocks {
                         this.activity.errorMsg(
                             _(
                                 "Some blocks in this project are unsupported and were replaced with placeholders: %s"
-                            ).replace(/%s/g, unsupportedList)
+                            ).replace(/%s/g, () => unsupportedList)
                         );
                     }
                     this._unsupportedBlocksInCurrentLoad.clear();

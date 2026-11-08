@@ -2883,6 +2883,23 @@ describe("Blocks Foundation", () => {
             );
         });
 
+        it("displays unsupported block names containing special replacement patterns literally", () => {
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, ["forward"]);
+            const blockObjs = [
+                [0, "forward", 100, 100, [null, 1]],
+                [1, "custom$&block", 100, 120, [0, 2]],
+                [2, "custom$$block", 100, 140, [1, 3]],
+                [3, "custom$1block", 100, 160, [2, null]]
+            ];
+
+            blocks.loadNewBlocks(blockObjs);
+
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Some blocks in this project are unsupported and were replaced with placeholders: custom$&block, custom$$block, custom$1block"
+            );
+        });
+
         it("does not emit an error notification when all blocks are supported", () => {
             const activity = makeActivity();
             const blocks = makeBlocks(activity, ["forward", "back"]);
