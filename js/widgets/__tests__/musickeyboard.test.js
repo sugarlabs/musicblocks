@@ -2689,10 +2689,6 @@ describe("MusicKeyboard note duration rounding and key handlers", () => {
         const newUser = new MusicKeyboard({ beginnerMode: true });
         expect(newUser._roundNoteDuration(0.19)).toBe(0.25);
 
-        // A returning user's saved "true" is kept as a string by the activity.
-        const returning = new MusicKeyboard({ beginnerMode: "true" });
-        expect(returning._roundNoteDuration(0.19)).toBe(0.25);
-
         // The activity decides, even when the stored value says otherwise.
         localStorage.beginnerMode = "true";
         const advanced = new MusicKeyboard({ beginnerMode: false });

@@ -53,7 +53,7 @@ const MusicKeyboardEditing = {
      *
      * @param {Object} deps - Values from the MusicKeyboard constructor's scope.
      * @param {number} deps.FAKEBLOCKNUMBER - Block numbers at or above this are padding keys.
-     * @param {string} deps.beginnerMode - "true" in beginner mode, else "false", when the widget was made.
+     * @param {boolean} deps.beginnerMode - Whether the keyboard was in beginner mode when it was made.
      * @param {Function} deps.resolveSynthNoteName - Maps a note name and octave to a synth note.
      * @param {Function} deps.fillChromaticGaps - Pads a note list out to a chromatic layout.
      * @returns {void}
@@ -417,7 +417,7 @@ const MusicKeyboardEditing = {
             this._notesPlayed = this._notesPlayed.reduce(function (prevValue, curValue) {
                 let newcurValue, newcurValue2, oldcurValue;
                 if (parseInt(curValue.startTime, 10) === start) {
-                    if (beginnerMode === "true") {
+                    if (beginnerMode) {
                         if (curValue.duration / divideNoteBy < 0.125) {
                             return prevValue.concat([curValue]);
                         }

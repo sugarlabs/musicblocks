@@ -94,16 +94,16 @@ function MusicKeyboard(activity) {
     this._cellScale = w / 1200;
 
     /**
-     * Whether the keyboard is in beginner mode, as the string "true" or "false".
-     * @type {string}
+     * Indicates whether the keyboard is in beginner mode.
+     * @type {boolean}
      */
-    const beginnerMode = this.activity.beginnerMode ? "true" : "false";
+    const beginnerMode = this.activity.beginnerMode;
 
     /**
      * Number of units in beginner mode.
      * @type {number}
      */
-    const unit = beginnerMode === "true" ? 8 : 16;
+    const unit = beginnerMode ? 8 : 16;
 
     /**
      * Converts how long a key was held into the note value it is recorded as, at the
@@ -122,7 +122,7 @@ function MusicKeyboard(activity) {
      */
     this._roundNoteDuration = rawDuration => {
         let duration;
-        if (beginnerMode === "true") {
+        if (beginnerMode) {
             duration = parseFloat((Math.round(rawDuration * 8) / 8).toFixed(3));
         } else {
             duration = parseFloat((Math.round(rawDuration * 16) / 16).toFixed(4));
