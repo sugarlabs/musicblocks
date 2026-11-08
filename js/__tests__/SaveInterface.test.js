@@ -632,6 +632,15 @@ describe("saveMIDI Method", () => {
         expect(activity.logo.runLogoCommands).toHaveBeenCalled();
         expect(document.body.style.cursor).toBe("wait");
     });
+
+    it("should restore default cursor when no start blocks are executed", () => {
+        mockLogo.runLogoCommands = jest.fn(() => {
+            mockLogo.runningMIDI = false;
+        });
+        instance.saveMIDI(activity);
+        expect(activity.logo.runningMIDI).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+    });
 });
 
 describe("afterSaveMIDI", () => {

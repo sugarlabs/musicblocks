@@ -1965,6 +1965,16 @@ describe("Logo doStopTurtles", () => {
         );
     });
 
+    test("doStopTurtles clears runningMIDI and restores default cursor", () => {
+        logo.runningMIDI = true;
+        document.body.style.cursor = "wait";
+
+        logo.doStopTurtles();
+
+        expect(logo.runningMIDI).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+    });
+
     test("setTurtleListener replaces existing listener and detaches previous listener from stage", () => {
         const oldListener = jest.fn();
         const newListener = jest.fn();
@@ -2433,6 +2443,29 @@ describe("Logo runLogoCommands", () => {
         logo.runLogoCommands(null, null);
 
         expect(Singer.resetMasterVolume).toHaveBeenCalledWith(logo);
+    });
+
+    test("clears runningMIDI and restores default cursor when there are no start blocks", () => {
+        logo.blockList = [];
+        mockActivity.blocks.stackList = [];
+        logo.runningMIDI = true;
+        document.body.style.cursor = "wait";
+
+        logo.runLogoCommands(null, null);
+
+        expect(logo.runningMIDI).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+    });
+
+    test("clears runningMIDI and restores default cursor when there are no turtles", () => {
+        mockActivity.turtles.turtleCount.mockReturnValue(0);
+        logo.runningMIDI = true;
+        document.body.style.cursor = "wait";
+
+        logo.runLogoCommands(null, null);
+
+        expect(logo.runningMIDI).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
     });
 
     test("resets the master volume on a restart with no stop in between", () => {
