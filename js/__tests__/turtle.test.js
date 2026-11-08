@@ -1328,6 +1328,24 @@ describe("Turtle.TurtleView", () => {
             expect(view._media).toHaveLength(1);
             expect(view._media[0].text).toBe("");
         });
+
+        it("advances the artwork revision so a cached thumbnail is invalidated", () => {
+            const view = makeView();
+            view.activity.artworkRevision = 0;
+
+            view.doShowText(20, "hi");
+
+            expect(view.activity.artworkRevision).toBe(1);
+        });
+
+        it("does not advance the artwork revision when there is no text to draw", () => {
+            const view = makeView();
+            view.activity.artworkRevision = 0;
+
+            view.doShowText(20, null);
+
+            expect(view.activity.artworkRevision).toBe(0);
+        });
     });
 
     describe("doShowImage", () => {
