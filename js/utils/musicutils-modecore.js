@@ -262,7 +262,11 @@ var getModeNumbers = name => {
 
     const lowercaseName = name.toLowerCase();
     for (const mode in MUSICALMODES) {
-        if (mode.toLowerCase() === lowercaseName) {
+        if (
+            Object.prototype.hasOwnProperty.call(MUSICALMODES, mode) &&
+            Array.isArray(MUSICALMODES[mode]) &&
+            mode.toLowerCase() === lowercaseName
+        ) {
             return __convert(MUSICALMODES[mode]);
         }
     }
@@ -283,7 +287,12 @@ var getModeNumbers = name => {
  * @returns {Array|null} step counts, or null when impossible
  */
 var getNonEDOModeSteps = (mode, temperament) => {
-    const pattern = MUSICALMODES[mode];
+    const pattern =
+        typeof mode === "string" &&
+        Object.prototype.hasOwnProperty.call(MUSICALMODES, mode) &&
+        Array.isArray(MUSICALMODES[mode])
+            ? MUSICALMODES[mode]
+            : null;
     const t = getTemperament(temperament);
     if (!pattern || !t || !Array.isArray(t.ratios) || t.ratios.length === 0) {
         return null;
@@ -982,7 +991,10 @@ var getModePattern = (mode, edo = 12) => {
         }
         return new Array(edo).fill(1);
     }
-    if (mode in MUSICALMODES) {
+    if (
+        Object.prototype.hasOwnProperty.call(MUSICALMODES, mode) &&
+        Array.isArray(MUSICALMODES[mode])
+    ) {
         return scalePatternToEDO(MUSICALMODES[mode], edo);
     }
     return scalePatternToEDO(MUSICALMODES.major, edo);
