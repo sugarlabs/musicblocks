@@ -1614,6 +1614,19 @@ describe("Blocks Foundation", () => {
                 ]);
             });
 
+            it("keeps the sound on a sample block when its file block is empty", () => {
+                blocks.blockList = sampleStack();
+                blocks.blockList[2].value = null;
+                blocks.selectedStack = 0;
+
+                const copied = blocks._copyBlocksToObj();
+                expect(copied[1][1]).toEqual([
+                    "customsample",
+                    { value: ["mysound", sound, "do", 4, 25] }
+                ]);
+                expect(copied[2][1]).toEqual(["audiofile", { value: null }]);
+            });
+
             it("does not change the copied sample block", () => {
                 blocks.blockList = sampleStack();
                 blocks.selectedStack = 0;

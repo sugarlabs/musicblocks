@@ -5370,7 +5370,8 @@ class Blocks {
                     blockItem = [b, [myBlock.name, { value: myBlock.privateData }], x, y, []];
                 } else if (myBlock.name === "customsample" && Array.isArray(myBlock.value)) {
                     const value = myBlock.value.slice();
-                    if (myBlock.connections[1] !== null) {
+                    const fileBlock = this.blockList[myBlock.connections[1]];
+                    if (fileBlock?.name === "audiofile" && fileBlock.value !== null) {
                         value[1] = "";
                     }
                     blockItem = [b, [myBlock.name, { value: value }], x, y, []];
