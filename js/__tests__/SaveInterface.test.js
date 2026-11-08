@@ -1224,6 +1224,8 @@ describe("keySignatureForMidi", () => {
         ["E♭ minor", { sharps: -6, minor: true }],
         ["G♯ minor", { sharps: 5, minor: true }],
         ["A harmonic minor", { sharps: 0, minor: true }],
+        ["C natural minor", { sharps: -3, minor: true }],
+        ["D jazz minor", { sharps: -1, minor: true }],
         ["D dorian", { sharps: 0, minor: false }],
         ["F lydian", { sharps: 0, minor: false }],
         ["E phrygian", { sharps: 0, minor: false }]

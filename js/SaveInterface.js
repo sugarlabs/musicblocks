@@ -77,15 +77,24 @@ const MIDI_MODE_SHARPS = new Map([
     ["mixolydian", -1],
     ["dorian", -2],
     ["minor", -3],
+    ["natural minor", -3],
     ["aeolian", -3],
     ["harmonic minor", -3],
     ["melodic minor", -3],
+    ["jazz minor", -3],
     ["phrygian", -4],
     ["locrian", -5]
 ]);
 
 // MIDI marks a key signature only as major or minor.
-const MIDI_MINOR_MODES = new Set(["minor", "aeolian", "harmonic minor", "melodic minor"]);
+const MIDI_MINOR_MODES = new Set([
+    "minor",
+    "natural minor",
+    "aeolian",
+    "harmonic minor",
+    "melodic minor",
+    "jazz minor"
+]);
 
 /**
  * A Music Blocks key as a MIDI key signature.
