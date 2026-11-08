@@ -785,6 +785,34 @@ describe("setupPitchBlocks", () => {
 
             spy.mockRestore();
         });
+
+        it("handles NoArgError by calling activity.errorMsg and stopping turtle", () => {
+            const block = createdBlocks["number2pitch"];
+            activity.blocks.blockList[10].name = "number2pitch";
+            logo.stopTurtle = false;
+
+            global.Singer.PitchActions.numToPitch.mockImplementation(() => {
+                throw new Error("NoArgError");
+            });
+
+            const result = block.arg(logo, 0, 10, null);
+            expect(result).toBeUndefined();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+            expect(logo.stopTurtle).toBe(true);
+
+            // Also verify for Number2OctaveBlock
+            const blockOct = createdBlocks["number2octave"];
+            activity.blocks.blockList[20] = {
+                name: "number2octave",
+                connections: [null, null, null, null, null]
+            };
+            logo.stopTurtle = false;
+
+            const resultOct = blockOct.arg(logo, 0, 20, null);
+            expect(resultOct).toBeUndefined();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 20);
+            expect(logo.stopTurtle).toBe(true);
+        });
     });
 
     describe("OutputToolsBlocks Extensive", () => {

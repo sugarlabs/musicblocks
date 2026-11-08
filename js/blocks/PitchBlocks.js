@@ -752,7 +752,7 @@ function setupPitchBlocks(activity) {
                     activity.blocks.blockList[blk].name === "number2pitch" ? "pitch" : "octave";
                 return Singer.PitchActions.numToPitch(num, outType, turtle);
             } catch (e) {
-                if (e === "NoArgError") {
+                if (e.message === "NoArgError" || e === "NoArgError") {
                     activity.errorMsg(NOINPUTERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else {
