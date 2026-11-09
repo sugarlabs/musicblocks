@@ -2183,6 +2183,9 @@ describe("setupRhythmActions", () => {
                     activity.logo
                 );
                 activity.logo.doStopTurtles = Logo.prototype.doStopTurtles.bind(activity.logo);
+                activity.logo._resetExportSteps = Logo.prototype._resetExportSteps.bind(
+                    activity.logo
+                );
                 activity.logo.dispatchUnissuedSignals = Logo.prototype.dispatchUnissuedSignals.bind(
                     activity.logo
                 );
