@@ -35,15 +35,14 @@ Other utilities
 * `background.js` -- extension utilities
 * `boundary.js` -- boundary box for home screen
 * `loader.js` -- loader for require
-* `sugarizer-compatibility.js` -- datastore utilities used by sugarizer
 * `trash.js` -- trash can manager
 * `turtledefs.js` -- strings and palettes unique to Music Blocks
 
 In the `blocks` subdirectory is the code for generating blocks and
 associating them with some action.
 
-`BaseBlock.js` is the base class for all blocks. All of the other
-files define blocks in each of the palettes:
+The `BaseBlock` class (defined in `protoblocks.js`) is the base class
+for all blocks. The files below define blocks in each of the palettes:
 
 `Music Palette`
 `   RhythmBlockPaletteBlocks.js`
@@ -87,7 +86,7 @@ Subdirectories with additional utilities
 	* `pitchdrummatrix.js` -- map pitches to drum sounds
 	* `pitchslider.js` -- generate pitch blocks based on frequency (in Hertz)
 	* `pitchstaircase.js` -- generate a collection of pitches based on ratios of frequency (Hertz)
-	* `pitchtimematrix.js` -- map pitch to rhythm (create a "chunk" of notes)
+	* `phrasemaker.js` -- map pitch to rhythm (create a "chunk" of notes)
 	* `rhythmruler.js` -- define rhythms (and drum machines)
 	* `status.js` -- track the status of various parameters as the program plays (a useful debugging tool)
 	* `tempo.js` -- change the tempo
@@ -119,7 +118,8 @@ a new palette.
 1. Make a new file in `js/blocks` with a meaningful name. Current
 files are `GraphicsBlocks.js`, `MediaBlocks.js`, et al.
 
-2. Add the new file to `MUSICBLOCKS_EXTRAS` in `js/activity.js`.
+2. Add the new file to the `MYDEFINES` array in `js/activity.js`,
+e.g. `"activity/blocks/GraphicsBlocks",`.
 
 3. Create a `setup` function in your new file at the end, with a
 meaningful name, e.g. `setupGraphicsBlocks()`.
@@ -475,11 +475,11 @@ as the *Start* block, do not have any external flow, so their
 
 `var listenerName = '_listenername_' + turtle + '_' + blk;`
 
-3. Assign the block that will dispatch the listener. _setDispatchBlock
+3. Assign the block that will dispatch the listener. setDispatchBlock
 will make this assignment for you (typically this is the block that
 immediately follows the clamp block).
 
-`that.setDispatchBlock(blk, turtle, listenerName);`
+`logo.setDispatchBlock(blk, turtle, listenerName);`
 
 4. Create a listener event, where you typically clean up anything
 associated with the clamp block's childFlow.
@@ -636,13 +636,13 @@ connection 0 connects to the `newnote` block connection 1, etc.
 
 Checkbox regarding adding new languages to the Language pulldown menu.
 
-You must update three files: ```index.html```, ```js/toolbar.js``` and ```js/languagebox.js```
+You must update three files: ```index.html```, ```js/toolbar-ui.js``` and ```js/languagebox.js```
 
 [ ] In ```index.html```, add an element for the language you are adding to ```"languagedropdown"```
 
-[ ] In ```toolbar.js```, add to the strings for both MUSIC BLOCKS and TURTLE ART
+[ ] In ```toolbar-ui.js```, add to the strings for both MUSIC BLOCKS and TURTLE ART
 
-[ ] and add a click event to ```renderLanguageSelectIcon```
+[ ] and add the language code to the ```languages``` list in ```renderLanguageSelectIcon```
 
 [ ] In ```languagebox.js```, add an event handler,
 
