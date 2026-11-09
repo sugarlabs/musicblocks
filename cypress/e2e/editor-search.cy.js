@@ -13,10 +13,10 @@ describe("JavaScript editor and block search", () => {
         });
         cy.waitForAppReady();
 
-        // User input activates the page in Chrome, which causes the
-        // SaveInterface beforeunload handler ("Leave page?" prompt) to trigger
-        // on subsequent visits and hang headless browser navigation. Disable
-        // the beforeunload prompt on test pages to allow clean navigation.
+        // Native key events activate the page, which can make Chrome open the
+        // SaveInterface leave-page prompt on the next visit or at spec teardown.
+        // This spec checks search and editing, so remove that jQuery warning
+        // from its test pages. The native autosave listener still runs.
         cy.window().then(win => {
             if (win.jQuery) {
                 win.jQuery(win).off("beforeunload");

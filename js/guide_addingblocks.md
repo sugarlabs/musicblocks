@@ -5,7 +5,7 @@ support of additional functionality by changes to the core code of
 Music and Turtle Blocks.
 
 A complete block is made in two steps: (1) defining the new block in
-basicblocks.js; and (2) and writing the corresponding code to be run
+basicblocks.js; and (2) writing the corresponding code to be run
 when the block is run in logo.js.
 
 ## How to make your block a part of the main repository
@@ -43,7 +43,7 @@ block is defined.
    Palette name can be pitch, tone, rhythm, etc. The color of the block
    is determined by the palette to which it is assigned. A complete
    list of available palettes is found in
-   [turtledef.js](https://github.com/sugarlabs/musicblocks/blob/master/js/turtledefs.js).
+   [turtledefs.js](https://github.com/sugarlabs/musicblocks/blob/master/js/turtledefs.js).
 
 3. To add block to the protoblock dictionary.
     
@@ -64,7 +64,7 @@ block is defined.
      * Adjust width of block to label size with `newblock.adjustWidthToLabel()`
 
   You can check the available properties on
-  [protoblock.js](https://github.com/sugarlabs/turtleblocksjs/blob/master/js/protoblocks.js).
+  [protoblocks.js](https://github.com/sugarlabs/turtleblocksjs/blob/master/js/protoblocks.js).
   Depending on your needs, you can add more features and properties.
 
 6. Macro expansions
