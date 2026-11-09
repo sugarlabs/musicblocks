@@ -228,6 +228,13 @@ class CallGraphWidget {
 
         this._onWheel = e => {
             e.preventDefault();
+            if (
+                !this.viewport ||
+                !Number.isFinite(this.transform.scale) ||
+                this.transform.scale <= 0
+            ) {
+                return;
+            }
             const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
             const newScale = Math.max(0.05, Math.min(3.0, this.transform.scale * zoomFactor));
 
@@ -327,7 +334,10 @@ class CallGraphWidget {
 
             // Tooltip title
             const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
-            title.textContent = `${edge.callType}: ${edge.source} -> ${edge.target}${edge.isRecursive ? " (Recursive)" : ""}`;
+            const recSuffix = edge.isRecursive
+                ? ` (${typeof _ === "function" ? _("Recursive") : "Recursive"})`
+                : "";
+            title.textContent = `${edge.callType}: ${edge.source} -> ${edge.target}${recSuffix}`;
             path.appendChild(title);
 
             edgesGroup.appendChild(path);
@@ -417,7 +427,11 @@ class CallGraphWidget {
 
             // Accessibility tooltip
             const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
-            title.textContent = `${node.label} (${node.type})\nClick to focus block in workspace`;
+            const focusHint =
+                typeof _ === "function"
+                    ? _("Click to focus block in workspace")
+                    : "Click to focus block in workspace";
+            title.textContent = `${node.label} (${node.type})\n${focusHint}`;
             nodeG.appendChild(title);
 
             // Click and keyboard focus handlers
@@ -453,16 +467,41 @@ class CallGraphWidget {
         const totalCalls = summary.totalCalls || 0;
         const recCount = summary.recursiveActionsCount || 0;
 
-        let statusText = `${totalActions} Action${totalActions === 1 ? "" : "s"} • ${totalCalls} Call${totalCalls === 1 ? "" : "s"}`;
+        const actionLabel =
+            totalActions === 1
+                ? typeof _ === "function"
+                    ? _("1 Action")
+                    : "1 Action"
+                : typeof _ === "function"
+                  ? _("%s Actions", { count: totalActions })
+                  : `${totalActions} Actions`;
+        const callLabel =
+            totalCalls === 1
+                ? typeof _ === "function"
+                    ? _("1 Call")
+                    : "1 Call"
+                : typeof _ === "function"
+                  ? _("%s Calls", { count: totalCalls })
+                  : `${totalCalls} Calls`;
+
+        let statusText = `${actionLabel} • ${callLabel}`;
         if (recCount > 0) {
-            statusText += ` • ⚠️ ${recCount} Recursive`;
+            const recLabel =
+                typeof _ === "function"
+                    ? _("%s Recursive", { count: recCount })
+                    : `${recCount} Recursive`;
+            statusText += ` • ⚠️ ${recLabel}`;
             this.summaryBadge.className = "codemap-summary-badge codemap-summary-warning";
         } else {
             this.summaryBadge.className = "codemap-summary-badge";
         }
 
         if (summary.missingTargetsCount > 0) {
-            statusText += ` • ${summary.missingTargetsCount} Missing`;
+            const missingLabel =
+                typeof _ === "function"
+                    ? _("%s Missing", { count: summary.missingTargetsCount })
+                    : `${summary.missingTargetsCount} Missing`;
+            statusText += ` • ${missingLabel}`;
         }
 
         this.summaryBadge.textContent = statusText;
@@ -565,21 +604,26 @@ class CallGraphWidget {
      * Auto-fits and centers the graph within the viewport.
      */
     fitToView() {
-        if (!this.currentLayout || !this.viewport) {
+        if (!this.currentLayout || !this.currentLayout.bounds || !this.viewport) {
             return;
         }
 
         const { bounds } = this.currentLayout;
+        const bWidth = bounds.width > 0 ? bounds.width : 600;
+        const bHeight = bounds.height > 0 ? bounds.height : 400;
+
         const vRect = this.viewport.getBoundingClientRect();
-        const vWidth = vRect.width || 600;
-        const vHeight = vRect.height || 400;
+        const vWidth = Math.max(100, vRect.width || 600);
+        const vHeight = Math.max(100, vRect.height || 400);
 
-        const scaleX = (vWidth - 40) / bounds.width;
-        const scaleY = (vHeight - 40) / bounds.height;
-        const scale = Math.max(0.05, Math.min(1.2, Math.min(scaleX, scaleY)));
+        const availableW = Math.max(20, vWidth - 40);
+        const availableH = Math.max(20, vHeight - 40);
 
-        const tx = Math.round((vWidth - bounds.width * scale) / 2 - bounds.minX * scale);
-        const ty = Math.round((vHeight - bounds.height * scale) / 2 - bounds.minY * scale);
+        const rawScale = Math.min(availableW / bWidth, availableH / bHeight);
+        const scale = Number.isFinite(rawScale) ? Math.max(0.05, Math.min(1.2, rawScale)) : 1;
+
+        const tx = Math.round((vWidth - bWidth * scale) / 2 - (bounds.minX || 0) * scale);
+        const ty = Math.round((vHeight - bHeight * scale) / 2 - (bounds.minY || 0) * scale);
 
         this.transform = { x: tx, y: ty, scale };
         this._updateTransform();

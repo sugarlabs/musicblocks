@@ -378,3 +378,27 @@ describe("ToolbarUI keyboard activation", () => {
         expect(playButton.onclick).not.toHaveBeenCalled();
     });
 });
+
+describe("ToolbarUI - renderCodeMapIcon", () => {
+    test("wires onclick handler to invoke callback with activity instance", () => {
+        const mockIcon = document.createElement("a");
+        mockIcon.id = "codeMapIcon";
+        document.body.appendChild(mockIcon);
+
+        const origDocById = global.docById;
+        global.docById = id => (id === "codeMapIcon" ? mockIcon : null);
+
+        const mockActivity = { showCodeMap: jest.fn() };
+        const toolbar = new ToolbarUI();
+        toolbar.activity = mockActivity;
+
+        const onclick = jest.fn();
+        toolbar.renderCodeMapIcon(onclick);
+
+        mockIcon.onclick();
+        expect(onclick).toHaveBeenCalledWith(mockActivity);
+
+        global.docById = origDocById;
+        mockIcon.remove();
+    });
+});

@@ -649,6 +649,126 @@ describe("CallGraphAnalyzer", () => {
         expect(result.edges.some(e => e.target === "action:targetAction")).toBe(true);
     });
 
+    test("handles edge cases: null blockList, trashed or whitespace action names", () => {
+        const analyzer = new CallGraphAnalyzer(null);
+        const emptyMap = analyzer._normalizeBlocks(null);
+        expect(emptyMap.size).toBe(0);
+
+        // Action definition with trashed name block
+        const trashedNameResult = CallGraphAnalyzer.analyze([
+            { id: 1, name: "action", connections: [null, 2, 3], trash: false },
+            { id: 2, name: "text", value: "trashedAction", trash: true },
+            { id: 3, name: "forward", connections: [1], trash: false }
+        ]);
+        expect(trashedNameResult.nodes[0].isIncomplete).toBe(true);
+        expect(trashedNameResult.nodes[0].label).toContain("unnamed_");
+
+        // Action definition with whitespace-only name
+        const whitespaceNameResult = CallGraphAnalyzer.analyze([
+            { id: 1, name: "action", connections: [null, 2, 3], trash: false },
+            { id: 2, name: "text", value: "    ", trash: false },
+            { id: 3, name: "forward", connections: [1], trash: false }
+        ]);
+        expect(whitespaceNameResult.nodes[0].isIncomplete).toBe(true);
+        expect(whitespaceNameResult.nodes[0].label).toContain("unnamed_");
+    });
+
+    test("handles named calls with value instead of privateData and empty target names", () => {
+        // Named call with value instead of privateData
+        const resultWithValue = CallGraphAnalyzer.analyze([
+            { id: 1, name: "action", connections: [null, 2, 3], trash: false },
+            { id: 2, name: "text", value: "actTarget", trash: false },
+            { id: 3, name: "forward", connections: [1], trash: false },
+            { id: 4, name: "start", connections: [null, 5], trash: false },
+            { id: 5, name: "nameddo", value: "actTarget", trash: false }
+        ]);
+        expect(resultWithValue.edges[0].target).toBe("action:actTarget");
+
+        // Named call with blank target name
+        const resultBlankNamed = CallGraphAnalyzer.analyze([
+            { id: 1, name: "start", connections: [null, 2], trash: false },
+            { id: 2, name: "nameddo", privateData: "   ", trash: false }
+        ]);
+        expect(resultBlankNamed.edges[0].target).toContain("missing:");
+
+        // Ordinary call with trashed target block
+        const resultTrashedTarget = CallGraphAnalyzer.analyze([
+            { id: 1, name: "start", connections: [null, 2], trash: false },
+            { id: 2, name: "do", connections: [1, 3], trash: false },
+            { id: 3, name: "text", value: "foo", trash: true }
+        ]);
+        expect(resultTrashedTarget.edges[0].target).toContain("missing:");
+
+        // Ordinary call with blank string in target text block
+        const resultBlankOrdinary = CallGraphAnalyzer.analyze([
+            { id: 1, name: "start", connections: [null, 2], trash: false },
+            { id: 2, name: "do", connections: [1, 3], trash: false },
+            { id: 3, name: "text", value: "   ", trash: false }
+        ]);
+        expect(resultBlankOrdinary.edges[0].target).toContain("missing:");
+    });
+
+    test("handles queue edge cases, nested actions, and _isActionCallBlock safety checks", () => {
+        const analyzer = new CallGraphAnalyzer([]);
+        expect(analyzer._isActionCallBlock(null)).toBe(false);
+        expect(analyzer._isActionCallBlock({ trash: true, name: "do" })).toBe(false);
+
+        // Root block with null connection targets (exercises startBlockId === null)
+        const nullConnResult = CallGraphAnalyzer.analyze([
+            { id: 1, name: "start", connections: [null, null], trash: false }
+        ]);
+        expect(nullConnResult.summary.totalStarts).toBe(1);
+
+        // Circular connection between two blocks (exercises visited.has in queue)
+        const circularConnResult = CallGraphAnalyzer.analyze([
+            { id: 1, name: "start", connections: [null, 2], trash: false },
+            { id: 2, name: "forward", connections: [1, 3], trash: false },
+            { id: 3, name: "forward", connections: [2, 2], trash: false }
+        ]);
+        expect(circularConnResult.summary.totalStarts).toBe(1);
+
+        // Nested action definition attached inside an action stack
+        const nestedActionResult = CallGraphAnalyzer.analyze([
+            { id: 1, name: "action", connections: [null, 2, 3], trash: false },
+            { id: 2, name: "text", value: "outerAction", trash: false },
+            { id: 3, name: "forward", connections: [1, 4], trash: false },
+            { id: 4, name: "action", connections: [3, 5, 6], trash: false },
+            { id: 5, name: "text", value: "innerAction", trash: false },
+            { id: 6, name: "nameddo", privateData: "innerTarget", trash: false }
+        ]);
+        expect(nestedActionResult.summary.totalActions).toBe(2);
+
+        // Duplicate edge insertion attempt
+        const blocksWithDupCall = [
+            { id: 1, name: "start", connections: [null, 2], trash: false },
+            { id: 2, name: "nameddo", privateData: "actX", connections: [1, 2], trash: false },
+            { id: 3, name: "action", connections: [null, 4, null], trash: false },
+            { id: 4, name: "text", value: "actX", trash: false }
+        ];
+        const dupResult = CallGraphAnalyzer.analyze(blocksWithDupCall);
+        expect(dupResult.edges).toHaveLength(1);
+    });
+
+    test("exercises DFS cycle extraction with dead-ends, outside-SCC edges, and empty cycle key", () => {
+        const analyzer = new CallGraphAnalyzer([]);
+        expect(analyzer._getCanonicalCycleKey([])).toBe("");
+
+        // Construct an SCC where DFS backtracks:
+        // A -> Branch1 -> DeadEnd (dead-end within SCC)
+        // A -> Branch2 -> A (cycle!)
+        const adj = new Map([
+            ["action:A", new Set(["action:Branch1", "action:Branch2", "action:Outside"])],
+            ["action:Branch1", new Set(["action:DeadEnd"])],
+            ["action:DeadEnd", new Set()],
+            ["action:Branch2", new Set(["action:A"])],
+            ["action:Outside", new Set()]
+        ]);
+        const sccSet = new Set(["action:A", "action:Branch1", "action:DeadEnd", "action:Branch2"]);
+
+        const cycle = analyzer._extractRepresentativeCycle("action:A", sccSet, adj);
+        expect(cycle).toEqual(["action:A", "action:Branch2", "action:A"]);
+    });
+
     test("exercises AMD define branch when define is available", () => {
         const origDefine = global.define;
         let registeredFactory;

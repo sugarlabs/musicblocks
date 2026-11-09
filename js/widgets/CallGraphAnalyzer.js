@@ -339,7 +339,11 @@ class CallGraphAnalyzer {
             if (!block || typeof block !== "object") {
                 continue;
             }
-            const id = Number.isInteger(block.id) ? block.id : Number(idx);
+            const id = Number.isInteger(block.id)
+                ? block.id
+                : Number.isInteger(block.blockIndex)
+                  ? block.blockIndex
+                  : Number(idx);
             if (!Number.isNaN(id)) {
                 map.set(id, block);
             }
@@ -373,9 +377,6 @@ class CallGraphAnalyzer {
             if (actionDefs.has(actionName)) {
                 const existing = actionDefs.get(actionName);
                 existing.isDuplicate = true;
-                if (!existing.duplicateBlockIds) {
-                    existing.duplicateBlockIds = [];
-                }
                 existing.duplicateBlockIds.push(id);
             } else {
                 actionDefs.set(actionName, {

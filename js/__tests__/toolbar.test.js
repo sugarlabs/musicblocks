@@ -1240,6 +1240,16 @@ describe("Toolbar Class", () => {
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity);
     });
 
+    test("renderCodeMapIcon sets onclick and triggers Code Map visualizer", () => {
+        const codeMapIcon = { onclick: null };
+        global.docById.mockReturnValue(codeMapIcon);
+        const mockOnClick = jest.fn();
+        toolbar.renderCodeMapIcon(mockOnClick);
+        expect(codeMapIcon.onclick).toBeInstanceOf(Function);
+        codeMapIcon.onclick();
+        expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity);
+    });
+
     test("renderLanguageSelectIcon sets onclick and updates language selection", () => {
         const languageSelectIcon = { onclick: null };
         const languageBox = { enUS_onclick: jest.fn() };
