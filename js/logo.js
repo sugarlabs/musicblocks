@@ -1350,8 +1350,7 @@ class Logo {
      * Records a note event into the per-turtle MIDI buffer for later export.
      *
      * @param {string[]} note - Array of pitch names.
-     * @param {string[]|null} drum - Drum patch names; only the first element is
-     *     used. Pass a falsy value for non-drum notes.
+     * @param {string[]|null} drum - Drum patch names. Pass a falsy value for non-drum notes.
      * @param {number} duration - Note duration in beats.
      * @param {number} turtle - Index of the active turtle.
      * @param {number} bpm - Tempo in beats per minute at the time of the note.
@@ -1365,8 +1364,8 @@ class Logo {
         if (!this._midiData[turtle]) {
             this._midiData[turtle] = [];
         }
-        if (drum) drum = drum[0];
-        this._midiData[turtle].push({ note, duration, bpm, instrument, drum, meter, key });
+        const drums = drum && drum.length > 0 ? [...drum] : null;
+        this._midiData[turtle].push({ note, duration, bpm, instrument, drum: drums, meter, key });
     }
 
     // ========================================================================
@@ -1465,6 +1464,50 @@ class Logo {
                 turtle.parentFlowQueue.push(loopBlkIdx);
                 turtle.queue.push(queueBlock);
             }
+        }
+    }
+
+    /**
+     * Stops one turtle, including the next block it has already scheduled,
+     * while the other turtles keep running.
+     *
+     * @param {number} turtle - Index of the turtle to stop.
+     * @returns {void}
+     */
+    stopTurtleRun(turtle) {
+        const tur = this.turtles.ithTurtle(turtle);
+
+        tur.queue = [];
+        tur.parentFlowQueue = [];
+        tur.unhighlightQueue = [];
+        tur.parameterQueue = [];
+        tur.actionBoundaries = [];
+
+        tur.singer.tieCarryOver = 0;
+        tur.singer.runningFromEvent = false;
+        for (const b in tur.endOfClampSignals) {
+            tur.endOfClampSignals[b] = tur.endOfClampSignals[b].map(signal =>
+                signal && signal.startsWith("_playnote_") ? null : signal
+            );
+        }
+        this.dispatchUnissuedSignals(tur);
+        tur.singer.dropPendingNotes();
+        tur.endOfClampSignals = {};
+        tur.butNotThese = {};
+
+        tur.runGeneration += 1;
+        if (tur.delayTimeout !== null) {
+            this._timerManager.clearTimeout(tur.delayTimeout);
+            tur.delayTimeout = null;
+        }
+        if (tur._transportEventId !== null) {
+            this.synth.transport.clear(tur._transportEventId);
+            tur._transportEventId = null;
+        }
+        delete this.stepQueue[turtle];
+
+        if (tur.running) {
+            this._finishTurtle(this, turtle, 0);
         }
     }
 
@@ -1626,6 +1669,9 @@ class Logo {
         // stuck true (and hotkeys stuck blocked) if a stop happens mid-window.
         this._valueBarTimeout = null;
         if (this.activity) this.activity.valueBarVisible = false;
+
+        this.runningMIDI = false;
+        document.body.style.cursor = "default";
 
         this._cleanupAfterCompletion();
 
@@ -2010,6 +2056,8 @@ class Logo {
         */
         if (this.turtles.turtleCount() === 0) {
             this.deps.errorHandler(NOACTIONERRORMSG, null, _("start"));
+            this.runningMIDI = false;
+            document.body.style.cursor = "default";
             // eslint-disable-next-line eqeqeq
         } else if (startHere != null) {
             // If a block to start from was passed, find its associated
@@ -2095,6 +2143,7 @@ class Logo {
                 () => this.stopTurtle
             );
         } else {
+            this.runningMIDI = false;
             document.body.style.cursor = "default";
         }
 
@@ -2131,16 +2180,18 @@ class Logo {
         if (blk == null) return;
 
         this.receivedArg = receivedArg;
+        const tur = logo.turtles.ithTurtle(turtle);
 
         // Synchronous fast path for notation exports; yield every 100 transitions.
         if (logo._exportingNotation) {
             logo._syncCounter++;
             if (logo._syncCounter >= logo._EXPORT_YIELD_AFTER_SYNC_RUNS) {
                 logo._syncCounter = 0;
+                const generation = tur.runGeneration;
                 logo._timerManager.setGuardedTimeout(
                     () => logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg),
                     0,
-                    () => logo.stopTurtle
+                    () => logo.stopTurtle || tur.runGeneration !== generation
                 );
             } else {
                 logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg);
@@ -2151,8 +2202,6 @@ class Logo {
         // Reset async yield counters – execution will go through
         // setTimeout below, giving the event loop a chance to breathe.
         logo._syncCounter = 0;
-
-        const tur = logo.turtles.ithTurtle(turtle);
 
         if (tur._transportTime === null && logo.synth.transport.isAvailable) {
             tur._transportTime = logo.synth.transport.seconds;
@@ -2691,6 +2740,7 @@ class Logo {
                     logo._syncCounter++;
                     if (logo._syncCounter >= logo._YIELD_AFTER_SYNC_RUNS) {
                         logo._syncCounter = 0;
+                        const generation = tur.runGeneration;
                         logo._timerManager.setGuardedTimeout(
                             () =>
                                 logo.runFromBlockNow(
@@ -2702,7 +2752,7 @@ class Logo {
                                     queueStart
                                 ),
                             0,
-                            () => logo.stopTurtle
+                            () => logo.stopTurtle || tur.runGeneration !== generation
                         );
                         if (profilingEnabled) {
                             Logo._recordBlockTiming(logo, blk, profilingStart);
@@ -2733,180 +2783,7 @@ class Logo {
                     logo.dispatchUnissuedSignals(tur);
                 }
             } else {
-                logo._alreadyRunning = false;
-
-                if (!logo._prematureRestart) {
-                    logo.dispatchUnissuedSignals(tur);
-
-                    // Make sure SVG path is closed.
-                    logo.turtles.getTurtle(turtle).painter.closeSVG();
-
-                    // Mark the turtle as not running.
-                    logo.turtles.getTurtle(turtle).running = false;
-                    if (!logo.turtles.running() && queueStart === 0) {
-                        logo.onStopTurtle();
-                    }
-                } else {
-                    logo.turtles.getTurtle(turtle).running = false;
-                }
-
-                const comp = logo.turtles.getTurtle(turtle).companionTurtle;
-                if (comp !== null && comp !== undefined) {
-                    const compTurtle = logo.turtles.getTurtle(comp);
-                    compTurtle.running = false;
-                    // Null tur.interval after cancel — mirrors fix at doStopTurtles
-                    // (~line 1123) to prevent stale-ID no-op on next Play.
-                    if (compTurtle.interval !== undefined) {
-                        if (!logo._timerManager.clearInterval(compTurtle.interval)) {
-                            clearInterval(compTurtle.interval);
-                        }
-                        compTurtle.interval = undefined;
-                    }
-                }
-                // Because flow can come from calc blocks, we are not
-                // ensured that the turtle is really finished running
-                // yet. Hence the timeout.
-                const __checkCompletionState = () => {
-                    if (logo._exportNotationFinished) {
-                        return;
-                    }
-
-                    if (
-                        !logo.turtles.running() &&
-                        queueStart === 0 &&
-                        tur.singer.justCounting.length === 0
-                    ) {
-                        // Performance instrumentation: end tracking and log stats.
-                        // Looked up again because this runs on a timeout, well
-                        // after the lookup at the top of runFromBlockNow.
-                        const runTracker = getPerformanceTracker();
-                        if (runTracker) {
-                            runTracker.endRun();
-                            runTracker.logStats();
-                        }
-
-                        if (logo.runningLilypond) {
-                            logo._exportNotationFinished = true;
-                            try {
-                                if (logo.collectingStats) {
-                                    logo.projectStats = logo.deps.utils.getStatsFromNotation(
-                                        logo.activity
-                                    );
-                                    logo.deps.statsWindow.displayInfo(logo.projectStats);
-                                } else {
-                                    logo.deps.save.afterSaveLilypond();
-                                }
-                            } catch (e) {
-                                console.error("Error generating Lilypond output: ", e);
-                                logo.deps.errorHandler(
-                                    `${_("Error generating Lilypond output.")} ${e.message}`
-                                );
-                            } finally {
-                                logo.collectingStats = false;
-                                logo.runningLilypond = false;
-                                document.body.style.cursor = "default";
-                            }
-                        } else if (logo.runningAbc) {
-                            logo._exportNotationFinished = true;
-                            try {
-                                logo.deps.save.afterSaveAbc();
-                            } catch (e) {
-                                console.error("Error generating ABC output: ", e);
-                                logo.deps.errorHandler(
-                                    `${_("Error generating ABC output.")} ${e.message}`
-                                );
-                            } finally {
-                                logo.runningAbc = false;
-                                document.body.style.cursor = "default";
-                            }
-                        } else if (logo.runningMxml) {
-                            logo._exportNotationFinished = true;
-                            logo.deps.save.afterSaveMxml();
-                            logo.runningMxml = false;
-                        } else if (logo.runningMIDI) {
-                            logo._exportNotationFinished = true;
-                            logo.deps.save.afterSaveMIDI();
-                            logo.runningMIDI = false;
-                        } else if (tur.singer.suppressOutput) {
-                            if (!logo.recording) {
-                                logo.deps.errorHandler(_("Playback is ready."));
-                            }
-                        } else {
-                            // Record notation data into buffer for later save (Issue #2330)
-                            // This allows saving Lilypond/ABC from interactive sessions
-                            const hasStagedNotation =
-                                logo.notation &&
-                                logo.notation.notationStaging &&
-                                Object.values(logo.notation.notationStaging).some(
-                                    staging => Array.isArray(staging) && staging.length > 0
-                                );
-                            if (
-                                hasStagedNotation &&
-                                logo.notationOutput &&
-                                logo.notationOutput.length > 0
-                            ) {
-                                logo.recordingBuffer.hasData = true;
-                                logo.recordingBuffer.notationOutput = logo.notationOutput;
-                                logo.recordingBuffer.notationNotes = JSON.parse(
-                                    JSON.stringify(logo.notationNotes)
-                                );
-                                // Copy notation staging data
-                                logo.recordingBuffer.notationStaging = {};
-                                logo.recordingBuffer.notationDrumStaging = {};
-                                for (let t = 0; t < logo.turtles.getTurtleCount(); t++) {
-                                    if (logo.notation.notationStaging[t]) {
-                                        logo.recordingBuffer.notationStaging[t] = [
-                                            ...logo.notation.notationStaging[t]
-                                        ];
-                                    }
-                                    if (logo.notation.notationDrumStaging[t]) {
-                                        logo.recordingBuffer.notationDrumStaging[t] = [
-                                            ...logo.notation.notationDrumStaging[t]
-                                        ];
-                                    }
-                                }
-                            }
-                        }
-
-                        // Wait a beat for the last note, then clean up.
-                        // Cancel any pending timer from a previous turtle.
-                        if (logo._lastNoteTimeout !== null) {
-                            logo._timerManager.clearTimeout(logo._lastNoteTimeout);
-                        }
-                        logo._lastNoteTimeout = logo._timerManager.setTimeout(() => {
-                            logo._lastNoteTimeout = null;
-                            if (logo.turtles && logo.turtles.running && logo.turtles.running()) {
-                                return;
-                            }
-                            if (logo.turtles && logo.turtles.turtleList) {
-                                for (const t of logo.turtles.turtleList) {
-                                    if (
-                                        logo.turtles &&
-                                        logo.turtles.running &&
-                                        logo.turtles.running()
-                                    ) {
-                                        return;
-                                    }
-                                    if (t && !t.running) {
-                                        if (t.singer) {
-                                            t.singer.runningFromEvent = false;
-                                        }
-                                        logo.dispatchUnissuedSignals(t);
-                                    }
-                                }
-                            }
-                            if (logo.turtles && logo.turtles.running && logo.turtles.running()) {
-                                return;
-                            }
-                            if (tur && tur.singer && tur.singer.suppressOutput && logo.recording) {
-                                tur.singer.suppressOutput = false;
-                            }
-                            logo._cleanupAfterCompletion();
-                        }, 1000);
-                    }
-                };
-
-                logo._timerManager.setTimeout(__checkCompletionState, 100);
+                logo._finishTurtle(logo, turtle, queueStart);
             }
 
             if (profilingEnabled) {
@@ -2915,6 +2792,186 @@ class Logo {
             }
             break;
         }
+    }
+
+    /**
+     * Marks a turtle whose flow has ended as no longer running and, once no
+     * turtle is running, completes the run.
+     *
+     * @param {Logo} logo - The running Logo instance (always `this`).
+     * @param {number} turtle - Index of the turtle.
+     * @param {number} queueStart - Queue depth the flow was started from.
+     * @returns {void}
+     */
+    _finishTurtle(logo, turtle, queueStart) {
+        const tur = logo.turtles.ithTurtle(turtle);
+
+        logo._alreadyRunning = false;
+
+        if (!logo._prematureRestart) {
+            logo.dispatchUnissuedSignals(tur);
+
+            // Make sure SVG path is closed.
+            logo.turtles.getTurtle(turtle).painter.closeSVG();
+
+            // Mark the turtle as not running.
+            logo.turtles.getTurtle(turtle).running = false;
+            if (!logo.turtles.running() && queueStart === 0) {
+                logo.onStopTurtle();
+            }
+        } else {
+            logo.turtles.getTurtle(turtle).running = false;
+        }
+
+        const comp = logo.turtles.getTurtle(turtle).companionTurtle;
+        if (comp !== null && comp !== undefined) {
+            const compTurtle = logo.turtles.getTurtle(comp);
+            compTurtle.running = false;
+            // Null tur.interval after cancel — mirrors fix at doStopTurtles
+            // (~line 1123) to prevent stale-ID no-op on next Play.
+            if (compTurtle.interval !== undefined) {
+                if (!logo._timerManager.clearInterval(compTurtle.interval)) {
+                    clearInterval(compTurtle.interval);
+                }
+                compTurtle.interval = undefined;
+            }
+        }
+        // Because flow can come from calc blocks, we are not
+        // ensured that the turtle is really finished running
+        // yet. Hence the timeout.
+        const __checkCompletionState = () => {
+            if (logo._exportNotationFinished) {
+                return;
+            }
+
+            if (
+                !logo.turtles.running() &&
+                queueStart === 0 &&
+                tur.singer.justCounting.length === 0
+            ) {
+                // Performance instrumentation: end tracking and log stats.
+                // Looked up again because this runs on a timeout, well
+                // after the lookup at the top of runFromBlockNow.
+                const runTracker = getPerformanceTracker();
+                if (runTracker) {
+                    runTracker.endRun();
+                    runTracker.logStats();
+                }
+
+                if (logo.runningLilypond) {
+                    logo._exportNotationFinished = true;
+                    try {
+                        if (logo.collectingStats) {
+                            logo.projectStats = logo.deps.utils.getStatsFromNotation(logo.activity);
+                            logo.deps.statsWindow.displayInfo(logo.projectStats);
+                        } else {
+                            logo.deps.save.afterSaveLilypond();
+                        }
+                    } catch (e) {
+                        console.error("Error generating Lilypond output: ", e);
+                        logo.deps.errorHandler(
+                            `${_("Error generating Lilypond output.")} ${e.message}`
+                        );
+                    } finally {
+                        logo.collectingStats = false;
+                        logo.runningLilypond = false;
+                        document.body.style.cursor = "default";
+                    }
+                } else if (logo.runningAbc) {
+                    logo._exportNotationFinished = true;
+                    try {
+                        logo.deps.save.afterSaveAbc();
+                    } catch (e) {
+                        console.error("Error generating ABC output: ", e);
+                        logo.deps.errorHandler(`${_("Error generating ABC output.")} ${e.message}`);
+                    } finally {
+                        logo.runningAbc = false;
+                        document.body.style.cursor = "default";
+                    }
+                } else if (logo.runningMxml) {
+                    logo._exportNotationFinished = true;
+                    logo.deps.save.afterSaveMxml();
+                    logo.runningMxml = false;
+                } else if (logo.runningMIDI) {
+                    logo._exportNotationFinished = true;
+                    logo.deps.save.afterSaveMIDI();
+                    logo.runningMIDI = false;
+                } else if (tur.singer.suppressOutput) {
+                    if (!logo.recording) {
+                        logo.deps.errorHandler(_("Playback is ready."));
+                    }
+                } else {
+                    // Record notation data into buffer for later save (Issue #2330)
+                    // This allows saving Lilypond/ABC from interactive sessions
+                    const hasStagedNotation =
+                        logo.notation &&
+                        logo.notation.notationStaging &&
+                        Object.values(logo.notation.notationStaging).some(
+                            staging => Array.isArray(staging) && staging.length > 0
+                        );
+                    if (
+                        hasStagedNotation &&
+                        logo.notationOutput &&
+                        logo.notationOutput.length > 0
+                    ) {
+                        logo.recordingBuffer.hasData = true;
+                        logo.recordingBuffer.notationOutput = logo.notationOutput;
+                        logo.recordingBuffer.notationNotes = JSON.parse(
+                            JSON.stringify(logo.notationNotes)
+                        );
+                        // Copy notation staging data
+                        logo.recordingBuffer.notationStaging = {};
+                        logo.recordingBuffer.notationDrumStaging = {};
+                        for (let t = 0; t < logo.turtles.getTurtleCount(); t++) {
+                            if (logo.notation.notationStaging[t]) {
+                                logo.recordingBuffer.notationStaging[t] = [
+                                    ...logo.notation.notationStaging[t]
+                                ];
+                            }
+                            if (logo.notation.notationDrumStaging[t]) {
+                                logo.recordingBuffer.notationDrumStaging[t] = [
+                                    ...logo.notation.notationDrumStaging[t]
+                                ];
+                            }
+                        }
+                    }
+                }
+
+                // Wait a beat for the last note, then clean up.
+                // Cancel any pending timer from a previous turtle.
+                if (logo._lastNoteTimeout !== null) {
+                    logo._timerManager.clearTimeout(logo._lastNoteTimeout);
+                }
+                logo._lastNoteTimeout = logo._timerManager.setTimeout(() => {
+                    logo._lastNoteTimeout = null;
+                    if (logo.turtles && logo.turtles.running && logo.turtles.running()) {
+                        return;
+                    }
+                    if (logo.turtles && logo.turtles.turtleList) {
+                        for (const t of logo.turtles.turtleList) {
+                            if (logo.turtles && logo.turtles.running && logo.turtles.running()) {
+                                return;
+                            }
+                            if (t && !t.running) {
+                                if (t.singer) {
+                                    t.singer.runningFromEvent = false;
+                                }
+                                logo.dispatchUnissuedSignals(t);
+                            }
+                        }
+                    }
+                    if (logo.turtles && logo.turtles.running && logo.turtles.running()) {
+                        return;
+                    }
+                    if (tur && tur.singer && tur.singer.suppressOutput && logo.recording) {
+                        tur.singer.suppressOutput = false;
+                    }
+                    logo._cleanupAfterCompletion();
+                }, 1000);
+            }
+        };
+
+        logo._timerManager.setTimeout(__checkCompletionState, 100);
     }
 
     /**

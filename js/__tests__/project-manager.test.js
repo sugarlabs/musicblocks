@@ -2600,6 +2600,52 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(activity.stopLoadAnimation).toHaveBeenCalled();
     });
 
+    it.each([
+        ["an object", '{"name":"equal","pitchNumber":12}'],
+        ["a list of numbers", "[1,2,3]"],
+        ["a list with one empty list", "[[]]"],
+        ["a list of lists that are not blocks", '[["name","age"],["a",1]]']
+    ])("change handler rejects %s and leaves the project alone", async (_label, rawData) => {
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = rawData;
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+
+        const planet = {
+            saveLocally: jest.fn().mockResolvedValue(),
+            closePlanet: jest.fn(),
+            initialiseNewProject: jest.fn().mockResolvedValue()
+        };
+        const activity = makeActivity({ planet });
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "temperament-equal.json" }];
+        handlers.change();
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Cannot load project from the file. Please check the file type."
+        );
+        expect(planet.saveLocally).not.toHaveBeenCalled();
+        expect(planet.initialiseNewProject).not.toHaveBeenCalled();
+        expect(activity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
     it("change handler reports HTML without project data once and preserves the workspace", () => {
         origFileReader = global.FileReader;
         class MockFR {
@@ -3556,6 +3602,56 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(activity.saveLocally.mock.invocationCallOrder[0]).toBeGreaterThan(
             blocks.loadNewBlocks.mock.invocationCallOrder[0]
         );
+    });
+
+    it.each([
+        ["an object", '{"name":"equal","pitchNumber":12}'],
+        ["a list of numbers", "[1,2,3]"],
+        ["a list with one empty list", "[[]]"],
+        ["a list of lists that are not blocks", '[["name","age"],["a",1]]']
+    ])("drop handler rejects %s and leaves the project alone", async (_label, rawData) => {
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = rawData;
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+        jest.spyOn(window, "scroll").mockImplementation(() => {});
+
+        const planet = {
+            saveLocally: jest.fn().mockResolvedValue(),
+            closePlanet: jest.fn(),
+            initialiseNewProject: jest.fn().mockResolvedValue()
+        };
+        const activity = makeActivity({ planet });
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        handlers.drop({
+            stopPropagation: jest.fn(),
+            preventDefault: jest.fn(),
+            dataTransfer: { files: [{ name: "temperament-equal.json" }] }
+        });
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Cannot load project from the file. Please check the file type."
+        );
+        expect(planet.saveLocally).not.toHaveBeenCalled();
+        expect(planet.initialiseNewProject).not.toHaveBeenCalled();
+        expect(activity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
     });
 
     it("drop handler catches a deferred block-load failure and restores state", async () => {

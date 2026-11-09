@@ -578,7 +578,11 @@ class SaveInterface {
         // Suppress music and turtle output when generating
         activity.logo.runningMIDI = true;
         activity.logo.runLogoCommands();
-        document.body.style.cursor = "wait";
+        if (activity.logo.runningMIDI) {
+            document.body.style.cursor = "wait";
+        } else {
+            document.body.style.cursor = "default";
+        }
     }
 
     /**
@@ -715,17 +719,19 @@ class SaveInterface {
                     if (duration === null) return;
                     const instrument = noteData.instrument || "default";
 
-                    if (noteData.drum) {
-                        const drum = noteData.drum || false;
+                    const drums = Array.isArray(noteData.drum)
+                        ? noteData.drum
+                        : noteData.drum
+                          ? [noteData.drum]
+                          : [];
+                    for (const drum of drums) {
                         if (!drumTracks.has(drum)) {
                             const drumTrack = midi.addTrack();
                             drumTrack.name = `Track ${parseInt(blockIndex, 10) + 1} - ${drum}`;
                             drumTrack.channel = 9; // Drums must be on Channel 10
                             drumTracks.set(drum, drumTrack);
                         }
-
                         const drumTrack = drumTracks.get(drum);
-
                         const midiNumber =
                             Object.prototype.hasOwnProperty.call(drumMIDI, drum) && drumMIDI[drum]
                                 ? drumMIDI[drum]
@@ -738,9 +744,9 @@ class SaveInterface {
                         });
                     }
 
-                    // A note can play pitches together with a drum: write those as well.
+                    // A note can play pitches together with drums: write those as well.
                     const pitches = noteData.note.filter(pitch => !pitch.includes("R"));
-                    if (!noteData.drum || pitches.length > 0) {
+                    if (drums.length === 0 || pitches.length > 0) {
                         if (!instrumentTracks.has(instrument)) {
                             const instrumentTrack = midi.addTrack();
                             instrumentTrack.name = `Track ${

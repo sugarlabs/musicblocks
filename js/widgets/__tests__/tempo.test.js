@@ -1084,6 +1084,14 @@ describe("Tempo Widget", () => {
     });
 
     describe("init() - Additional Coverage", () => {
+        test("selects the first row again when the widget is reopened", () => {
+            tempoWidget.activeBPMIndex = 1;
+
+            tempoWidget.init(mockActivity);
+
+            expect(tempoWidget.activeBPMIndex).toBe(0);
+        });
+
         test("should clear existing interval when re-initializing", () => {
             tempoWidget.BPMs = [100];
             tempoWidget._intervalID = setInterval(() => {}, 1000);

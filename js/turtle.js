@@ -20,7 +20,7 @@
    global
 
    createjs, DEFAULTVOLUME, importMembers, Painter, Singer,
-   DEFAULTVOICE, retryWithBackoff, base64Encode
+   DEFAULTVOICE, retryWithBackoff, base64Encode, escapeHTML
  */
 /* exported Turtle */
 /**
@@ -74,6 +74,7 @@ class Turtle {
 
         this._transportTime = null;
         this._transportEventId = null;
+        this.runGeneration = 0;
     }
 
     /**
@@ -970,6 +971,8 @@ Turtle.TurtleView = class {
                 const xScaled = text.x * this.turtles.scale;
                 const yScaled = text.y * this.turtles.scale;
                 const sizeScaled = size * this.turtles.scale;
+                // Both come from the user, so escape them: a bare "&" or "<"
+                // makes the whole SVG invalid and nothing of it renders.
                 this.painter.svgOutput +=
                     '<text x="' +
                     xScaled +
@@ -978,11 +981,11 @@ Turtle.TurtleView = class {
                     '" fill="' +
                     this.painter.canvasColor +
                     '" font-family = "' +
-                    this.painter.font +
+                    escapeHTML(this.painter.font) +
                     '" font-size = "' +
                     sizeScaled +
                     '">' +
-                    lineContent +
+                    escapeHTML(lineContent) +
                     "</text>";
             }
         }

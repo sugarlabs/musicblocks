@@ -2,6 +2,7 @@ require("../turtle");
 const Turtle = global.Turtle;
 // Mock all external dependencies
 global.importMembers = jest.fn();
+global.escapeHTML = require("../utils/utils-logic").escapeHTML;
 const defaultSingerState = () => ({
     attack: [],
     decay: [],
@@ -1318,6 +1319,23 @@ describe("Turtle.TurtleView", () => {
             expect(view.painter.svgOutput).toContain('x="60"');
             expect(view.painter.svgOutput).toContain('font-size = "40"');
             expect(view.painter.svgOutput).toContain(">hi</text>");
+        });
+
+        it("escapes the text and font so the svg stays well formed", () => {
+            const view = makeView();
+            view.painter.font = 'Tom "&" Jerry';
+
+            view.doShowText(20, "Tom & Jerry <3");
+
+            expect(view._media[0].text).toBe("Tom & Jerry <3");
+            const doc = new DOMParser().parseFromString(
+                '<svg xmlns="http://www.w3.org/2000/svg">' + view.painter.svgOutput + "</svg>",
+                "image/svg+xml"
+            );
+            expect(doc.querySelector("parsererror")).toBeNull();
+            const text = doc.querySelector("text");
+            expect(text.textContent).toBe("Tom & Jerry <3");
+            expect(text.getAttribute("font-family")).toBe('Tom "&" Jerry');
         });
 
         it("draws an empty string as a single empty line", () => {

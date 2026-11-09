@@ -289,6 +289,24 @@ describe("Singer Class", () => {
         });
     });
 
+    test("dropPendingNotes() forgets the notes it had started", () => {
+        singer.inNoteBlock = [12, 14];
+        singer.multipleVoices = true;
+        singer.noteValue = { 12: 4, 14: 8 };
+        singer.notePitches = { 12: ["G"], 14: ["A"] };
+        singer.delayedNotes = [[14, 8]];
+        singer.turtleTime = 3;
+
+        singer.dropPendingNotes();
+
+        expect(singer.inNoteBlock).toEqual([]);
+        expect(singer.multipleVoices).toBe(false);
+        expect(singer.noteValue).toEqual({});
+        expect(singer.notePitches).toEqual({});
+        expect(singer.delayedNotes).toEqual([]);
+        expect(singer.turtleTime).toBe(3);
+    });
+
     test("should correctly add scalar transposition", () => {
         const result = Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, 2);
         expect(result).toEqual(["C", 4]);
@@ -2763,6 +2781,27 @@ describe("processNote notation and MIDI emission guards against non-positive dur
         expect(activityMock.logo.updateNotation).toHaveBeenCalledWith(["C4"], 4, 0, -1, []);
     });
 
+    test("passes every drum in a note to the notation", () => {
+        const blk = "twoDrumsNoteBlk";
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["C", "C"] };
+        turtleMock.singer.noteOctaves = { [blk]: [2, 2] };
+        turtleMock.singer.noteCents = { [blk]: [0, 0] };
+        turtleMock.singer.noteHertz = { [blk]: [0, 0] };
+        turtleMock.singer.noteDrums = { [blk]: ["kick drum", "snare drum"] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1, 1] };
+        turtleMock.singer.instrumentNames = ["piano"];
+        turtleMock.singer.oscList = { [blk]: [] };
+        turtleMock.singer.bpm = [90];
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+        expect(activityMock.logo.updateNotation.mock.calls[0][4]).toEqual([
+            "kick drum",
+            "snare drum"
+        ]);
+    });
+
     test("passes a hertz note to notationMIDI as its nearest note name", () => {
         const blk = "hertzNoteBlk";
         turtleMock.singer.inNoteBlock = [blk];
@@ -2868,6 +2907,33 @@ describe("processNote notation and MIDI emission guards against non-positive dur
             );
         }
     );
+
+    test("passes every drum in one Note to the MIDI recorder", () => {
+        const blk = "drumNoteBlk";
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["C"] };
+        turtleMock.singer.noteOctaves = { [blk]: [4] };
+        turtleMock.singer.noteCents = { [blk]: [0] };
+        turtleMock.singer.noteHertz = { [blk]: [0] };
+        turtleMock.singer.noteDrums = { [blk]: ["kick drum", "snare drum"] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1] };
+        turtleMock.singer.instrumentNames = ["piano"];
+        turtleMock.singer.oscList = { [blk]: [] };
+        turtleMock.singer.bpm = [90];
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+        expect(activityMock.logo.notationMIDI).toHaveBeenCalledWith(
+            ["C4"],
+            ["kick drum", "snare drum"],
+            4,
+            0,
+            90,
+            "piano",
+            [4, 4],
+            "C major"
+        );
+    });
 
     describe("inside Set Drum", () => {
         const blk = "setDrumNoteBlk";

@@ -632,6 +632,15 @@ describe("saveMIDI Method", () => {
         expect(activity.logo.runLogoCommands).toHaveBeenCalled();
         expect(document.body.style.cursor).toBe("wait");
     });
+
+    it("should restore default cursor when no start blocks are executed", () => {
+        mockLogo.runLogoCommands = jest.fn(() => {
+            mockLogo.runningMIDI = false;
+        });
+        instance.saveMIDI(activity);
+        expect(activity.logo.runningMIDI).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+    });
 });
 
 describe("afterSaveMIDI", () => {
@@ -838,6 +847,38 @@ describe("afterSaveMIDI", () => {
         expect(track("Track 1 - guitar").addNote.mock.calls).toEqual([
             [{ name: "G4", time: beat, duration: beat, velocity: 0.8 }],
             [{ name: "A4", time: 2 * beat, duration: beat, velocity: 0.8 }]
+        ]);
+    });
+
+    it("writes every drum and pitch of a mixed Note at the same time", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                {
+                    note: ["C4", "E4"],
+                    drum: ["kick drum", "snare drum"],
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "piano"
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const track = name => tracks.find(t => t.name === name);
+        const beat = 0.6666666666666666;
+
+        expect(track("Track 1 - kick drum").addNote.mock.calls).toEqual([
+            [{ midi: 36, time: 0, duration: beat, velocity: 0.9 }]
+        ]);
+        expect(track("Track 1 - snare drum").addNote.mock.calls).toEqual([
+            [{ midi: 38, time: 0, duration: beat, velocity: 0.9 }]
+        ]);
+        expect(track("Track 1 - piano").addNote.mock.calls).toEqual([
+            [{ name: "C4", time: 0, duration: beat, velocity: 0.8 }],
+            [{ name: "E4", time: 0, duration: beat, velocity: 0.8 }]
         ]);
     });
 
