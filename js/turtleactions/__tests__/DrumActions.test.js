@@ -483,6 +483,15 @@ describe("setupDrumActions", () => {
             expect(targetTurtle.singer.pushedNote).toBe(false);
         });
 
+        it("keeps a noise sample loaded from a URL, like Play Drum does", () => {
+            const url = "https://example.com/custom-noise.wav";
+            targetTurtle.singer.inNoteBlock.push(7);
+            targetTurtle.singer.noteDrums[7] = [];
+            targetTurtle.singer.noteBeatValues[7] = [];
+            Singer.DrumActions.playNoise(url, 0, 7);
+            expect(targetTurtle.singer.noteDrums[7]).toEqual([url]);
+        });
+
         it("resolves noise names case-insensitively, with trimmed whitespace, or omitted spaces", () => {
             targetTurtle.singer.inNoteBlock.push(2);
             targetTurtle.singer.noteDrums[2] = [];
