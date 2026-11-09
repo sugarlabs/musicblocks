@@ -383,6 +383,7 @@ class Logo {
         this._syncCounter = 0;
         this._YIELD_AFTER_SYNC_RUNS = 1000;
         this._EXPORT_YIELD_AFTER_SYNC_RUNS = 100; // Sync yield threshold during exports.
+        this._resetExportSteps();
         this._MAX_ITERATIONS = 1000000;
         this._iterationBudget = this._MAX_ITERATIONS + 1;
 
@@ -1662,6 +1663,7 @@ class Logo {
 
         // Prevent stale timeout from firing cleanup on next run.
         this._lastNoteTimeout = null;
+        this._resetExportSteps();
 
         // clearAll() above cancels the value-bar timeout without running its
         // callback, so reset both directly to avoid valueBarVisible getting
@@ -1851,6 +1853,7 @@ class Logo {
         this.runGeneration += 1;
 
         this._syncCounter = 0;
+        this._resetExportSteps();
         this._iterationBudget = this._MAX_ITERATIONS + 1;
 
         this.blocks.unhighlightAll();
@@ -2154,6 +2157,83 @@ class Logo {
         return this.runningLilypond || this.runningAbc || this.runningMxml || this.runningMIDI;
     }
 
+    _resetExportSteps() {
+        this._exportSteps = [];
+        this._exportWaits = {};
+        this._exportTime = 0;
+        this._exportStepsPending = false;
+    }
+
+    /**
+     * Queues the next block of a turtle during a notation export at the
+     * musical time it would run at: the time of its notes plus its waits.
+     * Steps run earliest first, so voices meet each other's events, names
+     * and syncs where they do when the project plays.
+     *
+     * @param {number} turtle - Index of the turtle.
+     * @param {number} blk - Index of the block to run.
+     * @param {number} isflow
+     * @param {*} receivedArg
+     * @returns {void}
+     */
+    _queueExportStep(turtle, blk, isflow, receivedArg) {
+        const tur = this.turtles.ithTurtle(turtle);
+        this._exportWaits[turtle] = (this._exportWaits[turtle] || 0) + tur.waitTime / 1000;
+        tur.doWait(0);
+
+        const time = tur.singer.turtleTime + this._exportWaits[turtle];
+        const steps = this._exportSteps;
+        let i = steps.length;
+        while (i > 0 && steps[i - 1].time > time) i--;
+        steps.splice(i, 0, {
+            time,
+            turtle,
+            blk,
+            isflow,
+            receivedArg,
+            generation: tur.runGeneration
+        });
+
+        if (!this._exportStepsPending) this._scheduleExportSteps();
+    }
+
+    _scheduleExportSteps() {
+        this._exportStepsPending = true;
+        this._timerManager.setGuardedTimeout(
+            () => this._runExportSteps(),
+            0,
+            () => this.stopTurtle
+        );
+    }
+
+    /**
+     * Runs up to _EXPORT_YIELD_AFTER_SYNC_RUNS queued export steps, then
+     * yields to the browser if any are left.
+     *
+     * @returns {void}
+     */
+    _runExportSteps() {
+        let count = this._EXPORT_YIELD_AFTER_SYNC_RUNS;
+        try {
+            while (count-- > 0 && this._exportSteps.length > 0 && !this.stopTurtle) {
+                const step = this._exportSteps.shift();
+                if (this.turtles.ithTurtle(step.turtle).runGeneration === step.generation) {
+                    this._exportTime = step.time;
+                    this.runFromBlockNow(
+                        this,
+                        step.turtle,
+                        step.blk,
+                        step.isflow,
+                        step.receivedArg
+                    );
+                }
+            }
+        } finally {
+            this._exportStepsPending = false;
+            if (this._exportSteps.length > 0 && !this.stopTurtle) this._scheduleExportSteps();
+        }
+    }
+
     /**
      * Schedules execution of block `blk` after the turtle's current delay.
      *
@@ -2181,20 +2261,9 @@ class Logo {
         this.receivedArg = receivedArg;
         const tur = logo.turtles.ithTurtle(turtle);
 
-        // Synchronous fast path for notation exports; yield every 100 transitions.
+        // Notation exports skip the delays but keep the order the project plays in.
         if (logo._exportingNotation) {
-            logo._syncCounter++;
-            if (logo._syncCounter >= logo._EXPORT_YIELD_AFTER_SYNC_RUNS) {
-                logo._syncCounter = 0;
-                const generation = tur.runGeneration;
-                logo._timerManager.setGuardedTimeout(
-                    () => logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg),
-                    0,
-                    () => logo.stopTurtle || tur.runGeneration !== generation
-                );
-            } else {
-                logo.runFromBlockNow(logo, turtle, blk, isflow, receivedArg);
-            }
+            logo._queueExportStep(turtle, blk, isflow, receivedArg);
             return;
         }
 
@@ -2839,7 +2908,7 @@ class Logo {
         // ensured that the turtle is really finished running
         // yet. Hence the timeout.
         const __checkCompletionState = () => {
-            if (logo._exportNotationFinished) {
+            if (logo._exportNotationFinished || logo._exportSteps.length > 0) {
                 return;
             }
 
