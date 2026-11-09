@@ -629,19 +629,24 @@ class SaveInterface {
             meter[1] > 0 &&
             (meter[1] & (meter[1] - 1)) === 0;
 
-        // Without a tempo and a time signature a MIDI file is read at 120 bpm in 4/4, so
-        // notes played at any other tempo fall off the beat grid. A MIDI file has one tempo
-        // map and one set of time and key signatures for all its tracks: take them from the
-        // first track. Notes are placed by the time they play, so every track keeps its timing.
-        // Returns the key signatures, which addMidiKeySignatures() writes into the file.
-        const writeHeaderEvents = (header, notes) => {
+        // Calls back with each note that is written and the second it starts at.
+        const forEachWrittenNote = (notes, callback) => {
             let time = 0;
-            let lastMeter = null;
-            const keySignatures = [];
             notes.forEach(noteData => {
                 const duration = noteSeconds(noteData);
                 if (duration === null) return;
+                callback(noteData, time);
+                time += duration;
+            });
+        };
 
+        // Without a tempo and a time signature a MIDI file is read at 120 bpm in 4/4, so
+        // notes played at any other tempo fall off the beat grid. A MIDI file has one tempo
+        // map and one set of time signatures for all its tracks: take them from the first
+        // track. Notes are placed by the time they play, so every track keeps its timing.
+        const writeTempoAndMeter = (header, notes) => {
+            let lastMeter = null;
+            forEachWrittenNote(notes, (noteData, time) => {
                 const bpm = noteBpm(noteData);
                 const tempos = header.tempos;
                 if (tempos.length === 0 || tempos[tempos.length - 1].bpm !== bpm) {
@@ -661,7 +666,14 @@ class SaveInterface {
                     header.update();
                     lastMeter = meter;
                 }
+            });
+        };
 
+        // A MIDI file also has one set of key signatures. Drums have no key, so take them from
+        // the first track that plays pitches, for addMidiKeySignatures() to write into the file.
+        const keySignaturesOf = (header, notes) => {
+            const keySignatures = [];
+            forEachWrittenNote(notes, (noteData, time) => {
                 const key = keySignatureForMidi(noteData.key);
                 const lastKey = keySignatures[keySignatures.length - 1];
                 if (
@@ -672,11 +684,11 @@ class SaveInterface {
                 ) {
                     keySignatures.push({ ticks: header.secondsToTicks(time), ...key });
                 }
-
-                time += duration;
             });
             return keySignatures;
         };
+
+        const hasPitch = noteData => noteData.note.some(pitch => !pitch.includes("R"));
 
         const generateMidi = data => {
             const midi = new Midi();
@@ -690,7 +702,16 @@ class SaveInterface {
                         (noteData.drum || noteData.note.some(pitch => !pitch.includes("R")))
                 )
             );
-            const keySignatures = firstTrack ? writeHeaderEvents(midi.header, firstTrack) : [];
+            if (firstTrack) {
+                writeTempoAndMeter(midi.header, firstTrack);
+            }
+
+            const firstPitchedTrack = Object.values(data).find(notes =>
+                notes.some(noteData => noteSeconds(noteData) !== null && hasPitch(noteData))
+            );
+            const keySignatures = firstPitchedTrack
+                ? keySignaturesOf(midi.header, firstPitchedTrack)
+                : [];
 
             // A MIDI channel plays one instrument at a time, whichever track set it last, so
             // each instrument in the file gets its own channel. Channel 9 is for drums; past

@@ -1395,6 +1395,30 @@ describe("afterSaveMIDI key signatures", () => {
         expect(keyEvents(file)).toEqual([]);
     });
 
+    it("takes the key from the first mouse that plays pitches, not one with only drums", () => {
+        const drum = { ...note("R", "C major", [3, 4]), drum: "kick drum" };
+        const file = exportMidi({
+            0: [drum, drum],
+            1: [note("A4", "F major"), note("B♭4", "F major"), note("C5", "D minor")]
+        });
+        const midi = new ToneMidi(file);
+
+        expect(keyEvents(file)).toEqual([
+            [0, -1, false],
+            [960, -1, true]
+        ]);
+        // The tempo and meter still come from the first mouse.
+        expect(midi.header.timeSignatures.map(t => t.timeSignature)).toEqual([[3, 4]]);
+    });
+
+    it("writes no key signature when only drums play", () => {
+        const drum = { ...note("R", "F major"), drum: "kick drum" };
+        const file = exportMidi({ 0: [drum, drum] });
+
+        expect(file).toBe(written);
+        expect(keyEvents(file)).toEqual([]);
+    });
+
     it("writes no key signature for a mode that has none", () => {
         const file = exportMidi({
             0: [note("C4", "C chromatic"), note("D4", "D dorian"), note("E4", "C chromatic")]
