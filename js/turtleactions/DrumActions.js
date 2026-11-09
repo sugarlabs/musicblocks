@@ -214,12 +214,14 @@ function setupDrumActions(activity) {
          */
         static playNoise(noise, turtle, blk) {
             if (typeof noise !== "string") return;
-            const target = noise.trim().toLowerCase();
-            if (!target) return;
+            const trimmed = noise.trim();
+            if (!trimmed) return;
+            const target = trimmed.toLowerCase();
             const targetNoSpaces = target.replace(/\s+/g, "");
 
-            let noisename = null;
-            if (typeof NOISENAMES === "object" && NOISENAMES !== null) {
+            // A noise sample can be loaded from a URL, just as a drum can.
+            let noisename = target.slice(0, 4) === "http" ? trimmed : null;
+            if (!noisename && typeof NOISENAMES === "object" && NOISENAMES !== null) {
                 for (const [, value] of Object.entries(NOISENAMES)) {
                     if (!value) continue;
                     const localized =
