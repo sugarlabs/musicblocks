@@ -143,12 +143,17 @@ describe("Notation exports keep the order the mice play in", () => {
             values.length
         );
 
-    // "label:beats" is a note, [name, ...text] a block with text arguments.
+    const wait = (secs, parent) =>
+        flowBlock("wait", [parent, null], (args, l, turtle) => turtles[turtle].doWait(secs));
+
+    // "label:beats" is a note, a number a wait, [name, ...text] a block with text arguments.
     const addStack = (blocks, stack) => {
         let parent = null;
         for (const item of stack) {
             const id = blocks.length;
-            if (Array.isArray(item)) {
+            if (typeof item === "number") {
+                blocks.push(wait(item, parent));
+            } else if (Array.isArray(item)) {
                 const [name, ...values] = item;
                 const block = named(name, parent, values);
                 blocks.push(block);
@@ -273,5 +278,17 @@ describe("Notation exports keep the order the mice play in", () => {
         );
 
         expect(played).toEqual(["a1", "b1", "b2", "a2", "a3", "c1", "a4", "c2", "b3", "saved"]);
+    });
+
+    test("starts a mouse from the event again without its earlier waits", () => {
+        exportAbc(
+            [
+                ["a1:1", ["dispatch", "go"], "a2:4", ["dispatch", "go"], "a3:1", "a4:1", "a5:1"],
+                [["listen", "go", "part"]]
+            ],
+            { part: ["b1:1", 1, "b2:1"] }
+        );
+
+        expect(played).toEqual(["a1", "b1", "a2", "b2", "b1", "a3", "a4", "b2", "a5", "saved"]);
     });
 });
