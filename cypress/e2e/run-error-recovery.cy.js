@@ -11,8 +11,17 @@ describe("Run stopped by an error", () => {
         cy.get("#myOpenFile").selectFile("cypress/fixtures/note-value-zero-minimal.tb", {
             force: true
         });
-        cy.get("#load-container").should("be.visible");
-        cy.get("#load-container", { timeout: 30000 }).should("not.be.visible");
+        cy.window({ timeout: 30000 }).should(win => {
+            const activity = win.ActivityContext.getActivity();
+            expect(
+                activity.blocks.blockList.some(
+                    block => !block.trash && block.name === "number" && block.value === 0
+                ),
+                "project loaded"
+            ).to.be.true;
+            expect(activity.blocks.isLoading()).to.be.false;
+            expect(activity.loading).to.be.false;
+        });
 
         cy.get("#play").click();
         cy.get("#errorText", { timeout: 10000 }).should("be.visible");
