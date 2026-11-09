@@ -254,6 +254,7 @@ describe("PitchSlider Widget", () => {
             const previousWindow = slider.widgetWindow;
 
             global.window.widgetWindows.openWindows.slider = previousWindow;
+            const oncloseSpy = jest.spyOn(previousWindow, "onclose");
 
             // Simulate PitchActions supplying a new frequency.
             slider.frequencies = [];
@@ -265,6 +266,7 @@ describe("PitchSlider Widget", () => {
             expect(slider.initialFrequencies).toEqual([660]);
             expect(Number(slider.sliders[0].value)).toBe(660);
 
+            expect(oncloseSpy).toHaveBeenCalledTimes(1);
             expect(previousWindow.destroy).toHaveBeenCalledTimes(1);
             expect(activityMock.logo.pitchSlider).toBe(slider);
         });
@@ -324,7 +326,7 @@ describe("PitchSlider Widget", () => {
             expect(slider.frequencies).toEqual([392, 392, 27.5, 500, 16744.04, 392, 392]);
         });
 
-        test("clamps this.frequency with clampNumber when frequencies array is empty", () => {
+        test("clamps this.frequency when frequencies array is empty", () => {
             slider.frequency = 10;
             slider.frequencies = [];
             slider.init(activityMock);
