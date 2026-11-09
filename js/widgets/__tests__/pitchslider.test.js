@@ -150,6 +150,33 @@ describe("PitchSlider Widget", () => {
         });
     });
 
+    describe("Frequency Normalization", () => {
+        test("returns valid frequency unchanged", () => {
+            expect(PitchSlider.normalizeFrequency(440)).toBe(440);
+        });
+
+        test("accepts numeric strings", () => {
+            expect(PitchSlider.normalizeFrequency("440")).toBe(440);
+        });
+
+        test("uses default for invalid inputs", () => {
+            expect(PitchSlider.normalizeFrequency("440Hz")).toBe(392);
+            expect(PitchSlider.normalizeFrequency(0)).toBe(392);
+            expect(PitchSlider.normalizeFrequency(-100)).toBe(392);
+            expect(PitchSlider.normalizeFrequency(NaN)).toBe(392);
+            expect(PitchSlider.normalizeFrequency(Infinity)).toBe(392);
+            expect(PitchSlider.normalizeFrequency(null)).toBe(392);
+            expect(PitchSlider.normalizeFrequency(true)).toBe(392);
+            expect(PitchSlider.normalizeFrequency(false)).toBe(392);
+            expect(PitchSlider.normalizeFrequency({})).toBe(392);
+        });
+
+        test("clamps valid positive frequencies to supported limits", () => {
+            expect(PitchSlider.normalizeFrequency(20)).toBe(27.5);
+            expect(PitchSlider.normalizeFrequency(20000)).toBe(16744.04);
+        });
+    });
+
     describe("Constructor", () => {
         test("initializes _delta to 0", () => {
             expect(slider._delta).toBe(0);
@@ -220,6 +247,28 @@ describe("PitchSlider Widget", () => {
             ]);
         });
 
+        test("preserves newly supplied frequency when reinitializing an open slider", () => {
+            slider.frequencies = [440];
+            slider.init(activityMock);
+
+            const previousWindow = slider.widgetWindow;
+
+            global.window.widgetWindows.openWindows.slider = previousWindow;
+
+            // Simulate PitchActions supplying a new frequency.
+            slider.frequencies = [];
+            slider.frequency = 660;
+
+            slider.init(activityMock);
+
+            expect(slider.frequencies).toEqual([660]);
+            expect(slider.initialFrequencies).toEqual([660]);
+            expect(Number(slider.sliders[0].value)).toBe(660);
+
+            expect(previousWindow.destroy).toHaveBeenCalledTimes(1);
+            expect(activityMock.logo.pitchSlider).toBe(slider);
+        });
+
         test("rerunning uses changed block input for Reset and Save", () => {
             slider.frequencies = [392];
             slider.init(activityMock);
@@ -256,10 +305,10 @@ describe("PitchSlider Widget", () => {
         });
 
         test("uses this.frequency when frequencies array is empty and clears it", () => {
-            slider.frequency = 440;
+            slider.frequency = 660;
             slider.frequencies = [];
             slider.init(activityMock);
-            expect(slider.frequencies).toEqual([440]);
+            expect(slider.frequencies).toEqual([660]);
             expect(slider.frequency).toBeNull();
         });
 
@@ -269,10 +318,10 @@ describe("PitchSlider Widget", () => {
             expect(slider.frequencies).toEqual([440, 880]);
         });
 
-        test("clamps out-of-range frequencies and uses fallback for NaN", () => {
-            slider.frequencies = [0, -100, 500, 20000, NaN, "invalid"];
+        test("normalizes invalid and out-of-range frequencies", () => {
+            slider.frequencies = [0, -100, 20, 500, 20000, NaN, "invalid"];
             slider.init(activityMock);
-            expect(slider.frequencies).toEqual([27.5, 27.5, 500, 16744.04, 392, 392]);
+            expect(slider.frequencies).toEqual([392, 392, 27.5, 500, 16744.04, 392, 392]);
         });
 
         test("clamps this.frequency with clampNumber when frequencies array is empty", () => {

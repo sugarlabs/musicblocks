@@ -30,6 +30,25 @@ class PitchSlider {
     static MIN_FREQUENCY = 27.5;
     static MAX_FREQUENCY = 16744.04;
     static DEFAULT_FREQUENCY = 392;
+
+    static normalizeFrequency(value) {
+        const frequency = Number(value);
+
+        if (
+            (typeof value !== "number" && typeof value !== "string") ||
+            (typeof value === "string" && value.trim() === "") ||
+            !Number.isFinite(frequency) ||
+            frequency <= 0
+        ) {
+            return PitchSlider.DEFAULT_FREQUENCY;
+        }
+        return clampNumber(
+            frequency,
+            PitchSlider.MIN_FREQUENCY,
+            PitchSlider.MAX_FREQUENCY,
+            PitchSlider.DEFAULT_FREQUENCY
+        );
+    }
     /**
      * @constructor
      */
@@ -50,37 +69,35 @@ class PitchSlider {
         this.activity = activity;
         const edo = getCurrentEDO(activity.logo.synth.inTemperament);
         const semitone = Math.pow(2, 1 / edo);
+        // Preserve pending frequency before closing an existing window.
+        const pendingFrequency = this.frequency;
+
         const openWindow =
             typeof window !== "undefined" &&
             window.widgetWindows &&
             window.widgetWindows.openWindows
                 ? window.widgetWindows.openWindows["slider"]
                 : null;
-        if (openWindow && typeof openWindow.onclose === "function") openWindow.onclose();
+
+        if (openWindow && typeof openWindow.onclose === "function") {
+            openWindow.onclose();
+
+            // Preserve a newly supplied frequency during reinitialization.
+            if (pendingFrequency !== undefined && pendingFrequency !== null) {
+                this.frequency = pendingFrequency;
+            }
+        }
         this.sliders = {};
         this.activeSlider = null;
         if (!this.frequencies || !this.frequencies.length) {
-            if (typeof this.frequency !== "undefined" && this.frequency !== null) {
-                const f = clampNumber(
-                    parseFloat(this.frequency),
-                    PitchSlider.MIN_FREQUENCY,
-                    PitchSlider.MAX_FREQUENCY,
-                    PitchSlider.DEFAULT_FREQUENCY
-                );
-                this.frequencies = [f];
+            if (this.frequency !== undefined && this.frequency !== null) {
+                this.frequencies = [PitchSlider.normalizeFrequency(this.frequency)];
                 this.frequency = null;
             } else {
                 this.frequencies = [PitchSlider.DEFAULT_FREQUENCY];
             }
         } else {
-            this.frequencies = this.frequencies.map(f =>
-                clampNumber(
-                    parseFloat(f),
-                    PitchSlider.MIN_FREQUENCY,
-                    PitchSlider.MAX_FREQUENCY,
-                    PitchSlider.DEFAULT_FREQUENCY
-                )
-            );
+            this.frequencies = this.frequencies.map(f => PitchSlider.normalizeFrequency(f));
         }
         this.initialFrequencies = [...this.frequencies];
 
