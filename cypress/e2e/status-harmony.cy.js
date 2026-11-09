@@ -49,7 +49,8 @@ describe("Status widget Harmony row", () => {
                     "major 3",
                     "5:4",
                     "1.260",
-                    "+13.7"
+                    "+13.7",
+                    "imperfect"
                 ]);
             });
         harmonyCell().contains("td", "C4 → G4").should("be.visible");

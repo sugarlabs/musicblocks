@@ -32,6 +32,8 @@
 class ChordBuilderWidget {
     static dependencies = ["widgets/ChordBuilderAudio", "widgets/chordbuilder"];
 
+    static MAX_BARS = 16;
+
     static ROOT_KEYS = [
         "C",
         "C#",
@@ -429,6 +431,10 @@ class ChordBuilderWidget {
      */
     addChord(chord) {
         if (!chord) return;
+        if (this.progression.length >= ChordBuilderWidget.MAX_BARS * this.beatsPerBar) {
+            this.errorMsg(_("The progression is full. Remove a chord before adding another."));
+            return;
+        }
         const chordClone = { ...chord };
         this.progression.push(chordClone);
         if (this.audio) {
@@ -802,8 +808,9 @@ class ChordBuilderWidget {
         barsInput.id = "chordNumBarsInput";
         barsInput.type = "number";
         barsInput.min = "1";
-        barsInput.max = "16";
+        barsInput.max = String(ChordBuilderWidget.MAX_BARS);
         barsInput.value = String(this.numBars);
+        this.barsInput = barsInput;
         barsInput.style.width = "48px";
         barsInput.style.padding = "2px 4px";
         barsInput.style.borderRadius = "4px";
@@ -811,7 +818,7 @@ class ChordBuilderWidget {
         barsInput.style.fontSize = "12px";
         barsInput.onchange = e => {
             const n = parseInt(e.target.value, 10);
-            if (n >= 1 && n <= 16) {
+            if (n >= 1 && n <= ChordBuilderWidget.MAX_BARS) {
                 this.numBars = n;
                 this._renderBarGrid();
             }
@@ -834,7 +841,13 @@ class ChordBuilderWidget {
             beatsSelect.appendChild(opt);
         });
         beatsSelect.onchange = e => {
-            this.beatsPerBar = parseInt(e.target.value, 10);
+            const beats = parseInt(e.target.value, 10);
+            if (this.progression.length > ChordBuilderWidget.MAX_BARS * beats) {
+                this.errorMsg(_("Remove chords before reducing the number of beats."));
+                e.target.value = String(this.beatsPerBar);
+                return;
+            }
+            this.beatsPerBar = beats;
             this._renderBarGrid();
         };
 
@@ -992,6 +1005,12 @@ class ChordBuilderWidget {
      * @private
      */
     _renderBarGrid() {
+        // All stored beats must remain visible, including rests between chords.
+        this.numBars = Math.max(
+            this.numBars,
+            Math.ceil(this.progression.length / this.beatsPerBar)
+        );
+        if (this.barsInput) this.barsInput.value = String(this.numBars);
         if (!this.barGridContainer) return;
         this.barGridContainer.innerHTML = "";
 

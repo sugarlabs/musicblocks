@@ -73,10 +73,14 @@ function setupHeapBlocks(activity) {
                 logo.turtleHeaps[turtle] = [];
             }
 
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId !== null &&
+                parentId !== undefined &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "heap"]);
                 return JSON.stringify([]);
@@ -214,11 +218,15 @@ function setupHeapBlocks(activity) {
                 logo.turtleHeaps[turtle] = [];
             }
 
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             // If in status matrix, push information to the status fields
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId !== null &&
+                parentId !== undefined &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "heapLength"]);
                 return 0;

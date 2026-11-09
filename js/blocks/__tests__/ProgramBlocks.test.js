@@ -943,11 +943,198 @@ describe("ProgramBlocks", () => {
             expect(activity.blocks.palettes.show).toHaveBeenCalled();
         });
 
-        test("handles missing arguments", () => {
+        test("opens specified palette case-insensitively and with trimmed whitespace", () => {
+            activity.blocks.palettes.dict = {
+                rhythm: {
+                    name: "rhythm",
+                    show: jest.fn()
+                }
+            };
+
+            const block = getBlock("openpalette");
+            block.flow(["  RHYTHM  "], logo, 0, 10);
+
+            expect(activity.blocks.palettes.hide).toHaveBeenCalled();
+            expect(activity.blocks.palettes.dict.rhythm.show).toHaveBeenCalled();
+            expect(activity.blocks.palettes.show).toHaveBeenCalled();
+        });
+
+        test("opens palette when localized name is capitalized (e.g. German 'Rhythmus')", () => {
+            activity.blocks.palettes.dict = {
+                rhythm: {
+                    name: "rhythm",
+                    show: jest.fn()
+                }
+            };
+
+            const originalTranslate = global._;
+            global._ = s => (s === "rhythm" ? "Rhythmus" : s);
+            try {
+                const block = getBlock("openpalette");
+                block.flow(["Rhythmus"], logo, 0, 10);
+
+                expect(activity.blocks.palettes.hide).toHaveBeenCalled();
+                expect(activity.blocks.palettes.dict.rhythm.show).toHaveBeenCalled();
+                expect(activity.blocks.palettes.show).toHaveBeenCalled();
+            } finally {
+                global._ = originalTranslate;
+            }
+        });
+
+        test("opens palette when user passes lowercase input for capitalized localized name", () => {
+            activity.blocks.palettes.dict = {
+                rhythm: {
+                    name: "rhythm",
+                    show: jest.fn()
+                }
+            };
+
+            const originalTranslate = global._;
+            global._ = s => (s === "rhythm" ? "Rhythmus" : s);
+            try {
+                const block = getBlock("openpalette");
+                block.flow(["rhythmus"], logo, 0, 10);
+
+                expect(activity.blocks.palettes.hide).toHaveBeenCalled();
+                expect(activity.blocks.palettes.dict.rhythm.show).toHaveBeenCalled();
+                expect(activity.blocks.palettes.show).toHaveBeenCalled();
+            } finally {
+                global._ = originalTranslate;
+            }
+        });
+
+        test("opens palette when non-English locale is active but canonical English name is passed", () => {
+            activity.blocks.palettes.dict = {
+                rhythm: {
+                    name: "rhythm",
+                    show: jest.fn()
+                }
+            };
+
+            const originalTranslate = global._;
+            global._ = s => (s === "rhythm" ? "Rhythmus" : s);
+            try {
+                const block = getBlock("openpalette");
+                block.flow(["rhythm"], logo, 0, 10);
+
+                expect(activity.blocks.palettes.hide).toHaveBeenCalled();
+                expect(activity.blocks.palettes.dict.rhythm.show).toHaveBeenCalled();
+                expect(activity.blocks.palettes.show).toHaveBeenCalled();
+            } finally {
+                global._ = originalTranslate;
+            }
+        });
+
+        test("opens palette with locale-aware matching (e.g. Turkish dotted I 'RİTİM')", () => {
+            activity.blocks.palettes.dict = {
+                rhythm: {
+                    name: "rhythm",
+                    show: jest.fn()
+                }
+            };
+
+            const originalTranslate = global._;
+            const originalI18next = global.i18next;
+            global._ = s => (s === "rhythm" ? "ritim" : s);
+            global.i18next = { language: "tr_TR" };
+            try {
+                const block = getBlock("openpalette");
+                block.flow(["RİTİM"], logo, 0, 10);
+
+                expect(activity.blocks.palettes.hide).toHaveBeenCalled();
+                expect(activity.blocks.palettes.dict.rhythm.show).toHaveBeenCalled();
+                expect(activity.blocks.palettes.show).toHaveBeenCalled();
+            } finally {
+                global._ = originalTranslate;
+                global.i18next = originalI18next;
+            }
+        });
+
+        test("handles missing arguments (empty array)", () => {
             const block = getBlock("openpalette");
             block.flow([], logo, 0, 10);
 
             expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+        });
+
+        test("handles missing arguments (null or undefined input) without throwing", () => {
+            const block = getBlock("openpalette");
+            expect(() => block.flow([null], logo, 0, 10)).not.toThrow();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+
+            activity.errorMsg.mockClear();
+            expect(() => block.flow([undefined], logo, 0, 11)).not.toThrow();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 11);
+
+            activity.errorMsg.mockClear();
+            expect(() => block.flow(null, logo, 0, 12)).not.toThrow();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 12);
+        });
+
+        test("handles non-string number input without throwing", () => {
+            activity.blocks.palettes.dict = {
+                rhythm: {
+                    name: "rhythm",
+                    show: jest.fn()
+                }
+            };
+
+            const block = getBlock("openpalette");
+            expect(() => block.flow([5], logo, 0, 10)).not.toThrow();
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(activity.blocks.palettes.dict.rhythm.show).not.toHaveBeenCalled();
+        });
+
+        test("handles other non-string inputs (boolean, object) without throwing", () => {
+            activity.blocks.palettes.dict = {
+                rhythm: {
+                    name: "rhythm",
+                    show: jest.fn()
+                }
+            };
+
+            const block = getBlock("openpalette");
+            expect(() => block.flow([true], logo, 0, 10)).not.toThrow();
+            expect(() => block.flow([{}], logo, 0, 10)).not.toThrow();
+            expect(activity.blocks.palettes.dict.rhythm.show).not.toHaveBeenCalled();
+        });
+
+        test("handles non-string object that throws on string conversion without throwing", () => {
+            activity.blocks.palettes.dict = {
+                rhythm: {
+                    name: "rhythm",
+                    show: jest.fn()
+                }
+            };
+
+            const block = getBlock("openpalette");
+            const invalidObj = Object.create(null);
+            invalidObj.toString = null;
+
+            expect(() => block.flow([invalidObj], logo, 0, 10)).not.toThrow();
+            expect(activity.blocks.palettes.dict.rhythm.show).not.toHaveBeenCalled();
+        });
+
+        test("safely ignores empty string and non-matching palette names", () => {
+            activity.blocks.palettes.dict = {
+                rhythm: {
+                    name: "rhythm",
+                    show: jest.fn()
+                }
+            };
+
+            const block = getBlock("openpalette");
+            block.flow([""], logo, 0, 10);
+            block.flow(["nonexistent_palette"], logo, 0, 10);
+
+            expect(activity.blocks.palettes.dict.rhythm.show).not.toHaveBeenCalled();
+        });
+
+        test("handles missing activity.blocks.palettes gracefully", () => {
+            delete activity.blocks.palettes;
+            const block = getBlock("openpalette");
+
+            expect(() => block.flow(["rhythm"], logo, 0, 10)).not.toThrow();
         });
     });
 
@@ -1045,8 +1232,9 @@ describe("ProgramBlocks", () => {
             ];
 
             const args = ["myBlock"];
-            block.flow(args, logo, 0, 5);
+            const flow = block.flow(args, logo, 0, 5);
             expect(args[0]).toBe(0);
+            expect(flow).toEqual([0, 1]);
         });
 
         test("reports an error instead of throwing when the slot is empty", () => {
@@ -1055,6 +1243,89 @@ describe("ProgramBlocks", () => {
             expect(() => block.flow([null], logo, 0, 5)).not.toThrow();
             expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 5);
             expect(logo.runFromBlock).not.toHaveBeenCalled();
+        });
+
+        test.each([
+            ["renamed", [0, 1]],
+            ["action", undefined]
+        ])("matches the actual name of an action block: %s", (targetName, expectedFlow) => {
+            const block = getBlock("runblock");
+            activity.blocks.blockList = [
+                {
+                    name: "action",
+                    protoblock: { staticLabels: ["action"] },
+                    connections: [null, 1, 2, 3]
+                },
+                { name: "text", value: "renamed", protoblock: { staticLabels: [] } },
+                { name: "hidden", protoblock: { staticLabels: [] } },
+                { name: "hidden", protoblock: { staticLabels: [] } }
+            ];
+            logo.actions = { renamed: 2 };
+
+            const args = [targetName];
+            const flow = block.flow(args, logo, 0, 5);
+
+            if (expectedFlow === undefined) {
+                expect(args[0]).toBe(-1);
+                expect(flow).toBeUndefined();
+                expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 5);
+            } else {
+                expect(args[0]).toBe(0);
+                expect(flow).toEqual(expectedFlow);
+            }
+        });
+
+        test("resolves an action name from its connected reporter", () => {
+            const block = getBlock("runblock");
+            activity.blocks.blockList = [
+                {
+                    name: "action",
+                    connections: [null, 1, 2]
+                },
+                { name: "computedname", value: "changed after registration" },
+                { name: "hidden", protoblock: { staticLabels: [] } }
+            ];
+            logo.actions = { "computed action": 2 };
+            logo.parseArg = jest.fn(() => "side effect");
+
+            const args = ["computed action"];
+            const flow = block.flow(args, logo, 1, 5, "received");
+
+            expect(logo.parseArg).not.toHaveBeenCalled();
+            expect(args[0]).toBe(0);
+            expect(flow).toEqual([0, 1]);
+        });
+
+        test("prefers a matching action over an earlier static label", () => {
+            const block = getBlock("runblock");
+            activity.blocks.blockList = [
+                { name: "start", value: 0, protoblock: { staticLabels: ["start"] } },
+                { name: "action", connections: [null, 2, 3] },
+                { name: "text", value: "start" },
+                { name: "hidden", protoblock: { staticLabels: [] } }
+            ];
+            logo.actions = { start: 3 };
+
+            const args = ["start"];
+            const flow = block.flow(args, logo, 0, 5);
+
+            expect(args[0]).toBe(1);
+            expect(flow).toEqual([1, 1]);
+        });
+
+        test("skips null and trashed blocks when resolving a name", () => {
+            const block = getBlock("runblock");
+            activity.blocks.blockList = [
+                null,
+                { name: "old", trash: true, protoblock: { staticLabels: ["target"] } },
+                { name: "live", protoblock: { staticLabels: ["target"] } }
+            ];
+
+            const args = ["target"];
+            const flow = block.flow(args, logo, 0, 5);
+
+            expect(args[0]).toBe(2);
+            expect(flow).toEqual([2, 1]);
         });
     });
 

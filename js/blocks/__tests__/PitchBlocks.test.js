@@ -406,6 +406,9 @@ describe("setupPitchBlocks", () => {
             activity.blocks.blockList[20] = { name: "print" };
             block.arg(logo, 0, 10);
             expect(logo.statusFields).toContainEqual([10, "transposition"]);
+
+            activity.blocks.blockList[10].connections[0] = null;
+            expect(() => block.arg(logo, 0, 10)).not.toThrow();
         });
     });
 
@@ -429,6 +432,9 @@ describe("setupPitchBlocks", () => {
             activity.blocks.blockList[20] = { name: "print", connections: [null] };
             block.arg(logo, 0, 10);
             expect(logo.statusFields).toContainEqual([10, "mypitch"]);
+
+            activity.blocks.blockList[10].connections[0] = null;
+            expect(() => block.arg(logo, 0, 10)).not.toThrow();
         });
         it("Scalar change in pitch has its own help text and example", () => {
             const half = createdBlocks["deltapitch"].helpString;
@@ -527,6 +533,9 @@ describe("setupPitchBlocks", () => {
             block.arg(logo, 0, 10);
             expect(logo.statusFields).toContainEqual([10, "mypitch"]);
 
+            activity.blocks.blockList[10].connections[0] = null;
+            expect(() => block.arg(logo, 0, 10)).not.toThrow();
+
             logo.inStatusMatrix = false;
 
             // Branch: lastNotePlayed is string
@@ -564,6 +573,44 @@ describe("setupPitchBlocks", () => {
             turtles.ithTurtle(0).singer.lastNotePlayed = null;
             block.setter(logo, 60, 0);
             expect(turtles.ithTurtle(0).singer.lastNotePlayed).toEqual(["C5", 4]);
+        });
+
+        it("MyPitchBlock reads the innermost note being built in nested notes", () => {
+            const block = createdBlocks["mypitch"];
+            const singer = turtles.ithTurtle(0).singer;
+            logo.inStatusMatrix = false;
+            singer.lastNotePlayed = null;
+            singer.inNoteBlock = [32, 40];
+            singer.notePitches = { 32: ["E"], 40: ["A"] };
+            singer.noteOctaves = { 32: [4], 40: [5] };
+
+            block.arg(logo, 0, 10);
+
+            expect(global.getNote).toHaveBeenCalledWith(
+                "A",
+                5,
+                0,
+                singer.keySignature,
+                singer.movable,
+                null,
+                activity.errorMsg
+            );
+        });
+
+        it("MyPitchBlock gives G4 outside any note before a note has played", () => {
+            const block = createdBlocks["mypitch"];
+            const singer = turtles.ithTurtle(0).singer;
+            logo.inStatusMatrix = false;
+            singer.lastNotePlayed = null;
+            singer.inNoteBlock = [];
+            singer.notePitches = {};
+            singer.noteOctaves = {};
+            singer.pitchNumberOffset = 39;
+            global.pitchToNumber.mockReturnValueOnce(46);
+
+            expect(block.arg(logo, 0, 10)).toBe(7);
+            expect(global.getNote).not.toHaveBeenCalled();
+            expect(global.pitchToNumber).toHaveBeenCalledWith("G", 4, singer.keySignature);
         });
     });
 
@@ -746,6 +793,58 @@ describe("setupPitchBlocks", () => {
             expect(spy).toHaveBeenCalledTimes(2);
 
             spy.mockRestore();
+        });
+
+        it("handles disconnected input by stopping turtle", () => {
+            const block = createdBlocks["number2pitch"];
+            activity.blocks.blockList[10].name = "number2pitch";
+            activity.blocks.blockList[10].connections[1] = null;
+            logo.stopTurtle = false;
+
+            const result = block.arg(logo, 0, 10);
+            expect(result).toBeUndefined();
+            expect(logo.stopTurtle).toBe(true);
+        });
+
+        it("handles NoArgError by calling activity.errorMsg and stopping turtle", () => {
+            const block = createdBlocks["number2pitch"];
+            activity.blocks.blockList[10].name = "number2pitch";
+            activity.blocks.blockList[10].connections[1] = 15;
+            logo.stopTurtle = false;
+
+            global.Singer.PitchActions.numToPitch.mockImplementation(() => {
+                throw new Error("NoArgError");
+            });
+
+            const result = block.arg(logo, 0, 10, null);
+            expect(result).toBeUndefined();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+            expect(logo.stopTurtle).toBe(true);
+
+            // Also verify for Number2OctaveBlock
+            const blockOct = createdBlocks["number2octave"];
+            activity.blocks.blockList[20] = {
+                name: "number2octave",
+                connections: [null, 25, null, null, null]
+            };
+            logo.stopTurtle = false;
+
+            const resultOct = blockOct.arg(logo, 0, 20, null);
+            expect(resultOct).toBeUndefined();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 20);
+            expect(logo.stopTurtle).toBe(true);
+        });
+
+        it("handles NaN input by calling activity.errorMsg and stopping turtle", () => {
+            const block = createdBlocks["number2pitch"];
+            activity.blocks.blockList[10].name = "number2pitch";
+            activity.blocks.blockList[10].connections[1] = 15;
+            logo.stopTurtle = false;
+
+            const result = block.arg(logo, 0, 10, NaN);
+            expect(result).toBeUndefined();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+            expect(logo.stopTurtle).toBe(true);
         });
     });
 
@@ -1234,6 +1333,47 @@ describe("setupPitchBlocks", () => {
             // Restore default
             global.getCurrentEDO.mockReturnValue(12);
         });
+
+        it("falls back to 392 Hz for non-finite pitch inputs instead of passing nulls on", () => {
+            const block = createdBlocks["pitch"];
+
+            // 392 Hz is G4: make the mock return the real conversion
+            // result for the fallback frequency.
+            global.frequencyToPitch.mockImplementation(() => ["G", 4, 0]);
+
+            // NaN slips past both sides of the old range check
+            // (NaN < A0 and NaN > C8 are both false), so the real
+            // frequencyToPitch(NaN) returns [null, null, null] and the
+            // null note throws inside processPitch (getNote reads
+            // .slice of null; widget paths call note.toLowerCase()).
+            // A NaN pitch is reachable from ordinary math blocks,
+            // e.g. a power block computing (-1) ^ 0.5.
+            block.flow([NaN, 4], logo, 0, 10);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.INVALIDPITCH, 10);
+            expect(global.frequencyToPitch).toHaveBeenCalledWith(392);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith("G", 4, 0, 0, 10);
+
+            // Clear the mocks so the Infinity assertions verify the
+            // Infinity call itself, not calls left over from the NaN case.
+            jest.clearAllMocks();
+
+            // Infinity takes the same fallback path.
+            block.flow([Infinity, 4], logo, 0, 10);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.INVALIDPITCH, 10);
+            expect(global.frequencyToPitch).toHaveBeenCalledWith(392);
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith("G", 4, 0, 0, 10);
+
+            jest.clearAllMocks();
+
+            // -Infinity satisfies arg0 <= currentEDO, so without the
+            // finiteness check it is misread as a movable solfege scale
+            // degree and plays degree 7 instead of the fallback.
+            block.flow([-Infinity, 4], logo, 0, 10);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.INVALIDPITCH, 10);
+            expect(global.frequencyToPitch).toHaveBeenCalledWith(392);
+            expect(global.nthDegreeToPitch).not.toHaveBeenCalled();
+            expect(global.Singer.PitchActions.playPitch).toHaveBeenLastCalledWith("G", 4, 0, 0, 10);
+        });
     });
 
     describe("Macro Execution", () => {
@@ -1571,6 +1711,9 @@ describe("setupPitchBlocks", () => {
                     block.arg(logo, 0, 10);
                     expect(logo.statusFields).toContainEqual([10, "pitchinhertz"]);
 
+                    activity.blocks.blockList[10].connections[0] = null;
+                    expect(() => block.arg(logo, 0, 10)).not.toThrow();
+
                     // Test normal case
                     logo.inStatusMatrix = false;
                     turtles.ithTurtle(0).singer.lastNotePlayed = ["C4", 0.5];
@@ -1604,6 +1747,11 @@ describe("setupPitchBlocks", () => {
                     turtles.ithTurtle(0).singer.lastNotePlayed = ["A4", 0.5];
                     result = block.arg(logo, 0, 10);
                     expect(result).toBe("A4");
+
+                    // Test detached currentpitch in status matrix
+                    activity.blocks.blockList[10].connections[0] = null;
+                    expect(() => block.arg(logo, 0, 10)).not.toThrow();
+                    expect(block.arg(logo, 0, 10)).toBe("A4");
                 }
             });
         });
@@ -1675,6 +1823,9 @@ describe("setupPitchBlocks", () => {
                     activity.blocks.blockList[30] = { name: "print" };
                     block.arg(logo, 0, 10);
                     expect(logo.statusFields).toContainEqual([10, "outputtools"]);
+
+                    activity.blocks.blockList[10].connections[0] = null;
+                    expect(() => block.arg(logo, 0, 10)).not.toThrow();
                 }
             });
         });

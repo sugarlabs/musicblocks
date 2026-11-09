@@ -345,7 +345,7 @@ class ThemeBox {
                     this.activity.palettes.showPalette(activeName);
                 }
             } catch (e) {
-                console.debug("Could not refresh palette:", e);
+                console.error("Could not refresh palette:", e);
             }
         }
 
@@ -414,7 +414,7 @@ class ThemeBox {
                     "*"
                 );
             } catch (e) {
-                console.debug("Could not update planet iframe theme:", e);
+                console.error("Could not update planet iframe theme:", e);
             }
         }
 

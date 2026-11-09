@@ -289,6 +289,14 @@ describe("SearchUI empty search results", () => {
         expect(ui.isEmptySearchResult(wrapped[0])).toBe(true);
     });
 
+    test("wrapEmptySearchResults preserves replacement tokens in the query", () => {
+        const ui = new SearchUI(makeActivity());
+        for (const query of ["$&", "$$", "$`", "$'"]) {
+            const wrapped = ui.wrapEmptySearchResults(query, [], query);
+            expect(wrapped[0].label).toBe(`No results found for ${query}`);
+        }
+    });
+
     test("wrapEmptySearchResults leaves a blank query empty", () => {
         const ui = new SearchUI(makeActivity());
         expect(ui.wrapEmptySearchResults("", [], "")).toEqual([]);

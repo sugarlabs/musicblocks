@@ -705,6 +705,7 @@ class BlockDragController {
                                 myBlock.container.y += bounceFactor;
                             }
 
+                            blocks._updateSpatialGrid(thisBlock);
                             bounced = true;
                         }
                     }

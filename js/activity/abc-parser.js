@@ -627,6 +627,13 @@ const setupActivityAbcParser = activityInstance => {
             blockId = _finalizeStaffBlocks(voiceRecord, blockId, finalBlock);
         });
 
+        // Blocks.loadNewBlocks() reads every connection as a position in this array, not as
+        // the id in each block's [0]. Ids are handed out in one reading pass across all the
+        // voices and are gapless, but a voice's blocks are only added to finalBlock when that
+        // voice is finished, so a repeat in an earlier voice, or two voices sharing a staff
+        // over several lines, puts blocks out of id order. Sorting by id lines position up
+        // with id again, as mxml-parser.js does.
+        finalBlock.sort((a, b) => a[0] - b[0]);
         this.blocks.loadNewBlocks(finalBlock);
         return null;
     };

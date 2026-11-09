@@ -225,6 +225,9 @@ class ContextMenuController {
             `${_("Home")} [${_("Home").toUpperCase()}]`,
             activity.findBlocks
         );
+        if (activity.workspaceLayoutController) {
+            activity.workspaceLayoutController.refreshHomeIndicators();
+        }
         activity.boundary.hide();
 
         if (!activity.helpfulWheelItems.find(ele => ele.label === "Home [HOME]"))

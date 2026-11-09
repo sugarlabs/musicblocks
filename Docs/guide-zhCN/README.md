@@ -152,7 +152,7 @@
 
 ![alt tag](../guide/matrix4.svg "working of action stack")
 
-![alt tag](../guide/chunk1.svg "using chunk inside Start block")
+![alt tag](../guide/chunk-1.svg "using chunk inside Start block")
 
 每当你做出一个新的 *Action* 程序堆，《音乐拼块》会产生一个新的拼块。
 这个拼块会是独特的，也会链接程序堆。
@@ -171,22 +171,22 @@
 这代表每当其中一个开始按钮按下之后，*Start* 拼块里面的程序 (*Chunk* 拼块) 会被执行。
 之后，你可以在 *Start* 加更多拼块, 顺序的执行拼块里的程序。
 
-![alt tag](../guide/chunk2.svg "usage of multiple Chunk blocks")
+![alt tag](../guide/chunk-3.svg "usage of multiple Chunk blocks")
 
-![alt tag](../guide/chunk3.svg "usage of Repeat block")
+![alt tag](../guide/chunk-4.svg "usage of Repeat block")
 
 你可以使用更多 *Chunk* 拼块或使用 *Repeat* 拼块 [重复](#REPETITION) 程序。
 
-![alt tag](../guide/chunk4.svg "multiple action stacks")
+![alt tag](../guide/chunk-6.svg "multiple action stacks")
 
-![alt tag](../guide/chunk5.svg "mixing and matching chunks")
+![alt tag](../guide/chunk-5.svg "mixing and matching chunks")
 
 你也可以混合不同的拼块。
 在上面的程序例子， 我们执行 "chunk" 的行动拼块, 接着我们两次执行 "chunk1" , 然后又执行 "chunk".
 
-![alt tag](../guide/chunk6.svg "creating a song using chunks")
+![alt tag](../guide/chunk-8.svg "creating a song using chunks")
 
-![alt tag](../guide/chunk7.svg "usage of Repeat block in a song")
+![alt tag](../guide/chunk-7.svg "usage of Repeat block in a song")
 
 假如我们有更多拼块，我们就可以创造一个歌曲. 
 (你可以猜猜程序的后果吗? 你对我们制造的歌曲熟悉吗?)
@@ -441,7 +441,7 @@ LIVE](https://musicblocks.sugarlabs.org/index.html?id=1522885752309944&run=True)
 *On-Beat-Do* 和 *Off-Beat-Do* 拼块让我们指定在某一个拍时做出一个行动。
 (注意行动会在任何一个在节奏拼块里的音符先执行。)
 
-![alt tag](../graphics5.svg "using beat to synchronize graphics")
+![alt tag](./graphics5.svg "using beat to synchronize graphics")
 
 另外一个显示图像的方法就是靠节奏执行它们。
 在上面的例子，我们在每一个音符执行同样的行动，但是行动的参数，如笔的宽度，依赖着现在执行的音符。
@@ -700,7 +700,7 @@ notes.
 *Mode* 小部件可以让你探索模式和生成自定义模式。
 使用 *Custom Mode* 拼块调用小部件，模式在 *Set Key* 指定的块将是小部件启动的时候的原本模式。
 
-![alt tag](../guide/mode2.svg "launching widget with Major mode")
+![alt tag](./mode2.svg "launching widget with Major mode")
 
 在上面的例子中，小部件已经以 *Major* 模式启动（原本设定）。
 请注意，该模式中包含的音符由标示黑色的盒子，它们排列成圆形的tweleve图案半步完成八度。
@@ -728,16 +728,16 @@ notes.
 请注意，*Custom Mode* 拼块内的模式会随时更新
 小部件内部的模式被改变
 
-![alt tag](../guide/mode3.svg "creating Dorian mode")
+![alt tag](./mode3.svg "creating Dorian mode")
 
 
 在上面的例子中，*Major* 模式已经顺时针旋转，把它变成 *Dorian* 。
 
-![alt tag](../guide/mode4.svg "creating Locrian mode")
+![alt tag](./mode4.svg "creating Locrian mode")
 
 在上面的例子中，*Major* 模式已被旋转逆时针，将其转换成 *Locrian*。
 
-![alt tag](../guide/mode5.svg "creating Phrygian mode")
+![alt tag](./mode5.svg "creating Phrygian mode")
 
 在上面的例子中，*Major* 模式已经被反转，转换它成 *Phrygian*。
 
@@ -762,7 +762,7 @@ each occurrence of a `Re` `4`.
 鼓声使用指定的鼓在单声道中播放。
 在上面的例子中，一个 `kick drum` 将被代替每个 `Re 4` 的发生。
 
-![alt tag](../guide/drum8.svg "pitch-drum matrix 1")
+![alt tag](./drum8.svg "pitch-drum matrix 1")
 
 ![alt tag](../guide/drum5.svg "table for pitch-drum matrix")
 

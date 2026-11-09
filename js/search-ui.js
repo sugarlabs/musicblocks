@@ -209,7 +209,7 @@ class SearchUI {
         ).trim();
         return [
             {
-                label: _("No results found for %s").replace(/%s/g, query),
+                label: _("No results found for %s").replace(/%s/g, () => query),
                 value: "",
                 artwork: "",
                 specialDict: null,

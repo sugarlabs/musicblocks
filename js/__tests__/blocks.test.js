@@ -18,6 +18,7 @@
 
 const Blocks = require("../blocks");
 const ManagedTimer = require("../utils/ManagedTimer");
+const { WorkspaceLayoutController } = require("../activity/workspace-layout-controller");
 
 // blocks.js references these constants (MINIMUMDOCKDISTANCE, ALLOWED_CONNECTIONS, etc.) as
 // bare globals at runtime. In the browser they're provided by loader.js's RequireJS shim
@@ -182,6 +183,114 @@ describe("Viewport Culling", () => {
         expect(blocks.blockList[2]._viewportVisible).toBe(true);
     });
 
+    it("only checks blocks whose bounds overlap viewport grid cells", () => {
+        blocks.blockList = [
+            { trash: false, container: { x: 100, y: 100 }, width: 50, height: 30 },
+            { trash: false, container: { x: 2000, y: 2000 }, width: 50, height: 30 },
+            { trash: false, container: { x: 790, y: 100 }, width: 40, height: 30 }
+        ];
+        blocks._rebuildSpatialGrid();
+
+        const candidates = blocks._getViewportCandidates(0, 0, 800, 600);
+
+        expect([...candidates].sort()).toEqual([0, 2]);
+    });
+
+    it("culls initially visible blocks outside the viewport", () => {
+        blocks.blockList = [
+            { trash: false, container: { x: 2000, y: 2000 }, width: 50, height: 30 }
+        ];
+        blocks._rebuildSpatialGrid();
+
+        blocks._updateViewportCulling();
+
+        expect(blocks.blockList[0]._viewportVisible).toBe(false);
+    });
+
+    it("does not rescan all blocks on later culls when none are visible", () => {
+        let xReads = 0;
+        const block = {
+            container: {
+                get x() {
+                    xReads++;
+                    return 2000;
+                },
+                y: 2000
+            },
+            width: 50,
+            height: 30,
+            trash: false
+        };
+        blocks.blockList = [block];
+        blocks._rebuildSpatialGrid();
+        xReads = 0;
+
+        blocks._updateViewportCulling();
+        const firstPassReads = xReads;
+        blocks._updateViewportCulling();
+
+        expect(block._viewportVisible).toBe(false);
+        expect(firstPassReads).toBeGreaterThan(0);
+        expect(xReads).toBe(firstPassReads);
+    });
+
+    it("updates viewport grid membership when a block moves", () => {
+        blocks.blockList = [
+            { trash: false, container: { x: 100, y: 100 }, width: 50, height: 30, docks: [[0, 0]] }
+        ];
+        blocks._rebuildSpatialGrid();
+        blocks.blockList[0].container.x = 2000;
+        blocks._updateSpatialGrid(0);
+
+        expect(blocks._getViewportCandidates(0, 0, 800, 600).has(0)).toBe(false);
+        expect(blocks._getViewportCandidates(2000, 100, 2800, 700).has(0)).toBe(true);
+    });
+
+    it("keeps trashed blocks out of viewport candidates after updates and rebuilds", () => {
+        blocks.blockList = [{ trash: false, container: { x: 100, y: 100 }, width: 50, height: 30 }];
+        blocks._rebuildSpatialGrid();
+        blocks.blockList[0].trash = true;
+
+        blocks._updateSpatialGrid(0);
+        expect(blocks._getViewportCandidates(0, 0, 800, 600).has(0)).toBe(false);
+
+        blocks._rebuildSpatialGrid();
+        expect(blocks._getViewportCandidates(0, 0, 800, 600).has(0)).toBe(false);
+    });
+
+    it("falls back for block coordinates outside the safe integer range", () => {
+        blocks.blockList = [
+            {
+                trash: false,
+                container: { x: 1e18, y: 1e18 },
+                width: 50,
+                height: 30,
+                docks: [[0, 0]]
+            }
+        ];
+
+        expect(() => blocks._updateSpatialGrid(0)).not.toThrow();
+        expect(blocks._viewportFallback.has(0)).toBe(true);
+        expect(blocks._getViewportCandidates(0, 0, 800, 600).has(0)).toBe(true);
+    });
+
+    it("falls back when block bounds span too many grid cells", () => {
+        blocks.blockList = [
+            { trash: false, container: { x: 0, y: 0 }, width: 1e9, height: 30, docks: [[0, 0]] }
+        ];
+
+        blocks._updateSpatialGrid(0);
+
+        expect(blocks._viewportFallback.has(0)).toBe(true);
+    });
+
+    it("falls back to a block scan for a viewport outside the safe integer range", () => {
+        blocks.blockList = [{ trash: false, container: { x: 100, y: 100 }, width: 50, height: 30 }];
+        blocks._rebuildSpatialGrid();
+
+        expect([...blocks._getViewportCandidates(1e18, 0, 1e18 + 800, 600)]).toEqual([0]);
+    });
+
     it("should mark blocks outside the viewport as not visible", () => {
         blocks.blockList = [
             { trash: false, container: { x: -200, y: 100 }, width: 50, height: 30 },
@@ -215,6 +324,295 @@ describe("Viewport Culling", () => {
         expect(blocks.blockList[0]._viewportVisible).toBe(false);
         expect(blocks.blockList[1]._viewportVisible).toBe(true);
         expect(blocks.blockList[2]._viewportVisible).toBe(false);
+    });
+
+    it("should show directional Home indicators for off-screen blocks", () => {
+        const homeButton = document.createElement("div");
+        homeButton.appendChild(document.createElement("img"));
+        mockActivity.homeButtonContainer = homeButton;
+        mockActivity.workspaceLayoutController = new WorkspaceLayoutController(mockActivity);
+        mockActivity.blocksContainer.x = -100;
+        mockActivity.blocksContainer.y = -50;
+        blocks.blockList = [
+            { trash: false, container: { x: 20, y: 100 }, width: 50, height: 30 },
+            { trash: false, container: { x: 910, y: 100 }, width: 50, height: 30 },
+            { trash: false, container: { x: 300, y: 700 }, width: 50, height: 30 },
+            { trash: false, container: { x: 300, y: -100 }, width: 50, height: 30 },
+            { trash: false, container: { x: 300, y: 100 }, width: 50, height: 30 }
+        ];
+
+        blocks._updateViewportCulling();
+
+        expect(homeButton.querySelector('[data-home-indicator="left"]').hidden).toBe(false);
+        expect(homeButton.querySelector('[data-home-indicator="right"]').hidden).toBe(false);
+        expect(homeButton.querySelector('[data-home-indicator="above"]').hidden).toBe(false);
+        expect(homeButton.querySelector('[data-home-indicator="below"]').hidden).toBe(false);
+
+        const recreatedHomeButton = document.createElement("div");
+        recreatedHomeButton.appendChild(document.createElement("img"));
+        mockActivity.homeButtonContainer = recreatedHomeButton;
+        mockActivity.workspaceLayoutController.refreshHomeIndicators();
+
+        expect(recreatedHomeButton.querySelector('[data-home-indicator="left"]').hidden).toBe(
+            false
+        );
+        expect(recreatedHomeButton.querySelector('[data-home-indicator="right"]').hidden).toBe(
+            false
+        );
+        expect(recreatedHomeButton.querySelector('[data-home-indicator="above"]').hidden).toBe(
+            false
+        );
+        expect(recreatedHomeButton.querySelector('[data-home-indicator="below"]').hidden).toBe(
+            false
+        );
+    });
+
+    it("should refresh home indicators safely before any block state is recorded", () => {
+        const homeButton = document.createElement("div");
+        homeButton.appendChild(document.createElement("img"));
+        mockActivity.homeButtonContainer = homeButton;
+        const controller = new WorkspaceLayoutController(mockActivity);
+        controller._homeIndicatorState = null;
+
+        expect(() => controller.refreshHomeIndicators()).not.toThrow();
+        ["left", "right", "above", "below"].forEach(indicator => {
+            expect(homeButton.querySelector(`[data-home-indicator="${indicator}"]`).hidden).toBe(
+                true
+            );
+        });
+    });
+
+    it("should use collapsed artwork bounds and ignore collapsed descendants for Home indicators", () => {
+        const homeButton = document.createElement("div");
+        mockActivity.homeButtonContainer = homeButton;
+        mockActivity.workspaceLayoutController = new WorkspaceLayoutController(mockActivity);
+        blocks.boundary = { hide: jest.fn() };
+        const collapsedRoot = {
+            trash: false,
+            collapsed: true,
+            inCollapsed: false,
+            container: { x: 770, y: 100 },
+            width: 100,
+            height: 60,
+            collapseBlockBitmap: {
+                visible: true,
+                getBounds: jest.fn().mockReturnValue({ x: 0, y: 0, width: 20, height: 20 })
+            },
+            connections: [null],
+            offScreen: jest.fn().mockReturnValue(false)
+        };
+        const collapsedDescendant = {
+            trash: false,
+            inCollapsed: true,
+            container: { x: -100, y: 100 },
+            width: 50,
+            height: 30,
+            connections: [null],
+            offScreen: jest.fn().mockReturnValue(false)
+        };
+        blocks.blockList = [collapsedRoot, collapsedDescendant];
+
+        blocks._updateViewportCulling();
+        ["left", "right", "above", "below"].forEach(indicator => {
+            expect(homeButton.querySelector(`[data-home-indicator="${indicator}"]`).hidden).toBe(
+                true
+            );
+        });
+
+        blocks.checkBounds();
+        ["left", "right", "above", "below"].forEach(indicator => {
+            expect(homeButton.querySelector(`[data-home-indicator="${indicator}"]`).hidden).toBe(
+                true
+            );
+        });
+    });
+
+    it("should refresh Home bounds when a block collapses", () => {
+        const homeButton = document.createElement("div");
+        mockActivity.homeButtonContainer = homeButton;
+        mockActivity.workspaceLayoutController = new WorkspaceLayoutController(mockActivity);
+        blocks.blockList = [
+            {
+                trash: false,
+                collapsed: false,
+                inCollapsed: false,
+                container: { x: 770, y: 100 },
+                width: 100,
+                height: 60,
+                collapseBlockBitmap: {
+                    getBounds: jest.fn().mockReturnValue({ x: 0, y: 0, width: 20, height: 20 })
+                }
+            }
+        ];
+
+        blocks._updateViewportCulling();
+        expect(homeButton.querySelector('[data-home-indicator="right"]').hidden).toBe(false);
+
+        blocks.blockList[0].collapsed = true;
+        blocks._updateViewportGrid(0);
+        blocks._updateViewportCulling();
+
+        expect(homeButton.querySelector('[data-home-indicator="right"]').hidden).toBe(true);
+    });
+
+    it.each([
+        ["left", { x: -10, y: 100 }],
+        ["right", { x: 780, y: 100 }],
+        ["above", { x: 100, y: -10 }],
+        ["below", { x: 100, y: 580 }]
+    ])("should indicate a block partially crossing the %s edge", (direction, position) => {
+        const homeButton = document.createElement("div");
+        mockActivity.homeButtonContainer = homeButton;
+        mockActivity.workspaceLayoutController = new WorkspaceLayoutController(mockActivity);
+        blocks.blockList = [
+            {
+                trash: false,
+                container: { x: position.x, y: position.y },
+                width: 50,
+                height: 30
+            }
+        ];
+
+        blocks._updateViewportCulling();
+
+        ["left", "right", "above", "below"].forEach(indicator => {
+            expect(homeButton.querySelector(`[data-home-indicator="${indicator}"]`).hidden).toBe(
+                indicator !== direction
+            );
+        });
+    });
+
+    it("should show multiple indicators for blocks beyond different corners", () => {
+        const homeButton = document.createElement("div");
+        mockActivity.homeButtonContainer = homeButton;
+        mockActivity.workspaceLayoutController = new WorkspaceLayoutController(mockActivity);
+        blocks.blockList = [
+            { trash: false, container: { x: -60, y: -40 }, width: 50, height: 30 },
+            { trash: false, container: { x: 780, y: 580 }, width: 50, height: 30 }
+        ];
+
+        blocks._updateViewportCulling();
+
+        ["left", "right", "above", "below"].forEach(indicator => {
+            expect(homeButton.querySelector(`[data-home-indicator="${indicator}"]`).hidden).toBe(
+                false
+            );
+        });
+    });
+
+    it("should account for stage, workspace, and block scaling", () => {
+        const homeButton = document.createElement("div");
+        mockActivity.homeButtonContainer = homeButton;
+        mockActivity.workspaceLayoutController = new WorkspaceLayoutController(mockActivity);
+        mockActivity.stage = { scaleX: 2, scaleY: 2 };
+        mockActivity.blocksContainer.scaleX = 2;
+        mockActivity.blocksContainer.scaleY = 2;
+        blocks.blockList = [
+            {
+                trash: false,
+                container: { x: 185, y: 20, scaleX: 2, scaleY: 2 },
+                width: 10,
+                height: 10
+            }
+        ];
+
+        blocks._updateViewportCulling();
+
+        expect(homeButton.querySelector('[data-home-indicator="right"]').hidden).toBe(false);
+        expect(homeButton.querySelector('[data-home-indicator="left"]').hidden).toBe(true);
+        expect(homeButton.querySelector('[data-home-indicator="above"]').hidden).toBe(true);
+        expect(homeButton.querySelector('[data-home-indicator="below"]').hidden).toBe(true);
+    });
+
+    it("should hide directional indicators when blocks return inside the viewport", () => {
+        const homeButton = document.createElement("div");
+        homeButton.appendChild(document.createElement("img"));
+        mockActivity.homeButtonContainer = homeButton;
+        mockActivity.workspaceLayoutController = new WorkspaceLayoutController(mockActivity);
+        blocks.blockList = [
+            { trash: false, container: { x: -100, y: 10 }, width: 50, height: 30 },
+            { trash: false, container: { x: 900, y: 10 }, width: 50, height: 30 },
+            { trash: false, container: { x: 10, y: 700 }, width: 50, height: 30 }
+        ];
+
+        blocks._updateViewportCulling();
+        blocks.blockList.forEach(block => {
+            block.container.x = 100;
+            block.container.y = 100;
+        });
+        blocks.blockList.forEach((block, index) => {
+            blocks._updateSpatialGrid(index);
+        });
+        blocks._updateViewportCulling();
+
+        expect(homeButton.querySelector('[data-home-indicator="left"]').hidden).toBe(true);
+        expect(homeButton.querySelector('[data-home-indicator="right"]').hidden).toBe(true);
+        expect(homeButton.querySelector('[data-home-indicator="above"]').hidden).toBe(true);
+        expect(homeButton.querySelector('[data-home-indicator="below"]').hidden).toBe(true);
+    });
+
+    it("should recalculate directional indicators when the viewport is resized", () => {
+        const homeButton = document.createElement("div");
+        homeButton.appendChild(document.createElement("img"));
+        mockActivity.homeButtonContainer = homeButton;
+        mockActivity.workspaceLayoutController = new WorkspaceLayoutController(mockActivity);
+        blocks.blockList = [{ trash: false, container: { x: 850, y: 610 }, width: 50, height: 30 }];
+
+        blocks._updateViewportCulling();
+        expect(homeButton.querySelector('[data-home-indicator="right"]').hidden).toBe(false);
+        expect(homeButton.querySelector('[data-home-indicator="below"]').hidden).toBe(false);
+
+        mockActivity.canvas.width = 1000;
+        mockActivity.canvas.height = 700;
+        blocks._updateViewportCulling();
+
+        expect(homeButton.querySelector('[data-home-indicator="right"]').hidden).toBe(true);
+        expect(homeButton.querySelector('[data-home-indicator="below"]').hidden).toBe(true);
+    });
+
+    it("should update all four indicators when the workspace pans", () => {
+        const homeButton = document.createElement("div");
+        mockActivity.homeButtonContainer = homeButton;
+        mockActivity.workspaceLayoutController = new WorkspaceLayoutController(mockActivity);
+        mockActivity.blocksContainer.x = -100;
+        mockActivity.blocksContainer.y = -100;
+        blocks.blockList = [{ trash: false, container: { x: 95, y: 95 }, width: 50, height: 30 }];
+
+        blocks._updateViewportCulling();
+        expect(homeButton.querySelector('[data-home-indicator="left"]').hidden).toBe(false);
+        expect(homeButton.querySelector('[data-home-indicator="above"]').hidden).toBe(false);
+
+        mockActivity.blocksContainer.x = 0;
+        mockActivity.blocksContainer.y = 0;
+        blocks._updateViewportCulling();
+
+        expect(homeButton.querySelector('[data-home-indicator="left"]').hidden).toBe(true);
+        expect(homeButton.querySelector('[data-home-indicator="above"]').hidden).toBe(true);
+    });
+
+    it("should refresh directional indicators when blocks move", () => {
+        const homeButton = document.createElement("div");
+        homeButton.appendChild(document.createElement("img"));
+        mockActivity.homeButtonContainer = homeButton;
+        mockActivity.workspaceLayoutController = new WorkspaceLayoutController(mockActivity);
+        blocks.boundary = { hide: jest.fn() };
+        const block = {
+            trash: false,
+            connections: [null],
+            container: { x: 850, y: 100 },
+            width: 50,
+            height: 30,
+            offScreen: jest.fn().mockReturnValue(false)
+        };
+        blocks.blockList = [block];
+
+        blocks.checkBounds();
+        expect(homeButton.querySelector('[data-home-indicator="right"]').hidden).toBe(false);
+
+        block.container.x = 100;
+        blocks.checkBounds();
+
+        expect(homeButton.querySelector('[data-home-indicator="right"]').hidden).toBe(true);
     });
 
     it("should refresh a stale highlight cache when a block re-enters the viewport", () => {
@@ -1340,7 +1738,7 @@ describe("Blocks Foundation", () => {
             ];
             blocks.selectedStack = 1;
 
-            const copiedBlocks = blocks._copyBlocksToObj(false);
+            const copiedBlocks = blocks._copyBlocksToObj();
 
             expect(copiedBlocks).toEqual([
                 [0, "forward", 75, 75, [null, 1]],
@@ -1366,11 +1764,11 @@ describe("Blocks Foundation", () => {
             ];
             blocks.selectedStack = 0;
 
-            const copiedBlocks = blocks._copyBlocksToObj(false);
+            const copiedBlocks = blocks._copyBlocksToObj();
             expect(copiedBlocks[0][1]).toEqual(["notename", { value: "F", manualAccidental: "♮" }]);
 
             blocks.selectedStack = 1;
-            const copiedSolfege = blocks._copyBlocksToObj(false);
+            const copiedSolfege = blocks._copyBlocksToObj();
             expect(copiedSolfege[0][1]).toEqual(["solfege", { value: "Fa" }]);
         });
 
@@ -1396,7 +1794,7 @@ describe("Blocks Foundation", () => {
             ];
             blocks.selectedStack = 0;
 
-            expect(blocks._copyBlocksToObj(false)).toEqual([
+            expect(blocks._copyBlocksToObj()).toEqual([
                 [0, "eat", 75, 75, [null, 1, null]],
                 [1, ["apple", { value: 2 }], 0, 0, [0]]
             ]);
@@ -1427,7 +1825,7 @@ describe("Blocks Foundation", () => {
             ];
             blocks.selectedStack = 1;
 
-            expect(blocks._copyBlocksToObj(false)[0]).toEqual([
+            expect(blocks._copyBlocksToObj()[0]).toEqual([
                 0,
                 [
                     "pitchdrummatrix",
@@ -1442,6 +1840,147 @@ describe("Blocks Foundation", () => {
                 75,
                 [null, 1, null]
             ]);
+        });
+
+        describe("sound and image data", () => {
+            const sound = "data:audio/wav;base64,UklGRg==";
+            const image = "data:image/png;base64,iVBORw0KGgo=";
+            const makeBlock = (name, value, connections, isValue) => ({
+                name,
+                value,
+                connections,
+                isValueBlock: jest.fn().mockReturnValue(isValue)
+            });
+            const sampleStack = () => [
+                makeBlock("settimbre", null, [null, 1, null, 5], false),
+                makeBlock("customsample", ["mysound", sound, "do", 4, 25], [0, 2, 3, 4], false),
+                makeBlock("audiofile", ["mysound", sound], [1], true),
+                makeBlock("solfege", "do", [1], true),
+                makeBlock("number", 4, [1], true),
+                makeBlock("hidden", null, [0, null], false)
+            ];
+
+            let blocks;
+            beforeEach(() => {
+                blocks = new Blocks(mockActivity);
+                mockActivity.blocksContainer.x = 0;
+                mockActivity.blocksContainer.y = 0;
+            });
+
+            it("copies a sampler instrument with its sound and tuning", () => {
+                blocks.blockList = sampleStack();
+                blocks.selectedStack = 0;
+
+                expect(blocks._copyBlocksToObj()).toEqual([
+                    [0, "settimbre", 75, 75, [null, 1, null, 5]],
+                    [
+                        1,
+                        ["customsample", { value: ["mysound", "", "do", 4, 25] }],
+                        0,
+                        0,
+                        [0, 2, 3, 4]
+                    ],
+                    [2, ["audiofile", { value: ["mysound", sound] }], 0, 0, [1]],
+                    [3, ["solfege", { value: "do" }], 0, 0, [1]],
+                    [4, ["number", { value: 4 }], 0, 0, [1]],
+                    [5, "hidden", 0, 0, [0, null]]
+                ]);
+            });
+
+            it("keeps the sound on a sample block with no file block", () => {
+                blocks.blockList = [
+                    makeBlock(
+                        "customsample",
+                        ["mysound", sound, "do", 4, 25],
+                        [null, null, null, null],
+                        false
+                    )
+                ];
+                blocks.selectedStack = 0;
+
+                expect(blocks._copyBlocksToObj()[0][1]).toEqual([
+                    "customsample",
+                    { value: ["mysound", sound, "do", 4, 25] }
+                ]);
+            });
+
+            it("keeps the sound on a sample block when its file block is empty", () => {
+                blocks.blockList = sampleStack();
+                blocks.blockList[2].value = null;
+                blocks.selectedStack = 0;
+
+                const copied = blocks._copyBlocksToObj();
+                expect(copied[1][1]).toEqual([
+                    "customsample",
+                    { value: ["mysound", sound, "do", 4, 25] }
+                ]);
+                expect(copied[2][1]).toEqual(["audiofile", { value: null }]);
+            });
+
+            it("does not change the copied sample block", () => {
+                blocks.blockList = sampleStack();
+                blocks.selectedStack = 0;
+
+                blocks._copyBlocksToObj();
+
+                expect(blocks.blockList[1].value).toEqual(["mysound", sound, "do", 4, 25]);
+            });
+
+            it("copies an image with its picture", () => {
+                blocks.blockList = [
+                    makeBlock("show", null, [null, 1, 2, null], false),
+                    makeBlock("number", 24, [0], true),
+                    makeBlock("media", image, [0], true)
+                ];
+                blocks.selectedStack = 0;
+
+                expect(blocks._copyBlocksToObj()[2]).toEqual([
+                    2,
+                    ["media", { value: image }],
+                    0,
+                    0,
+                    [0]
+                ]);
+            });
+
+            it("pastes a duplicated sampler instrument with its sound", () => {
+                global.deepClone = require("../utils/utils-logic").deepClone;
+                global.docById = jest.fn(() => ({ style: { display: "none" } }));
+                blocks.blockList = sampleStack();
+                blocks.activeBlock = 0;
+                blocks.loadNewBlocks = jest.fn();
+
+                blocks.prepareStackForCopy();
+                blocks.blockList[2].value = null;
+                blocks.pasteStack();
+
+                const pasted = blocks.loadNewBlocks.mock.calls[0][0];
+                expect(pasted[1][1]).toEqual([
+                    "customsample",
+                    { value: ["mysound", "", "do", 4, 25] }
+                ]);
+                expect(pasted[2][1]).toEqual(["audiofile", { value: ["mysound", sound] }]);
+            });
+
+            it("saves a sampler instrument to My Blocks with its sound and tuning", () => {
+                global.MathUtility = { doRandom: jest.fn(() => 7) };
+                global.prepareMacroExports = require("../utils/macro-utils").prepareMacroExports;
+                mockActivity.palettes.updatePalettes = jest.fn();
+                blocks.addToMyPalette = jest.fn();
+                blocks.storage = {};
+                blocks.blockList = sampleStack();
+                blocks.selectedStack = 0;
+
+                blocks.saveStack();
+
+                const macro = JSON.parse(blocks.storage.macros)["customsample-7"];
+                expect(macro[1][1]).toEqual([
+                    "customsample",
+                    { value: ["mysound", "", "do", 4, 25] }
+                ]);
+                expect(macro[2][1]).toEqual(["audiofile", { value: ["mysound", sound] }]);
+                expect(blocks.addToMyPalette).toHaveBeenCalledWith("customsample-7");
+            });
         });
     });
 
@@ -1938,7 +2477,7 @@ describe("Blocks Foundation", () => {
 
             expect(mockActivity._suppressRefresh).toBe(false);
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
-                "Something went wrong reading JSON-encoded project data."
+                "Cannot load project: circular block connection detected."
             );
         });
 
@@ -1956,7 +2495,7 @@ describe("Blocks Foundation", () => {
             blocks.loadNewBlocks(twoBlockCycle);
             expect(mockActivity._suppressRefresh).toBe(false);
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
-                "Something went wrong reading JSON-encoded project data."
+                "Cannot load project: circular block connection detected."
             );
 
             // Three-block cycle: 0 -> 1 -> 2 -> 0
@@ -1971,7 +2510,7 @@ describe("Blocks Foundation", () => {
             blocks.loadNewBlocks(threeBlockCycle);
             expect(mockActivity._suppressRefresh).toBe(false);
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
-                "Something went wrong reading JSON-encoded project data."
+                "Cannot load project: circular block connection detected."
             );
         });
 
@@ -1995,7 +2534,7 @@ describe("Blocks Foundation", () => {
                 expect(() => blocks.loadNewBlocks(truncated)).not.toThrow();
                 expect(mockActivity._suppressRefresh).toBe(false);
                 expect(mockActivity.errorMsg).toHaveBeenCalledWith(
-                    "Something went wrong reading JSON-encoded project data."
+                    "Cannot load project: malformed block structure detected."
                 );
                 // The load is abandoned before any block is built.
                 expect(blocks._makeNewBlockWithConnections).not.toHaveBeenCalled();
@@ -2017,7 +2556,7 @@ describe("Blocks Foundation", () => {
             expect(() => blocks.loadNewBlocks(danglingNext)).not.toThrow();
             expect(mockActivity._suppressRefresh).toBe(false);
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
-                "Something went wrong reading JSON-encoded project data."
+                "Cannot load project: invalid block connection detected."
             );
         });
 
@@ -2749,6 +3288,234 @@ describe("Blocks Foundation", () => {
         });
     });
 
+    describe("validation feedback on project load (#10256)", () => {
+        const { PubSub } = require("../pubsub");
+        let loadContainer;
+
+        function makeActivity() {
+            return {
+                storage: {},
+                trashcan: {},
+                turtles: { getTurtleCount: jest.fn(() => 0), addTurtle: jest.fn() },
+                boundary: {},
+                macroDict: {},
+                palettes: {
+                    dict: {},
+                    show: jest.fn(),
+                    updatePalettes: jest.fn(),
+                    showPalette: jest.fn()
+                },
+                logo: {
+                    synth: {
+                        loadSynth: jest.fn(),
+                        preloadProjectSamples: jest.fn()
+                    },
+                    customTemperamentDefined: false
+                },
+                blocksContainer: { x: 0, y: 0, addChild: jest.fn(), children: [] },
+                canvas: { width: 800, height: 600 },
+                refreshCanvas: jest.fn(),
+                errorMsg: jest.fn(),
+                setSelectionMode: jest.fn(),
+                stopLoadAnimation: jest.fn(),
+                setHomeContainers: jest.fn(),
+                __tick: jest.fn(),
+                _suppressRefresh: false
+            };
+        }
+
+        function makeBlocks(activity, protoNames) {
+            const b = new Blocks(activity);
+            b.blockList = [];
+            b.protoBlockDict = {};
+            for (const name of protoNames || []) {
+                b.protoBlockDict[name] = {
+                    hasCapability: () => false,
+                    dockTypes: ["in", "out"],
+                    style: "flow"
+                };
+            }
+            for (const nop of [
+                "nopValueBlock",
+                "nopZeroArgBlock",
+                "nopOneArgBlock",
+                "nopTwoArgBlock",
+                "nopThreeArgBlock"
+            ]) {
+                b.protoBlockDict[nop] = {
+                    hasCapability: () => false,
+                    dockTypes: ["in", "out"],
+                    style: "flow"
+                };
+            }
+            b.setActionProtoVisibility = jest.fn();
+            b.customTemperamentDefined = true;
+            b._findDrumURLs = jest.fn();
+            b.updateBlockPositions = jest.fn();
+            b._rebuildSpatialGrid = jest.fn();
+            b._cleanupStacks = jest.fn();
+            b.newNameddoBlock = jest.fn(() => false);
+            b.newStorein2Block = jest.fn();
+            b.newNamedboxBlock = jest.fn();
+            b.actionMetadata = jest.fn(() => ({ hasReturn: false, hasArgs: false }));
+            b._updateSpatialGrid = jest.fn();
+            b._makeNewBlockWithConnections = jest.fn((name, offset, conns, post, arg) => {
+                b.blockList.push({
+                    name,
+                    connections: conns || [],
+                    container: { x: 0, y: 0 },
+                    privateData: null,
+                    unknownBlock: null
+                });
+                if (typeof post === "function") {
+                    post(arg !== undefined ? arg : b.blockList.length - 1);
+                }
+                b.cleanupAfterLoad(b._activeLoadGeneration);
+            });
+            return b;
+        }
+
+        beforeEach(() => {
+            global.pubsub = new PubSub();
+            loadContainer = document.createElement("div");
+            loadContainer.id = "load-container";
+            document.body.appendChild(loadContainer);
+        });
+
+        afterEach(() => {
+            loadContainer.remove();
+            delete global.pubsub;
+        });
+
+        it("notifies user when an unsupported block is substituted with a placeholder", () => {
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, ["forward"]);
+            const blockObjs = [
+                [0, "forward", 100, 100, [null, 1]],
+                [1, "unsupportedCustomBlock", 100, 120, [0, null]]
+            ];
+
+            blocks.loadNewBlocks(blockObjs);
+
+            expect(blocks.blockList.length).toBe(2);
+            expect(blocks.blockList[1].name).toBe("nopOneArgMathBlock");
+            expect(blocks.blockList[1].privateData).toBe("unsupportedCustomBlock");
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Some blocks in this project are unsupported and were replaced with placeholders: unsupportedCustomBlock"
+            );
+        });
+
+        it("lists multiple distinct unsupported blocks in the notification", () => {
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, ["forward"]);
+            const blockObjs = [
+                [0, "forward", 100, 100, [null, 1]],
+                [1, "customSynthBlock", 100, 120, [0, 2]],
+                [2, "customFilterBlock", 100, 140, [1, 3]],
+                [3, "customSynthBlock", 100, 160, [2, null]]
+            ];
+
+            blocks.loadNewBlocks(blockObjs);
+
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Some blocks in this project are unsupported and were replaced with placeholders: customSynthBlock, customFilterBlock"
+            );
+        });
+
+        it("displays unsupported block names containing special replacement patterns literally", () => {
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, ["forward"]);
+            const blockObjs = [
+                [0, "forward", 100, 100, [null, 1]],
+                [1, "custom$&block", 100, 120, [0, 2]],
+                [2, "custom$$block", 100, 140, [1, 3]],
+                [3, "custom$1block", 100, 160, [2, null]]
+            ];
+
+            blocks.loadNewBlocks(blockObjs);
+
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Some blocks in this project are unsupported and were replaced with placeholders: custom$&block, custom$$block, custom$1block"
+            );
+        });
+
+        it("does not emit an error notification when all blocks are supported", () => {
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, ["forward", "back"]);
+            const blockObjs = [
+                [0, "forward", 100, 100, [null, 1]],
+                [1, "back", 100, 120, [0, null]]
+            ];
+
+            blocks.loadNewBlocks(blockObjs);
+
+            expect(blocks.blockList.length).toBe(2);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("aborts cleanly with actionable message when blockObjs is not an array", () => {
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, ["forward"]);
+
+            expect(() => blocks.loadNewBlocks({ invalid: "data" })).not.toThrow();
+            expect(blocks._loadInProgress).toBe(false);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Cannot load project: invalid project structure."
+            );
+        });
+
+        it("aborts with actionable message when block has out-of-range connection", () => {
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, ["forward"]);
+            const blockObjs = [[0, "forward", 100, 100, [null, 999]]];
+
+            blocks.loadNewBlocks(blockObjs);
+
+            expect(blocks.blockList.length).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Cannot load project: invalid block connection detected."
+            );
+        });
+
+        it("aborts cleanly with actionable message when blockObjs contains a null entry", () => {
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, ["forward"]);
+            const blockObjs = [
+                [0, "forward", 100, 100, [null, null]],
+                null,
+                [2, "forward", 100, 150, [null, null]]
+            ];
+
+            expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
+            expect(blocks._loadInProgress).toBe(false);
+            expect(activity._suppressRefresh).toBe(false);
+            expect(activity.stopLoadAnimation).toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Cannot load project: malformed block structure detected."
+            );
+            expect(blocks.blockList.length).toBe(0);
+        });
+
+        it("aborts cleanly with actionable message when blockObjs contains a non-array entry", () => {
+            const activity = makeActivity();
+            const blocks = makeBlocks(activity, ["forward"]);
+            const blockObjs = [
+                [0, "forward", 100, 100, [null, null]],
+                { invalid: "blockObject" },
+                [2, "forward", 100, 150, [null, null]]
+            ];
+
+            expect(() => blocks.loadNewBlocks(blockObjs)).not.toThrow();
+            expect(blocks._loadInProgress).toBe(false);
+            expect(activity._suppressRefresh).toBe(false);
+            expect(activity.stopLoadAnimation).toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Cannot load project: malformed block structure detected."
+            );
+            expect(blocks.blockList.length).toBe(0);
+        });
+    });
+
     describe("loadNewBlocks re-entrancy (#8392)", () => {
         const { PubSub } = require("../pubsub");
         let mockActivity;
@@ -3149,6 +3916,22 @@ describe("Blocks Foundation", () => {
             } finally {
                 window.removeEventListener("error", onWindowError);
             }
+        });
+
+        it.each([
+            ["an object", { name: "equal", pitchNumber: 12 }],
+            ["null", null],
+            ["undefined", undefined]
+        ])("rejects %s without leaving a load in progress", (_label, notBlocks) => {
+            expect(() => blocks.loadNewBlocks(notBlocks)).toThrow(TypeError);
+            expect(blocks.isLoading()).toBe(false);
+        });
+
+        it("does not queue data that is not a block list behind a running load", () => {
+            blocks.loadNewBlocks(makeBatch(1));
+
+            expect(() => blocks.loadNewBlocks({})).toThrow(TypeError);
+            expect(blocks._loadQueue).toHaveLength(0);
         });
 
         it("runAfterLoad runs the callback right away when nothing is loading", () => {

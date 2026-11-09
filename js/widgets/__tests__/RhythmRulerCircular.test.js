@@ -86,6 +86,7 @@ describe("RhythmRulerCircular", () => {
                 _playing: false,
                 _rulers: [{ cells }, { cells: [{}] }],
                 _dissectNumber: { value: "" },
+                _getDissectNumber: RhythmRuler.prototype._getDissectNumber,
                 _hitTestCircular: jest.fn(() => hits.shift() || null),
                 _tieCircular: jest.fn(),
                 __dissectByNumber: jest.fn(),
