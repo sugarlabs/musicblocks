@@ -562,13 +562,26 @@ const _MXML_BEAT_UNIT_QUARTERS = {
 function _metronomeTempo(metronomeEl) {
     if (metronomeEl === null) return null;
 
-    const quarters = _MXML_BEAT_UNIT_QUARTERS[_text(metronomeEl, "beat-unit")?.trim()];
-    const perMinute = Number(_text(metronomeEl, "per-minute"));
-    if (quarters === undefined || !Number.isFinite(perMinute) || perMinute <= 0) return null;
+    const beatUnitDuration = beatUnitEl => {
+        const quarters = _MXML_BEAT_UNIT_QUARTERS[_text(beatUnitEl, "beat-unit")?.trim()];
+        if (quarters === undefined) return null;
 
-    const dots = metronomeEl.querySelectorAll(":scope > beat-unit-dot").length;
-    const dottedQuarters = quarters * (2 - 1 / 2 ** dots);
-    const tempo = perMinute * dottedQuarters;
+        const dots = beatUnitEl.querySelectorAll(":scope > beat-unit-dot").length;
+        return quarters * (2 - 1 / 2 ** dots);
+    };
+
+    let quarters = beatUnitDuration(metronomeEl);
+    if (quarters === null) return null;
+    for (const tiedBeatUnit of metronomeEl.querySelectorAll(":scope > beat-unit-tied")) {
+        const tiedDuration = beatUnitDuration(tiedBeatUnit);
+        if (tiedDuration === null) return null;
+        quarters += tiedDuration;
+    }
+
+    const perMinute = Number(_text(metronomeEl, "per-minute"));
+    if (!Number.isFinite(perMinute) || perMinute <= 0) return null;
+
+    const tempo = perMinute * quarters;
     return Number.isFinite(tempo) && tempo > 0 ? tempo : null;
 }
 
@@ -665,15 +678,21 @@ function _tempoChanges(partEls) {
                             ? child
                             : child.querySelector(":scope > sound[tempo]");
                     const soundTempo = Number(soundEl?.getAttribute("tempo"));
+                    const hasSoundTempo = Number.isFinite(soundTempo) && soundTempo > 0;
                     const metronomeTempo =
                         child.tagName === "direction"
                             ? _metronomeTempo(
                                   child.querySelector(":scope > direction-type > metronome")
                               )
                             : null;
-                    const tempoBpm =
-                        Number.isFinite(soundTempo) && soundTempo > 0 ? soundTempo : metronomeTempo;
-                    const soundOffset = Number(soundEl ? _text(soundEl, "offset") : 0);
+                    const tempoBpm = hasSoundTempo ? soundTempo : metronomeTempo;
+                    const directionOffset =
+                        !hasSoundTempo && child.tagName === "direction"
+                            ? child.querySelector(':scope > offset[sound="yes"]')
+                            : null;
+                    const soundOffset = Number(
+                        soundEl ? _text(soundEl, "offset") : directionOffset?.textContent
+                    );
                     if (Number.isFinite(tempoBpm) && tempoBpm > 0) {
                         changes.push({
                             measureIndex,
