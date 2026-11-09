@@ -49,6 +49,22 @@ const _MXML_TYPE_DENOMINATOR = {
     "256th": 256
 };
 
+// MusicXML leaves dynamic playback levels to the application. Keep mp at the
+// Music Blocks default synth volume and space the other common markings around it.
+const _MXML_DYNAMIC_VOLUMES = {
+    pp: 20,
+    p: 35,
+    mp: 50,
+    mf: 65,
+    f: 80,
+    ff: 100
+};
+
+// Alternate endings are expanded into individual blocks because a Music
+// Blocks repeat clamp has no final-pass branch. Keep that expansion bounded;
+// larger repeat counts retain the existing repeat-clamp representation.
+const _MAX_FLATTENED_ENDING_REPETITIONS = 16;
+
 const _text = (parent, tag) => parent.querySelector(`:scope > ${tag}`)?.textContent ?? null;
 
 const _isUsableFraction = fraction => {
@@ -530,6 +546,28 @@ const _MXML_MODE_NAME = {
 const _MXML_ASCII_ACCIDENTAL_SUFFIX = { "#": "♯", "b": "♭", "": "" };
 
 /**
+ * Returns the Music Blocks volume for a supported dynamic marking in a
+ * MusicXML <direction>, or null when there is no supported marking.
+ * @param {Element} directionEl - a MusicXML <direction> element
+ * @returns {number|null}
+ */
+function _dynamicVolume(directionEl) {
+    // Positioning an offset direction requires timeline-aware placement. Until
+    // that is supported, skip it rather than attaching it to the next note.
+    if (directionEl.querySelector(":scope > offset") !== null) return null;
+
+    const dynamicsEl = directionEl.querySelector(":scope > direction-type > dynamics");
+    if (dynamicsEl === null) return null;
+
+    for (const marking of dynamicsEl.children) {
+        const volume = _MXML_DYNAMIC_VOLUMES[marking.tagName];
+        if (volume !== undefined) return volume;
+    }
+
+    return null;
+}
+
+/**
  * A part's key signature as a Music Blocks {root, mode} pair, from its first
  * <attributes><key><fifths> (+ optional <mode>), defaulting to C major when
  * absent, unparseable, or outside the range a reasonable key signature covers.
@@ -794,6 +832,37 @@ function _createTempoBlocks(blockId, tempoBpm, timeSignature, prevId, nextFlowId
 }
 
 /**
+ * Builds a set-synth-volume block for the imported voice's guitar timbre.
+ * @param {number} blockId - this volume block's starting id
+ * @param {number} volume - volume in Music Blocks' 0..100 range
+ * @param {number} prevId - the previous flow block's id
+ * @returns {Array} the block literals
+ */
+function _createVolumeBlocks(blockId, volume, prevId) {
+    return [
+        [blockId, "setsynthvolume", 0, 0, [prevId, blockId + 1, blockId + 2, null]],
+        [blockId + 1, ["voicename", { value: "guitar" }], 0, 0, [blockId]],
+        [blockId + 2, ["number", { value: volume }], 0, 0, [blockId]]
+    ];
+}
+
+/**
+ * Replaces a generated note block's duration fraction.
+ *
+ * @param {Array} blocks - the block literals that contain the note
+ * @param {number} noteId - the newnote block id
+ * @param {[number, number]} duration - replacement [numerator, denominator]
+ * @returns {void}
+ */
+function _setNoteDuration(blocks, noteId, duration) {
+    const byId = new Map(blocks.map(block => [block[0], block]));
+    const note = byId.get(noteId);
+    const divide = byId.get(note[4][1]);
+    byId.get(divide[4][1])[1][1].value = duration[0];
+    byId.get(divide[4][2])[1][1].value = duration[1];
+}
+
+/**
  * The time signature in force at the start of the first part, from its first
  * <attributes><time>, defaulting to 4/4 when absent.
  * @param {Element} partEl - a MusicXML <part> element
@@ -897,11 +966,13 @@ function _buildPreamble(startId, title, voiceLabel, timeSignature, keySignature,
  *
  * Deliberately simple: ranges are assumed non-overlapping and non-nested (a
  * second forward repeat seen before a backward one just moves the pending
- * start forward, rather than stacking); MusicXML's multiple-ending ("volta")
- * repeats are not handled, the same gap js/activity/abc-parser.js's own
- * header comment already documents for ABC's alternate endings.
+ * start forward, rather than stacking). A simple first/second ending is
+ * flattened into its playable note sequence because a Music Blocks repeat
+ * clamp has no conditional final-iteration branch.
  *
- * @param {Array<{startIndex: number, endIndex: number, times: number}>} repeats
+ * @param {Array<{startIndex: number, endIndex: number, times: number,
+ *     firstEndingStartIndex: number|null,
+ *     bodyTieDurations: Array<{index: number, duration: [number, number]}>}>} repeats
  * @param {Array} noteBlocks - every note/rest/drum block literal for this
  *     part, already with the final note's trailing connection nulled
  *     (mutated in place: connections are redirected around each range)
@@ -936,13 +1007,98 @@ function _applyRepeats(
     const byId = new Map(noteBlocks.map(block => [block[0], block]));
     const repeatBlocks = [];
 
-    for (const { startIndex, endIndex, times } of repeats) {
+    const cloneNotes = (startIndex, endIndex, prevId, durationOverrides = []) => {
+        const firstId = noteStartIds[startIndex];
+        const lastId = noteEndIds[endIndex];
+        const sourceBlocks = noteBlocks.filter(block => block[0] >= firstId && block[0] <= lastId);
+        const idMap = new Map(sourceBlocks.map((block, index) => [block[0], blockId + index]));
+        const blocks = sourceBlocks.map(block => [
+            idMap.get(block[0]),
+            Array.isArray(block[1]) ? [block[1][0], { ...block[1][1] }] : block[1],
+            block[2],
+            block[3],
+            block[4].map(connection => idMap.get(connection) ?? connection)
+        ]);
+        const firstBlock = blocks.find(block => block[0] === idMap.get(firstId));
+        const lastBlock = blocks.find(block => block[0] === idMap.get(lastId));
+        firstBlock[4][0] = prevId;
+        lastBlock[4][1] = null;
+        durationOverrides.forEach(({ index, duration }) => {
+            if (index >= startIndex && index <= endIndex) {
+                _setNoteDuration(blocks, idMap.get(noteStartIds[index]), duration);
+            }
+        });
+        blockId += blocks.length;
+        return { blocks, firstId: firstBlock[0], lastId: lastBlock[0] };
+    };
+
+    for (const {
+        startIndex,
+        endIndex,
+        times,
+        firstEndingStartIndex = null,
+        bodyTieDurations = []
+    } of repeats) {
         const startNote = byId.get(noteStartIds[startIndex]);
         const endHidden = byId.get(noteEndIds[endIndex]);
         const prevId = startNote[4][0];
         const prevBlock = byId.get(prevId);
         const nextFlowId = endHidden[4][1];
         const startTempoBpm = noteTempoBpms[startIndex];
+
+        if (
+            firstEndingStartIndex !== null &&
+            firstEndingStartIndex >= startIndex &&
+            nextFlowId !== null &&
+            Number.isSafeInteger(times) &&
+            times >= 2 &&
+            times <= _MAX_FLATTENED_ENDING_REPETITIONS
+        ) {
+            // The original flow already plays the first ending once. Replay
+            // its body and first ending for every extra non-final pass, then
+            // replay only the body before falling through to the second ending.
+            let previousEnd = endHidden;
+            const copies = [];
+            const clonePass = (cloneStartIndex, cloneEndIndex, durationOverrides = []) => {
+                let clonePrevId = previousEnd[0];
+                let resetTempoBlocks = [];
+                if (Number.isFinite(startTempoBpm)) {
+                    resetTempoBlocks = _createTempoBlocks(
+                        blockId,
+                        startTempoBpm,
+                        timeSignature,
+                        clonePrevId
+                    );
+                    blockId += resetTempoBlocks.length;
+                    previousEnd[4][1] = resetTempoBlocks[0][0];
+                    clonePrevId = resetTempoBlocks[5][0];
+                }
+                const copy = cloneNotes(
+                    cloneStartIndex,
+                    cloneEndIndex,
+                    clonePrevId,
+                    durationOverrides
+                );
+                if (resetTempoBlocks.length === 0) {
+                    previousEnd[4][1] = copy.firstId;
+                } else {
+                    resetTempoBlocks[5][4][1] = copy.firstId;
+                }
+                copies.push(...resetTempoBlocks, ...copy.blocks);
+                previousEnd = copy.blocks.find(block => block[0] === copy.lastId);
+            };
+            for (let pass = 2; pass < times; pass++) {
+                clonePass(startIndex, endIndex);
+            }
+            if (firstEndingStartIndex > startIndex) {
+                clonePass(startIndex, firstEndingStartIndex - 1, bodyTieDurations);
+            }
+            previousEnd[4][1] = nextFlowId;
+            byId.get(nextFlowId)[4][0] = previousEnd[0];
+            copies.forEach(block => byId.set(block[0], block));
+            noteBlocks.push(...copies);
+            continue;
+        }
 
         const repeatId = blockId;
         const countId = blockId + 1;
@@ -1044,6 +1200,9 @@ function _processPart(
     const noteTempoBpms = [];
     const repeats = [];
     let repeatPendingStart = null;
+    let firstEndingStartIndex = null;
+    let firstEndingBodyTie = null;
+    let bodyTieDurations = [];
     // The last note index any repeat range (explicit or implicit) has
     // already covered, so a second unpaired backward repeat starts right
     // after the first one instead of both claiming to start from 0 --
@@ -1058,16 +1217,51 @@ function _processPart(
     let tieLyrics = [];
     let currentTempoBpm = initialTempoBpm;
     let nextTempoIndex = 0;
+    let pendingVolumes = [];
+    let importedVoice = "1";
+
+    outer: for (const measureEl of partEl.querySelectorAll(":scope > measure")) {
+        for (const child of measureEl.children) {
+            if (child.tagName === "backup") break;
+            if (child.tagName !== "note") continue;
+            if (child.querySelector(":scope > chord, :scope > grace") !== null) continue;
+
+            importedVoice = _text(child, "voice")?.trim() || "1";
+            break outer;
+        }
+    }
 
     const emitNote = (duration, content, lyrics = []) => {
+        let startId = blockId;
+        let previousVolumeBlock = null;
+        pendingVolumes.forEach(volume => {
+            const volumeBlocks = _createVolumeBlocks(blockId, volume, prevId);
+            noteBlocks.push(...volumeBlocks);
+            if (previousVolumeBlock !== null) previousVolumeBlock[4][3] = blockId;
+            previousVolumeBlock = volumeBlocks[0];
+            prevId = blockId;
+            blockId += volumeBlocks.length;
+        });
+        pendingVolumes = [];
+
         const blocks = _createNoteBlocks(blockId, duration, content, prevId, lyrics);
+        if (previousVolumeBlock !== null) previousVolumeBlock[4][3] = blockId;
         noteBlocks.push(...blocks);
-        noteStartIds.push(blockId);
+        noteStartIds.push(startId);
         noteEndIds.push(blocks[blocks.length - 1][0]);
         noteTempoBpms.push(currentTempoBpm);
         producedNotes = true;
         prevId = blocks[blocks.length - 1][0];
         blockId = prevId + 1;
+    };
+
+    const flushTie = () => {
+        if (tieDuration !== null) {
+            emitNote(tieDuration, tieContent, tieLyrics);
+            tieDuration = null;
+            tieContent = null;
+            tieLyrics = [];
+        }
     };
 
     const emitTempo = tempoBpm => {
@@ -1088,12 +1282,7 @@ function _processPart(
             const { tempoBpm } = change;
             if (change.measureIndex === 0 && change.offset === 0) continue;
             if (tempoBpm === currentTempoBpm) continue;
-            if (tieDuration !== null) {
-                emitNote(tieDuration, tieContent, tieLyrics);
-                tieDuration = null;
-                tieContent = null;
-                tieLyrics = [];
-            }
+            flushTie();
             emitTempo(tempoBpm);
         }
     };
@@ -1109,18 +1298,26 @@ function _processPart(
             emitDueTempoChanges(measureIndex, offset);
             if (child.tagName === "backup") break;
 
+            if (child.tagName === "direction") {
+                const directionVoice = _text(child, "voice")?.trim();
+                if (directionVoice && directionVoice !== importedVoice) continue;
+
+                const volume = _dynamicVolume(child);
+                if (volume !== null) {
+                    // A tied note is emitted as one block. Keep it open so a
+                    // dynamic between its start and stop cannot split it.
+                    pendingVolumes.push(volume);
+                }
+                continue;
+            }
+
             // <forward> moves this voice on by its <duration> with no note
             // written. Skipping it brought every later note in early.
             if (child.tagName === "forward") {
                 const durationText = _text(child, "duration");
                 const length = durationText?.trim() ? Number(durationText) : NaN;
                 if (Number.isFinite(length) && length > 0 && divisions > 0) {
-                    if (tieDuration !== null) {
-                        emitNote(tieDuration, tieContent, tieLyrics);
-                        tieDuration = null;
-                        tieContent = null;
-                        tieLyrics = [];
-                    }
+                    flushTie();
                     emitNote([length, divisions * 4], null);
                     offset += length / divisions;
                 }
@@ -1129,18 +1326,64 @@ function _processPart(
 
             if (child.tagName === "barline") {
                 const repeatEl = child.querySelector(":scope > repeat");
+                const endingEl = child.querySelector(":scope > ending");
                 const direction = repeatEl?.getAttribute("direction");
+                const startsFirstEnding =
+                    endingEl?.getAttribute("type") === "start" &&
+                    endingEl.getAttribute("number")?.trim() === "1";
+                if (startsFirstEnding) {
+                    // A tie may legitimately continue from the repeat body
+                    // into the first ending. Emit its body note now so it is
+                    // part of the final-pass clone, then extend that note if
+                    // the first ending supplies the matching tie stop.
+                    if (tieDuration !== null) {
+                        const index = noteStartIds.length;
+                        const duration = tieDuration;
+                        const content = tieContent;
+                        emitNote(tieDuration, tieContent, tieLyrics);
+                        firstEndingBodyTie = { index, duration, content };
+                        bodyTieDurations.push({ index, duration });
+                        tieDuration = null;
+                        tieContent = null;
+                        tieLyrics = [];
+                    }
+                    firstEndingStartIndex = noteStartIds.length;
+                }
                 if (direction === "forward") {
                     repeatPendingStart = noteStartIds.length;
                 } else if (direction === "backward") {
-                    const times = Number(repeatEl.getAttribute("times")) || 2;
+                    if (firstEndingStartIndex !== null && tieDuration !== null) {
+                        flushTie();
+                    }
+                    const parsedTimes = Number(repeatEl.getAttribute("times"));
+                    const times =
+                        Number.isSafeInteger(parsedTimes) && parsedTimes > 0 ? parsedTimes : 2;
                     const startIndex = repeatPendingStart ?? lastRepeatEnd + 1;
                     const endIndex = noteStartIds.length - 1;
                     if (endIndex >= startIndex) {
-                        repeats.push({ startIndex, endIndex, times });
+                        repeats.push({
+                            startIndex,
+                            endIndex,
+                            times,
+                            firstEndingStartIndex,
+                            bodyTieDurations
+                        });
                         lastRepeatEnd = endIndex;
                     }
                     repeatPendingStart = null;
+                    firstEndingStartIndex = null;
+                    firstEndingBodyTie = null;
+                    bodyTieDurations = [];
+                } else if (
+                    firstEndingStartIndex !== null &&
+                    (endingEl?.getAttribute("type") === "stop" ||
+                        endingEl?.getAttribute("type") === "discontinue")
+                ) {
+                    // An ending can close without a backward repeat. Do not
+                    // let that unrelated marker affect a later repeat.
+                    firstEndingStartIndex = null;
+                    firstEndingBodyTie = null;
+                    bodyTieDurations = [];
                 }
                 continue;
             }
@@ -1177,6 +1420,23 @@ function _processPart(
                 if (type === "stop") hasTieStop = true;
             }
 
+            if (firstEndingBodyTie !== null) {
+                if (hasTieStop && _contentsEqual(content, firstEndingBodyTie.content)) {
+                    const combinedDuration = _addFractions(firstEndingBodyTie.duration, duration);
+                    _setNoteDuration(
+                        noteBlocks,
+                        noteStartIds[firstEndingBodyTie.index],
+                        combinedDuration
+                    );
+                    firstEndingBodyTie = hasTieStart
+                        ? { ...firstEndingBodyTie, duration: combinedDuration }
+                        : null;
+                    offset += (duration[0] * 4) / duration[1];
+                    continue;
+                }
+                firstEndingBodyTie = null;
+            }
+
             // Only a note that both has a tie stop and shares the open tie's
             // pitch genuinely continues the chain -- anything else (a rest,
             // a different pitch, a note with no tie tag at all) is unrelated
@@ -1187,12 +1447,7 @@ function _processPart(
             const continuesTie =
                 tieDuration !== null && hasTieStop && _contentsEqual(content, tieContent);
 
-            if (tieDuration !== null && !continuesTie) {
-                emitNote(tieDuration, tieContent, tieLyrics);
-                tieDuration = null;
-                tieContent = null;
-                tieLyrics = [];
-            }
+            if (tieDuration !== null && !continuesTie) flushTie();
 
             if (continuesTie) {
                 tieLyrics = _mergeLyrics(tieLyrics, lyrics);
@@ -1221,9 +1476,7 @@ function _processPart(
     // A file that ends mid-tie (a <tie type="start"/> with no matching stop)
     // is malformed, but the accumulated duration is still real music: emit it
     // rather than silently dropping it.
-    if (tieDuration !== null) {
-        emitNote(tieDuration, tieContent, tieLyrics);
-    }
+    flushTie();
 
     if (!producedNotes) {
         // A part with no notes must not leave behind tempo-only blocks. They
