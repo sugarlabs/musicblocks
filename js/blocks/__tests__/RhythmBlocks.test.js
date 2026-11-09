@@ -31,6 +31,7 @@ const Blocks = jest.requireActual("../../blocks");
 
 global._ = s => s;
 global.NOINPUTERRORMSG = "NO_INPUT";
+global.NANERRORMSG = "Not a number.";
 global.DEFAULTDRUM = "kick";
 global.DEFAULTBLOCKSCALE = 1.0;
 global.last = arr => (arr && arr.length > 0 ? arr[arr.length - 1] : null);
@@ -515,6 +516,36 @@ describe("RhythmBlocks", () => {
 
             expect(turtle.singer.skipIndex).toBe(4);
             expect(logo.setTurtleListener).not.toHaveBeenCalled();
+        });
+
+        test.each([NaN, Infinity, -Infinity])(
+            "rejects non-finite skip value %p without corrupting skipFactor or registering listeners",
+            badValue => {
+                turtle.singer.skipFactor = 1;
+                turtle.singer.skipIndex = 4;
+
+                const result = getBlock("skipnotes").flow([badValue, true], logo, 0, 10);
+
+                expect(result).toBeUndefined();
+                expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 10);
+                expect(turtle.singer.skipFactor).toBe(1);
+                expect(turtle.singer.skipIndex).toBe(4);
+                expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+                expect(logo.setTurtleListener).not.toHaveBeenCalled();
+            }
+        );
+
+        test("subsequent valid skip clamp continues skipping notes after a non-finite clamp", () => {
+            turtle.singer.skipFactor = 1;
+            turtle.singer.skipIndex = 0;
+
+            getBlock("skipnotes").flow([Infinity, true], logo, 0, 10);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 10);
+            expect(turtle.singer.skipFactor).toBe(1);
+
+            const silenced = runClamp(2, 4);
+            expect(silenced).toEqual([false, true, true, false]);
+            expect(turtle.singer.skipFactor).toBe(1);
         });
     });
 
