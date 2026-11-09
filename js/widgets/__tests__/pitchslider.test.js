@@ -109,6 +109,7 @@ describe("PitchSlider Widget", () => {
             windowFor: jest.fn().mockImplementation(() => createMockWidgetWindow())
         };
         global.window.btoa = jest.fn(str => Buffer.from(str).toString("base64"));
+        global.window.requestAnimationFrame = jest.fn(cb => cb());
 
         if (!global.document) global.document = {};
         global.document.activeElement = null;
@@ -826,6 +827,52 @@ describe("PitchSlider Widget", () => {
             slider.activeSlider = null;
             mousedownHandler();
             expect(slider.activeSlider).toBe("0");
+        });
+
+        test("focus event sets activeSlider to slider id", () => {
+            const focusCall = slider.sliders[0].addEventListener.mock.calls.find(
+                call => call[0] === "focus"
+            );
+            const focusHandler = focusCall[1];
+            slider.activeSlider = null;
+            focusHandler();
+            expect(slider.activeSlider).toBe("0");
+        });
+
+        test("Reset frequency button falls back to DEFAULT_FREQUENCY when initialFrequencies is missing", () => {
+            slider.init(activityMock);
+            slider.initialFrequencies = null;
+            const resetBtn = slider.widgetWindow.getButtons().find(b => b.tip === "Reset");
+            resetBtn.onclick();
+            expect(slider.frequencies[0]).toBe(PitchSlider.DEFAULT_FREQUENCY);
+        });
+
+        test("handles widgetWindow without takeFocus gracefully", () => {
+            const mockWindow = createMockWidgetWindow();
+            delete mockWindow.takeFocus;
+            global.window.widgetWindows.windowFor = jest.fn(() => mockWindow);
+            expect(() => slider.init(activityMock)).not.toThrow();
+
+            const pointerdownHandler = slider.sliders[0].addEventListener.mock.calls.find(
+                call => call[0] === "pointerdown"
+            )[1];
+            expect(() => pointerdownHandler()).not.toThrow();
+
+            const mousedownHandler = slider.sliders[0].addEventListener.mock.calls.find(
+                call => call[0] === "mousedown"
+            )[1];
+            expect(() => mousedownHandler()).not.toThrow();
+
+            const focusHandler = slider.sliders[0].addEventListener.mock.calls.find(
+                call => call[0] === "focus"
+            )[1];
+            expect(() => focusHandler()).not.toThrow();
+        });
+
+        test("widgetWindow.onclose handles already-cleared _keyHandler", () => {
+            slider.init(activityMock);
+            slider._keyHandler = null;
+            expect(() => slider.widgetWindow.onclose()).not.toThrow();
         });
 
         test("Shift + ArrowUp keydown steps frequency up by an octave", () => {
