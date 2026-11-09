@@ -539,6 +539,39 @@ const _MXML_MODE_NAME = {
 
 const _MXML_ASCII_ACCIDENTAL_SUFFIX = { "#": "♯", "b": "♭", "": "" };
 
+const _MXML_BEAT_UNIT_QUARTERS = {
+    "breve": 8,
+    "whole": 4,
+    "half": 2,
+    "quarter": 1,
+    "eighth": 1 / 2,
+    "16th": 1 / 4,
+    "32nd": 1 / 8,
+    "64th": 1 / 16,
+    "128th": 1 / 32,
+    "256th": 1 / 64,
+    "512th": 1 / 128,
+    "1024th": 1 / 256
+};
+
+/**
+ * Converts a regular MusicXML <metronome> mark to quarter notes per minute.
+ * @param {Element|null} metronomeEl - a MusicXML <metronome> element
+ * @returns {number|null}
+ */
+function _metronomeTempo(metronomeEl) {
+    if (metronomeEl === null) return null;
+
+    const quarters = _MXML_BEAT_UNIT_QUARTERS[_text(metronomeEl, "beat-unit")?.trim()];
+    const perMinute = Number(_text(metronomeEl, "per-minute"));
+    if (quarters === undefined || !Number.isFinite(perMinute) || perMinute <= 0) return null;
+
+    const dots = metronomeEl.querySelectorAll(":scope > beat-unit-dot").length;
+    const dottedQuarters = quarters * (2 - 1 / 2 ** dots);
+    const tempo = perMinute * dottedQuarters;
+    return Number.isFinite(tempo) && tempo > 0 ? tempo : null;
+}
+
 /**
  * Returns the Music Blocks volume for a supported dynamic marking in a
  * MusicXML <direction>, or null when there is no supported marking.
@@ -631,7 +664,15 @@ function _tempoChanges(partEls) {
                         child.tagName === "sound"
                             ? child
                             : child.querySelector(":scope > sound[tempo]");
-                    const tempoBpm = Number(soundEl?.getAttribute("tempo"));
+                    const soundTempo = Number(soundEl?.getAttribute("tempo"));
+                    const metronomeTempo =
+                        child.tagName === "direction"
+                            ? _metronomeTempo(
+                                  child.querySelector(":scope > direction-type > metronome")
+                              )
+                            : null;
+                    const tempoBpm =
+                        Number.isFinite(soundTempo) && soundTempo > 0 ? soundTempo : metronomeTempo;
                     const soundOffset = Number(soundEl ? _text(soundEl, "offset") : 0);
                     if (Number.isFinite(tempoBpm) && tempoBpm > 0) {
                         changes.push({
