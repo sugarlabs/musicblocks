@@ -74,6 +74,7 @@ class Turtle {
 
         this._transportTime = null;
         this._transportEventId = null;
+        this.runGeneration = 0;
     }
 
     /**

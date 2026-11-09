@@ -289,6 +289,24 @@ describe("Singer Class", () => {
         });
     });
 
+    test("dropPendingNotes() forgets the notes it had started", () => {
+        singer.inNoteBlock = [12, 14];
+        singer.multipleVoices = true;
+        singer.noteValue = { 12: 4, 14: 8 };
+        singer.notePitches = { 12: ["G"], 14: ["A"] };
+        singer.delayedNotes = [[14, 8]];
+        singer.turtleTime = 3;
+
+        singer.dropPendingNotes();
+
+        expect(singer.inNoteBlock).toEqual([]);
+        expect(singer.multipleVoices).toBe(false);
+        expect(singer.noteValue).toEqual({});
+        expect(singer.notePitches).toEqual({});
+        expect(singer.delayedNotes).toEqual([]);
+        expect(singer.turtleTime).toBe(3);
+    });
+
     test("should correctly add scalar transposition", () => {
         const result = Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, 2);
         expect(result).toEqual(["C", 4]);
