@@ -48,120 +48,114 @@ class CallGraphLayout {
                 ...n,
                 width,
                 height: nodeHeight,
-                rank: 0,
+                rank: typeof n.rank === "number" ? n.rank : 0,
                 x: 0,
                 y: 0
             });
         }
 
-        // 1. Assign Ranks (cycle-aware longest-path topological layering)
-        // Step 1a: Build non-self-loop adjacency list
-        const rawAdj = new Map();
-        for (const n of nodes) {
-            rawAdj.set(n.id, []);
-        }
-        for (const edge of edges) {
-            if (nodeMap.has(edge.source) && nodeMap.has(edge.target)) {
-                if (edge.source !== edge.target) {
-                    rawAdj.get(edge.source).push(edge.target);
-                }
+        if (options.assignRanks !== false) {
+            // 1. Assign Ranks (cycle-aware longest-path topological layering)
+            // Step 1a: Build non-self-loop adjacency list
+            const rawAdj = new Map();
+            for (const n of nodes) {
+                rawAdj.set(n.id, []);
             }
-        }
-
-        // Step 1b: Detect back edges via DFS with an on-stack set
-        // Prioritize Start nodes first, then alphabetical for deterministic ordering
-        const startIds = nodes
-            .filter(n => n.type === "start")
-            .map(n => n.id)
-            .sort();
-        const otherIds = nodes
-            .filter(n => n.type !== "start")
-            .map(n => n.id)
-            .sort();
-        const searchOrder = [...startIds, ...otherIds];
-
-        const visitedDfs = new Set();
-        const onStack = new Set();
-        const backEdges = new Set();
-
-        const dfsCycles = u => {
-            visitedDfs.add(u);
-            onStack.add(u);
-
-            const neighbors = rawAdj.get(u) || [];
-            for (const v of neighbors) {
-                if (onStack.has(v)) {
-                    backEdges.add(`${u}->${v}`);
-                } else if (!visitedDfs.has(v)) {
-                    dfsCycles(v);
-                }
-            }
-
-            onStack.delete(u);
-        };
-
-        for (const id of searchOrder) {
-            if (!visitedDfs.has(id)) {
-                dfsCycles(id);
-            }
-        }
-
-        // Step 1c: Construct DAG excluding back-edges and compute in-degrees
-        const dagAdj = new Map();
-        const dagInDegree = new Map();
-        for (const n of nodes) {
-            dagAdj.set(n.id, []);
-            dagInDegree.set(n.id, 0);
-        }
-
-        for (const edge of edges) {
-            if (nodeMap.has(edge.source) && nodeMap.has(edge.target)) {
-                if (edge.source !== edge.target) {
-                    const edgeKey = `${edge.source}->${edge.target}`;
-                    if (!backEdges.has(edgeKey)) {
-                        dagAdj.get(edge.source).push(edge.target);
-                        dagInDegree.set(edge.target, dagInDegree.get(edge.target) + 1);
+            for (const edge of edges) {
+                if (nodeMap.has(edge.source) && nodeMap.has(edge.target)) {
+                    if (edge.source !== edge.target) {
+                        rawAdj.get(edge.source).push(edge.target);
                     }
                 }
             }
-        }
 
-        // Step 1d: Longest-path ranking in topological order (Kahn's algorithm)
-        const queue = [];
-        for (const n of nodes) {
-            if (dagInDegree.get(n.id) === 0) {
-                queue.push(n.id);
-                const node = nodeMap.get(n.id);
-                if (node) {
-                    node.rank = 0;
+            // Step 1b: Detect back edges via DFS with an on-stack set
+            // Prioritize Start nodes first, then alphabetical for deterministic ordering
+            const startIds = nodes
+                .filter(n => n.type === "start")
+                .map(n => n.id)
+                .sort();
+            const otherIds = nodes
+                .filter(n => n.type !== "start")
+                .map(n => n.id)
+                .sort();
+            const searchOrder = [...startIds, ...otherIds];
+
+            const visitedDfs = new Set();
+            const onStack = new Set();
+            const backEdges = new Set();
+
+            const dfsCycles = u => {
+                visitedDfs.add(u);
+                onStack.add(u);
+
+                const neighbors = rawAdj.get(u) || [];
+                for (const v of neighbors) {
+                    if (onStack.has(v)) {
+                        backEdges.add(`${u}->${v}`);
+                    } else if (!visitedDfs.has(v)) {
+                        dfsCycles(v);
+                    }
+                }
+
+                onStack.delete(u);
+            };
+
+            for (const id of searchOrder) {
+                if (!visitedDfs.has(id)) {
+                    dfsCycles(id);
                 }
             }
-        }
 
-        while (queue.length > 0) {
-            const u = queue.shift();
-            const uNode = nodeMap.get(u);
-            const uRank = uNode ? uNode.rank : 0;
+            // Step 1c: Construct DAG excluding back-edges and compute in-degrees
+            const dagAdj = new Map();
+            const dagInDegree = new Map();
+            for (const n of nodes) {
+                dagAdj.set(n.id, []);
+                dagInDegree.set(n.id, 0);
+            }
 
-            const neighbors = dagAdj.get(u) || [];
-            for (const v of neighbors) {
-                const vNode = nodeMap.get(v);
-                if (vNode) {
-                    vNode.rank = Math.max(vNode.rank, uRank + 1);
-                }
-                const remainingDeg = dagInDegree.get(v) - 1;
-                dagInDegree.set(v, remainingDeg);
-                if (remainingDeg === 0) {
-                    queue.push(v);
+            for (const edge of edges) {
+                if (nodeMap.has(edge.source) && nodeMap.has(edge.target)) {
+                    if (edge.source !== edge.target) {
+                        const edgeKey = `${edge.source}->${edge.target}`;
+                        if (!backEdges.has(edgeKey)) {
+                            dagAdj.get(edge.source).push(edge.target);
+                            dagInDegree.set(edge.target, dagInDegree.get(edge.target) + 1);
+                        }
+                    }
                 }
             }
-        }
 
-        // Safe fallback for any node that had in-degree > 0 due to an isolated back-edge component
-        for (const n of nodes) {
-            const node = nodeMap.get(n.id);
-            if (node && (node.rank === undefined || node.rank === null)) {
-                node.rank = 0;
+            // Step 1d: Longest-path ranking in topological order (Kahn's algorithm)
+            const queue = [];
+            for (const n of nodes) {
+                if (dagInDegree.get(n.id) === 0) {
+                    queue.push(n.id);
+                    const node = nodeMap.get(n.id);
+                    if (node) {
+                        node.rank = 0;
+                    }
+                }
+            }
+
+            while (queue.length > 0) {
+                const u = queue.shift();
+                const uNode = nodeMap.get(u);
+                const uRank = uNode ? uNode.rank : 0;
+
+                const neighbors = dagAdj.get(u) || [];
+                for (const v of neighbors) {
+                    const vNode = nodeMap.get(v);
+                    if (vNode) {
+                        vNode.rank = Math.max(vNode.rank, uRank + 1);
+                    }
+                    const remainingDeg = dagInDegree.get(v) - 1;
+                    dagInDegree.set(v, remainingDeg);
+                    if (remainingDeg === 0) {
+                        queue.push(v);
+                    }
+                }
             }
         }
 

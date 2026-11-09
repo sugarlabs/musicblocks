@@ -186,6 +186,12 @@ describe("CallGraphWidget", () => {
         widget.viewport.dispatchEvent(new WheelEvent("wheel", { deltaY: -100, bubbles: true }));
         expect(widget.transform.scale).toBeGreaterThan(initialScale);
 
+        // Guard against invalid scale in wheel zoom
+        widget.transform.scale = 0;
+        widget.viewport.dispatchEvent(new WheelEvent("wheel", { deltaY: -100, bubbles: true }));
+        expect(widget.transform.scale).toBe(0);
+        widget.transform.scale = initialScale;
+
         // Drag to pan
         widget.svg.dispatchEvent(
             new MouseEvent("mousedown", { clientX: 100, clientY: 100, bubbles: true })
@@ -265,6 +271,114 @@ describe("CallGraphWidget", () => {
         widget.viewport.dispatchEvent(new WheelEvent("wheel", { deltaY: 100, bubbles: true }));
         expect(widget.transform.scale).toBeLessThan(currentScale);
         expect(widget.transform.scale).toBeGreaterThanOrEqual(0.05);
+    });
+
+    test("wires window buttons: reload, fit to view, and onclose callback", () => {
+        let reloadCb, fitCb;
+        widgetWin.addButton = jest.fn().mockImplementation((icon, size, title) => {
+            const btn = { onclick: null };
+            if (icon === "reload.svg") reloadCb = btn;
+            if (icon === "icon-expand.svg") fitCb = btn;
+            return btn;
+        });
+
+        const widget = new CallGraphWidget(activity);
+        const refreshSpy = jest.spyOn(widget, "refresh");
+        const fitSpy = jest.spyOn(widget, "fitToView");
+        const destroySpy = jest.spyOn(widget, "destroy");
+
+        reloadCb.onclick();
+        expect(refreshSpy).toHaveBeenCalled();
+
+        fitCb.onclick();
+        expect(fitSpy).toHaveBeenCalled();
+
+        widgetWin.onclose();
+        expect(destroySpy).toHaveBeenCalled();
+    });
+
+    test("handles mousedown on node without starting pan, and direct node click", () => {
+        const widget = new CallGraphWidget(activity);
+        const nodeG = widget.graphRoot.querySelector(".codemap-node");
+        const focusSpy = jest.spyOn(widget, "focusNode");
+
+        // Click directly on node element
+        nodeG.onclick();
+        expect(focusSpy).toHaveBeenCalled();
+
+        // Mousedown on node target should not start pan
+        const evt = new MouseEvent("mousedown", { bubbles: true });
+        Object.defineProperty(evt, "target", { value: nodeG });
+        widget.svg.dispatchEvent(evt);
+        expect(widget.isPanning).toBe(false);
+    });
+
+    test("renders badges and icons for missing calls, dynamic calls, and multiple callers", () => {
+        activity.blocks.blockList = [
+            { id: 1, name: "start", connections: [null, 2], trash: false },
+            { id: 2, name: "nameddo", privateData: "ghost", connections: [1], trash: false },
+            { id: 3, name: "start", connections: [null, 4], trash: false },
+            { id: 4, name: "nameddo", privateData: "ghost", connections: [3], trash: false },
+            { id: 5, name: "start", connections: [null, 6], trash: false },
+            { id: 6, name: "do", connections: [5, 7], trash: false },
+            { id: 7, name: "box", value: 123, trash: false }
+        ];
+
+        const widget = new CallGraphWidget(activity);
+        expect(widget.summaryBadge.textContent).toContain("Missing");
+
+        const missingNode = widget.graphRoot.querySelector(".codemap-node-missing");
+        expect(missingNode).not.toBeNull();
+        expect(missingNode.textContent).toContain("?");
+
+        const dynamicNode = widget.graphRoot.querySelector(".codemap-node-dynamic");
+        expect(dynamicNode).not.toBeNull();
+        expect(dynamicNode.textContent).toContain("~");
+
+        // Called by count badge when calledByCount > 1
+        const badgeBg = widget.graphRoot.querySelector(".codemap-badge-bg");
+        const badgeText = widget.graphRoot.querySelector(".codemap-badge-text");
+        expect(badgeBg).not.toBeNull();
+        expect(badgeText).not.toBeNull();
+        expect(badgeText.textContent).toBe("2");
+    });
+
+    test("refreshes stage via activity.stage.update fallback when refreshCanvas is absent", () => {
+        delete activity.refreshCanvas;
+        const widget = new CallGraphWidget(activity);
+        const targetNode = widget.currentLayout.positionedNodes.find(n => n.id === "action:melody");
+        const success = widget.focusNode(targetNode);
+        expect(success).toBe(true);
+        expect(activity.stage.update).toHaveBeenCalled();
+    });
+
+    test("handles missing dependencies gracefully and guards against null layout or graphRoot", () => {
+        const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        const widget = new CallGraphWidget(activity);
+
+        const origAnalyzer = global.CallGraphAnalyzer;
+        delete global.CallGraphAnalyzer;
+        jest.isolateModules(() => {
+            jest.doMock("../CallGraphAnalyzer.js", () => ({ CallGraphAnalyzer: null }));
+            const { CallGraphWidget: ModWidget } = require("../CallGraphWidget.js");
+            const w = new ModWidget(activity);
+            w.refresh();
+            expect(consoleErrorSpy).toHaveBeenCalledWith("Code Map dependencies not loaded.");
+        });
+        global.CallGraphAnalyzer = origAnalyzer;
+        consoleErrorSpy.mockRestore();
+
+        // Calling fitToView with null currentLayout
+        widget.currentLayout = null;
+        widget.fitToView();
+
+        // Calling _applyFilter when graphRoot is null
+        widget.graphRoot = null;
+        widget._applyFilter();
+
+        // Calling _updateSummary when summaryBadge is null
+        widget.summaryBadge = null;
+        widget._updateSummary({}, []);
     });
 
     test("triggers fitToView on window maximize", () => {

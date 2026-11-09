@@ -101,8 +101,8 @@ describe("CallGraphLayout", () => {
     test("routes same-rank calls with arch curve in both directions", () => {
         const graph = {
             nodes: [
-                { id: "action:one", type: "action", label: "one" },
-                { id: "action:two", type: "action", label: "two" }
+                { id: "action:one", type: "action", label: "one", rank: 0 },
+                { id: "action:two", type: "action", label: "two", rank: 0 }
             ],
             edges: [
                 { source: "action:one", target: "action:two", isRecursive: false },
@@ -110,10 +110,83 @@ describe("CallGraphLayout", () => {
             ]
         };
 
-        const layout = CallGraphLayout.compute(graph);
+        const layout = CallGraphLayout.compute(graph, { assignRanks: false });
         expect(layout.routedEdges).toHaveLength(2);
-        expect(layout.routedEdges[0].pathD).toContain("C");
-        expect(layout.routedEdges[1].pathD).toContain("C");
+
+        const nodeOne = layout.positionedNodes.find(n => n.id === "action:one");
+        const nodeTwo = layout.positionedNodes.find(n => n.id === "action:two");
+        expect(nodeOne.y).toBe(nodeTwo.y);
+        expect(nodeOne.x).toBeLessThan(nodeTwo.x);
+
+        // Forward arch: one -> two (left to right) starts at right side of one, arches above, lands on left side of two
+        const forwardEdge = layout.routedEdges.find(
+            e => e.source === "action:one" && e.target === "action:two"
+        );
+        const expectedSx1 = nodeOne.x + nodeOne.width / 2;
+        const expectedTx1 = nodeTwo.x - nodeTwo.width / 2;
+        expect(forwardEdge.pathD).toBe(
+            `M ${expectedSx1} ${nodeOne.y} C ${expectedSx1} ${nodeOne.y - 32}, ${expectedTx1} ${nodeTwo.y - 32}, ${expectedTx1} ${nodeTwo.y}`
+        );
+
+        // Reverse arch: two -> one (right to left) starts at left side of two, arches above, lands on right side of one
+        const reverseEdge = layout.routedEdges.find(
+            e => e.source === "action:two" && e.target === "action:one"
+        );
+        const expectedSx2 = nodeTwo.x - nodeTwo.width / 2;
+        const expectedTx2 = nodeOne.x + nodeOne.width / 2;
+        expect(reverseEdge.pathD).toBe(
+            `M ${expectedSx2} ${nodeTwo.y} C ${expectedSx2} ${nodeTwo.y - 32}, ${expectedTx2} ${nodeOne.y - 32}, ${expectedTx2} ${nodeOne.y}`
+        );
+    });
+
+    test("ignores edges where source or target node is missing from nodeMap", () => {
+        const graph = {
+            nodes: [{ id: "action:one", type: "action", label: "one" }],
+            edges: [
+                { source: "action:one", target: "action:missingNode", isRecursive: false },
+                { source: "action:nonexistent", target: "action:one", isRecursive: false }
+            ]
+        };
+
+        const layout = CallGraphLayout.compute(graph);
+        expect(layout.routedEdges).toHaveLength(0);
+    });
+
+    test("sorts nodes within a rank deterministically by type (start, action, missing, dynamic) then label", () => {
+        const graph = {
+            nodes: [
+                { id: "missing:zoo", type: "missing", label: "zoo", rank: 0 },
+                { id: "dynamic:d2", type: "dynamic", label: "dynamicBeta", rank: 0 },
+                { id: "action:beta", type: "action", label: "beta", rank: 0 },
+                { id: "action:alpha", type: "action", label: "alpha", rank: 0 },
+                { id: "start:s1", type: "start", label: "Start", rank: 0 },
+                { id: "other:custom", type: "unknown", label: "custom", rank: 0 }
+            ],
+            edges: []
+        };
+
+        const layout = CallGraphLayout.compute(graph, { assignRanks: false });
+        const ids = layout.positionedNodes
+            .slice()
+            .sort((a, b) => a.x - b.x)
+            .map(n => n.id);
+        expect(ids).toEqual([
+            "start:s1",
+            "action:alpha",
+            "action:beta",
+            "missing:zoo",
+            "dynamic:d2",
+            "other:custom"
+        ]);
+    });
+
+    test("handles fallback when node rank is undefined in dag traversal", () => {
+        const graph = {
+            nodes: [{ id: "action:solo", type: "action", label: "solo" }],
+            edges: []
+        };
+        const layout = CallGraphLayout.compute(graph);
+        expect(layout.positionedNodes[0].rank).toBe(0);
     });
 
     test("propagates ranks correctly through multi-path DAG so forward calls flow downward", () => {
