@@ -429,6 +429,7 @@ Music Blocks has handy widgets for various musical concepts to create musical co
 | HyperScore-Tonal.html | Create music by painting patterns on the canvas |
 | 19-EDO-Microtonal-Counterpoint.html | Two-part polyphonic counterpoint in 19-EDO microtonal temperament (flute & cello), exploring pure 19-EDO major/minor thirds and fifths. |
 | 5-Limit-Just-Intonation-Polyrhythm.html | Three-turtle polyphonic composition combining 5-limit Just Intonation pure integer ratio harmonies (vibraphone & piano) with 3-against-2 metric subdivisions and acoustic percussion. |
+| Sound-Mandala-and-Polyrhythmic-Spiral.html | Synchronized 3-turtle algorithmic art and polyphony combining a soaring D Dorian flute theme weaving a 12-petaled chromatic mandala, an orbiting cello ground bass tracing celestial resonance boundaries, and polyrhythmic percussion drawing a central sacred starburst. |
 
 # Utilities
 
