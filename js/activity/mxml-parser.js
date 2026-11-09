@@ -1310,8 +1310,7 @@ function _processPart(
             if (child.querySelector(":scope > chord") !== null) continue;
             if (child.querySelector(":scope > grace") !== null) continue;
 
-            const volume = _dynamicVolume(child.querySelector(":scope > notations > dynamics"));
-            if (volume !== null) pendingVolumes.push(volume);
+            const noteVolume = _dynamicVolume(child.querySelector(":scope > notations > dynamics"));
 
             const duration = _noteDuration(child, divisions);
             const unpitchedEl = child.querySelector(":scope > unpitched");
@@ -1368,6 +1367,8 @@ function _processPart(
                 tieDuration !== null && hasTieStop && _contentsEqual(content, tieContent);
 
             if (tieDuration !== null && !continuesTie) flushTie();
+
+            if (noteVolume !== null) pendingVolumes.push(noteVolume);
 
             if (continuesTie) {
                 const combined = _addFractions(tieDuration, duration);

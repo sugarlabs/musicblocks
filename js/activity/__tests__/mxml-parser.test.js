@@ -878,8 +878,7 @@ describe("Test 12: Tempo", () => {
 describe("Test 13: Dynamic markings", () => {
     const dynamic = marking =>
         `<direction><direction-type><dynamics><${marking}/></dynamics></direction-type></direction>`;
-    const noteDynamic = marking =>
-        `<notations><dynamics><${marking}/></dynamics></notations>`;
+    const noteDynamic = marking => `<notations><dynamics><${marking}/></dynamics></notations>`;
 
     it("places each supported dynamic's synth-volume block before its following note", async () => {
         const { blocks } = await parseAndCapture(
@@ -1429,6 +1428,10 @@ describe("Test 16: Ties", () => {
     const tiedNote = (step, octave, tieAttrs) =>
         `<note><pitch><step>${step}</step><octave>${octave}</octave></pitch>` +
         `<duration>8</duration><type>quarter</type>${tieAttrs}</note>`;
+    const tiedNoteWithDynamic = (step, octave, tieAttrs, marking) =>
+        `<note><pitch><step>${step}</step><octave>${octave}</octave></pitch>` +
+        `<duration>8</duration><type>quarter</type>${tieAttrs}` +
+        `<notations><dynamics><${marking}/></dynamics></notations></note>`;
 
     it("merges two tied notes into one note block with their durations summed", async () => {
         const { blocks } = await parseAndCapture(
@@ -1490,6 +1493,43 @@ describe("Test 16: Ties", () => {
             { name: "D", octave: 4 }
         ]);
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("keeps a note-attached dynamic with an unrelated note after an open tie", async () => {
+        const noteWithDynamic =
+            "<note><pitch><step>D</step><octave>4</octave></pitch>" +
+            "<duration>8</duration><type>quarter</type>" +
+            "<notations><dynamics><f/></dynamics></notations></note>";
+        const { blocks } = await parseAndCapture(
+            scorePartwise(tiedNote("C", 4, '<tie type="start"/>') + noteWithDynamic)
+        );
+
+        const [, dNote] = blocks.filter(b => blockName(b) === "newnote");
+        const volumeBlock = blocks.find(block => blockName(block) === "setsynthvolume");
+        expect(synthVolumes(blocks)).toEqual([80]);
+        expect(volumeBlock[4][3]).toBe(dNote[0]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("does not leak a first-ending continuation's dynamic to a later note", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                tiedNote("C", 4, '<tie type="start"/>') +
+                    '<barline><ending number="1" type="start"/></barline>' +
+                    tiedNoteWithDynamic("C", 4, '<tie type="stop"/>', "f") +
+                    '<barline><ending number="1" type="stop"/></barline>' +
+                    SIMPLE_NOTE("D", 4, "quarter")
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([
+            [1, 2],
+            [1, 4]
+        ]);
+        expect(synthVolumes(blocks)).toEqual([]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
     });
 
     it("keeps a long tie chain finite when importing its combined duration", async () => {
