@@ -513,6 +513,19 @@ class Singer {
     static addScalarTransposition(logo, turtle, note, octave, steps) {
         if (steps === 0) return [note, octave];
 
+        // A step count is walked one scale degree at a time below, so a
+        // non-finite or absurdly large value (e.g. a computed 10^308 from
+        // the power block, which passes the finite checks in the step-pitch
+        // and scalar-transpose actions) would hang the main thread. getNote
+        // already clamps the resulting octave to 1..10, so anything past a
+        // few hundred steps cannot change the outcome; cap the walk there.
+        if (!Number.isFinite(steps)) return [note, octave];
+        const MAX_SCALAR_TRANSPOSITION_STEPS = 1000;
+        steps = Math.max(
+            -MAX_SCALAR_TRANSPOSITION_STEPS,
+            Math.min(MAX_SCALAR_TRANSPOSITION_STEPS, steps)
+        );
+
         const activity = logo.activity;
         const tur = activity.turtles.ithTurtle(turtle);
         const temperament = logo && logo.synth && logo.synth.inTemperament;
