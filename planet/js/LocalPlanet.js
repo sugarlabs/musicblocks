@@ -30,6 +30,7 @@ class LocalPlanet {
         this.Publisher = null;
         this.currentProjectImage = null;
         this.currentProjectID = null;
+        this.searchString = "";
     }
 
     updateProjects() {
@@ -37,6 +38,7 @@ class LocalPlanet {
         this.refreshProjectArray();
         this.initCards();
         this.renderAllProjects();
+        this.filterProjects(this.searchString);
     }
 
     setCurrentProjectImage(image) {
@@ -85,6 +87,38 @@ class LocalPlanet {
         }
 
         jQuery(".tooltipped").tooltip({ delay: 50 });
+    }
+
+    filterProjects(query) {
+        this.searchString = query.trim().toLowerCase();
+
+        let matchCount = 0;
+
+        for (let i = 0; i < this.projects.length; i++) {
+            const id = this.projects[i][0];
+
+            const projectName = String(this.ProjectTable[id]?.ProjectName || "").toLowerCase();
+
+            const input = document.getElementById(`local-project-input-${id}`);
+
+            if (!input) continue;
+
+            const card = input.closest(".col");
+
+            if (!card) continue;
+
+            const matches = projectName.includes(this.searchString);
+
+            card.style.display = matches ? "" : "none";
+
+            if (matches) matchCount++;
+        }
+
+        const emptyState = document.getElementById("local-search-empty");
+
+        if (emptyState) {
+            emptyState.hidden = this.searchString === "" || matchCount > 0;
+        }
     }
 
     initDeleteModal() {
@@ -139,6 +173,14 @@ class LocalPlanet {
         this.initDeleteModal();
         this.Publisher = new Publisher(Planet);
         this.Publisher.init();
+
+        const localSearch = document.getElementById("local-search");
+
+        if (localSearch) {
+            localSearch.addEventListener("input", evt => {
+                this.filterProjects(evt.target.value);
+            });
+        }
     }
 }
 
