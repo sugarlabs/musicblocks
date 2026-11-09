@@ -321,6 +321,38 @@ describe("FlowBlocks integration", () => {
         }
     });
 
+    test("DuplicateBlock shows a clear message for values below 1", () => {
+        const block = getBlock("duplicatenotes");
+        const blk = 0;
+        activity.blocks.blockList = {
+            0: { name: "duplicatenotes", connections: [null, 1, null, 2] },
+            1: { name: "visibleA", connections: [0, 2] },
+            2: { name: "hidden", connections: [1, null] }
+        };
+        activity.blocks.findBottomBlock = jest.fn(() => 1);
+
+        for (const tooSmall of [0, -1, 0.5]) {
+            activity.errorMsg.mockClear();
+            logo.connectionStore = { 0: { [blk]: [] } };
+            logo.connectionStoreLock = false;
+            const turtle = activity.turtles.ithTurtle(0);
+            turtle.singer.duplicateFactor = 1;
+            turtle.queue = [];
+
+            block.flow([tooSmall, 1], logo, 0, blk, ["arg"]);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Duplicate value must be at least 1.",
+                blk
+            );
+            expect(activity.errorMsg).not.toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
+            expect(turtle.singer.duplicateFactor).toBe(2);
+
+            const listener = logo.setTurtleListener.mock.calls.pop()[2];
+            listener();
+            expect(turtle.singer.duplicateFactor).toBe(1);
+        }
+    });
+
     test("DuplicateBlock releases lock even when critical section throws", () => {
         const block = getBlock("duplicatenotes");
         const blk = 0;
