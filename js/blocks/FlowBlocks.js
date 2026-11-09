@@ -158,9 +158,12 @@ function setupFlowBlocks(activity) {
             if (args[1] === undefined) return;
 
             let arg0;
-            if (!Number.isFinite(args[0]) || args[0] < 1) {
-                // Handle invalid input for the number of duplicates
+            if (!Number.isFinite(args[0])) {
+                // Handle missing or non-numeric input for the number of duplicates
                 activity.errorMsg(NOINPUTERRORMSG, blk);
+                arg0 = 2;
+            } else if (args[0] < 1) {
+                activity.errorMsg(_("Duplicate value must be at least 1."), blk);
                 arg0 = 2;
             } else {
                 arg0 = args[0];

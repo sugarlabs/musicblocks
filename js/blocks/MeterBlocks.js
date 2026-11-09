@@ -1417,8 +1417,12 @@ function setupMeterBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             const arg0 = args[0];
-            if (args.length !== 1 || typeof args[0] !== "number" || arg0 < 0) {
+            if (args.length !== 1 || typeof args[0] !== "number") {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
+                return;
+            }
+            if (arg0 < 0) {
+                activity.errorMsg(_("Pickup value cannot be negative."), blk);
                 return;
             }
 
