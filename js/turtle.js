@@ -631,7 +631,10 @@ Turtle.TurtleModel = class {
         // eslint-disable-next-line eqeqeq
         if (startBlock != null) {
             startBlock.overrideName = this._name;
-            startBlock.collapseText.text = this._name;
+            // eslint-disable-next-line eqeqeq
+            if (startBlock.collapseText != null) {
+                startBlock.collapseText.text = this._name;
+            }
             startBlock.regenerateArtwork(false);
             startBlock.value = this._turtles.getIndexOfTurtle(this);
         }
