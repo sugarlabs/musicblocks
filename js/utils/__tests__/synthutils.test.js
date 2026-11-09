@@ -1922,7 +1922,7 @@ describe("Utility Functions (logic-only)", () => {
                 close: jest.fn(),
                 dispose: jest.fn()
             };
-            Synth.recorder = mockRecorder;
+            Synth.micRecorder = mockRecorder;
             Synth.mic = mockMic;
 
             const result = await Synth.stopRecording();
@@ -1933,7 +1933,7 @@ describe("Utility Functions (logic-only)", () => {
             expect(mockMic.dispose).toHaveBeenCalled();
             expect(Synth.mic).toBeNull();
             expect(mockRecorder.dispose).toHaveBeenCalled();
-            expect(Synth.recorder).toBeNull();
+            expect(Synth.micRecorder).toBeNull();
             expect(global.URL.createObjectURL).toHaveBeenCalledWith("recording-blob");
             expect(result).toBe("blob:recording-url");
         });
@@ -1974,7 +1974,7 @@ describe("Utility Functions (logic-only)", () => {
             const oldMic = { close: jest.fn(), dispose: jest.fn() };
             const oldRecorder = { dispose: jest.fn() };
             Synth.mic = oldMic;
-            Synth.recorder = oldRecorder;
+            Synth.micRecorder = oldRecorder;
 
             await Synth.startRecording();
 
@@ -1982,23 +1982,44 @@ describe("Utility Functions (logic-only)", () => {
             expect(oldMic.dispose).toHaveBeenCalled();
             expect(oldRecorder.dispose).toHaveBeenCalled();
             expect(Synth.mic).not.toBe(oldMic);
-            expect(Synth.recorder).not.toBe(oldRecorder);
+            expect(Synth.micRecorder).not.toBe(oldRecorder);
         });
 
-        it("does not throw when a native MediaRecorder (no dispose) is set as previous recorder", async () => {
-            const oldMic = { close: jest.fn(), dispose: jest.fn() };
-            const nativeRecorder = { stop: jest.fn(), state: "inactive" };
-            Synth.mic = oldMic;
-            Synth.recorder = nativeRecorder;
+        it("leaves the save as wav recorder alone when the sampler starts recording", async () => {
+            const wavRecorder = { stop: jest.fn(), state: "recording" };
+            Synth.recorder = wavRecorder;
+            Synth.mic = null;
+            Synth.micRecorder = null;
 
-            await expect(Synth.startRecording()).resolves.not.toThrow();
-            expect(Synth.mic).not.toBe(oldMic);
-            expect(Synth.recorder).not.toBe(nativeRecorder);
+            await Synth.startRecording();
+
+            expect(Synth.recorder).toBe(wavRecorder);
+            expect(wavRecorder.stop).not.toHaveBeenCalled();
+            expect(Synth.micRecorder).toBeInstanceOf(Tone.Recorder);
+            Synth.recorder = null;
+        });
+
+        it("doesn't stop the save as wav recorder when the sampler stops recording", async () => {
+            const wavRecorder = { stop: jest.fn(), state: "recording" };
+            Synth.recorder = wavRecorder;
+            Synth.mic = { close: jest.fn(), dispose: jest.fn() };
+            Synth.micRecorder = {
+                stop: jest.fn().mockResolvedValue("recording-blob"),
+                dispose: jest.fn()
+            };
+
+            const result = await Synth.stopRecording();
+
+            expect(wavRecorder.stop).not.toHaveBeenCalled();
+            expect(Synth.recorder).toBe(wavRecorder);
+            expect(global.URL.createObjectURL).toHaveBeenCalledWith("recording-blob");
+            expect(result).toBe("blob:recording-url");
+            Synth.recorder = null;
         });
 
         it("returns null when stopRecording is called without an active recorder", async () => {
             Synth.mic = null;
-            Synth.recorder = null;
+            Synth.micRecorder = null;
 
             const result = await Synth.stopRecording();
             expect(result).toBeNull();
@@ -2006,7 +2027,7 @@ describe("Utility Functions (logic-only)", () => {
 
         it("does not throw when startRecording is called with no previous mic/recorder", async () => {
             Synth.mic = null;
-            Synth.recorder = null;
+            Synth.micRecorder = null;
 
             await expect(Synth.startRecording()).resolves.not.toThrow();
         });
@@ -4455,7 +4476,7 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             global.URL.revokeObjectURL = jest.fn();
 
             await synth.startRecording();
-            expect(synth.recorder).not.toBeNull();
+            expect(synth.micRecorder).not.toBeNull();
             expect(synth.mic).not.toBeNull();
 
             const url = await synth.stopRecording();
