@@ -743,6 +743,31 @@ describe("Activity Toolbar Integration", () => {
             expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith([{ name: "pitch" }]);
             expect(activity.pasteBox.hide).toHaveBeenCalled();
         });
+
+        test.each(['{"a":1}', "42", '"text"', "null"])(
+            "pasted rejects %s, which is not a list of blocks, with a message",
+            raw => {
+                activity.palettes = { dict: {} };
+                activity.blocks = {
+                    loadNewBlocks: jest.fn(() => {
+                        throw new TypeError("loadNewBlocks expects a list of blocks.");
+                    })
+                };
+                activity.pasteBox = { hide: jest.fn() };
+                activity.refreshCanvas = jest.fn();
+                activity.errorMsg = jest.fn();
+                document.getElementById = jest.fn(id => (id === "paste" ? { value: raw } : null));
+
+                expect(() => activity.pasted()).not.toThrow();
+
+                expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+                expect(activity.errorMsg).toHaveBeenCalledWith(
+                    expect.stringContaining("Invalid clipboard data")
+                );
+                expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+                expect(activity.pasteBox.hide).not.toHaveBeenCalled();
+            }
+        );
     });
 
     describe("Window resize and viewport handling", () => {
