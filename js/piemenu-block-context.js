@@ -12,7 +12,7 @@
 /*
    global
 
-   platformColor, docById, slicePath, wheelnav, HelpWidget, _
+   platformColor, docById, slicePath, wheelnav, HelpWidget, _, _THIS_IS_MUSIC_BLOCKS_
 */
 
 /* exported piemenuBlockContext */
@@ -90,6 +90,26 @@ const piemenuBlockContext = block => {
         labels.push("imgsrc:header-icons/save-blocks-button.svg");
     }
 
+    // Mute and Solo the mouse of a Start block.
+    const mouse =
+        typeof _THIS_IS_MUSIC_BLOCKS_ !== "undefined" &&
+        _THIS_IS_MUSIC_BLOCKS_ &&
+        ["start", "drum"].includes(block.name) &&
+        block.value !== null &&
+        block.value !== undefined
+            ? block.activity.turtles.getTurtle(block.value)
+            : null;
+    let muteButton = null;
+    let soloButton = null;
+    if (mouse) {
+        labels.push(
+            mouse.muted ? "imgsrc:header-icons/volume-up.svg" : "imgsrc:header-icons/volume-off.svg"
+        );
+        muteButton = labels.length - 1;
+        labels.push("imgsrc:header-icons/headphones.svg");
+        soloButton = labels.length - 1;
+    }
+
     const message = block.blocks.blockList[block.blocks.activeBlock].protoblock.helpString;
 
     let helpButton;
@@ -124,6 +144,21 @@ const piemenuBlockContext = block => {
 
     if (helpButton !== null) {
         wheel.navItems[helpButton].setTooltip(_("Help"));
+    }
+
+    if (mouse) {
+        //.TRANS: play this mouse silently, or hear it again
+        wheel.navItems[muteButton].setTooltip(mouse.muted ? _("Unmute") : _("Mute"));
+        //.TRANS: hear only this mouse (again: hear all the mice)
+        wheel.navItems[soloButton].setTooltip(_("Solo"));
+        wheel.navItems[muteButton].navigateFunction = () => {
+            block.activity.turtles.setMuted(mouse, !mouse.muted);
+            docById("contextWheelDiv").style.display = "none";
+        };
+        wheel.navItems[soloButton].navigateFunction = () => {
+            block.activity.turtles.toggleSolo(mouse);
+            docById("contextWheelDiv").style.display = "none";
+        };
     }
 
     wheel.navItems[0].selected = false;

@@ -125,6 +125,18 @@ describe("EmbeddedGraphicsScheduler", () => {
         expect(turtle0.embeddedGraphicsPending).toBe(0);
     });
 
+    test("a muted mouse does not speak inside a note", () => {
+        mockLogo.blockList = [null, { name: "speak", connections: [null, 7] }];
+
+        turtle0.muted = true;
+        scheduler._speak(false, 0, 1, 0);
+        expect(mockLogo.processSpeak).not.toHaveBeenCalled();
+
+        turtle0.muted = false;
+        scheduler._speak(false, 0, 1, 0);
+        expect(mockLogo.processSpeak).toHaveBeenCalledWith(9);
+    });
+
     test("set translucency in a note passes the block value, not an alpha, to the painter", async () => {
         mockLogo.parseArg = jest.fn(() => 50);
         mockLogo.blockList = [null, { name: "settranslucency", connections: [null, 7] }];
