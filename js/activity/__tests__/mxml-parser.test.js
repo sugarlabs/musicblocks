@@ -878,6 +878,8 @@ describe("Test 12: Tempo", () => {
 describe("Test 13: Dynamic markings", () => {
     const dynamic = marking =>
         `<direction><direction-type><dynamics><${marking}/></dynamics></direction-type></direction>`;
+    const noteDynamic = marking =>
+        `<notations><dynamics><${marking}/></dynamics></notations>`;
 
     it("places each supported dynamic's synth-volume block before its following note", async () => {
         const { blocks } = await parseAndCapture(
@@ -894,6 +896,22 @@ describe("Test 13: Dynamic markings", () => {
         const byIndex = new Map(blocks.map(block => [block[0], block]));
         expect(blockName(byIndex.get(volumeBlocks[0][4][3]))).toBe("newnote");
         expect(blockName(byIndex.get(volumeBlocks[1][4][3]))).toBe("newnote");
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("places a note-attached dynamic's synth-volume block before that note", async () => {
+        const noteWithDynamic =
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            "<duration>1</duration><type>quarter</type>" +
+            noteDynamic("f") +
+            "</note>";
+        const { blocks } = await parseAndCapture(scorePartwise(noteWithDynamic));
+
+        expect(synthVolumes(blocks)).toEqual([80]);
+        const volumeBlock = blocks.find(block => blockName(block) === "setsynthvolume");
+        const byIndex = new Map(blocks.map(block => [block[0], block]));
+        expect(blockName(byIndex.get(volumeBlock[4][3]))).toBe("newnote");
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
         expect(findPositionMismatches(blocks)).toEqual([]);
     });
