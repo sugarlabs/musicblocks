@@ -68,6 +68,7 @@ class PitchSlider {
                     PitchSlider.DEFAULT_FREQUENCY
                 );
                 this.frequencies = [f];
+                this.frequency = null;
             } else {
                 this.frequencies = [PitchSlider.DEFAULT_FREQUENCY];
             }
@@ -115,6 +116,7 @@ class PitchSlider {
                 osc.dispose();
             }
             this.isActive = false;
+            this.frequency = null;
             activity.logo.pitchSlider = null;
             announceToScreenReader(_("Pitch Slider closed"));
             this.widgetWindow.destroy();

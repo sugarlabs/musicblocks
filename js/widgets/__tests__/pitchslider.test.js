@@ -255,11 +255,12 @@ describe("PitchSlider Widget", () => {
             expect(slider.frequencies).toEqual([440, 880]);
         });
 
-        test("uses this.frequency when frequencies array is empty", () => {
+        test("uses this.frequency when frequencies array is empty and clears it", () => {
             slider.frequency = 440;
             slider.frequencies = [];
             slider.init(activityMock);
             expect(slider.frequencies).toEqual([440]);
+            expect(slider.frequency).toBeNull();
         });
 
         test("normalizes string frequencies to numeric values", () => {
@@ -430,6 +431,12 @@ describe("PitchSlider Widget", () => {
         test("clears activity.logo.pitchSlider reference", () => {
             slider.widgetWindow.onclose();
             expect(activityMock.logo.pitchSlider).toBeNull();
+        });
+
+        test("clears frequency property", () => {
+            slider.frequency = 440;
+            slider.widgetWindow.onclose();
+            expect(slider.frequency).toBeNull();
         });
 
         test("destroys widget window", () => {
