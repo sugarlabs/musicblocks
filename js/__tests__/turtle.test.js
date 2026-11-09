@@ -801,6 +801,37 @@ describe("Turtle.TurtleModel", () => {
             expect(startBlock.overrideName).toBe("");
             expect(startBlock.collapseText.text).toBe("");
         });
+
+        it("renames without throwing when start block has not been collapsed (collapseText is null)", () => {
+            const startBlock = {
+                overrideName: "",
+                collapseText: null,
+                value: null,
+                regenerateArtwork: jest.fn()
+            };
+            const model = new Turtle.TurtleModel(activity, 0, "old", turtles, startBlock);
+
+            expect(() => model.rename("Mr. Mouse")).not.toThrow();
+            expect(model._name).toBe("Mr. Mouse");
+            expect(startBlock.overrideName).toBe("Mr. Mouse");
+            expect(startBlock.collapseText).toBeNull();
+            expect(startBlock.regenerateArtwork).toHaveBeenCalledWith(false);
+            expect(startBlock.value).toBe(4);
+        });
+
+        it("renames without throwing when start block collapseText is undefined", () => {
+            const startBlock = {
+                overrideName: "",
+                value: null,
+                regenerateArtwork: jest.fn()
+            };
+            const model = new Turtle.TurtleModel(activity, 0, "old", turtles, startBlock);
+
+            expect(() => model.rename("Mr. Mouse")).not.toThrow();
+            expect(model._name).toBe("Mr. Mouse");
+            expect(startBlock.overrideName).toBe("Mr. Mouse");
+            expect(startBlock.collapseText).toBeUndefined();
+        });
     });
 });
 
