@@ -800,6 +800,17 @@ describe("saveLilypondOutput", () => {
         expect(result).toContain("sn4 r4 sn4 sn4");
     });
 
+    test("should write the drums of one note as a chord in drummode", () => {
+        activity.logo.notation.notationDrumStaging = {
+            0: [
+                [["bd", "sn"], 4, 0, null, 0, -1, false],
+                [["bd"], 4, 0, null, 0, -1, false]
+            ]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain("<bd sn>4 bd4");
+    });
+
     test("should keep drum voices out of the guitar tablature", () => {
         activity.logo.notation.notationDrumStaging = {
             0: [[["sn"], 4, 0, null, 0, -1, false]]

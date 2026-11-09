@@ -431,6 +431,27 @@ class Singer {
     }
 
     /**
+     * Drops the notes a stopped turtle had started but not yet played.
+     *
+     * @returns {void}
+     */
+    dropPendingNotes() {
+        this.oscList = {};
+        this.noteBeat = {};
+        this.noteValue = {};
+        this.noteDrums = {};
+        this.notePitches = {};
+        this.noteOctaves = {};
+        this.noteCents = {};
+        this.noteHertz = {};
+        this.noteBeatValues = {};
+        this.embeddedGraphics = {};
+        this.delayedNotes = [];
+        this.inNoteBlock = [];
+        this.multipleVoices = false;
+    }
+
+    /**
      * Kills all active audio voices for this turtle.
      * Called during stop/halt to prevent "zombie audio" that continues playing.
      * Uses try/catch to handle nodes that may have already stopped.
@@ -1128,13 +1149,14 @@ class Singer {
             tur.singer.neighborArgNote1.push(noteObj[0] + noteObj[1]);
 
             let noteObj2;
+            const neighborStep = last(tur.singer.neighborStepPitch);
             if (activity.blocks.blockList[last(tur.singer.inNeighbor)].name === "neighbor2") {
                 noteObj2 = Singer.addScalarTransposition(
                     activity.logo,
                     turtle,
                     note,
                     octave,
-                    parseInt(tur.singer.neighborStepPitch, 10)
+                    parseInt(neighborStep, 10)
                 );
                 if (tur.singer.transposition !== 0) {
                     noteObj2 = getNote(
@@ -1152,7 +1174,7 @@ class Singer {
                 noteObj2 = getNote(
                     note,
                     octave,
-                    tur.singer.transposition + parseInt(tur.singer.neighborStepPitch, 10),
+                    tur.singer.transposition + parseInt(neighborStep, 10),
                     tur.singer.keySignature,
                     tur.singer.movable,
                     null,
@@ -1841,9 +1863,11 @@ class Singer {
                 neighborArgNote2.push(tur.singer.neighborArgNote2.pop());
             }
 
-            neighborArgBeat = bpmFactor / last(tur.singer.neighborArgBeat);
-            neighborArgCurrentBeat = bpmFactor / last(tur.singer.neighborArgCurrentBeat);
-            doNeighbor = true;
+            if (last(tur.singer.neighborArgCurrentBeat) !== null) {
+                neighborArgBeat = bpmFactor / last(tur.singer.neighborArgBeat);
+                neighborArgCurrentBeat = bpmFactor / last(tur.singer.neighborArgCurrentBeat);
+                doNeighbor = true;
+            }
         }
 
         let carry = 0;
@@ -2548,8 +2572,10 @@ class Singer {
                                         chordNotes.push(notationNote);
                                     }
 
-                                    if (!chordDrums.includes(tur.singer.noteDrums[thisBlk][0])) {
-                                        chordDrums.push(tur.singer.noteDrums[thisBlk][0]);
+                                    for (const drum of tur.singer.noteDrums[thisBlk]) {
+                                        if (!chordDrums.includes(drum)) {
+                                            chordDrums.push(drum);
+                                        }
                                     }
                                 } else {
                                     // A frequency (cents or hertz) has no accidental to restate.

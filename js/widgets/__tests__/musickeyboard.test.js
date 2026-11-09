@@ -2155,10 +2155,7 @@ describe("MusicKeyboard core logic", () => {
         });
 
         test("rounds to the nearest eighth in beginner mode", () => {
-            const savedBeginnerMode = global.localStorage.beginnerMode;
-            global.localStorage.beginnerMode = "true";
-            const keyboard = new MusicKeyboard({});
-            global.localStorage.beginnerMode = savedBeginnerMode;
+            const keyboard = new MusicKeyboard({ beginnerMode: true });
 
             expect(keyboard._roundNoteDuration(0.2)).toBeCloseTo(0.25);
         });
@@ -2677,8 +2674,7 @@ describe("MusicKeyboard note duration rounding and key handlers", () => {
     });
 
     test("rounds raw note durations to 1/8th grid in beginner mode", () => {
-        localStorage.beginnerMode = "true";
-        const keyboard = new MusicKeyboard({});
+        const keyboard = new MusicKeyboard({ beginnerMode: true });
 
         // 0.26s -> 0.25s (nearest 1/8th)
         expect(keyboard._roundNoteDuration(0.26)).toBe(0.25);
@@ -2686,6 +2682,17 @@ describe("MusicKeyboard note duration rounding and key handlers", () => {
         expect(keyboard._roundNoteDuration(0.19)).toBe(0.25);
         // 0s falls back to 0.125s minimum
         expect(keyboard._roundNoteDuration(0)).toBe(0.125);
+    });
+
+    test("uses the activity's mode, not the stored value, which is unset for a new user", () => {
+        delete localStorage.beginnerMode;
+        const newUser = new MusicKeyboard({ beginnerMode: true });
+        expect(newUser._roundNoteDuration(0.19)).toBe(0.25);
+
+        // The activity decides, even when the stored value says otherwise.
+        localStorage.beginnerMode = "true";
+        const advanced = new MusicKeyboard({ beginnerMode: false });
+        expect(advanced._roundNoteDuration(0.19)).toBe(0.1875);
     });
 
     test("tracks keyboard ownership of the document key handlers", () => {

@@ -423,7 +423,11 @@ class SaveInterface {
         // Suppress music and turtle output when generating
         activity.logo.runningMIDI = true;
         activity.logo.runLogoCommands();
-        document.body.style.cursor = "wait";
+        if (activity.logo.runningMIDI) {
+            document.body.style.cursor = "wait";
+        } else {
+            document.body.style.cursor = "default";
+        }
     }
 
     /**
@@ -521,6 +525,19 @@ class SaveInterface {
                 writeTempoAndMeter(midi.header, firstTrack);
             }
 
+            // A MIDI channel plays one instrument at a time, whichever track set it last, so
+            // each instrument in the file gets its own channel. Channel 9 is for drums; past
+            // 15 instruments the other channels are shared.
+            const melodicChannels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15];
+            const programChannels = new Map();
+            const channelFor = program => {
+                if (!programChannels.has(program)) {
+                    const next = programChannels.size % melodicChannels.length;
+                    programChannels.set(program, melodicChannels[next]);
+                }
+                return programChannels.get(program);
+            };
+
             Object.entries(data).forEach(([blockIndex, notes]) => {
                 const mainTrack = midi.addTrack();
                 mainTrack.name = `Track ${parseInt(blockIndex, 10) + 1}`;
@@ -535,17 +552,19 @@ class SaveInterface {
                     if (duration === null) return;
                     const instrument = noteData.instrument || "default";
 
-                    if (noteData.drum) {
-                        const drum = noteData.drum || false;
+                    const drums = Array.isArray(noteData.drum)
+                        ? noteData.drum
+                        : noteData.drum
+                          ? [noteData.drum]
+                          : [];
+                    for (const drum of drums) {
                         if (!drumTracks.has(drum)) {
                             const drumTrack = midi.addTrack();
                             drumTrack.name = `Track ${parseInt(blockIndex, 10) + 1} - ${drum}`;
                             drumTrack.channel = 9; // Drums must be on Channel 10
                             drumTracks.set(drum, drumTrack);
                         }
-
                         const drumTrack = drumTracks.get(drum);
-
                         const midiNumber =
                             Object.prototype.hasOwnProperty.call(drumMIDI, drum) && drumMIDI[drum]
                                 ? drumMIDI[drum]
@@ -558,9 +577,9 @@ class SaveInterface {
                         });
                     }
 
-                    // A note can play pitches together with a drum: write those as well.
+                    // A note can play pitches together with drums: write those as well.
                     const pitches = noteData.note.filter(pitch => !pitch.includes("R"));
-                    if (!noteData.drum || pitches.length > 0) {
+                    if (drums.length === 0 || pitches.length > 0) {
                         if (!instrumentTracks.has(instrument)) {
                             const instrumentTrack = midi.addTrack();
                             instrumentTrack.name = `Track ${
@@ -570,6 +589,7 @@ class SaveInterface {
                                 Object.prototype.hasOwnProperty.call(instrumentMIDI, instrument)
                                     ? instrumentMIDI[instrument]
                                     : instrumentMIDI["default"];
+                            instrumentTrack.channel = channelFor(instrumentTrack.instrument.number);
                             instrumentTracks.set(instrument, instrumentTrack);
                         }
 
@@ -587,6 +607,12 @@ class SaveInterface {
                     globalTime += duration;
                 });
                 globalTime = 0;
+
+                // The empty track still writes a program change: give it the one its first
+                // instrument part writes, or the drum channel's, so it changes no instrument.
+                const firstPart = instrumentTracks.values().next().value;
+                mainTrack.channel = firstPart ? firstPart.channel : 9;
+                mainTrack.instrument.number = firstPart ? firstPart.instrument.number : 0;
             });
 
             // Generate the MIDI file and trigger download.

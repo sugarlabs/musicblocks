@@ -466,12 +466,7 @@ class RhythmRulerCircular {
         this._rulerSelected = down.rulerIndex;
         const ruler = this._rulers[down.rulerIndex];
         if (ruler && ruler.cells[down.cellIndex]) {
-            let inputNum = this._dissectNumber.value;
-            if (inputNum === "" || isNaN(inputNum)) {
-                inputNum = 2;
-            } else {
-                inputNum = Math.abs(Math.floor(inputNum));
-            }
+            const inputNum = this._getDissectNumber();
             this.__dissectByNumber(ruler.cells[down.cellIndex], inputNum, true);
             this.saveDissectHistory();
             this._drawCircularView();

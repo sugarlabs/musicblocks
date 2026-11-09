@@ -6,10 +6,20 @@ describe("JavaScript editor and block search", () => {
         // touch global singletons (window.jsEditor, activity.searchWidget)
         // that persist across interactions, so tests are isolated the same
         // way cypress/e2e/maker-widgets.cy.js resets between widget tests.
-        cy.visit("http://127.0.0.1:3000");
-        cy.clearLocalStorage();
-        cy.visit("http://127.0.0.1:3000");
+        cy.visit("http://127.0.0.1:3000", {
+            onBeforeLoad(win) {
+                win.localStorage.clear();
+            }
+        });
         cy.waitForAppReady();
+
+        // Native key events activate the page, which can make Chrome open the
+        // SaveInterface leave-page prompt on the next visit or at spec teardown.
+        // This spec checks search and editing, so remove that jQuery warning
+        // from its test pages. The native autosave listener still runs.
+        cy.window().then(win => {
+            win.jQuery(win).off("beforeunload");
+        });
 
         // Dismiss the first-run "Take a Tour" guide, which is itself a
         // widget window (js/widgets/widgetWindows.js) and would otherwise
