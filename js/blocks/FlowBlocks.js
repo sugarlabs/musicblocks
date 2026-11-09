@@ -699,18 +699,21 @@ function setupFlowBlocks(activity) {
                 queue.push(queueBlock);
                 tur.doWait(0.05);
             } else {
-                // Since a wait-for block was requeued each
-                // time, we need to flush the queue of all but
-                // the last one, otherwise the child of the
-                // while block is executed multiple times.
-                const queueLength = queue.length;
-                let kept_one = false;
-                for (let i = queueLength - 1; i > 0; i--) {
+                // Keep only the most recent wait-for requeue; remove older
+                // duplicates. Stop at the innermost action boundary — entries
+                // below it belong to a nested action call and must not be
+                // touched (the return block restores the queue to that index).
+                const boundary =
+                    tur.actionBoundaries && tur.actionBoundaries.length > 0
+                        ? tur.actionBoundaries[tur.actionBoundaries.length - 1]
+                        : 0;
+                let keptOne = false;
+                for (let i = queue.length - 1; i >= boundary; i--) {
                     if (queue[i].parentBlk === blk) {
-                        if (kept_one) {
-                            queue.pop();
+                        if (keptOne) {
+                            queue.splice(i, 1);
                         } else {
-                            kept_one = true;
+                            keptOne = true;
                         }
                     }
                 }
@@ -1226,7 +1229,15 @@ function setupFlowBlocks(activity) {
          */
         arg(logo, turtle, blk) {
             const blockList = activity.blocks.blockList;
-            if (logo.inStatusMatrix && blockList[blockList[blk].connections[0]].name === "print") {
+            const connections = blockList[blk]?.connections;
+            const parentId = connections?.[0];
+            if (
+                logo.inStatusMatrix &&
+                parentId !== null &&
+                parentId !== undefined &&
+                parentId in blockList &&
+                blockList[parentId]?.name === "print"
+            ) {
                 logo.statusFields.push([blk, "duplicate"]);
             } else {
                 return (blockList[blk].value =

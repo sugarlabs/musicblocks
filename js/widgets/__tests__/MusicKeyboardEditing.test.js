@@ -53,7 +53,7 @@ const makeKeyboard = (deps = {}) => {
     const keyboard = { _createTable: jest.fn() };
     MusicKeyboardEditing.install.call(keyboard, {
         FAKEBLOCKNUMBER: 100000,
-        beginnerMode: "false",
+        beginnerMode: false,
         resolveSynthNoteName: jest.fn(),
         fillChromaticGaps: jest.fn(list => list),
         ...deps
@@ -120,7 +120,7 @@ describe("MusicKeyboardEditing", () => {
         const quarterNote = () => [{ startTime: 0, duration: 0.25, noteOctave: 4 }];
 
         test("beginnerMode keeps notes from being split below an eighth", () => {
-            const keyboard = makeKeyboard({ beginnerMode: "true" });
+            const keyboard = makeKeyboard({ beginnerMode: true });
             keyboard._notesPlayed = quarterNote();
 
             keyboard._divideNotes("0", 4);
@@ -130,7 +130,7 @@ describe("MusicKeyboardEditing", () => {
         });
 
         test("advanced mode splits the note evenly", () => {
-            const keyboard = makeKeyboard({ beginnerMode: "false" });
+            const keyboard = makeKeyboard({ beginnerMode: false });
             keyboard._notesPlayed = quarterNote();
 
             keyboard._divideNotes("0", 4);
@@ -144,8 +144,8 @@ describe("MusicKeyboardEditing", () => {
         });
 
         test("each keyboard keeps the beginnerMode it was made with", () => {
-            const beginner = makeKeyboard({ beginnerMode: "true" });
-            const advanced = makeKeyboard({ beginnerMode: "false" });
+            const beginner = makeKeyboard({ beginnerMode: true });
+            const advanced = makeKeyboard({ beginnerMode: false });
             beginner._notesPlayed = quarterNote();
             advanced._notesPlayed = quarterNote();
 

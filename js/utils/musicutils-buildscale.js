@@ -324,7 +324,9 @@ var buildScale = (keySignature, edo) => {
         }
         // Final check -- we may need to use double sharps or double flats.
         if (myKeySignature.length === 2 && myKeySignature[1] === SHARP) {
-            for (let i = scale.length - 1; i > 0; i--) {
+            // Stop at index 2 so the tonic (index 0) keeps the key's own name:
+            // C♯ fibonacci used to come back starting on B𝄪.
+            for (let i = scale.length - 1; i > 1; i--) {
                 if (scale[i][0] === scale[i - 1][0]) {
                     if (scale[i - 1] in CONVERT_DOWN) {
                         scale[i - 1] = CONVERT_DOWN[scale[i - 1]];
