@@ -27,6 +27,9 @@ class PitchSlider {
     static dependencies = ["widgets/pitchslider"];
 
     static ICONSIZE = 32;
+    static MIN_FREQUENCY = 27.5;
+    static MAX_FREQUENCY = 16744.04;
+    static DEFAULT_FREQUENCY = 392;
     /**
      * @constructor
      */
@@ -58,18 +61,25 @@ class PitchSlider {
         this.activeSlider = null;
         if (!this.frequencies || !this.frequencies.length) {
             if (typeof this.frequency !== "undefined" && this.frequency !== null) {
-                const f = parseFloat(this.frequency);
-                this.frequencies = !isNaN(f) && f > 0 ? [f] : [392];
+                const f = clampNumber(
+                    parseFloat(this.frequency),
+                    PitchSlider.MIN_FREQUENCY,
+                    PitchSlider.MAX_FREQUENCY,
+                    PitchSlider.DEFAULT_FREQUENCY
+                );
+                this.frequencies = [f];
             } else {
-                this.frequencies = [392];
+                this.frequencies = [PitchSlider.DEFAULT_FREQUENCY];
             }
         } else {
-            this.frequencies = this.frequencies
-                .map(f => parseFloat(f))
-                .filter(f => !isNaN(f) && f > 0);
-            if (!this.frequencies.length) {
-                this.frequencies = [392];
-            }
+            this.frequencies = this.frequencies.map(f =>
+                clampNumber(
+                    parseFloat(f),
+                    PitchSlider.MIN_FREQUENCY,
+                    PitchSlider.MAX_FREQUENCY,
+                    PitchSlider.DEFAULT_FREQUENCY
+                )
+            );
         }
         this.initialFrequencies = [...this.frequencies];
 
@@ -295,7 +305,7 @@ class PitchSlider {
                 const initialFreq =
                     this.initialFrequencies && this.initialFrequencies[id] !== undefined
                         ? this.initialFrequencies[id]
-                        : 392;
+                        : PitchSlider.DEFAULT_FREQUENCY;
                 slider.value = initialFreq;
                 changeFreq();
                 oscillators[id].triggerAttackRelease(this.frequencies[id], "4n");

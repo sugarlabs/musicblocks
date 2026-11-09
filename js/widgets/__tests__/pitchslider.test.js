@@ -141,6 +141,12 @@ describe("PitchSlider Widget", () => {
         test("ICONSIZE is 32", () => {
             expect(PitchSlider.ICONSIZE).toBe(32);
         });
+
+        test("defines MIN_FREQUENCY, MAX_FREQUENCY, and DEFAULT_FREQUENCY", () => {
+            expect(PitchSlider.MIN_FREQUENCY).toBe(27.5);
+            expect(PitchSlider.MAX_FREQUENCY).toBe(16744.04);
+            expect(PitchSlider.DEFAULT_FREQUENCY).toBe(392);
+        });
     });
 
     describe("Constructor", () => {
@@ -261,16 +267,22 @@ describe("PitchSlider Widget", () => {
             expect(slider.frequencies).toEqual([440, 880]);
         });
 
-        test("filters out non-positive and NaN frequencies", () => {
-            slider.frequencies = [0, -100, NaN, null, 500];
+        test("clamps out-of-range frequencies and uses fallback for NaN", () => {
+            slider.frequencies = [0, -100, 500, 20000, NaN, "invalid"];
             slider.init(activityMock);
-            expect(slider.frequencies).toEqual([500]);
+            expect(slider.frequencies).toEqual([27.5, 27.5, 500, 16744.04, 392, 392]);
         });
 
-        test("falls back to [392] when all frequencies are invalid", () => {
-            slider.frequencies = [0, -50, "invalid"];
+        test("clamps this.frequency with clampNumber when frequencies array is empty", () => {
+            slider.frequency = 10;
+            slider.frequencies = [];
             slider.init(activityMock);
-            expect(slider.frequencies).toEqual([392]);
+            expect(slider.frequencies).toEqual([27.5]);
+
+            slider.frequency = 25000;
+            slider.frequencies = [];
+            slider.init(activityMock);
+            expect(slider.frequencies).toEqual([16744.04]);
         });
 
         test("handles missing window.widgetWindows or openWindows safely", () => {
