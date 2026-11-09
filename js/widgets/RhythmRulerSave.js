@@ -18,12 +18,12 @@
 /*
    global
 
-   _, rationalToFraction, DRUMNAMES, VOICENAMES, EFFECTSNAMES
+   _, rationalToFraction, GCD, DRUMNAMES, VOICENAMES, EFFECTSNAMES
 */
 /*
     Globals location
     - js/utils/utils.js
-        _, rationalToFraction
+        _, rationalToFraction, GCD
     - js/utils/synthutils.js
         DRUMNAMES, VOICENAMES, EFFECTSNAMES
 */
@@ -684,32 +684,37 @@ class RhythmRulerSave {
      * @returns {number[]} An array containing the merged rhythm values.
      */
     _mergeRulers() {
-        // Merge the rulers into one set of rhythms.
+        // Merge the rulers into one set of rhythms. Cell boundaries are kept as
+        // [numerator, denominator]: as floats, six sixths add up to
+        // 0.9999999999999999, which misses the boundary at 1 on another ruler.
         const rList = [];
         let noteValues;
         for (let r = 0; r < this.Rulers.length; r++) {
-            let t = 0;
+            let t = [0, 1];
             const selectedRuler = this.Rulers[r];
             noteValues = selectedRuler[0];
             for (let i = 0; i < noteValues.length; i++) {
-                t += 1 / Math.abs(noteValues[i]);
-                if (!rList.includes(t)) {
+                const cell = rationalToFraction(1 / Math.abs(noteValues[i]));
+                t = [t[0] * cell[1] + cell[0] * t[1], t[1] * cell[1]];
+                const divisor = GCD(t[0], t[1]);
+                t = [t[0] / divisor, t[1] / divisor];
+                if (!rList.some(b => b[0] === t[0] && b[1] === t[1])) {
                     rList.push(t);
                 }
             }
         }
 
         rList.sort((a, b) => {
-            return a - b;
+            return a[0] * b[1] - b[0] * a[1];
         });
 
         noteValues = [];
         for (let i = 0; i < rList.length; i++) {
-            if (i === 0) {
-                noteValues.push(1 / rList[i]);
-            } else {
-                noteValues.push(1 / (rList[i] - rList[i - 1]));
-            }
+            const previous = i === 0 ? [0, 1] : rList[i - 1];
+            noteValues.push(
+                (rList[i][1] * previous[1]) /
+                    (rList[i][0] * previous[1] - previous[0] * rList[i][1])
+            );
         }
 
         return noteValues;
