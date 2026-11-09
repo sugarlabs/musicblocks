@@ -2684,6 +2684,27 @@ describe("Logo runLogoCommands", () => {
         expect(logo.runFromBlock).not.toHaveBeenCalled();
     });
 
+    test("does not stop again when Stop ends the run first", () => {
+        mockActivity.blocks.stackList = [0];
+        logo.blockList = [
+            { name: "action", connections: [null, 1, 2], trash: false },
+            { name: "divide" },
+            { name: "print", connections: [null] }
+        ];
+        logo.parseArg = jest.fn(() => {
+            logo.stopTurtle = true;
+        });
+        const stop = jest.spyOn(logo, "doStopTurtles");
+        jest.useFakeTimers();
+
+        logo.runLogoCommands(null, null);
+        logo.doStopTurtles();
+        jest.runOnlyPendingTimers();
+        jest.useRealTimers();
+
+        expect(stop).toHaveBeenCalledTimes(1);
+    });
+
     test("fires _cleanupAfterCompletion when _lastNoteTimeout is cancelled on re-run", () => {
         logo._lastNoteTimeout = 42;
         logo._cleanupAfterCompletion = jest.fn();

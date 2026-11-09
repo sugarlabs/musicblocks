@@ -2045,7 +2045,12 @@ class Logo {
         }
 
         if (this.stopTurtle) {
-            setTimeout(() => this.stopTurtle && this.doStopTurtles(), 0);
+            const runGeneration = this.runGeneration;
+            setTimeout(() => {
+                if (this.runGeneration === runGeneration) {
+                    this.doStopTurtles();
+                }
+            }, 0);
             return;
         }
 
