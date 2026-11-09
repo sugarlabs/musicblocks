@@ -2020,6 +2020,13 @@ describe("Test 20: Lyrics", () => {
         expect(lyricTexts(blocks)).toEqual(["hello"]);
     });
 
+    it("preserves elisions between text fragments", async () => {
+        const lyric = "<lyric><text>cro</text><elision>‿</elision><text>a</text></lyric>";
+        const { blocks } = await parseAndCapture(scorePartwise(sungNote("C", lyric)));
+
+        expect(lyricTexts(blocks)).toEqual(["cro‿a"]);
+    });
+
     it("writes <syllabic> as the hyphen a singer reads", async () => {
         const { blocks } = await parseAndCapture(
             scorePartwise(

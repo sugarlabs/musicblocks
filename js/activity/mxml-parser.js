@@ -669,7 +669,7 @@ function _lyricTexts(noteEl) {
     const lines = [];
     for (const lyricEl of noteEl.querySelectorAll(":scope > lyric")) {
         const raw = Array.from(
-            lyricEl.querySelectorAll(":scope > text"),
+            lyricEl.querySelectorAll(":scope > text, :scope > elision"),
             textEl => textEl.textContent
         )
             .join("")
