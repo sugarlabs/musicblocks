@@ -1998,6 +1998,11 @@ class Logo {
             }
         }
 
+        if (this.stopTurtle) {
+            setTimeout(() => this.stopTurtle && this.doStopTurtles(), 0);
+            return;
+        }
+
         this.svgOutput = "";
         this.svgBackground = true;
 
