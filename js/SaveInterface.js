@@ -12,7 +12,7 @@
 /*
    globals
 
-   TITLESTRING, GUIDEURL, docById, docByClass, doSVG,
+   TITLESTRING, GUIDEURL, docById, doSVG, makeKeyboardAccessible,
    fileExt, ABCHEADER, LILYPONDHEADER, platform, saveAbcOutput,
    saveLilypondOutput, escapeLilypondString, saveMxmlOutput, getMidiInstrument, getMidiDrum,
    Midi, activity, normalizeNoteAccidentals
@@ -931,10 +931,25 @@ class SaveInterface {
         // } else {
         //     docById('submitPDF').disabled = true;
         // }
-        docByClass("close")[0].onclick = () => {
+
+        // Look the close control up inside the dialog: the first element with the
+        // class "close" on the page can be an open widget window's close button.
+        const modal = docById("lilypondModal");
+        const closeLilypond = () => {
             activity.logo.runningLilypond = false;
-            docById("lilypondModal").style.display = "none";
+            modal.style.display = "none";
         };
+        const closeControl = modal.querySelector(".close");
+        closeControl.onclick = closeLilypond;
+        // Enter and Space click it. The helper also stops the key reaching the
+        // document, where it would start the project once the dialog is hidden.
+        makeKeyboardAccessible(closeControl, _("Close"));
+        modal.onkeydown = event => {
+            if (event.key === "Escape" && modal.style.display === "block") {
+                closeLilypond();
+            }
+        };
+        docById("fileName").focus();
     }
     /**
      * Save Lilypond file with optional PDF conversion.
