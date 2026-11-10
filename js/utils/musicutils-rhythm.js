@@ -19,7 +19,8 @@
    exported
 
    reducedFraction, calcNoteValueToDisplay, durationToNoteValue, plainUnwritableTuplets,
-   convertFactor, getMeasurePosition, getMeterAnchor, saveMeterState, restoreMeterState, MusicUtilsRhythm
+   convertFactor, getMeasurePosition, getMeterAnchor, saveMeterState, restoreMeterState,
+   computeEuclideanRhythm, isEuclideanStep, euclideanToDurations, MusicUtilsRhythm
  */
 
 // var, not const or let: a hoisted var in musicutils.js cannot redeclare a top-level const or let.
@@ -341,6 +342,129 @@ var restoreMeterState = (singer, state) => {
     Object.assign(singer, state, { beatList: state.beatList.slice() });
 };
 
+/**
+ * Compute Bjorklund's algorithm for Euclidean rhythm distribution.
+ * Distributes k active pulses across n steps as evenly as possible.
+ *
+ * @function
+ * @param {number|string} pulses - Number of active pulses (k).
+ * @param {number|string} steps - Total number of subdivisions/steps in cycle (n).
+ * @param {number|string} [rotation=0] - Offset / cyclic rotation (positive shifts onsets forward).
+ * @returns {Array<number>} An array of 1s (pulses) and 0s (rests) of length n.
+ */
+var computeEuclideanRhythm = (pulses, steps, rotation = 0) => {
+    const k = Math.floor(Number(pulses));
+    const n = Math.floor(Number(steps));
+    const r = Math.floor(Number(rotation)) || 0;
+
+    if (!Number.isFinite(n) || n <= 0) {
+        return [];
+    }
+    if (!Number.isFinite(k) || k <= 0) {
+        return new Array(n).fill(0);
+    }
+    if (k >= n) {
+        return new Array(n).fill(1);
+    }
+
+    let front = Array.from({ length: k }, () => [1]);
+    let back = Array.from({ length: n - k }, () => [0]);
+
+    while (back.length > 1) {
+        const minLen = Math.min(front.length, back.length);
+        const remainderFront = front.slice(minLen);
+        const remainderBack = back.slice(minLen);
+        const combined = [];
+        for (let i = 0; i < minLen; i++) {
+            combined.push(front[i].concat(back[i]));
+        }
+        front = combined;
+        back = remainderFront.length > 0 ? remainderFront : remainderBack;
+    }
+
+    let pattern = front.concat(back).flat();
+
+    if (r !== 0 && pattern.length > 0) {
+        const rot = ((r % n) + n) % n;
+        if (rot > 0) {
+            pattern = pattern.slice(n - rot).concat(pattern.slice(0, n - rot));
+        }
+    }
+
+    return pattern;
+};
+
+/**
+ * Determine if a specific step is an active onset in a Euclidean rhythm.
+ *
+ * @function
+ * @param {number|string} pulses - Number of active pulses (k).
+ * @param {number|string} steps - Total steps in cycle (n).
+ * @param {number|string} currentStep - Current step index (0-based, wraps with modulo).
+ * @param {number|string} [rotation=0] - Offset / cyclic rotation.
+ * @returns {number} 1 if active onset, 0 if rest.
+ */
+var isEuclideanStep = (pulses, steps, currentStep, rotation = 0) => {
+    const pattern = computeEuclideanRhythm(pulses, steps, rotation);
+    if (pattern.length === 0) {
+        return 0;
+    }
+
+    const s =
+        currentStep === null || currentStep === undefined || !Number.isFinite(Number(currentStep))
+            ? 0
+            : Math.floor(Number(currentStep));
+
+    const idx = ((s % pattern.length) + pattern.length) % pattern.length;
+    return pattern[idx];
+};
+
+/**
+ * Convert a Euclidean rhythm into inter-onset duration fractions.
+ *
+ * @function
+ * @param {number|string} pulses - Number of active pulses (k).
+ * @param {number|string} steps - Total steps in cycle (n).
+ * @param {number|string} [totalDuration=1] - Total duration of the metric cycle.
+ * @param {number|string} [rotation=0] - Offset / cyclic rotation.
+ * @returns {Array<number>} An array of duration fractions.
+ */
+var euclideanToDurations = (pulses, steps, totalDuration = 1, rotation = 0) => {
+    let dur = Number(totalDuration);
+    if (!Number.isFinite(dur) || dur <= 0) {
+        dur = 1;
+    }
+
+    const pattern = computeEuclideanRhythm(pulses, steps, rotation);
+    if (pattern.length === 0) {
+        return [];
+    }
+
+    const indices = [];
+    for (let i = 0; i < pattern.length; i++) {
+        if (pattern[i] === 1) {
+            indices.push(i);
+        }
+    }
+
+    if (indices.length === 0) {
+        return [dur];
+    }
+
+    const n = pattern.length;
+    const stepDuration = dur / n;
+    const durations = [];
+
+    for (let i = 0; i < indices.length; i++) {
+        const currentIdx = indices[i];
+        const nextIdx = i + 1 < indices.length ? indices[i + 1] : indices[0] + n;
+        const intervalSteps = nextIdx - currentIdx;
+        durations.push(intervalSteps * stepDuration);
+    }
+
+    return durations;
+};
+
 var MusicUtilsRhythm = {
     reducedFraction,
     calcNoteValueToDisplay,
@@ -350,7 +474,10 @@ var MusicUtilsRhythm = {
     getMeasurePosition,
     getMeterAnchor,
     saveMeterState,
-    restoreMeterState
+    restoreMeterState,
+    computeEuclideanRhythm,
+    isEuclideanStep,
+    euclideanToDurations
 };
 
 if (typeof module !== "undefined" && module.exports) {
