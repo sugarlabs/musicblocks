@@ -25,7 +25,6 @@ class GlobalCard {
         this.Planet = Planet;
         this.ProjectData = null;
         this.id = null;
-        this.likeTimeout = null;
         this.likePending = false;
         this.clipboard = null;
         this._shareRepositionHandler = null;
@@ -456,11 +455,6 @@ class GlobalCard {
             this._shareRepositionFrame = null;
         }
 
-        if (this.likeTimeout) {
-            clearTimeout(this.likeTimeout);
-            this.likeTimeout = null;
-        }
-
         if (this.clipboard) {
             this.clipboard.destroy();
             this.clipboard = null;
@@ -473,28 +467,36 @@ class GlobalCard {
     like() {
         if (this.likePending) return;
         const Planet = this.Planet;
-        clearTimeout(this.likeTimeout);
-        const like = !Planet.ProjectStorage.isLiked(this.id);
+        const id = this.id;
+        const projectData = this.ProjectData;
+        // Coordinate by project so a replacement card cannot send a second,
+        // conflicting request while the first is still in flight.
+        if (!Planet.pendingLikes) Planet.pendingLikes = new Set();
+        if (Planet.pendingLikes.has(id)) return;
+        const like = !Planet.ProjectStorage.isLiked(id);
         this.likePending = true;
-        // Optimistic UI update — only when card DOM is present
-        const likesEl = document.getElementById(`global-project-likes-${this.id}`);
+        Planet.pendingLikes.add(id);
+        const likesEl = document.getElementById(`global-project-likes-${id}`);
         if (likesEl) this.setLike(like);
-        this.likeTimeout = setTimeout(() => {
-            // GitServerInterface.likeProject uses repoName (this.id) directly
-            Planet.ServerInterface.likeProject(this.id, like, data => {
-                this.likePending = false;
-                if (data.success && Number.isFinite(data.likes)) {
-                    this.ProjectData.ProjectLikes = data.likes;
-                    const currentLikes = document.getElementById(`global-project-likes-${this.id}`);
-                    if (currentLikes) currentLikes.textContent = data.likes.toString();
-                } else if (!data.success) {
-                    // Roll back optimistic update on failure
-                    if (document.getElementById(`global-project-likes-${this.id}`)) {
-                        this.setLike(!like);
-                    }
+        Planet.ServerInterface.likeProject(id, like, data => {
+            this.likePending = false;
+            Planet.pendingLikes.delete(id);
+            if (data.success && Number.isFinite(data.likes)) {
+                projectData.ProjectLikes = data.likes;
+                const currentLikesEl = document.getElementById(`global-project-likes-${id}`);
+                if (currentLikesEl === likesEl) currentLikesEl.textContent = data.likes.toString();
+            } else if (!data.success) {
+                Planet.ProjectStorage.like(id, !like);
+                const currentLikesEl = document.getElementById(`global-project-likes-${id}`);
+                if (currentLikesEl === likesEl) {
+                    currentLikesEl.textContent = (
+                        parseInt(currentLikesEl.textContent) + (like ? -1 : 1)
+                    ).toString();
                 }
-            });
-        }, 500);
+                const iconEl = document.getElementById(`global-like-icon-${id}`);
+                if (iconEl) iconEl.textContent = like ? "favorite_border" : "favorite";
+            }
+        });
     }
 
     afterLike(data, like) {
