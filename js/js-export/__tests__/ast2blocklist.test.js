@@ -591,6 +591,88 @@ describe("AST2BlockList Class", () => {
             });
         });
 
+        // A Stop inside a non-loop clamp in an action also ends the loop the action was
+        // called from: Logo.doBreak walks the queue for the nearest loop whatever the
+        // nesting. A Stop inside a nested loop belongs to that loop instead.
+        describe("an action with a Stop nested in a clamp, as Music Blocks runs it", () => {
+            const run = async (action, start) => {
+                ASTUtils.setStoppingActions(["action"], [action]);
+                const code =
+                    astring.generate(ASTUtils.getMethodAST("action", action)) +
+                    "\n" +
+                    exportStart(start);
+                expect(() => acorn.parse(code, { ecmaVersion: 2020 })).not.toThrow();
+                const printed = [];
+                const mouse = {
+                    ENDFLOW: Promise.resolve(),
+                    STOPFLOW: Promise.resolve("STOPFLOW"),
+                    ENDMOUSE: "ENDMOUSE",
+                    print: async value => printed.push(value)
+                };
+                let finish;
+                await new Function("mouse", "Mouse", code)(mouse, function (flow) {
+                    finish = flow(mouse);
+                });
+                await finish;
+                return printed;
+            };
+            const call = ["nameddo_action", null];
+            const z = ["print", ["z"]];
+            const inIf = [
+                ["print", ["k"]],
+                ["if", ["bool_true"], [["break"]]],
+                ["print", ["j"]]
+            ];
+
+            test("inside an if, called from a loop: the rest runs and the loop ends", async () => {
+                expect(await run(inIf, [["repeat", [3], [call, z]]])).toEqual(["k", "j", "z"]);
+            });
+
+            test("inside an if, no loop: the action ends there, the caller carries on", async () => {
+                expect(await run(inIf, [call, z])).toEqual(["k", "z"]);
+            });
+
+            test("inside a switch case, called from a loop: the rest runs and the loop ends", async () => {
+                const action = [
+                    ["print", ["k"]],
+                    ["switch", [1], [["case", [1], [["break"]]]]],
+                    ["print", ["j"]]
+                ];
+                expect(await run(action, [["repeat", [3], [call, z]]])).toEqual(["k", "j", "z"]);
+            });
+
+            test("inside an if inside an if, called from a loop: the rest runs and the loop ends", async () => {
+                const action = [
+                    ["print", ["k"]],
+                    ["if", ["bool_true"], [["if", ["bool_true"], [["break"]]]]],
+                    ["print", ["j"]]
+                ];
+                expect(await run(action, [["repeat", [3], [call, z]]])).toEqual(["k", "j", "z"]);
+            });
+
+            test("inside a nested loop in the action: only that loop ends", async () => {
+                const action = [
+                    ["print", ["k"]],
+                    ["repeat", [2], [["print", ["i"]], ["break"]]],
+                    ["print", ["j"]]
+                ];
+                expect(await run(action, [["repeat", [3], [call, z]]])).toEqual([
+                    "k",
+                    "i",
+                    "j",
+                    "z",
+                    "k",
+                    "i",
+                    "j",
+                    "z",
+                    "k",
+                    "i",
+                    "j",
+                    "z"
+                ]);
+            });
+        });
+
         test.each([
             ["called from a loop", [["repeat", [3], [["nameddo_action", null]]]]],
             [
