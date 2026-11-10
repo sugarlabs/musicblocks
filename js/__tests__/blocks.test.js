@@ -3922,16 +3922,25 @@ describe("Blocks Foundation", () => {
             ["an object", { name: "equal", pitchNumber: 12 }],
             ["null", null],
             ["undefined", undefined]
-        ])("rejects %s without leaving a load in progress", (_label, notBlocks) => {
-            expect(() => blocks.loadNewBlocks(notBlocks)).toThrow(TypeError);
-            expect(blocks.isLoading()).toBe(false);
-        });
+        ])(
+            "rejects %s cleanly without throwing or leaving a load in progress",
+            (_label, notBlocks) => {
+                expect(() => blocks.loadNewBlocks(notBlocks)).not.toThrow();
+                expect(blocks.isLoading()).toBe(false);
+                expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                    "Cannot load project: invalid project structure."
+                );
+            }
+        );
 
-        it("does not queue data that is not a block list behind a running load", () => {
+        it("does not queue non-array data behind a running load", () => {
             blocks.loadNewBlocks(makeBatch(1));
 
-            expect(() => blocks.loadNewBlocks({})).toThrow(TypeError);
+            expect(() => blocks.loadNewBlocks({})).not.toThrow();
             expect(blocks._loadQueue).toHaveLength(0);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Cannot load project: invalid project structure."
+            );
         });
 
         it("runAfterLoad runs the callback right away when nothing is loading", () => {
