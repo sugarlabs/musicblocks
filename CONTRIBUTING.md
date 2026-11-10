@@ -226,6 +226,18 @@ When you believe your work is complete, tested, and ready for detailed
 review, convert the PR from draft to **Ready for Review**. This is the
 signal maintainers use to begin a thorough review.
 
+### The Open Pull Request Limit
+
+You can have at most five non-draft pull requests open at once. Past
+that, opening another one fails outright rather than being queued or
+converted, and GitHub reports it as a permissions error that does not
+say why.
+
+Draft pull requests are not subject to the limit, and they do not
+count toward it. If you are at five and have more work ready, open
+the new pull request as a draft, then mark it **Ready for Review**
+once one of your others is merged or closed.
+
 ### Review Expectations
 
 Maintainers and reviewers decide when and how to review based on
