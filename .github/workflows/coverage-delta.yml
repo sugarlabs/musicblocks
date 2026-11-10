@@ -54,10 +54,24 @@ jobs:
               run: npm ci
               shell: bash
 
+            # This job only measures coverage on the base branch. Test
+            # correctness on the merged result is enforced separately by the
+            # "Jest tests & coverage" job in ci.yml, so a pre-existing failure
+            # on the base branch must not prevent the comparison from running.
+            # Keep failing if Jest produced no coverage summary at all.
             - name: Run Jest with coverage
+              id: base_jest
+              continue-on-error: true
               run: |
                   npx jest --coverage --coverageReporters=json-summary --ci \
                       --passWithNoTests
+              shell: bash
+
+            - name: Verify base coverage was generated
+              if: steps.base_jest.outcome == 'failure'
+              run: |
+                  echo "::warning::Base-branch Jest failed; checking whether coverage was still generated."
+                  test -s coverage/coverage-summary.json
               shell: bash
 
             - name: Upload base coverage summary
