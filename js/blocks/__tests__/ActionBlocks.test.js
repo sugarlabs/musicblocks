@@ -388,7 +388,8 @@ describe("ActionBlocks", () => {
             const block = getBlock("dispatch");
             block.flow([null], logo, 0, 15);
 
-            expect(activity.stage.dispatchEvent).toHaveBeenCalledWith(null);
+            expect(activity.stage.dispatchEvent).not.toHaveBeenCalled();
+            expect(logo.eventList).toEqual({});
         });
     });
 
