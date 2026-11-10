@@ -663,6 +663,7 @@ Turtle.TurtleView = class {
         this._penstrokes = null;
 
         this._skinChanged = false; // should we reskin the turtle on clear?
+        this._shellRequestId = 0;
         this._orientation = 0; // orientation of the turtle sprite
 
         this._canvas = document.getElementById("overlayCanvas");
@@ -826,10 +827,15 @@ Turtle.TurtleView = class {
         }
 
         const shellSize = Number(size);
+        const requestId = ++this._shellRequestId;
         const image = new Image();
         image.src = myImage;
 
         image.onload = () => {
+            if (requestId !== this._shellRequestId) {
+                return;
+            }
+
             this.container.removeChild(this._bitmap);
             this._bitmap = new createjs.Bitmap(image);
             this.container.addChild(this._bitmap);
