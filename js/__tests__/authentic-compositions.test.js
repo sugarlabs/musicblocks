@@ -470,5 +470,45 @@ describe("Authentic Musical Compositions & Multi-Turtle Fixtures", () => {
             expect(orbitDuration).toBe(4);
             expect(starDuration).toBe(4);
         });
+
+        it("implements enharmonic Bb spelling in D minor cello ground bass", () => {
+            const tbContent = fs.readFileSync(tbPath, "utf8");
+            const blocks = JSON.parse(tbContent);
+
+            // Locate note names used in the AST
+            const noteNameBlocks = blocks.filter(
+                b => Array.isArray(b[1]) && b[1][0] === "notename"
+            );
+            const noteNames = noteNameBlocks.map(b => b[1][1].value);
+
+            // In D minor/Dorian, scale degree 6 must be Bb, not A#
+            expect(noteNames).toContain("Bb");
+            expect(noteNames).not.toContain("A#");
+        });
+
+        it("decouples note execution with everybeatdo and manages color dynamics with Box variables", () => {
+            const tbContent = fs.readFileSync(tbPath, "utf8");
+            const blocks = JSON.parse(tbContent);
+
+            // Verify 'on every note do' block exists and points to 'draw petal'
+            const everyBeatBlock = blocks.find(b => b[1] === "everybeatdo");
+            expect(everyBeatBlock).toBeDefined();
+            const actionTextId = everyBeatBlock[4][1];
+            expect(blocks[actionTextId][1][1].value).toBe("draw petal");
+
+            // Verify Box variables (storein, namedbox, plus) for 'mandalaColor'
+            const storeInBlocks = blocks.filter(b => b[1] === "storein");
+            expect(storeInBlocks.length).toBeGreaterThanOrEqual(2);
+
+            const namedBoxBlocks = blocks.filter(
+                b => Array.isArray(b[1]) && b[1][0] === "namedbox"
+            );
+            expect(namedBoxBlocks.length).toBeGreaterThanOrEqual(2);
+            expect(namedBoxBlocks.every(b => b[1][1].value === "mandalaColor")).toBe(true);
+
+            // Verify plus block increments the box variable
+            const plusBlocks = blocks.filter(b => b[1] === "plus");
+            expect(plusBlocks.length).toBeGreaterThanOrEqual(1);
+        });
     });
 });
