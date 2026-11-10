@@ -3488,12 +3488,33 @@ table {
 /* ======================================================
    Code Map Widget CSS
    ====================================================== */
+#floatingWindows > .windowFrame.codemap-widget-frame > .wfWinBody {
+    min-height: calc(420px - 29px) !important;
+    height: calc(100% - 29px) !important;
+}
+
 .codemap-widget-body {
     display: flex;
     flex-direction: column;
+    width: 680px;
+    min-width: 420px;
+    min-height: 391px;
     height: 100%;
+    max-width: 100%;
+    max-height: 100%;
     overflow: hidden;
     background-color: var(--color-bg-primary);
+}
+
+#floatingWindows > .windowFrame.codemap-widget-frame > .wfWinBody > .wfbWidget.codemap-widget-body {
+    width: 100%;
+    height: 100%;
+    min-height: 391px;
+}
+
+.windowFrame[style*="100vw"] .codemap-widget-body {
+    width: 100%;
+    height: 100%;
 }
 
 .codemap-header-bar {
@@ -3547,6 +3568,9 @@ table {
 }
 
 .codemap-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     display: block;
@@ -3626,6 +3650,12 @@ table {
 .codemap-node:focus-visible .codemap-node-rect {
     stroke: var(--color-brand-primary);
     stroke-width: 3px;
+}
+
+.codemap-node-selected .codemap-node-rect {
+    stroke: var(--color-brand-primary);
+    stroke-width: 3.5px;
+    filter: drop-shadow(0 0 6px var(--color-brand-primary));
 }
 
 .codemap-node-dimmed {
