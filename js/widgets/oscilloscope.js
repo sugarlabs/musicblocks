@@ -59,11 +59,14 @@ class Oscilloscope {
         document.addEventListener("visibilitychange", this._handleVisibilityChange);
 
         this.pitchAnalysers = {};
+        this.spectrumAnalysers = {};
         this._canvasState = {};
         this.drawVisualIDs = {};
 
+        this.mode = "waveform";
         this.isFrozen = false;
         this._frozenWaveforms = {};
+        this._frozenFrames = {};
         this._connectedSynths = {};
         this.toggleFreeze = this.toggleFreeze.bind(this);
         this._keyHandler = this._keyHandler.bind(this);
@@ -111,6 +114,15 @@ class Oscilloscope {
 
         widgetWindow.sendToCenter();
 
+        this.modeButton = widgetWindow.addButton(
+            "",
+            Oscilloscope.ICONSIZE,
+            _("Toggle waveform/spectrum mode (M)")
+        );
+
+        this.modeButton.onclick = () => this.toggleMode();
+        this._updateModeButton();
+
         // Active turtles
         this.divisions = [];
         for (const turtle of this.activity.logo.oscilloscopeTurtles) {
@@ -120,6 +132,34 @@ class Oscilloscope {
         }
 
         this._scale();
+    }
+
+    toggleMode() {
+        this.mode = this.mode === "waveform" ? "spectrum" : "waveform";
+        this._updateModeButton();
+
+        if (this.isFrozen) {
+            this._renderFrame();
+        }
+    }
+
+    _updateModeButton() {
+        if (!this.modeButton) return;
+
+        const label = this.mode === "waveform" ? _("Switch to Spectrum") : _("Switch to Waveform");
+
+        this.modeButton.title = label;
+        this.modeButton.setAttribute("aria-label", label);
+
+        // Use a visible text label in the toolbar.
+        const image = this.modeButton.querySelector("img");
+
+        if (image) {
+            image.style.display = "none";
+        }
+
+        this.modeButton.setAttribute("data-mode", this.mode);
+        this.modeButton.textContent = this.mode === "waveform" ? "FFT" : "Wave";
     }
 
     /* ---------------- Lifecycle ---------------- */
@@ -195,15 +235,42 @@ class Oscilloscope {
         }
     }
 
+    _captureFrozenFrames() {
+        for (const key of Object.keys(this._canvasState)) {
+            const state = this._canvasState[key];
+            if (!state) continue;
+
+            const turtleIdx = state.turtleIdx;
+            this.reconnectSynthsToAnalyser(turtleIdx);
+
+            const waveform = this.pitchAnalysers[turtleIdx];
+            const spectrum = this.spectrumAnalysers[turtleIdx];
+
+            if (waveform) {
+                this._frozenFrames[`${turtleIdx}:waveform`] = new Float32Array(waveform.getValue());
+            }
+
+            if (spectrum) {
+                this._frozenFrames[`${turtleIdx}:spectrum`] = new Float32Array(spectrum.getValue());
+            }
+        }
+    }
+
     toggleFreeze() {
-        this.isFrozen = !this.isFrozen;
-        this._updateFreezeButton();
-        if (this.isFrozen) {
+        if (!this.isFrozen) {
+            this._captureFrozenFrames();
+            this.isFrozen = true;
             this._stopAnimation();
             this._renderFrame();
-        } else if (this.divisions.length > 0) {
-            this._startAnimation();
+        } else {
+            this.isFrozen = false;
+            this._frozenFrames = {};
+            if (this.divisions.length > 0) {
+                this._startAnimation();
+            }
         }
+
+        this._updateFreezeButton();
     }
 
     _updateFreezeButton() {
@@ -225,6 +292,9 @@ class Oscilloscope {
         if (e.code === "Space") {
             e.preventDefault();
             this.toggleFreeze();
+        } else if (e.code === "KeyM") {
+            e.preventDefault();
+            this.toggleMode();
         }
     }
 
@@ -244,11 +314,19 @@ class Oscilloscope {
             }
         }
 
+        for (const key of Object.keys(this.spectrumAnalysers)) {
+            const analyser = this.spectrumAnalysers[key];
+            if (analyser && typeof analyser.dispose === "function" && !analyser.disposed) {
+                analyser.dispose();
+            }
+        }
+
         this.drawVisualIDs = {};
         this._canvasState = {};
         this.pitchAnalysers = {};
-        this._frozenWaveforms = {};
         this._connectedSynths = {};
+        this.spectrumAnalysers = {};
+        this._frozenFrames = {};
 
         if (this.widgetWindow) {
             this.widgetWindow.destroy();
@@ -264,13 +342,25 @@ class Oscilloscope {
                 type: "waveform",
                 size: Oscilloscope.analyserSize
             });
+
             this._connectedSynths[turtleIdx] = new Set();
+        }
+
+        if (!this.spectrumAnalysers[turtleIdx]) {
+            this.spectrumAnalysers[turtleIdx] = new Tone.Analyser({
+                type: "fft",
+                size: 2048,
+                smoothing: 0.8
+            });
         }
 
         for (const synth in instruments[turtleIdx]) {
             const synthInst = instruments[turtleIdx][synth];
+
             if (!this._connectedSynths[turtleIdx].has(synthInst)) {
                 synthInst.connect(this.pitchAnalysers[turtleIdx]);
+                synthInst.connect(this.spectrumAnalysers[turtleIdx]);
+
                 this._connectedSynths[turtleIdx].add(synthInst);
             }
         }
@@ -308,28 +398,34 @@ class Oscilloscope {
             const state = this._canvasState[key];
             if (!state) continue;
 
+            const turtleIdx = state.turtleIdx;
+            const frameKey = `${turtleIdx}:${this.mode}`;
             let dataArray;
+
             if (this.isFrozen) {
-                dataArray = this._frozenWaveforms[state.turtleIdx];
-                if (!dataArray) {
-                    const analyser = this.pitchAnalysers[state.turtleIdx];
-                    if (analyser) {
-                        dataArray = new Float32Array(analyser.getValue());
-                        this._frozenWaveforms[state.turtleIdx] = dataArray;
-                    }
-                }
+                dataArray = this._frozenFrames[frameKey];
+
                 if (!dataArray) continue;
             } else {
-                this.reconnectSynthsToAnalyser(state.turtleIdx);
-                const analyser = this.pitchAnalysers[state.turtleIdx];
+                this.reconnectSynthsToAnalyser(turtleIdx);
+
+                const analyser =
+                    this.mode === "spectrum"
+                        ? this.spectrumAnalysers[turtleIdx]
+                        : this.pitchAnalysers[turtleIdx];
+
                 if (!analyser) continue;
 
-                const rawData = analyser.getValue();
-                // Copy to preserve the current waveform when frozen
-                dataArray = new Float32Array(rawData);
-                this._frozenWaveforms[state.turtleIdx] = dataArray;
+                dataArray = new Float32Array(analyser.getValue());
+                this._frozenFrames[frameKey] = dataArray;
             }
 
+            if (this.mode === "spectrum") {
+                this._drawSpectrum(state, dataArray);
+                continue;
+            }
+
+            // Existing waveform drawing behavior.
             const ctx = state.canvasCtx;
             const bufferLength = dataArray.length;
 
@@ -340,17 +436,101 @@ class Oscilloscope {
             ctx.beginPath();
 
             const sliceWidth = (state.width * this.zoomFactor) / bufferLength;
+
             let x = 0;
 
             for (let i = 0; i < bufferLength; i++) {
                 const y = (state.height / 2) * (1 - dataArray[i]) + this.verticalOffset;
-                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+
                 x += sliceWidth;
             }
 
             ctx.stroke();
             state.resizedOnce = false;
         }
+    }
+
+    _drawSpectrum(state, dataArray) {
+        const ctx = state.canvasCtx;
+        const width = state.width;
+        const height = state.height;
+
+        const sampleRate = this.spectrumAnalysers[state.turtleIdx].context.sampleRate;
+
+        const nyquist = sampleRate / 2;
+        const minFrequency = 20;
+        const maxFrequency = Math.min(20000, nyquist);
+
+        const dbFloor = -100;
+        const dbCeiling = -20;
+
+        ctx.fillStyle = platformColor.background || "#FFFFFF";
+        ctx.fillRect(0, 0, width, height);
+
+        // Frequency-axis guides.
+        ctx.font = "12px sans-serif";
+        ctx.textBaseline = "bottom";
+        ctx.lineWidth = 1;
+
+        const frequencies = [
+            { value: 100, label: "100 Hz" },
+            { value: 1000, label: "1 kHz" },
+            { value: 10000, label: "10 kHz" }
+        ];
+
+        for (const item of frequencies) {
+            if (item.value > maxFrequency) continue;
+
+            const x =
+                (Math.log(item.value / minFrequency) / Math.log(maxFrequency / minFrequency)) *
+                width;
+
+            ctx.strokeStyle = "rgba(128, 128, 128, 0.35)";
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, height - 22);
+            ctx.stroke();
+
+            ctx.fillStyle = state.turtle.painter._canvasColor;
+            ctx.fillText(item.label, Math.min(x + 3, width - 48), height - 4);
+        }
+
+        // Draw one vertical bar per horizontal pixel.
+        // The logarithmic mapping makes low frequencies easier to inspect.
+        const usableHeight = height - 26;
+
+        for (let x = 0; x < width; x++) {
+            const frequency = minFrequency * Math.pow(maxFrequency / minFrequency, x / width);
+            const nextFrequency =
+                minFrequency * Math.pow(maxFrequency / minFrequency, (x + 1) / width);
+            const startIndex = Math.floor((frequency / nyquist) * dataArray.length);
+            const endIndex = Math.min(
+                dataArray.length,
+                Math.max(startIndex + 1, Math.ceil((nextFrequency / nyquist) * dataArray.length))
+            );
+            if (startIndex < 0 || startIndex >= dataArray.length || endIndex <= startIndex) {
+                continue;
+            }
+            let db = -Infinity;
+            for (let index = startIndex; index < endIndex; index++) {
+                db = Math.max(db, dataArray[index]);
+            }
+
+            const normalized = Math.max(0, Math.min(1, (db - dbFloor) / (dbCeiling - dbFloor)));
+
+            const barHeight = normalized * usableHeight;
+
+            ctx.fillStyle = state.turtle.painter._canvasColor;
+            ctx.fillRect(x, usableHeight - barHeight, 1, barHeight);
+        }
+
+        state.resizedOnce = false;
     }
 
     draw() {
@@ -414,7 +594,6 @@ class Oscilloscope {
         }
     }
 }
-
 if (typeof module !== "undefined") {
     module.exports = Oscilloscope;
 }
