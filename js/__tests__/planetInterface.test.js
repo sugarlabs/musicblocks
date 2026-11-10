@@ -89,6 +89,10 @@ describe("PlanetInterface", () => {
         mockActivity.artworkRevision = 0;
     });
 
+    afterEach(() => {
+        global.docById = docById;
+    });
+
     test("hideMusicBlocks hides relevant elements and disables DOM events", () => {
         planetInterface.hideMusicBlocks();
 
@@ -403,7 +407,7 @@ describe("PlanetInterface", () => {
         expect(window.scroll).toHaveBeenCalledWith(0, 0);
     });
 
-    test("saveLocally: svgData empty → saveLocally(data, null)", () => {
+    test("saveLocally: svgData empty → saveLocally(data, undefined)", () => {
         doSVG.mockReturnValue("");
         const D = { x: 1 };
         mockActivity.prepareExport.mockReturnValue(D);
@@ -413,7 +417,10 @@ describe("PlanetInterface", () => {
 
         return planetInterface.saveLocally().then(() => {
             expect(mockActivity.stage.update).toHaveBeenCalled();
-            expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(D, null);
+            expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(
+                D,
+                undefined
+            );
         });
     });
 
@@ -437,7 +444,7 @@ describe("PlanetInterface", () => {
         mockActivity.prepareExport.mockReturnValue("[full project]");
         await saveAfterLoad();
 
-        expect(saveLocally).toHaveBeenCalledWith("[full project]", null, "B");
+        expect(saveLocally).toHaveBeenCalledWith("[full project]", undefined, "B");
     });
 
     test("saveLocally handles unavailable Planet storage according to its failure option", async () => {
@@ -477,7 +484,7 @@ describe("PlanetInterface", () => {
         planetInterface.iframe = { style: { display: "none" } };
 
         await planetInterface.saveLocally();
-        expect(saveLocally).toHaveBeenCalledWith(D, null, "proj1");
+        expect(saveLocally).toHaveBeenCalledWith(D, undefined, "proj1");
     });
 
     test("Test 2 — Missing SVG: saveLocally with svgData='' preserves existing thumbnail in projectStorage", async () => {
@@ -503,7 +510,7 @@ describe("PlanetInterface", () => {
         planetInterface.iframe = { style: { display: "none" } };
 
         await planetInterface.saveLocally();
-        expect(saveLocally).toHaveBeenCalledWith(D, "existing-turtle-thumbnail", "projB");
+        expect(saveLocally).toHaveBeenCalledWith(D, undefined, "projB");
     });
 
     test("Test 12 — Pencil/edit UI regression: editing project B without turtle graphics preserves both thumbnails on return to Planet", async () => {
@@ -1392,7 +1399,7 @@ describe("PlanetInterface", () => {
 
         expect(console.error).toHaveBeenCalled();
     });
-    test("saveLocally: non-empty SVG triggers image‑onload path", done => {
+    test("saveLocally: non-empty SVG triggers image‑onload path", () => {
         doSVG.mockReturnValue("<svg/>");
         mockActivity.prepareExport.mockReturnValue("EXPORT");
         global.base64Encode = jest.fn(s => s);
@@ -1421,18 +1428,17 @@ describe("PlanetInterface", () => {
             }
         };
 
-        planetInterface.saveLocally().then(() => {
+        return planetInterface.saveLocally().then(() => {
             expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenNthCalledWith(
                 1,
                 "EXPORT",
-                "OLD_IMAGE"
+                undefined
             );
             expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenNthCalledWith(
                 2,
                 "EXPORT",
                 "DATAURL"
             );
-            done();
         });
     });
     test("saveLocally keeps delayed thumbnail writes on the project being saved", async () => {
@@ -1475,7 +1481,7 @@ describe("PlanetInterface", () => {
         expect(saveLocally).toHaveBeenNthCalledWith(
             1,
             "OLD_PROJECT_DATA",
-            "OLD_IMAGE",
+            undefined,
             "old-project"
         );
         expect(saveLocally).toHaveBeenNthCalledWith(
@@ -1512,7 +1518,7 @@ describe("PlanetInterface", () => {
 
         expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(
             "EXPORT",
-            "OLD_IMAGE"
+            undefined
         );
 
         let resolved = false;
@@ -2116,7 +2122,6 @@ describe("PlanetInterface", () => {
             "data:image/png;base64,renderedThumb",
             "proj-card"
         );
-    });
     });
 
     describe("_isCanvasBlank", () => {
