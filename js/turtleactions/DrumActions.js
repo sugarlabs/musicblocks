@@ -219,8 +219,14 @@ function setupDrumActions(activity) {
             const target = trimmed.toLowerCase();
             const targetNoSpaces = target.replace(/\s+/g, "");
 
-            // A noise sample can be loaded from a URL, just as a drum can.
-            let noisename = target.slice(0, 4) === "http" ? trimmed : null;
+            // A noise sample can be loaded from a URL, just as a drum can. Only the
+            // scheme is lower-cased; the rest of the URL is case-sensitive.
+            const urlMatch = /^(https?):\/\/\S+/i.exec(trimmed);
+            let noisename = null;
+            if (urlMatch) {
+                noisename = urlMatch[1].toLowerCase() + trimmed.slice(urlMatch[1].length);
+            }
+
             if (!noisename && typeof NOISENAMES === "object" && NOISENAMES !== null) {
                 for (const [, value] of Object.entries(NOISENAMES)) {
                     if (!value) continue;
