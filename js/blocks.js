@@ -5607,15 +5607,6 @@ class Blocks {
          * @returns {number} this request's load token
          */
         this.loadNewBlocks = blockObjs => {
-            if (!Array.isArray(blockObjs)) {
-                console.warn("Invalid block data: expected an array of blocks.");
-                console.debug(blockObjs);
-                if (this.activity && typeof this.activity.errorMsg === "function") {
-                    this.activity.errorMsg(_("Cannot load project: invalid project structure."));
-                }
-                return ++this._nextLoadToken;
-            }
-
             const loadToken = ++this._nextLoadToken;
 
             if (this._loadInProgress) {
@@ -5743,13 +5734,31 @@ class Blocks {
                      * successful path leaves it.
                      */
                     document.body.style.cursor = "default";
+                    const loadContainer = document.getElementById("load-container");
+                    if (loadContainer) {
+                        loadContainer.style.display = "none";
+                    }
                     if (this.activity && typeof this.activity.stopLoadAnimation === "function") {
                         this.activity.stopLoadAnimation();
                     }
                     // Nothing was loaded, so a waiting save would only store
                     // the cleared workspace over the project.
+                    this._lastLoadFailed = true;
                     this._afterLoadCallbacks.clear();
                     this._advanceLoadQueue();
+                    if (
+                        typeof pubsub !== "undefined" &&
+                        pubsub &&
+                        typeof pubsub.emit === "function"
+                    ) {
+                        const err = new Error(warning);
+                        this.setTimeout(() => {
+                            pubsub.emit("loadFailed", {
+                                token: loadToken,
+                                error: err
+                            });
+                        }, 0);
+                    }
                 };
 
                 if (!Array.isArray(blockObjs)) {
