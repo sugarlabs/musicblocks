@@ -99,6 +99,31 @@ class PlanetInterface {
         };
 
         /**
+         * Checks whether a canvas is empty/completely transparent.
+         * @param {HTMLCanvasElement} canvas - The canvas to check.
+         * @returns {boolean} True if canvas is blank or invalid, false if it contains drawn pixels.
+         */
+        this._isCanvasBlank = canvas => {
+            if (!canvas || !canvas.getContext || canvas.width === 0 || canvas.height === 0) {
+                return true;
+            }
+            try {
+                const ctx = canvas.getContext("2d");
+                if (!ctx) return true;
+                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data32 = new Uint32Array(imgData.data.buffer);
+                for (let i = 0; i < data32.length; i++) {
+                    if (data32[i] !== 0) {
+                        return false;
+                    }
+                }
+                return true;
+            } catch (e) {
+                return true;
+            }
+        };
+
+        /**
          * Shows the planet interface.
          */
         this.showPlanet = () => {
@@ -107,8 +132,16 @@ class PlanetInterface {
                 return;
             }
 
-            const png = docById("overlayCanvas").toDataURL("image/png");
-            this.planet.open(png); // this.mainCanvas.toDataURL("image/png"));
+            const overlayCanvas = typeof docById === "function" ? docById("overlayCanvas") : null;
+            let previewImage = null;
+            if (overlayCanvas && !this._isCanvasBlank(overlayCanvas)) {
+                try {
+                    previewImage = overlayCanvas.toDataURL("image/png");
+                } catch (e) {
+                    previewImage = null;
+                }
+            }
+            this.planet.open(previewImage);
             this.iframe.style.display = "block";
             this.iframe.style.zIndex = "9999";
             try {
@@ -392,6 +425,13 @@ class PlanetInterface {
                     ) {
                         projectId = projectStorage.getCurrentProjectID();
                     }
+                    if (
+                        this.planet &&
+                        typeof this.planet.saveThumbnail === "function" &&
+                        projectId !== undefined
+                    ) {
+                        return this.planet.saveThumbnail(image, projectId);
+                    }
                     if (typeof projectStorage.saveThumbnail === "function") {
                         if (projectId === undefined) {
                             return Promise.resolve(null);
@@ -411,13 +451,9 @@ class PlanetInterface {
                     // No image to save, so drop any cached thumbnail to avoid
                     // reusing a stale URL on a subsequent save.
                     this._thumbnailCache = { projectId: undefined, url: null, revision: -1 };
-                    return Promise.resolve(saveProject(null)).catch(handleProjectSaveError);
+                    return Promise.resolve(saveProject(undefined)).catch(handleProjectSaveError);
                 } else {
-                    const fallbackImage =
-                        typeof projectStorage.getCurrentProjectImage === "function"
-                            ? projectStorage.getCurrentProjectImage()
-                            : null;
-                    const savePromise = Promise.resolve(saveProject(fallbackImage)).catch(
+                    const savePromise = Promise.resolve(saveProject(undefined)).catch(
                         handleProjectSaveError
                     );
                     const img = new Image();
