@@ -27,6 +27,8 @@ const jQueryMock = {
 
 global.jQuery = jest.fn(() => jQueryMock);
 
+global._ = jest.fn(str => str);
+
 global.LocalCard = jest.fn().mockImplementation(() => {
     return {
         init: jest.fn(),
@@ -229,12 +231,48 @@ describe("LocalPlanet", () => {
     });
 
     describe("openProject", () => {
-        it("should set current project ID and load project from data", () => {
+        it("should set current project ID and load project from data", async () => {
             localPlanet.ProjectTable = mockPlanet.ProjectStorage.data.Projects;
-            localPlanet.openProject("testProj1");
+            await localPlanet.openProject("testProj1");
 
             expect(mockPlanet.ProjectStorage.setCurrentProjectID).toHaveBeenCalledWith("testProj1");
             expect(mockPlanet.loadProjectFromData).toHaveBeenCalledWith("data1");
+        });
+
+        it("should still load the project when persisting the selection fails", async () => {
+            localPlanet.ProjectTable = mockPlanet.ProjectStorage.data.Projects;
+            mockPlanet.ProjectStorage.setCurrentProjectID.mockRejectedValueOnce(
+                new Error("quota exceeded")
+            );
+
+            await expect(localPlanet.openProject("testProj1")).resolves.toBeUndefined();
+            expect(mockPlanet.loadProjectFromData).toHaveBeenCalledWith("data1");
+        });
+
+        it("should not load an older project after a newer open changes the selection", async () => {
+            localPlanet.ProjectTable = mockPlanet.ProjectStorage.data.Projects;
+
+            let resolveFirstSave;
+            mockPlanet.ProjectStorage.setCurrentProjectID
+                .mockImplementationOnce(
+                    () =>
+                        new Promise(resolve => {
+                            resolveFirstSave = resolve;
+                        })
+                )
+                .mockImplementationOnce(() => {
+                    // A newer selection wins while the first open is still pending.
+                    mockPlanet.ProjectStorage.getCurrentProjectID.mockReturnValue("testProj2");
+                    return Promise.resolve();
+                });
+
+            const firstOpen = localPlanet.openProject("testProj1");
+            await localPlanet.openProject("testProj2");
+            resolveFirstSave();
+            await firstOpen;
+
+            expect(mockPlanet.loadProjectFromData).toHaveBeenCalledTimes(1);
+            expect(mockPlanet.loadProjectFromData).toHaveBeenCalledWith("data2");
         });
     });
 

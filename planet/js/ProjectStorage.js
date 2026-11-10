@@ -408,8 +408,9 @@ class ProjectStorage {
         return this.data.CurrentProject;
     }
 
-    setCurrentProjectID(id) {
+    async setCurrentProjectID(id) {
         this.data.CurrentProject = id;
+        await this.save();
     }
 
     encodeTB(tb) {
