@@ -1103,11 +1103,15 @@ function setupActionBlocks(activity) {
                         tur.singer.runningFromEvent = true;
                         // First, we need to reset the turtle's
                         // elapsed time since it has been falling behind.
-                        const elapsedTime =
-                            activity.logo.firstNoteTime === null
-                                ? 0
-                                : (new Date().getTime() - activity.logo.firstNoteTime) / 1000;
-                        tur.singer.turtleTime = elapsedTime;
+                        if (logo._exportingNotation) {
+                            tur.singer.turtleTime = logo._exportTime;
+                            logo._exportWaits[turtle] = 0;
+                        } else {
+                            tur.singer.turtleTime =
+                                activity.logo.firstNoteTime === null
+                                    ? 0
+                                    : (new Date().getTime() - activity.logo.firstNoteTime) / 1000;
+                        }
 
                         logo.runFromBlockNow(
                             logo,
