@@ -221,7 +221,8 @@ class SaveInterface {
         let filename = null;
         //const self = this;
         const finishDownload = name => {
-            if (name === null) {
+            // A blank name would save a hidden file called ".html", so treat it as Cancel.
+            if (name === null || name.trim() === "") {
                 console.debug("save cancelled");
                 // downloadURL() won't run to free a Blob URL, so free it here.
                 if (typeof URL.revokeObjectURL === "function") {
@@ -276,9 +277,6 @@ class SaveInterface {
                 filename = prompt(_("Filename:"), defaultfilename);
             }
         } else {
-            if (fileExt(defaultfilename) !== extension) {
-                defaultfilename += "." + extension;
-            }
             filename = defaultfilename;
         }
 
