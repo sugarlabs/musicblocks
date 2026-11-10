@@ -516,10 +516,15 @@ class Singer {
         // A step count is walked one scale degree at a time below, so a
         // non-finite or absurdly large value (e.g. a computed 10^308 from
         // the power block, which passes the finite checks in the step-pitch
-        // and scalar-transpose actions) would hang the main thread. getNote
-        // already clamps the resulting octave to 1..10, so anything past a
-        // few hundred steps cannot change the outcome; cap the walk there.
-        if (!Number.isFinite(steps)) return [note, octave];
+        // and scalar-transpose actions) would hang the main thread. Cap the
+        // walk at 1000 steps as a performance guard only: it is NOT
+        // musically neutral — getNote clamps the octave to 1..10 but the
+        // note letter keeps cycling, so e.g. 1000 steps up from C in
+        // C major lands on B while an uncapped 1001 would land on C.
+        // Treat an overflowed Infinity the same way as a huge finite
+        // value (clamp to the cap in its direction); only NaN, which has
+        // no direction, leaves the note unchanged.
+        if (typeof steps !== "number" || Number.isNaN(steps)) return [note, octave];
         const MAX_SCALAR_TRANSPOSITION_STEPS = 1000;
         steps = Math.max(
             -MAX_SCALAR_TRANSPOSITION_STEPS,
