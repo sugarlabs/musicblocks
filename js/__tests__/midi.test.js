@@ -18,6 +18,7 @@
  */
 
 const { getClosestStandardNoteValue, transcribeMidi } = require("../midi");
+const { MIDI_INSTRUMENTS } = require("../utils/musicutils-constants");
 
 const mockMidi = {
     header: {
@@ -126,6 +127,7 @@ describe("transcribeMidi", () => {
             36: ["kick drum"],
             41: ["tom tom"]
         }));
+        global.getMidiInstrument = jest.fn(() => MIDI_INSTRUMENTS);
 
         global.VOICENAMES = [
             ["piano", "acoustic grand piano"],
@@ -312,19 +314,131 @@ describe("transcribeMidi", () => {
         expect(loadedBlocks.filter(block => block[1] === "pitch")).toHaveLength(2);
     });
 
-    it("should assign correct instruments to tracks", async () => {
-        await transcribeMidi(mockMidi);
-        expect(loadNewBlocksSpy).toHaveBeenCalled();
+    it("maps every unique exported program to its Music Blocks instrument", async () => {
+        const expected = Object.entries(MIDI_INSTRUMENTS).filter(
+            ([name, program]) => name !== "default" && program !== 81
+        );
+        const midi = {
+            header: mockMidi.header,
+            tracks: expected.map(([name, number], index) => ({
+                instrument: { name: `unrelated instrument ${index}`, number, percussion: false },
+                channel: index % 9,
+                notes: [{ name: "C4", midi: 60, time: 0, duration: 0.5 }]
+            }))
+        };
+
+        await transcribeMidi(midi);
 
         const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
-        const instrumentBlocks = loadedBlocks.filter(
-            block => Array.isArray(block[1]) && block[1][0] === "settimbre"
-        );
-        const nonPercussionTracks = mockMidi.tracks.filter(track => !track.instrument.percussion);
-        instrumentBlocks.forEach((block, index) => {
-            const instrumentName = nonPercussionTracks[index].instrument.name;
-            expect(block[1][1].value).toBe(instrumentName);
-        });
+        expect(
+            loadedBlocks
+                .filter(block => Array.isArray(block[1]) && block[1][0] === "voicename")
+                .map(block => block[1][1].value)
+        ).toEqual(expected.map(([name]) => name));
+    });
+
+    it("maps every saxophone program to saxophone", async () => {
+        const midi = {
+            header: mockMidi.header,
+            tracks: [64, 65, 66, 67].map(number => ({
+                instrument: { name: "unrelated instrument", number, percussion: false },
+                channel: 0,
+                notes: [{ name: "C4", midi: 60, time: 0, duration: 0.5 }]
+            }))
+        };
+
+        await transcribeMidi(midi);
+
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        expect(
+            loadedBlocks
+                .filter(block => Array.isArray(block[1]) && block[1][0] === "voicename")
+                .map(block => block[1][1].value)
+        ).toEqual(["saxophone", "saxophone", "saxophone", "saxophone"]);
+    });
+
+    it("uses the General MIDI name to disambiguate program 81", async () => {
+        const midi = {
+            header: mockMidi.header,
+            tracks: [
+                {
+                    instrument: { name: "lead 2 (sawtooth)", number: 81, percussion: false },
+                    channel: 0,
+                    notes: [{ name: "C4", midi: 60, time: 0, duration: 0.5 }]
+                }
+            ]
+        };
+
+        await transcribeMidi(midi);
+
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        expect(
+            loadedBlocks.find(block => Array.isArray(block[1]) && block[1][0] === "voicename")[1][1]
+                .value
+        ).toBe("sawtooth");
+    });
+
+    it("does not let a conflicting name override mapped program 81", async () => {
+        const midi = {
+            header: mockMidi.header,
+            tracks: [
+                {
+                    instrument: { name: "acoustic guitar", number: 81, percussion: false },
+                    channel: 0,
+                    notes: [{ name: "C4", midi: 60, time: 0, duration: 0.5 }]
+                }
+            ]
+        };
+
+        await transcribeMidi(midi);
+
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        expect(
+            loadedBlocks.find(block => Array.isArray(block[1]) && block[1][0] === "voicename")[1][1]
+                .value
+        ).toBe("electronic synth");
+    });
+
+    it("keeps the name lookup fallback for an unmapped program", async () => {
+        const midi = {
+            header: mockMidi.header,
+            tracks: [
+                {
+                    instrument: { name: "acoustic guitar (nylon)", number: 1, percussion: false },
+                    channel: 0,
+                    notes: [{ name: "C4", midi: 60, time: 0, duration: 0.5 }]
+                }
+            ]
+        };
+
+        await transcribeMidi(midi);
+
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        expect(
+            loadedBlocks.find(block => Array.isArray(block[1]) && block[1][0] === "voicename")[1][1]
+                .value
+        ).toBe("guitar");
+    });
+
+    it("does not assign a melodic instrument to a percussion track", async () => {
+        const midi = {
+            header: mockMidi.header,
+            tracks: [
+                {
+                    instrument: { name: "alto sax", number: 65, percussion: true },
+                    channel: 9,
+                    notes: [{ name: "Kick Drum", midi: 36, time: 0, duration: 0.5 }]
+                }
+            ]
+        };
+
+        await transcribeMidi(midi);
+
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        expect(
+            loadedBlocks.some(block => Array.isArray(block[1]) && block[1][0] === "voicename")
+        ).toBe(false);
+        expect(loadedBlocks.some(block => block[1] === "playdrum")).toBe(true);
     });
 
     it("should generate correct note durations", async () => {
