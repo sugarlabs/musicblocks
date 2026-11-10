@@ -310,11 +310,31 @@ class MidiTranscriber {
         const isPercussionTrack =
             track.instrument.percussion && (track.channel === 9 || track.channel === 10);
         let instrument = "electronic synth";
-        if (track.instrument.name && !track.instrument.percussion) {
-            if (typeof VOICENAMES !== "undefined") {
-                for (const voices of VOICENAMES) {
-                    if (track.instrument.name.indexOf(voices[1]) > -1) {
-                        instrument = voices[0];
+        if (!track.instrument.percussion) {
+            const midiInstruments =
+                typeof getMidiInstrument !== "undefined" ? getMidiInstrument() : {};
+            const program = track.instrument.number;
+            const matches = Object.keys(midiInstruments).filter(
+                name => name !== "default" && midiInstruments[name] === program
+            );
+            const name = (track.instrument.name || "").toLowerCase();
+
+            if ([64, 65, 66, 67].includes(program)) {
+                instrument = "saxophone";
+            } else if (matches.length === 1) {
+                instrument = matches[0];
+            } else if (matches.length > 1) {
+                const match = matches.find(candidate => name.includes(candidate));
+                if (match) instrument = match;
+            }
+
+            // MIDI programs outside Music Blocks' map still get the legacy best-effort lookup.
+            if (instrument === "electronic synth" && track.instrument.name) {
+                if (typeof VOICENAMES !== "undefined") {
+                    for (const voices of VOICENAMES) {
+                        if (track.instrument.name.indexOf(voices[1]) > -1) {
+                            instrument = voices[0];
+                        }
                     }
                 }
             }
