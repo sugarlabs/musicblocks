@@ -1,4 +1,4 @@
-window.ast2blocklist_config = {
+﻿window.ast2blocklist_config = {
     default_connections: ["parent_or_previous_sibling", "argument", "first_child", "next_sibling"],
     argument_blocks: [
         {
@@ -56,6 +56,22 @@ window.ast2blocklist_config = {
         {
             comment: "Literals such as numbers or booleans or strings",
             ast: { identifiers: [{ property: "type", value: "Literal" }], value_property: "value" }
+        },
+        {
+            comment: "Dictionary block",
+            ast: {
+                identifiers: [
+                    { property: "type", value: "AwaitExpression" },
+                    { property: "argument.type", value: "CallExpression" },
+                    { property: "argument.callee.type", value: "MemberExpression" },
+                    { property: "argument.callee.object.name", value: "mouse" },
+                    { property: "argument.callee.property.name", value: "getDict" },
+                    { property: "argument.arguments", size: 1 }
+                ],
+                name_property: "argument.callee.property.name",
+                argument_properties: ["argument.arguments[0]"]
+            },
+            name_map: { getDict: "dictionary" }
         },
         {
             comment: "Dictionary get function for 2 arguments",
@@ -734,7 +750,11 @@ window.ast2blocklist_config = {
         {
             name: "setDict",
             comment: "Set value block for dictionary, with specific dictionary",
-            arguments: [{ type: "text" }, { type: "text" }, { type: "NumberExpression" }],
+            arguments: [
+                { type: "ValueExpression" },
+                { type: "text" },
+                { type: "NumberExpression" }
+            ],
             ast: {
                 identifiers: [
                     { property: "type", value: "ExpressionStatement" },
@@ -762,7 +782,7 @@ window.ast2blocklist_config = {
         {
             name: "setDict2",
             comment: "Dictionary blocks, the set functions",
-            arguments: [{ type: "text" }, { type: "NumberExpression" }],
+            arguments: [{ type: "ValueExpression" }, { type: "NumberExpression" }],
             ast: {
                 identifiers: [
                     { property: "type", value: "ExpressionStatement" },
