@@ -232,6 +232,26 @@ describe("Tuner Widget", () => {
                 expect(result[0]).toBe("A");
             });
 
+            test.each([-5, 1.5, Infinity])("falls back to 12-EDO for invalid EDO %p", edo => {
+                let generatedEDO;
+                const generateNoteNamesSpy = jest
+                    .spyOn(global, "generateNoteNames")
+                    .mockImplementation(edoValue => {
+                        generatedEDO = edoValue;
+                        return ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+                    });
+                let result;
+
+                try {
+                    result = TunerUtils.frequencyToPitch(440, edo);
+                } finally {
+                    generateNoteNamesSpy.mockRestore();
+                }
+
+                expect(result).toEqual(["A", 0, 440]);
+                expect(generatedEDO).toBe(12);
+            });
+
             test("preserves original frequency in return value", () => {
                 const freq = 523.25; // C5
                 const result = TunerUtils.frequencyToPitch(freq);

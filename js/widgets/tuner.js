@@ -146,7 +146,11 @@ const TunerUtils = {
     frequencyToPitch: function (frequency, edo) {
         const A4 = 440;
         const C0 = A4 * Math.pow(2, -4.75);
-        const currentEDO = edo || 12;
+        const numericEDO = Number(edo);
+        const currentEDO =
+            Number.isFinite(numericEDO) && Number.isInteger(numericEDO) && numericEDO > 0
+                ? numericEDO
+                : 12;
         const noteNames = generateNoteNames(currentEDO);
 
         if (frequency < C0) {
