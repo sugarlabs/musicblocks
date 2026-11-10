@@ -12,7 +12,7 @@
 /*
    global
 
-   _, hideOnClickOutside, toggleExpandable, updateCheckboxes, ClipboardJS
+   _, hideOnClickOutside, toggleExpandable, updateCheckboxes, ClipboardJS, jQuery
 */
 /*
    exported
@@ -28,6 +28,7 @@ class GlobalCard {
         this.likeTimeout = null;
         this.likePending = false;
         this.clipboard = null;
+        this._tooltipped = null;
         this._shareRepositionHandler = null;
         this._shareRepositionFrame = null;
         this.PlaceholderMBImage = "images/mbgraphic.png";
@@ -373,7 +374,9 @@ class GlobalCard {
             this.like();
         });
 
+        this._tooltipped = frag.querySelectorAll(".tooltipped");
         document.getElementById("global-projects").appendChild(frag);
+        jQuery(this._tooltipped).tooltip({ delay: 50 });
         updateCheckboxes(`global-sharebox-${this.id}`);
 
         if (this.clipboard) {
@@ -440,6 +443,13 @@ class GlobalCard {
     }
 
     cleanup() {
+        if (this._tooltipped) {
+            if (this._tooltipped.length > 0) {
+                jQuery(this._tooltipped).tooltip("remove");
+            }
+            this._tooltipped = null;
+        }
+
         if (this._thumbObserver) {
             this._thumbObserver.disconnect();
             this._thumbObserver = null;
