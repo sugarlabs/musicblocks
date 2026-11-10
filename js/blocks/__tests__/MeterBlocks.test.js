@@ -765,6 +765,21 @@ describe("MeterBlocks setup", () => {
         expect(Singer.MeterActions.setPickup).toHaveBeenCalledWith(2, 0, activity);
     });
 
+    it("shows a clear message for a negative pickup value", () => {
+        const pickup = getBlock("pickup");
+        activity.errorMsg.mockClear();
+        Singer.MeterActions.setPickup.mockClear();
+
+        pickup.flow([-1], logo, 0, "pickup");
+
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Pickup value cannot be negative.",
+            "pickup"
+        );
+        expect(activity.errorMsg).not.toHaveBeenCalledWith(NOINPUTERRORMSG, "pickup");
+        expect(Singer.MeterActions.setPickup).not.toHaveBeenCalled();
+    });
+
     it("handles meter changes with defaults and widget state", () => {
         const block = getBlock("meter");
         logo.insideMeterWidget = true;
