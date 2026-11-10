@@ -984,6 +984,39 @@ describe("prepareExport", () => {
         expect(result[0][1]).toEqual(["notename", { value: "F", manualAccidental: "♮" }]);
     });
 
+    it("exports a customNote block with customID if set and omits null customID (Issue #4724)", () => {
+        const activity = makeActivity();
+        activity.blocks.blockList = [
+            {
+                name: "customNote",
+                trash: false,
+                value: "C(+14¢)",
+                customID: "my_temperament",
+                collapsed: false,
+                container: { x: 0, y: 0 },
+                connections: [null],
+                isValueBlock: () => true
+            },
+            {
+                name: "customNote",
+                trash: false,
+                value: "D(+0¢)",
+                customID: null,
+                collapsed: false,
+                container: { x: 10, y: 0 },
+                connections: [null],
+                isValueBlock: () => true
+            }
+        ];
+        const pm = new ProjectManager(activity);
+        const result = JSON.parse(pm.prepareExport());
+        expect(result[0][1]).toEqual([
+            "customNote",
+            { value: "C(+14¢)", customID: "my_temperament" }
+        ]);
+        expect(result[1][1]).toEqual(["customNote", { value: "D(+0¢)" }]);
+    });
+
     it("exports namedbox with privateData", () => {
         const activity = makeActivity();
         activity.blocks.blockList = [
