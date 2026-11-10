@@ -125,6 +125,16 @@ describe("LocalCard", () => {
             expect(card.id).toBe("proj1");
             expect(card.ProjectData).toBe(data);
         });
+
+        it("should sanitize id to prevent HTML attribute injection", () => {
+            const data = makeProjectData();
+            planet.LocalPlanet.ProjectTable['proj1" onfocus="alert(1)'] = data;
+
+            const card = new LocalCard(planet);
+            card.init('proj1" onfocus="alert(1)');
+
+            expect(card.id).toBe("proj1onfocusalert1");
+        });
     });
 
     // ─── render() ───────────────────────────────────────────────────────────────
@@ -272,6 +282,15 @@ describe("LocalCard", () => {
             document.getElementById("local-project-cloud-p13").click();
 
             expect(planet.GlobalPlanet.ProjectViewer.open).toHaveBeenCalledWith("p13");
+        });
+
+        it("should safely sanitize {ID} in render() when id contains unsafe characters", () => {
+            const card = prepareCard('p_xss" onfocus="alert(1)');
+            card.render();
+
+            const el = document.getElementById("local-project-image-p_xssonfocusalert1");
+            expect(el).not.toBeNull();
+            expect(document.querySelector("[onfocus]")).toBeNull();
         });
     });
 

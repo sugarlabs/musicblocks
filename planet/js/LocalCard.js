@@ -124,7 +124,12 @@ class LocalCard {
     render() {
         const Planet = this.Planet;
 
-        const html = this.renderData.replace(new RegExp("{ID}", "g"), this.id);
+        const safeId =
+            this.id !== null && this.id !== undefined
+                ? String(this.id).replace(/[^a-zA-Z0-9._-]/g, "")
+                : "";
+        this.id = safeId;
+        const html = this.renderData.replace(new RegExp("{ID}", "g"), safeId);
         const frag = document.createRange().createContextualFragment(html);
 
         // set image
@@ -219,8 +224,11 @@ class LocalCard {
 
     init(id) {
         const Planet = this.Planet;
-        this.id = id;
-        this.ProjectData = Planet.LocalPlanet.ProjectTable[this.id];
+        this.id =
+            id !== null && id !== undefined ? String(id).replace(/[^a-zA-Z0-9._-]/g, "") : null;
+        this.ProjectData =
+            Planet.LocalPlanet.ProjectTable[id] ||
+            (this.id ? Planet.LocalPlanet.ProjectTable[this.id] : null);
     }
 }
 
