@@ -12,7 +12,7 @@
 /*
    global
 
-   _, FlowBlock, NOINPUTERRORMSG, Singer, ValueBlock, mixedNumber,
+   _, FlowBlock, NOINPUTERRORMSG, NANERRORMSG, Singer, ValueBlock, mixedNumber,
    FlowClampBlock, DEFAULTDRUM, i18nSolfege
  */
 
@@ -457,6 +457,14 @@ function setupRhythmBlocks(activity) {
             }
 
             const rawArg = args[0];
+
+            // Reject non-finite values: NaN passes typeof === "number" and rawArg <= 0,
+            // displaying "Rounded down to NaN." and corrupting skipFactor; Infinity adds
+            // Infinity and leaves skipFactor as NaN on teardown (Infinity - Infinity).
+            if (!Number.isFinite(rawArg)) {
+                activity.errorMsg(NANERRORMSG, blk);
+                return;
+            }
 
             // Validate sign: negative or zero skip factors invert or disable the skip logic,
             // corrupting singer.skipFactor across all notes for this turtle.
