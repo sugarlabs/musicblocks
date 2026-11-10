@@ -1597,6 +1597,72 @@ describe("piemenuVoices teardown on close", () => {
         }
     });
 
+    test("selection and preview use selectedNavItemIndex directly to handle duplicate or truncated labels", () => {
+        jest.useFakeTimers();
+
+        try {
+            getDrumName.mockImplementation(name =>
+                name && name.startsWith("electronic") ? name : null
+            );
+
+            const { piemenuVoices } = require("../piemenus");
+            piemenuVoices(
+                mockBlock,
+                ["electron...", "electron..."],
+                ["electronic soft kick", "electronic hollow kick"],
+                [0, 0],
+                "electronic soft kick",
+                undefined
+            );
+
+            // Test navigation and selection at index 0
+            mockBlock._voiceWheel.selectedNavItemIndex = 0;
+            mockBlock._voiceWheel.navItems[0].navigateFunction();
+
+            expect(getDrumName).toHaveBeenCalledWith("electronic soft kick");
+            expect(getDrumSynthName).toHaveBeenCalledWith("electronic soft kick");
+            expect(synth.loadSynth).toHaveBeenCalledWith(0, "electronic soft kick");
+
+            jest.advanceTimersByTime(1000);
+
+            expect(synth.trigger).toHaveBeenCalledWith(
+                0,
+                "G4",
+                1 / 4,
+                "electronic soft kick",
+                null,
+                null,
+                false
+            );
+            expect(mockBlock.value).toBe("electronic soft kick");
+            expect(mockBlock.text.text).toBe("electron...");
+
+            // Test navigation and selection at index 1
+            mockBlock._voiceWheel.selectedNavItemIndex = 1;
+            mockBlock._voiceWheel.navItems[1].navigateFunction();
+
+            expect(getDrumName).toHaveBeenCalledWith("electronic hollow kick");
+            expect(getDrumSynthName).toHaveBeenCalledWith("electronic hollow kick");
+            expect(synth.loadSynth).toHaveBeenCalledWith(0, "electronic hollow kick");
+
+            jest.advanceTimersByTime(1000);
+
+            expect(synth.trigger).toHaveBeenCalledWith(
+                0,
+                "G4",
+                1 / 4,
+                "electronic hollow kick",
+                null,
+                null,
+                false
+            );
+            expect(mockBlock.value).toBe("electronic hollow kick");
+            expect(mockBlock.text.text).toBe("electron...");
+        } finally {
+            jest.useRealTimers();
+        }
+    });
+
     test("hiding the wheel div detaches the scroll-to-rotate listener", () => {
         const { hideWheelDiv } = require("../piemenus");
 
