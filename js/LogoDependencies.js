@@ -77,45 +77,35 @@ class LogoDependencies {
      * @param {Object} [deps.statsWindow] - Stats display handler
      * @param {Function} [deps.statsWindow.displayInfo]
      */
-    constructor({
-        blocks,
-        turtles,
-        stage,
-        errorHandler,
-        messageHandler,
-        storage,
-        config,
-        callbacks,
+    constructor(deps = {}) {
+        LogoDependencies.validate(deps);
 
-        refreshCanvas = null,
-        textMsg = null,
-        markStageDirty = null,
-        save = null,
-        statsWindow = null,
+        const {
+            blocks,
+            turtles,
+            stage,
+            errorHandler,
+            messageHandler,
+            storage,
+            config,
+            callbacks,
 
-        instruments = null,
-        instrumentsFilters = null,
-        instrumentsEffects = null,
-        widgetWindows = null,
-        cameraUtils = null,
-        utils = null,
-        Singer = null,
-        Tone = null,
-        classes = null
-    }) {
-        // Validate required dependencies
-        if (!blocks) {
-            throw new Error("LogoDependencies: 'blocks' is required");
-        }
-        if (!turtles) {
-            throw new Error("LogoDependencies: 'turtles' is required");
-        }
-        if (!stage) {
-            throw new Error("LogoDependencies: 'stage' is required");
-        }
-        if (!errorHandler) {
-            throw new Error("LogoDependencies: 'errorHandler' is required");
-        }
+            refreshCanvas = null,
+            textMsg = null,
+            markStageDirty = null,
+            save = null,
+            statsWindow = null,
+
+            instruments = null,
+            instrumentsFilters = null,
+            instrumentsEffects = null,
+            widgetWindows = null,
+            cameraUtils = null,
+            utils = null,
+            Singer = null,
+            Tone = null,
+            classes = null
+        } = deps;
 
         /**
          * Blocks subsystem - manages program structure and visual feedback
@@ -270,6 +260,26 @@ class LogoDependencies {
      * const logo = new Logo(deps);
      */
     static fromActivity(activity) {
+        if (!activity || typeof activity !== "object" || Array.isArray(activity)) {
+            throw new Error("LogoDependencies: 'activity' must be an object");
+        }
+        if (!activity.blocks) {
+            throw new Error("LogoDependencies: 'blocks' is required");
+        }
+        if (!activity.turtles) {
+            throw new Error("LogoDependencies: 'turtles' is required");
+        }
+        if (!activity.stage) {
+            throw new Error("LogoDependencies: 'stage' is required");
+        }
+        if (
+            activity.errorMsg !== undefined &&
+            activity.errorMsg !== null &&
+            typeof activity.errorMsg !== "function"
+        ) {
+            throw new Error("LogoDependencies: 'errorMsg' must be a function");
+        }
+
         const resolvedCameraUtils =
             typeof CameraUtils !== "undefined"
                 ? CameraUtils
@@ -281,7 +291,8 @@ class LogoDependencies {
             blocks: activity.blocks,
             turtles: activity.turtles,
             stage: activity.stage,
-            errorHandler: (msg, blk) => activity.errorMsg(msg, blk),
+            errorHandler: (msg, blk) =>
+                typeof activity.errorMsg === "function" ? activity.errorMsg(msg, blk) : undefined,
             messageHandler: {
                 hide: () => activity.hideMsgs()
             },
@@ -376,6 +387,32 @@ class LogoDependencies {
      */
     static isLogoDependencies(obj) {
         return obj instanceof LogoDependencies;
+    }
+
+    /**
+     * Validate the dependencies required by the Logo execution engine.
+     *
+     * Shared by the constructor and Logo's explicit dependency path so plain
+     * objects receive the same validation as class instances.
+     *
+     * @param {*} deps - Dependency object to validate
+     * @throws {Error} When a required dependency is missing or malformed
+     */
+    static validate(deps) {
+        if (!deps || typeof deps !== "object" || Array.isArray(deps)) {
+            throw new Error("LogoDependencies: dependencies must be an object");
+        }
+
+        const required = ["blocks", "turtles", "stage", "errorHandler"];
+        for (const key of required) {
+            if (deps[key] === null || deps[key] === undefined) {
+                throw new Error(`LogoDependencies: '${key}' is required`);
+            }
+        }
+
+        if (typeof deps.errorHandler !== "function") {
+            throw new Error("LogoDependencies: 'errorHandler' must be a function");
+        }
     }
 }
 
