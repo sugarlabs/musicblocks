@@ -5605,14 +5605,8 @@ class Blocks {
          * @param - blockObj - Block Objects
          * @public
          * @returns {number} this request's load token
-         * @throws {TypeError} if blockObjs is not a list
          */
         this.loadNewBlocks = blockObjs => {
-            // Anything else has no blocks to finish on, so the load would never end.
-            if (!Array.isArray(blockObjs)) {
-                throw new TypeError("loadNewBlocks expects a list of blocks.");
-            }
-
             const loadToken = ++this._nextLoadToken;
 
             if (this._loadInProgress) {
@@ -5740,13 +5734,34 @@ class Blocks {
                      * successful path leaves it.
                      */
                     document.body.style.cursor = "default";
+                    const loadContainer = document.getElementById("load-container");
+                    if (loadContainer) {
+                        loadContainer.style.display = "none";
+                    }
                     if (this.activity && typeof this.activity.stopLoadAnimation === "function") {
                         this.activity.stopLoadAnimation();
                     }
                     // Nothing was loaded, so a waiting save would only store
                     // the cleared workspace over the project.
+                    this._lastLoadFailed = true;
                     this._afterLoadCallbacks.clear();
-                    this._advanceLoadQueue();
+                    this._loadInProgress = false;
+                    if (
+                        typeof pubsub !== "undefined" &&
+                        pubsub &&
+                        typeof pubsub.emit === "function"
+                    ) {
+                        const err = new Error(warning);
+                        this.setTimeout(() => {
+                            pubsub.emit("loadFailed", {
+                                token: loadToken,
+                                error: err
+                            });
+                            this._advanceLoadQueue();
+                        }, 0);
+                    } else {
+                        this._advanceLoadQueue();
+                    }
                 };
 
                 if (!Array.isArray(blockObjs)) {
