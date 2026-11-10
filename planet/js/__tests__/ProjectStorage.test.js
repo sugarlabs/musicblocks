@@ -969,21 +969,38 @@ describe("ProjectStorage", () => {
             expect(storage.data.CurrentProject).toBe("projB");
         });
 
-        // Test 7 — Sequential thumbnail operations
-        it("Test 7 — Sequential thumbnail operations: start two thumbnail operations on projA; verify final result maintains integrity and latest thumbnail is saved", async () => {
+        // Test 7 — Sequential thumbnail operations with reverse settlement
+        it("Test 7 — Sequential thumbnail operations: start two thumbnail operations on projA; verify in-memory update order and that latest thumbnail is preserved even under reverse persistence settlement", async () => {
             const saveOrder = [];
-            jest.spyOn(storage, "save").mockImplementation(async () => {
-                saveOrder.push(storage.data.Projects["projA"].ProjectImage);
+            let resolveSave1, resolveSave2;
+            const save1Promise = new Promise(resolve => {
+                resolveSave1 = resolve;
+            });
+            const save2Promise = new Promise(resolve => {
+                resolveSave2 = resolve;
             });
 
-            // Queue Op 1 (early snapshot) and Op 2 (late snapshot)
+            let saveCount = 0;
+            jest.spyOn(storage, "save").mockImplementation(() => {
+                saveCount++;
+                saveOrder.push(storage.data.Projects["projA"].ProjectImage);
+                if (saveCount === 1) return save1Promise;
+                return save2Promise;
+            });
+
+            // Start Op 1 (early thumbnail) and Op 2 (late thumbnail) sequentially
             const op1 = storage.saveThumbnail("thumb-early", "projA");
             const op2 = storage.saveThumbnail("thumb-late", "projA");
 
-            await Promise.all([op1, op2]);
+            // Deliberately resolve the second persistence promise before the first
+            resolveSave2();
+            await op2;
+            resolveSave1();
+            await op1;
 
-            // Both saves complete through the save queue in sequence
+            // In-memory data updates occurred in invocation order
             expect(saveOrder).toEqual(["thumb-early", "thumb-late"]);
+            // Invariant: latest thumbnail remains persisted without getting clobbered
             expect(storage.data.Projects["projA"].ProjectImage).toBe("thumb-late");
             expect(storage.data.Projects["projB"].ProjectImage).toBe("thumbnail-B");
         });

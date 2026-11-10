@@ -180,7 +180,7 @@ describe("LocalCard", () => {
             expect(img.src).toBe("data:image/png;base64,abc");
         });
 
-        it("should use placeholder when ProjectImage is undefined or empty string", () => {
+        it("should use placeholder when ProjectImage is undefined, empty string, or whitespace-only", () => {
             const cardUndefined = prepareCard("p-undef", { ProjectImage: undefined });
             cardUndefined.render();
             const imgUndef = document.getElementById("local-project-image-p-undef");
@@ -190,9 +190,14 @@ describe("LocalCard", () => {
             cardEmpty.render();
             const imgEmpty = document.getElementById("local-project-image-p-empty");
             expect(imgEmpty.src).toContain("mbgraphic.png");
+
+            const cardWhitespace = prepareCard("p-space", { ProjectImage: "   " });
+            cardWhitespace.render();
+            const imgSpace = document.getElementById("local-project-image-p-space");
+            expect(imgSpace.src).toContain("mbgraphic.png");
         });
 
-        it("should fall back to placeholder when malformed nonempty image triggers onerror", () => {
+        it("should fall back to placeholder when malformed nonempty image triggers onerror and guard against infinite loops", () => {
             const cardMalformed = prepareCard("p-malformed", {
                 ProjectImage: "malformed-invalid-data-uri"
             });
@@ -203,7 +208,11 @@ describe("LocalCard", () => {
             // Simulate browser failing to decode/load the malformed image
             expect(typeof img.onerror).toBe("function");
             img.onerror();
+
+            // Fallback rendered
             expect(img.src).toContain("mbgraphic.png");
+            // Invariant: onerror is nullified to prevent infinite error loops if placeholder fails
+            expect(img.onerror).toBeNull();
         });
 
         it("should set input value to the project name", () => {
