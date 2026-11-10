@@ -302,6 +302,8 @@ function setupPitchBlocks(activity) {
                 activity
             );
             tur.singer.lastNotePlayed = [obj[0] + obj[1], tur.singer.lastNotePlayed?.[1] ?? 4];
+            tur.singer.lastNoteTransposition = 0;
+            tur.singer.lastNoteScalarTransposition = 0;
         }
 
         arg(logo, turtle, blk) {
@@ -1756,6 +1758,8 @@ function setupPitchBlocks(activity) {
                 // convert hertz to note/octave
                 const note = obj;
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];
+                tur.singer.lastNoteTransposition = 0;
+                tur.singer.lastNoteScalarTransposition = 0;
             } else if (logo.inPitchDrumMatrix) {
                 // The widget's rows are notes, so use the nearest note and octave. The pitch
                 // path would add the cents as semitones.
@@ -1773,6 +1777,8 @@ function setupPitchBlocks(activity) {
                     logo.pitchDrumMatrix.rowArgs.push(note[1]);
                     tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
                     tur.singer.lastNotePlayed = [note[0] + note[1], 4];
+                    tur.singer.lastNoteTransposition = 0;
+                    tur.singer.lastNoteScalarTransposition = 0;
                 }
             } else if (logo.inLegoWidget) {
                 logo.legoWidget.addRowBlock(blk);
@@ -1785,6 +1791,8 @@ function setupPitchBlocks(activity) {
                 // convert hertz to note/octave
                 const note = obj;
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];
+                tur.singer.lastNoteTransposition = 0;
+                tur.singer.lastNoteScalarTransposition = 0;
             } else if (logo.inMusicKeyboard) {
                 const musicKeyboard = logo.musicKeyboardByTurtle?.[turtle] || logo.musicKeyboard;
                 musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
@@ -1794,6 +1802,8 @@ function setupPitchBlocks(activity) {
                 // convert hertz to note/octave
                 const note = obj;
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];
+                tur.singer.lastNoteTransposition = 0;
+                tur.singer.lastNoteScalarTransposition = 0;
             } else if (logo.inPitchStaircase) {
                 const note = obj;
                 logo.pitchStaircase.addStair(note[0], note[1], parseFloat(arg), blk);

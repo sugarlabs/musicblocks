@@ -314,6 +314,8 @@ class Singer {
         this.embeddedGraphics = {};
         this.delayedNotes = [];
         this.lastNotePlayed = null;
+        this.lastNoteTransposition = 0;
+        this.lastNoteScalarTransposition = 0;
         this.lastPitchPlayed = {}; // for a stand-alone pitch block
         this.previousNotePlayed = null;
         this.noteStatus = null;
@@ -1262,6 +1264,8 @@ class Singer {
             ) {
                 tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
                 tur.singer.lastNotePlayed = [nnote[0] + nnote[1], 4];
+                tur.singer.lastNoteTransposition = tur.singer.transposition;
+                tur.singer.lastNoteScalarTransposition = tur.singer.scalarTransposition;
             }
             nnote[0] =
                 anote !== "rest" && noteIsSolfege(note)
@@ -1316,6 +1320,8 @@ class Singer {
             );
             tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
             tur.singer.lastNotePlayed = [noteObj[0] + noteObj[1], 4];
+            tur.singer.lastNoteTransposition = tur.singer.transposition;
+            tur.singer.lastNoteScalarTransposition = tur.singer.scalarTransposition;
 
             const isCMajor = Array.isArray(tur.singer.keySignature)
                 ? tur.singer.keySignature[0] === "C" &&
@@ -1391,6 +1397,8 @@ class Singer {
             );
             tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
             tur.singer.lastNotePlayed = [noteObj[0] + noteObj[1], 4];
+            tur.singer.lastNoteTransposition = tur.singer.transposition;
+            tur.singer.lastNoteScalarTransposition = tur.singer.scalarTransposition;
 
             const isCMajor = Array.isArray(tur.singer.keySignature)
                 ? tur.singer.keySignature[0] === "C" &&
@@ -1660,6 +1668,7 @@ class Singer {
                 activity.errorMsg,
                 activity.logo.synth.inTemperament
             );
+            const playedNote = nnote[0] + nnote[1];
             nnote[0] = noteIsSolfege(note)
                 ? getSolfege(
                       nnote[0],
@@ -1677,7 +1686,9 @@ class Singer {
                 musicKeyboard.noteNames.push(nnote[0]);
                 musicKeyboard.octaves.push(nnote[1]);
                 musicKeyboard.addRowBlock(blk);
-                tur.singer.lastNotePlayed = [noteObj[0] + noteObj[1], 4];
+                tur.singer.lastNotePlayed = [playedNote, 4];
+                tur.singer.lastNoteTransposition = tur.singer.transposition;
+                tur.singer.lastNoteScalarTransposition = tur.singer.scalarTransposition;
             }
         } else {
             // Play a stand-alone pitch block as a quarter note.
@@ -1934,7 +1945,14 @@ class Singer {
             activity.logo.timbre.notesToPlay.push([noteObj[0] + noteObj[1], 1 / noteBeatValue]);
             tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
             tur.singer.lastNotePlayed = [noteObj[0] + noteObj[1], noteBeatValue];
-        } else if (activity.logo.inArpeggio) {
+            tur.singer.lastNoteTransposition = tur.singer.transposition;
+            tur.singer.lastNoteScalarTransposition = tur.singer.scalarTransposition;
+        } else if (
+            activity.logo.inArpeggio &&
+            (activity.logo.arpeggioTurtle === undefined ||
+                activity.logo.arpeggioTurtle === null ||
+                activity.logo.arpeggioTurtle === turtle)
+        ) {
             const noteObj = getNote(
                 tur.singer.notePitches[last(tur.singer.inNoteBlock)][0],
                 tur.singer.noteOctaves[last(tur.singer.inNoteBlock)][0],
@@ -1947,6 +1965,8 @@ class Singer {
             activity.logo.arpeggio.notesToPlay.push([noteObj[0] + noteObj[1], 1 / noteBeatValue]);
             tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
             tur.singer.lastNotePlayed = [noteObj[0] + noteObj[1], noteBeatValue];
+            tur.singer.lastNoteTransposition = tur.singer.transposition;
+            tur.singer.lastNoteScalarTransposition = tur.singer.scalarTransposition;
         } else if (activity.logo.inLegoWidget && !activity.logo.inMatrix) {
             // For LEGO widget, we don't need to handle rhythm blocks currently
             // Just store the note information
@@ -2877,6 +2897,8 @@ class Singer {
 
                         tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
                         tur.singer.lastNotePlayed = [notes[0], noteBeatValue];
+                        tur.singer.lastNoteTransposition = tur.singer.transposition;
+                        tur.singer.lastNoteScalarTransposition = tur.singer.scalarTransposition;
                         tur.singer.noteStatus = [notes, noteBeatValue];
                         // Record what is heard as pitch, for the Status widget. A zero-length
                         // note (the first half of a tie) is not played, and counting passes
@@ -2993,6 +3015,8 @@ class Singer {
                         if (notes.length === 0) {
                             tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
                             tur.singer.lastNotePlayed = ["C2", noteBeatValue];
+                            tur.singer.lastNoteTransposition = 0;
+                            tur.singer.lastNoteScalarTransposition = 0;
                             tur.singer.noteStatus = [["C2"], noteBeatValue];
                             tur.singer.lastPitchPlayed = tur.singer.lastNotePlayed;
                         }

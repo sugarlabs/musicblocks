@@ -105,10 +105,13 @@ function setupPitchActions(activity) {
                 !activity.logo.inMatrix &&
                 !activity.logo.inMusicKeyboard &&
                 !activity.logo.inPitchDrumMatrix &&
+                !activity.logo.inArpeggio &&
                 tur.singer.inNoteBlock.length === 0
             ) {
                 // If there was no previous pitch, use default.
                 tur.singer.lastNotePlayed = ["G4", 4];
+                tur.singer.lastNoteTransposition = 0;
+                tur.singer.lastNoteScalarTransposition = 0;
             }
 
             if (typeof value !== "number" || !Number.isFinite(value)) {
@@ -121,10 +124,14 @@ function setupPitchActions(activity) {
             if (tur.singer.justCounting.length > 0 && tur.singer.lastNotePlayed === null) {
                 tur.singer.previousNotePlayed = ["G4", 4];
                 tur.singer.lastNotePlayed = ["G4", 4];
+                tur.singer.lastNoteTransposition = 0;
+                tur.singer.lastNoteScalarTransposition = 0;
             }
 
             if (tur.singer.lastNotePlayed === null) {
                 tur.singer.lastNotePlayed = ["G4", 4];
+                tur.singer.lastNoteTransposition = 0;
+                tur.singer.lastNoteScalarTransposition = 0;
             }
 
             let lastNotePlayed = tur.singer.lastNotePlayed;
@@ -146,6 +153,26 @@ function setupPitchActions(activity) {
                 pitchName = noteObj[0];
                 octave = noteObj[1];
             }
+
+            const noteTransposition =
+                tur.singer.lastNoteTransposition !== undefined
+                    ? tur.singer.lastNoteTransposition
+                    : tur.singer.transposition;
+            if (noteTransposition !== 0) {
+                const untransposedNote = getNote(
+                    pitchName,
+                    octave,
+                    -noteTransposition,
+                    tur.singer.keySignature,
+                    tur.singer.movable,
+                    null,
+                    activity.errorMsg,
+                    activity.logo.synth.inTemperament
+                );
+                pitchName = untransposedNote[0];
+                octave = untransposedNote[1];
+            }
+
             if (tur.singer.invertList.length > 0) {
                 // If the last note is inverted then inverting it
                 // again to get the original note
@@ -169,6 +196,22 @@ function setupPitchActions(activity) {
                 );
                 pitchName = invertedNote[0];
                 octave = invertedNote[1];
+            }
+
+            const noteScalarTransposition =
+                tur.singer.lastNoteScalarTransposition !== undefined
+                    ? tur.singer.lastNoteScalarTransposition
+                    : tur.singer.scalarTransposition;
+            if (noteScalarTransposition !== 0) {
+                const unscalarStepped = Singer.addScalarTransposition(
+                    activity.logo,
+                    turtle,
+                    pitchName,
+                    octave,
+                    -noteScalarTransposition
+                );
+                pitchName = unscalarStepped[0];
+                octave = unscalarStepped[1];
             }
 
             const noteObj = Singer.addScalarTransposition(
