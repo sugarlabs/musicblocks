@@ -757,7 +757,11 @@ describe("CallGraphAnalyzer", () => {
         // A -> Branch1 -> DeadEnd (dead-end within SCC)
         // A -> Branch2 -> A (cycle!)
         const adj = new Map([
-            ["action:A", new Set(["action:Branch1", "action:Branch2", "action:Outside"])],
+            [
+                "action:A",
+                new Set(["action:0_Outside", "action:Branch1", "action:Branch2", "action:Outside"])
+            ],
+            ["action:0_Outside", new Set()],
             ["action:Branch1", new Set(["action:DeadEnd"])],
             ["action:DeadEnd", new Set()],
             ["action:Branch2", new Set(["action:A"])],
@@ -767,6 +771,19 @@ describe("CallGraphAnalyzer", () => {
 
         const cycle = analyzer._extractRepresentativeCycle("action:A", sccSet, adj);
         expect(cycle).toEqual(["action:A", "action:Branch2", "action:A"]);
+    });
+
+    test("handles cyclic and duplicate block connections safely during traversal", () => {
+        const blocks = [
+            { id: 1, name: "start", connections: [null, 2] },
+            { id: 2, name: "forward", connections: [1, 3, 4] },
+            { id: 3, name: "forward", connections: [2, 5] },
+            { id: 4, name: "forward", connections: [2, 5] },
+            { id: 5, name: "right", connections: [3, null] }
+        ];
+        const result = CallGraphAnalyzer.analyze(blocks);
+        expect(result.nodes.length).toBe(1);
+        expect(result.nodes[0].id).toBe("start:1");
     });
 
     test("exercises AMD define branch when define is available", () => {

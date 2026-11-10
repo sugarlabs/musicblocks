@@ -2862,11 +2862,6 @@ class Activity {
             this.toolbar.renderWrapIcon();
             this._perfMark("activity.init.ui_ready");
 
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get("codemap") === "true") {
-                setTimeout(() => this.showCodeMap(), 500);
-            }
-
             initPalettes(this.palettes);
 
             if (this.planet !== undefined) {
