@@ -103,22 +103,52 @@ describe("PenBlocksAPI", () => {
         expect(penBlocksAPI.runCommand).toHaveBeenCalledWith("doPenDown");
     });
 
-    test("fillShape calls commands and refreshCanvas", async () => {
-        const flow = jest.fn();
-        await penBlocksAPI.fillShape(flow);
-        expect(penBlocksAPI.runCommand).toHaveBeenCalledWith("doStartFill");
-        expect(flow).toHaveBeenCalled();
-        expect(penBlocksAPI.runCommand).toHaveBeenCalledWith("doEndFill");
-        expect(global.globalActivity.turtles.refreshCanvas).toHaveBeenCalled();
-    });
+    describe.each([
+        ["fillShape", "doStartFill", "doEndFill"],
+        ["hollowLine", "doStartHollowLine", "doEndHollowLine"]
+    ])("%s with the real argument validation", (method, startCommand, endCommand) => {
+        let mockedJSInterface;
 
-    test("hollowLine calls commands and refreshCanvas", async () => {
-        const flow = jest.fn();
-        await penBlocksAPI.hollowLine(flow);
-        expect(penBlocksAPI.runCommand).toHaveBeenCalledWith("doStartHollowLine");
-        expect(flow).toHaveBeenCalled();
-        expect(penBlocksAPI.runCommand).toHaveBeenCalledWith("doEndHollowLine");
-        expect(global.globalActivity.turtles.refreshCanvas).toHaveBeenCalled();
+        beforeEach(() => {
+            mockedJSInterface = global.JSInterface;
+            global.JSEditor = { logConsole: jest.fn() };
+            // constraints.js attaches to an existing JSInterface, so load it before the real one.
+            delete global.JSInterface;
+            jest.isolateModules(() => {
+                require("../../constraints.js");
+                global.JSInterface = require("../../interface");
+            });
+        });
+
+        afterEach(() => {
+            global.JSInterface = mockedJSInterface;
+            delete global.JSEditor;
+        });
+
+        test("runs the flow between the start and end commands", async () => {
+            const mockFlow = jest.fn();
+            const result = await penBlocksAPI[method](async () => mockFlow());
+
+            expect(penBlocksAPI.runCommand.mock.calls).toEqual([[startCommand], [endCommand]]);
+            expect(mockFlow).toHaveBeenCalled();
+            expect(global.globalActivity.turtles.refreshCanvas).toHaveBeenCalled();
+            expect(result).toBe("end");
+        });
+
+        test("rejects a flow that is not an async function before starting", async () => {
+            await expect(penBlocksAPI[method](() => {})).rejects.toBeDefined();
+            expect(penBlocksAPI.runCommand).not.toHaveBeenCalled();
+        });
+
+        test("rejects a missing flow before starting", async () => {
+            await expect(penBlocksAPI[method]()).rejects.toBeDefined();
+            expect(penBlocksAPI.runCommand).not.toHaveBeenCalled();
+        });
+
+        test("rejects a null flow before starting", async () => {
+            await expect(penBlocksAPI[method](null)).rejects.toBeDefined();
+            expect(penBlocksAPI.runCommand).not.toHaveBeenCalled();
+        });
     });
 
     test("fillBackground calls setBackgroundColor", () => {
