@@ -979,6 +979,9 @@ class ProjectManager {
                         ) {
                             args.manualAccidental = myBlock.manualAccidental;
                         }
+                        if (myBlock.customID !== undefined && myBlock.customID !== null) {
+                            args.customID = myBlock.customID;
+                        }
                 }
             } else {
                 switch (myBlock.name) {

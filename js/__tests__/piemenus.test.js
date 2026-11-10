@@ -3268,4 +3268,134 @@ describe("piemenuCustomNotes preview sound and frequency resolution", () => {
             false
         );
     });
+
+    test("preserves existing cents when selecting a wheel note without cents and detunes preview", async () => {
+        mockBlock.value = "C(+14¢)";
+        synth.getCustomFrequency.mockReturnValue([293.66]);
+
+        const noteLabels = {
+            my_temperament: {
+                pitchNumber: 1,
+                0: [1.125, "D", 4]
+            }
+        };
+        const customLabels = ["my_temperament"];
+
+        piemenuCustomNotes(mockBlock, noteLabels, customLabels, "my_temperament", "C(+14¢)");
+
+        mockBlock._cusNoteWheel.selectedNavItemIndex = 0;
+        mockBlock._customWheel.selectedNavItemIndex = 0;
+        mockBlock._cusNoteWheel.navItems[0].title = "D";
+        mockBlock._customWheel.navItems[0].title = "my_temperament";
+
+        await mockBlock._cusNoteWheel.navItems[0].navigateFunction();
+
+        expect(mockBlock.value).toBe("D(+14¢)");
+        expect(mockBlock.text.text).toBe("D(+14¢)");
+        expect(synth.getCustomFrequency).toHaveBeenCalledWith(["D4"], "my_temperament");
+        expect(synth.trigger).toHaveBeenCalledTimes(1);
+        const triggeredFreqs = synth.trigger.mock.calls[0][1];
+        expect(triggeredFreqs[0]).toBeCloseTo(293.66 * Math.pow(2, 14 / 1200), 4);
+    });
+
+    test("preserves tuned cents on octave change and applies cents detune on preview", async () => {
+        mockBlock.connections = [0];
+        mockBlock.blocks.blockList = [{ name: "custompitch" }];
+        mockBlock.blocks.findPitchOctave = jest.fn().mockReturnValue(4);
+        mockBlock.value = "C(+14¢)";
+        synth.getCustomFrequency.mockReturnValue([523.25]);
+
+        const noteLabels = {
+            my_temperament: {
+                pitchNumber: 1,
+                0: [1, "C(+0¢)", 4]
+            }
+        };
+        const customLabels = ["my_temperament"];
+
+        piemenuCustomNotes(mockBlock, noteLabels, customLabels, "my_temperament", "C(+14¢)");
+
+        mockBlock._cusNoteWheel.selectedNavItemIndex = 0;
+        mockBlock._customWheel.selectedNavItemIndex = 0;
+        mockBlock._octavesWheel.selectedNavItemIndex = 3; // Octave 5 (8 - 5)
+        mockBlock._cusNoteWheel.navItems[0].title = "C(+0¢)";
+        mockBlock._customWheel.navItems[0].title = "my_temperament";
+        mockBlock._octavesWheel.navItems[3].title = "5";
+
+        await mockBlock._octavesWheel.navItems[3].navigateFunction();
+
+        expect(mockBlock.value).toBe("C(+14¢)");
+        expect(mockBlock.text.text).toBe("C(+14¢)");
+        expect(mockBlock.blocks.setPitchOctave).toHaveBeenCalledWith(0, 5);
+        expect(synth.getCustomFrequency).toHaveBeenCalledWith(["C5"], "my_temperament");
+        const triggeredFreqs = synth.trigger.mock.calls[0][1];
+        expect(triggeredFreqs[0]).toBeCloseTo(523.25 * Math.pow(2, 14 / 1200), 4);
+    });
+
+    test("bails out of stale selections during Tone.start even when voice is already loaded", async () => {
+        const originalToneStart = global.Tone.start;
+        let resolveFirstStart;
+        let resolveSecondStart;
+        let startCount = 0;
+
+        try {
+            global.Tone.start = jest.fn().mockImplementation(() => {
+                startCount++;
+                if (startCount === 1) {
+                    return new Promise(resolve => {
+                        resolveFirstStart = resolve;
+                    });
+                }
+                return new Promise(resolve => {
+                    resolveSecondStart = resolve;
+                });
+            });
+
+            const noteLabels = {
+                my_temperament: {
+                    pitchNumber: 2,
+                    0: [1, "C", 4],
+                    1: [1.125, "D", 4]
+                }
+            };
+            const customLabels = ["my_temperament"];
+
+            piemenuCustomNotes(mockBlock, noteLabels, customLabels, "my_temperament", "C");
+
+            synth.getCustomFrequency.mockImplementation(notes => {
+                if (notes[0] === "C4") return [261.63];
+                if (notes[0] === "D4") return [293.66];
+                return [0];
+            });
+
+            mockBlock._customWheel.selectedNavItemIndex = 0;
+            mockBlock._customWheel.navItems[0].title = "my_temperament";
+            mockBlock._cusNoteWheel.navItems[0].title = "C";
+            mockBlock._cusNoteWheel.navItems[1].title = "D";
+
+            mockBlock._cusNoteWheel.selectedNavItemIndex = 0;
+            const promise1 = mockBlock._cusNoteWheel.navItems[0].navigateFunction();
+
+            mockBlock._cusNoteWheel.selectedNavItemIndex = 1;
+            const promise2 = mockBlock._cusNoteWheel.navItems[1].navigateFunction();
+
+            resolveFirstStart();
+            await promise1;
+            resolveSecondStart();
+            await promise2;
+
+            expect(synth.trigger).toHaveBeenCalledTimes(1);
+            expect(synth.trigger).toHaveBeenCalledWith(
+                0,
+                [293.66],
+                1 / 8,
+                global.DEFAULTVOICE,
+                null,
+                null,
+                false
+            );
+        } finally {
+            global.Tone.start = originalToneStart;
+        }
+    });
 });

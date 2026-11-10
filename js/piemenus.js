@@ -1600,10 +1600,10 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     block._customWheel.navigateWheel(ii);
     that.customID = selectedCustom;
 
-    const cleanSelectedNote = (selectedNote || "").replace(/\([+-]?\d+¢\)/g, "");
-    let initialIndex = labels.findIndex(
-        l => l && l.replace(/\([+-]?\d+¢\)/g, "") === cleanSelectedNote
-    );
+    const centsRegex = /\(([+-]?\d+)[¢c]?\)/;
+    const stripNoteCents = value => (value || "").replace(/\([+-]?\d+[¢c]?\)/g, "");
+    const cleanSelectedNote = stripNoteCents(selectedNote);
+    let initialIndex = labels.findIndex(l => l && stripNoteCents(l) === cleanSelectedNote);
     if (initialIndex === -1) {
         initialIndex = 0;
     }
@@ -1618,14 +1618,21 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
 
     let previewRequestId = 0;
 
-    const __selectionChanged = async () => {
+    const __selectionChanged = async (fromOctaveWheel = false) => {
         const currentRequestId = ++previewRequestId;
         const label = that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
         that.customID = label;
         const rawNote = that._cusNoteWheel.navItems[that._cusNoteWheel.selectedNavItemIndex].title;
-        that.value = rawNote;
-        that.text.text = rawNote;
-        const note = (rawNote || "").replace(/\([+-]?\d+[¢c]?\)/g, "");
+        const rawCentsMatch = (rawNote || "").match(centsRegex);
+        const existingCentsMatch = (that.value || "").match(centsRegex);
+        const activeCentsMatch = fromOctaveWheel
+            ? existingCentsMatch || rawCentsMatch
+            : rawCentsMatch || existingCentsMatch;
+        const note = stripNoteCents(rawNote);
+        const updatedValue = activeCentsMatch ? note + activeCentsMatch[0] : note;
+        const cents = activeCentsMatch ? parseInt(activeCentsMatch[1], 10) : 0;
+        that.value = updatedValue;
+        that.text.text = updatedValue;
 
         let octave = 4;
         if (
@@ -1695,9 +1702,12 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
             } catch (e) {
                 console.debug("Tone.start() skipped or failed", e);
             }
+            if (currentRequestId !== previewRequestId) {
+                return;
+            }
         }
 
-        const customID = that.customID || label;
+        const customID = label;
 
         // Create and load synth if needed
         if (!instruments[0] || !instruments[0][DEFAULTVOICE]) {
@@ -1762,11 +1772,18 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
                 const freq = Array.isArray(freqs) ? freqs[0] : freqs;
 
                 if (Number.isFinite(freq) && freq > 0) {
+                    const detuneRatio = cents !== 0 ? Math.pow(2, cents / 1200) : 1;
+                    const triggerFreqs =
+                        detuneRatio === 1
+                            ? freqs
+                            : Array.isArray(freqs)
+                              ? freqs.map(f => f * detuneRatio)
+                              : freqs * detuneRatio;
                     if (typeof that.activity.logo.synth.trigger === "function") {
                         try {
                             await that.activity.logo.synth.trigger(
                                 0,
-                                freqs,
+                                triggerFreqs,
                                 1 / 8,
                                 DEFAULTVOICE,
                                 null,
@@ -1777,8 +1794,11 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
                             console.error("Synth trigger error:", e);
                         }
                     }
-                    if (typeof announceToScreenReader === "function") {
-                        announceToScreenReader(_("played") + " " + that.value + octave);
+                    if (
+                        currentRequestId === previewRequestId &&
+                        typeof announceToScreenReader === "function"
+                    ) {
+                        announceToScreenReader(_("played") + " " + updatedValue + octave);
                     }
                 }
             } catch (err) {
@@ -1796,7 +1816,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
             that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
         );
         that.blocks.setPitchOctave(that.connections[0], octave);
-        __selectionChanged();
+        return __selectionChanged(true);
     };
 
     if (hasOctaveWheel) {
@@ -1807,7 +1827,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
 
     // Set up handlers for preview.
     for (let i = 0; i < labels.length; i++) {
-        block._cusNoteWheel.navItems[i].navigateFunction = __selectionChanged;
+        block._cusNoteWheel.navItems[i].navigateFunction = () => __selectionChanged(false);
     }
 
     block._exitWheel.navItems[0].navigateFunction = __exitMenu;
