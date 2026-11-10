@@ -55,18 +55,9 @@ jobs:
               shell: bash
 
             - name: Run Jest with coverage
-              id: base_jest
-              continue-on-error: true
               run: |
                   npx jest --coverage --coverageReporters=json-summary --ci \
                       --passWithNoTests
-              shell: bash
-
-            - name: Report base test failures
-              if: steps.base_jest.outcome == 'failure'
-              run: |
-                  echo "::warning::Base-branch Jest failed; checking whether coverage was still generated."
-                  test -s coverage/coverage-summary.json
               shell: bash
 
             - name: Upload base coverage summary
