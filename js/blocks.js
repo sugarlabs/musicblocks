@@ -5745,7 +5745,7 @@ class Blocks {
                     // the cleared workspace over the project.
                     this._lastLoadFailed = true;
                     this._afterLoadCallbacks.clear();
-                    this._advanceLoadQueue();
+                    this._loadInProgress = false;
                     if (
                         typeof pubsub !== "undefined" &&
                         pubsub &&
@@ -5757,7 +5757,10 @@ class Blocks {
                                 token: loadToken,
                                 error: err
                             });
+                            this._advanceLoadQueue();
                         }, 0);
+                    } else {
+                        this._advanceLoadQueue();
                     }
                 };
 

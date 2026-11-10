@@ -514,6 +514,50 @@ describe("_loadStart", () => {
         expect(activity.justLoadStart).toHaveBeenCalled();
     });
 
+    it("recovers from corrupt, non-array saved-session data and triggers session recovery", async () => {
+        const sessionData = JSON.stringify({ invalid: "not an array of blocks" });
+        const removeItem = jest.fn();
+        const activity = makeActivity({
+            storage: {
+                currentProject: "CorruptProject",
+                ["SESSIONCorruptProject"]: sessionData,
+                removeItem
+            }
+        });
+        activity.sessionData = sessionData;
+
+        // When loadNewBlocks receives non-array data, it returns a token and abortLoad emits loadFailed
+        activity.blocks.loadNewBlocks = jest.fn(data => {
+            const token = 42;
+            setTimeout(() => {
+                global.pubsub.emit("loadFailed", {
+                    token,
+                    error: new Error("Invalid block data: expected an array of blocks.")
+                });
+            }, 0);
+            return token;
+        });
+
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+
+        expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith({
+            invalid: "not an array of blocks"
+        });
+
+        // Allow deferred loadFailed emission and session recovery to run
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(
+            expect.objectContaining({ message: expect.stringContaining("Invalid block data") }),
+            { operation: "loadSessionData" }
+        );
+        expect(removeItem).toHaveBeenCalledWith("SESSIONCorruptProject");
+        expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, false);
+        expect(activity.errorMsg).toHaveBeenCalled();
+        expect(activity.justLoadStart).toHaveBeenCalled();
+    });
+
     it("deletes the session key when removeItem is not a function", async () => {
         const storage = {
             currentProject: "Bad",
