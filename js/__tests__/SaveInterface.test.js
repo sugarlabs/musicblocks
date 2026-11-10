@@ -17,6 +17,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+const fs = require("fs");
+const path = require("path");
+
 global.Midi = jest.fn().mockImplementation(() => ({
     header: {
         ticksPerBeat: 480,
@@ -1658,6 +1661,7 @@ describe("saveLilypond Methods", () => {
 
     beforeEach(() => {
         jest.useRealTimers();
+        global.makeKeyboardAccessible = require("../utils/dom-helpers").makeKeyboardAccessible;
         originalClipboard = navigator.clipboard;
         originalSecureContext = window.isSecureContext;
         // Set up the DOM structure
@@ -1835,6 +1839,89 @@ describe("saveLilypond Methods", () => {
 
         expect(activity.logo.runningLilypond).toBe(false);
         expect(docById("lilypondModal").style.display).toBe("none");
+    });
+
+    it("closes with its own close control even when a widget window close button comes first", () => {
+        document.body.insertAdjacentHTML(
+            "afterbegin",
+            '<div id="floatingWindows"><div class="wftButton close"></div></div>'
+        );
+        const widgetClose = document.querySelector(".wftButton.close");
+        const widgetOnClick = jest.fn();
+        widgetClose.onclick = widgetOnClick;
+
+        instance.saveLilypond(activity);
+
+        expect(widgetClose.onclick).toBe(widgetOnClick);
+        document.querySelector("#lilypondModal .close").click();
+        expect(docById("lilypondModal").style.display).toBe("none");
+        expect(widgetOnClick).not.toHaveBeenCalled();
+    });
+
+    it("closes from the keyboard with Enter or Space on the close control, or Escape", () => {
+        const pressKey = (element, key) =>
+            element.dispatchEvent(
+                new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true })
+            );
+        const modal = docById("lilypondModal");
+        const closeControl = modal.querySelector(".close");
+
+        for (const [target, key] of [
+            [closeControl, "Enter"],
+            [closeControl, " "],
+            [docById("fileName"), "Escape"]
+        ]) {
+            instance.saveLilypond(activity);
+            expect(modal.style.display).toBe("block");
+
+            pressKey(target, key);
+
+            expect(modal.style.display).toBe("none");
+            expect(activity.logo.runningLilypond).toBe(false);
+        }
+    });
+
+    it("does not pass Enter or Space from the close control on to the app's key handler", () => {
+        const documentKeydown = jest.fn();
+        document.addEventListener("keydown", documentKeydown);
+        try {
+            instance.saveLilypond(activity);
+            const closeControl = docById("lilypondModal").querySelector(".close");
+
+            for (const key of ["Enter", " "]) {
+                instance.saveLilypond(activity);
+                closeControl.dispatchEvent(
+                    new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true })
+                );
+            }
+
+            expect(documentKeydown).not.toHaveBeenCalled();
+        } finally {
+            document.removeEventListener("keydown", documentKeydown);
+        }
+    });
+
+    it("ignores Escape once the dialog is already closed", () => {
+        instance.saveLilypond(activity);
+        const modal = docById("lilypondModal");
+        modal.style.display = "none";
+        activity.logo.runningLilypond = true;
+
+        docById("fileName").dispatchEvent(
+            new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
+        );
+
+        expect(activity.logo.runningLilypond).toBe(true);
+    });
+
+    it("moves focus into the dialog and makes the close control a named button", () => {
+        instance.saveLilypond(activity);
+
+        expect(document.activeElement).toBe(docById("fileName"));
+        const closeControl = docById("lilypondModal").querySelector(".close");
+        expect(closeControl.getAttribute("role")).toBe("button");
+        expect(closeControl.getAttribute("tabindex")).toBe("0");
+        expect(closeControl.getAttribute("aria-label")).toBe("Close");
     });
 
     it("should call saveLYFile when save button is clicked", () => {
@@ -2111,5 +2198,21 @@ describe("MXML Methods", () => {
             "data:text;utf8," + encodeURIComponent(""),
             "empty.xml"
         );
+    });
+});
+
+describe("index.html Lilypond dialog markup", () => {
+    it("lets keyboard and screen reader users reach and name every control", () => {
+        const html = fs.readFileSync(path.join(__dirname, "..", "..", "index.html"), "utf8");
+        const page = new DOMParser().parseFromString(html, "text/html");
+        const modal = page.getElementById("lilypondModal");
+        const inputs = modal.querySelectorAll("input");
+
+        expect(inputs).toHaveLength(5);
+        inputs.forEach(input => {
+            expect(input.getAttribute("tabindex")).not.toBe("-1");
+            const label = page.getElementById(input.getAttribute("aria-labelledby"));
+            expect(modal.contains(label)).toBe(true);
+        });
     });
 });
