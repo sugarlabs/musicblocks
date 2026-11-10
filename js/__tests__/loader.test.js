@@ -101,6 +101,9 @@ describe("loader.js coverage", () => {
                 shim: expect.objectContaining({
                     "tweenjs.min": expect.objectContaining({
                         deps: ["easeljs.min"]
+                    }),
+                    "activity/block": expect.objectContaining({
+                        deps: expect.arrayContaining(["activity/piemenus"])
                     })
                 })
             })
