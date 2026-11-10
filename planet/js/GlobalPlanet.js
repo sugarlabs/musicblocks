@@ -50,6 +50,7 @@ class GlobalPlanet {
         this.searching = false;
         this.searchString = "";
         this.oldSearchString = "";
+        this._offline = false;
         this._requestId = 0;
         this.remixPrefix = _("Remix of");
 
@@ -232,7 +233,14 @@ class GlobalPlanet {
 
     afterRefreshProjects(data, requestId = this._requestId) {
         if (requestId !== this._requestId) return;
-        data.success ? this.addProjects(data.data, requestId) : this.throwOfflineError();
+
+        if (data.success) {
+            this._offline = false;
+            this.addProjects(data.data, requestId);
+        } else {
+            this.throwOfflineError();
+            this.Planet._scheduleReconnectRetry?.();
+        }
     }
 
     addProjects(data, requestId = this._requestId) {
@@ -422,6 +430,7 @@ class GlobalPlanet {
         if (rendered === 0 && data.length > 0) {
             if (this.batchHasOfflineError) {
                 this.throwOfflineError();
+                this.Planet._scheduleReconnectRetry?.();
             } else {
                 this.throwNoProjectsError();
             }
@@ -435,14 +444,24 @@ class GlobalPlanet {
     afterAddProjects() {
         this.index += this.page;
         this.hideLoading();
+        this.Planet._finishReconnectRecovery?.();
 
         if (this.oldSearchString !== "") this.afterSearch();
+    }
+
+    recoverFromOffline() {
+        if (!this._offline) return false;
+
+        this._offline = false;
+        this.refreshProjects();
+        return true;
     }
 
     // Both error screens end whatever list was loading. A search that ends here never
     // reaches afterSearch(), so clear the flag too, or search() ignores every later
     // query (and the clear button) until reload.
     throwOfflineError() {
+        this._offline = true;
         this.searching = false;
         this.hideLoading();
         this.hideLoadMore();
@@ -460,6 +479,8 @@ class GlobalPlanet {
         const element = document.getElementById("global-projects");
         element.innerHTML = "";
         element.insertAdjacentHTML("afterbegin", this.noProjects);
+
+        this.Planet._finishReconnectRecovery?.();
     }
 
     hideLoading() {
@@ -731,13 +752,25 @@ class GlobalPlanet {
             this.listenerRefs.push({ el, type, bound });
         };
 
+        const globalTitle = document.getElementById("globaltitle");
+        const globalContents = document.getElementById("globalcontents");
+        const startupOffline = document.getElementById("global-startup-offline");
+
         if (!Planet.ConnectedToServer) {
-            document.getElementById("globaltitle").textContent = _("Cannot connect to server");
-            document.getElementById("globalcontents").innerHTML = "";
-            document
-                .getElementById("globalcontents")
-                .insertAdjacentHTML("afterbegin", this.offlineHTML);
+            globalTitle.textContent = _("Cannot connect to server");
+            globalContents.style.display = "none";
+
+            if (!startupOffline) {
+                const offline = document.createElement("div");
+                offline.id = "global-startup-offline";
+                offline.insertAdjacentHTML("afterbegin", this.offlineHTML);
+                globalContents.insertAdjacentElement("afterend", offline);
+            }
         } else {
+            globalTitle.textContent = _("Explore Projects");
+            globalContents.style.display = "";
+
+            if (startupOffline) startupOffline.remove();
             jQuery("#sort-select").material_select(evt => {
                 this.sortBy = document.getElementById("sort-select").value;
                 this.refreshProjects();

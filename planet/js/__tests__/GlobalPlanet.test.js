@@ -118,12 +118,68 @@ describe("GlobalPlanet", () => {
             expect(gp.searching).toBe(false);
             expect(gp.searchString).toBe("");
             expect(gp.oldSearchString).toBe("");
+            expect(gp._offline).toBe(false);
         });
 
         it("should set remixPrefix from translation", () => {
             expect(gp.remixPrefix).toBe("Remix of");
         });
     });
+
+    describe("init startup recovery", () => {
+        it("preserves Global Planet controls when startup is offline and restores them later", () => {
+            const globalContents = document.getElementById("globalcontents");
+            globalContents.innerHTML = '<div id="preserved-control"></div>';
+
+            mockPlanet.ConnectedToServer = false;
+
+            gp.init();
+
+            expect(globalContents.style.display).toBe("none");
+            expect(document.getElementById("preserved-control")).not.toBeNull();
+            expect(document.getElementById("global-startup-offline")).not.toBeNull();
+            expect(document.getElementById("globaltitle").textContent).toBe(
+                "Cannot connect to server"
+            );
+
+            mockPlanet.ConnectedToServer = true;
+
+            jest.spyOn(gp, "initTagList").mockImplementation(() => {});
+
+            gp.init();
+
+            expect(globalContents.style.display).toBe("");
+            expect(document.getElementById("global-startup-offline")).toBeNull();
+            expect(document.getElementById("preserved-control")).not.toBeNull();
+            expect(document.getElementById("globaltitle").textContent).toBe("Explore Projects");
+        });
+    });
+
+    describe("recoverFromOffline", () => {
+        it("refreshes projects when recovering from the offline state", () => {
+            const refreshSpy = jest.spyOn(gp, "refreshProjects").mockImplementation(() => {});
+
+            gp.throwOfflineError();
+
+            expect(gp._offline).toBe(true);
+
+            const recovered = gp.recoverFromOffline();
+
+            expect(recovered).toBe(true);
+            expect(gp._offline).toBe(false);
+            expect(refreshSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("does not refresh projects when not in the offline state", () => {
+            const refreshSpy = jest.spyOn(gp, "refreshProjects").mockImplementation(() => {});
+
+            const recovered = gp.recoverFromOffline();
+
+            expect(recovered).toBe(false);
+            expect(refreshSpy).not.toHaveBeenCalled();
+        });
+    });
+
     describe("initTagList", () => {
         it("should read the selected sort option", () => {
             const sortSelect = document.getElementById("sort-select");
@@ -206,6 +262,60 @@ describe("GlobalPlanet", () => {
                 25,
                 expect.any(Function)
             );
+        });
+
+        it("ignores a delayed search failure after a reconnect refresh", () => {
+            const callbacks = [];
+
+            mockPlanet.ServerInterface.searchProjects.mockImplementation(
+                (_query, _sort, _start, _end, callback) => {
+                    callbacks.push(callback);
+                }
+            );
+
+            gp.oldSearchString = "hello";
+            gp.searchString = "hello";
+            gp.sortBy = "RECENT";
+
+            // Original request starts before reconnect.
+            gp.refreshProjects();
+            const firstRequestId = gp._requestId;
+
+            // Reconnect triggers a fresh request.
+            gp.refreshProjects();
+
+            expect(gp._requestId).toBe(firstRequestId + 1);
+            expect(callbacks).toHaveLength(2);
+
+            // Original request reports failure after reconnect.
+            callbacks[0]({ success: false });
+
+            expect(gp._offline).toBe(false);
+            expect(document.getElementById("global-projects").textContent).not.toContain(
+                "Feature unavailable"
+            );
+
+            // The new request completes successfully.
+            callbacks[1]({ success: true, data: [] });
+
+            expect(gp._offline).toBe(false);
+            expect(document.getElementById("global-projects").textContent).toContain(
+                "No results found."
+            );
+        });
+
+        it("requests another recovery attempt when the project list fails", () => {
+            const scheduleRetry = jest.fn();
+            mockPlanet._scheduleReconnectRetry = scheduleRetry;
+
+            gp.refreshProjects();
+
+            const callback = mockPlanet.ServerInterface.downloadProjectList.mock.calls[0][4];
+
+            callback({ success: false });
+
+            expect(gp._offline).toBe(true);
+            expect(scheduleRetry).toHaveBeenCalledTimes(1);
         });
     });
 

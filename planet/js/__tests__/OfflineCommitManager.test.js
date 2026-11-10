@@ -170,6 +170,44 @@ describe("OfflineCommitManager", () => {
         });
     });
 
+    describe("Reconnect handling", () => {
+        test("calls the reconnect callback when NetworkMonitor reports online", () => {
+            const onReconnect = jest.fn();
+
+            manager.destroy();
+            manager = new OfflineCommitManager(storage, server, onReconnect);
+
+            manager._monitor.onOnline();
+
+            expect(onReconnect).toHaveBeenCalledTimes(1);
+        });
+
+        test("continues reconnect handling when the reconnect callback throws", () => {
+            const error = new Error("reconnect failed");
+            const onReconnect = jest.fn(() => {
+                throw error;
+            });
+
+            const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+
+            manager.destroy();
+            manager = new OfflineCommitManager(storage, server, onReconnect);
+
+            const onlineSpy = jest.spyOn(manager, "_onOnline").mockImplementation(() => {});
+
+            manager._monitor.onOnline();
+
+            expect(onReconnect).toHaveBeenCalledTimes(1);
+            expect(warnSpy).toHaveBeenCalledWith(
+                "[OfflineCommitManager] Reconnect handler failed:",
+                error
+            );
+            expect(onlineSpy).toHaveBeenCalledTimes(1);
+
+            warnSpy.mockRestore();
+        });
+    });
+
     describe("Offline Repo Creation", () => {
         test("queueRepoCreation stores pendingRepoCreation and assigns placeholder GitRepoData", async () => {
             storage.data.Projects.p2 = {
