@@ -18,10 +18,11 @@ global.CallGraphLayout = CallGraphLayout;
 global._ = msg => msg;
 
 describe("CallGraphWidget", () => {
-    let activity, widgetWin, body;
+    let activity, widgetWin, body, frame;
 
     beforeEach(() => {
         body = document.createElement("div");
+        frame = document.createElement("div");
 
         widgetWin = {
             clear: jest.fn(),
@@ -31,7 +32,8 @@ describe("CallGraphWidget", () => {
             addButton: jest.fn().mockImplementation(() => ({ onclick: null })),
             onclose: null,
             onmaximize: null,
-            getWidgetBody: jest.fn().mockReturnValue(body)
+            getWidgetBody: jest.fn().mockReturnValue(body),
+            getWidgetFrame: jest.fn().mockReturnValue(frame)
         };
 
         window.widgetWindows = {
@@ -242,8 +244,14 @@ describe("CallGraphWidget", () => {
         // live Block instances in workspace do not have an .id property
         activity.blocks.blockList[4] = liveBlock;
 
-        const success = widget.focusNode({ blockId: 4 });
+        const mockNodeEl = document.createElement("g");
+        mockNodeEl.className = "codemap-node";
+        mockNodeEl.dataset.id = "node-4";
+        widget.graphRoot.appendChild(mockNodeEl);
+
+        const success = widget.focusNode({ id: "node-4", blockId: 4 });
         expect(success).toBe(true);
+        expect(mockNodeEl.classList.contains("codemap-node-selected")).toBe(true);
         expect(activity.blocksContainer.x).toBe(Math.round(800 / 2 - 350));
         expect(activity.blocksContainer.y).toBe(Math.round(600 / 2 - 220));
         expect(liveBlock.highlight).toHaveBeenCalled();

@@ -45,6 +45,10 @@ class CallGraphWidget {
         this._setupWindow();
         this._buildUI();
         this.refresh();
+        if (typeof this.widgetWindow?.sendToCenter === "function") {
+            this.widgetWindow.sendToCenter();
+        }
+        this.fitToView();
     }
 
     /**
@@ -57,6 +61,12 @@ class CallGraphWidget {
         this.widgetWindow = window.widgetWindows.windowFor(this, title, "code map");
         this.widgetWindow.clear();
         this.widgetWindow.show();
+        if (
+            typeof this.widgetWindow.getWidgetFrame === "function" &&
+            this.widgetWindow.getWidgetFrame()
+        ) {
+            this.widgetWindow.getWidgetFrame().classList.add("codemap-widget-frame");
+        }
 
         // Window controls
         this.widgetWindow.addButton(
@@ -473,7 +483,7 @@ class CallGraphWidget {
                     ? _("1 Action")
                     : "1 Action"
                 : typeof _ === "function"
-                  ? _("%s Actions", { count: totalActions })
+                  ? _("%s Actions").replace("%s", totalActions)
                   : `${totalActions} Actions`;
         const callLabel =
             totalCalls === 1
@@ -481,14 +491,14 @@ class CallGraphWidget {
                     ? _("1 Call")
                     : "1 Call"
                 : typeof _ === "function"
-                  ? _("%s Calls", { count: totalCalls })
+                  ? _("%s Calls").replace("%s", totalCalls)
                   : `${totalCalls} Calls`;
 
         let statusText = `${actionLabel} • ${callLabel}`;
         if (recCount > 0) {
             const recLabel =
                 typeof _ === "function"
-                    ? _("%s Recursive", { count: recCount })
+                    ? _("%s Recursive").replace("%s", recCount)
                     : `${recCount} Recursive`;
             statusText += ` • ⚠️ ${recLabel}`;
             this.summaryBadge.className = "codemap-summary-badge codemap-summary-warning";
@@ -499,7 +509,7 @@ class CallGraphWidget {
         if (summary.missingTargetsCount > 0) {
             const missingLabel =
                 typeof _ === "function"
-                    ? _("%s Missing", { count: summary.missingTargetsCount })
+                    ? _("%s Missing").replace("%s", summary.missingTargetsCount)
                     : `${summary.missingTargetsCount} Missing`;
             statusText += ` • ${missingLabel}`;
         }
@@ -564,6 +574,18 @@ class CallGraphWidget {
             return false;
         }
 
+        // Highlight selected node in Code Map SVG
+        if (this.graphRoot) {
+            const nodeEls = this.graphRoot.querySelectorAll(".codemap-node");
+            for (const el of nodeEls) {
+                el.classList.remove("codemap-node-selected");
+            }
+            const targetEl = this.graphRoot.querySelector(`.codemap-node[data-id="${node.id}"]`);
+            if (targetEl) {
+                targetEl.classList.add("codemap-node-selected");
+            }
+        }
+
         // Center block in canvas viewport
         const canvas = this.activity.canvas || docById("myCanvas");
         if (canvas && this.activity.blocksContainer) {
@@ -609,8 +631,13 @@ class CallGraphWidget {
         }
 
         const { bounds } = this.currentLayout;
-        const bWidth = bounds.width > 0 ? bounds.width : 600;
-        const bHeight = bounds.height > 0 ? bounds.height : 400;
+        const minX = Number.isFinite(bounds.minX) ? bounds.minX : 0;
+        const maxX = Number.isFinite(bounds.maxX) ? bounds.maxX : 600;
+        const minY = Number.isFinite(bounds.minY) ? bounds.minY : 0;
+        const maxY = Number.isFinite(bounds.maxY) ? bounds.maxY : 400;
+
+        const graphW = Math.max(50, maxX - minX + 40);
+        const graphH = Math.max(50, maxY - minY + 40);
 
         const vRect = this.viewport.getBoundingClientRect();
         const vWidth = Math.max(100, vRect.width || 600);
@@ -619,11 +646,14 @@ class CallGraphWidget {
         const availableW = Math.max(20, vWidth - 40);
         const availableH = Math.max(20, vHeight - 40);
 
-        const rawScale = Math.min(availableW / bWidth, availableH / bHeight);
+        const rawScale = Math.min(availableW / graphW, availableH / graphH);
         const scale = Number.isFinite(rawScale) ? Math.max(0.05, Math.min(1.2, rawScale)) : 1;
 
-        const tx = Math.round((vWidth - bWidth * scale) / 2 - (bounds.minX || 0) * scale);
-        const ty = Math.round((vHeight - bHeight * scale) / 2 - (bounds.minY || 0) * scale);
+        const centerX = (minX + maxX) / 2;
+        const centerY = (minY + maxY) / 2;
+
+        const tx = Math.round(vWidth / 2 - centerX * scale);
+        const ty = Math.round(vHeight / 2 - centerY * scale);
 
         this.transform = { x: tx, y: ty, scale };
         this._updateTransform();
