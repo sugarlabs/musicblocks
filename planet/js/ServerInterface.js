@@ -130,17 +130,19 @@ class ServerInterface {
 
     async throttledRequest(data, callback) {
         if (this.requestManager) {
+            let result;
+
             try {
-                await this.requestManager.throttledRequest(data, resolve => {
-                    this.request(data, result => {
-                        resolve();
-                        callback(result);
-                    });
+                result = await this.requestManager.throttledRequest(data, resolve => {
+                    this.request(data, resolve);
                 });
             } catch (err) {
                 console.error("[ServerInterface] throttledRequest error:", err);
                 callback(this.ConnectionFailureData);
+                return;
             }
+
+            callback(result);
         } else {
             this.request(data, callback);
         }
