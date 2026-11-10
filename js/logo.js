@@ -1199,10 +1199,14 @@ class Logo {
             firstDockType === "booleanout"
         ) {
             switch (blockName) {
-                case "dectofrac":
+                case "dectofrac": {
+                    const parentId = currentBlock.connections?.[0];
                     if (
                         logo.inStatusMatrix &&
-                        logo.blockList[currentBlock.connections[0]].name === "print"
+                        parentId !== null &&
+                        parentId !== undefined &&
+                        logo.blockList[parentId] &&
+                        logo.blockList[parentId].name === "print"
                     ) {
                         logo.statusFields.push([blk, "dectofrac"]);
                     } else {
@@ -1222,17 +1226,23 @@ class Logo {
                         }
                     }
                     break;
+                }
 
-                case "hue":
+                case "hue": {
+                    const parentId = currentBlock.connections?.[0];
                     if (
                         logo.inStatusMatrix &&
-                        logo.blockList[currentBlock.connections[0]].name === "print"
+                        parentId !== null &&
+                        parentId !== undefined &&
+                        logo.blockList[parentId] &&
+                        logo.blockList[parentId].name === "print"
                     ) {
                         logo.statusFields.push([blk, "color"]);
                     } else {
                         currentBlock.value = tur.painter.color;
                     }
                     break;
+                }
 
                 /** @deprecated */
                 case "returnValue":

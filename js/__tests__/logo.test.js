@@ -4038,6 +4038,121 @@ describe("Logo parseArg", () => {
             expect(logo.blockList[1].value).toBe(75);
         });
 
+        test("dectofrac with null parent connection when inStatusMatrix is true does not throw and calculates value", () => {
+            logo.statusFields = [];
+            logo.inStatusMatrix = true;
+            logo.blockList = [
+                {
+                    name: "dectofrac",
+                    value: null,
+                    connections: [null, 1],
+                    protoblock: { parameter: false, dockTypes: ["numberout"] },
+                    isValueBlock: () => false
+                },
+                {
+                    name: "number",
+                    value: 0.5,
+                    protoblock: { parameter: false },
+                    isValueBlock: () => true
+                }
+            ];
+
+            let result;
+            expect(() => {
+                result = logo.parseArg(logo, 0, 0, null, null);
+            }).not.toThrow();
+
+            expect(result).toBe("0.5");
+            expect(logo.blockList[0].value).toBe("0.5");
+            expect(logo.statusFields).toEqual([]);
+            logo.inStatusMatrix = false;
+        });
+
+        test("dectofrac with null parent and null child connection when inStatusMatrix is true handles NOINPUTERRORMSG safely", () => {
+            logo.statusFields = [];
+            logo.inStatusMatrix = true;
+            logo.blockList = [
+                {
+                    name: "dectofrac",
+                    value: 99,
+                    connections: [null, null],
+                    protoblock: { parameter: false, dockTypes: ["numberout"] },
+                    isValueBlock: () => false
+                }
+            ];
+
+            let result;
+            expect(() => {
+                result = logo.parseArg(logo, 0, 0, null, null);
+            }).not.toThrow();
+
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 0);
+            expect(logo.blockList[0].value).toBe(0);
+            expect(result).toBe(0);
+            expect(logo.statusFields).toEqual([]);
+            logo.inStatusMatrix = false;
+        });
+
+        test("hue with null parent connection when inStatusMatrix is true does not throw and returns painter color", () => {
+            logo.statusFields = [];
+            logo.inStatusMatrix = true;
+            logo.blockList = [
+                {
+                    name: "hue",
+                    value: null,
+                    connections: [null],
+                    protoblock: { parameter: false, dockTypes: ["numberout"] },
+                    isValueBlock: () => false
+                }
+            ];
+
+            let result;
+            expect(() => {
+                result = logo.parseArg(logo, 0, 0, null, null);
+            }).not.toThrow();
+
+            expect(result).toBe(75);
+            expect(logo.blockList[0].value).toBe(75);
+            expect(logo.statusFields).toEqual([]);
+            logo.inStatusMatrix = false;
+        });
+
+        test("dectofrac and hue connected to non-print parent when inStatusMatrix is true do not register in statusFields", () => {
+            logo.statusFields = [];
+            logo.inStatusMatrix = true;
+            logo.blockList = [
+                {
+                    name: "forward",
+                    connections: [null, 1]
+                },
+                {
+                    name: "dectofrac",
+                    value: null,
+                    connections: [0, 2],
+                    protoblock: { parameter: false, dockTypes: ["numberout"] },
+                    isValueBlock: () => false
+                },
+                {
+                    name: "number",
+                    value: 0.25,
+                    protoblock: { parameter: false },
+                    isValueBlock: () => true
+                },
+                {
+                    name: "hue",
+                    value: null,
+                    connections: [0],
+                    protoblock: { parameter: false, dockTypes: ["numberout"] },
+                    isValueBlock: () => false
+                }
+            ];
+
+            expect(logo.parseArg(logo, 0, 1, 0, null)).toBe("0.25");
+            expect(logo.parseArg(logo, 0, 3, 0, null)).toBe(75);
+            expect(logo.statusFields).toEqual([]);
+            logo.inStatusMatrix = false;
+        });
+
         test("returnValue with empty returns stack returns 0", () => {
             logo.returns[0] = [];
             logo.blockList = [makeNumArgBlock("returnValue")];
