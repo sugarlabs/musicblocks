@@ -117,6 +117,48 @@ describe("Mouse Class", () => {
         mouse = new Mouse(mockFlow);
     });
 
+    test("screen dimension getters use canvas dimensions and turtle scale", () => {
+        const originalCanvas = globalActivity.turtles._canvas;
+        const originalScale = globalActivity.turtles.scale;
+        try {
+            globalActivity.turtles._canvas = { width: 1200, height: 800 };
+            globalActivity.turtles.scale = 2;
+
+            expect(mouse.MB.TOPPOS).toBe(200);
+            expect(mouse.MB.BOTTOMPOS).toBe(-200);
+            expect(mouse.MB.LEFTPOS).toBe(-300);
+            expect(mouse.MB.RIGHTPOS).toBe(300);
+            expect(mouse.MB.WIDTH).toBe(600);
+            expect(mouse.MB.HEIGHT).toBe(400);
+
+            globalActivity.turtles.scale = 0;
+            expect(mouse.MB.TOPPOS).toBe(0);
+            expect(mouse.MB.LEFTPOS).toBe(0);
+            expect(mouse.MB.RIGHTPOS).toBe(0);
+            expect(mouse.MB.WIDTH).toBe(0);
+            expect(mouse.MB.HEIGHT).toBe(0);
+
+            globalActivity.turtles.scale = 2;
+            globalActivity.turtles._canvas = { width: 0, height: 0 };
+            expect(mouse.MB.TOPPOS).toBe(0);
+            expect(mouse.MB.LEFTPOS).toBe(0);
+            expect(mouse.MB.RIGHTPOS).toBe(0);
+            expect(mouse.MB.WIDTH).toBe(0);
+            expect(mouse.MB.HEIGHT).toBe(0);
+
+            globalActivity.turtles._canvas = null;
+            expect(mouse.MB.TOPPOS).toBe(0);
+            expect(mouse.MB.BOTTOMPOS).toBe(0);
+            expect(mouse.MB.LEFTPOS).toBe(0);
+            expect(mouse.MB.RIGHTPOS).toBe(0);
+            expect(mouse.MB.WIDTH).toBe(0);
+            expect(mouse.MB.HEIGHT).toBe(0);
+        } finally {
+            globalActivity.turtles._canvas = originalCanvas;
+            globalActivity.turtles.scale = originalScale;
+        }
+    });
+
     test("should create a new Mouse instance", () => {
         expect(mouse).toBeInstanceOf(Mouse);
         expect(Mouse.MouseList).toContain(mouse);
