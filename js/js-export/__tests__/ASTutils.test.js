@@ -615,6 +615,25 @@ describe("ASTUtils", () => {
                 arguments: ASTUtils._getArgsAST(args)
             });
         });
+
+        it("should call the mapped method for a block the API supports", () => {
+            JSInterface.isMethod.mockReturnValueOnce(true);
+            JSInterface.getMethodName.mockReturnValueOnce("MathUtility.doInt");
+            const result = ASTUtils._getArgExpAST("int", [3.7]);
+            expect(astring.generate(result)).toBe("MathUtility.doInt(3.7)");
+        });
+
+        it("should export a block with no mapping as a marked undefined, not null(...)", () => {
+            JSInterface.isMethod.mockReturnValueOnce(false);
+            ASTUtils.unsupportedArgBlocks.clear();
+
+            const result = ASTUtils._getArgExpAST("clampNumber", [5, 0, 3]);
+            const code = astring.generate(result);
+
+            expect(code).toBe("undefined /* unsupported block: clampNumber */");
+            expect(new Function(`return ${code}`)()).toBeUndefined();
+            expect([...ASTUtils.unsupportedArgBlocks]).toEqual(["clampNumber"]);
+        });
     });
 
     describe("_getArgsAST", () => {
