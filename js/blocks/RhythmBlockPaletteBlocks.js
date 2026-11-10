@@ -249,6 +249,18 @@ function setupRhythmBlockPaletteBlocks(activity) {
                     tur.singer.noteCents[last(tur.singer.inNoteBlock)] = [0];
                 }
 
+                // Set noteValue for the rhythm block so getNoteValue() returns the correct
+                // beat value (fraction of whole note) instead of falling back to lastNotePlayed
+                // which stores different units for different block types.
+                if (tur.singer.noteValue === undefined) {
+                    tur.singer.noteValue = {};
+                }
+                const isRhythm2 = activity.blocks.blockList[blk].name === "rhythm2";
+                const storedNoteValue = isRhythm2
+                    ? noteBeatValue / tur.singer.beatFactor
+                    : 1 / (noteBeatValue * tur.singer.beatFactor);
+                tur.singer.noteValue[last(tur.singer.inNoteBlock)] = storedNoteValue;
+
                 const bpmFactor =
                     TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 
