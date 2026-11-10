@@ -6886,4 +6886,66 @@ describe("sendStackToTrash – turtle container guard", () => {
             expect(blocksInstance.insideExpandableBlock(4)).toBeNull();
         });
     });
+
+    describe("sendStackToTrash position preservation", () => {
+        let blocksInstance;
+
+        beforeEach(() => {
+            blocksInstance = new Blocks(mockActivity);
+            blocksInstance.captureStackPreview = jest.fn(() => "data:image/png;base64,abc");
+            blocksInstance.findDragGroup = jest.fn(blkId => {
+                blocksInstance.dragGroup = [blkId, blkId + 1];
+            });
+            blocksInstance.blockList = [
+                {
+                    blockIndex: 0,
+                    name: "forward",
+                    connections: [null, 1],
+                    trash: false,
+                    container: { x: 450, y: 520, uncache: jest.fn() },
+                    hide: jest.fn(),
+                    protoblock: {}
+                },
+                {
+                    blockIndex: 1,
+                    name: "right",
+                    connections: [0, null],
+                    trash: false,
+                    container: { x: 450, y: 560, uncache: jest.fn() },
+                    hide: jest.fn(),
+                    protoblock: {}
+                }
+            ];
+        });
+
+        it("saves pre-drag positions in trashPositions when trashed via drag-and-drop", () => {
+            blocksInstance.dragStartX = 120;
+            blocksInstance.dragStartY = 180;
+
+            blocksInstance.sendStackToTrash(blocksInstance.blockList[0]);
+
+            expect(blocksInstance.trashPositions[0]).toEqual({ x: 120, y: 180 });
+            expect(blocksInstance.trashPositions[1]).toEqual({ x: 120, y: 220 });
+            expect(blocksInstance.dragStartX).toBeUndefined();
+            expect(blocksInstance.dragStartY).toBeUndefined();
+        });
+
+        it("saves current container positions in trashPositions when trashed without drag", () => {
+            blocksInstance.dragStartX = undefined;
+            blocksInstance.dragStartY = undefined;
+
+            blocksInstance.sendStackToTrash(blocksInstance.blockList[0]);
+
+            expect(blocksInstance.trashPositions[0]).toEqual({ x: 450, y: 520 });
+            expect(blocksInstance.trashPositions[1]).toEqual({ x: 450, y: 560 });
+        });
+
+        it("cleans up trashPositions when a block is disposed", () => {
+            blocksInstance.trashPositions[0] = { x: 120, y: 180 };
+
+            blocksInstance.disposeBlock(0);
+
+            expect(blocksInstance.trashPositions[0]).toBeUndefined();
+        });
+    });
 });

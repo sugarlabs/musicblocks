@@ -3598,6 +3598,8 @@ class Block {
             const onLongPress = () => {
                 that.blocks.activeBlock = that.blockIndex;
                 that._triggerLongPress = true;
+                that.blocks.dragStartX = undefined;
+                that.blocks.dragStartY = undefined;
                 window._contextWheelIgnoreNextClick = that._longPressButton === 0;
                 window._contextWheelIgnoreNextMouseUp = true;
                 that.blocks.triggerLongPress();
@@ -3618,6 +3620,8 @@ class Block {
                     this.expandButtonBitmap.getBounds().contains(localPoint.x, localPoint.y);
 
                 if (isColExpClick) {
+                    that.blocks.dragStartX = undefined;
+                    that.blocks.dragStartY = undefined;
                     that.activity.trashcan.hide();
                     return;
                 }
@@ -4067,6 +4071,11 @@ class Block {
                     }
                 }
             }
+        }
+
+        if (dragEnded) {
+            this.blocks.dragStartX = undefined;
+            this.blocks.dragStartY = undefined;
         }
 
         if (hideDOM) {

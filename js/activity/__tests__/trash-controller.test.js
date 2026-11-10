@@ -201,6 +201,34 @@ describe("TrashController.restoreTrashById", () => {
         expect(activity.refreshCanvas).toHaveBeenCalled();
     });
 
+    test("restores blocks to their saved pre-trash positions when trashPositions is present", () => {
+        const activity = makeActivity();
+        const block1 = makeBlock({ name: "note" });
+        block1.container.x = 500;
+        block1.container.y = 550;
+        const block2 = makeBlock({ name: "pitch" });
+        block2.container.x = 500;
+        block2.container.y = 590;
+        activity.blocks.blockList.blk1 = block1;
+        activity.blocks.blockList.blk2 = block2;
+        activity.blocks.trashStacks = ["blk1"];
+        activity.blocks.trashPositions = {
+            blk1: { x: 120, y: 180 },
+            blk2: { x: 120, y: 220 }
+        };
+        activity.blocks.findDragGroup.mockImplementation(() => {
+            activity.blocks.dragGroup = ["blk1", "blk2"];
+        });
+        const controller = new TrashController(activity);
+
+        controller.restoreTrashById("blk1");
+
+        expect(activity.blocks.moveBlockRelative).toHaveBeenCalledWith("blk1", -380, -370);
+        expect(activity.blocks.moveBlockRelative).toHaveBeenCalledWith("blk2", -380, -370);
+        expect(activity.blocks.trashPositions.blk1).toBeUndefined();
+        expect(activity.blocks.trashPositions.blk2).toBeUndefined();
+    });
+
     test("regenerates artwork and re-caches the container when they were freed by trashing", () => {
         const activity = makeActivity();
         const block = makeBlock();

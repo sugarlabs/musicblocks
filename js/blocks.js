@@ -213,6 +213,8 @@ class Blocks {
         this.isUndoingOrRedoing = false;
         /** We keep a list of previews of stacks in the trash. */
         this.trashPreviews = {};
+        /** We keep the pre-trash workspace positions of blocks in the trash. */
+        this.trashPositions = {};
 
         /** When true, checkBounds() calls are suppressed until
          *  _endDeferCheckBounds() runs one final check. */
@@ -8018,6 +8020,9 @@ class Blocks {
             if (this.blockCollapseArt && this.blockCollapseArt[blkIdx]) {
                 delete this.blockCollapseArt[blkIdx];
             }
+            if (this.trashPositions && this.trashPositions[blkIdx]) {
+                delete this.trashPositions[blkIdx];
+            }
             // The block is gone for good, so drop it from the spatial grid too --
             // otherwise _getNearbyBlocks keeps handing out this index after
             // blockList[blkIdx] has been nulled out below (issue #8610).
@@ -8154,6 +8159,21 @@ class Blocks {
             this.activity.refreshCanvas();
 
             const thisBlock = myBlock.blockIndex;
+            let dragDx = 0;
+            let dragDy = 0;
+            if (
+                this.dragStartX !== undefined &&
+                this.dragStartY !== undefined &&
+                myBlock &&
+                myBlock.container &&
+                typeof myBlock.container.x === "number" &&
+                typeof myBlock.container.y === "number"
+            ) {
+                dragDx = myBlock.container.x - this.dragStartX;
+                dragDy = myBlock.container.y - this.dragStartY;
+            }
+            this.dragStartX = undefined;
+            this.dragStartY = undefined;
 
             /** Capture a preview of the stack before hiding/uncaching. */
             const preview = this.captureStackPreview(thisBlock);
@@ -8228,6 +8248,19 @@ class Blocks {
             this.findDragGroup(thisBlock);
             for (let b = 0; b < this.dragGroup.length; b++) {
                 const blk = this.dragGroup[b];
+                if (
+                    this.blockList[blk].container &&
+                    typeof this.blockList[blk].container.x === "number" &&
+                    typeof this.blockList[blk].container.y === "number"
+                ) {
+                    if (!this.trashPositions) {
+                        this.trashPositions = {};
+                    }
+                    this.trashPositions[blk] = {
+                        x: this.blockList[blk].container.x - dragDx,
+                        y: this.blockList[blk].container.y - dragDy
+                    };
+                }
                 this.blockList[blk].trash = true;
                 this._updateViewportGrid(blk);
                 this.blockList[blk].hide();
