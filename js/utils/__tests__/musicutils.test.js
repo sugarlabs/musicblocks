@@ -752,6 +752,869 @@ describe("getIntervalRatio", () => {
     });
 });
 
+describe("getInterval", () => {
+    // The sum a stepwise walk over the scale steps produces, computed
+    // directly from buildScale's step table. getInterval must agree with
+    // it for every ordinary interval while costing the same to compute
+    // for an interval of any size.
+    const stepwiseSum = (interval, keySignature, pitch, edo) => {
+        const [scale, halfSteps] = buildScale(keySignature, edo);
+        const ii = scale.indexOf(pitch);
+        let j = 0;
+        if (interval > 0) {
+            for (let k = 0; k < interval; k++) {
+                j += halfSteps[(ii + k) % halfSteps.length];
+            }
+        } else {
+            for (let k = 0; k > interval; k--) {
+                let z = (ii + k - 1) % halfSteps.length;
+                while (z < 0) {
+                    z += halfSteps.length;
+                }
+                j -= halfSteps[z];
+            }
+        }
+        return j;
+    };
+
+    it("resolves the documented examples", () => {
+        expect(getInterval(2, "C major", "E")).toBe(3);
+        expect(getInterval(2, "C major", "E", 19)).toBe(5);
+        expect(getInterval(2, "C major", "E", 31)).toBe(8);
+        expect(getInterval(4, "C major", "C")).toBe(7);
+        expect(getInterval(-2, "C major", "C")).toBe(-3);
+        expect(getInterval(0, "C major", "C")).toBe(0);
+        expect(getInterval(1, "C major", "C")).toBe(2);
+        expect(getInterval(-1, "C major", "C")).toBe(-1);
+        expect(getInterval(7, "C major", "C")).toBe(12);
+        expect(getInterval(-7, "C major", "C")).toBe(-12);
+        expect(getInterval(3, "G major", "D")).toBe(5);
+        expect(getInterval(-3, "G major", "D")).toBe(-5);
+    });
+
+    it("agrees with the stepwise sum for every mode and scale pitch", () => {
+        const tonics = ["C", "G", "D", "F", "B♭", "F♯"];
+        const modes = Object.keys(MUSICALMODES).filter(mode => mode !== "custom");
+        let checked = 0;
+        for (const tonic of tonics) {
+            for (const mode of modes) {
+                const keySignature = tonic + " " + mode;
+                const scale = buildScale(keySignature)[0];
+                for (const pitch of scale.slice(0, -1)) {
+                    for (let interval = -15; interval <= 15; interval++) {
+                        expect(getInterval(interval, keySignature, pitch)).toBe(
+                            stepwiseSum(interval, keySignature, pitch)
+                        );
+                        checked++;
+                    }
+                }
+            }
+        }
+        expect(checked).toBeGreaterThan(10000);
+    });
+
+    it("agrees with the stepwise sum in other EDOs", () => {
+        const keys = ["C major", "G major", "F major", "D minor", "A locrian", "E whole tone"];
+        let checked = 0;
+        for (const edo of [5, 7, 19, 24, 31, 53]) {
+            for (const keySignature of keys) {
+                const scale = buildScale(keySignature, edo)[0];
+                for (const pitch of scale.slice(0, -1)) {
+                    for (let interval = -15; interval <= 15; interval++) {
+                        expect(getInterval(interval, keySignature, pitch, edo)).toBe(
+                            stepwiseSum(interval, keySignature, pitch, edo)
+                        );
+                        checked++;
+                    }
+                }
+            }
+        }
+        expect(checked).toBeGreaterThan(5000);
+    });
+
+    // Recorded from the stepwise implementation this replaced, so any
+    // change in how a pitch outside the scale is shifted to a neighbour
+    // shows up here even where the stepwise helper above cannot follow.
+    it("sums from chromatic pitches next to the scale", () => {
+        const cases = [
+            ["C major", "C♯", -9, -15],
+            ["C major", "C♯", -4, -7],
+            ["C major", "C♯", -1, -1],
+            ["C major", "C♯", 1, 2],
+            ["C major", "C♯", 4, 7],
+            ["C major", "C♯", 9, 15],
+            ["C major", "D♯", -9, -15],
+            ["C major", "D♯", -4, -7],
+            ["C major", "D♯", -1, -2],
+            ["C major", "D♯", 1, 1],
+            ["C major", "D♯", 4, 7],
+            ["C major", "D♯", 9, 15],
+            ["G major", "C♯", -9, -15],
+            ["G major", "C♯", -4, -6],
+            ["G major", "C♯", -1, -1],
+            ["G major", "C♯", 1, 2],
+            ["G major", "C♯", 4, 7],
+            ["G major", "C♯", 9, 16],
+            ["G major", "D♯", -9, -15],
+            ["G major", "D♯", -4, -7],
+            ["G major", "D♯", -1, -2],
+            ["G major", "D♯", 1, 2],
+            ["G major", "D♯", 4, 7],
+            ["G major", "D♯", 9, 15],
+            ["D major", "C", -9, -16],
+            ["D major", "C", -4, -7],
+            ["D major", "C", -1, -2],
+            ["D major", "C", 1, 1],
+            ["D major", "C", 4, 6],
+            ["D major", "C", 9, 15],
+            ["D major", "D♯", -9, -15],
+            ["D major", "D♯", -4, -7],
+            ["D major", "D♯", -1, -1],
+            ["D major", "D♯", 1, 2],
+            ["D major", "D♯", 4, 7],
+            ["D major", "D♯", 9, 15],
+            ["A major", "C", -9, -15],
+            ["A major", "C", -4, -7],
+            ["A major", "C", -1, -2],
+            ["A major", "C", 1, 1],
+            ["A major", "C", 4, 7],
+            ["A major", "C", 9, 15],
+            ["A major", "D♯", -9, -15],
+            ["A major", "D♯", -4, -6],
+            ["A major", "D♯", -1, -1],
+            ["A major", "D♯", 1, 2],
+            ["A major", "D♯", 4, 7],
+            ["A major", "D♯", 9, 16],
+            ["E major", "C", -9, -15],
+            ["E major", "C", -4, -7],
+            ["E major", "C", -1, -2],
+            ["E major", "C", 1, 2],
+            ["E major", "C", 4, 7],
+            ["E major", "C", 9, 15],
+            ["E major", "D", -9, -16],
+            ["E major", "D", -4, -7],
+            ["E major", "D", -1, -2],
+            ["E major", "D", 1, 1],
+            ["E major", "D", 4, 6],
+            ["E major", "D", 9, 15],
+            ["B major", "C", -9, -15],
+            ["B major", "C", -4, -7],
+            ["B major", "C", -1, -1],
+            ["B major", "C", 1, 2],
+            ["B major", "C", 4, 7],
+            ["B major", "C", 9, 15],
+            ["B major", "D", -9, -15],
+            ["B major", "D", -4, -7],
+            ["B major", "D", -1, -2],
+            ["B major", "D", 1, 1],
+            ["B major", "D", 4, 7],
+            ["B major", "D", 9, 15],
+            ["F♯ major", "C", -9, -15],
+            ["F♯ major", "C", -4, -6],
+            ["F♯ major", "C", -1, -1],
+            ["F♯ major", "C", 1, 2],
+            ["F♯ major", "C", 4, 7],
+            ["F♯ major", "C", 9, 16],
+            ["F♯ major", "D", -9, -15],
+            ["F♯ major", "D", -4, -7],
+            ["F♯ major", "D", -1, -2],
+            ["F♯ major", "D", 1, 2],
+            ["F♯ major", "D", 4, 7],
+            ["F♯ major", "D", 9, 15],
+            ["C♯ major", "C", -9, -16],
+            ["C♯ major", "C", -4, -7],
+            ["C♯ major", "C", -1, -2],
+            ["C♯ major", "C", 1, 1],
+            ["C♯ major", "C", 4, 6],
+            ["C♯ major", "C", 9, 15],
+            ["C♯ major", "D", -9, -15],
+            ["C♯ major", "D", -4, -7],
+            ["C♯ major", "D", -1, -1],
+            ["C♯ major", "D", 1, 2],
+            ["C♯ major", "D", 4, 7],
+            ["C♯ major", "D", 9, 15],
+            ["F major", "C♯", -9, -15],
+            ["F major", "C♯", -4, -7],
+            ["F major", "C♯", -1, -2],
+            ["F major", "C♯", 1, 2],
+            ["F major", "C♯", 4, 7],
+            ["F major", "C♯", 9, 15],
+            ["F major", "D♯", -9, -16],
+            ["F major", "D♯", -4, -7],
+            ["F major", "D♯", -1, -2],
+            ["F major", "D♯", 1, 1],
+            ["F major", "D♯", 4, 6],
+            ["F major", "D♯", 9, 15],
+            ["B♭ major", "C♯", -9, -15],
+            ["B♭ major", "C♯", -4, -7],
+            ["B♭ major", "C♯", -1, -2],
+            ["B♭ major", "C♯", 1, 1],
+            ["B♭ major", "C♯", 4, 7],
+            ["B♭ major", "C♯", 9, 15],
+            ["B♭ major", "D♯", -9, -15],
+            ["B♭ major", "D♯", -4, -6],
+            ["B♭ major", "D♯", -1, -1],
+            ["B♭ major", "D♯", 1, 2],
+            ["B♭ major", "D♯", 4, 7],
+            ["B♭ major", "D♯", 9, 16],
+            ["E♭ major", "C♯", -9, -16],
+            ["E♭ major", "C♯", -4, -7],
+            ["E♭ major", "C♯", -1, -2],
+            ["E♭ major", "C♯", 1, 1],
+            ["E♭ major", "C♯", 4, 6],
+            ["E♭ major", "C♯", 9, 15],
+            ["E♭ major", "D♯", -9, -15],
+            ["E♭ major", "D♯", -4, -7],
+            ["E♭ major", "D♯", -1, -1],
+            ["E♭ major", "D♯", 1, 2],
+            ["E♭ major", "D♯", 4, 7],
+            ["E♭ major", "D♯", 9, 16],
+            ["A♭ major", "C♯", -9, -15],
+            ["A♭ major", "C♯", -4, -6],
+            ["A♭ major", "C♯", -1, -1],
+            ["A♭ major", "C♯", 1, 2],
+            ["A♭ major", "C♯", 4, 7],
+            ["A♭ major", "C♯", 9, 16],
+            ["A♭ major", "D", -9, -15],
+            ["A♭ major", "D", -4, -6],
+            ["A♭ major", "D", -1, -1],
+            ["A♭ major", "D", 1, 2],
+            ["A♭ major", "D", 4, 7],
+            ["A♭ major", "D", 9, 16],
+            ["D♭ major", "C♯", -9, -15],
+            ["D♭ major", "C♯", -4, -7],
+            ["D♭ major", "C♯", -1, -1],
+            ["D♭ major", "C♯", 1, 2],
+            ["D♭ major", "C♯", 4, 7],
+            ["D♭ major", "C♯", 9, 16],
+            ["D♭ major", "D", -9, -15],
+            ["D♭ major", "D", -4, -7],
+            ["D♭ major", "D", -1, -1],
+            ["D♭ major", "D", 1, 2],
+            ["D♭ major", "D", 4, 7],
+            ["D♭ major", "D", 9, 15],
+            ["G♭ major", "C", -9, -15],
+            ["G♭ major", "C", -4, -6],
+            ["G♭ major", "C", -1, -1],
+            ["G♭ major", "C", 1, 2],
+            ["G♭ major", "C", 4, 7],
+            ["G♭ major", "C", 9, 16],
+            ["G♭ major", "C♯", -9, -15],
+            ["G♭ major", "C♯", -4, -7],
+            ["G♭ major", "C♯", -1, -2],
+            ["G♭ major", "C♯", 1, 2],
+            ["G♭ major", "C♯", 4, 7],
+            ["G♭ major", "C♯", 9, 16]
+        ];
+        for (const [keySignature, pitch, interval, expected] of cases) {
+            expect(getInterval(interval, keySignature, pitch)).toBe(expected);
+        }
+    });
+
+    it("sums from enharmonic spellings of chromatic pitches", () => {
+        const cases = [
+            ["G major", "D♭", -5, -8],
+            ["G major", "D♭", -1, -1],
+            ["G major", "D♭", 1, 2],
+            ["G major", "D♭", 5, 9],
+            ["D major", "A♭", -5, -8],
+            ["D major", "A♭", -1, -1],
+            ["D major", "A♭", 1, 2],
+            ["D major", "A♭", 5, 9],
+            ["A major", "E♭", -5, -8],
+            ["A major", "E♭", -1, -1],
+            ["A major", "E♭", 1, 2],
+            ["A major", "E♭", 5, 9],
+            ["F major", "G♯", -5, -9],
+            ["F major", "G♯", -1, -2],
+            ["F major", "G♯", 1, 1],
+            ["F major", "G♯", 5, 8],
+            ["B♭ major", "F♯", -5, -8],
+            ["B♭ major", "F♯", -1, -2],
+            ["B♭ major", "F♯", 1, 2],
+            ["B♭ major", "F♯", 5, 8],
+            ["E♭ major", "C♯", -5, -9],
+            ["E♭ major", "C♯", -1, -2],
+            ["E♭ major", "C♯", 1, 1],
+            ["E♭ major", "C♯", 5, 8]
+        ];
+        for (const [keySignature, pitch, interval, expected] of cases) {
+            expect(getInterval(interval, keySignature, pitch)).toBe(expected);
+        }
+    });
+
+    it("matches recorded values across modes", () => {
+        const cases = [
+            ["C major", "C", -8, -13],
+            ["C major", "C", -1, -1],
+            ["C major", "C", 1, 2],
+            ["C major", "C", 8, 14],
+            ["C natural minor", "C", -8, -14],
+            ["C natural minor", "C", -1, -2],
+            ["C natural minor", "C", 1, 2],
+            ["C natural minor", "C", 8, 14],
+            ["C harmonic minor", "C", -8, -13],
+            ["C harmonic minor", "C", -1, -1],
+            ["C harmonic minor", "C", 1, 2],
+            ["C harmonic minor", "C", 8, 14],
+            ["C melodic minor", "C", -8, -13],
+            ["C melodic minor", "C", -1, -1],
+            ["C melodic minor", "C", 1, 2],
+            ["C melodic minor", "C", 8, 14],
+            ["C dorian", "C", -8, -14],
+            ["C dorian", "C", -1, -2],
+            ["C dorian", "C", 1, 2],
+            ["C dorian", "C", 8, 14],
+            ["C phrygian", "C", -8, -14],
+            ["C phrygian", "C", -1, -2],
+            ["C phrygian", "C", 1, 1],
+            ["C phrygian", "C", 8, 13],
+            ["C lydian", "C", -8, -13],
+            ["C lydian", "C", -1, -1],
+            ["C lydian", "C", 1, 2],
+            ["C lydian", "C", 8, 14],
+            ["C mixolydian", "C", -8, -14],
+            ["C mixolydian", "C", -1, -2],
+            ["C mixolydian", "C", 1, 2],
+            ["C mixolydian", "C", 8, 14],
+            ["C locrian", "C", -8, -14],
+            ["C locrian", "C", -1, -2],
+            ["C locrian", "C", 1, 1],
+            ["C locrian", "C", 8, 13],
+            ["C whole tone", "C", -8, -16],
+            ["C whole tone", "C", -1, -2],
+            ["C whole tone", "C", 1, 2],
+            ["C whole tone", "C", 8, 16],
+            ["C chromatic", "C", -8, -8],
+            ["C chromatic", "C", -1, -1],
+            ["C chromatic", "C", 1, 1],
+            ["C chromatic", "C", 8, 8],
+            ["C major pentatonic", "C", -8, -20],
+            ["C major pentatonic", "C", -1, -3],
+            ["C major pentatonic", "C", 1, 2],
+            ["C major pentatonic", "C", 8, 19],
+            ["C minor pentatonic", "C", -8, -19],
+            ["C minor pentatonic", "C", -1, -2],
+            ["C minor pentatonic", "C", 1, 3],
+            ["C minor pentatonic", "C", 8, 19],
+            ["C diminished", "C", -8, -12],
+            ["C diminished", "C", -1, -1],
+            ["C diminished", "C", 1, 2],
+            ["C diminished", "C", 8, 12],
+            ["C octatonic", "C", -8, -12],
+            ["C octatonic", "C", -1, -2],
+            ["C octatonic", "C", 1, 1],
+            ["C octatonic", "C", 8, 12],
+            ["C minor blues", "C", -8, -17],
+            ["C minor blues", "C", -1, -2],
+            ["C minor blues", "C", 1, 3],
+            ["C minor blues", "C", 8, 17],
+            ["C arabic", "C", -8, -14],
+            ["C arabic", "C", -1, -2],
+            ["C arabic", "C", 1, 2],
+            ["C arabic", "C", 8, 14],
+            ["C byzantine", "C", -8, -13],
+            ["C byzantine", "C", -1, -1],
+            ["C byzantine", "C", 1, 1],
+            ["C byzantine", "C", 8, 13],
+            ["G major", "G", -8, -13],
+            ["G major", "G", -1, -1],
+            ["G major", "G", 1, 2],
+            ["G major", "G", 8, 14],
+            ["G natural minor", "G", -8, -14],
+            ["G natural minor", "G", -1, -2],
+            ["G natural minor", "G", 1, 2],
+            ["G natural minor", "G", 8, 14],
+            ["G harmonic minor", "G", -8, -13],
+            ["G harmonic minor", "G", -1, -1],
+            ["G harmonic minor", "G", 1, 2],
+            ["G harmonic minor", "G", 8, 14],
+            ["G melodic minor", "G", -8, -13],
+            ["G melodic minor", "G", -1, -1],
+            ["G melodic minor", "G", 1, 2],
+            ["G melodic minor", "G", 8, 14],
+            ["G dorian", "G", -8, -14],
+            ["G dorian", "G", -1, -2],
+            ["G dorian", "G", 1, 2],
+            ["G dorian", "G", 8, 14],
+            ["G phrygian", "G", -8, -14],
+            ["G phrygian", "G", -1, -2],
+            ["G phrygian", "G", 1, 1],
+            ["G phrygian", "G", 8, 13],
+            ["G lydian", "G", -8, -13],
+            ["G lydian", "G", -1, -1],
+            ["G lydian", "G", 1, 2],
+            ["G lydian", "G", 8, 14],
+            ["G mixolydian", "G", -8, -14],
+            ["G mixolydian", "G", -1, -2],
+            ["G mixolydian", "G", 1, 2],
+            ["G mixolydian", "G", 8, 14],
+            ["G locrian", "G", -8, -14],
+            ["G locrian", "G", -1, -2],
+            ["G locrian", "G", 1, 1],
+            ["G locrian", "G", 8, 13],
+            ["G whole tone", "G", -8, -16],
+            ["G whole tone", "G", -1, -2],
+            ["G whole tone", "G", 1, 2],
+            ["G whole tone", "G", 8, 16],
+            ["G chromatic", "G", -8, -8],
+            ["G chromatic", "G", -1, -1],
+            ["G chromatic", "G", 1, 1],
+            ["G chromatic", "G", 8, 8],
+            ["G major pentatonic", "G", -8, -20],
+            ["G major pentatonic", "G", -1, -3],
+            ["G major pentatonic", "G", 1, 2],
+            ["G major pentatonic", "G", 8, 19],
+            ["G minor pentatonic", "G", -8, -19],
+            ["G minor pentatonic", "G", -1, -2],
+            ["G minor pentatonic", "G", 1, 3],
+            ["G minor pentatonic", "G", 8, 19],
+            ["G diminished", "G", -8, -12],
+            ["G diminished", "G", -1, -1],
+            ["G diminished", "G", 1, 2],
+            ["G diminished", "G", 8, 12],
+            ["G octatonic", "G", -8, -12],
+            ["G octatonic", "G", -1, -2],
+            ["G octatonic", "G", 1, 1],
+            ["G octatonic", "G", 8, 12],
+            ["G minor blues", "G", -8, -17],
+            ["G minor blues", "G", -1, -2],
+            ["G minor blues", "G", 1, 3],
+            ["G minor blues", "G", 8, 17],
+            ["G arabic", "G", -8, -14],
+            ["G arabic", "G", -1, -2],
+            ["G arabic", "G", 1, 2],
+            ["G arabic", "G", 8, 14],
+            ["G byzantine", "G", -8, -13],
+            ["G byzantine", "G", -1, -1],
+            ["G byzantine", "G", 1, 1],
+            ["G byzantine", "G", 8, 13]
+        ];
+        for (const [keySignature, pitch, interval, expected] of cases) {
+            expect(getInterval(interval, keySignature, pitch)).toBe(expected);
+        }
+    });
+
+    it("matches recorded values across modes from mid-scale pitches", () => {
+        const cases = [
+            ["C major", "G", -8, -14],
+            ["C major", "G", -1, -2],
+            ["C major", "G", 1, 2],
+            ["C major", "G", 8, 14],
+            ["C natural minor", "G", -8, -14],
+            ["C natural minor", "G", -1, -2],
+            ["C natural minor", "G", 1, 1],
+            ["C natural minor", "G", 8, 13],
+            ["C harmonic minor", "G", -8, -14],
+            ["C harmonic minor", "G", -1, -2],
+            ["C harmonic minor", "G", 1, 1],
+            ["C harmonic minor", "G", 8, 13],
+            ["C melodic minor", "G", -8, -14],
+            ["C melodic minor", "G", -1, -2],
+            ["C melodic minor", "G", 1, 2],
+            ["C melodic minor", "G", 8, 14],
+            ["C dorian", "G", -8, -14],
+            ["C dorian", "G", -1, -2],
+            ["C dorian", "G", 1, 2],
+            ["C dorian", "G", 8, 14],
+            ["C phrygian", "G", -8, -14],
+            ["C phrygian", "G", -1, -2],
+            ["C phrygian", "G", 1, 1],
+            ["C phrygian", "G", 8, 13],
+            ["C lydian", "G", -8, -13],
+            ["C lydian", "G", -1, -1],
+            ["C lydian", "G", 1, 2],
+            ["C lydian", "G", 8, 14],
+            ["C mixolydian", "G", -8, -14],
+            ["C mixolydian", "G", -1, -2],
+            ["C mixolydian", "G", 1, 2],
+            ["C mixolydian", "G", 8, 14],
+            ["C locrian", "G♭", -8, -13],
+            ["C locrian", "G♭", -1, -1],
+            ["C locrian", "G♭", 1, 2],
+            ["C locrian", "G♭", 8, 14],
+            ["C whole tone", "G♭", -8, -16],
+            ["C whole tone", "G♭", -1, -2],
+            ["C whole tone", "G♭", 1, 2],
+            ["C whole tone", "G♭", 8, 16],
+            ["C chromatic", "G♭", -8, -8],
+            ["C chromatic", "G♭", -1, -1],
+            ["C chromatic", "G♭", 1, 1],
+            ["C chromatic", "G♭", 8, 8],
+            ["C major pentatonic", "G", -8, -19],
+            ["C major pentatonic", "G", -1, -3],
+            ["C major pentatonic", "G", 1, 2],
+            ["C major pentatonic", "G", 8, 19],
+            ["C minor pentatonic", "G", -8, -19],
+            ["C minor pentatonic", "G", -1, -2],
+            ["C minor pentatonic", "G", 1, 3],
+            ["C minor pentatonic", "G", 8, 20],
+            ["C diminished", "G♭", -8, -12],
+            ["C diminished", "G♭", -1, -1],
+            ["C diminished", "G♭", 1, 2],
+            ["C diminished", "G♭", 8, 12],
+            ["C octatonic", "G♭", -8, -12],
+            ["C octatonic", "G♭", -1, -2],
+            ["C octatonic", "G♭", 1, 1],
+            ["C octatonic", "G♭", 8, 12],
+            ["C minor blues", "G♭", -8, -15],
+            ["C minor blues", "G♭", -1, -1],
+            ["C minor blues", "G♭", 1, 1],
+            ["C minor blues", "G♭", 8, 16],
+            ["C arabic", "G♭", -8, -13],
+            ["C arabic", "G♭", -1, -1],
+            ["C arabic", "G♭", 1, 2],
+            ["C arabic", "G♭", 8, 14],
+            ["C byzantine", "G", -8, -14],
+            ["C byzantine", "G", -1, -2],
+            ["C byzantine", "G", 1, 1],
+            ["C byzantine", "G", 8, 13],
+            ["G major", "D", -8, -14],
+            ["G major", "D", -1, -2],
+            ["G major", "D", 1, 2],
+            ["G major", "D", 8, 14],
+            ["G natural minor", "D", -8, -14],
+            ["G natural minor", "D", -1, -2],
+            ["G natural minor", "D", 1, 1],
+            ["G natural minor", "D", 8, 13],
+            ["G harmonic minor", "D", -8, -14],
+            ["G harmonic minor", "D", -1, -2],
+            ["G harmonic minor", "D", 1, 1],
+            ["G harmonic minor", "D", 8, 13],
+            ["G melodic minor", "D", -8, -14],
+            ["G melodic minor", "D", -1, -2],
+            ["G melodic minor", "D", 1, 2],
+            ["G melodic minor", "D", 8, 14],
+            ["G dorian", "D", -8, -14],
+            ["G dorian", "D", -1, -2],
+            ["G dorian", "D", 1, 2],
+            ["G dorian", "D", 8, 14],
+            ["G phrygian", "D", -8, -14],
+            ["G phrygian", "D", -1, -2],
+            ["G phrygian", "D", 1, 1],
+            ["G phrygian", "D", 8, 13],
+            ["G lydian", "D", -8, -13],
+            ["G lydian", "D", -1, -1],
+            ["G lydian", "D", 1, 2],
+            ["G lydian", "D", 8, 14],
+            ["G mixolydian", "D", -8, -14],
+            ["G mixolydian", "D", -1, -2],
+            ["G mixolydian", "D", 1, 2],
+            ["G mixolydian", "D", 8, 14],
+            ["G locrian", "D♭", -8, -13],
+            ["G locrian", "D♭", -1, -1],
+            ["G locrian", "D♭", 1, 2],
+            ["G locrian", "D♭", 8, 14],
+            ["G whole tone", "D♭", -8, -16],
+            ["G whole tone", "D♭", -1, -2],
+            ["G whole tone", "D♭", 1, 2],
+            ["G whole tone", "D♭", 8, 16],
+            ["G chromatic", "D♭", -8, -8],
+            ["G chromatic", "D♭", -1, -1],
+            ["G chromatic", "D♭", 1, 1],
+            ["G chromatic", "D♭", 8, 8],
+            ["G major pentatonic", "D", -8, -19],
+            ["G major pentatonic", "D", -1, -3],
+            ["G major pentatonic", "D", 1, 2],
+            ["G major pentatonic", "D", 8, 19],
+            ["G minor pentatonic", "D", -8, -19],
+            ["G minor pentatonic", "D", -1, -2],
+            ["G minor pentatonic", "D", 1, 3],
+            ["G minor pentatonic", "D", 8, 20],
+            ["G diminished", "D♭", -8, -12],
+            ["G diminished", "D♭", -1, -1],
+            ["G diminished", "D♭", 1, 2],
+            ["G diminished", "D♭", 8, 12],
+            ["G octatonic", "D♭", -8, -12],
+            ["G octatonic", "D♭", -1, -2],
+            ["G octatonic", "D♭", 1, 1],
+            ["G octatonic", "D♭", 8, 12],
+            ["G minor blues", "D♭", -8, -15],
+            ["G minor blues", "D♭", -1, -1],
+            ["G minor blues", "D♭", 1, 1],
+            ["G minor blues", "D♭", 8, 16],
+            ["G arabic", "D♭", -8, -13],
+            ["G arabic", "D♭", -1, -1],
+            ["G arabic", "D♭", 1, 2],
+            ["G arabic", "D♭", 8, 14],
+            ["G byzantine", "D", -8, -14],
+            ["G byzantine", "D", -1, -2],
+            ["G byzantine", "D", 1, 1],
+            ["G byzantine", "D", 8, 13]
+        ];
+        for (const [keySignature, pitch, interval, expected] of cases) {
+            expect(getInterval(interval, keySignature, pitch)).toBe(expected);
+        }
+    });
+
+    it("matches recorded values in other EDOs", () => {
+        const cases = [
+            ["C major", "C", -14, 19, -38],
+            ["C major", "C", -1, 19, -2],
+            ["C major", "C", 1, 19, 3],
+            ["C major", "C", 14, 19, 38],
+            ["C major", "F", -14, 19, -38],
+            ["C major", "F", -1, 19, -2],
+            ["C major", "F", 1, 19, 3],
+            ["C major", "F", 14, 19, 38],
+            ["C major", "B", -14, 19, -38],
+            ["C major", "B", -1, 19, -3],
+            ["C major", "B", 1, 19, 2],
+            ["C major", "B", 14, 19, 38],
+            ["D minor", "D", -14, 19, -38],
+            ["D minor", "D", -1, 19, -3],
+            ["D minor", "D", 1, 19, 3],
+            ["D minor", "D", 14, 19, 38],
+            ["D minor", "G", -14, 19, -38],
+            ["D minor", "G", -1, 19, -3],
+            ["D minor", "G", 1, 19, 3],
+            ["D minor", "G", 14, 19, 38],
+            ["D minor", "C", -14, 19, -38],
+            ["D minor", "C", -1, 19, -3],
+            ["D minor", "C", 1, 19, 3],
+            ["D minor", "C", 14, 19, 38],
+            ["C major", "C", -14, 24, -48],
+            ["C major", "C", -1, 24, -2],
+            ["C major", "C", 1, 24, 4],
+            ["C major", "C", 14, 24, 48],
+            ["C major", "F", -14, 24, -48],
+            ["C major", "F", -1, 24, -2],
+            ["C major", "F", 1, 24, 4],
+            ["C major", "F", 14, 24, 48],
+            ["C major", "B", -14, 24, -48],
+            ["C major", "B", -1, 24, -4],
+            ["C major", "B", 1, 24, 2],
+            ["C major", "B", 14, 24, 48],
+            ["D minor", "D", -14, 24, -48],
+            ["D minor", "D", -1, 24, -4],
+            ["D minor", "D", 1, 24, 4],
+            ["D minor", "D", 14, 24, 48],
+            ["D minor", "G", -14, 24, -48],
+            ["D minor", "G", -1, 24, -4],
+            ["D minor", "G", 1, 24, 4],
+            ["D minor", "G", 14, 24, 48],
+            ["D minor", "C", -14, 24, -48],
+            ["D minor", "C", -1, 24, -4],
+            ["D minor", "C", 1, 24, 4],
+            ["D minor", "C", 14, 24, 48],
+            ["C major", "C", -14, 31, -62],
+            ["C major", "C", -1, 31, -3],
+            ["C major", "C", 1, 31, 5],
+            ["C major", "C", 14, 31, 62],
+            ["C major", "F", -14, 31, -62],
+            ["C major", "F", -1, 31, -3],
+            ["C major", "F", 1, 31, 5],
+            ["C major", "F", 14, 31, 62],
+            ["C major", "B", -14, 31, -62],
+            ["C major", "B", -1, 31, -5],
+            ["C major", "B", 1, 31, 3],
+            ["C major", "B", 14, 31, 62],
+            ["D minor", "D", -14, 31, -62],
+            ["D minor", "D", -1, 31, -5],
+            ["D minor", "D", 1, 31, 5],
+            ["D minor", "D", 14, 31, 62],
+            ["D minor", "G", -14, 31, -62],
+            ["D minor", "G", -1, 31, -5],
+            ["D minor", "G", 1, 31, 5],
+            ["D minor", "G", 14, 31, 62],
+            ["D minor", "C", -14, 31, -62],
+            ["D minor", "C", -1, 31, -5],
+            ["D minor", "C", 1, 31, 5],
+            ["D minor", "C", 14, 31, 62],
+            ["C major", "C", -14, 53, -106],
+            ["C major", "C", -1, 53, -4],
+            ["C major", "C", 1, 53, 9],
+            ["C major", "C", 14, 53, 106],
+            ["C major", "F", -14, 53, -106],
+            ["C major", "F", -1, 53, -4],
+            ["C major", "F", 1, 53, 9],
+            ["C major", "F", 14, 53, 106],
+            ["C major", "B", -14, 53, -106],
+            ["C major", "B", -1, 53, -9],
+            ["C major", "B", 1, 53, 4],
+            ["C major", "B", 14, 53, 106],
+            ["D minor", "D", -14, 53, -106],
+            ["D minor", "D", -1, 53, -9],
+            ["D minor", "D", 1, 53, 9],
+            ["D minor", "D", 14, 53, 106],
+            ["D minor", "G", -14, 53, -106],
+            ["D minor", "G", -1, 53, -9],
+            ["D minor", "G", 1, 53, 9],
+            ["D minor", "G", 14, 53, 106],
+            ["D minor", "C", -14, 53, -106],
+            ["D minor", "C", -1, 53, -9],
+            ["D minor", "C", 1, 53, 9],
+            ["D minor", "C", 14, 53, 106]
+        ];
+        for (const [keySignature, pitch, interval, edo, expected] of cases) {
+            expect(getInterval(interval, keySignature, pitch, edo)).toBe(expected);
+        }
+    });
+
+    it("accepts solfege pitch names", () => {
+        const cases = [
+            ["C major", "do", -2, -3],
+            ["C major", "do", 1, 2],
+            ["C major", "do", 3, 5],
+            ["C major", "re", -2, -3],
+            ["C major", "re", 1, 2],
+            ["C major", "re", 3, 5],
+            ["C major", "mi", -2, -4],
+            ["C major", "mi", 1, 1],
+            ["C major", "mi", 3, 5],
+            ["C major", "fa", -2, -3],
+            ["C major", "fa", 1, 2],
+            ["C major", "fa", 3, 6],
+            ["C major", "sol", -2, -3],
+            ["C major", "sol", 1, 2],
+            ["C major", "sol", 3, 5],
+            ["C major", "la", -2, -4],
+            ["C major", "la", 1, 2],
+            ["C major", "la", 3, 5],
+            ["C major", "ti", -2, -4],
+            ["C major", "ti", 1, 1],
+            ["C major", "ti", 3, 5]
+        ];
+        for (const [keySignature, pitch, interval, expected] of cases) {
+            expect(getInterval(interval, keySignature, pitch)).toBe(expected);
+        }
+    });
+
+    it("accepts ASCII accidental spellings", () => {
+        const cases = [
+            ["C major", "Bb", -2, -4],
+            ["C major", "Bb", 1, 1],
+            ["C major", "Bb", 4, 6],
+            ["C major", "F#", -2, -3],
+            ["C major", "F#", 1, 2],
+            ["C major", "F#", 4, 7],
+            ["F major", "Eb", -2, -4],
+            ["F major", "Eb", 1, 1],
+            ["F major", "Eb", 4, 6],
+            ["G major", "C#", -2, -3],
+            ["G major", "C#", 1, 2],
+            ["G major", "C#", 4, 7]
+        ];
+        for (const [keySignature, pitch, interval, expected] of cases) {
+            expect(getInterval(interval, keySignature, pitch)).toBe(expected);
+        }
+    });
+
+    it("handles C♭ and F♭ tonics outside 12-EDO", () => {
+        const cases = [
+            ["C♭ major", "C♭", -1, 19, -2],
+            ["C♭ major", "C♭", 1, 19, 3],
+            ["C♭ major", "C♭", 2, 19, 6],
+            ["C♭ major", "B♯", -1, 19, -2],
+            ["C♭ major", "B♯", 1, 19, 3],
+            ["C♭ major", "B♯", 2, 19, 6],
+            ["F♭ major", "F♭", -1, 19, -2],
+            ["F♭ major", "F♭", 1, 19, 3],
+            ["F♭ major", "F♭", 2, 19, 6],
+            ["F♭ major", "E♯", -1, 19, -2],
+            ["F♭ major", "E♯", 1, 19, 3],
+            ["F♭ major", "E♯", 2, 19, 6],
+            ["C♭ major", "C♭", -1, 31, -3],
+            ["C♭ major", "C♭", 1, 31, 5],
+            ["C♭ major", "C♭", 2, 31, 10],
+            ["C♭ major", "B♯", -1, 31, 0],
+            ["C♭ major", "B♯", 1, 31, 0],
+            ["C♭ major", "B♯", 2, 31, 0],
+            ["F♭ major", "F♭", -1, 31, -3],
+            ["F♭ major", "F♭", 1, 31, 5],
+            ["F♭ major", "F♭", 2, 31, 10],
+            ["F♭ major", "E♯", -1, 31, 0],
+            ["F♭ major", "E♯", 1, 31, 0],
+            ["F♭ major", "E♯", 2, 31, 0]
+        ];
+        for (const [keySignature, pitch, interval, edo, expected] of cases) {
+            expect(getInterval(interval, keySignature, pitch, edo)).toBe(expected);
+        }
+    });
+
+    it("sums very large intervals exactly", () => {
+        const cases = [
+            [100, "C major", "C", 172],
+            [1000, "C major", "C", 1715],
+            [10000, "C major", "C", 17143],
+            [100000, "C major", "C", 171429],
+            [1000000, "C major", "C", 1714286],
+            [-1000000, "C major", "C", -1714285],
+            [10000000, "C major", "C", 17142857],
+            [-10000000, "C major", "C", -17142857],
+            [100000000, "C major", "C", 171428572],
+            [-100000000, "C major", "C", -171428571],
+            [1000000000, "C major", "C", 1714285715],
+            [-1000000000, "C major", "C", -1714285714],
+            [1000000000000, "C major", "C", 1714285714286],
+            [-1000000000000, "C major", "C", -1714285714285],
+            [1000000, "C major", "E", 1714285],
+            [-1000000, "C major", "E", -1714286],
+            [1000000, "G major", "D", 1714286],
+            [-999999, "G major", "D", -1714284],
+            [100000, "D minor", "A", 171428],
+            [-100000, "D minor", "A", -171429]
+        ];
+        for (const [interval, keySignature, pitch, expected] of cases) {
+            expect(getInterval(interval, keySignature, pitch)).toBe(expected);
+        }
+        expect(getInterval(1000000, "C major", "C", 19)).toBe(2714286);
+        expect(getInterval(-1000000, "C major", "C", 19)).toBe(-2714285);
+        expect(getInterval(123456789, "F major", "A", 31)).toBe(546737207);
+    });
+
+    it("returns 0 for non-finite intervals instead of never returning", () => {
+        expect(getInterval(Infinity, "C major", "C")).toBe(0);
+        expect(getInterval(-Infinity, "C major", "C")).toBe(0);
+        expect(getInterval(NaN, "C major", "C")).toBe(0);
+        expect(getInterval(Infinity, "C major", "C♯")).toBe(0);
+        expect(getInterval(-Infinity, "G major", "D", 19)).toBe(0);
+        expect(getInterval(Infinity, "C♭ major", "C♭", 31)).toBe(0);
+    });
+
+    it("keeps the historic rounding of fractional intervals", () => {
+        expect(getInterval(0.5, "C major", "C")).toBe(2);
+        expect(getInterval(-0.5, "C major", "C")).toBe(-1);
+        expect(getInterval(2.5, "C major", "C")).toBe(5);
+        expect(getInterval(-2.5, "C major", "C")).toBe(-5);
+        expect(getInterval(7.25, "C major", "C")).toBe(14);
+        expect(getInterval(-7.25, "C major", "C")).toBe(-13);
+    });
+
+    it("accepts intervals given as text or other loose values", () => {
+        expect(getInterval("5", "C major", "C")).toBe(9);
+        expect(getInterval(" -3 ", "C major", "C")).toBe(-5);
+        expect(getInterval("2.5", "C major", "C")).toBe(5);
+        expect(getInterval("abc", "C major", "C")).toBe(0);
+        expect(getInterval(null, "C major", "C")).toBe(0);
+        expect(getInterval(undefined, "C major", "C")).toBe(0);
+    });
+
+    it("answers a billion-step interval in well under a second", () => {
+        const start = Date.now();
+        expect(getInterval(1000000000, "C major", "C")).toBe(1714285715);
+        expect(getInterval(-1000000000, "C major", "C")).toBe(-1714285714);
+        expect(Date.now() - start).toBeLessThan(1000);
+    });
+
+    it("answers an infinite interval instead of hanging", () => {
+        const start = Date.now();
+        expect(getInterval(Infinity, "C major", "C")).toBe(0);
+        expect(getInterval(-Infinity, "C major", "C")).toBe(0);
+        expect(Date.now() - start).toBeLessThan(1000);
+    });
+
+    it("keeps a long chord sequence with large intervals cheap", () => {
+        const start = Date.now();
+        let total = 0;
+        for (let n = 0; n < 2000; n++) {
+            total += getInterval(100000, "C major", "C");
+        }
+        expect(total).toBe(342858000);
+        expect(Date.now() - start).toBeLessThan(1000);
+    });
+});
+
 describe("getModeNumbers", () => {
     it("should return the correct mode numbers for a valid mode", () => {
         expect(getModeNumbers("chromatic")).toBe("0 1 2 3 4 5 6 7 8 9 10 11");
