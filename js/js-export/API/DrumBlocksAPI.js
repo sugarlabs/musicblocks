@@ -34,7 +34,7 @@ class DrumBlocksAPI {
 
     async setDrum(drum, flow) {
         const args = JSInterface.validateArgs("setDrum", [drum, flow]);
-        await this.runCommand("setDrum", [args[0], this.turIndex]);
+        await this.runCommand("setDrum", [args[0], this.turIndex, MusicBlocks.BLK]);
         await args[1]();
         return this.ENDFLOWCOMMAND;
     }
