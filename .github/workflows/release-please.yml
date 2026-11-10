@@ -105,21 +105,82 @@ jobs:
                   # trigger above.
                   target-branch: master
 
-    # Runs only on the push that merges the release PR. Today it just reports
-    # the release; add build / publish / deploy steps here rather than in a
-    # new workflow (see the note above about GITHUB_TOKEN not chaining).
-    # Production deploys for Music Blocks remain manual by policy.
+    # Runs only on the push that merges the release PR (see the note above
+    # about GITHUB_TOKEN not chaining). It publishes the container image for
+    # the release, so a host can pull a tagged build instead of running
+    # `git pull`; it does not deploy anything. Production deploys for Music
+    # Blocks remain manual by policy.
     on-release:
         name: Post-release
         needs: release-please
         if: needs.release-please.outputs.release_created == 'true'
         runs-on: ubuntu-latest
-        timeout-minutes: 15
+        timeout-minutes: 30
         permissions:
             contents: read
+            packages: write # push the release image to ghcr.io
+        env:
+            VERSION: ${{ needs.release-please.outputs.version }}
         steps:
+            - name: Check out the release tag
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ needs.release-please.outputs.tag_name }}
+                  persist-credentials: false
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            # Build and load locally first, so the image is checked before
+            # anything is published.
+            - name: Build the release image
+              uses: docker/build-push-action@v6
+              with:
+                  context: .
+                  file: ./dockerfile
+                  load: true
+                  push: false
+                  tags: musicblocks:release
+                  provenance: false
+                  cache-from: type=gha
+
+            # Same check as docker.yml: the container starts and /healthz
+            # reports the version being released.
+            - name: Check the image serves the released version
+              run: |
+                  docker run -d --name musicblocks-release -p 3000:3000 musicblocks:release
+                  for i in $(seq 1 60); do
+                      body=$(curl -fsS http://localhost:3000/healthz 2>/dev/null) && break
+                      sleep 1
+                  done
+                  echo "$body"
+                  served=$(echo "$body" | jq -r '.version')
+                  if [ "$served" != "$VERSION" ]; then
+                      echo "::error::/healthz reports '$served', expected '$VERSION'"
+                      docker logs musicblocks-release
+                      exit 1
+                  fi
+
+            - name: Log in to GitHub Container Registry
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            # Image names must be lowercase; github.repository keeps the owner's case.
+            - name: Push the release image
+              run: |
+                  IMAGE="ghcr.io/${GITHUB_REPOSITORY,,}"
+                  echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
+                  docker tag musicblocks:release "$IMAGE:$VERSION"
+                  docker tag musicblocks:release "$IMAGE:latest"
+                  docker push "$IMAGE:$VERSION"
+                  docker push "$IMAGE:latest"
+
             - name: Report released version
               run: |
                   echo "Released ${{ needs.release-please.outputs.tag_name }}"
                   echo "version: ${{ needs.release-please.outputs.version }}"
+                  echo "image: $IMAGE:$VERSION (also :latest)"
                   echo "Deployment is manual — see CONTRIBUTING.md."
