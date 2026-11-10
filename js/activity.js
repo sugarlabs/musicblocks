@@ -2857,6 +2857,8 @@ class Activity {
                 this.toolbar.renderChooseKeyIcon(chooseKeyMenu);
             }
             this.toolbar.renderJavaScriptIcon(this.toggleJSWindow);
+            /* istanbul ignore next -- toolbar wiring executed in browser init */
+            this.toolbar.renderCodeMapIcon(this.showCodeMap);
             this.toolbar.renderLanguageSelectIcon(this.languageBox);
             this.toolbar.renderWrapIcon();
             this._perfMark("activity.init.ui_ready");

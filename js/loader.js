@@ -392,6 +392,16 @@ requirejs.config({
         },
         "widgets/aidebugger": {
             deps: ["utils/ai-widget-lifecycle", "utils/ai-markdown"]
+        },
+        "widgets/CallGraphAnalyzer": {
+            exports: "CallGraphAnalyzer"
+        },
+        "widgets/CallGraphLayout": {
+            exports: "CallGraphLayout"
+        },
+        "widgets/CallGraphWidget": {
+            deps: ["widgets/widgetWindows", "widgets/CallGraphAnalyzer", "widgets/CallGraphLayout"],
+            exports: "CallGraphWidget"
         }
     },
     paths: {

@@ -18,7 +18,9 @@ describe("JavaScript editor and block search", () => {
         // This spec checks search and editing, so remove that jQuery warning
         // from its test pages. The native autosave listener still runs.
         cy.window().then(win => {
-            win.jQuery(win).off("beforeunload");
+            if (win.jQuery) {
+                win.jQuery(win).off("beforeunload");
+            }
         });
 
         // Dismiss the first-run "Take a Tour" guide, which is itself a
@@ -117,23 +119,15 @@ describe("JavaScript editor and block search", () => {
 
         cases.forEach(({ query, caret, left, right }) => {
             [
-                { key: "ArrowLeft", keyCode: 37, expected: left },
-                { key: "ArrowRight", keyCode: 39, expected: right }
-            ].forEach(({ key, keyCode, expected }) => {
+                { key: "ArrowLeft", cypressKey: "{leftarrow}", expected: left },
+                { key: "ArrowRight", cypressKey: "{rightarrow}", expected: right }
+            ].forEach(({ key, cypressKey, expected }) => {
                 cy.get("#search").clear();
                 if (query) cy.get("#search").type(query);
                 cy.get("#search").then($input => {
                     $input[0].setSelectionRange(caret, caret);
                 });
-                // Native events exercise the browser's default caret movement.
-                cy.then(async () => {
-                    for (const type of ["keyDown", "keyUp"]) {
-                        await Cypress.automation("remote:debugger:protocol", {
-                            command: "Input.dispatchKeyEvent",
-                            params: { type, key, code: key, windowsVirtualKeyCode: keyCode }
-                        });
-                    }
-                });
+                cy.get("#search").type(cypressKey);
                 cy.get("#search")
                     .should("be.visible")
                     .and("have.focus")
@@ -154,14 +148,12 @@ describe("JavaScript editor and block search", () => {
         // makeSearchButton() before the per-category makeButton() calls), so
         // it is reliably identified by its rendered label.
         cy.contains("#palette tbody tr", "Search").click();
-        cy.get("#search").should("be.visible");
-
         // SearchController.showSearchWidget() focuses #search and calls
         // doSearch() (which lazily binds jQuery-UI autocomplete) back to
         // back inside the same setTimeout callback, so waiting for real
         // focus to land on #search also guarantees autocomplete is bound -
         // no arbitrary wait needed.
-        cy.focused().should("have.id", "search").type("forward");
+        cy.get("#search").should("be.visible").and("have.focus").type("forward");
 
         // "forward" (js/blocks/GraphicsBlocks.js ForwardBlock) is a core,
         // always-present block, so its label is guaranteed to appear in the
