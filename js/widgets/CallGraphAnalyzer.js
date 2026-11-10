@@ -60,7 +60,6 @@ class CallGraphAnalyzer {
 
         const nodesMap = new Map();
         const edges = [];
-        const edgeKeySet = new Set();
 
         // 1. Register Action definition nodes
         for (const [name, def] of actionDefs.entries()) {
@@ -103,10 +102,6 @@ class CallGraphAnalyzer {
         // 3. Helper to record a call edge
         const addEdge = (callerNodeId, targetNodeId, callBlock, targetName, flags = {}) => {
             const edgeId = `edge:${callerNodeId}->${targetNodeId}:${callBlock.id}`;
-            if (edgeKeySet.has(edgeId)) {
-                return;
-            }
-            edgeKeySet.add(edgeId);
 
             edges.push({
                 id: edgeId,
@@ -138,8 +133,9 @@ class CallGraphAnalyzer {
             const visited = new Set();
             const queue = [startBlockId];
 
-            while (queue.length > 0 && visited.size < this.options.maxTraversalDepth) {
-                const currId = queue.shift();
+            let head = 0;
+            while (head < queue.length && visited.size < this.options.maxTraversalDepth) {
+                const currId = queue[head++];
                 if (currId === null || currId === undefined || visited.has(currId)) {
                     continue;
                 }
@@ -673,9 +669,6 @@ class CallGraphAnalyzer {
         let foundCycle = null;
 
         const dfs = curr => {
-            if (foundCycle !== null) {
-                return;
-            }
             path.push(curr);
             onPath.add(curr);
             visited.add(curr);

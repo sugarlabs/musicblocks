@@ -281,17 +281,21 @@ class CallGraphLayout {
         }
 
         const positionedNodes = Array.from(nodeMap.values());
-        const width = Math.max(640, Math.round(maxX - minX + padding * 2));
-        const height = Math.max(420, Math.round(maxY - minY + padding * 2));
+        const contentW = maxX - minX + padding * 2;
+        const contentH = maxY - minY + padding * 2;
+        const width = Math.max(640, Math.round(contentW));
+        const height = Math.max(420, Math.round(contentH));
+        const extraX = (width - contentW) / 2;
+        const extraY = (height - contentH) / 2;
 
         return {
             positionedNodes,
             routedEdges,
             bounds: {
-                minX: Math.round(minX - padding),
-                minY: Math.round(minY - padding),
-                maxX: Math.round(maxX + padding),
-                maxY: Math.round(maxY + padding),
+                minX: Math.round(minX - padding - extraX),
+                minY: Math.round(minY - padding - extraY),
+                maxX: Math.round(maxX + padding + extraX),
+                maxY: Math.round(maxY + padding + extraY),
                 width,
                 height
             }
