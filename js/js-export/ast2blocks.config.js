@@ -166,6 +166,20 @@ window.ast2blocklist_config = {
             name_map: { abs: "abs", pow: "power", sqrt: "sqrt" }
         },
         {
+            comment: "Math constants such as PI or E",
+            ast: {
+                identifiers: [
+                    { property: "type", value: "MemberExpression" },
+                    { property: "object.type", value: "Identifier" },
+                    { property: "object.name", value: "Math" },
+                    { property: "computed", value: false }
+                ],
+                name_property: "property.name",
+                argument_properties: []
+            },
+            name_map: { PI: "pi", E: "e" }
+        },
+        {
             comment: "Math utility operators such as distance or random",
             ast: {
                 identifiers: [
@@ -178,10 +192,18 @@ window.ast2blocklist_config = {
                 arguments_property: "arguments"
             },
             name_map: {
+                doArcCos: "arccos",
+                doArcSin: "arcsin",
+                doArcTan: "arctan",
                 doCalculateDistance: "distance",
+                doCos: "cos",
                 doInt: "int",
+                doLn: "ln",
+                doLog: "log",
                 doOneOf: "oneOf",
                 doRandom: "random",
+                doSin: "sin",
+                doTan: "tan",
                 doXor: "xor"
             }
         },
@@ -297,7 +319,8 @@ window.ast2blocklist_config = {
                     { property: "declarations[0].init.type", value: "BinaryExpression" },
                     { property: "declarations[0].init.type", value: "UnaryExpression" },
                     { property: "declarations[0].init.type", value: "CallExpression" },
-                    { property: "declarations[0].init.type", value: "AwaitExpression" }
+                    { property: "declarations[0].init.type", value: "AwaitExpression" },
+                    { property: "declarations[0].init.type", value: "MemberExpression" }
                 ],
                 name_property: "declarations[0].id.name",
                 argument_properties: ["declarations[0].init"]
