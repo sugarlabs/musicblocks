@@ -2865,19 +2865,19 @@ Looking for a block? The tables below (one for beginner mode and one for advance
 | | semi tone interval (+/-) | | | ^ | | | bottom (screen) |
 | | major 3 | | | mod | | | top (screen) |
 | | scalar interval measure | | | int | | | left (screen) |
-| | semi-tone interval measure | | **Boolean** | true | | | right (screen) |
-| | interval name | | | = | | **Sensors** | keyboard |
-| | doubly | | | < | | | to ASCII |
-| | set temperament | | | > | | | mouse bottom |
-| **Tone** | set instrument | | | or | | | cursor x |
-| | voice name | | | and | | | cursor y |
-| | audio sample | | | not | | | time |
-| | vibrato | | **Heap** | push | | | pixel color |
-| | chorus | | | pop | | | red |
-| | phaser | | | set heap | | | green |
-| | tremolo | | | index heap | | | blue |
-| | distortion | | | reverse heap | | | click |
-| | harmonic | | | empty heap | | | loudness |
+| | semi-tone interval measure | | | clamp | | | right (screen) |
+| | interval name | | | lerp | | **Sensors** | keyboard |
+| | doubly | | | gcd | | | to ASCII |
+| | set temperament | | | lcm | | | mouse bottom |
+| **Tone** | set instrument | | | map | | | cursor x |
+| | voice name | | **Boolean** | true | | | cursor y |
+| | audio sample | | | = | | | time |
+| | vibrato | | | < | | | pixel color |
+| | chorus | | | > | | | red |
+| | phaser | | | or | | | green |
+| | tremolo | | | and | | | blue |
+| | distortion | | | not | | | click |
+| | harmonic | | **Heap** | push | | | loudness |
 | | weighted partials | | | heap empty? | | **Ensemble** | set name |
 | | partial | | | heap length | | | mouse name |
 | | FM synth | | | show heap | | | new mouse |

@@ -190,6 +190,29 @@ describe("rubrics.js test suite", () => {
             expect(debugSpy).toHaveBeenCalledWith("notacatalogblock not in catalog");
             debugSpy.mockRestore();
         });
+
+        it("accounts for lerp, gcd, lcm, and map blocks in the number category without catalog warnings", () => {
+            const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+            ["lerp", "gcd", "lcm", "map"].forEach(blockName => {
+                expect(TACAT[blockName]).toBe("number");
+            });
+
+            const activity = {
+                blocks: {
+                    blockList: [
+                        { name: "lerp", connections: ["conn1", {}, {}, {}] },
+                        { name: "gcd", connections: ["conn2", {}, {}] },
+                        { name: "lcm", connections: ["conn3", {}, {}] },
+                        { name: "map", connections: ["conn4", {}, {}, {}, {}, {}] }
+                    ]
+                }
+            };
+            const scores = analyzeProject(activity);
+            const numberpIndex = PALS_INDEX_MAP.get("numberp");
+            expect(scores[numberpIndex]).toBeGreaterThan(0);
+            expect(debugSpy).not.toHaveBeenCalled();
+            debugSpy.mockRestore();
+        });
     });
 
     describe("scoreToChartData", () => {
