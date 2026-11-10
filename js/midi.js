@@ -329,7 +329,7 @@ class MidiTranscriber {
             }
 
             // MIDI programs outside Music Blocks' map still get the legacy best-effort lookup.
-            if (instrument === "electronic synth" && track.instrument.name) {
+            if (matches.length === 0 && track.instrument.name) {
                 if (typeof VOICENAMES !== "undefined") {
                     for (const voices of VOICENAMES) {
                         if (track.instrument.name.indexOf(voices[1]) > -1) {

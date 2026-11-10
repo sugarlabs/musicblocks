@@ -378,6 +378,27 @@ describe("transcribeMidi", () => {
         ).toBe("sawtooth");
     });
 
+    it("does not let a conflicting name override mapped program 81", async () => {
+        const midi = {
+            header: mockMidi.header,
+            tracks: [
+                {
+                    instrument: { name: "acoustic guitar", number: 81, percussion: false },
+                    channel: 0,
+                    notes: [{ name: "C4", midi: 60, time: 0, duration: 0.5 }]
+                }
+            ]
+        };
+
+        await transcribeMidi(midi);
+
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        expect(
+            loadedBlocks.find(block => Array.isArray(block[1]) && block[1][0] === "voicename")[1][1]
+                .value
+        ).toBe("electronic synth");
+    });
+
     it("keeps the name lookup fallback for an unmapped program", async () => {
         const midi = {
             header: mockMidi.header,
