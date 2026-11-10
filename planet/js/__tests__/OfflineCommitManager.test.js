@@ -105,7 +105,8 @@ describe("OfflineCommitManager", () => {
         server = {
             addProject: jest.fn(),
             editProject: jest.fn(),
-            getCommitHistory: jest.fn()
+            getCommitHistory: jest.fn(),
+            getKey: jest.fn(() => null)
         };
 
         manager = new OfflineCommitManager(storage, server);
@@ -325,6 +326,43 @@ describe("OfflineCommitManager", () => {
     });
 
     describe("Automatic On-Reconnect Sync (_onOnline)", () => {
+        test("reuses a created repo when saving its details failed", async () => {
+            storage.data.Projects.p_off = {
+                ProjectName: "Offline Song",
+                ProjectData: { melody: [1, 2, 3] },
+                commitDrafts: [
+                    { id: "d1", message: "First save", data: {}, timestamp: 1, status: "pending" }
+                ],
+                pendingRepoCreation: {
+                    status: "pending",
+                    projectName: "Offline Song",
+                    repoName: "Offline-Song-abcdef12"
+                },
+                GitRepoData: { repoName: "Offline-Song-abcdef12", hashedKey: "" }
+            };
+            server.addProject.mockImplementation((payload, callback) => {
+                server.getKey.mockReturnValue("saved-key");
+                callback({ success: true, repository: "Offline-Song-abcdef12", key: "saved-key" });
+            });
+            server.editProject.mockImplementation((repo, key, data, message, callback) => {
+                callback({ success: true });
+            });
+            server.getCommitHistory.mockImplementation((repo, callback) => {
+                callback({ success: true, data: [] });
+            });
+            storage.addGitRepoData.mockRejectedValueOnce(new Error("IndexedDB write failed"));
+
+            await manager._onOnline();
+            expect(storage.data.Projects.p_off.pendingRepoCreation.status).toBe("pending");
+
+            await manager._onOnline();
+
+            expect(server.addProject).toHaveBeenCalledTimes(1);
+            expect(server.editProject).toHaveBeenCalledTimes(1);
+            expect(storage.data.Projects.p_off.pendingRepoCreation).toBeNull();
+            expect(storage.data.Projects.p_off.GitRepoData.hashedKey).toBe("saved-key");
+        });
+
         test("creates pending repos first, updates GitRepoData, and syncs all drafts", async () => {
             storage.data.Projects.p_off = {
                 ProjectName: "Offline Song",
