@@ -5608,12 +5608,16 @@ class Blocks {
          * @throws {TypeError} if blockObjs is not a list
          */
         this.loadNewBlocks = blockObjs => {
-            // Anything else has no blocks to finish on, so the load would never end.
-            if (!Array.isArray(blockObjs)) {
-                throw new TypeError("loadNewBlocks expects a list of blocks.");
-            }
-
             const loadToken = ++this._nextLoadToken;
+
+            // When a load is already in progress, do not queue non-array data
+            // that cannot load and would disrupt subsequent queue advancement.
+            if (!Array.isArray(blockObjs) && this._loadInProgress) {
+                if (this.activity && typeof this.activity.errorMsg === "function") {
+                    this.activity.errorMsg(_("Cannot load project: invalid project structure."));
+                }
+                return loadToken;
+            }
 
             if (this._loadInProgress) {
                 this._loadQueue.push({ blockObjs, loadToken });
