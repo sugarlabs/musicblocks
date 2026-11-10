@@ -12,7 +12,7 @@
 /*
    global
 
-   _
+   _, makeKeyboardAccessible
 */
 /*
    exported
@@ -93,6 +93,12 @@ class StringHelper {
             if (elem) {
                 if (this.strings[i].length === 3) {
                     elem.setAttribute(obj[2], obj[1]);
+                    if (
+                        KEYBOARD_BUTTON_IDS.has(obj[0]) &&
+                        typeof makeKeyboardAccessible === "function"
+                    ) {
+                        makeKeyboardAccessible(elem, obj[1]);
+                    }
                 } else if (HTML_ALLOWED_IDS.has(obj[0])) {
                     elem.innerHTML = elem.innerHTML + sanitizeAllowedHTML(obj[1]);
                 } else {
@@ -102,6 +108,11 @@ class StringHelper {
         }
     }
 }
+
+// The toolbar icons are <a> elements without an href, so by themselves they cannot
+// be reached or activated from the keyboard. Give them a button role, a tab stop,
+// a name (the tooltip text) and Enter/Space activation.
+const KEYBOARD_BUTTON_IDS = new Set(["close-planet", "planet-open-file", "planet-new-project"]);
 
 // SECURITY: Only allow IDs here when the localized string intentionally
 // contains HTML and has been reviewed for safe rendering.

@@ -71,6 +71,76 @@ describe("StringHelper", () => {
             expect(elem.getAttribute("data-tooltip")).toBe("Close Planet");
         });
 
+        describe("toolbar icons", () => {
+            const toolbarIds = ["close-planet", "planet-open-file", "planet-new-project"];
+            const pressKey = (element, key) =>
+                element.dispatchEvent(
+                    new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true })
+                );
+
+            beforeEach(() => {
+                global.makeKeyboardAccessible =
+                    require("../../../js/utils/dom-helpers").makeKeyboardAccessible;
+                document.body.innerHTML =
+                    toolbarIds.map(id => `<a id="${id}"></a>`).join("") +
+                    '<a id="projectviewer-download-file"></a>';
+            });
+
+            afterEach(() => {
+                delete global.makeKeyboardAccessible;
+            });
+
+            it("makes the icons named buttons that can be reached with Tab", () => {
+                new StringHelper({ IsMusicBlocks: true }).init();
+
+                const expectedNames = {
+                    "close-planet": "Close Planet",
+                    "planet-open-file": "Open project from file",
+                    "planet-new-project": "New project"
+                };
+                for (const id of toolbarIds) {
+                    const elem = document.getElementById(id);
+                    expect(elem.getAttribute("role")).toBe("button");
+                    expect(elem.getAttribute("tabindex")).toBe("0");
+                    expect(elem.getAttribute("aria-label")).toBe(expectedNames[id]);
+                }
+            });
+
+            it("activates the icons with Enter and Space", () => {
+                new StringHelper({ IsMusicBlocks: true }).init();
+
+                for (const id of toolbarIds) {
+                    const elem = document.getElementById(id);
+                    const onClick = jest.fn();
+                    elem.addEventListener("click", onClick);
+
+                    pressKey(elem, "Enter");
+                    pressKey(elem, " ");
+                    pressKey(elem, "a");
+
+                    expect(onClick).toHaveBeenCalledTimes(2);
+                }
+            });
+
+            it("leaves other tooltip icons alone", () => {
+                new StringHelper({ IsMusicBlocks: true }).init();
+
+                const other = document.getElementById("projectviewer-download-file");
+                expect(other.getAttribute("data-tooltip")).toBe("Download as File");
+                expect(other.hasAttribute("role")).toBe(false);
+                expect(other.hasAttribute("tabindex")).toBe(false);
+            });
+
+            it("still sets the tooltips when the keyboard helper is not available", () => {
+                delete global.makeKeyboardAccessible;
+
+                expect(() => new StringHelper({ IsMusicBlocks: true }).init()).not.toThrow();
+                expect(document.getElementById("close-planet").getAttribute("data-tooltip")).toBe(
+                    "Close Planet"
+                );
+            });
+        });
+
         it("should not throw error when init runs and elements are missing", () => {
             document.body.innerHTML = ""; // No elements exist
             const helperObj = new StringHelper({ IsMusicBlocks: true });
