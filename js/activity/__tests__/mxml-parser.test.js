@@ -713,6 +713,95 @@ describe("Test 12: Tempo", () => {
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
+    it("reads a standard metronome marking into a setbpm3 block", async () => {
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1">' +
+            "<attributes><divisions>8</divisions></attributes>" +
+            "<direction><direction-type><metronome><beat-unit>quarter</beat-unit>" +
+            "<per-minute>120</per-minute></metronome></direction-type></direction>" +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        expect(tempos(blocks)).toEqual([120]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+
+        const setkey2 = blocks.find(b => blockName(b) === "setkey2");
+        const tempo = blocks.find(b => blockName(b) === "setbpm3");
+        const spacer = blocks.find(b => b[0] === tempo[4][3]);
+        const settimbre = blocks.find(b => blockName(b) === "settimbre");
+        const note = blocks.find(b => blockName(b) === "newnote");
+        expect(setkey2[4][3]).toBe(tempo[0]);
+        expect(spacer[4][1]).toBe(settimbre[0]);
+        expect(settimbre[4][2]).toBe(note[0]);
+    });
+
+    it("converts dotted metronome beat units to quarter notes per minute", async () => {
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1">' +
+            "<attributes><divisions>8</divisions></attributes>" +
+            "<direction><direction-type><metronome><beat-unit>eighth</beat-unit>" +
+            "<beat-unit-dot/><per-minute>120</per-minute></metronome></direction-type></direction>" +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        expect(tempos(blocks)).toEqual([90]);
+    });
+
+    it("includes tied metronome beat units in the quarter-note tempo", async () => {
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1">' +
+            "<attributes><divisions>8</divisions></attributes>" +
+            "<direction><direction-type><metronome><beat-unit>quarter</beat-unit>" +
+            "<beat-unit-tied><beat-unit>eighth</beat-unit></beat-unit-tied>" +
+            "<per-minute>120</per-minute></metronome></direction-type></direction>" +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        expect(tempos(blocks)).toEqual([180]);
+    });
+
+    it("prefers a valid sound tempo and falls back to a metronome tempo", async () => {
+        const metronome =
+            "<direction-type><metronome><beat-unit>quarter</beat-unit>" +
+            "<per-minute>120</per-minute></metronome></direction-type>";
+        const xml =
+            '<score-partwise><part id="P1">' +
+            '<measure number="1"><attributes><divisions>8</divisions></attributes>' +
+            `<direction>${metronome}<sound tempo="96"/></direction>` +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure>" +
+            '<measure number="2">' +
+            `<direction>${metronome}<sound tempo="invalid"/></direction>` +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        expect(tempos(blocks)).toEqual([96, 120]);
+    });
+
+    it("applies a playback direction offset to a metronome tempo", async () => {
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1">' +
+            "<attributes><divisions>8</divisions></attributes>" +
+            "<direction><direction-type><metronome><beat-unit>quarter</beat-unit>" +
+            "<per-minute>120</per-minute></metronome></direction-type>" +
+            '<offset sound="yes">8</offset></direction>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        const [cNote, dNote] = blocks.filter(b => blockName(b) === "newnote");
+        const tempo = blocks.find(b => blockName(b) === "setbpm3");
+        expect(tempos(blocks)).toEqual([120]);
+        expect(tempo[4][0]).toBe(cNote[4][3]);
+        expect(dNote[4][0]).toBe(tempo[0] + 5);
+    });
+
     it("reads a measure-level <sound tempo> into a setbpm3 block", async () => {
         const xml =
             '<score-partwise><part id="P1"><measure number="1">' +
