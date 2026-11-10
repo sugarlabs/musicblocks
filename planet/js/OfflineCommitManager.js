@@ -276,9 +276,10 @@ class OfflineCommitManager {
 
         // Notify parent window so toolbar shows the confirmed repo + key
         try {
+            // Our own origin, not "*", since this carries the repo key.
             window.parent?.postMessage(
                 { type: "MB_GIT_STATE", repoName: actualRepoName, hashedKey: realKey },
-                "*"
+                window.location.origin
             );
         } catch (_) {
             /* cross-origin guard */
@@ -380,7 +381,7 @@ class OfflineCommitManager {
                 try {
                     window.parent?.postMessage(
                         { type: "MB_SYNC_COMPLETE", synced: syncedCount },
-                        "*"
+                        window.location.origin
                     );
                 } catch (_) {
                     /* cross-origin guard */
