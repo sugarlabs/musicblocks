@@ -3947,6 +3947,46 @@ describe("Logo parseArg", () => {
             expect(logo.parseArg(logo, 0, 4, null, null)).toBe(1234);
         });
 
+        test("handles detached dectofrac and hue blocks in status matrix without throwing (#10213)", () => {
+            const tur = logo.turtles.ithTurtle(0);
+            tur.painter.color = 45;
+            logo.blockList = [
+                {
+                    name: "dectofrac",
+                    value: null,
+                    connections: [null, 1],
+                    protoblock: { parameter: false, dockTypes: ["numberout"] },
+                    isValueBlock: () => false
+                },
+                {
+                    name: "number",
+                    value: 0.75,
+                    protoblock: { parameter: false },
+                    isValueBlock: () => true
+                },
+                {
+                    name: "hue",
+                    value: null,
+                    connections: [null],
+                    protoblock: { parameter: false, dockTypes: ["numberout"] },
+                    isValueBlock: () => false
+                }
+            ];
+
+            logo.inStatusMatrix = true;
+            logo.statusFields = [];
+
+            expect(() => {
+                expect(logo.parseArg(logo, 0, 0, null, null)).toBe("0.75");
+            }).not.toThrow();
+            expect(logo.statusFields).toEqual([]);
+
+            expect(() => {
+                expect(logo.parseArg(logo, 0, 2, null, null)).toBe(45);
+            }).not.toThrow();
+            expect(logo.statusFields).toEqual([]);
+        });
+
         test("covers arg-function, non-string interval, and fallback id branches", () => {
             logo.blockList = [
                 {
