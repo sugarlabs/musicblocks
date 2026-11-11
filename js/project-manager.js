@@ -829,6 +829,9 @@ class ProjectManager {
             that._doHardStopButton();
         }
 
+        // A run pressed while the old project was loading must not start the new one.
+        that._cancelPendingRun();
+
         // Clear the Git tracking for the new project — mirrors the
         // same cleanup done in activity.js _afterDelete (which is only
         // reached via a different code path).
