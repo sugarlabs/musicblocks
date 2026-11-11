@@ -397,7 +397,8 @@ let delayExecution = duration => {
  */
 const announceToScreenReader = msg => {
     let region = document.getElementById("mbA11yLiveRegion");
-    if (!region) {
+    const isNewRegion = !region;
+    if (isNewRegion) {
         region = document.createElement("div");
         region.id = "mbA11yLiveRegion";
         region.setAttribute("role", "status");
@@ -407,7 +408,16 @@ const announceToScreenReader = msg => {
             "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;";
         document.body.appendChild(region);
     }
-    region.textContent = msg;
+    if (isNewRegion) {
+        // Some screen readers miss the first announcement if the live region's
+        // content is set in the same task that inserts it into the DOM, so give
+        // assistive tech a tick to register the region before its first update.
+        requestAnimationFrame(() => {
+            region.textContent = msg;
+        });
+    } else {
+        region.textContent = msg;
+    }
 };
 let importMembers = (obj, className, modelArgs, viewArgs) => {
     /**
