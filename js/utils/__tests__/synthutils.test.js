@@ -4208,6 +4208,16 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
                 global.instruments[testTurtle]["noise1"].triggerAttackRelease
             ).toHaveBeenCalled();
 
+            // A noise synth has no pitch, so the note value is its duration and
+            // the start time comes second, as Tone.NoiseSynth expects.
+            global.instruments[testTurtle]["noise1"].triggerAttackRelease.mockClear();
+            await synth.trigger(testTurtle, "C4", 0.25, "noise1", null, null, false, 0.5);
+            const noiseArgs =
+                global.instruments[testTurtle]["noise1"].triggerAttackRelease.mock.calls[0];
+            expect(noiseArgs).toHaveLength(2);
+            expect(noiseArgs[0]).toBe(0.25);
+            expect(noiseArgs[1]).toBeCloseTo(Tone.now() + 0.5, 5);
+
             // 6. Suspended audio context triggering watchdog timer
             Tone.context.state = "suspended";
             window.hasShownAudioWarning = false;
