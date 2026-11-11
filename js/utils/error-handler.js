@@ -26,11 +26,135 @@
  *   ErrorHandler.recoverable(error, context) – handled/recoverable errors (console.warn)
  *   ErrorHandler.userFacing(error, context, uiMessage) – errors + user-facing
  *                                                        notification
+ *   ErrorHandler.installGlobalHandlers()  – window error + rejection listeners (once)
+ *   ErrorHandler.getRecentErrors()        – last 50 recorded errors
+ *   ErrorHandler.debug(...args)           – debugLog wrapper
+ *   ErrorHandler.info(...args)            – debugLog wrapper
  *
  * @author Music Blocks Contributors
  */
 
 /* exported ErrorHandler */
+
+const MAX_ERROR_RECORDS = 50;
+const MAX_STACK_LENGTH = 1024;
+const ERROR_LOG_KEY = "mb_error_log_v1";
+const BOUNDARY_FLAG = "__mbErrorBoundaryInstalled";
+
+const recentErrors = [];
+const errorCounts = new Map();
+
+/**
+ * Runs a function, swallowing anything it throws.
+ *
+ * @param {Function} fn - Function to run.
+ * @returns {*} The function result, or undefined.
+ */
+const safely = fn => {
+    try {
+        return fn();
+    } catch (e) {
+        return undefined;
+    }
+};
+
+/**
+ * Collects the environment metadata stored with each error record.
+ *
+ * @returns {Object} version, browser, language and mode.
+ */
+const errorMetadata = () => ({
+    version: safely(() => window.VERSION) || "unknown",
+    browser: safely(() => navigator.userAgent) || "unknown",
+    language: safely(() => navigator.language) || "unknown",
+    mode:
+        safely(() => {
+            const stored = localStorage.getItem("beginnerMode");
+            if (stored === "true") return "beginner";
+            if (stored === "false") return "advanced";
+            return "unknown";
+        }) || "unknown"
+});
+
+/**
+ * Browser-extension frames and ResizeObserver reports are noise, not app bugs.
+ *
+ * @param {string} message - Error message.
+ * @param {string} source - Source file URL.
+ * @returns {boolean} True when the error should be ignored.
+ */
+const isIgnorableError = (message, source) =>
+    /^[a-z-]+-extension:/i.test(source || "") || /ResizeObserver loop/i.test(message || "");
+
+const persistErrors = () => {
+    safely(() => sessionStorage.setItem(ERROR_LOG_KEY, JSON.stringify(recentErrors)));
+};
+
+const recordError = (kind, message, source, line, column, error) => {
+    if (isIgnorableError(message, source)) return;
+
+    const now = Date.now();
+    const key = [kind, message, source || "", line || 0].join("|");
+    const existing = errorCounts.get(key);
+
+    if (existing) {
+        existing.count += 1;
+        existing.lastSeen = now;
+        persistErrors();
+        return;
+    }
+
+    const record = {
+        key: key,
+        kind: kind,
+        message: String(message || "Unknown error"),
+        source: source || "",
+        line: line || 0,
+        column: column || 0,
+        stack: error && error.stack ? String(error.stack).slice(0, MAX_STACK_LENGTH) : "",
+        count: 1,
+        firstSeen: now,
+        lastSeen: now,
+        ...errorMetadata()
+    };
+
+    errorCounts.set(key, record);
+    recentErrors.push(record);
+
+    if (recentErrors.length > MAX_ERROR_RECORDS) {
+        const dropped = recentErrors.shift();
+        if (dropped) errorCounts.delete(dropped.key);
+    }
+
+    persistErrors();
+    // Deduplicated repeats update the record instead of logging again.
+    console.error("[GlobalError]", record.message, record);
+};
+
+const handleWindowError = event => {
+    safely(() =>
+        recordError("error", event.message, event.filename, event.lineno, event.colno, event.error)
+    );
+};
+
+const handleUnhandledRejection = event => {
+    safely(() => {
+        const reason = event.reason;
+        const message = reason && reason.message ? reason.message : String(reason);
+        recordError("unhandledrejection", message, "", 0, 0, reason);
+    });
+};
+
+safely(() => {
+    const stored = JSON.parse(sessionStorage.getItem(ERROR_LOG_KEY) || "[]");
+    if (!Array.isArray(stored)) return;
+
+    stored.slice(-MAX_ERROR_RECORDS).forEach(record => {
+        if (!record || !record.key) return;
+        recentErrors.push(record);
+        errorCounts.set(record.key, record);
+    });
+});
 
 const ErrorHandler = {
     /**
@@ -101,12 +225,63 @@ const ErrorHandler = {
                 // Best-effort: do nothing if Activity is not available
             }
         }
+    },
+
+    /**
+     * Installs the window error and unhandledrejection listeners once.
+     * Disabled by localStorage MB_ERROR_BOUNDARY === "false".
+     *
+     * @returns {boolean} True when this call installed the listeners.
+     */
+    installGlobalHandlers() {
+        if (typeof window === "undefined" || typeof window.addEventListener !== "function") {
+            return false;
+        }
+        if (safely(() => localStorage.getItem("MB_ERROR_BOUNDARY")) === "false") return false;
+        if (window[BOUNDARY_FLAG]) return false;
+
+        window.addEventListener("error", handleWindowError);
+        window.addEventListener("unhandledrejection", handleUnhandledRejection);
+        window[BOUNDARY_FLAG] = true;
+        return true;
+    },
+
+    /**
+     * Returns a copy of the recorded errors, oldest first.
+     *
+     * @returns {Object[]} Up to the last 50 records.
+     */
+    getRecentErrors() {
+        return recentErrors.slice();
+    },
+
+    /**
+     * Debug log, a no-op unless debug logging is enabled.
+     *
+     * @param {...*} args - Values forwarded to debugLog.
+     */
+    debug(...args) {
+        safely(() => {
+            if (typeof debugLog === "function") debugLog(...args);
+        });
+    },
+
+    /**
+     * Info log, a no-op unless debug logging is enabled.
+     *
+     * @param {...*} args - Values forwarded to debugLog.
+     */
+    info(...args) {
+        safely(() => {
+            if (typeof debugLog === "function") debugLog(...args);
+        });
     }
 };
 
 // Ensure the global exists for the RequireJS shim (exports: "ErrorHandler")
 if (typeof window !== "undefined") {
     window.ErrorHandler = ErrorHandler;
+    ErrorHandler.installGlobalHandlers();
 }
 
 if (typeof module !== "undefined" && module.exports) {
