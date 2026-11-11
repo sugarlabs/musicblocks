@@ -26,6 +26,17 @@ describe("ErrorHandler", () => {
     });
 
     afterEach(() => {
+        if (
+            typeof window !== "undefined" &&
+            typeof window.__MB_ERROR_HANDLER_DISPOSE__ === "function"
+        ) {
+            window.__MB_ERROR_HANDLER_DISPOSE__();
+        }
+        if (typeof window !== "undefined") {
+            delete window.__MB_ERROR_HANDLER_INSTALLED__;
+            delete window.__MB_ERROR_HANDLER_DISPOSE__;
+            delete window.ActivityContext;
+        }
         consoleErrorSpy.mockRestore();
         consoleWarnSpy.mockRestore();
     });
@@ -148,6 +159,158 @@ describe("ErrorHandler", () => {
             }).not.toThrow();
 
             delete global.window.ActivityContext;
+        });
+    });
+
+    describe("recent error buffer", () => {
+        it("deduplicates repeated errors and counts them", () => {
+            const error = new Error("loop");
+            ErrorHandler.capture(error, { operation: "run" });
+            ErrorHandler.capture(error, { operation: "run" });
+            ErrorHandler.capture(error, { operation: "run" });
+
+            const records = ErrorHandler.getRecentErrors();
+            expect(records).toHaveLength(1);
+            expect(records[0].count).toBe(3);
+            expect(records[0].level).toBe("error");
+            expect(records[0].operation).toBe("run");
+            expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("keeps separate records for different operations", () => {
+            const error = new Error("same message");
+            ErrorHandler.capture(error, { operation: "one" });
+            ErrorHandler.capture(error, { operation: "two" });
+
+            expect(ErrorHandler.getRecentErrors()).toHaveLength(2);
+        });
+
+        it("returns a copy of the buffer", () => {
+            ErrorHandler.capture("boom", { operation: "copy" });
+
+            const records = ErrorHandler.getRecentErrors();
+            records.push({});
+
+            expect(ErrorHandler.getRecentErrors()).toHaveLength(1);
+        });
+
+        it("clears the buffer", () => {
+            ErrorHandler.capture("boom", { operation: "clear" });
+            ErrorHandler.clearRecentErrors();
+
+            expect(ErrorHandler.getRecentErrors()).toHaveLength(0);
+        });
+
+        it("still shows the user-facing message on repeats", () => {
+            const errorMsgMock = jest.fn();
+            global.window.ActivityContext = {
+                getActivity: () => ({ errorMsg: errorMsgMock })
+            };
+            const error = new Error("repeat");
+
+            ErrorHandler.userFacing(error, { operation: "save" }, "Could not save");
+            ErrorHandler.userFacing(error, { operation: "save" }, "Could not save");
+
+            expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+            expect(errorMsgMock).toHaveBeenCalledTimes(2);
+
+            delete global.window.ActivityContext;
+        });
+    });
+
+    describe("global handlers", () => {
+        afterEach(() => {
+            ErrorHandler.uninstallGlobalHandlers();
+        });
+
+        it("installs idempotently", () => {
+            const first = ErrorHandler.installGlobalHandlers();
+            const second = ErrorHandler.installGlobalHandlers();
+
+            expect(second).toBe(first);
+        });
+
+        it("captures uncaught errors", () => {
+            window.dispatchEvent(
+                new ErrorEvent("error", {
+                    message: "boom",
+                    error: new Error("boom"),
+                    filename: "http://localhost/app.js",
+                    lineno: 10,
+                    colno: 5
+                })
+            );
+
+            const records = ErrorHandler.getRecentErrors();
+            expect(records).toHaveLength(1);
+            expect(records[0].level).toBe("uncaught");
+            expect(records[0].operation).toBe("uncaught");
+            expect(records[0].source).toBe("http://localhost/app.js");
+            expect(records[0].line).toBe(10);
+            expect(records[0].column).toBe(5);
+            expect(consoleErrorSpy).toHaveBeenCalled();
+        });
+
+        it("captures unhandled promise rejections", () => {
+            const event = new Event("unhandledrejection");
+            event.reason = new Error("rejected");
+            window.dispatchEvent(event);
+
+            const records = ErrorHandler.getRecentErrors();
+            expect(records).toHaveLength(1);
+            expect(records[0].level).toBe("unhandledrejection");
+            expect(records[0].operation).toBe("unhandledrejection");
+            expect(consoleErrorSpy).toHaveBeenCalled();
+        });
+
+        it("ignores extension errors and ResizeObserver noise", () => {
+            window.dispatchEvent(
+                new ErrorEvent("error", {
+                    message: "extension failure",
+                    filename: "chrome-extension://abc/content.js"
+                })
+            );
+            window.dispatchEvent(
+                new ErrorEvent("error", {
+                    message: "ResizeObserver loop completed with undelivered notifications.",
+                    filename: "http://localhost/app.js"
+                })
+            );
+
+            expect(ErrorHandler.getRecentErrors()).toHaveLength(0);
+        });
+
+        it("deduplicates repeated uncaught errors", () => {
+            const error = new Error("repeat");
+            const dispatch = () => {
+                window.dispatchEvent(
+                    new ErrorEvent("error", {
+                        message: "repeat",
+                        error,
+                        filename: "http://localhost/app.js",
+                        lineno: 20,
+                        colno: 3
+                    })
+                );
+            };
+
+            dispatch();
+            dispatch();
+
+            const records = ErrorHandler.getRecentErrors();
+            expect(records).toHaveLength(1);
+            expect(records[0].count).toBe(2);
+        });
+
+        it("removes listeners when disposed", () => {
+            ErrorHandler.uninstallGlobalHandlers();
+
+            const event = new Event("unhandledrejection");
+            event.reason = new Error("after dispose");
+            window.dispatchEvent(event);
+
+            expect(consoleErrorSpy).not.toHaveBeenCalled();
+            expect(ErrorHandler.getRecentErrors()).toHaveLength(0);
         });
     });
 });
