@@ -986,6 +986,25 @@ describe("HelpWidget", () => {
             blockHelpSpy.mockRestore();
         });
 
+        test("announces Help closed before showing the tour starter hint", () => {
+            const activity = createMockActivity();
+            new HelpWidget(activity, false);
+            announceToScreenReader.mockClear();
+
+            mockWidgetWindow.onclose();
+
+            // Both must fire: textMsg() itself also calls announceToScreenReader
+            // in production, and the shared live region queues rather than lets
+            // the hint silently overwrite "Help closed" before it's read.
+            const announceOrder = announceToScreenReader.mock.invocationCallOrder[0];
+            const textMsgOrder = activity.textMsg.mock.invocationCallOrder[0];
+            expect(announceToScreenReader).toHaveBeenCalledWith("Help closed");
+            expect(activity.textMsg).toHaveBeenCalledWith(
+                "Start by dragging a block from the left panel and connect it to the Start block."
+            );
+            expect(announceOrder).toBeLessThan(textMsgOrder);
+        });
+
         test("closing a custom card does not show the tour starter hint", () => {
             const activity = createMockActivity();
             HelpWidget.showCard(activity, {

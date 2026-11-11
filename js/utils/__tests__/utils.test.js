@@ -1438,13 +1438,19 @@ describe("importMembers() additional branches", () => {
 
 describe("announceToScreenReader()", () => {
     let mockElement;
+    let appendedRegion;
     let freshAnnounceToScreenReader;
 
     beforeEach(() => {
+        appendedRegion = null;
         mockElement = { setAttribute: jest.fn(), style: {} };
-        document.getElementById = jest.fn(() => null);
+        // Mimic a real DOM: getElementById only finds the region once
+        // appendChild has actually inserted it.
+        document.getElementById = jest.fn(() => appendedRegion);
         document.createElement = jest.fn(() => mockElement);
-        document.body.appendChild = jest.fn();
+        document.body.appendChild = jest.fn(el => {
+            appendedRegion = el;
+        });
         // Reset modules so each test gets its own live-region-ready state,
         // instead of sharing it with whichever test ran first.
         jest.resetModules();
@@ -1469,15 +1475,22 @@ describe("announceToScreenReader()", () => {
         jest.useRealTimers();
     });
 
-    it("applies the latest message if a second call lands before the first tick fires", () => {
+    it("announces back-to-back messages in order instead of dropping one", () => {
         jest.useFakeTimers();
 
-        freshAnnounceToScreenReader("Stale message");
-        freshAnnounceToScreenReader("Latest message");
+        freshAnnounceToScreenReader("Help closed");
+        freshAnnounceToScreenReader("Start by dragging a block");
+        // Neither message is lost: the first call establishes the region,
+        // the second just joins the queue behind it.
         expect(mockElement.textContent).toBeUndefined();
 
-        jest.runAllTimers();
-        expect(mockElement.textContent).toBe("Latest message");
+        // The first tick registers the region and announces the first message.
+        jest.runOnlyPendingTimers();
+        expect(mockElement.textContent).toBe("Help closed");
+
+        // The second message replaces it only after the first had its turn.
+        jest.advanceTimersByTime(300);
+        expect(mockElement.textContent).toBe("Start by dragging a block");
 
         jest.useRealTimers();
     });
@@ -1488,7 +1501,6 @@ describe("announceToScreenReader()", () => {
         jest.runAllTimers();
         document.createElement.mockClear();
 
-        document.getElementById = jest.fn(() => mockElement);
         freshAnnounceToScreenReader("Second message");
 
         expect(document.createElement).not.toHaveBeenCalled();
@@ -1497,7 +1509,7 @@ describe("announceToScreenReader()", () => {
         jest.useRealTimers();
     });
 
-    it("writes synchronously once the region is established", () => {
+    it("writes synchronously once the region is established and idle", () => {
         jest.useFakeTimers();
         freshAnnounceToScreenReader("First message");
         jest.runAllTimers();
