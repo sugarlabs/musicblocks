@@ -38,6 +38,7 @@ global.MeterWidget = MeterWidget;
 
 // --- 1. Global Mocks (Fake the Browser Environment) ---
 global._ = msg => msg; // Mock translation function
+global.announceToScreenReader = jest.fn();
 global.platformColor = {
     selectorBackground: "#FFFFFF",
     selectorBackgroundHOVER: "#EEEEEE",
@@ -263,6 +264,15 @@ describe("Meter Widget", () => {
         expect(mockActivity.logo.synth.loadSynth).toHaveBeenCalledWith(0, "kick drum");
         expect(mockActivity.logo.synth.loadSynth).toHaveBeenCalledWith(0, "snare drum");
         expect(global.wheelnav).toHaveBeenCalledTimes(3); // meterWheel, beatWheel, playWheel
+        expect(announceToScreenReader).toHaveBeenCalledWith("Meter opened");
+    });
+
+    test("announces Meter closed on onclose", () => {
+        announceToScreenReader.mockClear();
+
+        meterWidget.widgetWindow.onclose();
+
+        expect(announceToScreenReader).toHaveBeenCalledWith("Meter closed");
     });
 
     test("should handle play button toggle", () => {

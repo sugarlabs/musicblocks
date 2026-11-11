@@ -21,7 +21,7 @@
     rotateSliceAngles,
     scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes,
     isUnsafeObjectKey, ManagedTimer, readTextFile, downloadTextFile, createSharePopup,
-    closeSharePopup, makeKeyboardAccessible
+    closeSharePopup, makeKeyboardAccessible, announceToScreenReader
  */
 
 /*
@@ -100,6 +100,7 @@ class ModeWidget {
         this.widgetWindow = window.widgetWindows.windowFor(this, "custom mode");
         this.widgetWindow.clear();
         this.widgetWindow.show();
+        announceToScreenReader(_("Mode opened"));
 
         /**
          * Timer manager for managing all widget timeouts safely.
@@ -155,6 +156,7 @@ class ModeWidget {
                     this.logo.modeWidget = null;
                 }
             }
+            announceToScreenReader(_("Mode closed"));
             this.widgetWindow.destroy();
         };
 

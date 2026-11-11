@@ -16,7 +16,7 @@
 /*
    global
 
-   _, LegoWidget
+   _, LegoWidget, announceToScreenReader
 */
 /*
     Globals location
@@ -48,6 +48,7 @@ function LegoBricksLayout() {
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
+        announceToScreenReader(_("LEGO Bricks opened"));
 
         widgetWindow.onclose = () => {
             this._stopPlayback();
@@ -71,6 +72,7 @@ function LegoBricksLayout() {
             this._offscreenCtx = null;
             this._offscreenMediaElement = null;
             this.running = false;
+            announceToScreenReader(_("LEGO Bricks closed"));
             widgetWindow.destroy();
         };
 

@@ -13,6 +13,7 @@
  */
 
 global._ = msg => msg;
+global.announceToScreenReader = jest.fn();
 
 // updateAll schedules its DOM render on the next animation frame; run it
 // synchronously so the rendering tests below stay direct. The throttling
@@ -194,6 +195,11 @@ describe("StatusMatrix Widget", () => {
             expect(statusMatrix.widgetWindow.show).toHaveBeenCalled();
         });
 
+        test("announces Status opened", () => {
+            statusMatrix.init(mockActivity);
+            expect(announceToScreenReader).toHaveBeenCalledWith("Status opened");
+        });
+
         test("stores activity reference", () => {
             statusMatrix.init(mockActivity);
             expect(statusMatrix.activity).toBe(mockActivity);
@@ -221,6 +227,12 @@ describe("StatusMatrix Widget", () => {
         test("destroys widget window", () => {
             statusMatrix.widgetWindow.onclose();
             expect(statusMatrix.widgetWindow.destroy).toHaveBeenCalled();
+        });
+
+        test("announces Status closed", () => {
+            announceToScreenReader.mockClear();
+            statusMatrix.widgetWindow.onclose();
+            expect(announceToScreenReader).toHaveBeenCalledWith("Status closed");
         });
     });
 

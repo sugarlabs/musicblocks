@@ -15,7 +15,7 @@
 /*
    global
    _, getDrumSynthName, TempoWindow, TempoRows, TempoKeyboard, TempoTap, TempoControls,
-   TempoMetronome, TempoSave
+   TempoMetronome, TempoSave, announceToScreenReader
  */
 
 /*
@@ -171,6 +171,7 @@ class Tempo {
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
+        announceToScreenReader(_("Tempo opened"));
         if (typeof widgetWindow.takeFocus === "function") {
             widgetWindow.takeFocus();
         }

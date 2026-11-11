@@ -16,7 +16,8 @@
    global
 
    _, docById, MATRIXSOLFEWIDTH, PitchDrumMatrixWindow, PitchDrumMatrixGrid,
-   PitchDrumMatrixBlocks, PitchDrumMatrixCells, PitchDrumMatrixPlayback, PitchDrumMatrixSave
+   PitchDrumMatrixBlocks, PitchDrumMatrixCells, PitchDrumMatrixPlayback, PitchDrumMatrixSave,
+   announceToScreenReader
 */
 /*
    Global locations
@@ -210,6 +211,7 @@ class PitchDrumMatrix {
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
+        announceToScreenReader(_("Pitch Drum Matrix opened"));
 
         this._addToolbar(widgetWindow);
 

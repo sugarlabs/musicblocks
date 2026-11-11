@@ -28,6 +28,7 @@ global.ManagedTimer = ManagedTimer;
 global.parseNoteString = parseNoteString;
 
 global._ = msg => msg;
+global.announceToScreenReader = jest.fn();
 global.platformColor = {
     labelColor: "#90c100",
     selectorBackground: "#f0f0f0",
@@ -181,6 +182,12 @@ describe("Arpeggio Widget", () => {
 
     // --- Init Tests ---
     describe("init", () => {
+        test("announces Arpeggio opened", () => {
+            arpeggio.init(activityMock);
+
+            expect(announceToScreenReader).toHaveBeenCalledWith("Arpeggio opened");
+        });
+
         test("should set up DOM table properly", () => {
             arpeggio.init(activityMock);
 
@@ -794,6 +801,14 @@ describe("Arpeggio Widget", () => {
 
         afterEach(() => {
             jest.useRealTimers();
+        });
+
+        test("announces Arpeggio closed on onclose", () => {
+            announceToScreenReader.mockClear();
+
+            arpeggio.widgetWindow.onclose();
+
+            expect(announceToScreenReader).toHaveBeenCalledWith("Arpeggio closed");
         });
 
         test("widgetWindow.onclose stops playback and clears timeout", () => {
