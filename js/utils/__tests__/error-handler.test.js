@@ -459,4 +459,40 @@ describe("ErrorHandler", () => {
             expect(reloaded.getRecentErrors()).toHaveLength(0);
         });
     });
+
+    describe("logging helpers", () => {
+        it("delegates debug and info to debugLog", () => {
+            const original = global.debugLog;
+            const logger = jest.fn();
+            global.debugLog = logger;
+
+            try {
+                ErrorHandler.debug("debug message", { a: 1 });
+                ErrorHandler.info("info message");
+
+                expect(logger).toHaveBeenNthCalledWith(1, "debug message", { a: 1 });
+                expect(logger).toHaveBeenNthCalledWith(2, "[info]", "info message");
+            } finally {
+                if (original === undefined) {
+                    delete global.debugLog;
+                } else {
+                    global.debugLog = original;
+                }
+            }
+        });
+
+        it("does not throw when debugLog is unavailable", () => {
+            const original = global.debugLog;
+            delete global.debugLog;
+
+            try {
+                expect(() => ErrorHandler.debug("debug")).not.toThrow();
+                expect(() => ErrorHandler.info("info")).not.toThrow();
+            } finally {
+                if (original !== undefined) {
+                    global.debugLog = original;
+                }
+            }
+        });
+    });
 });

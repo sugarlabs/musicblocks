@@ -132,6 +132,9 @@ jobs:
                   cat changed-js-files.txt
                   xargs -r npx prettier --check < changed-js-files.txt
 
+            - name: Check console usage does not increase
+              run: node scripts/check-console-usage.js
+
     # ----------------------------------------------------------------------
     # Build / smoke test across Node versions
     # ----------------------------------------------------------------------
