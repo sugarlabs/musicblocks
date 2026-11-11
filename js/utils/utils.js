@@ -416,11 +416,25 @@ const _drainA11yAnnounceQueue = region => {
         return;
     }
     _a11yAnnouncing = true;
-    region.textContent = _a11yAnnounceQueue.shift();
-    setTimeout(() => {
-        _a11yAnnouncing = false;
-        _drainA11yAnnounceQueue(region);
-    }, A11Y_ANNOUNCE_GAP_MS);
+    const msg = _a11yAnnounceQueue.shift();
+
+    const writeAndScheduleNext = () => {
+        region.textContent = msg;
+        setTimeout(() => {
+            _a11yAnnouncing = false;
+            _drainA11yAnnounceQueue(region);
+        }, A11Y_ANNOUNCE_GAP_MS);
+    };
+
+    if (region.textContent === msg) {
+        // Some browsers won't re-announce a live region whose textContent
+        // doesn't actually change, so clear it first and write the repeated
+        // message on a later tick to force a visible mutation.
+        region.textContent = "";
+        setTimeout(writeAndScheduleNext, 0);
+    } else {
+        writeAndScheduleNext();
+    }
 };
 
 /**
