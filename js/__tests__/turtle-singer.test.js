@@ -312,6 +312,27 @@ describe("Singer Class", () => {
         expect(result).toEqual(["C", 4]);
     });
 
+    test("should ignore a non-finite step count", () => {
+        mockGlobals.getStepSizeUp.mockClear();
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, Infinity)).toEqual([
+            "C",
+            4
+        ]);
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, -Infinity)).toEqual([
+            "C",
+            4
+        ]);
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, NaN)).toEqual(["C", 4]);
+        expect(mockGlobals.getStepSizeUp).not.toHaveBeenCalled();
+    });
+
+    test("should cap a huge finite step count instead of looping forever", () => {
+        mockGlobals.getStepSizeUp.mockClear();
+        const result = Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, 1e308);
+        expect(result).toEqual(["C", 4]);
+        expect(mockGlobals.getStepSizeUp.mock.calls.length).toBeLessThanOrEqual(495);
+    });
+
     test("should correctly calculate scalar distance", () => {
         const result = Singer.scalarDistance(logoMock, turtleMock, 60, 62);
         expect(result).toBeGreaterThan(0);
