@@ -444,24 +444,49 @@ function _processVoice(voice, blockId, staff, voiceNumber, staffRecord, voiceIdx
                 };
             }
 
-            // Every note of a chord ([CEG]) is played, each with its own
-            // carried accidental; reading pitches[0] alone kept just the first.
+            // Each pitch carries its own accidental, or the one already marked
+            // on that pitch earlier in the bar.
+            const accidentalsOf = pitches =>
+                pitches.map(pitch => {
+                    if (pitch.accidental) {
+                        barAccidentals[voiceIdx][pitch.pitch] = pitch.accidental;
+                        return pitch.accidental;
+                    }
+                    return barAccidentals[voiceIdx][pitch.pitch];
+                });
+
+            // Every note of a chord ([CEG]) is played; reading pitches[0]
+            // alone kept just the first.
             const chord = element.pitches ?? [];
-            const accidentals = chord.map(pitch => {
-                if (pitch.accidental) {
-                    barAccidentals[voiceIdx][pitch.pitch] = pitch.accidental;
-                    return pitch.accidental;
+            let duration =
+                element.duration * (isSpacerRest ? 1 : (tuplets[voiceIdx]?.multiplier ?? 1));
+
+            // Grace notes ({ga}c) are played, taking half of the note they lead
+            // into between them -- the timing abcjs gives them when it plays the
+            // tune. Dropping them lost notes from ornamented tunes. A rest's
+            // grace notes are not played, by abcjs either.
+            const graces = chord.length ? (element.gracenotes ?? []) : [];
+            if (graces.length) {
+                duration /= 2;
+                for (const grace of graces) {
+                    blockId += _createPitchBlocks(
+                        [grace],
+                        blockId,
+                        duration / graces.length,
+                        staffRecord.keySignature,
+                        actionBlock,
+                        accidentalsOf([grace])
+                    );
                 }
-                return barAccidentals[voiceIdx][pitch.pitch];
-            });
+            }
 
             blockId += _createPitchBlocks(
                 chord,
                 blockId,
-                element.duration * (isSpacerRest ? 1 : (tuplets[voiceIdx]?.multiplier ?? 1)),
+                duration,
                 staffRecord.keySignature,
                 actionBlock,
-                accidentals
+                accidentalsOf(chord)
             );
 
             if (tuplets[voiceIdx] && !isSpacerRest) {
