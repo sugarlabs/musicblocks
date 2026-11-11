@@ -272,6 +272,14 @@
     <body id="body" data-title="index">
         <!-- Fallback for browsers that don't support preload -->
         <noscript> JavaScript is required to view this page. </noscript>
+        <!-- Registered up front so widget open/close announcements are never missed on first use -->
+        <div
+            id="mbA11yLiveRegion"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+            style="position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden"
+        ></div>
         <header>
             <div
                 id="loading-image-container"

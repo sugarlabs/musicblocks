@@ -22,6 +22,7 @@ const { escapeHTML, isSafeUrl } = require("../../utils/utils");
 global.escapeHTML = escapeHTML;
 global.isSafeUrl = isSafeUrl;
 global._ = text => text;
+global.announceToScreenReader = jest.fn();
 global.ManagedTimer = require("../../utils/ManagedTimer.js");
 global.DOMPurify = require("../../../lib/purify.min.js");
 
