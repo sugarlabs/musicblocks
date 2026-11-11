@@ -14,7 +14,7 @@ const HELP_SVG_DATA_PREFIX = "data:image/svg+xml;base64,";
 
 /* global
 
-   _, docById, getMacroExpansion, HELPCONTENT,
+   _, docById, getMacroExpansion, HELPCONTENT, announceToScreenReader
 */
 /*
      Globals locations
@@ -56,12 +56,14 @@ class HelpWidget {
         widgetWindow.getWidgetFrame().classList.add("help-widget-frame");
         widgetWindow.getWidgetBody().classList.add("help-widget-body");
         widgetWindow.show();
+        announceToScreenReader(_("Help opened"));
         widgetWindow.onclose = () => {
             this.isOpen = false;
             if (this._keydownHandler) {
                 document.removeEventListener("keydown", this._keydownHandler);
                 this._keydownHandler = null;
             }
+            announceToScreenReader(_("Help closed"));
             widgetWindow.destroy();
             // Trigger the hint only if they were on the first page of the tour
             if (

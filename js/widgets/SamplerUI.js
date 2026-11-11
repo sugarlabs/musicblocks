@@ -13,7 +13,7 @@
 /*
    global
 
-   _, docById, instruments, platformColor, resolveBackendURL
+   _, docById, instruments, platformColor, resolveBackendURL, announceToScreenReader
 */
 /*
     Globals location
@@ -64,6 +64,7 @@ const SamplerUI = {
             this.drawVisualIDs = {};
 
             const widgetWindow = window.widgetWindows.windowFor(this, "sampler", "sampler");
+            announceToScreenReader(_("Sampler opened"));
             const that = this;
 
             // For the widget buttons
@@ -200,6 +201,7 @@ const SamplerUI = {
                     this._dropZone = null;
                 }
 
+                announceToScreenReader(_("Sampler closed"));
                 widgetWindow.destroy();
             };
 
