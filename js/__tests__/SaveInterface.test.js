@@ -1215,6 +1215,33 @@ describe("afterSaveMIDI velocity", () => {
         expect(velocities(midi, "Track 1 - guitar")).toEqual([1, 127]);
     });
 
+    it.each([[NaN], [Infinity], [null], ["50"]])(
+        "writes the former velocities for a recorded volume of %p",
+        volume => {
+            const midi = exportMidi({
+                0: [
+                    note("A4", { note: volume, drums: {} }),
+                    note("R", { note: 50, drums: { "snare drum": volume } }, "snare drum")
+                ]
+            });
+
+            expect(velocities(midi, "Track 1 - guitar")).toEqual([101]);
+            expect(velocities(midi, "Track 1 - snare drum")).toEqual([114]);
+        }
+    );
+
+    it("keeps a negative volume at the lowest velocity", () => {
+        const midi = exportMidi({
+            0: [
+                note("A4", { note: -20, drums: {} }),
+                note("R", { note: 50, drums: { "snare drum": -5 } }, "snare drum")
+            ]
+        });
+
+        expect(velocities(midi, "Track 1 - guitar")).toEqual([1]);
+        expect(velocities(midi, "Track 1 - snare drum")).toEqual([1]);
+    });
+
     it("writes the former velocities when no volume was recorded", () => {
         const midi = exportMidi({
             0: [note("A4", undefined), note("R", { note: 50, drums: {} }, "snare drum")]

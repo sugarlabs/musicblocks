@@ -2907,6 +2907,37 @@ describe("processNote notation and MIDI emission guards against non-positive dur
         }
     );
 
+    test.each([
+        ["the default synth when no instrument is set", {}, "DEFAULTVOICE"],
+        ["the voice when no instrument is set", { voices: ["flute"] }, "flute"],
+        ["the oscillator of the note", { instrumentNames: ["piano"], osc: ["sine"] }, "sine"]
+    ])(
+        "records the volume of %s",
+        (_label, { instrumentNames = [], voices = [], osc = [] }, synth) => {
+            const blk = "playbackSynthBlk";
+            turtleMock.singer.inNoteBlock = [blk];
+            turtleMock.singer.notePitches = { [blk]: ["C"] };
+            turtleMock.singer.noteOctaves = { [blk]: [4] };
+            turtleMock.singer.noteCents = { [blk]: [0] };
+            turtleMock.singer.noteHertz = { [blk]: [0] };
+            turtleMock.singer.noteDrums = { [blk]: [] };
+            turtleMock.singer.noteBeatValues = { [blk]: [1] };
+            turtleMock.singer.instrumentNames = instrumentNames;
+            turtleMock.singer.voices = voices;
+            turtleMock.singer.oscList = { [blk]: osc };
+            turtleMock.singer.bpm = [90];
+            // Only the synth that plays the note has this volume.
+            turtleMock.singer.synthVolume = { piano: [70], [synth]: [50, 30] };
+
+            Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+            expect(activityMock.logo.notationMIDI.mock.calls[0][7]).toEqual({
+                note: 30,
+                drums: {}
+            });
+        }
+    );
+
     test("passes every drum in one Note to the MIDI recorder", () => {
         const blk = "drumNoteBlk";
         turtleMock.singer.inNoteBlock = [blk];

@@ -1460,12 +1460,62 @@ describe("transcribeMidi", () => {
             expect(findUnreciprocatedConnections(blocks)).toEqual([]);
         });
 
-        it("leaves the volume of drums alone", async () => {
+        // A drum track whose notes are given as [midi number, velocity], one chord per entry.
+        const drumFile = chords => {
+            const file = midiFile({ velocities: [], percussion: true });
+            file.tracks[0].notes = chords.flatMap((chord, i) =>
+                chord.map(([midi, velocity]) => ({
+                    name: "C2",
+                    midi,
+                    time: i * 0.5,
+                    duration: 0.5,
+                    velocity
+                }))
+            );
+            return file;
+        };
+
+        it("sets the volume of a drum where its velocity changes", async () => {
+            const flow = await importFlow(drumFile([[[38, 0.2]], [[38, 0.2]], [[38, 0.9]]]));
+
+            expect(flow).toEqual(["snare drum 20", "note", "note", "snare drum 90", "note"]);
+        });
+
+        it("keeps a volume for each drum", async () => {
             const flow = await importFlow(
-                midiFile({ velocities: [0.1, 1], names: ["C2", "D2"], percussion: true })
+                drumFile([
+                    [
+                        [38, 0.9],
+                        [36, 0.3]
+                    ],
+                    [
+                        [38, 0.9],
+                        [36, 0.8]
+                    ],
+                    [[41, 0.52]]
+                ])
             );
 
-            expect(flow).toEqual(["note", "note"]);
+            expect(flow).toEqual([
+                "snare drum 90",
+                "kick drum 30",
+                "note",
+                "kick drum 80",
+                "note",
+                "note"
+            ]);
+        });
+
+        it("sets the volume of an unknown drum, which plays as a kick drum", async () => {
+            const flow = await importFlow(drumFile([[[99, 0.9]]]));
+
+            expect(flow).toEqual(["kick drum 90", "note"]);
+        });
+
+        it("reads back the drum velocities Save as MIDI writes", async () => {
+            const flow = await importFlow(drumFile([[[38, 25 / 127]], [[38, 114 / 127]]]));
+
+            expect(flow).toEqual(["snare drum 20", "note", "snare drum 90", "note"]);
         });
     });
 });

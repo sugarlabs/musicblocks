@@ -2650,6 +2650,15 @@ class Singer {
                                     const midiDrums = playedBySetDrum
                                         ? [last(tur.singer.drumStyle)]
                                         : chordDrums;
+                                    // The synth the pitches play with, chosen as for playback
+                                    // below: an oscillator, the instrument, the voice, or the
+                                    // default.
+                                    const pitchSynth =
+                                        (tur.singer.oscList[thisBlk].length > 0 &&
+                                            last(tur.singer.oscList[thisBlk])) ||
+                                        last(tur.singer.instrumentNames) ||
+                                        (tur.singer.voices.length > 0 && last(tur.singer.voices)) ||
+                                        DEFAULTVOICE;
                                     // A note with cents or set in hertz is a frequency; MIDI
                                     // takes the nearest 12-EDO note name.
                                     activity.logo.notationMIDI(
@@ -2669,7 +2678,7 @@ class Singer {
                                         last(tur.singer.instrumentNames),
                                         [tur.singer.beatsPerMeasure, tur.singer.noteValuePerBeat],
                                         {
-                                            note: volumeOf(last(tur.singer.instrumentNames)),
+                                            note: volumeOf(pitchSynth),
                                             drums: Object.fromEntries(
                                                 midiDrums.map(drum => [drum, volumeOf(drum)])
                                             )

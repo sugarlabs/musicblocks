@@ -283,13 +283,52 @@ class MidiTranscriber {
         return Math.round(Math.min(Math.max(...velocities, 0), 1) * 100);
     }
 
+    // The Music Blocks drum a percussion note plays.
+    drumName(note) {
+        return this.drumMidi[note.midi]?.[0] || "kick drum";
+    }
+
+    /**
+     * The volume changes a chord needs: for a track's instrument, or for each drum of a drum
+     * track, wherever the volume differs by volumeStep or more from the one in force.
+     * @param {Array} notes - the chord
+     * @param {string|null} instrument - the track's instrument, or null for a drum track
+     * @param {Map<string, number>} applied - the volume in force for each instrument or drum,
+     *     updated with the changes
+     * @returns {Array<[Array, number]>} the voicename or drumname block, and the volume
+     */
+    volumeChanges(notes, instrument, applied) {
+        const volumes = new Map();
+        if (instrument !== null) {
+            const volume = this.noteVolume(notes);
+            if (volume !== null) volumes.set(instrument, volume);
+        } else if (notes[0].name !== "R") {
+            for (const note of notes) {
+                const volume = this.noteVolume([note]);
+                const drum = this.drumName(note);
+                if (volume !== null) volumes.set(drum, Math.max(volume, volumes.get(drum) ?? 0));
+            }
+        }
+
+        const changes = [];
+        volumes.forEach((volume, name) => {
+            if (Math.abs(volume - (applied.get(name) ?? defaultVolume)) < volumeStep) return;
+            applied.set(name, volume);
+            changes.push([
+                [instrument !== null ? "voicename" : "drumname", { value: name }],
+                volume
+            ]);
+        });
+        return changes;
+    }
+
     getPitch(x, notes, prev, isPercussionTrack) {
         const ar = [];
         if (notes[0].name === "R") {
             ar.push([x, "rest2", 0, 0, [prev, null]]);
         } else if (isPercussionTrack) {
             for (let i = 0; i < notes.length; i++) {
-                const drumname = this.drumMidi[notes[i].midi]?.[0] || "kick drum";
+                const drumname = this.drumName(notes[i]);
                 ar.push(
                     [
                         x,
@@ -354,9 +393,9 @@ class MidiTranscriber {
         // at 0: finalizeTracks() always writes one setbpm3 for the file's starting tempo,
         // shared by every track, before any of this runs.
         let appliedTempoIndex = 0;
-        // The volume this track's notes play at so far: Music Blocks' default until the first
-        // set synth volume block.
-        let appliedVolume = defaultVolume;
+        // The volume this track's instrument and each of its drums play at so far: Music
+        // Blocks' default until a set synth volume block for it.
+        const appliedVolumes = new Map();
         // Seconds the written notes play for. Each note runs up to where the file's note ends,
         // at the tempo it plays at, so rounding never adds up.
         let written = 0;
@@ -470,9 +509,12 @@ class MidiTranscriber {
             }
 
             // Likewise a set synth volume chunk where the velocity changes, so soft and loud
-            // passages keep their dynamics. Drums keep their volume.
-            const volume = isPercussionTrack ? null : this.noteVolume(notes);
-            if (volume !== null && Math.abs(volume - appliedVolume) >= volumeStep) {
+            // passages keep their dynamics: for the track's instrument, or for each drum.
+            for (const [target, volume] of this.volumeChanges(
+                notes,
+                isPercussionTrack ? null : instrument,
+                appliedVolumes
+            )) {
                 let volumeBase = this.jsONON.length + currentActionBlock.length;
                 if (k !== 0) volumeBase = volumeBase + 2;
                 if (tempoVspaceEntry) tempoVspaceEntry[4][1] = volumeBase;
@@ -484,13 +526,12 @@ class MidiTranscriber {
                         0,
                         [prevForNote, volumeBase + 1, volumeBase + 2, volumeBase + 3]
                     ],
-                    [volumeBase + 1, ["voicename", { value: instrument }], 0, 0, [volumeBase]],
+                    [volumeBase + 1, target, 0, 0, [volumeBase]],
                     [volumeBase + 2, ["number", { value: volume }], 0, 0, [volumeBase]],
                     [volumeBase + 3, "vspace", 0, 0, [volumeBase, null]]
                 );
                 tempoVspaceEntry = currentActionBlock[currentActionBlock.length - 1];
                 prevForNote = volumeBase + 3;
-                appliedVolume = volume;
             }
 
             // currentActionBlock may have just grown by the chunks above, so this note's own
