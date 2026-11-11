@@ -1173,22 +1173,72 @@ describe("Timewise score layout", () => {
 });
 
 describe("Test 14: Grace notes", () => {
-    it("skips a grace note rather than importing it as a full-length note", async () => {
-        // A grace note has a <type> (quarter here) but no <duration> -- it
-        // doesn't take up measure time. Importing it as a full note would make
-        // the following note start late and throw off every note after it.
-        // (Re-covers what part 1 of this series intended to fix but never
-        // actually pushed -- see this PR's description.)
+    const GRACE = (step, octave, attributes = "") =>
+        `<note><grace${attributes}/><pitch><step>${step}</step><octave>${octave}</octave></pitch><type>16th</type></note>`;
+
+    it("plays a grace note in half the note it leads into, so measure time is unchanged", async () => {
+        // A grace note has a <type> but no <duration>: it takes no measure time
+        // of its own. Its time comes out of the next note, so that note and
+        // every note after it still start on their beat.
         const { blocks } = await parseAndCapture(
             scorePartwise(
-                "<note><grace/><pitch><step>D</step><octave>4</octave></pitch><type>quarter</type></note>" +
+                GRACE("D", 4) + SIMPLE_NOTE("C", 4, "quarter") + SIMPLE_NOTE("E", 4, "quarter")
+            )
+        );
+
+        expect(pitches(blocks)).toEqual([
+            { name: "D", octave: 4 },
+            { name: "C", octave: 4 },
+            { name: "E", octave: 4 }
+        ]);
+        expect(noteValues(blocks)).toEqual([
+            [1, 8],
+            [1, 8],
+            [1, 4]
+        ]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("splits the share evenly between several grace notes", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(GRACE("G", 4) + GRACE("A", 4) + SIMPLE_NOTE("C", 5, "quarter"))
+        );
+
+        expect(pitches(blocks).map(p => p.name)).toEqual(["G", "A", "C"]);
+        expect(noteValues(blocks)).toEqual([
+            [1, 16],
+            [1, 16],
+            [1, 8]
+        ]);
+    });
+
+    it("takes the share steal-time-following asks for", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                GRACE("D", 4, ' steal-time-following="25"') + SIMPLE_NOTE("C", 4, "quarter")
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([
+            [1, 16],
+            [3, 16]
+        ]);
+    });
+
+    it("drops grace notes that lead into a rest", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                GRACE("D", 4) +
+                    "<note><rest/><duration>8</duration><type>quarter</type></note>" +
                     SIMPLE_NOTE("C", 4, "quarter")
             )
         );
 
         expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
-        expect(noteValues(blocks)).toEqual([[1, 4]]);
-        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(noteValues(blocks)).toEqual([
+            [1, 4],
+            [1, 4]
+        ]);
     });
 });
 
