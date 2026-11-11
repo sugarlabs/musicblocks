@@ -316,6 +316,52 @@ describe("Activity Toolbar Integration", () => {
                 expect(activity.toolbarController.runFast).toHaveBeenCalledTimes(1);
             });
 
+            test("Play handles an audio failure while the project is still loading", async () => {
+                const unhandled = [];
+                const onUnhandled = reason => unhandled.push(reason);
+                process.on("unhandledRejection", onUnhandled);
+                try {
+                    activity._doFastButton("normal-env");
+                    settleAudio.reject(new Error("blocked"));
+                    await flush();
+                    await flush();
+                    expect(unhandled).toEqual([]);
+
+                    finishLoad();
+                    await flush();
+                    expect(activity.toolbarController.runFast).toHaveBeenCalledTimes(1);
+                } finally {
+                    process.off("unhandledRejection", onUnhandled);
+                }
+            });
+
+            test("Play waits for a load that starts while audio starts", async () => {
+                activity.blocks.isLoading.mockReturnValue(false);
+                activity._doFastButton("normal-env");
+
+                activity.blocks.isLoading.mockReturnValue(true);
+                settleAudio.resolve();
+                await flush();
+                expect(activity.toolbarController.runFast).not.toHaveBeenCalled();
+
+                finishLoad();
+                expect(activity.toolbarController.runFast).toHaveBeenCalledTimes(1);
+            });
+
+            test("a newer press replaces a Play waiting for a load that started during audio", async () => {
+                activity.blocks.isLoading.mockReturnValue(false);
+                activity._doFastButton("normal-env");
+                activity.blocks.isLoading.mockReturnValue(true);
+                settleAudio.resolve();
+                await flush();
+
+                activity._doSlowButton();
+                finishLoad();
+
+                expect(activity.toolbarController.runSlow).toHaveBeenCalledTimes(1);
+                expect(activity.toolbarController.runFast).not.toHaveBeenCalled();
+            });
+
             test("a newer Run slowly replaces a Play still waiting for audio", async () => {
                 activity._doFastButton("normal-env");
                 activity._doSlowButton();

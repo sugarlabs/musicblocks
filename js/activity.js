@@ -867,13 +867,17 @@ class Activity {
             this._runRequest = (this._runRequest || 0) + 1;
             const request = this._runRequest;
             const isLatest = () => request === this._runRequest;
+            this._afterLoad(() => action(isLatest));
+        };
 
+        // Runs callback now, or as the pending run once the load has finished.
+        this._afterLoad = callback => {
             if (!this.blocks.isLoading()) {
-                action(isLatest);
+                callback();
                 return;
             }
 
-            this._actionAfterLoad = () => action(isLatest);
+            this._actionAfterLoad = callback;
             this.blocks.runAfterLoad(this._runActionAfterLoad);
         };
 
@@ -949,14 +953,20 @@ class Activity {
             // the project has finished loading. The press is queued now, so a Run
             // slowly or Run step by step pressed while audio starts replaces it.
             if (this.logo.synth && typeof this.logo.synth.startAudio === "function") {
-                const audioStarted = this.logo.synth.startAudio();
+                // Play runs whether or not audio starts, so a failure needs no handling
+                // beyond not being left unhandled while the press waits.
+                const audioStarted = this.logo.synth.startAudio().catch(() => {});
                 this._runWhenLoaded(isLatest => {
-                    const play = () => {
+                    audioStarted.then(() => {
+                        // Another load may have started while audio was starting.
                         if (isLatest()) {
-                            runPlayAction();
+                            this._afterLoad(() => {
+                                if (isLatest()) {
+                                    runPlayAction();
+                                }
+                            });
                         }
-                    };
-                    audioStarted.then(play, play);
+                    });
                 });
             } else {
                 this._runWhenLoaded(runPlayAction);
