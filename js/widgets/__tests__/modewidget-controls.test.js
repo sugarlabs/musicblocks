@@ -31,6 +31,7 @@ describe("ModeWidget control bar keyboard access", () => {
         widget = Object.create(ModeWidget.prototype);
         Object.assign(widget, {
             _selectedModeName: "test mode",
+            _selectedNotes: [true, false, true, false, true, true, false, true],
             _modeBlock: null,
             _onModePieButtonClick: jest.fn(),
             _calculateMode: jest.fn().mockReturnValue(pattern),
@@ -105,6 +106,16 @@ describe("ModeWidget control bar keyboard access", () => {
         save.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown" }));
         expect(widget._save).not.toHaveBeenCalled();
         expect(widget._saveCustomMode).not.toHaveBeenCalled();
+    });
+
+    test("does not store a custom mode when no notes are selected", () => {
+        widget._selectedNotes = Array(12).fill(false);
+        button("Save").click();
+        expect(widget.errorMsg).toHaveBeenCalledWith(
+            "Please select at least one note before saving."
+        );
+        expect(widget._saveCustomMode).not.toHaveBeenCalled();
+        expect(widget._save).not.toHaveBeenCalled();
     });
 
     test("keeps name validation when Save is activated from the keyboard", () => {

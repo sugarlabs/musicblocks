@@ -818,6 +818,13 @@ class ModeWidget {
                 this.errorMsg(_("Please enter a mode name."));
                 return;
             }
+            // Check the selection before anything is written to storage:
+            // _saveCustomMode would otherwise overwrite a saved mode with
+            // the empty pattern before _save() gets to refuse the export.
+            if (!this._selectedNotes.some(note => note)) {
+                this.errorMsg(_("Please select at least one note before saving."));
+                return;
+            }
             const pattern = this._calculateMode();
             if (!this._saveCustomMode(name, pattern)) {
                 return;
