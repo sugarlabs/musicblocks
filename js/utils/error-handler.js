@@ -36,6 +36,7 @@
  * @author Music Blocks Contributors
  */
 
+/* global debugLog */
 /* exported ErrorHandler */
 
 const ErrorHandler = {
@@ -312,6 +313,29 @@ const ErrorHandler = {
             } catch (e) {
                 // Best-effort: do nothing if Activity is not available
             }
+        }
+    },
+
+    /**
+     * Forwards development diagnostics to debugLog, which is a no-op in
+     * production. Use instead of console.log for non-error output.
+     *
+     * @param {...unknown} args - Values passed through to debugLog.
+     */
+    debug(...args) {
+        if (typeof debugLog === "function") {
+            debugLog(...args);
+        }
+    },
+
+    /**
+     * Forwards informational diagnostics to debugLog with an [info] prefix.
+     *
+     * @param {...unknown} args - Values passed through to debugLog.
+     */
+    info(...args) {
+        if (typeof debugLog === "function") {
+            debugLog("[info]", ...args);
         }
     },
 
