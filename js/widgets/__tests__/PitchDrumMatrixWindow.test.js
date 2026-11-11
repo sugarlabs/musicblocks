@@ -27,6 +27,7 @@ global.PitchDrumMatrixSave = require("../PitchDrumMatrixSave.js");
 global.PitchDrumMatrix = require("../pitchdrummatrix.js");
 
 global._ = s => s;
+global.announceToScreenReader = jest.fn();
 global.docById = id => document.getElementById(id);
 
 const PitchDrumMatrixWindow = global.PitchDrumMatrixWindow;
@@ -136,6 +137,7 @@ describe("PitchDrumMatrixWindow", () => {
         expect(pdm.pitchDrumDiv.style.visibility).toBe("hidden");
         expect(pdm.activity.hideMsgs).toHaveBeenCalled();
         expect(widgetWindow.destroy).toHaveBeenCalled();
+        expect(announceToScreenReader).toHaveBeenCalledWith("Pitch Drum Matrix closed");
     });
 
     test("maximizing sizes the body and both scroll divs for the full screen", () => {

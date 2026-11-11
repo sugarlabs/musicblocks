@@ -26,6 +26,8 @@
 
 const StatsWindow = require("../statistics.js");
 
+global.announceToScreenReader = jest.fn();
+
 describe("StatsWindow", () => {
     let activity, widgetWin, body, capturedCb, myChartMock, radarMock;
 
@@ -94,6 +96,16 @@ describe("StatsWindow", () => {
         expect(sw.isOpen).toBe(true);
         expect(global.analyzeProject).toHaveBeenCalledWith(activity);
         expect(global.runAnalytics).toHaveBeenCalledWith(activity);
+        expect(announceToScreenReader).toHaveBeenCalledWith("Statistics opened");
+    });
+
+    test("announces Statistics closed on onclose", () => {
+        new StatsWindow(activity);
+        announceToScreenReader.mockClear();
+
+        widgetWin.onclose();
+
+        expect(announceToScreenReader).toHaveBeenCalledWith("Statistics closed");
     });
 
     test("releases the chart after capturing its image on each refresh", () => {

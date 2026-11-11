@@ -34,6 +34,7 @@ const jsdomDocument = global.document;
 
 // --- Global Mocks ---
 global._ = msg => msg;
+global.announceToScreenReader = jest.fn();
 global.platformColor = {
     labelColor: "#90c100",
     selectorBackground: "#f0f0f0",
@@ -421,6 +422,24 @@ describe("PitchDrumMatrix Widget", () => {
             expect(mockStop).toHaveBeenCalled();
             expect(mockHideMsgs).toHaveBeenCalled();
             expect(pdm.widgetWindow.destroy).toHaveBeenCalled();
+            expect(announceToScreenReader).toHaveBeenCalledWith("Pitch Drum Matrix closed");
+        });
+    });
+
+    describe("announces open", () => {
+        test("announces Pitch Drum Matrix opened on init", () => {
+            const mockActivity = {
+                logo: {
+                    synth: { stop: jest.fn() },
+                    turtleDelay: 0
+                },
+                hideMsgs: jest.fn(),
+                textMsg: jest.fn()
+            };
+
+            pdm.init(mockActivity);
+
+            expect(announceToScreenReader).toHaveBeenCalledWith("Pitch Drum Matrix opened");
         });
     });
 

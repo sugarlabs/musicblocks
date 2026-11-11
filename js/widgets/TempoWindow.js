@@ -17,7 +17,7 @@
 
 /*
    global
-   _, Tempo
+   _, Tempo, announceToScreenReader
  */
 
 /* exported TempoWindow */
@@ -70,6 +70,7 @@ class TempoWindow {
             }
             this._intervalID = null;
         }
+        announceToScreenReader(_("Tempo closed"));
         widgetWindow.destroy();
     }
 

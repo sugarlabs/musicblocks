@@ -9,6 +9,7 @@ const DomHelpers = require("../../utils/dom-helpers");
 global.downloadTextFile = DomHelpers.downloadTextFile;
 global.createSharePopup = DomHelpers.createSharePopup;
 global.closeSharePopup = DomHelpers.closeSharePopup;
+global.announceToScreenReader = jest.fn();
 
 const setupImportGlobals = () => {
     global._ = jest.fn(text => text);
@@ -753,6 +754,50 @@ describe("TemperamentWidget basic tests", () => {
         expect(mockWidgetWindow.show).toHaveBeenCalled();
         expect(widget.activity).toBe(mockActivity);
         expect(widget.pitchNumber).toBe(1);
+        expect(announceToScreenReader).toHaveBeenCalledWith("Temperament opened");
+    });
+
+    test("announces Temperament closed on onclose", () => {
+        const mockWidgetWindow = {
+            clear: jest.fn(),
+            show: jest.fn(),
+            getWidgetBody: jest.fn(() => ({
+                append: jest.fn(),
+                style: {}
+            })),
+            addButton: jest.fn(() => ({
+                onclick: null,
+                getElementsByTagName: jest.fn(() => [{}])
+            })),
+            sendToCenter: jest.fn(),
+            destroy: jest.fn()
+        };
+
+        global.window.widgetWindows = {
+            windowFor: jest.fn(() => mockWidgetWindow)
+        };
+
+        const mockActivity = {
+            errorMsg: jest.fn(),
+            logo: {
+                synth: {
+                    startingPitch: "C4",
+                    _getFrequency: jest.fn(() => 440),
+                    stop: jest.fn(),
+                    setMasterVolume: jest.fn()
+                }
+            }
+        };
+
+        widget.inTemperament = "equal";
+        widget.scale = ["C", "Major"];
+        widget.init(mockActivity);
+        announceToScreenReader.mockClear();
+
+        widget.widgetWindow.onclose();
+
+        expect(announceToScreenReader).toHaveBeenCalledWith("Temperament closed");
+        expect(mockWidgetWindow.destroy).toHaveBeenCalled();
     });
 
     test("checkTemperament identifies predefined temperament", () => {
