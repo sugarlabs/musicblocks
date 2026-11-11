@@ -4503,6 +4503,26 @@ describe("Logo initMediaDevices", () => {
         expect(logo.mic).toBeNull();
     });
 
+    test("reports a blocked microphone instead of leaving the rejection unhandled", async () => {
+        // A denied permission rejects the promise from open(), it does not throw.
+        const denied = Promise.reject(new Error("NotAllowedError: Permission denied"));
+        // Keep Jest itself from failing on the rejection; the check below is
+        // whether initMediaDevices handles it.
+        denied.catch(() => {});
+        const catchSpy = jest.spyOn(denied, "catch");
+        logo.deps.Tone = { UserMedia: jest.fn(() => ({ open: jest.fn(() => denied) })) };
+
+        logo.initMediaDevices();
+        expect(catchSpy).toHaveBeenCalled();
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+            "The microphone is not available.",
+            undefined
+        );
+        expect(logo.mic).toBeNull();
+    });
+
     test("closes the previous mic stream instead of dropping the reference", () => {
         const firstClose = jest.fn();
         logo.deps.Tone = {

@@ -707,16 +707,28 @@ class Logo {
             this.mic.close();
         }
 
-        let mic = new this.deps.Tone.UserMedia();
-        try {
-            mic.open();
-        } catch (e) {
+        const mic = new this.deps.Tone.UserMedia();
+        const onMicError = () => {
             this.deps.errorHandler(NOMICERRORMSG);
-            mic = null;
-        }
+            // Only forget this mic if a newer one has not replaced it.
+            if (this.mic === mic) {
+                this.mic = null;
+            }
+        };
 
         this.mic = mic;
         this.limit = 16384;
+
+        try {
+            // open() is async: a blocked or missing microphone rejects
+            // the promise rather than throwing here.
+            const opening = mic.open();
+            if (opening && typeof opening.catch === "function") {
+                opening.catch(onMicError);
+            }
+        } catch (e) {
+            onMicError();
+        }
     }
 
     /**
