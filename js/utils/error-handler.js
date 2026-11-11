@@ -30,7 +30,8 @@
  *   ErrorHandler.clearRecentErrors()         – empty the recent error buffer
  *
  * Uncaught errors and unhandled rejections are routed through the same buffer
- * so repeated failures are counted instead of flooding the console.
+ * so repeated failures are counted instead of flooding the console. The buffer
+ * is mirrored to sessionStorage so it survives a reload in the same tab.
  *
  * @author Music Blocks Contributors
  */
@@ -42,6 +43,9 @@ const ErrorHandler = {
     _counts: new Map(),
     _maxRecords: 50,
     _maxCounts: 200,
+    _storageKey: "mb_error_log_v1",
+    _persistThrottleMs: 1000,
+    _lastPersistMs: 0,
     _installed: false,
     _disposeGlobalHandlers: null,
 
@@ -147,6 +151,7 @@ const ErrorHandler = {
             if (existing && this._records.indexOf(existing) !== -1) {
                 existing.count += 1;
                 existing.lastSeen = new Date().toISOString();
+                this._persist(false);
                 return { record: existing, isNew: false };
             }
 
@@ -185,9 +190,45 @@ const ErrorHandler = {
                 }
             }
 
+            this._persist(true);
             return { record: entry, isNew: true };
         } catch (e) {
             return { record: null, isNew: true };
+        }
+    },
+
+    _persist(force) {
+        try {
+            if (typeof window === "undefined" || !window.sessionStorage) {
+                return;
+            }
+            const now = Date.now();
+            if (!force && now - this._lastPersistMs < this._persistThrottleMs) {
+                return;
+            }
+            this._lastPersistMs = now;
+            window.sessionStorage.setItem(this._storageKey, JSON.stringify(this._records));
+        } catch (e) {
+            // Ignore; persistence is best-effort and must not affect recording.
+        }
+    },
+
+    _restore() {
+        try {
+            if (typeof window === "undefined" || !window.sessionStorage) {
+                return;
+            }
+            const raw = window.sessionStorage.getItem(this._storageKey);
+            if (!raw) {
+                return;
+            }
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+                this._records = parsed.slice(-this._maxRecords);
+                this._counts.clear();
+            }
+        } catch (e) {
+            // Ignore; a corrupt or unavailable store must not break startup.
         }
     },
 
@@ -281,6 +322,13 @@ const ErrorHandler = {
     clearRecentErrors() {
         this._records.length = 0;
         this._counts.clear();
+        try {
+            if (typeof window !== "undefined" && window.sessionStorage) {
+                window.sessionStorage.removeItem(this._storageKey);
+            }
+        } catch (e) {
+            // Ignore; persistence is best-effort.
+        }
     },
 
     _isNoise(filename, message) {
@@ -370,8 +418,10 @@ const ErrorHandler = {
     }
 };
 
-// Install once per page load. Tests and embedders can opt out via
-// localStorage["MB_ERROR_BOUNDARY"] = "false".
+// Restore the current tab's recent records, then install once per page load.
+// Tests and embedders can opt out via localStorage["MB_ERROR_BOUNDARY"] = "false".
+ErrorHandler._restore();
+
 if (typeof window !== "undefined" && !window.__MB_ERROR_HANDLER_INSTALLED__) {
     ErrorHandler.installGlobalHandlers();
 }
