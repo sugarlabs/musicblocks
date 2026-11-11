@@ -2434,5 +2434,12 @@
     "actor": "vidhisingh24",
     "branch": "fix/midi-velocity",
     "headRepo": "vidhisingh24/musicblocks"
+  },
+  "10374": {
+    "pushedAt": "2026-11-11T17:12:33.134Z",
+    "sha": "59088e287badde2b7269fcefa624da5a3bd2b3a9",
+    "actor": "vidhisingh24",
+    "branch": "fix/play-while-loading",
+    "headRepo": "vidhisingh24/musicblocks"
   }
 }
