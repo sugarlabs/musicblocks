@@ -15,6 +15,7 @@ const { AIWidget, getGroqApiKey, setGroqApiKey } = require("../aiwidget");
 
 // Mock globals
 global._ = jest.fn(str => str);
+global.announceToScreenReader = jest.fn();
 global.docById = jest.fn(() => ({
     style: {},
     appendChild: jest.fn(),
@@ -128,6 +129,20 @@ describe("AIWidget Instance", () => {
         aiWidget.init(mockActivity);
         expect(aiWidget.activity).toBe(mockActivity);
         expect(mockActivity.logo.synth.loadSynth).toHaveBeenCalled();
+    });
+
+    it("announces AI opened", () => {
+        aiWidget.init(mockActivity);
+        expect(announceToScreenReader).toHaveBeenCalledWith("AI opened");
+    });
+
+    it("announces AI closed on onclose", () => {
+        aiWidget.init(mockActivity);
+        announceToScreenReader.mockClear();
+
+        aiWidget.widgetWindow.onclose();
+
+        expect(announceToScreenReader).toHaveBeenCalledWith("AI closed");
     });
 
     it("should retain both pitch analysers after initialization", () => {

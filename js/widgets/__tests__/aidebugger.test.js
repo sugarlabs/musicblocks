@@ -25,6 +25,7 @@ const { aiWidgetConsent } = require("../../utils/ai-widget-lifecycle");
 
 // Mock globals
 global._ = str => str;
+global.announceToScreenReader = jest.fn();
 global._THIS_IS_MUSIC_BLOCKS_ = true;
 
 // Polyfill Blob.prototype.text for jsdom if absent
@@ -997,6 +998,25 @@ describe("AIDebuggerWidget", () => {
 
             global.fetch = jest.fn();
             debuggerWidget = new AIDebuggerWidget();
+        });
+
+        test("announces Debugger opened on init", () => {
+            jest.spyOn(debuggerWidget, "_showConsentBanner").mockImplementation(() => {});
+
+            debuggerWidget.init(mockActivity);
+
+            expect(announceToScreenReader).toHaveBeenCalledWith("Debugger opened");
+        });
+
+        test("announces Debugger closed on onclose", () => {
+            jest.spyOn(debuggerWidget, "_showConsentBanner").mockImplementation(() => {});
+
+            debuggerWidget.init(mockActivity);
+            announceToScreenReader.mockClear();
+
+            mockWidgetWindow.onclose();
+
+            expect(announceToScreenReader).toHaveBeenCalledWith("Debugger closed");
         });
 
         test("init aborts pending requests on close", () => {

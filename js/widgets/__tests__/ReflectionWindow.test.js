@@ -22,6 +22,7 @@ const { escapeHTML, isSafeUrl } = require("../../utils/utils");
 global.escapeHTML = escapeHTML;
 global.isSafeUrl = isSafeUrl;
 global._ = text => text;
+global.announceToScreenReader = jest.fn();
 global.ManagedTimer = require("../../utils/ManagedTimer.js");
 global.DOMPurify = require("../../../lib/purify.min.js");
 
@@ -183,6 +184,7 @@ describe("ReflectionWindow", () => {
             expect(reflection.isOpen).toBe(false);
             expect(activity.isInputON).toBe(false);
             expect(widgetWindow.destroy).toHaveBeenCalledTimes(1);
+            expect(announceToScreenReader).toHaveBeenCalledWith("Reflection closed");
         });
 
         test("aborts the requests in flight and drops queued messages", async () => {

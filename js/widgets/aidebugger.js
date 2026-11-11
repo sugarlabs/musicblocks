@@ -10,7 +10,7 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /* global _THIS_IS_MUSIC_BLOCKS_, renderChatMarkdown, extractProjectDataFromHTML,
-   unescapeHTML */
+   unescapeHTML, _, announceToScreenReader */
 
 if (typeof module !== "undefined" && module.exports) {
     // Under Jest the shared helper resolves through CommonJS. In the browser it
@@ -210,6 +210,7 @@ function AIDebuggerWidget() {
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
+        announceToScreenReader(_("Debugger opened"));
 
         widgetWindow.getWidgetBody().style.width = CHATWIDTH + "px";
         widgetWindow.getWidgetBody().style.height = CHATHEIGHT + "px";
@@ -220,6 +221,7 @@ function AIDebuggerWidget() {
             this._lifecycle.abortPendingRequests();
             this._isProcessing = false;
             this._hideTypingIndicator();
+            announceToScreenReader(_("Debugger closed"));
             widgetWindow.destroy();
             this.activity.isInputON = false;
         };
