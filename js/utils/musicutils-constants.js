@@ -679,7 +679,8 @@ var SHARPPREFERENCE = [
     "f" + SHARP + " minor",
     "c" + SHARP + " minor",
     "g" + SHARP + " minor",
-    "d" + SHARP + " minor"
+    "d" + SHARP + " minor",
+    "a" + SHARP + " minor"
 ];
 
 /**
@@ -700,6 +701,7 @@ var FLATPREFERENCE = [
     "f minor",
     "b" + FLAT + " minor",
     "e" + FLAT + " minor",
+    "a" + FLAT + " minor",
     "d harmonic minor",
     "g harmonic minor",
     "c harmonic minor",

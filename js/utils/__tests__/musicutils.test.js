@@ -1644,6 +1644,7 @@ describe("getSharpFlatPreference", () => {
         ["C♯ minor", "sharp"],
         ["G♯ minor", "sharp"],
         ["D♯ minor", "sharp"],
+        ["A♯ minor", "sharp"],
         ["B♭ major", "flat"],
         ["E♭ major", "flat"],
         ["A♭ major", "flat"],
@@ -1651,7 +1652,8 @@ describe("getSharpFlatPreference", () => {
         ["G♭ major", "flat"],
         ["C♭ major", "flat"],
         ["B♭ minor", "flat"],
-        ["E♭ minor", "flat"]
+        ["E♭ minor", "flat"],
+        ["A♭ minor", "flat"]
     ])("should treat %s as a %s key", (keySignature, expected) => {
         expect(getSharpFlatPreference(keySignature)).toBe(expected);
     });
@@ -2319,12 +2321,14 @@ describe("getNote", () => {
         expect(getNote("D", 4, 1, "E♭ major")).toEqual(["E♭", 4, 0]);
         expect(getNote("G", 4, 1, "A♭ major")).toEqual(["A♭", 4, 0]);
         expect(getNote("C", 4, 1, "B♭ minor")).toEqual(["D♭", 4, 0]);
+        expect(getNote("A♭", 4, 2, "A♭ minor")).toEqual(["B♭", 4, 0]);
     });
 
     it("should spell pitch numbers with sharps in sharp keys", () => {
         expect(getNote(6, 4, 0, "F♯ major")).toEqual(["F♯", 4, 0]);
         expect(getNote(1, 4, 0, "C♯ major")).toEqual(["C♯", 4, 0]);
         expect(getNote(8, 4, 0, "C♯ minor")).toEqual(["G♯", 4, 0]);
+        expect(getNote(1, 4, 0, "A♯ minor")).toEqual(["C♯", 4, 0]);
     });
 
     it("should not change spellings in keys without a sharp or flat preference", () => {
