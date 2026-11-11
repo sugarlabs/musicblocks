@@ -31,6 +31,7 @@ describe("ModeWidget control bar keyboard access", () => {
         widget = Object.create(ModeWidget.prototype);
         Object.assign(widget, {
             _selectedModeName: "test mode",
+            _locked: false,
             _selectedNotes: [true, false, true, false, true, true, false, true],
             _modeBlock: null,
             _onModePieButtonClick: jest.fn(),
@@ -106,6 +107,14 @@ describe("ModeWidget control bar keyboard access", () => {
         save.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown" }));
         expect(widget._save).not.toHaveBeenCalled();
         expect(widget._saveCustomMode).not.toHaveBeenCalled();
+    });
+
+    test("does not save while the wheel is mid-rotation", () => {
+        widget._locked = true;
+        button("Save").click();
+        expect(widget._saveCustomMode).not.toHaveBeenCalled();
+        expect(widget._save).not.toHaveBeenCalled();
+        expect(widget.errorMsg).not.toHaveBeenCalled();
     });
 
     test("does not store a custom mode when no notes are selected", () => {

@@ -813,6 +813,13 @@ class ModeWidget {
 
         // Save button
         const saveBtn = iconButton("save-button.svg", _("Save"), () => {
+            // Rotation and inversion rewrite the selection step by step on
+            // a timer; a save taken mid-animation would persist a
+            // half-updated pattern, so ignore it like the other operations
+            // that check the lock.
+            if (this._locked) {
+                return;
+            }
             const name = nameInput.value.trim();
             if (!name) {
                 this.errorMsg(_("Please enter a mode name."));
