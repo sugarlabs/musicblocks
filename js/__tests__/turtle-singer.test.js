@@ -2763,6 +2763,7 @@ describe("processNote notation and MIDI emission guards against non-positive dur
         turtleMock.singer.oscList = { [blk]: [] };
 
         turtleMock.singer.bpm = [90];
+        turtleMock.singer.synthVolume = { piano: [50, 20] };
 
         Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
 
@@ -2773,7 +2774,8 @@ describe("processNote notation and MIDI emission guards against non-positive dur
             0,
             90,
             "piano",
-            [4, 4]
+            [4, 4],
+            { note: 20, drums: {} }
         );
         expect(activityMock.logo.updateNotation).toHaveBeenCalledWith(["C4"], 4, 0, -1, []);
     });
@@ -2827,7 +2829,8 @@ describe("processNote notation and MIDI emission guards against non-positive dur
             0,
             90,
             "piano",
-            [4, 4]
+            [4, 4],
+            expect.any(Object)
         );
         // The other notations read frequencies themselves.
         expect(activityMock.logo.updateNotation).toHaveBeenCalledWith([450], 4, 0, -1, []);
@@ -2898,7 +2901,8 @@ describe("processNote notation and MIDI emission guards against non-positive dur
                 0,
                 recorded,
                 "piano",
-                [6, 8]
+                [6, 8],
+                expect.any(Object)
             );
         }
     );
@@ -2915,6 +2919,8 @@ describe("processNote notation and MIDI emission guards against non-positive dur
         turtleMock.singer.instrumentNames = ["piano"];
         turtleMock.singer.oscList = { [blk]: [] };
         turtleMock.singer.bpm = [90];
+        // The snare drum has no volume of its own, so it plays at the default.
+        turtleMock.singer.synthVolume = { "piano": [70], "kick drum": [50, 90] };
 
         Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
 
@@ -2925,7 +2931,8 @@ describe("processNote notation and MIDI emission guards against non-positive dur
             0,
             90,
             "piano",
-            [4, 4]
+            [4, 4],
+            { note: 70, drums: { "kick drum": 90, "snare drum": DEFAULTVOLUME } }
         );
     });
 

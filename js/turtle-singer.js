@@ -2637,6 +2637,19 @@ class Singer {
                                         chordNotes.some(
                                             note => typeof note === "number" || !note.includes("R")
                                         );
+                                    // The volume a synth plays at, which MIDI writes as the
+                                    // note's velocity.
+                                    const volumeOf = synth => {
+                                        const volumes = tur.singer.synthVolume[synth];
+                                        return Array.isArray(volumes) && volumes.length > 0
+                                            ? last(volumes)
+                                            : typeof DEFAULTVOLUME !== "undefined"
+                                              ? DEFAULTVOLUME
+                                              : 50;
+                                    };
+                                    const midiDrums = playedBySetDrum
+                                        ? [last(tur.singer.drumStyle)]
+                                        : chordDrums;
                                     // A note with cents or set in hertz is a frequency; MIDI
                                     // takes the nearest 12-EDO note name.
                                     activity.logo.notationMIDI(
@@ -2649,12 +2662,18 @@ class Singer {
                                                   const [name, octave] = frequencyToPitch(note);
                                                   return name + octave;
                                               }),
-                                        playedBySetDrum ? [last(tur.singer.drumStyle)] : chordDrums,
+                                        midiDrums,
                                         d,
                                         turtle,
                                         bpmValue || 90,
                                         last(tur.singer.instrumentNames),
-                                        [tur.singer.beatsPerMeasure, tur.singer.noteValuePerBeat]
+                                        [tur.singer.beatsPerMeasure, tur.singer.noteValuePerBeat],
+                                        {
+                                            note: volumeOf(last(tur.singer.instrumentNames)),
+                                            drums: Object.fromEntries(
+                                                midiDrums.map(drum => [drum, volumeOf(drum)])
+                                            )
+                                        }
                                     );
                                 }
                                 if (exporting || tur.singer.recordingNotation) {

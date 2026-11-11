@@ -1357,14 +1357,24 @@ class Logo {
      * @param {string} instrument - Instrument name for the note.
      * @param {number[]} [meter] - The meter at the time of the note, as
      *     [beats per measure, note value per beat].
+     * @param {{note: number, drums: Object<string, number>}} [volume] - The volume (0 to 100)
+     *     the note's pitches play at, and each of its drums.
      * @returns {void}
      */
-    notationMIDI(note, drum, duration, turtle, bpm, instrument, meter) {
+    notationMIDI(note, drum, duration, turtle, bpm, instrument, meter, volume) {
         if (!this._midiData[turtle]) {
             this._midiData[turtle] = [];
         }
         const drums = drum && drum.length > 0 ? [...drum] : null;
-        this._midiData[turtle].push({ note, duration, bpm, instrument, drum: drums, meter });
+        this._midiData[turtle].push({
+            note,
+            duration,
+            bpm,
+            instrument,
+            drum: drums,
+            meter,
+            volume
+        });
     }
 
     // ========================================================================

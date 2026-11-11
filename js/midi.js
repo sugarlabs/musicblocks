@@ -17,6 +17,13 @@
 // also the tempo @tonejs/midi assumes when it times the file's notes.
 const defaultTempo = 120;
 
+// The volume (0 to 100) an instrument plays at until a block changes it, as in Music Blocks.
+const defaultVolume = 50;
+
+// The smallest change in volume that gets a set synth volume block, so a performance whose
+// velocities vary a little from note to note does not get a block before every note.
+const volumeStep = 10;
+
 // Note values an imported note can take, in whole notes. Plain values come first, so a length
 // exactly between two values keeps the plain one. Dotted values stop at 3/32 and triplets at
 // 1/12: shorter ones sit so close to the plain values that a note played slightly short, or the
@@ -266,6 +273,16 @@ class MidiTranscriber {
         return true;
     }
 
+    // The volume (0 to 100) a chord plays at, from the velocity (0 to 1) of its loudest note,
+    // or null for a rest or notes with no velocity.
+    noteVolume(notes) {
+        const velocities = notes
+            .map(note => note.velocity)
+            .filter(velocity => typeof velocity === "number" && Number.isFinite(velocity));
+        if (velocities.length === 0) return null;
+        return Math.round(Math.min(Math.max(...velocities, 0), 1) * 100);
+    }
+
     getPitch(x, notes, prev, isPercussionTrack) {
         const ar = [];
         if (notes[0].name === "R") {
@@ -337,6 +354,9 @@ class MidiTranscriber {
         // at 0: finalizeTracks() always writes one setbpm3 for the file's starting tempo,
         // shared by every track, before any of this runs.
         let appliedTempoIndex = 0;
+        // The volume this track's notes play at so far: Music Blocks' default until the first
+        // set synth volume block.
+        let appliedVolume = defaultVolume;
         // Seconds the written notes play for. Each note runs up to where the file's note ends,
         // at the tempo it plays at, so rounding never adds up.
         let written = 0;
@@ -449,8 +469,32 @@ class MidiTranscriber {
                 appliedTempoIndex = segIndex;
             }
 
-            // currentActionBlock may have just grown by the tempo chunk above, so this note's
-            // own index is computed fresh here rather than reusing baseIdx.
+            // Likewise a set synth volume chunk where the velocity changes, so soft and loud
+            // passages keep their dynamics. Drums keep their volume.
+            const volume = isPercussionTrack ? null : this.noteVolume(notes);
+            if (volume !== null && Math.abs(volume - appliedVolume) >= volumeStep) {
+                let volumeBase = this.jsONON.length + currentActionBlock.length;
+                if (k !== 0) volumeBase = volumeBase + 2;
+                if (tempoVspaceEntry) tempoVspaceEntry[4][1] = volumeBase;
+                currentActionBlock.push(
+                    [
+                        volumeBase,
+                        "setsynthvolume",
+                        0,
+                        0,
+                        [prevForNote, volumeBase + 1, volumeBase + 2, volumeBase + 3]
+                    ],
+                    [volumeBase + 1, ["voicename", { value: instrument }], 0, 0, [volumeBase]],
+                    [volumeBase + 2, ["number", { value: volume }], 0, 0, [volumeBase]],
+                    [volumeBase + 3, "vspace", 0, 0, [volumeBase, null]]
+                );
+                tempoVspaceEntry = currentActionBlock[currentActionBlock.length - 1];
+                prevForNote = volumeBase + 3;
+                appliedVolume = volume;
+            }
+
+            // currentActionBlock may have just grown by the chunks above, so this note's own
+            // index is computed fresh here rather than reusing baseIdx.
             let val = this.jsONON.length + currentActionBlock.length;
             if (k !== 0) val = val + 2;
             if (tempoVspaceEntry) tempoVspaceEntry[4][1] = val;
