@@ -918,9 +918,9 @@ function setupActionBlocks(activity) {
             const name = activity.blocks.blockList[blk].privateData;
             const actionArgs = receivedArg;
 
-            // If an action block with an arg is clicked,
-            // the arg will have no value.
-            if (actionArgs === null) {
+            // If an action block with an arg is clicked, or the arg block
+            // itself, the arg will have no value (null or undefined).
+            if (actionArgs === null || actionArgs === undefined) {
                 activity.errorMsg(_("Invalid argument"), blk);
                 return 0;
             }
