@@ -1728,6 +1728,58 @@ describe("Palettes Class", () => {
             expect(mockRemove).toHaveBeenCalled();
         });
 
+        test("showMenu drops the outside click listener of the menu open before it", () => {
+            const palDiv = {
+                childNodes: [{ style: {} }],
+                children: [{ offsetWidth: 180 }],
+                offsetLeft: 0,
+                offsetTop: 0,
+                style: {},
+                parentNode: { appendChild: jest.fn() }
+            };
+            const paletteBody = {
+                appendChild: jest.fn(),
+                style: {},
+                childNodes: [{ style: {} }, { style: {} }],
+                children: [
+                    {
+                        insertRow: jest.fn(() => ({
+                            style: {},
+                            appendChild: jest.fn(),
+                            children: [{ style: {}, appendChild: jest.fn() }]
+                        }))
+                    },
+                    {}
+                ]
+            };
+            global.document.createElement = jest.fn(tag =>
+                tag === "table"
+                    ? paletteBody
+                    : {
+                          style: {},
+                          children: [],
+                          appendChild: jest.fn(),
+                          removeAttribute: jest.fn(),
+                          setAttribute: jest.fn()
+                      }
+            );
+            global.docById = jest.fn(id => (id === "palette" ? palDiv : null));
+
+            palettes.add("rhythm");
+            palettes.add("meter");
+            const rhythmListener = jest.fn();
+            palettes.dict.rhythm._outsideClickListener = rhythmListener;
+            palettes.dict.meter._showMenuItems = jest.fn();
+            const removeListenerSpy = jest.spyOn(document, "removeEventListener");
+
+            // Rhythm is open and the user clicks Meter.
+            palettes.dict.meter.showMenu(true);
+
+            expect(removeListenerSpy).toHaveBeenCalledWith("click", rhythmListener);
+            expect(palettes.dict.rhythm._outsideClickListener).toBeNull();
+            removeListenerSpy.mockRestore();
+        });
+
         test("_hideMenuItems does not throw when PaletteBody is absent", () => {
             global.docById = jest.fn(() => null);
             palettes.add("testAbsent");
