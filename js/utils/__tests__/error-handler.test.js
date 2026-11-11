@@ -36,6 +36,9 @@ describe("ErrorHandler", () => {
             delete window.__MB_ERROR_HANDLER_INSTALLED__;
             delete window.__MB_ERROR_HANDLER_DISPOSE__;
             delete window.ActivityContext;
+            delete window.MB_VERSION;
+            delete window.BrowserUtils;
+            delete window.i18next;
         }
         consoleErrorSpy.mockRestore();
         consoleWarnSpy.mockRestore();
@@ -199,6 +202,54 @@ describe("ErrorHandler", () => {
             ErrorHandler.clearRecentErrors();
 
             expect(ErrorHandler.getRecentErrors()).toHaveLength(0);
+        });
+
+        it("attaches diagnostics metadata to each record", () => {
+            window.MB_VERSION = "9.9.9";
+            window.BrowserUtils = { fnBrowserDetect: () => "firefox" };
+            window.i18next = { language: "es-MX" };
+            window.ActivityContext = { getActivity: () => ({ beginnerMode: true }) };
+
+            ErrorHandler.capture("boom", { operation: "metadata" });
+
+            const record = ErrorHandler.getRecentErrors()[0];
+            expect(record.appVersion).toBe("9.9.9");
+            expect(record.browser).toBe("firefox");
+            expect(record.language).toBe("es-MX");
+            expect(record.mode).toBe("beginner");
+        });
+
+        it("falls back to safe metadata when sources are unavailable", () => {
+            window.ActivityContext = { getActivity: () => ({ beginnerMode: false }) };
+
+            ErrorHandler.capture("boom", { operation: "metadata-fallback" });
+
+            const record = ErrorHandler.getRecentErrors()[0];
+            expect(record.appVersion).toBe("unknown");
+            expect(record.mode).toBe("advanced");
+            expect(typeof record.browser).toBe("string");
+            expect(typeof record.language).toBe("string");
+        });
+
+        it("records errors even when metadata sources throw", () => {
+            window.ActivityContext = {
+                getActivity: () => {
+                    throw new Error("not ready");
+                }
+            };
+            window.i18next = {
+                get language() {
+                    throw new Error("no language");
+                }
+            };
+
+            expect(() =>
+                ErrorHandler.capture("boom", { operation: "metadata-throw" })
+            ).not.toThrow();
+
+            const record = ErrorHandler.getRecentErrors()[0];
+            expect(record.mode).toBe("unknown");
+            expect(record.language).toBe("unknown");
         });
 
         it("still shows the user-facing message on repeats", () => {

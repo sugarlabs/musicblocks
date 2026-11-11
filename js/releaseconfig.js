@@ -24,10 +24,13 @@
 
 /* exported
    THIS_IS_MUSIC_BLOCKS, THIS_IS_TURTLE_BLOCKS,
-   getSplashScreenSrc, RELEASE_TAB_TITLE, LOADING_TEXTS
+   getSplashScreenSrc, RELEASE_TAB_TITLE, LOADING_TEXTS, MB_VERSION
 */
 
 const DEFAULT_IS_MUSIC_BLOCKS = true;
+
+// Keep in sync with the "version" field in package.json.
+const MB_VERSION = "3.8.0";
 
 const setReleaseGlobals = () => {
     const isMusicBlocks = resolveIsMusicBlocks();
@@ -37,6 +40,7 @@ const setReleaseGlobals = () => {
     window._THIS_IS_TURTLE_BLOCKS_ = isTurtleBlocks;
     window.THIS_IS_MUSIC_BLOCKS = isMusicBlocks;
     window.THIS_IS_TURTLE_BLOCKS = isTurtleBlocks;
+    window.MB_VERSION = MB_VERSION;
 };
 
 function resolveIsMusicBlocks(loc) {
@@ -112,6 +116,7 @@ if (typeof module !== "undefined" && module.exports) {
         getSplashScreenSrc,
         RELEASE_TAB_TITLE,
         LOADING_TEXTS,
+        MB_VERSION,
         TURTLE_SPLASH_SRC,
         MUSIC_BLOCKS_SPLASH_SRC,
         MUSIC_BLOCKS_SPLASH_SRC_JA
