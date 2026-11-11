@@ -1767,17 +1767,25 @@ describe("Palettes Class", () => {
 
             palettes.add("rhythm");
             palettes.add("meter");
-            const rhythmListener = jest.fn();
-            palettes.dict.rhythm._outsideClickListener = rhythmListener;
-            palettes.dict.meter._showMenuItems = jest.fn();
-            const removeListenerSpy = jest.spyOn(document, "removeEventListener");
+            const rhythm = palettes.dict.rhythm;
+            const meter = palettes.dict.meter;
+            meter._showMenuItems = jest.fn();
 
-            // Rhythm is open and the user clicks Meter.
-            palettes.dict.meter.showMenu(true);
+            // Rhythm is open and listening for a click outside its menu.
+            const hideRhythm = jest.fn();
+            rhythm._outsideClickListener = () => hideRhythm();
+            document.addEventListener("click", rhythm._outsideClickListener);
 
-            expect(removeListenerSpy).toHaveBeenCalledWith("click", rhythmListener);
-            expect(palettes.dict.rhythm._outsideClickListener).toBeNull();
-            removeListenerSpy.mockRestore();
+            // The user clicks Meter: its menu opens, then the click reaches the document.
+            meter.showMenu(true);
+            document.body.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+            // Rhythm's listener must not fire, or it would remove the Meter menu.
+            expect(hideRhythm).not.toHaveBeenCalled();
+            expect(rhythm._outsideClickListener).toBeNull();
+            if (meter._outsideClickListener) {
+                document.removeEventListener("click", meter._outsideClickListener);
+            }
         });
 
         test("_hideMenuItems does not throw when PaletteBody is absent", () => {
