@@ -102,7 +102,9 @@ describe("Activity Toolbar Integration", () => {
         activity.blocks = {
             activeBlock: null,
             hideBlocks: jest.fn(),
-            showBlocks: jest.fn()
+            showBlocks: jest.fn(),
+            isLoading: jest.fn(() => false),
+            runAfterLoad: jest.fn()
         };
 
         activity.logo = {
@@ -249,6 +251,74 @@ describe("Activity Toolbar Integration", () => {
 
             expect(activity.toolbar.resetStop).toHaveBeenCalled();
             expect(activity.toolbar.highlightStop).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("while a project is loading", () => {
+        // Finishes the load: runs what was waiting on runAfterLoad(), as Blocks does.
+        const finishLoad = () => {
+            activity.blocks.isLoading.mockReturnValue(false);
+            const callbacks = [...new Set(activity.blocks.runAfterLoad.mock.calls.map(c => c[0]))];
+            callbacks.forEach(callback => callback());
+        };
+
+        beforeEach(() => {
+            activity.blocks.isLoading.mockReturnValue(true);
+        });
+
+        test("Play waits for the load, then runs the project", () => {
+            activity._doFastButton("normal-env");
+
+            expect(activity.toolbarController.runFast).not.toHaveBeenCalled();
+            expect(activity.toolbar.highlightStop).not.toHaveBeenCalled();
+
+            finishLoad();
+
+            expect(activity.toolbarController.runFast).toHaveBeenCalledTimes(1);
+            expect(activity.toolbarController.runFast).toHaveBeenCalledWith("normal-env", 0);
+        });
+
+        test("Play unlocks audio during the click and runs once the load is done", async () => {
+            activity.logo.synth = { startAudio: jest.fn(() => Promise.resolve()) };
+
+            activity._doFastButton("normal-env");
+            expect(activity.logo.synth.startAudio).toHaveBeenCalledTimes(1);
+            await Promise.resolve();
+            expect(activity.toolbarController.runFast).not.toHaveBeenCalled();
+
+            finishLoad();
+
+            expect(activity.toolbarController.runFast).toHaveBeenCalledTimes(1);
+        });
+
+        test("Run slowly and Run step by step also wait for the load", () => {
+            activity._doSlowButton();
+            expect(activity.toolbarController.runSlow).not.toHaveBeenCalled();
+            finishLoad();
+            expect(activity.toolbarController.runSlow).toHaveBeenCalledTimes(1);
+
+            activity.blocks.isLoading.mockReturnValue(true);
+            activity.blocks.runAfterLoad.mockClear();
+            activity.toolbarController.runStep.mockReturnValue("started");
+            activity._doStepButton();
+            expect(activity.toolbarController.runStep).not.toHaveBeenCalled();
+            finishLoad();
+            expect(activity.toolbarController.runStep).toHaveBeenCalledTimes(1);
+            expect(activity.toolbar.highlightStop).toHaveBeenCalledWith("blue");
+        });
+
+        test("runs only the last of several presses, and only once", () => {
+            activity._doFastButton("normal-env");
+            activity._doFastButton("normal-env");
+            activity._doSlowButton();
+
+            expect(new Set(activity.blocks.runAfterLoad.mock.calls.map(c => c[0])).size).toBe(1);
+
+            finishLoad();
+            activity._runActionAfterLoad();
+
+            expect(activity.toolbarController.runFast).not.toHaveBeenCalled();
+            expect(activity.toolbarController.runSlow).toHaveBeenCalledTimes(1);
         });
     });
 

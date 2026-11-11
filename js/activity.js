@@ -852,6 +852,34 @@ class Activity {
             activity._doFastButton(env);
         };
 
+        /**
+         * Runs a Play, Run slowly or Run step by step action now, or once the project has
+         * finished loading: until then the workspace holds only part of the project, with Start
+         * blocks that have no mouse yet and actions that are not there, so running it fails.
+         * Pressed several times while loading, only the last action runs, and only once.
+         * @private
+         * @param {Function} action
+         * @returns {void}
+         */
+        this._runWhenLoaded = action => {
+            if (!this.blocks.isLoading()) {
+                action();
+                return;
+            }
+
+            this._actionAfterLoad = action;
+            this.blocks.runAfterLoad(this._runActionAfterLoad);
+        };
+
+        // Passed to runAfterLoad() as the same function every time, so it is queued once.
+        this._runActionAfterLoad = () => {
+            const action = this._actionAfterLoad;
+            this._actionAfterLoad = null;
+            if (action) {
+                action();
+            }
+        };
+
         this._doFastButton = env => {
             // Prevent spam-clicking by checking if already running
             if (this.logo._alreadyRunning) {
@@ -905,11 +933,13 @@ class Activity {
             };
 
             // Unlock the Web Audio context while the play click is still a user
-            // gesture, then run the rest of the Play action once that settles.
+            // gesture, then run the rest of the Play action once that settles and
+            // the project has finished loading.
+            const runWhenLoaded = () => this._runWhenLoaded(runPlayAction);
             if (this.logo.synth && typeof this.logo.synth.startAudio === "function") {
-                this.logo.synth.startAudio().then(runPlayAction, runPlayAction);
+                this.logo.synth.startAudio().then(runWhenLoaded, runWhenLoaded);
             } else {
-                runPlayAction();
+                runWhenLoaded();
             }
         };
 
@@ -929,10 +959,12 @@ class Activity {
          * @private
          */
         this._doSlowButton = () => {
-            this.blocks.activeBlock = null;
-            hideDOMLabel();
+            this._runWhenLoaded(() => {
+                this.blocks.activeBlock = null;
+                hideDOMLabel();
 
-            this.toolbarController.runSlow();
+                this.toolbarController.runSlow();
+            });
         };
 
         /*
@@ -949,16 +981,18 @@ class Activity {
          * @private
          */
         this._doStepButton = () => {
-            this.blocks.activeBlock = null;
-            hideDOMLabel();
+            this._runWhenLoaded(() => {
+                this.blocks.activeBlock = null;
+                hideDOMLabel();
 
-            const didRunStart = this.toolbarController.runStep();
+                const didRunStart = this.toolbarController.runStep();
 
-            if (didRunStart === "started") {
-                this.toolbar.highlightStop(this.toolbar.stopIconColorWhenPlaying);
-            } else if (didRunStart === "stopped") {
-                this.toolbar.resetStop();
-            }
+                if (didRunStart === "started") {
+                    this.toolbar.highlightStop(this.toolbar.stopIconColorWhenPlaying);
+                } else if (didRunStart === "stopped") {
+                    this.toolbar.resetStop();
+                }
+            });
         };
 
         /**
