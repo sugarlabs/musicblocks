@@ -1445,13 +1445,22 @@ describe("announceToScreenReader()", () => {
         document.body.appendChild = jest.fn();
     });
 
-    it("creates a live region and sets textContent", () => {
+    it("creates and appends a live region before setting its first textContent", () => {
+        jest.useFakeTimers();
+
         announceToScreenReader("Test message 1");
         expect(document.createElement).toHaveBeenCalledWith("div");
         expect(mockElement.id).toBe("mbA11yLiveRegion");
-        expect(mockElement.textContent).toBe("Test message 1");
         expect(mockElement.setAttribute).toHaveBeenCalledWith("aria-live", "polite");
         expect(document.body.appendChild).toHaveBeenCalledWith(mockElement);
+        // The region must exist in the DOM for at least a tick before its
+        // content changes, or some screen readers miss the announcement.
+        expect(mockElement.textContent).toBeUndefined();
+
+        jest.runAllTimers();
+        expect(mockElement.textContent).toBe("Test message 1");
+
+        jest.useRealTimers();
     });
 
     it("reuses the existing live region", () => {
