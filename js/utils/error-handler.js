@@ -47,6 +47,7 @@ const ErrorHandler = {
     _storageKey: "mb_error_log_v1",
     _persistThrottleMs: 1000,
     _lastPersistMs: 0,
+    _persistTimer: null,
     _installed: false,
     _disposeGlobalHandlers: null,
 
@@ -65,10 +66,13 @@ const ErrorHandler = {
         const lines = String(stack).split("\n");
         for (let i = 0; i < lines.length; i++) {
             const text = lines[i].trim();
-            if (text.indexOf("at ") !== 0) {
+            if (text.indexOf("error-handler.js") !== -1) {
                 continue;
             }
-            if (text.indexOf("error-handler.js") !== -1) {
+            // V8 frames start with "at "; Firefox and Safari use "fn@file:line:col".
+            const isV8Frame = text.indexOf("at ") === 0;
+            const isGeckoFrame = text.indexOf("@") !== -1 && /:\d+/.test(text);
+            if (!isV8Frame && !isGeckoFrame) {
                 continue;
             }
             return text;
@@ -76,8 +80,17 @@ const ErrorHandler = {
         return "";
     },
 
-    _key(operation, message, frame) {
-        return operation + "|" + message + "|" + frame;
+    _key(level, operation, message, frame) {
+        return level + "|" + operation + "|" + message + "|" + frame;
+    },
+
+    _describeReason(reason) {
+        try {
+            return String(reason);
+        } catch (e) {
+            // Objects without a prototype cannot be converted to a string.
+            return "[unstringifiable rejection reason]";
+        }
     },
 
     _metadata() {
@@ -126,8 +139,14 @@ const ErrorHandler = {
                 typeof window.ActivityContext.getActivity === "function"
             ) {
                 const activity = window.ActivityContext.getActivity();
-                if (activity && typeof activity.beginnerMode === "boolean") {
-                    mode = activity.beginnerMode ? "beginner" : "advanced";
+                if (activity) {
+                    // Activity persists this flag as the string "true"/"false".
+                    const beginnerMode = activity.beginnerMode;
+                    if (beginnerMode === true || beginnerMode === "true") {
+                        mode = "beginner";
+                    } else if (beginnerMode === false || beginnerMode === "false") {
+                        mode = "advanced";
+                    }
                 }
             }
         } catch (e) {
@@ -146,7 +165,7 @@ const ErrorHandler = {
             const line = context && context.line ? Number(context.line) || 0 : 0;
             const column = context && context.column ? Number(context.column) || 0 : 0;
             const frame = this._frame(stack, source, line, column);
-            const key = this._key(operation, message, frame);
+            const key = this._key(level, operation, message, frame);
             const existing = this._counts.get(key);
 
             if (existing && this._records.indexOf(existing) !== -1) {
@@ -205,12 +224,31 @@ const ErrorHandler = {
             }
             const now = Date.now();
             if (!force && now - this._lastPersistMs < this._persistThrottleMs) {
+                this._schedulePersist();
                 return;
             }
             this._lastPersistMs = now;
             window.sessionStorage.setItem(this._storageKey, JSON.stringify(this._records));
         } catch (e) {
             // Ignore; persistence is best-effort and must not affect recording.
+        }
+    },
+
+    _schedulePersist() {
+        if (this._persistTimer) {
+            return;
+        }
+        const self = this;
+        this._persistTimer = window.setTimeout(function () {
+            self._persistTimer = null;
+            self._persist(true);
+        }, this._persistThrottleMs);
+    },
+
+    _cancelScheduledPersist() {
+        if (this._persistTimer) {
+            window.clearTimeout(this._persistTimer);
+            this._persistTimer = null;
         }
     },
 
@@ -227,6 +265,12 @@ const ErrorHandler = {
             if (Array.isArray(parsed)) {
                 this._records = parsed.slice(-this._maxRecords);
                 this._counts.clear();
+                for (let i = 0; i < this._records.length; i++) {
+                    const record = this._records[i];
+                    if (record && record.key) {
+                        this._counts.set(record.key, record);
+                    }
+                }
             }
         } catch (e) {
             // Ignore; a corrupt or unavailable store must not break startup.
@@ -346,6 +390,7 @@ const ErrorHandler = {
     clearRecentErrors() {
         this._records.length = 0;
         this._counts.clear();
+        this._cancelScheduledPersist();
         try {
             if (typeof window !== "undefined" && window.sessionStorage) {
                 window.sessionStorage.removeItem(this._storageKey);
@@ -410,7 +455,8 @@ const ErrorHandler = {
 
         const onRejection = function (event) {
             const reason = event && event.reason;
-            const error = reason instanceof Error ? reason : new Error(String(reason));
+            const error =
+                reason instanceof Error ? reason : new Error(self._describeReason(reason));
             self._report("unhandledrejection", error, { operation: "unhandledrejection" });
         };
 
@@ -420,6 +466,7 @@ const ErrorHandler = {
         const dispose = function () {
             window.removeEventListener("error", onError);
             window.removeEventListener("unhandledrejection", onRejection);
+            self._cancelScheduledPersist();
             if (window.__MB_ERROR_HANDLER_DISPOSE__ === dispose) {
                 delete window.__MB_ERROR_HANDLER_DISPOSE__;
             }

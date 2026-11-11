@@ -193,6 +193,31 @@ describe("ErrorHandler", () => {
             expect(ErrorHandler.getRecentErrors()).toHaveLength(2);
         });
 
+        it("keeps separate records for different levels", () => {
+            ErrorHandler.warn("failed", { operation: "save" });
+            ErrorHandler.capture("failed", { operation: "save" });
+
+            const records = ErrorHandler.getRecentErrors();
+            expect(records).toHaveLength(2);
+            expect(records[0].level).toBe("warn");
+            expect(records[1].level).toBe("error");
+            expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
+            expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("keeps separate records for Firefox and Safari stack frames", () => {
+            const first = new Error("same message");
+            first.stack = "firstStep@http://localhost/a.js:10:5";
+            const second = new Error("same message");
+            second.stack = "secondStep@http://localhost/a.js:20:7";
+
+            ErrorHandler.capture(first, { operation: "gecko" });
+            ErrorHandler.capture(second, { operation: "gecko" });
+
+            expect(ErrorHandler.getRecentErrors()).toHaveLength(2);
+            expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
+        });
+
         it("returns a copy of the buffer", () => {
             ErrorHandler.capture("boom", { operation: "copy" });
 
@@ -222,6 +247,22 @@ describe("ErrorHandler", () => {
             expect(record.browser).toBe("firefox");
             expect(record.language).toBe("es-MX");
             expect(record.mode).toBe("beginner");
+        });
+
+        it("recognizes the persisted string beginner mode", () => {
+            window.ActivityContext = { getActivity: () => ({ beginnerMode: "true" }) };
+
+            ErrorHandler.capture("boom", { operation: "metadata-string-mode" });
+
+            expect(ErrorHandler.getRecentErrors()[0].mode).toBe("beginner");
+        });
+
+        it("recognizes the persisted string advanced mode", () => {
+            window.ActivityContext = { getActivity: () => ({ beginnerMode: "false" }) };
+
+            ErrorHandler.capture("boom", { operation: "metadata-string-advanced" });
+
+            expect(ErrorHandler.getRecentErrors()[0].mode).toBe("advanced");
         });
 
         it("falls back to safe metadata when sources are unavailable", () => {
@@ -319,6 +360,18 @@ describe("ErrorHandler", () => {
             expect(consoleErrorSpy).toHaveBeenCalled();
         });
 
+        it("records rejections whose reason cannot be stringified", () => {
+            const event = new Event("unhandledrejection");
+            event.reason = Object.create(null);
+
+            window.dispatchEvent(event);
+
+            const records = ErrorHandler.getRecentErrors();
+            expect(records).toHaveLength(1);
+            expect(records[0].level).toBe("unhandledrejection");
+            expect(records[0].message).toBe("[unstringifiable rejection reason]");
+        });
+
         it("ignores extension errors and ResizeObserver noise", () => {
             window.dispatchEvent(
                 new ErrorEvent("error", {
@@ -391,6 +444,38 @@ describe("ErrorHandler", () => {
 
             expect(records).toHaveLength(1);
             expect(records[0].operation).toBe("restore");
+        });
+
+        it("indexes restored records for deduplication", () => {
+            ErrorHandler.capture("boom", { operation: "restore-count" });
+
+            jest.resetModules();
+            const Reloaded = require("../error-handler");
+            Reloaded.capture("boom", { operation: "restore-count" });
+
+            const records = Reloaded.getRecentErrors();
+            expect(records).toHaveLength(1);
+            expect(records[0].count).toBe(2);
+            expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("writes a trailing update for throttled counts", () => {
+            jest.useFakeTimers();
+            try {
+                ErrorHandler.capture("boom", { operation: "throttle" });
+                ErrorHandler.capture("boom", { operation: "throttle" });
+
+                const throttled = JSON.parse(window.sessionStorage.getItem(storageKey));
+                expect(throttled[0].count).toBe(1);
+
+                jest.advanceTimersByTime(ErrorHandler._persistThrottleMs);
+
+                const flushed = JSON.parse(window.sessionStorage.getItem(storageKey));
+                expect(flushed[0].count).toBe(2);
+            } finally {
+                ErrorHandler._cancelScheduledPersist();
+                jest.useRealTimers();
+            }
         });
 
         it("clears persisted records", () => {
