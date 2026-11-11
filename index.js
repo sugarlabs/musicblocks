@@ -43,32 +43,82 @@ app.use(
 );
 
 // --- Security: Block access to sensitive project files ---
-// express.static(__dirname) serves the entire project root, which exposes
-// server config, dependency info, and build files. This middleware intercepts
-// requests for known-sensitive files and returns 403 before they reach
-// the static file handler.
-const SENSITIVE_PATTERNS = [
-    /^\/package\.json$/i,
-    /^\/package-lock\.json$/i,
-    /^\/index\.js$/i,
-    /^\/dockerfile$/i,
-    /^\/jest\.config\.js$/i,
-    /^\/eslint\.config\.mjs$/i,
-    /^\/cypress\.config\.js$/i,
-    /^\/gulpfile\.(js|mjs)$/i,
-    /^\/setup\.py$/i,
-    /^\/convert_po_to_json\.py$/i,
-    /^\/\.github\//i,
-    /^\/node_modules\//i,
-    /^\/cypress\//i,
-    /^\/scripts\//i
-];
+// Rather than serving the entire project directory with an incomplete blacklist,
+// we enforce a strict allowlist. Only designated public directories and root files
+// needed by the client are accessible; unlisted root files and private directories
+// (.github, scripts, cypress, node_modules) are blocked by default.
+// Allowed directories are served without internal test-file or backup filtering.
+const ALLOWED_DIRECTORIES = new Set([
+    "activity",
+    "bower_components",
+    "css",
+    "dist",
+    "Docs",
+    "examples",
+    "fonts",
+    "header-icons",
+    "images",
+    "js",
+    "lessonPlan",
+    "lib",
+    "lilypond",
+    "locales",
+    "mouse-art",
+    "planet",
+    "plugins",
+    "screenshots",
+    "sounds",
+    "staff",
+    "TurtleDocs",
+    "usermanual",
+    "videos"
+]);
+
+const ALLOWED_ROOT_FILES = new Set([
+    "index.html",
+    "favicon.ico",
+    "sw.js",
+    "manifest.json",
+    "manifest.webapp",
+    "android_chrome_manifest.json",
+    "loading-animation.mp4",
+    "loading-animation.webm",
+    "loading-animation-ja.png",
+    "Minsky.jpg",
+    "script.js"
+]);
 
 app.use((req, res, next) => {
-    if (SENSITIVE_PATTERNS.some(pattern => pattern.test(req.path))) {
-        return res.status(403).send("Forbidden");
+    let decodedPath;
+    try {
+        decodedPath = decodeURIComponent(req.path);
+    } catch (err) {
+        return res.status(400).send("Bad Request");
     }
-    next();
+
+    // Normalise path and remove leading/trailing separators
+    const cleanPath = path.normalize(decodedPath).replace(/^(\.\.[/\\])+/, "");
+    const segments = cleanPath.split(/[/\\]/).filter(Boolean);
+
+    // Root ("/") serves index.html by default
+    if (segments.length === 0) {
+        return next();
+    }
+
+    const firstSegment = segments[0];
+
+    // Allow request to permitted public asset directories
+    if (ALLOWED_DIRECTORIES.has(firstSegment)) {
+        return next();
+    }
+
+    // Allow single root file explicitly designated as public
+    if (segments.length === 1 && ALLOWED_ROOT_FILES.has(firstSegment)) {
+        return next();
+    }
+
+    // Everything else is blocked
+    return res.status(403).send("Forbidden");
 });
 
 // Environment-aware static file serving
