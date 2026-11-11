@@ -4521,6 +4521,26 @@ describe("Logo initMediaDevices", () => {
         expect(logo.mic).toBeNull();
     });
 
+    test("keeps the newer mic when an older one is rejected after being replaced", async () => {
+        let rejectFirst;
+        logo.deps.Tone = {
+            UserMedia: jest.fn(() => ({
+                open: jest.fn(() => new Promise((resolve, reject) => (rejectFirst = reject))),
+                close: jest.fn()
+            }))
+        };
+        logo.initMediaDevices();
+
+        const second = { open: jest.fn(), close: jest.fn() };
+        logo.deps.Tone = { UserMedia: jest.fn(() => second) };
+        logo.initMediaDevices();
+
+        rejectFirst(new Error("NotAllowedError: Permission denied"));
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(logo.mic).toBe(second);
+    });
+
     test("drops analysers connected to the previous mic", () => {
         logo.deps.Tone = { UserMedia: jest.fn(() => ({ open: jest.fn() })) };
         logo.volumeAnalyser = { connected: "old mic" };
