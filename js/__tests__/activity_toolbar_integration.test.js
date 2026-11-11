@@ -278,17 +278,94 @@ describe("Activity Toolbar Integration", () => {
             expect(activity.toolbarController.runFast).toHaveBeenCalledWith("normal-env", 0);
         });
 
-        test("Play unlocks audio during the click and runs once the load is done", async () => {
-            activity.logo.synth = { startAudio: jest.fn(() => Promise.resolve()) };
+        describe("while audio starts", () => {
+            // A startAudio() whose promise the test settles.
+            let settleAudio;
+            const flush = () => new Promise(resolve => setTimeout(resolve, 0));
 
-            activity._doFastButton("normal-env");
-            expect(activity.logo.synth.startAudio).toHaveBeenCalledTimes(1);
-            await Promise.resolve();
-            expect(activity.toolbarController.runFast).not.toHaveBeenCalled();
+            beforeEach(() => {
+                activity.logo.synth = {
+                    startAudio: jest.fn(
+                        () =>
+                            new Promise((resolve, reject) => {
+                                settleAudio = { resolve, reject };
+                            })
+                    )
+                };
+            });
 
+            test("Play unlocks audio during the click and runs after the load and audio", async () => {
+                activity._doFastButton("normal-env");
+                expect(activity.logo.synth.startAudio).toHaveBeenCalledTimes(1);
+
+                finishLoad();
+                await flush();
+                expect(activity.toolbarController.runFast).not.toHaveBeenCalled();
+
+                settleAudio.resolve();
+                await flush();
+                expect(activity.toolbarController.runFast).toHaveBeenCalledTimes(1);
+            });
+
+            test("Play runs even if audio fails to start", async () => {
+                activity._doFastButton("normal-env");
+                finishLoad();
+                settleAudio.reject(new Error("blocked"));
+                await flush();
+
+                expect(activity.toolbarController.runFast).toHaveBeenCalledTimes(1);
+            });
+
+            test("a newer Run slowly replaces a Play still waiting for audio", async () => {
+                activity._doFastButton("normal-env");
+                activity._doSlowButton();
+                finishLoad();
+                settleAudio.resolve();
+                await flush();
+
+                expect(activity.toolbarController.runSlow).toHaveBeenCalledTimes(1);
+                expect(activity.toolbarController.runFast).not.toHaveBeenCalled();
+            });
+
+            test("a newer Run step by step replaces Play after the load as well", async () => {
+                activity.blocks.isLoading.mockReturnValue(false);
+                activity._doFastButton("normal-env");
+                activity._doStepButton();
+                settleAudio.resolve();
+                await flush();
+
+                expect(activity.toolbarController.runStep).toHaveBeenCalledTimes(1);
+                expect(activity.toolbarController.runFast).not.toHaveBeenCalled();
+            });
+
+            test("Stop cancels a Play still waiting for audio", async () => {
+                activity.blocks.isLoading.mockReturnValue(false);
+                activity.toolbarController.hardStop.mockReturnValue(true);
+                activity._doFastButton("normal-env");
+                activity._doHardStopButton(false);
+                settleAudio.resolve();
+                await flush();
+
+                expect(activity.toolbarController.runFast).not.toHaveBeenCalled();
+            });
+        });
+
+        test("Stop cancels a run waiting for the load", () => {
+            activity.toolbarController.hardStop.mockReturnValue(true);
+            activity._doSlowButton();
+            activity._doHardStopButton(false);
             finishLoad();
 
-            expect(activity.toolbarController.runFast).toHaveBeenCalledTimes(1);
+            expect(activity.toolbarController.runSlow).not.toHaveBeenCalled();
+        });
+
+        test("a Stop that does not stop, on losing focus, keeps the waiting run", () => {
+            activity.toolbarController.hardStop.mockReturnValue(false);
+            activity._doSlowButton();
+            activity._doHardStopButton(true);
+            finishLoad();
+
+            expect(activity.toolbarController.runSlow).toHaveBeenCalledTimes(1);
         });
 
         test("Run slowly and Run step by step also wait for the load", () => {

@@ -857,18 +857,30 @@ class Activity {
          * finished loading: until then the workspace holds only part of the project, with Start
          * blocks that have no mouse yet and actions that are not there, so running it fails.
          * Pressed several times while loading, only the last action runs, and only once.
+         * The action gets a function that tells it whether it is still the latest press, for
+         * an action that waits on something more before it runs (see _doFastButton).
          * @private
-         * @param {Function} action
+         * @param {function(function(): boolean): void} action
          * @returns {void}
          */
         this._runWhenLoaded = action => {
+            this._runRequest = (this._runRequest || 0) + 1;
+            const request = this._runRequest;
+            const isLatest = () => request === this._runRequest;
+
             if (!this.blocks.isLoading()) {
-                action();
+                action(isLatest);
                 return;
             }
 
-            this._actionAfterLoad = action;
+            this._actionAfterLoad = () => action(isLatest);
             this.blocks.runAfterLoad(this._runActionAfterLoad);
+        };
+
+        // Stop cancels a run that is still waiting for the load or for audio.
+        this._cancelPendingRun = () => {
+            this._actionAfterLoad = null;
+            this._runRequest = (this._runRequest || 0) + 1;
         };
 
         // Passed to runAfterLoad() as the same function every time, so it is queued once.
@@ -934,12 +946,20 @@ class Activity {
 
             // Unlock the Web Audio context while the play click is still a user
             // gesture, then run the rest of the Play action once that settles and
-            // the project has finished loading.
-            const runWhenLoaded = () => this._runWhenLoaded(runPlayAction);
+            // the project has finished loading. The press is queued now, so a Run
+            // slowly or Run step by step pressed while audio starts replaces it.
             if (this.logo.synth && typeof this.logo.synth.startAudio === "function") {
-                this.logo.synth.startAudio().then(runWhenLoaded, runWhenLoaded);
+                const audioStarted = this.logo.synth.startAudio();
+                this._runWhenLoaded(isLatest => {
+                    const play = () => {
+                        if (isLatest()) {
+                            runPlayAction();
+                        }
+                    };
+                    audioStarted.then(play, play);
+                });
             } else {
-                runWhenLoaded();
+                this._runWhenLoaded(runPlayAction);
             }
         };
 
@@ -1016,6 +1036,8 @@ class Activity {
             if (!stopped) {
                 return;
             }
+
+            this._cancelPendingRun();
 
             if (this.cleanupIdleWatcher) {
                 this.cleanupIdleWatcher();
