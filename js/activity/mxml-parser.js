@@ -639,8 +639,14 @@ function _keySignature(partEl) {
     // A transposing part writes its key signature at written pitch too (D major
     // for a B-flat clarinet playing in C). An interval of d steps and c
     // semitones moves a key 7c - 12d places round the circle of fifths.
-    const attributesEl = keyEl.parentElement;
-    const interval = _transposeInterval(attributesEl ? _staffOneTranspose(attributesEl) : null);
+    // The <transpose> in force can sit in an earlier <attributes> than the
+    // key's own, so take the last one up to and including the key's.
+    let transposeEl = null;
+    for (const attributesEl of partEl.querySelectorAll("measure > attributes")) {
+        transposeEl = _staffOneTranspose(attributesEl) ?? transposeEl;
+        if (attributesEl === keyEl.parentElement) break;
+    }
+    const interval = _transposeInterval(transposeEl);
     const fifths =
         Number(fifthsText) + (interval ? 7 * interval.chromatic - 12 * interval.diatonic : 0);
     const modeText = (_text(keyEl, "mode") ?? "major").toLowerCase();
@@ -1264,17 +1270,20 @@ function _processPart(
             ":scope > attributes > divisions"
         )?.textContent;
         if (divisionsText !== undefined) divisions = Number(divisionsText);
-        // A part can change instrument (and transposition) mid-piece; a
-        // <transpose> holds until the next one replaces it.
-        for (const attributesEl of measureEl.querySelectorAll(":scope > attributes")) {
-            const transposeEl = _staffOneTranspose(attributesEl);
-            if (transposeEl !== null) interval = _transposeInterval(transposeEl);
-        }
 
         let offset = 0;
         for (const child of measureEl.children) {
             emitDueTempoChanges(measureIndex, offset);
             if (child.tagName === "backup") break;
+
+            // A part can change instrument (and transposition) mid-piece, even
+            // mid-measure: a <transpose> holds from where it is written until
+            // the next one replaces it, so notes before it keep the old one.
+            if (child.tagName === "attributes") {
+                const transposeEl = _staffOneTranspose(child);
+                if (transposeEl !== null) interval = _transposeInterval(transposeEl);
+                continue;
+            }
 
             if (child.tagName === "direction") {
                 const directionVoice = _text(child, "voice")?.trim();

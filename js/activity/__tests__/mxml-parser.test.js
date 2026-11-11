@@ -2543,4 +2543,31 @@ describe("Test 18: Transposing parts are imported at sounding pitch", () => {
 
         expect(pitches(blocks)).toEqual([{ name: "D", octave: 5 }]);
     });
+
+    it("moves the key by a transposition declared in an earlier <attributes>", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                "<attributes><key><fifths>2</fifths></key></attributes>" +
+                    SIMPLE_NOTE("D", 5, "quarter"),
+                "<divisions>8</divisions>" + BB_CLARINET
+            )
+        );
+
+        expect(keySignatureOf(blocks)).toEqual({ root: "C", mode: "major" });
+    });
+
+    it("leaves a note before a mid-measure <transpose> at the old pitch", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                SIMPLE_NOTE("D", 5, "quarter") +
+                    `<attributes>${BB_CLARINET}</attributes>` +
+                    SIMPLE_NOTE("D", 5, "quarter")
+            )
+        );
+
+        expect(pitches(blocks)).toEqual([
+            { name: "D", octave: 5 },
+            { name: "C", octave: 5 }
+        ]);
+    });
 });
