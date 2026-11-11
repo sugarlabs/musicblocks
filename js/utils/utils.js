@@ -391,6 +391,53 @@ let delayExecution = duration => {
  * @returns {void}
  */
 /**
+ * Tracks whether the shared live region has had at least one tick to be
+ * registered by assistive tech since it was inserted into the DOM, and
+ * sequences back-to-back announcements so one doesn't silently overwrite
+ * another before a screen reader has had a chance to read it.
+ */
+let _a11yLiveRegionReady = false;
+let _a11yLiveRegionScheduled = false;
+let _a11yAnnounceQueue = [];
+let _a11yAnnouncing = false;
+
+/** Minimum gap, in ms, assistive tech gets to pick up one announcement before the next replaces it. */
+const A11Y_ANNOUNCE_GAP_MS = 300;
+
+/**
+ * Writes the next queued message to the live region, then waits before
+ * writing the one after that, so each gets a chance to be read instead of
+ * being clobbered by whichever call happened to land in the same task.
+ * @param {HTMLElement} region - The shared live region.
+ * @returns {void}
+ */
+const _drainA11yAnnounceQueue = region => {
+    if (_a11yAnnouncing || _a11yAnnounceQueue.length === 0) {
+        return;
+    }
+    _a11yAnnouncing = true;
+    const msg = _a11yAnnounceQueue.shift();
+
+    const writeAndScheduleNext = () => {
+        region.textContent = msg;
+        setTimeout(() => {
+            _a11yAnnouncing = false;
+            _drainA11yAnnounceQueue(region);
+        }, A11Y_ANNOUNCE_GAP_MS);
+    };
+
+    if (region.textContent === msg) {
+        // Some browsers won't re-announce a live region whose textContent
+        // doesn't actually change, so clear it first and write the repeated
+        // message on a later tick to force a visible mutation.
+        region.textContent = "";
+        setTimeout(writeAndScheduleNext, 0);
+    } else {
+        writeAndScheduleNext();
+    }
+};
+
+/**
  * Announces a message to screen readers via a shared aria-live region.
  * Creates the region lazily on first use and reuses it for all subsequent calls.
  * @param {string} msg - The message to announce.
@@ -407,7 +454,24 @@ const announceToScreenReader = msg => {
             "position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;";
         document.body.appendChild(region);
     }
-    region.textContent = msg;
+
+    _a11yAnnounceQueue.push(msg);
+
+    if (_a11yLiveRegionReady) {
+        _drainA11yAnnounceQueue(region);
+        return;
+    }
+
+    // Some screen readers miss the first announcement if the live region's
+    // content is set in the same task that inserts it into the DOM, so give
+    // assistive tech a tick to register the region before its first update.
+    if (!_a11yLiveRegionScheduled) {
+        _a11yLiveRegionScheduled = true;
+        requestAnimationFrame(() => {
+            _a11yLiveRegionReady = true;
+            _drainA11yAnnounceQueue(region);
+        });
+    }
 };
 let importMembers = (obj, className, modelArgs, viewArgs) => {
     /**
