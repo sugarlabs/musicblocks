@@ -392,11 +392,36 @@ let delayExecution = duration => {
  */
 /**
  * Tracks whether the shared live region has had at least one tick to be
- * registered by assistive tech since it was inserted into the DOM.
+ * registered by assistive tech since it was inserted into the DOM, and
+ * sequences back-to-back announcements so one doesn't silently overwrite
+ * another before a screen reader has had a chance to read it.
  */
 let _a11yLiveRegionReady = false;
 let _a11yLiveRegionScheduled = false;
-let _a11yPendingMessage = null;
+let _a11yAnnounceQueue = [];
+let _a11yAnnouncing = false;
+
+/** Minimum gap, in ms, assistive tech gets to pick up one announcement before the next replaces it. */
+const A11Y_ANNOUNCE_GAP_MS = 300;
+
+/**
+ * Writes the next queued message to the live region, then waits before
+ * writing the one after that, so each gets a chance to be read instead of
+ * being clobbered by whichever call happened to land in the same task.
+ * @param {HTMLElement} region - The shared live region.
+ * @returns {void}
+ */
+const _drainA11yAnnounceQueue = region => {
+    if (_a11yAnnouncing || _a11yAnnounceQueue.length === 0) {
+        return;
+    }
+    _a11yAnnouncing = true;
+    region.textContent = _a11yAnnounceQueue.shift();
+    setTimeout(() => {
+        _a11yAnnouncing = false;
+        _drainA11yAnnounceQueue(region);
+    }, A11Y_ANNOUNCE_GAP_MS);
+};
 
 /**
  * Announces a message to screen readers via a shared aria-live region.
@@ -416,23 +441,21 @@ const announceToScreenReader = msg => {
         document.body.appendChild(region);
     }
 
+    _a11yAnnounceQueue.push(msg);
+
     if (_a11yLiveRegionReady) {
-        region.textContent = msg;
+        _drainA11yAnnounceQueue(region);
         return;
     }
 
     // Some screen readers miss the first announcement if the live region's
     // content is set in the same task that inserts it into the DOM, so give
     // assistive tech a tick to register the region before its first update.
-    // Calls that land before that tick fires only update the pending
-    // message, so the deferred write always applies the latest one instead
-    // of a stale message from whichever call scheduled it.
-    _a11yPendingMessage = msg;
     if (!_a11yLiveRegionScheduled) {
         _a11yLiveRegionScheduled = true;
         requestAnimationFrame(() => {
             _a11yLiveRegionReady = true;
-            region.textContent = _a11yPendingMessage;
+            _drainA11yAnnounceQueue(region);
         });
     }
 };
