@@ -16,7 +16,7 @@
    global
 
    _, _THIS_IS_MUSIC_BLOCKS_, MATRIXBUTTONHEIGHT, MATRIXSOLFEHEIGHT, toFixed2,
-   mixedNumber, rationalToFraction, frequencyToPitch, HarmonyUtils
+   mixedNumber, rationalToFraction, frequencyToPitch, HarmonyUtils, announceToScreenReader
  */
 
 /* exported StatusMatrix */
@@ -52,6 +52,7 @@ class StatusMatrix {
         this.widgetWindow = window.widgetWindows.windowFor(this, "status", "status");
         this.widgetWindow.clear();
         this.widgetWindow.show();
+        announceToScreenReader(_("Status opened"));
         // For the button callbacks
         let cell;
 
@@ -61,6 +62,7 @@ class StatusMatrix {
         this.widgetWindow.onclose = () => {
             this.isOpen = false;
             this._clearHarmonyTimer();
+            announceToScreenReader(_("Status closed"));
             this.widgetWindow.destroy();
         };
 

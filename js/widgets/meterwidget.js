@@ -12,7 +12,7 @@
 /* global
 
    Singer, _, PREVIEWVOLUME, ManagedTimer, MeterWidgetWindow, MeterWidgetMeter,
-   MeterWidgetPlayback, MeterWidgetWheel, MeterWidgetSave
+   MeterWidgetPlayback, MeterWidgetWheel, MeterWidgetSave, announceToScreenReader
 */
 
 /*
@@ -246,6 +246,7 @@ class MeterWidget {
         const widgetWindow = window.widgetWindows.windowFor(this, "meter");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
+        announceToScreenReader(_("Meter opened"));
 
         this.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
         this.activity.logo.synth.loadSynth(0, "kick drum");

@@ -17,19 +17,19 @@
 /*
    global
 
-   _, SMALLERBUTTON, BIGGERBUTTON, Tone, instruments
+   _, SMALLERBUTTON, BIGGERBUTTON, Tone, instruments, announceToScreenReader
  */
-/* 
+/*
     Globals location
      - js/artwork.js
          SMALLERBUTTON,BIGGERBUTTON
      - js/utils/utils.js
-         _
+         _, announceToScreenReader
      - js/activity.js
          Tone
      - js/utils/synthutils.js
          instruments
-         
+
 */
 /* exported Oscilloscope */
 
@@ -74,6 +74,7 @@ class Oscilloscope {
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
+        announceToScreenReader(_("Oscilloscope opened"));
 
         widgetWindow.onclose = () => {
             this.close();
@@ -251,6 +252,7 @@ class Oscilloscope {
         this._connectedSynths = {};
 
         if (this.widgetWindow) {
+            announceToScreenReader(_("Oscilloscope closed"));
             this.widgetWindow.destroy();
             this.widgetWindow = null;
         }

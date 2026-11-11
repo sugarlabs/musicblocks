@@ -122,6 +122,7 @@ describe("TemperamentUI module", () => {
             <div id="wheelDiv4"></div>
         `;
         global._ = jest.fn(str => str);
+        global.announceToScreenReader = jest.fn();
         global.platformColor = {
             selectorBackground: "#e0e0e0",
             selectorBackgroundHOVER: "#eee",
