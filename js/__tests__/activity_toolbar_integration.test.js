@@ -102,7 +102,9 @@ describe("Activity Toolbar Integration", () => {
         activity.blocks = {
             activeBlock: null,
             hideBlocks: jest.fn(),
-            showBlocks: jest.fn()
+            showBlocks: jest.fn(),
+            isLoading: jest.fn(() => false),
+            runAfterLoad: jest.fn()
         };
 
         activity.logo = {
@@ -249,6 +251,197 @@ describe("Activity Toolbar Integration", () => {
 
             expect(activity.toolbar.resetStop).toHaveBeenCalled();
             expect(activity.toolbar.highlightStop).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("while a project is loading", () => {
+        // Finishes the load: runs what was waiting on runAfterLoad(), as Blocks does.
+        const finishLoad = () => {
+            activity.blocks.isLoading.mockReturnValue(false);
+            const callbacks = [...new Set(activity.blocks.runAfterLoad.mock.calls.map(c => c[0]))];
+            callbacks.forEach(callback => callback());
+        };
+
+        beforeEach(() => {
+            activity.blocks.isLoading.mockReturnValue(true);
+        });
+
+        test("Play waits for the load, then runs the project", () => {
+            activity._doFastButton("normal-env");
+
+            expect(activity.toolbarController.runFast).not.toHaveBeenCalled();
+            expect(activity.toolbar.highlightStop).not.toHaveBeenCalled();
+
+            finishLoad();
+
+            expect(activity.toolbarController.runFast).toHaveBeenCalledTimes(1);
+            expect(activity.toolbarController.runFast).toHaveBeenCalledWith("normal-env", 0);
+        });
+
+        describe("while audio starts", () => {
+            // A startAudio() whose promise the test settles.
+            let settleAudio;
+            const flush = () => new Promise(resolve => setTimeout(resolve, 0));
+
+            beforeEach(() => {
+                activity.logo.synth = {
+                    startAudio: jest.fn(
+                        () =>
+                            new Promise((resolve, reject) => {
+                                settleAudio = { resolve, reject };
+                            })
+                    )
+                };
+            });
+
+            test("Play unlocks audio during the click and runs after the load and audio", async () => {
+                activity._doFastButton("normal-env");
+                expect(activity.logo.synth.startAudio).toHaveBeenCalledTimes(1);
+
+                finishLoad();
+                await flush();
+                expect(activity.toolbarController.runFast).not.toHaveBeenCalled();
+
+                settleAudio.resolve();
+                await flush();
+                expect(activity.toolbarController.runFast).toHaveBeenCalledTimes(1);
+            });
+
+            test("Play runs even if audio fails to start", async () => {
+                activity._doFastButton("normal-env");
+                finishLoad();
+                settleAudio.reject(new Error("blocked"));
+                await flush();
+
+                expect(activity.toolbarController.runFast).toHaveBeenCalledTimes(1);
+            });
+
+            test("Play handles an audio failure while the project is still loading", async () => {
+                const unhandled = [];
+                const onUnhandled = reason => unhandled.push(reason);
+                process.on("unhandledRejection", onUnhandled);
+                try {
+                    activity._doFastButton("normal-env");
+                    settleAudio.reject(new Error("blocked"));
+                    await flush();
+                    await flush();
+                    expect(unhandled).toEqual([]);
+
+                    finishLoad();
+                    await flush();
+                    expect(activity.toolbarController.runFast).toHaveBeenCalledTimes(1);
+                } finally {
+                    process.off("unhandledRejection", onUnhandled);
+                }
+            });
+
+            test("Play waits for a load that starts while audio starts", async () => {
+                activity.blocks.isLoading.mockReturnValue(false);
+                activity._doFastButton("normal-env");
+
+                activity.blocks.isLoading.mockReturnValue(true);
+                settleAudio.resolve();
+                await flush();
+                expect(activity.toolbarController.runFast).not.toHaveBeenCalled();
+
+                finishLoad();
+                expect(activity.toolbarController.runFast).toHaveBeenCalledTimes(1);
+            });
+
+            test("a newer press replaces a Play waiting for a load that started during audio", async () => {
+                activity.blocks.isLoading.mockReturnValue(false);
+                activity._doFastButton("normal-env");
+                activity.blocks.isLoading.mockReturnValue(true);
+                settleAudio.resolve();
+                await flush();
+
+                activity._doSlowButton();
+                finishLoad();
+
+                expect(activity.toolbarController.runSlow).toHaveBeenCalledTimes(1);
+                expect(activity.toolbarController.runFast).not.toHaveBeenCalled();
+            });
+
+            test("a newer Run slowly replaces a Play still waiting for audio", async () => {
+                activity._doFastButton("normal-env");
+                activity._doSlowButton();
+                finishLoad();
+                settleAudio.resolve();
+                await flush();
+
+                expect(activity.toolbarController.runSlow).toHaveBeenCalledTimes(1);
+                expect(activity.toolbarController.runFast).not.toHaveBeenCalled();
+            });
+
+            test("a newer Run step by step replaces Play after the load as well", async () => {
+                activity.blocks.isLoading.mockReturnValue(false);
+                activity._doFastButton("normal-env");
+                activity._doStepButton();
+                settleAudio.resolve();
+                await flush();
+
+                expect(activity.toolbarController.runStep).toHaveBeenCalledTimes(1);
+                expect(activity.toolbarController.runFast).not.toHaveBeenCalled();
+            });
+
+            test("Stop cancels a Play still waiting for audio", async () => {
+                activity.blocks.isLoading.mockReturnValue(false);
+                activity.toolbarController.hardStop.mockReturnValue(true);
+                activity._doFastButton("normal-env");
+                activity._doHardStopButton(false);
+                settleAudio.resolve();
+                await flush();
+
+                expect(activity.toolbarController.runFast).not.toHaveBeenCalled();
+            });
+        });
+
+        test("Stop cancels a run waiting for the load", () => {
+            activity.toolbarController.hardStop.mockReturnValue(true);
+            activity._doSlowButton();
+            activity._doHardStopButton(false);
+            finishLoad();
+
+            expect(activity.toolbarController.runSlow).not.toHaveBeenCalled();
+        });
+
+        test("a Stop that does not stop, on losing focus, keeps the waiting run", () => {
+            activity.toolbarController.hardStop.mockReturnValue(false);
+            activity._doSlowButton();
+            activity._doHardStopButton(true);
+            finishLoad();
+
+            expect(activity.toolbarController.runSlow).toHaveBeenCalledTimes(1);
+        });
+
+        test("Run slowly and Run step by step also wait for the load", () => {
+            activity._doSlowButton();
+            expect(activity.toolbarController.runSlow).not.toHaveBeenCalled();
+            finishLoad();
+            expect(activity.toolbarController.runSlow).toHaveBeenCalledTimes(1);
+
+            activity.blocks.isLoading.mockReturnValue(true);
+            activity.blocks.runAfterLoad.mockClear();
+            activity.toolbarController.runStep.mockReturnValue("started");
+            activity._doStepButton();
+            expect(activity.toolbarController.runStep).not.toHaveBeenCalled();
+            finishLoad();
+            expect(activity.toolbarController.runStep).toHaveBeenCalledTimes(1);
+            expect(activity.toolbar.highlightStop).toHaveBeenCalledWith("blue");
+        });
+
+        test("runs only the last of several presses, and only once", () => {
+            activity._doFastButton("normal-env");
+            activity._doFastButton("normal-env");
+            activity._doSlowButton();
+
+            expect(new Set(activity.blocks.runAfterLoad.mock.calls.map(c => c[0])).size).toBe(1);
+
+            finishLoad();
+            activity._runActionAfterLoad();
+
+            expect(activity.toolbarController.runFast).not.toHaveBeenCalled();
+            expect(activity.toolbarController.runSlow).toHaveBeenCalledTimes(1);
         });
     });
 
