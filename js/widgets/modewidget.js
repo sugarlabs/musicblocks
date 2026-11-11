@@ -1305,6 +1305,11 @@ class ModeWidget {
 
     _undo() {
         if (this._undoStack.length > 0) {
+            if (this._playing) {
+                this.logo.synth.stop();
+            }
+            this._cancelAnimations();
+            this._setPlayButtonIcon("play-button.svg", _("Play all"));
             const prevState = JSON.parse(this._undoStack.pop());
             for (let i = 0; i < this._activeEDO; i++) {
                 this._selectedNotes[i] = prevState[i];
