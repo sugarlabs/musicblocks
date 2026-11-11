@@ -1465,6 +1465,79 @@ describe("ModeWidget", () => {
         });
     });
 
+    describe("Undo during animation", () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+        });
+
+        afterEach(() => {
+            jest.clearAllTimers();
+            jest.useRealTimers();
+        });
+
+        test.each(["_rotateRight", "_rotateLeft", "_invert"])(
+            "Undo keeps the original notes after %s callbacks would have run",
+            operation => {
+                const original = [...modeWidget._selectedNotes];
+                const label = modeWidget._modeLabelCell.textContent;
+                modeWidget[operation]();
+                jest.advanceTimersByTime(250);
+                modeWidget._undo();
+                jest.runAllTimers();
+
+                expect(modeWidget._selectedNotes).toEqual(original);
+                expect(modeWidget._modeLabelCell.textContent).toBe(label);
+                expect(modeWidget._locked).toBe(false);
+                expect(modeWidget._undoStack).toHaveLength(0);
+                modeWidget._rotateRight();
+                jest.runAllTimers();
+                expect(modeWidget._locked).toBe(false);
+            }
+        );
+
+        test("Undo cancels rotation with the fallback timer implementation", () => {
+            modeWidget._timerManager = null;
+            const original = [...modeWidget._selectedNotes];
+            modeWidget._rotateRight();
+            jest.advanceTimersByTime(250);
+            modeWidget._undo();
+            jest.runAllTimers();
+
+            expect(modeWidget._selectedNotes).toEqual(original);
+            expect(modeWidget._activeTimeouts.size).toBe(0);
+            expect(modeWidget._locked).toBe(false);
+        });
+
+        test("Undo stops playback before restoring notes", () => {
+            const original = [...modeWidget._selectedNotes];
+            modeWidget._clear();
+            modeWidget._playButton.onclick();
+            jest.advanceTimersByTime(500);
+            const triggerCount = mockActivity.logo.synth.trigger.mock.calls.length;
+            const stopCount = mockActivity.logo.synth.stop.mock.calls.length;
+            const setIcon = jest.spyOn(modeWidget, "_setPlayButtonIcon");
+            modeWidget._undo();
+            jest.runAllTimers();
+
+            expect(modeWidget._selectedNotes).toEqual(original);
+            expect(modeWidget._playing).toBe(false);
+            expect(modeWidget._locked).toBe(false);
+            expect(mockActivity.logo.synth.stop).toHaveBeenCalledTimes(stopCount + 1);
+            expect(mockActivity.logo.synth.trigger).toHaveBeenCalledTimes(triggerCount);
+            expect(setIcon).toHaveBeenCalledWith("play-button.svg", "Play all");
+        });
+
+        test("Undo with no history leaves playback running", () => {
+            modeWidget._playButton.onclick();
+            const stopCount = mockActivity.logo.synth.stop.mock.calls.length;
+            modeWidget._undo();
+
+            expect(modeWidget._playing).toBe(true);
+            expect(modeWidget._locked).toBe(true);
+            expect(mockActivity.logo.synth.stop).toHaveBeenCalledTimes(stopCount);
+        });
+    });
+
     describe("Clear during animation", () => {
         beforeEach(() => {
             jest.useFakeTimers();
