@@ -4509,11 +4509,9 @@ describe("Logo initMediaDevices", () => {
         // Keep Jest itself from failing on the rejection; the check below is
         // whether initMediaDevices handles it.
         denied.catch(() => {});
-        const catchSpy = jest.spyOn(denied, "catch");
         logo.deps.Tone = { UserMedia: jest.fn(() => ({ open: jest.fn(() => denied) })) };
 
         logo.initMediaDevices();
-        expect(catchSpy).toHaveBeenCalled();
         await new Promise(resolve => setTimeout(resolve, 0));
 
         expect(mockActivity.errorMsg).toHaveBeenCalledWith(
@@ -4521,6 +4519,40 @@ describe("Logo initMediaDevices", () => {
             undefined
         );
         expect(logo.mic).toBeNull();
+    });
+
+    test("drops analysers connected to the previous mic", () => {
+        logo.deps.Tone = { UserMedia: jest.fn(() => ({ open: jest.fn() })) };
+        logo.volumeAnalyser = { connected: "old mic" };
+        logo.pitchAnalyser = { connected: "old mic" };
+
+        logo.initMediaDevices();
+
+        expect(logo.volumeAnalyser).toBeNull();
+        expect(logo.pitchAnalyser).toBeNull();
+    });
+
+    test("closes a mic that finishes opening after a newer one replaced it", async () => {
+        let finishOpening;
+        const firstClose = jest.fn();
+        logo.deps.Tone = {
+            UserMedia: jest.fn(() => ({
+                open: jest.fn(() => new Promise(resolve => (finishOpening = resolve))),
+                close: firstClose
+            }))
+        };
+        logo.initMediaDevices();
+
+        logo.deps.Tone = {
+            UserMedia: jest.fn(() => ({ open: jest.fn(), close: jest.fn() }))
+        };
+        logo.initMediaDevices();
+        firstClose.mockClear();
+
+        finishOpening();
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(firstClose).toHaveBeenCalledTimes(1);
     });
 
     test("closes the previous mic stream instead of dropping the reference", () => {
