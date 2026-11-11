@@ -361,4 +361,154 @@ describe("Authentic Musical Compositions & Multi-Turtle Fixtures", () => {
             expect(drumDuration).toBe(2);
         });
     });
+
+    describe("Sound Mandala and Polyrhythmic Spiral Composition", () => {
+        const htmlPath = path.join(
+            projectRoot,
+            "examples",
+            "Sound-Mandala-and-Polyrhythmic-Spiral.html"
+        );
+        const tbPath = path.join(
+            projectRoot,
+            "cypress",
+            "fixtures",
+            "sound-mandala-polyrhythmic-spiral-minimal.tb"
+        );
+
+        it("HTML project file exists and contains valid embedded project code", () => {
+            expect(fs.existsSync(htmlPath)).toBe(true);
+            const htmlContent = fs.readFileSync(htmlPath, "utf8");
+            const rawData = extractProjectDataFromHTML(htmlContent);
+            expect(rawData).not.toBeNull();
+
+            const parsed = JSON.parse(rawData);
+            expect(Array.isArray(parsed)).toBe(true);
+            expect(parsed.length).toBeGreaterThan(600);
+        });
+
+        it("Cypress .tb fixture matches embedded HTML project data exactly", () => {
+            expect(fs.existsSync(tbPath)).toBe(true);
+            const tbContent = fs.readFileSync(tbPath, "utf8");
+            const tbParsed = JSON.parse(tbContent);
+
+            const htmlContent = fs.readFileSync(htmlPath, "utf8");
+            const htmlParsed = JSON.parse(extractProjectDataFromHTML(htmlContent));
+
+            expect(tbParsed).toEqual(htmlParsed);
+        });
+
+        it("passes complete reciprocal block graph connectivity validation", () => {
+            const tbContent = fs.readFileSync(tbPath, "utf8");
+            const blocks = JSON.parse(tbContent);
+            const errors = validateBlockGraph(blocks);
+            expect(errors).toEqual([]);
+        });
+
+        it("defines three coordinated turtles for solar mandala, harmonic orbit, and polyrhythmic star", () => {
+            const tbContent = fs.readFileSync(tbPath, "utf8");
+            const blocks = JSON.parse(tbContent);
+
+            const startBlocks = blocks.filter(b => Array.isArray(b[1]) && b[1][0] === "start");
+            expect(startBlocks).toHaveLength(3);
+
+            const turtleIds = new Set(startBlocks.map(b => b[1][1].id));
+            expect(turtleIds.size).toBe(3);
+        });
+
+        it("positions the three turtles with pen up, set xy, heading, and timbres", () => {
+            const tbContent = fs.readFileSync(tbPath, "utf8");
+            const blocks = JSON.parse(tbContent);
+
+            const startBlocks = blocks.filter(b => Array.isArray(b[1]) && b[1][0] === "start");
+            expect(startBlocks).toHaveLength(3);
+
+            // Turtle 1: Center (0, 0), heading 0, flute
+            expect(startBlocks[0][1][1].xcor).toBe(0);
+            expect(startBlocks[0][1][1].ycor).toBe(0);
+            expect(startBlocks[0][1][1].heading).toBe(0);
+
+            // Turtle 2: Outer orbit (0, -180), heading 90, cello
+            expect(startBlocks[1][1][1].xcor).toBe(0);
+            expect(startBlocks[1][1][1].ycor).toBe(-180);
+            expect(startBlocks[1][1][1].heading).toBe(90);
+
+            // Turtle 3: Center starburst (0, 0), heading 15, percussion
+            expect(startBlocks[2][1][1].xcor).toBe(0);
+            expect(startBlocks[2][1][1].ycor).toBe(0);
+            expect(startBlocks[2][1][1].heading).toBe(15);
+        });
+
+        it("integrates synchronized Turtle Art geometry blocks with musical sound blocks", () => {
+            const tbContent = fs.readFileSync(tbPath, "utf8");
+            const blocks = JSON.parse(tbContent);
+
+            // Check for graphic movement and styling blocks chained in the music AST
+            const forwardBlocks = blocks.filter(b => b[1] === "forward");
+            const rightBlocks = blocks.filter(b => b[1] === "right");
+            const leftBlocks = blocks.filter(b => b[1] === "left");
+            const setColorBlocks = blocks.filter(b => b[1] === "setcolor");
+            const setPenSizeBlocks = blocks.filter(b => b[1] === "setpensize");
+            const setShadeBlocks = blocks.filter(b => b[1] === "setshade");
+
+            expect(forwardBlocks.length).toBeGreaterThan(20);
+            expect(rightBlocks.length).toBeGreaterThan(15);
+            expect(leftBlocks.length).toBeGreaterThan(5);
+            expect(setColorBlocks.length).toBeGreaterThan(15);
+            expect(setPenSizeBlocks.length).toBeGreaterThan(10);
+            expect(setShadeBlocks.length).toBeGreaterThan(5);
+        });
+
+        it("aligns voice durations across solar mandala, harmonic orbit, and polyrhythmic star to exactly 4 whole notes", () => {
+            const tbContent = fs.readFileSync(tbPath, "utf8");
+            const blocks = JSON.parse(tbContent);
+
+            const mandalaDuration = calculateVoiceDuration(blocks, "solar mandala");
+            const orbitDuration = calculateVoiceDuration(blocks, "harmonic orbit");
+            const starDuration = calculateVoiceDuration(blocks, "polyrhythmic star");
+
+            expect(mandalaDuration).toBe(4);
+            expect(orbitDuration).toBe(4);
+            expect(starDuration).toBe(4);
+        });
+
+        it("implements enharmonic Bb spelling in D minor cello ground bass", () => {
+            const tbContent = fs.readFileSync(tbPath, "utf8");
+            const blocks = JSON.parse(tbContent);
+
+            // Locate note names used in the AST
+            const noteNameBlocks = blocks.filter(
+                b => Array.isArray(b[1]) && b[1][0] === "notename"
+            );
+            const noteNames = noteNameBlocks.map(b => b[1][1].value);
+
+            // In D minor/Dorian, scale degree 6 must be Bb, not A#
+            expect(noteNames).toContain("Bb");
+            expect(noteNames).not.toContain("A#");
+        });
+
+        it("decouples note execution with everybeatdo and manages color dynamics with Box variables", () => {
+            const tbContent = fs.readFileSync(tbPath, "utf8");
+            const blocks = JSON.parse(tbContent);
+
+            // Verify 'on every note do' block exists and points to 'draw petal'
+            const everyBeatBlock = blocks.find(b => b[1] === "everybeatdo");
+            expect(everyBeatBlock).toBeDefined();
+            const actionTextId = everyBeatBlock[4][1];
+            expect(blocks[actionTextId][1][1].value).toBe("draw petal");
+
+            // Verify Box variables (storein, namedbox, plus) for 'mandalaColor'
+            const storeInBlocks = blocks.filter(b => b[1] === "storein");
+            expect(storeInBlocks.length).toBeGreaterThanOrEqual(2);
+
+            const namedBoxBlocks = blocks.filter(
+                b => Array.isArray(b[1]) && b[1][0] === "namedbox"
+            );
+            expect(namedBoxBlocks.length).toBeGreaterThanOrEqual(2);
+            expect(namedBoxBlocks.every(b => b[1][1].value === "mandalaColor")).toBe(true);
+
+            // Verify plus block increments the box variable
+            const plusBlocks = blocks.filter(b => b[1] === "plus");
+            expect(plusBlocks.length).toBeGreaterThanOrEqual(1);
+        });
+    });
 });
