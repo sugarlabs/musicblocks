@@ -1230,8 +1230,7 @@ describe("ModeWidget", () => {
     test("should cancel in-flight animations and clear pending timeouts", () => {
         modeWidget._locked = true;
         modeWidget._playing = true;
-        modeWidget._timeouts = [123, 456];
-        modeWidget._setWidgetTimeout(jest.fn(), 500);
+        modeWidget._setAnimationTimeout(jest.fn(), 500);
         expect(modeWidget._timerManager.activeTimeoutCount).toBe(1);
         modeWidget._newPattern = [true, false];
         modeWidget._notesToPlay = [0, 2];
@@ -1240,8 +1239,8 @@ describe("ModeWidget", () => {
 
         expect(modeWidget._locked).toBe(false);
         expect(modeWidget._playing).toBe(false);
-        expect(modeWidget._timeouts).toEqual([]);
         expect(modeWidget._timerManager.activeTimeoutCount).toBe(0);
+        expect(modeWidget._animationTimeouts.size).toBe(0);
         expect(modeWidget._activeTimeouts.size).toBe(0);
         expect(modeWidget._newPattern).toBeNull();
         expect(modeWidget._notesToPlay).toBeNull();
@@ -1536,6 +1535,50 @@ describe("ModeWidget", () => {
             expect(modeWidget._locked).toBe(true);
             expect(mockActivity.logo.synth.stop).toHaveBeenCalledTimes(stopCount);
         });
+
+        test.each(["managed", "fallback"])(
+            "Undo preserves a pending export with %s timers",
+            timers => {
+                if (timers === "fallback") {
+                    modeWidget._timerManager = null;
+                }
+                modeWidget._rotateRight();
+                jest.runAllTimers();
+                modeWidget.blocks.loadNewBlocks = jest.fn();
+                modeWidget._save();
+                expect(modeWidget.blocks.loadNewBlocks).toHaveBeenCalledTimes(1);
+
+                modeWidget._undo();
+                jest.advanceTimersByTime(2000);
+
+                expect(modeWidget.blocks.loadNewBlocks).toHaveBeenCalledTimes(2);
+                const exported = modeWidget.blocks.loadNewBlocks.mock.calls[1][0];
+                expect(exported[0][1][0]).toBe("definemode");
+            }
+        );
+
+        test("Undo preserves pointer restoration after scaling", () => {
+            const svg = { style: {}, setAttribute: jest.fn() };
+            modeWidget._meterWheelDiv = { querySelector: jest.fn().mockReturnValue(svg) };
+            modeWidget._rotateRight();
+            modeWidget._scale();
+            expect(svg.style.pointerEvents).toBe("none");
+
+            modeWidget._undo();
+            jest.advanceTimersByTime(100);
+
+            expect(svg.style.pointerEvents).toBe("auto");
+        });
+
+        test("closing the widget still cancels a pending export", () => {
+            modeWidget.blocks.loadNewBlocks = jest.fn();
+            modeWidget._save();
+            modeWidget.widgetWindow.onclose();
+            jest.runAllTimers();
+
+            expect(modeWidget.blocks.loadNewBlocks).toHaveBeenCalledTimes(1);
+            expect(modeWidget._timerManager.activeTimeoutCount).toBe(0);
+        });
     });
 
     describe("Clear during animation", () => {
@@ -1656,7 +1699,7 @@ describe("ModeWidget", () => {
         });
 
         test("_cancelAnimations clears tracked timeouts and resets playing/locked flags", () => {
-            widget._setWidgetTimeout(jest.fn(), 500);
+            widget._setAnimationTimeout(jest.fn(), 500);
             widget._locked = true;
             widget._playing = true;
             widget._newPattern = [2, 2, 1];
@@ -1694,6 +1737,7 @@ describe("ModeWidget", () => {
 
         afterEach(() => {
             widget._clearWidgetTimers();
+            jest.useRealTimers();
         });
 
         test("initializes with ManagedTimer when available", () => {
@@ -1732,10 +1776,12 @@ describe("ModeWidget", () => {
             expect(count).toBe(3);
         });
 
-        test("_cancelAnimations delegates to timer manager clearAll and resets state", () => {
-            widget._timerManager = {
-                clearAll: jest.fn().mockReturnValue(2)
-            };
+        test("_cancelAnimations clears only animation timers and resets state", () => {
+            jest.useFakeTimers();
+            const unrelated = jest.fn();
+            const animation = jest.fn();
+            widget._setWidgetTimeout(unrelated, 500);
+            widget._setAnimationTimeout(animation, 500);
             widget._locked = true;
             widget._playing = true;
             widget._newPattern = [2, 2, 1];
@@ -1743,7 +1789,10 @@ describe("ModeWidget", () => {
 
             widget._cancelAnimations();
 
-            expect(widget._timerManager.clearAll).toHaveBeenCalledTimes(1);
+            jest.runAllTimers();
+            expect(unrelated).toHaveBeenCalledTimes(1);
+            expect(animation).not.toHaveBeenCalled();
+            expect(widget._animationTimeouts.size).toBe(0);
             expect(widget._locked).toBe(false);
             expect(widget._playing).toBe(false);
             expect(widget._newPattern).toBeNull();
