@@ -366,6 +366,14 @@ describe("transcribeMidi", () => {
     // up with connections that the target block does not reciprocate.
     const blockName = block => (Array.isArray(block[1]) ? block[1][0] : block[1]);
 
+    // The instrument each imported track plays, from its set instrument block.
+    const instrumentsOf = blocks => {
+        const byIndex = new Map(blocks.map(block => [block[0], block]));
+        return blocks
+            .filter(block => blockName(block) === "settimbre")
+            .map(block => byIndex.get(block[4][1])[1][1].value);
+    };
+
     /**
      * Mirrors the integrity check Blocks.adjustDocks() performs: for every
      * non-null connection A -> B, block B must list A among its own
@@ -626,9 +634,7 @@ describe("transcribeMidi", () => {
                 [64, 0.5, 1]
             ]);
             const byIndex = new Map(blocks.map(b => [b[0], b]));
-            expect(
-                blocks.filter(b => blockName(b) === "voicename").map(b => b[1][1].value)
-            ).toEqual(["piano", "piano"]);
+            expect(instrumentsOf(blocks)).toEqual(["piano", "piano"]);
             expect(
                 blocks
                     .filter(b => blockName(b) === "setturtlename2")
@@ -670,8 +676,11 @@ describe("transcribeMidi", () => {
                 );
                 expect(findUnreciprocatedConnections(blocks)).toEqual([]);
                 expect(blocks.every((block, index) => block[0] === index)).toBe(true);
+                // An action starts with its first note, or the volume it plays at.
                 for (const action of blocks.filter(b => blockName(b) === "action")) {
-                    expect(blockName(blocks[action[4][2]])).toBe("newnote");
+                    expect(["newnote", "setsynthvolume"]).toContain(
+                        blockName(blocks[action[4][2]])
+                    );
                 }
                 const attacks = attacksOf(readPlayback(blocks));
                 expect(attacks.length).toBeLessThanOrEqual(3);
@@ -856,11 +865,7 @@ describe("transcribeMidi", () => {
             const blocks = loadNewBlocksSpy.mock.calls[0][0];
             expect(findUnreciprocatedConnections(blocks)).toEqual([]);
             expect(blocks.filter(block => blockName(block) === "start")).toHaveLength(3);
-            expect(
-                blocks
-                    .filter(block => blockName(block) === "voicename")
-                    .map(block => block[1][1].value)
-            ).toEqual(["piano", "piano", "guitar"]);
+            expect(instrumentsOf(blocks)).toEqual(["piano", "piano", "guitar"]);
             expect(blocks.filter(block => blockName(block) === "newnote")).toHaveLength(4);
             expect(
                 blocks
@@ -1340,5 +1345,177 @@ describe("transcribeMidi", () => {
 
         // This exactly matches the legacy `master` behavior.
         expect(noteBlocks.length).toBe(100);
+    });
+
+    describe("velocity", () => {
+        // Quarter notes at 120 bpm: each lasts half a second.
+        const midiFile = ({ velocities, names, percussion = false }) => ({
+            header: {
+                ppq: 480,
+                tempos: [{ ticks: 0, bpm: 120 }],
+                timeSignatures: [{ ticks: 0, timeSignature: [4, 4] }]
+            },
+            tracks: [
+                {
+                    instrument: { name: "acoustic grand piano", percussion },
+                    channel: percussion ? 9 : 0,
+                    notes: velocities.flatMap((velocity, i) =>
+                        (Array.isArray(velocity) ? velocity : [velocity]).map((v, j) => ({
+                            name: names ? names[i] : ["C4", "E4", "G4"][j],
+                            midi: 60 + j,
+                            time: i * 0.5,
+                            duration: 0.5,
+                            velocity: v
+                        }))
+                    )
+                }
+            ]
+        });
+
+        // What the imported track plays, in order: "volume N" for each set synth volume
+        // block and "note" for each note.
+        const importFlow = async file => {
+            await transcribeMidi(file);
+            const blocks = loadNewBlocksSpy.mock.calls[0][0];
+            const byIndex = new Map(blocks.map(block => [block[0], block]));
+            const flow = [];
+            for (const block of blocks) {
+                const name = blockName(block);
+                if (name === "start") break;
+                if (name === "setsynthvolume") {
+                    const voice = byIndex.get(block[4][1])[1][1].value;
+                    flow.push(`${voice} ${byIndex.get(block[4][2])[1][1].value}`);
+                }
+                if (name === "newnote") flow.push("note");
+            }
+            expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+            return flow;
+        };
+
+        it("sets the volume where the velocity changes", async () => {
+            const flow = await importFlow(midiFile({ velocities: [0.1, 0.1, 1, 0.5] }));
+
+            expect(flow).toEqual([
+                "piano 10",
+                "note",
+                "note",
+                "piano 100",
+                "note",
+                "piano 50",
+                "note"
+            ]);
+        });
+
+        it("reads back the velocities Save as MIDI writes", async () => {
+            const flow = await importFlow(midiFile({ velocities: [13 / 127, 64 / 127, 1] }));
+
+            expect(flow).toEqual(["piano 10", "note", "piano 50", "note", "piano 100", "note"]);
+        });
+
+        it("adds no block for the default volume or small changes", async () => {
+            const flow = await importFlow(midiFile({ velocities: [0.5, 0.55, 0.46, 0.59] }));
+
+            expect(flow).toEqual(["note", "note", "note", "note"]);
+        });
+
+        it("plays a chord at the volume of its loudest note", async () => {
+            const flow = await importFlow(midiFile({ velocities: [[0.2, 0.9, 0.4]] }));
+
+            expect(flow).toEqual(["piano 90", "note"]);
+        });
+
+        it("keeps the volume over a rest and for notes with no velocity", async () => {
+            const file = midiFile({ velocities: [0.9, 0.9, undefined] });
+            // A gap after the first note becomes a rest.
+            file.tracks[0].notes[1].time = 1;
+            file.tracks[0].notes[2].time = 1.5;
+            const flow = await importFlow(file);
+
+            expect(flow).toEqual(["piano 90", "note", "note", "note", "note"]);
+        });
+
+        it("sets the volume after a tempo change at the same note", async () => {
+            const file = midiFile({ velocities: [0.5, 1] });
+            file.header.tempos.push({ ticks: 480, bpm: 60 });
+            await transcribeMidi(file);
+            const blocks = loadNewBlocksSpy.mock.calls[0][0];
+            const byIndex = new Map(blocks.map(block => [block[0], block]));
+            const setbpm = blocks.find(block => blockName(block) === "setbpm3");
+            const vspace = byIndex.get(setbpm[4][3]);
+
+            expect(blockName(byIndex.get(vspace[4][1]))).toBe("setsynthvolume");
+            expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        });
+
+        it("sets the volume at the start of a later action", async () => {
+            // The first action holds 25 notes, so the 26th starts the next one.
+            const velocities = Array.from({ length: 27 }, (_, i) => (i < 25 ? 0.5 : 1));
+            await transcribeMidi(midiFile({ velocities, names: velocities.map(() => "C4") }));
+            const blocks = loadNewBlocksSpy.mock.calls[0][0];
+            const byIndex = new Map(blocks.map(block => [block[0], block]));
+            const actions = blocks.filter(block => blockName(block) === "action");
+
+            expect(actions).toHaveLength(2);
+            expect(blockName(byIndex.get(actions[1][4][2]))).toBe("setsynthvolume");
+            expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        });
+
+        // A drum track whose notes are given as [midi number, velocity], one chord per entry.
+        const drumFile = chords => {
+            const file = midiFile({ velocities: [], percussion: true });
+            file.tracks[0].notes = chords.flatMap((chord, i) =>
+                chord.map(([midi, velocity]) => ({
+                    name: "C2",
+                    midi,
+                    time: i * 0.5,
+                    duration: 0.5,
+                    velocity
+                }))
+            );
+            return file;
+        };
+
+        it("sets the volume of a drum where its velocity changes", async () => {
+            const flow = await importFlow(drumFile([[[38, 0.2]], [[38, 0.2]], [[38, 0.9]]]));
+
+            expect(flow).toEqual(["snare drum 20", "note", "note", "snare drum 90", "note"]);
+        });
+
+        it("keeps a volume for each drum", async () => {
+            const flow = await importFlow(
+                drumFile([
+                    [
+                        [38, 0.9],
+                        [36, 0.3]
+                    ],
+                    [
+                        [38, 0.9],
+                        [36, 0.8]
+                    ],
+                    [[41, 0.52]]
+                ])
+            );
+
+            expect(flow).toEqual([
+                "snare drum 90",
+                "kick drum 30",
+                "note",
+                "kick drum 80",
+                "note",
+                "note"
+            ]);
+        });
+
+        it("sets the volume of an unknown drum, which plays as a kick drum", async () => {
+            const flow = await importFlow(drumFile([[[99, 0.9]]]));
+
+            expect(flow).toEqual(["kick drum 90", "note"]);
+        });
+
+        it("reads back the drum velocities Save as MIDI writes", async () => {
+            const flow = await importFlow(drumFile([[[38, 25 / 127]], [[38, 114 / 127]]]));
+
+            expect(flow).toEqual(["snare drum 20", "note", "snare drum 90", "note"]);
+        });
     });
 });

@@ -2763,6 +2763,7 @@ describe("processNote notation and MIDI emission guards against non-positive dur
         turtleMock.singer.oscList = { [blk]: [] };
 
         turtleMock.singer.bpm = [90];
+        turtleMock.singer.synthVolume = { piano: [50, 20] };
 
         Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
 
@@ -2773,7 +2774,8 @@ describe("processNote notation and MIDI emission guards against non-positive dur
             0,
             90,
             "piano",
-            [4, 4]
+            [4, 4],
+            { note: 20, drums: {} }
         );
         expect(activityMock.logo.updateNotation).toHaveBeenCalledWith(["C4"], 4, 0, -1, []);
     });
@@ -2827,7 +2829,8 @@ describe("processNote notation and MIDI emission guards against non-positive dur
             0,
             90,
             "piano",
-            [4, 4]
+            [4, 4],
+            expect.any(Object)
         );
         // The other notations read frequencies themselves.
         expect(activityMock.logo.updateNotation).toHaveBeenCalledWith([450], 4, 0, -1, []);
@@ -2898,8 +2901,40 @@ describe("processNote notation and MIDI emission guards against non-positive dur
                 0,
                 recorded,
                 "piano",
-                [6, 8]
+                [6, 8],
+                expect.any(Object)
             );
+        }
+    );
+
+    test.each([
+        ["the default synth when no instrument is set", {}, "DEFAULTVOICE"],
+        ["the voice when no instrument is set", { voices: ["flute"] }, "flute"],
+        ["the oscillator of the note", { instrumentNames: ["piano"], osc: ["sine"] }, "sine"]
+    ])(
+        "records the volume of %s",
+        (_label, { instrumentNames = [], voices = [], osc = [] }, synth) => {
+            const blk = "playbackSynthBlk";
+            turtleMock.singer.inNoteBlock = [blk];
+            turtleMock.singer.notePitches = { [blk]: ["C"] };
+            turtleMock.singer.noteOctaves = { [blk]: [4] };
+            turtleMock.singer.noteCents = { [blk]: [0] };
+            turtleMock.singer.noteHertz = { [blk]: [0] };
+            turtleMock.singer.noteDrums = { [blk]: [] };
+            turtleMock.singer.noteBeatValues = { [blk]: [1] };
+            turtleMock.singer.instrumentNames = instrumentNames;
+            turtleMock.singer.voices = voices;
+            turtleMock.singer.oscList = { [blk]: osc };
+            turtleMock.singer.bpm = [90];
+            // Only the synth that plays the note has this volume.
+            turtleMock.singer.synthVolume = { piano: [70], [synth]: [50, 30] };
+
+            Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+            expect(activityMock.logo.notationMIDI.mock.calls[0][7]).toEqual({
+                note: 30,
+                drums: {}
+            });
         }
     );
 
@@ -2915,6 +2950,8 @@ describe("processNote notation and MIDI emission guards against non-positive dur
         turtleMock.singer.instrumentNames = ["piano"];
         turtleMock.singer.oscList = { [blk]: [] };
         turtleMock.singer.bpm = [90];
+        // The snare drum has no volume of its own, so it plays at the default.
+        turtleMock.singer.synthVolume = { "piano": [70], "kick drum": [50, 90] };
 
         Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
 
@@ -2925,7 +2962,8 @@ describe("processNote notation and MIDI emission guards against non-positive dur
             0,
             90,
             "piano",
-            [4, 4]
+            [4, 4],
+            { note: 70, drums: { "kick drum": 90, "snare drum": DEFAULTVOLUME } }
         );
     });
 
