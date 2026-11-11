@@ -19,6 +19,11 @@ describe("ErrorHandler", () => {
     let consoleWarnSpy;
 
     beforeEach(() => {
+        try {
+            window.sessionStorage.clear();
+        } catch (e) {
+            // Ignore storage cleanup errors in the test environment.
+        }
         jest.resetModules();
         consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
         consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
@@ -362,6 +367,96 @@ describe("ErrorHandler", () => {
 
             expect(consoleErrorSpy).not.toHaveBeenCalled();
             expect(ErrorHandler.getRecentErrors()).toHaveLength(0);
+        });
+    });
+
+    describe("persistence", () => {
+        const storageKey = "mb_error_log_v1";
+
+        it("persists records to sessionStorage", () => {
+            ErrorHandler.capture("boom", { operation: "persist" });
+
+            const stored = JSON.parse(window.sessionStorage.getItem(storageKey));
+            expect(stored).toHaveLength(1);
+            expect(stored[0].operation).toBe("persist");
+            expect(stored[0].message).toBe("boom");
+        });
+
+        it("restores records after a module reload", () => {
+            ErrorHandler.capture("boom", { operation: "restore" });
+
+            jest.resetModules();
+            const Reloaded = require("../error-handler");
+            const records = Reloaded.getRecentErrors();
+
+            expect(records).toHaveLength(1);
+            expect(records[0].operation).toBe("restore");
+        });
+
+        it("clears persisted records", () => {
+            ErrorHandler.capture("boom", { operation: "clear-storage" });
+            expect(window.sessionStorage.getItem(storageKey)).not.toBeNull();
+
+            ErrorHandler.clearRecentErrors();
+
+            expect(window.sessionStorage.getItem(storageKey)).toBeNull();
+        });
+
+        it("does not throw when sessionStorage is unavailable", () => {
+            const original = window.sessionStorage;
+            Object.defineProperty(window, "sessionStorage", {
+                configurable: true,
+                value: {
+                    getItem() {
+                        throw new Error("access denied");
+                    },
+                    setItem() {
+                        throw new Error("quota exceeded");
+                    },
+                    removeItem() {
+                        throw new Error("access denied");
+                    }
+                }
+            });
+
+            try {
+                expect(() =>
+                    ErrorHandler.capture("boom", { operation: "no-storage" })
+                ).not.toThrow();
+                expect(ErrorHandler.getRecentErrors()).toHaveLength(1);
+            } finally {
+                Object.defineProperty(window, "sessionStorage", {
+                    configurable: true,
+                    value: original
+                });
+            }
+        });
+
+        it("does not throw when restoring from unavailable storage", () => {
+            const original = window.sessionStorage;
+            Object.defineProperty(window, "sessionStorage", {
+                configurable: true,
+                value: {
+                    getItem() {
+                        throw new Error("access denied");
+                    }
+                }
+            });
+
+            let reloaded;
+            try {
+                jest.resetModules();
+                expect(() => {
+                    reloaded = require("../error-handler");
+                }).not.toThrow();
+            } finally {
+                Object.defineProperty(window, "sessionStorage", {
+                    configurable: true,
+                    value: original
+                });
+            }
+
+            expect(reloaded.getRecentErrors()).toHaveLength(0);
         });
     });
 });
