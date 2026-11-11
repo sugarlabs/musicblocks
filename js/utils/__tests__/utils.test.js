@@ -1438,17 +1438,23 @@ describe("importMembers() additional branches", () => {
 
 describe("announceToScreenReader()", () => {
     let mockElement;
+    let freshAnnounceToScreenReader;
+
     beforeEach(() => {
         mockElement = { setAttribute: jest.fn(), style: {} };
         document.getElementById = jest.fn(() => null);
         document.createElement = jest.fn(() => mockElement);
         document.body.appendChild = jest.fn();
+        // Reset modules so each test gets its own live-region-ready state,
+        // instead of sharing it with whichever test ran first.
+        jest.resetModules();
+        freshAnnounceToScreenReader = require("../utils.js").announceToScreenReader;
     });
 
     it("creates and appends a live region before setting its first textContent", () => {
         jest.useFakeTimers();
 
-        announceToScreenReader("Test message 1");
+        freshAnnounceToScreenReader("Test message 1");
         expect(document.createElement).toHaveBeenCalledWith("div");
         expect(mockElement.id).toBe("mbA11yLiveRegion");
         expect(mockElement.setAttribute).toHaveBeenCalledWith("aria-live", "polite");
@@ -1463,11 +1469,43 @@ describe("announceToScreenReader()", () => {
         jest.useRealTimers();
     });
 
-    it("reuses the existing live region", () => {
+    it("applies the latest message if a second call lands before the first tick fires", () => {
+        jest.useFakeTimers();
+
+        freshAnnounceToScreenReader("Stale message");
+        freshAnnounceToScreenReader("Latest message");
+        expect(mockElement.textContent).toBeUndefined();
+
+        jest.runAllTimers();
+        expect(mockElement.textContent).toBe("Latest message");
+
+        jest.useRealTimers();
+    });
+
+    it("reuses the existing live region instead of creating a new one", () => {
+        jest.useFakeTimers();
+        freshAnnounceToScreenReader("First message");
+        jest.runAllTimers();
+        document.createElement.mockClear();
+
         document.getElementById = jest.fn(() => mockElement);
-        announceToScreenReader("Second message");
+        freshAnnounceToScreenReader("Second message");
+
         expect(document.createElement).not.toHaveBeenCalled();
         expect(mockElement.textContent).toBe("Second message");
+
+        jest.useRealTimers();
+    });
+
+    it("writes synchronously once the region is established", () => {
+        jest.useFakeTimers();
+        freshAnnounceToScreenReader("First message");
+        jest.runAllTimers();
+
+        freshAnnounceToScreenReader("Next message");
+        expect(mockElement.textContent).toBe("Next message");
+
+        jest.useRealTimers();
     });
 });
 
