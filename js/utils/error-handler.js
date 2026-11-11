@@ -75,6 +75,63 @@ const ErrorHandler = {
         return operation + "|" + message + "|" + frame;
     },
 
+    _metadata() {
+        let appVersion = "unknown";
+        let browser = "unknown";
+        let language = "unknown";
+        let mode = "unknown";
+
+        try {
+            if (typeof window !== "undefined" && window.MB_VERSION) {
+                appVersion = String(window.MB_VERSION);
+            }
+        } catch (e) {
+            // Ignore; metadata is best-effort.
+        }
+
+        try {
+            const browserUtils = typeof window !== "undefined" ? window.BrowserUtils : null;
+            if (browserUtils && typeof browserUtils.fnBrowserDetect === "function") {
+                const label = browserUtils.fnBrowserDetect();
+                if (label) {
+                    browser = String(label);
+                }
+            } else if (typeof navigator !== "undefined" && navigator.userAgent) {
+                browser = this._truncate(navigator.userAgent, 200);
+            }
+        } catch (e) {
+            // Ignore; metadata is best-effort.
+        }
+
+        try {
+            const i18n = typeof window !== "undefined" ? window.i18next : null;
+            if (i18n && typeof i18n.language === "string" && i18n.language) {
+                language = i18n.language;
+            } else if (typeof navigator !== "undefined" && navigator.language) {
+                language = navigator.language;
+            }
+        } catch (e) {
+            // Ignore; metadata is best-effort.
+        }
+
+        try {
+            if (
+                typeof window !== "undefined" &&
+                window.ActivityContext &&
+                typeof window.ActivityContext.getActivity === "function"
+            ) {
+                const activity = window.ActivityContext.getActivity();
+                if (activity && typeof activity.beginnerMode === "boolean") {
+                    mode = activity.beginnerMode ? "beginner" : "advanced";
+                }
+            }
+        } catch (e) {
+            // Ignore; metadata is best-effort.
+        }
+
+        return { appVersion, browser, language, mode };
+    },
+
     _record(level, error, context) {
         try {
             const operation = context && context.operation ? String(context.operation) : "";
@@ -94,6 +151,7 @@ const ErrorHandler = {
             }
 
             const timestamp = new Date().toISOString();
+            const metadata = this._metadata();
             const entry = {
                 key,
                 level,
@@ -103,6 +161,10 @@ const ErrorHandler = {
                 source,
                 line,
                 column,
+                appVersion: metadata.appVersion,
+                browser: metadata.browser,
+                language: metadata.language,
+                mode: metadata.mode,
                 count: 1,
                 firstSeen: timestamp,
                 lastSeen: timestamp

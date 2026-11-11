@@ -140,6 +140,13 @@ describe("releaseconfig globals", () => {
             expect(Array.isArray(releaseconfig.LOADING_TEXTS)).toBe(true);
             expect(releaseconfig.LOADING_TEXTS.length).toBeGreaterThan(0);
         });
+
+        test("exposes the app version and keeps it in sync with package.json", () => {
+            const pkg = require("../../package.json");
+
+            expect(releaseconfig.MB_VERSION).toBe(pkg.version);
+            expect(window.MB_VERSION).toBe(releaseconfig.MB_VERSION);
+        });
     });
 
     describe("Release notes policy", () => {
