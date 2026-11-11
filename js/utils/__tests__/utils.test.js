@@ -1495,6 +1495,28 @@ describe("announceToScreenReader()", () => {
         jest.useRealTimers();
     });
 
+    it("re-announces an identical repeated message by clearing it first", () => {
+        jest.useFakeTimers();
+        freshAnnounceToScreenReader("Setup message");
+        jest.runAllTimers();
+
+        freshAnnounceToScreenReader("Repeat message");
+        freshAnnounceToScreenReader("Repeat message");
+        // The first write happens right away, since the region is ready and idle.
+        expect(mockElement.textContent).toBe("Repeat message");
+
+        // Some browsers won't re-announce a live region whose text doesn't
+        // actually change, so the identical repeat clears it first...
+        jest.advanceTimersByTime(300);
+        expect(mockElement.textContent).toBe("");
+
+        // ...then writes the message again on a later tick.
+        jest.runOnlyPendingTimers();
+        expect(mockElement.textContent).toBe("Repeat message");
+
+        jest.useRealTimers();
+    });
+
     it("reuses the existing live region instead of creating a new one", () => {
         jest.useFakeTimers();
         freshAnnounceToScreenReader("First message");
