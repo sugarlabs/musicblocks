@@ -15,7 +15,8 @@
    global
 
    _, ManagedTimer, ReflectionLifecycle, ReflectionWindow, ReflectionChatLog,
-   ReflectionSession, ReflectionBackend, ReflectionReport, ReflectionMarkdown
+   ReflectionSession, ReflectionBackend, ReflectionReport, ReflectionMarkdown,
+   announceToScreenReader
 */
 
 /*
@@ -329,6 +330,7 @@ class ReflectionMatrix {
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
+        announceToScreenReader(_("Reflection opened"));
         widgetWindow.getWidgetBody().style.height = ReflectionMatrix.OUTERWINDOWHEIGHT;
         widgetWindow.getWidgetBody().style.width = ReflectionMatrix.OUTERWINDOWWIDTH;
 
