@@ -14,7 +14,7 @@
  * MA 02110-1335 USA.
  */
 
-/* global _, ReflectionMatrix */
+/* global _, ReflectionMatrix, announceToScreenReader */
 /*
     Globals location
     - js/utils/utils.js
@@ -153,6 +153,7 @@ class ReflectionWindow {
         if (this.chatHistory.length === 0) this.triggerFirst = false;
         this.activity.isInputON = false;
         this._endSession();
+        announceToScreenReader(_("Reflection closed"));
         this.widgetWindow.destroy();
     }
 

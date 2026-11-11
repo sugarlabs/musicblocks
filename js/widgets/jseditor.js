@@ -22,7 +22,7 @@
  * Private members' names begin with underscore '_".
  */
 
-/* global docById, MusicBlocks, hljs, CodeJar, JSGenerate, JS_API, pubsub */
+/* global docById, MusicBlocks, hljs, CodeJar, JSGenerate, JS_API, pubsub, _, announceToScreenReader */
 
 /* exported JSEditor */
 
@@ -44,6 +44,7 @@ class JSEditor {
         this.widgetWindow.clear();
         this.widgetWindow.show();
         this.widgetWindow.setPosition(160, 132);
+        announceToScreenReader(_("JavaScript Editor opened"));
 
         /** topmost DOM container for the widget contents */
         this._editor = document.createElement("div");
@@ -345,6 +346,7 @@ class JSEditor {
                 this._styles = null;
             }
             this.isOpen = false;
+            announceToScreenReader(_("JavaScript Editor closed"));
             defaultOnClose();
         };
 

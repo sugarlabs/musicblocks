@@ -43,6 +43,7 @@ global.DOMPurify = require("../../../lib/purify.min.js");
 
 // Mock globals
 global._ = str => str;
+global.announceToScreenReader = jest.fn();
 
 // Mock window.widgetWindows and widget
 function createMockWidgetWindow() {
@@ -271,6 +272,7 @@ describe("ReflectionMatrix", () => {
             const body = mockWidgetWindow.getWidgetBody();
             expect(body.style.height).toBe(ReflectionMatrix.OUTERWINDOWHEIGHT);
             expect(body.style.width).toBe(ReflectionMatrix.OUTERWINDOWWIDTH);
+            expect(announceToScreenReader).toHaveBeenCalledWith("Reflection opened");
         });
 
         test("Sets up onclose handler", () => {
