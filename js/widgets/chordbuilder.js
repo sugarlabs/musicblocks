@@ -32,6 +32,8 @@
 class ChordBuilderWidget {
     static dependencies = ["widgets/ChordBuilderAudio", "widgets/chordbuilder"];
 
+    static MAX_BARS = 16;
+
     static ROOT_KEYS = [
         "C",
         "C#",
@@ -429,6 +431,10 @@ class ChordBuilderWidget {
      */
     addChord(chord) {
         if (!chord) return;
+        if (this.progression.length >= ChordBuilderWidget.MAX_BARS * this.beatsPerBar) {
+            this.errorMsg(_("The progression is full. Remove a chord before adding another."));
+            return;
+        }
         const chordClone = { ...chord };
         this.progression.push(chordClone);
         if (this.audio) {
@@ -522,7 +528,7 @@ class ChordBuilderWidget {
             return;
         }
 
-        if (this.progression.length === 0) {
+        if (this.progression.every(chord => chord === null)) {
             this.errorMsg(_("Add chords to your progression before saving."));
             return;
         }
@@ -541,6 +547,45 @@ class ChordBuilderWidget {
         let lastFlowConnIndex = 1; // flow connection slot for start block
 
         this.progression.forEach(chord => {
+            if (chord === null) {
+                const noteBlockId = idCounter++;
+                const durationId = idCounter++;
+                const durationNumeratorId = idCounter++;
+                const durationDenominatorId = idCounter++;
+                const restId = idCounter++;
+                const noteEndId = idCounter++;
+
+                newStack.push([
+                    noteBlockId,
+                    ["newnote", {}],
+                    0,
+                    0,
+                    [lastFlowId, durationId, restId, noteEndId]
+                ]);
+                newStack.push([
+                    durationId,
+                    ["divide", {}],
+                    0,
+                    0,
+                    [noteBlockId, durationNumeratorId, durationDenominatorId]
+                ]);
+                newStack.push([durationNumeratorId, ["number", { value: 1 }], 0, 0, [durationId]]);
+                newStack.push([
+                    durationDenominatorId,
+                    ["number", { value: 4 }],
+                    0,
+                    0,
+                    [durationId]
+                ]);
+                newStack.push([restId, ["rest2", {}], 0, 0, [noteBlockId, null]]);
+                newStack.push([noteEndId, ["hidden", {}], 0, 0, [noteBlockId, null]]);
+
+                newStack[lastFlowId][4][lastFlowConnIndex] = noteBlockId;
+                lastFlowId = noteEndId;
+                lastFlowConnIndex = 1;
+                return;
+            }
+
             const chordBlockId = idCounter++;
             const chordNameId = idCounter++;
             const noteBlockId = idCounter++;
@@ -551,6 +596,7 @@ class ChordBuilderWidget {
             const rootId = idCounter++;
             const octaveId = idCounter++;
             const noteEndId = idCounter++;
+            const chordEndId = idCounter++;
 
             // Map chord quality to MusicBlocks chord type
             let chordType = "major";
@@ -563,7 +609,7 @@ class ChordBuilderWidget {
                 ["chordinterval", {}],
                 0,
                 0,
-                [lastFlowId, chordNameId, noteBlockId, null]
+                [lastFlowId, chordNameId, noteBlockId, chordEndId]
             ]);
             newStack.push([chordNameId, ["chordname", { value: chordType }], 0, 0, [chordBlockId]]);
             // Connect newnote body slot directly to pitch — no vspace needed
@@ -593,11 +639,12 @@ class ChordBuilderWidget {
             newStack.push([rootId, ["notename", { value: chord.root }], 0, 0, [pitchBlockId]]);
             newStack.push([octaveId, ["number", { value: this.octave }], 0, 0, [pitchBlockId]]);
             newStack.push([noteEndId, ["hidden", {}], 0, 0, [noteBlockId, null]]);
+            newStack.push([chordEndId, ["hidden", {}], 0, 0, [chordBlockId, null]]);
 
             // Link previous block's flow slot to this chord block
             newStack[lastFlowId][4][lastFlowConnIndex] = chordBlockId;
-            lastFlowId = chordBlockId;
-            lastFlowConnIndex = 3;
+            lastFlowId = chordEndId;
+            lastFlowConnIndex = 1;
         });
 
         this.blocks.loadNewBlocks(newStack);
@@ -761,8 +808,9 @@ class ChordBuilderWidget {
         barsInput.id = "chordNumBarsInput";
         barsInput.type = "number";
         barsInput.min = "1";
-        barsInput.max = "16";
+        barsInput.max = String(ChordBuilderWidget.MAX_BARS);
         barsInput.value = String(this.numBars);
+        this.barsInput = barsInput;
         barsInput.style.width = "48px";
         barsInput.style.padding = "2px 4px";
         barsInput.style.borderRadius = "4px";
@@ -770,10 +818,12 @@ class ChordBuilderWidget {
         barsInput.style.fontSize = "12px";
         barsInput.onchange = e => {
             const n = parseInt(e.target.value, 10);
-            if (n >= 1 && n <= 16) {
+            if (n >= 1 && n <= ChordBuilderWidget.MAX_BARS) {
                 this.numBars = n;
                 this._renderBarGrid();
             }
+            // Show the bar count in use, so a rejected or decimal entry doesn't stay in the box.
+            e.target.value = String(this.numBars);
         };
 
         const beatsLabel = document.createElement("span");
@@ -791,7 +841,13 @@ class ChordBuilderWidget {
             beatsSelect.appendChild(opt);
         });
         beatsSelect.onchange = e => {
-            this.beatsPerBar = parseInt(e.target.value, 10);
+            const beats = parseInt(e.target.value, 10);
+            if (this.progression.length > ChordBuilderWidget.MAX_BARS * beats) {
+                this.errorMsg(_("Remove chords before reducing the number of beats."));
+                e.target.value = String(this.beatsPerBar);
+                return;
+            }
+            this.beatsPerBar = beats;
             this._renderBarGrid();
         };
 
@@ -949,6 +1005,12 @@ class ChordBuilderWidget {
      * @private
      */
     _renderBarGrid() {
+        // All stored beats must remain visible, including rests between chords.
+        this.numBars = Math.max(
+            this.numBars,
+            Math.ceil(this.progression.length / this.beatsPerBar)
+        );
+        if (this.barsInput) this.barsInput.value = String(this.numBars);
         if (!this.barGridContainer) return;
         this.barGridContainer.innerHTML = "";
 

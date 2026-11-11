@@ -16,6 +16,7 @@ export default [
             "**/*.min.js",
             "**/bower_components/**",
             "**/planet/libs/**",
+            "usermanual/MusicBlocksUserManual-GSoC-2017/**",
             "**/sounds/**",
             "**/.kilo/**"
         ]

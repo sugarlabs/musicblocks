@@ -581,7 +581,7 @@ all have essentially the same modal pattern; the starting point is
 just shifted slightly for each: Dorian could be thought of starting
 from the second scale degree of Major and Phrygian from the third, for
 example. Not all modes have this relationship to Major. The ones that
-do are: Ionian (Major), Dorian, Phrygian, Lydian, Myxolydian, Aeolian
+do are: Ionian (Major), Dorian, Phrygian, Lydian, Mixolydian, Aeolian
 (Minor), and Locrian.
 
 **Set Key & Scalar Step**

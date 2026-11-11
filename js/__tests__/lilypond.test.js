@@ -52,6 +52,7 @@ global.NOTATIONDOTCOUNT = NOTATIONDOTCOUNT;
 global._ = jest.fn(str => str);
 global.last = jest.fn(array => array[array.length - 1]);
 global.getCurrentEDO = jest.fn(() => 12);
+global.plainUnwritableTuplets = require("../utils/musicutils-rhythm").plainUnwritableTuplets;
 
 const { getLilypondHeader, processLilypondNotes, saveLilypondOutput } = require("../lilypond");
 
@@ -210,30 +211,90 @@ describe("processLilypondNotes", () => {
         logo.notation.notationStaging[turtle] = [
             "begin slur",
             [["G4"], 4, 0, null, 0, -1, false],
+            [["A4"], 4, 0, null, 0, -1, false],
             "end slur"
         ];
         processLilypondNotes(lilypond, logo, turtle);
-        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "g'4 (  )  ");
+        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "g'4 (  a'4 )  ");
     });
 
     test("should process a crescendo correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "begin crescendo",
             [["G4"], 4, 0, null, 0, -1, false],
+            [["A4"], 4, 0, null, 0, -1, false],
             "end crescendo"
         ];
         processLilypondNotes(lilypond, logo, turtle);
-        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "  g'4 \\< \\! ");
+        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "  g'4 \\< a'4 \\! ");
     });
 
     test("should process a decrescendo correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "begin decrescendo",
             [["G4"], 4, 0, null, 0, -1, false],
+            [["A4"], 4, 0, null, 0, -1, false],
             "end decrescendo"
         ];
         processLilypondNotes(lilypond, logo, turtle);
-        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "  g'4 \\> \\! ");
+        expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "  g'4 \\> a'4 \\! ");
+    });
+
+    // Lilypond cannot end a slur or hairpin on the note it starts on, so these
+    // are left out rather than written as "g'4 (  )" or "g'4 \< \!".
+    describe("a slur or hairpin that covers fewer than two notes", () => {
+        test.each([
+            ["begin slur", "end slur"],
+            ["begin crescendo", "end crescendo"],
+            ["begin decrescendo", "end decrescendo"]
+        ])("should leave out %s / %s around a single note", (begin, end) => {
+            logo.notation.notationStaging[turtle] = [
+                begin,
+                [["G4"], 4, 0, null, 0, -1, false],
+                end,
+                [["A4"], 4, 0, null, 0, -1, false]
+            ];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).toBe("\\meter\n" + "g'4 a'4 ");
+        });
+
+        test("should not open an empty slur on the note after it", () => {
+            logo.notation.notationStaging[turtle] = [
+                "begin slur",
+                "end slur",
+                [["A4"], 4, 0, null, 0, -1, false]
+            ];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).toBe("\\meter\n" + "a'4 ");
+        });
+
+        test("should keep a following slur that covers two notes", () => {
+            logo.notation.notationStaging[turtle] = [
+                "begin slur",
+                [["C4"], 4, 0, null, 0, -1, false],
+                "end slur",
+                "begin slur",
+                [["D4"], 4, 0, null, 0, -1, false],
+                [["E4"], 4, 0, null, 0, -1, false],
+                "end slur"
+            ];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).toBe("\\meter\n" + "c'4 d'4 (  e'4 )  ");
+        });
+
+        test("should not treat markup text that reads 'end slur' as a marker", () => {
+            logo.notation.notationStaging[turtle] = [
+                "begin slur",
+                [["C4"], 4, 0, null, 0, -1, false],
+                "markup",
+                "end slur",
+                [["D4"], 4, 0, null, 0, -1, false],
+                "end slur"
+            ];
+            processLilypondNotes(lilypond, logo, turtle);
+            expect(logo.notationNotes[turtle]).toContain("c'4 (  ");
+            expect(logo.notationNotes[turtle]).toContain("d'4 )  ");
+        });
     });
 
     test("should process a tuplet correctly", () => {
@@ -307,6 +368,21 @@ describe("processLilypondNotes", () => {
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("{ c' 8(  d' 8e' 8)  } f'4 ");
+    });
+
+    test("should leave out a single-note slur that ends on the last note of a tuplet", () => {
+        logo.notation.notationStaging[turtle] = [
+            tripletNote("C4"),
+            tripletNote("D4"),
+            "begin slur",
+            tripletNote("E4"),
+            "end slur",
+            [["F4"], 4, 0, null, 0, -1, false]
+        ];
+        processLilypondNotes(lilypond, logo, turtle);
+        expect(logo.notationNotes[turtle]).not.toContain("(");
+        expect(logo.notationNotes[turtle]).not.toContain(")");
+        expect(logo.notationNotes[turtle]).toContain("f'4 ");
     });
 
     test("should wrap a forever loop in repeat bars that run to the end of the voice", () => {
@@ -722,6 +798,17 @@ describe("saveLilypondOutput", () => {
         const result = saveLilypondOutput(activity);
         expect(result).toContain("\\drummode {");
         expect(result).toContain("sn4 r4 sn4 sn4");
+    });
+
+    test("should write the drums of one note as a chord in drummode", () => {
+        activity.logo.notation.notationDrumStaging = {
+            0: [
+                [["bd", "sn"], 4, 0, null, 0, -1, false],
+                [["bd"], 4, 0, null, 0, -1, false]
+            ]
+        };
+        const result = saveLilypondOutput(activity);
+        expect(result).toContain("<bd sn>4 bd4");
     });
 
     test("should keep drum voices out of the guitar tablature", () => {
@@ -1173,5 +1260,42 @@ describe("saveLilypondOutput - drum staff numbering", () => {
         const result = saveLilypondOutput(build(n));
 
         expect(result).toContain('shortInstrumentName = "d1"');
+    });
+});
+
+describe("processLilypondNotes - fractional tuplets", () => {
+    const exportNotes = staged => {
+        const logo = {
+            notationNotes: { 0: "" },
+            notation: { notationStaging: { 0: staged } },
+            synth: { inTemperament: "equal" }
+        };
+        processLilypondNotes("", logo, 0);
+        return logo.notationNotes[0];
+    };
+
+    it("writes the rows examples/test-suite.html stages as plain notes", () => {
+        const notes = exportNotes([
+            [["G4"], 1, 0, [4.012036108324975, 0.5], 2, -1, false, null],
+            [["A4"], 1, 0, [3.988035892323031, 0.5], 1, -1, false, null]
+        ]);
+        expect(notes).not.toContain("\\tuplet");
+        expect(notes.match(/2/g)).toHaveLength(2);
+    });
+
+    it("writes what is left of a note at a bar line as a plain note", () => {
+        const notes = exportNotes([[["G4"], 1, 0, [625, 1], 128, -1, false, null]]);
+        expect(notes).not.toContain("\\tuplet");
+    });
+
+    it("writes a note of two whole notes as a breve", () => {
+        const notes = exportNotes([[["G4"], 1, 0, [1, 0.5], 1, -1, false, null]]);
+        expect(notes).toContain("\\breve");
+        expect(notes).not.toContain("\\tuplet");
+    });
+
+    it("leaves a whole tuplet alone", () => {
+        const triplet = [["G4"], 1, 0, [3, 1], 2, -1, false, null];
+        expect(exportNotes([triplet, triplet, triplet])).toContain("\\tuplet");
     });
 });

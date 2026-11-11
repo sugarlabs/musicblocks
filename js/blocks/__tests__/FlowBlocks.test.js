@@ -292,6 +292,35 @@ describe("FlowBlocks integration", () => {
         expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
     });
 
+    test("DuplicateBlock safely handles non-finite duplication factors", () => {
+        const block = getBlock("duplicatenotes");
+        const blk = 0;
+        activity.blocks.blockList = {
+            0: { name: "duplicatenotes", connections: [null, 1, null, 2] },
+            1: { name: "visibleA", connections: [0, 2] },
+            2: { name: "hidden", connections: [1, null] }
+        };
+        activity.blocks.findBottomBlock = jest.fn(() => 1);
+
+        for (const nonFinite of [Infinity, -Infinity, NaN]) {
+            activity.errorMsg.mockClear();
+            logo.connectionStore = { 0: { [blk]: [] } };
+            logo.connectionStoreLock = false;
+            const turtle = activity.turtles.ithTurtle(0);
+            turtle.singer.duplicateFactor = 1;
+            turtle.queue = [];
+
+            block.flow([nonFinite, 1], logo, 0, blk, ["arg"]);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, blk);
+            expect(turtle.singer.duplicateFactor).toBe(2);
+            expect(turtle.queue[0].count).toBe(2);
+
+            const listener = logo.setTurtleListener.mock.calls.pop()[2];
+            listener();
+            expect(turtle.singer.duplicateFactor).toBe(1);
+        }
+    });
+
     test("DuplicateBlock releases lock even when critical section throws", () => {
         const block = getBlock("duplicatenotes");
         const blk = 0;
@@ -474,18 +503,66 @@ describe("FlowBlocks integration", () => {
         expect(remaining).toHaveLength(1);
     });
 
+    test("WaitForBlock flushes older duplicate requeues while preserving unrelated trailing queue items", () => {
+        const block = getBlock("waitFor");
+        const blk = 6;
+        activity.blocks.blockList[blk] = { connections: [60] };
+        const turtle = activity.turtles.ithTurtle(0);
+        turtle.queue = [];
+
+        turtle.queue.push(new Queue(blk, 1, blk));
+        turtle.queue.push(new Queue(blk, 1, blk));
+        turtle.queue.push(new Queue(blk, 1, blk));
+        turtle.queue.push(new Queue(99, 1, 999));
+
+        block.flow([true], logo, 0, blk);
+
+        expect(turtle.queue).toHaveLength(2);
+        expect(turtle.queue[0].blk).toBe(blk);
+        expect(turtle.queue[0].parentBlk).toBe(blk);
+        expect(turtle.queue[1].blk).toBe(99);
+        expect(turtle.queue[1].parentBlk).toBe(999);
+    });
+
+    test("WaitForBlock cleanup respects actionBoundaries and does not remove entries below nested action boundary", () => {
+        const block = getBlock("waitFor");
+        const blk = 6;
+        activity.blocks.blockList[blk] = { connections: [60] };
+        const turtle = activity.turtles.ithTurtle(0);
+
+        turtle.queue = [];
+        turtle.queue.push(new Queue(50, 1, 500));
+        turtle.queue.push(new Queue(51, 1, 501));
+        turtle.queue.push(new Queue(blk, 1, blk));
+        turtle.queue.push(new Queue(blk, 1, blk));
+        turtle.queue.push(new Queue(99, 1, 999));
+
+        turtle.actionBoundaries = [2];
+
+        block.flow([true], logo, 0, blk);
+
+        expect(turtle.queue).toHaveLength(4);
+        expect(turtle.queue[0].blk).toBe(50);
+        expect(turtle.queue[1].blk).toBe(51);
+        expect(turtle.queue[2].parentBlk).toBe(blk);
+        expect(turtle.queue[3].blk).toBe(99);
+    });
+
     test("UntilBlock requeues when false and cleans when true", () => {
         const block = getBlock("until");
         const blk = 7;
         activity.blocks.blockList[blk] = { connections: [70] };
-        block.flow([false, 71], logo, 0, blk);
+        const res = block.flow([false, 71], logo, 0, blk);
+        expect(res).toEqual([71, 1]);
         expect(activity.turtles.ithTurtle(0).queue.pop().parentBlk).toBe(70);
 
         const turtle = activity.turtles.ithTurtle(0);
         turtle.queue.push(new Queue(99, 1, blk));
         turtle.queue.push(new Queue(98, 1, blk));
-        block.flow([true, 72], logo, 0, blk);
+        const resClean = block.flow([true, 72], logo, 0, blk);
+        expect(resClean).toBeUndefined();
         expect(turtle.queue).toHaveLength(1);
+        expect(turtle.queue[0].blk).toBe(98);
     });
 
     test("WhileBlock requeues when true and flushes when false", () => {
@@ -500,8 +577,10 @@ describe("FlowBlocks integration", () => {
 
         turtle.queue.push(new Queue(99, 1, blk));
         turtle.queue.push(new Queue(98, 1, blk));
-        block.flow([false, 82], logo, 0, blk);
+        const resFlush = block.flow([false, 82], logo, 0, blk);
+        expect(resFlush).toBeUndefined();
         expect(turtle.queue).toHaveLength(1);
+        expect(turtle.queue[0].blk).toBe(98);
     });
 
     test("WaitForBlock's requeue carries receivedArg forward so a later re-check can still resolve an arg block (#8696)", () => {
@@ -561,6 +640,54 @@ describe("FlowBlocks integration", () => {
         const block = getBlock("if");
         expect(block.flow([true, 10])).toEqual([10, 1]);
         expect(block.flow([false, 10])).toBeUndefined();
+    });
+
+    test("WhileBlock does not flow when condition is false", () => {
+        const block = getBlock("while");
+        const blk = 8;
+        activity.blocks.blockList[blk] = { connections: [80] };
+        expect(block.flow([false, 10], logo, 0, blk)).toBeUndefined();
+    });
+
+    test("WhileBlock preserves outflow block connected below when condition is false", () => {
+        const block = getBlock("while");
+        const blk = 8;
+        activity.blocks.blockList[blk] = { connections: [80] };
+        const turtle = activity.turtles.ithTurtle(0);
+        turtle.queue = [];
+
+        turtle.queue.push(new Queue(50, 1, 999));
+        turtle.queue.push(new Queue(85, 1, blk));
+
+        const res = block.flow([false, 10], logo, 0, blk);
+        expect(res).toBeUndefined();
+        expect(turtle.queue).toHaveLength(2);
+        expect(turtle.queue[0].blk).toBe(50);
+        expect(turtle.queue[1].blk).toBe(85);
+    });
+
+    test("UntilBlock does not flow when condition is true", () => {
+        const block = getBlock("until");
+        const blk = 7;
+        activity.blocks.blockList[blk] = { connections: [70] };
+        expect(block.flow([true, 10], logo, 0, blk)).toBeUndefined();
+    });
+
+    test("UntilBlock preserves outflow block connected below when condition is true", () => {
+        const block = getBlock("until");
+        const blk = 7;
+        activity.blocks.blockList[blk] = { connections: [70] };
+        const turtle = activity.turtles.ithTurtle(0);
+        turtle.queue = [];
+
+        turtle.queue.push(new Queue(50, 1, 999));
+        turtle.queue.push(new Queue(75, 1, blk));
+
+        const res = block.flow([true, 10], logo, 0, blk);
+        expect(res).toBeUndefined();
+        expect(turtle.queue).toHaveLength(2);
+        expect(turtle.queue[0].blk).toBe(50);
+        expect(turtle.queue[1].blk).toBe(75);
     });
 
     test("ForeverBlock returns continuous or limited flow", () => {
@@ -760,22 +887,204 @@ describe("FlowBlocks integration", () => {
         }
     });
 
-    test("DuplicateFactorBlock exposes singer value or status field", () => {
-        const block = getBlock("duplicatefactor");
-        const blk = 11;
-        activity.blocks.blockList[blk] = { connections: [12] };
-        activity.blocks.blockList[12] = { name: "print" };
+    describe("DuplicateFactorBlock", () => {
+        const { Logo } = require("../../logo");
 
-        logo.inStatusMatrix = true;
-        logo.statusFields = [];
-        block.arg(logo, 0, blk);
-        expect(logo.statusFields).toContainEqual([blk, "duplicate"]);
+        beforeEach(() => {
+            logo.turtles = activity.turtles;
+            logo.blockList = activity.blocks.blockList;
+            logo.statusFields = [];
+        });
 
-        logo.inStatusMatrix = false;
-        block.arg(logo, 0, blk);
-        expect(activity.blocks.blockList[blk].value).toBe(
-            activity.turtles.ithTurtle(0).singer.duplicateFactor
-        );
+        test("DuplicateFactorBlock exposes singer value or status field", () => {
+            const block = getBlock("duplicatefactor");
+            const blk = 11;
+            activity.blocks.blockList[blk] = { connections: [12] };
+            activity.blocks.blockList[12] = { name: "print" };
+
+            logo.inStatusMatrix = true;
+            logo.statusFields = [];
+            expect(block.arg(logo, 0, blk)).toBeUndefined();
+            expect(logo.statusFields).toContainEqual([blk, "duplicate"]);
+
+            logo.inStatusMatrix = false;
+            const expectedFactor = activity.turtles.ithTurtle(0).singer.duplicateFactor;
+            expect(block.arg(logo, 0, blk)).toBe(expectedFactor);
+            expect(activity.blocks.blockList[blk].value).toBe(expectedFactor);
+        });
+
+        test("arg() returns duplicateFactor and assigns blockList[blk].value directly", () => {
+            const block = getBlock("duplicatefactor");
+            const blk = 11;
+            activity.blocks.blockList[blk] = { connections: [12] };
+            activity.blocks.blockList[12] = { name: "print" };
+            activity.turtles.ithTurtle(0).singer.duplicateFactor = 4;
+
+            logo.inStatusMatrix = false;
+            const res = block.arg(logo, 0, blk);
+
+            expect(res).toBe(4);
+            expect(activity.blocks.blockList[blk].value).toBe(4);
+        });
+
+        test("logo.parseArg() evaluates duplicateFactor (factor = 4) without overwriting value with undefined", () => {
+            const block = getBlock("duplicatefactor");
+            const blk = 11;
+            activity.blocks.blockList[blk] = {
+                protoblock: block,
+                connections: [12],
+                value: 999
+            };
+            activity.blocks.blockList[12] = { name: "print" };
+            activity.turtles.ithTurtle(0).singer.duplicateFactor = 4;
+
+            logo.inStatusMatrix = false;
+            const res = Logo.prototype.parseArg.call(logo, logo, 0, blk);
+
+            expect(res).toBe(4);
+            expect(activity.blocks.blockList[blk].value).toBe(4);
+            expect(activity.blocks.blockList[blk].value).not.toBeUndefined();
+        });
+
+        test("logo.parseArg() evaluates fractional duplicateFactor (factor = 2.5)", () => {
+            const block = getBlock("duplicatefactor");
+            const blk = 11;
+            activity.blocks.blockList[blk] = {
+                protoblock: block,
+                connections: [12],
+                value: 999
+            };
+            activity.blocks.blockList[12] = { name: "print" };
+            activity.turtles.ithTurtle(0).singer.duplicateFactor = 2.5;
+
+            logo.inStatusMatrix = false;
+            const res = Logo.prototype.parseArg.call(logo, logo, 0, blk);
+
+            expect(res).toBe(2.5);
+            expect(activity.blocks.blockList[blk].value).toBe(2.5);
+        });
+
+        test("reflects varying duplicateFactor values dynamically across direct arg and parseArg calls", () => {
+            const block = getBlock("duplicatefactor");
+            const blk = 11;
+            activity.blocks.blockList[blk] = {
+                protoblock: block,
+                connections: [0],
+                value: null
+            };
+
+            for (const factor of [1, 2.5, 6]) {
+                activity.turtles.ithTurtle(0).singer.duplicateFactor = factor;
+                const parseRes = Logo.prototype.parseArg.call(logo, logo, 0, blk);
+                expect(parseRes).toBe(factor);
+                expect(activity.blocks.blockList[blk].value).toBe(factor);
+
+                const directRes = block.arg(logo, 0, blk);
+                expect(directRes).toBe(factor);
+                expect(activity.blocks.blockList[blk].value).toBe(factor);
+            }
+        });
+
+        test("evaluates duplicateFactor for different turtle indices independently", () => {
+            const block = getBlock("duplicatefactor");
+            const blk = 11;
+            activity.blocks.blockList[blk] = {
+                protoblock: block,
+                connections: [12],
+                value: null
+            };
+            activity.blocks.blockList[12] = { name: "print" };
+            activity.turtles.ithTurtle(0).singer.duplicateFactor = 3;
+            activity.turtles.ithTurtle(1).singer.duplicateFactor = 5;
+
+            logo.inStatusMatrix = false;
+            expect(Logo.prototype.parseArg.call(logo, logo, 0, blk)).toBe(3);
+            expect(activity.blocks.blockList[blk].value).toBe(3);
+
+            expect(Logo.prototype.parseArg.call(logo, logo, 1, blk)).toBe(5);
+            expect(activity.blocks.blockList[blk].value).toBe(5);
+        });
+
+        test("status-matrix with print parent registers field and does not assign value", () => {
+            const block = getBlock("duplicatefactor");
+            const blk = 11;
+            activity.blocks.blockList[blk] = {
+                protoblock: block,
+                connections: [12],
+                value: undefined
+            };
+            activity.blocks.blockList[12] = { name: "print" };
+            activity.turtles.ithTurtle(0).singer.duplicateFactor = 5;
+
+            logo.inStatusMatrix = true;
+            logo.statusFields = [];
+            const res = block.arg(logo, 0, blk);
+
+            expect(logo.statusFields).toEqual([[blk, "duplicate"]]);
+            expect(res).toBeUndefined();
+        });
+
+        test("logo.parseArg() in status-matrix with print parent returns undefined and registers field", () => {
+            const block = getBlock("duplicatefactor");
+            const blk = 11;
+            activity.blocks.blockList[blk] = {
+                protoblock: block,
+                connections: [12],
+                value: "initial"
+            };
+            activity.blocks.blockList[12] = { name: "print" };
+            activity.turtles.ithTurtle(0).singer.duplicateFactor = 4;
+
+            logo.inStatusMatrix = true;
+            logo.statusFields = [];
+            const res = Logo.prototype.parseArg.call(logo, logo, 0, blk);
+
+            expect(res).toBeUndefined();
+            expect(activity.blocks.blockList[blk].value).toBeUndefined();
+            expect(logo.statusFields).toEqual([[blk, "duplicate"]]);
+        });
+
+        test("status-matrix with non-print parent returns duplicateFactor", () => {
+            const block = getBlock("duplicatefactor");
+            const blk = 11;
+            activity.blocks.blockList[blk] = {
+                protoblock: block,
+                connections: [13],
+                value: undefined
+            };
+            activity.blocks.blockList[13] = { name: "plus" };
+            activity.turtles.ithTurtle(0).singer.duplicateFactor = 7;
+
+            logo.inStatusMatrix = true;
+            logo.statusFields = [];
+            const res = block.arg(logo, 0, blk);
+
+            expect(logo.statusFields).toHaveLength(0);
+            expect(res).toBe(7);
+            expect(activity.blocks.blockList[blk].value).toBe(7);
+        });
+
+        test("status-matrix with detached block does not throw TypeError", () => {
+            const block = getBlock("duplicatefactor");
+            const blk = 11;
+            activity.blocks.blockList[blk] = {
+                protoblock: block,
+                connections: [null],
+                value: undefined
+            };
+            activity.turtles.ithTurtle(0).singer.duplicateFactor = 7;
+
+            logo.inStatusMatrix = true;
+            logo.statusFields = [];
+            let res;
+            expect(() => {
+                res = block.arg(logo, 0, blk);
+            }).not.toThrow();
+
+            expect(logo.statusFields).toHaveLength(0);
+            expect(res).toBe(7);
+            expect(activity.blocks.blockList[blk].value).toBe(7);
+        });
     });
 
     test("Hidden block variants simply no-op", () => {

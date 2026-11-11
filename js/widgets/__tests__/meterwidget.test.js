@@ -24,10 +24,17 @@
  * Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
  */
 
-const MeterWidget = require("../meterwidget.js");
 const ManagedTimer = require("../../utils/ManagedTimer");
 
 global.ManagedTimer = ManagedTimer;
+global.rationalToFraction = require("../../utils/utils-logic.js").rationalToFraction;
+global.MeterWidgetWindow = require("../MeterWidgetWindow.js");
+global.MeterWidgetMeter = require("../MeterWidgetMeter.js");
+global.MeterWidgetPlayback = require("../MeterWidgetPlayback.js");
+global.MeterWidgetWheel = require("../MeterWidgetWheel.js");
+global.MeterWidgetSave = require("../MeterWidgetSave.js");
+const MeterWidget = require("../meterwidget.js");
+global.MeterWidget = MeterWidget;
 
 // --- 1. Global Mocks (Fake the Browser Environment) ---
 global._ = msg => msg; // Mock translation function
@@ -850,6 +857,45 @@ describe("Meter Widget", () => {
             };
             expect(() => meterWidget._hidePlaybackIndicator()).not.toThrow();
             expect(hide).toHaveBeenCalledTimes(1);
+        });
+    });
+    describe("modules", () => {
+        test("loads the five modules before the widget", () => {
+            expect(MeterWidget.dependencies).toEqual([
+                "widgets/MeterWidgetWindow",
+                "widgets/MeterWidgetMeter",
+                "widgets/MeterWidgetPlayback",
+                "widgets/MeterWidgetWheel",
+                "widgets/MeterWidgetSave",
+                "widgets/meterwidget"
+            ]);
+        });
+
+        test("installModules is done once every module is defined", () => {
+            expect(MeterWidget._modulesInstalled).toBe(true);
+            expect(MeterWidget.installModules()).toBe(true);
+            expect(typeof MeterWidget.prototype._stopPlayback).toBe("function");
+        });
+    });
+
+    describe("running the block again while the widget is open", () => {
+        test("stops the beats of the widget it replaces", () => {
+            jest.useFakeTimers();
+            try {
+                meterWidget._playing = true;
+                meterWidget._playBeat();
+                expect(mockActivity.logo.synth.trigger).toHaveBeenCalledTimes(1);
+
+                mockActivity.logo.meterWidget = meterWidget;
+                const replacement = new MeterWidget(mockActivity, 1);
+                jest.advanceTimersByTime(5000);
+
+                expect(replacement).not.toBe(meterWidget);
+                expect(meterWidget._playing).toBe(false);
+                expect(mockActivity.logo.synth.trigger).toHaveBeenCalledTimes(1);
+            } finally {
+                jest.useRealTimers();
+            }
         });
     });
 });

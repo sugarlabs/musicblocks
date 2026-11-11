@@ -118,12 +118,12 @@
 }
 
 .play-only #keyboardHolder2 table.white > tbody > tr > td {
-    background-color: #ffffff !important;
+    background-color: #ffffff;
     color: #000000 !important;
 }
 
 .play-only #keyboardHolder2 table.black > tbody > tr > td:not(.spacer) {
-    background-color: #000000 !important;
+    background-color: #000000;
     color: #ffffff !important;
 }
 

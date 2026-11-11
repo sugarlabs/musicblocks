@@ -386,6 +386,12 @@ var __MB_methodArgConstraints = {
                 values: ["even", "odd", "scalar"],
                 defaultIndex: 0
             }
+        },
+        {
+            type: "function",
+            constraints: {
+                async: true
+            }
         }
     ],
     setPitchNumberOffset: [
@@ -442,7 +448,7 @@ var __MB_methodArgConstraints = {
                     "dorian",
                     "phrygian",
                     "lydian",
-                    "myxolydian",
+                    "mixolydian",
                     "minor",
                     "aeolian"
                 ],

@@ -56,24 +56,45 @@ describe("RhythmRulerSave", () => {
         }
     });
 
+    describe("_mergeRulers", () => {
+        test.each([
+            ["a leading rest", [[-4, 4, 4, 4]]],
+            ["a middle rest", [[4, -4, 4, 4]]],
+            ["a trailing rest", [[4, 4, 4, -4]]],
+            ["only rests", [[-4, -4, -4, -4]]],
+            [
+                "overlapping notes and rests",
+                [
+                    [-2, 2],
+                    [4, -4, 4, 4]
+                ]
+            ],
+            ["notes without rests", [[4, 4, 4, 4]]]
+        ])("preserves beat boundaries with %s", (_description, rulers) => {
+            const widget = { Rulers: rulers.map(values => [values, []]) };
+
+            const merged = RhythmRulerSave.prototype._mergeRulers.call(widget);
+
+            expect(merged).toEqual([4, 4, 4, 4]);
+            expect(merged.reduce((duration, value) => duration + 1 / value, 0)).toBe(1);
+        });
+    });
+
     describe("_saveTupletsMerged", () => {
         beforeEach(() => {
             global._ = text => text;
-            global.activity = { textMsg: jest.fn() };
             global.rationalToFraction = require("../../utils/utils-logic.js").rationalToFraction;
         });
 
-        afterEach(() => {
-            delete global.activity;
-        });
-
-        test("merges repeated note values into one rhythm block", () => {
+        test("merges repeated note values into one rhythm block without global activity", () => {
             const loadNewBlocks = jest.fn();
+            const textMsg = jest.fn();
             const widget = {
                 activity: {
                     palettes: { dict: { rhythm: { hideMenu: jest.fn() } } },
                     refreshCanvas: jest.fn(),
-                    blocks: { loadNewBlocks }
+                    blocks: { loadNewBlocks },
+                    textMsg
                 }
             };
 
@@ -87,7 +108,39 @@ describe("RhythmRulerSave", () => {
             expect(stack[rhythms[0][0] + 4][1]).toEqual(["number", { value: 4 }]);
             expect(stack[rhythms[1][0] + 1][1]).toEqual(["number", { value: 1 }]);
             expect(stack[rhythms[1][0] + 4][1]).toEqual(["number", { value: 8 }]);
-            expect(global.activity.textMsg).toHaveBeenCalled();
+            expect(widget.activity.textMsg).toHaveBeenCalledWith(
+                "New action block generated.",
+                3000
+            );
+            expect(global.activity).toBeUndefined();
+        });
+
+        test("exports the full duration of a ruler containing a rest", () => {
+            const loadNewBlocks = jest.fn();
+            const widget = {
+                activity: {
+                    palettes: { dict: {} },
+                    refreshCanvas: jest.fn(),
+                    blocks: { loadNewBlocks },
+                    textMsg: jest.fn()
+                },
+                Rulers: [[[4, -4, 4, 4], []]]
+            };
+
+            const merged = RhythmRulerSave.prototype._mergeRulers.call(widget);
+            RhythmRulerSave.prototype._saveTupletsMerged.call(widget, merged);
+
+            const stack = loadNewBlocks.mock.calls[0][0];
+            const rhythms = stack.filter(block => block[1] === "rhythm2");
+            const duration = rhythms.reduce((total, block) => {
+                const count = stack[block[4][1]][1][1].value;
+                const fraction = stack[block[4][2]][4];
+                const numerator = stack[fraction[1]][1][1].value;
+                const denominator = stack[fraction[2]][1][1].value;
+                return total + (count * numerator) / denominator;
+            }, 0);
+            expect(duration).toBe(1);
+            expect(rhythms).toHaveLength(1);
         });
     });
 
@@ -142,35 +195,37 @@ describe("RhythmRulerSave", () => {
         beforeEach(() => {
             jest.useFakeTimers();
             global._ = text => text;
-            global.activity = { textMsg: jest.fn() };
             global.rationalToFraction = require("../../utils/utils-logic.js").rationalToFraction;
             loadNewBlocks = jest.fn();
         });
 
         afterEach(() => {
             jest.useRealTimers();
-            delete global.activity;
         });
 
         // One ruler per entry in noteValues; a negative value is a rest.
-        const makeWidget = (noteValues, drumName = "kick drum") => ({
-            activity: {
-                palettes: { dict: { rhythm: { hideMenu: jest.fn() } } },
-                refreshCanvas: jest.fn(),
-                blocks: { loadNewBlocks }
-            },
-            _rulers: noteValues.map(values => ({ cells: values.map(() => ({})) })),
-            Rulers: noteValues.map(values => [values, []]),
-            Drums: noteValues.map((_values, i) => 10 + i),
-            _getDrumName: () => drumName,
-            _saveMachine: jest.fn()
-        });
+        const makeWidget = (noteValues, drumName = "kick drum") => {
+            const textMsg = jest.fn();
+            return {
+                activity: {
+                    palettes: { dict: { rhythm: { hideMenu: jest.fn() } } },
+                    refreshCanvas: jest.fn(),
+                    blocks: { loadNewBlocks },
+                    textMsg
+                },
+                _rulers: noteValues.map(values => ({ cells: values.map(() => ({})) })),
+                Rulers: noteValues.map(values => [values, []]),
+                Drums: noteValues.map((_values, i) => 10 + i),
+                _getDrumName: () => drumName,
+                _saveMachine: jest.fn()
+            };
+        };
 
         const names = stack =>
             stack.map(block => (Array.isArray(block[1]) ? block[1][0] : block[1]));
         const valueOf = (stack, name) => stack.find(block => block[1][0] === name)[1][1].value;
 
-        test("a drum machine plays notes, rests and repeated notes", () => {
+        test("a drum machine plays notes, rests and repeated notes without global activity", () => {
             const widget = makeWidget([[4, 4, -8, 2]]);
 
             RhythmRulerSave.prototype._saveDrumMachine.call(widget, 0, "kick drum", false);
@@ -186,8 +241,55 @@ describe("RhythmRulerSave", () => {
             expect(names(stack).filter(name => name === "playdrum")).toHaveLength(2);
             expect(valueOf(stack, "drumname")).toBe("kick drum");
             expect(names(stack)).not.toContain("effectsname");
+            expect(widget.activity.textMsg).toHaveBeenCalledWith(
+                "New action block generated.",
+                3000
+            );
+            expect(global.activity).toBeUndefined();
             // Only one ruler, so it doesn't go on to save another.
             expect(widget._saveMachine).not.toHaveBeenCalled();
+        });
+
+        test("a drum machine decomposes fractional repeated note values using rationalToFraction", () => {
+            const widget = makeWidget([[6, 6]]);
+
+            RhythmRulerSave.prototype._saveDrumMachine.call(widget, 0, "kick drum", false);
+            jest.advanceTimersByTime(500);
+
+            const stack = loadNewBlocks.mock.calls[0][0];
+            const repeat = stack.find(block => block[1] === "repeat");
+            expect(repeat).toBeDefined();
+            expect(stack[repeat[0] + 1][1]).toEqual(["number", { value: 2 }]);
+            expect(stack[repeat[0] + 4][1]).toEqual(["number", { value: 1 }]);
+            expect(stack[repeat[0] + 5][1]).toEqual(["number", { value: 6 }]);
+        });
+
+        test("a drum machine decomposes non-integer repeated notes and rests using rationalToFraction", () => {
+            const widgetNotes = makeWidget([[8 / 3, 8 / 3]]);
+            RhythmRulerSave.prototype._saveDrumMachine.call(widgetNotes, 0, "kick drum", false);
+            jest.advanceTimersByTime(500);
+
+            const stackNotes = loadNewBlocks.mock.calls[0][0];
+            const repeatNotes = stackNotes.find(block => block[1] === "repeat");
+            expect(repeatNotes).toBeDefined();
+            expect(stackNotes[repeatNotes[0] + 1][1]).toEqual(["number", { value: 2 }]);
+            expect(stackNotes[repeatNotes[0] + 4][1]).toEqual(["number", { value: 3 }]);
+            expect(stackNotes[repeatNotes[0] + 5][1]).toEqual(["number", { value: 8 }]);
+            expect(names(stackNotes)).toContain("playdrum");
+
+            loadNewBlocks.mockClear();
+
+            const widgetRests = makeWidget([[-8 / 3, -8 / 3]]);
+            RhythmRulerSave.prototype._saveDrumMachine.call(widgetRests, 0, "kick drum", false);
+            jest.advanceTimersByTime(500);
+
+            const stackRests = loadNewBlocks.mock.calls[0][0];
+            const repeatRests = stackRests.find(block => block[1] === "repeat");
+            expect(repeatRests).toBeDefined();
+            expect(stackRests[repeatRests[0] + 1][1]).toEqual(["number", { value: 2 }]);
+            expect(stackRests[repeatRests[0] + 4][1]).toEqual(["number", { value: 3 }]);
+            expect(stackRests[repeatRests[0] + 5][1]).toEqual(["number", { value: 8 }]);
+            expect(names(stackRests)).toContain("rest2");
         });
 
         test("an effects machine uses the effect name and saves the next ruler", () => {
@@ -199,10 +301,14 @@ describe("RhythmRulerSave", () => {
             const stack = loadNewBlocks.mock.calls[0][0];
             expect(valueOf(stack, "effectsname")).toBe("clang");
             expect(names(stack)).not.toContain("drumname");
+            expect(widget.activity.textMsg).toHaveBeenCalledWith(
+                "New action block generated.",
+                3000
+            );
             expect(widget._saveMachine).toHaveBeenCalledWith(1);
         });
 
-        test("a voice machine sets the timbre before its notes", () => {
+        test("a voice machine sets the timbre and handles repeated notes and rests", () => {
             const widget = makeWidget([[2, -4, 4, 4]], "guitar");
 
             RhythmRulerSave.prototype._saveVoiceMachine.call(widget, 0, "guitar");
@@ -214,7 +320,42 @@ describe("RhythmRulerSave", () => {
             expect(names(stack).filter(name => name === "rest2")).toHaveLength(1);
             const repeat = stack.find(block => block[1] === "repeat");
             expect(stack[repeat[0] + 1][1]).toEqual(["number", { value: 2 }]);
+            expect(stack[repeat[0] + 4][1]).toEqual(["number", { value: 1 }]);
+            expect(stack[repeat[0] + 5][1]).toEqual(["number", { value: 4 }]);
+            expect(widget.activity.textMsg).toHaveBeenCalledWith(
+                "New action block generated.",
+                3000
+            );
+            expect(global.activity).toBeUndefined();
             expect(widget._saveMachine).not.toHaveBeenCalled();
+        });
+
+        test("a voice machine decomposes non-integer repeated notes and rests using rationalToFraction", () => {
+            const widgetNotes = makeWidget([[8 / 3, 8 / 3]], "guitar");
+            RhythmRulerSave.prototype._saveVoiceMachine.call(widgetNotes, 0, "guitar");
+            jest.advanceTimersByTime(500);
+
+            const stackNotes = loadNewBlocks.mock.calls[0][0];
+            const repeatNotes = stackNotes.find(block => block[1] === "repeat");
+            expect(repeatNotes).toBeDefined();
+            expect(stackNotes[repeatNotes[0] + 1][1]).toEqual(["number", { value: 2 }]);
+            expect(stackNotes[repeatNotes[0] + 4][1]).toEqual(["number", { value: 3 }]);
+            expect(stackNotes[repeatNotes[0] + 5][1]).toEqual(["number", { value: 8 }]);
+            expect(names(stackNotes)).toContain("pitch");
+
+            loadNewBlocks.mockClear();
+
+            const widgetRests = makeWidget([[-8 / 3, -8 / 3]], "guitar");
+            RhythmRulerSave.prototype._saveVoiceMachine.call(widgetRests, 0, "guitar");
+            jest.advanceTimersByTime(500);
+
+            const stackRests = loadNewBlocks.mock.calls[0][0];
+            const repeatRests = stackRests.find(block => block[1] === "repeat");
+            expect(repeatRests).toBeDefined();
+            expect(stackRests[repeatRests[0] + 1][1]).toEqual(["number", { value: 2 }]);
+            expect(stackRests[repeatRests[0] + 4][1]).toEqual(["number", { value: 3 }]);
+            expect(stackRests[repeatRests[0] + 5][1]).toEqual(["number", { value: 8 }]);
+            expect(names(stackRests)).toContain("rest2");
         });
     });
 });

@@ -158,7 +158,7 @@ function setupFlowBlocks(activity) {
             if (args[1] === undefined) return;
 
             let arg0;
-            if (args[0] === null || typeof args[0] !== "number" || args[0] < 1) {
+            if (!Number.isFinite(args[0]) || args[0] < 1) {
                 // Handle invalid input for the number of duplicates
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg0 = 2;
@@ -699,18 +699,21 @@ function setupFlowBlocks(activity) {
                 queue.push(queueBlock);
                 tur.doWait(0.05);
             } else {
-                // Since a wait-for block was requeued each
-                // time, we need to flush the queue of all but
-                // the last one, otherwise the child of the
-                // while block is executed multiple times.
-                const queueLength = queue.length;
-                let kept_one = false;
-                for (let i = queueLength - 1; i > 0; i--) {
+                // Keep only the most recent wait-for requeue; remove older
+                // duplicates. Stop at the innermost action boundary — entries
+                // below it belong to a nested action call and must not be
+                // touched (the return block restores the queue to that index).
+                const boundary =
+                    tur.actionBoundaries && tur.actionBoundaries.length > 0
+                        ? tur.actionBoundaries[tur.actionBoundaries.length - 1]
+                        : 0;
+                let keptOne = false;
+                for (let i = queue.length - 1; i >= boundary; i--) {
                     if (queue[i].parentBlk === blk) {
-                        if (kept_one) {
-                            queue.pop();
+                        if (keptOne) {
+                            queue.splice(i, 1);
                         } else {
-                            kept_one = true;
+                            keptOne = true;
                         }
                     }
                 }
@@ -796,21 +799,17 @@ function setupFlowBlocks(activity) {
                 const queueBlock = new Queue(blk, 1, parentBlk, receivedArg);
                 parentFlowQueue.push(parentBlk);
                 queue.push(queueBlock);
+
+                // and queue the interior child flow.
+                return [args[1], 1];
             } else {
-                // Since an until block was requeued each
-                // time, we need to flush the queue of all but
-                // the last one, otherwise the child of the
-                // until block is executed multiple times.
-                const queueLength = queue.length;
-                for (let i = queueLength - 1; i > 0; i--) {
+                // Preserve the newly scheduled outflow.
+                for (let i = queue.length - 2; i >= 0; i--) {
                     if (queue[i].parentBlk === blk) {
-                        queue.pop();
+                        queue.splice(i, 1);
                     }
                 }
             }
-
-            // Queue the child flow.
-            return [args[1], 1];
         }
     }
 
@@ -889,20 +888,13 @@ function setupFlowBlocks(activity) {
                 // and queue the interior child flow.
                 return [args[1], 1];
             } else {
-                // Since a while block was requeued each time,
-                // we need to flush the queue of all but the
-                // last one, otherwise the child of the while
-                // block is executed multiple times.
-                const queueLength = queue.length;
-                for (let i = queueLength - 1; i > 0; i--) {
+                // Preserve the newly scheduled outflow.
+                for (let i = queue.length - 2; i >= 0; i--) {
                     if (queue[i].parentBlk === blk) {
-                        queue.pop();
+                        queue.splice(i, 1);
                     }
                 }
             }
-
-            // Queue the child flow.
-            return [args[1], 1];
         }
     }
 
@@ -1233,13 +1225,23 @@ function setupFlowBlocks(activity) {
          * @param {object} logo - The logo object.
          * @param {object} turtle - The turtle object.
          * @param {number} blk - The block number.
+         * @returns {number|undefined} The duplicate factor, or undefined in status matrix print registration.
          */
         arg(logo, turtle, blk) {
             const blockList = activity.blocks.blockList;
-            if (logo.inStatusMatrix && blockList[blockList[blk].connections[0]].name === "print") {
+            const connections = blockList[blk]?.connections;
+            const parentId = connections?.[0];
+            if (
+                logo.inStatusMatrix &&
+                parentId !== null &&
+                parentId !== undefined &&
+                parentId in blockList &&
+                blockList[parentId]?.name === "print"
+            ) {
                 logo.statusFields.push([blk, "duplicate"]);
             } else {
-                blockList[blk].value = activity.turtles.ithTurtle(turtle).singer.duplicateFactor;
+                return (blockList[blk].value =
+                    activity.turtles.ithTurtle(turtle).singer.duplicateFactor);
             }
         }
     }

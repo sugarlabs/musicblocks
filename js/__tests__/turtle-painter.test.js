@@ -65,7 +65,12 @@ const createMockTurtle = () => {
             getTurtleCount: jest.fn(() => 0),
             getTurtle: jest.fn()
         },
-        activity: { refreshCanvas: jest.fn(), errorMsg: jest.fn(), gifAnimator: {} },
+        activity: {
+            refreshCanvas: jest.fn(),
+            errorMsg: jest.fn(),
+            gifAnimator: {},
+            artworkRevision: 0
+        },
         canvas: { width: 800, height: 600 },
         container: { x: 0, y: 0, rotation: 0 },
         x: 0,
@@ -267,6 +272,23 @@ describe("Painter Class", () => {
             expect(window.requestAnimationFrame).not.toHaveBeenCalled();
         });
 
+        test("should advance the artwork revision on every update request", () => {
+            painter._scheduleCanvasUpdate();
+            expect(painter.activity.artworkRevision).toBe(1);
+
+            painter._scheduleCanvasUpdate();
+            expect(painter.activity.artworkRevision).toBe(2);
+        });
+
+        test("should advance the artwork revision even when an update is already scheduled", () => {
+            painter._pendingCanvasUpdate = true;
+
+            painter._scheduleCanvasUpdate();
+
+            expect(painter.activity.artworkRevision).toBe(1);
+            expect(window.requestAnimationFrame).not.toHaveBeenCalled();
+        });
+
         test("should schedule canvas update and transition state correctly", () => {
             const raf = setupRafMock(true);
             const refreshSpy = jest.spyOn(painter.activity, "refreshCanvas");
@@ -402,6 +424,58 @@ describe("Pen operations", () => {
     test("doSetPenAlpha should handle full opacity", () => {
         painter.doSetPenAlpha(1);
         expect(painter.canvasAlpha).toBe(1);
+    });
+
+    test("doSetPenAlpha should close active SVG path and update canvas styles", () => {
+        painter.doSetColor(0);
+        painter.doForward(50);
+        expect(painter._svgPath).toBe(true);
+
+        painter.doSetPenAlpha(0.5);
+
+        expect(painter._svgPath).toBe(false);
+        expect(mockTurtle.ctx.strokeStyle).toContain("0.5");
+        expect(mockTurtle.ctx.fillStyle).toContain("0.5");
+    });
+
+    test("doSetPenAlpha should reject non-finite values and retain canvas alpha", () => {
+        painter.doSetPenAlpha(0.7);
+        mockTurtle.turtles.activity.errorMsg.mockClear();
+
+        painter.doSetPenAlpha(NaN);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.canvasAlpha).toBe(0.7);
+
+        mockTurtle.turtles.activity.errorMsg.mockClear();
+        painter.doSetPenAlpha("not-a-number");
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.canvasAlpha).toBe(0.7);
+
+        mockTurtle.turtles.activity.errorMsg.mockClear();
+        painter.doSetPenAlpha(Infinity);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.canvasAlpha).toBe(0.7);
+    });
+
+    test("doSetPenAlpha should clamp values below 0 or above 1", () => {
+        painter.doSetPenAlpha(-0.5);
+        expect(painter.canvasAlpha).toBe(0);
+
+        painter.doSetPenAlpha(1.5);
+        expect(painter.canvasAlpha).toBe(1);
+    });
+
+    test("doEndFill should fill with updated translucency", () => {
+        painter.doSetColor(0);
+        painter.doSetTranslucency(0);
+        painter.doStartFill();
+        painter.doForward(50);
+
+        painter.doSetTranslucency(50);
+        painter.doEndFill();
+
+        expect(mockTurtle.ctx.fill).toHaveBeenCalled();
+        expect(mockTurtle.ctx.fillStyle).toContain("0.5");
     });
 
     test.each([

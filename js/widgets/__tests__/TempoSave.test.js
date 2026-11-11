@@ -98,16 +98,11 @@ describe("TempoSave", () => {
         expect(stack[4][1][1].value).toBe(denominator);
     });
 
-    test("_saveTempo saves each row 200 ms apart, each block lower than the last", () => {
+    test("_saveTempo submits every row immediately, each block lower than the last", () => {
         tempo.BPMs = [90, 120, 150];
 
         tempo._saveTempo();
 
-        jest.advanceTimersByTime(0);
-        expect(loadNewBlocks).toHaveBeenCalledTimes(1);
-        jest.advanceTimersByTime(200);
-        expect(loadNewBlocks).toHaveBeenCalledTimes(2);
-        jest.advanceTimersByTime(200);
         expect(loadNewBlocks).toHaveBeenCalledTimes(3);
 
         const stacks = loadNewBlocks.mock.calls.map(call => call[0]);
@@ -119,24 +114,20 @@ describe("TempoSave", () => {
         ]);
     });
 
-    test("closing the widget cancels the saves still to come", () => {
+    test("closing the widget after Save does not discard any BPM blocks", () => {
         tempo.BPMs = [90, 120];
 
         tempo._saveTempo();
-        jest.advanceTimersByTime(0);
         tempo.widgetWindow.timerManager.clearAll();
-        jest.advanceTimersByTime(1000);
 
-        expect(loadNewBlocks).toHaveBeenCalledTimes(1);
+        expect(loadNewBlocks).toHaveBeenCalledTimes(2);
     });
 
-    test("saves with plain timeouts without a timer manager", () => {
+    test("saves without a timer manager", () => {
         tempo.widgetWindow = null;
         tempo.BPMs = [90, 120];
 
         tempo._saveTempo();
-        jest.advanceTimersByTime(200);
-
         expect(loadNewBlocks).toHaveBeenCalledTimes(2);
     });
 

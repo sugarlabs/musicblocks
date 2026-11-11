@@ -158,8 +158,18 @@ const resolveNoteEffects = (turtleState, instrumentSettings) => {
     if (instEffects && typeof instEffects === "object") {
         if (instEffects.vibratoActive) {
             resolved.doVibrato = true;
-            resolved.vibratoRate = instEffects.vibratoRate ?? 0;
-            resolved.vibratoIntensity = instEffects.vibratoIntensity ?? 0;
+            resolved.vibratoRate =
+                instEffects.vibratoRate !== undefined && instEffects.vibratoRate > 0
+                    ? instEffects.vibratoRate
+                    : instEffects.vibratoFrequency && instEffects.vibratoFrequency > 0
+                      ? 1 / instEffects.vibratoFrequency
+                      : 16;
+            resolved.vibratoIntensity =
+                instEffects.vibratoIntensity !== undefined &&
+                Number.isFinite(instEffects.vibratoIntensity) &&
+                instEffects.vibratoIntensity >= 0
+                    ? instEffects.vibratoIntensity
+                    : 0.05;
         }
 
         if (instEffects.distortionActive) {
@@ -421,6 +431,27 @@ class Singer {
     }
 
     /**
+     * Drops the notes a stopped turtle had started but not yet played.
+     *
+     * @returns {void}
+     */
+    dropPendingNotes() {
+        this.oscList = {};
+        this.noteBeat = {};
+        this.noteValue = {};
+        this.noteDrums = {};
+        this.notePitches = {};
+        this.noteOctaves = {};
+        this.noteCents = {};
+        this.noteHertz = {};
+        this.noteBeatValues = {};
+        this.embeddedGraphics = {};
+        this.delayedNotes = [];
+        this.inNoteBlock = [];
+        this.multipleVoices = false;
+    }
+
+    /**
      * Kills all active audio voices for this turtle.
      * Called during stop/halt to prevent "zombie audio" that continues playing.
      * Uses try/catch to handle nodes that may have already stopped.
@@ -634,18 +665,20 @@ class Singer {
      * @param {Object} turtle
      * @param {String} note
      * @param {Number} octave
+     * @param {Number} [cents=0]
      * @returns {Number} inverted value
      */
     static calculateInvert(logo, turtle, note, octave, cents = 0) {
         const activity = logo.activity;
         const tur = activity.turtles.ithTurtle(turtle);
         const temperament = activity.logo.synth.inTemperament;
+        const edo = getCurrentEDO(temperament);
 
         let delta = 0;
         const note1 = getNote(
             note,
             octave,
-            cents,
+            0,
             tur.singer.keySignature,
             tur.singer.movable,
             null,
@@ -654,13 +687,15 @@ class Singer {
         );
         let num1 =
             pitchToNumber(note1[0], note1[1], tur.singer.keySignature, temperament) -
-            tur.singer.pitchNumberOffset;
+            tur.singer.pitchNumberOffset +
+            (cents / 1200) * edo;
 
         for (let i = tur.singer.invertList.length - 1; i >= 0; i--) {
+            const axisCents = tur.singer.invertList[i][3] || 0;
             const note2 = getNote(
                 tur.singer.invertList[i][0],
                 tur.singer.invertList[i][1],
-                -cents,
+                axisCents / 100,
                 tur.singer.keySignature,
                 tur.singer.movable,
                 null,
@@ -669,14 +704,17 @@ class Singer {
             );
             const num2 =
                 pitchToNumber(note2[0], note2[1], tur.singer.keySignature, temperament) -
-                tur.singer.pitchNumberOffset;
+                tur.singer.pitchNumberOffset +
+                ((note2[2] || 0) / 1200) * edo;
 
             if (tur.singer.invertList[i][2] === "even") {
-                delta += num2 - num1;
-                num1 += 2 * delta;
+                const stepDelta = num2 - num1;
+                delta += stepDelta;
+                num1 += 2 * stepDelta;
             } else if (tur.singer.invertList[i][2] === "odd") {
-                delta += num2 - num1 + 0.5;
-                num1 += 2 * delta;
+                const stepDelta = num2 - num1 + 0.5;
+                delta += stepDelta;
+                num1 += 2 * stepDelta;
             } else {
                 // We need to calculate the scalar difference
                 const scalarSteps = Singer.scalarDistance(logo, turtle, num2, num1);
@@ -1111,13 +1149,14 @@ class Singer {
             tur.singer.neighborArgNote1.push(noteObj[0] + noteObj[1]);
 
             let noteObj2;
+            const neighborStep = last(tur.singer.neighborStepPitch);
             if (activity.blocks.blockList[last(tur.singer.inNeighbor)].name === "neighbor2") {
                 noteObj2 = Singer.addScalarTransposition(
                     activity.logo,
                     turtle,
                     note,
                     octave,
-                    parseInt(tur.singer.neighborStepPitch, 10)
+                    parseInt(neighborStep, 10)
                 );
                 if (tur.singer.transposition !== 0) {
                     noteObj2 = getNote(
@@ -1135,7 +1174,7 @@ class Singer {
                 noteObj2 = getNote(
                     note,
                     octave,
-                    tur.singer.transposition + parseInt(tur.singer.neighborStepPitch, 10),
+                    tur.singer.transposition + parseInt(neighborStep, 10),
                     tur.singer.keySignature,
                     tur.singer.movable,
                     null,
@@ -1149,7 +1188,7 @@ class Singer {
 
         const delta =
             tur.singer.invertList.length > 0
-                ? Singer.calculateInvert(activity.logo, turtle, note, octave)
+                ? Singer.calculateInvert(activity.logo, turtle, note, octave, cents)
                 : 0;
 
         if (tur.singer.justMeasuring.length > 0) {
@@ -1632,10 +1671,12 @@ class Singer {
                 : nnote[0];
 
             if (tur.singer.drumStyle.length === 0) {
-                activity.logo.musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
-                activity.logo.musicKeyboard.noteNames.push(nnote[0]);
-                activity.logo.musicKeyboard.octaves.push(nnote[1]);
-                activity.logo.musicKeyboard.addRowBlock(blk);
+                const musicKeyboard =
+                    activity.logo.musicKeyboardByTurtle?.[turtle] || activity.logo.musicKeyboard;
+                musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
+                musicKeyboard.noteNames.push(nnote[0]);
+                musicKeyboard.octaves.push(nnote[1]);
+                musicKeyboard.addRowBlock(blk);
                 tur.singer.lastNotePlayed = [noteObj[0] + noteObj[1], 4];
             }
         } else {
@@ -1822,9 +1863,11 @@ class Singer {
                 neighborArgNote2.push(tur.singer.neighborArgNote2.pop());
             }
 
-            neighborArgBeat = bpmFactor / last(tur.singer.neighborArgBeat);
-            neighborArgCurrentBeat = bpmFactor / last(tur.singer.neighborArgCurrentBeat);
-            doNeighbor = true;
+            if (last(tur.singer.neighborArgCurrentBeat) !== null) {
+                neighborArgBeat = bpmFactor / last(tur.singer.neighborArgBeat);
+                neighborArgCurrentBeat = bpmFactor / last(tur.singer.neighborArgCurrentBeat);
+                doNeighbor = true;
+            }
         }
 
         let carry = 0;
@@ -2353,7 +2396,32 @@ class Singer {
 
                 const notes = [];
                 const drums = [];
+                // For case when note block is inside a settimbre block, which in turn is inside a setdrum block
                 let hasSetTimbreInSetDrum = false;
+                // This case is only applicable if the note block is at all inside a setdrum block
+                if (tur.singer.drumStyle.length > 0 && blk in activity.blocks.blockList) {
+                    // Start from the note block's parent
+                    let parentId = activity.blocks.blockList[blk].connections
+                        ? activity.blocks.blockList[blk].connections[0]
+                        : null;
+                    const visited = new Set();
+                    // Keep looking for all parents up in order
+                    while (parentId !== null && parentId !== undefined && !visited.has(parentId)) {
+                        visited.add(parentId);
+                        const parentBlock = activity.blocks.blockList[parentId];
+                        if (!parentBlock) {
+                            break;
+                        }
+                        if (parentBlock.name === "settimbre") {
+                            hasSetTimbreInSetDrum = true;
+                            break;
+                        }
+                        if (parentBlock.name === "setdrum") {
+                            break;
+                        }
+                        parentId = parentBlock.connections ? parentBlock.connections[0] : null;
+                    }
+                }
                 // let insideChord = -1;
                 // if (
                 //     tur.singer.notePitches[thisBlk].length + tur.singer.oscList[thisBlk].length >
@@ -2504,8 +2572,10 @@ class Singer {
                                         chordNotes.push(notationNote);
                                     }
 
-                                    if (!chordDrums.includes(tur.singer.noteDrums[thisBlk][0])) {
-                                        chordDrums.push(tur.singer.noteDrums[thisBlk][0]);
+                                    for (const drum of tur.singer.noteDrums[thisBlk]) {
+                                        if (!chordDrums.includes(drum)) {
+                                            chordDrums.push(drum);
+                                        }
                                     }
                                 } else {
                                     // A frequency (cents or hertz) has no accidental to restate.
@@ -2557,17 +2627,29 @@ class Singer {
                                 activity.logo.runningMIDI;
                             if (typeof d === "number" && d > 0 && isFinite(d)) {
                                 if (exporting) {
+                                    // Set Drum plays the note's pitches as its drum, unless an
+                                    // oscillator or a Set Instrument inside it plays them, so
+                                    // MIDI gets that drum and no pitches.
+                                    const playedBySetDrum =
+                                        tur.singer.drumStyle.length > 0 &&
+                                        !hasSetTimbreInSetDrum &&
+                                        tur.singer.oscList[thisBlk].length === 0 &&
+                                        chordNotes.some(
+                                            note => typeof note === "number" || !note.includes("R")
+                                        );
                                     // A note with cents or set in hertz is a frequency; MIDI
                                     // takes the nearest 12-EDO note name.
                                     activity.logo.notationMIDI(
-                                        chordNotes.map(note => {
-                                            if (typeof note !== "number") {
-                                                return note;
-                                            }
-                                            const [name, octave] = frequencyToPitch(note);
-                                            return name + octave;
-                                        }),
-                                        chordDrums,
+                                        playedBySetDrum
+                                            ? ["R"]
+                                            : chordNotes.map(note => {
+                                                  if (typeof note !== "number") {
+                                                      return note;
+                                                  }
+                                                  const [name, octave] = frequencyToPitch(note);
+                                                  return name + octave;
+                                              }),
+                                        playedBySetDrum ? [last(tur.singer.drumStyle)] : chordDrums,
                                         d,
                                         turtle,
                                         bpmValue || 90,
@@ -2646,42 +2728,6 @@ class Singer {
                                     neighborArgBeat: neighborArgBeat,
                                     neighborArgCurrentBeat: neighborArgCurrentBeat
                                 };
-
-                                // For case when note block is inside a settimbre block, which in turn is inside a setdrum block
-                                hasSetTimbreInSetDrum = false;
-                                // This case is only applicable if the note block is at all inside a setdrum block
-                                if (
-                                    tur.singer.drumStyle.length > 0 &&
-                                    blk in activity.blocks.blockList
-                                ) {
-                                    // Start from the note block's parent
-                                    let parentId = activity.blocks.blockList[blk].connections
-                                        ? activity.blocks.blockList[blk].connections[0]
-                                        : null;
-                                    const visited = new Set();
-                                    // Keep looking for all parents up in order
-                                    while (
-                                        parentId !== null &&
-                                        parentId !== undefined &&
-                                        !visited.has(parentId)
-                                    ) {
-                                        visited.add(parentId);
-                                        const parentBlock = activity.blocks.blockList[parentId];
-                                        if (!parentBlock) {
-                                            break;
-                                        }
-                                        if (parentBlock.name === "settimbre") {
-                                            hasSetTimbreInSetDrum = true;
-                                            break;
-                                        }
-                                        if (parentBlock.name === "setdrum") {
-                                            break;
-                                        }
-                                        parentId = parentBlock.connections
-                                            ? parentBlock.connections[0]
-                                            : null;
-                                    }
-                                }
 
                                 if (tur.singer.oscList[thisBlk].length > 0) {
                                     if (notes.length > 1) {

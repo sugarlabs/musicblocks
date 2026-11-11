@@ -97,6 +97,22 @@ const ACTION_NAME_SLOTS = {
  * that sustained more than one highlight per frame would drift without this.
  */
 const MAXPENDINGHIGHLIGHTS = 24;
+const MAX_VIEWPORT_GRID_CELLS = 4096;
+
+const isSafeViewportGridRange = (minX, minY, maxX, maxY) => {
+    if (
+        !Number.isSafeInteger(minX) ||
+        !Number.isSafeInteger(minY) ||
+        !Number.isSafeInteger(maxX) ||
+        !Number.isSafeInteger(maxY)
+    ) {
+        return false;
+    }
+
+    const width = maxX - minX + 1;
+    const height = maxY - minY + 1;
+    return width > 0 && height > 0 && width * height <= MAX_VIEWPORT_GRID_CELLS;
+};
 
 /**
  * Maximum number of unrendered transitions retained for any single block. A block
@@ -342,6 +358,11 @@ class Blocks {
         /** The loadToken of whichever load is currently running, if any — see _loadNewBlocksNow. */
         this._activeLoadToken = null;
         /**
+         * Unsupported block names encountered during active load session.
+         * Used to notify the user upon load completion.
+         */
+        this._unsupportedBlocksInCurrentLoad = new Set();
+        /**
          * Stacks of blocks that need adjusting as blocks are repositioned
          * due to expanding and contracting or insertion into the flow.
          */
@@ -396,11 +417,126 @@ class Blocks {
         // Throttle timestamp for edge-scroll calls
         this._lastEdgeScrollTime = 0;
 
+        this._getWorkspaceViewport = () => {
+            const { canvas, blocksContainer, stage, turtleBlocksScale } = this.activity;
+            if (
+                !canvas ||
+                !canvas.width ||
+                !canvas.height ||
+                !blocksContainer ||
+                typeof blocksContainer.x !== "number" ||
+                typeof blocksContainer.y !== "number"
+            ) {
+                return null;
+            }
+
+            const stageScaleX = stage?.scaleX || turtleBlocksScale || 1;
+            const stageScaleY = stage?.scaleY || turtleBlocksScale || 1;
+            const containerScaleX = blocksContainer.scaleX || 1;
+            const containerScaleY = blocksContainer.scaleY || 1;
+            const scaleX = stageScaleX * containerScaleX;
+            const scaleY = stageScaleY * containerScaleY;
+            if (scaleX <= 0 || scaleY <= 0) {
+                return null;
+            }
+
+            const left = -blocksContainer.x / containerScaleX;
+            const top = -blocksContainer.y / containerScaleY;
+            return {
+                left,
+                top,
+                right: left + canvas.width / scaleX,
+                bottom: top + canvas.height / scaleY
+            };
+        };
+
+        this._getBlockBounds = block => {
+            const scaleX = Math.abs(block.container.scaleX || 1);
+            const scaleY = Math.abs(block.container.scaleY || 1);
+            return {
+                left: block.container.x,
+                top: block.container.y,
+                right: block.container.x + block.width * scaleX,
+                bottom: block.container.y + block.height * scaleY
+            };
+        };
+
+        this._getViewportHomeBounds = () => {
+            if (!this._viewportHomeBoundsDirty) {
+                return this._viewportHomeBounds;
+            }
+
+            let homeBounds = null;
+            for (const block of this.blockList) {
+                if (
+                    !block ||
+                    block.trash ||
+                    block.inCollapsed ||
+                    !block.container ||
+                    !block.width ||
+                    !block.height
+                ) {
+                    continue;
+                }
+
+                const bounds = this._getHomeIndicatorBounds(block);
+                if (!homeBounds) {
+                    homeBounds = { ...bounds };
+                    continue;
+                }
+                homeBounds.left = Math.min(homeBounds.left, bounds.left);
+                homeBounds.top = Math.min(homeBounds.top, bounds.top);
+                homeBounds.right = Math.max(homeBounds.right, bounds.right);
+                homeBounds.bottom = Math.max(homeBounds.bottom, bounds.bottom);
+            }
+
+            this._viewportHomeBounds = homeBounds;
+            this._viewportHomeBoundsDirty = false;
+            return homeBounds;
+        };
+
+        this._getHomeIndicatorBounds = block => {
+            const bitmap = block.collapsed && block.collapseBlockBitmap;
+            const bitmapBounds =
+                bitmap && typeof bitmap.getBounds === "function" ? bitmap.getBounds() : null;
+            if (!bitmapBounds || !bitmapBounds.width || !bitmapBounds.height) {
+                return this._getBlockBounds(block);
+            }
+
+            const containerScaleX = Math.abs(block.container.scaleX || 1);
+            const containerScaleY = Math.abs(block.container.scaleY || 1);
+            const bitmapScaleX = Math.abs(bitmap.scaleX || bitmap.scale || 1);
+            const bitmapScaleY = Math.abs(bitmap.scaleY || bitmap.scale || 1);
+            const left =
+                block.container.x +
+                (bitmap.x || 0) * containerScaleX +
+                (bitmapBounds.x || 0) * containerScaleX * bitmapScaleX;
+            const top =
+                block.container.y +
+                (bitmap.y || 0) * containerScaleY +
+                (bitmapBounds.y || 0) * containerScaleY * bitmapScaleY;
+
+            return {
+                left,
+                top,
+                right: left + bitmapBounds.width * containerScaleX * bitmapScaleX,
+                bottom: top + bitmapBounds.height * containerScaleY * bitmapScaleY
+            };
+        };
+
         // --- Performance: spatial grid for O(1) nearest-dock lookup ---
         // Maps "cellX,cellY" -> Set of block indices in that cell
         this._spatialGrid = new Map();
         // Tracks each block's current grid cell to avoid redundant updates
         this._blockGridCell = new Map();
+        this._viewportGrid = new Map();
+        this._blockViewportCells = new Map();
+        this._viewportAlwaysVisible = new Set();
+        this._viewportFallback = new Set();
+        this._viewportVisibleBlocks = new Set();
+        this._viewportCullingInitialized = false;
+        this._viewportHomeBounds = null;
+        this._viewportHomeBoundsDirty = true;
 
         /**
          * We stage deletion of prototype action blocks on the palette so
@@ -445,6 +581,98 @@ class Blocks {
                     if (oldSet.size === 0) this._spatialGrid.delete(oldKey);
                 }
             }
+        };
+
+        this._updateViewportGrid = blkIdx => {
+            this._viewportHomeBoundsDirty = true;
+            const idx = Number(blkIdx);
+            const block = this.blockList[idx];
+            if (!block) return;
+
+            const oldKeys = this._blockViewportCells.get(idx);
+            if (oldKeys) {
+                for (const key of oldKeys) {
+                    const cell = this._viewportGrid.get(key);
+                    if (cell) {
+                        cell.delete(idx);
+                        if (cell.size === 0) this._viewportGrid.delete(key);
+                    }
+                }
+            }
+
+            this._viewportFallback.delete(idx);
+            this._viewportAlwaysVisible.delete(idx);
+            if (block.trash || !block.container) {
+                this._blockViewportCells.delete(idx);
+                this._viewportVisibleBlocks.delete(idx);
+                return;
+            }
+
+            if (block._viewportVisible === false) {
+                this._viewportVisibleBlocks.delete(idx);
+            } else {
+                this._viewportVisibleBlocks.add(idx);
+            }
+            if (!block.width || !block.height) {
+                this._blockViewportCells.delete(idx);
+                this._viewportAlwaysVisible.add(idx);
+                return;
+            }
+
+            const left = Math.floor(block.container.x / SPATIAL_GRID_CELL_SIZE);
+            const top = Math.floor(block.container.y / SPATIAL_GRID_CELL_SIZE);
+            const right = Math.floor((block.container.x + block.width) / SPATIAL_GRID_CELL_SIZE);
+            const bottom = Math.floor((block.container.y + block.height) / SPATIAL_GRID_CELL_SIZE);
+            if (!isSafeViewportGridRange(left, top, right, bottom)) {
+                this._blockViewportCells.delete(idx);
+                this._viewportFallback.add(idx);
+                return;
+            }
+
+            const keys = new Set();
+            for (let x = left; x <= right; x++) {
+                for (let y = top; y <= bottom; y++) {
+                    const key = x + "," + y;
+                    keys.add(key);
+                    let cell = this._viewportGrid.get(key);
+                    if (!cell) {
+                        cell = new Set();
+                        this._viewportGrid.set(key, cell);
+                    }
+                    cell.add(idx);
+                }
+            }
+            this._blockViewportCells.set(idx, keys);
+        };
+
+        this._getViewportCandidates = (left, top, right, bottom) => {
+            const minX = Math.floor(left / SPATIAL_GRID_CELL_SIZE);
+            const minY = Math.floor(top / SPATIAL_GRID_CELL_SIZE);
+            const maxX = Math.floor(right / SPATIAL_GRID_CELL_SIZE);
+            const maxY = Math.floor(bottom / SPATIAL_GRID_CELL_SIZE);
+            if (
+                (this._viewportGrid.size === 0 &&
+                    this._viewportAlwaysVisible.size === 0 &&
+                    this._viewportFallback.size === 0) ||
+                !isSafeViewportGridRange(minX, minY, maxX, maxY)
+            ) {
+                return new Set(
+                    this.blockList
+                        .map((block, idx) => (block && !block.trash ? idx : -1))
+                        .filter(idx => idx >= 0)
+                );
+            }
+
+            const candidates = new Set([...this._viewportAlwaysVisible, ...this._viewportFallback]);
+            for (let x = minX; x <= maxX; x++) {
+                for (let y = minY; y <= maxY; y++) {
+                    const cell = this._viewportGrid.get(x + "," + y);
+                    if (cell) {
+                        for (const idx of cell) candidates.add(idx);
+                    }
+                }
+            }
+            return candidates;
         };
 
         /**
@@ -492,7 +720,10 @@ class Blocks {
                         break;
                     }
                 }
-                if (same) return;
+                if (same) {
+                    this._updateViewportGrid(idx);
+                    return;
+                }
             }
 
             this._removeFromSpatialGrid(idx);
@@ -507,6 +738,7 @@ class Blocks {
                 cellSet.add(idx);
             }
             this._blockGridCell.set(idx, newKeys);
+            this._updateViewportGrid(idx);
         };
 
         /**
@@ -557,6 +789,10 @@ class Blocks {
         this._rebuildSpatialGrid = () => {
             this._spatialGrid.clear();
             this._blockGridCell.clear();
+            this._viewportGrid.clear();
+            this._blockViewportCells.clear();
+            this._viewportAlwaysVisible.clear();
+            this._viewportFallback.clear();
             for (let i = 0; i < this.blockList.length; i++) {
                 this._updateSpatialGrid(i);
             }
@@ -1993,8 +2229,34 @@ class Blocks {
                 }
             }
 
-            for (let blk = 0; blk < this._adjustTheseStacks.length; blk++) {
-                this.raiseStackToTop(this._adjustTheseStacks[blk]);
+            if (this._adjustTheseStacks.length > 0) {
+                const container = this.activity.blocksContainer;
+                const order = new Map(container.children.map((child, index) => [child, index]));
+                let nextIndex = container.children.length;
+                let canBatch = true;
+
+                for (const blk of this._adjustTheseStacks) {
+                    this.findDragGroup(this.findTopBlock(blk));
+                    const seen = new Set();
+                    for (let b = this.dragGroup.length - 1; b >= 0; b--) {
+                        const child = this.blockList[this.dragGroup[b]].container;
+                        if (seen.has(child) || child?.parent !== container || !order.has(child)) {
+                            canBatch = false;
+                            break;
+                        }
+                        seen.add(child);
+                        order.set(child, nextIndex++);
+                    }
+                    if (!canBatch) break;
+                }
+
+                if (canBatch) {
+                    container.sortChildren((a, b) => order.get(a) - order.get(b));
+                } else {
+                    for (const blk of this._adjustTheseStacks) {
+                        this.raiseStackToTop(blk);
+                    }
+                }
             }
 
             this.activity.refreshCanvas();
@@ -2013,19 +2275,41 @@ class Blocks {
         this.checkBounds = () => {
             if (this._deferCheckBounds) return;
             const start = window.__ENABLE_REFRESH_PROFILING__ ? performance.now() : 0;
+            const viewport = this._getWorkspaceViewport();
+            const homeIndicators = { left: false, right: false, above: false, below: false };
 
             let onScreen = true;
             for (const block of this.blockList) {
                 if (!block || block.trash) continue;
-                if (block.connections[0] === null) {
+                if (
+                    viewport &&
+                    !block.inCollapsed &&
+                    block.container &&
+                    block.width &&
+                    block.height
+                ) {
+                    const bounds = this._getHomeIndicatorBounds(block);
+                    homeIndicators.left = homeIndicators.left || bounds.left < viewport.left;
+                    homeIndicators.right = homeIndicators.right || bounds.right > viewport.right;
+                    homeIndicators.above = homeIndicators.above || bounds.top < viewport.top;
+                    homeIndicators.below = homeIndicators.below || bounds.bottom > viewport.bottom;
+                }
+                if (onScreen && block.connections[0] === null) {
                     if (block.offScreen(this.boundary)) {
                         this.activity.setHomeContainers(true);
                         /** Just highlight the button. */
                         /** this.boundary.show(); */
                         onScreen = false;
-                        break;
                     }
                 }
+            }
+
+            if (
+                viewport &&
+                this.activity.workspaceLayoutController &&
+                typeof this.activity.workspaceLayoutController.setHomeIndicators === "function"
+            ) {
+                this.activity.workspaceLayoutController.setHomeIndicators(homeIndicators);
             }
 
             if (onScreen) {
@@ -2178,12 +2462,17 @@ class Blocks {
                             label = _("audio file");
                         } else {
                             label = myBlock.value[0].toString();
-                            if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
+                            if (label.trim() === "") {
+                                label = _("audio file");
+                            } else if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
                                 label = label.slice(0, STRINGLEN) + "...";
                             }
                         }
                     } catch (e) {
                         label = _("audio file");
+                    }
+                    if (label === _("audio file")) {
+                        maxLength = label.length;
                     }
                     break;
                 case "solfege":
@@ -5036,7 +5325,7 @@ class Blocks {
             this.selectedStack = this.activeBlock;
 
             /** Copy the selectedStack. */
-            this.selectedBlocksObj = deepClone(this._copyBlocksToObj(false));
+            this.selectedBlocksObj = deepClone(this._copyBlocksToObj());
 
             /** Reset paste offset. */
             this.pasteDx = 0;
@@ -5105,7 +5394,7 @@ class Blocks {
                 return;
             }
 
-            const blockObjs = this._copyBlocksToObj(true);
+            const blockObjs = this._copyBlocksToObj();
             /**
              * If the first block is an action block, the its first
              * connection is the block containing its label.
@@ -5127,8 +5416,9 @@ class Blocks {
             } else {
                 /** Look for "show", "turtleshell", or "customsample". */
                 for (let i = 0; i < blockObjs.length; i++) {
-                    if (["show", "turtleshell", "customsample"].includes(blockObjs[i][1])) {
-                        switch (blockObjs[i][1]) {
+                    const blockName = [].concat(blockObjs[i][1])[0];
+                    if (["show", "turtleshell", "customsample"].includes(blockName)) {
+                        switch (blockName) {
                             case "show":
                                 name = `${_("Show").toLowerCase()}-${MathUtility.doRandom(
                                     0,
@@ -5142,7 +5432,7 @@ class Blocks {
                                 name = `${_("sample")}-${MathUtility.doRandom(0, 1000)}`;
                                 break;
                             default:
-                                name = `${blockObjs[i][1]}-${MathUtility.doRandom(0, 1000)}`;
+                                name = `${blockName}-${MathUtility.doRandom(0, 1000)}`;
                                 break;
                         }
                         break;
@@ -5160,8 +5450,7 @@ class Blocks {
          * @public
          * @returns blockObj
          */
-        this._copyBlocksToObj = saveStack => {
-            /** If saveStack then don't override media or audiofile blocks. */
+        this._copyBlocksToObj = () => {
             const blockObjs = [];
             const blockMap = {};
             let x;
@@ -5183,14 +5472,6 @@ class Blocks {
                     blockItem = [b, myBlock.unknownBlock, x, y, []];
                 } else if (myBlock.isValueBlock()) {
                     switch (myBlock.name) {
-                        case "media":
-                        case "audiofile":
-                            if (saveStack) {
-                                blockItem = [b, [myBlock.name, { value: myBlock.value }], x, y, []];
-                            } else {
-                                blockItem = [b, [myBlock.name, null], x, y, []];
-                            }
-                            break;
                         case "namedbox":
                         case "namedarg":
                             blockItem = [
@@ -5224,6 +5505,13 @@ class Blocks {
                     ].includes(myBlock.name)
                 ) {
                     blockItem = [b, [myBlock.name, { value: myBlock.privateData }], x, y, []];
+                } else if (myBlock.name === "customsample" && Array.isArray(myBlock.value)) {
+                    const value = myBlock.value.slice();
+                    const fileBlock = this.blockList[myBlock.connections[1]];
+                    if (fileBlock?.name === "audiofile" && fileBlock.value !== null) {
+                        value[1] = "";
+                    }
+                    blockItem = [b, [myBlock.name, { value: value }], x, y, []];
                 } else {
                     blockItem = [b, myBlock.name, x, y, []];
                 }
@@ -5244,6 +5532,21 @@ class Blocks {
                     } else {
                         blockObjs[b][4].push(blockMap[connection]);
                     }
+                }
+
+                if (Array.isArray(myBlock.drumCells)) {
+                    blockObjs[b][1] = [
+                        myBlock.name,
+                        {
+                            drumCells: myBlock.drumCells
+                                .filter(([pitch, drum]) => pitch in blockMap && drum in blockMap)
+                                .map(([pitch, drum, repeat]) => [
+                                    blockMap[pitch],
+                                    blockMap[drum],
+                                    repeat
+                                ])
+                        }
+                    ];
                 }
             }
 
@@ -5302,8 +5605,14 @@ class Blocks {
          * @param - blockObj - Block Objects
          * @public
          * @returns {number} this request's load token
+         * @throws {TypeError} if blockObjs is not a list
          */
         this.loadNewBlocks = blockObjs => {
+            // Anything else has no blocks to finish on, so the load would never end.
+            if (!Array.isArray(blockObjs)) {
+                throw new TypeError("loadNewBlocks expects a list of blocks.");
+            }
+
             const loadToken = ++this._nextLoadToken;
 
             if (this._loadInProgress) {
@@ -5382,8 +5691,8 @@ class Blocks {
          * Does the actual work of loading new blocks. Only ever runs for one
          * call to loadNewBlocks at a time, see _advanceLoadQueue above.
          * @private
-         * @param - blockObj - Block Objects
-         * @param - loadToken - this request's token, as returned by
+         * @param {Array} blockObjs - Block Objects.
+         * @param {number} loadToken - this request's token, as returned by
          *   loadNewBlocks() (see there for why it's distinct from
          *   _activeLoadGeneration)
          * @returns {void}
@@ -5404,8 +5713,61 @@ class Blocks {
             // "finishedLoading" with the token of whichever load is
             // current when it fires.
             this._activeLoadToken = loadToken;
+            this._unsupportedBlocksInCurrentLoad = new Set();
 
             try {
+                /**
+                 * Abandon a project we cannot load safely, telling the user
+                 * rather than crashing partway through the load.
+                 * @param {string} warning - Console warning describing the problem.
+                 * @param {*} data - The offending block data.
+                 * @param {string} [userMessage] - Optional user-facing error message.
+                 * @returns {void}
+                 */
+                const abortLoad = (warning, data, userMessage) => {
+                    console.warn(warning);
+                    console.debug(data);
+                    if (this.activity && typeof this.activity.errorMsg === "function") {
+                        this.activity.errorMsg(
+                            userMessage ||
+                                _("Something went wrong reading JSON-encoded project data.")
+                        );
+                    }
+                    this.activity._suppressRefresh = false;
+                    /**
+                     * The load queue cleared the workspace and started the
+                     * loading animation, so put the UI back the way the
+                     * successful path leaves it.
+                     */
+                    document.body.style.cursor = "default";
+                    if (this.activity && typeof this.activity.stopLoadAnimation === "function") {
+                        this.activity.stopLoadAnimation();
+                    }
+                    // Nothing was loaded, so a waiting save would only store
+                    // the cleared workspace over the project.
+                    this._afterLoadCallbacks.clear();
+                    this._advanceLoadQueue();
+                };
+
+                if (!Array.isArray(blockObjs)) {
+                    abortLoad(
+                        "Invalid block data: expected an array of blocks.",
+                        blockObjs,
+                        _("Cannot load project: invalid project structure.")
+                    );
+                    return;
+                }
+
+                for (let b = 0; b < blockObjs.length; b++) {
+                    if (!blockObjs[b] || !Array.isArray(blockObjs[b])) {
+                        abortLoad(
+                            "Invalid block data: expected an array for block at index " + b + ".",
+                            blockObjs[b],
+                            _("Cannot load project: malformed block structure detected.")
+                        );
+                        return;
+                    }
+                }
                 /**
                  * Playback Queue has been deprecated, but some old projects
                  * may still have playback blocks appended, which we will
@@ -5514,41 +5876,11 @@ class Blocks {
                     return false;
                 };
 
-                /**
-                 * Abandon a project we cannot load safely, telling the user
-                 * rather than crashing partway through the load.
-                 * @param - warning - console warning describing the problem
-                 * @param - data - the offending block data
-                 * @returns {void}
-                 */
-                const abortLoad = (warning, data) => {
-                    console.warn(warning);
-                    console.debug(data);
-                    if (this.activity && typeof this.activity.errorMsg === "function") {
-                        this.activity.errorMsg(
-                            _("Something went wrong reading JSON-encoded project data.")
-                        );
-                    }
-                    this.activity._suppressRefresh = false;
-                    /**
-                     * The load queue cleared the workspace and started the
-                     * loading animation, so put the UI back the way the
-                     * successful path leaves it.
-                     */
-                    document.body.style.cursor = "default";
-                    if (this.activity && typeof this.activity.stopLoadAnimation === "function") {
-                        this.activity.stopLoadAnimation();
-                    }
-                    // Nothing was loaded, so a waiting save would only store
-                    // the cleared workspace over the project.
-                    this._afterLoadCallbacks.clear();
-                    this._advanceLoadQueue();
-                };
-
                 if (hasCycle()) {
                     abortLoad(
                         "Circular connection detected in block data. Punting loading of new blocks!",
-                        blockObjs
+                        blockObjs,
+                        _("Cannot load project: circular block connection detected.")
                     );
                     return;
                 }
@@ -5865,7 +6197,8 @@ class Blocks {
                                     "Too few connections for " +
                                         name +
                                         ": punting loading of new blocks!",
-                                    blockObjs[b]
+                                    blockObjs[b],
+                                    _("Cannot load project: malformed block structure detected.")
                                 );
                                 return;
                             }
@@ -5894,7 +6227,8 @@ class Blocks {
                                         "Last connection of " +
                                             name +
                                             " is not a block in this project: punting loading of new blocks!",
-                                        blockObjs[b]
+                                        blockObjs[b],
+                                        _("Cannot load project: invalid block connection detected.")
                                     );
                                     return;
                                 }
@@ -5939,7 +6273,10 @@ class Blocks {
                                         "Too few connections to convert " +
                                             name +
                                             " to newnote style: punting loading of new blocks!",
-                                        blockObjs[b]
+                                        blockObjs[b],
+                                        _(
+                                            "Cannot load project: malformed block structure detected."
+                                        )
                                     );
                                     return;
                                 }
@@ -6141,7 +6478,8 @@ class Blocks {
                                     " in block " +
                                     b +
                                     ": punting loading of new blocks!",
-                                blkData
+                                blkData,
+                                _("Cannot load project: invalid block connection detected.")
                             );
                             return;
                         }
@@ -6437,6 +6775,32 @@ class Blocks {
                                         cell[0] + blockOffset,
                                         [cell[1][0] + blockOffset, cell[1][1]],
                                         cell[2]
+                                    ]);
+                            }
+                        };
+                        this._makeNewBlockWithConnections(
+                            name,
+                            blockOffset,
+                            blkData[4],
+                            postProcess,
+                            [thisBlock, blkInfo[1]]
+                        );
+                        break;
+                    case "pitchdrummatrix":
+                        postProcess = args => {
+                            const drumCells = args[1]?.drumCells;
+                            if (Array.isArray(drumCells)) {
+                                that.blockList[args[0]].drumCells = drumCells
+                                    .filter(
+                                        cell =>
+                                            Array.isArray(cell) &&
+                                            cell.length === 3 &&
+                                            cell.every(n => Number.isInteger(n) && n >= 0)
+                                    )
+                                    .map(([pitch, drum, repeat]) => [
+                                        pitch + blockOffset,
+                                        drum + blockOffset,
+                                        repeat
                                     ]);
                             }
                         };
@@ -7051,6 +7415,9 @@ class Blocks {
                     default:
                         /** Check that name is in the proto list */
                         if (!(name in this.protoBlockDict) || this.protoBlockDict[name] === null) {
+                            if (this._unsupportedBlocksInCurrentLoad) {
+                                this._unsupportedBlocksInCurrentLoad.add(name);
+                            }
                             const postProcessUnknownBlock = args => {
                                 /** save original block name */
                                 that.blockList[args[0]].privateData = args[1];
@@ -7289,6 +7656,23 @@ class Blocks {
                 if (this.activity.stopLoadAnimation) {
                     this.activity.stopLoadAnimation();
                 }
+                if (
+                    this._unsupportedBlocksInCurrentLoad &&
+                    this._unsupportedBlocksInCurrentLoad.size > 0
+                ) {
+                    const unsupportedList = Array.from(this._unsupportedBlocksInCurrentLoad).join(
+                        ", "
+                    );
+                    if (this.activity && typeof this.activity.errorMsg === "function") {
+                        this.activity.errorMsg(
+                            _(
+                                "Some blocks in this project are unsupported and were replaced with placeholders: %s"
+                            ).replace(/%s/g, () => unsupportedList)
+                        );
+                    }
+                    this._unsupportedBlocksInCurrentLoad.clear();
+                }
+
                 // Tagged with the request token loadNewBlocks() returned for
                 // the load that just finished, the same way "loadFailed" is
                 // tagged, so a listener scoped to one particular
@@ -7637,9 +8021,24 @@ class Blocks {
             // The block is gone for good, so drop it from the spatial grid too --
             // otherwise _getNearbyBlocks keeps handing out this index after
             // blockList[blkIdx] has been nulled out below (issue #8610).
+            this._viewportHomeBoundsDirty = true;
             const idx = Number(blkIdx);
             this._removeFromSpatialGrid(idx);
             this._blockGridCell.delete(idx);
+            const viewportKeys = this._blockViewportCells.get(idx);
+            if (viewportKeys) {
+                for (const key of viewportKeys) {
+                    const cell = this._viewportGrid.get(key);
+                    if (cell) {
+                        cell.delete(idx);
+                        if (cell.size === 0) this._viewportGrid.delete(key);
+                    }
+                }
+                this._blockViewportCells.delete(idx);
+            }
+            this._viewportAlwaysVisible.delete(idx);
+            this._viewportFallback.delete(idx);
+            this._viewportVisibleBlocks.delete(idx);
             this.blockList[blkIdx] = null;
         };
 
@@ -7808,20 +8207,15 @@ class Blocks {
                 if (turtle !== null) {
                     console.debug("putting turtle " + turtle + " in the trash");
                     const comp = this.turtles.turtleList[turtle].companionTurtle;
-                    if (comp) {
+                    if (comp !== null && comp !== undefined) {
                         this.turtles.turtleList[comp].inTrash = true;
                         if (this.turtles.turtleList[comp].container) {
                             this.turtles.turtleList[comp].container.visible = false;
                         }
-                        this.turtles.turtleList[turtle].inTrash = true;
-                        if (this.turtles.turtleList[turtle].container) {
-                            this.turtles.turtleList[turtle].container.visible = false;
-                        }
-                    } else {
-                        this.turtles.turtleList[turtle].inTrash = true;
-                        if (this.turtles.turtleList[turtle].container) {
-                            this.turtles.turtleList[turtle].container.visible = false;
-                        }
+                    }
+                    this.turtles.turtleList[turtle].inTrash = true;
+                    if (this.turtles.turtleList[turtle].container) {
+                        this.turtles.turtleList[turtle].container.visible = false;
                     }
                 }
             } else if (myBlock.name === "action") {
@@ -7835,6 +8229,7 @@ class Blocks {
             for (let b = 0; b < this.dragGroup.length; b++) {
                 const blk = this.dragGroup[b];
                 this.blockList[blk].trash = true;
+                this._updateViewportGrid(blk);
                 this.blockList[blk].hide();
 
                 // Free the backing canvas memory for trashed blocks.
@@ -8034,23 +8429,36 @@ class Blocks {
          * Recompute after scroll, pan, resize, or project load.
          */
         this._updateViewportCulling = () => {
-            const canvas = this.activity.canvas;
-            // Skip culling until the canvas has been initialized with valid dimensions.
-            // Calling culling too early (e.g. during project load before layout is final)
-            // would mark on-screen blocks as off-screen, and since the viewport never
-            // moves afterward, they'd stay invisible.
-            if (!canvas || !canvas.width || !canvas.height) return;
+            const viewport = this._getWorkspaceViewport();
+            if (!viewport) return;
+            const homeBounds = this._getViewportHomeBounds();
+            const homeIndicators = {
+                left: homeBounds ? homeBounds.left < viewport.left : false,
+                right: homeBounds ? homeBounds.right > viewport.right : false,
+                above: homeBounds ? homeBounds.top < viewport.top : false,
+                below: homeBounds ? homeBounds.bottom > viewport.bottom : false
+            };
+            const candidates = this._getViewportCandidates(
+                viewport.left,
+                viewport.top,
+                viewport.right,
+                viewport.bottom
+            );
+            const blocksToCheck = !this._viewportCullingInitialized
+                ? this.blockList.map((_, i) => i)
+                : candidates;
 
-            const container = this.activity.blocksContainer;
-            if (!container) return;
+            for (const i of this._viewportVisibleBlocks) {
+                if (!candidates.has(i)) {
+                    const block = this.blockList[i];
+                    if (block && !block.trash && block.container && block.width && block.height) {
+                        block._viewportVisible = false;
+                    }
+                }
+            }
 
-            // Viewport rect in container-space
-            const vpLeft = -container.x;
-            const vpTop = -container.y;
-            const vpRight = vpLeft + canvas.width;
-            const vpBottom = vpTop + canvas.height;
-
-            for (let i = 0; i < this.blockList.length; i++) {
+            const nextVisibleBlocks = new Set();
+            for (const i of blocksToCheck) {
                 const block = this.blockList[i];
                 if (!block || block.trash || !block.container) {
                     continue;
@@ -8061,15 +8469,18 @@ class Blocks {
                 // to avoid culling them before their size is known.
                 if (!block.width || !block.height) {
                     block._viewportVisible = true;
+                    nextVisibleBlocks.add(i);
                     continue;
                 }
                 const wasViewportVisible = block._viewportVisible;
+                const bounds = this._getBlockBounds(block);
                 block._viewportVisible = !(
-                    c.x + block.width <= vpLeft ||
-                    c.x >= vpRight ||
-                    c.y + block.height <= vpTop ||
-                    c.y >= vpBottom
+                    bounds.right <= viewport.left ||
+                    bounds.left >= viewport.right ||
+                    bounds.bottom <= viewport.top ||
+                    bounds.top >= viewport.bottom
                 );
+                if (block._viewportVisible) nextVisibleBlocks.add(i);
                 if (wasViewportVisible === false && block._viewportVisible && c.bitmapCache) {
                     // Visual state may have changed while its cache update was culled.
                     // The bitmap cache can legitimately be missing here: regenerating a
@@ -8077,6 +8488,18 @@ class Blocks {
                     // asynchronously, and updateCache() throws if we land in that window.
                     c.updateCache();
                 }
+            }
+
+            this._viewportVisibleBlocks = nextVisibleBlocks;
+            if (this.blockList.length > 0) {
+                this._viewportCullingInitialized = true;
+            }
+
+            if (
+                this.activity.workspaceLayoutController &&
+                typeof this.activity.workspaceLayoutController.setHomeIndicators === "function"
+            ) {
+                this.activity.workspaceLayoutController.setHomeIndicators(homeIndicators);
             }
         };
 

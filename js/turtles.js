@@ -230,6 +230,9 @@ class Turtles {
         for (let i = 0; i < this.getTurtleCount(); i++) {
             const turtle = this.getTurtle(i);
             turtle.running = false;
+            // Stop's clearAll() cancels managed timers, including a pending blink's
+            // "show the turtle again", so restore visibility explicitly.
+            turtle.stopBlink();
         }
 
         this.activity.refreshCanvas();
@@ -484,6 +487,18 @@ Turtles.TurtlesModel = class {
                     if (child) {
                         turtlesStage.removeChild(child);
                     }
+                }
+            }
+
+            for (const remainingTurtle of this._turtleList) {
+                if (remainingTurtle === turtle || remainingTurtle.companionTurtle === undefined) {
+                    continue;
+                }
+
+                if (remainingTurtle.companionTurtle === index) {
+                    delete remainingTurtle.companionTurtle;
+                } else if (remainingTurtle.companionTurtle > index) {
+                    remainingTurtle.companionTurtle -= 1;
                 }
             }
 

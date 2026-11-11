@@ -46,11 +46,11 @@
 /**
  * Bounds (in scalar steps) on the value accepted by setScalarInterval().
  * GetNotesForInterval() derives an octave count as `Math.floor(intervals[0] / 7)`,
- * which GetIntervalNumber() then walks with a `while (octave > 0)` loop that runs
- * once per octave. These line up with the existing octave range convention used
- * elsewhere for pitch (see PitchBlocks.js's "Octave must be an integer in [0, 9]"):
- * 69 is the largest value for which Math.floor(69 / 7) is still 9, and -63 is the
- * smallest (Math.floor rounds toward -Infinity, so -64 already overshoots to -10).
+ * which GetIntervalNumber() then turns into whole octaves of steps. These line up
+ * with the existing octave range convention used elsewhere for pitch (see
+ * PitchBlocks.js's "Octave must be an integer in [0, 9]"): 69 is the largest
+ * value for which Math.floor(69 / 7) is still 9, and -63 is the smallest
+ * (Math.floor rounds toward -Infinity, so -64 already overshoots to -10).
  * Anything outside this range corresponds to an octave shift no Pitch block could
  * represent, rather than an arbitrary cap.
  */
@@ -112,37 +112,54 @@ function setupIntervalsActions(activity) {
         static GetIntervalNumber(turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
             const temperament = activity.logo.synth.inTemperament;
-            let { firstNote, secondNote, octave } = GetNotesForInterval(tur, temperament);
+            const { firstNote, secondNote, octave } = GetNotesForInterval(tur, temperament);
             const keySig = tur.singer.keySignature;
             const firstStep = pitchToNumber(firstNote, 0, keySig, temperament);
             const secondStep = pitchToNumber(secondNote, 0, keySig, temperament);
-            let totalIntervals = Math.abs(firstStep - secondStep);
 
             // Use dynamic temperament length for custom tunings
             const temperamentLength = this.getTemperamentLength();
 
-            // Handle octave boundary wrap-around for enharmonic equivalents
-            // For cases like B (12) to B#/Cb (0), the raw difference is 12 but should be 1
-            // Calculate forward distance across octave boundary using modular arithmetic
-            if (totalIntervals !== 0) {
-                const forwardDiff =
-                    (secondStep - firstStep + temperamentLength) % temperamentLength;
-                // When notes are at octave boundary (forwardDiff === 0), use 1 semitone
-                // Otherwise use the shorter of raw difference or forward distance
-                totalIntervals = forwardDiff === 0 ? 1 : Math.min(totalIntervals, forwardDiff);
+            // Octave numbers change at C, so the second note sits in a later
+            // (or earlier) octave whenever the letter steps cross a C.
+            const letterSteps = this.getLetterSteps(firstNote, secondNote, octave);
+            const octaveShift =
+                letterSteps === null
+                    ? octave
+                    : Math.floor((this.getLetterIndex(firstNote) + letterSteps) / NOTENAMES.length);
+
+            return Math.abs(secondStep - firstStep + octaveShift * temperamentLength);
+        }
+
+        /**
+         * @static
+         * @param {String} note - Note name, e.g. "A" or "c#".
+         * @returns {Number} Index of the note's letter in NOTENAMES, or -1.
+         */
+        static getLetterIndex(note) {
+            return NOTENAMES.indexOf(String(note).charAt(0).toUpperCase());
+        }
+
+        /**
+         * Letter steps from the first note to the second, e.g. 2 for A up to C
+         * and -4 for G down to C. `octave` follows the scalar-interval convention
+         * of GetNotesForInterval (0 is up by less than an octave, -1 is down by
+         * up to an octave).
+         *
+         * @static
+         * @param {String} firstNote
+         * @param {String} secondNote
+         * @param {Number} octave
+         * @returns {Number|null} Null if either name does not start with a letter.
+         */
+        static getLetterSteps(firstNote, secondNote, octave) {
+            const length = NOTENAMES.length;
+            const index1 = this.getLetterIndex(firstNote);
+            const index2 = this.getLetterIndex(secondNote);
+            if (index1 === -1 || index2 === -1) {
+                return null;
             }
-
-            if (octave < 0 && totalIntervals !== 0 && totalIntervals !== temperamentLength)
-                totalIntervals = temperamentLength - totalIntervals;
-
-            if (octave < -1 || totalIntervals === 0) octave = Math.abs(octave);
-
-            while (octave > 0) {
-                totalIntervals += temperamentLength;
-                octave--;
-            }
-
-            return totalIntervals;
+            return length * octave + ((((index2 - index1) % length) + length) % length);
         }
 
         /**
@@ -156,15 +173,13 @@ function setupIntervalsActions(activity) {
             const temperament = activity.logo.synth.inTemperament;
             const { firstNote, secondNote, octave } = GetNotesForInterval(tur, temperament);
 
-            const index1 = NOTENAMES.indexOf(firstNote.substring(0, 1));
-            const index2 = NOTENAMES.indexOf(secondNote.substring(0, 1));
             let lastWord = "";
-            let letterGap = Math.abs(index2 - index1);
+            const letterGap =
+                Math.abs(this.getLetterSteps(firstNote, secondNote, octave) ?? 0) %
+                NOTENAMES.length;
 
             // Use dynamic temperament length for custom tunings
             const temperamentLength = this.getTemperamentLength();
-
-            if (index1 > index2 && octave !== 0) letterGap = NOTENAMES.length - letterGap;
 
             let totalIntervals = this.GetIntervalNumber(turtle);
 
@@ -197,16 +212,23 @@ function setupIntervalsActions(activity) {
             // +9 is the original 12-EDO offset: intervals beyond
             // temperamentLength + 9 get an explicit "plus N octave(s)"
             // suffix. Same offset scales proportionally for all EDOs.
+            let octavesRemoved = 0;
             if (totalIntervals > temperamentLength + 9) {
-                if (octave >= 1) {
-                    lastWord = `, ${_("plus")} ${os} ${plural}`;
+                while (totalIntervals > temperamentLength) {
+                    totalIntervals -= temperamentLength;
+                    octavesRemoved += 1;
                 }
-                while (totalIntervals > temperamentLength) totalIntervals -= temperamentLength;
+            }
+
+            // Count only the octaves taken off above: smaller intervals already
+            // have a compound name (e.g. tenth), and so does "diminished octave".
+            if (octavesRemoved > 0) {
+                const count = numberToStringMap[octavesRemoved - 1] || octavesRemoved;
+                const unit = octavesRemoved > 1 ? _("octaves") : _("octave");
+                lastWord = octave < 0 ? `,  ${count} ${unit}` : `, ${_("plus")} ${count} ${unit}`;
             }
 
             if (octave < 0) {
-                letterGap = letterGap !== 0 ? NOTENAMES.length - letterGap : letterGap;
-                if (octave < -1) lastWord = `,  ${os} ${plural}`;
                 lastWord += ` ${_("below")}`;
             }
 
@@ -428,7 +450,7 @@ function setupIntervalsActions(activity) {
             const i = arg > 0 ? Math.floor(arg) : Math.ceil(arg);
             tur.singer.intervals.push(i);
 
-            const listenerName = "_interval_" + turtle;
+            const listenerName = "_interval_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -462,7 +484,7 @@ function setupIntervalsActions(activity) {
 
             tur.singer.chordIntervals.push(arg);
 
-            const listenerName = "_chord_interval_" + turtle;
+            const listenerName = "_chord_interval_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -499,7 +521,7 @@ function setupIntervalsActions(activity) {
                 tur.singer.semitoneIntervals.push([i, tur.singer.noteDirection]);
                 tur.singer.noteDirection = 0;
 
-                const listenerName = "_semitone_interval_" + turtle;
+                const listenerName = "_semitone_interval_" + turtle + "_" + blk;
                 if (blk !== undefined && blk in activity.blocks.blockList) {
                     activity.logo.setDispatchBlock(blk, turtle, listenerName);
                 } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -532,7 +554,7 @@ function setupIntervalsActions(activity) {
 
             const tur = activity.turtles.ithTurtle(turtle);
             tur.singer.ratioIntervals.push(arg);
-            const listenerName = "_ratio_interval_" + turtle;
+            const listenerName = "_ratio_interval_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {

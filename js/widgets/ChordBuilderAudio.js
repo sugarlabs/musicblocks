@@ -18,7 +18,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* global DEFAULTVOICE, ManagedTimer */
+/* global ACCIDENTAL_SEMITONE_MAP, DEFAULTVOICE, ManagedTimer, NOTENAMES */
 
 /**
  * @file ChordBuilderAudio.js
@@ -103,50 +103,34 @@ class ChordBuilderAudio {
             return [];
         }
 
-        const SEMITONE_MAP = {
-            "C": 0,
-            "C#": 1,
-            "C♯": 1,
-            "Db": 1,
-            "D♭": 1,
-            "D": 2,
-            "D#": 3,
-            "D♯": 3,
-            "Eb": 3,
-            "E♭": 3,
-            "E": 4,
-            "F": 5,
-            "F#": 6,
-            "F♯": 6,
-            "Gb": 6,
-            "G♭": 6,
-            "G": 7,
-            "G#": 8,
-            "G♯": 8,
-            "Ab": 8,
-            "A♭": 8,
-            "A": 9,
-            "A#": 10,
-            "A♯": 10,
-            "Bb": 10,
-            "B♭": 10,
-            "B": 11
-        };
-
         const result = [];
         let currentOctave = baseOctave;
-        let lastSemitone = -1;
+        let lastLetter = -1;
+        let lastAccidental = 0;
 
+        // Scientific octave numbers advance when diatonic letter order wraps
+        // past B (C=0 ... B=6) or when descending accidentals appear on the same letter.
+        // Diatonic wrapping ensures enharmonic spellings (e.g., E#, B#) preserve ascending voicings.
         for (let i = 0; i < notes.length; i++) {
             const note = notes[i];
             const cleanNote = typeof note === "string" ? note.trim() : String(note);
-            const semitone = SEMITONE_MAP[cleanNote] !== undefined ? SEMITONE_MAP[cleanNote] : 0;
-
-            if (i > 0 && semitone < lastSemitone) {
-                // Pitch wrapped past B -> advance octave
-                currentOctave++;
+            const letterIndex = NOTENAMES.indexOf(cleanNote.charAt(0).toUpperCase());
+            let accidentalOffset = 0;
+            for (const char of cleanNote.slice(1)) {
+                accidentalOffset += ACCIDENTAL_SEMITONE_MAP[char] || 0;
             }
-            lastSemitone = semitone;
+
+            if (i > 0 && letterIndex !== -1 && lastLetter !== -1) {
+                if (
+                    letterIndex < lastLetter ||
+                    (letterIndex === lastLetter && accidentalOffset < lastAccidental)
+                ) {
+                    currentOctave++;
+                }
+            }
+
+            lastLetter = letterIndex;
+            lastAccidental = accidentalOffset;
             result.push(`${cleanNote}${currentOctave}`);
         }
 

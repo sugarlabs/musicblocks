@@ -20,6 +20,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+// What MeterActions.setBPM and setMasterBPM return: null for a bpm or beat value they
+// reject, otherwise the tempo clamped to 30-1000 quarter notes, counted in the beat value.
+const tempoInUse = (bpm, beat) => {
+    if (!Number.isFinite(bpm) || bpm <= 0 || !Number.isFinite(beat) || beat <= 0) {
+        return null;
+    }
+    return Math.min(Math.max((bpm * beat) / 0.25, 30), 1000) * (0.25 / beat);
+};
+
 describe("MeterBlocks setup", () => {
     let activity;
     let logo;
@@ -120,8 +129,8 @@ describe("MeterBlocks setup", () => {
                 onStrongBeatDo: jest.fn(),
                 onEveryBeatDo: jest.fn(),
                 onEveryNoteDo: jest.fn(),
-                setMasterBPM: jest.fn(),
-                setBPM: jest.fn(),
+                setMasterBPM: jest.fn(tempoInUse),
+                setBPM: jest.fn(tempoInUse),
                 setPickup: jest.fn(),
                 setMeter: jest.fn()
             },
@@ -497,6 +506,39 @@ describe("MeterBlocks setup", () => {
         expect(logo.tempo.BPMs).toEqual([100]);
     });
 
+    it.each(["setmasterbpm2", "setbpm3"])(
+        "%s notates the clamped tempo that plays, not the raw bpm",
+        name => {
+            const block = getBlock(name);
+            activity.blocks.blockList.clamped = { connections: [null, "clampedText"] };
+            activity.blocks.blockList.clampedText = { text: { text: "2000" } };
+
+            block.flow([2000, 0.25], logo, 0, "clamped");
+            expect(logo.notation.notationTempo).toHaveBeenLastCalledWith(0, 1000, 0.25);
+
+            block.flow([10, 0.5], logo, 0, "clamped");
+            expect(logo.notation.notationTempo).toHaveBeenLastCalledWith(0, 15, 0.5);
+
+            // A tempo the setter rejects is not notated.
+            logo.notation.notationTempo.mockClear();
+            block.flow([0, 0.25], logo, 0, "clamped");
+            block.flow([-60, 0.25], logo, 0, "clamped");
+            block.flow([120, 0], logo, 0, "clamped");
+            block.flow([NaN, 0.25], logo, 0, "clamped");
+            block.flow([Infinity, 0.25], logo, 0, "clamped");
+            block.flow([-Infinity, 0.25], logo, 0, "clamped");
+            block.flow([120, NaN], logo, 0, "clamped");
+            block.flow([120, Infinity], logo, 0, "clamped");
+            block.flow([120, -Infinity], logo, 0, "clamped");
+            expect(logo.notation.notationTempo).not.toHaveBeenCalled();
+
+            // Nor is a block with missing arguments.
+            block.flow([], logo, 0, "clamped");
+            block.flow([120], logo, 0, "clamped");
+            expect(logo.notation.notationTempo).not.toHaveBeenCalled();
+        }
+    );
+
     describe("the BPM given to the Tempo widget", () => {
         beforeEach(() => {
             logo.inTempo = true;
@@ -621,10 +663,12 @@ describe("MeterBlocks setup", () => {
         response = block.flow([2000, 0.25, "next"], logo, 0, "flow");
         expect(activity.errorMsg).toHaveBeenCalledWith("Maximum beats per minute is 1000.");
         expect(turtle.singer.bpm[turtle.singer.bpm.length - 1]).toBe(1000);
+        expect(logo.notation.notationTempo).toHaveBeenLastCalledWith(0, 1000, 0.25);
 
         response = block.flow([120, 0.5, "next"], logo, 0, "flow");
         expect(turtle.singer.bpm[turtle.singer.bpm.length - 1]).toBe((120 * 0.5) / 0.25);
-        expect(logo.setDispatchBlock).toHaveBeenCalledWith("flow", 0, "_bpm_0");
+        expect(logo.notation.notationTempo).toHaveBeenLastCalledWith(0, 120, 0.5);
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("flow", 0, "_bpm_0_flow");
         expect(listenerCalls).toHaveLength(3);
         listenerCalls.forEach(handler => handler());
         expect(turtle.singer.bpm).toEqual([]);
@@ -654,6 +698,34 @@ describe("MeterBlocks setup", () => {
         expect(turtle.singer.bpm[turtle.singer.bpm.length - 1]).toBe(1000);
     });
 
+    it("rejects non-positive and non-finite setbpm2 inputs but still runs the clamp", () => {
+        const block = getBlock("setbpm2");
+        const turtle = { singer: { bpm: [] } };
+        activity.turtles.ithTurtle.mockReturnValue(turtle);
+
+        [0, -2, NaN, Infinity].forEach(beatValue => {
+            activity.errorMsg.mockClear();
+            expect(block.flow([90, beatValue, "next"], logo, 0, "flow")).toEqual(["next", 1]);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Beat value must be a positive number.",
+                "flow"
+            );
+        });
+
+        [0, -90, NaN, Infinity].forEach(bpm => {
+            activity.errorMsg.mockClear();
+            expect(block.flow([bpm, 0.25, "next"], logo, 0, "flow")).toEqual(["next", 1]);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "BPM must be a positive number.",
+                "flow"
+            );
+        });
+
+        expect(logo.notation.notationTempo).not.toHaveBeenCalled();
+        expect(turtle.singer.bpm).toEqual([]);
+        expect(logo.setTurtleListener).not.toHaveBeenCalled();
+    });
+
     it("pushes and pops BPM values with the older setbpm block", () => {
         const block = getBlock("setbpm");
         const turtle = { singer: { bpm: [] } };
@@ -679,7 +751,7 @@ describe("MeterBlocks setup", () => {
 
         const response = block.flow([180, "next"], logo, 0, "legacyBpm");
         expect(response).toEqual(["next", 1]);
-        expect(logo.setDispatchBlock).toHaveBeenCalledWith("legacyBpm", 0, "_bpm_0");
+        expect(logo.setDispatchBlock).toHaveBeenCalledWith("legacyBpm", 0, "_bpm_0_legacyBpm");
         listeners.forEach(handler => handler());
         expect(turtle.singer.bpm).toEqual([]);
     });
@@ -706,6 +778,20 @@ describe("MeterBlocks setup", () => {
 
         block.flow([6, 0.125], logo, 1, "meterBlk");
         expect(Singer.MeterActions.setMeter).toHaveBeenCalledWith(6, 0.125, 1);
+    });
+
+    it("sets meterArgs on the turtle's own keyboard", () => {
+        const block = getBlock("meter");
+        const own = {};
+        const lastActive = {};
+        logo.inMusicKeyboard = true;
+        logo.musicKeyboard = lastActive;
+        logo.musicKeyboardByTurtle = { 1: own };
+
+        block.flow([4, 0.25], logo, 1, "meterBlk");
+
+        expect(own.meterArgs).toEqual([4, 0.25]);
+        expect(lastActive.meterArgs).toBeUndefined();
     });
     it("bpmfactor arg pushes to statusFields when inStatusMatrix", () => {
         const block = getBlock("bpmfactor");
@@ -822,5 +908,118 @@ describe("MeterBlocks setup", () => {
         activity.turtles.ithTurtle.mockReturnValue(tur);
         block.setter(logo, 120, 0);
         expect(tur.singer.bpm[0]).toBe(120);
+    });
+
+    describe("nested tempo clamp isolation", () => {
+        it("nested setbpm2 clamps register distinct block-scoped listeners and pop in order", () => {
+            const block = getBlock("setbpm2");
+            const turtle = { singer: { bpm: [] } };
+            activity.turtles.ithTurtle.mockReturnValue(turtle);
+
+            const callbacks = {};
+            logo.setTurtleListener.mockImplementation((turtleId, name, cb) => {
+                callbacks[name] = cb;
+            });
+
+            // Outer clamp: 60 BPM with 1/4 note value (blk 1)
+            block.flow([60, 0.25, "outerChild"], logo, 0, 1);
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_bpm_0_1");
+            expect(logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                "_bpm_0_1",
+                expect.any(Function)
+            );
+            expect(turtle.singer.bpm).toEqual([60]);
+
+            // Inner clamp: 120 BPM with 1/4 note value (blk 2)
+            block.flow([120, 0.25, "innerChild"], logo, 0, 2);
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith(2, 0, "_bpm_0_2");
+            expect(logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                "_bpm_0_2",
+                expect.any(Function)
+            );
+            expect(turtle.singer.bpm).toEqual([60, 120]);
+
+            // Inner completes first
+            callbacks["_bpm_0_2"]();
+            expect(turtle.singer.bpm).toEqual([60]);
+
+            // Outer completes
+            callbacks["_bpm_0_1"]();
+            expect(turtle.singer.bpm).toEqual([]);
+        });
+
+        it("nested setbpm legacy clamps register distinct block-scoped listeners and pop in order", () => {
+            const block = getBlock("setbpm");
+            const turtle = { singer: { bpm: [] } };
+            activity.turtles.ithTurtle.mockReturnValue(turtle);
+
+            const callbacks = {};
+            logo.setTurtleListener.mockImplementation((turtleId, name, cb) => {
+                callbacks[name] = cb;
+            });
+
+            // Outer clamp: 80 BPM (blk 10)
+            block.flow([80, "outerChild"], logo, 0, 10);
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith(10, 0, "_bpm_0_10");
+            expect(turtle.singer.bpm).toEqual([80]);
+
+            // Inner clamp: 140 BPM (blk 20)
+            block.flow([140, "innerChild"], logo, 0, 20);
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith(20, 0, "_bpm_0_20");
+            expect(turtle.singer.bpm).toEqual([80, 140]);
+
+            // Inner completes
+            callbacks["_bpm_0_20"]();
+            expect(turtle.singer.bpm).toEqual([80]);
+
+            // Outer completes
+            callbacks["_bpm_0_10"]();
+            expect(turtle.singer.bpm).toEqual([]);
+        });
+
+        it("nested tempo clamps preserve outer stage event listener with real setTurtleListener", () => {
+            const block = getBlock("setbpm2");
+            const stageListeners = {};
+            activity.stage = {
+                addEventListener: jest.fn((name, fn) => {
+                    stageListeners[name] = stageListeners[name] || [];
+                    stageListeners[name].push(fn);
+                }),
+                removeEventListener: jest.fn((name, fn) => {
+                    if (stageListeners[name]) {
+                        stageListeners[name] = stageListeners[name].filter(f => f !== fn);
+                    }
+                })
+            };
+            const turtle = { singer: { bpm: [] }, listeners: {} };
+            activity.turtles.ithTurtle.mockReturnValue(turtle);
+            logo.setTurtleListener = (turtleId, listenerName, listener) => {
+                const tur = activity.turtles.ithTurtle(turtleId);
+                if (listenerName in tur.listeners) {
+                    activity.stage.removeEventListener(
+                        listenerName,
+                        tur.listeners[listenerName],
+                        false
+                    );
+                }
+                tur.listeners[listenerName] = listener;
+                activity.stage.addEventListener(listenerName, listener, false);
+            };
+
+            // Outer clamp (blk 1)
+            block.flow([60, 0.25, "outerChild"], logo, 0, 1);
+            expect(turtle.listeners["_bpm_0_1"]).toBeDefined();
+            expect(stageListeners["_bpm_0_1"]).toHaveLength(1);
+
+            // Inner clamp (blk 2)
+            block.flow([120, 0.25, "innerChild"], logo, 0, 2);
+            expect(turtle.listeners["_bpm_0_2"]).toBeDefined();
+            expect(stageListeners["_bpm_0_2"]).toHaveLength(1);
+
+            // Verify outer stage listener was NOT detached when inner clamp registered
+            expect(stageListeners["_bpm_0_1"]).toHaveLength(1);
+        });
     });
 });

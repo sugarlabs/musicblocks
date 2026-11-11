@@ -52,6 +52,30 @@ describe("musicutils-modecore", () => {
         expect(modecore.getModePattern("major")).toEqual([2, 2, 1, 2, 2, 2, 1]);
     });
 
+    it("handles nullish, empty, and non-string inputs safely in mode and note utilities", () => {
+        expect(modecore.getModeNumbers(null)).toBe("");
+        expect(modecore.getModeNumbers(undefined)).toBe("");
+        expect(modecore.getModeNumbers(123)).toBe("");
+        expect(modecore.getModeNumbers("")).toBe("");
+
+        expect(modecore.getArticulation(null)).toBe("");
+        expect(modecore.getArticulation(undefined)).toBe("");
+        expect(modecore.getArticulation(42)).toBe("");
+        expect(modecore.getArticulation("")).toBe("");
+
+        expect(modecore.modeMapper(null, "dorian")).toEqual(["b♭", "major"]);
+        expect(modecore.modeMapper("c", undefined)).toEqual(["c", "major"]);
+        expect(modecore.modeMapper(null, null)).toEqual(["c", "major"]);
+
+        expect(modecore.getCustomNote(null)).toBe("");
+        expect(modecore.getCustomNote(undefined)).toBe("");
+        expect(modecore.getCustomNote([])).toBe("");
+        expect(modecore.getCustomNote(123)).toBe("");
+
+        expect(modecore.getModePattern(null)).toEqual([2, 2, 1, 2, 2, 2, 1]);
+        expect(modecore.getModePattern(undefined)).toEqual([2, 2, 1, 2, 2, 2, 1]);
+        expect(modecore.getModePattern(99)).toEqual([2, 2, 1, 2, 2, 2, 1]);
+    });
     it("has 20 chord definitions and a movable-tonic-degree table", () => {
         expect(modecore.CHORDVALUES).toHaveLength(20);
         expect(modecore.CHORDVALUES[0]).toEqual([
@@ -87,6 +111,25 @@ describe("musicutils-modecore", () => {
             expect(modecore.getModePattern(123)).toEqual(major12);
             expect(modecore.getModePattern({})).toEqual(major12);
             expect(modecore.getModePattern("unknownMode")).toEqual(major12);
+        });
+
+        it("falls back to the 12-EDO pattern for an invalid EDO in getModePattern", () => {
+            // A bad EDO passed straight here previously produced NaN
+            // steps for named modes and threw a RangeError for "custom"
+            // (new Array(Infinity)); both must now give the 12-EDO result.
+            for (const edo of [Infinity, -Infinity, NaN, 12.5, 0, -3, 257]) {
+                expect(modecore.getModePattern("major", edo)).toEqual([2, 2, 1, 2, 2, 2, 1]);
+                expect(modecore.getModePattern("custom", edo)).toEqual([
+                    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+                ]);
+                expect(modecore.getModePattern("major", edo)).toEqual(
+                    modecore.getModePattern("major", 12)
+                );
+            }
+            // Valid EDOs are unchanged, boundaries included.
+            expect(modecore.getModePattern("major", 1)).toEqual([1, 1, 1, 1, 1, 1, 1]);
+            expect(modecore.getModePattern("major", 19)).toEqual([3, 3, 2, 3, 3, 3, 2]);
+            expect(modecore.getModePattern("major", 256).reduce((a, b) => a + b, 0)).toBe(256);
         });
 
         it("returns an empty string for non-string inputs in getModeNumbers", () => {

@@ -20,7 +20,7 @@
    global
 
    createjs, DEFAULTVOLUME, importMembers, Painter, Singer,
-   DEFAULTVOICE, retryWithBackoff, base64Encode
+   DEFAULTVOICE, retryWithBackoff, base64Encode, escapeHTML
  */
 /* exported Turtle */
 /**
@@ -74,6 +74,7 @@ class Turtle {
 
         this._transportTime = null;
         this._transportEventId = null;
+        this.runGeneration = 0;
     }
 
     /**
@@ -890,7 +891,11 @@ Turtle.TurtleView = class {
      * @param width - resize decoration by width
      */
     resizeDecoration(scale, width) {
-        this._decorationBitmap.x = width - (30 * scale) / 2;
+        if (!this._decorationBitmap) {
+            return;
+        }
+        const w = width !== undefined ? width : this._startBlock ? this._startBlock.width : 0;
+        this._decorationBitmap.x = w - (30 * scale) / 2;
         this._decorationBitmap.y = (20 * scale) / 2; // Use 20 to match doTurtleShell
         this._decorationBitmap.scaleX =
             this._decorationBitmap.scaleY =
@@ -966,6 +971,8 @@ Turtle.TurtleView = class {
                 const xScaled = text.x * this.turtles.scale;
                 const yScaled = text.y * this.turtles.scale;
                 const sizeScaled = size * this.turtles.scale;
+                // Both come from the user, so escape them: a bare "&" or "<"
+                // makes the whole SVG invalid and nothing of it renders.
                 this.painter.svgOutput +=
                     '<text x="' +
                     xScaled +
@@ -974,14 +981,15 @@ Turtle.TurtleView = class {
                     '" fill="' +
                     this.painter.canvasColor +
                     '" font-family = "' +
-                    this.painter.font +
+                    escapeHTML(this.painter.font) +
                     '" font-size = "' +
                     sizeScaled +
                     '">' +
-                    lineContent +
+                    escapeHTML(lineContent) +
                     "</text>";
             }
         }
+        this.activity.artworkRevision = (this.activity.artworkRevision || 0) + 1;
         this.activity.refreshCanvas();
     }
 
@@ -997,6 +1005,10 @@ Turtle.TurtleView = class {
         const img = new Image();
 
         img.onload = () => {
+            if (this._skinChanged) {
+                return;
+            }
+
             const bitmap = new createjs.Bitmap(img);
 
             this._bitmap = bitmap;
@@ -1009,19 +1021,29 @@ Turtle.TurtleView = class {
             const startBlock = this._startBlock;
             // eslint-disable-next-line eqeqeq
             if (useTurtleArtwork && startBlock != null) {
+                // eslint-disable-next-line eqeqeq
+                if (this._decorationBitmap != null) {
+                    startBlock.container.removeChild(this._decorationBitmap);
+                }
                 startBlock.updateCache();
                 this._decorationBitmap = this._bitmap.clone();
+                this._decorationBitmap.regX = 0;
+                this._decorationBitmap.regY = 0;
+                this._decorationBitmap.rotation = 0;
                 startBlock.container.addChild(this._decorationBitmap);
                 this._decorationBitmap.name = "decoration";
                 const width = startBlock.width;
-                const offset = 40;
+                const offset = 30;
+
+                const baseScale = img.width ? 27.5 / img.width : 0.5;
+                this._decorationBaseScale = baseScale;
 
                 this._decorationBitmap.x = width - (offset * startBlock.protoblock.scale) / 2;
-                this._decorationBitmap.y = (35 * startBlock.protoblock.scale) / 2;
+                this._decorationBitmap.y = (20 * startBlock.protoblock.scale) / 2;
                 this._decorationBitmap.scaleX =
                     this._decorationBitmap.scaleY =
                     this._decorationBitmap.scale =
-                        (0.5 * startBlock.protoblock.scale) / 2;
+                        (baseScale * startBlock.protoblock.scale) / 2;
                 startBlock.updateCache();
             }
 

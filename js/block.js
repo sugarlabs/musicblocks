@@ -900,13 +900,11 @@ class Block {
                 this.container.setChildIndex(this.imageBitmap, zIndex);
             }
 
-            if (this.name === "start" || this.name === "drum") {
+            if (this.name === "start") {
                 // Rescale the decoration on the start blocks.
                 for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
                     if (this.activity.turtles.getTurtle(t).startBlock === this) {
-                        this.activity.turtles
-                            .getTurtle(t)
-                            .resizeDecoration(scale, this.bitmap.image.width);
+                        this.activity.turtles.getTurtle(t).resizeDecoration(scale, this.width);
                         this._ensureDecorationOnTop();
                         break;
                     }
@@ -1069,6 +1067,9 @@ class Block {
         this.width = obj[2];
         this.height = obj[3];
         this.hitHeight = obj[4];
+        if (this.blockIndex >= 0 && this.blocks._updateViewportGrid) {
+            this.blocks._updateViewportGrid(this.blockIndex);
+        }
     }
 
     /**
@@ -1436,6 +1437,9 @@ class Block {
             this.width = obj[2];
             this.height = obj[3];
             this.hitHeight = obj[4];
+            if (this.blockIndex >= 0 && this.blocks._updateViewportGrid) {
+                this.blocks._updateViewportGrid(this.blockIndex);
+            }
         }
         let artwork;
         if (this.protoblock.disabled) {
@@ -1807,6 +1811,13 @@ class Block {
                             platformColor.blockText
                         );
                         break;
+                    case "chordbuilder":
+                        that.collapseText = new createjs.Text(
+                            _("chords"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
                     case "status":
                         that.collapseText = new createjs.Text(
                             _("status"),
@@ -2047,6 +2058,9 @@ class Block {
         if (!this.trash && !this.inCollapsed && this.container) {
             this.container.visible = true;
             this._viewportVisible = true;
+            if (this.blockIndex >= 0 && this.blocks._updateViewportGrid) {
+                this.blocks._updateViewportGrid(this.blockIndex);
+            }
             if (this.isCollapsible()) {
                 if (this.collapsed) {
                     if (this.bitmap !== null) {
@@ -2827,6 +2841,9 @@ class Block {
 
         this.updateCache();
         this.unhighlight();
+        if (typeof this.blocks._updateViewportGrid === "function") {
+            this.blocks._updateViewportGrid(thisBlock);
+        }
         this.activity.refreshCanvas();
     }
 
@@ -2978,10 +2995,13 @@ class Block {
             // are there more pitch blocks in this note?
             c = this.blocks.findFirstPitchBlock(last(this.blocks.blockList[c].connections));
             // Update the collapsed-block label.
-            if (c === null) {
-                this.collapseText.text = p + " | " + v;
+            const pitchLabel = c === null ? p : p + "...";
+            if (p === "") {
+                this.collapseText.text = v;
+            } else if (v === "") {
+                this.collapseText.text = pitchLabel;
             } else {
-                this.collapseText.text = p + "... | " + v;
+                this.collapseText.text = pitchLabel + " | " + v;
             }
         }
     }
@@ -3002,15 +3022,22 @@ class Block {
                 if (c1 !== null && c2 !== null && this.blocks.blockList[c2].name === "divide") {
                     const ci = this.blocks.blockList[c2].connections[1];
                     const cii = this.blocks.blockList[c2].connections[2];
+                    const b1 = c1 !== null ? this.blocks.blockList[c1] : null;
+                    const bi = ci !== null ? this.blocks.blockList[ci] : null;
+                    const bii = cii !== null ? this.blocks.blockList[cii] : null;
                     if (
-                        ci !== null &&
-                        cii !== null &&
-                        this.blocks.blockList[ci].name === "number" &&
-                        this.blocks.blockList[cii].name === "number"
+                        b1 &&
+                        bi &&
+                        bii &&
+                        b1.name === "number" &&
+                        bi.name === "number" &&
+                        bii.name === "number" &&
+                        bi.value !== 0
                     ) {
-                        v =
-                            (this.blocks.blockList[c1].value / this.blocks.blockList[ci].value) *
-                            this.blocks.blockList[cii].value;
+                        const calculated = (b1.value / bi.value) * bii.value;
+                        if (Number.isFinite(calculated)) {
+                            v = calculated;
+                        }
                     }
                 }
             }
@@ -3019,22 +3046,27 @@ class Block {
         c = this.connections[2];
         c = this.blocks.findFirstPitchBlock(c);
         const p = this._getPitch(c);
+        const hasValidTime = typeof v === "number" && Number.isFinite(v);
         if (c === null) {
-            this.collapseText.text = `${_("silence")} | ${v}`;
-        } else if (p === "" && v === "") {
+            this.collapseText.text = hasValidTime
+                ? `${_("silence")} | ${v.toFixed(0)}`
+                : _("silence");
+        } else if (p === "" && !hasValidTime) {
             this.collapseText.text = _("note value");
         } else {
             // Are there more pitch blocks in this note?
             c = this.blocks.findFirstPitchBlock(last(this.blocks.blockList[c].connections));
             // Update the collapsed-block label.
-            if (v !== "") {
-                if (c === null) {
-                    this.collapseText.text = p + " | " + v.toFixed(0);
+            const pitchLabel = c === null ? p : p + "...";
+            if (hasValidTime) {
+                const formattedTime = v.toFixed(0);
+                if (p === "") {
+                    this.collapseText.text = formattedTime;
                 } else {
-                    this.collapseText.text = p + "... | " + v.toFixed(0);
+                    this.collapseText.text = pitchLabel + " | " + formattedTime;
                 }
             } else {
-                this.collapseText.text = p + "...";
+                this.collapseText.text = pitchLabel;
             }
         }
     }
@@ -3045,23 +3077,25 @@ class Block {
      * @returns {string} - The pitch value.
      */
     _getPitch(c) {
-        if (c === null) {
+        if (c === null || !this.blocks.blockList[c]) {
             return "";
         }
 
-        let c1, c2;
+        let c1, c2, b1, b2;
         switch (this.blocks.blockList[c].name) {
             case "pitch":
                 c1 = this.blocks.blockList[c].connections[1];
                 c2 = this.blocks.blockList[c].connections[2];
-                if (this.blocks.blockList[c2].name === "number") {
-                    if (this.blocks.blockList[c1].name === "solfege") {
+                b1 = c1 !== null ? this.blocks.blockList[c1] : null;
+                b2 = c2 !== null ? this.blocks.blockList[c2] : null;
+                if (b1 && b2 && b2.name === "number") {
+                    if (b1.name === "solfege") {
                         // English reference for logic
                         const solfnotesRef = ["ti", "la", "sol", "fa", "mi", "re", "do"];
                         // Localized notes for display
                         const solfnotesLocalized = _("ti la sol fa mi re do").split(" ");
 
-                        const stripped = this.blocks.blockList[c1].value
+                        const stripped = b1.value
                             .replace(SHARP, "")
                             .replace(FLAT, "")
                             .replace(DOUBLESHARP, "")
@@ -3070,90 +3104,77 @@ class Block {
                         const i = solfnotesRef.indexOf(stripped);
                         if (i === -1) {
                             // fallback if note not found
-                            return stripped + " " + this.blocks.blockList[c2].value;
+                            return stripped + " " + b2.value;
                         }
 
-                        if (this.blocks.blockList[c1].value.includes(SHARP)) {
-                            return (
-                                solfnotesLocalized[i] +
-                                SHARP +
-                                " " +
-                                this.blocks.blockList[c2].value
-                            );
-                        } else if (this.blocks.blockList[c1].value.includes(FLAT)) {
-                            return (
-                                solfnotesLocalized[i] + FLAT + " " + this.blocks.blockList[c2].value
-                            );
-                        } else if (this.blocks.blockList[c1].value.includes(DOUBLESHARP)) {
-                            return (
-                                solfnotesLocalized[i] +
-                                DOUBLESHARP +
-                                " " +
-                                this.blocks.blockList[c2].value
-                            );
-                        } else if (this.blocks.blockList[c1].value.includes(DOUBLEFLAT)) {
-                            return (
-                                solfnotesLocalized[i] +
-                                DOUBLEFLAT +
-                                " " +
-                                this.blocks.blockList[c2].value
-                            );
+                        if (b1.value.includes(SHARP)) {
+                            return solfnotesLocalized[i] + SHARP + " " + b2.value;
+                        } else if (b1.value.includes(FLAT)) {
+                            return solfnotesLocalized[i] + FLAT + " " + b2.value;
+                        } else if (b1.value.includes(DOUBLESHARP)) {
+                            return solfnotesLocalized[i] + DOUBLESHARP + " " + b2.value;
+                        } else if (b1.value.includes(DOUBLEFLAT)) {
+                            return solfnotesLocalized[i] + DOUBLEFLAT + " " + b2.value;
                         } else {
-                            return solfnotesLocalized[i] + " " + this.blocks.blockList[c2].value;
+                            return solfnotesLocalized[i] + " " + b2.value;
                         }
-                    } else if (this.blocks.blockList[c1].name === "notename") {
-                        return (
-                            this.blocks.blockList[c1].value + " " + this.blocks.blockList[c2].value
-                        );
-                    } else if (this.blocks.blockList[c1].name === "scaledegree2") {
-                        const obj = splitScaleDegree(this.blocks.blockList[c1].value);
+                    } else if (b1.name === "notename") {
+                        return b1.value + " " + b2.value;
+                    } else if (b1.name === "scaledegree2") {
+                        const obj = splitScaleDegree(b1.value);
                         let note = obj[0];
                         if (obj[1] !== NATURAL) {
                             note += obj[1];
                         }
-                        return note + " " + this.blocks.blockList[c2].value;
+                        return note + " " + b2.value;
                     }
                 }
                 break;
             case "nthmodalpitch":
                 c1 = this.blocks.blockList[c].connections[1];
                 c2 = this.blocks.blockList[c].connections[2];
-                if (this.blocks.blockList[c2].name === "number") {
-                    if (this.blocks.blockList[c1].name === "number") {
-                        const degrees = DEGREES.split(" ");
-                        const i = this.blocks.blockList[c1].value;
-                        if (i >= 0 && i < degrees.length) {
-                            return degrees[i] + " " + this.blocks.blockList[c2].value;
-                        } else {
-                            return (
-                                this.blocks.blockList[c1].value +
-                                " " +
-                                this.blocks.blockList[c2].value
-                            );
-                        }
+                b1 = c1 !== null ? this.blocks.blockList[c1] : null;
+                b2 = c2 !== null ? this.blocks.blockList[c2] : null;
+                if (b1 && b2 && b1.name === "number" && b2.name === "number") {
+                    const degrees = DEGREES.split(" ");
+                    const idx = Math.round(Number(b1.value));
+                    if (idx >= 0 && idx < degrees.length) {
+                        return degrees[idx] + " " + b2.value;
+                    } else {
+                        return b1.value + " " + b2.value;
                     }
                 }
                 break;
             case "hertz":
                 c1 = this.blocks.blockList[c].connections[0];
-                if (this.blocks.blockList[c1].name === "number") {
-                    return this.blocks.blockList[c1].value + "HZ";
+                b1 = c1 !== null ? this.blocks.blockList[c1] : null;
+                if (b1 && b1.name === "number") {
+                    return b1.value + "HZ";
+                }
+                c1 = this.blocks.blockList[c].connections[1];
+                b1 = c1 !== null ? this.blocks.blockList[c1] : null;
+                if (b1 && b1.name === "number") {
+                    return b1.value + "HZ";
                 }
                 break;
             case "steppitch":
                 c1 = this.blocks.blockList[c].connections[1];
-                if (
-                    this.blocks.blockList[c1].name === "number" &&
-                    this.blocks.blockList[c1].value < 0
-                ) {
-                    //.TRANS: scalar step
-                    return `${_("down")} ${Math.abs(this.blocks.blockList[c1].value)}`;
-                } else return `${_("up")} ${this.blocks.blockList[c1].value}`;
+                b1 = c1 !== null ? this.blocks.blockList[c1] : null;
+                if (b1 && b1.name === "number") {
+                    if (b1.value < 0) {
+                        //.TRANS: scalar step
+                        return `${_("down")} ${Math.abs(b1.value)}`;
+                    } else {
+                        return `${_("up")} ${b1.value}`;
+                    }
+                }
+                break;
             case "pitchnumber":
                 c1 = this.blocks.blockList[c].connections[1];
-                if (this.blocks.blockList[c1].name === "number") {
+                b1 = c1 !== null ? this.blocks.blockList[c1] : null;
+                if (b1 && b1.name === "number") {
                     //.TRANS: pitch number
-                    return `${_("pitch")} ${this.blocks.blockList[c1].value}`;
+                    return `${_("pitch")} ${b1.value}`;
                 }
                 break;
             case "playdrum":
@@ -3163,6 +3184,7 @@ class Block {
             default:
                 return "";
         }
+        return "";
     }
 
     /**
@@ -3978,6 +4000,7 @@ class Block {
 
         if (spatialGridDirty) {
             this.blocks.syncDragGroupSpatialGrid();
+            this.blocks._updateViewportCulling();
         }
 
         // Always hide the trash when there is no block selected.

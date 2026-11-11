@@ -22,8 +22,10 @@
 
 const Arpeggio = require("../arpeggio.js");
 const ManagedTimer = require("../../utils/ManagedTimer");
+const { parseNoteString } = require("../../utils/musicutils-pitch");
 
 global.ManagedTimer = ManagedTimer;
+global.parseNoteString = parseNoteString;
 
 global._ = msg => msg;
 global.platformColor = {
@@ -254,21 +256,28 @@ describe("Arpeggio Widget", () => {
         });
 
         test.each([
-            [0, "var(--color-selector-selected)"],
-            [2, "var(--color-selector-bg)"]
-        ])("highlights only the hovered cell in row %i", (row, background) => {
-            const cell = document.getElementById(`${row},0`);
-            const columnLabel = document.getElementById("arpeggioNoteTable").rows[0].cells[0];
+            [0, "var(--color-brand-primary-hover)", "var(--color-selector-selected)"],
+            [2, "var(--color-selector-selected)", "var(--color-selector-bg)"]
+        ])(
+            "hovering row %i is temporary and preserves its scale color",
+            (row, hoverColor, background) => {
+                const cell = document.getElementById(`${row},0`);
+                const selectedNodes = arpeggio._blockMap.map(node => [...node]);
 
-            cell.dispatchEvent(new MouseEvent("mouseover"));
+                cell.dispatchEvent(new MouseEvent("mouseover"));
+                expect(cell.style.backgroundColor).toBe(hoverColor);
+                expect(arpeggio._blockMap).toEqual(selectedNodes);
 
-            expect(cell.style.backgroundColor).toBe("var(--color-selector-selected)");
-            expect(columnLabel.style.backgroundColor).toBe("var(--color-selector-bg)");
+                cell.dispatchEvent(new MouseEvent("mouseout"));
+                expect(cell.style.backgroundColor).toBe(background);
+                expect(arpeggio._blockMap).toEqual(selectedNodes);
 
-            cell.dispatchEvent(new MouseEvent("mouseout"));
-
-            expect(cell.style.backgroundColor).toBe(background);
-        });
+                cell.dispatchEvent(new MouseEvent("mouseover"));
+                cell.dispatchEvent(new MouseEvent("mouseout"));
+                expect(cell.style.backgroundColor).toBe(background);
+                expect(arpeggio._blockMap).toEqual(selectedNodes);
+            }
+        );
 
         test("keeps selected cells black when hovered", () => {
             const cell = document.getElementById("2,0");
@@ -331,6 +340,22 @@ describe("Arpeggio Widget", () => {
             expect(cell2.style.backgroundColor).toBe("black");
             expect(cell1.style.backgroundColor).not.toBe("black");
         });
+
+        test("should not highlight the column label when hovering a grid cell", () => {
+            const cell = document.getElementById("2,1");
+            const headerCell = document.getElementById("1");
+
+            expect(cell).not.toBeNull();
+            expect(headerCell).not.toBeNull();
+
+            cell.onmouseover();
+            expect(cell.style.backgroundColor).toBe("var(--color-selector-selected)");
+            expect(headerCell.style.backgroundColor).toBe("var(--color-selector-bg)");
+
+            cell.onmouseout();
+            expect(cell.style.backgroundColor).toBe("var(--color-selector-bg)");
+            expect(headerCell.style.backgroundColor).toBe("var(--color-selector-bg)");
+        });
     });
 
     // --- Action Button Tests ---
@@ -354,6 +379,29 @@ describe("Arpeggio Widget", () => {
             // Click again to stop
             arpeggio.playButton.onclick();
             expect(arpeggio._playing).toBe(false);
+        });
+
+        test.each([
+            ["C-1", "C", -1],
+            ["C10", "C", 10],
+            ["Db-1", "Db", -1]
+        ])("playback parses %s with its full octave", (note, letter, octave) => {
+            const cell = document.getElementById("2,0");
+            cell.onclick({ target: cell });
+            arpeggio.notesToPlay = [[note, 1 / 16]];
+            global.getNote.mockClear();
+
+            arpeggio.playButton.onclick();
+
+            expect(global.getNote).toHaveBeenCalledWith(
+                letter,
+                octave,
+                expect.any(Number),
+                expect.anything(),
+                false,
+                null,
+                expect.anything()
+            );
         });
 
         test("play button uses a C4 sixteenth-note fallback when notesToPlay is empty", () => {
@@ -475,6 +523,16 @@ describe("Arpeggio Widget", () => {
             // row 2 maps to ii = (13 - 2 - 1) % 12 = 10, which is NOT in mode
             const color = arpeggio._getBackgroundColor(2);
             expect(color).toBe("var(--color-selector-bg)");
+        });
+
+        test("_getHoverColor returns brandPrimaryHover for a mode row", () => {
+            const color = arpeggio._getHoverColor(0);
+            expect(color).toBe("var(--color-brand-primary-hover)");
+        });
+
+        test("_getHoverColor returns selectorSelected for a non-mode row", () => {
+            const color = arpeggio._getHoverColor(2);
+            expect(color).toBe("var(--color-selector-selected)");
         });
     });
 
@@ -645,6 +703,25 @@ describe("Arpeggio Widget", () => {
                 expect.anything()
             );
             expect(activityMock.logo.synth.trigger).toHaveBeenCalled();
+        });
+
+        test.each([
+            ["C-1", "C", -1],
+            ["C10", "C", 10],
+            ["Db-1", "Db", -1]
+        ])("parses %s with its full octave", (note, letter, octave) => {
+            arpeggio.notesToPlay = [[note, 1 / 16]];
+            arpeggio.__playCell(3, 0, document.createElement("td"), true);
+
+            expect(global.getNote).toHaveBeenCalledWith(
+                letter,
+                octave,
+                expect.any(Number),
+                expect.anything(),
+                false,
+                null,
+                expect.anything()
+            );
         });
 
         test("defaults to C4 when notesToPlay is empty", () => {

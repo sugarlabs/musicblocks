@@ -190,6 +190,24 @@ describe("download", () => {
         expect(spy).not.toHaveBeenCalled();
     });
 
+    it("calls the success callback only after a download completes", () => {
+        const onSuccess = jest.fn();
+
+        instance.download("abc", "data", "My Project", onSuccess);
+
+        expect(mockDownloadURL).toHaveBeenCalled();
+        expect(onSuccess).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not call the success callback when the user cancels", () => {
+        const onSuccess = jest.fn();
+        window.prompt = jest.fn(() => null);
+
+        instance.download("abc", "data", null, onSuccess);
+
+        expect(onSuccess).not.toHaveBeenCalled();
+    });
+
     it("should revoke the Blob URL when the user cancels the prompt", () => {
         global.URL.revokeObjectURL = jest.fn();
         window.prompt = jest.fn(() => null);
@@ -614,6 +632,15 @@ describe("saveMIDI Method", () => {
         expect(activity.logo.runLogoCommands).toHaveBeenCalled();
         expect(document.body.style.cursor).toBe("wait");
     });
+
+    it("should restore default cursor when no start blocks are executed", () => {
+        mockLogo.runLogoCommands = jest.fn(() => {
+            mockLogo.runningMIDI = false;
+        });
+        instance.saveMIDI(activity);
+        expect(activity.logo.runningMIDI).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+    });
 });
 
 describe("afterSaveMIDI", () => {
@@ -792,6 +819,130 @@ describe("afterSaveMIDI", () => {
             duration: 0.6666666666666666,
             velocity: 0.9
         });
+    });
+
+    it("writes both the pitch and the drum of a note that plays both", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                // A note with only a drum is recorded with a rest for its pitch.
+                { note: ["R"], drum: "snare drum", duration: 4, bpm: 90, instrument: "guitar" },
+                { note: ["G4"], drum: "kick drum", duration: 4, bpm: 90, instrument: "guitar" },
+                { note: ["A4"], duration: 4, bpm: 90, instrument: "guitar" }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const track = name => tracks.find(t => t.name === name);
+        const beat = 0.6666666666666666;
+
+        expect(track("Track 1 - snare drum").addNote.mock.calls).toEqual([
+            [{ midi: 38, time: 0, duration: beat, velocity: 0.9 }]
+        ]);
+        expect(track("Track 1 - kick drum").addNote.mock.calls).toEqual([
+            [{ midi: 36, time: beat, duration: beat, velocity: 0.9 }]
+        ]);
+        expect(track("Track 1 - guitar").addNote.mock.calls).toEqual([
+            [{ name: "G4", time: beat, duration: beat, velocity: 0.8 }],
+            [{ name: "A4", time: 2 * beat, duration: beat, velocity: 0.8 }]
+        ]);
+    });
+
+    it("writes every drum and pitch of a mixed Note at the same time", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                {
+                    note: ["C4", "E4"],
+                    drum: ["kick drum", "snare drum"],
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "piano"
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const track = name => tracks.find(t => t.name === name);
+        const beat = 0.6666666666666666;
+
+        expect(track("Track 1 - kick drum").addNote.mock.calls).toEqual([
+            [{ midi: 36, time: 0, duration: beat, velocity: 0.9 }]
+        ]);
+        expect(track("Track 1 - snare drum").addNote.mock.calls).toEqual([
+            [{ midi: 38, time: 0, duration: beat, velocity: 0.9 }]
+        ]);
+        expect(track("Track 1 - piano").addNote.mock.calls).toEqual([
+            [{ name: "C4", time: 0, duration: beat, velocity: 0.8 }],
+            [{ name: "E4", time: 0, duration: beat, velocity: 0.8 }]
+        ]);
+    });
+
+    it("writes the drum and every pitch of a chord with a rest in it, but not the rest", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                {
+                    note: ["R", "G4", "B4"],
+                    drum: "kick drum",
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "guitar"
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const track = name => tracks.find(t => t.name === name);
+        const beat = 0.6666666666666666;
+
+        expect(track("Track 1 - kick drum").addNote.mock.calls).toEqual([
+            [{ midi: 36, time: 0, duration: beat, velocity: 0.9 }]
+        ]);
+        expect(track("Track 1 - guitar").addNote.mock.calls).toEqual([
+            [{ name: "G4", time: 0, duration: beat, velocity: 0.8 }],
+            [{ name: "B4", time: 0, duration: beat, velocity: 0.8 }]
+        ]);
+    });
+
+    it("keeps the pitch off the drum track when the instrument is named like the drum", () => {
+        mockActivity.logo._midiData = {
+            0: [{ note: ["G4"], drum: "kick drum", duration: 4, bpm: 90, instrument: "kick drum" }]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const [drumTrack, instrumentTrack] = tracks.filter(t => t.name === "Track 1 - kick drum");
+        const beat = 0.6666666666666666;
+
+        expect(drumTrack.channel).toBe(9);
+        expect(drumTrack.addNote.mock.calls).toEqual([
+            [{ midi: 36, time: 0, duration: beat, velocity: 0.9 }]
+        ]);
+        expect(instrumentTrack.channel).not.toBe(9);
+        expect(instrumentTrack.addNote.mock.calls).toEqual([
+            [{ name: "G4", time: 0, duration: beat, velocity: 0.8 }]
+        ]);
+    });
+
+    it("adds no instrument track for notes that only play drums", () => {
+        mockActivity.logo._midiData = {
+            0: [{ note: ["R"], drum: "snare drum", duration: 4, bpm: 90, instrument: "guitar" }]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const names = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value.name);
+        expect(names).toEqual(["Track 1", "Track 1 - snare drum"]);
     });
 });
 
@@ -978,6 +1129,154 @@ describe("afterSaveMIDI tempo and time signatures", () => {
         expect(midi.header.tempos).toEqual([]);
         expect(midi.header.timeSignatures).toEqual([]);
         expect(midi.tracks.every(track => track.notes.length === 0)).toBe(true);
+    });
+});
+
+describe("afterSaveMIDI instrument channels", () => {
+    const { Midi: ToneMidi } = require("@tonejs/midi");
+    let mockMidi;
+    let instance;
+    let written;
+    let bytes;
+
+    // Exports the notes and returns the tracks as they were built. Reading the file back
+    // drops the channel of a track with no notes, so the file is checked against the
+    // built tracks only for the tracks that have notes.
+    const exportMidi = data => {
+        instance.activity.logo._midiData = data;
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+        const noteTracks = midi =>
+            midi.tracks
+                .filter(t => t.notes.length > 0)
+                .map(t => [t.name, t.channel, t.instrument.number, t.notes.length]);
+        expect(noteTracks(new ToneMidi(bytes))).toEqual(noteTracks(written));
+        return written;
+    };
+
+    const note = (name, instrument, drum) => ({
+        note: [name],
+        duration: 4,
+        bpm: 90,
+        instrument,
+        drum
+    });
+
+    // The channel and instrument of every track, as [channel, program], in track order.
+    // The encoder writes one program change per track with these.
+    const programs = midi => midi.tracks.map(t => [t.channel, t.instrument.number]);
+
+    // A channel plays one instrument at a time, so no channel may carry two.
+    const expectOneProgramPerChannel = midi => {
+        const byChannel = new Map();
+        programs(midi).forEach(([channel, program]) => {
+            if (!byChannel.has(channel)) byChannel.set(channel, new Set());
+            byChannel.get(channel).add(program);
+        });
+        byChannel.forEach(set => expect(set.size).toBe(1));
+    };
+
+    const track = (midi, name) => midi.tracks.find(t => t.name === name);
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        mockMidi = global.Midi;
+        global.Midi = class extends ToneMidi {
+            toArray() {
+                written = this;
+                bytes = super.toArray();
+                return bytes;
+            }
+        };
+        const activity = { logo: {}, save: { download: jest.fn() } };
+        instance = new SaveInterface(activity);
+        instance.activity = activity;
+        global.URL.createObjectURL = jest.fn(() => "mockURL");
+        global.getMidiInstrument = jest.fn(() => ({
+            default: 0,
+            piano: 0,
+            guitar: 24,
+            flute: 73
+        }));
+        global.getMidiDrum = jest.fn(() => ({ "snare drum": 38 }));
+    });
+
+    afterEach(() => {
+        global.Midi = mockMidi;
+        jest.useRealTimers();
+    });
+
+    it("gives two mice playing different instruments their own channels", () => {
+        const midi = exportMidi({
+            0: [note("C4", "guitar"), note("E4", "guitar")],
+            1: [note("G4", "flute"), note("A4", "flute")]
+        });
+
+        const guitar = track(midi, "Track 1 - guitar");
+        const flute = track(midi, "Track 2 - flute");
+        expect(guitar.channel).not.toBe(flute.channel);
+        expect([guitar.instrument.number, flute.instrument.number]).toEqual([24, 73]);
+        expect([guitar.channel, flute.channel]).not.toContain(9);
+        expectOneProgramPerChannel(midi);
+    });
+
+    it("gives each instrument of one mouse its own channel", () => {
+        const midi = exportMidi({ 0: [note("C4", "guitar"), note("D4", "flute")] });
+
+        expect(track(midi, "Track 1 - guitar").channel).not.toBe(
+            track(midi, "Track 1 - flute").channel
+        );
+        expectOneProgramPerChannel(midi);
+    });
+
+    it("lets the empty track of each mouse repeat its first part's instrument", () => {
+        const midi = exportMidi({
+            0: [note("C4", "guitar")],
+            1: [note("R", "flute", "snare drum")]
+        });
+
+        expect([track(midi, "Track 1").channel, track(midi, "Track 1").instrument.number]).toEqual([
+            track(midi, "Track 1 - guitar").channel,
+            24
+        ]);
+        expect(track(midi, "Track 2").channel).toBe(9);
+        expect(track(midi, "Track 2 - snare drum").channel).toBe(9);
+        expectOneProgramPerChannel(midi);
+    });
+
+    it("puts the empty track of a mouse with no notes on the drum channel", () => {
+        const midi = exportMidi({ 0: [note("C4", "flute")], 1: [] });
+
+        expect(track(midi, "Track 2").channel).toBe(9);
+        expectOneProgramPerChannel(midi);
+    });
+
+    it("shares a channel between parts that play the same instrument", () => {
+        const midi = exportMidi({
+            0: [note("C4", "guitar")],
+            1: [note("E4", "guitar")]
+        });
+
+        expect(track(midi, "Track 1 - guitar").channel).toBe(
+            track(midi, "Track 2 - guitar").channel
+        );
+    });
+
+    it("reuses the melodic channels after 15 instruments, never the drum channel", () => {
+        const instruments = {};
+        const data = {};
+        for (let i = 0; i < 16; i++) {
+            instruments[`instrument ${i}`] = i + 1;
+            data[i] = [note("C4", `instrument ${i}`)];
+        }
+        global.getMidiInstrument = jest.fn(() => ({ default: 0, ...instruments }));
+
+        const midi = exportMidi(data);
+        const channels = [...Array(16).keys()].map(
+            i => track(midi, `Track ${i + 1} - instrument ${i}`).channel
+        );
+
+        expect(channels).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 0]);
     });
 });
 
@@ -1250,6 +1549,36 @@ describe("saveWAV & saveABC methods", () => {
         expect(mockDownload).toHaveBeenCalledWith("abc", "data:text;utf8,mock_abc_data", null);
         expect(activity.logo.notationOutput).toBe("");
         expect(activity.logo.recordingBuffer.hasData).toBe(false);
+    });
+
+    it("shows a warning when ABC export rounds a Hertz pitch", () => {
+        const download = jest.fn((extension, dataurl, filename, onSuccess) => onSuccess());
+        const activity = {
+            save: { download },
+            textMsg: jest.fn(),
+            logo: { abcExportWarnings: ["445 Hz was rounded to A4 (+19.6 cents)"] }
+        };
+        global.saveAbcOutput = jest.fn(() => "mock_abc_data");
+
+        instance.afterSaveAbc.call({ activity });
+
+        expect(activity.textMsg).toHaveBeenCalledWith(
+            "ABC export rounded one or more Hertz pitches to the nearest note.",
+            5000
+        );
+    });
+
+    it("does not show a warning when the ABC download is cancelled", () => {
+        const activity = {
+            save: { download: jest.fn() },
+            textMsg: jest.fn(),
+            logo: { abcExportWarnings: ["445 Hz was rounded to A4 (+19.6 cents)"] }
+        };
+        global.saveAbcOutput = jest.fn(() => "mock_abc_data");
+
+        instance.afterSaveAbc.call({ activity });
+
+        expect(activity.textMsg).not.toHaveBeenCalled();
     });
 
     it("should save ABC notation under the file name it is given", () => {
@@ -1609,19 +1938,23 @@ describe("saveLilypond Methods", () => {
             callback(false, errorMessage);
         });
 
-        // Mock console.debug to verify the error message
-        console.debug = jest.fn();
+        // Mock console.debug to verify the error message without mutating global console
+        const consoleSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
 
-        instance.afterSaveLilypondPDF(lydata, filename);
+        try {
+            instance.afterSaveLilypondPDF(lydata, filename);
 
-        expect(document.body.style.cursor).toBe("default");
-        expect(console.debug).toHaveBeenCalledWith("Error: " + errorMessage);
-        expect(activity.errorMsg).toHaveBeenCalledWith(
-            "Failed to convert Lilypond to PDF. Please try saving as .ly file instead.",
-            5000
-        );
-        // Verify activity.save.download is not called
-        expect(activity.save.download).not.toHaveBeenCalled();
+            expect(document.body.style.cursor).toBe("default");
+            expect(consoleSpy).toHaveBeenCalledWith("Error: " + errorMessage);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Failed to convert Lilypond to PDF. Please try saving as .ly file instead.",
+                5000
+            );
+            // Verify activity.save.download is not called
+            expect(activity.save.download).not.toHaveBeenCalled();
+        } finally {
+            consoleSpy.mockRestore();
+        }
     });
 
     it("should show copied message when Clipboard API succeeds", async () => {

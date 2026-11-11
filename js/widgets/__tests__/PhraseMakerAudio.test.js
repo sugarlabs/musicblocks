@@ -418,6 +418,51 @@ describe("PhraseMakerAudio", () => {
                 null
             );
         });
+
+        test("schedules and triggers every note of a chord larger than four", () => {
+            const notes = ["C4", "E4", "G4", "B4", "D5", "F5"];
+            PhraseMakerAudio._playChord(mockPM, notes, 1);
+
+            expect(mockPM._chordTimeouts.length).toBe(notes.length);
+
+            jest.runAllTimers();
+
+            expect(mockPM.activity.logo.synth.trigger).toHaveBeenCalledTimes(notes.length);
+            expect(mockPM.activity.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                "C4",
+                1,
+                "piano",
+                null,
+                null
+            );
+            expect(mockPM.activity.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                "D5",
+                1,
+                "piano",
+                null,
+                null
+            );
+            expect(mockPM.activity.logo.synth.trigger).toHaveBeenCalledWith(
+                0,
+                "F5",
+                1,
+                "piano",
+                null,
+                null
+            );
+        });
+
+        test("does not schedule any trigger when notes array is empty", () => {
+            PhraseMakerAudio._playChord(mockPM, [], 1);
+
+            expect(mockPM._chordTimeouts.length).toBe(0);
+
+            jest.runAllTimers();
+
+            expect(mockPM.activity.logo.synth.trigger).not.toHaveBeenCalled();
+        });
     });
 
     describe("playAll", () => {

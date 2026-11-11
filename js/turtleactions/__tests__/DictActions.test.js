@@ -42,6 +42,7 @@ describe("setupDictActions", () => {
         global.frequencyToPitch = jest.fn().mockReturnValue(["A", 4]);
         global.noteToObj = require("../../utils/musicutils").noteToObj;
         global.isUnsafeObjectKey = require("../../utils/utils-logic").isUnsafeObjectKey;
+        global.last = require("../../utils/utils").last;
     });
 
     beforeEach(() => {
@@ -87,8 +88,10 @@ describe("setupDictActions", () => {
             singer: {
                 notesPlayed: [1, 2],
                 lastNotePlayed: ["C4"],
-                notePitches: ["C"],
-                noteOctaves: [4],
+                // Keyed by note block, as in Singer.
+                inNoteBlock: [],
+                notePitches: {},
+                noteOctaves: {},
                 keySignature: "C",
                 movable: true,
                 pitchNumberOffset: 0
@@ -146,18 +149,59 @@ describe("setupDictActions", () => {
             expect(pitchToNumber).toHaveBeenCalledWith("C", 4, "C");
         });
 
-        it("should get the pitch number correctly using notePitches when lastNotePlayed is null", () => {
+        it("should get the pitch number from the note being built when lastNotePlayed is null", () => {
             targetTurtle.singer.lastNotePlayed = null;
+            targetTurtle.singer.inNoteBlock = [32];
+            targetTurtle.singer.notePitches = { 32: ["E"] };
+            targetTurtle.singer.noteOctaves = { 32: [4] };
+            getNote.mockReturnValueOnce(["E", 4]);
+
             const pitchNumber = Turtle.DictActions._GetDict(0, turtle, "pitch number", 1);
+
             expect(pitchNumber).toBe(60);
-            expect(getNote).toHaveBeenCalled();
+            expect(getNote).toHaveBeenCalledWith(
+                "E",
+                4,
+                0,
+                "C",
+                true,
+                null,
+                activity.errorMsg,
+                "equal"
+            );
+            expect(pitchToNumber).toHaveBeenCalledWith("E", 4, "C");
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("should read the innermost note when notes are nested", () => {
+            targetTurtle.singer.lastNotePlayed = null;
+            targetTurtle.singer.inNoteBlock = [10, 20];
+            targetTurtle.singer.notePitches = { 10: ["C"], 20: ["A"] };
+            targetTurtle.singer.noteOctaves = { 10: [4], 20: [5] };
+
+            Turtle.DictActions._GetDict(0, turtle, "pitch number", 1);
+
+            expect(getNote.mock.calls[0].slice(0, 2)).toEqual(["A", 5]);
         });
 
         it("should handle error when getting pitch number with no notes", () => {
             targetTurtle.singer.lastNotePlayed = null;
-            targetTurtle.singer.notePitches = [];
             const pitchNumber = Turtle.DictActions._GetDict(0, turtle, "pitch number", 1);
             expect(pitchNumber).toBe(60);
+            expect(getNote).not.toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith(INVALIDPITCH, 1);
+            expect(pitchToNumber).toHaveBeenCalledWith("G", 4, "C");
+        });
+
+        it("should handle error when the note being built has no pitch yet", () => {
+            targetTurtle.singer.lastNotePlayed = null;
+            targetTurtle.singer.inNoteBlock = [32];
+            targetTurtle.singer.notePitches = { 32: [] };
+            targetTurtle.singer.noteOctaves = { 32: [] };
+
+            Turtle.DictActions._GetDict(0, turtle, "pitch number", 1);
+
+            expect(getNote).not.toHaveBeenCalled();
             expect(activity.errorMsg).toHaveBeenCalledWith(INVALIDPITCH, 1);
             expect(pitchToNumber).toHaveBeenCalledWith("G", 4, "C");
         });
@@ -586,6 +630,37 @@ describe("setupDictActions", () => {
         it("should show an empty dictionary for an inherited property name", () => {
             activity.logo.turtleDicts[turtle] = {};
             expect(Turtle.DictActions.getDict("constructor", turtle)).toBe("{}");
+        });
+
+        it("should reject non-string reserved dictionary names such as ['__proto__']", () => {
+            activity.logo.turtleDicts[turtle] = {};
+            const initialProto = Object.getPrototypeOf(activity.logo.turtleDicts[turtle]);
+            Turtle.DictActions.setValue(["__proto__"], "polluted", 42, turtle);
+            expect({}.polluted).toBeUndefined();
+            expect(Object.getPrototypeOf(activity.logo.turtleDicts[turtle])).toBe(initialProto);
+            expect(activity.errorMsg).toHaveBeenCalledWith("The dictionary name is reserved.");
+        });
+
+        it("should reject non-string reserved keys such as ['__proto__']", () => {
+            activity.logo.turtleDicts[turtle] = {};
+            Turtle.DictActions.setValue("testDict", ["__proto__"], { polluted: 1 }, turtle);
+            expect({}.polluted).toBeUndefined();
+            expect(activity.logo.turtleDicts[turtle].testDict).toBeUndefined();
+            expect(activity.errorMsg).toHaveBeenCalledWith("The key name is reserved.");
+        });
+
+        it("should normalize numeric and non-string keys when getting and setting values", () => {
+            activity.logo.turtleDicts[turtle] = {};
+            Turtle.DictActions.setValue("testDict", 123, "numberKey", turtle);
+            expect(Turtle.DictActions.getValue("testDict", 123, turtle, 3)).toBe("numberKey");
+            expect(Turtle.DictActions.getValue("testDict", "123", turtle, 3)).toBe("numberKey");
+            expect(Turtle.DictActions.getDict("testDict", turtle)).toBe('{"123":"numberKey"}');
+        });
+
+        it("should route non-string turtle keys correctly to turtle status", () => {
+            Turtle.DictActions.setValue("target", ["heading"], 180, turtle);
+            expect(targetTurtle.painter.doSetHeading).toHaveBeenCalledWith(180);
+            expect(Turtle.DictActions.getValue("target", ["heading"], turtle, 3)).toBe(90);
         });
     });
 

@@ -17,12 +17,12 @@
 
    _, docById, getNote, setCustomChord, keySignatureToMode,
    getModeNumbers, getTemperament, normalizeNoteAccidentals, DEFAULTVOICE,
-   ManagedTimer
+   ManagedTimer, parseNoteString
 */
 /*
    Global locations
    js/utils/musicutils.js
-       getNote, setCustomChord
+       getNote, setCustomChord, parseNoteString
    js/utils/utils.js
         _, docById
    js/utils/ManagedTimer.js
@@ -485,6 +485,18 @@ class Arpeggio {
 
     /**
      * @private
+     * @param {number} row index
+     * @returns {string} color, e.g. "var(--color-brand-primary-hover)"
+     */
+    _getHoverColor(i) {
+        if (this._rowInMode(i)) {
+            return "var(--color-brand-primary-hover)";
+        }
+        return "var(--color-selector-selected)";
+    }
+
+    /**
+     * @private
      * @param {number} arpeggioIdx
      * @returns {void}
      */
@@ -493,6 +505,7 @@ class Arpeggio {
         const arpeggioTable = this._arpeggioTable;
         let table;
         let row;
+        let headerCell;
         for (let i = 0; i < arpeggioTable.rows.length - 1; i++) {
             table = this._arpeggioCellTables[i];
             row = table.rows[0];
@@ -510,7 +523,7 @@ class Arpeggio {
 
             cell.onmouseover = () => {
                 if (cell.style.backgroundColor !== "black") {
-                    cell.style.backgroundColor = "var(--color-selector-selected)";
+                    cell.style.backgroundColor = this._getHoverColor(i);
                 }
             };
             cell.onmouseout = () => {
@@ -522,19 +535,19 @@ class Arpeggio {
 
         const arpeggioNoteTable = docById("arpeggioNoteTable");
         row = arpeggioNoteTable.rows[0];
-        const cell = row.insertCell();
-        cell.height = Arpeggio.CELLSIZE + 1 + "px";
-        cell.width = Arpeggio.CELLSIZE;
-        cell.style.width = cell.width + "px";
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.height = Arpeggio.CELLSIZE + "px";
-        cell.style.fontSize = Math.floor(this._cellScale * 50) + "%";
-        cell.style.lineHeight = 100 + "%";
-        cell.setAttribute("id", arpeggioIdx);
-        cell.className = "headcol";
-        cell.textContent = arpeggioName;
-        cell.style.backgroundColor = "var(--color-selector-bg)";
+        headerCell = row.insertCell();
+        headerCell.height = Arpeggio.CELLSIZE + 1 + "px";
+        headerCell.width = Arpeggio.CELLSIZE;
+        headerCell.style.width = headerCell.width + "px";
+        headerCell.style.minWidth = headerCell.style.width;
+        headerCell.style.maxWidth = headerCell.style.width;
+        headerCell.style.height = Arpeggio.CELLSIZE + "px";
+        headerCell.style.fontSize = Math.floor(this._cellScale * 50) + "%";
+        headerCell.style.lineHeight = 100 + "%";
+        headerCell.setAttribute("id", arpeggioIdx);
+        headerCell.className = "headcol";
+        headerCell.textContent = arpeggioName;
+        headerCell.style.backgroundColor = "var(--color-selector-bg)";
     }
 
     /**
@@ -704,8 +717,7 @@ class Arpeggio {
         const notesToPlay = this.notesToPlay.length > 0 ? this.notesToPlay : [["C4", 1 / 16]];
         for (let n = 0; n < notesToPlay.length; n++) {
             const noteValue = notesToPlay[n][1];
-            const letter = notesToPlay[n][0].slice(0, -1);
-            const octave = Number(notesToPlay[n][0].slice(notesToPlay[n][0].length - 1));
+            const [letter, octave] = parseNoteString(notesToPlay[n][0]);
             for (let i = 0; i < pairs.length; i++) {
                 if (pairs[i][0] === -1) {
                     this._playList.push(["", noteValue]);
@@ -896,8 +908,7 @@ class Arpeggio {
     __playCell(rowIndex, colIndex, cell, playNote) {
         if (playNote) {
             const noteData = this.notesToPlay[0] || ["C4", 1 / 16];
-            const letter = noteData[0].slice(0, -1);
-            const octave = Number(noteData[0].slice(-1));
+            const [letter, octave] = parseNoteString(noteData[0]);
             const noteObj = getNote(
                 letter,
                 octave,

@@ -306,4 +306,70 @@ describe("PitchStaircaseLayout", () => {
         expect(psc._playingRowIndex).toBeNull();
         expect(stepCellOf(1).classList.contains("active")).toBe(false);
     });
+
+    describe("removing stairs during playback", () => {
+        let buttons;
+
+        beforeEach(() => {
+            buttons = {};
+            psc._addToolbar({
+                getWidgetBody: () => document.createElement("div"),
+                addDivider: jest.fn(),
+                addInputButton: value => ({ value }),
+                addButton: (icon, size, label) => {
+                    const button = document.createElement("button");
+                    psc._setButtonIcon(button, icon, label);
+                    buttons[label] = button;
+                    return button;
+                }
+            });
+            psc.Stairs = [
+                ["E", 5, 742.5, 8, 27, 495, 220],
+                ["B", 4, 495, 4, 9, 330, 220],
+                ["E", 4, 330, 2, 3, 220, 220],
+                ["A", 3, 220, 1, 1, 220, 220]
+            ];
+            psc._history = [0, 0, 0];
+            psc._makeStairs();
+        });
+
+        test.each([
+            ["Clear", "Play scale", "_isPlayingScale", 1],
+            ["Undo", "Play scale", "_isPlayingScale", 3],
+            ["Clear", "Play chord", "_isPlayingAll", 1],
+            ["Undo", "Play chord", "_isPlayingAll", 3]
+        ])("%s stops %s before removing stairs", (edit, play, playingFlag, remaining) => {
+            buttons[play].click();
+            expect(psc[playingFlag]).toBe(true);
+
+            buttons[edit].click();
+
+            expect(psc.Stairs).toHaveLength(remaining);
+            expect(psc._pscTable.rows).toHaveLength(remaining);
+            expect(psc[playingFlag]).toBe(false);
+            expect(buttons[play].querySelector("img").alt).toBe(play);
+            expect(psc.activity.logo.synth.stopSound).toHaveBeenCalledWith(0, "electronic synth");
+            expect(psc._pscTable.querySelectorAll(".active")).toHaveLength(0);
+            const trigger = psc.activity.logo.synth.trigger;
+            const callsBeforeWaiting = trigger.mock.calls.length;
+            expect(() => jest.advanceTimersByTime(20000)).not.toThrow();
+            expect(trigger).toHaveBeenCalledTimes(callsBeforeWaiting);
+
+            // The first click after editing starts playback, rather than just resetting Stop.
+            buttons[play].click();
+            expect(psc[playingFlag]).toBe(true);
+            expect(trigger).toHaveBeenCalledTimes(callsBeforeWaiting + 1);
+            jest.advanceTimersByTime(20000);
+            expect(psc[playingFlag]).toBe(false);
+            expect(buttons[play].querySelector("img").alt).toBe(play);
+        });
+
+        test("Clear while idle keeps the original stair without stopping other audio", () => {
+            buttons.Clear.click();
+
+            expect(psc.Stairs.map(stair => stair[2])).toEqual([220]);
+            expect(psc.activity.logo.synth.stopSound).not.toHaveBeenCalled();
+            expect(psc.activity.logo.synth.trigger).not.toHaveBeenCalled();
+        });
+    });
 });

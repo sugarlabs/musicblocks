@@ -11,11 +11,17 @@
 
 "use strict";
 
+const fs = require("fs");
+const path = require("path");
+
+global.GCD = require("../../utils/utils-logic.js").GCD;
+
 const { setupActivityMxmlParser } = require("../mxml-parser.js");
 
 // Globals in the browser (js/utils/musicutils-constants.js); the drum-name
 // lookup reads them.
 const { DRUM_MIDI_MAP, REVERSE_DRUM_MIDI_MAP } = require("../../utils/musicutils-constants.js");
+
 global.DRUM_MIDI_MAP = DRUM_MIDI_MAP;
 global.REVERSE_DRUM_MIDI_MAP = REVERSE_DRUM_MIDI_MAP;
 
@@ -268,6 +274,34 @@ describe("Test 5: Duration/divisions fallback when <type> is absent", () => {
     it("falls back to a quarter note when both <type> and <duration> are missing", async () => {
         const { blocks } = await parseAndCapture(
             scorePartwise("<note><pitch><step>D</step><octave>4</octave></pitch></note>")
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 4]]);
+    });
+
+    it("falls back safely when finite divisions overflow the computed denominator", async () => {
+        const hugeDivisions = `1${"0".repeat(308)}`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                "<note><pitch><step>D</step><octave>4</octave></pitch><duration>1</duration></note>",
+                `<divisions>${hugeDivisions}</divisions>`
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 4]]);
+    });
+
+    it("falls back safely when the computed duration underflows to zero", async () => {
+        const tinyDuration = `0.${"0".repeat(308)}1`;
+        const hugeDivisions = `1${"0".repeat(307)}`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                `<note><pitch><step>D</step><octave>4</octave></pitch>` +
+                    `<duration>${tinyDuration}</duration></note>`,
+                `<divisions>${hugeDivisions}</divisions>`
+            )
         );
 
         expect(noteValues(blocks)).toEqual([[1, 4]]);
@@ -541,6 +575,14 @@ function tempos(blocks) {
         .map(b => byIndex.get(b[4][1])[1][1].value);
 }
 
+/** Every set-synth-volume block's numeric value, in block-array order. */
+function synthVolumes(blocks) {
+    const byIndex = new Map(blocks.map(block => [block[0], block]));
+    return blocks
+        .filter(block => blockName(block) === "setsynthvolume")
+        .map(block => byIndex.get(block[4][2])[1][1].value);
+}
+
 const withKey = (fifths, mode) =>
     `<key><fifths>${fifths}</fifths>${mode ? `<mode>${mode}</mode>` : ""}</key>`;
 
@@ -671,6 +713,35 @@ describe("Test 12: Tempo", () => {
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
+    it("reads a measure-level <sound tempo> into a setbpm3 block", async () => {
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1">' +
+            "<attributes><divisions>8</divisions></attributes>" +
+            '<sound tempo="96"/>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+
+        expect(tempos(blocks)).toEqual([96]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("ignores a direction with no tempo sound element", async () => {
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1">' +
+            "<attributes><divisions>8</divisions></attributes>" +
+            "<direction><direction-type><words>dolce</words></direction-type></direction>" +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+
+        expect(tempos(blocks)).toEqual([]);
+        expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
+    });
+
     it("scales the setbpm3 value by the time signature's beat type", async () => {
         // MusicXML tempo is always quarter notes per minute; the setbpm3 block
         // counts beats of the project's own time signature (see
@@ -687,6 +758,110 @@ describe("Test 12: Tempo", () => {
         expect(tempos(blocks)).toEqual([240]);
     });
 
+    it("inserts a later tempo change before the following note", async () => {
+        const xml =
+            '<score-partwise><part id="P1">' +
+            '<measure number="1"><attributes><divisions>8</divisions></attributes>' +
+            '<direction><sound tempo="60"/></direction>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure>" +
+            '<measure number="2"><direction><sound tempo="120"/></direction>' +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        const [cNote, dNote] = blocks.filter(b => blockName(b) === "newnote");
+        const [, secondTempo] = blocks.filter(b => blockName(b) === "setbpm3");
+
+        expect(tempos(blocks)).toEqual([60, 120]);
+        expect(secondTempo[4][0]).toBe(cNote[4][3]);
+        expect(dNote[4][0]).toBe(secondTempo[0] + 5);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("applies a sound offset before inserting a later tempo change", async () => {
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1">' +
+            "<attributes><divisions>8</divisions></attributes>" +
+            '<sound tempo="120"><offset>8</offset></sound>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        const [cNote, dNote] = blocks.filter(b => blockName(b) === "newnote");
+        const tempo = blocks.find(b => blockName(b) === "setbpm3");
+
+        expect(tempos(blocks)).toEqual([120]);
+        expect(tempo[4][0]).toBe(cNote[4][3]);
+        expect(dNote[4][0]).toBe(tempo[0] + 5);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("applies a tempo change from one part to every part", async () => {
+        const xml =
+            '<score-partwise><part id="P1">' +
+            '<measure number="1"><attributes><divisions>8</divisions></attributes>' +
+            '<direction><sound tempo="60"/></direction>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure>" +
+            '<measure number="2"><direction><sound tempo="120"/></direction>' +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            "</measure></part>" +
+            '<part id="P2">' +
+            '<measure number="1"><attributes><divisions>8</divisions></attributes>' +
+            SIMPLE_NOTE("E", 4, "quarter") +
+            "</measure>" +
+            '<measure number="2">' +
+            SIMPLE_NOTE("F", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        const [, , , fNote] = blocks.filter(b => blockName(b) === "newnote");
+        const [, , , secondPartTempo] = blocks.filter(b => blockName(b) === "setbpm3");
+
+        expect(tempos(blocks)).toEqual([60, 120, 60, 120]);
+        expect(fNote[4][0]).toBe(secondPartTempo[0] + 5);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("does not leave tempo-only blocks for a part with no notes", async () => {
+        const xml =
+            '<score-partwise><part id="P1">' +
+            '<measure number="1"><attributes><divisions>8</divisions></attributes>' +
+            '<direction><sound tempo="60"/></direction>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure>" +
+            '<measure number="2"><direction><sound tempo="120"/></direction>' +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            "</measure></part>" +
+            '<part id="P2"><measure number="1"><attributes><divisions>8</divisions></attributes></measure>' +
+            '<measure number="2"></measure></part></score-partwise>';
+
+        const { blocks } = await parseAndCapture(xml);
+
+        // The empty part still has the shared initial tempo in its preamble,
+        // but it must not receive the later, unreachable tempo change.
+        expect(tempos(blocks)).toEqual([60, 120, 60]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("uses the last tempo direction before the first note", async () => {
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1">' +
+            "<attributes><divisions>8</divisions></attributes>" +
+            '<direction><sound tempo="60"/></direction>' +
+            '<direction><sound tempo="80"/></direction>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+
+        expect(tempos(blocks)).toEqual([80]);
+    });
+
     it("ignores a non-positive or non-numeric tempo rather than staging a bad value", async () => {
         const xml =
             '<score-partwise><part id="P1"><measure number="1">' +
@@ -700,7 +875,134 @@ describe("Test 12: Tempo", () => {
     });
 });
 
-describe("Test 13: Multi-part scores", () => {
+describe("Test 13: Dynamic markings", () => {
+    const dynamic = marking =>
+        `<direction><direction-type><dynamics><${marking}/></dynamics></direction-type></direction>`;
+
+    it("places each supported dynamic's synth-volume block before its following note", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                dynamic("p") +
+                    SIMPLE_NOTE("C", 4, "quarter") +
+                    dynamic("f") +
+                    SIMPLE_NOTE("D", 4, "quarter")
+            )
+        );
+
+        expect(synthVolumes(blocks)).toEqual([35, 80]);
+        const volumeBlocks = blocks.filter(block => blockName(block) === "setsynthvolume");
+        const byIndex = new Map(blocks.map(block => [block[0], block]));
+        expect(blockName(byIndex.get(volumeBlocks[0][4][3]))).toBe("newnote");
+        expect(blockName(byIndex.get(volumeBlocks[1][4][3]))).toBe("newnote");
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("imports common dynamics from the committed MusicXML fixture", async () => {
+        const fixturePath = path.join(__dirname, "fixtures", "dynamics.musicxml");
+        const { blocks } = await parseAndCapture(fs.readFileSync(fixturePath, "utf8"));
+
+        expect(synthVolumes(blocks)).toEqual([35, 80]);
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 }
+        ]);
+    });
+
+    it.each([
+        ["pp", 20],
+        ["p", 35],
+        ["mp", 50],
+        ["mf", 65],
+        ["f", 80],
+        ["ff", 100]
+    ])("maps %s to synth volume %i", async (marking, volume) => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(dynamic(marking) + SIMPLE_NOTE("C", 4, "quarter"))
+        );
+
+        expect(synthVolumes(blocks)).toEqual([volume]);
+    });
+
+    it("ignores an unsupported dynamic marking without creating a volume block", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(dynamic("sfz") + SIMPLE_NOTE("C", 4, "quarter"))
+        );
+
+        expect(synthVolumes(blocks)).toEqual([]);
+    });
+
+    it("keeps a dynamic marking inside a repeated section connected to its note", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                '<barline><repeat direction="forward"/></barline>' +
+                    dynamic("mf") +
+                    SIMPLE_NOTE("C", 4, "quarter") +
+                    '<barline><repeat direction="backward"/></barline>'
+            )
+        );
+
+        expect(synthVolumes(blocks)).toEqual([65]);
+        const byIndex = new Map(blocks.map(block => [block[0], block]));
+        const repeat = blocks.find(block => blockName(block) === "repeat");
+        expect(repeat).toBeDefined();
+        expect(blockName(byIndex.get(repeat[4][2]))).toBe("setsynthvolume");
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("keeps consecutive dynamic markings in document order", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(dynamic("p") + dynamic("f") + SIMPLE_NOTE("C", 4, "quarter"))
+        );
+
+        const volumeBlocks = blocks.filter(block => blockName(block) === "setsynthvolume");
+        const byIndex = new Map(blocks.map(block => [block[0], block]));
+        expect(synthVolumes(blocks)).toEqual([35, 80]);
+        expect(volumeBlocks[0][4][3]).toBe(volumeBlocks[1][0]);
+        expect(blockName(byIndex.get(volumeBlocks[1][4][3]))).toBe("newnote");
+    });
+
+    it("ignores a dynamic direction with an explicit offset", async () => {
+        const offsetDynamic =
+            "<direction><offset>1</offset><direction-type><dynamics><p/></dynamics></direction-type></direction>";
+        const { blocks } = await parseAndCapture(
+            scorePartwise(offsetDynamic + SIMPLE_NOTE("C", 4, "quarter"))
+        );
+
+        expect(synthVolumes(blocks)).toEqual([]);
+    });
+
+    it("ignores a dynamic that explicitly targets another voice", async () => {
+        const voiceTwoDynamic =
+            "<direction><voice>2</voice><direction-type><dynamics><f/></dynamics></direction-type></direction>";
+        const voiceOneNote =
+            "<note><voice>1</voice><pitch><step>C</step><octave>4</octave></pitch>" +
+            "<duration>1</duration><type>quarter</type></note>";
+        const voiceTwoNote =
+            "<note><voice>2</voice><pitch><step>D</step><octave>4</octave></pitch>" +
+            "<duration>1</duration><type>quarter</type></note>";
+        const { blocks } = await parseAndCapture(
+            scorePartwise(voiceTwoDynamic + voiceOneNote + "<backup/>" + voiceTwoNote)
+        );
+
+        expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
+        expect(synthVolumes(blocks)).toEqual([]);
+    });
+
+    it("keeps a dynamic that explicitly targets the imported voice", async () => {
+        const voiceOneDynamic =
+            "<direction><voice>1</voice><direction-type><dynamics><f/></dynamics></direction-type></direction>";
+        const voiceOneNote =
+            "<note><voice>1</voice><pitch><step>C</step><octave>4</octave></pitch>" +
+            "<duration>1</duration><type>quarter</type></note>";
+        const { blocks } = await parseAndCapture(scorePartwise(voiceOneDynamic + voiceOneNote));
+
+        expect(synthVolumes(blocks)).toEqual([80]);
+    });
+});
+
+describe("Test 14: Multi-part scores", () => {
     const twoPartScore = (part1Measures, part2Measures) =>
         "<score-partwise>" +
         '<part-list><score-part id="P1"/><score-part id="P2"/></part-list>' +
@@ -736,6 +1038,25 @@ describe("Test 13: Multi-part scores", () => {
         expect(newnotes).toHaveLength(2);
         expect(newnotes[0][4][0]).toBe(settimbres[0][0]);
         expect(newnotes[1][4][0]).toBe(settimbres[1][0]);
+    });
+
+    it("keeps dynamic markings in their own imported voice", async () => {
+        const quiet =
+            "<direction><direction-type><dynamics><p/></dynamics></direction-type></direction>";
+        const loud =
+            "<direction><direction-type><dynamics><f/></dynamics></direction-type></direction>";
+        const { blocks } = await parseAndCapture(
+            twoPartScore(
+                quiet + SIMPLE_NOTE("C", 4, "quarter"),
+                loud + SIMPLE_NOTE("E", 3, "quarter")
+            )
+        );
+
+        const settimbres = blocks.filter(block => blockName(block) === "settimbre");
+        const volumeBlocks = blocks.filter(block => blockName(block) === "setsynthvolume");
+        expect(synthVolumes(blocks)).toEqual([35, 80]);
+        expect(volumeBlocks.map(block => block[4][0])).toEqual(settimbres.map(block => block[0]));
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
     it("extracts each part's own key signature independently", async () => {
@@ -807,6 +1128,47 @@ describe("Test 13: Multi-part scores", () => {
         const settimbres = blocks.filter(b => blockName(b) === "settimbre");
         expect(settimbres).toHaveLength(3);
         expect(settimbres[2][4][2]).toBeNull();
+    });
+});
+
+describe("Timewise score layout", () => {
+    it("imports multiple parts across multiple measures in part-list order", async () => {
+        const durationNote = (step, octave, duration) =>
+            `<note><pitch><step>${step}</step><octave>${octave}</octave></pitch><duration>${duration}</duration></note>`;
+        const xml =
+            '<score-timewise xmlns="http://www.musicxml.org/ns/musicxml"><movement-title>Timewise Tune</movement-title>' +
+            '<part-list><score-part id="P1"/><score-part id="P2"/></part-list>' +
+            '<measure number="1">' +
+            `<part id="P2"><attributes><divisions>4</divisions></attributes>${durationNote("D", 3, 4)}</part>` +
+            `<part id="P1"><attributes><divisions>8</divisions></attributes>${durationNote("C", 4, 8)}</part>` +
+            "</measure>" +
+            '<measure number="2">' +
+            `<part id="P1">${durationNote("G", 4, 4)}</part>` +
+            `<part id="P2">${durationNote("A", 3, 2)}</part>` +
+            "</measure></score-timewise>";
+
+        const { blocks } = await parseAndCapture(xml);
+
+        expect(blocks.find(b => b[0] === 2)[1][1].value).toBe("Timewise Tune");
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "G", octave: 4 },
+            { name: "D", octave: 3 },
+            { name: "A", octave: 3 }
+        ]);
+        expect(noteValues(blocks)).toEqual([
+            [8, 32],
+            [4, 32],
+            [4, 16],
+            [2, 16]
+        ]);
+        expect(
+            blocks
+                .filter(b => blockName(b) === "text")
+                .map(b => b[1][1].value)
+                .filter(value => value.startsWith("Voice"))
+        ).toEqual(["Voice 1", "Voice 2"]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 });
 
@@ -982,6 +1344,67 @@ describe("Test 15b: drum kits named by other programs", () => {
 
         expect(drumNames(blocks)).toEqual(["clap"]);
     });
+
+    it("resolves repeated notes referencing the same instrument correctly", async () => {
+        const { blocks } = await parseAndCapture(
+            kitScore([["X1", "Snare Drum", 39]], ["X1", "X1", "X1"])
+        );
+
+        expect(drumNames(blocks)).toEqual(["snare drum", "snare drum", "snare drum"]);
+    });
+});
+
+describe("Test 15c: <forward>", () => {
+    it("imports a <forward> as a rest of its length, so later notes keep their place", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                SIMPLE_NOTE("C", 4, "quarter") +
+                    "<forward><duration>16</duration></forward>" +
+                    SIMPLE_NOTE("D", 4, "quarter")
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([
+            [1, 4],
+            [16, 32],
+            [1, 4]
+        ]);
+        expect(blocks.filter(b => blockName(b) === "rest2")).toHaveLength(1);
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 }
+        ]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("ends an open tie at a <forward> instead of stretching it over the gap", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                '<note><pitch><step>C</step><octave>4</octave></pitch><duration>8</duration><tie type="start"/><type>quarter</type></note>' +
+                    "<forward><duration>8</duration></forward>"
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([
+            [1, 4],
+            [8, 32]
+        ]);
+    });
+
+    it("ignores a <forward> with no usable <duration>", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                SIMPLE_NOTE("C", 4, "quarter") +
+                    "<forward><duration></duration></forward><forward/>" +
+                    SIMPLE_NOTE("D", 4, "quarter")
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([
+            [1, 4],
+            [1, 4]
+        ]);
+    });
 });
 
 describe("Test 16: Ties", () => {
@@ -999,6 +1422,24 @@ describe("Test 16: Ties", () => {
         // Two tied quarter notes become one half note.
         expect(noteValues(blocks)).toEqual([[1, 2]]);
         expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("keeps a tie intact when a dynamic occurs between its start and stop", async () => {
+        const dynamic =
+            "<direction><direction-type><dynamics><mf/></dynamics></direction-type></direction>";
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                tiedNote("C", 4, '<tie type="start"/>') +
+                    dynamic +
+                    tiedNote("C", 4, '<tie type="stop"/>')
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 2]]);
+        expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
+        expect(synthVolumes(blocks)).toEqual([65]);
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
         expect(findPositionMismatches(blocks)).toEqual([]);
     });
@@ -1080,6 +1521,238 @@ describe("Test 16: Ties", () => {
         expect(numerator / denominator).toBeCloseTo((2 * duration) / (divisions * 4));
         expect(Math.abs(numerator)).toBeLessThan(Number.MAX_SAFE_INTEGER);
         expect(Math.abs(denominator)).toBeLessThan(Number.MAX_SAFE_INTEGER);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("preserves the note-value fraction when decimal ties form a quarter note", async () => {
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>0.25</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(note("start") + note("stop"), "<divisions>0.5</divisions>")
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 4]]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("preserves very small decimal tie durations", async () => {
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>0.0001</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(note("start") + note("stop"), "<divisions>1</divisions>")
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 20000]]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("keeps an extremely small decimal tie finite when integer conversion cannot scale it", async () => {
+        const tinyDuration = `0.${"0".repeat(308)}1`;
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>${tinyDuration}</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(note("start") + note("stop"), "<divisions>1</divisions>")
+        );
+
+        const values = noteValues(blocks);
+        expect(values).toHaveLength(1);
+
+        const [[numerator, denominator]] = values;
+        expect(Number.isFinite(numerator)).toBe(true);
+        expect(Number.isFinite(denominator)).toBe(true);
+        expect(numerator).toBeGreaterThan(0);
+        expect(denominator).toBeGreaterThan(0);
+        expect(numerator / denominator).toBe(Number(tinyDuration) / 2);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("reduces huge integer tie operands before addition can overflow", async () => {
+        const hugeDuration = `1${"0".repeat(308)}`;
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>${hugeDuration}</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(note("start") + note("stop"), "<divisions>1</divisions>")
+        );
+
+        const values = noteValues(blocks);
+        expect(values).toHaveLength(1);
+
+        const [[numerator, denominator]] = values;
+        expect(Number.isFinite(numerator)).toBe(true);
+        expect(Number.isFinite(denominator)).toBe(true);
+        expect(numerator).toBeGreaterThan(0);
+        expect(denominator).toBeGreaterThan(0);
+        expect(numerator / denominator).toBe(Number(hugeDuration) / 2);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("keeps a large decimal-denominator tie finite when direct addition overflows", async () => {
+        const hugeDuration = `1${"0".repeat(308)}`;
+        const divisions = 1.025;
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>${hugeDuration}</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(note("start") + note("stop"), `<divisions>${divisions}</divisions>`)
+        );
+
+        const values = noteValues(blocks);
+        expect(values).toHaveLength(1);
+
+        const [[numerator, denominator]] = values;
+        const expected = (Number(hugeDuration) / (divisions * 4)) * 2;
+
+        expect(Number.isFinite(numerator)).toBe(true);
+        expect(Number.isFinite(denominator)).toBe(true);
+        expect(numerator).toBeGreaterThan(0);
+        expect(denominator).toBeGreaterThan(0);
+        expect(numerator / denominator).toBe(expected);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("preserves the sum when fallback denominator scaling underflows", async () => {
+        const xml =
+            '<score-partwise><part id="P1">' +
+            '<measure number="1"><attributes><divisions>5e-324</divisions></attributes>' +
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            '<duration>2e-323</duration><tie type="start"/></note>' +
+            "</measure>" +
+            '<measure number="2"><attributes><divisions>2.5e307</divisions></attributes>' +
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            '<duration>1e308</duration><tie type="stop"/></note>' +
+            "</measure>" +
+            "</part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        const values = noteValues(blocks);
+
+        expect(values).toHaveLength(1);
+
+        const [[numerator, denominator]] = values;
+        expect(Number.isFinite(numerator)).toBe(true);
+        expect(Number.isFinite(denominator)).toBe(true);
+        expect(numerator).toBeGreaterThan(0);
+        expect(denominator).toBeGreaterThan(0);
+        expect(numerator / denominator).toBe(2);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("preserves a fractional sum when safe fallback scaling would round", async () => {
+        const xml =
+            '<score-partwise><part id="P1">' +
+            '<measure number="1"><attributes><divisions>5e-324</divisions></attributes>' +
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            '<duration>2e-323</duration><tie type="start"/></note>' +
+            "</measure>" +
+            '<measure number="2"><attributes><divisions>2.5e307</divisions></attributes>' +
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            '<duration>1.25e307</duration><tie type="stop"/></note>' +
+            "</measure>" +
+            "</part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        const values = noteValues(blocks);
+
+        expect(values).toHaveLength(1);
+
+        const [[numerator, denominator]] = values;
+        expect(Number.isFinite(numerator)).toBe(true);
+        expect(Number.isFinite(denominator)).toBe(true);
+        expect(numerator).toBeGreaterThan(0);
+        expect(denominator).toBeGreaterThan(0);
+        expect(numerator / denominator).toBe(1.125);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("falls back safely when a tied duration sum exceeds the numeric range", async () => {
+        const hugeDuration = `17${"0".repeat(307)}`;
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>${hugeDuration}</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(note("start") + note("stop"), "<divisions>0.275</divisions>")
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 4]]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("falls back safely for a tied note with a non-numeric duration", async () => {
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>abc</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(scorePartwise(note("start") + note("stop")));
+
+        expect(noteValues(blocks)).toEqual([[1, 2]]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it.each([
+        ["empty", ""],
+        ["whitespace-only", "   "],
+        ["zero", "0"],
+        ["negative", "-1"]
+    ])("falls back safely for tied notes with %s duration", async (_name, duration) => {
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>${duration}</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(scorePartwise(note("start") + note("stop")));
+
+        expect(noteValues(blocks)).toEqual([[1, 2]]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("falls back safely for tied notes with non-finite divisions", async () => {
+        const note = tie =>
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            `<duration>1</duration><tie type="${tie}"/></note>`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(note("start") + note("stop"), "<divisions>Infinity</divisions>")
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 2]]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it.each([
+        ["decimal durations", 0.1, 1],
+        ["decimal divisions", 1, 0.3]
+    ])("keeps a long tie chain with %s finite", async (_name, duration, divisions) => {
+        const notes = Array.from({ length: 512 }, (_, index) => {
+            const ties =
+                (index > 0 ? '<tie type="stop"/>' : "") +
+                (index < 511 ? '<tie type="start"/>' : "");
+
+            return (
+                "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+                `<duration>${duration}</duration>${ties}</note>`
+            );
+        }).join("");
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(notes, `<divisions>${divisions}</divisions>`)
+        );
+
+        const values = noteValues(blocks);
+        expect(values).toHaveLength(1);
+
+        const [[numerator, denominator]] = values;
+        expect(Number.isFinite(numerator)).toBe(true);
+        expect(Number.isFinite(denominator)).toBe(true);
+        expect(numerator / denominator).toBeCloseTo((512 * duration) / (divisions * 4));
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
@@ -1176,6 +1849,22 @@ describe("Test 17: Repeats", () => {
     const BARLINE_FORWARD = '<barline location="left"><repeat direction="forward"/></barline>';
     const barlineBackward = times =>
         `<barline location="right"><repeat direction="backward"${times ? ` times="${times}"` : ""}/></barline>`;
+    const playedPitches = blocks => {
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const settimbre = blocks.find(block => blockName(block) === "settimbre");
+        const result = [];
+        let note = byId.get(settimbre[4][2]);
+        while (note !== undefined && note !== null) {
+            const vspace = byId.get(note[4][2]);
+            const pitch = byId.get(vspace[4][1]);
+            result.push({
+                name: byId.get(pitch[4][1])[1][1].value,
+                octave: byId.get(pitch[4][2])[1][1].value
+            });
+            note = byId.get(byId.get(note[4][3])[4][1]);
+        }
+        return result;
+    };
 
     it("wraps the whole part in a repeat block when there's no explicit forward repeat", async () => {
         const { blocks } = await parseAndCapture(
@@ -1207,6 +1896,351 @@ describe("Test 17: Repeats", () => {
         const repeat = blocks.find(b => blockName(b) === "repeat");
         const countBlock = blocks.find(b => b[0] === repeat[4][1]);
         expect(countBlock[1][1].value).toBe(2);
+    });
+
+    it("keeps a tempo after a repeat on the repeat's outgoing flow", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                '<direction><sound tempo="60"/></direction>' +
+                    SIMPLE_NOTE("C", 4, "quarter") +
+                    barlineBackward(null) +
+                    '<direction><sound tempo="120"/></direction>' +
+                    SIMPLE_NOTE("D", 4, "quarter")
+            )
+        );
+
+        const repeat = blocks.find(b => blockName(b) === "repeat");
+        const [, secondTempo] = blocks.filter(b => blockName(b) === "setbpm3");
+
+        expect(repeat[4][3]).toBe(secondTempo[0]);
+        expect(secondTempo[4][0]).toBe(repeat[0]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("restores the repeat's starting tempo on every loop", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                '<direction><sound tempo="60"/></direction>' +
+                    SIMPLE_NOTE("C", 4, "quarter") +
+                    barlineBackward(null) +
+                    '<direction><sound tempo="120"/></direction>' +
+                    SIMPLE_NOTE("D", 4, "quarter")
+            )
+        );
+
+        const repeat = blocks.find(b => blockName(b) === "repeat");
+        const initialTempo = blocks.filter(b => blockName(b) === "setbpm3")[0];
+        const repeatedTempo = blocks.find(b => b[0] === repeat[4][2]);
+        const laterTempo = blocks.find(b => b[0] === repeat[4][3]);
+        const cNote = blocks.find(b => blockName(b) === "newnote");
+
+        expect(tempos(blocks)).toEqual([60, 120, 60]);
+        expect(repeat[4][2]).toBe(repeatedTempo[0]);
+        expect(repeatedTempo[4][0]).toBe(repeat[0]);
+        expect(cNote[4][0]).toBe(repeatedTempo[0] + 5);
+        expect(initialTempo[4][0]).not.toBe(repeat[0]);
+        expect(laterTempo[4][0]).toBe(repeat[0]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("flattens first and second MusicXML repeat endings into the correct playback order", async () => {
+        const xml =
+            '<score-partwise><part id="P1">' +
+            '<measure number="1"><attributes><divisions>1</divisions></attributes>' +
+            '<barline location="left"><repeat direction="forward"/></barline>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure>" +
+            '<measure number="2">' +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            "</measure>" +
+            '<measure number="3"><barline location="left"><ending number="1" type="start"/></barline>' +
+            SIMPLE_NOTE("E", 4, "quarter") +
+            '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+            "</measure>" +
+            '<measure number="4"><barline location="left"><ending number="2" type="start"/></barline>' +
+            SIMPLE_NOTE("F", 4, "quarter") +
+            '<barline location="right"><ending number="2" type="stop"/></barline>' +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        expect(playedPitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 },
+            { name: "E", octave: 4 },
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 },
+            { name: "F", octave: 4 }
+        ]);
+        expect(blocks.filter(b => blockName(b) === "repeat")).toHaveLength(0);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("flattens a first ending with no shared repeat-body notes", async () => {
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1"><attributes><divisions>1</divisions></attributes>' +
+            SIMPLE_NOTE("G", 4, "quarter") +
+            '<barline location="left"><repeat direction="forward"/><ending number="1" type="start"/></barline>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+            '<barline location="left"><ending number="2" type="start"/></barline>' +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+
+        expect(playedPitches(blocks).map(pitch => pitch.name)).toEqual(["G", "C", "D"]);
+        expect(blocks.filter(block => blockName(block) === "repeat")).toHaveLength(0);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("flattens a three-pass first and second ending", async () => {
+        const xml =
+            '<score-partwise><part id="P1">' +
+            '<measure number="1"><attributes><divisions>1</divisions></attributes>' +
+            '<barline location="left"><repeat direction="forward"/></barline>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            '<barline location="left"><ending number="1" type="start"/></barline>' +
+            SIMPLE_NOTE("E", 4, "quarter") +
+            '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward" times="3"/></barline>' +
+            '<barline location="left"><ending number="2" type="start"/></barline>' +
+            SIMPLE_NOTE("F", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+
+        expect(playedPitches(blocks).map(pitch => pitch.name)).toEqual([
+            "C",
+            "D",
+            "E",
+            "C",
+            "D",
+            "E",
+            "C",
+            "D",
+            "F"
+        ]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("restores the repeat's starting tempo before each flattened pass", async () => {
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1"><attributes><divisions>1</divisions></attributes>' +
+            '<direction><sound tempo="60"/></direction>' +
+            BARLINE_FORWARD +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            '<direction><sound tempo="120"/></direction>' +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            '<barline location="left"><ending number="1" type="start"/></barline>' +
+            SIMPLE_NOTE("E", 4, "quarter") +
+            '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+            '<barline location="left"><ending number="2" type="start"/></barline>' +
+            SIMPLE_NOTE("F", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+
+        expect(tempos(blocks)).toEqual([60, 120, 60, 120]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("flattens an ending repeat that starts after an earlier note", async () => {
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1"><attributes><divisions>1</divisions></attributes>' +
+            SIMPLE_NOTE("A", 4, "quarter") +
+            '<barline location="left"><repeat direction="forward"/></barline>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            '<barline location="left"><ending number="1" type="start"/></barline>' +
+            SIMPLE_NOTE("E", 4, "quarter") +
+            '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+            '<barline location="left"><ending number="2" type="start"/></barline>' +
+            SIMPLE_NOTE("F", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+
+        expect(playedPitches(blocks).map(pitch => pitch.name)).toEqual([
+            "A",
+            "C",
+            "D",
+            "E",
+            "C",
+            "D",
+            "F"
+        ]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("keeps a shared 1,2 ending in the repeat clamp", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                BARLINE_FORWARD +
+                    SIMPLE_NOTE("C", 4, "quarter") +
+                    '<barline location="left"><ending number="1,2" type="start"/></barline>' +
+                    SIMPLE_NOTE("E", 4, "quarter") +
+                    '<barline location="right"><ending number="1,2" type="stop"/><repeat direction="backward"/></barline>' +
+                    SIMPLE_NOTE("F", 4, "quarter")
+            )
+        );
+
+        expect(blocks.filter(block => blockName(block) === "repeat")).toHaveLength(1);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("keeps an oversized ending repeat in the repeat clamp", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                BARLINE_FORWARD +
+                    SIMPLE_NOTE("C", 4, "quarter") +
+                    '<barline location="left"><ending number="1" type="start"/></barline>' +
+                    SIMPLE_NOTE("E", 4, "quarter") +
+                    '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward" times="17"/></barline>' +
+                    SIMPLE_NOTE("F", 4, "quarter")
+            )
+        );
+
+        const repeat = blocks.find(block => blockName(block) === "repeat");
+        const count = blocks.find(block => block[0] === repeat[4][1]);
+        expect(count[1][1].value).toBe(17);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("keeps a body-to-first-ending tie on the first pass only", async () => {
+        const tiedNote = (step, tie) =>
+            `<note><pitch><step>${step}</step><octave>4</octave></pitch>` +
+            `<duration>1</duration><type>quarter</type>${tie}</note>`;
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1"><attributes><divisions>1</divisions></attributes>' +
+            '<barline location="left"><repeat direction="forward"/></barline>' +
+            tiedNote("C", '<tie type="start"/>') +
+            '<barline location="left"><ending number="1" type="start"/></barline>' +
+            tiedNote("C", '<tie type="stop"/>') +
+            '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+            '<barline location="left"><ending number="2" type="start"/></barline>' +
+            SIMPLE_NOTE("F", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+
+        expect(playedPitches(blocks).map(pitch => pitch.name)).toEqual(["C", "C", "F"]);
+        expect(noteValues(blocks)).toEqual([
+            [1, 2],
+            [1, 4],
+            [1, 4]
+        ]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("keeps a tie chain through the first ending", async () => {
+        const tiedNote = (step, tie) =>
+            `<note><pitch><step>${step}</step><octave>4</octave></pitch>` +
+            `<duration>1</duration><type>quarter</type>${tie}</note>`;
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1"><attributes><divisions>1</divisions></attributes>' +
+            BARLINE_FORWARD +
+            tiedNote("C", '<tie type="start"/>') +
+            '<barline location="left"><ending number="1" type="start"/></barline>' +
+            tiedNote("C", '<tie type="stop"/><tie type="start"/>') +
+            tiedNote("C", '<tie type="stop"/>') +
+            '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+            '<barline location="left"><ending number="2" type="start"/></barline>' +
+            SIMPLE_NOTE("F", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+
+        expect(playedPitches(blocks).map(pitch => pitch.name)).toEqual(["C", "C", "F"]);
+        expect(noteValues(blocks)).toEqual([
+            [3, 4],
+            [1, 4],
+            [1, 4]
+        ]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("keeps an unmatched body tie separate from the first ending", async () => {
+        const tiedNote = (step, tie) =>
+            `<note><pitch><step>${step}</step><octave>4</octave></pitch>` +
+            `<duration>1</duration><type>quarter</type>${tie}</note>`;
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1"><attributes><divisions>1</divisions></attributes>' +
+            '<barline location="left"><repeat direction="forward"/></barline>' +
+            tiedNote("C", '<tie type="start"/>') +
+            '<barline location="left"><ending number="1" type="start"/></barline>' +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+            '<barline location="left"><ending number="2" type="start"/></barline>' +
+            SIMPLE_NOTE("F", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+
+        expect(playedPitches(blocks).map(pitch => pitch.name)).toEqual(["C", "D", "C", "F"]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("clears an ending marker that closes without a backward repeat", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                '<barline location="left"><ending number="1" type="start"/></barline>' +
+                    SIMPLE_NOTE("C", 4, "quarter") +
+                    '<barline location="right"><ending number="1" type="stop"/></barline>' +
+                    SIMPLE_NOTE("D", 4, "quarter") +
+                    barlineBackward(null) +
+                    SIMPLE_NOTE("F", 4, "quarter")
+            )
+        );
+
+        expect(blocks.filter(block => blockName(block) === "repeat")).toHaveLength(1);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("does not merge a tie from the first ending into the second ending", async () => {
+        const tiedEndingNote = (step, tie) =>
+            `<note><pitch><step>${step}</step><octave>4</octave></pitch>` +
+            `<duration>1</duration><type>quarter</type>${tie}</note>`;
+        const xml =
+            '<score-partwise><part id="P1">' +
+            '<measure number="1"><attributes><divisions>1</divisions></attributes>' +
+            '<barline location="left"><repeat direction="forward"/></barline>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "</measure>" +
+            '<measure number="2">' +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            "</measure>" +
+            '<measure number="3"><barline location="left"><ending number="1" type="start"/></barline>' +
+            tiedEndingNote("E", '<tie type="start"/>') +
+            '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+            "</measure>" +
+            '<measure number="4"><barline location="left"><ending number="2" type="start"/></barline>' +
+            tiedEndingNote("E", '<tie type="stop"/>') +
+            '<barline location="right"><ending number="2" type="stop"/></barline>' +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        expect(playedPitches(blocks).map(pitch => pitch.name)).toEqual([
+            "C",
+            "D",
+            "E",
+            "C",
+            "D",
+            "E"
+        ]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
     });
 
     it("wraps only a middle section, leaving notes before and after it outside the clamp", async () => {
@@ -1351,10 +2385,26 @@ describe("Test 11: Tuplets are played at their time-modification ratio", () => {
         expect(noteValues(blocks)).toEqual([[1, 4]]);
     });
 
-    it("ignores a malformed time-modification rather than producing a zero length", async () => {
-        const { blocks } = await parseAndCapture(scorePartwise(TUPLET_NOTE("C", "quarter", 0, 2)));
+    it.each([0, Infinity])(
+        "ignores malformed actual-notes %s rather than producing an invalid length",
+        async actual => {
+            const { blocks } = await parseAndCapture(
+                scorePartwise(TUPLET_NOTE("C", "quarter", actual, 2))
+            );
 
-        expect(noteValues(blocks)).toEqual([[1, 4]]);
+            expect(noteValues(blocks)).toEqual([[1, 4]]);
+        }
+    );
+
+    it("uses the duration fallback when a finite tuplet ratio overflows", async () => {
+        const hugeActual = `1${"0".repeat(308)}`;
+
+        const { blocks } = await parseAndCapture(
+            scorePartwise(TUPLET_NOTE("C", "quarter", hugeActual, 2))
+        );
+
+        expect(noteValues(blocks)).toEqual([[1, 32]]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
     it("does not touch a note that falls back to duration, which already has the ratio", async () => {

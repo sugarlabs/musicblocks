@@ -293,7 +293,7 @@ class Planet {
 
             // ── Git state sync from gitDropdown ──────────────────────────
             if (e.data.type === "MB_GIT_CREATED") {
-                const id = this.ProjectStorage.getCurrentProjectID();
+                const id = e.data.projectId || this.ProjectStorage.getCurrentProjectID();
                 if (!id) return;
                 const { repoName, hashedKey, displayName, description } = e.data;
                 if (displayName) {

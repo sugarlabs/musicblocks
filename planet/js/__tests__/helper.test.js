@@ -59,6 +59,58 @@ const {
     updateCheckboxes
 } = require("../helper");
 
+describe("search clear button visibility", () => {
+    function loadHelperForSearchTest({ includeMobile = true } = {}) {
+        const mobileSearch = includeMobile
+            ? `
+                <input id="global-search-2" value="" />
+                <div id="search-close-2" style="display:none;"></div>
+            `
+            : "";
+
+        document.body.innerHTML = `
+            <div id="publisher"></div>
+            <div id="deleter"></div>
+            <div id="projectviewer"></div>
+            <input id="global-search" value="" />
+            <div id="search-close" style="display:none;"></div>
+            ${mobileSearch}
+            <div id="local-tab"></div>
+            <div id="global-tab"></div>
+            <div id="searchcontainer" style="display:block;"></div>
+            <div id="view-more-chips"></div>
+            <div id="morechips" class="flexchips"></div>
+        `;
+
+        jest.isolateModules(() => {
+            require("../helper");
+        });
+    }
+
+    afterEach(() => {
+        document.body.innerHTML = "";
+    });
+
+    it("shows the mobile clear button when text is entered and hides it when cleared", () => {
+        loadHelperForSearchTest();
+
+        const input = document.getElementById("global-search-2");
+        const clearButton = document.getElementById("search-close-2");
+
+        input.value = "melody";
+        input.dispatchEvent(new Event("input"));
+        expect(clearButton.style.display).toBe("initial");
+
+        input.value = "";
+        input.dispatchEvent(new Event("input"));
+        expect(clearButton.style.display).toBe("none");
+    });
+
+    it("initializes when mobile search elements are missing", () => {
+        expect(() => loadHelperForSearchTest({ includeMobile: false })).not.toThrow();
+    });
+});
+
 describe("helper.js", () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -248,6 +300,26 @@ describe("helper.js", () => {
             expect(spyRemove).toHaveBeenCalledTimes(2);
 
             spyRemove.mockRestore();
+        });
+
+        it("calls the onHide callback when clicking outside", () => {
+            document.body.innerHTML = `
+                <div id="anchor"></div>
+                <div id="target" style="display: block;"></div>
+                <div id="outside"></div>
+            `;
+
+            const anchor = document.getElementById("anchor");
+            const target = document.getElementById("target");
+            const outside = document.getElementById("outside");
+            const onHide = jest.fn();
+
+            hideOnClickOutside([anchor], "target", onHide);
+
+            outside.click();
+
+            expect(target.style.display).toBe("none");
+            expect(onHide).toHaveBeenCalledTimes(1);
         });
     });
 

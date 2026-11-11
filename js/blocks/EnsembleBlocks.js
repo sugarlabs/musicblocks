@@ -26,6 +26,10 @@
  * @returns {number|null}
  */
 function getTargetTurtle(turtles, targetTurtle) {
+    if (!turtles || !turtles.turtleList || targetTurtle === null || targetTurtle === undefined) {
+        return null;
+    }
+
     // We'll compare the names as strings so convert to "string" if "number".
     targetTurtle = targetTurtle.toString();
 
@@ -228,6 +232,8 @@ function setupEnsembleBlocks(activity) {
                 } else {
                     activity.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
                 }
+            } else if (String(targetTurtle) !== String(turtle)) {
+                logo.stopTurtleRun(targetTurtle);
             } else {
                 const tur = activity.turtles.ithTurtle(targetTurtle);
 
@@ -236,7 +242,7 @@ function setupEnsembleBlocks(activity) {
                 tur.unhighlightQueue = [];
                 tur.parameterQueue = [];
 
-                activity.turtles.ithTurtle(turtle).running = false;
+                tur.running = false;
                 logo.doBreak(tur);
             }
         }
@@ -794,6 +800,7 @@ function setupEnsembleBlocks(activity) {
                     tur.singer.pitchNumberOffset;
                 activity.blocks.blockList[blk].value = value;
             }
+            return activity.blocks.blockList[blk].value;
         }
     }
 
@@ -868,6 +875,7 @@ function setupEnsembleBlocks(activity) {
                 }
                 activity.blocks.blockList[blk].value = -1;
             }
+            return activity.blocks.blockList[blk].value;
         }
     }
 
@@ -1245,7 +1253,7 @@ function setupEnsembleBlocks(activity) {
             }
             let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
             if (typeof a === "number") {
-                a -= 1; // Internally, we count from 0
+                a = Math.floor(a) - 1; // Internally, we count from 0
                 if (a >= 0 && a < activity.turtles.getTurtleCount()) {
                     return activity.turtles.getTurtle(a).name;
                 } else {

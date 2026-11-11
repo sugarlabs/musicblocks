@@ -566,6 +566,26 @@ describe("Utility Functions (logic-only)", () => {
                 spy.mockRestore();
             });
 
+            it("rejects non-finite and NaN values", () => {
+                const spy = jest.spyOn(console, "warn").mockImplementation(() => {});
+                const [res1, err1] = rationalSum([1, NaN], [1, 4]);
+                expect(res1).toEqual([0, 1]);
+                expect(err1).not.toBeNull();
+
+                const [res2, err2] = rationalSum([1, 4], [1, NaN]);
+                expect(res2).toEqual([0, 1]);
+                expect(err2).not.toBeNull();
+
+                const [res3, err3] = rationalSum([NaN, 2], [1, 4]);
+                expect(res3).toEqual([0, 1]);
+                expect(err3).not.toBeNull();
+
+                const [res4, err4] = rationalSum([1, Infinity], [1, 4]);
+                expect(res4).toEqual([0, 1]);
+                expect(err4).not.toBeNull();
+                spy.mockRestore();
+            });
+
             it("logs error and returns [0,1] for zero second denominator", () => {
                 const spy = jest.spyOn(console, "error").mockImplementation(() => {});
                 const [result, err] = rationalSum([2, 3], [1, 0]);

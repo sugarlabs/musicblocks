@@ -597,11 +597,12 @@ class JSInterface {
                             "snare roll",
                             "kick drum",
                             "heavy kick",
+                            "bass drum",
                             "tom tom",
                             "tom hi",
                             "tom mid",
                             "tom lo",
-                            "floor tom tom",
+                            "floor tom",
                             "cup drum",
                             "darbuka drum",
                             "japanese drum",
@@ -1042,6 +1043,12 @@ class JSInterface {
                     values: ["even", "odd", "scalar"],
                     defaultIndex: 0
                 }
+            },
+            {
+                type: "function",
+                constraints: {
+                    async: true
+                }
             }
         ],
         setPitchNumberOffset: [
@@ -1098,7 +1105,7 @@ class JSInterface {
                         "dorian",
                         "phrygian",
                         "lydian",
-                        "myxolydian",
+                        "mixolydian",
                         "minor",
                         "aeolian"
                     ],

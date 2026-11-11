@@ -530,18 +530,13 @@ describe("Tempo Widget", () => {
             expect(newStack[1][1][1].value).toBe(175);
         });
 
-        test("__save() should delay based on index", () => {
+        test("__save() submits a later row without waiting for a timer", () => {
             tempoWidget.BPMs = [100, 120];
 
             tempoWidget.__save(1);
 
-            // Should not be called before 200ms * 1
-            jest.advanceTimersByTime(100);
-            expect(mockActivity.blocks.loadNewBlocks).not.toHaveBeenCalled();
-
-            // Should be called after 200ms * 1
-            jest.advanceTimersByTime(200);
-            expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalled();
+            expect(mockActivity.blocks.loadNewBlocks).toHaveBeenCalledTimes(1);
+            expect(mockActivity.blocks.loadNewBlocks.mock.calls[0][0][1][1][1].value).toBe(120);
         });
     });
 
@@ -1089,6 +1084,14 @@ describe("Tempo Widget", () => {
     });
 
     describe("init() - Additional Coverage", () => {
+        test("selects the first row again when the widget is reopened", () => {
+            tempoWidget.activeBPMIndex = 1;
+
+            tempoWidget.init(mockActivity);
+
+            expect(tempoWidget.activeBPMIndex).toBe(0);
+        });
+
         test("should clear existing interval when re-initializing", () => {
             tempoWidget.BPMs = [100];
             tempoWidget._intervalID = setInterval(() => {}, 1000);

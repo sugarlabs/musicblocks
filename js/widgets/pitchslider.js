@@ -47,7 +47,10 @@ class PitchSlider {
         this.activity = activity;
         const edo = getCurrentEDO(activity.logo.synth.inTemperament);
         const semitone = Math.pow(2, 1 / edo);
-        if (window.widgetWindows.openWindows["slider"]) return;
+        const openWindow = window.widgetWindows.openWindows["slider"];
+        if (openWindow) openWindow.onclose();
+        this.sliders = {};
+        this.activeSlider = null;
         if (!this.frequencies || !this.frequencies.length) this.frequencies = [392];
         this.initialFrequencies = [...this.frequencies];
 
@@ -323,19 +326,16 @@ class PitchSlider {
         this.activity.refreshCanvas();
 
         const newStack = [
-            [0, "note", 100 + this._delta, 100 + this._delta, [null, 1, 2, null]],
-            [1, ["number", { value: 8 }], 0, 0, [0]]
+            [0, "newnote", 100 + this._delta, 100 + this._delta, [null, 1, 4, 7]],
+            [1, "divide", 0, 0, [0, 2, 3]],
+            [2, ["number", { value: 1 }], 0, 0, [1]],
+            [3, ["number", { value: 4 }], 0, 0, [1]],
+            [4, "vspace", 0, 0, [0, 5]],
+            [5, "hertz", 0, 0, [4, 6, null]],
+            [6, ["number", { value: frequency }], 0, 0, [5]],
+            [7, "hidden", 0, 0, [0, null]]
         ];
         this._delta += 21;
-
-        const previousBlock = 0;
-
-        const hertzIdx = newStack.length;
-        const frequencyIdx = hertzIdx + 1;
-        const hiddenIdx = hertzIdx + 2;
-        newStack.push([hertzIdx, "hertz", 0, 0, [previousBlock, frequencyIdx, hiddenIdx]]);
-        newStack.push([frequencyIdx, ["number", { value: frequency }], 0, 0, [hertzIdx]]);
-        newStack.push([hiddenIdx, "hidden", 0, 0, [hertzIdx, null]]);
 
         this.activity.blocks.loadNewBlocks(newStack);
     }

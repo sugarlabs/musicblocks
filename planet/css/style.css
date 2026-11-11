@@ -46,6 +46,10 @@
 	justify-content: center;
 }
 
+button.project-icon {
+	color: #ffab40;
+}
+
 .projectscontainer {
 	display: -webkit-box;
 	display: -ms-flexbox;
@@ -91,14 +95,29 @@
 	color: #343434;
 }
 
+.global-share-container {
+	position: relative;
+}
+
 .share-card {
 	position: absolute;
 	z-index: 200;
-	left: 50%;
-	-webkit-transform: translateX(-50%);
-	-ms-transform: translateX(-50%);
-	transform: translateX(-50%);
-	min-width: 350px;
+	right: 0;
+	left: auto;
+	width: 350px;
+	max-width: calc(100vw - 24px);
+	max-height: calc(100vh - 24px);
+	overflow-y: auto;
+}
+
+.share-card-below {
+	top: calc(100% + 8px);
+	bottom: auto;
+}
+
+.share-card-above {
+	top: auto;
+	bottom: calc(100% + 8px);
 }
 
 .shareurltext {
@@ -225,6 +244,19 @@
 	flex-wrap: wrap ;
 }
 
+.global-tags-container .global-tags-more {
+	flex: 0 0 auto;
+	border: 0;
+	cursor: pointer;
+	padding: 0 7px;
+}
+
+.global-tags-container .global-tags-more:active,
+.global-tags-container .global-tags-more:focus,
+.global-tags-container .global-tags-more:focus-visible {
+	background-color: #ffab40;
+}
+
 .chipselect {
 	display: inline-block;
 	height: 32px;
@@ -297,15 +329,19 @@ div.select-wrapper * {
 }
 
 .likes-count {
-	position: relative;
-	top: -7px;
+	display: inline-flex;
+	align-items: center;
+}
+
+#search-close,
+#search-close-2 {
+	display: none;
+	cursor: pointer;
 }
 
 #search-close {
-	display: none;
 	position: absolute;
 	top: -4px;
-	cursor: pointer;
 }
 
 #localglobal {
@@ -405,10 +441,6 @@ a {
 }
 
 @media only screen and (max-width: 1100px) {
-	#projectviewer-download-file, #projectviewer-open-mb, #projectviewer-merge-mb {
-		margin-left: -25px !important;
-	}
-
 	#projectviewer-report-project, #projectviewer-report-project-disabled {
 		padding-left: 0px;
 		padding-right: 0px;
@@ -452,8 +484,10 @@ a {
 	.input-field-2 {
        display: flex;
 	}
-	#two-header.nav-extended.light-green.lighten-1{
+	#two_header.nav-extended.light-green.lighten-1{
 		position: relative;
+		top: 0;
+		z-index: 99;
 	}
 	.input-field-2.search{
 		position: absolute;
@@ -554,6 +588,11 @@ a {
     transform: translateY(-5px) scale(1.02);
     box-shadow: 0 12px 26px rgba(0, 0, 0, 0.22);
     z-index: 5;
+}
+
+#globalcontents .card.share-popup-open {
+	position: relative;
+	z-index: 10;
 }
 
 @media (prefers-reduced-motion: reduce) {

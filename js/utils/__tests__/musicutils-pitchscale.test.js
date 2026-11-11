@@ -56,6 +56,17 @@ describe("musicutils-pitchscale", () => {
         expect(pitchscale.getSharpFlatPreference("G major")).toBe("sharp");
     });
 
+    it("handles nullish, empty, and non-string inputs safely in keySignatureToMode", () => {
+        expect(pitchscale.keySignatureToMode("")).toEqual(["C", "major"]);
+        expect(pitchscale.keySignatureToMode("   ")).toEqual(["C", "major"]);
+        expect(pitchscale.keySignatureToMode(null)).toEqual(["C", "major"]);
+        expect(pitchscale.keySignatureToMode(undefined)).toEqual(["C", "major"]);
+        expect(pitchscale.keySignatureToMode(42)).toEqual(["C", "major"]);
+        expect(pitchscale.keySignatureToMode(true)).toEqual(["C", "major"]);
+        expect(pitchscale.keySignatureToMode({})).toEqual(["C", "major"]);
+        expect(pitchscale.keySignatureToMode([])).toEqual(["C", "major"]);
+    });
+
     it("calculates pitch numbers accurately for enharmonic notes and boundary shifts in 12-EDO", () => {
         expect(pitchscale.pitchToNumber("B♯", 4, "C major", "equal")).toBe(
             pitchscale.pitchToNumber("C", 5, "C major", "equal")
@@ -91,6 +102,43 @@ describe("musicutils-pitchscale", () => {
         expect(pitchscale.pitchToNumber("dobb", 4, "C major", "equal")).toBe(37);
         expect(pitchscale.pitchToNumber("do♭♭", 4, "C major", "equal")).toBe(37);
         expect(pitchscale.pitchToNumber("do♯♯", 4, "C major", "equal")).toBe(41);
+        expect(pitchscale.pitchToNumber("C#b", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("C", 4, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("Cb#", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("C", 4, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("C#♭", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("C", 4, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("C♯b", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("C", 4, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("Cb♯", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("C", 4, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("C♭#", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("C", 4, "C major", "equal")
+        );
+    });
+
+    it("keeps the full solfege root when parsing double accidentals", () => {
+        expect(pitchscale.pitchToNumber("sol##", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("A", 4, "C major", "equal")
+        );
+        expect(pitchscale.pitchToNumber("do𝄫", 4, "C major", "equal")).toBe(
+            pitchscale.pitchToNumber("B♭", 3, "C major", "equal")
+        );
+        expect(pitchscale.getNoteFromSolfege("sol##", "C major", false, 12, 4, 0)).toEqual([
+            "A",
+            4,
+            0
+        ]);
+        expect(pitchscale.getNoteFromSolfege("do𝄫", "C major", false, 12, 4, 0)).toEqual([
+            "B♭",
+            3,
+            0
+        ]);
     });
 
     it("resolves a solfege note argument to a note name, or null if unresolvable", () => {
@@ -102,12 +150,38 @@ describe("musicutils-pitchscale", () => {
         expect(pitchscale.getNoteFromSolfege("xyz", "C major", true, 12, 4, 0)).toBeNull();
     });
 
+    it("spells ASCII and Unicode double accidentals the same way in non-12 EDO", () => {
+        // Regression: the downstream spelling branch must use the already-parsed
+        // doubleSharp flag, not re-check the raw noteArg, so "mi##" and its
+        // Unicode equivalent pick the same enharmonic spelling in e.g. 19-EDO.
+        expect(pitchscale.getNoteFromSolfege("mi##", "C major", true, 19, 4, 0)).toEqual(
+            pitchscale.getNoteFromSolfege("mi𝄪", "C major", true, 19, 4, 0)
+        );
+        expect(pitchscale.getNoteFromSolfege("mibb", "C major", true, 19, 4, 0)).toEqual(
+            pitchscale.getNoteFromSolfege("mi𝄫", "C major", true, 19, 4, 0)
+        );
+    });
+
     it("gives a key signature's scale, solfege slots, tonic and mode together", () => {
         const [scale, solfege, tonic, mode] = pitchscale.getScaleAndHalfSteps("C major");
         expect(scale).toHaveLength(12);
         expect(solfege).toHaveLength(12);
         expect(tonic).toBe("C");
         expect(mode).toBe("major");
+    });
+
+    it("takes the 12-EDO path for an invalid EDO in getScaleAndHalfSteps", () => {
+        // Before normalising here, Infinity or NaN returned the EDO
+        // name table in the scale slot where the 12-EDO path returns
+        // solfege slots, so the result shape disagreed with 12-EDO.
+        const twelve = pitchscale.getScaleAndHalfSteps("C major", 12);
+        for (const edo of [Infinity, -Infinity, NaN, 0, 12.5, 257]) {
+            expect(pitchscale.getScaleAndHalfSteps("C major", edo)).toEqual(twelve);
+        }
+        // Valid EDOs are unchanged.
+        const nineteen = pitchscale.getScaleAndHalfSteps("C major", 19);
+        expect(nineteen[0]).toHaveLength(19);
+        expect(nineteen[1].reduce((a, b) => a + b, 0)).toBe(19);
     });
 
     describe("input validation and type guards (#9900)", () => {
@@ -141,6 +215,64 @@ describe("musicutils-pitchscale", () => {
             expect(pitchscale.getNoteFromSolfege(null, "C major", true, 12, 4, 0)).toBeNull();
             expect(pitchscale.getNoteFromSolfege(42, "C major", true, 12, 4, 0)).toBeNull();
             expect(pitchscale.getNoteFromSolfege("", "C major", true, 12, 4, 0)).toBeNull();
+        });
+    });
+
+    describe("numberToPitch non-finite and large-magnitude inputs", () => {
+        // Regression: the negative branch used to bump the pitch number up
+        // one octave per loop iteration, so -Infinity never terminated and
+        // a finite -1e308 effectively never did; NaN/Infinity fell through
+        // to [undefined, NaN/Infinity]. #9126 fixed the same hang class in
+        // numberToPitchSharp and specified the ["A", 0] default.
+        it("returns the A0 default for non-finite pitch numbers instead of hanging", () => {
+            expect(pitchscale.numberToPitch(-Infinity, "equal")).toEqual(["A", 0]);
+            expect(pitchscale.numberToPitch(Infinity, "equal")).toEqual(["A", 0]);
+            expect(pitchscale.numberToPitch(NaN, "equal")).toEqual(["A", 0]);
+            expect(pitchscale.numberToPitch(-Infinity, "equal19")).toEqual(["A", 0]);
+        });
+
+        it("converts a very large finite negative pitch number in constant time", () => {
+            // The step within the octave comes from exact remainder
+            // arithmetic: -1e308 mod 12 normalises to step 4 (D♭), and the
+            // largest finite double must still produce a defined note
+            // instead of overflowing to [undefined, Infinity].
+            expect(pitchscale.numberToPitch(-1e308, "equal")).toEqual([
+                "D♭",
+                -8.333333333333333e306
+            ]);
+            expect(pitchscale.numberToPitch(-Number.MAX_VALUE, "equal")).toEqual([
+                "D♭",
+                -1.4980776123852632e307
+            ]);
+            expect(pitchscale.numberToPitch(-1e308, "equal19")).toEqual([
+                "C♯",
+                -5.263157894736842e306
+            ]);
+        });
+
+        it("keeps a sub-octave negative remainder in its own octave", () => {
+            // -Number.EPSILON sits a hair below A0: the remainder rounds up
+            // to exactly one octave, so a second modulo would push it into
+            // octave -1; it must stay ["A", 0] as before.
+            expect(pitchscale.numberToPitch(-Number.EPSILON, "equal")).toEqual(["A", 0]);
+            expect(pitchscale.numberToPitch(-Number.EPSILON, "equal19")).toEqual(["A", 0]);
+            // -Number.MIN_VALUE is smaller still: -i / currentEDO underflows
+            // to 0, so without a floor of one octave bump it used to come
+            // out as ["A", 1] instead of ["A", 0].
+            expect(pitchscale.numberToPitch(-Number.MIN_VALUE, "equal")).toEqual(["A", 0]);
+            expect(pitchscale.numberToPitch(-Number.MIN_VALUE, "equal19")).toEqual(["A", 0]);
+        });
+
+        it("leaves ordinary pitch numbers unchanged", () => {
+            expect(pitchscale.numberToPitch(0, "equal")).toEqual(["A", 0]);
+            expect(pitchscale.numberToPitch(-1, "equal")).toEqual(["A♭", 0]);
+            expect(pitchscale.numberToPitch(-5, "equal")).toEqual(["E", 0]);
+            expect(pitchscale.numberToPitch(-12, "equal")).toEqual(["A", -1]);
+            expect(pitchscale.numberToPitch(-13, "equal")).toEqual(["A♭", -1]);
+            expect(pitchscale.numberToPitch(-24, "equal")).toEqual(["A", -2]);
+            expect(pitchscale.numberToPitch(-100, "equal")).toEqual(["F", -8]);
+            expect(pitchscale.numberToPitch(-19, "equal19")).toEqual(["A", -1]);
+            expect(pitchscale.numberToPitch(-20, "equal19")).toEqual(["A♭", -1]);
         });
     });
 

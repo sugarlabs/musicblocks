@@ -213,9 +213,10 @@ class SaveInterface {
      * @param {string} extension - The file extension (including the dot).
      * @param {string} dataurl - The base64 data url of the file.
      * @param {string} defaultfilename - The default filename to be used.
+     * @param {Function} [onSuccess] - Called after the user confirms the download.
      * @returns {void}
      */
-    download(extension, dataurl, defaultfilename) {
+    download(extension, dataurl, defaultfilename, onSuccess = null) {
         let message = _("Enter a filename to save your project:");
         let filename = null;
         //const self = this;
@@ -242,6 +243,9 @@ class SaveInterface {
                 message = _("File saved! Check Downloads.");
             }
             this.showToast(message);
+            if (typeof onSuccess === "function") {
+                onSuccess();
+            }
         };
 
         if (defaultfilename === undefined || defaultfilename === null) {
@@ -419,7 +423,11 @@ class SaveInterface {
         // Suppress music and turtle output when generating
         activity.logo.runningMIDI = true;
         activity.logo.runLogoCommands();
-        document.body.style.cursor = "wait";
+        if (activity.logo.runningMIDI) {
+            document.body.style.cursor = "wait";
+        } else {
+            document.body.style.cursor = "default";
+        }
     }
 
     /**
@@ -517,11 +525,26 @@ class SaveInterface {
                 writeTempoAndMeter(midi.header, firstTrack);
             }
 
+            // A MIDI channel plays one instrument at a time, whichever track set it last, so
+            // each instrument in the file gets its own channel. Channel 9 is for drums; past
+            // 15 instruments the other channels are shared.
+            const melodicChannels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15];
+            const programChannels = new Map();
+            const channelFor = program => {
+                if (!programChannels.has(program)) {
+                    const next = programChannels.size % melodicChannels.length;
+                    programChannels.set(program, melodicChannels[next]);
+                }
+                return programChannels.get(program);
+            };
+
             Object.entries(data).forEach(([blockIndex, notes]) => {
                 const mainTrack = midi.addTrack();
                 mainTrack.name = `Track ${parseInt(blockIndex, 10) + 1}`;
 
-                const trackMap = new Map();
+                // Kept apart, so an instrument named like a drum gets its own track.
+                const drumTracks = new Map();
+                const instrumentTracks = new Map();
                 let globalTime = 0;
 
                 notes.forEach(noteData => {
@@ -529,17 +552,19 @@ class SaveInterface {
                     if (duration === null) return;
                     const instrument = noteData.instrument || "default";
 
-                    if (noteData.drum) {
-                        const drum = noteData.drum || false;
-                        if (!trackMap.has(drum)) {
+                    const drums = Array.isArray(noteData.drum)
+                        ? noteData.drum
+                        : noteData.drum
+                          ? [noteData.drum]
+                          : [];
+                    for (const drum of drums) {
+                        if (!drumTracks.has(drum)) {
                             const drumTrack = midi.addTrack();
                             drumTrack.name = `Track ${parseInt(blockIndex, 10) + 1} - ${drum}`;
                             drumTrack.channel = 9; // Drums must be on Channel 10
-                            trackMap.set(drum, drumTrack);
+                            drumTracks.set(drum, drumTrack);
                         }
-
-                        const drumTrack = trackMap.get(drum);
-
+                        const drumTrack = drumTracks.get(drum);
                         const midiNumber =
                             Object.prototype.hasOwnProperty.call(drumMIDI, drum) && drumMIDI[drum]
                                 ? drumMIDI[drum]
@@ -550,8 +575,12 @@ class SaveInterface {
                             duration: duration,
                             velocity: 0.9
                         });
-                    } else {
-                        if (!trackMap.has(instrument)) {
+                    }
+
+                    // A note can play pitches together with drums: write those as well.
+                    const pitches = noteData.note.filter(pitch => !pitch.includes("R"));
+                    if (drums.length === 0 || pitches.length > 0) {
+                        if (!instrumentTracks.has(instrument)) {
                             const instrumentTrack = midi.addTrack();
                             instrumentTrack.name = `Track ${
                                 parseInt(blockIndex, 10) + 1
@@ -560,25 +589,30 @@ class SaveInterface {
                                 Object.prototype.hasOwnProperty.call(instrumentMIDI, instrument)
                                     ? instrumentMIDI[instrument]
                                     : instrumentMIDI["default"];
-                            trackMap.set(instrument, instrumentTrack);
+                            instrumentTrack.channel = channelFor(instrumentTrack.instrument.number);
+                            instrumentTracks.set(instrument, instrumentTrack);
                         }
 
-                        const instrumentTrack = trackMap.get(instrument);
+                        const instrumentTrack = instrumentTracks.get(instrument);
 
-                        noteData.note.forEach(pitch => {
-                            if (!pitch.includes("R")) {
-                                instrumentTrack.addNote({
-                                    name: normalizeNoteAccidentals(pitch),
-                                    time: globalTime,
-                                    duration: duration,
-                                    velocity: 0.8
-                                });
-                            }
+                        pitches.forEach(pitch => {
+                            instrumentTrack.addNote({
+                                name: normalizeNoteAccidentals(pitch),
+                                time: globalTime,
+                                duration: duration,
+                                velocity: 0.8
+                            });
                         });
                     }
                     globalTime += duration;
                 });
                 globalTime = 0;
+
+                // The empty track still writes a program change: give it the one its first
+                // instrument part writes, or the drum channel's, so it changes no instrument.
+                const firstPart = instrumentTracks.values().next().value;
+                mainTrack.channel = firstPart ? firstPart.channel : 9;
+                mainTrack.instrument.number = firstPart ? firstPart.instrument.number : 0;
             });
 
             // Generate the MIDI file and trigger download.
@@ -772,7 +806,23 @@ class SaveInterface {
         _lazyRequire(["activity/abc"], () => {
             try {
                 const abc = encodeURIComponent(saveAbcOutput(this.activity));
-                this.activity.save.download("abc", "data:text;utf8," + abc, filename || null);
+                if (this.activity.logo?.abcExportWarnings?.length > 0) {
+                    this.activity.save.download(
+                        "abc",
+                        "data:text;utf8," + abc,
+                        filename || null,
+                        () => {
+                            this.activity.textMsg(
+                                _(
+                                    "ABC export rounded one or more Hertz pitches to the nearest note."
+                                ),
+                                5000
+                            );
+                        }
+                    );
+                } else {
+                    this.activity.save.download("abc", "data:text;utf8," + abc, filename || null);
+                }
             } catch (e) {
                 console.error("Error in ABC output generation: ", e);
                 this.activity.errorMsg(`${_("Error generating ABC output.")} ${e.message}`);

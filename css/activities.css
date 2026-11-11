@@ -23,6 +23,11 @@
     outline-offset: 2px;
 }
 
+.mode-temperament-control:focus-within {
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: 2px;
+}
+
 body:not(.dark):not(.highcontrast) #helpfulSearch,
 body:not(.dark):not(.highcontrast) .ui-autocomplete {
     background-color: var(--color-bg-primary) !important;
@@ -347,7 +352,7 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     z-index: 2000;
     width: 300px;
     height: 48px;
-    padding: 0 16px;
+    padding: 0 40px 0 16px;
     background-color: var(--color-bg-primary);
     border: 2px solid var(--color-brand-primary);
     border-radius: 24px;
@@ -1021,6 +1026,10 @@ body.highcontrast #aux-toolbar .aux-nav-container {
     min-height: 38px !important;
     background: transparent !important;
     line-height: normal !important;
+}
+
+#aux-toolbar .aux-nav-container .inspection-group {
+    margin-left: auto !important;
 }
 
 #aux-toolbar .aux-group {

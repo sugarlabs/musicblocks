@@ -132,6 +132,19 @@ describe("TempoRows", () => {
             expect(tempo._intervals[0]).toBe(2000);
         });
 
+        test.each([NaN, "NaN", "invalid", undefined, Infinity, -Infinity])(
+            "falls back to 30 for invalid BPM of %s",
+            bpm => {
+                tempo.BPMs = [bpm];
+
+                tempo._makeRows(widgetWindow);
+
+                expect(tempo.BPMs[0]).toBe(30);
+                expect(tempo._intervals[0]).toBe(2000);
+                expect(Number.isFinite(tempo._widgetNextTimes[0])).toBe(true);
+            }
+        );
+
         test.each([
             ["40 at 1/8 opens at 60, the 30 quarter notes it plays at", 40, 1 / 8, 60],
             ["2000 at 1/4 opens at 1000", 2000, 1 / 4, 1000],
