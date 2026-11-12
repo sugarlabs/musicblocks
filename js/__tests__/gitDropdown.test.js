@@ -1056,4 +1056,44 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             }
         });
     });
+
+    describe("Time Travel translations", () => {
+        const identity = global._;
+
+        beforeEach(() => {
+            global._ = text => `[${text}]`;
+        });
+
+        afterEach(() => {
+            global._ = identity;
+            gitDropdown._closeHistoryPanel();
+        });
+
+        test("relative times go through _()", () => {
+            const ago = ms => new Date(Date.now() - ms).toISOString();
+            const day = 24 * 60 * 60 * 1000;
+
+            expect(gitDropdown._relativeTime(ago(0))).toBe("[Just now]");
+            expect(gitDropdown._relativeTime(ago(60 * 1000))).toBe("[1 minute ago]");
+            expect(gitDropdown._relativeTime(ago(5 * 60 * 1000))).toBe("[5 minutes ago]");
+            expect(gitDropdown._relativeTime(ago(2 * 60 * 60 * 1000))).toBe("[2 hours ago]");
+            expect(gitDropdown._relativeTime(ago(3 * day))).toBe("[3 days ago]");
+            expect(gitDropdown._relativeTime(ago(65 * day))).toBe("[2 months ago]");
+        });
+
+        test("the history panel text goes through _()", () => {
+            gitDropdown._renderHistoryPanel([
+                { sha: "chorus-sha", message: "Chorus", date: "2026-10-24T10:00:00Z" },
+                { sha: "riff-sha", message: "Riff", date: "2026-10-23T10:00:00Z" }
+            ]);
+
+            const text = selector => document.querySelector(selector).textContent;
+            expect(text(".git-tt-title")).toBe("[Time Travel]");
+            expect(text(".git-tt-subtitle")).toBe("[Every save, forever yours] ✦");
+            expect(text(".git-tt-latest-badge")).toBe("[Latest]");
+            expect(text(".git-tt-go-btn").trim()).toBe("[Go back to this version]");
+            expect(document.body.textContent).toContain("[The very beginning]");
+            expect(document.body.textContent).toContain("[Where your project started] ✦");
+        });
+    });
 });
