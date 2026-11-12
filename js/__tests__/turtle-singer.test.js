@@ -330,7 +330,50 @@ describe("Singer Class", () => {
         mockGlobals.getStepSizeUp.mockClear();
         const result = Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, 1e308);
         expect(result).toEqual(["C", 4]);
-        expect(mockGlobals.getStepSizeUp.mock.calls.length).toBeLessThanOrEqual(495);
+        expect(mockGlobals.getStepSizeUp).toHaveBeenCalledTimes(495);
+    });
+
+    test("should cap a huge negative finite step count in the EDO branch", () => {
+        const getStepSizeDown = jest.fn().mockReturnValue(1);
+        const savedGetStepSizeDown = global.getStepSizeDown;
+        global.getStepSizeDown = getStepSizeDown;
+
+        try {
+            Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, -1e308);
+            expect(getStepSizeDown).toHaveBeenCalledTimes(495);
+        } finally {
+            global.getStepSizeDown = savedGetStepSizeDown;
+        }
+    });
+
+    describe("non-EDO branch step cap", () => {
+        let savedIsNonEDO;
+        let savedGetStepSizeDown;
+        let getStepSizeDown;
+
+        beforeEach(() => {
+            savedIsNonEDO = global.isNonEDO;
+            savedGetStepSizeDown = global.getStepSizeDown;
+            getStepSizeDown = jest.fn().mockReturnValue(-1);
+            global.isNonEDO = jest.fn().mockReturnValue(true);
+            global.getStepSizeDown = getStepSizeDown;
+            mockGlobals.getStepSizeUp.mockClear();
+        });
+
+        afterEach(() => {
+            global.isNonEDO = savedIsNonEDO;
+            global.getStepSizeDown = savedGetStepSizeDown;
+        });
+
+        test("should cap a huge positive finite step count", () => {
+            Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, 1e308);
+            expect(mockGlobals.getStepSizeUp).toHaveBeenCalledTimes(495);
+        });
+
+        test("should cap a huge negative finite step count", () => {
+            Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, -1e308);
+            expect(getStepSizeDown).toHaveBeenCalledTimes(495);
+        });
     });
 
     test("should correctly calculate scalar distance", () => {
