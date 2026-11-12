@@ -552,12 +552,18 @@ const SamplerUI = {
                     this._addSample();
                     if (img) {
                         img.src = "header-icons/stop-button.svg";
+                        img.title = _("Stop");
+                        img.alt = _("Stop");
                     }
+                    this._playbackBtn.setAttribute("aria-label", _("Stop"));
                     this.activity.logo.synth.playRecording(() => {
                         this.playback = false;
                         if (img) {
                             img.src = "header-icons/playback.svg";
+                            img.title = _("Playback");
+                            img.alt = _("Playback");
                         }
+                        this._playbackBtn.setAttribute("aria-label", _("Playback"));
                     });
                     this.playback = true;
                 } else {
@@ -565,7 +571,10 @@ const SamplerUI = {
                     this.playback = false;
                     if (img) {
                         img.src = "header-icons/playback.svg";
+                        img.title = _("Playback");
+                        img.alt = _("Playback");
                     }
+                    this._playbackBtn.setAttribute("aria-label", _("Playback"));
                 }
             };
 

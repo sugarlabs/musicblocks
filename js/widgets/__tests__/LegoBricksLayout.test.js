@@ -184,6 +184,7 @@ describe("LegoBricksLayout", () => {
         widget.playButton.onclick();
         expect(widget._playPhrase).toHaveBeenCalled();
         expect(widget.playButton.querySelector("img").src).toContain("stop-button.svg");
+        expect(widget.playButton.getAttribute("aria-label")).toBe("Stop");
 
         widget.isPlaying = true;
         widget.playButton.onclick();
