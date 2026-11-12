@@ -3502,4 +3502,58 @@ describe("Block Foundation", () => {
             expect(block.isClampBlock()).toBe(false);
         });
     });
+
+    describe("unhighlightSelectedBlocks()", () => {
+        let block;
+        let mockUnhighlight;
+        let mockUpdateCache;
+
+        beforeEach(() => {
+            block = new Block(mockProtoBlock, mockBlocks);
+            mockUpdateCache = jest.fn();
+            block.container = {
+                ...new global.createjs.Container(),
+                updateCache: mockUpdateCache
+            };
+            mockUnhighlight = jest.fn();
+            block.blocks = {
+                ...mockBlocks,
+                unhighlight: mockUnhighlight
+            };
+            block.collapsed = false;
+            // disconnectedBitmap is null by default (constructor state before artwork loads)
+            block.disconnectedBitmap = null;
+        });
+
+        it("should not throw when disconnectedBitmap is null and selection is true", () => {
+            // Regression: previously threw TypeError: Cannot set properties of null (setting 'visible')
+            // because disconnectedBitmap is null until artwork generation completes.
+            expect(() => block.unhighlightSelectedBlocks(0, true)).not.toThrow();
+        });
+
+        it("should call blocks.unhighlight and updateCache when selection is true", () => {
+            block.unhighlightSelectedBlocks(0, true);
+            expect(mockUnhighlight).toHaveBeenCalledWith(0, true);
+            expect(mockUpdateCache).toHaveBeenCalled();
+        });
+
+        it("should set disconnectedBitmap.visible to true when it exists and block is not collapsed", () => {
+            block.disconnectedBitmap = { visible: false };
+            block.unhighlightSelectedBlocks(0, true);
+            expect(block.disconnectedBitmap.visible).toBe(true);
+        });
+
+        it("should not set disconnectedBitmap.visible when block is collapsed", () => {
+            block.disconnectedBitmap = { visible: false };
+            block.collapsed = true;
+            block.unhighlightSelectedBlocks(0, true);
+            expect(block.disconnectedBitmap.visible).toBe(false);
+        });
+
+        it("should do nothing when selection is false", () => {
+            block.unhighlightSelectedBlocks(0, false);
+            expect(mockUnhighlight).not.toHaveBeenCalled();
+            expect(mockUpdateCache).not.toHaveBeenCalled();
+        });
+    });
 });
