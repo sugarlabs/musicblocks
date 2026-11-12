@@ -2858,33 +2858,187 @@ function Synth() {
         Tone.Destination.volume.rampTo(0, 0.01);
     };
 
+    this._recordingSessionId = 0;
+    this._recordingStartPromise = null;
+    this._stopPromiseBySession = new Map();
+    this._cancelledSessions = new Set();
+
     /**
-     * Starts Recording
+     * Checks if a recording startup is currently in progress
+     * @function
+     * @memberof Synth
+     * @returns {boolean}
+     */
+    this.isRecordingStarting = () => {
+        return Boolean(this._recordingStartPromise);
+    };
+
+    const _disposeRecordingAnalyser = () => {
+        if (this.analyser) {
+            try {
+                if (this.mic && typeof this.mic.disconnect === "function") {
+                    this.mic.disconnect(this.analyser);
+                }
+            } catch (e) {
+                console.debug("Error disconnecting analyser:", e);
+            }
+            try {
+                if (typeof this.analyser.dispose === "function") {
+                    this.analyser.dispose();
+                }
+            } catch (e) {
+                console.debug("Error disposing analyser:", e);
+            }
+            this.analyser = null;
+        }
+    };
+
+    const _disposeSessionResources = (analyser, mic, recorder, sessionToken) => {
+        if (analyser) {
+            try {
+                if (mic && typeof mic.disconnect === "function") {
+                    mic.disconnect(analyser);
+                }
+            } catch (e) {
+                console.debug("Error disconnecting analyser:", e);
+            }
+            try {
+                if (typeof analyser.dispose === "function") {
+                    analyser.dispose();
+                }
+            } catch (e) {
+                console.debug("Error disposing analyser:", e);
+            }
+        }
+        if (mic) {
+            try {
+                if (typeof mic.close === "function") {
+                    mic.close();
+                }
+            } catch (e) {
+                console.debug("Error closing mic:", e);
+            }
+            try {
+                if (typeof mic.dispose === "function") {
+                    mic.dispose();
+                }
+            } catch (e) {
+                console.debug("Error disposing mic:", e);
+            }
+        }
+        if (recorder) {
+            try {
+                if (typeof recorder.stop === "function" && recorder.state === "started") {
+                    recorder.stop();
+                }
+            } catch (e) {
+                console.debug("Error stopping recorder in cleanup:", e);
+            }
+            try {
+                if (typeof recorder.dispose === "function") {
+                    recorder.dispose();
+                }
+            } catch (e) {
+                console.debug("Error disposing sampler recorder:", e);
+            }
+        }
+        if (this._recordingSessionId === sessionToken) {
+            this.samplerRecorder = null;
+            this.mic = null;
+            this.analyser = null;
+        }
+    };
+
+    /**
+     * Starts Recording (Sampler microphone capture)
      * @function
      * @memberof Synth
      */
     this.startRecording = async () => {
-        await Tone.start();
-
-        if (this.mic) {
-            this.mic.close();
-            if (typeof this.mic.dispose === "function") {
-                this.mic.dispose();
-            }
-            this.mic = null;
+        if (this.samplerRecorder && this.samplerRecorder.state === "started") {
+            return;
         }
-        if (this.recorder) {
-            if (typeof this.recorder.dispose === "function") {
-                this.recorder.dispose();
-            }
-            this.recorder = null;
+        if (this._recordingStartPromise) {
+            return await this._recordingStartPromise;
         }
 
-        this.mic = new Tone.UserMedia();
-        this.recorder = new Tone.Recorder();
-        await this.mic.open();
-        this.mic.connect(this.recorder);
-        this.recorder.start();
+        const startTask = (async () => {
+            const currentSession = ++this._recordingSessionId;
+            _disposeSessionResources(this.analyser, this.mic, this.samplerRecorder, currentSession);
+
+            const mic = new Tone.UserMedia();
+            const recorder = new Tone.Recorder();
+
+            const isSessionValid = () => {
+                return (
+                    this._recordingSessionId === currentSession &&
+                    !this._cancelledSessions.has(currentSession)
+                );
+            };
+
+            try {
+                await Tone.start();
+                if (!isSessionValid()) {
+                    const err = new Error("Recording start cancelled");
+                    err.name = "AbortError";
+                    throw err;
+                }
+
+                await mic.open();
+                if (!isSessionValid()) {
+                    const err = new Error("Recording start cancelled");
+                    err.name = "AbortError";
+                    throw err;
+                }
+
+                if (typeof mic.connect === "function") {
+                    mic.connect(recorder);
+                }
+
+                if (!isSessionValid()) {
+                    const err = new Error("Recording start cancelled");
+                    err.name = "AbortError";
+                    throw err;
+                }
+
+                if (typeof recorder.start === "function") {
+                    recorder.start();
+                }
+
+                if (!isSessionValid()) {
+                    const err = new Error("Recording start cancelled");
+                    err.name = "AbortError";
+                    throw err;
+                }
+
+                this.mic = mic;
+                this.samplerRecorder = recorder;
+            } catch (err) {
+                _disposeSessionResources(null, mic, recorder, currentSession);
+                if (this._recordingSessionId === currentSession) {
+                    this.mic = null;
+                    this.samplerRecorder = null;
+                    this.analyser = null;
+                }
+                if (err && err.name === "AbortError") {
+                    console.debug("Recording startup cancelled");
+                } else {
+                    console.debug("Failed to start recording:", err);
+                }
+                throw err;
+            } finally {
+                this._cancelledSessions.delete(currentSession);
+            }
+        })();
+
+        this._recordingStartPromise = startTask;
+        try {
+            await startTask;
+        } finally {
+            if (this._recordingStartPromise === startTask) {
+                this._recordingStartPromise = null;
+            }
+        }
     };
 
     const _disposeRecordingPlayer = () => {
@@ -2926,28 +3080,90 @@ function Synth() {
     };
 
     /**
-     * Stops Recording
+     * Stops Recording (Sampler microphone capture)
      * @function
      * @memberof Synth
      */
     this.stopRecording = async () => {
-        if (!this.recorder || !this.mic) {
+        if (this._recordingStartPromise) {
+            this._cancelledSessions.add(this._recordingSessionId);
+            this._recordingSessionId++;
+            this._recordingStartPromise = null;
+        }
+        const legacyRecorder =
+            this.recorder &&
+            typeof this.recorder.stop === "function" &&
+            this.recorder.state !== "recording"
+                ? this.recorder
+                : null;
+        if (!this.samplerRecorder && !this.mic && !legacyRecorder) {
+            // Check if there is an in-flight stop for the current session
+            if (this._stopPromiseBySession.has(this._recordingSessionId)) {
+                try {
+                    return await this._stopPromiseBySession.get(this._recordingSessionId);
+                } catch (e) {
+                    return null;
+                }
+            }
             return null;
         }
+
+        const currentSession = this._recordingSessionId;
+        if (this._stopPromiseBySession.has(currentSession)) {
+            try {
+                return await this._stopPromiseBySession.get(currentSession);
+            } catch (e) {
+                return null;
+            }
+        }
+
         _disposeRecordingPlayer();
         _revokeRecordingURL();
-        this.recording = await this.recorder.stop();
-        this.mic.close();
-        if (typeof this.mic.dispose === "function") {
-            this.mic.dispose();
+
+        const currentRecorder = this.samplerRecorder || legacyRecorder;
+        const currentMic = this.mic;
+        const currentAnalyser = this.analyser;
+
+        this.samplerRecorder = null;
+        if (this.recorder === legacyRecorder) {
+            this.recorder = null;
         }
         this.mic = null;
-        if (typeof this.recorder.dispose === "function") {
-            this.recorder.dispose();
+        this.analyser = null;
+
+        const stopTask = (async () => {
+            let blob = null;
+            try {
+                if (currentRecorder && typeof currentRecorder.stop === "function") {
+                    blob = await currentRecorder.stop();
+                }
+            } catch (e) {
+                console.debug("Error stopping sampler recorder:", e);
+            } finally {
+                _disposeSessionResources(
+                    currentAnalyser,
+                    currentMic,
+                    currentRecorder,
+                    currentSession
+                );
+            }
+
+            if (blob) {
+                this.recording = blob;
+                if (typeof URL !== "undefined" && typeof URL.createObjectURL === "function") {
+                    this.audioURL = URL.createObjectURL(blob);
+                }
+                return this.audioURL;
+            }
+            return null;
+        })();
+
+        this._stopPromiseBySession.set(currentSession, stopTask);
+        try {
+            return await stopTask;
+        } finally {
+            this._stopPromiseBySession.delete(currentSession);
         }
-        this.recorder = null;
-        this.audioURL = URL.createObjectURL(this.recording);
-        return this.audioURL;
     };
 
     /**
@@ -3011,12 +3227,11 @@ function Synth() {
      * @memberof Synth
      */
     this.LiveWaveForm = () => {
-        if (this.analyser) {
-            this.mic.disconnect(this.analyser);
-            this.analyser.dispose();
-        }
+        _disposeRecordingAnalyser();
         this.analyser = new Tone.Analyser("waveform", 8192);
-        this.mic.connect(this.analyser);
+        if (this.mic && typeof this.mic.connect === "function") {
+            this.mic.connect(this.analyser);
+        }
     };
 
     /**
@@ -3025,6 +3240,9 @@ function Synth() {
      * @memberof Synth
      */
     this.getWaveFormValues = () => {
+        if (!this.analyser || typeof this.analyser.getValue !== "function") {
+            return null;
+        }
         const values = this.analyser.getValue();
         return values;
     };
@@ -3041,15 +3259,8 @@ function Synth() {
         this._instrumentEpoch++;
         _disposeRecordingPlayer();
         _revokeRecordingURL();
-
-        if (this.analyser) {
-            try {
-                this.mic.disconnect(this.analyser);
-                this.analyser.dispose();
-            } catch (e) {
-                console.debug("Error disposing analyser:", e);
-            }
-            this.analyser = null;
+        if (!this.samplerRecorder || this.samplerRecorder.state !== "started") {
+            _disposeRecordingAnalyser();
         }
 
         for (const turtle in instruments) {
@@ -3121,6 +3332,10 @@ function Synth() {
     this.playbackRate = 1;
     this.defaultBPMFactor = 1;
     this.recorder = null;
+    this.samplerRecorder = null;
+    this.analyser = null;
+    this._recordingStopPromise = null;
+    this._recordingStartPromise = null;
     this.samples = null;
     this.samplesManifest = null;
     this.sampleCentAdjustments = {}; // Initialize the sampleCentAdjustments object

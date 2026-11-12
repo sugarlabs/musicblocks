@@ -88,5 +88,101 @@ describe("SamplerCanvas", () => {
             expect(global.cancelAnimationFrame).toHaveBeenCalledWith(5);
             expect(widget.drawVisualIDs[0]).toBeNull();
         });
+
+        test("reconnects synths to analyser before making canvas", () => {
+            const widget = scaledWidget(false);
+            widget._scale();
+            const reconnectOrder = widget.reconnectSynthsToAnalyser.mock.invocationCallOrder[0];
+            const makeCanvasOrder = widget.makeCanvas.mock.invocationCallOrder[0];
+            expect(reconnectOrder).toBeLessThan(makeCanvasOrder);
+        });
+    });
+
+    describe("makeCanvas and draw loop", () => {
+        let widget;
+        let body;
+        let mockActivity;
+        let scheduledCallbacks;
+
+        beforeEach(() => {
+            scheduledCallbacks = [];
+            global.requestAnimationFrame = jest.fn(cb => {
+                scheduledCallbacks.push(cb);
+                return 42;
+            });
+            global.cancelAnimationFrame = jest.fn(id => {
+                scheduledCallbacks = [];
+            });
+            global.platformColor = { background: "#FFFFFF", textColor: "#000000" };
+            global._ = s => s;
+
+            widget = makeWidget();
+            body = document.createElement("div");
+            widget.widgetWindow = {
+                getWidgetBody: () => body,
+                getWidgetFrame: () => ({ getBoundingClientRect: () => ({ height: 600 }) }),
+                isMaximized: () => false
+            };
+            mockActivity = {
+                logo: {
+                    synth: {
+                        getWaveFormValues: jest.fn(() => new Float32Array([0.1, -0.1, 0.2]))
+                    }
+                }
+            };
+            widget.activity = mockActivity;
+            widget.drawVisualIDs = {};
+            widget.running = true;
+            widget.sampleName = "test_sample";
+            widget.pitchAnalysers = {
+                0: { getValue: jest.fn(() => new Float32Array([0.5, -0.5])) },
+                1: { getValue: jest.fn(() => new Float32Array([0.2, -0.2])) }
+            };
+        });
+
+        test("makeCanvas exposes _drawLoop function and starts drawing", () => {
+            widget.makeCanvas(800, 400, 0, true);
+            expect(typeof widget._drawLoop).toBe("function");
+            expect(widget.drawVisualIDs[0]).toBe(42);
+        });
+
+        test("draw loop terminates and resets is_recording and record button when synth returns null during recording", () => {
+            const btn = document.createElement("button");
+            const img = document.createElement("img");
+            img.src = "header-icons/record.svg";
+            btn.appendChild(img);
+            widget._recordBtn = btn;
+            widget.is_recording = true;
+
+            // When getWaveFormValues returns null (synth was disposed / torn down)
+            mockActivity.logo.synth.getWaveFormValues.mockReturnValue(null);
+
+            widget.makeCanvas(800, 400, 0, true);
+
+            // On the frame where getWaveFormValues() returns null:
+            // 1. is_recording is immediately reset to false
+            expect(widget.is_recording).toBe(false);
+            // 2. record button icon is restored to mic.svg
+            expect(img.src).toContain("header-icons/mic.svg");
+            // 3. drawVisualIDs[0] is cancelled and cleared to null
+            expect(widget.drawVisualIDs[0]).toBeNull();
+            // 4. No future RAF loop remains queued
+            expect(scheduledCallbacks.length).toBe(0);
+        });
+
+        test("draw loop handles missing pitchAnalysers gracefully without throwing", () => {
+            widget.is_recording = true;
+            widget.pitchAnalysers = {};
+            mockActivity.logo.synth.getWaveFormValues.mockReturnValue(null);
+
+            expect(() => widget.makeCanvas(800, 400, 0, true)).not.toThrow();
+        });
+
+        test("draw loop stops and clears drawVisualIDs when idle", () => {
+            widget.is_recording = false;
+            widget.running = false;
+            widget.makeCanvas(800, 400, 0, false);
+            expect(widget.drawVisualIDs[0]).toBeNull();
+        });
     });
 });

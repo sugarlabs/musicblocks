@@ -243,7 +243,8 @@ describe("Sampler Widget", () => {
                 _toolbar: toolbar,
                 addButton: jest.fn((icon, size, tip) => {
                     const btn = document.createElement("button");
-                    btn.getElementsByTagName = jest.fn(() => [{ src: "" }]);
+                    const img = { src: icon };
+                    btn.getElementsByTagName = jest.fn(tag => (tag === "img" ? [img] : []));
                     btn.classList = { add: jest.fn(), remove: jest.fn() };
                     btn.tip = tip;
                     buttons.push(btn);
@@ -969,6 +970,131 @@ describe("Sampler Widget", () => {
             expect(widget.tuner.startTuner).toHaveBeenCalledTimes(2);
         });
 
+        test("record button starts waveform draw loop when not running", async () => {
+            widget.init(mockActivity, 1);
+            widget.drawVisualIDs = { 0: null };
+            widget._drawLoop = jest.fn();
+
+            await widget._recordBtn.onclick();
+
+            expect(mockActivity.logo.synth.startRecording).toHaveBeenCalled();
+            expect(widget.is_recording).toBe(true);
+            expect(mockActivity.logo.synth.LiveWaveForm).toHaveBeenCalled();
+            expect(widget._drawLoop).toHaveBeenCalled();
+        });
+
+        test("global synth teardown during recording terminates loop and resets state cleanly", async () => {
+            widget.init(mockActivity, 1);
+            await widget._recordBtn.onclick();
+            expect(widget.is_recording).toBe(true);
+            expect(widget._recordBtn.getElementsByTagName("img")[0].src).toContain("record.svg");
+
+            // Synth disposed (returns null from getWaveFormValues)
+            mockActivity.logo.synth.getWaveFormValues.mockReturnValue(null);
+
+            expect(() => {
+                if (typeof widget._drawLoop === "function") {
+                    widget._drawLoop();
+                }
+            }).not.toThrow();
+
+            // Loop terminates and state resets
+            expect(widget.is_recording).toBe(false);
+            expect(widget._recordBtn.getElementsByTagName("img")[0].src).toContain("mic.svg");
+            expect(widget.drawVisualIDs[0]).toBeNull();
+            expect(mockActivity.logo.synth.stopRecording).toHaveBeenCalled();
+
+            // Can recover and cleanly record again
+            mockActivity.logo.synth.getWaveFormValues.mockReturnValue(
+                new Float32Array([0.1, -0.1])
+            );
+            await widget._recordBtn.onclick();
+            expect(widget.is_recording).toBe(true);
+            expect(widget._recordBtn.getElementsByTagName("img")[0].src).toContain("record.svg");
+        });
+
+        test("concurrent stop: global Stop and canvas null detection trigger stopRecording concurrently without state corruption", async () => {
+            let resolveStop;
+            const stopPromise = new Promise(resolve => {
+                resolveStop = resolve;
+            });
+            mockActivity.logo.synth.stopRecording = jest.fn(() => stopPromise);
+
+            widget.init(mockActivity, 1);
+            await widget._recordBtn.onclick();
+            expect(widget.is_recording).toBe(true);
+
+            // 1. Global stop starts asynchronous Sampler stop
+            mockActivity.logo.synth.stopRecording();
+
+            // 2. Before stop resolves, canvas draw loop detects null analyser while still in recording state
+            mockActivity.logo.synth.getWaveFormValues.mockReturnValue(null);
+            if (typeof widget._drawLoop === "function") {
+                widget._drawLoop();
+            }
+
+            // 3. Resolve the in-flight stop
+            resolveStop("blob:http://localhost/test");
+            await stopPromise;
+
+            expect(widget.is_recording).toBe(false);
+            expect(widget._recordBtn.getElementsByTagName("img")[0].src).toContain("mic.svg");
+            expect(widget.drawVisualIDs[0]).toBeNull();
+        });
+
+        test("reopening widget after close reinitializes cleanly without errors", async () => {
+            widget.init(mockActivity, 1);
+            await widget._recordBtn.onclick();
+            expect(widget.is_recording).toBe(true);
+
+            widgetWindow.onclose();
+            expect(widget.running).toBe(false);
+            expect(widget.is_recording).toBe(false);
+            expect(widget._drawLoop).toBeNull();
+
+            // Reopen
+            const reWidget = new SampleWidget();
+            reWidget.init(mockActivity, 1);
+            expect(reWidget.running).toBe(true);
+            expect(typeof reWidget._drawLoop).toBe("function");
+
+            await reWidget._recordBtn.onclick();
+            expect(reWidget.is_recording).toBe(true);
+        });
+
+        test("closing widget while startRecording is pending cancels startup and prevents recording activation", async () => {
+            let resolveStart;
+            const pendingStart = new Promise(resolve => {
+                resolveStart = resolve;
+            });
+            mockActivity.logo.synth.startRecording = jest.fn(() => pendingStart);
+            mockActivity.logo.synth.isRecordingStarting = jest.fn(() => true);
+
+            widget.init(mockActivity, 1);
+
+            // User clicks Record: startup begins
+            const clickPromise = widget._recordBtn.onclick();
+            expect(widget.is_recording_starting).toBe(true);
+            expect(widget.is_recording).toBe(false);
+
+            // User closes widget before startup completes
+            widgetWindow.onclose();
+            expect(widget.running).toBe(false);
+            expect(mockActivity.logo.synth.stopRecording).toHaveBeenCalled();
+
+            // Startup resolves
+            resolveStart();
+            await clickPromise;
+
+            // Widget must NOT transition to recording, and icon must remain mic.svg
+            expect(widget.is_recording).toBe(false);
+            expect(widget.is_recording_starting).toBe(false);
+            expect(widget._recordBtn.getElementsByTagName("img")[0].src).toContain(
+                "header-icons/mic.svg"
+            );
+            expect(mockActivity.logo.synth.LiveWaveForm).not.toHaveBeenCalled();
+        });
+
         test("onclose does not call stopRecording/stopTuner when neither is active", () => {
             widget.init(mockActivity, 1);
 
@@ -1487,7 +1613,8 @@ describe("Sampler Widget", () => {
                 _toolbar: toolbar,
                 addButton: jest.fn((icon, size, tip) => {
                     const btn = document.createElement("button");
-                    btn.getElementsByTagName = jest.fn(() => [{ src: "" }]);
+                    const img = { src: icon };
+                    btn.getElementsByTagName = jest.fn(tag => (tag === "img" ? [img] : []));
                     btn.classList = { add: jest.fn(), remove: jest.fn() };
                     btn.tip = tip;
                     buttons.push(btn);

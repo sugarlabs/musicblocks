@@ -73,8 +73,8 @@ const SamplerCanvas = {
                 cancelAnimationFrame(this.drawVisualIDs[0]);
                 this.drawVisualIDs[0] = null;
             }
-            this.makeCanvas(width, height, 0, true);
             this.reconnectSynthsToAnalyser();
+            this.makeCanvas(width, height, 0, true);
         };
 
         /**
@@ -176,12 +176,53 @@ const SamplerCanvas = {
                     for (let turtleIdx = 0; turtleIdx < 2; turtleIdx += 1) {
                         let dataArray;
                         if (this.is_recording) {
-                            dataArray =
-                                turtleIdx === 0
-                                    ? this.pitchAnalysers[0].getValue()
-                                    : this.activity.logo.synth.getWaveFormValues();
+                            if (turtleIdx === 0) {
+                                dataArray =
+                                    this.pitchAnalysers[0] &&
+                                    typeof this.pitchAnalysers[0].getValue === "function"
+                                        ? this.pitchAnalysers[0].getValue()
+                                        : null;
+                            } else {
+                                dataArray =
+                                    this.activity &&
+                                    this.activity.logo &&
+                                    this.activity.logo.synth &&
+                                    typeof this.activity.logo.synth.getWaveFormValues === "function"
+                                        ? this.activity.logo.synth.getWaveFormValues()
+                                        : null;
+                                if (dataArray === null) {
+                                    this.is_recording = false;
+                                    if (this._recordBtn) {
+                                        const img = this._recordBtn.getElementsByTagName("img")[0];
+                                        if (img) {
+                                            img.src = "header-icons/mic.svg";
+                                        }
+                                    }
+                                    if (this.drawVisualIDs[0]) {
+                                        cancelAnimationFrame(this.drawVisualIDs[0]);
+                                        this.drawVisualIDs[0] = null;
+                                    }
+                                    if (
+                                        this.activity &&
+                                        this.activity.logo &&
+                                        this.activity.logo.synth &&
+                                        typeof this.activity.logo.synth.stopRecording === "function"
+                                    ) {
+                                        this.activity.logo.synth.stopRecording();
+                                    }
+                                    break;
+                                }
+                            }
                         } else {
-                            dataArray = this.pitchAnalysers[turtleIdx].getValue();
+                            dataArray =
+                                this.pitchAnalysers[turtleIdx] &&
+                                typeof this.pitchAnalysers[turtleIdx].getValue === "function"
+                                    ? this.pitchAnalysers[turtleIdx].getValue()
+                                    : null;
+                        }
+
+                        if (!dataArray || !dataArray.length) {
+                            continue;
                         }
 
                         const bufferLength = dataArray.length;
@@ -238,6 +279,7 @@ const SamplerCanvas = {
                     this.drawVisualIDs[turtleIdx] = null;
                 }
             };
+            this._drawLoop = draw;
             draw();
         };
     }
