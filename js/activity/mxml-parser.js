@@ -1227,17 +1227,21 @@ function _processPart(
         blockId = prevId + 1;
     };
 
+    const applyDeferredKey = () => {
+        if (deferredKey !== null) {
+            currentKey = deferredKey;
+            pendingKey = deferredKey;
+            deferredKey = null;
+        }
+    };
+
     const flushTie = () => {
         if (tieDuration !== null) {
             emitNote(tieDuration, tieContent);
             tieDuration = null;
             tieContent = null;
         }
-        if (deferredKey !== null) {
-            currentKey = deferredKey;
-            pendingKey = deferredKey;
-            deferredKey = null;
-        }
+        if (firstEndingBodyTie === null) applyDeferredKey();
     };
 
     const emitTempo = tempoBpm => {
@@ -1278,7 +1282,7 @@ function _processPart(
                 const key = _readKeySignature(child.querySelector(":scope > key"));
                 const activeKey = deferredKey ?? currentKey;
                 if (key && (key.root !== activeKey.root || key.mode !== activeKey.mode)) {
-                    if (tieDuration !== null) deferredKey = key;
+                    if (tieDuration !== null || firstEndingBodyTie !== null) deferredKey = key;
                     else {
                         currentKey = key;
                         pendingKey = key;
@@ -1362,6 +1366,7 @@ function _processPart(
                     }
                     repeatPendingStart = null;
                     firstEndingStartIndex = null;
+                    if (firstEndingBodyTie !== null) applyDeferredKey();
                     firstEndingBodyTie = null;
                     bodyTieDurations = [];
                 } else if (
@@ -1372,6 +1377,7 @@ function _processPart(
                     // An ending can close without a backward repeat. Do not
                     // let that unrelated marker affect a later repeat.
                     firstEndingStartIndex = null;
+                    if (firstEndingBodyTie !== null) applyDeferredKey();
                     firstEndingBodyTie = null;
                     bodyTieDurations = [];
                 }
@@ -1420,15 +1426,12 @@ function _processPart(
                     firstEndingBodyTie = hasTieStart
                         ? { ...firstEndingBodyTie, duration: combinedDuration }
                         : null;
-                    if (!hasTieStart && deferredKey !== null) {
-                        currentKey = deferredKey;
-                        pendingKey = deferredKey;
-                        deferredKey = null;
-                    }
+                    if (!hasTieStart) applyDeferredKey();
                     offset += (duration[0] * 4) / duration[1];
                     continue;
                 }
                 firstEndingBodyTie = null;
+                applyDeferredKey();
             }
 
             // Only a note that both has a tie stop and shares the open tie's
@@ -1451,11 +1454,7 @@ function _processPart(
                     emitNote(combined, tieContent);
                     tieDuration = null;
                     tieContent = null;
-                    if (deferredKey !== null) {
-                        currentKey = deferredKey;
-                        pendingKey = deferredKey;
-                        deferredKey = null;
-                    }
+                    applyDeferredKey();
                 }
             } else if (hasTieStart && !hasTieStop) {
                 tieDuration = duration;

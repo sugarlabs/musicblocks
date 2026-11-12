@@ -1891,6 +1891,31 @@ describe("Test 17: Repeats", () => {
     const keyAttr = fifths => `<attributes><key><fifths>${fifths}</fifths></key></attributes>`;
     const keyName = (blocks, block) => blocks[block[4][1]][1][1].value;
 
+    it("keeps the latest key change across a tie into the first ending", async () => {
+        const tied = type =>
+            `<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type><tie type="${type}"/></note>`;
+        const xml = scorePartwise(
+            BARLINE_FORWARD +
+                tied("start") +
+                keyAttr(1) +
+                '<barline location="left"><ending number="1" type="start"/></barline>' +
+                keyAttr(2) +
+                tied("stop") +
+                SIMPLE_NOTE("D", 4, "quarter") +
+                '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+                SIMPLE_NOTE("E", 4, "quarter"),
+            "<divisions>1</divisions><key><fifths>0</fifths></key>"
+        );
+        const { blocks } = await parseAndCapture(xml);
+        const notes = blocks.filter(block => blockName(block) === "newnote");
+        const key = blocks[notes[1][4][0]];
+        expect(blockName(key)).toBe("setkey2");
+        expect(keyName(blocks, key)).toBe("D");
+        expect(noteValueOf(blocks, notes[0])).toEqual([1, 2]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
     it("restores the second ending key after replaying the repeat body", async () => {
         const xml = scorePartwise(
             BARLINE_FORWARD +
