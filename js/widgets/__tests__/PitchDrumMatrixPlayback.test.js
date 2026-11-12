@@ -135,6 +135,16 @@ describe("PitchDrumMatrixPlayback", () => {
         expect(pdm.playButton.querySelectorAll("img")).toHaveLength(1);
     });
 
+    test("_setPlayButtonIcon updates the button's own accessible name, not just the icon's tooltip", () => {
+        grid([]);
+
+        pdm._setPlayButtonIcon("stop");
+        expect(pdm.playButton.getAttribute("aria-label")).toBe("Stop");
+
+        pdm._setPlayButtonIcon("play");
+        expect(pdm.playButton.getAttribute("aria-label")).toBe("Play");
+    });
+
     test("plays each mapped row in turn, a second apart", () => {
         grid([0, 2]);
 

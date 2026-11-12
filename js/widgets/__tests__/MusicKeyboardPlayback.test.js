@@ -247,4 +247,14 @@ describe("MusicKeyboardPlayback", () => {
         expect(img.src).toContain("stop-button.svg");
         expect(img.width).toBe(32);
     });
+
+    test("_updatePlayButtonIcon updates the button's own accessible name, not just the icon's tooltip", () => {
+        const keyboard = makeKeyboard();
+
+        keyboard._updatePlayButtonIcon(keyboard.playButton, true);
+        expect(keyboard.playButton.getAttribute("aria-label")).toBe("Stop");
+
+        keyboard._updatePlayButtonIcon(keyboard.playButton, false);
+        expect(keyboard.playButton.getAttribute("aria-label")).toBe("Play");
+    });
 });

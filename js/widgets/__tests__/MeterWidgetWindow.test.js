@@ -173,6 +173,19 @@ describe("MeterWidgetWindow", () => {
             expect(playBtn.querySelector("img").title).toBe("Play");
         });
 
+        test("button's own accessible name tracks Play/Stop, not just the icon's tooltip", () => {
+            widget._playBeat = jest.fn();
+            widget._stopPlayback = jest.fn(() => (widget._playing = false));
+            const playBtn = widget._makePlayButton();
+
+            playBtn.onclick();
+            expect(playBtn.getAttribute("aria-label")).toBe("Stop");
+
+            jest.advanceTimersByTime(1000);
+            playBtn.onclick();
+            expect(playBtn.getAttribute("aria-label")).toBe("Play");
+        });
+
         test("ignores a second click within a second", () => {
             widget._playBeat = jest.fn();
             const playBtn = widget._makePlayButton();

@@ -104,6 +104,7 @@ class MeterWidgetWindow {
         img.setAttribute("height", MeterWidget.ICONSIZE);
         img.setAttribute("width", MeterWidget.ICONSIZE);
         img.setAttribute("vertical-align", "middle");
+        playBtn.setAttribute("aria-label", label);
         playBtn.appendChild(img);
         playBtn.appendChild(document.createTextNode("  "));
     }
