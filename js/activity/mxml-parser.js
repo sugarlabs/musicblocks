@@ -575,9 +575,13 @@ function _dynamicVolume(directionEl) {
  * @returns {{root: string, mode: string}}
  */
 function _keySignature(partEl) {
-    const keyEl = partEl.querySelector("measure attributes key");
+    const keyEl = partEl.querySelector(":scope > measure:first-child > attributes > key");
+    return _readKeySignature(keyEl) ?? { root: "C", mode: "major" };
+}
+
+function _readKeySignature(keyEl) {
     const fifthsText = keyEl && _text(keyEl, "fifths");
-    if (fifthsText === null || fifthsText === undefined) return { root: "C", mode: "major" };
+    if (fifthsText === null || fifthsText === undefined || fifthsText.trim() === "") return null;
 
     const fifths = Number(fifthsText);
     const modeText = (_text(keyEl, "mode") ?? "major").toLowerCase();
@@ -585,11 +589,19 @@ function _keySignature(partEl) {
     const majorTonicFifths = fifths - offset;
 
     const tonicAscii = _MXML_FIFTHS_TO_MAJOR_TONIC[String(majorTonicFifths)];
-    if (tonicAscii === undefined) return { root: "C", mode: "major" };
+    if (tonicAscii === undefined) return null;
 
     const root = tonicAscii[0] + (_MXML_ASCII_ACCIDENTAL_SUFFIX[tonicAscii[1] ?? ""] ?? "");
     const mode = _MXML_MODE_NAME[modeText] ?? "major";
     return { root, mode };
+}
+
+function _createKeyBlocks(id, key, prevId, nextId = id + 3) {
+    return [
+        [id, "setkey2", 0, 0, [prevId, id + 1, id + 2, nextId]],
+        [id + 1, ["notename", { value: key.root }], 0, 0, [id]],
+        [id + 2, ["modename", { value: key.mode }], 0, 0, [id]]
+    ];
 }
 
 /**
@@ -908,6 +920,7 @@ function _applyRepeats(
     noteStartIds,
     noteEndIds,
     noteTempoBpms,
+    noteKeys,
     timeSignature,
     blockId
 ) {
@@ -959,6 +972,10 @@ function _applyRepeats(
         const prevBlock = byId.get(prevId);
         const nextFlowId = endHidden[4][1];
         const startTempoBpm = noteTempoBpms[startIndex];
+        const startKey = noteKeys[startIndex];
+        const needsKeyReset = noteKeys
+            .slice(startIndex, endIndex + 1)
+            .some(key => key.root !== startKey.root || key.mode !== startKey.mode);
 
         if (
             firstEndingStartIndex !== null &&
@@ -976,6 +993,14 @@ function _applyRepeats(
             const clonePass = (cloneStartIndex, cloneEndIndex, durationOverrides = []) => {
                 let clonePrevId = previousEnd[0];
                 let resetTempoBlocks = [];
+                const resetKeyBlocks = needsKeyReset
+                    ? _createKeyBlocks(blockId, startKey, clonePrevId)
+                    : [];
+                blockId += resetKeyBlocks.length;
+                if (needsKeyReset) {
+                    previousEnd[4][1] = resetKeyBlocks[0][0];
+                    clonePrevId = resetKeyBlocks[0][0];
+                }
                 if (Number.isFinite(startTempoBpm)) {
                     resetTempoBlocks = _createTempoBlocks(
                         blockId,
@@ -984,7 +1009,8 @@ function _applyRepeats(
                         clonePrevId
                     );
                     blockId += resetTempoBlocks.length;
-                    previousEnd[4][1] = resetTempoBlocks[0][0];
+                    if (needsKeyReset) resetKeyBlocks[0][4][3] = resetTempoBlocks[0][0];
+                    else previousEnd[4][1] = resetTempoBlocks[0][0];
                     clonePrevId = resetTempoBlocks[5][0];
                 }
                 const copy = cloneNotes(
@@ -994,11 +1020,12 @@ function _applyRepeats(
                     durationOverrides
                 );
                 if (resetTempoBlocks.length === 0) {
-                    previousEnd[4][1] = copy.firstId;
+                    if (needsKeyReset) resetKeyBlocks[0][4][3] = copy.firstId;
+                    else previousEnd[4][1] = copy.firstId;
                 } else {
                     resetTempoBlocks[5][4][1] = copy.firstId;
                 }
-                copies.push(...resetTempoBlocks, ...copy.blocks);
+                copies.push(...resetKeyBlocks, ...resetTempoBlocks, ...copy.blocks);
                 previousEnd = copy.blocks.find(block => block[0] === copy.lastId);
             };
             for (let pass = 2; pass < times; pass++) {
@@ -1016,18 +1043,26 @@ function _applyRepeats(
 
         const repeatId = blockId;
         const countId = blockId + 1;
-        const resetTempoId = Number.isFinite(startTempoBpm) ? blockId + 2 : null;
-        blockId += resetTempoId === null ? 2 : 8;
+        const resetKeyId = needsKeyReset ? blockId + 2 : null;
+        const resetTempoId = Number.isFinite(startTempoBpm)
+            ? blockId + 2 + (needsKeyReset ? 3 : 0)
+            : null;
+        blockId += 2 + (needsKeyReset ? 3 : 0) + (resetTempoId === null ? 0 : 6);
 
         const repeatBlock = [
             repeatId,
             "repeat",
             0,
             0,
-            [prevId, countId, resetTempoId ?? startNote[0], nextFlowId]
+            [prevId, countId, resetKeyId ?? resetTempoId ?? startNote[0], nextFlowId]
         ];
         repeatBlocks.push(repeatBlock, [countId, ["number", { value: times }], 0, 0, [repeatId]]);
         byId.set(repeatId, repeatBlock);
+
+        if (needsKeyReset)
+            repeatBlocks.push(
+                ..._createKeyBlocks(resetKeyId, startKey, repeatId, resetTempoId ?? startNote[0])
+            );
 
         if (resetTempoId !== null) {
             repeatBlocks.push(
@@ -1035,7 +1070,7 @@ function _applyRepeats(
                     resetTempoId,
                     startTempoBpm,
                     timeSignature,
-                    repeatId,
+                    resetKeyId ?? repeatId,
                     startNote[0]
                 )
             );
@@ -1055,7 +1090,7 @@ function _applyRepeats(
             const prevSlot = prevBlock[4].indexOf(startNote[0]);
             prevBlock[4][prevSlot] = repeatId;
         }
-        startNote[4][0] = resetTempoId === null ? repeatId : resetTempoId + 5;
+        startNote[4][0] = resetTempoId === null ? (resetKeyId ?? repeatId) : resetTempoId + 5;
         endHidden[4][1] = null;
         if (nextFlowId !== null) {
             byId.get(nextFlowId)[4][0] = repeatId;
@@ -1108,6 +1143,7 @@ function _processPart(
     const noteStartIds = [];
     const noteEndIds = [];
     const noteTempoBpms = [];
+    const noteKeys = [];
     const repeats = [];
     let repeatPendingStart = null;
     let firstEndingStartIndex = null;
@@ -1127,6 +1163,9 @@ function _processPart(
     let currentTempoBpm = initialTempoBpm;
     let nextTempoIndex = 0;
     let pendingVolumes = [];
+    let currentKey = _keySignature(partEl);
+    let pendingKey = null;
+    let deferredKey = null;
     let importedVoice = "1";
 
     outer: for (const measureEl of partEl.querySelectorAll(":scope > measure")) {
@@ -1143,6 +1182,15 @@ function _processPart(
     const emitNote = (duration, content) => {
         let startId = blockId;
         let previousVolumeBlock = null;
+        let keyBlock = null;
+        if (pendingKey !== null) {
+            const keyBlocks = _createKeyBlocks(blockId, pendingKey, prevId);
+            keyBlock = keyBlocks[0];
+            noteBlocks.push(...keyBlocks);
+            prevId = blockId;
+            blockId += keyBlocks.length;
+            pendingKey = null;
+        }
         pendingVolumes.forEach(volume => {
             const volumeBlocks = _createVolumeBlocks(blockId, volume, prevId);
             noteBlocks.push(...volumeBlocks);
@@ -1154,11 +1202,14 @@ function _processPart(
         pendingVolumes = [];
 
         const blocks = _createNoteBlocks(blockId, duration, content, prevId);
+        if (keyBlock !== null)
+            keyBlock[4][3] = previousVolumeBlock === null ? blockId : startId + 3;
         if (previousVolumeBlock !== null) previousVolumeBlock[4][3] = blockId;
         noteBlocks.push(...blocks);
         noteStartIds.push(startId);
         noteEndIds.push(blocks[blocks.length - 1][0]);
         noteTempoBpms.push(currentTempoBpm);
+        noteKeys.push(currentKey);
         producedNotes = true;
         prevId = blocks[blocks.length - 1][0];
         blockId = prevId + 1;
@@ -1169,6 +1220,11 @@ function _processPart(
             emitNote(tieDuration, tieContent);
             tieDuration = null;
             tieContent = null;
+        }
+        if (deferredKey !== null) {
+            currentKey = deferredKey;
+            pendingKey = deferredKey;
+            deferredKey = null;
         }
     };
 
@@ -1205,6 +1261,19 @@ function _processPart(
         for (const child of measureEl.children) {
             emitDueTempoChanges(measureIndex, offset);
             if (child.tagName === "backup") break;
+
+            if (child.tagName === "attributes") {
+                const key = _readKeySignature(child.querySelector(":scope > key"));
+                const activeKey = deferredKey ?? currentKey;
+                if (key && (key.root !== activeKey.root || key.mode !== activeKey.mode)) {
+                    if (tieDuration !== null) deferredKey = key;
+                    else {
+                        currentKey = key;
+                        pendingKey = key;
+                    }
+                }
+                continue;
+            }
 
             if (child.tagName === "direction") {
                 const directionVoice = _text(child, "voice")?.trim();
@@ -1365,6 +1434,11 @@ function _processPart(
                     emitNote(combined, tieContent);
                     tieDuration = null;
                     tieContent = null;
+                    if (deferredKey !== null) {
+                        currentKey = deferredKey;
+                        pendingKey = deferredKey;
+                        deferredKey = null;
+                    }
                 }
             } else if (hasTieStart && !hasTieStop) {
                 tieDuration = duration;
@@ -1402,6 +1476,7 @@ function _processPart(
         noteStartIds,
         noteEndIds,
         noteTempoBpms,
+        noteKeys,
         timeSignature,
         blockId
     );
