@@ -429,6 +429,7 @@ Music Blocks has handy widgets for various musical concepts to create musical co
 | HyperScore-Tonal.html | Create music by painting patterns on the canvas |
 | 19-EDO-Microtonal-Counterpoint.html | Two-part polyphonic counterpoint in 19-EDO microtonal temperament (flute & cello), exploring pure 19-EDO major/minor thirds and fifths. |
 | 5-Limit-Just-Intonation-Polyrhythm.html | Three-turtle polyphonic composition combining 5-limit Just Intonation pure integer ratio harmonies (vibraphone & piano) with 3-against-2 metric subdivisions and acoustic percussion. |
+| Diwali-rangoli-diyas.html | Layered circular rangoli drawn ring by ring in time with a Raag Yaman flute melody, piano, guitar, and percussion, ending with four lit diyas. |
 
 # Utilities
 
