@@ -811,6 +811,26 @@ describe("_loadProject", () => {
         jest.useRealTimers();
     });
 
+    it("turns keyboard input on once the project from Planet has loaded", () => {
+        const planet = {
+            getCurrentProjectName: jest.fn(() => "Test"),
+            openProjectFromPlanet: jest.fn(),
+            initialiseNewProject: jest.fn()
+        };
+        const activity = makeActivity({ planet });
+        delete activity.keyboardEnableFlag;
+        const pm = new ProjectManager(activity);
+        jest.useFakeTimers();
+
+        pm._loadProject("proj-1", { run: true, show: false, collapse: false });
+        jest.advanceTimersByTime(2500);
+        expect(activity.keyboardEnableFlag).toBeFalsy();
+
+        global.pubsub.emit("finishedLoading");
+        expect(activity.keyboardEnableFlag).toBe(1);
+        jest.useRealTimers();
+    });
+
     it("handles missing getCurrentProjectName gracefully", () => {
         const planet = {
             getCurrentProjectName: null,
