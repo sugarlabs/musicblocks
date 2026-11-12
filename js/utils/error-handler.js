@@ -86,6 +86,22 @@ const errorMetadata = () => ({
 const isIgnorableError = (message, source) =>
     /^[a-z-]+-extension:/i.test(source || "") || /ResizeObserver loop/i.test(message || "");
 
+const isValidRecord = record =>
+    record !== null &&
+    typeof record === "object" &&
+    typeof record.key === "string" &&
+    record.key.length > 0 &&
+    typeof record.kind === "string" &&
+    typeof record.message === "string" &&
+    typeof record.source === "string" &&
+    Number.isFinite(record.line) &&
+    Number.isFinite(record.column) &&
+    typeof record.stack === "string" &&
+    Number.isInteger(record.count) &&
+    record.count > 0 &&
+    Number.isFinite(record.firstSeen) &&
+    Number.isFinite(record.lastSeen);
+
 const persistErrors = () => {
     safely(() => sessionStorage.setItem(ERROR_LOG_KEY, JSON.stringify(recentErrors)));
 };
@@ -150,7 +166,7 @@ safely(() => {
     if (!Array.isArray(stored)) return;
 
     stored.slice(-MAX_ERROR_RECORDS).forEach(record => {
-        if (!record || !record.key) return;
+        if (!isValidRecord(record)) return;
         recentErrors.push(record);
         errorCounts.set(record.key, record);
     });
@@ -247,12 +263,12 @@ const ErrorHandler = {
     },
 
     /**
-     * Returns a copy of the recorded errors, oldest first.
+     * Returns copies of the recorded errors, oldest first.
      *
-     * @returns {Object[]} Up to the last 50 records.
+     * @returns {Object[]} Copies of up to the last 50 records.
      */
     getRecentErrors() {
-        return recentErrors.slice();
+        return recentErrors.map(record => ({ ...record }));
     },
 
     /**

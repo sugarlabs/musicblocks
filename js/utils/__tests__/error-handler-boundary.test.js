@@ -1,13 +1,24 @@
-// Copyright (c) 2026 Music Blocks contributors
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the The GNU Affero General Public
-// License as published by the Free Software Foundation; either
-// version 3 of the License, or (at your option) any later version.
-//
-// You should have received a copy of the GNU Affero General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+/**
+ * MusicBlocks v3.8.0
+ *
+ * @author Anurag Singh
+ *
+ * @copyright 2026 Anurag Singh
+ *
+ * @license
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 
 /**
  * @jest-environment jsdom
@@ -116,6 +127,56 @@ describe("ErrorHandler global error boundary", () => {
         expect(stored[stored.length - 1].message).toBe("boundary-persisted");
     });
 
+    it("discards malformed records restored from sessionStorage", () => {
+        sessionStorage.setItem(
+            "mb_error_log_v1",
+            JSON.stringify([
+                {
+                    key: "missing-count",
+                    kind: "error",
+                    message: "missing count",
+                    source: "",
+                    line: 0,
+                    column: 0,
+                    stack: "",
+                    firstSeen: 1,
+                    lastSeen: 1
+                },
+                {
+                    key: "bad-count",
+                    kind: "error",
+                    message: "bad count",
+                    source: "",
+                    line: 0,
+                    column: 0,
+                    stack: "",
+                    count: "2",
+                    firstSeen: 1,
+                    lastSeen: 1
+                },
+                {
+                    key: "valid",
+                    kind: "error",
+                    message: "valid",
+                    source: "",
+                    line: 0,
+                    column: 0,
+                    stack: "",
+                    count: 1,
+                    firstSeen: 1,
+                    lastSeen: 1
+                }
+            ])
+        );
+
+        jest.resetModules();
+        const restored = require("../error-handler");
+        const records = restored.getRecentErrors();
+
+        expect(records).toHaveLength(1);
+        expect(records[0].key).toBe("valid");
+    });
+
     it("truncates long stacks", () => {
         const error = new Error("boundary-stack");
         error.stack = "x".repeat(5000);
@@ -131,11 +192,21 @@ describe("ErrorHandler global error boundary", () => {
         expect(ErrorHandler.getRecentErrors()).toHaveLength(50);
     });
 
-    it("returns a copy of the records", () => {
+    it("returns copies of the records", () => {
+        dispatchError("boundary-copy");
+
         const records = ErrorHandler.getRecentErrors();
+        const last = records[records.length - 1];
+        const originalCount = last.count;
+
+        last.count = 999;
+        last.key = "mutated";
         records.push({});
 
-        expect(ErrorHandler.getRecentErrors()).toHaveLength(records.length - 1);
+        const stored = ErrorHandler.getRecentErrors();
+        expect(stored).toHaveLength(records.length - 1);
+        expect(stored[stored.length - 1].count).toBe(originalCount);
+        expect(stored[stored.length - 1].key).not.toBe("mutated");
     });
 
     it("delegates debug and info to debugLog", () => {
