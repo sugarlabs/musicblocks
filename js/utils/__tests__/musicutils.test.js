@@ -1758,6 +1758,59 @@ describe("pitchToNumber", () => {
         expect(result).toBe(62);
     });
 
+    it("should map 19-EDO enharmonic flats to their EDO pitch positions", () => {
+        expect(pitchToNumber("F♭", 4, "C major", "equal19")).toBe(69);
+        expect(pitchToNumber("C♭", 4, "C major", "equal19")).toBe(61);
+        expect(pitchToNumber("C♭", 4, "C major", "equal19")).toBe(
+            pitchToNumber("B♯", 3, "C major", "equal19")
+        );
+    });
+
+    it("should place C-flat below C in 31-EDO", () => {
+        const cFlat = pitchToNumber("C♭", 4, "C major", "equal31");
+        expect(cFlat).toBe(pitchToNumber("C", 4, "C major", "equal31") - 1);
+        expect(numberToPitch(cFlat, "equal31")).toEqual(["C♭", 4]);
+    });
+
+    it("uses the generated 31-EDO table positions for single accidentals", () => {
+        const names = generateNoteNames(31);
+        const c4 = pitchToNumber("C", 4, "C major", "equal31");
+        const b4 = pitchToNumber("B", 4, "C major", "equal31");
+        const e4 = pitchToNumber("E", 4, "C major", "equal31");
+        const f4 = pitchToNumber("F", 4, "C major", "equal31");
+
+        expect(c4).toBe(101);
+        expect(b4).toBe(129);
+        expect(e4).toBe(111);
+        expect(f4).toBe(114);
+        expect(names[(names.indexOf("C") + 30) % 31]).toBe("C" + FLAT);
+        expect(names.indexOf("B" + SHARP)).toBe(names.indexOf("B") + 1);
+        expect(names.indexOf("E" + SHARP) + 1).toBe(names.indexOf("F" + FLAT));
+        expect(pitchToNumber("C" + FLAT, 4, "C major", "equal31")).toBe(100);
+        expect(pitchToNumber("B" + SHARP, 4, "C major", "equal31")).toBe(130);
+        expect(pitchToNumber("E" + SHARP, 4, "C major", "equal31")).toBe(112);
+        expect(pitchToNumber("F" + FLAT, 4, "C major", "equal31")).toBe(113);
+    });
+
+    it("uses the proportional A reference when an EDO name table has no A", () => {
+        const previous = TEMPERAMENT.equal3;
+        TEMPERAMENT.equal3 = { pitchNumber: 3 };
+        try {
+            expect(pitchToNumber("C", 4, "C major", "equal3")).toBe(10);
+        } finally {
+            if (previous === undefined) {
+                delete TEMPERAMENT.equal3;
+            } else {
+                TEMPERAMENT.equal3 = previous;
+            }
+        }
+    });
+
+    it("should map quarter-comma meantone notes using temperament labels", () => {
+        expect(pitchToNumber("F♭", 4, "C major", "1/4 comma meantone")).toBe(76);
+        expect(pitchToNumber("E♯", 4, "C major", "1/4 comma meantone")).toBe(77);
+    });
+
     it("should handle lowercase pitches in alternate tunings (equal19)", () => {
         // Verifies that lowercase 'c' and uppercase 'C' resolve identically in equal19
         const upperCaseResult = pitchToNumber("C", 4, "C major", "equal19");
@@ -1772,6 +1825,49 @@ describe("pitchToNumber", () => {
     it("should fallback to 12-EDO for unknown temperament", () => {
         const result = pitchToNumber("C", 4, "C major", "unknown");
         expect(result).toBe(39);
+    });
+});
+
+describe("custom equal temperaments without note labels", () => {
+    it("uses the EDO pitch table for a 24-step custom temperament", () => {
+        const previous = TEMPERAMENT.custom24;
+        TEMPERAMENT.custom24 = {
+            isEDO: true,
+            pitchNumber: 24,
+            ratios: Array.from({ length: 24 }, (_, i) => Math.pow(2, i / 24))
+        };
+        try {
+            expect(pitchToFrequency("C", 4, 0, "C major", "custom24")).toBeCloseTo(261.63, 1);
+            expect(pitchToFrequency("D", 4, 0, "C major", "custom24")).toBeCloseTo(293.66, 1);
+        } finally {
+            if (previous === undefined) {
+                delete TEMPERAMENT.custom24;
+            } else {
+                TEMPERAMENT.custom24 = previous;
+            }
+        }
+    });
+
+    it("matches equal7 pitch numbers for a 7-step custom temperament", () => {
+        const previous = TEMPERAMENT.custom7;
+        TEMPERAMENT.custom7 = {
+            isEDO: true,
+            pitchNumber: 7,
+            ratios: Array.from({ length: 7 }, (_, i) => Math.pow(2, i / 7))
+        };
+        try {
+            for (const pitch of ["C", "D", "E", "F", "G", "A", "B", "C♭", "D♯"]) {
+                expect(pitchToNumber(pitch, 4, "C major", "custom7")).toBe(
+                    pitchToNumber(pitch, 4, "C major", "equal7")
+                );
+            }
+        } finally {
+            if (previous === undefined) {
+                delete TEMPERAMENT.custom7;
+            } else {
+                TEMPERAMENT.custom7 = previous;
+            }
+        }
     });
 });
 
@@ -1816,6 +1912,35 @@ describe("numberToPitchSharp", () => {
                 4
             ]);
         }
+    });
+    it("keeps C-flat in the correct octave in 31-EDO numeric conversions", () => {
+        const cFlat = pitchToNumber("C" + FLAT, 4, "C major", "equal31");
+        expect(numberToPitchSharp(cFlat, "equal31")).toEqual(["C" + FLAT, 4]);
+        expect(getNote(-1, 4, 0, "C major", false, undefined, undefined, "equal31")).toEqual([
+            "C" + FLAT,
+            4,
+            0
+        ]);
+        expect(getNote(30, 4, 0, "C major", false, undefined, undefined, "equal31")).toEqual([
+            "C" + FLAT,
+            5,
+            0
+        ]);
+        expect(getNote(61, 4, 0, "C major", false, undefined, undefined, "equal31")).toEqual([
+            "C" + FLAT,
+            6,
+            0
+        ]);
+        expect(getNote(29, 4, 1, "C major", false, undefined, undefined, "equal31", true)).toEqual([
+            "C" + FLAT,
+            5,
+            0
+        ]);
+        expect(getNote(-1, 4, 1, "C major", false, undefined, undefined, "equal31", true)).toEqual([
+            "C",
+            4,
+            0
+        ]);
     });
 });
 
@@ -5255,6 +5380,11 @@ describe("getSolfege with temperament", () => {
     it("should fall back to fixed-do when movable is false", () => {
         expect(getSolfege("C", "C major", false, "equal")).toBe("do");
         expect(getSolfege("A", "C major", false, "equal")).toBe("la");
+    });
+
+    it("should give EDO enharmonic flats the same movable solfege as their matching pitches", () => {
+        expect(getSolfege("F♭", "C major", true, "equal19")).toBe("mi");
+        expect(getSolfege("C♭", "C major", true, "equal19")).toBe("ti");
     });
 });
 
