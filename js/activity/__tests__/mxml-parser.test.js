@@ -56,6 +56,45 @@ async function parseAndCapture(xml) {
 
 const blockName = block => (Array.isArray(block[1]) ? block[1][0] : block[1]);
 
+test("imports an in-score key change before the next note", async () => {
+    const xml = `<score-partwise version="3.1"><part-list><score-part id="P1"><part-name>Piano</part-name></score-part></part-list><part id="P1"><measure number="1"><attributes><divisions>1</divisions><key><fifths>0</fifths></key></attributes><note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration><type>whole</type></note></measure><measure number="2"><attributes><key><fifths>1</fifths></key></attributes><note><pitch><step>F</step><alter>1</alter><octave>4</octave></pitch><duration>4</duration><type>whole</type></note></measure></part></score-partwise>`;
+    const { blocks } = await parseAndCapture(xml);
+    const keys = blocks.filter(block => blockName(block) === "setkey2");
+    expect(keys).toHaveLength(2);
+    const key = keys[1];
+    expect(blocks[key[4][1]][1][1].value).toBe("G");
+    expect(blockName(blocks[key[4][3]])).toBe("newnote");
+    expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    expect(findPositionMismatches(blocks)).toEqual([]);
+});
+
+test("preserves a tied note across a key change and places the change before the next note", async () => {
+    const xml = `<score-partwise><part-list><score-part id="P1"><part-name>Piano</part-name></score-part></part-list><part id="P1"><measure number="1"><attributes><divisions>1</divisions><key><fifths>0</fifths></key></attributes><note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type><tie type="start"/></note></measure><measure number="2"><attributes><key><fifths>1</fifths></key></attributes><note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type><tie type="stop"/></note><note><pitch><step>G</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note></measure></part></score-partwise>`;
+    const { blocks } = await parseAndCapture(xml);
+    expect(noteValues(blocks)).toEqual([
+        [1, 2],
+        [1, 4]
+    ]);
+    const notes = blocks.filter(block => blockName(block) === "newnote");
+    const keys = blocks.filter(block => blockName(block) === "setkey2");
+    expect(keys).toHaveLength(2);
+    expect(keys[1][4][3]).toBe(notes[1][0]);
+    expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    expect(findPositionMismatches(blocks)).toEqual([]);
+});
+
+test("resets the key at the start of each pass through a repeat", async () => {
+    const xml = `<score-partwise><part-list><score-part id="P1"><part-name>Piano</part-name></score-part></part-list><part id="P1"><measure number="1"><attributes><divisions>1</divisions><key><fifths>0</fifths></key></attributes><barline location="left"><repeat direction="forward"/></barline><note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note></measure><measure number="2"><attributes><key><fifths>1</fifths></key></attributes><note><pitch><step>G</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note><barline location="right"><repeat direction="backward"/></barline></measure></part></score-partwise>`;
+    const { blocks } = await parseAndCapture(xml);
+    const repeat = blocks.find(block => blockName(block) === "repeat");
+    const reset = blocks[repeat[4][2]];
+    expect(blockName(reset)).toBe("setkey2");
+    expect(blocks[reset[4][1]][1][1].value).toBe("C");
+    expect(blocks.filter(block => blockName(block) === "setkey2")).toHaveLength(3);
+    expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    expect(findPositionMismatches(blocks)).toEqual([]);
+});
+
 /**
  * Mirrors the integrity check Blocks.adjustDocks() performs: for every
  * non-null connection A -> B, block B must list A among its own connections.
@@ -1849,6 +1888,104 @@ describe("Test 17: Repeats", () => {
     const BARLINE_FORWARD = '<barline location="left"><repeat direction="forward"/></barline>';
     const barlineBackward = times =>
         `<barline location="right"><repeat direction="backward"${times ? ` times="${times}"` : ""}/></barline>`;
+    const keyAttr = fifths => `<attributes><key><fifths>${fifths}</fifths></key></attributes>`;
+    const keyName = (blocks, block) => blocks[block[4][1]][1][1].value;
+
+    it("keeps the latest key change across a tie into the first ending", async () => {
+        const tied = type =>
+            `<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type><tie type="${type}"/></note>`;
+        const xml = scorePartwise(
+            BARLINE_FORWARD +
+                tied("start") +
+                keyAttr(1) +
+                '<barline location="left"><ending number="1" type="start"/></barline>' +
+                keyAttr(2) +
+                tied("stop") +
+                SIMPLE_NOTE("D", 4, "quarter") +
+                '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+                SIMPLE_NOTE("E", 4, "quarter"),
+            "<divisions>1</divisions><key><fifths>0</fifths></key>"
+        );
+        const { blocks } = await parseAndCapture(xml);
+        const notes = blocks.filter(block => blockName(block) === "newnote");
+        const key = blocks[notes[1][4][0]];
+        expect(blockName(key)).toBe("setkey2");
+        expect(keyName(blocks, key)).toBe("D");
+        expect(noteValueOf(blocks, notes[0])).toEqual([1, 2]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("restores the second ending key after replaying the repeat body", async () => {
+        const xml = scorePartwise(
+            BARLINE_FORWARD +
+                SIMPLE_NOTE("C", 4, "quarter") +
+                '<barline location="left"><ending number="1" type="start"/></barline>' +
+                keyAttr(1) +
+                SIMPLE_NOTE("G", 4, "quarter") +
+                '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+                '<barline location="left"><ending number="2" type="start"/></barline>' +
+                keyAttr(1) +
+                SIMPLE_NOTE("F", 4, "quarter"),
+            "<divisions>1</divisions><key><fifths>0</fifths></key>"
+        );
+        const { blocks } = await parseAndCapture(xml);
+        const notes = blocks.filter(block => blockName(block) === "newnote");
+        const ending = notes[2];
+        const restore = blocks[ending[4][0]];
+        expect(blockName(restore)).toBe("setkey2");
+        expect(keyName(blocks, restore)).toBe("G");
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("updates the tied note duration when a key block precedes it", async () => {
+        const tied = tie =>
+            `<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type><tie type="${tie}"/></note>`;
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                BARLINE_FORWARD +
+                    keyAttr(1) +
+                    tied("start") +
+                    '<barline location="left"><ending number="1" type="start"/></barline>' +
+                    tied("stop") +
+                    '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+                    SIMPLE_NOTE("F", 4, "quarter"),
+                "<divisions>1</divisions><key><fifths>0</fifths></key>"
+            )
+        );
+        expect(noteValues(blocks)).toEqual([
+            [1, 2],
+            [1, 4],
+            [1, 4]
+        ]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("applies a deferred key after the first-ending tie completes", async () => {
+        const tied = tie =>
+            `<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type><tie type="${tie}"/></note>`;
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                BARLINE_FORWARD +
+                    tied("start") +
+                    keyAttr(1) +
+                    '<barline location="left"><ending number="1" type="start"/></barline>' +
+                    tied("stop") +
+                    SIMPLE_NOTE("G", 4, "quarter") +
+                    '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+                    SIMPLE_NOTE("F", 4, "quarter"),
+                "<divisions>1</divisions><key><fifths>0</fifths></key>"
+            )
+        );
+        const notes = blocks.filter(block => blockName(block) === "newnote");
+        const key = blocks[notes[1][4][0]];
+        expect(blockName(key)).toBe("setkey2");
+        expect(keyName(blocks, key)).toBe("G");
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
     const playedPitches = blocks => {
         const byId = new Map(blocks.map(block => [block[0], block]));
         const settimbre = blocks.find(block => blockName(block) === "settimbre");
