@@ -2865,6 +2865,18 @@ describe("AIDebuggerWidget", () => {
                 expect(widget._borrowedProject()).toEqual({ name: "drums.tb", data: drums });
             });
 
+            test("reads a project containing the word 'html' in block data", () => {
+                const projectWithHtml = JSON.stringify([
+                    [0, "start", 0, 0, [null, null, null]],
+                    [1, "text", 0, 0, ["learning html"]]
+                ]);
+                widget._addBorrowFile("lesson.json", projectWithHtml);
+                expect(widget._borrowedProject()).toEqual({
+                    name: "lesson.json",
+                    data: projectWithHtml
+                });
+            });
+
             test("says so when a file holds no project", () => {
                 widget._addBorrowFile("notes.txt", "my shopping list");
                 expect(widget._borrowedProject()).toBeNull();

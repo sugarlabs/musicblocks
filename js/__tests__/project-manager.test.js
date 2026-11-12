@@ -2682,6 +2682,48 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(activity.stopLoadAnimation).toHaveBeenCalled();
     });
 
+    it("change handler loads a JSON project containing the word 'html' without false-positive error", async () => {
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = '[[0,"start",0,0,[]],[1,"text",0,0,["learning html"]]]';
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+
+        const stage = {
+            update: jest.fn(),
+            addEventListener: jest.fn((event, listener) => {
+                if (event === "trashsignal") listener();
+            }),
+            removeAllEventListeners: jest.fn(),
+            dispatchEvent: jest.fn()
+        };
+        const blocks = {
+            ...makeActivity().blocks,
+            loadNewBlocks: jest.fn(() => 7)
+        };
+        const activity = makeActivity({ stage, blocks });
+        activity.sendAllToTrash = jest.fn(() => {
+            stage.dispatchEvent("trashsignal");
+        });
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "learning-html.tb" }];
+        handlers.change();
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(blocks.loadNewBlocks).toHaveBeenCalledTimes(1);
+    });
+
     it("change handler preserves the old project and saves the import after loading", async () => {
         origFileReader = global.FileReader;
         class MockFR {
@@ -3537,6 +3579,52 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(activity.loading).toBe(false);
         expect(document.body.style.cursor).toBe("default");
         expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
+    it("drop handler loads a JSON project containing the word 'html' without false-positive error", async () => {
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = '[[0,"start",0,0,[]],[1,"text",0,0,["learning html"]]]';
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+        jest.spyOn(window, "scroll").mockImplementation(() => {});
+
+        const stage = {
+            update: jest.fn(),
+            addEventListener: jest.fn((event, listener) => {
+                if (event === "trashsignal") listener();
+            }),
+            removeAllEventListeners: jest.fn(),
+            dispatchEvent: jest.fn()
+        };
+        const blocks = {
+            ...makeActivity().blocks,
+            loadNewBlocks: jest.fn(() => 7)
+        };
+        const activity = makeActivity({ stage, blocks });
+        activity.sendAllToTrash = jest.fn(() => {
+            stage.dispatchEvent("trashsignal");
+        });
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        handlers.drop({
+            stopPropagation: jest.fn(),
+            preventDefault: jest.fn(),
+            dataTransfer: { files: [{ name: "dropped-project.json" }] }
+        });
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(blocks.loadNewBlocks).toHaveBeenCalledTimes(1);
     });
 
     it("drop handler clears without saving an empty project and saves after loading", async () => {

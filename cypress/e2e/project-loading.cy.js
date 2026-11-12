@@ -107,4 +107,36 @@ describe("Project loading", () => {
             cy.title().should("equal", projectName);
         }
     });
+
+    it("loads a JSON project containing the word 'html' without error banner", () => {
+        let baselineBlockCount = 0;
+
+        cy.window().then(win => {
+            baselineBlockCount = win.ActivityContext.getActivity().blocks.blockList.length;
+        });
+
+        cy.get("#load").click();
+        cy.get("#myOpenFile").selectFile("cypress/fixtures/project-with-html-string.json", {
+            force: true
+        });
+
+        cy.get("#load-container").should("be.visible");
+        cy.get("#load-container", { timeout: 30000 }).should("not.be.visible");
+
+        cy.get("#errorText").should("not.be.visible");
+        cy.get("#canvas").should("be.visible");
+
+        cy.window().should(win => {
+            const activity = win.ActivityContext.getActivity();
+            const { blockList } = activity.blocks;
+
+            expect(blockList.length).to.be.greaterThan(baselineBlockCount);
+
+            const hasHtmlTextBlock = blockList.some(
+                block => block.name === "text" && block.value === "learning html basics"
+            );
+            expect(hasHtmlTextBlock, "project containing 'html' in text block should be loaded").to
+                .be.true;
+        });
+    });
 });
