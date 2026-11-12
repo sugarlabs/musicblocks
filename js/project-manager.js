@@ -782,6 +782,10 @@ class ProjectManager {
         const collapse = flags.collapse;
 
         const __functionload = () => {
+            // Planet loads the project without _loadStart(), which is what
+            // otherwise turns keyboard input on once a load finishes.
+            that.keyboardEnableFlag = 1;
+
             setTimeout(() => {
                 if (!collapse && that.firstRun) {
                     that._toggleCollapsibleStacks();
