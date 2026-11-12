@@ -216,7 +216,8 @@ var numberToPitchSharp = (i, temperament) => {
     const octave = Math.floor((i + aIndex) / currentEDO);
     const nameIndex =
         Math.round((((i + aIndex) % currentEDO) + currentEDO) % currentEDO) % currentEDO;
-    return [edoNames[nameIndex], octave];
+    const noteName = edoNames[nameIndex];
+    return [noteName, octave + (noteName === "C" + FLAT ? 1 : 0)];
 };
 
 /**

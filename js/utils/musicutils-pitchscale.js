@@ -409,7 +409,10 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
     // For EDO > 12, use the EDO-specific name table for ALL pitches
     // (naturals and accidentals alike) so that the A reference is
     // consistent with the table's natural positions.
-    if (currentEDO !== 12 && isTrueEDO(temperament)) {
+    if (
+        currentEDO !== 12 &&
+        !(temperamentData && temperamentData.noteLabels && !isTrueEDO(temperament))
+    ) {
         const names = generateNoteNames(currentEDO);
         let aIndex = names.indexOf("A");
         if (aIndex === -1) {
@@ -417,6 +420,8 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
             // Use its proportional position from 12-EDO (A is at index 9).
             aIndex = Math.round((9 / 12) * currentEDO);
         }
+        // The generated 31-EDO table places C♭ one slot before C and B♯
+        // one slot after B, so single accidentals follow a one-slot delta.
         const naturalPos = names.indexOf(pitch.toUpperCase());
         if (naturalPos !== -1) {
             const unwrappedPos = naturalPos + transposition;
@@ -1261,6 +1266,9 @@ function getNote(
         } else {
             const edoNames = generateNoteNames(octaveLength);
             noteArg = edoNames[pitchIndex];
+            if (noteArg === "C" + FLAT && pitchValue < 0) {
+                octave += 1;
+            }
         }
     }
 
