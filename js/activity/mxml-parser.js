@@ -918,6 +918,7 @@ function _applyRepeats(
     repeats,
     noteBlocks,
     noteStartIds,
+    noteIds,
     noteEndIds,
     noteTempoBpms,
     noteKeys,
@@ -952,7 +953,7 @@ function _applyRepeats(
         lastBlock[4][1] = null;
         durationOverrides.forEach(({ index, duration }) => {
             if (index >= startIndex && index <= endIndex) {
-                _setNoteDuration(blocks, idMap.get(noteStartIds[index]), duration);
+                _setNoteDuration(blocks, idMap.get(noteIds[index]), duration);
             }
         });
         blockId += blocks.length;
@@ -1034,8 +1035,17 @@ function _applyRepeats(
             if (firstEndingStartIndex > startIndex) {
                 clonePass(startIndex, firstEndingStartIndex - 1, bodyTieDurations);
             }
-            previousEnd[4][1] = nextFlowId;
-            byId.get(nextFlowId)[4][0] = previousEnd[0];
+            const nextKey = noteKeys[endIndex + 1];
+            if (nextKey && needsKeyReset) {
+                const restore = _createKeyBlocks(blockId, nextKey, previousEnd[0], nextFlowId);
+                blockId += restore.length;
+                previousEnd[4][1] = restore[0][0];
+                byId.get(nextFlowId)[4][0] = restore[0][0];
+                copies.push(...restore);
+            } else {
+                previousEnd[4][1] = nextFlowId;
+                byId.get(nextFlowId)[4][0] = previousEnd[0];
+            }
             copies.forEach(block => byId.set(block[0], block));
             noteBlocks.push(...copies);
             continue;
@@ -1141,6 +1151,7 @@ function _processPart(
     const startingBlockId = blockId;
     const noteBlocks = [];
     const noteStartIds = [];
+    const noteIds = [];
     const noteEndIds = [];
     const noteTempoBpms = [];
     const noteKeys = [];
@@ -1207,6 +1218,7 @@ function _processPart(
         if (previousVolumeBlock !== null) previousVolumeBlock[4][3] = blockId;
         noteBlocks.push(...blocks);
         noteStartIds.push(startId);
+        noteIds.push(blockId);
         noteEndIds.push(blocks[blocks.length - 1][0]);
         noteTempoBpms.push(currentTempoBpm);
         noteKeys.push(currentKey);
@@ -1402,12 +1414,17 @@ function _processPart(
                     const combinedDuration = _addFractions(firstEndingBodyTie.duration, duration);
                     _setNoteDuration(
                         noteBlocks,
-                        noteStartIds[firstEndingBodyTie.index],
+                        noteIds[firstEndingBodyTie.index],
                         combinedDuration
                     );
                     firstEndingBodyTie = hasTieStart
                         ? { ...firstEndingBodyTie, duration: combinedDuration }
                         : null;
+                    if (!hasTieStart && deferredKey !== null) {
+                        currentKey = deferredKey;
+                        pendingKey = deferredKey;
+                        deferredKey = null;
+                    }
                     offset += (duration[0] * 4) / duration[1];
                     continue;
                 }
@@ -1474,6 +1491,7 @@ function _processPart(
         repeats,
         noteBlocks,
         noteStartIds,
+        noteIds,
         noteEndIds,
         noteTempoBpms,
         noteKeys,

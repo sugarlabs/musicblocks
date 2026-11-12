@@ -1888,6 +1888,79 @@ describe("Test 17: Repeats", () => {
     const BARLINE_FORWARD = '<barline location="left"><repeat direction="forward"/></barline>';
     const barlineBackward = times =>
         `<barline location="right"><repeat direction="backward"${times ? ` times="${times}"` : ""}/></barline>`;
+    const keyAttr = fifths => `<attributes><key><fifths>${fifths}</fifths></key></attributes>`;
+    const keyName = (blocks, block) => blocks[block[4][1]][1][1].value;
+
+    it("restores the second ending key after replaying the repeat body", async () => {
+        const xml = scorePartwise(
+            BARLINE_FORWARD +
+                SIMPLE_NOTE("C", 4, "quarter") +
+                '<barline location="left"><ending number="1" type="start"/></barline>' +
+                keyAttr(1) +
+                SIMPLE_NOTE("G", 4, "quarter") +
+                '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+                '<barline location="left"><ending number="2" type="start"/></barline>' +
+                keyAttr(1) +
+                SIMPLE_NOTE("F", 4, "quarter"),
+            "<divisions>1</divisions><key><fifths>0</fifths></key>"
+        );
+        const { blocks } = await parseAndCapture(xml);
+        const notes = blocks.filter(block => blockName(block) === "newnote");
+        const ending = notes[2];
+        const restore = blocks[ending[4][0]];
+        expect(blockName(restore)).toBe("setkey2");
+        expect(keyName(blocks, restore)).toBe("G");
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("updates the tied note duration when a key block precedes it", async () => {
+        const tied = tie =>
+            `<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type><tie type="${tie}"/></note>`;
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                BARLINE_FORWARD +
+                    keyAttr(1) +
+                    tied("start") +
+                    '<barline location="left"><ending number="1" type="start"/></barline>' +
+                    tied("stop") +
+                    '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+                    SIMPLE_NOTE("F", 4, "quarter"),
+                "<divisions>1</divisions><key><fifths>0</fifths></key>"
+            )
+        );
+        expect(noteValues(blocks)).toEqual([
+            [1, 2],
+            [1, 4],
+            [1, 4]
+        ]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("applies a deferred key after the first-ending tie completes", async () => {
+        const tied = tie =>
+            `<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type><tie type="${tie}"/></note>`;
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                BARLINE_FORWARD +
+                    tied("start") +
+                    keyAttr(1) +
+                    '<barline location="left"><ending number="1" type="start"/></barline>' +
+                    tied("stop") +
+                    SIMPLE_NOTE("G", 4, "quarter") +
+                    '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+                    SIMPLE_NOTE("F", 4, "quarter"),
+                "<divisions>1</divisions><key><fifths>0</fifths></key>"
+            )
+        );
+        const notes = blocks.filter(block => blockName(block) === "newnote");
+        const key = blocks[notes[1][4][0]];
+        expect(blockName(key)).toBe("setkey2");
+        expect(keyName(blocks, key)).toBe("G");
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
     const playedPitches = blocks => {
         const byId = new Map(blocks.map(block => [block[0], block]));
         const settimbre = blocks.find(block => blockName(block) === "settimbre");
