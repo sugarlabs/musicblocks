@@ -1921,6 +1921,26 @@ describe("numberToPitchSharp", () => {
             4,
             0
         ]);
+        expect(getNote(30, 4, 0, "C major", false, undefined, undefined, "equal31")).toEqual([
+            "C" + FLAT,
+            5,
+            0
+        ]);
+        expect(getNote(61, 4, 0, "C major", false, undefined, undefined, "equal31")).toEqual([
+            "C" + FLAT,
+            6,
+            0
+        ]);
+        expect(getNote(29, 4, 1, "C major", false, undefined, undefined, "equal31", true)).toEqual([
+            "C" + FLAT,
+            5,
+            0
+        ]);
+        expect(getNote(-1, 4, 1, "C major", false, undefined, undefined, "equal31", true)).toEqual([
+            "C",
+            4,
+            0
+        ]);
     });
 });
 

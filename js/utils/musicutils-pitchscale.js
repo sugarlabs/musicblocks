@@ -1170,6 +1170,7 @@ function getNote(
 
     let rememberFlat = false;
     let rememberSharp = false;
+    let numericPitchInput = false;
     let transpositionFloor = 0;
     let transpositionCents = 0;
 
@@ -1233,6 +1234,7 @@ function getNote(
     octave = Math.round(octave);
 
     if (typeof noteArg === "number") {
+        numericPitchInput = true;
         // Assume it is a pitch number.
         if (!keySignature) {
             keySignature = "C major";
@@ -1266,9 +1268,6 @@ function getNote(
         } else {
             const edoNames = generateNoteNames(octaveLength);
             noteArg = edoNames[pitchIndex];
-            if (noteArg === "C" + FLAT && pitchValue < 0) {
-                octave += 1;
-            }
         }
     }
 
@@ -1467,6 +1466,10 @@ function getNote(
                     console.debug("note not found in EDO table? " + note);
                 }
             }
+        }
+
+        if (numericPitchInput && note === "C" + FLAT) {
+            octave += 1;
         }
 
         // Try to find a note in the current keySignature
