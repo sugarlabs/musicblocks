@@ -85,6 +85,9 @@ const SamplerPlayback = {
                 this.playBtn.textContent = "";
                 this.playBtn.appendChild(playImg);
             }
+            if (this.playBtn) {
+                this.playBtn.setAttribute("aria-label", _("Play"));
+            }
             this.isMoving = false;
         };
 
@@ -108,6 +111,9 @@ const SamplerPlayback = {
                 pauseImg.style.verticalAlign = "middle";
                 this.playBtn.textContent = "";
                 this.playBtn.appendChild(pauseImg);
+            }
+            if (this.playBtn) {
+                this.playBtn.setAttribute("aria-label", _("Pause"));
             }
             this.isMoving = true;
         };

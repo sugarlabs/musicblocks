@@ -681,6 +681,7 @@ class Arpeggio {
                     })(),
                     document.createTextNode("\u00a0\u00a0")
                 );
+                icon.setAttribute("aria-label", _("Stop"));
             }
         } else {
             if (icon && typeof icon.replaceChildren === "function") {
@@ -699,6 +700,7 @@ class Arpeggio {
                     })(),
                     document.createTextNode("\u00a0\u00a0")
                 );
+                icon.setAttribute("aria-label", _("Play"));
             }
             if (this._playTimeout) {
                 this._clearWidgetTimeout(this._playTimeout);
@@ -812,6 +814,7 @@ class Arpeggio {
                     })(),
                     document.createTextNode("\u00a0\u00a0")
                 );
+                icon.setAttribute("aria-label", _("Play"));
             }
             this._playing = false;
         }
@@ -986,6 +989,7 @@ class Arpeggio {
                     })(),
                     document.createTextNode("\u00a0\u00a0")
                 );
+                icon.setAttribute("aria-label", _("Play"));
             }
         }
         // "Unclick" every entry in the matrix.

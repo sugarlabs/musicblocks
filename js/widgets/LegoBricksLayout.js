@@ -93,7 +93,12 @@ function LegoBricksLayout() {
             } else {
                 this._playPhrase();
                 const img = this.playButton.querySelector("img");
-                if (img) img.src = "header-icons/stop-button.svg";
+                if (img) {
+                    img.src = "header-icons/stop-button.svg";
+                    img.title = _("Stop");
+                    img.alt = _("Stop");
+                }
+                this.playButton.setAttribute("aria-label", _("Stop"));
             }
         };
 
