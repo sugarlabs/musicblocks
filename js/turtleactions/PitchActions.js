@@ -25,7 +25,7 @@
    nthDegreeToPitch, SHARP, FLAT, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    numberToPitch, ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP,
    keySignatureToMode, getInterval, EFFECTSNAMES, NANERRORMSG, frequencyToPitch,
-   MusicBlocks, Mouse, isCustomTemperament, getCurrentEDO, getModeLength, noteToObj
+   MusicBlocks, Mouse, isCustomTemperament, getCurrentEDO, getModeLength, noteToObj, isNonEDO
 */
 
 /*
@@ -816,6 +816,13 @@ function setupPitchActions(activity) {
                     // convert to scalar steps
                     let scalarDelta = 0;
                     let i = 0;
+                    // Outside 12 EDO the step sizes count the temperament's own steps, like
+                    // pitchToNumber. getNote must be told so, or it rescales them by edo/12 a
+                    // second time and each step overshoots: in 19 EDO C4 -> E4 counted 4 steps.
+                    // Ratio temperaments take a semitone offset, as in addScalarTransposition.
+                    const temperament = activity.logo.synth.inTemperament;
+                    const edoSteps = !isNonEDO(temperament);
+                    const edo = getCurrentEDO(temperament);
 
                     const _calculate = type => {
                         i++;
@@ -838,12 +845,13 @@ function setupPitchActions(activity) {
                         const nextObj = getNote(
                             pitch,
                             octave,
-                            nhalf,
+                            edoSteps ? nhalf : (nhalf * 12) / edo,
                             tur.singer.keySignature,
                             tur.singer.movable,
                             null,
                             activity.errorMsg,
-                            activity.logo.synth.inTemperament
+                            temperament,
+                            edoSteps
                         );
                         [pitch, octave] = nextObj;
 
