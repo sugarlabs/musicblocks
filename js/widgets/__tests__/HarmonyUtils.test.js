@@ -534,3 +534,278 @@ describe("HarmonyUtils.findHiddenPerfects", () => {
         expect(checked).toBe(25 ** 4);
     });
 });
+
+describe("HarmonyUtils.noteToPitchClass", () => {
+    it("converts standard note names to pitch classes (0-11)", () => {
+        expect(HarmonyUtils.noteToPitchClass("C")).toBe(0);
+        expect(HarmonyUtils.noteToPitchClass("C#")).toBe(1);
+        expect(HarmonyUtils.noteToPitchClass("Db")).toBe(1);
+        expect(HarmonyUtils.noteToPitchClass("D")).toBe(2);
+        expect(HarmonyUtils.noteToPitchClass("D#")).toBe(3);
+        expect(HarmonyUtils.noteToPitchClass("Eb")).toBe(3);
+        expect(HarmonyUtils.noteToPitchClass("E")).toBe(4);
+        expect(HarmonyUtils.noteToPitchClass("F")).toBe(5);
+        expect(HarmonyUtils.noteToPitchClass("F#")).toBe(6);
+        expect(HarmonyUtils.noteToPitchClass("Gb")).toBe(6);
+        expect(HarmonyUtils.noteToPitchClass("G")).toBe(7);
+        expect(HarmonyUtils.noteToPitchClass("G#")).toBe(8);
+        expect(HarmonyUtils.noteToPitchClass("Ab")).toBe(8);
+        expect(HarmonyUtils.noteToPitchClass("A")).toBe(9);
+        expect(HarmonyUtils.noteToPitchClass("A#")).toBe(10);
+        expect(HarmonyUtils.noteToPitchClass("Bb")).toBe(10);
+        expect(HarmonyUtils.noteToPitchClass("B")).toBe(11);
+    });
+
+    it("strips octaves and normalizes accidentals", () => {
+        expect(HarmonyUtils.noteToPitchClass("C4")).toBe(0);
+        expect(HarmonyUtils.noteToPitchClass("G3")).toBe(7);
+        expect(HarmonyUtils.noteToPitchClass("F♯5")).toBe(6);
+        expect(HarmonyUtils.noteToPitchClass("B♭2")).toBe(10);
+        expect(HarmonyUtils.noteToPitchClass("A-1")).toBe(9);
+    });
+
+    it("parses frequencies in Hz", () => {
+        expect(HarmonyUtils.noteToPitchClass("440Hz")).toBe(9); // A
+        expect(HarmonyUtils.noteToPitchClass("261.63Hz")).toBe(0); // C
+    });
+
+    it("parses Solfege syllables", () => {
+        expect(HarmonyUtils.noteToPitchClass("Do")).toBe(0);
+        expect(HarmonyUtils.noteToPitchClass("Re")).toBe(2);
+        expect(HarmonyUtils.noteToPitchClass("Mi")).toBe(4);
+        expect(HarmonyUtils.noteToPitchClass("Fa")).toBe(5);
+        expect(HarmonyUtils.noteToPitchClass("Sol")).toBe(7);
+        expect(HarmonyUtils.noteToPitchClass("La")).toBe(9);
+        expect(HarmonyUtils.noteToPitchClass("Ti")).toBe(11);
+    });
+
+    it("returns null for invalid inputs", () => {
+        expect(HarmonyUtils.noteToPitchClass(null)).toBeNull();
+        expect(HarmonyUtils.noteToPitchClass(undefined)).toBeNull();
+        expect(HarmonyUtils.noteToPitchClass("")).toBeNull();
+        expect(HarmonyUtils.noteToPitchClass("invalid")).toBeNull();
+        expect(HarmonyUtils.noteToPitchClass("NaNHz")).toBeNull();
+    });
+});
+
+describe("HarmonyUtils.parseKey", () => {
+    it("parses valid key signature strings and arrays", () => {
+        expect(HarmonyUtils.parseKey("C major")).toEqual(["C", "major"]);
+        expect(HarmonyUtils.parseKey("A minor")).toEqual(["A", "minor"]);
+        expect(HarmonyUtils.parseKey("A natural minor")).toEqual(["A", "natural minor"]);
+        expect(HarmonyUtils.parseKey("A harmonic minor")).toEqual(["A", "harmonic minor"]);
+        expect(HarmonyUtils.parseKey("G")).toEqual(["G", "major"]);
+        expect(HarmonyUtils.parseKey(["D", "minor"])).toEqual(["D", "minor"]);
+    });
+
+    it("returns null for nullish or empty key signatures", () => {
+        expect(HarmonyUtils.parseKey(null)).toBeNull();
+        expect(HarmonyUtils.parseKey(undefined)).toBeNull();
+        expect(HarmonyUtils.parseKey("")).toBeNull();
+    });
+});
+
+describe("HarmonyUtils.romanNumeral", () => {
+    describe("Diatonic chords in major keys", () => {
+        it.each([
+            ["C", "major", "C major", "I", "I in C major"],
+            ["D", "minor", "C major", "ii", "ii in C major"],
+            ["E", "minor", "C major", "iii", "iii in C major"],
+            ["F", "major", "C major", "IV", "IV in C major"],
+            ["G", "major", "C major", "V", "V in C major"],
+            ["G", "dominant 7th", "C major", "V7", "V7 in C major"],
+            ["A", "minor", "C major", "vi", "vi in C major"],
+            ["B", "diminished", "C major", "vii°", "vii° in C major"],
+            ["B", "half-diminished 7th", "C major", "viiø7", "viiø7 in C major"],
+            ["C", "major 7th", "C major", "Imaj7", "Imaj7 in C major"],
+            ["D", "minor 7th", "C major", "ii7", "ii7 in C major"]
+        ])("analyzes %s %s in %s as %s", (root, quality, key, expectedRoman, expectedFormatted) => {
+            const res = HarmonyUtils.romanNumeral(root, quality, key, root);
+            expect(res).not.toBeNull();
+            expect(res.roman).toBe(expectedRoman);
+            expect(res.formatted).toBe(expectedFormatted);
+            expect(res.inversion).toBe(0);
+        });
+    });
+
+    describe("Inversions", () => {
+        it("identifies 1st inversion triad (3rd in bass)", () => {
+            const res = HarmonyUtils.romanNumeral("C", "major", "C major", "E");
+            expect(res).not.toBeNull();
+            expect(res.roman).toBe("I⁶");
+            expect(res.inversion).toBe(1);
+            expect(res.inversionName).toBe("1st inversion");
+            expect(res.figuredBass).toBe("⁶");
+            expect(res.formatted).toBe("I⁶ (1st inversion) in C major");
+        });
+
+        it("identifies 2nd inversion triad (5th in bass)", () => {
+            const res = HarmonyUtils.romanNumeral("C", "major", "C major", "G");
+            expect(res).not.toBeNull();
+            expect(res.roman).toBe("I⁶⁴");
+            expect(res.inversion).toBe(2);
+            expect(res.inversionName).toBe("2nd inversion");
+            expect(res.figuredBass).toBe("⁶⁴");
+            expect(res.formatted).toBe("I⁶⁴ (2nd inversion) in C major");
+        });
+
+        it("identifies 1st inversion seventh chord (3rd in bass)", () => {
+            const res = HarmonyUtils.romanNumeral("G", "dominant 7th", "C major", "B");
+            expect(res).not.toBeNull();
+            expect(res.roman).toBe("V⁶₅");
+            expect(res.inversion).toBe(1);
+            expect(res.inversionName).toBe("1st inversion");
+            expect(res.figuredBass).toBe("⁶₅");
+            expect(res.formatted).toBe("V⁶₅ (1st inversion) in C major");
+        });
+
+        it("identifies 2nd inversion seventh chord (5th in bass)", () => {
+            const res = HarmonyUtils.romanNumeral("G", "dominant 7th", "C major", "D");
+            expect(res).not.toBeNull();
+            expect(res.roman).toBe("V⁴₃");
+            expect(res.inversion).toBe(2);
+            expect(res.inversionName).toBe("2nd inversion");
+            expect(res.figuredBass).toBe("⁴₃");
+            expect(res.formatted).toBe("V⁴₃ (2nd inversion) in C major");
+        });
+
+        it("identifies 3rd inversion seventh chord (7th in bass)", () => {
+            const res = HarmonyUtils.romanNumeral("G", "dominant 7th", "C major", "F");
+            expect(res).not.toBeNull();
+            expect(res.roman).toBe("V⁴₂");
+            expect(res.inversion).toBe(3);
+            expect(res.inversionName).toBe("3rd inversion");
+            expect(res.figuredBass).toBe("⁴₂");
+            expect(res.formatted).toBe("V⁴₂ (3rd inversion) in C major");
+        });
+
+        it("falls back to slash notation for non-chord bass notes", () => {
+            const res = HarmonyUtils.romanNumeral("C", "major", "C major", "A");
+            expect(res).not.toBeNull();
+            expect(res.inversion).toBe(-1);
+            expect(res.roman).toBe("I/A");
+            expect(res.formatted).toBe("I/A in C major");
+        });
+    });
+
+    describe("Borrowed and chromatic chords", () => {
+        it.each([
+            ["Bb", "major", "C major", "♭VII", "♭VII in C major"],
+            ["Ab", "major", "C major", "♭VI", "♭VI in C major"],
+            ["Eb", "major", "C major", "♭III", "♭III in C major"],
+            ["Db", "major", "C major", "♭II", "♭II in C major"],
+            ["F#", "diminished", "C major", "♯iv°", "♯iv° in C major"]
+        ])(
+            "identifies %s %s in %s as %s",
+            (root, quality, key, expectedRoman, expectedFormatted) => {
+                const res = HarmonyUtils.romanNumeral(root, quality, key, root);
+                expect(res).not.toBeNull();
+                expect(res.roman).toBe(expectedRoman);
+                expect(res.formatted).toBe(expectedFormatted);
+            }
+        );
+    });
+
+    describe("Minor keys", () => {
+        it.each([
+            ["A", "minor", "A minor", "i", "i in A minor"],
+            ["B", "diminished", "A minor", "ii°", "ii° in A minor"],
+            ["C", "major", "A minor", "III", "III in A minor"],
+            ["D", "minor", "A minor", "iv", "iv in A minor"],
+            ["E", "major", "A minor", "V", "V in A minor"],
+            ["E", "dominant 7th", "A minor", "V7", "V7 in A minor"],
+            ["F", "major", "A minor", "VI", "VI in A minor"],
+            ["G", "major", "A minor", "VII", "VII in A minor"],
+            ["G#", "diminished", "A minor", "vii°", "vii° in A minor"],
+            ["G#", "fully-diminished 7th", "A minor", "vii°7", "vii°7 in A minor"]
+        ])("analyzes %s %s in %s as %s", (root, quality, key, expectedRoman, expectedFormatted) => {
+            const res = HarmonyUtils.romanNumeral(root, quality, key, root);
+            expect(res).not.toBeNull();
+            expect(res.roman).toBe(expectedRoman);
+            expect(res.formatted).toBe(expectedFormatted);
+        });
+
+        it("handles minor key inversions", () => {
+            const res = HarmonyUtils.romanNumeral("A", "minor", "A minor", "C");
+            expect(res).not.toBeNull();
+            expect(res.roman).toBe("i⁶");
+            expect(res.inversion).toBe(1);
+            expect(res.formatted).toBe("i⁶ (1st inversion) in A minor");
+        });
+
+        it("handles minor mode variants and modal keys", () => {
+            expect(HarmonyUtils.romanNumeral("C", "major", "A natural minor").formatted).toBe(
+                "III in A natural minor"
+            );
+            expect(
+                HarmonyUtils.romanNumeral("G#", "diminished", "A harmonic minor").formatted
+            ).toBe("vii° in A harmonic minor");
+            expect(HarmonyUtils.romanNumeral("F", "major", "D dorian").formatted).toBe(
+                "III in D dorian"
+            );
+        });
+    });
+
+    describe("Other keys", () => {
+        it("analyzes chords in G major", () => {
+            expect(HarmonyUtils.romanNumeral("G", "major", "G major").formatted).toBe(
+                "I in G major"
+            );
+            expect(HarmonyUtils.romanNumeral("D", "dominant 7th", "G major").formatted).toBe(
+                "V7 in G major"
+            );
+            expect(HarmonyUtils.romanNumeral("C", "major", "G major").formatted).toBe(
+                "IV in G major"
+            );
+        });
+
+        it("analyzes chords in F major", () => {
+            expect(HarmonyUtils.romanNumeral("F", "major", "F major").formatted).toBe(
+                "I in F major"
+            );
+            expect(HarmonyUtils.romanNumeral("Bb", "major", "F major").formatted).toBe(
+                "IV in F major"
+            );
+            expect(HarmonyUtils.romanNumeral("C", "dominant 7th", "F major").formatted).toBe(
+                "V7 in F major"
+            );
+        });
+
+        it("analyzes chords in D minor", () => {
+            expect(HarmonyUtils.romanNumeral("D", "minor", "D minor").formatted).toBe(
+                "i in D minor"
+            );
+            expect(HarmonyUtils.romanNumeral("A", "dominant 7th", "D minor").formatted).toBe(
+                "V7 in D minor"
+            );
+            expect(HarmonyUtils.romanNumeral("Bb", "major", "D minor").formatted).toBe(
+                "VI in D minor"
+            );
+        });
+    });
+
+    describe("Defensive edge cases", () => {
+        it("returns null for missing, null, or empty arguments", () => {
+            expect(HarmonyUtils.romanNumeral(null, "major", "C major")).toBeNull();
+            expect(HarmonyUtils.romanNumeral("C", null, "C major")).toBeNull();
+            expect(HarmonyUtils.romanNumeral("C", "major", null)).toBeNull();
+            expect(HarmonyUtils.romanNumeral("C", "major", "")).toBeNull();
+            expect(HarmonyUtils.romanNumeral(undefined, undefined, undefined)).toBeNull();
+        });
+
+        it("returns null for invalid pitch or key", () => {
+            expect(HarmonyUtils.romanNumeral("invalid", "major", "C major")).toBeNull();
+            expect(HarmonyUtils.romanNumeral("C", "major", "invalidKey")).toBeNull();
+        });
+
+        it("handles note labels with octave numbers and Hz strings", () => {
+            const res1 = HarmonyUtils.romanNumeral("C4", "major", "C major", "C4");
+            expect(res1).not.toBeNull();
+            expect(res1.roman).toBe("I");
+
+            const res2 = HarmonyUtils.romanNumeral("261.63Hz", "major", "C major", "261.63Hz");
+            expect(res2).not.toBeNull();
+            expect(res2.roman).toBe("I");
+        });
+    });
+});

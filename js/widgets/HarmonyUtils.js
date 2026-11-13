@@ -12,7 +12,8 @@
 /*
    global
 
-   INTERVALVALUES, CHORDNAMES, CHORDVALUES
+   INTERVALVALUES, CHORDNAMES, CHORDVALUES, pitchToNumber,
+   keySignatureToMode, normalizeNoteAccidentals, frequencyToPitch
  */
 /*
     Globals location
@@ -20,6 +21,10 @@
          INTERVALVALUES, CHORDNAMES
      - js/utils/musicutils-modecore.js
          CHORDVALUES
+     - js/utils/musicutils-pitchscale.js
+         pitchToNumber, keySignatureToMode
+     - js/utils/musicutils-pitch.js
+         normalizeNoteAccidentals, frequencyToPitch
 */
 /* exported HarmonyUtils */
 
@@ -355,6 +360,299 @@ const HarmonyUtils = {
                 frequencies: [lowTo.frequency, highTo.frequency]
             }
         ];
+    },
+
+    /**
+     * Roman numeral degree labels in major keys indexed by semitone offset from tonic.
+     * @type {Object<number, string>}
+     */
+    MAJOR_DEGREE_MAP: {
+        0: "I",
+        1: "♭II",
+        2: "II",
+        3: "♭III",
+        4: "III",
+        5: "IV",
+        6: "♯IV",
+        7: "V",
+        8: "♭VI",
+        9: "VI",
+        10: "♭VII",
+        11: "VII"
+    },
+
+    /**
+     * Roman numeral degree labels in minor keys indexed by semitone offset from tonic.
+     * @type {Object<number, string>}
+     */
+    MINOR_DEGREE_MAP: {
+        0: "I",
+        1: "♭II",
+        2: "II",
+        3: "III",
+        4: "♯III",
+        5: "IV",
+        6: "♯IV",
+        7: "V",
+        8: "VI",
+        9: "♯VI",
+        10: "VII",
+        11: "VII"
+    },
+
+    /**
+     * Pitch class (0-11) for a given note name or frequency.
+     * @param {string|number} note - Note label (e.g. "C4", "F#", "Bb3") or frequency.
+     * @returns {number|null} Pitch class from 0 to 11, or null if invalid.
+     */
+    noteToPitchClass(note) {
+        if (!note && note !== 0) {
+            return null;
+        }
+        let clean = String(note).trim();
+        if (clean.endsWith("Hz")) {
+            const freq = parseFloat(clean);
+            if (!(freq > 0) || !isFinite(freq)) {
+                return null;
+            }
+            if (typeof frequencyToPitch === "function") {
+                clean = frequencyToPitch(freq)[0];
+            } else {
+                const semitonesFromA4 = Math.round(12 * Math.log2(freq / 440));
+                return (((9 + semitonesFromA4) % 12) + 12) % 12;
+            }
+        } else {
+            clean = clean.replace(/-?\d+$/, "");
+        }
+
+        if (typeof normalizeNoteAccidentals === "function") {
+            clean = normalizeNoteAccidentals(clean);
+        }
+
+        if (typeof pitchToNumber === "function") {
+            const step = pitchToNumber(clean, 4, "C major", "equal");
+            if (step !== undefined && !isNaN(step)) {
+                // In Music Blocks, pitch 3 is C (e.g. C4 = 39, (39 - 3) % 12 = 0).
+                return (((step - 3) % 12) + 12) % 12;
+            }
+        }
+
+        const baseMap = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+        const solfegeMap = {
+            DO: 0,
+            RE: 2,
+            MI: 4,
+            FA: 5,
+            SOL: 7,
+            SO: 7,
+            LA: 9,
+            TI: 11,
+            SI: 11
+        };
+
+        const upper = clean.toUpperCase();
+        let pc = null;
+        let accStart = 1;
+
+        for (const solf of Object.keys(solfegeMap)) {
+            if (upper.startsWith(solf)) {
+                pc = solfegeMap[solf];
+                accStart = solf.length;
+                break;
+            }
+        }
+
+        if (pc === null) {
+            const letter = upper.charAt(0);
+            if (!(letter in baseMap)) {
+                return null;
+            }
+            pc = baseMap[letter];
+            accStart = 1;
+        }
+
+        for (let i = accStart; i < clean.length; i++) {
+            const acc = clean.charAt(i);
+            if (acc === "#" || acc === "♯") {
+                pc += 1;
+            } else if (acc === "b" || acc === "♭" || acc === "-") {
+                pc -= 1;
+            } else if (acc === "𝄪" || acc === "x") {
+                pc += 2;
+            } else if (acc === "𝄫") {
+                pc -= 2;
+            }
+        }
+        return ((pc % 12) + 12) % 12;
+    },
+
+    /**
+     * Parses a key signature into tonic and mode name.
+     * @param {string|number|Array} keySignature - E.g. "C major", "A minor", "G", 0, etc.
+     * @returns {[string, string]|null} [tonic, mode] or null if invalid.
+     */
+    parseKey(keySignature) {
+        if (keySignature === null || keySignature === undefined || keySignature === "") {
+            return null;
+        }
+        if (typeof keySignatureToMode === "function") {
+            const parsed = keySignatureToMode(keySignature);
+            if (Array.isArray(parsed) && parsed.length >= 2 && parsed[0]) {
+                return parsed;
+            }
+        }
+        if (Array.isArray(keySignature) && keySignature.length >= 2) {
+            return [String(keySignature[0]), String(keySignature[1] || "major")];
+        }
+        if (typeof keySignature === "string") {
+            const parts = keySignature.trim().split(/\s+/);
+            if (parts.length > 0 && parts[0]) {
+                const tonic = parts[0];
+                const modeName = parts.length > 1 ? parts.slice(1).join(" ") : "major";
+                return [tonic, modeName];
+            }
+        }
+        return null;
+    },
+
+    /**
+     * Analyzes a chord relative to a key signature and returns its Roman numeral analysis.
+     * @param {string|number} rootNote - Root of the chord (e.g. "C", "G3", "440Hz").
+     * @param {string} chordName - CHORDNAMES entry (e.g. "major", "minor", "dominant 7th").
+     * @param {string|number|Array} keySignature - Active key signature (e.g. "C major", "A minor").
+     * @param {string|number} [bassNote] - Lowest sounding note in the chord (for inversion detection).
+     * @returns {Object|null} Analysis object or null if inputs are missing/invalid:
+     *   { roman, degree, quality, inversion, inversionName, figuredBass, keyTonic, keyMode, formatted }
+     */
+    romanNumeral(rootNote, chordName, keySignature, bassNote) {
+        if (
+            !rootNote ||
+            !chordName ||
+            keySignature === null ||
+            keySignature === undefined ||
+            keySignature === ""
+        ) {
+            return null;
+        }
+
+        const parsedKey = HarmonyUtils.parseKey(keySignature);
+        if (!parsedKey) {
+            return null;
+        }
+        const [keyTonic, mode] = parsedKey;
+
+        const rootPc = HarmonyUtils.noteToPitchClass(rootNote);
+        const tonicPc = HarmonyUtils.noteToPitchClass(keyTonic);
+        if (rootPc === null || tonicPc === null) {
+            return null;
+        }
+
+        const delta = (((rootPc - tonicPc) % 12) + 12) % 12;
+        const normMode = typeof mode === "string" ? mode.toLowerCase() : "";
+        const isMinorKey =
+            normMode.includes("minor") ||
+            normMode === "aeolian" ||
+            normMode === "dorian" ||
+            normMode === "phrygian" ||
+            normMode === "locrian";
+
+        const degreeMap = isMinorKey
+            ? HarmonyUtils.MINOR_DEGREE_MAP
+            : HarmonyUtils.MAJOR_DEGREE_MAP;
+        const baseDegree = degreeMap[delta];
+        if (!baseDegree) {
+            return null;
+        }
+
+        const isSeventh = chordName.includes("7th");
+        const isMinor =
+            chordName === "minor" || chordName === "minor 7th" || chordName === "minor-major 7th";
+        const isDiminished = chordName.includes("diminished");
+
+        let degreeText = baseDegree;
+        if (isMinorKey && delta === 11 && !isDiminished) {
+            degreeText = "♯VII";
+        }
+
+        if (isMinor || isDiminished) {
+            degreeText = degreeText.toLowerCase();
+        }
+
+        let inversion = 0;
+        let inversionName = null;
+        let figuredBass = "";
+        let slashBass = null;
+
+        if (bassNote) {
+            const bassPc = HarmonyUtils.noteToPitchClass(bassNote);
+            if (bassPc !== null && bassPc !== rootPc) {
+                const bassDelta = (((bassPc - rootPc) % 12) + 12) % 12;
+                if (bassDelta === 3 || bassDelta === 4) {
+                    inversion = 1;
+                    inversionName = "1st inversion";
+                    figuredBass = isSeventh ? "⁶₅" : "⁶";
+                } else if (bassDelta === 6 || bassDelta === 7 || bassDelta === 8) {
+                    inversion = 2;
+                    inversionName = "2nd inversion";
+                    figuredBass = isSeventh ? "⁴₃" : "⁶⁴";
+                } else if (isSeventh && (bassDelta === 9 || bassDelta === 10 || bassDelta === 11)) {
+                    inversion = 3;
+                    inversionName = "3rd inversion";
+                    figuredBass = "⁴₂";
+                } else {
+                    inversion = -1;
+                    slashBass = String(bassNote).replace(/-?\d+$/, "");
+                }
+            }
+        }
+
+        let roman = degreeText;
+
+        if (chordName === "major" || chordName === "minor") {
+            roman += figuredBass;
+        } else if (chordName === "diminished") {
+            roman += "°" + figuredBass;
+        } else if (chordName === "augmented") {
+            roman += "+" + figuredBass;
+        } else if (chordName === "dominant 7th" || chordName === "minor 7th") {
+            roman += figuredBass || "7";
+        } else if (chordName === "major 7th") {
+            roman += "maj" + (figuredBass || "7");
+        } else if (chordName === "half-diminished 7th") {
+            roman += "ø" + (figuredBass || "7");
+        } else if (chordName === "fully-diminished 7th") {
+            roman += "°" + (figuredBass || "7");
+        } else if (chordName === "minor-major 7th") {
+            roman += "m(maj" + (figuredBass || "7") + ")";
+        } else {
+            roman += figuredBass;
+        }
+
+        if (slashBass) {
+            roman += "/" + slashBass;
+        }
+
+        let formatted = roman;
+        if (inversionName) {
+            formatted += " (" + inversionName + ")";
+        }
+        const keyLabel =
+            typeof keySignature === "string" && keySignature.trim()
+                ? keySignature
+                : keyTonic + " " + mode;
+        formatted += " in " + keyLabel;
+
+        return {
+            roman,
+            degree: baseDegree,
+            quality: chordName,
+            inversion,
+            inversionName,
+            figuredBass,
+            keyTonic,
+            keyMode: mode,
+            formatted
+        };
     }
 };
 
