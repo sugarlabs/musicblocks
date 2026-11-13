@@ -86,6 +86,7 @@ describe("RhythmRulerEditing", () => {
             _playingAll: true,
             _playingOne: true,
             _setButtonIcon: jest.fn(),
+            _setPlayAllAccessibleName: jest.fn(),
             _refreshCircularView: jest.fn()
         };
         widget._undo = jest.fn(() => widget.Rulers[widget._rulerSelected][1].pop());
