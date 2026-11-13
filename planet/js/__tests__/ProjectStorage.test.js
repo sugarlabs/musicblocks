@@ -218,6 +218,60 @@ describe("ProjectStorage", () => {
     });
 
     describe("restore()", () => {
+        it.each([{ Projects: null }, {}, { Projects: [] }, [], 42])(
+            "recovers a valid backup when primary has an invalid structure: %j",
+            async primary => {
+                jest.spyOn(console, "warn").mockImplementation();
+                const backup = { Projects: { song: { ProjectData: "saved blocks" } } };
+                await storage.set(storage.LocalStorageKey, primary);
+                await storage.set(storage.BackupStorageKey, backup);
+
+                await storage.restore();
+                await storage.initialiseStorage();
+
+                expect(storage.data.Projects).toEqual(backup.Projects);
+                expect(await storage.get(storage.LocalStorageKey)).toMatchObject(backup);
+                expect(await storage.get(storage.BackupStorageKey)).toMatchObject(backup);
+            }
+        );
+
+        it("does not overwrite an invalid backup with a structurally invalid primary", async () => {
+            const primary = { Projects: null };
+            const backup = { Projects: null, marker: "keep" };
+            await storage.set(storage.LocalStorageKey, primary);
+            await storage.set(storage.BackupStorageKey, backup);
+
+            await storage.restore();
+            await storage.initialiseStorage();
+            await storage.save();
+
+            expect(await storage.get(storage.BackupStorageKey)).toEqual(backup);
+        });
+
+        it("recovers a legacy string-encoded backup", async () => {
+            jest.spyOn(console, "warn").mockImplementation();
+            const backup = { Projects: { song: { ProjectData: "saved blocks" } } };
+            await storage.set(storage.LocalStorageKey, { Projects: null });
+            await storage.set(storage.BackupStorageKey, JSON.stringify(backup));
+
+            await storage.restore();
+            expect(storage.data).toEqual(backup);
+        });
+
+        it("keeps recovered projects and backup after full initialization", async () => {
+            jest.spyOn(console, "warn").mockImplementation();
+            const backup = { Projects: { song: { ProjectData: "saved blocks" } } };
+            await storage.set(storage.LocalStorageKey, { Projects: null });
+            await storage.set(storage.BackupStorageKey, backup);
+            await storage.set(storage.VersionKey, storage.Version);
+            global.localforage = mockLocalforage;
+
+            await storage.init();
+
+            expect(storage.data.Projects).toEqual(backup.Projects);
+            expect(await storage.get(storage.BackupStorageKey)).toMatchObject(backup);
+        });
+
         it("should restore data from primary storage", async () => {
             const projectData = {
                 Projects: { 123: { ProjectName: "My Song" } },
