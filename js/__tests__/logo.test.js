@@ -3540,6 +3540,100 @@ describe("Logo runFromBlockNow", () => {
             logo._cleanupAfterCompletion();
 
             expect(recorderStop).not.toHaveBeenCalled();
+            expect(logo.synth.recorder).not.toBeNull();
+        });
+
+        test("doStopTurtles stops project WAV recorder on explicit Stop", () => {
+            const recorderStop = jest.fn();
+            logo.synth = makeSynth();
+            logo.synth.recorder = { state: "recording", stop: recorderStop };
+
+            logo.doStopTurtles();
+
+            expect(recorderStop).toHaveBeenCalledTimes(1);
+        });
+
+        test("doStopTurtles stops active Sampler microphone recording and resets Sampler UI", () => {
+            logo.synth = makeSynth();
+            logo.synth.samplerRecorder = { state: "started" };
+            logo.synth.mic = { close: jest.fn() };
+            logo.synth.stopRecording = jest.fn();
+
+            const img = document.createElement("img");
+            img.src = "header-icons/record.svg";
+            const btn = document.createElement("button");
+            btn.appendChild(img);
+
+            logo.sample = {
+                is_recording: true,
+                _recordBtn: btn,
+                drawVisualIDs: { 0: 42 }
+            };
+
+            const cancelSpy = jest.spyOn(global, "cancelAnimationFrame");
+
+            logo.doStopTurtles();
+
+            expect(logo.synth.stopRecording).toHaveBeenCalledTimes(1);
+            expect(logo.sample.is_recording).toBe(false);
+            expect(img.src).toContain("header-icons/mic.svg");
+            expect(cancelSpy).toHaveBeenCalledWith(42);
+            expect(logo.sample.drawVisualIDs[0]).toBeNull();
+
+            cancelSpy.mockRestore();
+        });
+
+        test("project WAV recorder and Sampler recorder have independent ownership and do not overwrite", () => {
+            logo.synth = makeSynth();
+            const projectRecorder = { state: "recording", stop: jest.fn() };
+            const samplerRecorder = { state: "started", stop: jest.fn() };
+
+            logo.synth.recorder = projectRecorder;
+            logo.synth.samplerRecorder = samplerRecorder;
+            logo.synth.stopRecording = jest.fn();
+
+            // Natural completion does not stop either
+            logo._cleanupAfterCompletion();
+            expect(projectRecorder.stop).not.toHaveBeenCalled();
+            expect(samplerRecorder.stop).not.toHaveBeenCalled();
+            expect(logo.synth.recorder).toBe(projectRecorder);
+            expect(logo.synth.samplerRecorder).toBe(samplerRecorder);
+
+            // Explicit Stop stops both independently
+            logo.doStopTurtles();
+            expect(projectRecorder.stop).toHaveBeenCalledTimes(1);
+            expect(logo.synth.stopRecording).toHaveBeenCalledTimes(1);
+        });
+
+        test("explicit Stop cancels pending in-flight Sampler startup and resets UI", () => {
+            logo.synth = makeSynth();
+            logo.synth.isRecordingStarting = jest.fn(() => true);
+            logo.synth.stopRecording = jest.fn();
+
+            const img = document.createElement("img");
+            img.src = "header-icons/record.svg";
+            const btn = document.createElement("button");
+            btn.appendChild(img);
+
+            logo.sample = {
+                is_recording: false,
+                is_recording_starting: true,
+                _recordBtn: btn,
+                drawVisualIDs: { 0: 99 }
+            };
+
+            const cancelSpy = jest.spyOn(global, "cancelAnimationFrame");
+
+            logo.doStopTurtles();
+
+            expect(logo.synth.stopRecording).toHaveBeenCalledTimes(1);
+            expect(logo.sample.is_recording).toBe(false);
+            expect(logo.sample.is_recording_starting).toBe(false);
+            expect(img.src).toContain("header-icons/mic.svg");
+            expect(cancelSpy).toHaveBeenCalledWith(99);
+            expect(logo.sample.drawVisualIDs[0]).toBeNull();
+
+            cancelSpy.mockRestore();
         });
     });
 

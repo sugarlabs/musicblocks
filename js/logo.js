@@ -1683,6 +1683,36 @@ class Logo {
         if (this.synth.recorder && this.synth.recorder.state === "recording")
             this.synth.recorder.stop();
 
+        // Stop Sampler microphone recording if active or starting on explicit stop
+        if (
+            (this.synth.samplerRecorder && this.synth.samplerRecorder.state === "started") ||
+            this.synth.mic ||
+            (typeof this.synth.isRecordingStarting === "function" &&
+                this.synth.isRecordingStarting())
+        ) {
+            this.synth.stopRecording();
+        }
+        if (
+            this.sample &&
+            (this.sample.is_recording ||
+                this.sample.is_recording_starting ||
+                (typeof this.sample.isRecordingStarting === "function" &&
+                    this.sample.isRecordingStarting()))
+        ) {
+            this.sample.is_recording = false;
+            this.sample.is_recording_starting = false;
+            if (this.sample._recordBtn) {
+                const img = this.sample._recordBtn.getElementsByTagName("img")[0];
+                if (img) {
+                    img.src = "header-icons/mic.svg";
+                }
+            }
+            if (this.sample.drawVisualIDs && this.sample.drawVisualIDs[0]) {
+                cancelAnimationFrame(this.sample.drawVisualIDs[0]);
+                this.sample.drawVisualIDs[0] = null;
+            }
+        }
+
         this.onStopTurtle();
         if (
             this.blocks &&

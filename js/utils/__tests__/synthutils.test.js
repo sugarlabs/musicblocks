@@ -1922,7 +1922,7 @@ describe("Utility Functions (logic-only)", () => {
                 close: jest.fn(),
                 dispose: jest.fn()
             };
-            Synth.recorder = mockRecorder;
+            Synth.samplerRecorder = mockRecorder;
             Synth.mic = mockMic;
 
             const result = await Synth.stopRecording();
@@ -1933,7 +1933,7 @@ describe("Utility Functions (logic-only)", () => {
             expect(mockMic.dispose).toHaveBeenCalled();
             expect(Synth.mic).toBeNull();
             expect(mockRecorder.dispose).toHaveBeenCalled();
-            expect(Synth.recorder).toBeNull();
+            expect(Synth.samplerRecorder).toBeNull();
             expect(global.URL.createObjectURL).toHaveBeenCalledWith("recording-blob");
             expect(result).toBe("blob:recording-url");
         });
@@ -1970,11 +1970,11 @@ describe("Utility Functions (logic-only)", () => {
             expect(Synth.audioURL).toBeNull();
         });
 
-        it("disposes previous mic and recorder before creating new ones on startRecording", async () => {
+        it("disposes previous mic and samplerRecorder before creating new ones on startRecording", async () => {
             const oldMic = { close: jest.fn(), dispose: jest.fn() };
             const oldRecorder = { dispose: jest.fn() };
             Synth.mic = oldMic;
-            Synth.recorder = oldRecorder;
+            Synth.samplerRecorder = oldRecorder;
 
             await Synth.startRecording();
 
@@ -1982,23 +1982,24 @@ describe("Utility Functions (logic-only)", () => {
             expect(oldMic.dispose).toHaveBeenCalled();
             expect(oldRecorder.dispose).toHaveBeenCalled();
             expect(Synth.mic).not.toBe(oldMic);
-            expect(Synth.recorder).not.toBe(oldRecorder);
+            expect(Synth.samplerRecorder).not.toBe(oldRecorder);
         });
 
-        it("does not throw when a native MediaRecorder (no dispose) is set as previous recorder", async () => {
-            const oldMic = { close: jest.fn(), dispose: jest.fn() };
-            const nativeRecorder = { stop: jest.fn(), state: "inactive" };
-            Synth.mic = oldMic;
-            Synth.recorder = nativeRecorder;
+        it("does not overwrite project MediaRecorder when startRecording is called", async () => {
+            const projectRecorder = { stop: jest.fn(), state: "recording" };
+            Synth.recorder = projectRecorder;
 
-            await expect(Synth.startRecording()).resolves.not.toThrow();
-            expect(Synth.mic).not.toBe(oldMic);
-            expect(Synth.recorder).not.toBe(nativeRecorder);
+            await Synth.startRecording();
+
+            // Project recorder must remain completely untouched
+            expect(Synth.recorder).toBe(projectRecorder);
+            expect(Synth.samplerRecorder).toBeDefined();
+            expect(Synth.samplerRecorder).not.toBe(projectRecorder);
         });
 
         it("returns null when stopRecording is called without an active recorder", async () => {
             Synth.mic = null;
-            Synth.recorder = null;
+            Synth.samplerRecorder = null;
 
             const result = await Synth.stopRecording();
             expect(result).toBeNull();
@@ -2006,7 +2007,7 @@ describe("Utility Functions (logic-only)", () => {
 
         it("does not throw when startRecording is called with no previous mic/recorder", async () => {
             Synth.mic = null;
-            Synth.recorder = null;
+            Synth.samplerRecorder = null;
 
             await expect(Synth.startRecording()).resolves.not.toThrow();
         });
@@ -2778,6 +2779,662 @@ describe("Utility Functions (logic-only)", () => {
 
             expect(Synth.getWaveFormValues()).toBe(values);
             expect(Synth.analyser.getValue).toHaveBeenCalled();
+        });
+
+        it("returns null when analyser is null (e.g. after disposal)", () => {
+            Synth.analyser = null;
+            expect(Synth.getWaveFormValues()).toBeNull();
+        });
+
+        it("returns null when analyser is undefined or has no getValue method", () => {
+            Synth.analyser = undefined;
+            expect(Synth.getWaveFormValues()).toBeNull();
+
+            Synth.analyser = {};
+            expect(Synth.getWaveFormValues()).toBeNull();
+        });
+
+        it("safely handles missing microphone when replacing an analyser in LiveWaveForm", () => {
+            const previous = { dispose: jest.fn() };
+            Synth.analyser = previous;
+            Synth.mic = null;
+
+            expect(() => Synth.LiveWaveForm()).not.toThrow();
+            expect(previous.dispose).toHaveBeenCalled();
+            expect(Synth.analyser).not.toBeNull();
+        });
+
+        it("safely catches errors when mic.disconnect or analyser.dispose throws in LiveWaveForm", () => {
+            const previous = {
+                dispose: jest.fn(() => {
+                    throw new Error("Dispose error");
+                })
+            };
+            const disconnect = jest.fn(() => {
+                throw new Error("Disconnect error");
+            });
+            Synth.analyser = previous;
+            Synth.mic = { connect: jest.fn(), disconnect };
+
+            expect(() => Synth.LiveWaveForm()).not.toThrow();
+            expect(disconnect).toHaveBeenCalledWith(previous);
+            expect(previous.dispose).toHaveBeenCalled();
+            expect(Synth.analyser).not.toBe(previous);
+        });
+
+        it("stopRecording disposes analyser and clears reference", async () => {
+            const analyserDispose = jest.fn();
+            const micDisconnect = jest.fn();
+            const analyser = { dispose: analyserDispose };
+            Synth.analyser = analyser;
+            Synth.mic = {
+                disconnect: micDisconnect,
+                close: jest.fn(),
+                dispose: jest.fn()
+            };
+            Synth.samplerRecorder = {
+                stop: jest.fn().mockResolvedValue(new Blob()),
+                dispose: jest.fn()
+            };
+            const origCreate = global.URL.createObjectURL;
+            global.URL.createObjectURL = jest.fn(() => "blob:test-url");
+
+            await Synth.stopRecording();
+
+            expect(micDisconnect).toHaveBeenCalledWith(analyser);
+            expect(analyserDispose).toHaveBeenCalled();
+            expect(Synth.analyser).toBeNull();
+            expect(Synth.getWaveFormValues()).toBeNull();
+
+            global.URL.createObjectURL = origCreate;
+        });
+
+        it("disposeAllInstruments leaves active project WAV recorder and sampler recorder intact", () => {
+            const callOrder = [];
+            const projectRecorder = {
+                state: "recording",
+                stop: jest.fn(),
+                dispose: jest.fn(() => callOrder.push("projectRecorder.dispose"))
+            };
+            const samplerRecorder = {
+                state: "started",
+                stop: jest.fn(),
+                dispose: jest.fn(() => callOrder.push("samplerRecorder.dispose"))
+            };
+
+            Synth.recorder = projectRecorder;
+            Synth.samplerRecorder = samplerRecorder;
+
+            Synth.disposeAllInstruments();
+
+            expect(callOrder).toEqual([]);
+            // Both recorders must be preserved
+            expect(Synth.recorder).toBe(projectRecorder);
+            expect(Synth.samplerRecorder).toBe(samplerRecorder);
+            expect(projectRecorder.dispose).not.toHaveBeenCalled();
+            expect(projectRecorder.stop).not.toHaveBeenCalled();
+            expect(samplerRecorder.dispose).not.toHaveBeenCalled();
+            expect(samplerRecorder.stop).not.toHaveBeenCalled();
+        });
+
+        it("repeated startRecording calls cleanly dispose existing session without resource leaks", async () => {
+            const oldAnalyser = { dispose: jest.fn() };
+            const oldMic = {
+                disconnect: jest.fn(),
+                close: jest.fn(),
+                dispose: jest.fn(),
+                open: jest.fn().mockResolvedValue()
+            };
+            const oldRecorder = {
+                dispose: jest.fn(),
+                start: jest.fn()
+            };
+
+            Synth.analyser = oldAnalyser;
+            Synth.mic = oldMic;
+            Synth.samplerRecorder = oldRecorder;
+
+            await Synth.startRecording();
+
+            expect(oldMic.disconnect).toHaveBeenCalledWith(oldAnalyser);
+            expect(oldAnalyser.dispose).toHaveBeenCalled();
+            expect(oldMic.close).toHaveBeenCalled();
+            expect(oldMic.dispose).toHaveBeenCalled();
+            expect(oldRecorder.dispose).toHaveBeenCalled();
+            expect(Synth.mic).not.toBe(oldMic);
+            expect(Synth.samplerRecorder).not.toBe(oldRecorder);
+        });
+
+        it("async race: starting session B while session A is stopping does not destroy session B", async () => {
+            let resolveStopA;
+            const stopPromiseA = new Promise(resolve => {
+                resolveStopA = resolve;
+            });
+            const micA = { close: jest.fn(), dispose: jest.fn() };
+            const recorderA = {
+                stop: jest.fn(() => stopPromiseA),
+                dispose: jest.fn()
+            };
+            const analyserA = { dispose: jest.fn() };
+
+            Synth.mic = micA;
+            Synth.samplerRecorder = recorderA;
+            Synth.analyser = analyserA;
+            Synth._recordingSessionId = 1;
+
+            const stopTaskA = Synth.stopRecording();
+
+            const micB = {
+                close: jest.fn(),
+                dispose: jest.fn(),
+                open: jest.fn().mockResolvedValue(),
+                connect: jest.fn()
+            };
+            const recorderB = { dispose: jest.fn(), start: jest.fn() };
+            const origUserMedia = Tone.UserMedia;
+            const origRecorder = Tone.Recorder;
+            Tone.UserMedia = jest.fn(() => micB);
+            Tone.Recorder = jest.fn(() => recorderB);
+
+            try {
+                await Synth.startRecording();
+                expect(Synth.samplerRecorder).toBe(recorderB);
+                expect(Synth.mic).toBe(micB);
+
+                resolveStopA(new Blob());
+                await stopTaskA;
+
+                expect(Synth.samplerRecorder).toBe(recorderB);
+                expect(Synth.mic).toBe(micB);
+                expect(recorderB.dispose).not.toHaveBeenCalled();
+                expect(micB.close).not.toHaveBeenCalled();
+            } finally {
+                Tone.UserMedia = origUserMedia;
+                Tone.Recorder = origRecorder;
+            }
+        });
+
+        it("concurrent stop requests share single stop promise and execute underlying recorder.stop() exactly once", async () => {
+            let resolveStop;
+            const stopPromise = new Promise(resolve => {
+                resolveStop = resolve;
+            });
+            const micClose = jest.fn();
+            const micDispose = jest.fn();
+            const recorderDispose = jest.fn();
+            const analyserDispose = jest.fn();
+
+            const mic = { close: micClose, dispose: micDispose, disconnect: jest.fn() };
+            const recorder = {
+                stop: jest.fn(() => stopPromise),
+                dispose: recorderDispose
+            };
+            const analyser = { dispose: analyserDispose };
+
+            Synth.mic = mic;
+            Synth.samplerRecorder = recorder;
+            Synth.analyser = analyser;
+            Synth._recordingSessionId = 42;
+
+            const origCreate = global.URL.createObjectURL;
+            global.URL.createObjectURL = jest.fn(() => "blob:single-flight-test");
+
+            try {
+                // Call 1 (e.g. from Logo.doStopTurtles) and Call 2 (e.g. from SamplerCanvas draw)
+                const stopTask1 = Synth.stopRecording();
+                const stopTask2 = Synth.stopRecording();
+
+                // Assert underlying Tone.Recorder.stop() was called exactly once
+                expect(recorder.stop).toHaveBeenCalledTimes(1);
+
+                // Resources must not be disposed before the stop promise resolves
+                expect(micClose).not.toHaveBeenCalled();
+                expect(recorderDispose).not.toHaveBeenCalled();
+
+                // Resolve the stop promise with mock blob
+                const mockBlob = new Blob(["audio-data"], { type: "audio/webm" });
+                resolveStop(mockBlob);
+
+                const [result1, result2] = await Promise.all([stopTask1, stopTask2]);
+
+                // Both callers receive the exact same finalized result
+                expect(result1).toBe("blob:single-flight-test");
+                expect(result2).toBe("blob:single-flight-test");
+
+                // Cleanup must happen exactly once
+                expect(micClose).toHaveBeenCalledTimes(1);
+                expect(micDispose).toHaveBeenCalledTimes(1);
+                expect(recorderDispose).toHaveBeenCalledTimes(1);
+                expect(analyserDispose).toHaveBeenCalledTimes(1);
+            } finally {
+                global.URL.createObjectURL = origCreate;
+            }
+        });
+
+        it("failed recorder.stop() still disposes microphone and resources without leaking", async () => {
+            const micClose = jest.fn();
+            const micDispose = jest.fn();
+            const recorderDispose = jest.fn();
+            const analyserDispose = jest.fn();
+
+            const mic = { close: micClose, dispose: micDispose, disconnect: jest.fn() };
+            const recorder = {
+                stop: jest.fn(() => Promise.reject(new Error("MediaRecorder encoding failure"))),
+                dispose: recorderDispose
+            };
+            const analyser = { dispose: analyserDispose };
+
+            Synth.mic = mic;
+            Synth.samplerRecorder = recorder;
+            Synth.analyser = analyser;
+
+            const result = await Synth.stopRecording();
+            expect(result).toBeNull();
+
+            // Resources must still be released even when recorder.stop fails
+            expect(micClose).toHaveBeenCalledTimes(1);
+            expect(micDispose).toHaveBeenCalledTimes(1);
+            expect(recorderDispose).toHaveBeenCalledTimes(1);
+            expect(analyserDispose).toHaveBeenCalledTimes(1);
+        });
+
+        it("concurrent start requests share single start promise and do not duplicate streams", async () => {
+            let resolveOpen;
+            const openPromise = new Promise(resolve => {
+                resolveOpen = resolve;
+            });
+            const micInstance = {
+                open: jest.fn(() => openPromise),
+                connect: jest.fn(),
+                close: jest.fn(),
+                dispose: jest.fn()
+            };
+            const recorderInstance = {
+                start: jest.fn(),
+                dispose: jest.fn(),
+                state: "stopped"
+            };
+
+            const origUserMedia = Tone.UserMedia;
+            const origRecorder = Tone.Recorder;
+            Tone.UserMedia = jest.fn(() => micInstance);
+            Tone.Recorder = jest.fn(() => recorderInstance);
+
+            try {
+                // Two concurrent start calls (e.g. rapid double-clicks on Record button)
+                const startTask1 = Synth.startRecording();
+                const startTask2 = Synth.startRecording();
+
+                await Promise.resolve();
+                await Promise.resolve();
+
+                expect(Tone.UserMedia).toHaveBeenCalledTimes(1);
+                expect(Tone.Recorder).toHaveBeenCalledTimes(1);
+                expect(micInstance.open).toHaveBeenCalledTimes(1);
+
+                resolveOpen();
+                await Promise.all([startTask1, startTask2]);
+
+                expect(micInstance.connect).toHaveBeenCalledWith(recorderInstance);
+                expect(recorderInstance.start).toHaveBeenCalledTimes(1);
+            } finally {
+                Tone.UserMedia = origUserMedia;
+                Tone.Recorder = origRecorder;
+            }
+        });
+
+        it("disposeAllInstruments preserves active Sampler analyser and recorder across natural project completion", () => {
+            const projectRecorder = {
+                state: "recording",
+                stop: jest.fn(),
+                dispose: jest.fn()
+            };
+            const samplerRecorder = {
+                state: "started",
+                stop: jest.fn(),
+                dispose: jest.fn()
+            };
+            const analyser = {
+                dispose: jest.fn(),
+                getValue: jest.fn(() => new Float32Array([0.5, 0.5]))
+            };
+
+            Synth.recorder = projectRecorder;
+            Synth.samplerRecorder = samplerRecorder;
+            Synth.analyser = analyser;
+
+            Synth.disposeAllInstruments();
+
+            // Both project recorder and Sampler audio chain must survive natural completion
+            expect(Synth.recorder).toBe(projectRecorder);
+            expect(Synth.samplerRecorder).toBe(samplerRecorder);
+            expect(Synth.analyser).toBe(analyser);
+            expect(analyser.dispose).not.toHaveBeenCalled();
+            expect(projectRecorder.stop).not.toHaveBeenCalled();
+            expect(samplerRecorder.stop).not.toHaveBeenCalled();
+        });
+
+        it("session-aware stop locks prevent cross-session lock clearing during overlapping multi-session stops", async () => {
+            let resolveStopA;
+            let resolveStopB;
+            const stopPromiseA = new Promise(resolve => {
+                resolveStopA = resolve;
+            });
+            const stopPromiseB = new Promise(resolve => {
+                resolveStopB = resolve;
+            });
+
+            const micA = { close: jest.fn(), dispose: jest.fn(), disconnect: jest.fn() };
+            const recorderA = {
+                stop: jest.fn(() => stopPromiseA),
+                dispose: jest.fn()
+            };
+            const analyserA = { dispose: jest.fn() };
+
+            const micB = {
+                close: jest.fn(),
+                dispose: jest.fn(),
+                disconnect: jest.fn(),
+                open: jest.fn().mockResolvedValue(),
+                connect: jest.fn()
+            };
+            const recorderB = {
+                stop: jest.fn(() => stopPromiseB),
+                start: jest.fn(),
+                dispose: jest.fn(),
+                state: "started"
+            };
+
+            const origUserMedia = Tone.UserMedia;
+            const origRecorder = Tone.Recorder;
+            Tone.UserMedia = jest.fn(() => micB);
+            Tone.Recorder = jest.fn(() => recorderB);
+
+            try {
+                // Session A is active
+                Synth.mic = micA;
+                Synth.samplerRecorder = recorderA;
+                Synth.analyser = analyserA;
+                Synth._recordingSessionId = 1;
+
+                // Stop Session A (pending)
+                const stopTaskA = Synth.stopRecording();
+                expect(recorderA.stop).toHaveBeenCalledTimes(1);
+
+                // Start Session B
+                await Synth.startRecording();
+                expect(Synth._recordingSessionId).toBe(2);
+                expect(Synth.samplerRecorder).toBe(recorderB);
+
+                // Stop Session B concurrently from two callers
+                const stopTaskB1 = Synth.stopRecording();
+                const stopTaskB2 = Synth.stopRecording();
+                expect(recorderB.stop).toHaveBeenCalledTimes(1);
+
+                // Resolve Session A
+                const blobA = new Blob(["a"], { type: "audio/webm" });
+                resolveStopA(blobA);
+                await stopTaskA;
+
+                // Session A resolution must NOT dispose Session B or clear Session B's stop lock
+                expect(recorderB.dispose).not.toHaveBeenCalled();
+                expect(micB.close).not.toHaveBeenCalled();
+
+                // A third stop call for Session B while stopPromiseB is still pending must join Session B's lock
+                const stopTaskB3 = Synth.stopRecording();
+                expect(recorderB.stop).toHaveBeenCalledTimes(1);
+
+                // Resolve Session B
+                const blobB = new Blob(["b"], { type: "audio/webm" });
+                resolveStopB(blobB);
+                await Promise.all([stopTaskB1, stopTaskB2, stopTaskB3]);
+
+                expect(recorderB.dispose).toHaveBeenCalledTimes(1);
+                expect(micB.close).toHaveBeenCalledTimes(1);
+            } finally {
+                Tone.UserMedia = origUserMedia;
+                Tone.Recorder = origRecorder;
+            }
+        });
+
+        it("cleans up partially initialized resources and releases lock if startRecording fails", async () => {
+            const micClose = jest.fn();
+            const micDispose = jest.fn();
+            const recorderDispose = jest.fn();
+
+            const failingMic = {
+                open: jest.fn().mockRejectedValue(new Error("Permission denied")),
+                close: micClose,
+                dispose: micDispose
+            };
+            const recorder = {
+                dispose: recorderDispose,
+                start: jest.fn()
+            };
+
+            const origUserMedia = Tone.UserMedia;
+            const origRecorder = Tone.Recorder;
+            Tone.UserMedia = jest.fn(() => failingMic);
+            Tone.Recorder = jest.fn(() => recorder);
+
+            try {
+                // Initial start fails
+                await expect(Synth.startRecording()).rejects.toThrow("Permission denied");
+
+                // Verify immediate teardown of opened resources
+                expect(failingMic.close).toHaveBeenCalledTimes(1);
+                expect(failingMic.dispose).toHaveBeenCalledTimes(1);
+                expect(recorderDispose).toHaveBeenCalledTimes(1);
+                expect(Synth.mic).toBeNull();
+                expect(Synth.samplerRecorder).toBeNull();
+                expect(Synth.analyser).toBeNull();
+
+                // Subsequent start is not locked and can succeed
+                const workingMic = {
+                    open: jest.fn().mockResolvedValue(),
+                    connect: jest.fn(),
+                    close: jest.fn(),
+                    dispose: jest.fn()
+                };
+                const workingRecorder = {
+                    start: jest.fn(),
+                    dispose: jest.fn()
+                };
+                Tone.UserMedia = jest.fn(() => workingMic);
+                Tone.Recorder = jest.fn(() => workingRecorder);
+
+                await expect(Synth.startRecording()).resolves.not.toThrow();
+                expect(Synth.samplerRecorder).toBe(workingRecorder);
+            } finally {
+                Tone.UserMedia = origUserMedia;
+                Tone.Recorder = origRecorder;
+            }
+        });
+
+        it("cancels in-flight startup if stopRecording is called while mic.open is pending", async () => {
+            let resolveOpen;
+            const openPromise = new Promise(resolve => {
+                resolveOpen = resolve;
+            });
+
+            const micInstance = {
+                open: jest.fn(() => openPromise),
+                connect: jest.fn(),
+                close: jest.fn(),
+                dispose: jest.fn()
+            };
+            const recorderInstance = {
+                start: jest.fn(),
+                dispose: jest.fn()
+            };
+
+            const origUserMedia = Tone.UserMedia;
+            const origRecorder = Tone.Recorder;
+            Tone.UserMedia = jest.fn(() => micInstance);
+            Tone.Recorder = jest.fn(() => recorderInstance);
+
+            try {
+                // User clicks Record: startRecording begins and awaits mic.open()
+                const startPromise = Synth.startRecording();
+                expect(Synth.isRecordingStarting()).toBe(true);
+
+                // User calls stopRecording() before mic.open() resolves
+                const stopResult = await Synth.stopRecording();
+                expect(stopResult).toBeNull();
+                expect(Synth.isRecordingStarting()).toBe(false);
+
+                // Now mic.open() finally resolves
+                resolveOpen();
+
+                // startRecording should reject with AbortError
+                await expect(startPromise).rejects.toThrow("Recording start cancelled");
+
+                // Assert recorder never started and microphone was closed and disposed
+                expect(recorderInstance.start).not.toHaveBeenCalled();
+                expect(micInstance.connect).not.toHaveBeenCalled();
+                expect(micInstance.close).toHaveBeenCalledTimes(1);
+                expect(micInstance.dispose).toHaveBeenCalledTimes(1);
+                expect(recorderInstance.dispose).toHaveBeenCalledTimes(1);
+                expect(Synth.samplerRecorder).toBeNull();
+                expect(Synth.mic).toBeNull();
+            } finally {
+                Synth.samplerRecorder = null;
+                Synth.mic = null;
+                Synth.analyser = null;
+                Tone.UserMedia = origUserMedia;
+                Tone.Recorder = origRecorder;
+            }
+        });
+
+        it("handles Session A cancelled during mic.open, Session B starting and becoming active, and Session A resolving later without corrupting Session B", async () => {
+            let resolveOpenA;
+            let resolveOpenB;
+            const openPromiseA = new Promise(resolve => {
+                resolveOpenA = resolve;
+            });
+            const openPromiseB = new Promise(resolve => {
+                resolveOpenB = resolve;
+            });
+
+            const micA = {
+                open: jest.fn(() => openPromiseA),
+                connect: jest.fn(),
+                close: jest.fn(),
+                dispose: jest.fn()
+            };
+            const recorderA = {
+                start: jest.fn(),
+                dispose: jest.fn()
+            };
+
+            const micB = {
+                open: jest.fn(() => openPromiseB),
+                connect: jest.fn(),
+                close: jest.fn(),
+                dispose: jest.fn()
+            };
+            const recorderB = {
+                start: jest.fn(),
+                dispose: jest.fn(),
+                state: "started"
+            };
+
+            const origUserMedia = Tone.UserMedia;
+            const origRecorder = Tone.Recorder;
+
+            try {
+                // Session A starts
+                Tone.UserMedia = jest.fn(() => micA);
+                Tone.Recorder = jest.fn(() => recorderA);
+                const startPromiseA = Synth.startRecording();
+
+                // Stop cancels Session A
+                await Synth.stopRecording();
+
+                // Session B starts immediately
+                Tone.UserMedia = jest.fn(() => micB);
+                Tone.Recorder = jest.fn(() => recorderB);
+                const startPromiseB = Synth.startRecording();
+
+                // Session B completes and becomes active
+                resolveOpenB();
+                await startPromiseB;
+
+                expect(Synth.samplerRecorder).toBe(recorderB);
+                expect(Synth.mic).toBe(micB);
+                expect(recorderB.start).toHaveBeenCalledTimes(1);
+
+                // Now Session A's delayed open resolves
+                resolveOpenA();
+                await expect(startPromiseA).rejects.toThrow("Recording start cancelled");
+
+                // Session A must be disposed, but Session B must be untouched
+                expect(recorderA.start).not.toHaveBeenCalled();
+                expect(micA.close).toHaveBeenCalledTimes(1);
+                expect(micA.dispose).toHaveBeenCalledTimes(1);
+                expect(recorderA.dispose).toHaveBeenCalledTimes(1);
+
+                // Crucial invariant: Session B's resources remain active and undamaged
+                expect(Synth.samplerRecorder).toBe(recorderB);
+                expect(Synth.mic).toBe(micB);
+                expect(micB.close).not.toHaveBeenCalled();
+                expect(recorderB.dispose).not.toHaveBeenCalled();
+            } finally {
+                Synth.samplerRecorder = null;
+                Synth.mic = null;
+                Synth.analyser = null;
+                Tone.UserMedia = origUserMedia;
+                Tone.Recorder = origRecorder;
+            }
+        });
+
+        it("safely handles repeated Stop requests during pending startup without error", async () => {
+            let resolveOpen;
+            const openPromise = new Promise(resolve => {
+                resolveOpen = resolve;
+            });
+
+            const mic = {
+                open: jest.fn(() => openPromise),
+                connect: jest.fn(),
+                close: jest.fn(),
+                dispose: jest.fn()
+            };
+            const recorder = {
+                start: jest.fn(),
+                dispose: jest.fn()
+            };
+
+            const origUserMedia = Tone.UserMedia;
+            const origRecorder = Tone.Recorder;
+            Tone.UserMedia = jest.fn(() => mic);
+            Tone.Recorder = jest.fn(() => recorder);
+
+            try {
+                const startPromise = Synth.startRecording();
+
+                // Multiple stops during pending startup
+                const stop1 = Synth.stopRecording();
+                const stop2 = Synth.stopRecording();
+                const stop3 = Synth.stopRecording();
+
+                const [res1, res2, res3] = await Promise.all([stop1, stop2, stop3]);
+                expect(res1).toBeNull();
+                expect(res2).toBeNull();
+                expect(res3).toBeNull();
+
+                resolveOpen();
+                await expect(startPromise).rejects.toThrow("Recording start cancelled");
+
+                expect(mic.close).toHaveBeenCalledTimes(1);
+                expect(recorder.dispose).toHaveBeenCalledTimes(1);
+            } finally {
+                Synth.samplerRecorder = null;
+                Synth.mic = null;
+                Synth.analyser = null;
+                Tone.UserMedia = origUserMedia;
+                Tone.Recorder = origRecorder;
+            }
         });
     });
 
@@ -4455,7 +5112,7 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             global.URL.revokeObjectURL = jest.fn();
 
             await synth.startRecording();
-            expect(synth.recorder).not.toBeNull();
+            expect(synth.samplerRecorder).not.toBeNull();
             expect(synth.mic).not.toBeNull();
 
             const url = await synth.stopRecording();
