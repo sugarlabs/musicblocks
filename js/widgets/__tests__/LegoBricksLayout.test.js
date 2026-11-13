@@ -195,16 +195,17 @@ describe("LegoBricksLayout", () => {
 
     test("does not leave the button labeled Stop when playback ends before _playPhrase returns", () => {
         // Simulates a matrix with no note rows: _playPhrase starts, then synchronously
-        // finishes and calls _stopPlayback before the onclick handler continues.
+        // finishes and calls the real _stopPlayback before the onclick handler continues.
         widget._playPhrase = jest.fn(() => {
-            widget.isPlaying = false;
+            widget._stopPlayback();
         });
         widget._createToolbarButtons(widget.widgetWindow);
 
         widget.playButton.onclick();
 
-        expect(widget.playButton.querySelector("img").src).not.toContain("stop-button.svg");
-        expect(widget.playButton.getAttribute("aria-label")).not.toBe("Stop");
+        expect(widget.isPlaying).toBe(false);
+        expect(widget.playButton.querySelector("img").src).toContain("play-button.svg");
+        expect(widget.playButton.getAttribute("aria-label")).toBe("Play");
     });
 
     describe("createMainContainer", () => {
