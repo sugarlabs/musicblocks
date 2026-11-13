@@ -813,9 +813,24 @@ class ModeWidget {
 
         // Save button
         const saveBtn = iconButton("save-button.svg", _("Save"), () => {
+            // Rotation and inversion rewrite the selection step by step on
+            // a timer; a save taken mid-animation would persist a
+            // half-updated pattern, so ignore it like the other operations
+            // that check the lock.
+            if (this._locked) {
+                this.errorMsg(_("Please wait for the current operation to finish before saving."));
+                return;
+            }
             const name = nameInput.value.trim();
             if (!name) {
                 this.errorMsg(_("Please enter a mode name."));
+                return;
+            }
+            // Check the selection before anything is written to storage:
+            // _saveCustomMode would otherwise overwrite a saved mode with
+            // the empty pattern before _save() gets to refuse the export.
+            if (!this._selectedNotes.some(note => note)) {
+                this.errorMsg(_("Please select at least one note before saving."));
                 return;
             }
             const pattern = this._calculateMode();
@@ -825,7 +840,9 @@ class ModeWidget {
             this._selectedModeName = name;
             // Export the mode to the workspace blocks so the user can use it.
             this._setModeName();
-            this._save();
+            if (!this._save()) {
+                return;
+            }
             this.textMsg(_("Mode saved: ") + name, 3000);
         });
 
@@ -1736,6 +1753,16 @@ class ModeWidget {
     }
 
     _save() {
+        // With no notes selected the loop below creates no pitch blocks, but
+        // the action stack it builds pre-declares a connection to block
+        // index 2, so loadNewBlocks throws. Refuse early — as
+        // PitchDrumMatrixSave does for an empty pair list — instead of
+        // showing a false success toast.
+        if (!this._selectedNotes.some(note => note)) {
+            this.errorMsg(_("Please select at least one note before saving."));
+            return false;
+        }
+
         const n = this._activeEDO;
         const label = this._modeLabelCell.textContent;
         const modeName = label && label !== "\u00a0" ? label : _("custom");
@@ -1813,6 +1840,7 @@ class ModeWidget {
         this._setTimeout(() => {
             this.blocks.loadNewBlocks(newStack);
         }, 2000);
+        return true;
     }
 
     /** Title font size for a wheel of `count` slices, clamped to the widget's limits. */

@@ -1719,4 +1719,79 @@ describe("ModeWidget", () => {
             expect(modeWidget._modeWheel.navAngle).toBe(-90);
         });
     });
+
+    describe("_save", () => {
+        // loadNewBlocks stub that validates connection indices exactly like
+        // the real loader in js/blocks.js (_loadNewBlocksNow): a connection
+        // naming a block that does not exist in the stack throws the same
+        // TypeError the browser reports for issue #10198.
+        const validatingLoadNewBlocks = jest.fn(stack => {
+            for (const entry of stack) {
+                const connections = entry[4] || [];
+                for (const connId of connections) {
+                    if (connId !== null && stack[connId] === undefined) {
+                        throw new TypeError("Cannot read properties of undefined (reading '1')");
+                    }
+                }
+            }
+        });
+
+        beforeEach(() => {
+            modeWidget._modeLabelCell = { textContent: "testmode" };
+            modeWidget.blocks = { loadNewBlocks: validatingLoadNewBlocks, blockList: [] };
+            validatingLoadNewBlocks.mockClear();
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+
+        test("refuses to save when no notes are selected", () => {
+            modeWidget._selectedNotes = Array(12).fill(false);
+
+            expect(modeWidget._save()).toBe(false);
+            expect(validatingLoadNewBlocks).not.toHaveBeenCalled();
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                expect.stringContaining("Please select at least one note before saving.")
+            );
+            expect(mockActivity.textMsg).not.toHaveBeenCalledWith(
+                "New action block generated.",
+                3000
+            );
+        });
+
+        test("saves a selected mode with well-formed stacks", () => {
+            jest.useFakeTimers();
+            modeWidget._selectedNotes = [
+                true,
+                false,
+                true,
+                false,
+                true,
+                true,
+                false,
+                true,
+                false,
+                true,
+                false,
+                true
+            ];
+
+            expect(modeWidget._save()).toBe(true);
+            // The action stack loads at once; the definemode stack follows
+            // after the 2s delay.
+            expect(validatingLoadNewBlocks).toHaveBeenCalledTimes(1);
+            expect(validatingLoadNewBlocks.mock.calls[0][0][0][1]).toEqual([
+                "action",
+                { collapsed: true }
+            ]);
+            jest.advanceTimersByTime(2000);
+            expect(validatingLoadNewBlocks).toHaveBeenCalledTimes(2);
+            expect(validatingLoadNewBlocks.mock.calls[1][0][0][1]).toEqual([
+                "definemode",
+                { collapsed: true }
+            ]);
+            expect(mockActivity.textMsg).toHaveBeenCalledWith("New action block generated.", 3000);
+        });
+    });
 });
