@@ -487,10 +487,42 @@ describe("setupPitchBlocks", () => {
         });
         it("SetTranspositionBlock", () => {
             const block = createdBlocks["settransposition"];
-            block.flow([12], logo, 0, 10);
-
             expect(block).toBeDefined();
-            block.flow([null], logo, 0, 10);
+
+            // When child flow is missing, returns undefined early
+            expect(block.flow([12], logo, 0, 10)).toBeUndefined();
+
+            // When valid number is provided
+            activity.errorMsg.mockClear();
+            Singer.PitchActions.setSemitoneTranspose.mockClear();
+            const resValid = block.flow([12, 20], logo, 0, 10);
+            expect(resValid).toEqual([20, 1]);
+            expect(Singer.PitchActions.setSemitoneTranspose).toHaveBeenCalledWith(12, 0, 10);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+
+            // When input is null (missing argument)
+            activity.errorMsg.mockClear();
+            Singer.PitchActions.setSemitoneTranspose.mockClear();
+            const resNull = block.flow([null, 20], logo, 0, 10);
+            expect(resNull).toEqual([20, 1]);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+            expect(Singer.PitchActions.setSemitoneTranspose).toHaveBeenCalledWith(0, 0, 10);
+
+            // When input is non-numeric
+            activity.errorMsg.mockClear();
+            Singer.PitchActions.setSemitoneTranspose.mockClear();
+            const resString = block.flow(["invalid", 20], logo, 0, 10);
+            expect(resString).toEqual([20, 1]);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+            expect(Singer.PitchActions.setSemitoneTranspose).toHaveBeenCalledWith(0, 0, 10);
+
+            // When input is NaN
+            activity.errorMsg.mockClear();
+            Singer.PitchActions.setSemitoneTranspose.mockClear();
+            const resNaN = block.flow([NaN, 20], logo, 0, 10);
+            expect(resNaN).toEqual([20, 1]);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+            expect(Singer.PitchActions.setSemitoneTranspose).toHaveBeenCalledWith(0, 0, 10);
         });
         it("SetScalarTranspositionBlock", () => {
             const block = createdBlocks["setscalartransposition"];
