@@ -177,7 +177,9 @@ describe("LegoBricksLayout", () => {
     });
 
     test("the play button switches between scanning and stopping", () => {
-        widget._playPhrase = jest.fn();
+        widget._playPhrase = jest.fn(() => {
+            widget.isPlaying = true;
+        });
         widget._stopPlayback = jest.fn();
         widget._createToolbarButtons(widget.widgetWindow);
 
@@ -189,6 +191,20 @@ describe("LegoBricksLayout", () => {
         widget.isPlaying = true;
         widget.playButton.onclick();
         expect(widget._stopPlayback).toHaveBeenCalled();
+    });
+
+    test("does not leave the button labeled Stop when playback ends before _playPhrase returns", () => {
+        // Simulates a matrix with no note rows: _playPhrase starts, then synchronously
+        // finishes and calls _stopPlayback before the onclick handler continues.
+        widget._playPhrase = jest.fn(() => {
+            widget.isPlaying = false;
+        });
+        widget._createToolbarButtons(widget.widgetWindow);
+
+        widget.playButton.onclick();
+
+        expect(widget.playButton.querySelector("img").src).not.toContain("stop-button.svg");
+        expect(widget.playButton.getAttribute("aria-label")).not.toBe("Stop");
     });
 
     describe("createMainContainer", () => {
