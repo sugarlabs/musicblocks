@@ -4991,6 +4991,17 @@ describe("Kokoro singing preflight", () => {
         };
         return { logo, complete };
     }
+    test("announces syllable preparation and ignores stale progress after Stop", () => {
+        const { logo } = preflight();
+        Logo.prototype.runLogoCommands.call(logo, 7);
+        const progress = logo.synth.prepareSinging.mock.calls[0][1];
+        progress({ status: "singing", index: 1, total: 2 });
+        expect(logo.deps.textMsg).toHaveBeenLastCalledWith("Preparing voice: 1 of 2");
+        const count = logo.deps.textMsg.mock.calls.length;
+        logo.runGeneration++;
+        progress({ status: "singing", index: 2, total: 2 });
+        expect(logo.deps.textMsg).toHaveBeenCalledTimes(count);
+    });
     test("waits for model preparation before restarting the requested program", async () => {
         const { logo, complete } = preflight();
         Logo.prototype.runLogoCommands.call(logo, 7, "env");

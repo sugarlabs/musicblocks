@@ -18,12 +18,23 @@ This is experimental pitch-shifted speech, not a trained singing model.
 Pitch changes also change the voice's formants. Whole phrases are not aligned
 to individual notes. Notes support 20–4000 Hz and durations up to 30 seconds;
 a project can prepare up to 32 distinct syllables, each at most 40 characters.
+Prepared syllables are cached locally across page reloads, keyed by model,
+precision, voice and text. A cache hit skips model loading and inference.
+Storage failures fall back to ordinary synthesis. The disk cache retains at
+most 32 entries, each no larger than 4 MiB. Rendered pitch/duration buffers
+are reused across Stop and replay, with an 8 MiB / 64-note memory limit.
+Changing a pitch or duration renders that variant once.
+
+The first uncached syllable still needs the model download and inference;
+playback waits for preparation rather than letting the music run ahead.
+Progress distinguishes model download from syllable preparation.
+
 Model loading failures are shown rather than silently replacing the singing
 voice with an oscillator. Preparation is skipped for notation and MIDI export.
 
 The browser regression tests in `cypress/e2e/singing.cy.js` cover playback,
-cached replay, save serialization, Stop during preparation, and recovery from
-a synthesis failure. They stub the Kokoro model boundary so CI does not
+cached replay, reload without model inference, save serialization, Stop during
+preparation, and recovery from a synthesis failure. They stub the Kokoro model boundary so CI does not
 download weights; scheduling, audio processing, and the sampler remain real.
 
 ## Speak block

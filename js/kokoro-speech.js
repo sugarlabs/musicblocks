@@ -381,9 +381,75 @@ class KokoroSpeech {
 
     /** Render a syllable once; the singing instrument reuses its samples across notes. */
     async renderSyllable(text) {
+        const cached = await this._readSyllableCache(text);
+        if (cached) return cached;
         const engine = await this._ensureEngine();
         const audio = await engine.generate(text, { voice: this._voice });
-        return KokoroSpeech.analyzeSyllable(audio);
+        const source = KokoroSpeech.analyzeSyllable(audio);
+        await this._writeSyllableCache(text, source);
+        return source;
+    }
+
+    _syllableCacheKey(text) {
+        const identity = [KokoroSpeech.MODEL_ID, KokoroSpeech.DTYPE, this._voice, text];
+        return new URL(
+            "/_kokoro-singing/" + encodeURIComponent(JSON.stringify(identity)),
+            window.location.href
+        ).href;
+    }
+
+    async _readSyllableCache(text) {
+        try {
+            const cache = await globalThis.caches.open("musicblocks-kokoro-syllables-v1");
+            const response = await cache.match(this._syllableCacheKey(text));
+            if (!response) return null;
+            const bytes = await response.arrayBuffer();
+            if (
+                bytes.byteLength === 0 ||
+                bytes.byteLength > 4 * 1024 * 1024 ||
+                bytes.byteLength % 4
+            )
+                return null;
+            const rate = Number(response.headers.get("X-Sample-Rate"));
+            const period = Number(response.headers.get("X-Pitch-Period"));
+            const samples = new Float32Array(bytes);
+            if (
+                rate !== 24000 ||
+                !Number.isInteger(period) ||
+                period < rate / 500 ||
+                period > rate / 70 ||
+                samples.length < 2 * period ||
+                !samples.every(Number.isFinite)
+            )
+                return null;
+            return { samples, rate, period };
+        } catch {
+            // Storage may be unavailable or full; ordinary synthesis still works.
+            return null;
+        }
+    }
+
+    async _writeSyllableCache(text, source) {
+        try {
+            if (source.samples.byteLength > 4 * 1024 * 1024) return;
+            const cache = await globalThis.caches.open("musicblocks-kokoro-syllables-v1");
+            await cache.put(
+                this._syllableCacheKey(text),
+                new Response(source.samples, {
+                    headers: {
+                        "Content-Type": "application/octet-stream",
+                        "X-Sample-Rate": String(source.rate),
+                        "X-Pitch-Period": String(source.period)
+                    }
+                })
+            );
+            const keys = await cache.keys();
+            await Promise.all(
+                keys.slice(0, Math.max(0, keys.length - 32)).map(key => cache.delete(key))
+            );
+        } catch {
+            // This cache is an optimization, not a prerequisite for playback.
+        }
     }
 
     /** Trim silence and estimate a stable voiced period with normalized autocorrelation. */
@@ -464,17 +530,23 @@ class KokoroSpeech {
         const output = new Float32Array(Math.max(1, Math.round(rate * duration)));
         const weights = new Float32Array(output.length);
         const hop = rate / frequency;
+        const halfGrain = Math.ceil(hop);
+        const grainWindow = Float64Array.from(
+            { length: halfGrain * 2 },
+            (_, i) => 0.5 + 0.5 * Math.cos((Math.PI * (i - halfGrain)) / hop)
+        );
         // shortcut: grains shift formants along with pitch; use phoneme alignment
         // and formant-preserving processing before supporting whole lyric phrases.
         for (let target = 0; target < output.length + hop; target += hop) {
             const position = (target / output.length) * Math.max(0, samples.length - 2 * period);
             const mark = Math.round(position / period) * period + period;
-            for (let delta = -Math.ceil(hop); delta < hop; delta++) {
-                const index = Math.round(target) + delta;
+            const center = Math.round(target);
+            for (let delta = -halfGrain; delta < hop; delta++) {
+                const index = center + delta;
                 const from = mark + (delta * period) / hop;
                 if (index < 0 || index >= output.length || from < 0 || from >= samples.length - 1)
                     continue;
-                const weight = 0.5 + 0.5 * Math.cos((Math.PI * delta) / hop);
+                const weight = grainWindow[delta + halfGrain];
                 const base = Math.floor(from);
                 const sample = samples[base] + (samples[base + 1] - samples[base]) * (from - base);
                 output[index] += sample * weight;

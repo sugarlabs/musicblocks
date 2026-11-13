@@ -1856,7 +1856,16 @@ class Logo {
                 this.onRunTurtle();
                 if (!this._singingPreparation) {
                     this._singingPreparation = this.synth
-                        .prepareSinging(texts, progress => this._showKokoroProgress(progress))
+                        .prepareSinging(texts, progress => {
+                            if (this.runGeneration !== generation) return;
+                            if (progress.status === "singing") {
+                                this.deps.textMsg(
+                                    _("Preparing voice: %s of %s")
+                                        .replace("%s", progress.index)
+                                        .replace("%s", progress.total)
+                                );
+                            } else this._showKokoroProgress(progress);
+                        })
                         .finally(() => {
                             this._singingPreparation = null;
                         });

@@ -455,3 +455,87 @@ describe("Kokoro singing resynthesis", () => {
         ).toThrow();
     });
 });
+
+describe("Persistent singing syllable cache", () => {
+    let originalCaches;
+    let originalResponse;
+    let cache;
+    let records;
+    beforeEach(() => {
+        originalCaches = global.caches;
+        originalResponse = global.Response;
+        records = new Map();
+        cache = {
+            match: jest.fn(async key => records.get(key)),
+            put: jest.fn(async (key, value) => records.set(key, value)),
+            keys: jest.fn(async () => [...records.keys()]),
+            delete: jest.fn(async key => records.delete(key))
+        };
+        global.caches = { open: jest.fn(async () => cache) };
+        global.Response = class {
+            constructor(data, options) {
+                this.data = data.slice();
+                this.headers = { get: key => options.headers[key] };
+            }
+            async arrayBuffer() {
+                return this.data.buffer.slice(0);
+            }
+        };
+    });
+    afterEach(() => {
+        global.caches = originalCaches;
+        global.Response = originalResponse;
+    });
+    test("a new engine instance uses saved syllables without loading the model", async () => {
+        const rate = 24000;
+        const first = new KokoroSpeech();
+        jest.spyOn(first, "_ensureEngine").mockResolvedValue({
+            generate: async () => ({
+                audio: Float32Array.from(
+                    { length: 12000 },
+                    (_, i) => 0.5 * Math.sin((2 * Math.PI * 220 * i) / rate)
+                ),
+                sampling_rate: rate
+            })
+        });
+        const source = await first.renderSyllable("la");
+        const reloaded = new KokoroSpeech();
+        const load = jest.spyOn(reloaded, "_ensureEngine");
+        expect(await reloaded.renderSyllable("la")).toEqual(source);
+        expect(load).not.toHaveBeenCalled();
+        expect(reloaded._syllableCacheKey("la")).not.toBe(
+            new KokoroSpeech({ voice: "am_adam" })._syllableCacheKey("la")
+        );
+    });
+    test("corrupt cache entries are ignored and storage failure is non-fatal", async () => {
+        const speech = new KokoroSpeech();
+        records.set(
+            speech._syllableCacheKey("la"),
+            new Response(new Float32Array([NaN]), {
+                headers: { "X-Sample-Rate": "24000", "X-Pitch-Period": "0" }
+            })
+        );
+        expect(await speech._readSyllableCache("la")).toBeNull();
+        global.caches.open.mockRejectedValue(new Error("quota"));
+        expect(await speech._readSyllableCache("la")).toBeNull();
+        await expect(
+            speech._writeSyllableCache("la", {
+                samples: new Float32Array(1),
+                rate: 24000,
+                period: 109
+            })
+        ).resolves.toBeUndefined();
+    });
+    test("keeps no more than 32 syllables on disk", async () => {
+        const speech = new KokoroSpeech();
+        for (let i = 0; i < 35; i++) {
+            await speech._writeSyllableCache(String(i), {
+                samples: new Float32Array(1000),
+                rate: 24000,
+                period: 109
+            });
+        }
+        expect(records.size).toBe(32);
+        expect(records.has(speech._syllableCacheKey("0"))).toBe(false);
+    });
+});

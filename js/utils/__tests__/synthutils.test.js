@@ -3788,6 +3788,30 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             }
         });
 
+        test("reuses rendered notes and bounds their retained audio memory", () => {
+            const source = { samples: new Float32Array(1000), rate: 24000, period: 109 };
+            synth.singingSamples.set("la", source);
+            global.KokoroSpeech = { tuneSyllable: jest.fn(() => new Float32Array(400000)) };
+            const originalContext = Tone.getContext.getMockImplementation();
+            Tone.getContext.mockReturnValue({
+                createBuffer: jest.fn((channels, length) => ({
+                    getChannelData: () => new Float32Array(length)
+                }))
+            });
+            try {
+                const first = synth._getSingingBuffer("la", 220, 0.5);
+                expect(synth._getSingingBuffer("la", 220, 0.5)).toBe(first);
+                expect(KokoroSpeech.tuneSyllable).toHaveBeenCalledTimes(1);
+                for (let i = 0; i < 10; i++) synth._getSingingBuffer("la", 300 + i, 0.5);
+                expect(synth._singingBufferBytes).toBeLessThanOrEqual(8 * 1024 * 1024);
+                synth.singingSamples.set("la", { ...source });
+                expect(synth._getSingingBuffer("la", 220, 0.5)).not.toBe(first);
+            } finally {
+                delete global.KokoroSpeech;
+                Tone.getContext.mockImplementation(originalContext);
+            }
+        });
+
         test("_createCustomSynth handles amsynth, fmsynth, duosynth, and default", () => {
             ["amsynth", "fmsynth", "duosynth", "other"].forEach(type => {
                 const s = synth._createCustomSynth(type, {});

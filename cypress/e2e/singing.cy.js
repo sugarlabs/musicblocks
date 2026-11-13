@@ -15,6 +15,7 @@ describe("Kokoro Sing block", () => {
         played = [];
         cy.visit("http://127.0.0.1:3000");
         cy.waitForAppReady();
+        cy.window().then(win => win.caches.delete("musicblocks-kokoro-syllables-v1"));
         cy.window().then(win => {
             win.widgetWindows.hideAllWindows();
             // Exercise our real scheduler, sampler and DSP without a model download in CI.
@@ -27,6 +28,7 @@ describe("Kokoro Sing block", () => {
             cy.stub(win.KokoroSpeech.prototype, "_ensureEngine").resolves({ generate });
             const synth = win.ActivityContext.getActivity().logo.synth;
             const trigger = synth.trigger;
+            cy.spy(win.KokoroSpeech, "tuneSyllable").as("tuneSyllable");
             synth.trigger = (turtle, notes, duration, instrument, ...rest) => {
                 if (instrument.startsWith("sing:")) played.push([].concat(notes).join("+"));
                 return trigger(turtle, notes, duration, instrument, ...rest);
@@ -67,6 +69,28 @@ describe("Kokoro Sing block", () => {
                 exported.some(row => (Array.isArray(row[1]) ? row[1][0] : row[1]) === "sing")
             ).to.equal(true);
         });
+        cy.get("@tuneSyllable").should("have.callCount", 4);
+        cy.get("#errorText").should("not.be.visible");
+    });
+
+    it("reloads prepared syllables without loading the model", () => {
+        cy.get("#play").click();
+        cy.wrap(null, { timeout: 20000 }).should(() => expect(played).to.have.length(4));
+        cy.reload();
+        cy.waitForAppReady();
+        cy.window().then(win => {
+            win.widgetWindows.hideAllWindows();
+            cy.stub(win.KokoroSpeech.prototype, "_ensureEngine")
+                .rejects(new Error("Should not load the model"))
+                .as("modelLoad");
+        });
+        cy.get("#play").click();
+        cy.window().should(win =>
+            expect(win.ActivityContext.getActivity().logo.synth.singingSamples.has("la")).to.equal(
+                true
+            )
+        );
+        cy.get("@modelLoad").should("not.have.been.called");
         cy.get("#errorText").should("not.be.visible");
     });
 
