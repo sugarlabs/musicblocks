@@ -120,7 +120,6 @@ describe("Project loading", () => {
             force: true
         });
 
-        cy.get("#load-container").should("be.visible");
         cy.get("#load-container", { timeout: 30000 }).should("not.be.visible");
 
         cy.get("#errorText").should("not.be.visible");

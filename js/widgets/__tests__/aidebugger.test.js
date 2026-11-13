@@ -2867,8 +2867,8 @@ describe("AIDebuggerWidget", () => {
 
             test("reads a project containing the word 'html' in block data", () => {
                 const projectWithHtml = JSON.stringify([
-                    [0, "start", 0, 0, [null, null, null]],
-                    [1, "text", 0, 0, ["learning html"]]
+                    [0, "start", 0, 0, [null, 1]],
+                    [1, ["text", { value: "learning html" }], 0, 0, [0]]
                 ]);
                 widget._addBorrowFile("lesson.json", projectWithHtml);
                 expect(widget._borrowedProject()).toEqual({

@@ -2683,10 +2683,14 @@ describe("_setupFileHandlers inner callbacks", () => {
     });
 
     it("change handler loads a JSON project containing the word 'html' without false-positive error", async () => {
+        const expectedProject = [
+            [0, "start", 0, 0, [null, 1]],
+            [1, ["text", { value: "learning html" }], 0, 0, [0]]
+        ];
         origFileReader = global.FileReader;
         class MockFR {
             constructor() {
-                this.result = '[[0,"start",0,0,[]],[1,"text",0,0,["learning html"]]]';
+                this.result = JSON.stringify(expectedProject);
                 this.onload = null;
             }
             readAsText() {
@@ -2722,6 +2726,7 @@ describe("_setupFileHandlers inner callbacks", () => {
 
         expect(activity.errorMsg).not.toHaveBeenCalled();
         expect(blocks.loadNewBlocks).toHaveBeenCalledTimes(1);
+        expect(blocks.loadNewBlocks).toHaveBeenCalledWith(expectedProject);
     });
 
     it("change handler preserves the old project and saves the import after loading", async () => {
@@ -3582,10 +3587,14 @@ describe("_setupFileHandlers inner callbacks", () => {
     });
 
     it("drop handler loads a JSON project containing the word 'html' without false-positive error", async () => {
+        const expectedProject = [
+            [0, "start", 0, 0, [null, 1]],
+            [1, ["text", { value: "learning html" }], 0, 0, [0]]
+        ];
         origFileReader = global.FileReader;
         class MockFR {
             constructor() {
-                this.result = '[[0,"start",0,0,[]],[1,"text",0,0,["learning html"]]]';
+                this.result = JSON.stringify(expectedProject);
                 this.onload = null;
             }
             readAsText() {
@@ -3625,6 +3634,7 @@ describe("_setupFileHandlers inner callbacks", () => {
 
         expect(activity.errorMsg).not.toHaveBeenCalled();
         expect(blocks.loadNewBlocks).toHaveBeenCalledTimes(1);
+        expect(blocks.loadNewBlocks).toHaveBeenCalledWith(expectedProject);
     });
 
     it("drop handler clears without saving an empty project and saves after loading", async () => {
