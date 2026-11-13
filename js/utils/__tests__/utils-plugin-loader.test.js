@@ -509,6 +509,73 @@ describe("processPluginData - plugin vetting", () => {
         expect(Object.keys(window.__mb_plugin_registry)).toHaveLength(0);
     });
 
+    it("compiles vetted setter and parameter plugins with their callback signatures", async () => {
+        mockScriptLoading();
+
+        const activity = createActivity();
+        await processPluginData(
+            activity,
+            JSON.stringify({
+                SETTERPLUGINS: {
+                    mySetter: "logo.seen = [blk, value, turtle]; return value + 1;"
+                },
+                PARAMETERPLUGINS: {
+                    myParam: "logo.seen = [turtle, blk]; return turtle + blk;"
+                }
+            }),
+            "plugins/test.json"
+        );
+
+        const logo = {};
+        const setter = activity.logo.evalSetterDict["mySetter"];
+        const param = activity.logo.evalParameterDict["myParam"];
+        expect(typeof setter).toBe("function");
+        expect(typeof param).toBe("function");
+
+        // Setter callbacks are invoked as (logo, blk, value, turtle).
+        expect(setter(logo, "BLK", 10, "TURTLE")).toBe(11);
+        expect(logo.seen).toEqual(["BLK", 10, "TURTLE"]);
+
+        // Parameter callbacks are invoked as (logo, turtle, blk).
+        expect(param(logo, 2, 3)).toBe(5);
+        expect(logo.seen).toEqual([2, 3]);
+    });
+
+    it("declining an unvetted plugin executes no code and registers no eval entries", async () => {
+        global.confirm.mockReturnValue(false);
+        const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+        const createUrlSpy = jest.fn();
+        URL.createObjectURL = createUrlSpy;
+
+        const activity = createActivity();
+        const result = await processPluginData(
+            activity,
+            JSON.stringify({
+                GLOBALS: "globalThis.declinedGlobalsRan = true;",
+                BLOCKPLUGINS: { declinedBlock: "globalThis.declinedBlockRan = true;" },
+                FLOWPLUGINS: { declinedFlow: "return 1;" },
+                SETTERPLUGINS: { declinedSetter: "return value;" },
+                PARAMETERPLUGINS: { declinedParam: "return blk;" }
+            }),
+            "https://example.com/plugin.json"
+        );
+
+        expect(global.confirm).toHaveBeenCalledTimes(1);
+        expect(result).toBeNull();
+        expect(createUrlSpy).not.toHaveBeenCalled();
+        expect(globalThis.declinedGlobalsRan).toBeUndefined();
+        expect(globalThis.declinedBlockRan).toBeUndefined();
+        expect(activity.logo.evalFlowDict["declinedFlow"]).toBeUndefined();
+        expect(activity.logo.evalSetterDict["declinedSetter"]).toBeUndefined();
+        expect(activity.logo.evalParameterDict["declinedParam"]).toBeUndefined();
+        expect(warnSpy).toHaveBeenCalledWith(
+            "User declined unvetted plugin execution:",
+            "https://example.com/plugin.json"
+        );
+
+        warnSpy.mockRestore();
+    });
+
     it("runs ONSTART/ONSTOP registry functions with the logo object", async () => {
         mockScriptLoading();
 
@@ -763,6 +830,23 @@ describe("processPluginData - macros, images and setup code", () => {
         expect(createUrlSpy).not.toHaveBeenCalled();
 
         warnSpy.mockRestore();
+    });
+
+    it("executes setup code at the 500000-character limit", async () => {
+        mockScriptLoading();
+
+        const base = "globalThis.limitProbe = 1;";
+        const padded = base + " ".repeat(500000 - base.length);
+
+        const activity = createActivity();
+        await processPluginData(
+            activity,
+            JSON.stringify({ BLOCKPLUGINS: { limitBlock: padded } }),
+            "plugins/test.json"
+        );
+
+        expect(globalThis.limitProbe).toBe(1);
+        delete globalThis.limitProbe;
     });
 
     it("rewrites Function('return this')() so CSP does not block the setup code", async () => {
