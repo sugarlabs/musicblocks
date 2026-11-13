@@ -556,6 +556,7 @@ const SamplerUI = {
                         img.alt = _("Stop");
                     }
                     this._playbackBtn.setAttribute("aria-label", _("Stop"));
+                    this.playback = true;
                     this.activity.logo.synth.playRecording(() => {
                         this.playback = false;
                         if (img) {
@@ -565,7 +566,6 @@ const SamplerUI = {
                         }
                         this._playbackBtn.setAttribute("aria-label", _("Playback"));
                     });
-                    this.playback = true;
                 } else {
                     this.activity.logo.synth.stopPlayBackRecording();
                     this.playback = false;
