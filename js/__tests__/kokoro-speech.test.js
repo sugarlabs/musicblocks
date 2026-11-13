@@ -404,3 +404,54 @@ describe("KokoroSpeech", () => {
         expect(onProgress).toHaveBeenCalledWith({ progress: 42, status: "progress" });
     });
 });
+
+describe("Kokoro singing resynthesis", () => {
+    const rate = 24000;
+    const tone = frequency => ({
+        audio: Float32Array.from(
+            { length: rate / 2 },
+            (_, i) => 0.5 * Math.sin((2 * Math.PI * frequency * i) / rate)
+        ),
+        sampling_rate: rate
+    });
+
+    test("renders with the real speech engine interface", async () => {
+        const speech = new KokoroSpeech();
+        const generate = jest.fn().mockResolvedValue(tone(220));
+        jest.spyOn(speech, "_ensureEngine").mockResolvedValue({ generate });
+        const source = await speech.renderSyllable("la");
+        expect(generate).toHaveBeenCalledWith("la", { voice: "af_heart" });
+        expect(source.rate / source.period).toBeCloseTo(220, 0);
+    });
+
+    test.each([110, 220, 440])("sings a %i Hz note for the requested duration", frequency => {
+        const source = KokoroSpeech.analyzeSyllable(tone(220));
+        const output = KokoroSpeech.tuneSyllable(source, frequency, 0.8);
+        expect(output).toHaveLength(rate * 0.8);
+        expect(output.every(Number.isFinite)).toBe(true);
+        expect(output[0]).toBe(0);
+        expect(Math.abs(output[output.length - 1])).toBe(0);
+        const analyzed = KokoroSpeech.analyzeSyllable({ audio: output, sampling_rate: rate });
+        expect(Math.abs(rate / analyzed.period - frequency) / frequency).toBeLessThan(0.03);
+    });
+
+    test("rejects silence and non-finite audio", () => {
+        expect(() =>
+            KokoroSpeech.analyzeSyllable({ audio: new Float32Array(rate), sampling_rate: rate })
+        ).toThrow("silent");
+        const bad = tone(220);
+        bad.audio[20] = NaN;
+        expect(() => KokoroSpeech.analyzeSyllable(bad)).toThrow("Invalid singing");
+    });
+
+    test.each([
+        [NaN, 1],
+        [440, Infinity],
+        [440, -1],
+        [440, 31]
+    ])("rejects unsupported pitch or duration (%s, %s)", (frequency, duration) => {
+        expect(() =>
+            KokoroSpeech.tuneSyllable(KokoroSpeech.analyzeSyllable(tone(220)), frequency, duration)
+        ).toThrow();
+    });
+});

@@ -1,5 +1,33 @@
 # Using the Kokoro voice in Music Blocks
 
+## Experimental Sing block
+
+The **Sing** clamp in the **Tone** palette turns one Kokoro syllable into a
+pitched singing voice. Place ordinary **Note value** and **Pitch** blocks inside
+it. The text input must be a literal text block, for example `la`, `ah`, or `oh`.
+Use separate Sing clamps for different syllables. A newly dragged Sing block
+already contains a playable quarter note. Singing also works inside called
+actions, including recursive actions.
+
+Load `examples/kokoro-singing.tb` for a four-note `la` melody. Press **Run** and
+wait for the model and syllable to prepare before playback starts. **Stop**
+also cancels playback that is waiting for preparation. Unlike Speak, Sing
+explicitly requests Kokoro and does not require `?kokoro=true`.
+
+This is experimental pitch-shifted speech, not a trained singing model.
+Pitch changes also change the voice's formants. Whole phrases are not aligned
+to individual notes. Notes support 20–4000 Hz and durations up to 30 seconds;
+a project can prepare up to 32 distinct syllables, each at most 40 characters.
+Model loading failures are shown rather than silently replacing the singing
+voice with an oscillator. Preparation is skipped for notation and MIDI export.
+
+The browser regression tests in `cypress/e2e/singing.cy.js` cover playback,
+cached replay, save serialization, Stop during preparation, and recovery from
+a synthesis failure. They stub the Kokoro model boundary so CI does not
+download weights; scheduling, audio processing, and the sampler remain real.
+
+## Speak block
+
 The Speak block can use Kokoro, a more natural sounding AI voice that runs in
 your browser. The normal browser speech voice is still the default, so Kokoro
 is completely optional.

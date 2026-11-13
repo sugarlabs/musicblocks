@@ -1763,6 +1763,53 @@ class Logo {
         }
     }
 
+    /** Find literal syllables in reachable stacks, including called actions. */
+    _getSingingTexts(startHere) {
+        const blocks = this.blocks.blockList;
+        const actions = new Map();
+        for (const block of blocks) {
+            if (block?.name === "action" && !block.trash) {
+                const name = blocks[block.connections[1]]?.value;
+                actions.set(name, block.connections[2]);
+            }
+        }
+        const pending =
+            startHere !== null && startHere !== undefined
+                ? [startHere]
+                : Object.keys(blocks).filter(id =>
+                      ["start", "drum", "status", "oscilloscope"].includes(blocks[id]?.name)
+                  );
+        const visited = new Set();
+        const texts = new Set();
+        while (pending.length) {
+            const id = pending.pop();
+            if (visited.has(String(id))) continue;
+            visited.add(String(id));
+            const block = blocks[id];
+            if (!block || block.trash) continue;
+            if (["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].includes(block.name)) {
+                pending.push(actions.get(block.privateData));
+            } else if (["do", "doArg", "calc", "calcArg", "listen"].includes(block.name)) {
+                const name = blocks[block.connections[block.name === "listen" ? 2 : 1]];
+                // A computed action name can call any action at runtime.
+                if (name?.name === "text") pending.push(actions.get(name.value));
+                else pending.push(...actions.values());
+            }
+            if (block.name === "sing") {
+                const input = blocks[block.connections[1]];
+                const text = typeof input?.value === "string" ? input.value.trim() : "";
+                if (input?.name !== "text" || !text || text.length > 40) {
+                    throw new Error(_("Sing needs a text block containing one short syllable."));
+                }
+                texts.add(text);
+                if (texts.size > 32)
+                    throw new Error(_("Use at most 32 different singing syllables."));
+            }
+            pending.push(...(block.connections || []).slice(1).filter(id => id !== null));
+        }
+        return [...texts];
+    }
+
     /**
      * Initialises interpreter state and launches all turtle execution queues.
      *
@@ -1786,6 +1833,46 @@ class Logo {
      * @returns {void}
      */
     runLogoCommands(startHere, env) {
+        if (
+            this.synth.singingSamples &&
+            !this.runningLilypond &&
+            !this.runningAbc &&
+            !this.runningMIDI
+        ) {
+            let texts;
+            try {
+                texts = this._getSingingTexts(startHere);
+            } catch (error) {
+                this.deps.errorHandler(error.message);
+                return;
+            }
+            if (texts.some(text => !this.synth.singingSamples.has(text))) {
+                if (this._alreadyRunning) this.doStopTurtles();
+                const generation = ++this.runGeneration;
+                this._cancelSpeech();
+                this.deps.textMsg(
+                    _("Preparing Kokoro singing voice. First use downloads the model.")
+                );
+                this.onRunTurtle();
+                if (!this._singingPreparation) {
+                    this._singingPreparation = this.synth
+                        .prepareSinging(texts, progress => this._showKokoroProgress(progress))
+                        .finally(() => {
+                            this._singingPreparation = null;
+                        });
+                }
+                this._singingPreparation
+                    .then(() => {
+                        if (this.runGeneration === generation) this.runLogoCommands(startHere, env);
+                    })
+                    .catch(error => {
+                        if (this.runGeneration !== generation) return;
+                        this.deps.errorHandler(error.message);
+                        this.onStopTurtle();
+                    });
+                return;
+            }
+        }
         // Drop any speech the previous run left queued immediately, including
         // while the optional performance tracker is still loading.
         this._cancelSpeech();

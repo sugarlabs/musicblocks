@@ -20,6 +20,63 @@
 /* exported setupToneBlocks */
 
 function setupToneBlocks(activity) {
+    class SingBlock extends FlowClampBlock {
+        constructor() {
+            super("sing");
+            this.setPalette("tone", activity);
+            this.beginnerBlock(true);
+            this.setHelpString([
+                _(
+                    "The Sing block uses Kokoro to sing one syllable at the pitches and rhythms inside it. Use a text block, such as la or ah."
+                ),
+                "documentation",
+                ""
+            ]);
+            this.formBlock({
+                name: _("sing"),
+                args: 1,
+                argTypes: ["textin"],
+                defaults: ["la"]
+            });
+            this.makeMacro((x, y) => [
+                [0, "sing", x, y, [null, 1, 3, 2]],
+                [1, ["text", { value: "la" }], 0, 0, [0]],
+                [2, "hidden", 0, 0, [0, null]],
+                [3, "newnote", 0, 0, [0, 4, 7, 11]],
+                [4, "divide", 0, 0, [3, 5, 6]],
+                [5, ["number", { value: 1 }], 0, 0, [4]],
+                [6, ["number", { value: 4 }], 0, 0, [4]],
+                [7, "vspace", 0, 0, [3, 8]],
+                [8, "pitch", 0, 0, [7, 9, 10, null]],
+                [9, ["solfege", { value: "sol" }], 0, 0, [8]],
+                [10, ["number", { value: 4 }], 0, 0, [8]],
+                [11, "hidden", 0, 0, [3, null]]
+            ]);
+        }
+
+        flow(args, logo, turtle, blk) {
+            if (args[1] === undefined) return;
+            if (
+                activity.turtles.ithTurtle(turtle).singer.suppressOutput ||
+                logo.runningLilypond ||
+                logo.runningAbc ||
+                logo.runningMIDI
+            )
+                return [args[1], 1];
+            const text = typeof args[0] === "string" ? args[0].trim() : "";
+            if (!text || text.length > 40 || !logo.synth.singingSamples.has(text)) {
+                activity.errorMsg(
+                    _("Use a short text syllable in Sing, then press Play to prepare Kokoro."),
+                    blk
+                );
+                logo.stopTurtle = true;
+                return;
+            }
+            Singer.ToneActions.setTimbre("sing:" + text, turtle, blk);
+            return [args[1], 1];
+        }
+    }
+
     /**
      * Represents an Oscillator block.
      * Extends FlowBlock.
@@ -1194,6 +1251,7 @@ function setupToneBlocks(activity) {
         }
     }
 
+    new SingBlock().setup(activity);
     new OscillatorBlock().setup(activity);
     new FillerTypeBlock().setup(activity);
     new OscillatorTypeBlock().setup(activity);

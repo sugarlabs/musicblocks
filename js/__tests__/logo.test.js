@@ -4949,3 +4949,98 @@ describe("Logo.processSpeak", () => {
         });
     });
 });
+
+describe("Kokoro singing preflight", () => {
+    test("prepares singing inside called actions without following unused actions", () => {
+        const blocks = [
+            { name: "start", connections: [null, 1] },
+            { name: "nameddo", privateData: "verse", connections: [0, null] },
+            { name: "action", connections: [null, 3, 4, null] },
+            { name: "text", value: "verse", connections: [2] },
+            { name: "sing", connections: [2, 5, 6, null] },
+            { name: "text", value: "la", connections: [4] },
+            { name: "nameddo", privateData: "verse", connections: [4, null] },
+            { name: "action", connections: [null, 8, 9, null] },
+            { name: "text", value: "unused", connections: [7] },
+            { name: "sing", connections: [7, 10, null, null] },
+            { name: "text", value: "do not render", connections: [9] }
+        ];
+        expect(Logo.prototype._getSingingTexts.call({ blocks: { blockList: blocks } })).toEqual([
+            "la"
+        ]);
+        blocks[1] = { name: "do", connections: [0, 3, null] };
+        expect(Logo.prototype._getSingingTexts.call({ blocks: { blockList: blocks } })).toEqual([
+            "la"
+        ]);
+    });
+    function preflight() {
+        let complete;
+        const pending = new Promise(resolve => {
+            complete = resolve;
+        });
+        const logo = {
+            synth: { singingSamples: new Map(), prepareSinging: jest.fn(() => pending) },
+            _getSingingTexts: jest.fn(() => ["la"]),
+            _cancelSpeech: jest.fn(),
+            _showKokoroProgress: jest.fn(),
+            deps: { textMsg: jest.fn(), errorHandler: jest.fn() },
+            runGeneration: 0,
+            runLogoCommands: jest.fn(),
+            onRunTurtle: jest.fn(),
+            onStopTurtle: jest.fn()
+        };
+        return { logo, complete };
+    }
+    test("waits for model preparation before restarting the requested program", async () => {
+        const { logo, complete } = preflight();
+        Logo.prototype.runLogoCommands.call(logo, 7, "env");
+        expect(logo.runLogoCommands).not.toHaveBeenCalled();
+        complete();
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(logo.runLogoCommands).toHaveBeenCalledWith(7, "env");
+    });
+    test("Stop while loading prevents delayed playback", async () => {
+        const { logo, complete } = preflight();
+        Logo.prototype.runLogoCommands.call(logo, 7);
+        logo.runGeneration++;
+        complete();
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(logo.runLogoCommands).not.toHaveBeenCalled();
+    });
+    test("reports preparation errors and permits a new attempt", async () => {
+        const { logo } = preflight();
+        logo.synth.prepareSinging.mockRejectedValueOnce(new Error("offline"));
+        Logo.prototype.runLogoCommands.call(logo, 7);
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(logo.deps.errorHandler).toHaveBeenCalledWith("offline");
+        expect(logo.onStopTurtle).toHaveBeenCalled();
+        expect(logo._singingPreparation).toBeNull();
+        expect(logo.runLogoCommands).not.toHaveBeenCalled();
+    });
+    test("repeated Play prepares only once and starts only the latest request", async () => {
+        const { logo, complete } = preflight();
+        Logo.prototype.runLogoCommands.call(logo, 7);
+        Logo.prototype.runLogoCommands.call(logo, 8);
+        complete();
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(logo.synth.prepareSinging).toHaveBeenCalledTimes(1);
+        expect(logo.runLogoCommands).toHaveBeenCalledTimes(1);
+        expect(logo.runLogoCommands).toHaveBeenCalledWith(8, undefined);
+    });
+    test("only follows connected non-trash singing blocks", () => {
+        const logo = {
+            blocks: {
+                blockList: [
+                    { name: "start", connections: [null, 1] },
+                    { name: "sing", connections: [0, 2, null] },
+                    { name: "text", value: " la ", connections: [1] },
+                    { name: "sing", connections: [null, 4, null] },
+                    { name: "text", value: "unused", connections: [3] }
+                ]
+            }
+        };
+        expect(Logo.prototype._getSingingTexts.call(logo)).toEqual(["la"]);
+        logo.blocks.blockList[1].trash = true;
+        expect(Logo.prototype._getSingingTexts.call(logo)).toEqual([]);
+    });
+});

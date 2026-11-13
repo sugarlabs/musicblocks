@@ -379,6 +379,117 @@ class KokoroSpeech {
         }
     }
 
+    /** Render a syllable once; the singing instrument reuses its samples across notes. */
+    async renderSyllable(text) {
+        const engine = await this._ensureEngine();
+        const audio = await engine.generate(text, { voice: this._voice });
+        return KokoroSpeech.analyzeSyllable(audio);
+    }
+
+    /** Trim silence and estimate a stable voiced period with normalized autocorrelation. */
+    static analyzeSyllable(audio) {
+        const samples = audio?.audio;
+        const rate = audio?.sampling_rate;
+        if (
+            !samples ||
+            !Number.isFinite(rate) ||
+            rate < 8000 ||
+            rate > 48000 ||
+            samples.length < rate / 20
+        ) {
+            throw new Error("Kokoro returned invalid singing audio.");
+        }
+        let peak = 0;
+        let center = 0;
+        for (let i = 0; i < samples.length; i++) {
+            if (!Number.isFinite(samples[i])) throw new Error("Invalid singing samples.");
+            if (Math.abs(samples[i]) > peak) {
+                peak = Math.abs(samples[i]);
+                center = i;
+            }
+        }
+        if (peak < 0.001) throw new Error("Kokoro returned silent singing audio.");
+        let start = 0;
+        let end = samples.length - 1;
+        while (Math.abs(samples[start]) < peak * 0.02) start++;
+        while (Math.abs(samples[end]) < peak * 0.02) end--;
+        const frame = Math.min(Math.floor(rate * 0.06), end - start);
+        const offset = Math.max(start, Math.min(center - Math.floor(frame / 2), end - frame));
+        const correlations = [];
+        let best = 0;
+        for (let lag = Math.floor(rate / 500); lag <= Math.floor(rate / 70); lag++) {
+            let cross = 0;
+            let left = 0;
+            let right = 0;
+            for (let i = 0; i < frame - lag; i++) {
+                const a = samples[offset + i];
+                const b = samples[offset + i + lag];
+                cross += a * b;
+                left += a * a;
+                right += b * b;
+            }
+            correlations[lag] = cross / Math.sqrt(left * right || 1);
+            best = Math.max(best, correlations[lag]);
+        }
+        let period = 0;
+        for (let lag = Math.floor(rate / 500) + 1; lag < correlations.length - 1; lag++) {
+            if (
+                correlations[lag] >= best * 0.9 &&
+                correlations[lag] > correlations[lag - 1] &&
+                correlations[lag] >= correlations[lag + 1]
+            ) {
+                period = lag;
+                break;
+            }
+        }
+        if (!period || best < 0.4)
+            throw new Error("No stable vowel found. Try a syllable like la or ah.");
+        return { samples: samples.slice(start, end + 1), rate, period };
+    }
+
+    /** Resample pitch-synchronous grains and overlap them to fit the requested duration. */
+    static tuneSyllable(source, frequency, duration) {
+        if (
+            !Number.isFinite(frequency) ||
+            frequency < 20 ||
+            frequency > 4000 ||
+            !Number.isFinite(duration) ||
+            duration <= 0 ||
+            duration > 30
+        )
+            throw new Error(
+                "Singing notes must be between 20 and 4000 Hz and at most 30 seconds long."
+            );
+        const { samples, rate, period } = source;
+        const output = new Float32Array(Math.max(1, Math.round(rate * duration)));
+        const weights = new Float32Array(output.length);
+        const hop = rate / frequency;
+        // shortcut: grains shift formants along with pitch; use phoneme alignment
+        // and formant-preserving processing before supporting whole lyric phrases.
+        for (let target = 0; target < output.length + hop; target += hop) {
+            const position = (target / output.length) * Math.max(0, samples.length - 2 * period);
+            const mark = Math.round(position / period) * period + period;
+            for (let delta = -Math.ceil(hop); delta < hop; delta++) {
+                const index = Math.round(target) + delta;
+                const from = mark + (delta * period) / hop;
+                if (index < 0 || index >= output.length || from < 0 || from >= samples.length - 1)
+                    continue;
+                const weight = 0.5 + 0.5 * Math.cos((Math.PI * delta) / hop);
+                const base = Math.floor(from);
+                const sample = samples[base] + (samples[base + 1] - samples[base]) * (from - base);
+                output[index] += sample * weight;
+                weights[index] += weight;
+            }
+        }
+        const fade = Math.min(rate * 0.01, output.length / 2);
+        for (let i = 0; i < output.length; i++) {
+            output[i] =
+                (output[i] / Math.max(1, weights[i])) *
+                Math.min(1, i / fade, (output.length - 1 - i) / fade);
+        }
+        return output;
+    }
+
     /**
      * Plays one rendered phrase and resolves when it finishes.
      *

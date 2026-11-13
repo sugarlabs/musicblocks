@@ -3759,6 +3759,35 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             });
         });
 
+        test("singing requires prepared Kokoro audio instead of silently using a synth", () => {
+            expect(() => synth.___createSynth("turtle0", "sing:la", "sing:la", null)).toThrow(
+                "Prepare the singing voice"
+            );
+        });
+
+        test("prepares each syllable once and preserves errors for retry", async () => {
+            const renderSyllable = jest.fn().mockResolvedValue({ samples: [1], rate: 24000 });
+            global.KokoroSpeech = jest.fn(() => ({ renderSyllable }));
+            try {
+                await synth.prepareSinging(["la", "la", "ah"]);
+                await synth.prepareSinging(["la"]);
+                expect(renderSyllable.mock.calls.map(call => call[0])).toEqual(["la", "ah"]);
+                renderSyllable.mockRejectedValueOnce(new Error("offline"));
+                await expect(synth.prepareSinging(["oh"])).rejects.toThrow("offline");
+                expect(synth.singingSamples.has("oh")).toBe(false);
+                await synth.prepareSinging(["oh"]);
+                expect(synth.singingSamples.has("oh")).toBe(true);
+                expect(KokoroSpeech).toHaveBeenCalledTimes(2);
+                const needed = Array.from({ length: 32 }, (_, i) => "la" + i);
+                for (const text of needed) synth.singingSamples.set(text, {});
+                needed[31] = "new";
+                await synth.prepareSinging(needed);
+                expect([...synth.singingSamples.keys()].sort()).toEqual(needed.sort());
+            } finally {
+                delete global.KokoroSpeech;
+            }
+        });
+
         test("_createCustomSynth handles amsynth, fmsynth, duosynth, and default", () => {
             ["amsynth", "fmsynth", "duosynth", "other"].forEach(type => {
                 const s = synth._createCustomSynth(type, {});

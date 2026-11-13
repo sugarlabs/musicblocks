@@ -13,7 +13,7 @@
 /*
    global
 
-   last, Tone, getTemperament, pitchToNumber,
+   last, Tone, KokoroSpeech, getTemperament, pitchToNumber,
    getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
    getOctaveRatio, getEffectiveOctaveRatio, isCustomTemperament, isEquallyTempered, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
@@ -1782,6 +1782,32 @@ function Synth() {
         return tempSynth;
     };
 
+    this.singingSamples = new Map();
+    /** Prepare every requested syllable before the interpreter starts its audio clock. */
+    this.prepareSinging = async (texts, onProgress) => {
+        const needed = new Set(texts);
+        if (
+            needed.size > 32 ||
+            [...needed].some(text => typeof text !== "string" || !text.trim() || text.length > 40)
+        ) {
+            throw new Error("Use at most 32 singing syllables of 1-40 characters each.");
+        }
+        // Evict only unused syllables: evicting one needed later causes endless preflight retries.
+        for (const text of this.singingSamples.keys()) {
+            if (!needed.has(text)) this.singingSamples.delete(text);
+        }
+        for (const text of needed) {
+            if (this.singingSamples.has(text)) continue;
+            if (!this._singingSpeech) this._singingSpeech = new KokoroSpeech({ onProgress });
+            try {
+                this.singingSamples.set(text, await this._singingSpeech.renderSyllable(text));
+            } catch (error) {
+                this._singingSpeech = null;
+                throw error;
+            }
+        }
+    };
+
     /**
      * Creates a synth based on the specified parameters, either using samples, built-in synths, or custom synths.
      * @function
@@ -1829,6 +1855,30 @@ function Synth() {
      * Internal implementation of createSynth, called after sample is ensured loaded.
      */
     this.___createSynth = (turtle, instrumentName, sourceName, params) => {
+        if (sourceName.startsWith("sing:")) {
+            if (!instruments[turtle][instrumentName]) {
+                const source = this.singingSamples.get(sourceName.slice(5));
+                if (!source) throw new Error("Prepare the singing voice before playing.");
+                const voice = new Tone.Sampler({ urls: {}, attack: 0, release: 0.02 });
+                const play = voice.triggerAttackRelease.bind(voice);
+                // Keep Tone's scheduling, routing, polyphony and Stop lifecycle.
+                voice.triggerAttackRelease = (notes, duration, time, velocity) => {
+                    const pitches = Array.isArray(notes) ? notes : [notes];
+                    for (const note of pitches) {
+                        const midi = Math.round(Tone.Frequency(note).toMidi());
+                        const frequency = Tone.Frequency(midi, "midi").toFrequency();
+                        const data = KokoroSpeech.tuneSyllable(source, frequency, duration);
+                        const buffer = Tone.getContext().createBuffer(1, data.length, source.rate);
+                        buffer.getChannelData(0).set(data);
+                        voice.add(midi, buffer);
+                    }
+                    return play(notes, duration, time, velocity);
+                };
+                instruments[turtle][instrumentName] = voice;
+                instrumentsSource[instrumentName] = [2, sourceName];
+            }
+            return;
+        }
         // this._loadSample(sourceName); // Already loaded by __createSynth wrapper
         if (sourceName in this.samples.voice || sourceName in this.samples.drum) {
             if (!instruments[turtle][instrumentName]) {

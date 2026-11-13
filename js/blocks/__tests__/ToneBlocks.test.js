@@ -206,6 +206,49 @@ describe("setupToneBlocks", () => {
 
     const getBlock = type => activity.blockInstances[type];
 
+    describe("SingBlock", () => {
+        it("inserts a playable note in the palette macro", () => {
+            const macro = getBlock("sing").macro(100, 200);
+            expect(macro.find(row => row[1] === "newnote")).toBeDefined();
+            expect(macro.find(row => row[1] === "pitch")).toBeDefined();
+            expect(macro[0][4][2]).not.toBeNull();
+        });
+        it("does not require Kokoro while counting or exporting notes", () => {
+            activity.turtles.ithTurtle(0).singer.suppressOutput = true;
+            logo.synth.singingSamples.clear();
+            expect(getBlock("sing").flow(["la", 42], logo, 0, 7)).toEqual([42, 1]);
+            expect(Singer.ToneActions.setTimbre).not.toHaveBeenCalled();
+        });
+        beforeEach(() => {
+            jest.clearAllMocks();
+            logo.synth.singingSamples = new Map([
+                ["la", {}],
+                ["ah", {}]
+            ]);
+        });
+        it.each(["la", "ah"])("selects the prepared Kokoro syllable %s", text => {
+            expect(getBlock("sing").flow([text, 42], logo, 0, 7)).toEqual([42, 1]);
+            expect(Singer.ToneActions.setTimbre).toHaveBeenCalledWith("sing:" + text, 0, 7);
+        });
+        it("trims input", () => {
+            getBlock("sing").flow([" la ", 42], logo, 0, 7);
+            expect(Singer.ToneActions.setTimbre).toHaveBeenCalledWith("sing:la", 0, 7);
+        });
+        it.each([null, undefined, 12, "", "unprepared", "x".repeat(41)])(
+            "rejects invalid or unprepared input %s",
+            text => {
+                getBlock("sing").flow([text, 42], logo, 0, 7);
+                expect(activity.errorMsg).toHaveBeenCalled();
+                expect(logo.stopTurtle).toBe(true);
+                expect(Singer.ToneActions.setTimbre).not.toHaveBeenCalled();
+            }
+        );
+        it("does not change the voice for an empty clamp", () => {
+            getBlock("sing").flow(["la"], logo, 0, 7);
+            expect(Singer.ToneActions.setTimbre).not.toHaveBeenCalled();
+        });
+    });
+
     describe("OscillatorBlock", () => {
         it("should create synth if no oscillator exists", () => {
             const oscBlock = getBlock("oscillator");
