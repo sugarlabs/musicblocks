@@ -587,7 +587,12 @@ function LegoBricksPlayback() {
 
         if (this.playButton) {
             const img = this.playButton.querySelector("img");
-            if (img) img.src = "header-icons/play-button.svg";
+            if (img) {
+                img.src = "header-icons/play-button.svg";
+                img.title = _("Play");
+                img.alt = _("Play");
+            }
+            this.playButton.setAttribute("aria-label", _("Play"));
         }
 
         // Save final color segments for all lines

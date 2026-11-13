@@ -375,10 +375,12 @@ describe("Arpeggio Widget", () => {
             expect(arpeggio._playing).toBe(true);
             expect(activityMock.logo.synth.stop).toHaveBeenCalled();
             expect(activityMock.logo.synth.trigger).toHaveBeenCalled(); // Triggered due to __playNote
+            expect(arpeggio.playButton.getAttribute("aria-label")).toBe("Stop");
 
             // Click again to stop
             arpeggio.playButton.onclick();
             expect(arpeggio._playing).toBe(false);
+            expect(arpeggio.playButton.getAttribute("aria-label")).toBe("Play");
         });
 
         test.each([
