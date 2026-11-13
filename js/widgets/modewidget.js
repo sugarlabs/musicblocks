@@ -818,6 +818,7 @@ class ModeWidget {
             // half-updated pattern, so ignore it like the other operations
             // that check the lock.
             if (this._locked) {
+                this.errorMsg(_("Please wait for the current operation to finish before saving."));
                 return;
             }
             const name = nameInput.value.trim();
