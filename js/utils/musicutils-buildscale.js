@@ -342,9 +342,11 @@ var buildScale = (keySignature, edo) => {
         // major scale on C misses the naturals, spell every mode as 12 EDO does and find those
         // names here (C major pentatonic played C D E♭ G♭ A under 1/4-comma meantone). Where
         // the table spells sharps and flats as meantone does, only seven-note modes need it.
+        // A custom mode is written in this EDO's own steps, so it is never respelled.
         if (
-            !_stretchHitsNaturals(edoNames, currentEDO) ||
-            (edoHalfSteps.length === 7 && _namesAreMeantone(edoNames))
+            obj[1] !== "custom" &&
+            (!_stretchHitsNaturals(edoNames, currentEDO) ||
+                (edoHalfSteps.length === 7 && _namesAreMeantone(edoNames)))
         ) {
             const respelled = _respellInEdo(keySignature, edoNames, idx);
             if (respelled !== null && respelled[1].length === edoHalfSteps.length) {

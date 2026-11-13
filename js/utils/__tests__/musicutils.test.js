@@ -2762,6 +2762,22 @@ describe("buildScale with explicit EDO", () => {
         }
     });
 
+    it("never respells a custom mode, which is written in the EDO's own steps", () => {
+        const saved = MUSICALMODES.custom;
+        try {
+            for (const [edo, pattern] of [
+                [19, [3, 3, 2, 3, 3, 3, 2]],
+                [21, [3, 3, 3, 3, 3, 3, 3]],
+                [21, [4, 4, 2, 3, 3, 3, 2]]
+            ]) {
+                MUSICALMODES.custom = pattern;
+                expect(buildScale("C custom", edo)[1]).toEqual(pattern);
+            }
+        } finally {
+            MUSICALMODES.custom = saved;
+        }
+    });
+
     it("keeps the stretched 21-EDO scale when a name is missing from the table", () => {
         // The 21-name table has no C♭, so E♭ minor stays as it was.
         const [scale, steps] = buildScale("E♭ minor", 21);
