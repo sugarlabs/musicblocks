@@ -2665,5 +2665,12 @@
     "actor": "Abhist17",
     "branch": "fix/midi-import-exact-ties",
     "headRepo": "Abhist17/musicblocks"
+  },
+  "10424": {
+    "pushedAt": "2026-11-13T19:37:58.766Z",
+    "sha": "be1beecb48aaf8bd4af79d4c76bc8ccbe04e92c8",
+    "actor": "Abhist17",
+    "branch": "fix/midi-export-edo-names",
+    "headRepo": "Abhist17/musicblocks"
   }
 }
