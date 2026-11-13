@@ -13,18 +13,21 @@
    global
 
    INTERVALVALUES, CHORDNAMES, CHORDVALUES, pitchToNumber,
-   keySignatureToMode, normalizeNoteAccidentals, frequencyToPitch
+   keySignatureToMode, normalizeNoteAccidentals, frequencyToPitch,
+   MAQAMTABLE, _
  */
 /*
     Globals location
      - js/utils/musicutils-constants.js
-         INTERVALVALUES, CHORDNAMES
+         INTERVALVALUES, CHORDNAMES, MAQAMTABLE
      - js/utils/musicutils-modecore.js
          CHORDVALUES
      - js/utils/musicutils-pitchscale.js
          pitchToNumber, keySignatureToMode
      - js/utils/musicutils-pitch.js
          normalizeNoteAccidentals, frequencyToPitch
+     - js/loader.js / js/utils/utils.js
+         _ (localization)
 */
 /* exported HarmonyUtils */
 
@@ -401,6 +404,24 @@ const HarmonyUtils = {
     },
 
     /**
+     * Expected semitone intervals above the root for chord members (3rd, 5th, 7th),
+     * used to verify whether a bass note belongs to the chord or requires a slash-bass fallback.
+     * @type {Object<string, {third: number, fifth: number, seventh?: number}>}
+     */
+    CHORD_MEMBER_INTERVALS: {
+        "major": { third: 4, fifth: 7 },
+        "minor": { third: 3, fifth: 7 },
+        "augmented": { third: 4, fifth: 8 },
+        "diminished": { third: 3, fifth: 6 },
+        "major 7th": { third: 4, fifth: 7, seventh: 11 },
+        "minor 7th": { third: 3, fifth: 7, seventh: 10 },
+        "dominant 7th": { third: 4, fifth: 7, seventh: 10 },
+        "minor-major 7th": { third: 3, fifth: 7, seventh: 11 },
+        "fully-diminished 7th": { third: 3, fifth: 6, seventh: 9 },
+        "half-diminished 7th": { third: 3, fifth: 6, seventh: 10 }
+    },
+
+    /**
      * Pitch class (0-11) for a given note name or frequency.
      * @param {string|number} note - Note label (e.g. "C4", "F#", "Bb3") or frequency.
      * @returns {number|null} Pitch class from 0 to 11, or null if invalid.
@@ -425,16 +446,11 @@ const HarmonyUtils = {
             clean = clean.replace(/-?\d+$/, "");
         }
 
+        // Normalize natural signs (e.g. C♮, Cnatural) before accidentals
+        clean = clean.replace(/[♮]|_?natural/gi, "");
+
         if (typeof normalizeNoteAccidentals === "function") {
             clean = normalizeNoteAccidentals(clean);
-        }
-
-        if (typeof pitchToNumber === "function") {
-            const step = pitchToNumber(clean, 4, "C major", "equal");
-            if (step !== undefined && !isNaN(step)) {
-                // In Music Blocks, pitch 3 is C (e.g. C4 = 39, (39 - 3) % 12 = 0).
-                return (((step - 3) % 12) + 12) % 12;
-            }
         }
 
         const baseMap = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
@@ -471,6 +487,7 @@ const HarmonyUtils = {
             accStart = 1;
         }
 
+        // Validate that all trailing characters are valid accidentals
         for (let i = accStart; i < clean.length; i++) {
             const acc = clean.charAt(i);
             if (acc === "#" || acc === "♯") {
@@ -481,8 +498,19 @@ const HarmonyUtils = {
                 pc += 2;
             } else if (acc === "𝄫") {
                 pc -= 2;
+            } else {
+                return null;
             }
         }
+
+        if (typeof pitchToNumber === "function") {
+            const step = pitchToNumber(clean, 4, "C major", "equal");
+            if (step !== undefined && !isNaN(step)) {
+                // In Music Blocks, pitch 3 is C (e.g. C4 = 39, (39 - 3) % 12 = 0).
+                return (((step - 3) % 12) + 12) % 12;
+            }
+        }
+
         return ((pc % 12) + 12) % 12;
     },
 
@@ -495,23 +523,64 @@ const HarmonyUtils = {
         if (keySignature === null || keySignature === undefined || keySignature === "") {
             return null;
         }
-        if (typeof keySignatureToMode === "function") {
-            const parsed = keySignatureToMode(keySignature);
-            if (Array.isArray(parsed) && parsed.length >= 2 && parsed[0]) {
-                return parsed;
+
+        // 1. Array inputs must be handled BEFORE calling keySignatureToMode,
+        // because keySignatureToMode expects a string and defaults arrays to ["C", "major"].
+        if (Array.isArray(keySignature)) {
+            if (keySignature.length >= 2 && keySignature[0]) {
+                const tonic = String(keySignature[0]).trim();
+                if (HarmonyUtils.noteToPitchClass(tonic) !== null) {
+                    return [tonic, String(keySignature[1] || "major").trim()];
+                }
             }
+            return null;
         }
-        if (Array.isArray(keySignature) && keySignature.length >= 2) {
-            return [String(keySignature[0]), String(keySignature[1] || "major")];
-        }
+
+        // 2. Validate string input
         if (typeof keySignature === "string") {
-            const parts = keySignature.trim().split(/\s+/);
-            if (parts.length > 0 && parts[0]) {
-                const tonic = parts[0];
-                const modeName = parts.length > 1 ? parts.slice(1).join(" ") : "major";
-                return [tonic, modeName];
+            const trimmed = keySignature.trim();
+            if (!trimmed) {
+                return null;
             }
+
+            // Check if input is a recognized Maqam name (e.g. "rast", "bayati")
+            if (
+                typeof MAQAMTABLE !== "undefined" &&
+                Object.prototype.hasOwnProperty.call(MAQAMTABLE, trimmed.toLowerCase())
+            ) {
+                if (typeof keySignatureToMode === "function") {
+                    return keySignatureToMode(trimmed);
+                }
+                return [trimmed, "maqam"];
+            }
+
+            // Extract tonic candidate and test whether it's a valid pitch
+            let parts = trimmed.split(/\s+/);
+            let tonicCandidate = parts[0];
+            let modeCandidate = parts.length > 1 ? parts.slice(1).join(" ") : "major";
+
+            // Support "Am", "Cm" shorthand
+            if (parts.length === 1 && tonicCandidate.length > 1 && tonicCandidate.endsWith("m")) {
+                tonicCandidate = tonicCandidate.slice(0, -1);
+                modeCandidate = "minor";
+            }
+
+            // If the tonic candidate cannot be parsed into a pitch class, the key signature is invalid
+            if (HarmonyUtils.noteToPitchClass(tonicCandidate) === null) {
+                return null;
+            }
+
+            // Now that we've verified the key input is non-garbage, delegate to keySignatureToMode if present
+            if (typeof keySignatureToMode === "function") {
+                const parsed = keySignatureToMode(trimmed);
+                if (Array.isArray(parsed) && parsed.length >= 2 && parsed[0]) {
+                    return parsed;
+                }
+            }
+
+            return [tonicCandidate, modeCandidate];
         }
+
         return null;
     },
 
@@ -587,15 +656,16 @@ const HarmonyUtils = {
             const bassPc = HarmonyUtils.noteToPitchClass(bassNote);
             if (bassPc !== null && bassPc !== rootPc) {
                 const bassDelta = (((bassPc - rootPc) % 12) + 12) % 12;
-                if (bassDelta === 3 || bassDelta === 4) {
+                const members = HarmonyUtils.CHORD_MEMBER_INTERVALS[chordName];
+                if (members && bassDelta === members.third) {
                     inversion = 1;
                     inversionName = "1st inversion";
                     figuredBass = isSeventh ? "⁶₅" : "⁶";
-                } else if (bassDelta === 6 || bassDelta === 7 || bassDelta === 8) {
+                } else if (members && bassDelta === members.fifth) {
                     inversion = 2;
                     inversionName = "2nd inversion";
                     figuredBass = isSeventh ? "⁴₃" : "⁶⁴";
-                } else if (isSeventh && (bassDelta === 9 || bassDelta === 10 || bassDelta === 11)) {
+                } else if (members && isSeventh && bassDelta === members.seventh) {
                     inversion = 3;
                     inversionName = "3rd inversion";
                     figuredBass = "⁴₂";
@@ -632,15 +702,16 @@ const HarmonyUtils = {
             roman += "/" + slashBass;
         }
 
+        const i18n = text => (typeof _ === "function" ? _(text) : text);
         let formatted = roman;
         if (inversionName) {
-            formatted += " (" + inversionName + ")";
+            formatted += " (" + i18n(inversionName) + ")";
         }
         const keyLabel =
             typeof keySignature === "string" && keySignature.trim()
                 ? keySignature
-                : keyTonic + " " + mode;
-        formatted += " in " + keyLabel;
+                : keyTonic + " " + i18n(mode);
+        formatted += " " + i18n("in") + " " + keyLabel;
 
         return {
             roman,

@@ -686,6 +686,24 @@ describe("HarmonyUtils.romanNumeral", () => {
             expect(res.roman).toBe("I/A");
             expect(res.formatted).toBe("I/A in C major");
         });
+
+        it("verifies chord membership before assigning an inversion (e.g. Eb is not in C major)", () => {
+            const res = HarmonyUtils.romanNumeral("C", "major", "C major", "Eb");
+            expect(res).not.toBeNull();
+            expect(res.inversion).toBe(-1);
+            expect(res.inversionName).toBeNull();
+            expect(res.roman).toBe("I/Eb");
+            expect(res.formatted).toBe("I/Eb in C major");
+        });
+
+        it("assigns 1st inversion to Eb when chord is C minor", () => {
+            const res = HarmonyUtils.romanNumeral("C", "minor", "C minor", "Eb");
+            expect(res).not.toBeNull();
+            expect(res.inversion).toBe(1);
+            expect(res.inversionName).toBe("1st inversion");
+            expect(res.roman).toBe("i⁶");
+            expect(res.formatted).toBe("i⁶ (1st inversion) in C minor");
+        });
     });
 
     describe("Borrowed and chromatic chords", () => {
@@ -796,6 +814,54 @@ describe("HarmonyUtils.romanNumeral", () => {
         it("returns null for invalid pitch or key", () => {
             expect(HarmonyUtils.romanNumeral("invalid", "major", "C major")).toBeNull();
             expect(HarmonyUtils.romanNumeral("C", "major", "invalidKey")).toBeNull();
+        });
+
+        it("rejects unknown pitch labels even when pitchToNumber returns default numeric pitch", () => {
+            const origPitchToNumber = global.pitchToNumber;
+            global.pitchToNumber = jest.fn(() => 39); // In Music Blocks, unknown label returns 39 (C4)
+            try {
+                expect(HarmonyUtils.noteToPitchClass("invalid")).toBeNull();
+                expect(HarmonyUtils.noteToPitchClass("foo")).toBeNull();
+                expect(HarmonyUtils.noteToPitchClass("Cxyz")).toBeNull();
+                expect(HarmonyUtils.romanNumeral("invalid", "major", "C major")).toBeNull();
+            } finally {
+                global.pitchToNumber = origPitchToNumber;
+            }
+        });
+
+        it("normalizes natural signs in note labels (♮ and natural)", () => {
+            expect(HarmonyUtils.noteToPitchClass("C♮")).toBe(0);
+            expect(HarmonyUtils.noteToPitchClass("C♮4")).toBe(0);
+            expect(HarmonyUtils.noteToPitchClass("Cnatural")).toBe(0);
+            expect(HarmonyUtils.noteToPitchClass("F♮")).toBe(5);
+        });
+
+        it("handles array keys before keySignatureToMode fallback", () => {
+            const origKeySigToMode = global.keySignatureToMode;
+            // In browser runtime, keySignatureToMode defaults non-string inputs to ["C", "major"]
+            global.keySignatureToMode = jest.fn(key => {
+                if (typeof key !== "string") {
+                    return ["C", "major"];
+                }
+                return ["C", "major"];
+            });
+            try {
+                expect(HarmonyUtils.parseKey(["D", "minor"])).toEqual(["D", "minor"]);
+                expect(HarmonyUtils.parseKey(["invalid", "minor"])).toBeNull();
+            } finally {
+                global.keySignatureToMode = origKeySigToMode;
+            }
+        });
+
+        it("does not accept default keySignatureToMode result for invalid key strings", () => {
+            const origKeySigToMode = global.keySignatureToMode;
+            global.keySignatureToMode = jest.fn(() => ["C", "major"]);
+            try {
+                expect(HarmonyUtils.parseKey("invalidKey")).toBeNull();
+                expect(HarmonyUtils.romanNumeral("C", "major", "invalidKey")).toBeNull();
+            } finally {
+                global.keySignatureToMode = origKeySigToMode;
+            }
         });
 
         it("handles note labels with octave numbers and Hz strings", () => {

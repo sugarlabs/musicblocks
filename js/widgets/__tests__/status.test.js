@@ -1633,6 +1633,17 @@ describe("StatusMatrix Widget", () => {
             expect(statusMatrix._harmonyCell.textContent).toContain("C major — IV in G major");
         });
 
+        test("does not look up turtle 0 or crash when turtleList is empty", () => {
+            mockActivity.turtles.turtleList = [];
+            mockActivity.turtles.ithTurtle = jest.fn(() => {
+                throw new Error("Turtle 0 not found");
+            });
+            useMice([]);
+            statusMatrix.init(mockActivity);
+            expect(() => statusMatrix.updateAll()).not.toThrow();
+            expect(mockActivity.turtles.ithTurtle).not.toHaveBeenCalled();
+        });
+
         test("leaves out a mouse that has moved on to a rest or a drum", () => {
             // The second mouse's last pitched note started at 0, but it is now at 0.5.
             useMice([mouse(["C4"]), mouse(["E4"], 0.5)]);

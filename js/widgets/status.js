@@ -832,9 +832,9 @@ class StatusMatrix {
             const activeIndex = list.findIndex(t => !t.inTrash);
             if (activeIndex >= 0 && typeof turtles.ithTurtle === "function") {
                 activeTurtle = turtles.ithTurtle(activeIndex);
-            } else if (typeof turtles.ithTurtle === "function") {
+            } else if (list.length > 0 && typeof turtles.ithTurtle === "function") {
                 activeTurtle = turtles.ithTurtle(0);
-            } else {
+            } else if (list.length > 0) {
                 activeTurtle = list[0];
             }
         }
