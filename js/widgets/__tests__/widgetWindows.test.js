@@ -1592,6 +1592,41 @@ describe("widgetWindows", () => {
 
             expect(window.widgetWindows.openWindows["FallbackTitle"]).toBe(win);
         });
+
+        test("windowFor falls back to saveAs when widget.blockNo is null", () => {
+            const widget = { blockNo: null };
+            const win = windowFor(widget, "Title", "mySaveKey");
+
+            expect(window.widgetWindows.openWindows["mySaveKey"]).toBe(win);
+            expect(window.widgetWindows.openWindows[null]).toBeUndefined();
+        });
+
+        test("windowFor falls back to title when widget.blockNo is null and saveAs is missing", () => {
+            const widget = { blockNo: null };
+            const win = windowFor(widget, "FallbackTitle");
+
+            expect(window.widgetWindows.openWindows["FallbackTitle"]).toBe(win);
+            expect(window.widgetWindows.openWindows[null]).toBeUndefined();
+        });
+
+        test("windowFor prevents window collision between multiple widgets with blockNo: null", () => {
+            const widgetA = { blockNo: null };
+            const widgetB = { blockNo: null };
+            const winA = windowFor(widgetA, "WidgetA", "saveA");
+            const winB = windowFor(widgetB, "WidgetB", "saveB");
+
+            expect(winA).not.toBe(winB);
+            expect(window.widgetWindows.openWindows["saveA"]).toBe(winA);
+            expect(window.widgetWindows.openWindows["saveB"]).toBe(winB);
+            expect(window.widgetWindows.openWindows[null]).toBeUndefined();
+        });
+
+        test("windowFor preserves blockNo when it is 0", () => {
+            const widget = { blockNo: 0 };
+            const win = windowFor(widget, "ZeroBlockWidget");
+
+            expect(window.widgetWindows.openWindows[0]).toBe(win);
+        });
     });
 
     describe("_handleGlobalMouseDown and focus management", () => {
@@ -2205,6 +2240,19 @@ describe("widgetWindows", () => {
             expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("LEGO Bricks");
         });
 
+        it("closes timbre and phrase maker using mapped keys", () => {
+            window.widgetWindows.openWindows = {
+                "timbre": { close: jest.fn() },
+                "phrase maker": { close: jest.fn() }
+            };
+
+            window.widgetWindows.closeBlkWidgets("timbre");
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("timbre");
+
+            window.widgetWindows.closeBlkWidgets("phrase maker");
+            expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("phrase maker");
+        });
+
         it("closes widgets when receiving localized block titles", () => {
             const originalI18n = global._;
             const translations = {
@@ -2212,7 +2260,9 @@ describe("widgetWindows", () => {
                 "music keyboard": "teclado musical",
                 "pitch staircase": "escalera de tono",
                 "status": "estado",
-                "sampler": "muestreador"
+                "sampler": "muestreador",
+                "timbre": "timbre traducido",
+                "phrase maker": "creador de frases"
             };
             global._ = jest.fn(str => translations[str] || str);
 
@@ -2220,7 +2270,9 @@ describe("widgetWindows", () => {
                 "slider": { close: jest.fn() },
                 "pitch staircase": { close: jest.fn() },
                 "status": { close: jest.fn() },
-                "sampler": { close: jest.fn() }
+                "sampler": { close: jest.fn() },
+                "timbre": { close: jest.fn() },
+                "phrase maker": { close: jest.fn() }
             };
             windowFor({ blockNo: 7 }, "music keyboard");
 
@@ -2239,6 +2291,12 @@ describe("widgetWindows", () => {
 
                 window.widgetWindows.closeBlkWidgets("muestreador");
                 expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("sampler");
+
+                window.widgetWindows.closeBlkWidgets("timbre traducido");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("timbre");
+
+                window.widgetWindows.closeBlkWidgets("creador de frases");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("phrase maker");
             } finally {
                 global._ = originalI18n;
             }

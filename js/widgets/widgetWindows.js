@@ -105,22 +105,20 @@ window.widgetWindows = {
         return bottom;
     },
 
-    // NOTE: This mapping only works for widgets that never set their own
-    // `blockNo` property (e.g. ModeWidget). window.widgetWindows.windowFor()
-    // keys a widget's window by `widget.blockNo` if that property is set to
-    // anything other than undefined (including null) — otherwise it falls
-    // back to the `saveAs` or `title` argument. Widgets like PhraseMaker set
-    // `this.blockNo` in their constructor, so they are keyed by blockNo, not
-    // by name, and will NOT be found via this KEY_MAPPING lookup. Adding such
-    // widgets here would silently do nothing. Before adding a new entry,
-    // verify the target widget's windowFor() call and confirm it does not
-    // rely on blockNo for its window key.
+    // NOTE: This mapping works for widgets that are keyed by name (e.g. ModeWidget,
+    // TimbreWidget when blockNo is null). window.widgetWindows.windowFor() keys a
+    // widget's window by `widget.blockNo` only when that property is a valid,
+    // defined identifier (neither undefined nor null). Otherwise it falls back to
+    // the `saveAs` or `title` argument. When a widget is bound to a specific block
+    // instance (e.g. PhraseMaker bound to blockNo 5), its window is keyed by that
+    // block number and closed via title DOM matching in closeBlkWidgets().
     KEY_MAPPING: {
         "pitch drum": "pitch drum",
         "custom mode": "custom mode",
         "tempo": "tempo",
         "arpeggio": "arpeggio",
         "timbre": "timbre",
+        "phrase maker": "phrase maker",
         "sampler": "sampler",
         "rhythm maker": "rhythm maker",
         "oscilloscope": "oscilloscope",
@@ -1340,8 +1338,8 @@ class WidgetWindow {
  */
 window.widgetWindows.windowFor = (widget, title, saveAs, fullscreen) => {
     let key = undefined;
-    // Check for a blockNo attribute
-    if (typeof widget.blockNo !== "undefined") key = widget.blockNo;
+    // Check for a defined and non-null blockNo attribute
+    if (widget?.blockNo !== undefined && widget?.blockNo !== null) key = widget.blockNo;
     // Fall back on the next best thing we have
     else key = saveAs || title;
 
