@@ -114,7 +114,9 @@ describe("ModeWidget control bar keyboard access", () => {
         button("Save").click();
         expect(widget._saveCustomMode).not.toHaveBeenCalled();
         expect(widget._save).not.toHaveBeenCalled();
-        expect(widget.errorMsg).not.toHaveBeenCalled();
+        expect(widget.errorMsg).toHaveBeenCalledWith(
+            "Please wait for the current operation to finish before saving."
+        );
     });
 
     test("does not store a custom mode when no notes are selected", () => {
