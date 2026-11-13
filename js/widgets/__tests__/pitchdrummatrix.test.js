@@ -75,7 +75,7 @@ window.widgetWindows = {
     windowFor: jest.fn().mockReturnValue({
         clear: jest.fn(),
         show: jest.fn(),
-        addButton: jest.fn().mockReturnValue({ onclick: null }),
+        addButton: jest.fn().mockReturnValue({ onclick: null, setAttribute: jest.fn() }),
         getWidgetBody: jest.fn().mockReturnValue({
             append: jest.fn(),
             appendChild: jest.fn(),
@@ -334,7 +334,8 @@ describe("PitchDrumMatrix Widget", () => {
             const appendChildSpy = jest.fn();
             pdm.playButton = {
                 textContent: "",
-                appendChild: appendChildSpy
+                appendChild: appendChildSpy,
+                setAttribute: jest.fn()
             };
 
             pdm._setPlayButtonIcon("play");
@@ -343,26 +344,30 @@ describe("PitchDrumMatrix Widget", () => {
             expect(pdm.playButton.textContent).toBe("\u00A0\u00A0");
             // Should append img and text node (2 calls)
             expect(appendChildSpy).toHaveBeenCalledTimes(2);
+            expect(pdm.playButton.setAttribute).toHaveBeenCalledWith("aria-label", "Play");
         });
 
         test("should set stop icon when state is 'stop'", () => {
             const appendChildSpy = jest.fn();
             pdm.playButton = {
                 textContent: "",
-                appendChild: appendChildSpy
+                appendChild: appendChildSpy,
+                setAttribute: jest.fn()
             };
 
             pdm._setPlayButtonIcon("stop");
 
             expect(pdm.playButton.textContent).toBe("\u00A0\u00A0");
             expect(appendChildSpy).toHaveBeenCalledTimes(2);
+            expect(pdm.playButton.setAttribute).toHaveBeenCalledWith("aria-label", "Stop");
         });
 
         test("should create img element with correct play attributes", () => {
             const appendedElements = [];
             pdm.playButton = {
                 textContent: "",
-                appendChild: el => appendedElements.push(el)
+                appendChild: el => appendedElements.push(el),
+                setAttribute: jest.fn()
             };
 
             pdm._setPlayButtonIcon("play");
@@ -379,7 +384,8 @@ describe("PitchDrumMatrix Widget", () => {
             const appendedElements = [];
             pdm.playButton = {
                 textContent: "",
-                appendChild: el => appendedElements.push(el)
+                appendChild: el => appendedElements.push(el),
+                setAttribute: jest.fn()
             };
 
             pdm._setPlayButtonIcon("stop");
@@ -953,7 +959,8 @@ describe("PitchDrumMatrix Widget", () => {
                         icon,
                         label,
                         appendChild: jest.fn(),
-                        textContent: ""
+                        textContent: "",
+                        setAttribute: jest.fn()
                     };
                     buttons[label] = btn;
                     return btn;
