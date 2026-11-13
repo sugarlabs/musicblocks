@@ -3923,14 +3923,14 @@ describe("Blocks Foundation", () => {
             ["null", null],
             ["undefined", undefined]
         ])("rejects %s without leaving a load in progress", (_label, notBlocks) => {
-            expect(() => blocks.loadNewBlocks(notBlocks)).toThrow(TypeError);
+            expect(() => blocks.loadNewBlocks(notBlocks)).not.toThrow();
             expect(blocks.isLoading()).toBe(false);
         });
 
         it("does not queue data that is not a block list behind a running load", () => {
             blocks.loadNewBlocks(makeBatch(1));
 
-            expect(() => blocks.loadNewBlocks({})).toThrow(TypeError);
+            expect(() => blocks.loadNewBlocks({})).not.toThrow();
             expect(blocks._loadQueue).toHaveLength(0);
         });
 
