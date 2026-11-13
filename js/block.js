@@ -5157,6 +5157,30 @@ class Block {
 
         let newValue = this.label.value;
 
+        // Normalize box names when a user commits an edit, not while typing.
+        // Keep imported/older names unchanged unless the user renames them.
+        if (this.name === "text" && closeInput && newValue !== oldValue) {
+            const parentIndex = this.connections[0];
+            const parent =
+                parentIndex !== null && parentIndex !== undefined
+                    ? this.blocks.blockList[parentIndex]
+                    : null;
+            if (
+                parent &&
+                parent.name === "storein" &&
+                parent.connections?.[1] === this.blockIndex
+            ) {
+                const trimmedName = newValue.trim();
+                if (trimmedName) {
+                    newValue = trimmedName;
+                } else {
+                    newValue = oldValue;
+                    this.activity.errorMsg(_("Box name cannot be empty."), this.blockIndex);
+                }
+                this.label.value = newValue;
+            }
+        }
+
         if (this.labelattr !== null) {
             const attrValue = this.labelattr.value;
             switch (attrValue) {

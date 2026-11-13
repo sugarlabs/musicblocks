@@ -1446,6 +1446,121 @@ describe("Block Foundation", () => {
         });
     });
 
+    describe("box name whitespace on label commit", () => {
+        let block;
+        let boxBlocks;
+        let originalDocById;
+
+        beforeEach(() => {
+            boxBlocks = {
+                activity: { refreshCanvas: jest.fn(), errorMsg: jest.fn() },
+                blockList: [],
+                palettes: {
+                    hide: jest.fn(),
+                    updatePalettes: jest.fn(),
+                    show: jest.fn()
+                },
+                newStorein2Block: jest.fn(),
+                newNamedboxBlock: jest.fn(),
+                renameBoxes: jest.fn(),
+                renameNamedboxes: jest.fn(),
+                renameStoreinBoxes: jest.fn(),
+                renameStorein2Boxes: jest.fn()
+            };
+            block = new Block({ name: "text", image: "", size: 1, docks: [] }, boxBlocks);
+            block.name = "text";
+            block.blockIndex = 0;
+            block.connections = [1];
+            block.value = "box";
+            block.label = { value: "box", style: { display: "" } };
+            block.text = { text: "box" };
+            block.container = { setChildIndex: jest.fn(), children: [] };
+            block.updateCache = jest.fn();
+            boxBlocks.blockList[0] = block;
+            boxBlocks.blockList[1] = { name: "storein", connections: [null, 0] };
+
+            originalDocById = global.docById;
+            global.docById = jest.fn().mockReturnValue({ style: {} });
+        });
+
+        afterEach(() => {
+            global.docById = originalDocById;
+        });
+
+        it("trims leading and trailing spaces before creating named box blocks", () => {
+            block.label.value = "  my score  ";
+            block._labelChanged(true, true);
+
+            expect(block.value).toBe("my score");
+            expect(block.label.value).toBe("my score");
+            expect(boxBlocks.newStorein2Block).toHaveBeenCalledWith("my score");
+            expect(boxBlocks.newNamedboxBlock).toHaveBeenCalledWith("my score");
+            expect(boxBlocks.renameBoxes).toHaveBeenCalledWith("box", "my score");
+        });
+
+        it("rejects a whitespace-only box name and keeps the previous name", () => {
+            block.label.value = "  ";
+            block._labelChanged(true, true);
+
+            expect(block.value).toBe("box");
+            expect(block.label.value).toBe("box");
+            expect(boxBlocks.newNamedboxBlock).not.toHaveBeenCalled();
+            expect(boxBlocks.activity.errorMsg).toHaveBeenCalledWith(
+                "Box name cannot be empty.",
+                0
+            );
+        });
+
+        it("leaves Box reporter names untouched for legacy spaced names", () => {
+            boxBlocks.blockList[1].name = "box";
+            block.label.value = " score ";
+            block._labelChanged(true, true);
+
+            expect(block.value).toBe(" score ");
+            expect(boxBlocks.newStorein2Block).not.toHaveBeenCalled();
+        });
+
+        it("preserves spaces inside a box name", () => {
+            block.label.value = "  my score  ";
+            block._labelChanged(true, true);
+
+            expect(block.value).toBe("my score");
+        });
+
+        it("does not trim text used as a Store in value", () => {
+            boxBlocks.blockList[1].connections = [null, 2, 0];
+            block.label.value = "  important text  ";
+            block._labelChanged(true, true);
+
+            expect(block.value).toBe("  important text  ");
+            expect(boxBlocks.newNamedboxBlock).not.toHaveBeenCalled();
+        });
+
+        it("does not trim unrelated text values", () => {
+            boxBlocks.blockList[1].name = "print";
+            block.label.value = "  hello  ";
+            block._labelChanged(true, true);
+
+            expect(block.value).toBe("  hello  ");
+        });
+
+        it("keeps legacy spaced names when no edit was made", () => {
+            block.value = " score";
+            block.label.value = " score";
+            block._labelChanged(true, true);
+
+            expect(block.value).toBe(" score");
+        });
+
+        it("does not change a box name while it is being typed", () => {
+            block.label.value = " score ";
+            block._labelChanged(false, true);
+
+            expect(block.value).toBe(" score ");
+            expect(block.label.value).toBe(" score ");
+        });
+    });
+
     describe("loadThumbnail()", () => {
         let block;
         let mockImageInstance;
