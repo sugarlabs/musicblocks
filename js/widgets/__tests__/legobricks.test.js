@@ -1593,16 +1593,20 @@ describe("LegoWidget — _createToolbarButtons", () => {
     });
 
     it("should not leave the button labeled Stop when playback ends before _playPhrase returns", () => {
+        // Simulates a matrix with no note rows: _playPhrase starts, then synchronously
+        // finishes and calls the real _stopPlayback before the onclick handler continues.
+        const realStopPlayback = new LegoWidget()._stopPlayback;
+        legoWidget.activity = { hideMsgs: jest.fn() };
         legoWidget.isPlaying = false;
         legoWidget._playPhrase = jest.fn(() => {
-            legoWidget.isPlaying = false;
+            realStopPlayback.call(legoWidget);
         });
 
         legoWidget.playButton.onclick();
 
-        expect(legoWidget.playButton.querySelector("img").src).not.toBe(
-            "header-icons/stop-button.svg"
-        );
+        expect(legoWidget.isPlaying).toBe(false);
+        expect(legoWidget.playButton.querySelector("img").src).toBe("header-icons/play-button.svg");
+        expect(legoWidget.playButton.setAttribute).toHaveBeenCalledWith("aria-label", "Play");
     });
 
     it("should delegate save, export, upload, webcam, and clear buttons to their handlers", () => {
