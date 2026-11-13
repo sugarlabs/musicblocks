@@ -5604,13 +5604,18 @@ class Blocks {
          * when the request eventually runs is still this one (issue #8855).
          * @param - blockObj - Block Objects
          * @public
-         * @returns {number} this request's load token
-         * @throws {TypeError} if blockObjs is not a list
+         * @returns {number|null} this request's load token, or null if invalid
          */
         this.loadNewBlocks = blockObjs => {
-            // Anything else has no blocks to finish on, so the load would never end.
             if (!Array.isArray(blockObjs)) {
-                throw new TypeError("loadNewBlocks expects a list of blocks.");
+                if (this._loadInProgress) {
+                    if (this.activity && typeof this.activity.errorMsg === "function") {
+                        this.activity.errorMsg(
+                            _("Cannot load project: invalid project structure.")
+                        );
+                    }
+                    return null;
+                }
             }
 
             const loadToken = ++this._nextLoadToken;
