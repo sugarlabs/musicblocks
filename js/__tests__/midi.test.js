@@ -1216,6 +1216,24 @@ describe("transcribeMidi", () => {
                 ]);
             });
 
+            it("writes a sixteenth-note syncopation as ties, not triplets", async () => {
+                // 5/16 is within a thirty-second of 1/3 and was imported as a half-note
+                // triplet, which left 1/6 for the 3/16 after it.
+                const blocks = await importBlocks(
+                    midiFile({ lengths: [1.25, 0.75, 1, 3.25, 0.75, 0.875, 1.125] })
+                );
+
+                expect(noteValues(blocks)).toEqual([
+                    "5/16",
+                    "3/16",
+                    "1/4",
+                    "13/16",
+                    "3/16",
+                    "7/32",
+                    "9/32"
+                ]);
+            });
+
             it("does not let rounding add up along a track", async () => {
                 const lengths = Array(12).fill(1.1);
                 const blocks = await importBlocks(midiFile({ lengths }));
