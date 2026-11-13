@@ -339,14 +339,15 @@ var buildScale = (keySignature, edo) => {
         // C D E♭ E♯ G♭ A B, and meantone looks those names up in its own labels, so that is
         // what played. In 19 EDO the tritone is 9.5 steps and rounds up to the diminished
         // fifth, so every lydian scale played G♭ for F♯, 63 cents sharp. Where the stretched
-        // major scale on C misses the naturals, or where the table spells sharps and flats as
-        // meantone does, spell seven-note modes as 12 EDO does and find those names here.
+        // major scale on C misses the naturals, spell every mode as 12 EDO does and find those
+        // names here (C major pentatonic played C D E♭ G♭ A under 1/4-comma meantone). Where
+        // the table spells sharps and flats as meantone does, only seven-note modes need it.
         if (
-            edoHalfSteps.length === 7 &&
-            (!_stretchHitsNaturals(edoNames, currentEDO) || _namesAreMeantone(edoNames))
+            !_stretchHitsNaturals(edoNames, currentEDO) ||
+            (edoHalfSteps.length === 7 && _namesAreMeantone(edoNames))
         ) {
             const respelled = _respellInEdo(keySignature, edoNames, idx);
-            if (respelled !== null) {
+            if (respelled !== null && respelled[1].length === edoHalfSteps.length) {
                 return respelled;
             }
         }

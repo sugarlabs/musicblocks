@@ -2748,6 +2748,20 @@ describe("buildScale with explicit EDO", () => {
         }
     });
 
+    it("spells pentatonic, whole-tone and chromatic modes by letter in 21-EDO", () => {
+        // C major pentatonic played C D E♭ G♭ A under 1/4-comma meantone.
+        expect(buildScale("C major pentatonic", 21)).toEqual([
+            ["C", "D", "E", "G", "A", "C"],
+            [4, 4, 5, 3, 5]
+        ]);
+        for (const key of ["G minor pentatonic", "C whole tone", "D chromatic", "A bebop"]) {
+            const [scale, steps] = buildScale(key, 21);
+            expect(scale).toEqual(buildScale(key, 12)[0]);
+            expect(steps.reduce((a, b) => a + b, 0)).toBe(21);
+            expect(steps.every(step => step > 0)).toBe(true);
+        }
+    });
+
     it("keeps the stretched 21-EDO scale when a name is missing from the table", () => {
         // The 21-name table has no C♭, so E♭ minor stays as it was.
         const [scale, steps] = buildScale("E♭ minor", 21);
