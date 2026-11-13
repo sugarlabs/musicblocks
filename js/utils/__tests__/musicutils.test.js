@@ -2734,6 +2734,74 @@ describe("buildScale with explicit EDO", () => {
         expect(scale.length).toBe(steps.length + 1);
     });
 
+    it("spells seven-note modes by letter in 21-EDO (1/4-comma meantone)", () => {
+        // Stretching the 12-EDO step pattern over the 21-name table gave C major as
+        // C D E♭ E♯ G♭ A B, and meantone plays whatever names come back.
+        expect(buildScale("C major", 21)).toEqual([
+            ["C", "D", "E", "F", "G", "A", "B", "C"],
+            [4, 4, 2, 3, 3, 3, 2]
+        ]);
+        for (const key of ["G major", "A dorian", "D minor", "F♯ major", "B♭ major", "E lydian"]) {
+            const [scale, steps] = buildScale(key, 21);
+            expect(scale).toEqual(buildScale(key, 12)[0]);
+            expect(steps.reduce((a, b) => a + b, 0)).toBe(21);
+        }
+    });
+
+    it("spells pentatonic, whole-tone and chromatic modes by letter in 21-EDO", () => {
+        // C major pentatonic played C D E♭ G♭ A under 1/4-comma meantone.
+        expect(buildScale("C major pentatonic", 21)).toEqual([
+            ["C", "D", "E", "G", "A", "C"],
+            [4, 4, 5, 3, 5]
+        ]);
+        for (const key of ["G minor pentatonic", "C whole tone", "D chromatic", "A bebop"]) {
+            const [scale, steps] = buildScale(key, 21);
+            expect(scale).toEqual(buildScale(key, 12)[0]);
+            expect(steps.reduce((a, b) => a + b, 0)).toBe(21);
+            expect(steps.every(step => step > 0)).toBe(true);
+        }
+    });
+
+    it("never respells a custom mode, which is written in the EDO's own steps", () => {
+        const saved = MUSICALMODES.custom;
+        try {
+            for (const [edo, pattern] of [
+                [19, [3, 3, 2, 3, 3, 3, 2]],
+                [21, [3, 3, 3, 3, 3, 3, 3]],
+                [21, [4, 4, 2, 3, 3, 3, 2]]
+            ]) {
+                MUSICALMODES.custom = pattern;
+                expect(buildScale("C custom", edo)[1]).toEqual(pattern);
+            }
+        } finally {
+            MUSICALMODES.custom = saved;
+        }
+    });
+
+    it("keeps the stretched 21-EDO scale when a name is missing from the table", () => {
+        // The 21-name table has no C♭, so E♭ minor stays as it was.
+        const [scale, steps] = buildScale("E♭ minor", 21);
+        expect(scale[0]).toBe("E♭");
+        expect(steps.reduce((a, b) => a + b, 0)).toBe(21);
+    });
+
+    it("plays the augmented fourth, not the diminished fifth, in 19-EDO lydian", () => {
+        // 6 semitones is 9.5 steps of 19 and rounded up to G♭, 63 cents above F♯.
+        expect(buildScale("C lydian", 19)).toEqual([
+            ["C", "D", "E", "F♯", "G", "A", "B", "C"],
+            [3, 3, 3, 2, 3, 3, 2]
+        ]);
+        for (const key of ["E♭ lydian", "G lydian", "C hungarian", "D romanian minor"]) {
+            const [scale, steps] = buildScale(key, 19);
+            expect(scale).toEqual(buildScale(key, 12)[0]);
+            expect(steps.reduce((a, b) => a + b, 0)).toBe(19);
+        }
+        expect(buildScale("A dorian", 19)).toEqual([
+            ["A", "B", "C", "D", "E", "F♯", "G", "A"],
+            [3, 2, 3, 3, 3, 2, 3]
+        ]);
+    });
+
     it("clamps steps for 5-EDO so the scale never gets stuck", () => {
         const [scale, steps] = buildScale("C major", 5);
         expect(steps).toEqual([1, 1, 1, 1, 1, 1, 1]);

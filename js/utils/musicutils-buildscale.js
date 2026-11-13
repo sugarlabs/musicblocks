@@ -157,6 +157,86 @@ var _notePitchClass = name => {
  *     current temperament's EDO is used (legacy behavior).
  * @returns {Array} An array containing the scale and the corresponding intervals.
  */
+/**
+ * The scale of `keySignature` in an EDO whose note names are not spread evenly, found by
+ * looking up each note of the 12-EDO spelling in that EDO's name table. Null when a note
+ * is missing from the table or the steps don't add up to one octave.
+ * @param {string} keySignature - The key signature.
+ * @param {Array<string>} edoNames - generateNoteNames(edo).
+ * @param {number} idx - Index of the tonic in `edoNames`.
+ * @returns {Array|null} [scale, steps], as buildScale returns them.
+ */
+var _respellInEdo = (keySignature, edoNames, idx) => {
+    const spelled = buildScale(keySignature, 12)[0];
+    const scale = [edoNames[idx]];
+    const steps = [];
+    let pos = idx;
+    for (let i = 1; i < spelled.length; i++) {
+        let next = -1;
+        for (let j = 1; j <= edoNames.length; j++) {
+            if (edoNames[(pos + j) % edoNames.length] === spelled[i]) {
+                next = j;
+                break;
+            }
+        }
+        if (next === -1) {
+            return null;
+        }
+        steps.push(next);
+        pos = (pos + next) % edoNames.length;
+        scale.push(edoNames[pos]);
+    }
+    return steps.reduce((a, b) => a + b, 0) === edoNames.length ? [scale, steps] : null;
+};
+
+/**
+ * Whether stretching the major pattern over `edoNames` from C lands on C D E F G A B.
+ * @param {Array<string>} edoNames - generateNoteNames(edo).
+ * @param {number} edo - The EDO.
+ * @returns {boolean}
+ */
+var _stretchHitsNaturals = (edoNames, edo) => {
+    let pos = edoNames.indexOf("C");
+    if (pos === -1) {
+        return true;
+    }
+    const letters = ["C"];
+    for (const step of getModePattern("major", edo).slice(0, -1)) {
+        pos = (pos + step) % edoNames.length;
+        letters.push(edoNames[pos]);
+    }
+    return letters.join("") === "CDEFGAB";
+};
+
+/**
+ * Whether `edoNames` places sharps and flats as meantone does: X♯ one chromatic semitone
+ * (C→D minus E→F) above X, and X♭ the same below it. True of 12 and 19 EDO; not of the
+ * 17-, 21- and 31-EDO tables, whose ♯ and ♭ are one step.
+ * @param {Array<string>} edoNames - generateNoteNames(edo).
+ * @returns {boolean}
+ */
+var _namesAreMeantone = edoNames => {
+    const n = edoNames.length;
+    const at = name => edoNames.indexOf(name);
+    if (["C", "D", "E", "F"].some(name => at(name) === -1)) {
+        return false;
+    }
+    const chromatic = at("D") - at("C") - (at("F") - at("E"));
+    if (chromatic < 1) {
+        return false;
+    }
+    return ["C", "D", "E", "F", "G", "A", "B"].every(letter => {
+        const base = at(letter);
+        const sharp = at(letter + SHARP);
+        const flat = at(letter + FLAT);
+        return (
+            base !== -1 &&
+            (sharp === -1 || sharp === (base + chromatic) % n) &&
+            (flat === -1 || flat === (base - chromatic + n) % n)
+        );
+    });
+};
+
 var buildScale = (keySignature, edo) => {
     // Determine active EDO: only an omitted parameter falls back to the
     // global temperament state, so existing callers keep working
@@ -252,6 +332,26 @@ var buildScale = (keySignature, edo) => {
         for (let i = 0; i < edoHalfSteps.length; i++) {
             ii = (ii + edoHalfSteps[i] + edoNames.length) % edoNames.length;
             scale.push(edoNames[ii]);
+        }
+
+        // Stretching the 12-EDO pattern rounds each degree on its own, and that can land on
+        // the wrong name. In 21 EDO (the pitch count of 1/4-comma meantone) C major came out
+        // C D E♭ E♯ G♭ A B, and meantone looks those names up in its own labels, so that is
+        // what played. In 19 EDO the tritone is 9.5 steps and rounds up to the diminished
+        // fifth, so every lydian scale played G♭ for F♯, 63 cents sharp. Where the stretched
+        // major scale on C misses the naturals, spell every mode as 12 EDO does and find those
+        // names here (C major pentatonic played C D E♭ G♭ A under 1/4-comma meantone). Where
+        // the table spells sharps and flats as meantone does, only seven-note modes need it.
+        // A custom mode is written in this EDO's own steps, so it is never respelled.
+        if (
+            obj[1] !== "custom" &&
+            (!_stretchHitsNaturals(edoNames, currentEDO) ||
+                (edoHalfSteps.length === 7 && _namesAreMeantone(edoNames)))
+        ) {
+            const respelled = _respellInEdo(keySignature, edoNames, idx);
+            if (respelled !== null && respelled[1].length === edoHalfSteps.length) {
+                return respelled;
+            }
         }
         return [scale, edoHalfSteps];
     }
@@ -1443,6 +1543,9 @@ var getSolfege = (note, keySignature, movable, temperament, edo) => {
 
 var MusicUtilsBuildScale = {
     _notePitchClass,
+    _respellInEdo,
+    _stretchHitsNaturals,
+    _namesAreMeantone,
     getNonEDOFrequency,
     buildScale,
     _getStepSize,
