@@ -33,6 +33,7 @@ global.window = { btoa: str => Buffer.from(str, "binary").toString("base64") };
 
 const buildscale = require("../musicutils-buildscale");
 const musicutils = require("../musicutils");
+const { MUSICALMODES } = require("../musicutils-modecore");
 const { SHARP, FLAT, NATURAL, DOUBLESHARP, DOUBLEFLAT } = require("../musicutils-constants");
 
 const readSource = name => fs.readFileSync(path.join(__dirname, "..", name), "utf8");
@@ -128,6 +129,47 @@ describe("musicutils-buildscale", () => {
         expect(buildscale._getStepSize("C major", "C", "up", 0, "equal19", 19)).toBe(3);
         expect(buildscale.getInterval(4, "C major", "C")).toBe(7);
         expect(buildscale.getInterval(-2, "C major", "C")).toBe(-3);
+    });
+
+    it("preserves seven-note spellings in 21-note meantone", () => {
+        expect(buildscale.buildScale("C major", 21)).toEqual([
+            ["C", "D", "E", "F", "G", "A", "B", "C"],
+            [4, 4, 2, 3, 3, 3, 2]
+        ]);
+        expect(buildscale.buildScale("G major", 21)[0]).toEqual([
+            "G",
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F" + SHARP,
+            "G"
+        ]);
+    });
+
+    it("keeps the EDO-native scale when a seven-note spelling is unavailable", () => {
+        expect(buildscale.buildScale("G major", 7)).toEqual([
+            ["G", "A", "B", "C", "D", "E", "F", "G"],
+            [1, 1, 1, 1, 1, 1, 1]
+        ]);
+        expect(buildscale.buildScale("C" + SHARP + " major", 7)).toEqual([
+            ["C", "D", "E", "F", "G", "A", "B", "C"],
+            [1, 1, 1, 1, 1, 1, 1]
+        ]);
+    });
+
+    it("keeps custom seven-step patterns in their EDO", () => {
+        const originalCustom = MUSICALMODES.custom;
+        MUSICALMODES.custom = [3, 3, 2, 3, 3, 3, 2];
+        try {
+            expect(buildscale.buildScale("C custom", 19)).toEqual([
+                ["C", "D", "E", "F", "G", "A", "B", "C"],
+                [3, 3, 2, 3, 3, 3, 2]
+            ]);
+        } finally {
+            MUSICALMODES.custom = originalCustom;
+        }
     });
 
     it("resolves correct accidentals in reverse scale-degree mapping for altered and unaltered pitches", () => {

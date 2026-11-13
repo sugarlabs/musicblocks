@@ -246,6 +246,33 @@ var buildScale = (keySignature, edo) => {
         // pitch class, so no pitch class is left unreachable.
         const edoHalfSteps = getModePattern(obj[1], currentEDO);
 
+        // Keep the usual spelling for seven-note modes. The note positions in
+        // 21-note meantone do not match a proportional 12-EDO scale.
+        if (edoHalfSteps.length === 7 && obj[1].toLowerCase() !== "custom") {
+            const twelveEDOScale = buildScale(keySignature, 12)[0];
+            const positions = [];
+            let previous = edoNames.indexOf(twelveEDOScale[0]);
+            if (previous !== -1) {
+                positions.push(previous);
+                for (let i = 1; i < twelveEDOScale.length; i++) {
+                    let position = edoNames.indexOf(twelveEDOScale[i]);
+                    if (position === -1) {
+                        positions.length = 0;
+                        break;
+                    }
+                    while (position <= previous) {
+                        position += edoNames.length;
+                    }
+                    positions.push(position);
+                    previous = position;
+                }
+            }
+            if (positions.length === twelveEDOScale.length) {
+                const steps = positions.slice(1).map((position, i) => position - positions[i]);
+                return [twelveEDOScale, steps];
+            }
+        }
+
         const startNote = edoNames[idx];
         const scale = [startNote];
         let ii = idx;
