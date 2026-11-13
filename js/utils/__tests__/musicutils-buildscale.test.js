@@ -33,6 +33,7 @@ global.window = { btoa: str => Buffer.from(str, "binary").toString("base64") };
 
 const buildscale = require("../musicutils-buildscale");
 const musicutils = require("../musicutils");
+const { MUSICALMODES } = require("../musicutils-modecore");
 const { SHARP, FLAT, NATURAL, DOUBLESHARP, DOUBLEFLAT } = require("../musicutils-constants");
 
 const readSource = name => fs.readFileSync(path.join(__dirname, "..", name), "utf8");
@@ -145,6 +146,30 @@ describe("musicutils-buildscale", () => {
             "F" + SHARP,
             "G"
         ]);
+    });
+
+    it("keeps the EDO-native scale when a seven-note spelling is unavailable", () => {
+        expect(buildscale.buildScale("G major", 7)).toEqual([
+            ["G", "A", "B", "C", "D", "E", "F", "G"],
+            [1, 1, 1, 1, 1, 1, 1]
+        ]);
+        expect(buildscale.buildScale("C" + SHARP + " major", 7)).toEqual([
+            ["C", "D", "E", "F", "G", "A", "B", "C"],
+            [1, 1, 1, 1, 1, 1, 1]
+        ]);
+    });
+
+    it("keeps custom seven-step patterns in their EDO", () => {
+        const originalCustom = MUSICALMODES.custom;
+        MUSICALMODES.custom = [3, 3, 2, 3, 3, 3, 2];
+        try {
+            expect(buildscale.buildScale("C custom", 19)).toEqual([
+                ["C", "D", "E", "F", "G", "A", "B", "C"],
+                [3, 3, 2, 3, 3, 3, 2]
+            ]);
+        } finally {
+            MUSICALMODES.custom = originalCustom;
+        }
     });
 
     it("resolves correct accidentals in reverse scale-degree mapping for altered and unaltered pitches", () => {

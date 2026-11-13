@@ -248,7 +248,7 @@ var buildScale = (keySignature, edo) => {
 
         // Keep the usual spelling for seven-note modes. The note positions in
         // 21-note meantone do not match a proportional 12-EDO scale.
-        if (edoHalfSteps.length === 7) {
+        if (edoHalfSteps.length === 7 && obj[1].toLowerCase() !== "custom") {
             const twelveEDOScale = buildScale(keySignature, 12)[0];
             const positions = [];
             let previous = edoNames.indexOf(twelveEDOScale[0]);
