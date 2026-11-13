@@ -2260,7 +2260,9 @@ describe("widgetWindows", () => {
                 "music keyboard": "teclado musical",
                 "pitch staircase": "escalera de tono",
                 "status": "estado",
-                "sampler": "muestreador"
+                "sampler": "muestreador",
+                "timbre": "timbre traducido",
+                "phrase maker": "creador de frases"
             };
             global._ = jest.fn(str => translations[str] || str);
 
@@ -2268,7 +2270,9 @@ describe("widgetWindows", () => {
                 "slider": { close: jest.fn() },
                 "pitch staircase": { close: jest.fn() },
                 "status": { close: jest.fn() },
-                "sampler": { close: jest.fn() }
+                "sampler": { close: jest.fn() },
+                "timbre": { close: jest.fn() },
+                "phrase maker": { close: jest.fn() }
             };
             windowFor({ blockNo: 7 }, "music keyboard");
 
@@ -2287,6 +2291,12 @@ describe("widgetWindows", () => {
 
                 window.widgetWindows.closeBlkWidgets("muestreador");
                 expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("sampler");
+
+                window.widgetWindows.closeBlkWidgets("timbre traducido");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("timbre");
+
+                window.widgetWindows.closeBlkWidgets("creador de frases");
+                expect(window.widgetWindows.closeWindow).toHaveBeenCalledWith("phrase maker");
             } finally {
                 global._ = originalI18n;
             }
