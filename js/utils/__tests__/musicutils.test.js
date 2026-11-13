@@ -2755,7 +2755,17 @@ describe("buildScale with explicit EDO", () => {
         expect(steps.reduce((a, b) => a + b, 0)).toBe(21);
     });
 
-    it("leaves 19-EDO modes on the stretched pattern", () => {
+    it("plays the augmented fourth, not the diminished fifth, in 19-EDO lydian", () => {
+        // 6 semitones is 9.5 steps of 19 and rounded up to G♭, 63 cents above F♯.
+        expect(buildScale("C lydian", 19)).toEqual([
+            ["C", "D", "E", "F♯", "G", "A", "B", "C"],
+            [3, 3, 3, 2, 3, 3, 2]
+        ]);
+        for (const key of ["E♭ lydian", "G lydian", "C hungarian", "D romanian minor"]) {
+            const [scale, steps] = buildScale(key, 19);
+            expect(scale).toEqual(buildScale(key, 12)[0]);
+            expect(steps.reduce((a, b) => a + b, 0)).toBe(19);
+        }
         expect(buildScale("A dorian", 19)).toEqual([
             ["A", "B", "C", "D", "E", "F♯", "G", "A"],
             [3, 2, 3, 3, 3, 2, 3]

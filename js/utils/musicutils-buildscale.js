@@ -208,6 +208,35 @@ var _stretchHitsNaturals = (edoNames, edo) => {
     return letters.join("") === "CDEFGAB";
 };
 
+/**
+ * Whether `edoNames` places sharps and flats as meantone does: X♯ one chromatic semitone
+ * (C→D minus E→F) above X, and X♭ the same below it. True of 12 and 19 EDO; not of the
+ * 17-, 21- and 31-EDO tables, whose ♯ and ♭ are one step.
+ * @param {Array<string>} edoNames - generateNoteNames(edo).
+ * @returns {boolean}
+ */
+var _namesAreMeantone = edoNames => {
+    const n = edoNames.length;
+    const at = name => edoNames.indexOf(name);
+    if (["C", "D", "E", "F"].some(name => at(name) === -1)) {
+        return false;
+    }
+    const chromatic = at("D") - at("C") - (at("F") - at("E"));
+    if (chromatic < 1) {
+        return false;
+    }
+    return ["C", "D", "E", "F", "G", "A", "B"].every(letter => {
+        const base = at(letter);
+        const sharp = at(letter + SHARP);
+        const flat = at(letter + FLAT);
+        return (
+            base !== -1 &&
+            (sharp === -1 || sharp === (base + chromatic) % n) &&
+            (flat === -1 || flat === (base - chromatic + n) % n)
+        );
+    });
+};
+
 var buildScale = (keySignature, edo) => {
     // Determine active EDO: only an omitted parameter falls back to the
     // global temperament state, so existing callers keep working
@@ -305,12 +334,17 @@ var buildScale = (keySignature, edo) => {
             scale.push(edoNames[ii]);
         }
 
-        // Stretching the 12-EDO pattern assumes the names are spread the same way, and in
-        // 21 EDO (the pitch count of 1/4-comma meantone) they aren't: C major came out
+        // Stretching the 12-EDO pattern rounds each degree on its own, and that can land on
+        // the wrong name. In 21 EDO (the pitch count of 1/4-comma meantone) C major came out
         // C D E♭ E♯ G♭ A B, and meantone looks those names up in its own labels, so that is
-        // what played. Where the stretched major scale on C misses the naturals, spell
-        // seven-note modes as 12 EDO does and find those names in this table instead.
-        if (edoHalfSteps.length === 7 && !_stretchHitsNaturals(edoNames, currentEDO)) {
+        // what played. In 19 EDO the tritone is 9.5 steps and rounds up to the diminished
+        // fifth, so every lydian scale played G♭ for F♯, 63 cents sharp. Where the stretched
+        // major scale on C misses the naturals, or where the table spells sharps and flats as
+        // meantone does, spell seven-note modes as 12 EDO does and find those names here.
+        if (
+            edoHalfSteps.length === 7 &&
+            (!_stretchHitsNaturals(edoNames, currentEDO) || _namesAreMeantone(edoNames))
+        ) {
             const respelled = _respellInEdo(keySignature, edoNames, idx);
             if (respelled !== null) {
                 return respelled;
@@ -1508,6 +1542,7 @@ var MusicUtilsBuildScale = {
     _notePitchClass,
     _respellInEdo,
     _stretchHitsNaturals,
+    _namesAreMeantone,
     getNonEDOFrequency,
     buildScale,
     _getStepSize,
