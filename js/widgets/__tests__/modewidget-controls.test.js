@@ -39,7 +39,7 @@ describe("ModeWidget control bar keyboard access", () => {
             _saveCustomMode: jest.fn().mockReturnValue(true),
             _deleteCustomMode: jest.fn(),
             _setModeName: jest.fn(),
-            _save: jest.fn(),
+            _save: jest.fn().mockReturnValue(true),
             textMsg: jest.fn(),
             errorMsg: jest.fn(),
             _initEdoSelect: jest.fn(select => {
@@ -73,6 +73,7 @@ describe("ModeWidget control bar keyboard access", () => {
             expect(widget._saveCustomMode).toHaveBeenCalledWith("test mode", pattern);
             expect(widget._saveCustomMode).toHaveBeenCalledTimes(1);
             expect(widget._save).toHaveBeenCalledTimes(1);
+            expect(widget.textMsg).toHaveBeenCalledWith("Mode saved: test mode", 3000);
         } else {
             expect(widget._deleteCustomMode).toHaveBeenCalledWith("test mode");
             expect(widget._deleteCustomMode).toHaveBeenCalledTimes(1);
