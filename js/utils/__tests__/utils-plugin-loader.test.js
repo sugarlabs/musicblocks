@@ -362,6 +362,7 @@ describe("processPluginData - plugin vetting", () => {
                 });
             return script;
         });
+        return blobUrls;
     };
 
     beforeEach(() => {
@@ -658,6 +659,7 @@ describe("processPluginData - macros, images and setup code", () => {
                 });
             return script;
         });
+        return blobUrls;
     };
 
     beforeEach(() => {
@@ -764,7 +766,7 @@ describe("processPluginData - macros, images and setup code", () => {
     });
 
     it("rewrites Function('return this')() so CSP does not block the setup code", async () => {
-        mockScriptLoading();
+        const blobUrls = mockScriptLoading();
 
         const activity = createActivity();
         await processPluginData(
@@ -776,6 +778,17 @@ describe("processPluginData - macros, images and setup code", () => {
             }),
             "plugins/test.json"
         );
+
+        // The generated setup Blob source must carry the rewritten probe, not the
+        // CSP-blocked form - executing Function('return this')() would also return
+        // window here, so the execution assertion alone cannot prove the rewrite.
+        const blobSources = [];
+        for (const blob of blobUrls.values()) {
+            blobSources.push(await blob.text());
+        }
+        const combinedSource = blobSources.join("\n");
+        expect(combinedSource).toContain("globalThis.cspProbe = window;");
+        expect(combinedSource).not.toContain("Function('return this')()");
 
         expect(globalThis.cspProbe).toBe(window);
         delete globalThis.cspProbe;
