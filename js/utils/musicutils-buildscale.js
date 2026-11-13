@@ -157,6 +157,57 @@ var _notePitchClass = name => {
  *     current temperament's EDO is used (legacy behavior).
  * @returns {Array} An array containing the scale and the corresponding intervals.
  */
+/**
+ * The scale of `keySignature` in an EDO whose note names are not spread evenly, found by
+ * looking up each note of the 12-EDO spelling in that EDO's name table. Null when a note
+ * is missing from the table or the steps don't add up to one octave.
+ * @param {string} keySignature - The key signature.
+ * @param {Array<string>} edoNames - generateNoteNames(edo).
+ * @param {number} idx - Index of the tonic in `edoNames`.
+ * @returns {Array|null} [scale, steps], as buildScale returns them.
+ */
+var _respellInEdo = (keySignature, edoNames, idx) => {
+    const spelled = buildScale(keySignature, 12)[0];
+    const scale = [edoNames[idx]];
+    const steps = [];
+    let pos = idx;
+    for (let i = 1; i < spelled.length; i++) {
+        let next = -1;
+        for (let j = 1; j <= edoNames.length; j++) {
+            if (edoNames[(pos + j) % edoNames.length] === spelled[i]) {
+                next = j;
+                break;
+            }
+        }
+        if (next === -1) {
+            return null;
+        }
+        steps.push(next);
+        pos = (pos + next) % edoNames.length;
+        scale.push(edoNames[pos]);
+    }
+    return steps.reduce((a, b) => a + b, 0) === edoNames.length ? [scale, steps] : null;
+};
+
+/**
+ * Whether stretching the major pattern over `edoNames` from C lands on C D E F G A B.
+ * @param {Array<string>} edoNames - generateNoteNames(edo).
+ * @param {number} edo - The EDO.
+ * @returns {boolean}
+ */
+var _stretchHitsNaturals = (edoNames, edo) => {
+    let pos = edoNames.indexOf("C");
+    if (pos === -1) {
+        return true;
+    }
+    const letters = ["C"];
+    for (const step of getModePattern("major", edo).slice(0, -1)) {
+        pos = (pos + step) % edoNames.length;
+        letters.push(edoNames[pos]);
+    }
+    return letters.join("") === "CDEFGAB";
+};
+
 var buildScale = (keySignature, edo) => {
     // Determine active EDO: only an omitted parameter falls back to the
     // global temperament state, so existing callers keep working
@@ -252,6 +303,18 @@ var buildScale = (keySignature, edo) => {
         for (let i = 0; i < edoHalfSteps.length; i++) {
             ii = (ii + edoHalfSteps[i] + edoNames.length) % edoNames.length;
             scale.push(edoNames[ii]);
+        }
+
+        // Stretching the 12-EDO pattern assumes the names are spread the same way, and in
+        // 21 EDO (the pitch count of 1/4-comma meantone) they aren't: C major came out
+        // C D E♭ E♯ G♭ A B, and meantone looks those names up in its own labels, so that is
+        // what played. Where the stretched major scale on C misses the naturals, spell
+        // seven-note modes as 12 EDO does and find those names in this table instead.
+        if (edoHalfSteps.length === 7 && !_stretchHitsNaturals(edoNames, currentEDO)) {
+            const respelled = _respellInEdo(keySignature, edoNames, idx);
+            if (respelled !== null) {
+                return respelled;
+            }
         }
         return [scale, edoHalfSteps];
     }
@@ -1443,6 +1506,8 @@ var getSolfege = (note, keySignature, movable, temperament, edo) => {
 
 var MusicUtilsBuildScale = {
     _notePitchClass,
+    _respellInEdo,
+    _stretchHitsNaturals,
     getNonEDOFrequency,
     buildScale,
     _getStepSize,

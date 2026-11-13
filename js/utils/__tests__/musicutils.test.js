@@ -2734,6 +2734,34 @@ describe("buildScale with explicit EDO", () => {
         expect(scale.length).toBe(steps.length + 1);
     });
 
+    it("spells seven-note modes by letter in 21-EDO (1/4-comma meantone)", () => {
+        // Stretching the 12-EDO step pattern over the 21-name table gave C major as
+        // C D E♭ E♯ G♭ A B, and meantone plays whatever names come back.
+        expect(buildScale("C major", 21)).toEqual([
+            ["C", "D", "E", "F", "G", "A", "B", "C"],
+            [4, 4, 2, 3, 3, 3, 2]
+        ]);
+        for (const key of ["G major", "A dorian", "D minor", "F♯ major", "B♭ major", "E lydian"]) {
+            const [scale, steps] = buildScale(key, 21);
+            expect(scale).toEqual(buildScale(key, 12)[0]);
+            expect(steps.reduce((a, b) => a + b, 0)).toBe(21);
+        }
+    });
+
+    it("keeps the stretched 21-EDO scale when a name is missing from the table", () => {
+        // The 21-name table has no C♭, so E♭ minor stays as it was.
+        const [scale, steps] = buildScale("E♭ minor", 21);
+        expect(scale[0]).toBe("E♭");
+        expect(steps.reduce((a, b) => a + b, 0)).toBe(21);
+    });
+
+    it("leaves 19-EDO modes on the stretched pattern", () => {
+        expect(buildScale("A dorian", 19)).toEqual([
+            ["A", "B", "C", "D", "E", "F♯", "G", "A"],
+            [3, 2, 3, 3, 3, 2, 3]
+        ]);
+    });
+
     it("clamps steps for 5-EDO so the scale never gets stuck", () => {
         const [scale, steps] = buildScale("C major", 5);
         expect(steps).toEqual([1, 1, 1, 1, 1, 1, 1]);
