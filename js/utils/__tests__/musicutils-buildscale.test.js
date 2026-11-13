@@ -130,6 +130,23 @@ describe("musicutils-buildscale", () => {
         expect(buildscale.getInterval(-2, "C major", "C")).toBe(-3);
     });
 
+    it("preserves seven-note spellings in 21-note meantone", () => {
+        expect(buildscale.buildScale("C major", 21)).toEqual([
+            ["C", "D", "E", "F", "G", "A", "B", "C"],
+            [4, 4, 2, 3, 3, 3, 2]
+        ]);
+        expect(buildscale.buildScale("G major", 21)[0]).toEqual([
+            "G",
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F" + SHARP,
+            "G"
+        ]);
+    });
+
     it("resolves correct accidentals in reverse scale-degree mapping for altered and unaltered pitches", () => {
         // Flat-key scale note with natural pitch above it (F major: Bb -> B)
         expect(buildscale.scaleDegreeToPitchMapping("F major", null, false, "B")).toEqual([
