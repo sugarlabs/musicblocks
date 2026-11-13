@@ -13,6 +13,7 @@
  */
 
 global._ = msg => msg;
+global.normalizeBoxName = require("../../blocks/BoxesBlocks").normalizeBoxName;
 
 // updateAll schedules its DOM render on the next animation frame; run it
 // synchronously so the rendering tests below stay direct. The throttling
@@ -616,6 +617,17 @@ describe("StatusMatrix Widget", () => {
 
             statusMatrix.updateAll();
             expect(mockActivity.logo.parseArg).toHaveBeenCalled();
+        });
+
+        test("reads a box stored without the space typed on the block", () => {
+            mockActivity.blocks.blockList = {
+                0: { name: "namedbox", privateData: " myVar " }
+            };
+            mockActivity.logo.statusFields = [[0, "namedbox"]];
+            mockActivity.logo.boxes = { myVar: 42 };
+
+            statusMatrix.updateAll();
+            expect(statusMatrix._statusTable.rows[1].cells[1].textContent).toBe(42);
         });
 
         test("handles namedbox with missing variable", () => {

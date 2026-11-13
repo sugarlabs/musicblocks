@@ -5157,6 +5157,28 @@ class Block {
 
         let newValue = this.label.value;
 
+        // Trim a Store in / Box name when the edit is committed. Leave the
+        // field alone while typing so a name like "my box" can still be entered.
+        if (closeInput && this.name === "text" && typeof newValue === "string") {
+            const parentIndex = this.connections[0];
+            const parent =
+                parentIndex !== null && this.blocks && this.blocks.blockList
+                    ? this.blocks.blockList[parentIndex]
+                    : null;
+            if (
+                parent &&
+                (parent.name === "storein" || parent.name === "box") &&
+                parent.connections &&
+                parent.connections[1] === this.blockIndex
+            ) {
+                const trimmed = newValue.trim();
+                if (trimmed.length > 0 && trimmed !== newValue) {
+                    newValue = trimmed;
+                    this.label.value = trimmed;
+                }
+            }
+        }
+
         if (this.labelattr !== null) {
             const attrValue = this.labelattr.value;
             switch (attrValue) {
@@ -5173,7 +5195,7 @@ class Block {
 
         let c = this.connections[0];
 
-        if (oldValue === newValue) {
+        if (oldValue === newValue && this.value === newValue) {
             // Nothing to do in this case.
             this._labelLock = false;
 

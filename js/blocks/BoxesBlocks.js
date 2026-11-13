@@ -16,7 +16,20 @@
    NOBOXERRORMSG
 */
 
-/* exported setupBoxesBlocks */
+/* exported setupBoxesBlocks, normalizeBoxName */
+
+/**
+ * Normalizes a box name by trimming surrounding whitespace.
+ * @param {*} name
+ * @returns {*} Normalized box name.
+ */
+function normalizeBoxName(name) {
+    if (typeof name !== "string") {
+        return name;
+    }
+    const trimmed = name.trim();
+    return trimmed.length === 0 ? name : trimmed;
+}
 
 function setupBoxesBlocks(activity) {
     /**
@@ -98,7 +111,7 @@ function setupBoxesBlocks(activity) {
                 if (activity.blocks.blockList[cblk].name === "text") {
                     // Work-around to #1302
                     // Look for a namedbox with this text value.
-                    const name = activity.blocks.blockList[cblk].value;
+                    const name = normalizeBoxName(activity.blocks.blockList[cblk].value);
                     if (name in logo.boxes) {
                         logo.boxes[name] = logo.boxes[name] + i;
                         return;
@@ -303,7 +316,9 @@ function setupBoxesBlocks(activity) {
          */
         updateParameter(logo, turtle, blk) {
             const cblk = activity.blocks.blockList[blk].connections[1];
-            const boxname = logo.parseArg(logo, turtle, cblk, blk, logo.receivedArg);
+            const boxname = normalizeBoxName(
+                logo.parseArg(logo, turtle, cblk, blk, logo.receivedArg)
+            );
 
             if (boxname in logo.boxes) {
                 return logo.boxes[boxname];
@@ -322,7 +337,7 @@ function setupBoxesBlocks(activity) {
          */
         setter(logo, value, turtle, blk) {
             const cblk = activity.blocks.blockList[blk].connections[1];
-            const name = logo.parseArg(logo, turtle, cblk, blk, logo.receivedArg);
+            const name = normalizeBoxName(logo.parseArg(logo, turtle, cblk, blk, logo.receivedArg));
 
             if (name in logo.boxes) {
                 logo.boxes[name] = value;
@@ -347,7 +362,7 @@ function setupBoxesBlocks(activity) {
                 return 0;
             }
 
-            const name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+            const name = normalizeBoxName(logo.parseArg(logo, turtle, cblk, blk, receivedArg));
             if (name in logo.boxes) {
                 return logo.boxes[name];
             } else {
@@ -422,7 +437,7 @@ function setupBoxesBlocks(activity) {
          * @returns {number} The value stored in the specified named box.
          */
         updateParameter(logo, turtle, blk) {
-            const name = activity.blocks.blockList[blk].privateData;
+            const name = normalizeBoxName(activity.blocks.blockList[blk].privateData);
 
             if (name in logo.boxes) {
                 return logo.boxes[name];
@@ -440,7 +455,7 @@ function setupBoxesBlocks(activity) {
          * @param {string} blk - The block identifier.
          */
         setter(logo, value, turtle, blk) {
-            const name = activity.blocks.blockList[blk].privateData;
+            const name = normalizeBoxName(activity.blocks.blockList[blk].privateData);
 
             if (name in logo.boxes) {
                 logo.boxes[name] = value;
@@ -457,7 +472,7 @@ function setupBoxesBlocks(activity) {
          * @returns {number} The value stored in the specified named box.
          */
         arg(logo, turtle, blk) {
-            const name = activity.blocks.blockList[blk].privateData;
+            const name = normalizeBoxName(activity.blocks.blockList[blk].privateData);
 
             const connections = activity.blocks.blockList[blk]?.connections;
             const parentId = connections?.[0];
@@ -543,7 +558,7 @@ function setupBoxesBlocks(activity) {
              * The private data associated with the block.
              * @type {string}
              */
-            const privateData = activity.blocks.blockList[blk].privateData;
+            const privateData = normalizeBoxName(activity.blocks.blockList[blk].privateData);
 
             /**
              * The value to be stored in the box.
@@ -619,7 +634,7 @@ function setupBoxesBlocks(activity) {
              * The name of the box to store the value.
              * @type {string}
              */
-            const boxName = args[0];
+            const boxName = normalizeBoxName(args[0]);
 
             /**
              * The value to be stored in the box.
@@ -866,5 +881,5 @@ function setupBoxesBlocks(activity) {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { setupBoxesBlocks };
+    module.exports = { setupBoxesBlocks, normalizeBoxName };
 }
