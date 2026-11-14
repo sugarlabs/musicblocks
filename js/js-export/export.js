@@ -18,7 +18,7 @@
  * Internal functions' names are in PascalCase.
  */
 
-/* global JSEditor, last, importMembers, Singer, JSInterface, globalActivity, CAMERAVALUE, ManagedTimer */
+/* global JSEditor, last, importMembers, Singer, JSInterface, globalActivity, CAMERAVALUE, ManagedTimer, isUnsafeObjectKey */
 
 /**
  * @class
@@ -470,6 +470,10 @@ class MusicBlocks {
     }
 
     setBox(name, value) {
+        if (isUnsafeObjectKey(name)) {
+            JSEditor.logConsole("The box name is reserved.", "maroon");
+            return;
+        }
         globalActivity.logo.boxes[name] = value;
     }
 
