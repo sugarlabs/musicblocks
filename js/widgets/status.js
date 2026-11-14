@@ -405,7 +405,7 @@ class StatusMatrix {
                         if (
                             name &&
                             this.activity?.logo?.boxes &&
-                            name in this.activity.logo.boxes
+                            Object.prototype.hasOwnProperty.call(this.activity.logo.boxes, name)
                         ) {
                             value = this.activity.logo.boxes[name];
                         } else {

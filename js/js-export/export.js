@@ -18,7 +18,7 @@
  * Internal functions' names are in PascalCase.
  */
 
-/* global JSEditor, last, importMembers, Singer, JSInterface, globalActivity, CAMERAVALUE, ManagedTimer */
+/* global JSEditor, last, importMembers, Singer, JSInterface, globalActivity, CAMERAVALUE, ManagedTimer, isUnsafeObjectKey */
 
 /**
  * @class
@@ -462,7 +462,7 @@ class MusicBlocks {
     // ============================== BOXES ==================================
 
     getBox(name) {
-        if (name in globalActivity.logo.boxes) {
+        if (Object.prototype.hasOwnProperty.call(globalActivity.logo.boxes, name)) {
             return globalActivity.logo.boxes[name];
         }
         JSEditor.logConsole(`No box named "${name}"`, "maroon");
@@ -470,11 +470,17 @@ class MusicBlocks {
     }
 
     setBox(name, value) {
+        if (isUnsafeObjectKey(name)) {
+            JSEditor.logConsole("The box name is reserved.", "maroon");
+            return;
+        }
         globalActivity.logo.boxes[name] = value;
     }
 
     incrementBox(name, delta) {
-        const current = name in globalActivity.logo.boxes ? globalActivity.logo.boxes[name] : 0;
+        const current = Object.prototype.hasOwnProperty.call(globalActivity.logo.boxes, name)
+            ? globalActivity.logo.boxes[name]
+            : 0;
         globalActivity.logo.boxes[name] = current + delta;
     }
 
