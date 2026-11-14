@@ -523,6 +523,22 @@ describe("setupPitchBlocks", () => {
             expect(resNaN).toEqual([20, 1]);
             expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
             expect(Singer.PitchActions.setSemitoneTranspose).toHaveBeenCalledWith(0, 0, 10);
+
+            // When input is Infinity
+            activity.errorMsg.mockClear();
+            Singer.PitchActions.setSemitoneTranspose.mockClear();
+            const resInf = block.flow([Infinity, 20], logo, 0, 10);
+            expect(resInf).toEqual([20, 1]);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+            expect(Singer.PitchActions.setSemitoneTranspose).toHaveBeenCalledWith(0, 0, 10);
+
+            // When input is -Infinity
+            activity.errorMsg.mockClear();
+            Singer.PitchActions.setSemitoneTranspose.mockClear();
+            const resNegInf = block.flow([-Infinity, 20], logo, 0, 10);
+            expect(resNegInf).toEqual([20, 1]);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+            expect(Singer.PitchActions.setSemitoneTranspose).toHaveBeenCalledWith(0, 0, 10);
         });
         it("SetScalarTranspositionBlock", () => {
             const block = createdBlocks["setscalartransposition"];
