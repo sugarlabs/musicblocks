@@ -1095,5 +1095,34 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             expect(document.body.textContent).toContain("[The very beginning]");
             expect(document.body.textContent).toContain("[Where your project started] ✦");
         });
+
+        test("translated labels next to icons are shown as text, not parsed as HTML", () => {
+            global._ = text => `<b>${text}</b>`;
+
+            gitDropdown._renderHistoryPanel(
+                [
+                    {
+                        sha: "draft-sha",
+                        message: "Draft",
+                        date: "2026-10-25T10:00:00Z",
+                        _pending: true
+                    },
+                    { sha: "chorus-sha", message: "Chorus", date: "2026-10-24T10:00:00Z" },
+                    { sha: "riff-sha", message: "Riff", date: "2026-10-23T10:00:00Z" }
+                ],
+                true
+            );
+
+            const panel = document.querySelector(".git-tt-frame");
+            expect(panel.querySelector("b")).toBeNull();
+            expect(document.querySelector(".git-tt-go-btn").textContent).toContain(
+                "<b>Go back to this version</b>"
+            );
+            expect(document.querySelector(".git-tt-sync-pending-badge").textContent).toContain(
+                "<b>Sync Pending</b>"
+            );
+            expect(panel.textContent).toContain("<b>Showing locally saved drafts</b>");
+            expect(panel.textContent).toContain("<b>4 more commits can be made</b>");
+        });
     });
 });

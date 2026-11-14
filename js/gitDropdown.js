@@ -1114,7 +1114,8 @@ class GitDropdownUI {
                     ` stroke-linecap="round" stroke-linejoin="round" width="10" height="10">` +
                     `<path d="M1 4v6h6M23 20v-6h-6"/>` +
                     `<path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/>` +
-                    `</svg> ${_("Sync Pending")}`;
+                    `</svg>`;
+                syncBadge.appendChild(document.createTextNode(" " + _("Sync Pending")));
                 msgEl.appendChild(syncBadge);
             } else if (idx - visibleCommits.filter(c => c._pending).length === 0) {
                 // "Latest" badge on the first non-pending commit
@@ -1132,7 +1133,8 @@ class GitDropdownUI {
                 // "Undo my changes" — lets student discard unsaved edits and restore to this save
                 const clearBtn = document.createElement("button");
                 clearBtn.className = "git-tt-clear-btn";
-                clearBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg> ${_("Undo my changes")}`;
+                clearBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>`;
+                clearBtn.appendChild(document.createTextNode(" " + _("Undo my changes")));
                 clearBtn.addEventListener("click", () => {
                     close();
                     this._clearChanges(commit, commit.message);
@@ -1141,7 +1143,8 @@ class GitDropdownUI {
             } else {
                 const btn = document.createElement("button");
                 btn.className = "git-tt-go-btn";
-                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M5 12h14M13 6l6 6-6 6"/></svg> ${_("Go back to this version")}`;
+                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`;
+                btn.appendChild(document.createTextNode(" " + _("Go back to this version")));
                 btn.addEventListener("click", () => {
                     close();
                     this._confirmTimeTravel(commit, commit.message);
@@ -1225,7 +1228,8 @@ class GitDropdownUI {
                 // Only show the Undo my changes button — no "your song right now" chip
                 const clearOriginBtn = document.createElement("button");
                 clearOriginBtn.className = "git-tt-clear-btn";
-                clearOriginBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg> ${_("Undo my changes")}`;
+                clearOriginBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>`;
+                clearOriginBtn.appendChild(document.createTextNode(" " + _("Undo my changes")));
                 clearOriginBtn.addEventListener("click", () => {
                     close();
                     this._clearChanges(originTarget || "origin", _("Start point"));
@@ -1234,7 +1238,8 @@ class GitDropdownUI {
             } else if (originTarget) {
                 const flagBtn = document.createElement("button");
                 flagBtn.className = "git-tt-go-btn";
-                flagBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M5 12h14M13 6l6 6-6 6"/></svg> ${_("Go back to this version")}`;
+                flagBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`;
+                flagBtn.appendChild(document.createTextNode(" " + _("Go back to this version")));
                 flagBtn.addEventListener("click", () => {
                     close();
                     this._confirmTimeTravel(originTarget, _("Start point"));
@@ -1273,7 +1278,12 @@ class GitDropdownUI {
             banner.innerHTML =
                 `<svg viewBox="0 0 24 24" fill="white" width="14" height="14" style="flex-shrink:0">` +
                 `<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>` +
-                `</svg>${_("Showing locally saved drafts")} &nbsp;·&nbsp; ${remainingText}`;
+                `</svg>`;
+            banner.appendChild(
+                document.createTextNode(
+                    `${_("Showing locally saved drafts")} \u00a0·\u00a0 ${remainingText}`
+                )
+            );
             frame.appendChild(banner);
         }
         frame.appendChild(body);
