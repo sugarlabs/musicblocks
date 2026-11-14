@@ -491,6 +491,12 @@ var __listener = function (event) {
 
 ```
 
+5. Register the listener for the turtle, as `BackwardBlock.flow` in
+`js/blocks/FlowBlocks.js` does. `setDispatchBlock` only picks the
+block that will fire it.
+
+`logo.setTurtleListener(turtle, listenerName, __listener);`
+
 ## Using tone.js
 
 [Tone.js](https://github.com/Tonejs/Tone.js) is "a framework for
