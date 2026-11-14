@@ -444,7 +444,9 @@ describe("setupIntervalsActions", () => {
                 "equal": { pitchNumber: 12 },
                 "equal19": { pitchNumber: 19 },
                 "equal31": { pitchNumber: 31 },
-                "1/4 comma meantone": { pitchNumber: 12 }
+                "1/4 comma meantone": { pitchNumber: 12 },
+                "just intonation": { pitchNumber: 12 },
+                "Pythagorean": { pitchNumber: 12 }
             };
         });
 
@@ -504,6 +506,25 @@ describe("setupIntervalsActions", () => {
                 return Singer.IntervalsActions.GetCurrentInterval(0);
             };
 
+            expect(check("C", "G")).toBe("Perfect fifth");
+            expect(check("C", "E")).toBe("Major third");
+            expect(check("C", "C", 1)).toBe("Perfect octave");
+        });
+
+        test("just intonation and Pythagorean recognize diatonic intervals", () => {
+            const check = (first, second, oct = 0) => {
+                const notes = { firstNote: first, secondNote: second, octave: oct };
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                return Singer.IntervalsActions.GetCurrentInterval(0);
+            };
+
+            logo.synth.inTemperament = "just intonation";
+            expect(check("C", "G")).toBe("Perfect fifth");
+            expect(check("C", "E")).toBe("Major third");
+            expect(check("C", "C", 1)).toBe("Perfect octave");
+
+            logo.synth.inTemperament = "Pythagorean";
             expect(check("C", "G")).toBe("Perfect fifth");
             expect(check("C", "E")).toBe("Major third");
             expect(check("C", "C", 1)).toBe("Perfect octave");
