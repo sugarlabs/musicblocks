@@ -350,6 +350,60 @@ describe("KeyboardController", () => {
         });
     });
 
+    describe("search widget keyboard shortcuts", () => {
+        afterEach(() => {
+            global.disableHorizScrollIcon.style.display = "none";
+        });
+
+        it.each(["searchWidget", "helpfulSearchWidget"])(
+            "does not stop playback on Space while %s is visible",
+            widget => {
+                const activity = makeActivity();
+                activity[widget].style.visibility = "visible";
+                activity.turtles.running.mockReturnValue(true);
+                const controller = createController(activity);
+                const event = makeEvent({
+                    keyCode: KEYCODE.SPACE,
+                    key: " "
+                });
+
+                controller.__keyPressed(event);
+
+                expect(activity._doHardStopButton).not.toHaveBeenCalled();
+                expect(event.preventDefault).not.toHaveBeenCalled();
+            }
+        );
+
+        it.each([
+            ["/", 191],
+            ["\\", 220]
+        ])("does not scroll the workspace on %s while Search is visible", (key, keyCode) => {
+            global.disableHorizScrollIcon.style.display = "block";
+
+            const activity = makeActivity();
+            activity.searchWidget.style.visibility = "visible";
+            const controller = createController(activity);
+
+            controller.__keyPressed(makeEvent({ key, keyCode }));
+
+            expect(activity.blocksContainer.x).toBe(0);
+            expect(activity.stageDirty).toBe(false);
+        });
+
+        it("preserves slash scrolling when Search is closed", () => {
+            global.disableHorizScrollIcon.style.display = "block";
+
+            const activity = makeActivity();
+            const controller = createController(activity);
+
+            controller.__keyPressed(makeEvent({ key: "/", keyCode: 191 }));
+            expect(activity.blocksContainer.x).toBe(80);
+
+            controller.__keyPressed(makeEvent({ key: "\\", keyCode: 220 }));
+            expect(activity.blocksContainer.x).toBe(0);
+        });
+    });
+
     describe("return / enter key handling", () => {
         it("starts playback and prevents default when not running", () => {
             const activity = makeActivity();
