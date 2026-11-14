@@ -480,38 +480,94 @@ const HarmonyUtils = {
 
         if (pc === null) {
             const letter = upper.charAt(0);
-            if (!(letter in baseMap)) {
-                return null;
-            }
-            pc = baseMap[letter];
-            accStart = 1;
-        }
-
-        // Validate that all trailing characters are valid accidentals
-        for (let i = accStart; i < clean.length; i++) {
-            const acc = clean.charAt(i);
-            if (acc === "#" || acc === "♯") {
-                pc += 1;
-            } else if (acc === "b" || acc === "♭" || acc === "-") {
-                pc -= 1;
-            } else if (acc === "𝄪" || acc === "x") {
-                pc += 2;
-            } else if (acc === "𝄫") {
-                pc -= 2;
-            } else {
-                return null;
+            if (letter in baseMap) {
+                pc = baseMap[letter];
+                accStart = 1;
             }
         }
 
-        if (typeof pitchToNumber === "function") {
-            const step = pitchToNumber(clean, 4, "C major", "equal");
-            if (step !== undefined && !isNaN(step)) {
-                // In Music Blocks, pitch 3 is C (e.g. C4 = 39, (39 - 3) % 12 = 0).
-                return (((step - 3) % 12) + 12) % 12;
+        // If a root was identified, process complete Unicode accidentals locally
+        if (pc !== null) {
+            const accs = Array.from(clean.slice(accStart));
+            let validAccidentals = true;
+            let hasExternalAccidental = false;
+            for (const acc of accs) {
+                if (acc === "#" || acc === "♯") {
+                    pc += 1;
+                } else if (acc === "b" || acc === "♭" || acc === "-") {
+                    pc -= 1;
+                } else if (acc === "𝄪" || acc === "x") {
+                    pc += 2;
+                } else if (acc === "𝄫") {
+                    pc -= 2;
+                } else if (acc === "*") {
+                    hasExternalAccidental = true;
+                } else {
+                    validAccidentals = false;
+                    break;
+                }
+            }
+
+            if (validAccidentals && !hasExternalAccidental) {
+                return ((pc % 12) + 12) % 12;
+            }
+
+            // If trailing accidentals included "*" (Music Blocks double-sharp symbol),
+            // delegate to pitchToNumber
+            if (validAccidentals && hasExternalAccidental && typeof pitchToNumber === "function") {
+                const step = pitchToNumber(clean, 4, "C major", "equal");
+                if (step !== undefined && !isNaN(step)) {
+                    return (((step - 3) % 12) + 12) % 12;
+                }
             }
         }
 
-        return ((pc % 12) + 12) % 12;
+        return null;
+    },
+
+    /**
+     * Checks whether a mode name is a recognized musical mode or maqam.
+     * @param {string} modeName
+     * @returns {boolean}
+     */
+    isValidMode(modeName) {
+        if (!modeName || typeof modeName !== "string") {
+            return false;
+        }
+        const clean = modeName.trim().toLowerCase();
+        if (typeof MUSICALMODES !== "undefined" && MUSICALMODES) {
+            for (const m in MUSICALMODES) {
+                if (m.toLowerCase() === clean) {
+                    return true;
+                }
+            }
+        }
+        if (typeof MAQAMTABLE !== "undefined" && MAQAMTABLE) {
+            for (const mq in MAQAMTABLE) {
+                if (mq.toLowerCase() === clean || String(MAQAMTABLE[mq]).toLowerCase() === clean) {
+                    return true;
+                }
+            }
+        }
+        const standardModes = [
+            "major",
+            "minor",
+            "natural minor",
+            "harmonic minor",
+            "melodic minor",
+            "dorian",
+            "phrygian",
+            "lydian",
+            "mixolydian",
+            "aeolian",
+            "locrian",
+            "ionian",
+            "chromatic",
+            "pentatonic",
+            "whole tone",
+            "blues"
+        ];
+        return standardModes.includes(clean);
     },
 
     /**
@@ -527,16 +583,40 @@ const HarmonyUtils = {
         // 1. Array inputs must be handled BEFORE calling keySignatureToMode,
         // because keySignatureToMode expects a string and defaults arrays to ["C", "major"].
         if (Array.isArray(keySignature)) {
-            if (keySignature.length >= 2 && keySignature[0]) {
+            if (keySignature.length >= 1 && keySignature[0]) {
                 const tonic = String(keySignature[0]).trim();
-                if (HarmonyUtils.noteToPitchClass(tonic) !== null) {
-                    return [tonic, String(keySignature[1] || "major").trim()];
+                if (HarmonyUtils.noteToPitchClass(tonic) === null) {
+                    return null;
                 }
+                const rawMode =
+                    keySignature.length >= 2 &&
+                    keySignature[1] !== undefined &&
+                    keySignature[1] !== null
+                        ? String(keySignature[1]).trim()
+                        : "major";
+                if (!HarmonyUtils.isValidMode(rawMode)) {
+                    return null;
+                }
+                return [tonic, rawMode];
             }
             return null;
         }
 
-        // 2. Validate string input
+        // 2. Numeric inputs (e.g. 0, pitch numbers)
+        if (typeof keySignature === "number" && !isNaN(keySignature) && isFinite(keySignature)) {
+            if (typeof numberToPitch === "function") {
+                const res = numberToPitch(keySignature);
+                if (Array.isArray(res) && res[0]) {
+                    return [res[0], "major"];
+                }
+            }
+            const pitchClasses = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
+            const normalized = Math.round(keySignature);
+            const pc = (((normalized >= 12 ? normalized - 3 : normalized) % 12) + 12) % 12;
+            return [pitchClasses[pc], "major"];
+        }
+
+        // 3. Validate string input
         if (typeof keySignature === "string") {
             const trimmed = keySignature.trim();
             if (!trimmed) {
@@ -570,10 +650,20 @@ const HarmonyUtils = {
                 return null;
             }
 
+            // Reject invalid/unrecognized mode names before delegating
+            if (!HarmonyUtils.isValidMode(modeCandidate)) {
+                return null;
+            }
+
             // Now that we've verified the key input is non-garbage, delegate to keySignatureToMode if present
             if (typeof keySignatureToMode === "function") {
                 const parsed = keySignatureToMode(trimmed);
-                if (Array.isArray(parsed) && parsed.length >= 2 && parsed[0]) {
+                if (
+                    Array.isArray(parsed) &&
+                    parsed.length >= 2 &&
+                    parsed[0] &&
+                    HarmonyUtils.isValidMode(parsed[1])
+                ) {
                     return parsed;
                 }
             }

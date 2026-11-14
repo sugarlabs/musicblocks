@@ -1634,14 +1634,25 @@ describe("StatusMatrix Widget", () => {
         });
 
         test("does not look up turtle 0 or crash when turtleList is empty", () => {
-            mockActivity.turtles.turtleList = [];
+            useMice([]);
             mockActivity.turtles.ithTurtle = jest.fn(() => {
                 throw new Error("Turtle 0 not found");
             });
-            useMice([]);
             statusMatrix.init(mockActivity);
             expect(() => statusMatrix.updateAll()).not.toThrow();
             expect(mockActivity.turtles.ithTurtle).not.toHaveBeenCalled();
+            expect(mockActivity.logo.updatingStatusMatrix).toBe(false);
+        });
+
+        test("falls back to raw chord display when turtle key mode is invalid", () => {
+            const m0 = mouse(["C4"]);
+            m0.singer.keySignature = "C not-a-mode";
+            useMice([m0, mouse(["E4"]), mouse(["G4"])]);
+            statusMatrix.init(mockActivity);
+            statusMatrix.updateAll();
+
+            expect(statusMatrix._harmonyCell.textContent).toContain("C major");
+            expect(statusMatrix._harmonyCell.textContent).not.toContain("—");
         });
 
         test("leaves out a mouse that has moved on to a rest or a drum", () => {

@@ -575,8 +575,30 @@ describe("HarmonyUtils.noteToPitchClass", () => {
         expect(HarmonyUtils.noteToPitchClass("Mi")).toBe(4);
         expect(HarmonyUtils.noteToPitchClass("Fa")).toBe(5);
         expect(HarmonyUtils.noteToPitchClass("Sol")).toBe(7);
+        expect(HarmonyUtils.noteToPitchClass("So")).toBe(7);
         expect(HarmonyUtils.noteToPitchClass("La")).toBe(9);
         expect(HarmonyUtils.noteToPitchClass("Ti")).toBe(11);
+    });
+
+    it("handles Unicode double accidentals and alternative spellings", () => {
+        expect(HarmonyUtils.noteToPitchClass("C-")).toBe(11); // C flat
+        expect(HarmonyUtils.noteToPitchClass("C𝄪")).toBe(2); // C double sharp
+        expect(HarmonyUtils.noteToPitchClass("D𝄫")).toBe(0); // D double flat
+        expect(HarmonyUtils.noteToPitchClass("Cx")).toBe(2);
+        expect(HarmonyUtils.noteToPitchClass("C##")).toBe(2);
+        expect(HarmonyUtils.noteToPitchClass("Dbb")).toBe(0);
+    });
+
+    it("rejects invalid pitch labels even when pitchToNumber helper is present", () => {
+        const originalHelper = global.pitchToNumber;
+        try {
+            global.pitchToNumber = jest.fn(pitch => (pitch === "C*" ? 53 : 39));
+            expect(HarmonyUtils.noteToPitchClass("invalid")).toBeNull();
+            expect(HarmonyUtils.noteToPitchClass("C*")).toBe(2);
+            expect(HarmonyUtils.romanNumeral("invalid", "major", "C major")).toBeNull();
+        } finally {
+            global.pitchToNumber = originalHelper;
+        }
     });
 
     it("returns null for invalid inputs", () => {
@@ -596,6 +618,18 @@ describe("HarmonyUtils.parseKey", () => {
         expect(HarmonyUtils.parseKey("A harmonic minor")).toEqual(["A", "harmonic minor"]);
         expect(HarmonyUtils.parseKey("G")).toEqual(["G", "major"]);
         expect(HarmonyUtils.parseKey(["D", "minor"])).toEqual(["D", "minor"]);
+    });
+
+    it("validates mode names and returns null for invalid modes", () => {
+        expect(HarmonyUtils.parseKey("C not-a-mode")).toBeNull();
+        expect(HarmonyUtils.parseKey(["C", "not-a-mode"])).toBeNull();
+        expect(HarmonyUtils.parseKey("invalidKey major")).toBeNull();
+    });
+
+    it("normalizes numeric key signatures", () => {
+        expect(HarmonyUtils.parseKey(0)).toEqual(["C", "major"]);
+        expect(HarmonyUtils.parseKey(39)).toEqual(["C", "major"]);
+        expect(HarmonyUtils.parseKey(2)).toEqual(["D", "major"]);
     });
 
     it("returns null for nullish or empty key signatures", () => {
@@ -694,6 +728,15 @@ describe("HarmonyUtils.romanNumeral", () => {
             expect(res.inversionName).toBeNull();
             expect(res.roman).toBe("I/Eb");
             expect(res.formatted).toBe("I/Eb in C major");
+        });
+
+        it("falls back to slash chord notation for non-chord bass in other positions (e.g. F# over C major)", () => {
+            const res = HarmonyUtils.romanNumeral("C", "major", "C major", "F#");
+            expect(res).not.toBeNull();
+            expect(res.inversion).toBe(-1);
+            expect(res.inversionName).toBeNull();
+            expect(res.roman).toBe("I/F#");
+            expect(res.formatted).toBe("I/F# in C major");
         });
 
         it("assigns 1st inversion to Eb when chord is C minor", () => {
