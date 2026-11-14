@@ -259,7 +259,7 @@ msgstr "doble planas"
 #: js/piemenus.js:1064
 #: js/piemenus.js:1712
 msgid "played"
-msgstr ""
+msgstr "jugó"
 
 #: js/piemenus.js:3496
 #: js/block.js:1596
@@ -277,7 +277,7 @@ msgstr "Ha elegido la tecla para la vista previa de su tono."
 
 #: js/trash.js:413
 msgid "Release to delete the block."
-msgstr ""
+msgstr "Suelta para eliminar el bloque."
 
 #: js/languagebox.js:330
 msgid "Refresh your browser to change your language preference."
@@ -554,7 +554,7 @@ msgstr "Grabar"
 #: js/toolbar-ui.js:131
 #: js/toolbar-ui.js:211
 msgid "Record options"
-msgstr ""
+msgstr "Opciones de grabación"
 
 #: js/toolbar-ui.js:132
 #: js/toolbar-ui.js:133
@@ -606,12 +606,12 @@ msgstr "Guardar como HTML"
 #: js/toolbar-ui.js:219
 #: planet/js/StringHelper.js:29
 msgid "Git Planet"
-msgstr ""
+msgstr "Planeta Git"
 
 #: js/toolbar-ui.js:140
 #: js/toolbar-ui.js:220
 msgid "Offline. Git Planet is unavailable"
-msgstr ""
+msgstr "Sin conexión. Git Planet no está disponible."
 
 #: js/toolbar-ui.js:141
 #: js/toolbar-ui.js:221
@@ -827,15 +827,15 @@ msgstr "Guardar la ilustración de la tortuga como SVG"
 
 #: js/toolbar-ui.js:252
 msgid "Track my project"
-msgstr ""
+msgstr "Sigue mi proyecto"
 
 #: js/toolbar-ui.js:253
 msgid "Mark this moment"
-msgstr ""
+msgstr "Marca este momento"
 
 #: js/toolbar-ui.js:254
 msgid "Time travel"
-msgstr ""
+msgstr "Viaje en el tiempo"
 
 #: js/toolbar-ui.js:453
 msgid "Play project"
@@ -851,7 +851,7 @@ msgstr "¿Estás seguro de que quieres crear un nuevo proyecto?"
 
 #: js/toolbar-ui.js:599
 msgid "New project confirmation"
-msgstr ""
+msgstr "Confirmación de nuevo proyecto"
 
 #: js/toolbar-ui.js:791
 #: js/toolbar-ui.js:803
@@ -1210,7 +1210,7 @@ msgstr "Error al generar la salida ABC."
 
 #: js/SaveInterface.js:816
 msgid "ABC export rounded one or more Hertz pitches to the nearest note."
-msgstr ""
+msgstr "La exportación a ABC redondea una o más frecuencias (en hercios) a la nota más cercana."
 
 #: js/SaveInterface.js:897
 #.TRANS: File name prompt for save as Lilypond
@@ -1296,15 +1296,15 @@ msgstr "Desplazamiento horizontal desactivado."
 
 #: js/activity.js:1098
 msgid "Please open a plugin palette before clicking delete."
-msgstr ""
+msgstr "Por favor, abre una paleta de plugins antes de hacer clic en eliminar."
 
 #: js/activity.js:1164
 msgid "Plugin deleted successfully."
-msgstr ""
+msgstr "Plugin eliminado correctamente."
 
 #: js/activity.js:1166
 msgid "Plugin could not be deleted or was not found."
-msgstr ""
+msgstr "No se pudo eliminar el plugin."
 
 #: js/activity.js:1722
 msgid "Firefox performance may be affected because the canvas is unusually large. For the best experience, consider resetting the browser zoom to 100%."
@@ -1312,20 +1312,20 @@ msgstr "El rendimiento de Firefox podría verse afectado debido a que el lienzo 
 
 #: js/activity.js:2205
 msgid "Program stopped."
-msgstr ""
+msgstr "Programa detenido."
 
 #: js/activity.js:2225
 msgid "Program running."
-msgstr ""
+msgstr "Programa en marcha."
 
 #: js/activity.js:2464
 #: js/activity.js:2492
 msgid "Plugin added"
-msgstr ""
+msgstr "Plugin añadido."
 
 #: js/activity.js:2475
 msgid "Could not load plugin:"
-msgstr ""
+msgstr "No se pudo cargar el complemento:"
 
 #: js/activity.js:2542
 msgid "Invalid clipboard data. To paste blocks, first copy them from the Music Blocks canvas. To paste text, click inside an input field."
@@ -1337,7 +1337,7 @@ msgstr "matriz"
 
 #: js/block.js:1816
 msgid "chords"
-msgstr ""
+msgstr "acordes"
 
 #: js/block.js:1823
 #: js/blocks/WidgetBlocks.js:2150
@@ -1557,11 +1557,11 @@ msgstr "apagado"
 
 #: js/block.js:5215
 msgid "Renaming"
-msgstr ""
+msgstr "Cambio de nombre"
 
 #: js/block.js:5215
 msgid "to avoid name collision"
-msgstr ""
+msgstr "para evitar conflictos de nombres"
 
 #: js/block.js:5293
 msgid "Not a number"
@@ -1658,34 +1658,34 @@ msgstr "Algo salió mal al leer los datos del proyecto codificados en JSON."
 
 #: js/blocks.js:5756
 msgid "Cannot load project: invalid project structure."
-msgstr ""
+msgstr "No se puede cargar el proyecto: estructura de proyecto no válida."
 
 #: js/blocks.js:5766
 #: js/blocks.js:6201
 #: js/blocks.js:6277
 msgid "Cannot load project: malformed block structure detected."
-msgstr ""
+msgstr "No se puede cargar el proyecto: se ha detectado una estructura de bloques mal formada."
 
 #: js/blocks.js:5883
 msgid "Cannot load project: circular block connection detected."
-msgstr ""
+msgstr "No se puede cargar el proyecto: se ha detectado una conexión circular entre bloques."
 
 #: js/blocks.js:6231
 #: js/blocks.js:6482
 msgid "Cannot load project: invalid block connection detected."
-msgstr ""
+msgstr "No se puede cargar el proyecto: se ha detectado una conexión de bloques no válida."
 
 #: js/blocks.js:7668
 msgid "Some blocks in this project are unsupported and were replaced with placeholders: %s"
-msgstr ""
+msgstr "Algunos bloques de este proyecto no son compatibles y han sido sustituidos por marcadores de posición: %s"
 
 #: js/blocks.js:8053
 msgid "Nothing to undo."
-msgstr ""
+msgstr "No hay nada que deshacer."
 
 #: js/blocks.js:8105
 msgid "Nothing to redo."
-msgstr ""
+msgstr "No hay nada que rehacer"
 
 #: js/blocks.js:8266
 msgid "block sent to trash"
@@ -1705,7 +1705,7 @@ msgstr "No se pudo inicializar el núcleo de Bloques de Música. Por favor, actu
 
 #: js/logo.js:854
 msgid "Downloading Kokoro voice: %s"
-msgstr ""
+msgstr "Descargando la voz de Kokoro: %s"
 
 #: js/logo.js:998
 #: js/blocks/ProgramBlocks.js:277
@@ -1763,7 +1763,7 @@ msgstr "Error: No se pudo guardar porque se agotó el almacenamiento local. Inte
 
 #: js/planetInterface.js:345
 msgid "Could not save your project."
-msgstr ""
+msgstr "No se pudo guardar tu proyecto."
 
 #: js/project-manager.js:321
 msgid "Catching mice"
@@ -1807,7 +1807,7 @@ msgstr "¡Carga completa!"
 
 #: js/project-manager.js:687
 msgid "Your saved project could not be loaded. Starting a new project."
-msgstr ""
+msgstr "No se pudo cargar el proyecto guardado. Se iniciará un proyecto nuevo."
 
 #: js/project-manager.js:795
 msgid "Click the run button to run the project."
@@ -1852,7 +1852,7 @@ msgstr "El parametro es invalido."
 
 #: js/search-ui.js:212
 msgid "No results found for %s"
-msgstr ""
+msgstr "No se encontraron resultados para %s"
 
 #: js/themebox.js:244
 msgid "Theme switched to %s mode."
@@ -1864,15 +1864,15 @@ msgstr "Bloques de Música ya está configurado con este tema."
 
 #: js/turtle-painter.js:911
 msgid "Steps must be within -%s to %s when Wrap Mode is on."
-msgstr ""
+msgstr "Los pasos deben estar dentro del rango de -%s a %s cuando el modo de ajuste (Modo Envolver) está activado."
 
 #: js/turtle-painter.js:1084
 msgid "Arc angle must be within -45000 to 45000 degrees."
-msgstr ""
+msgstr "El ángulo del arco debe estar comprendido entre -45000 y 45000 grados."
 
 #: js/turtle-painter.js:1701
 msgid "Pen size must be greater than 0."
-msgstr ""
+msgstr "El tamaño de la pluma debe ser mayor a 0."
 
 #: js/turtle-singer.js:1852
 #.TRANS: partials are weighted components in a harmonic series
@@ -2429,11 +2429,11 @@ msgstr "Antes de empezar"
 
 #: js/utils/ai-widget-lifecycle.js:187
 msgid "Agreeing counts for all the AI tools until you reload the page."
-msgstr ""
+msgstr "La aceptación se aplica a todas las herramientas de IA hasta que recargues la página."
 
 #: js/utils/ai-widget-lifecycle.js:198
 msgid "Agree and continue"
-msgstr ""
+msgstr "Aceptar y continuar"
 
 #: js/utils/musicutils-modewheel.js:92
 #: js/utils/musicutils-modewheel.js:103
@@ -2555,17 +2555,17 @@ msgstr "personalizado"
 
 #: js/utils/dom-helpers.js:193
 msgid "File input not found."
-msgstr ""
+msgstr "No se encontró el archivo de entrada."
 
 #: js/utils/dom-helpers.js:206
 #: js/widgets/aidebugger.js:535
 msgid "File too large. Maximum is 1 MB."
-msgstr ""
+msgstr "Archivo demasiado grande. El máximo es 1 MB."
 
 #: js/utils/dom-helpers.js:215
 #: js/widgets/aidebugger.js:540
 msgid "Failed to read file."
-msgstr ""
+msgstr "No se pudo leer el archivo."
 
 #: js/utils/musicutils-i18n.js:61
 #: js/utils/musicutils-i18n.js:104
@@ -2856,12 +2856,12 @@ msgstr "bebop"
 #: js/utils/musicutils-i18n.js:189
 #.TRANS: major bebop scale for music
 msgid "major bebop"
-msgstr ""
+msgstr "bebop mayor"
 
 #: js/utils/musicutils-i18n.js:191
 #.TRANS: minor bebop scale for music, also known as the bebop dorian scale
 msgid "minor bebop"
-msgstr ""
+msgstr "bebop menor"
 
 #: js/utils/musicutils-i18n.js:192
 msgid "arabic"
@@ -3259,19 +3259,19 @@ msgstr "tambor militar pequeño"
 #: js/utils/synthutils.js:160
 #.TRANS: musical instrument
 msgid "snare hard"
-msgstr ""
+msgstr "tambor militar pequeño (fuerte)"
 
 #: js/utils/musicutils-i18n.js:283
 #: js/utils/synthutils.js:162
 #.TRANS: musical instrument
 msgid "snare soft"
-msgstr ""
+msgstr "tambor militar pequeño (piano)"
 
 #: js/utils/musicutils-i18n.js:284
 #: js/utils/synthutils.js:164
 #.TRANS: musical instrument
 msgid "snare roll"
-msgstr ""
+msgstr "tambor militar pequeño (redoble)"
 
 #: js/utils/musicutils-i18n.js:285
 #: js/utils/synthutils.js:166
@@ -3283,7 +3283,7 @@ msgstr "tambor de patada"
 #: js/utils/synthutils.js:168
 #.TRANS: musical instrument
 msgid "heavy kick"
-msgstr ""
+msgstr "bombo potente"
 
 #: js/utils/musicutils-i18n.js:287
 #: js/utils/synthutils.js:170
@@ -3301,19 +3301,19 @@ msgstr "tom tom"
 #: js/utils/synthutils.js:174
 #.TRANS: musical instrument
 msgid "tom hi"
-msgstr ""
+msgstr "tom (agudo)"
 
 #: js/utils/musicutils-i18n.js:290
 #: js/utils/synthutils.js:176
 #.TRANS: musical instrument
 msgid "tom mid"
-msgstr ""
+msgstr "tom (medio)"
 
 #: js/utils/musicutils-i18n.js:291
 #: js/utils/synthutils.js:178
 #.TRANS: musical instrument
 msgid "tom lo"
-msgstr ""
+msgstr "tom (grave)"
 
 #: js/utils/musicutils-i18n.js:292
 #: js/utils/synthutils.js:180
@@ -3347,19 +3347,19 @@ msgstr "platillos charles"
 #: js/utils/synthutils.js:190
 #.TRANS: musical instrument
 msgid "cymbal closed"
-msgstr ""
+msgstr "platillo (cerrado)"
 
 #: js/utils/musicutils-i18n.js:298
 #: js/utils/synthutils.js:192
 #.TRANS: musical instrument
 msgid "cymbal open"
-msgstr ""
+msgstr "platillo (abierta)"
 
 #: js/utils/musicutils-i18n.js:299
 #: js/utils/synthutils.js:194
 #.TRANS: musical instrument
 msgid "cymbal pedal"
-msgstr ""
+msgstr "platillo (pedal)"
 
 #: js/utils/musicutils-i18n.js:300
 #: js/utils/synthutils.js:196
@@ -3383,7 +3383,7 @@ msgstr "campana de vaca"
 #: js/utils/synthutils.js:202
 #.TRANS: musical instrument
 msgid "sonic cowbell"
-msgstr ""
+msgstr "cencerro electrónico"
 
 #: js/utils/musicutils-i18n.js:304
 #: js/utils/synthutils.js:204
@@ -3717,7 +3717,7 @@ msgstr "hablar"
 
 #: js/blocks/MediaBlocks.js:578
 msgid "The Speak block reads its text aloud using the built-in speech synthesizer."
-msgstr ""
+msgstr "El bloque «Hablar» lee su texto en voz alta utilizando el sintetizador de voz integrado."
 
 #: js/blocks/MediaBlocks.js:628
 msgid "camera"
@@ -3928,7 +3928,7 @@ msgstr "guardar en caja 1"
 
 #: js/blocks/RhythmBlockPaletteBlocks.js:45
 msgid "Maximum number of notes is %s."
-msgstr ""
+msgstr "El número máximo de notas es %s."
 
 #: js/blocks/RhythmBlockPaletteBlocks.js:91
 #: js/blocks/RhythmBlockPaletteBlocks.js:313
@@ -4102,7 +4102,7 @@ msgstr "valor ajustado"
 
 #: js/blocks/DictBlocks.js:468
 msgid "The Turtle key block selects a key in the turtle dictionary, such as pen size or heading."
-msgstr ""
+msgstr "El bloque de clave «tortuga» selecciona una clave en el diccionario de la tortuga, como el grosor de la pluma o la orientación."
 
 #: js/blocks/ExtrasBlocks.js:33
 msgid "fraction"
@@ -4114,15 +4114,15 @@ msgstr "convertir un número racional en fracción"
 
 #: js/blocks/ExtrasBlocks.js:89
 msgid "record notation"
-msgstr ""
+msgstr "notación de registro"
 
 #: js/blocks/ExtrasBlocks.js:92
 msgid "The Record notation block captures music as it plays so that it can be saved as sheet music."
-msgstr ""
+msgstr "El bloque de notación de grabación captura la música a medida que suena, de modo que pueda guardarse como partitura."
 
 #: js/blocks/ExtrasBlocks.js:125
 msgid "The Save as ABC block saves the notes recorded with the Record notation block as an ABC file."
-msgstr ""
+msgstr "El bloque «Guardar como ABC» guarda las notas registradas con el bloque «Registrar notación» como un archivo ABC."
 
 #: js/blocks/ExtrasBlocks.js:133
 msgid "save as ABC"
@@ -4145,7 +4145,7 @@ msgstr "guardar como Lilypond"
 
 #: js/blocks/ExtrasBlocks.js:209
 msgid "The Save as SVG block saves the mouse artwork as an SVG file."
-msgstr ""
+msgstr "El bloque «Guardar como LilyPond» guarda las notas registradas con el bloque «Registrar notación» como un archivo LilyPond."
 
 #: js/blocks/ExtrasBlocks.js:215
 msgid "save as SVG"
@@ -4153,11 +4153,11 @@ msgstr "guardar como SVG"
 
 #: js/blocks/ExtrasBlocks.js:270
 msgid "The Save as MusicXML block saves the notes recorded with the Record notation block as a MusicXML file."
-msgstr ""
+msgstr "El bloque «Guardar como MusicXML» guarda las notas registradas con el bloque «Registrar notación» como un archivo MusicXML."
 
 #: js/blocks/ExtrasBlocks.js:278
 msgid "save as MusicXML"
-msgstr ""
+msgstr "guardar como MusicXML"
 
 #: js/blocks/ExtrasBlocks.js:309
 msgid "no background"
@@ -5038,7 +5038,7 @@ msgstr "Puede utilizar varios bloques de percusión dentro de un bloque de notas
 
 #: js/blocks/WidgetBlocks.js:118
 msgid "The widget could not be loaded. Check your connection and try again."
-msgstr ""
+msgstr "No se ha podido cargar el widget. Comprueba tu conexión y vuelve a intentarlo."
 
 #: js/blocks/WidgetBlocks.js:288
 #: js/widgets/timbre.js:365
@@ -5150,12 +5150,12 @@ msgstr "modo personalizado"
 
 #: js/blocks/WidgetBlocks.js:1014
 msgid "The Chord progression block opens a tool to explore diatonic chords and build musical progressions."
-msgstr ""
+msgstr "El bloque de progresión de acordes abre una herramienta para explorar acordes diatónicos y construir progresiones musicales."
 
 #: js/blocks/WidgetBlocks.js:1022
 #.TRANS: musical chord progression builder
 msgid "chord progression"
-msgstr ""
+msgstr "progresión de acordes"
 
 #: js/blocks/WidgetBlocks.js:1103
 msgid "The Tempo block opens a metronome to visualize the beat."
@@ -5172,7 +5172,7 @@ msgstr "La \"Matriz de percusión de tono\" se utiliza para asignar tonos a los 
 #: js/blocks/WidgetBlocks.js:1277
 #.TRANS: makes a mapping between pitches and drum sounds
 msgid "pitch drum"
-msgstr ""
+msgstr "tono y tambor"
 
 #: js/blocks/WidgetBlocks.js:1347
 msgid "You must have at least one pitch block and one drum block in the matrix."
@@ -5376,11 +5376,11 @@ msgstr "El bloque \"Numérico\" contiene un número."
 
 #: js/blocks/NumberBlocks.js:963
 msgid "The Clamp block restricts a number so it stays within a minimum and maximum range."
-msgstr ""
+msgstr "El bloque «Clamp» restringe un número para que se mantenga dentro de un rango mínimo y máximo."
 
 #: js/blocks/NumberBlocks.js:971
 msgid "clamp"
-msgstr ""
+msgstr "clamp"
 
 #: js/blocks/MeterBlocks.js:55
 #.TRANS: musical meter (time signature), e.g., 4:4
@@ -5576,13 +5576,13 @@ msgstr "El bloque \"Latidos por minuto\" establece el número de 1/4 notas por m
 #: js/turtleactions/MeterActions.js:136
 #: js/turtleactions/MeterActions.js:173
 msgid "BPM must be a positive number."
-msgstr ""
+msgstr "El BPM debe ser un número positivo."
 
 #: js/blocks/MeterBlocks.js:1261
 #: js/turtleactions/MeterActions.js:141
 #: js/turtleactions/MeterActions.js:178
 msgid "Beat value must be a positive number."
-msgstr ""
+msgstr "El mejor valor debe ser un número positivo."
 
 #: js/blocks/MeterBlocks.js:1377
 #.TRANS: anacrusis
@@ -5790,7 +5790,7 @@ msgstr "fijar ratón"
 
 #: js/blocks/EnsembleBlocks.js:430
 msgid "The Set mouse block places the specified mouse at a specific x and y coordinate."
-msgstr ""
+msgstr "El bloque «establecer ratón» coloca el ratón indicado en unas coordenadas x e y específicas."
 
 #: js/blocks/EnsembleBlocks.js:445
 #: js/blocks/EnsembleBlocks.js:517
@@ -5800,7 +5800,7 @@ msgstr "fijar tortuga"
 
 #: js/blocks/EnsembleBlocks.js:447
 msgid "The Set turtle block places the specified turtle at a specific x and y coordinate."
-msgstr ""
+msgstr "El bloque «Set turtle» coloca la tortuga especificada en una coordenada x e y determinada."
 
 #: js/blocks/EnsembleBlocks.js:494
 msgid "The Set mouse block sends a stack of blocks to be run by the specified mouse."
@@ -6322,7 +6322,7 @@ msgstr "cambio escalar en el tono"
 
 #: js/blocks/PitchBlocks.js:261
 msgid "The Scalar change in pitch block is the difference (in scale steps) between the current pitch being played and the previous pitch played."
-msgstr ""
+msgstr "El bloque «Cambio escalar de tono» representa la diferencia (en grados de la escala) entre el tono que se está reproduciendo actualmente y el tono que se reprodujo anteriormente."
 
 #: js/blocks/PitchBlocks.js:274
 #: js/blocks/PitchBlocks.js:483
@@ -6674,7 +6674,7 @@ msgstr "cargar pila en App"
 #: js/blocks/ProgramBlocks.js:93
 #: js/blocks/ProgramBlocks.js:192
 msgid "The heap name is reserved."
-msgstr ""
+msgstr "El nombre del montón está reservado."
 
 #: js/blocks/ProgramBlocks.js:110
 msgid "404: Page not found"
@@ -6745,7 +6745,7 @@ msgstr "archivo"
 #: js/blocks/ProgramBlocks.js:569
 #: js/turtleactions/DictActions.js:355
 msgid "The dictionary name is reserved."
-msgstr ""
+msgstr "El nombre del diccionario está reservado."
 
 #: js/blocks/ProgramBlocks.js:487
 msgid "The file you selected does not contain a valid dictionary."
@@ -6937,11 +6937,11 @@ msgstr "saltar notas"
 
 #: js/blocks/RhythmBlocks.js:464
 msgid "Skip factor must be a positive number greater than 0."
-msgstr ""
+msgstr "El factor de salto debe ser un número positivo mayor que 0."
 
 #: js/blocks/RhythmBlocks.js:473
 msgid "Skip factor must be a whole number. Rounded down to %s."
-msgstr ""
+msgstr "El factor de salto debe ser un número entero. Se ha redondeado hacia abajo a %s."
 
 #: js/blocks/RhythmBlocks.js:516
 msgid "The Multiply note value block changes the duration of notes by changing their note values."
@@ -6954,7 +6954,7 @@ msgstr "Multiplicar el valor de la nota"
 
 #: js/blocks/RhythmBlocks.js:557
 msgid "Multiply note value must be greater than 0."
-msgstr ""
+msgstr "El valor de multiplicación de la nota debe ser mayor que 0."
 
 #: js/blocks/RhythmBlocks.js:582
 msgid "The Tie block works on pairs of notes, combining them into one note."
@@ -7544,11 +7544,11 @@ msgstr "crescendo"
 
 #: js/turtleactions/OrnamentActions.js:49
 msgid "Staccato value must be a positive number."
-msgstr ""
+msgstr "El valor de staccato debe ser un número positivo."
 
 #: js/turtleactions/OrnamentActions.js:79
 msgid "Slur value must be a positive number."
-msgstr ""
+msgstr "El valor de la ligadura debe ser un número positivo."
 
 #: js/turtleactions/OrnamentActions.js:117
 msgid "Neighbor interval must be a finite number."
