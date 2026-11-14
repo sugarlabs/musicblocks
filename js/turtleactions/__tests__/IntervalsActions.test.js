@@ -380,6 +380,157 @@ describe("setupIntervalsActions", () => {
         });
     });
 
+    describe("GetIntervalSemitones", () => {
+        test("calculates correct semitones for standard intervals within one octave", () => {
+            expect(Singer.IntervalsActions.GetIntervalSemitones("C", "C", 0)).toBe(0);
+            expect(Singer.IntervalsActions.GetIntervalSemitones("C", "Db", 0)).toBe(1);
+            expect(Singer.IntervalsActions.GetIntervalSemitones("C", "D", 0)).toBe(2);
+            expect(Singer.IntervalsActions.GetIntervalSemitones("C", "Eb", 0)).toBe(3);
+            expect(Singer.IntervalsActions.GetIntervalSemitones("C", "E", 0)).toBe(4);
+            expect(Singer.IntervalsActions.GetIntervalSemitones("C", "F", 0)).toBe(5);
+            expect(Singer.IntervalsActions.GetIntervalSemitones("C", "F#", 0)).toBe(6);
+            expect(Singer.IntervalsActions.GetIntervalSemitones("C", "G", 0)).toBe(7);
+            expect(Singer.IntervalsActions.GetIntervalSemitones("C", "Ab", 0)).toBe(8);
+            expect(Singer.IntervalsActions.GetIntervalSemitones("C", "A", 0)).toBe(9);
+            expect(Singer.IntervalsActions.GetIntervalSemitones("C", "Bb", 0)).toBe(10);
+            expect(Singer.IntervalsActions.GetIntervalSemitones("C", "B", 0)).toBe(11);
+        });
+
+        test("calculates correct semitones across octave boundaries", () => {
+            // B4 up to D5 is a minor third (3 semitones)
+            expect(Singer.IntervalsActions.GetIntervalSemitones("B", "D", 0)).toBe(3);
+            // C4 up to C5 is an octave (12 semitones)
+            expect(Singer.IntervalsActions.GetIntervalSemitones("C", "C", 1)).toBe(12);
+            // C4 up to D5 is a major ninth (14 semitones)
+            expect(Singer.IntervalsActions.GetIntervalSemitones("C", "D", 1)).toBe(14);
+            // C4 up to D6 is 2 octaves + major second (26 semitones)
+            expect(Singer.IntervalsActions.GetIntervalSemitones("C", "D", 2)).toBe(26);
+        });
+
+        test("calculates correct semitones for descending intervals", () => {
+            // G4 down to C4 is a fifth (7 semitones)
+            expect(Singer.IntervalsActions.GetIntervalSemitones("G", "C", -1)).toBe(7);
+            // C5 down to C4 is an octave (12 semitones)
+            expect(Singer.IntervalsActions.GetIntervalSemitones("C", "C", -1)).toBe(12);
+        });
+
+        test("defensively handles non-string or NaN pitch inputs", () => {
+            expect(Singer.IntervalsActions.GetIntervalSemitones(null, "C", 0)).toBe(0);
+            expect(Singer.IntervalsActions.GetIntervalSemitones("C", undefined, 0)).toBe(0);
+        });
+    });
+
+    describe("Microtonal and temperament diatonic interval names in GetCurrentInterval", () => {
+        let originalTemperament;
+        let originalMap;
+        let originalPitchToNumber;
+
+        beforeEach(() => {
+            originalTemperament = logo.synth.inTemperament;
+            originalMap = global.SEMITONETOINTERVALMAP;
+            originalPitchToNumber = global.pitchToNumber;
+
+            // Load real SEMITONETOINTERVALMAP
+            const { SEMITONETOINTERVALMAP: REAL_MAP } = require("../../utils/musicutils-i18n.js");
+            global.SEMITONETOINTERVALMAP = REAL_MAP;
+
+            // Use real pitchToNumber to verify full integration across temperaments
+            const {
+                pitchToNumber: realPitchToNumber
+            } = require("../../utils/musicutils-pitchscale.js");
+            global.pitchToNumber = realPitchToNumber;
+
+            global.TEMPERAMENT = {
+                "equal": { pitchNumber: 12 },
+                "equal19": { pitchNumber: 19 },
+                "equal31": { pitchNumber: 31 },
+                "1/4 comma meantone": { pitchNumber: 12 },
+                "just intonation": { pitchNumber: 12 },
+                "Pythagorean": { pitchNumber: 12 }
+            };
+        });
+
+        afterEach(() => {
+            logo.synth.inTemperament = originalTemperament;
+            global.SEMITONETOINTERVALMAP = originalMap;
+            global.pitchToNumber = originalPitchToNumber;
+        });
+
+        test("19-EDO recognizes standard diatonic intervals correctly", () => {
+            logo.synth.inTemperament = "equal19";
+
+            const check = (first, second, oct = 0) => {
+                const notes = { firstNote: first, secondNote: second, octave: oct };
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                return Singer.IntervalsActions.GetCurrentInterval(0);
+            };
+
+            expect(check("C", "G")).toBe("Perfect fifth");
+            expect(check("C", "E")).toBe("Major third");
+            expect(check("C", "Eb")).toBe("Minor third");
+            expect(check("C", "F#")).toBe("Augmented fourth");
+            expect(check("C", "Gb")).toBe("Diminished fifth");
+            expect(check("C", "C", 1)).toBe("Perfect octave");
+            expect(check("C", "D", 1)).toBe("Major ninth");
+            expect(check("G", "C", -1)).toBe("Perfect fifth below");
+            expect(check("C", "C", -1)).toBe("Perfect octave below");
+            expect(check("C", "D", 2)).toBe("Major second, plus two octaves");
+        });
+
+        test("31-EDO recognizes standard diatonic intervals without misidentification", () => {
+            logo.synth.inTemperament = "equal31";
+
+            const check = (first, second, oct = 0) => {
+                const notes = { firstNote: first, secondNote: second, octave: oct };
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                return Singer.IntervalsActions.GetCurrentInterval(0);
+            };
+
+            expect(check("C", "G")).toBe("Perfect fifth");
+            expect(check("C", "E")).toBe("Major third");
+            expect(check("C", "Eb")).toBe("Minor third");
+            expect(check("C", "C", 1)).toBe("Perfect octave");
+            expect(check("C", "D", 1)).toBe("Major ninth");
+            expect(check("G", "C", -1)).toBe("Perfect fifth below");
+        });
+
+        test("1/4 comma meantone recognizes diatonic intervals", () => {
+            logo.synth.inTemperament = "1/4 comma meantone";
+
+            const check = (first, second, oct = 0) => {
+                const notes = { firstNote: first, secondNote: second, octave: oct };
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                return Singer.IntervalsActions.GetCurrentInterval(0);
+            };
+
+            expect(check("C", "G")).toBe("Perfect fifth");
+            expect(check("C", "E")).toBe("Major third");
+            expect(check("C", "C", 1)).toBe("Perfect octave");
+        });
+
+        test("just intonation and Pythagorean recognize diatonic intervals", () => {
+            const check = (first, second, oct = 0) => {
+                const notes = { firstNote: first, secondNote: second, octave: oct };
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                return Singer.IntervalsActions.GetCurrentInterval(0);
+            };
+
+            logo.synth.inTemperament = "just intonation";
+            expect(check("C", "G")).toBe("Perfect fifth");
+            expect(check("C", "E")).toBe("Major third");
+            expect(check("C", "C", 1)).toBe("Perfect octave");
+
+            logo.synth.inTemperament = "Pythagorean";
+            expect(check("C", "G")).toBe("Perfect fifth");
+            expect(check("C", "E")).toBe("Major third");
+            expect(check("C", "C", 1)).toBe("Perfect octave");
+        });
+    });
+
     describe("GetModename exact-vs-localized match precedence", () => {
         afterEach(() => {
             global._ = x => x;
