@@ -610,10 +610,11 @@ const HarmonyUtils = {
                     return [res[0], "major"];
                 }
             }
-            const pitchClasses = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
-            const normalized = Math.round(keySignature);
-            const pc = (((normalized >= 12 ? normalized - 3 : normalized) % 12) + 12) % 12;
-            return [pitchClasses[pc], "major"];
+            // A-based pitch numbering matching Music Blocks' numberToPitch
+            // (pitch 0 = A0, pitch 1 = A♯0, pitch 2 = B0, pitch 3 = C1, pitch 39 = C4)
+            const aBasedPitches = ["A", "A♯", "B", "C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯"];
+            const idx = ((Math.round(keySignature) % 12) + 12) % 12;
+            return [aBasedPitches[idx], "major"];
         }
 
         // 3. Validate string input

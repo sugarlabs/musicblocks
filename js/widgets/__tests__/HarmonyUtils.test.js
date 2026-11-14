@@ -626,10 +626,26 @@ describe("HarmonyUtils.parseKey", () => {
         expect(HarmonyUtils.parseKey("invalidKey major")).toBeNull();
     });
 
-    it("normalizes numeric key signatures", () => {
-        expect(HarmonyUtils.parseKey(0)).toEqual(["C", "major"]);
+    it("normalizes numeric key signatures using A-based convention (matching numberToPitch)", () => {
+        expect(HarmonyUtils.parseKey(0)).toEqual(["A", "major"]);
+        expect(HarmonyUtils.parseKey(2)).toEqual(["B", "major"]);
+        expect(HarmonyUtils.parseKey(3)).toEqual(["C", "major"]);
         expect(HarmonyUtils.parseKey(39)).toEqual(["C", "major"]);
-        expect(HarmonyUtils.parseKey(2)).toEqual(["D", "major"]);
+    });
+
+    it("maintains the same convention when numberToPitch helper is present", () => {
+        const originalHelper = global.numberToPitch;
+        try {
+            global.numberToPitch = jest.fn(num => {
+                const table = ["A", "A♯", "B", "C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯"];
+                return [table[((num % 12) + 12) % 12], 4];
+            });
+            expect(HarmonyUtils.parseKey(0)).toEqual(["A", "major"]);
+            expect(HarmonyUtils.parseKey(39)).toEqual(["C", "major"]);
+            expect(global.numberToPitch).toHaveBeenCalledWith(0);
+        } finally {
+            global.numberToPitch = originalHelper;
+        }
     });
 
     it("returns null for nullish or empty key signatures", () => {
