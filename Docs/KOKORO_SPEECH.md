@@ -25,6 +25,11 @@ most 32 entries, each no larger than 4 MiB. Rendered pitch/duration buffers
 are reused across Stop and replay, with an 8 MiB / 64-note memory limit.
 Changing a pitch or duration renders that variant once.
 
+Held notes of at least 0.75 seconds gain a subtle automatic vibrato: the pitch
+stays steady for the first 0.25 seconds, then eases over 0.4 seconds into a
+5.5 Hz variation of up to 20 cents in either direction. Shorter notes stay
+steady. This runs in the existing audio renderer, without extra model inference.
+
 The first uncached syllable still needs the model download and inference;
 playback waits for preparation rather than letting the music run ahead.
 Progress distinguishes model download from syllable preparation.

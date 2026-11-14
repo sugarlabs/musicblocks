@@ -444,6 +444,44 @@ describe("Kokoro singing resynthesis", () => {
         expect(() => KokoroSpeech.analyzeSyllable(bad)).toThrow("Invalid singing");
     });
 
+    test.each([110, 220, 440])("held %i Hz notes ease into bounded vibrato", frequency => {
+        const source = {
+            samples: Float32Array.from(
+                { length: rate / 2 },
+                (_, i) => 0.5 * Math.sin((2 * Math.PI * (i % 120)) / 120)
+            ),
+            rate,
+            period: 120
+        };
+        const short = KokoroSpeech.tuneSyllable(source, frequency, 0.5);
+        const held = KokoroSpeech.tuneSyllable(source, frequency, 2);
+        expect(held).toHaveLength(rate * 2);
+        expect(held.every(Number.isFinite)).toBe(true);
+        expect(held[0]).toBe(0);
+        expect(held[held.length - 1]).toBe(0);
+        // A periodic source keeps the same steady attack before vibrato begins.
+        let attackDifference = 0;
+        for (let i = 0; i < rate * 0.2; i++)
+            attackDifference = Math.max(attackDifference, Math.abs(held[i] - short[i]));
+        expect(attackDifference).toBeLessThan(0.00001);
+        const pitches = [];
+        let previous;
+        for (let i = rate * 0.8; i < rate * 1.8; i++) {
+            if (held[i - 1] <= 0 && held[i] > 0) {
+                const crossing = i - held[i] / (held[i] - held[i - 1]);
+                if (previous !== undefined)
+                    pitches.push(1200 * Math.log2(rate / (crossing - previous) / frequency));
+                previous = crossing;
+            }
+        }
+        expect(Math.max(...pitches)).toBeGreaterThan(10);
+        expect(Math.min(...pitches)).toBeLessThan(-10);
+        expect(Math.max(...pitches.map(Math.abs))).toBeLessThan(30);
+        // A short note retains its original pitch for its entire sustain.
+        const analyzed = KokoroSpeech.analyzeSyllable({ audio: short, sampling_rate: rate });
+        expect(Math.abs(rate / analyzed.period - frequency) / frequency).toBeLessThan(0.02);
+    });
+
     test.each([
         [NaN, 1],
         [440, Infinity],

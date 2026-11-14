@@ -537,13 +537,18 @@ class KokoroSpeech {
         );
         // shortcut: grains shift formants along with pitch; use phoneme alignment
         // and formant-preserving processing before supporting whole lyric phrases.
-        for (let target = 0; target < output.length + hop; target += hop) {
+        for (let target = 0; target < output.length + hop;) {
+            // Held notes ease into a 5.5 Hz, 20-cent vibrato; short notes stay steady.
+            const depth =
+                duration >= 0.75 ? 20 * Math.min(1, Math.max(0, (target / rate - 0.25) / 0.4)) : 0;
+            const pitchHop =
+                hop / 2 ** ((depth * Math.sin(2 * Math.PI * 5.5 * (target / rate - 0.25))) / 1200);
             const position = (target / output.length) * Math.max(0, samples.length - 2 * period);
             const mark = Math.round(position / period) * period + period;
             const center = Math.round(target);
             for (let delta = -halfGrain; delta < hop; delta++) {
                 const index = center + delta;
-                const from = mark + (delta * period) / hop;
+                const from = mark + ((delta + center - target) * period) / pitchHop;
                 if (index < 0 || index >= output.length || from < 0 || from >= samples.length - 1)
                     continue;
                 const weight = grainWindow[delta + halfGrain];
@@ -552,6 +557,7 @@ class KokoroSpeech {
                 output[index] += sample * weight;
                 weights[index] += weight;
             }
+            target += pitchHop;
         }
         const fade = Math.min(rate * 0.01, output.length / 2);
         for (let i = 0; i < output.length; i++) {
