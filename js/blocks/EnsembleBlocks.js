@@ -145,7 +145,7 @@ function setupEnsembleBlocks(activity) {
                 activity.errorMsg(NANERRORMSG, blk);
             } else {
                 let a = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                if (typeof a === "number") {
+                if (typeof a === "number" && !Number.isNaN(a)) {
                     if (!(i in logo.turtleHeaps)) {
                         logo.turtleHeaps[i] = [];
                     }

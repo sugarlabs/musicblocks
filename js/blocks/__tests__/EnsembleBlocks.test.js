@@ -429,6 +429,15 @@ describe("setupEnsembleBlocks", () => {
             const result = turtleHeapBlock.arg(logo, 0, blk, null);
             expect(activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG, blk);
         });
+
+        it("should return error if index is NaN", () => {
+            logo.turtleHeaps[0] = [10, 20, 30];
+            logo.parseArg.mockReturnValueOnce("Yertle").mockReturnValueOnce(NaN);
+            const result = turtleHeapBlock.arg(logo, 0, blk, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG, blk);
+            expect(result).toBeUndefined();
+            expect(logo.turtleHeaps[0]).toEqual([10, 20, 30]);
+        });
     });
 
     describe("StopTurtleBlock", () => {
