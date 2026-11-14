@@ -127,12 +127,20 @@ class ReflectionMarkdown {
         html = html.replace(/^## (.*$)/gim, "<h2>$1</h2>");
         html = html.replace(/^# (.*$)/gim, "<h1>$1</h1>");
 
-        // Bold & Italic
-        html = html.replace(/\*\*(.*?)\*\*/gim, "<b>$1</b>");
-        html = html.replace(/\*(.*?)\*/gim, "<i>$1</i>");
+        // Links are set aside first, so that a "*" in a URL is not read as italic. They are put
+        // back below as raw anchor tags; sanitization happens in Step 3.
+        const emphasize = text =>
+            text.replace(/\*\*(.*?)\*\*/gim, "<b>$1</b>").replace(/\*(.*?)\*/gim, "<i>$1</i>");
+        const links = [];
+        html = html.replace(/\uE000/g, "");
+        html = html.replace(/\[(.*?)\]\((.*?)\)/gim, (match, text, url) => {
+            links.push(`<a href='${url}'>${emphasize(text)}</a>`);
+            return `\uE000${links.length - 1}\uE000`;
+        });
 
-        // Links - Create raw anchor tags, sanitization happens in Step 3
-        html = html.replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2'>$1</a>");
+        // Bold & Italic
+        html = emphasize(html);
+        html = html.replace(/\uE000(\d+)\uE000/g, (match, index) => links[Number(index)]);
 
         // Line breaks
         html = html.replace(/\n/gim, "<br>");
