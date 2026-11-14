@@ -42,6 +42,7 @@ class TimbrePanels {
      * @returns {HTMLElement} the fresh #timbreTable element.
      */
     _resetTimbreTable() {
+        this._cleanupEventListeners?.();
         this.timbreTableDiv.style.display = "inline";
         this.timbreTableDiv.style.visibility = "visible";
         this.timbreTableDiv.style.border = "0px";
@@ -873,6 +874,13 @@ class TimbrePanels {
         this._eventHandler = event => {
             const target = event.target;
             const targetId = target.id || "";
+            if (
+                targetId.startsWith("sel") ||
+                targetId.startsWith("radio") ||
+                targetId.startsWith("myRangeF")
+            ) {
+                event.stopPropagation?.();
+            }
 
             if (targetId.startsWith("sel") && event.type === "change") {
                 filterButtonCell.style.backgroundColor = "#C8C8C0";
