@@ -3574,6 +3574,133 @@ describe("Utility Functions (logic-only)", () => {
                 URL.revokeObjectURL = origRevokeObjectURL;
             }
         });
+
+        it("startRecording returns immediately when samplerRecorder is already started", async () => {
+            const Synth = new synthutilsModule.Synth();
+            Synth.samplerRecorder = { state: "started" };
+            const origToneStart = Tone.start;
+            Tone.start = jest.fn();
+            try {
+                await Synth.startRecording();
+                expect(Tone.start).not.toHaveBeenCalled();
+            } finally {
+                Tone.start = origToneStart;
+                Synth.samplerRecorder = null;
+            }
+        });
+
+        it("cancels startup and disposes resources if cancelled while Tone.start is pending", async () => {
+            const Synth = new synthutilsModule.Synth();
+            let resolveToneStart;
+            const toneStartPromise = new Promise(resolve => {
+                resolveToneStart = resolve;
+            });
+            const origToneStart = Tone.start;
+            Tone.start = jest.fn(() => toneStartPromise);
+
+            const origUserMedia = Tone.UserMedia;
+            const origRecorder = Tone.Recorder;
+            const micInstance = {
+                open: jest.fn().mockResolvedValue(),
+                connect: jest.fn(),
+                close: jest.fn(),
+                dispose: jest.fn()
+            };
+            const recorderInstance = {
+                start: jest.fn(),
+                stop: jest.fn().mockResolvedValue(null),
+                dispose: jest.fn(),
+                state: "stopped"
+            };
+            Tone.UserMedia = jest.fn(() => micInstance);
+            Tone.Recorder = jest.fn(() => recorderInstance);
+
+            try {
+                const startPromise = Synth.startRecording();
+                expect(Synth.isRecordingStarting()).toBe(true);
+
+                // Cancel while Tone.start() is still pending
+                await Synth.stopRecording();
+
+                resolveToneStart();
+                await expect(startPromise).rejects.toThrow("Recording start cancelled");
+
+                expect(Synth.isRecordingStarting()).toBe(false);
+                expect(Synth.samplerRecorder).toBeNull();
+                expect(micInstance.close).toHaveBeenCalled();
+                expect(recorderInstance.dispose).toHaveBeenCalled();
+            } finally {
+                Tone.start = origToneStart;
+                Tone.UserMedia = origUserMedia;
+                Tone.Recorder = origRecorder;
+            }
+        });
+
+        it("safely catches and logs errors when disposing session resources during teardown", async () => {
+            const Synth = new synthutilsModule.Synth();
+            const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+
+            const throwingAnalyser = {
+                dispose: jest.fn(() => {
+                    throw new Error("analyser dispose failed");
+                })
+            };
+            const throwingMic = {
+                disconnect: jest.fn(() => {
+                    throw new Error("mic disconnect failed");
+                }),
+                close: jest.fn(() => {
+                    throw new Error("mic close failed");
+                }),
+                dispose: jest.fn(() => {
+                    throw new Error("mic dispose failed");
+                })
+            };
+            const throwingRecorder = {
+                state: "started",
+                stop: jest.fn(() => {
+                    throw new Error("recorder stop failed");
+                }),
+                dispose: jest.fn(() => {
+                    throw new Error("recorder dispose failed");
+                })
+            };
+
+            Synth.analyser = throwingAnalyser;
+            Synth.mic = throwingMic;
+            Synth.samplerRecorder = throwingRecorder;
+
+            await expect(Synth.stopRecording()).resolves.toBeNull();
+
+            expect(debugSpy).toHaveBeenCalledWith(
+                "Error disconnecting analyser:",
+                expect.any(Error)
+            );
+            expect(debugSpy).toHaveBeenCalledWith("Error disposing analyser:", expect.any(Error));
+            expect(debugSpy).toHaveBeenCalledWith("Error closing mic:", expect.any(Error));
+            expect(debugSpy).toHaveBeenCalledWith("Error disposing mic:", expect.any(Error));
+            expect(debugSpy).toHaveBeenCalledWith(
+                "Error stopping recorder in cleanup:",
+                expect.any(Error)
+            );
+            expect(debugSpy).toHaveBeenCalledWith(
+                "Error disposing sampler recorder:",
+                expect.any(Error)
+            );
+
+            debugSpy.mockRestore();
+        });
+
+        it("returns null if an in-flight stop promise rejects", async () => {
+            const Synth = new synthutilsModule.Synth();
+            Synth._stopPromiseBySession.set(
+                Synth._recordingSessionId,
+                Promise.reject(new Error("Stop rejection"))
+            );
+
+            const res = await Synth.stopRecording();
+            expect(res).toBeNull();
+        });
     });
 
     describe("audioBufferToWav", () => {

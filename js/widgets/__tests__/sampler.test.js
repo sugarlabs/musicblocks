@@ -1167,6 +1167,42 @@ describe("Sampler Widget", () => {
             expect(mockActivity.logo.synth.LiveWaveForm).toHaveBeenCalled();
         });
 
+        test("isRecordingStarting reflects is_recording_starting state", () => {
+            widget.init(mockActivity, 1);
+            expect(widget.isRecordingStarting()).toBe(false);
+            widget.is_recording_starting = true;
+            expect(widget.isRecordingStarting()).toBe(true);
+            widget.is_recording_starting = false;
+            expect(widget.isRecordingStarting()).toBe(false);
+        });
+
+        test("opening prompt while recording stops recording and resets record button icon", () => {
+            widget.init(mockActivity, 1);
+            widget.is_recording = true;
+            const img = widget._recordBtn.getElementsByTagName("img")[0];
+            img.src = "header-icons/record.svg";
+
+            widget._promptBtn.onclick();
+
+            expect(mockActivity.logo.synth.stopRecording).toHaveBeenCalled();
+            expect(widget.is_recording).toBe(false);
+            expect(widget.is_recording_starting).toBe(false);
+            expect(img.src).toContain("header-icons/mic.svg");
+        });
+
+        test("handles AbortError during recording startup gracefully without showing error message", async () => {
+            widget.init(mockActivity, 1);
+            const abortErr = new Error("The operation was aborted");
+            abortErr.name = "AbortError";
+            mockActivity.logo.synth.startRecording.mockRejectedValue(abortErr);
+
+            await widget._recordBtn.onclick();
+
+            expect(widget.is_recording).toBe(false);
+            expect(widget.is_recording_starting).toBe(false);
+            expect(mockActivity.errorMsg).not.toHaveBeenCalled();
+        });
+
         test("onclose does not call stopRecording/stopTuner when neither is active", () => {
             widget.init(mockActivity, 1);
 

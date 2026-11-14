@@ -3553,11 +3553,13 @@ describe("Logo runFromBlockNow", () => {
             expect(recorderStop).toHaveBeenCalledTimes(1);
         });
 
-        test("doStopTurtles stops active Sampler microphone recording and resets Sampler UI", () => {
+        test("doStopTurtles stops active Sampler microphone recording and resets Sampler UI", async () => {
             logo.synth = makeSynth();
             logo.synth.samplerRecorder = { state: "started" };
             logo.synth.mic = { close: jest.fn() };
-            logo.synth.stopRecording = jest.fn();
+            logo.synth.stopRecording = jest
+                .fn()
+                .mockResolvedValue("blob:http://localhost/new-audio");
 
             const img = document.createElement("img");
             img.src = "header-icons/record.svg";
@@ -3573,9 +3575,11 @@ describe("Logo runFromBlockNow", () => {
             const cancelSpy = jest.spyOn(global, "cancelAnimationFrame");
 
             logo.doStopTurtles();
+            await Promise.resolve();
 
             expect(logo.synth.stopRecording).toHaveBeenCalledTimes(1);
             expect(logo.sample.is_recording).toBe(false);
+            expect(logo.sample.recordingURL).toBe("blob:http://localhost/new-audio");
             expect(img.src).toContain("header-icons/mic.svg");
             expect(cancelSpy).toHaveBeenCalledWith(42);
             expect(logo.sample.drawVisualIDs[0]).toBeNull();

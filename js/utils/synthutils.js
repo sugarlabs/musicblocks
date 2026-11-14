@@ -2969,47 +2969,33 @@ function Synth() {
             const mic = new Tone.UserMedia();
             const recorder = new Tone.Recorder();
 
-            const isSessionValid = () => {
-                return (
-                    this._recordingSessionId === currentSession &&
-                    !this._cancelledSessions.has(currentSession)
-                );
+            const abortIfCancelled = () => {
+                if (
+                    this._recordingSessionId !== currentSession ||
+                    this._cancelledSessions.has(currentSession)
+                ) {
+                    const err = new Error("Recording start cancelled");
+                    err.name = "AbortError";
+                    throw err;
+                }
             };
 
             try {
                 await Tone.start();
-                if (!isSessionValid()) {
-                    const err = new Error("Recording start cancelled");
-                    err.name = "AbortError";
-                    throw err;
-                }
+                abortIfCancelled();
 
                 await mic.open();
-                if (!isSessionValid()) {
-                    const err = new Error("Recording start cancelled");
-                    err.name = "AbortError";
-                    throw err;
-                }
+                abortIfCancelled();
 
                 if (typeof mic.connect === "function") {
                     mic.connect(recorder);
                 }
-
-                if (!isSessionValid()) {
-                    const err = new Error("Recording start cancelled");
-                    err.name = "AbortError";
-                    throw err;
-                }
+                abortIfCancelled();
 
                 if (typeof recorder.start === "function") {
                     recorder.start();
                 }
-
-                if (!isSessionValid()) {
-                    const err = new Error("Recording start cancelled");
-                    err.name = "AbortError";
-                    throw err;
-                }
+                abortIfCancelled();
 
                 this.mic = mic;
                 this.samplerRecorder = recorder;
@@ -3096,18 +3082,6 @@ function Synth() {
             this.recorder.state !== "recording"
                 ? this.recorder
                 : null;
-        if (!this.samplerRecorder && !this.mic && !legacyRecorder) {
-            // Check if there is an in-flight stop for the current session
-            if (this._stopPromiseBySession.has(this._recordingSessionId)) {
-                try {
-                    return await this._stopPromiseBySession.get(this._recordingSessionId);
-                } catch (e) {
-                    return null;
-                }
-            }
-            return null;
-        }
-
         const currentSession = this._recordingSessionId;
         if (this._stopPromiseBySession.has(currentSession)) {
             try {
@@ -3115,6 +3089,10 @@ function Synth() {
             } catch (e) {
                 return null;
             }
+        }
+
+        if (!this.samplerRecorder && !this.mic && !legacyRecorder) {
+            return null;
         }
 
         _disposeRecordingPlayer();
