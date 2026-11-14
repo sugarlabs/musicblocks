@@ -77,6 +77,93 @@ window.widgetWindows = {
     focused: null,
     draggingWindow: null,
     _globalListenersInitialized: false,
+
+    /** localStorage key for persisted widget layout. */
+    _STORAGE_KEY: "mb_widgetWindowLayout",
+
+    /**
+     * Persist the current _posCache and _maximizedCache to localStorage.
+     * Silently ignores errors (e.g. storage full, private browsing).
+     * @private
+     */
+    _persistLayout() {
+        try {
+            const data = JSON.stringify({
+                positions: this._posCache,
+                maximized: this._maximizedCache
+            });
+            localStorage.setItem(this._STORAGE_KEY, data);
+        } catch (_) {
+            // Storage unavailable or full — silently ignore.
+        }
+    },
+
+    /**
+     * Load persisted widget layout from localStorage into the in-memory
+     * caches. Called once during module initialization.
+     * @private
+     */
+    _loadPersistedLayout() {
+        try {
+            const raw = localStorage.getItem(this._STORAGE_KEY);
+            if (raw) {
+                const data = JSON.parse(raw);
+                if (data && typeof data === "object" && !Array.isArray(data)) {
+                    if (
+                        data.positions &&
+                        typeof data.positions === "object" &&
+                        !Array.isArray(data.positions)
+                    ) {
+                        const validPositions = {};
+                        for (const [key, pos] of Object.entries(data.positions)) {
+                            if (
+                                Array.isArray(pos) &&
+                                pos.length >= 2 &&
+                                (typeof pos[0] === "number" ||
+                                    (typeof pos[0] === "string" && pos[0].trim() !== "")) &&
+                                Number.isFinite(Number(pos[0])) &&
+                                (typeof pos[1] === "number" ||
+                                    (typeof pos[1] === "string" && pos[1].trim() !== "")) &&
+                                Number.isFinite(Number(pos[1]))
+                            ) {
+                                validPositions[key] = [Number(pos[0]), Number(pos[1])];
+                            }
+                        }
+                        this._posCache = validPositions;
+                    }
+                    if (
+                        data.maximized &&
+                        typeof data.maximized === "object" &&
+                        !Array.isArray(data.maximized)
+                    ) {
+                        const validMaximized = {};
+                        for (const [key, val] of Object.entries(data.maximized)) {
+                            if (typeof val === "boolean") {
+                                validMaximized[key] = val;
+                            }
+                        }
+                        this._maximizedCache = validMaximized;
+                    }
+                }
+            }
+        } catch (_) {
+            // Malformed data or storage unavailable — start fresh.
+        }
+        if (
+            !this._posCache ||
+            typeof this._posCache !== "object" ||
+            Array.isArray(this._posCache)
+        ) {
+            this._posCache = {};
+        }
+        if (
+            !this._maximizedCache ||
+            typeof this._maximizedCache !== "object" ||
+            Array.isArray(this._maximizedCache)
+        ) {
+            this._maximizedCache = {};
+        }
+    },
     /**
      * Returns the bottom edge of the visible toolbar area.
      *
@@ -430,6 +517,9 @@ window.widgetWindows = {
     }
 };
 
+// Load any persisted widget layout from localStorage on module init.
+window.widgetWindows._loadPersistedLayout();
+
 class WidgetWindow {
     /**
      * @param {string} key
@@ -464,23 +554,29 @@ class WidgetWindow {
 
         this._restorePending = false;
         this._activeTouchId = null;
+        const wasMaximized = !!window.widgetWindows._maximizedCache[this._key];
         if (window.widgetWindows._posCache[this._key]) {
             const _pos = window.widgetWindows._posCache[this._key];
-            const x = Number(_pos[0]);
-            const y = Number(_pos[1]);
-            if (
-                !Number.isNaN(x) &&
-                !Number.isNaN(y) &&
-                !window.widgetWindows._maximizedCache[this._key]
-            ) {
+            let x = NaN;
+            let y = NaN;
+            try {
+                if (Array.isArray(_pos) && _pos.length >= 2) {
+                    x = Number(_pos[0]);
+                    y = Number(_pos[1]);
+                }
+            } catch (_) {
+                // Ignore conversion errors
+            }
+            if (!Number.isNaN(x) && !Number.isNaN(y)) {
                 const clamped = this._clampToViewport(x, y);
                 this.setPosition(clamped[0], clamped[1]);
                 this._restorePending = true;
             } else {
-                if (Number.isNaN(x) || Number.isNaN(y)) {
-                    delete window.widgetWindows._posCache[this._key];
-                }
+                delete window.widgetWindows._posCache[this._key];
             }
+        }
+        if (wasMaximized) {
+            window.widgetWindows._maximizedCache[this._key] = true;
         }
 
         this.takeFocus();
@@ -1038,6 +1134,7 @@ class WidgetWindow {
     _restore() {
         this._restorePending = false;
         window.widgetWindows._maximizedCache[this._key] = false;
+        window.widgetWindows._persistLayout();
         this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
         if (this._maxminButton) {
             this._maxminButton.title = _("Maximize window");
@@ -1066,6 +1163,7 @@ class WidgetWindow {
     _maximize() {
         this._savedPos = [this._frame.style.left, this._frame.style.top];
         window.widgetWindows._maximizedCache[this._key] = true;
+        window.widgetWindows._persistLayout();
         this._maxminIcon.setAttribute("src", "header-icons/icon-contract.svg");
         if (this._maxminButton) {
             this._maxminButton.title = _("Restore");
@@ -1230,6 +1328,7 @@ class WidgetWindow {
         this._frame.style.top = `${top}px`;
         window.widgetWindows._posCache[this._key] = [x, top];
         window.widgetWindows._maximizedCache[this._key] = false;
+        window.widgetWindows._persistLayout();
         return this;
     }
 
@@ -1349,10 +1448,17 @@ window.widgetWindows.windowFor = (widget, title, saveAs, fullscreen) => {
         const win = new WidgetWindow(key, title, fullscreen);
         // The constructor restores a previously saved position, so only center
         // the window the first time it is opened.
-        if (!window.widgetWindows._posCache[key] || window.widgetWindows._maximizedCache[key]) {
+        if (!window.widgetWindows._posCache[key]) {
             win.sendToCenter();
         }
-        window.widgetWindows._maximizedCache[key] = false;
+        if (window.widgetWindows._maximizedCache[key]) {
+            if (win._fullscreenEnabled) {
+                win._maximize();
+            } else {
+                window.widgetWindows._maximizedCache[key] = false;
+                window.widgetWindows._persistLayout();
+            }
+        }
         window.widgetWindows.openWindows[key] = win;
     }
 

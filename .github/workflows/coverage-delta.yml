@@ -58,8 +58,26 @@ jobs:
               id: base_jest
               continue-on-error: true
               run: |
+                  set +e
                   npx jest --coverage --coverageReporters=json-summary --ci \
                       --passWithNoTests
+                  export JEST_EXIT=$?
+                  set -e
+                  if [ ! -f coverage/coverage-summary.json ]; then
+                      echo "coverage/coverage-summary.json was not generated."
+                      exit 1
+                  fi
+                  node -e '
+                  const fs = require("fs");
+                  const summary = JSON.parse(fs.readFileSync("coverage/coverage-summary.json", "utf8"));
+                  if (!summary.total || !summary.total.lines || summary.total.lines.covered === 0) {
+                      console.error("Coverage summary is empty or untested.");
+                      process.exit(1);
+                  }
+                  if (process.env.JEST_EXIT !== "0") {
+                      console.log("Jest completed with failing test(s) on base branch (exit code " + process.env.JEST_EXIT + "), but verified valid coverage summary was generated (" + summary.total.lines.covered + " lines covered).");
+                  }
+                  '
               shell: bash
 
             - name: Report base test failures
