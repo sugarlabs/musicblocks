@@ -120,22 +120,28 @@ describe("Project loading", () => {
             force: true
         });
 
-        cy.get("#load-container", { timeout: 30000 }).should("not.be.visible");
-
-        cy.get("#errorText").should("not.be.visible");
-        cy.get("#canvas").should("be.visible");
-
-        cy.window().should(win => {
+        // Wait for completed load and the new non-trashed imported text block
+        cy.window({ timeout: 30000 }).should(win => {
             const activity = win.ActivityContext.getActivity();
-            const { blockList } = activity.blocks;
+            expect(activity, "activity context").to.exist;
+            expect(activity.blocks, "blocks manager").to.exist;
+            expect(activity.blocks._loadInProgress, "load in progress").to.be.false;
 
+            const { blockList } = activity.blocks;
             expect(blockList.length).to.be.greaterThan(baselineBlockCount);
 
             const hasHtmlTextBlock = blockList.some(
-                block => block.name === "text" && block.value === "learning html basics"
+                block =>
+                    !block.trash && block.name === "text" && block.value === "learning html basics"
             );
-            expect(hasHtmlTextBlock, "project containing 'html' in text block should be loaded").to
-                .be.true;
+            expect(
+                hasHtmlTextBlock,
+                "project containing 'html' in non-trashed text block should be loaded"
+            ).to.be.true;
         });
+
+        cy.get("#load-container").should("not.be.visible");
+        cy.get("#errorText").should("not.be.visible");
+        cy.get("#canvas").should("be.visible");
     });
 });
