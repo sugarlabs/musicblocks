@@ -3149,11 +3149,19 @@ function Synth() {
             }
 
             if (blob) {
-                this.recording = blob;
+                let sessionAudioURL = null;
                 if (typeof URL !== "undefined" && typeof URL.createObjectURL === "function") {
-                    this.audioURL = URL.createObjectURL(blob);
+                    sessionAudioURL = URL.createObjectURL(blob);
                 }
-                return this.audioURL;
+                if (currentSession === this._recordingSessionId) {
+                    this.recording = blob;
+                    this.audioURL = sessionAudioURL;
+                    return this.audioURL;
+                }
+                if (sessionAudioURL && typeof URL.revokeObjectURL === "function") {
+                    URL.revokeObjectURL(sessionAudioURL);
+                }
+                return null;
             }
             return null;
         })();

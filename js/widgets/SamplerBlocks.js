@@ -120,6 +120,17 @@ const SamplerBlocks = {
         this.__save = function () {
             const that = this;
             this._setWidgetTimeout(function () {
+                if (
+                    that.activity &&
+                    that.activity.logo &&
+                    that.activity.logo.synth &&
+                    that.activity.logo.synth.audioURL &&
+                    (!that.sampleData || that.sampleData === that.recordingURL)
+                ) {
+                    that.recordingURL = that.activity.logo.synth.audioURL;
+                    that.sampleData = that.recordingURL;
+                    that.sampleName = `Recorded Audio ${that.recordingURL}`;
+                }
                 that._addSample();
 
                 // Include the cent adjustment value in the sample block

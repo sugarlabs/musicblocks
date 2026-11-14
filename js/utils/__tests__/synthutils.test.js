@@ -3256,9 +3256,16 @@ describe("Utility Functions (logic-only)", () => {
             const openPromise = new Promise(resolve => {
                 resolveOpen = resolve;
             });
+            let micOpenInvokedResolve;
+            const micOpenInvokedPromise = new Promise(resolve => {
+                micOpenInvokedResolve = resolve;
+            });
 
             const micInstance = {
-                open: jest.fn(() => openPromise),
+                open: jest.fn(() => {
+                    micOpenInvokedResolve();
+                    return openPromise;
+                }),
                 connect: jest.fn(),
                 close: jest.fn(),
                 dispose: jest.fn()
@@ -3277,6 +3284,10 @@ describe("Utility Functions (logic-only)", () => {
                 // User clicks Record: startRecording begins and awaits mic.open()
                 const startPromise = Synth.startRecording();
                 expect(Synth.isRecordingStarting()).toBe(true);
+
+                // Wait until mic.open() is actually invoked before cancelling
+                await micOpenInvokedPromise;
+                expect(micInstance.open).toHaveBeenCalledTimes(1);
 
                 // User calls stopRecording() before mic.open() resolves
                 const stopResult = await Synth.stopRecording();
@@ -3315,9 +3326,16 @@ describe("Utility Functions (logic-only)", () => {
             const openPromiseB = new Promise(resolve => {
                 resolveOpenB = resolve;
             });
+            let micAOpenInvokedResolve;
+            const micAOpenInvokedPromise = new Promise(resolve => {
+                micAOpenInvokedResolve = resolve;
+            });
 
             const micA = {
-                open: jest.fn(() => openPromiseA),
+                open: jest.fn(() => {
+                    micAOpenInvokedResolve();
+                    return openPromiseA;
+                }),
                 connect: jest.fn(),
                 close: jest.fn(),
                 dispose: jest.fn()
@@ -3347,6 +3365,10 @@ describe("Utility Functions (logic-only)", () => {
                 Tone.UserMedia = jest.fn(() => micA);
                 Tone.Recorder = jest.fn(() => recorderA);
                 const startPromiseA = Synth.startRecording();
+
+                // Await micA.open invocation to ensure mic.open is genuinely pending
+                await micAOpenInvokedPromise;
+                expect(micA.open).toHaveBeenCalledTimes(1);
 
                 // Stop cancels Session A
                 await Synth.stopRecording();
@@ -3393,9 +3415,16 @@ describe("Utility Functions (logic-only)", () => {
             const openPromise = new Promise(resolve => {
                 resolveOpen = resolve;
             });
+            let micOpenInvokedResolve;
+            const micOpenInvokedPromise = new Promise(resolve => {
+                micOpenInvokedResolve = resolve;
+            });
 
             const mic = {
-                open: jest.fn(() => openPromise),
+                open: jest.fn(() => {
+                    micOpenInvokedResolve();
+                    return openPromise;
+                }),
                 connect: jest.fn(),
                 close: jest.fn(),
                 dispose: jest.fn()
@@ -3412,6 +3441,10 @@ describe("Utility Functions (logic-only)", () => {
 
             try {
                 const startPromise = Synth.startRecording();
+
+                // Wait until mic.open is actually invoked
+                await micOpenInvokedPromise;
+                expect(mic.open).toHaveBeenCalledTimes(1);
 
                 // Multiple stops during pending startup
                 const stop1 = Synth.stopRecording();
@@ -3434,6 +3467,111 @@ describe("Utility Functions (logic-only)", () => {
                 Synth.analyser = null;
                 Tone.UserMedia = origUserMedia;
                 Tone.Recorder = origRecorder;
+            }
+        });
+
+        it("prevents an older delayed recording session A from overwriting newer session B published result", async () => {
+            let resolveStopA;
+            const stopPromiseA = new Promise(resolve => {
+                resolveStopA = resolve;
+            });
+
+            const blobA = new Blob(["audio-take-A"], { type: "audio/wav" });
+            const blobB = new Blob(["audio-take-B"], { type: "audio/wav" });
+
+            const recorderA = {
+                start: jest.fn(),
+                stop: jest.fn(() => stopPromiseA),
+                dispose: jest.fn(),
+                state: "started"
+            };
+            const micA = {
+                open: jest.fn().mockResolvedValue(),
+                connect: jest.fn(),
+                close: jest.fn(),
+                dispose: jest.fn()
+            };
+
+            const recorderB = {
+                start: jest.fn(),
+                stop: jest.fn().mockResolvedValue(blobB),
+                dispose: jest.fn(),
+                state: "started"
+            };
+            const micB = {
+                open: jest.fn().mockResolvedValue(),
+                connect: jest.fn(),
+                close: jest.fn(),
+                dispose: jest.fn()
+            };
+
+            const origUserMedia = Tone.UserMedia;
+            const origRecorder = Tone.Recorder;
+            const origCreateObjectURL = URL.createObjectURL;
+            const origRevokeObjectURL = URL.revokeObjectURL;
+
+            const urlMap = new Map();
+            let urlCounter = 0;
+            URL.createObjectURL = jest.fn(blob => {
+                const url = `blob:http://localhost/test-audio-${++urlCounter}`;
+                urlMap.set(url, blob);
+                return url;
+            });
+            URL.revokeObjectURL = jest.fn(url => {
+                urlMap.delete(url);
+            });
+
+            try {
+                // 1. Session A starts and completes startup
+                Tone.UserMedia = jest.fn(() => micA);
+                Tone.Recorder = jest.fn(() => recorderA);
+                await Synth.startRecording();
+                expect(Synth.samplerRecorder).toBe(recorderA);
+
+                // 2. Stop Session A is initiated, but recorderA.stop() remains delayed
+                const stopTaskA = Synth.stopRecording();
+                expect(recorderA.stop).toHaveBeenCalledTimes(1);
+
+                // 3. While Session A's stop is in flight, Session B starts
+                Tone.UserMedia = jest.fn(() => micB);
+                Tone.Recorder = jest.fn(() => recorderB);
+                await Synth.startRecording();
+                expect(Synth.samplerRecorder).toBe(recorderB);
+
+                // 4. Session B stops and its stop completes immediately
+                const resultB = await Synth.stopRecording();
+                expect(resultB).toContain("blob:http://localhost/test-audio-");
+                expect(Synth.recording).toBe(blobB);
+                expect(Synth.audioURL).toBe(resultB);
+                const publishedUrlB = resultB;
+
+                // 5. Now Session A's delayed stop operation finally resolves with blobA
+                resolveStopA(blobA);
+                const resultA = await stopTaskA;
+
+                // 6. Session A must NOT overwrite Session B's published result or state
+                expect(Synth.recording).toBe(blobB);
+                expect(Synth.audioURL).toBe(publishedUrlB);
+                expect(resultA).toBeNull();
+
+                // 7. Session A's blob URL must be revoked, while Session B's URL remains active
+                expect(URL.revokeObjectURL).toHaveBeenCalledWith(
+                    expect.stringMatching(/blob:http:\/\/localhost\/test-audio-/)
+                );
+                expect(urlMap.has(publishedUrlB)).toBe(true);
+
+                // 8. Session A's teardown must not dispose Session B's resources
+                expect(recorderA.dispose).toHaveBeenCalled();
+            } finally {
+                Synth.samplerRecorder = null;
+                Synth.mic = null;
+                Synth.analyser = null;
+                Synth.recording = null;
+                Synth.audioURL = null;
+                Tone.UserMedia = origUserMedia;
+                Tone.Recorder = origRecorder;
+                URL.createObjectURL = origCreateObjectURL;
+                URL.revokeObjectURL = origRevokeObjectURL;
             }
         });
     });

@@ -143,10 +143,18 @@ const SamplerUI = {
                         typeof this.activity.logo.synth.isRecordingStarting === "function" &&
                         this.activity.logo.synth.isRecordingStarting())
                 ) {
+                    this._recordingStartToken = (this._recordingStartToken || 0) + 1;
                     this.activity.logo.synth.stopRecording();
                     this.is_recording = false;
                 }
+                this._recordingStartToken = (this._recordingStartToken || 0) + 1;
                 this.is_recording_starting = false;
+                if (this._recordBtn) {
+                    const img = this._recordBtn.getElementsByTagName("img")[0];
+                    if (img) {
+                        img.src = "header-icons/mic.svg";
+                    }
+                }
 
                 if (tunerOn) {
                     this.tuner.stopTuner();
@@ -338,6 +346,7 @@ const SamplerUI = {
                     console.warn("AI sample endpoint is using HTTP instead of HTTPS.");
                 }
                 if (this.is_recording || this.is_recording_starting) {
+                    this._recordingStartToken = (this._recordingStartToken || 0) + 1;
                     this.activity.logo.synth.stopRecording();
                     this.is_recording = false;
                     this.is_recording_starting = false;
@@ -546,10 +555,12 @@ const SamplerUI = {
             this._recordBtn.onclick = async () => {
                 stopTuner();
                 if (!this.is_recording && !this.is_recording_starting) {
+                    this._recordingStartToken = (this._recordingStartToken || 0) + 1;
+                    const currentToken = this._recordingStartToken;
                     this.is_recording_starting = true;
                     try {
                         await this.activity.logo.synth.startRecording();
-                        if (!this.running || !this.is_recording_starting) {
+                        if (!this.running || this._recordingStartToken !== currentToken) {
                             return;
                         }
                         this.is_recording = true;
@@ -565,17 +576,22 @@ const SamplerUI = {
                             this._drawLoop();
                         }
                     } catch (err) {
+                        if (this._recordingStartToken !== currentToken) {
+                            return;
+                        }
                         if (err && err.name === "AbortError") {
                             return;
                         }
                         console.error(err);
                         this.activity.errorMsg(_("Microphone access denied."));
                     } finally {
-                        this.is_recording_starting = false;
-                        if (!this.is_recording && this._recordBtn) {
-                            const img = this._recordBtn.getElementsByTagName("img")[0];
-                            if (img) {
-                                img.src = "header-icons/mic.svg";
+                        if (this._recordingStartToken === currentToken) {
+                            this.is_recording_starting = false;
+                            if (!this.is_recording && this._recordBtn) {
+                                const img = this._recordBtn.getElementsByTagName("img")[0];
+                                if (img) {
+                                    img.src = "header-icons/mic.svg";
+                                }
                             }
                         }
                     }
@@ -586,6 +602,7 @@ const SamplerUI = {
                     this.displayRecordingStopMessage();
                     this._playbackBtn.classList.remove("disabled");
                 } else if (this.is_recording_starting) {
+                    this._recordingStartToken = (this._recordingStartToken || 0) + 1;
                     this.is_recording_starting = false;
                     this.activity.logo.synth.stopRecording();
                     if (this._recordBtn) {
@@ -601,6 +618,14 @@ const SamplerUI = {
                 stopTuner();
                 const img = this._playbackBtn.getElementsByTagName("img")[0];
                 if (!this.playback) {
+                    if (
+                        this.activity &&
+                        this.activity.logo &&
+                        this.activity.logo.synth &&
+                        this.activity.logo.synth.audioURL
+                    ) {
+                        this.recordingURL = this.activity.logo.synth.audioURL;
+                    }
                     this.sampleData = this.recordingURL;
                     this.sampleName = `Recorded Audio ${this.recordingURL}`;
                     this._addSample();

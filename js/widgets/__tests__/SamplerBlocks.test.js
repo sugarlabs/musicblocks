@@ -57,4 +57,35 @@ describe("SamplerBlocks", () => {
         widget._saveSample();
         expect(widget.__save).toHaveBeenCalledTimes(1);
     });
+
+    test("__save synchronizes recordingURL and sampleData from synth.audioURL", () => {
+        global._ = s => s;
+        const widget = makeWidget();
+        widget._setWidgetTimeout = (fn, delay) => fn();
+        widget._addSample = jest.fn();
+        widget.activity = {
+            logo: {
+                synth: {
+                    audioURL: "blob:http://localhost/new-recording"
+                }
+            },
+            blocks: {
+                loadNewBlocks: jest.fn()
+            }
+        };
+        global.activity = { textMsg: jest.fn() };
+        widget.recordingURL = "blob:http://localhost/old-recording";
+        widget.sampleData = "blob:http://localhost/old-recording";
+        widget.samplePitch = "la";
+        widget.sampleOctave = "4";
+
+        widget.__save();
+
+        expect(widget.recordingURL).toBe("blob:http://localhost/new-recording");
+        expect(widget.sampleData).toBe("blob:http://localhost/new-recording");
+        expect(widget.sampleName).toBe("Recorded Audio blob:http://localhost/new-recording");
+        expect(widget.activity.blocks.loadNewBlocks).toHaveBeenCalled();
+        const generatedStack = widget.activity.blocks.loadNewBlocks.mock.calls[0][0];
+        expect(generatedStack[1][1][1].value[1]).toBe("blob:http://localhost/new-recording");
+    });
 });

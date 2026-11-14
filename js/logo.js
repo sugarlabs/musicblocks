@@ -1690,7 +1690,14 @@ class Logo {
             (typeof this.synth.isRecordingStarting === "function" &&
                 this.synth.isRecordingStarting())
         ) {
-            this.synth.stopRecording();
+            const stopPromise = this.synth.stopRecording();
+            if (this.sample && stopPromise && typeof stopPromise.then === "function") {
+                stopPromise.then(url => {
+                    if (url && this.sample) {
+                        this.sample.recordingURL = url;
+                    }
+                });
+            }
         }
         if (
             this.sample &&
@@ -1699,6 +1706,7 @@ class Logo {
                 (typeof this.sample.isRecordingStarting === "function" &&
                     this.sample.isRecordingStarting()))
         ) {
+            this.sample._recordingStartToken = (this.sample._recordingStartToken || 0) + 1;
             this.sample.is_recording = false;
             this.sample.is_recording_starting = false;
             if (this.sample._recordBtn) {

@@ -208,7 +208,15 @@ const SamplerCanvas = {
                                         this.activity.logo.synth &&
                                         typeof this.activity.logo.synth.stopRecording === "function"
                                     ) {
-                                        this.activity.logo.synth.stopRecording();
+                                        const stopPromise =
+                                            this.activity.logo.synth.stopRecording();
+                                        if (stopPromise && typeof stopPromise.then === "function") {
+                                            stopPromise.then(url => {
+                                                if (url) {
+                                                    this.recordingURL = url;
+                                                }
+                                            });
+                                        }
                                     }
                                     break;
                                 }

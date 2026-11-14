@@ -171,11 +171,22 @@ describe("SamplerCanvas", () => {
         });
 
         test("draw loop handles missing pitchAnalysers gracefully without throwing", () => {
+            const btn = document.createElement("button");
+            const img = document.createElement("img");
+            img.src = "header-icons/record.svg";
+            btn.appendChild(img);
+            widget._recordBtn = btn;
             widget.is_recording = true;
             widget.pitchAnalysers = {};
             mockActivity.logo.synth.getWaveFormValues.mockReturnValue(null);
+            mockActivity.logo.synth.stopRecording = jest.fn();
 
             expect(() => widget.makeCanvas(800, 400, 0, true)).not.toThrow();
+
+            expect(mockActivity.logo.synth.stopRecording).toHaveBeenCalled();
+            expect(widget.is_recording).toBe(false);
+            expect(widget.drawVisualIDs[0]).toBeNull();
+            expect(img.src).toContain("header-icons/mic.svg");
         });
 
         test("draw loop stops and clears drawVisualIDs when idle", () => {

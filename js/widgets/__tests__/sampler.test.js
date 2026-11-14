@@ -1095,6 +1095,78 @@ describe("Sampler Widget", () => {
             expect(mockActivity.logo.synth.LiveWaveForm).not.toHaveBeenCalled();
         });
 
+        test("stopping via global Stop updates recordingURL from synth.audioURL on playback", async () => {
+            widget.init(mockActivity, 1);
+            widget._addSample = jest.fn();
+            mockActivity.logo.synth.playRecording = jest.fn();
+
+            // Simulate global stop completing a recording and publishing synth.audioURL
+            mockActivity.logo.synth.audioURL = "blob:http://localhost/global-stopped-url";
+            widget.recordingURL = "blob:http://localhost/old-url";
+
+            widget._playbackBtn.onclick();
+
+            expect(widget.recordingURL).toBe("blob:http://localhost/global-stopped-url");
+            expect(widget.sampleData).toBe("blob:http://localhost/global-stopped-url");
+            expect(widget._addSample).toHaveBeenCalled();
+            expect(mockActivity.logo.synth.playRecording).toHaveBeenCalled();
+        });
+
+        test("rapid start-cancel-start prevents stale request rejection from clearing active start request", async () => {
+            let rejectA;
+            const pendingA = new Promise((_, reject) => {
+                rejectA = reject;
+            });
+            let resolveB;
+            const pendingB = new Promise(resolve => {
+                resolveB = resolve;
+            });
+
+            let callCount = 0;
+            mockActivity.logo.synth.startRecording = jest.fn(() => {
+                callCount++;
+                return callCount === 1 ? pendingA : pendingB;
+            });
+
+            widget.init(mockActivity, 1);
+
+            // 1. User clicks Record (Request A starts)
+            const promiseA = widget._recordBtn.onclick();
+            expect(widget.is_recording_starting).toBe(true);
+            expect(widget._recordingStartToken).toBe(1);
+
+            // 2. User clicks Record again to cancel Request A
+            await widget._recordBtn.onclick();
+            expect(widget.is_recording_starting).toBe(false);
+            expect(widget._recordingStartToken).toBe(2);
+            expect(mockActivity.logo.synth.stopRecording).toHaveBeenCalled();
+
+            // 3. User clicks Record again (Request B starts)
+            const promiseB = widget._recordBtn.onclick();
+            expect(widget.is_recording_starting).toBe(true);
+            expect(widget._recordingStartToken).toBe(3);
+
+            // 4. Request A rejects in the background (e.g. AbortError)
+            const abortErr = new Error("Aborted");
+            abortErr.name = "AbortError";
+            rejectA(abortErr);
+            await promiseA;
+
+            // Crucial assertion: Request A's finally block must NOT clear Request B's pending flag!
+            expect(widget.is_recording_starting).toBe(true);
+            expect(widget.is_recording).toBe(false);
+
+            // 5. Request B resolves successfully
+            resolveB();
+            await promiseB;
+
+            // Request B successfully transitions to active recording
+            expect(widget.is_recording).toBe(true);
+            expect(widget.is_recording_starting).toBe(false);
+            expect(widget._recordBtn.getElementsByTagName("img")[0].src).toContain("record.svg");
+            expect(mockActivity.logo.synth.LiveWaveForm).toHaveBeenCalled();
+        });
+
         test("onclose does not call stopRecording/stopTuner when neither is active", () => {
             widget.init(mockActivity, 1);
 
