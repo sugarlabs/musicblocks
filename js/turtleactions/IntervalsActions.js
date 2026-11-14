@@ -163,11 +163,43 @@ function setupIntervalsActions(activity) {
         }
 
         /**
+         * Calculates the standard 12-EDO semitone distance between two notes,
+         * used to identify the diatonic interval name in SEMITONETOINTERVALMAP
+         * regardless of the current tuning temperament.
+         *
+         * @static
+         * @param {string} firstNote
+         * @param {string} secondNote
+         * @param {number} octave
+         * @returns {number} Distance in standard semitones.
+         */
+        static GetIntervalSemitones(firstNote, secondNote, octave) {
+            const letterSteps = this.getLetterSteps(firstNote, secondNote, octave);
+            if (letterSteps === null) {
+                return 0;
+            }
+            const firstStep = pitchToNumber(firstNote, 0, "C major", "equal");
+            const secondStep = pitchToNumber(secondNote, 0, "C major", "equal");
+            if (
+                typeof firstStep !== "number" ||
+                typeof secondStep !== "number" ||
+                isNaN(firstStep) ||
+                isNaN(secondStep)
+            ) {
+                return 0;
+            }
+            const octaveShift = Math.floor(
+                (this.getLetterIndex(firstNote) + letterSteps) / NOTENAMES.length
+            );
+
+            return Math.abs(secondStep - firstStep + octaveShift * 12);
+        }
+
+        /**
          * @static
          * @param {number} turtle
          * @returns {String}
          */
-
         static GetCurrentInterval(turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
             const temperament = activity.logo.synth.inTemperament;
@@ -209,12 +241,12 @@ function setupIntervalsActions(activity) {
                 }
             }
 
-            // +9 is the original 12-EDO offset: intervals beyond
-            // temperamentLength + 9 get an explicit "plus N octave(s)"
-            // suffix. Same offset scales proportionally for all EDOs.
+            let semitones = this.GetIntervalSemitones(firstNote, secondNote, octave);
+
             let octavesRemoved = 0;
-            if (totalIntervals > temperamentLength + 9) {
-                while (totalIntervals > temperamentLength) {
+            if (semitones > 21) {
+                while (semitones > 12) {
+                    semitones -= 12;
                     totalIntervals -= temperamentLength;
                     octavesRemoved += 1;
                 }
@@ -232,7 +264,7 @@ function setupIntervalsActions(activity) {
                 lastWord += ` ${_("below")}`;
             }
 
-            const mapEntry = SEMITONETOINTERVALMAP[totalIntervals];
+            const mapEntry = SEMITONETOINTERVALMAP[semitones];
             const intervalName =
                 mapEntry && mapEntry[letterGap] !== undefined
                     ? mapEntry[letterGap]
