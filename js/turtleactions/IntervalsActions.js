@@ -247,7 +247,9 @@ function setupIntervalsActions(activity) {
             if (semitones > 21) {
                 while (semitones > 12) {
                     semitones -= 12;
-                    totalIntervals -= temperamentLength;
+                    if (totalIntervals >= temperamentLength) {
+                        totalIntervals -= temperamentLength;
+                    }
                     octavesRemoved += 1;
                 }
             }
