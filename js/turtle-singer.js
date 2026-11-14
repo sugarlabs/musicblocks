@@ -663,6 +663,7 @@ class Singer {
             noteObj = numberToPitch(n2, temp, undefined, tur.singer.pitchNumberOffset, activity);
         }
 
+        if (i === 0) return 0;
         return positive ? i : -i;
     }
 
