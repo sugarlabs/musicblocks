@@ -121,4 +121,93 @@ describe("SamplerFiles", () => {
             global.FileReader = originalFileReader;
         }
     });
+
+    describe("upload ordering and read failures", () => {
+        let originalFileReader;
+        let readers;
+
+        beforeEach(() => {
+            originalFileReader = global.FileReader;
+            readers = [];
+            global.FileReader = class {
+                constructor() {
+                    readers.push(this);
+                }
+
+                readAsDataURL() {}
+            };
+        });
+
+        afterEach(() => {
+            global.FileReader = originalFileReader;
+        });
+
+        const makeUploadWidget = () => {
+            const widget = makeWidget();
+            widget.activity = { errorMsg: jest.fn() };
+            widget._addSample = jest.fn();
+            return widget;
+        };
+
+        test("ignores a slower earlier upload that finishes after a newer one", () => {
+            const widget = makeUploadWidget();
+
+            widget.handleFiles({ name: "old.wav", type: "audio/wav" });
+            widget.handleFiles({ name: "new.wav", type: "audio/wav" });
+            expect(readers).toHaveLength(2);
+
+            // The newer selection finishes first.
+            readers[1].result = "data:audio/wav;base64,TkVX";
+            readers[1].onload();
+
+            // The older read finishes last and must not overwrite it.
+            readers[0].result = "data:audio/wav;base64,T0xE";
+            readers[0].onload();
+
+            expect(widget.sampleName).toBe("new.wav");
+            expect(widget.sampleData).toBe("data:audio/wav;base64,TkVX");
+            expect(widget._addSample).toHaveBeenCalledTimes(1);
+        });
+
+        test("reports a failed read without changing the current sample", () => {
+            const widget = makeUploadWidget();
+            widget.sampleName = "keep.wav";
+            widget.sampleData = "data:audio/wav;base64,S0VFUA==";
+
+            widget.handleFiles({ name: "broken.wav", type: "audio/wav" });
+            readers[0].onerror();
+
+            expect(widget.activity.errorMsg).toHaveBeenCalledWith(
+                "Upload failed: Could not read the sample file.",
+                undefined
+            );
+            expect(widget.sampleName).toBe("keep.wav");
+            expect(widget._addSample).not.toHaveBeenCalled();
+        });
+
+        test("reports an aborted read", () => {
+            const widget = makeUploadWidget();
+
+            widget.handleFiles({ name: "cancelled.wav", type: "audio/wav" });
+            readers[0].onabort();
+
+            expect(widget.activity.errorMsg).toHaveBeenCalledWith(
+                "Upload failed: Reading the sample file was aborted.",
+                undefined
+            );
+            expect(widget._addSample).not.toHaveBeenCalled();
+        });
+
+        test("ignores errors from an upload superseded by a newer selection", () => {
+            const widget = makeUploadWidget();
+
+            widget.handleFiles({ name: "old.wav", type: "audio/wav" });
+            widget.handleFiles({ name: "new.wav", type: "audio/wav" });
+
+            readers[0].onerror();
+            readers[0].onabort();
+
+            expect(widget.activity.errorMsg).not.toHaveBeenCalled();
+        });
+    });
 });

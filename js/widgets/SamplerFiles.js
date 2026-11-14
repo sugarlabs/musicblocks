@@ -78,10 +78,16 @@ const SamplerFiles = {
 
         //To handle sample files
         this.handleFiles = sampleFile => {
+            this._latestSampleUpload = (this._latestSampleUpload || 0) + 1;
+            const uploadId = this._latestSampleUpload;
             const reader = new FileReader();
             reader.readAsDataURL(sampleFile);
 
             reader.onload = () => {
+                // Ignore stale reads that finished after a newer selection.
+                if (uploadId !== this._latestSampleUpload) {
+                    return;
+                }
                 // if the file is of .wav type, save it
                 const mimeType = reader.result.substring(
                     reader.result.indexOf(":") + 1,
@@ -103,6 +109,26 @@ const SamplerFiles = {
                 } else {
                     this.showSampleTypeError();
                 }
+            };
+
+            reader.onerror = () => {
+                if (uploadId !== this._latestSampleUpload) {
+                    return;
+                }
+                this.activity.errorMsg(
+                    _("Upload failed: Could not read the sample file."),
+                    this.timbreBlock
+                );
+            };
+
+            reader.onabort = () => {
+                if (uploadId !== this._latestSampleUpload) {
+                    return;
+                }
+                this.activity.errorMsg(
+                    _("Upload failed: Reading the sample file was aborted."),
+                    this.timbreBlock
+                );
             };
         };
 
