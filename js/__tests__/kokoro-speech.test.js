@@ -482,6 +482,53 @@ describe("Kokoro singing resynthesis", () => {
         expect(Math.abs(rate / analyzed.period - frequency) / frequency).toBeLessThan(0.02);
     });
 
+    test("pitching a voiced syllable up preserves its vowel resonance", () => {
+        const source = {
+            rate,
+            period: 120,
+            samples: Float32Array.from({ length: rate / 2 }, (_, i) => {
+                let sample = 0;
+                for (let harmonic = 1; harmonic < 15; harmonic++) {
+                    const amplitude =
+                        (harmonic === 1 ? 0.1 : 0) +
+                        Math.exp(-0.5 * ((harmonic * 200 - 1000) / 180) ** 2);
+                    sample += amplitude * Math.cos((2 * Math.PI * harmonic * (i % 120)) / 120);
+                }
+                return sample * 0.15;
+            })
+        };
+        const output = KokoroSpeech.tuneSyllable(source, 300, 0.5);
+        const energyAt = frequency => {
+            let sine = 0;
+            let cosine = 0;
+            for (let i = rate * 0.1; i < rate * 0.4; i++) {
+                sine += output[i] * Math.sin((2 * Math.PI * frequency * i) / rate);
+                cosine += output[i] * Math.cos((2 * Math.PI * frequency * i) / rate);
+            }
+            return sine * sine + cosine * cosine;
+        };
+        // The 1 kHz vowel resonance stays near 1 kHz instead of shifting to 1.5 kHz.
+        expect(energyAt(900) + energyAt(1200)).toBeGreaterThan(
+            10 * (energyAt(1500) + energyAt(1800))
+        );
+    });
+
+    test("a held note sustains its vowel instead of stretching the attack and release", () => {
+        const source = {
+            rate,
+            period: 120,
+            samples: Float32Array.from({ length: rate / 2 }, (_, i) => {
+                const amplitude = i < rate * 0.05 || i > rate * 0.45 ? 0.8 : 0.2;
+                return amplitude * Math.cos((2 * Math.PI * (i % 120)) / 120);
+            })
+        };
+        const output = KokoroSpeech.tuneSyllable(source, 200, 2);
+        expect(Math.max(...output.slice(0, rate * 0.08))).toBeGreaterThan(0.5);
+        expect(Math.max(...output.slice(rate * 0.15, rate * 1.85).map(Math.abs))).toBeLessThan(
+            0.25
+        );
+    });
+
     test.each([
         [NaN, 1],
         [440, Infinity],

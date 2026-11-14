@@ -513,7 +513,7 @@ class KokoroSpeech {
         return { samples: samples.slice(start, end + 1), rate, period };
     }
 
-    /** Resample pitch-synchronous grains and overlap them to fit the requested duration. */
+    /** Overlap source-period grains, sustaining the vowel without stretching its attack. */
     static tuneSyllable(source, frequency, duration) {
         if (
             !Number.isFinite(frequency) ||
@@ -530,25 +530,69 @@ class KokoroSpeech {
         const output = new Float32Array(Math.max(1, Math.round(rate * duration)));
         const weights = new Float32Array(output.length);
         const hop = rate / frequency;
-        const halfGrain = Math.ceil(hop);
+        const frameStart = Math.max(0, Math.floor(samples.length / 2 - period));
+        const frameLength = Math.min(2 * period, samples.length - frameStart);
+        let sine = 0;
+        let cosine = 0;
+        let energy = 0;
+        for (let i = 0; i < frameLength; i++) {
+            const sample = samples[frameStart + i];
+            sine += sample * Math.sin((2 * Math.PI * i) / period);
+            cosine += sample * Math.cos((2 * Math.PI * i) / period);
+            energy += sample * sample;
+        }
+        // A nearly sinusoidal source has no higher harmonics to preserve when pitching up.
+        const pureTone = (2 * (sine * sine + cosine * cosine)) / (frameLength * energy || 1) > 0.9;
+        // Preserve the source spectrum except below 2/3 of its original pitch.
+        const stretch = Math.max(1, hop / (1.5 * period));
+        const radius = pureTone ? hop : period * stretch;
+        const halfGrain = Math.ceil(radius);
         const grainWindow = Float64Array.from(
             { length: halfGrain * 2 },
-            (_, i) => 0.5 + 0.5 * Math.cos((Math.PI * (i - halfGrain)) / hop)
+            (_, i) => 0.5 + 0.5 * Math.cos((Math.PI * (i - halfGrain)) / radius)
         );
-        // shortcut: grains shift formants along with pitch; use phoneme alignment
-        // and formant-preserving processing before supporting whole lyric phrases.
-        for (let target = 0; target < output.length + hop;) {
+        const marks = [];
+        for (let expected = period; expected < samples.length - period;) {
+            let mark = Math.round(expected);
+            for (
+                let i = Math.max(0, Math.ceil(expected - period * 0.2));
+                i <= Math.min(samples.length - 1, expected + period * 0.2);
+                i++
+            )
+                if (samples[i] > samples[mark]) mark = i;
+            marks.push(mark);
+            expected = mark + period;
+        }
+        const attack = Math.min(rate * 0.08, output.length * 0.2);
+        const release = Math.min(rate * 0.08, output.length * 0.2);
+        const sustainStart = Math.floor(marks.length * 0.4);
+        const sustainEnd = Math.floor(marks.length * 0.6);
+        for (let target = 0; target < output.length + radius;) {
             // Held notes ease into a 5.5 Hz, 20-cent vibrato; short notes stay steady.
             const depth =
                 duration >= 0.75 ? 20 * Math.min(1, Math.max(0, (target / rate - 0.25) / 0.4)) : 0;
             const pitchHop =
                 hop / 2 ** ((depth * Math.sin(2 * Math.PI * 5.5 * (target / rate - 0.25))) / 1200);
-            const position = (target / output.length) * Math.max(0, samples.length - 2 * period);
-            const mark = Math.round(position / period) * period + period;
+            // Keep consonants brief; spend extra note time in the middle of the vowel.
+            let position;
+            if (target < attack) position = (target / attack) * sustainStart;
+            else if (target > output.length - release)
+                position =
+                    sustainEnd +
+                    ((target - output.length + release) / release) *
+                        (marks.length - 1 - sustainEnd);
+            else
+                position =
+                    sustainStart +
+                    ((target - attack) / (output.length - attack - release)) *
+                        (sustainEnd - sustainStart);
+            const mark =
+                marks[Math.min(marks.length - 1, Math.max(0, Math.round(position)))] ?? period;
             const center = Math.round(target);
-            for (let delta = -halfGrain; delta < hop; delta++) {
+            for (let delta = -halfGrain; delta < radius; delta++) {
                 const index = center + delta;
-                const from = mark + ((delta + center - target) * period) / pitchHop;
+                const from =
+                    mark + (delta + center - target) * (pureTone ? period / pitchHop : 1 / stretch);
                 if (index < 0 || index >= output.length || from < 0 || from >= samples.length - 1)
                     continue;
                 const weight = grainWindow[delta + halfGrain];
@@ -559,12 +603,18 @@ class KokoroSpeech {
             }
             target += pitchHop;
         }
-        const fade = Math.min(rate * 0.01, output.length / 2);
+        const fadeIn = Math.min(rate * 0.015, output.length / 2);
+        const fadeOut = Math.min(rate * 0.05, output.length / 2);
+        let peak = 0;
         for (let i = 0; i < output.length; i++) {
             output[i] =
                 (output[i] / Math.max(1, weights[i])) *
-                Math.min(1, i / fade, (output.length - 1 - i) / fade);
+                Math.min(1, i / fadeIn, (output.length - 1 - i) / fadeOut);
+            peak = Math.max(peak, Math.abs(output[i]));
         }
+        const gain = pureTone ? 1 : Math.min(3, Math.max(1, period / hop), 0.95 / (peak || 1));
+        for (let i = 0; i < output.length; i++) output[i] *= gain;
+        output[0] = output[output.length - 1] = 0;
         return output;
     }
 

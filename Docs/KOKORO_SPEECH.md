@@ -14,8 +14,11 @@ wait for the model and syllable to prepare before playback starts. **Stop**
 also cancels playback that is waiting for preparation. Unlike Speak, Sing
 explicitly requests Kokoro and does not require `?kokoro=true`.
 
-This is experimental pitch-shifted speech, not a trained singing model.
-Pitch changes also change the voice's formants. Whole phrases are not aligned
+This is experimental speech-based resynthesis, not a trained singing model.
+Pitch-synchronous source grains retain the vowel's spectral shape over the
+normal vocal range, while a brief attack and release surround a sustained
+middle vowel. Very low notes below two-thirds of the source pitch still shift
+formants, and nearly sinusoidal sources use ordinary resampling. Whole phrases are not aligned
 to individual notes. Notes support 20–4000 Hz and durations up to 30 seconds;
 a project can prepare up to 32 distinct syllables, each at most 40 characters.
 Prepared syllables are cached locally across page reloads, keyed by model,
