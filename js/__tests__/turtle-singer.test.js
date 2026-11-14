@@ -3195,6 +3195,91 @@ describe("scalarDistance edge cases", () => {
     });
 });
 
+describe("scalarDistance beyond 100 steps and boundary conditions", () => {
+    let turtleMock;
+    let activityMock;
+    let logoMock;
+    const saved = {};
+
+    beforeEach(() => {
+        for (const name of [
+            "getStepSizeUp",
+            "getStepSizeDown",
+            "numberToPitch",
+            "pitchToNumber",
+            "getCurrentEDO",
+            "getNote",
+            "normalizeEDO"
+        ]) {
+            saved[name] = global[name];
+            global[name] = musicUtils[name];
+        }
+
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        activityMock = createActivityMock(turtleMock);
+        logoMock = createLogoMock(activityMock);
+        logoMock.synth.inTemperament = "equal";
+        turtleMock.singer.keySignature = "C chromatic";
+    });
+
+    afterEach(() => {
+        Object.assign(global, saved);
+    });
+
+    test.each([
+        [100, 100, -100],
+        [101, 101, -101],
+        [102, 102, -102],
+        [103, 103, -103],
+        [108, 108, -108]
+    ])(
+        "calculates correct distance for %i scale steps in both directions",
+        (steps, expectedAsc, expectedDesc) => {
+            const pC1 = musicUtils.pitchToNumber("C", 1, "C chromatic", "equal");
+            const targetPitch = pC1 + steps;
+
+            const asc = Singer.scalarDistance(logoMock, turtleMock, pC1, targetPitch);
+            const desc = Singer.scalarDistance(logoMock, turtleMock, targetPitch, pC1);
+
+            expect(asc).toBe(expectedAsc);
+            expect(desc).toBe(expectedDesc);
+        }
+    );
+
+    test("calculates correct distance across 9 octaves in 19-EDO", () => {
+        logoMock.synth.inTemperament = "equal19";
+        const pC1 = musicUtils.pitchToNumber("C", 1, "C chromatic", "equal19");
+        const pC10 = musicUtils.pitchToNumber("C", 10, "C chromatic", "equal19");
+
+        const dist = Singer.scalarDistance(logoMock, turtleMock, pC1, pC10);
+        // 9 octaves * 19 scale steps per octave = 171 steps
+        expect(dist).toBe(171);
+    });
+
+    test("inversion across 108 steps calculates correct transposition", () => {
+        turtleMock.singer.invertList = [["C", 1, "scalar", 0]];
+
+        // Invert C10 around axis C1 in C chromatic:
+        // C10 is pitch 111, C1 is pitch 3 (108 semitones apart).
+        // Reflected note is C1 (pitch 3).
+        // Delta = (3 - 111) / 2 = -54 semitones.
+        const delta = Singer.calculateInvert(logoMock, turtleMock, "C", 10, 0);
+        expect(delta).toBe(-54);
+    });
+
+    test("returns 0 for non-finite inputs", () => {
+        expect(Singer.scalarDistance(logoMock, turtleMock, NaN, 60)).toBe(0);
+        expect(Singer.scalarDistance(logoMock, turtleMock, 60, Infinity)).toBe(0);
+    });
+
+    test("caps runaway inputs at maxSteps without hanging", () => {
+        const pC1 = musicUtils.pitchToNumber("C", 1, "C chromatic", "equal");
+        const runaway = Singer.scalarDistance(logoMock, turtleMock, pC1, 1e308);
+        expect(runaway).toBe(1000);
+    });
+});
+
 describe("addScalarTransposition on non-EDO temperaments", () => {
     let turtleMock;
     let activityMock;
