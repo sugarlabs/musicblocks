@@ -21,6 +21,8 @@
 // Global mocks
 global._ = msg => msg;
 global.DEFAULTVOICE = "piano";
+global.ACCIDENTAL_SEMITONE_MAP =
+    require("../../utils/musicutils-constants").ACCIDENTAL_SEMITONE_MAP;
 
 const ChordBuilderWidget = require("../chordbuilder.js");
 
@@ -249,7 +251,45 @@ describe("ChordBuilderWidget", () => {
             );
         });
     });
+    describe("Chord quality with double accidentals", () => {
+        it("maps every spelling to the right pitch class", () => {
+            const expected = {
+                "C": 0,
+                "B♯": 0,
+                "C♭": 11,
+                "E♯": 5,
+                "F♭": 4,
+                "B𝄫": 9,
+                "A𝄫": 7,
+                "D𝄫": 0,
+                "F𝄪": 7,
+                "C𝄪": 2,
+                "G♭": 6,
+                "Db": 1
+            };
+            Object.entries(expected).forEach(([note, semitone]) => {
+                expect(widget._noteToSemitone(note)).toBe(semitone);
+            });
+        });
 
+        it("returns 0 for invalid input", () => {
+            expect(widget._noteToSemitone("")).toBe(0);
+            expect(widget._noteToSemitone(null)).toBe(0);
+            expect(widget._noteToSemitone("H")).toBe(0);
+        });
+
+        it("labels G♭ minor chords by their notes (G♭ B𝄫 D♭ is minor)", () => {
+            const chords = widget._buildDiatonicChords("G♭", "minor");
+            expect(chords[0].quality).toBe("minor");
+            expect(chords[0].name).toBe("G♭m");
+            expect(chords[1].quality).toBe("diminished");
+        });
+
+        it("labels D♭ locrian and C♯ lydian chords that contain double accidentals", () => {
+            expect(widget._buildDiatonicChords("D♭", "locrian")[0].quality).toBe("diminished");
+            expect(widget._buildDiatonicChords("C♯", "lydian")[3].quality).toBe("diminished");
+        });
+    });
     describe("Progression Management", () => {
         it("auditions chord without adding to progression", () => {
             const chord = widget.diatonicChords[0];
