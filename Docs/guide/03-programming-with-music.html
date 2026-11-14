@@ -1437,6 +1437,12 @@
 	    the example above, all of the notes in <code>chunk</code> will be played with a
 	    kick drum.
 	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1734456316657915&amp;run=True">RUN LIVE</a></p>
+	  <h4><a name="MUTE_SOLO_VOICES">Muting and Soloing Voices</a></h4>
+	  <p>When working with multiple voices or mice running concurrently, you can mute or solo individual voices directly from their <em>Start</em> or <em>Start drum</em> blocks on the workspace:</p>
+	  <ul>
+	    <li><strong>Mute / Unmute</strong>: Right-click (or long-press) on the <em>Start</em> block to open its context menu and select <strong>Mute</strong>. The voice continues executing in sync with the project (keeping turtle timing, graphics, and pitch status active), but its audio synthesis, drum triggers, and speech output are silenced. The <em>Start</em> block becomes translucent (50% opacity) to provide immediate visual feedback. Selecting <strong>Unmute</strong> restores audio and full opacity.</li>
+	    <li><strong>Solo</strong>: Select <strong>Solo</strong> from the <em>Start</em> block context menu to isolate that voice immediately. All other active voices are automatically muted so you can listen to a single melodic line or rhythm in isolation. Selecting <strong>Solo</strong> again or unmuting restores multi-voice playback.</li>
+	  </ul>
 	  <h3><a name="GRAPHICS">3.6 Adding graphics</a></h3>
 	  <p><img alt="graphics" src="./graphics1.svg" title="adding graphics" /></p>
 	  <p><img alt="graphics" src="./graphics2.svg" title="color range" /></p>

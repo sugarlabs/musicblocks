@@ -61,8 +61,13 @@ one of the _Action_ blocks. [RUN LIVE](https://musicblocks.sugarlabs.org/index.h
 
 When debugging projects with multiple voices or mice running in parallel, you can isolate or silence specific voices directly from the canvas without having to detach or reconstruct your block stacks:
 
-- **Mute / Unmute**: Right-click (or long-press) on a mouse's _Start_ or _Start drum_ block to open its context menu and select **Mute**. A muted mouse continues to execute its blocks (keeping turtle timing, graphics, and pitch status intact), but its audio synthesis, drum triggers, and speech output are silenced. A muted _Start_ block becomes translucent (50% opacity) to provide immediate visual feedback. Selecting **Unmute** restores its sound.
-- **Solo**: Select **Solo** from the _Start_ block context menu to isolate that voice immediately. Soloing mutes all other active mice, allowing you to focus on a single melodic line or rhythm in isolation while running the full project. Selecting **Solo** again or unmuting restores multi-voice playback.
+| Action     | Context Menu Icon | Description                                                                                                | Visual Feedback                                  |
+| :--------- | :---------------: | :--------------------------------------------------------------------------------------------------------- | :----------------------------------------------- |
+| **Mute**   | 🔇 (_Volume Off_) | Silences note, drum, and speech playback while keeping turtle movement, timing, and pitch tracking active. | _Start_ block becomes translucent (50% opacity). |
+| **Unmute** | 🔊 (_Volume Up_)  | Restores synth playback, drum triggers, and speech output.                                                 | _Start_ block returns to full opacity (100%).    |
+| **Solo**   | 🎧 (_Headphones_) | Isolates the selected voice by automatically muting all other active mice.                                 | Other active _Start_ blocks dim to 50% opacity.  |
+
+To access these controls, right-click (or long-press) directly on a mouse's _Start_ or _Start drum_ block to open its context menu.
 
 ## <a>2. Print and Comment Blocks</a>
 
