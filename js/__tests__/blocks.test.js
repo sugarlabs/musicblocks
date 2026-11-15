@@ -3453,12 +3453,16 @@ describe("Blocks Foundation", () => {
             expect(activity.errorMsg).not.toHaveBeenCalled();
         });
 
-        it("aborts cleanly with actionable message when blockObjs is not an array", () => {
+        it("internal loader aborts cleanly with actionable message for non-array data", () => {
             const activity = makeActivity();
             const blocks = makeBlocks(activity, ["forward"]);
 
-            expect(() => blocks.loadNewBlocks({ invalid: "data" })).not.toThrow();
+            // The public entry point rejects non-arrays; exercise the internal abort guard.
+            blocks._loadInProgress = true;
+            expect(() => blocks._loadNewBlocksNow({ invalid: "data" }, 1)).not.toThrow();
             expect(blocks._loadInProgress).toBe(false);
+            expect(activity._suppressRefresh).toBe(false);
+            expect(activity.stopLoadAnimation).toHaveBeenCalled();
             expect(activity.errorMsg).toHaveBeenCalledWith(
                 "Cannot load project: invalid project structure."
             );
