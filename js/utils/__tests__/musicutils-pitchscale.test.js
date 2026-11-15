@@ -126,6 +126,19 @@ describe("musicutils-pitchscale", () => {
             expect(pitchscale.getNote(0, 4, 0, "C𝄪 major", true)).toEqual(["D", 4, 0]);
             expect(pitchscale.getNote(0, 4, 0, "F𝄫 minor", true)).toEqual(["E♭", 4, 0]);
             expect(pitchscale.getNote(2, 4, 0, "C𝄪 major", true)).toEqual(["E", 4, 0]);
+
+            // Octave boundary normalization with double-accidental keys
+            expect(pitchscale.getNote(-3, 4, 0, "C𝄪 major", true)).toEqual(["B", 3, 0]);
+            expect(pitchscale.getNote(10, 4, 0, "C𝄪 major", true)).toEqual(["C", 5, 0]);
+
+            // Empty and invalid key signature fallbacks
+            expect(pitchscale.getNote(0, 4, 0, "", true)).toEqual(["C", 4, 0]);
+            expect(pitchscale.getNote(0, 4, 0, "invalid key", true)).toEqual(["C", 4, 0]);
+
+            // Non-12-EDO temperament preserves native note position before 12-EDO enharmonic fallback
+            expect(
+                pitchscale.getNote(0, 4, 0, "E♯ major", true, undefined, undefined, "equal19")
+            ).toEqual(["E♯", 4, 0]);
         });
     });
 

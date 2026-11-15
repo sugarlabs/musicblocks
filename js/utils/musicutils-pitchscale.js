@@ -1289,29 +1289,37 @@ function getNote(
         let kOffset = 0;
         if (movable) {
             const tonic = keySignatureToMode(keySignature)[0];
-            kOffset = PITCHES.indexOf(tonic);
-            if (kOffset === -1) {
-                kOffset = PITCHES2.indexOf(tonic);
+            let foundOffset = -1;
+            if (octaveLength !== 12) {
+                foundOffset = getEdoNoteNamePosition(tonic, octaveLength);
             }
-            if (kOffset === -1) {
-                const enharmonicEquivalents = {
-                    ["E" + SHARP]: "F",
-                    ["e" + SHARP]: "F",
-                    ["B" + SHARP]: "C",
-                    ["b" + SHARP]: "C",
-                    ["C" + FLAT]: "B",
-                    ["c" + FLAT]: "B",
-                    ["F" + FLAT]: "E",
-                    ["f" + FLAT]: "E"
-                };
-                if (tonic in enharmonicEquivalents) {
-                    kOffset = PITCHES.indexOf(enharmonicEquivalents[tonic]);
+            if (foundOffset === -1) {
+                foundOffset = PITCHES.indexOf(tonic);
+                if (foundOffset === -1) {
+                    foundOffset = PITCHES2.indexOf(tonic);
+                }
+                if (foundOffset === -1) {
+                    const enharmonicEquivalents = {
+                        ["E" + SHARP]: "F",
+                        ["e" + SHARP]: "F",
+                        ["B" + SHARP]: "C",
+                        ["b" + SHARP]: "C",
+                        ["C" + FLAT]: "B",
+                        ["c" + FLAT]: "B",
+                        ["F" + FLAT]: "E",
+                        ["f" + FLAT]: "E"
+                    };
+                    if (tonic in enharmonicEquivalents) {
+                        foundOffset = PITCHES.indexOf(enharmonicEquivalents[tonic]);
+                    }
                 }
             }
-            if (kOffset === -1) {
+            if (foundOffset === -1) {
                 kOffset = 0;
 
                 console.log("Cannot find " + keySignature.split(" ")[0] + ". Reverting to C");
+            } else {
+                kOffset = foundOffset;
             }
         }
         // Apply the key offset before normalizing the pitch index.
