@@ -66,6 +66,26 @@ describe("musicutils-buildscale", () => {
         });
     });
 
+    describe("Issue #10426: buildScale on E♯ and double-accidental keys", () => {
+        it("builds the correct scale for E♯ major and E♯ minor", () => {
+            const [eSharpMajor, intervalsMajor] = buildscale.buildScale("E♯ major", 12);
+            expect(eSharpMajor).toEqual(["E♯", "F𝄪", "G𝄪", "A♯", "B♯", "C𝄪", "D𝄪", "E♯"]);
+            expect(intervalsMajor).toEqual([2, 2, 1, 2, 2, 2, 1]);
+
+            const [eSharpMinor, intervalsMinor] = buildscale.buildScale("E♯ minor", 12);
+            expect(eSharpMinor).toEqual(["E♯", "F𝄪", "G♯", "A♯", "B♯", "C♯", "D♯", "E♯"]);
+            expect(intervalsMinor).toEqual([2, 1, 2, 2, 1, 2, 2]);
+        });
+
+        it("builds the sounding scale for double-accidental keys", () => {
+            const [cDoubleSharpMajor] = buildscale.buildScale("C𝄪 major", 12);
+            expect(cDoubleSharpMajor).toEqual(["D", "E", "F♯", "G", "A", "B", "C♯", "D"]);
+
+            const [fDoubleFlatMinor] = buildscale.buildScale("F𝄫 minor", 12);
+            expect(fDoubleFlatMinor).toEqual(["E♭", "F", "G♭", "A♭", "B♭", "C♭", "D♭", "E♭"]);
+        });
+    });
+
     it("unifies pitchToFrequency with dynamic powerBase for stretched and non-octave temperaments", () => {
         // 1. Stretched 12-EDO (octaveRatio: 2.01)
         const stretched12 = { isEDO: true, edo: 12, octaveRatio: 2.01 };
