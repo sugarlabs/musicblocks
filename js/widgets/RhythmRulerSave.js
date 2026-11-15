@@ -229,7 +229,8 @@ class RhythmRulerSave {
             } else {
                 const idx = newStack.length;
                 const noteValue = noteValues[i];
-                const obj = rationalToFraction(1 / Math.abs(noteValue));
+                // From the note value, not its length: see _mergeRulers().
+                const obj = rationalToFraction(Math.abs(noteValue)).reverse();
                 newStack.push([idx, "rhythm2", 0, 0, [previousBlock, idx + 1, idx + 2, idx + 5]]);
                 newStack.push([idx + 1, ["number", { value: sameNoteValue }], 0, 0, [idx]]);
                 newStack.push([idx + 2, "divide", 0, 0, [idx, idx + 3, idx + 4]]);
@@ -687,6 +688,9 @@ class RhythmRulerSave {
         // Merge the rulers into one set of rhythms. Cell boundaries are kept as
         // [numerator, denominator]: as floats, six sixths add up to
         // 0.9999999999999999, which misses the boundary at 1 on another ruler.
+        // A cell's length comes from its note value, not from 1 / note value:
+        // rationalToFraction() matches within 1e-7, too loose for a short tied
+        // cell such as 1/80 + 1/82 = 81/3280.
         const rList = [];
         let noteValues;
         for (let r = 0; r < this.Rulers.length; r++) {
@@ -694,7 +698,7 @@ class RhythmRulerSave {
             const selectedRuler = this.Rulers[r];
             noteValues = selectedRuler[0];
             for (let i = 0; i < noteValues.length; i++) {
-                const cell = rationalToFraction(1 / Math.abs(noteValues[i]));
+                const cell = rationalToFraction(Math.abs(noteValues[i])).reverse();
                 t = [t[0] * cell[1] + cell[0] * t[1], t[1] * cell[1]];
                 const divisor = GCD(t[0], t[1]);
                 t = [t[0] / divisor, t[1] / divisor];
