@@ -2778,6 +2778,13 @@ describe("buildScale with explicit EDO", () => {
         }
     });
 
+    it("finds a double sharp under its stacked spelling in the 21-EDO table", () => {
+        // F♯ enigmatic needs C𝄪 and D𝄪, which the table writes C♯♯ and D♯♯.
+        const [scale, steps] = buildScale("F♯ enigmatic", 21);
+        expect(scale).toEqual(["F♯", "G", "A♯", "B♯", "C♯♯", "D♯♯", "E♯", "F♯"]);
+        expect(steps.reduce((a, b) => a + b, 0)).toBe(21);
+    });
+
     it("keeps the stretched 21-EDO scale when a name is missing from the table", () => {
         // The 21-name table has no C♭, so E♭ minor stays as it was.
         const [scale, steps] = buildScale("E♭ minor", 21);

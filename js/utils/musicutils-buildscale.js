@@ -167,7 +167,10 @@ var _notePitchClass = name => {
  * @returns {Array|null} [scale, steps], as buildScale returns them.
  */
 var _respellInEdo = (keySignature, edoNames, idx) => {
-    const spelled = buildScale(keySignature, 12)[0];
+    // The EDO tables stack single accidentals (C♯♯), where 12 EDO writes C𝄪.
+    const stacked = name =>
+        name.replaceAll(DOUBLESHARP, SHARP + SHARP).replaceAll(DOUBLEFLAT, FLAT + FLAT);
+    const spelled = buildScale(keySignature, 12)[0].map(stacked);
     const scale = [edoNames[idx]];
     const steps = [];
     let pos = idx;
