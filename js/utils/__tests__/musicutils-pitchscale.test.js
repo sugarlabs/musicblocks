@@ -120,6 +120,13 @@ describe("musicutils-pitchscale", () => {
                 ]);
             }
         });
+
+        it("resolves movable numeric pitches for E♯ and double-accidental keys", () => {
+            expect(pitchscale.getNote(0, 4, 0, "E♯ major", true)).toEqual(["F", 4, 0]);
+            expect(pitchscale.getNote(0, 4, 0, "C𝄪 major", true)).toEqual(["D", 4, 0]);
+            expect(pitchscale.getNote(0, 4, 0, "F𝄫 minor", true)).toEqual(["E♭", 4, 0]);
+            expect(pitchscale.getNote(2, 4, 0, "C𝄪 major", true)).toEqual(["E", 4, 0]);
+        });
     });
 
     it("calculates pitch numbers accurately for enharmonic notes and boundary shifts in 12-EDO", () => {

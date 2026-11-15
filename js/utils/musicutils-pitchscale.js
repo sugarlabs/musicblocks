@@ -1288,9 +1288,25 @@ function getNote(
         }
         let kOffset = 0;
         if (movable) {
-            kOffset = PITCHES.indexOf(keySignature.split(" ")[0]);
+            const tonic = keySignatureToMode(keySignature)[0];
+            kOffset = PITCHES.indexOf(tonic);
             if (kOffset === -1) {
-                kOffset = PITCHES2.indexOf(keySignature.split(" ")[0]);
+                kOffset = PITCHES2.indexOf(tonic);
+            }
+            if (kOffset === -1) {
+                const enharmonicEquivalents = {
+                    ["E" + SHARP]: "F",
+                    ["e" + SHARP]: "F",
+                    ["B" + SHARP]: "C",
+                    ["b" + SHARP]: "C",
+                    ["C" + FLAT]: "B",
+                    ["c" + FLAT]: "B",
+                    ["F" + FLAT]: "E",
+                    ["f" + FLAT]: "E"
+                };
+                if (tonic in enharmonicEquivalents) {
+                    kOffset = PITCHES.indexOf(enharmonicEquivalents[tonic]);
+                }
             }
             if (kOffset === -1) {
                 kOffset = 0;
