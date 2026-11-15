@@ -2959,12 +2959,12 @@ describe("processNote notation and MIDI emission guards against non-positive dur
         test("strips trailing courtesy natural before parsing a chord note for MIDI", () => {
             const blk = "courtesyNaturalBlk";
             turtleMock.singer.inNoteBlock = [blk];
-            turtleMock.singer.notePitches = { [blk]: ["C"] };
-            turtleMock.singer.noteOctaves = { [blk]: [4] };
-            turtleMock.singer.noteCents = { [blk]: [0] };
-            turtleMock.singer.noteHertz = { [blk]: [0] };
+            turtleMock.singer.notePitches = { [blk]: ["C", "C♯"] };
+            turtleMock.singer.noteOctaves = { [blk]: [4, 4] };
+            turtleMock.singer.noteCents = { [blk]: [0, 0] };
+            turtleMock.singer.noteHertz = { [blk]: [0, 0] };
             turtleMock.singer.noteDrums = { [blk]: [] };
-            turtleMock.singer.noteBeatValues = { [blk]: [1] };
+            turtleMock.singer.noteBeatValues = { [blk]: [1, 1] };
             turtleMock.singer.instrumentNames = ["piano"];
             turtleMock.singer.oscList = { [blk]: [] };
             turtleMock.singer.bpm = [90];
@@ -2973,23 +2973,29 @@ describe("processNote notation and MIDI emission guards against non-positive dur
             activityMock.logo.synth.inTemperament = "equal31";
             Singer.clearPitchToFrequencyCache();
 
+            const savedGetNote = global.getNote;
             const savedParse = global.parseNoteString;
             const savedPitchToFreq = global.pitchToFrequency;
             const savedFreqToPitch = global.frequencyToPitch;
 
+            // Preserve input pitches in getNote so courtesy detection fires
+            global.getNote = jest.fn((pitch, oct) => [pitch, oct]);
+
             const parseArgs = [];
             global.parseNoteString = jest.fn(n => {
                 parseArgs.push(n);
-                return ["C", 4];
+                return [n.slice(0, -1), parseInt(n.slice(-1), 10)];
             });
             global.pitchToFrequency = jest.fn(() => 277.18);
-            global.frequencyToPitch = jest.fn(() => ["C#", 4, 0]);
+            global.frequencyToPitch = jest.fn((freq, t) => {
+                expect(t).toBe("equal");
+                return ["C#", 4, 0];
+            });
 
             try {
-                // If a chord note has a courtesy natural (e.g. C♮), parseNoteString should receive it stripped
-                turtleMock.singer.notePitches[blk] = ["C♮"];
                 Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
             } finally {
+                global.getNote = savedGetNote;
                 global.parseNoteString = savedParse;
                 global.pitchToFrequency = savedPitchToFreq;
                 global.frequencyToPitch = savedFreqToPitch;
@@ -2997,12 +3003,19 @@ describe("processNote notation and MIDI emission guards against non-positive dur
                 Singer.clearPitchToFrequencyCache();
             }
 
+            // Courtesy natural is present in chordNotes for notation:
+            expect(activityMock.logo.updateNotation).toHaveBeenCalled();
+            const notationCall = activityMock.logo.updateNotation.mock.calls[0];
+            expect(notationCall[0]).toContain("C4♮");
+
+            // But MIDI conversion receives the stripped note:
+            expect(parseArgs).toContain("C4");
             expect(parseArgs.some(arg => String(arg).includes("♮"))).toBe(false);
             expect(activityMock.logo.notationMIDI).toHaveBeenCalledWith(
-                ["C#4"],
+                ["C#4", "C#4"],
                 [],
                 4,
-                0,
+                expect.anything(),
                 90,
                 "piano",
                 [4, 4]
