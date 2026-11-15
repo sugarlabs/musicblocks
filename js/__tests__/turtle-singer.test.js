@@ -2910,14 +2910,23 @@ describe("processNote notation and MIDI emission guards against non-positive dur
             turtleMock.singer.keySignature = "C major";
 
             activityMock.logo.synth.inTemperament = temperament;
+            Singer.clearPitchToFrequencyCache();
 
             const savedParse = global.parseNoteString;
-            const savedGetCached = global.getCachedPitchToFrequency;
+            const savedPitchToFreq = global.pitchToFrequency;
             const savedFreqToPitch = global.frequencyToPitch;
 
             global.parseNoteString = jest.fn(() => [pitch, octave]);
-            global.getCachedPitchToFrequency = jest.fn(() => freq);
+            global.pitchToFrequency = jest.fn((p, o, c, k, temp) => {
+                if (temp === temperament && p === pitch && o === octave) {
+                    return freq;
+                }
+                return 440;
+            });
+
+            const receivedFreqToPitchArgs = [];
             global.frequencyToPitch = jest.fn((f, t) => {
+                receivedFreqToPitchArgs.push({ f, t });
                 if (t === "equal") {
                     const match = expected12.match(/^([A-G][♯♭]?)([0-9]+)$/);
                     if (match) return [match[1], parseInt(match[2], 10), 0];
@@ -2929,13 +2938,68 @@ describe("processNote notation and MIDI emission guards against non-positive dur
                 Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
             } finally {
                 global.parseNoteString = savedParse;
-                global.getCachedPitchToFrequency = savedGetCached;
+                global.pitchToFrequency = savedPitchToFreq;
                 global.frequencyToPitch = savedFreqToPitch;
                 activityMock.logo.synth.inTemperament = "equal";
+                Singer.clearPitchToFrequencyCache();
             }
 
+            expect(receivedFreqToPitchArgs).toEqual([{ f: freq, t: "equal" }]);
             expect(activityMock.logo.notationMIDI).toHaveBeenCalledWith(
                 [expected12],
+                [],
+                4,
+                0,
+                90,
+                "piano",
+                [4, 4]
+            );
+        });
+
+        test("strips trailing courtesy natural before parsing a chord note for MIDI", () => {
+            const blk = "courtesyNaturalBlk";
+            turtleMock.singer.inNoteBlock = [blk];
+            turtleMock.singer.notePitches = { [blk]: ["C"] };
+            turtleMock.singer.noteOctaves = { [blk]: [4] };
+            turtleMock.singer.noteCents = { [blk]: [0] };
+            turtleMock.singer.noteHertz = { [blk]: [0] };
+            turtleMock.singer.noteDrums = { [blk]: [] };
+            turtleMock.singer.noteBeatValues = { [blk]: [1] };
+            turtleMock.singer.instrumentNames = ["piano"];
+            turtleMock.singer.oscList = { [blk]: [] };
+            turtleMock.singer.bpm = [90];
+            turtleMock.singer.keySignature = "C major";
+
+            activityMock.logo.synth.inTemperament = "equal31";
+            Singer.clearPitchToFrequencyCache();
+
+            const savedParse = global.parseNoteString;
+            const savedPitchToFreq = global.pitchToFrequency;
+            const savedFreqToPitch = global.frequencyToPitch;
+
+            const parseArgs = [];
+            global.parseNoteString = jest.fn(n => {
+                parseArgs.push(n);
+                return ["C", 4];
+            });
+            global.pitchToFrequency = jest.fn(() => 277.18);
+            global.frequencyToPitch = jest.fn(() => ["C#", 4, 0]);
+
+            try {
+                // If a chord note has a courtesy natural (e.g. C♮), parseNoteString should receive it stripped
+                turtleMock.singer.notePitches[blk] = ["C♮"];
+                Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+            } finally {
+                global.parseNoteString = savedParse;
+                global.pitchToFrequency = savedPitchToFreq;
+                global.frequencyToPitch = savedFreqToPitch;
+                activityMock.logo.synth.inTemperament = "equal";
+                Singer.clearPitchToFrequencyCache();
+            }
+
+            expect(parseArgs.some(arg => String(arg).includes("♮"))).toBe(false);
+            expect(activityMock.logo.notationMIDI).toHaveBeenCalledWith(
+                ["C#4"],
                 [],
                 4,
                 0,

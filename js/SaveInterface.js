@@ -608,30 +608,69 @@ class SaveInterface {
                                     velocity: 0.8
                                 });
                             } catch (e) {
-                                if (
-                                    typeof frequencyToPitch === "function" &&
-                                    typeof parseNoteString === "function" &&
-                                    typeof pitchToFrequency === "function"
-                                ) {
-                                    try {
+                                try {
+                                    if (typeof parseNoteString === "function") {
                                         const parsed = parseNoteString(pitch);
-                                        const freq = pitchToFrequency(
-                                            parsed[0],
-                                            parsed[1],
-                                            0,
-                                            "C major",
-                                            "equal"
-                                        );
-                                        const [n12, o12] = frequencyToPitch(freq, "equal");
-                                        instrumentTrack.addNote({
-                                            name: normalizeNoteAccidentals(n12 + o12),
-                                            time: globalTime,
-                                            duration: duration,
-                                            velocity: 0.8
-                                        });
-                                    } catch (fallbackErr) {
-                                        // Ignore fallback error
+                                        if (parsed && parsed[0]) {
+                                            const clean =
+                                                typeof normalizeNoteAccidentals === "function"
+                                                    ? normalizeNoteAccidentals(parsed[0])
+                                                    : String(parsed[0]);
+                                            const letter = clean.charAt(0).toUpperCase();
+                                            const naturalSteps = {
+                                                C: 0,
+                                                D: 2,
+                                                E: 4,
+                                                F: 5,
+                                                G: 7,
+                                                A: 9,
+                                                B: 11
+                                            };
+                                            if (naturalSteps[letter] !== undefined) {
+                                                let semitones = naturalSteps[letter];
+                                                for (const char of clean.slice(1)) {
+                                                    if (char === "#" || char === "♯")
+                                                        semitones += 1;
+                                                    else if (char === "b" || char === "♭")
+                                                        semitones -= 1;
+                                                    else if (char === "x" || char === "𝄪")
+                                                        semitones += 2;
+                                                    else if (char === "𝄫") semitones -= 2;
+                                                }
+                                                const oct =
+                                                    typeof parsed[1] === "number" &&
+                                                    !isNaN(parsed[1])
+                                                        ? parsed[1]
+                                                        : 4;
+                                                const midiNumber = (oct + 1) * 12 + semitones;
+                                                const noteNames = [
+                                                    "C",
+                                                    "C#",
+                                                    "D",
+                                                    "Eb",
+                                                    "E",
+                                                    "F",
+                                                    "F#",
+                                                    "G",
+                                                    "Ab",
+                                                    "A",
+                                                    "Bb",
+                                                    "B"
+                                                ];
+                                                const fallbackName =
+                                                    noteNames[((midiNumber % 12) + 12) % 12] +
+                                                    (Math.floor(midiNumber / 12) - 1);
+                                                instrumentTrack.addNote({
+                                                    name: fallbackName,
+                                                    time: globalTime,
+                                                    duration: duration,
+                                                    velocity: 0.8
+                                                });
+                                            }
+                                        }
                                     }
+                                } catch (fallbackErr) {
+                                    // Ignore fallback error
                                 }
                             }
                         });

@@ -2654,7 +2654,11 @@ class Singer {
                                                           activity.logo.synth.inTemperament !==
                                                               "equal"
                                                       ) {
-                                                          const parsed = parseNoteString(note);
+                                                          const cleanNote =
+                                                              typeof note === "string"
+                                                                  ? note.replace(/[♮]/gu, "")
+                                                                  : note;
+                                                          const parsed = parseNoteString(cleanNote);
                                                           if (parsed && parsed[0]) {
                                                               const freq =
                                                                   getCachedPitchToFrequency(
