@@ -990,7 +990,9 @@ class Logo {
         } else if (
             typeof arg1 === "object" &&
             blk !== null &&
-            this.blockList[this.blockList[blk].connections[2]].name === "loadFile"
+            this.blockList[blk]?.connections?.[2] !== null &&
+            this.blockList[blk]?.connections?.[2] !== undefined &&
+            this.blockList[this.blockList[blk].connections[2]]?.name === "loadFile"
         ) {
             if (arg1) {
                 requiredTurtle.doShowText(arg0, arg1[1]);
