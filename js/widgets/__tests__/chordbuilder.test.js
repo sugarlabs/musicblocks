@@ -276,18 +276,26 @@ describe("ChordBuilderWidget", () => {
             expect(widget._noteToSemitone("")).toBe(0);
             expect(widget._noteToSemitone(null)).toBe(0);
             expect(widget._noteToSemitone("H")).toBe(0);
+            expect(widget._noteToSemitone("D?")).toBe(0);
+            expect(widget._noteToSemitone("C#?")).toBe(0);
         });
 
         it("labels G♭ minor chords by their notes (G♭ B𝄫 D♭ is minor)", () => {
             const chords = widget._buildDiatonicChords("G♭", "minor");
+            expect(chords[0].notes).toEqual(["G♭", "B𝄫", "D♭"]);
             expect(chords[0].quality).toBe("minor");
             expect(chords[0].name).toBe("G♭m");
             expect(chords[1].quality).toBe("diminished");
         });
 
         it("labels D♭ locrian and C♯ lydian chords that contain double accidentals", () => {
-            expect(widget._buildDiatonicChords("D♭", "locrian")[0].quality).toBe("diminished");
-            expect(widget._buildDiatonicChords("C♯", "lydian")[3].quality).toBe("diminished");
+            const locrian = widget._buildDiatonicChords("D♭", "locrian");
+            expect(locrian[0].notes).toEqual(["D♭", "F♭", "A𝄫"]);
+            expect(locrian[0].quality).toBe("diminished");
+
+            const lydian = widget._buildDiatonicChords("C♯", "lydian");
+            expect(lydian[3].notes).toEqual(["F𝄪", "A♯", "C♯"]);
+            expect(lydian[3].quality).toBe("diminished");
         });
     });
     describe("Progression Management", () => {

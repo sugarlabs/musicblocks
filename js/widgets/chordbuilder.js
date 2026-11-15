@@ -177,7 +177,9 @@ class ChordBuilderWidget {
         // for...of walks code points, so the astral 𝄪 and 𝄫 count as one accidental each.
         let offset = 0;
         for (const accidental of clean.slice(1)) {
-            offset += ACCIDENTAL_SEMITONE_MAP[accidental] || 0;
+            const step = ACCIDENTAL_SEMITONE_MAP[accidental];
+            if (step === undefined) return 0;
+            offset += step;
         }
         return (((base + offset) % 12) + 12) % 12;
     }
