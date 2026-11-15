@@ -565,15 +565,36 @@ class KokoroSpeech {
         }
         const attack = Math.min(rate * 0.08, output.length * 0.2);
         const release = Math.min(rate * 0.08, output.length * 0.2);
-        const sustainStart = Math.floor(marks.length * 0.4);
-        const sustainEnd = Math.floor(marks.length * 0.6);
+        let sustainStart = Math.floor(marks.length * 0.4);
+        let sustainEnd = Math.floor(marks.length * 0.6);
+        let bestVoicing = 0;
+        // Avoid sustaining an unvoiced consonant or breath in the middle of a syllable.
+        for (let m = Math.floor(marks.length * 0.2); m < marks.length * 0.8; m++) {
+            const start = Math.max(0, marks[m] - 2 * period);
+            const end = Math.min(samples.length - period, marks[m] + 2 * period);
+            let cross = 0;
+            let left = 0;
+            let right = 0;
+            for (let i = start; i < end; i++) {
+                cross += samples[i] * samples[i + period];
+                left += samples[i] * samples[i];
+                right += samples[i + period] * samples[i + period];
+            }
+            const correlation = cross / Math.sqrt(left * right || 1);
+            const score = correlation * correlation * Math.sqrt(left);
+            if (correlation >= 0.6 && score > bestVoicing) {
+                bestVoicing = score;
+                sustainStart = Math.max(0, m - 2);
+                sustainEnd = Math.min(marks.length - 1, m + 2);
+            }
+        }
         for (let target = 0; target < output.length + radius;) {
             // Held notes ease into a 5.5 Hz, 20-cent vibrato; short notes stay steady.
             const depth =
                 duration >= 0.75 ? 20 * Math.min(1, Math.max(0, (target / rate - 0.25) / 0.4)) : 0;
             const pitchHop =
                 hop / 2 ** ((depth * Math.sin(2 * Math.PI * 5.5 * (target / rate - 0.25))) / 1200);
-            // Keep consonants brief; spend extra note time in the middle of the vowel.
+            // Keep consonants brief; spend extra note time in the stable voiced region.
             let position;
             if (target < attack) position = (target / attack) * sustainStart;
             else if (target > output.length - release)
@@ -609,7 +630,11 @@ class KokoroSpeech {
         for (let i = 0; i < output.length; i++) {
             output[i] =
                 (output[i] / Math.max(1, weights[i])) *
-                Math.min(1, i / fadeIn, (output.length - 1 - i) / fadeOut);
+                (0.5 -
+                    0.5 *
+                        Math.cos(
+                            Math.PI * Math.min(1, i / fadeIn, (output.length - 1 - i) / fadeOut)
+                        ));
             peak = Math.max(peak, Math.abs(output[i]));
         }
         const gain = pureTone ? 1 : Math.min(3, Math.max(1, period / hop), 0.95 / (peak || 1));

@@ -17,7 +17,8 @@ explicitly requests Kokoro and does not require `?kokoro=true`.
 This is experimental speech-based resynthesis, not a trained singing model.
 Pitch-synchronous source grains retain the vowel's spectral shape over the
 normal vocal range, while a brief attack and release surround a sustained
-middle vowel. Very low notes below two-thirds of the source pitch still shift
+voiced region selected by periodicity and energy rather than a fixed position.
+Smooth cosine fades soften note boundaries. Very low notes below two-thirds of the source pitch still shift
 formants, and nearly sinusoidal sources use ordinary resampling. Whole phrases are not aligned
 to individual notes. Notes support 20–4000 Hz and durations up to 30 seconds;
 a project can prepare up to 32 distinct syllables, each at most 40 characters.

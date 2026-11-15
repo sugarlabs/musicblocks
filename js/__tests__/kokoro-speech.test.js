@@ -529,6 +529,31 @@ describe("Kokoro singing resynthesis", () => {
         );
     });
 
+    test("sustain selects a voiced region when the syllable's middle is noisy", () => {
+        const source = {
+            rate,
+            period: 120,
+            samples: Float32Array.from({ length: rate / 2 }, (_, i) => {
+                if (i > rate * 0.2 && i < rate * 0.3)
+                    return 0.35 * Math.sin(i * 1.713 + i * i * 0.001);
+                return (
+                    0.2 *
+                    (Math.cos((2 * Math.PI * i) / 120) + 0.35 * Math.cos((4 * Math.PI * i) / 120))
+                );
+            })
+        };
+        const output = KokoroSpeech.tuneSyllable(source, 200, 0.7);
+        let cross = 0;
+        let left = 0;
+        let right = 0;
+        for (let i = rate * 0.15; i < rate * 0.55; i++) {
+            cross += output[i] * output[i + 120];
+            left += output[i] * output[i];
+            right += output[i + 120] * output[i + 120];
+        }
+        expect(cross / Math.sqrt(left * right)).toBeGreaterThan(0.99);
+    });
+
     test.each([
         [NaN, 1],
         [440, Infinity],
