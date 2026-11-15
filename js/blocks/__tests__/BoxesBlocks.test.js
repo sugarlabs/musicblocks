@@ -556,10 +556,12 @@ describe("setupBoxesBlocks", () => {
             const testBlk = 320;
 
             for (const key of ["__proto__", "constructor", "prototype"]) {
+                const protoBefore = Object.getPrototypeOf(logo.boxes);
                 activity.errorMsg.mockClear();
                 storeInBlock.flow([key, { polluted: true }], logo, "turtle0", testBlk);
                 expect(activity.errorMsg).toHaveBeenCalledWith("The box name is reserved.", testBlk);
                 expect(Object.prototype.hasOwnProperty.call(logo.boxes, key)).toBe(false);
+                expect(Object.getPrototypeOf(logo.boxes)).toBe(protoBefore);
             }
         });
 
@@ -568,11 +570,13 @@ describe("setupBoxesBlocks", () => {
             const testBlk = 330;
 
             for (const key of ["__proto__", "constructor", "prototype"]) {
+                const protoBefore = Object.getPrototypeOf(logo.boxes);
                 activity.blocks.blockList[testBlk] = { privateData: key };
                 activity.errorMsg.mockClear();
                 storeIn2Block.flow([{ polluted: true }], logo, "turtle0", testBlk);
                 expect(activity.errorMsg).toHaveBeenCalledWith("The box name is reserved.", testBlk);
                 expect(Object.prototype.hasOwnProperty.call(logo.boxes, key)).toBe(false);
+                expect(Object.getPrototypeOf(logo.boxes)).toBe(protoBefore);
             }
         });
 
