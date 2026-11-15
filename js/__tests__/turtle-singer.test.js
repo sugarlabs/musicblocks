@@ -2861,6 +2861,119 @@ describe("processNote notation and MIDI emission guards against non-positive dur
         expect(activityMock.logo.updateNotation.mock.calls[0][0][0]).toBe(450);
     });
 
+    describe("Issue #10423 — MIDI export in non-12-EDO and microtonal temperaments", () => {
+        test.each([
+            {
+                temperament: "equal31",
+                pitch: "D♯♯",
+                octave: 4,
+                freq: 307.67,
+                expected12: "E♭4",
+                desc: "maps 31-EDO D♯♯4 (307.67 Hz) to nearest 12-EDO pitch E♭4"
+            },
+            {
+                temperament: "equal31",
+                pitch: "E♭♭",
+                octave: 4,
+                freq: 314.62,
+                expected12: "E♭4",
+                desc: "maps 31-EDO E♭♭4 (314.62 Hz) to nearest 12-EDO pitch E♭4 rather than D4"
+            },
+            {
+                temperament: "meantone",
+                pitch: "F♭",
+                octave: 4,
+                freq: 336.87,
+                expected12: "E4",
+                desc: "maps meantone F♭4 (336.87 Hz) to nearest 12-EDO pitch E4"
+            },
+            {
+                temperament: "meantone",
+                pitch: "E♯",
+                octave: 4,
+                freq: 343.75,
+                expected12: "F4",
+                desc: "maps meantone E♯4 (343.75 Hz) to nearest 12-EDO pitch F4"
+            }
+        ])("$desc", ({ temperament, pitch, octave, freq, expected12 }) => {
+            const blk = "microNoteBlk";
+            turtleMock.singer.inNoteBlock = [blk];
+            turtleMock.singer.notePitches = { [blk]: [pitch] };
+            turtleMock.singer.noteOctaves = { [blk]: [octave] };
+            turtleMock.singer.noteCents = { [blk]: [0] };
+            turtleMock.singer.noteHertz = { [blk]: [0] };
+            turtleMock.singer.noteDrums = { [blk]: [] };
+            turtleMock.singer.noteBeatValues = { [blk]: [1] };
+            turtleMock.singer.instrumentNames = ["piano"];
+            turtleMock.singer.oscList = { [blk]: [] };
+            turtleMock.singer.bpm = [90];
+            turtleMock.singer.keySignature = "C major";
+
+            activityMock.logo.synth.inTemperament = temperament;
+
+            const savedParse = global.parseNoteString;
+            const savedGetCached = global.getCachedPitchToFrequency;
+            const savedFreqToPitch = global.frequencyToPitch;
+
+            global.parseNoteString = jest.fn(() => [pitch, octave]);
+            global.getCachedPitchToFrequency = jest.fn(() => freq);
+            global.frequencyToPitch = jest.fn((f, t) => {
+                if (t === "equal") {
+                    const match = expected12.match(/^([A-G][♯♭]?)([0-9]+)$/);
+                    if (match) return [match[1], parseInt(match[2], 10), 0];
+                }
+                return ["A", 4, 0];
+            });
+
+            try {
+                Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+            } finally {
+                global.parseNoteString = savedParse;
+                global.getCachedPitchToFrequency = savedGetCached;
+                global.frequencyToPitch = savedFreqToPitch;
+                activityMock.logo.synth.inTemperament = "equal";
+            }
+
+            expect(activityMock.logo.notationMIDI).toHaveBeenCalledWith(
+                [expected12],
+                [],
+                4,
+                0,
+                90,
+                "piano",
+                [4, 4]
+            );
+        });
+
+        test("preserves standard 12-EDO note names without conversion when inTemperament is equal", () => {
+            const blk = "standardNoteBlk";
+            turtleMock.singer.inNoteBlock = [blk];
+            turtleMock.singer.notePitches = { [blk]: ["C"] };
+            turtleMock.singer.noteOctaves = { [blk]: [4] };
+            turtleMock.singer.noteCents = { [blk]: [0] };
+            turtleMock.singer.noteHertz = { [blk]: [0] };
+            turtleMock.singer.noteDrums = { [blk]: [] };
+            turtleMock.singer.noteBeatValues = { [blk]: [1] };
+            turtleMock.singer.instrumentNames = ["piano"];
+            turtleMock.singer.oscList = { [blk]: [] };
+            turtleMock.singer.bpm = [90];
+
+            activityMock.logo.synth.inTemperament = "equal";
+
+            Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+            expect(activityMock.logo.notationMIDI).toHaveBeenCalledWith(
+                ["C4"],
+                [],
+                4,
+                0,
+                90,
+                "piano",
+                [4, 4]
+            );
+        });
+    });
+
     test.each([
         { bpm: [], masterBPM: 180, recorded: 180 },
         { bpm: [120], masterBPM: 180, recorded: 120 }

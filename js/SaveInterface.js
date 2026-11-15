@@ -596,12 +596,44 @@ class SaveInterface {
                         const instrumentTrack = instrumentTracks.get(instrument);
 
                         pitches.forEach(pitch => {
-                            instrumentTrack.addNote({
-                                name: normalizeNoteAccidentals(pitch),
-                                time: globalTime,
-                                duration: duration,
-                                velocity: 0.8
-                            });
+                            let noteName = normalizeNoteAccidentals(pitch);
+                            if (noteName.includes("##")) {
+                                noteName = noteName.replace(/##/g, "x");
+                            }
+                            try {
+                                instrumentTrack.addNote({
+                                    name: noteName,
+                                    time: globalTime,
+                                    duration: duration,
+                                    velocity: 0.8
+                                });
+                            } catch (e) {
+                                if (
+                                    typeof frequencyToPitch === "function" &&
+                                    typeof parseNoteString === "function" &&
+                                    typeof pitchToFrequency === "function"
+                                ) {
+                                    try {
+                                        const parsed = parseNoteString(pitch);
+                                        const freq = pitchToFrequency(
+                                            parsed[0],
+                                            parsed[1],
+                                            0,
+                                            "C major",
+                                            "equal"
+                                        );
+                                        const [n12, o12] = frequencyToPitch(freq, "equal");
+                                        instrumentTrack.addNote({
+                                            name: normalizeNoteAccidentals(n12 + o12),
+                                            time: globalTime,
+                                            duration: duration,
+                                            velocity: 0.8
+                                        });
+                                    } catch (fallbackErr) {
+                                        // Ignore fallback error
+                                    }
+                                }
+                            }
                         });
                     }
                     globalTime += duration;

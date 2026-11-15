@@ -747,6 +747,96 @@ describe("afterSaveMIDI", () => {
         });
     });
 
+    it("should convert ## to x for Tone.js Midi compatibility (Issue #10423)", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                {
+                    note: ["D##4"],
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "guitar"
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const instrumentTrack = tracks.find(track => track.name === "Track 1 - guitar");
+        expect(instrumentTrack.addNote).toHaveBeenCalledWith({
+            name: "Dx4",
+            time: 0,
+            duration: 0.6666666666666666,
+            velocity: 0.8
+        });
+    });
+
+    it("should safely fall back to sounding frequency when addNote throws on unparseable accidentals (Issue #10423)", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                {
+                    note: ["D###4"],
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "guitar"
+                }
+            ]
+        };
+
+        const savedFrequencyToPitch = global.frequencyToPitch;
+        const savedParseNoteString = global.parseNoteString;
+        const savedPitchToFrequency = global.pitchToFrequency;
+        const savedMidi = global.Midi;
+
+        global.frequencyToPitch = jest.fn(() => ["F", 4, 0]);
+        global.parseNoteString = jest.fn(() => ["D###", 4]);
+        global.pitchToFrequency = jest.fn(() => 349.23);
+
+        let firstCall = true;
+        const mockTrack = {
+            addNote: jest.fn(arg => {
+                if (firstCall) {
+                    firstCall = false;
+                    throw new TypeError("Cannot read properties of null (reading '1')");
+                }
+            }),
+            name: "",
+            instrument: { number: 0 },
+            channel: 0
+        };
+
+        global.Midi = jest.fn(() => ({
+            header: {
+                ticksPerBeat: 480,
+                tempos: [],
+                timeSignatures: [],
+                secondsToTicks: jest.fn(() => 0),
+                update: jest.fn()
+            },
+            addTrack: jest.fn(() => mockTrack),
+            toArray: jest.fn(() => new Uint8Array([1, 2, 3]))
+        }));
+
+        try {
+            instance.afterSaveMIDI();
+            jest.runAllTimers();
+        } finally {
+            global.frequencyToPitch = savedFrequencyToPitch;
+            global.parseNoteString = savedParseNoteString;
+            global.pitchToFrequency = savedPitchToFrequency;
+            global.Midi = savedMidi;
+        }
+
+        expect(mockTrack.addNote).toHaveBeenCalledTimes(2);
+        expect(mockTrack.addNote).toHaveBeenLastCalledWith({
+            name: "F4",
+            time: 0,
+            duration: 0.6666666666666666,
+            velocity: 0.8
+        });
+    });
+
     it("should skip notes with zero or invalid duration and not corrupt globalTime with Infinity", () => {
         mockActivity.logo._midiData = {
             0: [

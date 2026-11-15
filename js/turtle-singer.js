@@ -2638,15 +2638,53 @@ class Singer {
                                             note => typeof note === "number" || !note.includes("R")
                                         );
                                     // A note with cents or set in hertz is a frequency; MIDI
-                                    // takes the nearest 12-EDO note name.
+                                    // takes the nearest 12-EDO note name. Notes played outside
+                                    // 12-EDO are also converted to their nearest 12-EDO note so
+                                    // MIDI export accurately reflects the sounding pitch and
+                                    // never fails on non-12-EDO accidental spellings (issue #10423).
                                     activity.logo.notationMIDI(
                                         playedBySetDrum
                                             ? ["R"]
                                             : chordNotes.map(note => {
                                                   if (typeof note !== "number") {
+                                                      if (
+                                                          note !== "R" &&
+                                                          activity.logo.synth &&
+                                                          activity.logo.synth.inTemperament &&
+                                                          activity.logo.synth.inTemperament !==
+                                                              "equal"
+                                                      ) {
+                                                          const parsed = parseNoteString(note);
+                                                          if (parsed && parsed[0]) {
+                                                              const freq =
+                                                                  getCachedPitchToFrequency(
+                                                                      parsed[0],
+                                                                      parsed[1],
+                                                                      0,
+                                                                      tur.singer.keySignature,
+                                                                      activity.logo.synth
+                                                                          .inTemperament
+                                                                  );
+                                                              if (
+                                                                  typeof freq === "number" &&
+                                                                  isFinite(freq) &&
+                                                                  freq > 0
+                                                              ) {
+                                                                  const [name12, octave12] =
+                                                                      frequencyToPitch(
+                                                                          freq,
+                                                                          "equal"
+                                                                      );
+                                                                  return name12 + octave12;
+                                                              }
+                                                          }
+                                                      }
                                                       return note;
                                                   }
-                                                  const [name, octave] = frequencyToPitch(note);
+                                                  const [name, octave] = frequencyToPitch(
+                                                      note,
+                                                      "equal"
+                                                  );
                                                   return name + octave;
                                               }),
                                         playedBySetDrum ? [last(tur.singer.drumStyle)] : chordDrums,
