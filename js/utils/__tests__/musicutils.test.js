@@ -1505,6 +1505,11 @@ describe("keySignatureToMode", () => {
         ]);
     });
 
+    it("starts the steps of a non-seven-note E♯ scale from F", () => {
+        // E♯ is in neither note list, so the steps started from C (E♯ D E G A).
+        expect(buildScale("E♯ major pentatonic", 12)[0]).toEqual(["E♯", "G", "A", "C", "D", "F"]);
+    });
+
     it("plays a tonic with a double accidental as the key it sounds as", () => {
         // The Set Key wheel offers 𝄪 and 𝄫; every such key used to play C major.
         expect(keySignatureToMode("C𝄪 major")).toEqual(["D", "major"]);
