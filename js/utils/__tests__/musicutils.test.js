@@ -4910,6 +4910,39 @@ describe("getScaleAndHalfSteps extended modes", () => {
     });
 });
 
+describe("getNote: movable Do outside 12 EDO", () => {
+    const movable = (syllable, key, temperament) =>
+        getNote(syllable, 4, 0, key, true, null, () => {}, temperament)[0];
+
+    it("plays the degree of the key's own scale, not its flat enharmonic", () => {
+        // ti in G major came out G♭, a different pitch from F♯ in 19 EDO.
+        expect(movable("ti", "G major", "equal19")).toBe("F♯");
+        expect(movable("mi", "D major", "equal19")).toBe("F♯");
+        expect(movable("ti", "D major", "equal19")).toBe("C♯");
+        expect(movable("ti", "G major", "1/3 comma meantone")).toBe("F♯");
+    });
+
+    it("agrees with the scale Scalar Step walks in every EDO", () => {
+        const syllables = ["do", "re", "mi", "fa", "sol", "la", "ti"];
+        for (const [temperament, edo] of [
+            ["equal19", 19],
+            ["equal31", 31],
+            ["1/4 comma meantone", 21]
+        ]) {
+            for (const key of ["G major", "D major", "E♭ major", "A major"]) {
+                expect(syllables.map(s => movable(s, key, temperament))).toEqual(
+                    buildScale(key, edo)[0].slice(0, 7)
+                );
+            }
+        }
+    });
+
+    it("leaves 12 EDO alone", () => {
+        expect(movable("ti", "G major", "equal")).toBe("F♯");
+        expect(movable("mi", "E♭ major", "equal")).toBe("G");
+    });
+});
+
 describe("getNote additional paths", () => {
     it("parses matrix-style note labels with embedded octave markup", () => {
         expect(getNote("mi<sub>5</sub>", 4, 0, "C major", false)).toEqual(["E", 5, 0]);
