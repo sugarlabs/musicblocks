@@ -529,4 +529,62 @@ describe("setupVolumeBlocks", () => {
             expect(ret).toEqual([88, 1]);
         });
     });
+
+    describe("NaN inputs", () => {
+        it("master volume clamp reports NaN and uses 50 instead of muting", () => {
+            Singer.masterVolume = [];
+            createdBlocks["setnotevolume2"].flow([NaN, 100], logo, turtleIndex, "blkNaN1");
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, "blkNaN1");
+            expect(Singer.masterVolume).toEqual([50]);
+            expect(Singer.setMasterVolume).toHaveBeenCalledWith(logo, 50);
+        });
+
+        it("synth volume clamp reports NaN and uses 50 instead of muting", () => {
+            const turtleObj = activity.turtles.ithTurtle(turtleIndex);
+            turtleObj.singer.synthVolume = {};
+            turtleObj.singer.crescendoInitialVolume = {};
+            logo.synth.loadSynth = jest.fn();
+            createdBlocks["setsynthvolume2"].flow(
+                ["piano", NaN, 100],
+                logo,
+                turtleIndex,
+                "blkNaN2"
+            );
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, "blkNaN2");
+            expect(last(turtleObj.singer.synthVolume.piano)).toBe(50);
+        });
+
+        it("set synth volume reports NaN and uses 50", () => {
+            createdBlocks["setsynthvolume"].flow(["piano", NaN], logo, turtleIndex, "blkNaN3");
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, "blkNaN3");
+            expect(Singer.VolumeActions.setSynthVolume).toHaveBeenCalledWith(
+                "piano",
+                50,
+                turtleIndex,
+                "blkNaN3"
+            );
+        });
+
+        it("set master volume reports NaN", () => {
+            createdBlocks["setnotevolume"].flow([NaN], logo, turtleIndex, "blkNaN4");
+            expect(activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG, "blkNaN4");
+            expect(Singer.VolumeActions.setMasterVolume).not.toHaveBeenCalled();
+        });
+
+        it("set panning reports NaN", () => {
+            createdBlocks["setpanning"].flow([NaN], logo, turtleIndex, "blkNaN5");
+            expect(activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG, "blkNaN5");
+            expect(Singer.VolumeActions.setPanning).not.toHaveBeenCalled();
+        });
+
+        it("relative volume reports NaN and changes nothing", () => {
+            createdBlocks["articulation"].flow([NaN, 50], logo, turtleIndex, "blkNaN6");
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, "blkNaN6");
+            expect(Singer.VolumeActions.setRelativeVolume).toHaveBeenCalledWith(
+                0,
+                turtleIndex,
+                "blkNaN6"
+            );
+        });
+    });
 });

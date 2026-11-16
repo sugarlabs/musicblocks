@@ -396,7 +396,7 @@ function setupVolumeBlocks(activity) {
                 arg0 = args[0];
             }
 
-            if (args[1] === null || typeof args[1] !== "number") {
+            if (args[1] === null || typeof args[1] !== "number" || Number.isNaN(args[1])) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg1 = 50;
             } else {
@@ -578,7 +578,7 @@ function setupVolumeBlocks(activity) {
             }
 
             let arg1;
-            if (args[1] === null || typeof args[1] !== "number") {
+            if (args[1] === null || typeof args[1] !== "number" || Number.isNaN(args[1])) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg1 = 50;
             } else {
@@ -628,7 +628,7 @@ function setupVolumeBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             if (args.length === 1) {
-                if (typeof args[0] !== "number") {
+                if (typeof args[0] !== "number" || Number.isNaN(args[0])) {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else {
                     if (args[0] === 100 || args[0] === -100) {
@@ -678,7 +678,7 @@ function setupVolumeBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             if (args.length === 1) {
-                if (typeof args[0] !== "number") {
+                if (typeof args[0] !== "number" || Number.isNaN(args[0])) {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else {
                     Singer.VolumeActions.setMasterVolume(args[0], turtle, blk);
@@ -735,7 +735,7 @@ function setupVolumeBlocks(activity) {
             }
 
             let arg;
-            if (args[0] === null || typeof args[0] !== "number") {
+            if (args[0] === null || typeof args[0] !== "number" || Number.isNaN(args[0])) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg = 50;
             } else {
@@ -821,7 +821,7 @@ function setupVolumeBlocks(activity) {
             if (args[1] === undefined) return;
 
             let arg = args[0];
-            if (arg === null || typeof arg !== "number") {
+            if (arg === null || typeof arg !== "number" || Number.isNaN(arg)) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 arg = 0;
             }
