@@ -419,7 +419,7 @@ function setupNumberBlocks(activity) {
             try {
                 return MathUtility.doCalculateDistance(x1, y1, x2, y2);
             } catch (e) {
-                activity.errorMsg(NANERRORMSG, blk);
+                handleMathError(logo, e, blk);
                 return 0;
             }
         }
@@ -797,7 +797,12 @@ function setupNumberBlocks(activity) {
             const bIsValid = b !== null && b !== undefined && !isNaN(b);
 
             if (aIsValid && bIsValid) {
-                return MathUtility.doPlus(a, b);
+                try {
+                    return MathUtility.doPlus(a, b);
+                } catch (e) {
+                    handleMathError(logo, e, blk);
+                    return 0;
+                }
             } else {
                 try {
                     return MathUtility.doPlus(a, b);
