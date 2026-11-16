@@ -82,6 +82,25 @@ function setupToneActions(activity) {
                 }
             }
 
+            // A name typed into the block, such as "Violin" or " violin ", is matched on its
+            // own too. Left as typed, no synth is created for it and its notes stay silent.
+            if (!accounted && typeof instrument === "string") {
+                const typed = instrument.trim().toLowerCase();
+                if (typed !== "") {
+                    for (const voice in VOICENAMES) {
+                        const [displayName, synthName] = VOICENAMES[voice];
+                        if (
+                            String(displayName).toLowerCase() === typed ||
+                            String(synthName).toLowerCase() === typed
+                        ) {
+                            synth = synthName;
+                            accounted = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
             if (!accounted && typeof instrument === "object" && instrument !== null) {
                 if (instrument[0] !== "") {
                     synth = "customsample_" + instrument[0];
