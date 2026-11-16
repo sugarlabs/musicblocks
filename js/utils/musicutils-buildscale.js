@@ -732,6 +732,25 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
     const obj1 = buildScale(keySignature, edo);
     const chosenModeScale = obj1[0];
     const chosenModePattern = obj1[1];
+    let currentEDO = edo;
+    if (currentEDO === undefined) {
+        currentEDO = 12;
+        if (typeof globalActivity !== "undefined" && globalActivity?.logo?.synth?.inTemperament) {
+            currentEDO = getCurrentEDO(globalActivity.logo.synth.inTemperament);
+        }
+    }
+    currentEDO = normalizeEDO(currentEDO);
+
+    let classificationPattern = chosenModePattern;
+    if (currentEDO === 21 && chosenMode[1].toLowerCase() !== "custom") {
+        const twelveEDOScale = buildScale(keySignature, 12);
+        const usesTwelveEDOSpelling =
+            chosenModeScale.length === twelveEDOScale[0].length &&
+            chosenModeScale.every((note, i) => note === twelveEDOScale[0][i]);
+        if (usesTwelveEDOSpelling) {
+            classificationPattern = twelveEDOScale[1];
+        }
+    }
 
     // Pitch numbers of the chosen mode
     const semitones = [0];
@@ -853,7 +872,7 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
                     case 6:
                         if (definedScaleDegree[definedScaleDegree.length - 1] !== 4) {
                             definedScaleDegree.push(4);
-                        } else if (semitones[i] + chosenModePattern[i] !== 7) {
+                        } else if (semitones[i] + classificationPattern[i] !== 7) {
                             definedScaleDegree.push(5);
                         } else {
                             // Keep indices aligned with chosenModeScale
@@ -875,7 +894,7 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
                         continue;
                 }
 
-                semitones.push(semitones[i] + chosenModePattern[i]);
+                semitones.push(semitones[i] + classificationPattern[i]);
             }
 
             // For scale degrees which are defined --> Use choosen Mode's notes
@@ -909,7 +928,7 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
             // All scales degrees are defined, just prefer the perfect/major ones
 
             for (let i = 0; i < chosenModePattern.length; i++) {
-                semitones.push(semitones[i] + chosenModePattern[i]);
+                semitones.push(semitones[i] + classificationPattern[i]);
             }
 
             for (let i = 0; i < semitones.length; i++) {

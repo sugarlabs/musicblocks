@@ -150,6 +150,9 @@ describe("musicutils-buildscale", () => {
             ["C", "D", "E", "G", "A", "C"],
             [4, 4, 5, 3, 5]
         ]);
+        expect(buildscale.scaleDegreeToPitchMapping("C major pentatonic", 6, false, null, 21)).toBe(
+            "A"
+        );
         expect(buildscale.buildScale("C chromatic", 21)).toEqual([
             [
                 "C",
