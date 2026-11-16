@@ -219,6 +219,16 @@ describe("setupToneBlocks", () => {
             expect(getBlock("sing").flow(["la", 42], logo, 0, 7)).toEqual([42, 1]);
             expect(Singer.ToneActions.setTimbre).not.toHaveBeenCalled();
         });
+        it.each(["runningLilypond", "runningAbc", "runningMIDI", "runningMxml"])(
+            "does not require Kokoro during %s export",
+            flag => {
+                logo[flag] = true;
+                logo.synth.singingSamples.clear();
+                expect(getBlock("sing").flow(["la", 42], logo, 0, 7)).toEqual([42, 1]);
+                expect(activity.errorMsg).not.toHaveBeenCalled();
+                expect(Singer.ToneActions.setTimbre).not.toHaveBeenCalled();
+            }
+        );
         beforeEach(() => {
             jest.clearAllMocks();
             logo.synth.singingSamples = new Map([
@@ -233,6 +243,20 @@ describe("setupToneBlocks", () => {
         it("trims input", () => {
             getBlock("sing").flow([" la ", 42], logo, 0, 7);
             expect(Singer.ToneActions.setTimbre).toHaveBeenCalledWith("sing:la", 0, 7);
+        });
+        it.each([40, 41])("validates the length of a prepared %s-character syllable", length => {
+            const text = "x".repeat(length);
+            logo.synth.singingSamples.set(text, {});
+            const result = getBlock("sing").flow([text, 42], logo, 0, 7);
+            if (length === 40) {
+                expect(result).toEqual([42, 1]);
+                expect(Singer.ToneActions.setTimbre).toHaveBeenCalledWith("sing:" + text, 0, 7);
+                expect(activity.errorMsg).not.toHaveBeenCalled();
+            } else {
+                expect(activity.errorMsg).toHaveBeenCalled();
+                expect(logo.stopTurtle).toBe(true);
+                expect(Singer.ToneActions.setTimbre).not.toHaveBeenCalled();
+            }
         });
         it.each([null, undefined, 12, "", "unprepared", "x".repeat(41)])(
             "rejects invalid or unprepared input %s",

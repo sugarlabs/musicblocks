@@ -1789,8 +1789,21 @@ class Logo {
             if (!block || block.trash) continue;
             if (["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].includes(block.name)) {
                 pending.push(actions.get(block.privateData));
-            } else if (["do", "doArg", "calc", "calcArg", "listen"].includes(block.name)) {
-                const name = blocks[block.connections[block.name === "listen" ? 2 : 1]];
+            } else if (
+                [
+                    "do",
+                    "doArg",
+                    "calc",
+                    "calcArg",
+                    "listen",
+                    "offbeatdo",
+                    "onbeatdo",
+                    "everybeatdonew",
+                    "everybeatdo"
+                ].includes(block.name)
+            ) {
+                const name =
+                    blocks[block.connections[["listen", "onbeatdo"].includes(block.name) ? 2 : 1]];
                 // A computed action name can call any action at runtime.
                 if (name?.name === "text") pending.push(actions.get(name.value));
                 else pending.push(...actions.values());
@@ -1833,12 +1846,7 @@ class Logo {
      * @returns {void}
      */
     runLogoCommands(startHere, env) {
-        if (
-            this.synth.singingSamples &&
-            !this.runningLilypond &&
-            !this.runningAbc &&
-            !this.runningMIDI
-        ) {
+        if (this.synth.singingSamples && !this._exportingNotation) {
             let texts;
             try {
                 texts = this._getSingingTexts(startHere);
@@ -1848,26 +1856,42 @@ class Logo {
             }
             if (texts.some(text => !this.synth.singingSamples.has(text))) {
                 if (this._alreadyRunning) this.doStopTurtles();
+                // Share active requests only; Stop or edited syllables cancel the old work.
+                const previous = this._singingPreparationRequest;
+                const reuse =
+                    previous &&
+                    previous.generation === this.runGeneration &&
+                    previous.texts.length === texts.length &&
+                    texts.every(text => previous.texts.includes(text));
                 const generation = ++this.runGeneration;
+                if (previous) previous.generation = reuse ? generation : null;
                 this._cancelSpeech();
                 this.deps.textMsg(
                     _("Preparing Kokoro singing voice. First use downloads the model.")
                 );
                 this.onRunTurtle();
                 if (!this._singingPreparation) {
+                    const request = { generation, texts };
+                    this._singingPreparationRequest = request;
+                    const cancelled = () => this.runGeneration !== request.generation;
                     this._singingPreparation = this.synth
-                        .prepareSinging(texts, progress => {
-                            if (this.runGeneration !== generation) return;
-                            if (progress.status === "singing") {
-                                this.deps.textMsg(
-                                    _("Preparing voice: %s of %s")
-                                        .replace("%s", progress.index)
-                                        .replace("%s", progress.total)
-                                );
-                            } else this._showKokoroProgress(progress);
-                        })
+                        .prepareSinging(
+                            texts,
+                            progress => {
+                                if (cancelled()) return;
+                                if (progress.status === "singing") {
+                                    this.deps.textMsg(
+                                        _("Preparing voice: %s of %s")
+                                            .replace("%s", progress.index)
+                                            .replace("%s", progress.total)
+                                    );
+                                } else this._showKokoroProgress(progress);
+                            },
+                            cancelled
+                        )
                         .finally(() => {
                             this._singingPreparation = null;
+                            this._singingPreparationRequest = null;
                         });
                 }
                 this._singingPreparation

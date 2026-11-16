@@ -2157,6 +2157,24 @@ describe("Logo runLogoCommands", () => {
         jest.restoreAllMocks();
     });
 
+    test.each(["runningLilypond", "runningAbc", "runningMIDI", "runningMxml"])(
+        "skips singing validation and preparation during %s export",
+        flag => {
+            logo[flag] = true;
+            logo.synth.singingSamples = new Map();
+            logo.synth.prepareSinging = jest.fn();
+            jest.spyOn(logo, "_getSingingTexts").mockImplementation(() => {
+                throw new Error("Must not validate singing during export");
+            });
+            logo._restoreConnections = jest.fn();
+            logo.runFromBlock = jest.fn();
+            logo.blockList = [];
+            logo.runLogoCommands(null, null);
+            expect(logo._getSingingTexts).not.toHaveBeenCalled();
+            expect(logo.synth.prepareSinging).not.toHaveBeenCalled();
+        }
+    );
+
     describe("performance mode detection from the URL", () => {
         // window.location cannot be reassigned in this jsdom, so drive the query
         // string through history.replaceState, which jsdom does support.
@@ -4951,6 +4969,69 @@ describe("Logo.processSpeak", () => {
 });
 
 describe("Kokoro singing preflight", () => {
+    function actionProject(name = "do", computed = false) {
+        const secondArgument = ["listen", "onbeatdo"].includes(name);
+        return [
+            { name: "start", connections: [null, 1] },
+            { name, connections: secondArgument ? [0, 7, 3, null] : [0, 3, null] },
+            { name: "action", connections: [null, 4, 5, null] },
+            { name: computed ? "namedbox" : "text", value: "verse", connections: [1] },
+            { name: "text", value: "verse", connections: [2] },
+            { name: "sing", connections: [2, 6, null, null] },
+            { name: "text", value: "la", connections: [5] },
+            { name: "number", value: 1, connections: [1] }
+        ];
+    }
+    test.each(["offbeatdo", "onbeatdo", "everybeatdonew", "everybeatdo", "listen"])(
+        "prepares the action called by %s before playback",
+        name => {
+            const blocks = actionProject(name);
+            expect(Logo.prototype._getSingingTexts.call({ blocks: { blockList: blocks } })).toEqual(
+                ["la"]
+            );
+        }
+    );
+    test.each(["do", "onbeatdo", "everybeatdo"])(
+        "includes action bodies when %s has a computed name",
+        name => {
+            const blocks = actionProject(name, true);
+            expect(
+                Logo.prototype._getSingingTexts.call({ blocks: { blockList: blocks } }, 0)
+            ).toEqual(["la"]);
+        }
+    );
+    test.each([
+        null,
+        { name: "number", value: 12 },
+        { name: "text", value: " " },
+        { name: "text", value: "x".repeat(41) }
+    ])("rejects a missing or invalid literal singing input: %j", input => {
+        const blocks = [
+            { name: "start", connections: [null, 1] },
+            { name: "sing", connections: [0, input ? 2 : null, null, null] },
+            input
+        ];
+        expect(() =>
+            Logo.prototype._getSingingTexts.call({ blocks: { blockList: blocks } })
+        ).toThrow("Sing needs a text block containing one short syllable.");
+    });
+    test("accepts 32 distinct syllables, then rejects a 33rd", () => {
+        const blocks = [{ name: "start", connections: [null, 1] }];
+        for (let i = 0; i < 33; i++) {
+            const id = blocks.length;
+            blocks.push(
+                { name: "sing", connections: [id - 2, id + 1, null, i === 32 ? null : id + 2] },
+                { name: "text", value: i === 0 ? "x".repeat(40) : "la" + i, connections: [id] }
+            );
+        }
+        blocks[63].connections[3] = null;
+        const logo = { blocks: { blockList: blocks } };
+        expect(Logo.prototype._getSingingTexts.call(logo)).toHaveLength(32);
+        blocks[63].connections[3] = 65;
+        expect(() => Logo.prototype._getSingingTexts.call(logo)).toThrow(
+            "Use at most 32 different singing syllables."
+        );
+    });
     test("prepares singing inside called actions without following unused actions", () => {
         const blocks = [
             { name: "start", connections: [null, 1] },
@@ -4991,6 +5072,17 @@ describe("Kokoro singing preflight", () => {
         };
         return { logo, complete };
     }
+    test("reports validation failure without preparing or starting playback", () => {
+        const { logo } = preflight();
+        logo._getSingingTexts.mockImplementation(() => {
+            throw new Error("invalid syllable");
+        });
+        Logo.prototype.runLogoCommands.call(logo, 7);
+        expect(logo.deps.errorHandler).toHaveBeenCalledWith("invalid syllable");
+        expect(logo.synth.prepareSinging).not.toHaveBeenCalled();
+        expect(logo.onRunTurtle).not.toHaveBeenCalled();
+        expect(logo.runLogoCommands).not.toHaveBeenCalled();
+    });
     test("announces syllable preparation and ignores stale progress after Stop", () => {
         const { logo } = preflight();
         Logo.prototype.runLogoCommands.call(logo, 7);
@@ -5038,6 +5130,41 @@ describe("Kokoro singing preflight", () => {
         expect(logo.runLogoCommands).toHaveBeenCalledTimes(1);
         expect(logo.runLogoCommands).toHaveBeenCalledWith(8, undefined);
     });
+    test("repeated Play keeps progress and cancellation attached to the latest request", () => {
+        const { logo } = preflight();
+        Logo.prototype.runLogoCommands.call(logo, 7);
+        const [, progress, cancelled] = logo.synth.prepareSinging.mock.calls[0];
+        Logo.prototype.runLogoCommands.call(logo, 8);
+        expect(cancelled()).toBe(false);
+        progress({ status: "singing", index: 2, total: 3 });
+        expect(logo.deps.textMsg).toHaveBeenLastCalledWith("Preparing voice: 2 of 3");
+        const download = { status: "progress", progress: 50 };
+        progress(download);
+        expect(logo._showKokoroProgress).toHaveBeenCalledWith(download);
+        logo.runGeneration++;
+        expect(cancelled()).toBe(true);
+    });
+    test.each([false, true])(
+        "does not revive old preparation after %s Stop or an edited project",
+        async stopped => {
+            const { logo, complete } = preflight();
+            Logo.prototype.runLogoCommands.call(logo, 7);
+            const [, progress, cancelled] = logo.synth.prepareSinging.mock.calls[0];
+            if (stopped) logo.runGeneration++;
+            else logo._getSingingTexts.mockReturnValue(["oh"]);
+            Logo.prototype.runLogoCommands.call(logo, 8);
+            expect(cancelled()).toBe(true);
+            const count = logo.deps.textMsg.mock.calls.length;
+            progress({ status: "singing", index: 2, total: 2 });
+            expect(logo.deps.textMsg).toHaveBeenCalledTimes(count);
+            complete();
+            await new Promise(resolve => setTimeout(resolve, 0));
+            expect(logo._singingPreparation).toBeNull();
+            expect(logo._singingPreparationRequest).toBeNull();
+            expect(logo.runLogoCommands).toHaveBeenCalledTimes(1);
+            expect(logo.runLogoCommands).toHaveBeenCalledWith(8, undefined);
+        }
+    );
     test("only follows connected non-trash singing blocks", () => {
         const logo = {
             blocks: {

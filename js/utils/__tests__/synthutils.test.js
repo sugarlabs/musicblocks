@@ -3777,7 +3777,7 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
                 expect(synth.singingSamples.has("oh")).toBe(false);
                 await synth.prepareSinging(["oh"]);
                 expect(synth.singingSamples.has("oh")).toBe(true);
-                expect(KokoroSpeech).toHaveBeenCalledTimes(2);
+                expect(KokoroSpeech).toHaveBeenCalledTimes(1);
                 const needed = Array.from({ length: 32 }, (_, i) => "la" + i);
                 for (const text of needed) synth.singingSamples.set(text, {});
                 needed[31] = "new";
@@ -3787,6 +3787,72 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
                 delete global.KokoroSpeech;
             }
         });
+
+        test.each([
+            [Array.from({ length: 33 }, (_, i) => "la" + i)],
+            [["x".repeat(41)]],
+            [[""]],
+            [["   "]],
+            [[12]],
+            [[null]]
+        ])("rejects invalid singing inputs without changing prepared samples: %j", async texts => {
+            const source = {};
+            synth.singingSamples.set("la", source);
+            await expect(synth.prepareSinging(texts)).rejects.toThrow(
+                "Use at most 32 singing syllables of 1-40 characters each."
+            );
+            expect([...synth.singingSamples]).toEqual([["la", source]]);
+        });
+
+        test("accepts exactly 32 syllables and a 40-character syllable", async () => {
+            const texts = ["x".repeat(40), ...Array.from({ length: 31 }, (_, i) => "la" + i)];
+            const renderSyllable = jest.fn().mockResolvedValue({ samples: [1], rate: 24000 });
+            global.KokoroSpeech = jest.fn(() => ({ renderSyllable }));
+            try {
+                await synth.prepareSinging(texts);
+                expect([...synth.singingSamples.keys()]).toEqual(texts);
+                expect(renderSyllable).toHaveBeenCalledTimes(32);
+            } finally {
+                delete global.KokoroSpeech;
+            }
+        });
+
+        test.each([false, true])(
+            "stops preparing later syllables after cancellation (failure: %s)",
+            async fails => {
+                let finish;
+                const renderSyllable = jest.fn(
+                    () =>
+                        new Promise((resolve, reject) => {
+                            finish = () =>
+                                fails
+                                    ? reject(new Error("offline"))
+                                    : resolve({ samples: [1], rate: 24000 });
+                        })
+                );
+                global.KokoroSpeech = jest.fn(() => ({ renderSyllable }));
+                try {
+                    let cancelled = false;
+                    const preparing = synth.prepareSinging(
+                        ["la", "ah"],
+                        undefined,
+                        () => cancelled
+                    );
+                    cancelled = true;
+                    finish();
+                    await expect(preparing).resolves.toBeUndefined();
+                    expect(renderSyllable).toHaveBeenCalledTimes(1);
+                    expect(synth.singingSamples.has("ah")).toBe(false);
+                    const source = { samples: [2], rate: 24000 };
+                    renderSyllable.mockResolvedValue(source);
+                    await synth.prepareSinging(["oh"]);
+                    expect(synth.singingSamples.get("oh")).toBe(source);
+                    expect(KokoroSpeech).toHaveBeenCalledTimes(1);
+                } finally {
+                    delete global.KokoroSpeech;
+                }
+            }
+        );
 
         test("reuses rendered notes and bounds their retained audio memory", () => {
             const source = { samples: new Float32Array(1000), rate: 24000, period: 109 };

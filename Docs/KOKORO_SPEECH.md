@@ -7,12 +7,15 @@ pitched singing voice. Place ordinary **Note value** and **Pitch** blocks inside
 it. The text input must be a literal text block, for example `la`, `ah`, or `oh`.
 Use separate Sing clamps for different syllables. A newly dragged Sing block
 already contains a playable quarter note. Singing also works inside called
-actions, including recursive actions.
+actions, including recursive actions and actions triggered by beat or note events.
 
 Load `examples/kokoro-singing.tb` for a four-note `la` melody. Press **Run** and
 wait for the model and syllable to prepare before playback starts. **Stop**
 also cancels playback that is waiting for preparation. Unlike Speak, Sing
 explicitly requests Kokoro and does not require `?kokoro=true`.
+An in-flight syllable render may finish after Stop, but no further syllables
+are started for that request. Retrying a failed syllable reuses the loaded model;
+a failed model download can be retried on the next Run.
 
 This is experimental speech-based resynthesis, not a trained singing model.
 Pitch-synchronous source grains retain the vowel's spectral shape over the

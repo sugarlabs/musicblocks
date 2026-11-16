@@ -123,8 +123,8 @@ class KokoroSpeech {
     _ensureEngine() {
         if (this._enginePromise === null) {
             this._enginePromise = (async () => {
-                const { KokoroTTS } = await this._loadVerifiedModule();
                 try {
+                    const { KokoroTTS } = await this._loadVerifiedModule();
                     return await KokoroTTS.from_pretrained(KokoroSpeech.MODEL_ID, {
                         dtype: KokoroSpeech.DTYPE,
                         device: "wasm",
@@ -132,6 +132,7 @@ class KokoroSpeech {
                     });
                 } catch (e) {
                     this._revokeAssetURLs();
+                    this._enginePromise = null;
                     throw e;
                 }
             })();

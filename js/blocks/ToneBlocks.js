@@ -60,7 +60,8 @@ function setupToneBlocks(activity) {
                 activity.turtles.ithTurtle(turtle).singer.suppressOutput ||
                 logo.runningLilypond ||
                 logo.runningAbc ||
-                logo.runningMIDI
+                logo.runningMIDI ||
+                logo.runningMxml
             )
                 return [args[1], 1];
             const text = typeof args[0] === "string" ? args[0].trim() : "";

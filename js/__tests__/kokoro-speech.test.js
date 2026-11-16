@@ -171,6 +171,43 @@ describe("KokoroSpeech", () => {
         });
     });
 
+    test.each(["module", "model"])(
+        "retries a failed %s load on the same instance",
+        async failure => {
+            const speech = new KokoroSpeech();
+            const engine = { generate: jest.fn() };
+            const fromPretrained = jest.fn().mockResolvedValue(engine);
+            const load = jest.spyOn(speech, "_loadVerifiedModule").mockResolvedValue({
+                KokoroTTS: { from_pretrained: fromPretrained }
+            });
+            const revoke = jest.spyOn(speech, "_revokeAssetURLs");
+            (failure === "module" ? load : fromPretrained).mockRejectedValueOnce(
+                new Error("offline")
+            );
+            await expect(speech._ensureEngine()).rejects.toThrow("offline");
+            expect(speech._enginePromise).toBeNull();
+            expect(revoke).toHaveBeenCalled();
+            const retry = speech._ensureEngine();
+            expect(speech._ensureEngine()).toBe(retry);
+            await expect(retry).resolves.toBe(engine);
+        }
+    );
+
+    test("Speak does not retry a failed engine load on each block", async () => {
+        const speech = new KokoroSpeech();
+        const load = jest
+            .spyOn(speech, "_loadVerifiedModule")
+            .mockRejectedValue(new Error("offline"));
+        jest.spyOn(console, "warn").mockImplementation(() => {});
+        speech.speak("first");
+        await settle();
+        speech.speak("second");
+        await settle();
+        expect(load).toHaveBeenCalledTimes(1);
+        expect(speech._unavailable).toBe(true);
+        expect(audio.started).toHaveLength(0);
+    });
+
     test("verifies every executable asset before importing Kokoro", async () => {
         const speech = new KokoroSpeech();
         const assets = KokoroSpeech.ASSETS;
@@ -617,15 +654,28 @@ describe("Persistent singing syllable cache", () => {
             new KokoroSpeech({ voice: "am_adam" })._syllableCacheKey("la")
         );
     });
-    test("corrupt cache entries are ignored and storage failure is non-fatal", async () => {
+    test.each([
+        ["empty audio", new Float32Array(0), 24000, 109],
+        ["oversized audio", new Float32Array(1024 * 1024 + 1), 24000, 109],
+        ["partial float", new Uint8Array(3), 24000, 109],
+        ["wrong sample rate", new Float32Array(1000), 22050, 109],
+        ["fractional period", new Float32Array(1000), 24000, 109.5],
+        ["period too short", new Float32Array(1000), 24000, 0],
+        ["period too long", new Float32Array(1000), 24000, 400],
+        ["too few periods", new Float32Array(217), 24000, 109],
+        ["non-finite sample", new Float32Array(1000).fill(NaN), 24000, 109]
+    ])("ignores cache entries with %s", async (reason, samples, rate, period) => {
         const speech = new KokoroSpeech();
         records.set(
             speech._syllableCacheKey("la"),
-            new Response(new Float32Array([NaN]), {
-                headers: { "X-Sample-Rate": "24000", "X-Pitch-Period": "0" }
+            new Response(samples, {
+                headers: { "X-Sample-Rate": String(rate), "X-Pitch-Period": String(period) }
             })
         );
         expect(await speech._readSyllableCache("la")).toBeNull();
+    });
+    test("storage failure is non-fatal", async () => {
+        const speech = new KokoroSpeech();
         global.caches.open.mockRejectedValue(new Error("quota"));
         expect(await speech._readSyllableCache("la")).toBeNull();
         await expect(
@@ -635,6 +685,14 @@ describe("Persistent singing syllable cache", () => {
                 period: 109
             })
         ).resolves.toBeUndefined();
+    });
+    test("does not persist syllables larger than 4 MiB", async () => {
+        await new KokoroSpeech()._writeSyllableCache("la", {
+            samples: new Float32Array(1024 * 1024 + 1),
+            rate: 24000,
+            period: 109
+        });
+        expect(cache.put).not.toHaveBeenCalled();
     });
     test("keeps no more than 32 syllables on disk", async () => {
         const speech = new KokoroSpeech();

@@ -1820,7 +1820,7 @@ function Synth() {
     };
 
     /** Prepare every requested syllable before the interpreter starts its audio clock. */
-    this.prepareSinging = async (texts, onProgress) => {
+    this.prepareSinging = async (texts, onProgress, isCancelled = () => false) => {
         const needed = new Set(texts);
         if (
             needed.size > 32 ||
@@ -1835,6 +1835,7 @@ function Synth() {
             if (!needed.has(text)) this.singingSamples.delete(text);
         }
         for (const text of needed) {
+            if (isCancelled()) return;
             if (this.singingSamples.has(text)) continue;
             if (onProgress)
                 onProgress({
@@ -1849,7 +1850,7 @@ function Synth() {
             try {
                 this.singingSamples.set(text, await this._singingSpeech.renderSyllable(text));
             } catch (error) {
-                this._singingSpeech = null;
+                if (isCancelled()) return;
                 throw error;
             }
         }
