@@ -836,12 +836,21 @@ class ProjectManager {
 
         if (hasNamedPlanetProject) {
             try {
-                let snapshot;
-                do {
-                    snapshot = that.prepareExport();
+                let savedCurrentState = false;
+                for (let attempt = 0; attempt < 3; attempt++) {
+                    const snapshot = that.prepareExport();
                     const saved = await that.planet.saveLocally({ rejectOnProjectSaveError: true });
-                    if (saved === false || saved === null) return;
-                } while (that.prepareExport() !== snapshot);
+                    if (saved === false || saved === null) {
+                        throw new Error("Could not save the current project.");
+                    }
+                    if (that.prepareExport() === snapshot) {
+                        savedCurrentState = true;
+                        break;
+                    }
+                }
+                if (!savedCurrentState) {
+                    throw new Error("The current project kept changing while saving.");
+                }
             } catch (error) {
                 ErrorHandler.recoverable(error, { operation: "saveProjectBeforeNewProject" });
                 that.errorMsg(
@@ -911,9 +920,14 @@ class ProjectManager {
         if (this._newProjectPending) return;
 
         this._newProjectPending = true;
-        return Promise.resolve(this._afterDelete()).finally(() => {
-            this._newProjectPending = false;
-        });
+        return Promise.resolve(this._afterDelete())
+            .catch(error => {
+                ErrorHandler.recoverable(error, { operation: "createNewProject" });
+                this.activity.errorMsg(_("Could not finish creating the new project."));
+            })
+            .finally(() => {
+                this._newProjectPending = false;
+            });
     }
 
     // -----------------------------------------------------------------------

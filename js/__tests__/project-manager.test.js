@@ -1508,33 +1508,90 @@ describe("newProject / _afterDelete", () => {
 
     it("saves edits made while the previous save is pending before clearing", async () => {
         let finishSave;
+        let currentData = "before";
+        const savedData = [];
         const planet = {
             planet: {},
             getCurrentProjectName: jest.fn(() => "Real Project"),
             saveLocally: jest
                 .fn()
-                .mockImplementationOnce(
-                    () =>
-                        new Promise(resolve => {
-                            finishSave = resolve;
-                        })
-                )
-                .mockResolvedValue(undefined),
+                .mockImplementationOnce(() => {
+                    savedData.push(currentData);
+                    return new Promise(resolve => {
+                        finishSave = resolve;
+                    });
+                })
+                .mockImplementation(() => {
+                    savedData.push(currentData);
+                    return Promise.resolve();
+                }),
             initialiseNewProject: jest.fn()
         };
         const activity = makeActivity({ planet });
-        activity.prepareExport.mockReturnValueOnce("before").mockReturnValueOnce("after");
-        activity.prepareExport.mockReturnValue("after");
+        activity.prepareExport.mockImplementation(() => currentData);
         const pm = new ProjectManager(activity);
         pm._loadStart = jest.fn();
 
         const request = pm.newProject();
         expect(planet.saveLocally).toHaveBeenCalledTimes(1);
+        currentData = "after";
         finishSave();
         await request;
 
+        expect(savedData).toEqual(["before", "after", "after"]);
         expect(planet.saveLocally).toHaveBeenCalledTimes(3);
         expect(planet.initialiseNewProject).toHaveBeenCalledTimes(1);
+        expect(planet.saveLocally.mock.invocationCallOrder[1]).toBeLessThan(
+            planet.initialiseNewProject.mock.invocationCallOrder[0]
+        );
+        expect(planet.initialiseNewProject.mock.invocationCallOrder[0]).toBeLessThan(
+            planet.saveLocally.mock.invocationCallOrder[2]
+        );
+    });
+
+    it("keeps the current project when edits continue throughout the save attempts", async () => {
+        const planet = {
+            planet: {},
+            getCurrentProjectName: jest.fn(() => "Real Project"),
+            saveLocally: jest.fn().mockResolvedValue(undefined),
+            initialiseNewProject: jest.fn()
+        };
+        const activity = makeActivity({ planet });
+        let version = 0;
+        activity.prepareExport.mockImplementation(() => `version-${++version}`);
+        const pm = new ProjectManager(activity);
+
+        await pm.newProject();
+
+        expect(planet.saveLocally).toHaveBeenCalledTimes(3);
+        expect(planet.initialiseNewProject).not.toHaveBeenCalled();
+        expect(activity.storage.removeItem).not.toHaveBeenCalled();
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Could not save the current project, so the new project was not created."
+        );
+        expect(pm._newProjectPending).toBe(false);
+    });
+
+    it("reports an initialization failure and releases the pending guard", async () => {
+        const error = new Error("Storage full");
+        const planet = {
+            planet: {},
+            getCurrentProjectName: jest.fn(() => "Real Project"),
+            saveLocally: jest.fn().mockResolvedValue(undefined),
+            initialiseNewProject: jest.fn().mockRejectedValue(error)
+        };
+        const activity = makeActivity({ planet });
+        const pm = new ProjectManager(activity);
+
+        await pm.newProject();
+
+        expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(error, {
+            operation: "createNewProject"
+        });
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Could not finish creating the new project."
+        );
+        expect(pm._newProjectPending).toBe(false);
     });
 
     it("reports that a project must finish loading before a new one can be created", async () => {
