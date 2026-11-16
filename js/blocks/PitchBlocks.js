@@ -878,10 +878,27 @@ function setupPitchBlocks(activity) {
                 // Now that we have the note, look for its pitch number.
                 const temperament = logo?.synth?.inTemperament || "equal";
                 const currentEDO = getCurrentEDO(temperament);
+                // Semitones above C, from the letter and its accidentals, for spellings
+                // the note lists leave out (E♯, B♯, F𝄪 in C♯ or E♯ major). B♯ comes out
+                // as 12 and C♭ as -1, so the octave is right across C.
+                const semitonesOf = name => {
+                    const match = /^([A-G])((?:♯|♭|𝄪|𝄫|#|b|x)*)$/u.exec(name);
+                    if (match === null) {
+                        return null;
+                    }
+                    const steps = { "♯": 1, "#": 1, "♭": -1, "b": -1, "𝄪": 2, "x": 2, "𝄫": -2 };
+                    return Array.from(match[2]).reduce(
+                        (sum, accidental) => sum + steps[accidental],
+                        { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }[match[1]]
+                    );
+                };
                 if (currentEDO === 12) {
                     lc = NOTESSHARP.indexOf(thisNote);
                     if (lc === -1) {
                         lc = NOTESFLAT.indexOf(thisNote);
+                    }
+                    if (lc === -1 && semitonesOf(thisNote) !== null) {
+                        lc = semitonesOf(thisNote);
                     }
                     return lc + 12 * o;
                 } else {
@@ -891,6 +908,9 @@ function setupPitchBlocks(activity) {
                         lc = NOTESSHARP.indexOf(thisNote);
                         if (lc === -1) {
                             lc = NOTESFLAT.indexOf(thisNote);
+                        }
+                        if (lc === -1 && semitonesOf(thisNote) !== null) {
+                            lc = semitonesOf(thisNote);
                         }
                         if (lc !== -1) {
                             lc = Math.round((lc / 12) * currentEDO);
