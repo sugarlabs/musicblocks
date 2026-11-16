@@ -45,6 +45,12 @@ describe("musicutils-solfege", () => {
         for (const note of ["do", "sol♯", "ti♭", "la𝄫", "fa𝄪", "Fa", "La"]) {
             expect(solfege.noteIsSolfege(note)).toBe(true);
         }
+        // Only accidentals may follow the letter: these are not note names.
+        for (const note of ["C#z", "Cq", ""]) {
+            expect(solfege.noteIsSolfege(note)).toBe(true);
+        }
+        // Mixed accidentals are still accidentals.
+        expect(solfege.noteIsSolfege("C#♭")).toBe(false);
     });
 
     it("gives E sharp and F flat their fixed solfege names", () => {

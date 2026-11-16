@@ -2724,6 +2724,8 @@ describe("getSolfege for notes spelled with double accidentals", () => {
         // B𝄫 is the second degree of A♭ phrygian (fa in movable Do); E♭♭ the third of C minor in
         // 31 EDO and D♯♯ a degree of B♭ phrygian in 21 EDO. All came back as their own names.
         expect(getSolfege("B𝄫", "A♭ phrygian", true, "equal", 12)).toBe("fa");
+        // Fixed Do has no syllable for B𝄫 in its table: the name comes back, not undefined.
+        expect(getSolfege("B𝄫", "C major", false, "equal", 12)).toBe("B𝄫");
         expect(getSolfege("E♭♭", "C minor", true, "equal31")).toBe("do");
         expect(getSolfege("E♭", "C minor", true, "equal31")).toBe(
             getSolfege("E♭", "C minor", true, "equal", 12)
