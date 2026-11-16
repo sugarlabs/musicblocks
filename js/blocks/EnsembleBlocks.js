@@ -143,6 +143,7 @@ function setupEnsembleBlocks(activity) {
             const cblk2 = activity.blocks.blockList[blk].connections[2];
             if (cblk2 === null) {
                 activity.errorMsg(NANERRORMSG, blk);
+                return 0;
             } else {
                 let a = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                 if (typeof a === "number" && !Number.isNaN(a)) {
@@ -181,6 +182,7 @@ function setupEnsembleBlocks(activity) {
                     return logo.turtleHeaps[i][a - 1];
                 } else {
                     activity.errorMsg(NANERRORMSG, blk);
+                    return 0;
                 }
             }
         }
