@@ -862,6 +862,29 @@ describe("setupVolumeActions", () => {
             }
         });
 
+        it("matches drum names case-insensitively and with hyphens or spaces", () => {
+            DRUMNAMES.HiHat = ["hi-hat", "hihat"];
+            DRUMNAMES.BassDrum = ["bass drum", "bass-drum"];
+            try {
+                Singer.VolumeActions.setSynthVolume("Hi Hat", 75, 0, "testBlock");
+                expect(targetTurtle.singer.synthVolume.hihat).toContain(75);
+
+                Singer.VolumeActions.setSynthVolume("hi-hat", 80, 0, "testBlock");
+                expect(targetTurtle.singer.synthVolume.hihat).toContain(80);
+
+                Singer.VolumeActions.setSynthVolume("Bass Drum", 65, 0, "testBlock");
+                expect(targetTurtle.singer.synthVolume["bass-drum"]).toContain(65);
+
+                Singer.VolumeActions.setSynthVolume("bass-drum", 70, 0, "testBlock");
+                expect(targetTurtle.singer.synthVolume["bass-drum"]).toContain(70);
+
+                expect(activity.errorMsg).not.toHaveBeenCalled();
+            } finally {
+                delete DRUMNAMES.HiHat;
+                delete DRUMNAMES.BassDrum;
+            }
+        });
+
         it("does not re-scan VOICENAMES when synth is already resolved", () => {
             VOICENAMES.ShouldNotMatch = [DEFAULTVOICE, "wrong-synth"];
             try {
@@ -1042,6 +1065,17 @@ describe("setupVolumeActions", () => {
             targetTurtle.singer.synthVolume.Piano = [50, 60];
 
             expect(Singer.VolumeActions.getSynthVolume("Piano", 0)).toBe(70);
+        });
+
+        it("should resolve drum display names case-insensitively in getSynthVolume", () => {
+            targetTurtle.singer.synthVolume["bass-drum"] = [50, 85];
+            DRUMNAMES.BassDrum = ["bass drum", "bass-drum"];
+            try {
+                expect(Singer.VolumeActions.getSynthVolume("Bass Drum", 0)).toBe(85);
+                expect(Singer.VolumeActions.getSynthVolume("bass-drum", 0)).toBe(85);
+            } finally {
+                delete DRUMNAMES.BassDrum;
+            }
         });
 
         it("should get synth volume for a stored custom sample key", () => {
