@@ -2785,6 +2785,27 @@ describe("buildScale with explicit EDO", () => {
         expect(steps.reduce((a, b) => a + b, 0)).toBe(21);
     });
 
+    it("reads stacked and double accidentals alike in 21-EDO degree lookups", () => {
+        // F♯ enigmatic in 21 EDO has C♯♯ as a degree: C𝄪 must find it, and C♯ sits a
+        // sharp below it, not level with it.
+        expect(getInterval(1, "F♯ enigmatic", "C𝄪", 21)).toBe(
+            getInterval(1, "F♯ enigmatic", "C♯♯", 21)
+        );
+        // The fifth degree is C♯♯: C♯ is a flattened fifth and C𝄪 the same note.
+        expect(scaleDegreeToPitchMapping("F♯ enigmatic", null, false, "C♯", 21)).toEqual([
+            "5",
+            FLAT
+        ]);
+        expect(scaleDegreeToPitchMapping("F♯ enigmatic", null, false, "C♯♯", 21)).toEqual([
+            "5",
+            NATURAL
+        ]);
+        expect(scaleDegreeToPitchMapping("F♯ enigmatic", null, false, "C𝄪", 21)).toEqual([
+            "5",
+            NATURAL
+        ]);
+    });
+
     it("keeps the stretched 21-EDO scale when a name is missing from the table", () => {
         // The 21-name table has no C♭, so E♭ minor stays as it was.
         const [scale, steps] = buildScale("E♭ minor", 21);

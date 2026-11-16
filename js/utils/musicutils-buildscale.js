@@ -824,21 +824,13 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
         if (scaleNote === pitchNote) {
             return NATURAL;
         }
-        const getOffset = note => {
-            if (note.includes(DOUBLESHARP)) {
-                return 2;
-            }
-            if (note.includes(SHARP)) {
-                return 1;
-            }
-            if (note.includes(DOUBLEFLAT)) {
-                return -2;
-            }
-            if (note.includes(FLAT)) {
-                return -1;
-            }
-            return 0;
-        };
+        // Count every symbol: the EDO tables stack them (C♯♯ is two sharps).
+        const countOf = (note, symbol) => note.split(symbol).length - 1;
+        const getOffset = note =>
+            2 * countOf(note, DOUBLESHARP) +
+            countOf(note, SHARP) -
+            2 * countOf(note, DOUBLEFLAT) -
+            countOf(note, FLAT);
         if (
             pitchNote.length > 1 &&
             !pitchNote.includes(DOUBLESHARP) &&
@@ -1183,7 +1175,10 @@ var getInterval = (interval, keySignature, pitch, edo) => {
     const indexInScale = name => {
         const pitchClass = is12EDO ? _notePitchClass(name) : NaN;
         if (Number.isNaN(pitchClass)) {
-            return scale.indexOf(name);
+            // The EDO tables write C♯♯ where 12 EDO writes C𝄪.
+            return scale.indexOf(
+                name.replaceAll(DOUBLESHARP, SHARP + SHARP).replaceAll(DOUBLEFLAT, FLAT + FLAT)
+            );
         }
         return scale.findIndex(note => _notePitchClass(note) === pitchClass);
     };
