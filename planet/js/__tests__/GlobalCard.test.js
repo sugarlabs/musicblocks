@@ -628,7 +628,6 @@ describe("GlobalCard", () => {
             });
 
             card.like();
-            jest.advanceTimersByTime(500);
 
             expect(document.getElementById("global-project-likes-test-id-1").textContent).toBe("1");
             expect(card.ProjectData.ProjectLikes).toBe(1);
@@ -642,7 +641,6 @@ describe("GlobalCard", () => {
             });
 
             card.like();
-            jest.advanceTimersByTime(500);
 
             expect(document.getElementById("global-project-likes-test-id-1").textContent).toBe("5");
             expect(mockPlanet.ProjectStorage.like).toHaveBeenLastCalledWith("test-id-1", false);
