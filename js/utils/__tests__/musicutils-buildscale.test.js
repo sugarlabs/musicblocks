@@ -146,6 +146,32 @@ describe("musicutils-buildscale", () => {
             "F" + SHARP,
             "G"
         ]);
+        expect(buildscale.buildScale("C major pentatonic", 21)).toEqual([
+            ["C", "D", "E", "G", "A", "C"],
+            [4, 4, 5, 3, 5]
+        ]);
+        expect(buildscale.buildScale("C chromatic", 21)).toEqual([
+            [
+                "C",
+                "D" + FLAT,
+                "D",
+                "E" + FLAT,
+                "E",
+                "F",
+                "G" + FLAT,
+                "G",
+                "A" + FLAT,
+                "A",
+                "B" + FLAT,
+                "B",
+                "C"
+            ],
+            [3, 1, 3, 1, 2, 2, 1, 2, 1, 2, 1, 2]
+        ]);
+    });
+
+    it("keeps 31-EDO scale construction unchanged", () => {
+        expect(buildscale.buildScale("C minor", 31)[1]).toEqual([5, 3, 5, 5, 3, 5, 5]);
     });
 
     it("keeps the EDO-native scale when a seven-note spelling is unavailable", () => {
