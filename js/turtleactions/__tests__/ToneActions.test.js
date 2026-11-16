@@ -230,10 +230,14 @@ describe("setupToneActions", () => {
             expect(activity.logo.synth.loadSynth).toHaveBeenCalledWith(0, expected);
         });
 
-        it("should keep an unknown or blank name as typed", () => {
-            Singer.ToneActions.setTimbre("not-a-voice", 0, 1);
-            expect(targetTurtle.singer.instrumentNames).toEqual(["not-a-voice"]);
-        });
+        it.each(["not-a-voice", "", "   "])(
+            "should keep the unknown or blank name %j as typed",
+            typed => {
+                Singer.ToneActions.setTimbre(typed, 0, 1);
+                expect(targetTurtle.singer.instrumentNames).toEqual([typed]);
+                expect(activity.logo.synth.loadSynth).toHaveBeenCalledWith(0, typed);
+            }
+        );
 
         it("should handle direct synth name", () => {
             Singer.ToneActions.setTimbre("grand-piano", 0, 1);
