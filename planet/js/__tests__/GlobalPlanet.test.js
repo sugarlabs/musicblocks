@@ -756,7 +756,9 @@ describe("GlobalPlanet", () => {
         });
 
         it("forceAddToCache should open only after details are cached", () => {
-            const cb = jest.fn();
+            const cb = jest.fn(() => {
+                expect(gp.cache["repo-1"].ProjectName).toBe("Test");
+            });
             gp.forceAddToCache("repo-1", cb);
             const response = mockPlanet.ServerInterface.getProjectDetails.mock.calls[0][1];
 
@@ -765,6 +767,22 @@ describe("GlobalPlanet", () => {
             expect(gp.cache["repo-1"].ProjectName).toBe("Test");
             expect(cb).toHaveBeenCalledTimes(1);
             expect(gp.loadCount).toBe(0);
+        });
+
+        it("ignores a late badge response after the list changes", () => {
+            const cb = jest.fn();
+            gp.cache["repo-1"] = { ProjectName: "Existing" };
+            gp.forceAddToCache("repo-1", cb);
+            const response = mockPlanet.ServerInterface.getProjectDetails.mock.calls[0][1];
+
+            gp.refreshProjects();
+            response({ success: true, data: { ProjectName: "Stale" } });
+
+            expect(gp.cache["repo-1"].ProjectName).toBe("Existing");
+            expect(cb).not.toHaveBeenCalled();
+
+            response({ success: false });
+            expect(document.getElementById("global-badge-error")).toBeNull();
         });
 
         it("forceAddToCache should show an error without opening when details fail", () => {

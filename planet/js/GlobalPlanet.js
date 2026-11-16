@@ -323,9 +323,11 @@ class GlobalPlanet {
 
     forceAddToCache(id, callback) {
         this.hideBadgeError();
+        const requestId = this._requestId;
         this.Planet.ServerInterface.getProjectDetails(
             id,
             function (d) {
+                if (requestId !== this._requestId) return;
                 this.afterForceAddToCache(id, d, callback);
             }.bind(this),
             true
