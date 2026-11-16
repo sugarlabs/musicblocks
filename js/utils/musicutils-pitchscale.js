@@ -1078,6 +1078,33 @@ var getNoteFromSolfege = (
             } else {
                 note = NOTESFLAT[index];
             }
+        } else if (octaveLength !== 12 && movable) {
+            // getScaleAndHalfSteps() hands every natural tonic the flat list, so ti in
+            // G major came out G♭. 12 EDO respells it by the key later; outside 12 EDO
+            // G♭ and F♯ are different pitches, so take the degree from the scale this EDO
+            // builds for the key, the one Scalar Step walks.
+            const buildScaleFn =
+                typeof buildScale === "function"
+                    ? buildScale
+                    : typeof require !== "undefined"
+                      ? require("./musicutils-buildscale").buildScale
+                      : null;
+            const scale = buildScaleFn ? buildScaleFn(keySignature, octaveLength)[0] : [];
+            const degree = SOLFEGENAMES.indexOf(solfegePart);
+            // Only a scale spelled with seven different letters names its degrees
+            // (21-EDO C major still comes out C D E♭ E♯ G♭ A B, see #10407).
+            const lettered =
+                scale.length === 8 && new Set(scale.slice(0, 7).map(name => name[0])).size === 7;
+            if (lettered && degree !== -1) {
+                const name = scale[degree];
+                // B♯ and C♭ are spelled across the C where octaves change.
+                if (name[0] === "B" && note[0] === "C") {
+                    octave -= 1;
+                } else if (name[0] === "C" && note[0] === "B") {
+                    octave += 1;
+                }
+                note = name;
+            }
         }
 
         if (octaveLength === 12 && note in EXTRATRANSPOSITIONS) {
