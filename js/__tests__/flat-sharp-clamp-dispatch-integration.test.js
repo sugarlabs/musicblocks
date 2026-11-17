@@ -729,6 +729,19 @@ describe("FlatBlock and SharpBlock clamp lifecycle, nesting, and transposition s
             tur.listeners[sharpListenerName]();
             expect(tur.singer.transposition).toBe(0);
             expect(tur.listeners[sharpListenerName]).toBeUndefined();
+
+            // 3. When in mouse mode but no mouse completion route exists (mouse is null),
+            // safely return without mutating state or leaking listeners.
+            global.Mouse.getMouseFromTurtle.mockReturnValue(null);
+            tur.singer.transposition = 0;
+            tur.listeners = {};
+            protos.flat.flow([2], logo, 0, undefined);
+            expect(tur.singer.transposition).toBe(0);
+            expect(activeClampListeners(tur)).toEqual([]);
+
+            protos.sharp.flow([2], logo, 0, undefined);
+            expect(tur.singer.transposition).toBe(0);
+            expect(activeClampListeners(tur)).toEqual([]);
         } finally {
             global.MusicBlocks.isRun = false;
         }

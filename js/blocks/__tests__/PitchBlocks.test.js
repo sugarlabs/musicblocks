@@ -1767,6 +1767,44 @@ describe("setupPitchBlocks", () => {
                 }
             });
 
+            it("FlatBlock and SharpBlock flow return safely in mouse mode when mouse completion route is unavailable", () => {
+                const flatBlock = createdBlocks["flat"];
+                const sharpBlock = createdBlocks["sharp"];
+                const tur = turtles.ithTurtle(0);
+                const origMusicBlocks = global.MusicBlocks;
+                const origMouse = global.Mouse;
+
+                global.MusicBlocks = { isRun: true };
+                // Mouse route unavailable (null or missing MB.listeners)
+                global.Mouse = {
+                    getMouseFromTurtle: jest.fn(() => null)
+                };
+
+                try {
+                    tur.singer.transposition = 0;
+                    tur.listeners = {};
+                    logo.setDispatchBlock.mockClear();
+                    logo.setTurtleListener.mockClear();
+
+                    expect(() => {
+                        flatBlock.flow(["child"], logo, 0, undefined);
+                    }).not.toThrow();
+                    expect(tur.singer.transposition).toBe(0);
+                    expect(tur.listeners).toEqual({});
+                    expect(logo.setTurtleListener).not.toHaveBeenCalled();
+
+                    expect(() => {
+                        sharpBlock.flow(["child"], logo, 0, undefined);
+                    }).not.toThrow();
+                    expect(tur.singer.transposition).toBe(0);
+                    expect(tur.listeners).toEqual({});
+                    expect(logo.setTurtleListener).not.toHaveBeenCalled();
+                } finally {
+                    global.MusicBlocks = origMusicBlocks;
+                    global.Mouse = origMouse;
+                }
+            });
+
             it("AccidentalNameBlock arg", () => {
                 const block = createdBlocks["accidentalname"];
                 if (block && block.arg) {

@@ -1685,14 +1685,24 @@ function setupPitchBlocks(activity) {
                 blk !== null &&
                 blk in activity.blocks.blockList;
             const isMouseRun = typeof MusicBlocks !== "undefined" && MusicBlocks.isRun;
+            const execTur = activity.turtles.ithTurtle(turtle);
+            const execMouse =
+                isMouseRun && typeof Mouse !== "undefined"
+                    ? Mouse.getMouseFromTurtle(execTur)
+                    : null;
+            const canRegisterMouse = Boolean(
+                isMouseRun &&
+                execMouse !== null &&
+                execMouse.MB &&
+                Array.isArray(execMouse.MB.listeners)
+            );
 
             // When dispatch registration cannot be guaranteed, return safely before
             // mutating state to prevent un-unwound transposition drift and orphaned listeners.
-            if (!hasValidBlock && !isMouseRun) {
+            if (!hasValidBlock && !canRegisterMouse) {
                 return;
             }
 
-            const execTur = activity.turtles.ithTurtle(turtle);
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
             const applied = tur.singer.invertList.length > 0 ? 1 : -1;
             tur.singer.transposition += applied;
@@ -1701,12 +1711,8 @@ function setupPitchBlocks(activity) {
             const listenerName = getUniqueListenerName(execTur, baseListenerName);
             if (hasValidBlock) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (isMouseRun) {
-                const mouse =
-                    typeof Mouse !== "undefined" ? Mouse.getMouseFromTurtle(execTur) : null;
-                if (mouse !== null && mouse.MB && Array.isArray(mouse.MB.listeners)) {
-                    mouse.MB.listeners.push(listenerName);
-                }
+            } else if (canRegisterMouse) {
+                execMouse.MB.listeners.push(listenerName);
             }
 
             let cleanedUp = false;
@@ -1768,14 +1774,24 @@ function setupPitchBlocks(activity) {
                 blk !== null &&
                 blk in activity.blocks.blockList;
             const isMouseRun = typeof MusicBlocks !== "undefined" && MusicBlocks.isRun;
+            const execTur = activity.turtles.ithTurtle(turtle);
+            const execMouse =
+                isMouseRun && typeof Mouse !== "undefined"
+                    ? Mouse.getMouseFromTurtle(execTur)
+                    : null;
+            const canRegisterMouse = Boolean(
+                isMouseRun &&
+                execMouse !== null &&
+                execMouse.MB &&
+                Array.isArray(execMouse.MB.listeners)
+            );
 
             // When dispatch registration cannot be guaranteed, return safely before
             // mutating state to prevent un-unwound transposition drift and orphaned listeners.
-            if (!hasValidBlock && !isMouseRun) {
+            if (!hasValidBlock && !canRegisterMouse) {
                 return;
             }
 
-            const execTur = activity.turtles.ithTurtle(turtle);
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
             const applied = tur.singer.invertList.length > 0 ? -1 : 1;
             tur.singer.transposition += applied;
@@ -1784,12 +1800,8 @@ function setupPitchBlocks(activity) {
             const listenerName = getUniqueListenerName(execTur, baseListenerName);
             if (hasValidBlock) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (isMouseRun) {
-                const mouse =
-                    typeof Mouse !== "undefined" ? Mouse.getMouseFromTurtle(execTur) : null;
-                if (mouse !== null && mouse.MB && Array.isArray(mouse.MB.listeners)) {
-                    mouse.MB.listeners.push(listenerName);
-                }
+            } else if (canRegisterMouse) {
+                execMouse.MB.listeners.push(listenerName);
             }
 
             let cleanedUp = false;
