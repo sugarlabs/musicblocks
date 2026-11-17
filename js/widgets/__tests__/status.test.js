@@ -232,7 +232,9 @@ describe("StatusMatrix Widget", () => {
                 0: { name: "namedbox", privateData: "nextNote" },
                 1: { name: "storein2", privateData: "counter" },
                 2: { name: "text", value: "computedName" },
-                3: { name: "storein", connections: [null, 2] }
+                3: { name: "storein", connections: [null, 2] },
+                4: { name: "box1" },
+                5: { name: "storebox2" }
             };
             statusMatrix.init(mockActivity);
         });
@@ -244,6 +246,8 @@ describe("StatusMatrix Widget", () => {
 
             expect(optionLabels).toEqual([
                 "Select a box or heap",
+                "Box: box1",
+                "Box: box2",
                 "Box: computedName",
                 "Box: counter",
                 "Box: nextNote",
@@ -315,6 +319,45 @@ describe("StatusMatrix Widget", () => {
 
             expect(statusMatrix._watches).toHaveLength(1);
             expect(statusMatrix._watches[0].valueElement.textContent).toBe("3");
+        });
+
+        test("ignores empty and duplicate watch selections", () => {
+            statusMatrix._watchAddButton.click();
+            expect(statusMatrix._watches).toHaveLength(0);
+
+            statusMatrix._watchSelect.value = JSON.stringify(["box", "score"]);
+            statusMatrix._watchAddButton.click();
+            statusMatrix._watchAddButton.click();
+
+            expect(statusMatrix._watches).toHaveLength(1);
+        });
+
+        test("formats missing boxes and values that cannot be serialized", () => {
+            statusMatrix._watchSelect.value = JSON.stringify(["box", "nextNote"]);
+            statusMatrix._watchAddButton.click();
+
+            expect(statusMatrix._watches[0].valueElement.textContent).toBe("undefined");
+
+            const circular = {};
+            circular.self = circular;
+            expect(statusMatrix._formatWatchValue(circular)).toBe("[object Object]");
+
+            const unserializable = {
+                toJSON: () => {
+                    throw new Error("cannot serialize");
+                }
+            };
+            expect(() => statusMatrix._formatWatchValue(unserializable)).toThrow(
+                "cannot serialize"
+            );
+        });
+
+        test("skips rendering when the watch panel is unavailable", () => {
+            statusMatrix._watchSelect = null;
+            expect(() => statusMatrix._refreshWatchOptions()).not.toThrow();
+
+            statusMatrix._watchList = null;
+            expect(() => statusMatrix._renderWatchList()).not.toThrow();
         });
     });
 
