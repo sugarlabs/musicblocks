@@ -259,6 +259,7 @@ class ProjectCheckerWindow {
                     locateBtn.style.borderRadius = "3px";
                     locateBtn.style.border = "1px solid #bdbdbd";
                     locateBtn.style.backgroundColor = "#ffffff";
+                    locateBtn.style.color = "#333333";
                     locateBtn.style.whiteSpace = "nowrap";
 
                     locateBtn.addEventListener("click", () => {
@@ -287,7 +288,7 @@ class ProjectCheckerWindow {
         }
 
         const block = this.activity.blocks.blockList[blockId];
-        if (block && typeof block.highlight === "function") {
+        if (block && !block.trash && typeof block.highlight === "function") {
             block.highlight();
             this._highlightedBlockId = blockId;
             if (typeof this.activity.refreshCanvas === "function") {

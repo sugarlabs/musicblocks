@@ -104,6 +104,33 @@ describe("ProjectCheckerWindow", () => {
         expect(activity.refreshCanvas).toHaveBeenCalled();
     });
 
+    test("does not highlight a block if it is in trash", () => {
+        const highlightMock = jest.fn();
+        activity.blocks.blockList = [
+            {
+                name: "start",
+                trash: false,
+                connections: [null, 1]
+            },
+            {
+                name: "nameddo",
+                trash: false,
+                privateData: "ghost",
+                connections: [0, null],
+                highlight: highlightMock
+            }
+        ];
+
+        new ProjectCheckerWindow(activity);
+        const locateBtn = body.querySelector("button");
+
+        // Now move the block to trash
+        activity.blocks.blockList[1].trash = true;
+        locateBtn.click();
+
+        expect(highlightMock).not.toHaveBeenCalled();
+    });
+
     test("refresh re-runs validation and updates the view", () => {
         activity.blocks.blockList = [];
         const checker = new ProjectCheckerWindow(activity);

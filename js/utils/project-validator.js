@@ -120,6 +120,40 @@ function isValueOrArgBlock(blk) {
 }
 
 /**
+ * Safely formats a localized template string by replacing %s sequentially with literal strings.
+ * Avoids String.prototype.replace regex special pattern parsing (e.g. $&, $1).
+ *
+ * @param {string} template - The message format string
+ * @param {...any} args - Values to substitute into %s
+ * @returns {string} The formatted message
+ */
+function formatMessage(template, ...args) {
+    let result = template;
+    for (let i = 0; i < args.length; i++) {
+        result = result.replace("%s", () => String(args[i] ?? ""));
+    }
+    return result;
+}
+
+/**
+ * Checks whether a block is the root/top of a stack.
+ * Returns true if connections[0] is null/undefined or points to a non-existent/trashed parent.
+ *
+ * @param {Object} blk - Block instance
+ * @param {Array} blockList - The blocks list
+ * @returns {boolean} True if the block has no active parent connected above it
+ */
+function isTopBlock(blk, blockList) {
+    if (!blk || blk.trash) return false;
+    if (!blk.connections || blk.connections[0] === null || blk.connections[0] === undefined) {
+        return true;
+    }
+    const parentId = blk.connections[0];
+    const parent = blockList[parentId];
+    return !parent || parent.trash;
+}
+
+/**
  * Performs comprehensive static sanity and consistency analysis on a Music Blocks workspace.
  *
  * @param {Object} activity - The Activity instance or an object containing `{ blocks: { blockList } }`
@@ -197,7 +231,7 @@ function validateProject(activity) {
                     blockId: i,
                     blockName: "action",
                     actionName: actionName,
-                    message: gettext('Action "%s" has an empty body.').replace("%s", actionName)
+                    message: formatMessage(gettext('Action "%s" has an empty body.'), actionName)
                 });
             }
 
@@ -268,8 +302,8 @@ function validateProject(activity) {
                             blockId: i,
                             blockName: blk.name,
                             argIndex: 1,
-                            message: gettext('Block "%s" is missing an input argument.').replace(
-                                "%s",
+                            message: formatMessage(
+                                gettext('Block "%s" is missing an input argument.'),
                                 blk.name
                             )
                         });
@@ -293,34 +327,47 @@ function validateProject(activity) {
             }
         }
 
-        if (calledName !== null && calledName.trim() !== "") {
-            usedActions.add(calledName);
+        if (calledName !== null) {
+            if (calledName.trim() === "") {
+                items.push({
+                    severity: "error",
+                    code: VALIDATOR_CODES.ERR_MISSING_ACTION,
+                    blockId: i,
+                    blockName: blk.name,
+                    actionName: calledName,
+                    message: gettext("Action name cannot be empty.")
+                });
+            } else {
+                usedActions.add(calledName);
 
-            if (!definedActions.has(calledName)) {
-                const suggestion = actionNameLowerMap.get(calledName.toLowerCase());
-                if (suggestion && suggestion !== calledName) {
-                    items.push({
-                        severity: "error",
-                        code: VALIDATOR_CODES.ERR_MISSING_ACTION,
-                        blockId: i,
-                        blockName: blk.name,
-                        actionName: calledName,
-                        suggestion: suggestion,
-                        message: gettext(
-                            'Cannot find action "%s". Did you mean "%s"? Action names are case-sensitive.'
-                        )
-                            .replace("%s", calledName)
-                            .replace("%s", suggestion)
-                    });
-                } else {
-                    items.push({
-                        severity: "error",
-                        code: VALIDATOR_CODES.ERR_MISSING_ACTION,
-                        blockId: i,
-                        blockName: blk.name,
-                        actionName: calledName,
-                        message: gettext('Cannot find action "%s".').replace("%s", calledName)
-                    });
+                if (!definedActions.has(calledName)) {
+                    const suggestion = actionNameLowerMap.get(calledName.toLowerCase());
+                    if (suggestion && suggestion !== calledName) {
+                        items.push({
+                            severity: "error",
+                            code: VALIDATOR_CODES.ERR_MISSING_ACTION,
+                            blockId: i,
+                            blockName: blk.name,
+                            actionName: calledName,
+                            suggestion: suggestion,
+                            message: formatMessage(
+                                gettext(
+                                    'Cannot find action "%s". Did you mean "%s"? Action names are case-sensitive.'
+                                ),
+                                calledName,
+                                suggestion
+                            )
+                        });
+                    } else {
+                        items.push({
+                            severity: "error",
+                            code: VALIDATOR_CODES.ERR_MISSING_ACTION,
+                            blockId: i,
+                            blockName: blk.name,
+                            actionName: calledName,
+                            message: formatMessage(gettext('Cannot find action "%s".'), calledName)
+                        });
+                    }
                 }
             }
         }
@@ -336,8 +383,8 @@ function validateProject(activity) {
                     blockId: defInfo.blockId,
                     blockName: "action",
                     actionName: actName,
-                    message: gettext('Action "%s" is not called directly by name.').replace(
-                        "%s",
+                    message: formatMessage(
+                        gettext('Action "%s" is not called directly by name.'),
                         actName
                     )
                 });
@@ -348,8 +395,8 @@ function validateProject(activity) {
                     blockId: defInfo.blockId,
                     blockName: "action",
                     actionName: actName,
-                    message: gettext('Action "%s" is defined but never called.').replace(
-                        "%s",
+                    message: formatMessage(
+                        gettext('Action "%s" is defined but never called.'),
                         actName
                     )
                 });
@@ -377,8 +424,8 @@ function validateProject(activity) {
                             blockId: id,
                             blockName: b.name,
                             argIndex: dock,
-                            message: gettext('Block "%s" is missing an input argument.').replace(
-                                "%s",
+                            message: formatMessage(
+                                gettext('Block "%s" is missing an input argument.'),
                                 b.name
                             )
                         });
@@ -394,7 +441,7 @@ function validateProject(activity) {
         if (!blk || blk.trash) continue;
 
         // Is it the top of an unattached stack?
-        if (blk.connections && blk.connections[0] === null) {
+        if (isTopBlock(blk, blockList)) {
             if (START_BLOCK_NAMES.includes(blk.name) || blk.name === "action") {
                 continue;
             }
@@ -409,9 +456,12 @@ function validateProject(activity) {
                 code: VALIDATOR_CODES.INFO_ORPHAN_STACK,
                 blockId: i,
                 blockName: blk.name,
-                message: gettext(
-                    'Stack starting with "%s" has no Start or Action block and will not execute.'
-                ).replace("%s", blk.name)
+                message: formatMessage(
+                    gettext(
+                        'Stack starting with "%s" has no Start or Action block and will not execute.'
+                    ),
+                    blk.name
+                )
             });
         }
     }
@@ -469,8 +519,8 @@ function validateProject(activity) {
 function VALIDATOR_DUPLICATE_ACTION(actionName, gettext) {
     return {
         code: VALIDATOR_CODES.WARN_DUPLICATE_ACTION,
-        message: gettext('Action "%s" is defined multiple times. Only one will run.').replace(
-            "%s",
+        message: formatMessage(
+            gettext('Action "%s" is defined multiple times. Only one will run.'),
             actionName
         )
     };

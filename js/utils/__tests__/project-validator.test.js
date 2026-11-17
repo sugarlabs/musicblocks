@@ -228,6 +228,54 @@ describe("ProjectValidator", () => {
             // Dynamic call should not generate a false-positive ERR_MISSING_ACTION
             expect(report.summary.errors).toBe(0);
         });
+
+        test("reports ERR_MISSING_ACTION when do block calls an empty action name string", () => {
+            const blockList = [
+                {
+                    name: "start",
+                    trash: false,
+                    connections: [null, 1]
+                },
+                {
+                    name: "do",
+                    trash: false,
+                    connections: [0, 2, null]
+                },
+                {
+                    name: "text",
+                    trash: false,
+                    value: "   ",
+                    isValueBlock: () => true,
+                    connections: [1]
+                }
+            ];
+
+            const report = validateProject({ blocks: { blockList } });
+            const err = report.items.find(i => i.code === VALIDATOR_CODES.ERR_MISSING_ACTION);
+            expect(err).toBeDefined();
+            expect(err.message).toBe("Action name cannot be empty.");
+        });
+
+        test("safely formats action names containing dollar signs without regex distortion", () => {
+            const blockList = [
+                {
+                    name: "start",
+                    trash: false,
+                    connections: [null, 1]
+                },
+                {
+                    name: "nameddo",
+                    trash: false,
+                    privateData: "$intro$&",
+                    connections: [0, null]
+                }
+            ];
+
+            const report = validateProject({ blocks: { blockList } });
+            const err = report.items.find(i => i.code === VALIDATOR_CODES.ERR_MISSING_ACTION);
+            expect(err).toBeDefined();
+            expect(err.message).toContain('Cannot find action "$intro$&"');
+        });
     });
 
     describe("Action Definition Integrity", () => {
@@ -527,6 +575,37 @@ describe("ProjectValidator", () => {
             const report = validateProject({ blocks: { blockList } });
             const orphan = report.items.find(i => i.code === VALIDATOR_CODES.INFO_ORPHAN_STACK);
             expect(orphan).toBeUndefined();
+        });
+
+        test("treats a flow block whose parent was trashed as an orphan stack", () => {
+            const blockList = [
+                // 0: Parent in trash
+                {
+                    name: "forward",
+                    trash: true,
+                    connections: [null, 1]
+                },
+                // 1: Child whose connections[0] still points to 0
+                {
+                    name: "forward",
+                    trash: false,
+                    connections: [0, 2],
+                    protoblock: { args: 1, dockTypes: ["out", "numberin", "in"] }
+                },
+                // 2: number
+                {
+                    name: "number",
+                    trash: false,
+                    value: 50,
+                    isValueBlock: () => true,
+                    connections: [1]
+                }
+            ];
+
+            const report = validateProject({ blocks: { blockList } });
+            const orphan = report.items.find(i => i.code === VALIDATOR_CODES.INFO_ORPHAN_STACK);
+            expect(orphan).toBeDefined();
+            expect(orphan.blockId).toBe(1);
         });
     });
 
