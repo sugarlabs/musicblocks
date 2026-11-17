@@ -5604,20 +5604,20 @@ class Blocks {
          * when the request eventually runs is still this one (issue #8855).
          * @param - blockObj - Block Objects
          * @public
-         * @returns {number} this request's load token
+         * @returns {number|null} this request's load token, or null if invalid
          */
         this.loadNewBlocks = blockObjs => {
-            const loadToken = ++this._nextLoadToken;
-
             // Invalid input is reported by _loadNewBlocksNow when idle. Do not
             // queue it behind a valid load: it cannot complete normally and
             // must not interfere with the active load's bookkeeping.
             if (!Array.isArray(blockObjs) && this._loadInProgress) {
-                if (typeof this.activity?.errorMsg === "function") {
+                if (this.activity && typeof this.activity.errorMsg === "function") {
                     this.activity.errorMsg(_("Cannot load project: invalid project structure."));
                 }
-                return loadToken;
+                return null;
             }
+
+            const loadToken = ++this._nextLoadToken;
 
             if (this._loadInProgress) {
                 this._loadQueue.push({ blockObjs, loadToken });

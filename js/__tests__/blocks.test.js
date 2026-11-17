@@ -3933,7 +3933,7 @@ describe("Blocks Foundation", () => {
         it("reports invalid data without queuing it behind a running load", () => {
             blocks.loadNewBlocks(makeBatch(1));
 
-            expect(() => blocks.loadNewBlocks({})).not.toThrow();
+            expect(blocks.loadNewBlocks({})).toBeNull();
             expect(blocks.isLoading()).toBe(true);
             expect(blocks._loadQueue).toHaveLength(0);
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
