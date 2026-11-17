@@ -20,12 +20,31 @@
     YSTAFFNOTEHEIGHT, MUSICALMODES, keySignatureToMode, ALLNOTENAMES,
     nthDegreeToPitch, getCurrentEDO, A0, C8, calcOctave, SOLFEGECONVERSIONTABLE,
      NOTESFLAT, NOTESSHARP, NOTESTEP, scaleDegreeToPitchMapping,
-     INTERVALVALUES, CENTSSYMBOL, noteToObj
+     INTERVALVALUES, CENTSSYMBOL, noteToObj, Mouse, MusicBlocks
   */
 
 /* exported setupPitchBlocks */
 
 function setupPitchBlocks(activity) {
+    /**
+     * Returns a unique stage listener name for a turtle by appending a numeric
+     * suffix if an active listener with the same base name already exists.
+     *
+     * @param {Object} tur - The turtle object.
+     * @param {string} baseName - The base name of the event listener.
+     * @returns {string} The unique listener name.
+     */
+    function getUniqueListenerName(tur, baseName) {
+        let name = baseName;
+        if (tur && tur.listeners) {
+            let suffix = 1;
+            while (name in tur.listeners) {
+                name = baseName + "_" + suffix++;
+            }
+        }
+        return name;
+    }
+
     class RestBlock extends ValueBlock {
         constructor() {
             super("rest");
@@ -1655,14 +1674,37 @@ function setupPitchBlocks(activity) {
         flow(args, logo, turtle, blk) {
             if (args[0] === undefined) return;
 
+            const execTur = activity.turtles.ithTurtle(turtle);
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
-            tur.singer.transposition += tur.singer.invertList.length > 0 ? 1 : -1;
+            const applied = tur.singer.invertList.length > 0 ? 1 : -1;
+            tur.singer.transposition += applied;
 
-            const listenerName = "_flat_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
+            const baseListenerName = "_flat_" + turtle + "_" + blk;
+            const listenerName = getUniqueListenerName(execTur, baseListenerName);
+            if (blk !== undefined && blk in activity.blocks.blockList) {
+                logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
+                const mouse =
+                    typeof Mouse !== "undefined" ? Mouse.getMouseFromTurtle(execTur) : null;
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
+            }
 
-            const __listener = event =>
-                (tur.singer.transposition += tur.singer.invertList.length > 0 ? -1 : 1);
+            let cleanedUp = false;
+            const __listener = () => {
+                if (cleanedUp) return;
+                cleanedUp = true;
+                if (execTur && execTur.listeners) {
+                    delete execTur.listeners[listenerName];
+                }
+                if (
+                    activity &&
+                    activity.stage &&
+                    typeof activity.stage.removeEventListener === "function"
+                ) {
+                    activity.stage.removeEventListener(listenerName, __listener, false);
+                }
+                tur.singer.transposition -= applied;
+            };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
 
@@ -1695,14 +1737,37 @@ function setupPitchBlocks(activity) {
         flow(args, logo, turtle, blk) {
             if (args[0] === undefined) return;
 
+            const execTur = activity.turtles.ithTurtle(turtle);
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
-            tur.singer.transposition += tur.singer.invertList.length > 0 ? -1 : 1;
+            const applied = tur.singer.invertList.length > 0 ? -1 : 1;
+            tur.singer.transposition += applied;
 
-            const listenerName = "_sharp_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
+            const baseListenerName = "_sharp_" + turtle + "_" + blk;
+            const listenerName = getUniqueListenerName(execTur, baseListenerName);
+            if (blk !== undefined && blk in activity.blocks.blockList) {
+                logo.setDispatchBlock(blk, turtle, listenerName);
+            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
+                const mouse =
+                    typeof Mouse !== "undefined" ? Mouse.getMouseFromTurtle(execTur) : null;
+                if (mouse !== null) mouse.MB.listeners.push(listenerName);
+            }
 
-            const __listener = event =>
-                (tur.singer.transposition += tur.singer.invertList.length > 0 ? 1 : -1);
+            let cleanedUp = false;
+            const __listener = () => {
+                if (cleanedUp) return;
+                cleanedUp = true;
+                if (execTur && execTur.listeners) {
+                    delete execTur.listeners[listenerName];
+                }
+                if (
+                    activity &&
+                    activity.stage &&
+                    typeof activity.stage.removeEventListener === "function"
+                ) {
+                    activity.stage.removeEventListener(listenerName, __listener, false);
+                }
+                tur.singer.transposition -= applied;
+            };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
 
