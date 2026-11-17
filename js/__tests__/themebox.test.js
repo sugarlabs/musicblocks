@@ -629,4 +629,30 @@ describe("ThemeBox", () => {
         expect(rhythmRow.style.backgroundColor).toBe(lightBg);
         expect(customRow.style.backgroundColor).toBe(lightBg);
     });
+
+    test("applyThemeInstantly() repaints the palette selector tab background", () => {
+        global.PALETTEICONS = { music: "<svg></svg>" };
+        global.MULTIPALETTEICONS = ["music"];
+        global.makePaletteIcons = jest.fn(() => ({ src: "data:image/svg+xml," }));
+
+        const palette = document.getElementById("palette");
+        palette.innerHTML =
+            "<div>" +
+            "<table><thead><tr>" +
+            '<td id="tab-music" style="background-color: #FFFFFF"><img src=""><div></div></td>' +
+            "</tr></thead></table>" +
+            "<table><tbody></tbody></table>" +
+            "</div>";
+
+        mockActivity.palettes = { cellSize: 32, dict: {}, activePalette: null };
+        const tab = document.getElementById("tab-music");
+
+        themeBox._theme = "dark";
+        themeBox.applyThemeInstantly();
+        expect(tab.style.backgroundColor).toBe("rgb(28, 28, 28)");
+
+        themeBox._theme = "light";
+        themeBox.applyThemeInstantly();
+        expect(tab.style.backgroundColor).toBe("rgb(255, 255, 255)");
+    });
 });
