@@ -163,6 +163,43 @@ function setupIntervalsActions(activity) {
         }
 
         /**
+         * Resolves a note with any number of accidentals (including repeated
+         * accidentals such as C### or G### generated in high EDOs like 53-EDO)
+         * to a standard 12-EDO semitone pitch relative to "C major" equal temperament.
+         *
+         * @static
+         * @param {string} note
+         * @returns {number|null} Pitch step in standard semitones, or null if invalid.
+         */
+        static noteToStandardSemitones(note) {
+            if (typeof note !== "string" || !note.length) {
+                return null;
+            }
+            const letter = note.charAt(0).toUpperCase();
+            if (NOTENAMES.indexOf(letter) === -1) {
+                return null;
+            }
+            const baseStep = pitchToNumber(letter, 0, "C major", "equal");
+            if (typeof baseStep !== "number" || isNaN(baseStep)) {
+                return null;
+            }
+            let accidentalShift = 0;
+            for (let i = 1; i < note.length; i++) {
+                const char = note.charAt(i);
+                if (char === "#" || char === "♯") {
+                    accidentalShift += 1;
+                } else if (char === "b" || char === "♭") {
+                    accidentalShift -= 1;
+                } else if (char === "x" || char === "*" || char === "𝄪") {
+                    accidentalShift += 2;
+                } else if (char === "𝄫") {
+                    accidentalShift -= 2;
+                }
+            }
+            return baseStep + accidentalShift;
+        }
+
+        /**
          * Calculates the standard 12-EDO semitone distance between two notes,
          * used to identify the diatonic interval name in SEMITONETOINTERVALMAP
          * regardless of the current tuning temperament.
@@ -178,8 +215,8 @@ function setupIntervalsActions(activity) {
             if (letterSteps === null) {
                 return 0;
             }
-            const firstStep = pitchToNumber(firstNote, 0, "C major", "equal");
-            const secondStep = pitchToNumber(secondNote, 0, "C major", "equal");
+            const firstStep = this.noteToStandardSemitones(firstNote);
+            const secondStep = this.noteToStandardSemitones(secondNote);
             if (
                 typeof firstStep !== "number" ||
                 typeof secondStep !== "number" ||

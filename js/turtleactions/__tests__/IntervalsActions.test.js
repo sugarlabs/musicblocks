@@ -414,9 +414,28 @@ describe("setupIntervalsActions", () => {
             expect(Singer.IntervalsActions.GetIntervalSemitones("C", "C", -1)).toBe(12);
         });
 
-        test("defensively handles non-string or NaN pitch inputs", () => {
+        test("defensively handles non-string, empty, or NaN pitch inputs", () => {
             expect(Singer.IntervalsActions.GetIntervalSemitones(null, "C", 0)).toBe(0);
             expect(Singer.IntervalsActions.GetIntervalSemitones("C", undefined, 0)).toBe(0);
+            expect(Singer.IntervalsActions.GetIntervalSemitones("", "C", 0)).toBe(0);
+            expect(Singer.IntervalsActions.GetIntervalSemitones("C", "", 0)).toBe(0);
+            expect(Singer.IntervalsActions.GetIntervalSemitones(NaN, "C", 0)).toBe(0);
+            expect(Singer.IntervalsActions.GetIntervalSemitones("C", NaN, 0)).toBe(0);
+        });
+
+        test("returns zero when pitch converter mock returns NaN or non-number", () => {
+            global.pitchToNumber.mockReturnValueOnce(NaN);
+            expect(Singer.IntervalsActions.GetIntervalSemitones("C", "D", 0)).toBe(0);
+
+            global.pitchToNumber.mockReturnValueOnce("not-a-number");
+            expect(Singer.IntervalsActions.GetIntervalSemitones("C", "D", 0)).toBe(0);
+        });
+
+        test("calculates correct semitones for repeated accidentals such as C### and G###", () => {
+            // C### and G### are both 3 sharps above their natural notes; distance is 7 semitones (fifth)
+            expect(Singer.IntervalsActions.GetIntervalSemitones("C###", "G###", 0)).toBe(7);
+            // Dbbb and Abbb are both 3 flats below their natural notes; distance is 7 semitones
+            expect(Singer.IntervalsActions.GetIntervalSemitones("Dbbb", "Abbb", 0)).toBe(7);
         });
     });
 
@@ -424,11 +443,13 @@ describe("setupIntervalsActions", () => {
         let originalTemperament;
         let originalMap;
         let originalPitchToNumber;
+        let originalGetCurrentEDO;
 
         beforeEach(() => {
             originalTemperament = logo.synth.inTemperament;
             originalMap = global.SEMITONETOINTERVALMAP;
             originalPitchToNumber = global.pitchToNumber;
+            originalGetCurrentEDO = global.getCurrentEDO;
 
             // Load real SEMITONETOINTERVALMAP
             const { SEMITONETOINTERVALMAP: REAL_MAP } = require("../../utils/musicutils-i18n.js");
@@ -440,10 +461,16 @@ describe("setupIntervalsActions", () => {
             } = require("../../utils/musicutils-pitchscale.js");
             global.pitchToNumber = realPitchToNumber;
 
+            const {
+                getCurrentEDO: realGetCurrentEDO
+            } = require("../../utils/musicutils-temperament.js");
+            global.getCurrentEDO = realGetCurrentEDO;
+
             global.TEMPERAMENT = {
                 "equal": { pitchNumber: 12 },
                 "equal19": { pitchNumber: 19 },
                 "equal31": { pitchNumber: 31 },
+                "equal53": { pitchNumber: 53 },
                 "1/4 comma meantone": { pitchNumber: 12 },
                 "just intonation": { pitchNumber: 12 },
                 "Pythagorean": { pitchNumber: 12 }
@@ -454,6 +481,7 @@ describe("setupIntervalsActions", () => {
             logo.synth.inTemperament = originalTemperament;
             global.SEMITONETOINTERVALMAP = originalMap;
             global.pitchToNumber = originalPitchToNumber;
+            global.getCurrentEDO = originalGetCurrentEDO;
         });
 
         test("19-EDO recognizes standard diatonic intervals correctly", () => {
@@ -528,6 +556,19 @@ describe("setupIntervalsActions", () => {
             expect(check("C", "G")).toBe("Perfect fifth");
             expect(check("C", "E")).toBe("Major third");
             expect(check("C", "C", 1)).toBe("Perfect octave");
+        });
+
+        test("53-EDO recognizes diatonic intervals with repeated accidentals such as C### and G###", () => {
+            logo.synth.inTemperament = "equal53";
+
+            const check = (first, second, oct = 0) => {
+                const notes = { firstNote: first, secondNote: second, octave: oct };
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                GetNotesForInterval.mockReturnValueOnce(notes);
+                return Singer.IntervalsActions.GetCurrentInterval(0);
+            };
+
+            expect(check("C###", "G###")).toBe("Perfect fifth");
         });
     });
 
