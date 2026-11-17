@@ -1714,3 +1714,193 @@ table.black > tbody > tr > td.spacer {
     background-color: var(--color-bg-primary) !important;
     color: var(--color-text-primary) !important;
 }
+
+/* ==========================================================================
+   Project Checker Widget — light, dark & high-contrast
+   ========================================================================== */
+
+.project-checker-widget {
+    background-color: var(--color-bg-primary) !important;
+    color: var(--color-text-primary) !important;
+    font-family: var(--font-family-system, "Fira Sans", Roboto, system-ui, sans-serif);
+}
+
+.project-checker-summary {
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
+}
+
+.project-checker-summary-clean {
+    background: linear-gradient(
+        135deg,
+        rgba(16, 185, 129, 0.12) 0%,
+        rgba(16, 185, 129, 0.04) 100%
+    ) !important;
+    border: 1px solid var(--color-success) !important;
+    border-left: 5px solid var(--color-success) !important;
+}
+
+.project-checker-clean-title {
+    color: var(--color-text-primary) !important;
+}
+
+.project-checker-clean-desc {
+    color: var(--color-text-secondary) !important;
+}
+
+.project-checker-stat-clean {
+    background-color: rgba(16, 185, 129, 0.15) !important;
+    color: var(--color-success) !important;
+    border: 1px solid rgba(16, 185, 129, 0.35) !important;
+}
+
+.project-checker-summary-issues {
+    background-color: var(--color-bg-secondary) !important;
+    border: 1px solid var(--color-border-primary) !important;
+}
+
+.project-checker-stat-issues {
+    background-color: var(--color-bg-tertiary) !important;
+    color: var(--color-text-secondary) !important;
+    border: 1px solid var(--color-border-primary) !important;
+}
+
+.project-checker-item {
+    background-color: var(--color-bg-secondary) !important;
+    border: 1px solid var(--color-border-secondary) !important;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.project-checker-item:hover {
+    background-color: var(--color-bg-tertiary) !important;
+    border-color: var(--color-border-primary) !important;
+    box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+}
+
+.project-checker-msg {
+    color: var(--color-text-primary) !important;
+}
+
+.project-checker-locate-btn {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 6px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    transition:
+        background-color 0.15s ease,
+        transform 0.1s ease,
+        box-shadow 0.15s ease;
+}
+
+.project-checker-locate-btn:hover {
+    background-color: #1d4ed8 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+.project-checker-locate-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* Dark Mode Overrides */
+.dark .project-checker-widget {
+    background-color: var(--color-bg-primary) !important;
+    color: var(--color-text-primary) !important;
+}
+
+.dark .project-checker-summary-clean {
+    background: linear-gradient(
+        135deg,
+        rgba(16, 185, 129, 0.2) 0%,
+        rgba(16, 185, 129, 0.06) 100%
+    ) !important;
+    border-color: rgba(16, 185, 129, 0.4) !important;
+    border-left: 5px solid var(--color-success) !important;
+}
+
+.dark .project-checker-summary-issues {
+    background-color: var(--color-bg-secondary) !important;
+    border-color: var(--color-border-primary) !important;
+}
+
+.dark .project-checker-item {
+    background-color: var(--color-bg-secondary) !important;
+    border-color: var(--color-border-secondary) !important;
+}
+
+.dark .project-checker-item:hover {
+    background-color: var(--color-bg-tertiary) !important;
+    border-color: var(--color-border-primary) !important;
+}
+
+.dark .project-checker-locate-btn {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+}
+
+.dark .project-checker-locate-btn:hover {
+    background-color: #1d4ed8 !important;
+}
+
+/* High Contrast Mode Overrides */
+.highcontrast .project-checker-widget {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+.highcontrast .project-checker-summary-clean {
+    background: #000000 !important;
+    border: 2px solid #00ff00 !important;
+    border-left: 6px solid #00ff00 !important;
+}
+
+.highcontrast .project-checker-summary-clean .project-checker-clean-title,
+.highcontrast .project-checker-summary-clean .project-checker-clean-desc {
+    color: #ffffff !important;
+}
+
+.highcontrast .project-checker-stat-clean {
+    background-color: #000000 !important;
+    color: #00ff00 !important;
+    border: 1px solid #00ff00 !important;
+}
+
+.highcontrast .project-checker-summary-issues {
+    background-color: #000000 !important;
+    border: 2px solid #ffffff !important;
+}
+
+.highcontrast .project-checker-stat-issues {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 1px solid #ffffff !important;
+}
+
+.highcontrast .project-checker-item {
+    background-color: #000000 !important;
+    border: 1px solid #ffffff !important;
+}
+
+.highcontrast .project-checker-item:hover {
+    background-color: #1a1a1a !important;
+    border: 1px solid #ffff00 !important;
+}
+
+.highcontrast .project-checker-locate-btn {
+    background-color: #ffff00 !important;
+    color: #000000 !important;
+    border: 1px solid #ffffff !important;
+}
+
+.highcontrast .project-checker-locate-btn:hover {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    outline: 2px solid #ffff00 !important;
+}

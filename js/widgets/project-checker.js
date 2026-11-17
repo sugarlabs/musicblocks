@@ -41,6 +41,11 @@ class ProjectCheckerWindow {
         this.widgetWindow.clear();
         this.widgetWindow.show();
 
+        const initialBody = this.widgetWindow.getWidgetBody();
+        if (initialBody && initialBody.classList) {
+            initialBody.classList.add("project-checker-widget");
+        }
+
         const reloadTooltip = gettext("Recheck Project");
         this.widgetWindow.addButton("reload.svg", 32, reloadTooltip).onclick = () => {
             this.refresh();
@@ -98,91 +103,132 @@ class ProjectCheckerWindow {
         const body = this.widgetWindow.getWidgetBody();
         body.textContent = "";
 
+        if (body.classList) {
+            body.classList.add("project-checker-widget");
+        }
         body.style.display = "flex";
         body.style.flexDirection = "column";
         body.style.gap = "12px";
-        body.style.padding = "14px 16px";
+        body.style.padding = "16px";
         body.style.overflowY = "auto";
-        body.style.fontFamily = "Arial, sans-serif";
+        body.style.fontFamily =
+            "var(--font-family-system, 'Fira Sans', Roboto, system-ui, sans-serif)";
         body.style.fontSize = "14px";
+        body.style.lineHeight = "1.5";
         body.style.boxSizing = "border-box";
-        body.style.maxHeight = "480px";
+        body.style.maxHeight = "500px";
+        body.style.minWidth = "440px";
+        body.style.backgroundColor = "var(--color-bg-primary, #ffffff)";
+        body.style.color = "var(--color-text-primary, #1f2937)";
 
         // Summary Card
         const summaryCard = document.createElement("div");
-        summaryCard.style.padding = "10px 14px";
-        summaryCard.style.borderRadius = "6px";
+        summaryCard.className = "project-checker-summary";
+        summaryCard.style.padding = "14px 16px";
+        summaryCard.style.borderRadius = "8px";
         summaryCard.style.display = "flex";
         summaryCard.style.justifyContent = "space-between";
         summaryCard.style.alignItems = "center";
         summaryCard.style.flexWrap = "wrap";
-        summaryCard.style.gap = "8px";
+        summaryCard.style.gap = "10px";
+        summaryCard.style.boxShadow = "var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08))";
 
         if (report.items.length === 0) {
-            summaryCard.style.backgroundColor = "#e8f5e9";
-            summaryCard.style.border = "1px solid #a5d6a7";
-            summaryCard.style.color = "#2e7d32";
+            summaryCard.classList.add("project-checker-summary-clean");
+            summaryCard.style.backgroundColor = "var(--color-success-bg, #ecfdf5)";
+            summaryCard.style.border = "1px solid var(--color-success, #10b981)";
+            summaryCard.style.borderLeft = "5px solid var(--color-success, #10b981)";
 
             const msgDiv = document.createElement("div");
             const title = document.createElement("strong");
+            title.className = "project-checker-clean-title";
             title.textContent = gettext("All Clear!");
-            title.style.display = "block";
-            title.style.marginBottom = "2px";
+            title.style.display = "flex";
+            title.style.alignItems = "center";
+            title.style.gap = "6px";
+            title.style.fontSize = "15px";
+            title.style.fontWeight = "700";
+            title.style.color = "var(--color-text-primary, #1f2937)";
 
-            const desc = document.createElement("span");
+            const desc = document.createElement("div");
+            desc.className = "project-checker-clean-desc";
             desc.textContent = gettext("No issues found. Your project is ready to play.");
+            desc.style.fontSize = "13px";
+            desc.style.marginTop = "2px";
+            desc.style.color = "var(--color-text-secondary, #4b5563)";
 
             msgDiv.appendChild(title);
             msgDiv.appendChild(desc);
             summaryCard.appendChild(msgDiv);
 
             const statsSpan = document.createElement("span");
+            statsSpan.className = "project-checker-stat-clean";
             statsSpan.style.fontSize = "12px";
-            statsSpan.style.opacity = "0.85";
+            statsSpan.style.fontWeight = "600";
+            statsSpan.style.backgroundColor = "rgba(16, 185, 129, 0.15)";
+            statsSpan.style.color = "var(--color-success, #10b981)";
+            statsSpan.style.border = "1px solid rgba(16, 185, 129, 0.35)";
+            statsSpan.style.borderRadius = "9999px";
+            statsSpan.style.padding = "3px 10px";
             statsSpan.textContent = `${report.summary.totalBlocks} ${gettext("blocks")}, ${report.summary.actionCount} ${gettext("actions")}`;
             summaryCard.appendChild(statsSpan);
         } else {
-            summaryCard.style.backgroundColor = "#fff3e0";
-            summaryCard.style.border = "1px solid #ffe0b2";
-            summaryCard.style.color = "#e65100";
+            summaryCard.classList.add("project-checker-summary-issues");
+            summaryCard.style.backgroundColor = "var(--color-bg-secondary, #f3f4f6)";
+            summaryCard.style.border = "1px solid var(--color-border-primary, #d1d5db)";
+
+            if (report.summary.errors > 0) {
+                summaryCard.style.borderLeft = "5px solid var(--color-error, #ef4444)";
+            } else if (report.summary.warnings > 0) {
+                summaryCard.style.borderLeft = "5px solid var(--color-warning, #f59e0b)";
+            } else {
+                summaryCard.style.borderLeft = "5px solid var(--color-info, #3b82f6)";
+            }
 
             const badgesDiv = document.createElement("div");
             badgesDiv.style.display = "flex";
             badgesDiv.style.gap = "8px";
             badgesDiv.style.alignItems = "center";
+            badgesDiv.style.flexWrap = "wrap";
 
             if (report.summary.errors > 0) {
                 const errBadge = document.createElement("span");
-                errBadge.style.backgroundColor = "#d32f2f";
+                errBadge.className = "project-checker-badge project-checker-badge-error";
+                errBadge.style.backgroundColor = "var(--color-error, #ef4444)";
                 errBadge.style.color = "#ffffff";
-                errBadge.style.padding = "2px 8px";
-                errBadge.style.borderRadius = "12px";
+                errBadge.style.padding = "3px 10px";
+                errBadge.style.borderRadius = "9999px";
                 errBadge.style.fontSize = "12px";
-                errBadge.style.fontWeight = "bold";
+                errBadge.style.fontWeight = "700";
+                errBadge.style.letterSpacing = "0.3px";
                 errBadge.textContent = `${report.summary.errors} ${gettext("Errors")}`;
                 badgesDiv.appendChild(errBadge);
             }
 
             if (report.summary.warnings > 0) {
                 const warnBadge = document.createElement("span");
-                warnBadge.style.backgroundColor = "#f57c00";
+                warnBadge.className = "project-checker-badge project-checker-badge-warning";
+                warnBadge.style.backgroundColor = "var(--color-warning, #f59e0b)";
                 warnBadge.style.color = "#ffffff";
-                warnBadge.style.padding = "2px 8px";
-                warnBadge.style.borderRadius = "12px";
+                warnBadge.style.padding = "3px 10px";
+                warnBadge.style.borderRadius = "9999px";
                 warnBadge.style.fontSize = "12px";
-                warnBadge.style.fontWeight = "bold";
+                warnBadge.style.fontWeight = "700";
+                warnBadge.style.letterSpacing = "0.3px";
                 warnBadge.textContent = `${report.summary.warnings} ${gettext("Warnings")}`;
                 badgesDiv.appendChild(warnBadge);
             }
 
             if (report.summary.notices > 0) {
                 const noticeBadge = document.createElement("span");
-                noticeBadge.style.backgroundColor = "#1976d2";
+                noticeBadge.className = "project-checker-badge project-checker-badge-notice";
+                noticeBadge.style.backgroundColor = "var(--color-info, #3b82f6)";
                 noticeBadge.style.color = "#ffffff";
-                noticeBadge.style.padding = "2px 8px";
-                noticeBadge.style.borderRadius = "12px";
+                noticeBadge.style.padding = "3px 10px";
+                noticeBadge.style.borderRadius = "9999px";
                 noticeBadge.style.fontSize = "12px";
-                noticeBadge.style.fontWeight = "bold";
+                noticeBadge.style.fontWeight = "700";
+                noticeBadge.style.letterSpacing = "0.3px";
                 noticeBadge.textContent = `${report.summary.notices} ${gettext("Notices")}`;
                 badgesDiv.appendChild(noticeBadge);
             }
@@ -190,8 +236,14 @@ class ProjectCheckerWindow {
             summaryCard.appendChild(badgesDiv);
 
             const statsSpan = document.createElement("span");
+            statsSpan.className = "project-checker-stat-issues";
             statsSpan.style.fontSize = "12px";
-            statsSpan.style.opacity = "0.85";
+            statsSpan.style.fontWeight = "600";
+            statsSpan.style.backgroundColor = "var(--color-bg-tertiary, #e5e7eb)";
+            statsSpan.style.color = "var(--color-text-secondary, #4b5563)";
+            statsSpan.style.border = "1px solid var(--color-border-primary, #d1d5db)";
+            statsSpan.style.borderRadius = "9999px";
+            statsSpan.style.padding = "3px 10px";
             statsSpan.textContent = `${report.summary.totalBlocks} ${gettext("blocks")}`;
             summaryCard.appendChild(statsSpan);
         }
@@ -201,6 +253,7 @@ class ProjectCheckerWindow {
         // Findings List
         if (report.items.length > 0) {
             const listContainer = document.createElement("div");
+            listContainer.className = "project-checker-list";
             listContainer.style.display = "flex";
             listContainer.style.flexDirection = "column";
             listContainer.style.gap = "8px";
@@ -208,59 +261,95 @@ class ProjectCheckerWindow {
             for (let i = 0; i < report.items.length; i++) {
                 const item = report.items[i];
                 const itemRow = document.createElement("div");
+                itemRow.className = "project-checker-item";
                 itemRow.style.display = "flex";
                 itemRow.style.justifyContent = "space-between";
                 itemRow.style.alignItems = "center";
-                itemRow.style.padding = "8px 12px";
-                itemRow.style.borderRadius = "4px";
-                itemRow.style.border = "1px solid #e0e0e0";
-                itemRow.style.backgroundColor = "#fafafa";
-                itemRow.style.gap = "10px";
+                itemRow.style.padding = "10px 14px";
+                itemRow.style.borderRadius = "8px";
+                itemRow.style.border = "1px solid var(--color-border-secondary, #e5e7eb)";
+                itemRow.style.backgroundColor = "var(--color-bg-secondary, #f3f4f6)";
+                itemRow.style.gap = "12px";
+                itemRow.style.boxShadow = "var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.04))";
+
+                if (item.severity === "error") {
+                    itemRow.style.borderLeft = "4px solid var(--color-error, #ef4444)";
+                } else if (item.severity === "warning") {
+                    itemRow.style.borderLeft = "4px solid var(--color-warning, #f59e0b)";
+                } else {
+                    itemRow.style.borderLeft = "4px solid var(--color-info, #3b82f6)";
+                }
 
                 const leftCol = document.createElement("div");
                 leftCol.style.display = "flex";
                 leftCol.style.alignItems = "center";
-                leftCol.style.gap = "8px";
+                leftCol.style.gap = "10px";
                 leftCol.style.flex = "1";
 
                 const tag = document.createElement("span");
+                tag.className = "project-checker-tag";
                 tag.style.fontSize = "11px";
-                tag.style.fontWeight = "bold";
+                tag.style.fontWeight = "700";
                 tag.style.textTransform = "uppercase";
-                tag.style.padding = "2px 6px";
-                tag.style.borderRadius = "3px";
+                tag.style.letterSpacing = "0.5px";
+                tag.style.padding = "3px 8px";
+                tag.style.borderRadius = "4px";
                 tag.style.color = "#ffffff";
+                tag.style.flexShrink = "0";
 
                 if (item.severity === "error") {
-                    tag.style.backgroundColor = "#d32f2f";
+                    tag.classList.add("project-checker-tag-error");
+                    tag.style.backgroundColor = "var(--color-error, #ef4444)";
                     tag.textContent = gettext("Error");
                 } else if (item.severity === "warning") {
-                    tag.style.backgroundColor = "#f57c00";
+                    tag.classList.add("project-checker-tag-warning");
+                    tag.style.backgroundColor = "var(--color-warning, #f59e0b)";
                     tag.textContent = gettext("Warning");
                 } else {
-                    tag.style.backgroundColor = "#1976d2";
+                    tag.classList.add("project-checker-tag-notice");
+                    tag.style.backgroundColor = "var(--color-info, #3b82f6)";
                     tag.textContent = gettext("Notice");
                 }
                 leftCol.appendChild(tag);
 
                 const msg = document.createElement("span");
+                msg.className = "project-checker-msg";
                 msg.textContent = item.message;
-                msg.style.color = "#333333";
+                msg.style.color = "var(--color-text-primary, #1f2937)";
+                msg.style.fontSize = "13.5px";
+                msg.style.lineHeight = "1.4";
+                msg.style.fontWeight = "500";
                 leftCol.appendChild(msg);
 
                 itemRow.appendChild(leftCol);
 
                 if (item.blockId !== null && item.blockId !== undefined) {
                     const locateBtn = document.createElement("button");
+                    locateBtn.className = "project-checker-locate-btn";
                     locateBtn.textContent = gettext("Locate");
-                    locateBtn.style.padding = "3px 8px";
+                    locateBtn.style.padding = "6px 14px";
                     locateBtn.style.fontSize = "12px";
+                    locateBtn.style.fontWeight = "600";
+                    locateBtn.style.fontFamily = "inherit";
                     locateBtn.style.cursor = "pointer";
-                    locateBtn.style.borderRadius = "3px";
-                    locateBtn.style.border = "1px solid #bdbdbd";
-                    locateBtn.style.backgroundColor = "#ffffff";
-                    locateBtn.style.color = "#333333";
+                    locateBtn.style.borderRadius = "6px";
+                    locateBtn.style.border = "none";
+                    locateBtn.style.backgroundColor = "#2563eb";
+                    locateBtn.style.color = "#ffffff";
                     locateBtn.style.whiteSpace = "nowrap";
+                    locateBtn.style.boxShadow = "0 1px 3px rgba(0, 0, 0, 0.15)";
+                    locateBtn.style.transition = "all 0.15s ease";
+
+                    locateBtn.addEventListener("mouseenter", () => {
+                        locateBtn.style.backgroundColor = "#1d4ed8";
+                        locateBtn.style.transform = "translateY(-1px)";
+                        locateBtn.style.boxShadow = "0 3px 6px rgba(0, 0, 0, 0.25)";
+                    });
+                    locateBtn.addEventListener("mouseleave", () => {
+                        locateBtn.style.backgroundColor = "#2563eb";
+                        locateBtn.style.transform = "translateY(0)";
+                        locateBtn.style.boxShadow = "0 1px 3px rgba(0, 0, 0, 0.15)";
+                    });
 
                     locateBtn.addEventListener("click", () => {
                         this._highlightBlock(item.blockId);
