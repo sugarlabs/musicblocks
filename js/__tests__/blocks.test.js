@@ -3930,15 +3930,66 @@ describe("Blocks Foundation", () => {
             );
         });
 
-        it("reports invalid data without queuing it behind a running load", () => {
-            blocks.loadNewBlocks(makeBatch(1));
+        it.each([
+            ["an object", { name: "equal", pitchNumber: 12 }],
+            ["null", null],
+            ["undefined", undefined]
+        ])(
+            "rejects %s during an active load, returning null and keeping active load intact",
+            (_label, notBlocks) => {
+                const initialToken = blocks.loadNewBlocks(makeBatch(1));
+                expect(blocks.isLoading()).toBe(true);
+                const activeToken = blocks._activeLoadToken;
+                const activeGeneration = blocks._activeLoadGeneration;
 
-            expect(blocks.loadNewBlocks({})).toBeNull();
-            expect(blocks.isLoading()).toBe(true);
-            expect(blocks._loadQueue).toHaveLength(0);
+                const res = blocks.loadNewBlocks(notBlocks);
+
+                expect(res).toBeNull();
+                expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                    "Cannot load project: invalid project structure."
+                );
+                expect(blocks._activeLoadToken).toBe(activeToken);
+                expect(blocks._activeLoadGeneration).toBe(activeGeneration);
+                expect(blocks.isLoading()).toBe(true);
+                expect(blocks._loadQueue).toHaveLength(0);
+            }
+        );
+
+        it("safely rejects non-array input during active load even if activity.errorMsg is missing", () => {
+            const savedErrorMsg = mockActivity.errorMsg;
+            delete mockActivity.errorMsg;
+            try {
+                blocks.loadNewBlocks(makeBatch(1));
+                expect(blocks.isLoading()).toBe(true);
+
+                let res;
+                expect(() => {
+                    res = blocks.loadNewBlocks({ invalid: "data" });
+                }).not.toThrow();
+
+                expect(res).toBeNull();
+                expect(blocks.isLoading()).toBe(true);
+                expect(blocks._loadQueue).toHaveLength(0);
+            } finally {
+                mockActivity.errorMsg = savedErrorMsg;
+            }
+        });
+
+        it("preserves _lastLoadFailed flag when an invalid non-array load is attempted", () => {
+            blocks._lastLoadFailed = true;
+
+            blocks.loadNewBlocks({ invalid: "data" });
+
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
                 "Cannot load project: invalid project structure."
             );
+            expect(blocks._lastLoadFailed).toBe(true);
+            expect(blocks.isLoading()).toBe(false);
+
+            // A subsequent successful load attempt clears the failure flag
+            blocks.loadNewBlocks([[0, "forward", 100, 100, [null, null]]]);
+            expect(blocks._lastLoadFailed).toBe(false);
+        });
         });
 
         it("runAfterLoad runs the callback right away when nothing is loading", () => {

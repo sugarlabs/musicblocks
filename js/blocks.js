@@ -5704,20 +5704,6 @@ class Blocks {
         this._loadNewBlocksNow = (blockObjs, loadToken) => {
             /** Suppress intermediate canvas redraws during block loading. */
             this.activity._suppressRefresh = true;
-            // Optimistically clear the previous attempt's failure flag; the
-            // catch blocks below set it again if this attempt fails too.
-            this._lastLoadFailed = false;
-            // Every load attempt gets its own generation, win or lose, so a
-            // completion that lands after this one has been abandoned can be
-            // told apart from a completion belonging to whatever load is
-            // active by the time it fires.
-            this._activeLoadGeneration += 1;
-            // Recorded so cleanupAfterLoad() — a shared method with no
-            // closure over any one call's loadToken — can still tag
-            // "finishedLoading" with the token of whichever load is
-            // current when it fires.
-            this._activeLoadToken = loadToken;
-            this._unsupportedBlocksInCurrentLoad = new Set();
 
             try {
                 /**
@@ -5731,6 +5717,7 @@ class Blocks {
                 const abortLoad = (warning, data, userMessage) => {
                     console.warn(warning);
                     console.debug(data);
+                    this._lastLoadFailed = true;
                     if (this.activity && typeof this.activity.errorMsg === "function") {
                         this.activity.errorMsg(
                             userMessage ||
@@ -5751,6 +5738,12 @@ class Blocks {
                     // the cleared workspace over the project.
                     this._afterLoadCallbacks.clear();
                     this._advanceLoadQueue();
+                    if (typeof pubsub !== "undefined" && typeof pubsub.emit === "function") {
+                        pubsub.emit("loadFailed", {
+                            token: loadToken,
+                            error: new Error(userMessage || warning)
+                        });
+                    }
                 };
 
                 if (!Array.isArray(blockObjs)) {
@@ -5761,6 +5754,22 @@ class Blocks {
                     );
                     return;
                 }
+
+                // Optimistically clear the previous attempt's failure flag only
+                // after validating that blockObjs is an array; an invalid non-array
+                // request must not erase an earlier load failure indication.
+                this._lastLoadFailed = false;
+                // Every load attempt gets its own generation, win or lose, so a
+                // completion that lands after this one has been abandoned can be
+                // told apart from a completion belonging to whatever load is
+                // active by the time it fires.
+                this._activeLoadGeneration += 1;
+                // Recorded so cleanupAfterLoad() — a shared method with no
+                // closure over any one call's loadToken — can still tag
+                // "finishedLoading" with the token of whichever load is
+                // current when it fires.
+                this._activeLoadToken = loadToken;
+                this._unsupportedBlocksInCurrentLoad = new Set();
 
                 for (let b = 0; b < blockObjs.length; b++) {
                     if (!blockObjs[b] || !Array.isArray(blockObjs[b])) {

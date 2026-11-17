@@ -720,6 +720,99 @@ describe("_loadStart", () => {
         expect(activity.justLoadStart).not.toHaveBeenCalled();
         expect(global.ErrorHandler.recoverable).not.toHaveBeenCalled();
     });
+
+    it.each([
+        ["an object", JSON.stringify({ name: "equal", pitchNumber: 12 })],
+        ["a number", "42"],
+        ["a boolean", "true"],
+        ["a string", '"just text"'],
+        ["null", "null"]
+    ])(
+        "rejects %s saved session data and recovers cleanly via loadFailed event",
+        async (_label, invalidData) => {
+            const removeItem = jest.fn();
+            const activity = makeActivity({
+                storage: {
+                    currentProject: "Test",
+                    ["SESSIONTest"]: invalidData,
+                    removeItem
+                }
+            });
+            activity.sessionData = invalidData;
+            activity.blocks.loadNewBlocks = jest.fn(data => {
+                const token = 42;
+                setTimeout(() => {
+                    global.pubsub.emit("loadFailed", {
+                        token,
+                        error: new Error("Invalid block data: expected an array of blocks.")
+                    });
+                }, 0);
+                return token;
+            });
+
+            const pm = new ProjectManager(activity);
+            await pm._loadStart(activity);
+            await new Promise(resolve => setTimeout(resolve, 0));
+
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith(JSON.parse(invalidData));
+            expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    message: "Invalid block data: expected an array of blocks."
+                }),
+                { operation: "loadSessionData" }
+            );
+            expect(removeItem).toHaveBeenCalledWith("SESSIONTest");
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Your saved project could not be loaded. Starting a new project."
+            );
+            expect(activity.justLoadStart).toHaveBeenCalled();
+        }
+    );
+
+    it("falls back to local storage when idb session data reports loadFailed", async () => {
+        const invalidIdbData = JSON.stringify({ corrupted: true });
+        const validLocalData = JSON.stringify([[0, "forward", 100, 100, [null, null]]]);
+        const deleteSession = jest.fn().mockResolvedValue();
+        const sessionStorageManager = {
+            loadSession: jest.fn().mockResolvedValue({
+                data: invalidIdbData,
+                timestamp: Date.now()
+            }),
+            deleteSession
+        };
+        const activity = makeActivity({
+            sessionStorageManager,
+            storage: {
+                currentProject: "Test",
+                ["SESSIONTest"]: validLocalData
+            }
+        });
+
+        let callCount = 0;
+        activity.blocks.loadNewBlocks = jest.fn(data => {
+            callCount++;
+            const token = callCount;
+            if (callCount === 1) {
+                setTimeout(() => {
+                    global.pubsub.emit("loadFailed", {
+                        token,
+                        error: new Error("Invalid block data: expected an array of blocks.")
+                    });
+                }, 0);
+            }
+            return token;
+        });
+
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(deleteSession).toHaveBeenCalledWith("SESSIONTest");
+        expect(activity.blocks.loadNewBlocks).toHaveBeenLastCalledWith([
+            [0, "forward", 100, 100, [null, null]]
+        ]);
+        expect(window.loadedSession).toBe(validLocalData);
+    });
 });
 
 // ---------------------------------------------------------------------------

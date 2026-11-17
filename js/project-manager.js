@@ -684,7 +684,9 @@ class ProjectManager {
                 }
             }
 
-            that.errorMsg(_("Your saved project could not be loaded. Starting a new project."));
+            if (that && typeof that.errorMsg === "function") {
+                that.errorMsg(_("Your saved project could not be loaded. Starting a new project."));
+            }
             that.justLoadStart();
         };
 
