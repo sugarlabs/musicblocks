@@ -148,6 +148,7 @@ class ToolbarUI {
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
+                ["checkProjectIcon", _("Check My Project")],
                 ["loadPluginIcon", _("Load plugin")],
                 ["delPluginIcon", _("Delete plugin")],
                 ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
@@ -228,6 +229,7 @@ class ToolbarUI {
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
+                ["checkProjectIcon", _("Check My Project")],
                 ["loadPluginIcon", _("Load plugin")],
                 ["delPluginIcon", _("Delete plugin")],
                 ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
@@ -1410,6 +1412,12 @@ class ToolbarUI {
                     displayStatsIcon.onclick = () => analytics_onclick(this.activity);
                 }
 
+                // Check My Project
+                const checkProjectIcon = docById("checkProjectIcon");
+                if (checkProjectIcon) {
+                    checkProjectIcon.style.display = "block";
+                }
+
                 // Load Plugin
                 const loadPluginIcon = docById("loadPluginIcon");
                 if (loadPluginIcon) {
@@ -1463,6 +1471,7 @@ class ToolbarUI {
                 // Hide all advanced icons in beginner mode
                 const advancedIcons = [
                     "displayStatsIcon",
+                    "checkProjectIcon",
                     "loadPluginIcon",
                     "delPluginIcon",
                     "enableHorizScrollIcon",
@@ -1668,6 +1677,20 @@ class ToolbarUI {
     }
 
     /**
+     * Renders the Check Project icon with the provided onclick handler.
+     *
+     * @public
+     * @param {Function} onclick - The onclick handler for the Check Project icon.
+     * @returns {void}
+     */
+    renderCheckProjectIcon(onclick) {
+        const icon = docById("checkProjectIcon");
+        if (icon) {
+            icon.onclick = () => onclick(this.activity);
+        }
+    }
+
+    /**
      * Renders the JavaScript icon with the provided onclick handler.
      *
      * @public
@@ -1847,7 +1870,7 @@ class ToolbarUI {
 
             // Aux toolbar button selectors (Option A: Playback & Inspection, Workspace & Tools, Preferences & Modes)
             const auxSelectors =
-                "#runSlowlyIcon, #runStepByStepIcon, #displayStatsIcon, #toggleJavaScriptIcon, " +
+                "#runSlowlyIcon, #runStepByStepIcon, #displayStatsIcon, #checkProjectIcon, #toggleJavaScriptIcon, " +
                 "#wrapTurtle, #enableHorizScrollIcon, #disableHorizScrollIcon, #restoreIcon, " +
                 "#chooseKeyIcon, #mergeWithCurrentIcon, #loadPluginIcon, #delPluginIcon, " +
                 "#beginnerMode, #advancedMode, #themeSelectIcon, #languageSelectIcon";

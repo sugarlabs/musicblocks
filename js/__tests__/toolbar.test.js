@@ -1230,6 +1230,16 @@ describe("Toolbar Class", () => {
         expect(chooseKeyDiv.style.display).toBe("none");
     });
 
+    test("renderCheckProjectIcon sets onclick and triggers check project", () => {
+        const checkProjectIcon = { onclick: null };
+        global.docById.mockReturnValue(checkProjectIcon);
+        const mockOnClick = jest.fn();
+        toolbar.renderCheckProjectIcon(mockOnClick);
+        expect(checkProjectIcon.onclick).toBeInstanceOf(Function);
+        checkProjectIcon.onclick();
+        expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity);
+    });
+
     test("renderJavaScriptIcon sets onclick and triggers JavaScript editor", () => {
         const toggleJavaScriptIcon = { onclick: null };
         global.docById.mockReturnValue(toggleJavaScriptIcon);

@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* global _, lazyLoad, HelpWidget, StatsWindow, JSEditor, getMacroExpansion, debugLog */
+/* global _, lazyLoad, HelpWidget, StatsWindow, JSEditor, getMacroExpansion, debugLog, ProjectCheckerWindow */
 
 /* exported setupHelpController, HelpController */
 
@@ -79,6 +79,13 @@ class HelpController {
         if (!this.activity.statsWindow || !this.activity.statsWindow.isOpen) {
             await lazyLoad("widgets/statistics");
             this.activity.statsWindow = new StatsWindow(this.activity);
+        }
+    }
+
+    async showProjectChecker() {
+        if (!this.activity.projectCheckerWindow || !this.activity.projectCheckerWindow.isOpen) {
+            await lazyLoad(["utils/project-validator", "widgets/project-checker"]);
+            this.activity.projectCheckerWindow = new ProjectCheckerWindow(this.activity);
         }
     }
 
@@ -450,6 +457,7 @@ const setupHelpController = activity => {
     activity.showKeyboardShortcuts = (...args) => controller.showKeyboardShortcuts(...args);
     activity.toggleJSWindow = (...args) => controller.toggleJSEditor(...args);
     activity.doAnalytics = (...args) => controller.showStats(...args);
+    activity.showProjectChecker = (...args) => controller.showProjectChecker(...args);
     activity._saveHelpBlocks = (...args) => controller.saveHelpBlocks(...args);
 
     return controller;
