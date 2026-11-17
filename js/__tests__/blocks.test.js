@@ -3992,6 +3992,18 @@ describe("Blocks Foundation", () => {
         });
         });
 
+        it("does not set _lastLoadFailed when an abort occurs before any block is created", () => {
+            blocks._lastLoadFailed = false;
+
+            blocks.loadNewBlocks([null]);
+
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Cannot load project: malformed block structure detected."
+            );
+            // Workspace remains intact, so autosave is not disabled
+            expect(blocks._lastLoadFailed).toBe(false);
+        });
+
         it("runAfterLoad runs the callback right away when nothing is loading", () => {
             const callback = jest.fn();
 

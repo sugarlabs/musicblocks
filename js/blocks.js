@@ -5717,7 +5717,6 @@ class Blocks {
                 const abortLoad = (warning, data, userMessage) => {
                     console.warn(warning);
                     console.debug(data);
-                    this._lastLoadFailed = true;
                     if (this.activity && typeof this.activity.errorMsg === "function") {
                         this.activity.errorMsg(
                             userMessage ||
