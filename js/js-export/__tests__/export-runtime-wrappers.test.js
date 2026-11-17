@@ -120,6 +120,8 @@ describe("MusicBlocks runtime API wrappers", () => {
             container: { x: 10, y: 20 }
         });
         globalActivity.turtles.getIndexOfTurtle.mockReturnValue(0);
+        Mouse.MouseList = [];
+        Mouse.AddedTurtles = [];
         mouse = new Mouse(jest.fn());
         mouse.run = jest.fn();
         musicBlocks = new MusicBlocks(mouse);
@@ -165,6 +167,7 @@ describe("MusicBlocks runtime API wrappers", () => {
             musicBlocks.setHeapEntry(null, 9);
             musicBlocks.setHeapEntry(2, undefined);
             expect(globalActivity.logo.turtleHeaps[musicBlocks.turIndex]).toEqual([1]);
+            expect(JSEditor.logConsole).toHaveBeenCalledTimes(2);
             expect(JSEditor.logConsole).toHaveBeenCalledWith(
                 "Missing heap index or value.",
                 "maroon"
@@ -205,6 +208,23 @@ describe("MusicBlocks runtime API wrappers", () => {
             musicBlocks.setHeapEntry(4, "x");
             expect(globalActivity.logo.turtleHeaps[musicBlocks.turIndex]).toEqual([0, 0, 0, "x"]);
         });
+
+        test("setHeapEntry accepts boundary and fractional indices without warning", () => {
+            globalActivity.logo.turtleHeaps[musicBlocks.turIndex] = [];
+            musicBlocks.setHeapEntry(1, "first");
+            musicBlocks.setHeapEntry(1000, "last");
+            let heap = globalActivity.logo.turtleHeaps[musicBlocks.turIndex];
+            expect(heap).toHaveLength(1000);
+            expect(heap[0]).toBe("first");
+            expect(heap[999]).toBe("last");
+            expect(JSEditor.logConsole).not.toHaveBeenCalled();
+
+            globalActivity.logo.turtleHeaps[musicBlocks.turIndex] = [];
+            musicBlocks.setHeapEntry(2.9, "floored");
+            heap = globalActivity.logo.turtleHeaps[musicBlocks.turIndex];
+            expect(heap).toEqual([0, "floored"]);
+            expect(JSEditor.logConsole).not.toHaveBeenCalled();
+        });
     });
 
     describe("position and camera getters", () => {
@@ -214,10 +234,19 @@ describe("MusicBlocks runtime API wrappers", () => {
             expect(musicBlocks.BOTTOMPOS).toBe(-200);
         });
 
-        test("BOTTOMPOS falls back to 0 without a usable canvas or scale", () => {
-            globalActivity.turtles._canvas = null;
-            globalActivity.turtles.scale = 1;
-            expect(musicBlocks.BOTTOMPOS).toBe(0);
+        test("BOTTOMPOS falls back to 0 when any canvas or scale guard fails", () => {
+            const cases = [
+                [null, 1], // no canvas
+                [{}, 1], // missing height
+                [{ height: 0 }, 1], // zero height
+                [{ height: 600 }, 0], // zero scale
+                [{ height: 600 }, undefined] // missing scale
+            ];
+            for (const [canvas, scale] of cases) {
+                globalActivity.turtles._canvas = canvas;
+                globalActivity.turtles.scale = scale;
+                expect(musicBlocks.BOTTOMPOS).toBe(0);
+            }
         });
 
         test("CAMERA returns the camera value", () => {
