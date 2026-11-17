@@ -413,18 +413,27 @@ const MusicKeyboardEditing = {
          */
         this._divideNotes = function (start, divideNoteBy) {
             start = parseInt(start, 10);
+            const minimumDuration = beginnerMode ? 0.125 : 0.0625;
+            let end = start;
+            let nextStart = Infinity;
+            for (const note of this._notesPlayed) {
+                if (parseInt(note.startTime, 10) === start) {
+                    if (note.duration / divideNoteBy >= minimumDuration) {
+                        end = Math.max(end, start + note.duration * 1000);
+                    }
+                } else if (note.startTime > start) {
+                    nextStart = Math.min(nextStart, note.startTime);
+                }
+            }
+
+            // A duration edit can make the subdivisions outgrow the recorded gap.
+            const shift = divideNoteBy > 1 ? Math.max(0, end - nextStart) : 0;
 
             this._notesPlayed = this._notesPlayed.reduce(function (prevValue, curValue) {
                 let newcurValue, newcurValue2, oldcurValue;
                 if (parseInt(curValue.startTime, 10) === start) {
-                    if (beginnerMode) {
-                        if (curValue.duration / divideNoteBy < 0.125) {
-                            return prevValue.concat([curValue]);
-                        }
-                    } else {
-                        if (curValue.duration / divideNoteBy < 0.0625) {
-                            return prevValue.concat([curValue]);
-                        }
+                    if (curValue.duration / divideNoteBy < minimumDuration) {
+                        return prevValue.concat([curValue]);
                     }
 
                     newcurValue = Object.assign({}, curValue);
@@ -444,6 +453,9 @@ const MusicKeyboardEditing = {
                     return prevValue;
                 }
 
+                if (curValue.startTime > start) {
+                    curValue.startTime += shift;
+                }
                 return prevValue.concat([curValue]);
             }, []);
 
