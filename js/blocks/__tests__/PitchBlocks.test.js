@@ -1670,6 +1670,8 @@ describe("setupPitchBlocks", () => {
                 tur.singer.transposition = 0;
                 tur.singer.invertList = [["sol", 4, "even"]];
                 tur.listeners = {};
+                activity.blocks.blockList["invFlat"] = {};
+                activity.blocks.blockList["invSharp"] = {};
                 logo.setTurtleListener.mockImplementation((t, name, fn) => {
                     tur.listeners[name] = fn;
                 });
@@ -1687,6 +1689,82 @@ describe("setupPitchBlocks", () => {
                 expect(tur.singer.transposition).toBe(0);
 
                 tur.singer.invertList = [];
+            });
+
+            it("FlatBlock and SharpBlock flow return safely and do not mutate state when blk is invalid or unlisted", () => {
+                const flatBlock = createdBlocks["flat"];
+                const sharpBlock = createdBlocks["sharp"];
+                const tur = turtles.ithTurtle(0);
+                const invalidIds = [undefined, null, "", "nonexistent", 99999];
+
+                for (const blk of invalidIds) {
+                    tur.singer.transposition = 0;
+                    tur.listeners = {};
+                    logo.setDispatchBlock.mockClear();
+                    logo.setTurtleListener.mockClear();
+
+                    expect(() => {
+                        flatBlock.flow(["child"], logo, 0, blk);
+                    }).not.toThrow();
+                    expect(tur.singer.transposition).toBe(0);
+                    expect(tur.listeners).toEqual({});
+                    expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+                    expect(logo.setTurtleListener).not.toHaveBeenCalled();
+
+                    expect(() => {
+                        sharpBlock.flow(["child"], logo, 0, blk);
+                    }).not.toThrow();
+                    expect(tur.singer.transposition).toBe(0);
+                    expect(tur.listeners).toEqual({});
+                    expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+                    expect(logo.setTurtleListener).not.toHaveBeenCalled();
+                }
+            });
+
+            it("FlatBlock and SharpBlock flow register with mouse when MusicBlocks.isRun is true", () => {
+                const flatBlock = createdBlocks["flat"];
+                const sharpBlock = createdBlocks["sharp"];
+                const tur = turtles.ithTurtle(0);
+                const mockListeners = [];
+                const origMusicBlocks = global.MusicBlocks;
+                const origMouse = global.Mouse;
+
+                global.MusicBlocks = { isRun: true };
+                global.Mouse = {
+                    getMouseFromTurtle: jest.fn(() => ({ MB: { listeners: mockListeners } }))
+                };
+                logo.setTurtleListener.mockImplementation((t, name, fn) => {
+                    tur.listeners[name] = fn;
+                });
+
+                try {
+                    tur.singer.transposition = 0;
+                    tur.listeners = {};
+                    mockListeners.length = 0;
+
+                    flatBlock.flow(["child"], logo, 0, undefined);
+                    expect(tur.singer.transposition).toBe(-1);
+                    expect(mockListeners.length).toBe(1);
+                    const flatListenerName = mockListeners[0];
+                    expect(typeof tur.listeners[flatListenerName]).toBe("function");
+
+                    tur.listeners[flatListenerName]();
+                    expect(tur.singer.transposition).toBe(0);
+
+                    // SharpBlock under mouse mode
+                    mockListeners.length = 0;
+                    sharpBlock.flow(["child"], logo, 0, 99999);
+                    expect(tur.singer.transposition).toBe(1);
+                    expect(mockListeners.length).toBe(1);
+                    const sharpListenerName = mockListeners[0];
+                    expect(typeof tur.listeners[sharpListenerName]).toBe("function");
+
+                    tur.listeners[sharpListenerName]();
+                    expect(tur.singer.transposition).toBe(0);
+                } finally {
+                    global.MusicBlocks = origMusicBlocks;
+                    global.Mouse = origMouse;
+                }
             });
 
             it("AccidentalNameBlock arg", () => {

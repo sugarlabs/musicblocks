@@ -1674,6 +1674,24 @@ function setupPitchBlocks(activity) {
         flow(args, logo, turtle, blk) {
             if (args[0] === undefined) return;
 
+            const hasBlockList =
+                activity &&
+                activity.blocks &&
+                typeof activity.blocks.blockList === "object" &&
+                activity.blocks.blockList !== null;
+            const hasValidBlock =
+                hasBlockList &&
+                blk !== undefined &&
+                blk !== null &&
+                blk in activity.blocks.blockList;
+            const isMouseRun = typeof MusicBlocks !== "undefined" && MusicBlocks.isRun;
+
+            // When dispatch registration cannot be guaranteed, return safely before
+            // mutating state to prevent un-unwound transposition drift and orphaned listeners.
+            if (!hasValidBlock && !isMouseRun) {
+                return;
+            }
+
             const execTur = activity.turtles.ithTurtle(turtle);
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
             const applied = tur.singer.invertList.length > 0 ? 1 : -1;
@@ -1681,12 +1699,14 @@ function setupPitchBlocks(activity) {
 
             const baseListenerName = "_flat_" + turtle + "_" + blk;
             const listenerName = getUniqueListenerName(execTur, baseListenerName);
-            if (blk !== undefined && blk in activity.blocks.blockList) {
+            if (hasValidBlock) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
+            } else if (isMouseRun) {
                 const mouse =
                     typeof Mouse !== "undefined" ? Mouse.getMouseFromTurtle(execTur) : null;
-                if (mouse !== null) mouse.MB.listeners.push(listenerName);
+                if (mouse !== null && mouse.MB && Array.isArray(mouse.MB.listeners)) {
+                    mouse.MB.listeners.push(listenerName);
+                }
             }
 
             let cleanedUp = false;
@@ -1737,6 +1757,24 @@ function setupPitchBlocks(activity) {
         flow(args, logo, turtle, blk) {
             if (args[0] === undefined) return;
 
+            const hasBlockList =
+                activity &&
+                activity.blocks &&
+                typeof activity.blocks.blockList === "object" &&
+                activity.blocks.blockList !== null;
+            const hasValidBlock =
+                hasBlockList &&
+                blk !== undefined &&
+                blk !== null &&
+                blk in activity.blocks.blockList;
+            const isMouseRun = typeof MusicBlocks !== "undefined" && MusicBlocks.isRun;
+
+            // When dispatch registration cannot be guaranteed, return safely before
+            // mutating state to prevent un-unwound transposition drift and orphaned listeners.
+            if (!hasValidBlock && !isMouseRun) {
+                return;
+            }
+
             const execTur = activity.turtles.ithTurtle(turtle);
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
             const applied = tur.singer.invertList.length > 0 ? -1 : 1;
@@ -1744,12 +1782,14 @@ function setupPitchBlocks(activity) {
 
             const baseListenerName = "_sharp_" + turtle + "_" + blk;
             const listenerName = getUniqueListenerName(execTur, baseListenerName);
-            if (blk !== undefined && blk in activity.blocks.blockList) {
+            if (hasValidBlock) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
-            } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
+            } else if (isMouseRun) {
                 const mouse =
                     typeof Mouse !== "undefined" ? Mouse.getMouseFromTurtle(execTur) : null;
-                if (mouse !== null) mouse.MB.listeners.push(listenerName);
+                if (mouse !== null && mouse.MB && Array.isArray(mouse.MB.listeners)) {
+                    mouse.MB.listeners.push(listenerName);
+                }
             }
 
             let cleanedUp = false;

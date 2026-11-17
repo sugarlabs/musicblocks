@@ -668,17 +668,69 @@ describe("FlatBlock and SharpBlock clamp lifecycle, nesting, and transposition s
         expect(executingTur.listeners["_flat_0_1"]).toBeUndefined();
     });
 
-    test("Test 14 — Graceful handling when blk is undefined or not in blockList", () => {
+    test("Test 14 — Graceful handling when blk is undefined, null, or not in blockList", () => {
         const tur = turtlesList[0];
-        expect(() => {
-            protos.flat.flow([null], logo, 0, undefined);
-        }).not.toThrow();
+        const invalidBlockIds = [undefined, null, "", "nonexistent", 99999];
 
-        expect(tur.singer.transposition).toBe(-1);
-        const listenerName = Object.keys(tur.listeners)[0];
-        expect(listenerName).toBe("_flat_0_undefined");
+        // 1. In standard execution (not mouse run), invalid blk must safely return
+        // without mutating transposition or leaking listeners on turtle or stage.
+        global.MusicBlocks.isRun = false;
+        for (const blk of invalidBlockIds) {
+            tur.singer.transposition = 0;
+            tur.listeners = {};
 
-        tur.listeners[listenerName]();
-        expect(tur.singer.transposition).toBe(0);
+            expect(() => {
+                protos.flat.flow([2], logo, 0, blk);
+            }).not.toThrow();
+            expect(tur.singer.transposition).toBe(0);
+            expect(activeClampListeners(tur)).toEqual([]);
+            expect(activeStageClampListeners(activity)).toEqual([]);
+
+            expect(() => {
+                protos.sharp.flow([2], logo, 0, blk);
+            }).not.toThrow();
+            expect(tur.singer.transposition).toBe(0);
+            expect(activeClampListeners(tur)).toEqual([]);
+            expect(activeStageClampListeners(activity)).toEqual([]);
+        }
+
+        // 2. In mouse execution mode (MusicBlocks.isRun = true), listener is tracked
+        // in mouse.MB.listeners and unwinds symmetrically when triggered.
+        try {
+            global.MusicBlocks.isRun = true;
+            const mockListeners = [];
+            global.Mouse.getMouseFromTurtle.mockReturnValue({ MB: { listeners: mockListeners } });
+
+            tur.singer.transposition = 0;
+            tur.listeners = {};
+            protos.flat.flow([2], logo, 0, undefined);
+
+            expect(tur.singer.transposition).toBe(-1);
+            expect(mockListeners.length).toBe(1);
+            const flatListenerName = mockListeners[0];
+            expect(typeof tur.listeners[flatListenerName]).toBe("function");
+
+            // Firing listener restores state and cleans up
+            tur.listeners[flatListenerName]();
+            expect(tur.singer.transposition).toBe(0);
+            expect(tur.listeners[flatListenerName]).toBeUndefined();
+
+            // Sharp in mouse mode
+            mockListeners.length = 0;
+            tur.singer.transposition = 0;
+            tur.listeners = {};
+            protos.sharp.flow([2], logo, 0, 99999);
+
+            expect(tur.singer.transposition).toBe(1);
+            expect(mockListeners.length).toBe(1);
+            const sharpListenerName = mockListeners[0];
+            expect(typeof tur.listeners[sharpListenerName]).toBe("function");
+
+            tur.listeners[sharpListenerName]();
+            expect(tur.singer.transposition).toBe(0);
+            expect(tur.listeners[sharpListenerName]).toBeUndefined();
+        } finally {
+            global.MusicBlocks.isRun = false;
+        }
     });
 });
