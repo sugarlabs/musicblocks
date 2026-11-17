@@ -298,6 +298,7 @@ class ThemeBox {
                             this.activity.palettes.cellSize,
                             this.activity.palettes.cellSize
                         );
+                        tr.children[j].style.backgroundColor = platformColor.paletteBackground;
                         tr.children[j].children[0].src = img.src;
                         tr.children[j].children[1].style.background =
                             platformColor.paletteLabelBackground;
