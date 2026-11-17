@@ -759,6 +759,148 @@ describe("ProjectValidator", () => {
         });
     });
 
+    describe("Music & Math Runtime Safety", () => {
+        test("detects ERR_ZERO_DIVISION when divide or mod block divides by literal zero in a runnable stack", () => {
+            const blockList = [
+                {
+                    name: "start",
+                    trash: false,
+                    connections: [null, 1]
+                },
+                {
+                    name: "forward",
+                    trash: false,
+                    connections: [0, 2],
+                    protoblock: { args: 1, dockTypes: ["out", "numberin", "in"] }
+                },
+                {
+                    name: "divide",
+                    trash: false,
+                    connections: [1, 3, 4],
+                    protoblock: { args: 2, dockTypes: ["numberout", "anyin", "anyin"] }
+                },
+                {
+                    name: "number",
+                    trash: false,
+                    value: 10,
+                    isValueBlock: () => true,
+                    connections: [2]
+                },
+                {
+                    name: "number",
+                    trash: false,
+                    value: 0,
+                    isValueBlock: () => true,
+                    connections: [2]
+                }
+            ];
+
+            const report = validateProject({ blocks: { blockList } });
+            const zeroDiv = report.items.find(i => i.code === VALIDATOR_CODES.ERR_ZERO_DIVISION);
+            expect(zeroDiv).toBeDefined();
+            expect(zeroDiv.blockId).toBe(2);
+            expect(zeroDiv.blockName).toBe("divide");
+            expect(zeroDiv.message).toContain('Block "divide" divides by zero.');
+        });
+
+        test("detects ERR_INVALID_NOTE_VALUE when note block duration is non-positive", () => {
+            const blockList = [
+                {
+                    name: "start",
+                    trash: false,
+                    connections: [null, 1]
+                },
+                {
+                    name: "newnote",
+                    trash: false,
+                    connections: [0, 2, null, null],
+                    protoblock: { args: 1, dockTypes: ["out", "numberin", "in"] }
+                },
+                {
+                    name: "number",
+                    trash: false,
+                    value: 0,
+                    isValueBlock: () => true,
+                    connections: [1]
+                }
+            ];
+
+            const report = validateProject({ blocks: { blockList } });
+            const invalidNote = report.items.find(
+                i => i.code === VALIDATOR_CODES.ERR_INVALID_NOTE_VALUE
+            );
+            expect(invalidNote).toBeDefined();
+            expect(invalidNote.blockName).toBe("newnote");
+            expect(invalidNote.message).toBe("Note value must be greater than 0.");
+        });
+
+        test("unwraps vertical spacers (vspace) to detect empty action bodies with hidden sentinels", () => {
+            const blockList = [
+                {
+                    name: "action",
+                    trash: false,
+                    connections: [null, 1, 2]
+                },
+                {
+                    name: "text",
+                    trash: false,
+                    value: "spacedAction",
+                    isValueBlock: () => true,
+                    connections: [0]
+                },
+                {
+                    name: "vspace",
+                    trash: false,
+                    connections: [0, 3]
+                },
+                {
+                    name: "hiddennoflow",
+                    trash: false,
+                    connections: [2, null]
+                }
+            ];
+
+            const report = validateProject({ blocks: { blockList } });
+            const emptyAct = report.items.find(i => i.code === VALIDATOR_CODES.WARN_EMPTY_ACTION);
+            expect(emptyAct).toBeDefined();
+            expect(emptyAct.actionName).toBe("spacedAction");
+        });
+
+        test("does NOT treat loose layout spacers or sentinels as orphan executable stacks", () => {
+            const blockList = [
+                {
+                    name: "start",
+                    trash: false,
+                    connections: [null, null]
+                },
+                {
+                    name: "vspace",
+                    trash: false,
+                    connections: [null, null]
+                },
+                {
+                    name: "hspace",
+                    trash: false,
+                    connections: [null, null]
+                },
+                {
+                    name: "hidden",
+                    trash: false,
+                    connections: [null, null]
+                },
+                {
+                    name: "hiddennoflow",
+                    trash: false,
+                    connections: [null, null]
+                }
+            ];
+
+            const report = validateProject({ blocks: { blockList } });
+            const orphan = report.items.find(i => i.code === VALIDATOR_CODES.INFO_ORPHAN_STACK);
+            expect(orphan).toBeUndefined();
+        });
+    });
+
     describe("Performance test", () => {
         test("analyzes a large project with 500 blocks in under 50ms", () => {
             const blockList = [];

@@ -19,6 +19,8 @@ const VALIDATOR_CODES = {
     ERR_MISSING_ACTION: "ERR_MISSING_ACTION",
     ERR_ACTION_NO_NAME: "ERR_ACTION_NO_NAME",
     ERR_MISSING_ARGUMENT: "ERR_MISSING_ARGUMENT",
+    ERR_ZERO_DIVISION: "ERR_ZERO_DIVISION",
+    ERR_INVALID_NOTE_VALUE: "ERR_INVALID_NOTE_VALUE",
     WARN_DUPLICATE_ACTION: "WARN_DUPLICATE_ACTION",
     WARN_EMPTY_ACTION: "WARN_EMPTY_ACTION",
     WARN_NO_START: "WARN_NO_START",
@@ -41,8 +43,8 @@ const ACTION_CALL_BLOCKS = [
 const START_BLOCK_NAMES = ["start", "drum", "status", "oscilloscope"];
 
 /**
- * Traverses forward through horizontal spacer blocks (hspace) to find
- * the actual underlying target block id.
+ * Traverses forward through horizontal or vertical spacer blocks (hspace, vspace)
+ * to find the actual underlying target block id.
  *
  * @param {number|null} blkId - Initial block id
  * @param {Array} blockList - The blocks list
@@ -55,12 +57,28 @@ function unwrapSpacers(blkId, blockList) {
         curr !== null &&
         curr !== undefined &&
         blockList[curr] &&
-        blockList[curr].name === "hspace" &&
+        (blockList[curr].name === "hspace" || blockList[curr].name === "vspace") &&
         guard++ < 50
     ) {
         curr = blockList[curr].connections ? blockList[curr].connections[1] : null;
     }
     return curr;
+}
+
+/**
+ * Checks whether a block is a visual spacer or terminal clamp sentinel.
+ *
+ * @param {Object} blk - Block instance
+ * @returns {boolean} True if the block is a spacer or terminal sentinel
+ */
+function isSpacerOrSentinel(blk) {
+    if (!blk) return false;
+    return (
+        blk.name === "hspace" ||
+        blk.name === "vspace" ||
+        blk.name === "hidden" ||
+        blk.name === "hiddennoflow"
+    );
 }
 
 /**
@@ -245,7 +263,8 @@ function validateProject(activity) {
                 unwrappedBody === undefined ||
                 !blockList[unwrappedBody] ||
                 blockList[unwrappedBody].trash ||
-                blockList[unwrappedBody].name === "hidden";
+                blockList[unwrappedBody].name === "hidden" ||
+                blockList[unwrappedBody].name === "hiddennoflow";
 
             if (isBodyEmpty) {
                 items.push({
@@ -417,13 +436,53 @@ function validateProject(activity) {
         }
     }
 
-    // Step 5: Check for missing arguments on runnable flow blocks
+    // Step 5: Check for missing arguments & runtime hazards on runnable blocks
     for (const id of runnableBlockIndices) {
         const b = blockList[id];
-        if (!b || b.trash || !b.protoblock) continue;
+        if (!b || b.trash) continue;
+
+        // Check for static division/modulo by zero
+        if (b.name === "divide" || b.name === "mod") {
+            const divisorId = b.connections ? b.connections[2] : null;
+            const divisorVal = extractLiteralName(divisorId, blockList);
+            if (
+                divisorVal !== null &&
+                divisorVal.trim() !== "" &&
+                !isNaN(Number(divisorVal)) &&
+                Number(divisorVal) === 0
+            ) {
+                items.push({
+                    severity: "error",
+                    code: VALIDATOR_CODES.ERR_ZERO_DIVISION,
+                    blockId: id,
+                    blockName: b.name,
+                    message: formatMessage(gettext('Block "%s" divides by zero.'), b.name)
+                });
+            }
+        }
+
+        // Check for non-positive note value duration
+        if (b.name === "newnote" || b.name === "note") {
+            const durationId = b.connections ? b.connections[1] : null;
+            const durationVal = extractLiteralName(durationId, blockList);
+            if (
+                durationVal !== null &&
+                durationVal.trim() !== "" &&
+                !isNaN(Number(durationVal)) &&
+                Number(durationVal) <= 0
+            ) {
+                items.push({
+                    severity: "error",
+                    code: VALIDATOR_CODES.ERR_INVALID_NOTE_VALUE,
+                    blockId: id,
+                    blockName: b.name,
+                    message: gettext("Note value must be greater than 0.")
+                });
+            }
+        }
 
         const proto = b.protoblock;
-        if (proto.args > 0 && Array.isArray(proto.dockTypes)) {
+        if (proto && proto.args > 0 && Array.isArray(proto.dockTypes)) {
             // Socket 0 is top flow; arguments start from 1 up to proto.args
             for (let dock = 1; dock <= proto.args; dock++) {
                 const dockType = proto.dockTypes[dock];
@@ -449,8 +508,8 @@ function validateProject(activity) {
                 continue;
             }
 
-            // Exclude single unconnected argument/value blocks (loose numbers, pitches, etc.)
-            if (isValueOrArgBlock(blk)) {
+            // Exclude single unconnected argument/value blocks or layout spacers/sentinels
+            if (isValueOrArgBlock(blk) || isSpacerOrSentinel(blk)) {
                 continue;
             }
 
@@ -474,7 +533,7 @@ function validateProject(activity) {
         let hasExecutable = false;
         for (let i = 0; i < blockList.length; i++) {
             const b = blockList[i];
-            if (b && !b.trash && !isValueOrArgBlock(b)) {
+            if (b && !b.trash && !isValueOrArgBlock(b) && !isSpacerOrSentinel(b)) {
                 hasExecutable = true;
                 break;
             }
