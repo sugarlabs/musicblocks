@@ -813,6 +813,22 @@ describe("_loadStart", () => {
         ]);
         expect(window.loadedSession).toBe(validLocalData);
     });
+
+    it("handles active load returning null when session data is invalid", async () => {
+        const activity = makeActivity({
+            storage: {
+                currentProject: "Test",
+                ["SESSIONTest"]: JSON.stringify({ corrupted: true })
+            }
+        });
+        activity.blocks.loadNewBlocks = jest.fn(() => null);
+
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+
+        expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith({ corrupted: true });
+        expect(activity.justLoadStart).not.toHaveBeenCalled();
+    });
 });
 
 // ---------------------------------------------------------------------------

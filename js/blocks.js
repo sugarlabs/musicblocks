@@ -5738,10 +5738,12 @@ class Blocks {
                     this._afterLoadCallbacks.clear();
                     this._advanceLoadQueue();
                     if (typeof pubsub !== "undefined" && typeof pubsub.emit === "function") {
-                        pubsub.emit("loadFailed", {
-                            token: loadToken,
-                            error: new Error(userMessage || warning)
-                        });
+                        setTimeout(() => {
+                            pubsub.emit("loadFailed", {
+                                token: loadToken,
+                                error: new Error(userMessage || warning)
+                            });
+                        }, 0);
                     }
                 };
 
