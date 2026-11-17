@@ -335,6 +335,52 @@ describe("FocusCycleManager module", () => {
 
             manager.dispose();
         });
+
+        test("clicking a number editor does not steal its focus", () => {
+            document.body.innerHTML = `
+                <div id="canvasHolder">
+                    <div id="labelDiv">
+                        <input id="numberLabel" type="number" value="10" />
+                    </div>
+                </div>
+            `;
+
+            const manager = new FocusCycleManager();
+            const focusSpy = jest.spyOn(manager, "_focusWorkspaceFromMouse");
+
+            manager.init();
+
+            const input = document.getElementById("numberLabel");
+            input.focus();
+
+            input.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+            expect(focusSpy).not.toHaveBeenCalled();
+            expect(document.activeElement).toBe(input);
+
+            manager.dispose();
+        });
+
+        test("clicking the workspace still triggers workspace focus", () => {
+            document.body.innerHTML = `
+                <div id="canvasHolder"></div>
+            `;
+
+            const manager = new FocusCycleManager();
+            const focusSpy = jest
+                .spyOn(manager, "_focusWorkspaceFromMouse")
+                .mockImplementation(() => {});
+
+            manager.init();
+
+            document
+                .getElementById("canvasHolder")
+                .dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+            expect(focusSpy).toHaveBeenCalledTimes(1);
+
+            manager.dispose();
+        });
     });
 
     describe("legacy export compatibility", () => {
