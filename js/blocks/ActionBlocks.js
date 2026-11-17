@@ -1196,6 +1196,13 @@ function setupActionBlocks(activity) {
             // Dispatch an event.
             if (args.length !== 1) return;
 
+            if (args[0] === null) {
+                // The name slot is empty. parseArg has already put "Missing
+                // argument." on the block, so stopping is all that is left to do.
+                logo.stopTurtle = true;
+                return;
+            }
+
             // If the event is not in the event list, add it.
             if (!(args[0] in logo.eventList)) {
                 const event = new Event(args[0]);

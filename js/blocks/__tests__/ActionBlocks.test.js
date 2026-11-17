@@ -384,11 +384,15 @@ describe("ActionBlocks", () => {
             expect(logo.eventList).toHaveProperty("event1");
         });
 
-        test("handles null event name", () => {
+        test("halts on an empty event name instead of broadcasting one", () => {
             const block = getBlock("dispatch");
+            logo.stopTurtle = false;
+
             block.flow([null], logo, 0, 15);
 
-            expect(activity.stage.dispatchEvent).toHaveBeenCalledWith(null);
+            expect(activity.stage.dispatchEvent).not.toHaveBeenCalled();
+            expect(logo.eventList).toEqual({});
+            expect(logo.stopTurtle).toBe(true);
         });
     });
 
