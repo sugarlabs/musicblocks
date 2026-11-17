@@ -116,7 +116,14 @@ function isValueOrArgBlock(blk) {
     if (typeof blk.isArgBlock === "function" && blk.isArgBlock()) return true;
     if (typeof blk.isValueBlock === "function" && blk.isValueBlock()) return true;
     const style = blk.protoblock?.style;
-    return style === "value" || style === "arg" || style === "twoarg";
+    if (style === "value" || style === "arg") return true;
+    if (style === "twoarg") {
+        const outDock = blk.protoblock?.dockTypes?.[0];
+        if (outDock && outDock !== "out") {
+            return true;
+        }
+    }
+    return false;
 }
 
 /**
@@ -172,6 +179,20 @@ function validateProject(activity) {
 
     const blockList = activity.blocks.blockList;
     const items = [];
+    const reportedMissingArgs = new Set();
+    const addMissingArgWarning = (blockId, blockName, argIndex) => {
+        const key = `${blockId}:${argIndex}`;
+        if (reportedMissingArgs.has(key)) return;
+        reportedMissingArgs.add(key);
+        items.push({
+            severity: "warning",
+            code: VALIDATOR_CODES.ERR_MISSING_ARGUMENT,
+            blockId: blockId,
+            blockName: blockName,
+            argIndex: argIndex,
+            message: formatMessage(gettext('Block "%s" is missing an input argument.'), blockName)
+        });
+    };
     let totalActiveBlocks = 0;
 
     for (let i = 0; i < blockList.length; i++) {
@@ -219,12 +240,14 @@ function validateProject(activity) {
 
             const bodyBlkId = blk.connections ? blk.connections[2] : null;
             const unwrappedBody = unwrapSpacers(bodyBlkId, blockList);
-            if (
+            const isBodyEmpty =
                 unwrappedBody === null ||
                 unwrappedBody === undefined ||
                 !blockList[unwrappedBody] ||
-                blockList[unwrappedBody].trash
-            ) {
+                blockList[unwrappedBody].trash ||
+                blockList[unwrappedBody].name === "hidden";
+
+            if (isBodyEmpty) {
                 items.push({
                     severity: "warning",
                     code: VALIDATOR_CODES.WARN_EMPTY_ACTION,
@@ -296,17 +319,7 @@ function validateProject(activity) {
                 const argId = blk.connections ? blk.connections[1] : null;
                 if (argId === null || argId === undefined) {
                     if (runnableBlockIndices.has(i)) {
-                        items.push({
-                            severity: "warning",
-                            code: VALIDATOR_CODES.ERR_MISSING_ARGUMENT,
-                            blockId: i,
-                            blockName: blk.name,
-                            argIndex: 1,
-                            message: formatMessage(
-                                gettext('Block "%s" is missing an input argument.'),
-                                blk.name
-                            )
-                        });
+                        addMissingArgWarning(i, blk.name, 1);
                     }
                 } else {
                     calledName = extractLiteralName(argId, blockList);
@@ -418,17 +431,7 @@ function validateProject(activity) {
                 if (dockType && dockType !== "in" && dockType !== "unavailable") {
                     const conn = b.connections ? b.connections[dock] : null;
                     if (conn === null || conn === undefined) {
-                        items.push({
-                            severity: "warning",
-                            code: VALIDATOR_CODES.ERR_MISSING_ARGUMENT,
-                            blockId: id,
-                            blockName: b.name,
-                            argIndex: dock,
-                            message: formatMessage(
-                                gettext('Block "%s" is missing an input argument.'),
-                                b.name
-                            )
-                        });
+                        addMissingArgWarning(id, b.name, dock);
                     }
                 }
             }

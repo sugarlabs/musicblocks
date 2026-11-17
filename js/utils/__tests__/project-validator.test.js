@@ -322,6 +322,33 @@ describe("ProjectValidator", () => {
             expect(warn.actionName).toBe("emptyRoutine");
         });
 
+        test("detects WARN_EMPTY_ACTION when action block clamp body contains only terminal hidden block", () => {
+            const blockList = [
+                {
+                    name: "action",
+                    trash: false,
+                    connections: [null, 1, 2]
+                },
+                {
+                    name: "text",
+                    trash: false,
+                    value: "freshAction",
+                    isValueBlock: () => true,
+                    connections: [0]
+                },
+                {
+                    name: "hidden",
+                    trash: false,
+                    connections: [0, null]
+                }
+            ];
+
+            const report = validateProject({ blocks: { blockList } });
+            const warn = report.items.find(i => i.code === VALIDATOR_CODES.WARN_EMPTY_ACTION);
+            expect(warn).toBeDefined();
+            expect(warn.actionName).toBe("freshAction");
+        });
+
         test("detects WARN_DUPLICATE_ACTION when multiple actions share the same name", () => {
             const blockList = [
                 // First action "solo"
@@ -517,14 +544,21 @@ describe("ProjectValidator", () => {
                 {
                     name: "do",
                     trash: false,
-                    connections: [0, null, null] // socket 1 (action name) is empty
+                    connections: [0, null, null], // socket 1 (action name) is empty
+                    protoblock: {
+                        args: 1,
+                        dockTypes: ["out", "textin", "in"]
+                    }
                 }
             ];
 
             const report = validateProject({ blocks: { blockList } });
-            const warn = report.items.find(i => i.code === VALIDATOR_CODES.ERR_MISSING_ARGUMENT);
-            expect(warn).toBeDefined();
-            expect(warn.blockName).toBe("do");
+            const warnings = report.items.filter(
+                i => i.code === VALIDATOR_CODES.ERR_MISSING_ARGUMENT
+            );
+            expect(warnings.length).toBe(1);
+            expect(warnings[0].blockName).toBe("do");
+            expect(warnings[0].argIndex).toBe(1);
         });
     });
 
@@ -606,6 +640,79 @@ describe("ProjectValidator", () => {
             const orphan = report.items.find(i => i.code === VALIDATOR_CODES.INFO_ORPHAN_STACK);
             expect(orphan).toBeDefined();
             expect(orphan.blockId).toBe(1);
+        });
+
+        test("treats a loose twoarg flow block (like setxy) as an orphan stack and warns no start", () => {
+            const blockList = [
+                {
+                    name: "setxy",
+                    trash: false,
+                    connections: [null, 1, 2, null],
+                    protoblock: {
+                        style: "twoarg",
+                        args: 2,
+                        dockTypes: ["out", "numberin", "numberin", "in"]
+                    }
+                },
+                {
+                    name: "number",
+                    trash: false,
+                    value: 10,
+                    isValueBlock: () => true,
+                    connections: [0]
+                },
+                {
+                    name: "number",
+                    trash: false,
+                    value: 20,
+                    isValueBlock: () => true,
+                    connections: [0]
+                }
+            ];
+
+            const report = validateProject({ blocks: { blockList } });
+            const orphan = report.items.find(i => i.code === VALIDATOR_CODES.INFO_ORPHAN_STACK);
+            expect(orphan).toBeDefined();
+            expect(orphan.blockName).toBe("setxy");
+
+            const noStart = report.items.find(i => i.code === VALIDATOR_CODES.WARN_NO_START);
+            expect(noStart).toBeDefined();
+        });
+
+        test("does NOT treat a loose twoarg value block (like arithmetic operator) as an orphan stack", () => {
+            const blockList = [
+                {
+                    name: "plus",
+                    trash: false,
+                    connections: [null, 1, 2],
+                    protoblock: {
+                        style: "twoarg",
+                        args: 2,
+                        dockTypes: ["numberout", "numberin", "numberin"]
+                    }
+                },
+                {
+                    name: "number",
+                    trash: false,
+                    value: 3,
+                    isValueBlock: () => true,
+                    connections: [0]
+                },
+                {
+                    name: "number",
+                    trash: false,
+                    value: 4,
+                    isValueBlock: () => true,
+                    connections: [0]
+                }
+            ];
+
+            const report = validateProject({ blocks: { blockList } });
+            const orphan = report.items.find(i => i.code === VALIDATOR_CODES.INFO_ORPHAN_STACK);
+            expect(orphan).toBeUndefined();
+
+            const noStart = report.items.find(i => i.code === VALIDATOR_CODES.WARN_NO_START);
+            expect(noStart).toBeUndefined();
         });
     });
 

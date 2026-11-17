@@ -83,10 +83,22 @@ class HelpController {
     }
 
     async showProjectChecker() {
-        if (!this.activity.projectCheckerWindow || !this.activity.projectCheckerWindow.isOpen) {
-            await lazyLoad(["utils/project-validator", "widgets/project-checker"]);
-            this.activity.projectCheckerWindow = new ProjectCheckerWindow(this.activity);
-        }
+        if (this._projectCheckerOpening) return this._projectCheckerOpening;
+        if (this.activity.projectCheckerWindow && this.activity.projectCheckerWindow.isOpen) return;
+        this._projectCheckerOpening = (async () => {
+            try {
+                await lazyLoad(["utils/project-validator", "widgets/project-checker"]);
+                if (
+                    !this.activity.projectCheckerWindow ||
+                    !this.activity.projectCheckerWindow.isOpen
+                ) {
+                    this.activity.projectCheckerWindow = new ProjectCheckerWindow(this.activity);
+                }
+            } finally {
+                this._projectCheckerOpening = null;
+            }
+        })();
+        return this._projectCheckerOpening;
     }
 
     showKeyboardShortcuts() {

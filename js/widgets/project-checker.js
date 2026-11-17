@@ -37,7 +37,7 @@ class ProjectCheckerWindow {
         const gettext = typeof _ === "function" ? _ : s => s;
         const title = gettext("Check My Project");
 
-        this.widgetWindow = window.widgetWindows.windowFor(this, "project-checker", title);
+        this.widgetWindow = window.widgetWindows.windowFor(this, title, "project-checker");
         this.widgetWindow.clear();
         this.widgetWindow.show();
 
@@ -288,9 +288,44 @@ class ProjectCheckerWindow {
         }
 
         const block = this.activity.blocks.blockList[blockId];
-        if (block && !block.trash && typeof block.highlight === "function") {
-            block.highlight();
-            this._highlightedBlockId = blockId;
+        if (!block || block.trash) {
+            return;
+        }
+
+        let targetBlock = block;
+        let targetBlockId = blockId;
+
+        if (block.inCollapsed) {
+            let curr = block;
+            let guard = 0;
+            while (curr && guard++ < 50) {
+                if (
+                    curr.connections &&
+                    curr.connections[0] !== null &&
+                    curr.connections[0] !== undefined
+                ) {
+                    const parent = this.activity.blocks.blockList[curr.connections[0]];
+                    if (parent && parent.collapsed) {
+                        if (typeof parent.collapseToggle === "function") {
+                            parent.collapseToggle();
+                            if (!block.inCollapsed) {
+                                break;
+                            }
+                        }
+                        targetBlock = parent;
+                        targetBlockId = curr.connections[0];
+                        break;
+                    }
+                    curr = parent;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        if (targetBlock && !targetBlock.trash && typeof targetBlock.highlight === "function") {
+            targetBlock.highlight();
+            this._highlightedBlockId = targetBlockId;
             if (typeof this.activity.refreshCanvas === "function") {
                 this.activity.refreshCanvas();
             }

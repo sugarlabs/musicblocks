@@ -453,6 +453,29 @@ describe("HelpController.showProjectChecker", () => {
         expect(global.lazyLoad).not.toHaveBeenCalled();
         expect(activity.projectCheckerWindow).toBe(existing);
     });
+
+    test("coalesces concurrent overlapping calls while lazy load is pending", async () => {
+        const activity = makeActivity();
+        const controller = new HelpController(activity);
+
+        let resolveLazyLoad;
+        global.lazyLoad = jest.fn(
+            () =>
+                new Promise(resolve => {
+                    resolveLazyLoad = resolve;
+                })
+        );
+
+        const call1 = controller.showProjectChecker();
+        const call2 = controller.showProjectChecker();
+
+        expect(global.lazyLoad).toHaveBeenCalledTimes(1);
+
+        resolveLazyLoad();
+        await Promise.all([call1, call2]);
+
+        expect(activity.projectCheckerWindow).toBeInstanceOf(ProjectCheckerWindowMock);
+    });
 });
 
 describe("HelpController.saveHelpBlocks", () => {

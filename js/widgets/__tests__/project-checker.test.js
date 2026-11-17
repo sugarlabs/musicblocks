@@ -47,8 +47,8 @@ describe("ProjectCheckerWindow", () => {
         const checker = new ProjectCheckerWindow(activity);
         expect(window.widgetWindows.windowFor).toHaveBeenCalledWith(
             checker,
-            "project-checker",
-            "Check My Project"
+            "Check My Project",
+            "project-checker"
         );
         expect(widgetWin.clear).toHaveBeenCalled();
         expect(widgetWin.show).toHaveBeenCalled();
@@ -129,6 +129,43 @@ describe("ProjectCheckerWindow", () => {
         locateBtn.click();
 
         expect(highlightMock).not.toHaveBeenCalled();
+    });
+
+    test("reveals and highlights target inside a collapsed stack", () => {
+        const childHighlightMock = jest.fn();
+        const parentCollapseToggleMock = jest.fn(function () {
+            // Uncollapse the child on toggle
+            activity.blocks.blockList[1].inCollapsed = false;
+        });
+
+        activity.blocks.blockList = [
+            // 0: Collapsed parent stack
+            {
+                name: "repeat",
+                trash: false,
+                collapsed: true,
+                connections: [null, null, 1],
+                collapseToggle: parentCollapseToggleMock,
+                highlight: jest.fn()
+            },
+            // 1: Child inside collapsed stack with error
+            {
+                name: "nameddo",
+                trash: false,
+                inCollapsed: true,
+                privateData: "unresolvedAction",
+                connections: [0, null],
+                highlight: childHighlightMock
+            }
+        ];
+
+        new ProjectCheckerWindow(activity);
+        const locateBtn = body.querySelector("button");
+        locateBtn.click();
+
+        expect(parentCollapseToggleMock).toHaveBeenCalled();
+        expect(childHighlightMock).toHaveBeenCalled();
+        expect(activity.refreshCanvas).toHaveBeenCalled();
     });
 
     test("refresh re-runs validation and updates the view", () => {
