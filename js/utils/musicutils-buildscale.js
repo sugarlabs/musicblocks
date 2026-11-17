@@ -523,7 +523,7 @@ var _getStepSize = (keySignature, pitch, direction, transposition, temperament, 
         }
         if (
             keyTonic === "C" + FLAT &&
-            scale[0] === "B" + SHARP &&
+            (scale[0] === "B" + SHARP || (currentEDO === 21 && scale[0] === "C" + FLAT)) &&
             ((s1 === "C" + FLAT && s2 === "B" + SHARP) || (s1 === "B" + SHARP && s2 === "C" + FLAT))
         ) {
             return true;

@@ -152,6 +152,7 @@ describe("musicutils-buildscale", () => {
             ["C", "D", "E", "G", "A", "C"],
             [4, 4, 5, 3, 5]
         ]);
+
         expect(buildscale.scaleDegreeToPitchMapping("C major pentatonic", 6, false, null, 21)).toBe(
             "A"
         );
@@ -184,6 +185,12 @@ describe("musicutils-buildscale", () => {
         expect(buildscale.buildScale("Cb minor", 21)[0][0]).toBe("C♭");
     });
 
+    it("steps up correctly from the closing B-sharp alias in Cb minor, 21 EDO", () => {
+        const halfSteps = buildscale.buildScale("Cb minor", 21)[1];
+
+        expect(buildscale._getStepSize("Cb minor", "B♯", "up", 0, "equal", 21)).toBe(halfSteps[0]);
+    });
+
     it("keeps user-defined modes in their native EDO", () => {
         const originalFoo = MUSICALMODES.foo;
         MUSICALMODES.foo = [3, 3, 2, 4, 3, 3, 3];
@@ -208,6 +215,7 @@ describe("musicutils-buildscale", () => {
             [1, 1, 1, 1, 1, 1, 1]
         ]);
     });
+
     it("keeps custom seven-step patterns in their EDO", () => {
         const originalCustom = MUSICALMODES.custom;
         MUSICALMODES.custom = [3, 3, 2, 3, 3, 3, 2];
