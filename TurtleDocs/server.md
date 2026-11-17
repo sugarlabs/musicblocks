@@ -5,8 +5,7 @@ Running a local server
 ----------------------
 
 [Clone the server](https://github.com/tchx84/turtleblocksjs-server) and
-[change the api key]
-(https://github.com/tchx84/turtleblocksjs-server/blob/master/settings.py#L26)
+[change the api key](https://github.com/tchx84/turtleblocksjs-server/blob/master/settings.py#L26)
 to your TurtleJS key.
 
 Install apache and turtleblocksjs.

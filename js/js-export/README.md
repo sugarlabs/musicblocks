@@ -19,7 +19,7 @@ The code corresponding to the JavaScript Editor widget is in
 * `ast2blocklist.js` - contains the utilities for generating blocks from the code in the editor
 
 * `ast2blocks.json` - contains the block configurations for code to block conversion.
-  For detailed information on how to add blocks for code to block support see `./conversion_config_guide.md`
+  For detailed information on how to add blocks for code to block support see [CONVERSION_GUIDE.md](./CONVERSION_GUIDE.md)
 
 * `ASTutils.js` — contains the utilities for generating the *Abstract
   Syntax Tree* (*AST*) in `ESTree` specification, for the corresponding
@@ -32,7 +32,7 @@ The code corresponding to the JavaScript Editor widget is in
 * `constraints.js` — contains the constraint definitions for the API methods'
   arguments, for validation in `interface.js`.
 
-* `sample.js` — contains the help (guide) for the API, and some example codes.
+* `samples/sample.js` — contains the help (guide) for the API, and some example codes.
 
 The `API` subdirectory stores the API method definitions of each block.
 
