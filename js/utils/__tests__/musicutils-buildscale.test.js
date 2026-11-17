@@ -136,6 +136,7 @@ describe("musicutils-buildscale", () => {
             ["C", "D", "E", "F", "G", "A", "B", "C"],
             [4, 4, 2, 3, 3, 3, 2]
         ]);
+
         expect(buildscale.buildScale("G major", 21)[0]).toEqual([
             "G",
             "A",
@@ -146,6 +147,7 @@ describe("musicutils-buildscale", () => {
             "F" + SHARP,
             "G"
         ]);
+
         expect(buildscale.buildScale("C major pentatonic", 21)).toEqual([
             ["C", "D", "E", "G", "A", "C"],
             [4, 4, 5, 3, 5]
@@ -153,6 +155,7 @@ describe("musicutils-buildscale", () => {
         expect(buildscale.scaleDegreeToPitchMapping("C major pentatonic", 6, false, null, 21)).toBe(
             "A"
         );
+
         expect(buildscale.buildScale("C chromatic", 21)).toEqual([
             [
                 "C",
@@ -177,6 +180,24 @@ describe("musicutils-buildscale", () => {
         expect(buildscale.buildScale("C minor", 31)[1]).toEqual([5, 3, 5, 5, 3, 5, 5]);
     });
 
+    it("preserves the tonic spelling for Cb minor in 21 EDO", () => {
+        expect(buildscale.buildScale("Cb minor", 21)[0][0]).toBe("C♭");
+    });
+
+    it("keeps user-defined modes in their native EDO", () => {
+        const originalFoo = MUSICALMODES.foo;
+        MUSICALMODES.foo = [3, 3, 2, 4, 3, 3, 3];
+
+        try {
+            expect(buildscale.buildScale("C foo", 21)[1]).toEqual([3, 3, 2, 4, 3, 3, 3]);
+        } finally {
+            if (originalFoo === undefined) {
+                delete MUSICALMODES.foo;
+            } else {
+                MUSICALMODES.foo = originalFoo;
+            }
+        }
+    });
     it("keeps the EDO-native scale when a seven-note spelling is unavailable", () => {
         expect(buildscale.buildScale("G major", 7)).toEqual([
             ["G", "A", "B", "C", "D", "E", "F", "G"],
@@ -187,17 +208,21 @@ describe("musicutils-buildscale", () => {
             [1, 1, 1, 1, 1, 1, 1]
         ]);
     });
-
     it("keeps custom seven-step patterns in their EDO", () => {
         const originalCustom = MUSICALMODES.custom;
         MUSICALMODES.custom = [3, 3, 2, 3, 3, 3, 2];
+
         try {
             expect(buildscale.buildScale("C custom", 19)).toEqual([
                 ["C", "D", "E", "F", "G", "A", "B", "C"],
                 [3, 3, 2, 3, 3, 3, 2]
             ]);
         } finally {
-            MUSICALMODES.custom = originalCustom;
+            if (originalCustom === undefined) {
+                delete MUSICALMODES.custom;
+            } else {
+                MUSICALMODES.custom = originalCustom;
+            }
         }
     });
 

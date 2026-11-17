@@ -89,7 +89,7 @@ if (typeof module !== "undefined" && module.exports) {
     var MusicUtilsModeCore =
         (typeof window !== "undefined" && window.MusicUtilsModeCore) ||
         (typeof require !== "undefined" ? require("./musicutils-modecore") : {});
-    var { getModePattern, modeMapper, MOVABLE_TONIC_DEGREE } = MusicUtilsModeCore;
+    var { getModePattern, isBuiltInMode, modeMapper, MOVABLE_TONIC_DEGREE } = MusicUtilsModeCore;
     var UtilsLogic =
         (typeof window !== "undefined" && window.UtilsLogic) ||
         (typeof require !== "undefined" ? require("./utils-logic") : {});
@@ -248,7 +248,7 @@ var buildScale = (keySignature, edo) => {
 
         // Keep the usual spelling in 21-note meantone. Its note positions do
         // not match a proportional 12-EDO scale.
-        if (currentEDO === 21 && obj[1].toLowerCase() !== "custom") {
+        if (currentEDO === 21 && isBuiltInMode(obj[1])) {
             const twelveEDOScale = buildScale(keySignature, 12)[0];
             const positions = [];
             let previous = edoNames.indexOf(twelveEDOScale[0]);
@@ -267,13 +267,19 @@ var buildScale = (keySignature, edo) => {
                     previous = position;
                 }
             }
-            if (positions.length === twelveEDOScale.length) {
+            if (positions.length === twelveEDOScale.length && positions[0] === idx) {
                 const steps = positions.slice(1).map((position, i) => position - positions[i]);
                 return [twelveEDOScale, steps];
             }
         }
 
-        const startNote = edoNames[idx];
+        const startNote =
+            currentEDO === 21 &&
+            idx !== edoNames.indexOf(myKeySignature) &&
+            typeof EXTRATRANSPOSITIONS !== "undefined" &&
+            myKeySignature in EXTRATRANSPOSITIONS
+                ? myKeySignature
+                : edoNames[idx];
         const scale = [startNote];
         let ii = idx;
         for (let i = 0; i < edoHalfSteps.length; i++) {
@@ -742,7 +748,7 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
     currentEDO = normalizeEDO(currentEDO);
 
     let classificationPattern = chosenModePattern;
-    if (currentEDO === 21 && chosenMode[1].toLowerCase() !== "custom") {
+    if (currentEDO === 21 && isBuiltInMode(chosenMode[1])) {
         const twelveEDOScale = buildScale(keySignature, 12);
         const usesTwelveEDOSpelling =
             chosenModeScale.length === twelveEDOScale[0].length &&
