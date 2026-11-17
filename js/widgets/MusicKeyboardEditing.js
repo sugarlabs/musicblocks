@@ -427,7 +427,7 @@ const MusicKeyboardEditing = {
             }
 
             // A duration edit can make the subdivisions outgrow the recorded gap.
-            const shift = divideNoteBy > 1 ? Math.max(0, end - nextStart) : 0;
+            const shift = divideNoteBy > 1 ? Math.ceil(Math.max(0, end - nextStart)) : 0;
 
             this._notesPlayed = this._notesPlayed.reduce(function (prevValue, curValue) {
                 let newcurValue, newcurValue2, oldcurValue;
