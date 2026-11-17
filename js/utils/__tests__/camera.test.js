@@ -8,6 +8,8 @@
  * (at your option) any later version.
  */
 
+global._ = text => text;
+
 const { doUseCamera, doStopVideoCam, CameraManager } = require("../camera-utils.js");
 
 /**
