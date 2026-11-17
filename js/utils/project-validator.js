@@ -21,8 +21,14 @@ const VALIDATOR_CODES = {
     ERR_MISSING_ARGUMENT: "ERR_MISSING_ARGUMENT",
     ERR_ZERO_DIVISION: "ERR_ZERO_DIVISION",
     ERR_INVALID_NOTE_VALUE: "ERR_INVALID_NOTE_VALUE",
+    ERR_INVALID_BPM: "ERR_INVALID_BPM",
+    ERR_INVALID_METER: "ERR_INVALID_METER",
+    ERR_INVALID_PITCH: "ERR_INVALID_PITCH",
     WARN_DUPLICATE_ACTION: "WARN_DUPLICATE_ACTION",
     WARN_EMPTY_ACTION: "WARN_EMPTY_ACTION",
+    WARN_EMPTY_NOTE: "WARN_EMPTY_NOTE",
+    WARN_INVALID_MODE: "WARN_INVALID_MODE",
+    WARN_OUT_OF_RANGE: "WARN_OUT_OF_RANGE",
     WARN_NO_START: "WARN_NO_START",
     INFO_ORPHAN_STACK: "INFO_ORPHAN_STACK",
     INFO_UNUSED_ACTION: "INFO_UNUSED_ACTION",
@@ -41,6 +47,83 @@ const ACTION_CALL_BLOCKS = [
 ];
 
 const START_BLOCK_NAMES = ["start", "drum", "status", "oscilloscope"];
+
+const VALID_SOLFEGE_ROOTS = new Set([
+    "do",
+    "re",
+    "mi",
+    "fa",
+    "so",
+    "sol",
+    "la",
+    "ti",
+    "si",
+    "di",
+    "ri",
+    "fi",
+    "li",
+    "ra",
+    "me",
+    "se",
+    "le",
+    "te",
+    "sa",
+    "ga",
+    "ma",
+    "pa",
+    "dha",
+    "ni",
+    "ut"
+]);
+
+const VALID_LETTER_ROOTS = new Set(["a", "b", "c", "d", "e", "f", "g"]);
+
+const VALID_MUSICAL_MODES = new Set([
+    "major",
+    "minor",
+    "natural minor",
+    "harmonic minor",
+    "melodic minor",
+    "harmonic major",
+    "dorian",
+    "phrygian",
+    "lydian",
+    "mixolydian",
+    "locrian",
+    "chromatic",
+    "algerian",
+    "diminished",
+    "spanish",
+    "octatonic",
+    "bebop",
+    "arabic",
+    "byzantine",
+    "enigmatic",
+    "hindu",
+    "hungarian",
+    "romanian minor",
+    "spanish gypsy",
+    "minor blues",
+    "major blues",
+    "whole tone",
+    "major pentatonic",
+    "minor pentatonic",
+    "pentatonic",
+    "chinese",
+    "egyptian",
+    "hirajoshi",
+    "in",
+    "fibonacci",
+    "alt pentatonic",
+    "ionian",
+    "aeolian",
+    "ethiopian",
+    "geez",
+    "jazz minor",
+    "maqam",
+    "minyo",
+    "custom"
+]);
 
 /**
  * Traverses forward through horizontal or vertical spacer blocks (hspace, vspace)
@@ -95,7 +178,13 @@ function extractLiteralName(blkId, blockList) {
     const blk = blockList[unwrappedId];
     if (!blk || blk.trash) return null;
 
-    if (blk.name === "text" || blk.name === "string") {
+    if (
+        blk.name === "text" ||
+        blk.name === "string" ||
+        blk.name === "solfege" ||
+        blk.name === "notename" ||
+        blk.name === "modename"
+    ) {
         return typeof blk.value === "string" ? blk.value : String(blk.value ?? "");
     }
     if (blk.name === "number") {
@@ -105,6 +194,91 @@ function extractLiteralName(blkId, blockList) {
         return blk.value !== undefined && blk.value !== null ? String(blk.value) : null;
     }
     return null;
+}
+
+/**
+ * Extracts a literal numeric value from an argument block, including division expressions (e.g. 1 / 4).
+ * Returns null if the block is dynamic, empty, or cannot be evaluated statically.
+ *
+ * @param {number|null} blkId - Block id connected to the dock
+ * @param {Array} blockList - The blocks list
+ * @returns {number|null} Evaluated numeric value or null
+ */
+function extractLiteralNumber(blkId, blockList) {
+    const unwrappedId = unwrapSpacers(blkId, blockList);
+    if (unwrappedId === null || unwrappedId === undefined) return null;
+    const blk = blockList[unwrappedId];
+    if (!blk || blk.trash) return null;
+
+    if (blk.name === "number") {
+        const val = Number(blk.value);
+        return Number.isFinite(val) ? val : null;
+    }
+    if (blk.name === "text" || blk.name === "string") {
+        const val = Number(blk.value);
+        return Number.isFinite(val) ? val : null;
+    }
+    if (typeof blk.isValueBlock === "function" && blk.isValueBlock()) {
+        const val = Number(blk.value);
+        return Number.isFinite(val) ? val : null;
+    }
+    if (blk.name === "divide" && Array.isArray(blk.connections)) {
+        const num = extractLiteralNumber(blk.connections[1], blockList);
+        const den = extractLiteralNumber(blk.connections[2], blockList);
+        if (num !== null && den !== null && den !== 0) {
+            return num / den;
+        }
+    }
+    return null;
+}
+
+/**
+ * Determines whether a given pitch identifier is valid in Music Blocks.
+ * Recognizes solfege names (diatonic, chromatic, East Indian), letter note names (A-G with accidentals),
+ * numeric pitches/scale degrees/frequencies, and rest notations.
+ *
+ * @param {any} val - Value to validate
+ * @returns {boolean} True if the value is a recognized pitch
+ */
+function isValidPitchName(val) {
+    if (val === null || val === undefined) return false;
+    const str = String(val).trim();
+    if (!str) return false;
+
+    // Check rest notation
+    const lower = str.toLowerCase();
+    if (lower === "rest" || lower === "r") return true;
+
+    // Pure numeric pitch (scale degree, temperament step, or frequency)
+    const num = Number(str);
+    if (Number.isFinite(num)) {
+        return num > 0 && num <= 20000;
+    }
+
+    // Strip microtonal prefix: ^, ^^, v, vv, \, /
+    const clean = lower.replace(/^[\^v\\/]+/, "");
+    if (!clean) return false;
+
+    // Check letter note names with optional accidentals and octave: e.g. C, Bb, F#4, Cx, Bbb-1
+    const letterMatch = clean.match(/^([a-g])([#b♭♯𝄪𝄫x*]|bb|##|♭♭|♯♯)*(-?\d+)?$/u);
+    if (letterMatch) {
+        return true;
+    }
+
+    // Check solfege names with optional accidentals and octave: e.g. do, sol#, la4, ti♭
+    const solfegeMatch = clean.match(/^([a-z]+?)([#b♭♯𝄪𝄫x*]|bb|##|♭♭|♯♯)*(-?\d+)?$/u);
+    if (solfegeMatch && VALID_SOLFEGE_ROOTS.has(solfegeMatch[1])) {
+        return true;
+    }
+
+    // Scale degree number with accidental e.g. "1#", "7b", "4♯"
+    const degreeMatch = clean.match(/^(\d+)([#b♭♯𝄪𝄫x*]|bb|##|♭♭|♯♯)*$/u);
+    if (degreeMatch) {
+        const degree = Number(degreeMatch[1]);
+        return degree > 0 && degree <= 57;
+    }
+
+    return false;
 }
 
 /**
@@ -120,7 +294,17 @@ function isDynamicBlock(blkId, blockList) {
     if (unwrappedId === null || unwrappedId === undefined) return false;
     const blk = blockList[unwrappedId];
     if (!blk || blk.trash) return false;
-    return blk.name !== "text" && blk.name !== "string" && blk.name !== "number";
+    const literalBlocks = [
+        "text",
+        "string",
+        "number",
+        "solfege",
+        "notename",
+        "modename",
+        "scaledegree",
+        "scaledegree2"
+    ];
+    return !literalBlocks.includes(blk.name);
 }
 
 /**
@@ -141,6 +325,17 @@ function isValueOrArgBlock(blk) {
             return true;
         }
     }
+    const valBlockNames = [
+        "number",
+        "text",
+        "string",
+        "solfege",
+        "notename",
+        "modename",
+        "scaledegree",
+        "scaledegree2"
+    ];
+    if (valBlockNames.includes(blk.name)) return true;
     return false;
 }
 
@@ -444,13 +639,8 @@ function validateProject(activity) {
         // Check for static division/modulo by zero
         if (b.name === "divide" || b.name === "mod") {
             const divisorId = b.connections ? b.connections[2] : null;
-            const divisorVal = extractLiteralName(divisorId, blockList);
-            if (
-                divisorVal !== null &&
-                divisorVal.trim() !== "" &&
-                !isNaN(Number(divisorVal)) &&
-                Number(divisorVal) === 0
-            ) {
+            const divisorVal = extractLiteralNumber(divisorId, blockList);
+            if (divisorVal !== null && divisorVal === 0) {
                 items.push({
                     severity: "error",
                     code: VALIDATOR_CODES.ERR_ZERO_DIVISION,
@@ -461,22 +651,240 @@ function validateProject(activity) {
             }
         }
 
-        // Check for non-positive note value duration
+        // Check for note block duration & empty note clamp body
         if (b.name === "newnote" || b.name === "note") {
             const durationId = b.connections ? b.connections[1] : null;
-            const durationVal = extractLiteralName(durationId, blockList);
-            if (
-                durationVal !== null &&
-                durationVal.trim() !== "" &&
-                !isNaN(Number(durationVal)) &&
-                Number(durationVal) <= 0
-            ) {
+            const durationVal = extractLiteralNumber(durationId, blockList);
+            if (durationVal !== null && durationVal <= 0) {
                 items.push({
                     severity: "error",
                     code: VALIDATOR_CODES.ERR_INVALID_NOTE_VALUE,
                     blockId: id,
                     blockName: b.name,
                     message: gettext("Note value must be greater than 0.")
+                });
+            }
+
+            const bodyId = b.connections ? b.connections[2] : null;
+            const unwrappedBody = unwrapSpacers(bodyId, blockList);
+            const isNoteBodyEmpty =
+                unwrappedBody === null ||
+                unwrappedBody === undefined ||
+                !blockList[unwrappedBody] ||
+                blockList[unwrappedBody].trash ||
+                blockList[unwrappedBody].name === "hidden" ||
+                blockList[unwrappedBody].name === "hiddennoflow";
+
+            if (isNoteBodyEmpty) {
+                items.push({
+                    severity: "warning",
+                    code: VALIDATOR_CODES.WARN_EMPTY_NOTE,
+                    blockId: id,
+                    blockName: b.name,
+                    message: gettext("Note block has no pitch or drum inside.")
+                });
+            }
+        }
+
+        // Check BPM / Tempo blocks
+        if (
+            b.name === "setmasterbpm2" ||
+            b.name === "setmasterbpm" ||
+            b.name === "setbpm3" ||
+            b.name === "setbpm2" ||
+            b.name === "setbpm"
+        ) {
+            const bpmId = b.connections ? b.connections[1] : null;
+            const bpmVal = extractLiteralNumber(bpmId, blockList);
+            if (bpmVal !== null) {
+                if (bpmVal <= 0) {
+                    items.push({
+                        severity: "error",
+                        code: VALIDATOR_CODES.ERR_INVALID_BPM,
+                        blockId: id,
+                        blockName: b.name,
+                        message: gettext("BPM must be a positive number.")
+                    });
+                } else if (bpmVal < 30 || bpmVal > 1000) {
+                    items.push({
+                        severity: "warning",
+                        code: VALIDATOR_CODES.WARN_OUT_OF_RANGE,
+                        blockId: id,
+                        blockName: b.name,
+                        value: bpmVal,
+                        message: formatMessage(
+                            gettext("BPM %s is out of standard tempo range (30 to 1000)."),
+                            bpmVal
+                        )
+                    });
+                }
+            }
+
+            if (b.name === "setmasterbpm2" || b.name === "setbpm3") {
+                const beatId = b.connections ? b.connections[2] : null;
+                const beatVal = extractLiteralNumber(beatId, blockList);
+                if (beatVal !== null && beatVal <= 0) {
+                    items.push({
+                        severity: "error",
+                        code: VALIDATOR_CODES.ERR_INVALID_BPM,
+                        blockId: id,
+                        blockName: b.name,
+                        message: gettext("Beat value must be a positive number.")
+                    });
+                }
+            }
+        }
+
+        // Check meter (time signature)
+        if (b.name === "meter") {
+            const countId = b.connections ? b.connections[1] : null;
+            const countVal = extractLiteralNumber(countId, blockList);
+            if (countVal !== null && countVal <= 0) {
+                items.push({
+                    severity: "error",
+                    code: VALIDATOR_CODES.ERR_INVALID_METER,
+                    blockId: id,
+                    blockName: b.name,
+                    message: gettext("Beats per measure must be a positive number.")
+                });
+            }
+
+            const beatValId = b.connections ? b.connections[2] : null;
+            const beatVal = extractLiteralNumber(beatValId, blockList);
+            if (beatVal !== null && beatVal <= 0) {
+                items.push({
+                    severity: "error",
+                    code: VALIDATOR_CODES.ERR_INVALID_METER,
+                    blockId: id,
+                    blockName: b.name,
+                    message: gettext("Beat value must be a positive number.")
+                });
+            }
+        }
+
+        // Check pitch block
+        if (b.name === "pitch") {
+            const pitchNameId = b.connections ? b.connections[1] : null;
+            const pitchNameVal = extractLiteralName(pitchNameId, blockList);
+            if (
+                pitchNameVal !== null &&
+                !isDynamicBlock(pitchNameId, blockList) &&
+                !isValidPitchName(pitchNameVal)
+            ) {
+                items.push({
+                    severity: "error",
+                    code: VALIDATOR_CODES.ERR_INVALID_PITCH,
+                    blockId: id,
+                    blockName: b.name,
+                    pitchName: pitchNameVal,
+                    message: formatMessage(gettext('"%s" is not a valid pitch name.'), pitchNameVal)
+                });
+            }
+
+            const octaveId = b.connections ? b.connections[2] : null;
+            const octaveVal = extractLiteralNumber(octaveId, blockList);
+            if (octaveVal !== null && (octaveVal < 0 || octaveVal > 9)) {
+                items.push({
+                    severity: "warning",
+                    code: VALIDATOR_CODES.WARN_OUT_OF_RANGE,
+                    blockId: id,
+                    blockName: b.name,
+                    value: octaveVal,
+                    message: formatMessage(
+                        gettext("Octave %s is out of standard audible range (0 to 9)."),
+                        octaveVal
+                    )
+                });
+            }
+        }
+
+        // Check setkey2 block (key and mode)
+        if (b.name === "setkey2") {
+            const keyId = b.connections ? b.connections[1] : null;
+            const keyVal = extractLiteralName(keyId, blockList);
+            if (keyVal !== null && !isDynamicBlock(keyId, blockList) && !isValidPitchName(keyVal)) {
+                items.push({
+                    severity: "error",
+                    code: VALIDATOR_CODES.ERR_INVALID_PITCH,
+                    blockId: id,
+                    blockName: b.name,
+                    pitchName: keyVal,
+                    message: formatMessage(gettext('"%s" is not a valid pitch name.'), keyVal)
+                });
+            }
+
+            const modeId = b.connections ? b.connections[2] : null;
+            const modeVal = extractLiteralName(modeId, blockList);
+            if (modeVal !== null && !isDynamicBlock(modeId, blockList) && modeVal.trim() !== "") {
+                const lowerMode = modeVal.trim().toLowerCase();
+                if (!VALID_MUSICAL_MODES.has(lowerMode)) {
+                    items.push({
+                        severity: "warning",
+                        code: VALIDATOR_CODES.WARN_INVALID_MODE,
+                        blockId: id,
+                        blockName: b.name,
+                        modeName: modeVal,
+                        message: formatMessage(
+                            gettext(
+                                'Mode "%s" is not recognized. Music Blocks will default to major.'
+                            ),
+                            modeVal
+                        )
+                    });
+                }
+            }
+        }
+
+        // Check volume blocks: setnotevolume, setsynthvolume, setsynthvolume2
+        if (b.name === "setnotevolume") {
+            const volId = b.connections ? b.connections[1] : null;
+            const volVal = extractLiteralNumber(volId, blockList);
+            if (volVal !== null && (volVal < 0 || volVal > 100)) {
+                items.push({
+                    severity: "warning",
+                    code: VALIDATOR_CODES.WARN_OUT_OF_RANGE,
+                    blockId: id,
+                    blockName: b.name,
+                    value: volVal,
+                    message: formatMessage(
+                        gettext("Volume %s is out of range (expected 0 to 100)."),
+                        volVal
+                    )
+                });
+            }
+        } else if (b.name === "setsynthvolume" || b.name === "setsynthvolume2") {
+            const volId = b.connections ? b.connections[2] : null;
+            const volVal = extractLiteralNumber(volId, blockList);
+            if (volVal !== null && (volVal < 0 || volVal > 100)) {
+                items.push({
+                    severity: "warning",
+                    code: VALIDATOR_CODES.WARN_OUT_OF_RANGE,
+                    blockId: id,
+                    blockName: b.name,
+                    value: volVal,
+                    message: formatMessage(
+                        gettext("Volume %s is out of range (expected 0 to 100)."),
+                        volVal
+                    )
+                });
+            }
+        }
+
+        // Check scalar interval
+        if (b.name === "interval") {
+            const intId = b.connections ? b.connections[1] : null;
+            const intVal = extractLiteralNumber(intId, blockList);
+            if (intVal !== null && (intVal < -63 || intVal > 69)) {
+                items.push({
+                    severity: "warning",
+                    code: VALIDATOR_CODES.WARN_OUT_OF_RANGE,
+                    blockId: id,
+                    blockName: b.name,
+                    value: intVal,
+                    message: formatMessage(
+                        gettext("Scalar interval %s must be within -63 to 69."),
+                        intVal
+                    )
                 });
             }
         }

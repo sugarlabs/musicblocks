@@ -901,6 +901,459 @@ describe("ProjectValidator", () => {
         });
     });
 
+    describe("Music Theory & Domain-Specific Diagnostics", () => {
+        test("detects ERR_INVALID_BPM for non-positive BPM on setmasterbpm2 and setbpm", () => {
+            const blockList = [
+                {
+                    name: "start",
+                    trash: false,
+                    connections: [null, 1]
+                },
+                {
+                    name: "setmasterbpm2",
+                    trash: false,
+                    connections: [0, 2, 3, null],
+                    protoblock: { args: 2, dockTypes: ["out", "numberin", "numberin", "in"] }
+                },
+                {
+                    name: "number",
+                    trash: false,
+                    value: 0,
+                    isValueBlock: () => true,
+                    connections: [1]
+                },
+                {
+                    name: "number",
+                    trash: false,
+                    value: 0.25,
+                    isValueBlock: () => true,
+                    connections: [1]
+                }
+            ];
+
+            const report = validateProject({ blocks: { blockList } });
+            const bpmErr = report.items.find(i => i.code === VALIDATOR_CODES.ERR_INVALID_BPM);
+            expect(bpmErr).toBeDefined();
+            expect(bpmErr.blockName).toBe("setmasterbpm2");
+            expect(bpmErr.message).toBe("BPM must be a positive number.");
+        });
+
+        test("detects ERR_INVALID_BPM for non-positive beat value on setmasterbpm2", () => {
+            const blockList = [
+                {
+                    name: "start",
+                    trash: false,
+                    connections: [null, 1]
+                },
+                {
+                    name: "setmasterbpm2",
+                    trash: false,
+                    connections: [0, 2, 3, null],
+                    protoblock: { args: 2, dockTypes: ["out", "numberin", "numberin", "in"] }
+                },
+                {
+                    name: "number",
+                    trash: false,
+                    value: 120,
+                    isValueBlock: () => true,
+                    connections: [1]
+                },
+                {
+                    name: "number",
+                    trash: false,
+                    value: -0.25,
+                    isValueBlock: () => true,
+                    connections: [1]
+                }
+            ];
+
+            const report = validateProject({ blocks: { blockList } });
+            const beatErr = report.items.find(i => i.code === VALIDATOR_CODES.ERR_INVALID_BPM);
+            expect(beatErr).toBeDefined();
+            expect(beatErr.message).toBe("Beat value must be a positive number.");
+        });
+
+        test("detects WARN_OUT_OF_RANGE for tempo outside 30-1000 range", () => {
+            const blockList = [
+                {
+                    name: "start",
+                    trash: false,
+                    connections: [null, 1]
+                },
+                {
+                    name: "setbpm",
+                    trash: false,
+                    connections: [0, 2, null],
+                    protoblock: { args: 1, dockTypes: ["out", "numberin", "in"] }
+                },
+                {
+                    name: "number",
+                    trash: false,
+                    value: 15,
+                    isValueBlock: () => true,
+                    connections: [1]
+                }
+            ];
+
+            const report = validateProject({ blocks: { blockList } });
+            const tempoWarn = report.items.find(i => i.code === VALIDATOR_CODES.WARN_OUT_OF_RANGE);
+            expect(tempoWarn).toBeDefined();
+            expect(tempoWarn.message).toContain("out of standard tempo range");
+        });
+
+        test("detects ERR_INVALID_METER for non-positive beats per measure or beat value", () => {
+            const blockList = [
+                {
+                    name: "start",
+                    trash: false,
+                    connections: [null, 1]
+                },
+                {
+                    name: "meter",
+                    trash: false,
+                    connections: [0, 2, 3, null],
+                    protoblock: { args: 2, dockTypes: ["out", "numberin", "numberin", "in"] }
+                },
+                {
+                    name: "number",
+                    trash: false,
+                    value: 0,
+                    isValueBlock: () => true,
+                    connections: [1]
+                },
+                {
+                    name: "number",
+                    trash: false,
+                    value: 0.25,
+                    isValueBlock: () => true,
+                    connections: [1]
+                }
+            ];
+
+            const report = validateProject({ blocks: { blockList } });
+            const meterErr = report.items.find(i => i.code === VALIDATOR_CODES.ERR_INVALID_METER);
+            expect(meterErr).toBeDefined();
+            expect(meterErr.message).toBe("Beats per measure must be a positive number.");
+        });
+
+        test("detects ERR_INVALID_PITCH for invalid pitch string on pitch block", () => {
+            const blockList = [
+                {
+                    name: "start",
+                    trash: false,
+                    connections: [null, 1]
+                },
+                {
+                    name: "pitch",
+                    trash: false,
+                    connections: [0, 2, 3, null],
+                    protoblock: { args: 2, dockTypes: ["out", "solfegein", "anyin", "in"] }
+                },
+                {
+                    name: "text",
+                    trash: false,
+                    value: "not_a_note",
+                    isValueBlock: () => true,
+                    connections: [1]
+                },
+                {
+                    name: "number",
+                    trash: false,
+                    value: 4,
+                    isValueBlock: () => true,
+                    connections: [1]
+                }
+            ];
+
+            const report = validateProject({ blocks: { blockList } });
+            const pitchErr = report.items.find(i => i.code === VALIDATOR_CODES.ERR_INVALID_PITCH);
+            expect(pitchErr).toBeDefined();
+            expect(pitchErr.pitchName).toBe("not_a_note");
+            expect(pitchErr.message).toContain('"not_a_note" is not a valid pitch name.');
+        });
+
+        test("accepts valid solfege, letters, accidentals, microtones, and rests without ERR_INVALID_PITCH", () => {
+            const validPitches = [
+                "C",
+                "c",
+                "F#",
+                "Bb",
+                "B♭",
+                "C♯",
+                "D𝄪",
+                "E𝄫",
+                "sol",
+                "do#",
+                "la",
+                "ti♭",
+                "sa",
+                "ga",
+                "rest",
+                "r",
+                "vvC",
+                "^G",
+                "C4",
+                "G#5",
+                440
+            ];
+
+            for (const pitchVal of validPitches) {
+                const blockList = [
+                    {
+                        name: "start",
+                        trash: false,
+                        connections: [null, 1]
+                    },
+                    {
+                        name: "pitch",
+                        trash: false,
+                        connections: [0, 2, 3, null],
+                        protoblock: { args: 2, dockTypes: ["out", "solfegein", "anyin", "in"] }
+                    },
+                    {
+                        name: typeof pitchVal === "number" ? "number" : "text",
+                        trash: false,
+                        value: pitchVal,
+                        isValueBlock: () => true,
+                        connections: [1]
+                    },
+                    {
+                        name: "number",
+                        trash: false,
+                        value: 4,
+                        isValueBlock: () => true,
+                        connections: [1]
+                    }
+                ];
+
+                const report = validateProject({ blocks: { blockList } });
+                const pitchErr = report.items.find(
+                    i => i.code === VALIDATOR_CODES.ERR_INVALID_PITCH
+                );
+                expect(pitchErr).toBeUndefined();
+            }
+        });
+
+        test("detects WARN_OUT_OF_RANGE for pitch octave outside [0, 9]", () => {
+            const blockList = [
+                {
+                    name: "start",
+                    trash: false,
+                    connections: [null, 1]
+                },
+                {
+                    name: "pitch",
+                    trash: false,
+                    connections: [0, 2, 3, null],
+                    protoblock: { args: 2, dockTypes: ["out", "solfegein", "anyin", "in"] }
+                },
+                {
+                    name: "solfege",
+                    trash: false,
+                    value: "sol",
+                    connections: [1]
+                },
+                {
+                    name: "number",
+                    trash: false,
+                    value: 12,
+                    isValueBlock: () => true,
+                    connections: [1]
+                }
+            ];
+
+            const report = validateProject({ blocks: { blockList } });
+            const octWarn = report.items.find(i => i.code === VALIDATOR_CODES.WARN_OUT_OF_RANGE);
+            expect(octWarn).toBeDefined();
+            expect(octWarn.message).toContain("Octave 12 is out of standard audible range");
+        });
+
+        test("detects ERR_INVALID_PITCH and WARN_INVALID_MODE on setkey2 block", () => {
+            const blockList = [
+                {
+                    name: "start",
+                    trash: false,
+                    connections: [null, 1]
+                },
+                {
+                    name: "setkey2",
+                    trash: false,
+                    connections: [0, 2, 3, null],
+                    protoblock: { args: 2, dockTypes: ["out", "anyin", "anyin", "in"] }
+                },
+                {
+                    name: "text",
+                    trash: false,
+                    value: "invalidKey",
+                    isValueBlock: () => true,
+                    connections: [1]
+                },
+                {
+                    name: "text",
+                    trash: false,
+                    value: "alienMode",
+                    isValueBlock: () => true,
+                    connections: [1]
+                }
+            ];
+
+            const report = validateProject({ blocks: { blockList } });
+            const pitchErr = report.items.find(i => i.code === VALIDATOR_CODES.ERR_INVALID_PITCH);
+            expect(pitchErr).toBeDefined();
+            expect(pitchErr.message).toContain('"invalidKey" is not a valid pitch name.');
+
+            const modeWarn = report.items.find(i => i.code === VALIDATOR_CODES.WARN_INVALID_MODE);
+            expect(modeWarn).toBeDefined();
+            expect(modeWarn.message).toContain('Mode "alienMode" is not recognized');
+        });
+
+        test("detects WARN_OUT_OF_RANGE for volume on setnotevolume and setsynthvolume2", () => {
+            const blockList = [
+                {
+                    name: "start",
+                    trash: false,
+                    connections: [null, 1]
+                },
+                {
+                    name: "setnotevolume",
+                    trash: false,
+                    connections: [0, 2, null],
+                    protoblock: { args: 1, dockTypes: ["out", "numberin", "in"] }
+                },
+                {
+                    name: "number",
+                    trash: false,
+                    value: 120,
+                    isValueBlock: () => true,
+                    connections: [1]
+                }
+            ];
+
+            const report = validateProject({ blocks: { blockList } });
+            const volWarn = report.items.find(i => i.code === VALIDATOR_CODES.WARN_OUT_OF_RANGE);
+            expect(volWarn).toBeDefined();
+            expect(volWarn.message).toContain("Volume 120 is out of range");
+        });
+
+        test("detects WARN_OUT_OF_RANGE for scalar interval outside -63 to 69", () => {
+            const blockList = [
+                {
+                    name: "start",
+                    trash: false,
+                    connections: [null, 1]
+                },
+                {
+                    name: "interval",
+                    trash: false,
+                    connections: [0, 2, null],
+                    protoblock: { args: 1, dockTypes: ["out", "numberin", "in"] }
+                },
+                {
+                    name: "number",
+                    trash: false,
+                    value: 80,
+                    isValueBlock: () => true,
+                    connections: [1]
+                }
+            ];
+
+            const report = validateProject({ blocks: { blockList } });
+            const intWarn = report.items.find(i => i.code === VALIDATOR_CODES.WARN_OUT_OF_RANGE);
+            expect(intWarn).toBeDefined();
+            expect(intWarn.message).toContain("Scalar interval 80 must be within -63 to 69.");
+        });
+
+        test("detects WARN_EMPTY_NOTE when note clamp body is empty", () => {
+            const blockList = [
+                {
+                    name: "start",
+                    trash: false,
+                    connections: [null, 1]
+                },
+                {
+                    name: "newnote",
+                    trash: false,
+                    connections: [0, 2, null, null],
+                    protoblock: { args: 1, dockTypes: ["out", "numberin", "in"] }
+                },
+                {
+                    name: "number",
+                    trash: false,
+                    value: 0.25,
+                    isValueBlock: () => true,
+                    connections: [1]
+                }
+            ];
+
+            const report = validateProject({ blocks: { blockList } });
+            const emptyNote = report.items.find(i => i.code === VALIDATOR_CODES.WARN_EMPTY_NOTE);
+            expect(emptyNote).toBeDefined();
+            expect(emptyNote.message).toBe("Note block has no pitch or drum inside.");
+        });
+
+        test("evaluates divide expressions in extractLiteralNumber statically", () => {
+            // Note with duration divide(1, -4) -> -0.25 (non-positive note value)
+            const blockList = [
+                {
+                    name: "start",
+                    trash: false,
+                    connections: [null, 1]
+                },
+                {
+                    name: "newnote",
+                    trash: false,
+                    connections: [0, 2, 5, null],
+                    protoblock: { args: 1, dockTypes: ["out", "numberin", "in"] }
+                },
+                {
+                    name: "divide",
+                    trash: false,
+                    connections: [1, 3, 4]
+                },
+                {
+                    name: "number",
+                    trash: false,
+                    value: 1,
+                    isValueBlock: () => true,
+                    connections: [2]
+                },
+                {
+                    name: "number",
+                    trash: false,
+                    value: -4,
+                    isValueBlock: () => true,
+                    connections: [2]
+                },
+                {
+                    name: "pitch",
+                    trash: false,
+                    connections: [1, 6, 7, null],
+                    protoblock: { args: 2, dockTypes: ["out", "solfegein", "anyin", "in"] }
+                },
+                {
+                    name: "solfege",
+                    trash: false,
+                    value: "sol",
+                    connections: [5]
+                },
+                {
+                    name: "number",
+                    trash: false,
+                    value: 4,
+                    isValueBlock: () => true,
+                    connections: [5]
+                }
+            ];
+
+            const report = validateProject({ blocks: { blockList } });
+            const noteErr = report.items.find(
+                i => i.code === VALIDATOR_CODES.ERR_INVALID_NOTE_VALUE
+            );
+            expect(noteErr).toBeDefined();
+            expect(noteErr.message).toBe("Note value must be greater than 0.");
+        });
+    });
+
     describe("Performance test", () => {
         test("analyzes a large project with 500 blocks in under 50ms", () => {
             const blockList = [];
