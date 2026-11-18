@@ -72,9 +72,18 @@ function setupMeterActions(activity) {
         static setMeter(beatCount, noteValue, turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            const beatsPerMeasure = !Number.isFinite(beatCount) || beatCount <= 0 ? 4 : beatCount;
-            const noteValuePerBeat =
+            // The meter wheel caps the beat count at 16, and the Rhythm
+            // Ruler counts off one timeout per beat — an unbounded count
+            // (a power block can produce 1e308, which is finite and
+            // passes the guard below) would hang the tab there.
+            const beatsPerMeasure =
+                !Number.isFinite(beatCount) || beatCount <= 0 ? 4 : Math.min(beatCount, 16);
+            let noteValuePerBeat =
                 !Number.isFinite(noteValue) || noteValue <= 0 ? 4 : 1 / noteValue;
+            // 1 / noteValue overflows to Infinity for a denormal note
+            // value; a non-finite beat value would poison every
+            // measure-duration computation downstream.
+            if (!Number.isFinite(noteValuePerBeat)) noteValuePerBeat = 4;
             // Measures after a change are counted in the new meter from where it starts.
             if (
                 beatsPerMeasure !== tur.singer.beatsPerMeasure ||
