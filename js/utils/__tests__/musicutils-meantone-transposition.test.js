@@ -108,6 +108,13 @@ describe("semi-tone transposition in 1/3-comma meantone", () => {
         expect(transpose("C", 4, semitones, THIRD)).toEqual([note, octave, 0]);
     });
 
+    test("a tritone, halfway between two pitches, goes to the higher one as before", () => {
+        // 6 semitones are 9.5 of its 19 steps; rounding to steps took the upper pitch.
+        expect(transpose("E", 4, 6, THIRD)).toEqual(["B♭", 4, 0]);
+        expect(transpose("E", 4, -6, THIRD)).toEqual(["B♭", 3, 0]);
+        expect(transpose("F♯", 4, 6, THIRD)).toEqual(["C", 5, 0]);
+    });
+
     test("half a semitone more is cents on G, not on G♯", () => {
         expect(transpose("C", 4, 7.5, THIRD)).toEqual(["G", 4, 50]);
     });

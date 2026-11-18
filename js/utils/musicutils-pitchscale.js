@@ -1118,8 +1118,10 @@ const _transposeInRatioTable = (t, note, octave, semitones) => {
     for (let o = targetOctave - 1; o <= targetOctave + 1; o++) {
         for (let i = 0; i < t.noteLabels.length; i++) {
             const distance = Math.abs(1200 * o + centsOf(i) - target);
-            // Equally near pitches keep the lower one.
-            if (distance < nearestDistance - 1e-9) {
+            // Of two equally near pitches take the higher one, as Math.round does with
+            // half a step in an EDO: 6 semitones are 9.5 steps of 1/3-comma meantone,
+            // whose six-place ratios put the two candidates 0.001 cents apart.
+            if (distance <= nearestDistance + 0.01) {
                 nearestDistance = distance;
                 nearest = [t.noteLabels[i], o];
             }
