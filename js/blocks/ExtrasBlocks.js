@@ -486,18 +486,32 @@ function setupExtrasBlocks(activity) {
          * @param {Array} args - The arguments passed to the block.
          * @param {Logo} logo - The Logo interpreter instance.
          * @param {number} turtle - The turtle associated with the block.
+         * @param {number} [blk] - The block ID.
          */
-        flow(args, logo, turtle) {
+        flow(args, logo, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
             if (args.length === 1) {
+                const secs =
+                    args[0] === null ||
+                    typeof args[0] === "boolean" ||
+                    Array.isArray(args[0]) ||
+                    (typeof args[0] === "string" && args[0].trim() === "")
+                        ? NaN
+                        : Number(args[0]);
+
+                if (!Number.isFinite(secs)) {
+                    activity.errorMsg(NANERRORMSG, blk);
+                    return;
+                }
+
                 const bpmFactor =
                     TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 
-                const noteBeatValue = bpmFactor / (1 / args[0]);
+                const noteBeatValue = secs === 0 ? 0 : bpmFactor / (1 / secs);
                 tur.singer.previousTurtleTime = tur.singer.turtleTime;
                 tur.singer.turtleTime += noteBeatValue;
-                tur.doWait(args[0]);
+                tur.doWait(secs);
             }
         }
     }

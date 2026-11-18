@@ -753,6 +753,76 @@ describe("real ExtrasBlocks instances - direct method coverage", () => {
         instances["CommentBlock"].flow(["a comment"], logo, turtle, blk);
         expect(activity.textMsg).toHaveBeenCalledWith("a comment");
     });
+
+    describe("real WaitBlock flow() timing and non-finite validation (#10487)", () => {
+        let mockTur;
+
+        beforeEach(() => {
+            mockTur = {
+                singer: {
+                    suppressOutput: false,
+                    bpm: [120],
+                    inNoteBlock: [],
+                    turtleTime: 10,
+                    previousTurtleTime: 0,
+                    embeddedGraphics: {}
+                },
+                doWait: jest.fn()
+            };
+            activity.turtles.ithTurtle.mockReturnValue(mockTur);
+        });
+
+        test("updates turtleTime and calls doWait with valid numeric seconds", () => {
+            instances["WaitBlock"].flow([2], logo, turtle, blk);
+
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(mockTur.doWait).toHaveBeenCalledWith(2);
+            expect(mockTur.singer.previousTurtleTime).toBe(10);
+            expect(mockTur.singer.turtleTime).toBeGreaterThan(10);
+        });
+
+        test("supports numeric string seconds such as '1.5'", () => {
+            instances["WaitBlock"].flow(["1.5"], logo, turtle, blk);
+
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(mockTur.doWait).toHaveBeenCalledWith(1.5);
+            expect(mockTur.singer.previousTurtleTime).toBe(10);
+            expect(mockTur.singer.turtleTime).toBeGreaterThan(10);
+        });
+
+        test("handles 0 seconds wait without corrupting turtleTime", () => {
+            instances["WaitBlock"].flow([0], logo, turtle, blk);
+
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(mockTur.doWait).toHaveBeenCalledWith(0);
+            expect(mockTur.singer.turtleTime).toBe(10);
+        });
+
+        test.each([
+            ["Infinity", Infinity],
+            ["-Infinity", -Infinity],
+            ["NaN", NaN],
+            ["non-numeric string", "abc"],
+            ["empty string", ""],
+            ["whitespace string", "   "],
+            ["null", null],
+            ["undefined", undefined],
+            ["boolean true", true],
+            ["boolean false", false],
+            ["array", []],
+            ["object", {}]
+        ])(
+            "rejects non-finite/non-numeric wait %s with NANERRORMSG without touching turtleTime or doWait",
+            (_label, invalidVal) => {
+                instances["WaitBlock"].flow([invalidVal], logo, turtle, blk);
+
+                expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, blk);
+                expect(mockTur.doWait).not.toHaveBeenCalled();
+                expect(mockTur.singer.turtleTime).toBe(10);
+                expect(mockTur.singer.previousTurtleTime).toBe(0);
+            }
+        );
+    });
 });
 
 describe("proto block registration names", () => {
