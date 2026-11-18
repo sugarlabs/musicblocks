@@ -1152,12 +1152,12 @@ function getNote(
         transpositionCents = (transposition - transpositionFloor) * 100;
     }
 
-    // Scale transposition from semitones to EDO steps.
-    // Use the original transposition value (not the already-floored transpositionFloor)
-    // to preserve fractional precision during conversion.
-    // Skip this conversion if transposition is already in EDO steps (non-equal temperaments).
+    // Scale the whole semitones of the transposition to EDO steps. The fraction is
+    // already kept as transpositionCents, as in 12 EDO, so rounding the full value to
+    // steps as well counted it twice: half a semitone in 19 EDO played a step (63 cents)
+    // and 50 cents more. Skip this if the transposition is already in EDO steps.
     if (octaveLength !== 12 && !isAlreadyEdoSteps) {
-        transpositionFloor = Math.round((transposition * octaveLength) / 12);
+        transpositionFloor = Math.round((transpositionFloor * octaveLength) / 12);
     }
 
     if (typeof noteArg !== "number") {
