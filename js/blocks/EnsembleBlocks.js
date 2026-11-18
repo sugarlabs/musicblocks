@@ -232,6 +232,8 @@ function setupEnsembleBlocks(activity) {
                 } else {
                     activity.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
                 }
+            } else if (String(targetTurtle) !== String(turtle)) {
+                logo.stopTurtleRun(targetTurtle);
             } else {
                 const tur = activity.turtles.ithTurtle(targetTurtle);
 
@@ -240,7 +242,7 @@ function setupEnsembleBlocks(activity) {
                 tur.unhighlightQueue = [];
                 tur.parameterQueue = [];
 
-                activity.turtles.ithTurtle(turtle).running = false;
+                tur.running = false;
                 logo.doBreak(tur);
             }
         }

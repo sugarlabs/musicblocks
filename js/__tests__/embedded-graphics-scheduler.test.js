@@ -136,6 +136,28 @@ describe("EmbeddedGraphicsScheduler", () => {
         expect(turtle0.painter.doSetPenAlpha).not.toHaveBeenCalled();
     });
 
+    test("a mouse stopped on its own draws none of its pending graphics", async () => {
+        const guards = [];
+        mockLogo._timerManager.setGuardedTimeout = jest.fn((fn, ms, aborted) => {
+            guards.push(aborted);
+            return guards.length;
+        });
+        turtle0.runGeneration = 0;
+        mockLogo.blockList = [
+            null,
+            { name: "forward", connections: [null, 7] },
+            { name: "setcolor", connections: [null, 7] },
+            { name: "print", connections: [null, 7] }
+        ];
+        turtle0.singer.embeddedGraphics = { 3: [1, 2, 3] };
+
+        await scheduler.schedule(0, 1, 3, 0);
+        expect(guards.some(aborted => aborted())).toBe(false);
+
+        turtle0.runGeneration += 1;
+        expect(guards.every(aborted => aborted())).toBe(true);
+    });
+
     test("clear in a note is scheduled after the note's earlier graphics", async () => {
         const calls = [];
         const timers = [];

@@ -200,7 +200,8 @@ var RESERVED_OBJECT_KEYS = ["__proto__", "constructor", "prototype"];
 /**
  * Checks whether a key is unsafe to assign onto a plain object.
  */
-var isUnsafeObjectKey = key => RESERVED_OBJECT_KEYS.includes(key);
+var isUnsafeObjectKey = key =>
+    key !== null && key !== undefined && RESERVED_OBJECT_KEYS.includes(String(key));
 
 /**
  * Formats a number to at most two decimal places.

@@ -238,6 +238,7 @@ describe("setupEnsembleBlocks", () => {
             }),
             runFromBlock: jest.fn(),
             doBreak: jest.fn(),
+            stopTurtleRun: jest.fn(),
             initTurtle: jest.fn(),
             synth: {
                 inTemperament: "equal"
@@ -457,7 +458,19 @@ describe("setupEnsembleBlocks", () => {
             expect(tur.parentFlowQueue).toEqual([]);
             expect(tur.unhighlightQueue).toEqual([]);
             expect(tur.parameterQueue).toEqual([]);
+            expect(tur.running).toBe(false);
             expect(logo.doBreak).toHaveBeenCalledWith(tur);
+            expect(logo.stopTurtleRun).not.toHaveBeenCalled();
+        });
+
+        it("should stop another turtle and keep the caller running", () => {
+            const caller = turtles.ithTurtle(1);
+            caller.running = true;
+            stopTurtleBlock.flow(["Yertle"], logo, 1, 10);
+            expect(logo.stopTurtleRun).toHaveBeenCalledWith("0");
+            expect(caller.running).toBe(true);
+            expect(caller.queue).toEqual([1, 2, 3]);
+            expect(logo.doBreak).not.toHaveBeenCalled();
         });
     });
 

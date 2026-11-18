@@ -431,6 +431,27 @@ class Singer {
     }
 
     /**
+     * Drops the notes a stopped turtle had started but not yet played.
+     *
+     * @returns {void}
+     */
+    dropPendingNotes() {
+        this.oscList = {};
+        this.noteBeat = {};
+        this.noteValue = {};
+        this.noteDrums = {};
+        this.notePitches = {};
+        this.noteOctaves = {};
+        this.noteCents = {};
+        this.noteHertz = {};
+        this.noteBeatValues = {};
+        this.embeddedGraphics = {};
+        this.delayedNotes = [];
+        this.inNoteBlock = [];
+        this.multipleVoices = false;
+    }
+
+    /**
      * Kills all active audio voices for this turtle.
      * Called during stop/halt to prevent "zombie audio" that continues playing.
      * Uses try/catch to handle nodes that may have already stopped.
@@ -2551,8 +2572,10 @@ class Singer {
                                         chordNotes.push(notationNote);
                                     }
 
-                                    if (!chordDrums.includes(tur.singer.noteDrums[thisBlk][0])) {
-                                        chordDrums.push(tur.singer.noteDrums[thisBlk][0]);
+                                    for (const drum of tur.singer.noteDrums[thisBlk]) {
+                                        if (!chordDrums.includes(drum)) {
+                                            chordDrums.push(drum);
+                                        }
                                     }
                                 } else {
                                     // A frequency (cents or hertz) has no accidental to restate.

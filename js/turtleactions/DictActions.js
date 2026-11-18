@@ -300,9 +300,10 @@ function setupDictActions(activity) {
                 return Turtle.DictActions.SerializeDict(target, turtle);
             }
 
+            const dictName = String(dict);
             return JSON.stringify(
-                Object.prototype.hasOwnProperty.call(activity.logo.turtleDicts[turtle], dict)
-                    ? activity.logo.turtleDicts[turtle][dict]
+                Object.prototype.hasOwnProperty.call(activity.logo.turtleDicts[turtle], dictName)
+                    ? activity.logo.turtleDicts[turtle][dictName]
                     : {}
             );
         }
@@ -334,31 +335,37 @@ function setupDictActions(activity) {
                 activity.logo.turtleDicts[turtle] = {};
             }
 
+            const keyName = String(key);
+
             // Is the dictionary the same as a turtle name?
             const target = getTargetTurtle(activity.turtles, dict);
             if (target !== null) {
-                if (Turtle.DictActions.IsTurtleKey(key)) {
-                    Turtle.DictActions.SetDictValue(target, turtle, key, value);
+                if (Turtle.DictActions.IsTurtleKey(keyName)) {
+                    Turtle.DictActions.SetDictValue(target, turtle, keyName, value);
                     return;
                 }
                 // Other keys are stored where SerializeDict reads them.
                 dict = target;
             }
 
+            const dictName = String(dict);
+
             // Assigning these names on a plain object reaches Object.prototype.
-            if (isUnsafeObjectKey(dict)) {
+            if (isUnsafeObjectKey(dictName)) {
                 activity.errorMsg(_("The dictionary name is reserved."));
                 return;
             }
-            if (isUnsafeObjectKey(key)) {
+            if (isUnsafeObjectKey(keyName)) {
                 activity.errorMsg(_("The key name is reserved."));
                 return;
             }
 
-            if (!Object.prototype.hasOwnProperty.call(activity.logo.turtleDicts[turtle], dict)) {
-                activity.logo.turtleDicts[turtle][dict] = {};
+            if (
+                !Object.prototype.hasOwnProperty.call(activity.logo.turtleDicts[turtle], dictName)
+            ) {
+                activity.logo.turtleDicts[turtle][dictName] = {};
             }
-            activity.logo.turtleDicts[turtle][dict][key] = value;
+            activity.logo.turtleDicts[turtle][dictName][keyName] = value;
         }
 
         /**
@@ -376,16 +383,18 @@ function setupDictActions(activity) {
                 activity.logo.turtleDicts[turtle] = {};
             }
 
+            const keyName = String(key);
+
             // Is the dictionary the same as a turtle name?
             const target = getTargetTurtle(activity.turtles, dict);
             if (target !== null) {
-                if (Turtle.DictActions.IsTurtleKey(key)) {
-                    return Turtle.DictActions._GetDict(target, turtle, key, blk);
+                if (Turtle.DictActions.IsTurtleKey(keyName)) {
+                    return Turtle.DictActions._GetDict(target, turtle, keyName, blk);
                 }
                 const turtleDict = activity.logo.turtleDicts[turtle][target];
                 if (
                     turtleDict === undefined ||
-                    !Object.prototype.hasOwnProperty.call(turtleDict, key)
+                    !Object.prototype.hasOwnProperty.call(turtleDict, keyName)
                 ) {
                     const msg = _("Key with this name does not exist in %s").replace(
                         /%s/g,
@@ -394,21 +403,22 @@ function setupDictActions(activity) {
                     activity.errorMsg(msg, blk);
                     return 0;
                 }
-                return turtleDict[key];
+                return turtleDict[keyName];
             }
 
+            const dictName = String(dict);
             const dicts = activity.logo.turtleDicts[turtle];
-            if (!Object.prototype.hasOwnProperty.call(dicts, dict)) {
+            if (!Object.prototype.hasOwnProperty.call(dicts, dictName)) {
                 const msg = _("Dictionary with this name does not exist");
                 activity.errorMsg(msg, blk);
                 return 0;
-            } else if (!Object.prototype.hasOwnProperty.call(dicts[dict], key)) {
-                const msg = _("Key with this name does not exist in %s").replace(/%s/g, dict);
+            } else if (!Object.prototype.hasOwnProperty.call(dicts[dictName], keyName)) {
+                const msg = _("Key with this name does not exist in %s").replace(/%s/g, dictName);
                 activity.errorMsg(msg, blk);
                 return 0;
             }
 
-            return activity.logo.turtleDicts[turtle][dict][key];
+            return activity.logo.turtleDicts[turtle][dictName][keyName];
         }
     };
 }
