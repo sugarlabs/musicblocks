@@ -1695,7 +1695,7 @@ class Singer {
                 const register = isInterval ? 0 : tur.singer.register;
 
                 const pitchTransform = transposition + register * getOctaveInterval(activity);
-                const noteObj = getNote(
+                let noteObj = getNote(
                     note,
                     octave,
                     pitchTransform,
@@ -1705,6 +1705,29 @@ class Singer {
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
                 );
+
+                // Transpose by ratio and keep the cents a transposition adds, as a
+                // pitch in a Note block does.
+                let ratio = 1;
+                const transpositionRatios = isInterval ? [] : tur.singer.transpositionRatios;
+                for (let i = 0, len = transpositionRatios.length; i < len; i++) {
+                    ratio *= transpositionRatios[i];
+                }
+                if (ratio !== 1) {
+                    const hertz = getCachedPitchToFrequency(
+                        noteObj[0],
+                        noteObj[1],
+                        noteObj[2],
+                        tur.singer.keySignature,
+                        activity.logo.synth.inTemperament
+                    );
+                    noteObj = frequencyToPitch(hertz * ratio);
+                }
+
+                cents += noteObj[2] || 0;
+                if (Math.abs(cents) < 1e-9) {
+                    cents = 0;
+                }
 
                 if (tur.singer.drumStyle.length > 0) {
                     const drumname = last(tur.singer.drumStyle);
@@ -1716,7 +1739,7 @@ class Singer {
                     octave,
                     noteObj[0],
                     noteObj[1],
-                    !activity.logo.runningMxml || pitchTransform !== 0
+                    !activity.logo.runningMxml || pitchTransform !== 0 || ratio !== 1
                 );
                 tur.singer.notePitches[last(tur.singer.inNoteBlock)].push(notationPitch[0]);
                 tur.singer.noteOctaves[last(tur.singer.inNoteBlock)].push(notationPitch[1]);
@@ -1733,7 +1756,8 @@ class Singer {
                           )
                 );
 
-                return noteObj;
+                // Return the cents too, so the interval notes can keep them.
+                return [noteObj[0], noteObj[1], cents];
             };
 
             const noteObj1 = addPitch(note, octave, cents);
@@ -1750,7 +1774,7 @@ class Singer {
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
                 );
-                addPitch(noteObj2[0], noteObj2[1], cents, true);
+                addPitch(noteObj2[0], noteObj2[1], noteObj1[2], true);
             }
 
             const semitoneIntervals = tur.singer.semitoneIntervals;
@@ -1766,7 +1790,40 @@ class Singer {
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
                 );
-                addPitch(noteObj2[0], noteObj2[1], cents, true, semitoneInterval[1]);
+                addPitch(noteObj2[0], noteObj2[1], noteObj1[2], true, semitoneInterval[1]);
+            }
+
+            // Combo of a scalar interval and a semitone interval
+            const chordIntervals = tur.singer.chordIntervals;
+            for (let i = 0, len = chordIntervals.length; i < len; i++) {
+                const chordInterval = chordIntervals[i];
+                const noteObj2 = getNote(
+                    noteObj1[0],
+                    noteObj1[1],
+                    getInterval(chordInterval[0], tur.singer.keySignature, noteObj1[0], edo) +
+                        chordInterval[1],
+                    tur.singer.keySignature,
+                    tur.singer.movable,
+                    null,
+                    activity.errorMsg,
+                    activity.logo.synth.inTemperament
+                );
+                addPitch(noteObj2[0], noteObj2[1], noteObj1[2], true);
+            }
+
+            const ratioIntervals = tur.singer.ratioIntervals;
+            if (ratioIntervals.length > 0) {
+                const baseFrequency = getCachedPitchToFrequency(
+                    noteObj1[0],
+                    noteObj1[1],
+                    noteObj1[2],
+                    tur.singer.keySignature,
+                    activity.logo.synth.inTemperament
+                );
+                for (let i = 0, len = ratioIntervals.length; i < len; i++) {
+                    const noteObj2 = frequencyToPitch(baseFrequency * ratioIntervals[i]);
+                    addPitch(noteObj2[0], noteObj2[1], noteObj2[2], true);
+                }
             }
 
             if (tur.singer.inNoteBlock.length > 0) {
