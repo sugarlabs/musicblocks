@@ -1721,7 +1721,7 @@ class Singer {
                         tur.singer.keySignature,
                         activity.logo.synth.inTemperament
                     );
-                    noteObj = frequencyToPitch(hertz * ratio);
+                    noteObj = frequencyToPitch(hertz * ratio, activity.logo.synth.inTemperament);
                 }
 
                 cents += noteObj[2] || 0;
@@ -1821,7 +1821,10 @@ class Singer {
                     activity.logo.synth.inTemperament
                 );
                 for (let i = 0, len = ratioIntervals.length; i < len; i++) {
-                    const noteObj2 = frequencyToPitch(baseFrequency * ratioIntervals[i]);
+                    const noteObj2 = frequencyToPitch(
+                        baseFrequency * ratioIntervals[i],
+                        activity.logo.synth.inTemperament
+                    );
                     addPitch(noteObj2[0], noteObj2[1], noteObj2[2], true);
                 }
             }
