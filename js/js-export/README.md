@@ -5,7 +5,7 @@ in this directory and the API subdirectory.
 
 The JavaScript code is written and viewed on the **JavaScript Editor**
 widget which can be opened by pressing on the "*Toggle JavaScript
-Editor*" (`<>`) button in the auxilliary menu.
+Editor*" (`<>`) button in the auxiliary menu.
 
 The code corresponding to the JavaScript Editor widget is in
 `widgets/jseditor.js`.
@@ -27,7 +27,7 @@ The code corresponding to the JavaScript Editor widget is in
 
 * `interface.js` — contains lookups tables (to method names) and lists
   of certain block names: used for the *AST* generation. Also contains
-  the contraints and logic for argument validation for blocks.
+  the constraints and logic for argument validation for blocks.
 
 * `constraints.js` — contains the constraint definitions for the API methods'
   arguments, for validation in `interface.js`.
