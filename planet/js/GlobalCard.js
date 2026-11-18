@@ -484,7 +484,7 @@ class GlobalCard {
             if (data.success && Number.isFinite(data.likes)) {
                 projectData.ProjectLikes = data.likes;
                 const currentLikesEl = document.getElementById(`global-project-likes-${id}`);
-                if (currentLikesEl === likesEl) currentLikesEl.textContent = data.likes.toString();
+                if (currentLikesEl) currentLikesEl.textContent = data.likes.toString();
             } else if (!data.success) {
                 Planet.ProjectStorage.like(id, !like);
                 const currentLikesEl = document.getElementById(`global-project-likes-${id}`);

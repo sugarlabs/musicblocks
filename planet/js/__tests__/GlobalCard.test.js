@@ -657,6 +657,26 @@ describe("GlobalCard", () => {
             );
         });
 
+        it("should update a replacement card with the server count on success", () => {
+            card.render();
+            card.like();
+            card.cleanup();
+            document.getElementById("global-projects").innerHTML = "";
+            const newCard = new GlobalCard(mockPlanet);
+            newCard.init("test-id-1");
+            newCard.render();
+
+            expect(document.getElementById("global-project-likes-test-id-1").textContent).toBe("5");
+
+            mockPlanet.ServerInterface.likeProject.mock.calls[0][2]({
+                success: true,
+                likes: 6
+            });
+
+            expect(document.getElementById("global-project-likes-test-id-1").textContent).toBe("6");
+            expect(newCard.ProjectData.ProjectLikes).toBe(6);
+        });
+
         it("should ignore a replacement card's like while the first request is pending", () => {
             card.render();
             card.like();
