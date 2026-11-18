@@ -2329,7 +2329,8 @@ describe("Blocks Foundation", () => {
             document.body.appendChild(loadContainer);
         });
 
-        afterEach(() => {
+        afterEach(async () => {
+            await new Promise(resolve => setTimeout(resolve, 0));
             loadContainer.remove();
             delete global.pubsub;
         });
@@ -2399,7 +2400,8 @@ describe("Blocks Foundation", () => {
             document.body.appendChild(loadContainer);
         });
 
-        afterEach(() => {
+        afterEach(async () => {
+            await new Promise(resolve => setTimeout(resolve, 0));
             loadContainer.remove();
             delete global.pubsub;
         });
@@ -3218,7 +3220,8 @@ describe("Blocks Foundation", () => {
             document.body.appendChild(loadContainer);
         });
 
-        afterEach(() => {
+        afterEach(async () => {
+            await new Promise(resolve => setTimeout(resolve, 0));
             loadContainer.remove();
             delete global.pubsub;
         });
@@ -3382,7 +3385,8 @@ describe("Blocks Foundation", () => {
             document.body.appendChild(loadContainer);
         });
 
-        afterEach(() => {
+        afterEach(async () => {
+            await new Promise(resolve => setTimeout(resolve, 0));
             loadContainer.remove();
             delete global.pubsub;
         });

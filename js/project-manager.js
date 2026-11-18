@@ -563,7 +563,9 @@ class ProjectManager {
             window.loadedSession = data;
             const token = that.blocks.loadNewBlocks(parsed);
             if (token === null) {
-                throw new Error("Cannot load project: invalid project structure.");
+                const err = new Error("Cannot load project: invalid project structure.");
+                err.isRejected = true;
+                throw err;
             }
             return token;
         };
@@ -657,8 +659,19 @@ class ProjectManager {
             // them instead of replacing them (reported against this fix).
             // Pass doNotSave=true so clearing does not write an empty workspace
             // over a good fallback session in storage.
-            if (typeof that.sendAllToTrash === "function") {
-                that.sendAllToTrash(false, true);
+            // When a request is rejected during an active load, no blocks were created
+            // by this request and an active load is still in progress; do not trash
+            // the in-flight blocks.
+            const isRejected = Boolean(error && error.isRejected);
+            const isBlocksLoading = Boolean(
+                that.blocks &&
+                typeof that.blocks.isLoading === "function" &&
+                that.blocks.isLoading()
+            );
+            if (!isRejected && !isBlocksLoading) {
+                if (typeof that.sendAllToTrash === "function") {
+                    that.sendAllToTrash(false, true);
+                }
             }
 
             let fallbackData = null;
@@ -690,10 +703,14 @@ class ProjectManager {
                 }
             }
 
-            if (that && typeof that.errorMsg === "function") {
-                that.errorMsg(_("Your saved project could not be loaded. Starting a new project."));
+            if (!isRejected && !isBlocksLoading) {
+                if (that && typeof that.errorMsg === "function") {
+                    that.errorMsg(
+                        _("Your saved project could not be loaded. Starting a new project.")
+                    );
+                }
+                that.justLoadStart();
             }
-            that.justLoadStart();
         };
 
         if (that.sessionData) {

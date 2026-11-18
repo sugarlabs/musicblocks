@@ -814,7 +814,7 @@ describe("_loadStart", () => {
         expect(window.loadedSession).toBe(validLocalData);
     });
 
-    it("handles active load returning null when session data is invalid by recovering cleanly", async () => {
+    it("handles active load returning null when session data is invalid by recovering cleanly without trashing blocks", async () => {
         const removeItem = jest.fn();
         const activity = makeActivity({
             storage: {
@@ -829,9 +829,52 @@ describe("_loadStart", () => {
         await pm._loadStart(activity);
 
         expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith({ corrupted: true });
-        expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, true);
+        expect(activity.sendAllToTrash).not.toHaveBeenCalled();
         expect(removeItem).toHaveBeenCalledWith("SESSIONTest");
-        expect(activity.justLoadStart).toHaveBeenCalled();
+        expect(activity.justLoadStart).not.toHaveBeenCalled();
+    });
+
+    it("preserves active load blocks and completes fallback when rejected request occurs during an active load", async () => {
+        const deleteSession = jest.fn().mockResolvedValue();
+        const sessionStorageManager = {
+            loadSession: jest.fn().mockResolvedValue({
+                data: JSON.stringify({ corrupted: true }),
+                timestamp: Date.now()
+            }),
+            deleteSession
+        };
+        const validFallbackData = JSON.stringify([[1, "forward", 100, 100, [null, null]]]);
+        const activity = makeActivity({
+            sessionStorageManager,
+            storage: {
+                currentProject: "Test",
+                ["SESSIONTest"]: validFallbackData
+            }
+        });
+
+        const activeBlock = { id: 0, name: "forward", connections: [null, null] };
+        activity.blocks.blockList = [activeBlock];
+        activity.blocks.isLoading = jest.fn(() => true);
+
+        let callCount = 0;
+        activity.blocks.loadNewBlocks = jest.fn(data => {
+            callCount++;
+            if (callCount === 1) {
+                return null;
+            }
+            return 99;
+        });
+
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+
+        expect(activity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(activity.justLoadStart).not.toHaveBeenCalled();
+        expect(deleteSession).toHaveBeenCalledWith("SESSIONTest");
+        expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith([
+            [1, "forward", 100, 100, [null, null]]
+        ]);
+        expect(activity.blocks.blockList).toContain(activeBlock);
     });
 });
 
