@@ -341,7 +341,9 @@ function setupPitchActions(activity) {
             if (!Number.isFinite(hertz)) return;
             const tur = activity.turtles.ithTurtle(turtle);
 
-            const obj = frequencyToPitch(hertz);
+            // Named in the current temperament, so that the cents are measured from the
+            // pitch that will play them and the note sounds at this frequency.
+            const obj = frequencyToPitch(hertz, activity.logo.synth.inTemperament);
             const note = obj[0];
             const octave = obj[1];
             const cents = obj[2];
@@ -405,7 +407,9 @@ function setupPitchActions(activity) {
         static playSynthFrequency(hertz, turtle, blk) {
             if (!Number.isFinite(hertz)) return;
             const tur = activity.turtles.ithTurtle(turtle);
-            const obj = frequencyToPitch(hertz);
+            // Named in the current temperament, so that the cents are measured from the
+            // pitch that will play them and the note sounds at this frequency.
+            const obj = frequencyToPitch(hertz, activity.logo.synth.inTemperament);
 
             if (activity.logo.inMatrix) {
                 activity.logo.phraseMaker.addRowBlock(blk);

@@ -1489,7 +1489,9 @@ class Singer {
                         tur.singer.keySignature,
                         activity.logo.synth.inTemperament
                     );
-                    noteObj = frequencyToPitch(hertz * ratio);
+                    // Name the result in the current temperament, so that its cents are
+                    // measured from the pitch that will play them.
+                    noteObj = frequencyToPitch(hertz * ratio, activity.logo.synth.inTemperament);
                 }
 
                 // Cents may have been added through a transposition.
@@ -1597,7 +1599,7 @@ class Singer {
                 // (2) apply the ratio
                 // (3) convert it to pitch, octave, cents
                 const hertz = baseFrequency * ratioIntervals[i];
-                const noteObj2 = frequencyToPitch(hertz);
+                const noteObj2 = frequencyToPitch(hertz, activity.logo.synth.inTemperament);
                 addPitch(noteObj2[0], noteObj2[1], noteObj2[2], true);
             }
 
