@@ -190,6 +190,18 @@
                 <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat" id="deleter-cancel"></a>
             </div>
         </div>
+        <!-- Planet uses Materialize for confirmation dialogs because it does not load MBDialog. -->
+        <div id="unpublisher" class="modal">
+            <div class="modal-content">
+                <a class="modal-close close-button"><i class="material-icons">close</i></a>
+                <h4 id="unpublisher-confirm"></h4>
+                <p><span id="unpublisher-title"></span>: <span id="unpublisher-paragraph"></span></p>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" id="unpublisher-button" class="modal-action modal-close waves-effect waves-red btn-flat"></a>
+                <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat" id="unpublisher-cancel"></a>
+            </div>
+        </div>
     </div>
     <div id="global">
         <div class="section no-pad-bot">

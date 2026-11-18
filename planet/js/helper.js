@@ -165,6 +165,7 @@ function bindSearchClearButton(inputId, clearId) {
 $(document).ready(() => {
     $("#publisher").modal();
     $("#deleter").modal();
+    $("#unpublisher").modal();
     $("#projectviewer").modal();
 
     bindSearchClearButton("global-search", "search-close");

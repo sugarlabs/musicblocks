@@ -238,10 +238,15 @@ class GlobalPlanet {
 
     addProjects(data, requestId = this._requestId) {
         const toDownload = [];
+        this.batchHasOfflineError = false;
 
         for (let i = 0; i < data.length; i++) {
             if (this.cache.hasOwnProperty(data[i][0])) {
-                if (this.cache[data[i][0]].ProjectLastUpdated !== data[i][1])
+                const visibility = Number(this.cache[data[i][0]].visible);
+                if (
+                    (this.searchMode === "USER_PROJECTS" && visibility !== 0 && visibility !== 1) ||
+                    this.cache[data[i][0]].ProjectLastUpdated !== data[i][1]
+                )
                     toDownload.push(data[i]);
             } else toDownload.push(data[i]);
         }
@@ -256,6 +261,8 @@ class GlobalPlanet {
             if (this.index === 0) {
                 // Initial load returned nothing — show the empty-state message.
                 this.throwNoProjectsError();
+            } else if (this.cards.length === 0) {
+                this.throwNoProjectsError();
             } else {
                 // Load-more returned nothing — pagination is exhausted.
                 // Keep the cards already rendered; just hide the Load More button.
@@ -263,20 +270,22 @@ class GlobalPlanet {
             }
             this.afterAddProjects();
         } else if (this.loadCount === 0) {
-            this.render(data);
+            const rendered = this.render(data, hasMore);
 
             if (requestId !== this._requestId) return;
 
-            hasMore ? this.showLoadMore() : this.hideLoadMore();
+            if (rendered) {
+                hasMore ? this.showLoadMore() : this.hideLoadMore();
+            }
         } else if (hasMore) {
             this.downloadProjectsToCache(
                 toDownload,
                 function () {
-                    this.render(data);
+                    const rendered = this.render(data, hasMore);
 
                     if (requestId !== this._requestId) return;
 
-                    this.showLoadMore();
+                    if (rendered) this.showLoadMore();
                 }.bind(this),
                 requestId
             );
@@ -284,11 +293,11 @@ class GlobalPlanet {
             this.downloadProjectsToCache(
                 toDownload,
                 function () {
-                    this.render(data);
+                    const rendered = this.render(data, hasMore);
 
                     if (requestId !== this._requestId) return;
 
-                    this.hideLoadMore();
+                    if (rendered) this.hideLoadMore();
                 }.bind(this),
                 requestId
             );
@@ -319,6 +328,12 @@ class GlobalPlanet {
         if (data.success) {
             this.cache[id] = data.data;
             this.cache[id].ProjectData = null;
+            if (this.searchMode === "USER_PROJECTS" && Number(this.cache[id].visible) !== 1) {
+                const card = this.cards.find(item => item.id === id);
+                if (card) card.cleanup();
+                this.cards = this.cards.filter(item => item.id !== id);
+                document.getElementById(`global-project-open-${id}`)?.closest(".col")?.remove();
+            }
         } else if (data.error === "PROJECT_NOT_FOUND") {
             delete this.cache[id];
         } else {
@@ -409,13 +424,38 @@ class GlobalPlanet {
         });
     }
 
-    render(data) {
+    render(data, hasMore = false) {
         // Make sure the container doesn't display the offlineHTML or noProjectsHTML even when cards are being rendered.
         this.cleanContainer();
+        if (this.searchMode === "USER_PROJECTS") {
+            data = data.filter(idAndDate => {
+                const project = this.cache[idAndDate[0]];
+                return project && Number(project.visible) === 1;
+            });
+        }
+
+        if (data.length === 0) {
+            if (hasMore) {
+                const requestId = this._requestId;
+                this.afterAddProjects();
+                if (requestId === this._requestId) this.loadMoreProjects();
+            } else {
+                if (this.cards.length === 0) {
+                    if (this.batchHasOfflineError) this.throwOfflineError();
+                    else this.throwNoProjectsError();
+                }
+                this.afterAddProjects();
+            }
+            return false;
+        }
 
         let rendered = 0;
         for (let i = 0; i < data.length; i++) {
-            if (this.cache.hasOwnProperty(data[i][0])) {
+            if (
+                this.cache.hasOwnProperty(data[i][0]) &&
+                (this.searchMode !== "USER_PROJECTS" ||
+                    Number(this.cache[data[i][0]].visible) === 1)
+            ) {
                 const g = new GlobalCard(this.Planet);
                 g.init(data[i][0]);
                 g.render();
@@ -440,6 +480,7 @@ class GlobalPlanet {
 
         jQuery(".tooltipped").tooltip({ delay: 50 });
         this.afterAddProjects();
+        return true;
     }
 
     afterAddProjects() {
