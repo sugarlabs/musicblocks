@@ -2496,12 +2496,14 @@ class Logo {
                                     : queueStart;
                             while (tur.queue.length > boundary) {
                                 const popped = tur.queue.pop();
-                                if (popped && popped.blk in tur.endOfClampSignals) {
-                                    while (tur.endOfClampSignals[popped.blk].length > 0) {
-                                        const signal = tur.endOfClampSignals[popped.blk].pop();
-                                        if (signal !== null && signal !== undefined) {
-                                            logo.stage.dispatchEvent(signal);
-                                        }
+                                if (
+                                    popped &&
+                                    popped.blk in tur.endOfClampSignals &&
+                                    tur.endOfClampSignals[popped.blk].length > 0
+                                ) {
+                                    const signal = tur.endOfClampSignals[popped.blk].pop();
+                                    if (signal !== null && signal !== undefined) {
+                                        logo.stage.dispatchEvent(signal);
                                     }
                                 }
                                 Queue.recycle(popped);

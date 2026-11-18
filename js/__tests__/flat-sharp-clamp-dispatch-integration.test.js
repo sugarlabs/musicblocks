@@ -340,7 +340,7 @@ describe("FlatBlock and SharpBlock clamp lifecycle, nesting, and transposition s
         logo = new Logo(activity);
         activity.logo = logo;
         logo.notation = { notationVoices: jest.fn() };
-        logo.synth = { inTemperament: "equal" };
+        logo.synth = { inTemperament: "equal", transport: { clear: jest.fn() } };
         notePitchesAtSchedule = null;
         noteOctavesAtSchedule = null;
         scheduledForBlk = null;
@@ -813,26 +813,245 @@ describe("FlatBlock and SharpBlock clamp lifecycle, nesting, and transposition s
         }
     });
 
-    test("Test 15 — Scoped clamp dispatch: recursive invocation consumes only its own completion signal", () => {
-        const tur = turtlesList[0];
-        const flatProto = protos.flat;
-        const { clampIds } = installProgram(["flat"]);
-        const flatId = clampIds[0];
-
-        let reentered = false;
-        const originalProcessNote = Singer.processNote;
-        Singer.processNote = jest.fn((act, noteValue, isOsc, blk, t) => {
-            if (!reentered) {
-                reentered = true;
-                // Re-enter the flat clamp recursively (e.g. via recursive action)
-                flatProto.flow([blk], logo, t, flatId);
+    function installActionClampProgram(clampType, useExplicitReturn = false, sharedExit = false) {
+        protos.do = {
+            args: 1,
+            dockTypes: [null, "anyin"],
+            flow: (args, lgo) => {
+                if (args && args[0] in lgo.actions) {
+                    return [lgo.actions[args[0]], 1];
+                }
             }
-            return originalProcessNote.call(Singer, act, noteValue, isOsc, blk, t);
+        };
+        protos.return = {
+            args: 0,
+            dockTypes: [null],
+            flow: () => [null, null, true]
+        };
+
+        const newnote = makeRealBlock("newnote", [null, 1, 3, 2], protos.newnote);
+        const duration = makeValueBlock("number", 0.25);
+        duration.connections = [0];
+        const newnoteHidden = makeHidden(0);
+
+        // Outer clamp [3] -> child [5] outer note 1, exit [4] outer hidden
+        const outerClamp = makeRealBlock(clampType, [0, 5, 4], protos[clampType]);
+        const outerHidden = {
+            name: "hidden",
+            connections: [3, null],
+            protoblock: { args: 0, dockTypes: [null], flow: () => null },
+            isValueBlock: () => false,
+            isArgBlock: () => false
+        };
+
+        // Outer note 1 [5] -> next [8] doBlock
+        const outerNote1 = makeRealBlock("pitch", [3, 6, 7, 8], protos.pitch);
+        const solfege1 = makeValueBlock("solfege", "sol");
+        solfege1.connections = [5];
+        const octave1 = makeValueBlock("number", 4);
+        octave1.connections = [5];
+
+        // Do block [8] -> next [10] outer note 2
+        const doBlock = makeRealBlock("do", [5, 9, 10], protos.do);
+        const actionName = makeValueBlock("text", "mySub");
+        actionName.connections = [8];
+
+        // Outer note 2 [10] -> next null
+        const outerNote2 = makeRealBlock("pitch", [8, 11, 12, null], protos.pitch);
+        const solfege2 = makeValueBlock("solfege", "sol");
+        solfege2.connections = [10];
+        const octave2 = makeValueBlock("number", 4);
+        octave2.connections = [10];
+
+        // Subroutine: inner clamp [15]
+        const innerExit = sharedExit ? 4 : 16;
+        const innerClamp = makeRealBlock(clampType, [null, 17, innerExit], protos[clampType]);
+        const innerHidden = makeHidden(15);
+
+        // Inner note [17] -> next [20] return if explicit return, else null
+        const innerNext = useExplicitReturn ? 20 : null;
+        const innerNote = makeRealBlock("pitch", [15, 18, 19, innerNext], protos.pitch);
+        const innerSolfege = makeValueBlock("solfege", "sol");
+        innerSolfege.connections = [17];
+        const innerOctave = makeValueBlock("number", 4);
+        innerOctave.connections = [17];
+
+        const blocks = [];
+        blocks[0] = newnote;
+        blocks[1] = duration;
+        blocks[2] = newnoteHidden;
+        blocks[3] = outerClamp;
+        blocks[4] = outerHidden;
+        blocks[5] = outerNote1;
+        blocks[6] = solfege1;
+        blocks[7] = octave1;
+        blocks[8] = doBlock;
+        blocks[9] = actionName;
+        blocks[10] = outerNote2;
+        blocks[11] = solfege2;
+        blocks[12] = octave2;
+        blocks[15] = innerClamp;
+        blocks[16] = innerHidden;
+        blocks[17] = innerNote;
+        blocks[18] = innerSolfege;
+        blocks[19] = innerOctave;
+        if (useExplicitReturn) {
+            const returnBlock = makeRealBlock("return", [17, null], protos.return);
+            blocks[20] = returnBlock;
+        }
+
+        logo.actions = { mySub: 15 };
+        logo.blockList = blocks;
+        activity.blocks.blockList = blocks;
+    }
+
+    test("Test 15 — Scoped clamp dispatch in interpreter: nested action with normal return maintains outer Flat clamp transposition", () => {
+        const tur = turtlesList[0];
+        const notesHistory = [];
+        Singer.processPitch = jest.fn((act, note, octave, cents, t, blk) => {
+            notesHistory.push({
+                blk,
+                note,
+                octave,
+                transposition: act.turtles.ithTurtle(t).singer.transposition
+            });
+            return realProcessPitch.call(Singer, act, note, octave, cents, t, blk);
         });
 
+        installActionClampProgram("flat", false);
         logo.runFromBlockNow(logo, 0, 0, 1, null);
 
+        // Note 1 (outer flat clamp): transposition = -1
+        expect(notesHistory[0].blk).toBe(5);
+        expect(notesHistory[0].transposition).toBe(-1);
+
+        // Note 2 (inner flat clamp in action): transposition = -2
+        expect(notesHistory[1].blk).toBe(17);
+        expect(notesHistory[1].transposition).toBe(-2);
+
+        // Note 3 (outer flat clamp after action returns): transposition must still be -1
+        expect(notesHistory[2].blk).toBe(10);
+        expect(notesHistory[2].transposition).toBe(-1);
+
         // After all invocations have exited cleanly:
+        expect(tur.singer.transposition).toBe(0);
+        expect(activeClampListeners(tur)).toEqual([]);
+        expect(activeStageClampListeners(activity)).toEqual([]);
+    });
+
+    test("Test 16 — Scoped clamp dispatch in interpreter: nested action with normal return maintains outer Sharp clamp transposition", () => {
+        const tur = turtlesList[0];
+        const notesHistory = [];
+        Singer.processPitch = jest.fn((act, note, octave, cents, t, blk) => {
+            notesHistory.push({
+                blk,
+                note,
+                octave,
+                transposition: act.turtles.ithTurtle(t).singer.transposition
+            });
+            return realProcessPitch.call(Singer, act, note, octave, cents, t, blk);
+        });
+
+        installActionClampProgram("sharp", false);
+        logo.runFromBlockNow(logo, 0, 0, 1, null);
+
+        // Note 1 (outer sharp clamp): transposition = +1
+        expect(notesHistory[0].blk).toBe(5);
+        expect(notesHistory[0].transposition).toBe(1);
+
+        // Note 2 (inner sharp clamp in action): transposition = +2
+        expect(notesHistory[1].blk).toBe(17);
+        expect(notesHistory[1].transposition).toBe(2);
+
+        // Note 3 (outer sharp clamp after action returns): transposition must still be +1
+        expect(notesHistory[2].blk).toBe(10);
+        expect(notesHistory[2].transposition).toBe(1);
+
+        // After all invocations have exited cleanly:
+        expect(tur.singer.transposition).toBe(0);
+        expect(activeClampListeners(tur)).toEqual([]);
+        expect(activeStageClampListeners(activity)).toEqual([]);
+    });
+
+    test("Test 17 — Scoped clamp dispatch in interpreter: action executing explicit return inside Flat clamp only dispatches inner completion signal", () => {
+        const tur = turtlesList[0];
+        const notesHistory = [];
+        Singer.processPitch = jest.fn((act, note, octave, cents, t, blk) => {
+            notesHistory.push({
+                blk,
+                note,
+                octave,
+                transposition: act.turtles.ithTurtle(t).singer.transposition
+            });
+            return realProcessPitch.call(Singer, act, note, octave, cents, t, blk);
+        });
+
+        installActionClampProgram("flat", true, true);
+        logo.runFromBlockNow(logo, 0, 0, 1, null);
+
+        // Note 1 (outer flat clamp): transposition = -1
+        expect(notesHistory[0].blk).toBe(5);
+        expect(notesHistory[0].transposition).toBe(-1);
+
+        // Note 2 (inner flat clamp before explicit return): transposition = -2
+        expect(notesHistory[1].blk).toBe(17);
+        expect(notesHistory[1].transposition).toBe(-2);
+
+        // Note 3 (outer flat clamp after return unwinds): transposition must still be -1
+        expect(notesHistory[2].blk).toBe(10);
+        expect(notesHistory[2].transposition).toBe(-1);
+
+        // After all invocations have exited cleanly:
+        expect(tur.singer.transposition).toBe(0);
+        expect(activeClampListeners(tur)).toEqual([]);
+        expect(activeStageClampListeners(activity)).toEqual([]);
+    });
+
+    test("Test 18 — Scoped clamp dispatch in interpreter: action executing explicit return inside Sharp clamp only dispatches inner completion signal", () => {
+        const tur = turtlesList[0];
+        const notesHistory = [];
+        Singer.processPitch = jest.fn((act, note, octave, cents, t, blk) => {
+            notesHistory.push({
+                blk,
+                note,
+                octave,
+                transposition: act.turtles.ithTurtle(t).singer.transposition
+            });
+            return realProcessPitch.call(Singer, act, note, octave, cents, t, blk);
+        });
+
+        installActionClampProgram("sharp", true, true);
+        logo.runFromBlockNow(logo, 0, 0, 1, null);
+
+        // Note 1 (outer sharp clamp): transposition = +1
+        expect(notesHistory[0].blk).toBe(5);
+        expect(notesHistory[0].transposition).toBe(1);
+
+        // Note 2 (inner sharp clamp before explicit return): transposition = +2
+        expect(notesHistory[1].blk).toBe(17);
+        expect(notesHistory[1].transposition).toBe(2);
+
+        // Note 3 (outer sharp clamp after return unwinds): transposition must still be +1
+        expect(notesHistory[2].blk).toBe(10);
+        expect(notesHistory[2].transposition).toBe(1);
+
+        // After all invocations have exited cleanly:
+        expect(tur.singer.transposition).toBe(0);
+        expect(activeClampListeners(tur)).toEqual([]);
+        expect(activeStageClampListeners(activity)).toEqual([]);
+    });
+
+    test("Test 19 — Stop and stopTurtleRun unwinds all unissued completion signals across nested clamps", () => {
+        const tur = turtlesList[0];
+        installProgram(["flat", "sharp"]);
+
+        // Enter both clamps manually
+        protos.flat.flow([0], logo, 0, 3);
+        protos.sharp.flow([0], logo, 0, 5);
+
+        // Now both clamps are active; calling stopTurtleRun unwinds all unissued signals
+        logo.stopTurtleRun(0);
+
         expect(tur.singer.transposition).toBe(0);
         expect(activeClampListeners(tur)).toEqual([]);
         expect(activeStageClampListeners(activity)).toEqual([]);
