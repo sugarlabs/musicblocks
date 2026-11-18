@@ -756,6 +756,44 @@ class Singer {
     }
 
     /**
+     * Moves a pitch by a number of steps of the current temperament.
+     *
+     * getNote returns the fraction of a transposition as cents of a semitone, but a
+     * fraction of a step is a fraction of 1200 / edo cents, so only whole steps go to
+     * getNote and the remainder is added to the cents.
+     *
+     * @static
+     * @param {Object} activity
+     * @param {Object} tur - the turtle
+     * @param {String} note
+     * @param {Number} octave
+     * @param {Number} cents
+     * @param {Number} steps - steps of the temperament, possibly fractional
+     * @param {Number} edo - steps per octave of the temperament
+     * @returns {Array} [note, octave, cents]
+     */
+    static moveByEdoSteps(activity, tur, note, octave, cents, steps, edo) {
+        const wholeSteps = Math.round(steps);
+        const noteObj = getNote(
+            note,
+            octave,
+            wholeSteps,
+            tur.singer.keySignature,
+            tur.singer.movable,
+            null,
+            activity.errorMsg,
+            activity.logo.synth.inTemperament,
+            true // isAlreadyEdoSteps
+        );
+        const fraction = steps - wholeSteps;
+        return [
+            noteObj[0],
+            noteObj[1],
+            Math.abs(fraction) < 1e-9 ? cents : cents + (fraction * 1200) / edo
+        ];
+    }
+
+    /**
      * Counts notes, with saving of the box, heap, dict, and turtle states.
      *
      * @static
@@ -1204,10 +1242,30 @@ class Singer {
             tur.singer.neighborArgNote2.push(noteObj2[0] + noteObj2[1]);
         }
 
-        const delta =
+        let delta =
             tur.singer.invertList.length > 0
                 ? Singer.calculateInvert(activity.logo, turtle, note, octave, cents)
                 : 0;
+
+        // Outside 12 EDO, calculateInvert measures in steps of the temperament, but the
+        // branches below add 2 * delta to a transposition that getNote reads as semitones
+        // and rescales by edo / 12: in 19 EDO, C4 inverted around E4 played C5, not G♯4.
+        // Each branch that inverts calls this first to reflect the note in steps, the way a
+        // scalar transposition already moves it above, and then transposes it as usual.
+        const invertInEdoSteps = () => {
+            if (delta !== 0 && edo !== 12) {
+                [note, octave, cents] = Singer.moveByEdoSteps(
+                    activity,
+                    tur,
+                    note,
+                    octave,
+                    cents,
+                    2 * delta,
+                    edo
+                );
+                delta = 0;
+            }
+        };
 
         if (tur.singer.justMeasuring.length > 0) {
             const transposition = tur.singer.transposition;
@@ -1237,6 +1295,7 @@ class Singer {
                 tur.singer.lastPitch.push(pitchNumber);
             }
         } else if (activity.logo.inPitchDrumMatrix) {
+            invertInEdoSteps();
             // A rest ("rest" or "r") is not a row, and a pitch inside Set Drum
             // becomes a drum column instead.
             if (!["rest", "r"].includes(note.toLowerCase()) && tur.singer.drumStyle.length === 0) {
@@ -1300,6 +1359,7 @@ class Singer {
                 activity.logo.pitchDrumMatrix.rowArgs.push(nnote[1]);
             }
         } else if (activity.logo.inMatrix) {
+            invertInEdoSteps();
             if (note.toLowerCase() !== "rest") {
                 activity.logo.phraseMaker.addRowBlock(blk);
                 if (!activity.logo.pitchBlocks.includes(blk)) {
@@ -1375,6 +1435,7 @@ class Singer {
                 activity.logo.phraseMaker.rowArgs.push(noteObj[1]);
             }
         } else if (activity.logo.inLegoWidget && !activity.logo.inMatrix) {
+            invertInEdoSteps();
             if (note.toLowerCase() !== "rest") {
                 activity.logo.legoWidget.addRowBlock(blk);
                 if (!activity.logo.pitchBlocks.includes(blk)) {
@@ -1437,6 +1498,7 @@ class Singer {
                 activity.logo.legoWidget.rowArgs.push(noteObj[1]);
             }
         } else if (tur.singer.inNoteBlock.length > 0) {
+            invertInEdoSteps();
             const addPitch = (note, octave, cents, isInterval, direction) => {
                 // Apply transpositions, but only to the base note of an
                 // interval: the interval notes are built from it.
@@ -1665,6 +1727,7 @@ class Singer {
                 blk
             );
         } else if (activity.logo.inMusicKeyboard) {
+            invertInEdoSteps();
             // Apply transpositions
             const transposition = 2 * delta + tur.singer.transposition;
 
@@ -1699,6 +1762,7 @@ class Singer {
             }
         } else {
             // Play a stand-alone pitch block as a quarter note.
+            invertInEdoSteps();
             activity.logo.clearNoteParams(tur, blk, []);
             if (tur.singer.currentCalculatedOctave === undefined) {
                 tur.singer.currentCalculatedOctave = 4;
