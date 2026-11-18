@@ -220,12 +220,12 @@ describe("setupPitchBlocks", () => {
                 blockList: {
                     10: {
                         name: "test",
-                        connections: [null, null, null, null, null],
+                        connections: [null, null, null, null, 100],
                         value: null,
                         privateData: {}
                     },
-                    20: { name: "test2", connections: [null, null, null, null, null], value: null },
-                    30: { name: "test3", connections: [null, null, null, null, null], value: null }
+                    20: { name: "test2", connections: [null, null, null, null, 200], value: null },
+                    30: { name: "test3", connections: [null, null, null, null, 300], value: null }
                 }
             },
             turtles: turtles,
@@ -1604,8 +1604,8 @@ describe("setupPitchBlocks", () => {
                 const tur = turtles.ithTurtle(0);
                 tur.singer.transposition = 0;
                 tur.listeners = {};
-                activity.blocks.blockList["outer"] = {};
-                activity.blocks.blockList["inner"] = {};
+                activity.blocks.blockList["outer"] = { connections: [null, "inner", "outerExit"] };
+                activity.blocks.blockList["inner"] = { connections: [null, null, "innerExit"] };
                 logo.setTurtleListener.mockImplementation((t, name, fn) => {
                     tur.listeners[name] = fn;
                 });
@@ -1637,8 +1637,12 @@ describe("setupPitchBlocks", () => {
                 const tur = turtles.ithTurtle(0);
                 tur.singer.transposition = 0;
                 tur.listeners = {};
-                activity.blocks.blockList["outerSharp"] = {};
-                activity.blocks.blockList["innerSharp"] = {};
+                activity.blocks.blockList["outerSharp"] = {
+                    connections: [null, "innerSharp", "outerExit"]
+                };
+                activity.blocks.blockList["innerSharp"] = {
+                    connections: [null, null, "innerExit"]
+                };
                 logo.setTurtleListener.mockImplementation((t, name, fn) => {
                     tur.listeners[name] = fn;
                 });
@@ -1670,8 +1674,10 @@ describe("setupPitchBlocks", () => {
                 tur.singer.transposition = 0;
                 tur.singer.invertList = [["sol", 4, "even"]];
                 tur.listeners = {};
-                activity.blocks.blockList["invFlat"] = {};
-                activity.blocks.blockList["invSharp"] = {};
+                activity.blocks.blockList["invFlat"] = { connections: [null, null, "invFlatExit"] };
+                activity.blocks.blockList["invSharp"] = {
+                    connections: [null, null, "invSharpExit"]
+                };
                 logo.setTurtleListener.mockImplementation((t, name, fn) => {
                     tur.listeners[name] = fn;
                 });
@@ -1698,6 +1704,49 @@ describe("setupPitchBlocks", () => {
                 const invalidIds = [undefined, null, "", "nonexistent", 99999];
 
                 for (const blk of invalidIds) {
+                    tur.singer.transposition = 0;
+                    tur.listeners = {};
+                    logo.setDispatchBlock.mockClear();
+                    logo.setTurtleListener.mockClear();
+
+                    expect(() => {
+                        flatBlock.flow(["child"], logo, 0, blk);
+                    }).not.toThrow();
+                    expect(tur.singer.transposition).toBe(0);
+                    expect(tur.listeners).toEqual({});
+                    expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+                    expect(logo.setTurtleListener).not.toHaveBeenCalled();
+
+                    expect(() => {
+                        sharpBlock.flow(["child"], logo, 0, blk);
+                    }).not.toThrow();
+                    expect(tur.singer.transposition).toBe(0);
+                    expect(tur.listeners).toEqual({});
+                    expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+                    expect(logo.setTurtleListener).not.toHaveBeenCalled();
+                }
+            });
+
+            it("FlatBlock and SharpBlock flow return safely and do not mutate state when exit connection is missing, null, or undefined", () => {
+                const flatBlock = createdBlocks["flat"];
+                const sharpBlock = createdBlocks["sharp"];
+                const tur = turtles.ithTurtle(0);
+
+                activity.blocks.blockList["nullExit"] = { connections: [null, 1, null] };
+                activity.blocks.blockList["undefinedExit"] = { connections: [null, 1, undefined] };
+                activity.blocks.blockList["emptyConns"] = { connections: [] };
+                activity.blocks.blockList["malformedConns"] = { connections: "notAnArray" };
+                activity.blocks.blockList["noConns"] = {};
+
+                const testIds = [
+                    "nullExit",
+                    "undefinedExit",
+                    "emptyConns",
+                    "malformedConns",
+                    "noConns"
+                ];
+
+                for (const blk of testIds) {
                     tur.singer.transposition = 0;
                     tur.listeners = {};
                     logo.setDispatchBlock.mockClear();
@@ -1761,6 +1810,21 @@ describe("setupPitchBlocks", () => {
 
                     tur.listeners[sharpListenerName]();
                     expect(tur.singer.transposition).toBe(0);
+
+                    // When block has null exit connection, mouse completion handles it
+                    mockListeners.length = 0;
+                    flatBlock.flow(["child"], logo, 0, "nullExit");
+                    expect(tur.singer.transposition).toBe(-1);
+                    expect(mockListeners.length).toBe(1);
+                    tur.listeners[mockListeners[0]]();
+                    expect(tur.singer.transposition).toBe(0);
+
+                    mockListeners.length = 0;
+                    sharpBlock.flow(["child"], logo, 0, "nullExit");
+                    expect(tur.singer.transposition).toBe(1);
+                    expect(mockListeners.length).toBe(1);
+                    tur.listeners[mockListeners[0]]();
+                    expect(tur.singer.transposition).toBe(0);
                 } finally {
                     global.MusicBlocks = origMusicBlocks;
                     global.Mouse = origMouse;
@@ -1799,6 +1863,17 @@ describe("setupPitchBlocks", () => {
                     expect(tur.singer.transposition).toBe(0);
                     expect(tur.listeners).toEqual({});
                     expect(logo.setTurtleListener).not.toHaveBeenCalled();
+
+                    // Block exists with null exit connection, but mouse is unavailable
+                    expect(() => {
+                        flatBlock.flow(["child"], logo, 0, "nullExit");
+                    }).not.toThrow();
+                    expect(tur.singer.transposition).toBe(0);
+
+                    expect(() => {
+                        sharpBlock.flow(["child"], logo, 0, "nullExit");
+                    }).not.toThrow();
+                    expect(tur.singer.transposition).toBe(0);
                 } finally {
                     global.MusicBlocks = origMusicBlocks;
                     global.Mouse = origMouse;

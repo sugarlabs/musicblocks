@@ -746,4 +746,56 @@ describe("FlatBlock and SharpBlock clamp lifecycle, nesting, and transposition s
             global.MusicBlocks.isRun = false;
         }
     });
+
+    test("Test 14 — Missing, null, or undefined exit connection prevents transposition modification and listener installation", () => {
+        const tur = turtlesList[0];
+
+        const testCases = [
+            { label: "null final connection", connections: [null, 1, null] },
+            { label: "undefined final connection", connections: [null, 1, undefined] },
+            { label: "empty connections array", connections: [] },
+            { label: "malformed connections string", connections: "malformed" },
+            { label: "null connections property", connections: null }
+        ];
+
+        for (const tc of testCases) {
+            const blockIndex = 500;
+            activity.blocks.blockList = {
+                [blockIndex]: {
+                    name: "flat",
+                    connections: tc.connections,
+                    protoblock: protos.flat
+                }
+            };
+
+            // Test FlatBlock
+            tur.singer.transposition = 0;
+            tur.listeners = {};
+            activity.stage._stageListeners = {};
+
+            expect(() => {
+                const res = protos.flat.flow([2], logo, 0, blockIndex);
+                expect(res).toBeUndefined();
+            }).not.toThrow();
+            expect(tur.singer.transposition).toBe(0);
+            expect(activeClampListeners(tur)).toEqual([]);
+            expect(activeStageClampListeners(activity)).toEqual([]);
+
+            // Test SharpBlock
+            activity.blocks.blockList[blockIndex].name = "sharp";
+            activity.blocks.blockList[blockIndex].protoblock = protos.sharp;
+
+            tur.singer.transposition = 0;
+            tur.listeners = {};
+            activity.stage._stageListeners = {};
+
+            expect(() => {
+                const res = protos.sharp.flow([2], logo, 0, blockIndex);
+                expect(res).toBeUndefined();
+            }).not.toThrow();
+            expect(tur.singer.transposition).toBe(0);
+            expect(activeClampListeners(tur)).toEqual([]);
+            expect(activeStageClampListeners(activity)).toEqual([]);
+        }
+    });
 });

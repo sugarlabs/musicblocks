@@ -25,26 +25,93 @@
 
 /* exported setupPitchBlocks */
 
-function setupPitchBlocks(activity) {
-    /**
-     * Returns a unique stage listener name for a turtle by appending a numeric
-     * suffix if an active listener with the same base name already exists.
-     *
-     * @param {Object} tur - The turtle object.
-     * @param {string} baseName - The base name of the event listener.
-     * @returns {string} The unique listener name.
-     */
-    function getUniqueListenerName(tur, baseName) {
-        let name = baseName;
-        if (tur && tur.listeners) {
-            let suffix = 1;
-            while (name in tur.listeners) {
-                name = baseName + "_" + suffix++;
-            }
+/**
+ * Returns a unique stage listener name for a turtle by appending a numeric
+ * suffix if an active listener with the same base name already exists.
+ *
+ * @param {Object} tur - The turtle object.
+ * @param {string} baseName - The base name of the event listener.
+ * @returns {string} The unique listener name.
+ */
+function getUniqueListenerName(tur, baseName) {
+    let name = baseName;
+    if (tur && tur.listeners) {
+        let suffix = 1;
+        while (name in tur.listeners) {
+            name = baseName + "_" + suffix++;
         }
-        return name;
+    }
+    return name;
+}
+
+/**
+ * Checks whether a block possesses a valid completion route via logo.setDispatchBlock.
+ * In MusicBlocks clamps, setDispatchBlock registers completion only when the target
+ * nextBlock (typically the final connection in connections, or connection 0 in backward mode)
+ * is non-null and defined. If this connection is null or undefined, setDispatchBlock skips
+ * registering the listener into endOfClampSignals, causing transposition adjustments to linger.
+ *
+ * @param {Object} act - The activity object.
+ * @param {Object} log - The logo execution engine.
+ * @param {number} turt - The executing turtle index.
+ * @param {number|string} blockId - The block ID.
+ * @returns {boolean} True if setDispatchBlock can establish a completion signal route.
+ */
+function hasDispatchCompletionRoute(act, log, turt, blockId) {
+    if (
+        !act ||
+        !act.blocks ||
+        !act.blocks.blockList ||
+        blockId === undefined ||
+        blockId === null ||
+        !(blockId in act.blocks.blockList)
+    ) {
+        return false;
     }
 
+    const block = act.blocks.blockList[blockId];
+    if (!block || !Array.isArray(block.connections) || block.connections.length === 0) {
+        return false;
+    }
+
+    const execTur =
+        act.turtles && typeof act.turtles.ithTurtle === "function"
+            ? act.turtles.ithTurtle(turt)
+            : null;
+
+    let nextBlock = null;
+    if (
+        execTur &&
+        execTur.singer &&
+        !execTur.singer.inDuplicate &&
+        Array.isArray(execTur.singer.backward) &&
+        execTur.singer.backward.length > 0 &&
+        log &&
+        log.blocks &&
+        typeof log.blocks.sameGeneration === "function" &&
+        act.utils &&
+        typeof act.utils.last === "function"
+    ) {
+        const lastBackward = act.utils.last(execTur.singer.backward);
+        const backwardBlk = act.blocks.blockList[lastBackward];
+        const c = backwardBlk && backwardBlk.name === "backward" ? 1 : 2;
+        if (
+            backwardBlk &&
+            Array.isArray(backwardBlk.connections) &&
+            log.blocks.sameGeneration(backwardBlk.connections[c], blockId)
+        ) {
+            nextBlock = block.connections[0];
+        } else {
+            nextBlock = block.connections[block.connections.length - 1];
+        }
+    } else {
+        nextBlock = block.connections[block.connections.length - 1];
+    }
+
+    return nextBlock !== null && nextBlock !== undefined;
+}
+
+function setupPitchBlocks(activity) {
     class RestBlock extends ValueBlock {
         constructor() {
             super("rest");
@@ -1674,16 +1741,7 @@ function setupPitchBlocks(activity) {
         flow(args, logo, turtle, blk) {
             if (args[0] === undefined) return;
 
-            const hasBlockList =
-                activity &&
-                activity.blocks &&
-                typeof activity.blocks.blockList === "object" &&
-                activity.blocks.blockList !== null;
-            const hasValidBlock =
-                hasBlockList &&
-                blk !== undefined &&
-                blk !== null &&
-                blk in activity.blocks.blockList;
+            const canRegisterDispatch = hasDispatchCompletionRoute(activity, logo, turtle, blk);
             const isMouseRun = typeof MusicBlocks !== "undefined" && MusicBlocks.isRun;
             const execTur = activity.turtles.ithTurtle(turtle);
             const execMouse =
@@ -1699,7 +1757,7 @@ function setupPitchBlocks(activity) {
 
             // When dispatch registration cannot be guaranteed, return safely before
             // mutating state to prevent un-unwound transposition drift and orphaned listeners.
-            if (!hasValidBlock && !canRegisterMouse) {
+            if (!canRegisterDispatch && !canRegisterMouse) {
                 return;
             }
 
@@ -1709,7 +1767,7 @@ function setupPitchBlocks(activity) {
 
             const baseListenerName = "_flat_" + turtle + "_" + blk;
             const listenerName = getUniqueListenerName(execTur, baseListenerName);
-            if (hasValidBlock) {
+            if (canRegisterDispatch) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (canRegisterMouse) {
                 execMouse.MB.listeners.push(listenerName);
@@ -1763,16 +1821,7 @@ function setupPitchBlocks(activity) {
         flow(args, logo, turtle, blk) {
             if (args[0] === undefined) return;
 
-            const hasBlockList =
-                activity &&
-                activity.blocks &&
-                typeof activity.blocks.blockList === "object" &&
-                activity.blocks.blockList !== null;
-            const hasValidBlock =
-                hasBlockList &&
-                blk !== undefined &&
-                blk !== null &&
-                blk in activity.blocks.blockList;
+            const canRegisterDispatch = hasDispatchCompletionRoute(activity, logo, turtle, blk);
             const isMouseRun = typeof MusicBlocks !== "undefined" && MusicBlocks.isRun;
             const execTur = activity.turtles.ithTurtle(turtle);
             const execMouse =
@@ -1788,7 +1837,7 @@ function setupPitchBlocks(activity) {
 
             // When dispatch registration cannot be guaranteed, return safely before
             // mutating state to prevent un-unwound transposition drift and orphaned listeners.
-            if (!hasValidBlock && !canRegisterMouse) {
+            if (!canRegisterDispatch && !canRegisterMouse) {
                 return;
             }
 
@@ -1798,7 +1847,7 @@ function setupPitchBlocks(activity) {
 
             const baseListenerName = "_sharp_" + turtle + "_" + blk;
             const listenerName = getUniqueListenerName(execTur, baseListenerName);
-            if (hasValidBlock) {
+            if (canRegisterDispatch) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (canRegisterMouse) {
                 execMouse.MB.listeners.push(listenerName);
@@ -2448,5 +2497,5 @@ function setupPitchBlocks(activity) {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { setupPitchBlocks };
+    module.exports = { setupPitchBlocks, hasDispatchCompletionRoute };
 }
