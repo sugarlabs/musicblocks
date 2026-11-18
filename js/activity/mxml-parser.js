@@ -732,6 +732,19 @@ function _createNoteBlocks(blockId, duration, content, prevId) {
     return blocks;
 }
 
+function _createMeterBlocks(blockId, timeSignature, prevId) {
+    const { beats, beatType } = timeSignature;
+
+    return [
+        [blockId, "meter", 0, 0, [prevId, blockId + 1, blockId + 2, blockId + 5]],
+        [blockId + 1, ["number", { value: beats }], 0, 0, [blockId]],
+        [blockId + 2, "divide", 0, 0, [blockId, blockId + 3, blockId + 4]],
+        [blockId + 3, ["number", { value: 1 }], 0, 0, [blockId + 2]],
+        [blockId + 4, ["number", { value: beatType }], 0, 0, [blockId + 2]],
+        [blockId + 5, "vspace", 0, 0, [blockId, blockId + 6]]
+    ];
+}
+
 /** Builds one setbpm3 flow segment and its argument blocks. */
 function _createTempoBlocks(blockId, tempoBpm, timeSignature, prevId, nextFlowId = blockId + 6) {
     const bpmValue = (tempoBpm * timeSignature.beatType) / 4;
@@ -782,23 +795,44 @@ function _setNoteDuration(blocks, noteId, duration) {
  * @param {Element} partEl - a MusicXML <part> element
  * @returns {{beats: number, beatType: number}}
  */
-function _initialTimeSignature(partEl) {
-    const timeEl = partEl.querySelector("measure attributes time");
+function _readTimeSignature(timeEl) {
     if (!timeEl) return { beats: 4, beatType: 4 };
-    // <beats> can be additive: the MusicXML spec writes a 3+2/8 bar as one
-    // <beats>3+2</beats>/<beat-type>8</beat-type> pair, and it holds the sum.
-    // Number("3+2") is NaN, and the meter block was handed that as its beat
-    // count.
-    // An empty part ("3+", "3++2", or an empty <beats>) is malformed, not
-    // zero, so it falls back to 4 with the rest.
+
     const beats = (_text(timeEl, "beats") ?? "4")
         .split("+")
         .reduce((total, part) => total + (part.trim() === "" ? NaN : Number(part)), 0);
+
     const beatType = Number(_text(timeEl, "beat-type") ?? "4");
+
     return {
         beats: Number.isFinite(beats) && beats > 0 ? beats : 4,
         beatType: Number.isFinite(beatType) && beatType > 0 ? beatType : 4
     };
+}
+
+function _initialTimeSignature(partEl) {
+    const firstMeasure = partEl.querySelector(":scope > measure");
+
+    if (!firstMeasure) {
+        return { beats: 4, beatType: 4 };
+    }
+
+    for (const child of firstMeasure.children) {
+        if (child.tagName === "attributes") {
+            const timeEl = child.querySelector(":scope > time");
+
+            if (timeEl) {
+                return _readTimeSignature(timeEl);
+            }
+        }
+
+        // A later meter must not be applied to earlier notes.
+        if (["note", "forward", "backup"].includes(child.tagName)) {
+            break;
+        }
+    }
+
+    return { beats: 4, beatType: 4 };
 }
 
 /**
@@ -908,10 +942,11 @@ function _applyRepeats(
     noteStartIds,
     noteEndIds,
     noteTempoBpms,
+    noteTimeSignatures,
     timeSignature,
     blockId
 ) {
-    let firstBlockId = noteStartIds[0];
+    let firstBlockId = noteBlocks[0]?.[0] ?? noteStartIds[0];
     if (repeats.length === 0) return { blocks: [], nextBlockId: blockId, firstBlockId };
 
     // Repeat blocks created by an earlier iteration of this loop are added
@@ -920,9 +955,15 @@ function _applyRepeats(
     // range's "prev" to resolve to the first range's own repeat block.
     const byId = new Map(noteBlocks.map(block => [block[0], block]));
     const repeatBlocks = [];
+    const flowStartIds = noteStartIds.map((noteId, index) => {
+        if (index === 0) return noteBlocks[0][0];
 
+        // Include any meter, tempo or volume blocks inserted
+        // between the previous note and this one.
+        return byId.get(noteEndIds[index - 1])[4][1] ?? noteId;
+    });
     const cloneNotes = (startIndex, endIndex, prevId, durationOverrides = []) => {
-        const firstId = noteStartIds[startIndex];
+        const firstId = flowStartIds[startIndex];
         const lastId = noteEndIds[endIndex];
         const sourceBlocks = noteBlocks.filter(block => block[0] >= firstId && block[0] <= lastId);
         const idMap = new Map(sourceBlocks.map((block, index) => [block[0], blockId + index]));
@@ -951,14 +992,22 @@ function _applyRepeats(
         endIndex,
         times,
         firstEndingStartIndex = null,
-        bodyTieDurations = []
+        bodyTieDurations = [],
+        endTimeSignature
     } of repeats) {
-        const startNote = byId.get(noteStartIds[startIndex]);
+        const startNote = byId.get(flowStartIds[startIndex]);
         const endHidden = byId.get(noteEndIds[endIndex]);
         const prevId = startNote[4][0];
         const prevBlock = byId.get(prevId);
         const nextFlowId = endHidden[4][1];
         const startTempoBpm = noteTempoBpms[startIndex];
+        const startMeter = noteTimeSignatures[startIndex];
+        const firstBlockType = Array.isArray(startNote[1]) ? startNote[1][0] : startNote[1];
+
+        const needsMeterReset =
+            firstBlockType !== "meter" &&
+            (startMeter.beats !== endTimeSignature.beats ||
+                startMeter.beatType !== endTimeSignature.beatType);
 
         if (
             firstEndingStartIndex !== null &&
@@ -973,34 +1022,59 @@ function _applyRepeats(
             // replay only the body before falling through to the second ending.
             let previousEnd = endHidden;
             const copies = [];
+
             const clonePass = (cloneStartIndex, cloneEndIndex, durationOverrides = []) => {
                 let clonePrevId = previousEnd[0];
-                let resetTempoBlocks = [];
+                const resetBlocks = [];
+
+                // Restore the meter before replaying the passage when needed.
+                if (needsMeterReset) {
+                    const meterBlocks = _createMeterBlocks(blockId, startMeter, clonePrevId);
+
+                    previousEnd[4][1] = meterBlocks[0][0];
+                    resetBlocks.push(...meterBlocks);
+
+                    clonePrevId = meterBlocks[5][0];
+                    blockId += meterBlocks.length;
+                }
+
+                // Restore the starting tempo using the repeat's starting meter.
                 if (Number.isFinite(startTempoBpm)) {
-                    resetTempoBlocks = _createTempoBlocks(
+                    const tempoBlocks = _createTempoBlocks(
                         blockId,
                         startTempoBpm,
-                        timeSignature,
+                        startMeter,
                         clonePrevId
                     );
-                    blockId += resetTempoBlocks.length;
-                    previousEnd[4][1] = resetTempoBlocks[0][0];
-                    clonePrevId = resetTempoBlocks[5][0];
+
+                    if (resetBlocks.length === 0) {
+                        previousEnd[4][1] = tempoBlocks[0][0];
+                    } else {
+                        resetBlocks[resetBlocks.length - 1][4][1] = tempoBlocks[0][0];
+                    }
+
+                    resetBlocks.push(...tempoBlocks);
+                    clonePrevId = tempoBlocks[5][0];
+                    blockId += tempoBlocks.length;
                 }
+
                 const copy = cloneNotes(
                     cloneStartIndex,
                     cloneEndIndex,
                     clonePrevId,
                     durationOverrides
                 );
-                if (resetTempoBlocks.length === 0) {
+
+                if (resetBlocks.length === 0) {
                     previousEnd[4][1] = copy.firstId;
                 } else {
-                    resetTempoBlocks[5][4][1] = copy.firstId;
+                    resetBlocks[resetBlocks.length - 1][4][1] = copy.firstId;
                 }
-                copies.push(...resetTempoBlocks, ...copy.blocks);
+
+                copies.push(...resetBlocks, ...copy.blocks);
                 previousEnd = copy.blocks.find(block => block[0] === copy.lastId);
             };
+
             for (let pass = 2; pass < times; pass++) {
                 clonePass(startIndex, endIndex);
             }
@@ -1016,26 +1090,36 @@ function _applyRepeats(
 
         const repeatId = blockId;
         const countId = blockId + 1;
-        const resetTempoId = Number.isFinite(startTempoBpm) ? blockId + 2 : null;
-        blockId += resetTempoId === null ? 2 : 8;
+
+        const meterResetId = needsMeterReset ? blockId + 2 : null;
+        const resetTempoId = Number.isFinite(startTempoBpm)
+            ? blockId + 2 + (needsMeterReset ? 6 : 0)
+            : null;
+
+        blockId += 2 + (needsMeterReset ? 6 : 0) + (resetTempoId !== null ? 6 : 0);
 
         const repeatBlock = [
             repeatId,
             "repeat",
             0,
             0,
-            [prevId, countId, resetTempoId ?? startNote[0], nextFlowId]
+            [prevId, countId, meterResetId ?? resetTempoId ?? startNote[0], nextFlowId]
         ];
         repeatBlocks.push(repeatBlock, [countId, ["number", { value: times }], 0, 0, [repeatId]]);
         byId.set(repeatId, repeatBlock);
+        if (meterResetId !== null) {
+            const meterBlocks = _createMeterBlocks(meterResetId, startMeter, repeatId);
+            meterBlocks[5][4][1] = resetTempoId ?? startNote[0];
+            repeatBlocks.push(...meterBlocks);
+        }
 
         if (resetTempoId !== null) {
             repeatBlocks.push(
                 ..._createTempoBlocks(
                     resetTempoId,
                     startTempoBpm,
-                    timeSignature,
-                    repeatId,
+                    startMeter,
+                    meterResetId !== null ? meterResetId + 5 : repeatId,
                     startNote[0]
                 )
             );
@@ -1055,7 +1139,12 @@ function _applyRepeats(
             const prevSlot = prevBlock[4].indexOf(startNote[0]);
             prevBlock[4][prevSlot] = repeatId;
         }
-        startNote[4][0] = resetTempoId === null ? repeatId : resetTempoId + 5;
+        startNote[4][0] =
+            resetTempoId !== null
+                ? resetTempoId + 5
+                : meterResetId !== null
+                  ? meterResetId + 5
+                  : repeatId;
         endHidden[4][1] = null;
         if (nextFlowId !== null) {
             byId.get(nextFlowId)[4][0] = repeatId;
@@ -1108,6 +1197,7 @@ function _processPart(
     const noteStartIds = [];
     const noteEndIds = [];
     const noteTempoBpms = [];
+    const noteTimeSignatures = [];
     const repeats = [];
     let repeatPendingStart = null;
     let firstEndingStartIndex = null;
@@ -1124,7 +1214,10 @@ function _processPart(
     let producedNotes = false;
     let tieDuration = null;
     let tieContent = null;
+    let tieStartTimeSignature = null;
+    let deferredMeters = [];
     let currentTempoBpm = initialTempoBpm;
+    let currentTimeSignature = { ...timeSignature };
     let nextTempoIndex = 0;
     let pendingVolumes = [];
     let importedVoice = "1";
@@ -1140,7 +1233,7 @@ function _processPart(
         }
     }
 
-    const emitNote = (duration, content) => {
+    const emitNote = (duration, content, noteMeter = currentTimeSignature) => {
         let startId = blockId;
         let previousVolumeBlock = null;
         pendingVolumes.forEach(volume => {
@@ -1159,24 +1252,55 @@ function _processPart(
         noteStartIds.push(startId);
         noteEndIds.push(blocks[blocks.length - 1][0]);
         noteTempoBpms.push(currentTempoBpm);
+        noteTimeSignatures.push({ ...noteMeter });
         producedNotes = true;
         prevId = blocks[blocks.length - 1][0];
         blockId = prevId + 1;
     };
 
+    const flushDeferredMeters = () => {
+        for (const meter of deferredMeters) {
+            noteBlocks.push(..._createMeterBlocks(blockId, meter, prevId));
+            prevId = blockId + 5;
+            blockId += 6;
+        }
+
+        deferredMeters = [];
+    };
+
+    const emitFinishedTie = (duration, content) => {
+        emitNote(duration, content, tieStartTimeSignature ?? currentTimeSignature);
+        tieStartTimeSignature = null;
+        flushDeferredMeters();
+    };
+
     const flushTie = () => {
         if (tieDuration !== null) {
-            emitNote(tieDuration, tieContent);
+            emitFinishedTie(tieDuration, tieContent);
             tieDuration = null;
             tieContent = null;
         }
     };
 
     const emitTempo = tempoBpm => {
-        noteBlocks.push(..._createTempoBlocks(blockId, tempoBpm, timeSignature, prevId));
+        noteBlocks.push(..._createTempoBlocks(blockId, tempoBpm, currentTimeSignature, prevId));
         prevId = blockId + 5;
         blockId += 6;
         currentTempoBpm = tempoBpm;
+    };
+
+    const emitMeter = nextTimeSignature => {
+        if (tieDuration !== null) {
+            deferredMeters.push(nextTimeSignature);
+            currentTimeSignature = nextTimeSignature;
+            return;
+        }
+
+        noteBlocks.push(..._createMeterBlocks(blockId, nextTimeSignature, prevId));
+
+        prevId = blockId + 5;
+        blockId += 6;
+        currentTimeSignature = nextTimeSignature;
     };
 
     const emitDueTempoChanges = (measureIndex, offset) => {
@@ -1203,8 +1327,27 @@ function _processPart(
 
         let offset = 0;
         for (const child of measureEl.children) {
-            emitDueTempoChanges(measureIndex, offset);
             if (child.tagName === "backup") break;
+
+            if (child.tagName === "attributes") {
+                const timeEl = child.querySelector(":scope > time");
+
+                if (timeEl) {
+                    const nextTimeSignature = _readTimeSignature(timeEl);
+
+                    if (
+                        nextTimeSignature.beats !== currentTimeSignature.beats ||
+                        nextTimeSignature.beatType !== currentTimeSignature.beatType
+                    ) {
+                        emitMeter(nextTimeSignature);
+                    }
+                }
+
+                emitDueTempoChanges(measureIndex, offset);
+                continue;
+            }
+
+            emitDueTempoChanges(measureIndex, offset);
 
             if (child.tagName === "direction") {
                 const directionVoice = _text(child, "voice")?.trim();
@@ -1248,7 +1391,7 @@ function _processPart(
                         const index = noteStartIds.length;
                         const duration = tieDuration;
                         const content = tieContent;
-                        emitNote(tieDuration, tieContent);
+                        emitFinishedTie(tieDuration, tieContent);
                         firstEndingBodyTie = { index, duration, content };
                         bodyTieDurations.push({ index, duration });
                         tieDuration = null;
@@ -1260,7 +1403,7 @@ function _processPart(
                     repeatPendingStart = noteStartIds.length;
                 } else if (direction === "backward") {
                     if (firstEndingStartIndex !== null && tieDuration !== null) {
-                        emitNote(tieDuration, tieContent);
+                        emitFinishedTie(tieDuration, tieContent);
                         tieDuration = null;
                         tieContent = null;
                     }
@@ -1275,7 +1418,8 @@ function _processPart(
                             endIndex,
                             times,
                             firstEndingStartIndex,
-                            bodyTieDurations
+                            bodyTieDurations,
+                            endTimeSignature: { ...currentTimeSignature }
                         });
                         lastRepeatEnd = endIndex;
                     }
@@ -1362,13 +1506,14 @@ function _processPart(
                 if (hasTieStart) {
                     tieDuration = combined;
                 } else {
-                    emitNote(combined, tieContent);
+                    emitFinishedTie(combined, tieContent);
                     tieDuration = null;
                     tieContent = null;
                 }
             } else if (hasTieStart && !hasTieStop) {
                 tieDuration = duration;
                 tieContent = content;
+                tieStartTimeSignature = { ...currentTimeSignature };
             } else {
                 emitNote(duration, content);
             }
@@ -1402,6 +1547,7 @@ function _processPart(
         noteStartIds,
         noteEndIds,
         noteTempoBpms,
+        noteTimeSignatures,
         timeSignature,
         blockId
     );

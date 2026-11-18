@@ -470,6 +470,438 @@ describe("Test 8: Title and meter extraction", () => {
         const numBlock = blocks.find(b => b[0] === meter[4][1]);
         expect(numBlock[1][1].value).toBe(4);
     });
+
+    it("imports time signature changes between measures", async () => {
+        const xml = `
+            <score-partwise>
+                <part id="P1">
+                    <measure number="1">
+                        <attributes>
+                            <divisions>8</divisions>
+                            <time>
+                                <beats>4</beats>
+                                <beat-type>4</beat-type>
+                            </time>
+                        </attributes>
+                        ${SIMPLE_NOTE("C", 4, "quarter")}
+                        ${SIMPLE_NOTE("D", 4, "quarter")}
+                    </measure>
+                    <measure number="2">
+                        <attributes>
+                            <time>
+                                <beats>3</beats>
+                                <beat-type>4</beat-type>
+                            </time>
+                        </attributes>
+                        ${SIMPLE_NOTE("G", 4, "quarter")}
+                        ${SIMPLE_NOTE("A", 4, "quarter")}
+                    </measure>
+                </part>
+            </score-partwise>
+        `;
+
+        const { blocks } = await parseAndCapture(xml);
+        const meters = blocks.filter(block => blockName(block) === "meter");
+
+        expect(meters).toHaveLength(2);
+
+        const byId = new Map(blocks.map(block => [block[0], block]));
+
+        const meterValues = meters.map(meter => {
+            const numerator = byId.get(meter[4][1])[1][1].value;
+            const divide = byId.get(meter[4][2]);
+            const denominator = byId.get(divide[4][2])[1][1].value;
+            return [numerator, denominator];
+        });
+
+        expect(meterValues).toEqual([
+            [4, 4],
+            [3, 4]
+        ]);
+
+        const notes = blocks.filter(block => blockName(block) === "newnote");
+
+        expect(notes).toHaveLength(4);
+
+        // The second meter must come after the second note.
+        const previousNoteEnd = byId.get(notes[1][4][3]);
+        expect(previousNoteEnd[4][1]).toBe(meters[1][0]);
+
+        // The second meter must connect to the third note.
+        const meterSpacer = byId.get(meters[1][4][3]);
+        expect(meterSpacer[4][1]).toBe(notes[2][0]);
+        expect(notes[2][4][0]).toBe(meterSpacer[0]);
+
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("uses the new meter for a tempo change at the same measure boundary", async () => {
+        const xml = `
+            <score-partwise>
+                <part id="P1">
+                    <measure number="1">
+                        <attributes>
+                            <divisions>1</divisions>
+                            <time><beats>4</beats><beat-type>4</beat-type></time>
+                        </attributes>
+                        ${SIMPLE_NOTE("C", 4, "quarter")}
+                        ${SIMPLE_NOTE("D", 4, "quarter")}
+                        ${SIMPLE_NOTE("E", 4, "quarter")}
+                        ${SIMPLE_NOTE("F", 4, "quarter")}
+                    </measure>
+                    <measure number="2">
+                        <attributes>
+                            <time><beats>6</beats><beat-type>8</beat-type></time>
+                        </attributes>
+                        <direction><sound tempo="120"/></direction>
+                        ${SIMPLE_NOTE("G", 4, "quarter")}
+                        ${SIMPLE_NOTE("A", 4, "quarter")}
+                        ${SIMPLE_NOTE("B", 4, "quarter")}
+                    </measure>
+                </part>
+            </score-partwise>
+        `;
+
+        const { blocks } = await parseAndCapture(xml);
+        const byId = new Map(blocks.map(block => [block[0], block]));
+
+        const meters = blocks.filter(block => blockName(block) === "meter");
+        const tempos = blocks.filter(block => blockName(block) === "setbpm3");
+
+        expect(meters).toHaveLength(2);
+        expect(tempos).toHaveLength(1);
+
+        const newMeter = meters[1];
+        const tempo = tempos[0];
+
+        // The meter change must happen before the tempo change.
+        expect(newMeter[0]).toBeLessThan(tempo[0]);
+
+        // MusicXML tempo is quarter notes per minute.
+        // Music Blocks expresses BPM using the active beat value.
+        expect(byId.get(tempo[4][1])[1][1].value).toBe(240);
+
+        const beatValue = byId.get(tempo[4][2]);
+        expect(byId.get(beatValue[4][2])[1][1].value).toBe(8);
+
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("keeps meter changes inside a repeated passage", async () => {
+        const xml = `
+            <score-partwise>
+                <part id="P1">
+                    <measure number="1">
+                        <attributes>
+                            <divisions>1</divisions>
+                            <time><beats>4</beats><beat-type>4</beat-type></time>
+                        </attributes>
+                        ${SIMPLE_NOTE("C", 4, "quarter")}
+                    </measure>
+                    <measure number="2">
+                        <attributes>
+                            <time><beats>3</beats><beat-type>4</beat-type></time>
+                        </attributes>
+                        <barline location="left">
+                            <repeat direction="forward"/>
+                        </barline>
+                        ${SIMPLE_NOTE("G", 4, "quarter")}
+                        ${SIMPLE_NOTE("A", 4, "quarter")}
+                        ${SIMPLE_NOTE("B", 4, "quarter")}
+                    </measure>
+                    <measure number="3">
+                        <attributes>
+                            <time><beats>4</beats><beat-type>4</beat-type></time>
+                        </attributes>
+                        ${SIMPLE_NOTE("C", 5, "quarter")}
+                        <barline location="right">
+                            <repeat direction="backward"/>
+                        </barline>
+                    </measure>
+                </part>
+            </score-partwise>
+        `;
+
+        const { blocks } = await parseAndCapture(xml);
+        const byId = new Map(blocks.map(block => [block[0], block]));
+
+        const meters = blocks.filter(block => blockName(block) === "meter");
+        const repeat = blocks.find(block => blockName(block) === "repeat");
+
+        expect(meters).toHaveLength(3);
+        expect(repeat).toBeDefined();
+
+        // The repeat body must begin with the 3/4 meter change,
+        // so that the correct meter is restored on each pass.
+        const repeatBodyStart = byId.get(repeat[4][2]);
+
+        expect(repeatBodyStart[0]).toBe(meters[1][0]);
+
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("restores the original meter when repeating a passage with a meter change", async () => {
+        const xml = `
+            <score-partwise>
+                <part id="P1">
+                    <measure number="1">
+                        <attributes>
+                            <divisions>1</divisions>
+                            <time><beats>4</beats><beat-type>4</beat-type></time>
+                        </attributes>
+                        <barline location="left">
+                            <repeat direction="forward"/>
+                        </barline>
+                        ${SIMPLE_NOTE("C", 4, "quarter")}
+                    </measure>
+                    <measure number="2">
+                        <attributes>
+                            <time><beats>3</beats><beat-type>4</beat-type></time>
+                        </attributes>
+                        ${SIMPLE_NOTE("G", 4, "quarter")}
+                        <barline location="right">
+                            <repeat direction="backward"/>
+                        </barline>
+                    </measure>
+                </part>
+            </score-partwise>
+        `;
+
+        const { blocks } = await parseAndCapture(xml);
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const repeat = blocks.find(block => blockName(block) === "repeat");
+
+        expect(repeat).toBeDefined();
+
+        // The repeated body must restore 4/4 before its first note.
+        const bodyStart = byId.get(repeat[4][2]);
+
+        expect(blockName(bodyStart)).toBe("meter");
+
+        const numerator = byId.get(bodyStart[4][1])[1][1].value;
+        const divide = byId.get(bodyStart[4][2]);
+        const denominator = byId.get(divide[4][2])[1][1].value;
+
+        expect([numerator, denominator]).toEqual([4, 4]);
+
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("restores the meter when flattening first and second endings", async () => {
+        const xml = `
+            <score-partwise>
+                <part id="P1">
+                    <measure number="1">
+                        <attributes>
+                            <divisions>1</divisions>
+                            <time><beats>4</beats><beat-type>4</beat-type></time>
+                        </attributes>
+                        <barline location="left">
+                            <repeat direction="forward"/>
+                        </barline>
+                        ${SIMPLE_NOTE("C", 4, "quarter")}
+                    </measure>
+                    <measure number="2">
+                        <attributes>
+                            <time><beats>3</beats><beat-type>4</beat-type></time>
+                        </attributes>
+                        ${SIMPLE_NOTE("D", 4, "quarter")}
+                    </measure>
+                    <measure number="3">
+                        <barline location="left">
+                            <ending number="1" type="start"/>
+                        </barline>
+                        ${SIMPLE_NOTE("E", 4, "quarter")}
+                        <barline location="right">
+                            <ending number="1" type="stop"/>
+                            <repeat direction="backward"/>
+                        </barline>
+                    </measure>
+                    <measure number="4">
+                        <barline location="left">
+                            <ending number="2" type="start"/>
+                        </barline>
+                        ${SIMPLE_NOTE("F", 4, "quarter")}
+                    </measure>
+                </part>
+            </score-partwise>
+        `;
+
+        const { blocks } = await parseAndCapture(xml);
+        const byId = new Map(blocks.map(block => [block[0], block]));
+
+        const meterValues = blocks
+            .filter(block => blockName(block) === "meter")
+            .map(meter => {
+                const beats = byId.get(meter[4][1])[1][1].value;
+                const divide = byId.get(meter[4][2]);
+                const beatType = byId.get(divide[4][2])[1][1].value;
+                return [beats, beatType];
+            });
+
+        expect(meterValues).toEqual([
+            [4, 4],
+            [3, 4],
+            [4, 4],
+            [3, 4]
+        ]);
+
+        const settimbre = blocks.find(block => blockName(block) === "settimbre");
+        const sequence = [];
+        let currentId = settimbre[4][2];
+
+        for (let steps = 0; currentId !== null && steps < 20; steps++) {
+            const block = byId.get(currentId);
+            expect(block).toBeDefined();
+
+            if (blockName(block) === "meter") {
+                const beats = byId.get(block[4][1])[1][1].value;
+                const divide = byId.get(block[4][2]);
+                const beatType = byId.get(divide[4][2])[1][1].value;
+
+                sequence.push(`${beats}/${beatType}`);
+                currentId = byId.get(block[4][3])[4][1];
+            } else if (blockName(block) === "newnote") {
+                const noteContent = byId.get(byId.get(block[4][2])[4][1]);
+                const name = byId.get(noteContent[4][1])[1][1].value;
+                const octave = byId.get(noteContent[4][2])[1][1].value;
+
+                sequence.push(`${name}${octave}`);
+                currentId = byId.get(block[4][3])[4][1];
+            } else {
+                throw new Error(`Unexpected flow block: ${blockName(block)}`);
+            }
+        }
+
+        expect(currentId).toBeNull();
+        expect(sequence).toEqual(["C4", "3/4", "D4", "E4", "4/4", "C4", "3/4", "D4", "F4"]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("preserves the start of a tied note across a meter change", async () => {
+        const tiedNote = tie =>
+            `<note>
+                <pitch><step>C</step><octave>4</octave></pitch>
+                <duration>1</duration>
+                <type>quarter</type>
+                <tie type="${tie}"/>
+            </note>`;
+
+        const xml = `
+            <score-partwise>
+                <part id="P1">
+                    <measure number="1">
+                        <attributes>
+                            <divisions>1</divisions>
+                            <time><beats>4</beats><beat-type>4</beat-type></time>
+                        </attributes>
+                        ${tiedNote("start")}
+                    </measure>
+                    <measure number="2">
+                        <attributes>
+                            <time><beats>3</beats><beat-type>4</beat-type></time>
+                        </attributes>
+                        ${tiedNote("stop")}
+                        ${SIMPLE_NOTE("G", 4, "quarter")}
+                    </measure>
+                </part>
+            </score-partwise>
+        `;
+
+        const { blocks } = await parseAndCapture(xml);
+        const byId = new Map(blocks.map(block => [block[0], block]));
+        const settimbre = blocks.find(block => blockName(block) === "settimbre");
+
+        const firstFlowBlock = byId.get(settimbre[4][2]);
+
+        // The C note begins in 4/4, not in 3/4.
+        expect(blockName(firstFlowBlock)).toBe("newnote");
+
+        const firstNoteEnd = byId.get(firstFlowBlock[4][3]);
+        const nextMeter = byId.get(firstNoteEnd[4][1]);
+
+        expect(blockName(nextMeter)).toBe("meter");
+        expect(nextMeter[4][0]).toBe(firstNoteEnd[0]);
+
+        const beats = byId.get(nextMeter[4][1])[1][1].value;
+        const divide = byId.get(nextMeter[4][2]);
+        const beatType = byId.get(divide[4][2])[1][1].value;
+
+        expect([beats, beatType]).toEqual([3, 4]);
+
+        const meterSpacer = byId.get(nextMeter[4][3]);
+        const followingNote = byId.get(meterSpacer[4][1]);
+
+        expect(blockName(followingNote)).toBe("newnote");
+        expect(followingNote[4][0]).toBe(meterSpacer[0]);
+
+        // The tied C notes must still produce one half-note.
+        expect(noteValues(blocks)).toEqual([
+            [1, 2],
+            [1, 4]
+        ]);
+
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "G", octave: 4 }
+        ]);
+
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("does not apply a later measure's time signature to earlier notes", async () => {
+        const xml = `
+            <score-partwise>
+                <part id="P1">
+                    <measure number="1">
+                        <attributes><divisions>1</divisions></attributes>
+                        ${SIMPLE_NOTE("C", 4, "quarter")}
+                    </measure>
+                    <measure number="2">
+                        <attributes>
+                            <time><beats>3</beats><beat-type>4</beat-type></time>
+                        </attributes>
+                        ${SIMPLE_NOTE("D", 4, "quarter")}
+                    </measure>
+                </part>
+            </score-partwise>
+        `;
+
+        const { blocks } = await parseAndCapture(xml);
+        const byId = new Map(blocks.map(block => [block[0], block]));
+
+        const meters = blocks
+            .filter(block => blockName(block) === "meter")
+            .map(meter => {
+                const beats = byId.get(meter[4][1])[1][1].value;
+                const divide = byId.get(meter[4][2]);
+                const beatType = byId.get(divide[4][2])[1][1].value;
+
+                return [beats, beatType];
+            });
+
+        expect(meters).toEqual([
+            [4, 4],
+            [3, 4]
+        ]);
+
+        const settimbre = blocks.find(block => blockName(block) === "settimbre");
+        const firstNote = byId.get(settimbre[4][2]);
+
+        expect(blockName(firstNote)).toBe("newnote");
+
+        const firstNoteEnd = byId.get(firstNote[4][3]);
+        expect(blockName(byId.get(firstNoteEnd[4][1]))).toBe("meter");
+
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
 });
 
 describe("Test 9: Degenerate input guards", () => {
