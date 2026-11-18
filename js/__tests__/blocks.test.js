@@ -3936,7 +3936,8 @@ describe("Blocks Foundation", () => {
             ["undefined", undefined]
         ])(
             "rejects %s during an active load, returning null and keeping active load intact",
-            (_label, notBlocks) => {
+            async (_label, notBlocks) => {
+                const finishedPromise = nextLoadEvent("finishedLoading");
                 const initialToken = blocks.loadNewBlocks(makeBatch(1));
                 expect(blocks.isLoading()).toBe(true);
                 const activeToken = blocks._activeLoadToken;
@@ -3952,6 +3953,10 @@ describe("Blocks Foundation", () => {
                 expect(blocks._activeLoadGeneration).toBe(activeGeneration);
                 expect(blocks.isLoading()).toBe(true);
                 expect(blocks._loadQueue).toHaveLength(0);
+
+                const finishedEvent = await finishedPromise;
+                expect(finishedEvent.token).toBe(initialToken);
+                expect(blocks.isLoading()).toBe(false);
             }
         );
 
@@ -3990,6 +3995,37 @@ describe("Blocks Foundation", () => {
             blocks.loadNewBlocks([[0, "forward", 100, 100, [null, null]]]);
             expect(blocks._lastLoadFailed).toBe(false);
         });
+
+        it("preserves _lastLoadFailed flag when an array load is rejected before block creation", () => {
+            blocks._lastLoadFailed = true;
+
+            // Malformed block element in array
+            blocks.loadNewBlocks([null]);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Cannot load project: malformed block structure detected."
+            );
+            expect(blocks._lastLoadFailed).toBe(true);
+            expect(blocks.isLoading()).toBe(false);
+
+            // Circular connection in array
+            blocks.loadNewBlocks([[0, "forward", 100, 100, [null, 0]]]);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Cannot load project: circular block connection detected."
+            );
+            expect(blocks._lastLoadFailed).toBe(true);
+            expect(blocks.isLoading()).toBe(false);
+
+            // Out-of-range connection in array
+            blocks.loadNewBlocks([[0, "forward", 100, 100, [null, 999]]]);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Cannot load project: invalid block connection detected."
+            );
+            expect(blocks._lastLoadFailed).toBe(true);
+            expect(blocks.isLoading()).toBe(false);
+
+            // A subsequent valid load clears the failure flag once validated
+            blocks.loadNewBlocks([[0, "forward", 100, 100, [null, null]]]);
+            expect(blocks._lastLoadFailed).toBe(false);
         });
 
         it("does not set _lastLoadFailed when an abort occurs before any block is created", () => {

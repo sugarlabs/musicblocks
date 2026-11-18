@@ -5756,10 +5756,6 @@ class Blocks {
                     return;
                 }
 
-                // Optimistically clear the previous attempt's failure flag only
-                // after validating that blockObjs is an array; an invalid non-array
-                // request must not erase an earlier load failure indication.
-                this._lastLoadFailed = false;
                 // Every load attempt gets its own generation, win or lose, so a
                 // completion that lands after this one has been abandoned can be
                 // told apart from a completion belonging to whatever load is
@@ -6504,6 +6500,11 @@ class Blocks {
                 this._adjustTheseStacks = [];
                 this._adjustTheseDocks = [];
                 this._loadCounter = blockObjs.length;
+
+                // Clear the previous load failure flag only after all structural
+                // and element validation has succeeded and block creation is about
+                // to begin; early aborts preserve any existing failure state.
+                this._lastLoadFailed = false;
 
                 // Preload audio samples for instruments used in this project (background task)
                 if (this.activity && this.activity.logo && this.activity.logo.synth) {
