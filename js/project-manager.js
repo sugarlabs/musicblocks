@@ -561,7 +561,11 @@ class ProjectManager {
                 return null;
             }
             window.loadedSession = data;
-            return that.blocks.loadNewBlocks(parsed);
+            const token = that.blocks.loadNewBlocks(parsed);
+            if (token === null) {
+                throw new Error("Cannot load project: invalid project structure.");
+            }
+            return token;
         };
 
         const deleteFromSource = async source => {
@@ -651,8 +655,10 @@ class ProjectManager {
             // before it threw. Clear those leftover blocks before loading
             // anything else, or the next attempt's blocks render on top of
             // them instead of replacing them (reported against this fix).
+            // Pass doNotSave=true so clearing does not write an empty workspace
+            // over a good fallback session in storage.
             if (typeof that.sendAllToTrash === "function") {
-                that.sendAllToTrash(false, false);
+                that.sendAllToTrash(false, true);
             }
 
             let fallbackData = null;

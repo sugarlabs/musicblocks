@@ -510,7 +510,7 @@ describe("_loadStart", () => {
         // cleared before justLoadStart()/the fallback attempt runs, or the
         // new stack renders on top of the leftovers instead of replacing
         // them (reported against this fix).
-        expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, false);
+        expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, true);
         expect(activity.justLoadStart).toHaveBeenCalled();
     });
 
@@ -615,7 +615,7 @@ describe("_loadStart", () => {
             operation: "loadSessionData"
         });
         expect(removeItem).toHaveBeenCalledWith("SESSIONTest");
-        expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, false);
+        expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, true);
         expect(activity.errorMsg).toHaveBeenCalled();
         expect(activity.justLoadStart).toHaveBeenCalled();
     });
@@ -814,11 +814,13 @@ describe("_loadStart", () => {
         expect(window.loadedSession).toBe(validLocalData);
     });
 
-    it("handles active load returning null when session data is invalid", async () => {
+    it("handles active load returning null when session data is invalid by recovering cleanly", async () => {
+        const removeItem = jest.fn();
         const activity = makeActivity({
             storage: {
                 currentProject: "Test",
-                ["SESSIONTest"]: JSON.stringify({ corrupted: true })
+                ["SESSIONTest"]: JSON.stringify({ corrupted: true }),
+                removeItem
             }
         });
         activity.blocks.loadNewBlocks = jest.fn(() => null);
@@ -827,7 +829,9 @@ describe("_loadStart", () => {
         await pm._loadStart(activity);
 
         expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith({ corrupted: true });
-        expect(activity.justLoadStart).not.toHaveBeenCalled();
+        expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, true);
+        expect(removeItem).toHaveBeenCalledWith("SESSIONTest");
+        expect(activity.justLoadStart).toHaveBeenCalled();
     });
 });
 

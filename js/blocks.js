@@ -5736,15 +5736,19 @@ class Blocks {
                     // Nothing was loaded, so a waiting save would only store
                     // the cleared workspace over the project.
                     this._afterLoadCallbacks.clear();
-                    this._advanceLoadQueue();
-                    if (typeof pubsub !== "undefined" && typeof pubsub.emit === "function") {
+                    const eventBus =
+                        typeof pubsub !== "undefined" && typeof pubsub.emit === "function"
+                            ? pubsub
+                            : null;
+                    if (eventBus) {
                         setTimeout(() => {
-                            pubsub.emit("loadFailed", {
+                            eventBus.emit("loadFailed", {
                                 token: loadToken,
                                 error: new Error(userMessage || warning)
                             });
                         }, 0);
                     }
+                    this._advanceLoadQueue();
                 };
 
                 if (!Array.isArray(blockObjs)) {
@@ -6502,9 +6506,12 @@ class Blocks {
                 this._loadCounter = blockObjs.length;
 
                 // Clear the previous load failure flag only after all structural
-                // and element validation has succeeded and block creation is about
-                // to begin; early aborts preserve any existing failure state.
-                this._lastLoadFailed = false;
+                // and element validation has succeeded and a non-empty set of blocks
+                // is being loaded, or when the workspace is completely empty; loading
+                // empty blocks into a non-empty failed workspace preserves the flag.
+                if (blockObjs.length > 0 || this.blockList.length === 0) {
+                    this._lastLoadFailed = false;
+                }
 
                 // Preload audio samples for instruments used in this project (background task)
                 if (this.activity && this.activity.logo && this.activity.logo.synth) {

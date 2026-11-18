@@ -248,7 +248,8 @@ function createActivity(turtlesList) {
                     : t
             ),
             running: jest.fn(() => false),
-            getTurtleCount: jest.fn(() => turtlesList.length)
+            getTurtleCount: jest.fn(() => turtlesList.length),
+            markAllAsStopped: jest.fn()
         },
         stage: {
             addEventListener: jest.fn((name, listener) => {
@@ -367,6 +368,9 @@ describe("FlatBlock and SharpBlock clamp lifecycle, nesting, and transposition s
     });
 
     afterEach(() => {
+        if (logo && logo._timerManager) {
+            logo._timerManager.clearAll();
+        }
         Singer.processNote = realProcessNote;
         Singer.addScalarTransposition = realAddScalarTransposition;
         Singer.processPitch = realProcessPitch;
@@ -523,7 +527,11 @@ describe("FlatBlock and SharpBlock clamp lifecycle, nesting, and transposition s
         installProgram(["flat"]);
 
         for (let i = 0; i < 3; i++) {
+            notePitchesAtSchedule = null;
+            noteOctavesAtSchedule = null;
             logo.runFromBlockNow(logo, 0, 0, 1, null);
+            expect(notePitchesAtSchedule).toEqual(["F♯"]);
+            expect(noteOctavesAtSchedule).toEqual([4]);
             expect(tur.singer.transposition).toBe(0);
             expect(activeClampListeners(tur)).toEqual([]);
             expect(activeStageClampListeners(activity)).toEqual([]);
@@ -620,13 +628,17 @@ describe("FlatBlock and SharpBlock clamp lifecycle, nesting, and transposition s
         const tur = turtlesList[0];
 
         installProgram(["flat"]);
+        notePitchesAtSchedule = null;
         logo.runFromBlockNow(logo, 0, 0, 1, null);
+        expect(notePitchesAtSchedule).toEqual(["F♯"]);
         expect(tur.singer.transposition).toBe(0);
         expect(activeClampListeners(tur)).toEqual([]);
         expect(activeStageClampListeners(activity)).toEqual([]);
 
         installProgram(["sharp"]);
+        notePitchesAtSchedule = null;
         logo.runFromBlockNow(logo, 0, 0, 1, null);
+        expect(notePitchesAtSchedule).toEqual(["G♯"]);
         expect(tur.singer.transposition).toBe(0);
         expect(activeClampListeners(tur)).toEqual([]);
         expect(activeStageClampListeners(activity)).toEqual([]);
@@ -771,14 +783,15 @@ describe("FlatBlock and SharpBlock clamp lifecycle, nesting, and transposition s
             // Test FlatBlock
             tur.singer.transposition = 0;
             tur.listeners = {};
-            activity.stage._stageListeners = {};
+            activity.stage.addEventListener.mockClear();
 
             expect(() => {
                 const res = protos.flat.flow([2], logo, 0, blockIndex);
-                expect(res).toBeUndefined();
+                expect(res).toEqual([2, 1]);
             }).not.toThrow();
             expect(tur.singer.transposition).toBe(0);
             expect(activeClampListeners(tur)).toEqual([]);
+            expect(activity.stage.addEventListener).not.toHaveBeenCalled();
             expect(activeStageClampListeners(activity)).toEqual([]);
 
             // Test SharpBlock
@@ -787,15 +800,41 @@ describe("FlatBlock and SharpBlock clamp lifecycle, nesting, and transposition s
 
             tur.singer.transposition = 0;
             tur.listeners = {};
-            activity.stage._stageListeners = {};
+            activity.stage.addEventListener.mockClear();
 
             expect(() => {
                 const res = protos.sharp.flow([2], logo, 0, blockIndex);
-                expect(res).toBeUndefined();
+                expect(res).toEqual([2, 1]);
             }).not.toThrow();
             expect(tur.singer.transposition).toBe(0);
             expect(activeClampListeners(tur)).toEqual([]);
+            expect(activity.stage.addEventListener).not.toHaveBeenCalled();
             expect(activeStageClampListeners(activity)).toEqual([]);
         }
+    });
+
+    test("Test 15 — Scoped clamp dispatch: recursive invocation consumes only its own completion signal", () => {
+        const tur = turtlesList[0];
+        const flatProto = protos.flat;
+        const { clampIds } = installProgram(["flat"]);
+        const flatId = clampIds[0];
+
+        let reentered = false;
+        const originalProcessNote = Singer.processNote;
+        Singer.processNote = jest.fn((act, noteValue, isOsc, blk, t) => {
+            if (!reentered) {
+                reentered = true;
+                // Re-enter the flat clamp recursively (e.g. via recursive action)
+                flatProto.flow([blk], logo, t, flatId);
+            }
+            return originalProcessNote.call(Singer, act, noteValue, isOsc, blk, t);
+        });
+
+        logo.runFromBlockNow(logo, 0, 0, 1, null);
+
+        // After all invocations have exited cleanly:
+        expect(tur.singer.transposition).toBe(0);
+        expect(activeClampListeners(tur)).toEqual([]);
+        expect(activeStageClampListeners(activity)).toEqual([]);
     });
 });

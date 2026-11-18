@@ -3980,10 +3980,14 @@ describe("Blocks Foundation", () => {
             }
         });
 
-        it("preserves _lastLoadFailed flag when an invalid non-array load is attempted", () => {
+        it("preserves _lastLoadFailed flag when an invalid non-array load is attempted and emits loadFailed", async () => {
             blocks._lastLoadFailed = true;
 
-            blocks.loadNewBlocks({ invalid: "data" });
+            const failurePromise = new Promise(resolve => {
+                global.pubsub.once("loadFailed", resolve);
+            });
+
+            const returnedToken = blocks.loadNewBlocks({ invalid: "data" });
 
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
                 "Cannot load project: invalid project structure."
@@ -3991,9 +3995,24 @@ describe("Blocks Foundation", () => {
             expect(blocks._lastLoadFailed).toBe(true);
             expect(blocks.isLoading()).toBe(false);
 
+            const payload = await failurePromise;
+            expect(payload.token).toBe(returnedToken);
+            expect(payload.error.message).toBe("Cannot load project: invalid project structure.");
+
             // A subsequent successful load attempt clears the failure flag
             blocks.loadNewBlocks([[0, "forward", 100, 100, [null, null]]]);
             expect(blocks._lastLoadFailed).toBe(false);
+        });
+
+        it("preserves _lastLoadFailed flag when loading an empty array into a non-empty failed workspace", () => {
+            blocks._lastLoadFailed = true;
+            blocks.blockList = [makeBatch(1)[0]];
+
+            blocks.loadNewBlocks([]);
+
+            // Empty load completes, but must not clear failure flag while a failed workspace remains
+            expect(blocks._lastLoadFailed).toBe(true);
+            expect(blocks.isLoading()).toBe(false);
         });
 
         it("preserves _lastLoadFailed flag when an array load is rejected before block creation", () => {
@@ -4332,7 +4351,7 @@ describe("Blocks Foundation", () => {
 
             window.removeEventListener("error", onWindowError);
 
-            expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, false);
+            expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, true);
             expect(activity.errorMsg).toHaveBeenCalled();
 
             // The fallback's own load (DATAOBJS) must have found the flag

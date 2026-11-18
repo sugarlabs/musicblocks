@@ -46,10 +46,11 @@ function getUniqueListenerName(tur, baseName) {
 
 /**
  * Checks whether a block possesses a valid completion route via logo.setDispatchBlock.
- * In MusicBlocks clamps, setDispatchBlock registers completion only when the target
- * nextBlock (typically the final connection in connections, or connection 0 in backward mode)
- * is non-null and defined. If this connection is null or undefined, setDispatchBlock skips
- * registering the listener into endOfClampSignals, causing transposition adjustments to linger.
+ * This helper enforces a strict completion policy: the target connection must be
+ * non-null and defined. While logo.setDispatchBlock explicitly skips null target connections,
+ * an undefined connection could register under the key "undefined" and only fire during
+ * finish-time sweeps. To prevent un-unwound transposition drift and orphaned listeners, this
+ * preflight check requires a defined, non-null completion block connection.
  *
  * @param {Object} act - The activity object.
  * @param {Object} log - The logo execution engine.
@@ -79,6 +80,15 @@ function hasDispatchCompletionRoute(act, log, turt, blockId) {
             ? act.turtles.ithTurtle(turt)
             : null;
 
+    const utilsLast =
+        (log &&
+            log.deps &&
+            log.deps.utils &&
+            typeof log.deps.utils.last === "function" &&
+            log.deps.utils.last) ||
+        (act && act.utils && typeof act.utils.last === "function" && act.utils.last) ||
+        (arr => (Array.isArray(arr) && arr.length > 0 ? arr[arr.length - 1] : undefined));
+
     let nextBlock = null;
     if (
         execTur &&
@@ -88,11 +98,9 @@ function hasDispatchCompletionRoute(act, log, turt, blockId) {
         execTur.singer.backward.length > 0 &&
         log &&
         log.blocks &&
-        typeof log.blocks.sameGeneration === "function" &&
-        act.utils &&
-        typeof act.utils.last === "function"
+        typeof log.blocks.sameGeneration === "function"
     ) {
-        const lastBackward = act.utils.last(execTur.singer.backward);
+        const lastBackward = utilsLast(execTur.singer.backward);
         const backwardBlk = act.blocks.blockList[lastBackward];
         const c = backwardBlk && backwardBlk.name === "backward" ? 1 : 2;
         if (
@@ -102,10 +110,10 @@ function hasDispatchCompletionRoute(act, log, turt, blockId) {
         ) {
             nextBlock = block.connections[0];
         } else {
-            nextBlock = block.connections[block.connections.length - 1];
+            nextBlock = utilsLast(block.connections);
         }
     } else {
-        nextBlock = block.connections[block.connections.length - 1];
+        nextBlock = utilsLast(block.connections);
     }
 
     return nextBlock !== null && nextBlock !== undefined;
@@ -1755,10 +1763,12 @@ function setupPitchBlocks(activity) {
                 Array.isArray(execMouse.MB.listeners)
             );
 
-            // When dispatch registration cannot be guaranteed, return safely before
+            // When dispatch registration cannot be guaranteed, return early before
             // mutating state to prevent un-unwound transposition drift and orphaned listeners.
+            // FlowBlock contracts require returning the expected flow result to allow Logo
+            // to queue any child body.
             if (!canRegisterDispatch && !canRegisterMouse) {
-                return;
+                return [args[0], 1];
             }
 
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
@@ -1835,10 +1845,12 @@ function setupPitchBlocks(activity) {
                 Array.isArray(execMouse.MB.listeners)
             );
 
-            // When dispatch registration cannot be guaranteed, return safely before
+            // When dispatch registration cannot be guaranteed, return early before
             // mutating state to prevent un-unwound transposition drift and orphaned listeners.
+            // FlowBlock contracts require returning the expected flow result to allow Logo
+            // to queue any child body.
             if (!canRegisterDispatch && !canRegisterMouse) {
-                return;
+                return [args[0], 1];
             }
 
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));

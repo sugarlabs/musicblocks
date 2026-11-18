@@ -1753,7 +1753,8 @@ describe("setupPitchBlocks", () => {
                     logo.setTurtleListener.mockClear();
 
                     expect(() => {
-                        flatBlock.flow(["child"], logo, 0, blk);
+                        const res = flatBlock.flow(["child"], logo, 0, blk);
+                        expect(res).toEqual(["child", 1]);
                     }).not.toThrow();
                     expect(tur.singer.transposition).toBe(0);
                     expect(tur.listeners).toEqual({});
@@ -1761,7 +1762,8 @@ describe("setupPitchBlocks", () => {
                     expect(logo.setTurtleListener).not.toHaveBeenCalled();
 
                     expect(() => {
-                        sharpBlock.flow(["child"], logo, 0, blk);
+                        const res = sharpBlock.flow(["child"], logo, 0, blk);
+                        expect(res).toEqual(["child", 1]);
                     }).not.toThrow();
                     expect(tur.singer.transposition).toBe(0);
                     expect(tur.listeners).toEqual({});
@@ -1812,6 +1814,7 @@ describe("setupPitchBlocks", () => {
                     expect(tur.singer.transposition).toBe(0);
 
                     // When block has null exit connection, mouse completion handles it
+                    activity.blocks.blockList["nullExit"] = { connections: [null, 1, null] };
                     mockListeners.length = 0;
                     flatBlock.flow(["child"], logo, 0, "nullExit");
                     expect(tur.singer.transposition).toBe(-1);
@@ -1865,13 +1868,16 @@ describe("setupPitchBlocks", () => {
                     expect(logo.setTurtleListener).not.toHaveBeenCalled();
 
                     // Block exists with null exit connection, but mouse is unavailable
+                    activity.blocks.blockList["nullExit"] = { connections: [null, 1, null] };
                     expect(() => {
-                        flatBlock.flow(["child"], logo, 0, "nullExit");
+                        const res = flatBlock.flow(["child"], logo, 0, "nullExit");
+                        expect(res).toEqual(["child", 1]);
                     }).not.toThrow();
                     expect(tur.singer.transposition).toBe(0);
 
                     expect(() => {
-                        sharpBlock.flow(["child"], logo, 0, "nullExit");
+                        const res = sharpBlock.flow(["child"], logo, 0, "nullExit");
+                        expect(res).toEqual(["child", 1]);
                     }).not.toThrow();
                     expect(tur.singer.transposition).toBe(0);
                 } finally {

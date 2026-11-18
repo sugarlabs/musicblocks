@@ -2569,13 +2569,11 @@ class Logo {
         */
             // Is the block in a queued clamp?
             if (blk !== logo._ignoringBlock) {
-                if (blk in tur.endOfClampSignals) {
-                    while (tur.endOfClampSignals[blk].length > 0) {
-                        const signal = tur.endOfClampSignals[blk].pop();
-                        // eslint-disable-next-line eqeqeq
-                        if (signal != null) {
-                            logo.stage.dispatchEvent(signal);
-                        }
+                if (blk in tur.endOfClampSignals && tur.endOfClampSignals[blk].length > 0) {
+                    const signal = tur.endOfClampSignals[blk].pop();
+                    // eslint-disable-next-line eqeqeq
+                    if (signal != null) {
+                        logo.stage.dispatchEvent(signal);
                     }
                 }
             }
