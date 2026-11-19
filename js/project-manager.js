@@ -399,7 +399,19 @@ class ProjectManager {
     }
 
     justLoadStart() {
-        this.activity.blocks.loadNewBlocks(DATAOBJS);
+        const activity = this.activity;
+        activity.blocks.loadNewBlocks(DATAOBJS);
+
+        // The default project's blocks come from a fixed template whose
+        // coordinates assume a full-screen window, so they can load
+        // off-centre (or off-screen) in a smaller one. Recentre once the load
+        // finishes; loaded projects take the tryParseAndLoad() path above and
+        // never reach here, so their layout is left untouched.
+        activity.blocks.runAfterLoad(() => {
+            if (activity.workspaceLayoutController) {
+                activity.workspaceLayoutController.centerBlocksInViewport();
+            }
+        });
     }
 
     async _loadStart(that) {

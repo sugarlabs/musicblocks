@@ -265,6 +265,101 @@ describe("findBlocks", () => {
 });
 
 // ---------------------------------------------------------------------------
+// centerBlocksInViewport
+// ---------------------------------------------------------------------------
+
+describe("centerBlocksInViewport", () => {
+    test("pans the container so a block is centered in the canvas", () => {
+        const blockList = {
+            a: makeBlock("a", { x: 900, y: 500, width: 100, height: 100 })
+        };
+        const activity = setupActivity({ blockList });
+        activity.canvas.height = 600;
+        activity.stage = { scaleX: 1, scaleY: 1 };
+
+        activity.workspaceLayoutController.centerBlocksInViewport();
+
+        // Bounds center is (950, 550); canvas center is (500, 300).
+        expect(activity.blocksContainer.x).toBe(-450);
+        expect(activity.blocksContainer.y).toBe(-250);
+        expect(activity.refreshCanvas).toHaveBeenCalled();
+    });
+
+    test("accounts for the stage and container scale", () => {
+        const blockList = {
+            a: makeBlock("a", { x: 900, y: 500, width: 100, height: 100 })
+        };
+        const activity = setupActivity({ blockList });
+        activity.canvas.height = 600;
+        activity.blocksContainer.scaleX = 2;
+        activity.blocksContainer.scaleY = 2;
+        activity.stage = { scaleX: 1, scaleY: 1 };
+
+        activity.workspaceLayoutController.centerBlocksInViewport();
+
+        // x = 1000 / (2 * 1) - 950 * 2
+        expect(activity.blocksContainer.x).toBe(-1400);
+        // y = 600 / (2 * 1) - 550 * 2
+        expect(activity.blocksContainer.y).toBe(-800);
+    });
+
+    test("uses the bounds of all visible blocks, not just the first", () => {
+        const blockList = {
+            a: makeBlock("a", { x: 100, y: 100, width: 50, height: 50 }),
+            b: makeBlock("b", { x: 350, y: 250, width: 50, height: 50 })
+        };
+        const activity = setupActivity({ blockList });
+        activity.canvas.height = 600;
+        activity.stage = { scaleX: 1, scaleY: 1 };
+
+        activity.workspaceLayoutController.centerBlocksInViewport();
+
+        // Bounds are (100, 100)-(400, 300), center (250, 200).
+        expect(activity.blocksContainer.x).toBe(250);
+        expect(activity.blocksContainer.y).toBe(100);
+    });
+
+    test("ignores trashed blocks", () => {
+        const blockList = {
+            kept: makeBlock("kept", { x: 400, y: 200, width: 100, height: 100 }),
+            trashed: makeBlock("trashed", { x: -5000, y: -5000, trash: true })
+        };
+        const activity = setupActivity({ blockList });
+        activity.canvas.height = 600;
+        activity.stage = { scaleX: 1, scaleY: 1 };
+
+        activity.workspaceLayoutController.centerBlocksInViewport();
+
+        // Bounds are the kept block alone: center (450, 250).
+        expect(activity.blocksContainer.x).toBe(50);
+        expect(activity.blocksContainer.y).toBe(50);
+    });
+
+    test("does not change the container when there are no visible blocks", () => {
+        const activity = setupActivity({ blockList: {} });
+        activity.canvas.height = 600;
+        activity.blocksContainer = { x: 10, y: 20 };
+
+        activity.workspaceLayoutController.centerBlocksInViewport();
+
+        expect(activity.blocksContainer.x).toBe(10);
+        expect(activity.blocksContainer.y).toBe(20);
+        expect(activity.refreshCanvas).not.toHaveBeenCalled();
+    });
+
+    test("does not change the container when the canvas has no size", () => {
+        const blockList = { a: makeBlock("a", { x: 900, y: 500, width: 100, height: 100 }) };
+        const activity = setupActivity({ blockList });
+        activity.blocksContainer = { x: 10, y: 20 };
+
+        activity.workspaceLayoutController.centerBlocksInViewport();
+
+        expect(activity.blocksContainer.x).toBe(10);
+        expect(activity.blocksContainer.y).toBe(20);
+    });
+});
+
+// ---------------------------------------------------------------------------
 // _findBlocks — Home button toggle behavior
 // ---------------------------------------------------------------------------
 
