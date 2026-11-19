@@ -1272,15 +1272,21 @@ var pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
 
     // Unified stretched-octave powerBase and engine getOctaveRatio: generalizes base 2 to dynamic powerBase.
     // Frequency = A0 * powerBase^(pitchNumber / currentEDO)
-    // With cents offset: Frequency = A0 * powerBase^((pitchNumber * 100 + cents) / (currentEDO * 100))
-    // This works because 1 semitone = 100 cents, and powerBase^(1/1200) is the cents resolution.
-    // Example (base 2): 19-EDO, A4 (pitchNumber=48), 0 cents → 27.5 * 2^(48/19) ≈ 440 Hz
-    // Example (base 2): 19-EDO, A4 + 50 cents → 27.5 * 2^((48*100+50)/(19*100)) ≈ 447.8 Hz
+    // With cents offset: Frequency = A0 * powerBase^(pitchNumber / currentEDO + cents / 1200),
+    // computed in hundredths of a step. A cent is 1/1200 of the octave in every temperament
+    // (it is what frequencyToPitch returns and what the ratio tables above add), so it is
+    // 12 / currentEDO hundredths of a step. Taking the cents as hundredths of a step played
+    // them at 12 / currentEDO of their size outside 12 EDO.
+    // Example (base 2): 19-EDO, A4 (pitchNumber=76), 0 cents → 27.5 * 2^(76/19) = 440 Hz
+    // Example (base 2): 19-EDO, A4 + 50 cents → 440 * 2^(50/1200) ≈ 452.9 Hz
     // Example (stretched): powerBase=2.01, scales exactly with the stretched interval space.
     if (cents === 0) {
         return A0 * Math.pow(powerBase, 1 / currentEDO) ** pitchNumber;
     } else {
-        return A0 * Math.pow(powerBase, 1 / (currentEDO * 100)) ** (pitchNumber * 100 + cents);
+        const stepHundredths = currentEDO === 12 ? cents : (cents * currentEDO) / 12;
+        return (
+            A0 * Math.pow(powerBase, 1 / (currentEDO * 100)) ** (pitchNumber * 100 + stepHundredths)
+        );
     }
 };
 
