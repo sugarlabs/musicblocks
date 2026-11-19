@@ -1894,15 +1894,26 @@ class Logo {
                             this._singingPreparationRequest = null;
                         });
                 }
-                this._singingPreparation
-                    .then(() => {
-                        if (this.runGeneration === generation) this.runLogoCommands(startHere, env);
-                    })
-                    .catch(error => {
-                        if (this.runGeneration !== generation) return;
+                const request = this._singingPreparationRequest;
+                const resume = () => {
+                    if (this.runGeneration !== generation) return;
+                    try {
+                        this.runLogoCommands(startHere, env);
+                    } catch (error) {
+                        this.doStopTurtles();
                         this.deps.errorHandler(error.message);
-                        this.onStopTurtle();
-                    });
+                    }
+                };
+                this._singingPreparation.then(resume, error => {
+                    if (this.runGeneration !== generation) return;
+                    if (request.generation !== generation) {
+                        // The failed preparation belonged to a superseded Play request.
+                        resume();
+                        return;
+                    }
+                    this.deps.errorHandler(error.message);
+                    this.onStopTurtle();
+                });
                 return;
             }
         }

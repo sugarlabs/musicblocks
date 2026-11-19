@@ -5102,6 +5102,37 @@ describe("Kokoro singing preflight", () => {
         await new Promise(resolve => setTimeout(resolve, 0));
         expect(logo.runLogoCommands).toHaveBeenCalledWith(7, "env");
     });
+    test("reports and cleans up a startup failure after singing preparation", async () => {
+        const { logo, complete } = preflight();
+        logo.doStopTurtles = jest.fn();
+        logo.runLogoCommands.mockImplementation(() => {
+            logo.runGeneration++;
+            throw new Error("synth startup failed");
+        });
+        Logo.prototype.runLogoCommands.call(logo, 7);
+        complete();
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(logo.doStopTurtles).toHaveBeenCalledTimes(1);
+        expect(logo.deps.errorHandler).toHaveBeenCalledWith("synth startup failed");
+    });
+    test("continues the latest Play when superseded preparation fails", async () => {
+        const { logo } = preflight();
+        let fail;
+        logo.synth.prepareSinging.mockReturnValueOnce(
+            new Promise((_, reject) => {
+                fail = reject;
+            })
+        );
+        Logo.prototype.runLogoCommands.call(logo, 7);
+        logo._getSingingTexts.mockReturnValue(["oh"]);
+        Logo.prototype.runLogoCommands.call(logo, 8);
+        fail(new Error("old syllable failed"));
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(logo.runLogoCommands).toHaveBeenCalledTimes(1);
+        expect(logo.runLogoCommands).toHaveBeenCalledWith(8, undefined);
+        expect(logo.deps.errorHandler).not.toHaveBeenCalled();
+        expect(logo.onStopTurtle).not.toHaveBeenCalled();
+    });
     test("Stop while loading prevents delayed playback", async () => {
         const { logo, complete } = preflight();
         Logo.prototype.runLogoCommands.call(logo, 7);
