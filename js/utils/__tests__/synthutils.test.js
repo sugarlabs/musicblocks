@@ -3627,6 +3627,8 @@ describe("Utility Functions (logic-only)", () => {
 
                 expect(Synth.isRecordingStarting()).toBe(false);
                 expect(Synth.samplerRecorder).toBeNull();
+                expect(micInstance.open).not.toHaveBeenCalled();
+                expect(recorderInstance.start).not.toHaveBeenCalled();
                 expect(micInstance.close).toHaveBeenCalled();
                 expect(recorderInstance.dispose).toHaveBeenCalled();
             } finally {

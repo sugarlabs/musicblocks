@@ -120,12 +120,17 @@ const SamplerBlocks = {
         this.__save = function () {
             const that = this;
             this._setWidgetTimeout(function () {
+                const isRecorded =
+                    !that.sampleData ||
+                    that.sampleData === that.recordingURL ||
+                    (typeof that.sampleName === "string" &&
+                        that.sampleName.startsWith("Recorded Audio"));
                 if (
                     that.activity &&
                     that.activity.logo &&
                     that.activity.logo.synth &&
                     that.activity.logo.synth.audioURL &&
-                    (!that.sampleData || that.sampleData === that.recordingURL)
+                    isRecorded
                 ) {
                     that.recordingURL = that.activity.logo.synth.audioURL;
                     that.sampleData = that.recordingURL;

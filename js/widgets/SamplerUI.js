@@ -597,6 +597,10 @@ const SamplerUI = {
                     }
                 } else if (this.is_recording) {
                     this.recordingURL = await this.activity.logo.synth.stopRecording();
+                    if (this.recordingURL) {
+                        this.sampleData = this.recordingURL;
+                        this.sampleName = `Recorded Audio ${this.recordingURL}`;
+                    }
                     this.is_recording = false;
                     this._recordBtn.getElementsByTagName("img")[0].src = "header-icons/mic.svg";
                     this.displayRecordingStopMessage();
