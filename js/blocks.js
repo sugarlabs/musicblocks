@@ -5706,9 +5706,13 @@ class Blocks {
                     if (this.activity && typeof this.activity.stopLoadAnimation === "function") {
                         this.activity.stopLoadAnimation();
                     }
-                    // Nothing was loaded, so a waiting save would only store
-                    // the cleared workspace over the project.
-                    this._afterLoadCallbacks.clear();
+                    // Report this failed load before discarding waits, so
+                    // callers cannot save an incomplete workspace.
+                    this._lastLoadFailed = true;
+                    pubsub.emit("loadFailed", {
+                        token: loadToken,
+                        error: new Error(warning)
+                    });
                     this._advanceLoadQueue();
                 };
 
