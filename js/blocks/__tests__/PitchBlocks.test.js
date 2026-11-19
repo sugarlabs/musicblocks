@@ -20,7 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const { setupPitchBlocks } = require("../PitchBlocks");
+const { setupPitchBlocks, hasDispatchCompletionRoute } = require("../PitchBlocks");
 const PitchStaircaseSteps = require("../../widgets/PitchStaircaseSteps");
 
 const SHARP = "\u266F";
@@ -2350,6 +2350,102 @@ describe("setupPitchBlocks", () => {
                         }
                     });
                 });
+            });
+        });
+
+        describe("hasDispatchCompletionRoute", () => {
+            it("returns false for invalid activity or block inputs", () => {
+                expect(hasDispatchCompletionRoute(null, logo, 0, 1)).toBe(false);
+                expect(hasDispatchCompletionRoute({}, logo, 0, 1)).toBe(false);
+                expect(hasDispatchCompletionRoute({ blocks: {} }, logo, 0, 1)).toBe(false);
+                expect(hasDispatchCompletionRoute(activity, logo, 0, undefined)).toBe(false);
+                expect(hasDispatchCompletionRoute(activity, logo, 0, null)).toBe(false);
+                expect(hasDispatchCompletionRoute(activity, logo, 0, 99999)).toBe(false);
+            });
+
+            it("returns false for malformed block or missing connections", () => {
+                activity.blocks.blockList[100] = null;
+                expect(hasDispatchCompletionRoute(activity, logo, 0, 100)).toBe(false);
+                activity.blocks.blockList[101] = { connections: null };
+                expect(hasDispatchCompletionRoute(activity, logo, 0, 101)).toBe(false);
+                activity.blocks.blockList[102] = { connections: [] };
+                expect(hasDispatchCompletionRoute(activity, logo, 0, 102)).toBe(false);
+            });
+
+            it("evaluates forward clamp completion correctly", () => {
+                activity.blocks.blockList[103] = { connections: [0, 1, 2] };
+                expect(hasDispatchCompletionRoute(activity, logo, 0, 103)).toBe(true);
+
+                activity.blocks.blockList[104] = { connections: [0, 1, null] };
+                expect(hasDispatchCompletionRoute(activity, logo, 0, 104)).toBe(false);
+
+                activity.blocks.blockList[105] = { connections: [0, 1, undefined] };
+                expect(hasDispatchCompletionRoute(activity, logo, 0, 105)).toBe(false);
+            });
+
+            it("handles backward mode when backward block is backward", () => {
+                const tur = turtles.ithTurtle(0);
+                tur.singer.inDuplicate = false;
+                tur.singer.backward = [200];
+                activity.blocks.blockList[200] = { name: "backward", connections: [null, 300] };
+                activity.blocks.blockList[106] = { connections: [400, 1, 500] };
+
+                logo.blocks = {
+                    sameGeneration: jest.fn((c, blk) => c === 300 && blk === 106)
+                };
+
+                // sameGeneration is true -> nextBlock is connection 0 (400)
+                expect(hasDispatchCompletionRoute(activity, logo, 0, 106)).toBe(true);
+
+                // when connection 0 is null -> false
+                activity.blocks.blockList[106].connections[0] = null;
+                expect(hasDispatchCompletionRoute(activity, logo, 0, 106)).toBe(false);
+            });
+
+            it("handles backward mode when backward block is action/clamp boundary", () => {
+                const tur = turtles.ithTurtle(0);
+                tur.singer.inDuplicate = false;
+                tur.singer.backward = [201];
+                activity.blocks.blockList[201] = { name: "action", connections: [null, null, 301] };
+                activity.blocks.blockList[107] = { connections: [401, 1, 501] };
+
+                logo.blocks = {
+                    sameGeneration: jest.fn(() => false)
+                };
+
+                // sameGeneration is false -> falls back to utilsLast (501)
+                expect(hasDispatchCompletionRoute(activity, logo, 0, 107)).toBe(true);
+            });
+
+            it("skips backward logic when inDuplicate is true", () => {
+                const tur = turtles.ithTurtle(0);
+                tur.singer.inDuplicate = true;
+                tur.singer.backward = [200];
+                activity.blocks.blockList[108] = { connections: [null, 1, 502] };
+
+                // Uses utilsLast despite backward list
+                expect(hasDispatchCompletionRoute(activity, logo, 0, 108)).toBe(true);
+            });
+
+            it("uses act.utils.last or fallback arrow function when log.deps.utils is absent", () => {
+                const minimalAct = {
+                    blocks: {
+                        blockList: {
+                            109: { connections: [1, 2, 3] }
+                        }
+                    },
+                    utils: { last: arr => arr[arr.length - 1] }
+                };
+                expect(hasDispatchCompletionRoute(minimalAct, null, 0, 109)).toBe(true);
+
+                const noUtilsAct = {
+                    blocks: {
+                        blockList: {
+                            110: { connections: [1, 2, 4] }
+                        }
+                    }
+                };
+                expect(hasDispatchCompletionRoute(noUtilsAct, null, 0, 110)).toBe(true);
             });
         });
     });
