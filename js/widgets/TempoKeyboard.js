@@ -125,6 +125,13 @@ class TempoKeyboard {
         }
 
         if (event.key === " " || event.code === "Space" || event.keyCode === 32) {
+            if (
+                activeElement &&
+                activeElement.tagName === "CANVAS" &&
+                activeElement.getAttribute("role") === "button"
+            ) {
+                return;
+            }
             event.preventDefault();
             event.stopPropagation();
             this.togglePlayPause();

@@ -96,6 +96,27 @@ describe("TempoKeyboard", () => {
         expect(event.defaultPrevented).toBe(true);
     });
 
+    test("Space taps a focused tempo canvas instead of toggling playback", () => {
+        const canvas = document.createElement("canvas");
+        canvas.setAttribute("tabindex", "0");
+        canvas.setAttribute("role", "button");
+        const tap = jest.fn();
+        canvas.addEventListener("keydown", tap);
+        document.body.appendChild(canvas);
+        canvas.focus();
+
+        const event = new KeyboardEvent("keydown", {
+            key: " ",
+            cancelable: true,
+            bubbles: true
+        });
+        canvas.dispatchEvent(event);
+
+        expect(tempo.togglePlayPause).not.toHaveBeenCalled();
+        expect(tap).toHaveBeenCalledTimes(1);
+        expect(event.defaultPrevented).toBe(false);
+    });
+
     test.each(["t", "T"])("%s taps the tempo of the active row", key => {
         press(key);
 
