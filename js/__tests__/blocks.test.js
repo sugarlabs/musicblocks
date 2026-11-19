@@ -3453,16 +3453,12 @@ describe("Blocks Foundation", () => {
             expect(activity.errorMsg).not.toHaveBeenCalled();
         });
 
-        it("internal loader aborts cleanly with actionable message for non-array data", () => {
+        it("aborts cleanly with actionable message when blockObjs is not an array", () => {
             const activity = makeActivity();
             const blocks = makeBlocks(activity, ["forward"]);
 
-            // The public entry point rejects non-arrays; exercise the internal abort guard.
-            blocks._loadInProgress = true;
-            expect(() => blocks._loadNewBlocksNow({ invalid: "data" }, 1)).not.toThrow();
+            expect(() => blocks.loadNewBlocks({ invalid: "data" })).not.toThrow();
             expect(blocks._loadInProgress).toBe(false);
-            expect(activity._suppressRefresh).toBe(false);
-            expect(activity.stopLoadAnimation).toHaveBeenCalled();
             expect(activity.errorMsg).toHaveBeenCalledWith(
                 "Cannot load project: invalid project structure."
             );
@@ -3926,16 +3922,23 @@ describe("Blocks Foundation", () => {
             ["an object", { name: "equal", pitchNumber: 12 }],
             ["null", null],
             ["undefined", undefined]
-        ])("rejects %s without leaving a load in progress", (_label, notBlocks) => {
-            expect(() => blocks.loadNewBlocks(notBlocks)).toThrow(TypeError);
+        ])("reports %s without leaving a load in progress", (_label, notBlocks) => {
+            expect(() => blocks.loadNewBlocks(notBlocks)).not.toThrow();
             expect(blocks.isLoading()).toBe(false);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Cannot load project: invalid project structure."
+            );
         });
 
-        it("does not queue data that is not a block list behind a running load", () => {
+        it("reports invalid data without queuing it behind a running load", () => {
             blocks.loadNewBlocks(makeBatch(1));
 
-            expect(() => blocks.loadNewBlocks({})).toThrow(TypeError);
+            expect(() => blocks.loadNewBlocks({})).not.toThrow();
+            expect(blocks.isLoading()).toBe(true);
             expect(blocks._loadQueue).toHaveLength(0);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Cannot load project: invalid project structure."
+            );
         });
 
         it("runAfterLoad runs the callback right away when nothing is loading", () => {
