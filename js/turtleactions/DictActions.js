@@ -268,8 +268,8 @@ function setupDictActions(activity) {
             this_dict[_("pen size")] = targetTur.painter.stroke;
             this_dict[_("font")] = targetTur.painter.font;
             this_dict[_("heading")] = targetTur.painter.turtle.orientation;
-            this_dict["y"] = activity.turtles.screenY2turtleY(targetTur.container.y);
-            this_dict["x"] = activity.turtles.screenX2turtleX(targetTur.container.x);
+            this_dict[_("y")] = activity.turtles.screenY2turtleY(targetTur.container.y);
+            this_dict[_("x")] = activity.turtles.screenX2turtleX(targetTur.container.x);
 
             if (
                 turtle in activity.logo.turtleDicts &&
@@ -413,7 +413,10 @@ function setupDictActions(activity) {
                 activity.errorMsg(msg, blk);
                 return 0;
             } else if (!Object.prototype.hasOwnProperty.call(dicts[dictName], keyName)) {
-                const msg = _("Key with this name does not exist in %s").replace(/%s/g, dictName);
+                const msg = _("Key with this name does not exist in %s").replace(
+                    /%s/g,
+                    () => dictName
+                );
                 activity.errorMsg(msg, blk);
                 return 0;
             }
