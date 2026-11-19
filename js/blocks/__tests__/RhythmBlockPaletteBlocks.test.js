@@ -95,7 +95,8 @@ function createDummyTurtle() {
             inNoteBlock: [],
             notePitches: {},
             noteOctaves: {},
-            noteCents: {}
+            noteCents: {},
+            noteDrums: {}
         },
         doWait: jest.fn()
     };
@@ -122,6 +123,7 @@ dummyActivity.turtles = {
 
 const dummyLogo = {
     inMatrix: false,
+    inRhythmRuler: false,
     tuplet: false,
     tupletParams: [],
     tupletRhythms: [],
@@ -275,6 +277,40 @@ describe("setupRhythmBlockPaletteBlocks", () => {
 
             expect(logo.addingNotesToTuplet).toBe(true);
             expect(logo.tupletRhythms).toEqual([["notes", 0, 0.25, 0.25]]);
+        });
+
+        it("routes notes to rhythm ruler when inRhythmRuler is true without calling Singer.processNote", () => {
+            const rhythmBlock = DummyFlowBlock.createdBlocks["rhythm"];
+            logo.inRhythmRuler = true;
+            logo.rhythmRulerMeasure = null;
+            logo._currentDrumBlock = "drum1";
+            logo.rhythmRuler = {
+                Drums: ["drum1"],
+                Rulers: [[[], []]]
+            };
+            activity.blocks.blockList["blkRhythm"] = { name: "rhythm", connections: [] };
+
+            Singer.processNote.mockClear();
+            rhythmBlock.flow([3, 0.25], logo, turtleIndex, "blkRhythm");
+
+            expect(Singer.processNote).not.toHaveBeenCalled();
+            expect(logo.rhythmRulerMeasure).toBe(3 * 0.25);
+            expect(logo.rhythmRuler.Rulers[0][0]).toEqual([0.25, 0.25, 0.25]);
+        });
+
+        it("calls Singer.processNote normally when inRhythmRuler is false", () => {
+            jest.useFakeTimers();
+            const rhythmBlock = DummyFlowBlock.createdBlocks["rhythm"];
+            logo.inRhythmRuler = false;
+            activity.blocks.blockList["blkRhythm"] = { name: "rhythm", connections: [] };
+
+            Singer.processNote.mockClear();
+            rhythmBlock.flow([2, 0.25], logo, turtleIndex, "blkRhythm");
+
+            jest.runAllTimers();
+
+            expect(Singer.processNote).toHaveBeenCalledTimes(2);
+            jest.useRealTimers();
         });
     });
 

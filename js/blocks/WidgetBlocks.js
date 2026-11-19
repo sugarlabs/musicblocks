@@ -1808,7 +1808,14 @@ function setupWidgetBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = () => {
-                logo.rhythmRuler.init(activity);
+                const ownsRuler = logo.rhythmRuler?.rulerBlock === blk;
+                try {
+                    logo.rhythmRuler.init(activity);
+                } finally {
+                    if (ownsRuler && logo.rhythmRuler?.rulerBlock === blk) {
+                        logo.inRhythmRuler = false;
+                    }
+                }
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
