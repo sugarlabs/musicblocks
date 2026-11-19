@@ -117,6 +117,26 @@ const fullProgram = (form = FORM) => ({
 });
 
 describe("PracticeValidator Twinkle Phrase Maker form", () => {
+    afterEach(() => {
+        delete window.ActivityContext;
+    });
+
+    test("fails closed when the workspace has no blocks", () => {
+        useBlocks({});
+
+        expect(PracticeValidator.validate(PROBLEM)).toBe(false);
+    });
+
+    test("fails closed when the activity cannot be read", () => {
+        window.ActivityContext = {
+            getActivity: () => {
+                throw new Error("not ready");
+            }
+        };
+
+        expect(PracticeValidator.validate(PROBLEM)).toBe(false);
+    });
+
     test("accepts the three phrases called in song order", () => {
         useBlocks(fullProgram());
 
@@ -239,23 +259,38 @@ describe("PracticeValidator Twinkle Phrase Maker form", () => {
         expect(PracticeValidator.validate(PROBLEM)).toBe(false);
     });
 
+    // A1 A2, then B inside a repeat, then A1 A2.
+    const programWithRepeatedB = count => ({
+        ...matrix,
+        ...phraseAction("A1", PHRASES.A1),
+        ...phraseAction("A2", PHRASES.A2),
+        ...phraseAction("B", PHRASES.B),
+        start: { name: "start", trash: false, connections: [null, "a1", null] },
+        a1: { name: "nameddo", value: "A1", trash: false, connections: ["start", "a2"] },
+        a2: { name: "nameddo", value: "A2", trash: false, connections: ["a1", "loop"] },
+        loop: { name: "repeat", trash: false, connections: ["a2", "times", "b", "a1b"] },
+        times: { name: "number", value: count, trash: false, connections: ["loop"] },
+        b: { name: "nameddo", value: "B", trash: false, connections: ["loop", null] },
+        a1b: { name: "nameddo", value: "A1", trash: false, connections: ["loop", "a2b"] },
+        a2b: { name: "nameddo", value: "A2", trash: false, connections: ["a1b", null] }
+    });
+
     test("counts a repeat of the middle phrase as two calls", () => {
-        useBlocks({
-            ...matrix,
-            ...phraseAction("A1", PHRASES.A1),
-            ...phraseAction("A2", PHRASES.A2),
-            ...phraseAction("B", PHRASES.B),
-            start: { name: "start", trash: false, connections: [null, "a1", null] },
-            a1: { name: "nameddo", value: "A1", trash: false, connections: ["start", "a2"] },
-            a2: { name: "nameddo", value: "A2", trash: false, connections: ["a1", "loop"] },
-            loop: { name: "repeat", trash: false, connections: ["a2", "times", "b", "a1b"] },
-            times: { name: "number", value: 2, trash: false, connections: ["loop"] },
-            b: { name: "nameddo", value: "B", trash: false, connections: ["loop", null] },
-            a1b: { name: "nameddo", value: "A1", trash: false, connections: ["loop", "a2b"] },
-            a2b: { name: "nameddo", value: "A2", trash: false, connections: ["a1b", null] }
-        });
+        useBlocks(programWithRepeatedB(2));
 
         expect(PracticeValidator.validate(PROBLEM)).toBe(true);
+    });
+
+    test.each([
+        [2.5, true, "a fractional count is floored to two passes"],
+        [3, false, "three passes is one B too many"],
+        [1, false, "one pass leaves the middle phrase short"],
+        [0, false, "a count below one runs the body zero times"],
+        ["high", false, "a count that is not a number runs the body zero times"]
+    ])("repeat count %p gives %p: %s", (count, expected) => {
+        useBlocks(programWithRepeatedB(count));
+
+        expect(PracticeValidator.validate(PROBLEM)).toBe(expected);
     });
 
     test("reads pitches placed directly in an action as well as inside notes", () => {
