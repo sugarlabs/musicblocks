@@ -3868,6 +3868,10 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
                 const first = synth._getSingingBuffer("la", 220, 0.5);
                 expect(synth._getSingingBuffer("la", 220, 0.5)).toBe(first);
                 expect(KokoroSpeech.tuneSyllable).toHaveBeenCalledTimes(1);
+                const held = synth._getSingingBuffer("la", 220, 0.75);
+                expect(synth._getSingingBuffer("la", 220, 0.75 - 0.25 / source.rate)).not.toBe(
+                    held
+                );
                 for (let i = 0; i < 10; i++) synth._getSingingBuffer("la", 300 + i, 0.5);
                 expect(synth._singingBufferBytes).toBeLessThanOrEqual(8 * 1024 * 1024);
                 synth.singingSamples.set("la", { ...source });

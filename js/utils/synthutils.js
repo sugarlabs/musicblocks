@@ -1788,7 +1788,7 @@ function Synth() {
     this._getSingingBuffer = (text, frequency, duration) => {
         const source = this.singingSamples.get(text);
         if (!source) throw new Error("Prepare the singing voice before playing.");
-        const key = JSON.stringify([text, frequency, Math.round(duration * source.rate)]);
+        const key = JSON.stringify([text, frequency, duration]);
         const cached = this._singingBuffers.get(key);
         if (cached?.source === source) {
             this._singingBuffers.delete(key);
@@ -1903,7 +1903,7 @@ function Synth() {
      * Internal implementation of createSynth, called after sample is ensured loaded.
      */
     this.___createSynth = (turtle, instrumentName, sourceName, params) => {
-        if (sourceName.startsWith("sing:")) {
+        if (typeof sourceName === "string" && sourceName.startsWith("sing:")) {
             if (!instruments[turtle][instrumentName]) {
                 const source = this.singingSamples.get(sourceName.slice(5));
                 if (!source) throw new Error("Prepare the singing voice before playing.");
