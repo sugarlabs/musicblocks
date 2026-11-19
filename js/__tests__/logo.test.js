@@ -4969,37 +4969,6 @@ describe("Logo.processSpeak", () => {
 });
 
 describe("Kokoro singing preflight", () => {
-    function actionProject(name = "do", computed = false) {
-        const secondArgument = ["listen", "onbeatdo"].includes(name);
-        return [
-            { name: "start", connections: [null, 1] },
-            { name, connections: secondArgument ? [0, 7, 3, null] : [0, 3, null] },
-            { name: "action", connections: [null, 4, 5, null] },
-            { name: computed ? "namedbox" : "text", value: "verse", connections: [1] },
-            { name: "text", value: "verse", connections: [2] },
-            { name: "sing", connections: [2, 6, null, null] },
-            { name: "text", value: "la", connections: [5] },
-            { name: "number", value: 1, connections: [1] }
-        ];
-    }
-    test.each(["offbeatdo", "onbeatdo", "everybeatdonew", "everybeatdo", "listen"])(
-        "prepares the action called by %s before playback",
-        name => {
-            const blocks = actionProject(name);
-            expect(Logo.prototype._getSingingTexts.call({ blocks: { blockList: blocks } })).toEqual(
-                ["la"]
-            );
-        }
-    );
-    test.each(["do", "onbeatdo", "everybeatdo"])(
-        "includes action bodies when %s has a computed name",
-        name => {
-            const blocks = actionProject(name, true);
-            expect(
-                Logo.prototype._getSingingTexts.call({ blocks: { blockList: blocks } }, 0)
-            ).toEqual(["la"]);
-        }
-    );
     test.each([
         null,
         { name: "number", value: 12 },
@@ -5024,35 +4993,15 @@ describe("Kokoro singing preflight", () => {
                 { name: "text", value: i === 0 ? "x".repeat(40) : "la" + i, connections: [id] }
             );
         }
-        blocks[63].connections[3] = null;
-        const logo = { blocks: { blockList: blocks } };
+        const logo = { blocks: { blockList: blocks.slice(0, -2) } };
         expect(Logo.prototype._getSingingTexts.call(logo)).toHaveLength(32);
-        blocks[63].connections[3] = 65;
+        logo.blocks.blockList = blocks;
         expect(() => Logo.prototype._getSingingTexts.call(logo)).toThrow(
-            "Use at most 32 different singing syllables."
+            expect.objectContaining({
+                message: "Use at most 32 different singing syllables.",
+                blk: 65
+            })
         );
-    });
-    test("prepares singing inside called actions without following unused actions", () => {
-        const blocks = [
-            { name: "start", connections: [null, 1] },
-            { name: "nameddo", privateData: "verse", connections: [0, null] },
-            { name: "action", connections: [null, 3, 4, null] },
-            { name: "text", value: "verse", connections: [2] },
-            { name: "sing", connections: [2, 5, 6, null] },
-            { name: "text", value: "la", connections: [4] },
-            { name: "nameddo", privateData: "verse", connections: [4, null] },
-            { name: "action", connections: [null, 8, 9, null] },
-            { name: "text", value: "unused", connections: [7] },
-            { name: "sing", connections: [7, 10, null, null] },
-            { name: "text", value: "do not render", connections: [9] }
-        ];
-        expect(Logo.prototype._getSingingTexts.call({ blocks: { blockList: blocks } })).toEqual([
-            "la"
-        ]);
-        blocks[1] = { name: "do", connections: [0, 3, null] };
-        expect(Logo.prototype._getSingingTexts.call({ blocks: { blockList: blocks } })).toEqual([
-            "la"
-        ]);
     });
     function preflight() {
         let complete;
@@ -5074,11 +5023,19 @@ describe("Kokoro singing preflight", () => {
     }
     test("reports validation failure without preparing or starting playback", () => {
         const { logo } = preflight();
-        logo._getSingingTexts.mockImplementation(() => {
-            throw new Error("invalid syllable");
-        });
+        logo.blocks = {
+            blockList: [
+                null,
+                { name: "sing", connections: [null, 2] },
+                { name: "number", value: 12 }
+            ]
+        };
+        logo._getSingingTexts = Logo.prototype._getSingingTexts;
         Logo.prototype.runLogoCommands.call(logo, 7);
-        expect(logo.deps.errorHandler).toHaveBeenCalledWith("invalid syllable");
+        expect(logo.deps.errorHandler).toHaveBeenCalledWith(
+            "Sing needs a text block containing one short syllable.",
+            1
+        );
         expect(logo.synth.prepareSinging).not.toHaveBeenCalled();
         expect(logo.onRunTurtle).not.toHaveBeenCalled();
         expect(logo.runLogoCommands).not.toHaveBeenCalled();
@@ -5196,20 +5153,25 @@ describe("Kokoro singing preflight", () => {
             expect(logo.runLogoCommands).toHaveBeenCalledWith(8, undefined);
         }
     );
-    test("only follows connected non-trash singing blocks", () => {
-        const logo = {
-            blocks: {
+    test.each(["runblock", "startTurtle"])(
+        "prepares disconnected Sing stacks before executing %s",
+        name => {
+            const { logo } = preflight();
+            logo.blocks = {
                 blockList: [
-                    { name: "start", connections: [null, 1] },
-                    { name: "sing", connections: [0, 2, null] },
+                    { name, connections: [null, null] },
+                    { name: "sing", connections: [null, 2, null] },
                     { name: "text", value: " la ", connections: [1] },
-                    { name: "sing", connections: [null, 4, null] },
-                    { name: "text", value: "unused", connections: [3] }
+                    { name: "sing", trash: true, connections: [null, null, null] }
                 ]
-            }
-        };
-        expect(Logo.prototype._getSingingTexts.call(logo)).toEqual(["la"]);
-        logo.blocks.blockList[1].trash = true;
-        expect(Logo.prototype._getSingingTexts.call(logo)).toEqual([]);
-    });
+            };
+            logo._getSingingTexts = Logo.prototype._getSingingTexts;
+            Logo.prototype.runLogoCommands.call(logo, 0);
+            expect(logo.synth.prepareSinging).toHaveBeenCalledWith(
+                ["la"],
+                expect.any(Function),
+                expect.any(Function)
+            );
+        }
+    );
 });

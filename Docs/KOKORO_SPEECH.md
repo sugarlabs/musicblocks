@@ -10,7 +10,8 @@ already contains a playable quarter note. Singing also works inside called
 actions, including recursive actions and actions triggered by beat or note events.
 
 Load `examples/kokoro-singing.tb` for a four-note `la` melody. Press **Run** and
-wait for the model and syllable to prepare before playback starts. **Stop**
+wait for the model and the project's Sing syllables to prepare before playback
+starts. This includes disconnected stacks that can be run dynamically. **Stop**
 also cancels playback that is waiting for preparation. Unlike Speak, Sing
 explicitly requests Kokoro and does not require `?kokoro=true`.
 An in-flight syllable render may finish after Stop, but no further syllables
@@ -29,7 +30,8 @@ Prepared syllables are cached locally across page reloads, keyed by model,
 precision, voice and text. A cache hit skips model loading and inference.
 Storage failures fall back to ordinary synthesis. The disk cache retains at
 most 32 entries, each no larger than 4 MiB. Rendered pitch/duration buffers
-are reused across Stop and replay, with an 8 MiB / 64-note memory limit.
+are reused across Stop and replay. The replay cache holds up to 8 MiB or 64
+notes, and active samplers can retain buffers until playback stops.
 Changing a pitch or duration renders that variant once.
 
 Held notes of at least 0.75 seconds gain a subtle automatic vibrato: the pitch

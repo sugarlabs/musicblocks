@@ -1763,62 +1763,26 @@ class Logo {
         }
     }
 
-    /** Find literal syllables in reachable stacks, including called actions. */
-    _getSingingTexts(startHere) {
+    /** Collect literal syllables, including stacks that can be started dynamically. */
+    _getSingingTexts() {
         const blocks = this.blocks.blockList;
-        const actions = new Map();
-        for (const block of blocks) {
-            if (block?.name === "action" && !block.trash) {
-                const name = blocks[block.connections[1]]?.value;
-                actions.set(name, block.connections[2]);
-            }
-        }
-        const pending =
-            startHere !== null && startHere !== undefined
-                ? [startHere]
-                : Object.keys(blocks).filter(id =>
-                      ["start", "drum", "status", "oscilloscope"].includes(blocks[id]?.name)
-                  );
-        const visited = new Set();
         const texts = new Set();
-        while (pending.length) {
-            const id = pending.pop();
-            if (visited.has(String(id))) continue;
-            visited.add(String(id));
-            const block = blocks[id];
-            if (!block || block.trash) continue;
-            if (["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].includes(block.name)) {
-                pending.push(actions.get(block.privateData));
-            } else if (
-                [
-                    "do",
-                    "doArg",
-                    "calc",
-                    "calcArg",
-                    "listen",
-                    "offbeatdo",
-                    "onbeatdo",
-                    "everybeatdonew",
-                    "everybeatdo"
-                ].includes(block.name)
-            ) {
-                const name =
-                    blocks[block.connections[["listen", "onbeatdo"].includes(block.name) ? 2 : 1]];
-                // A computed action name can call any action at runtime.
-                if (name?.name === "text") pending.push(actions.get(name.value));
-                else pending.push(...actions.values());
-            }
-            if (block.name === "sing") {
-                const input = blocks[block.connections[1]];
-                const text = typeof input?.value === "string" ? input.value.trim() : "";
-                if (input?.name !== "text" || !text || text.length > 40) {
-                    throw new Error(_("Sing needs a text block containing one short syllable."));
-                }
+        for (const [id, block] of blocks.entries()) {
+            if (block?.name !== "sing" || block.trash) continue;
+            const input = blocks[block.connections[1]];
+            const text = typeof input?.value === "string" ? input.value.trim() : "";
+            let message;
+            if (input?.name !== "text" || !text || text.length > 40) {
+                message = _("Sing needs a text block containing one short syllable.");
+            } else {
                 texts.add(text);
-                if (texts.size > 32)
-                    throw new Error(_("Use at most 32 different singing syllables."));
+                if (texts.size > 32) message = _("Use at most 32 different singing syllables.");
             }
-            pending.push(...(block.connections || []).slice(1).filter(id => id !== null));
+            if (message) {
+                const error = new Error(message);
+                error.blk = id;
+                throw error;
+            }
         }
         return [...texts];
     }
@@ -1849,9 +1813,11 @@ class Logo {
         if (this.synth.singingSamples && !this._exportingNotation) {
             let texts;
             try {
-                texts = this._getSingingTexts(startHere);
+                texts = this._getSingingTexts();
             } catch (error) {
-                this.deps.errorHandler(error.message);
+                this.runGeneration++;
+                if (!this._alreadyRunning) this.onStopTurtle();
+                this.deps.errorHandler(error.message, error.blk);
                 return;
             }
             if (texts.some(text => !this.synth.singingSamples.has(text))) {
