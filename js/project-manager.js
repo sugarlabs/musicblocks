@@ -400,7 +400,7 @@ class ProjectManager {
     }
 
     justLoadStart() {
-        this.activity.blocks.loadNewBlocks(DATAOBJS);
+        return this.activity.blocks.loadNewBlocks(DATAOBJS);
     }
 
     async _loadStart(that) {
@@ -541,9 +541,10 @@ class ProjectManager {
         // js/blocks.js), or null when no load was actually started (the
         // empty/undefined-session shortcuts below already route through
         // justLoadStart() instead).
+        let newProjectLoadToken;
         const tryParseAndLoad = data => {
             if (data === "undefined" || data === "[]") {
-                that.justLoadStart();
+                newProjectLoadToken = that.justLoadStart();
                 return null;
             }
             const parsed = JSON.parse(data);
@@ -558,11 +559,12 @@ class ProjectManager {
                 // literal "[]" case keeps that synchronous emit from
                 // leaving watchForDeferredLoadFailure()'s listeners
                 // stranded (review comment on issue #8855's fix).
-                that.justLoadStart();
+                newProjectLoadToken = that.justLoadStart();
                 return null;
             }
             window.loadedSession = data;
-            return that.blocks.loadNewBlocks(parsed);
+            newProjectLoadToken = that.blocks.loadNewBlocks(parsed);
+            return newProjectLoadToken;
         };
 
         const deleteFromSource = async source => {
@@ -686,7 +688,7 @@ class ProjectManager {
             }
 
             that.errorMsg(_("Your saved project could not be loaded. Starting a new project."));
-            that.justLoadStart();
+            newProjectLoadToken = that.justLoadStart();
         };
 
         if (that.sessionData) {
@@ -700,10 +702,11 @@ class ProjectManager {
                 await recoverFromLoadFailure(sessionSource, e);
             }
         } else {
-            that.justLoadStart();
+            newProjectLoadToken = that.justLoadStart();
         }
 
         that.update = true;
+        return newProjectLoadToken;
     }
 
     /**
@@ -822,6 +825,47 @@ class ProjectManager {
     // New project
     // -----------------------------------------------------------------------
 
+    _waitForNewProjectLoad(blocks, token) {
+        if (!blocks.isLoading()) {
+            return blocks._lastLoadFailed && blocks._activeLoadToken === token
+                ? Promise.reject(new Error("New project block load failed."))
+                : Promise.resolve();
+        }
+
+        return new Promise((resolve, reject) => {
+            const stopWatching = () => pubsub.off("loadFailed", onFailed);
+            const onLoaded = () => {
+                stopWatching();
+                resolve();
+            };
+            const onFailed = payload => {
+                if (token !== undefined && payload?.token !== token) {
+                    // A queued load may still be ours. The failed load dropped
+                    // runAfterLoad callbacks; subscribe again once it advances.
+                    Promise.resolve().then(() => {
+                        if (blocks.isLoading()) blocks.runAfterLoad(onLoaded);
+                        else {
+                            stopWatching();
+                            reject(
+                                new Error("Block loading stopped before the new project loaded.")
+                            );
+                        }
+                    });
+                    return;
+                }
+                stopWatching();
+                reject(payload?.error || new Error("New project block load failed."));
+            };
+            pubsub.on("loadFailed", onFailed);
+            try {
+                blocks.runAfterLoad(onLoaded);
+            } catch (error) {
+                stopWatching();
+                reject(error);
+            }
+        });
+    }
+
     async _afterDelete() {
         const that = this.activity;
         const pm = this;
@@ -901,24 +945,23 @@ class ProjectManager {
             // _loadStart is async: it fires loadNewBlocks and then emits
             // "finishedLoading". We save the NEW project only after that
             // event fires so we capture the fresh start blocks, not stale data.
-            await pm._loadStart(that);
-            if (that.blocks.isLoading()) {
-                await new Promise(resolve => that.blocks.runAfterLoad(resolve));
-            }
+            const loadToken = await pm._loadStart(that);
+            await pm._waitForNewProjectLoad(that.blocks, loadToken);
             await that.planet.saveLocally();
         } else {
             that.toolbar.closeAuxToolbar((act, resize) => act._showHideAuxMenu(resize));
 
-            await new Promise(resolve => {
+            const loadToken = await new Promise((resolve, reject) => {
                 setTimeout(() => {
-                    that.sendAllToTrash(false, false);
-                    that.blocks.loadNewBlocks(DATAOBJS);
-                    resolve();
+                    try {
+                        that.sendAllToTrash(false, false);
+                        resolve(that.blocks.loadNewBlocks(DATAOBJS));
+                    } catch (error) {
+                        reject(error);
+                    }
                 }, 1000);
             });
-            if (that.blocks.isLoading()) {
-                await new Promise(resolve => that.blocks.runAfterLoad(resolve));
-            }
+            await pm._waitForNewProjectLoad(that.blocks, loadToken);
         }
     }
 
