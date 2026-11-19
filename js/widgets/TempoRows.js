@@ -95,10 +95,23 @@ class TempoRows {
             // The tempo can be set from the interval between successive clicks on the canvas.
             this.tempoCanvases[i].style.cursor = "pointer";
             this.tempoCanvases[i].title = _("Click to tap tempo");
+            this.tempoCanvases[i].setAttribute("tabindex", "0");
+            this.tempoCanvases[i].setAttribute("role", "button");
+            this.tempoCanvases[i].setAttribute("aria-label", _("Click to tap tempo"));
+            this.tempoCanvases[i].addEventListener("focus", () => {
+                this.activeBPMIndex = i;
+            });
             this.tempoCanvases[i].onclick = (
                 id => () =>
                     this._onCanvasClick(id)
             )(i);
+            this.tempoCanvases[i].onkeydown = (id => e => {
+                if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this._onCanvasClick(id);
+                }
+            })(i);
 
             this.BPMInputs[i].addEventListener(
                 "keyup",
