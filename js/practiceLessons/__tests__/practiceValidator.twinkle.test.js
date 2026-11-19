@@ -284,11 +284,40 @@ describe("PracticeValidator Twinkle Phrase Maker form", () => {
     test.each([
         [2.5, true, "a fractional count is floored to two passes"],
         [3, false, "three passes is one B too many"],
-        [1, false, "one pass leaves the middle phrase short"],
-        [0, false, "a count below one runs the body zero times"],
-        ["high", false, "a count that is not a number runs the body zero times"]
+        [1, false, "one pass leaves the middle phrase short"]
     ])("repeat count %p gives %p: %s", (count, expected) => {
         useBlocks(programWithRepeatedB(count));
+
+        expect(PracticeValidator.validate(PROBLEM)).toBe(expected);
+    });
+
+    // A complete form (A1 A2 B B A1 A2) with a spare repeat of B tucked in after the second B.
+    // The song is only right when that repeat runs zero times, so a validator that ran the body
+    // once would be caught here, unlike on a form that was already short.
+    const programWithSpareRepeatOfB = count => ({
+        ...matrix,
+        ...phraseAction("A1", PHRASES.A1),
+        ...phraseAction("A2", PHRASES.A2),
+        ...phraseAction("B", PHRASES.B),
+        start: { name: "start", trash: false, connections: [null, "a1", null] },
+        a1: { name: "nameddo", value: "A1", trash: false, connections: ["start", "a2"] },
+        a2: { name: "nameddo", value: "A2", trash: false, connections: ["a1", "b1"] },
+        b1: { name: "nameddo", value: "B", trash: false, connections: ["a2", "b2"] },
+        b2: { name: "nameddo", value: "B", trash: false, connections: ["b1", "spare"] },
+        spare: { name: "repeat", trash: false, connections: ["b2", "times", "extra", "a1b"] },
+        times: { name: "number", value: count, trash: false, connections: ["spare"] },
+        extra: { name: "nameddo", value: "B", trash: false, connections: ["spare", null] },
+        a1b: { name: "nameddo", value: "A1", trash: false, connections: ["spare", "a2b"] },
+        a2b: { name: "nameddo", value: "A2", trash: false, connections: ["a1b", null] }
+    });
+
+    test.each([
+        [0, true, "a count below one runs the body zero times"],
+        [0.5, true, "a count below one, even a fraction, runs the body zero times"],
+        ["high", true, "a count that is not a number runs the body zero times"],
+        [1, false, "one pass adds a third B"]
+    ])("spare repeat of B with count %p gives %p: %s", (count, expected) => {
+        useBlocks(programWithSpareRepeatOfB(count));
 
         expect(PracticeValidator.validate(PROBLEM)).toBe(expected);
     });
