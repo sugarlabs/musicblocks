@@ -543,7 +543,7 @@ describe("setupSensorsBlocks", () => {
             expect(labelDiv.classList.remove).toHaveBeenCalledWith("hasKeyboard");
         });
 
-        it("should handle Enter key with numeric value and convert with parseFloat", () => {
+        it("should handle Enter key with numeric value", () => {
             const inputBlock = DummyFlowBlock.createdBlocks["input"];
             activity.turtles.ithTurtle(turtleIndex).doWait = jest.fn();
             activity.blocks.blockList["blkInput"] = { connections: [null, null] };
@@ -556,6 +556,31 @@ describe("setupSensorsBlocks", () => {
 
             expect(logo.inputValues[turtleIndex]).toBe(123.45);
             expect(typeof logo.inputValues[turtleIndex]).toBe("number");
+        });
+
+        it.each([
+            ["", 0],
+            ["   ", 0],
+            ["0x10", 16],
+            ["0b10", 2],
+            ["123.45", 123.45],
+            ["-2.5", -2.5],
+            ["1e3", 1000],
+            ["hello", "hello"]
+        ])("should preserve conversion of input %j", (entered, expected) => {
+            const inputBlock = DummyFlowBlock.createdBlocks["input"];
+            activity.blocks.blockList["blkInput"] = { connections: [null, null] };
+
+            inputBlock.flow([], logo, turtleIndex, "blkInput");
+            const inputElem = docById("labelDiv").children[0];
+            inputElem.value = entered;
+            inputElem.dispatchEvent(new KeyboardEvent("keypress", { key: "Enter", bubbles: true }));
+
+            expect(logo.inputValues[turtleIndex]).toBe(expected);
+            expect(DummyFlowBlock.createdBlocks["inputvalue"].arg(logo, turtleIndex)).toBe(
+                expected
+            );
+            expect(logo.clearTurtleRun).toHaveBeenCalledWith(turtleIndex);
         });
 
         it("should handle missing labelDiv or turtle container defensively without throwing", () => {
