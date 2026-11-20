@@ -3180,6 +3180,32 @@ describe("Block Foundation", () => {
             expect(activateSpy).toHaveBeenCalledTimes(2);
         });
 
+        it("announces a value set after the accessible element was created", () => {
+            const el = block._setupAccessibleElement();
+            expect(el.getAttribute("aria-label")).toBe("forward block");
+
+            block.value = 4;
+            // Nothing refreshed the label yet, so it is still stale.
+            expect(el.getAttribute("aria-label")).toBe("forward block");
+
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward, value: 4");
+        });
+
+        it("keeps the label current when the value changes between focuses", () => {
+            block.value = 1;
+            const el = block._setupAccessibleElement();
+            expect(el.getAttribute("aria-label")).toBe("forward, value: 1");
+
+            block.value = 9;
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward, value: 9");
+
+            block.value = null;
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward block");
+        });
+
         it("arrow keys navigate between sibling block elements", () => {
             const block2 = new Block(
                 { name: "right", staticLabels: ["right"], image: "right.svg", docks: [] },

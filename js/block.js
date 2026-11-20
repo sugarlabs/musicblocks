@@ -5586,6 +5586,10 @@ class Block {
 
         el.setAttribute("aria-label", this.getAccessibleLabel());
 
+        // The value is often set after this element is created (project load, undo,
+        // programmatic changes), so refresh the label when the block gains focus.
+        el.addEventListener("focus", () => this._updateAccessibleElement());
+
         el.addEventListener("keydown", event => {
             if (event.key === "Enter" || event.key === " " || event.key === "Spacebar") {
                 event.preventDefault();
