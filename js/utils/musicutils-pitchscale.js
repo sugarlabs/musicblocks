@@ -77,7 +77,7 @@ if (typeof module !== "undefined" && module.exports) {
     var MusicUtilsPitch =
         (typeof window !== "undefined" && window.MusicUtilsPitch) ||
         (typeof require !== "undefined" ? require("./musicutils-pitch") : {});
-    var { parseNoteString, numberToPitchSharp, getNumber } = MusicUtilsPitch;
+    var { parseNoteString, numberToPitchSharp, getNumber, ratioTableOctaveShift } = MusicUtilsPitch;
     var MusicUtilsSolfege =
         (typeof window !== "undefined" && window.MusicUtilsSolfege) ||
         (typeof require !== "undefined" ? require("./musicutils-solfege") : {});
@@ -913,12 +913,15 @@ var numberToPitch = (i, temperament, startPitch, offset, activity) => {
             ((pitchNumber % temperamentPitchNumber) + temperamentPitchNumber) %
             temperamentPitchNumber;
         const octaveOffset = Math.floor(pitchNumber / temperamentPitchNumber);
-        const noteName =
-            noteNames[
-                (((startPos + idx) % temperamentPitchNumber) + temperamentPitchNumber) %
-                    temperamentPitchNumber
-            ];
-        return [noteName, baseOctave + octaveOffset];
+        const nameIndex =
+            (((startPos + idx) % temperamentPitchNumber) + temperamentPitchNumber) %
+            temperamentPitchNumber;
+        const noteName = noteNames[nameIndex];
+        const shift =
+            t && Array.isArray(t.ratios) && t.noteLabels
+                ? ratioTableOctaveShift(noteName, t.ratios[nameIndex])
+                : 0;
+        return [noteName, baseOctave + octaveOffset + shift];
     }
 };
 

@@ -77,7 +77,7 @@ if (typeof module !== "undefined" && module.exports) {
     var MusicUtilsPitch =
         (typeof window !== "undefined" && window.MusicUtilsPitch) ||
         (typeof require !== "undefined" ? require("./musicutils-pitch") : {});
-    var { noteToPitchOctave } = MusicUtilsPitch;
+    var { noteToPitchOctave, ratioTableOctaveShift } = MusicUtilsPitch;
     var MusicUtilsPitchScale =
         (typeof window !== "undefined" && window.MusicUtilsPitchScale) ||
         (typeof require !== "undefined" ? require("./musicutils-pitchscale") : {});
@@ -1258,6 +1258,8 @@ var pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
             }
         }
         if (noteIdx !== -1) {
+            // C♭4 is in the table's row 3 when the table lists C♭ at the top of a row.
+            octave -= ratioTableOctaveShift(t.noteLabels[noteIdx], t.ratios[noteIdx]);
             const aIdx = t.noteLabels.indexOf("A");
             const baseRefFreq = A0 / t.ratios[aIdx];
             let freq = baseRefFreq * t.ratios[noteIdx] * Math.pow(powerBase, octave);
