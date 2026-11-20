@@ -819,10 +819,8 @@ function setupPitchActions(activity) {
                     // Outside 12 EDO the step sizes count the temperament's own steps, like
                     // pitchToNumber. getNote must be told so, or it rescales them by edo/12 a
                     // second time and each step overshoots: in 19 EDO C4 -> E4 counted 4 steps.
-                    // Ratio temperaments take a semitone offset, as in addScalarTransposition.
+                    // Ratio temperaments are counted in the steps of their table too.
                     const temperament = activity.logo.synth.inTemperament;
-                    const edoSteps = !isNonEDO(temperament);
-                    const edo = getCurrentEDO(temperament);
 
                     const _calculate = type => {
                         i++;
@@ -845,13 +843,13 @@ function setupPitchActions(activity) {
                         const nextObj = getNote(
                             pitch,
                             octave,
-                            edoSteps ? nhalf : (nhalf * 12) / edo,
+                            nhalf,
                             tur.singer.keySignature,
                             tur.singer.movable,
                             null,
                             activity.errorMsg,
                             temperament,
-                            edoSteps
+                            true // isAlreadyEdoSteps
                         );
                         [pitch, octave] = nextObj;
 
