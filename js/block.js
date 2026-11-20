@@ -5526,13 +5526,15 @@ class Block {
             (this.protoblock && this.protoblock.staticLabels && this.protoblock.staticLabels[0]) ||
             this.name ||
             "block";
+        // A file block holds [filename, dataURL]: describe it by its filename, never its payload.
+        const value = Array.isArray(this.value) ? this.value[0] : this.value;
         if (
-            this.value !== null &&
-            this.value !== undefined &&
-            this.value !== "" &&
-            !(typeof this.value === "string" && this.value.startsWith("data:"))
+            value !== null &&
+            value !== undefined &&
+            value !== "" &&
+            !(typeof value === "string" && value.startsWith("data:"))
         ) {
-            return `${name}, value: ${this.value}`;
+            return `${name}, value: ${value}`;
         }
         return `${name} block`;
     }
