@@ -195,10 +195,10 @@ describe("musicutils-modewheel", () => {
             const angles = modewheel.getTemperamentSliceAngles("just intonation", 12);
             expect(angles).toHaveLength(12);
             expect(angles.reduce((sum, a) => sum + a, 0)).toBeCloseTo(360, 6);
-            // 5-limit JI extremes: 6/5 to 5/4 is the narrowest slice,
-            // 5/3 to 9/5 the widest; equal slices would be 30 each.
+            // 5-limit JI extremes: 6/5 to 5/4 (70.7 cents) is the narrowest slice,
+            // the 16/15 semitones (111.7 cents) the widest; equal slices would be 30 each.
             expect(Math.min(...angles)).toBeCloseTo(21.2, 1);
-            expect(Math.max(...angles)).toBeCloseTo(39.97, 1);
+            expect(Math.max(...angles)).toBeCloseTo(33.51, 1);
         });
     });
 
