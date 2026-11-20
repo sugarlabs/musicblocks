@@ -183,6 +183,22 @@ describe("ServerInterface", () => {
             });
         });
 
+        it.each([null, new Error("Network offline")])(
+            "should not return stale metadata for a required server refresh (%p)",
+            async result => {
+                mockCacheManager.getMetadata.mockResolvedValue({ ProjectLikes: 5 });
+                const request = jest.spyOn(server, "_get");
+                if (result instanceof Error) request.mockRejectedValue(result);
+                else request.mockResolvedValue(result);
+                const callback = jest.fn();
+
+                await server.getProjectDetails("123", callback, true, false);
+
+                expect(mockCacheManager.getMetadata).not.toHaveBeenCalled();
+                expect(callback).toHaveBeenCalledWith(server.ConnectionFailureData);
+            }
+        );
+
         it("should return ConnectionFailureData when skipCache is true, network fails, and cache is empty", async () => {
             mockCacheManager.getMetadata.mockResolvedValue(null);
             jest.spyOn(server, "_get").mockResolvedValue(null);

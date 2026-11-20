@@ -703,7 +703,9 @@ describe("GlobalCard", () => {
             expect(document.getElementById("global-project-likes-test-id-1").textContent).toBe("6");
             expect(mockPlanet.ServerInterface.getProjectDetails).toHaveBeenCalledWith(
                 "test-id-1",
-                expect.any(Function)
+                expect.any(Function),
+                true,
+                false
             );
             // The replacement might have been fetched after a newer server update.
             expect(newCard.ProjectData.ProjectLikes).toBe(5);
