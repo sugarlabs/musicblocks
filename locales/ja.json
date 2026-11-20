@@ -92,7 +92,7 @@
     "kana": "ダブルフラット"
   },
   "played": {
-    "kanji": "played",
+    "kanji": "演奏済み",
     "kana": "played"
   },
   "unison": {
@@ -104,7 +104,7 @@
     "kana": "ピッチプレビューのキーをせんたくしました。"
   },
   "Release to delete the block.": {
-    "kanji": "Release to delete the block.",
+    "kanji": "ここで離すとブロックが削除されます。",
     "kana": "Release to delete the block."
   },
   "Refresh your browser to change your language preference.": {
@@ -216,7 +216,7 @@
     "kana": "ろくおん"
   },
   "Record options": {
-    "kanji": "Record options",
+    "kanji": "録音オプション",
     "kana": "Record options"
   },
   "Enter Fullscreen": {
@@ -244,11 +244,11 @@
     "kana": "HTMLをほぞん"
   },
   "Git Planet": {
-    "kanji": "Git Planet",
+    "kanji": "Gitプラネット",
     "kana": "Git Planet"
   },
   "Offline. Git Planet is unavailable": {
-    "kanji": "Offline. Git Planet is unavailable",
+    "kanji": "オフラインです。Gitプラネットは利用できません",
     "kana": "Offline. Git Planet is unavailable"
   },
   "My Project": {
@@ -400,15 +400,15 @@
     "kana": "アートを SVGで ほぞん"
   },
   "Track my project": {
-    "kanji": "Track my project",
+    "kanji": "プロジェクトを記録する",
     "kana": "Track my project"
   },
   "Mark this moment": {
-    "kanji": "Mark this moment",
+    "kanji": "この時点に印をつける",
     "kana": "Mark this moment"
   },
   "Time travel": {
-    "kanji": "Time travel",
+    "kanji": "タイムトラベル",
     "kana": "Time travel"
   },
   "Play project": {
@@ -424,7 +424,7 @@
     "kana": "あたらしいプロジェクトをさくせいしてもよろしいですか？"
   },
   "New project confirmation": {
-    "kanji": "New project confirmation",
+    "kanji": "新しいプロジェクトの確認",
     "kana": "New project confirmation"
   },
   "Turtle Wrap Off": {
@@ -652,7 +652,7 @@
     "kana": "ABC しゅつりょくのせいせいなかにエラーがはっせいしました。"
   },
   "ABC export rounded one or more Hertz pitches to the nearest note.": {
-    "kanji": "ABC export rounded one or more Hertz pitches to the nearest note.",
+    "kanji": "ABCへの書き出しで、1つ以上のヘルツ指定のピッチが最も近い音に丸められました。",
     "kana": "ABC export rounded one or more Hertz pitches to the nearest note."
   },
   "File name": {
@@ -708,15 +708,15 @@
     "kana": "すいへいスクロールがむこうになっています。"
   },
   "Please open a plugin palette before clicking delete.": {
-    "kanji": "Please open a plugin palette before clicking delete.",
+    "kanji": "削除をクリックする前に、プラグインのパレットを開いてください。",
     "kana": "Please open a plugin palette before clicking delete."
   },
   "Plugin deleted successfully.": {
-    "kanji": "Plugin deleted successfully.",
+    "kanji": "プラグインを削除しました。",
     "kana": "Plugin deleted successfully."
   },
   "Plugin could not be deleted or was not found.": {
-    "kanji": "Plugin could not be deleted or was not found.",
+    "kanji": "プラグインを削除できないか、見つかりませんでした。",
     "kana": "Plugin could not be deleted or was not found."
   },
   "Firefox performance may be affected because the canvas is unusually large. For the best experience, consider resetting the browser zoom to 100%.": {
@@ -724,19 +724,19 @@
     "kana": "Firefox performance may be affected because the canvas is unusually large. For the best experience, consider resetting the browser zoom to 100%."
   },
   "Program stopped.": {
-    "kanji": "Program stopped.",
+    "kanji": "プログラムを停止しました。",
     "kana": "Program stopped."
   },
   "Program running.": {
-    "kanji": "Program running.",
+    "kanji": "プログラムを実行中です。",
     "kana": "Program running."
   },
   "Plugin added": {
-    "kanji": "Plugin added",
+    "kanji": "プラグインを追加しました",
     "kana": "Plugin added"
   },
   "Could not load plugin:": {
-    "kanji": "Could not load plugin:",
+    "kanji": "プラグインを読み込めませんでした:",
     "kana": "Could not load plugin:"
   },
   "Invalid clipboard data. To paste blocks, first copy them from the Music Blocks canvas. To paste text, click inside an input field.": {
@@ -748,7 +748,7 @@
     "kana": "フレーズメーカー"
   },
   "chords": {
-    "kanji": "chords",
+    "kanji": "コード",
     "kana": "chords"
   },
   "status": {
@@ -880,11 +880,11 @@
     "kana": "オフ"
   },
   "Renaming": {
-    "kanji": "Renaming",
+    "kanji": "名前を変更しています:",
     "kana": "Renaming"
   },
   "to avoid name collision": {
-    "kanji": "to avoid name collision",
+    "kanji": "名前の衝突を避けるため",
     "kana": "to avoid name collision"
   },
   "Not a number": {
@@ -940,31 +940,31 @@
     "kana": "JSON えんコードされたプロジェクト データのよみとりなかにもんだいがはっせいしました。"
   },
   "Cannot load project: invalid project structure.": {
-    "kanji": "Cannot load project: invalid project structure.",
+    "kanji": "プロジェクトを読み込めません: プロジェクトの構造が無効です。",
     "kana": "Cannot load project: invalid project structure."
   },
   "Cannot load project: malformed block structure detected.": {
-    "kanji": "Cannot load project: malformed block structure detected.",
+    "kanji": "プロジェクトを読み込めません: ブロックの構造が不正です。",
     "kana": "Cannot load project: malformed block structure detected."
   },
   "Cannot load project: circular block connection detected.": {
-    "kanji": "Cannot load project: circular block connection detected.",
+    "kanji": "プロジェクトを読み込めません: ブロックの接続が循環しています。",
     "kana": "Cannot load project: circular block connection detected."
   },
   "Cannot load project: invalid block connection detected.": {
-    "kanji": "Cannot load project: invalid block connection detected.",
+    "kanji": "プロジェクトを読み込めません: ブロックの接続が無効です。",
     "kana": "Cannot load project: invalid block connection detected."
   },
   "Some blocks in this project are unsupported and were replaced with placeholders: %s": {
-    "kanji": "Some blocks in this project are unsupported and were replaced with placeholders: %s",
+    "kanji": "このプロジェクトの一部のブロックは未対応のため、プレースホルダーに置き換えられました: %s",
     "kana": "Some blocks in this project are unsupported and were replaced with placeholders: %s"
   },
   "Nothing to undo.": {
-    "kanji": "Nothing to undo.",
+    "kanji": "元に戻す操作はありません。",
     "kana": "Nothing to undo."
   },
   "Nothing to redo.": {
-    "kanji": "Nothing to redo.",
+    "kanji": "やり直す操作はありません。",
     "kana": "Nothing to redo."
   },
   "block sent to trash": {
@@ -984,7 +984,7 @@
     "kana": "Failed to initialize Music Blocks core. Please refresh the page.\\n\\nError: %s"
   },
   "Downloading Kokoro voice: %s": {
-    "kanji": "Downloading Kokoro voice: %s",
+    "kanji": "Kokoroの音声をダウンロードしています: %s",
     "kana": "Downloading Kokoro voice: %s"
   },
   "You must select a file.": {
@@ -1032,7 +1032,7 @@
     "kana": "Error: Unable to save because you ran out of local storage. Try deleting some saved projects."
   },
   "Could not save your project.": {
-    "kanji": "Could not save your project.",
+    "kanji": "プロジェクトを保存できませんでした。",
     "kana": "Could not save your project."
   },
   "Catching mice": {
@@ -1076,7 +1076,7 @@
     "kana": "よみこみかんりょう！"
   },
   "Your saved project could not be loaded. Starting a new project.": {
-    "kanji": "Your saved project could not be loaded. Starting a new project.",
+    "kanji": "保存したプロジェクトを読み込めませんでした。新しいプロジェクトを開始します。",
     "kana": "Your saved project could not be loaded. Starting a new project."
   },
   "Click the run button to run the project.": {
@@ -1104,7 +1104,7 @@
     "kana": "むこうな パラメータ"
   },
   "No results found for %s": {
-    "kanji": "No results found for %s",
+    "kanji": "%s の検索結果は見つかりませんでした",
     "kana": "No results found for %s"
   },
   "Theme switched to %s mode.": {
@@ -1116,15 +1116,15 @@
     "kana": "ミュージック・ブロックスはすでにこのテーマにせっていされています。"
   },
   "Steps must be within -%s to %s when Wrap Mode is on.": {
-    "kanji": "Steps must be within -%s to %s when Wrap Mode is on.",
+    "kanji": "ラップモードがオンのとき、ステップ数は -%s から %s の範囲でなければなりません。",
     "kana": "Steps must be within -%s to %s when Wrap Mode is on."
   },
   "Arc angle must be within -45000 to 45000 degrees.": {
-    "kanji": "Arc angle must be within -45000 to 45000 degrees.",
+    "kanji": "円弧の角度は -45000 から 45000 度の範囲でなければなりません。",
     "kana": "Arc angle must be within -45000 to 45000 degrees."
   },
   "Pen size must be greater than 0.": {
-    "kanji": "Pen size must be greater than 0.",
+    "kanji": "ペンの太さは0より大きくしてください。",
     "kana": "Pen size must be greater than 0."
   },
   "You must have at least one Partial block inside of a Weighted-partial block": {
@@ -1616,11 +1616,11 @@
     "kana": "はじめるまえに"
   },
   "Agreeing counts for all the AI tools until you reload the page.": {
-    "kanji": "Agreeing counts for all the AI tools until you reload the page.",
+    "kanji": "同意は、ページを再読み込みするまで、すべてのAIツールに適用されます。",
     "kana": "Agreeing counts for all the AI tools until you reload the page."
   },
   "Agree and continue": {
-    "kanji": "Agree and continue",
+    "kanji": "同意して続ける",
     "kana": "Agree and continue"
   },
   "major": {
@@ -1696,15 +1696,15 @@
     "kana": "オリジナル"
   },
   "File input not found.": {
-    "kanji": "File input not found.",
+    "kanji": "ファイル入力が見つかりません。",
     "kana": "File input not found."
   },
   "File too large. Maximum is 1 MB.": {
-    "kanji": "File too large. Maximum is 1 MB.",
+    "kanji": "ファイルが大きすぎます。上限は1MBです。",
     "kana": "File too large. Maximum is 1 MB."
   },
   "Failed to read file.": {
-    "kanji": "Failed to read file.",
+    "kanji": "ファイルを読み込めませんでした。",
     "kana": "Failed to read file."
   },
   "rest": {
@@ -1964,11 +1964,11 @@
     "kana": "ビバップ おんかい"
   },
   "major bebop": {
-    "kanji": "major bebop",
+    "kanji": "メジャー・ビバップ",
     "kana": "major bebop"
   },
   "minor bebop": {
-    "kanji": "minor bebop",
+    "kanji": "マイナー・ビバップ",
     "kana": "minor bebop"
   },
   "arabic": {
@@ -2232,15 +2232,15 @@
     "kana": "スネアドラム"
   },
   "snare hard": {
-    "kanji": "snare hard",
+    "kanji": "スネア（強）",
     "kana": "snare hard"
   },
   "snare soft": {
-    "kanji": "snare soft",
+    "kanji": "スネア（弱）",
     "kana": "snare soft"
   },
   "snare roll": {
-    "kanji": "snare roll",
+    "kanji": "スネアロール",
     "kana": "snare roll"
   },
   "kick drum": {
@@ -2248,7 +2248,7 @@
     "kana": "キックドラム"
   },
   "heavy kick": {
-    "kanji": "heavy kick",
+    "kanji": "ヘビーキック",
     "kana": "heavy kick"
   },
   "bass drum": {
@@ -2260,15 +2260,15 @@
     "kana": "タムタム"
   },
   "tom hi": {
-    "kanji": "tom hi",
+    "kanji": "タム（高）",
     "kana": "tom hi"
   },
   "tom mid": {
-    "kanji": "tom mid",
+    "kanji": "タム（中）",
     "kana": "tom mid"
   },
   "tom lo": {
-    "kanji": "tom lo",
+    "kanji": "タム（低）",
     "kana": "tom lo"
   },
   "floor tom": {
@@ -2292,15 +2292,15 @@
     "kana": "ハイハット"
   },
   "cymbal closed": {
-    "kanji": "cymbal closed",
+    "kanji": "シンバル（クローズ）",
     "kana": "cymbal closed"
   },
   "cymbal open": {
-    "kanji": "cymbal open",
+    "kanji": "シンバル（オープン）",
     "kana": "cymbal open"
   },
   "cymbal pedal": {
-    "kanji": "cymbal pedal",
+    "kanji": "シンバル（ペダル）",
     "kana": "cymbal pedal"
   },
   "finger cymbals": {
@@ -2316,7 +2316,7 @@
     "kana": "カウベル"
   },
   "sonic cowbell": {
-    "kanji": "sonic cowbell",
+    "kanji": "ソニックカウベル",
     "kana": "sonic cowbell"
   },
   "triangle bell": {
@@ -2588,7 +2588,7 @@
     "kana": "しゃべる"
   },
   "The Speak block reads its text aloud using the built-in speech synthesizer.": {
-    "kanji": "The Speak block reads its text aloud using the built-in speech synthesizer.",
+    "kanji": "「話す」ブロックは、内蔵の音声合成を使って、テキストを読み上げます。",
     "kana": "The Speak block reads its text aloud using the built-in speech synthesizer."
   },
   "camera": {
@@ -2760,7 +2760,7 @@
     "kana": "はこ１に すうちを いれる"
   },
   "Maximum number of notes is %s.": {
-    "kanji": "Maximum number of notes is %s.",
+    "kanji": "音符の数は最大 %s です。",
     "kana": "Maximum number of notes is %s."
   },
   "rhythm1": {
@@ -2880,7 +2880,7 @@
     "kana": "あたいを せってい"
   },
   "The Turtle key block selects a key in the turtle dictionary, such as pen size or heading.": {
-    "kanji": "The Turtle key block selects a key in the turtle dictionary, such as pen size or heading.",
+    "kanji": "「タートルのキー」ブロックは、ペンの太さや向きなど、タートルの辞書にあるキーを選びます。",
     "kana": "The Turtle key block selects a key in the turtle dictionary, such as pen size or heading."
   },
   "fraction": {
@@ -2892,15 +2892,15 @@
     "kana": "しょうすうからぶんすう"
   },
   "record notation": {
-    "kanji": "record notation",
+    "kanji": "楽譜を記録する",
     "kana": "record notation"
   },
   "The Record notation block captures music as it plays so that it can be saved as sheet music.": {
-    "kanji": "The Record notation block captures music as it plays so that it can be saved as sheet music.",
+    "kanji": "「楽譜を記録する」ブロックは、演奏中の音楽を記録して、楽譜として保存できるようにします。",
     "kana": "The Record notation block captures music as it plays so that it can be saved as sheet music."
   },
   "The Save as ABC block saves the notes recorded with the Record notation block as an ABC file.": {
-    "kanji": "The Save as ABC block saves the notes recorded with the Record notation block as an ABC file.",
+    "kanji": "「ABCで保存」ブロックは、「楽譜を記録する」ブロックで記録した音符をABCファイルとして保存します。",
     "kana": "The Save as ABC block saves the notes recorded with the Record notation block as an ABC file."
   },
   "save as ABC": {
@@ -2912,7 +2912,7 @@
     "kana": "めい"
   },
   "The Save as Lilypond block saves the notes recorded with the Record notation block as a Lilypond file.": {
-    "kanji": "The Save as Lilypond block saves the notes recorded with the Record notation block as a Lilypond file.",
+    "kanji": "「Lilypondで保存」ブロックは、「楽譜を記録する」ブロックで記録した音符をLilypondファイルとして保存します。",
     "kana": "The Save as Lilypond block saves the notes recorded with the Record notation block as a Lilypond file."
   },
   "save as Lilypond": {
@@ -2920,7 +2920,7 @@
     "kana": "Lilypondのフォーマットでほぞん"
   },
   "The Save as SVG block saves the mouse artwork as an SVG file.": {
-    "kanji": "The Save as SVG block saves the mouse artwork as an SVG file.",
+    "kanji": "「SVGで保存」ブロックは、マウスが描いた作品をSVGファイルとして保存します。",
     "kana": "The Save as SVG block saves the mouse artwork as an SVG file."
   },
   "save as SVG": {
@@ -2928,11 +2928,11 @@
     "kana": "SVGフォーマットでほぞん"
   },
   "The Save as MusicXML block saves the notes recorded with the Record notation block as a MusicXML file.": {
-    "kanji": "The Save as MusicXML block saves the notes recorded with the Record notation block as a MusicXML file.",
+    "kanji": "「MusicXMLで保存」ブロックは、「楽譜を記録する」ブロックで記録した音符をMusicXMLファイルとして保存します。",
     "kana": "The Save as MusicXML block saves the notes recorded with the Record notation block as a MusicXML file."
   },
   "save as MusicXML": {
-    "kanji": "save as MusicXML",
+    "kanji": "MusicXMLで保存",
     "kana": "save as MusicXML"
   },
   "no background": {
@@ -3704,7 +3704,7 @@
     "kana": "You can use multiple Drum blocks within a Note block."
   },
   "The widget could not be loaded. Check your connection and try again.": {
-    "kanji": "The widget could not be loaded. Check your connection and try again.",
+    "kanji": "ウィジェットを読み込めませんでした。接続を確認して、もう一度お試しください。",
     "kana": "The widget could not be loaded. Check your connection and try again."
   },
   "Envelope": {
@@ -3796,11 +3796,11 @@
     "kana": "おんかい"
   },
   "The Chord progression block opens a tool to explore diatonic chords and build musical progressions.": {
-    "kanji": "The Chord progression block opens a tool to explore diatonic chords and build musical progressions.",
+    "kanji": "「コード進行」ブロックは、ダイアトニックコードを調べたり、コード進行を作ったりするツールを開きます。",
     "kana": "The Chord progression block opens a tool to explore diatonic chords and build musical progressions."
   },
   "chord progression": {
-    "kanji": "chord progression",
+    "kanji": "コード進行",
     "kana": "chord progression"
   },
   "The Tempo block opens a metronome to visualize the beat.": {
@@ -3816,7 +3816,7 @@
     "kana": "Pitch drumまとりっくすはピッチをドラムおとにまっぴんぐするためにつかわれます。"
   },
   "pitch drum": {
-    "kanji": "pitch drum",
+    "kanji": "ピッチ・ドラム",
     "kana": "pitch drum"
   },
   "You must have at least one pitch block and one drum block in the matrix.": {
@@ -4008,11 +4008,11 @@
     "kana": "<h2>すうちブロック</h2><br>すうちを していするブロック。"
   },
   "The Clamp block restricts a number so it stays within a minimum and maximum range.": {
-    "kanji": "The Clamp block restricts a number so it stays within a minimum and maximum range.",
+    "kanji": "「クランプ」ブロックは、数値が最小値と最大値の範囲内に収まるように制限します。",
     "kana": "The Clamp block restricts a number so it stays within a minimum and maximum range."
   },
   "clamp": {
-    "kanji": "clamp",
+    "kanji": "クランプ",
     "kana": "clamp"
   },
   "current meter": {
@@ -4172,11 +4172,11 @@
     "kana": "The Beats per minute block sets the number of 1/4 notes per minute."
   },
   "BPM must be a positive number.": {
-    "kanji": "BPM must be a positive number.",
+    "kanji": "BPMは正の数でなければなりません。",
     "kana": "BPM must be a positive number."
   },
   "Beat value must be a positive number.": {
-    "kanji": "Beat value must be a positive number.",
+    "kanji": "拍の値は正の数でなければなりません。",
     "kana": "Beat value must be a positive number."
   },
   "pickup": {
@@ -4328,7 +4328,7 @@
     "kana": "ネズミを せってい"
   },
   "The Set mouse block places the specified mouse at a specific x and y coordinate.": {
-    "kanji": "The Set mouse block places the specified mouse at a specific x and y coordinate.",
+    "kanji": "「マウスをせってい」ブロックは、指定したマウスを特定のxy座標に配置します。",
     "kana": "The Set mouse block places the specified mouse at a specific x and y coordinate."
   },
   "set turtle": {
@@ -4336,7 +4336,7 @@
     "kana": "タートルをせってい"
   },
   "The Set turtle block places the specified turtle at a specific x and y coordinate.": {
-    "kanji": "The Set turtle block places the specified turtle at a specific x and y coordinate.",
+    "kanji": "「タートルをせってい」ブロックは、指定したタートルを特定のxy座標に配置します。",
     "kana": "The Set turtle block places the specified turtle at a specific x and y coordinate."
   },
   "The Set mouse block sends a stack of blocks to be run by the specified mouse.": {
@@ -4816,7 +4816,7 @@
     "kana": "おんかいに よって おんていの ちがい"
   },
   "The Scalar change in pitch block is the difference (in scale steps) between the current pitch being played and the previous pitch played.": {
-    "kanji": "The Scalar change in pitch block is the difference (in scale steps) between the current pitch being played and the previous pitch played.",
+    "kanji": "「音階上のピッチの変化」ブロックは、いま演奏している音と、直前に演奏した音との差（音階のステップ数）です。",
     "kana": "The Scalar change in pitch block is the difference (in scale steps) between the current pitch being played and the previous pitch played."
   },
   "pitch number": {
@@ -4992,7 +4992,7 @@
     "kana": "The Semi-tone transposition block will shift the pitches contained inside Note blocks up (or down) by half steps."
   },
   "In the example shown above, sol is shifted up to sol#.": {
-    "kanji": "In the example shown above, sol is shifted up to sol#.",
+    "kanji": "上の例では、ソがソ#に上がります。",
     "kana": "In the example shown above, sol is shifted up to sol#."
   },
   "semi-tone transpose": {
@@ -5124,7 +5124,7 @@
     "kana": "アプリから ヒープを ロード"
   },
   "The heap name is reserved.": {
-    "kanji": "The heap name is reserved.",
+    "kanji": "このヒープ名は予約されています。",
     "kana": "The heap name is reserved."
   },
   "404: Page not found": {
@@ -5188,7 +5188,7 @@
     "kana": "ファイル"
   },
   "The dictionary name is reserved.": {
-    "kanji": "The dictionary name is reserved.",
+    "kanji": "この辞書名は予約されています。",
     "kana": "The dictionary name is reserved."
   },
   "The file you selected does not contain a valid dictionary.": {
@@ -5360,11 +5360,11 @@
     "kana": "おんぷの省略"
   },
   "Skip factor must be a positive number greater than 0.": {
-    "kanji": "Skip factor must be a positive number greater than 0.",
+    "kanji": "スキップ係数は0より大きい正の数でなければなりません。",
     "kana": "Skip factor must be a positive number greater than 0."
   },
   "Skip factor must be a whole number. Rounded down to %s.": {
-    "kanji": "Skip factor must be a whole number. Rounded down to %s.",
+    "kanji": "スキップ係数は整数でなければなりません。%s に切り捨てました。",
     "kana": "Skip factor must be a whole number. Rounded down to %s."
   },
   "The Multiply note value block changes the duration of notes by changing their note values.": {
@@ -5376,7 +5376,7 @@
     "kana": "おんかを ～ばいにする ファクター"
   },
   "Multiply note value must be greater than 0.": {
-    "kanji": "Multiply note value must be greater than 0.",
+    "kanji": "音符の長さの倍率は0より大きくしてください。",
     "kana": "Multiply note value must be greater than 0."
   },
   "The Tie block works on pairs of notes, combining them into one note.": {
@@ -5908,19 +5908,19 @@
     "kana": "クレシェンド"
   },
   "Staccato value must be a positive number.": {
-    "kanji": "Staccato value must be a positive number.",
+    "kanji": "スタッカートの値は正の数でなければなりません。",
     "kana": "Staccato value must be a positive number."
   },
   "Slur value must be a positive number.": {
-    "kanji": "Slur value must be a positive number.",
+    "kanji": "スラーの値は正の数でなければなりません。",
     "kana": "Slur value must be a positive number."
   },
   "Neighbor interval must be a finite number.": {
-    "kanji": "Neighbor interval must be a finite number.",
+    "kanji": "隣接音の音程は有限の数でなければなりません。",
     "kana": "Neighbor interval must be a finite number."
   },
   "Neighbor note value must be a positive number.": {
-    "kanji": "Neighbor note value must be a positive number.",
+    "kanji": "隣接音の長さは正の数でなければなりません。",
     "kana": "Neighbor note value must be a positive number."
   },
   "Synth not found: %s": {
@@ -5988,11 +5988,11 @@
     "kana": "ちょうふく している ピッチすうちは むし します"
   },
   "Scalar interval must be within -63 to 69.": {
-    "kanji": "Scalar interval must be within -63 to 69.",
+    "kanji": "音階上の音程は -63 から 69 の範囲でなければなりません。",
     "kana": "Scalar interval must be within -63 to 69."
   },
   "The custom mode does not fit the new tuning, so it was reset.": {
-    "kanji": "The custom mode does not fit the new tuning, so it was reset.",
+    "kanji": "カスタムモードが新しい調律に合わないため、リセットされました。",
     "kana": "The custom mode does not fit the new tuning, so it was reset."
   },
   "Scalar transpositions are equal to Semitone transpositions for custom temperament.": {
@@ -6032,7 +6032,7 @@
     "kana": "ばいおんが ０いじょう である ひつようが あります。"
   },
   "Partial must be less than or equal to %s.": {
-    "kanji": "Partial must be less than or equal to %s.",
+    "kanji": "倍音は %s 以下でなければなりません。",
     "kana": "Partial must be less than or equal to %s."
   },
   "Unable to use synth due to existing oscillator.": {
@@ -6044,11 +6044,11 @@
     "kana": "マイナスの すうちを いれることは できません。"
   },
   "Unknown key: %s": {
-    "kanji": "Unknown key: %s",
+    "kanji": "不明なキー: %s",
     "kana": "Unknown key: %s"
   },
   "Cannot set read-only key: %s": {
-    "kanji": "Cannot set read-only key: %s",
+    "kanji": "読み取り専用のキーは設定できません: %s",
     "kana": "Cannot set read-only key: %s"
   },
   "font": {
@@ -6056,7 +6056,7 @@
     "kana": "フォント"
   },
   "The key name is reserved.": {
-    "kanji": "The key name is reserved.",
+    "kanji": "このキー名は予約されています。",
     "kana": "The key name is reserved."
   },
   "Key with this name does not exist in %s": {
@@ -6076,7 +6076,7 @@
     "kana": "ねいばーのーとのあたいが、げんざいのおんぷのながさにくらべておおきすぎます。"
   },
   "Dot value must be a finite number.": {
-    "kanji": "Dot value must be a finite number.",
+    "kanji": "付点の値は有限の数でなければなりません。",
     "kana": "Dot value must be a finite number."
   },
   "An argument of -1 results in a note value of 0.": {
@@ -6096,7 +6096,7 @@
     "kana": "いちじ ていし"
   },
   "Resume": {
-    "kanji": "Resume",
+    "kanji": "再開",
     "kana": "Resume"
   },
   "No color data to save. Please scan an image first.": {
@@ -6176,7 +6176,7 @@
     "kana": "グラフに クリックして おんぷを どちらの ドラムに かえるか きめる ことが できます。"
   },
   "Frequency ratio exceeds displayable range": {
-    "kanji": "Frequency ratio exceeds displayable range",
+    "kanji": "周波数比が表示できる範囲を超えています",
     "kana": "Frequency ratio exceeds displayable range"
   },
   "Play chord": {
@@ -6192,11 +6192,11 @@
     "kana": "あたらしいアクションを つくりました。"
   },
   "Pitch Staircase opened": {
-    "kanji": "Pitch Staircase opened",
+    "kanji": "ピッチ・ステアケースを開きました",
     "kana": "Pitch Staircase opened"
   },
   "Pitch Staircase closed": {
-    "kanji": "Pitch Staircase closed",
+    "kanji": "ピッチ・ステアケースを閉じました",
     "kana": "Pitch Staircase closed"
   },
   "Undo": {
@@ -6240,7 +6240,7 @@
     "kana": "ぷろんぷと"
   },
   "AI sample generation is not available.": {
-    "kanji": "AI sample generation is not available.",
+    "kanji": "AIによるサンプル生成は利用できません。",
     "kana": "AI sample generation is not available."
   },
   "AI Sample Generation": {
@@ -6268,7 +6268,7 @@
     "kana": "エラーがはっせいしました。"
   },
   "Microphone access denied.": {
-    "kanji": "Microphone access denied.",
+    "kanji": "マイクへのアクセスが拒否されました。",
     "kana": "Microphone access denied."
   },
   "Tuner": {
@@ -6308,15 +6308,15 @@
     "kana": "ぶんぱいの かず"
   },
   "Maximum 57 divisions": {
-    "kanji": "Maximum 57 divisions",
+    "kanji": "分割数は最大57です",
     "kana": "Maximum 57 divisions"
   },
   "Please enter pitch numbers between 0 and %s.": {
-    "kanji": "Please enter pitch numbers between 0 and %s.",
+    "kanji": "0から %s までのピッチ番号を入力してください。",
     "kana": "Please enter pitch numbers between 0 and %s."
   },
   "Please enter a valid number of divisions.": {
-    "kanji": "Please enter a valid number of divisions.",
+    "kanji": "有効な分割数を入力してください。",
     "kana": "Please enter a valid number of divisions."
   },
   "ratio": {
@@ -6328,7 +6328,7 @@
     "kana": "はんぷく"
   },
   "Please enter a recursion between 1 and 56.": {
-    "kanji": "Please enter a recursion between 1 and 56.",
+    "kanji": "1から56までの再帰回数を入力してください。",
     "kana": "Please enter a recursion between 1 and 56."
   },
   "Please enter a valid ratio (e.g. 3:2) within the octave space.": {
@@ -6336,7 +6336,7 @@
     "kana": "おくたーぶのはんいないで、ゆうこうなひりつ（れい：3:2）をにゅうりょくしてください。"
   },
   "Please enter an octave ratio greater than 1 (e.g. 2:1).": {
-    "kanji": "Please enter an octave ratio greater than 1 (e.g. 2:1).",
+    "kanji": "1より大きいオクターブ比を入力してください（例: 2:1）。",
     "kana": "Please enter an octave ratio greater than 1 (e.g. 2:1)."
   },
   "The octave ratio has changed. This changes temperament significantly.": {
@@ -6360,15 +6360,15 @@
     "kana": "１っぷん あたりの はくの かずは、３０より大きいあたいをせっていしてください。"
   },
   "Tap tempo": {
-    "kanji": "Tap tempo",
+    "kanji": "タップテンポ",
     "kana": "Tap tempo"
   },
   "Tap again to set tempo": {
-    "kanji": "Tap again to set tempo",
+    "kanji": "もう一度タップしてテンポを設定します",
     "kana": "Tap again to set tempo"
   },
   "Syntax Error at position %s:": {
-    "kanji": "Syntax Error at position %s:",
+    "kanji": "%s 文字目に構文エラーがあります:",
     "kana": "Syntax Error at position %s:"
   },
   "Reset Code": {
@@ -6380,7 +6380,7 @@
     "kana": "JavaScript をブロックにへんかんする"
   },
   "CONSOLE": {
-    "kanji": "CONSOLE",
+    "kanji": "コンソール",
     "kana": "CONSOLE"
   },
   "Toggle Console": {
@@ -6388,19 +6388,19 @@
     "kana": "こんそーるのきりかえ"
   },
   "Syntax Error:": {
-    "kanji": "Syntax Error:",
+    "kanji": "構文エラー:",
     "kana": "Syntax Error:"
   },
   "Code executed successfully!": {
-    "kanji": "Code executed successfully!",
+    "kanji": "コードを実行しました!",
     "kana": "Code executed successfully!"
   },
   "Sandbox Error:": {
-    "kanji": "Sandbox Error:",
+    "kanji": "サンドボックスエラー:",
     "kana": "Sandbox Error:"
   },
   "Stack trace:": {
-    "kanji": "Stack trace:",
+    "kanji": "スタックトレース:",
     "kana": "Stack trace:"
   },
   "JavaScript block conversion is unavailable because its configuration file failed to load.": {
@@ -6412,31 +6412,31 @@
     "kana": "JavaScript ブロックへんかんはまだよみこみなかです。もういちどためしてください。"
   },
   "No valid blocks could be generated from the code.": {
-    "kanji": "No valid blocks could be generated from the code.",
+    "kanji": "コードから有効なブロックを生成できませんでした。",
     "kana": "No valid blocks could be generated from the code."
   },
   "Cannot add breakpoint to line %s. Breakpoints can only be added after lines ending with '{' or ';'": {
-    "kanji": "Cannot add breakpoint to line %s. Breakpoints can only be added after lines ending with '{' or ';'",
+    "kanji": "%s 行目にはブレークポイントを追加できません。ブレークポイントは、行末が '{' または ';' の行の後にのみ追加できます。",
     "kana": "Cannot add breakpoint to line %s. Breakpoints can only be added after lines ending with '{' or ';'"
   },
   "Cannot add breakpoint to line %s because there is already a breakpoint on an adjacent line.": {
-    "kanji": "Cannot add breakpoint to line %s because there is already a breakpoint on an adjacent line.",
+    "kanji": "隣の行にすでにブレークポイントがあるため、%s 行目にはブレークポイントを追加できません。",
     "kana": "Cannot add breakpoint to line %s because there is already a breakpoint on an adjacent line."
   },
   "Debugger added to line %s": {
-    "kanji": "Debugger added to line %s",
+    "kanji": "%s 行目にデバッガーを追加しました",
     "kana": "Debugger added to line %s"
   },
   "Debugger removed from line %s": {
-    "kanji": "Debugger removed from line %s",
+    "kanji": "%s 行目からデバッガーを削除しました",
     "kana": "Debugger removed from line %s"
   },
   "Status window is already open.": {
-    "kanji": "Status window is already open.",
+    "kanji": "ステータスウィンドウはすでに開いています。",
     "kana": "Status window is already open."
   },
   "Status window opened.": {
-    "kanji": "Status window opened.",
+    "kanji": "ステータスウィンドウを開きました。",
     "kana": "Status window opened."
   },
   "LEGO Bricks - Phrase Maker with %s pitch rows (sorted by frequency, Instrument)": {
@@ -6448,75 +6448,75 @@
     "kana": "ピッチをクリックするとあたらしい段が作れますよ。"
   },
   "Maximum 57 divisions. For larger, use a dedicated tool.": {
-    "kanji": "Maximum 57 divisions. For larger, use a dedicated tool.",
+    "kanji": "分割数は最大57です。それより大きい場合は、専用のツールを使ってください。",
     "kana": "Maximum 57 divisions. For larger, use a dedicated tool."
   },
   "modified": {
-    "kanji": "modified",
+    "kanji": "変更済み",
     "kana": "modified"
   },
   "active temperament": {
-    "kanji": "active temperament",
+    "kanji": "現在の音律",
     "kana": "active temperament"
   },
   "12-EDO reference": {
-    "kanji": "12-EDO reference",
+    "kanji": "12-EDOの基準",
     "kana": "12-EDO reference"
   },
   "no deviation": {
-    "kanji": "no deviation",
+    "kanji": "ずれなし",
     "kana": "no deviation"
   },
   "sharp (+cents)": {
-    "kanji": "sharp (+cents)",
+    "kanji": "高い（+セント）",
     "kana": "sharp (+cents)"
   },
   "flat (-cents)": {
-    "kanji": "flat (-cents)",
+    "kanji": "低い（-セント）",
     "kana": "flat (-cents)"
   },
   "Temperament visualizer circle": {
-    "kanji": "Temperament visualizer circle",
+    "kanji": "音律ビジュアライザーの円",
     "kana": "Temperament visualizer circle"
   },
   "Pitch": {
-    "kanji": "Pitch",
+    "kanji": "ピッチ",
     "kana": "Pitch"
   },
   "Step": {
-    "kanji": "Step",
+    "kanji": "ステップ",
     "kana": "Step"
   },
   "Frequency (Hz)": {
-    "kanji": "Frequency (Hz)",
+    "kanji": "周波数 (Hz)",
     "kana": "Frequency (Hz)"
   },
   "Cents dev. from 12-EDO": {
-    "kanji": "Cents dev. from 12-EDO",
+    "kanji": "12-EDOからのずれ（セント）",
     "kana": "Cents dev. from 12-EDO"
   },
   "Ratio": {
-    "kanji": "Ratio",
+    "kanji": "比率",
     "kana": "Ratio"
   },
   "scroll for all": {
-    "kanji": "scroll for all",
+    "kanji": "スクロールで全て表示",
     "kana": "scroll for all"
   },
   "pitches": {
-    "kanji": "pitches",
+    "kanji": "ピッチ",
     "kana": "pitches"
   },
   "Relative cents from 12-EDO (-50 to +50)": {
-    "kanji": "Relative cents from 12-EDO (-50 to +50)",
+    "kanji": "12-EDOからの相対セント（-50 〜 +50）",
     "kana": "Relative cents from 12-EDO (-50 to +50)"
   },
   "Set cents": {
-    "kanji": "Set cents",
+    "kanji": "セントを設定",
     "kana": "Set cents"
   },
   "Reset to 12-EDO": {
-    "kanji": "Reset to 12-EDO",
+    "kanji": "12-EDOに戻す",
     "kana": "Reset to 12-EDO"
   },
   "Invalid temperament: %s. Skipping to next temperament.": {
@@ -6524,55 +6524,55 @@
     "kana": "むこうなおんりつ: %s。つぎのおんりつにスキップします。"
   },
   "No temperament to export.": {
-    "kanji": "No temperament to export.",
+    "kanji": "書き出す音律がありません。",
     "kana": "No temperament to export."
   },
   "Error reading JSON file:": {
-    "kanji": "Error reading JSON file:",
+    "kanji": "JSONファイルの読み込みエラー:",
     "kana": "Error reading JSON file:"
   },
   "Error reading .scl file:": {
-    "kanji": "Error reading .scl file:",
+    "kanji": ".sclファイルの読み込みエラー:",
     "kana": "Error reading .scl file:"
   },
   "Invalid .scl file: pitches must be strictly ascending above 1/1.": {
-    "kanji": "Invalid .scl file: pitches must be strictly ascending above 1/1.",
+    "kanji": "無効な.sclファイルです: ピッチは1/1より上で、厳密に上昇していなければなりません。",
     "kana": "Invalid .scl file: pitches must be strictly ascending above 1/1."
   },
   "Unsupported file type. Use .json or .scl.": {
-    "kanji": "Unsupported file type. Use .json or .scl.",
+    "kanji": "未対応のファイル形式です。.json または .scl を使ってください。",
     "kana": "Unsupported file type. Use .json or .scl."
   },
   "Invalid temperament name.": {
-    "kanji": "Invalid temperament name.",
+    "kanji": "無効な音律名です。",
     "kana": "Invalid temperament name."
   },
   "Cannot import: no reference frequency.": {
-    "kanji": "Cannot import: no reference frequency.",
+    "kanji": "読み込めません: 基準周波数がありません。",
     "kana": "Cannot import: no reference frequency."
   },
   "Invalid temperament: octave ratio out of range.": {
-    "kanji": "Invalid temperament: octave ratio out of range.",
+    "kanji": "無効な音律です: オクターブ比が範囲外です。",
     "kana": "Invalid temperament: octave ratio out of range."
   },
   "Temperament imported:": {
-    "kanji": "Temperament imported:",
+    "kanji": "音律を読み込みました:",
     "kana": "Temperament imported:"
   },
   "Export .scl": {
-    "kanji": "Export .scl",
+    "kanji": ".sclを書き出す",
     "kana": "Export .scl"
   },
   "Export JSON": {
-    "kanji": "Export JSON",
+    "kanji": "JSONを書き出す",
     "kana": "Export JSON"
   },
   "Import": {
-    "kanji": "Import",
+    "kanji": "読み込む",
     "kana": "Import"
   },
   "Play all pitches": {
-    "kanji": "Play all pitches",
+    "kanji": "すべてのピッチを再生",
     "kana": "Play all pitches"
   },
   "Share": {
@@ -6580,15 +6580,15 @@
     "kana": "シェア"
   },
   "Add pitch after selected (clockwise)": {
-    "kanji": "Add pitch after selected (clockwise)",
+    "kanji": "選択したピッチの後ろに追加（時計回り）",
     "kana": "Add pitch after selected (clockwise)"
   },
   "Add pitch before selected (counterclockwise)": {
-    "kanji": "Add pitch before selected (counterclockwise)",
+    "kanji": "選択したピッチの前に追加（反時計回り）",
     "kana": "Add pitch before selected (counterclockwise)"
   },
   "Remove selected pitch": {
-    "kanji": "Remove selected pitch",
+    "kanji": "選択したピッチを削除",
     "kana": "Remove selected pitch"
   },
   "Invalid temperament interval data. Skipping note %s.": {
@@ -6596,15 +6596,15 @@
     "kana": "むこうなおんりつかんかくデータです。%sのピッチ をスキップします。"
   },
   "Create new temperament": {
-    "kanji": "Create new temperament",
+    "kanji": "新しい音律を作成",
     "kana": "Create new temperament"
   },
   "Timbre Widget opened": {
-    "kanji": "Timbre Widget opened",
+    "kanji": "音色ウィジェットを開きました",
     "kana": "Timbre Widget opened"
   },
   "Timbre Widget closed": {
-    "kanji": "Timbre Widget closed",
+    "kanji": "音色ウィジェットを閉じました",
     "kana": "Timbre Widget closed"
   },
   "Synthesizer": {
@@ -6628,7 +6628,7 @@
     "kana": "おんぷのあたい"
   },
   "Frequency is outside supported range (27.5 Hz - 16744.04 Hz).": {
-    "kanji": "Frequency is outside supported range (27.5 Hz - 16744.04 Hz).",
+    "kanji": "周波数が対応範囲（27.5 Hz 〜 16744.04 Hz）の外です。",
     "kana": "Frequency is outside supported range (27.5 Hz - 16744.04 Hz)."
   },
   "Warning: Sample is bigger than 1MB.": {
@@ -6728,63 +6728,63 @@
     "kana": "クリックでおとのたかさを選んでちょうをせっていできます。"
   },
   "Non-EDO temperament: modes use its pitch count; switching the tuning replaces the temperament.": {
-    "kanji": "Non-EDO temperament: modes use its pitch count; switching the tuning replaces the temperament.",
+    "kanji": "EDO以外の音律: モードにはその音律のピッチ数が使われます。調律を切り替えると音律が置き換えられます。",
     "kana": "Non-EDO temperament: modes use its pitch count; switching the tuning replaces the temperament."
   },
   "Switching tuning replaces the current non-EDO temperament.": {
-    "kanji": "Switching tuning replaces the current non-EDO temperament.",
+    "kanji": "調律を切り替えると、現在のEDO以外の音律が置き換えられます。",
     "kana": "Switching tuning replaces the current non-EDO temperament."
   },
   "Could not save the custom mode. Local storage is full or unavailable.": {
-    "kanji": "Could not save the custom mode. Local storage is full or unavailable.",
+    "kanji": "カスタムモードを保存できませんでした。ローカルストレージがいっぱいか、利用できません。",
     "kana": "Could not save the custom mode. Local storage is full or unavailable."
   },
   "Invalid EDO for mode.": {
-    "kanji": "Invalid EDO for mode.",
+    "kanji": "モードに対して無効なEDOです。",
     "kana": "Invalid EDO for mode."
   },
   "Invalid mode name.": {
-    "kanji": "Invalid mode name.",
+    "kanji": "無効なモード名です。",
     "kana": "Invalid mode name."
   },
   "Cannot overwrite built-in mode:": {
-    "kanji": "Cannot overwrite built-in mode:",
+    "kanji": "組み込みのモードは上書きできません:",
     "kana": "Cannot overwrite built-in mode:"
   },
   "Mode name": {
-    "kanji": "Mode name",
+    "kanji": "モード名",
     "kana": "Mode name"
   },
   "Please enter a mode name.": {
-    "kanji": "Please enter a mode name.",
+    "kanji": "モード名を入力してください。",
     "kana": "Please enter a mode name."
   },
   "Mode saved:": {
-    "kanji": "Mode saved:",
+    "kanji": "モードを保存しました:",
     "kana": "Mode saved:"
   },
   "No mode selected.": {
-    "kanji": "No mode selected.",
+    "kanji": "モードが選択されていません。",
     "kana": "No mode selected."
   },
   "Cannot delete a built-in mode.": {
-    "kanji": "Cannot delete a built-in mode.",
+    "kanji": "組み込みのモードは削除できません。",
     "kana": "Cannot delete a built-in mode."
   },
   "Mode deleted:": {
-    "kanji": "Mode deleted:",
+    "kanji": "モードを削除しました:",
     "kana": "Mode deleted:"
   },
   "No mode to export.": {
-    "kanji": "No mode to export.",
+    "kanji": "書き出すモードがありません。",
     "kana": "No mode to export."
   },
   "Not a valid EDO mode. Import requires a mode that fits an equal division of the octave.": {
-    "kanji": "Not a valid EDO mode. Import requires a mode that fits an equal division of the octave.",
+    "kanji": "有効なEDOモードではありません。読み込むには、オクターブの等分割に合うモードが必要です。",
     "kana": "Not a valid EDO mode. Import requires a mode that fits an equal division of the octave."
   },
   "Mode imported:": {
-    "kanji": "Mode imported:",
+    "kanji": "モードを読み込みました:",
     "kana": "Mode imported:"
   },
   "Refresh": {
@@ -6800,19 +6800,19 @@
     "kana": "もくひょうピッチ"
   },
   "Chromatic mode": {
-    "kanji": "Chromatic mode",
+    "kanji": "半音階モード",
     "kana": "Chromatic mode"
   },
   "Target pitch mode": {
-    "kanji": "Target pitch mode",
+    "kanji": "目標ピッチモード",
     "kana": "Target pitch mode"
   },
   "Number of beats": {
-    "kanji": "Number of beats",
+    "kanji": "拍の数",
     "kana": "Number of beats"
   },
   "Beat note value": {
-    "kanji": "Beat note value",
+    "kanji": "拍の音符の長さ",
     "kana": "Beat note value"
   },
   "MIDI device present.": {
@@ -6828,11 +6828,11 @@
     "kana": "ブラウザはMIDIのアクセスができませんでした。"
   },
   "Reflection is not available on this host. The backend URL could not be determined.": {
-    "kanji": "Reflection is not available on this host. The backend URL could not be determined.",
+    "kanji": "このホストではリフレクションは利用できません。バックエンドのURLを特定できませんでした。",
     "kana": "Reflection is not available on this host. The backend URL could not be determined."
   },
   "Thinking": {
-    "kanji": "Thinking",
+    "kanji": "考え中",
     "kana": "Thinking"
   },
   "No conversation to save.": {
@@ -6840,15 +6840,15 @@
     "kana": "ほぞんできるかいわはありません。"
   },
   "Reading code": {
-    "kanji": "Reading code",
+    "kanji": "コードを読み込み中",
     "kana": "Reading code"
   },
   "Reflection will send your current project data to an external server for analysis. Your project blocks and structure will be shared with:": {
-    "kanji": "Reflection will send your current project data to an external server for analysis. Your project blocks and structure will be shared with:",
+    "kanji": "リフレクションは、分析のために現在のプロジェクトのデータを外部サーバーに送信します。プロジェクトのブロックと構造が、次の宛先と共有されます:",
     "kana": "Reflection will send your current project data to an external server for analysis. Your project blocks and structure will be shared with:"
   },
   "Nothing was sent. Your project stays here until you agree.": {
-    "kanji": "Nothing was sent. Your project stays here until you agree.",
+    "kanji": "何も送信されていません。同意するまで、プロジェクトはここに残ります。",
     "kana": "Nothing was sent. Your project stays here until you agree."
   },
   "No changes were detected in your project.": {
@@ -6856,11 +6856,11 @@
     "kana": "プロジェクトないでへんこうはけんしゅつされませんでした。"
   },
   "Chat a little longer first. The summary needs at least 10 messages.": {
-    "kanji": "Chat a little longer first. The summary needs at least 10 messages.",
+    "kanji": "もう少しチャットを続けてください。要約には10件以上のメッセージが必要です。",
     "kana": "Chat a little longer first. The summary needs at least 10 messages."
   },
   "Analyzing": {
-    "kanji": "Analyzing",
+    "kanji": "分析中",
     "kana": "Analyzing"
   },
   "Summary": {
@@ -6880,11 +6880,11 @@
     "kana": "ベートーヴェンさんと はなす"
   },
   "Type a message": {
-    "kanji": "Type a message",
+    "kanji": "メッセージを入力",
     "kana": "Type a message"
   },
   "Send": {
-    "kanji": "Send",
+    "kanji": "送信",
     "kana": "Send"
   },
   "harmonicity": {
@@ -6924,7 +6924,7 @@
     "kana": "おそく する"
   },
   "Click to tap tempo": {
-    "kanji": "Click to tap tempo",
+    "kanji": "クリックしてテンポをタップ",
     "kana": "Click to tap tempo"
   },
   "Reset conversation": {
@@ -6936,7 +6936,7 @@
     "kana": "ちゃっとをえくすぽーとする"
   },
   "Undo the change": {
-    "kanji": "Undo the change",
+    "kanji": "変更を元に戻す",
     "kana": "Undo the change"
   },
   "Debugger initialized": {
@@ -6944,71 +6944,71 @@
     "kana": "デバッガーがしょきかされました"
   },
   "Remove": {
-    "kanji": "Remove",
+    "kanji": "削除",
     "kana": "Remove"
   },
   "Ask a question, or say what to change or make": {
-    "kanji": "Ask a question, or say what to change or make",
+    "kanji": "質問するか、変更したいことや作りたいものを伝えてください",
     "kana": "Ask a question, or say what to change or make"
   },
   "Ask": {
-    "kanji": "Ask",
+    "kanji": "質問する",
     "kana": "Ask"
   },
   "Borrow from another project": {
-    "kanji": "Borrow from another project",
+    "kanji": "別のプロジェクトから借りる",
     "kana": "Borrow from another project"
   },
   "Change my project": {
-    "kanji": "Change my project",
+    "kanji": "プロジェクトを変更する",
     "kana": "Change my project"
   },
   "Make a new project": {
-    "kanji": "Make a new project",
+    "kanji": "新しいプロジェクトを作る",
     "kana": "Make a new project"
   },
   "Borrowing from": {
-    "kanji": "Borrowing from",
+    "kanji": "借りているプロジェクト:",
     "kana": "Borrowing from"
   },
   "Why won't my project play?": {
-    "kanji": "Why won't my project play?",
+    "kanji": "プロジェクトが再生されないのはなぜ？",
     "kana": "Why won't my project play?"
   },
   "Add drums to my song": {
-    "kanji": "Add drums to my song",
+    "kanji": "曲にドラムを追加して",
     "kana": "Add drums to my song"
   },
   "Make a song about rain": {
-    "kanji": "Make a song about rain",
+    "kanji": "雨についての曲を作って",
     "kana": "Make a song about rain"
   },
   "a song about rain": {
-    "kanji": "a song about rain",
+    "kanji": "雨についての曲",
     "kana": "a song about rain"
   },
   "Why doesn't my drawing work?": {
-    "kanji": "Why doesn't my drawing work?",
+    "kanji": "絵がうまく動かないのはなぜ？",
     "kana": "Why doesn't my drawing work?"
   },
   "Add a star to my drawing": {
-    "kanji": "Add a star to my drawing",
+    "kanji": "絵に星を追加して",
     "kana": "Add a star to my drawing"
   },
   "Make a colorful spiral": {
-    "kanji": "Make a colorful spiral",
+    "kanji": "カラフルならせんを作って",
     "kana": "Make a colorful spiral"
   },
   "a colorful spiral": {
-    "kanji": "a colorful spiral",
+    "kanji": "カラフルならせん",
     "kana": "a colorful spiral"
   },
   "Do it for me": {
-    "kanji": "Do it for me",
+    "kanji": "代わりにやってもらう",
     "kana": "Do it for me"
   },
   "Change my project the way this reply says": {
-    "kanji": "Change my project the way this reply says",
+    "kanji": "この返信のとおりにプロジェクトを変更する",
     "kana": "Change my project the way this reply says"
   },
   "AI Debugger backend is not configured for this host.": {
@@ -7032,11 +7032,11 @@
     "kana": "Could not reach the AI assistant. Please check your connection and try again."
   },
   "Debugger is typing...": {
-    "kanji": "Debugger is typing...",
+    "kanji": "デバッガーが入力中...",
     "kana": "Debugger is typing..."
   },
   "Debugger is typing": {
-    "kanji": "Debugger is typing",
+    "kanji": "デバッガーが入力中",
     "kana": "Debugger is typing"
   },
   "The AI Debugger will send your current project data to an external server for analysis. Your project blocks and structure will be shared with:": {
@@ -7048,7 +7048,7 @@
     "kana": "デバッガー エラー: むこうなプロジェクト データけいしきです。"
   },
   "Loading your current project and initializing AI assistant...": {
-    "kanji": "Loading your current project and initializing AI assistant...",
+    "kanji": "現在のプロジェクトを読み込み、AIアシスタントを準備しています...",
     "kana": "Loading your current project and initializing AI assistant..."
   },
   "Debugger error: Could not load project data.": {
@@ -7056,7 +7056,7 @@
     "kana": "デバッガー エラー: プロジェクト データをロードできませんでした。"
   },
   "Could not load project data. Starting with basic assistant...": {
-    "kanji": "Could not load project data. Starting with basic assistant...",
+    "kanji": "プロジェクトのデータを読み込めませんでした。基本のアシスタントで開始します...",
     "kana": "Could not load project data. Starting with basic assistant..."
   },
   "AI Debugger is not available on this host. The backend URL could not be determined.": {
@@ -7072,43 +7072,43 @@
     "kana": "さーばー エラー: AI デバッガーのしょきかにしっぱいしました。"
   },
   "Hover to see this block in your project": {
-    "kanji": "Hover to see this block in your project",
+    "kanji": "マウスを重ねると、プロジェクト内のこのブロックを確認できます",
     "kana": "Hover to see this block in your project"
   },
   "Your project is still loading. Please try again in a moment.": {
-    "kanji": "Your project is still loading. Please try again in a moment.",
+    "kanji": "プロジェクトを読み込み中です。しばらくしてからもう一度お試しください。",
     "kana": "Your project is still loading. Please try again in a moment."
   },
   "I'm still working on your last request. Please wait a moment.": {
-    "kanji": "I'm still working on your last request. Please wait a moment.",
+    "kanji": "前のリクエストを処理しています。しばらくお待ちください。",
     "kana": "I'm still working on your last request. Please wait a moment."
   },
   "Tell me what to change first, then I can do it for you.": {
-    "kanji": "Tell me what to change first, then I can do it for you.",
+    "kanji": "まず、何を変更したいか教えてください。そうすれば代わりに行います。",
     "kana": "Tell me what to change first, then I can do it for you."
   },
   "I changed your project. Press Undo to go back.": {
-    "kanji": "I changed your project. Press Undo to go back.",
+    "kanji": "プロジェクトを変更しました。元に戻すには「元に戻す」を押してください。",
     "kana": "I changed your project. Press Undo to go back."
   },
   "Tell me what project to make, for example a drum beat or a song.": {
-    "kanji": "Tell me what project to make, for example a drum beat or a song.",
+    "kanji": "どんなプロジェクトを作るか教えてください。たとえば、ドラムのビートや曲などです。",
     "kana": "Tell me what project to make, for example a drum beat or a song."
   },
   "Make": {
-    "kanji": "Make",
+    "kanji": "作る",
     "kana": "Make"
   },
   "I made a new project. Press Undo to get yours back.": {
-    "kanji": "I made a new project. Press Undo to get yours back.",
+    "kanji": "新しいプロジェクトを作りました。元のプロジェクトに戻すには「元に戻す」を押してください。",
     "kana": "I made a new project. Press Undo to get yours back."
   },
   "Could not change the project. Please try again.": {
-    "kanji": "Could not change the project. Please try again.",
+    "kanji": "プロジェクトを変更できませんでした。もう一度お試しください。",
     "kana": "Could not change the project. Please try again."
   },
   "Your project is back to how it was before the change.": {
-    "kanji": "Your project is back to how it was before the change.",
+    "kanji": "プロジェクトを変更前の状態に戻しました。",
     "kana": "Your project is back to how it was before the change."
   },
   "Conversation reset.": {
@@ -7132,7 +7132,7 @@
     "kana": "ちゃっとがくりあされました。"
   },
   "Enter ABC notation containing at least one note.": {
-    "kanji": "Enter ABC notation containing at least one note.",
+    "kanji": "音符を1つ以上含むABC記譜を入力してください。",
     "kana": "Enter ABC notation containing at least one note."
   },
   "New start block generated.": {
@@ -7140,7 +7140,7 @@
     "kana": "あたらしい「スタート」ブロックがせいせいされました。"
   },
   "Unable to generate blocks.": {
-    "kanji": "Unable to generate blocks.",
+    "kanji": "ブロックを生成できません。",
     "kana": "Unable to generate blocks."
   },
   "Generate blocks": {
@@ -7152,7 +7152,7 @@
     "kana": "APIキーのせってい"
   },
   "Enter your Groq API Key:": {
-    "kanji": "Enter your Groq API Key:",
+    "kanji": "GroqのAPIキーを入力してください:",
     "kana": "Enter your Groq API Key:"
   },
   "Enter your Groq API Key: %s": {
@@ -7188,103 +7188,103 @@
     "kana": "テーブルを クリックでアルペジオのピッチを加える。"
   },
   "Mode not supported by chord progression widget. Defaulting to major.": {
-    "kanji": "Mode not supported by chord progression widget. Defaulting to major.",
+    "kanji": "このモードはコード進行ウィジェットでは使えません。メジャーにします。",
     "kana": "Mode not supported by chord progression widget. Defaulting to major."
   },
   "The progression is full. Remove a chord before adding another.": {
-    "kanji": "The progression is full. Remove a chord before adding another.",
+    "kanji": "コード進行がいっぱいです。別のコードを追加する前に、コードを削除してください。",
     "kana": "The progression is full. Remove a chord before adding another."
   },
   "Cannot save: blocks engine is unavailable.": {
-    "kanji": "Cannot save: blocks engine is unavailable.",
+    "kanji": "保存できません: ブロックエンジンが利用できません。",
     "kana": "Cannot save: blocks engine is unavailable."
   },
   "Add chords to your progression before saving.": {
-    "kanji": "Add chords to your progression before saving.",
+    "kanji": "保存する前に、コード進行にコードを追加してください。",
     "kana": "Add chords to your progression before saving."
   },
   "New chord progression blocks generated.": {
-    "kanji": "New chord progression blocks generated.",
+    "kanji": "新しいコード進行のブロックを生成しました。",
     "kana": "New chord progression blocks generated."
   },
   "Key": {
-    "kanji": "Key",
+    "kanji": "調",
     "kana": "Key"
   },
   "Scale": {
-    "kanji": "Scale",
+    "kanji": "音階",
     "kana": "Scale"
   },
   "Preset": {
-    "kanji": "Preset",
+    "kanji": "プリセット",
     "kana": "Preset"
   },
   "Choose Preset": {
-    "kanji": "Choose Preset",
+    "kanji": "プリセットを選ぶ",
     "kana": "Choose Preset"
   },
   "Diatonic Chords": {
-    "kanji": "Diatonic Chords",
+    "kanji": "ダイアトニックコード",
     "kana": "Diatonic Chords"
   },
   "Click card to audition · Click + to add": {
-    "kanji": "Click card to audition · Click + to add",
+    "kanji": "カードをクリックで試聴 · +をクリックで追加",
     "kana": "Click card to audition · Click + to add"
   },
   "Progression (bars)": {
-    "kanji": "Progression (bars)",
+    "kanji": "コード進行（小節）",
     "kana": "Progression (bars)"
   },
   "Bars": {
-    "kanji": "Bars",
+    "kanji": "小節",
     "kana": "Bars"
   },
   "Beats": {
-    "kanji": "Beats",
+    "kanji": "拍",
     "kana": "Beats"
   },
   "Remove chords before reducing the number of beats.": {
-    "kanji": "Remove chords before reducing the number of beats.",
+    "kanji": "拍の数を減らす前に、コードを削除してください。",
     "kana": "Remove chords before reducing the number of beats."
   },
   "Save to Canvas": {
-    "kanji": "Save to Canvas",
+    "kanji": "キャンバスに保存",
     "kana": "Save to Canvas"
   },
   "Click to audition": {
-    "kanji": "Click to audition",
+    "kanji": "クリックで試聴",
     "kana": "Click to audition"
   },
   "Add to progression": {
-    "kanji": "Add to progression",
+    "kanji": "コード進行に追加",
     "kana": "Add to progression"
   },
   "Bar": {
-    "kanji": "Bar",
+    "kanji": "小節",
     "kana": "Bar"
   },
   "Beat": {
-    "kanji": "Beat",
+    "kanji": "拍",
     "kana": "Beat"
   },
   "Remove chord": {
-    "kanji": "Remove chord",
+    "kanji": "コードを削除",
     "kana": "Remove chord"
   },
   "Click to add chord": {
-    "kanji": "Click to add chord",
+    "kanji": "クリックでコードを追加",
     "kana": "Click to add chord"
   },
   "pick": {
-    "kanji": "pick",
+    "kanji": "選ぶ",
     "kana": "pick"
   },
   "Pitch Slider opened": {
-    "kanji": "Pitch Slider opened",
+    "kanji": "ピッチスライダーを開きました",
     "kana": "Pitch Slider opened"
   },
   "Pitch Slider closed": {
-    "kanji": "Pitch Slider closed",
+    "kanji": "ピッチスライダーを閉じました",
     "kana": "Pitch Slider closed"
   },
   "Use the up/down buttons or arrow keys to change pitch.": {
@@ -7296,35 +7296,35 @@
     "kana": "スライダーでおとのたかさを変えます。"
   },
   "Load Plugin": {
-    "kanji": "Load Plugin",
+    "kanji": "プラグインを読み込む",
     "kana": "Load Plugin"
   },
   "Select a built-in plugin to load, or upload a local file.": {
-    "kanji": "Select a built-in plugin to load, or upload a local file.",
+    "kanji": "読み込む組み込みプラグインを選ぶか、ローカルのファイルをアップロードしてください。",
     "kana": "Select a built-in plugin to load, or upload a local file."
   },
   "Choose built-in plugin...": {
-    "kanji": "Choose built-in plugin...",
+    "kanji": "組み込みプラグインを選ぶ...",
     "kana": "Choose built-in plugin..."
   },
   "Upload File": {
-    "kanji": "Upload File",
+    "kanji": "ファイルをアップロード",
     "kana": "Upload File"
   },
   "Load": {
-    "kanji": "Load",
+    "kanji": "読み込む",
     "kana": "Load"
   },
   "Delete Plugin": {
-    "kanji": "Delete Plugin",
+    "kanji": "プラグインを削除",
     "kana": "Delete Plugin"
   },
   "Select the plugin you want to delete:": {
-    "kanji": "Select the plugin you want to delete:",
+    "kanji": "削除するプラグインを選んでください:",
     "kana": "Select the plugin you want to delete:"
   },
   "No custom plugins are currently loaded.": {
-    "kanji": "No custom plugins are currently loaded.",
+    "kanji": "読み込まれているカスタムプラグインはありません。",
     "kana": "No custom plugins are currently loaded."
   },
   "OK": {
@@ -7332,39 +7332,39 @@
     "kana": "OK"
   },
   "There is no free pitch left to add to the keyboard.": {
-    "kanji": "There is no free pitch left to add to the keyboard.",
+    "kanji": "キーボードに追加できる空きピッチがありません。",
     "kana": "There is no free pitch left to add to the keyboard."
   },
   "Octave 8 (Shift+↑/↓ to shift octaves)": {
-    "kanji": "Octave 8 (Shift+↑/↓ to shift octaves)",
+    "kanji": "オクターブ8（Shift+↑/↓でオクターブを移動）",
     "kana": "Octave 8 (Shift+↑/↓ to shift octaves)"
   },
   "Octave 7 (Shift+↑/↓ to shift octaves)": {
-    "kanji": "Octave 7 (Shift+↑/↓ to shift octaves)",
+    "kanji": "オクターブ7（Shift+↑/↓でオクターブを移動）",
     "kana": "Octave 7 (Shift+↑/↓ to shift octaves)"
   },
   "Octave 6 (Shift+↑/↓ to shift octaves)": {
-    "kanji": "Octave 6 (Shift+↑/↓ to shift octaves)",
+    "kanji": "オクターブ6（Shift+↑/↓でオクターブを移動）",
     "kana": "Octave 6 (Shift+↑/↓ to shift octaves)"
   },
   "Octave 5 (Shift+↑/↓ to shift octaves)": {
-    "kanji": "Octave 5 (Shift+↑/↓ to shift octaves)",
+    "kanji": "オクターブ5（Shift+↑/↓でオクターブを移動）",
     "kana": "Octave 5 (Shift+↑/↓ to shift octaves)"
   },
   "Octave 4 (Shift+↑/↓ to shift octaves)": {
-    "kanji": "Octave 4 (Shift+↑/↓ to shift octaves)",
+    "kanji": "オクターブ4（Shift+↑/↓でオクターブを移動）",
     "kana": "Octave 4 (Shift+↑/↓ to shift octaves)"
   },
   "Octave 3 (Shift+↑/↓ to shift octaves)": {
-    "kanji": "Octave 3 (Shift+↑/↓ to shift octaves)",
+    "kanji": "オクターブ3（Shift+↑/↓でオクターブを移動）",
     "kana": "Octave 3 (Shift+↑/↓ to shift octaves)"
   },
   "Octave 2 (Shift+↑/↓ to shift octaves)": {
-    "kanji": "Octave 2 (Shift+↑/↓ to shift octaves)",
+    "kanji": "オクターブ2（Shift+↑/↓でオクターブを移動）",
     "kana": "Octave 2 (Shift+↑/↓ to shift octaves)"
   },
   "Octave 1 (Shift+↑/↓ to shift octaves)": {
-    "kanji": "Octave 1 (Shift+↑/↓ to shift octaves)",
+    "kanji": "オクターブ1（Shift+↑/↓でオクターブを移動）",
     "kana": "Octave 1 (Shift+↑/↓ to shift octaves)"
   },
   "tap a rhythm": {
@@ -7376,11 +7376,11 @@
     "kana": "リズムメーカーの おとの ながさは、さいだい ２５６ です。"
   },
   "Rhythm Maker opened": {
-    "kanji": "Rhythm Maker opened",
+    "kanji": "リズムメーカーを開きました",
     "kana": "Rhythm Maker opened"
   },
   "Rhythm Maker closed": {
-    "kanji": "Rhythm Maker closed",
+    "kanji": "リズムメーカーを閉じました",
     "kana": "Rhythm Maker closed"
   },
   "Save rhythms": {
@@ -7400,11 +7400,11 @@
     "kana": "えんけいビュー"
   },
   "Music Keyboard opened": {
-    "kanji": "Music Keyboard opened",
+    "kanji": "ミュージックキーボードを開きました",
     "kana": "Music Keyboard opened"
   },
   "Music Keyboard closed": {
-    "kanji": "Music Keyboard closed",
+    "kanji": "ミュージックキーボードを閉じました",
     "kana": "Music Keyboard closed"
   },
   "Add note": {
@@ -7416,7 +7416,7 @@
     "kana": "メトロノーム"
   },
   "No notes to save.": {
-    "kanji": "No notes to save.",
+    "kanji": "保存する音符がありません。",
     "kana": "No notes to save."
   },
   "New action blocks generated.": {
@@ -7424,11 +7424,11 @@
     "kana": "あたらしいアクションを つくりました。"
   },
   "bell": {
-    "kanji": "bell",
+    "kanji": "ベル",
     "kana": "bell"
   },
   "Phrase Maker opened": {
-    "kanji": "Phrase Maker opened",
+    "kanji": "フレーズメーカーを開きました",
     "kana": "Phrase Maker opened"
   },
   "Sort": {
@@ -7440,11 +7440,11 @@
     "kana": "ます目をクリックするとメロディやリズムを作れます。"
   },
   "Phrase Maker closed": {
-    "kanji": "Phrase Maker closed",
+    "kanji": "フレーズメーカーを閉じました",
     "kana": "Phrase Maker closed"
   },
   "Could not open export window. This is often caused by a browser pop-up blocker — check your settings and try again.": {
-    "kanji": "Could not open export window. This is often caused by a browser pop-up blocker — check your settings and try again.",
+    "kanji": "書き出しウィンドウを開けませんでした。ブラウザーのポップアップブロックが原因であることが多いので、設定を確認して、もう一度お試しください。",
     "kana": "Could not open export window. This is often caused by a browser pop-up blocker — check your settings and try again."
   },
   "tuplet value": {
@@ -7456,11 +7456,11 @@
     "kana": "クリック すると リズムを わる ことが できます。"
   },
   "harmony": {
-    "kanji": "harmony",
+    "kanji": "ハーモニー",
     "kana": "harmony"
   },
   "notes": {
-    "kanji": "notes",
+    "kanji": "音符",
     "kana": "notes"
   },
   "interval": {
@@ -7468,51 +7468,51 @@
     "kana": "おととおとのまのかんかく"
   },
   "just ratio": {
-    "kanji": "just ratio",
+    "kanji": "純正律の比率",
     "kana": "just ratio"
   },
   "played ratio": {
-    "kanji": "played ratio",
+    "kanji": "演奏された比率",
     "kana": "played ratio"
   },
   "cents from just": {
-    "kanji": "cents from just",
+    "kanji": "純正律からのセント",
     "kana": "cents from just"
   },
   "consonance": {
-    "kanji": "consonance",
+    "kanji": "協和",
     "kana": "consonance"
   },
   "imperfect": {
-    "kanji": "imperfect",
+    "kanji": "不完全",
     "kana": "imperfect"
   },
   "dissonant": {
-    "kanji": "dissonant",
+    "kanji": "不協和",
     "kana": "dissonant"
   },
   "parallel fifths": {
-    "kanji": "parallel fifths",
+    "kanji": "平行5度",
     "kana": "parallel fifths"
   },
   "parallel octaves": {
-    "kanji": "parallel octaves",
+    "kanji": "平行8度",
     "kana": "parallel octaves"
   },
   "parallel unisons": {
-    "kanji": "parallel unisons",
+    "kanji": "平行1度",
     "kana": "parallel unisons"
   },
   "hidden fifths": {
-    "kanji": "hidden fifths",
+    "kanji": "隠伏5度",
     "kana": "hidden fifths"
   },
   "hidden octaves": {
-    "kanji": "hidden octaves",
+    "kanji": "隠伏8度",
     "kana": "hidden octaves"
   },
   "Window controls": {
-    "kanji": "Window controls",
+    "kanji": "ウィンドウの操作",
     "kana": "Window controls"
   },
   "Close window": {
@@ -7532,11 +7532,11 @@
     "kana": "ウィンドウをさいだいかする"
   },
   "Widget toolbar": {
-    "kanji": "Widget toolbar",
+    "kanji": "ウィジェットのツールバー",
     "kana": "Widget toolbar"
   },
   "Expand window": {
-    "kanji": "Expand window",
+    "kanji": "ウィンドウを広げる",
     "kana": "Expand window"
   },
   "Adjust the tempo with the buttons.": {
@@ -7588,7 +7588,7 @@
     "kana": "のリミックス"
   },
   "Could not load project. Please check your connection and try again.": {
-    "kanji": "Could not load project. Please check your connection and try again.",
+    "kanji": "プロジェクトを読み込めませんでした。接続を確認して、もう一度お試しください。",
     "kana": "Could not load project. Please check your connection and try again."
   },
   "Cannot connect to server": {
@@ -7608,11 +7608,11 @@
     "kana": "こうかい された プロジェクトを みる"
   },
   "Being tracked": {
-    "kanji": "Being tracked",
+    "kanji": "記録中",
     "kana": "Being tracked"
   },
   "Project thumbnail": {
-    "kanji": "Project thumbnail",
+    "kanji": "プロジェクトのサムネイル",
     "kana": "Project thumbnail"
   },
   "Publish project": {
@@ -7620,7 +7620,7 @@
     "kana": "プロジェクトを こうかい する"
   },
   "Project name": {
-    "kanji": "Project name",
+    "kanji": "プロジェクト名",
     "kana": "Project name"
   },
   "Edit project": {
@@ -7672,7 +7672,7 @@
     "kana": "さらにくわしく"
   },
   "Remix project": {
-    "kanji": "Remix project",
+    "kanji": "プロジェクトをリミックス",
     "kana": "Remix project"
   },
   "Share project": {
@@ -7704,7 +7704,7 @@
     "kana": "しょうさい オプション"
   },
   "Show all tags": {
-    "kanji": "Show all tags",
+    "kanji": "すべてのタグを表示",
     "kana": "Show all tags"
   },
   "Link copied to clipboard!": {
@@ -7728,7 +7728,7 @@
     "kana": "Feature unavailable - cannot connect to server. Reload Music Blocks to try again."
   },
   "Republish project": {
-    "kanji": "Republish project",
+    "kanji": "プロジェクトを再公開",
     "kana": "Republish project"
   },
   "This field is required": {
