@@ -72,7 +72,8 @@ if (typeof module !== "undefined" && module.exports) {
         isCustomTemperament,
         TEMPERAMENT,
         PreDefinedTemperaments,
-        isEquallyTempered
+        isEquallyTempered,
+        getTemperament
     } = MusicUtilsTemperament;
     var MusicUtilsPitch =
         (typeof window !== "undefined" && window.MusicUtilsPitch) ||
@@ -1092,6 +1093,31 @@ var getNoteFromSolfege = (
 };
 
 /**
+ * A note name as written in the label list of a ratio temperament whose pitches are not
+ * twelve to the octave (the meantones), or null when the temperament has no such list or
+ * the name is not on it.
+ * @param {string} noteArg - e.g. "F♭", "fb", "C#"
+ * @param {string} temperament
+ * @returns {string|null}
+ */
+const _ownRatioTableName = (noteArg, temperament) => {
+    const t = getTemperament(temperament);
+    if (
+        typeof noteArg !== "string" ||
+        !/^[A-Ga-g]/.test(noteArg) ||
+        !t ||
+        t.isEDO !== false ||
+        t.pitchNumber === 12 ||
+        !Array.isArray(t.noteLabels)
+    ) {
+        return null;
+    }
+    const name =
+        noteArg[0].toUpperCase() + noteArg.slice(1).replaceAll("b", FLAT).replaceAll("#", SHARP);
+    return t.noteLabels.includes(name) ? name : null;
+};
+
+/**
  * Get the note based on various parameters.
  * @function
  * @param {string|number} noteArg - The note name or pitch number.
@@ -1129,6 +1155,15 @@ function getNote(
         TEMPERAMENT[temperament] && typeof TEMPERAMENT[temperament].pitchNumber === "number"
             ? TEMPERAMENT[temperament].pitchNumber
             : 12;
+
+    // A ratio temperament that lists its own note names (1/4-comma meantone's F♭ and C♭
+    // are pitches of their own, 41 cents above E and B) keeps a name from that list. The
+    // name table below is built for EDOs and has no F♭ or C♭, so they became E and B.
+    const ownName = _ownRatioTableName(noteArg, temperament);
+    if (ownName !== null && !isAlreadyEdoSteps && Math.abs(transposition || 0) < 1) {
+        const cents = (transposition || 0) * 100;
+        return [ownName, Math.round(octave), cents === 0 ? 0 : cents];
+    }
 
     let rememberFlat = false;
     let rememberSharp = false;
