@@ -118,43 +118,6 @@ var NOTESYMBOLS = {
  * @param {string} keySignature - The key signature string.
  * @returns {Array} An array containing the key and mode.
  */
-/**
- * Where a letter with one sharp or flat sits in an EDO name table that leaves it out, for a
- * table that spaces sharps and flats as meantone does (X♯ one chromatic step above X, the
- * step being C→D minus E→F). 19 EDO writes E♯ and B♯ but not F♭ and C♭, which are the
- * same pitches there; the 12-EDO fallback played F♭ as E and C♭ as B instead.
- * @param {Array<string>} edoNames - generateNoteNames(edo).
- * @param {string} name - A letter with one ♯ or ♭, e.g. "F♭".
- * @returns {Array|null} [the table's name for that pitch, octave shift], or null.
- */
-var _edoEnharmonicSlot = (edoNames, name) => {
-    const match = /^([A-G])([♯♭])$/u.exec(name);
-    if (match === null) {
-        return null;
-    }
-    const n = edoNames.length;
-    const at = letter => edoNames.indexOf(letter);
-    const chromatic = at("D") - at("C") - (at("F") - at("E"));
-    if (["C", "D", "E", "F"].some(letter => at(letter) === -1) || chromatic < 1) {
-        return null;
-    }
-    const meantone = ["C", "D", "E", "F", "G", "A", "B"].every(letter => {
-        const sharp = at(letter + SHARP);
-        const flat = at(letter + FLAT);
-        return (
-            at(letter) !== -1 &&
-            (sharp === -1 || sharp === (at(letter) + chromatic) % n) &&
-            (flat === -1 || flat === (at(letter) - chromatic + n) % n)
-        );
-    });
-    if (!meantone) {
-        return null;
-    }
-    const position = at(match[1]) + (match[2] === SHARP ? chromatic : -chromatic);
-    const octaveShift = Math.floor(position / n);
-    return [edoNames[position - octaveShift * n], octaveShift];
-};
-
 var keySignatureToMode = keySignature => {
     // Convert from "A Minor" to "A" and "MINOR"
     if (typeof keySignature !== "string" || keySignature.trim() === "") {
@@ -347,6 +310,43 @@ var getSharpFlatPreference = keySignature => {
     } else {
         return "natural";
     }
+};
+
+/**
+ * Where a letter with one sharp or flat sits in an EDO name table that leaves it out, for a
+ * table that spaces sharps and flats as meantone does (X♯ one chromatic step above X, the
+ * step being C→D minus E→F). 19 EDO writes E♯ and B♯ but not F♭ and C♭, which are the
+ * same pitches there; the 12-EDO fallback played F♭ as E and C♭ as B instead.
+ * @param {Array<string>} edoNames - generateNoteNames(edo).
+ * @param {string} name - A letter with one ♯ or ♭, e.g. "F♭".
+ * @returns {Array|null} [the table's name for that pitch, octave shift], or null.
+ */
+var _edoEnharmonicSlot = (edoNames, name) => {
+    const match = /^([A-G])([♯♭])$/u.exec(name);
+    if (match === null) {
+        return null;
+    }
+    const n = edoNames.length;
+    const at = letter => edoNames.indexOf(letter);
+    const chromatic = at("D") - at("C") - (at("F") - at("E"));
+    if (["C", "D", "E", "F"].some(letter => at(letter) === -1) || chromatic < 1) {
+        return null;
+    }
+    const meantone = ["C", "D", "E", "F", "G", "A", "B"].every(letter => {
+        const sharp = at(letter + SHARP);
+        const flat = at(letter + FLAT);
+        return (
+            at(letter) !== -1 &&
+            (sharp === -1 || sharp === (at(letter) + chromatic) % n) &&
+            (flat === -1 || flat === (at(letter) - chromatic + n) % n)
+        );
+    });
+    if (!meantone) {
+        return null;
+    }
+    const position = at(match[1]) + (match[2] === SHARP ? chromatic : -chromatic);
+    const octaveShift = Math.floor(position / n);
+    return [edoNames[position - octaveShift * n], octaveShift];
 };
 
 /**
@@ -1708,7 +1708,6 @@ function getNote(
 }
 
 var MusicUtilsPitchScale = {
-    _edoEnharmonicSlot,
     NOTESYMBOLS,
     keySignatureToMode,
     getScaleAndHalfSteps,
@@ -1717,7 +1716,8 @@ var MusicUtilsPitchScale = {
     getNoteFromInterval,
     numberToPitch,
     getNoteFromSolfege,
-    getNote
+    getNote,
+    _edoEnharmonicSlot
 };
 
 if (typeof module !== "undefined" && module.exports) {
