@@ -499,14 +499,20 @@ class GlobalCard {
                 if (globalPlanet.cache[id] !== projectData) {
                     // The replacement may be newer than this response; fetch the
                     // committed count instead of overwriting it with stale data.
-                    Planet.ServerInterface.getProjectDetails(id, response => {
-                        if (response.success && Number.isFinite(response.data?.ProjectLikes)) {
-                            const current = globalPlanet.cache[id];
-                            if (current) current.ProjectLikes = response.data.ProjectLikes;
-                            const count = document.getElementById(`global-project-likes-${id}`);
-                            if (count) count.textContent = response.data.ProjectLikes.toString();
-                        }
-                    });
+                    Planet.ServerInterface.getProjectDetails(
+                        id,
+                        response => {
+                            if (response.success && Number.isFinite(response.data?.ProjectLikes)) {
+                                const current = globalPlanet.cache[id];
+                                if (current) current.ProjectLikes = response.data.ProjectLikes;
+                                const count = document.getElementById(`global-project-likes-${id}`);
+                                if (count)
+                                    count.textContent = response.data.ProjectLikes.toString();
+                            }
+                        },
+                        true,
+                        false
+                    );
                 }
             } else if (!data.success) {
                 Planet.ProjectStorage.like(id, !like);
