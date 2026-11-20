@@ -1124,5 +1124,49 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             expect(panel.textContent).toContain("<b>Showing locally saved drafts</b>");
             expect(panel.textContent).toContain("<b>4 more commits can be made</b>");
         });
+
+        test("the start flag text goes through _() when you're at the start", () => {
+            const clear = jest.spyOn(gitDropdown, "_clearChanges").mockImplementation(() => {});
+
+            gitDropdown._renderHistoryPanel([], true);
+
+            const text = selector => document.querySelector(selector).textContent;
+            expect(text(".git-tt-you-here")).toBe("[YOU ARE HERE]");
+            expect(text(".git-tt-sync-pending-badge")).toBe("[Setting Up Tracking]");
+            expect(text(".git-tt-clear-btn").trim()).toBe("[Undo my changes]");
+
+            document.querySelector(".git-tt-clear-btn").click();
+            expect(clear).toHaveBeenCalledWith("origin", "[Start point]");
+        });
+
+        test("going back to the start uses a translated name", () => {
+            const travel = jest
+                .spyOn(gitDropdown, "_confirmTimeTravel")
+                .mockImplementation(() => {});
+            const riff = { sha: "riff-sha", message: "Riff", date: "2026-10-23T10:00:00Z" };
+
+            gitDropdown._renderHistoryPanel([
+                { sha: "chorus-sha", message: "Chorus", date: "2026-10-24T10:00:00Z" },
+                riff
+            ]);
+
+            const buttons = document.querySelectorAll(".git-tt-go-btn");
+            buttons[buttons.length - 1].click();
+            expect(travel).toHaveBeenCalledWith(riff, "[Start point]");
+        });
+
+        test("a cached commit with no message gets a translated name", async () => {
+            jest.spyOn(console, "error").mockImplementation(() => {});
+            jest.spyOn(gitDropdown, "_getRepoName").mockReturnValue("drum-beat");
+            gitDropdown._prefetchRepo = "drum-beat";
+            gitDropdown._prefetchPromise = Promise.resolve(null);
+            jest.spyOn(gitDropdown, "_waitForMessage").mockResolvedValue({
+                data: [{ status: "synced", sha: "beat-sha", date: "2026-10-24T10:00:00Z" }]
+            });
+
+            await gitDropdown._showHistoryPanel();
+
+            expect(document.querySelector(".git-tt-frame").textContent).toContain("[Saved moment]");
+        });
     });
 });
