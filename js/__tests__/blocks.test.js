@@ -3822,6 +3822,22 @@ describe("Blocks Foundation", () => {
             expect(blocks._lastLoadFailed).toBe(true);
         });
 
+        it("reports a queued request's first-chunk failure by its own token", async () => {
+            const processBlock = blocks._processOneBlock;
+            const error = new Error("queued first chunk failed");
+            blocks._processOneBlock = jest.fn((b, blockObjs, offset) => {
+                if (blockObjs.length === 2) throw error;
+                processBlock(b, blockObjs, offset);
+            });
+            const failure = nextLoadEvent("loadFailed");
+            blocks.loadNewBlocks(makeBatch(25));
+            const queuedToken = blocks.loadNewBlocks(makeBatch(2));
+
+            expect(await failure).toEqual({ token: queuedToken, error });
+            expect(blocks._loadInProgress).toBe(false);
+            expect(blocks._lastLoadFailed).toBe(true);
+        });
+
         it("tags 'finishedLoading' with the load's token, like 'loadFailed'", async () => {
             // A listener scoped to one particular loadNewBlocks() call (e.g.
             // ProjectManager._loadStart()'s recovery watcher) needs this to
