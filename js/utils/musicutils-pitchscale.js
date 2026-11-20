@@ -924,6 +924,31 @@ var numberToPitch = (i, temperament, startPitch, offset, activity) => {
 };
 
 /**
+ * A note name as written in the label list of a ratio temperament whose pitches are not
+ * twelve to the octave (the meantones), or null when the temperament has no such list or
+ * the name is not on it.
+ * @param {string} noteArg - e.g. "F♭", "fb", "C#"
+ * @param {string} temperament
+ * @returns {string|null}
+ */
+const _ownRatioTableName = (noteArg, temperament) => {
+    const t = getTemperament(temperament);
+    if (
+        typeof noteArg !== "string" ||
+        !/^[A-Ga-g]/.test(noteArg) ||
+        !t ||
+        t.isEDO !== false ||
+        t.pitchNumber === 12 ||
+        !Array.isArray(t.noteLabels)
+    ) {
+        return null;
+    }
+    const name =
+        noteArg[0].toUpperCase() + noteArg.slice(1).replaceAll("b", FLAT).replaceAll("#", SHARP);
+    return t.noteLabels.includes(name) ? name : null;
+};
+
+/**
  * Resolve a solfege note argument (e.g. "do", "re♯") to a note name for the
  * given key signature and octave length. Shared by the 12-EDO and microtonal
  * EDO paths in getNote().
@@ -1090,31 +1115,6 @@ var getNoteFromSolfege = (
     }
 
     return null;
-};
-
-/**
- * A note name as written in the label list of a ratio temperament whose pitches are not
- * twelve to the octave (the meantones), or null when the temperament has no such list or
- * the name is not on it.
- * @param {string} noteArg - e.g. "F♭", "fb", "C#"
- * @param {string} temperament
- * @returns {string|null}
- */
-const _ownRatioTableName = (noteArg, temperament) => {
-    const t = getTemperament(temperament);
-    if (
-        typeof noteArg !== "string" ||
-        !/^[A-Ga-g]/.test(noteArg) ||
-        !t ||
-        t.isEDO !== false ||
-        t.pitchNumber === 12 ||
-        !Array.isArray(t.noteLabels)
-    ) {
-        return null;
-    }
-    const name =
-        noteArg[0].toUpperCase() + noteArg.slice(1).replaceAll("b", FLAT).replaceAll("#", SHARP);
-    return t.noteLabels.includes(name) ? name : null;
 };
 
 /**
