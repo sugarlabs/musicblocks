@@ -1213,8 +1213,19 @@ function getNote(
         transpositionCents = (transposition - transpositionFloor) * 100;
     }
 
+    // Scale transposition from semitones to EDO steps.
+    // Use the original transposition value (not the already-floored transpositionFloor)
+    // to preserve fractional precision during conversion.
+    // Skip this conversion if transposition is already in EDO steps (non-equal temperaments).
+    if (octaveLength !== 12 && !isAlreadyEdoSteps) {
+        transpositionFloor = Math.round((transposition * octaveLength) / 12);
+    }
+
+    // Whole semitones of the transposition (transpositionFloor is in steps by now).
+    const wholeSemitones =
+        transposition < 0 ? -Math.floor(-transposition) : Math.floor(transposition);
     const unevenTable =
-        transpositionFloor !== 0 && !isAlreadyEdoSteps ? _unevenRatioTable(temperament) : null;
+        wholeSemitones !== 0 && !isAlreadyEdoSteps ? _unevenRatioTable(temperament) : null;
     if (unevenTable !== null) {
         // Resolve the note itself, then move it by the whole semitones to the table's
         // nearest pitch; the fraction stays cents, as everywhere else.
@@ -1230,18 +1241,10 @@ function getNote(
             false,
             clampIndex
         );
-        const moved = _transposeInRatioTable(unevenTable, base[0], base[1], transpositionFloor);
+        const moved = _transposeInRatioTable(unevenTable, base[0], base[1], wholeSemitones);
         if (moved !== null) {
             return [moved[0], moved[1], transpositionCents === 0 ? 0 : transpositionCents];
         }
-    }
-
-    // Scale transposition from semitones to EDO steps.
-    // Use the original transposition value (not the already-floored transpositionFloor)
-    // to preserve fractional precision during conversion.
-    // Skip this conversion if transposition is already in EDO steps (non-equal temperaments).
-    if (octaveLength !== 12 && !isAlreadyEdoSteps) {
-        transpositionFloor = Math.round((transposition * octaveLength) / 12);
     }
 
     if (typeof noteArg !== "number") {
