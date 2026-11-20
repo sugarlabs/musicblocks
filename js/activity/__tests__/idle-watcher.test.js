@@ -436,13 +436,54 @@ describe("setupActivityIdleWatcher", () => {
 
         it("does not save right after a project load has failed partway (issue #8855)", () => {
             setupActivityIdleWatcher(mockActivity);
-            mockActivity.blocks = { _loadInProgress: false, _lastLoadFailed: true };
+            mockActivity.blocks = {
+                _loadInProgress: false,
+                _lastLoadFailed: true,
+                _failedLoadSnapshot: "[partial]"
+            };
+            mockActivity.prepareExport = jest.fn(() => "[partial]");
             mockActivity._initAutoSave();
 
             jest.advanceTimersByTime(15 * 1000);
 
             expect(mockActivity.saveSessionAsync).not.toHaveBeenCalled();
             expect(mockActivity.saveLocally).not.toHaveBeenCalled();
+        });
+
+        it("resumes autosave when the workspace changes after a failed load", () => {
+            setupActivityIdleWatcher(mockActivity);
+            mockActivity.blocks = {
+                _loadInProgress: false,
+                _lastLoadFailed: true,
+                _failedLoadSnapshot: "[partial]"
+            };
+            mockActivity.prepareExport = jest
+                .fn()
+                .mockReturnValueOnce("[partial]")
+                .mockReturnValue("[edited]");
+            mockActivity._initAutoSave();
+
+            jest.advanceTimersByTime(15 * 1000);
+            expect(mockActivity.saveSessionAsync).not.toHaveBeenCalled();
+
+            jest.advanceTimersByTime(15 * 1000);
+            expect(mockActivity.saveSessionAsync).toHaveBeenCalledTimes(1);
+            expect(mockActivity.blocks._lastLoadFailed).toBe(false);
+        });
+
+        it("does not save an unexportable failed load", () => {
+            setupActivityIdleWatcher(mockActivity);
+            mockActivity.blocks = {
+                _loadInProgress: false,
+                _lastLoadFailed: true,
+                _failedLoadSnapshot: null
+            };
+            mockActivity.prepareExport = jest.fn();
+            mockActivity._initAutoSave();
+
+            jest.advanceTimersByTime(15 * 1000);
+            expect(mockActivity.prepareExport).not.toHaveBeenCalled();
+            expect(mockActivity.saveSessionAsync).not.toHaveBeenCalled();
         });
 
         it("saves normally once a load has completed successfully", () => {

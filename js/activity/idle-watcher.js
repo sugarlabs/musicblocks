@@ -159,11 +159,18 @@ const setupActivityIdleWatcher = activityInstance => {
                     // truncated prefix of the intended project, and saving
                     // that now would overwrite the last good session with it
                     // on every storage tier (issue #8855).
-                    if (
-                        activity.blocks &&
-                        (activity.blocks._loadInProgress || activity.blocks._lastLoadFailed)
-                    ) {
-                        return;
+                    if (activity.blocks) {
+                        if (activity.blocks._loadInProgress) return;
+                        if (activity.blocks._lastLoadFailed) {
+                            if (
+                                activity.blocks._failedLoadSnapshot === null ||
+                                activity.prepareExport() === activity.blocks._failedLoadSnapshot
+                            ) {
+                                return;
+                            }
+                            activity.blocks._lastLoadFailed = false;
+                            activity.blocks._failedLoadSnapshot = null;
+                        }
                     }
 
                     // Fix #7: Use saveSessionAsync (IndexedDB) when available;
