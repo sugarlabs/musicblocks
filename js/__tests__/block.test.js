@@ -3241,6 +3241,31 @@ describe("Block Foundation", () => {
                 expect(Block.getProgramOrder(swapped)).toEqual([0, 1, 2, 3]);
             });
 
+            it("getProgramOrder puts a block inserted in the middle in program order", () => {
+                const inserted = [
+                    { connections: [null, 2] }, // 0 start, next is 2
+                    { connections: [2, null] }, // 1 last, after 2
+                    { connections: [0, 1] } // 2 inserted between 0 and 1
+                ];
+                expect(Block.getProgramOrder(inserted)).toEqual([0, 2, 1]);
+            });
+
+            it("getProgramOrder orders stacks by their top block, not their highest index", () => {
+                const interleaved = [
+                    { connections: [null, 3] }, // 0 top of stack A, followed by 3
+                    { connections: [null, 2] }, // 1 top of stack B, followed by 2
+                    { connections: [1, null] }, // 2
+                    { connections: [0, null] } // 3
+                ];
+                expect(Block.getProgramOrder(interleaved)).toEqual([0, 3, 1, 2]);
+            });
+
+            it("getProgramOrder copes with an empty list and a component with no top block", () => {
+                expect(Block.getProgramOrder([])).toEqual([]);
+                const ring = [{ connections: [1, 1] }, { connections: [0, 0] }];
+                expect(Block.getProgramOrder(ring)).toEqual([0, 1]);
+            });
+
             it("getProgramOrder ignores empty slots and survives a connection loop", () => {
                 const looped = [undefined, { connections: [null, 2] }, { connections: [1, 1] }];
                 expect(Block.getProgramOrder(looped)).toEqual([1, 2]);

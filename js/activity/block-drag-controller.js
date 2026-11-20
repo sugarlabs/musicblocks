@@ -28,7 +28,7 @@
    call block.isCollapsible() / block.isInlineCollapsible() on the Block
    instance directly. No global classification lists are consulted here.
 */
-/* global DEFAULTBLOCKSCALE, STRINGLEN, TEXTWIDTH, delayExecution, getTextWidth, _,
+/* global Block, DEFAULTBLOCKSCALE, STRINGLEN, TEXTWIDTH, delayExecution, getTextWidth, _,
    MINIMUMDOCKDISTANCE, LONGSTACK, announceToScreenReader, widgetWindows */
 
 /* exported setupBlockDragController, BlockDragController */
@@ -1199,7 +1199,20 @@ const setupBlockDragController = blocks => {
     const controller = new BlockDragController(blocks);
     blocks.blockDragController = controller;
 
-    blocks.blockMoved = (...args) => controller.blockMoved(...args);
+    // Moving a block can change which stack it is in, and so the program order that the
+    // accessible block list (used for arrow-key navigation) must follow.
+    blocks.blockMoved = async (...args) => {
+        try {
+            return await controller.blockMoved(...args);
+        } finally {
+            if (
+                typeof Block !== "undefined" &&
+                typeof Block._scheduleAccessibleReorder === "function"
+            ) {
+                Block._scheduleAccessibleReorder(blocks);
+            }
+        }
+    };
     blocks.findDragGroup = (...args) => controller.findDragGroup(...args);
     blocks.cacheDragGroup = (...args) => controller.cacheDragGroup(...args);
     blocks.clearCachedDragGroup = (...args) => controller.clearCachedDragGroup(...args);

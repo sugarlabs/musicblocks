@@ -583,6 +583,65 @@ describe("BlockDragController", () => {
             expect(blocks.hideSnapIndicator).toHaveBeenCalled();
         });
 
+        describe("accessible block order after a move", () => {
+            const makePair = () => {
+                const target = makeFlowBlock({
+                    x: 0,
+                    y: 0,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "out"]
+                    ],
+                    connections: [null, null],
+                    name: "target"
+                });
+                target.isArgClamp = () => false;
+                const moving = makeFlowBlock({
+                    x: 0,
+                    y: 15,
+                    docks: [[0, 0, "in"]],
+                    connections: [null],
+                    name: "moving"
+                });
+                return makeBlocks([target, moving]);
+            };
+
+            afterEach(() => {
+                delete global.Block;
+            });
+
+            it("queues a reorder of the accessible list after the move completes", async () => {
+                global.Block = { _scheduleAccessibleReorder: jest.fn() };
+                const blocks = makePair();
+
+                await blocks.blockMoved(1);
+
+                // The connection was made first, so the reorder sees the final structure.
+                expect(blocks.blockList[1].connections[0]).toBe(0);
+                expect(global.Block._scheduleAccessibleReorder).toHaveBeenCalledTimes(1);
+                expect(global.Block._scheduleAccessibleReorder).toHaveBeenCalledWith(blocks);
+            });
+
+            it("still queues the reorder when the move throws, and rethrows", async () => {
+                global.Block = { _scheduleAccessibleReorder: jest.fn() };
+                const blocks = makePair();
+                blocks.hideSnapIndicator = jest.fn(() => {
+                    throw new Error("boom");
+                });
+
+                await expect(blocks.blockMoved(1)).rejects.toThrow("boom");
+                expect(global.Block._scheduleAccessibleReorder).toHaveBeenCalledTimes(1);
+            });
+
+            it("works when the Block class is not available", async () => {
+                delete global.Block;
+                const blocks = makePair();
+
+                await expect(blocks.blockMoved(1)).resolves.not.toThrow();
+                expect(blocks.blockList[1].connections[0]).toBe(0);
+            });
+        });
+
         it("does not connect to an incompatible dock type even when very close", async () => {
             const target = makeFlowBlock({
                 x: 0,
