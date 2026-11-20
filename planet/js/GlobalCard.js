@@ -485,6 +485,19 @@ class GlobalCard {
                 projectData.ProjectLikes = data.likes;
                 const currentLikesEl = document.getElementById(`global-project-likes-${id}`);
                 if (currentLikesEl) currentLikesEl.textContent = data.likes.toString();
+                const globalPlanet = Planet.GlobalPlanet;
+                if (globalPlanet.cache[id] !== projectData) {
+                    // The replacement may be newer than this response; fetch the
+                    // committed count instead of overwriting it with stale data.
+                    Planet.ServerInterface.getProjectDetails(id, response => {
+                        if (response.success && Number.isFinite(response.data?.ProjectLikes)) {
+                            const current = globalPlanet.cache[id];
+                            if (current) current.ProjectLikes = response.data.ProjectLikes;
+                            const count = document.getElementById(`global-project-likes-${id}`);
+                            if (count) count.textContent = response.data.ProjectLikes.toString();
+                        }
+                    });
+                }
             } else if (!data.success) {
                 Planet.ProjectStorage.like(id, !like);
                 const currentLikesEl = document.getElementById(`global-project-likes-${id}`);
