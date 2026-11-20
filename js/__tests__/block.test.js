@@ -3180,6 +3180,91 @@ describe("Block Foundation", () => {
             expect(activateSpy).toHaveBeenCalledTimes(2);
         });
 
+        describe("keyboard collapse and expand", () => {
+            const press = (el, key, init = {}) =>
+                el.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true, ...init }));
+
+            beforeEach(() => {
+                block.isCollapsible = jest.fn().mockReturnValue(true);
+                block.collapseToggle = jest.fn();
+                block.activate = jest.fn();
+            });
+
+            it("Shift+Enter and Shift+Space toggle collapse instead of activating", () => {
+                const el = block._setupAccessibleElement();
+
+                press(el, "Enter", { shiftKey: true });
+                press(el, " ", { shiftKey: true });
+
+                expect(block.collapseToggle).toHaveBeenCalledTimes(2);
+                expect(block.activate).not.toHaveBeenCalled();
+            });
+
+            it("plain Enter and Space still activate a collapsible block", () => {
+                const el = block._setupAccessibleElement();
+
+                press(el, "Enter");
+                press(el, " ");
+
+                expect(block.activate).toHaveBeenCalledTimes(2);
+                expect(block.collapseToggle).not.toHaveBeenCalled();
+            });
+
+            it("Shift+Enter on a block that cannot collapse just activates it", () => {
+                block.isCollapsible.mockReturnValue(false);
+                const el = block._setupAccessibleElement();
+
+                press(el, "Enter", { shiftKey: true });
+
+                expect(block.collapseToggle).not.toHaveBeenCalled();
+                expect(block.activate).toHaveBeenCalledTimes(1);
+            });
+
+            it("reports aria-expanded for a collapsible block", () => {
+                const el = block._setupAccessibleElement();
+                expect(el.getAttribute("aria-expanded")).toBe("true");
+
+                block.collapsed = true;
+                block._updateAccessibleElement();
+                expect(el.getAttribute("aria-expanded")).toBe("false");
+
+                block.collapsed = false;
+                block._updateAccessibleElement();
+                expect(el.getAttribute("aria-expanded")).toBe("true");
+            });
+
+            it("leaves aria-expanded off a block that cannot collapse", () => {
+                block.isCollapsible.mockReturnValue(false);
+                const el = block._setupAccessibleElement();
+
+                expect(el.hasAttribute("aria-expanded")).toBe(false);
+            });
+
+            it("collapseToggle keeps aria-expanded in step with the visible state", () => {
+                const realToggle = Block.prototype.collapseToggle;
+                block.collapseBlockBitmap = { visible: true };
+                block.collapseButtonBitmap = null;
+                block.expandButtonBitmap = null;
+                block.highlightCollapseBlockBitmap = null;
+                block.collapseText = null;
+                block.blocks.findDragGroup = jest.fn();
+                block.blocks.dragGroup = [0];
+                block.blocks._updateViewportGrid = jest.fn();
+                block.isInlineCollapsible = jest.fn().mockReturnValue(false);
+                block._createCache = jest.fn();
+                block.updateCache = jest.fn();
+                block.unhighlight = jest.fn();
+                block.activity = { refreshCanvas: jest.fn() };
+                const el = block._setupAccessibleElement();
+
+                realToggle.call(block);
+                expect(el.getAttribute("aria-expanded")).toBe("false");
+
+                realToggle.call(block);
+                expect(el.getAttribute("aria-expanded")).toBe("true");
+            });
+        });
+
         it("arrow keys navigate between sibling block elements", () => {
             const block2 = new Block(
                 { name: "right", staticLabels: ["right"], image: "right.svg", docks: [] },
