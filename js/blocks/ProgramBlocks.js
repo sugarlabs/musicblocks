@@ -12,8 +12,8 @@
 /*
    global
 
-   LeftBlock, FlowBlock, NOINPUTERRORMSG, getTargetTurtle, Turtle, isSafeUrl, isUnsafeObjectKey,
-   i18next
+   Block, LeftBlock, FlowBlock, NOINPUTERRORMSG, getTargetTurtle, Turtle, isSafeUrl,
+   isUnsafeObjectKey, i18next
  */
 
 /* exported setupProgramBlocks */
@@ -27,6 +27,19 @@ function setupProgramBlocks(activity) {
      */
     function isTurtleStatusKey(key) {
         return Turtle.DictActions.IsTurtleKey(key);
+    }
+
+    /**
+     * Blocks that rewire connections while a program runs change the program order, so queue
+     * the same accessible-list reorder that a drag does.
+     */
+    function queueAccessibleReorder() {
+        if (
+            typeof Block !== "undefined" &&
+            typeof Block._scheduleAccessibleReorder === "function"
+        ) {
+            Block._scheduleAccessibleReorder(activity.blocks);
+        }
     }
     /**
      * Represents a block that loads the heap from a web page in the logo programming language.
@@ -1264,6 +1277,7 @@ function setupProgramBlocks(activity) {
                     for (let i = 0; i < activity.blocks.blockList[c].connections.length; i++) {
                         if (activity.blocks.blockList[c].connections[i] === args[0]) {
                             activity.blocks.blockList[c].connections[i] = null;
+                            queueAccessibleReorder();
                             return;
                         }
                     }
@@ -1276,6 +1290,7 @@ function setupProgramBlocks(activity) {
             activity.blocks.blockList[args[2]].connections[0] = args[0];
 
             activity.blocks.adjustDocks(args[0], true);
+            queueAccessibleReorder();
         }
     }
 
