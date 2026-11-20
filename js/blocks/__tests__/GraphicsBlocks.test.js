@@ -602,7 +602,11 @@ describe("GraphicsBlocks", () => {
             const block = new activity.blocks.wrap();
             block.flow(["on", 2], logo, turtle, 10);
             expect(turtleObj.painter.wrap).toBe(true);
-            expect(logo.setDispatchBlock).toHaveBeenCalledWith(10, turtle, "_wrap_" + turtle);
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith(
+                10,
+                turtle,
+                "_wrap_" + turtle + "_10"
+            );
         });
         test("WrapBlock disables wrap mode when args[0] is 'off'", () => {
             const block = new activity.blocks.wrap();
@@ -618,6 +622,178 @@ describe("GraphicsBlocks", () => {
             const block = new activity.blocks.wrap();
             const res = block.flow(["on"], logo, turtle, 10);
             expect(res).toBeUndefined();
+        });
+        test("WrapBlock restores previous wrap state when clamp listener executes", () => {
+            activity.blocks.blockList[10] = { name: "wrap" };
+            turtleObj.painter.wrap = null;
+            const block = new activity.blocks.wrap();
+            block.flow(["on", 2], logo, turtle, 10);
+            expect(turtleObj.painter.wrap).toBe(true);
+
+            const listener = logo.setTurtleListener.mock.calls.find(
+                call => call[1] === "_wrap_" + turtle + "_10"
+            )[2];
+            listener();
+            expect(turtleObj.painter.wrap).toBeNull();
+        });
+        test("WrapBlock preserves outer wrap state across nested invocations on the same turtle", () => {
+            activity.blocks.blockList[10] = { name: "wrap" };
+            activity.blocks.blockList[20] = { name: "wrap" };
+            turtleObj.painter.wrap = null;
+            const block = new activity.blocks.wrap();
+
+            // Enter outer clamp: wrap on
+            block.flow(["on", 2], logo, turtle, 10);
+            expect(turtleObj.painter.wrap).toBe(true);
+            const outerListener = logo.setTurtleListener.mock.calls.find(
+                call => call[1] === "_wrap_" + turtle + "_10"
+            )[2];
+
+            // Enter inner clamp: wrap off
+            block.flow(["off", 3], logo, turtle, 20);
+            expect(turtleObj.painter.wrap).toBe(false);
+            const innerListener = logo.setTurtleListener.mock.calls.find(
+                call => call[1] === "_wrap_" + turtle + "_20"
+            )[2];
+
+            // Inner clamp completes: must restore outer clamp's wrap state (true)
+            innerListener();
+            expect(turtleObj.painter.wrap).toBe(true);
+
+            // Outer clamp completes: restores initial wrap state (null)
+            outerListener();
+            expect(turtleObj.painter.wrap).toBeNull();
+        });
+        test("WrapBlock preserves outer wrap state when nested clamp also has wrap 'on'", () => {
+            activity.blocks.blockList[10] = { name: "wrap" };
+            activity.blocks.blockList[20] = { name: "wrap" };
+            turtleObj.painter.wrap = null;
+            const block = new activity.blocks.wrap();
+
+            // Enter outer clamp: wrap on
+            block.flow(["on", 2], logo, turtle, 10);
+            expect(turtleObj.painter.wrap).toBe(true);
+            const outerListener = logo.setTurtleListener.mock.calls.find(
+                call => call[1] === "_wrap_" + turtle + "_10"
+            )[2];
+
+            // Enter inner clamp: wrap on
+            block.flow(["on", 3], logo, turtle, 20);
+            expect(turtleObj.painter.wrap).toBe(true);
+            const innerListener = logo.setTurtleListener.mock.calls.find(
+                call => call[1] === "_wrap_" + turtle + "_20"
+            )[2];
+
+            // Inner clamp completes: must NOT clear to null; outer clamp is still active
+            innerListener();
+            expect(turtleObj.painter.wrap).toBe(true);
+
+            // Outer clamp completes: restores initial wrap state (null)
+            outerListener();
+            expect(turtleObj.painter.wrap).toBeNull();
+        });
+        test("WrapBlock supports 3 levels of nesting with correct LIFO restoration", () => {
+            activity.blocks.blockList[10] = { name: "wrap" };
+            activity.blocks.blockList[20] = { name: "wrap" };
+            activity.blocks.blockList[30] = { name: "wrap" };
+            turtleObj.painter.wrap = null;
+            const block = new activity.blocks.wrap();
+
+            // Level 1: on
+            block.flow(["on", 2], logo, turtle, 10);
+            expect(turtleObj.painter.wrap).toBe(true);
+            const listenerL1 = logo.setTurtleListener.mock.calls.find(
+                call => call[1] === "_wrap_" + turtle + "_10"
+            )[2];
+
+            // Level 2: off
+            block.flow(["off", 2], logo, turtle, 20);
+            expect(turtleObj.painter.wrap).toBe(false);
+            const listenerL2 = logo.setTurtleListener.mock.calls.find(
+                call => call[1] === "_wrap_" + turtle + "_20"
+            )[2];
+
+            // Level 3: on
+            block.flow(["on", 2], logo, turtle, 30);
+            expect(turtleObj.painter.wrap).toBe(true);
+            const listenerL3 = logo.setTurtleListener.mock.calls.find(
+                call => call[1] === "_wrap_" + turtle + "_30"
+            )[2];
+
+            // Exit Level 3 -> restores Level 2 (false)
+            listenerL3();
+            expect(turtleObj.painter.wrap).toBe(false);
+
+            // Exit Level 2 -> restores Level 1 (true)
+            listenerL2();
+            expect(turtleObj.painter.wrap).toBe(true);
+
+            // Exit Level 1 -> restores initial (null)
+            listenerL1();
+            expect(turtleObj.painter.wrap).toBeNull();
+        });
+        test("WrapBlock preserves non-null initial wrap state after clamp completion", () => {
+            activity.blocks.blockList[10] = { name: "wrap" };
+            turtleObj.painter.wrap = false;
+            const block = new activity.blocks.wrap();
+
+            block.flow(["on", 2], logo, turtle, 10);
+            expect(turtleObj.painter.wrap).toBe(true);
+
+            const listener = logo.setTurtleListener.mock.calls.find(
+                call => call[1] === "_wrap_" + turtle + "_10"
+            )[2];
+            listener();
+            expect(turtleObj.painter.wrap).toBe(false);
+        });
+        test("WrapBlock isolates listener names across different turtles", () => {
+            activity.blocks.blockList[10] = { name: "wrap" };
+            const otherTurtle = 1;
+            const otherTurtleObj = {
+                painter: { wrap: null },
+                singer: { embeddedGraphics: {} }
+            };
+            activity.turtles.ithTurtle = jest.fn(t =>
+                t === otherTurtle ? otherTurtleObj : turtleObj
+            );
+
+            const block = new activity.blocks.wrap();
+            block.flow(["on", 2], logo, turtle, 10);
+            block.flow(["off", 2], logo, otherTurtle, 10);
+
+            expect(logo.setTurtleListener).toHaveBeenCalledWith(
+                turtle,
+                "_wrap_" + turtle + "_10",
+                expect.any(Function)
+            );
+            expect(logo.setTurtleListener).toHaveBeenCalledWith(
+                otherTurtle,
+                "_wrap_" + otherTurtle + "_10",
+                expect.any(Function)
+            );
+            expect(turtleObj.painter.wrap).toBe(true);
+            expect(otherTurtleObj.painter.wrap).toBe(false);
+        });
+        test("WrapBlock falls back to _wrap_<turtle> when blk is undefined", () => {
+            const block = new activity.blocks.wrap();
+            block.flow(["on", 2], logo, turtle);
+            expect(logo.setTurtleListener).toHaveBeenCalledWith(
+                turtle,
+                "_wrap_" + turtle,
+                expect.any(Function)
+            );
+        });
+        test("WrapBlock registers listener on mouse when MusicBlocks.isRun is true and blk is not in blockList", () => {
+            const origIsRun = MusicBlocks.isRun;
+            MusicBlocks.isRun = true;
+            const fakeMouse = { MB: { listeners: [] } };
+            Mouse.getMouseFromTurtle.mockReturnValueOnce(fakeMouse);
+
+            const block = new activity.blocks.wrap();
+            block.flow(["on", 2], logo, turtle);
+            expect(fakeMouse.MB.listeners).toContain("_wrap_" + turtle);
+
+            MusicBlocks.isRun = origIsRun;
         });
     });
 
