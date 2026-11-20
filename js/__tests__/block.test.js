@@ -3263,6 +3263,34 @@ describe("Block Foundation", () => {
                 realToggle.call(block);
                 expect(el.getAttribute("aria-expanded")).toBe("true");
             });
+
+            it("Shift+Enter does nothing until the collapse artwork is ready, then toggles", () => {
+                // Use the real keyboard listener and the real collapseToggle().
+                block.collapseToggle = Block.prototype.collapseToggle;
+                block.collapseBlockBitmap = null;
+                block.collapseButtonBitmap = null;
+                block.expandButtonBitmap = null;
+                block.highlightCollapseBlockBitmap = null;
+                block.collapseText = null;
+                block.blocks.findDragGroup = jest.fn();
+                block.blocks.dragGroup = [0];
+                block.blocks._updateViewportGrid = jest.fn();
+                block.isInlineCollapsible = jest.fn().mockReturnValue(false);
+                block._createCache = jest.fn();
+                block.updateCache = jest.fn();
+                block.unhighlight = jest.fn();
+                block.activity = { refreshCanvas: jest.fn() };
+                const el = block._setupAccessibleElement();
+
+                press(el, "Enter", { shiftKey: true });
+                expect(block.collapsed).toBe(false);
+                expect(el.getAttribute("aria-expanded")).toBe("true");
+
+                block.collapseBlockBitmap = { visible: true };
+                press(el, "Enter", { shiftKey: true });
+                expect(block.collapsed).toBe(true);
+                expect(el.getAttribute("aria-expanded")).toBe("false");
+            });
         });
 
         it("arrow keys navigate between sibling block elements", () => {
