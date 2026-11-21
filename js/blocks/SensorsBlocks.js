@@ -116,7 +116,7 @@ function setupSensorsBlocks(activity) {
                     if (isNaN(value)) {
                         logo.inputValues[turtle] = value;
                     } else {
-                        logo.inputValues[turtle] = parseFloat(value);
+                        logo.inputValues[turtle] = Number(value);
                     }
                     inputElem.blur();
                     inputElem.style.display = "none";
