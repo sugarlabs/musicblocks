@@ -20,6 +20,17 @@
    ProjectStorage
 */
 
+function isValidProjectStorage(data) {
+    return (
+        data !== null &&
+        typeof data === "object" &&
+        !Array.isArray(data) &&
+        data.Projects !== null &&
+        typeof data.Projects === "object" &&
+        !Array.isArray(data.Projects)
+    );
+}
+
 class ProjectStorage {
     constructor(Planet) {
         this.Planet = Planet;
@@ -470,7 +481,15 @@ class ProjectStorage {
             try {
                 // Write backup of current persisted data before overwriting primary.
                 const existing = await this.get(this.LocalStorageKey);
-                if (existing !== null) {
+                let backupCandidate = existing;
+                if (typeof backupCandidate === "string") {
+                    try {
+                        backupCandidate = JSON.parse(backupCandidate);
+                    } catch (_) {
+                        backupCandidate = null;
+                    }
+                }
+                if (isValidProjectStorage(backupCandidate)) {
                     await this.set(this.BackupStorageKey, existing);
                 }
 
@@ -495,6 +514,7 @@ class ProjectStorage {
 
         try {
             this.data = typeof currentData === "string" ? JSON.parse(currentData) : currentData;
+            if (!isValidProjectStorage(this.data)) this.data = null;
         } catch (e) {
             console.error("[ProjectStorage] Primary data corrupted, attempting backup restore:", e);
             this.data = null;
@@ -505,11 +525,14 @@ class ProjectStorage {
             try {
                 const backupData = await this.get(this.BackupStorageKey);
                 if (backupData !== null && backupData !== undefined) {
-                    this.data =
+                    const recovered =
                         typeof backupData === "string" ? JSON.parse(backupData) : backupData;
-                    console.warn("[ProjectStorage] Restored from backup successfully.");
-                    // Re-persist recovered data as primary.
-                    await this.set(this.LocalStorageKey, this.data);
+                    if (isValidProjectStorage(recovered)) {
+                        this.data = recovered;
+                        console.warn("[ProjectStorage] Restored from backup successfully.");
+                        // Re-persist recovered data as primary.
+                        await this.set(this.LocalStorageKey, this.data);
+                    }
                 }
             } catch (backupError) {
                 console.error("[ProjectStorage] Backup restore also failed:", backupError);
