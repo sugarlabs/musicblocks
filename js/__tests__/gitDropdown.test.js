@@ -1056,4 +1056,117 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             }
         });
     });
+
+    describe("Time Travel translations", () => {
+        const identity = global._;
+
+        beforeEach(() => {
+            global._ = text => `[${text}]`;
+        });
+
+        afterEach(() => {
+            global._ = identity;
+            gitDropdown._closeHistoryPanel();
+        });
+
+        test("relative times go through _()", () => {
+            const ago = ms => new Date(Date.now() - ms).toISOString();
+            const day = 24 * 60 * 60 * 1000;
+
+            expect(gitDropdown._relativeTime(ago(0))).toBe("[Just now]");
+            expect(gitDropdown._relativeTime(ago(60 * 1000))).toBe("[1 minute ago]");
+            expect(gitDropdown._relativeTime(ago(5 * 60 * 1000))).toBe("[5 minutes ago]");
+            expect(gitDropdown._relativeTime(ago(2 * 60 * 60 * 1000))).toBe("[2 hours ago]");
+            expect(gitDropdown._relativeTime(ago(3 * day))).toBe("[3 days ago]");
+            expect(gitDropdown._relativeTime(ago(65 * day))).toBe("[2 months ago]");
+        });
+
+        test("the history panel text goes through _()", () => {
+            gitDropdown._renderHistoryPanel([
+                { sha: "chorus-sha", message: "Chorus", date: "2026-10-24T10:00:00Z" },
+                { sha: "riff-sha", message: "Riff", date: "2026-10-23T10:00:00Z" }
+            ]);
+
+            const text = selector => document.querySelector(selector).textContent;
+            expect(text(".git-tt-title")).toBe("[Time Travel]");
+            expect(text(".git-tt-subtitle")).toBe("[Every save, forever yours] ✦");
+            expect(text(".git-tt-latest-badge")).toBe("[Latest]");
+            expect(text(".git-tt-go-btn").trim()).toBe("[Go back to this version]");
+            expect(document.body.textContent).toContain("[The very beginning]");
+            expect(document.body.textContent).toContain("[Where your project started] ✦");
+        });
+
+        test("translated labels next to icons are shown as text, not parsed as HTML", () => {
+            global._ = text => `<b>${text}</b>`;
+
+            gitDropdown._renderHistoryPanel(
+                [
+                    {
+                        sha: "draft-sha",
+                        message: "Draft",
+                        date: "2026-10-25T10:00:00Z",
+                        _pending: true
+                    },
+                    { sha: "chorus-sha", message: "Chorus", date: "2026-10-24T10:00:00Z" },
+                    { sha: "riff-sha", message: "Riff", date: "2026-10-23T10:00:00Z" }
+                ],
+                true
+            );
+
+            const panel = document.querySelector(".git-tt-frame");
+            expect(panel.querySelector("b")).toBeNull();
+            expect(document.querySelector(".git-tt-go-btn").textContent).toContain(
+                "<b>Go back to this version</b>"
+            );
+            expect(document.querySelector(".git-tt-sync-pending-badge").textContent).toContain(
+                "<b>Sync Pending</b>"
+            );
+            expect(panel.textContent).toContain("<b>Showing locally saved drafts</b>");
+            expect(panel.textContent).toContain("<b>4 more commits can be made</b>");
+        });
+
+        test("the start flag text goes through _() when you're at the start", () => {
+            const clear = jest.spyOn(gitDropdown, "_clearChanges").mockImplementation(() => {});
+
+            gitDropdown._renderHistoryPanel([], true);
+
+            const text = selector => document.querySelector(selector).textContent;
+            expect(text(".git-tt-you-here")).toBe("[YOU ARE HERE]");
+            expect(text(".git-tt-sync-pending-badge")).toBe("[Setting Up Tracking]");
+            expect(text(".git-tt-clear-btn").trim()).toBe("[Undo my changes]");
+
+            document.querySelector(".git-tt-clear-btn").click();
+            expect(clear).toHaveBeenCalledWith("origin", "[Start point]");
+        });
+
+        test("going back to the start uses a translated name", () => {
+            const travel = jest
+                .spyOn(gitDropdown, "_confirmTimeTravel")
+                .mockImplementation(() => {});
+            const riff = { sha: "riff-sha", message: "Riff", date: "2026-10-23T10:00:00Z" };
+
+            gitDropdown._renderHistoryPanel([
+                { sha: "chorus-sha", message: "Chorus", date: "2026-10-24T10:00:00Z" },
+                riff
+            ]);
+
+            const buttons = document.querySelectorAll(".git-tt-go-btn");
+            buttons[buttons.length - 1].click();
+            expect(travel).toHaveBeenCalledWith(riff, "[Start point]");
+        });
+
+        test("a cached commit with no message gets a translated name", async () => {
+            jest.spyOn(console, "error").mockImplementation(() => {});
+            jest.spyOn(gitDropdown, "_getRepoName").mockReturnValue("drum-beat");
+            gitDropdown._prefetchRepo = "drum-beat";
+            gitDropdown._prefetchPromise = Promise.resolve(null);
+            jest.spyOn(gitDropdown, "_waitForMessage").mockResolvedValue({
+                data: [{ status: "synced", sha: "beat-sha", date: "2026-10-24T10:00:00Z" }]
+            });
+
+            await gitDropdown._showHistoryPanel();
+
+            expect(document.querySelector(".git-tt-frame").textContent).toContain("[Saved moment]");
+        });
+    });
 });
