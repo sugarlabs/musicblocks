@@ -4583,6 +4583,15 @@ describe("Logo processShow", () => {
         global.CAMERAVALUE = originalCameraValue;
         global.VIDEOVALUE = originalVideoValue;
     });
+
+    test("halts instead of throwing when the obj slot is empty", () => {
+        logo.blockList = [{ connections: [null, null, null] }];
+        logo.stopTurtle = false;
+
+        expect(() => logo.processShow(0, 0, 12, null)).not.toThrow();
+        expect(logo.stopTurtle).toBe(true);
+        expect(turtle0.doShowText).not.toHaveBeenCalled();
+    });
 });
 describe("Logo.processSpeak", () => {
     let logo;
