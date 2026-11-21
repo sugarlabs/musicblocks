@@ -1880,7 +1880,7 @@ function setupPitchBlocks(activity) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
             }
 
-            if (typeof arg0 === "number") {
+            if (typeof arg0 === "number" && Number.isFinite(arg0)) {
                 return Singer.PitchActions.playNthModalPitch(arg0, arg1, turtle, blk);
             } else {
                 activity.errorMsg(INVALIDPITCH, blk);
@@ -1926,7 +1926,7 @@ function setupPitchBlocks(activity) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
             }
 
-            if (typeof arg0 === "number") {
+            if (typeof arg0 === "number" && Number.isFinite(arg0)) {
                 return Singer.PitchActions.playNthModalPitch(arg0, arg1, turtle, blk);
             } else {
                 activity.errorMsg(INVALIDPITCH, blk);
