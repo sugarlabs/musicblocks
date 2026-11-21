@@ -61,7 +61,13 @@ const SamplerUI = {
             this.running = true;
             this.originalSampleName = "";
             this.isMoving = false;
+            this.is_recording = false;
+            this.is_recording_starting = false;
             this.drawVisualIDs = {};
+
+            this.isRecordingStarting = () => {
+                return Boolean(this.is_recording_starting);
+            };
 
             const widgetWindow = window.widgetWindows.windowFor(this, "sampler", "sampler");
             const that = this;
@@ -114,10 +120,12 @@ const SamplerUI = {
                 if (this.drawVisualIDs) {
                     for (const id of Object.keys(this.drawVisualIDs)) {
                         cancelAnimationFrame(this.drawVisualIDs[id]);
+                        this.drawVisualIDs[id] = null;
                     }
                 }
 
                 this.running = false;
+                this._drawLoop = null;
 
                 // Stop current audio
                 if (this.audioPreview) {
@@ -126,9 +134,26 @@ const SamplerUI = {
                     this.audioPreview = null;
                 }
 
-                if (this.is_recording) {
+                if (
+                    this.is_recording ||
+                    this.is_recording_starting ||
+                    (this.activity &&
+                        this.activity.logo &&
+                        this.activity.logo.synth &&
+                        typeof this.activity.logo.synth.isRecordingStarting === "function" &&
+                        this.activity.logo.synth.isRecordingStarting())
+                ) {
+                    this._recordingStartToken = (this._recordingStartToken || 0) + 1;
                     this.activity.logo.synth.stopRecording();
                     this.is_recording = false;
+                }
+                this._recordingStartToken = (this._recordingStartToken || 0) + 1;
+                this.is_recording_starting = false;
+                if (this._recordBtn) {
+                    const img = this._recordBtn.getElementsByTagName("img")[0];
+                    if (img) {
+                        img.src = "header-icons/mic.svg";
+                    }
                 }
 
                 if (tunerOn) {
@@ -320,10 +345,17 @@ const SamplerUI = {
                 if (aiSampleEndpoint.startsWith("http://")) {
                     console.warn("AI sample endpoint is using HTTP instead of HTTPS.");
                 }
-                if (this.is_recording) {
+                if (this.is_recording || this.is_recording_starting) {
+                    this._recordingStartToken = (this._recordingStartToken || 0) + 1;
                     this.activity.logo.synth.stopRecording();
                     this.is_recording = false;
-                    this._recordBtn.getElementsByTagName("img")[0].src = "header-icons/mic.svg";
+                    this.is_recording_starting = false;
+                    if (this._recordBtn) {
+                        const img = this._recordBtn.getElementsByTagName("img")[0];
+                        if (img) {
+                            img.src = "header-icons/mic.svg";
+                        }
+                    }
                 }
                 if (this.audioPreview) {
                     this.audioPreview.pause();
@@ -522,24 +554,67 @@ const SamplerUI = {
 
             this._recordBtn.onclick = async () => {
                 stopTuner();
-                if (!this.is_recording) {
+                if (!this.is_recording && !this.is_recording_starting) {
+                    this._recordingStartToken = (this._recordingStartToken || 0) + 1;
+                    const currentToken = this._recordingStartToken;
+                    this.is_recording_starting = true;
                     try {
                         await this.activity.logo.synth.startRecording();
+                        if (!this.running || this._recordingStartToken !== currentToken) {
+                            return;
+                        }
                         this.is_recording = true;
                         this._recordBtn.getElementsByTagName("img")[0].src =
                             "header-icons/record.svg";
                         this.displayRecordingStartMessage();
                         this.activity.logo.synth.LiveWaveForm();
+                        if (
+                            (this.drawVisualIDs[0] === null ||
+                                this.drawVisualIDs[0] === undefined) &&
+                            typeof this._drawLoop === "function"
+                        ) {
+                            this._drawLoop();
+                        }
                     } catch (err) {
+                        if (this._recordingStartToken !== currentToken) {
+                            return;
+                        }
+                        if (err && err.name === "AbortError") {
+                            return;
+                        }
                         console.error(err);
                         this.activity.errorMsg(_("Microphone access denied."));
+                    } finally {
+                        if (this._recordingStartToken === currentToken) {
+                            this.is_recording_starting = false;
+                            if (!this.is_recording && this._recordBtn) {
+                                const img = this._recordBtn.getElementsByTagName("img")[0];
+                                if (img) {
+                                    img.src = "header-icons/mic.svg";
+                                }
+                            }
+                        }
                     }
-                } else {
+                } else if (this.is_recording) {
                     this.recordingURL = await this.activity.logo.synth.stopRecording();
+                    if (this.recordingURL) {
+                        this.sampleData = this.recordingURL;
+                        this.sampleName = `Recorded Audio ${this.recordingURL}`;
+                    }
                     this.is_recording = false;
                     this._recordBtn.getElementsByTagName("img")[0].src = "header-icons/mic.svg";
                     this.displayRecordingStopMessage();
                     this._playbackBtn.classList.remove("disabled");
+                } else if (this.is_recording_starting) {
+                    this._recordingStartToken = (this._recordingStartToken || 0) + 1;
+                    this.is_recording_starting = false;
+                    this.activity.logo.synth.stopRecording();
+                    if (this._recordBtn) {
+                        const img = this._recordBtn.getElementsByTagName("img")[0];
+                        if (img) {
+                            img.src = "header-icons/mic.svg";
+                        }
+                    }
                 }
             };
 
@@ -547,6 +622,14 @@ const SamplerUI = {
                 stopTuner();
                 const img = this._playbackBtn.getElementsByTagName("img")[0];
                 if (!this.playback) {
+                    if (
+                        this.activity &&
+                        this.activity.logo &&
+                        this.activity.logo.synth &&
+                        this.activity.logo.synth.audioURL
+                    ) {
+                        this.recordingURL = this.activity.logo.synth.audioURL;
+                    }
                     this.sampleData = this.recordingURL;
                     this.sampleName = `Recorded Audio ${this.recordingURL}`;
                     this._addSample();
