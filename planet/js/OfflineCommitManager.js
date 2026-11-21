@@ -38,16 +38,28 @@ class OfflineCommitManager {
     /**
      * @param {Object} projectStorage   Planet.ProjectStorage instance
      * @param {Object} serverInterface  Planet.ServerInterface instance
+     * @param {Function} [onReconnect]  called after connectivity is restored
      */
-    constructor(projectStorage, serverInterface) {
+    constructor(projectStorage, serverInterface, onReconnect) {
         this.storage = projectStorage;
         this.server = serverInterface;
+        this._onReconnect = typeof onReconnect === "function" ? onReconnect : null;
 
         // Per-project sync lock map — prevents concurrent syncPending for the same project
         this._syncingProjects = {};
 
         // Auto-trigger on reconnect
-        this._monitor = new NetworkMonitor(() => this._onOnline(), null);
+        this._monitor = new NetworkMonitor(() => {
+            if (this._onReconnect) {
+                try {
+                    this._onReconnect();
+                } catch (err) {
+                    console.warn("[OfflineCommitManager] Reconnect handler failed:", err);
+                }
+            }
+
+            this._onOnline();
+        }, null);
 
         // Bug fix: NetworkMonitor only fires _onOnline() on an offline→online
         // TRANSITION. After a hard refresh (Ctrl+Shift+R) or a normal page reload
