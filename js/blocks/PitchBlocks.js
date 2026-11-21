@@ -1255,11 +1255,19 @@ function setupPitchBlocks(activity) {
         flow(args, logo, turtle, blk) {
             if (args[1] === undefined) return;
 
-            if (args[0] !== null && typeof args[0] === "number") {
-                Singer.PitchActions.setSemitoneTranspose(args[0], turtle, blk);
-
-                return [args[1], 1];
+            let transValue = args[0];
+            if (
+                transValue === null ||
+                typeof transValue !== "number" ||
+                !Number.isFinite(transValue)
+            ) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                transValue = 0;
             }
+
+            Singer.PitchActions.setSemitoneTranspose(transValue, turtle, blk);
+
+            return [args[1], 1];
         }
     }
 
