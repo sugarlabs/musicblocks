@@ -4503,6 +4503,78 @@ describe("Logo initMediaDevices", () => {
         expect(logo.mic).toBeNull();
     });
 
+    test("reports a blocked microphone instead of leaving the rejection unhandled", async () => {
+        // A denied permission rejects the promise from open(), it does not throw.
+        const denied = Promise.reject(new Error("NotAllowedError: Permission denied"));
+        // Keep Jest itself from failing on the rejection; the check below is
+        // whether initMediaDevices handles it.
+        denied.catch(() => {});
+        logo.deps.Tone = { UserMedia: jest.fn(() => ({ open: jest.fn(() => denied) })) };
+
+        logo.initMediaDevices();
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+            "The microphone is not available.",
+            undefined
+        );
+        expect(logo.mic).toBeNull();
+    });
+
+    test("keeps the newer mic when an older one is rejected after being replaced", async () => {
+        let rejectFirst;
+        logo.deps.Tone = {
+            UserMedia: jest.fn(() => ({
+                open: jest.fn(() => new Promise((resolve, reject) => (rejectFirst = reject))),
+                close: jest.fn()
+            }))
+        };
+        logo.initMediaDevices();
+
+        const second = { open: jest.fn(), close: jest.fn() };
+        logo.deps.Tone = { UserMedia: jest.fn(() => second) };
+        logo.initMediaDevices();
+
+        rejectFirst(new Error("NotAllowedError: Permission denied"));
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(logo.mic).toBe(second);
+    });
+
+    test("drops analysers connected to the previous mic", () => {
+        logo.deps.Tone = { UserMedia: jest.fn(() => ({ open: jest.fn() })) };
+        logo.volumeAnalyser = { connected: "old mic" };
+        logo.pitchAnalyser = { connected: "old mic" };
+
+        logo.initMediaDevices();
+
+        expect(logo.volumeAnalyser).toBeNull();
+        expect(logo.pitchAnalyser).toBeNull();
+    });
+
+    test("closes a mic that finishes opening after a newer one replaced it", async () => {
+        let finishOpening;
+        const firstClose = jest.fn();
+        logo.deps.Tone = {
+            UserMedia: jest.fn(() => ({
+                open: jest.fn(() => new Promise(resolve => (finishOpening = resolve))),
+                close: firstClose
+            }))
+        };
+        logo.initMediaDevices();
+
+        logo.deps.Tone = {
+            UserMedia: jest.fn(() => ({ open: jest.fn(), close: jest.fn() }))
+        };
+        logo.initMediaDevices();
+        firstClose.mockClear();
+
+        finishOpening();
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(firstClose).toHaveBeenCalledTimes(1);
+    });
+
     test("closes the previous mic stream instead of dropping the reference", () => {
         const firstClose = jest.fn();
         logo.deps.Tone = {
