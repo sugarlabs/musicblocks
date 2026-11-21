@@ -1526,19 +1526,28 @@ class ProjectManager {
                             const cleanData = rawData.replace(/\n/g, " ");
                             let obj;
                             try {
-                                if (cleanData.includes("html")) {
-                                    let extracted;
-                                    extracted = extractProjectDataFromHTML(cleanData);
-                                    if (!extracted) {
-                                        that.errorMsg(
-                                            _("Cannot find project data in this HTML file.")
-                                        );
-                                        finishLoading();
-                                        return;
-                                    }
-                                    obj = JSON.parse(unescapeHTML(extracted));
-                                } else {
+                                try {
                                     obj = JSON.parse(cleanData);
+                                } catch (jsonErr) {
+                                    const isHtmlFile =
+                                        (that.fileChooser.files[0] &&
+                                            /\.html?$/i.test(that.fileChooser.files[0].name)) ||
+                                        cleanData.includes('class="code"') ||
+                                        /^\s*<(!DOCTYPE|html)/i.test(cleanData);
+                                    if (isHtmlFile) {
+                                        let extracted;
+                                        extracted = extractProjectDataFromHTML(cleanData);
+                                        if (!extracted) {
+                                            that.errorMsg(
+                                                _("Cannot find project data in this HTML file.")
+                                            );
+                                            finishLoading();
+                                            return;
+                                        }
+                                        obj = JSON.parse(unescapeHTML(extracted));
+                                    } else {
+                                        throw jsonErr;
+                                    }
                                 }
                                 for (const name in that.palettes.dict) {
                                     that.palettes.dict[name].hideMenu(true);
@@ -1734,17 +1743,27 @@ class ProjectManager {
                         const cleanData = rawData.replace(/\n/g, " ");
                         let obj;
                         try {
-                            if (cleanData.includes("html")) {
-                                let extracted;
-                                extracted = extractProjectDataFromHTML(cleanData);
-                                if (!extracted) {
-                                    that.errorMsg(_("Cannot find project data in this HTML file."));
-                                    finishLoading();
-                                    return;
-                                }
-                                obj = JSON.parse(unescapeHTML(extracted));
-                            } else {
+                            try {
                                 obj = JSON.parse(cleanData);
+                            } catch (jsonErr) {
+                                const isHtmlFile =
+                                    (files[0] && /\.html?$/i.test(files[0].name)) ||
+                                    cleanData.includes('class="code"') ||
+                                    /^\s*<(!DOCTYPE|html)/i.test(cleanData);
+                                if (isHtmlFile) {
+                                    let extracted;
+                                    extracted = extractProjectDataFromHTML(cleanData);
+                                    if (!extracted) {
+                                        that.errorMsg(
+                                            _("Cannot find project data in this HTML file.")
+                                        );
+                                        finishLoading();
+                                        return;
+                                    }
+                                    obj = JSON.parse(unescapeHTML(extracted));
+                                } else {
+                                    throw jsonErr;
+                                }
                             }
                             for (const name in that.blocks.palettes.dict) {
                                 that.palettes.dict[name].hideMenu(true);
