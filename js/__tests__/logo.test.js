@@ -4583,6 +4583,28 @@ describe("Logo processShow", () => {
         global.CAMERAVALUE = originalCameraValue;
         global.VIDEOVALUE = originalVideoValue;
     });
+
+    test("handles object and null arguments safely when dock 2 is unconnected or non-loadFile", () => {
+        // Unconnected dock 2 (null connection) with null argument
+        logo.blockList = [{ connections: [null, null, null] }];
+        expect(() => logo.processShow(0, 0, 50, null)).not.toThrow();
+        expect(turtle0.doShowText).toHaveBeenCalledWith(50, null);
+
+        // Unconnected dock 2 with an object/dictionary argument
+        const sampleDict = { key: "value" };
+        expect(() => logo.processShow(0, 0, 50, sampleDict)).not.toThrow();
+        expect(turtle0.doShowText).toHaveBeenCalledWith(50, sampleDict);
+
+        // Dock 2 connected to a non-loadFile block (e.g. number or box block)
+        logo.blockList = [{ connections: [null, null, 1] }, { name: "number", value: 42 }];
+        expect(() => logo.processShow(0, 0, 30, [1, 2, 3])).not.toThrow();
+        expect(turtle0.doShowText).toHaveBeenCalledWith(30, [1, 2, 3]);
+
+        // blk has no connections array
+        logo.blockList = [{}];
+        expect(() => logo.processShow(0, 0, 20, {})).not.toThrow();
+        expect(turtle0.doShowText).toHaveBeenCalledWith(20, {});
+    });
 });
 describe("Logo.processSpeak", () => {
     let logo;
