@@ -464,6 +464,15 @@ class SaveInterface {
             return isFinite(duration) && duration > 0 ? duration : null;
         };
 
+        // A note's velocity from the volume (0 to 100) it plays at, or the fallback when no
+        // volume was recorded. A velocity of 0 would end the note, so a silent note gets the
+        // lowest velocity. The MIDI library writes Math.floor(velocity * 127), hence the + 0.5.
+        const noteVelocity = (volume, fallback) => {
+            if (typeof volume !== "number" || !isFinite(volume)) return fallback;
+            const velocity = Math.round((Math.min(Math.max(volume, 0), 100) * 127) / 100);
+            return (Math.max(velocity, 1) + 0.5) / 127;
+        };
+
         // A MIDI time signature's note value is a power of two.
         const isMidiMeter = meter =>
             Array.isArray(meter) &&
@@ -573,7 +582,7 @@ class SaveInterface {
                             midi: midiNumber,
                             time: globalTime,
                             duration: duration,
-                            velocity: 0.9
+                            velocity: noteVelocity(noteData.volume?.drums?.[drum], 0.9)
                         });
                     }
 
@@ -600,7 +609,7 @@ class SaveInterface {
                                 name: normalizeNoteAccidentals(pitch),
                                 time: globalTime,
                                 duration: duration,
-                                velocity: 0.8
+                                velocity: noteVelocity(noteData.volume?.note, 0.8)
                             });
                         });
                     }

@@ -1132,6 +1132,126 @@ describe("afterSaveMIDI tempo and time signatures", () => {
     });
 });
 
+describe("afterSaveMIDI velocity", () => {
+    const { Midi: ToneMidi } = require("@tonejs/midi");
+    let mockMidi;
+    let instance;
+    let exported;
+
+    // Exports the notes through the real MIDI library and reads the file back.
+    const exportMidi = data => {
+        instance.activity.logo._midiData = data;
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+        return new ToneMidi(exported);
+    };
+
+    const note = (name, volume, drum) => ({
+        note: [name],
+        duration: 4,
+        bpm: 90,
+        instrument: "guitar",
+        meter: [4, 4],
+        drum: drum ? [drum] : null,
+        volume
+    });
+
+    // The MIDI velocity (1 to 127) of each note in a track.
+    const velocities = (midi, trackName) =>
+        midi.tracks
+            .find(track => track.name === trackName)
+            .notes.map(n => Math.round(n.velocity * 127));
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        mockMidi = global.Midi;
+        global.Midi = class extends ToneMidi {
+            toArray() {
+                exported = super.toArray();
+                return exported;
+            }
+        };
+        const activity = { logo: {}, save: { download: jest.fn() } };
+        instance = new SaveInterface(activity);
+        instance.activity = activity;
+        global.URL.createObjectURL = jest.fn(() => "mockURL");
+        global.getMidiInstrument = jest.fn(() => ({ default: 0, guitar: 25 }));
+        global.getMidiDrum = jest.fn(() => ({ "snare drum": 38 }));
+    });
+
+    afterEach(() => {
+        global.Midi = mockMidi;
+        jest.useRealTimers();
+    });
+
+    it("writes each note at the volume it plays at", () => {
+        const midi = exportMidi({
+            0: [
+                note("A4", { note: 10, drums: {} }),
+                note("B4", { note: 50, drums: {} }),
+                note("C5", { note: 100, drums: {} })
+            ]
+        });
+
+        expect(velocities(midi, "Track 1 - guitar")).toEqual([13, 64, 127]);
+    });
+
+    it("writes each drum at its own volume", () => {
+        const midi = exportMidi({
+            0: [
+                note("R", { note: 50, drums: { "snare drum": 20 } }, "snare drum"),
+                note("R", { note: 50, drums: { "snare drum": 90 } }, "snare drum")
+            ]
+        });
+
+        expect(velocities(midi, "Track 1 - snare drum")).toEqual([25, 114]);
+    });
+
+    it("keeps a silent note at the lowest velocity and caps a loud one", () => {
+        const midi = exportMidi({
+            0: [note("A4", { note: 0, drums: {} }), note("B4", { note: 140, drums: {} })]
+        });
+
+        expect(velocities(midi, "Track 1 - guitar")).toEqual([1, 127]);
+    });
+
+    it.each([[NaN], [Infinity], [null], ["50"]])(
+        "writes the former velocities for a recorded volume of %p",
+        volume => {
+            const midi = exportMidi({
+                0: [
+                    note("A4", { note: volume, drums: {} }),
+                    note("R", { note: 50, drums: { "snare drum": volume } }, "snare drum")
+                ]
+            });
+
+            expect(velocities(midi, "Track 1 - guitar")).toEqual([101]);
+            expect(velocities(midi, "Track 1 - snare drum")).toEqual([114]);
+        }
+    );
+
+    it("keeps a negative volume at the lowest velocity", () => {
+        const midi = exportMidi({
+            0: [
+                note("A4", { note: -20, drums: {} }),
+                note("R", { note: 50, drums: { "snare drum": -5 } }, "snare drum")
+            ]
+        });
+
+        expect(velocities(midi, "Track 1 - guitar")).toEqual([1]);
+        expect(velocities(midi, "Track 1 - snare drum")).toEqual([1]);
+    });
+
+    it("writes the former velocities when no volume was recorded", () => {
+        const midi = exportMidi({
+            0: [note("A4", undefined), note("R", { note: 50, drums: {} }, "snare drum")]
+        });
+
+        expect(velocities(midi, "Track 1 - guitar")).toEqual([101]);
+        expect(velocities(midi, "Track 1 - snare drum")).toEqual([114]);
+    });
+});
+
 describe("afterSaveMIDI instrument channels", () => {
     const { Midi: ToneMidi } = require("@tonejs/midi");
     let mockMidi;
