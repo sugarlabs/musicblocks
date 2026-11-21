@@ -149,6 +149,7 @@ const makeActivity = (overrides = {}) => ({
     loadStartWrapper: jest.fn(),
     sendAllToTrash: jest.fn(),
     _doHardStopButton: jest.fn(),
+    _cancelPendingRun: jest.fn(),
     _allClear: jest.fn(),
     _toggleCollapsibleStacks: jest.fn(),
     _changeBlockVisibility: jest.fn(),
@@ -1435,6 +1436,16 @@ describe("newProject / _afterDelete", () => {
         jest.useFakeTimers();
         pm._afterDelete();
         expect(activity._doHardStopButton).toHaveBeenCalled();
+        jest.useRealTimers();
+    });
+
+    it("cancels a run still waiting for the old project to load", () => {
+        const activity = makeActivity();
+        const pm = new ProjectManager(activity);
+        jest.useFakeTimers();
+        pm._afterDelete();
+        expect(activity._doHardStopButton).not.toHaveBeenCalled();
+        expect(activity._cancelPendingRun).toHaveBeenCalled();
         jest.useRealTimers();
     });
 
