@@ -884,13 +884,16 @@ function setupVolumeBlocks(activity) {
          * @returns {Array} - The result of the flow.
          */
         flow(args, logo, turtle, blk) {
-            if (args.length > 1 && args[0] !== 0) {
-                Singer.VolumeActions.doCrescendo(
-                    activity.blocks.blockList[blk].name,
-                    args[0],
-                    turtle,
-                    blk
-                );
+            if (args.length > 1) {
+                // 0 changes nothing, but the clamp body must still run.
+                if (args[0] !== 0) {
+                    Singer.VolumeActions.doCrescendo(
+                        activity.blocks.blockList[blk].name,
+                        args[0],
+                        turtle,
+                        blk
+                    );
+                }
 
                 return [args[1], 1];
             }
