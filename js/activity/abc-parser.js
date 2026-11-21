@@ -473,10 +473,55 @@ function _processVoice(voice, blockId, staff, voiceNumber, staffRecord, voiceIdx
             }
         } else if (element.el_type === "bar") {
             barAccidentals[voiceIdx] = {};
-            if (_ABC_REPEAT_BARS.includes(element.type)) {
+
+            const isRepeatBar = _ABC_REPEAT_BARS.includes(element.type);
+
+            if (element.startEnding === "1" && !isRepeatBar) {
                 blockId = _closeSegment(actionBlock, blockId, voiceNumber, staffRecord);
                 actionBlock = [];
+                staffRecord.firstEndingStart = staffRecord.baseBlocks.length;
+            }
+
+            if (isRepeatBar) {
+                blockId = _closeSegment(actionBlock, blockId, voiceNumber, staffRecord);
+                actionBlock = [];
+
+                // A new repeat section also ends the preceding second ending.
+                // ABCJS does not always provide endEnding on this boundary.
+                if (
+                    (element.type === "bar_left_repeat" || element.type === "bar_dbl_repeat") &&
+                    staffRecord.activeSecondEnding
+                ) {
+                    staffRecord.activeSecondEnding.secondEndingEnd =
+                        staffRecord.baseBlocks.length - 1;
+                    staffRecord.activeSecondEnding = null;
+                }
+
                 _handleRepeatBar(element.type, staffRecord);
+
+                if (element.type === "bar_right_repeat" && element.startEnding === "2") {
+                    const repeat = staffRecord.repeatArray.at(-1);
+
+                    if (
+                        repeat &&
+                        staffRecord.firstEndingStart !== null &&
+                        staffRecord.firstEndingStart >= repeat.start &&
+                        staffRecord.firstEndingStart <= repeat.end
+                    ) {
+                        repeat.firstEndingStart = staffRecord.firstEndingStart;
+                        repeat.secondEndingStart = staffRecord.baseBlocks.length;
+                        staffRecord.activeSecondEnding = repeat;
+                    }
+
+                    staffRecord.firstEndingStart = null;
+                }
+            } else if (element.endEnding === true && staffRecord.activeSecondEnding) {
+                blockId = _closeSegment(actionBlock, blockId, voiceNumber, staffRecord);
+                actionBlock = [];
+
+                staffRecord.activeSecondEnding.secondEndingEnd = staffRecord.baseBlocks.length - 1;
+
+                staffRecord.activeSecondEnding = null;
             }
         } else if (element.el_type === "key") {
             blockId += _createKeyBlocks(element, blockId, actionBlock, staffRecord);
@@ -528,16 +573,62 @@ function _finalizeStaffBlocks(staffRecord, blockId, finalBlock) {
     );
     const stack = [];
     let next = 0;
-    for (const { start, end } of staffRecord.repeatArray) {
+
+    for (const [index, range] of staffRecord.repeatArray.entries()) {
+        const { start, end, firstEndingStart, secondEndingStart } = range;
+
         stack.push(...segments.slice(next, start));
+
+        if (
+            Number.isInteger(firstEndingStart) &&
+            Number.isInteger(secondEndingStart) &&
+            firstEndingStart >= start &&
+            firstEndingStart <= end &&
+            secondEndingStart === end + 1
+        ) {
+            const nextRepeatStart = staffRecord.repeatArray[index + 1]?.start;
+            const endingEnd = Math.min(
+                range.secondEndingEnd ?? segments.length - 1,
+                nextRepeatStart === undefined ? segments.length - 1 : nextRepeatStart - 1
+            );
+            const shared = segments.slice(start, firstEndingStart);
+
+            // First pass: shared section and first ending.
+            stack.push(...shared, ...segments.slice(firstEndingStart, secondEndingStart));
+
+            // Second pass: call the shared actions again.
+            for (const original of shared) {
+                const duplicate = [
+                    blockId,
+                    ["nameddo", { value: original[1][1].value }],
+                    0,
+                    0,
+                    [null, null]
+                ];
+
+                staffRecord.repeatBlock.push(duplicate);
+                stack.push(duplicate);
+                blockId++;
+            }
+
+            // Play the second ending only on the second pass.
+            stack.push(...segments.slice(secondEndingStart, endingEnd + 1));
+            next = endingEnd + 1;
+            continue;
+        }
+
+        // Existing ordinary-repeat behavior.
         const repeat = [blockId, "repeat", 0, 0, [null, blockId + 1, null, null]];
         const count = [blockId + 1, ["number", { value: 2 }], 0, 0, [blockId]];
+
         staffRecord.repeatBlock.push(repeat, count);
         _chainBlocks(segments.slice(start, end + 1), repeat, 2);
         stack.push(repeat);
+
         next = end + 1;
         blockId += 2;
     }
+
     stack.push(...segments.slice(next));
     _chainBlocks(stack, staffRecord.startBlock[staffRecord.startBlock.length - 3], 2);
 
@@ -560,9 +651,7 @@ function _finalizeStaffBlocks(staffRecord, blockId, finalBlock) {
  * Blocks. However, the following aspects need work:
  *
  * Hammers, pulls, and sliding offs grace notes (breaking the
- * conversion) Alternate endings (not failing but not showing
- * correctly) and DS al coda Bass voicing (failing)
- *
+ * conversion) Complex alternate-ending patterns beyond basic first and second endings and DS al coda Bass voicing (failing)
  * @param {object} activityInstance - The activity instance.
  */
 const setupActivityAbcParser = activityInstance => {
@@ -601,6 +690,8 @@ const setupActivityAbcParser = activityInstance => {
                             repeatArray: [],
                             repeatStart: null,
                             repeatFrom: 0,
+                            firstEndingStart: null,
+                            activeSecondEnding: null,
                             nameddoIds: [],
                             barAccidentals: [],
                             tuplets: []
