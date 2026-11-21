@@ -52,6 +52,7 @@ class GlobalPlanet {
         this.oldSearchString = "";
         this._requestId = 0;
         this.remixPrefix = _("Remix of");
+        this.searchDebounce = null;
 
         /** @type {IntersectionObserver|null} */
         this._scrollObserver = null;
@@ -269,12 +270,22 @@ class GlobalPlanet {
             }
             this.afterAddProjects();
         } else if (this.loadCount === 0) {
-            if (this.render(data, hasMore)) hasMore ? this.showLoadMore() : this.hideLoadMore();
+            const rendered = this.render(data, hasMore);
+
+            if (requestId !== this._requestId) return;
+
+            if (rendered) {
+                hasMore ? this.showLoadMore() : this.hideLoadMore();
+            }
         } else if (hasMore) {
             this.downloadProjectsToCache(
                 toDownload,
                 function () {
-                    if (this.render(data, hasMore)) this.showLoadMore();
+                    const rendered = this.render(data, hasMore);
+
+                    if (requestId !== this._requestId) return;
+
+                    if (rendered) this.showLoadMore();
                 }.bind(this),
                 requestId
             );
@@ -282,7 +293,11 @@ class GlobalPlanet {
             this.downloadProjectsToCache(
                 toDownload,
                 function () {
-                    if (this.render(data, hasMore)) this.hideLoadMore();
+                    const rendered = this.render(data, hasMore);
+
+                    if (requestId !== this._requestId) return;
+
+                    if (rendered) this.hideLoadMore();
                 }.bind(this),
                 requestId
             );
@@ -479,6 +494,7 @@ class GlobalPlanet {
     // reaches afterSearch(), so clear the flag too, or search() ignores every later
     // query (and the clear button) until reload.
     throwOfflineError() {
+        const wasSearching = this.searching;
         this.searching = false;
         this.hideLoading();
         this.hideLoadMore();
@@ -486,6 +502,8 @@ class GlobalPlanet {
         const element = document.getElementById("global-projects");
         element.innerHTML = "";
         element.insertAdjacentHTML("afterbegin", this.offlineHTML);
+
+        if (wasSearching && this.oldSearchString !== "") this.afterSearch();
     }
 
     throwNoProjectsError() {
@@ -747,6 +765,9 @@ class GlobalPlanet {
     }
 
     destroy() {
+        clearTimeout(this.searchDebounce);
+        this.searchDebounce = null;
+
         this.listenerRefs.forEach(({ el, type, bound }) => {
             el.removeEventListener(type, bound);
         });
@@ -839,41 +860,51 @@ class GlobalPlanet {
                 }
             });
 
+            const scheduleGlobalSearch = value => {
+                clearTimeout(this.searchDebounce);
+
+                this.searchDebounce = setTimeout(() => {
+                    this.searchDebounce = null;
+                    this.searchString = value.trim();
+                    this.search();
+                }, 300);
+            };
+
+            register("global-search", "compositionstart", function () {
+                clearTimeout(this.searchDebounce);
+                this.searchDebounce = null;
+                this.searchString = this.oldSearchString;
+            });
+
+            register("global-search", "input", function (evt) {
+                if (evt.isComposing) return;
+
+                scheduleGlobalSearch.call(this, evt.target.value);
+            });
+
+            register("global-search", "compositionend", function (evt) {
+                scheduleGlobalSearch.call(this, evt.target.value);
+            });
+
             register("global-search", "keydown", function (evt) {
-                if (evt.key === "Enter") {
-                    this.searchString = document.getElementById("global-search").value;
+                if (evt.key === "Enter" && !evt.isComposing && evt.keyCode !== 229) {
+                    clearTimeout(this.searchDebounce);
+                    this.searchString = document.getElementById("global-search").value.trim();
                     this.search();
                 }
             });
 
-            register("global-search-2", "keydown", function (evt) {
-                if (evt.key === "Enter") {
-                    this.searchString = document.getElementById("global-search-2").value;
-                    this.search();
-                }
-            });
+            register("search-close", "click", function () {
+                clearTimeout(this.searchDebounce);
 
-            register("search-close", "click", function (evt) {
-                document.getElementById("global-search").value = "";
+                const input = document.getElementById("global-search");
+                input.value = "";
                 this.searchString = "";
+
+                input.focus({ preventScroll: true });
+
                 document.getElementById("search-close").style.display = "none";
                 this.search();
-            });
-
-            register("search-close-2", "click", function (evt) {
-                document.getElementById("global-search-2").value = "";
-                this.searchString = "";
-                document.getElementById("search-close-2").style.display = "none";
-                this.search();
-            });
-
-            register("global-tab", "click", function (evt) {
-                document.getElementById("searchcontainer-one").style.display = "block";
-            });
-
-            register("local-tab", "click", function (evt) {
-                document.getElementById("searchcontainer-one").style.display = "none";
-                // document.getElementById("two_header").style.display = "none";
             });
 
             this.ProjectViewer = new ProjectViewer(Planet);
