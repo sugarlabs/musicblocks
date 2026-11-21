@@ -1311,8 +1311,6 @@ function setupPitchBlocks(activity) {
 
             if (isNaN(r) || r < 0) {
                 r = 1;
-
-                console.debug("ratio " + r + " must be a number > 0");
             }
             Singer.PitchActions.setRatioTranspose(r, turtle, blk);
             return [args[1], 1];
