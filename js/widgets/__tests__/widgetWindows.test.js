@@ -43,7 +43,29 @@ document.body.appendChild(canvas);
 
 Object.defineProperty(window, "localStorage", {
     writable: true,
-    value: { languagePreference: "en" }
+    value: (() => {
+        const store = { languagePreference: "en" };
+        return {
+            get languagePreference() {
+                return store.languagePreference;
+            },
+            set languagePreference(v) {
+                store.languagePreference = v;
+            },
+            getItem(key) {
+                return Object.prototype.hasOwnProperty.call(store, key) ? store[key] : null;
+            },
+            setItem(key, value) {
+                store[key] = String(value);
+            },
+            removeItem(key) {
+                delete store[key];
+            },
+            clear() {
+                for (const k of Object.keys(store)) delete store[k];
+            }
+        };
+    })()
 });
 
 // Load the module — this sets up window.widgetWindows and WidgetWindow class
@@ -2058,15 +2080,20 @@ describe("widgetWindows", () => {
             expect(win._frame.style.top).toBe("64px");
         });
 
-        test("windowFor centers a window explicitly cached as maximized", () => {
+        test("windowFor restores and applies saved maximized state", () => {
             const widget = { blockNo: 94 };
             window.widgetWindows._posCache[94] = [120, 64];
             window.widgetWindows._maximizedCache[94] = true;
 
             const win = windowFor(widget, "Maximized Window", undefined, true);
 
-            expect(win._frame.style.left).toBe("200px");
-            expect(win._frame.style.top).toBe("140px");
+            expect(win._maximized).toBe(true);
+            expect(window.widgetWindows._maximizedCache[94]).toBe(true);
+
+            // Restoring returns to the saved coordinates
+            win._restore();
+            expect(win._frame.style.left).toBe("120px");
+            expect(win._frame.style.top).toBe("64px");
             expect(window.widgetWindows._maximizedCache[94]).toBe(false);
         });
     });
@@ -2567,6 +2594,241 @@ describe("widgetWindows", () => {
             win2.destroy();
 
             expect(window.widgetWindows.focused).toBe(win1);
+        });
+    });
+
+    describe("Widget position persistence across reloads (#10441)", () => {
+        const STORAGE_KEY = "mb_widgetWindowLayout";
+
+        beforeEach(() => {
+            localStorage.removeItem(STORAGE_KEY);
+            window.widgetWindows._posCache = {};
+            window.widgetWindows._maximizedCache = {};
+        });
+
+        test("setPosition persists layout to localStorage", () => {
+            const win = createTestWindow("persist-pos");
+            win.setPosition(200, 300);
+
+            const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+            expect(stored).toBeTruthy();
+            expect(stored.positions[win._key]).toEqual([200, 300]);
+            expect(stored.maximized[win._key]).toBe(false);
+        });
+
+        test("_loadPersistedLayout restores positions from localStorage", () => {
+            const data = {
+                positions: { myWidget: [150, 250] },
+                maximized: { myWidget: false }
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
+            window.widgetWindows._posCache = {};
+            window.widgetWindows._maximizedCache = {};
+            window.widgetWindows._loadPersistedLayout();
+
+            expect(window.widgetWindows._posCache).toEqual({ myWidget: [150, 250] });
+            expect(window.widgetWindows._maximizedCache).toEqual({ myWidget: false });
+        });
+
+        test("_loadPersistedLayout handles malformed JSON gracefully", () => {
+            localStorage.setItem(STORAGE_KEY, "not valid json{{{");
+
+            window.widgetWindows._posCache = {};
+            window.widgetWindows._loadPersistedLayout();
+
+            // Should not throw, caches stay empty
+            expect(window.widgetWindows._posCache).toEqual({});
+        });
+
+        test("_loadPersistedLayout handles missing key gracefully", () => {
+            localStorage.removeItem(STORAGE_KEY);
+
+            window.widgetWindows._posCache = {};
+            window.widgetWindows._loadPersistedLayout();
+
+            expect(window.widgetWindows._posCache).toEqual({});
+        });
+
+        test("_maximize persists maximized state to localStorage", () => {
+            const win = createTestWindow("persist-max");
+            win.setPosition(100, 100);
+            win._maximize();
+
+            const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+            expect(stored.maximized[win._key]).toBe(true);
+        });
+
+        test("_restore persists non-maximized state to localStorage", () => {
+            const win = createTestWindow("persist-restore");
+            win.setPosition(100, 100);
+            win._maximize();
+            win._restore();
+
+            const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+            expect(stored.maximized[win._key]).toBe(false);
+        });
+
+        test("widget restores persisted position on construction", () => {
+            const originalInnerWidth = window.innerWidth;
+            const originalInnerHeight = window.innerHeight;
+            window.innerWidth = 1920;
+            window.innerHeight = 1080;
+
+            try {
+                const nextKey = keyCounter + 1;
+                localStorage.setItem(
+                    STORAGE_KEY,
+                    JSON.stringify({
+                        positions: { [nextKey]: [350, 400] },
+                        maximized: { [nextKey]: false }
+                    })
+                );
+                window.widgetWindows._loadPersistedLayout();
+
+                const win = createTestWindow("Restored Widget");
+                const left = parseInt(win._frame.style.left, 10);
+                const top = parseInt(win._frame.style.top, 10);
+
+                // Position should be exactly restored to saved coordinates [350, 400]
+                expect(left).toBe(350);
+                expect(top).toBe(400);
+            } finally {
+                window.innerWidth = originalInnerWidth;
+                window.innerHeight = originalInnerHeight;
+            }
+        });
+
+        test("rejects arrays in persisted data and preserves string keys after setPosition", () => {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ positions: [], maximized: [] }));
+            window.widgetWindows._posCache = {};
+            window.widgetWindows._maximizedCache = {};
+            window.widgetWindows._loadPersistedLayout();
+
+            expect(Array.isArray(window.widgetWindows._posCache)).toBe(false);
+            expect(Array.isArray(window.widgetWindows._maximizedCache)).toBe(false);
+
+            const win = createTestWindow("Array Edge Case");
+            win.setPosition(120, 180);
+
+            const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+            expect(stored.positions[win._key]).toEqual([120, 180]);
+        });
+
+        test("_persistLayout silently ignores storage errors and maintains usable layout state", () => {
+            const originalSetItem = localStorage.setItem;
+            try {
+                const win = createTestWindow("Storage Error Window");
+                localStorage.setItem = () => {
+                    throw new Error("QuotaExceededError");
+                };
+
+                // Should not throw and should update in-memory cache and DOM styles
+                expect(() => win.setPosition(150, 250)).not.toThrow();
+                expect(window.widgetWindows._posCache[win._key]).toEqual([150, 250]);
+                expect(win._frame.style.left).toBe("150px");
+                expect(win._frame.style.top).toBe("250px");
+
+                // Restoring storage allows subsequent updates to persist successfully
+                localStorage.setItem = originalSetItem;
+                win.setPosition(160, 260);
+
+                const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+                expect(stored.positions[win._key]).toEqual([160, 260]);
+            } finally {
+                localStorage.setItem = originalSetItem;
+            }
+        });
+
+        test("_loadPersistedLayout handles storage read failures and leaves default caches usable", () => {
+            const originalGetItem = localStorage.getItem;
+            try {
+                localStorage.getItem = () => {
+                    throw new Error("SecurityError: Access is denied");
+                };
+
+                window.widgetWindows._posCache = {};
+                window.widgetWindows._maximizedCache = {};
+                expect(() => window.widgetWindows._loadPersistedLayout()).not.toThrow();
+
+                expect(window.widgetWindows._posCache).toEqual({});
+                expect(window.widgetWindows._maximizedCache).toEqual({});
+
+                // Cache remains usable for subsequent writes
+                window.widgetWindows._posCache["testKey"] = [100, 200];
+                expect(window.widgetWindows._posCache["testKey"]).toEqual([100, 200]);
+            } finally {
+                localStorage.getItem = originalGetItem;
+            }
+        });
+
+        test("rejects malformed coordinate entries in _loadPersistedLayout while keeping valid entries usable", () => {
+            localStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify({
+                    positions: {
+                        invalid1: [{ toString: null }, 200],
+                        invalid2: [100, null],
+                        invalid3: "not-an-array",
+                        valid1: [300, 400]
+                    },
+                    maximized: {
+                        invalidMax: "yes",
+                        validMax: true
+                    }
+                })
+            );
+
+            window.widgetWindows._posCache = {};
+            window.widgetWindows._maximizedCache = {};
+            expect(() => window.widgetWindows._loadPersistedLayout()).not.toThrow();
+
+            // Malformed entries rejected, valid entry kept
+            expect(window.widgetWindows._posCache["invalid1"]).toBeUndefined();
+            expect(window.widgetWindows._posCache["invalid2"]).toBeUndefined();
+            expect(window.widgetWindows._posCache["invalid3"]).toBeUndefined();
+            expect(window.widgetWindows._posCache["valid1"]).toEqual([300, 400]);
+
+            expect(window.widgetWindows._maximizedCache["invalidMax"]).toBeUndefined();
+            expect(window.widgetWindows._maximizedCache["validMax"]).toBe(true);
+
+            // Opening a widget with invalid coordinates does not throw and centers safely
+            const widget = { blockNo: "invalid1" };
+            expect(() => windowFor(widget, "Malformed Key Window")).not.toThrow();
+        });
+
+        test("restores saved maximized state across reload and preserves normal coordinates on restore", () => {
+            const originalInnerWidth = window.innerWidth;
+            const originalInnerHeight = window.innerHeight;
+            window.innerWidth = 1920;
+            window.innerHeight = 1080;
+
+            try {
+                const nextKey = keyCounter + 1;
+                localStorage.setItem(
+                    STORAGE_KEY,
+                    JSON.stringify({
+                        positions: { [nextKey]: [350, 400] },
+                        maximized: { [nextKey]: true }
+                    })
+                );
+                window.widgetWindows._loadPersistedLayout();
+
+                const win = createTestWindow("Maximized Reload Widget");
+
+                // Window should be restored in maximized state
+                expect(win._maximized).toBe(true);
+                expect(window.widgetWindows._maximizedCache[win._key]).toBe(true);
+
+                // Unmaximizing should restore the saved [350, 400] coordinates
+                win._restore();
+                expect(win._maximized).toBe(false);
+                expect(parseInt(win._frame.style.left, 10)).toBe(350);
+                expect(parseInt(win._frame.style.top, 10)).toBe(400);
+            } finally {
+                window.innerWidth = originalInnerWidth;
+                window.innerHeight = originalInnerHeight;
+            }
         });
     });
 });
