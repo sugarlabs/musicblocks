@@ -172,6 +172,80 @@ const basicValuesAndExpressions = [
         ]
     },
     {
+        name: "comparison_less_than",
+        description: "Prints a comparison less-than expression (3 < 5)",
+        category: "comparison",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "print", 0, 0, [0, 2, null]],
+            [2, "less", 0, 0, [1, 3, 4]],
+            [3, ["number", { value: 3 }], 0, 0, [2]],
+            [4, ["number", { value: 5 }], 0, 0, [2]]
+        ]
+    },
+    {
+        name: "comparison_less_than_or_equal",
+        description: "Prints a comparison less-than-or-equal-to expression (3 <= 5)",
+        category: "comparison",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "print", 0, 0, [0, 2, null]],
+            [2, "less_than_or_equal_to", 0, 0, [1, 3, 4]],
+            [3, ["number", { value: 3 }], 0, 0, [2]],
+            [4, ["number", { value: 5 }], 0, 0, [2]]
+        ]
+    },
+    {
+        name: "comparison_less_than_or_equal_boundary",
+        description:
+            "Prints an equality-boundary comparison less-than-or-equal-to expression (3 <= 3)",
+        category: "comparison",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "print", 0, 0, [0, 2, null]],
+            [2, "less_than_or_equal_to", 0, 0, [1, 3, 4]],
+            [3, ["number", { value: 3 }], 0, 0, [2]],
+            [4, ["number", { value: 3 }], 0, 0, [2]]
+        ]
+    },
+    {
+        name: "comparison_greater_than_or_equal",
+        description: "Prints a comparison greater-than-or-equal-to expression (7 >= 4)",
+        category: "comparison",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "print", 0, 0, [0, 2, null]],
+            [2, "greater_than_or_equal_to", 0, 0, [1, 3, 4]],
+            [3, ["number", { value: 7 }], 0, 0, [2]],
+            [4, ["number", { value: 4 }], 0, 0, [2]]
+        ]
+    },
+    {
+        name: "comparison_greater_than_or_equal_boundary",
+        description:
+            "Prints an equality-boundary comparison greater-than-or-equal-to expression (7 >= 7)",
+        category: "comparison",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "print", 0, 0, [0, 2, null]],
+            [2, "greater_than_or_equal_to", 0, 0, [1, 3, 4]],
+            [3, ["number", { value: 7 }], 0, 0, [2]],
+            [4, ["number", { value: 7 }], 0, 0, [2]]
+        ]
+    },
+    {
+        name: "comparison_not_equal",
+        description: "Prints a comparison not-equal-to expression (3 != 5)",
+        category: "comparison",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "print", 0, 0, [0, 2, null]],
+            [2, "not_equal_to", 0, 0, [1, 3, 4]],
+            [3, ["number", { value: 3 }], 0, 0, [2]],
+            [4, ["number", { value: 5 }], 0, 0, [2]]
+        ]
+    },
+    {
         name: "logical_conjunction_and",
         description: "Prints a logical AND expression (true && false)",
         category: "logical",
