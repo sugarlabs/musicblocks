@@ -772,6 +772,15 @@ describe("ActionBlocks", () => {
             expect(result).toBe(0);
         });
 
+        test("calls errorMsg when the arg block is clicked on its own", () => {
+            // Clicking a lone arg block runs it with no received args.
+            const block = activity.registeredBlocks["namedarg"];
+            activity.blocks.blockList[95] = { privateData: "1" };
+            const result = block.arg(logo, 0, 95, undefined);
+            expect(activity.errorMsg).toHaveBeenCalledWith(_("Invalid argument"), 95);
+            expect(result).toBe(0);
+        });
+
         test("calls errorMsg when index out of range", () => {
             const block = activity.registeredBlocks["namedarg"];
             activity.blocks.blockList[95] = { privateData: "5" };
