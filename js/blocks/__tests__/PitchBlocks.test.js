@@ -1015,6 +1015,27 @@ describe("setupPitchBlocks", () => {
             }
         });
 
+        it("gives E♯ and B♯ degrees their pitch numbers in StaffYToPitch", () => {
+            // NOTESSHARP and NOTESFLAT have no E♯ or B♯, so these degrees of C♯ major
+            // (and of E♯ major) returned -1 instead of 5 and 12.
+            const block = createdBlocks["ytopitch"];
+            global.buildScale = jest.fn(() => [
+                ["C♯", "D♯", "E♯", "F♯", "G♯", "A♯", "B♯", "C♯"],
+                [2, 2, 1, 2, 2, 2, 1]
+            ]);
+            activity.blocks.blockList[20] = { name: "pitchnumber" };
+            activity.blocks.blockList[30] = { value: 0 };
+            activity.blocks.blockList[10].connections = [20, 30];
+            try {
+                logo.parseArg.mockReturnValue(20); // E line
+                expect(block.arg(logo, 0, 10)).toBe(5);
+                logo.parseArg.mockReturnValue(60); // B line: B♯4 sounds as C5
+                expect(block.arg(logo, 0, 10)).toBe(12);
+            } finally {
+                global.buildScale = jest.fn(() => [["C", "D", "E", "F", "G", "A", "B"], []]);
+            }
+        });
+
         it("falls back to NOTENAMES when note is missing from scale in StaffYToPitch", () => {
             const block = createdBlocks["ytopitch"];
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(0));

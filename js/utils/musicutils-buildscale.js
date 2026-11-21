@@ -284,7 +284,9 @@ var buildScale = (keySignature, edo) => {
 
     let idx = thisScale.indexOf(myKeySignature);
     if (idx === -1) {
-        idx = 0;
+        // E♯ is in neither list: start the steps from the pitch it sounds as (F), not C.
+        const pitchClass = _notePitchClass(myKeySignature);
+        idx = Number.isFinite(pitchClass) ? pitchClass : 0;
     }
 
     const scale = [myKeySignature];
