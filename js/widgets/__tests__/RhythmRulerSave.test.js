@@ -78,6 +78,33 @@ describe("RhythmRulerSave", () => {
             expect(merged).toEqual([4, 4, 4, 4]);
             expect(merged.reduce((duration, value) => duration + 1 / value, 0)).toBe(1);
         });
+
+        // As floats, these cells add up to 0.9999999999999999 and similar.
+        test.each([
+            ["thirds", [[3, 3, 3]], [3, 3, 3]],
+            ["sixths against a whole note", [Array(6).fill(6), [1]], Array(6).fill(6)],
+            ["fifths against tenths", [Array(5).fill(5), Array(10).fill(10)], Array(10).fill(10)],
+            [
+                "three against two",
+                [
+                    [2, 2],
+                    [3, 3, 3]
+                ],
+                [3, 6, 6, 3]
+            ],
+            [
+                "a tied cell",
+                [
+                    [4 / 3, 4],
+                    [4, 4, 4, 4]
+                ],
+                [4, 4, 4, 4]
+            ]
+        ])("adds up %s exactly", (_description, rulers, expected) => {
+            const widget = { Rulers: rulers.map(values => [values, []]) };
+
+            expect(RhythmRulerSave.prototype._mergeRulers.call(widget)).toEqual(expected);
+        });
     });
 
     describe("_saveTupletsMerged", () => {
@@ -141,6 +168,82 @@ describe("RhythmRulerSave", () => {
             }, 0);
             expect(duration).toBe(1);
             expect(rhythms).toHaveLength(1);
+        });
+
+        test("saves a ruler split into six, next to a whole note, as one rhythm block", () => {
+            const loadNewBlocks = jest.fn();
+            const widget = {
+                activity: {
+                    palettes: { dict: {} },
+                    refreshCanvas: jest.fn(),
+                    blocks: { loadNewBlocks },
+                    textMsg: jest.fn()
+                },
+                Rulers: [
+                    [Array(6).fill(6), []],
+                    [[1], []]
+                ]
+            };
+
+            const merged = RhythmRulerSave.prototype._mergeRulers.call(widget);
+            RhythmRulerSave.prototype._saveTupletsMerged.call(widget, merged);
+
+            const stack = loadNewBlocks.mock.calls[0][0];
+            const rhythms = stack.filter(block => block[1] === "rhythm2");
+            expect(rhythms).toHaveLength(1);
+            expect(stack[rhythms[0][0] + 1][1]).toEqual(["number", { value: 6 }]);
+            expect(stack[rhythms[0][0] + 4][1]).toEqual(["number", { value: 6 }]);
+        });
+
+        describe("with a tied cell", () => {
+            // The note value __tie() stores for two tied cells.
+            const tied = (a, b) => 1 / (1 / a + 1 / b);
+
+            // Each rhythm block Save rhythms makes, as "count x numerator/denominator".
+            const saveRhythms = rulers => {
+                const loadNewBlocks = jest.fn();
+                const widget = {
+                    activity: {
+                        palettes: { dict: {} },
+                        refreshCanvas: jest.fn(),
+                        blocks: { loadNewBlocks },
+                        textMsg: jest.fn()
+                    },
+                    Rulers: rulers.map(values => [values, []])
+                };
+                const merged = RhythmRulerSave.prototype._mergeRulers.call(widget);
+                RhythmRulerSave.prototype._saveTupletsMerged.call(widget, merged);
+                const stack = loadNewBlocks.mock.calls[0][0];
+                return stack
+                    .filter(block => block[1] === "rhythm2")
+                    .map(block => {
+                        const value = offset => stack[block[0] + offset][1][1].value;
+                        return `${value(1)} x ${value(3)}/${value(4)}`;
+                    });
+            };
+
+            // A whole note split in half, the halves into 40 and 41 (or 49) cells, and
+            // the two cells at the middle tied.
+            test.each([
+                [82, 40, "81/3280"],
+                [98, 48, "89/3920"]
+            ])("saves 1/80 tied to 1/%i exactly", (other, count, tie) => {
+                const ruler = [...Array(39).fill(80), tied(80, other), ...Array(count).fill(other)];
+
+                expect(saveRhythms([ruler, [1]])).toEqual([
+                    "39 x 1/80",
+                    `1 x ${tie}`,
+                    `${count} x 1/${other}`
+                ]);
+            });
+
+            test("adds no 1/20000 note next to a ruler of 49 cells", () => {
+                const ruler = [...Array(39).fill(80), tied(80, 98), ...Array(48).fill(98)];
+
+                expect(
+                    saveRhythms([ruler, Array(49).fill(49)]).some(r => r.endsWith("/20000"))
+                ).toBe(false);
+            });
         });
     });
 
