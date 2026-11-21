@@ -208,7 +208,7 @@ button.project-icon {
 	color: rgba(255, 255, 255, 0.7) !important;
 }
 
-#searchicon {
+.search-icon {
 	top: -4px;
 	color: #fff !important;
 }
