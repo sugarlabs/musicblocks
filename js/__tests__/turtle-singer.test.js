@@ -3195,6 +3195,144 @@ describe("scalarDistance edge cases", () => {
     });
 });
 
+describe("scalarDistance beyond 100 steps and boundary conditions", () => {
+    let turtleMock;
+    let activityMock;
+    let logoMock;
+    const saved = {};
+
+    beforeEach(() => {
+        for (const name of [
+            "getStepSizeUp",
+            "getStepSizeDown",
+            "numberToPitch",
+            "pitchToNumber",
+            "getCurrentEDO",
+            "getNote",
+            "normalizeEDO"
+        ]) {
+            saved[name] = global[name];
+            global[name] = musicUtils[name];
+        }
+
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.singer.pitchNumberOffset = 0;
+        activityMock = createActivityMock(turtleMock);
+        logoMock = createLogoMock(activityMock);
+        activityMock.logo = logoMock;
+        logoMock.synth.inTemperament = "equal";
+        turtleMock.singer.keySignature = "C chromatic";
+    });
+
+    afterEach(() => {
+        Object.assign(global, saved);
+        jest.restoreAllMocks();
+    });
+
+    test.each([
+        [100, 100, -100],
+        [101, 101, -101],
+        [102, 102, -102],
+        [103, 103, -103],
+        [108, 108, -108]
+    ])(
+        "calculates correct distance for %i scale steps in both directions",
+        (steps, expectedAsc, expectedDesc) => {
+            const pC1 = musicUtils.pitchToNumber("C", 1, "C chromatic", "equal");
+            const targetPitch = pC1 + steps;
+
+            const asc = Singer.scalarDistance(logoMock, turtleMock, pC1, targetPitch);
+            const desc = Singer.scalarDistance(logoMock, turtleMock, targetPitch, pC1);
+
+            expect(asc).toBe(expectedAsc);
+            expect(desc).toBe(expectedDesc);
+        }
+    );
+
+    test("calculates correct distance across 9 octaves in 19-EDO", () => {
+        logoMock.synth.inTemperament = "equal19";
+        activityMock.logo.synth.inTemperament = "equal19";
+
+        // In 19-EDO C chromatic, each octave has 12 scale degrees spanning 19 EDO units.
+        // Across 9 octaves (C1 to C10), the total pitch distance is 171 EDO units,
+        // traversed in 9 * 12 = 108 scale steps.
+        const pC1 = musicUtils.pitchToNumber("C", 1, "C chromatic", "equal19");
+        const pC10 = musicUtils.pitchToNumber("C", 10, "C chromatic", "equal19");
+
+        const dist = Singer.scalarDistance(logoMock, turtleMock, pC1, pC10);
+        expect(dist).toBe(108);
+    });
+
+    describe("invalid step size handling", () => {
+        test("stops immediately and returns 0 when getStepSizeUp returns 0", () => {
+            global.getStepSizeUp = jest.fn().mockReturnValue(0);
+            const dist = Singer.scalarDistance(logoMock, turtleMock, 60, 72);
+            expect(dist).toBe(0);
+            expect(global.getStepSizeUp).toHaveBeenCalledTimes(1);
+        });
+
+        test("stops immediately and returns 0 when getStepSizeUp returns a negative value", () => {
+            global.getStepSizeUp = jest.fn().mockReturnValue(-2);
+            const dist = Singer.scalarDistance(logoMock, turtleMock, 60, 72);
+            expect(dist).toBe(0);
+            expect(global.getStepSizeUp).toHaveBeenCalledTimes(1);
+        });
+
+        test("stops immediately and returns 0 when getStepSizeUp returns NaN", () => {
+            global.getStepSizeUp = jest.fn().mockReturnValue(NaN);
+            const dist = Singer.scalarDistance(logoMock, turtleMock, 60, 72);
+            expect(dist).toBe(0);
+            expect(global.getStepSizeUp).toHaveBeenCalledTimes(1);
+        });
+
+        test("stops immediately and returns 0 when getStepSizeUp returns Infinity", () => {
+            global.getStepSizeUp = jest.fn().mockReturnValue(Infinity);
+            const dist = Singer.scalarDistance(logoMock, turtleMock, 60, 72);
+            expect(dist).toBe(0);
+            expect(global.getStepSizeUp).toHaveBeenCalledTimes(1);
+        });
+
+        test("preserves completed step count when an invalid step follows a valid step (ascending)", () => {
+            global.getStepSizeUp = jest.fn().mockReturnValueOnce(2).mockReturnValueOnce(0);
+
+            const dist = Singer.scalarDistance(logoMock, turtleMock, 60, 72);
+            expect(dist).toBe(1);
+            expect(global.getStepSizeUp).toHaveBeenCalledTimes(2);
+        });
+
+        test("preserves completed step count when an invalid step follows a valid step (descending)", () => {
+            global.getStepSizeUp = jest.fn().mockReturnValueOnce(2).mockReturnValueOnce(-1);
+
+            const dist = Singer.scalarDistance(logoMock, turtleMock, 72, 60);
+            expect(dist).toBe(-1);
+            expect(global.getStepSizeUp).toHaveBeenCalledTimes(2);
+        });
+    });
+
+    test("inversion across 108 steps calculates correct transposition", () => {
+        turtleMock.singer.invertList = [["C", 1, "scalar", 0]];
+
+        // Invert C10 around axis C1 in C chromatic:
+        // C10 is pitch 111, C1 is pitch 3 (108 semitones apart).
+        // Reflected note is C1 (pitch 3).
+        // Delta = (3 - 111) / 2 = -54 semitones.
+        const delta = Singer.calculateInvert(logoMock, turtleMock, "C", 10, 0);
+        expect(delta).toBe(-54);
+    });
+
+    test("returns 0 for non-finite inputs", () => {
+        expect(Singer.scalarDistance(logoMock, turtleMock, NaN, 60)).toBe(0);
+        expect(Singer.scalarDistance(logoMock, turtleMock, 60, Infinity)).toBe(0);
+    });
+
+    test("caps runaway inputs at maxSteps without hanging", () => {
+        const pC1 = musicUtils.pitchToNumber("C", 1, "C chromatic", "equal");
+        const runaway = Singer.scalarDistance(logoMock, turtleMock, pC1, 1e308);
+        expect(runaway).toBe(1000);
+    });
+});
+
 describe("addScalarTransposition on non-EDO temperaments", () => {
     let turtleMock;
     let activityMock;
