@@ -3977,6 +3977,59 @@ describe("Blocks Foundation", () => {
             expect(seen).toEqual([[false, 28]]);
         });
 
+        it("runAfterLoad with a token runs once that load is the last one to finish", async () => {
+            const callback = jest.fn();
+            const loadFinished = nextLoadEvent("finishedLoading");
+
+            const loadToken = blocks.loadNewBlocks(makeBatch(25));
+            blocks.runAfterLoad(callback, loadToken);
+            // Repeating the same callback for the same load must not queue it
+            // twice, matching the no-token behavior above.
+            blocks.runAfterLoad(callback, loadToken);
+            expect(callback).not.toHaveBeenCalled();
+
+            expect((await loadFinished).token).toBe(loadToken);
+
+            expect(callback).toHaveBeenCalledTimes(1);
+            expect(blocks.isLoading()).toBe(false);
+        });
+
+        it("runAfterLoad with a token is dropped when a newer load replaces that request", async () => {
+            // Reproduces the race where the default template (more than one
+            // 20-block chunk) is still loading when the user opens a project:
+            // the replacement loads after it, so recentering on the default
+            // load's completion must not run against the replacement's blocks.
+            const callback = jest.fn();
+            const finishedTokens = [];
+            const bothLoadsFinished = new Promise(resolve => {
+                global.pubsub.on("finishedLoading", payload => {
+                    finishedTokens.push(payload.token);
+                    if (finishedTokens.length === 2) resolve();
+                });
+            });
+
+            const firstToken = blocks.loadNewBlocks(makeBatch(25));
+            const secondToken = blocks.loadNewBlocks(makeBatch(3));
+            blocks.runAfterLoad(callback, firstToken);
+            expect(callback).not.toHaveBeenCalled();
+
+            await bothLoadsFinished;
+
+            expect(finishedTokens).toEqual([firstToken, secondToken]);
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(blocks.isLoading()).toBe(false);
+            expect(blocks.blockList).toHaveLength(28);
+        });
+
+        it("runAfterLoad with a token runs right away when nothing is loading", () => {
+            const callback = jest.fn();
+
+            blocks.runAfterLoad(callback, 123);
+
+            expect(callback).toHaveBeenCalledTimes(1);
+        });
+
         it("runAfterLoad drops its callbacks when the load fails partway", async () => {
             let callCount = 0;
             blocks._processOneBlock = jest.fn((b, blockObjs, blockOffset) => {
