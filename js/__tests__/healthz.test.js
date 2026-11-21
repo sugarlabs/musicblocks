@@ -82,3 +82,73 @@ describe("/healthz", () => {
         expect(res.headers["cache-control"]).toBe("no-store");
     });
 });
+
+describe("Security: Block access to sensitive project files", () => {
+    let server;
+    let port;
+    beforeAll(done => {
+        server = app.listen(0, "127.0.0.1", () => {
+            port = server.address().port;
+            done();
+        });
+    });
+    afterAll(done => {
+        server.close(done);
+    });
+
+    it("serves allowed root files (index.html, favicon.ico, android_chrome_manifest.json)", async () => {
+        const res1 = await request(port, "/index.html");
+        expect(res1.status).toBe(200);
+
+        const res2 = await request(port, "/");
+        expect(res2.status).toBe(200);
+
+        const res3 = await request(port, "/android_chrome_manifest.json");
+        expect(res3.status).toBe(200);
+    });
+
+    it("serves allowed public subdirectories (/css/style.css)", async () => {
+        const res = await request(port, "/css/style.css");
+        expect(res.status).toBe(200);
+    });
+
+    it("blocks access to sensitive configuration files (package.json, index.js, dockerfile)", async () => {
+        const res1 = await request(port, "/package.json");
+        expect(res1.status).toBe(403);
+
+        const res2 = await request(port, "/index.js");
+        expect(res2.status).toBe(403);
+
+        const res3 = await request(port, "/dockerfile");
+        expect(res3.status).toBe(403);
+    });
+
+    it("blocks access to unlisted root files (.gitattributes, README.md, stryker.config.js)", async () => {
+        const res1 = await request(port, "/.gitattributes");
+        expect(res1.status).toBe(403);
+
+        const res2 = await request(port, "/README.md");
+        expect(res2.status).toBe(403);
+
+        const res3 = await request(port, "/stryker.config.js");
+        expect(res3.status).toBe(403);
+    });
+
+    it("blocks access to private directories (.github, scripts, cypress, node_modules)", async () => {
+        const res1 = await request(port, "/.github/workflows/ci.yml");
+        expect(res1.status).toBe(403);
+
+        const res2 = await request(port, "/scripts/generate-tests/cli.js");
+        expect(res2.status).toBe(403);
+    });
+
+    it("blocks encoded path traversal attempting to escape allowed directories", async () => {
+        const res = await request(port, "/js/%2e%2e/package.json");
+        expect(res.status).toBe(403);
+    });
+
+    it("rejects malformed percent-encoding with 400", async () => {
+        const res = await request(port, "/%ZZ");
+        expect(res.status).toBe(400);
+    });
+});
