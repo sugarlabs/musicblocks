@@ -105,6 +105,25 @@ describe("setupMeterActions", () => {
         expect(activity.logo.notation.notationMeter).toHaveBeenCalledWith(0, 4, 1 / 4);
     });
 
+    it("caps a huge beat count at 16 so the Rhythm Ruler count-off cannot hang", () => {
+        // A power block can produce 1e308, which is finite and passes the
+        // existing guard; the Rhythm Ruler then loops once per beat.
+        Singer.MeterActions.setMeter(1e308, 1 / 4, 0);
+        expect(targetTurtle.singer.beatsPerMeasure).toBe(16);
+    });
+
+    it("keeps ordinary beat counts unchanged", () => {
+        Singer.MeterActions.setMeter(7, 1 / 4, 0);
+        expect(targetTurtle.singer.beatsPerMeasure).toBe(7);
+    });
+
+    it("falls back to 4 when the note value is too small to invert", () => {
+        // 1 / 5e-324 overflows to Infinity, which would poison every
+        // measure-duration computation downstream.
+        Singer.MeterActions.setMeter(4, 5e-324, 0);
+        expect(targetTurtle.singer.noteValuePerBeat).toBe(4);
+    });
+
     describe("default strong beats for various time signatures", () => {
         test.each([
             [4, 1 / 4, [1, 3]],
