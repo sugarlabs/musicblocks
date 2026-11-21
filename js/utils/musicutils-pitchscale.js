@@ -1078,6 +1078,33 @@ var getNoteFromSolfege = (
             } else {
                 note = NOTESFLAT[index];
             }
+        } else if (octaveLength !== 12 && movable) {
+            // getScaleAndHalfSteps() hands every natural tonic the flat list, so ti in
+            // G major came out G♭. 12 EDO respells it by the key later; outside 12 EDO
+            // G♭ and F♯ are different pitches, so take the degree from the scale this EDO
+            // builds for the key, the one Scalar Step walks.
+            const buildScaleFn =
+                typeof buildScale === "function"
+                    ? buildScale
+                    : typeof require !== "undefined"
+                      ? require("./musicutils-buildscale").buildScale
+                      : null;
+            const scale = buildScaleFn ? buildScaleFn(keySignature, octaveLength)[0] : [];
+            const degree = SOLFEGENAMES.indexOf(solfegePart);
+            // Any seven-note scale names its degrees, even when an EDO without double
+            // sharps spells one with a letter twice: E♯ major in 19 EDO is E♯ G♭ A♭ A♯ B♯
+            // D♭ E♭ (F𝄪 is G♭ there), and the 12-EDO fallback, F G A A♯ C D E, is
+            // another set of pitches.
+            if (scale.length === 8 && degree !== -1) {
+                const name = scale[degree];
+                // B♯ and C♭ are spelled across the C where octaves change.
+                if (name[0] === "B" && note[0] === "C") {
+                    octave -= 1;
+                } else if (name[0] === "C" && note[0] === "B") {
+                    octave += 1;
+                }
+                note = name;
+            }
         }
 
         if (octaveLength === 12 && note in EXTRATRANSPOSITIONS) {
