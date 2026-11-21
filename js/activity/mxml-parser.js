@@ -546,17 +546,12 @@ const _MXML_MODE_NAME = {
 const _MXML_ASCII_ACCIDENTAL_SUFFIX = { "#": "♯", "b": "♭", "": "" };
 
 /**
- * Returns the Music Blocks volume for a supported dynamic marking in a
- * MusicXML <direction>, or null when there is no supported marking.
- * @param {Element} directionEl - a MusicXML <direction> element
+ * Returns the Music Blocks volume for a supported MusicXML <dynamics>
+ * element, or null when there is no supported marking.
+ * @param {Element|null} dynamicsEl - a MusicXML <dynamics> element
  * @returns {number|null}
  */
-function _dynamicVolume(directionEl) {
-    // Positioning an offset direction requires timeline-aware placement. Until
-    // that is supported, skip it rather than attaching it to the next note.
-    if (directionEl.querySelector(":scope > offset") !== null) return null;
-
-    const dynamicsEl = directionEl.querySelector(":scope > direction-type > dynamics");
+function _dynamicVolume(dynamicsEl) {
     if (dynamicsEl === null) return null;
 
     for (const marking of dynamicsEl.children) {
@@ -565,6 +560,20 @@ function _dynamicVolume(directionEl) {
     }
 
     return null;
+}
+
+/**
+ * Returns the volume for a supported dynamic marking in a MusicXML
+ * <direction>, or null when there is no supported marking.
+ * @param {Element} directionEl - a MusicXML <direction> element
+ * @returns {number|null}
+ */
+function _directionDynamicVolume(directionEl) {
+    // Positioning an offset direction requires timeline-aware placement. Until
+    // that is supported, skip it rather than attaching it to the next note.
+    if (directionEl.querySelector(":scope > offset") !== null) return null;
+
+    return _dynamicVolume(directionEl.querySelector(":scope > direction-type > dynamics"));
 }
 
 /**
@@ -1302,7 +1311,7 @@ function _processPart(
                 const directionVoice = _text(child, "voice")?.trim();
                 if (directionVoice && directionVoice !== importedVoice) continue;
 
-                const volume = _dynamicVolume(child);
+                const volume = _directionDynamicVolume(child);
                 if (volume !== null) {
                     // A tied note is emitted as one block. Keep it open so a
                     // dynamic between its start and stop cannot split it.
@@ -1392,6 +1401,8 @@ function _processPart(
             if (child.querySelector(":scope > chord") !== null) continue;
             if (child.querySelector(":scope > grace") !== null) continue;
 
+            const noteVolume = _dynamicVolume(child.querySelector(":scope > notations > dynamics"));
+
             const duration = _noteDuration(child, divisions);
             const lyrics = _lyricTexts(child);
             const unpitchedEl = child.querySelector(":scope > unpitched");
@@ -1448,6 +1459,8 @@ function _processPart(
                 tieDuration !== null && hasTieStop && _contentsEqual(content, tieContent);
 
             if (tieDuration !== null && !continuesTie) flushTie();
+
+            if (noteVolume !== null) pendingVolumes.push(noteVolume);
 
             if (continuesTie) {
                 tieLyrics = _mergeLyrics(tieLyrics, lyrics);
