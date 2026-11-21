@@ -14,7 +14,7 @@
 
    _b64Cache, wholeNoteImg, halfNoteImg, quarterNoteImg, eighthNoteImg,
    sixteenthNoteImg, thirtysecondNoteImg, sixtyfourthNoteImg, CHORDVALUES,
-   setCustomChord, MUSICALMODES, getModeNumbers,
+   setCustomChord, MUSICALMODES, isBuiltInMode, getModeNumbers,
    getNonEDOModeSteps, getArticulation, modeMapper, getCustomNote,
    GetNotesForInterval, base64Encode, MOVABLE_TONIC_DEGREE, scalePatternToEDO,
    PITCH_COLLECTIONS_EDO_OVERRIDES, getModePattern, MusicUtilsModeCore
@@ -227,6 +227,11 @@ for (const count in PITCH_COLLECTIONS) {
 for (const alias in PITCH_COLLECTION_ALIASES) {
     MUSICALMODES[alias] = MUSICALMODES[PITCH_COLLECTION_ALIASES[alias]];
 }
+
+var isBuiltInMode = (() => {
+    const builtinModeNames = new Set(Object.keys(MUSICALMODES).map(mode => mode.toLowerCase()));
+    return mode => typeof mode === "string" && builtinModeNames.has(mode.toLowerCase());
+})();
 
 // User definition overrides this constant.
 MUSICALMODES["custom"] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
@@ -983,6 +988,16 @@ var getModePattern = (mode, edo = 12) => {
         return new Array(edo).fill(1);
     }
     if (mode in MUSICALMODES) {
+        if (!isBuiltInMode(mode)) {
+            const userMode = MUSICALMODES[mode];
+            if (
+                Array.isArray(userMode) &&
+                userMode.every(step => Number.isInteger(step) && step > 0) &&
+                userMode.reduce((sum, step) => sum + step, 0) === edo
+            ) {
+                return userMode.slice();
+            }
+        }
         return scalePatternToEDO(MUSICALMODES[mode], edo);
     }
     return scalePatternToEDO(MUSICALMODES.major, edo);
@@ -1000,6 +1015,7 @@ var MusicUtilsModeCore = {
     CHORDVALUES,
     setCustomChord,
     MUSICALMODES,
+    isBuiltInMode,
     getModeNumbers,
     getNonEDOModeSteps,
     getArticulation,
