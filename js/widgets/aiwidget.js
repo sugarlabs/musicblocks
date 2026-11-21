@@ -14,7 +14,7 @@
 
    _, docById, DOUBLEFLAT, FLAT, NATURAL, SHARP, DOUBLESHARP,
    CUSTOMSAMPLES, wheelnav, getVoiceSynthName, Singer, DRUMS, Tone,
-   instruments, slicePath, platformColor, ABCJS, ensureABCJS
+   instruments, slicePath, platformColor, ABCJS, ensureABCJS, announceToScreenReader
 */
 
 /* exported Abhijeet Singh */
@@ -288,6 +288,7 @@ function AIWidget() {
         this.divisions = [];
         widgetWindow.clear();
         widgetWindow.show();
+        announceToScreenReader(_("AI opened"));
 
         // For the button callbacks
         const that = this;
@@ -315,6 +316,7 @@ function AIWidget() {
                 this._octavesWheel.removeWheel();
             }
             this._disposePitchAnalysers();
+            announceToScreenReader(_("AI closed"));
             widgetWindow.destroy();
         };
 

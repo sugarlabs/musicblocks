@@ -22,6 +22,7 @@
 
 // Set up globals required by jseditor.js
 global._ = str => str;
+global.announceToScreenReader = jest.fn();
 global.docById = jest.fn(id => document.getElementById(id));
 
 // Mock CodeJar
@@ -313,6 +314,12 @@ describe("JSEditor", () => {
             );
         });
 
+        test("announces JavaScript Editor opened", () => {
+            createEditor();
+
+            expect(announceToScreenReader).toHaveBeenCalledWith("JavaScript Editor opened");
+        });
+
         test("calls takeFocus after setup", () => {
             createEditor();
 
@@ -355,6 +362,15 @@ describe("JSEditor", () => {
             expect(onclose).toHaveBeenCalled();
 
             removeEventListener.mockRestore();
+        });
+
+        test("announces JavaScript Editor closed on onclose", () => {
+            const editor = createEditor();
+            announceToScreenReader.mockClear();
+
+            editor.widgetWindow.onclose();
+
+            expect(announceToScreenReader).toHaveBeenCalledWith("JavaScript Editor closed");
         });
 
         test("onclose removes the editor's stylesheet links from document.head", () => {
