@@ -2644,9 +2644,10 @@ function Synth() {
                         output
                     );
                     break;
-                case 4:
+                case 4: // noise
                     this._trackVoice(turtle, tempSynth);
-                    tempSynth.triggerAttackRelease("c2", beatValue, Tone.now() + future);
+                    // A NoiseSynth has no pitch: it takes (duration, time).
+                    tempSynth.triggerAttackRelease(beatValue, Tone.now() + future);
                     break;
                 case 0: // default synth
                 default:
