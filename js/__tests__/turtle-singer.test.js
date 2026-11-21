@@ -2833,6 +2833,51 @@ describe("processNote notation and MIDI emission guards against non-positive dur
         expect(activityMock.logo.updateNotation).toHaveBeenCalledWith([450], 4, 0, -1, []);
     });
 
+    test("passes a note named outside 12 EDO to notationMIDI as its nearest 12-EDO note", () => {
+        // 31 EDO names D + 2 steps D♯♯, which MIDI cannot read (it threw and lost the file).
+        const blk = "edo31NoteBlk";
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["D♯♯"] };
+        turtleMock.singer.noteOctaves = { [blk]: [4] };
+        turtleMock.singer.noteCents = { [blk]: [0] };
+        turtleMock.singer.noteHertz = { [blk]: [0] };
+        turtleMock.singer.noteDrums = { [blk]: [] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1] };
+        turtleMock.singer.instrumentNames = ["piano"];
+        turtleMock.singer.oscList = { [blk]: [] };
+        turtleMock.singer.bpm = [90];
+        activityMock.logo.synth.inTemperament = "equal31";
+
+        const saved = {
+            getNote: global.getNote,
+            getCurrentEDO: global.getCurrentEDO,
+            parseNoteString: global.parseNoteString,
+            pitchToFrequency: global.pitchToFrequency,
+            frequencyToPitch: global.frequencyToPitch
+        };
+        global.getNote = jest.fn((note, octave) => [note, octave]);
+        global.getCurrentEDO = jest.fn(t => (t === "equal31" ? 31 : 12));
+        global.parseNoteString = jest.fn(note => [note.slice(0, -1), Number(note.slice(-1))]);
+        global.pitchToFrequency = jest.fn(() => 305.4);
+        global.frequencyToPitch = jest.fn(() => ["E♭", 4, -16.5]);
+        try {
+            Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+            expect(global.pitchToFrequency).toHaveBeenCalledWith(
+                "D♯♯",
+                4,
+                0,
+                turtleMock.singer.keySignature,
+                "equal31"
+            );
+        } finally {
+            Object.assign(global, saved);
+        }
+
+        expect(activityMock.logo.notationMIDI.mock.calls[0][0]).toEqual(["E♭4"]);
+        // The other notations keep the temperament's own name.
+        expect(activityMock.logo.updateNotation.mock.calls[0][0]).toEqual(["D♯♯4"]);
+    });
+
     test("does not add a courtesy natural to a hertz note in a chord with its sharp", () => {
         // A4 at 450 Hz (39 cents) with A♯4 in the same note gets a courtesy natural.
         const blk = "hertzChordBlk";

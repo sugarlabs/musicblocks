@@ -2638,17 +2638,40 @@ class Singer {
                                             note => typeof note === "number" || !note.includes("R")
                                         );
                                     // A note with cents or set in hertz is a frequency; MIDI
-                                    // takes the nearest 12-EDO note name.
+                                    // takes the nearest 12-EDO note name. So does a note named
+                                    // in a temperament with other than 12 pitches: its name
+                                    // (D♯♯ in 31 EDO) means a step of that table, and MIDI
+                                    // read E♭♭ as D and threw on D♯♯, losing the whole file.
+                                    const temperament = activity.logo.synth.inTemperament;
+                                    const midiName = note => {
+                                        if (typeof note === "number") {
+                                            const [name, octave] = frequencyToPitch(note);
+                                            return name + octave;
+                                        }
+                                        if (
+                                            note.includes("R") ||
+                                            getCurrentEDO(temperament) === 12
+                                        ) {
+                                            return note;
+                                        }
+                                        const [pitch, octave] = parseNoteString(
+                                            note.replace("♮", "")
+                                        );
+                                        const hz = pitchToFrequency(
+                                            pitch,
+                                            octave,
+                                            0,
+                                            tur.singer.keySignature,
+                                            temperament
+                                        );
+                                        if (!isFinite(hz) || hz <= 0) {
+                                            return note;
+                                        }
+                                        const [name, nearestOctave] = frequencyToPitch(hz);
+                                        return name + nearestOctave;
+                                    };
                                     activity.logo.notationMIDI(
-                                        playedBySetDrum
-                                            ? ["R"]
-                                            : chordNotes.map(note => {
-                                                  if (typeof note !== "number") {
-                                                      return note;
-                                                  }
-                                                  const [name, octave] = frequencyToPitch(note);
-                                                  return name + octave;
-                                              }),
+                                        playedBySetDrum ? ["R"] : chordNotes.map(midiName),
                                         playedBySetDrum ? [last(tur.singer.drumStyle)] : chordDrums,
                                         d,
                                         turtle,
