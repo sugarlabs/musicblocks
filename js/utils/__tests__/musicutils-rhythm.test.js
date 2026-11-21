@@ -410,4 +410,160 @@ describe("musicutils-rhythm", () => {
             expect(sandbox.window.MusicUtilsRhythm.reducedFraction(4, 8)).toContain("2");
         });
     });
+
+    describe("Euclidean Rhythm Generator (Bjorklund Algorithm)", () => {
+        describe("computeEuclideanRhythm", () => {
+            it("generates canonical traditional world rhythms", () => {
+                // Persian Khafif-e-ramal E(2, 5)
+                expect(rhythm.computeEuclideanRhythm(2, 5)).toEqual([1, 0, 1, 0, 0]);
+
+                // Bulgarian Ruchenitza E(3, 7)
+                expect(rhythm.computeEuclideanRhythm(3, 7)).toEqual([1, 0, 1, 0, 1, 0, 0]);
+
+                // Cuban Tresillo E(3, 8)
+                expect(rhythm.computeEuclideanRhythm(3, 8)).toEqual([1, 0, 0, 1, 0, 0, 1, 0]);
+
+                // Turkish Aksak E(4, 9)
+                expect(rhythm.computeEuclideanRhythm(4, 9)).toEqual([1, 0, 1, 0, 1, 0, 1, 0, 0]);
+
+                // Cuban Cinquillo / Spanish Tango E(5, 8)
+                expect(rhythm.computeEuclideanRhythm(5, 8)).toEqual([1, 0, 1, 1, 0, 1, 1, 0]);
+
+                // South African Venda clapping E(5, 12)
+                expect(rhythm.computeEuclideanRhythm(5, 12)).toEqual([
+                    1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0
+                ]);
+
+                // Brazilian Bossa Nova necklace E(5, 16)
+                expect(rhythm.computeEuclideanRhythm(5, 16)).toEqual([
+                    1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0
+                ]);
+
+                // West African Yoruba bell pattern E(7, 12)
+                expect(rhythm.computeEuclideanRhythm(7, 12)).toEqual([
+                    1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0
+                ]);
+
+                // Brazilian Samba rhythm E(7, 16)
+                expect(rhythm.computeEuclideanRhythm(7, 16)).toEqual([
+                    1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0
+                ]);
+            });
+
+            it("handles rotation / cyclic offsets correctly", () => {
+                // E(3, 8) shifted right by 1
+                expect(rhythm.computeEuclideanRhythm(3, 8, 1)).toEqual(
+                    [1, 0, 0, 1, 0, 0, 1, 0].slice(7).concat([1, 0, 0, 1, 0, 0, 1])
+                );
+                expect(rhythm.computeEuclideanRhythm(3, 8, 1)).toEqual([0, 1, 0, 0, 1, 0, 0, 1]);
+
+                // E(3, 8) shifted left by 1 (equivalent to rotation = -1 or rotation = 7)
+                expect(rhythm.computeEuclideanRhythm(3, 8, -1)).toEqual([0, 0, 1, 0, 0, 1, 0, 1]);
+
+                // Full period rotation equals original
+                expect(rhythm.computeEuclideanRhythm(3, 8, 8)).toEqual(
+                    rhythm.computeEuclideanRhythm(3, 8, 0)
+                );
+                expect(rhythm.computeEuclideanRhythm(3, 8, 16)).toEqual(
+                    rhythm.computeEuclideanRhythm(3, 8, 0)
+                );
+            });
+
+            it("handles boundary, degenerate, and type-coercion edge cases", () => {
+                // k = 0 returns all rests
+                expect(rhythm.computeEuclideanRhythm(0, 4)).toEqual([0, 0, 0, 0]);
+
+                // negative k returns all rests
+                expect(rhythm.computeEuclideanRhythm(-2, 4)).toEqual([0, 0, 0, 0]);
+
+                // k >= n returns all pulses
+                expect(rhythm.computeEuclideanRhythm(4, 4)).toEqual([1, 1, 1, 1]);
+                expect(rhythm.computeEuclideanRhythm(6, 4)).toEqual([1, 1, 1, 1]);
+
+                // n <= 0 returns empty array
+                expect(rhythm.computeEuclideanRhythm(3, 0)).toEqual([]);
+                expect(rhythm.computeEuclideanRhythm(3, -5)).toEqual([]);
+
+                // String parsing
+                expect(rhythm.computeEuclideanRhythm("3", "8")).toEqual([1, 0, 0, 1, 0, 0, 1, 0]);
+
+                // NaN, null, undefined, non-finite fallbacks
+                expect(rhythm.computeEuclideanRhythm(null, 4)).toEqual([0, 0, 0, 0]);
+                expect(rhythm.computeEuclideanRhythm(undefined, 4)).toEqual([0, 0, 0, 0]);
+                expect(rhythm.computeEuclideanRhythm(NaN, 4)).toEqual([0, 0, 0, 0]);
+                expect(rhythm.computeEuclideanRhythm(3, null)).toEqual([]);
+                expect(rhythm.computeEuclideanRhythm(3, Infinity)).toEqual([]);
+                expect(rhythm.computeEuclideanRhythm(3, -Infinity)).toEqual([]);
+            });
+        });
+
+        describe("isEuclideanStep", () => {
+            it("correctly identifies active pulses at specific steps", () => {
+                // Tresillo E(3, 8): [1, 0, 0, 1, 0, 0, 1, 0]
+                expect(rhythm.isEuclideanStep(3, 8, 0)).toBe(1);
+                expect(rhythm.isEuclideanStep(3, 8, 1)).toBe(0);
+                expect(rhythm.isEuclideanStep(3, 8, 2)).toBe(0);
+                expect(rhythm.isEuclideanStep(3, 8, 3)).toBe(1);
+                expect(rhythm.isEuclideanStep(3, 8, 4)).toBe(0);
+                expect(rhythm.isEuclideanStep(3, 8, 5)).toBe(0);
+                expect(rhythm.isEuclideanStep(3, 8, 6)).toBe(1);
+                expect(rhythm.isEuclideanStep(3, 8, 7)).toBe(0);
+            });
+
+            it("wraps step indices cyclically across measures", () => {
+                // Step 8 is equivalent to step 0 in an 8-step cycle
+                expect(rhythm.isEuclideanStep(3, 8, 8)).toBe(1);
+                expect(rhythm.isEuclideanStep(3, 8, 11)).toBe(1); // 11 % 8 = 3
+
+                // Negative step index wrapping
+                expect(rhythm.isEuclideanStep(3, 8, -1)).toBe(0); // -1 wraps to 7 (0)
+                expect(rhythm.isEuclideanStep(3, 8, -2)).toBe(1); // -2 wraps to 6 (1)
+            });
+
+            it("handles degenerate step arguments gracefully", () => {
+                expect(rhythm.isEuclideanStep(3, 8, null)).toBe(1); // defaults to step 0 (1)
+                expect(rhythm.isEuclideanStep(3, 8, undefined)).toBe(1);
+                expect(rhythm.isEuclideanStep(3, 8, NaN)).toBe(1);
+                expect(rhythm.isEuclideanStep(3, 8, Infinity)).toBe(1);
+                expect(rhythm.isEuclideanStep(3, 8, -Infinity)).toBe(1);
+                expect(rhythm.isEuclideanStep(3, 0, 0)).toBe(0);
+                expect(rhythm.isEuclideanStep(3, Infinity, 0)).toBe(0);
+            });
+        });
+
+        describe("euclideanToDurations", () => {
+            it("computes exact note durations for traditional rhythms", () => {
+                // Tresillo E(3, 8) with total duration 1: intervals 3, 3, 2 steps
+                const tresillo = rhythm.euclideanToDurations(3, 8, 1);
+                expect(tresillo).toEqual([0.375, 0.375, 0.25]);
+                expect(tresillo.reduce((a, b) => a + b, 0)).toBeCloseTo(1.0);
+
+                // Cinquillo E(5, 8) with total duration 1: intervals 2, 1, 2, 1, 2
+                const cinquillo = rhythm.euclideanToDurations(5, 8, 1);
+                expect(cinquillo).toEqual([0.25, 0.125, 0.25, 0.125, 0.25]);
+                expect(cinquillo.reduce((a, b) => a + b, 0)).toBeCloseTo(1.0);
+
+                // Scaled total duration (e.g. 4 beats)
+                const scaled = rhythm.euclideanToDurations(3, 8, 4);
+                expect(scaled).toEqual([1.5, 1.5, 1.0]);
+                expect(scaled.reduce((a, b) => a + b, 0)).toBeCloseTo(4.0);
+            });
+
+            it("handles boundary and fallback durations", () => {
+                // k = 0: returns [totalDuration]
+                expect(rhythm.euclideanToDurations(0, 8, 2)).toEqual([2]);
+
+                // k >= n: returns equal subdivisions
+                const equalSubdivs = rhythm.euclideanToDurations(4, 4, 1);
+                expect(equalSubdivs).toEqual([0.25, 0.25, 0.25, 0.25]);
+
+                // Invalid steps: returns []
+                expect(rhythm.euclideanToDurations(3, 0, 1)).toEqual([]);
+
+                // Invalid total duration defaults to 1
+                expect(rhythm.euclideanToDurations(3, 8, -1)).toEqual([0.375, 0.375, 0.25]);
+                expect(rhythm.euclideanToDurations(3, 8, NaN)).toEqual([0.375, 0.375, 0.25]);
+            });
+        });
+    });
 });

@@ -429,6 +429,8 @@ Music Blocks has handy widgets for various musical concepts to create musical co
 | HyperScore-Tonal.html | Create music by painting patterns on the canvas |
 | 19-EDO-Microtonal-Counterpoint.html | Two-part polyphonic counterpoint in 19-EDO microtonal temperament (flute & cello), exploring pure 19-EDO major/minor thirds and fifths. |
 | 5-Limit-Just-Intonation-Polyrhythm.html | Three-turtle polyphonic composition combining 5-limit Just Intonation pure integer ratio harmonies (vibraphone & piano) with 3-against-2 metric subdivisions and acoustic percussion. |
+| euclidean-rhythm-generator.html | Algorithmic Euclidean rhythm generator: uses the Euclidean block on the Meter palette to synthesize canonical world rhythms (Cuban Tresillo E(3,8) and Cinquillo E(5,8)) with visual turtle tracking. |
+| euclidean-polyrhythm-interlock.html | Euclidean polyrhythm & duration explorer: demonstrates compound 12-beat West African bell patterns E(5,12) and E(7,12), and explores proportional inter-onset intervals with the Euclidean Durations block. |
 
 # Utilities
 

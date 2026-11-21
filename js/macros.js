@@ -81,6 +81,8 @@ const blockIsMacro = (activity, blkname) => {
         "eihelp",
         "elapsedhelp",
         "elifhelp",
+        "euclideanhelp",
+        "euclideandurationshelp",
         "everybeathelp",
         "fillhelp",
         "fmsynthhelp",
@@ -1718,7 +1720,24 @@ const getMacroExpansion = (activity, blkname, x, y) => {
         [18, "abs", 0, 0, [8, 10]]
     ];
 
+    const EUCLIDEANHELP = [
+        [0, "euclidean", x, y, [null, 1, 2, 3, 4]],
+        [1, ["number", { value: 3 }], 0, 0, [0]],
+        [2, ["number", { value: 8 }], 0, 0, [0]],
+        [3, ["number", { value: 0 }], 0, 0, [0]],
+        [4, ["number", { value: 0 }], 0, 0, [0]]
+    ];
+    const EUCLIDEANDURATIONSHELP = [
+        [0, "euclideandurations", x, y, [null, 1, 2, 3, 4]],
+        [1, ["number", { value: 3 }], 0, 0, [0]],
+        [2, ["number", { value: 8 }], 0, 0, [0]],
+        [3, ["number", { value: 1 }], 0, 0, [0]],
+        [4, ["number", { value: 0 }], 0, 0, [0]]
+    ];
+
     const BUILTINMACROS = {
+        euclideanhelp: EUCLIDEANHELP,
+        euclideandurationshelp: EUCLIDEANDURATIONSHELP,
         actionhelp: ACTIONHELP,
         archelp: ARCHELP,
         amsynthhelp: AMSYNTHHELP,

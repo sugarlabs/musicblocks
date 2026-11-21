@@ -57,7 +57,9 @@ describe("MeterBlocks setup", () => {
         "setbpm2",
         "setbpm",
         "pickup",
-        "meter"
+        "meter",
+        "euclidean",
+        "euclideandurations"
     ];
 
     const setupGlobals = () => {
@@ -132,7 +134,9 @@ describe("MeterBlocks setup", () => {
                 setMasterBPM: jest.fn(tempoInUse),
                 setBPM: jest.fn(tempoInUse),
                 setPickup: jest.fn(),
-                setMeter: jest.fn()
+                setMeter: jest.fn(),
+                getEuclideanStep: jest.fn(),
+                getEuclideanDurations: jest.fn()
             },
             noteCounter: jest.fn(() => 11),
             numberOfNotes: jest.fn(() => 12),
@@ -1020,6 +1024,173 @@ describe("MeterBlocks setup", () => {
 
             // Verify outer stage listener was NOT detached when inner clamp registered
             expect(stageListeners["_bpm_0_1"]).toHaveLength(1);
+        });
+    });
+
+    describe("EuclideanBlock in Meter palette", () => {
+        let euclidean;
+
+        beforeEach(() => {
+            euclidean = getBlock("euclidean");
+        });
+
+        it("has correct configuration and meter palette set", () => {
+            expect(euclidean).toBeDefined();
+            expect(euclidean.palette).toBe("meter");
+            expect(euclidean.schema.args).toBe(4);
+            expect(euclidean.schema.defaults).toEqual([3, 8, 0, 0]);
+        });
+
+        it("returns 0 and shows error if required inputs are missing", () => {
+            activity.blocks.blockList[10] = {
+                connections: [null, null, null, null, null]
+            };
+
+            const result = euclidean.arg(logo, 0, 10);
+            expect(result).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith("NO_INPUT", 10);
+        });
+
+        it("returns 0 and skips the action when only pulses is missing", () => {
+            activity.blocks.blockList[10] = {
+                connections: [null, null, 12, null, null]
+            };
+            activity.errorMsg.mockClear();
+            Singer.MeterActions.getEuclideanStep.mockClear();
+
+            const result = euclidean.arg(logo, 0, 10);
+            expect(result).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith("NO_INPUT", 10);
+            expect(Singer.MeterActions.getEuclideanStep).not.toHaveBeenCalled();
+        });
+
+        it("returns 0 and skips the action when only steps is missing", () => {
+            activity.blocks.blockList[10] = {
+                connections: [null, 11, null, null, null]
+            };
+            activity.errorMsg.mockClear();
+            Singer.MeterActions.getEuclideanStep.mockClear();
+
+            const result = euclidean.arg(logo, 0, 10);
+            expect(result).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith("NO_INPUT", 10);
+            expect(Singer.MeterActions.getEuclideanStep).not.toHaveBeenCalled();
+        });
+
+        it("calls Singer.MeterActions.getEuclideanStep with parsed arguments", () => {
+            activity.blocks.blockList[10] = {
+                connections: [null, 11, 12, 13, 14]
+            };
+            logo.parseArg = jest.fn((lg, tur, blk) => {
+                const map = { 11: 3, 12: 8, 13: 2, 14: 1 };
+                return map[blk];
+            });
+
+            Singer.MeterActions.getEuclideanStep.mockReturnValue(1);
+
+            const result = euclidean.arg(logo, 0, 10);
+            expect(Singer.MeterActions.getEuclideanStep).toHaveBeenCalledWith(3, 8, 2, 1, 0);
+            expect(result).toBe(1);
+        });
+
+        it("passes null step and 0 rotation when optional connections are null", () => {
+            activity.blocks.blockList[10] = {
+                connections: [null, 11, 12, null, null]
+            };
+            logo.parseArg = jest.fn((lg, tur, blk) => {
+                const map = { 11: 5, 12: 8 };
+                return map[blk];
+            });
+
+            Singer.MeterActions.getEuclideanStep.mockReturnValue(0);
+
+            const result = euclidean.arg(logo, 1, 10);
+            expect(Singer.MeterActions.getEuclideanStep).toHaveBeenCalledWith(5, 8, null, 0, 1);
+            expect(result).toBe(0);
+        });
+    });
+
+    describe("EuclideanDurationsBlock in Meter palette", () => {
+        let euclideanDurations;
+
+        beforeEach(() => {
+            euclideanDurations = getBlock("euclideandurations");
+        });
+
+        it("has correct configuration and meter palette set", () => {
+            expect(euclideanDurations).toBeDefined();
+            expect(euclideanDurations.palette).toBe("meter");
+            expect(euclideanDurations.schema.args).toBe(4);
+            expect(euclideanDurations.schema.defaults).toEqual([3, 8, 1, 0]);
+        });
+
+        it("returns empty JSON array and shows error if required inputs are missing", () => {
+            activity.blocks.blockList[20] = {
+                connections: [null, null, 22, 23, 24]
+            };
+
+            const result = euclideanDurations.arg(logo, 0, 20);
+            expect(result).toBe(JSON.stringify([]));
+            expect(activity.errorMsg).toHaveBeenCalledWith("NO_INPUT", 20);
+        });
+
+        it("returns empty JSON array and skips the action when only pulses is missing", () => {
+            activity.blocks.blockList[20] = {
+                connections: [null, null, 22, 23, 24]
+            };
+            activity.errorMsg.mockClear();
+            Singer.MeterActions.getEuclideanDurations.mockClear();
+
+            const result = euclideanDurations.arg(logo, 0, 20);
+            expect(result).toBe(JSON.stringify([]));
+            expect(activity.errorMsg).toHaveBeenCalledWith("NO_INPUT", 20);
+            expect(Singer.MeterActions.getEuclideanDurations).not.toHaveBeenCalled();
+        });
+
+        it("returns empty JSON array and skips the action when only steps is missing", () => {
+            activity.blocks.blockList[20] = {
+                connections: [null, 21, null, 23, 24]
+            };
+            activity.errorMsg.mockClear();
+            Singer.MeterActions.getEuclideanDurations.mockClear();
+
+            const result = euclideanDurations.arg(logo, 0, 20);
+            expect(result).toBe(JSON.stringify([]));
+            expect(activity.errorMsg).toHaveBeenCalledWith("NO_INPUT", 20);
+            expect(Singer.MeterActions.getEuclideanDurations).not.toHaveBeenCalled();
+        });
+
+        it("calls Singer.MeterActions.getEuclideanDurations and returns JSON string", () => {
+            activity.blocks.blockList[20] = {
+                connections: [null, 21, 22, 23, 24]
+            };
+            logo.parseArg = jest.fn((lg, tur, blk) => {
+                const map = { 21: 3, 22: 8, 23: 1, 24: 0 };
+                return map[blk];
+            });
+
+            const mockDurations = [0.375, 0.375, 0.25];
+            Singer.MeterActions.getEuclideanDurations.mockReturnValue(mockDurations);
+
+            const result = euclideanDurations.arg(logo, 0, 20);
+            expect(Singer.MeterActions.getEuclideanDurations).toHaveBeenCalledWith(3, 8, 1, 0);
+            expect(result).toBe(JSON.stringify(mockDurations));
+        });
+
+        it("defaults totalDuration to 1 and rotation to 0 when optional connections are null", () => {
+            activity.blocks.blockList[20] = {
+                connections: [null, 21, 22, null, null]
+            };
+            logo.parseArg = jest.fn((lg, tur, blk) => {
+                const map = { 21: 3, 22: 8 };
+                return map[blk];
+            });
+
+            Singer.MeterActions.getEuclideanDurations.mockReturnValue([0.375, 0.375, 0.25]);
+
+            const result = euclideanDurations.arg(logo, 0, 20);
+            expect(Singer.MeterActions.getEuclideanDurations).toHaveBeenCalledWith(3, 8, 1, 0);
+            expect(result).toBe(JSON.stringify([0.375, 0.375, 0.25]));
         });
     });
 });
