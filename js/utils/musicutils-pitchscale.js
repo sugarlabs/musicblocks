@@ -72,7 +72,8 @@ if (typeof module !== "undefined" && module.exports) {
         isCustomTemperament,
         TEMPERAMENT,
         PreDefinedTemperaments,
-        isEquallyTempered
+        isEquallyTempered,
+        getTemperament
     } = MusicUtilsTemperament;
     var MusicUtilsPitch =
         (typeof window !== "undefined" && window.MusicUtilsPitch) ||
@@ -1092,6 +1093,66 @@ var getNoteFromSolfege = (
 };
 
 /**
+ * The pitch nearest to a note moved by whole semitones, in a ratio temperament whose
+ * pitches are not evenly spaced (1/3- and 1/4-comma meantone). A semitone is 100 cents
+ * there as anywhere, so this is what rounding semitones * edo / 12 to steps does in an
+ * EDO. Counting steps of an uneven table instead lands on the wrong pitch: in 1/4-comma
+ * meantone, C up a fifth was G♭ and up a major third E♭.
+ * @param {Object} t - The temperament, with noteLabels and ratios in ascending order.
+ * @param {string} note - A note name from t.noteLabels.
+ * @param {number} octave - The octave of the note.
+ * @param {number} semitones - Whole semitones to move by.
+ * @returns {Array|null} [note, octave], or null when the note is not one of the table's.
+ */
+const _transposeInRatioTable = (t, note, octave, semitones) => {
+    const index = t.noteLabels.indexOf(note);
+    if (index === -1) {
+        return null;
+    }
+
+    const centsOf = i => 1200 * Math.log2(t.ratios[i]);
+    const target = 1200 * octave + centsOf(index) + 100 * semitones;
+    const targetOctave = Math.floor(target / 1200);
+    let nearest = null;
+    let nearestDistance = Infinity;
+    for (let o = targetOctave - 1; o <= targetOctave + 1; o++) {
+        for (let i = 0; i < t.noteLabels.length; i++) {
+            const distance = Math.abs(1200 * o + centsOf(i) - target);
+            // Of two pitches within a cent of each other take the higher one, as
+            // Math.round does with half a step in an EDO: 6 semitones are 9.5 steps of
+            // 1/3-comma meantone, whose table is up to 0.6 cents off 19 EDO.
+            if (distance <= nearestDistance + 1) {
+                nearestDistance = distance;
+                nearest = [t.noteLabels[i], o];
+            }
+        }
+    }
+    return nearest;
+};
+
+/**
+ * Whether a temperament is a table of ratios whose pitches are not evenly spaced and
+ * not twelve to the octave, so semitones can't be counted as steps of the table.
+ * @param {string} temperament
+ * @returns {Object|null} The temperament, or null.
+ */
+const _unevenRatioTable = temperament => {
+    const t = getTemperament(temperament);
+    if (
+        t &&
+        t.isEDO === false &&
+        t.pitchNumber !== 12 &&
+        Array.isArray(t.noteLabels) &&
+        Array.isArray(t.ratios) &&
+        t.noteLabels.length === t.pitchNumber &&
+        t.ratios.length === t.pitchNumber
+    ) {
+        return t;
+    }
+    return null;
+};
+
+/**
  * Get the note based on various parameters.
  * @function
  * @param {string|number} noteArg - The note name or pitch number.
@@ -1158,6 +1219,32 @@ function getNote(
     // Skip this conversion if transposition is already in EDO steps (non-equal temperaments).
     if (octaveLength !== 12 && !isAlreadyEdoSteps) {
         transpositionFloor = Math.round((transposition * octaveLength) / 12);
+    }
+
+    // Whole semitones of the transposition (transpositionFloor is in steps by now).
+    const wholeSemitones =
+        transposition < 0 ? -Math.floor(-transposition) : Math.floor(transposition);
+    const unevenTable =
+        wholeSemitones !== 0 && !isAlreadyEdoSteps ? _unevenRatioTable(temperament) : null;
+    if (unevenTable !== null) {
+        // Resolve the note itself, then move it by the whole semitones to the table's
+        // nearest pitch; the fraction stays cents, as everywhere else.
+        const base = getNote(
+            noteArg,
+            octave,
+            0,
+            keySignature,
+            movable,
+            direction,
+            errorMsg,
+            temperament,
+            false,
+            clampIndex
+        );
+        const moved = _transposeInRatioTable(unevenTable, base[0], base[1], wholeSemitones);
+        if (moved !== null) {
+            return [moved[0], moved[1], transpositionCents === 0 ? 0 : transpositionCents];
+        }
     }
 
     if (typeof noteArg !== "number") {
