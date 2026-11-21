@@ -3209,10 +3209,9 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
     const that = block;
 
     const __selectionChanged = () => {
-        const label = that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex].title;
-        const i = voiceLabels.indexOf(label);
+        const i = that._voiceWheel.selectedNavItemIndex;
         that.value = voiceValues[i];
-        that.text.text = label;
+        that.text.text = voiceLabels[i];
 
         if (getDrumName(that.value) === null) {
             that.activity.logo.synth.loadSynth(0, getVoiceSynthName(that.value));
@@ -3235,8 +3234,7 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
      * @private
      */
     const __voicePreview = () => {
-        const label = that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex].title;
-        const i = voiceLabels.indexOf(label);
+        const i = that._voiceWheel.selectedNavItemIndex;
         const voice = voiceValues[i];
         let timeout = 0;
 
