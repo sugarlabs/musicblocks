@@ -96,3 +96,41 @@ describe("ratioTableOctaveShift", () => {
         expect(ratioTableOctaveShift(label, ratio)).toBe(shift);
     });
 });
+
+describe("pitch numbers in a ratio temperament that starts away from C", () => {
+    // Set Temperament can start a temperament on any pitch (just intonation tuned to A,
+    // say); pitch numbers then count from that pitch, and the octave still changes at C.
+    const rising = (temperament, start) => {
+        let previous = 0;
+        for (let n = -30; n <= 30; n++) {
+            const [note, octave] = numberToPitch(n, temperament, start, 0);
+            const hertz = pitchToFrequency(note, octave, 0, "C major", temperament);
+            if (!(hertz > previous)) {
+                return `${n}: ${note}${octave}`;
+            }
+            previous = hertz;
+        }
+        return "rising";
+    };
+
+    test.each([
+        ["just intonation", "A4"],
+        ["just intonation", "F#4"],
+        ["Pythagorean", "D4"],
+        ["1/3 comma meantone", "A4"],
+        [MEANTONE, "G3"],
+        [MEANTONE, "C4"]
+    ])("%s from %s rises with every pitch number", (temperament, start) => {
+        expect(rising(temperament, start)).toBe("rising");
+    });
+
+    test("the pitch after B is in the next octave", () => {
+        expect(numberToPitch(3, "just intonation", "A4", 0)).toEqual(["C", 5]);
+        expect(numberToPitch(-1, "just intonation", "C4", 0)).toEqual(["B", 3]);
+    });
+
+    test("a sharp start is found in a table that writes sharps as #", () => {
+        expect(numberToPitch(0, "just intonation", "F#4", 0)).toEqual(["F#", 4]);
+        expect(numberToPitch(0, "just intonation", "F♯4", 0)).toEqual(["F#", 4]);
+    });
+});

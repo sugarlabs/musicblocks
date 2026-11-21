@@ -903,25 +903,31 @@ var numberToPitch = (i, temperament, startPitch, offset, activity) => {
                 startPitch = startPitch.slice(0, -octMatch[1].length);
             }
             const normalized = startPitch.replace(/#/g, SHARP).replace(/b/g, FLAT);
-            const pos = noteNames.indexOf(normalized);
-            if (pos !== -1) {
+            // Just intonation and Pythagorean label their sharps "F#", not "F♯".
+            const ascii = normalized.replace(new RegExp(SHARP, "g"), "#");
+            const pos = [normalized, ascii, startPitch]
+                .map(name => noteNames.indexOf(name))
+                .find(index => index !== -1);
+            if (pos !== undefined) {
                 startPos = pos;
             }
         }
 
-        const idx =
-            ((pitchNumber % temperamentPitchNumber) + temperamentPitchNumber) %
-            temperamentPitchNumber;
-        const octaveOffset = Math.floor(pitchNumber / temperamentPitchNumber);
+        // Each row of the table runs from C, so count from the starting pitch's place in
+        // its row: the octave changes at C, not at the starting pitch. From A4, the third
+        // pitch number above B4 is C5, not C4.
+        const fromRowStart = startPos + pitchNumber;
         const nameIndex =
-            (((startPos + idx) % temperamentPitchNumber) + temperamentPitchNumber) %
+            ((fromRowStart % temperamentPitchNumber) + temperamentPitchNumber) %
             temperamentPitchNumber;
+        const octaveOffset = Math.floor(fromRowStart / temperamentPitchNumber);
         const noteName = noteNames[nameIndex];
         const shift =
             t && Array.isArray(t.ratios) && t.noteLabels
                 ? ratioTableOctaveShift(noteName, t.ratios[nameIndex])
                 : 0;
-        return [noteName, baseOctave + octaveOffset + shift];
+        // A negative input was folded into the octave above by n octaves first.
+        return [noteName, baseOctave + octaveOffset + shift - n];
     }
 };
 
