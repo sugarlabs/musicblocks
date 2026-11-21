@@ -1030,7 +1030,9 @@ function Synth() {
                 note = key.substring(0, 1) + "" + "b";
                 this.noteFrequencies[note] = this.noteFrequencies[key];
 
-                delete this.noteFrequencies[key];
+                if (note !== key) {
+                    delete this.noteFrequencies[key];
+                }
             } else if (
                 key.substring(1, key.length) === SHARP ||
                 key.substring(1, key.length) === "#"
@@ -1038,7 +1040,9 @@ function Synth() {
                 note = key.substring(0, 1) + "" + "#";
                 this.noteFrequencies[note] = this.noteFrequencies[key];
 
-                delete this.noteFrequencies[key];
+                if (note !== key) {
+                    delete this.noteFrequencies[key];
+                }
             }
         }
 
@@ -2047,10 +2051,16 @@ function Synth() {
                 const notes1 = notes;
                 notes = this._getFrequency(notes, this.changeInTemperament);
                 if (notes === undefined) {
-                    if (notes1.substring(1, notes1.length - 1) === DOUBLEFLAT) {
-                        notes = notes1.substring(0, 1) + "bb" + notes1.substring(notes1.length - 1);
-                    } else if (notes1.substring(1, notes1.length - 1) === DOUBLESHARP) {
-                        notes = notes1.substring(0, 1) + "x" + notes1.substring(notes1.length - 1);
+                    if (typeof notes1 === "string") {
+                        if (notes1.substring(1, notes1.length - 1) === DOUBLEFLAT) {
+                            notes =
+                                notes1.substring(0, 1) + "bb" + notes1.substring(notes1.length - 1);
+                        } else if (notes1.substring(1, notes1.length - 1) === DOUBLESHARP) {
+                            notes =
+                                notes1.substring(0, 1) + "x" + notes1.substring(notes1.length - 1);
+                        } else {
+                            notes = notes1;
+                        }
                     } else {
                         notes = notes1;
                     }
