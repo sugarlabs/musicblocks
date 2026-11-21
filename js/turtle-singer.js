@@ -1492,10 +1492,11 @@ class Singer {
                     noteObj = frequencyToPitch(hertz * ratio);
                 }
 
-                // Cents may have been added through a transposition.
-                if (noteObj[2] !== 0 && cents === 0) {
-                    cents = noteObj[2];
-                }
+                // A transposition can add cents: the fraction of a semi-tone
+                // transposition, or what is left over from a ratio. They add to the
+                // pitch's own cents (Hertz, or a custom pitch such as C(+35)) instead
+                // of being dropped whenever the pitch has some.
+                cents += noteObj[2] || 0;
 
                 if (Math.abs(cents) < 1e-9) {
                     cents = 0;
