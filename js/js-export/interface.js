@@ -1754,6 +1754,22 @@ class JSInterface {
                 }
             }
         ],
+        fillShape: [
+            {
+                type: "function",
+                constraints: {
+                    async: true
+                }
+            }
+        ],
+        hollowLine: [
+            {
+                type: "function",
+                constraints: {
+                    async: true
+                }
+            }
+        ],
         // Dictionary blocks
         setValue: [
             [
