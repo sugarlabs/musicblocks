@@ -43,10 +43,33 @@ describe("ToneBlocksAPI", () => {
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("setInstrument", ["piano", mockFlow]);
         expect(toneBlocksAPI.runCommand).toHaveBeenCalledWith("setTimbre", [
             "piano",
-            toneBlocksAPI.turIndex
+            toneBlocksAPI.turIndex,
+            global.MusicBlocks.BLK
         ]);
         expect(mockFlow).toHaveBeenCalled();
         expect(result).toBe(toneBlocksAPI.ENDFLOWCOMMAND);
+    });
+
+    test("nested setInstrument calls get their own block number", async () => {
+        let blockNo = 0;
+        const savedMusicBlocks = global.MusicBlocks;
+        global.MusicBlocks = {
+            get BLK() {
+                return "B" + blockNo++;
+            }
+        };
+        JSInterface.validateArgs.mockImplementation((_name, args) => args);
+
+        await toneBlocksAPI.setInstrument("piano", async () => {
+            await toneBlocksAPI.setInstrument("piano", async () => {});
+        });
+
+        expect(toneBlocksAPI.runCommand.mock.calls).toEqual([
+            ["setTimbre", ["piano", 1, "B0"]],
+            ["setTimbre", ["piano", 1, "B1"]]
+        ]);
+        global.MusicBlocks = savedMusicBlocks;
+        JSInterface.validateArgs.mockReset();
     });
 
     test("doVibrato calls runCommand with validated arguments", async () => {

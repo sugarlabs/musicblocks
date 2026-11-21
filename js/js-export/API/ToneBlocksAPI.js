@@ -35,7 +35,7 @@ class ToneBlocksAPI {
      */
     async setInstrument(instrument, flow) {
         const args = JSInterface.validateArgs("setInstrument", [instrument, flow]);
-        await this.runCommand("setTimbre", [args[0], this.turIndex]);
+        await this.runCommand("setTimbre", [args[0], this.turIndex, MusicBlocks.BLK]);
         await args[1]();
         return this.ENDFLOWCOMMAND;
     }
