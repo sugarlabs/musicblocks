@@ -226,6 +226,37 @@ describe("download", () => {
         expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:mock-svg");
     });
 
+    it.each([
+        ["empty", ""],
+        ["only spaces", "   "]
+    ])("should not download when the filename entered is %s", (_label, name) => {
+        global.URL.revokeObjectURL = jest.fn();
+        window.prompt = jest.fn(() => name);
+        instance.download("html", "blob:mock-html", null);
+        expect(mockDownloadURL).not.toHaveBeenCalled();
+        expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:mock-html");
+    });
+
+    it.each([
+        ["empty", ""],
+        ["only spaces", "   "]
+    ])("should not download when the export passes a filename that is %s", (_label, name) => {
+        global.URL.revokeObjectURL = jest.fn();
+        instance.download("ly", "blob:mock-ly", name);
+        expect(mockDownloadURL).not.toHaveBeenCalled();
+        expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:mock-ly");
+    });
+
+    it("should not download when the MBDialog filename is left empty", async () => {
+        global.URL.revokeObjectURL = jest.fn();
+        let entered;
+        window.MBDialog = { prompt: jest.fn(() => (entered = Promise.resolve(""))) };
+        instance.download("html", "blob:mock-html", null);
+        await entered;
+        expect(mockDownloadURL).not.toHaveBeenCalled();
+        expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:mock-html");
+    });
+
     it("should handle empty extension gracefully", () => {
         const other = new SaveInterface({
             PlanetInterface: { getCurrentProjectName: () => "Test" }
