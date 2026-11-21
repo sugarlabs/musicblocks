@@ -129,6 +129,16 @@ describe("JSInterface", () => {
             expect(JSInterface.getGetterName("heapLength")).toBe("HEAPLENGTH");
         });
 
+        it.each([
+            ["toppos", "TOPPOS"],
+            ["leftpos", "LEFTPOS"],
+            ["rightpos", "RIGHTPOS"],
+            ["width", "WIDTH"],
+            ["height", "HEIGHT"]
+        ])("maps %s to the %s screen getter", (block, getter) => {
+            expect(JSInterface.getGetterName(block)).toBe(getter);
+        });
+
         it("should return null when no getter exists for the given block", () => {
             expect(JSInterface.getGetterName("pickup")).toBeNull();
         });
