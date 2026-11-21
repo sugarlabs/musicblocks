@@ -276,6 +276,7 @@ class PlanetInterface {
          * @param {Object} [options] - Save behavior options.
          * @param {boolean} [options.rejectOnProjectSaveError=false] - Reject when project data cannot be saved.
          * @param {boolean} [options.forceThumbnail=false] - Rebuild the thumbnail even if it is still fresh.
+         * @param {boolean} [options.reportSaveErrors=true] - Report failures unless the caller handles recovery.
          * @returns {Promise|boolean} False if project data could not be saved.
          */
         this.saveLocally = (options = {}) => {
@@ -334,15 +335,20 @@ class PlanetInterface {
                 e?.code === DOMException.QUOTA_EXCEEDED_ERR ||
                 e?.message === "Not enough space to save locally";
             const reportSaveError = e => {
+                if (!isQuotaError(e)) console.error(e);
+                if (options.reportSaveErrors === false) return false;
                 if (isQuotaError(e)) {
                     this.activity.textMsg(
                         _(
-                            "Error: Unable to save because you ran out of local storage. Try deleting some saved projects."
+                            "Unable to save because local storage is full. Try deleting some saved projects. Retry saving or export a Music Blocks project to keep your work."
                         )
                     );
                 } else {
-                    console.error(e);
-                    this.activity.textMsg(_("Could not save your project."));
+                    this.activity.textMsg(
+                        _(
+                            "Could not save your project. Retry saving or export a Music Blocks project to keep your work."
+                        )
+                    );
                 }
                 return false;
             };
