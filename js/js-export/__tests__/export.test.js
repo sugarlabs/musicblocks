@@ -103,6 +103,9 @@ global.Turtle = {
     }
 };
 
+const { isUnsafeObjectKey } = jest.requireActual("../../utils/utils-logic");
+global.isUnsafeObjectKey = isUnsafeObjectKey;
+
 describe("Mouse Class", () => {
     let mouse;
     const mockFlow = jest.fn();
@@ -139,6 +142,50 @@ describe("Mouse Class", () => {
         mouse.run();
         expect(mouse.turtle.doWait).toHaveBeenCalledWith(0);
         expect(mockFlow).toHaveBeenCalledWith(mouse.MB);
+    });
+});
+
+describe("MusicBlocks box methods", () => {
+    let musicBlocks;
+
+    beforeEach(() => {
+        globalActivity.turtles.getTurtleCount.mockReturnValue(1);
+        globalActivity.turtles.getTurtle.mockReturnValue({
+            id: 1,
+            initTurtle: jest.fn(),
+            doWait: jest.fn(),
+            container: { x: 10, y: 20 }
+        });
+        globalActivity.turtles.getIndexOfTurtle.mockReturnValue(0);
+        globalActivity.logo.boxes = {};
+        JSEditor.logConsole.mockClear();
+        const mouse = new Mouse(jest.fn());
+        musicBlocks = new MusicBlocks(mouse);
+    });
+
+    test("setBox stores a value under an ordinary name and getBox reads it back", () => {
+        musicBlocks.setBox("mybox", 42);
+        expect(Object.prototype.hasOwnProperty.call(globalActivity.logo.boxes, "mybox")).toBe(true);
+        expect(musicBlocks.getBox("mybox")).toBe(42);
+    });
+
+    test("setBox refuses __proto__ and does not touch the prototype", () => {
+        musicBlocks.setBox("__proto__", { polluted: true });
+        const boxes = globalActivity.logo.boxes;
+        expect(Object.prototype.hasOwnProperty.call(boxes, "__proto__")).toBe(false);
+        expect(Object.getPrototypeOf(boxes)).toBe(Object.prototype);
+        expect("polluted" in boxes).toBe(false);
+        expect(JSEditor.logConsole).toHaveBeenCalledWith("The box name is reserved.", "maroon");
+        expect(musicBlocks.getBox("__proto__")).toBe(0);
+    });
+
+    test("setBox refuses constructor and prototype", () => {
+        musicBlocks.setBox("constructor", { polluted: true });
+        musicBlocks.setBox("prototype", { polluted: true });
+        const boxes = globalActivity.logo.boxes;
+        expect(Object.prototype.hasOwnProperty.call(boxes, "constructor")).toBe(false);
+        expect(Object.prototype.hasOwnProperty.call(boxes, "prototype")).toBe(false);
+        expect(boxes.constructor).toBe(Object);
     });
 });
 

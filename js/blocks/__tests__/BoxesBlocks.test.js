@@ -21,6 +21,9 @@
  */
 
 const { setupBoxesBlocks } = require("../BoxesBlocks");
+const { isUnsafeObjectKey } = jest.requireActual("../../utils/utils-logic");
+
+global.isUnsafeObjectKey = isUnsafeObjectKey;
 
 let createdBlocks = {};
 
@@ -487,6 +490,88 @@ describe("setupBoxesBlocks", () => {
                 testBlk,
                 "missingKey"
             );
+        });
+    });
+
+    describe("prototype-inherited box names", () => {
+        test("BoxBlock.arg returns 0 + error for 'toString' when no such box exists", () => {
+            const boxBlock = createdBlocks["box"];
+            const testBlk = 130;
+            activity.blocks.blockList[testBlk] = { connections: [null, 300] };
+            activity.blocks.blockList[300] = { value: "toString" };
+            const result = boxBlock.arg(logo, "turtle0", testBlk, "toString");
+            expect(activity.errorMsg).toHaveBeenCalledWith("No box error", testBlk, "toString");
+            expect(result).toBe(0);
+        });
+
+        test("BoxBlock.updateParameter returns 0 + error for '__proto__'", () => {
+            const boxBlock = createdBlocks["box"];
+            const testBlk = 130;
+            activity.blocks.blockList[testBlk] = { connections: [null, 300] };
+            activity.blocks.blockList[300] = { value: "__proto__" };
+            logo.receivedArg = "__proto__";
+            const result = boxBlock.updateParameter(logo, "turtle0", testBlk);
+            expect(activity.errorMsg).toHaveBeenCalledWith("No box error", testBlk, "__proto__");
+            expect(result).toBe(0);
+        });
+
+        test("BoxBlock.setter errors for '__proto__' instead of writing it", () => {
+            const boxBlock = createdBlocks["box"];
+            const testBlk = 130;
+            activity.blocks.blockList[testBlk] = { connections: [null, 300] };
+            activity.blocks.blockList[300] = { value: "__proto__" };
+            logo.receivedArg = "__proto__";
+            boxBlock.setter(logo, { polluted: 1 }, "turtle0", testBlk);
+            expect(activity.errorMsg).toHaveBeenCalledWith("No box error", testBlk, "__proto__");
+            expect("polluted" in logo.boxes).toBe(false);
+            expect(Object.getPrototypeOf(logo.boxes)).toBe(Object.prototype);
+        });
+
+        test("NamedBoxBlock.arg returns 0 + error for 'constructor'", () => {
+            const namedBoxBlock = createdBlocks["namedbox"];
+            const testBlk = 140;
+            activity.blocks.blockList[testBlk] = { privateData: "constructor", connections: [] };
+            const result = namedBoxBlock.arg(logo, "turtle0", testBlk);
+            expect(activity.errorMsg).toHaveBeenCalledWith("No box error", testBlk, "constructor");
+            expect(result).toBe(0);
+        });
+
+        test("StoreInBlock.flow rejects '__proto__' and stores nothing", () => {
+            const storeInBlock = createdBlocks["storein"];
+            storeInBlock.flow(["__proto__", { polluted: 1 }], logo);
+            expect(activity.errorMsg).toHaveBeenCalledWith("The box name is reserved.");
+            expect("polluted" in logo.boxes).toBe(false);
+            expect(logo.boxes["polluted"]).toBeUndefined();
+            expect(Object.prototype.hasOwnProperty.call(logo.boxes, "__proto__")).toBe(false);
+        });
+
+        test("StoreInBlock.flow rejects 'constructor' and 'prototype' too", () => {
+            const storeInBlock = createdBlocks["storein"];
+            storeInBlock.flow(["constructor", 1], logo);
+            storeInBlock.flow(["prototype", 2], logo);
+            expect(activity.errorMsg).toHaveBeenCalledTimes(2);
+            expect(Object.keys(logo.boxes).length).toBe(0);
+        });
+
+        test("StoreIn2Block.flow rejects '__proto__' and leaves the prototype alone", () => {
+            const storeIn2Block = createdBlocks["storein2"];
+            const testBlk = 150;
+            activity.blocks.blockList[testBlk] = { privateData: "__proto__" };
+            storeIn2Block.flow([{ polluted: 1 }], logo, "turtle0", testBlk);
+            expect(activity.errorMsg).toHaveBeenCalledWith("The box name is reserved.", testBlk);
+            expect("polluted" in logo.boxes).toBe(false);
+            expect(Object.getPrototypeOf(logo.boxes)).toBe(Object.prototype);
+        });
+
+        test("IncrementBlock does not take the inherited-value branch for 'toString'", () => {
+            const incrementBlock = createdBlocks["increment"];
+            const testBlk = 100;
+            activity.blocks.blockList[testBlk] = { connections: [null, 200] };
+            activity.blocks.blockList[200] = { name: "text", value: "toString" };
+            activity.blocks.blockSetter = jest.fn();
+            incrementBlock.flow([10, 2], logo, "turtle0", testBlk);
+            expect(activity.blocks.blockSetter).toHaveBeenCalledWith(logo, 200, 12, "turtle0");
+            expect(Object.prototype.hasOwnProperty.call(logo.boxes, "toString")).toBe(false);
         });
     });
 
