@@ -42,33 +42,84 @@ app.use(
     })
 );
 
-// --- Security: Block access to sensitive project files ---
-// express.static(__dirname) serves the entire project root, which exposes
-// server config, dependency info, and build files. This middleware intercepts
-// requests for known-sensitive files and returns 403 before they reach
-// the static file handler.
-const SENSITIVE_PATTERNS = [
-    /^\/package\.json$/i,
-    /^\/package-lock\.json$/i,
-    /^\/index\.js$/i,
-    /^\/dockerfile$/i,
-    /^\/jest\.config\.js$/i,
-    /^\/eslint\.config\.mjs$/i,
-    /^\/cypress\.config\.js$/i,
-    /^\/gulpfile\.(js|mjs)$/i,
-    /^\/setup\.py$/i,
-    /^\/convert_po_to_json\.py$/i,
-    /^\/\.github\//i,
-    /^\/node_modules\//i,
-    /^\/cypress\//i,
-    /^\/scripts\//i
-];
+// --- Security: Enforce strict allowlist for static file serving ---
+// Serving the repository root via express.static can expose server config,
+// build scripts, internal testing directories, and tooling configurations.
+// To prevent information disclosure and encoded path traversal bypasses,
+// validate, decode, and normalize the request path against an explicit allowlist.
+const ALLOWED_ROOT_FILES = new Set([
+    "",
+    "index.html",
+    "favicon.ico",
+    "manifest.json",
+    "manifest.webapp",
+    "android_chrome_manifest.json",
+    "config.xml",
+    "sw.js",
+    "Minsky.jpg",
+    "loading-animation.mp4",
+    "loading-animation.webm",
+    "loading-animation-ja.png"
+]);
+
+const ALLOWED_TOP_LEVEL_DIRS = new Set([
+    "activity",
+    "bower_components",
+    "css",
+    "dist",
+    "Docs",
+    "examples",
+    "fonts",
+    "header-icons",
+    "images",
+    "js",
+    "lessonPlan",
+    "lib",
+    "lilypond",
+    "locales",
+    "mouse-art",
+    "planet",
+    "plugins",
+    "po",
+    "screenshots",
+    "sounds",
+    "staff",
+    "TurtleDocs",
+    "usermanual",
+    "videos",
+    ".well-known"
+]);
 
 app.use((req, res, next) => {
-    if (SENSITIVE_PATTERNS.some(pattern => pattern.test(req.path))) {
+    let decodedPath;
+    try {
+        decodedPath = decodeURIComponent(req.path);
+    } catch {
+        return res.status(400).send("Bad Request");
+    }
+
+    if (decodedPath.includes("\0")) {
+        return res.status(400).send("Bad Request");
+    }
+
+    const normalizedPath = path.posix.normalize(decodedPath);
+    if (normalizedPath.startsWith("../") || normalizedPath === "..") {
         return res.status(403).send("Forbidden");
     }
-    next();
+
+    const relativePath = normalizedPath.replace(/^\/+/, "");
+    const segments = relativePath.split("/");
+    const topSegment = segments[0];
+
+    if (segments.length === 1 && ALLOWED_ROOT_FILES.has(topSegment)) {
+        return next();
+    }
+
+    if (ALLOWED_TOP_LEVEL_DIRS.has(topSegment)) {
+        return next();
+    }
+
+    return res.status(403).send("Forbidden");
 });
 
 // Environment-aware static file serving
