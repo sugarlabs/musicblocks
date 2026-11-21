@@ -48,8 +48,12 @@ jobs:
                   node-version: "22"
                   cache: "npm"
 
+            # --ignore-scripts: this job only needs commitlint, which is pure
+            # JS. Skipping lifecycle scripts avoids running install hooks from
+            # a fork PR's dependency tree, and skips the Electron and Cypress
+            # binary downloads, which are pure waste here.
             - name: Install dependencies
-              run: npm ci
+              run: npm ci --ignore-scripts
 
             - name: Lint PR commits
               if: github.event_name == 'pull_request'
