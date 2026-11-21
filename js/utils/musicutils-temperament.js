@@ -801,7 +801,7 @@ var TEMPERAMENT = {
             3 / 2,
             8 / 5,
             5 / 3,
-            9 / 5,
+            16 / 9,
             15 / 8
         ],
         "octaveRatio": 2,
