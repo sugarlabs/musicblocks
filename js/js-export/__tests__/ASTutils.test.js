@@ -615,6 +615,38 @@ describe("ASTUtils", () => {
                 arguments: ASTUtils._getArgsAST(args)
             });
         });
+
+        it("should return the AST for pi constant expression", () => {
+            const result = ASTUtils._getArgExpAST("pi");
+            expect(result).toEqual({
+                type: "MemberExpression",
+                object: {
+                    type: "Identifier",
+                    name: "Math"
+                },
+                property: {
+                    type: "Identifier",
+                    name: "PI"
+                },
+                computed: false
+            });
+        });
+
+        it("should return the AST for e constant expression", () => {
+            const result = ASTUtils._getArgExpAST("e");
+            expect(result).toEqual({
+                type: "MemberExpression",
+                object: {
+                    type: "Identifier",
+                    name: "Math"
+                },
+                property: {
+                    type: "Identifier",
+                    name: "E"
+                },
+                computed: false
+            });
+        });
     });
 
     describe("_getArgsAST", () => {
