@@ -20,7 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const { setupBoxesBlocks } = require("../BoxesBlocks");
+const { setupBoxesBlocks, normalizeBoxName } = require("../BoxesBlocks");
 
 let createdBlocks = {};
 
@@ -487,6 +487,84 @@ describe("setupBoxesBlocks", () => {
                 testBlk,
                 "missingKey"
             );
+        });
+    });
+
+    describe("box name whitespace", () => {
+        test("normalizeBoxName trims surrounding whitespace and keeps internal spaces", () => {
+            expect(normalizeBoxName("myBox")).toBe("myBox");
+            expect(normalizeBoxName(" myBox")).toBe("myBox");
+            expect(normalizeBoxName("myBox ")).toBe("myBox");
+            expect(normalizeBoxName("  my box  ")).toBe("my box");
+            expect(normalizeBoxName("   ")).toBe("   ");
+            expect(normalizeBoxName(4)).toBe(4);
+            expect(normalizeBoxName(null)).toBeNull();
+        });
+
+        test("store and retrieve treat spaced names as the same box", () => {
+            const storeInBlock = createdBlocks["storein"];
+            const storeIn2Block = createdBlocks["storein2"];
+            const boxBlock = createdBlocks["box"];
+            const namedBoxBlock = createdBlocks["namedbox"];
+            const incrementBlock = createdBlocks["increment"];
+
+            storeInBlock.flow([" myBox", 5], logo);
+            expect(logo.boxes["myBox"]).toBe(5);
+            expect(logo.boxes[" myBox"]).toBeUndefined();
+
+            activity.blocks.blockList[130] = { connections: [null, 300] };
+            logo.receivedArg = "myBox ";
+            expect(boxBlock.arg(logo, "turtle0", 130, "myBox ")).toBe(5);
+
+            logo.receivedArg = " myBox";
+            boxBlock.setter(logo, 9, "turtle0", 130);
+            expect(logo.boxes["myBox"]).toBe(9);
+
+            activity.blocks.blockList[150] = { privateData: " myBox " };
+            storeIn2Block.flow([11], logo, "turtle0", 150);
+            expect(logo.boxes["myBox"]).toBe(11);
+            expect(Object.keys(logo.boxes)).toEqual(["myBox"]);
+
+            activity.blocks.blockList[140] = { privateData: " myBox", connections: [] };
+            expect(namedBoxBlock.arg(logo, "turtle0", 140)).toBe(11);
+            expect(namedBoxBlock.updateParameter(logo, "turtle0", 140)).toBe(11);
+
+            namedBoxBlock.setter(logo, 15, "turtle0", 140);
+            expect(logo.boxes["myBox"]).toBe(15);
+
+            activity.blocks.blockList[100] = { connections: [null, 200] };
+            activity.blocks.blockList[200] = { name: "text", value: " myBox" };
+            incrementBlock.flow([15, 2], logo, "turtle0", 100);
+            expect(logo.boxes["myBox"]).toBe(17);
+        });
+
+        test("a missing spaced name reports the trimmed box", () => {
+            const boxBlock = createdBlocks["box"];
+            activity.blocks.blockList[130] = { connections: [null, 300] };
+            logo.receivedArg = " missing ";
+            expect(boxBlock.arg(logo, "turtle0", 130, " missing ")).toBe(0);
+            expect(activity.errorMsg).toHaveBeenCalledWith("No box error", 130, "missing");
+        });
+
+        test("keeps an all-whitespace name and a numeric name distinct", () => {
+            const storeInBlock = createdBlocks["storein"];
+            storeInBlock.flow(["   ", 1], logo);
+            storeInBlock.flow(["my box", 2], logo);
+            storeInBlock.flow([4, 3], logo);
+            expect(logo.boxes["   "]).toBe(1);
+            expect(logo.boxes["my box"]).toBe(2);
+            expect(logo.boxes[4]).toBe(3);
+            expect(logo.boxes[""]).toBeUndefined();
+        });
+
+        test("an unchanged name still stores and reads back", () => {
+            const storeInBlock = createdBlocks["storein"];
+            const boxBlock = createdBlocks["box"];
+            storeInBlock.flow(["myBox", 555], logo);
+            activity.blocks.blockList[130] = { connections: [null, 300] };
+            logo.receivedArg = "myBox";
+            expect(boxBlock.arg(logo, "turtle0", 130, "myBox")).toBe(555);
+            expect(logo.boxes["myBox"]).toBe(555);
         });
     });
 

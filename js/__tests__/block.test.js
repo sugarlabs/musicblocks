@@ -2843,6 +2843,98 @@ describe("Block Foundation", () => {
             expect(block.text.text).toBe("this is a...");
         });
 
+        it("trims a store-in name when the edit is committed", () => {
+            global.getTextWidth.mockReturnValue(10);
+            global.docById.mockReturnValue({ style: {} });
+            block.blocks = mockBlocksForRename;
+            block.name = "text";
+            block.blockIndex = 2;
+            block.value = "box";
+            block._capturedInitialValue = "box";
+            block.label = { value: " myBox ", style: {} };
+            block.labelattr = null;
+            block.connections = [1];
+            block.text = { text: "box" };
+            block.container = { setChildIndex: jest.fn(), children: { length: 1 } };
+            block.updateCache = jest.fn();
+            mockBlocksForRename.blockList[1] = {
+                name: "storein",
+                connections: [null, 2, null, null]
+            };
+            mockBlocksForRename.newStorein2Block = jest.fn();
+            mockBlocksForRename.newNamedboxBlock = jest.fn();
+            mockBlocksForRename.renameBoxes = jest.fn();
+            mockBlocksForRename.renameNamedboxes = jest.fn();
+            mockBlocksForRename.renameStoreinBoxes = jest.fn();
+            mockBlocksForRename.renameStorein2Boxes = jest.fn();
+            mockBlocksForRename.palettes = {
+                hide: jest.fn(),
+                show: jest.fn(),
+                updatePalettes: jest.fn()
+            };
+
+            block._labelChanged(true, true);
+
+            expect(block.value).toBe("myBox");
+            expect(block.label.value).toBe("myBox");
+            expect(mockBlocksForRename.newStorein2Block).toHaveBeenCalledWith("myBox");
+            expect(mockBlocksForRename.newNamedboxBlock).toHaveBeenCalledWith("myBox");
+        });
+
+        it("trims a box name on blur after it was updated while typing", () => {
+            global.getTextWidth.mockReturnValue(10);
+            global.docById.mockReturnValue({ style: {} });
+            block.blocks = mockBlocksForRename;
+            block.name = "text";
+            block.blockIndex = 2;
+            block.value = "myBox";
+            block._capturedInitialValue = "myBox";
+            block.label = { value: "myBox ", style: {} };
+            block.labelattr = null;
+            block.connections = [1];
+            block.text = { text: "myBox" };
+            block.container = { setChildIndex: jest.fn(), children: { length: 1 } };
+            block.updateCache = jest.fn();
+            mockBlocksForRename.blockList[1] = {
+                name: "box",
+                connections: [null, 2]
+            };
+
+            block._labelChanged(false, true);
+            expect(block.value).toBe("myBox ");
+            expect(block.label.value).toBe("myBox ");
+
+            block._labelChanged(true, true);
+
+            expect(block.value).toBe("myBox");
+            expect(block.label.value).toBe("myBox");
+            expect(block.text.text).toBe("myBox");
+        });
+
+        it("leaves a store-in name untrimmed while the user is still typing", () => {
+            global.getTextWidth.mockReturnValue(10);
+            block.blocks = mockBlocksForRename;
+            block.name = "text";
+            block.blockIndex = 2;
+            block.value = "my";
+            block._capturedInitialValue = "my";
+            block.label = { value: "my ", style: {} };
+            block.labelattr = null;
+            block.connections = [1];
+            block.text = { text: "my" };
+            block.container = { setChildIndex: jest.fn(), children: { length: 1 } };
+            block.updateCache = jest.fn();
+            mockBlocksForRename.blockList[1] = {
+                name: "storein",
+                connections: [null, 2, null, null]
+            };
+
+            block._labelChanged(false, true);
+
+            expect(block.label.value).toBe("my ");
+            expect(block.value).toBe("my ");
+        });
+
         it("_labelChanged storein/action wideLabel truncation", () => {
             global.getTextWidth.mockReturnValue(500); // Forces > TEXTWIDTH
             block.name = "storein";
