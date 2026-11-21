@@ -4929,12 +4929,26 @@ describe("getNote: movable Do outside 12 EDO", () => {
             ["equal31", 31],
             ["1/4 comma meantone", 21]
         ]) {
-            for (const key of ["G major", "D major", "E♭ major", "A major"]) {
+            for (const key of [
+                "G major",
+                "D major",
+                "E♭ major",
+                "A major",
+                "B♯ major",
+                "F♭ major"
+            ]) {
                 expect(syllables.map(s => movable(s, key, temperament))).toEqual(
                     buildScale(key, edo)[0].slice(0, 7)
                 );
             }
         }
+    });
+
+    it("plays F♭ major's degrees in 19 EDO, where F♭ is E♯ and not E", () => {
+        // 19 EDO has no double flats, so F♭ major is spelled E♯ G♭ A♭ A♯ B♯ D♭ E♭.
+        expect(movable("do", "F♭ major", "equal19")).toBe("E♯");
+        expect(movable("mi", "F♭ major", "equal19")).toBe("A♭");
+        expect(movable("ti", "F♭ major", "equal19")).toBe("E♭");
     });
 
     it("leaves 12 EDO alone", () => {

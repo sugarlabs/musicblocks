@@ -1091,11 +1091,11 @@ var getNoteFromSolfege = (
                       : null;
             const scale = buildScaleFn ? buildScaleFn(keySignature, octaveLength)[0] : [];
             const degree = SOLFEGENAMES.indexOf(solfegePart);
-            // Only a scale spelled with seven different letters names its degrees
-            // (21-EDO C major still comes out C D E♭ E♯ G♭ A B, see #10407).
-            const lettered =
-                scale.length === 8 && new Set(scale.slice(0, 7).map(name => name[0])).size === 7;
-            if (lettered && degree !== -1) {
+            // Any seven-note scale names its degrees, even when an EDO without double
+            // sharps spells one with a letter twice: E♯ major in 19 EDO is E♯ G♭ A♭ A♯ B♯
+            // D♭ E♭ (F𝄪 is G♭ there), and the 12-EDO fallback, F G A A♯ C D E, is
+            // another set of pitches.
+            if (scale.length === 8 && degree !== -1) {
                 const name = scale[degree];
                 // B♯ and C♭ are spelled across the C where octaves change.
                 if (name[0] === "B" && note[0] === "C") {
