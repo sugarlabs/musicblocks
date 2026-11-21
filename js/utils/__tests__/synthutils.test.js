@@ -3759,6 +3759,129 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             });
         });
 
+        test("singing requires prepared Kokoro audio instead of silently using a synth", () => {
+            expect(() => synth.___createSynth("turtle0", "sing:la", "sing:la", null)).toThrow(
+                "Prepare the singing voice"
+            );
+        });
+
+        test("prepares each syllable once and preserves errors for retry", async () => {
+            const renderSyllable = jest.fn().mockResolvedValue({ samples: [1], rate: 24000 });
+            global.KokoroSpeech = jest.fn(() => ({ renderSyllable }));
+            try {
+                await synth.prepareSinging(["la", "la", "ah"]);
+                await synth.prepareSinging(["la"]);
+                expect(renderSyllable.mock.calls.map(call => call[0])).toEqual(["la", "ah"]);
+                renderSyllable.mockRejectedValueOnce(new Error("offline"));
+                await expect(synth.prepareSinging(["oh"])).rejects.toThrow("offline");
+                expect(synth.singingSamples.has("oh")).toBe(false);
+                await synth.prepareSinging(["oh"]);
+                expect(synth.singingSamples.has("oh")).toBe(true);
+                expect(KokoroSpeech).toHaveBeenCalledTimes(1);
+                const needed = Array.from({ length: 32 }, (_, i) => "la" + i);
+                for (const text of needed) synth.singingSamples.set(text, {});
+                needed[31] = "new";
+                await synth.prepareSinging(needed);
+                expect([...synth.singingSamples.keys()].sort()).toEqual(needed.sort());
+            } finally {
+                delete global.KokoroSpeech;
+            }
+        });
+
+        test.each([
+            [Array.from({ length: 33 }, (_, i) => "la" + i)],
+            [["x".repeat(41)]],
+            [[""]],
+            [["   "]],
+            [[12]],
+            [[null]]
+        ])("rejects invalid singing inputs without changing prepared samples: %j", async texts => {
+            const source = {};
+            synth.singingSamples.set("la", source);
+            await expect(synth.prepareSinging(texts)).rejects.toThrow(
+                "Use at most 32 singing syllables of 1-40 characters each."
+            );
+            expect([...synth.singingSamples]).toEqual([["la", source]]);
+        });
+
+        test("accepts exactly 32 syllables and a 40-character syllable", async () => {
+            const texts = ["x".repeat(40), ...Array.from({ length: 31 }, (_, i) => "la" + i)];
+            const renderSyllable = jest.fn().mockResolvedValue({ samples: [1], rate: 24000 });
+            global.KokoroSpeech = jest.fn(() => ({ renderSyllable }));
+            try {
+                await synth.prepareSinging(texts);
+                expect([...synth.singingSamples.keys()]).toEqual(texts);
+                expect(renderSyllable).toHaveBeenCalledTimes(32);
+            } finally {
+                delete global.KokoroSpeech;
+            }
+        });
+
+        test.each([false, true])(
+            "stops preparing later syllables after cancellation (failure: %s)",
+            async fails => {
+                let finish;
+                const renderSyllable = jest.fn(
+                    () =>
+                        new Promise((resolve, reject) => {
+                            finish = () =>
+                                fails
+                                    ? reject(new Error("offline"))
+                                    : resolve({ samples: [1], rate: 24000 });
+                        })
+                );
+                global.KokoroSpeech = jest.fn(() => ({ renderSyllable }));
+                try {
+                    let cancelled = false;
+                    const preparing = synth.prepareSinging(
+                        ["la", "ah"],
+                        undefined,
+                        () => cancelled
+                    );
+                    cancelled = true;
+                    finish();
+                    await expect(preparing).resolves.toBeUndefined();
+                    expect(renderSyllable).toHaveBeenCalledTimes(1);
+                    expect(synth.singingSamples.has("ah")).toBe(false);
+                    const source = { samples: [2], rate: 24000 };
+                    renderSyllable.mockResolvedValue(source);
+                    await synth.prepareSinging(["oh"]);
+                    expect(synth.singingSamples.get("oh")).toBe(source);
+                    expect(KokoroSpeech).toHaveBeenCalledTimes(1);
+                } finally {
+                    delete global.KokoroSpeech;
+                }
+            }
+        );
+
+        test("reuses rendered notes and bounds their retained audio memory", () => {
+            const source = { samples: new Float32Array(1000), rate: 24000, period: 109 };
+            synth.singingSamples.set("la", source);
+            global.KokoroSpeech = { tuneSyllable: jest.fn(() => new Float32Array(400000)) };
+            const originalContext = Tone.getContext.getMockImplementation();
+            Tone.getContext.mockReturnValue({
+                createBuffer: jest.fn((channels, length) => ({
+                    getChannelData: () => new Float32Array(length)
+                }))
+            });
+            try {
+                const first = synth._getSingingBuffer("la", 220, 0.5);
+                expect(synth._getSingingBuffer("la", 220, 0.5)).toBe(first);
+                expect(KokoroSpeech.tuneSyllable).toHaveBeenCalledTimes(1);
+                const held = synth._getSingingBuffer("la", 220, 0.75);
+                expect(synth._getSingingBuffer("la", 220, 0.75 - 0.25 / source.rate)).not.toBe(
+                    held
+                );
+                for (let i = 0; i < 10; i++) synth._getSingingBuffer("la", 300 + i, 0.5);
+                expect(synth._singingBufferBytes).toBeLessThanOrEqual(8 * 1024 * 1024);
+                synth.singingSamples.set("la", { ...source });
+                expect(synth._getSingingBuffer("la", 220, 0.5)).not.toBe(first);
+            } finally {
+                delete global.KokoroSpeech;
+                Tone.getContext.mockImplementation(originalContext);
+            }
+        });
+
         test("_createCustomSynth handles amsynth, fmsynth, duosynth, and default", () => {
             ["amsynth", "fmsynth", "duosynth", "other"].forEach(type => {
                 const s = synth._createCustomSynth(type, {});

@@ -1,5 +1,58 @@
 # Using the Kokoro voice in Music Blocks
 
+## Experimental Sing block
+
+The **Sing** clamp in the **Tone** palette turns one Kokoro syllable into a
+pitched singing voice. Place ordinary **Note value** and **Pitch** blocks inside
+it. The text input must be a literal text block, for example `la`, `ah`, or `oh`.
+Use separate Sing clamps for different syllables. A newly dragged Sing block
+already contains a playable quarter note. Singing also works inside called
+actions, including recursive actions and actions triggered by beat or note events.
+
+Load `examples/kokoro-singing.tb` for a four-note `la` melody. Press **Run** and
+wait for the model and the project's Sing syllables to prepare before playback
+starts. This includes disconnected stacks that can be run dynamically. **Stop**
+also cancels playback that is waiting for preparation. Unlike Speak, Sing
+explicitly requests Kokoro and does not require `?kokoro=true`.
+An in-flight syllable render may finish after Stop, but no further syllables
+are started for that request. Retrying a failed syllable reuses the loaded model;
+a failed model download can be retried on the next Run.
+
+This is experimental speech-based resynthesis, not a trained singing model.
+Pitch-synchronous source grains retain the vowel's spectral shape over the
+normal vocal range, while a brief attack and release surround a sustained
+voiced region selected by periodicity and energy rather than a fixed position.
+Smooth cosine fades soften note boundaries. Very low notes below two-thirds of the source pitch still shift
+formants, and nearly sinusoidal sources use ordinary resampling. Whole phrases are not aligned
+to individual notes. Notes support 20–4000 Hz and durations up to 30 seconds;
+a project can prepare up to 32 distinct syllables, each at most 40 characters.
+Prepared syllables are cached locally across page reloads, keyed by model,
+precision, voice and text. A cache hit skips model loading and inference.
+Storage failures fall back to ordinary synthesis. The disk cache retains at
+most 32 entries, each no larger than 4 MiB. Rendered pitch/duration buffers
+are reused across Stop and replay. The replay cache holds up to 8 MiB or 64
+notes, and active samplers can retain buffers until playback stops.
+Changing a pitch or duration renders that variant once.
+
+Held notes of at least 0.75 seconds gain a subtle automatic vibrato: the pitch
+stays steady for the first 0.25 seconds, then eases over 0.4 seconds into a
+5.5 Hz variation of up to 20 cents in either direction. Shorter notes stay
+steady. This runs in the existing audio renderer, without extra model inference.
+
+The first uncached syllable still needs the model download and inference;
+playback waits for preparation rather than letting the music run ahead.
+Progress distinguishes model download from syllable preparation.
+
+Model loading failures are shown rather than silently replacing the singing
+voice with an oscillator. Preparation is skipped for notation and MIDI export.
+
+The browser regression tests in `cypress/e2e/singing.cy.js` cover playback,
+cached replay, reload without model inference, save serialization, Stop during
+preparation, and recovery from a synthesis failure. They stub the Kokoro model boundary so CI does not
+download weights; scheduling, audio processing, and the sampler remain real.
+
+## Speak block
+
 The Speak block can use Kokoro, a more natural sounding AI voice that runs in
 your browser. The normal browser speech voice is still the default, so Kokoro
 is completely optional.

@@ -123,8 +123,8 @@ class KokoroSpeech {
     _ensureEngine() {
         if (this._enginePromise === null) {
             this._enginePromise = (async () => {
-                const { KokoroTTS } = await this._loadVerifiedModule();
                 try {
+                    const { KokoroTTS } = await this._loadVerifiedModule();
                     return await KokoroTTS.from_pretrained(KokoroSpeech.MODEL_ID, {
                         dtype: KokoroSpeech.DTYPE,
                         device: "wasm",
@@ -132,6 +132,7 @@ class KokoroSpeech {
                     });
                 } catch (e) {
                     this._revokeAssetURLs();
+                    this._enginePromise = null;
                     throw e;
                 }
             })();
@@ -377,6 +378,270 @@ class KokoroSpeech {
             console.warn(`Speak block: could not load the Kokoro voice (${e.message}).`);
             return null;
         }
+    }
+
+    /** Render a syllable once; the singing instrument reuses its samples across notes. */
+    async renderSyllable(text) {
+        const cached = await this._readSyllableCache(text);
+        if (cached) return cached;
+        const engine = await this._ensureEngine();
+        const audio = await engine.generate(text, { voice: this._voice });
+        const source = KokoroSpeech.analyzeSyllable(audio);
+        await this._writeSyllableCache(text, source);
+        return source;
+    }
+
+    _syllableCacheKey(text) {
+        const identity = [KokoroSpeech.MODEL_ID, KokoroSpeech.DTYPE, this._voice, text];
+        return new URL(
+            "/_kokoro-singing/" + encodeURIComponent(JSON.stringify(identity)),
+            window.location.href
+        ).href;
+    }
+
+    async _readSyllableCache(text) {
+        try {
+            const cache = await globalThis.caches.open("musicblocks-kokoro-syllables-v1");
+            const response = await cache.match(this._syllableCacheKey(text));
+            if (!response) return null;
+            const bytes = await response.arrayBuffer();
+            if (
+                bytes.byteLength === 0 ||
+                bytes.byteLength > 4 * 1024 * 1024 ||
+                bytes.byteLength % 4
+            )
+                return null;
+            const rate = Number(response.headers.get("X-Sample-Rate"));
+            const period = Number(response.headers.get("X-Pitch-Period"));
+            const samples = new Float32Array(bytes);
+            if (
+                rate !== 24000 ||
+                !Number.isInteger(period) ||
+                period < rate / 500 ||
+                period > rate / 70 ||
+                samples.length < 2 * period ||
+                !samples.every(Number.isFinite)
+            )
+                return null;
+            return { samples, rate, period };
+        } catch {
+            // Storage may be unavailable or full; ordinary synthesis still works.
+            return null;
+        }
+    }
+
+    async _writeSyllableCache(text, source) {
+        try {
+            if (source.samples.byteLength > 4 * 1024 * 1024) return;
+            const cache = await globalThis.caches.open("musicblocks-kokoro-syllables-v1");
+            await cache.put(
+                this._syllableCacheKey(text),
+                new Response(source.samples, {
+                    headers: {
+                        "Content-Type": "application/octet-stream",
+                        "X-Sample-Rate": String(source.rate),
+                        "X-Pitch-Period": String(source.period)
+                    }
+                })
+            );
+            const keys = await cache.keys();
+            await Promise.all(
+                keys.slice(0, Math.max(0, keys.length - 32)).map(key => cache.delete(key))
+            );
+        } catch {
+            // This cache is an optimization, not a prerequisite for playback.
+        }
+    }
+
+    /** Trim silence and estimate a stable voiced period with normalized autocorrelation. */
+    static analyzeSyllable(audio) {
+        const samples = audio?.audio;
+        const rate = audio?.sampling_rate;
+        if (
+            !samples ||
+            !Number.isFinite(rate) ||
+            rate < 8000 ||
+            rate > 48000 ||
+            samples.length < rate / 20
+        ) {
+            throw new Error("Kokoro returned invalid singing audio.");
+        }
+        let peak = 0;
+        let center = 0;
+        for (let i = 0; i < samples.length; i++) {
+            if (!Number.isFinite(samples[i])) throw new Error("Invalid singing samples.");
+            if (Math.abs(samples[i]) > peak) {
+                peak = Math.abs(samples[i]);
+                center = i;
+            }
+        }
+        if (peak < 0.001) throw new Error("Kokoro returned silent singing audio.");
+        let start = 0;
+        let end = samples.length - 1;
+        while (Math.abs(samples[start]) < peak * 0.02) start++;
+        while (Math.abs(samples[end]) < peak * 0.02) end--;
+        const frame = Math.min(Math.floor(rate * 0.06), end - start);
+        const offset = Math.max(start, Math.min(center - Math.floor(frame / 2), end - frame));
+        const correlations = [];
+        let best = 0;
+        for (let lag = Math.floor(rate / 500); lag <= Math.floor(rate / 70); lag++) {
+            let cross = 0;
+            let left = 0;
+            let right = 0;
+            for (let i = 0; i < frame - lag; i++) {
+                const a = samples[offset + i];
+                const b = samples[offset + i + lag];
+                cross += a * b;
+                left += a * a;
+                right += b * b;
+            }
+            correlations[lag] = cross / Math.sqrt(left * right || 1);
+            best = Math.max(best, correlations[lag]);
+        }
+        let period = 0;
+        for (let lag = Math.floor(rate / 500) + 1; lag < correlations.length - 1; lag++) {
+            if (
+                correlations[lag] >= best * 0.9 &&
+                correlations[lag] > correlations[lag - 1] &&
+                correlations[lag] >= correlations[lag + 1]
+            ) {
+                period = lag;
+                break;
+            }
+        }
+        if (!period || best < 0.4)
+            throw new Error("No stable vowel found. Try a syllable like la or ah.");
+        return { samples: samples.slice(start, end + 1), rate, period };
+    }
+
+    /** Overlap source-period grains, sustaining the vowel without stretching its attack. */
+    static tuneSyllable(source, frequency, duration) {
+        if (
+            !Number.isFinite(frequency) ||
+            frequency < 20 ||
+            frequency > 4000 ||
+            !Number.isFinite(duration) ||
+            duration <= 0 ||
+            duration > 30
+        )
+            throw new Error(
+                "Singing notes must be between 20 and 4000 Hz and at most 30 seconds long."
+            );
+        const { samples, rate, period } = source;
+        const output = new Float32Array(Math.max(1, Math.round(rate * duration)));
+        const weights = new Float32Array(output.length);
+        const hop = rate / frequency;
+        const frameStart = Math.max(0, Math.floor(samples.length / 2 - period));
+        const frameLength = Math.min(2 * period, samples.length - frameStart);
+        let sine = 0;
+        let cosine = 0;
+        let energy = 0;
+        for (let i = 0; i < frameLength; i++) {
+            const sample = samples[frameStart + i];
+            sine += sample * Math.sin((2 * Math.PI * i) / period);
+            cosine += sample * Math.cos((2 * Math.PI * i) / period);
+            energy += sample * sample;
+        }
+        // A nearly sinusoidal source has no higher harmonics to preserve when pitching up.
+        const pureTone = (2 * (sine * sine + cosine * cosine)) / (frameLength * energy || 1) > 0.9;
+        // Preserve the source spectrum except below 2/3 of its original pitch.
+        const stretch = Math.max(1, hop / (1.5 * period));
+        const radius = pureTone ? hop : period * stretch;
+        const halfGrain = Math.ceil(radius);
+        const grainWindow = Float64Array.from(
+            { length: halfGrain * 2 },
+            (_, i) => 0.5 + 0.5 * Math.cos((Math.PI * (i - halfGrain)) / radius)
+        );
+        const marks = [];
+        for (let expected = period; expected < samples.length - period;) {
+            let mark = Math.round(expected);
+            for (
+                let i = Math.max(0, Math.ceil(expected - period * 0.2));
+                i <= Math.min(samples.length - 1, expected + period * 0.2);
+                i++
+            )
+                if (samples[i] > samples[mark]) mark = i;
+            marks.push(mark);
+            expected = mark + period;
+        }
+        const attack = Math.min(rate * 0.08, output.length * 0.2);
+        const release = Math.min(rate * 0.08, output.length * 0.2);
+        let sustainStart = Math.floor(marks.length * 0.4);
+        let sustainEnd = Math.floor(marks.length * 0.6);
+        let bestVoicing = 0;
+        // Avoid sustaining an unvoiced consonant or breath in the middle of a syllable.
+        for (let m = Math.floor(marks.length * 0.2); m < marks.length * 0.8; m++) {
+            const start = Math.max(0, marks[m] - 2 * period);
+            const end = Math.min(samples.length - period, marks[m] + 2 * period);
+            let cross = 0;
+            let left = 0;
+            let right = 0;
+            for (let i = start; i < end; i++) {
+                cross += samples[i] * samples[i + period];
+                left += samples[i] * samples[i];
+                right += samples[i + period] * samples[i + period];
+            }
+            const correlation = cross / Math.sqrt(left * right || 1);
+            const score = correlation * correlation * Math.sqrt(left);
+            if (correlation >= 0.6 && score > bestVoicing) {
+                bestVoicing = score;
+                sustainStart = Math.max(0, m - 2);
+                sustainEnd = Math.min(marks.length - 1, m + 2);
+            }
+        }
+        for (let target = 0; target < output.length + radius;) {
+            // Held notes ease into a 5.5 Hz, 20-cent vibrato; short notes stay steady.
+            const depth =
+                duration >= 0.75 ? 20 * Math.min(1, Math.max(0, (target / rate - 0.25) / 0.4)) : 0;
+            const pitchHop =
+                hop / 2 ** ((depth * Math.sin(2 * Math.PI * 5.5 * (target / rate - 0.25))) / 1200);
+            // Keep consonants brief; spend extra note time in the stable voiced region.
+            let position;
+            if (target < attack) position = (target / attack) * sustainStart;
+            else if (target > output.length - release)
+                position =
+                    sustainEnd +
+                    ((target - output.length + release) / release) *
+                        (marks.length - 1 - sustainEnd);
+            else
+                position =
+                    sustainStart +
+                    ((target - attack) / (output.length - attack - release)) *
+                        (sustainEnd - sustainStart);
+            const mark =
+                marks[Math.min(marks.length - 1, Math.max(0, Math.round(position)))] ?? period;
+            const center = Math.round(target);
+            for (let delta = -halfGrain; delta < radius; delta++) {
+                const index = center + delta;
+                const from =
+                    mark + (delta + center - target) * (pureTone ? period / pitchHop : 1 / stretch);
+                if (index < 0 || index >= output.length || from < 0 || from >= samples.length - 1)
+                    continue;
+                const weight = grainWindow[delta + halfGrain];
+                const base = Math.floor(from);
+                const sample = samples[base] + (samples[base + 1] - samples[base]) * (from - base);
+                output[index] += sample * weight;
+                weights[index] += weight;
+            }
+            target += pitchHop;
+        }
+        const fadeIn = Math.min(rate * 0.015, output.length / 2);
+        const fadeOut = Math.min(rate * 0.05, output.length / 2);
+        let peak = 0;
+        for (let i = 0; i < output.length; i++) {
+            output[i] =
+                (output[i] / Math.max(1, weights[i])) *
+                (0.5 -
+                    0.5 *
+                        Math.cos(
+                            Math.PI * Math.min(1, i / fadeIn, (output.length - 1 - i) / fadeOut)
+                        ));
+            peak = Math.max(peak, Math.abs(output[i]));
+        }
+        const gain = pureTone ? 1 : Math.min(3, Math.max(1, period / hop), 0.95 / (peak || 1));
+        for (let i = 0; i < output.length; i++) output[i] *= gain;
+        output[0] = output[output.length - 1] = 0;
+        return output;
     }
 
     /**
