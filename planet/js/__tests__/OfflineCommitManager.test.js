@@ -400,12 +400,12 @@ describe("OfflineCommitManager", () => {
                     repoName: "Offline-Song-abcdef12",
                     hashedKey: "real-secret-key-123"
                 },
-                "*"
+                window.location.origin
             );
 
             expect(window.parent.postMessage).toHaveBeenCalledWith(
                 { type: "MB_SYNC_COMPLETE", synced: 2 },
-                "*"
+                window.location.origin
             );
         });
 
@@ -442,7 +442,7 @@ describe("OfflineCommitManager", () => {
             expect(server.editProject).not.toHaveBeenCalled();
             expect(window.parent.postMessage).not.toHaveBeenCalledWith(
                 expect.objectContaining({ type: "MB_SYNC_COMPLETE" }),
-                "*"
+                window.location.origin
             );
         });
     });
