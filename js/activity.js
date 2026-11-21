@@ -2537,6 +2537,9 @@ class Activity {
 
             try {
                 obj = JSON.parse(cleanData);
+                if (!Array.isArray(obj)) {
+                    throw new TypeError("Pasted data is not a list of blocks.");
+                }
             } catch (e) {
                 this.errorMsg(
                     _(
