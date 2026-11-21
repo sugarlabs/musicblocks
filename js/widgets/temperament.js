@@ -27,7 +27,7 @@
     PREVIEWVOLUME, rationalToFraction, setOctaveRatio, SHARP, Singer,
     TuningFormats, updateTemperaments, frequencyToPitch, clampNumber,
     ManagedTimer, readTextFile, downloadTextFile, createSharePopup,
-    closeSharePopup, stripMicrotonalPrefix
+    closeSharePopup, stripMicrotonalPrefix, announceToScreenReader
 */
 
 /* exported TemperamentWidget, deviationColor, deviationFrom12EDO, largestGapMid */
@@ -2215,6 +2215,7 @@ function TemperamentWidget() {
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
+        announceToScreenReader(_("Temperament opened"));
 
         widgetWindow.getWidgetBody().append(temperamentTableDiv);
         widgetWindow.getWidgetBody().style.height = "500px";
@@ -2244,6 +2245,7 @@ function TemperamentWidget() {
             TemperamentUI._removeWheelIfPresent("wheelDiv3", that.wheel);
             TemperamentUI._removeWheelIfPresent("wheelDiv4", that.wheel1);
 
+            announceToScreenReader(_("Temperament closed"));
             this.destroy();
         };
 

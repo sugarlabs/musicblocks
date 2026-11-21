@@ -31,6 +31,7 @@ global.makeKeyboardAccessible = require("../../utils/dom-helpers.js").makeKeyboa
 
 // --- 1. Global Mocks ---
 global._ = msg => msg;
+global.announceToScreenReader = jest.fn();
 global.platformColor = {
     selectorBackground: "#FFFFFF",
     selectorBackgroundHOVER: "#EEEEEE",
@@ -324,6 +325,15 @@ describe("ModeWidget", () => {
         };
 
         modeWidget = new ModeWidget(mockActivity);
+    });
+
+    test("announces Mode opened on construction and Mode closed on onclose", () => {
+        expect(announceToScreenReader).toHaveBeenCalledWith("Mode opened");
+        announceToScreenReader.mockClear();
+
+        modeWidget.widgetWindow.onclose();
+
+        expect(announceToScreenReader).toHaveBeenCalledWith("Mode closed");
     });
 
     test("should initialize pitch from natural key signature", () => {

@@ -22,6 +22,7 @@ global.LegoBricksColor = require("../LegoBricksColor");
 global.LegoBricksPlayback = require("../LegoBricksPlayback");
 global.LegoBricksVisualization = require("../LegoBricksVisualization");
 global.LegoWidget = require("../legobricks");
+global.announceToScreenReader = jest.fn();
 
 const LegoWidget = global.LegoWidget;
 const LegoBricksLayout = global.LegoBricksLayout;
@@ -111,6 +112,7 @@ describe("LegoBricksLayout", () => {
             expect(win.clear).toHaveBeenCalled();
             expect(win.show).toHaveBeenCalled();
             expect(widget.widgetWindow).toBe(win);
+            expect(announceToScreenReader).toHaveBeenCalledWith("LEGO Bricks opened");
         });
 
         test("closing releases the webcam, timers and drag listeners", () => {
@@ -129,6 +131,7 @@ describe("LegoBricksLayout", () => {
             expect(widget.webcamVideo).toBeNull();
             expect(widget.running).toBe(false);
             expect(win.destroy).toHaveBeenCalled();
+            expect(announceToScreenReader).toHaveBeenCalledWith("LEGO Bricks closed");
         });
 
         test("closing removes the hidden file input and cancels the scan frame", () => {
