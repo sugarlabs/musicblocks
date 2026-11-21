@@ -182,4 +182,171 @@ describe("MusicKeyboardEditing", () => {
             ]);
         });
     });
+
+    describe("dividing recorded notes", () => {
+        test("keeps later columns editable after repeated division", () => {
+            const keyboard = makeKeyboard();
+            keyboard._notesPlayed = [
+                { startTime: 1000, duration: 0.375, noteOctave: "C4" },
+                { startTime: 1100, duration: 0.125, noteOctave: "D4" },
+                { startTime: 2000, duration: 0.125, noteOctave: "E4" }
+            ];
+
+            keyboard._divideNotes("1000", 2);
+            keyboard._divideNotes("1000", 2);
+
+            const laterNotes = keyboard._notesPlayed.filter(note => note.startTime > 1100);
+            for (const note of laterNotes) {
+                keyboard._updateDuration(String(note.startTime), [1, 4]);
+                expect(note.duration).toBe(0.25);
+            }
+            expect(laterNotes.map(note => note.startTime)).toEqual([1188, 1376, 2276]);
+            expect(keyboard._notesPlayed.every(note => Number.isInteger(note.startTime))).toBe(
+                true
+            );
+        });
+
+        test.each([
+            [true, 0.25, 0.125, [1000, 1125, 1250]],
+            [false, 0.125, 0.0625, [1000, 1062, 1125]]
+        ])(
+            "accepts the minimum note duration in beginner mode %s",
+            (beginnerMode, duration, minimumDuration, starts) => {
+                const keyboard = makeKeyboard({ beginnerMode });
+                keyboard._notesPlayed = [
+                    { startTime: 1000, duration, noteOctave: "C4" },
+                    { startTime: 1050, duration: 0.25, noteOctave: "D4" }
+                ];
+
+                keyboard._divideNotes("1000", 2);
+
+                expect(keyboard._notesPlayed.map(note => note.startTime)).toEqual(starts);
+                expect(keyboard._notesPlayed.slice(0, 2).map(note => note.duration)).toEqual([
+                    minimumDuration,
+                    minimumDuration
+                ]);
+            }
+        );
+
+        test("leaves an empty recording empty", () => {
+            const keyboard = makeKeyboard();
+            keyboard._notesPlayed = [];
+
+            keyboard._divideNotes("1000", 2);
+
+            expect(keyboard._notesPlayed).toEqual([]);
+            expect(keyboard._createTable).toHaveBeenCalled();
+        });
+
+        test("divides the last column without moving its subdivisions", () => {
+            const keyboard = makeKeyboard();
+            keyboard._notesPlayed = [{ startTime: 1000, duration: 0.375, noteOctave: "C4" }];
+
+            keyboard._divideNotes("1000", 2);
+
+            expect(keyboard._notesPlayed.map(note => [note.startTime, note.duration])).toEqual([
+                [1000, 0.1875],
+                [1187, 0.1875]
+            ]);
+            expect(keyboard._notesPlayed.every(note => Number.isFinite(note.startTime))).toBe(true);
+        });
+
+        test("keeps subdivisions before the next column after a duration edit", () => {
+            const keyboard = makeKeyboard();
+            keyboard._notesPlayed = [
+                { startTime: 1000, duration: 0.125, noteOctave: "C4" },
+                { startTime: 1234, duration: 0.125, noteOctave: "D4" }
+            ];
+
+            keyboard._updateDuration("1000", [1, 1]);
+            keyboard._divideNotes("1000", 2);
+
+            expect(
+                keyboard._notesPlayed
+                    .sort((a, b) => a.startTime - b.startTime)
+                    .map(note => [note.noteOctave, note.duration])
+            ).toEqual([
+                ["C4", 0.5],
+                ["C4", 0.5],
+                ["D4", 0.125]
+            ]);
+        });
+
+        test("keeps chords together and preserves the spacing of later columns", () => {
+            const keyboard = makeKeyboard();
+            keyboard._notesPlayed = [
+                { startTime: 1000, duration: 1, noteOctave: "C4", voice: "piano" },
+                { startTime: 1000, duration: 1, noteOctave: "E4", voice: "violin" },
+                { startTime: 1100, duration: 0.25, noteOctave: "D4" },
+                { startTime: 1100, duration: 0.25, noteOctave: "F4" },
+                { startTime: 1300, duration: 0.125, noteOctave: "R" }
+            ];
+
+            keyboard._divideNotes("1000", 2);
+
+            const notes = keyboard._notesPlayed.sort((a, b) => a.startTime - b.startTime);
+            expect(notes.map(note => note.noteOctave)).toEqual([
+                "C4",
+                "E4",
+                "C4",
+                "E4",
+                "D4",
+                "F4",
+                "R"
+            ]);
+            expect(notes[0].startTime).toBe(notes[1].startTime);
+            expect(notes[2].startTime).toBe(notes[3].startTime);
+            expect(notes[4].startTime).toBe(notes[5].startTime);
+            expect(notes[6].startTime - notes[4].startTime).toBe(200);
+            expect(notes.slice(0, 4).map(note => note.voice)).toEqual([
+                "piano",
+                "violin",
+                "piano",
+                "violin"
+            ]);
+        });
+
+        test.each([0.125, 0.25])(
+            "does not move later notes when a %s note cannot be divided",
+            duration => {
+                const keyboard = makeKeyboard({ beginnerMode: true });
+                const notes = [
+                    { startTime: 1000, duration, noteOctave: "C4" },
+                    { startTime: 1050, duration: 0.25, noteOctave: "D4" }
+                ];
+                keyboard._notesPlayed = notes.map(note => ({ ...note }));
+
+                keyboard._divideNotes("1000", 4);
+
+                expect(keyboard._notesPlayed).toEqual(notes);
+            }
+        );
+
+        test("leaves later timestamps alone when the subdivisions already fit", () => {
+            const keyboard = makeKeyboard();
+            keyboard._notesPlayed = [
+                { startTime: 1000, duration: 0.25, noteOctave: "C4" },
+                { startTime: 2000, duration: 0.125, noteOctave: "D4" }
+            ];
+
+            keyboard._divideNotes("1000", 2);
+
+            expect(keyboard._notesPlayed.find(note => note.noteOctave === "D4").startTime).toBe(
+                2000
+            );
+        });
+
+        test("dividing by one leaves the recording unchanged", () => {
+            const keyboard = makeKeyboard();
+            const notes = [
+                { startTime: 1000, duration: 1, noteOctave: "C4" },
+                { startTime: 1100, duration: 0.25, noteOctave: "D4" }
+            ];
+            keyboard._notesPlayed = notes.map(note => ({ ...note }));
+
+            keyboard._divideNotes("1000", 1);
+
+            expect(keyboard._notesPlayed).toEqual(notes);
+        });
+    });
 });
