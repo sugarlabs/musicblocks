@@ -163,14 +163,16 @@ The test corpus in `conformance-corpus.js` contains 59 deterministic programs ac
     - Multiple distinct boxes: summing three boxes (`x + y + z`).
     - Parameter passing: box passed to command block (`forward stepSize`).
     - Comparison evaluation: box evaluated in comparison (`score > 50`).
-3. **Actions and Calls (`actionsAndCalls`, 7 cases)**:
+3. **Actions and Calls (`actionsAndCalls`, 8 cases)**:
     - Definition and invocation: `action` defined and called via `nameddo`.
     - Beginner invocation: `action` called via beginner `do` block with text slot.
     - Multi-statement bodies: action containing sequential commands (`forward`, `right`).
     - Subroutine nesting: action calling another defined action.
     - Multiple independent actions: sequential definitions called in order from `start`.
     - Parameterized invocation: action called with arguments via `nameddoArg`.
-    - Local variable scoping: action containing local box assignment (`storein2`) and print statements.
+    - Boxes in actions: action containing a box assignment (`storein2`) and print statements. Boxes are
+      global in Music Blocks, so a box used in an action exports through `setBox`/`getBox`.
+    - Shared boxes: box stored in `start` and read inside the action it calls.
 4. **Control Flow and Repetition (`controlFlow`, 10 cases)**:
     - Repetition: `repeat` with fixed count, dynamic box count, and nested `repeat` loops.
     - Infinite loops: `forever` loop clamp.

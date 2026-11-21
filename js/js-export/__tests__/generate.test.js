@@ -38,6 +38,7 @@ const ASTUtils = {
     getMouseAST: jest.fn(),
     setActionNames: jest.fn(),
     setStoppingActions: jest.fn(),
+    setSharedBoxes: jest.fn(),
     getBoxNames: jest.fn(() => [])
 };
 const astring = {
