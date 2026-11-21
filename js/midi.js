@@ -74,18 +74,25 @@ const gcd = (a, b) => (b ? gcd(b, a % b) : a);
 
 // A length no single value fits within a thirty-second note, such as a tied note or a rest of
 // several bars, is written as the largest plain value that fits plus the value of the rest.
+// So is one that such a tie fits clearly better than the nearest single value: a quarter tied
+// to a sixteenth (5/16) is within a thirty-second of a half-note triplet (1/3), and was
+// imported as one. The tie has to beat the single value by a 128th note, and its shorter part
+// be at least a thirty-second, so a note played a little long or short keeps its value.
 const getNoteValue = length => {
     const error = ([n, d]) => Math.abs(n / d - length);
     const closest = getClosestStandardNoteValue(length);
-    if (length <= 1 / 128 || error(closest) <= 1 / 32) return closest;
+    if (length <= 1 / 128 || error(closest) === 0) return closest;
 
     const plain = length >= 1 ? [Math.floor(length), 1] : [1, 2 ** Math.ceil(-Math.log2(length))];
-    const [n, d] = getNoteValue(length - plain[0] / plain[1]);
+    const rest = length - plain[0] / plain[1];
+    const [n, d] = getNoteValue(rest);
     const numerator = plain[0] * d + n * plain[1];
     const denominator = plain[1] * d;
     const divisor = gcd(numerator, denominator);
     const tied = [numerator / divisor, denominator / divisor];
-    return error(tied) < error(plain) ? tied : plain;
+    const split = error(tied) < error(plain) ? tied : plain;
+    if (error(closest) > 1 / 32) return split;
+    return rest >= 1 / 32 && error(split) + 1 / 128 < error(closest) ? split : closest;
 };
 
 /**
