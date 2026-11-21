@@ -1028,6 +1028,33 @@ describe("prepareExport", () => {
         const result = JSON.parse(pm.prepareExport());
         expect(result[0][1][0]).toBe("start");
         expect(result[0][1][1]).toMatchObject({ id: 0, xcor: 10, ycor: 20 });
+        expect(result[0][1][1]).not.toHaveProperty("muted");
+    });
+
+    it("saves a muted mouse as muted", () => {
+        const activity = makeActivity();
+        activity.turtles.getTurtle.mockReturnValue({
+            id: 0,
+            x: 0,
+            y: 0,
+            orientation: 0,
+            muted: true,
+            painter: { color: 0, value: 50, stroke: 5, chroma: 100 }
+        });
+        activity.blocks.blockList = [
+            {
+                name: "start",
+                trash: false,
+                value: 0,
+                collapsed: false,
+                container: { x: 0, y: 0 },
+                connections: [null],
+                isValueBlock: () => false
+            }
+        ];
+        const pm = new ProjectManager(activity);
+        const result = JSON.parse(pm.prepareExport());
+        expect(result[0][1][1]).toMatchObject({ id: 0, muted: true });
     });
 
     it("exports collapsed block correctly", () => {
