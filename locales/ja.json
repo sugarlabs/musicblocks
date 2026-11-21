@@ -907,9 +907,9 @@
     "kanji": "ミュージック・ブロックスの読み込みに失敗しました。ページを更新してください。",
     "kana": "ミュージック・ブロックスのよみこみにしっぱいしました。ページをこうしんしてください。"
   },
-  "Failed to initialize Music Blocks core. Please refresh the page.\\n\\nError: %s": {
-    "kanji": "ミュージック・ブロックス コアの初期化に失敗しました。ページを更新してください。\\n\\nエラー: %s",
-    "kana": "Failed to initialize Music Blocks core. Please refresh the page.\\n\\nError: %s"
+  "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: %s": {
+    "kanji": "ミュージック・ブロックス コアの初期化に失敗しました。ページを更新してください。\n\nエラー: %s",
+    "kana": "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: %s"
   },
   "project undefined": {
     "kanji": "プロジェクト未定義",
@@ -1603,9 +1603,9 @@
     "kanji": "Network Connection Required",
     "kana": "Network Connection Required"
   },
-  "No moments marked yet. Click \\\"Mark this moment\\\" to save your first one!": {
-    "kanji": "No moments marked yet. Click \\\"Mark this moment\\\" to save your first one!",
-    "kana": "No moments marked yet. Click \\\"Mark this moment\\\" to save your first one!"
+  "No moments marked yet. Click \"Mark this moment\" to save your first one!": {
+    "kanji": "No moments marked yet. Click \"Mark this moment\" to save your first one!",
+    "kana": "No moments marked yet. Click \"Mark this moment\" to save your first one!"
   },
   "No Saved Moments Yet": {
     "kanji": "No Saved Moments Yet",
@@ -2579,9 +2579,9 @@
     "kanji": "鉦",
     "kana": "しょう"
   },
-  "⚠️ Sound is disabled!\\n\\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks.": {
-    "kanji": "⚠️ サウンドは無効になっています。\\n\\nブラウザの設定 (サイト設定 > サウンド) を確認して、ミュージック・ブロックスの音声を許可してください。",
-    "kana": "⚠️ Sound is disabled!\\n\\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
+  "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks.": {
+    "kanji": "⚠️ サウンドは無効になっています。\n\nブラウザの設定 (サイト設定 > サウンド) を確認して、ミュージック・ブロックスの音声を許可してください。",
+    "kana": "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
   },
   "The Not block is the logical not operator.": {
     "kanji": "Notブロックは論理的なNOT演算子です。",
@@ -3447,9 +3447,9 @@
     "kanji": "移動ド",
     "kana": "いどう ド"
   },
-  "When Movable do is false, the solfege note names are always tied to specific pitches, eg \\\"do\\\" is always \\\"C-natural\\\" when Movable do is true, the solfege note names are assigned to scale degrees \\\"do\\\" is always the first degree of the major scale.": {
+  "When Movable do is false, the solfege note names are always tied to specific pitches, eg \"do\" is always \"C-natural\" when Movable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale.": {
     "kanji": "「移動ド」が「偽」の場合、ソルフェージュ音名は常に特定のピッチに関連付けられます。たとえば、「移動ド」が「真」の場合、「ド」は常に「ド・メジャー」となり、ソルフェージュ音名はスケール度に割り当てられます。「ド」は常に長音階の 1 度です。",
-    "kana": "When Movable do is false, the solfege note names are always tied to specific pitches, eg \\\"do\\\" is always \\\"C-natural\\\" when Movable do is true, the solfege note names are assigned to scale degrees \\\"do\\\" is always the first degree of the major scale."
+    "kana": "When Movable do is false, the solfege note names are always tied to specific pitches, eg \"do\" is always \"C-natural\" when Movable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
   },
   "mode length": {
     "kanji": "音階の音数",
@@ -7919,13 +7919,13 @@
     "kanji": "確認",
     "kana": "かくにん"
   },
-  "Delete \\\"<span id=\\\"deleter-title\\\"></span>\\\"?": {
-    "kanji": "「<span id=\\\"deleter-title\\\"></span>」を削除しますか?",
-    "kana": "「<span id=\\\"deleter-title\\\"></span>」をさくじょしますか?"
+  "Delete \"<span id=\"deleter-title\"></span>\"?": {
+    "kanji": "「<span id=\"deleter-title\"></span>」を削除しますか?",
+    "kana": "「<span id=\"deleter-title\"></span>」をさくじょしますか?"
   },
-  "Permanently delete project \\\"<span id=\\\"deleter-name\\\"></span>\\\"?": {
-    "kanji": "プロジェクト「<span id=\\\"deleter-name\\\"></span>」を完全に削除しますか?",
-    "kana": "プロジェクト「<span id=\\\"deleter-name\\\"></span>」をかんぜんにさくじょしますか?"
+  "Permanently delete project \"<span id=\"deleter-name\"></span>\"?": {
+    "kanji": "プロジェクト「<span id=\"deleter-name\"></span>」を完全に削除しますか?",
+    "kana": "プロジェクト「<span id=\"deleter-name\"></span>」をかんぜんにさくじょしますか?"
   },
   "Unpublish project?": {
     "kanji": "Unpublish project?",
@@ -7987,9 +7987,9 @@
     "kanji": "タッグ",
     "kana": "タッグ"
   },
-  "Report projects which violate the <a href=\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\" target=\\\"_blank\\\" rel=\\\"noopener noreferrer\\\">Sugar Labs Code of Conduct</a>.": {
-    "kanji": "<a href=\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\" target=\\\"_blank\\\" rel=\\\"noopener noreferrer\\\">Sugar Labs 行動規範</a>に違反するプロジェクトを報告します。",
-    "kana": "Report projects which violate the <a href=\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\" target=\\\"_blank\\\" rel=\\\"noopener noreferrer\\\">Sugar Labs Code of Conduct</a>."
+  "Report projects which violate the <a href=\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\" target=\"_blank\" rel=\"noopener noreferrer\">Sugar Labs Code of Conduct</a>.": {
+    "kanji": "<a href=\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\" target=\"_blank\" rel=\"noopener noreferrer\">Sugar Labs 行動規範</a>に違反するプロジェクトを報告します。",
+    "kana": "Report projects which violate the <a href=\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\" target=\"_blank\" rel=\"noopener noreferrer\">Sugar Labs Code of Conduct</a>."
   },
   "Reason for reporting project": {
     "kanji": "プロジェクトを通報する理由",
