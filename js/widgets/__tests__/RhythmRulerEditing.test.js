@@ -180,6 +180,34 @@ describe("RhythmRulerEditing", () => {
             expect(widget.Rulers[0][0]).toEqual([2, 2]);
             expect(widget._dissectRuler).toHaveBeenCalledTimes(1);
         });
+
+        test("cancelling a pointer press clears the pending long press", () => {
+            const cell = row.cells[0];
+            cell.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
+
+            cell.dispatchEvent(new MouseEvent("pointercancel", { bubbles: true }));
+            jest.advanceTimersByTime(1750);
+
+            expect(widget._mouseDownCell).toBeNull();
+            expect(widget._longPressStartTime).toBeNull();
+            expect(cell.style.backgroundColor).toBe("");
+            expect(jest.getTimerCount()).toBe(0);
+        });
+
+        test("releasing outside a ruler cell does not try to tie another element", () => {
+            const cell = row.cells[0];
+            const outside = document.createElement("div");
+            document.body.append(outside);
+            document.elementFromPoint = jest.fn(() => outside);
+            const tieRuler = jest.spyOn(widget, "_tieRuler");
+
+            cell.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
+            cell.dispatchEvent(new MouseEvent("pointerup", { bubbles: true }));
+
+            expect(tieRuler).not.toHaveBeenCalled();
+            expect(widget._mouseDownCell).toBeNull();
+            expect(jest.getTimerCount()).toBe(0);
+        });
     });
 
     describe("_undo", () => {
