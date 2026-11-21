@@ -3206,6 +3206,167 @@ describe("Block Foundation", () => {
             expect(focusSpy).toHaveBeenCalled();
         });
 
+        describe("accessible block order", () => {
+            // A Start block with an argument, a clamp body and a next block, plus a second stack.
+            const stacks = [
+                { connections: [null, 1, null] }, // 0 start
+                { connections: [0, 2, 3, 5] }, // 1 clamp: argument 2, body 3, next 5
+                { connections: [1] }, // 2 argument of 1
+                { connections: [1, 4] }, // 3 body of 1, followed by 4
+                { connections: [3, null] }, // 4
+                { connections: [1, null] }, // 5 next after the clamp
+                { connections: [null, 7] }, // 6 top of a second stack
+                { connections: [6, null] } // 7
+            ];
+
+            const addEl = (container, index) => {
+                const el = document.createElement("div");
+                el.id = "accessible-block-" + index;
+                container.appendChild(el);
+                return el;
+            };
+            const domOrder = container => Array.from(container.children).map(el => el.id);
+
+            it("getProgramOrder follows arguments, clamp bodies and next blocks", () => {
+                expect(Block.getProgramOrder(stacks)).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
+            });
+
+            it("getProgramOrder puts stacks in order of their top block", () => {
+                const swapped = [
+                    { connections: [null, 1] }, // 0 top of the first stack
+                    { connections: [0, null] },
+                    { connections: [null, 3] }, // 2 top of the second stack
+                    { connections: [2, null] }
+                ];
+                expect(Block.getProgramOrder(swapped)).toEqual([0, 1, 2, 3]);
+            });
+
+            it("getProgramOrder puts a block inserted in the middle in program order", () => {
+                const inserted = [
+                    { connections: [null, 2] }, // 0 start, next is 2
+                    { connections: [2, null] }, // 1 last, after 2
+                    { connections: [0, 1] } // 2 inserted between 0 and 1
+                ];
+                expect(Block.getProgramOrder(inserted)).toEqual([0, 2, 1]);
+            });
+
+            it("getProgramOrder orders stacks by their top block, not their highest index", () => {
+                const interleaved = [
+                    { connections: [null, 3] }, // 0 top of stack A, followed by 3
+                    { connections: [null, 2] }, // 1 top of stack B, followed by 2
+                    { connections: [1, null] }, // 2
+                    { connections: [0, null] } // 3
+                ];
+                expect(Block.getProgramOrder(interleaved)).toEqual([0, 3, 1, 2]);
+            });
+
+            it("getProgramOrder copes with an empty list and a component with no top block", () => {
+                expect(Block.getProgramOrder([])).toEqual([]);
+                const ring = [{ connections: [1, 1] }, { connections: [0, 0] }];
+                expect(Block.getProgramOrder(ring)).toEqual([0, 1]);
+            });
+
+            it("getProgramOrder ignores empty slots and survives a connection loop", () => {
+                const looped = [undefined, { connections: [null, 2] }, { connections: [1, 1] }];
+                expect(Block.getProgramOrder(looped)).toEqual([1, 2]);
+                expect(Block.getProgramOrder(null)).toEqual([]);
+            });
+
+            it("getProgramOrder handles a very long flow without recursion", () => {
+                const long = [];
+                for (let i = 0; i < 20000; i++) {
+                    long.push({ connections: [i === 0 ? null : i - 1, i < 19999 ? i + 1 : null] });
+                }
+                const order = Block.getProgramOrder(long);
+                expect(order).toHaveLength(20000);
+                expect(order[19999]).toBe(19999);
+            });
+
+            it("reorderAccessibleElements puts scrambled elements in program order", () => {
+                const container = Block.getAccessibleContainer();
+                [5, 0, 7, 2, 1, 4, 3, 6].forEach(i => addEl(container, i));
+
+                Block.reorderAccessibleElements(stacks);
+
+                expect(domOrder(container)).toEqual(
+                    [0, 1, 2, 3, 4, 5, 6, 7].map(i => "accessible-block-" + i)
+                );
+            });
+
+            it("reorderAccessibleElements skips blocks without an element and keeps others last", () => {
+                const container = Block.getAccessibleContainer();
+                [4, 0].forEach(i => addEl(container, i));
+                const stray = document.createElement("div");
+                stray.id = "not-a-block";
+                container.insertBefore(stray, container.firstChild);
+
+                Block.reorderAccessibleElements(stacks);
+
+                expect(domOrder(container)).toEqual([
+                    "accessible-block-0",
+                    "accessible-block-4",
+                    "not-a-block"
+                ]);
+            });
+
+            it("reorderAccessibleElements leaves an ordered list untouched", () => {
+                const container = Block.getAccessibleContainer();
+                [0, 1, 2].forEach(i => addEl(container, i));
+                const spy = jest.spyOn(container, "appendChild");
+
+                Block.reorderAccessibleElements(stacks);
+
+                expect(spy).not.toHaveBeenCalled();
+            });
+
+            it("reorderAccessibleElements keeps focus on the focused element", () => {
+                const container = Block.getAccessibleContainer();
+                [2, 1, 0].forEach(i => {
+                    addEl(container, i).setAttribute("tabindex", "0");
+                });
+                const focused = document.getElementById("accessible-block-1");
+                focused.focus();
+                expect(document.activeElement).toBe(focused);
+
+                Block.reorderAccessibleElements(stacks);
+
+                expect(domOrder(container)).toEqual([0, 1, 2].map(i => "accessible-block-" + i));
+                expect(document.activeElement).toBe(focused);
+            });
+
+            it("sorts once after elements are created out of order", () => {
+                jest.useFakeTimers();
+                try {
+                    Block._accessibleReorderTimer = null;
+                    const second = new Block(
+                        { name: "right", staticLabels: ["right"], image: "right.svg", docks: [] },
+                        testBlocks
+                    );
+                    second.blockIndex = 1;
+                    second.container = { x: 0, y: 0, on: jest.fn(), children: [] };
+                    testBlocks.blockList = [{ connections: [null, 1] }, { connections: [0, null] }];
+
+                    second._setupAccessibleElement();
+                    block._setupAccessibleElement();
+                    const container = Block.getAccessibleContainer();
+                    expect(domOrder(container)).toEqual([
+                        "accessible-block-1",
+                        "accessible-block-0"
+                    ]);
+
+                    jest.runOnlyPendingTimers();
+
+                    expect(domOrder(container)).toEqual([
+                        "accessible-block-0",
+                        "accessible-block-1"
+                    ]);
+                    expect(Block._accessibleReorderTimer).toBeNull();
+                } finally {
+                    jest.useRealTimers();
+                }
+            });
+        });
+
         it("_removeAccessibleElement removes the element from DOM", () => {
             block._setupAccessibleElement();
             expect(document.getElementById("accessible-block-0")).not.toBeNull();

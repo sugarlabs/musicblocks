@@ -1346,6 +1346,69 @@ describe("ProgramBlocks", () => {
             expect(activity.blocks.adjustDocks).toHaveBeenCalledWith(0, true);
         });
 
+        describe("accessible block order", () => {
+            afterEach(() => {
+                delete global.Block;
+            });
+
+            test("queues a reorder of the accessible list after connecting", () => {
+                global.Block = { _scheduleAccessibleReorder: jest.fn() };
+                const block = getBlock("dockblock");
+                activity.blocks.blockList = [
+                    { connections: [null, null] },
+                    { connections: [null] },
+                    { connections: [null] }
+                ];
+
+                block.flow([0, 1, 2], logo, 0, 5);
+
+                // The connection and the dock adjustment come first.
+                expect(activity.blocks.blockList[0].connections[1]).toBe(2);
+                expect(global.Block._scheduleAccessibleReorder).toHaveBeenCalledTimes(1);
+                expect(global.Block._scheduleAccessibleReorder).toHaveBeenCalledWith(
+                    activity.blocks
+                );
+            });
+
+            test("queues a reorder when the old connection is only disconnected", () => {
+                global.Block = { _scheduleAccessibleReorder: jest.fn() };
+                const block = getBlock("dockblock");
+                activity.blocks.blockList = [
+                    { connections: [null, 1] }, // block 0 already holds block 1
+                    { connections: [0] },
+                    { connections: [null] }
+                ];
+
+                block.flow([0, 1, 2], logo, 0, 5);
+
+                expect(activity.blocks.blockList[1].connections[0]).toBeNull();
+                expect(global.Block._scheduleAccessibleReorder).toHaveBeenCalledTimes(1);
+            });
+
+            test("does not queue a reorder for a rejected connection", () => {
+                global.Block = { _scheduleAccessibleReorder: jest.fn() };
+                const block = getBlock("dockblock");
+                activity.blocks.blockList = [{ connections: [null, null] }];
+
+                block.flow([0, 1, 0], logo, 0, 5);
+
+                expect(global.Block._scheduleAccessibleReorder).not.toHaveBeenCalled();
+            });
+
+            test("still connects when the Block class is not available", () => {
+                delete global.Block;
+                const block = getBlock("dockblock");
+                activity.blocks.blockList = [
+                    { connections: [null, null] },
+                    { connections: [null] },
+                    { connections: [null] }
+                ];
+
+                expect(() => block.flow([0, 1, 2], logo, 0, 5)).not.toThrow();
+                expect(activity.blocks.blockList[0].connections[1]).toBe(2);
+            });
+        });
+
         test("handles connection to -1 (last)", () => {
             const block = getBlock("dockblock");
             activity.blocks.blockList = [
