@@ -89,6 +89,10 @@ describe("PlanetInterface", () => {
         mockActivity.artworkRevision = 0;
     });
 
+    afterEach(() => {
+        global.docById = docById;
+    });
+
     test("hideMusicBlocks hides relevant elements and disables DOM events", () => {
         planetInterface.hideMusicBlocks();
 
@@ -403,7 +407,7 @@ describe("PlanetInterface", () => {
         expect(window.scroll).toHaveBeenCalledWith(0, 0);
     });
 
-    test("saveLocally: svgData empty → saveLocally(data, null)", () => {
+    test("saveLocally: svgData empty → saveLocally(data, undefined)", () => {
         doSVG.mockReturnValue("");
         const D = { x: 1 };
         mockActivity.prepareExport.mockReturnValue(D);
@@ -413,7 +417,10 @@ describe("PlanetInterface", () => {
 
         return planetInterface.saveLocally().then(() => {
             expect(mockActivity.stage.update).toHaveBeenCalled();
-            expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(D, null);
+            expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(
+                D,
+                undefined
+            );
         });
     });
 
@@ -437,7 +444,7 @@ describe("PlanetInterface", () => {
         mockActivity.prepareExport.mockReturnValue("[full project]");
         await saveAfterLoad();
 
-        expect(saveLocally).toHaveBeenCalledWith("[full project]", null, "B");
+        expect(saveLocally).toHaveBeenCalledWith("[full project]", undefined, "B");
     });
 
     test("saveLocally handles unavailable Planet storage according to its failure option", async () => {
@@ -477,7 +484,119 @@ describe("PlanetInterface", () => {
         planetInterface.iframe = { style: { display: "none" } };
 
         await planetInterface.saveLocally();
-        expect(saveLocally).toHaveBeenCalledWith(D, null, "proj1");
+        expect(saveLocally).toHaveBeenCalledWith(D, undefined, "proj1");
+    });
+
+    test("Test 2 — Missing SVG: saveLocally with svgData='' preserves existing thumbnail in projectStorage", async () => {
+        doSVG.mockReturnValue("");
+        const D = { blocks: ["edited-notes"] };
+        mockActivity.prepareExport.mockReturnValue(D);
+        const saveLocally = jest.fn().mockResolvedValue();
+        planetInterface.planet = {
+            ProjectStorage: {
+                saveLocally,
+                getCurrentProjectID: () => "projB",
+                data: {
+                    Projects: {
+                        projB: {
+                            ProjectName: "heylooo",
+                            ProjectData: { blocks: ["old-notes"] },
+                            ProjectImage: "existing-turtle-thumbnail"
+                        }
+                    }
+                }
+            }
+        };
+        planetInterface.iframe = { style: { display: "none" } };
+
+        await planetInterface.saveLocally();
+        expect(saveLocally).toHaveBeenCalledWith(D, undefined, "projB");
+    });
+
+    test("Test 12 — Pencil/edit UI regression: editing project B without turtle graphics preserves both thumbnails on return to Planet", async () => {
+        const storageData = {
+            CurrentProject: "projA",
+            Projects: {
+                projA: {
+                    ProjectName: "My Project",
+                    ProjectData: { blocks: ["project-A-blocks"] },
+                    ProjectImage: "thumbnail-A"
+                },
+                projB: {
+                    ProjectName: "heylooo",
+                    ProjectData: { blocks: ["project-B-blocks"] },
+                    ProjectImage: "thumbnail-B"
+                }
+            }
+        };
+
+        const mockPlanet = {
+            ProjectStorage: {
+                data: storageData,
+                getCurrentProjectID: () => storageData.CurrentProject,
+                getCurrentProjectImage: () =>
+                    storageData.Projects[storageData.CurrentProject]?.ProjectImage || null,
+                saveLocally: jest.fn(async (data, image, id) => {
+                    const target = id ?? storageData.CurrentProject;
+                    if (!storageData.Projects[target]) return;
+                    if (data !== undefined) storageData.Projects[target].ProjectData = data;
+                    if (image !== undefined) storageData.Projects[target].ProjectImage = image;
+                })
+            },
+            open: jest.fn()
+        };
+
+        const localTabClickSpy = jest.fn();
+        planetInterface.planet = mockPlanet;
+        planetInterface.iframe = {
+            style: { display: "none", zIndex: "0" },
+            contentWindow: {
+                document: {
+                    getElementById: jest.fn(id =>
+                        id === "local-tab" ? { click: localTabClickSpy } : null
+                    )
+                }
+            }
+        };
+
+        // 1. User opens Project B (heylooo) through edit/pencil action
+        storageData.CurrentProject = "projB";
+
+        // 2. User rearranges blocks (no turtle graphics, svgData is empty)
+        doSVG.mockReturnValue("");
+        const updatedBlocksB = { blocks: ["project-B-modified-blocks"] };
+        mockActivity.prepareExport.mockReturnValue(updatedBlocksB);
+
+        const buffer = new ArrayBuffer(4 * 4 * 4); // all 0 (transparent)
+        const transparentCanvas = {
+            width: 4,
+            height: 4,
+            getContext: () => ({
+                getImageData: () => ({ data: new Uint8ClampedArray(buffer) })
+            }),
+            toDataURL: () => "data:image/png;base64,transparentStub"
+        };
+        const origDocById = global.docById;
+        global.docById = jest.fn(id => (id === "overlayCanvas" ? transparentCanvas : null));
+
+        try {
+            // 3. User saves and re-opens Planet (showPlanet)
+            await planetInterface.saveLocally();
+            planetInterface.showPlanet();
+
+            // 4. Invariant: planet.open must be called with null, NEVER a transparent overlay
+            expect(mockPlanet.open).toHaveBeenCalledWith(null);
+            expect(localTabClickSpy).toHaveBeenCalled();
+
+            // 5. Invariant: Project B's thumbnail remains thumbnail-B and data is updated
+            expect(storageData.Projects["projB"].ProjectData).toEqual(updatedBlocksB);
+            expect(storageData.Projects["projB"].ProjectImage).toBe("thumbnail-B");
+
+            // 6. Invariant: Project A's thumbnail remains thumbnail-A and is not swapped
+            expect(storageData.Projects["projA"].ProjectImage).toBe("thumbnail-A");
+        } finally {
+            global.docById = origDocById;
+        }
     });
 
     test("saveLocally: pending thumbnail callback executing after Planet opens, active project is deleted, and Planet closes does not overwrite replacement project or recreate deleted project", async () => {
@@ -1280,7 +1399,7 @@ describe("PlanetInterface", () => {
 
         expect(console.error).toHaveBeenCalled();
     });
-    test("saveLocally: non-empty SVG triggers image‑onload path", done => {
+    test("saveLocally: non-empty SVG triggers image‑onload path", () => {
         doSVG.mockReturnValue("<svg/>");
         mockActivity.prepareExport.mockReturnValue("EXPORT");
         global.base64Encode = jest.fn(s => s);
@@ -1309,18 +1428,17 @@ describe("PlanetInterface", () => {
             }
         };
 
-        planetInterface.saveLocally().then(() => {
+        return planetInterface.saveLocally().then(() => {
             expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenNthCalledWith(
                 1,
                 "EXPORT",
-                "OLD_IMAGE"
+                undefined
             );
             expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenNthCalledWith(
                 2,
                 "EXPORT",
                 "DATAURL"
             );
-            done();
         });
     });
     test("saveLocally keeps delayed thumbnail writes on the project being saved", async () => {
@@ -1363,7 +1481,7 @@ describe("PlanetInterface", () => {
         expect(saveLocally).toHaveBeenNthCalledWith(
             1,
             "OLD_PROJECT_DATA",
-            "OLD_IMAGE",
+            undefined,
             "old-project"
         );
         expect(saveLocally).toHaveBeenNthCalledWith(
@@ -1400,7 +1518,7 @@ describe("PlanetInterface", () => {
 
         expect(planetInterface.planet.ProjectStorage.saveLocally).toHaveBeenCalledWith(
             "EXPORT",
-            "OLD_IMAGE"
+            undefined
         );
 
         let resolved = false;
@@ -1780,7 +1898,7 @@ describe("PlanetInterface", () => {
 
         await planetInterface.saveLocally();
         expect(doSVG).toHaveBeenCalledTimes(1);
-        expect(saveLocally).toHaveBeenNthCalledWith(1, "EXPORT", "OLD_IMAGE", "proj-1");
+        expect(saveLocally).toHaveBeenNthCalledWith(1, "EXPORT", undefined, "proj-1");
         expect(saveLocally).toHaveBeenNthCalledWith(2, "EXPORT", "DATAURL", "proj-1");
         expect(saveLocally).toHaveBeenNthCalledWith(3, "EXPORT", "DATAURL", "proj-1");
     });
@@ -1934,7 +2052,7 @@ describe("PlanetInterface", () => {
         await planetInterface.saveLocally();
 
         expect(doSVG).toHaveBeenCalledTimes(2);
-        expect(saveLocally).toHaveBeenNthCalledWith(1, "EXPORT", null);
+        expect(saveLocally).toHaveBeenNthCalledWith(1, "EXPORT", undefined);
         expect(planetInterface._thumbnailCache.projectId).toBeUndefined();
         expect(planetInterface._thumbnailCache.url).toBeNull();
     });
@@ -1949,7 +2067,7 @@ describe("PlanetInterface", () => {
         // A forced save with no artwork must drop the cached URL...
         doSVG.mockReturnValue("");
         await planetInterface.saveLocally({ forceThumbnail: true });
-        expect(saveLocally).toHaveBeenLastCalledWith("EXPORT", null, "proj-1");
+        expect(saveLocally).toHaveBeenLastCalledWith("EXPORT", undefined, "proj-1");
         expect(planetInterface._thumbnailCache.projectId).toBeUndefined();
         expect(planetInterface._thumbnailCache.url).toBeNull();
 
@@ -1957,5 +2075,213 @@ describe("PlanetInterface", () => {
         doSVG.mockReturnValue("<svg/>");
         await planetInterface.saveLocally();
         expect(doSVG).toHaveBeenCalledTimes(3);
+    });
+
+    test("saveLocally: delegates thumbnail save to planet.saveThumbnail when available to refresh card", async () => {
+        doSVG.mockReturnValue("<svg/>");
+        mockActivity.prepareExport.mockReturnValue({ blocks: [] });
+        global.base64Encode = jest.fn(s => s);
+
+        let pendingImage;
+        global.Image = class {
+            constructor() {
+                pendingImage = this;
+            }
+            set src(_value) {}
+        };
+        global.createjs = {
+            Bitmap: class {
+                getBounds() {
+                    return { x: 0, y: 0, width: 10, height: 10 };
+                }
+                cache() {
+                    this.bitmapCache = {
+                        getCacheDataURL: () => "data:image/png;base64,renderedThumb"
+                    };
+                }
+            }
+        };
+
+        const storageData = { CurrentProject: "proj-card", Projects: { "proj-card": {} } };
+        const planetSaveThumbSpy = jest.fn(async () => {});
+        planetInterface.planet = {
+            saveThumbnail: planetSaveThumbSpy,
+            ProjectStorage: {
+                data: storageData,
+                getCurrentProjectID: () => "proj-card",
+                saveLocally: jest.fn(async () => {})
+            }
+        };
+        planetInterface.iframe = { style: { display: "none" } };
+
+        await planetInterface.saveLocally();
+        expect(pendingImage).toBeDefined();
+        await pendingImage.onload();
+
+        expect(planetSaveThumbSpy).toHaveBeenCalledWith(
+            "data:image/png;base64,renderedThumb",
+            "proj-card"
+        );
+    });
+
+    describe("_isCanvasBlank", () => {
+        test("returns true for null, undefined, or 0-dimension canvas", () => {
+            expect(planetInterface._isCanvasBlank(null)).toBe(true);
+            expect(planetInterface._isCanvasBlank(undefined)).toBe(true);
+            const getContext = () => ({
+                getImageData: () => ({ data: new Uint8ClampedArray([255, 0, 0, 255]) })
+            });
+            expect(planetInterface._isCanvasBlank({ width: 0, height: 0, getContext })).toBe(true);
+            expect(planetInterface._isCanvasBlank({ width: 10, height: 0, getContext })).toBe(true);
+            expect(planetInterface._isCanvasBlank({ width: 0, height: 10, getContext })).toBe(true);
+        });
+
+        test("returns true for completely transparent canvas buffer", () => {
+            const buffer = new ArrayBuffer(4 * 4 * 4); // 4x4 RGBA
+            const mockCanvas = {
+                width: 4,
+                height: 4,
+                getContext: () => ({
+                    getImageData: () => ({
+                        data: new Uint8ClampedArray(buffer)
+                    })
+                })
+            };
+            expect(planetInterface._isCanvasBlank(mockCanvas)).toBe(true);
+        });
+
+        test("returns false when canvas buffer contains drawn pixels", () => {
+            const buffer = new ArrayBuffer(4 * 4 * 4); // 4x4 RGBA
+            const u8 = new Uint8ClampedArray(buffer);
+            u8[0] = 255; // Red pixel
+            const mockCanvas = {
+                width: 4,
+                height: 4,
+                getContext: () => ({
+                    getImageData: () => ({
+                        data: u8
+                    })
+                })
+            };
+            expect(planetInterface._isCanvasBlank(mockCanvas)).toBe(false);
+        });
+
+        test("returns true if getContext throws or returns null", () => {
+            const throwingCanvas = {
+                width: 4,
+                height: 4,
+                getContext: () => {
+                    throw new Error("Context error");
+                }
+            };
+            expect(planetInterface._isCanvasBlank(throwingCanvas)).toBe(true);
+            const nullCtxCanvas = {
+                width: 4,
+                height: 4,
+                getContext: () => null
+            };
+            expect(planetInterface._isCanvasBlank(nullCtxCanvas)).toBe(true);
+        });
+    });
+
+    describe("showPlanet preview integration", () => {
+        test("passes preview image to planet.open if overlayCanvas has artwork", () => {
+            const mockPlanet = { open: jest.fn() };
+            planetInterface.planet = mockPlanet;
+            planetInterface.iframe = {
+                style: { display: "none", zIndex: "0" },
+                contentWindow: {
+                    document: {
+                        getElementById: () => ({ click: jest.fn() })
+                    }
+                }
+            };
+
+            const buffer = new ArrayBuffer(4 * 4 * 4);
+            const u8 = new Uint8ClampedArray(buffer);
+            u8[3] = 255; // Alpha > 0
+            const canvasWithArt = {
+                width: 4,
+                height: 4,
+                getContext: () => ({
+                    getImageData: () => ({ data: u8 })
+                }),
+                toDataURL: () => "data:image/png;base64,artworkPreview"
+            };
+
+            global.docById = jest.fn(id => (id === "overlayCanvas" ? canvasWithArt : null));
+
+            planetInterface.showPlanet();
+
+            expect(mockPlanet.open).toHaveBeenCalledWith("data:image/png;base64,artworkPreview");
+        });
+
+        test("passes null to planet.open if overlayCanvas is blank or transparent", () => {
+            const mockPlanet = { open: jest.fn() };
+            planetInterface.planet = mockPlanet;
+            planetInterface.iframe = {
+                style: { display: "none", zIndex: "0" },
+                contentWindow: {
+                    document: {
+                        getElementById: () => ({ click: jest.fn() })
+                    }
+                }
+            };
+
+            const buffer = new ArrayBuffer(4 * 4 * 4); // all 0
+            const blankCanvas = {
+                width: 4,
+                height: 4,
+                getContext: () => ({
+                    getImageData: () => ({ data: new Uint8ClampedArray(buffer) })
+                }),
+                toDataURL: () => "data:image/png;base64,transparent"
+            };
+
+            global.docById = jest.fn(id => (id === "overlayCanvas" ? blankCanvas : null));
+
+            planetInterface.showPlanet();
+
+            expect(mockPlanet.open).toHaveBeenCalledWith(null);
+        });
+
+        test("showPlanet logs error and returns early if planet or planet.open is unavailable", () => {
+            const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+            planetInterface.planet = null;
+            planetInterface.showPlanet();
+            expect(consoleSpy).toHaveBeenCalledWith(
+                "[PlanetInterface] showPlanet called before Planet is ready."
+            );
+            planetInterface.planet = { open: "not-a-function" };
+            planetInterface.showPlanet();
+            expect(consoleSpy).toHaveBeenCalledTimes(2);
+            consoleSpy.mockRestore();
+        });
+
+        test("passes null to planet.open if overlayCanvas.toDataURL throws", () => {
+            const mockPlanet = { open: jest.fn() };
+            planetInterface.planet = mockPlanet;
+            planetInterface.iframe = {
+                style: { display: "none", zIndex: "0" },
+                contentWindow: {
+                    document: {
+                        getElementById: () => ({ click: jest.fn() })
+                    }
+                }
+            };
+            const throwingCanvas = {
+                width: 4,
+                height: 4,
+                getContext: () => ({
+                    getImageData: () => ({ data: new Uint8ClampedArray([0, 0, 0, 255]) })
+                }),
+                toDataURL: () => {
+                    throw new Error("SecurityError: tainted canvas");
+                }
+            };
+            global.docById = jest.fn(id => (id === "overlayCanvas" ? throwingCanvas : null));
+            planetInterface.showPlanet();
+            expect(mockPlanet.open).toHaveBeenCalledWith(null);
+        });
     });
 });
