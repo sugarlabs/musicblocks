@@ -394,6 +394,7 @@ class ChordBuilderWidget {
         }
         this.diatonicChords = this._buildDiatonicChords(this.rootKey, this.mode);
         // Clear progression when key changes — chords from old key are no longer valid
+        this._stopPlayback();
         this.progression = [];
         this._updateKeyModeDisplay();
         this._renderDiatonicChords();
@@ -445,11 +446,22 @@ class ChordBuilderWidget {
 
     /**
      * Removes a chord at a specific index from the progression sequence.
+     * Preserves metric grid alignment by clearing the slot to null rather than
+     * shifting subsequent chords across beats and bars, and trims trailing nulls.
      * @param {number} index
      */
     removeChord(index) {
         if (index >= 0 && index < this.progression.length) {
-            this.progression.splice(index, 1);
+            this.progression[index] = null;
+            while (
+                this.progression.length > 0 &&
+                this.progression[this.progression.length - 1] === null
+            ) {
+                this.progression.pop();
+            }
+            if (this.progression.length === 0) {
+                this._stopPlayback();
+            }
             this._renderBarGrid();
         }
     }
@@ -500,7 +512,7 @@ class ChordBuilderWidget {
                 this._highlightActiveStep(-1);
                 this._updatePlayButtonState(false);
             },
-            { octave: this.octave }
+            { octave: this.octave, beatsPerChord: 1 }
         );
     }
 
@@ -1199,13 +1211,17 @@ class ChordBuilderWidget {
             cells.forEach(cell => {
                 const idx = parseInt(cell.dataset.cellIndex, 10);
                 const chord = this.progression[idx] || null;
-                if (!chord) return;
-                if (idx === activeIndex) {
-                    cell.style.background = "#ffd700";
-                    cell.style.border = "2px solid #f0a500";
+                const isActive = idx === activeIndex;
+                if (chord) {
+                    cell.style.background = isActive ? "#ffd700" : "#eef4fd";
+                    cell.style.border = isActive
+                        ? "2px solid #f0a500"
+                        : "1px solid rgba(74,144,226,0.4)";
                 } else {
-                    cell.style.background = "#eef4fd";
-                    cell.style.border = "1px solid rgba(74,144,226,0.4)";
+                    cell.style.background = isActive ? "rgba(255, 215, 0, 0.35)" : "transparent";
+                    cell.style.border = isActive
+                        ? "2px solid #f0a500"
+                        : "1px solid rgba(0,0,0,0.08)";
                 }
             });
         }
