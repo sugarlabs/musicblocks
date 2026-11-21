@@ -153,16 +153,23 @@ class GlobalCard {
         }
     }
 
+    getSafeId() {
+        return typeof this.id === "string"
+            ? this.id.replace(/[^a-zA-Z0-9._-]/g, "")
+            : String(this.id ?? "");
+    }
+
     render() {
         const Planet = this.Planet;
-        const html = this.renderData.replace(new RegExp("{ID}", "g"), this.id);
+        const safeId = this.getSafeId();
+        const html = this.renderData.replace(new RegExp("{ID}", "g"), safeId);
         const frag = document.createRange().createContextualFragment(html);
 
         // ── Thumbnail (lazy) ─────────────────────────────────────────────
         // Cards render immediately with a shimmer placeholder.
         // The real thumbnail URL is only fetched when the card scrolls
         // into view (via IntersectionObserver), keeping initial render fast.
-        const imageId = `global-project-image-${this.id}`;
+        const imageId = `global-project-image-${safeId}`;
         const imgEl = frag.getElementById(imageId);
         const placeholder =
             this.ProjectData.ProjectIsMusicBlocks === 1
@@ -192,7 +199,7 @@ class GlobalCard {
         // set tags
         // ProjectTags is now an array of lowercase topic strings (e.g. ["music","math"]).
         // Planet.TagsManifest keys are those same lowercase strings.
-        const tagcontainer = frag.getElementById(`global-project-tags-${this.id}`);
+        const tagcontainer = frag.getElementById(`global-project-tags-${safeId}`);
         tagcontainer.classList.add("global-tags-container");
 
         const projectTags = this.ProjectData.ProjectTags || [];
@@ -224,16 +231,16 @@ class GlobalCard {
         }
 
         // set project title text and tooltip
-        const titleEl = frag.getElementById(`global-project-title-${this.id}`);
+        const titleEl = frag.getElementById(`global-project-title-${safeId}`);
         titleEl.textContent = this.ProjectData.ProjectName;
         titleEl.title = this.ProjectData.ProjectName;
         // set number of likes
-        frag.getElementById(`global-project-likes-${this.id}`).textContent =
+        frag.getElementById(`global-project-likes-${safeId}`).textContent =
             this.ProjectData.ProjectLikes.toString();
 
         // set view button listener
 
-        frag.getElementById(`global-project-more-details-${this.id}`).addEventListener(
+        frag.getElementById(`global-project-more-details-${safeId}`).addEventListener(
             "click",
             evt => {
                 Planet.GlobalPlanet.ProjectViewer.open(this.id);
@@ -242,31 +249,31 @@ class GlobalCard {
 
         // set open button listener
 
-        frag.getElementById(`global-project-open-${this.id}`).addEventListener("click", evt => {
+        frag.getElementById(`global-project-open-${safeId}`).addEventListener("click", evt => {
             Planet.GlobalPlanet.openGlobalProject(this.id);
         });
 
         // set image listener
 
-        frag.getElementById(`global-project-image-${this.id}`).addEventListener("click", evt => {
+        frag.getElementById(`global-project-image-${safeId}`).addEventListener("click", evt => {
             Planet.GlobalPlanet.ProjectViewer.open(this.id);
         });
 
         // set fork button listener
-        frag.getElementById(`global-project-fork-${this.id}`).addEventListener("click", evt => {
+        frag.getElementById(`global-project-fork-${safeId}`).addEventListener("click", evt => {
             Planet.GlobalPlanet.forkGlobalProject(this.id, evt.currentTarget);
         });
 
         // set merge modify listener
 
-        frag.getElementById(`global-project-merge-${this.id}`).addEventListener("click", evt => {
+        frag.getElementById(`global-project-merge-${safeId}`).addEventListener("click", evt => {
             Planet.GlobalPlanet.mergeGlobalProject(this.id);
         });
 
         // set share button listener
 
-        frag.getElementById(`global-project-share-${this.id}`).addEventListener("click", evt => {
-            const s = document.getElementById(`global-sharebox-${this.id}`);
+        frag.getElementById(`global-project-share-${safeId}`).addEventListener("click", evt => {
+            const s = document.getElementById(`global-sharebox-${safeId}`);
             const trigger = evt.currentTarget;
             const card = trigger.closest(".card");
 
@@ -312,8 +319,8 @@ class GlobalCard {
                 window.addEventListener("scroll", this._shareRepositionHandler, true);
 
                 hideOnClickOutside(
-                    [document.getElementById(`global-share-${this.id}`)],
-                    `global-sharebox-${this.id}`,
+                    [document.getElementById(`global-share-${safeId}`)],
+                    `global-sharebox-${safeId}`,
                     () => {
                         if (card) {
                             card.classList.remove("share-popup-open");
@@ -335,26 +342,26 @@ class GlobalCard {
 
         // set share checkbox listener
 
-        frag.getElementById(`global-checkboxrun-${this.id}`).addEventListener("click", evt => {
-            updateCheckboxes(`global-sharebox-${this.id}`);
+        frag.getElementById(`global-checkboxrun-${safeId}`).addEventListener("click", evt => {
+            updateCheckboxes(`global-sharebox-${safeId}`);
         });
 
-        frag.getElementById(`global-checkboxshow-${this.id}`).addEventListener("click", evt => {
-            updateCheckboxes(`global-sharebox-${this.id}`);
+        frag.getElementById(`global-checkboxshow-${safeId}`).addEventListener("click", evt => {
+            updateCheckboxes(`global-sharebox-${safeId}`);
         });
 
-        frag.getElementById(`global-checkboxcollapse-${this.id}`).addEventListener("click", evt => {
-            updateCheckboxes(`global-sharebox-${this.id}`);
+        frag.getElementById(`global-checkboxcollapse-${safeId}`).addEventListener("click", evt => {
+            updateCheckboxes(`global-sharebox-${safeId}`);
         });
 
         // set advanced options toggle listener
-        const advancedToggle = frag.getElementById(`global-advanced-toggle-${this.id}`);
+        const advancedToggle = frag.getElementById(`global-advanced-toggle-${safeId}`);
         if (advancedToggle) {
             advancedToggle.addEventListener("click", () => {
-                toggleExpandable(`global-advanced-${this.id}`, "shareurl-advanced");
+                toggleExpandable(`global-advanced-${safeId}`, "shareurl-advanced");
 
-                const shareBox = document.getElementById(`global-sharebox-${this.id}`);
-                const shareTrigger = document.getElementById(`global-project-share-${this.id}`);
+                const shareBox = document.getElementById(`global-sharebox-${safeId}`);
+                const shareTrigger = document.getElementById(`global-project-share-${safeId}`);
 
                 if (shareBox && shareTrigger) {
                     this._positionShareCard(shareBox, shareTrigger);
@@ -363,24 +370,24 @@ class GlobalCard {
         }
 
         // set like icon
-        const likeIconId = `global-like-icon-${this.id}`;
+        const likeIconId = `global-like-icon-${safeId}`;
 
         frag.getElementById(likeIconId).textContent = Planet.ProjectStorage.isLiked(this.id)
             ? "favorite"
             : "favorite_border";
 
-        frag.getElementById(`global-like-icon-${this.id}`).addEventListener("click", evt => {
+        frag.getElementById(`global-like-icon-${safeId}`).addEventListener("click", evt => {
             this.like();
         });
 
         document.getElementById("global-projects").appendChild(frag);
-        updateCheckboxes(`global-sharebox-${this.id}`);
+        updateCheckboxes(`global-sharebox-${safeId}`);
 
         if (this.clipboard) {
             this.clipboard.destroy();
         }
 
-        this.clipboard = new ClipboardJS(`.copyshareurl[data-clipboard-text*="${this.id}"]`);
+        this.clipboard = new ClipboardJS(`.copyshareurl[data-clipboard-text*="${safeId}"]`);
 
         this.clipboard.on("success", e => {
             console.info("Copied:", e.text);
@@ -473,11 +480,12 @@ class GlobalCard {
     like() {
         if (this.likePending) return;
         const Planet = this.Planet;
+        const safeId = this.getSafeId();
         clearTimeout(this.likeTimeout);
         const like = !Planet.ProjectStorage.isLiked(this.id);
         this.likePending = true;
         // Optimistic UI update — only when card DOM is present
-        const likesEl = document.getElementById(`global-project-likes-${this.id}`);
+        const likesEl = document.getElementById(`global-project-likes-${safeId}`);
         if (likesEl) this.setLike(like);
         this.likeTimeout = setTimeout(() => {
             // GitServerInterface.likeProject uses repoName (this.id) directly
@@ -485,11 +493,11 @@ class GlobalCard {
                 this.likePending = false;
                 if (data.success && Number.isFinite(data.likes)) {
                     this.ProjectData.ProjectLikes = data.likes;
-                    const currentLikes = document.getElementById(`global-project-likes-${this.id}`);
+                    const currentLikes = document.getElementById(`global-project-likes-${safeId}`);
                     if (currentLikes) currentLikes.textContent = data.likes.toString();
                 } else if (!data.success) {
                     // Roll back optimistic update on failure
-                    if (document.getElementById(`global-project-likes-${this.id}`)) {
+                    if (document.getElementById(`global-project-likes-${safeId}`)) {
                         this.setLike(!like);
                     }
                 }
@@ -505,6 +513,7 @@ class GlobalCard {
 
     setLike(like) {
         this.Planet.ProjectStorage.like(this.id, like);
+        const safeId = this.getSafeId();
         let incr = 1;
         let text = "favorite";
 
@@ -513,10 +522,10 @@ class GlobalCard {
             text = "favorite_border";
         }
 
-        const l = document.getElementById(`global-project-likes-${this.id}`);
+        const l = document.getElementById(`global-project-likes-${safeId}`);
         if (!l) return;
         l.textContent = (parseInt(l.textContent) + incr).toString();
-        const iconEl = document.getElementById(`global-like-icon-${this.id}`);
+        const iconEl = document.getElementById(`global-like-icon-${safeId}`);
         if (iconEl) iconEl.textContent = text;
     }
 

@@ -164,6 +164,23 @@ describe("GlobalCard", () => {
             expect(likes.textContent).toBe("5");
         });
 
+        it("should sanitize unsafe characters in project id to prevent attribute breakout and DOM XSS (#10321)", () => {
+            card.id = 'test-id" onfocus="alert(1)';
+            card.ProjectData = {
+                ProjectName: "XSS Test",
+                ProjectLikes: 0,
+                ProjectImage: null,
+                ProjectIsMusicBlocks: 1
+            };
+            card.render();
+
+            const sanitizedId = "test-idonfocusalert1";
+            expect(card.getSafeId()).toBe(sanitizedId);
+            const container = document.getElementById("global-projects");
+            expect(container.querySelector("[onfocus]")).toBeNull();
+            expect(document.getElementById(`global-project-image-${sanitizedId}`)).not.toBeNull();
+        });
+
         it("should render tags as chip elements", () => {
             card.init("test-id-1");
             card.render();
