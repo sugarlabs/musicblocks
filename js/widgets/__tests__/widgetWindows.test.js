@@ -41,9 +41,29 @@ const canvas = document.createElement("canvas");
 canvas.id = "myCanvas";
 document.body.appendChild(canvas);
 
+const localStorageData = {};
+
 Object.defineProperty(window, "localStorage", {
     writable: true,
-    value: { languagePreference: "en" }
+    value: {
+        languagePreference: "en",
+        getItem: jest.fn(key =>
+            Object.prototype.hasOwnProperty.call(localStorageData, key)
+                ? localStorageData[key]
+                : null
+        ),
+        setItem: jest.fn((key, value) => {
+            localStorageData[key] = String(value);
+        }),
+        removeItem: jest.fn(key => {
+            delete localStorageData[key];
+        }),
+        clear: jest.fn(() => {
+            Object.keys(localStorageData).forEach(key => {
+                delete localStorageData[key];
+            });
+        })
+    }
 });
 
 // Load the module — this sets up window.widgetWindows and WidgetWindow class
@@ -136,6 +156,7 @@ beforeEach(() => {
     window.widgetWindows.openWindows = {};
     window.widgetWindows._posCache = {};
     window.widgetWindows._maximizedCache = {};
+    window.localStorage.removeItem("musicblocks.widgetWindows.positions");
     window.widgetWindows._globalListenersInitialized = false;
     window.widgetWindows.draggingWindow = null;
     // Restore functions
@@ -1867,6 +1888,23 @@ describe("widgetWindows", () => {
             document.dispatchEvent(upEvent);
             expect(win._dragTopHandler).toHaveBeenCalledWith(upEvent);
             expect(window.widgetWindows.draggingWindow).toBeNull();
+        });
+
+        test("persists window position after mouse drag ends", () => {
+            const win = createTestWindow("Persistent Drag Window");
+            win.setPosition(123, 200);
+
+            win._dragTopHandler = jest.fn();
+            window.widgetWindows.draggingWindow = win;
+            win._activeTouchId = null;
+
+            document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+
+            const savedPositions = JSON.parse(
+                window.localStorage.getItem("musicblocks.widgetWindows.positions")
+            );
+
+            expect(savedPositions[win._key]).toEqual([123, 200]);
         });
 
         test("recalculates _dx and _dy after restoring a maximized window during drag", () => {
