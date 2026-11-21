@@ -387,12 +387,15 @@ function setupRhythmBlocks(activity) {
             if (
                 args[0] === null ||
                 typeof args[0] !== "number" ||
-                args[0] <= 0 ||
                 args[1] === null ||
-                typeof args[1] !== "number" ||
-                args[1] <= 0
-            )
+                typeof args[1] !== "number"
+            ) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
+            } else if (args[0] <= 0) {
+                activity.errorMsg(_("Swing value must be greater than 0."), blk);
+            } else if (args[1] <= 0) {
+                activity.errorMsg(_("Note value must be greater than 0."), blk);
+            }
             const arg0 =
                 args[0] === null || typeof args[0] !== "number" || args[0] <= 0 ? 1 / 24 : args[0];
             const arg1 =
