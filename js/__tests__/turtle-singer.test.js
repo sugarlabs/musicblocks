@@ -2799,6 +2799,43 @@ describe("processNote notation and MIDI emission guards against non-positive dur
         ]);
     });
 
+    test("calls notationUpdateTiedDrums with combined length and all drums on tied note", () => {
+        const blk = "tiedDrumsBlk";
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: [] };
+        turtleMock.singer.noteOctaves = { [blk]: [] };
+        turtleMock.singer.noteCents = { [blk]: [] };
+        turtleMock.singer.noteHertz = { [blk]: [] };
+        turtleMock.singer.noteDrums = { [blk]: ["bass drum"] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1] };
+        turtleMock.singer.instrumentNames = ["piano"];
+        turtleMock.singer.oscList = { [blk]: [] };
+        turtleMock.singer.bpm = [90];
+
+        // Simulate second note of a tie (duration = 2 for half note, carry = 4 for quarter note)
+        turtleMock.singer.tieFirstDrums = ["snare drum"];
+        turtleMock.singer.tieCarryOver = 4;
+        turtleMock.singer.tie = true;
+        turtleMock.singer.tieNotePitches = [];
+        turtleMock.singer.tieNoteExtras = [blk, [], [1], [1], ["snare drum"], [], false, 4];
+        activityMock.errorMsg = jest.fn();
+
+        activityMock.logo.notation = {
+            notationUpdateTiedDrums: jest.fn(),
+            notationInsertTie: jest.fn()
+        };
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+        expect(activityMock.logo.notation.notationUpdateTiedDrums).toHaveBeenCalledWith(
+            0,
+            2,
+            ["snare drum", "bass drum"],
+            false
+        );
+        expect(activityMock.logo.updateNotation).not.toHaveBeenCalled();
+    });
+
     test("passes a hertz note to notationMIDI as its nearest note name", () => {
         const blk = "hertzNoteBlk";
         turtleMock.singer.inNoteBlock = [blk];

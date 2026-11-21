@@ -487,6 +487,62 @@ class Notation {
     }
 
     /**
+     * Updates notation staging for tied drums so drums are notated at the start
+     * of the tie with the combined duration.
+     *
+     * @param turtle
+     * @param {number} duration
+     * @param {Array<string>} tiedDrums
+     * @param {boolean} hasRealPitches
+     * @returns {void}
+     */
+    notationUpdateTiedDrums(turtle, duration, tiedDrums, hasRealPitches) {
+        const obj = durationToNoteValue(duration);
+        const notatedDrums = [...tiedDrums].filter(
+            name => !["noise1", "noise2", "noise3"].includes(name)
+        );
+        const drumSymbols = [...new Set(notatedDrums.map(name => getDrumSymbol(name)))];
+
+        if (this._notationDrumStaging[turtle] && this._notationDrumStaging[turtle].length > 0) {
+            const lastDrum =
+                this._notationDrumStaging[turtle][this._notationDrumStaging[turtle].length - 1];
+            if (Array.isArray(lastDrum)) {
+                lastDrum[0] = drumSymbols.length > 0 ? drumSymbols : ["R"];
+                lastDrum[1] = obj[0];
+                lastDrum[2] = obj[1];
+                lastDrum[3] = obj[2];
+                lastDrum[4] = obj[3];
+            }
+        }
+
+        if (this._notationStaging[turtle] && this._notationStaging[turtle].length > 0) {
+            if (!hasRealPitches) {
+                if (
+                    this._notationStaging[turtle][this._notationStaging[turtle].length - 1] ===
+                    "tie"
+                ) {
+                    this._notationStaging[turtle].pop();
+                }
+                const lastStaging =
+                    this._notationStaging[turtle][this._notationStaging[turtle].length - 1];
+                if (Array.isArray(lastStaging)) {
+                    lastStaging[1] = obj[0];
+                    lastStaging[2] = obj[1];
+                    lastStaging[3] = obj[2];
+                    lastStaging[4] = obj[3];
+                    lastStaging[7] = notatedDrums.length > 0 ? notatedDrums : null;
+                }
+            } else {
+                const tieIdx = this._notationStaging[turtle].lastIndexOf("tie");
+                if (tieIdx > 0 && Array.isArray(this._notationStaging[turtle][tieIdx - 1])) {
+                    this._notationStaging[turtle][tieIdx - 1][7] =
+                        notatedDrums.length > 0 ? notatedDrums : null;
+                }
+            }
+        }
+    }
+
+    /**
      * Begins harmonics.
      *
      * @param turtle

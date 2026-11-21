@@ -404,6 +404,50 @@ describe("Notation Class", () => {
             expect(notation._notationStaging[turtle].length).toBe(initialLength - 1);
             expect(notation._pickupPoint[turtle]).toBeNull();
         });
+
+        it("should update drum staging and remove tie for drum-only tied notes", () => {
+            getDrumSymbol.mockImplementation(name => (name === "snare drum" ? "sn" : "bd"));
+            durationToNoteValue.mockReturnValue([2, 0, null, 2]);
+            const turtle = "turtle1";
+            // Stage Note 1 (snare drum, quarter note)
+            notation.doUpdateNotation(["R"], 4, turtle, false, ["snare drum"]);
+            notation.notationInsertTie(turtle);
+
+            // Update tied drums with combined half-note duration (2) and both drums
+            notation.notationUpdateTiedDrums(turtle, 2, ["snare drum", "bass drum"], false);
+
+            // Main notation staging has tie removed and Note 1 updated to duration 2 with both drums
+            expect(notation._notationStaging[turtle]).toHaveLength(1);
+            expect(notation._notationStaging[turtle][0][1]).toBe(2);
+            expect(notation._notationStaging[turtle][0][7]).toEqual(["snare drum", "bass drum"]);
+
+            // Drum staging updated to chord <sn bd> with duration 2
+            expect(notation._notationDrumStaging[turtle]).toHaveLength(1);
+            expect(notation._notationDrumStaging[turtle][0][0]).toEqual(["sn", "bd"]);
+            expect(notation._notationDrumStaging[turtle][0][1]).toBe(2);
+        });
+
+        it("should retain tie in notation staging when tied notes have real pitches", () => {
+            getDrumSymbol.mockImplementation(name => (name === "snare drum" ? "sn" : "bd"));
+            durationToNoteValue.mockReturnValue([2, 0, null, 2]);
+            const turtle = "turtle1";
+            // Stage Note 1 (C4, quarter note) with snare drum
+            notation.doUpdateNotation(["C4"], 4, turtle, false, ["snare drum"]);
+            notation.notationInsertTie(turtle);
+
+            // Update tied drums with combined half-note duration (2) and both drums
+            notation.notationUpdateTiedDrums(turtle, 2, ["snare drum", "bass drum"], true);
+
+            // Main notation staging keeps "tie" for pitches
+            expect(notation._notationStaging[turtle]).toHaveLength(2);
+            expect(notation._notationStaging[turtle][1]).toBe("tie");
+            expect(notation._notationStaging[turtle][0][7]).toEqual(["snare drum", "bass drum"]);
+
+            // Drum staging updated to chord <sn bd> with duration 2
+            expect(notation._notationDrumStaging[turtle]).toHaveLength(1);
+            expect(notation._notationDrumStaging[turtle][0][0]).toEqual(["sn", "bd"]);
+            expect(notation._notationDrumStaging[turtle][0][1]).toBe(2);
+        });
     });
 
     describe("Edge Cases", () => {

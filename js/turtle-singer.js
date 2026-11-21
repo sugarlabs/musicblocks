@@ -2559,9 +2559,50 @@ class Singer {
                             notes.push(note);
                         }
 
+                        let hasTiedDrums = false;
+                        let hasRealPitches = false;
+                        let tiedDrums = [];
+
                         if (duration > 0) {
                             if (carry > 0) {
-                                if (i === 0 && tur.singer.justCounting.length === 0) {
+                                hasTiedDrums =
+                                    (tur.singer.tieFirstDrums &&
+                                        tur.singer.tieFirstDrums.length > 0) ||
+                                    tur.singer.noteDrums[thisBlk].length > 0;
+                                if (hasTiedDrums) {
+                                    tiedDrums = [
+                                        ...new Set([
+                                            ...(tur.singer.tieFirstDrums || []),
+                                            ...tur.singer.noteDrums[thisBlk]
+                                        ])
+                                    ];
+                                    hasRealPitches =
+                                        (tur.singer.tieNotePitches &&
+                                            tur.singer.tieNotePitches.some(p => p[0] !== "rest")) ||
+                                        tur.singer.notePitches[thisBlk].some(p => p !== "rest");
+
+                                    if (
+                                        i === 0 &&
+                                        tur.singer.justCounting.length === 0 &&
+                                        activity.logo &&
+                                        activity.logo.notation &&
+                                        typeof activity.logo.notation.notationUpdateTiedDrums ===
+                                            "function"
+                                    ) {
+                                        activity.logo.notation.notationUpdateTiedDrums(
+                                            turtle,
+                                            duration,
+                                            tiedDrums,
+                                            hasRealPitches
+                                        );
+                                    }
+                                }
+
+                                if (
+                                    i === 0 &&
+                                    tur.singer.justCounting.length === 0 &&
+                                    (!hasTiedDrums || hasRealPitches)
+                                ) {
                                     activity.logo.notation.notationInsertTie(turtle);
                                 }
                             }
@@ -2592,7 +2633,17 @@ class Singer {
                             }
                         } else if (tur.singer.tieCarryOver > 0) {
                             if (tur.singer.justCounting.length === 0) {
-                                if (courtesy[i]) {
+                                if (tur.singer.noteDrums[thisBlk].length > 0) {
+                                    if (!chordNotes.includes(notationNote)) {
+                                        chordNotes.push(notationNote);
+                                    }
+
+                                    for (const drum of tur.singer.noteDrums[thisBlk]) {
+                                        if (!chordDrums.includes(drum)) {
+                                            chordDrums.push(drum);
+                                        }
+                                    }
+                                } else if (courtesy[i]) {
                                     if (!chordNotes.includes(notationNote)) {
                                         chordNotes.push(notationNote);
                                     }
@@ -2649,8 +2700,12 @@ class Singer {
                                                   const [name, octave] = frequencyToPitch(note);
                                                   return name + octave;
                                               }),
-                                        playedBySetDrum ? [last(tur.singer.drumStyle)] : chordDrums,
-                                        d,
+                                        playedBySetDrum
+                                            ? [last(tur.singer.drumStyle)]
+                                            : hasTiedDrums && !hasRealPitches
+                                              ? tiedDrums
+                                              : chordDrums,
+                                        hasTiedDrums && !hasRealPitches ? duration : d,
                                         turtle,
                                         bpmValue || 90,
                                         last(tur.singer.instrumentNames),
@@ -2658,13 +2713,15 @@ class Singer {
                                     );
                                 }
                                 if (exporting || tur.singer.recordingNotation) {
-                                    activity.logo.updateNotation(
-                                        chordNotes,
-                                        d,
-                                        turtle,
-                                        -1,
-                                        chordDrums
-                                    );
+                                    if (!(hasTiedDrums && !hasRealPitches)) {
+                                        activity.logo.updateNotation(
+                                            chordNotes,
+                                            d,
+                                            turtle,
+                                            -1,
+                                            hasTiedDrums ? [] : chordDrums
+                                        );
+                                    }
                                 }
                             }
                         }
