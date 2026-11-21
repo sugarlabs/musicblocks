@@ -37,7 +37,7 @@ is used by JavaScript to do the actual translation of the interface.
 
 There are instructions for adding a new language to the pull-down menu
 in the
-[README.md](https://github.com/sugarlabs/musicblocks/blob/master/README.md)
+[README.md](https://github.com/sugarlabs/musicblocks/blob/master/js/README.md)
 file found in the js directory.
 
 The tools for maintaining the POT, PO, and INI files are found in the
