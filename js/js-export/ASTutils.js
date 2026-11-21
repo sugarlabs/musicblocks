@@ -130,6 +130,68 @@ class ASTUtils {
         return names;
     }
 
+    /**
+     * Finds the boxes that can't be a `var` in a single flow. A box is shared by every stack in
+     * the program, but a `var` is only visible in the action or mouse that declares it, so a box
+     * used in more than one stack, or read in a stack that never stores it, is exported through
+     * setBox/getBox instead.
+     *
+     * @static
+     * @param {Object[]} trees - every action and start stack tree, as built by JSGenerate
+     * @returns {void}
+     */
+    static setSharedBoxes(trees) {
+        const users = new Map();
+        const local = new Set();
+        trees.forEach((tree, index) => {
+            const used = new Set();
+            const walk = node => {
+                if (typeof node === "string") {
+                    if (node.startsWith("box_")) used.add(node.slice("box_".length));
+                    return;
+                }
+                if (!Array.isArray(node)) return;
+                // A box block, or an increment naming its box with text rather than a box block
+                if (
+                    ["box", "increment", "incrementOne", "decrementOne"].includes(node[0]) &&
+                    Array.isArray(node[1]) &&
+                    typeof node[1][0] === "string" &&
+                    !node[1][0].startsWith("box_")
+                ) {
+                    used.add(node[1][0]);
+                }
+                node.forEach(walk);
+            };
+            walk(tree);
+            const stored = ASTUtils.getBoxNames([tree]);
+            stored.forEach(name => used.add(name));
+            for (const name of used) {
+                if (!users.has(name)) users.set(name, new Set());
+                users.get(name).add(index);
+            }
+            stored.forEach(name => local.add(name));
+        });
+        ASTUtils._sharedBoxes = new Set(
+            [...users]
+                .filter(([name, stacks]) => stacks.size > 1 || !local.has(name))
+                .map(([n]) => n)
+        );
+    }
+
+    /**
+     * Whether a box is exported as a plain variable rather than through setBox/getBox.
+     *
+     * @static
+     * @param {*} name - box name
+     * @returns {Boolean}
+     */
+    static _isBoxVariable(name) {
+        return ASTUtils._isValidIdentifier(name) && !ASTUtils._sharedBoxes.has(name);
+    }
+
+    /** Boxes used across stacks in the program being generated; see setSharedBoxes. */
+    static _sharedBoxes = new Set();
+
     /** Action name → identifier for the program being generated; see setActionNames. */
     static _actionIdentifiers = new Map();
 
@@ -557,7 +619,7 @@ class ASTUtils {
             typeof args[0] === "string" && args[0].startsWith("box_") ? args[0].slice(4) : args[0];
         const arg = ASTUtils._getArgsAST([args[1]])[0];
 
-        if (!ASTUtils._isValidIdentifier(identifier)) {
+        if (!ASTUtils._isBoxVariable(identifier)) {
             const deltaAst = isIncrement
                 ? arg
                 : {
@@ -815,7 +877,7 @@ class ASTUtils {
                 return nameAst;
             }
             if (nameAst && nameAst.type === "Literal" && typeof nameAst.value === "string") {
-                if (ASTUtils._isValidIdentifier(nameAst.value)) {
+                if (ASTUtils._isBoxVariable(nameAst.value)) {
                     return {
                         type: "Identifier",
                         name: nameAst.value
@@ -933,7 +995,7 @@ class ASTUtils {
                             value: argVal === "true"
                         });
                     } else if (type === "box") {
-                        if (ASTUtils._isValidIdentifier(argVal)) {
+                        if (ASTUtils._isBoxVariable(argVal)) {
                             ASTs.push({
                                 type: "Identifier",
                                 name: argVal
@@ -1428,7 +1490,7 @@ class ASTUtils {
                 if (
                     nameAst &&
                     nameAst.type === "Literal" &&
-                    ASTUtils._isValidIdentifier(nameAst.value)
+                    ASTUtils._isBoxVariable(nameAst.value)
                 ) {
                     ASTs.push({
                         type: "VariableDeclaration",
@@ -1461,7 +1523,7 @@ class ASTUtils {
                 const instruction = flow[0].slice(0, splitIndex);
                 const idName = flow[0].slice(splitIndex + 1);
                 if (instruction === "storein2") {
-                    if (ASTUtils._isValidIdentifier(idName)) {
+                    if (ASTUtils._isBoxVariable(idName)) {
                         ASTs.push({
                             type: "VariableDeclaration",
                             kind: "var",
