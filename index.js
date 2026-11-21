@@ -102,6 +102,10 @@ app.use((req, res, next) => {
         return res.status(400).send("Bad Request");
     }
 
+    if (decodedPath.includes("\\")) {
+        return res.status(403).send("Forbidden");
+    }
+
     const normalizedPath = path.posix.normalize(decodedPath);
     if (normalizedPath.startsWith("../") || normalizedPath === "..") {
         return res.status(403).send("Forbidden");

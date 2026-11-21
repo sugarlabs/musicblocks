@@ -8,12 +8,31 @@ const app = require("../../index");
 describe("Express server static file access control (SEC-04)", () => {
     let server;
     let baseUrl;
+    let serverPort;
+
+    const sendRawRequest = rawPath =>
+        new Promise((resolve, reject) => {
+            const req = http.request(
+                {
+                    hostname: "127.0.0.1",
+                    port: serverPort,
+                    path: rawPath,
+                    method: "GET"
+                },
+                res => {
+                    res.resume();
+                    resolve(res.statusCode);
+                }
+            );
+            req.on("error", reject);
+            req.end();
+        });
 
     beforeAll(done => {
         server = http.createServer(app);
         server.listen(0, "127.0.0.1", () => {
-            const port = server.address().port;
-            baseUrl = `http://127.0.0.1:${port}`;
+            serverPort = server.address().port;
+            baseUrl = `http://127.0.0.1:${serverPort}`;
             done();
         });
     });
@@ -100,28 +119,38 @@ describe("Express server static file access control (SEC-04)", () => {
 
     describe("Encoded directory traversal protection", () => {
         test("blocks encoded traversal to package.json (/js/%2e%2e/package.json) with 403", async () => {
-            const res = await fetch(`${baseUrl}/js/%2e%2e/package.json`);
-            expect(res.status).toBe(403);
+            const status = await sendRawRequest("/js/%2e%2e/package.json");
+            expect(status).toBe(403);
         });
 
         test("blocks encoded traversal to index.js (/css/%2e%2e/index.js) with 403", async () => {
-            const res = await fetch(`${baseUrl}/css/%2e%2e/index.js`);
-            expect(res.status).toBe(403);
+            const status = await sendRawRequest("/css/%2e%2e/index.js");
+            expect(status).toBe(403);
         });
 
         test("blocks root escape attempts with 403", async () => {
-            const res = await fetch(`${baseUrl}/%2e%2e/%2e%2e/etc/passwd`);
-            expect(res.status).toBe(403);
+            const status = await sendRawRequest("/%2e%2e/%2e%2e/etc/passwd");
+            expect(status).toBe(403);
+        });
+
+        test("blocks encoded backslash traversal attempt (%5c) with 403", async () => {
+            const status = await sendRawRequest("/js%5c%2e%2e%5cpackage.json");
+            expect(status).toBe(403);
+        });
+
+        test("blocks literal backslash in request path with 403", async () => {
+            const status = await sendRawRequest("/js\\..\\package.json");
+            expect(status).toBe(403);
         });
 
         test("rejects malformed percent-encoding with 400 Bad Request", async () => {
-            const res = await fetch(`${baseUrl}/%FF%FE`);
-            expect(res.status).toBe(400);
+            const status = await sendRawRequest("/%FF%FE");
+            expect(status).toBe(400);
         });
 
         test("rejects null byte in path with 400 Bad Request", async () => {
-            const res = await fetch(`${baseUrl}/js/%00/test.js`);
-            expect(res.status).toBe(400);
+            const status = await sendRawRequest("/js/%00/test.js");
+            expect(status).toBe(400);
         });
     });
 });
