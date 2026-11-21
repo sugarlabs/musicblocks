@@ -1438,7 +1438,8 @@ var getSolfege = (note, keySignature, movable, temperament, edo) => {
         return CHROMATIC_SOLFEGE[solfegeIndex].toLowerCase();
     }
 
-    return SOLFEGECONVERSIONTABLE[note];
+    // The table only spells single accidentals; a name it lacks (B𝄫) stays a name.
+    return SOLFEGECONVERSIONTABLE[note] ?? note;
 };
 
 var MusicUtilsBuildScale = {
