@@ -66,6 +66,7 @@ if (typeof module !== "undefined" && module.exports) {
     var {
         generateNoteNames,
         getCurrentEDO,
+        getTemperament,
         normalizeEDO,
         getEdoNoteNamePosition,
         isTrueEDO,
@@ -331,6 +332,26 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
         return 0;
     }
     const originalPitch = pitch;
+    const temperamentData = getTemperament(temperament);
+    if (
+        temperamentData &&
+        !isTrueEDO(temperament) &&
+        temperamentData.noteLabels &&
+        temperamentData.ratios
+    ) {
+        const normalizedPitch = originalPitch
+            .replace(/^([a-g])/, letter => letter.toUpperCase())
+            .replaceAll("#", SHARP)
+            .replaceAll("b", FLAT);
+        const noteIndex = temperamentData.noteLabels.indexOf(normalizedPitch);
+        if (noteIndex !== -1) {
+            const aIndex = temperamentData.noteLabels.indexOf("A");
+            return (
+                octave * temperamentData.ratios.length + noteIndex - (aIndex !== -1 ? aIndex : 0)
+            );
+        }
+    }
+
     // Check for flat, sharp, double flat, or double sharp.
     let transposition = 0;
     if (pitch.length > 1) {
@@ -388,7 +409,10 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
     // For EDO > 12, use the EDO-specific name table for ALL pitches
     // (naturals and accidentals alike) so that the A reference is
     // consistent with the table's natural positions.
-    if (currentEDO !== 12) {
+    if (
+        currentEDO !== 12 &&
+        !(temperamentData && temperamentData.noteLabels && !isTrueEDO(temperament))
+    ) {
         const names = generateNoteNames(currentEDO);
         let aIndex = names.indexOf("A");
         if (aIndex === -1) {
@@ -396,6 +420,16 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
             // Use its proportional position from 12-EDO (A is at index 9).
             aIndex = Math.round((9 / 12) * currentEDO);
         }
+        // The generated 31-EDO table places C♭ one slot before C and B♯
+        // one slot after B, so single accidentals follow a one-slot delta.
+        const naturalPos = names.indexOf(pitch.toUpperCase());
+        if (naturalPos !== -1) {
+            const unwrappedPos = naturalPos + transposition;
+            const octaveShift = Math.floor(unwrappedPos / currentEDO);
+            const edoPos = ((unwrappedPos % currentEDO) + currentEDO) % currentEDO;
+            return (octave + octaveShift) * currentEDO + edoPos - aIndex;
+        }
+
         const normalizedPitch = originalPitch
             .replace(/^([a-g])/, (_, letter) => letter.toUpperCase())
             .replaceAll("#", SHARP)
@@ -818,7 +852,9 @@ var numberToPitch = (i, temperament, startPitch, offset, activity) => {
                     aIndex = Math.round((9 / 12) * currentEDO);
                 }
                 const nameIndex = (((i + aIndex) % currentEDO) + currentEDO) % currentEDO;
-                return [edoNames[nameIndex], Math.floor((i + aIndex) / currentEDO) - n];
+                const noteName = edoNames[nameIndex];
+                const noteOctave = Math.floor((i + aIndex) / currentEDO) - n;
+                return [noteName, noteOctave + (noteName === "C" + FLAT ? 1 : 0)];
             }
         } else {
             pitchNumber = Math.floor(i - offset);
@@ -838,7 +874,9 @@ var numberToPitch = (i, temperament, startPitch, offset, activity) => {
                     aIndex = Math.round((9 / 12) * currentEDO);
                 }
                 const nameIndex = (((i + aIndex) % currentEDO) + currentEDO) % currentEDO;
-                return [edoNames[nameIndex], Math.floor((i + aIndex) / currentEDO)];
+                const noteName = edoNames[nameIndex];
+                const noteOctave = Math.floor((i + aIndex) / currentEDO);
+                return [noteName, noteOctave + (noteName === "C" + FLAT ? 1 : 0)];
             }
         } else {
             pitchNumber = Math.floor(i - offset);
@@ -1132,6 +1170,7 @@ function getNote(
 
     let rememberFlat = false;
     let rememberSharp = false;
+    let numericPitchInput = false;
     let transpositionFloor = 0;
     let transpositionCents = 0;
 
@@ -1195,6 +1234,7 @@ function getNote(
     octave = Math.round(octave);
 
     if (typeof noteArg === "number") {
+        numericPitchInput = true;
         // Assume it is a pitch number.
         if (!keySignature) {
             keySignature = "C major";
@@ -1426,6 +1466,10 @@ function getNote(
                     console.debug("note not found in EDO table? " + note);
                 }
             }
+        }
+
+        if (numericPitchInput && note === "C" + FLAT) {
+            octave += 1;
         }
 
         // Try to find a note in the current keySignature
