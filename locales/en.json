@@ -2015,5 +2015,19 @@
   "day": "day",
   "high": "high",
   "low": "low",
-  "publish": "publish"
+  "publish": "publish",
+  "Code Map": "Code Map",
+  "Action Call Graph": "Action Call Graph",
+  "Filter actions...": "Filter actions...",
+  "Filter actions": "Filter actions",
+  "Fit to View": "Fit to View",
+  "No action definitions or start stacks found in workspace.": "No action definitions or start stacks found in workspace.",
+  "1 Action": "1 Action",
+  "%s Actions": "%s Actions",
+  "1 Call": "1 Call",
+  "%s Calls": "%s Calls",
+  "%s Recursive": "%s Recursive",
+  "%s Missing": "%s Missing",
+  "Click to focus block in workspace": "Click to focus block in workspace",
+  "Recursive": "Recursive"
 }

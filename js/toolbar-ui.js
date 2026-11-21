@@ -159,6 +159,7 @@ class ToolbarUI {
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["chooseKeyIcon", _("Set Pitch Preview")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
+                ["codeMapIcon", _("Code Map")],
                 ["restoreIcon", _("Restore")],
                 ["beginnerMode", _("Switch to beginner mode")],
                 ["advancedMode", _("Switch to advanced mode")],
@@ -238,6 +239,7 @@ class ToolbarUI {
                 ["highcontrast", _("High-contrast Mode")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
+                ["codeMapIcon", _("Code Map")],
                 ["restoreIcon", _("Restore")],
                 ["beginnerMode", _("Switch to beginner mode")],
                 ["advancedMode", _("Switch to advanced mode")],
@@ -1451,6 +1453,12 @@ class ToolbarUI {
                     toggleJavaScriptIcon.style.display = "block";
                 }
 
+                // Code Map Toggle
+                const codeMapIcon = docById("codeMapIcon");
+                if (codeMapIcon) {
+                    codeMapIcon.style.display = "block";
+                }
+
                 // Update helpful wheel items visibility for advanced mode
                 if (this.activity.helpfulWheelItems) {
                     this.activity.helpfulWheelItems.forEach(item => {
@@ -1467,7 +1475,8 @@ class ToolbarUI {
                     "delPluginIcon",
                     "enableHorizScrollIcon",
                     "disableHorizScrollIcon",
-                    "toggleJavaScriptIcon"
+                    "toggleJavaScriptIcon",
+                    "codeMapIcon"
                 ];
 
                 advancedIcons.forEach(iconId => {
@@ -1679,6 +1688,20 @@ class ToolbarUI {
     }
 
     /**
+     * Renders the Code Map icon with the provided onclick handler.
+     *
+     * @public
+     * @param {Function} onclick - The onclick handler for the Code Map icon.
+     * @returns {void}
+     */
+    renderCodeMapIcon(onclick) {
+        const icon = docById("codeMapIcon");
+        if (icon) {
+            icon.onclick = () => onclick(this.activity);
+        }
+    }
+
+    /**
      * Renders the language select icon with the provided languageBox object.
      *
      * @public
@@ -1847,7 +1870,7 @@ class ToolbarUI {
 
             // Aux toolbar button selectors (Option A: Playback & Inspection, Workspace & Tools, Preferences & Modes)
             const auxSelectors =
-                "#runSlowlyIcon, #runStepByStepIcon, #displayStatsIcon, #toggleJavaScriptIcon, " +
+                "#runSlowlyIcon, #runStepByStepIcon, #displayStatsIcon, #toggleJavaScriptIcon, #codeMapIcon, " +
                 "#wrapTurtle, #enableHorizScrollIcon, #disableHorizScrollIcon, #restoreIcon, " +
                 "#chooseKeyIcon, #mergeWithCurrentIcon, #loadPluginIcon, #delPluginIcon, " +
                 "#beginnerMode, #advancedMode, #themeSelectIcon, #languageSelectIcon";
