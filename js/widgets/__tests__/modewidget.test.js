@@ -230,6 +230,7 @@ window.widgetWindows = {
                 appendChild: jest.fn(),
                 replaceChildren: jest.fn(),
                 removeChild: jest.fn(),
+                setAttribute: jest.fn(),
                 firstChild: null
             };
             btn.onclick = jest.fn();
@@ -1519,6 +1520,17 @@ describe("ModeWidget", () => {
             expect(modeWidget._locked).toBe(false);
             expect(mockActivity.logo.synth.trigger).toHaveBeenCalledTimes(triggerCount);
             expect(setIcon).toHaveBeenCalledWith("play-button.svg", "Play all");
+        });
+
+        test("play button's accessible name tracks Play/Stop so screen readers hear its current state", () => {
+            modeWidget._playButton.onclick();
+            expect(modeWidget._playButton.setAttribute).toHaveBeenCalledWith("aria-label", "Stop");
+
+            modeWidget._playButton.onclick();
+            expect(modeWidget._playButton.setAttribute).toHaveBeenCalledWith(
+                "aria-label",
+                "Play all"
+            );
         });
 
         test("idle Clear preserves the root and can be undone", () => {

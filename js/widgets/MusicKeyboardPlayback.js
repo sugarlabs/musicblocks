@@ -94,6 +94,7 @@ const MusicKeyboardPlayback = {
                 })(),
                 document.createTextNode("\u00a0\u00a0")
             );
+            playButtonCell.setAttribute("aria-label", isPlaying ? _("Stop") : _("Play"));
         };
 
         /**

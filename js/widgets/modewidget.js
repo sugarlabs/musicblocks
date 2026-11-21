@@ -345,6 +345,7 @@ class ModeWidget {
             img,
             document.createTextNode("\u00a0\u00a0")
         );
+        this._playButton.setAttribute("aria-label", titleText);
     }
 
     // ── EDO helpers ───────────────────────────────────────────────

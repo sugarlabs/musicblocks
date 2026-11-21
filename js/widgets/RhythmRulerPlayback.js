@@ -50,6 +50,7 @@ class RhythmRulerPlayback {
      */
     __pause() {
         this._setButtonIcon(this._playAllCell, "play-button.svg", _("Play all"));
+        this._setPlayAllAccessibleName(_("Play all"));
         this._playing = false;
         this._playingAll = false;
         this._playingOne = false;
@@ -95,6 +96,7 @@ class RhythmRulerPlayback {
     __resume() {
         this._clearWidgetTimers();
         this._setButtonIcon(this._playAllCell, "pause-button.svg", _("Pause"));
+        this._setPlayAllAccessibleName(_("Pause"));
         this.activity.logo.turtleDelay = 0;
         this._playingAll = true;
         this._playing = true;

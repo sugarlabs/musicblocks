@@ -404,6 +404,21 @@ describe("RhythmRuler Widget", () => {
             expect(callback).not.toHaveBeenCalled();
             expect(rhythmRuler._timerManager.activeCount).toBe(0);
         });
+
+        test("__pause and __resume update the Play all button's own accessible name", () => {
+            rhythmRuler._playAllCell = document.createElement("div");
+            rhythmRuler.Rulers = [[[4], []]];
+            rhythmRuler.activity.logo.synth.stop = jest.fn();
+            jest.spyOn(rhythmRuler, "_playAll").mockImplementation();
+            jest.spyOn(rhythmRuler, "_calculateZebraStripes").mockImplementation();
+            jest.spyOn(rhythmRuler, "_refreshCircularView").mockImplementation();
+
+            rhythmRuler.__resume();
+            expect(rhythmRuler._playAllCell.getAttribute("aria-label")).toBe("Pause");
+
+            rhythmRuler.__pause();
+            expect(rhythmRuler._playAllCell.getAttribute("aria-label")).toBe("Play all");
+        });
     });
 
     describe("Per-drum play controls", () => {
