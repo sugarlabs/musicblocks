@@ -690,11 +690,32 @@ class MidiTranscriber {
     }
 
     async transcribe() {
+        // Name-based blocks resolve the first matching turtle, so imported
+        // names must be unique within the set of tracks being transcribed.
+        const usedTrackNames = new Set();
+        const uniqueName = name => {
+            let candidate = name;
+            let suffix = 2;
+            while (usedTrackNames.has(candidate)) {
+                candidate = `${name} ${suffix++}`;
+            }
+            usedTrackNames.add(candidate);
+            return candidate;
+        };
+
         this.midi.tracks.forEach((track, trackIndex) => {
             const schedules = this.buildSchedules(track);
+            // Keep the source track's name when the MIDI file provides one so
+            // named tracks stay recognizable in the imported project; fall back
+            // to trackN for tracks without a name.
+            const baseName =
+                track.name && String(track.name).trim()
+                    ? String(track.name).trim()
+                    : `track${trackIndex}`;
             schedules.forEach((schedule, voiceIndex) => {
-                const name =
-                    `track${trackIndex}` + (schedules.length > 1 ? ` voice ${voiceIndex + 1}` : "");
+                const name = uniqueName(
+                    baseName + (schedules.length > 1 ? ` voice ${voiceIndex + 1}` : "")
+                );
                 this.processTrack(track, schedule, name, schedules.length > 1);
             });
         });

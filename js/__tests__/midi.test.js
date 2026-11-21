@@ -1341,4 +1341,129 @@ describe("transcribeMidi", () => {
         // This exactly matches the legacy `master` behavior.
         expect(noteBlocks.length).toBe(100);
     });
+
+    describe("source track names", () => {
+        const importedNames = () => {
+            const blocks = loadNewBlocksSpy.mock.calls[0][0];
+            const byIndex = new Map(blocks.map(b => [b[0], b]));
+            return blocks
+                .filter(b => blockName(b) === "setturtlename2")
+                .map(b => byIndex.get(b[4][1])[1][1].value);
+        };
+
+        it("uses a non-empty MIDI track name", async () => {
+            const { Midi } = require("@tonejs/midi");
+            const file = new Midi();
+            file.header.setTempo(120);
+            const track = file.addTrack();
+            track.name = "Piano";
+            track.addNote({ midi: 60, time: 0, duration: 1 });
+            await transcribeMidi(new Midi(file.toArray()), 1000);
+            const blocks = loadNewBlocksSpy.mock.calls[0][0];
+            const byIndex = new Map(blocks.map(b => [b[0], b]));
+            const names = blocks
+                .filter(b => blockName(b) === "setturtlename2")
+                .map(b => byIndex.get(b[4][1])[1][1].value);
+            expect(names).toEqual(["Piano"]);
+        });
+
+        it("falls back to trackN for an unnamed track", async () => {
+            const { Midi } = require("@tonejs/midi");
+            const file = new Midi();
+            file.header.setTempo(120);
+            const track = file.addTrack();
+            track.addNote({ midi: 60, time: 0, duration: 1 });
+            await transcribeMidi(new Midi(file.toArray()), 1000);
+            const blocks = loadNewBlocksSpy.mock.calls[0][0];
+            const byIndex = new Map(blocks.map(b => [b[0], b]));
+            const names = blocks
+                .filter(b => blockName(b) === "setturtlename2")
+                .map(b => byIndex.get(b[4][1])[1][1].value);
+            expect(names).toEqual(["track0"]);
+        });
+
+        it("appends a voice suffix for multi-voice tracks", async () => {
+            const { Midi } = require("@tonejs/midi");
+            const file = new Midi();
+            file.header.setTempo(120);
+            const track = file.addTrack();
+            track.name = "Strings";
+            track.addNote({ midi: 60, time: 0, duration: 2 });
+            track.addNote({ midi: 64, time: 0.5, duration: 1 });
+            await transcribeMidi(new Midi(file.toArray()), 1000);
+            const blocks = loadNewBlocksSpy.mock.calls[0][0];
+            const byIndex = new Map(blocks.map(b => [b[0], b]));
+            const names = blocks
+                .filter(b => blockName(b) === "setturtlename2")
+                .map(b => byIndex.get(b[4][1])[1][1].value);
+            expect(names).toEqual(["Strings voice 1", "Strings voice 2"]);
+        });
+
+        it("trims a padded MIDI track name", async () => {
+            const { Midi } = require("@tonejs/midi");
+            const file = new Midi();
+            file.header.setTempo(120);
+            const track = file.addTrack();
+            track.name = "  Piano  ";
+            track.addNote({ midi: 60, time: 0, duration: 1 });
+            await transcribeMidi(new Midi(file.toArray()), 1000);
+            expect(importedNames()).toEqual(["Piano"]);
+        });
+
+        it("falls back to trackN for a whitespace-only track name", async () => {
+            const { Midi } = require("@tonejs/midi");
+            const file = new Midi();
+            file.header.setTempo(120);
+            const track = file.addTrack();
+            track.name = "   ";
+            track.addNote({ midi: 60, time: 0, duration: 1 });
+            await transcribeMidi(new Midi(file.toArray()), 1000);
+            expect(importedNames()).toEqual(["track0"]);
+        });
+
+        it("deduplicates repeated source track names", async () => {
+            const { Midi } = require("@tonejs/midi");
+            const file = new Midi();
+            file.header.setTempo(120);
+            for (const name of ["Piano", "Piano", "Piano 2"]) {
+                const track = file.addTrack();
+                track.name = name;
+                track.addNote({ midi: 60, time: 0, duration: 1 });
+            }
+            await transcribeMidi(new Midi(file.toArray()), 1000);
+            expect(importedNames()).toEqual(["Piano", "Piano 2", "Piano 2 2"]);
+        });
+
+        it("deduplicates fallback names", async () => {
+            const { Midi } = require("@tonejs/midi");
+            const file = new Midi();
+            file.header.setTempo(120);
+            const unnamed = file.addTrack();
+            unnamed.addNote({ midi: 60, time: 0, duration: 1 });
+            const named = file.addTrack();
+            named.name = "track0";
+            named.addNote({ midi: 64, time: 0, duration: 1 });
+            await transcribeMidi(new Midi(file.toArray()), 1000);
+            expect(importedNames()).toEqual(["track0", "track0 2"]);
+        });
+
+        it("deduplicates multi-voice labels", async () => {
+            const { Midi } = require("@tonejs/midi");
+            const file = new Midi();
+            file.header.setTempo(120);
+            const strings = file.addTrack();
+            strings.name = "Strings";
+            strings.addNote({ midi: 60, time: 0, duration: 2 });
+            strings.addNote({ midi: 64, time: 0.5, duration: 1 });
+            const other = file.addTrack();
+            other.name = "Strings voice 1";
+            other.addNote({ midi: 67, time: 0, duration: 1 });
+            await transcribeMidi(new Midi(file.toArray()), 1000);
+            expect(importedNames()).toEqual([
+                "Strings voice 1",
+                "Strings voice 2",
+                "Strings voice 1 2"
+            ]);
+        });
+    });
 });
