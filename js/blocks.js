@@ -5634,6 +5634,24 @@ class Blocks {
         };
 
         /**
+         * Drops waiting callbacks invalidated by a failed load. Unscoped
+         * callbacks can act on a partially loaded workspace, and callbacks
+         * for the failed or an already-replaced load must not run at all.
+         * Token-scoped callbacks for requests still in _loadQueue are kept:
+         * their blocks have not been touched by the failure yet.
+         * @private
+         * @returns {void}
+         */
+        this._dropFailedLoadCallbacks = () => {
+            const queuedTokens = new Set(this._loadQueue.map(request => request.loadToken));
+            for (const entry of [...this._afterLoadCallbacks]) {
+                if (typeof entry === "function" || !queuedTokens.has(entry.loadToken)) {
+                    this._afterLoadCallbacks.delete(entry);
+                }
+            }
+        };
+
+        /**
          * Marks the current load as finished and, if another load was
          * queued while it ran, starts that one. Otherwise runs whatever
          * was waiting on runAfterLoad(), except callbacks scoped to a load
@@ -5646,9 +5664,11 @@ class Blocks {
 
             // A failed load leaves only part of the project behind, which is
             // exactly what the waiting callbacks were held back from seeing.
-            // Drop them now, since a queued load clears _lastLoadFailed.
+            // Drop those, but keep token-scoped callbacks for requests still
+            // queued behind the failure: their blocks have not been touched
+            // by it and are still coming.
             if (this._lastLoadFailed) {
-                this._afterLoadCallbacks.clear();
+                this._dropFailedLoadCallbacks();
             }
 
             if (this._loadQueue.length > 0) {
@@ -5780,8 +5800,9 @@ class Blocks {
                         this.activity.stopLoadAnimation();
                     }
                     // Nothing was loaded, so a waiting save would only store
-                    // the cleared workspace over the project.
-                    this._afterLoadCallbacks.clear();
+                    // the cleared workspace over the project. Keep callbacks
+                    // scoped to loads still queued behind this one.
+                    this._dropFailedLoadCallbacks();
                     this._advanceLoadQueue();
                 };
 

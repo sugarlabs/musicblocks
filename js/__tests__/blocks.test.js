@@ -4030,6 +4030,65 @@ describe("Blocks Foundation", () => {
             expect(callback).toHaveBeenCalledTimes(1);
         });
 
+        it("runAfterLoad keeps a token-scoped callback for a load queued behind a failed one", async () => {
+            let callCount = 0;
+            blocks._processOneBlock = jest.fn((b, blockObjs, blockOffset) => {
+                callCount++;
+                if (callCount === 21) {
+                    throw new Error("deferred chunk failure");
+                }
+                blocks.blockList[blockOffset + b] = { connections: null, trash: false };
+                blocks._adjustTheseStacks.push(blockOffset + b);
+                setTimeout(() => blocks.cleanupAfterLoad(), 0);
+            });
+            const onWindowError = event => event.preventDefault();
+            window.addEventListener("error", onWindowError);
+            const failedCallback = jest.fn();
+            const queuedCallback = jest.fn();
+
+            try {
+                const loadFailed = nextLoadEvent("loadFailed");
+                const queuedFinished = nextLoadEvent("finishedLoading");
+                const failedToken = blocks.loadNewBlocks(makeBatch(25));
+                const queuedToken = blocks.loadNewBlocks(makeBatch(2));
+                blocks.runAfterLoad(failedCallback, failedToken);
+                blocks.runAfterLoad(queuedCallback, queuedToken);
+                expect(failedCallback).not.toHaveBeenCalled();
+                expect(queuedCallback).not.toHaveBeenCalled();
+                expect((await loadFailed).token).toBe(failedToken);
+                expect((await queuedFinished).token).toBe(queuedToken);
+            } finally {
+                window.removeEventListener("error", onWindowError);
+            }
+
+            expect(failedCallback).not.toHaveBeenCalled();
+            expect(queuedCallback).toHaveBeenCalledTimes(1);
+        });
+
+        it("runAfterLoad keeps a token-scoped callback for a load queued behind a rejected one", async () => {
+            const circularBatch = [[0, "forward", 0, 0, [0, null, null]]];
+            const callback = jest.fn();
+            const finishedTokens = [];
+            const bothLoadsFinished = new Promise(resolve => {
+                global.pubsub.on("finishedLoading", payload => {
+                    finishedTokens.push(payload.token);
+                    if (finishedTokens.length === 2) resolve();
+                });
+            });
+
+            const firstToken = blocks.loadNewBlocks(makeBatch(25));
+            blocks.loadNewBlocks(circularBatch);
+            const queuedToken = blocks.loadNewBlocks(makeBatch(2));
+            blocks.runAfterLoad(callback, queuedToken);
+            expect(callback).not.toHaveBeenCalled();
+
+            await bothLoadsFinished;
+
+            expect(finishedTokens).toEqual([firstToken, queuedToken]);
+            expect(mockActivity.errorMsg).toHaveBeenCalled();
+            expect(callback).toHaveBeenCalledTimes(1);
+        });
+
         it("runAfterLoad drops its callbacks when the load fails partway", async () => {
             let callCount = 0;
             blocks._processOneBlock = jest.fn((b, blockObjs, blockOffset) => {

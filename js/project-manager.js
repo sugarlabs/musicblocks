@@ -901,7 +901,9 @@ class ProjectManager {
 
             setTimeout(() => {
                 that.sendAllToTrash(false, false);
-                that.blocks.loadNewBlocks(DATAOBJS);
+                // Route through justLoadStart() so the fresh default stack is
+                // also recentred, like a first load.
+                pm.justLoadStart();
             }, 1000);
         }
     }

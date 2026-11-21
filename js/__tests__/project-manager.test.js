@@ -1465,8 +1465,10 @@ describe("newProject / _afterDelete", () => {
         jest.useRealTimers();
     });
 
-    it("schedules sendAllToTrash and loadNewBlocks when no planet", () => {
+    it("schedules sendAllToTrash and a centered default load when no planet", () => {
         const activity = makeActivity({ planet: undefined });
+        const loadToken = 9;
+        activity.blocks.loadNewBlocks.mockReturnValue(loadToken);
         const pm = new ProjectManager(activity);
         jest.useFakeTimers();
 
@@ -1475,6 +1477,7 @@ describe("newProject / _afterDelete", () => {
 
         expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, false);
         expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith(global.DATAOBJS);
+        expect(activity.blocks.runAfterLoad).toHaveBeenCalledWith(expect.any(Function), loadToken);
         jest.useRealTimers();
     });
 
