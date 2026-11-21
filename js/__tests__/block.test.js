@@ -3133,6 +3133,31 @@ describe("Block Foundation", () => {
             expect(el.id).toBe("accessible-block-0");
         });
 
+        it.each(["hidden", "hiddennoflow"])(
+            "_setupAccessibleElement skips the invisible %s connector block",
+            name => {
+                const hiddenBlock = new Block(
+                    { name, staticLabels: [], image: "", docks: [] },
+                    testBlocks
+                );
+                hiddenBlock.blockIndex = 5;
+                hiddenBlock.container = { x: 0, y: 0, on: jest.fn(), children: [] };
+
+                expect(hiddenBlock._setupAccessibleElement()).toBeNull();
+                expect(hiddenBlock.accessibleElement).toBeFalsy();
+                expect(document.getElementById("accessible-block-5")).toBeNull();
+            }
+        );
+
+        it("_setupAccessibleElement removes a stale element when the block becomes hidden", () => {
+            block._setupAccessibleElement();
+            expect(document.getElementById("accessible-block-0")).not.toBeNull();
+
+            block.name = "hidden";
+            expect(block._setupAccessibleElement()).toBeNull();
+            expect(document.getElementById("accessible-block-0")).toBeNull();
+        });
+
         it("activate dispatches synthetic click event to container", () => {
             block.activate();
             expect(block.container.dispatchEvent).toHaveBeenCalledWith(
