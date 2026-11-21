@@ -815,6 +815,39 @@ describe("Tests for Singer.PitchActions setup", () => {
         });
     });
 
+    describe("a frequency is named in the current temperament", () => {
+        // Just intonation tunes C4 so that A4 is 440 Hz, which puts its G4 at 396 Hz. The
+        // equal-tempered G4 is 392 Hz, so 396 Hz named there is G4 + 17.6 cents, and those
+        // cents added to just G4 played about 400 Hz.
+        const justG4 = () => musicUtils.pitchToFrequency("G", 4, 0, "C major", "just intonation");
+
+        test("a Hertz block passes the pitch with cents from the just G4", () => {
+            activity.logo.synth.inTemperament = "just intonation";
+
+            Singer.PitchActions.playHertz(justG4(), 0, blkId);
+
+            expect(Singer.processPitch).toHaveBeenCalledWith(activity, "G", 4, 0, 0, blkId);
+        });
+
+        test("a synth frequency plays the frequency it was given", () => {
+            activity.logo.synth.inTemperament = "just intonation";
+            turtle.singer.inNoteBlock = [blkId];
+            turtle.singer.oscList = { [blkId]: [] };
+            turtle.singer.notePitches = { [blkId]: [] };
+            turtle.singer.noteOctaves = { [blkId]: [] };
+            turtle.singer.noteCents = { [blkId]: [] };
+            turtle.singer.noteHertz = { [blkId]: [] };
+            turtle.singer.noteBeatValues = { [blkId]: [] };
+            activity.blocks.blockList[blkId] = { name: "sine" };
+
+            // 405 Hz is 39 cents above the just G4.
+            Singer.PitchActions.playSynthFrequency(405, 0, blkId);
+
+            expect(turtle.singer.notePitches[blkId]).toEqual(["G"]);
+            expect(turtle.singer.noteHertz[blkId][0]).toBeCloseTo(405, 1);
+        });
+    });
+
     describe("Tests for setAccidental", () => {
         test("named accidental from ACCIDENTALNAMES applies its value", () => {
             const dsp = jest.spyOn(activity.logo, "setDispatchBlock");
