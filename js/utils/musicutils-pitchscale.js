@@ -20,7 +20,7 @@
 
    NOTESYMBOLS, keySignatureToMode, getScaleAndHalfSteps,
    getSharpFlatPreference, pitchToNumber, getNoteFromInterval, numberToPitch,
-   getNoteFromSolfege, getNote, MusicUtilsPitchScale
+   getNoteFromSolfege, getNote, DOUBLE_ACCIDENTAL_EQUIVALENTS, MusicUtilsPitchScale
  */
 
 // var, not const or let: a hoisted var in musicutils.js cannot redeclare a top-level const or let.
@@ -112,6 +112,88 @@ var NOTESYMBOLS = {
     64: sixtyfourthNoteImg
 };
 
+var DOUBLE_ACCIDENTAL_EQUIVALENTS = {
+    ["C" + DOUBLESHARP]: "D",
+    ["D" + DOUBLESHARP]: "E",
+    ["E" + DOUBLESHARP]: "F" + SHARP,
+    ["F" + DOUBLESHARP]: "G",
+    ["G" + DOUBLESHARP]: "A",
+    ["A" + DOUBLESHARP]: "B",
+    ["B" + DOUBLESHARP]: "C" + SHARP,
+
+    ["c" + DOUBLESHARP]: "D",
+    ["d" + DOUBLESHARP]: "E",
+    ["e" + DOUBLESHARP]: "F" + SHARP,
+    ["f" + DOUBLESHARP]: "G",
+    ["g" + DOUBLESHARP]: "A",
+    ["a" + DOUBLESHARP]: "B",
+    ["b" + DOUBLESHARP]: "C" + SHARP,
+
+    "C##": "D",
+    "D##": "E",
+    "E##": "F" + SHARP,
+    "F##": "G",
+    "G##": "A",
+    "A##": "B",
+    "B##": "C" + SHARP,
+
+    "c##": "D",
+    "d##": "E",
+    "e##": "F" + SHARP,
+    "f##": "G",
+    "g##": "A",
+    "a##": "B",
+    "b##": "C" + SHARP,
+
+    "Cx": "D",
+    "Dx": "E",
+    "Ex": "F" + SHARP,
+    "Fx": "G",
+    "Gx": "A",
+    "Ax": "B",
+    "Bx": "C" + SHARP,
+
+    "cx": "D",
+    "dx": "E",
+    "ex": "F" + SHARP,
+    "fx": "G",
+    "gx": "A",
+    "ax": "B",
+    "bx": "C" + SHARP,
+
+    ["C" + DOUBLEFLAT]: "B" + FLAT,
+    ["D" + DOUBLEFLAT]: "C",
+    ["E" + DOUBLEFLAT]: "D",
+    ["F" + DOUBLEFLAT]: "E" + FLAT,
+    ["G" + DOUBLEFLAT]: "F",
+    ["A" + DOUBLEFLAT]: "G",
+    ["B" + DOUBLEFLAT]: "A",
+
+    ["c" + DOUBLEFLAT]: "B" + FLAT,
+    ["d" + DOUBLEFLAT]: "C",
+    ["e" + DOUBLEFLAT]: "D",
+    ["f" + DOUBLEFLAT]: "E" + FLAT,
+    ["g" + DOUBLEFLAT]: "F",
+    ["a" + DOUBLEFLAT]: "G",
+    ["b" + DOUBLEFLAT]: "A",
+
+    "Cbb": "B" + FLAT,
+    "Dbb": "C",
+    "Ebb": "D",
+    "Fbb": "E" + FLAT,
+    "Gbb": "F",
+    "Abb": "G",
+    "Bbb": "A",
+
+    "cbb": "B" + FLAT,
+    "dbb": "C",
+    "ebb": "D",
+    "fbb": "E" + FLAT,
+    "gbb": "F",
+    "abb": "G",
+    "bbb": "A"
+};
+
 /**
  * Convert a key signature to mode, returning an array with the key and mode.
  * @function
@@ -147,15 +229,20 @@ var keySignatureToMode = keySignature => {
         key = parts[0];
     }
 
-    if (key === "C" + FLAT) {
+    if (key === "C" + FLAT || key === "c" + FLAT) {
         parts = keySignature.split(" ");
         key = "C" + FLAT;
-    } else if (key === "B" + SHARP) {
+    } else if (key === "B" + SHARP || key === "b" + SHARP) {
         parts = keySignature.split(" ");
         key = "B" + SHARP;
-    } else if (key === "F" + FLAT) {
+    } else if (key === "F" + FLAT || key === "f" + FLAT) {
         parts = keySignature.split(" ");
         key = "F" + FLAT;
+    } else if (key === "E" + SHARP || key === "e" + SHARP) {
+        parts = keySignature.split(" ");
+        key = "E" + SHARP;
+    } else if (key in DOUBLE_ACCIDENTAL_EQUIVALENTS) {
+        key = DOUBLE_ACCIDENTAL_EQUIVALENTS[key];
     } else if (SOLFEGENAMES1.includes(key)) {
         // This conversion will be a bit iffy depending upon the current mode.
 
@@ -1201,14 +1288,38 @@ function getNote(
         }
         let kOffset = 0;
         if (movable) {
-            kOffset = PITCHES.indexOf(keySignature.split(" ")[0]);
-            if (kOffset === -1) {
-                kOffset = PITCHES2.indexOf(keySignature.split(" ")[0]);
+            const tonic = keySignatureToMode(keySignature)[0];
+            let foundOffset = -1;
+            if (octaveLength !== 12) {
+                foundOffset = getEdoNoteNamePosition(tonic, octaveLength);
             }
-            if (kOffset === -1) {
+            if (foundOffset === -1) {
+                foundOffset = PITCHES.indexOf(tonic);
+                if (foundOffset === -1) {
+                    foundOffset = PITCHES2.indexOf(tonic);
+                }
+                if (foundOffset === -1) {
+                    const enharmonicEquivalents = {
+                        ["E" + SHARP]: "F",
+                        ["e" + SHARP]: "F",
+                        ["B" + SHARP]: "C",
+                        ["b" + SHARP]: "C",
+                        ["C" + FLAT]: "B",
+                        ["c" + FLAT]: "B",
+                        ["F" + FLAT]: "E",
+                        ["f" + FLAT]: "E"
+                    };
+                    if (tonic in enharmonicEquivalents) {
+                        foundOffset = PITCHES.indexOf(enharmonicEquivalents[tonic]);
+                    }
+                }
+            }
+            if (foundOffset === -1) {
                 kOffset = 0;
 
                 console.log("Cannot find " + keySignature.split(" ")[0] + ". Reverting to C");
+            } else {
+                kOffset = foundOffset;
             }
         }
         // Apply the key offset before normalizing the pitch index.
@@ -1665,7 +1776,8 @@ var MusicUtilsPitchScale = {
     getNoteFromInterval,
     numberToPitch,
     getNoteFromSolfege,
-    getNote
+    getNote,
+    DOUBLE_ACCIDENTAL_EQUIVALENTS
 };
 
 if (typeof module !== "undefined" && module.exports) {

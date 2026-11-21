@@ -67,6 +67,81 @@ describe("musicutils-pitchscale", () => {
         expect(pitchscale.keySignatureToMode([])).toEqual(["C", "major"]);
     });
 
+    describe("Issue #10426: keySignatureToMode on E♯ and double accidentals", () => {
+        it("preserves E♯ as a valid tonic across modes and formats", () => {
+            expect(pitchscale.keySignatureToMode("E♯ major")).toEqual(["E♯", "major"]);
+            expect(pitchscale.keySignatureToMode("E♯ minor")).toEqual(["E♯", "minor"]);
+            expect(pitchscale.keySignatureToMode("E# minor")).toEqual(["E♯", "minor"]);
+            expect(pitchscale.keySignatureToMode("E#m")).toEqual(["E♯", "natural minor"]);
+            expect(pitchscale.keySignatureToMode("E♯m")).toEqual(["E♯", "natural minor"]);
+            expect(pitchscale.keySignatureToMode("e# major")).toEqual(["E♯", "major"]);
+            expect(pitchscale.keySignatureToMode("e♯ major")).toEqual(["E♯", "major"]);
+            expect(pitchscale.keySignatureToMode("E♯ dorian")).toEqual(["E♯", "dorian"]);
+        });
+
+        it("maps double-accidental tonics to their sounding pitch while preserving the mode", () => {
+            expect(pitchscale.keySignatureToMode("C𝄪 major")).toEqual(["D", "major"]);
+            expect(pitchscale.keySignatureToMode("C## major")).toEqual(["D", "major"]);
+            expect(pitchscale.keySignatureToMode("Cx major")).toEqual(["D", "major"]);
+            expect(pitchscale.keySignatureToMode("F𝄫 minor")).toEqual(["E♭", "minor"]);
+            expect(pitchscale.keySignatureToMode("Fbb minor")).toEqual(["E♭", "minor"]);
+            expect(pitchscale.keySignatureToMode("F𝄫m")).toEqual(["E♭", "natural minor"]);
+            expect(pitchscale.keySignatureToMode("B𝄫 major")).toEqual(["A", "major"]);
+            expect(pitchscale.keySignatureToMode("D𝄪 dorian")).toEqual(["E", "dorian"]);
+        });
+
+        it("covers all 14 double-accidental tonics (C𝄪 to B𝄫)", () => {
+            const doubleSharps = [
+                ["C𝄪", "D"],
+                ["D𝄪", "E"],
+                ["E𝄪", "F♯"],
+                ["F𝄪", "G"],
+                ["G𝄪", "A"],
+                ["A𝄪", "B"],
+                ["B𝄪", "C♯"]
+            ];
+            const doubleFlats = [
+                ["C𝄫", "B♭"],
+                ["D𝄫", "C"],
+                ["E𝄫", "D"],
+                ["F𝄫", "E♭"],
+                ["G𝄫", "F"],
+                ["A𝄫", "G"],
+                ["B𝄫", "A"]
+            ];
+            for (const [tonic, expected] of [...doubleSharps, ...doubleFlats]) {
+                expect(pitchscale.keySignatureToMode(`${tonic} major`)).toEqual([
+                    expected,
+                    "major"
+                ]);
+                expect(pitchscale.keySignatureToMode(`${tonic} minor`)).toEqual([
+                    expected,
+                    "minor"
+                ]);
+            }
+        });
+
+        it("resolves movable numeric pitches for E♯ and double-accidental keys", () => {
+            expect(pitchscale.getNote(0, 4, 0, "E♯ major", true)).toEqual(["F", 4, 0]);
+            expect(pitchscale.getNote(0, 4, 0, "C𝄪 major", true)).toEqual(["D", 4, 0]);
+            expect(pitchscale.getNote(0, 4, 0, "F𝄫 minor", true)).toEqual(["E♭", 4, 0]);
+            expect(pitchscale.getNote(2, 4, 0, "C𝄪 major", true)).toEqual(["E", 4, 0]);
+
+            // Octave boundary normalization with double-accidental keys
+            expect(pitchscale.getNote(-3, 4, 0, "C𝄪 major", true)).toEqual(["B", 3, 0]);
+            expect(pitchscale.getNote(10, 4, 0, "C𝄪 major", true)).toEqual(["C", 5, 0]);
+
+            // Empty and invalid key signature fallbacks
+            expect(pitchscale.getNote(0, 4, 0, "", true)).toEqual(["C", 4, 0]);
+            expect(pitchscale.getNote(0, 4, 0, "invalid key", true)).toEqual(["C", 4, 0]);
+
+            // Non-12-EDO temperament preserves native note position before 12-EDO enharmonic fallback
+            expect(
+                pitchscale.getNote(0, 4, 0, "E♯ major", true, undefined, undefined, "equal19")
+            ).toEqual(["E♯", 4, 0]);
+        });
+    });
+
     it("calculates pitch numbers accurately for enharmonic notes and boundary shifts in 12-EDO", () => {
         expect(pitchscale.pitchToNumber("B♯", 4, "C major", "equal")).toBe(
             pitchscale.pitchToNumber("C", 5, "C major", "equal")
