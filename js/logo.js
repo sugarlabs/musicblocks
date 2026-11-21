@@ -1357,14 +1357,15 @@ class Logo {
      * @param {string} instrument - Instrument name for the note.
      * @param {number[]} [meter] - The meter at the time of the note, as
      *     [beats per measure, note value per beat].
+     * @param {string} [key] - The key at the time of the note, e.g. "F major".
      * @returns {void}
      */
-    notationMIDI(note, drum, duration, turtle, bpm, instrument, meter) {
+    notationMIDI(note, drum, duration, turtle, bpm, instrument, meter, key) {
         if (!this._midiData[turtle]) {
             this._midiData[turtle] = [];
         }
         const drums = drum && drum.length > 0 ? [...drum] : null;
-        this._midiData[turtle].push({ note, duration, bpm, instrument, drum: drums, meter });
+        this._midiData[turtle].push({ note, duration, bpm, instrument, drum: drums, meter, key });
     }
 
     // ========================================================================

@@ -1341,4 +1341,200 @@ describe("transcribeMidi", () => {
         // This exactly matches the legacy `master` behavior.
         expect(noteBlocks.length).toBe(100);
     });
+
+    describe("key and time signatures", () => {
+        // One quarter note a beat at 120 bpm, so each note lasts half a second and a beat is
+        // 480 ticks.
+        const PPQ = 480;
+        const midiFile = ({
+            names,
+            keySignatures = [],
+            timeSignatures = [[0, [4, 4]]],
+            tempos = [[0, 120]],
+            percussion = false
+        }) => ({
+            header: {
+                ppq: PPQ,
+                tempos: tempos.map(([ticks, bpm]) => ({ ticks, bpm })),
+                timeSignatures: timeSignatures.map(([ticks, timeSignature]) => ({
+                    ticks,
+                    timeSignature
+                })),
+                keySignatures: keySignatures.map(([ticks, key, scale]) => ({ ticks, key, scale }))
+            },
+            tracks: [
+                {
+                    instrument: { name: "acoustic grand piano", percussion },
+                    channel: percussion ? 9 : 0,
+                    notes: names.map((name, i) => ({
+                        name,
+                        midi: 60 + i,
+                        time: i * 0.5,
+                        duration: 0.5
+                    }))
+                }
+            ]
+        });
+
+        // What an imported track plays, in order: its notes and the key, meter and tempo
+        // blocks between them. The start block's own meter and tempo come after every note
+        // in the block array, so they are left out.
+        const importFlow = async file => {
+            await transcribeMidi(file);
+            const blocks = loadNewBlocksSpy.mock.calls[0][0];
+            const byIndex = new Map(blocks.map(block => [block[0], block]));
+            const value = index => byIndex.get(index)[1][1].value;
+            const flow = [];
+            for (const block of blocks) {
+                const name = blockName(block);
+                if (name === "start") break;
+                if (name === "setkey2") {
+                    flow.push(`key ${value(block[4][1])} ${value(block[4][2])}`);
+                }
+                if (name === "meter") {
+                    const divide = byIndex.get(block[4][2]);
+                    flow.push(`meter ${value(block[4][1])}/${value(divide[4][2])}`);
+                }
+                if (name === "setbpm3") flow.push("tempo");
+                if (name === "notename" && blockName(byIndex.get(block[4][0])) === "pitch") {
+                    flow.push(value(block[0]));
+                }
+                if (name === "drumname") flow.push("drum");
+            }
+            return { flow, blocks };
+        };
+
+        it("sets the key at the start and spells a flat key with flats", async () => {
+            const { flow, blocks } = await importFlow(
+                midiFile({ names: ["F4", "A4", "A#4", "C5"], keySignatures: [[0, "F", "major"]] })
+            );
+
+            expect(flow).toEqual(["key F major", "F", "A", "B♭", "C"]);
+            expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        });
+
+        it("changes key where the file does, and respells after it", async () => {
+            const { flow, blocks } = await importFlow(
+                midiFile({
+                    names: ["C4", "F#4", "D#4", "G4"],
+                    keySignatures: [
+                        [0, "G", "major"],
+                        [2 * PPQ, "Eb", "major"]
+                    ]
+                })
+            );
+
+            expect(flow).toEqual(["key G major", "C", "F#", "key E♭ major", "E♭", "G"]);
+            expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        });
+
+        it.each([
+            ["C", "A", "A#"],
+            ["Bb", "G", "B♭"],
+            ["E", "C♯", "A#"]
+        ])("reads %s minor as the key of its tonic", async (key, tonic, spelled) => {
+            const { flow } = await importFlow(
+                midiFile({ names: ["A#4"], keySignatures: [[0, key, "minor"]] })
+            );
+
+            expect(flow).toEqual([`key ${tonic} minor`, spelled]);
+        });
+
+        it("keeps sharps and sets no key for a file with no key signature", async () => {
+            const { flow } = await importFlow(midiFile({ names: ["C#4", "A#4"] }));
+
+            expect(flow).toEqual(["C#", "A#"]);
+        });
+
+        it("sets no key before a file's first key signature", async () => {
+            const { flow } = await importFlow(
+                midiFile({ names: ["A#4", "A#4"], keySignatures: [[PPQ, "F", "major"]] })
+            );
+
+            expect(flow).toEqual(["A#", "key F major", "B♭"]);
+        });
+
+        it("skips a repeated key signature and one the MIDI library could not name", async () => {
+            const { flow } = await importFlow(
+                midiFile({
+                    names: ["A#4", "A#4", "A#4"],
+                    keySignatures: [
+                        [0, "F", "major"],
+                        [PPQ, "F", "major"],
+                        [2 * PPQ, undefined, "major"]
+                    ]
+                })
+            );
+
+            expect(flow).toEqual(["key F major", "B♭", "B♭", "B♭"]);
+        });
+
+        it("writes a meter block where the time signature changes", async () => {
+            const { flow, blocks } = await importFlow(
+                midiFile({
+                    names: ["C4", "D4", "E4", "F4", "G4", "A4", "B4"],
+                    timeSignatures: [
+                        [0, [4, 4]],
+                        [4 * PPQ, [3, 4]],
+                        [7 * PPQ, [3, 4]]
+                    ]
+                })
+            );
+
+            expect(flow).toEqual(["C", "D", "E", "F", "meter 3/4", "G", "A", "B"]);
+            expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        });
+
+        it("writes tempo, meter and key changes at the same note in that order", async () => {
+            const { flow, blocks } = await importFlow(
+                midiFile({
+                    names: ["C4", "A#4"],
+                    tempos: [
+                        [0, 120],
+                        [PPQ, 60]
+                    ],
+                    timeSignatures: [
+                        [0, [4, 4]],
+                        [PPQ, [6, 8]]
+                    ],
+                    keySignatures: [
+                        [0, "C", "major"],
+                        [PPQ, "F", "major"]
+                    ]
+                })
+            );
+
+            expect(flow).toEqual(["key C major", "C", "tempo", "meter 6/8", "key F major", "B♭"]);
+            expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        });
+
+        it("reads a file with no time or key signatures in 4/4 with no key", async () => {
+            const file = midiFile({ names: ["C#4", "D4"] });
+            delete file.header.timeSignatures;
+            delete file.header.keySignatures;
+            const { flow, blocks } = await importFlow(file);
+
+            expect(flow).toEqual(["C#", "D"]);
+            const meter = blocks.find(block => blockName(block) === "meter");
+            const byIndex = new Map(blocks.map(block => [block[0], block]));
+            expect(byIndex.get(meter[4][1])[1][1].value).toBe(4);
+        });
+
+        it("changes meter but sets no key on a drum track", async () => {
+            const { flow, blocks } = await importFlow(
+                midiFile({
+                    names: ["C2", "D2"],
+                    percussion: true,
+                    keySignatures: [[0, "F", "major"]],
+                    timeSignatures: [
+                        [0, [4, 4]],
+                        [PPQ, [2, 4]]
+                    ]
+                })
+            );
+
+            expect(flow).toEqual(["drum", "meter 2/4", "drum"]);
+            expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        });
+    });
 });
