@@ -187,10 +187,17 @@ class LocalCard {
         jQuery("#unpublisher").modal("open");
     }
 
+    getSafeId() {
+        return typeof this.id === "string"
+            ? this.id.replace(/[^a-zA-Z0-9._-]/g, "")
+            : String(this.id ?? "");
+    }
+
     render() {
         const Planet = this.Planet;
+        const safeId = this.getSafeId();
 
-        const html = this.renderData.replace(new RegExp("{ID}", "g"), this.id);
+        const html = this.renderData.replace(new RegExp("{ID}", "g"), safeId);
         const frag = document.createRange().createContextualFragment(html);
 
         // set image
@@ -201,15 +208,15 @@ class LocalCard {
             imageSrc = Planet.IsMusicBlocks ? this.PlaceholderMBImage : this.PlaceholderTBImage;
         }
 
-        const imageId = `local-project-image-${this.id}`;
+        const imageId = `local-project-image-${safeId}`;
         frag.getElementById(imageId).src = imageSrc;
 
         // set input text
-        frag.getElementById(`local-project-input-${this.id}`).value = this.ProjectData.ProjectName;
+        frag.getElementById(`local-project-input-${safeId}`).value = this.ProjectData.ProjectName;
 
         // set edit modify listener
 
-        frag.getElementById(`local-project-edit-${this.id}`).addEventListener("click", evt => {
+        frag.getElementById(`local-project-edit-${safeId}`).addEventListener("click", evt => {
             Planet.LocalPlanet.openProject(this.id);
         });
 
@@ -221,13 +228,13 @@ class LocalCard {
 
         // set merge modify listener
 
-        frag.getElementById(`local-project-merge-${this.id}`).addEventListener("click", () => {
+        frag.getElementById(`local-project-merge-${safeId}`).addEventListener("click", () => {
             Planet.LocalPlanet.mergeProject(this.id);
         });
 
         // set input modify listener
 
-        frag.getElementById(`local-project-input-${this.id}`).addEventListener("input", evt => {
+        frag.getElementById(`local-project-input-${safeId}`).addEventListener("input", evt => {
             const projectId = this.id;
             const newName = evt.target.value;
             clearTimeout(this._renameTimers[projectId]);
@@ -239,13 +246,13 @@ class LocalCard {
 
         // set delete button listener
 
-        frag.getElementById(`local-project-delete-${this.id}`).addEventListener("click", evt => {
+        frag.getElementById(`local-project-delete-${safeId}`).addEventListener("click", evt => {
             Planet.LocalPlanet.openDeleteModal(this.id);
         });
 
         // set publish button listener
 
-        const publishButton = frag.getElementById(`local-project-publish-${this.id}`);
+        const publishButton = frag.getElementById(`local-project-publish-${safeId}`);
         if (this.ProjectData.PublishedData) {
             publishButton.querySelector("i").textContent = "cloud_off";
             publishButton.dataset.tooltip = _("Unpublish project");
@@ -257,24 +264,24 @@ class LocalCard {
 
         // set download button listener
 
-        frag.getElementById(`local-project-download-${this.id}`).addEventListener("click", evt => {
+        frag.getElementById(`local-project-download-${safeId}`).addEventListener("click", evt => {
             this.download();
         });
 
         // set duplicate button listener
 
-        frag.getElementById(`local-project-duplicate-${this.id}`).addEventListener("click", evt => {
+        frag.getElementById(`local-project-duplicate-${safeId}`).addEventListener("click", evt => {
             this.duplicate();
         });
 
         // show git-repo badge (static indicator — no link) if project is linked to a GitHub repo
         if (this.ProjectData.GitRepoData && this.ProjectData.GitRepoData.repoName) {
-            frag.getElementById(`local-project-git-${this.id}`).style.display = "inline-flex";
+            frag.getElementById(`local-project-git-${safeId}`).style.display = "inline-flex";
         }
 
         // set published cloud listener
         if (this.ProjectData.PublishedData !== null) {
-            const cloudBadge = frag.getElementById(`local-project-cloud-${this.id}`);
+            const cloudBadge = frag.getElementById(`local-project-cloud-${safeId}`);
             cloudBadge.style.display = "inline-flex";
 
             cloudBadge.addEventListener("click", evt => {

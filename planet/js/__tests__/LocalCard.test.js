@@ -158,6 +158,24 @@ describe("LocalCard", () => {
             expect(document.getElementById("local-projects").children.length).toBe(1);
         });
 
+        it("should sanitize unsafe characters in project id to prevent attribute breakout and DOM XSS (#10321)", () => {
+            const card = new LocalCard(planet);
+            card.id = 'test-id" onfocus="alert(1)';
+            card.ProjectData = {
+                ProjectName: "Local XSS Test",
+                ProjectImage: null,
+                PublishedData: null,
+                GitRepoData: null
+            };
+            card.render();
+
+            const sanitizedId = "test-idonfocusalert1";
+            expect(card.getSafeId()).toBe(sanitizedId);
+            const container = document.getElementById("local-projects");
+            expect(container.querySelector("[onfocus]")).toBeNull();
+            expect(document.getElementById(`local-project-image-${sanitizedId}`)).not.toBeNull();
+        });
+
         it("should use the placeholder MB image when ProjectImage is null and IsMusicBlocks=1", () => {
             const card = prepareCard("p2", { ProjectImage: null });
             card.render();
