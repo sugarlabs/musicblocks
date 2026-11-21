@@ -90,6 +90,32 @@ describe("musicutils-modecore", () => {
         expect(modecore.wholeNoteImg).toMatch(/^data:image\/svg\+xml;base64,/);
     });
 
+    describe("prototype property and reserved key safety (#10307)", () => {
+        it("safely falls back to default major mode pattern for prototype property names", () => {
+            const defaultMajor = modecore.scalePatternToEDO(modecore.MUSICALMODES.major, 12);
+            expect(modecore.getModePattern("toString")).toEqual(defaultMajor);
+            expect(modecore.getModePattern("valueOf")).toEqual(defaultMajor);
+            expect(modecore.getModePattern("constructor")).toEqual(defaultMajor);
+            expect(modecore.getModePattern("__proto__")).toEqual(defaultMajor);
+            expect(modecore.getModePattern("hasOwnProperty")).toEqual(defaultMajor);
+        });
+
+        it("safely returns empty string for prototype property names in getModeNumbers", () => {
+            expect(modecore.getModeNumbers("toString")).toBe("");
+            expect(modecore.getModeNumbers("valueOf")).toBe("");
+            expect(modecore.getModeNumbers("constructor")).toBe("");
+            expect(modecore.getModeNumbers("__proto__")).toBe("");
+            expect(modecore.getModeNumbers("hasOwnProperty")).toBe("");
+        });
+
+        it("safely returns null for prototype property names in getNonEDOModeSteps", () => {
+            expect(modecore.getNonEDOModeSteps("toString", "equal")).toBeNull();
+            expect(modecore.getNonEDOModeSteps("valueOf", "equal")).toBeNull();
+            expect(modecore.getNonEDOModeSteps("constructor", "equal")).toBeNull();
+            expect(modecore.getNonEDOModeSteps("__proto__", "equal")).toBeNull();
+        });
+    });
+
     describe("input validation and type guards (#9900)", () => {
         it("safely handles nullish and non-string inputs in modeMapper", () => {
             expect(modecore.modeMapper(null, "major")).toEqual(["c", "major"]);
