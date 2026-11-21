@@ -579,6 +579,21 @@ describe("ASTUtils", () => {
             });
         });
 
+        it.each([
+            ["not_equal_to", "!=="],
+            ["less_than_or_equal_to", "<="],
+            ["greater_than_or_equal_to", ">="]
+        ])("should export %s as the %s operator", (methodName, operator) => {
+            const result = ASTUtils._getArgExpAST(methodName, [1, 2]);
+
+            expect(result).toEqual({
+                type: "BinaryExpression",
+                left: { type: "Literal", value: 1 },
+                right: { type: "Literal", value: 2 },
+                operator
+            });
+        });
+
         it("should preserve XOR results when compared with Equal", () => {
             const compare = (left, right, expected) => {
                 const ast = ASTUtils._getArgExpAST("equal", [["xor", [left, right]], expected]);
