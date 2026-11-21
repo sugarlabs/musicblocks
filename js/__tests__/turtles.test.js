@@ -19,10 +19,13 @@
 
 const Turtles = require("../turtles");
 const { setupGridController } = require("../activity/grid-controller.js");
+const ManagedTimer = require("../utils/ManagedTimer");
+global.ManagedTimer = ManagedTimer;
 
 global.createjs = {
     Container: jest.fn().mockImplementation(() => ({
         addChild: jest.fn(),
+        removeChild: jest.fn(),
         removeAllChildren: jest.fn(),
         on: jest.fn(),
         removeAllEventListeners: jest.fn()
@@ -512,6 +515,15 @@ describe("doScale", () => {
 
         expect(turtles._scale).toBe(originalScale);
     });
+
+    test("should clear queue when applying a new scale while unlocked", () => {
+        turtles._queue = [640, 480, 1.5];
+        turtles._locked = false;
+        turtles.doScale(800, 600, 2.0);
+
+        expect(turtles._queue).toEqual([]);
+        expect(turtles._scale).toBe(2.0);
+    });
 });
 
 describe("setStageScale", () => {
@@ -782,6 +794,393 @@ describe("aux toolbar collapse and expand", () => {
         }
     });
 
+    test("debounces canvas button rebuild during rapid resize events", () => {
+        const originalPlatformColor = global.platformColor;
+        const originalMakeKeyboardAccessible = global.makeKeyboardAccessible;
+        const originalWindowWidth = window.innerWidth;
+
+        global.platformColor = { ruleColor: "#000" };
+        global.makeKeyboardAccessible = jest.fn();
+        global.Image = class extends originalImage {
+            constructor() {
+                super();
+                Object.defineProperty(this, "src", {
+                    configurable: true,
+                    set: () => {
+                        this.onload?.();
+                    }
+                });
+            }
+        };
+        jest.useFakeTimers();
+
+        try {
+            turtles._locked = false;
+            turtles.makeBackground();
+
+            const initialGrid = document.getElementById("Grid");
+            const initialWidth = turtles._w;
+            window.innerWidth = initialWidth + 100;
+
+            // Fire multiple resize events in rapid succession (simulating window drag)
+            turtles._resizeHandler();
+            turtles._resizeHandler();
+            turtles._resizeHandler();
+
+            // Several animation frames pass, but the debounce has not settled
+            jest.advanceTimersByTime(100);
+            expect(turtles._w).toBe(window.innerWidth);
+            expect(turtles._w).not.toBe(initialWidth);
+            expect(document.getElementById("Grid")).toBe(initialGrid);
+
+            // Once debounce timer settles, button rebuild should have executed
+            jest.advanceTimersByTime(50);
+            expect(document.getElementById("Grid")).not.toBe(initialGrid);
+        } finally {
+            jest.useRealTimers();
+            global.platformColor = originalPlatformColor;
+            global.makeKeyboardAccessible = originalMakeKeyboardAccessible;
+            window.innerWidth = originalWindowWidth;
+        }
+    });
+
+    test("preserves collapsed state and button visibility when resize settles", () => {
+        const originalPlatformColor = global.platformColor;
+        const originalMakeKeyboardAccessible = global.makeKeyboardAccessible;
+
+        global.platformColor = { ruleColor: "#000" };
+        global.makeKeyboardAccessible = jest.fn();
+        global.Image = class extends originalImage {
+            constructor() {
+                super();
+                Object.defineProperty(this, "src", {
+                    configurable: true,
+                    set: () => {
+                        this.onload?.();
+                    }
+                });
+            }
+        };
+        jest.useFakeTimers();
+
+        try {
+            turtles._locked = false;
+            turtles.makeBackground();
+
+            // Set canvas to collapsed state
+            turtles._isShrunk = true;
+
+            // Trigger resize
+            turtles._resizeHandler();
+            jest.advanceTimersByTime(150);
+
+            // Collapsed boundary and expand button should be visible, others hidden
+            expect(turtles._collapsedBoundary.visible).toBe(true);
+            expect(turtles._expandedBoundary.visible).toBe(false);
+            expect(turtles._expandButton.style.visibility).toBe("visible");
+            expect(turtles._collapseButton.style.visibility).toBe("hidden");
+            expect(turtles.gridButton.style.visibility).toBe("hidden");
+        } finally {
+            jest.useRealTimers();
+            global.platformColor = originalPlatformColor;
+            global.makeKeyboardAccessible = originalMakeKeyboardAccessible;
+        }
+    });
+
+    test("replays queued resize from _queue through doScale when __makeAllButtons unlocks", () => {
+        const originalPlatformColor = global.platformColor;
+        const originalMakeKeyboardAccessible = global.makeKeyboardAccessible;
+
+        let pendingOnload = null;
+        global.platformColor = { ruleColor: "#000" };
+        global.makeKeyboardAccessible = jest.fn();
+        global.Image = class extends originalImage {
+            constructor() {
+                super();
+                Object.defineProperty(this, "src", {
+                    configurable: true,
+                    set: () => {
+                        pendingOnload = () => this.onload?.();
+                    }
+                });
+            }
+        };
+
+        try {
+            turtles._locked = false;
+            turtles.makeBackground();
+            // Trigger first boundary image load
+            pendingOnload?.();
+            // Trigger second boundary image load -> completes initial build and unlocks
+            pendingOnload?.();
+            expect(turtles._locked).toBe(false);
+
+            // Now start a new background build so that _locked becomes true
+            turtles.makeBackground();
+            expect(turtles._locked).toBe(true);
+
+            // While locked, a doScale call arrives and gets queued
+            turtles.doScale(800, 600, 2.0);
+            expect(turtles._queue).toEqual([800, 600, 2.0]);
+            expect(turtles._scale).not.toBe(2.0);
+
+            // First image loads -> calls __makeBoundary2
+            pendingOnload?.();
+            // Second image loads -> calls __makeAllButtons, which clears queue and replays doScale
+            pendingOnload?.();
+
+            expect(turtles._queue).toEqual([]);
+            expect(turtles._scale).toBe(2.0);
+            expect(turtles._w).toBe(400); // 800 / 2.0
+            expect(turtles._h).toBe(300); // 600 / 2.0
+        } finally {
+            global.platformColor = originalPlatformColor;
+            global.makeKeyboardAccessible = originalMakeKeyboardAccessible;
+        }
+    });
+
+    test("ignores out-of-order image callbacks from superseded boundary builds", () => {
+        const originalPlatformColor = global.platformColor;
+        const originalMakeKeyboardAccessible = global.makeKeyboardAccessible;
+
+        const onloads = [];
+        global.platformColor = { ruleColor: "#000" };
+        global.makeKeyboardAccessible = jest.fn();
+        global.Image = class extends originalImage {
+            constructor() {
+                super();
+                Object.defineProperty(this, "src", {
+                    configurable: true,
+                    set: () => {
+                        const cb = () => this.onload?.();
+                        onloads.push(cb);
+                    }
+                });
+            }
+        };
+
+        try {
+            turtles._locked = false;
+            // Build 1 starts
+            turtles.makeBackground();
+            const build1Image1 = onloads.shift();
+
+            // Build 2 starts before Build 1 loads
+            turtles._locked = false;
+            turtles.makeBackground();
+            const build2Image1 = onloads.shift();
+
+            // Build 2 image 1 finishes
+            build2Image1?.();
+            const build2Image2 = onloads.shift();
+            // Build 2 image 2 finishes -> completes build 2
+            build2Image2?.();
+
+            const latestExpanded = turtles._expandedBoundary;
+            const latestCollapsed = turtles._collapsedBoundary;
+
+            // Delayed Build 1 image 1 loads out of order
+            build1Image1?.();
+
+            // Boundaries must NOT have been replaced by the superseded build
+            expect(turtles._expandedBoundary).toBe(latestExpanded);
+            expect(turtles._collapsedBoundary).toBe(latestCollapsed);
+        } finally {
+            global.platformColor = originalPlatformColor;
+            global.makeKeyboardAccessible = originalMakeKeyboardAccessible;
+        }
+    });
+
+    test("cancels pending resize timeout when makeBackground re-renders", () => {
+        const originalPlatformColor = global.platformColor;
+        const originalMakeKeyboardAccessible = global.makeKeyboardAccessible;
+
+        global.platformColor = { ruleColor: "#000" };
+        global.makeKeyboardAccessible = jest.fn();
+        global.Image = class extends originalImage {
+            constructor() {
+                super();
+                Object.defineProperty(this, "src", {
+                    configurable: true,
+                    set: () => {
+                        this.onload?.();
+                    }
+                });
+            }
+        };
+        jest.useFakeTimers();
+
+        try {
+            turtles._locked = false;
+            turtles.makeBackground();
+
+            // Fire resize to schedule 150ms timeout
+            turtles._resizeHandler();
+            expect(turtles._resizeTimeout).not.toBeNull();
+            if (turtles._timerManager) {
+                expect(turtles._timerManager.activeTimeoutCount).toBe(1);
+            }
+
+            // Re-render occurs within debounce window (e.g. via setBackgroundColor or doScale)
+            turtles._locked = false;
+            turtles.makeBackground();
+
+            // The pending timeout must have been cancelled and cleared
+            expect(turtles._resizeTimeout).toBeNull();
+            if (turtles._timerManager) {
+                expect(turtles._timerManager.activeTimeoutCount).toBe(0);
+            }
+        } finally {
+            jest.useRealTimers();
+            global.platformColor = originalPlatformColor;
+            global.makeKeyboardAccessible = originalMakeKeyboardAccessible;
+        }
+    });
+
+    test("tracks debounced resize through ManagedTimer when available", () => {
+        const originalPlatformColor = global.platformColor;
+        const originalMakeKeyboardAccessible = global.makeKeyboardAccessible;
+
+        global.platformColor = { ruleColor: "#000" };
+        global.makeKeyboardAccessible = jest.fn();
+        global.Image = class extends originalImage {
+            constructor() {
+                super();
+                Object.defineProperty(this, "src", {
+                    configurable: true,
+                    set: () => {
+                        this.onload?.();
+                    }
+                });
+            }
+        };
+        jest.useFakeTimers();
+
+        try {
+            turtles._locked = false;
+            turtles.makeBackground();
+
+            expect(turtles._timerManager).toBeInstanceOf(ManagedTimer);
+
+            turtles._resizeHandler();
+            expect(turtles._timerManager.activeTimeoutCount).toBe(1);
+
+            // A second rapid resize clears previous timer and schedules a new one
+            turtles._resizeHandler();
+            expect(turtles._timerManager.activeTimeoutCount).toBe(1);
+
+            jest.advanceTimersByTime(150);
+            expect(turtles._timerManager.activeTimeoutCount).toBe(0);
+        } finally {
+            jest.useRealTimers();
+            global.platformColor = originalPlatformColor;
+            global.makeKeyboardAccessible = originalMakeKeyboardAccessible;
+        }
+    });
+
+    test("removes previous expanded and collapsed boundaries from borderContainer when replacing them", () => {
+        const originalPlatformColor = global.platformColor;
+        const originalMakeKeyboardAccessible = global.makeKeyboardAccessible;
+
+        global.platformColor = { ruleColor: "#000" };
+        global.makeKeyboardAccessible = jest.fn();
+        global.Image = class extends originalImage {
+            constructor() {
+                super();
+                Object.defineProperty(this, "src", {
+                    configurable: true,
+                    set: () => {
+                        this.onload?.();
+                    }
+                });
+            }
+        };
+
+        try {
+            const firstExpanded = turtles._expandedBoundary;
+            const firstCollapsed = turtles._collapsedBoundary;
+
+            turtles._borderContainer.removeChild.mockClear();
+
+            // Re-render occurs (e.g. on settled resize)
+            turtles._locked = false;
+            turtles.makeBackground();
+
+            // Previous boundaries must have been removed from borderContainer
+            expect(turtles._borderContainer.removeChild).toHaveBeenCalledWith(firstExpanded);
+            expect(turtles._borderContainer.removeChild).toHaveBeenCalledWith(firstCollapsed);
+        } finally {
+            global.platformColor = originalPlatformColor;
+            global.makeKeyboardAccessible = originalMakeKeyboardAccessible;
+        }
+    });
+
+    test("restores expanded boundary if detached by makeBackground during collapsed boundary load", () => {
+        const originalPlatformColor = global.platformColor;
+        const originalMakeKeyboardAccessible = global.makeKeyboardAccessible;
+        global.platformColor = { background: "#ffffff", ruleColor: "#000000" };
+        global.makeKeyboardAccessible = jest.fn();
+
+        const imageInstances = [];
+        global.Image = class extends originalImage {
+            constructor() {
+                super();
+                this.onload = null;
+                imageInstances.push(this);
+            }
+            set src(_val) {
+                // Do not auto-fire onload, control manually
+            }
+            get src() {
+                return "";
+            }
+        };
+
+        const children = [];
+        turtles._borderContainer = {
+            children,
+            addChild: jest.fn(child => children.push(child)),
+            removeChild: jest.fn(child => {
+                const idx = children.indexOf(child);
+                if (idx !== -1) children.splice(idx, 1);
+            }),
+            removeAllChildren: jest.fn(() => {
+                children.length = 0;
+            })
+        };
+
+        try {
+            turtles._locked = false;
+            turtles.makeBackground();
+
+            // First image is the expanded boundary
+            expect(imageInstances.length).toBe(1);
+            const expandedImg = imageInstances[0];
+            expandedImg.onload();
+
+            // At this point, expanded boundary is in borderContainer and second image is created
+            expect(turtles._expandedBoundary).not.toBeNull();
+            expect(children).toContain(turtles._expandedBoundary);
+            expect(imageInstances.length).toBe(2);
+            const collapsedImg = imageInstances[1];
+
+            // An intervening makeBackground() runs while _locked is still true
+            turtles.makeBackground();
+            expect(children).not.toContain(turtles._expandedBoundary);
+
+            // Now collapsed boundary image finishes loading
+            collapsedImg.onload();
+
+            // Expanded boundary must have been restored into borderContainer
+            expect(children).toContain(turtles._expandedBoundary);
+            expect(turtles._expandedBoundary.visible).toBe(true);
+            expect(children).toContain(turtles._collapsedBoundary);
+        } finally {
+            global.platformColor = originalPlatformColor;
+            global.makeKeyboardAccessible = originalMakeKeyboardAccessible;
+        }
+    });
+
     test("Escape key on canvas buttons exits keyboard navigation", () => {
         const listeners = [];
         const originalCreateElement = document.createElement;
@@ -839,7 +1238,11 @@ describe("aux toolbar collapse and expand", () => {
         const turtles = new Turtles(activityMock);
         mixinPrototypes(turtles);
         turtles.activity = activityMock; // Manually assign activity just in case importMembers is mocked
-        turtles._borderContainer = { removeAllChildren: jest.fn(), addChild: jest.fn() };
+        turtles._borderContainer = {
+            removeAllChildren: jest.fn(),
+            addChild: jest.fn(),
+            removeChild: jest.fn()
+        };
         turtles._canvas = { style: {}, getContext: jest.fn(), width: 1200, height: 900 };
         turtles.stage = { addChild: jest.fn() };
         turtles._backgroundColor = "white"; // Add to prevent crash
