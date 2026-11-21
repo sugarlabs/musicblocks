@@ -34,6 +34,19 @@ class ASTUtils {
     }
 
     /**
+     * Whether a box can be exported as a plain variable. Reserved words don't parse as one, and
+     * the names the generated code relies on (mouse, actionArgs, Math, ...) would be shadowed by
+     * it, so those boxes go through setBox/getBox like a name with a space does.
+     *
+     * @static
+     * @param {String} name - box name
+     * @returns {Boolean}
+     */
+    static _isBoxIdentifier(name) {
+        return ASTUtils._isValidIdentifier(name) && !ASTUtils._RESERVED_NAMES.has(name);
+    }
+
+    /**
      * Returns a valid JavaScript identifier for an action name.
      *
      * Action names are free text ("chorus 2", "1st verse"), but an action is exported as a
@@ -83,7 +96,7 @@ class ASTUtils {
      */
     static setActionNames(names, boxNames = []) {
         const identifiers = new Map();
-        const taken = new Set(boxNames.filter(ASTUtils._isValidIdentifier));
+        const taken = new Set(boxNames.filter(ASTUtils._isBoxIdentifier));
         for (const name of names) {
             const id = ASTUtils._toIdentifier(name);
             if (id === name && !taken.has(id)) {
@@ -557,7 +570,7 @@ class ASTUtils {
             typeof args[0] === "string" && args[0].startsWith("box_") ? args[0].slice(4) : args[0];
         const arg = ASTUtils._getArgsAST([args[1]])[0];
 
-        if (!ASTUtils._isValidIdentifier(identifier)) {
+        if (!ASTUtils._isBoxIdentifier(identifier)) {
             const deltaAst = isIncrement
                 ? arg
                 : {
@@ -815,7 +828,7 @@ class ASTUtils {
                 return nameAst;
             }
             if (nameAst && nameAst.type === "Literal" && typeof nameAst.value === "string") {
-                if (ASTUtils._isValidIdentifier(nameAst.value)) {
+                if (ASTUtils._isBoxIdentifier(nameAst.value)) {
                     return {
                         type: "Identifier",
                         name: nameAst.value
@@ -933,7 +946,7 @@ class ASTUtils {
                             value: argVal === "true"
                         });
                     } else if (type === "box") {
-                        if (ASTUtils._isValidIdentifier(argVal)) {
+                        if (ASTUtils._isBoxIdentifier(argVal)) {
                             ASTs.push({
                                 type: "Identifier",
                                 name: argVal
@@ -1428,7 +1441,7 @@ class ASTUtils {
                 if (
                     nameAst &&
                     nameAst.type === "Literal" &&
-                    ASTUtils._isValidIdentifier(nameAst.value)
+                    ASTUtils._isBoxIdentifier(nameAst.value)
                 ) {
                     ASTs.push({
                         type: "VariableDeclaration",
@@ -1461,7 +1474,7 @@ class ASTUtils {
                 const instruction = flow[0].slice(0, splitIndex);
                 const idName = flow[0].slice(splitIndex + 1);
                 if (instruction === "storein2") {
-                    if (ASTUtils._isValidIdentifier(idName)) {
+                    if (ASTUtils._isBoxIdentifier(idName)) {
                         ASTs.push({
                             type: "VariableDeclaration",
                             kind: "var",
