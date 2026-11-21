@@ -7803,7 +7803,7 @@ msgstr "El valor parcial debe ser mayor o igual a 0."
 
 #: js/turtleactions/ToneActions.js:437
 msgid "Partial must be less than or equal to %s."
-msgstr "El parcial debe ser menor o igual que% s."
+msgstr "El parcial debe ser menor o igual que %s."
 
 #: js/turtleactions/ToneActions.js:485
 #: js/turtleactions/ToneActions.js:525
@@ -9358,7 +9358,7 @@ msgstr "intervalo"
 #: js/widgets/status.js:871
 #.TRANS: the frequency ratio of the interval in just intonation, e.g. 5:4
 msgid "just ratio"
-msgstr "solo proporción"
+msgstr "proporción de entonación justa"
 
 #: js/widgets/status.js:873
 #.TRANS: the frequency ratio of the interval as it is actually played
@@ -9368,7 +9368,7 @@ msgstr "proporción de juego"
 #: js/widgets/status.js:875
 #.TRANS: how far the played interval is from its just-intonation ratio, in cents
 msgid "cents from just"
-msgstr "centavos a partir de entonación solo"
+msgstr "cents respecto a la entonación justa"
 
 #: js/widgets/status.js:877
 #.TRANS: whether an interval above the bass is a perfect or imperfect consonance, or a dissonance
@@ -9695,7 +9695,7 @@ msgstr "El proyecto no está publicado, pero no se pudo guardar el cambio en est
 
 #: planet/js/LocalCard.js:251
 msgid "Unpublish project"
-msgstr "Proyecto no publicado"
+msgstr "Despublicar proyecto"
 
 #: planet/js/SaveInterface.js:37
 msgid "Open in Turtle Blocks"
@@ -9745,7 +9745,7 @@ msgstr "Eliminar proyecto permanentemente \"<span id=\"deleter-name\"></span>\"?
 
 #: planet/js/StringHelper.js:50
 msgid "Unpublish project?"
-msgstr "¿Proyecto sin publicar?"
+msgstr "¿Despublicar proyecto?"
 
 #: planet/js/StringHelper.js:51
 msgid "This project will no longer appear in public listings."

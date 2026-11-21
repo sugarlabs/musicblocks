@@ -4736,7 +4736,7 @@ msgstr "Vuoi consentire l'esecuzione di questo plugin?"
 
 #: js/utils/plugin-utils.js:63
 msgid "Source: %s"
-msgstr "Fonti"
+msgstr "Fonti: %s"
 
 #: js/utils/plugin-utils.js:63
 #: js/blocks/ExtrasBlocks.js:788
