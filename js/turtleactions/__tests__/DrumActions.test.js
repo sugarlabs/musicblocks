@@ -483,6 +483,33 @@ describe("setupDrumActions", () => {
             expect(targetTurtle.singer.pushedNote).toBe(false);
         });
 
+        it("keeps a noise sample loaded from a URL, like Play Drum does", () => {
+            const url = "https://example.com/custom-noise.wav";
+            targetTurtle.singer.inNoteBlock.push(7);
+            targetTurtle.singer.noteDrums[7] = [];
+            targetTurtle.singer.noteBeatValues[7] = [];
+            Singer.DrumActions.playNoise(url, 0, 7);
+            expect(targetTurtle.singer.noteDrums[7]).toEqual([url]);
+        });
+
+        it("lowercases only the URL scheme, so the sample still loads", () => {
+            targetTurtle.singer.inNoteBlock.push(8);
+            targetTurtle.singer.noteDrums[8] = [];
+            targetTurtle.singer.noteBeatValues[8] = [];
+            Singer.DrumActions.playNoise("HTTPS://example.com/Custom-Noise.wav", 0, 8);
+            expect(targetTurtle.singer.noteDrums[8]).toEqual([
+                "https://example.com/Custom-Noise.wav"
+            ]);
+        });
+
+        it("ignores values that only start with http but are not a URL", () => {
+            targetTurtle.singer.inNoteBlock.push(9);
+            targetTurtle.singer.noteDrums[9] = [];
+            targetTurtle.singer.noteBeatValues[9] = [];
+            Singer.DrumActions.playNoise("http-invalid", 0, 9);
+            expect(targetTurtle.singer.noteDrums[9]).toHaveLength(0);
+        });
+
         it("resolves noise names case-insensitively, with trimmed whitespace, or omitted spaces", () => {
             targetTurtle.singer.inNoteBlock.push(2);
             targetTurtle.singer.noteDrums[2] = [];
