@@ -25,6 +25,7 @@ global._THIS_IS_TURTLE_BLOCKS_ = false;
 global.DEFAULTDRUM = "drum";
 
 const { setupRhythmBlockPaletteBlocks } = require("../RhythmBlockPaletteBlocks");
+const setupRhythmActions = require("../../turtleactions/RhythmActions");
 const ManagedTimer = require("../../utils/ManagedTimer");
 
 class DummyFlowBlock {
@@ -161,6 +162,7 @@ describe("setupRhythmBlockPaletteBlocks", () => {
         activity.logo = logo;
         turtleIndex = 0;
         setupRhythmBlockPaletteBlocks(activity);
+        setupRhythmActions(activity);
     });
 
     describe("RhythmBlock", () => {
@@ -276,6 +278,34 @@ describe("setupRhythmBlockPaletteBlocks", () => {
             expect(logo.addingNotesToTuplet).toBe(true);
             expect(logo.tupletRhythms).toEqual([["notes", 0, 0.25, 0.25]]);
         });
+
+        it("should set noteValue for getNoteValue() when processing quarter note rhythm", () => {
+            jest.useFakeTimers();
+
+            const rhythmBlock = DummyFlowBlock.createdBlocks["rhythm"];
+            logo._timerManager = new ManagedTimer();
+            logo.stopTurtle = false;
+            activity.blocks.blockList["blkRhythm"] = { name: "rhythm", connections: [] };
+
+            const tur = activity.turtles.ithTurtle(turtleIndex);
+            tur.singer.noteDrums = {};
+            tur.singer.noteValue = {};
+            tur.singer.lastNotePlayed = null;
+
+            // rhythm with quarter note (denominator 4) -> noteBeatValue = 4
+            rhythmBlock.flow([1, 4], logo, turtleIndex, "blkRhythm");
+
+            // For rhythm quarter note: noteBeatValue = 4, beatFactor = 1
+            // storedNoteValue = 1 / (4 * 1) = 0.25
+            expect(tur.singer.noteValue["blkRhythm"]).toBeCloseTo(0.25);
+
+            // Verify getNoteValue returns the beat value (fraction of whole note)
+            const noteValue = Singer.RhythmActions.getNoteValue(turtleIndex);
+            expect(noteValue).toBeCloseTo(0.25);
+
+            jest.runAllTimers();
+            jest.useRealTimers();
+        });
     });
 
     describe("Rhythm2Block", () => {
@@ -283,6 +313,39 @@ describe("setupRhythmBlockPaletteBlocks", () => {
             const rhythm2Block = DummyFlowBlock.createdBlocks["rhythm2"];
             expect(rhythm2Block.extraWidth).toEqual(10);
             expect(rhythm2Block.hidden).toBe(true);
+        });
+
+        it("should set noteValue for getNoteValue() when processing quarter note rhythm2", () => {
+            jest.useFakeTimers();
+
+            const rhythm2Block = DummyFlowBlock.createdBlocks["rhythm2"];
+            logo._timerManager = new ManagedTimer();
+            logo.stopTurtle = false;
+            activity.blocks.blockList["blkRhythm2"] = { name: "rhythm2", connections: [] };
+
+            // Get the turtle and initialize required singer properties
+            const tur = activity.turtles.ithTurtle(turtleIndex);
+            tur.singer.noteDrums = {};
+            tur.singer.noteValue = {};
+            tur.singer.lastNotePlayed = null;
+
+            // rhythm2 with quarter note (denominator 4) -> noteBeatValue = 1/4 = 0.25
+            rhythm2Block.flow([1, 4], logo, turtleIndex, "blkRhythm2");
+
+            // Verify noteValue was set for the rhythm2 block immediately after flow
+            // For rhythm2 quarter note: noteBeatValue = 1/4 = 0.25, beatFactor = 1
+            // storedNoteValue = 0.25 / 1 = 0.25
+            expect(tur.singer.noteValue["blkRhythm2"]).toBeCloseTo(0.25);
+
+            // Verify getNoteValue returns the beat value (fraction of whole note)
+            // The block is still in inNoteBlock at this point
+            const noteValue = Singer.RhythmActions.getNoteValue(turtleIndex);
+            expect(noteValue).toBeCloseTo(0.25);
+
+            // Advance timers to trigger processNote and clean up
+            jest.runAllTimers();
+
+            jest.useRealTimers();
         });
     });
 
