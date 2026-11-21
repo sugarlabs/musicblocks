@@ -769,12 +769,17 @@ function setupPitchActions(activity) {
                     activity.logo.synth.inTemperament
                 )
             );
-            tur.singer.pitchNumberOffset = pitchToNumber(
-                pitch,
-                _octave,
-                tur.singer.keySignature,
-                activity.logo.synth.inTemperament
-            );
+            // Kept as a pitch, so it stays this pitch if the temperament changes.
+            if (typeof tur.singer.setPitchNumberOffsetPitch === "function") {
+                tur.singer.setPitchNumberOffsetPitch(pitch, _octave, tur.singer.keySignature);
+            } else {
+                tur.singer.pitchNumberOffset = pitchToNumber(
+                    pitch,
+                    _octave,
+                    tur.singer.keySignature,
+                    activity.logo.synth.inTemperament
+                );
+            }
         }
 
         /**
