@@ -1023,7 +1023,8 @@ var nthDegreeToPitch = (keySignature, scaleDegree, edo) => {
 
 /**
  * Get the relative interval (steps within the current key and mode) based on the
- * position (pitch) in the scale.
+ * position (pitch) in the scale. The step sum is computed in closed form, so
+ * its cost does not grow with the interval; a non-finite interval returns 0.
  * @function
  * @param {number} interval - The interval value.
  * @param {string} keySignature - The key signature.
@@ -1032,12 +1033,12 @@ var nthDegreeToPitch = (keySignature, scaleDegree, edo) => {
  *     global temperament state is used (legacy behavior).
  * @returns {number} The relative interval value.
  * @example
- * // 12-EDO: interval from E in C major = 4 semitones (E→G#)
- * getInterval(2, "C major", "E")     // 3 (E→F, 1 scale step)
- * // 19-EDO: same scale step, different EDO spacing
- * getInterval(2, "C major", "E", 19) // 2 (E→F in 19-EDO)
+ * // 12-EDO: two scale steps up from E in C major (E→F→G)
+ * getInterval(2, "C major", "E")     // 3
+ * // 19-EDO: same scale steps, different EDO spacing
+ * getInterval(2, "C major", "E", 19) // 5
  * // 31-EDO
- * getInterval(2, "C major", "E", 31) // 3 (E→F in 31-EDO)
+ * getInterval(2, "C major", "E", 31) // 8
  */
 var getInterval = (interval, keySignature, pitch, edo) => {
     // Step size interval based on the position (pitch) in the scale
@@ -1194,24 +1195,35 @@ var getInterval = (interval, keySignature, pitch, edo) => {
     // What do we do with the offset? Is it ignored? Or does it count
     // as one step in the interval?
 
-    let j = 0;
-    if (interval === 0) {
+    // The steps repeat every scale length, so the sum over any number of
+    // steps is whole cycles times the cycle total plus one partial cycle,
+    // and its cost no longer grows with the interval. Stepping once per
+    // unit froze playback for very large intervals and never returned at
+    // all for an infinite one, which block arithmetic can produce (for
+    // example a division by zero feeding a scalar chord or arpeggio).
+    // A non-finite interval sums to 0, as a NaN interval already did.
+    const stepCount = Math.ceil(Math.abs(Number(interval)));
+    if (!Number.isFinite(stepCount) || stepCount === 0) {
         return 0;
-    } else if (interval > 0) {
-        for (let k = 0; k < interval; k++) {
-            j += halfSteps[(ii + k) % halfSteps.length];
-        }
-        return j;
-    } else {
-        for (let k = 0; k > interval; k--) {
-            let z = (ii + k - 1) % halfSteps.length;
-            while (z < 0) {
-                z += halfSteps.length;
-            }
-            j -= halfSteps[z];
-        }
-        return j;
     }
+
+    const scaleLength = halfSteps.length;
+    const cycleTotal = halfSteps.reduce((total, step) => total + step, 0);
+    const fullCycles = Math.floor(stepCount / scaleLength);
+    const remainder = stepCount % scaleLength;
+    let j;
+    if (interval > 0) {
+        j = fullCycles * cycleTotal;
+        for (let k = 0; k < remainder; k++) {
+            j += halfSteps[(ii + k) % scaleLength];
+        }
+    } else {
+        j = -fullCycles * cycleTotal;
+        for (let k = 0; k < remainder; k++) {
+            j -= halfSteps[(ii - k - 1 + scaleLength) % scaleLength];
+        }
+    }
+    return j;
 };
 
 /**
