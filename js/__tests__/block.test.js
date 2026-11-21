@@ -3180,6 +3180,61 @@ describe("Block Foundation", () => {
             expect(activateSpy).toHaveBeenCalledTimes(2);
         });
 
+        it("announces a value set after the accessible element was created", () => {
+            const el = block._setupAccessibleElement();
+            expect(el.getAttribute("aria-label")).toBe("forward block");
+
+            block.value = 4;
+            // Nothing refreshed the label yet, so it is still stale.
+            expect(el.getAttribute("aria-label")).toBe("forward block");
+
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward, value: 4");
+        });
+
+        it("keeps the label current when the value changes between focuses", () => {
+            block.value = 1;
+            const el = block._setupAccessibleElement();
+            expect(el.getAttribute("aria-label")).toBe("forward, value: 1");
+
+            block.value = 9;
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward, value: 9");
+
+            block.value = null;
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward block");
+        });
+
+        it("announces falsy values that are real values, and clears an empty string", () => {
+            block.value = 5;
+            const el = block._setupAccessibleElement();
+            const refresh = value => {
+                block.value = value;
+                el.dispatchEvent(new FocusEvent("focus"));
+                return el.getAttribute("aria-label");
+            };
+
+            expect(refresh(0)).toBe("forward, value: 0");
+            expect(refresh(false)).toBe("forward, value: false");
+            expect(refresh("")).toBe("forward block");
+        });
+
+        it("describes a file block by its filename and never its data URL", () => {
+            block.value = ["song.wav", "data:audio/wav;base64,AAAA"];
+            const el = block._setupAccessibleElement();
+            expect(el.getAttribute("aria-label")).toBe("forward, value: song.wav");
+            expect(el.getAttribute("aria-label")).not.toContain("base64");
+
+            block.value = ["", "data:audio/wav;base64,AAAA"];
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward block");
+
+            block.value = "data:audio/wav;base64,AAAA";
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward block");
+        });
+
         it("arrow keys navigate between sibling block elements", () => {
             const block2 = new Block(
                 { name: "right", staticLabels: ["right"], image: "right.svg", docks: [] },
