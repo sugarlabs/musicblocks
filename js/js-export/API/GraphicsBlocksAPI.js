@@ -69,12 +69,12 @@ class GraphicsBlocksAPI {
 
     setBezierControlPoint1(x, y) {
         const args = JSInterface.validateArgs("setBezierControlPoint1", [x, y]);
-        return this.runCommand("setControlPoint1", [args[0], args[1]]);
+        return this.runCommand("setControlPoint1", [[args[0], args[1]]]);
     }
 
     setBezierControlPoint2(x, y) {
         const args = JSInterface.validateArgs("setBezierControlPoint2", [x, y]);
-        return this.runCommand("setControlPoint2", [args[0], args[1]]);
+        return this.runCommand("setControlPoint2", [[args[0], args[1]]]);
     }
 
     clear() {
