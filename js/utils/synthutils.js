@@ -2873,18 +2873,19 @@ function Synth() {
             }
             this.mic = null;
         }
-        if (this.recorder) {
-            if (typeof this.recorder.dispose === "function") {
-                this.recorder.dispose();
+        if (this.micRecorder) {
+            if (typeof this.micRecorder.dispose === "function") {
+                this.micRecorder.dispose();
             }
-            this.recorder = null;
+            this.micRecorder = null;
         }
 
         this.mic = new Tone.UserMedia();
-        this.recorder = new Tone.Recorder();
+        // Separate from this.recorder, which "save as wav" uses.
+        this.micRecorder = new Tone.Recorder();
         await this.mic.open();
-        this.mic.connect(this.recorder);
-        this.recorder.start();
+        this.mic.connect(this.micRecorder);
+        this.micRecorder.start();
     };
 
     const _disposeRecordingPlayer = () => {
@@ -2931,21 +2932,21 @@ function Synth() {
      * @memberof Synth
      */
     this.stopRecording = async () => {
-        if (!this.recorder || !this.mic) {
+        if (!this.micRecorder || !this.mic) {
             return null;
         }
         _disposeRecordingPlayer();
         _revokeRecordingURL();
-        this.recording = await this.recorder.stop();
+        this.recording = await this.micRecorder.stop();
         this.mic.close();
         if (typeof this.mic.dispose === "function") {
             this.mic.dispose();
         }
         this.mic = null;
-        if (typeof this.recorder.dispose === "function") {
-            this.recorder.dispose();
+        if (typeof this.micRecorder.dispose === "function") {
+            this.micRecorder.dispose();
         }
-        this.recorder = null;
+        this.micRecorder = null;
         this.audioURL = URL.createObjectURL(this.recording);
         return this.audioURL;
     };
@@ -3121,6 +3122,7 @@ function Synth() {
     this.playbackRate = 1;
     this.defaultBPMFactor = 1;
     this.recorder = null;
+    this.micRecorder = null;
     this.samples = null;
     this.samplesManifest = null;
     this.sampleCentAdjustments = {}; // Initialize the sampleCentAdjustments object
