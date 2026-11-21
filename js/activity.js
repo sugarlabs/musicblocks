@@ -235,10 +235,10 @@ function lazyLoad(modulePaths) {
     }
 
     // In browser with RequireJS (AMD), load modules dynamically.
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
         require(Array.isArray(modulePaths) ? modulePaths : [modulePaths], function () {
             resolve();
-        });
+        }, reject);
     });
 }
 
