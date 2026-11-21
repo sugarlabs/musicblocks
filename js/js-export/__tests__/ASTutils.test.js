@@ -1113,6 +1113,45 @@ describe("ASTUtils", () => {
         });
     });
 
+    describe("box names", () => {
+        const acorn = require("../../../lib/acorn.min");
+
+        // Stores, increments and reads a box with this name inside a mouse, then parses the code.
+        const exportBox = name => {
+            const body = ASTUtils._getBlockAST([
+                ["storein", [name, 5]],
+                ["storein2_" + name, [5]],
+                ["increment", ["box_" + name, 2]],
+                ["decrementOne", ["box_" + name]]
+            ]);
+            body.push({
+                type: "ExpressionStatement",
+                expression: ASTUtils._getArgsAST(["box_" + name])[0]
+            });
+            const code = astring.generate({ type: "Program", body });
+            acorn.parse(`(async mouse => { ${code} })`, { ecmaVersion: 2020 });
+            return code;
+        };
+
+        it("exports a box whose name is an identifier as a variable", () => {
+            const code = exportBox("count");
+            expect(code).toContain("var count = 5;");
+            expect(code).toContain("count = count + 2;");
+            expect(code).not.toContain("Box(");
+        });
+
+        it.each(["class", "for", "new", "mouse", "Math", "actionArgs", "undefined"])(
+            "exports a box named %p through setBox and getBox",
+            name => {
+                const code = exportBox(name);
+                expect(code).not.toMatch(/\bvar\b/);
+                expect(code).toContain(`await mouse.setBox("${name}", 5);`);
+                expect(code).toContain(`await mouse.incrementBox("${name}", 2);`);
+                expect(code).toContain(`mouse.getBox("${name}")`);
+            }
+        );
+    });
+
     describe("getMouseAST", () => {
         it("should return the AST for a mouse", () => {
             const tree = ["flow"];
