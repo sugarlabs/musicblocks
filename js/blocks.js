@@ -5604,20 +5604,20 @@ class Blocks {
          * when the request eventually runs is still this one (issue #8855).
          * @param - blockObj - Block Objects
          * @public
-         * @returns {number} this request's load token
+         * @returns {number|null} this request's load token, or null if invalid
          */
         this.loadNewBlocks = blockObjs => {
-            const loadToken = ++this._nextLoadToken;
-
             // Invalid input is reported by _loadNewBlocksNow when idle. Do not
             // queue it behind a valid load: it cannot complete normally and
             // must not interfere with the active load's bookkeeping.
             if (!Array.isArray(blockObjs) && this._loadInProgress) {
-                if (typeof this.activity?.errorMsg === "function") {
+                if (this.activity && typeof this.activity.errorMsg === "function") {
                     this.activity.errorMsg(_("Cannot load project: invalid project structure."));
                 }
-                return loadToken;
+                return null;
             }
+
+            const loadToken = ++this._nextLoadToken;
 
             if (this._loadInProgress) {
                 this._loadQueue.push({ blockObjs, loadToken });
@@ -5704,20 +5704,6 @@ class Blocks {
         this._loadNewBlocksNow = (blockObjs, loadToken) => {
             /** Suppress intermediate canvas redraws during block loading. */
             this.activity._suppressRefresh = true;
-            // Optimistically clear the previous attempt's failure flag; the
-            // catch blocks below set it again if this attempt fails too.
-            this._lastLoadFailed = false;
-            // Every load attempt gets its own generation, win or lose, so a
-            // completion that lands after this one has been abandoned can be
-            // told apart from a completion belonging to whatever load is
-            // active by the time it fires.
-            this._activeLoadGeneration += 1;
-            // Recorded so cleanupAfterLoad() — a shared method with no
-            // closure over any one call's loadToken — can still tag
-            // "finishedLoading" with the token of whichever load is
-            // current when it fires.
-            this._activeLoadToken = loadToken;
-            this._unsupportedBlocksInCurrentLoad = new Set();
 
             try {
                 /**
@@ -5750,6 +5736,18 @@ class Blocks {
                     // Nothing was loaded, so a waiting save would only store
                     // the cleared workspace over the project.
                     this._afterLoadCallbacks.clear();
+                    const eventBus =
+                        typeof pubsub !== "undefined" && typeof pubsub.emit === "function"
+                            ? pubsub
+                            : null;
+                    if (eventBus) {
+                        setTimeout(() => {
+                            eventBus.emit("loadFailed", {
+                                token: loadToken,
+                                error: new Error(userMessage || warning)
+                            });
+                        }, 0);
+                    }
                     this._advanceLoadQueue();
                 };
 
@@ -5761,6 +5759,18 @@ class Blocks {
                     );
                     return;
                 }
+
+                // Every load attempt gets its own generation, win or lose, so a
+                // completion that lands after this one has been abandoned can be
+                // told apart from a completion belonging to whatever load is
+                // active by the time it fires.
+                this._activeLoadGeneration += 1;
+                // Recorded so cleanupAfterLoad() — a shared method with no
+                // closure over any one call's loadToken — can still tag
+                // "finishedLoading" with the token of whichever load is
+                // current when it fires.
+                this._activeLoadToken = loadToken;
+                this._unsupportedBlocksInCurrentLoad = new Set();
 
                 for (let b = 0; b < blockObjs.length; b++) {
                     if (!blockObjs[b] || !Array.isArray(blockObjs[b])) {
@@ -6494,6 +6504,14 @@ class Blocks {
                 this._adjustTheseStacks = [];
                 this._adjustTheseDocks = [];
                 this._loadCounter = blockObjs.length;
+
+                // Clear the previous load failure flag only after all structural
+                // and element validation has succeeded and a non-empty set of blocks
+                // is being loaded, or when the workspace is completely empty; loading
+                // empty blocks into a non-empty failed workspace preserves the flag.
+                if (blockObjs.length > 0 || this.blockList.length === 0) {
+                    this._lastLoadFailed = false;
+                }
 
                 // Preload audio samples for instruments used in this project (background task)
                 if (this.activity && this.activity.logo && this.activity.logo.synth) {

@@ -510,7 +510,7 @@ describe("_loadStart", () => {
         // cleared before justLoadStart()/the fallback attempt runs, or the
         // new stack renders on top of the leftovers instead of replacing
         // them (reported against this fix).
-        expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, false);
+        expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, true);
         expect(activity.justLoadStart).toHaveBeenCalled();
     });
 
@@ -615,7 +615,7 @@ describe("_loadStart", () => {
             operation: "loadSessionData"
         });
         expect(removeItem).toHaveBeenCalledWith("SESSIONTest");
-        expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, false);
+        expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, true);
         expect(activity.errorMsg).toHaveBeenCalled();
         expect(activity.justLoadStart).toHaveBeenCalled();
     });
@@ -719,6 +719,162 @@ describe("_loadStart", () => {
 
         expect(activity.justLoadStart).not.toHaveBeenCalled();
         expect(global.ErrorHandler.recoverable).not.toHaveBeenCalled();
+    });
+
+    it.each([
+        ["an object", JSON.stringify({ name: "equal", pitchNumber: 12 })],
+        ["a number", "42"],
+        ["a boolean", "true"],
+        ["a string", '"just text"'],
+        ["null", "null"]
+    ])(
+        "rejects %s saved session data and recovers cleanly via loadFailed event",
+        async (_label, invalidData) => {
+            const removeItem = jest.fn();
+            const activity = makeActivity({
+                storage: {
+                    currentProject: "Test",
+                    ["SESSIONTest"]: invalidData,
+                    removeItem
+                }
+            });
+            activity.sessionData = invalidData;
+            activity.blocks.loadNewBlocks = jest.fn(data => {
+                const token = 42;
+                setTimeout(() => {
+                    global.pubsub.emit("loadFailed", {
+                        token,
+                        error: new Error("Invalid block data: expected an array of blocks.")
+                    });
+                }, 0);
+                return token;
+            });
+
+            const pm = new ProjectManager(activity);
+            await pm._loadStart(activity);
+            await new Promise(resolve => setTimeout(resolve, 0));
+
+            expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith(JSON.parse(invalidData));
+            expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    message: "Invalid block data: expected an array of blocks."
+                }),
+                { operation: "loadSessionData" }
+            );
+            expect(removeItem).toHaveBeenCalledWith("SESSIONTest");
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Your saved project could not be loaded. Starting a new project."
+            );
+            expect(activity.justLoadStart).toHaveBeenCalled();
+        }
+    );
+
+    it("falls back to local storage when idb session data reports loadFailed", async () => {
+        const invalidIdbData = JSON.stringify({ corrupted: true });
+        const validLocalData = JSON.stringify([[0, "forward", 100, 100, [null, null]]]);
+        const deleteSession = jest.fn().mockResolvedValue();
+        const sessionStorageManager = {
+            loadSession: jest.fn().mockResolvedValue({
+                data: invalidIdbData,
+                timestamp: Date.now()
+            }),
+            deleteSession
+        };
+        const activity = makeActivity({
+            sessionStorageManager,
+            storage: {
+                currentProject: "Test",
+                ["SESSIONTest"]: validLocalData
+            }
+        });
+
+        let callCount = 0;
+        activity.blocks.loadNewBlocks = jest.fn(data => {
+            callCount++;
+            const token = callCount;
+            if (callCount === 1) {
+                setTimeout(() => {
+                    global.pubsub.emit("loadFailed", {
+                        token,
+                        error: new Error("Invalid block data: expected an array of blocks.")
+                    });
+                }, 0);
+            }
+            return token;
+        });
+
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(deleteSession).toHaveBeenCalledWith("SESSIONTest");
+        expect(activity.blocks.loadNewBlocks).toHaveBeenLastCalledWith([
+            [0, "forward", 100, 100, [null, null]]
+        ]);
+        expect(window.loadedSession).toBe(validLocalData);
+    });
+
+    it("handles active load returning null when session data is invalid by recovering cleanly without trashing blocks", async () => {
+        const removeItem = jest.fn();
+        const activity = makeActivity({
+            storage: {
+                currentProject: "Test",
+                ["SESSIONTest"]: JSON.stringify({ corrupted: true }),
+                removeItem
+            }
+        });
+        activity.blocks.loadNewBlocks = jest.fn(() => null);
+
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+
+        expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith({ corrupted: true });
+        expect(activity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(removeItem).toHaveBeenCalledWith("SESSIONTest");
+        expect(activity.justLoadStart).not.toHaveBeenCalled();
+    });
+
+    it("preserves active load blocks and completes fallback when rejected request occurs during an active load", async () => {
+        const deleteSession = jest.fn().mockResolvedValue();
+        const sessionStorageManager = {
+            loadSession: jest.fn().mockResolvedValue({
+                data: JSON.stringify({ corrupted: true }),
+                timestamp: Date.now()
+            }),
+            deleteSession
+        };
+        const validFallbackData = JSON.stringify([[1, "forward", 100, 100, [null, null]]]);
+        const activity = makeActivity({
+            sessionStorageManager,
+            storage: {
+                currentProject: "Test",
+                ["SESSIONTest"]: validFallbackData
+            }
+        });
+
+        const activeBlock = { id: 0, name: "forward", connections: [null, null] };
+        activity.blocks.blockList = [activeBlock];
+        activity.blocks.isLoading = jest.fn(() => true);
+
+        let callCount = 0;
+        activity.blocks.loadNewBlocks = jest.fn(data => {
+            callCount++;
+            if (callCount === 1) {
+                return null;
+            }
+            return 99;
+        });
+
+        const pm = new ProjectManager(activity);
+        await pm._loadStart(activity);
+
+        expect(activity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(activity.justLoadStart).not.toHaveBeenCalled();
+        expect(deleteSession).toHaveBeenCalledWith("SESSIONTest");
+        expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith([
+            [1, "forward", 100, 100, [null, null]]
+        ]);
+        expect(activity.blocks.blockList).toContain(activeBlock);
     });
 });
 
