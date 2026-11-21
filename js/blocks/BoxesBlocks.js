@@ -13,12 +13,16 @@
    global
 
    _, FlowBlock, ValueBlock, LeftBlock, NOINPUTERRORMSG, SOLFEGENAMES,
-   NOBOXERRORMSG
+   NOBOXERRORMSG, isUnsafeObjectKey
 */
 
 /* exported setupBoxesBlocks */
 
 function setupBoxesBlocks(activity) {
+    const checkUnsafeKey =
+        typeof isUnsafeObjectKey === "function"
+            ? isUnsafeObjectKey
+            : key => ["__proto__", "constructor", "prototype"].includes(String(key));
     /**
      * Represents a block used to increment the value stored in a box.
      * @extends {FlowBlock}
@@ -99,7 +103,7 @@ function setupBoxesBlocks(activity) {
                     // Work-around to #1302
                     // Look for a namedbox with this text value.
                     const name = activity.blocks.blockList[cblk].value;
-                    if (name in logo.boxes) {
+                    if (Object.prototype.hasOwnProperty.call(logo.boxes, name)) {
                         logo.boxes[name] = logo.boxes[name] + i;
                         return;
                     }
@@ -305,7 +309,7 @@ function setupBoxesBlocks(activity) {
             const cblk = activity.blocks.blockList[blk].connections[1];
             const boxname = logo.parseArg(logo, turtle, cblk, blk, logo.receivedArg);
 
-            if (boxname in logo.boxes) {
+            if (Object.prototype.hasOwnProperty.call(logo.boxes, boxname)) {
                 return logo.boxes[boxname];
             } else {
                 activity.errorMsg(NOBOXERRORMSG, blk, boxname);
@@ -324,7 +328,7 @@ function setupBoxesBlocks(activity) {
             const cblk = activity.blocks.blockList[blk].connections[1];
             const name = logo.parseArg(logo, turtle, cblk, blk, logo.receivedArg);
 
-            if (name in logo.boxes) {
+            if (Object.prototype.hasOwnProperty.call(logo.boxes, name)) {
                 logo.boxes[name] = value;
             } else {
                 activity.errorMsg(NOBOXERRORMSG, blk, name);
@@ -348,7 +352,7 @@ function setupBoxesBlocks(activity) {
             }
 
             const name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-            if (name in logo.boxes) {
+            if (Object.prototype.hasOwnProperty.call(logo.boxes, name)) {
                 return logo.boxes[name];
             } else {
                 activity.errorMsg(NOBOXERRORMSG, blk, name);
@@ -424,7 +428,7 @@ function setupBoxesBlocks(activity) {
         updateParameter(logo, turtle, blk) {
             const name = activity.blocks.blockList[blk].privateData;
 
-            if (name in logo.boxes) {
+            if (Object.prototype.hasOwnProperty.call(logo.boxes, name)) {
                 return logo.boxes[name];
             } else {
                 activity.errorMsg(NOBOXERRORMSG, blk, name);
@@ -442,7 +446,7 @@ function setupBoxesBlocks(activity) {
         setter(logo, value, turtle, blk) {
             const name = activity.blocks.blockList[blk].privateData;
 
-            if (name in logo.boxes) {
+            if (Object.prototype.hasOwnProperty.call(logo.boxes, name)) {
                 logo.boxes[name] = value;
             } else {
                 activity.errorMsg(NOBOXERRORMSG, blk, name);
@@ -470,7 +474,7 @@ function setupBoxesBlocks(activity) {
             ) {
                 logo.statusFields.push([blk, activity.blocks.blockList[blk].name]);
             } else if (!logo.updatingStatusMatrix) {
-                if (name in logo.boxes) {
+                if (Object.prototype.hasOwnProperty.call(logo.boxes, name)) {
                     return logo.boxes[name];
                 } else {
                     activity.errorMsg(NOBOXERRORMSG, blk, name);
@@ -545,6 +549,11 @@ function setupBoxesBlocks(activity) {
              */
             const privateData = activity.blocks.blockList[blk].privateData;
 
+            if (checkUnsafeKey(privateData)) {
+                activity.errorMsg(_("The box name is reserved."), blk);
+                return;
+            }
+
             /**
              * The value to be stored in the box.
              * @type {*}
@@ -611,8 +620,10 @@ function setupBoxesBlocks(activity) {
          * Stores a value in a box.
          * @param {Array} args - The arguments passed to the block.
          * @param {Logo} logo - The logo instance.
+         * @param {string} turtle - The turtle identifier.
+         * @param {string} blk - The block identifier.
          */
-        flow(args, logo) {
+        flow(args, logo, turtle, blk) {
             if (args.length !== 2) return;
 
             /**
@@ -620,6 +631,11 @@ function setupBoxesBlocks(activity) {
              * @type {string}
              */
             const boxName = args[0];
+
+            if (checkUnsafeKey(boxName)) {
+                activity.errorMsg(_("The box name is reserved."), blk);
+                return;
+            }
 
             /**
              * The value to be stored in the box.

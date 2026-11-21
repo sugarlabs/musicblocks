@@ -506,4 +506,88 @@ describe("setupBoxesBlocks", () => {
             expect(logo.statusFields).toContainEqual([testBlk, "namedbox"]);
         });
     });
+
+    describe("Prototype safety and reserved box names (#10431)", () => {
+        test("BoxBlock returns 0 and reports NOBOXERRORMSG for inherited Object prototype names", () => {
+            const boxBlock = createdBlocks["box"];
+            const testBlk = 300;
+            activity.blocks.blockList[testBlk] = { connections: [null, 301] };
+
+            for (const key of ["toString", "valueOf", "constructor", "__proto__", "hasOwnProperty"]) {
+                logo.receivedArg = key;
+                activity.errorMsg.mockClear();
+
+                const val = boxBlock.arg(logo, "turtle0", testBlk, key);
+                expect(val).toBe(0);
+                expect(activity.errorMsg).toHaveBeenCalledWith(global.NOBOXERRORMSG, testBlk, key);
+
+                const paramVal = boxBlock.updateParameter(logo, "turtle0", testBlk);
+                expect(paramVal).toBe(0);
+
+                activity.errorMsg.mockClear();
+                boxBlock.setter(logo, 999, "turtle0", testBlk);
+                expect(activity.errorMsg).toHaveBeenCalledWith(global.NOBOXERRORMSG, testBlk, key);
+            }
+        });
+
+        test("NamedBoxBlock returns 0 and reports NOBOXERRORMSG for inherited Object prototype names", () => {
+            const namedBoxBlock = createdBlocks["namedbox"];
+            const testBlk = 310;
+
+            for (const key of ["toString", "valueOf", "constructor", "__proto__", "hasOwnProperty"]) {
+                activity.blocks.blockList[testBlk] = { privateData: key, connections: [] };
+                activity.errorMsg.mockClear();
+
+                const val = namedBoxBlock.arg(logo, "turtle0", testBlk);
+                expect(val).toBe(0);
+                expect(activity.errorMsg).toHaveBeenCalledWith(global.NOBOXERRORMSG, testBlk, key);
+
+                const paramVal = namedBoxBlock.updateParameter(logo, "turtle0", testBlk);
+                expect(paramVal).toBe(0);
+
+                activity.errorMsg.mockClear();
+                namedBoxBlock.setter(logo, 999, "turtle0", testBlk);
+                expect(activity.errorMsg).toHaveBeenCalledWith(global.NOBOXERRORMSG, testBlk, key);
+            }
+        });
+
+        test("StoreInBlock rejects reserved prototype-polluting names with error", () => {
+            const storeInBlock = createdBlocks["storein"];
+            const testBlk = 320;
+
+            for (const key of ["__proto__", "constructor", "prototype"]) {
+                const protoBefore = Object.getPrototypeOf(logo.boxes);
+                activity.errorMsg.mockClear();
+                storeInBlock.flow([key, { polluted: true }], logo, "turtle0", testBlk);
+                expect(activity.errorMsg).toHaveBeenCalledWith("The box name is reserved.", testBlk);
+                expect(Object.prototype.hasOwnProperty.call(logo.boxes, key)).toBe(false);
+                expect(Object.getPrototypeOf(logo.boxes)).toBe(protoBefore);
+            }
+        });
+
+        test("StoreIn2Block rejects reserved prototype-polluting names with error", () => {
+            const storeIn2Block = createdBlocks["storein2"];
+            const testBlk = 330;
+
+            for (const key of ["__proto__", "constructor", "prototype"]) {
+                const protoBefore = Object.getPrototypeOf(logo.boxes);
+                activity.blocks.blockList[testBlk] = { privateData: key };
+                activity.errorMsg.mockClear();
+                storeIn2Block.flow([{ polluted: true }], logo, "turtle0", testBlk);
+                expect(activity.errorMsg).toHaveBeenCalledWith("The box name is reserved.", testBlk);
+                expect(Object.prototype.hasOwnProperty.call(logo.boxes, key)).toBe(false);
+                expect(Object.getPrototypeOf(logo.boxes)).toBe(protoBefore);
+            }
+        });
+
+        test("IncrementBlock does not increment inherited prototype names", () => {
+            const incrementBlock = createdBlocks["increment"];
+            const testBlk = 340;
+            activity.blocks.blockList[testBlk] = { connections: [null, 341] };
+            activity.blocks.blockList[341] = { name: "text", value: "toString" };
+
+            incrementBlock.flow([10, 1], logo, "turtle0", testBlk);
+            expect(Object.prototype.hasOwnProperty.call(logo.boxes, "toString")).toBe(false);
+        });
+    });
 });
