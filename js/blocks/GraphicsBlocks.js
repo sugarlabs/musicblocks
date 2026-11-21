@@ -1215,7 +1215,8 @@ function setupGraphicsBlocks(activity) {
 
             const arg0 = args[0] === null ? "on" : args[0];
             const tur = activity.turtles.ithTurtle(turtle);
-            const listenerName = "_wrap_" + turtle;
+            const prevWrap = tur.painter.wrap;
+            const listenerName = "_wrap_" + turtle + (blk !== undefined ? "_" + blk : "");
             tur.painter.wrap = arg0 === "on";
 
             if (blk !== undefined && blk in activity.blocks.blockList) {
@@ -1226,7 +1227,7 @@ function setupGraphicsBlocks(activity) {
             }
 
             const __listener = () => {
-                tur.painter.wrap = null;
+                tur.painter.wrap = prevWrap;
             };
             logo.setTurtleListener(turtle, listenerName, __listener);
             return [args[1], 1];
