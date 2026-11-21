@@ -310,6 +310,7 @@ const createMockLogo = () => {
         insideModeWidget: false,
         inTempo: false,
         inSample: false,
+        inRhythmRuler: false,
         insideTemperament: false,
         tempo: null,
         timbre: null,
@@ -1490,6 +1491,85 @@ describe("setupWidgetBlocks", () => {
 
             expect(logo.rhythmRuler.rulerBlock).toBe("rrBlk");
             expect(logo.rhythmRuler.Rulers).toEqual([]);
+        });
+
+        it("resets inRhythmRuler to false once the Rhythm Maker completion listener fires", () => {
+            logo.rhythmRuler = { Rulers: [], Drums: [], init: jest.fn() };
+
+            const result = getBlock("rhythmruler2").flow(["childBlk"], logo, 0, "rrBlk");
+            expect(result).toEqual(["childBlk", 1]);
+            expect(logo.inRhythmRuler).toBe(true);
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith("rrBlk", 0, "_rhythmruler_0");
+            expect(logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                "_rhythmruler_0",
+                expect.any(Function)
+            );
+
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            listener();
+
+            expect(logo.rhythmRuler.init).toHaveBeenCalledWith(activity);
+            expect(logo.inRhythmRuler).toBe(false);
+        });
+
+        it("ensures inRhythmRuler is reset to false even if rhythmRuler.init throws", () => {
+            logo.rhythmRuler = {
+                Rulers: [],
+                Drums: [],
+                init: jest.fn(() => {
+                    throw new Error("Init failure");
+                })
+            };
+
+            getBlock("rhythmruler2").flow(["childBlk"], logo, 0, "rrBlk");
+            expect(logo.inRhythmRuler).toBe(true);
+
+            const listener = logo.setTurtleListener.mock.calls[0][2];
+            expect(() => listener()).toThrow("Init failure");
+            expect(logo.inRhythmRuler).toBe(false);
+        });
+
+        it("permits subsequent Rhythm Maker execution to manage inRhythmRuler lifecycle cleanly", () => {
+            logo.rhythmRuler = { Rulers: [], Drums: [], init: jest.fn() };
+
+            // First run
+            getBlock("rhythmruler2").flow(["childBlk1"], logo, 0, "rrBlk1");
+            expect(logo.inRhythmRuler).toBe(true);
+            let listener = logo.setTurtleListener.mock.calls[0][2];
+            listener();
+            expect(logo.inRhythmRuler).toBe(false);
+
+            // Second run
+            logo.setTurtleListener.mockClear();
+            getBlock("rhythmruler2").flow(["childBlk2"], logo, 0, "rrBlk2");
+            expect(logo.inRhythmRuler).toBe(true);
+            listener = logo.setTurtleListener.mock.calls[0][2];
+            listener();
+            expect(logo.inRhythmRuler).toBe(false);
+        });
+
+        it("does not clear inRhythmRuler if another clamp owns the ruler when the listener fires", () => {
+            logo.rhythmRuler = { Rulers: [], Drums: [], init: jest.fn() };
+
+            // Clamp 1 runs
+            getBlock("rhythmruler2").flow(["childBlk1"], logo, 0, "rrBlk1");
+            const listener1 = logo.setTurtleListener.mock.calls[0][2];
+
+            // Clamp 2 runs and takes ownership
+            getBlock("rhythmruler2").flow(["childBlk2"], logo, 0, "rrBlk2");
+            const listener2 = logo.setTurtleListener.mock.calls[1][2];
+
+            expect(logo.inRhythmRuler).toBe(true);
+            expect(logo.rhythmRuler.rulerBlock).toBe("rrBlk2");
+
+            // Clamp 1 listener fires; should not clear inRhythmRuler since it no longer owns the ruler
+            listener1();
+            expect(logo.inRhythmRuler).toBe(true);
+
+            // Clamp 2 listener fires; should clear inRhythmRuler since it still owns the ruler
+            listener2();
+            expect(logo.inRhythmRuler).toBe(false);
         });
 
         it.each([
