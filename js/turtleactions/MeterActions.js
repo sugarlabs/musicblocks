@@ -62,6 +62,22 @@ function setupMeterActions(activity) {
         }
     }
 
+    function _showBpmLimitError(beatValue, limit, isMax, blk) {
+        const obj = rationalToFraction(beatValue);
+        const target = Math.round(((limit * 0.25) / beatValue) * 100) / 100;
+        if (isMax) {
+            activity.errorMsg(
+                `${_("maximum")} ${obj[0]}/${obj[1]} ${_("beats per minute is %s").replace(/%s/g, () => target)}`,
+                blk
+            );
+        } else {
+            activity.errorMsg(
+                `${obj[0]}/${obj[1]} ${_("beats per minute must be greater than %s").replace(/%s/g, () => target)}`,
+                blk
+            );
+        }
+    }
+
     Singer.MeterActions = class {
         /**
          * @param {Number} beatCount
@@ -143,23 +159,12 @@ function setupMeterActions(activity) {
             }
 
             let _bpm = (bpm * beatValue) / 0.25;
-            let obj, target;
 
             if (_bpm < 30) {
-                obj = rationalToFraction(beatValue);
-                target = (30 * 0.25) / beatValue;
-                activity.errorMsg(
-                    `${obj[0]}/${obj[1]} ${_("beats per minute must be greater than %s").replace(/%s/g, target)}`,
-                    blk
-                );
+                _showBpmLimitError(beatValue, 30, false, blk);
                 _bpm = 30;
             } else if (_bpm > 1000) {
-                obj = rationalToFraction(beatValue);
-                target = (1000 * 0.25) / beatValue;
-                activity.errorMsg(
-                    `${_("maximum")} ${obj[0]}/${obj[1]} ${_("beats per minute is %s").replace(/%s/g, target)}`,
-                    blk
-                );
+                _showBpmLimitError(beatValue, 1000, true, blk);
                 _bpm = 1000;
             }
 
@@ -180,23 +185,12 @@ function setupMeterActions(activity) {
             }
 
             const _bpm = (bpm * beatValue) / 0.25;
-            let obj, target;
 
             if (_bpm < 30) {
-                obj = rationalToFraction(beatValue);
-                target = (30 * 0.25) / beatValue;
-                activity.errorMsg(
-                    `${obj[0]}/${obj[1]} ${_("beats per minute must be greater than %s").replace(/%s/g, target)}`,
-                    blk
-                );
+                _showBpmLimitError(beatValue, 30, false, blk);
                 Singer.masterBPM = 30;
             } else if (_bpm > 1000) {
-                obj = rationalToFraction(beatValue);
-                target = (1000 * 0.25) / beatValue;
-                activity.errorMsg(
-                    `${_("maximum")} ${obj[0]}/${obj[1]} ${_("beats per minute is %s").replace(/%s/g, target)}`,
-                    blk
-                );
+                _showBpmLimitError(beatValue, 1000, true, blk);
                 Singer.masterBPM = 1000;
             } else {
                 Singer.masterBPM = _bpm;
