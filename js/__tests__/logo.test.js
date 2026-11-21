@@ -2896,45 +2896,137 @@ describe("Logo runFromBlock", () => {
         });
     });
 
-    describe("fast-export synchronous scheduling", () => {
-        test("runs runFromBlockNow synchronously while exporting notation", () => {
-            timeoutSpy = jest.spyOn(global, "setTimeout").mockImplementation(fn => {
-                fn();
-                return 5;
-            });
-            logo.runFromBlockNow = jest.fn();
+    describe("notation export scheduling", () => {
+        let turtle1;
+        let ran;
+
+        beforeEach(() => {
+            jest.useFakeTimers();
+            turtle1 = createMockTurtle();
+            for (const tur of [turtle0, turtle1]) {
+                tur.singer.turtleTime = 0;
+                tur.runGeneration = 0;
+            }
+            mockActivity.turtles.turtleList = [turtle0, turtle1];
+            mockActivity.turtles.ithTurtle = jest.fn(i => (String(i) === "1" ? turtle1 : turtle0));
+            ran = [];
+            logo.runFromBlockNow = jest.fn((l, turtle, blk) => ran.push([turtle, blk]));
             logo.turtleDelay = 25;
             logo.stopTurtle = false;
+            logo.runningAbc = true;
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+
+        test("queues the block and runs it on the next tick, without the turtle delay", () => {
             turtle0.waitTime = 10;
-            logo.runningLilypond = true;
 
             logo.runFromBlock(logo, 0, 3, 1, "x");
+            expect(logo.runFromBlockNow).not.toHaveBeenCalled();
 
-            expect(timeoutSpy).not.toHaveBeenCalled();
+            jest.advanceTimersByTime(0);
             expect(logo.runFromBlockNow).toHaveBeenCalledWith(logo, 0, 3, 1, "x");
         });
 
-        test("yields via setGuardedTimeout every _EXPORT_YIELD_AFTER_SYNC_RUNS transitions", () => {
-            const guardedSpy = jest.spyOn(logo.timerManager, "setGuardedTimeout");
-            logo.runFromBlockNow = jest.fn();
-            logo.turtleDelay = 25;
-            logo.stopTurtle = false;
-            turtle0.waitTime = 10;
-            logo.runningMxml = true;
+        test("runs the turtle that is earliest in the music first", () => {
+            turtle0.singer.turtleTime = 2;
+            turtle1.singer.turtleTime = 1;
 
-            for (let i = 0; i < logo._EXPORT_YIELD_AFTER_SYNC_RUNS; i++) {
-                logo.runFromBlock(logo, 0, 3, 1, "x");
+            logo.runFromBlock(logo, 0, 3, 0, null);
+            logo.runFromBlock(logo, 1, 7, 0, null);
+            jest.runAllTimers();
+
+            expect(ran).toEqual([
+                [1, 7],
+                [0, 3]
+            ]);
+        });
+
+        test("takes turns between turtles at the same time, in queue order", () => {
+            turtle0.singer.turtleTime = 1;
+            turtle1.singer.turtleTime = 1;
+            logo.runFromBlockNow = jest.fn((l, turtle, blk) => {
+                ran.push([turtle, blk]);
+                if (blk < 3) logo.runFromBlock(logo, turtle, blk + 1, 0, null);
+            });
+
+            logo.runFromBlock(logo, 0, 1, 0, null);
+            logo.runFromBlock(logo, 1, 1, 0, null);
+            jest.runAllTimers();
+
+            expect(ran).toEqual([
+                [0, 1],
+                [1, 1],
+                [0, 2],
+                [1, 2],
+                [0, 3],
+                [1, 3]
+            ]);
+        });
+
+        test("counts a wait toward the time of the next step", () => {
+            turtle0.singer.turtleTime = 1;
+            turtle1.singer.turtleTime = 1.25;
+            turtle0.waitTime = 500;
+
+            logo.runFromBlock(logo, 0, 3, 0, null);
+            logo.runFromBlock(logo, 1, 7, 0, null);
+            jest.runAllTimers();
+
+            expect(turtle0.doWait).toHaveBeenCalledWith(0);
+            expect(ran).toEqual([
+                [1, 7],
+                [0, 3]
+            ]);
+        });
+
+        test("yields every _EXPORT_YIELD_AFTER_SYNC_RUNS steps", () => {
+            const steps = logo._EXPORT_YIELD_AFTER_SYNC_RUNS + 5;
+            for (let i = 0; i < steps; i++) {
+                logo.runFromBlock(logo, 0, i, 0, null);
             }
 
-            expect(logo.runFromBlockNow).toHaveBeenCalledTimes(
-                logo._EXPORT_YIELD_AFTER_SYNC_RUNS - 1
-            );
-            expect(guardedSpy).toHaveBeenCalledTimes(1);
-            expect(guardedSpy).toHaveBeenCalledWith(expect.any(Function), 0, expect.any(Function));
+            jest.advanceTimersByTime(0);
+            expect(ran).toHaveLength(logo._EXPORT_YIELD_AFTER_SYNC_RUNS);
 
-            logo.runFromBlock(logo, 0, 3, 1, "x");
-            expect(logo.runFromBlockNow).toHaveBeenCalledTimes(logo._EXPORT_YIELD_AFTER_SYNC_RUNS);
-            expect(guardedSpy).toHaveBeenCalledTimes(1);
+            jest.runAllTimers();
+            expect(ran).toHaveLength(steps);
+        });
+
+        test("keeps running the other turtles when a block throws", () => {
+            logo.runFromBlockNow = jest.fn((l, turtle, blk) => {
+                ran.push([turtle, blk]);
+                if (turtle === 0) throw new Error("bad block");
+            });
+
+            logo.runFromBlock(logo, 0, 3, 0, null);
+            logo.runFromBlock(logo, 1, 7, 0, null);
+            expect(() => jest.advanceTimersByTime(0)).toThrow("bad block");
+            jest.runAllTimers();
+
+            expect(ran).toEqual([
+                [0, 3],
+                [1, 7]
+            ]);
+        });
+
+        test("drops the steps of a mouse that was stopped", () => {
+            logo.runFromBlock(logo, 0, 3, 0, null);
+            logo.runFromBlock(logo, 1, 7, 0, null);
+            turtle1.runGeneration += 1;
+            jest.runAllTimers();
+
+            expect(ran).toEqual([[0, 3]]);
+        });
+
+        test("drops the queued steps when the run is reset", () => {
+            logo.runFromBlock(logo, 0, 3, 0, null);
+            logo._resetExportSteps();
+            jest.runAllTimers();
+
+            expect(ran).toEqual([]);
         });
 
         test("_exportingNotation is false outside exports", () => {
