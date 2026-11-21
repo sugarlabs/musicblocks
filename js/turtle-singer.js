@@ -49,6 +49,10 @@
 
 /* exported Singer */
 
+// Scalar transposition budget: getNote clamps octaves to 1..10 and the largest EDO is 55 steps
+// per octave, so past this many steps every outcome is already saturated.
+const MAX_SCALAR_STEPS = 495;
+
 const pitchToFrequencyCache = new Map();
 
 const getCachedPitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
@@ -511,7 +515,9 @@ class Singer {
      * @returns {[String, Number]} transposed [note, octave]
      */
     static addScalarTransposition(logo, turtle, note, octave, steps) {
-        if (steps === 0) return [note, octave];
+        if (!Number.isFinite(steps) || steps === 0) return [note, octave];
+
+        const scalarSteps = Math.min(Math.abs(steps), MAX_SCALAR_STEPS);
 
         const activity = logo.activity;
         const tur = activity.turtles.ithTurtle(turtle);
@@ -536,7 +542,7 @@ class Singer {
         const useEdoSteps = !isNonEDO(temperament);
 
         if (useEdoSteps) {
-            for (let i = 0; i < Math.abs(steps); i++) {
+            for (let i = 0; i < scalarSteps; i++) {
                 const stepEdo =
                     steps > 0
                         ? getStepSizeUp(
@@ -576,7 +582,7 @@ class Singer {
             const custom = getSavedCustomModes().find(m => m.name === modeName);
             const modeEdo =
                 custom && Number.isInteger(custom.edo) && custom.edo > 0 ? custom.edo : edo;
-            for (let i = 0; i < Math.abs(steps); i++) {
+            for (let i = 0; i < scalarSteps; i++) {
                 const stepCount =
                     steps > 0
                         ? getStepSizeUp(
