@@ -373,6 +373,26 @@ describe("justLoadStart", () => {
         pm.justLoadStart();
         expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith(global.DATAOBJS);
     });
+
+    it("recenters the workspace after the default blocks finish loading", () => {
+        const activity = makeActivity();
+        activity.workspaceLayoutController = { centerBlocksInViewport: jest.fn() };
+        activity.blocks.runAfterLoad = jest.fn(callback => callback());
+        const pm = new ProjectManager(activity);
+
+        pm.justLoadStart();
+
+        expect(activity.blocks.runAfterLoad).toHaveBeenCalledTimes(1);
+        expect(activity.workspaceLayoutController.centerBlocksInViewport).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not throw when no workspace controller is attached", () => {
+        const activity = makeActivity();
+        activity.blocks.runAfterLoad = jest.fn(callback => callback());
+        const pm = new ProjectManager(activity);
+
+        expect(() => pm.justLoadStart()).not.toThrow();
+    });
 });
 
 // ---------------------------------------------------------------------------

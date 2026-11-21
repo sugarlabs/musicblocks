@@ -45,6 +45,70 @@ class WorkspaceLayoutController {
     }
 
     /**
+     * Pans the workspace so the visible blocks are centered in the canvas.
+     *
+     * Unlike `findBlocks()`, this only moves the blocks container: it never
+     * rearranges or rescales blocks, so it is safe to run once after a new
+     * project's default blocks have loaded.
+     * @returns {void}
+     */
+    centerBlocksInViewport() {
+        const activity = this.activity;
+        const blockList = activity.blocks && activity.blocks.blockList;
+        if (!blockList) {
+            return;
+        }
+
+        let left = Infinity;
+        let top = Infinity;
+        let right = -Infinity;
+        let bottom = -Infinity;
+
+        for (const key of Object.keys(blockList)) {
+            const block = blockList[key];
+            if (!block || block.trash || !block.container) {
+                continue;
+            }
+
+            const scaleX = Math.abs(block.container.scaleX || 1);
+            const scaleY = Math.abs(block.container.scaleY || 1);
+            left = Math.min(left, block.container.x);
+            top = Math.min(top, block.container.y);
+            right = Math.max(right, block.container.x + (block.width || 0) * scaleX);
+            bottom = Math.max(bottom, block.container.y + (block.height || 0) * scaleY);
+        }
+
+        if (!Number.isFinite(left)) {
+            return;
+        }
+
+        const { canvas, blocksContainer } = activity;
+        if (!canvas || !canvas.width || !canvas.height || !blocksContainer) {
+            return;
+        }
+
+        const containerScaleX = blocksContainer.scaleX || 1;
+        const containerScaleY = blocksContainer.scaleY || 1;
+        const stageScaleX =
+            (activity.stage && activity.stage.scaleX) || activity.turtleBlocksScale || 1;
+        const stageScaleY =
+            (activity.stage && activity.stage.scaleY) || activity.turtleBlocksScale || 1;
+
+        const centerX = (left + right) / 2;
+        const centerY = (top + bottom) / 2;
+
+        // The viewport's left edge is -blocksContainer.x / containerScaleX,
+        // so centering means solving for the container offset that puts the
+        // bounds' center at canvas.width / 2 (see Blocks._getWorkspaceViewport).
+        blocksContainer.x = canvas.width / (2 * stageScaleX) - centerX * containerScaleX;
+        blocksContainer.y = canvas.height / (2 * stageScaleY) - centerY * containerScaleY;
+
+        if (typeof activity.refreshCanvas === "function") {
+            activity.refreshCanvas();
+        }
+    }
+
+    /**
      * Ensures blocks stay within canvas boundaries when resized.
      * Ensures that music blocks are responsive to horizontal resizing.
      * Ensures that overall integrity of blocks isn't hampered with.
