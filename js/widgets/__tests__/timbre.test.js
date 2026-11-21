@@ -1650,6 +1650,7 @@ describe("TimbreWidget", () => {
                 timbre._play();
                 expect(timbre._playing).toBe(true);
                 expect(mockActivity.logo.resetSynth).toHaveBeenCalledWith(0);
+                expect(timbre.playButton.getAttribute("aria-label")).toBe("Stop");
 
                 // Run timers to advance to note 2
                 jest.runOnlyPendingTimers();
@@ -1657,6 +1658,7 @@ describe("TimbreWidget", () => {
                 jest.runOnlyPendingTimers();
 
                 expect(timbre._playing).toBe(false);
+                expect(timbre.playButton.getAttribute("aria-label")).toBe("Play");
             });
 
             test("_play stops playback when clicked again during playing", () => {
@@ -1669,12 +1671,14 @@ describe("TimbreWidget", () => {
 
                 timbre._play();
                 expect(timbre._playing).toBe(true);
+                expect(timbre.playButton.getAttribute("aria-label")).toBe("Stop");
 
                 // Click again to stop
                 timbre._play();
                 expect(timbre._playing).toBe(false);
                 expect(mockActivity.logo.synth.setMasterVolume).toHaveBeenCalledWith(0);
                 expect(mockActivity.logo.synth.stop).toHaveBeenCalled();
+                expect(timbre.playButton.getAttribute("aria-label")).toBe("Play");
             });
         });
 
