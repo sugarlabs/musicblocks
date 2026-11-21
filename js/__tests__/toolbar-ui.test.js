@@ -197,6 +197,7 @@ describe("ToolbarUI - Visual Helpers", () => {
                 runSlowlyIcon: "Run slowly",
                 runStepByStepIcon: "Run step by step",
                 displayStatsIcon: "Display statistics",
+                checkProjectIcon: "Check My Project",
                 loadPluginIcon: "Load plugin",
                 delPluginIcon: "Delete plugin",
                 languageSelectIcon: "Select language",

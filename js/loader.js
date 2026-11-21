@@ -375,6 +375,18 @@ requirejs.config({
             deps: ["utils/utils", "utils/dom-helpers", "widgets/widgetWindows"],
             exports: "HelpWidget"
         },
+        "utils/project-validator": {
+            exports: "ProjectValidator"
+        },
+        "widgets/project-checker": {
+            deps: [
+                "utils/utils",
+                "utils/dom-helpers",
+                "widgets/widgetWindows",
+                "utils/project-validator"
+            ],
+            exports: "ProjectCheckerWindow"
+        },
         // The chat widgets read createWidgetLifecycle off window, so the helper
         // must be evaluated before they are. These are plain scripts, which
         // RequireJS would otherwise fetch and evaluate in any order.
