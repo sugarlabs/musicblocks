@@ -639,6 +639,42 @@ describe("Utility Functions (logic-only)", () => {
             expect(player.start).not.toHaveBeenCalled();
         });
 
+        test("should wait for a URL player that replaced the one it was waiting for (#10319)", async () => {
+            if (!instruments[turtle]) {
+                instruments[turtle] = {}; // Initialize instruments for the turtle
+            }
+
+            const sourceName = "https://example.com/replaced-noise.wav";
+            const playback = trigger(turtle, ["C2"], beatValue, sourceName, null, null, false, 0);
+
+            for (let i = 0; i < 100 && !instruments[turtle][sourceName]; i++) {
+                await new Promise(resolve => setTimeout(resolve, 0));
+            }
+            const first = instruments[turtle][sourceName];
+
+            // Let trigger() capture this player and settle on its wait.
+            for (let i = 0; i < 5; i++) {
+                await new Promise(resolve => setTimeout(resolve, 0));
+            }
+
+            // A second loadSynth() for the same URL replaces the player.
+            await loadSynth(turtle, sourceName);
+            const second = instruments[turtle][sourceName];
+            expect(second).not.toBe(first);
+
+            // Let the first player finish, so trigger() notices the replacement.
+            first.onload();
+            await new Promise(resolve => setTimeout(resolve, 0));
+
+            expect(second.start).not.toHaveBeenCalled();
+
+            second.onload();
+            await playback;
+
+            expect(second.start).toHaveBeenCalledTimes(1);
+            expect(first.start).not.toHaveBeenCalled();
+        });
+
         test("should reapply the cent adjustment when a voice sample is reloaded after Stop (#7996)", async () => {
             if (!instruments[turtle]) {
                 instruments[turtle] = {}; // Initialize instruments for the turtle

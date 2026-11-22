@@ -2592,10 +2592,13 @@ function Synth() {
             // was registered before its download finished: start() throws while
             // the buffer is not loaded. A URL sample waits on its own load
             // promise, so an unrelated failing or stalled download cannot break
-            // it; other samples fall back to Tone's download queue.
-            if (tempSynth && typeof tempSynth.loaded === "boolean" && !tempSynth.loaded) {
+            // it; other samples fall back to Tone's download queue. Re-check
+            // after waiting, because a second loadSynth() for the same URL can
+            // replace the player in the meantime.
+            while (tempSynth && typeof tempSynth.loaded === "boolean" && !tempSynth.loaded) {
+                const waitingFor = tempSynth;
                 let ready = true;
-                const ownReady = _sampleReady.get(tempSynth);
+                const ownReady = _sampleReady.get(waitingFor);
                 if (ownReady) {
                     ready = await ownReady;
                 } else {
@@ -2615,12 +2618,24 @@ function Synth() {
                     return; // Exit gracefully - instruments were disposed
                 }
 
-                // The instrument may have been replaced while we were waiting.
-                if (instruments[turtle][instrumentName] !== tempSynth) {
-                    tempSynth = instruments[turtle][instrumentName];
+                const current = instruments[turtle][instrumentName];
+                if (!current) {
+                    return; // Exit gracefully - the instrument is gone
+                }
+
+                if (current !== waitingFor) {
+                    // Wait for the player that replaced it as well.
+                    tempSynth = current;
                     flag = instrumentsSource[instrumentName]
                         ? instrumentsSource[instrumentName][0]
                         : 0;
+                } else if (!current.loaded) {
+                    // This one will not load any further. A URL sample is
+                    // dropped; other samples are still tried, as before.
+                    if (ownReady) {
+                        return;
+                    }
+                    break;
                 }
             }
 
