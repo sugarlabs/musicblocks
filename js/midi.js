@@ -326,10 +326,8 @@ class MidiTranscriber {
             } else if (matches.length > 1) {
                 const match = matches.find(candidate => name.includes(candidate));
                 if (match) instrument = match;
-            }
-
-            // MIDI programs outside Music Blocks' map still get the legacy best-effort lookup.
-            if (matches.length === 0 && track.instrument.name) {
+            } else if (track.instrument.name) {
+                // MIDI programs outside Music Blocks' map still get the legacy best-effort lookup.
                 if (typeof VOICENAMES !== "undefined") {
                     for (const voices of VOICENAMES) {
                         if (track.instrument.name.indexOf(voices[1]) > -1) {

@@ -357,6 +357,26 @@ describe("transcribeMidi", () => {
         ).toEqual(["saxophone", "saxophone", "saxophone", "saxophone"]);
     });
 
+    it("does not let a conflicting name override mapped saxophone programs", async () => {
+        const midi = {
+            header: mockMidi.header,
+            tracks: [64, 65, 66, 67].map(number => ({
+                instrument: { name: "acoustic grand piano", number, percussion: false },
+                channel: 0,
+                notes: [{ name: "C4", midi: 60, time: 0, duration: 0.5 }]
+            }))
+        };
+
+        await transcribeMidi(midi);
+
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        expect(
+            loadedBlocks
+                .filter(block => Array.isArray(block[1]) && block[1][0] === "voicename")
+                .map(block => block[1][1].value)
+        ).toEqual(["saxophone", "saxophone", "saxophone", "saxophone"]);
+    });
+
     it("uses the General MIDI name to disambiguate program 81", async () => {
         const midi = {
             header: mockMidi.header,
@@ -418,6 +438,27 @@ describe("transcribeMidi", () => {
             loadedBlocks.find(block => Array.isArray(block[1]) && block[1][0] === "voicename")[1][1]
                 .value
         ).toBe("guitar");
+    });
+
+    it("defaults unmapped programs without matching name to electronic synth", async () => {
+        const midi = {
+            header: mockMidi.header,
+            tracks: [
+                {
+                    instrument: { name: "unrecognized instrument", number: 115, percussion: false },
+                    channel: 0,
+                    notes: [{ name: "C4", midi: 60, time: 0, duration: 0.5 }]
+                }
+            ]
+        };
+
+        await transcribeMidi(midi);
+
+        const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
+        expect(
+            loadedBlocks.find(block => Array.isArray(block[1]) && block[1][0] === "voicename")[1][1]
+                .value
+        ).toBe("electronic synth");
     });
 
     it("does not assign a melodic instrument to a percussion track", async () => {
