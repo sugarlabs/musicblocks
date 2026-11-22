@@ -110,6 +110,27 @@ describe("ProjectStorage", () => {
     });
 
     describe("save()", () => {
+        it("backs up a valid legacy string-encoded primary", async () => {
+            const legacy = JSON.stringify({ Projects: { song: { ProjectName: "Saved" } } });
+            await storage.set(storage.LocalStorageKey, legacy);
+            storage.data = { Projects: {} };
+
+            await storage.save();
+
+            expect(await storage.get(storage.BackupStorageKey)).toBe(legacy);
+        });
+
+        it("preserves the backup when a string-encoded primary is malformed", async () => {
+            const backup = { Projects: { song: { ProjectName: "Saved" } } };
+            await storage.set(storage.BackupStorageKey, backup);
+            await storage.set(storage.LocalStorageKey, "invalid json");
+            storage.data = { Projects: {} };
+
+            await storage.save();
+
+            expect(await storage.get(storage.BackupStorageKey)).toEqual(backup);
+        });
+
         it("should save data under the primary key", async () => {
             storage.data = { Projects: {}, LikedProjects: {} };
             await storage.save();
