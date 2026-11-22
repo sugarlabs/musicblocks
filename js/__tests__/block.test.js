@@ -3265,6 +3265,24 @@ describe("Block Foundation", () => {
             expect(el.getAttribute("aria-label")).toBe("forward, value: kick, do, 4, 0");
         });
 
+        it("keeps the blob: URL of a recorded sample out of the label", () => {
+            const url = "blob:https://musicblocks.example/1f3c-9a";
+            block.value = [url, url, "do", 4];
+            const el = block._setupAccessibleElement();
+            expect(el.getAttribute("aria-label")).toBe("forward, value: do, 4");
+            expect(el.getAttribute("aria-label")).not.toContain("blob:");
+
+            // A real name next to a blob: URL still shows the name.
+            block.value = ["snare", url, "re", 3];
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward, value: snare, re, 3");
+
+            // Only the URL schemes are filtered, not names that merely contain the word.
+            block.value = ["blobfish", "data:audio/wav;base64,AAAA", "do", 4];
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward, value: blobfish, do, 4");
+        });
+
         it.each(["loadFile", "audiofile"])(
             "announces only the filename of a %s block, never its contents",
             name => {

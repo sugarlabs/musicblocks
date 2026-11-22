@@ -5537,13 +5537,14 @@ class Block {
             value = value.slice(0, 1);
         }
         // Other blocks can hold a list of values, such as a sample's [name, dataURL, pitch,
-        // octave]. Announce every part except empty ones and data URLs.
+        // octave]. Announce every part except empty ones and data: or blob: URLs (a recorded
+        // sample keeps its blob: URL as both name and data).
         const parts = (Array.isArray(value) ? value : [value]).filter(
             part =>
                 part !== null &&
                 part !== undefined &&
                 part !== "" &&
-                !(typeof part === "string" && part.startsWith("data:"))
+                !(typeof part === "string" && /^(data|blob):/.test(part))
         );
         if (parts.length > 0) {
             return `${name}, value: ${parts.join(", ")}`;
