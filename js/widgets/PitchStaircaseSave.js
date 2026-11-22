@@ -46,6 +46,10 @@ class PitchStaircaseSave {
      * @returns {void}
      */
     _save() {
+        if (!this.Stairs || this.Stairs.length === 0) {
+            return;
+        }
+
         for (const name in this.activity.palettes.dict) {
             this.activity.palettes.dict[name].hideMenu(true);
         }

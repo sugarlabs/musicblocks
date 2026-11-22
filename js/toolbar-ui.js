@@ -11,7 +11,7 @@
 
 /*
   global _THIS_IS_MUSIC_BLOCKS_, docById, doSVG, fnBrowserDetect,
-  makeKeyboardAccessible, saveButton, saveButtonAdvanced
+  makeKeyboardAccessible, saveButton, saveButtonAdvanced, PracticeUI
 */
 
 /* exported ToolbarUI */
@@ -371,6 +371,33 @@ class ToolbarUI {
         }
 
         this.resetStop();
+        this.syncToolbarHeight();
+        if (typeof window !== "undefined") {
+            window.addEventListener("resize", () => this.syncToolbarHeight());
+        }
+    }
+
+    /**
+     * Synchronizes current rendered toolbar height to CSS variable --toolbar-total-height
+     * and notifies open panels (Explorer Journal / Practice) to adjust.
+     *
+     * @public
+     * @returns {void}
+     */
+    syncToolbarHeight() {
+        if (typeof document === "undefined" || !document.documentElement) return;
+        const toolbars = document.getElementById("toolbars");
+        const height = toolbars?.offsetHeight || 64;
+        document.documentElement.style.setProperty("--toolbar-total-height", `${height}px`);
+        const practiceUI =
+            typeof PracticeUI !== "undefined"
+                ? PracticeUI
+                : typeof window !== "undefined"
+                  ? window.PracticeUI
+                  : null;
+        if (practiceUI && typeof practiceUI.refreshOnToolbarChange === "function") {
+            practiceUI.refreshOnToolbarChange();
+        }
     }
 
     /**
@@ -1191,6 +1218,11 @@ class ToolbarUI {
                 docById("chooseKeyDiv").style.display = "none";
                 docById("movable").style.display = "none";
             }
+            this.syncToolbarHeight();
+
+            if (window.widgetWindows && typeof window.widgetWindows._handleResize === "function") {
+                window.widgetWindows._handleResize();
+            }
         };
     }
 
@@ -1224,11 +1256,19 @@ class ToolbarUI {
         const shortcutsGuideItem = docById("shortcutsGuideItem");
         const practiceLessonsItem = docById("practiceLessonsItem");
         const explorerJournalItem = docById("explorerJournalItem");
+        const gitTutorialItem = docById("gitTutorialItem");
         const hasDropdownMenu =
             !!helpGuideItem ||
             !!shortcutsGuideItem ||
             !!practiceLessonsItem ||
-            !!explorerJournalItem;
+            !!explorerJournalItem ||
+            !!gitTutorialItem;
+
+        const closeHelpDropdown = () => {
+            if (helpIcon) {
+                $j(helpIcon).dropdown("close");
+            }
+        };
 
         if (helpGuideItem) {
             helpGuideItem.onclick = event => {
@@ -1236,6 +1276,7 @@ class ToolbarUI {
                     event.preventDefault();
                     event.stopPropagation();
                 }
+                closeHelpDropdown();
                 onclick(this.activity);
             };
         }
@@ -1246,6 +1287,7 @@ class ToolbarUI {
                     event.preventDefault();
                     event.stopPropagation();
                 }
+                closeHelpDropdown();
                 if (shortcutsOnclick) {
                     shortcutsOnclick(this.activity);
                 }
@@ -1258,6 +1300,7 @@ class ToolbarUI {
                     event.preventDefault();
                     event.stopPropagation();
                 }
+                closeHelpDropdown();
                 if (typeof window.startPracticeMode === "function") {
                     window.startPracticeMode();
                 }
@@ -1270,20 +1313,23 @@ class ToolbarUI {
                     event.preventDefault();
                     event.stopPropagation();
                 }
+                closeHelpDropdown();
                 if (typeof window.openExplorerJournal === "function") {
                     window.openExplorerJournal();
                 }
             };
         }
 
-        const gitTutorialItem = docById("gitTutorialItem");
-        if (gitTutorialItem && typeof GitTutorial !== "undefined") {
+        if (gitTutorialItem) {
             gitTutorialItem.onclick = event => {
                 if (event) {
                     event.preventDefault();
                     event.stopPropagation();
                 }
-                GitTutorial.open(this.activity);
+                closeHelpDropdown();
+                if (typeof GitTutorial !== "undefined" && typeof GitTutorial.open === "function") {
+                    GitTutorial.open(this.activity);
+                }
             };
         }
 
@@ -2338,6 +2384,12 @@ class ToolbarUI {
         updateButtonsList();
     }
 
+    /**
+     * Closes the auxiliary toolbar and updates dependent widget layouts.
+     *
+     * @param {Function} onclick - Callback invoked when the toolbar visibility changes.
+     * @returns {void}
+     */
     closeAuxToolbar = onclick => {
         const auxToolbar = docById("aux-toolbar");
         if (auxToolbar.style.display === "block") {
@@ -2346,6 +2398,11 @@ class ToolbarUI {
             auxToolbar.style.display = "none";
             menuIcon.textContent = "menu";
             this._setAuxToolbarButtonState(false);
+            this.syncToolbarHeight();
+
+            if (window.widgetWindows && typeof window.widgetWindows._handleResize === "function") {
+                window.widgetWindows._handleResize();
+            }
         }
     };
 

@@ -127,6 +127,20 @@ describe("setupOrnamentBlocks", () => {
             expect(logo.statusFields).toContainEqual([blk, "staccato"]);
         });
 
+        it("should handle detached staccatofactor block in status matrix without throwing", () => {
+            const blk = "blkSF_detached";
+            activity.blocks.blockList[blk] = { connections: [null] };
+            logo.inStatusMatrix = true;
+            const turtleObj = activity.turtles.ithTurtle(0);
+            turtleObj.singer.staccato = [5];
+            const staccatoFactorBlock = createdBlocks["staccatofactor"];
+            let result;
+            expect(() => {
+                result = staccatoFactorBlock.arg(logo, 0, blk);
+            }).not.toThrow();
+            expect(result).toBe(5);
+        });
+
         it("should return the last staccato factor if available", () => {
             logo.inStatusMatrix = false;
             const turtleObj = activity.turtles.ithTurtle(0);
@@ -163,6 +177,20 @@ describe("setupOrnamentBlocks", () => {
             const slurFactorBlock = createdBlocks["slurfactor"];
             slurFactorBlock.arg(logo, 0, blk);
             expect(logo.statusFields).toContainEqual([blk, "slur"]);
+        });
+
+        it("should handle detached slurfactor block in status matrix without throwing", () => {
+            const blk = "blkSLF_detached";
+            activity.blocks.blockList[blk] = { connections: [null] };
+            logo.inStatusMatrix = true;
+            const turtleObj = activity.turtles.ithTurtle(0);
+            turtleObj.singer.staccato = [3];
+            const slurFactorBlock = createdBlocks["slurfactor"];
+            let result;
+            expect(() => {
+                result = slurFactorBlock.arg(logo, 0, blk);
+            }).not.toThrow();
+            expect(result).toBe(-3);
         });
 
         it("should return negative of the last staccato factor if available", () => {

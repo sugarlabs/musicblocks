@@ -577,55 +577,12 @@ const PhraseMakerAudio = {
         const timerManager = this._getTimerManager(pm);
         const schedule = cb => (timerManager ? timerManager.setTimeout(cb, 1) : setTimeout(cb, 1));
 
-        pm._chordTimeouts.push(
-            schedule(() => {
-                pm.activity.logo.synth.trigger(
-                    0,
-                    notes[0],
-                    noteValue,
-                    pm._instrumentName,
-                    null,
-                    null
-                );
-            })
-        );
-
-        if (notes.length > 1) {
+        for (let i = 0; i < notes.length; i++) {
             pm._chordTimeouts.push(
                 schedule(() => {
                     pm.activity.logo.synth.trigger(
                         0,
-                        notes[1],
-                        noteValue,
-                        pm._instrumentName,
-                        null,
-                        null
-                    );
-                })
-            );
-        }
-
-        if (notes.length > 2) {
-            pm._chordTimeouts.push(
-                schedule(() => {
-                    pm.activity.logo.synth.trigger(
-                        0,
-                        notes[2],
-                        noteValue,
-                        pm._instrumentName,
-                        null,
-                        null
-                    );
-                })
-            );
-        }
-
-        if (notes.length > 3) {
-            pm._chordTimeouts.push(
-                schedule(() => {
-                    pm.activity.logo.synth.trigger(
-                        0,
-                        notes[3],
+                        notes[i],
                         noteValue,
                         pm._instrumentName,
                         null,

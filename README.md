@@ -1,4 +1,4 @@
-<a href="https://github.com//sugarlabs/musicblocks/graphs/contributors" alt="Contributors">
+<a href="https://github.com/sugarlabs/musicblocks/graphs/contributors" alt="Contributors">
     <img src="https://img.shields.io/github/contributors/sugarlabs/musicblocks" />
 </a>
 
@@ -127,14 +127,12 @@ Blocks.
     npm run dev
     ```
 
-5. You should see a message `Serving HTTP on 127.0.0.1 port 3000
-(http://127.0.0.1:3000/) ...` since the HTTP Server is set to start
-   listening on port 3000.
+5. The server should report `Music Blocks running at
+http://127.0.0.1:3000/` and `Compression enabled`.
 
 6. Open your favorite browser and visit `localhost:3000` or `127.0.0.1:3000`.
 
-**NOTE:** _Use `ctrl + c` or `cmd + c` to quit the HTTP Server to avoid
-`socket.error:[Errno 48]`_.
+**NOTE:** Press `Ctrl + C` to stop the server, including on macOS.
 
 For Turtle Blocks, use `localhost:3000?turtle=true` or `http://127.0.0.1:3000?turtle=true`.
 
@@ -161,7 +159,7 @@ Before you begin, ensure you have Docker installed on your machine. You can down
 3. Build the Docker image using the provided Dockerfile:
 
     ```bash
-    docker build -t musicblocks .
+    docker build -f dockerfile -t musicblocks .
     ```
 
 #### Running Music Blocks

@@ -30,6 +30,27 @@ describe("musicutils-solfege", () => {
         expect(solfege.noteIsSolfege("C")).toBe(false);
     });
 
+    it("does not take E sharp or F flat for solfege", () => {
+        // Like B♯ and C♭, these are letter names, in Unicode or ASCII spelling.
+        for (const note of ["E♯", "F♭", "E#", "Fb", "B♯", "C♭"]) {
+            expect(solfege.noteIsSolfege(note)).toBe(false);
+        }
+    });
+
+    it("gives E sharp and F flat their fixed solfege names", () => {
+        expect(musicutils.getSolfege("E♯")).toBe("mi♯");
+        expect(musicutils.getSolfege("F♭")).toBe("fa♭");
+        expect(musicutils.getSolfege("E#")).toBe("mi♯");
+        expect(musicutils.getSolfege("Fb")).toBe("fa♭");
+        expect(musicutils.getSolfege("B♯")).toBe("ti♯");
+    });
+
+    it("finds E sharp in C sharp major with movable do", () => {
+        // C♯ major is C♯ D♯ E♯ F♯ G♯ A♯ B♯, so E♯ is its third degree.
+        expect(musicutils.getSolfege("E♯", "C♯ major", true)).toBe("mi");
+        expect(musicutils.getSolfege("F♭", "C♭ major", true)).toBe("fa");
+    });
+
     it("splits a solfege note into its name and octave", () => {
         expect(solfege.splitSolfege("sol4")).toEqual(["sol", "4"]);
         expect(solfege.splitI18nSolfege("sol4")).toEqual(["sol", "4"]);

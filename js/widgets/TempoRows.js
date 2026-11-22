@@ -47,11 +47,10 @@ class TempoRows {
             // quarter notes, so with a beat value of 1/8 a BPM of 40 plays as 60, and a BPM of 0
             // plays at the row's lowest BPM (15 with 1/2).
             const [minBPM, maxBPM] = this._bpmLimits(i);
-            if (this.BPMs[i] <= 0) {
-                this.BPMs[i] = minBPM;
-            }
             const bpm = Number(this.BPMs[i]);
-            if (Number.isFinite(bpm)) {
+            if (!Number.isFinite(bpm) || bpm <= 0) {
+                this.BPMs[i] = minBPM;
+            } else {
                 this.BPMs[i] = Math.min(Math.max(bpm, minBPM), maxBPM);
             }
 

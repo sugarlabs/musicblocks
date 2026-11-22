@@ -99,6 +99,10 @@ class JSGenerate {
              * @returns {[*]} tree representation
              */
             function ParseArg(blk) {
+                if (!blk || !blk.protoblock) {
+                    return [];
+                }
+
                 let argLen = blk.protoblock.args;
                 if (blk.protoblock.style === "clamp") {
                     argLen -= 1;
@@ -114,6 +118,11 @@ class JSGenerate {
                         continue;
                     }
 
+                    if (!arg.protoblock) {
+                        args.push(null);
+                        continue;
+                    }
+
                     if (
                         arg.protoblock.style === "clamp" &&
                         arg.protoblock._style.flows.left === true
@@ -124,8 +133,13 @@ class JSGenerate {
                     }
 
                     // ignore horizontal spacers
-                    while (arg.name === "hspace") {
+                    while (arg && arg.name === "hspace") {
                         arg = globalActivity.blocks.blockList[arg.connections[1]];
+                    }
+
+                    if (!arg || !arg.protoblock) {
+                        args.push(null);
+                        continue;
                     }
 
                     if (arg.protoblock.style === "value") {
@@ -191,9 +205,9 @@ class JSGenerate {
                     const args = doName !== null ? [] : ParseArg(nextBlk);
                     last(tree).push(args.length === 0 ? null : args);
 
-                    if (nextBlk.protoblock.style === "clamp") {
+                    if (nextBlk.protoblock && nextBlk.protoblock.style === "clamp") {
                         last(tree).push(GenerateStackTree(nextBlk, []));
-                    } else if (nextBlk.protoblock.style === "doubleclamp") {
+                    } else if (nextBlk.protoblock && nextBlk.protoblock.style === "doubleclamp") {
                         last(tree).push(GenerateStackTree(nextBlk, [], 1));
                         last(tree).push(GenerateStackTree(nextBlk, [], 0));
                     } else {

@@ -424,12 +424,7 @@ class MusicXMLExporter {
             const notes = staging[voice];
             const partNum = index + 1;
             const drums = [
-                ...new Set(
-                    notes
-                        .filter(Array.isArray)
-                        .map(entry => entry[MXML_DRUM])
-                        .filter(Boolean)
-                )
+                ...new Set(notes.filter(Array.isArray).flatMap(entry => entry[MXML_DRUM] || []))
             ];
             if (
                 drums.length === 0 ||
@@ -446,7 +441,7 @@ class MusicXMLExporter {
             const drumNotes = notes.map(entry => {
                 if (!Array.isArray(entry)) return entry;
                 const drumEntry = entry.slice();
-                drumEntry[0] = [entry[MXML_DRUM] || "R"];
+                drumEntry[0] = entry[MXML_DRUM] || ["R"];
                 return drumEntry;
             });
             parts.push({ id: `D${partNum}`, notes: drumNotes, isPercussion: true, instruments });

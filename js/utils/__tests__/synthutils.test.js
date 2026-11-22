@@ -66,6 +66,8 @@ describe("Utility Functions (logic-only)", () => {
         newTone,
         preloadProjectSamples,
         resolveInstrumentName,
+        calculateInstrumentVolumeDb,
+        getCalibratedVolumeDb,
         Synth,
         transport;
 
@@ -168,6 +170,7 @@ describe("Utility Functions (logic-only)", () => {
                 VOICENAMES: typeof VOICENAMES !== "undefined" ? VOICENAMES : undefined,
                 DRUMNAMES: typeof DRUMNAMES !== "undefined" ? DRUMNAMES : undefined,
                 NOISENAMES: typeof NOISENAMES !== "undefined" ? NOISENAMES : undefined,
+                calculateInstrumentVolumeDb: typeof calculateInstrumentVolumeDb !== "undefined" ? calculateInstrumentVolumeDb : undefined,
                   };
         `);
         const results = wrapper();
@@ -209,6 +212,8 @@ describe("Utility Functions (logic-only)", () => {
         newTone = Synth.newTone;
         preloadProjectSamples = Synth.preloadProjectSamples;
         resolveInstrumentName = Synth.resolveInstrumentName;
+        calculateInstrumentVolumeDb = Synth.calculateInstrumentVolumeDb;
+        getCalibratedVolumeDb = Synth.getCalibratedVolumeDb;
         transport = Synth.transport;
     });
 
@@ -769,6 +774,66 @@ describe("Utility Functions (logic-only)", () => {
             expect(Tone.gainToDb).not.toHaveBeenCalled();
             expect(instruments.turtle1.flute.volume.linearRampToValueAtTime).not.toHaveBeenCalled();
         });
+
+        test("verifies calibrated instrument at volumes 0, 50, and 100 preserving ramp scheduling", () => {
+            const now = 3000;
+            Tone.now.mockReturnValue(now);
+            const rampTime = 2.5;
+
+            // Volume 0
+            rampTo("turtle1", "flute", 50, 0, rampTime);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(0.0001);
+            expect(instruments.turtle1.flute.volume.linearRampToValueAtTime).toHaveBeenCalledWith(
+                4,
+                now + rampTime
+            );
+
+            // Volume 50
+            rampTo("turtle1", "flute", 0, 50, rampTime);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(0.9);
+            expect(instruments.turtle1.flute.volume.linearRampToValueAtTime).toHaveBeenCalledWith(
+                4,
+                now + rampTime
+            );
+
+            // Volume 100
+            rampTo("turtle1", "flute", 50, 100, rampTime);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(1);
+            expect(instruments.turtle1.flute.volume.linearRampToValueAtTime).toHaveBeenCalledWith(
+                4,
+                now + rampTime
+            );
+        });
+
+        test("verifies default instrument at volumes 0, 50, and 100 preserving ramp scheduling", () => {
+            if (!instruments.turtle1.custom_synth) {
+                instruments.turtle1.custom_synth = new Tone.Sampler();
+            }
+            const now = 4000;
+            Tone.now.mockReturnValue(now);
+            const rampTime = 3;
+
+            // Volume 0
+            rampTo("turtle1", "custom_synth", 50, 0, rampTime);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(0.0001);
+            expect(
+                instruments.turtle1.custom_synth.volume.linearRampToValueAtTime
+            ).toHaveBeenCalledWith(4, now + rampTime);
+
+            // Volume 50
+            rampTo("turtle1", "custom_synth", 0, 50, rampTime);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(0.5);
+            expect(
+                instruments.turtle1.custom_synth.volume.linearRampToValueAtTime
+            ).toHaveBeenCalledWith(4, now + rampTime);
+
+            // Volume 100
+            rampTo("turtle1", "custom_synth", 50, 100, rampTime);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(1);
+            expect(
+                instruments.turtle1.custom_synth.volume.linearRampToValueAtTime
+            ).toHaveBeenCalledWith(4, now + rampTime);
+        });
     });
 
     describe("setVolume function", () => {
@@ -803,6 +868,211 @@ describe("Utility Functions (logic-only)", () => {
 
         test("should not throw error if instrument is not found in turtle", () => {
             expect(() => setVolume("turtle1", "nonexistent", 50)).not.toThrow();
+        });
+
+        test("verifies calibrated instrument at volumes 0, 50, and 100 with click-prevention scheduling", () => {
+            const fluteSynth = instruments.turtle1.flute;
+            const now = 1000;
+            Tone.now.mockReturnValue(now);
+
+            // Volume 0
+            fluteSynth.volume.value = 10;
+            setVolume("turtle1", "flute", 0);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(0.0001);
+            expect(fluteSynth.volume.cancelScheduledValues).toHaveBeenCalledWith(now);
+            expect(fluteSynth.volume.setValueAtTime).toHaveBeenCalledWith(10, now);
+            expect(fluteSynth.volume.linearRampToValueAtTime).toHaveBeenCalledWith(4, now + 0.01);
+
+            // Volume 50
+            fluteSynth.volume.value = 10;
+            setVolume("turtle1", "flute", 50);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(0.9);
+            expect(fluteSynth.volume.cancelScheduledValues).toHaveBeenCalledWith(now);
+            expect(fluteSynth.volume.setValueAtTime).toHaveBeenCalledWith(10, now);
+            expect(fluteSynth.volume.linearRampToValueAtTime).toHaveBeenCalledWith(4, now + 0.01);
+
+            // Volume 100
+            fluteSynth.volume.value = 10;
+            setVolume("turtle1", "flute", 100);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(1);
+            expect(fluteSynth.volume.cancelScheduledValues).toHaveBeenCalledWith(now);
+            expect(fluteSynth.volume.setValueAtTime).toHaveBeenCalledWith(10, now);
+            expect(fluteSynth.volume.linearRampToValueAtTime).toHaveBeenCalledWith(4, now + 0.01);
+        });
+
+        test("verifies default instrument at volumes 0, 50, and 100 with click-prevention scheduling", () => {
+            if (!instruments.turtle1.synth) {
+                instruments.turtle1.synth = new Tone.Sampler();
+            }
+            const synth = instruments.turtle1.synth;
+            const now = 2000;
+            Tone.now.mockReturnValue(now);
+
+            // Volume 0
+            synth.volume.value = 10;
+            setVolume("turtle1", "synth", 0);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(0.0001);
+            expect(synth.volume.cancelScheduledValues).toHaveBeenCalledWith(now);
+            expect(synth.volume.setValueAtTime).toHaveBeenCalledWith(10, now);
+            expect(synth.volume.linearRampToValueAtTime).toHaveBeenCalledWith(4, now + 0.01);
+
+            // Volume 50
+            synth.volume.value = 10;
+            setVolume("turtle1", "synth", 50);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(0.5);
+            expect(synth.volume.cancelScheduledValues).toHaveBeenCalledWith(now);
+            expect(synth.volume.setValueAtTime).toHaveBeenCalledWith(10, now);
+            expect(synth.volume.linearRampToValueAtTime).toHaveBeenCalledWith(4, now + 0.01);
+
+            // Volume 100
+            synth.volume.value = 10;
+            setVolume("turtle1", "synth", 100);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(1);
+            expect(synth.volume.cancelScheduledValues).toHaveBeenCalledWith(now);
+            expect(synth.volume.setValueAtTime).toHaveBeenCalledWith(10, now);
+            expect(synth.volume.linearRampToValueAtTime).toHaveBeenCalledWith(4, now + 0.01);
+        });
+
+        test("skips scheduling when volume in decibels does not change (flutter prevention)", () => {
+            const fluteSynth = instruments.turtle1.flute;
+            // When synth.volume.value is already close to db (4), no ramp should be scheduled
+            fluteSynth.volume.value = 4;
+            fluteSynth.volume.linearRampToValueAtTime.mockClear();
+
+            setVolume("turtle1", "flute", 50);
+            expect(fluteSynth.volume.linearRampToValueAtTime).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("calculateInstrumentVolumeDb and getCalibratedVolumeDb", () => {
+        beforeEach(() => {
+            jest.clearAllMocks();
+        });
+
+        describe("calibrated instruments (DEFAULTSYNTHVOLUME)", () => {
+            test("calculates volume at 0 (minimum audio boundary safety gain 0.0001)", () => {
+                const db = calculateInstrumentVolumeDb("flute", 0);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.0001);
+                expect(db).toBe(Tone.gainToDb(0.0001));
+            });
+
+            test("calculates volume at 50 (calibrated default volume level)", () => {
+                // flute default volume is 90, so at vol 50, nv is (50/50)*90 = 90, gain = 0.9
+                const db = calculateInstrumentVolumeDb("flute", 50);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.9);
+                expect(db).toBe(Tone.gainToDb(0.9));
+            });
+
+            test("calculates volume at 100 (maximum calibrated level)", () => {
+                // at vol 100, nv is ((100-50)/50)*(100-90) + 90 = 100, gain = 1.0
+                const db = calculateInstrumentVolumeDb("flute", 100);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(1);
+                expect(db).toBe(Tone.gainToDb(1));
+            });
+
+            test("calculates calibrated volume with different default volumes (sv = 20, sv = 100)", () => {
+                // viola has default volume 20
+                calculateInstrumentVolumeDb("viola", 0);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.0001);
+
+                calculateInstrumentVolumeDb("viola", 50);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.2);
+
+                calculateInstrumentVolumeDb("viola", 100);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(1);
+
+                // piano has default volume 100
+                calculateInstrumentVolumeDb("piano", 50);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(1);
+            });
+        });
+
+        describe("default / uncalibrated instruments", () => {
+            test("calculates volume at 0 (minimum gain 0.0001)", () => {
+                const db = calculateInstrumentVolumeDb("synth", 0);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.0001);
+                expect(db).toBe(Tone.gainToDb(0.0001));
+            });
+
+            test("calculates volume at 50 (linear raw volume level)", () => {
+                const db = calculateInstrumentVolumeDb("synth", 50);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.5);
+                expect(db).toBe(Tone.gainToDb(0.5));
+            });
+
+            test("calculates volume at 100 (maximum volume level)", () => {
+                const db = calculateInstrumentVolumeDb("synth", 100);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(1);
+                expect(db).toBe(Tone.gainToDb(1));
+            });
+        });
+
+        describe("boundary clamping and safety", () => {
+            test("clamps negative volume to 0 (gain 0.0001)", () => {
+                calculateInstrumentVolumeDb("flute", -25);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.0001);
+
+                calculateInstrumentVolumeDb("synth", -50);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.0001);
+            });
+
+            test("clamps volume above 100 to 100 (gain 1.0)", () => {
+                calculateInstrumentVolumeDb("flute", 150);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(1);
+
+                calculateInstrumentVolumeDb("synth", 200);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(1);
+            });
+        });
+
+        describe("audio decibel verification", () => {
+            test("verifies decibel conversion aligns with 20 * log10(gain)", () => {
+                const realGainToDb = gain => 20 * Math.log10(gain);
+                Tone.gainToDb.mockImplementation(realGainToDb);
+
+                expect(calculateInstrumentVolumeDb("synth", 100)).toBeCloseTo(0, 5); // 0 dB
+                expect(calculateInstrumentVolumeDb("synth", 50)).toBeCloseTo(realGainToDb(0.5), 5); // ~ -6.02 dB
+                expect(calculateInstrumentVolumeDb("synth", 0)).toBeCloseTo(-80, 5); // 20 * log10(0.0001) = -80 dB
+                expect(calculateInstrumentVolumeDb("flute", 50)).toBeCloseTo(realGainToDb(0.9), 5); // ~ -0.915 dB
+
+                Tone.gainToDb.mockImplementation(() => 4);
+            });
+        });
+
+        describe("alias and name resolution", () => {
+            test("getCalibratedVolumeDb returns identical result to calculateInstrumentVolumeDb", () => {
+                expect(getCalibratedVolumeDb("flute", 50)).toBe(
+                    calculateInstrumentVolumeDb("flute", 50)
+                );
+            });
+
+            test("resolves localized instrument name if resolver is provided", () => {
+                const mockResolve = jest.fn(() => "flute");
+                calculateInstrumentVolumeDb("flûte", 50, mockResolve);
+                expect(mockResolve).toHaveBeenCalledWith("flûte");
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.9);
+            });
+
+            test("resolves localized instrument name via resolveInstrumentName by default", () => {
+                const resolveSpy = jest
+                    .spyOn(Synth, "resolveInstrumentName")
+                    .mockReturnValue("flute");
+                calculateInstrumentVolumeDb("flûte", 50);
+                expect(resolveSpy).toHaveBeenCalledWith("flûte");
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.9);
+                resolveSpy.mockRestore();
+            });
+
+            test("treats inherited property names as unconfigured instruments", () => {
+                // "constructor" and "toString" exist on Object.prototype, so `in` would
+                // match them; Object.hasOwn must not, so they fall back to uncalibrated.
+                calculateInstrumentVolumeDb("constructor", 50);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.5);
+
+                jest.clearAllMocks();
+                calculateInstrumentVolumeDb("toString", 50);
+                expect(Tone.gainToDb).toHaveBeenCalledWith(0.5);
+            });
         });
     });
 
@@ -2511,8 +2781,65 @@ describe("Utility Functions (logic-only)", () => {
         });
     });
 
+    describe("audioBufferToWav", () => {
+        const { audioBufferToWav } = synthutilsModule;
+        const makeBuffer = (channels, sampleRate) => ({
+            numberOfChannels: channels.length,
+            length: channels[0].length,
+            sampleRate,
+            getChannelData: c => Float32Array.from(channels[c])
+        });
+
+        it("writes a 16-bit PCM WAV header", () => {
+            const wav = audioBufferToWav(makeBuffer([[0, 0, 0]], 44100));
+            const view = new DataView(wav);
+            const text = (offset, length) =>
+                String.fromCharCode(...new Uint8Array(wav, offset, length));
+
+            expect(wav.byteLength).toBe(44 + 3 * 2);
+            expect(text(0, 4)).toBe("RIFF");
+            expect(view.getUint32(4, true)).toBe(36 + 6);
+            expect(text(8, 4)).toBe("WAVE");
+            expect(text(12, 4)).toBe("fmt ");
+            expect(view.getUint16(20, true)).toBe(1); // PCM
+            expect(view.getUint16(22, true)).toBe(1); // mono
+            expect(view.getUint32(24, true)).toBe(44100);
+            expect(view.getUint32(28, true)).toBe(44100 * 2);
+            expect(view.getUint16(32, true)).toBe(2);
+            expect(view.getUint16(34, true)).toBe(16);
+            expect(text(36, 4)).toBe("data");
+            expect(view.getUint32(40, true)).toBe(6);
+        });
+
+        it("converts samples to 16-bit and clamps values outside -1..1", () => {
+            const view = new DataView(audioBufferToWav(makeBuffer([[1, -1, 0, 2, -2]], 8000)));
+            const samples = [0, 1, 2, 3, 4].map(i => view.getInt16(44 + i * 2, true));
+            expect(samples).toEqual([32767, -32768, 0, 32767, -32768]);
+        });
+
+        it("interleaves stereo channels", () => {
+            const view = new DataView(
+                audioBufferToWav(
+                    makeBuffer(
+                        [
+                            [1, 0],
+                            [-1, 0.5]
+                        ],
+                        8000
+                    )
+                )
+            );
+            expect(view.getUint16(22, true)).toBe(2);
+            const samples = [0, 1, 2, 3].map(i => view.getInt16(44 + i * 2, true));
+            expect(samples).toEqual([32767, -32768, 0, Math.trunc(0.5 * 0x7fff)]);
+        });
+    });
+
     describe("recorder setup and recording download flow", () => {
-        let savedFF, savedMBDialog, savedCreateObjectURL, savedAlert;
+        let savedMBDialog, savedCreateObjectURL, savedRevokeObjectURL, savedAlert, savedBlob;
+        let savedGetContext;
+        let decodeAudioData;
+        let recorderMimeType;
 
         // setupRecorder connects every live instrument to the media-stream
         // destination, and the Tone mocks do not implement connect(), so run
@@ -2530,169 +2857,237 @@ describe("Utility Functions (logic-only)", () => {
             }
         };
 
+        // onstop is async (it decodes the recording), so let it finish.
+        const flush = () => new Promise(resolve => setTimeout(resolve, 0));
+
+        // jsdom's Blob has no arrayBuffer(), which the WAV conversion needs.
+        class FakeBlob {
+            constructor(parts, options = {}) {
+                this.parts = parts;
+                this.type = options.type || "";
+            }
+            arrayBuffer() {
+                return Promise.resolve(new ArrayBuffer(8));
+            }
+        }
+
+        const fakeAudioBuffer = {
+            numberOfChannels: 1,
+            length: 2,
+            sampleRate: 8000,
+            getChannelData: () => new Float32Array([0.5, -0.5])
+        };
+
         beforeEach(() => {
-            savedFF = platform.FF;
             savedMBDialog = window.MBDialog;
             savedCreateObjectURL = global.URL.createObjectURL;
+            savedRevokeObjectURL = global.URL.revokeObjectURL;
             savedAlert = global.alert;
+            savedBlob = global.Blob;
+            savedGetContext = global.Tone.getContext;
             global.URL.createObjectURL = jest.fn(() => "blob:recording");
+            global.URL.revokeObjectURL = jest.fn();
             global.alert = jest.fn();
+            global.Blob = FakeBlob;
+            recorderMimeType = "audio/webm;codecs=opus";
             global.MediaRecorder = jest.fn(function () {
+                this.mimeType = recorderMimeType;
                 return this;
             });
+            decodeAudioData = jest.fn(() => Promise.resolve(fakeAudioBuffer));
+            global.Tone.getContext = jest.fn(() => ({
+                createMediaStreamDestination: () => ({ stream: {} }),
+                decodeAudioData
+            }));
         });
 
         afterEach(() => {
-            platform.FF = savedFF;
             window.MBDialog = savedMBDialog;
             global.URL.createObjectURL = savedCreateObjectURL;
+            global.URL.revokeObjectURL = savedRevokeObjectURL;
             global.alert = savedAlert;
+            global.Blob = savedBlob;
+            global.Tone.getContext = savedGetContext;
             delete window.prompt;
+            jest.restoreAllMocks();
         });
 
         const setup = () => withNoInstruments(() => Synth.setupRecorder());
 
-        it("requests a wav recorder on Firefox", () => {
-            platform.FF = true;
+        const captureDownloads = () => {
+            const clicked = [];
+            jest.spyOn(document.body, "appendChild").mockImplementation(node => {
+                if (node.tagName === "A") clicked.push(node);
+                return node;
+            });
+            jest.spyOn(document.body, "removeChild").mockImplementation(node => node);
+            return clicked;
+        };
+
+        const recordAndStop = async (data = { size: 12 }) => {
+            Synth.recorder.ondataavailable({ data });
+            Synth.recorder.onstop();
+            await flush();
+            await flush();
+        };
+
+        it("records in the browser's own format instead of asking for wav", () => {
             setup();
-            expect(global.MediaRecorder.mock.calls[0][1]).toEqual({ type: "audio/wav" });
+            // Browsers can't record WAV, and { type } isn't a MediaRecorder option.
+            expect(global.MediaRecorder.mock.calls[0]).toHaveLength(1);
         });
 
-        it("requests a webm recorder on other browsers", () => {
-            platform.FF = false;
-            setup();
-            expect(global.MediaRecorder.mock.calls[0][1]).toEqual({ mimeType: "audio/webm" });
-        });
-
-        it("ignores data events with no payload", () => {
-            platform.FF = false;
+        it("ignores data events with no payload", async () => {
             setup();
 
             expect(() => Synth.recorder.ondataavailable({})).not.toThrow();
-            Synth.recorder.onstop();
+            await Synth.recorder.onstop();
 
             // No chunks were collected, so no object URL is ever minted.
             expect(global.URL.createObjectURL).not.toHaveBeenCalled();
         });
 
-        it("ignores zero-length data chunks", () => {
-            platform.FF = false;
+        it("ignores zero-length data chunks", async () => {
             setup();
 
             Synth.recorder.ondataavailable({ data: { size: 0 } });
-            Synth.recorder.onstop();
+            await Synth.recorder.onstop();
 
             expect(global.URL.createObjectURL).not.toHaveBeenCalled();
         });
 
-        it("does nothing on stop when nothing was recorded", () => {
-            platform.FF = false;
+        it("does nothing on stop when nothing was recorded", async () => {
             setup();
 
-            expect(() => Synth.recorder.onstop()).not.toThrow();
+            await expect(Synth.recorder.onstop()).resolves.toBeUndefined();
             expect(global.URL.createObjectURL).not.toHaveBeenCalled();
         });
 
-        it("prompts through MBDialog and downloads an ogg file off Firefox", async () => {
-            platform.FF = false;
+        it("converts the recording and saves a real .wav file", async () => {
             window.MBDialog = {
                 prompt: jest.fn(() => Promise.resolve("my song")),
                 alert: jest.fn()
             };
-            const clicked = [];
-            jest.spyOn(document.body, "appendChild").mockImplementation(node => {
-                if (node.tagName === "A") clicked.push(node);
-                return node;
-            });
-            jest.spyOn(document.body, "removeChild").mockImplementation(node => node);
+            const clicked = captureDownloads();
 
             setup();
-            Synth.recorder.ondataavailable({ data: { size: 12 } });
-            Synth.recorder.onstop();
-            await Promise.resolve();
+            await recordAndStop();
 
-            expect(window.MBDialog.prompt).toHaveBeenCalled();
-            expect(global.URL.createObjectURL).toHaveBeenCalled();
+            expect(decodeAudioData).toHaveBeenCalled();
+            const saved = global.URL.createObjectURL.mock.calls[0][0];
+            expect(saved.type).toBe("audio/wav");
+            const header = new Uint8Array(saved.parts[0]);
+            expect(String.fromCharCode(...header.slice(0, 4))).toBe("RIFF");
+            expect(String.fromCharCode(...header.slice(8, 12))).toBe("WAVE");
             expect(clicked).toHaveLength(1);
-            expect(clicked[0].download).toBe("my song.ogg");
-            jest.restoreAllMocks();
+            expect(clicked[0].download).toBe("my song.wav");
+            expect(global.URL.revokeObjectURL).toHaveBeenCalledWith("blob:recording");
         });
 
-        it("uses a wav extension on Firefox", async () => {
-            platform.FF = true;
+        it("saves a webm file named .webm when Chrome's recording can't be converted", async () => {
+            decodeAudioData.mockImplementation(() => Promise.reject(new Error("cannot decode")));
+            window.MBDialog = {
+                prompt: jest.fn(() => Promise.resolve("my song")),
+                alert: jest.fn()
+            };
+            const clicked = captureDownloads();
+
+            setup();
+            await recordAndStop();
+
+            expect(global.URL.createObjectURL.mock.calls[0][0].type).toBe("audio/webm;codecs=opus");
+            expect(clicked[0].download).toBe("my song.webm");
+        });
+
+        it("saves an ogg file named .ogg when Firefox's recording can't be converted", async () => {
+            recorderMimeType = "audio/ogg; codecs=opus";
+            decodeAudioData.mockImplementation(() => Promise.reject(new Error("cannot decode")));
             window.MBDialog = {
                 prompt: jest.fn(() => Promise.resolve("take one")),
                 alert: jest.fn()
             };
-            const clicked = [];
-            jest.spyOn(document.body, "appendChild").mockImplementation(node => {
-                if (node.tagName === "A") clicked.push(node);
-                return node;
-            });
-            jest.spyOn(document.body, "removeChild").mockImplementation(node => node);
+            const clicked = captureDownloads();
 
             setup();
-            Synth.recorder.ondataavailable({ data: { size: 12 } });
-            Synth.recorder.onstop();
-            await Promise.resolve();
+            await recordAndStop();
 
-            expect(clicked[0].download).toBe("take one.wav");
-            jest.restoreAllMocks();
+            expect(clicked[0].download).toBe("take one.ogg");
         });
 
-        it("falls back to the browser prompt when MBDialog is unavailable", () => {
-            platform.FF = false;
-            delete window.MBDialog;
-            window.prompt = jest.fn(() => "fallback");
-            jest.spyOn(document.body, "appendChild").mockImplementation(node => node);
-            jest.spyOn(document.body, "removeChild").mockImplementation(node => node);
+        it("names a Firefox recording .ogg from its data when mimeType was cleared on stop", async () => {
+            recorderMimeType = "";
+            decodeAudioData.mockImplementation(() => Promise.reject(new Error("cannot decode")));
+            window.MBDialog = {
+                prompt: jest.fn(() => Promise.resolve("take two")),
+                alert: jest.fn()
+            };
+            const clicked = captureDownloads();
 
             setup();
-            Synth.recorder.ondataavailable({ data: { size: 12 } });
-            Synth.recorder.onstop();
+            await recordAndStop({ size: 12, type: "audio/ogg; codecs=opus" });
+
+            expect(global.URL.createObjectURL.mock.calls[0][0].type).toBe("audio/ogg; codecs=opus");
+            expect(clicked[0].download).toBe("take two.ogg");
+        });
+
+        it("saves an mp4 file named .m4a when Safari's recording can't be converted", async () => {
+            recorderMimeType = "audio/mp4";
+            decodeAudioData.mockImplementation(() => Promise.reject(new Error("cannot decode")));
+            window.MBDialog = {
+                prompt: jest.fn(() => Promise.resolve("safari take")),
+                alert: jest.fn()
+            };
+            const clicked = captureDownloads();
+
+            setup();
+            await recordAndStop();
+
+            expect(clicked[0].download).toBe("safari take.m4a");
+        });
+
+        it("falls back to the browser prompt when MBDialog is unavailable", async () => {
+            delete window.MBDialog;
+            window.prompt = jest.fn(() => "fallback");
+            const clicked = captureDownloads();
+
+            setup();
+            await recordAndStop();
 
             expect(window.prompt).toHaveBeenCalled();
-            jest.restoreAllMocks();
+            expect(clicked[0].download).toBe("fallback.wav");
         });
 
         it("reports a cancelled download when the name is null", async () => {
-            platform.FF = false;
             window.MBDialog = {
                 prompt: jest.fn(() => Promise.resolve(null)),
                 alert: jest.fn()
             };
 
             setup();
-            Synth.recorder.ondataavailable({ data: { size: 12 } });
-            Synth.recorder.onstop();
-            await Promise.resolve();
+            await recordAndStop();
 
             expect(window.MBDialog.alert).toHaveBeenCalled();
+            expect(global.URL.revokeObjectURL).toHaveBeenCalled();
         });
 
         it("treats a whitespace-only name as a cancelled download", async () => {
-            platform.FF = false;
             window.MBDialog = {
                 prompt: jest.fn(() => Promise.resolve("   ")),
                 alert: jest.fn()
             };
 
             setup();
-            Synth.recorder.ondataavailable({ data: { size: 12 } });
-            Synth.recorder.onstop();
-            await Promise.resolve();
+            await recordAndStop();
 
             expect(window.MBDialog.alert).toHaveBeenCalled();
         });
 
-        it("falls back to a plain alert when MBDialog cannot report the cancel", () => {
-            platform.FF = false;
+        it("falls back to a plain alert when MBDialog cannot report the cancel", async () => {
             delete window.MBDialog;
             window.prompt = jest.fn(() => null);
 
             setup();
-            Synth.recorder.ondataavailable({ data: { size: 12 } });
-            Synth.recorder.onstop();
+            await recordAndStop();
 
             expect(global.alert).toHaveBeenCalled();
         });
@@ -4229,5 +4624,35 @@ describe("DRUMNAMES Lilypond symbols", () => {
         for (let i = 1; i < cymbalIndices.length; i++) {
             expect(cymbalIndices[i]).toBe(cymbalIndices[i - 1] + 1);
         }
+    });
+});
+
+describe("DRUMNAMES MIDI notes", () => {
+    const { DRUMNAMES } = synthutilsModule;
+    const { DRUM_MIDI_MAP } = require("../musicutils-constants");
+
+    // Save as MIDI writes a drum with no entry as a kick drum (36).
+    it("gives every drum and bell its own General MIDI note", () => {
+        const unmapped = DRUMNAMES.filter(
+            ([, name, , , category]) =>
+                ["drum", "bell"].includes(category) && !(name in DRUM_MIDI_MAP)
+        ).map(([, name]) => name);
+
+        expect(unmapped).toEqual([]);
+    });
+
+    it.each([
+        ["snare roll", 38],
+        ["snare hard", 40],
+        ["heavy kick", 35],
+        ["tom hi", 50],
+        ["tom mid", 47],
+        ["tom lo", 45],
+        ["floor tom", 43],
+        ["cymbal open", 46],
+        ["cymbal pedal", 44],
+        ["splash", 55]
+    ])("writes the %s as MIDI note %i", (name, note) => {
+        expect(DRUM_MIDI_MAP[name]).toBe(note);
     });
 });

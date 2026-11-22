@@ -364,4 +364,123 @@ describe("SVG Class", () => {
             expect(Number.isInteger(svg.docks[0][1])).toBe(true);
         });
     });
+
+    describe("block label vertical position with slot expansion", () => {
+        const getBlockLabelY = svgString => {
+            const match = svgString.match(/<tspan[^>]*\by="([^"]+)"[^>]*>block_label<\/tspan>/);
+            return match ? Number(match[1]) : null;
+        };
+
+        it("basicBlock shifts label with _expandY but does not move with _expandY2", () => {
+            const getLabelY = (ey1, ey2) => {
+                const s = new SVG();
+                s.setInnies([true, true]);
+                s.setExpand(30, ey1, 0, ey2);
+                return getBlockLabelY(s.basicBlock());
+            };
+
+            const y00 = getLabelY(0, 0);
+            const y01 = getLabelY(0, 20);
+            const y10 = getLabelY(20, 0);
+            const y11 = getLabelY(20, 20);
+
+            expect(y00).not.toBeNull();
+            // _expandY2 does not move the label:
+            expect(y01).toBe(y00);
+            expect(y11).toBe(y10);
+            // _expandY shifts the label down proportionally to center across expanded slot 0:
+            expect(y10).toBe(y00 + 10);
+        });
+
+        it("booleanCompare shifts label with _expandY but does not move with _expandY2", () => {
+            const getLabelY = (ey1, ey2) => {
+                const s = new SVG();
+                s.setInnies([true, true]);
+                s.setExpand(10, ey1, 0, ey2);
+                return getBlockLabelY(s.booleanCompare());
+            };
+
+            const y00 = getLabelY(0, 0);
+            const y01 = getLabelY(0, 20);
+            const y10 = getLabelY(20, 0);
+            const y11 = getLabelY(20, 20);
+
+            expect(y00).not.toBeNull();
+            // _expandY2 does not move the label:
+            expect(y01).toBe(y00);
+            expect(y11).toBe(y10);
+            // _expandY shifts the label down proportionally:
+            expect(y10).toBe(y00 + 10);
+        });
+
+        it("booleanAndOr shifts label vertically with _expandY and is not shifted by _expandY2", () => {
+            const s1 = new SVG();
+            s1.setExpand(10, 0, 0, 0);
+            const y1 = getBlockLabelY(s1.booleanAndOr());
+
+            const s2 = new SVG();
+            s2.setExpand(10, 20, 0, 0);
+            const y2 = getBlockLabelY(s2.booleanAndOr());
+
+            const s3 = new SVG();
+            s3.setExpand(10, 0, 0, 20);
+            const y3 = getBlockLabelY(s3.booleanAndOr());
+
+            expect(y1).not.toBeNull();
+            expect(y2).toBe(y1 + 10);
+            expect(y3).toBe(y1);
+        });
+
+        it("booleanNot keeps block label y position constant when _expandY2 expands", () => {
+            const s1 = new SVG();
+            s1.setExpand(10, 0, 0, 0);
+            const y1 = getBlockLabelY(s1.booleanNot(false));
+
+            const s2 = new SVG();
+            s2.setExpand(10, 0, 0, 20);
+            const y2 = getBlockLabelY(s2.booleanNot(false));
+
+            expect(y1).not.toBeNull();
+            expect(y2).toBe(y1);
+        });
+
+        it("asserts that odd-innies case (nInnies = 3) still applies its ty -= 2 * fontSize adjustment", () => {
+            const sThree = new SVG();
+            sThree.setInnies([true, true, true]);
+            sThree.setExpand(30, 0, 0, 0);
+            const yThree = getBlockLabelY(sThree.basicBlock());
+
+            const unadjustedTy =
+                (sThree._height - (sThree._expandY2 || 0) * sThree._scale) / 2 +
+                sThree._fontSize / (5 / sThree._scale);
+            const expectedAdjustedY = Math.floor(
+                (unadjustedTy - 2 * sThree._fontSize) / sThree._scale + 0.5
+            );
+            const expectedUnadjustedY = Math.floor(unadjustedTy / sThree._scale + 0.5);
+
+            expect(yThree).toBe(expectedAdjustedY);
+            expect(yThree).not.toBe(expectedUnadjustedY);
+
+            // Verify _expandY2 does not drift the label when nInnies = 3
+            const sThreeExpandedY2 = new SVG();
+            sThreeExpandedY2.setInnies([true, true, true]);
+            sThreeExpandedY2.setExpand(30, 0, 0, 20);
+            const yThreeExpandedY2 = getBlockLabelY(sThreeExpandedY2.basicBlock());
+            expect(yThreeExpandedY2).toBe(yThree);
+        });
+
+        it("regression test: label y does not increase when expandY2 increases", () => {
+            const sUnexpanded = new SVG();
+            sUnexpanded.setInnies([true, true]);
+            sUnexpanded.setExpand(30, 0, 0, 0);
+            const yUnexpanded = getBlockLabelY(sUnexpanded.basicBlock());
+
+            const sSlot2Expanded = new SVG();
+            sSlot2Expanded.setInnies([true, true]);
+            sSlot2Expanded.setExpand(30, 0, 0, 20);
+            const ySlot2Expanded = getBlockLabelY(sSlot2Expanded.basicBlock());
+
+            expect(ySlot2Expanded).toBe(yUnexpanded);
+        });
+    });
 });

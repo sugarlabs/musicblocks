@@ -100,6 +100,7 @@ function makeActivity({ blockList = {}, turtleList = [] } = {}) {
         _beginDeferCheckBounds: jest.fn(),
         _endDeferCheckBounds: jest.fn(),
         checkBounds: jest.fn(),
+        _updateSpatialGrid: jest.fn(),
         _updateViewportCulling: jest.fn()
     };
 
@@ -582,6 +583,23 @@ describe("repositionBlocks", () => {
         // shiftX = 400 - 430 - 10 = -40
         // new x = 380 - 40 = 340
         expect(blockList.root.container.x).toBe(340);
+    });
+
+    test("refreshes the spatial index for repositioned blocks before viewport culling", () => {
+        setInnerWidth(400);
+        const blockList = {
+            0: makeBlock("root", { x: 1200, y: 100, width: 100 })
+        };
+        const activity = setupActivity({ blockList });
+
+        activity.repositionBlocks();
+
+        expect(blockList[0].container.x).toBe(290);
+        expect(activity.blocks._updateSpatialGrid).toHaveBeenCalledTimes(1);
+        expect(activity.blocks._updateSpatialGrid).toHaveBeenCalledWith(0);
+        expect(activity.blocks._updateSpatialGrid.mock.invocationCallOrder[0]).toBeLessThan(
+            activity.blocks._updateViewportCulling.mock.invocationCallOrder[0]
+        );
     });
 
     test("shifts a drag group right when it starts left of the canvas origin", () => {

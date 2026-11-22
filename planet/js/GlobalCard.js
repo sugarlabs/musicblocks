@@ -28,6 +28,8 @@ class GlobalCard {
         this.likeTimeout = null;
         this.likePending = false;
         this.clipboard = null;
+        this._shareRepositionHandler = null;
+        this._shareRepositionFrame = null;
         this.PlaceholderMBImage = "images/mbgraphic.png";
         this.PlaceholderTBImage = "images/tbgraphic.png";
 
@@ -68,7 +70,7 @@ class GlobalCard {
                                 Planet.ProjectStorage.isLiked(this.id) ? "Unlike" : "Like"
                             } project`}"><i class="material-icons" id="global-like-icon-{ID}"></i><span class="likes-count" id="global-project-likes-{ID}"></span></a>
 
-                            <div id="global-share-{ID}"> 
+                            <div class="global-share-container" id="global-share-{ID}">
                                 <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_(
                                     "Share project"
                                 )}" id="global-project-share-{ID}"><i class="material-icons">share</i></a> 
@@ -115,6 +117,42 @@ class GlobalCard {
         }
     }
 
+    _positionShareCard(shareBox, trigger) {
+        const gap = 8;
+        const viewportPadding = 12;
+
+        shareBox.classList.remove("share-card-above", "share-card-below");
+
+        // Reset previous constraints before measuring the popup again.
+        shareBox.style.maxHeight = "";
+        shareBox.style.left = "";
+        shareBox.style.right = "";
+
+        const triggerRect = trigger.getBoundingClientRect();
+        const shareRect = shareBox.getBoundingClientRect();
+        const container = shareBox.offsetParent || shareBox.parentElement;
+        const containerRect = container ? container.getBoundingClientRect() : { left: 0 };
+
+        // Keep the popup horizontally inside the viewport.
+        const minLeft = viewportPadding;
+        const maxLeft = window.innerWidth - viewportPadding - shareRect.width;
+        const left = Math.min(Math.max(minLeft, shareRect.left), maxLeft);
+
+        shareBox.style.left = `${left - containerRect.left}px`;
+        shareBox.style.right = "auto";
+
+        const spaceBelow = Math.max(0, window.innerHeight - triggerRect.bottom - gap);
+        const spaceAbove = Math.max(0, triggerRect.top - gap);
+
+        if (spaceBelow < shareRect.height && spaceAbove > spaceBelow) {
+            shareBox.classList.add("share-card-above");
+            shareBox.style.maxHeight = `${spaceAbove}px`;
+        } else {
+            shareBox.classList.add("share-card-below");
+            shareBox.style.maxHeight = `${spaceBelow}px`;
+        }
+    }
+
     render() {
         const Planet = this.Planet;
         const html = this.renderData.replace(new RegExp("{ID}", "g"), this.id);
@@ -157,8 +195,11 @@ class GlobalCard {
         const tagcontainer = frag.getElementById(`global-project-tags-${this.id}`);
         tagcontainer.classList.add("global-tags-container");
 
-        for (let i = 0; i < this.ProjectData.ProjectTags.length; i++) {
-            const tag = this.ProjectData.ProjectTags[i];
+        const projectTags = this.ProjectData.ProjectTags || [];
+        const visibleTagCount = 3;
+
+        for (let i = 0; i < Math.min(projectTags.length, visibleTagCount); i++) {
+            const tag = projectTags[i];
             const chip = document.createElement("div");
             chip.classList.add("chipselect");
             const entry = Planet.TagsManifest && Planet.TagsManifest[tag];
@@ -166,6 +207,20 @@ class GlobalCard {
                 ? _(entry.TagName)
                 : _(tag.charAt(0).toUpperCase() + tag.slice(1));
             tagcontainer.appendChild(chip);
+        }
+
+        if (projectTags.length > visibleTagCount) {
+            const remainingTagCount = projectTags.length - visibleTagCount;
+            const moreTags = document.createElement("button");
+            moreTags.type = "button";
+            moreTags.classList.add("chipselect", "global-tags-more");
+            moreTags.textContent = `+${remainingTagCount}`;
+            moreTags.title = _("Show all tags");
+            moreTags.setAttribute("aria-label", `${_("Show all tags")}: ${remainingTagCount}`);
+            moreTags.addEventListener("click", () => {
+                Planet.GlobalPlanet.ProjectViewer.open(this.id);
+            });
+            tagcontainer.appendChild(moreTags);
         }
 
         // set project title text and tooltip
@@ -212,14 +267,70 @@ class GlobalCard {
 
         frag.getElementById(`global-project-share-${this.id}`).addEventListener("click", evt => {
             const s = document.getElementById(`global-sharebox-${this.id}`);
+            const trigger = evt.currentTarget;
+            const card = trigger.closest(".card");
+
+            const stopRepositioning = () => {
+                if (this._shareRepositionHandler) {
+                    window.removeEventListener("resize", this._shareRepositionHandler);
+                    window.removeEventListener("scroll", this._shareRepositionHandler, true);
+                    this._shareRepositionHandler = null;
+                }
+
+                if (this._shareRepositionFrame !== null) {
+                    window.cancelAnimationFrame(this._shareRepositionFrame);
+                    this._shareRepositionFrame = null;
+                }
+            };
 
             if (s.style.display === "none") {
                 s.style.display = "initial";
+
+                if (card) {
+                    card.classList.add("share-popup-open");
+                }
+
+                this._positionShareCard(s, trigger);
+
+                stopRepositioning();
+
+                this._shareRepositionHandler = () => {
+                    if (s.style.display === "none" || this._shareRepositionFrame !== null) {
+                        return;
+                    }
+
+                    this._shareRepositionFrame = window.requestAnimationFrame(() => {
+                        this._shareRepositionFrame = null;
+
+                        if (s.style.display !== "none") {
+                            this._positionShareCard(s, trigger);
+                        }
+                    });
+                };
+
+                window.addEventListener("resize", this._shareRepositionHandler);
+                window.addEventListener("scroll", this._shareRepositionHandler, true);
+
                 hideOnClickOutside(
                     [document.getElementById(`global-share-${this.id}`)],
-                    `global-sharebox-${this.id}`
+                    `global-sharebox-${this.id}`,
+                    () => {
+                        if (card) {
+                            card.classList.remove("share-popup-open");
+                        }
+
+                        stopRepositioning();
+                    }
                 );
-            } else s.style.display = "none";
+            } else {
+                s.style.display = "none";
+
+                if (card) {
+                    card.classList.remove("share-popup-open");
+                }
+
+                stopRepositioning();
+            }
         });
 
         // set share checkbox listener
@@ -241,6 +352,13 @@ class GlobalCard {
         if (advancedToggle) {
             advancedToggle.addEventListener("click", () => {
                 toggleExpandable(`global-advanced-${this.id}`, "shareurl-advanced");
+
+                const shareBox = document.getElementById(`global-sharebox-${this.id}`);
+                const shareTrigger = document.getElementById(`global-project-share-${this.id}`);
+
+                if (shareBox && shareTrigger) {
+                    this._positionShareCard(shareBox, shareTrigger);
+                }
             });
         }
 
@@ -327,6 +445,17 @@ class GlobalCard {
             this._thumbObserver = null;
         }
 
+        if (this._shareRepositionHandler) {
+            window.removeEventListener("resize", this._shareRepositionHandler);
+            window.removeEventListener("scroll", this._shareRepositionHandler, true);
+            this._shareRepositionHandler = null;
+        }
+
+        if (this._shareRepositionFrame !== null) {
+            window.cancelAnimationFrame(this._shareRepositionFrame);
+            this._shareRepositionFrame = null;
+        }
+
         if (this.likeTimeout) {
             clearTimeout(this.likeTimeout);
             this.likeTimeout = null;
@@ -354,7 +483,11 @@ class GlobalCard {
             // GitServerInterface.likeProject uses repoName (this.id) directly
             Planet.ServerInterface.likeProject(this.id, like, data => {
                 this.likePending = false;
-                if (!data.success) {
+                if (data.success && Number.isFinite(data.likes)) {
+                    this.ProjectData.ProjectLikes = data.likes;
+                    const currentLikes = document.getElementById(`global-project-likes-${this.id}`);
+                    if (currentLikes) currentLikes.textContent = data.likes.toString();
+                } else if (!data.success) {
                     // Roll back optimistic update on failure
                     if (document.getElementById(`global-project-likes-${this.id}`)) {
                         this.setLike(!like);

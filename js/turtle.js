@@ -19,8 +19,8 @@
 /*
    global
 
-   createjs, DEFAULTVOLUME, delayExecution, importMembers, Painter, Singer,
-   DEFAULTVOICE, retryWithBackoff, base64Encode
+   createjs, DEFAULTVOLUME, importMembers, Painter, Singer,
+   DEFAULTVOICE, retryWithBackoff, base64Encode, escapeHTML
  */
 /* exported Turtle */
 /**
@@ -74,6 +74,7 @@ class Turtle {
 
         this._transportTime = null;
         this._transportEventId = null;
+        this.runGeneration = 0;
     }
 
     /**
@@ -157,7 +158,13 @@ class Turtle {
     stopBlink() {
         // eslint-disable-next-line eqeqeq
         if (this._blinkTimeout != null || !this._blinkFinished) {
-            clearTimeout(this._blinkTimeout);
+            const timerManager =
+                this.activity && this.activity.logo ? this.activity.logo._timerManager : null;
+            if (timerManager && typeof timerManager.clearTimeout === "function") {
+                timerManager.clearTimeout(this._blinkTimeout);
+            } else {
+                clearTimeout(this._blinkTimeout);
+            }
             this._blinkTimeout = null;
 
             this.container.visible = true;
@@ -170,13 +177,11 @@ class Turtle {
      * Causes turtle to blink (toggle turtle's visibility) every 100 ms.
      */
 
-    async blink(duration, volume) {
+    blink(duration, volume) {
         // Suppress blinking when using cursorout and cursorover
         // sensors to prevent multiple triggers.
         if ("CursorOver" + this.id in this.listeners || "CursorOut" + this.id in this.listeners)
             return;
-
-        this._blinkTimeout = null;
 
         // No time to blink for really short notes. (t = 1 / duration)
         if (duration > 16) {
@@ -188,10 +193,18 @@ class Turtle {
 
         this.container.visible = false;
         this.activity.refreshCanvas();
-        this._blinkTimeout = await delayExecution(100);
-        this._blinkFinished = true;
-        this.container.visible = true;
-        this.activity.refreshCanvas();
+        const finishBlink = () => {
+            this._blinkTimeout = null;
+            this._blinkFinished = true;
+            this.container.visible = true;
+            this.activity.refreshCanvas();
+        };
+        const timerManager =
+            this.activity && this.activity.logo ? this.activity.logo._timerManager : null;
+        this._blinkTimeout =
+            timerManager && typeof timerManager.setTimeout === "function"
+                ? timerManager.setTimeout(finishBlink, 100)
+                : setTimeout(finishBlink, 100);
     }
 
     /**
@@ -349,6 +362,20 @@ class Turtle {
      */
     get parameterQueue() {
         return this._parameterQueue;
+    }
+
+    /**
+     * @param {number[]} boundaries
+     */
+    set actionBoundaries(boundaries) {
+        this._actionBoundaries = boundaries;
+    }
+
+    /**
+     * @returns {number[]}
+     */
+    get actionBoundaries() {
+        return this._actionBoundaries;
     }
 
     /**
@@ -569,6 +596,7 @@ Turtle.TurtleModel = class {
         this._parentFlowQueue = [];
         this._unhighlightQueue = [];
         this._parameterQueue = [];
+        this._actionBoundaries = [];
 
         this._listeners = {}; // Event listeners
         // When we leave a clamp block, we need to dispatch a signal
@@ -863,7 +891,11 @@ Turtle.TurtleView = class {
      * @param width - resize decoration by width
      */
     resizeDecoration(scale, width) {
-        this._decorationBitmap.x = width - (30 * scale) / 2;
+        if (!this._decorationBitmap) {
+            return;
+        }
+        const w = width !== undefined ? width : this._startBlock ? this._startBlock.width : 0;
+        this._decorationBitmap.x = w - (30 * scale) / 2;
         this._decorationBitmap.y = (20 * scale) / 2; // Use 20 to match doTurtleShell
         this._decorationBitmap.scaleX =
             this._decorationBitmap.scaleY =
@@ -939,6 +971,8 @@ Turtle.TurtleView = class {
                 const xScaled = text.x * this.turtles.scale;
                 const yScaled = text.y * this.turtles.scale;
                 const sizeScaled = size * this.turtles.scale;
+                // Both come from the user, so escape them: a bare "&" or "<"
+                // makes the whole SVG invalid and nothing of it renders.
                 this.painter.svgOutput +=
                     '<text x="' +
                     xScaled +
@@ -947,14 +981,15 @@ Turtle.TurtleView = class {
                     '" fill="' +
                     this.painter.canvasColor +
                     '" font-family = "' +
-                    this.painter.font +
+                    escapeHTML(this.painter.font) +
                     '" font-size = "' +
                     sizeScaled +
                     '">' +
-                    lineContent +
+                    escapeHTML(lineContent) +
                     "</text>";
             }
         }
+        this.activity.artworkRevision = (this.activity.artworkRevision || 0) + 1;
         this.activity.refreshCanvas();
     }
 
@@ -970,6 +1005,10 @@ Turtle.TurtleView = class {
         const img = new Image();
 
         img.onload = () => {
+            if (this._skinChanged) {
+                return;
+            }
+
             const bitmap = new createjs.Bitmap(img);
 
             this._bitmap = bitmap;
@@ -982,19 +1021,29 @@ Turtle.TurtleView = class {
             const startBlock = this._startBlock;
             // eslint-disable-next-line eqeqeq
             if (useTurtleArtwork && startBlock != null) {
+                // eslint-disable-next-line eqeqeq
+                if (this._decorationBitmap != null) {
+                    startBlock.container.removeChild(this._decorationBitmap);
+                }
                 startBlock.updateCache();
                 this._decorationBitmap = this._bitmap.clone();
+                this._decorationBitmap.regX = 0;
+                this._decorationBitmap.regY = 0;
+                this._decorationBitmap.rotation = 0;
                 startBlock.container.addChild(this._decorationBitmap);
                 this._decorationBitmap.name = "decoration";
                 const width = startBlock.width;
-                const offset = 40;
+                const offset = 30;
+
+                const baseScale = img.width ? 27.5 / img.width : 0.5;
+                this._decorationBaseScale = baseScale;
 
                 this._decorationBitmap.x = width - (offset * startBlock.protoblock.scale) / 2;
-                this._decorationBitmap.y = (35 * startBlock.protoblock.scale) / 2;
+                this._decorationBitmap.y = (20 * startBlock.protoblock.scale) / 2;
                 this._decorationBitmap.scaleX =
                     this._decorationBitmap.scaleY =
                     this._decorationBitmap.scale =
-                        (0.5 * startBlock.protoblock.scale) / 2;
+                        (baseScale * startBlock.protoblock.scale) / 2;
                 startBlock.updateCache();
             }
 

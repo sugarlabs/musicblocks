@@ -24,10 +24,17 @@
  * Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
  */
 
-const MeterWidget = require("../meterwidget.js");
 const ManagedTimer = require("../../utils/ManagedTimer");
 
 global.ManagedTimer = ManagedTimer;
+global.rationalToFraction = require("../../utils/utils-logic.js").rationalToFraction;
+global.MeterWidgetWindow = require("../MeterWidgetWindow.js");
+global.MeterWidgetMeter = require("../MeterWidgetMeter.js");
+global.MeterWidgetPlayback = require("../MeterWidgetPlayback.js");
+global.MeterWidgetWheel = require("../MeterWidgetWheel.js");
+global.MeterWidgetSave = require("../MeterWidgetSave.js");
+const MeterWidget = require("../meterwidget.js");
+global.MeterWidget = MeterWidget;
 
 // --- 1. Global Mocks (Fake the Browser Environment) ---
 global._ = msg => msg; // Mock translation function
@@ -753,6 +760,142 @@ describe("Meter Widget", () => {
             widget._beatValue = 1 / 8;
 
             expect(beatInterval(widget)).toBe((global.TONEBPM / 120) * 1000 * 0.125);
+        });
+    });
+
+    describe("Playback Indicator Visibility (#9556)", () => {
+        beforeEach(() => {
+            if (meterWidget._playWheel && meterWidget._playWheel.navItems) {
+                meterWidget._playWheel.navItems.forEach(item => {
+                    item.navItem.hide.mockClear();
+                    item.navItem.show.mockClear();
+                });
+            }
+        });
+
+        test("hides all play wheel beat indicators when stopping playback via Play button", () => {
+            jest.useFakeTimers();
+
+            const widgetWindow = window.widgetWindows.windowFor();
+            const playBtn = widgetWindow.addButton.mock.results[0].value;
+
+            meterWidget._strongBeats = [true, false, true, false];
+            const expectedStrongBeats = [...meterWidget._strongBeats];
+
+            playBtn.onclick();
+            expect(meterWidget._playing).toBe(true);
+
+            meterWidget.__playOneBeat(0, 500);
+            expect(meterWidget._playWheel.navItems[0].navItem.show).toHaveBeenCalled();
+
+            jest.advanceTimersByTime(1100);
+
+            meterWidget._playWheel.navItems.forEach(item => item.navItem.hide.mockClear());
+
+            playBtn.onclick();
+            expect(meterWidget._playing).toBe(false);
+
+            meterWidget._playWheel.navItems.forEach(item => {
+                expect(item.navItem.hide).toHaveBeenCalled();
+            });
+
+            // Stopping playback preserves the selected strong beats (#9556)
+            expect(meterWidget._strongBeats).toEqual(expectedStrongBeats);
+
+            jest.useRealTimers();
+        });
+
+        test("hides beat indicators when widget window is closed", () => {
+            const widgetWindow = window.widgetWindows.windowFor();
+            meterWidget._strongBeats = [true, false, true, false];
+            const expectedStrongBeats = [...meterWidget._strongBeats];
+
+            meterWidget._playing = true;
+            meterWidget.__playOneBeat(0, 500);
+
+            meterWidget._playWheel.navItems.forEach(item => item.navItem.hide.mockClear());
+
+            widgetWindow.onclose();
+
+            expect(meterWidget._playing).toBe(false);
+            meterWidget._playWheel.navItems.forEach(item => {
+                expect(item.navItem.hide).toHaveBeenCalled();
+            });
+            expect(meterWidget._strongBeats).toEqual(expectedStrongBeats);
+        });
+
+        test("hides beat indicators when Reset button is clicked", () => {
+            const widgetWindow = window.widgetWindows.windowFor();
+            const resetBtn = widgetWindow.addButton.mock.results.find(
+                res => res.value && res.value.tip === "Reset"
+            ).value;
+
+            meterWidget._playing = true;
+            meterWidget.__playOneBeat(0, 500);
+
+            meterWidget._playWheel.navItems.forEach(item => item.navItem.hide.mockClear());
+
+            resetBtn.onclick();
+
+            expect(meterWidget._playing).toBe(false);
+            meterWidget._playWheel.navItems.forEach(item => {
+                expect(item.navItem.hide).toHaveBeenCalled();
+            });
+        });
+
+        test("safely handles _hidePlaybackIndicator when _playWheel or navItems is undefined or malformed", () => {
+            meterWidget._playWheel = null;
+            expect(() => meterWidget._hidePlaybackIndicator()).not.toThrow();
+
+            meterWidget._playWheel = {};
+            expect(() => meterWidget._hidePlaybackIndicator()).not.toThrow();
+
+            const hide = jest.fn();
+            meterWidget._strongBeats = [true, false, false, false, false];
+            meterWidget._playWheel = {
+                navItems: [null, {}, { navItem: null }, { navItem: {} }, { navItem: { hide } }]
+            };
+            expect(() => meterWidget._hidePlaybackIndicator()).not.toThrow();
+            expect(hide).toHaveBeenCalledTimes(1);
+        });
+    });
+    describe("modules", () => {
+        test("loads the five modules before the widget", () => {
+            expect(MeterWidget.dependencies).toEqual([
+                "widgets/MeterWidgetWindow",
+                "widgets/MeterWidgetMeter",
+                "widgets/MeterWidgetPlayback",
+                "widgets/MeterWidgetWheel",
+                "widgets/MeterWidgetSave",
+                "widgets/meterwidget"
+            ]);
+        });
+
+        test("installModules is done once every module is defined", () => {
+            expect(MeterWidget._modulesInstalled).toBe(true);
+            expect(MeterWidget.installModules()).toBe(true);
+            expect(typeof MeterWidget.prototype._stopPlayback).toBe("function");
+        });
+    });
+
+    describe("running the block again while the widget is open", () => {
+        test("stops the beats of the widget it replaces", () => {
+            jest.useFakeTimers();
+            try {
+                meterWidget._playing = true;
+                meterWidget._playBeat();
+                expect(mockActivity.logo.synth.trigger).toHaveBeenCalledTimes(1);
+
+                mockActivity.logo.meterWidget = meterWidget;
+                const replacement = new MeterWidget(mockActivity, 1);
+                jest.advanceTimersByTime(5000);
+
+                expect(replacement).not.toBe(meterWidget);
+                expect(meterWidget._playing).toBe(false);
+                expect(mockActivity.logo.synth.trigger).toHaveBeenCalledTimes(1);
+            } finally {
+                jest.useRealTimers();
+            }
         });
     });
 });

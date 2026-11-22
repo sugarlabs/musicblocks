@@ -27,6 +27,28 @@ class PitchSlider {
     static dependencies = ["widgets/pitchslider"];
 
     static ICONSIZE = 32;
+    static MIN_FREQUENCY = 27.5;
+    static MAX_FREQUENCY = 16744.04;
+    static DEFAULT_FREQUENCY = 392;
+
+    static normalizeFrequency(value) {
+        const frequency = Number(value);
+
+        if (
+            (typeof value !== "number" && typeof value !== "string") ||
+            (typeof value === "string" && value.trim() === "") ||
+            !Number.isFinite(frequency) ||
+            frequency <= 0
+        ) {
+            return PitchSlider.DEFAULT_FREQUENCY;
+        }
+        return clampNumber(
+            frequency,
+            PitchSlider.MIN_FREQUENCY,
+            PitchSlider.MAX_FREQUENCY,
+            PitchSlider.DEFAULT_FREQUENCY
+        );
+    }
     /**
      * @constructor
      */
@@ -47,8 +69,36 @@ class PitchSlider {
         this.activity = activity;
         const edo = getCurrentEDO(activity.logo.synth.inTemperament);
         const semitone = Math.pow(2, 1 / edo);
-        if (window.widgetWindows.openWindows["slider"]) return;
-        if (!this.frequencies || !this.frequencies.length) this.frequencies = [392];
+        // Preserve pending frequency before closing an existing window.
+        const pendingFrequency = this.frequency;
+
+        const openWindow =
+            typeof window !== "undefined" &&
+            window.widgetWindows &&
+            window.widgetWindows.openWindows
+                ? window.widgetWindows.openWindows["slider"]
+                : null;
+
+        if (openWindow && typeof openWindow.onclose === "function") {
+            openWindow.onclose();
+
+            // Preserve a newly supplied frequency during reinitialization.
+            if (pendingFrequency !== undefined && pendingFrequency !== null) {
+                this.frequency = pendingFrequency;
+            }
+        }
+        this.sliders = {};
+        this.activeSlider = null;
+        if (!this.frequencies || !this.frequencies.length) {
+            if (this.frequency !== undefined && this.frequency !== null) {
+                this.frequencies = [PitchSlider.normalizeFrequency(this.frequency)];
+                this.frequency = null;
+            } else {
+                this.frequencies = [PitchSlider.DEFAULT_FREQUENCY];
+            }
+        } else {
+            this.frequencies = this.frequencies.map(f => PitchSlider.normalizeFrequency(f));
+        }
         this.initialFrequencies = [...this.frequencies];
 
         const oscillators = [];
@@ -83,6 +133,7 @@ class PitchSlider {
                 osc.dispose();
             }
             this.isActive = false;
+            this.frequency = null;
             activity.logo.pitchSlider = null;
             announceToScreenReader(_("Pitch Slider closed"));
             this.widgetWindow.destroy();
@@ -207,7 +258,7 @@ class PitchSlider {
             const freqLabel = document.createElement("div");
             freqLabel.className = "wfbtItem";
             toolBarDiv.appendChild(freqLabel);
-            freqLabel.textContent = parseFloat(this.frequencies[id].toFixed(2));
+            freqLabel.textContent = parseFloat(Number(this.frequencies[id]).toFixed(2));
 
             this.sliders[id] = slider;
             const changeFreq = () => {
@@ -273,15 +324,15 @@ class PitchSlider {
                 const initialFreq =
                     this.initialFrequencies && this.initialFrequencies[id] !== undefined
                         ? this.initialFrequencies[id]
-                        : 392;
+                        : PitchSlider.DEFAULT_FREQUENCY;
                 slider.value = initialFreq;
                 changeFreq();
                 oscillators[id].triggerAttackRelease(this.frequencies[id], "4n");
             };
         };
 
-        for (const id in this.frequencies) {
-            MakeToolbar(id);
+        for (let i = 0; i < this.frequencies.length; i++) {
+            MakeToolbar(String(i));
         }
 
         activity.textMsg(_("Use the up/down buttons or arrow keys to change pitch."), 3000);
@@ -323,19 +374,16 @@ class PitchSlider {
         this.activity.refreshCanvas();
 
         const newStack = [
-            [0, "note", 100 + this._delta, 100 + this._delta, [null, 1, 2, null]],
-            [1, ["number", { value: 8 }], 0, 0, [0]]
+            [0, "newnote", 100 + this._delta, 100 + this._delta, [null, 1, 4, 7]],
+            [1, "divide", 0, 0, [0, 2, 3]],
+            [2, ["number", { value: 1 }], 0, 0, [1]],
+            [3, ["number", { value: 4 }], 0, 0, [1]],
+            [4, "vspace", 0, 0, [0, 5]],
+            [5, "hertz", 0, 0, [4, 6, null]],
+            [6, ["number", { value: frequency }], 0, 0, [5]],
+            [7, "hidden", 0, 0, [0, null]]
         ];
         this._delta += 21;
-
-        const previousBlock = 0;
-
-        const hertzIdx = newStack.length;
-        const frequencyIdx = hertzIdx + 1;
-        const hiddenIdx = hertzIdx + 2;
-        newStack.push([hertzIdx, "hertz", 0, 0, [previousBlock, frequencyIdx, hiddenIdx]]);
-        newStack.push([frequencyIdx, ["number", { value: frequency }], 0, 0, [hertzIdx]]);
-        newStack.push([hiddenIdx, "hidden", 0, 0, [hertzIdx, null]]);
 
         this.activity.blocks.loadNewBlocks(newStack);
     }

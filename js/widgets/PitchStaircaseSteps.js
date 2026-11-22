@@ -105,6 +105,14 @@ class PitchStaircaseSteps {
             return false;
         }
 
+        // Playback holds row indices, so stop it before removing a stair.
+        if (this._isPlayingScale) {
+            this._stopScale();
+        }
+        if (this._isPlayingAll) {
+            this._stopChord();
+        }
+
         // Remove the last entry...
         const i = this._history.pop();
         this.Stairs.splice(i, 1);

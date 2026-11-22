@@ -849,13 +849,164 @@ const switchCases = [
     }
 ];
 
+const heapOperations = [
+    {
+        name: "heap_push_and_length",
+        description: "Pushes a value onto the heap and prints the heap length",
+        category: "heap_operations",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "push", 0, 0, [0, 2, 3]],
+            [2, ["number", { value: 5 }], 0, 0, [1]],
+            [3, "print", 0, 0, [1, 4, null]],
+            [4, "heapLength", 0, 0, [3]]
+        ]
+    },
+    {
+        name: "heap_empty_and_reverse_commands",
+        description: "Pushes a value, reverses and empties the heap, prints heap-empty flag",
+        category: "heap_operations",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "push", 0, 0, [0, 2, 3]],
+            [2, ["number", { value: 5 }], 0, 0, [1]],
+            [3, "reverseHeap", 0, 0, [1, 4]],
+            [4, "emptyHeap", 0, 0, [3, 5]],
+            [5, "print", 0, 0, [4, 6, null]],
+            [6, "heapEmpty", 0, 0, [5]]
+        ]
+    }
+];
+
+const toneAndTimbre = [
+    {
+        name: "tone_vibrato_clamp",
+        description: "Vibrato clamp with intensity and rate arguments around a print statement",
+        category: "tone_and_timbre",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "vibrato", 0, 0, [0, 2, 3, 4, null]],
+            [2, ["number", { value: 5 }], 0, 0, [1]],
+            [3, ["number", { value: 4 }], 0, 0, [1]],
+            [4, "print", 0, 0, [1, 5, null]],
+            [5, ["text", { value: "x" }], 0, 0, [4]]
+        ]
+    },
+    {
+        name: "tone_chorus_three_numeric_args",
+        description: "Chorus clamp with three numeric arguments around a print statement",
+        category: "tone_and_timbre",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "chorus", 0, 0, [0, 2, 3, 4, 5, null]],
+            [2, ["number", { value: 1.5 }], 0, 0, [1]],
+            [3, ["number", { value: 2 }], 0, 0, [1]],
+            [4, ["number", { value: 4 }], 0, 0, [1]],
+            [5, "print", 0, 0, [1, 6, null]],
+            [6, ["text", { value: "x" }], 0, 0, [5]]
+        ]
+    },
+    {
+        name: "tone_distortion_clamp",
+        description: "Distortion clamp with a percentage argument around a print statement",
+        category: "tone_and_timbre",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "dis", 0, 0, [0, 2, 3, null]],
+            [2, ["number", { value: 40 }], 0, 0, [1]],
+            [3, "print", 0, 0, [1, 4, null]],
+            [4, ["text", { value: "x" }], 0, 0, [3]]
+        ]
+    }
+];
+
+const meterAndTempo = [
+    {
+        name: "meter_setmeter_with_fraction_beat_value",
+        description: "Sets the meter to 4 beats of a quarter note (1 / 4 expression argument)",
+        category: "meter_and_tempo",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "meter", 0, 0, [0, 2, 3, null]],
+            [2, ["number", { value: 4 }], 0, 0, [1]],
+            [3, "divide", 0, 0, [1, 4, 5]],
+            [4, ["number", { value: 1 }], 0, 0, [3]],
+            [5, ["number", { value: 4 }], 0, 0, [3]]
+        ]
+    },
+    {
+        name: "meter_setmasterbpm_with_fraction_beat_value",
+        description: "Sets the master BPM to 90 quarter notes (1 / 4 expression argument)",
+        category: "meter_and_tempo",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "setmasterbpm2", 0, 0, [0, 2, 3, null]],
+            [2, ["number", { value: 90 }], 0, 0, [1]],
+            [3, "divide", 0, 0, [1, 4, 5]],
+            [4, ["number", { value: 1 }], 0, 0, [3]],
+            [5, ["number", { value: 4 }], 0, 0, [3]]
+        ]
+    }
+];
+
+const intervalsAndTransposition = [
+    {
+        name: "interval_scalar_interval_clamp",
+        description: "Scalar interval clamp (fifth) around a print statement",
+        category: "intervals_and_transposition",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "interval", 0, 0, [0, 2, 3, null]],
+            [2, ["number", { value: 5 }], 0, 0, [1]],
+            [3, "print", 0, 0, [1, 4, null]],
+            [4, ["text", { value: "x" }], 0, 0, [3]]
+        ]
+    },
+    {
+        name: "transposition_scalar_transpose_clamp",
+        description: "Scalar transposition clamp around a print statement",
+        category: "intervals_and_transposition",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "setscalartransposition", 0, 0, [0, 2, 3, null]],
+            [2, ["number", { value: 2 }], 0, 0, [1]],
+            [3, "print", 0, 0, [1, 4, null]],
+            [4, ["text", { value: "x" }], 0, 0, [3]]
+        ]
+    }
+];
+
+const penAttributes = [
+    {
+        name: "pen_attribute_setters_sequence",
+        description: "Sets pen size, color, shade, and hue in sequence",
+        category: "pen_attributes",
+        blocks: [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "setpensize", 0, 0, [0, 2, 3]],
+            [2, ["number", { value: 8 }], 0, 0, [1]],
+            [3, "setcolor", 0, 0, [1, 4, 5]],
+            [4, ["number", { value: 20 }], 0, 0, [3]],
+            [5, "setshade", 0, 0, [3, 6, 7]],
+            [6, ["number", { value: 50 }], 0, 0, [5]],
+            [7, "sethue", 0, 0, [5, 8, null]],
+            [8, ["number", { value: 30 }], 0, 0, [7]]
+        ]
+    }
+];
+
 const allCorpusCases = [
     ...basicValuesAndExpressions,
     ...variablesAndBoxes,
     ...actionsAndCalls,
     ...controlFlow,
     ...pitchAndPitches,
-    ...switchCases
+    ...switchCases,
+    ...heapOperations,
+    ...toneAndTimbre,
+    ...meterAndTempo,
+    ...intervalsAndTransposition,
+    ...penAttributes
 ];
 
 module.exports = {
@@ -865,5 +1016,10 @@ module.exports = {
     controlFlow,
     pitchAndPitches,
     switchCases,
+    heapOperations,
+    toneAndTimbre,
+    meterAndTempo,
+    intervalsAndTransposition,
+    penAttributes,
     allCorpusCases
 };

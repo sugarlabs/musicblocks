@@ -478,6 +478,12 @@ function setupRhythmBlocks(activity) {
             const tur = activity.turtles.ithTurtle(turtle);
             tur.singer.skipFactor += arg;
 
+            // Each clamp counts its notes from zero, so an identical clamp (or the
+            // next pass of a Repeat) skips the same notes. The enclosing count is
+            // saved and resumed, including the notes counted inside this clamp.
+            const outerSkipIndex = tur.singer.skipIndex;
+            tur.singer.skipIndex = 0;
+
             const listenerName = "_skip_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
@@ -485,6 +491,7 @@ function setupRhythmBlocks(activity) {
             // what was added above — no residual drift in skipFactor.
             const __listener = () => {
                 tur.singer.skipFactor -= arg;
+                tur.singer.skipIndex = outerSkipIndex + tur.singer.skipIndex;
             };
 
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -543,8 +550,11 @@ function setupRhythmBlocks(activity) {
             if (args[1] === undefined) return;
 
             let factor = args[0];
-            if (factor === null || typeof factor !== "number" || factor <= 0) {
+            if (factor === null || typeof factor !== "number") {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
+                factor = 2;
+            } else if (factor <= 0) {
+                activity.errorMsg(_("Multiply note value must be greater than 0."), blk);
                 factor = 2;
             }
 
@@ -648,7 +658,14 @@ function setupRhythmBlocks(activity) {
             const newDotFactor = 2 - 1 / Math.pow(2, tur.singer.dotCount);
             tur.singer.beatFactor /= newDotFactor;
 
-            const listenerName = "_dot_" + turtle + "_" + blk;
+            const baseListenerName = "_dot_" + turtle + "_" + blk;
+            let listenerName = baseListenerName;
+            if (tur && tur.listeners) {
+                let suffix = 1;
+                while (listenerName in tur.listeners) {
+                    listenerName = baseListenerName + "_" + suffix++;
+                }
+            }
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = event => {

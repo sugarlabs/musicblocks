@@ -83,11 +83,12 @@ const SamplerFiles = {
 
             reader.onload = () => {
                 // if the file is of .wav type, save it
+                const mimeType = reader.result.substring(
+                    reader.result.indexOf(":") + 1,
+                    reader.result.indexOf(";")
+                );
                 if (
-                    reader.result.substring(
-                        reader.result.indexOf(":") + 1,
-                        reader.result.indexOf(";")
-                    ) === "audio/wav"
+                    ["audio/wav", "audio/wave", "audio/x-wav", "audio/x-pn-wav"].includes(mimeType)
                 ) {
                     if (reader.result.length <= 1333333) {
                         this.sampleData = reader.result;

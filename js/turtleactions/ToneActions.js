@@ -82,7 +82,7 @@ function setupToneActions(activity) {
                 }
             }
 
-            if (!accounted && typeof instrument === "object") {
+            if (!accounted && typeof instrument === "object" && instrument !== null) {
                 if (instrument[0] !== "") {
                     synth = "customsample_" + instrument[0];
                     // data, pitch, octave and the cent adjustment from the sampler
@@ -105,10 +105,16 @@ function setupToneActions(activity) {
                 activity.logo.phraseMaker._instrumentName = synth;
             }
 
+            // Notes play the last instrument on the stack, so push the synth
+            // unless it is already last: piano > violin > piano plays piano.
+            const loaded = tur.singer.instrumentNames.includes(synth);
             let pushed = false;
-            if (!tur.singer.instrumentNames.includes(synth)) {
+            if (last(tur.singer.instrumentNames) !== synth) {
                 tur.singer.instrumentNames.push(synth);
                 pushed = true;
+            }
+
+            if (!loaded) {
                 activity.logo.synth.loadSynth(turtle, synth);
 
                 if (tur.singer.synthVolume[synth] === undefined) {
@@ -184,7 +190,7 @@ function setupToneActions(activity) {
             tur.singer.vibratoIntensity.push(intensity / 100);
             tur.singer.vibratoRate.push(1 / rate);
 
-            const listenerName = "_vibrato_" + turtle;
+            const listenerName = "_vibrato_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -244,7 +250,7 @@ function setupToneActions(activity) {
             tur.singer.delayTime.push(delayTime);
             tur.singer.chorusDepth.push(chorusDepth);
 
-            const listenerName = "_chorus_" + turtle;
+            const listenerName = "_chorus_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -293,7 +299,7 @@ function setupToneActions(activity) {
             tur.singer.octaves.push(octaves);
             tur.singer.baseFrequency.push(baseFrequency);
 
-            const listenerName = "_phaser_" + turtle;
+            const listenerName = "_phaser_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -348,7 +354,7 @@ function setupToneActions(activity) {
             tur.singer.tremoloFrequency.push(frequency);
             tur.singer.tremoloDepth.push(depth);
 
-            const listenerName = "_tremolo_" + turtle;
+            const listenerName = "_tremolo_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -398,7 +404,7 @@ function setupToneActions(activity) {
 
             tur.singer.distortionAmount.push(distortion);
 
-            const listenerName = "_distortion_" + turtle;
+            const listenerName = "_distortion_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {

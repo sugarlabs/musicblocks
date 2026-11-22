@@ -85,6 +85,11 @@
         }
         removeExistingDialogs();
 
+        const previouslyFocused =
+            document.activeElement && typeof document.activeElement.focus === "function"
+                ? document.activeElement
+                : null;
+
         const container = document.getElementById("floatingWindows") || document.body;
 
         const overlay = document.createElement("div");
@@ -98,11 +103,18 @@
         overlay.style.backgroundColor = "var(--color-overlay-backdrop)";
         overlay.style.zIndex = "10000";
 
+        const dialogId = `mb-dialog-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+        const titleId = `${dialogId}-title`;
+        const messageId = `${dialogId}-message`;
+
         const frame = document.createElement("div");
         frame.className = `windowFrame ${DIALOG_CLASS}`;
-        frame.setAttribute("role", "dialog");
+        const isAlert = !options.showCancel && !options.input;
+        frame.setAttribute("role", options.role || (isAlert ? "alertdialog" : "dialog"));
         frame.setAttribute("aria-modal", "true");
         frame.setAttribute("aria-label", options.title || DEFAULT_TITLE);
+        frame.setAttribute("aria-labelledby", titleId);
+        frame.setAttribute("aria-describedby", messageId);
         frame.style.position = "fixed";
         frame.style.maxWidth = "640px";
         frame.style.minWidth = "320px";
@@ -117,8 +129,17 @@
         closeButton.className = "wftButton close";
         closeButton.title = t("Close");
         closeButton.setAttribute("aria-label", t("Close"));
+        closeButton.setAttribute("role", "button");
+        closeButton.setAttribute("tabindex", "0");
+        closeButton.addEventListener("keydown", event => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                closeButton.click();
+            }
+        });
 
         const titleEl = document.createElement("div");
+        titleEl.id = titleId;
         titleEl.className = "wftTitle";
         titleEl.textContent = options.title || DEFAULT_TITLE;
 
@@ -143,6 +164,7 @@
         widget.style.color = "var(--color-text-primary)";
 
         const message = document.createElement("div");
+        message.id = messageId;
         message.textContent = options.message || "";
         message.style.whiteSpace = "pre-wrap";
 
@@ -180,6 +202,9 @@
 
         const cleanup = () => {
             window.removeEventListener("resize", onResize);
+            if (typeof window !== "undefined" && typeof window.removeEventListener === "function") {
+                window.removeEventListener("keydown", onKeyDown, true);
+            }
             document.removeEventListener("keydown", onKeyDown, true);
             document.removeEventListener("mousemove", onMouseMove, true);
             document.removeEventListener("mouseup", onMouseUp, true);
@@ -188,16 +213,59 @@
             if (typeof options.onClose === "function") {
                 options.onClose();
             }
+            if (
+                previouslyFocused &&
+                typeof previouslyFocused.focus === "function" &&
+                document.contains(previouslyFocused)
+            ) {
+                previouslyFocused.focus();
+            }
+        };
+
+        const getFocusableElements = () => {
+            const focusableSelectors = [
+                "button:not([disabled])",
+                "input:not([disabled])",
+                "select:not([disabled])",
+                "textarea:not([disabled])",
+                "[tabindex]:not([tabindex='-1'])",
+                "[role='button']:not([tabindex='-1'])"
+            ];
+            return Array.from(frame.querySelectorAll(focusableSelectors.join(",")));
         };
 
         const onResize = () => centerDialog(frame);
         const onKeyDown = event => {
             if (event.key === "Escape") {
                 event.preventDefault();
+                if (typeof event.stopImmediatePropagation === "function") {
+                    event.stopImmediatePropagation();
+                } else if (typeof event.stopPropagation === "function") {
+                    event.stopPropagation();
+                }
                 if (typeof options.onCancel === "function") {
                     options.onCancel();
                 }
                 cleanup();
+                return;
+            }
+
+            if (event.key === "Tab") {
+                const focusables = getFocusableElements();
+                if (focusables.length === 0) return;
+
+                const currentIndex = focusables.indexOf(document.activeElement);
+                if (event.shiftKey) {
+                    if (currentIndex <= 0) {
+                        event.preventDefault();
+                        focusables[focusables.length - 1].focus();
+                    }
+                } else {
+                    if (currentIndex === -1 || currentIndex >= focusables.length - 1) {
+                        event.preventDefault();
+                        focusables[0].focus();
+                    }
+                }
             }
         };
 
@@ -284,11 +352,20 @@
         document.addEventListener("mousemove", onMouseMove, true);
         document.addEventListener("mouseup", onMouseUp, true);
         window.addEventListener("resize", onResize);
+        if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+            window.addEventListener("keydown", onKeyDown, true);
+        }
         document.addEventListener("keydown", onKeyDown, true);
 
         centerDialog(frame);
         frame.tabIndex = -1;
-        frame.focus();
+        if (options.input) {
+            // Handled by caller (prompt): input.focus(); input.select();
+        } else if (okButton && typeof okButton.focus === "function") {
+            okButton.focus();
+        } else {
+            frame.focus();
+        }
 
         activeCleanup = cleanup;
         return { okButton, cancelButton, cleanup };

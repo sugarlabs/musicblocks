@@ -357,6 +357,8 @@ describe("themes.css colour tokens", () => {
         expect(spacerRule).toBeDefined();
         expect(declaration(spacerRule.body, "background-color")).toBe("transparent");
         expect(declaration(spacerRule.body, "border")).toBe("none");
+        expect(whiteRule.body).not.toMatch(/background-color\s*:[^;]*!important/);
+        expect(blackRule.body).not.toMatch(/background-color\s*:[^;]*!important/);
     });
 });
 
@@ -420,6 +422,8 @@ describe("play-only-mode.css colour tokens", () => {
         expect(spacerRule).toBeDefined();
         expect(declaration(spacerRule.body, "background-color")).toBe("transparent");
         expect(declaration(spacerRule.body, "border")).toBe("none");
+        expect(whiteRule.body).not.toMatch(/background-color\s*:[^;]*!important/);
+        expect(blackRule.body).not.toMatch(/background-color\s*:[^;]*!important/);
     });
 
     it("anchors floating windows below the toolbar in play-only mode", () => {

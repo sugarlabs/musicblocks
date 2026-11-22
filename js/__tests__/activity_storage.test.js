@@ -61,6 +61,7 @@ const loadActivityStorageMethods = () => {
         globalActivity: null,
         _THIS_IS_MUSIC_BLOCKS_: true,
         setupActivityAbcParser: jest.fn(),
+        setupActivityMxmlParser: jest.fn(),
         pubsub: { on: jest.fn(), off: jest.fn() },
         Date: { now: () => 1000000 } // Mock Date.now()
     };

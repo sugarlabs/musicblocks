@@ -95,6 +95,29 @@ describe("musicutils-buildscale", () => {
 
     it("still resolves scale degrees, step sizes and intervals", () => {
         expect(buildscale.getModeLength("C major")).toBe(7);
+        // A non-finite EDO previously hung inside generateNoteNames;
+        // it must now return promptly through the 12-EDO fallback.
+        expect(buildscale.getModeLength("C major", Infinity)).toBe(7);
+        expect(buildscale.buildScale("C major", Infinity)[0][0]).toBe("C");
+        // Downstream of generateNoteNames, a bad EDO must give the full
+        // 12-EDO scale and steps: previously "C major" with Infinity
+        // returned undefined notes with NaN steps, and "C custom" threw
+        // a RangeError from getModePattern.
+        for (const edo of [Infinity, -Infinity, NaN, 12.5, 0, 257]) {
+            expect(buildscale.buildScale("C major", edo)).toEqual(
+                buildscale.buildScale("C major", 12)
+            );
+            expect(buildscale.buildScale("C custom", edo)).toEqual(
+                buildscale.buildScale("C custom", 12)
+            );
+            expect(buildscale.getModeLength("C major", edo)).toBe(7);
+        }
+        // Valid EDOs are unchanged, boundaries included.
+        expect(buildscale.buildScale("C major", 19)).toEqual([
+            ["C", "D", "E", "F", "G", "A", "B", "C"],
+            [3, 3, 2, 3, 3, 3, 2]
+        ]);
+        expect(buildscale.buildScale("C major", 256)[1].reduce((a, b) => a + b, 0)).toBe(256);
         expect(buildscale.scaleDegreeToPitchMapping("C major", 2, false, null)).toBe("D");
         expect(buildscale.scaleDegreeToPitchMapping("C major", 1, true, null)).toBe("C");
         expect(buildscale.nthDegreeToPitch("C major", 3)).toEqual(["E", 0]);
@@ -188,6 +211,70 @@ describe("musicutils-buildscale", () => {
         ).toEqual(["1", SHARP]);
     });
 
+    it.each([
+        ["A minor blues", "A C D E♭ E G A"],
+        ["E minor blues", "E G A B♭ B D E"],
+        ["B minor blues", "B D E F F♯ A B"],
+        ["F♯ minor blues", "F♯ A B C C♯ E F♯"],
+        ["C minor blues", "C E♭ F G♭ G B♭ C"],
+        ["B♭ minor blues", "B♭ D♭ E♭ F♭ F A♭ B♭"],
+        ["C major blues", "C D E♭ E G A C"],
+        ["D major blues", "D E F F♯ A B D"],
+        ["E major blues", "E F♯ G G♯ B C♯ E"],
+        ["F♯ major blues", "F♯ G♯ A A♯ C♯ D♯ F♯"],
+        ["E♭ major blues", "E♭ F G♭ G B♭ C E♭"]
+    ])("spells %s with its blue note flattened", (keySignature, expected) => {
+        expect(buildscale.buildScale(keySignature, 12)[0].join(" ")).toBe(expected);
+    });
+
+    it("gives the notes of a blues scale their own scale degrees", () => {
+        const degree = pitch =>
+            buildscale.scaleDegreeToPitchMapping("D major blues", null, false, pitch).join("");
+        // D E F F♯ A B: the blue note F is degree 3, and F♯ is not a flat 4.
+        expect(buildscale.buildScale("D major blues", 12)[0].slice(0, 6).map(degree)).toEqual([
+            "1" + NATURAL,
+            "2" + NATURAL,
+            "3" + NATURAL,
+            "3" + SHARP,
+            "5" + NATURAL,
+            "6" + NATURAL
+        ]);
+    });
+
+    it("round-trips every spelling of a blues scale note through movable solfege", () => {
+        const names = ["C", "D", "E", "F", "G", "A", "B"].flatMap(letter => [
+            letter,
+            letter + SHARP,
+            letter + FLAT
+        ]);
+        const tonics = ["C", "G", "D", "A", "E", "B", "F♯", "F", "B♭", "E♭", "A♭", "D♭"];
+        for (const keySignature of tonics.flatMap(k => [k + " major blues", k + " minor blues"])) {
+            const scalePitches = buildscale
+                .buildScale(keySignature, 12)[0]
+                .map(buildscale._notePitchClass);
+            for (const name of names) {
+                const pitchClass = buildscale._notePitchClass(name);
+                if (!scalePitches.includes(pitchClass)) {
+                    continue;
+                }
+                const solfege = buildscale.getSolfege(name, keySignature, true, "equal", 12);
+                const note = musicutils.getNote(solfege, 4, 0, keySignature, true, null, null);
+                expect([keySignature, name, buildscale._notePitchClass(note[0])]).toEqual([
+                    keySignature,
+                    name,
+                    pitchClass
+                ]);
+            }
+        }
+    });
+
+    it("leaves movable solfege in chromatic and 8-note modes as it was", () => {
+        // Seven syllables can't name 12 or 8 notes, so an enharmonic match there
+        // would turn C♯ into "re" and play a D.
+        expect(buildscale.getSolfege("C♯", "C chromatic", true, "equal", 12)).toBe("di");
+        expect(buildscale.getSolfege("D♯", "C octatonic", true, "equal", 12)).toBe("ri");
+    });
+
     it("still resolves a minor key signature's scale and solfege", () => {
         expect(buildscale.buildScale("A minor", 12)[0].slice(0, 3)).toEqual(["A", "B", "C"]);
         expect(buildscale.getSolfege("A", "A minor", false, "equal")).toBe("la");
@@ -195,6 +282,67 @@ describe("musicutils-buildscale", () => {
 
     it("still resolves solfege for a key signature", () => {
         expect(buildscale.getSolfege("C", "C major", true, "equal")).toBe("do");
+    });
+
+    it("resolves solfege for notes with ASCII accidentals in fixed and non-movable modes", () => {
+        expect(buildscale.getSolfege("C#")).toBe("do" + SHARP);
+        expect(buildscale.getSolfege("Db")).toBe("re" + FLAT);
+        expect(buildscale.getSolfege("F#")).toBe("fa" + SHARP);
+        expect(buildscale.getSolfege("Bb")).toBe("ti" + FLAT);
+        expect(buildscale.getSolfege("G#", "C major", false, "equal")).toBe("sol" + SHARP);
+        expect(buildscale.getSolfege("c#")).toBe("do" + SHARP);
+        expect(buildscale.getSolfege("db")).toBe("re" + FLAT);
+        expect(buildscale.getSolfege("f#", "G major", true, "equal")).toBe("ti");
+        expect(buildscale.getSolfege("bb")).toBe("ti" + FLAT);
+        expect(buildscale.getSolfege("b#")).toBe("ti" + SHARP);
+        expect(buildscale.getSolfege("bbb")).toBe("bbb");
+        expect(buildscale.getSolfege("b##")).toBe("b##");
+        expect(buildscale.getSolfege("Hb")).toBe("Hb");
+        expect(buildscale.getSolfege("")).toBe("");
+    });
+
+    it("distinguishes an omitted EDO from an explicitly invalid one", () => {
+        // With an ambient equal19 temperament, an omitted EDO keeps
+        // the ambient 19-EDO scale, but an explicitly passed invalid
+        // value (0, NaN, Infinity, ...) falls back to 12 instead of
+        // silently picking up the ambient temperament.
+        const savedActivity = global.globalActivity;
+        global.globalActivity = { logo: { synth: { inTemperament: "equal19" } } };
+        try {
+            expect(buildscale.buildScale("C major")).toEqual(buildscale.buildScale("C major", 19));
+            for (const edo of [0, NaN, Infinity, -Infinity, 12.5, 257]) {
+                expect(buildscale.buildScale("C major", edo)).toEqual(
+                    buildscale.buildScale("C major", 12)
+                );
+            }
+        } finally {
+            global.globalActivity = savedActivity;
+        }
+    });
+
+    it("measures the chromatic fallback in the fallback EDO, not the temperament's", () => {
+        // With temperament "equal19" and an explicitly invalid EDO, the
+        // scale falls back to 12-EDO, so the chromatic interval must be
+        // measured in 12-EDO too: D-flat is one step above the tonic
+        // ("di"), not two as the 19-EDO name table would count it.
+        expect(buildscale.getSolfege("D♭", "C major", true, "equal19", Infinity)).toBe(
+            buildscale.getSolfege("D♭", "C major", true, "equal", 12)
+        );
+        expect(buildscale.getSolfege("D♭", "C major", true, "equal19", Infinity)).toBe("di");
+        // A genuine 19-EDO call is unchanged.
+        expect(buildscale.getSolfege("D♭", "C major", true, "equal19", 19)).toBe("di");
+    });
+
+    it("normalises an invalid EDO in getSolfege instead of throwing", () => {
+        // A chromatic note with a non-finite EDO previously built a
+        // 12-EDO scale but did its chromatic math with Infinity,
+        // producing NaN and throwing on the missing solfege entry.
+        for (const edo of [Infinity, -Infinity, NaN, 0, 12.5, 257]) {
+            expect(() => buildscale.getSolfege("C♯", "C major", true, "equal", edo)).not.toThrow();
+            expect(buildscale.getSolfege("C♯", "C major", true, "equal", edo)).toBe(
+                buildscale.getSolfege("C♯", "C major", true, "equal", 12)
+            );
+        }
     });
 
     it("is still reachable through musicutils.js for callers that require it", () => {
