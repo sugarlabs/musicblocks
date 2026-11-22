@@ -400,8 +400,6 @@ class BlockDragController {
                                     ? blocks.findBottomBlock(thisBlock)
                                     : null
                         };
-                        blocks.actionHistory.push(move);
-                        blocks.redoActionHistory = [];
                     }
                 }
             }
@@ -1195,6 +1193,8 @@ class BlockDragController {
         blocks.activity.refreshCanvas();
         if (move) {
             move.to = blocks.dockOf(myBlock);
+            blocks.actionHistory.push(move);
+            blocks.redoActionHistory = [];
         }
 
         if (blocks.activity.turtles.running()) {

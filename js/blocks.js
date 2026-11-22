@@ -8093,6 +8093,23 @@ class Blocks {
                 if (bottom !== null) {
                     this.blockList[bottom].connections.splice(-1, 1, null);
                 }
+                if (parentBlock.name === "action" && filler !== null) {
+                    const name = this.blockList[blk].value;
+                    const restored = this.blockList[filler].value;
+                    const { hasReturn, hasArgs } = this.actionMetadata(parent);
+                    const palette = this.activity.palettes.dict["action"];
+                    const proto = palette.protoList.find(
+                        p => p.name === "nameddo" && p.staticLabels[0] === name
+                    );
+                    if (proto) {
+                        palette.remove(proto, name);
+                    }
+                    delete this.protoBlockDict["myDo_" + name];
+                    this.newNameddoBlock(restored, hasReturn, hasArgs);
+                    this.renameNameddos(name, restored);
+                    this.renameDos(name, restored);
+                    this.activity.palettes.updatePalettes("action");
+                }
                 this.addDefaultBlock(container, blk);
                 this.adjustDocks(this.findTopBlock(parent), true);
             }

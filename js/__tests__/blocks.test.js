@@ -1380,9 +1380,29 @@ describe("Blocks Foundation", () => {
             });
 
             let blocks;
+            // Dock blk onto the dock it was moved to, the way blockMoved does
+            const snap = blk => {
+                const me = blocks.blockList[blk];
+                blocks.blockList.forEach((b, parent) => {
+                    b.docks.forEach(([dx, dy], slot) => {
+                        if (
+                            slot > 0 &&
+                            b !== me &&
+                            b.container.x + dx - me.docks[0][0] === me.container.x &&
+                            b.container.y + dy - me.docks[0][1] === me.container.y
+                        ) {
+                            b.connections[slot] = blk;
+                            me.connections[0] = parent;
+                        }
+                    });
+                });
+            };
+
             beforeEach(() => {
                 blocks = new Blocks(mockActivity);
-                blocks.moveBlock = jest.fn();
+                blocks.moveBlock = jest.fn((blk, x, y) => {
+                    blocks.blockList[blk].container = { x, y };
+                });
                 blocks.blockMoved = jest.fn();
                 blocks.addDefaultBlock = jest.fn();
                 blocks.adjustDocks = jest.fn();
@@ -1574,18 +1594,23 @@ describe("Blocks Foundation", () => {
                     bottom: 1,
                     to: { parent: 2, slot: 1 }
                 });
+                blocks.blockMoved = jest.fn(snap);
 
                 await blocks.redoAction();
 
                 expect(blocks.blockList[0].connections).toEqual([null, null]);
-                expect(blocks.blockList[1].connections[0]).toBeNull();
+                expect(blocks.blockList[2].connections[1]).toBe(1);
+                expect(blocks.blockList[1].connections[0]).toBe(2);
                 expect(blocks.moveBlock).toHaveBeenCalledWith(1, 400, 140);
-                expect(blocks.blockMoved).toHaveBeenCalledWith(1);
             });
 
             it("reconnects a stack restored by undoing its trash", async () => {
                 blocks.blockList = [flow(100, 100, [null, null]), flow(100, 300, [null, null])];
-                blocks.activity._restoreTrashById = jest.fn();
+                blocks.blockList[1].trash = true;
+                blocks.activity._restoreTrashById = jest.fn(blk => {
+                    blocks.blockList[blk].trash = false;
+                });
+                blocks.blockMoved = jest.fn(snap);
                 blocks.actionHistory.push({
                     type: "trash",
                     blockId: 1,
@@ -1595,8 +1620,8 @@ describe("Blocks Foundation", () => {
                 await blocks.undoAction();
 
                 expect(blocks.activity._restoreTrashById).toHaveBeenCalledWith(1);
-                expect(blocks.moveBlock).toHaveBeenCalledWith(1, 100, 140);
-                expect(blocks.blockMoved).toHaveBeenCalledWith(1);
+                expect(blocks.blockList[0].connections[1]).toBe(1);
+                expect(blocks.blockList[1].connections[0]).toBe(0);
             });
 
             it("leaves a stack loose when undoing its trash fails to restore it", async () => {
@@ -1660,8 +1685,7 @@ describe("Blocks Foundation", () => {
                     blk =>
                         new Promise(resolve => {
                             docking.push(() => {
-                                blocks.blockList[2].connections[1] = blk;
-                                blocks.blockList[blk].connections[0] = 2;
+                                snap(blk);
                                 resolve();
                             });
                         })
@@ -1691,7 +1715,59 @@ describe("Blocks Foundation", () => {
                 expect(blocks.blockList[2].connections[1]).toBeNull();
                 docking.shift()();
                 await undo;
+                expect(blocks.blockList[2].connections[1]).toBeNull();
+                expect(blocks.blockList[0].connections[1]).toBe(1);
+                expect(blocks.blockList[1].connections[0]).toBe(0);
                 expect(blocks.redoActionHistory.length).toBe(1);
+            });
+
+            it("renames the callers back when undo restores an action's old name", async () => {
+                const host = {
+                    ...shape(),
+                    name: "action",
+                    trash: false,
+                    container: { x: 0, y: 0 },
+                    docks: [
+                        [0, 0, "unavailable"],
+                        [20, 0, "anyin"]
+                    ],
+                    connections: [null, 1, null, null]
+                };
+                const chorus = { trash: false, value: "chorus", connections: [0] };
+                const verse = { trash: true, value: "verse", connections: [null] };
+                blocks.blockList = [host, chorus, verse];
+                const proto = { name: "nameddo", staticLabels: ["chorus"] };
+                const palette = { protoList: [proto], remove: jest.fn() };
+                blocks.activity.palettes = { dict: { action: palette }, updatePalettes: jest.fn() };
+                blocks.activity._restoreTrashById = jest.fn(blk => {
+                    blocks.blockList[blk].trash = false;
+                });
+                blocks.protoBlockDict["myDo_chorus"] = {};
+                blocks.actionMetadata = jest.fn(() => ({ hasReturn: false, hasArgs: false }));
+                blocks.newNameddoBlock = jest.fn();
+                blocks.renameNameddos = jest.fn();
+                blocks.renameDos = jest.fn();
+                blocks.actionHistory.push({
+                    type: "move",
+                    blockId: 1,
+                    oldX: 300,
+                    oldY: 50,
+                    newX: 20,
+                    newY: 0,
+                    from: { parent: null, slot: null },
+                    bottom: null,
+                    displaced: 2,
+                    to: { parent: 0, slot: 1 }
+                });
+
+                await blocks.undoAction();
+
+                expect(host.connections[1]).toBe(2);
+                expect(blocks.renameNameddos).toHaveBeenCalledWith("chorus", "verse");
+                expect(blocks.renameDos).toHaveBeenCalledWith("chorus", "verse");
+                expect(blocks.newNameddoBlock).toHaveBeenCalledWith("verse", false, false);
+                expect(palette.remove).toHaveBeenCalledWith(proto, "chorus");
+                expect(blocks.protoBlockDict["myDo_chorus"]).toBeUndefined();
             });
         });
 

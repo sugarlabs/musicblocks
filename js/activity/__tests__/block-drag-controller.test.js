@@ -1959,6 +1959,39 @@ describe("BlockDragController", () => {
             ]);
         });
 
+        it("records a drop only once it has finished connecting", async () => {
+            const occupant = makeMovingArg({ value: "verse" });
+            occupant.container = { x: 0, y: 0 };
+            const target = makeArgHost({ occupantIdx: 1 });
+            target.name = "action";
+            const moving = makeMovingArg({ value: "chorus" });
+            moving.container = { x: 0, y: 15, updateCache: jest.fn() };
+
+            const blocks = makeBlocks([target, occupant, moving]);
+            blocks.dragStartX = 200;
+            blocks.dragStartY = 200;
+            blocks.actionHistory = [];
+            blocks.isUndoingOrRedoing = false;
+            let open;
+            const gate = new Promise(resolve => (open = resolve));
+            global.delayExecution.mockImplementation(() => gate);
+
+            try {
+                const drop = blocks.blockMoved(2);
+                await Promise.resolve();
+                expect(blocks.actionHistory).toEqual([]);
+
+                open();
+                await drop;
+                expect(target.connections[1]).toBe(2);
+                expect(blocks.actionHistory).toEqual([
+                    expect.objectContaining({ blockId: 2, to: { parent: 0, slot: 1 } })
+                ]);
+            } finally {
+                global.delayExecution.mockResolvedValue(null);
+            }
+        });
+
         it("preserves redoActionHistory when isUndoingOrRedoing is true", async () => {
             const blockList = [
                 makeFlowBlock({ x: 50, y: 60, docks: [[0, 0, "in"]], connections: [null] })
