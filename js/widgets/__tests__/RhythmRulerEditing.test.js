@@ -215,6 +215,8 @@ describe("RhythmRulerEditing", () => {
                 __toggleRestState: jest.fn(),
                 _calculateZebraStripes: jest.fn(),
                 _refreshCircularView: jest.fn(),
+                _setButtonIcon: jest.fn(),
+                _setPlayAllAccessibleName: jest.fn(),
                 // Records the ruler history as it is when saved.
                 saveDissectHistory: jest.fn(function () {
                     this.savedHistory = JSON.parse(JSON.stringify(this.Rulers[0][1]));
@@ -234,6 +236,13 @@ describe("RhythmRulerEditing", () => {
             expect(widget._playing).toBe(false);
             expect(widget._rulerPlaying).toBe(-1);
             expect(widget._rulers[0].cells).toHaveLength(1);
+            // Undo during playback must restore the Play all button too (#10399).
+            expect(widget._setButtonIcon).toHaveBeenCalledWith(
+                widget._playAllCell,
+                "play-button.svg",
+                "Play all"
+            );
+            expect(widget._setPlayAllAccessibleName).toHaveBeenCalledWith("Play all");
         });
 
         test("puts a dissected cell back together", () => {

@@ -330,6 +330,7 @@ class ModeWidget {
         this._playing = false;
         this._newPattern = null;
         this._notesToPlay = null;
+        this._setPlayButtonIcon("play-button.svg", _("Play all"));
     }
 
     _setPlayButtonIcon(iconName, titleText) {

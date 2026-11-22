@@ -1608,6 +1608,8 @@ describe("ModeWidget", () => {
             expect(widget._playing).toBe(false);
             expect(widget._newPattern).toBeNull();
             expect(widget._notesToPlay).toBeNull();
+            // Changing tuning mid-playback must not leave a stale "Stop" label (#10399).
+            expect(widget._playButton.setAttribute).toHaveBeenCalledWith("aria-label", "Play all");
         });
 
         test("widgetWindow.onclose invokes _clearWidgetTimers and stops synth", () => {
