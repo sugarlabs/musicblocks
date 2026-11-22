@@ -2574,18 +2574,31 @@ function Synth() {
 
                 tempSynth = instruments[turtle][instrumentName];
                 flag = instrumentsSource[instrumentName] ? instrumentsSource[instrumentName][0] : 0;
+            }
 
-                // Wait for the sample buffer to finish decoding so the reloaded
-                // instrument is audible on the first trigger after a Stop.
-                // Tone.js exposes buffer readiness as a boolean `loaded` flag (it
-                // is not a promise), so wait on the global download queue, like
-                // _performNotes() does, when the sample is not ready yet.
-                if (tempSynth && typeof tempSynth.loaded === "boolean" && !tempSynth.loaded) {
-                    try {
-                        await Tone.ToneAudioBuffer.loaded();
-                    } catch (e) {
-                        console.debug("Error waiting for sample to load:", e);
-                    }
+            // Wait for the sample buffer to finish decoding so the sample is
+            // audible on the first trigger. This also covers a URL player that
+            // was registered before its download finished: start() throws while
+            // the buffer is not loaded. Tone.js exposes buffer readiness as a
+            // boolean `loaded` flag (it is not a promise), so wait on the global
+            // download queue, like _performNotes() does, when it is not ready.
+            if (tempSynth && typeof tempSynth.loaded === "boolean" && !tempSynth.loaded) {
+                try {
+                    await Tone.ToneAudioBuffer.loaded();
+                } catch (e) {
+                    console.debug("Error waiting for sample to load:", e);
+                }
+
+                if (this._instrumentEpoch !== epoch) {
+                    return; // Exit gracefully - instruments were disposed
+                }
+
+                // The instrument may have been replaced while we were waiting.
+                if (instruments[turtle][instrumentName] !== tempSynth) {
+                    tempSynth = instruments[turtle][instrumentName];
+                    flag = instrumentsSource[instrumentName]
+                        ? instrumentsSource[instrumentName][0]
+                        : 0;
                 }
             }
 

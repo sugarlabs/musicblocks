@@ -543,7 +543,7 @@ describe("Utility Functions (logic-only)", () => {
             expect(instruments[turtle]["snare drum"].start).toHaveBeenCalled();
         });
 
-        test("should play a drum sample given as a URL and wait for it to load (#10319)", async () => {
+        test("should wait for a URL sample created during trigger to finish loading (#10319)", async () => {
             if (!instruments[turtle]) {
                 instruments[turtle] = {}; // Initialize instruments for the turtle
             }
@@ -556,14 +556,86 @@ describe("Utility Functions (logic-only)", () => {
                     this.loaded = false;
                 }
             };
-            const loadedSpy = jest.spyOn(Tone.ToneAudioBuffer, "loaded");
+            let resolveLoaded;
+            const loadedSpy = jest
+                .spyOn(Tone.ToneAudioBuffer, "loaded")
+                .mockImplementation(() => new Promise(resolve => (resolveLoaded = resolve)));
             try {
-                await trigger(turtle, ["C2"], beatValue, sourceName, null, null, false, 0);
+                const playback = trigger(
+                    turtle,
+                    ["C2"],
+                    beatValue,
+                    sourceName,
+                    null,
+                    null,
+                    false,
+                    0
+                );
+
+                for (let i = 0; i < 100 && loadedSpy.mock.calls.length === 0; i++) {
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
 
                 const player = instruments[turtle][sourceName];
                 expect(loadedSpy).toHaveBeenCalled();
                 expect(player).toBeInstanceOf(Tone.Player);
-                expect(player.start).toHaveBeenCalled();
+                expect(player.start).not.toHaveBeenCalled();
+
+                resolveLoaded();
+                await playback;
+
+                expect(player.start).toHaveBeenCalledTimes(1);
+            } finally {
+                Tone.Player = RealPlayer;
+                loadedSpy.mockRestore();
+            }
+        });
+
+        test("should wait for a URL player registered before trigger to finish loading (#10319)", async () => {
+            if (!instruments[turtle]) {
+                instruments[turtle] = {}; // Initialize instruments for the turtle
+            }
+
+            const sourceName = "https://example.com/noise-before-trigger.wav";
+            const RealPlayer = Tone.Player;
+            Tone.Player = class extends RealPlayer {
+                constructor(sample) {
+                    super(sample);
+                    this.loaded = false;
+                }
+            };
+            let resolveLoaded;
+            const loadedSpy = jest
+                .spyOn(Tone.ToneAudioBuffer, "loaded")
+                .mockImplementation(() => new Promise(resolve => (resolveLoaded = resolve)));
+            try {
+                // The player is registered while its download is still pending.
+                await loadSynth(turtle, sourceName);
+                const player = instruments[turtle][sourceName];
+                expect(player).toBeInstanceOf(Tone.Player);
+
+                const playback = trigger(
+                    turtle,
+                    ["C2"],
+                    beatValue,
+                    sourceName,
+                    null,
+                    null,
+                    false,
+                    0
+                );
+
+                for (let i = 0; i < 100 && loadedSpy.mock.calls.length === 0; i++) {
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+
+                expect(loadedSpy).toHaveBeenCalled();
+                expect(player.start).not.toHaveBeenCalled();
+
+                resolveLoaded();
+                await playback;
+
+                expect(player.start).toHaveBeenCalledTimes(1);
             } finally {
                 Tone.Player = RealPlayer;
                 loadedSpy.mockRestore();
