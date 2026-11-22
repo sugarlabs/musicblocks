@@ -494,6 +494,11 @@ const _effectsInFlight = new WeakMap();
 // The output each synth should play into, as last set by routeInstrument().
 const _routedOutput = new WeakMap();
 
+// Resolves true once a URL sample's own buffer has loaded, false if it failed.
+// Waiting on this instead of Tone's global download queue means an unrelated
+// failing or stalled download cannot drop or delay this sample.
+const _sampleReady = new WeakMap();
+
 /**
  * Object containing effects associated with instruments in the timbre widget.
  * @type {Object.<number, Object>}
@@ -1900,12 +1905,18 @@ function Synth() {
             if (sourceName.length >= 4) {
                 // A sample given as a URL is played as a drum, i.e. by calling
                 // start(). Tone.Player takes the URL directly, while Tone.Sampler
-                // expects a note-to-URL map and has no start().
-                if (sourceName.slice(0, 4) === "http") {
-                    instruments[turtle][sourceName] = new Tone.Player(sourceName).toDestination();
-                    instrumentsSource[instrumentName] = [1, "drum"];
-                } else if (sourceName.slice(0, 4) === "file") {
-                    instruments[turtle][sourceName] = new Tone.Player(sourceName).toDestination();
+                // expects a note-to-URL map and has no start(). Keep the player's
+                // own load promise so playback waits for this sample only.
+                if (sourceName.slice(0, 4) === "http" || sourceName.slice(0, 4) === "file") {
+                    let markReady;
+                    const ready = new Promise(resolve => (markReady = resolve));
+                    const player = new Tone.Player({
+                        url: sourceName,
+                        onload: () => markReady(true),
+                        onerror: () => markReady(false)
+                    }).toDestination();
+                    _sampleReady.set(player, ready);
+                    instruments[turtle][sourceName] = player;
                     instrumentsSource[instrumentName] = [1, "drum"];
                 } else if (sourceName === "drum") {
                     instruments[turtle][sourceName] = this._createSampleSynth(
@@ -2579,14 +2590,25 @@ function Synth() {
             // Wait for the sample buffer to finish decoding so the sample is
             // audible on the first trigger. This also covers a URL player that
             // was registered before its download finished: start() throws while
-            // the buffer is not loaded. Tone.js exposes buffer readiness as a
-            // boolean `loaded` flag (it is not a promise), so wait on the global
-            // download queue, like _performNotes() does, when it is not ready.
+            // the buffer is not loaded. A URL sample waits on its own load
+            // promise, so an unrelated failing or stalled download cannot break
+            // it; other samples fall back to Tone's download queue.
             if (tempSynth && typeof tempSynth.loaded === "boolean" && !tempSynth.loaded) {
-                try {
-                    await Tone.ToneAudioBuffer.loaded();
-                } catch (e) {
-                    console.debug("Error waiting for sample to load:", e);
+                let ready = true;
+                const ownReady = _sampleReady.get(tempSynth);
+                if (ownReady) {
+                    ready = await ownReady;
+                } else {
+                    try {
+                        await Tone.ToneAudioBuffer.loaded();
+                    } catch (e) {
+                        console.debug("Error waiting for sample to load:", e);
+                    }
+                }
+
+                if (!ready) {
+                    // This sample's own download failed; do not start an empty buffer.
+                    return;
                 }
 
                 if (this._instrumentEpoch !== epoch) {
