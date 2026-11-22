@@ -1021,10 +1021,17 @@ var nthDegreeToPitch = (keySignature, scaleDegree, edo) => {
     return [scale[index], octaveOffset];
 };
 
+// Largest interval getInterval will sum: 1000 scale steps, already ~140
+// octaves, so anything larger saturates at the 1000-step sum.
+const MAX_INTERVAL_STEPS = 1000;
+
 /**
  * Get the relative interval (steps within the current key and mode) based on the
  * position (pitch) in the scale. The step sum is computed in closed form, so
  * its cost does not grow with the interval; a non-finite interval returns 0.
+ * Intervals are capped at 1000 steps — 1000 scale steps is already ~140
+ * octaves, so anything larger has no musical meaning and is saturated
+ * at the 1000-step sum instead of returning an absurd semitone offset.
  * @function
  * @param {number} interval - The interval value.
  * @param {string} keySignature - The key signature.
@@ -1202,10 +1209,13 @@ var getInterval = (interval, keySignature, pitch, edo) => {
     // all for an infinite one, which block arithmetic can produce (for
     // example a division by zero feeding a scalar chord or arpeggio).
     // A non-finite interval sums to 0, as a NaN interval already did.
-    const stepCount = Math.ceil(Math.abs(Number(interval)));
-    if (!Number.isFinite(stepCount) || stepCount === 0) {
+    // Intervals above 1000 steps saturate at the 1000-step sum: no real
+    // music uses more, and block arithmetic can produce far larger values.
+    const rawStepCount = Math.ceil(Math.abs(Number(interval)));
+    if (!Number.isFinite(rawStepCount) || rawStepCount === 0) {
         return 0;
     }
+    const stepCount = Math.min(rawStepCount, MAX_INTERVAL_STEPS);
 
     const scaleLength = halfSteps.length;
     const cycleTotal = halfSteps.reduce((total, step) => total + step, 0);

@@ -1536,31 +1536,33 @@ describe("getInterval", () => {
         const cases = [
             [100, "C major", "C", 172],
             [1000, "C major", "C", 1715],
-            [10000, "C major", "C", 17143],
-            [100000, "C major", "C", 171429],
-            [1000000, "C major", "C", 1714286],
-            [-1000000, "C major", "C", -1714285],
-            [10000000, "C major", "C", 17142857],
-            [-10000000, "C major", "C", -17142857],
-            [100000000, "C major", "C", 171428572],
-            [-100000000, "C major", "C", -171428571],
-            [1000000000, "C major", "C", 1714285715],
-            [-1000000000, "C major", "C", -1714285714],
-            [1000000000000, "C major", "C", 1714285714286],
-            [-1000000000000, "C major", "C", -1714285714285],
-            [1000000, "C major", "E", 1714285],
-            [-1000000, "C major", "E", -1714286],
-            [1000000, "G major", "D", 1714286],
-            [-999999, "G major", "D", -1714284],
-            [100000, "D minor", "A", 171428],
-            [-100000, "D minor", "A", -171429]
+            [-1000, "C major", "C", -1714]
         ];
         for (const [interval, keySignature, pitch, expected] of cases) {
             expect(getInterval(interval, keySignature, pitch)).toBe(expected);
         }
-        expect(getInterval(1000000, "C major", "C", 19)).toBe(2714286);
-        expect(getInterval(-1000000, "C major", "C", 19)).toBe(-2714285);
-        expect(getInterval(123456789, "F major", "A", 31)).toBe(546737207);
+    });
+
+    it("saturates intervals above 1000 steps at the 1000-step sum", () => {
+        const cases = [
+            ["C major", "C", undefined],
+            ["C major", "E", undefined],
+            ["G major", "D", undefined],
+            ["D minor", "A", undefined],
+            ["C major", "C", 19],
+            ["F major", "A", 31]
+        ];
+        for (const [keySignature, pitch, edo] of cases) {
+            const up = getInterval(1000, keySignature, pitch, edo);
+            const down = getInterval(-1000, keySignature, pitch, edo);
+            for (const interval of [1001, 10000, 100000, 1000000, 1000000000]) {
+                expect(getInterval(interval, keySignature, pitch, edo)).toBe(up);
+                expect(getInterval(-interval, keySignature, pitch, edo)).toBe(down);
+            }
+        }
+        // Pinned: a trillion-step interval in C major saturates at the 1000-step sum.
+        expect(getInterval(1000000000000, "C major", "C")).toBe(1715);
+        expect(getInterval(-1000000000000, "C major", "C")).toBe(-1714);
     });
 
     it("returns 0 for non-finite intervals instead of never returning", () => {
@@ -1592,8 +1594,8 @@ describe("getInterval", () => {
 
     it("answers a billion-step interval in well under a second", () => {
         const start = Date.now();
-        expect(getInterval(1000000000, "C major", "C")).toBe(1714285715);
-        expect(getInterval(-1000000000, "C major", "C")).toBe(-1714285714);
+        expect(getInterval(1000000000, "C major", "C")).toBe(1715);
+        expect(getInterval(-1000000000, "C major", "C")).toBe(-1714);
         expect(Date.now() - start).toBeLessThan(1000);
     });
 
@@ -1610,7 +1612,7 @@ describe("getInterval", () => {
         for (let n = 0; n < 2000; n++) {
             total += getInterval(100000, "C major", "C");
         }
-        expect(total).toBe(342858000);
+        expect(total).toBe(3430000);
         expect(Date.now() - start).toBeLessThan(1000);
     });
 });
