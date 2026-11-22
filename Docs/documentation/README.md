@@ -341,6 +341,7 @@ For further details on how to use these toolbars effectively, you can refer to t
 | `Ctrl + Y` or `Ctrl + Shift + Z` | `Control + Y` or `Control + Shift + Z` | Redo the last undone block action. |
 | `Shift + Space`           | `Shift + Space`            | Toggle the zoom level of the stage.                    |
 | `ESC`                     | `ESC`                     | Hide the block search bar when the search input is focused. |
+| `Shift + Enter` or `Shift + Space` | `Shift + Return` or `Shift + Space` | Collapse or expand the focused block, when a collapsible block (such as Start, Action or Note) has keyboard focus. `Enter` or `Space` on its own still activates the block. |
 
 ### 2. Navigation Shortcuts
 
