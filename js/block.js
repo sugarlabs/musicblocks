@@ -5526,19 +5526,21 @@ class Block {
             (this.protoblock && this.protoblock.staticLabels && this.protoblock.staticLabels[0]) ||
             this.name ||
             "block";
-        // A file block holds [filename, dataURL]: describe it by its filename, never its payload.
-        const value = Array.isArray(this.value) ? this.value[0] : this.value;
         // A start block carries its turtle number, which means nothing to a listener.
         if (this.name === "start") {
             return `${name} block`;
         }
-        if (
-            value !== null &&
-            value !== undefined &&
-            value !== "" &&
-            !(typeof value === "string" && value.startsWith("data:"))
-        ) {
-            return `${name}, value: ${value}`;
+        // A block can hold a list of values, such as a file's [filename, dataURL] or a sample's
+        // [name, dataURL, pitch, octave]. Announce every part except empty ones and data URLs.
+        const parts = (Array.isArray(this.value) ? this.value : [this.value]).filter(
+            part =>
+                part !== null &&
+                part !== undefined &&
+                part !== "" &&
+                !(typeof part === "string" && part.startsWith("data:"))
+        );
+        if (parts.length > 0) {
+            return `${name}, value: ${parts.join(", ")}`;
         }
         return `${name} block`;
     }

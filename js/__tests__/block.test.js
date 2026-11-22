@@ -3233,6 +3233,26 @@ describe("Block Foundation", () => {
             block.value = "data:audio/wav;base64,AAAA";
             el.dispatchEvent(new FocusEvent("focus"));
             expect(el.getAttribute("aria-label")).toBe("forward block");
+
+            block.value = [];
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward block");
+        });
+
+        it("announces a sample block's pitch and octave along with its name", () => {
+            block.value = ["kick", "data:audio/wav;base64,AAAA", "do", 4];
+            const el = block._setupAccessibleElement();
+            expect(el.getAttribute("aria-label")).toBe("forward, value: kick, do, 4");
+
+            // The same sample at another octave is announced differently.
+            block.value = ["kick", "data:audio/wav;base64,AAAA", "do", 5];
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward, value: kick, do, 5");
+
+            // A sample with no name yet still announces its pitch, and never the payload.
+            block.value = ["", "", "do", 4];
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward, value: do, 4");
         });
 
         it("does not announce the turtle number held by a start block", () => {
