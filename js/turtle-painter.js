@@ -1111,21 +1111,57 @@ class Painter {
     /**
      * Sets control point 1 for bezier curve.
      *
-     * @param {List} [x coordinate, y coordinate]
+     * @param {Array|number} vector - [x coordinate, y coordinate] or x coordinate
+     * @param {number} [optY] - y coordinate if vector is a number
      */
-    setControlPoint1(vector) {
-        this.cp1x = vector[0];
-        this.cp1y = vector[1];
+    setControlPoint1(vector, optY) {
+        let rawX, rawY;
+        if (Array.isArray(vector)) {
+            rawX = vector[0];
+            rawY = vector[1];
+        } else {
+            rawX = vector;
+            rawY = optY;
+        }
+        if (
+            rawX === null ||
+            rawY === null ||
+            !Number.isFinite(Number(rawX)) ||
+            !Number.isFinite(Number(rawY))
+        ) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+        this.cp1x = Number(rawX);
+        this.cp1y = Number(rawY);
     }
 
     /**
      * Sets control point 2 for bezier curve.
      *
-     * @param {List} [x coordinate, y coordinate]
+     * @param {Array|number} vector - [x coordinate, y coordinate] or x coordinate
+     * @param {number} [optY] - y coordinate if vector is a number
      */
-    setControlPoint2(vector) {
-        this.cp2x = vector[0];
-        this.cp2y = vector[1];
+    setControlPoint2(vector, optY) {
+        let rawX, rawY;
+        if (Array.isArray(vector)) {
+            rawX = vector[0];
+            rawY = vector[1];
+        } else {
+            rawX = vector;
+            rawY = optY;
+        }
+        if (
+            rawX === null ||
+            rawY === null ||
+            !Number.isFinite(Number(rawX)) ||
+            !Number.isFinite(Number(rawY))
+        ) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+        this.cp2x = Number(rawX);
+        this.cp2y = Number(rawY);
     }
 
     /**
@@ -1135,10 +1171,27 @@ class Painter {
      * @param y2 - the y-coordinate of the ending point
      */
     doBezier(x2, y2) {
-        const cp1x = this.cp1x;
-        const cp1y = this.cp1y;
-        const cp2x = this.cp2x;
-        const cp2y = this.cp2y;
+        const cp1x = Number(this.cp1x);
+        const cp1y = Number(this.cp1y);
+        const cp2x = Number(this.cp2x);
+        const cp2y = Number(this.cp2y);
+
+        if (
+            x2 === null ||
+            y2 === null ||
+            !Number.isFinite(Number(x2)) ||
+            !Number.isFinite(Number(y2)) ||
+            !Number.isFinite(cp1x) ||
+            !Number.isFinite(cp1y) ||
+            !Number.isFinite(cp2x) ||
+            !Number.isFinite(cp2y)
+        ) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+
+        x2 = Number(x2);
+        y2 = Number(y2);
 
         let fx, fy;
         let ax, ay, bx, by, cx, cy, dx, dy;
@@ -1510,6 +1563,18 @@ class Painter {
      * @param dy - change in y coordinate
      */
     doScrollXY(dx, dy) {
+        if (
+            dx === null ||
+            dy === null ||
+            !Number.isFinite(Number(dx)) ||
+            !Number.isFinite(Number(dy))
+        ) {
+            this.turtles.activity.errorMsg(NANERRORMSG);
+            return;
+        }
+        dx = Number(dx);
+        dy = Number(dy);
+
         // Scroll canvas uses SCROLL_CANVAS_SCALE multiplier for buffer sizing
 
         const imgData = this.turtle.ctx.getImageData(

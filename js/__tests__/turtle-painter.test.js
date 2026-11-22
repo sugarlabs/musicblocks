@@ -1069,6 +1069,53 @@ describe("Bezier control points", () => {
         expect(painter.cp2x).toBe(200);
         expect(painter.cp2y).toBe(150);
     });
+
+    test("setControlPoint1 should accept dual arguments (x, y)", () => {
+        painter.setControlPoint1(120, 140);
+        expect(painter.cp1x).toBe(120);
+        expect(painter.cp1y).toBe(140);
+    });
+
+    test("setControlPoint2 should accept dual arguments (x, y)", () => {
+        painter.setControlPoint2(220, 240);
+        expect(painter.cp2x).toBe(220);
+        expect(painter.cp2y).toBe(240);
+    });
+
+    test("setControlPoint1 and setControlPoint2 reject non-finite inputs and retain points", () => {
+        painter.setControlPoint1([10, 20]);
+        painter.setControlPoint2([30, 40]);
+        mockTurtle.turtles.activity.errorMsg.mockClear();
+
+        painter.setControlPoint1([NaN, 50]);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.cp1x).toBe(10);
+        expect(painter.cp1y).toBe(20);
+
+        mockTurtle.turtles.activity.errorMsg.mockClear();
+        painter.setControlPoint1(50, NaN);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.cp1x).toBe(10);
+        expect(painter.cp1y).toBe(20);
+
+        mockTurtle.turtles.activity.errorMsg.mockClear();
+        painter.setControlPoint1([null, 50]);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.cp1x).toBe(10);
+        expect(painter.cp1y).toBe(20);
+
+        mockTurtle.turtles.activity.errorMsg.mockClear();
+        painter.setControlPoint2([50, Infinity]);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.cp2x).toBe(30);
+        expect(painter.cp2y).toBe(40);
+
+        mockTurtle.turtles.activity.errorMsg.mockClear();
+        painter.setControlPoint2(undefined, 50);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.cp2x).toBe(30);
+        expect(painter.cp2y).toBe(40);
+    });
 });
 
 describe("Font setting", () => {
@@ -1402,6 +1449,47 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
         expect(painter.svgOutput).toBe("");
     });
 
+    test("doBezier rejects non-finite destination coordinates and preserves turtle position", () => {
+        painter.turtle.x = 25;
+        painter.turtle.y = 35;
+        mockTurtle.turtles.activity.errorMsg.mockClear();
+
+        painter.doBezier(NaN, 50);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.turtle.x).toBe(25);
+        expect(painter.turtle.y).toBe(35);
+
+        mockTurtle.turtles.activity.errorMsg.mockClear();
+        painter.doBezier(50, NaN);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.turtle.x).toBe(25);
+        expect(painter.turtle.y).toBe(35);
+
+        mockTurtle.turtles.activity.errorMsg.mockClear();
+        painter.doBezier(Infinity, 50);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.turtle.x).toBe(25);
+        expect(painter.turtle.y).toBe(35);
+
+        mockTurtle.turtles.activity.errorMsg.mockClear();
+        painter.doBezier(null, 50);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.turtle.x).toBe(25);
+        expect(painter.turtle.y).toBe(35);
+    });
+
+    test("doBezier rejects non-finite control points and preserves turtle position", () => {
+        painter.turtle.x = 10;
+        painter.turtle.y = 15;
+        painter.cp1x = NaN;
+        mockTurtle.turtles.activity.errorMsg.mockClear();
+
+        painter.doBezier(100, 100);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.turtle.x).toBe(10);
+        expect(painter.turtle.y).toBe(15);
+    });
+
     test("doClearMedia should return early if no media", () => {
         painter.turtle.media = [];
         painter.doClearMedia();
@@ -1517,6 +1605,35 @@ describe("doBezier, doClearMedia, doClear and doScrollXY", () => {
         expect(HTMLCanvasElement.prototype.getContext).toHaveBeenCalledWith("2d", {
             willReadFrequently: true
         });
+    });
+
+    test("doScrollXY rejects non-finite inputs and avoids mutating scroll offsets", () => {
+        painter.turtles.gx = 400;
+        painter.turtles.gy = 300;
+        mockTurtle.turtles.activity.errorMsg.mockClear();
+
+        painter.doScrollXY(NaN, 10);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.turtles.gx).toBe(400);
+        expect(painter.turtles.gy).toBe(300);
+
+        mockTurtle.turtles.activity.errorMsg.mockClear();
+        painter.doScrollXY(10, NaN);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.turtles.gx).toBe(400);
+        expect(painter.turtles.gy).toBe(300);
+
+        mockTurtle.turtles.activity.errorMsg.mockClear();
+        painter.doScrollXY(Infinity, 10);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.turtles.gx).toBe(400);
+        expect(painter.turtles.gy).toBe(300);
+
+        mockTurtle.turtles.activity.errorMsg.mockClear();
+        painter.doScrollXY(null, 10);
+        expect(mockTurtle.turtles.activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG);
+        expect(painter.turtles.gx).toBe(400);
+        expect(painter.turtles.gy).toBe(300);
     });
 });
 
