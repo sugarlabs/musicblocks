@@ -1197,6 +1197,10 @@ class ChordBuilderWidget {
 
         table.appendChild(tbody);
         this.barGridContainer.appendChild(table);
+
+        if (this.activeStep >= 0) {
+            this._highlightActiveStep(this.activeStep);
+        }
     }
 
     /**

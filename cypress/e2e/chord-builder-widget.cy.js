@@ -279,14 +279,14 @@ describe("Chord Builder widget", () => {
             .find('.bar-grid-cell[data-cell-index="0"] button.bar-grid-remove-btn')
             .click({ force: true });
 
-        // The remaining chord (V - G) shifts to index 0
+        // Cell 0 is now empty ('+'), preserving the grid metric alignment
+        chordBuilderFrame().find('.bar-grid-cell[data-cell-index="0"]').should("contain.text", "+");
+
+        // The remaining chord (V - G) remains at index 1 without shifting
         chordBuilderFrame()
-            .find('.bar-grid-cell[data-cell-index="0"]')
+            .find('.bar-grid-cell[data-cell-index="1"]')
             .should("contain.text", "V")
             .and("contain.text", "G");
-
-        // Cell 1 is now empty ('+')
-        chordBuilderFrame().find('.bar-grid-cell[data-cell-index="1"]').should("contain.text", "+");
     });
 
     // -- Test 6: Inline cell chord picker on empty cells ---------------------

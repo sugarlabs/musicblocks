@@ -376,9 +376,20 @@ describe("ChordBuilderWidget", () => {
             widget.playProgression();
             expect(mockAudio.playProgression).toHaveBeenCalled();
 
+            const stopCountBefore = mockAudio.stop.mock.calls.length;
             widget.setKeyAndMode("G", "major");
-            expect(mockAudio.stop).toHaveBeenCalled();
+            expect(mockAudio.stop.mock.calls.length).toBe(stopCountBefore + 1);
             expect(widget.progression).toHaveLength(0);
+        });
+
+        it("restores playhead highlight when grid is re-rendered during playback", () => {
+            widget.progression = [{ roman: "I", name: "C" }, null, { roman: "V", name: "G" }];
+            widget.activeStep = 1;
+            widget._renderBarGrid();
+
+            const cells = widget.barGridContainer.querySelectorAll(".bar-grid-cell");
+            expect(cells[1].style.background).toBe("rgba(255, 215, 0, 0.35)");
+            expect(cells[0].style.background).toBe("rgb(238, 244, 253)");
         });
 
         it("stops playback when _stopPlayback is called", () => {
