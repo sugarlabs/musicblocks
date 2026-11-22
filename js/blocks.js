@@ -5605,15 +5605,19 @@ class Blocks {
          * @param - blockObj - Block Objects
          * @public
          * @returns {number} this request's load token
-         * @throws {TypeError} if blockObjs is not a list
          */
         this.loadNewBlocks = blockObjs => {
-            // Anything else has no blocks to finish on, so the load would never end.
-            if (!Array.isArray(blockObjs)) {
-                throw new TypeError("loadNewBlocks expects a list of blocks.");
-            }
-
             const loadToken = ++this._nextLoadToken;
+
+            // Invalid input is reported by _loadNewBlocksNow when idle. Do not
+            // queue it behind a valid load: it cannot complete normally and
+            // must not interfere with the active load's bookkeeping.
+            if (!Array.isArray(blockObjs) && this._loadInProgress) {
+                if (typeof this.activity?.errorMsg === "function") {
+                    this.activity.errorMsg(_("Cannot load project: invalid project structure."));
+                }
+                return loadToken;
+            }
 
             if (this._loadInProgress) {
                 this._loadQueue.push({ blockObjs, loadToken });
