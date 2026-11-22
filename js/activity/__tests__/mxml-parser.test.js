@@ -56,6 +56,21 @@ async function parseAndCapture(xml) {
 
 const blockName = block => (Array.isArray(block[1]) ? block[1][0] : block[1]);
 
+test.each([
+    ["abc-parser.js", "mxml-parser.js"],
+    ["mxml-parser.js", "abc-parser.js"]
+])("keeps ABC and MusicXML key helpers separate when loading %s then %s", (first, second) => {
+    const vm = require("vm");
+    const context = vm.createContext({});
+    for (const filename of [first, second]) {
+        vm.runInContext(fs.readFileSync(path.join(__dirname, "..", filename), "utf8"), context);
+    }
+    expect(vm.runInContext("_createKeyBlocks.length", context)).toBe(4);
+    expect(
+        vm.runInContext("_createMxmlKeyBlocks(1, {root: 'G', mode: 'major'}, 0).length", context)
+    ).toBe(3);
+});
+
 test("imports an in-score key change before the next note", async () => {
     const xml = `<score-partwise version="3.1"><part-list><score-part id="P1"><part-name>Piano</part-name></score-part></part-list><part id="P1"><measure number="1"><attributes><divisions>1</divisions><key><fifths>0</fifths></key></attributes><note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration><type>whole</type></note></measure><measure number="2"><attributes><key><fifths>1</fifths></key></attributes><note><pitch><step>F</step><alter>1</alter><octave>4</octave></pitch><duration>4</duration><type>whole</type></note></measure></part></score-partwise>`;
     const { blocks } = await parseAndCapture(xml);
@@ -64,6 +79,20 @@ test("imports an in-score key change before the next note", async () => {
     const key = keys[1];
     expect(blocks[key[4][1]][1][1].value).toBe("G");
     expect(blockName(blocks[key[4][3]])).toBe("newnote");
+    expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    expect(findPositionMismatches(blocks)).toEqual([]);
+});
+
+test.each([
+    ["no key", "<divisions>1</divisions>"],
+    ["blank fifths", "<key><fifths> </fifths></key>"],
+    ["unmapped fifths", "<key><fifths>99</fifths></key>"]
+])("keeps the current key after attributes with %s", async (_, attributes) => {
+    const xml = `<score-partwise><part id="P1"><measure number="1"><attributes><divisions>1</divisions><key><fifths>1</fifths></key></attributes><note><pitch><step>G</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note></measure><measure number="2"><attributes>${attributes}</attributes><note><pitch><step>D</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note></measure></part></score-partwise>`;
+    const { blocks } = await parseAndCapture(xml);
+    const keys = blocks.filter(block => blockName(block) === "setkey2");
+    expect(keys).toHaveLength(1);
+    expect(blocks[keys[0][4][1]][1][1].value).toBe("G");
     expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     expect(findPositionMismatches(blocks)).toEqual([]);
 });

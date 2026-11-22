@@ -602,7 +602,7 @@ function _readKeySignature(keyEl) {
     return { root, mode };
 }
 
-function _createKeyBlocks(id, key, prevId, nextId = id + 3) {
+function _createMxmlKeyBlocks(id, key, prevId, nextId = id + 3) {
     return [
         [id, "setkey2", 0, 0, [prevId, id + 1, id + 2, nextId]],
         [id + 1, ["notename", { value: key.root }], 0, 0, [id]],
@@ -1081,7 +1081,7 @@ function _applyRepeats(
                 let clonePrevId = previousEnd[0];
                 let resetTempoBlocks = [];
                 const resetKeyBlocks = needsKeyReset
-                    ? _createKeyBlocks(blockId, startKey, clonePrevId)
+                    ? _createMxmlKeyBlocks(blockId, startKey, clonePrevId)
                     : [];
                 blockId += resetKeyBlocks.length;
                 if (needsKeyReset) {
@@ -1123,7 +1123,7 @@ function _applyRepeats(
             }
             const nextKey = noteKeys[endIndex + 1];
             if (nextKey && needsKeyReset) {
-                const restore = _createKeyBlocks(blockId, nextKey, previousEnd[0], nextFlowId);
+                const restore = _createMxmlKeyBlocks(blockId, nextKey, previousEnd[0], nextFlowId);
                 blockId += restore.length;
                 previousEnd[4][1] = restore[0][0];
                 byId.get(nextFlowId)[4][0] = restore[0][0];
@@ -1157,7 +1157,12 @@ function _applyRepeats(
 
         if (needsKeyReset)
             repeatBlocks.push(
-                ..._createKeyBlocks(resetKeyId, startKey, repeatId, resetTempoId ?? startNote[0])
+                ..._createMxmlKeyBlocks(
+                    resetKeyId,
+                    startKey,
+                    repeatId,
+                    resetTempoId ?? startNote[0]
+                )
             );
 
         if (resetTempoId !== null) {
@@ -1286,7 +1291,7 @@ function _processPart(
         let previousVolumeBlock = null;
         let keyBlock = null;
         if (pendingKey !== null) {
-            const keyBlocks = _createKeyBlocks(blockId, pendingKey, prevId);
+            const keyBlocks = _createMxmlKeyBlocks(blockId, pendingKey, prevId);
             keyBlock = keyBlocks[0];
             noteBlocks.push(...keyBlocks);
             prevId = blockId;
