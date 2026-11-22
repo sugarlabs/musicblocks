@@ -399,6 +399,7 @@ msgstr ""
 #: js/widgets/rhythmruler.js:2713
 #: js/widgets/musickeyboard.js:3344
 #: js/logoconstants.js:42
+#: js/logoconstants.js:42
 msgid "Not a valid pitch name"
 msgstr "ایک درست پچ نام نہیں"
 
@@ -414,10 +415,11 @@ msgstr ""
 #: js/piemenu-block-context.js:118
 #: js/palette.js:1673
 #: js/palette.js:1677
+#: js/gitDropdown.js:950
 #: js/widgets/TemperamentUI.js:491
 #: js/widgets/TemperamentUI.js:492
 #: js/widgets/widgetWindows.js:547
-#: planet/js/StringHelper.js:76
+#: planet/js/StringHelper.js:80
 msgid "Close"
 msgstr "بند کریں"
 
@@ -449,6 +451,7 @@ msgstr ""
 #: planet/js/Planet.js:225
 #: planet/js/StringHelper.js:42
 #: planet/js/StringHelper.js:49
+#: planet/js/StringHelper.js:53
 msgid "Cancel"
 msgstr "منسوخ کریں۔"
 
@@ -596,16 +599,16 @@ msgstr "میوزک بلاکس پہلے ہی اس زبان پر سیٹ ہے."
 #: js/palette.js:2064
 #: js/block.js:1788
 #: js/block.js:5387
+#: js/turtledefs.js:132
+#: js/turtledefs.js:230
 #: js/blocks.js:1749
 #: js/blocks.js:3806
 #: js/blocks.js:3807
 #: js/blocks.js:3980
 #: js/blocks.js:4379
 #: js/blocks.js:4564
-#: js/blocks.js:6058
-#: js/blocks.js:7609
-#: js/turtledefs.js:132
-#: js/turtledefs.js:230
+#: js/blocks.js:6062
+#: js/blocks.js:7613
 #: js/blocks/ActionBlocks.js:252
 #: js/blocks/ActionBlocks.js:329
 #: js/blocks/ActionBlocks.js:640
@@ -639,9 +642,9 @@ msgstr "بتھ"
 #: js/turtles.js:116
 #: js/lilypond.js:957
 #: js/block.js:1802
-#: js/logo.js:2057
 #: js/turtle-painter.js:1427
 #: js/turtle-painter.js:1428
+#: js/logo.js:2057
 #: js/blocks/ActionBlocks.js:1253
 #: js/blocks/ProgramBlocks.js:1420
 msgid "start"
@@ -912,10 +915,10 @@ msgstr ""
 #: js/project-manager.js:747
 #: js/project-manager.js:860
 #: js/project-manager.js:1364
-#: planet/js/GlobalPlanet.js:564
-#: planet/js/GlobalPlanet.js:566
-#: planet/js/GlobalPlanet.js:703
 #: planet/js/ProjectStorage.js:26
+#: planet/js/GlobalPlanet.js:600
+#: planet/js/GlobalPlanet.js:602
+#: planet/js/GlobalPlanet.js:739
 msgid "My Project"
 msgstr "میرا پروجیکٹ"
 
@@ -1009,9 +1012,9 @@ msgstr "ہائی کنٹراسٹ موڈ"
 #: js/toolbar-ui.js:159
 #: js/toolbar-ui.js:239
 #: js/turtledefs.js:619
-#: planet/js/LocalCard.js:79
 #: planet/js/GlobalCard.js:66
-#: planet/js/StringHelper.js:78
+#: planet/js/LocalCard.js:79
+#: planet/js/StringHelper.js:82
 msgid "Merge with current project"
 msgstr "موجودہ منصوبے کے ساتھ ضم کریں"
 
@@ -1261,7 +1264,7 @@ msgstr "پیلیٹ ٹوگل کریں۔"
 #: js/blocks.js:4148
 #: js/blocks.js:4203
 #: js/blocks.js:4249
-#: js/blocks.js:7635
+#: js/blocks.js:7639
 #: js/blocks/BoxesBlocks.js:289
 #: js/blocks/BoxesBlocks.js:292
 #: js/blocks/BoxesBlocks.js:412
@@ -1867,122 +1870,6 @@ msgstr "آکٹیو ویلیو 1 اور 8 کے درمیان ہونی چاہئے۔
 msgid "Numbers can have at most 10 digits."
 msgstr "تعداد میں زیادہ سے زیادہ 10 ہندسے ہوسکتے ہیں۔"
 
-#: js/blocks.js:2462
-#: js/blocks.js:2466
-#: js/blocks.js:2472
-#: js/blocks.js:2474
-msgid "audio file"
-msgstr "آڈیو فائل"
-
-#: js/blocks.js:3764
-#: js/blocks.js:4169
-#: js/blocks.js:4215
-#: js/blocks.js:4261
-#: js/blocks.js:6823
-#: js/blocks.js:6847
-#: js/blocks/BoxesBlocks.js:783
-msgid "box1"
-msgstr "باکس 1"
-
-#: js/blocks.js:3766
-#: js/blocks.js:4171
-#: js/blocks.js:4217
-#: js/blocks.js:4263
-#: js/blocks.js:6825
-#: js/blocks.js:6849
-#: js/blocks/BoxesBlocks.js:674
-msgid "box2"
-msgstr "باکس 2"
-
-#: js/blocks.js:4421
-#: js/blocks/MediaBlocks.js:827
-#: js/blocks/BoxesBlocks.js:606
-#: js/blocks/DictBlocks.js:215
-#: js/blocks/DictBlocks.js:289
-#: js/blocks/EnsembleBlocks.js:441
-#: js/blocks/EnsembleBlocks.js:458
-#: js/blocks/PitchBlocks.js:731
-#: js/blocks/PitchBlocks.js:1084
-#: js/blocks/PitchBlocks.js:2038
-#: js/blocks/ProgramBlocks.js:412
-#: js/blocks/ProgramBlocks.js:539
-#: js/blocks/ProgramBlocks.js:724
-#: js/blocks/ToneBlocks.js:1082
-msgid "name"
-msgstr "نام"
-
-#: js/blocks.js:4421
-#: js/blocks/BoxesBlocks.js:75
-#: js/blocks/BoxesBlocks.js:606
-#: js/blocks/DictBlocks.js:289
-#: js/blocks/DictBlocks.js:430
-#: js/blocks/NumberBlocks.js:973
-#: js/blocks/HeapBlocks.js:573
-#: js/blocks/RhythmBlocks.js:1164
-msgid "value"
-msgstr "قدر"
-
-#: js/blocks.js:4760
-msgid "Forever loop detected inside a note value block. Unexpected things may happen."
-msgstr "نوٹ ویلیو بلاک کے اندر ہمیشہ لوپ کا پتہ چلا۔ غیر متوقع چیزیں ہوسکتی ہیں۔"
-
-#: js/blocks.js:5319
-msgid "There is no block selected."
-msgstr "کوئی بلاک منتخب نہیں ہوا ہے۔"
-
-#: js/blocks.js:5429
-#: js/blocks/MediaBlocks.js:884
-#.TRANS: Avatar is the image used to determine the appearance of the mouse.
-msgid "avatar"
-msgstr "اوتار"
-
-#: js/blocks.js:5432
-#: js/blocks/ToneBlocks.js:1067
-#: js/widgets/SamplerCanvas.js:169
-#.TRANS: The sound sample that the user uploads.
-msgid "sample"
-msgstr "نمونہ"
-
-#: js/blocks.js:5733
-#: js/project-manager.js:1940
-msgid "Something went wrong reading JSON-encoded project data."
-msgstr "JSON انکوڈ شدہ پروجیکٹ ڈیٹا کو پڑھنے میں کچھ غلط ہو گیا۔"
-
-#: js/blocks.js:5756
-msgid "Cannot load project: invalid project structure."
-msgstr ""
-
-#: js/blocks.js:5766
-#: js/blocks.js:6201
-#: js/blocks.js:6277
-msgid "Cannot load project: malformed block structure detected."
-msgstr ""
-
-#: js/blocks.js:5883
-msgid "Cannot load project: circular block connection detected."
-msgstr ""
-
-#: js/blocks.js:6231
-#: js/blocks.js:6482
-msgid "Cannot load project: invalid block connection detected."
-msgstr ""
-
-#: js/blocks.js:7668
-msgid "Some blocks in this project are unsupported and were replaced with placeholders: %s"
-msgstr ""
-
-#: js/blocks.js:8053
-msgid "Nothing to undo."
-msgstr ""
-
-#: js/blocks.js:8105
-msgid "Nothing to redo."
-msgstr ""
-
-#: js/blocks.js:8266
-msgid "block sent to trash"
-msgstr ""
-
 #: js/loader.js:770
 msgid "Failed to load EaselJS. Please refresh the page."
 msgstr "EaselJS لوڈ کرنے میں ناکام۔ براہ کرم صفحہ کو ریفریش کریں۔"
@@ -1994,56 +1881,6 @@ msgstr "میوزک بلاکس لوڈ کرنے میں ناکام۔ براہ کر�
 #: js/loader.js:806
 msgid "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: %s"
 msgstr "میوزک بلاکس کور کو شروع کرنے میں ناکام۔ براہ کرم صفحہ کو ریفریش کریں۔\n\nخرابی: %s"
-
-#: js/logo.js:854
-msgid "Downloading Kokoro voice: %s"
-msgstr ""
-
-#: js/logo.js:998
-#: js/blocks/ProgramBlocks.js:277
-#: js/blocks/ProgramBlocks.js:453
-msgid "You must select a file."
-msgstr "آپ کو فائل منتخب کرنا ہوگی۔"
-
-#: js/logo.js:2319
-msgid "Infinite loop detected. Execution stopped to prevent browser freeze."
-msgstr "لامحدود لوپ کا پتہ چلا۔ براؤزر کو منجمد کرنے سے روکنے کے لیے عملدرآمد روک دیا گیا۔"
-
-#: js/logo.js:2527
-#: js/blocks/MediaBlocks.js:338
-msgid "width"
-msgstr "چوڑائی"
-
-#: js/logo.js:2528
-#: js/blocks/MediaBlocks.js:395
-msgid "height"
-msgstr "اونچائی"
-
-#: js/logo.js:2529
-#: js/blocks/MediaBlocks.js:35
-#.TRANS: right side of the screen
-msgid "right (screen)"
-msgstr "دائیں (اسکرین)"
-
-#: js/logo.js:2530
-#: js/blocks/MediaBlocks.js:111
-#.TRANS: left side of the screen
-msgid "left (screen)"
-msgstr "بائیں (اسکرین)"
-
-#: js/logo.js:2531
-#: js/blocks/MediaBlocks.js:186
-msgid "top (screen)"
-msgstr "اوپر (اسکرین)"
-
-#: js/logo.js:2532
-#: js/blocks/MediaBlocks.js:261
-msgid "bottom (screen)"
-msgstr "نیچے (اسکرین)"
-
-#: js/logo.js:2900
-msgid "Playback is ready."
-msgstr "پلے بیک تیار ہے۔"
 
 #: js/planetInterface.js:171
 msgid "project undefined"
@@ -2141,6 +1978,11 @@ msgstr ""
 #: js/project-manager.js:1971
 msgid "Invalid parameters"
 msgstr "غلط پیرامیٹرز"
+
+#: js/project-manager.js:1940
+#: js/blocks.js:5737
+msgid "Something went wrong reading JSON-encoded project data."
+msgstr "JSON انکوڈ شدہ پروجیکٹ ڈیٹا کو پڑھنے میں کچھ غلط ہو گیا۔"
 
 #: js/search-ui.js:212
 msgid "No results found for %s"
@@ -2687,6 +2529,289 @@ msgstr "مبارک ہو!"
 msgid "You have finished the tour. Please enjoy Music Blocks!"
 msgstr "آپ نے ٹور ختم کردیا ہے۔ براہ کرم میوزک بلاکس سے لطف اٹھائیں!"
 
+#: js/logo.js:854
+msgid "Downloading Kokoro voice: %s"
+msgstr ""
+
+#: js/logo.js:998
+#: js/blocks/ProgramBlocks.js:277
+#: js/blocks/ProgramBlocks.js:453
+msgid "You must select a file."
+msgstr "آپ کو فائل منتخب کرنا ہوگی۔"
+
+#: js/logo.js:2319
+msgid "Infinite loop detected. Execution stopped to prevent browser freeze."
+msgstr "لامحدود لوپ کا پتہ چلا۔ براؤزر کو منجمد کرنے سے روکنے کے لیے عملدرآمد روک دیا گیا۔"
+
+#: js/logo.js:2527
+#: js/blocks/MediaBlocks.js:338
+msgid "width"
+msgstr "چوڑائی"
+
+#: js/logo.js:2528
+#: js/blocks/MediaBlocks.js:395
+msgid "height"
+msgstr "اونچائی"
+
+#: js/logo.js:2529
+#: js/blocks/MediaBlocks.js:35
+#.TRANS: right side of the screen
+msgid "right (screen)"
+msgstr "دائیں (اسکرین)"
+
+#: js/logo.js:2530
+#: js/blocks/MediaBlocks.js:111
+#.TRANS: left side of the screen
+msgid "left (screen)"
+msgstr "بائیں (اسکرین)"
+
+#: js/logo.js:2531
+#: js/blocks/MediaBlocks.js:186
+msgid "top (screen)"
+msgstr "اوپر (اسکرین)"
+
+#: js/logo.js:2532
+#: js/blocks/MediaBlocks.js:261
+msgid "bottom (screen)"
+msgstr "نیچے (اسکرین)"
+
+#: js/logo.js:2900
+msgid "Playback is ready."
+msgstr "پلے بیک تیار ہے۔"
+
+#: js/blocks.js:2462
+#: js/blocks.js:2466
+#: js/blocks.js:2472
+#: js/blocks.js:2474
+msgid "audio file"
+msgstr "آڈیو فائل"
+
+#: js/blocks.js:3764
+#: js/blocks.js:4169
+#: js/blocks.js:4215
+#: js/blocks.js:4261
+#: js/blocks.js:6827
+#: js/blocks.js:6851
+#: js/blocks/BoxesBlocks.js:783
+msgid "box1"
+msgstr "باکس 1"
+
+#: js/blocks.js:3766
+#: js/blocks.js:4171
+#: js/blocks.js:4217
+#: js/blocks.js:4263
+#: js/blocks.js:6829
+#: js/blocks.js:6853
+#: js/blocks/BoxesBlocks.js:674
+msgid "box2"
+msgstr "باکس 2"
+
+#: js/blocks.js:4421
+#: js/blocks/MediaBlocks.js:827
+#: js/blocks/BoxesBlocks.js:606
+#: js/blocks/DictBlocks.js:215
+#: js/blocks/DictBlocks.js:289
+#: js/blocks/EnsembleBlocks.js:441
+#: js/blocks/EnsembleBlocks.js:458
+#: js/blocks/PitchBlocks.js:731
+#: js/blocks/PitchBlocks.js:1084
+#: js/blocks/PitchBlocks.js:2038
+#: js/blocks/ProgramBlocks.js:412
+#: js/blocks/ProgramBlocks.js:539
+#: js/blocks/ProgramBlocks.js:724
+#: js/blocks/ToneBlocks.js:1082
+msgid "name"
+msgstr "نام"
+
+#: js/blocks.js:4421
+#: js/blocks/BoxesBlocks.js:75
+#: js/blocks/BoxesBlocks.js:606
+#: js/blocks/DictBlocks.js:289
+#: js/blocks/DictBlocks.js:430
+#: js/blocks/NumberBlocks.js:973
+#: js/blocks/HeapBlocks.js:573
+#: js/blocks/RhythmBlocks.js:1164
+msgid "value"
+msgstr "قدر"
+
+#: js/blocks.js:4760
+msgid "Forever loop detected inside a note value block. Unexpected things may happen."
+msgstr "نوٹ ویلیو بلاک کے اندر ہمیشہ لوپ کا پتہ چلا۔ غیر متوقع چیزیں ہوسکتی ہیں۔"
+
+#: js/blocks.js:5319
+msgid "There is no block selected."
+msgstr "کوئی بلاک منتخب نہیں ہوا ہے۔"
+
+#: js/blocks.js:5429
+#: js/blocks/MediaBlocks.js:884
+#.TRANS: Avatar is the image used to determine the appearance of the mouse.
+msgid "avatar"
+msgstr "اوتار"
+
+#: js/blocks.js:5432
+#: js/blocks/ToneBlocks.js:1067
+#: js/widgets/SamplerCanvas.js:169
+#.TRANS: The sound sample that the user uploads.
+msgid "sample"
+msgstr "نمونہ"
+
+#: js/blocks.js:5617
+#: js/blocks.js:5760
+msgid "Cannot load project: invalid project structure."
+msgstr ""
+
+#: js/blocks.js:5770
+#: js/blocks.js:6205
+#: js/blocks.js:6281
+msgid "Cannot load project: malformed block structure detected."
+msgstr ""
+
+#: js/blocks.js:5887
+msgid "Cannot load project: circular block connection detected."
+msgstr ""
+
+#: js/blocks.js:6235
+#: js/blocks.js:6486
+msgid "Cannot load project: invalid block connection detected."
+msgstr ""
+
+#: js/blocks.js:7672
+msgid "Some blocks in this project are unsupported and were replaced with placeholders: %s"
+msgstr ""
+
+#: js/blocks.js:8057
+msgid "Nothing to undo."
+msgstr ""
+
+#: js/blocks.js:8109
+msgid "Nothing to redo."
+msgstr ""
+
+#: js/blocks.js:8270
+msgid "block sent to trash"
+msgstr ""
+
+#: js/gitDropdown.js:875
+msgid "Saved moment"
+msgstr ""
+
+#: js/gitDropdown.js:893
+msgid "You're offline. Connect to the network to view commits for this project."
+msgstr ""
+
+#: js/gitDropdown.js:894
+msgid "Network Connection Required"
+msgstr ""
+
+#: js/gitDropdown.js:907
+msgid "No moments marked yet. Click \"Mark this moment\" to save your first one!"
+msgstr ""
+
+#: js/gitDropdown.js:908
+msgid "No Saved Moments Yet"
+msgstr ""
+
+#: js/gitDropdown.js:939
+#: js/gitDropdown.js:969
+msgid "Time Travel"
+msgstr ""
+
+#: js/gitDropdown.js:972
+msgid "Every save, forever yours"
+msgstr ""
+
+#: js/gitDropdown.js:1091
+#: js/gitDropdown.js:1196
+msgid "YOU ARE HERE"
+msgstr ""
+
+#: js/gitDropdown.js:1118
+msgid "Sync Pending"
+msgstr ""
+
+#: js/gitDropdown.js:1124
+msgid "Latest"
+msgstr ""
+
+#: js/gitDropdown.js:1137
+#: js/gitDropdown.js:1232
+msgid "Undo my changes"
+msgstr ""
+
+#: js/gitDropdown.js:1147
+#: js/gitDropdown.js:1242
+msgid "Go back to this version"
+msgstr ""
+
+#: js/gitDropdown.js:1210
+msgid "The very beginning"
+msgstr ""
+
+#: js/gitDropdown.js:1214
+msgid "Where your project started"
+msgstr ""
+
+#: js/gitDropdown.js:1221
+msgid "Setting Up Tracking"
+msgstr ""
+
+#: js/gitDropdown.js:1235
+#: js/gitDropdown.js:1245
+msgid "Start point"
+msgstr ""
+
+#: js/gitDropdown.js:1269
+msgid "no more offline commits can be made"
+msgstr ""
+
+#: js/gitDropdown.js:1271
+msgid "1 more commit can be made"
+msgstr ""
+
+#: js/gitDropdown.js:1272
+msgid "%s more commits can be made"
+msgstr ""
+
+#: js/gitDropdown.js:1284
+msgid "Showing locally saved drafts"
+msgstr ""
+
+#: js/gitDropdown.js:1783
+msgid "Just now"
+msgstr ""
+
+#: js/gitDropdown.js:1784
+msgid "1 minute ago"
+msgstr ""
+
+#: js/gitDropdown.js:1784
+msgid "%s minutes ago"
+msgstr ""
+
+#: js/gitDropdown.js:1786
+msgid "1 hour ago"
+msgstr ""
+
+#: js/gitDropdown.js:1786
+msgid "%s hours ago"
+msgstr ""
+
+#: js/gitDropdown.js:1788
+msgid "1 day ago"
+msgstr ""
+
+#: js/gitDropdown.js:1788
+msgid "%s days ago"
+msgstr ""
+
+#: js/gitDropdown.js:1790
+msgid "1 month ago"
+msgstr ""
+
+#: js/gitDropdown.js:1790
+msgid "%s months ago"
+msgstr ""
+
 #: js/utils/plugin-utils.js:55
 msgid "Security Warning"
 msgstr "سیکیورٹی وارننگ"
@@ -2837,8 +2962,8 @@ msgstr "مینٹون"
 #: js/blocks/IntervalsBlocks.js:1187
 #: js/blocks/WidgetBlocks.js:640
 #: js/blocks/WidgetBlocks.js:645
-#: js/blocks/ToneBlocks.js:1003
 #: js/blocks/VolumeBlocks.js:420
+#: js/blocks/ToneBlocks.js:1003
 #: js/turtleactions/VolumeActions.js:49
 #: js/widgets/modewidget.js:1741
 #.TRANS: customize voice
@@ -3839,6 +3964,14 @@ msgstr "مکمل طور پر ختم شدہ 7 ویں"
 msgid "half-diminished 7th"
 msgstr "نصف جہتی 7 ویں"
 
+#: js/utils/utils-logic.js:431
+msgid "Invalid input passed to rational sum"
+msgstr ""
+
+#: js/utils/utils-logic.js:438
+msgid "Note calculation failed: zero denominator"
+msgstr ""
+
 #: js/utils/synthutils.js:130
 #.TRANS: simple monotone synthesizer
 msgid "simple-2"
@@ -3867,14 +4000,6 @@ msgstr "جاپانی گھنٹی"
 #: js/utils/synthutils.js:2493
 msgid "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
 msgstr "⚠️ آواز غیر فعال ہے!\n\nمیوزک بلاکس کے لیے آڈیو کی اجازت دینے کے لیے براہ کرم اپنے براؤزر کی سیٹنگز (سائٹ سیٹنگز > ساؤنڈ) چیک کریں۔"
-
-#: js/utils/utils-logic.js:431
-msgid "Invalid input passed to rational sum"
-msgstr ""
-
-#: js/utils/utils-logic.js:438
-msgid "Note calculation failed: zero denominator"
-msgstr ""
 
 #: js/blocks/BooleanBlocks.js:44
 msgid "The Not block is the logical not operator."
@@ -7479,6 +7604,112 @@ msgstr "گیٹ بلیو بلاک ماؤس کے نیچے پکسل کا نیلا �
 msgid "The Get blue block returns the blue component of the pixel under the turtle."
 msgstr "گیٹ بلیو بلاک کچھوے کے نیچے پکسل کا نیلا حصہ لوٹاتا ہے۔"
 
+#: js/blocks/VolumeBlocks.js:35
+msgid "synth volume"
+msgstr "synth حجم"
+
+#: js/blocks/VolumeBlocks.js:39
+msgid "The Synth volume block returns the current volume of the current synthesizer."
+msgstr "سنتھ والیوم بلاک موجودہ سنتھیسائزر کا موجودہ حجم لوٹاتا ہے۔"
+
+#: js/blocks/VolumeBlocks.js:109
+msgid "master volume"
+msgstr "ماسٹر حجم"
+
+#: js/blocks/VolumeBlocks.js:113
+msgid "The Master volume block returns the master volume."
+msgstr "ماسٹر والیوم بلاک ماسٹر والیوم واپس کرتا ہے۔"
+
+#: js/blocks/VolumeBlocks.js:364
+#: js/blocks/VolumeBlocks.js:535
+msgid "set synth volume"
+msgstr "synth حجم مقرر کریں"
+
+#: js/blocks/VolumeBlocks.js:371
+#: js/blocks/VolumeBlocks.js:556
+msgid "synth"
+msgstr "سنتھ "
+
+#: js/blocks/VolumeBlocks.js:412
+#: js/blocks/VolumeBlocks.js:588
+#: js/blocks/VolumeBlocks.js:751
+#: js/turtleactions/VolumeActions.js:222
+msgid "Setting volume to 0."
+msgstr "والیوم کو 0 پر سیٹ کرنا۔"
+
+#: js/blocks/VolumeBlocks.js:449
+msgid "Synth not found"
+msgstr "سنتھ نہیں ملا"
+
+#: js/blocks/VolumeBlocks.js:505
+msgid "set drum volume"
+msgstr "ڈھول کا حجم مقرر کریں"
+
+#: js/blocks/VolumeBlocks.js:541
+msgid "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc."
+msgstr "سیٹ سنتھ والیوم بلاک کسی خاص سنتھ کا حجم بدل دے گا، جیسے گٹار وائلن اسنیر ڈرم وغیرہ۔"
+
+#: js/blocks/VolumeBlocks.js:545
+msgid "The default volume is 50."
+msgstr "پہلے سے طے شدہ حجم 50 ہے۔"
+
+#: js/blocks/VolumeBlocks.js:547
+msgid "The range is 0 for silence to 100 for full volume."
+msgstr "خاموشی کے لیے رینج 0 سے مکمل والیوم کے لیے 100 ہے۔"
+
+#: js/blocks/VolumeBlocks.js:608
+msgid "set panning"
+msgstr "پیننگ سیٹ کریں"
+
+#: js/blocks/VolumeBlocks.js:614
+msgid "The Set Panning block sets the panning for all synthesizers."
+msgstr "سیٹ پیننگ بلاک تمام سنتھیسائزرز کے لیے پیننگ سیٹ کرتا ہے۔"
+
+#: js/blocks/VolumeBlocks.js:636
+msgid "Warning: Sound is coming out from only the left or right side."
+msgstr "انتباہ: آواز صرف بائیں یا دائیں طرف سے آرہی ہے۔"
+
+#: js/blocks/VolumeBlocks.js:658
+#: js/blocks/VolumeBlocks.js:706
+msgid "set master volume"
+msgstr "ماسٹر حجم مقرر کریں"
+
+#: js/blocks/VolumeBlocks.js:664
+msgid "The Set master volume block sets the volume for all synthesizers."
+msgstr "سیٹ ماسٹر والیوم بلاک تمام سنتھیسائزرز کے لیے والیوم سیٹ کرتا ہے۔"
+
+#: js/blocks/VolumeBlocks.js:794
+msgid "The Set relative volume block changes the volume of the contained notes."
+msgstr "سیٹ رشتہ دار والیوم بلاک موجود نوٹوں کے حجم کو تبدیل کرتا ہے۔"
+
+#: js/blocks/VolumeBlocks.js:801
+msgid "set relative volume"
+msgstr "رشتہ دار حجم مقرر کریں"
+
+#: js/blocks/VolumeBlocks.js:853
+msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
+msgstr "Decrescendo بلاک ہر کھیلے گئے نوٹ کے لیے ایک مخصوص رقم سے موجود نوٹوں کے حجم کو کم کر دے گا۔"
+
+#: js/blocks/VolumeBlocks.js:857
+msgid "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
+msgstr "مثال کے طور پر اگر آپ کے پاس ترتیب میں 7 نوٹ ہیں جو Decrescendo بلاک میں 5 کی قیمت کے ساتھ موجود ہیں تو حتمی نوٹ ابتدائی والیوم سے 35% کم ہوگا۔"
+
+#: js/blocks/VolumeBlocks.js:867
+msgid "decrescendo"
+msgstr "کمی"
+
+#: js/blocks/VolumeBlocks.js:917
+msgid "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
+msgstr "کریسسینڈو بلاک ہر کھیلے جانے والے نوٹ کے لیے ایک مخصوص رقم سے موجود نوٹوں کے حجم کو بڑھا دے گا۔"
+
+#: js/blocks/VolumeBlocks.js:921
+msgid "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
+msgstr "مثال کے طور پر اگر آپ کے پاس کریسسینڈو بلاک میں ترتیب میں 7 نوٹ ہیں جن کی قیمت 5 ہے تو حتمی نوٹ ابتدائی والیوم سے 35% زیادہ ہوگا۔"
+
+#: js/blocks/VolumeBlocks.js:931
+msgid "crescendo"
+msgstr "عروج"
+
 #: js/blocks/ToneBlocks.js:34
 #: js/widgets/timbre.js:314
 msgid "Oscillator"
@@ -7727,112 +7958,6 @@ msgstr "ایک آلے کے طور پر استعمال کرنے کے لیے ای�
 #: js/blocks/ToneBlocks.js:1174
 msgid "Upload a sound file to connect with the sample block."
 msgstr "نمونہ بلاک کے ساتھ جڑنے کے لیے آواز کی فائل اپ لوڈ کریں۔"
-
-#: js/blocks/VolumeBlocks.js:35
-msgid "synth volume"
-msgstr "synth حجم"
-
-#: js/blocks/VolumeBlocks.js:39
-msgid "The Synth volume block returns the current volume of the current synthesizer."
-msgstr "سنتھ والیوم بلاک موجودہ سنتھیسائزر کا موجودہ حجم لوٹاتا ہے۔"
-
-#: js/blocks/VolumeBlocks.js:109
-msgid "master volume"
-msgstr "ماسٹر حجم"
-
-#: js/blocks/VolumeBlocks.js:113
-msgid "The Master volume block returns the master volume."
-msgstr "ماسٹر والیوم بلاک ماسٹر والیوم واپس کرتا ہے۔"
-
-#: js/blocks/VolumeBlocks.js:364
-#: js/blocks/VolumeBlocks.js:535
-msgid "set synth volume"
-msgstr "synth حجم مقرر کریں"
-
-#: js/blocks/VolumeBlocks.js:371
-#: js/blocks/VolumeBlocks.js:556
-msgid "synth"
-msgstr "سنتھ "
-
-#: js/blocks/VolumeBlocks.js:412
-#: js/blocks/VolumeBlocks.js:588
-#: js/blocks/VolumeBlocks.js:751
-#: js/turtleactions/VolumeActions.js:222
-msgid "Setting volume to 0."
-msgstr "والیوم کو 0 پر سیٹ کرنا۔"
-
-#: js/blocks/VolumeBlocks.js:449
-msgid "Synth not found"
-msgstr "سنتھ نہیں ملا"
-
-#: js/blocks/VolumeBlocks.js:505
-msgid "set drum volume"
-msgstr "ڈھول کا حجم مقرر کریں"
-
-#: js/blocks/VolumeBlocks.js:541
-msgid "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc."
-msgstr "سیٹ سنتھ والیوم بلاک کسی خاص سنتھ کا حجم بدل دے گا، جیسے گٹار وائلن اسنیر ڈرم وغیرہ۔"
-
-#: js/blocks/VolumeBlocks.js:545
-msgid "The default volume is 50."
-msgstr "پہلے سے طے شدہ حجم 50 ہے۔"
-
-#: js/blocks/VolumeBlocks.js:547
-msgid "The range is 0 for silence to 100 for full volume."
-msgstr "خاموشی کے لیے رینج 0 سے مکمل والیوم کے لیے 100 ہے۔"
-
-#: js/blocks/VolumeBlocks.js:608
-msgid "set panning"
-msgstr "پیننگ سیٹ کریں"
-
-#: js/blocks/VolumeBlocks.js:614
-msgid "The Set Panning block sets the panning for all synthesizers."
-msgstr "سیٹ پیننگ بلاک تمام سنتھیسائزرز کے لیے پیننگ سیٹ کرتا ہے۔"
-
-#: js/blocks/VolumeBlocks.js:636
-msgid "Warning: Sound is coming out from only the left or right side."
-msgstr "انتباہ: آواز صرف بائیں یا دائیں طرف سے آرہی ہے۔"
-
-#: js/blocks/VolumeBlocks.js:658
-#: js/blocks/VolumeBlocks.js:706
-msgid "set master volume"
-msgstr "ماسٹر حجم مقرر کریں"
-
-#: js/blocks/VolumeBlocks.js:664
-msgid "The Set master volume block sets the volume for all synthesizers."
-msgstr "سیٹ ماسٹر والیوم بلاک تمام سنتھیسائزرز کے لیے والیوم سیٹ کرتا ہے۔"
-
-#: js/blocks/VolumeBlocks.js:794
-msgid "The Set relative volume block changes the volume of the contained notes."
-msgstr "سیٹ رشتہ دار والیوم بلاک موجود نوٹوں کے حجم کو تبدیل کرتا ہے۔"
-
-#: js/blocks/VolumeBlocks.js:801
-msgid "set relative volume"
-msgstr "رشتہ دار حجم مقرر کریں"
-
-#: js/blocks/VolumeBlocks.js:853
-msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
-msgstr "Decrescendo بلاک ہر کھیلے گئے نوٹ کے لیے ایک مخصوص رقم سے موجود نوٹوں کے حجم کو کم کر دے گا۔"
-
-#: js/blocks/VolumeBlocks.js:857
-msgid "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
-msgstr "مثال کے طور پر اگر آپ کے پاس ترتیب میں 7 نوٹ ہیں جو Decrescendo بلاک میں 5 کی قیمت کے ساتھ موجود ہیں تو حتمی نوٹ ابتدائی والیوم سے 35% کم ہوگا۔"
-
-#: js/blocks/VolumeBlocks.js:867
-msgid "decrescendo"
-msgstr "کمی"
-
-#: js/blocks/VolumeBlocks.js:917
-msgid "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
-msgstr "کریسسینڈو بلاک ہر کھیلے جانے والے نوٹ کے لیے ایک مخصوص رقم سے موجود نوٹوں کے حجم کو بڑھا دے گا۔"
-
-#: js/blocks/VolumeBlocks.js:921
-msgid "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
-msgstr "مثال کے طور پر اگر آپ کے پاس کریسسینڈو بلاک میں ترتیب میں 7 نوٹ ہیں جن کی قیمت 5 ہے تو حتمی نوٹ ابتدائی والیوم سے 35% زیادہ ہوگا۔"
-
-#: js/blocks/VolumeBlocks.js:931
-msgid "crescendo"
-msgstr "عروج"
 
 #: js/turtleactions/OrnamentActions.js:49
 msgid "Staccato value must be a positive number."
@@ -9663,71 +9788,6 @@ msgstr "کھیل"
 msgid "Code Snippet"
 msgstr "کوڈ کا ٹکڑا"
 
-#: planet/js/GlobalPlanet.js:37
-msgid "No results found."
-msgstr "کوئی نتیجہ نہیں ملا۔"
-
-#: planet/js/GlobalPlanet.js:54
-msgid "Remix of"
-msgstr "کا ریمکس"
-
-#: planet/js/GlobalPlanet.js:381
-msgid "Could not load project. Please check your connection and try again."
-msgstr ""
-
-#: planet/js/GlobalPlanet.js:735
-msgid "Cannot connect to server"
-msgstr "سرور سے منسلک نہیں ہو سکتا"
-
-#: planet/js/SaveInterface.js:34
-#: planet/js/GlobalCard.js:60
-msgid "Open in Music Blocks"
-msgstr "میوزک بلاکس میں کھولیں۔"
-
-#: planet/js/SaveInterface.js:37
-msgid "Open in Turtle Blocks"
-msgstr "ٹرٹل بلاکس میں کھولیں۔"
-
-#: planet/js/LocalCard.js:37
-msgid "View published project"
-msgstr "شائع شدہ پروجیکٹ دیکھیں"
-
-#: planet/js/LocalCard.js:42
-msgid "Being tracked"
-msgstr ""
-
-#: planet/js/LocalCard.js:54
-#: planet/js/ProjectViewer.js:92
-#: planet/js/GlobalCard.js:44
-msgid "Project thumbnail"
-msgstr ""
-
-#: planet/js/LocalCard.js:57
-#: planet/js/Publisher.js:236
-#: planet/js/StringHelper.js:37
-msgid "Publish project"
-msgstr "پروجیکٹ شائع کریں۔"
-
-#: planet/js/LocalCard.js:63
-msgid "Project name"
-msgstr ""
-
-#: planet/js/LocalCard.js:70
-msgid "Edit project"
-msgstr "پروجیکٹ میں ترمیم کریں۔"
-
-#: planet/js/LocalCard.js:73
-msgid "Delete project"
-msgstr "پروجیکٹ کو حذف کریں۔"
-
-#: planet/js/LocalCard.js:76
-msgid "Download project"
-msgstr "پروجیکٹ ڈاؤن لوڈ کریں۔"
-
-#: planet/js/LocalCard.js:82
-msgid "Duplicate project"
-msgstr "ڈپلیکیٹ پروجیکٹ"
-
 #: planet/js/ProjectStorage.js:541
 msgid "anonymous"
 msgstr "گمنام"
@@ -9741,14 +9801,14 @@ msgid "Thank you for reporting this project. A moderator will review the project
 msgstr "اس منصوبے کی اطلاع دینے کے لیے آپ کا شکریہ۔ شوگر لیبز کے ضابطہ اخلاق کی خلاف ورزی کی توثیق کرنے کے لیے ایک ماڈریٹر جلد ہی پروجیکٹ کا جائزہ لے گا۔"
 
 #: planet/js/ProjectViewer.js:33
-#: planet/js/StringHelper.js:64
-#: planet/js/StringHelper.js:66
-#: planet/js/StringHelper.js:75
+#: planet/js/StringHelper.js:68
+#: planet/js/StringHelper.js:70
+#: planet/js/StringHelper.js:79
 msgid "Report Project"
 msgstr "رپورٹ پروجیکٹ"
 
 #: planet/js/ProjectViewer.js:34
-#: planet/js/StringHelper.js:65
+#: planet/js/StringHelper.js:69
 msgid "Project Reported"
 msgstr "پروجیکٹ کی اطلاع دی گئی۔"
 
@@ -9760,9 +9820,20 @@ msgstr "رپورٹ کی تفصیل درکار ہے"
 msgid "Report description too long"
 msgstr "رپورٹ کی تفصیل بہت لمبی ہے۔"
 
+#: planet/js/ProjectViewer.js:92
+#: planet/js/GlobalCard.js:44
+#: planet/js/LocalCard.js:54
+msgid "Project thumbnail"
+msgstr ""
+
 #: planet/js/GlobalCard.js:57
 msgid "More Details"
 msgstr "مزید تفصیلات"
+
+#: planet/js/GlobalCard.js:60
+#: planet/js/SaveInterface.js:34
+msgid "Open in Music Blocks"
+msgstr "میوزک بلاکس میں کھولیں۔"
 
 #: planet/js/GlobalCard.js:63
 msgid "Remix project"
@@ -9798,8 +9869,8 @@ msgstr "اعلی درجے کے اختیارات"
 
 #: planet/js/GlobalCard.js:218
 #: planet/js/GlobalCard.js:219
-#: planet/js/StringHelper.js:51
-#: planet/js/helper.js:187
+#: planet/js/StringHelper.js:55
+#: planet/js/helper.js:188
 msgid "Show all tags"
 msgstr ""
 
@@ -9827,6 +9898,12 @@ msgstr "فیچر دستیاب نہیں ہے - سرور سے منسلک نہیں 
 msgid "Republish project"
 msgstr ""
 
+#: planet/js/Publisher.js:236
+#: planet/js/LocalCard.js:57
+#: planet/js/StringHelper.js:37
+msgid "Publish project"
+msgstr "پروجیکٹ شائع کریں۔"
+
 #: planet/js/Publisher.js:275
 #: planet/js/Publisher.js:292
 msgid "This field is required"
@@ -9847,6 +9924,74 @@ msgstr "سرور کی خرابی۔"
 #: planet/js/Publisher.js:546
 msgid "Try Again"
 msgstr "دوبارہ کوشش کریں۔"
+
+#: planet/js/GlobalPlanet.js:37
+msgid "No results found."
+msgstr "کوئی نتیجہ نہیں ملا۔"
+
+#: planet/js/GlobalPlanet.js:54
+msgid "Remix of"
+msgstr "کا ریمکس"
+
+#: planet/js/GlobalPlanet.js:391
+msgid "Could not load project. Please check your connection and try again."
+msgstr ""
+
+#: planet/js/GlobalPlanet.js:771
+msgid "Cannot connect to server"
+msgstr "سرور سے منسلک نہیں ہو سکتا"
+
+#: planet/js/LocalCard.js:37
+msgid "View published project"
+msgstr "شائع شدہ پروجیکٹ دیکھیں"
+
+#: planet/js/LocalCard.js:42
+msgid "Being tracked"
+msgstr ""
+
+#: planet/js/LocalCard.js:63
+msgid "Project name"
+msgstr ""
+
+#: planet/js/LocalCard.js:70
+msgid "Edit project"
+msgstr "پروجیکٹ میں ترمیم کریں۔"
+
+#: planet/js/LocalCard.js:73
+msgid "Delete project"
+msgstr "پروجیکٹ کو حذف کریں۔"
+
+#: planet/js/LocalCard.js:76
+msgid "Download project"
+msgstr "پروجیکٹ ڈاؤن لوڈ کریں۔"
+
+#: planet/js/LocalCard.js:82
+msgid "Duplicate project"
+msgstr "ڈپلیکیٹ پروجیکٹ"
+
+#: planet/js/LocalCard.js:133
+msgid "You do not have permission to unpublish this project from this browser."
+msgstr ""
+
+#: planet/js/LocalCard.js:144
+msgid "Could not unpublish project. Please try again."
+msgstr ""
+
+#: planet/js/LocalCard.js:175
+msgid "Project unpublished."
+msgstr ""
+
+#: planet/js/LocalCard.js:179
+msgid "Project unpublished, but the change could not be saved on this device."
+msgstr ""
+
+#: planet/js/LocalCard.js:251
+msgid "Unpublish project"
+msgstr ""
+
+#: planet/js/SaveInterface.js:37
+msgid "Open in Turtle Blocks"
+msgstr "ٹرٹل بلاکس میں کھولیں۔"
 
 #: planet/js/StringHelper.js:30
 msgid "Close Planet"
@@ -9873,12 +10018,12 @@ msgid "Tags (max 5)"
 msgstr "ٹیگز (زیادہ سے زیادہ 5)"
 
 #: planet/js/StringHelper.js:40
-#: planet/js/StringHelper.js:63
+#: planet/js/StringHelper.js:67
 msgid "Description"
 msgstr "تفصیل"
 
 #: planet/js/StringHelper.js:41
-#: planet/js/StringHelper.js:74
+#: planet/js/StringHelper.js:78
 msgid "Submit"
 msgstr "جمع کروائیں۔"
 
@@ -9891,66 +10036,78 @@ msgid "Permanently delete project \"<span id=\"deleter-name\"></span>\"?"
 msgstr "پروجیکٹ \"<span id=\"deleter-name\"></span>\" کو مستقل طور پر حذف کریں؟"
 
 #: planet/js/StringHelper.js:50
+msgid "Unpublish project?"
+msgstr ""
+
+#: planet/js/StringHelper.js:51
+msgid "This project will no longer appear in public listings."
+msgstr ""
+
+#: planet/js/StringHelper.js:52
+msgid "Unpublish"
+msgstr ""
+
+#: planet/js/StringHelper.js:54
 msgid "Explore Projects"
 msgstr "پروجیکٹس دریافت کریں۔"
 
-#: planet/js/StringHelper.js:52
+#: planet/js/StringHelper.js:56
 msgid "Most recent"
 msgstr "تازہ ترین"
 
-#: planet/js/StringHelper.js:53
+#: planet/js/StringHelper.js:57
 msgid "Most liked"
 msgstr "سب سے زیادہ پسند کیا"
 
-#: planet/js/StringHelper.js:54
+#: planet/js/StringHelper.js:58
 msgid "Most downloaded"
 msgstr "سب سے زیادہ ڈاؤن لوڈ"
 
-#: planet/js/StringHelper.js:55
+#: planet/js/StringHelper.js:59
 msgid "A-Z"
 msgstr "A-Z"
 
-#: planet/js/StringHelper.js:56
+#: planet/js/StringHelper.js:60
 msgid "Sort by"
 msgstr "ترتیب دیں"
 
-#: planet/js/StringHelper.js:57
+#: planet/js/StringHelper.js:61
 msgid "Load More Projects"
 msgstr "مزید پروجیکٹس لوڈ کریں۔"
 
-#: planet/js/StringHelper.js:58
+#: planet/js/StringHelper.js:62
 msgid "Last Updated"
 msgstr "آخری تازہ کاری"
 
-#: planet/js/StringHelper.js:59
+#: planet/js/StringHelper.js:63
 msgid "Creation Date"
 msgstr "تخلیق کی تاریخ"
 
-#: planet/js/StringHelper.js:60
+#: planet/js/StringHelper.js:64
 msgid "Number of Downloads:"
 msgstr "ڈاؤن لوڈز کی تعداد:"
 
-#: planet/js/StringHelper.js:61
+#: planet/js/StringHelper.js:65
 msgid "Number of Likes:"
 msgstr "پسندیدگیوں کی تعداد:"
 
-#: planet/js/StringHelper.js:62
+#: planet/js/StringHelper.js:66
 msgid "Tags:"
 msgstr "ٹیگز:"
 
-#: planet/js/StringHelper.js:69
+#: planet/js/StringHelper.js:73
 msgid "Report projects which violate the <a href=\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\" target=\"_blank\" rel=\"noopener noreferrer\">Sugar Labs Code of Conduct</a>."
 msgstr "ان منصوبوں کی اطلاع دیں جو <a href=\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\" target=\"_blank\" rel=\"noopener noreferrer\">شوگر لیبز کے ضابطہ اخلاق</a> کی خلاف ورزی کرتے ہیں۔"
 
-#: planet/js/StringHelper.js:73
+#: planet/js/StringHelper.js:77
 msgid "Reason for reporting project"
 msgstr "پروجیکٹ کی اطلاع دینے کی وجہ"
 
-#: planet/js/StringHelper.js:77
+#: planet/js/StringHelper.js:81
 msgid "Download as File"
 msgstr "فائل کے طور پر ڈاؤن لوڈ کریں۔"
 
-#: planet/js/helper.js:188
+#: planet/js/helper.js:189
 msgid "Show fewer tags"
 msgstr "کم ٹیگز دکھائیں"
 
