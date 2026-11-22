@@ -201,6 +201,18 @@ const MusicKeyboardRendering = {
             for (let i = 0; i < selectedNotes.length; i++) {
                 cell = rowNote.cells[i];
 
+                if (typeof cell.setAttribute === "function") {
+                    cell.setAttribute("tabindex", "0");
+                    cell.setAttribute("role", "button");
+                    const duration = cell.textContent ? cell.textContent.trim() : "";
+                    cell.setAttribute(
+                        "aria-label",
+                        `${_("note duration")}${duration ? " " + duration : ""}, ${_(
+                            "column"
+                        )} ${i + 1}`
+                    );
+                }
+
                 cell.onclick = event => {
                     cell = event.target;
                     this._createpiesubmenu(
@@ -208,6 +220,22 @@ const MusicKeyboardRendering = {
                         cell.getAttribute("start"),
                         cell.getAttribute("dur")
                     );
+                };
+                cell.onkeydown = event => {
+                    if (event.key === "Enter" || event.key === " " || event.key === "Spacebar") {
+                        if (typeof event.preventDefault === "function") {
+                            event.preventDefault();
+                        }
+                        if (typeof event.stopPropagation === "function") {
+                            event.stopPropagation();
+                        }
+                        const target = event.target || cell;
+                        this._createpiesubmenu(
+                            target.getAttribute("id"),
+                            target.getAttribute("start"),
+                            target.getAttribute("dur")
+                        );
+                    }
                 };
             }
 
@@ -220,36 +248,100 @@ const MusicKeyboardRendering = {
                     // Give each clickable cell a unique id
                     cell.setAttribute("id", i + ":" + j);
 
+                    if (typeof cell.setAttribute === "function") {
+                        cell.setAttribute("tabindex", "0");
+                        cell.setAttribute("role", "button");
+
+                        const notes = this.displayLayout || this.layout;
+                        const note = notes[notes.length - i - 1];
+                        const labelEl = this._mkbEl("labelcol" + i);
+                        let pitch =
+                            labelEl && labelEl.textContent ? labelEl.textContent.trim() : "";
+                        if (!pitch && note) {
+                            if (note.noteName === "drum") {
+                                pitch = note.voice;
+                            } else if (note.noteName === "hertz") {
+                                pitch = note.noteOctave + "HZ";
+                            } else if (typeof note.noteName === "string") {
+                                pitch = i18nSolfege(note.noteName) + note.noteOctave;
+                            } else if (note.noteName !== undefined) {
+                                pitch = String(note.noteName);
+                            }
+                        }
+                        const timingCell = this._mkbEl("cells-" + j);
+                        const duration =
+                            timingCell && timingCell.textContent
+                                ? timingCell.textContent.trim()
+                                : "";
+                        const labelParts = [pitch || _("note"), `${_("column")} ${j + 1}`];
+                        if (duration) {
+                            labelParts.push(`${_("duration")} ${duration}`);
+                        }
+                        cell.setAttribute("aria-label", labelParts.join(", "));
+                        cell.setAttribute(
+                            "aria-pressed",
+                            cell.style.backgroundColor === "black" ? "true" : "false"
+                        );
+                    }
+
                     isMouseDown = false;
+
+                    const toggleCell = targetCell => {
+                        const obj = targetCell.id.split(":");
+                        const col = Number(obj[1]);
+                        if (targetCell.style.backgroundColor === "black") {
+                            targetCell.style.backgroundColor = targetCell.getAttribute("cellColor");
+                            this._setNotes(col, false);
+                            if (typeof targetCell.setAttribute === "function") {
+                                targetCell.setAttribute("aria-pressed", "false");
+                            }
+                        } else {
+                            targetCell.style.backgroundColor = "black";
+                            this._setNotes(col, true);
+                            if (typeof targetCell.setAttribute === "function") {
+                                targetCell.setAttribute("aria-pressed", "true");
+                            }
+                        }
+                    };
 
                     cell.onmousedown = e => {
                         cell = e.target;
                         isMouseDown = true;
-                        const obj = cell.id.split(":");
-                        const j = Number(obj[1]);
-                        if (cell.style.backgroundColor === "black") {
-                            cell.style.backgroundColor = cell.getAttribute("cellColor");
-                            this._setNotes(j, false);
-                        } else {
-                            cell.style.backgroundColor = "black";
-                            this._setNotes(j, true);
-                        }
+                        toggleCell(cell);
                     };
 
-                    cell.onmouseover = () => {
+                    cell.onmouseover = event => {
                         if (isMouseDown) {
-                            if (cell.style.backgroundColor === "black") {
-                                cell.style.backgroundColor = cell.getAttribute("cellColor");
-                                this._setNotes(j, false);
-                            } else {
-                                cell.style.backgroundColor = "black";
-                                this._setNotes(j, true);
-                            }
+                            toggleCell((event && event.currentTarget) || cell);
                         }
                     };
 
                     cell.onmouseup = function () {
                         isMouseDown = false;
+                    };
+
+                    cell.onkeydown = event => {
+                        if (
+                            event.key === "Enter" ||
+                            event.key === " " ||
+                            event.key === "Spacebar"
+                        ) {
+                            if (typeof event.preventDefault === "function") {
+                                event.preventDefault();
+                            }
+                            if (typeof event.stopPropagation === "function") {
+                                event.stopPropagation();
+                            }
+                            toggleCell(event.target || cell);
+                        }
+                    };
+
+                    // Assistive technologies can activate a button with a click
+                    // (detail 0) without a preceding mousedown or keydown.
+                    cell.onclick = event => {
+                        if (event && event.detail === 0) {
+                            toggleCell(event.currentTarget || cell);
+                        }
                     };
                 }
             }

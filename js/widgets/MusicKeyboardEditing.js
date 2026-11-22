@@ -238,7 +238,8 @@ const MusicKeyboardEditing = {
             this._tabsWheel.createWheel(tabsLabels);
 
             this._durationWheel.colors = platformColor.pitchWheelcolors;
-            this._durationWheel.keynavigateEnabled = false;
+            // Arrow keys must select a duration after Enter opens this submenu.
+            this._durationWheel.keynavigateEnabled = true;
             this._durationWheel.slicePathFunction = slicePath().DonutSlice;
             this._durationWheel.slicePathCustom = slicePath().DonutSliceCustomization();
             this._durationWheel.slicePathCustom.minRadiusPercent = 0.7;
