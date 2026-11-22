@@ -26,7 +26,6 @@ on:
         # workflow itself in).
         paths:
             - "**"
-            - "!Docs/**"
             - "!**.md"
             - "!**/*.test.js"
             - "!**/*.spec.js"
@@ -40,7 +39,6 @@ on:
         # workflow itself in).
         paths:
             - "**"
-            - "!Docs/**"
             - "!**.md"
             - "!**/*.test.js"
             - "!**/*.spec.js"
