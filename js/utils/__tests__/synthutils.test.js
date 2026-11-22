@@ -313,14 +313,14 @@ describe("Utility Functions (logic-only)", () => {
             const instrumentName = "drumKick";
             const sourceName = "http://example.com/drumKick.wav";
             await __createSynth(turtle, instrumentName, sourceName, {});
-            expect(instruments[turtle][sourceName]["noteDict"]).toBe(sourceName);
+            expect(instruments[turtle][sourceName]).toBeInstanceOf(Tone.Player);
             expect(instrumentsSource[instrumentName]).toStrictEqual([1, "drum"]);
         });
         it("it should create a CUSTOMSAMPLES based on the specified parameters, either using samples, built-in synths, or custom synths", async () => {
             const instrumentName = "guitar";
             const sourceName = "file://testing.wav";
             await __createSynth(turtle, instrumentName, sourceName, {});
-            expect(instruments[turtle][sourceName]["noteDict"]).toBe(sourceName);
+            expect(instruments[turtle][sourceName]).toBeInstanceOf(Tone.Player);
             expect(instrumentsSource[instrumentName]).toStrictEqual([1, "drum"]);
         });
         it("it should create a CUSTOMSAMPLES based on the specified parameters, either using samples, built-in synths, or custom synths", async () => {
@@ -541,6 +541,33 @@ describe("Utility Functions (logic-only)", () => {
             }
 
             expect(instruments[turtle]["snare drum"].start).toHaveBeenCalled();
+        });
+
+        test("should play a drum sample given as a URL and wait for it to load (#10319)", async () => {
+            if (!instruments[turtle]) {
+                instruments[turtle] = {}; // Initialize instruments for the turtle
+            }
+
+            const sourceName = "https://example.com/custom-noise.wav";
+            const RealPlayer = Tone.Player;
+            Tone.Player = class extends RealPlayer {
+                constructor(sample) {
+                    super(sample);
+                    this.loaded = false;
+                }
+            };
+            const loadedSpy = jest.spyOn(Tone.ToneAudioBuffer, "loaded");
+            try {
+                await trigger(turtle, ["C2"], beatValue, sourceName, null, null, false, 0);
+
+                const player = instruments[turtle][sourceName];
+                expect(loadedSpy).toHaveBeenCalled();
+                expect(player).toBeInstanceOf(Tone.Player);
+                expect(player.start).toHaveBeenCalled();
+            } finally {
+                Tone.Player = RealPlayer;
+                loadedSpy.mockRestore();
+            }
         });
 
         test("should reapply the cent adjustment when a voice sample is reloaded after Stop (#7996)", async () => {

@@ -1898,11 +1898,14 @@ function Synth() {
             }
         } else {
             if (sourceName.length >= 4) {
+                // A sample given as a URL is played as a drum, i.e. by calling
+                // start(). Tone.Player takes the URL directly, while Tone.Sampler
+                // expects a note-to-URL map and has no start().
                 if (sourceName.slice(0, 4) === "http") {
-                    instruments[turtle][sourceName] = new Tone.Sampler(sourceName).toDestination();
+                    instruments[turtle][sourceName] = new Tone.Player(sourceName).toDestination();
                     instrumentsSource[instrumentName] = [1, "drum"];
                 } else if (sourceName.slice(0, 4) === "file") {
-                    instruments[turtle][sourceName] = new Tone.Sampler(sourceName).toDestination();
+                    instruments[turtle][sourceName] = new Tone.Player(sourceName).toDestination();
                     instrumentsSource[instrumentName] = [1, "drum"];
                 } else if (sourceName === "drum") {
                     instruments[turtle][sourceName] = this._createSampleSynth(
