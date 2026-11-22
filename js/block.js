@@ -5530,9 +5530,15 @@ class Block {
         if (this.name === "start") {
             return `${name} block`;
         }
-        // A block can hold a list of values, such as a file's [filename, dataURL] or a sample's
-        // [name, dataURL, pitch, octave]. Announce every part except empty ones and data URLs.
-        const parts = (Array.isArray(this.value) ? this.value : [this.value]).filter(
+        // A file block holds [filename, contents], and the contents can be a data URL or the
+        // whole text of the file, so announce only the filename.
+        let value = this.value;
+        if (["audiofile", "loadFile"].includes(this.name) && Array.isArray(value)) {
+            value = value.slice(0, 1);
+        }
+        // Other blocks can hold a list of values, such as a sample's [name, dataURL, pitch,
+        // octave]. Announce every part except empty ones and data URLs.
+        const parts = (Array.isArray(value) ? value : [value]).filter(
             part =>
                 part !== null &&
                 part !== undefined &&

@@ -3255,6 +3255,45 @@ describe("Block Foundation", () => {
             expect(el.getAttribute("aria-label")).toBe("forward, value: do, 4");
         });
 
+        it("includes a sample's cent adjustment when it has one", () => {
+            block.value = ["kick", "data:audio/wav;base64,AAAA", "do", 4, 25];
+            const el = block._setupAccessibleElement();
+            expect(el.getAttribute("aria-label")).toBe("forward, value: kick, do, 4, 25");
+
+            block.value = ["kick", "data:audio/wav;base64,AAAA", "do", 4, 0];
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward, value: kick, do, 4, 0");
+        });
+
+        it.each(["loadFile", "audiofile"])(
+            "announces only the filename of a %s block, never its contents",
+            name => {
+                const fileBlock = new Block(
+                    { name, staticLabels: [name], image: "", docks: [] },
+                    testBlocks
+                );
+                fileBlock.blockIndex = 9;
+                fileBlock.container = { x: 0, y: 0, on: jest.fn(), children: [] };
+
+                // loadFile reads plain text, which no data: filter can recognise.
+                fileBlock.value = ["notes.txt", "hello world, this is the whole file"];
+                expect(fileBlock.getAccessibleLabel()).toBe(`${name}, value: notes.txt`);
+
+                const el = fileBlock._setupAccessibleElement();
+                expect(el.getAttribute("aria-label")).toBe(`${name}, value: notes.txt`);
+                expect(el.getAttribute("aria-label")).not.toContain("hello world");
+
+                fileBlock.value = ["song.wav", "data:audio/wav;base64,AAAA"];
+                el.dispatchEvent(new FocusEvent("focus"));
+                expect(el.getAttribute("aria-label")).toBe(`${name}, value: song.wav`);
+
+                // No filename yet: fall back to the plain label, whatever the contents are.
+                fileBlock.value = ["", "some text"];
+                el.dispatchEvent(new FocusEvent("focus"));
+                expect(el.getAttribute("aria-label")).toBe(`${name} block`);
+            }
+        );
+
         it("does not announce the turtle number held by a start block", () => {
             const startBlock = new Block(
                 { name: "start", staticLabels: ["start"], image: "start.svg", docks: [] },
