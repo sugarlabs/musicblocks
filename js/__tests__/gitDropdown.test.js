@@ -1302,4 +1302,111 @@ describe("GitDropdownUI - Complete Git Features Test Suite", () => {
             expect(document.querySelector(".git-tt-frame").textContent).toContain("[Saved moment]");
         });
     });
+
+    describe("Git dialog and toast translations", () => {
+        const identity = global._;
+        let toast;
+
+        beforeEach(() => {
+            global._ = text => `[${text}]`;
+            toast = jest.spyOn(gitDropdown, "_showToast").mockImplementation(() => {});
+        });
+
+        afterEach(() => {
+            global._ = identity;
+            document.querySelectorAll(".mb-system-dialog").forEach(el => el.remove());
+        });
+
+        const syncComplete = synced =>
+            window.dispatchEvent(
+                new MessageEvent("message", {
+                    data: { type: "MB_SYNC_COMPLETE", synced },
+                    origin: window.location.origin,
+                    source: mockIframe.contentWindow
+                })
+            );
+
+        test("the track my project dialog goes through _()", async () => {
+            window.MBDialog.prompt.mockResolvedValueOnce(null);
+
+            await gitDropdown._showCreateFlow();
+
+            expect(window.MBDialog.prompt).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    title: "[Track My Project]",
+                    message: "[Give your project a name so you can find it later!]",
+                    okText: "[Next]",
+                    cancelText: "[Cancel]"
+                })
+            );
+        });
+
+        test("the toolbar tooltip keeps the project name as typed", () => {
+            localStorage.setItem("mbGitRepoName", "rock-roll");
+            localStorage.setItem("mbGitDisplayName", "Rock $& Roll");
+
+            gitDropdown._syncMenuState();
+
+            expect(mockBtn.setAttribute).toHaveBeenCalledWith(
+                "data-tooltip",
+                "[My project: Rock $& Roll]"
+            );
+        });
+
+        test("the synced toast has a singular and a plural", () => {
+            syncComplete(1);
+            syncComplete(3);
+
+            expect(toast).toHaveBeenCalledWith("[1 offline save synced to GitHub] ✔", "success");
+            expect(toast).toHaveBeenCalledWith("[3 offline saves synced to GitHub] ✔", "success");
+        });
+
+        test("a failed offline setup still shows a translated toast", async () => {
+            global.fetch.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+            jest.spyOn(gitDropdown, "_waitForMessage").mockRejectedValue(new Error("Timeout"));
+            jest.spyOn(console, "warn").mockImplementation(() => {});
+
+            await gitDropdown._doCreate("drum-beat", "Drum Beat", "");
+
+            expect(toast).toHaveBeenCalledWith(
+                "[Offline setup timed out — please try again.]",
+                "error"
+            );
+        });
+
+        test("an offline save error is filled into the translated toast", async () => {
+            jest.spyOn(gitDropdown, "_waitForMessage").mockResolvedValue({
+                success: false,
+                error: "DISK_FULL"
+            });
+
+            await gitDropdown._saveOfflineDraft("drum-beat", "", [], "Beat", "drums");
+
+            expect(toast).toHaveBeenCalledWith("[Offline save failed — DISK_FULL]", "error");
+        });
+
+        test("the unsaved changes dialog goes through _()", () => {
+            gitDropdown._showUnsavedGuard(jest.fn(), jest.fn());
+
+            const dialog = document.querySelector(".git-system-dialog");
+            expect(dialog.querySelector(".wftTitle").textContent).toBe(
+                "[You Have Unsaved Changes]"
+            );
+            expect([...dialog.querySelectorAll("button")].map(b => b.textContent)).toEqual([
+                "[Mark a moment first, then go back]",
+                "[Go back without saving changes]",
+                "[Keep editing]"
+            ]);
+        });
+
+        test("going back shows the translated start point name", async () => {
+            await gitDropdown._restoreCommit({
+                sha: null,
+                message: "Add metaData.json",
+                projectData: { blocks: [] }
+            });
+
+            expect(toast).toHaveBeenCalledWith('[Traveled back to: "[Start point]"] ✔', "success");
+        });
+    });
 });
