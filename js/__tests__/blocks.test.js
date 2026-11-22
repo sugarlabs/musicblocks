@@ -1370,6 +1370,16 @@ describe("Blocks Foundation", () => {
             });
             const flow = (x, y, connections) => ({
                 ...shape(),
+                name: "flow",
+                protoblock: { style: "basic", staticLabels: ["flow"] },
+                isArgumentLikeBlock: () => false,
+                isArgFlowClampBlock: () => false,
+                isLeftClampBlock: () => false,
+                isNoHitBlock: () => false,
+                isCollapsible: () => false,
+                isInlineCollapsible: () => false,
+                highlight: jest.fn(),
+                unhighlight: jest.fn(),
                 trash: false,
                 container: { x, y },
                 docks: [
@@ -1396,6 +1406,13 @@ describe("Blocks Foundation", () => {
                         }
                     });
                 });
+            };
+
+            // Let undo and redo dock through the real drag controller
+            const dockForReal = () => {
+                blocks.blockMoved = blk => blocks.blockDragController.blockMoved(blk);
+                blocks._getNearbyBlocks = () => blocks.blockList.map((_b, i) => i);
+                blocks.activity.turtles = { running: () => false };
             };
 
             beforeEach(() => {
@@ -1594,7 +1611,7 @@ describe("Blocks Foundation", () => {
                     bottom: 1,
                     to: { parent: 2, slot: 1 }
                 });
-                blocks.blockMoved = jest.fn(snap);
+                dockForReal();
 
                 await blocks.redoAction();
 
@@ -1610,7 +1627,7 @@ describe("Blocks Foundation", () => {
                 blocks.activity._restoreTrashById = jest.fn(blk => {
                     blocks.blockList[blk].trash = false;
                 });
-                blocks.blockMoved = jest.fn(snap);
+                dockForReal();
                 blocks.actionHistory.push({
                     type: "trash",
                     blockId: 1,
