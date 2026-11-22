@@ -6,10 +6,10 @@ __pycache__
 *.log
 
 .github/
-Dockerfile
+dockerfile
 .dockerignore
 
-docs/
+Docs/
 *.md
 README*
 
