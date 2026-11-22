@@ -3235,6 +3235,25 @@ describe("Block Foundation", () => {
             expect(el.getAttribute("aria-label")).toBe("forward block");
         });
 
+        it("does not announce the turtle number held by a start block", () => {
+            const startBlock = new Block(
+                { name: "start", staticLabels: ["start"], image: "start.svg", docks: [] },
+                testBlocks
+            );
+            startBlock.blockIndex = 7;
+            startBlock.container = { x: 0, y: 0, on: jest.fn(), children: [] };
+            startBlock.value = 0;
+
+            expect(startBlock.getAccessibleLabel()).toBe("start block");
+
+            const el = startBlock._setupAccessibleElement();
+            expect(el.getAttribute("aria-label")).toBe("start block");
+
+            startBlock.value = 2;
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("start block");
+        });
+
         it("arrow keys navigate between sibling block elements", () => {
             const block2 = new Block(
                 { name: "right", staticLabels: ["right"], image: "right.svg", docks: [] },

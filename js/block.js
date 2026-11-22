@@ -5528,6 +5528,10 @@ class Block {
             "block";
         // A file block holds [filename, dataURL]: describe it by its filename, never its payload.
         const value = Array.isArray(this.value) ? this.value[0] : this.value;
+        // A start block carries its turtle number, which means nothing to a listener.
+        if (this.name === "start") {
+            return `${name} block`;
+        }
         if (
             value !== null &&
             value !== undefined &&
