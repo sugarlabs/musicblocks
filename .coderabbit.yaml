@@ -139,9 +139,9 @@ reviews:
             - name: "Unexplained Executable Config Changes"
               mode: "warning"
               instructions: |
-                  Pass: The PR does not touch files that run during install, build, test, CI or app start, or that control review (*.config.*, lighthouserc.js, package.json, package-lock.json, .npmrc, gulpfile.*, jest.setup.js, test/setupTests.js, test/setup/*, index.js, electron-main.js, dockerfile, setup.py, .husky/*, scripts/*, .github/workflows/*, .github/scripts/*, .github/actions/*, .github/CODEOWNERS, .coderabbit.yaml), or the PR description explains every such change.
-                  Fail: The PR changes one of these files but the description does not mention it, or the change does not fit the PR's stated purpose (for example, a translation PR that also edits cypress.config.js).
-                  Inconclusive: The description is brief but the change is clearly related to its stated purpose.
+                  Pass: The PR does not touch files that run during install, build, test, CI or app start, or that control review (*.config.*, lighthouserc.js, package.json, package-lock.json, .npmrc, gulpfile.*, jest.setup.js, test/setupTests.js, test/setup/*, index.js, electron-main.js, dockerfile, setup.py, .husky/*, scripts/*, .github/workflows/*, .github/scripts/*, .github/actions/*, .github/CODEOWNERS, .coderabbit.yaml), or the PR description names every such file, explains each change, and each change fits the PR's stated purpose.
+                  Fail: The description does not name one of these changed files, or a change does not fit the PR's stated purpose even when it is explained (for example, a translation PR that also edits cypress.config.js).
+                  Inconclusive: The description names every such file and each change fits the stated purpose, but the explanation is too brief to judge.
 
 chat:
     auto_reply: true
