@@ -19,6 +19,7 @@ jobs:
         run: |
           set +e
           hits=$(LC_ALL=C.UTF-8 grep -RlP '\h{200,}\S|\t{25,}\S' \
+            -D skip \
             --include='*.js' --include='*.mjs' --include='*.cjs' --include='*.ts' \
             --exclude-dir=node_modules .)
           status=$?
