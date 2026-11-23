@@ -1190,6 +1190,12 @@ function _splitPartVoices(partEl) {
             } else if (child.tagName === "forward") {
                 cursor += Number(_text(child, "duration")) || 0;
                 measureLength = Math.max(measureLength, cursor);
+            } else if (child.tagName === "direction") {
+                const voice = _text(child, "voice")?.trim() || String(implicitVoice);
+                if (!events.has(voice)) events.set(voice, []);
+                events
+                    .get(voice)
+                    .push({ note: child, position: cursor, duration: 0, chord: false });
             } else if (child.tagName === "note") {
                 const voice = _text(child, "voice") || String(implicitVoice);
                 const chord = child.querySelector(":scope > chord") !== null;
@@ -1242,7 +1248,9 @@ function _splitPartVoices(partEl) {
                     appendForward(voiceMeasure, event.position - position);
                 }
                 voiceMeasure.appendChild(event.note.cloneNode(true));
-                if (!event.chord) position = Math.max(position, event.position + event.duration);
+                if (event.note.tagName === "note" && !event.chord) {
+                    position = Math.max(position, event.position + event.duration);
+                }
             }
             appendForward(voiceMeasure, measureLength - position);
 

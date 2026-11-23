@@ -1081,7 +1081,7 @@ describe("Test 13: Dynamic markings", () => {
         expect(synthVolumes(blocks)).toEqual([]);
     });
 
-    it("ignores a dynamic that explicitly targets another voice", async () => {
+    it("applies a dynamic targeting the second voice only to that voice", async () => {
         const voiceTwoDynamic =
             "<direction><voice>2</voice><direction-type><dynamics><f/></dynamics></direction-type></direction>";
         const voiceOneNote =
@@ -1094,8 +1094,39 @@ describe("Test 13: Dynamic markings", () => {
             scorePartwise(voiceTwoDynamic + voiceOneNote + "<backup/>" + voiceTwoNote)
         );
 
-        expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
-        expect(synthVolumes(blocks)).toEqual([]);
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 }
+        ]);
+        expect(synthVolumes(blocks)).toEqual([80]);
+        const settimbres = blocks.filter(block => blockName(block) === "settimbre");
+        const volume = blocks.find(block => blockName(block) === "setsynthvolume");
+        expect(settimbres).toHaveLength(2);
+        expect(volume[4][0]).toBe(settimbres[1][0]);
+    });
+
+    it("keeps unscoped directions with their voice across a backup", async () => {
+        const firstNote =
+            "<note><voice>1</voice><pitch><step>C</step><octave>4</octave></pitch>" +
+            "<duration>1</duration><type>quarter</type></note>";
+        const secondNote =
+            "<note><voice>2</voice><pitch><step>D</step><octave>4</octave></pitch>" +
+            "<duration>1</duration><type>quarter</type></note>";
+        const quiet =
+            "<direction><direction-type><dynamics><p/></dynamics></direction-type></direction>";
+        const loud =
+            "<direction><direction-type><dynamics><f/></dynamics></direction-type></direction>";
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                quiet + firstNote + "<backup><duration>1</duration></backup>" + loud + secondNote
+            )
+        );
+
+        const settimbres = blocks.filter(block => blockName(block) === "settimbre");
+        const volumes = blocks.filter(block => blockName(block) === "setsynthvolume");
+        expect(synthVolumes(blocks)).toEqual([35, 80]);
+        expect(volumes.map(block => block[4][0])).toEqual(settimbres.map(block => block[0]));
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
     it("keeps a dynamic that explicitly targets the imported voice", async () => {
