@@ -3372,5 +3372,12 @@
     "actor": "vyagh",
     "branch": "security-demo-author-spoofing",
     "headRepo": "sugarlabs/musicblocks"
+  },
+  "10566": {
+    "pushedAt": "2026-11-23T15:16:30.961Z",
+    "sha": "fc6a04025bc6658f5f42c12b9e14f9bcba93ceb2",
+    "actor": "vyagh",
+    "branch": "ci/hidden-payload-scan",
+    "headRepo": "sugarlabs/musicblocks"
   }
 }
