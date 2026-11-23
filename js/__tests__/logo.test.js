@@ -3295,7 +3295,12 @@ describe("Logo runFromBlockNow", () => {
             turtle0.running = true;
 
             logo.runFromBlockNow(logo, 0, 0, 0, null);
-            jest.runOnlyPendingTimers();
+            jest.advanceTimersByTime(0);
+            expect(mockActivity.valueBarVisible).toBe(true);
+            jest.advanceTimersByTime(2999);
+            expect(mockActivity.valueBarVisible).toBe(true);
+            jest.advanceTimersByTime(1);
+            expect(mockActivity.valueBarVisible).toBe(false);
             jest.useRealTimers();
 
             expect(mockActivity.textMsg).toHaveBeenCalledWith("3");
