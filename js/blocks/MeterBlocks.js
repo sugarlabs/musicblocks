@@ -12,7 +12,7 @@
 /*
    global
 
-   _, ValueBlock, LeftBlock, FlowBlock, NOINPUTERRORMSG, Singer,
+   _, ValueBlock, LeftBlock, FlowBlock, BooleanBlock, NOINPUTERRORMSG, Singer,
    NOACTIONERRORMSG, TONEBPM, FlowClampBlock
  */
 
@@ -1506,6 +1506,169 @@ function setupMeterBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a Euclidean rhythm generator block.
+     * Evaluates Bjorklund's algorithm for distributing pulses across steps.
+     * @class
+     * @extends BooleanBlock
+     */
+    class EuclideanBlock extends BooleanBlock {
+        /**
+         * Creates an instance of EuclideanBlock.
+         */
+        constructor() {
+            super("euclidean");
+            this.setPalette("meter", activity);
+            this.setHelpString([
+                _(
+                    "The Euclidean block evaluates whether a step is an active pulse (True) or a rest (False) in a Euclidean rhythm."
+                ),
+                "documentation",
+                null,
+                "euclideanhelp"
+            ]);
+            this.parameter = true;
+
+            this.formBlock({
+                name: _("euclidean"),
+                args: 4,
+                defaults: [3, 8, 0, 0],
+                argLabels: [_("pulses"), _("steps"), _("step"), _("rotation")]
+            });
+
+            this.makeMacro((x, y) => [
+                [0, "euclidean", x, y, [null, 1, 2, 3, 4]],
+                [1, ["number", { value: 3 }], 0, 0, [0]],
+                [2, ["number", { value: 8 }], 0, 0, [0]],
+                [3, ["number", { value: 0 }], 0, 0, [0]],
+                [4, ["number", { value: 0 }], 0, 0, [0]]
+            ]);
+        }
+
+        /**
+         * Updates the parameter of the block.
+         * @param {object} logo - The logo instance.
+         * @param {string} turtle - The turtle identifier.
+         * @param {string} blk - The block identifier.
+         * @returns {string} - The updated parameter value ("true" or "false").
+         */
+        updateParameter(logo, turtle, blk) {
+            if (activity.blocks.blockList[blk]?.value) {
+                return _("true");
+            } else {
+                return _("false");
+            }
+        }
+
+        /**
+         * Retrieves the argument value (true or false).
+         * @param {object} logo - Logo object.
+         * @param {number} turtle - Turtle identifier.
+         * @param {number} blk - Block identifier.
+         * @param {object} receivedArg - Received argument.
+         * @returns {boolean} true if active pulse, false if rest.
+         */
+        arg(logo, turtle, blk, receivedArg) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const cblk1 = connections ? connections[1] : null;
+            const cblk2 = connections ? connections[2] : null;
+            const cblk3 = connections ? connections[3] : null;
+            const cblk4 = connections ? connections[4] : null;
+
+            if (cblk1 === null || cblk2 === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            }
+
+            const pulses = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            const steps = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+            const step =
+                cblk3 !== null ? logo.parseArg(logo, turtle, cblk3, blk, receivedArg) : null;
+            const rotation =
+                cblk4 !== null ? logo.parseArg(logo, turtle, cblk4, blk, receivedArg) : 0;
+
+            const val = Singer.MeterActions
+                ? Singer.MeterActions.getEuclideanStep(pulses, steps, step, rotation, turtle)
+                : 0;
+            return Boolean(val);
+        }
+    }
+
+    /**
+     * Represents a Euclidean rhythm durations block.
+     * Returns an array of note durations representing the inter-onset intervals.
+     * @class
+     * @extends LeftBlock
+     */
+    class EuclideanDurationsBlock extends LeftBlock {
+        /**
+         * Creates an instance of EuclideanDurationsBlock.
+         */
+        constructor() {
+            super("euclideandurations");
+            this.setPalette("meter", activity);
+            this.setHelpString([
+                _(
+                    "The Euclidean durations block returns the list of note duration fractions for a Euclidean rhythm."
+                ),
+                "documentation",
+                null,
+                "euclideandurationshelp"
+            ]);
+
+            this.formBlock({
+                name: _("euclidean durations"),
+                args: 4,
+                defaults: [3, 8, 1, 0],
+                argLabels: [_("pulses"), _("steps"), _("total duration"), _("rotation")]
+            });
+
+            this.makeMacro((x, y) => [
+                [0, "euclideandurations", x, y, [null, 1, 2, 3, 4]],
+                [1, ["number", { value: 3 }], 0, 0, [0]],
+                [2, ["number", { value: 8 }], 0, 0, [0]],
+                [3, ["number", { value: 1 }], 0, 0, [0]],
+                [4, ["number", { value: 0 }], 0, 0, [0]]
+            ]);
+        }
+
+        /**
+         * Retrieves the durations as a JSON array.
+         * @param {object} logo - Logo object.
+         * @param {number} turtle - Turtle identifier.
+         * @param {number} blk - Block identifier.
+         * @param {object} receivedArg - Received argument.
+         * @returns {string} JSON string representation of durations array.
+         */
+        arg(logo, turtle, blk, receivedArg) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const cblk1 = connections ? connections[1] : null;
+            const cblk2 = connections ? connections[2] : null;
+            const cblk3 = connections ? connections[3] : null;
+            const cblk4 = connections ? connections[4] : null;
+
+            if (cblk1 === null || cblk2 === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return JSON.stringify([]);
+            }
+
+            const pulses = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            const steps = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+            const totalDuration =
+                cblk3 !== null ? logo.parseArg(logo, turtle, cblk3, blk, receivedArg) : 1;
+            const rotation =
+                cblk4 !== null ? logo.parseArg(logo, turtle, cblk4, blk, receivedArg) : 0;
+
+            const durations = Singer.MeterActions
+                ? Singer.MeterActions.getEuclideanDurations(pulses, steps, totalDuration, rotation)
+                : [];
+
+            return JSON.stringify(durations);
+        }
+    }
+
+    new EuclideanBlock().setup(activity);
+    new EuclideanDurationsBlock().setup(activity);
     new CurrentMeterBlock().setup(activity);
     new BeatFactorBlock().setup(activity);
     new BPMFactorBlock().setup(activity);
