@@ -366,12 +366,40 @@ class BlockDragController {
     }
 
     /**
+     * List visible, unoccupied docks that accept a given dock type.
+     * @param {string} type - Source dock type.
+     * @returns {Array<{targetBlock: number, connectionIndex: number}>}
+     */
+    getEmptyDockTargets(type) {
+        const targets = [];
+        this.blocks.blockList.forEach((block, targetBlock) => {
+            if (!block || block.trash || block.inCollapsed || block.container.visible === false)
+                return;
+            if (block.collapsed && !block.isInlineCollapsible()) return;
+            const start = block.collapsed ? block.connections.length - 1 : 1;
+            for (
+                let connectionIndex = start;
+                connectionIndex < block.docks.length;
+                connectionIndex++
+            ) {
+                if (
+                    block.connections[connectionIndex] === null &&
+                    this.blocks._testConnectionType(type, block.docks[connectionIndex][2])
+                ) {
+                    targets.push({ targetBlock, connectionIndex });
+                }
+            }
+        });
+        return targets;
+    }
+
+    /**
      * Handle connections when blocks are moved.
      * @param - thisBlock -new variable
      * @public
      * @returns {void}
      */
-    async blockMoved(thisBlock) {
+    async blockMoved(thisBlock, target = null) {
         const blocks = this.blocks;
         if (typeof blocks.hideSnapIndicator === "function") {
             blocks.hideSnapIndicator();
@@ -562,7 +590,7 @@ class BlockDragController {
         let insertAfterDefault = true;
 
         // Use spatial grid for O(1) neighbor lookup instead of full blockList scan
-        const nearby = blocks._getNearbyBlocks(x1, y1);
+        const nearby = target ? [target.targetBlock] : blocks._getNearbyBlocks(x1, y1);
 
         for (let bi = 0; bi < nearby.length; bi++) {
             const b = nearby[bi];
@@ -618,6 +646,12 @@ class BlockDragController {
             let bounced = false;
 
             for (let i = start; i < blocks.blockList[b].connections.length; i++) {
+                if (
+                    target &&
+                    (i !== target.connectionIndex || targetBlock.connections[i] !== null)
+                ) {
+                    continue;
+                }
                 /**
                  * When converting from Python projects to JS format,
                  * sometimes extra null connections are added. We need

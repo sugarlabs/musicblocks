@@ -552,6 +552,71 @@ describe("BlockDragController", () => {
         });
     });
 
+    describe("getEmptyDockTargets", () => {
+        it("returns only visible, compatible, unoccupied docks", () => {
+            const open = makeFlowBlock({
+                x: 0,
+                y: 0,
+                docks: [
+                    [0, 0, "in"],
+                    [0, 20, "out"],
+                    [0, 40, "numberin"]
+                ],
+                connections: [null, null, null]
+            });
+            const occupied = makeFlowBlock({
+                x: 100,
+                y: 0,
+                docks: [
+                    [0, 0, "in"],
+                    [0, 20, "out"]
+                ],
+                connections: [null, 3]
+            });
+            const hidden = makeFlowBlock({
+                x: 200,
+                y: 0,
+                docks: [
+                    [0, 0, "in"],
+                    [0, 20, "out"]
+                ],
+                connections: [null, null]
+            });
+            hidden.container.visible = false;
+            const source = makeFlowBlock({
+                x: 0,
+                y: 0,
+                docks: [[0, 0, "in"]],
+                connections: [1]
+            });
+            const blocks = makeBlocks([open, occupied, hidden, source]);
+
+            expect(blocks.blockDragController.getEmptyDockTargets("in")).toEqual([
+                { targetBlock: 0, connectionIndex: 1 }
+            ]);
+        });
+
+        it("exposes the final dock of a collapsed inline block", () => {
+            const target = makeFlowBlock({
+                x: 0,
+                y: 0,
+                docks: [
+                    [0, 0, "in"],
+                    [0, 20, "numberin"],
+                    [0, 40, "out"]
+                ],
+                connections: [null, null, null]
+            });
+            target.collapsed = true;
+            target.isInlineCollapsible = () => true;
+            const blocks = makeBlocks([target]);
+
+            expect(blocks.blockDragController.getEmptyDockTargets("in")).toEqual([
+                { targetBlock: 0, connectionIndex: 2 }
+            ]);
+        });
+    });
+
     describe("dock snapping (blockMoved)", () => {
         it("connects a block to a compatible dock within snapping range", async () => {
             const target = makeFlowBlock({
