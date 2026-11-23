@@ -132,6 +132,11 @@ http://127.0.0.1:3000/` and `Compression enabled`.
 
 6. Open your favorite browser and visit `localhost:3000` or `127.0.0.1:3000`.
 
+The development server restarts when `index.js` or `package.json` changes.
+Browser assets are served directly; refresh the page to see changes to them.
+If you add a server-side module, add it to the watch list in `nodemon.json`.
+This keeps nodemon from watching the entire repository and exhausting file watchers.
+
 **NOTE:** Press `Ctrl + C` to stop the server, including on macOS.
 
 For Turtle Blocks, use `localhost:3000?turtle=true` or `http://127.0.0.1:3000?turtle=true`.
