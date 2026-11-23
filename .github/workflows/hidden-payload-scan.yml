@@ -12,17 +12,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-      - name: Fail on code hidden behind long space runs
+      - name: Fail on code hidden behind long whitespace runs
         run: |
           set +e
-          hits=$(grep -rlP ' {200,}\S' \
+          hits=$(LC_ALL=C.UTF-8 grep -rlP '\h{200,}\S|\t{25,}\S' \
             --include='*.js' --include='*.mjs' --include='*.cjs' --include='*.ts' \
             --exclude-dir=node_modules .)
           status=$?
           set -e
           if [ "$status" -eq 0 ]; then
-            echo "::error::Hidden code found behind 200+ spaces in: $hits"
+            echo "::error::Hidden code found behind a long whitespace run in: $hits"
             exit 1
           elif [ "$status" -eq 1 ]; then
             echo "clean: no hidden payload found"
