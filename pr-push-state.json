@@ -3365,5 +3365,12 @@
     "actor": "SuspiciousChip",
     "branch": "tap-to-place-blocks",
     "headRepo": "SuspiciousChip/musicblocks"
+  },
+  "10565": {
+    "pushedAt": "2026-11-23T14:01:19.674Z",
+    "sha": "6896f262f0312f5a76f5853675a740d1eaa6e183",
+    "actor": "vyagh",
+    "branch": "security-demo-author-spoofing",
+    "headRepo": "sugarlabs/musicblocks"
   }
 }
