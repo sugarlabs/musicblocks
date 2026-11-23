@@ -1129,6 +1129,62 @@ describe("Test 13: Dynamic markings", () => {
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
+    it("uses explicit voice labels for unscoped directions in reversed sections", async () => {
+        const note = (name, voice) =>
+            `<note><voice>${voice}</voice><pitch><step>${name}</step><octave>4</octave></pitch>` +
+            "<duration>1</duration><type>quarter</type></note>";
+        const quiet =
+            "<direction><direction-type><dynamics><p/></dynamics></direction-type></direction>";
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                quiet + note("D", 2) + "<backup><duration>1</duration></backup>" + note("C", 1)
+            )
+        );
+
+        const settimbres = blocks.filter(block => blockName(block) === "settimbre");
+        const volume = blocks.find(block => blockName(block) === "setsynthvolume");
+        expect(pitches(blocks)).toEqual([
+            { name: "D", octave: 4 },
+            { name: "C", octave: 4 }
+        ]);
+        expect(synthVolumes(blocks)).toEqual([35]);
+        expect(volume[4][0]).toBe(settimbres[0][0]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("does not insert a forward gap twice when a direction precedes the note", async () => {
+        const note = (name, voice) =>
+            `<note><voice>${voice}</voice><pitch><step>${name}</step><octave>4</octave></pitch>` +
+            "<duration>4</duration><type>quarter</type></note>";
+        const quiet =
+            "<direction><direction-type><dynamics><p/></dynamics></direction-type></direction>";
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                note("C", 1) +
+                    note("D", 1) +
+                    "<backup><duration>8</duration></backup>" +
+                    "<forward><duration>4</duration></forward>" +
+                    quiet +
+                    note("E", 2),
+                "<divisions>4</divisions>"
+            )
+        );
+
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 },
+            { name: "E", octave: 4 }
+        ]);
+        expect(synthVolumes(blocks)).toEqual([35]);
+        expect(blocks.filter(block => blockName(block) === "rest2")).toHaveLength(1);
+        expect(noteValues(blocks)).toEqual([
+            [1, 4],
+            [1, 4],
+            [4, 16],
+            [1, 4]
+        ]);
+    });
+
     it("keeps a dynamic that explicitly targets the imported voice", async () => {
         const voiceOneDynamic =
             "<direction><voice>1</voice><direction-type><dynamics><f/></dynamics></direction-type></direction>";
@@ -2115,6 +2171,34 @@ describe("Test 17: Repeats", () => {
         expect(blocks.filter(b => blockName(b) === "repeat")).toHaveLength(0);
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
         expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("keeps a split voice's left first-ending barline before its notes", async () => {
+        const xml =
+            '<score-partwise><part id="P1">' +
+            '<measure number="1"><attributes><divisions>1</divisions></attributes>' +
+            '<barline location="left"><repeat direction="forward"/></barline>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "<backup><duration>1</duration></backup>" +
+            SIMPLE_NOTE("G", 3, "quarter") +
+            "</measure>" +
+            '<measure number="2"><barline location="left"><ending number="1" type="start"/></barline>' +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            "<backup><duration>1</duration></backup>" +
+            SIMPLE_NOTE("A", 3, "quarter") +
+            '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+            "</measure>" +
+            '<measure number="3"><barline location="left"><ending number="2" type="start"/></barline>' +
+            SIMPLE_NOTE("E", 4, "quarter") +
+            "<backup><duration>1</duration></backup>" +
+            SIMPLE_NOTE("B", 3, "quarter") +
+            '<barline location="right"><ending number="2" type="stop"/></barline>' +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        expect(playedPitches(blocks).map(pitch => pitch.name)).toEqual(["C", "D", "C", "E"]);
+        expect(blocks.filter(block => blockName(block) === "start")).toHaveLength(2);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
     it("flattens a first ending with no shared repeat-body notes", async () => {

@@ -1177,6 +1177,16 @@ function _splitPartVoices(partEl) {
         const divisionsText = measure.querySelector(":scope > attributes > divisions")?.textContent;
         if (divisionsText !== undefined) divisions = Number(divisionsText);
         const events = new Map();
+        const sectionVoices = [];
+        let sectionIndex = 0;
+        for (const child of measure.children) {
+            if (child.tagName === "backup") {
+                sectionIndex++;
+            } else if (child.tagName === "note" && !sectionVoices[sectionIndex]) {
+                sectionVoices[sectionIndex] =
+                    _text(child, "voice")?.trim() || String(sectionIndex + 1);
+            }
+        }
         let cursor = 0;
         let measureLength = 0;
         let implicitVoice = 1;
@@ -1191,13 +1201,19 @@ function _splitPartVoices(partEl) {
                 cursor += Number(_text(child, "duration")) || 0;
                 measureLength = Math.max(measureLength, cursor);
             } else if (child.tagName === "direction") {
-                const voice = _text(child, "voice")?.trim() || String(implicitVoice);
+                const voice =
+                    _text(child, "voice")?.trim() ||
+                    sectionVoices[implicitVoice - 1] ||
+                    String(implicitVoice);
                 if (!events.has(voice)) events.set(voice, []);
                 events
                     .get(voice)
                     .push({ note: child, position: cursor, duration: 0, chord: false });
             } else if (child.tagName === "note") {
-                const voice = _text(child, "voice") || String(implicitVoice);
+                const voice =
+                    _text(child, "voice")?.trim() ||
+                    sectionVoices[implicitVoice - 1] ||
+                    String(implicitVoice);
                 const chord = child.querySelector(":scope > chord") !== null;
                 const grace = child.querySelector(":scope > grace") !== null;
                 const position = chord ? lastNoteStart : cursor;
@@ -1237,7 +1253,10 @@ function _splitPartVoices(partEl) {
 
             const barlines = [...measure.querySelectorAll(":scope > barline")];
             for (const barline of barlines) {
-                if (barline.querySelector(':scope > repeat[direction="forward"]')) {
+                if (
+                    barline.getAttribute("location") === "left" ||
+                    barline.querySelector(':scope > repeat[direction="forward"]')
+                ) {
                     voiceMeasure.appendChild(barline.cloneNode(true));
                 }
             }
@@ -1246,6 +1265,7 @@ function _splitPartVoices(partEl) {
             for (const event of events.get(voice) || []) {
                 if (event.position > position) {
                     appendForward(voiceMeasure, event.position - position);
+                    position = event.position;
                 }
                 voiceMeasure.appendChild(event.note.cloneNode(true));
                 if (event.note.tagName === "note" && !event.chord) {
@@ -1255,7 +1275,10 @@ function _splitPartVoices(partEl) {
             appendForward(voiceMeasure, measureLength - position);
 
             for (const barline of barlines) {
-                if (!barline.querySelector(':scope > repeat[direction="forward"]')) {
+                if (
+                    barline.getAttribute("location") !== "left" &&
+                    !barline.querySelector(':scope > repeat[direction="forward"]')
+                ) {
                     voiceMeasure.appendChild(barline.cloneNode(true));
                 }
             }
