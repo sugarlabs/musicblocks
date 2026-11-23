@@ -123,7 +123,7 @@ reviews:
                   "Executable files" below means files that run during install, build, test, CI or app start, or that control review: any *.config.js, *.config.mjs, *.config.cjs, *.config.ts, lighthouserc.js, package.json, package-lock.json, .npmrc, gulpfile.*, jest.setup.js, test/setupTests.js, test/setup/*, index.js, electron-main.js, dockerfile, setup.py, .husky/*, scripts/*, .github/workflows/*, .github/scripts/*, .github/actions/*, .github/CODEOWNERS and .coderabbit.yaml.
                   Fail, whatever the PR description says, if any changed line in any file in the PR (including lib/, dist/ and sounds/):
                   - has 100 or more spaces, tabs or Unicode spaces followed by more code on the same line;
-                  - contains the known indicator global.o=;
+                  - assigns to global.o in code (the known indicator, with any spacing or as global["o"]); a mention of it in prose, documentation or this file's own rule text does not count;
                   - executes a decoded string: eval( or new Function( applied to the output of atob, Buffer.from with base64 or hex, String.fromCharCode or an XOR loop.
                   Also fail if a changed line in an executable file does any of the following and the PR description does not name that file and explain that change:
                   - is longer than 300 characters;
