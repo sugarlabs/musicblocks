@@ -13,7 +13,7 @@
    global
 
    _, FlowBlock, NOINPUTERRORMSG, ValueBlock, docById, toFixed2,
-   LeftBlock, BooleanSensorBlock, NANERRORMSG, hex2rgb, hexToRGB, isValidHex, searchColors,
+   LeftBlock, BooleanSensorBlock, NANERRORMSG, hexToRGB, isValidHex, searchColors,
    Tone, platformColor, _THIS_IS_MUSIC_BLOCKS_
  */
 
@@ -539,10 +539,12 @@ function setupSensorsBlocks(activity) {
          * @param {number} index - The RGB component index (0=red, 1=green, 2=blue).
          * @param {string} helpMouse - Help text for mouse context.
          * @param {string} helpTurtle - Help text for turtle context.
+         * @param {GetColorPixelBlock} pixelBlock - The pixel color block, which reads the canvas.
          */
-        constructor(name, label, index, helpMouse, helpTurtle) {
+        constructor(name, label, index, helpMouse, helpTurtle, pixelBlock) {
             super(name, label);
             this.colorIndex = index;
+            this.pixelBlock = pixelBlock;
             this.setPalette("sensors", activity);
             this.parameter = true;
 
@@ -557,17 +559,22 @@ function setupSensorsBlocks(activity) {
             return toFixed2(activity.blocks.blockList[blk].value);
         }
 
+        /**
+         * Retrieves the red, green or blue component of the pixel under the turtle.
+         * @param {Object} logo - The logo object managing the runtime state.
+         * @param {number} turtle - The identifier of the turtle.
+         * @returns {number} - The component from 0 to 100, or that of the fallback gray if
+         *     the pixel cannot be read.
+         */
         arg(logo, turtle) {
-            let colorString = activity.turtles.getTurtle(turtle).painter.canvasColor;
-
-            // Handle hex and rgb color formats
-            if (isValidHex(colorString)) {
-                colorString = hex2rgb(colorString);
+            let rgb;
+            try {
+                rgb = this.pixelBlock.getPixelRGB(turtle, true);
+            } catch (error) {
+                rgb = GetColorPixelBlock.FALLBACKRGB;
             }
 
-            const obj = colorString.split("(")[1].split(",");
-            const component = Number(obj[this.colorIndex]);
-            return parseInt(component / 2.55, 10);
+            return parseInt(rgb[this.colorIndex] / 2.55, 10);
         }
     }
 
@@ -614,19 +621,29 @@ function setupSensorsBlocks(activity) {
          * @param {Object} logo - The logo object managing the runtime state.
          * @param {number} turtle - The identifier of the turtle.
          * @returns {number} - The color index from searchColors, or a fallback value if detection fails.
-         * @throws {Error} - If the turtle or canvas context cannot be accessed.
          */
         arg(logo, turtle) {
-            let requiredTurtle;
-
             try {
-                requiredTurtle = activity.turtles.getTurtle(turtle);
+                return searchColors(...this.getPixelRGB(turtle));
             } catch (error) {
-                return this.getFallbackColor(); // Turtle not found, no visibility to restore
+                return this.getFallbackColor();
             }
+        }
 
+        /**
+         * Reads the pixel under the turtle, hiding the turtle while reading so that it does not
+         * cover the pixel.
+         * @param {number} turtle - The identifier of the turtle.
+         * @param {boolean} [composite=false] - Whether to blend a translucent pixel over the
+         *     background, giving the color shown on screen.
+         * @returns {number[]} - The red, green and blue values (0 to 255) of the pixel, or of the
+         *     background if the pixel is transparent.
+         * @throws {Error} - If the turtle, its container or the canvas context cannot be accessed.
+         */
+        getPixelRGB(turtle, composite = false) {
+            const requiredTurtle = activity.turtles.getTurtle(turtle);
             if (!requiredTurtle.container) {
-                return this.getFallbackColor(); // Container not found, no visibility to restore
+                throw new Error("Turtle container unavailable");
             }
 
             const { x, y } = requiredTurtle.container;
@@ -635,15 +652,9 @@ function setupSensorsBlocks(activity) {
             try {
                 requiredTurtle.container.visible = false;
                 activity.refreshCanvas();
-
-                const pixelData = this.getPixelData(x, y);
-                const color = this.detectColor(pixelData);
-
+                return this.pixelToRGB(this.getPixelData(x, y), composite);
+            } finally {
                 requiredTurtle.container.visible = originalVisibility;
-                return color;
-            } catch (error) {
-                requiredTurtle.container.visible = originalVisibility;
-                return this.getFallbackColor();
             }
         }
 
@@ -664,27 +675,42 @@ function setupSensorsBlocks(activity) {
         }
 
         /**
-         * Determines the color based on pixel data.
+         * Determines the red, green and blue values based on pixel data.
          * @param {Uint8ClampedArray} pixelData - The RGBA values of the pixel.
-         * @returns {number} - The color index from searchColors.
+         * @param {boolean} [composite=false] - Whether to blend a translucent pixel over the
+         *     background, giving the color shown on screen.
+         * @returns {number[]} - The red, green and blue values, those of the background for a
+         *     transparent pixel.
          */
-        detectColor(pixelData) {
+        pixelToRGB(pixelData, composite = false) {
             if (pixelData.length !== 4) {
                 throw new Error("Invalid pixel data");
             }
             const [r, g, b, a] = pixelData;
-            return a === 0 ? this.getBackgroundColor() : searchColors(r, g, b);
+            if (a === 0) {
+                return this.getBackgroundRGB();
+            }
+            if (!composite || a === 255) {
+                return [r, g, b];
+            }
+
+            const alpha = a / 255;
+            const background = this.getBackgroundRGB();
+            return [r, g, b].map((value, i) =>
+                Math.round(value * alpha + background[i] * (1 - alpha))
+            );
         }
 
         /**
-         * Retrieves the background color as a fallback.
-         * @returns {number} - The background color index.
+         * Retrieves the red, green and blue values of the background, the one set by the
+         * background block if any, otherwise the theme's.
+         * @returns {number[]} - The red, green and blue values of the background.
          */
-        getBackgroundColor() {
+        getBackgroundRGB() {
             let r;
             let g;
             let b;
-            const background = platformColor.background;
+            const background = activity.turtles?._backgroundColor || platformColor.background;
 
             if (isValidHex(background)) {
                 const rgb = hexToRGB(background);
@@ -698,7 +724,7 @@ function setupSensorsBlocks(activity) {
                     .map(Number);
             }
 
-            return searchColors(r, g, b);
+            return [r, g, b];
         }
 
         /**
@@ -706,9 +732,12 @@ function setupSensorsBlocks(activity) {
          * @returns {number} - A default color index (e.g., gray).
          */
         getFallbackColor() {
-            return searchColors(128, 128, 128);
+            return searchColors(...GetColorPixelBlock.FALLBACKRGB);
         }
     }
+
+    // Gray, used when the pixel under the turtle cannot be read
+    GetColorPixelBlock.FALLBACKRGB = [128, 128, 128];
 
     /**
      * Represents a block that returns the number of seconds that the program has been running.
@@ -929,10 +958,14 @@ function setupSensorsBlocks(activity) {
          * @returns {string|number} - The converted letter or 0 in case of an error.
          */
         arg(logo, turtle, blk, receivedArg) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId !== null &&
+                parentId !== undefined &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "toascii"]);
             } else {
@@ -1000,6 +1033,7 @@ function setupSensorsBlocks(activity) {
         }
     }
 
+    const colorPixelBlock = new GetColorPixelBlock();
     [
         {
             name: "getred",
@@ -1040,10 +1074,11 @@ function setupSensorsBlocks(activity) {
             cfg.label,
             cfg.index,
             cfg.helpMouse,
-            cfg.helpTurtle
+            cfg.helpTurtle,
+            colorPixelBlock
         ).setup(activity);
     });
-    new GetColorPixelBlock().setup(activity);
+    colorPixelBlock.setup(activity);
     new ToASCIIBlock().setup(activity);
     new KeyboardBlock().setup(activity);
     new InputValueBlock().setup(activity);

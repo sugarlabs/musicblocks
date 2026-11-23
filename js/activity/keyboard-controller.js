@@ -357,6 +357,11 @@ class KeyboardController {
                     activity.palettes.dict[activity.palettes.activePalette]
                         ? activity.palettes.dict[activity.palettes.activePalette]
                         : null;
+                // A BPM input being edited keeps Up and Down, so a tempo step
+                // cannot replace what was typed there.
+                const editingBPM =
+                    activity.inTempoWidget &&
+                    activity.logo.tempo.BPMInputs.includes(document.activeElement);
                 switch (event.keyCode) {
                     case END:
                         activity.textMsg("END " + _("Jumping to the bottom of the page."));
@@ -380,7 +385,10 @@ class KeyboardController {
                         break;
                     case KEYCODE_UP:
                         if (activity.inTempoWidget) {
-                            activity.logo.tempo.speedUp(0);
+                            if (editingBPM) {
+                                break;
+                            }
+                            activity.logo.tempo.speedUp(activity.logo.tempo.activeBPMIndex, 1);
                         } else {
                             if (activity.blocks.activeBlock !== null) {
                                 activity.textMsg("UP ARROW " + _("Moving block up."));
@@ -401,7 +409,10 @@ class KeyboardController {
                         break;
                     case KEYCODE_DOWN:
                         if (activity.inTempoWidget) {
-                            activity.logo.tempo.slowDown(0);
+                            if (editingBPM) {
+                                break;
+                            }
+                            activity.logo.tempo.slowDown(activity.logo.tempo.activeBPMIndex, 1);
                         } else {
                             if (activity.blocks.activeBlock !== null) {
                                 activity.textMsg(`DOWN ARROW ${_("Moving block down.")}`);

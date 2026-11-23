@@ -45,6 +45,8 @@ var SOLFEGECONVERSIONTABLE = {
     "D♯": "re" + SHARP,
     "E♭": "mi" + FLAT,
     "E": "mi",
+    "E♯": "mi" + SHARP,
+    "F♭": "fa" + FLAT,
     "F": "fa",
     "F♯": "fa" + SHARP,
     "G♭": "sol" + FLAT,

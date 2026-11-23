@@ -431,6 +431,27 @@ class Singer {
     }
 
     /**
+     * Drops the notes a stopped turtle had started but not yet played.
+     *
+     * @returns {void}
+     */
+    dropPendingNotes() {
+        this.oscList = {};
+        this.noteBeat = {};
+        this.noteValue = {};
+        this.noteDrums = {};
+        this.notePitches = {};
+        this.noteOctaves = {};
+        this.noteCents = {};
+        this.noteHertz = {};
+        this.noteBeatValues = {};
+        this.embeddedGraphics = {};
+        this.delayedNotes = [];
+        this.inNoteBlock = [];
+        this.multipleVoices = false;
+    }
+
+    /**
      * Kills all active audio voices for this turtle.
      * Called during stop/halt to prevent "zombie audio" that continues playing.
      * Uses try/catch to handle nodes that may have already stopped.
@@ -491,6 +512,24 @@ class Singer {
      */
     static addScalarTransposition(logo, turtle, note, octave, steps) {
         if (steps === 0) return [note, octave];
+
+        // A step count is walked one scale degree at a time below, so a
+        // non-finite or absurdly large value (e.g. a computed 10^308 from
+        // the power block, which passes the finite checks in the step-pitch
+        // and scalar-transpose actions) would hang the main thread. Cap the
+        // walk at 1000 steps as a performance guard only: it is NOT
+        // musically neutral — getNote clamps the octave to 1..10 but the
+        // note letter keeps cycling, so e.g. 1000 steps up from C in
+        // C major lands on B while an uncapped 1001 would land on C.
+        // Treat an overflowed Infinity the same way as a huge finite
+        // value (clamp to the cap in its direction); only NaN, which has
+        // no direction, leaves the note unchanged.
+        if (typeof steps !== "number" || Number.isNaN(steps)) return [note, octave];
+        const MAX_SCALAR_TRANSPOSITION_STEPS = 1000;
+        steps = Math.max(
+            -MAX_SCALAR_TRANSPOSITION_STEPS,
+            Math.min(MAX_SCALAR_TRANSPOSITION_STEPS, steps)
+        );
 
         const activity = logo.activity;
         const tur = activity.turtles.ithTurtle(turtle);
@@ -2551,8 +2590,10 @@ class Singer {
                                         chordNotes.push(notationNote);
                                     }
 
-                                    if (!chordDrums.includes(tur.singer.noteDrums[thisBlk][0])) {
-                                        chordDrums.push(tur.singer.noteDrums[thisBlk][0]);
+                                    for (const drum of tur.singer.noteDrums[thisBlk]) {
+                                        if (!chordDrums.includes(drum)) {
+                                            chordDrums.push(drum);
+                                        }
                                     }
                                 } else {
                                     // A frequency (cents or hertz) has no accidental to restate.

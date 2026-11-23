@@ -38,6 +38,7 @@ const mockGlobals = {
     temperamentHasRatios: jest.fn().mockReturnValue(false),
     isNonEDO: jest.fn().mockReturnValue(false),
     getStepSizeUp: jest.fn().mockReturnValue(1),
+    getStepSizeDown: jest.fn().mockReturnValue(-1),
     numberToPitch: jest.fn().mockReturnValue(["C", 4]),
     pitchToNumber: jest.fn().mockReturnValue(60),
     getTemperament: jest.fn().mockReturnValue({ pitchNumber: 12 }),
@@ -57,6 +58,7 @@ global.isEquallyTempered = mockGlobals.isEquallyTempered;
 global.temperamentHasRatios = mockGlobals.temperamentHasRatios;
 global.isNonEDO = mockGlobals.isNonEDO;
 global.getStepSizeUp = mockGlobals.getStepSizeUp;
+global.getStepSizeDown = mockGlobals.getStepSizeDown;
 global.numberToPitch = mockGlobals.numberToPitch;
 global.pitchToNumber = mockGlobals.pitchToNumber;
 global.getTemperament = mockGlobals.getTemperament;
@@ -289,9 +291,49 @@ describe("Singer Class", () => {
         });
     });
 
+    test("dropPendingNotes() forgets the notes it had started", () => {
+        singer.inNoteBlock = [12, 14];
+        singer.multipleVoices = true;
+        singer.noteValue = { 12: 4, 14: 8 };
+        singer.notePitches = { 12: ["G"], 14: ["A"] };
+        singer.delayedNotes = [[14, 8]];
+        singer.turtleTime = 3;
+
+        singer.dropPendingNotes();
+
+        expect(singer.inNoteBlock).toEqual([]);
+        expect(singer.multipleVoices).toBe(false);
+        expect(singer.noteValue).toEqual({});
+        expect(singer.notePitches).toEqual({});
+        expect(singer.delayedNotes).toEqual([]);
+        expect(singer.turtleTime).toBe(3);
+    });
+
     test("should correctly add scalar transposition", () => {
         const result = Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, 2);
         expect(result).toEqual(["C", 4]);
+    });
+
+    test("should return promptly for a huge finite step count instead of hanging", () => {
+        const start = Date.now();
+        const result = Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, 1e308);
+        expect(Date.now() - start).toBeLessThan(5000);
+        expect(result).toEqual(["C", 4]);
+    });
+
+    test("should clamp non-finite step counts instead of hanging", () => {
+        // Under this suite's getNote mock every walk returns ["C", 4], so
+        // the capped Infinity walks and the unchanged NaN both read the
+        // same; the real-getNote suite below pins the actual notes.
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, Infinity)).toEqual([
+            "C",
+            4
+        ]);
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, -Infinity)).toEqual([
+            "C",
+            4
+        ]);
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, NaN)).toEqual(["C", 4]);
     });
 
     test("should correctly calculate scalar distance", () => {
@@ -2760,6 +2802,27 @@ describe("processNote notation and MIDI emission guards against non-positive dur
         expect(activityMock.logo.updateNotation).toHaveBeenCalledWith(["C4"], 4, 0, -1, []);
     });
 
+    test("passes every drum in a note to the notation", () => {
+        const blk = "twoDrumsNoteBlk";
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["C", "C"] };
+        turtleMock.singer.noteOctaves = { [blk]: [2, 2] };
+        turtleMock.singer.noteCents = { [blk]: [0, 0] };
+        turtleMock.singer.noteHertz = { [blk]: [0, 0] };
+        turtleMock.singer.noteDrums = { [blk]: ["kick drum", "snare drum"] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1, 1] };
+        turtleMock.singer.instrumentNames = ["piano"];
+        turtleMock.singer.oscList = { [blk]: [] };
+        turtleMock.singer.bpm = [90];
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+        expect(activityMock.logo.updateNotation.mock.calls[0][4]).toEqual([
+            "kick drum",
+            "snare drum"
+        ]);
+    });
+
     test("passes a hertz note to notationMIDI as its nearest note name", () => {
         const blk = "hertzNoteBlk";
         turtleMock.singer.inNoteBlock = [blk];
@@ -2863,6 +2926,32 @@ describe("processNote notation and MIDI emission guards against non-positive dur
             );
         }
     );
+
+    test("passes every drum in one Note to the MIDI recorder", () => {
+        const blk = "drumNoteBlk";
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["C"] };
+        turtleMock.singer.noteOctaves = { [blk]: [4] };
+        turtleMock.singer.noteCents = { [blk]: [0] };
+        turtleMock.singer.noteHertz = { [blk]: [0] };
+        turtleMock.singer.noteDrums = { [blk]: ["kick drum", "snare drum"] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1] };
+        turtleMock.singer.instrumentNames = ["piano"];
+        turtleMock.singer.oscList = { [blk]: [] };
+        turtleMock.singer.bpm = [90];
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+        expect(activityMock.logo.notationMIDI).toHaveBeenCalledWith(
+            ["C4"],
+            ["kick drum", "snare drum"],
+            4,
+            0,
+            90,
+            "piano",
+            [4, 4]
+        );
+    });
 
     describe("inside Set Drum", () => {
         const blk = "setDrumNoteBlk";
@@ -3176,6 +3265,100 @@ describe("addScalarTransposition on non-EDO temperaments", () => {
         // the 9th positional argument (index 8).
         expect(loopCalls.every(c => c[8] === false)).toBe(true);
         expect(loopCalls.every(c => c[9] === false)).toBe(true);
+    });
+});
+
+describe("addScalarTransposition with real getNote", () => {
+    // The shared getNote mock always returns ["C", 4], so the mocked
+    // tests cannot verify the musical result. These tests use the real
+    // pitch resolver instead.
+    let turtleMock;
+    let activityMock;
+    let logoMock;
+    let savedGlobals;
+
+    beforeEach(() => {
+        savedGlobals = {
+            getNote: global.getNote,
+            getStepSizeUp: global.getStepSizeUp,
+            getStepSizeDown: global.getStepSizeDown
+        };
+        global.getNote = musicUtils.getNote;
+        global.getStepSizeUp = musicUtils.getStepSizeUp;
+        global.getStepSizeDown = musicUtils.getStepSizeDown;
+
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.singer.keySignature = "C major";
+        turtleMock.singer.movable = false;
+        activityMock = createActivityMock(turtleMock);
+        activityMock.errorMsg = jest.fn();
+        logoMock = createLogoMock(activityMock);
+        logoMock.synth.inTemperament = false;
+    });
+
+    afterEach(() => {
+        global.getNote = savedGlobals.getNote;
+        global.getStepSizeUp = savedGlobals.getStepSizeUp;
+        global.getStepSizeDown = savedGlobals.getStepSizeDown;
+    });
+
+    test("1000 steps up from C4 in C major lands on B10", () => {
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, 1000)).toEqual([
+            "B",
+            10,
+            0
+        ]);
+    });
+
+    test("1001 steps is capped to the same 1000-step result", () => {
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, 1001)).toEqual([
+            "B",
+            10,
+            0
+        ]);
+    });
+
+    test("the cap is not musically neutral: an uncapped 1001-step walk lands on C10", () => {
+        // Walk the same EDO loop without the cap, using the real resolver.
+        let noteObj = musicUtils.getNote("C", 4, 0, "C major", false, null, jest.fn(), false);
+        for (let i = 0; i < 1001; i++) {
+            const stepEdo = musicUtils.getStepSizeUp("C major", noteObj[0], undefined, false, 12);
+            noteObj = musicUtils.getNote(
+                noteObj[0],
+                noteObj[1],
+                stepEdo,
+                "C major",
+                false,
+                null,
+                jest.fn(),
+                false,
+                true,
+                false
+            );
+        }
+        expect(noteObj).toEqual(["C", 10, 0]);
+    });
+
+    test("Infinity is handled like a huge finite value, NaN leaves the note unchanged", () => {
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, Infinity)).toEqual(
+            Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, 1e308)
+        );
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, Infinity)).toEqual([
+            "B",
+            10,
+            0
+        ]);
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, -Infinity)).toEqual(
+            Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, -1e308)
+        );
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, -Infinity)).toEqual([
+            "D",
+            1,
+            // The resolver returns cents as -0 on the downward walk.
+            -0
+        ]);
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, NaN)).toEqual(["C", 4]);
     });
 });
 

@@ -269,6 +269,8 @@ class Painter {
      * @private
      */
     _scheduleCanvasUpdate() {
+        this.activity.artworkRevision = (this.activity.artworkRevision || 0) + 1;
+
         if (this._pendingCanvasUpdate) {
             return; // Already scheduled
         }

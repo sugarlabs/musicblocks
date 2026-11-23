@@ -79,10 +79,14 @@ function setupOrnamentBlocks(activity) {
         arg(logo, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId !== null &&
+                parentId !== undefined &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 // Push staccato status to the status fields
                 logo.statusFields.push([blk, "staccato"]);
@@ -155,10 +159,14 @@ function setupOrnamentBlocks(activity) {
         arg(logo, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId !== null &&
+                parentId !== undefined &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 // Push slur status to the status fields
                 logo.statusFields.push([blk, "slur"]);

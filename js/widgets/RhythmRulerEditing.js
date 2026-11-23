@@ -127,14 +127,7 @@ class RhythmRulerEditing {
                 }, interval);
             }
         } else {
-            let inputNum = this._dissectNumber.value;
-            if (inputNum === "" || isNaN(inputNum)) {
-                inputNum = 2;
-            } else {
-                inputNum = Math.abs(Math.floor(inputNum));
-            }
-
-            this._dissectNumber.value = inputNum;
+            const inputNum = this._getDissectNumber();
 
             this._rulerSelected = cell.parentNode.getAttribute("data-row");
             this.__dissectByNumber(cell, inputNum, true);
@@ -212,12 +205,7 @@ class RhythmRulerEditing {
             }
 
             // convert times into cells here.
-            let inputNum = this._dissectNumber.value;
-            if (inputNum === "" || isNaN(inputNum)) {
-                inputNum = 2;
-            } else {
-                inputNum = Math.abs(Math.floor(inputNum));
-            }
+            const inputNum = this._getDissectNumber();
 
             // Minimum beat is tied to the input number
             let minimumBeat;
@@ -588,11 +576,16 @@ class RhythmRulerEditing {
      * @returns {void}
      */
     __dissectByNumber(cell, inputNum, addToUndoList) {
-        if (typeof cell !== "object") {
+        if (typeof cell !== "object" || cell === null) {
             return;
         }
 
-        if (typeof inputNum !== "number") {
+        if (
+            typeof inputNum !== "number" ||
+            !Number.isFinite(inputNum) ||
+            !Number.isInteger(inputNum) ||
+            inputNum < 2
+        ) {
             return;
         }
 

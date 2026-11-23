@@ -672,6 +672,7 @@ describe("getInvertMode", () => {
         expect(getInvertMode(123)).toBe(123);
         expect(getInvertMode({})).toEqual({});
         expect(getInvertMode("")).toBe("");
+        expect(getInvertMode("  EVEN  ")).toBe("even");
     });
 });
 
@@ -2693,6 +2694,31 @@ describe("getModePattern", () => {
     });
 });
 
+describe("buildScale keeps the tonic named as the key", () => {
+    // The final double-accidental pass of buildScale used to respell the tonic itself when
+    // the next degree landed on the same letter, so C♯ fibonacci began on B𝄪.
+    test.each([
+        ["C♯ fibonacci", ["C♯", "C𝄪", "D♯", "F", "G♯", "C♯"]],
+        ["F♯ fibonacci", ["F♯", "F𝄪", "G♯", "A♯", "C♯", "F♯"]]
+    ])("%s starts and ends on the key's own name", (keySignature, expected) => {
+        const [scale, halfSteps] = buildScale(keySignature);
+        expect(scale).toEqual(expected);
+        expect(halfSteps).toEqual([1, 1, 2, 3, 5]);
+
+        // The user-facing lookup must also report the key note, in octaves 0 and 1.
+        expect(nthDegreeToPitch(keySignature, 1)).toEqual([expected[0], 0]);
+        expect(nthDegreeToPitch(keySignature, 6)).toEqual([expected[0], 1]);
+    });
+
+    test("every sharp key starts every mode on its own tonic", () => {
+        for (const key of ["C♯", "D♯", "F♯", "G♯", "A♯"]) {
+            for (const mode of Object.keys(MUSICALMODES)) {
+                expect(buildScale(`${key} ${mode}`)[0][0]).toBe(key);
+            }
+        }
+    });
+});
+
 describe("buildScale with explicit EDO", () => {
     it.each([
         [19, [3, 3, 2, 3, 3, 3, 2]],
@@ -3583,6 +3609,8 @@ describe("noteIsSolfege", () => {
         "D♯": "re" + SHARP,
         "E♭": "mi" + FLAT,
         "E": "mi",
+        "E♯": "mi" + SHARP,
+        "F♭": "fa" + FLAT,
         "F": "fa",
         "F♯": "fa" + SHARP,
         "G♭": "sol" + FLAT,
@@ -3605,8 +3633,13 @@ describe("noteIsSolfege", () => {
         expect(noteIsSolfege("R")).toBe(false);
     });
 
-    it("should return true for a note with an unrecognized sharp (e.g., E♯)", () => {
-        expect(noteIsSolfege("E♯")).toBe(true);
+    it("should return false for E♯ and F♭, which are letter names too", () => {
+        expect(noteIsSolfege("E♯")).toBe(false);
+        expect(noteIsSolfege("F♭")).toBe(false);
+    });
+
+    it("should return true for a solfege name", () => {
+        expect(noteIsSolfege("mi")).toBe(true);
     });
 });
 
@@ -3625,6 +3658,8 @@ describe("getSolfege", () => {
         "D♯": "re" + SHARP,
         "E♭": "mi" + FLAT,
         "E": "mi",
+        "E♯": "mi" + SHARP,
+        "F♭": "fa" + FLAT,
         "F": "fa",
         "F♯": "fa" + SHARP,
         "G♭": "sol" + FLAT,

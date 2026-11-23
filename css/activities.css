@@ -1028,6 +1028,10 @@ body.highcontrast #aux-toolbar .aux-nav-container {
     line-height: normal !important;
 }
 
+#aux-toolbar .aux-nav-container .inspection-group {
+    margin-left: auto !important;
+}
+
 #aux-toolbar .aux-group {
     display: inline-flex !important;
     align-items: center !important;
