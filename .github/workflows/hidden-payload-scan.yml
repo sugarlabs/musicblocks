@@ -1,0 +1,22 @@
+name: Hidden Payload Scan
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fail on code hidden behind long space runs
+        run: |
+          hits=$(grep -rlP ' {200,}\S' \
+            --include='*.js' --include='*.mjs' --include='*.cjs' --include='*.ts' \
+            --exclude-dir=node_modules . || true)
+          if [ -n "$hits" ]; then
+            echo "::error::Hidden code found behind 200+ spaces in: $hits"
+            exit 1
+          fi
+          echo "clean: no hidden payload found"
