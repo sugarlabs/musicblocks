@@ -27,7 +27,6 @@ class StatsWindow {
         this.activity = activity;
         this.isOpen = true;
         this._inFlight = false;
-        this._chart = null;
 
         this.widgetWindow = window.widgetWindows.windowFor(this, "stats", "stats");
         this.widgetWindow.clear();
@@ -37,11 +36,6 @@ class StatsWindow {
         };
         this.widgetWindow.onclose = () => {
             this.isOpen = false;
-            if (this._chart) {
-                this.activity.loading = false;
-                document.body.style.cursor = "default";
-            }
-            this._destroyChart();
             this._inFlight = false;
             this.activity.blocks.showBlocks();
             this.widgetWindow.destroy();
@@ -97,7 +91,7 @@ class StatsWindow {
      * @returns {void}
      */
     refresh() {
-        if (!this.isOpen || this._inFlight) {
+        if (this._inFlight) {
             return;
         }
         this._inFlight = true;
@@ -113,16 +107,6 @@ class StatsWindow {
                     this._inFlight = false;
                     console.error("Failed to load Chart.js:", err);
                 });
-        }
-    }
-
-    /** Release the temporary chart and cancel its pending animation. */
-    _destroyChart() {
-        const chart = this._chart;
-        this._chart = null;
-        if (chart) {
-            chart.stop();
-            chart.destroy();
         }
     }
 
@@ -151,10 +135,6 @@ class StatsWindow {
      * @returns {void}
      */
     doAnalytics() {
-        if (!this.isOpen) {
-            return;
-        }
-        this._destroyChart();
         this.activity.blocks.activeBlock = null;
         const myChart = docById("myChart");
 
@@ -176,34 +156,24 @@ class StatsWindow {
         };
 
         const __callback = () => {
-            if (!this.isOpen || this._chart !== myRadarChart) {
-                return;
+            const imageData = myRadarChart.toBase64Image();
+            const img = new Image();
+            img.src = imageData;
+            if (this.widgetWindow.isMaximized()) {
+                img.width = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 80;
+            } else {
+                img.width = 200;
             }
 
-            try {
-                const imageData = myRadarChart.toBase64Image();
-                const img = new Image();
-                img.src = imageData;
+            img.style.maxWidth = "100%";
+            img.style.height = "auto";
+            img.style.minWidth = "0";
+            img.style.objectFit = "contain";
 
-                if (this.widgetWindow.isMaximized()) {
-                    img.width =
-                        this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 80;
-                } else {
-                    img.width = 200;
-                }
-
-                img.style.maxWidth = "100%";
-                img.style.height = "auto";
-                img.style.minWidth = "0";
-                img.style.objectFit = "contain";
-
-                this.widgetWindow.getWidgetBody().appendChild(img);
-                this.activity.blocks.hideBlocks();
-                this.activity.showBlocksAfterRun = false;
-            } finally {
-                this._destroyChart();
-                __releaseBusyState();
-            }
+            this.widgetWindow.getWidgetBody().appendChild(img);
+            this.activity.blocks.hideBlocks();
+            this.activity.showBlocksAfterRun = false;
+            __releaseBusyState();
         };
 
         // Only the analysis and chart construction are guarded: those are the
@@ -215,7 +185,7 @@ class StatsWindow {
             runAnalytics(this.activity);
             const data = scoreToChartData(scores);
             const options = getChartOptions(__callback);
-            this._chart = myRadarChart = new window.Chart(ctx).Radar(data, options);
+            myRadarChart = new window.Chart(ctx).Radar(data, options);
         } catch (err) {
             console.error("Statistics analysis failed:", err);
             __releaseBusyState();
