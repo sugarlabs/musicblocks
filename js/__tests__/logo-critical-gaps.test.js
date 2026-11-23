@@ -288,9 +288,9 @@ describe("_iterationBudget init order", () => {
 
 // ─── resetTemperament ────────────────────────────────────────────────────────
 //
-// This is called at the start of every run. If the project no longer has a
-// settemperament block, the temperament should be wiped so it doesn't bleed
-// into the next project the user opens.
+// This is called at the start of every run. Each run starts in equal
+// temperament so a tuning set by one stack or project doesn't bleed into the
+// next run.
 
 describe("resetTemperament", () => {
     let logo;
@@ -314,14 +314,15 @@ describe("resetTemperament", () => {
         expect(logo.temperamentSelected).toEqual([]);
     });
 
-    test("keeps temperament when the project still has a settemperament block", () => {
+    test("wipes temperament even when the project still has a settemperament block", () => {
         logo._userTemperament = "pythagorean";
         logo.temperamentSelected = ["pythagorean"];
         logo.blockList = [{ name: "settemperament", trash: false }];
 
         logo.resetTemperament();
 
-        expect(logo._userTemperament).toBe("pythagorean");
+        expect(logo._userTemperament).toBeNull();
+        expect(logo.temperamentSelected).toEqual([]);
     });
 
     test("trashed settemperament blocks don't count — temperament gets cleared", () => {
@@ -351,13 +352,13 @@ describe("resetTemperament", () => {
         expect(logo.synth.inTemperament).toBe("equal");
     });
 
-    test("synth picks up a persisted temperament when the block is present", () => {
+    test("synth starts in equal even when the block is present", () => {
         logo._userTemperament = "just";
         logo.blockList = [{ name: "settemperament", trash: false }];
 
         logo.resetTemperament();
 
-        expect(logo.synth.inTemperament).toBe("just");
+        expect(logo.synth.inTemperament).toBe("equal");
     });
 });
 
