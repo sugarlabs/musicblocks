@@ -1536,6 +1536,18 @@ describe("ModeWidget", () => {
             expect(mockActivity.logo.synth.stop).toHaveBeenCalledTimes(stopCount);
         });
 
+        test("finishing playback restores the Play button and unlocks the widget", () => {
+            const setIcon = jest.spyOn(modeWidget, "_setPlayButtonIcon");
+            modeWidget._playButton.onclick();
+            expect(modeWidget._locked).toBe(true);
+
+            jest.runAllTimers();
+
+            expect(modeWidget._playing).toBe(false);
+            expect(modeWidget._locked).toBe(false);
+            expect(setIcon).toHaveBeenLastCalledWith("play-button.svg", "Play all");
+        });
+
         test.each(["managed", "fallback"])(
             "Undo preserves a pending export with %s timers",
             timers => {
