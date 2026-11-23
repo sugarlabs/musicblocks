@@ -18,7 +18,7 @@ jobs:
       - name: Fail on code hidden behind long whitespace runs
         run: |
           set +e
-          hits=$(LC_ALL=C.UTF-8 grep -rlP '\h{200,}\S|\t{25,}\S' \
+          hits=$(LC_ALL=C.UTF-8 grep -RlP '\h{200,}\S|\t{25,}\S' \
             --include='*.js' --include='*.mjs' --include='*.cjs' --include='*.ts' \
             --exclude-dir=node_modules .)
           status=$?
