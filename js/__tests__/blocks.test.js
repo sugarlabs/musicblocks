@@ -3456,9 +3456,8 @@ describe("Blocks Foundation", () => {
         it("aborts cleanly with actionable message when blockObjs is not an array", () => {
             const activity = makeActivity();
             const blocks = makeBlocks(activity, ["forward"]);
-            blocks._loadInProgress = true;
 
-            expect(() => blocks._loadNewBlocksNow({ invalid: "data" }, 1)).not.toThrow();
+            expect(() => blocks.loadNewBlocks({ invalid: "data" })).not.toThrow();
             expect(blocks._loadInProgress).toBe(false);
             expect(activity.errorMsg).toHaveBeenCalledWith(
                 "Cannot load project: invalid project structure."
