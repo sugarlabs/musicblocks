@@ -70,6 +70,16 @@ reviews:
               - Prefer SHA-pinned or specific version tags for GitHub Actions.
               - Check workflow scripts for portability issues across different environments and line-ending formats.
 
+        - path: "{**/*.config.{js,mjs,cjs,ts},package.json,.npmrc,gulpfile.{js,mjs},.husky/**,scripts/**,.github/scripts/**,.github/actions/**}"
+          instructions: |
+              These files run automatically during install, build, test or CI. Review every change as security-sensitive:
+              - Never treat a change here as whitespace-only. Read the full changed line to its end.
+              - Flag code placed after a long run of spaces or tabs, lines over 300 characters, and trailing whitespace followed by code.
+              - Flag eval(), new Function(), child_process, exec/spawn, base64 or hex decoding followed by execution, XOR decoding loops, and network calls (fetch, http, https, axios, WebSocket, RPC URLs).
+              - Flag blockchain RPC endpoints, wallet-like hex strings, and assignments to global.* in config files.
+              - Flag new or changed lifecycle scripts in package.json (preinstall, install, postinstall, prepare, prepublish).
+              - Say clearly if a PR changes one of these files without explaining why in its description.
+
     pre_merge_checks:
         title:
             mode: "warning"
@@ -96,6 +106,27 @@ reviews:
                   - Any other category checked -> "Description" and "Changes Made" contains essential details explaining the changes.
                   Fail: A required section is missing, empty, or contains only placeholder comment text.
                   Inconclusive: No Category box is checked and no visual changes are detected in the diff or description.
+
+            - name: "Hidden Code in Executable Config"
+              mode: "error"
+              instructions: |
+                  Inspect every changed line in files that run during install, build, test or CI: any *.config.js, *.config.mjs, *.config.cjs, *.config.ts, package.json, .npmrc, gulpfile.*, .husky/*, scripts/*, .github/workflows/*, .github/scripts/* and .github/actions/*. Read each changed line to its very end, including diffs that look whitespace-only.
+                  Fail if any changed line in those files:
+                  - has 50 or more spaces, tabs or Unicode spaces followed by more code on the same line;
+                  - is longer than 300 characters;
+                  - adds eval(, new Function(, child_process, or a decode-then-execute pattern (atob, Buffer.from with base64 or hex, or an XOR loop whose result is executed);
+                  - adds a network call or remote URL (fetch, http, https, axios, WebSocket, a blockchain RPC endpoint) in a config file;
+                  - contains the known indicator global.o= or assigns to global.* in a config file;
+                  - adds or changes a package.json lifecycle script (preinstall, install, postinstall, prepare, prepublish).
+                  Pass: None of the listed files changed, or their changes contain none of the patterns above.
+                  Inconclusive: A listed pattern appears but the PR description gives a clear, legitimate reason for it.
+
+            - name: "Unexplained Executable Config Changes"
+              mode: "warning"
+              instructions: |
+                  Pass: The PR does not touch files that run during install, build, test or CI (*.config.*, package.json, .npmrc, gulpfile.*, .husky/*, scripts/*, .github/workflows/*, .github/scripts/*, .github/actions/*), or the PR description explains every such change.
+                  Fail: The PR changes one of these files but the description does not mention it, or the change does not fit the PR's stated purpose (for example, a translation PR that also edits cypress.config.js).
+                  Inconclusive: The description is brief but the change is clearly related to its stated purpose.
 
 chat:
     auto_reply: true
