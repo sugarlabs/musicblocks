@@ -204,18 +204,19 @@ describe("SaveInterface", () => {
             const toast = document.querySelector(".planet-toast");
             expect(toast).not.toBeNull();
             expect(toast.textContent).toBe("Test notification");
-            expect(toast.style.background).toBe("rgb(50, 50, 50)");
+            expect(toast.getAttribute("role")).toBe("status");
 
             jest.advanceTimersByTime(3000);
             expect(toast.parentNode).toBeNull();
         });
 
-        it("should render an error toast with red background", () => {
+        it("should render an error toast as an alert", () => {
             saveInterface.showToast("Error occurred", true);
             const toast = document.querySelector(".planet-toast");
             expect(toast).not.toBeNull();
             expect(toast.textContent).toBe("Error occurred");
-            expect(toast.style.background).toBe("rgb(211, 47, 47)");
+            expect(toast.getAttribute("role")).toBe("alert");
+            expect(toast.classList.contains("planet-toast-error")).toBe(true);
         });
     });
 });
