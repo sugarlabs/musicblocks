@@ -2587,6 +2587,9 @@ class Logo {
                             if (logo.activity) logo.activity.valueBarVisible = false;
                         }, 3000);
                     }
+                    while (tur.queue.length > queueStart) {
+                        Queue.recycle(tur.queue.pop());
+                    }
                 } else {
                     logo.deps.errorHandler("I do not know how to " + blockName + ".", blk);
                 }

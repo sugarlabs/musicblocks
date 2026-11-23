@@ -3275,6 +3275,36 @@ describe("Logo runFromBlockNow", () => {
             jest.useRealTimers();
         });
 
+        test("a value block with an input ends its run without a full stop", () => {
+            jest.useFakeTimers();
+            logo.parseArg = jest.fn(() => 3);
+            logo.blockList = [
+                {
+                    name: "plus",
+                    value: 3,
+                    protoblock: { args: 2, dockTypes: ["numberout", "numberin", "numberin"] },
+                    connections: [null, 1, 2],
+                    isValueBlock: () => false,
+                    isArgBlock: () => true
+                },
+                { name: "number", value: 1, connections: [0] },
+                { name: "number", value: 2, connections: [0] }
+            ];
+            const stop = jest.spyOn(logo, "doStopTurtles");
+            logo._alreadyRunning = true;
+            turtle0.running = true;
+
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+            jest.runOnlyPendingTimers();
+            jest.useRealTimers();
+
+            expect(mockActivity.textMsg).toHaveBeenCalledWith("3");
+            expect(stop).not.toHaveBeenCalled();
+            expect(turtle0.queue).toHaveLength(0);
+            expect(logo._alreadyRunning).toBe(false);
+            expect(turtle0.running).toBe(false);
+        });
+
         test("doStopTurtles resets valueBarVisible even if it interrupts the window", () => {
             jest.useFakeTimers();
             logo.parseArg = jest.fn(() => 77);
