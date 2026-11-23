@@ -404,7 +404,7 @@
                                     src="images/loading.gif"
                                     alt="Loading..."
                                     loading="lazy"
-                                    >
+                                />
                             </div>
                         </div>
                     </div>
@@ -609,7 +609,7 @@
                                         width="100%"
                                         src="images/logo.svg"
                                         loading="lazy"
-                                    >
+                                    />
                                 </div>
                                 <ul class="main left toolbar-pill-group playback-group">
                                     <li>
@@ -1674,6 +1674,12 @@
                 modeToggle.addEventListener("click", function () {
                     compactEdit = !compactEdit;
                     togglePlayOnlyMode();
+                });
+
+                modeToggle.addEventListener("keydown", function (event) {
+                    if (event.key === " " || event.key === "Enter") {
+                        event.stopPropagation();
+                    }
                 });
 
                 window.addEventListener("resize", togglePlayOnlyMode);

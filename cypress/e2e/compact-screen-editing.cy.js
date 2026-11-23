@@ -67,13 +67,17 @@ describe("Compact-screen editing", () => {
                             identifier: 1,
                             target: $img[0],
                             clientX: x,
-                            clientY: y
+                            clientY: y,
+                            pageX: x,
+                            pageY: y
                         });
                         const end = new win.Touch({
                             identifier: 1,
                             target: $img[0],
                             clientX: 215,
-                            clientY: 190
+                            clientY: 190,
+                            pageX: 215,
+                            pageY: 190
                         });
                         // Cypress does not dispatch synthetic touchstart to this DOM0 handler.
                         $img[0].ontouchstart(
@@ -135,6 +139,20 @@ describe("Compact-screen editing", () => {
             expect(palettes.activePalette).to.be.null;
             expect(palettes.lastActivePalette).to.equal("rhythm");
         });
+    });
+
+    it("keeps mode-toggle keyboard events out of playback shortcuts", () => {
+        cy.window().then(win => {
+            cy.spy(win.ActivityContext.getActivity(), "_doFastButton").as("startPlayback");
+        });
+
+        cy.get("#compactModeToggle").focus().type(" ", { parseSpecialCharSequences: false });
+        cy.get("body").should("have.class", "compact-edit");
+        cy.get("@startPlayback").should("not.have.been.called");
+
+        cy.get("#compactModeToggle").type("{enter}");
+        cy.get("body").should("have.class", "play-only");
+        cy.get("@startPlayback").should("not.have.been.called");
     });
 
     it("keeps the palette toggle accessible while its contents scroll", () => {

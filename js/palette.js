@@ -1765,10 +1765,9 @@ class Palette {
         this.palettes._cancelPlacement = cancel;
         const canvas = this.activity.canvas;
         const rect = canvas.getBoundingClientRect();
-        const paletteRight = Math.max(
-            docById("palette").getBoundingClientRect().right,
-            docById("PaletteBody")?.getBoundingClientRect().right || 0
-        );
+        const paletteRects = [docById("palette"), docById("PaletteBody")]
+            .filter(Boolean)
+            .map(panel => panel.getBoundingClientRect());
         const scale = blocks.blockScale / DEFAULTBLOCKSCALE;
         for (const target of targets) {
             const block = blocks.blockList[target.targetBlock];
@@ -1779,8 +1778,15 @@ class Palette {
             );
             const left = rect.left + (point.x * rect.width) / canvas.width;
             const top = rect.top + (point.y * rect.height) / canvas.height;
+            const overlapsPalette = paletteRects.some(
+                panel =>
+                    left < panel.right &&
+                    left + 64 > panel.left &&
+                    top < panel.bottom &&
+                    top + 48 > panel.top
+            );
             if (
-                left < paletteRight ||
+                overlapsPalette ||
                 left > rect.right - 64 ||
                 top < rect.top ||
                 top > rect.bottom - 48

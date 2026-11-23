@@ -553,6 +553,32 @@ describe("BlockDragController", () => {
     });
 
     describe("getEmptyDockTargets", () => {
+        it("returns no targets for an empty workspace", () => {
+            const blocks = makeBlocks([]);
+
+            expect(blocks.blockDragController.getEmptyDockTargets("in")).toEqual([]);
+        });
+
+        it.each([
+            ["trashed", { trash: true }],
+            ["inside a collapsed stack", { inCollapsed: true }],
+            ["collapsed and non-inline", { collapsed: true }]
+        ])("rejects compatible, unoccupied docks on a %s block", (_label, state) => {
+            const target = makeFlowBlock({
+                x: 0,
+                y: 0,
+                docks: [
+                    [0, 0, "in"],
+                    [0, 20, "out"]
+                ],
+                connections: [null, null]
+            });
+            Object.assign(target, state);
+            const blocks = makeBlocks([target]);
+
+            expect(blocks.blockDragController.getEmptyDockTargets("in")).toEqual([]);
+        });
+
         it("returns only visible, compatible, unoccupied docks", () => {
             const open = makeFlowBlock({
                 x: 0,
