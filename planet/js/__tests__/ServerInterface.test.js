@@ -266,7 +266,9 @@ describe("ServerInterface", () => {
                 expect.objectContaining({
                     repoName: "123",
                     like: true
-                })
+                }),
+                "POST",
+                true
             );
             expect(callback).toHaveBeenCalledWith({ success: true, likes: 1 });
         });

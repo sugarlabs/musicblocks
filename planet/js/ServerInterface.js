@@ -950,7 +950,7 @@ class ServerInterface {
     async likeProject(repoName, like, callback) {
         try {
             const userId = this.Planet.UserID || "anon";
-            const response = await this._post("/like", { repoName, userId, like });
+            const response = await this._post("/like", { repoName, userId, like }, "POST", true);
 
             if (!response || response.error) {
                 callback({ success: false, error: response?.error || "LIKE_FAILED" });
