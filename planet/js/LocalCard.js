@@ -121,6 +121,72 @@ class LocalCard {
         Planet.LocalPlanet.updateProjects();
     }
 
+    unpublish() {
+        const Planet = this.Planet;
+        const published = this.ProjectData.PublishedData;
+        const isCurrentProject = () =>
+            Planet.LocalPlanet.ProjectTable[this.id] === this.ProjectData &&
+            this.ProjectData.PublishedData === published;
+        const repoName = published && published.repoName;
+        if (!repoName || !Planet.ServerInterface.ownsRepo(repoName)) {
+            Planet.SaveInterface.showToast(
+                _("You do not have permission to unpublish this project from this browser."),
+                true
+            );
+            return;
+        }
+
+        document.getElementById("unpublisher-title").textContent = this.ProjectData.ProjectName;
+        document.getElementById("unpublisher-button").onclick = () => {
+            Planet.ServerInterface.toggleProjectVisibility(repoName, false, async result => {
+                if (!result.success) {
+                    Planet.SaveInterface.showToast(
+                        _("Could not unpublish project. Please try again."),
+                        true
+                    );
+                    return;
+                }
+
+                const cached = Planet.GlobalPlanet.cache[repoName];
+                if (cached) cached.visible = 0;
+
+                try {
+                    if (isCurrentProject()) {
+                        const gitRepo = this.ProjectData.GitRepoData;
+                        if (!gitRepo?.repoName || gitRepo.repoName === repoName) {
+                            await Planet.ProjectStorage.addGitRepoData(
+                                this.id,
+                                repoName,
+                                published.ProjectDescription,
+                                published.ProjectTags,
+                                gitRepo?.hashedKey
+                            );
+                        }
+                        if (isCurrentProject()) {
+                            await Planet.ProjectStorage.addPublishedData(this.id, null);
+                        }
+                    }
+                    if (
+                        cached &&
+                        !(await Planet.ServerInterface.cacheManager.cacheMetadata(repoName, cached))
+                    ) {
+                        throw new Error("Could not cache project visibility.");
+                    }
+                    Planet.SaveInterface.showToast(_("Project unpublished."));
+                } catch (error) {
+                    console.error("[LocalCard] Could not save publication state:", error);
+                    Planet.SaveInterface.showToast(
+                        _("Project unpublished, but the change could not be saved on this device."),
+                        true
+                    );
+                }
+                Planet.LocalPlanet.updateProjects();
+                Planet.GlobalPlanet.refreshProjects();
+            });
+        };
+        jQuery("#unpublisher").modal("open");
+    }
+
     render() {
         const Planet = this.Planet;
 
@@ -179,8 +245,14 @@ class LocalCard {
 
         // set publish button listener
 
-        frag.getElementById(`local-project-publish-${this.id}`).addEventListener("click", evt => {
-            Planet.LocalPlanet.Publisher.open(this.id);
+        const publishButton = frag.getElementById(`local-project-publish-${this.id}`);
+        if (this.ProjectData.PublishedData) {
+            publishButton.querySelector("i").textContent = "cloud_off";
+            publishButton.dataset.tooltip = _("Unpublish project");
+        }
+        publishButton.addEventListener("click", () => {
+            if (this.ProjectData.PublishedData) this.unpublish();
+            else Planet.LocalPlanet.Publisher.open(this.id);
         });
 
         // set download button listener

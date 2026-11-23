@@ -683,3 +683,24 @@ a {
     from { opacity: 0.3; }
     to   { opacity: 1;   }
 }
+.planet-toast {
+    position: fixed;
+    z-index: 10000;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-sizing: border-box;
+    width: max-content;
+    max-width: calc(100% - 32px);
+    padding: 10px 20px;
+    border-radius: 4px;
+    background: #323232;
+    color: #fff;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.26);
+}
+
+.planet-toast-error {
+    background: #d32f2f;
+}

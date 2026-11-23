@@ -116,18 +116,10 @@ class SaveInterface {
             return;
         }
         const toast = document.createElement("div");
-        toast.className = "toast planet-toast";
+        toast.className = "planet-toast";
+        toast.setAttribute("role", isError ? "alert" : "status");
         toast.textContent = message;
-        toast.style.background = isError ? "#d32f2f" : "#323232";
-        toast.style.position = "fixed";
-        toast.style.bottom = "20px";
-        toast.style.left = "50%";
-        toast.style.transform = "translateX(-50%)";
-        toast.style.zIndex = "10000";
-        toast.style.padding = "10px 20px";
-        toast.style.borderRadius = "4px";
-        toast.style.color = "#fff";
-        toast.style.boxShadow = "0 2px 5px rgba(0,0,0,0.26)";
+        if (isError) toast.classList.add("planet-toast-error");
 
         document.body.appendChild(toast);
         setTimeout(() => {
