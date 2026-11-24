@@ -899,78 +899,6 @@
     "kanji": "数字は最大１０桁までです。",
     "kana": "すうじは さいだい １０けた までです。"
   },
-  "audio file": {
-    "kanji": "オーディオファイル",
-    "kana": "オーディオファイル"
-  },
-  "box1": {
-    "kanji": "箱１",
-    "kana": "はこ１"
-  },
-  "box2": {
-    "kanji": "箱２",
-    "kana": "はこ２"
-  },
-  "name": {
-    "kanji": "名前",
-    "kana": "なまえ"
-  },
-  "value": {
-    "kanji": "値",
-    "kana": "あたい"
-  },
-  "Forever loop detected inside a note value block. Unexpected things may happen.": {
-    "kanji": "「ずっとくり返す」状態が「音符」の中にある。",
-    "kana": "Forever loop detected inside a note value block. Unexpected things may happen."
-  },
-  "There is no block selected.": {
-    "kanji": "ブロックが選ばれていません",
-    "kana": "ブロックが えらばれて いません。"
-  },
-  "avatar": {
-    "kanji": "ネズミへんこう",
-    "kana": "ネズミへんこう"
-  },
-  "sample": {
-    "kanji": "音色サンプル",
-    "kana": "ねいろ サンプル"
-  },
-  "Something went wrong reading JSON-encoded project data.": {
-    "kanji": "JSON エンコードされたプロジェクト データの読み取り中に問題が発生しました。",
-    "kana": "JSON えんコードされたプロジェクト データのよみとりなかにもんだいがはっせいしました。"
-  },
-  "Cannot load project: invalid project structure.": {
-    "kanji": "Cannot load project: invalid project structure.",
-    "kana": "Cannot load project: invalid project structure."
-  },
-  "Cannot load project: malformed block structure detected.": {
-    "kanji": "Cannot load project: malformed block structure detected.",
-    "kana": "Cannot load project: malformed block structure detected."
-  },
-  "Cannot load project: circular block connection detected.": {
-    "kanji": "Cannot load project: circular block connection detected.",
-    "kana": "Cannot load project: circular block connection detected."
-  },
-  "Cannot load project: invalid block connection detected.": {
-    "kanji": "Cannot load project: invalid block connection detected.",
-    "kana": "Cannot load project: invalid block connection detected."
-  },
-  "Some blocks in this project are unsupported and were replaced with placeholders: %s": {
-    "kanji": "Some blocks in this project are unsupported and were replaced with placeholders: %s",
-    "kana": "Some blocks in this project are unsupported and were replaced with placeholders: %s"
-  },
-  "Nothing to undo.": {
-    "kanji": "Nothing to undo.",
-    "kana": "Nothing to undo."
-  },
-  "Nothing to redo.": {
-    "kanji": "Nothing to redo.",
-    "kana": "Nothing to redo."
-  },
-  "block sent to trash": {
-    "kanji": "ブロックがゴミ箱に送られる",
-    "kana": "ぶろっくがごみはこにおくられる"
-  },
   "Failed to load EaselJS. Please refresh the page.": {
     "kanji": "EaselJS のロードに失敗しました。ページを更新してください。",
     "kana": "EaselJS のロードにしっぱいしました。ページをこうしんしてください。"
@@ -979,49 +907,9 @@
     "kanji": "ミュージック・ブロックスの読み込みに失敗しました。ページを更新してください。",
     "kana": "ミュージック・ブロックスのよみこみにしっぱいしました。ページをこうしんしてください。"
   },
-  "Failed to initialize Music Blocks core. Please refresh the page.\\n\\nError: %s": {
-    "kanji": "ミュージック・ブロックス コアの初期化に失敗しました。ページを更新してください。\\n\\nエラー: %s",
-    "kana": "Failed to initialize Music Blocks core. Please refresh the page.\\n\\nError: %s"
-  },
-  "Downloading Kokoro voice: %s": {
-    "kanji": "Downloading Kokoro voice: %s",
-    "kana": "Downloading Kokoro voice: %s"
-  },
-  "You must select a file.": {
-    "kanji": "ファイルをえらんでください。",
-    "kana": "ファイルを えらんで ください。"
-  },
-  "Infinite loop detected. Execution stopped to prevent browser freeze.": {
-    "kanji": "無限ループが検出されました。ブラウザのフリーズを防ぐために実行が停止されました。",
-    "kana": "むげんループが けんしゅつ されました。ブラウザーの フレーズを ふせぐために じっこうが ていしされました。"
-  },
-  "width": {
-    "kanji": "カンバスのよこはば",
-    "kana": "カンバスの よこはば"
-  },
-  "height": {
-    "kanji": "カンバスのたてはば",
-    "kana": "カンバスの たてはば"
-  },
-  "right (screen)": {
-    "kanji": "ざひょうち（右）",
-    "kana": "ざひょうち（みぎ）"
-  },
-  "left (screen)": {
-    "kanji": "ざひょうち（左）",
-    "kana": "ざひょうち （ひだり）"
-  },
-  "top (screen)": {
-    "kanji": "ざひょうち（上）",
-    "kana": "ざひょうち（うえ）"
-  },
-  "bottom (screen)": {
-    "kanji": "ざひょうち（下）",
-    "kana": "ざひょうち（した）"
-  },
-  "Playback is ready.": {
-    "kanji": "コンパイル完了",
-    "kana": "コンパイル かんりょう"
+  "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: %s": {
+    "kanji": "ミュージック・ブロックス コアの初期化に失敗しました。ページを更新してください。\n\nエラー: %s",
+    "kana": "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: %s"
   },
   "project undefined": {
     "kanji": "プロジェクト未定義",
@@ -1102,6 +990,10 @@
   "Invalid parameters": {
     "kanji": "無効なパラメータ",
     "kana": "むこうな パラメータ"
+  },
+  "Something went wrong reading JSON-encoded project data.": {
+    "kanji": "JSON エンコードされたプロジェクト データの読み取り中に問題が発生しました。",
+    "kana": "JSON えんコードされたプロジェクト データのよみとりなかにもんだいがはっせいしました。"
   },
   "No results found for %s": {
     "kanji": "No results found for %s",
@@ -1590,6 +1482,230 @@
   "You have finished the tour. Please enjoy Music Blocks!": {
     "kanji": "ミスター・マウスのツアーはここで終わり。ミュージック・ブロックスを自由に楽しもう。",
     "kana": "ミスター・マウスの ツアーは ここでおわり。 ミュージック・ブロックスを じゆうに たのしもう。"
+  },
+  "Downloading Kokoro voice: %s": {
+    "kanji": "Downloading Kokoro voice: %s",
+    "kana": "Downloading Kokoro voice: %s"
+  },
+  "You must select a file.": {
+    "kanji": "ファイルをえらんでください。",
+    "kana": "ファイルを えらんで ください。"
+  },
+  "Infinite loop detected. Execution stopped to prevent browser freeze.": {
+    "kanji": "無限ループが検出されました。ブラウザのフリーズを防ぐために実行が停止されました。",
+    "kana": "むげんループが けんしゅつ されました。ブラウザーの フレーズを ふせぐために じっこうが ていしされました。"
+  },
+  "width": {
+    "kanji": "カンバスのよこはば",
+    "kana": "カンバスの よこはば"
+  },
+  "height": {
+    "kanji": "カンバスのたてはば",
+    "kana": "カンバスの たてはば"
+  },
+  "right (screen)": {
+    "kanji": "ざひょうち（右）",
+    "kana": "ざひょうち（みぎ）"
+  },
+  "left (screen)": {
+    "kanji": "ざひょうち（左）",
+    "kana": "ざひょうち （ひだり）"
+  },
+  "top (screen)": {
+    "kanji": "ざひょうち（上）",
+    "kana": "ざひょうち（うえ）"
+  },
+  "bottom (screen)": {
+    "kanji": "ざひょうち（下）",
+    "kana": "ざひょうち（した）"
+  },
+  "Playback is ready.": {
+    "kanji": "コンパイル完了",
+    "kana": "コンパイル かんりょう"
+  },
+  "audio file": {
+    "kanji": "オーディオファイル",
+    "kana": "オーディオファイル"
+  },
+  "box1": {
+    "kanji": "箱１",
+    "kana": "はこ１"
+  },
+  "box2": {
+    "kanji": "箱２",
+    "kana": "はこ２"
+  },
+  "name": {
+    "kanji": "名前",
+    "kana": "なまえ"
+  },
+  "value": {
+    "kanji": "値",
+    "kana": "あたい"
+  },
+  "Forever loop detected inside a note value block. Unexpected things may happen.": {
+    "kanji": "「ずっとくり返す」状態が「音符」の中にある。",
+    "kana": "Forever loop detected inside a note value block. Unexpected things may happen."
+  },
+  "There is no block selected.": {
+    "kanji": "ブロックが選ばれていません",
+    "kana": "ブロックが えらばれて いません。"
+  },
+  "avatar": {
+    "kanji": "ネズミへんこう",
+    "kana": "ネズミへんこう"
+  },
+  "sample": {
+    "kanji": "音色サンプル",
+    "kana": "ねいろ サンプル"
+  },
+  "Cannot load project: invalid project structure.": {
+    "kanji": "Cannot load project: invalid project structure.",
+    "kana": "Cannot load project: invalid project structure."
+  },
+  "Cannot load project: malformed block structure detected.": {
+    "kanji": "Cannot load project: malformed block structure detected.",
+    "kana": "Cannot load project: malformed block structure detected."
+  },
+  "Cannot load project: circular block connection detected.": {
+    "kanji": "Cannot load project: circular block connection detected.",
+    "kana": "Cannot load project: circular block connection detected."
+  },
+  "Cannot load project: invalid block connection detected.": {
+    "kanji": "Cannot load project: invalid block connection detected.",
+    "kana": "Cannot load project: invalid block connection detected."
+  },
+  "Some blocks in this project are unsupported and were replaced with placeholders: %s": {
+    "kanji": "Some blocks in this project are unsupported and were replaced with placeholders: %s",
+    "kana": "Some blocks in this project are unsupported and were replaced with placeholders: %s"
+  },
+  "Nothing to undo.": {
+    "kanji": "Nothing to undo.",
+    "kana": "Nothing to undo."
+  },
+  "Nothing to redo.": {
+    "kanji": "Nothing to redo.",
+    "kana": "Nothing to redo."
+  },
+  "block sent to trash": {
+    "kanji": "ブロックがゴミ箱に送られる",
+    "kana": "ぶろっくがごみはこにおくられる"
+  },
+  "Saved moment": {
+    "kanji": "Saved moment",
+    "kana": "Saved moment"
+  },
+  "You're offline. Connect to the network to view commits for this project.": {
+    "kanji": "You're offline. Connect to the network to view commits for this project.",
+    "kana": "You're offline. Connect to the network to view commits for this project."
+  },
+  "Network Connection Required": {
+    "kanji": "Network Connection Required",
+    "kana": "Network Connection Required"
+  },
+  "No moments marked yet. Click \"Mark this moment\" to save your first one!": {
+    "kanji": "No moments marked yet. Click \"Mark this moment\" to save your first one!",
+    "kana": "No moments marked yet. Click \"Mark this moment\" to save your first one!"
+  },
+  "No Saved Moments Yet": {
+    "kanji": "No Saved Moments Yet",
+    "kana": "No Saved Moments Yet"
+  },
+  "Time Travel": {
+    "kanji": "Time Travel",
+    "kana": "Time Travel"
+  },
+  "Every save, forever yours": {
+    "kanji": "Every save, forever yours",
+    "kana": "Every save, forever yours"
+  },
+  "YOU ARE HERE": {
+    "kanji": "YOU ARE HERE",
+    "kana": "YOU ARE HERE"
+  },
+  "Sync Pending": {
+    "kanji": "Sync Pending",
+    "kana": "Sync Pending"
+  },
+  "Latest": {
+    "kanji": "Latest",
+    "kana": "Latest"
+  },
+  "Undo my changes": {
+    "kanji": "Undo my changes",
+    "kana": "Undo my changes"
+  },
+  "Go back to this version": {
+    "kanji": "Go back to this version",
+    "kana": "Go back to this version"
+  },
+  "The very beginning": {
+    "kanji": "The very beginning",
+    "kana": "The very beginning"
+  },
+  "Where your project started": {
+    "kanji": "Where your project started",
+    "kana": "Where your project started"
+  },
+  "Setting Up Tracking": {
+    "kanji": "Setting Up Tracking",
+    "kana": "Setting Up Tracking"
+  },
+  "Start point": {
+    "kanji": "Start point",
+    "kana": "Start point"
+  },
+  "no more offline commits can be made": {
+    "kanji": "no more offline commits can be made",
+    "kana": "no more offline commits can be made"
+  },
+  "1 more commit can be made": {
+    "kanji": "1 more commit can be made",
+    "kana": "1 more commit can be made"
+  },
+  "%s more commits can be made": {
+    "kanji": "%s more commits can be made",
+    "kana": "%s more commits can be made"
+  },
+  "Showing locally saved drafts": {
+    "kanji": "Showing locally saved drafts",
+    "kana": "Showing locally saved drafts"
+  },
+  "Just now": {
+    "kanji": "Just now",
+    "kana": "Just now"
+  },
+  "1 minute ago": {
+    "kanji": "1 minute ago",
+    "kana": "1 minute ago"
+  },
+  "%s minutes ago": {
+    "kanji": "%s minutes ago",
+    "kana": "%s minutes ago"
+  },
+  "1 hour ago": {
+    "kanji": "1 hour ago",
+    "kana": "1 hour ago"
+  },
+  "%s hours ago": {
+    "kanji": "%s hours ago",
+    "kana": "%s hours ago"
+  },
+  "1 day ago": {
+    "kanji": "1 day ago",
+    "kana": "1 day ago"
+  },
+  "%s days ago": {
+    "kanji": "%s days ago",
+    "kana": "%s days ago"
+  },
+  "1 month ago": {
+    "kanji": "1 month ago",
+    "kana": "1 month ago"
+  },
+  "%s months ago": {
+    "kanji": "%s months ago",
+    "kana": "%s months ago"
   },
   "Security Warning": {
     "kanji": "セキュリティ警告",
@@ -2435,6 +2551,14 @@
     "kanji": "減五短七の和音（ハーフ・ディミニッシュト）",
     "kana": "げんごたんしちのわおん（ハーフ・ディミニッシュト）"
   },
+  "Invalid input passed to rational sum": {
+    "kanji": "無効な入力が有理合計に渡されました",
+    "kana": "むこうなにゅうりょくがゆうりごうけいにわたされました"
+  },
+  "Note calculation failed: zero denominator": {
+    "kanji": "ノートの計算が失敗しました: 分母がゼロです",
+    "kana": "のーとのけいさんがしっぱいしました: ぶんぼがぜろです"
+  },
   "simple-2": {
     "kanji": "シンプル・シンセ２",
     "kana": "シンプル・シンセ２"
@@ -2455,17 +2579,9 @@
     "kanji": "鉦",
     "kana": "しょう"
   },
-  "⚠️ Sound is disabled!\\n\\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks.": {
-    "kanji": "⚠️ サウンドは無効になっています。\\n\\nブラウザの設定 (サイト設定 > サウンド) を確認して、ミュージック・ブロックスの音声を許可してください。",
-    "kana": "⚠️ Sound is disabled!\\n\\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
-  },
-  "Invalid input passed to rational sum": {
-    "kanji": "無効な入力が有理合計に渡されました",
-    "kana": "むこうなにゅうりょくがゆうりごうけいにわたされました"
-  },
-  "Note calculation failed: zero denominator": {
-    "kanji": "ノートの計算が失敗しました: 分母がゼロです",
-    "kana": "のーとのけいさんがしっぱいしました: ぶんぼがぜろです"
+  "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks.": {
+    "kanji": "⚠️ サウンドは無効になっています。\n\nブラウザの設定 (サイト設定 > サウンド) を確認して、ミュージック・ブロックスの音声を許可してください。",
+    "kana": "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
   },
   "The Not block is the logical not operator.": {
     "kanji": "Notブロックは論理的なNOT演算子です。",
@@ -3331,9 +3447,9 @@
     "kanji": "移動ド",
     "kana": "いどう ド"
   },
-  "When Movable do is false, the solfege note names are always tied to specific pitches, eg \\\"do\\\" is always \\\"C-natural\\\" when Movable do is true, the solfege note names are assigned to scale degrees \\\"do\\\" is always the first degree of the major scale.": {
+  "When Movable do is false, the solfege note names are always tied to specific pitches, eg \"do\" is always \"C-natural\" when Movable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale.": {
     "kanji": "「移動ド」が「偽」の場合、ソルフェージュ音名は常に特定のピッチに関連付けられます。たとえば、「移動ド」が「真」の場合、「ド」は常に「ド・メジャー」となり、ソルフェージュ音名はスケール度に割り当てられます。「ド」は常に長音階の 1 度です。",
-    "kana": "When Movable do is false, the solfege note names are always tied to specific pitches, eg \\\"do\\\" is always \\\"C-natural\\\" when Movable do is true, the solfege note names are assigned to scale degrees \\\"do\\\" is always the first degree of the major scale."
+    "kana": "When Movable do is false, the solfege note names are always tied to specific pitches, eg \"do\" is always \"C-natural\" when Movable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
   },
   "mode length": {
     "kanji": "音階の音数",
@@ -5599,6 +5715,106 @@
     "kanji": "Get blue ブロックは、タートルの下のピクセルの青コンポーネントを返します。",
     "kana": "The Get blue block returns the blue component of the pixel under the turtle."
   },
+  "synth volume": {
+    "kanji": "シンセノ音量",
+    "kana": "シンセの おんりょう"
+  },
+  "The Synth volume block returns the current volume of the current synthesizer.": {
+    "kanji": "Synth volumeブロックは現在のシンセサイザーの音量を返します。",
+    "kana": "The Synth volume block returns the current volume of the current synthesizer."
+  },
+  "master volume": {
+    "kanji": "マスター音量",
+    "kana": "マスター おんりょう"
+  },
+  "The Master volume block returns the master volume.": {
+    "kanji": "Master volumeブロックはマスターボリュームを返します。",
+    "kana": "「マスター おんりょう」ブロックはマスター・ボリュームをかえします。"
+  },
+  "set synth volume": {
+    "kanji": "楽器の音量をせってい",
+    "kana": "シンセの おんりょうを せってい"
+  },
+  "synth": {
+    "kanji": "楽器",
+    "kana": "シンセ"
+  },
+  "Setting volume to 0.": {
+    "kanji": "音量を「0」にせっていします。",
+    "kana": "おんりょうを 「0」に せってい します。"
+  },
+  "Synth not found": {
+    "kanji": "シンセが見つかりません",
+    "kana": "シンセ(がっき)が みつかりません"
+  },
+  "set drum volume": {
+    "kanji": "ドラムの音量をせってい",
+    "kana": "ドラムの おんりょうを せってい"
+  },
+  "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc.": {
+    "kanji": "「楽器の音量をせってい」ブロックは、ギター、バイオリン、スネアドラムなどの特定のシンセサイザーの音量を変更します。",
+    "kana": "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc."
+  },
+  "The default volume is 50.": {
+    "kanji": "デフォルトは音量５０。",
+    "kana": "<br>"
+  },
+  "The range is 0 for silence to 100 for full volume.": {
+    "kanji": "０から１００までのすうちをせっていできる。<br><br> ",
+    "kana": "０から １００までの すうちを せってい できる。 "
+  },
+  "set panning": {
+    "kanji": "ステレオを設定",
+    "kana": "ステレオをせってい"
+  },
+  "The Set Panning block sets the panning for all synthesizers.": {
+    "kanji": "Set Panningブロックはすべてのシンセのパンを設定します。",
+    "kana": "「ステレオをせってい」ブロックはすべてのシンセのパンをせっていします。"
+  },
+  "Warning: Sound is coming out from only the left or right side.": {
+    "kanji": "ワーニング：音は右か左だけのスピーカーから出ている",
+    "kana": "ワーニング：おとはみぎかひだりだけのスピーカーからでている"
+  },
+  "set master volume": {
+    "kanji": "全体の音量をせってい",
+    "kana": "ぜんたいのおんりょうを せってい"
+  },
+  "The Set master volume block sets the volume for all synthesizers.": {
+    "kanji": "<h2>全体の音量をせっていブロック</h2><br>全体の音量をせっていする。",
+    "kana": "<h2>ぜんたいのおんりょうを せっていブロック</h2><br>ぜんたいの おんりょうを せっていする。"
+  },
+  "The Set relative volume block changes the volume of the contained notes.": {
+    "kanji": "Set relative volumeブロックは含まれる音符の音量を変更します。",
+    "kana": "The Set relative volume block changes the volume of the contained notes."
+  },
+  "set relative volume": {
+    "kanji": "相対音量を設定",
+    "kana": "あいたいおんりょうを せってい"
+  },
+  "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played.": {
+    "kanji": "「デクレッシェンド」ブロックは、再生される音符ごとに、含まれる音符の音量を指定された量だけ減少させます。",
+    "kana": "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
+  },
+  "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume.": {
+    "kanji": "たとえば、値が「5」の「デクレシェンド」ブロックに 7つの音符が連続して含まれている場合、最後の音符は開始音量より 35% 低くなります。",
+    "kana": "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
+  },
+  "decrescendo": {
+    "kanji": "デクレシェンド",
+    "kana": "デクレシェンド"
+  },
+  "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played.": {
+    "kanji": "「クレシェンド」ブロックは、再生される音符ごとに、含まれる音符の音量を指定された量だけ増加させます。",
+    "kana": "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
+  },
+  "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume.": {
+    "kanji": "たとえば、値が「5」の「クレシェンド」ブロックに 7つの音符が連続して含まれている場合、最後の音符は開始音量より 35% 大きくなります。",
+    "kana": "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
+  },
+  "crescendo": {
+    "kanji": "クレシェンド",
+    "kana": "クレシェンド"
+  },
   "Oscillator": {
     "kanji": "オシレータ―",
     "kana": "オシレータ―"
@@ -5806,106 +6022,6 @@
   "Upload a sound file to connect with the sample block.": {
     "kanji": "音色サンプルをアップロードして、音の高さを合わせる",
     "kana": "ねいろサンプルを アップロードして、 おとの たかさを あわせ"
-  },
-  "synth volume": {
-    "kanji": "シンセノ音量",
-    "kana": "シンセの おんりょう"
-  },
-  "The Synth volume block returns the current volume of the current synthesizer.": {
-    "kanji": "Synth volumeブロックは現在のシンセサイザーの音量を返します。",
-    "kana": "The Synth volume block returns the current volume of the current synthesizer."
-  },
-  "master volume": {
-    "kanji": "マスター音量",
-    "kana": "マスター おんりょう"
-  },
-  "The Master volume block returns the master volume.": {
-    "kanji": "Master volumeブロックはマスターボリュームを返します。",
-    "kana": "「マスター おんりょう」ブロックはマスター・ボリュームをかえします。"
-  },
-  "set synth volume": {
-    "kanji": "楽器の音量をせってい",
-    "kana": "シンセの おんりょうを せってい"
-  },
-  "synth": {
-    "kanji": "楽器",
-    "kana": "シンセ"
-  },
-  "Setting volume to 0.": {
-    "kanji": "音量を「0」にせっていします。",
-    "kana": "おんりょうを 「0」に せってい します。"
-  },
-  "Synth not found": {
-    "kanji": "シンセが見つかりません",
-    "kana": "シンセ(がっき)が みつかりません"
-  },
-  "set drum volume": {
-    "kanji": "ドラムの音量をせってい",
-    "kana": "ドラムの おんりょうを せってい"
-  },
-  "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc.": {
-    "kanji": "「楽器の音量をせってい」ブロックは、ギター、バイオリン、スネアドラムなどの特定のシンセサイザーの音量を変更します。",
-    "kana": "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc."
-  },
-  "The default volume is 50.": {
-    "kanji": "デフォルトは音量５０。",
-    "kana": "<br>"
-  },
-  "The range is 0 for silence to 100 for full volume.": {
-    "kanji": "０から１００までのすうちをせっていできる。<br><br> ",
-    "kana": "０から １００までの すうちを せってい できる。 "
-  },
-  "set panning": {
-    "kanji": "ステレオを設定",
-    "kana": "ステレオをせってい"
-  },
-  "The Set Panning block sets the panning for all synthesizers.": {
-    "kanji": "Set Panningブロックはすべてのシンセのパンを設定します。",
-    "kana": "「ステレオをせってい」ブロックはすべてのシンセのパンをせっていします。"
-  },
-  "Warning: Sound is coming out from only the left or right side.": {
-    "kanji": "ワーニング：音は右か左だけのスピーカーから出ている",
-    "kana": "ワーニング：おとはみぎかひだりだけのスピーカーからでている"
-  },
-  "set master volume": {
-    "kanji": "全体の音量をせってい",
-    "kana": "ぜんたいのおんりょうを せってい"
-  },
-  "The Set master volume block sets the volume for all synthesizers.": {
-    "kanji": "<h2>全体の音量をせっていブロック</h2><br>全体の音量をせっていする。",
-    "kana": "<h2>ぜんたいのおんりょうを せっていブロック</h2><br>ぜんたいの おんりょうを せっていする。"
-  },
-  "The Set relative volume block changes the volume of the contained notes.": {
-    "kanji": "Set relative volumeブロックは含まれる音符の音量を変更します。",
-    "kana": "The Set relative volume block changes the volume of the contained notes."
-  },
-  "set relative volume": {
-    "kanji": "相対音量を設定",
-    "kana": "あいたいおんりょうを せってい"
-  },
-  "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played.": {
-    "kanji": "「デクレッシェンド」ブロックは、再生される音符ごとに、含まれる音符の音量を指定された量だけ減少させます。",
-    "kana": "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
-  },
-  "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume.": {
-    "kanji": "たとえば、値が「5」の「デクレシェンド」ブロックに 7つの音符が連続して含まれている場合、最後の音符は開始音量より 35% 低くなります。",
-    "kana": "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
-  },
-  "decrescendo": {
-    "kanji": "デクレシェンド",
-    "kana": "デクレシェンド"
-  },
-  "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played.": {
-    "kanji": "「クレシェンド」ブロックは、再生される音符ごとに、含まれる音符の音量を指定された量だけ増加させます。",
-    "kana": "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
-  },
-  "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume.": {
-    "kanji": "たとえば、値が「5」の「クレシェンド」ブロックに 7つの音符が連続して含まれている場合、最後の音符は開始音量より 35% 大きくなります。",
-    "kana": "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
-  },
-  "crescendo": {
-    "kanji": "クレシェンド",
-    "kana": "クレシェンド"
   },
   "Staccato value must be a positive number.": {
     "kanji": "Staccato value must be a positive number.",
@@ -7579,66 +7695,6 @@
     "kanji": "短いコード",
     "kana": "みじかいコード"
   },
-  "No results found.": {
-    "kanji": "検索の結果に何もはありません",
-    "kana": "検索の結果に何もはありません"
-  },
-  "Remix of": {
-    "kanji": "のリミックス",
-    "kana": "のリミックス"
-  },
-  "Could not load project. Please check your connection and try again.": {
-    "kanji": "Could not load project. Please check your connection and try again.",
-    "kana": "Could not load project. Please check your connection and try again."
-  },
-  "Cannot connect to server": {
-    "kanji": "サーバに接続できません",
-    "kana": "サーバに せつぞく できません"
-  },
-  "Open in Music Blocks": {
-    "kanji": "ミュージック・ブロックスで開きます",
-    "kana": "ミュージック・ブロックスで ひらきます"
-  },
-  "Open in Turtle Blocks": {
-    "kanji": "タートル ブロックスで開きます",
-    "kana": "タートル ブロックスで ひらきます"
-  },
-  "View published project": {
-    "kanji": "公開されたプロジェクトを見る",
-    "kana": "こうかい された プロジェクトを みる"
-  },
-  "Being tracked": {
-    "kanji": "Being tracked",
-    "kana": "Being tracked"
-  },
-  "Project thumbnail": {
-    "kanji": "Project thumbnail",
-    "kana": "Project thumbnail"
-  },
-  "Publish project": {
-    "kanji": "プロジェクトを公開する",
-    "kana": "プロジェクトを こうかい する"
-  },
-  "Project name": {
-    "kanji": "Project name",
-    "kana": "Project name"
-  },
-  "Edit project": {
-    "kanji": "プロジェクトを編集する",
-    "kana": "プロジェクトを へんしゅう する"
-  },
-  "Delete project": {
-    "kanji": "プロジェクトを消す",
-    "kana": "プロジェクトを けす"
-  },
-  "Download project": {
-    "kanji": "プロジェクトをダウンロードする",
-    "kana": "プロジェクトを ダウンロード する"
-  },
-  "Duplicate project": {
-    "kanji": "プロジェクトをコピーする",
-    "kana": "プロジェクトを コピー する"
-  },
   "anonymous": {
     "kanji": "匿名",
     "kana": "とくめい"
@@ -7667,9 +7723,17 @@
     "kanji": "レポート表記が長すぎます",
     "kana": "レポート ひょうきが ながすぎます"
   },
+  "Project thumbnail": {
+    "kanji": "Project thumbnail",
+    "kana": "Project thumbnail"
+  },
   "More Details": {
     "kanji": "さらに詳しく",
     "kana": "さらにくわしく"
+  },
+  "Open in Music Blocks": {
+    "kanji": "ミュージック・ブロックスで開きます",
+    "kana": "ミュージック・ブロックスで ひらきます"
   },
   "Remix project": {
     "kanji": "Remix project",
@@ -7731,6 +7795,10 @@
     "kanji": "Republish project",
     "kana": "Republish project"
   },
+  "Publish project": {
+    "kanji": "プロジェクトを公開する",
+    "kana": "プロジェクトを こうかい する"
+  },
   "This field is required": {
     "kanji": "この項目は必須項目です",
     "kana": "この こうもくは ひっすこうもく です"
@@ -7750,6 +7818,74 @@
   "Try Again": {
     "kanji": "もう一度使い直してください。",
     "kana": "もういちど つかいなおして ください。"
+  },
+  "No results found.": {
+    "kanji": "検索の結果に何もはありません",
+    "kana": "検索の結果に何もはありません"
+  },
+  "Remix of": {
+    "kanji": "のリミックス",
+    "kana": "のリミックス"
+  },
+  "Could not load project. Please check your connection and try again.": {
+    "kanji": "Could not load project. Please check your connection and try again.",
+    "kana": "Could not load project. Please check your connection and try again."
+  },
+  "Cannot connect to server": {
+    "kanji": "サーバに接続できません",
+    "kana": "サーバに せつぞく できません"
+  },
+  "View published project": {
+    "kanji": "公開されたプロジェクトを見る",
+    "kana": "こうかい された プロジェクトを みる"
+  },
+  "Being tracked": {
+    "kanji": "Being tracked",
+    "kana": "Being tracked"
+  },
+  "Project name": {
+    "kanji": "Project name",
+    "kana": "Project name"
+  },
+  "Edit project": {
+    "kanji": "プロジェクトを編集する",
+    "kana": "プロジェクトを へんしゅう する"
+  },
+  "Delete project": {
+    "kanji": "プロジェクトを消す",
+    "kana": "プロジェクトを けす"
+  },
+  "Download project": {
+    "kanji": "プロジェクトをダウンロードする",
+    "kana": "プロジェクトを ダウンロード する"
+  },
+  "Duplicate project": {
+    "kanji": "プロジェクトをコピーする",
+    "kana": "プロジェクトを コピー する"
+  },
+  "You do not have permission to unpublish this project from this browser.": {
+    "kanji": "You do not have permission to unpublish this project from this browser.",
+    "kana": "You do not have permission to unpublish this project from this browser."
+  },
+  "Could not unpublish project. Please try again.": {
+    "kanji": "Could not unpublish project. Please try again.",
+    "kana": "Could not unpublish project. Please try again."
+  },
+  "Project unpublished.": {
+    "kanji": "Project unpublished.",
+    "kana": "Project unpublished."
+  },
+  "Project unpublished, but the change could not be saved on this device.": {
+    "kanji": "Project unpublished, but the change could not be saved on this device.",
+    "kana": "Project unpublished, but the change could not be saved on this device."
+  },
+  "Unpublish project": {
+    "kanji": "Unpublish project",
+    "kana": "Unpublish project"
+  },
+  "Open in Turtle Blocks": {
+    "kanji": "タートル ブロックスで開きます",
+    "kana": "タートル ブロックスで ひらきます"
   },
   "Close Planet": {
     "kanji": "プラネットを閉じる",
@@ -7783,13 +7919,25 @@
     "kanji": "確認",
     "kana": "かくにん"
   },
-  "Delete \\\"<span id=\\\"deleter-title\\\"></span>\\\"?": {
-    "kanji": "「<span id=\\\"deleter-title\\\"></span>」を削除しますか?",
-    "kana": "「<span id=\\\"deleter-title\\\"></span>」をさくじょしますか?"
+  "Delete \"<span id=\"deleter-title\"></span>\"?": {
+    "kanji": "「<span id=\"deleter-title\"></span>」を削除しますか?",
+    "kana": "「<span id=\"deleter-title\"></span>」をさくじょしますか?"
   },
-  "Permanently delete project \\\"<span id=\\\"deleter-name\\\"></span>\\\"?": {
-    "kanji": "プロジェクト「<span id=\\\"deleter-name\\\"></span>」を完全に削除しますか?",
-    "kana": "プロジェクト「<span id=\\\"deleter-name\\\"></span>」をかんぜんにさくじょしますか?"
+  "Permanently delete project \"<span id=\"deleter-name\"></span>\"?": {
+    "kanji": "プロジェクト「<span id=\"deleter-name\"></span>」を完全に削除しますか?",
+    "kana": "プロジェクト「<span id=\"deleter-name\"></span>」をかんぜんにさくじょしますか?"
+  },
+  "Unpublish project?": {
+    "kanji": "Unpublish project?",
+    "kana": "Unpublish project?"
+  },
+  "This project will no longer appear in public listings.": {
+    "kanji": "This project will no longer appear in public listings.",
+    "kana": "This project will no longer appear in public listings."
+  },
+  "Unpublish": {
+    "kanji": "Unpublish",
+    "kana": "Unpublish"
   },
   "Explore Projects": {
     "kanji": "プロジェクトを探す",
@@ -7839,9 +7987,9 @@
     "kanji": "タッグ",
     "kana": "タッグ"
   },
-  "Report projects which violate the <a href=\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\" target=\\\"_blank\\\" rel=\\\"noopener noreferrer\\\">Sugar Labs Code of Conduct</a>.": {
-    "kanji": "<a href=\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\" target=\\\"_blank\\\" rel=\\\"noopener noreferrer\\\">Sugar Labs 行動規範</a>に違反するプロジェクトを報告します。",
-    "kana": "Report projects which violate the <a href=\\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\\" target=\\\"_blank\\\" rel=\\\"noopener noreferrer\\\">Sugar Labs Code of Conduct</a>."
+  "Report projects which violate the <a href=\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\" target=\"_blank\" rel=\"noopener noreferrer\">Sugar Labs Code of Conduct</a>.": {
+    "kanji": "<a href=\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\" target=\"_blank\" rel=\"noopener noreferrer\">Sugar Labs 行動規範</a>に違反するプロジェクトを報告します。",
+    "kana": "Report projects which violate the <a href=\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\" target=\"_blank\" rel=\"noopener noreferrer\">Sugar Labs Code of Conduct</a>."
   },
   "Reason for reporting project": {
     "kanji": "プロジェクトを通報する理由",
