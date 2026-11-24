@@ -62,6 +62,8 @@ const ALLOWED_ROOT_FILES = new Set([
     "loading-animation-ja.png"
 ]);
 
+// Note: When adding a new top-level public directory intended to be served statically,
+// update this allowlist. Only add directories that are safe to expose publicly.
 const ALLOWED_TOP_LEVEL_DIRS = new Set([
     "activity",
     "bower_components",
