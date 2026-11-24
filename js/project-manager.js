@@ -1576,7 +1576,6 @@ class ProjectManager {
                 midiReader.onload = e => {
                     try {
                         const midi = new Midi(e.target.result);
-                        console.debug(midi);
                         pm._midiImportBlocks(midi);
                     } catch (err) {
                         ErrorHandler.capture(err, { operation: "midiImport" });
@@ -1764,7 +1763,6 @@ class ProjectManager {
             midiReader.onload = e => {
                 try {
                     const midi = new Midi(e.target.result);
-                    console.debug(midi);
                     pm._midiImportBlocks(midi);
                 } catch (err) {
                     ErrorHandler.capture(err, { operation: "midiImportBlocks" });
