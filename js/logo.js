@@ -1202,7 +1202,8 @@ class Logo {
                 case "dectofrac":
                     if (
                         logo.inStatusMatrix &&
-                        logo.blockList[currentBlock.connections[0]].name === "print"
+                        currentBlock.connections[0] !== null &&
+                        logo.blockList[currentBlock.connections[0]]?.name === "print"
                     ) {
                         logo.statusFields.push([blk, "dectofrac"]);
                     } else {
@@ -1226,7 +1227,8 @@ class Logo {
                 case "hue":
                     if (
                         logo.inStatusMatrix &&
-                        logo.blockList[currentBlock.connections[0]].name === "print"
+                        currentBlock.connections[0] !== null &&
+                        logo.blockList[currentBlock.connections[0]]?.name === "print"
                     ) {
                         logo.statusFields.push([blk, "color"]);
                     } else {
