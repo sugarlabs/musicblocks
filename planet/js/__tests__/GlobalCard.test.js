@@ -723,6 +723,11 @@ describe("GlobalCard", () => {
         });
 
         it("should refresh a replaced cache entry after the like succeeds", () => {
+            const liked = {};
+            mockPlanet.ProjectStorage.isLiked.mockImplementation(id => liked[id] === true);
+            mockPlanet.ProjectStorage.like.mockImplementation((id, value) => {
+                liked[id] = value;
+            });
             card.render();
             card.like();
             card.cleanup();
@@ -745,12 +750,44 @@ describe("GlobalCard", () => {
             );
             // The replacement might have been fetched after a newer server update.
             expect(newCard.ProjectData.ProjectLikes).toBe(5);
+            newCard.like();
+            expect(mockPlanet.ServerInterface.likeProject).toHaveBeenCalledTimes(1);
+            expect(mockPlanet.pendingLikes.has("test-id-1")).toBe(true);
             mockPlanet.ServerInterface.getProjectDetails.mock.calls[0][1]({
                 success: true,
                 data: { ProjectLikes: 7 }
             });
             expect(mockPlanet.GlobalPlanet.cache["test-id-1"].ProjectLikes).toBe(7);
             expect(document.getElementById("global-project-likes-test-id-1").textContent).toBe("7");
+            newCard.like();
+            expect(mockPlanet.ServerInterface.likeProject).toHaveBeenLastCalledWith(
+                "test-id-1",
+                false,
+                expect.any(Function)
+            );
+        });
+
+        it("should release the like guard if a replacement count cannot be refreshed", () => {
+            card.render();
+            card.like();
+            card.cleanup();
+            document.getElementById("global-projects").innerHTML = "";
+            mockPlanet.GlobalPlanet.cache["test-id-1"] = {
+                ...mockPlanet.GlobalPlanet.cache["test-id-1"]
+            };
+            const newCard = new GlobalCard(mockPlanet);
+            newCard.init("test-id-1");
+            newCard.render();
+
+            mockPlanet.ServerInterface.likeProject.mock.calls[0][2]({ success: true, likes: 6 });
+            expect(mockPlanet.pendingLikes.has("test-id-1")).toBe(true);
+            mockPlanet.ServerInterface.getProjectDetails.mock.calls[0][1]({
+                success: false,
+                error: "CONNECTION_FAILED"
+            });
+            expect(mockPlanet.pendingLikes.has("test-id-1")).toBe(false);
+            newCard.like();
+            expect(mockPlanet.ServerInterface.likeProject).toHaveBeenCalledTimes(2);
         });
 
         it("should ignore a replacement card's like while the first request is pending", () => {

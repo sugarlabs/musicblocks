@@ -846,8 +846,16 @@ describe("ServerInterface", () => {
                     })
             );
 
-            const pending = server._post("/like", { repoName: "x", like: true });
-            jest.advanceTimersByTime(server.RequestTimeout);
+            let settled = false;
+            const pending = server
+                ._post("/like", { repoName: "x", like: true }, "POST", true)
+                .then(response => {
+                    settled = true;
+                    return response;
+                });
+            await jest.advanceTimersByTimeAsync(server.RequestTimeout - 1);
+            expect(settled).toBe(false);
+            await jest.advanceTimersByTimeAsync(1);
 
             await expect(pending).resolves.toBeNull();
         });
@@ -859,9 +867,9 @@ describe("ServerInterface", () => {
                 json: jest.fn().mockResolvedValue({ likes: 1 })
             });
 
-            await expect(server._post("/like", { repoName: "x", like: true })).resolves.toEqual({
-                likes: 1
-            });
+            await expect(
+                server._post("/like", { repoName: "x", like: true }, "POST", true)
+            ).resolves.toEqual({ likes: 1 });
             expect(jest.getTimerCount()).toBe(0);
         });
     });

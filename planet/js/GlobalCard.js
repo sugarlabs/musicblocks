@@ -489,8 +489,10 @@ class GlobalCard {
         const likesEl = document.getElementById(`global-project-likes-${id}`);
         if (likesEl) this.setLike(like);
         Planet.ServerInterface.likeProject(id, like, data => {
-            this.likePending = false;
-            Planet.pendingLikes.delete(id);
+            const finish = () => {
+                this.likePending = false;
+                Planet.pendingLikes.delete(id);
+            };
             if (data.success && Number.isFinite(data.likes)) {
                 projectData.ProjectLikes = data.likes;
                 const currentLikesEl = document.getElementById(`global-project-likes-${id}`);
@@ -509,10 +511,12 @@ class GlobalCard {
                                 if (count)
                                     count.textContent = response.data.ProjectLikes.toString();
                             }
+                            finish();
                         },
                         true,
                         false
                     );
+                    return;
                 }
             } else if (!data.success) {
                 Planet.ProjectStorage.like(id, !like);
@@ -525,6 +529,7 @@ class GlobalCard {
                 const iconEl = document.getElementById(`global-like-icon-${id}`);
                 if (iconEl) iconEl.textContent = like ? "favorite_border" : "favorite";
             }
+            finish();
         });
     }
 
