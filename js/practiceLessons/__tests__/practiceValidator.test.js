@@ -628,6 +628,46 @@ describe("PracticeValidator chunk renaming", () => {
         expect(PracticeValidator.hasRenamedChunks(["A", "B"])).toBe(true);
     });
 
+    describe("when the lesson starts from the default action names", () => {
+        const defaultNames = ["action", "action1", "action2", "action3", "action4", "action5"];
+
+        afterEach(() => {
+            delete global._;
+        });
+
+        test("more saved actions than the lesson lists are not renames", () => {
+            useBlocks({ ...actionNamed("a1", "action5"), ...actionNamed("a2", "action6") });
+
+            expect(PracticeValidator.hasRenamedChunks(defaultNames)).toBe(false);
+        });
+
+        test("default names in the learner's language are not renames", () => {
+            global._ = text => (text === "action" ? "acción" : text);
+            useBlocks({ ...actionNamed("a1", "acción"), ...actionNamed("a2", "acción1") });
+
+            expect(PracticeValidator.hasRenamedChunks(defaultNames)).toBe(false);
+        });
+
+        test("a name of the learner's own still counts", () => {
+            global._ = text => (text === "action" ? "acción" : text);
+            useBlocks({ ...actionNamed("a1", "acción"), ...actionNamed("a2", "estribillo") });
+
+            expect(PracticeValidator.hasRenamedChunks(defaultNames)).toBe(true);
+        });
+
+        test("a name that only starts with the default word counts", () => {
+            useBlocks(actionNamed("a1", "actionVerse"));
+
+            expect(PracticeValidator.hasRenamedChunks(defaultNames)).toBe(true);
+        });
+    });
+
+    test("numbered names are still renames in a lesson that does not start from defaults", () => {
+        useBlocks(actionNamed("a1", "action1"));
+
+        expect(PracticeValidator.hasRenamedChunks(["A", "B"])).toBe(true);
+    });
+
     test("ignores an action that has been thrown away", () => {
         const blocks = actionNamed("a1", "Chorus");
         blocks.a1.trash = true;
