@@ -1140,6 +1140,69 @@ class Singer {
     }
 
     /**
+     * The cents to add to a note when a fractional transposition was rounded to
+     * a whole number of steps outside 12 EDO, so the note sounds exactly
+     * `semitones` above where the other, step-based shifts put it.
+     *
+     * In an EDO every step has the same size and pitchToFrequency reads cents
+     * as hundredths of a step, so this is edoTranspositionCents. A temperament
+     * with its own table of ratios (the meantones) has steps of different
+     * sizes, and pitchToFrequency reads its cents as hundredths of a semitone,
+     * so the cents come from where the rounded step actually landed.
+     *
+     * @static
+     * @param {Object} activity
+     * @param {Object} tur - the turtle
+     * @param {String} note - the note before any shift
+     * @param {Number} octave - its octave
+     * @param {Number} semitones - the transposition in semitones
+     * @param {Number} steps - the other shifts, in steps of the temperament
+     * @param {Array} noteObj - what getNote returned for both shifts
+     * @param {String|null} direction - passed on to getNote
+     * @returns {Number} the cents to add, or 0
+     */
+    static fractionalTranspositionCents(
+        activity,
+        tur,
+        note,
+        octave,
+        semitones,
+        steps,
+        noteObj,
+        direction
+    ) {
+        const temperament = activity.logo.synth.inTemperament;
+        const edo = getCurrentEDO(temperament);
+        if (edo === 12 || Number.isInteger(semitones) || noteObj[0] === "R") {
+            return 0;
+        }
+
+        const t = getTemperament(temperament);
+        if (!(t && !t.isEDO && t.noteLabels && t.ratios)) {
+            return edoTranspositionCents(semitones, edo);
+        }
+
+        const keySig = tur.singer.keySignature;
+        const from = getNote(
+            note,
+            octave,
+            steps,
+            keySig,
+            tur.singer.movable,
+            direction,
+            activity.errorMsg,
+            temperament,
+            true
+        );
+        if (from[0] === "R") {
+            return 0;
+        }
+        const fromHertz = pitchToFrequency(from[0], from[1], 0, keySig, temperament);
+        const toHertz = pitchToFrequency(noteObj[0], noteObj[1], 0, keySig, temperament);
+        return semitones * 100 - 1200 * Math.log2(toHertz / fromHertz);
+    }
+
+    /**
      * @static
      * @param {String} note - note value or solfege
      * @param {Number} octave - scale octave
@@ -1252,8 +1315,10 @@ class Singer {
                 }
             }
 
-            // Apply transpositions
-            const transposition = 2 * delta + tur.singer.transposition;
+            // Apply transpositions. Inversion moves the note by steps of the
+            // temperament (delta counts pitch numbers), a transposition by semitones.
+            const transposition = tur.singer.transposition;
+            const inversionSteps = 2 * delta;
             const { arpeggioSteps, arpeggioSemitones, anote } = Singer.resolveArpeggio(
                 activity,
                 tur,
@@ -1264,7 +1329,7 @@ class Singer {
             );
             const [atrans, atransInSteps] = edoTransposition(
                 transposition + cents / 100 + arpeggioSemitones,
-                arpeggioSteps,
+                arpeggioSteps + inversionSteps,
                 edo
             );
             const keySig = Array.isArray(tur.singer.keySignature)
@@ -1318,8 +1383,10 @@ class Singer {
                 }
             }
 
-            // Apply transpositions
-            const transposition = 2 * delta + tur.singer.transposition;
+            // Apply transpositions. Inversion moves the note by steps of the
+            // temperament (delta counts pitch numbers), a transposition by semitones.
+            const transposition = tur.singer.transposition;
+            const inversionSteps = 2 * delta;
             const { arpeggioSteps, arpeggioSemitones, anote } = Singer.resolveArpeggio(
                 activity,
                 tur,
@@ -1330,7 +1397,7 @@ class Singer {
             );
             const [atrans, atransInSteps] = edoTransposition(
                 transposition + cents / 100 + arpeggioSemitones,
-                arpeggioSteps,
+                arpeggioSteps + inversionSteps,
                 edo
             );
             const keySig = Array.isArray(tur.singer.keySignature)
@@ -1398,8 +1465,10 @@ class Singer {
                 }
             }
 
-            // Apply transpositions
-            const transposition = 2 * delta + tur.singer.transposition;
+            // Apply transpositions. Inversion moves the note by steps of the
+            // temperament (delta counts pitch numbers), a transposition by semitones.
+            const transposition = tur.singer.transposition;
+            const inversionSteps = 2 * delta;
             const { arpeggioSteps, arpeggioSemitones, anote } = Singer.resolveArpeggio(
                 activity,
                 tur,
@@ -1410,7 +1479,7 @@ class Singer {
             );
             const [atrans, atransInSteps] = edoTransposition(
                 transposition + cents / 100 + arpeggioSemitones,
-                arpeggioSteps,
+                arpeggioSteps + inversionSteps,
                 edo
             );
             const keySig = Array.isArray(tur.singer.keySignature)
@@ -1461,7 +1530,10 @@ class Singer {
             const addPitch = (note, octave, cents, isInterval, direction) => {
                 // Apply transpositions, but only to the base note of an
                 // interval: the interval notes are built from it.
-                const transposition = isInterval ? 0 : 2 * delta + tur.singer.transposition;
+                // Inversion moves the note by steps of the temperament (delta
+                // counts pitch numbers), a transposition by semitones.
+                const transposition = isInterval ? 0 : tur.singer.transposition;
+                const inversionSteps = isInterval ? 0 : 2 * delta;
                 const alen = isInterval ? 0 : tur.singer.arpeggio.length;
                 let atrans = transposition;
                 let arpeggioSteps = 0;
@@ -1502,9 +1574,11 @@ class Singer {
 
                 const register = isInterval ? 0 : tur.singer.register;
                 // getOctaveInterval is the number of steps in an octave.
+                const steps =
+                    arpeggioSteps + inversionSteps + register * getOctaveInterval(activity);
                 const [pitchTransform, pitchTransformInSteps] = edoTransposition(
                     atrans,
-                    arpeggioSteps + register * getOctaveInterval(activity),
+                    steps,
                     edo
                 );
                 noteObj = getNote(
@@ -1520,9 +1594,18 @@ class Singer {
                 );
 
                 // Keep the part of a fractional transposition lost to rounding.
-                const transformCents = edoTranspositionCents(atrans, edo);
-                if (transformCents !== 0 && noteObj[0] !== "R") {
-                    noteObj = [noteObj[0], noteObj[1], noteObj[2] + transformCents];
+                const transformCents = Singer.fractionalTranspositionCents(
+                    activity,
+                    tur,
+                    anote,
+                    octave,
+                    atrans,
+                    steps,
+                    noteObj,
+                    direction
+                );
+                if (transformCents !== 0) {
+                    noteObj = [noteObj[0], noteObj[1], (noteObj[2] || 0) + transformCents];
                 }
 
                 // Apply ratio transposition:
@@ -1545,9 +1628,10 @@ class Singer {
                     noteObj = frequencyToPitch(hertz * ratio);
                 }
 
-                // Cents may have been added through a transposition.
-                if (noteObj[2] !== 0 && cents === 0) {
-                    cents = noteObj[2];
+                // Cents may have been added through a transposition. They add to
+                // the note's own cents instead of replacing them.
+                if (noteObj[2]) {
+                    cents = (cents || 0) + noteObj[2];
                 }
 
                 if (Math.abs(cents) < 1e-9) {
@@ -1711,8 +1795,13 @@ class Singer {
                 blk
             );
         } else if (activity.logo.inMusicKeyboard) {
-            // Apply transpositions
-            const transposition = 2 * delta + tur.singer.transposition;
+            // Apply transpositions. Inversion moves the note by steps of the
+            // temperament, a transposition by semitones.
+            const [transposition, transpositionInSteps] = edoTransposition(
+                tur.singer.transposition,
+                2 * delta,
+                edo
+            );
 
             const nnote = getNote(
                 note,
@@ -1722,7 +1811,8 @@ class Singer {
                 tur.singer.movable,
                 null,
                 activity.errorMsg,
-                activity.logo.synth.inTemperament
+                activity.logo.synth.inTemperament,
+                transpositionInSteps
             );
             nnote[0] = noteIsSolfege(note)
                 ? getSolfege(
@@ -1755,16 +1845,19 @@ class Singer {
             const addPitch = (note, octave, cents, isInterval, direction) => {
                 // Apply transpositions, but only to the base note of an
                 // interval: the interval notes are built from it.
-                const transposition = isInterval ? 0 : 2 * delta + tur.singer.transposition;
+                // Inversion moves the note by steps of the temperament (delta
+                // counts pitch numbers), a transposition by semitones.
+                const transposition = isInterval ? 0 : tur.singer.transposition;
                 const register = isInterval ? 0 : tur.singer.register;
 
                 // getOctaveInterval is the number of steps in an octave.
+                const steps = (isInterval ? 0 : 2 * delta) + register * getOctaveInterval(activity);
                 const [pitchTransform, pitchTransformInSteps] = edoTransposition(
                     transposition,
-                    register * getOctaveInterval(activity),
+                    steps,
                     edo
                 );
-                const noteObj = getNote(
+                let noteObj = getNote(
                     note,
                     octave,
                     pitchTransform,
@@ -1775,6 +1868,32 @@ class Singer {
                     activity.logo.synth.inTemperament,
                     pitchTransformInSteps
                 );
+
+                // Keep the part of a fractional transposition lost to rounding, the
+                // same as for a note inside a Note block.
+                const transformCents = Singer.fractionalTranspositionCents(
+                    activity,
+                    tur,
+                    note,
+                    octave,
+                    transposition,
+                    steps,
+                    noteObj,
+                    direction
+                );
+                if (transformCents !== 0) {
+                    noteObj = [noteObj[0], noteObj[1], (noteObj[2] || 0) + transformCents];
+                }
+
+                // Cents may have been added through a transposition. They add to
+                // the note's own cents instead of replacing them.
+                if (noteObj[2]) {
+                    cents = (cents || 0) + noteObj[2];
+                }
+
+                if (Math.abs(cents) < 1e-9) {
+                    cents = 0;
+                }
 
                 if (tur.singer.drumStyle.length > 0) {
                     const drumname = last(tur.singer.drumStyle);
@@ -1803,7 +1922,8 @@ class Singer {
                           )
                 );
 
-                return noteObj;
+                // Return the cents too, so the interval notes can keep them.
+                return [noteObj[0], noteObj[1], cents];
             };
 
             const noteObj1 = addPitch(note, octave, cents);
@@ -1826,7 +1946,7 @@ class Singer {
                     activity.logo.synth.inTemperament,
                     intervalInSteps
                 );
-                addPitch(noteObj2[0], noteObj2[1], cents, true);
+                addPitch(noteObj2[0], noteObj2[1], noteObj1[2], true);
             }
 
             const semitoneIntervals = tur.singer.semitoneIntervals;
@@ -1842,7 +1962,7 @@ class Singer {
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
                 );
-                addPitch(noteObj2[0], noteObj2[1], cents, true, semitoneInterval[1]);
+                addPitch(noteObj2[0], noteObj2[1], noteObj1[2], true, semitoneInterval[1]);
             }
 
             if (tur.singer.inNoteBlock.length > 0) {
