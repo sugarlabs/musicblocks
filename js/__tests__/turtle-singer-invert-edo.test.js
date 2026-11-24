@@ -203,3 +203,41 @@ describe("Singer.moveByEdoSteps", () => {
         expect(cents).toBeCloseTo(-600 / 19, 6);
     });
 });
+
+describe("an inverted solfege note keeps its solfege label in the Phrase Maker", () => {
+    const rowLabelFor = temperament => {
+        const turtle = { singer: null };
+        turtle.singer = new Singer(turtle);
+        Object.assign(turtle.singer, {
+            inNoteBlock: [],
+            transposition: 0,
+            register: 0,
+            invertList: [["E", 4, "even"]],
+            arpeggio: [],
+            keySignature: "C major",
+            movable: false,
+            pitchNumberOffset: 0
+        });
+        const phraseMaker = { addRowBlock: jest.fn(), rowLabels: [], rowArgs: [] };
+        const activity = {
+            turtles: { ithTurtle: () => turtle },
+            blocks: { blockList: {} },
+            errorMsg: jest.fn()
+        };
+        activity.logo = {
+            activity,
+            synth: { inTemperament: temperament },
+            inMatrix: true,
+            phraseMaker,
+            pitchBlocks: []
+        };
+        Singer.processPitch(activity, "do", 4, 0, 0, 0);
+        return phraseMaker.rowLabels[0];
+    };
+
+    test("do inverted around E4 is labelled as in 12 EDO", () => {
+        const label = rowLabelFor("equal19");
+        expect(noteIsSolfege(label)).toBe(true);
+        expect(label).toBe(rowLabelFor("equal"));
+    });
+});

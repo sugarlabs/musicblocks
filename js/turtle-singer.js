@@ -1252,8 +1252,12 @@ class Singer {
         // and rescales by edo / 12: in 19 EDO, C4 inverted around E4 played C5, not G♯4.
         // Each branch that inverts calls this first to reflect the note in steps, the way a
         // scalar transposition already moves it above, and then transposes it as usual.
+        // A solfege note reflected here comes back as a letter name; the widget rows still
+        // label it in solfege, as they do in 12 EDO, where the note itself is kept.
+        let reflectedFromSolfege = false;
         const invertInEdoSteps = () => {
             if (delta !== 0 && edo !== 12) {
+                reflectedFromSolfege = noteIsSolfege(note);
                 [note, octave, cents] = Singer.moveByEdoSteps(
                     activity,
                     tur,
@@ -1341,7 +1345,7 @@ class Singer {
                 tur.singer.lastNotePlayed = [nnote[0] + nnote[1], 4];
             }
             nnote[0] =
-                anote !== "rest" && noteIsSolfege(note)
+                anote !== "rest" && (reflectedFromSolfege || noteIsSolfege(note))
                     ? getSolfege(
                           nnote[0],
                           keySig,
@@ -1402,7 +1406,7 @@ class Singer {
                 : typeof tur.singer.keySignature === "string" &&
                   tur.singer.keySignature.toLowerCase().startsWith("c major");
 
-            if (anote !== "rest" && isCMajor && noteIsSolfege(note)) {
+            if (anote !== "rest" && isCMajor && (reflectedFromSolfege || noteIsSolfege(note))) {
                 noteObj[0] = getSolfege(
                     noteObj[0],
                     keySig,
@@ -1478,7 +1482,7 @@ class Singer {
                 : typeof tur.singer.keySignature === "string" &&
                   tur.singer.keySignature.toLowerCase().startsWith("c major");
 
-            if (anote !== "rest" && isCMajor && noteIsSolfege(note)) {
+            if (anote !== "rest" && isCMajor && (reflectedFromSolfege || noteIsSolfege(note))) {
                 noteObj[0] = getSolfege(
                     noteObj[0],
                     keySig,
@@ -1741,15 +1745,16 @@ class Singer {
                 activity.errorMsg,
                 activity.logo.synth.inTemperament
             );
-            nnote[0] = noteIsSolfege(note)
-                ? getSolfege(
-                      nnote[0],
-                      tur.singer.keySignature,
-                      false, // getNote already applied movable Do; widgets use fixed Do
-                      activity.logo.synth.inTemperament,
-                      edo
-                  )
-                : nnote[0];
+            nnote[0] =
+                reflectedFromSolfege || noteIsSolfege(note)
+                    ? getSolfege(
+                          nnote[0],
+                          tur.singer.keySignature,
+                          false, // getNote already applied movable Do; widgets use fixed Do
+                          activity.logo.synth.inTemperament,
+                          edo
+                      )
+                    : nnote[0];
 
             if (tur.singer.drumStyle.length === 0) {
                 const musicKeyboard =
