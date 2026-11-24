@@ -5099,7 +5099,7 @@ describe("Kokoro singing preflight", () => {
         expect(logo.runLogoCommands).not.toHaveBeenCalled();
     });
     test("reports preparation errors and permits a new attempt", async () => {
-        const { logo } = preflight();
+        const { logo, complete } = preflight();
         logo.synth.prepareSinging.mockRejectedValueOnce(new Error("offline"));
         Logo.prototype.runLogoCommands.call(logo, 7);
         await new Promise(resolve => setTimeout(resolve, 0));
@@ -5107,6 +5107,13 @@ describe("Kokoro singing preflight", () => {
         expect(logo.onStopTurtle).toHaveBeenCalled();
         expect(logo._singingPreparation).toBeNull();
         expect(logo.runLogoCommands).not.toHaveBeenCalled();
+        Logo.prototype.runLogoCommands.call(logo, 8);
+        expect(logo.synth.prepareSinging).toHaveBeenCalledTimes(2);
+        logo.synth.singingSamples.set("la", {});
+        complete();
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(logo.runLogoCommands).toHaveBeenCalledWith(8, undefined);
+        expect(logo.deps.errorHandler).toHaveBeenCalledTimes(1);
     });
     test("repeated Play prepares only once and starts only the latest request", async () => {
         const { logo, complete } = preflight();

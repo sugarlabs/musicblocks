@@ -1364,40 +1364,44 @@ describe("BlockDragController", () => {
             expect(blocks.setActionProtoVisibility).toHaveBeenCalledWith(false);
         });
 
-        it("stops running turtles and resets the stop button color after a successful connection", async () => {
-            const target = makeFlowBlock({
-                x: 0,
-                y: 0,
-                docks: [
-                    [0, 0, "in"],
-                    [0, 20, "out"]
-                ],
-                connections: [null, null],
-                name: "target"
-            });
-            const moving = makeFlowBlock({
-                x: 0,
-                y: 15,
-                docks: [[0, 0, "in"]],
-                connections: [null],
-                name: "moving"
-            });
+        it.each([true, false])(
+            "stops playback or pending voice preparation on a block move (running: %s)",
+            async running => {
+                const target = makeFlowBlock({
+                    x: 0,
+                    y: 0,
+                    docks: [
+                        [0, 0, "in"],
+                        [0, 20, "out"]
+                    ],
+                    connections: [null, null],
+                    name: "target"
+                });
+                const moving = makeFlowBlock({
+                    x: 0,
+                    y: 15,
+                    docks: [[0, 0, "in"]],
+                    connections: [null],
+                    name: "moving"
+                });
 
-            const blocks = makeBlocks([target, moving]);
-            blocks.activity.turtles.running = jest.fn().mockReturnValue(true);
-            const stopBtn = document.createElement("button");
-            stopBtn.id = "stop";
-            document.body.appendChild(stopBtn);
+                const blocks = makeBlocks([target, moving]);
+                blocks.activity.turtles.running = jest.fn().mockReturnValue(running);
+                blocks.activity.logo._singingPreparation = running ? null : Promise.resolve();
+                const stopBtn = document.createElement("button");
+                stopBtn.id = "stop";
+                document.body.appendChild(stopBtn);
 
-            try {
-                await blocks.blockMoved(1);
+                try {
+                    await blocks.blockMoved(1);
 
-                expect(blocks.activity.logo.doStopTurtles).toHaveBeenCalled();
-                expect(stopBtn.style.color).toBe("white");
-            } finally {
-                stopBtn.remove();
+                    expect(blocks.activity.logo.doStopTurtles).toHaveBeenCalled();
+                    expect(stopBtn.style.color).toBe("white");
+                } finally {
+                    stopBtn.remove();
+                }
             }
-        });
+        );
 
         it("unhighlights the connected blocks after the highlight timeout elapses", async () => {
             jest.useFakeTimers();

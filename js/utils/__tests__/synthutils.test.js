@@ -3765,6 +3765,47 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             );
         });
 
+        test("a scheduled chord keeps its samples while idle sampler slots release theirs", () => {
+            const assigned = new Map();
+            const scheduled = [];
+            const silence = {};
+            const voice = {
+                add: (midi, buffer) => assigned.set(midi, buffer),
+                toSeconds: time => time,
+                triggerAttackRelease: (slot, duration, start) =>
+                    scheduled.push([assigned.get(slot), duration, start])
+            };
+            const sampler = jest.spyOn(Tone, "Sampler").mockImplementation(() => voice);
+            const originalContext = Tone.getContext.getMockImplementation();
+            const originalFrequency = Tone.Frequency.getMockImplementation();
+            Tone.getContext.mockReturnValue({ createBuffer: () => silence });
+            Tone.Frequency.mockImplementation(value => ({
+                toMidi: () => value,
+                toFrequency: () => value
+            }));
+            try {
+                synth.singingSamples.set("la", { rate: 24000 });
+                synth._getSingingBuffer = jest.fn((text, frequency) => ({ frequency }));
+                synth.___createSynth("turtle0", "sing:la", "sing:la", null);
+                voice.triggerAttackRelease([60, 60.25, 64], 30, 7, 1);
+                expect(scheduled).toEqual([
+                    [{ frequency: 60 }, 30, 7],
+                    [{ frequency: 60.25 }, 30, 7],
+                    [{ frequency: 64 }, 30, 7]
+                ]);
+                expect([...assigned.values()]).toEqual([silence, silence]);
+                synth._getSingingBuffer.mockReturnValueOnce({}).mockImplementationOnce(() => {
+                    throw new Error("render failed");
+                });
+                expect(() => voice.triggerAttackRelease([60, 64], 1)).toThrow("render failed");
+                expect([...assigned.values()]).toEqual([silence, silence]);
+            } finally {
+                sampler.mockRestore();
+                Tone.getContext.mockImplementation(originalContext);
+                Tone.Frequency.mockImplementation(originalFrequency);
+            }
+        });
+
         test("prepares each syllable once and preserves errors for retry", async () => {
             const renderSyllable = jest.fn().mockResolvedValue({ samples: [1], rate: 24000 });
             global.KokoroSpeech = jest.fn(() => ({ renderSyllable }));
@@ -3872,10 +3913,13 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
                 expect(synth._getSingingBuffer("la", 220, 0.75 - 0.25 / source.rate)).not.toBe(
                     held
                 );
-                for (let i = 0; i < 10; i++) synth._getSingingBuffer("la", 300 + i, 0.5);
-                expect(synth._singingBufferBytes).toBeLessThanOrEqual(8 * 1024 * 1024);
+                expect(synth._getSingingBuffer("la", 220, 0.5)).toBe(first);
+                const renders = KokoroSpeech.tuneSyllable.mock.calls.length;
                 synth.singingSamples.set("la", { ...source });
                 expect(synth._getSingingBuffer("la", 220, 0.5)).not.toBe(first);
+                expect(KokoroSpeech.tuneSyllable).toHaveBeenCalledTimes(renders + 1);
+                for (let i = 0; i < 10; i++) synth._getSingingBuffer("la", 300 + i, 0.5);
+                expect(synth._singingBufferBytes).toBeLessThanOrEqual(8 * 1024 * 1024);
             } finally {
                 delete global.KokoroSpeech;
                 Tone.getContext.mockImplementation(originalContext);

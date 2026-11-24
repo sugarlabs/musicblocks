@@ -1909,24 +1909,38 @@ function Synth() {
                 if (!source) throw new Error("Prepare the singing voice before playing.");
                 const voice = new Tone.Sampler({ urls: {}, attack: 0, release: 0.02 });
                 const play = voice.triggerAttackRelease.bind(voice);
-                const assigned = new Map();
+                const silence = Tone.getContext().createBuffer(1, 1, source.rate);
                 // Keep Tone's scheduling, routing, polyphony and Stop lifecycle.
                 voice.triggerAttackRelease = (notes, duration, time, velocity) => {
                     const pitches = Array.isArray(notes) ? notes : [notes];
-                    for (const note of pitches) {
-                        const midi = Math.round(Tone.Frequency(note).toMidi());
-                        const frequency = Tone.Frequency(midi, "midi").toFrequency();
+                    const rendered = pitches.map(note => {
+                        const pitch = Tone.Frequency(note);
+                        const midi = Math.round(pitch.toMidi());
                         const buffer = this._getSingingBuffer(
                             sourceName.slice(5),
-                            frequency,
+                            pitch.toFrequency(),
                             duration
                         );
-                        if (assigned.get(midi) !== buffer) {
-                            voice.add(midi, buffer);
-                            assigned.set(midi, buffer);
+                        return { midi, buffer };
+                    });
+                    const start = voice.toSeconds(time);
+                    for (const { midi, buffer } of rendered) {
+                        voice.add(midi, buffer);
+                        try {
+                            // The buffer already has its exact pitch. Playing at the slot's
+                            // center frequency preserves duration for microtonal notes too.
+                            play(
+                                Tone.Frequency(midi, "midi").toFrequency(),
+                                duration,
+                                start,
+                                velocity
+                            );
+                        } finally {
+                            // Scheduled sources own their audio; only the replay cache retains it.
+                            voice.add(midi, silence);
                         }
                     }
-                    return play(notes, duration, time, velocity);
+                    return voice;
                 };
                 instruments[turtle][instrumentName] = voice;
                 instrumentsSource[instrumentName] = [2, sourceName];
