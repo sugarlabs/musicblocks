@@ -563,7 +563,16 @@ class ProjectStorage {
         // Only persist if we already had data or this is a genuine first run.
         // Avoid overwriting backup with empty data on corruption.
         if (hadData) {
-            await this.save();
+            try {
+                await this.save();
+            } catch (error) {
+                // Allow initialization to complete with recovered data when
+                // primary storage is still unavailable. The save failure is
+                // already logged, and later saves can retry persistence.
+                if (!this._primaryRecoveryPending) {
+                    throw error;
+                }
+            }
         }
     }
 
