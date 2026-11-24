@@ -218,6 +218,65 @@ describe("ProjectStorage", () => {
     });
 
     describe("restore()", () => {
+        it("should preserve a valid backup when a malformed primary cannot be repaired", async () => {
+            jest.spyOn(console, "warn").mockImplementation();
+            jest.spyOn(console, "error").mockImplementation();
+
+            const backupData = {
+                Projects: {
+                    song: {
+                        ProjectName: "Recovered Song",
+                        ProjectData: "important blocks"
+                    }
+                }
+            };
+
+            await storage.set(storage.LocalStorageKey, "{broken");
+            await storage.set(storage.BackupStorageKey, backupData);
+
+            let primaryUnavailable = true;
+
+            mockLocalforage.setItem.mockImplementation(async (key, value) => {
+                if (key === storage.LocalStorageKey && primaryUnavailable) {
+                    throw new Error("Primary write failed");
+                }
+
+                mockLocalforage._store[key] = value;
+            });
+
+            await storage.restore();
+
+            await expect(storage.initialiseStorage()).rejects.toThrow("Primary write failed");
+
+            expect(storage.data.Projects).toEqual(backupData.Projects);
+
+            await expect(storage.save()).rejects.toThrow("Primary write failed");
+
+            expect(await storage.get(storage.BackupStorageKey)).toEqual(backupData);
+
+            // Simulate a restart using the same persisted storage.
+            const restartedStorage = new ProjectStorage(mockPlanet);
+            restartedStorage.LocalStorage = mockLocalforage;
+
+            await restartedStorage.restore();
+
+            expect(restartedStorage.data.Projects).toEqual(backupData.Projects);
+
+            primaryUnavailable = false;
+
+            await restartedStorage.initialiseStorage();
+
+            const primary = await restartedStorage.get(storage.LocalStorageKey);
+
+            expect(primary.Projects).toEqual(backupData.Projects);
+
+            // Normal backup rotation should resume after successful recovery.
+            restartedStorage.data.Projects.song.ProjectName = "Updated Song";
+
+            await restartedStorage.save();
+
+            expect(await restartedStorage.get(storage.BackupStorageKey)).toEqual(primary);
+        });
         it("should preserve recovered projects when initialization cannot persist data", async () => {
             jest.spyOn(console, "warn").mockImplementation();
             jest.spyOn(console, "error").mockImplementation();
