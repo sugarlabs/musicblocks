@@ -221,10 +221,19 @@ function setupDrumActions(activity) {
 
             // A noise sample can be loaded from a URL, just as a drum can. Only the
             // scheme is lower-cased; the rest of the URL is case-sensitive.
-            const urlMatch = /^(https?):\/\/\S+/i.exec(trimmed);
             let noisename = null;
-            if (urlMatch) {
-                noisename = urlMatch[1].toLowerCase() + trimmed.slice(urlMatch[1].length);
+            const schemeMatch = /^(https?):\/\//i.exec(trimmed);
+            if (schemeMatch) {
+                // Validate the whole value, so a malformed URL such as "http://?"
+                // is ignored instead of stored as a broken sample.
+                try {
+                    if (new URL(trimmed).hostname) {
+                        noisename =
+                            schemeMatch[1].toLowerCase() + trimmed.slice(schemeMatch[1].length);
+                    }
+                } catch {
+                    // Not a valid URL; ignore the value.
+                }
             }
 
             if (!noisename && typeof NOISENAMES === "object" && NOISENAMES !== null) {

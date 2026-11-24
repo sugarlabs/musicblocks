@@ -510,6 +510,15 @@ describe("setupDrumActions", () => {
             expect(targetTurtle.singer.noteDrums[9]).toHaveLength(0);
         });
 
+        it("ignores a URL with no host, such as http://?", () => {
+            targetTurtle.singer.inNoteBlock.push(10);
+            targetTurtle.singer.noteDrums[10] = [];
+            targetTurtle.singer.noteBeatValues[10] = [];
+            Singer.DrumActions.playNoise("http://?", 0, 10);
+            expect(targetTurtle.singer.noteDrums[10]).toHaveLength(0);
+            expect(targetTurtle.singer.pushedNote).toBe(false);
+        });
+
         it("resolves noise names case-insensitively, with trimmed whitespace, or omitted spaces", () => {
             targetTurtle.singer.inNoteBlock.push(2);
             targetTurtle.singer.noteDrums[2] = [];
