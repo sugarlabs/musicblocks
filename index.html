@@ -1671,7 +1671,8 @@
 
                 togglePlayOnlyMode();
 
-                modeToggle.addEventListener("click", function () {
+                modeToggle.addEventListener("click", function (event) {
+                    event.stopPropagation();
                     compactEdit = !compactEdit;
                     togglePlayOnlyMode();
                 });
@@ -1679,6 +1680,17 @@
                 modeToggle.addEventListener("keydown", function (event) {
                     if (event.key === " " || event.key === "Enter") {
                         event.stopPropagation();
+                    }
+                    if (event.key === " ") {
+                        event.preventDefault();
+                    }
+                });
+
+                modeToggle.addEventListener("keyup", function (event) {
+                    if (event.key === " ") {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        modeToggle.click();
                     }
                 });
 
