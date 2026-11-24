@@ -507,13 +507,24 @@ class ProjectStorage {
                 if (backupData !== null && backupData !== undefined) {
                     this.data =
                         typeof backupData === "string" ? JSON.parse(backupData) : backupData;
+
                     console.warn("[ProjectStorage] Restored from backup successfully.");
-                    // Re-persist recovered data as primary.
-                    await this.set(this.LocalStorageKey, this.data);
                 }
             } catch (backupError) {
                 console.error("[ProjectStorage] Backup restore also failed:", backupError);
                 this.data = null;
+            }
+
+            // Preserve recovered data even if restoring primary storage fails.
+            if (this.data !== null && this.data !== undefined) {
+                try {
+                    await this.set(this.LocalStorageKey, this.data);
+                } catch (writeError) {
+                    console.error(
+                        "[ProjectStorage] Failed to persist recovered backup:",
+                        writeError
+                    );
+                }
             }
         }
     }

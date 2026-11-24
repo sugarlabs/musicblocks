@@ -218,6 +218,131 @@ describe("ProjectStorage", () => {
     });
 
     describe("restore()", () => {
+        it("should preserve recovered projects when initialization cannot persist data", async () => {
+            jest.spyOn(console, "warn").mockImplementation();
+            jest.spyOn(console, "error").mockImplementation();
+
+            const backupData = {
+                Projects: {
+                    song: {
+                        ProjectName: "Recovered Song",
+                        ProjectData: "important blocks"
+                    }
+                }
+            };
+
+            await storage.set(storage.BackupStorageKey, backupData);
+
+            let primaryUnavailable = true;
+
+            mockLocalforage.setItem.mockImplementation(async (key, value) => {
+                if (key === storage.LocalStorageKey && primaryUnavailable) {
+                    throw new Error("Storage unavailable");
+                }
+
+                mockLocalforage._store[key] = value;
+            });
+
+            await storage.restore();
+
+            await expect(storage.initialiseStorage()).rejects.toThrow("Storage unavailable");
+
+            expect(storage.data.Projects).toEqual(backupData.Projects);
+
+            expect(await storage.get(storage.BackupStorageKey)).toEqual(backupData);
+
+            primaryUnavailable = false;
+
+            await storage.save();
+            await storage.save();
+
+            const primary = await storage.get(storage.LocalStorageKey);
+            const backup = await storage.get(storage.BackupStorageKey);
+
+            expect(primary.Projects).toEqual(backupData.Projects);
+            expect(backup.Projects).toEqual(backupData.Projects);
+        });
+
+        it("should not write primary storage when reading the backup fails", async () => {
+            const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+
+            mockLocalforage.getItem.mockImplementation(async key => {
+                if (key === storage.BackupStorageKey) {
+                    throw new Error("Backup read failed");
+                }
+
+                return null;
+            });
+
+            await storage.restore();
+
+            expect(storage.data).toBeNull();
+
+            expect(mockLocalforage.setItem).not.toHaveBeenCalled();
+
+            expect(consoleSpy).toHaveBeenCalledWith(
+                "[ProjectStorage] Backup restore also failed:",
+                expect.any(Error)
+            );
+        });
+        it("should preserve recovered projects after a temporary primary write failure", async () => {
+            jest.spyOn(console, "warn").mockImplementation();
+            jest.spyOn(console, "error").mockImplementation();
+
+            const backupData = {
+                Projects: {
+                    song: {
+                        ProjectName: "Song",
+                        ProjectData: "saved music"
+                    }
+                }
+            };
+
+            await storage.set(storage.BackupStorageKey, backupData);
+
+            mockLocalforage.setItem.mockRejectedValueOnce(new Error("Temporary storage failure"));
+
+            await storage.restore();
+            await storage.initialiseStorage();
+
+            expect(storage.data.Projects).toEqual(backupData.Projects);
+
+            await storage.save();
+            await storage.save();
+
+            const primary = await storage.get(storage.LocalStorageKey);
+            const backup = await storage.get(storage.BackupStorageKey);
+
+            expect(primary.Projects).toEqual(backupData.Projects);
+            expect(backup.Projects).toEqual(backupData.Projects);
+        });
+
+        it("should retain recovered data when primary storage remains unavailable", async () => {
+            jest.spyOn(console, "warn").mockImplementation();
+            jest.spyOn(console, "error").mockImplementation();
+
+            const backupData = {
+                Projects: {
+                    song: {
+                        ProjectName: "Recovered Song",
+                        ProjectData: "important blocks"
+                    }
+                }
+            };
+
+            await storage.set(storage.BackupStorageKey, backupData);
+
+            mockLocalforage.setItem.mockRejectedValue(new Error("Storage unavailable"));
+
+            await storage.restore();
+
+            expect(storage.data).toEqual(backupData);
+
+            await expect(storage.save()).rejects.toThrow("Storage unavailable");
+
+            expect(storage.data).toEqual(backupData);
+            expect(await storage.get(storage.BackupStorageKey)).toEqual(backupData);
+        });
         it("should restore data from primary storage", async () => {
             const projectData = {
                 Projects: { 123: { ProjectName: "My Song" } },
