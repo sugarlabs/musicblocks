@@ -386,6 +386,7 @@ class Activity {
         this.stageDirty = false;
         this._renderLoopRafId = null;
         this._renderLoopRunning = false;
+        this.artworkRevision = 0;
         this.firefoxWarningShown = false;
 
         this.themes = ["light", "dark", "highcontrast"];

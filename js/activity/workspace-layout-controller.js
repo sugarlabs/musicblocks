@@ -26,6 +26,7 @@ class WorkspaceLayoutController {
 
         this._previousCanvasWidth = undefined;
         this._resizeSession = null;
+        this._homeIndicatorState = { left: false, right: false, above: false, below: false };
     }
 
     /**
@@ -56,6 +57,18 @@ class WorkspaceLayoutController {
             this._previousCanvasWidth !== undefined && canvasWidth < this._previousCanvasWidth;
 
         const processedBlocks = new Set();
+        const movedBlockIds = new Set();
+        /**
+         * Moves a block by an X delta and records it for spatial-index refresh.
+         * @param {number|string} blockId - Index of the block to move
+         * @param {number} deltaX - Horizontal distance to move the block
+         * @returns {void}
+         */
+        const moveBlockDeltaX = (blockId, deltaX) => {
+            if (deltaX === 0) return;
+            activity.blocks.blockList[blockId].container.x += deltaX;
+            movedBlockIds.add(blockId);
+        };
 
         //Array for storing individual dragGroups (the chunks of code linked together which are not connected)
         const dragGroups = [];
@@ -145,8 +158,7 @@ class WorkspaceLayoutController {
                 const dx = referenceBlock.beforeMobilePosition.x - referenceBlock.container.x;
 
                 group.forEach(blockId => {
-                    const block = activity.blocks.blockList[blockId];
-                    block.container.x += dx;
+                    moveBlockDeltaX(blockId, dx);
                 });
                 referenceBlock.beforeMobilePosition = null; // Clear stored position
                 //this prevents old groups from affecting new calculations.
@@ -163,8 +175,7 @@ class WorkspaceLayoutController {
                 const dx = referenceBlock.before600pxPosition.x - referenceBlock.container.x;
 
                 group.forEach(blockId => {
-                    const block = activity.blocks.blockList[blockId];
-                    block.container.x += dx;
+                    moveBlockDeltaX(blockId, dx);
                 });
                 referenceBlock.before600pxPosition = null;
             }
@@ -194,7 +205,7 @@ class WorkspaceLayoutController {
                     const shiftX = targetLeft - currentLeftmostX;
 
                     group.forEach(blockId => {
-                        activity.blocks.blockList[blockId].container.x += shiftX;
+                        moveBlockDeltaX(blockId, shiftX);
                     });
 
                     currentLeftmostX += shiftX;
@@ -206,7 +217,7 @@ class WorkspaceLayoutController {
                 const shiftX = canvasWidth - currentRightmostX - 10;
 
                 group.forEach(blockId => {
-                    activity.blocks.blockList[blockId].container.x += shiftX;
+                    moveBlockDeltaX(blockId, shiftX);
                 });
             }
 
@@ -218,7 +229,7 @@ class WorkspaceLayoutController {
                 const shiftX = 100 - leftmostX;
 
                 group.forEach(blockId => {
-                    activity.blocks.blockList[blockId].container.x += shiftX;
+                    moveBlockDeltaX(blockId, shiftX);
                 });
             }
         });
@@ -268,7 +279,7 @@ class WorkspaceLayoutController {
                 }
 
                 layout.group.forEach(blockId => {
-                    activity.blocks.blockList[blockId].container.x += amount;
+                    moveBlockDeltaX(blockId, amount);
                 });
 
                 layout.left += amount;
@@ -415,7 +426,7 @@ class WorkspaceLayoutController {
                 const shiftX = LEFT_BOUNDARY - leftmostX;
 
                 group.forEach(blockId => {
-                    activity.blocks.blockList[blockId].container.x += shiftX;
+                    moveBlockDeltaX(blockId, shiftX);
                 });
             }
         });
@@ -437,7 +448,7 @@ class WorkspaceLayoutController {
                 const shiftX = savedLeft - currentLeft;
 
                 group.forEach(blockId => {
-                    activity.blocks.blockList[blockId].container.x += shiftX;
+                    moveBlockDeltaX(blockId, shiftX);
                 });
             });
 
@@ -446,6 +457,7 @@ class WorkspaceLayoutController {
 
         this._previousCanvasWidth = canvasWidth;
 
+        movedBlockIds.forEach(blockId => activity.blocks._updateSpatialGrid(blockId));
         activity.blocks._updateViewportCulling();
         activity.refreshCanvas();
     }
@@ -677,6 +689,69 @@ class WorkspaceLayoutController {
         } else {
             changeImage(activity.homeButtonContainer.children[0], GOHOMEBUTTON, GOHOMEFADEDBUTTON);
         }
+    }
+
+    /**
+     * Updates the directional markers shown around the Home button.
+     * @param {{left: boolean, right: boolean, above: boolean, below: boolean}} directions
+     * @returns {void}
+     */
+    setHomeIndicators(directions = {}) {
+        const indicatorState = {
+            left: Boolean(directions.left),
+            right: Boolean(directions.right),
+            above: Boolean(directions.above),
+            below: Boolean(directions.below)
+        };
+        this._homeIndicatorState = indicatorState;
+        const container = this.activity.homeButtonContainer;
+        if (
+            !container ||
+            typeof container.appendChild !== "function" ||
+            typeof container.querySelector !== "function"
+        ) {
+            return;
+        }
+
+        const positions = {
+            left: "left: -4px; top: 50%; transform: translateY(-50%);",
+            right: "right: -4px; top: 50%; transform: translateY(-50%);",
+            above: "left: 50%; top: -4px; transform: translateX(-50%);",
+            below: "left: 50%; bottom: -4px; transform: translateX(-50%);"
+        };
+        container.style.overflow = "visible";
+
+        for (const direction of Object.keys(positions)) {
+            let indicator = container.querySelector(`[data-home-indicator="${direction}"]`);
+            if (!indicator) {
+                indicator = document.createElement("span");
+                indicator.setAttribute("data-home-indicator", direction);
+                indicator.setAttribute("aria-hidden", "true");
+                indicator.style.cssText =
+                    "position: absolute; width: 7px; height: 7px; border-radius: 50%; " +
+                    "background-color: #f00; pointer-events: none; z-index: 1; " +
+                    positions[direction];
+                container.appendChild(indicator);
+            }
+
+            indicator.hidden = !directions[direction];
+            indicator.style.display = directions[direction] ? "block" : "none";
+        }
+    }
+
+    /**
+     * Reapplies the last directional state after the Home button is recreated.
+     * @returns {void}
+     */
+    refreshHomeIndicators() {
+        this.setHomeIndicators(
+            this._homeIndicatorState || {
+                left: false,
+                right: false,
+                above: false,
+                below: false
+            }
+        );
     }
 }
 

@@ -56,6 +56,7 @@ function makeActivity() {
                 activity.blocks.dragGroup = [blockId];
             }),
             moveBlockRelative: jest.fn(),
+            _updateViewportGrid: jest.fn(),
             raiseStackToTop: jest.fn(),
             findUniqueActionName: jest.fn(name => name),
             newNameddoBlock: jest.fn(),
@@ -194,6 +195,7 @@ describe("TrashController.restoreTrashById", () => {
         expect(activity.blocks.trashStacks).not.toContain("blk1");
         expect(block.trash).toBe(false);
         expect(activity.blocks.moveBlockRelative).toHaveBeenCalledWith("blk1", 0, -30);
+        expect(activity.blocks._updateViewportGrid).toHaveBeenCalledWith("blk1");
         expect(block.show).toHaveBeenCalled();
         expect(activity.blocks.raiseStackToTop).toHaveBeenCalledWith("blk1");
         expect(activity.refreshCanvas).toHaveBeenCalled();

@@ -30,8 +30,13 @@ global.frequencyToPitch = jest.fn(freq => {
     if (freq === 440) return ["A", "4"];
     return ["G♯", "4"];
 });
+const mockFrequencyToPitch = global.frequencyToPitch;
 
 global.toFraction = jest.fn(num => [1, 1]);
+global._ = jest.fn(str => str);
+global.plainUnwritableTuplets = require("../utils/musicutils-rhythm").plainUnwritableTuplets;
+
+const { frequencyToPitch: realFrequencyToPitch } = require("../utils/musicutils-pitch");
 
 const {
     getABCHeader,
@@ -464,6 +469,7 @@ describe("saveAbcOutput", () => {
     let activity;
 
     beforeEach(() => {
+        global.frequencyToPitch = mockFrequencyToPitch;
         activity = {
             logo: {
                 notationOutput: "",
@@ -484,6 +490,10 @@ describe("saveAbcOutput", () => {
         };
     });
 
+    afterEach(() => {
+        global.frequencyToPitch = mockFrequencyToPitch;
+    });
+
     it("should generate the correct ABC notation output with key signature replacements", () => {
         // A key set before the first note is the key the voice starts in.
         activity.logo.notation.notationStaging[0].unshift("key", "B♭", "major");
@@ -493,6 +503,56 @@ describe("saveAbcOutput", () => {
         expect(result).toContain("K:Bb\n");
         expect(result).not.toContain("[K:");
         expect(result).toContain("b");
+    });
+
+    it("warns when a Hertz pitch has cents that ABC cannot preserve", () => {
+        global.frequencyToPitch = realFrequencyToPitch;
+        activity.logo.notation.notationStaging[0] = [[[445], 4, 0, null, null, -1, false]];
+
+        const result = saveAbcOutput(activity);
+
+        expect(result).toContain(
+            "% WARNING: Music Blocks 445 Hz was rounded to A4 (+19.6 cents); the cents offset was not exported."
+        );
+        expect(activity.logo.abcExportWarnings).toEqual(["445 Hz was rounded to A4 (+19.6 cents)"]);
+    });
+
+    it("warns only when a Hertz pitch is at least half a cent from its ABC note", () => {
+        global.frequencyToPitch = jest.fn(frequency => {
+            const centsByFrequency = {
+                440: 0,
+                441: 0.49,
+                442: -0.49,
+                443: 0.5,
+                444: -0.5
+            };
+            return ["A", 4, centsByFrequency[frequency]];
+        });
+        activity.logo.notation.notationStaging[0] = [440, 441, 442, 443, 444].map(frequency => [
+            [frequency],
+            4,
+            0,
+            null,
+            null,
+            -1,
+            false
+        ]);
+
+        const result = saveAbcOutput(activity);
+
+        expect(result).toContain("443 Hz was rounded to A4 (+0.5 cents)");
+        expect(result).toContain("444 Hz was rounded to A4 (-0.5 cents)");
+        expect(result).not.toContain("440 Hz was rounded");
+        expect(result).not.toContain("441 Hz was rounded");
+        expect(result).not.toContain("442 Hz was rounded");
+    });
+
+    it("does not warn when the score is empty", () => {
+        activity.logo.notation.notationStaging[0] = [];
+
+        saveAbcOutput(activity);
+
+        expect(activity.logo.abcExportWarnings).toEqual([]);
     });
 
     const note = pitch => [[pitch], 4, 0, null, null, -1, false];
@@ -1698,5 +1758,48 @@ describe("processABCNotes - bar lines", () => {
         ];
         const body = exportBody(staged);
         expect(body).toContain("[V:2]\nM:3/4\nc4 d4 e4 |");
+    });
+});
+
+describe("processABCNotes - fractional tuplets", () => {
+    const abcjs = require("abcjs");
+
+    const exportParsed = staged => {
+        const logo = { notationNotes: { 0: "" }, notation: { notationStaging: { 0: staged } } };
+        processABCNotes(logo, "0");
+        const body = logo.notationNotes["0"];
+        const [tune] = abcjs.parseOnly(`${getABCHeader()}K:C\n${body}\n`);
+        expect((tune.warnings || []).map(w => w.replace(/<[^>]*>/g, ""))).toEqual([]);
+        return body;
+    };
+
+    it("writes the rows examples/test-suite.html stages as plain notes", () => {
+        const body = exportParsed([
+            [["G4"], 4, 0, null, 0, -1, false, null],
+            [["G4"], 1, 0, [4.012036108324975, 0.5], 2, -1, false, null],
+            [["A4"], 1, 0, [3.988035892323031, 0.5], 1, -1, false, null]
+        ]);
+        expect(body).not.toContain("(");
+        expect(body).toContain("G8");
+        expect(body).toContain("A8");
+    });
+
+    it("writes a rest for a pitchless fractional tuplet", () => {
+        expect(exportParsed([[[], 1, 0, [4.012036108324975, 0.5], 2, -1, false, null]])).toContain(
+            "z8"
+        );
+    });
+
+    it("writes what is left of a note at a bar line as a plain note", () => {
+        expect(exportParsed([[["A4"], 1, 0, [27, 1], 16, -1, false, null]])).not.toContain("(");
+    });
+
+    it("writes a note of two whole notes as a breve", () => {
+        expect(exportParsed([[["G4"], 1, 0, [1, 0.5], 1, -1, false, null]])).toContain("G32");
+    });
+
+    it("leaves a whole tuplet alone", () => {
+        const triplet = [["G4"], 1, 0, [3, 0.5], 1, -1, false, null];
+        expect(exportParsed([triplet, triplet, triplet])).toContain("(3:2");
     });
 });

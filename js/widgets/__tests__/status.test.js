@@ -1574,8 +1574,8 @@ describe("StatusMatrix Widget", () => {
 
             expect(statusMatrix._harmonyCell.textContent).toContain("C major");
             expect(harmonyText()).toEqual([
-                ["C4 → E4", "major 3", "5:4", "1.260", "+13.7"],
-                ["C4 → G4", "perfect 5", "3:2", "1.498", "-2.0"]
+                ["C4 → E4", "major 3", "5:4", "1.260", "+13.7", "imperfect"],
+                ["C4 → G4", "perfect 5", "3:2", "1.498", "-2.0", "perfect"]
             ]);
         });
 
@@ -1629,6 +1629,298 @@ describe("StatusMatrix Widget", () => {
             statusMatrix.updateAll();
 
             expect(statusMatrix._harmonyCell).toBeNull();
+        });
+
+        describe("parallel motion", () => {
+            const MIDI = {
+                C3: 48,
+                D3: 50,
+                E3: 52,
+                C4: 60,
+                D4: 62,
+                E4: 64,
+                F4: 65,
+                G4: 67,
+                A4: 69,
+                B4: 71,
+                C5: 72
+            };
+            let mice;
+
+            // Moves a mouse to a note group (or a rest, with no notes) that starts
+            // at `start` in turtle time, lasts `length` seconds and is sounding now.
+            const play = (i, notes, start, length = 1) => {
+                mice[i].running = true;
+                mice[i].singer.previousTurtleTime = start;
+                mice[i].singer.turtleTime = start + length;
+                mice[i].singer.pitchStatus =
+                    notes.length > 0
+                        ? [{ notes, start, startsAt: 10000, endsAt: 10000 + length * 1000 }]
+                        : [];
+                statusMatrix.updateAll();
+            };
+
+            const warnings = () =>
+                Array.from(statusMatrix._harmonyCell.children)
+                    .map(child => child.textContent)
+                    .filter(text => /^(parallel|hidden) /.test(text));
+
+            beforeEach(() => {
+                mockActivity.logo.synth.getFrequency.mockImplementation(
+                    note => 440 * Math.pow(2, (MIDI[note] - 69) / 12)
+                );
+                mice = [0, 1, 2].map(() => ({
+                    singer: { previousTurtleTime: 0, pitchStatus: null, noteStatus: null }
+                }));
+            });
+
+            test("shows parallel fifths when two mice move together", () => {
+                useMice(mice.slice(0, 2));
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["G4"], 0);
+                expect(warnings()).toEqual([]);
+
+                // The interpreter moves the mice on one at a time.
+                play(0, ["D4"], 1);
+                expect(warnings()).toEqual([]);
+                play(1, ["A4"], 1);
+
+                expect(warnings()).toEqual(["parallel fifths: mouse 1 C4 → D4, mouse 2 G4 → A4"]);
+            });
+
+            test("shows the warning only while those notes are sounding", () => {
+                useMice(mice.slice(0, 2));
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["G4"], 0);
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+                expect(warnings()).toHaveLength(1);
+
+                Date.now.mockReturnValue(11200);
+                statusMatrix.updateAll();
+
+                expect(warnings()).toEqual([]);
+            });
+
+            test("hides the warning once one of the two mice moves on", () => {
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["G4"], 0);
+                play(2, ["C3"], 0);
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+                play(2, ["E3"], 1);
+                expect(warnings()).toEqual(["parallel fifths: mouse 1 C4 → D4, mouse 2 G4 → A4"]);
+
+                // Mouse 1 moves on while mice 2 and 3 hold the notes that started at 1.
+                play(0, ["E4"], 2);
+
+                expect(warnings()).toEqual([]);
+            });
+
+            test("compares each mouse with its own previous note", () => {
+                // The second mouse repeats G4 while the first moves, then moves
+                // while the first repeats D4: no beat has both mice moving.
+                useMice(mice.slice(0, 2));
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["G4"], 0);
+                play(0, ["D4"], 1);
+                play(1, ["G4"], 1);
+                play(0, ["D4"], 2);
+                play(1, ["A4"], 2);
+
+                expect(warnings()).toEqual([]);
+            });
+
+            test("does not follow a mouse through a rest or a chord", () => {
+                useMice(mice.slice(0, 2));
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["G4"], 0);
+                play(0, [], 1);
+                play(1, ["B4"], 1);
+                play(0, ["D4"], 2);
+                play(1, ["A4"], 2);
+                expect(warnings()).toEqual([]);
+
+                play(0, ["C4", "E4"], 3);
+                play(1, ["G4"], 3);
+                play(0, ["D4", "F4"], 4);
+                play(1, ["A4"], 4);
+                expect(warnings()).toEqual([]);
+            });
+
+            test("checks every pair of mice", () => {
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                ["C3", "C4", "G4"].forEach((note, i) => play(i, [note], 0));
+                ["D3", "D4", "A4"].forEach((note, i) => play(i, [note], 1));
+
+                expect(warnings()).toEqual([
+                    "parallel octaves: mouse 1 C3 → D3, mouse 2 C4 → D4",
+                    "parallel fifths: mouse 1 C3 → D3, mouse 3 G4 → A4",
+                    "parallel fifths: mouse 2 C4 → D4, mouse 3 G4 → A4"
+                ]);
+            });
+
+            test("shows hidden fifths between the outer voices", () => {
+                useMice(mice.slice(0, 2));
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["E4"], 0);
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+
+                expect(warnings()).toEqual(["hidden fifths: mouse 1 C4 → D4, mouse 2 E4 → A4"]);
+            });
+
+            test("checks hidden fifths only between the lowest and highest notes", () => {
+                // A third mouse holds C3, below the two that move into a fifth.
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                play(2, ["C3"], 0, 2);
+                play(0, ["C4"], 0);
+                play(1, ["E4"], 0);
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+                expect(warnings()).toEqual([]);
+
+                // Between them, it leaves them the outer voices.
+                play(2, ["F4"], 2, 3);
+                play(0, ["C4"], 3);
+                play(1, ["E4"], 3);
+                play(0, ["D4"], 4);
+                play(1, ["A4"], 4);
+                expect(warnings()).toEqual(["hidden fifths: mouse 1 C4 → D4, mouse 2 E4 → A4"]);
+            });
+
+            test("does not count a mouse that rests when the others move", () => {
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                play(2, ["C3"], 0, 1);
+                play(0, ["C4"], 0);
+                play(1, ["E4"], 0);
+                play(2, [], 1);
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+
+                expect(warnings()).toEqual(["hidden fifths: mouse 1 C4 → D4, mouse 2 E4 → A4"]);
+            });
+
+            test("waits for a mouse that has not reached the move yet", () => {
+                // Mouse 3 plays C5 twice, above the others, but the interpreter
+                // moves it on after them.
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["E4"], 0);
+                play(2, ["C5"], 0);
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+                expect(warnings()).toEqual([]);
+
+                play(2, ["C5"], 1);
+                expect(warnings()).toEqual([]);
+            });
+
+            test("forgets a mouse that is put in the trash during a run", () => {
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["E4"], 0);
+                play(2, ["C5"], 0);
+                // Mouse 3 is still running when it goes in the trash.
+                mockActivity.turtles.turtleList[2].inTrash = true;
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+
+                expect(warnings()).toEqual(["hidden fifths: mouse 1 C4 → D4, mouse 2 E4 → A4"]);
+                expect([...statusMatrix._voices.keys()]).toEqual([0, 1]);
+            });
+
+            test("does not wait for a mouse that has finished", () => {
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["E4"], 0);
+                play(2, ["C5"], 0);
+                mice[2].running = false;
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+
+                expect(warnings()).toEqual(["hidden fifths: mouse 1 C4 → D4, mouse 2 E4 → A4"]);
+            });
+
+            test("marks each interval above the bass as consonant or dissonant", () => {
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                ["C4", "F4", "A4"].forEach((note, i) => play(i, [note], 0));
+
+                expect(harmonyText().map(row => [row[0], row[5]])).toEqual([
+                    ["C4 → F4", "dissonant"],
+                    ["C4 → A4", "imperfect"]
+                ]);
+            });
+
+            test("starts again when the project is played again", () => {
+                useMice(mice.slice(0, 2));
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["G4"], 0);
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+
+                // Turtle time goes back to 0 for every mouse on a new run.
+                mice.forEach(tur => {
+                    tur.singer.previousTurtleTime = 0;
+                    tur.singer.pitchStatus = null;
+                });
+                play(0, ["E4"], 0);
+                play(1, ["A4"], 0);
+                expect(warnings()).toEqual([]);
+                expect(
+                    [...statusMatrix._voices.values()].map(voice => voice.moments.length)
+                ).toEqual([1, 1]);
+
+                play(0, ["F4"], 1);
+                play(1, ["B4"], 1);
+                expect(warnings()).toEqual([]);
+            });
+
+            test("measures each note once, not on every refresh", () => {
+                useMice(mice.slice(0, 2));
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["G4"], 0);
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+                expect(warnings()).toHaveLength(1);
+
+                // The interpreter refreshes the Status after every block.
+                const calls = mockActivity.logo.synth.getFrequency.mock.calls.length;
+                for (let i = 0; i < 20; i++) {
+                    statusMatrix.updateAll();
+                }
+
+                expect(mockActivity.logo.synth.getFrequency.mock.calls.length).toBe(calls);
+                expect(warnings()).toHaveLength(1);
+            });
+
+            test("numbers the mice as the columns, leaving out mice in the trash", () => {
+                useMice(mice);
+                mockActivity.turtles.turtleList[0].inTrash = true;
+                statusMatrix.init(mockActivity);
+                play(1, ["C4"], 0);
+                play(2, ["G4"], 0);
+                play(1, ["D4"], 1);
+                play(2, ["A4"], 1);
+
+                expect(warnings()).toEqual(["parallel fifths: mouse 1 C4 → D4, mouse 2 G4 → A4"]);
+            });
         });
     });
 });

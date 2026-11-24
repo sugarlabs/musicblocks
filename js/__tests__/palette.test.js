@@ -211,6 +211,89 @@ describe("Palettes Class", () => {
         });
     });
 
+    describe("search keyboard navigation", () => {
+        let searchInput;
+        let paletteElement;
+        let documentKeydown;
+
+        beforeEach(() => {
+            document.body.replaceChildren();
+            searchInput = document.createElement("input");
+            searchInput.id = "search";
+            searchInput.value = "pitch";
+            paletteElement = document.createElement("div");
+            paletteElement.id = "palette";
+            paletteElement.tabIndex = 0;
+            document.body.append(searchInput, paletteElement);
+            global.docById = jest.fn(id => document.getElementById(id));
+            documentKeydown = jest.fn();
+            document.addEventListener("keydown", documentKeydown);
+            palettes._setupSearchKeyboardNav();
+            searchInput.focus();
+        });
+
+        afterEach(() => {
+            document.removeEventListener("keydown", documentKeydown);
+            document.body.replaceChildren();
+        });
+
+        test.each(["ArrowLeft", "ArrowRight"])(
+            "leaves %s uncancelled without reaching document shortcuts",
+            key => {
+                const event = new KeyboardEvent("keydown", {
+                    key,
+                    bubbles: true,
+                    cancelable: true
+                });
+                searchInput.dispatchEvent(event);
+
+                expect(event.defaultPrevented).toBe(false);
+                expect(documentKeydown).not.toHaveBeenCalled();
+                expect(mockActivity.hideSearchWidget).not.toHaveBeenCalled();
+                expect(document.activeElement).toBe(searchInput);
+            }
+        );
+
+        test.each(["ArrowLeft", "ArrowRight"])(
+            "leaves %s uncancelled with the pitch slider open",
+            key => {
+                const { KeyboardController } = require("../activity/keyboard-controller");
+                const controller = new KeyboardController(mockActivity);
+                jest.spyOn(controller, "_isWidgetOpen").mockReturnValue(true);
+                try {
+                    const event = new KeyboardEvent("keydown", {
+                        key,
+                        keyCode: key === "ArrowLeft" ? 37 : 39,
+                        bubbles: true,
+                        cancelable: true
+                    });
+                    searchInput.dispatchEvent(event);
+
+                    expect(event.defaultPrevented).toBe(false);
+                    expect(mockActivity.hideSearchWidget).not.toHaveBeenCalled();
+                    expect(document.activeElement).toBe(searchInput);
+                } finally {
+                    controller.dispose();
+                }
+            }
+        );
+
+        test("consumes Escape, closes search, and returns focus to the palette", () => {
+            const event = new KeyboardEvent("keydown", {
+                key: "Escape",
+                bubbles: true,
+                cancelable: true
+            });
+            searchInput.dispatchEvent(event);
+
+            expect(event.defaultPrevented).toBe(true);
+            expect(documentKeydown).not.toHaveBeenCalled();
+            expect(mockActivity.hideSearchWidget).toHaveBeenCalledTimes(1);
+            expect(document.activeElement).toBe(paletteElement);
+            expect(palettes._navSection).toBe("search");
+        });
+    });
+
     describe("_makeSelectorButton method", () => {
         test("creates a selector cell and hooks hover handlers", () => {
             const tdMock = { style: {}, appendChild: jest.fn(), setAttribute: jest.fn() };

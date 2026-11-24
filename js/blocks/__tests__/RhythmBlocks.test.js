@@ -542,11 +542,36 @@ describe("RhythmBlocks", () => {
             );
         });
 
-        test("handles negative factor", () => {
+        test("shows a positive-number message for a negative factor", () => {
             const block = getBlock("multiplybeatfactor");
             block.flow([-1, true], logo, 0, 10);
 
-            expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 10);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Multiply note value must be greater than 0.",
+                10
+            );
+            expect(activity.errorMsg).not.toHaveBeenCalledWith(global.NOINPUTERRORMSG, 10);
+            expect(global.global.Singer.RhythmActions.multiplyNoteValue).toHaveBeenCalledWith(
+                2,
+                0,
+                10
+            );
+        });
+
+        test("shows a positive-number message for a zero factor", () => {
+            const block = getBlock("multiplybeatfactor");
+            block.flow([0, true], logo, 0, 10);
+
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Multiply note value must be greater than 0.",
+                10
+            );
+            expect(activity.errorMsg).not.toHaveBeenCalledWith(global.NOINPUTERRORMSG, 10);
+            expect(global.global.Singer.RhythmActions.multiplyNoteValue).toHaveBeenCalledWith(
+                2,
+                0,
+                10
+            );
         });
     });
 

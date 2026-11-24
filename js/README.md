@@ -6,7 +6,7 @@ subdirectory.
 
 ## Testing
 
-For writing unit tests for block files, see [docs/TESTING.md](../docs/TESTING.md).
+For writing unit tests for block files, see [Docs/TESTING.md](../Docs/TESTING.md).
 
 * `activity.js` -- where the menus are defined
 
@@ -155,7 +155,7 @@ Block classes can also extend each other. Your class definition and
     }
 ```
 
-3. Assign a palette to the block, e.g. `this.setPalette('yourPaletteName);`
+3. Assign a palette to the block, e.g. `this.setPalette('yourPaletteName');`
 
 At this point your class definition should look similar to this:
 
@@ -205,7 +205,7 @@ used with the `Add-1` and `Add to` blocks.
 `setup` function, e.g.
 
 ```
-function setupUniqueBlocks() {`
+function setupUniqueBlocks() {
   new UniqueNameBlock().setup();
 }
 ```
@@ -226,9 +226,9 @@ viz. `(logo, turtle, blk, receivedArg)`, e.g.
 }
 ```
 
-For flow bocks define a function `flow` on the block. The same four
+For flow blocks define a function `flow` on the block. The same four
 arguments are passed to the flow function currently: `(logo, turtle,
-blk, receivedArg)`, e.g
+blk, receivedArg)`, e.g.
 
 ```
 class UniqueNameBlock extends SomeBlockClass{
@@ -299,7 +299,7 @@ class UniqueNameBlock extends SomeBlockClass{
 In some cases, you may want a block on the palette to expand into a stack
 of blocks.
 
-Note: Macro related code is no longed written in `macros.js`
+Note: Macro related code is no longer written in `macros.js`
 
 To add a macro:
 
@@ -405,7 +405,7 @@ Note: If the `name` is omitted or is set to an empty string, a second argument o
 
       * `bottom` :  Defines how bottom of the block should connect. Values: `true`, `false` or `cap`. `tail` is used for blocks like start, to produce the protruding spike.
 
-      * `left`: Defines how top of the block should connect. It's value is a boolean.
+      * `left`: Defines how top of the block should connect. Its value is a boolean.
 
       * `type` : Defines the flow used by the block.
 
@@ -416,7 +416,7 @@ Note: If the `name` is omitted or is set to an empty string, a second argument o
         * `value`: Used for blocks such as number.
         * `null` : Indicates that it is just a plain block with nothing special.
 
-      * `labels` : Defines the labels to be displayed for each flow branch. This list is also used to determine how many flows a block has. To mark an unlabelled flow use and empty string.
+      * `labels` : Defines the labels to be displayed for each flow branch. This list is also used to determine how many flows a block has. To mark an unlabelled flow use an empty string.
 
 3. `args` : Defines the number of arguments the block takes.
 
@@ -469,7 +469,7 @@ to the blocks.
 
 If there are no arguments, `childFlow = args[1]`. (Some blocks, such
 as the *Start* block, do not have any external flow, so their
-`childFlow = args[0]`.
+`childFlow = args[0]`.)
 
 2. Create a unique listener name
 
@@ -517,7 +517,7 @@ In order to set up a new synth effect:
   be set up for translation into other languages.
 
 * Before processing the notes, you need to check if the argument is present
-  of if the type of argument is correct, else, set `stopTurtle` to true.
+  or if the type of argument is correct, else, set `stopTurtle` to true.
 
 * If you are changing the functionality of an existing block (adding a
   new arg, etc.) then you probably should mark the existing block as
@@ -534,7 +534,7 @@ In order to set up a new synth effect:
 * `oneArgMathWithLabelBlock`: E.g., box
 * `twoArgMathBlock`: E.g., plus, minus, multiply, divide. These are also expandable.
 * `valueBlock`: E.g., number, string. Value blocks get DOM textareas associated with them so their values can be edited by the user.
-* `mediuniquenameBlock`: E.g., media. Media blocks invoke a chooser and a thumbnail image is overlayed to represent the data associated with the block.
+* `mediaBlock`: E.g., media. Media blocks invoke a chooser and a thumbnail image is overlayed to represent the data associated with the block.
 * `flowClampZeroArgBlock`: E.g., start. A "child" flow is docked in an expandable clamp. There are no additional arguments and no flow above or below.
 * `flowClampOneArgBlock`: E.g., repeat. Unlike action, there is a flow above and below.
 * `flowClampBooleanArgBlock`: E.g., if.  A "child" flow is docked in an expandable clamp. The additional argument is a boolean. There is flow above and below.
@@ -626,10 +626,10 @@ only need to worry about the position of the first block in a stack of
 blocks. Everything else is calculated for you.)
 
 ![alt
- tag](../documentation/block-connections-diagram.svg
+ tag](../Docs/documentation/block-connections-diagram.svg
  "Blocks maintain a list of connections to other blocks.")
 
-In the figure about and in the code example above, the `divide` block
+In the figure above and in the code example above, the `divide` block
 connection 0 connects to the `newnote` block connection 1, etc.
 
 ----

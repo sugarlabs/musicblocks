@@ -548,6 +548,19 @@ describe("setupToneBlocks", () => {
             synthName.arg(logo, 0, "synthNameBlk");
             expect(logo.statusFields).toContainEqual(["synthNameBlk", "synthname"]);
         });
+        it("should handle detached synthname block in status matrix without throwing", () => {
+            activity.blocks.blockList["synthNameBlkDetached"] = { connections: [null] };
+            const synthName = getBlock("synthname");
+            logo.inStatusMatrix = true;
+            const turtle = 0;
+            const tur = activity.turtles.ithTurtle(turtle);
+            tur.singer.instrumentNames = ["first", "second"];
+            let retVal;
+            expect(() => {
+                retVal = synthName.arg(logo, turtle, "synthNameBlkDetached");
+            }).not.toThrow();
+            expect(retVal).toEqual("second");
+        });
         it("should return last instrument name otherwise", () => {
             const synthName = getBlock("synthname");
             const turtle = 0;
@@ -677,6 +690,20 @@ describe("setupToneBlocks", () => {
             logo.inStatusMatrix = true;
             customSample.arg(logo, 0, "csBlk3");
             expect(logo.statusFields).toContainEqual(["csBlk3", "customsample"]);
+            logo.inStatusMatrix = false;
+        });
+        it("should handle detached customsample block in status matrix without throwing", () => {
+            const customSample = getBlock("customsample");
+            activity.blocks.blockList.csBlkDetached = {
+                connections: [null, null, null, null],
+                value: ["name", "data", "do", 4]
+            };
+            logo.inStatusMatrix = true;
+            let ret;
+            expect(() => {
+                ret = customSample.arg(logo, 0, "csBlkDetached");
+            }).not.toThrow();
+            expect(ret).toEqual(["name", "data", "do", 4]);
             logo.inStatusMatrix = false;
         });
     });

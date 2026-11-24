@@ -241,6 +241,19 @@ class EmbeddedGraphicsScheduler {
         // stale call knows nothing about, so leave it alone.
     }
 
+    /**
+     * Returns a guard that cancels a graphics step once the run stops or
+     * the turtle is stopped on its own.
+     *
+     * @param {Object} tur - The turtle drawing the step.
+     * @returns {Function}
+     */
+    _stopped(tur) {
+        const logo = this._logo;
+        const run = tur.runGeneration;
+        return () => logo.stopTurtle || tur.runGeneration !== run;
+    }
+
     _pen(tur, suppressOutput, turtle, name, b, timeout) {
         const logo = this._logo;
         let arg;
@@ -293,7 +306,7 @@ class EmbeddedGraphicsScheduler {
             logo._timerManager.setGuardedTimeout(
                 () => _penSwitch(name),
                 timeout,
-                () => logo.stopTurtle
+                this._stopped(tur)
             );
         }
     }
@@ -316,7 +329,7 @@ class EmbeddedGraphicsScheduler {
                     tur.painter.doClear(true, true, true);
                 },
                 timeout,
-                () => logo.stopTurtle
+                this._stopped(tur)
             );
         }
     }
@@ -338,7 +351,7 @@ class EmbeddedGraphicsScheduler {
                 logo._timerManager.setGuardedTimeout(
                     () => tur.painter.doRight(deltaArg),
                     deltaTime,
-                    () => logo.stopTurtle
+                    this._stopped(tur)
                 );
             }
         }
@@ -368,7 +381,7 @@ class EmbeddedGraphicsScheduler {
                     tur.painter.doSetHeading(arg);
                 },
                 timeout,
-                () => logo.stopTurtle
+                this._stopped(tur)
             );
         }
     }
@@ -391,19 +404,19 @@ class EmbeddedGraphicsScheduler {
                     logo._timerManager.setGuardedTimeout(
                         () => tur.painter.doForward(deltaArg, "first", arg),
                         deltaTime,
-                        () => logo.stopTurtle
+                        this._stopped(tur)
                     );
                 } else if (t === Math.ceil(NOTEDIV / tur.singer.dispatchFactor) - 1) {
                     logo._timerManager.setGuardedTimeout(
                         () => tur.painter.doForward(deltaArg, "last", arg),
                         deltaTime,
-                        () => logo.stopTurtle
+                        this._stopped(tur)
                     );
                 } else {
                     logo._timerManager.setGuardedTimeout(
                         () => tur.painter.doForward(deltaArg, "middle", arg),
                         deltaTime,
-                        () => logo.stopTurtle
+                        this._stopped(tur)
                     );
                 }
             }
@@ -448,7 +461,7 @@ class EmbeddedGraphicsScheduler {
                     tur.painter.doScrollXY(arg1, arg2);
                 },
                 timeout,
-                () => logo.stopTurtle
+                this._stopped(tur)
             );
         }
     }
@@ -494,7 +507,7 @@ class EmbeddedGraphicsScheduler {
                     tur.painter.doSetXY(arg1, arg2);
                 },
                 timeout,
-                () => logo.stopTurtle
+                this._stopped(tur)
             );
         }
     }
@@ -519,7 +532,7 @@ class EmbeddedGraphicsScheduler {
         logo._timerManager.setGuardedTimeout(
             () => logo.processShow(turtle, null, arg1, arg2),
             timeout,
-            () => logo.stopTurtle
+            this._stopped(logo.turtles.ithTurtle(turtle))
         );
     }
 
@@ -536,7 +549,7 @@ class EmbeddedGraphicsScheduler {
         logo._timerManager.setGuardedTimeout(
             () => logo.processSpeak(arg),
             timeout,
-            () => logo.stopTurtle
+            this._stopped(logo.turtles.ithTurtle(turtle))
         );
     }
 
@@ -554,7 +567,7 @@ class EmbeddedGraphicsScheduler {
         logo._timerManager.setGuardedTimeout(
             () => logo.deps.textMsg(arg.toString()),
             timeout,
-            () => logo.stopTurtle
+            this._stopped(logo.turtles.ithTurtle(turtle))
         );
     }
 
@@ -586,7 +599,7 @@ class EmbeddedGraphicsScheduler {
                 logo._timerManager.setGuardedTimeout(
                     () => tur.painter.doArc(deltaArg, arg2),
                     deltaTime,
-                    () => logo.stopTurtle
+                    this._stopped(tur)
                 );
             }
         }
@@ -632,7 +645,7 @@ class EmbeddedGraphicsScheduler {
                     tur.painter.cp1y = arg2;
                 },
                 timeout,
-                () => logo.stopTurtle
+                this._stopped(tur)
             );
         }
     }
@@ -677,7 +690,7 @@ class EmbeddedGraphicsScheduler {
                     tur.painter.cp2y = arg2;
                 },
                 timeout,
-                () => logo.stopTurtle
+                this._stopped(tur)
             );
         }
     }
@@ -723,7 +736,7 @@ class EmbeddedGraphicsScheduler {
                     tur.painter.doBezier(arg1, arg2);
                 },
                 timeout,
-                () => logo.stopTurtle
+                this._stopped(tur)
             );
         }
     }
@@ -753,7 +766,7 @@ class EmbeddedGraphicsScheduler {
                     }
                 },
                 timeout,
-                () => logo.stopTurtle
+                this._stopped(tur)
             );
         }
     }
@@ -780,7 +793,7 @@ class EmbeddedGraphicsScheduler {
                     }
                 },
                 timeout,
-                () => logo.stopTurtle
+                this._stopped(tur)
             );
         }
     }

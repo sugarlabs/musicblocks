@@ -32,6 +32,79 @@ describe("musicutils-rhythm", () => {
         expect(rhythm.reducedFraction(3, 9)).toContain("3");
     });
 
+    it("falls back instead of crashing on a non-finite or zero note-value pair", () => {
+        // The Euclid loop inside reducedFraction never terminates on a NaN
+        // operand, so Phrase Maker / Rhythm Ruler renders hit a RangeError.
+        expect(() => rhythm.reducedFraction(3, NaN)).not.toThrow();
+        expect(() => rhythm.reducedFraction(NaN, 2)).not.toThrow();
+        expect(() => rhythm.reducedFraction(Infinity, 2)).not.toThrow();
+        expect(() => rhythm.reducedFraction(2, Infinity)).not.toThrow();
+        expect(rhythm.reducedFraction(3, NaN)).toBe("0<br>&mdash;<br>1<br><br>");
+        expect(rhythm.reducedFraction(Infinity, 2)).toBe("0<br>&mdash;<br>1<br><br>");
+        expect(rhythm.reducedFraction(2, Infinity)).toBe("0<br>&mdash;<br>1<br><br>");
+        expect(rhythm.reducedFraction(0, 0)).toBe("0<br>&mdash;<br>1<br><br>");
+        expect(rhythm.calcNoteValueToDisplay(NaN, 2)).not.toContain("NaN");
+        expect(rhythm.calcNoteValueToDisplay(2, NaN)).not.toContain("NaN");
+        expect(rhythm.calcNoteValueToDisplay(0, 0)).not.toContain("NaN");
+        // Ordinary values are unchanged.
+        expect(rhythm.reducedFraction(4, 8)).toContain("2");
+        expect(rhythm.calcNoteValueToDisplay(4, 2)).toContain("2");
+    });
+
+    it("ignores floating-point noise in a duration", () => {
+        expect(rhythm.durationToNoteValue(6.0000000000001)).toEqual([1, 0, [3, 2], 4]);
+        expect(rhythm.durationToNoteValue(1.5000000000001)).toEqual([1, 0, [3, 0.5], 1]);
+        expect(rhythm.durationToNoteValue(4.0000000000001)).toEqual([4, 0, null]);
+    });
+
+    describe("plainUnwritableTuplets", () => {
+        beforeAll(() => {
+            global.NOTATIONDURATION = 1;
+            global.NOTATIONDOTCOUNT = 2;
+            global.NOTATIONTUPLETVALUE = 3;
+        });
+
+        const row = duration => {
+            const [noteValue, dotCount, tuplet, roundDown] = rhythm.durationToNoteValue(duration);
+            return [["G4"], noteValue, dotCount, tuplet, roundDown, -1, false, null];
+        };
+        const plain = (duration, maxCount = 32) =>
+            rhythm.plainUnwritableTuplets([row(duration)], maxCount)[0];
+
+        it("uses the nearest note value, not the one below", () => {
+            expect(plain(2.006018054162).slice(1, 4)).toEqual([2, 0, null]);
+            expect(plain(1.994017946161).slice(1, 4)).toEqual([2, 0, null]);
+        });
+
+        it("uses a dotted note when that is nearest", () => {
+            expect(plain(2.7).slice(1, 4)).toEqual([4, 1, null]);
+        });
+
+        it("writes a note of two whole notes as a breve", () => {
+            expect(plain(0.5).slice(1, 4)).toEqual([0.5, 0, null]);
+        });
+
+        it("replaces a tuplet above the exporter's limit", () => {
+            expect(plain(625, 32).slice(1, 4)).toEqual([128, 0, null]);
+            expect(plain(9, 9)[3]).toEqual([9, 1]);
+            expect(plain(11, 9)[3]).toBeNull();
+            expect(plain(11, 32)[3]).toEqual([11, 1]);
+            expect(plain(33, 32)[3]).toBeNull();
+        });
+
+        it("keeps whole tuplets and everything else as they are", () => {
+            const staging = [row(1.5), row(3), row(6), row(4), "meter", 4, 4];
+            expect(rhythm.plainUnwritableTuplets(staging, 9)).toEqual(staging);
+        });
+
+        it("does not change the staging it is given, which mxml.js also reads", () => {
+            const staging = [row(2.7)];
+            const tuplet = staging[0][3];
+            rhythm.plainUnwritableTuplets(staging, 9);
+            expect(staging[0][3]).toBe(tuplet);
+        });
+    });
+
     it("converts durations to note values and rhythm-block factors", () => {
         expect(rhythm.durationToNoteValue(0.25)).toEqual([1, 0, [0.5, 0.5], 1]);
         expect(rhythm.durationToNoteValue(0.75)).toEqual([1, 0, [1.5, 0.5], 1]);

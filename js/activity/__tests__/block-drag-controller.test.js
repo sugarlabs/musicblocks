@@ -1020,6 +1020,7 @@ describe("BlockDragController", () => {
             expect(moving.connections[0]).toBeNull();
             // Snapped back to lastGood, then bounced +60 on x only (arg blocks).
             expect(moving.container).toEqual({ x: 160, y: 200 });
+            expect(blocks._updateSpatialGrid).toHaveBeenCalledWith(1);
         });
 
         it("bounces a flow block down-and-right on an illegal connection", async () => {

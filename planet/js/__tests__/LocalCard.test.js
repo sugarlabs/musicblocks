@@ -34,10 +34,13 @@ function makeMockPlanet(overrides = {}) {
         ProjectStorage: {
             ImageDataURL: "images/default.png",
             renameProject: jest.fn(),
-            initialiseNewProject: jest.fn()
+            initialiseNewProject: jest.fn(),
+            addPublishedData: jest.fn().mockResolvedValue(),
+            addGitRepoData: jest.fn().mockResolvedValue()
         },
         SaveInterface: {
-            saveHTML: jest.fn()
+            saveHTML: jest.fn(),
+            showToast: jest.fn()
         },
         LocalPlanet: {
             ProjectTable: {},
@@ -48,8 +51,15 @@ function makeMockPlanet(overrides = {}) {
             updateProjects: jest.fn()
         },
         GlobalPlanet: {
+            cache: {},
+            refreshProjects: jest.fn(),
             forceAddToCache: jest.fn(),
             ProjectViewer: { open: jest.fn() }
+        },
+        ServerInterface: {
+            ownsRepo: jest.fn().mockReturnValue(true),
+            toggleProjectVisibility: jest.fn(),
+            cacheManager: { cacheMetadata: jest.fn().mockResolvedValue() }
         },
         ...overrides
     };
@@ -79,6 +89,8 @@ describe("LocalCard", () => {
         document.body.innerHTML = `
             <div id="local-projects"></div>
             <div id="global-tab"></div>
+            <div id="unpublisher-title"></div>
+            <button id="unpublisher-button"></button>
         `;
     });
 
@@ -226,6 +238,125 @@ describe("LocalCard", () => {
 
             document.getElementById("local-project-publish-p10").click();
             expect(planet.LocalPlanet.Publisher.open).toHaveBeenCalledWith("p10");
+        });
+
+        it("shows unpublish in the publish position and updates local state on success", async () => {
+            const card = prepareCard("published", {
+                GitRepoData: {
+                    repoName: "repo",
+                    description: "Previous",
+                    tags: ["old"],
+                    hashedKey: "key"
+                },
+                PublishedData: {
+                    repoName: "repo",
+                    ProjectDescription: "Description",
+                    ProjectTags: []
+                }
+            });
+            const originalJQuery = global.jQuery;
+            global.jQuery = jest.fn(() => ({ modal: jest.fn() }));
+
+            try {
+                card.render();
+                const button = document.getElementById("local-project-publish-published");
+                expect(button.querySelector("i").textContent).toBe("cloud_off");
+                expect(button.dataset.tooltip).toBe("Unpublish project");
+                button.click();
+                expect(planet.LocalPlanet.Publisher.open).not.toHaveBeenCalled();
+                document.getElementById("unpublisher-button").click();
+                expect(planet.ServerInterface.toggleProjectVisibility).toHaveBeenCalledWith(
+                    "repo",
+                    false,
+                    expect.any(Function)
+                );
+
+                await planet.ServerInterface.toggleProjectVisibility.mock.calls[0][2]({
+                    success: true
+                });
+                expect(planet.ProjectStorage.addPublishedData).toHaveBeenCalledWith(
+                    "published",
+                    null
+                );
+                expect(planet.ProjectStorage.addGitRepoData).toHaveBeenCalledWith(
+                    "published",
+                    "repo",
+                    "Description",
+                    [],
+                    "key"
+                );
+                expect(planet.LocalPlanet.updateProjects).toHaveBeenCalled();
+                expect(planet.SaveInterface.showToast).toHaveBeenCalledWith("Project unpublished.");
+            } finally {
+                global.jQuery = originalJQuery;
+            }
+        });
+
+        it("shows an error when the browser lacks the ownership key", () => {
+            planet.ServerInterface.ownsRepo.mockReturnValue(false);
+            const card = prepareCard("published", { PublishedData: { repoName: "repo" } });
+            card.render();
+            document.getElementById("local-project-publish-published").click();
+
+            expect(planet.SaveInterface.showToast).toHaveBeenCalledWith(
+                "You do not have permission to unpublish this project from this browser.",
+                true
+            );
+            expect(planet.ServerInterface.toggleProjectVisibility).not.toHaveBeenCalled();
+        });
+
+        it.each([false, true])(
+            "skips writes to a deleted project (during save=%s)",
+            async duringSave => {
+                const card = prepareCard("published", { PublishedData: { repoName: "repo" } });
+                const originalJQuery = global.jQuery;
+                global.jQuery = jest.fn(() => ({ modal: jest.fn() }));
+                const deleteProject = () => {
+                    delete planet.LocalPlanet.ProjectTable.published;
+                };
+                planet.ProjectStorage.addGitRepoData.mockImplementation(async () =>
+                    deleteProject()
+                );
+
+                try {
+                    card.unpublish();
+                    document.getElementById("unpublisher-button").click();
+                    if (!duringSave) deleteProject();
+                    await planet.ServerInterface.toggleProjectVisibility.mock.calls[0][2]({
+                        success: true
+                    });
+
+                    expect(planet.ProjectStorage.addGitRepoData).toHaveBeenCalledTimes(
+                        duringSave ? 1 : 0
+                    );
+                    expect(planet.ProjectStorage.addPublishedData).not.toHaveBeenCalled();
+                    expect(planet.GlobalPlanet.refreshProjects).toHaveBeenCalled();
+                } finally {
+                    global.jQuery = originalJQuery;
+                }
+            }
+        );
+
+        it.each([
+            [false, "Could not unpublish project. Please try again."],
+            [true, "Project unpublished, but the change could not be saved on this device."]
+        ])("shows error feedback when the server reports success=%s", async (success, message) => {
+            const card = prepareCard("published", { PublishedData: { repoName: "repo" } });
+            const originalJQuery = global.jQuery;
+            global.jQuery = jest.fn(() => ({ modal: jest.fn() }));
+            const consoleError = jest.spyOn(console, "error").mockImplementation(() => {});
+            planet.ProjectStorage.addGitRepoData.mockRejectedValue(new Error("Write failed"));
+
+            try {
+                card.unpublish();
+                document.getElementById("unpublisher-button").click();
+                await planet.ServerInterface.toggleProjectVisibility.mock.calls[0][2]({ success });
+                expect(planet.SaveInterface.showToast).toHaveBeenCalledWith(message, true);
+                expect(planet.ProjectStorage.addPublishedData).not.toHaveBeenCalled();
+            } finally {
+                consoleError.mockRestore();
+                global.jQuery = originalJQuery;
+            }
         });
 
         it("should call renameProject when the name input changes (after debounce)", () => {
