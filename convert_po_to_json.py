@@ -25,6 +25,10 @@ def is_valid_solfege_translation(value):
     """Return True when a solfege translation has seven note labels."""
     return len(value.split()) == SOLFEGE_TOKEN_COUNT
 
+def decode_po_string(raw):
+    """Decode C-style escape sequences in a single-line PO string."""
+    return json.loads('"' + raw + '"')
+
 def parse_po_file(po_file):
     """Parse a .po file and return a dict of {msgid: msgstr}."""
     data = {}
@@ -35,9 +39,9 @@ def parse_po_file(po_file):
         for line in f:
             line = line.strip()
             if line.startswith("msgid"):
-                current_msgid = re.findall(r'"(.*)"', line)[0]
+                current_msgid = decode_po_string(re.findall(r'"(.*)"', line)[0])
             elif line.startswith("msgstr"):
-                current_msgstr = re.findall(r'"(.*)"', line)[0]
+                current_msgstr = decode_po_string(re.findall(r'"(.*)"', line)[0])
                 if current_msgid is not None:
                     if (
                         current_msgid == SOLFEGE_KEY

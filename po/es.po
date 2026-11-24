@@ -107,6 +107,7 @@ msgstr ""
 #: js/widgets/rhythmruler.js:2713
 #: js/widgets/musickeyboard.js:3344
 #: js/logoconstants.js:42
+#: js/logoconstants.js:42
 msgid "Not a valid pitch name"
 msgstr "No es un nombre de tono válido."
 
@@ -122,10 +123,11 @@ msgstr "Elige una imagen"
 #: js/piemenu-block-context.js:118
 #: js/palette.js:1673
 #: js/palette.js:1677
+#: js/gitDropdown.js:950
 #: js/widgets/TemperamentUI.js:491
 #: js/widgets/TemperamentUI.js:492
 #: js/widgets/widgetWindows.js:547
-#: planet/js/StringHelper.js:76
+#: planet/js/StringHelper.js:80
 msgid "Close"
 msgstr "Cerrar"
 
@@ -157,6 +159,7 @@ msgstr "Admite PNG, JPG, SVG, GIF y otros formatos de imagen"
 #: planet/js/Planet.js:225
 #: planet/js/StringHelper.js:42
 #: planet/js/StringHelper.js:49
+#: planet/js/StringHelper.js:53
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -304,16 +307,16 @@ msgstr "Bloques de Música ya está configurado en este idioma."
 #: js/palette.js:2064
 #: js/block.js:1788
 #: js/block.js:5387
+#: js/turtledefs.js:132
+#: js/turtledefs.js:230
 #: js/blocks.js:1749
 #: js/blocks.js:3806
 #: js/blocks.js:3807
 #: js/blocks.js:3980
 #: js/blocks.js:4379
 #: js/blocks.js:4564
-#: js/blocks.js:6058
-#: js/blocks.js:7609
-#: js/turtledefs.js:132
-#: js/turtledefs.js:230
+#: js/blocks.js:6062
+#: js/blocks.js:7613
 #: js/blocks/ActionBlocks.js:252
 #: js/blocks/ActionBlocks.js:329
 #: js/blocks/ActionBlocks.js:640
@@ -347,9 +350,9 @@ msgstr "pato"
 #: js/turtles.js:116
 #: js/lilypond.js:957
 #: js/block.js:1802
-#: js/logo.js:2057
 #: js/turtle-painter.js:1427
 #: js/turtle-painter.js:1428
+#: js/logo.js:2057
 #: js/blocks/ActionBlocks.js:1253
 #: js/blocks/ProgramBlocks.js:1420
 msgid "start"
@@ -620,10 +623,10 @@ msgstr "Sin conexión. Git Planet no está disponible."
 #: js/project-manager.js:747
 #: js/project-manager.js:860
 #: js/project-manager.js:1364
-#: planet/js/GlobalPlanet.js:564
-#: planet/js/GlobalPlanet.js:566
-#: planet/js/GlobalPlanet.js:703
 #: planet/js/ProjectStorage.js:26
+#: planet/js/GlobalPlanet.js:600
+#: planet/js/GlobalPlanet.js:602
+#: planet/js/GlobalPlanet.js:739
 msgid "My Project"
 msgstr "Mi proyecto"
 
@@ -717,9 +720,9 @@ msgstr "Modo de alto contraste"
 #: js/toolbar-ui.js:159
 #: js/toolbar-ui.js:239
 #: js/turtledefs.js:619
-#: planet/js/LocalCard.js:79
 #: planet/js/GlobalCard.js:66
-#: planet/js/StringHelper.js:78
+#: planet/js/LocalCard.js:79
+#: planet/js/StringHelper.js:82
 msgid "Merge with current project"
 msgstr "Unir con el proyecto actual"
 
@@ -969,7 +972,7 @@ msgstr "Alternar paleta"
 #: js/blocks.js:4148
 #: js/blocks.js:4203
 #: js/blocks.js:4249
-#: js/blocks.js:7635
+#: js/blocks.js:7639
 #: js/blocks/BoxesBlocks.js:289
 #: js/blocks/BoxesBlocks.js:292
 #: js/blocks/BoxesBlocks.js:412
@@ -1324,8 +1327,8 @@ msgid "Plugin added"
 msgstr "Plugin añadido."
 
 #: js/activity.js:2475
-msgid "Could not load plugin: "
-msgstr "No se pudo cargar el complemento: "
+msgid "Could not load plugin:"
+msgstr "No se ha podido cargar el plugin"
 
 #: js/activity.js:2542
 msgid "Invalid clipboard data. To paste blocks, first copy them from the Music Blocks canvas. To paste text, click inside an input field."
@@ -1575,122 +1578,6 @@ msgstr "El valor de octava debe estar entre 1 y 8."
 msgid "Numbers can have at most 10 digits."
 msgstr "El bloqueo de silencio no se puede eliminar."
 
-#: js/blocks.js:2462
-#: js/blocks.js:2466
-#: js/blocks.js:2472
-#: js/blocks.js:2474
-msgid "audio file"
-msgstr "archivo de audio"
-
-#: js/blocks.js:3764
-#: js/blocks.js:4169
-#: js/blocks.js:4215
-#: js/blocks.js:4261
-#: js/blocks.js:6823
-#: js/blocks.js:6847
-#: js/blocks/BoxesBlocks.js:783
-msgid "box1"
-msgstr "caja1"
-
-#: js/blocks.js:3766
-#: js/blocks.js:4171
-#: js/blocks.js:4217
-#: js/blocks.js:4263
-#: js/blocks.js:6825
-#: js/blocks.js:6849
-#: js/blocks/BoxesBlocks.js:674
-msgid "box2"
-msgstr "caja2"
-
-#: js/blocks.js:4421
-#: js/blocks/MediaBlocks.js:827
-#: js/blocks/BoxesBlocks.js:606
-#: js/blocks/DictBlocks.js:215
-#: js/blocks/DictBlocks.js:289
-#: js/blocks/EnsembleBlocks.js:441
-#: js/blocks/EnsembleBlocks.js:458
-#: js/blocks/PitchBlocks.js:731
-#: js/blocks/PitchBlocks.js:1084
-#: js/blocks/PitchBlocks.js:2038
-#: js/blocks/ProgramBlocks.js:412
-#: js/blocks/ProgramBlocks.js:539
-#: js/blocks/ProgramBlocks.js:724
-#: js/blocks/ToneBlocks.js:1082
-msgid "name"
-msgstr "nombre"
-
-#: js/blocks.js:4421
-#: js/blocks/BoxesBlocks.js:75
-#: js/blocks/BoxesBlocks.js:606
-#: js/blocks/DictBlocks.js:289
-#: js/blocks/DictBlocks.js:430
-#: js/blocks/NumberBlocks.js:973
-#: js/blocks/HeapBlocks.js:573
-#: js/blocks/RhythmBlocks.js:1164
-msgid "value"
-msgstr "valor"
-
-#: js/blocks.js:4760
-msgid "Forever loop detected inside a note value block. Unexpected things may happen."
-msgstr "Se detectó un bucle indefinido dentro de un bloque de valor de nota. Pueden ocurrir cosas inesperadas."
-
-#: js/blocks.js:5319
-msgid "There is no block selected."
-msgstr "No hay bloque seleccionado."
-
-#: js/blocks.js:5429
-#: js/blocks/MediaBlocks.js:884
-#.TRANS: Avatar is the image used to determine the appearance of the mouse.
-msgid "avatar"
-msgstr "avatar"
-
-#: js/blocks.js:5432
-#: js/blocks/ToneBlocks.js:1067
-#: js/widgets/SamplerCanvas.js:169
-#.TRANS: The sound sample that the user uploads.
-msgid "sample"
-msgstr "muestra de audio"
-
-#: js/blocks.js:5733
-#: js/project-manager.js:1940
-msgid "Something went wrong reading JSON-encoded project data."
-msgstr "Algo salió mal al leer los datos del proyecto codificados en JSON."
-
-#: js/blocks.js:5756
-msgid "Cannot load project: invalid project structure."
-msgstr "No se puede cargar el proyecto: estructura de proyecto no válida."
-
-#: js/blocks.js:5766
-#: js/blocks.js:6201
-#: js/blocks.js:6277
-msgid "Cannot load project: malformed block structure detected."
-msgstr "No se puede cargar el proyecto: se ha detectado una estructura de bloques mal formada."
-
-#: js/blocks.js:5883
-msgid "Cannot load project: circular block connection detected."
-msgstr "No se puede cargar el proyecto: se ha detectado una conexión circular entre bloques."
-
-#: js/blocks.js:6231
-#: js/blocks.js:6482
-msgid "Cannot load project: invalid block connection detected."
-msgstr "No se puede cargar el proyecto: se ha detectado una conexión de bloques no válida."
-
-#: js/blocks.js:7668
-msgid "Some blocks in this project are unsupported and were replaced with placeholders: %s"
-msgstr "Algunos bloques de este proyecto no son compatibles y han sido sustituidos por marcadores de posición: %s"
-
-#: js/blocks.js:8053
-msgid "Nothing to undo."
-msgstr "No hay nada que deshacer."
-
-#: js/blocks.js:8105
-msgid "Nothing to redo."
-msgstr "No hay nada que rehacer"
-
-#: js/blocks.js:8266
-msgid "block sent to trash"
-msgstr "bloque eliminado"
-
 #: js/loader.js:770
 msgid "Failed to load EaselJS. Please refresh the page."
 msgstr "No se pudo cargar EaselJS. Por favor, actualice la página."
@@ -1702,56 +1589,6 @@ msgstr "No se pudo cargar Bloques de Música. Por favor, actualice la página."
 #: js/loader.js:806
 msgid "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: %s"
 msgstr "No se pudo inicializar el núcleo de Bloques de Música. Por favor, actualice la página.\n\nError: %s"
-
-#: js/logo.js:854
-msgid "Downloading Kokoro voice: %s"
-msgstr "Descargando la voz de Kokoro: %s"
-
-#: js/logo.js:998
-#: js/blocks/ProgramBlocks.js:277
-#: js/blocks/ProgramBlocks.js:453
-msgid "You must select a file."
-msgstr "Debe seleccionar un archivo."
-
-#: js/logo.js:2319
-msgid "Infinite loop detected. Execution stopped to prevent browser freeze."
-msgstr "Se ha detectado un bucle infinito. La ejecución se ha detenido para evitar que el navegador se bloquee."
-
-#: js/logo.js:2527
-#: js/blocks/MediaBlocks.js:338
-msgid "width"
-msgstr "anchura"
-
-#: js/logo.js:2528
-#: js/blocks/MediaBlocks.js:395
-msgid "height"
-msgstr "altura"
-
-#: js/logo.js:2529
-#: js/blocks/MediaBlocks.js:35
-#.TRANS: right side of the screen
-msgid "right (screen)"
-msgstr "derecha"
-
-#: js/logo.js:2530
-#: js/blocks/MediaBlocks.js:111
-#.TRANS: left side of the screen
-msgid "left (screen)"
-msgstr "izquierdo"
-
-#: js/logo.js:2531
-#: js/blocks/MediaBlocks.js:186
-msgid "top (screen)"
-msgstr "superior"
-
-#: js/logo.js:2532
-#: js/blocks/MediaBlocks.js:261
-msgid "bottom (screen)"
-msgstr "inferior"
-
-#: js/logo.js:2900
-msgid "Playback is ready."
-msgstr "La reproducción está preparada."
 
 #: js/planetInterface.js:171
 msgid "project undefined"
@@ -1849,6 +1686,11 @@ msgstr "No se encuentran datos del proyecto en este archivo HTML."
 #: js/project-manager.js:1971
 msgid "Invalid parameters"
 msgstr "El parametro es invalido."
+
+#: js/project-manager.js:1940
+#: js/blocks.js:5737
+msgid "Something went wrong reading JSON-encoded project data."
+msgstr "Algo salió mal al leer los datos del proyecto codificados en JSON."
 
 #: js/search-ui.js:212
 msgid "No results found for %s"
@@ -2136,11 +1978,11 @@ msgstr "Muestra mensajes de ayuda para la barra de herramientas principal y auxi
 
 #: js/turtledefs.js:583
 msgid "Click to run the project in slow mode."
-msgstr "Haz click para ejecutar el proyecto en modo lento."
+msgstr "Haga clic para ejecutar el proyecto en modo lento."
 
 #: js/turtledefs.js:588
 msgid "Click to run the project step by step."
-msgstr "Haz click para ejecutar el proyecto en modo paso a paso."
+msgstr "Haga clic para ejecutar el proyecto en modo paso a paso."
 
 #: js/turtledefs.js:594
 msgid "Display statistics about your Music project."
@@ -2395,6 +2237,289 @@ msgstr "¡Felicidades!"
 msgid "You have finished the tour. Please enjoy Music Blocks!"
 msgstr "¡Ha terminado la gira. Por favor, disfrutar de Bloques de Música!"
 
+#: js/logo.js:854
+msgid "Downloading Kokoro voice: %s"
+msgstr "Descargando la voz de Kokoro: %s"
+
+#: js/logo.js:998
+#: js/blocks/ProgramBlocks.js:277
+#: js/blocks/ProgramBlocks.js:453
+msgid "You must select a file."
+msgstr "Debe seleccionar un archivo."
+
+#: js/logo.js:2319
+msgid "Infinite loop detected. Execution stopped to prevent browser freeze."
+msgstr "Se ha detectado un bucle infinito. La ejecución se ha detenido para evitar que el navegador se bloquee."
+
+#: js/logo.js:2527
+#: js/blocks/MediaBlocks.js:338
+msgid "width"
+msgstr "anchura"
+
+#: js/logo.js:2528
+#: js/blocks/MediaBlocks.js:395
+msgid "height"
+msgstr "altura"
+
+#: js/logo.js:2529
+#: js/blocks/MediaBlocks.js:35
+#.TRANS: right side of the screen
+msgid "right (screen)"
+msgstr "derecha"
+
+#: js/logo.js:2530
+#: js/blocks/MediaBlocks.js:111
+#.TRANS: left side of the screen
+msgid "left (screen)"
+msgstr "izquierdo"
+
+#: js/logo.js:2531
+#: js/blocks/MediaBlocks.js:186
+msgid "top (screen)"
+msgstr "superior"
+
+#: js/logo.js:2532
+#: js/blocks/MediaBlocks.js:261
+msgid "bottom (screen)"
+msgstr "inferior"
+
+#: js/logo.js:2900
+msgid "Playback is ready."
+msgstr "La reproducción está preparada."
+
+#: js/blocks.js:2462
+#: js/blocks.js:2466
+#: js/blocks.js:2472
+#: js/blocks.js:2474
+msgid "audio file"
+msgstr "archivo de audio"
+
+#: js/blocks.js:3764
+#: js/blocks.js:4169
+#: js/blocks.js:4215
+#: js/blocks.js:4261
+#: js/blocks.js:6827
+#: js/blocks.js:6851
+#: js/blocks/BoxesBlocks.js:783
+msgid "box1"
+msgstr "caja1"
+
+#: js/blocks.js:3766
+#: js/blocks.js:4171
+#: js/blocks.js:4217
+#: js/blocks.js:4263
+#: js/blocks.js:6829
+#: js/blocks.js:6853
+#: js/blocks/BoxesBlocks.js:674
+msgid "box2"
+msgstr "caja2"
+
+#: js/blocks.js:4421
+#: js/blocks/MediaBlocks.js:827
+#: js/blocks/BoxesBlocks.js:606
+#: js/blocks/DictBlocks.js:215
+#: js/blocks/DictBlocks.js:289
+#: js/blocks/EnsembleBlocks.js:441
+#: js/blocks/EnsembleBlocks.js:458
+#: js/blocks/PitchBlocks.js:731
+#: js/blocks/PitchBlocks.js:1084
+#: js/blocks/PitchBlocks.js:2038
+#: js/blocks/ProgramBlocks.js:412
+#: js/blocks/ProgramBlocks.js:539
+#: js/blocks/ProgramBlocks.js:724
+#: js/blocks/ToneBlocks.js:1082
+msgid "name"
+msgstr "nombre"
+
+#: js/blocks.js:4421
+#: js/blocks/BoxesBlocks.js:75
+#: js/blocks/BoxesBlocks.js:606
+#: js/blocks/DictBlocks.js:289
+#: js/blocks/DictBlocks.js:430
+#: js/blocks/NumberBlocks.js:973
+#: js/blocks/HeapBlocks.js:573
+#: js/blocks/RhythmBlocks.js:1164
+msgid "value"
+msgstr "valor"
+
+#: js/blocks.js:4760
+msgid "Forever loop detected inside a note value block. Unexpected things may happen."
+msgstr "Se detectó un bucle indefinido dentro de un bloque de valor de nota. Pueden ocurrir cosas inesperadas."
+
+#: js/blocks.js:5319
+msgid "There is no block selected."
+msgstr "No hay bloque seleccionado."
+
+#: js/blocks.js:5429
+#: js/blocks/MediaBlocks.js:884
+#.TRANS: Avatar is the image used to determine the appearance of the mouse.
+msgid "avatar"
+msgstr "avatar"
+
+#: js/blocks.js:5432
+#: js/blocks/ToneBlocks.js:1067
+#: js/widgets/SamplerCanvas.js:169
+#.TRANS: The sound sample that the user uploads.
+msgid "sample"
+msgstr "muestra de audio"
+
+#: js/blocks.js:5617
+#: js/blocks.js:5760
+msgid "Cannot load project: invalid project structure."
+msgstr "No se puede cargar el proyecto: estructura de proyecto no válida."
+
+#: js/blocks.js:5770
+#: js/blocks.js:6205
+#: js/blocks.js:6281
+msgid "Cannot load project: malformed block structure detected."
+msgstr "No se puede cargar el proyecto: se ha detectado una estructura de bloques mal formada."
+
+#: js/blocks.js:5887
+msgid "Cannot load project: circular block connection detected."
+msgstr "No se puede cargar el proyecto: se ha detectado una conexión circular entre bloques."
+
+#: js/blocks.js:6235
+#: js/blocks.js:6486
+msgid "Cannot load project: invalid block connection detected."
+msgstr "No se puede cargar el proyecto: se ha detectado una conexión de bloques no válida."
+
+#: js/blocks.js:7672
+msgid "Some blocks in this project are unsupported and were replaced with placeholders: %s"
+msgstr "Algunos bloques de este proyecto no son compatibles y han sido sustituidos por marcadores de posición: %s"
+
+#: js/blocks.js:8057
+msgid "Nothing to undo."
+msgstr "No hay nada que deshacer."
+
+#: js/blocks.js:8109
+msgid "Nothing to redo."
+msgstr "No hay nada que rehacer"
+
+#: js/blocks.js:8270
+msgid "block sent to trash"
+msgstr "bloque eliminado"
+
+#: js/gitDropdown.js:875
+msgid "Saved moment"
+msgstr "Momento guardado"
+
+#: js/gitDropdown.js:893
+msgid "You're offline. Connect to the network to view commits for this project."
+msgstr "No tienes conexión. Conéctate a la red para ver las confirmaciones de este proyecto."
+
+#: js/gitDropdown.js:894
+msgid "Network Connection Required"
+msgstr "Requiere conexión a la red"
+
+#: js/gitDropdown.js:907
+msgid "No moments marked yet. Click \"Mark this moment\" to save your first one!"
+msgstr "Aún no hay momentos marcados. ¡Haz clic en «Marcar este momento» para guardar el primero!"
+
+#: js/gitDropdown.js:908
+msgid "No Saved Moments Yet"
+msgstr "No tienes momentos guardados"
+
+#: js/gitDropdown.js:939
+#: js/gitDropdown.js:969
+msgid "Time Travel"
+msgstr "Viaje en el tiempo"
+
+#: js/gitDropdown.js:972
+msgid "Every save, forever yours"
+msgstr "Cada archivo, para siempre tuyo"
+
+#: js/gitDropdown.js:1091
+#: js/gitDropdown.js:1196
+msgid "YOU ARE HERE"
+msgstr "ESTÁS AQUÍ"
+
+#: js/gitDropdown.js:1118
+msgid "Sync Pending"
+msgstr "sincronización pendiente"
+
+#: js/gitDropdown.js:1124
+msgid "Latest"
+msgstr "Último"
+
+#: js/gitDropdown.js:1137
+#: js/gitDropdown.js:1232
+msgid "Undo my changes"
+msgstr "Deshacer lo que hice"
+
+#: js/gitDropdown.js:1147
+#: js/gitDropdown.js:1242
+msgid "Go back to this version"
+msgstr "Restaurar esta versión"
+
+#: js/gitDropdown.js:1210
+msgid "The very beginning"
+msgstr "El principio"
+
+#: js/gitDropdown.js:1214
+msgid "Where your project started"
+msgstr "El origen de tu proyecto"
+
+#: js/gitDropdown.js:1221
+msgid "Setting Up Tracking"
+msgstr "Configurando el seguimiento"
+
+#: js/gitDropdown.js:1235
+#: js/gitDropdown.js:1245
+msgid "Start point"
+msgstr "Punto de partida"
+
+#: js/gitDropdown.js:1269
+msgid "no more offline commits can be made"
+msgstr "Ya no se pueden hacer commits offline."
+
+#: js/gitDropdown.js:1271
+msgid "1 more commit can be made"
+msgstr "Falta un commit por hacer."
+
+#: js/gitDropdown.js:1272
+msgid "%s more commits can be made"
+msgstr "Quedan %s confirmaciones por hacer"
+
+#: js/gitDropdown.js:1284
+msgid "Showing locally saved drafts"
+msgstr "Mostrando borradores en este equipo"
+
+#: js/gitDropdown.js:1783
+msgid "Just now"
+msgstr "Hace poco"
+
+#: js/gitDropdown.js:1784
+msgid "1 minute ago"
+msgstr "Hace un minuto"
+
+#: js/gitDropdown.js:1784
+msgid "%s minutes ago"
+msgstr "Hace %s minutos"
+
+#: js/gitDropdown.js:1786
+msgid "1 hour ago"
+msgstr "Hace una hora"
+
+#: js/gitDropdown.js:1786
+msgid "%s hours ago"
+msgstr "Hace %s horas"
+
+#: js/gitDropdown.js:1788
+msgid "1 day ago"
+msgstr "Hace una dia"
+
+#: js/gitDropdown.js:1788
+msgid "%s days ago"
+msgstr "Hace %s dias"
+
+#: js/gitDropdown.js:1790
+msgid "1 month ago"
+msgstr "Hace un mes"
+
+#: js/gitDropdown.js:1790
+msgid "%s months ago"
+msgstr "Hace %s meses"
+
 #: js/utils/plugin-utils.js:55
 msgid "Security Warning"
 msgstr "Advertencia de seguridad"
@@ -2520,7 +2645,7 @@ msgstr "Igual (31EDO)"
 #: js/utils/musicutils-temperament.js:291
 #: js/utils/musicutils-temperament.js:308
 msgid "5-limit Just Intonation"
-msgstr "5-Límite de entonación justa"
+msgstr "5-Límite de entonación solo"
 
 #: js/utils/musicutils-temperament.js:292
 #: js/utils/musicutils-temperament.js:309
@@ -2545,8 +2670,8 @@ msgstr "Mesotónico"
 #: js/blocks/IntervalsBlocks.js:1187
 #: js/blocks/WidgetBlocks.js:640
 #: js/blocks/WidgetBlocks.js:645
-#: js/blocks/ToneBlocks.js:1003
 #: js/blocks/VolumeBlocks.js:420
+#: js/blocks/ToneBlocks.js:1003
 #: js/turtleactions/VolumeActions.js:49
 #: js/widgets/modewidget.js:1741
 #.TRANS: customize voice
@@ -3547,6 +3672,14 @@ msgstr "7ú completamente disminuido"
 msgid "half-diminished 7th"
 msgstr "7ú medio disminuido"
 
+#: js/utils/utils-logic.js:431
+msgid "Invalid input passed to rational sum"
+msgstr "La entrada proporcionada a la suma racional no es válida."
+
+#: js/utils/utils-logic.js:438
+msgid "Note calculation failed: zero denominator"
+msgstr "Error al calcular la nota: división por cero"
+
 #: js/utils/synthutils.js:130
 #.TRANS: simple monotone synthesizer
 msgid "simple-2"
@@ -3575,14 +3708,6 @@ msgstr "campana japonés"
 #: js/utils/synthutils.js:2493
 msgid "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
 msgstr "⚠️ ¡El sonido está desactivado"
-
-#: js/utils/utils-logic.js:431
-msgid "Invalid input passed to rational sum"
-msgstr "La entrada proporcionada a la suma racional no es válida."
-
-#: js/utils/utils-logic.js:438
-msgid "Note calculation failed: zero denominator"
-msgstr "Error al calcular la nota: división por cero"
 
 #: js/blocks/BooleanBlocks.js:44
 msgid "The Not block is the logical not operator."
@@ -7187,6 +7312,112 @@ msgstr "El bloque «Obtener azul» devuelve el componente azul del píxel situad
 msgid "The Get blue block returns the blue component of the pixel under the turtle."
 msgstr "El bloque «Obtener azul» devuelve el componente azul del píxel situado bajo la tortuga."
 
+#: js/blocks/VolumeBlocks.js:35
+msgid "synth volume"
+msgstr "volumen del sintetizador"
+
+#: js/blocks/VolumeBlocks.js:39
+msgid "The Synth volume block returns the current volume of the current synthesizer."
+msgstr "El bloque «Volumen sintetizador» devuelve el volumen actual del sintetizador actual."
+
+#: js/blocks/VolumeBlocks.js:109
+msgid "master volume"
+msgstr "volumen maestro"
+
+#: js/blocks/VolumeBlocks.js:113
+msgid "The Master volume block returns the master volume."
+msgstr "El bloque «Volumen maestro» devuelve nivel de volumen maestro."
+
+#: js/blocks/VolumeBlocks.js:364
+#: js/blocks/VolumeBlocks.js:535
+msgid "set synth volume"
+msgstr "fijar volumen del sintetizador"
+
+#: js/blocks/VolumeBlocks.js:371
+#: js/blocks/VolumeBlocks.js:556
+msgid "synth"
+msgstr "sintetizador"
+
+#: js/blocks/VolumeBlocks.js:412
+#: js/blocks/VolumeBlocks.js:588
+#: js/blocks/VolumeBlocks.js:751
+#: js/turtleactions/VolumeActions.js:222
+msgid "Setting volume to 0."
+msgstr "Ajuste el volumen a 0"
+
+#: js/blocks/VolumeBlocks.js:449
+msgid "Synth not found"
+msgstr "No se encuentra el sintetizador."
+
+#: js/blocks/VolumeBlocks.js:505
+msgid "set drum volume"
+msgstr "filar volumen del tambor"
+
+#: js/blocks/VolumeBlocks.js:541
+msgid "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc."
+msgstr "El bloque «Establecer volumen del sintetizado» cambiará el volumen de un sintetizador específico, por ejemplo: guitarra, violín, caja, etc."
+
+#: js/blocks/VolumeBlocks.js:545
+msgid "The default volume is 50."
+msgstr "El volumen predeterminado es 50."
+
+#: js/blocks/VolumeBlocks.js:547
+msgid "The range is 0 for silence to 100 for full volume."
+msgstr "El rango es de 0 para el silencio a 100 para el volumen completo."
+
+#: js/blocks/VolumeBlocks.js:608
+msgid "set panning"
+msgstr "establecer panorámica"
+
+#: js/blocks/VolumeBlocks.js:614
+msgid "The Set Panning block sets the panning for all synthesizers."
+msgstr "El bloque «Establecer panorámica» establece el panorama para todos los sintetizadores."
+
+#: js/blocks/VolumeBlocks.js:636
+msgid "Warning: Sound is coming out from only the left or right side."
+msgstr "Advertencia: El sonido sale solo del lado izquierdo o derecho."
+
+#: js/blocks/VolumeBlocks.js:658
+#: js/blocks/VolumeBlocks.js:706
+msgid "set master volume"
+msgstr "filar volumen maestro"
+
+#: js/blocks/VolumeBlocks.js:664
+msgid "The Set master volume block sets the volume for all synthesizers."
+msgstr "El bloque «Ajuste volumen maestro» establece el volumen para todos los sintetizadores."
+
+#: js/blocks/VolumeBlocks.js:794
+msgid "The Set relative volume block changes the volume of the contained notes."
+msgstr "El bloque «Fijar volumen relativo» cambia el volumen de las notas contenidas."
+
+#: js/blocks/VolumeBlocks.js:801
+msgid "set relative volume"
+msgstr "fijar volumen relativo"
+
+#: js/blocks/VolumeBlocks.js:853
+msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
+msgstr "El bloque «Decrescendo» disminuirá el volumen de las notas contenidas en una cantidad especificada por cada nota reproducida."
+
+#: js/blocks/VolumeBlocks.js:857
+msgid "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
+msgstr "Por ejemplo, si tienes 7 notas en secuencia contenidas en un bloque de Decrescendo con un valor de 5, la nota final tendrá un volumen un 35% inferior al volumen inicial."
+
+#: js/blocks/VolumeBlocks.js:867
+msgid "decrescendo"
+msgstr "decrescendo"
+
+#: js/blocks/VolumeBlocks.js:917
+msgid "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
+msgstr "El bloque «Crescendo» aumentará el volumen de las notas contenidas en una cantidad especificada por cada nota reproducida."
+
+#: js/blocks/VolumeBlocks.js:921
+msgid "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
+msgstr "Por ejemplo, si tienes 7 notas en secuencia contenidas en un bloque de Crescendo con un valor de 5, la nota final tendrá un volumen un 35% superior al volumen inicial."
+
+#: js/blocks/VolumeBlocks.js:931
+msgid "crescendo"
+msgstr "crescendo"
+
 #: js/blocks/ToneBlocks.js:34
 #: js/widgets/timbre.js:314
 msgid "Oscillator"
@@ -7436,112 +7667,6 @@ msgstr "Importe un archivo de sonido para usarlo como instrumento y establezca s
 msgid "Upload a sound file to connect with the sample block."
 msgstr "Cargue un archivo de sonido para conectarlo con el bloque de muestra."
 
-#: js/blocks/VolumeBlocks.js:35
-msgid "synth volume"
-msgstr "volumen del sintetizador"
-
-#: js/blocks/VolumeBlocks.js:39
-msgid "The Synth volume block returns the current volume of the current synthesizer."
-msgstr "El bloque «Volumen sintetizador» devuelve el volumen actual del sintetizador actual."
-
-#: js/blocks/VolumeBlocks.js:109
-msgid "master volume"
-msgstr "volumen maestro"
-
-#: js/blocks/VolumeBlocks.js:113
-msgid "The Master volume block returns the master volume."
-msgstr "El bloque «Volumen maestro» devuelve nivel de volumen maestro."
-
-#: js/blocks/VolumeBlocks.js:364
-#: js/blocks/VolumeBlocks.js:535
-msgid "set synth volume"
-msgstr "fijar volumen del sintetizador"
-
-#: js/blocks/VolumeBlocks.js:371
-#: js/blocks/VolumeBlocks.js:556
-msgid "synth"
-msgstr "sintetizador"
-
-#: js/blocks/VolumeBlocks.js:412
-#: js/blocks/VolumeBlocks.js:588
-#: js/blocks/VolumeBlocks.js:751
-#: js/turtleactions/VolumeActions.js:222
-msgid "Setting volume to 0."
-msgstr "Ajuste el volumen a 0"
-
-#: js/blocks/VolumeBlocks.js:449
-msgid "Synth not found"
-msgstr "No se encuentra el sintetizador."
-
-#: js/blocks/VolumeBlocks.js:505
-msgid "set drum volume"
-msgstr "filar volumen del tambor"
-
-#: js/blocks/VolumeBlocks.js:541
-msgid "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc."
-msgstr "El bloque «Establecer volumen del sintetizado» cambiará el volumen de un sintetizador específico, por ejemplo: guitarra, violín, caja, etc."
-
-#: js/blocks/VolumeBlocks.js:545
-msgid "The default volume is 50."
-msgstr "El volumen predeterminado es 50."
-
-#: js/blocks/VolumeBlocks.js:547
-msgid "The range is 0 for silence to 100 for full volume."
-msgstr "El rango es de 0 para el silencio a 100 para el volumen completo."
-
-#: js/blocks/VolumeBlocks.js:608
-msgid "set panning"
-msgstr "establecer panorámica"
-
-#: js/blocks/VolumeBlocks.js:614
-msgid "The Set Panning block sets the panning for all synthesizers."
-msgstr "El bloque «Establecer panorámica» establece el panorama para todos los sintetizadores."
-
-#: js/blocks/VolumeBlocks.js:636
-msgid "Warning: Sound is coming out from only the left or right side."
-msgstr "Advertencia: El sonido sale solo del lado izquierdo o derecho."
-
-#: js/blocks/VolumeBlocks.js:658
-#: js/blocks/VolumeBlocks.js:706
-msgid "set master volume"
-msgstr "filar volumen maestro"
-
-#: js/blocks/VolumeBlocks.js:664
-msgid "The Set master volume block sets the volume for all synthesizers."
-msgstr "El bloque «Ajuste volumen maestro» establece el volumen para todos los sintetizadores."
-
-#: js/blocks/VolumeBlocks.js:794
-msgid "The Set relative volume block changes the volume of the contained notes."
-msgstr "El bloque «Fijar volumen relativo» cambia el volumen de las notas contenidas."
-
-#: js/blocks/VolumeBlocks.js:801
-msgid "set relative volume"
-msgstr "fijar volumen relativo"
-
-#: js/blocks/VolumeBlocks.js:853
-msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
-msgstr "El bloque «Decrescendo» disminuirá el volumen de las notas contenidas en una cantidad especificada por cada nota reproducida."
-
-#: js/blocks/VolumeBlocks.js:857
-msgid "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
-msgstr "Por ejemplo, si tienes 7 notas en secuencia contenidas en un bloque de Decrescendo con un valor de 5, la nota final tendrá un volumen un 35% inferior al volumen inicial."
-
-#: js/blocks/VolumeBlocks.js:867
-msgid "decrescendo"
-msgstr "decrescendo"
-
-#: js/blocks/VolumeBlocks.js:917
-msgid "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
-msgstr "El bloque «Crescendo» aumentará el volumen de las notas contenidas en una cantidad especificada por cada nota reproducida."
-
-#: js/blocks/VolumeBlocks.js:921
-msgid "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
-msgstr "Por ejemplo, si tienes 7 notas en secuencia contenidas en un bloque de Crescendo con un valor de 5, la nota final tendrá un volumen un 35% superior al volumen inicial."
-
-#: js/blocks/VolumeBlocks.js:931
-msgid "crescendo"
-msgstr "crescendo"
-
 #: js/turtleactions/OrnamentActions.js:49
 msgid "Staccato value must be a positive number."
 msgstr "El valor de staccato debe ser un número positivo."
@@ -7552,11 +7677,11 @@ msgstr "El valor de la ligadura debe ser un número positivo."
 
 #: js/turtleactions/OrnamentActions.js:117
 msgid "Neighbor interval must be a finite number."
-msgstr ""
+msgstr "El intervalo de vecinos tiene que ser un número finito."
 
 #: js/turtleactions/OrnamentActions.js:122
 msgid "Neighbor note value must be a positive number."
-msgstr ""
+msgstr "El valor de la nota de paso debe ser un número positivo."
 
 #: js/turtleactions/VolumeActions.js:275
 msgid "Synth not found: %s"
@@ -7625,11 +7750,11 @@ msgstr "Ignorando números de tono duplicados."
 
 #: js/turtleactions/IntervalsActions.js:444
 msgid "Scalar interval must be within -63 to 69."
-msgstr ""
+msgstr "El intervalo escalar tiene que ser de -63 a 69."
 
 #: js/turtleactions/IntervalsActions.js:615
 msgid "The custom mode does not fit the new tuning, so it was reset."
-msgstr ""
+msgstr "Como el modo personalizado no encaja con el nuevo ajuste, se restableció."
 
 #: js/turtleactions/PitchActions.js:314
 msgid "Scalar transpositions are equal to Semitone transpositions for custom temperament."
@@ -7678,7 +7803,7 @@ msgstr "El valor parcial debe ser mayor o igual a 0."
 
 #: js/turtleactions/ToneActions.js:437
 msgid "Partial must be less than or equal to %s."
-msgstr ""
+msgstr "El parcial debe ser menor o igual que %s."
 
 #: js/turtleactions/ToneActions.js:485
 #: js/turtleactions/ToneActions.js:525
@@ -7694,11 +7819,11 @@ msgstr "La entrada no puede ser negativa."
 
 #: js/turtleactions/DictActions.js:188
 msgid "Unknown key: %s"
-msgstr ""
+msgstr "Clave desconocida: %s"
 
 #: js/turtleactions/DictActions.js:234
 msgid "Cannot set read-only key: %s"
-msgstr ""
+msgstr "Imposible cambiar la clave de solo lectura: %s"
 
 #: js/turtleactions/DictActions.js:269
 msgid "font"
@@ -7706,7 +7831,7 @@ msgstr "fuente"
 
 #: js/turtleactions/DictActions.js:359
 msgid "The key name is reserved."
-msgstr ""
+msgstr "Ese nombre de clave está reservado."
 
 #: js/turtleactions/DictActions.js:399
 #: js/turtleactions/DictActions.js:416
@@ -7729,7 +7854,7 @@ msgstr "El valor de la nota auxiliar es demasiado grande para la duración de la
 #: js/turtleactions/RhythmActions.js:254
 #: js/turtleactions/RhythmActions.js:263
 msgid "Dot value must be a finite number."
-msgstr ""
+msgstr "El valor del punto tiene que ser un número finito."
 
 #: js/turtleactions/RhythmActions.js:244
 msgid "An argument of -1 results in a note value of 0."
@@ -7761,7 +7886,7 @@ msgstr "Pausa"
 
 #: js/widgets/oscilloscope.js:213
 msgid "Resume"
-msgstr ""
+msgstr "Reasumir"
 
 #: js/widgets/LegoBricksExport.js:46
 msgid "No color data to save. Please scan an image first."
@@ -7845,7 +7970,7 @@ msgstr "Haga clic en la cuadrícula para asignar notas a sonidos de tambors"
 
 #: js/widgets/PitchStaircaseLayout.js:383
 msgid "Frequency ratio exceeds displayable range"
-msgstr ""
+msgstr "El ratio de frecuencias es mayor que el rango en pantalla."
 
 #: js/widgets/PitchStaircasePlayback.js:135
 #: js/widgets/PitchStaircasePlayback.js:153
@@ -7873,11 +7998,11 @@ msgstr "Nuevo bloque de acción creado."
 
 #: js/widgets/PitchStaircaseWindow.js:58
 msgid "Pitch Staircase opened"
-msgstr ""
+msgstr "La herramienta escalera ya está abierta"
 
 #: js/widgets/PitchStaircaseWindow.js:87
 msgid "Pitch Staircase closed"
-msgstr ""
+msgstr "La herramienta escalera ya está cerrada."
 
 #: js/widgets/PitchStaircaseWindow.js:148
 #: js/widgets/timbre.js:481
@@ -7932,7 +8057,7 @@ msgstr "Instrucción"
 
 #: js/widgets/SamplerUI.js:317
 msgid "AI sample generation is not available."
-msgstr ""
+msgstr "No se pueden generar muestras con IA."
 
 #: js/widgets/SamplerUI.js:374
 msgid "AI Sample Generation"
@@ -7960,7 +8085,7 @@ msgstr "Se produjo un error."
 
 #: js/widgets/SamplerUI.js:535
 msgid "Microphone access denied."
-msgstr ""
+msgstr "Se denegó el acceso al micrófono."
 
 #: js/widgets/SamplerUI.js:572
 #: js/widgets/SamplerTuner.js:273
@@ -8009,15 +8134,15 @@ msgstr "número de divisiones"
 
 #: js/widgets/TemperamentUI.js:721
 msgid "Maximum 57 divisions"
-msgstr ""
+msgstr "Máximo 57 divisiones"
 
 #: js/widgets/TemperamentUI.js:768
 msgid "Please enter pitch numbers between 0 and %s."
-msgstr ""
+msgstr "Introduce números de tono del 0 al %s."
 
 #: js/widgets/TemperamentUI.js:778
 msgid "Please enter a valid number of divisions."
-msgstr ""
+msgstr "Introduce un número de divisiones que sea válido."
 
 #: js/widgets/TemperamentUI.js:852
 msgid "ratio"
@@ -8029,7 +8154,7 @@ msgstr "recursividad"
 
 #: js/widgets/TemperamentUI.js:899
 msgid "Please enter a recursion between 1 and 56."
-msgstr ""
+msgstr "Por favor, introduce un número de recursión entre 1 y 56."
 
 #: js/widgets/TemperamentUI.js:915
 #: js/widgets/TemperamentUI.js:956
@@ -8038,7 +8163,7 @@ msgstr "Por favor, ingrese una proporción válida (por ejemplo, 3:2) dentro del
 
 #: js/widgets/TemperamentUI.js:1124
 msgid "Please enter an octave ratio greater than 1 (e.g. 2:1)."
-msgstr ""
+msgstr "Por favor, introduce una relación de octava mayor que 1 (por ejemplo, 2:1)."
 
 #: js/widgets/TemperamentUI.js:1131
 msgid "The octave ratio has changed. This changes temperament significantly."
@@ -8069,15 +8194,15 @@ msgstr "Los latidos por minuto deben ser superiores a 30."
 #: js/widgets/TempoTap.js:71
 #: js/widgets/TempoWindow.js:133
 msgid "Tap tempo"
-msgstr ""
+msgstr "Pulsa ritmo"
 
 #: js/widgets/TempoTap.js:147
 msgid "Tap again to set tempo"
-msgstr ""
+msgstr "Pulsa otra vez para marcar el ritmo"
 
 #: js/widgets/jseditor.js:192
 msgid "Syntax Error at position %s:"
-msgstr ""
+msgstr "Error de sintaxis en el carácter %s:"
 
 #: js/widgets/jseditor.js:451
 msgid "Reset Code"
@@ -8089,7 +8214,7 @@ msgstr "Convertir JavaScript a bloques"
 
 #: js/widgets/jseditor.js:599
 msgid "CONSOLE"
-msgstr ""
+msgstr "CONSOLA"
 
 #: js/widgets/jseditor.js:613
 msgid "Toggle Console"
@@ -8097,19 +8222,19 @@ msgstr "Alternar consola"
 
 #: js/widgets/jseditor.js:1002
 msgid "Syntax Error:"
-msgstr ""
+msgstr "Error de sintaxis:"
 
 #: js/widgets/jseditor.js:1008
 msgid "Code executed successfully!"
-msgstr ""
+msgstr "¡Ejecución exitosa!"
 
 #: js/widgets/jseditor.js:1015
 msgid "Sandbox Error:"
-msgstr ""
+msgstr "Error de sandbox:"
 
 #: js/widgets/jseditor.js:1017
 msgid "Stack trace:"
-msgstr ""
+msgstr "Pila de llamadas:"
 
 #: js/widgets/jseditor.js:1062
 msgid "JavaScript block conversion is unavailable because its configuration file failed to load."
@@ -8121,31 +8246,31 @@ msgstr "La conversión del bloque de JavaScript aún se está cargando. Por favo
 
 #: js/widgets/jseditor.js:1072
 msgid "No valid blocks could be generated from the code."
-msgstr ""
+msgstr "El código no permitió generar bloques válidos."
 
 #: js/widgets/jseditor.js:1225
 msgid "Cannot add breakpoint to line %s. Breakpoints can only be added after lines ending with '{' or ';'"
-msgstr ""
+msgstr "Imposible añadir breakpoint en la línea %s. Solo se admiten breakpoints después de líneas que acaben en '{' o ';'."
 
 #: js/widgets/jseditor.js:1239
 msgid "Cannot add breakpoint to line %s because there is already a breakpoint on an adjacent line."
-msgstr ""
+msgstr "Imposible colocar punto de interrupción en la línea %s: ya existe uno en una línea contigua."
 
 #: js/widgets/jseditor.js:1264
 msgid "Debugger added to line %s"
-msgstr ""
+msgstr "Depurador agregado a la línea %s"
 
 #: js/widgets/jseditor.js:1288
 msgid "Debugger removed from line %s"
-msgstr ""
+msgstr "Depurador eliminado de la línea %s"
 
 #: js/widgets/jseditor.js:1384
 msgid "Status window is already open."
-msgstr ""
+msgstr "Ya está abierta la ventana de estado."
 
 #: js/widgets/jseditor.js:1396
 msgid "Status window opened."
-msgstr ""
+msgstr "Ventana de estado abierta"
 
 #: js/widgets/legobricks.js:172
 msgid "LEGO Bricks - Phrase Maker with %s pitch rows (sorted by frequency, Instrument)"
@@ -8157,75 +8282,75 @@ msgstr "Haga clic en una nota para crear un nuevo paso."
 
 #: js/widgets/temperament.js:91
 msgid "Maximum 57 divisions. For larger, use a dedicated tool."
-msgstr ""
+msgstr "Hasta 57 divisiones. Si son más, usa una herramienta dedicada."
 
 #: js/widgets/temperament.js:402
 msgid "modified"
-msgstr ""
+msgstr "modificado"
 
 #: js/widgets/temperament.js:633
 msgid "active temperament"
-msgstr ""
+msgstr "temperamento activo"
 
 #: js/widgets/temperament.js:636
 msgid "12-EDO reference"
-msgstr ""
+msgstr "Referencia 12-EDO"
 
 #: js/widgets/temperament.js:639
 msgid "no deviation"
-msgstr ""
+msgstr "sin desviación"
 
 #: js/widgets/temperament.js:640
 msgid "sharp (+cents)"
-msgstr ""
+msgstr "alta (+cents)"
 
 #: js/widgets/temperament.js:641
 msgid "flat (-cents)"
-msgstr ""
+msgstr "baja (-cents)"
 
 #: js/widgets/temperament.js:649
 msgid "Temperament visualizer circle"
-msgstr ""
+msgstr "Círculo de visualización del temperamento"
 
 #: js/widgets/temperament.js:793
 msgid "Pitch"
-msgstr ""
+msgstr "Tono"
 
 #: js/widgets/temperament.js:794
 msgid "Step"
-msgstr ""
+msgstr "Paso"
 
 #: js/widgets/temperament.js:795
 msgid "Frequency (Hz)"
-msgstr ""
+msgstr "Frecuencia (Hz)"
 
 #: js/widgets/temperament.js:796
 msgid "Cents dev. from 12-EDO"
-msgstr ""
+msgstr "Desviación en cents respecto al 12-EDO"
 
 #: js/widgets/temperament.js:797
 msgid "Ratio"
-msgstr ""
+msgstr "Proporción"
 
 #: js/widgets/temperament.js:1054
 msgid "scroll for all"
-msgstr ""
+msgstr "baja para ver más"
 
 #: js/widgets/temperament.js:1054
 msgid "pitches"
-msgstr ""
+msgstr "tonos"
 
 #: js/widgets/temperament.js:1329
 msgid "Relative cents from 12-EDO (-50 to +50)"
-msgstr ""
+msgstr "Desviación en cents para 12-EDO (-50 a +50)"
 
 #: js/widgets/temperament.js:1334
 msgid "Set cents"
-msgstr ""
+msgstr "Fijar cents"
 
 #: js/widgets/temperament.js:1354
 msgid "Reset to 12-EDO"
-msgstr ""
+msgstr "Volver a 12-EDO"
 
 #: js/widgets/temperament.js:1564
 msgid "Invalid temperament: %s. Skipping to next temperament."
@@ -8233,61 +8358,61 @@ msgstr "Temperamento no válido: %s. Saltando al siguiente temperamento."
 
 #: js/widgets/temperament.js:1615
 msgid "No temperament to export."
-msgstr ""
+msgstr "Sin temperamento para exportar."
 
 #: js/widgets/temperament.js:1709
 #: js/widgets/modewidget.js:1649
 msgid "Error reading JSON file:"
-msgstr ""
+msgstr "Fallo al leer el archivo JSON"
 
 #: js/widgets/temperament.js:1740
 #: js/widgets/modewidget.js:1662
 msgid "Error reading .scl file:"
-msgstr ""
+msgstr "Fallo al leer el archivo .scl"
 
 #: js/widgets/temperament.js:1748
 msgid "Invalid .scl file: pitches must be strictly ascending above 1/1."
-msgstr ""
+msgstr "Archivo .scl no válido: las alturas deben ser estrictamente ascendentes por encima de 1/1."
 
 #: js/widgets/temperament.js:1755
 #: js/widgets/modewidget.js:1680
 msgid "Unsupported file type. Use .json or .scl."
-msgstr ""
+msgstr "Tipo de archivo no admitido. Utilice .json o .scl."
 
 #: js/widgets/temperament.js:1780
 msgid "Invalid temperament name."
-msgstr ""
+msgstr "El nombre del temperamento no es válido."
 
 #: js/widgets/temperament.js:1796
 msgid "Cannot import: no reference frequency."
-msgstr ""
+msgstr "Error de importación: falta la frecuencia de referencia."
 
 #: js/widgets/temperament.js:1802
 msgid "Invalid temperament: octave ratio out of range."
-msgstr ""
+msgstr "Temperamento no válido: relación de octava fuera de rango."
 
 #: js/widgets/temperament.js:1823
 msgid "Temperament imported:"
-msgstr ""
+msgstr "Temperamento importado:"
 
 #: js/widgets/temperament.js:1837
 #: js/widgets/modewidget.js:1527
 msgid "Export .scl"
-msgstr ""
+msgstr "Exportar .scl"
 
 #: js/widgets/temperament.js:1838
 #: js/widgets/modewidget.js:1528
 msgid "Export JSON"
-msgstr ""
+msgstr "Exportar JSON"
 
 #: js/widgets/temperament.js:1839
 #: js/widgets/modewidget.js:1529
 msgid "Import"
-msgstr ""
+msgstr "Importar"
 
 #: js/widgets/temperament.js:2258
 msgid "Play all pitches"
-msgstr ""
+msgstr "Reproducir todos los tonos"
 
 #: js/widgets/temperament.js:2264
 #: js/widgets/modewidget.js:201
@@ -8297,15 +8422,15 @@ msgstr "Compartir"
 
 #: js/widgets/temperament.js:2272
 msgid "Add pitch after selected (clockwise)"
-msgstr ""
+msgstr "Añadir tono tras la selección (en sentido horario)"
 
 #: js/widgets/temperament.js:2277
 msgid "Add pitch before selected (counterclockwise)"
-msgstr ""
+msgstr "Añadir inclinación antes de lo seleccionado (en sentido antihorario)"
 
 #: js/widgets/temperament.js:2282
 msgid "Remove selected pitch"
-msgstr ""
+msgstr "Eliminar el tono seleccionado"
 
 #: js/widgets/temperament.js:2356
 msgid "Invalid temperament interval data. Skipping note %s."
@@ -8313,15 +8438,15 @@ msgstr "Datos de intervalo de temperamento no válidos. Omitiendo la nota %s."
 
 #: js/widgets/temperament.js:2398
 msgid "Create new temperament"
-msgstr ""
+msgstr "Crear nuevo temperamento"
 
 #: js/widgets/timbre.js:238
 msgid "Timbre Widget opened"
-msgstr ""
+msgstr "Widget de timbre abierto"
 
 #: js/widgets/timbre.js:260
 msgid "Timbre Widget closed"
-msgstr ""
+msgstr "Widget de timbre cerrado"
 
 #: js/widgets/timbre.js:295
 msgid "Synthesizer"
@@ -8347,7 +8472,7 @@ msgstr "Valor de la nota"
 
 #: js/widgets/PitchStaircaseSteps.js:161
 msgid "Frequency is outside supported range (27.5 Hz - 16744.04 Hz)."
-msgstr ""
+msgstr "La frecuencia se encuentra fuera del rango soportado (27,5 Hz - 16744,04 Hz)."
 
 #: js/widgets/SamplerFiles.js:48
 #: js/widgets/aiwidget.js:204
@@ -8459,67 +8584,67 @@ msgstr "Girar en sentido horario"
 
 #: js/widgets/modewidget.js:224
 msgid "Click in the circle to select notes for the mode."
-msgstr "Haz clic en el círculo para seleccionar las notas del modo."
+msgstr "Haga clic en el círculo para seleccionar las notas del modo."
 
 #: js/widgets/modewidget.js:233
 msgid "Non-EDO temperament: modes use its pitch count; switching the tuning replaces the temperament."
-msgstr ""
+msgstr "Temperamento no EDO: los modos utilizan su recuento de alturas; al cambiar la afinación se sustituye el temperamento."
 
 #: js/widgets/modewidget.js:425
 msgid "Switching tuning replaces the current non-EDO temperament."
-msgstr ""
+msgstr "Al cambiar la afinación se reemplaza el temperamento actual que no es EDO."
 
 #: js/widgets/modewidget.js:633
 msgid "Could not save the custom mode. Local storage is full or unavailable."
-msgstr ""
+msgstr "Error al guardar el modo personalizado: el almacenamiento local está lleno o no disponible."
 
 #: js/widgets/modewidget.js:646
 msgid "Invalid EDO for mode."
-msgstr ""
+msgstr "EDO no válido para el modo"
 
 #: js/widgets/modewidget.js:650
 msgid "Invalid mode name."
-msgstr ""
+msgstr "Nombre de modo inválido"
 
 #: js/widgets/modewidget.js:665
 msgid "Cannot overwrite built-in mode:"
-msgstr ""
+msgstr "No se puede modificar el modo nativo:"
 
 #: js/widgets/modewidget.js:809
 msgid "Mode name"
-msgstr ""
+msgstr "Nombre de modo"
 
 #: js/widgets/modewidget.js:818
 msgid "Please enter a mode name."
-msgstr ""
+msgstr "Introduce el nombre del modo."
 
 #: js/widgets/modewidget.js:829
 msgid "Mode saved:"
-msgstr ""
+msgstr "Modo guardado:"
 
 #: js/widgets/modewidget.js:836
 msgid "No mode selected."
-msgstr ""
+msgstr "Sin modo seleccionado"
 
 #: js/widgets/modewidget.js:841
 msgid "Cannot delete a built-in mode."
-msgstr ""
+msgstr "No es posible eliminar un modo de fábrica."
 
 #: js/widgets/modewidget.js:859
 msgid "Mode deleted:"
-msgstr ""
+msgstr "Modo eliminado:"
 
 #: js/widgets/modewidget.js:1584
 msgid "No mode to export."
-msgstr ""
+msgstr "No hay modo de exportar."
 
 #: js/widgets/modewidget.js:1668
 msgid "Not a valid EDO mode. Import requires a mode that fits an equal division of the octave."
-msgstr ""
+msgstr "Ese modo EDO no sirve. Para importar necesitas que la octava esté dividida en partes iguales."
 
 #: js/widgets/modewidget.js:1696
 msgid "Mode imported:"
-msgstr ""
+msgstr "Modo importado:"
 
 #: js/widgets/statistics.js:35
 #: js/widgets/ReflectionWindow.js:86
@@ -8536,19 +8661,19 @@ msgstr "Tono objetivo"
 
 #: js/widgets/tuner.js:862
 msgid "Chromatic mode"
-msgstr ""
+msgstr "Modo cromático"
 
 #: js/widgets/tuner.js:870
 msgid "Target pitch mode"
-msgstr ""
+msgstr "Modo de tono objetivo"
 
 #: js/widgets/MeterWidgetWindow.js:164
 msgid "Number of beats"
-msgstr ""
+msgstr "Cantidad de tiempos"
 
 #: js/widgets/MeterWidgetWindow.js:178
 msgid "Beat note value"
-msgstr ""
+msgstr "Duración de la nota"
 
 #: js/widgets/MusicKeyboardInput.js:482
 #: js/widgets/MusicKeyboardInput.js:494
@@ -8565,11 +8690,11 @@ msgstr "Error al obtener acceso MIDI en el navegador."
 
 #: js/widgets/ReflectionBackend.js:48
 msgid "Reflection is not available on this host. The backend URL could not be determined."
-msgstr ""
+msgstr "La función de reflexión no está disponible en este equipo. No se ha podido identificar la URL del backend."
 
 #: js/widgets/ReflectionChatLog.js:53
 msgid "Thinking"
-msgstr ""
+msgstr "Pensamiento"
 
 #: js/widgets/ReflectionReport.js:71
 msgid "No conversation to save."
@@ -8578,16 +8703,16 @@ msgstr "No se detectaron cambios en su proyecto."
 #: js/widgets/ReflectionSession.js:110
 #: js/widgets/ReflectionSession.js:197
 msgid "Reading code"
-msgstr ""
+msgstr "Leyendo código"
 
 #: js/widgets/ReflectionSession.js:148
 msgid "Reflection will send your current project data to an external server for analysis. Your project blocks and structure will be shared with:"
-msgstr ""
+msgstr "Reflection enviará los datos de tu proyecto actual a un servidor externo para su análisis. Los bloques y la estructura de tu proyecto se compartirán con:"
 
 #: js/widgets/ReflectionSession.js:156
 #: js/widgets/aidebugger.js:1072
 msgid "Nothing was sent. Your project stays here until you agree."
-msgstr ""
+msgstr "No se mandó nada. El proyecto se queda aquí hasta que aceptes."
 
 #: js/widgets/ReflectionSession.js:193
 msgid "No changes were detected in your project."
@@ -8595,11 +8720,11 @@ msgstr "No se detectaron cambios en su proyecto."
 
 #: js/widgets/ReflectionSession.js:237
 msgid "Chat a little longer first. The summary needs at least 10 messages."
-msgstr ""
+msgstr "Sigan chateando un poco más. El resumen requiere un mínimo de 10 mensajes."
 
 #: js/widgets/ReflectionSession.js:243
 msgid "Analyzing"
-msgstr ""
+msgstr "Procesando"
 
 #: js/widgets/ReflectionWindow.js:47
 msgid "Summary"
@@ -8619,11 +8744,11 @@ msgstr "Hablar con Beethoven"
 
 #: js/widgets/ReflectionWindow.js:112
 msgid "Type a message"
-msgstr ""
+msgstr "Escribe un mensaje"
 
 #: js/widgets/ReflectionWindow.js:130
 msgid "Send"
-msgstr ""
+msgstr "Enviar"
 
 #: js/widgets/TimbrePanels.js:196
 msgid "harmonicity"
@@ -8664,7 +8789,7 @@ msgstr "retardar"
 
 #: js/widgets/TempoRows.js:97
 msgid "Click to tap tempo"
-msgstr ""
+msgstr "haga clic para pulsar el ritmo"
 
 #: js/widgets/aidebugger.js:229
 msgid "Reset conversation"
@@ -8677,7 +8802,7 @@ msgstr "Exportar chat"
 #: js/widgets/aidebugger.js:242
 #: js/widgets/aidebugger.js:817
 msgid "Undo the change"
-msgstr ""
+msgstr "Deshacer el cambio"
 
 #: js/widgets/aidebugger.js:252
 msgid "Debugger initialized"
@@ -8685,73 +8810,73 @@ msgstr "Depurador inicializado"
 
 #: js/widgets/aidebugger.js:362
 msgid "Remove"
-msgstr ""
+msgstr "Eliminar"
 
 #: js/widgets/aidebugger.js:381
 msgid "Ask a question, or say what to change or make"
-msgstr ""
+msgstr "Pregunta algo, o dime qué cambiar o hacer."
 
 #: js/widgets/aidebugger.js:406
 msgid "Ask"
-msgstr ""
+msgstr "Preguntar"
 
 #: js/widgets/aidebugger.js:446
 msgid "Borrow from another project"
-msgstr ""
+msgstr "Tomar de otro proyecto"
 
 #: js/widgets/aidebugger.js:459
 msgid "Change my project"
-msgstr ""
+msgstr "Cambiar mi proyecto"
 
 #: js/widgets/aidebugger.js:464
 msgid "Make a new project"
-msgstr ""
+msgstr "Crear un proyecto nuevo"
 
 #: js/widgets/aidebugger.js:600
 #: js/widgets/aidebugger.js:1452
 msgid "Borrowing from"
-msgstr ""
+msgstr "Tomando elementos de"
 
 #: js/widgets/aidebugger.js:629
 msgid "Why won't my project play?"
-msgstr ""
+msgstr "¿Por qué no funciona mi proyecto?"
 
 #: js/widgets/aidebugger.js:630
 msgid "Add drums to my song"
-msgstr ""
+msgstr "Agrégale percusión a mi tema"
 
 #: js/widgets/aidebugger.js:631
 msgid "Make a song about rain"
-msgstr ""
+msgstr "Escribe una canción sobre la lluvia"
 
 #: js/widgets/aidebugger.js:631
 msgid "a song about rain"
-msgstr ""
+msgstr "una canción sobre la lluvia"
 
 #: js/widgets/aidebugger.js:634
 msgid "Why doesn't my drawing work?"
-msgstr ""
+msgstr "¿Por qué no me sale el dibujo?"
 
 #: js/widgets/aidebugger.js:635
 msgid "Add a star to my drawing"
-msgstr ""
+msgstr "Ponle una estrella a mi dibujo"
 
 #: js/widgets/aidebugger.js:636
 msgid "Make a colorful spiral"
-msgstr ""
+msgstr "Haz una espiral de colores"
 
 #: js/widgets/aidebugger.js:636
 msgid "a colorful spiral"
-msgstr ""
+msgstr "una espiral de colores"
 
 #: js/widgets/aidebugger.js:785
 #: js/widgets/aidebugger.js:797
 msgid "Do it for me"
-msgstr ""
+msgstr "Hazlo de mi parte"
 
 #: js/widgets/aidebugger.js:786
 msgid "Change my project the way this reply says"
-msgstr ""
+msgstr "Cambia mi proyecto según lo que dice esta respuesta."
 
 #: js/widgets/aidebugger.js:862
 #: js/widgets/aidebugger.js:1505
@@ -8777,11 +8902,11 @@ msgstr "No se pudo conectar con el asistente de IA. Comprueba tu conexión y vue
 
 #: js/widgets/aidebugger.js:986
 msgid "Debugger is typing..."
-msgstr ""
+msgstr "Depurador está escribiendo..."
 
 #: js/widgets/aidebugger.js:992
 msgid "Debugger is typing"
-msgstr ""
+msgstr "Depurador está escribiendo"
 
 #: js/widgets/aidebugger.js:1060
 msgid "The AI Debugger will send your current project data to an external server for analysis. Your project blocks and structure will be shared with:"
@@ -8793,7 +8918,7 @@ msgstr "Error del depurador: Formato de datos del proyecto no válido."
 
 #: js/widgets/aidebugger.js:1097
 msgid "Loading your current project and initializing AI assistant..."
-msgstr ""
+msgstr "Cargando el proyecto actual y preparando el asistente de IA..."
 
 #: js/widgets/aidebugger.js:1108
 msgid "Debugger error: Could not load project data."
@@ -8801,7 +8926,7 @@ msgstr "Error del depurador: No se pudieron cargar los datos del proyecto."
 
 #: js/widgets/aidebugger.js:1113
 msgid "Could not load project data. Starting with basic assistant..."
-msgstr ""
+msgstr "Error al cargar los datos del proyecto. Se iniciará el asistente básico..."
 
 #: js/widgets/aidebugger.js:1132
 msgid "AI Debugger is not available on this host. The backend URL could not be determined."
@@ -8817,43 +8942,43 @@ msgstr "Error del servidor: No se pudo inicializar el depurador de IA."
 
 #: js/widgets/aidebugger.js:1265
 msgid "Hover to see this block in your project"
-msgstr ""
+msgstr "Pasa el ratón por encima para ver este bloque en tu proyecto"
 
 #: js/widgets/aidebugger.js:1385
 msgid "Your project is still loading. Please try again in a moment."
-msgstr ""
+msgstr "Tu proyecto sigue cargándose. Inténtalo de nuevo en un momento."
 
 #: js/widgets/aidebugger.js:1410
 msgid "I'm still working on your last request. Please wait a moment."
-msgstr ""
+msgstr "Sigo trabajando en tu último pedido. Un momento, por favor."
 
 #: js/widgets/aidebugger.js:1430
 msgid "Tell me what to change first, then I can do it for you."
-msgstr ""
+msgstr "Dime qué tengo que cambiar primero y después te ayudo con eso."
 
 #: js/widgets/aidebugger.js:1453
 msgid "I changed your project. Press Undo to go back."
-msgstr ""
+msgstr "Hice cambios en tu proyecto. Pulsa Deshacer para regresar."
 
 #: js/widgets/aidebugger.js:1471
 msgid "Tell me what project to make, for example a drum beat or a song."
-msgstr ""
+msgstr "Dime qué proyecto hacer, por ejemplo un ritmo de batería o una canción."
 
 #: js/widgets/aidebugger.js:1478
 msgid "Make"
-msgstr ""
+msgstr "Macer"
 
 #: js/widgets/aidebugger.js:1479
 msgid "I made a new project. Press Undo to get yours back."
-msgstr ""
+msgstr "Hice un proyecto nuevo. Presiona Deshacer para recuperar el tuyo."
 
 #: js/widgets/aidebugger.js:1534
 msgid "Could not change the project. Please try again."
-msgstr ""
+msgstr "No se ha podido cambiar el proyecto. Inténtalo de nuevo, por favor."
 
 #: js/widgets/aidebugger.js:1611
 msgid "Your project is back to how it was before the change."
-msgstr ""
+msgstr "Tu proyecto está otra vez como antes del cambio."
 
 #: js/widgets/aidebugger.js:1634
 msgid "Conversation reset."
@@ -8877,7 +9002,7 @@ msgstr "Chat borrado."
 
 #: js/widgets/aiwidget.js:233
 msgid "Enter ABC notation containing at least one note."
-msgstr ""
+msgstr "Escribe notación ABC con al menos una nota."
 
 #: js/widgets/aiwidget.js:239
 msgid "New start block generated."
@@ -8885,7 +9010,7 @@ msgstr "Se ha generado un nuevo bloque de inicio."
 
 #: js/widgets/aiwidget.js:249
 msgid "Unable to generate blocks."
-msgstr ""
+msgstr "No se pueden generar bloques."
 
 #: js/widgets/aiwidget.js:346
 msgid "Generate blocks"
@@ -8899,7 +9024,7 @@ msgstr "Establecer clave de API"
 
 #: js/widgets/aiwidget.js:366
 msgid "Enter your Groq API Key:"
-msgstr ""
+msgstr "Introduce tu clave de API de Groq:"
 
 #: js/widgets/aiwidget.js:372
 msgid "Enter your Groq API Key: %s"
@@ -8938,104 +9063,104 @@ msgstr "Haga clic en la cuadrícula para agregar pasos al arpegio."
 #: js/widgets/chordbuilder.js:353
 #: js/widgets/chordbuilder.js:387
 msgid "Mode not supported by chord progression widget. Defaulting to major."
-msgstr ""
+msgstr "El widget de progresión de acordes no admite este modo. Cambiando a mayor por defecto."
 
 #: js/widgets/chordbuilder.js:435
 msgid "The progression is full. Remove a chord before adding another."
-msgstr ""
+msgstr "La progresión está llena. Quita un acorde antes de poner otro."
 
 #: js/widgets/chordbuilder.js:527
 msgid "Cannot save: blocks engine is unavailable."
-msgstr ""
+msgstr "Error al guardar: el motor de bloques no disponible."
 
 #: js/widgets/chordbuilder.js:532
 msgid "Add chords to your progression before saving."
-msgstr ""
+msgstr "Agrega acordes a tu progresión antes de guardarla."
 
 #: js/widgets/chordbuilder.js:651
 msgid "New chord progression blocks generated."
-msgstr ""
+msgstr "Nuevos bloques de progresión de acordes generados."
 
 #: js/widgets/chordbuilder.js:697
 msgid "Key"
-msgstr ""
+msgstr "Clave"
 
 #: js/widgets/chordbuilder.js:707
 msgid "Scale"
-msgstr ""
+msgstr "Escala"
 
 #: js/widgets/chordbuilder.js:723
 msgid "Preset"
-msgstr ""
+msgstr "Preset"
 
 #: js/widgets/chordbuilder.js:735
 msgid "Choose Preset"
-msgstr ""
+msgstr "Elige un preset"
 
 #: js/widgets/chordbuilder.js:766
 msgid "Diatonic Chords"
-msgstr ""
+msgstr "Acordes diatónicos"
 
 #: js/widgets/chordbuilder.js:771
 msgid "Click card to audition · Click + to add"
-msgstr ""
+msgstr "Toca la tarjeta para audicionar · Toca + para agregar"
 
 #: js/widgets/chordbuilder.js:795
 msgid "Progression (bars)"
-msgstr ""
+msgstr "Progression (barras)"
 
 #: js/widgets/chordbuilder.js:806
 msgid "Bars"
-msgstr ""
+msgstr "Barras"
 
 #: js/widgets/chordbuilder.js:830
 msgid "Beats"
-msgstr ""
+msgstr "Ritmos"
 
 #: js/widgets/chordbuilder.js:846
 msgid "Remove chords before reducing the number of beats."
-msgstr ""
+msgstr "Quita los acordes antes de disminuir la cantidad de ritmos."
 
 #: js/widgets/chordbuilder.js:900
 msgid "Save to Canvas"
-msgstr ""
+msgstr "Guardar en el panel"
 
 #: js/widgets/chordbuilder.js:940
 #: js/widgets/chordbuilder.js:1093
 msgid "Click to audition"
-msgstr ""
+msgstr "Haga clic para presentarte"
 
 #: js/widgets/chordbuilder.js:960
 msgid "Add to progression"
-msgstr ""
+msgstr "Añadir a la progresión"
 
 #: js/widgets/chordbuilder.js:1032
 msgid "Bar"
-msgstr ""
+msgstr "Bar"
 
 #: js/widgets/chordbuilder.js:1042
 msgid "Beat"
-msgstr ""
+msgstr "Ritmo"
 
 #: js/widgets/chordbuilder.js:1106
 msgid "Remove chord"
-msgstr ""
+msgstr "Eliminar acorde"
 
 #: js/widgets/chordbuilder.js:1133
 msgid "Click to add chord"
-msgstr ""
+msgstr "Haga clic para agregar acorde"
 
 #: js/widgets/chordbuilder.js:1147
 msgid "pick"
-msgstr ""
+msgstr "elegir"
 
 #: js/widgets/pitchslider.js:73
 msgid "Pitch Slider opened"
-msgstr ""
+msgstr "Deslizante de tono abierto"
 
 #: js/widgets/pitchslider.js:90
 msgid "Pitch Slider closed"
-msgstr ""
+msgstr "Deslizante de tono cerrado"
 
 #: js/widgets/pitchslider.js:290
 msgid "Use the up/down buttons or arrow keys to change pitch."
@@ -9047,76 +9172,76 @@ msgstr "Haga clic en el control deslizante para crear un bloque de notas."
 
 #: js/widgets/plugin-dialog.js:210
 msgid "Load Plugin"
-msgstr ""
+msgstr "Cargar plugin"
 
 #: js/widgets/plugin-dialog.js:216
 msgid "Select a built-in plugin to load, or upload a local file."
-msgstr ""
+msgstr "Selecciona un plugin integrado para cargar, o sube un archivo local."
 
 #: js/widgets/plugin-dialog.js:225
 msgid "Choose built-in plugin..."
-msgstr ""
+msgstr "Seleccionar plugin integrado..."
 
 #: js/widgets/plugin-dialog.js:236
 msgid "Upload File"
-msgstr ""
+msgstr "Subir archivo"
 
 #: js/widgets/plugin-dialog.js:250
 msgid "Load"
-msgstr ""
+msgstr "Cargar"
 
 #: js/widgets/plugin-dialog.js:305
 #: js/widgets/plugin-dialog.js:379
 msgid "Delete Plugin"
-msgstr ""
+msgstr "Eliminar plugin"
 
 #: js/widgets/plugin-dialog.js:311
 msgid "Select the plugin you want to delete:"
-msgstr ""
+msgstr "Elige el plugin que quieres borrar:"
 
 #: js/widgets/plugin-dialog.js:385
 msgid "No custom plugins are currently loaded."
-msgstr ""
+msgstr "No hay plugins personalizados cargados."
 
 #: js/widgets/plugin-dialog.js:393
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: js/widgets/MusicKeyboardEditing.js:585
 msgid "There is no free pitch left to add to the keyboard."
-msgstr ""
+msgstr "No hay más tonos disponibles para el teclado."
 
 #: js/widgets/MusicKeyboardEditing.js:1045
 msgid "Octave 8 (Shift+↑/↓ to shift octaves)"
-msgstr ""
+msgstr "Octava 8 (Shift+↓ para mover octavas)"
 
 #: js/widgets/MusicKeyboardEditing.js:1046
 msgid "Octave 7 (Shift+↑/↓ to shift octaves)"
-msgstr ""
+msgstr "Octava 7 (Shift+↑/↓ para mover octavas)"
 
 #: js/widgets/MusicKeyboardEditing.js:1047
 msgid "Octave 6 (Shift+↑/↓ to shift octaves)"
-msgstr ""
+msgstr "Octava 6 (Shift+↑/↓ para mover octavas)"
 
 #: js/widgets/MusicKeyboardEditing.js:1048
 msgid "Octave 5 (Shift+↑/↓ to shift octaves)"
-msgstr ""
+msgstr "Octava 5 (Shift+↑/↓ para mover octavas)"
 
 #: js/widgets/MusicKeyboardEditing.js:1049
 msgid "Octave 4 (Shift+↑/↓ to shift octaves)"
-msgstr ""
+msgstr "Octava 4 (Shift+↑/↓ para mover octavas)"
 
 #: js/widgets/MusicKeyboardEditing.js:1050
 msgid "Octave 3 (Shift+↑/↓ to shift octaves)"
-msgstr ""
+msgstr "Octava 3 (Shift+↑/↓ para mover octavas)"
 
 #: js/widgets/MusicKeyboardEditing.js:1051
 msgid "Octave 2 (Shift+↑/↓ to shift octaves)"
-msgstr ""
+msgstr "Octava 2 (Shift+↑/↓ para mover octavas)"
 
 #: js/widgets/MusicKeyboardEditing.js:1052
 msgid "Octave 1 (Shift+↑/↓ to shift octaves)"
-msgstr ""
+msgstr "Octava 1 (Shift+↑ para mover octavas)"
 
 #: js/widgets/RhythmRulerEditing.js:90
 #: js/widgets/RhythmRulerEditing.js:272
@@ -9130,11 +9255,11 @@ msgstr "Se ha superado el valor máximo de 256."
 
 #: js/widgets/RhythmRulerLayout.js:69
 msgid "Rhythm Maker opened"
-msgstr ""
+msgstr "Creador de ritmos abierto"
 
 #: js/widgets/RhythmRulerLayout.js:102
 msgid "Rhythm Maker closed"
-msgstr ""
+msgstr "Creador de ritmos cerrado"
 
 #: js/widgets/RhythmRulerLayout.js:144
 msgid "Save rhythms"
@@ -9155,11 +9280,11 @@ msgstr "Vista circular"
 
 #: js/widgets/musickeyboard.js:669
 msgid "Music Keyboard opened"
-msgstr ""
+msgstr "Teclado de música abierto"
 
 #: js/widgets/musickeyboard.js:773
 msgid "Music Keyboard closed"
-msgstr ""
+msgstr "Teclado de música cerrado"
 
 #: js/widgets/musickeyboard.js:823
 #: js/widgets/phrasemaker.js:700
@@ -9172,7 +9297,7 @@ msgstr "Metrónomo"
 
 #: js/widgets/musickeyboard.js:1358
 msgid "No notes to save."
-msgstr ""
+msgstr "Sin notas que guardar."
 
 #: js/widgets/musickeyboard.js:1576
 msgid "New action blocks generated."
@@ -9187,11 +9312,11 @@ msgstr "Nuevo bloques de acción creado."
 #: js/widgets/phrasemaker.js:863
 #: js/widgets/phrasemaker.js:864
 msgid "bell"
-msgstr ""
+msgstr "campanilla"
 
 #: js/widgets/phrasemaker.js:619
 msgid "Phrase Maker opened"
-msgstr ""
+msgstr "matriz de tono abierto"
 
 #: js/widgets/phrasemaker.js:697
 msgid "Sort"
@@ -9203,11 +9328,11 @@ msgstr "Haga clic en la tabla para agregar notas."
 
 #: js/widgets/phrasemaker.js:1265
 msgid "Phrase Maker closed"
-msgstr ""
+msgstr "matriz de tono cerrado"
 
 #: js/widgets/phrasemaker.js:2851
 msgid "Could not open export window. This is often caused by a browser pop-up blocker — check your settings and try again."
-msgstr ""
+msgstr "No se pudo abrir la ventana de exportación. Generalmente se debe a que el navegador está bloqueando las ventanas emergentes; revisa tus ajustes y vuelve a intentarlo."
 
 #: js/widgets/phrasemaker.js:2980
 #: js/widgets/phrasemaker.js:3133
@@ -9220,11 +9345,11 @@ msgstr "Haga clic en la regla para dividirla."
 
 #: js/widgets/status.js:266
 msgid "harmony"
-msgstr ""
+msgstr "harmonía"
 
 #: js/widgets/status.js:868
 msgid "notes"
-msgstr ""
+msgstr "notas"
 
 #: js/widgets/status.js:869
 msgid "interval"
@@ -9233,61 +9358,61 @@ msgstr "intervalo"
 #: js/widgets/status.js:871
 #.TRANS: the frequency ratio of the interval in just intonation, e.g. 5:4
 msgid "just ratio"
-msgstr ""
+msgstr "proporción de entonación justa"
 
 #: js/widgets/status.js:873
 #.TRANS: the frequency ratio of the interval as it is actually played
 msgid "played ratio"
-msgstr ""
+msgstr "proporción de juego"
 
 #: js/widgets/status.js:875
 #.TRANS: how far the played interval is from its just-intonation ratio, in cents
 msgid "cents from just"
-msgstr ""
+msgstr "cents respecto a la entonación justa"
 
 #: js/widgets/status.js:877
 #.TRANS: whether an interval above the bass is a perfect or imperfect consonance, or a dissonance
 msgid "consonance"
-msgstr ""
+msgstr "consonancia"
 
 #: js/widgets/status.js:891
 #.TRANS: an imperfect consonance: a third or a sixth
 msgid "imperfect"
-msgstr ""
+msgstr "imperfecto"
 
 #: js/widgets/status.js:893
 #.TRANS: a dissonant interval, e.g. a second, a seventh, or a fourth above the bass
 msgid "dissonant"
-msgstr ""
+msgstr "disonante"
 
 #: js/widgets/status.js:921
 #.TRANS: two voices moving in the same direction a perfect fifth apart
 msgid "parallel fifths"
-msgstr ""
+msgstr "quintas paralelas"
 
 #: js/widgets/status.js:923
 #.TRANS: two voices moving in the same direction an octave apart
 msgid "parallel octaves"
-msgstr ""
+msgstr "octavas paralelas"
 
 #: js/widgets/status.js:925
 #.TRANS: two voices moving in the same direction on the same note
 msgid "parallel unisons"
-msgstr ""
+msgstr "unísonos paralelos"
 
 #: js/widgets/status.js:929
 #.TRANS: the outer voices move the same way into a fifth, the upper one by a leap
 msgid "hidden fifths"
-msgstr ""
+msgstr "quintas ocultas"
 
 #: js/widgets/status.js:931
 #.TRANS: the outer voices move the same way into an octave, the upper one by a leap
 msgid "hidden octaves"
-msgstr ""
+msgstr "octavas ocultas"
 
 #: js/widgets/widgetWindows.js:527
 msgid "Window controls"
-msgstr ""
+msgstr "Controles de ventana"
 
 #: js/widgets/widgetWindows.js:549
 #: js/widgets/widgetWindows.js:560
@@ -9315,11 +9440,11 @@ msgstr "Maximizar ventana"
 
 #: js/widgets/widgetWindows.js:664
 msgid "Widget toolbar"
-msgstr ""
+msgstr "Barra de herramientas de widgets"
 
 #: js/widgets/widgetWindows.js:1283
 msgid "Expand window"
-msgstr ""
+msgstr "Ampliar ventana"
 
 #: js/widgets/tempo.js:189
 msgid "Adjust the tempo with the buttons."
@@ -9371,71 +9496,6 @@ msgstr "juego"
 msgid "Code Snippet"
 msgstr "fragmento de código"
 
-#: planet/js/GlobalPlanet.js:37
-msgid "No results found."
-msgstr "No se han encontrado resultados."
-
-#: planet/js/GlobalPlanet.js:54
-msgid "Remix of"
-msgstr "Remix de"
-
-#: planet/js/GlobalPlanet.js:381
-msgid "Could not load project. Please check your connection and try again."
-msgstr ""
-
-#: planet/js/GlobalPlanet.js:735
-msgid "Cannot connect to server"
-msgstr "No es posible conectar con el servidor."
-
-#: planet/js/SaveInterface.js:34
-#: planet/js/GlobalCard.js:60
-msgid "Open in Music Blocks"
-msgstr "Abrir en Bloques de Música"
-
-#: planet/js/SaveInterface.js:37
-msgid "Open in Turtle Blocks"
-msgstr "Abierto en TortuBloques"
-
-#: planet/js/LocalCard.js:37
-msgid "View published project"
-msgstr "Ver proyecto publicado"
-
-#: planet/js/LocalCard.js:42
-msgid "Being tracked"
-msgstr ""
-
-#: planet/js/LocalCard.js:54
-#: planet/js/ProjectViewer.js:92
-#: planet/js/GlobalCard.js:44
-msgid "Project thumbnail"
-msgstr ""
-
-#: planet/js/LocalCard.js:57
-#: planet/js/Publisher.js:236
-#: planet/js/StringHelper.js:37
-msgid "Publish project"
-msgstr "Publicar proyecto"
-
-#: planet/js/LocalCard.js:63
-msgid "Project name"
-msgstr ""
-
-#: planet/js/LocalCard.js:70
-msgid "Edit project"
-msgstr "Editar proyecto"
-
-#: planet/js/LocalCard.js:73
-msgid "Delete project"
-msgstr "Borrar proyecto"
-
-#: planet/js/LocalCard.js:76
-msgid "Download project"
-msgstr "Descargar proyecto"
-
-#: planet/js/LocalCard.js:82
-msgid "Duplicate project"
-msgstr "Duplucar proyecto"
-
 #: planet/js/ProjectStorage.js:541
 msgid "anonymous"
 msgstr "anónimo"
@@ -9449,14 +9509,14 @@ msgid "Thank you for reporting this project. A moderator will review the project
 msgstr "Gracias por reportar este proyecto. Un moderador revisará el proyecto en breve para verificar la violación del Código de conducta de Sugar Labs."
 
 #: planet/js/ProjectViewer.js:33
-#: planet/js/StringHelper.js:64
-#: planet/js/StringHelper.js:66
-#: planet/js/StringHelper.js:75
+#: planet/js/StringHelper.js:68
+#: planet/js/StringHelper.js:70
+#: planet/js/StringHelper.js:79
 msgid "Report Project"
 msgstr "Informe de proyecto"
 
 #: planet/js/ProjectViewer.js:34
-#: planet/js/StringHelper.js:65
+#: planet/js/StringHelper.js:69
 msgid "Project Reported"
 msgstr "Proyecto informado"
 
@@ -9468,13 +9528,24 @@ msgstr "Descripción requerida"
 msgid "Report description too long"
 msgstr "La descripción es demasiado larga."
 
+#: planet/js/ProjectViewer.js:92
+#: planet/js/GlobalCard.js:44
+#: planet/js/LocalCard.js:54
+msgid "Project thumbnail"
+msgstr "Miniatura del proyecto"
+
 #: planet/js/GlobalCard.js:57
 msgid "More Details"
 msgstr "Más detalles"
 
+#: planet/js/GlobalCard.js:60
+#: planet/js/SaveInterface.js:34
+msgid "Open in Music Blocks"
+msgstr "Abrir en Bloques de Música"
+
 #: planet/js/GlobalCard.js:63
 msgid "Remix project"
-msgstr ""
+msgstr "Proyecto remix"
 
 #: planet/js/GlobalCard.js:74
 msgid "Share project"
@@ -9506,10 +9577,10 @@ msgstr "Opciones avanzadas"
 
 #: planet/js/GlobalCard.js:218
 #: planet/js/GlobalCard.js:219
-#: planet/js/StringHelper.js:51
-#: planet/js/helper.js:187
+#: planet/js/StringHelper.js:55
+#: planet/js/helper.js:188
 msgid "Show all tags"
-msgstr ""
+msgstr "Mostrar todos los tags"
 
 #: planet/js/GlobalCard.js:387
 msgid "Link copied to clipboard!"
@@ -9533,7 +9604,13 @@ msgstr "Característica no disponible: no se puede conectar al servidor. Vuelve 
 
 #: planet/js/Publisher.js:236
 msgid "Republish project"
-msgstr ""
+msgstr "Re-publicar proyecto"
+
+#: planet/js/Publisher.js:236
+#: planet/js/LocalCard.js:57
+#: planet/js/StringHelper.js:37
+msgid "Publish project"
+msgstr "Publicar proyecto"
 
 #: planet/js/Publisher.js:275
 #: planet/js/Publisher.js:292
@@ -9555,6 +9632,74 @@ msgstr "Error del Servidor"
 #: planet/js/Publisher.js:546
 msgid "Try Again"
 msgstr "Inténtalo de nuevo"
+
+#: planet/js/GlobalPlanet.js:37
+msgid "No results found."
+msgstr "No se han encontrado resultados."
+
+#: planet/js/GlobalPlanet.js:54
+msgid "Remix of"
+msgstr "Remix de"
+
+#: planet/js/GlobalPlanet.js:391
+msgid "Could not load project. Please check your connection and try again."
+msgstr "Error al cargar el proyecto. Revisa tu conexión y vuelve a intentarlo."
+
+#: planet/js/GlobalPlanet.js:771
+msgid "Cannot connect to server"
+msgstr "No es posible conectar con el servidor."
+
+#: planet/js/LocalCard.js:37
+msgid "View published project"
+msgstr "Ver proyecto publicado"
+
+#: planet/js/LocalCard.js:42
+msgid "Being tracked"
+msgstr "Siendo rastreado"
+
+#: planet/js/LocalCard.js:63
+msgid "Project name"
+msgstr "Nombre de proyecto"
+
+#: planet/js/LocalCard.js:70
+msgid "Edit project"
+msgstr "Editar proyecto"
+
+#: planet/js/LocalCard.js:73
+msgid "Delete project"
+msgstr "Borrar proyecto"
+
+#: planet/js/LocalCard.js:76
+msgid "Download project"
+msgstr "Descargar proyecto"
+
+#: planet/js/LocalCard.js:82
+msgid "Duplicate project"
+msgstr "Duplucar proyecto"
+
+#: planet/js/LocalCard.js:133
+msgid "You do not have permission to unpublish this project from this browser."
+msgstr "No tienes permiso para quitar la publicación de este proyecto en este navegador."
+
+#: planet/js/LocalCard.js:144
+msgid "Could not unpublish project. Please try again."
+msgstr "No pudimos despublicar el proyecto. Por favor, vuelve a intentarlo."
+
+#: planet/js/LocalCard.js:175
+msgid "Project unpublished."
+msgstr "Proyecto no publicado"
+
+#: planet/js/LocalCard.js:179
+msgid "Project unpublished, but the change could not be saved on this device."
+msgstr "El proyecto no está publicado, pero no se pudo guardar el cambio en este dispositivo."
+
+#: planet/js/LocalCard.js:251
+msgid "Unpublish project"
+msgstr "Despublicar proyecto"
+
+#: planet/js/SaveInterface.js:37
+msgid "Open in Turtle Blocks"
+msgstr "Abierto en TortuBloques"
 
 #: planet/js/StringHelper.js:30
 msgid "Close Planet"
@@ -9581,12 +9726,12 @@ msgid "Tags (max 5)"
 msgstr "Etiquetas (max 5)"
 
 #: planet/js/StringHelper.js:40
-#: planet/js/StringHelper.js:63
+#: planet/js/StringHelper.js:67
 msgid "Description"
 msgstr "Descripción"
 
 #: planet/js/StringHelper.js:41
-#: planet/js/StringHelper.js:74
+#: planet/js/StringHelper.js:78
 msgid "Submit"
 msgstr "Presentar"
 
@@ -9599,66 +9744,78 @@ msgid "Permanently delete project \"<span id=\"deleter-name\"></span>\"?"
 msgstr "Eliminar proyecto permanentemente \"<span id=\"deleter-name\"></span>\"?"
 
 #: planet/js/StringHelper.js:50
+msgid "Unpublish project?"
+msgstr "¿Despublicar proyecto?"
+
+#: planet/js/StringHelper.js:51
+msgid "This project will no longer appear in public listings."
+msgstr "Este proyecto ya no saldrá en las listas públicas."
+
+#: planet/js/StringHelper.js:52
+msgid "Unpublish"
+msgstr "Despublicar"
+
+#: planet/js/StringHelper.js:54
 msgid "Explore Projects"
 msgstr "Explorar proyectos"
 
-#: planet/js/StringHelper.js:52
+#: planet/js/StringHelper.js:56
 msgid "Most recent"
 msgstr "Más reciente"
 
-#: planet/js/StringHelper.js:53
+#: planet/js/StringHelper.js:57
 msgid "Most liked"
 msgstr "Más gustado"
 
-#: planet/js/StringHelper.js:54
+#: planet/js/StringHelper.js:58
 msgid "Most downloaded"
 msgstr "Más descargados"
 
-#: planet/js/StringHelper.js:55
+#: planet/js/StringHelper.js:59
 msgid "A-Z"
 msgstr "A-Z"
 
-#: planet/js/StringHelper.js:56
+#: planet/js/StringHelper.js:60
 msgid "Sort by"
 msgstr "Ordenar por"
 
-#: planet/js/StringHelper.js:57
+#: planet/js/StringHelper.js:61
 msgid "Load More Projects"
 msgstr "Cargar más proyectos"
 
-#: planet/js/StringHelper.js:58
+#: planet/js/StringHelper.js:62
 msgid "Last Updated"
 msgstr "Ultima actualización"
 
-#: planet/js/StringHelper.js:59
+#: planet/js/StringHelper.js:63
 msgid "Creation Date"
 msgstr "Fecha de creación"
 
-#: planet/js/StringHelper.js:60
+#: planet/js/StringHelper.js:64
 msgid "Number of Downloads:"
 msgstr "Numero de descargas:"
 
-#: planet/js/StringHelper.js:61
+#: planet/js/StringHelper.js:65
 msgid "Number of Likes:"
 msgstr "Número de me gusta:"
 
-#: planet/js/StringHelper.js:62
+#: planet/js/StringHelper.js:66
 msgid "Tags:"
 msgstr "Etiquetas:"
 
-#: planet/js/StringHelper.js:69
+#: planet/js/StringHelper.js:73
 msgid "Report projects which violate the <a href=\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\" target=\"_blank\" rel=\"noopener noreferrer\">Sugar Labs Code of Conduct</a>."
 msgstr "Reporte los proyectos que infrinjan el <a href=\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\" target=\"_blank\" rel=\"noopener noreferrer\">Sugar Labs Código de Conducta</a>."
 
-#: planet/js/StringHelper.js:73
+#: planet/js/StringHelper.js:77
 msgid "Reason for reporting project"
 msgstr "Razón para informar el proyecto"
 
-#: planet/js/StringHelper.js:77
+#: planet/js/StringHelper.js:81
 msgid "Download as File"
 msgstr "Descargar como archivo"
 
-#: planet/js/helper.js:188
+#: planet/js/helper.js:189
 msgid "Show fewer tags"
 msgstr "Mostrar menos etiquetas"
 
@@ -9878,6 +10035,11 @@ msgstr "baja"
 #: plugins/facebook.rtp:27
 msgid "publish"
 msgstr "publicar"
+
+#: js/activity.js:2475
+
+#~msgid "Could not load plugin: "
+#~msgstr "No se pudo cargar el complemento: "
 
 #: js/keyboard-controller.js:165
 

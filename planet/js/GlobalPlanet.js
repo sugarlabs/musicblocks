@@ -463,7 +463,6 @@ class GlobalPlanet {
             return;
         }
 
-        jQuery(".tooltipped").tooltip({ delay: 50 });
         this.afterAddProjects();
         return true;
     }

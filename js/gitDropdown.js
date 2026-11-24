@@ -661,14 +661,13 @@ class GitDropdownUI {
         // OS network interface changes — no fetch needed, no waiting.
         // If the device has no network right now, skip straight to offline draft.
         if (this._isOffline()) {
-            await this._saveOfflineDraft(
+            return this._saveOfflineDraft(
                 repoName,
                 hashedKey,
                 projectData,
                 commitMessage,
                 projectId
             );
-            return;
         }
 
         // ── Step 2: attempt the commit, abort instantly if network drops ──────
@@ -700,7 +699,7 @@ class GitDropdownUI {
                 const err = await res.json().catch(() => ({}));
                 if (res.status === 401 || res.status === 403) {
                     this._showToast("You don't have permission to save this project.", "error");
-                    return;
+                    return false;
                 }
                 throw new Error(err.message || `HTTP ${res.status}`);
             }
@@ -710,6 +709,7 @@ class GitDropdownUI {
             localStorage.removeItem(this._projectKey("mbGitCurrentDraftId", projectId));
             this._prefetchCommits(); // Refresh cache after a new commit
             this._showToast("Moment saved! ✔", "success");
+            return true;
         } catch (e) {
             window.removeEventListener("offline", abortOnOffline);
 
@@ -725,7 +725,7 @@ class GitDropdownUI {
                     "[GitDropdownUI] Network lost during commit — saving offline draft.",
                     e
                 );
-                await this._saveOfflineDraft(
+                return this._saveOfflineDraft(
                     repoName,
                     hashedKey,
                     projectData,
@@ -739,6 +739,7 @@ class GitDropdownUI {
                     "Could not save this moment — the server returned an error.",
                     "error"
                 );
+                return false;
             }
         }
     }
@@ -760,7 +761,7 @@ class GitDropdownUI {
         const planetIframe = document.getElementById("planet-iframe");
         if (!planetIframe || !planetIframe.contentWindow) {
             this._showToast("Could not save offline — planet frame unavailable.", "error");
-            return;
+            return false;
         }
 
         planetIframe.contentWindow.postMessage(
@@ -783,6 +784,7 @@ class GitDropdownUI {
             if (result.success) {
                 this.onSaveLocally(projectId);
                 this._showToast("Saved offline ✔ — will sync when you reconnect.", "success");
+                return true;
             } else if (result.error === "OFFLINE_DRAFT_CAP_REACHED") {
                 this._showToast(
                     "You've reached 5 offline saves. Connect to the internet to sync first.",
@@ -803,6 +805,7 @@ class GitDropdownUI {
             console.error("[GitDropdownUI] offline commit bridge timeout:", e);
             this._showToast("Offline save timed out — please try again.", "error");
         }
+        return false;
     }
 
     async _showHistoryPanel() {
@@ -872,7 +875,7 @@ class GitDropdownUI {
                             .filter(c => c.status === "synced")
                             .map(c => ({
                                 sha: c.sha || null,
-                                message: c.message || "Saved moment",
+                                message: c.message || _("Saved moment"),
                                 date: c.date || new Date().toISOString(),
                                 projectData: c.projectData || null
                             }));
@@ -890,8 +893,8 @@ class GitDropdownUI {
             if (isOfflineHistory && !repoName) {
                 // Truly no registration at all — this shouldn't happen but guard it
                 await window.MBDialog.alert(
-                    "You're offline. Connect to the network to view commits for this project.",
-                    "Network Connection Required"
+                    _("You're offline. Connect to the network to view commits for this project."),
+                    _("Network Connection Required")
                 );
                 return;
             }
@@ -904,8 +907,8 @@ class GitDropdownUI {
             }
             // Online but genuinely empty — prompt the student to save
             await window.MBDialog.alert(
-                'No moments marked yet. Click "Mark this moment" to save your first one!',
-                "No Saved Moments Yet"
+                _('No moments marked yet. Click "Mark this moment" to save your first one!'),
+                _("No Saved Moments Yet")
             );
             return;
         }
@@ -936,7 +939,7 @@ class GitDropdownUI {
         frame.className = "windowFrame git-history-panel git-tt-frame";
         frame.setAttribute("role", "dialog");
         frame.setAttribute("aria-modal", "true");
-        frame.setAttribute("aria-label", "Time Travel");
+        frame.setAttribute("aria-label", _("Time Travel"));
         frame.style.cssText =
             "position:fixed;width:580px;max-width:94vw;max-height:88vh;" +
             "z-index:10001;display:flex;flex-direction:column;overflow:hidden;";
@@ -947,7 +950,7 @@ class GitDropdownUI {
 
         const closeBtn = document.createElement("button");
         closeBtn.className = "wftButton close";
-        closeBtn.setAttribute("aria-label", "Close");
+        closeBtn.setAttribute("aria-label", _("Close"));
         closeBtn.innerHTML = "&times;";
 
         const titleWrap = document.createElement("div");
@@ -966,10 +969,10 @@ class GitDropdownUI {
         const titleText = document.createElement("div");
         const titleH = document.createElement("span");
         titleH.className = "git-tt-title";
-        titleH.textContent = "Time Travel";
+        titleH.textContent = _("Time Travel");
         const titleSub = document.createElement("span");
         titleSub.className = "git-tt-subtitle";
-        titleSub.textContent = "Every save, forever yours ✦";
+        titleSub.textContent = _("Every save, forever yours") + " ✦";
         titleText.appendChild(titleH);
         titleText.appendChild(titleSub);
 
@@ -1088,7 +1091,7 @@ class GitDropdownUI {
             if (isNow) {
                 const badge = document.createElement("div");
                 badge.className = "git-tt-you-here";
-                badge.textContent = "YOU ARE HERE";
+                badge.textContent = _("YOU ARE HERE");
                 node.appendChild(badge);
             }
 
@@ -1114,13 +1117,14 @@ class GitDropdownUI {
                     ` stroke-linecap="round" stroke-linejoin="round" width="10" height="10">` +
                     `<path d="M1 4v6h6M23 20v-6h-6"/>` +
                     `<path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/>` +
-                    `</svg> Sync Pending`;
+                    `</svg>`;
+                syncBadge.appendChild(document.createTextNode(" " + _("Sync Pending")));
                 msgEl.appendChild(syncBadge);
             } else if (idx - visibleCommits.filter(c => c._pending).length === 0) {
                 // "Latest" badge on the first non-pending commit
                 const latestBadge = document.createElement("span");
                 latestBadge.className = "git-tt-latest-badge";
-                latestBadge.textContent = "Latest";
+                latestBadge.textContent = _("Latest");
                 msgEl.appendChild(latestBadge);
             }
 
@@ -1132,7 +1136,8 @@ class GitDropdownUI {
                 // "Undo my changes" — lets student discard unsaved edits and restore to this save
                 const clearBtn = document.createElement("button");
                 clearBtn.className = "git-tt-clear-btn";
-                clearBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg> Undo my changes`;
+                clearBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>`;
+                clearBtn.appendChild(document.createTextNode(" " + _("Undo my changes")));
                 clearBtn.addEventListener("click", () => {
                     close();
                     this._clearChanges(commit, commit.message);
@@ -1141,7 +1146,8 @@ class GitDropdownUI {
             } else {
                 const btn = document.createElement("button");
                 btn.className = "git-tt-go-btn";
-                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Go back to this version`;
+                btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`;
+                btn.appendChild(document.createTextNode(" " + _("Go back to this version")));
                 btn.addEventListener("click", () => {
                     close();
                     this._confirmTimeTravel(commit, commit.message);
@@ -1190,7 +1196,7 @@ class GitDropdownUI {
                 flagNode.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="#5d4000" width="32" height="32"><path d="M210.3,56.34l-80-24A8,8,0,0,0,120,40V148.26A48,48,0,1,0,136,184V98.75l69.7,20.91A8,8,0,0,0,216,112V64A8,8,0,0,0,210.3,56.34ZM88,216a32,32,0,1,1,32-32A32,32,0,0,1,88,216ZM200,101.25l-64-19.2V50.75L200,70Z"/></svg>`;
                 const badge = document.createElement("div");
                 badge.className = "git-tt-you-here";
-                badge.textContent = "YOU ARE HERE";
+                badge.textContent = _("YOU ARE HERE");
                 flagNode.appendChild(badge);
             } else {
                 flagNode.className = "git-tt-node c-grey";
@@ -1204,18 +1210,18 @@ class GitDropdownUI {
             // must be a separate element, not nested inside flagMsgEl.
             const flagNote = document.createElement("div");
             flagNote.className = "git-tt-flag-note";
-            flagNote.textContent = "The very beginning";
+            flagNote.textContent = _("The very beginning");
 
             const flagMsgEl = document.createElement("div");
             flagMsgEl.className = "git-tt-msg";
-            flagMsgEl.textContent = "Where your project started ✦";
+            flagMsgEl.textContent = _("Where your project started") + " ✦";
 
             // Show "Setting Up Tracking" badge on the origin flag when the
             // project itself was created offline and the GitHub repo hasn't been created yet.
             if (isRepoPending) {
                 const repoNote = document.createElement("span");
                 repoNote.className = "git-tt-sync-pending-badge";
-                repoNote.textContent = "Setting Up Tracking";
+                repoNote.textContent = _("Setting Up Tracking");
                 flagMsgEl.appendChild(repoNote);
             }
 
@@ -1225,19 +1231,21 @@ class GitDropdownUI {
                 // Only show the Undo my changes button — no "your song right now" chip
                 const clearOriginBtn = document.createElement("button");
                 clearOriginBtn.className = "git-tt-clear-btn";
-                clearOriginBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg> Undo my changes`;
+                clearOriginBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>`;
+                clearOriginBtn.appendChild(document.createTextNode(" " + _("Undo my changes")));
                 clearOriginBtn.addEventListener("click", () => {
                     close();
-                    this._clearChanges(originTarget || "origin", "Start point");
+                    this._clearChanges(originTarget || "origin", _("Start point"));
                 });
                 flagBtnRow.appendChild(clearOriginBtn);
             } else if (originTarget) {
                 const flagBtn = document.createElement("button");
                 flagBtn.className = "git-tt-go-btn";
-                flagBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Go back to this version`;
+                flagBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`;
+                flagBtn.appendChild(document.createTextNode(" " + _("Go back to this version")));
                 flagBtn.addEventListener("click", () => {
                     close();
-                    this._confirmTimeTravel(originTarget, "Start point");
+                    this._confirmTimeTravel(originTarget, _("Start point"));
                 });
                 flagBtnRow.appendChild(flagBtn);
             }
@@ -1261,10 +1269,10 @@ class GitDropdownUI {
             const remaining = Math.max(0, OFFLINE_CAP - pendingCount);
             const remainingText =
                 remaining === 0
-                    ? "no more offline commits can be made"
+                    ? _("no more offline commits can be made")
                     : remaining === 1
-                      ? "1 more commit can be made"
-                      : `${remaining} more commits can be made`;
+                      ? _("1 more commit can be made")
+                      : _("%s more commits can be made").replace(/%s/g, remaining);
 
             const banner = document.createElement("div");
             banner.style.cssText =
@@ -1273,7 +1281,12 @@ class GitDropdownUI {
             banner.innerHTML =
                 `<svg viewBox="0 0 24 24" fill="white" width="14" height="14" style="flex-shrink:0">` +
                 `<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>` +
-                `</svg>Showing locally saved drafts &nbsp;·&nbsp; ${remainingText}`;
+                `</svg>`;
+            banner.appendChild(
+                document.createTextNode(
+                    `${_("Showing locally saved drafts")} \u00a0·\u00a0 ${remainingText}`
+                )
+            );
             frame.appendChild(banner);
         }
         frame.appendChild(body);
@@ -1467,7 +1480,12 @@ class GitDropdownUI {
                         cancelText: "Cancel"
                     });
                     if (msg === null) return;
-                    await this._doCommit(repoName, this._getHashedKey(), msg.trim() || defaultMsg);
+                    const saved = await this._doCommit(
+                        repoName,
+                        this._getHashedKey(),
+                        msg.trim() || defaultMsg
+                    );
+                    if (!saved) return;
                 }
                 await this._restoreCommit(commitTarget, commitMessage);
             },
@@ -1523,7 +1541,12 @@ class GitDropdownUI {
                     cancelText: "Cancel"
                 });
                 if (userMsg === null) return;
-                await this._doCommit(repoName, this._getHashedKey(), userMsg.trim() || defaultMsg);
+                const saved = await this._doCommit(
+                    repoName,
+                    this._getHashedKey(),
+                    userMsg.trim() || defaultMsg
+                );
+                if (!saved) return;
             }
             await this._restoreCommit(commitTarget, commitMessage);
         });
@@ -1768,14 +1791,16 @@ class GitDropdownUI {
         try {
             const diff = Date.now() - new Date(isoDate).getTime();
             const minutes = Math.floor(diff / 60000);
-            if (minutes < 1) return "Just now";
-            if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+            // One string per unit and plural, so each can be translated whole.
+            const ago = (n, one, many) => (n === 1 ? one : many.replace(/%s/g, n));
+            if (minutes < 1) return _("Just now");
+            if (minutes < 60) return ago(minutes, _("1 minute ago"), _("%s minutes ago"));
             const hours = Math.floor(minutes / 60);
-            if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+            if (hours < 24) return ago(hours, _("1 hour ago"), _("%s hours ago"));
             const days = Math.floor(hours / 24);
-            if (days < 30) return `${days} day${days === 1 ? "" : "s"} ago`;
+            if (days < 30) return ago(days, _("1 day ago"), _("%s days ago"));
             const months = Math.floor(days / 30);
-            return `${months} month${months === 1 ? "" : "s"} ago`;
+            return ago(months, _("1 month ago"), _("%s months ago"));
         } catch (e) {
             return "";
         }
