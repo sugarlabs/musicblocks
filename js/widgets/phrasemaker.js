@@ -1245,6 +1245,10 @@ class PhraseMaker {
             this._lyricsInputs = [];
         }
 
+        if (this.activity) {
+            this.activity.isInputON = false;
+        }
+
         if (this.activity && this.activity.logo && this.activity.logo.synth) {
             this.activity.logo.synth.stopSound(0, this._instrumentName);
             this.activity.logo.synth.stop();

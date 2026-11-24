@@ -1164,6 +1164,24 @@ class WidgetWindow {
                     canvas.focus();
                 }
             }
+
+            try {
+                let act = null;
+                if (
+                    typeof window !== "undefined" &&
+                    window.ActivityContext &&
+                    typeof window.ActivityContext.getActivity === "function"
+                ) {
+                    act = window.ActivityContext.getActivity();
+                } else if (typeof globalActivity !== "undefined" && globalActivity) {
+                    act = globalActivity;
+                }
+                if (act && typeof act.isInputON !== "undefined") {
+                    act.isInputON = false;
+                }
+            } catch (e) {
+                // Ignore if ActivityContext is not initialized
+            }
         }
     }
 
