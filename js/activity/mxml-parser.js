@@ -687,6 +687,11 @@ function _tempoChanges(partEls) {
 // a singer reads -- so begin/middle syllables get one and end/single don't.
 const _MXML_SYLLABIC_HYPHEN = new Set(["begin", "middle"]);
 
+// An empty <elision/> leaves the symbol to the application (MusicXML 4.0).
+// The undertie is the usual one, and it keeps the two syllables apart instead
+// of joining them into what reads as a single word.
+const _MXML_DEFAULT_ELISION = "‿";
+
 // Verse numbers are strings in MusicXML ("1", "2", ...), so order them
 // numerically: a score with ten verses reads 1, 2, 10, not 1, 10, 2.
 const _byVerseNumber = (a, b) => a.number.localeCompare(b.number, undefined, { numeric: true });
@@ -695,10 +700,12 @@ const _byVerseNumber = (a, b) => a.number.localeCompare(b.number, undefined, { n
  * A note's <lyric> lines, one per verse, in verse-number order.
  *
  * A <lyric> carries one syllable; <syllabic> says whether that syllable
- * begins, continues, or ends a word (or stands alone). An empty <text> is a
- * melisma continuation (<extend/>) or an empty verse slot, so it adds no line
- * rather than a blank print. A <lyric> with no number is verse 1, MusicXML's
- * own default.
+ * begins, continues, or ends a word (or stands alone). An <elision> joins
+ * another syllable onto the same note, and each elided syllable may carry its
+ * own <syllabic>, so the last one decides whether the word goes on to the next
+ * note. An empty <text> is a melisma continuation (<extend/>) or an empty
+ * verse slot, so it adds no line rather than a blank print. A <lyric> with no
+ * number is verse 1, MusicXML's own default.
  *
  * @param {Element} noteEl - a MusicXML <note> element
  * @returns {Array<{number: string, text: string}>}
@@ -706,14 +713,16 @@ const _byVerseNumber = (a, b) => a.number.localeCompare(b.number, undefined, { n
 function _lyricTexts(noteEl) {
     const lines = [];
     for (const lyricEl of noteEl.querySelectorAll(":scope > lyric")) {
-        const raw = Array.from(
-            lyricEl.querySelectorAll(":scope > text, :scope > elision"),
-            textEl => textEl.textContent
+        const raw = Array.from(lyricEl.querySelectorAll(":scope > text, :scope > elision"), el =>
+            el.localName === "elision" && el.textContent === ""
+                ? _MXML_DEFAULT_ELISION
+                : el.textContent
         )
             .join("")
             .trim();
         if (raw === "") continue;
-        const syllabic = (_text(lyricEl, "syllabic") ?? "").trim();
+        const syllabics = lyricEl.querySelectorAll(":scope > syllabic");
+        const syllabic = (syllabics[syllabics.length - 1]?.textContent ?? "").trim();
         const text = _MXML_SYLLABIC_HYPHEN.has(syllabic) && !raw.endsWith("-") ? `${raw}-` : raw;
         lines.push({ number: lyricEl.getAttribute("number") ?? "1", text });
     }
