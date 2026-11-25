@@ -1770,6 +1770,8 @@ class Palette {
             .filter(Boolean)
             .map(panel => panel.getBoundingClientRect());
         const scale = blocks.blockScale / DEFAULTBLOCKSCALE;
+        const acceptedRects = [];
+        document.body.appendChild(overlay);
         for (const target of targets) {
             const block = blocks.blockList[target.targetBlock];
             const dock = block.docks[target.connectionIndex];
@@ -1779,22 +1781,6 @@ class Palette {
             );
             const left = rect.left + (point.x * rect.width) / canvas.width;
             const top = rect.top + (point.y * rect.height) / canvas.height;
-            const overlapsPalette = paletteRects.some(
-                panel =>
-                    left < panel.right &&
-                    left + 64 > panel.left &&
-                    top < panel.bottom &&
-                    top + 48 > panel.top
-            );
-            if (
-                overlapsPalette ||
-                left < rect.left ||
-                left > rect.right - 64 ||
-                top < rect.top ||
-                top > rect.bottom - 48
-            ) {
-                continue;
-            }
             const button = document.createElement("button");
             button.type = "button";
             const previewLabel = _(preview.staticLabels?.[0] || preview.name || preview.blkname);
@@ -1823,6 +1809,25 @@ class Palette {
             const ghost = img.cloneNode();
             ghost.style.cssText = "display:block;opacity:0.55;pointer-events:none";
             button.appendChild(ghost);
+            overlay.appendChild(button);
+            const buttonRect = button.getBoundingClientRect();
+            const intersects = other =>
+                buttonRect.left < other.right &&
+                buttonRect.right > other.left &&
+                buttonRect.top < other.bottom &&
+                buttonRect.bottom > other.top;
+            if (
+                buttonRect.left < rect.left ||
+                buttonRect.right > rect.right ||
+                buttonRect.top < rect.top ||
+                buttonRect.bottom > rect.bottom ||
+                paletteRects.some(intersects) ||
+                acceptedRects.some(intersects)
+            ) {
+                button.remove();
+                continue;
+            }
+            acceptedRects.push(buttonRect);
             button.onclick = event => {
                 event.stopPropagation();
                 cancel();
@@ -1847,13 +1852,11 @@ class Palette {
                     newBlock => this._placeAtDock(newBlock, target)
                 );
             };
-            overlay.appendChild(button);
         }
         if (!overlay.childElementCount) {
             cancel();
             return false;
         }
-        document.body.appendChild(overlay);
         document.addEventListener("pointerdown", outside, true);
         document.addEventListener("keydown", escape);
         window.addEventListener("resize", cancel);
@@ -1930,6 +1933,7 @@ class Palette {
                 if (event.button > 0 || (event.touches && event.touches.length !== 1)) return;
                 this.palettes._cancelPlacement?.();
                 const first = event.touches?.[0] || event;
+                const touchId = event.type === "touchstart" ? first.identifier : null;
                 const startX = first.pageX ?? first.clientX;
                 const startY = first.pageY ?? first.clientY;
                 let dragged = false;
@@ -1985,6 +1989,14 @@ class Palette {
                 const that = this;
                 let cancel;
                 const up = (event, cancelled = false) => {
+                    if (
+                        touchId !== null &&
+                        event?.type?.startsWith("touch") &&
+                        !Array.from(event.changedTouches || []).some(
+                            touch => touch.identifier === touchId
+                        )
+                    )
+                        return;
                     document.body.style.cursor = "default";
                     document.removeEventListener("mousemove", onMouseMove);
                     document.removeEventListener("touchmove", onMouseMove);
@@ -2030,7 +2042,7 @@ class Palette {
                             that.activity.blocksContainer.y
                     );
                 };
-                cancel = () => up(null, true);
+                cancel = event => up(event, true);
 
                 document.addEventListener("mouseup", up);
                 document.addEventListener("touchend", up);

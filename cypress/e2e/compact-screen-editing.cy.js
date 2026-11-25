@@ -86,7 +86,19 @@ describe("Compact-screen editing", () => {
                         win.document.dispatchEvent(
                             new win.TouchEvent("touchmove", { touches: [end] })
                         );
-                        win.document.dispatchEvent(new win.TouchEvent("touchend"));
+                        const other = new win.Touch({
+                            identifier: 2,
+                            target: $img[0],
+                            clientX: 215,
+                            clientY: 190
+                        });
+                        win.document.dispatchEvent(
+                            new win.TouchEvent("touchend", { changedTouches: [other] })
+                        );
+                        expect($img[0].parentElement).to.equal(win.document.body);
+                        win.document.dispatchEvent(
+                            new win.TouchEvent("touchend", { changedTouches: [end] })
+                        );
                     });
                 });
 
