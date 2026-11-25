@@ -49,7 +49,7 @@ Always perform full coverage validation before submitting code to ensure that no
 
 ### CI Coverage Validation
 
-In continuous integration, the [coverage-delta workflow](../.github/workflows/coverage-delta.yml) evaluates pull requests by comparing statement, branch, function, and line coverage metrics between the PR merge commit and the base branch. The check ensures that coverage does not regress relative to the base branch, rather than enforcing an arbitrary static percentage threshold.
+In continuous integration, the [coverage-delta workflow](../.github/workflows/coverage-delta.yml) evaluates pull requests by comparing statement, branch, function, and line coverage metrics between the PR merge commit and the base branch. Rather than enforcing an arbitrary static percentage threshold, the check ensures that coverage does not regress by more than a minimal tolerance (0.1 percentage points) relative to the base branch.
 
 ### Development vs. Pre-PR Workflow
 
