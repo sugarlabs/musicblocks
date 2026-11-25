@@ -1788,6 +1788,7 @@ class Palette {
             );
             if (
                 overlapsPalette ||
+                left < rect.left ||
                 left > rect.right - 64 ||
                 top < rect.top ||
                 top > rect.bottom - 48
@@ -2403,6 +2404,10 @@ class Palette {
             }
 
             if (macroExpansion !== null) {
+                if (onCreated && this.activity.blocks.isLoading()) {
+                    this.activity.textMsg(_("Please wait for blocks to finish loading."));
+                    return;
+                }
                 this.activity.blocks.loadNewBlocks(macroExpansion);
                 const thisBlock = this.activity.blocks.blockList.length - 1;
                 const topBlk = this.activity.blocks.findTopBlock(thisBlock);
