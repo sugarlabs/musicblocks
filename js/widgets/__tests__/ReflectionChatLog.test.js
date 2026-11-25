@@ -263,4 +263,45 @@ describe("ReflectionChatLog", () => {
             expect(text(mine)).toBe("[mine](https://example.com)");
         });
     });
+
+    describe("_setMarkdown fallback sanitization (#6819)", () => {
+        let savedDOMPurify;
+
+        beforeEach(() => {
+            savedDOMPurify = global.DOMPurify;
+            delete global.DOMPurify;
+            delete window.DOMPurify;
+        });
+
+        afterEach(() => {
+            global.DOMPurify = savedDOMPurify;
+        });
+
+        test("sanitizes rendered HTML with sanitizeHTML when DOMPurify is unavailable", () => {
+            const el = document.createElement("div");
+            jest.spyOn(reflection, "mdToHTML").mockReturnValue(
+                '<img src=x onerror="alert(1)"><script>alert(2)</script><a href="javascript:alert(3)">bad</a><b>safe</b>'
+            );
+
+            reflection._setMarkdown(el, "ignored");
+
+            expect(el.querySelector("script")).toBeNull();
+            expect(el.querySelector("img").getAttribute("onerror")).toBeNull();
+            expect(el.querySelector("a").getAttribute("href")).toBeNull();
+            expect(el.querySelector("b").textContent).toBe("safe");
+        });
+
+        test("falls back to textContent when neither DOMPurify nor sanitizeHTML is available", () => {
+            const el = document.createElement("div");
+            const originalSanitize = reflection.sanitizeHTML;
+            reflection.sanitizeHTML = undefined;
+            try {
+                reflection._setMarkdown(el, "<img src=x onerror=alert(1)>");
+                expect(el.querySelector("img")).toBeNull();
+                expect(el.textContent).toBe("<img src=x onerror=alert(1)>");
+            } finally {
+                reflection.sanitizeHTML = originalSanitize;
+            }
+        });
+    });
 });
