@@ -284,6 +284,96 @@ describe("_iterationBudget init order", () => {
         expect(activity.errorMsg).toHaveBeenCalledWith(expect.stringContaining("Infinite loop"), 0);
         expect(logo.stopTurtle).toBe(true);
     });
+
+    test("tracks iteration budget per turtle so combined multi-turtle runs do not false-trip", () => {
+        const turtle0 = makeTurtle({ name: "melody", running: true });
+        const turtle1 = makeTurtle({ name: "bass", running: true });
+        const activity = makeActivity(turtle0);
+        activity.turtles.turtleList = [turtle0, turtle1];
+        activity.turtles.ithTurtle = jest.fn(idx => activity.turtles.turtleList[idx]);
+        activity.turtles.getTurtle = jest.fn(idx => activity.turtles.turtleList[idx]);
+        activity.turtles.getTurtleCount = jest.fn(() => 2);
+        activity.turtles.turtleCount = jest.fn(() => 2);
+        activity.turtles.running = jest.fn(() => turtle0.running || turtle1.running);
+
+        const logo = new Logo(activity);
+        logo._iterationBudget = 4; // Each turtle has budget 4 -> trips on 4th block
+        logo.blockList = [
+            {
+                name: "print",
+                value: null,
+                connections: [null],
+                protoblock: {
+                    args: 0,
+                    dockTypes: ["flow"],
+                    parameter: false,
+                    flow: jest.fn(() => null)
+                },
+                isValueBlock: () => false,
+                isArgBlock: () => false
+            }
+        ];
+
+        // Combined 6 iterations (3 + 3 > 4) across two turtles should succeed without aborting
+        for (let i = 0; i < 3; i++) {
+            logo.runFromBlockNow(logo, 0, 0, 0, null);
+            logo.runFromBlockNow(logo, 1, 0, 0, null);
+        }
+
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(logo.stopTurtle).toBe(false);
+    });
+
+    test("stops only the offending turtle and names it when another turtle is still running", () => {
+        const turtle0 = makeTurtle({ name: "runaway", running: true });
+        const turtle1 = makeTurtle({ name: "steady", running: true });
+        const activity = makeActivity(turtle0);
+        activity.turtles.turtleList = [turtle0, turtle1];
+        activity.turtles.ithTurtle = jest.fn(idx => activity.turtles.turtleList[idx]);
+        activity.turtles.getTurtle = jest.fn(idx => activity.turtles.turtleList[idx]);
+        activity.turtles.getTurtleCount = jest.fn(() => 2);
+        activity.turtles.turtleCount = jest.fn(() => 2);
+        activity.turtles.running = jest.fn(() => turtle0.running || turtle1.running);
+
+        const logo = new Logo(activity);
+        logo._iterationBudget = 2; // trips on 2nd execution for a turtle
+        logo.stepQueue = { 0: [{ blk: 0 }], 1: [{ blk: 0 }] };
+        logo.blockList = [
+            {
+                name: "print",
+                value: null,
+                connections: [null],
+                protoblock: {
+                    args: 0,
+                    dockTypes: ["flow"],
+                    parameter: false,
+                    flow: jest.fn(() => null)
+                },
+                isValueBlock: () => false,
+                isArgBlock: () => false
+            }
+        ];
+
+        logo.runFromBlockNow(logo, 0, 0, 0, null);
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+
+        // 2nd iteration on turtle 0 exhausts turtle 0's budget while turtle 1 is still active
+        logo.runFromBlockNow(logo, 0, 0, 0, null);
+
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            expect.stringMatching(/Infinite loop.*runaway \(#0\)/),
+            0
+        );
+        expect(logo.stopTurtle).toBe(false);
+        expect(turtle0.running).toBe(false);
+        expect(logo.stepQueue[0]).toBeUndefined();
+        expect(turtle1.running).toBe(true);
+        expect(logo.stepQueue[1]).toEqual([{ blk: 0 }]);
+
+        // Turtle 1 still has its own budget and can continue running normally
+        logo.runFromBlockNow(logo, 1, 0, 0, null);
+        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+    });
 });
 
 // ─── resetTemperament ────────────────────────────────────────────────────────
