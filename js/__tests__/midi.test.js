@@ -1465,5 +1465,20 @@ describe("transcribeMidi", () => {
                 "Strings voice 1 2"
             ]);
         });
+
+        it("avoids names already used by mice in the workspace", async () => {
+            const { Midi } = require("@tonejs/midi");
+            const file = new Midi();
+            file.header.setTempo(120);
+            const track = file.addTrack();
+            track.name = "Piano";
+            track.addNote({ midi: 60, time: 0, duration: 1 });
+            activity.turtles = {
+                getTurtleCount: () => 1,
+                getTurtle: () => ({ name: "Piano" })
+            };
+            await transcribeMidi(new Midi(file.toArray()), 1000);
+            expect(importedNames()).toEqual(["Piano 2"]);
+        });
     });
 });

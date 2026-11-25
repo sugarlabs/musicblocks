@@ -691,8 +691,20 @@ class MidiTranscriber {
 
     async transcribe() {
         // Name-based blocks resolve the first matching turtle, so imported
-        // names must be unique within the set of tracks being transcribed.
+        // names must be unique within the tracks and against mice already in
+        // the workspace.
         const usedTrackNames = new Set();
+        if (
+            typeof activity !== "undefined" &&
+            activity.turtles &&
+            typeof activity.turtles.getTurtleCount === "function"
+        ) {
+            const turtleCount = activity.turtles.getTurtleCount();
+            for (let i = 0; i < turtleCount; i++) {
+                const turtle = activity.turtles.getTurtle(i);
+                if (turtle && turtle.name) usedTrackNames.add(turtle.name);
+            }
+        }
         const uniqueName = name => {
             let candidate = name;
             let suffix = 2;
