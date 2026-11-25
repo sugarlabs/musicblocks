@@ -118,10 +118,48 @@ describe("ensureABCJS", () => {
         const onloadCallback = addEventListenerSpy.mock.calls[0][1];
         onloadCallback();
 
+        // Wait for settlement
         await expect(promise).resolves.toBeUndefined();
 
         appendChildSpy.mockRestore();
         addEventListenerSpy.mockRestore();
+    });
+
+    it("should reject existing-script callers on error and remove the failed tag", async () => {
+        const existingScript = document.createElement("script");
+        existingScript.src = "lib/abc.min.js";
+        document.head.appendChild(existingScript);
+
+        const promise = ensureABCJS();
+        const errorEvent = new Event("error");
+        existingScript.dispatchEvent(errorEvent);
+
+        await expect(promise).rejects.toBe(errorEvent);
+        expect(document.querySelector('script[src="lib/abc.min.js"]')).toBeNull();
+    });
+
+    it("should reject all concurrent callers on error and allow a later retry", async () => {
+        const firstPromise = ensureABCJS();
+        const secondPromise = ensureABCJS();
+
+        const firstScript = document.querySelector('script[src="lib/abc.min.js"]');
+        expect(firstScript).not.toBeNull();
+
+        const errorEvent = new Event("error");
+        firstScript.dispatchEvent(errorEvent);
+
+        await expect(firstPromise).rejects.toBe(errorEvent);
+        await expect(secondPromise).rejects.toBe(errorEvent);
+        expect(document.querySelector('script[src="lib/abc.min.js"]')).toBeNull();
+
+        const retryPromise = ensureABCJS();
+        const retryScript = document.querySelector('script[src="lib/abc.min.js"]');
+        expect(retryScript).not.toBeNull();
+        expect(retryScript).not.toBe(firstScript);
+
+        retryScript.dispatchEvent(new Event("load"));
+        await expect(retryPromise).resolves.toBeUndefined();
+        expect(retryScript.getAttribute("data-loaded")).toBe("true");
     });
 
     describe("when RequireJS is present", () => {
