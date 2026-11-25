@@ -1256,13 +1256,16 @@ describe("ModeWidget", () => {
 
         test("delegates to piemenuModes with a mock block", () => {
             modeWidget._selectedModeName = "dorian";
+            modeWidget._activeTemperamentKey = "just intonation";
             modeWidget._piemenuModes();
 
             expect(global.piemenuModes).toHaveBeenCalledTimes(1);
-            const [mockBlock, selectedMode] = global.piemenuModes.mock.calls[0];
+            const [mockBlock, selectedMode, , previewTemperament] =
+                global.piemenuModes.mock.calls[0];
             expect(selectedMode).toBe("dorian");
             expect(mockBlock.value).toBe("dorian");
             expect(mockBlock.activity).toBeDefined();
+            expect(previewTemperament).toBe("just intonation");
         });
 
         test("sets _modePiemenuOpen to true while open", () => {
@@ -1795,6 +1798,88 @@ describe("ModeWidget", () => {
                 null
             );
             expect(modeWidget.logo.synth.inTemperament).toBe("just intonation");
+        });
+
+        test("_triggerNote handles 12-EDO root and octave boundaries using real getNote conversion", () => {
+            const realGetNote = require("../../utils/musicutils.js").getNote;
+            const prevGetNote = global.getNote;
+            const spyGetNote = jest.fn(realGetNote);
+            global.getNote = spyGetNote;
+
+            try {
+                modeWidget.logo.synth.inTemperament = "just intonation";
+                modeWidget._activeTemperamentKey = "equal";
+                modeWidget._activeEDO = 12;
+                modeWidget._pitch = "C";
+                mockActivity.logo.synth.trigger.mockClear();
+
+                modeWidget._triggerNote(0, 12);
+                const rootFreq = mockActivity.logo.synth.trigger.mock.calls[0][1];
+                expect(spyGetNote).toHaveBeenLastCalledWith(
+                    "C",
+                    4,
+                    0,
+                    "C major",
+                    false,
+                    null,
+                    modeWidget.errorMsg,
+                    "equal"
+                );
+
+                modeWidget._triggerNote(12, 12);
+                const octaveFreq = mockActivity.logo.synth.trigger.mock.calls[1][1];
+                expect(spyGetNote).toHaveBeenLastCalledWith(
+                    "C",
+                    4,
+                    12,
+                    "C major",
+                    false,
+                    null,
+                    modeWidget.errorMsg,
+                    "equal"
+                );
+                expect(octaveFreq).toBeCloseTo(rootFreq * 2, 6);
+                expect(modeWidget.logo.synth.inTemperament).toBe("just intonation");
+            } finally {
+                global.getNote = prevGetNote;
+            }
+        });
+
+        test("_triggerNote resolves numeric-entry custom 12-pitch ratios without modifying logo.synth", () => {
+            const customKey = "custom_numeric_12_test";
+            const { TEMPERAMENT: musicUtilsTEMPERAMENT } = require("../../utils/musicutils.js");
+            const table = {
+                isEDO: false,
+                pitchNumber: 12,
+                0: [1, "C", 4],
+                4: [5 / 4, "E", 4]
+            };
+            global.TEMPERAMENT[customKey] = table;
+            musicUtilsTEMPERAMENT[customKey] = table;
+
+            try {
+                modeWidget.logo.synth.inTemperament = "equal";
+                modeWidget._activeTemperamentKey = customKey;
+                modeWidget._activeEDO = 12;
+                global.getNote.mockReturnValueOnce(["E", 4]);
+                mockActivity.logo.synth.trigger.mockClear();
+
+                modeWidget._triggerNote(4, 12);
+
+                const expectedC4 = pitchToFrequency("C", 4, 0, "C major", "equal");
+                expect(mockActivity.logo.synth.trigger).toHaveBeenLastCalledWith(
+                    0,
+                    expect.closeTo(expectedC4 * (5 / 4), 6),
+                    modeWidget._noteValue,
+                    DEFAULTVOICE,
+                    null,
+                    null
+                );
+                expect(modeWidget.logo.synth.inTemperament).toBe("equal");
+            } finally {
+                delete global.TEMPERAMENT[customKey];
+                delete musicUtilsTEMPERAMENT[customKey];
+            }
         });
     });
 });

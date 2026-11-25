@@ -2072,18 +2072,23 @@ class ModeWidget {
         this._mockBlock = mockBlock;
 
         // Delegate to the standard piemenu with a direct callback — no monkey-patch.
-        piemenuModes(mockBlock, this._selectedModeName, modeName => {
-            if (modeName) {
-                widget._selectedModeName = modeName;
-                const mode = MUSICALMODES[modeName];
-                const custom = getSavedCustomModes().find(m => m.name === modeName);
-                const pattern = mode || (custom && custom.pattern);
-                if (pattern) {
-                    widget._closeModePiemenu();
-                    widget._loadMode(modeName, pattern, widget._edoSelect);
+        piemenuModes(
+            mockBlock,
+            this._selectedModeName,
+            modeName => {
+                if (modeName) {
+                    widget._selectedModeName = modeName;
+                    const mode = MUSICALMODES[modeName];
+                    const custom = getSavedCustomModes().find(m => m.name === modeName);
+                    const pattern = mode || (custom && custom.pattern);
+                    if (pattern) {
+                        widget._closeModePiemenu();
+                        widget._loadMode(modeName, pattern, widget._edoSelect);
+                    }
                 }
-            }
-        });
+            },
+            this._activeTemperamentKey
+        );
 
         // Scale the 600px pie menu to fit inside the ~350px widget body.
         if (wheelDiv) {

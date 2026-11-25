@@ -1266,6 +1266,56 @@ var pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
             }
             return freq;
         }
+    } else if (t && !t.isEDO) {
+        // Editor-saved / numeric-entry custom tables store `[ratio, label, refOctave]`
+        // keyed by pitch index rather than `noteLabels` and `ratios` arrays.
+        const entries = Object.keys(t)
+            .filter(key => /^\d+$/.test(key) && Array.isArray(t[key]))
+            .sort((a, b) => Number(a) - Number(b))
+            .map(key => t[key])
+            .filter(
+                entry =>
+                    typeof entry[0] === "number" &&
+                    Number.isFinite(entry[0]) &&
+                    entry[0] > 0 &&
+                    typeof entry[1] === "string"
+            );
+        if (entries.length > 0) {
+            const stripCents = name => name.replace(/\(.*\)/, "").trim();
+            const pitchClass = _notePitchClass(pitch);
+            let resolvedOctave = octave;
+            let matched = entries.find(
+                entry =>
+                    stripCents(entry[1])[0] === pitch[0] &&
+                    _notePitchClass(stripCents(entry[1])) === pitchClass
+            );
+            if (!matched && !Number.isNaN(pitchClass)) {
+                matched = entries.find(
+                    entry => _notePitchClass(stripCents(entry[1])) === pitchClass
+                );
+                const letter = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }[pitch[0]];
+                if (matched && entries.length === 12 && letter !== undefined) {
+                    resolvedOctave += Math.floor(
+                        (letter + ((pitchClass - letter + 18) % 12) - 6) / 12
+                    );
+                }
+            }
+            if (matched) {
+                const refEntry = entries[0];
+                const refName = stripCents(refEntry[1]);
+                const refOctave = typeof refEntry[2] === "number" ? refEntry[2] : 4;
+                const refBaseFreq = pitchToFrequency(refName, refOctave, 0, keySignature, "equal");
+                const entryOctave = typeof matched[2] === "number" ? matched[2] : refOctave;
+                let freq =
+                    refBaseFreq *
+                    (matched[0] / refEntry[0]) *
+                    Math.pow(powerBase, resolvedOctave - entryOctave);
+                if (cents !== 0) {
+                    freq *= Math.pow(powerBase, cents / 1200);
+                }
+                return freq;
+            }
+        }
     }
 
     const pitchNumber = pitchToNumber(pitch, octave, keySignature, temperament);

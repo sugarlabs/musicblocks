@@ -956,6 +956,33 @@ describe("piemenus behavioral tests", () => {
             global.updateWheelItems = prevUpdate;
             global.MODE_PIE_MENUS = savedModes;
         });
+
+        test("uses explicit temperament argument instead of logo.synth.inTemperament", () => {
+            const savedGetCurrentEDO = global.getCurrentEDO;
+            const savedIsNonEDO = global.isNonEDO;
+            const savedGetNonEDOModeSteps = global.getNonEDOModeSteps;
+
+            try {
+                mockBlock.activity.logo.synth.inTemperament = "equal";
+                global.getCurrentEDO = jest.fn(t => (t === "just intonation" ? 12 : 19));
+                global.isNonEDO = jest.fn(t => t === "just intonation");
+                global.getNonEDOModeSteps = jest.fn().mockReturnValue([2, 2, 1, 2, 2, 2, 1]);
+
+                piemenuModes(mockBlock, "ionian", jest.fn(), "just intonation");
+
+                expect(global.getCurrentEDO).toHaveBeenCalledWith("just intonation");
+                expect(global.isNonEDO).toHaveBeenCalledWith("just intonation");
+                expect(global.getNonEDOModeSteps).toHaveBeenCalledWith(
+                    expect.any(String),
+                    "just intonation"
+                );
+                expect(mockBlock.activity.logo.synth.inTemperament).toBe("equal");
+            } finally {
+                global.getCurrentEDO = savedGetCurrentEDO;
+                global.isNonEDO = savedIsNonEDO;
+                global.getNonEDOModeSteps = savedGetNonEDOModeSteps;
+            }
+        });
     });
 });
 
