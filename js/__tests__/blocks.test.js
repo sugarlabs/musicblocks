@@ -3453,17 +3453,15 @@ describe("Blocks Foundation", () => {
             expect(activity.errorMsg).not.toHaveBeenCalled();
         });
 
-        it("rejects data that is not a block list so the caller can report it", () => {
+        it("aborts cleanly with actionable message when blockObjs is not an array", () => {
             const activity = makeActivity();
             const blocks = makeBlocks(activity, ["forward"]);
 
-            // loadNewBlocks() rejects non-array data before touching the
-            // workspace; the project load boundary (ProjectManager's file
-            // handlers) turns that rejection into the user-facing message.
-            expect(() => blocks.loadNewBlocks({ invalid: "data" })).toThrow(TypeError);
+            expect(() => blocks.loadNewBlocks({ invalid: "data" })).not.toThrow();
             expect(blocks._loadInProgress).toBe(false);
-            expect(blocks.blockList).toHaveLength(0);
-            expect(activity.errorMsg).not.toHaveBeenCalled();
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Cannot load project: invalid project structure."
+            );
         });
 
         it("aborts with actionable message when block has out-of-range connection", () => {
