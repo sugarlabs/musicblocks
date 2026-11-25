@@ -740,9 +740,8 @@ function setupMediaBlocks(activity) {
          * @param {Logo} logo - The logo object.
          */
         flow(args, logo) {
-            if (logo.cameraID !== null) {
-                doStopVideoCam(logo.cameraID, logo.setCameraID);
-            }
+            // Always stop: still-photo capture opens a stream without a cameraID.
+            doStopVideoCam(logo.cameraID, logo.setCameraID);
         }
     }
 

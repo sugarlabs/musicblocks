@@ -1625,11 +1625,10 @@ class Logo {
 
         this.clearTurtleListeners(true);
 
-        // eslint-disable-next-line eqeqeq
-        if (this.cameraID != null) {
-            if (this.deps.utils.doStopVideoCam) {
-                this.deps.utils.doStopVideoCam(this.cameraID, this.setCameraID);
-            }
+        // Always release the webcam: a still-photo Camera block never registers
+        // a cameraID, but it still opens a MediaStream that must be stopped.
+        if (this.deps.utils.doStopVideoCam) {
+            this.deps.utils.doStopVideoCam(this.cameraID, this.setCameraID);
         }
     }
 

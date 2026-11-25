@@ -478,6 +478,16 @@ describe("_cleanupAfterCompletion", () => {
 
         expect(logo.deps.utils.doStopVideoCam).toHaveBeenCalledWith("cam-1", logo.setCameraID);
     });
+
+    test("stops the webcam on Stop even when cameraID is null (still-photo Camera block)", () => {
+        logo._synthsInitialized = true;
+        logo.cameraID = null;
+        logo.deps.utils.doStopVideoCam = jest.fn();
+
+        logo._cleanupAfterCompletion();
+
+        expect(logo.deps.utils.doStopVideoCam).toHaveBeenCalledWith(null, logo.setCameraID);
+    });
 });
 
 // ─── notationMIDI ────────────────────────────────────────────────────────────

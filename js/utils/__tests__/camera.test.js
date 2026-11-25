@@ -356,6 +356,49 @@ describe("doStopVideoCam", () => {
         expect(CameraManager.isSetup).toBe(false);
     });
 
+    test("releases the webcam tracks even when cameraID is null (still-photo path)", () => {
+        const track = { stop: jest.fn() };
+        const video = {
+            pause: jest.fn(),
+            srcObject: { getTracks: () => [track] }
+        };
+        document.querySelector = jest.fn(() => video);
+        const setCameraID = jest.fn();
+
+        doStopVideoCam(null, setCameraID);
+
+        expect(window.clearInterval).not.toHaveBeenCalled();
+        expect(track.stop).toHaveBeenCalledTimes(1);
+        expect(video.srcObject).toBeNull();
+        expect(setCameraID).toHaveBeenCalledWith(null);
+    });
+
+    test("still photo via doUseCamera leaves cameraID null, and Stop still stops the tracks", async () => {
+        const { video } = makeDom();
+        const track = { stop: jest.fn() };
+        const stream = { getTracks: () => [track] };
+        Object.defineProperty(global.navigator, "mediaDevices", {
+            configurable: true,
+            value: { getUserMedia: jest.fn(() => Promise.resolve(stream)) }
+        });
+        CameraManager.reset();
+        const { turtles } = makeTurtles();
+        const setCameraID = jest.fn();
+
+        doUseCamera(["x"], turtles, 0, false, null, setCameraID, jest.fn());
+        await Promise.resolve();
+        await Promise.resolve();
+        video.fireCanplay();
+
+        // Still photo never registers a camera ID...
+        expect(setCameraID).not.toHaveBeenCalled();
+
+        // ...so Stop is called with a null ID and must still release the stream.
+        doStopVideoCam(null, setCameraID);
+        expect(track.stop).toHaveBeenCalledTimes(1);
+        expect(video.srcObject).toBeNull();
+    });
+
     test("a Stop followed by a fresh Camera+Show run behaves like a first run again", async () => {
         const dom = makeDom();
         const turtlesCtx = makeTurtles();
