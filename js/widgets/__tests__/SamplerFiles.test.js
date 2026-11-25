@@ -169,6 +169,34 @@ describe("SamplerFiles", () => {
             expect(widget._addSample).toHaveBeenCalledTimes(1);
         });
 
+        test("keeps the existing sample when a superseded upload finishes first", () => {
+            const widget = makeUploadWidget();
+            widget.sampleName = "keep.wav";
+            widget.sampleData = "data:audio/wav;base64,S0VFUA==";
+
+            widget.handleFiles({ name: "old.wav", type: "audio/wav" });
+            widget.handleFiles({ name: "new.wav", type: "audio/wav" });
+
+            // The older read finishes while the newer selection is still pending.
+            readers[0].result = "data:audio/wav;base64,T0xE";
+            readers[0].onload();
+
+            expect(widget.sampleName).toBe("keep.wav");
+            expect(widget.sampleData).toBe("data:audio/wav;base64,S0VFUA==");
+            expect(widget._addSample).not.toHaveBeenCalled();
+
+            // Failing the pending upload must not touch the existing sample either.
+            readers[1].onerror();
+
+            expect(widget.sampleName).toBe("keep.wav");
+            expect(widget.sampleData).toBe("data:audio/wav;base64,S0VFUA==");
+            expect(widget._addSample).not.toHaveBeenCalled();
+            expect(widget.activity.errorMsg).toHaveBeenCalledWith(
+                "Upload failed: Could not read the sample file.",
+                undefined
+            );
+        });
+
         test("ignores an empty drop without invalidating a pending read", () => {
             const widget = makeUploadWidget();
 
