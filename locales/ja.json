@@ -404,7 +404,7 @@
     "kana": "Track my project"
   },
   "Mark this moment": {
-    "kanji": "Mark this moment",
+    "kanji": "この時点を保存",
     "kana": "Mark this moment"
   },
   "Time travel": {
@@ -1592,119 +1592,119 @@
     "kana": "ぶろっくがごみはこにおくられる"
   },
   "Saved moment": {
-    "kanji": "Saved moment",
+    "kanji": "保存した時点",
     "kana": "Saved moment"
   },
   "You're offline. Connect to the network to view commits for this project.": {
-    "kanji": "You're offline. Connect to the network to view commits for this project.",
+    "kanji": "オフラインです。コミットを見るにはネットワークに接続してください",
     "kana": "You're offline. Connect to the network to view commits for this project."
   },
   "Network Connection Required": {
-    "kanji": "Network Connection Required",
+    "kanji": "ネットワーク接続が必要です",
     "kana": "Network Connection Required"
   },
   "No moments marked yet. Click \"Mark this moment\" to save your first one!": {
-    "kanji": "No moments marked yet. Click \"Mark this moment\" to save your first one!",
+    "kanji": "まだ時点が保存されていません。「この時点を保存」をクリックして、最初の記録を作りましょう",
     "kana": "No moments marked yet. Click \"Mark this moment\" to save your first one!"
   },
   "No Saved Moments Yet": {
-    "kanji": "No Saved Moments Yet",
+    "kanji": "まだ保存した時点がありません",
     "kana": "No Saved Moments Yet"
   },
   "Time Travel": {
-    "kanji": "Time Travel",
+    "kanji": "タイムトラベル",
     "kana": "Time Travel"
   },
   "Every save, forever yours": {
-    "kanji": "Every save, forever yours",
+    "kanji": "保存したものは、ずっとあなたのもの",
     "kana": "Every save, forever yours"
   },
   "YOU ARE HERE": {
-    "kanji": "YOU ARE HERE",
+    "kanji": "いまここ",
     "kana": "YOU ARE HERE"
   },
   "Sync Pending": {
-    "kanji": "Sync Pending",
+    "kanji": "同期待ち",
     "kana": "Sync Pending"
   },
   "Latest": {
-    "kanji": "Latest",
+    "kanji": "最新",
     "kana": "Latest"
   },
   "Undo my changes": {
-    "kanji": "Undo my changes",
+    "kanji": "変更をもとに戻す",
     "kana": "Undo my changes"
   },
   "Go back to this version": {
-    "kanji": "Go back to this version",
+    "kanji": "このバージョンに戻る",
     "kana": "Go back to this version"
   },
   "The very beginning": {
-    "kanji": "The very beginning",
+    "kanji": "一番はじめ",
     "kana": "The very beginning"
   },
   "Where your project started": {
-    "kanji": "Where your project started",
+    "kanji": "プロジェクトが始まったところ",
     "kana": "Where your project started"
   },
   "Setting Up Tracking": {
-    "kanji": "Setting Up Tracking",
+    "kanji": "記録の準備中",
     "kana": "Setting Up Tracking"
   },
   "Start point": {
-    "kanji": "Start point",
+    "kanji": "スタート地点",
     "kana": "Start point"
   },
   "no more offline commits can be made": {
-    "kanji": "no more offline commits can be made",
+    "kanji": "オフラインでは、もうコミットできません",
     "kana": "no more offline commits can be made"
   },
   "1 more commit can be made": {
-    "kanji": "1 more commit can be made",
+    "kanji": "あと1回コミットできます",
     "kana": "1 more commit can be made"
   },
   "%s more commits can be made": {
-    "kanji": "%s more commits can be made",
+    "kanji": "あと%s回コミットできます",
     "kana": "%s more commits can be made"
   },
   "Showing locally saved drafts": {
-    "kanji": "Showing locally saved drafts",
+    "kanji": "ローカルに保存した下書きを表示しています",
     "kana": "Showing locally saved drafts"
   },
   "Just now": {
-    "kanji": "Just now",
+    "kanji": "たったいま",
     "kana": "Just now"
   },
   "1 minute ago": {
-    "kanji": "1 minute ago",
+    "kanji": "1分前",
     "kana": "1 minute ago"
   },
   "%s minutes ago": {
-    "kanji": "%s minutes ago",
+    "kanji": "%s分前",
     "kana": "%s minutes ago"
   },
   "1 hour ago": {
-    "kanji": "1 hour ago",
+    "kanji": "1時間前",
     "kana": "1 hour ago"
   },
   "%s hours ago": {
-    "kanji": "%s hours ago",
+    "kanji": "%s時間前",
     "kana": "%s hours ago"
   },
   "1 day ago": {
-    "kanji": "1 day ago",
+    "kanji": "1日前",
     "kana": "1 day ago"
   },
   "%s days ago": {
-    "kanji": "%s days ago",
+    "kanji": "%s日前",
     "kana": "%s days ago"
   },
   "1 month ago": {
-    "kanji": "1 month ago",
+    "kanji": "1か月前",
     "kana": "1 month ago"
   },
   "%s months ago": {
-    "kanji": "%s months ago",
+    "kanji": "%sか月前",
     "kana": "%s months ago"
   },
   "Security Warning": {
