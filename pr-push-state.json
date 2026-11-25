@@ -3666,5 +3666,12 @@
     "actor": "Harshitranjan07",
     "branch": "docs/10326-remove-note-shortcuts-docs",
     "headRepo": "Harshitranjan07/musicblocks"
+  },
+  "10621": {
+    "pushedAt": "2026-11-25T18:47:12.809Z",
+    "sha": "0c759cf1a574c67a42e22ae446615212945bc702",
+    "actor": "Harshitranjan07",
+    "branch": "docs/10477-fix-broken-doc-links",
+    "headRepo": "Harshitranjan07/musicblocks"
   }
 }
