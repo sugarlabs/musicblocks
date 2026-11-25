@@ -375,20 +375,49 @@ describe("ActionBlocks", () => {
     });
 
     describe("DispatchBlock", () => {
-        test("dispatches event", () => {
+        test("dispatches event and adds it to eventList if not present", () => {
             const block = getBlock("dispatch");
 
             block.flow(["event1"], logo, 0, 15);
 
             expect(activity.stage.dispatchEvent).toHaveBeenCalledWith("event1");
             expect(logo.eventList).toHaveProperty("event1");
+            expect(logo.stopTurtle).toBeFalsy();
         });
 
-        test("handles null event name", () => {
+        test("dispatches event without overwriting existing registered event", () => {
             const block = getBlock("dispatch");
+            const existingEvent = new Event("event1");
+            logo.eventList["event1"] = existingEvent;
+
+            block.flow(["event1"], logo, 0, 15);
+
+            expect(activity.stage.dispatchEvent).toHaveBeenCalledWith("event1");
+            expect(logo.eventList["event1"]).toBe(existingEvent);
+            expect(logo.stopTurtle).toBeFalsy();
+        });
+
+        test("halts execution on null event name without registering or dispatching event", () => {
+            const block = getBlock("dispatch");
+            logo.stopTurtle = false;
+
             block.flow([null], logo, 0, 15);
 
-            expect(activity.stage.dispatchEvent).toHaveBeenCalledWith(null);
+            expect(activity.stage.dispatchEvent).not.toHaveBeenCalled();
+            expect(logo.eventList).toEqual({});
+            expect(logo.eventList).not.toHaveProperty("null");
+            expect(logo.stopTurtle).toBe(true);
+        });
+
+        test("ignores flow when argument count is not 1", () => {
+            const block = getBlock("dispatch");
+
+            block.flow([], logo, 0, 15);
+            block.flow(["event1", "event2"], logo, 0, 15);
+
+            expect(activity.stage.dispatchEvent).not.toHaveBeenCalled();
+            expect(logo.eventList).toEqual({});
+            expect(logo.stopTurtle).toBeFalsy();
         });
     });
 
