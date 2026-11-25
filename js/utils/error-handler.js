@@ -81,7 +81,7 @@ const ErrorHandler = {
     },
 
     _key(level, operation, message, frame) {
-        return level + "|" + operation + "|" + message + "|" + frame;
+        return JSON.stringify([level, operation, message, frame]);
     },
 
     _describeReason(reason) {
@@ -151,11 +151,13 @@ const ErrorHandler = {
         try {
             const operation = context && context.operation ? String(context.operation) : "";
             const message = error && error.message ? String(error.message) : String(error);
-            const stack = error && error.stack ? this._truncate(error.stack, 1000) : "";
             const source = context && context.source ? String(context.source) : "";
             const line = context && context.line ? Number(context.line) || 0 : 0;
             const column = context && context.column ? Number(context.column) || 0 : 0;
-            const frame = this._frame(stack, source, line, column);
+            const fullStack = error && error.stack ? String(error.stack) : "";
+            // A long message would push the throw site out of the truncated stack.
+            const frame = this._frame(fullStack, source, line, column);
+            const stack = this._truncate(fullStack, 1000);
             const key = this._key(level, operation, message, frame);
             const existing = this._counts.get(key);
 
@@ -243,6 +245,18 @@ const ErrorHandler = {
         }
     },
 
+    _isValidRecord(record) {
+        return Boolean(
+            record &&
+            typeof record.key === "string" &&
+            record.key &&
+            typeof record.level === "string" &&
+            typeof record.message === "string" &&
+            Number.isFinite(record.count) &&
+            record.count > 0
+        );
+    },
+
     _restore() {
         try {
             if (typeof window === "undefined" || !window.sessionStorage) {
@@ -254,13 +268,12 @@ const ErrorHandler = {
             }
             const parsed = JSON.parse(raw);
             if (Array.isArray(parsed)) {
-                this._records = parsed.slice(-this._maxRecords);
+                const valid = parsed.filter(record => this._isValidRecord(record));
+                this._records = valid.slice(-this._maxRecords);
                 this._counts.clear();
                 for (let i = 0; i < this._records.length; i++) {
                     const record = this._records[i];
-                    if (record && record.key) {
-                        this._counts.set(record.key, record);
-                    }
+                    this._counts.set(record.key, record);
                 }
             }
         } catch (e) {
@@ -375,7 +388,8 @@ const ErrorHandler = {
     },
 
     getRecentErrors() {
-        return this._records.slice();
+        // Callers must not be able to mutate the counts used for deduplication.
+        return this._records.map(record => ({ ...record }));
     },
 
     clearRecentErrors() {
@@ -392,7 +406,7 @@ const ErrorHandler = {
     },
 
     _isNoise(filename, message) {
-        if (filename && /^(chrome|moz|safari|edge)-extension:\/\//.test(filename)) {
+        if (filename && /^(chrome|moz|safari|edge|safari-web)-extension:\/\//.test(filename)) {
             return true;
         }
         if (message && message.indexOf("ResizeObserver loop") === 0) {
@@ -455,6 +469,10 @@ const ErrorHandler = {
         window.addEventListener("unhandledrejection", onRejection);
 
         const dispose = function () {
+            // Ignore a disposer whose installation has already been replaced.
+            if (self._disposeGlobalHandlers !== dispose) {
+                return;
+            }
             window.removeEventListener("error", onError);
             window.removeEventListener("unhandledrejection", onRejection);
             self._cancelScheduledPersist();

@@ -228,6 +228,39 @@ describe("ErrorHandler", () => {
             expect(ErrorHandler.getRecentErrors()).toHaveLength(1);
         });
 
+        it("returns copies of the records themselves", () => {
+            ErrorHandler.capture("boom", { operation: "mutate" });
+
+            const records = ErrorHandler.getRecentErrors();
+            records[0].count = 0;
+
+            ErrorHandler.capture("boom", { operation: "mutate" });
+
+            expect(ErrorHandler.getRecentErrors()[0].count).toBe(2);
+        });
+
+        it("keeps delimiter-like content in operation and message separate", () => {
+            ErrorHandler.capture("b|c", { operation: "a" });
+            ErrorHandler.capture("c", { operation: "a|b" });
+
+            expect(ErrorHandler.getRecentErrors()).toHaveLength(2);
+            expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
+        });
+
+        it("separates long messages thrown from different frames", () => {
+            const message = "x".repeat(1200);
+            const first = new Error(message);
+            first.stack = "Error: " + message + "\n    at one (http://localhost/a.js:1:1)";
+            const second = new Error(message);
+            second.stack = "Error: " + message + "\n    at two (http://localhost/b.js:2:2)";
+
+            ErrorHandler.capture(first, { operation: "long" });
+            ErrorHandler.capture(second, { operation: "long" });
+
+            expect(ErrorHandler.getRecentErrors()).toHaveLength(2);
+            expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
+        });
+
         it("clears the buffer", () => {
             ErrorHandler.capture("boom", { operation: "clear" });
             ErrorHandler.clearRecentErrors();
@@ -389,8 +422,31 @@ describe("ErrorHandler", () => {
                     filename: "http://localhost/app.js"
                 })
             );
+            window.dispatchEvent(
+                new ErrorEvent("error", {
+                    message: "safari web extension failure",
+                    filename: "safari-web-extension://abc/content.js"
+                })
+            );
 
             expect(ErrorHandler.getRecentErrors()).toHaveLength(0);
+        });
+
+        it("keeps a newer installation when an older disposer is called again", () => {
+            const firstDispose = ErrorHandler.installGlobalHandlers();
+            firstDispose();
+            const secondDispose = ErrorHandler.installGlobalHandlers();
+
+            firstDispose();
+
+            expect(ErrorHandler._disposeGlobalHandlers).toBe(secondDispose);
+            expect(ErrorHandler._installed).toBe(true);
+
+            const event = new Event("unhandledrejection");
+            event.reason = new Error("still listening");
+            window.dispatchEvent(event);
+
+            expect(ErrorHandler.getRecentErrors()).toHaveLength(1);
         });
 
         it("deduplicates repeated uncaught errors", () => {
@@ -480,6 +536,28 @@ describe("ErrorHandler", () => {
                 ErrorHandler._cancelScheduledPersist();
                 jest.useRealTimers();
             }
+        });
+
+        it("keeps valid records and drops malformed ones when restoring", () => {
+            const valid = {
+                key: "kept",
+                level: "error",
+                operation: "restore-valid",
+                message: "boom",
+                count: 2
+            };
+            window.sessionStorage.setItem(
+                storageKey,
+                JSON.stringify([null, { key: "bad", count: "1" }, valid])
+            );
+
+            jest.resetModules();
+            const Reloaded = require("../error-handler");
+            const records = Reloaded.getRecentErrors();
+
+            expect(records).toHaveLength(1);
+            expect(records[0].key).toBe("kept");
+            expect(records[0].count).toBe(2);
         });
 
         it("clears persisted records", () => {
