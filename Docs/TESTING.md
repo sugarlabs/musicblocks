@@ -4,11 +4,35 @@ How to write unit tests for block files.
 
 ## Running Tests
 
+### Test Execution Commands
+
 ```bash
-npm test                                    # Run all tests
-npm test -- path/to/file.test.js           # Run specific test file
-npm test -- --coverage                      # Run with coverage report
+# Run all tests with default coverage collection
+npm test
+
+# Run a focused test without coverage collection (recommended during active development)
+npm test -- --coverage=false path/to/file.test.js
+
+# Run a specific test file by exact path without coverage
+npm test -- --runInBand --coverage=false --runTestsByPath planet/js/__tests__/ProjectStorage.test.js
+
+# Run full test suite with coverage report
+npm test -- --coverage
 ```
+
+### Coverage Defaults and Focused Testing Workflow
+
+By default, Music Blocks enables coverage collection in `jest.config.js` via `collectCoverage: true`. When iteratively developing or debugging individual components, collecting coverage overhead can significantly slow down local execution cycles.
+
+To streamline local development:
+- **Disable coverage collection for fast iterations**: Use `--coverage=false` (e.g. `npm test -- --coverage=false path/to/file.test.js`) to run unit tests quickly without generating coverage instrumentation reports.
+- **Run by exact path**: Use `--runTestsByPath` to ensure Jest targets the exact file rather than matching regex substrings across unrelated paths.
+- **Serial test execution (`--runInBand`)**: Use `--runInBand` (or `-i`) in resource-constrained environments to execute tests serially in the main process, avoiding worker thread memory overhead.
+
+### Continuous Integration & Full Validation
+
+- **Coverage Delta in CI**: The [coverage-delta.yml](https://github.com/sugarlabs/musicblocks/blob/master/.github/workflows/coverage-delta.yml) GitHub Actions workflow compares coverage metrics against the target base branch rather than enforcing a static threshold.
+- **Pre-submission verification**: Focused test runs with coverage disabled do not replace full validation. Before opening a pull request, run the full test suite with coverage enabled (`npm test -- --coverage`) to verify that all suites pass and no coverage regressions occur.
 
 ## Shared Test Infrastructure
 
