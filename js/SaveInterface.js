@@ -320,7 +320,6 @@ class SaveInterface {
         //const self = this;
         const finishDownload = name => {
             if (name === null) {
-                console.debug("save cancelled");
                 // downloadURL() won't run to free a Blob URL, so free it here.
                 if (typeof URL.revokeObjectURL === "function") {
                     URL.revokeObjectURL(dataurl);
@@ -380,7 +379,6 @@ class SaveInterface {
             filename = defaultfilename;
         }
 
-        console.debug("saving to " + filename);
         finishDownload(filename);
     }
 
@@ -1239,7 +1237,7 @@ class SaveInterface {
                     if (copied) {
                         showCopiedMessage();
                     } else {
-                        console.debug("Clipboard copy failed:", err);
+                        console.warn("Clipboard copy failed:", err);
                     }
                 });
         } else {
@@ -1247,7 +1245,7 @@ class SaveInterface {
             if (copied) {
                 showCopiedMessage();
             } else {
-                console.debug("Clipboard copy failed");
+                console.warn("Clipboard copy failed");
             }
         }
         this.download("ly", "data:text;utf8," + encodeURIComponent(lydata), filename);
