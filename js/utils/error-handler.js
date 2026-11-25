@@ -100,8 +100,8 @@ const ErrorHandler = {
         let mode = "unknown";
 
         try {
-            if (typeof window !== "undefined" && window.MB_VERSION) {
-                appVersion = String(window.MB_VERSION);
+            if (typeof window !== "undefined" && window.VERSION) {
+                appVersion = String(window.VERSION);
             }
         } catch (e) {
             // Ignore; metadata is best-effort.
@@ -133,21 +133,12 @@ const ErrorHandler = {
         }
 
         try {
-            if (
-                typeof window !== "undefined" &&
-                window.ActivityContext &&
-                typeof window.ActivityContext.getActivity === "function"
-            ) {
-                const activity = window.ActivityContext.getActivity();
-                if (activity) {
-                    // Activity persists this flag as the string "true"/"false".
-                    const beginnerMode = activity.beginnerMode;
-                    if (beginnerMode === true || beginnerMode === "true") {
-                        mode = "beginner";
-                    } else if (beginnerMode === false || beginnerMode === "false") {
-                        mode = "advanced";
-                    }
-                }
+            const beginnerMode =
+                typeof window !== "undefined" ? window.localStorage.getItem("beginnerMode") : null;
+            if (beginnerMode === "true") {
+                mode = "beginner";
+            } else if (beginnerMode === "false") {
+                mode = "advanced";
             }
         } catch (e) {
             // Ignore; metadata is best-effort.

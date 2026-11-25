@@ -41,9 +41,10 @@ describe("ErrorHandler", () => {
             delete window.__MB_ERROR_HANDLER_INSTALLED__;
             delete window.__MB_ERROR_HANDLER_DISPOSE__;
             delete window.ActivityContext;
-            delete window.MB_VERSION;
+            delete window.VERSION;
             delete window.BrowserUtils;
             delete window.i18next;
+            window.localStorage.removeItem("beginnerMode");
         }
         consoleErrorSpy.mockRestore();
         consoleWarnSpy.mockRestore();
@@ -235,10 +236,12 @@ describe("ErrorHandler", () => {
         });
 
         it("attaches diagnostics metadata to each record", () => {
-            window.MB_VERSION = "9.9.9";
+            window.VERSION = "9.9.9";
             window.BrowserUtils = { fnBrowserDetect: () => "firefox" };
             window.i18next = { language: "es-MX" };
-            window.ActivityContext = { getActivity: () => ({ beginnerMode: true }) };
+            window.localStorage.setItem("beginnerMode", "true");
+            const getActivity = jest.fn(() => ({ beginnerMode: false }));
+            window.ActivityContext = { getActivity };
 
             ErrorHandler.capture("boom", { operation: "metadata" });
 
@@ -247,10 +250,11 @@ describe("ErrorHandler", () => {
             expect(record.browser).toBe("firefox");
             expect(record.language).toBe("es-MX");
             expect(record.mode).toBe("beginner");
+            expect(getActivity).not.toHaveBeenCalled();
         });
 
         it("recognizes the persisted string beginner mode", () => {
-            window.ActivityContext = { getActivity: () => ({ beginnerMode: "true" }) };
+            window.localStorage.setItem("beginnerMode", "true");
 
             ErrorHandler.capture("boom", { operation: "metadata-string-mode" });
 
@@ -258,7 +262,7 @@ describe("ErrorHandler", () => {
         });
 
         it("recognizes the persisted string advanced mode", () => {
-            window.ActivityContext = { getActivity: () => ({ beginnerMode: "false" }) };
+            window.localStorage.setItem("beginnerMode", "false");
 
             ErrorHandler.capture("boom", { operation: "metadata-string-advanced" });
 
@@ -266,7 +270,7 @@ describe("ErrorHandler", () => {
         });
 
         it("falls back to safe metadata when sources are unavailable", () => {
-            window.ActivityContext = { getActivity: () => ({ beginnerMode: false }) };
+            window.localStorage.setItem("beginnerMode", "false");
 
             ErrorHandler.capture("boom", { operation: "metadata-fallback" });
 
@@ -278,11 +282,10 @@ describe("ErrorHandler", () => {
         });
 
         it("records errors even when metadata sources throw", () => {
-            window.ActivityContext = {
-                getActivity: () => {
-                    throw new Error("not ready");
-                }
-            };
+            const getActivity = jest.fn(() => {
+                throw new Error("not ready");
+            });
+            window.ActivityContext = { getActivity };
             window.i18next = {
                 get language() {
                     throw new Error("no language");
@@ -296,6 +299,7 @@ describe("ErrorHandler", () => {
             const record = ErrorHandler.getRecentErrors()[0];
             expect(record.mode).toBe("unknown");
             expect(record.language).toBe("unknown");
+            expect(getActivity).not.toHaveBeenCalled();
         });
 
         it("still shows the user-facing message on repeats", () => {
