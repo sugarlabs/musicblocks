@@ -434,9 +434,19 @@ class ThemeBox {
     }
 
     /**
-     * @public
+     * Close the theme dropdown by resetting its inline display style and active class
+     * so it collapses immediately without overlapping notification banners.
+     * @private
      * @returns {void}
      */
+    _closeThemeDropdown() {
+        const dropdown = document.getElementById("themedropdown");
+        if (dropdown) {
+            dropdown.style.display = "none";
+            dropdown.classList.remove("active");
+        }
+    }
+
     setPreference() {
         let currentPref;
         try {
@@ -446,6 +456,9 @@ class ThemeBox {
         }
 
         if (currentPref === this._theme && document.body.classList.contains(this._theme)) {
+            // Always close the dropdown before showing the notification so the
+            // icons do not overlap the banner (Bug #10563 – Bug 1).
+            this._closeThemeDropdown();
             this.activity.textMsg(_("Music Blocks is already set to this theme."));
         } else {
             // Save preference to localStorage
@@ -455,6 +468,10 @@ class ThemeBox {
             } catch (e) {
                 console.warn("Could not save theme preference:", e);
             }
+
+            // Close the dropdown before applying the new theme so the picker
+            // does not remain open during the DOM class swap (Bug #10563 – Bug 1).
+            this._closeThemeDropdown();
 
             // Apply theme instantly instead of reloading
             this.applyThemeInstantly();

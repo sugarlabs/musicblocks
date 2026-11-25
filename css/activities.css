@@ -1101,12 +1101,18 @@ body.dark #aux-toolbar .aux-group > li > a:hover {
     background-color: rgba(255, 255, 255, 0.12) !important;
 }
 
-body.highcontrast #aux-toolbar .aux-group > li > a:hover {
+body.highcontrast #aux-toolbar .aux-group > li > a:hover,
+body.highcontrast #aux-toolbar .aux-group > li > a:focus,
+body.highcontrast #aux-toolbar .aux-group > li > a:active,
+body.highcontrast #aux-toolbar .aux-group > li > a.active {
     background-color: #00ffff !important;
     color: #000000 !important;
 }
 
-body.highcontrast #aux-toolbar .aux-group > li > a:hover .material-icons {
+body.highcontrast #aux-toolbar .aux-group > li > a:hover .material-icons,
+body.highcontrast #aux-toolbar .aux-group > li > a:focus .material-icons,
+body.highcontrast #aux-toolbar .aux-group > li > a:active .material-icons,
+body.highcontrast #aux-toolbar .aux-group > li > a.active .material-icons {
     color: #000000 !important;
 }
 
@@ -1265,6 +1271,8 @@ body.dark .materialize-iso .dropdown-content li > a:hover {
     gap: 6px !important;
     min-width: max-content !important;
     width: auto !important;
+    height: auto !important;
+    max-height: none !important;
     box-sizing: border-box !important;
     overflow: visible !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
@@ -1281,6 +1289,7 @@ body.highcontrast #themedropdown[style*="display: block"] {
     background-color: #000000 !important;
     border: 2px solid #ffffff !important;
     box-shadow: none !important;
+    padding: 6px 8px !important;
 }
 
 #themedropdown li {
@@ -1297,6 +1306,7 @@ body.highcontrast #themedropdown[style*="display: block"] {
     background: transparent !important;
     float: none !important;
     box-sizing: border-box !important;
+    overflow: visible !important;
 }
 
 #themedropdown li:not([style*="display: none"]):not([style*="display:none"]) {
@@ -1344,7 +1354,32 @@ body.light #themedropdown li > a {
 }
 
 body.highcontrast #themedropdown li > a {
-    background: transparent !important;
+    background: #000000 !important;
+    color: #ffffff !important;
+    border: 1px solid #ffffff !important;
+}
+
+body.highcontrast #themedropdown li > a .material-icons {
+    color: #ffffff !important;
+}
+
+#themedropdown li > a.active {
+    background: rgba(255, 255, 255, 0.22) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+}
+
+body.light #themedropdown li > a.active {
+    background: rgba(0, 0, 0, 0.14) !important;
+    border: 1px solid rgba(0, 0, 0, 0.25) !important;
+}
+
+body.highcontrast #themedropdown li > a.active {
+    background: #000000 !important;
+    color: #00ffff !important;
+    border: 2px solid #00ffff !important;
+}
+
+body.highcontrast #themedropdown li > a.active .material-icons {
     color: #00ffff !important;
 }
 
@@ -1358,8 +1393,33 @@ body.light #themedropdown li > a:hover {
     transform: scale(1.06) !important;
 }
 
-body.highcontrast #themedropdown li > a:hover {
+body.highcontrast #themedropdown li > a:hover,
+body.highcontrast #themedropdown li > a:focus,
+body.highcontrast #themedropdown li > a:focus-visible,
+body.highcontrast #themedropdown li > a:active,
+body.highcontrast #themedropdown li > a.dropdown-item-focused,
+body.highcontrast #themedropdown li > a.active:hover,
+body.highcontrast #themedropdown li > a.active:focus,
+body.highcontrast #themedropdown li > a.active:focus-visible,
+body.highcontrast #themedropdown li > a.active:active,
+body.highcontrast #themedropdown li > a.active.dropdown-item-focused {
     background: #00ffff !important;
+    color: #000000 !important;
+    border-color: #00ffff !important;
+    outline: 2px solid #ffff00 !important;
+    outline-offset: 1px !important;
+}
+
+body.highcontrast #themedropdown li > a:hover .material-icons,
+body.highcontrast #themedropdown li > a:focus .material-icons,
+body.highcontrast #themedropdown li > a:focus-visible .material-icons,
+body.highcontrast #themedropdown li > a:active .material-icons,
+body.highcontrast #themedropdown li > a.dropdown-item-focused .material-icons,
+body.highcontrast #themedropdown li > a.active:hover .material-icons,
+body.highcontrast #themedropdown li > a.active:focus .material-icons,
+body.highcontrast #themedropdown li > a.active:focus-visible .material-icons,
+body.highcontrast #themedropdown li > a.active:active .material-icons,
+body.highcontrast #themedropdown li > a.active.dropdown-item-focused .material-icons {
     color: #000000 !important;
 }
 
