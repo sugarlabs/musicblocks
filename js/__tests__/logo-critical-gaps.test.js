@@ -336,16 +336,18 @@ describe("_iterationBudget init order", () => {
         activity.turtles.running = jest.fn(() => turtle0.running || turtle1.running);
 
         const logo = new Logo(activity);
+        logo.turtleDelay = global.TURTLESTEP;
         logo._iterationBudget = 2; // trips on 2nd execution for a turtle
+        logo._alreadyRunning = true;
         logo.stepQueue = { 0: [{ blk: 0 }], 1: [{ blk: 0 }] };
         logo.blockList = [
             {
                 name: "print",
                 value: null,
-                connections: [null],
+                connections: [null, 0],
                 protoblock: {
                     args: 0,
-                    dockTypes: ["flow"],
+                    dockTypes: ["flow", "flow"],
                     parameter: false,
                     flow: jest.fn(() => null)
                 },
@@ -365,14 +367,32 @@ describe("_iterationBudget init order", () => {
             0
         );
         expect(logo.stopTurtle).toBe(false);
+        expect(logo._alreadyRunning).toBe(false);
+        expect(activity.onStopTurtle).not.toHaveBeenCalled();
         expect(turtle0.running).toBe(false);
+        expect(turtle0._iterationBudget).toBe(2);
         expect(logo.stepQueue[0]).toBeUndefined();
         expect(turtle1.running).toBe(true);
         expect(logo.stepQueue[1]).toEqual([{ blk: 0 }]);
 
-        // Turtle 1 still has its own budget and can continue running normally
+        // Turtle 1 still has its own budget and runs normally on step 1
         logo.runFromBlockNow(logo, 1, 0, 0, null);
         expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+        expect(turtle1.running).toBe(true);
+
+        // Exhausting turtle 1's budget stops turtle 1 cleanly and finalizes the run
+        logo.runFromBlockNow(logo, 1, 0, 0, null);
+        expect(activity.errorMsg).toHaveBeenCalledTimes(2);
+        expect(activity.errorMsg).toHaveBeenLastCalledWith(
+            expect.stringMatching(/Infinite loop.*steady \(#1\)/),
+            0
+        );
+        expect(logo.stopTurtle).toBe(true);
+        expect(logo._alreadyRunning).toBe(false);
+        expect(activity.onStopTurtle).toHaveBeenCalledTimes(1);
+        expect(turtle1.running).toBe(false);
+        expect(turtle1._iterationBudget).toBe(2);
+        expect(logo.stepQueue[1]).toBeUndefined();
     });
 });
 
