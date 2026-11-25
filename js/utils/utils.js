@@ -485,6 +485,7 @@ if (typeof module !== "undefined" && module.exports) {
         doSVG,
         isSVGEmpty,
         announceToScreenReader,
+        waitForReadiness,
         _resetKanaCache
     };
 }
