@@ -1744,12 +1744,13 @@ class Palette {
             pointerEvents: "none"
         });
         const outline = img.style.outline;
+        const row = img.closest("tr");
         img.style.outline = "3px solid #2563eb";
-        img.closest("tr").setAttribute("aria-pressed", "true");
+        row?.setAttribute("aria-pressed", "true");
         const cancel = () => {
             overlay.remove();
             img.style.outline = outline;
-            img.closest("tr")?.removeAttribute("aria-pressed");
+            row?.removeAttribute("aria-pressed");
             document.removeEventListener("pointerdown", outside, true);
             document.removeEventListener("keydown", escape);
             window.removeEventListener("resize", cancel);
@@ -1795,11 +1796,12 @@ class Palette {
             }
             const button = document.createElement("button");
             button.type = "button";
+            const previewLabel = _(preview.staticLabels?.[0] || preview.name || preview.blkname);
             button.setAttribute(
                 "aria-label",
                 _("Place") +
                     " " +
-                    preview.label +
+                    previewLabel +
                     " — " +
                     (block.protoblock.staticLabels[0] || block.name)
             );
@@ -1869,8 +1871,10 @@ class Palette {
                     candidate.targetBlock === target.targetBlock &&
                     candidate.connectionIndex === target.connectionIndex
             )
-        )
+        ) {
+            this.activity.textMsg(_("The selected connection is no longer available."));
             return;
+        }
         const destination = blocks.blockList[target.targetBlock];
         const dock = destination.docks[target.connectionIndex];
         const dx = destination.container.x + dock[0] - source.container.x - source.docks[0][0];
@@ -2003,7 +2007,14 @@ class Palette {
                     itemCell.appendChild(img);
 
                     if (cancelled) return;
-                    if (!dragged && this._selectForPlacement(protoListScope[blk], b, img)) return;
+                    if (
+                        !dragged &&
+                        document.body.classList.contains("compact-edit") &&
+                        event.type === "touchend" &&
+                        event.isTrusted &&
+                        this._selectForPlacement(protoListScope[blk], b, img)
+                    )
+                        return;
 
                     // if (!x || !y) return;
 
