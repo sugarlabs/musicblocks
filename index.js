@@ -66,13 +66,7 @@ const SENSITIVE_PATTERNS = [
 ];
 
 app.use((req, res, next) => {
-    let requestPath;
-    try {
-        requestPath = path.posix.normalize(decodeURIComponent(req.path));
-    } catch {
-        return res.status(400).send("Bad Request");
-    }
-    if (SENSITIVE_PATTERNS.some(pattern => pattern.test(requestPath))) {
+    if (SENSITIVE_PATTERNS.some(pattern => pattern.test(req.path))) {
         return res.status(403).send("Forbidden");
     }
     next();
