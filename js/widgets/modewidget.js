@@ -350,7 +350,7 @@ class ModeWidget {
     // ── EDO helpers ───────────────────────────────────────────────
 
     _edoOptions() {
-        const inTemperament = this.logo.synth.inTemperament;
+        const activeKey = this._activeTemperamentKey || this.logo.synth.inTemperament;
         const builtInTemperaments = [
             { edo: 5, key: "equal5", label: "5-EDO" },
             { edo: 7, key: "equal7", label: "7-EDO" },
@@ -380,11 +380,11 @@ class ModeWidget {
             }
         }
 
-        if (!options.some(o => o.temperamentKey === inTemperament)) {
+        if (!options.some(o => o.temperamentKey === activeKey)) {
             options.unshift({
-                value: inTemperament,
+                value: activeKey,
                 label: this._activeEDO + "-EDO",
-                temperamentKey: inTemperament,
+                temperamentKey: activeKey,
                 edo: this._activeEDO
             });
         }
@@ -393,12 +393,12 @@ class ModeWidget {
     }
 
     _initEdoSelect(select) {
-        const inTemperament = this.logo.synth.inTemperament;
+        const activeKey = this._activeTemperamentKey || this.logo.synth.inTemperament;
         for (const o of this._edoOptions()) {
             const opt = document.createElement("option");
             opt.value = o.temperamentKey;
             opt.textContent = o.label;
-            if (o.temperamentKey === inTemperament) {
+            if (o.temperamentKey === activeKey) {
                 opt.selected = true;
             }
             select.appendChild(opt);
@@ -436,7 +436,6 @@ class ModeWidget {
             }
 
             this._activeTemperamentKey = key;
-            this.logo.synth.inTemperament = key;
 
             // _translateNotesToEDO() and _restoreState() must run while
             // this._activeEDO still holds the OLD EDO: _translateNotesToEDO
@@ -458,8 +457,8 @@ class ModeWidget {
             this.textMsg(
                 _(
                     isEquallyTempered(key)
-                        ? `Switched to ${newEDO}-EDO tuning.`
-                        : `Switched to ${tName}.`
+                        ? `Previewing in ${newEDO}-EDO tuning.`
+                        : `Previewing in ${tName}.`
                 ),
                 3000
             );
@@ -513,7 +512,6 @@ class ModeWidget {
                 ? this._activeTemperamentKey
                 : this._temperamentKeyForEDO(edoCount);
         this._activeTemperamentKey = key;
-        this.logo.synth.inTemperament = key;
         this._activeEDO = edoCount;
         if (select) {
             const label = isEquallyTempered(key)
@@ -756,9 +754,9 @@ class ModeWidget {
             return btn;
         };
 
-        // EDO/Tuning — transparent select overlay on top of the icon.
+        // EDO/Tuning preview — transparent select overlay on top of the icon.
         // The select is full-size but invisible; it IS the click target.
-        const tuningIcon = iconButton("menu-button.svg", _("temperament"), null);
+        const tuningIcon = iconButton("menu-button.svg", _("Preview tuning"), null);
         // Transparent select overlay — IS the click target; the icon behind
         // it is purely decorative.
         const edoSelect = document.createElement("select");
@@ -766,8 +764,8 @@ class ModeWidget {
         this._edoSelect = edoSelect;
         this._initEdoSelect(edoSelect);
         this._wireEdoSelect(edoSelect);
-        edoSelect.title = _("temperament");
-        edoSelect.setAttribute("aria-label", _("temperament"));
+        edoSelect.title = _("Preview tuning");
+        edoSelect.setAttribute("aria-label", _("Preview tuning"));
         Object.assign(edoSelect.style, {
             position: "absolute",
             top: 0,
@@ -977,10 +975,7 @@ class ModeWidget {
                 ),
                 3000
             );
-        } else if (
-            savedKeyMatches &&
-            (savedKey !== this._activeTemperamentKey || savedKey !== this.logo.synth.inTemperament)
-        ) {
+        } else if (savedKeyMatches && savedKey !== this._activeTemperamentKey) {
             const savedName = TEMPERAMENT[savedKey]?.name || savedKey;
             this._activeTemperamentKey = savedKey;
             this._rebuildWheel(modeEDO, edoSelect);
@@ -1265,15 +1260,24 @@ class ModeWidget {
         }
 
         if (edo === 12) {
-            const noteToPlay = getNote(this._pitch, 4, note, ks, false, null, this.errorMsg);
-            this.logo.synth.trigger(
-                0,
-                normalizeNoteAccidentals(noteToPlay[0]) + noteToPlay[1],
-                this._noteValue,
-                DEFAULTVOICE,
+            const noteToPlay = getNote(
+                this._pitch,
+                4,
+                note,
+                ks,
+                false,
                 null,
-                null
+                this.errorMsg,
+                this._activeTemperamentKey
             );
+            const freq = pitchToFrequency(
+                normalizeNoteAccidentals(noteToPlay[0]),
+                noteToPlay[1],
+                0,
+                ks,
+                this._activeTemperamentKey
+            );
+            this.logo.synth.trigger(0, freq, this._noteValue, DEFAULTVOICE, null, null);
         } else {
             // Use the active temperament directly: _temperamentKeyForEDO maps a
             // non-EDO pitch count to an EQUAL temperament (19 -> equal19), which
@@ -1684,7 +1688,6 @@ class ModeWidget {
     _applyImportedMode(foundEdo, foundPattern, name) {
         const key = this._temperamentKeyForEDO(foundEdo);
         this._cacheState(this._activeEDO);
-        this.logo.synth.inTemperament = key;
         this._activeTemperamentKey = key;
         this._rebuildWheel(foundEdo);
         this._applyModePattern(foundPattern);
