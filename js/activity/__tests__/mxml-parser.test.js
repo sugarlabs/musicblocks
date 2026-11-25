@@ -2525,6 +2525,17 @@ describe("Test 20: Lyrics", () => {
         expect(lyricTexts(blocks)).toEqual(["Lo‿rem"]);
     });
 
+    it("adds no lyric for an elision between empty syllables", async () => {
+        for (const lyric of [
+            "<lyric><text/><elision/><text/></lyric>",
+            "<lyric><text> </text><elision>‿</elision><text/></lyric>"
+        ]) {
+            const { blocks } = await parseAndCapture(scorePartwise(sungNote("C", lyric)));
+
+            expect(lyricTexts(blocks)).toEqual([]);
+        }
+    });
+
     it("keeps the elision symbol a score gives, including a no-break space", async () => {
         const lyric = "<lyric><text>e</text><elision> </elision><text>il</text></lyric>";
         const { blocks } = await parseAndCapture(scorePartwise(sungNote("C", lyric)));

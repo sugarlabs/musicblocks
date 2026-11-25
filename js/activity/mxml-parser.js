@@ -713,14 +713,16 @@ const _byVerseNumber = (a, b) => a.number.localeCompare(b.number, undefined, { n
 function _lyricTexts(noteEl) {
     const lines = [];
     for (const lyricEl of noteEl.querySelectorAll(":scope > lyric")) {
-        const raw = Array.from(lyricEl.querySelectorAll(":scope > text, :scope > elision"), el =>
-            el.localName === "elision" && el.textContent === ""
-                ? _MXML_DEFAULT_ELISION
-                : el.textContent
-        )
+        const parts = Array.from(lyricEl.querySelectorAll(":scope > text, :scope > elision"));
+        if (!parts.some(el => el.localName === "text" && el.textContent.trim() !== "")) continue;
+        const raw = parts
+            .map(el =>
+                el.localName === "elision" && el.textContent === ""
+                    ? _MXML_DEFAULT_ELISION
+                    : el.textContent
+            )
             .join("")
             .trim();
-        if (raw === "") continue;
         const syllabics = lyricEl.querySelectorAll(":scope > syllabic");
         const syllabic = (syllabics[syllabics.length - 1]?.textContent ?? "").trim();
         const text = _MXML_SYLLABIC_HYPHEN.has(syllabic) && !raw.endsWith("-") ? `${raw}-` : raw;
