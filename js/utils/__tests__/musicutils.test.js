@@ -1797,6 +1797,9 @@ describe("pitchToNumber", () => {
         TEMPERAMENT.equal3 = { pitchNumber: 3 };
         try {
             expect(pitchToNumber("C", 4, "C major", "equal3")).toBe(10);
+            expect(pitchToNumber("e", 4, "C major", "equal3")).toBe(
+                pitchToNumber("E", 4, "C major", "equal3")
+            );
         } finally {
             if (previous === undefined) {
                 delete TEMPERAMENT.equal3;
@@ -1825,6 +1828,17 @@ describe("pitchToNumber", () => {
     it("should fallback to 12-EDO for unknown temperament", () => {
         const result = pitchToNumber("C", 4, "C major", "unknown");
         expect(result).toBe(39);
+    });
+
+    it("uses the first label as reference when a ratio temperament has no A", () => {
+        const temperament = {
+            pitchNumber: 3,
+            noteLabels: ["C", "D", "E"],
+            ratios: [1, 1.25, 1.5]
+        };
+
+        expect(pitchToNumber("c", 4, "C major", temperament)).toBe(12);
+        expect(numberToPitchSharp(0, temperament)).toEqual(["C", 0]);
     });
 });
 
