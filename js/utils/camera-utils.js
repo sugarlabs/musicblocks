@@ -24,6 +24,8 @@ const CameraManager = {
     listenerVideoElement: null,
     _generationToken: 0,
     _pendingRequest: false,
+    // Timer that releases an idle still-photo webcam (see scheduleIdleRelease).
+    idleTimer: null,
 
     /**
      * Starts the capture interval if one isn't already running. Idempotent:
@@ -45,6 +47,33 @@ const CameraManager = {
         }
         this.intervalId = window.setInterval(() => this.captureDraw(), periodMs);
         return this.intervalId;
+    },
+
+    /**
+     * Schedules a callback to release the webcam after a still photo has been
+     * drawn. A still-photo program usually finishes (and hides the Stop button)
+     * before the user could press Stop, so nothing else would ever release the
+     * stream. Every new doUseCamera call cancels the timer, so a Camera block
+     * inside a loop keeps its stream open for as long as it keeps being called.
+     * @param {function} release - invoked once the camera has been idle
+     * @param {number} idleMs - idle time before releasing
+     */
+    scheduleIdleRelease(release, idleMs = 2000) {
+        this.cancelIdleRelease();
+        this.idleTimer = setTimeout(() => {
+            this.idleTimer = null;
+            release();
+        }, idleMs);
+    },
+
+    /**
+     * Cancels a scheduled idle release. Safe to call when none is scheduled.
+     */
+    cancelIdleRelease() {
+        if (this.idleTimer !== null) {
+            clearTimeout(this.idleTimer);
+            this.idleTimer = null;
+        }
     },
 
     /**
@@ -93,6 +122,7 @@ const CameraManager = {
      */
     reset() {
         this.isSetup = false;
+        this.cancelIdleRelease();
         this.stopCapture();
         this.clearCanplayListener();
         this._generationToken++;
@@ -113,6 +143,9 @@ const CameraManager = {
 let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorMsg) => {
     const w = 320;
     const h = 240;
+
+    // A new Camera/Video block call means the camera is in use again.
+    CameraManager.cancelIdleRelease();
 
     let streaming = false;
     const video = document.querySelector("#camVideo");
@@ -145,6 +178,13 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
             setCameraID(cameraID);
         } else {
             draw();
+            // Release the stream once a still photo is done, unless a video
+            // capture started in the meantime.
+            CameraManager.scheduleIdleRelease(() => {
+                if (CameraManager.intervalId === null) {
+                    doStopVideoCam(null, setCameraID);
+                }
+            }, 2000);
         }
     }
 
