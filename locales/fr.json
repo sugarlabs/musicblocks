@@ -1,6 +1,5 @@
 {
   "": "",
-  "edit": "modifier",
   "Not a valid pitch name": "Ce n'est pas un nom de pitch valide",
   "Pitch index exceeds EDO range": "Pitch index exceeds EDO range",
   "Choose an image": "Choose an image",
@@ -52,6 +51,7 @@
   "start drum": "démarrer le tambour",
   "About Music Blocks": "À propos de Music Blocks",
   "Play": "Jouer",
+  "edit": "modifier",
   "Stop": "Arrêter",
   "Record": "Enregistrer",
   "Record options": "Record options",
