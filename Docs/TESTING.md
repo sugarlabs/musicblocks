@@ -4,11 +4,57 @@ How to write unit tests for block files.
 
 ## Running Tests
 
+### Default Coverage Behavior
+
+Jest collects coverage by default because `collectCoverage: true` is configured in `jest.config.js`. Running `npm test` automatically runs all tests and generates a full coverage report. While this ensures code coverage standards are maintained, calculating coverage adds noticeable overhead when frequently running tests during local development.
+
+### Focused Development Without Coverage
+
+To speed up iterative development, disable coverage collection by passing `--coverage=false`:
+
 ```bash
-npm test                                    # Run all tests
-npm test -- path/to/file.test.js           # Run specific test file
-npm test -- --coverage                      # Run with coverage report
+npm test -- --coverage=false
 ```
+
+Use this flag while actively developing or debugging to reduce test execution time.
+
+### Running a Specific Test File
+
+To execute an individual test file without collecting coverage, combine `--coverage=false` with `--runTestsByPath`:
+
+```bash
+npm test -- --coverage=false --runTestsByPath planet/js/__tests__/ProjectStorage.test.js
+```
+
+Replace `planet/js/__tests__/ProjectStorage.test.js` with the path to the specific test file you want to execute.
+
+### Running Tests Serially
+
+By default, Jest runs tests in parallel across worker processes. In resource-constrained environments or when troubleshooting test runner behavior, pass `--runInBand` to run tests sequentially in a single process:
+
+```bash
+npm test -- --runInBand --coverage=false --runTestsByPath planet/js/__tests__/ProjectStorage.test.js
+```
+
+### Full Coverage Validation
+
+Before finalizing your changes, run full coverage validation across the repository:
+
+```bash
+npm test                   # Run all tests with default coverage collection
+npm run test:coverage      # Explicit full coverage script from package.json
+```
+
+Always perform full coverage validation before submitting code to ensure that no regressions have been introduced across other subsystems.
+
+### CI Coverage Validation
+
+In continuous integration, the [coverage-delta workflow](../.github/workflows/coverage-delta.yml) evaluates pull requests by comparing statement, branch, function, and line coverage metrics between the PR merge commit and the base branch. The check ensures that coverage does not regress relative to the base branch, rather than enforcing an arbitrary static percentage threshold.
+
+### Development vs. Pre-PR Workflow
+
+- **During development:** Use focused test runs without coverage (`--coverage=false`) to maintain a fast feedback loop.
+- **Before opening a PR:** Focused tests do not replace repository-wide validation. Always run the full test suite (`npm test`) and lint checks (`npm run lint`) locally to meet the repository's contribution guidelines.
 
 ## Shared Test Infrastructure
 
