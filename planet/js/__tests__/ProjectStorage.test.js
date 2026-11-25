@@ -268,7 +268,7 @@ describe("ProjectStorage", () => {
         });
 
         it("should propagate initialization save failures outside backup recovery", async () => {
-            jest.spyOn(console, "error").mockImplementation();
+            const consoleSpy = jest.spyOn(console, "error").mockImplementation();
 
             const primaryData = {
                 Projects: {
@@ -281,7 +281,7 @@ describe("ProjectStorage", () => {
 
             await storage.set(storage.LocalStorageKey, primaryData);
 
-            await storage.restore();
+            mockLocalforage.setItem.mockClear();
 
             mockLocalforage.setItem.mockImplementation(async (key, value) => {
                 if (key === storage.LocalStorageKey) {
@@ -291,8 +291,22 @@ describe("ProjectStorage", () => {
                 mockLocalforage._store[key] = value;
             });
 
+            await expect(storage.restore()).resolves.toBeUndefined();
+
+            expect(mockLocalforage.setItem).not.toHaveBeenCalled();
+            expect(storage._primaryRecoveryPending).toBe(false);
+            expect(storage.data).toEqual(primaryData);
+
             await expect(storage.initialiseStorage()).rejects.toThrow("Normal write failed");
+
+            expect(await storage.get(storage.BackupStorageKey)).toEqual(primaryData);
+
+            expect(consoleSpy).toHaveBeenCalledWith(
+                "[ProjectStorage] Save failed:",
+                expect.any(Error)
+            );
         });
+
         it("should preserve a valid backup when a malformed primary cannot be repaired", async () => {
             jest.spyOn(console, "warn").mockImplementation();
             jest.spyOn(console, "error").mockImplementation();
