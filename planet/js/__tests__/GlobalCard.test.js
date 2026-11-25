@@ -272,6 +272,46 @@ describe("GlobalCard", () => {
             expect(global.ClipboardJS).toHaveBeenCalled();
         });
 
+        it("sanitizes malicious project IDs to prevent DOM XSS and selector injection", () => {
+            const xssId = 'evil"><img src="x" onerror="alert(1)"><div data-x="';
+            mockPlanet.GlobalPlanet.cache[xssId] = {
+                ProjectName: "Evil Project",
+                ProjectImage: "test-image.png",
+                ProjectIsMusicBlocks: 1,
+                ProjectLikes: 0,
+                ProjectTags: []
+            };
+            card.init(xssId);
+            card.render();
+
+            const container = document.getElementById("global-projects");
+            expect(container.querySelectorAll('img[src="x"]')).toHaveLength(0);
+            expect(container.querySelectorAll("[onerror]")).toHaveLength(0);
+            expect(document.getElementById(`global-project-title-${xssId}`).textContent).toBe(
+                "Evil Project"
+            );
+            const passedTarget = global.ClipboardJS.mock.calls[0][0];
+            expect(passedTarget).toBeInstanceOf(HTMLElement);
+            expect(passedTarget.classList.contains("copyshareurl")).toBe(true);
+        });
+
+        it("preserves regex replacement tokens like $& literally in project IDs", () => {
+            const dollarId = "proj$&1";
+            mockPlanet.GlobalPlanet.cache[dollarId] = {
+                ProjectName: "Dollar Project",
+                ProjectImage: "test-image.png",
+                ProjectIsMusicBlocks: 1,
+                ProjectLikes: 2,
+                ProjectTags: []
+            };
+            card.init(dollarId);
+            card.render();
+
+            expect(document.getElementById(`global-project-title-${dollarId}`).textContent).toBe(
+                "Dollar Project"
+            );
+        });
+
         it("should render advanced options toggle as a button without inline onclick and attach click listener", () => {
             card.init("test-id-1");
             card.render();
