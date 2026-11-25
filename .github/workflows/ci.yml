@@ -37,13 +37,13 @@ jobs:
         if: "github.actor != 'renovate[bot]'"
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
               with:
                   fetch-depth: 0
                   ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
             - name: Set up Node.js
-              uses: actions/setup-node@v5
+              uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
               with:
                   node-version: "22"
                   cache: "npm"
@@ -73,13 +73,13 @@ jobs:
         timeout-minutes: 30
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
               with:
                   fetch-depth: 0
                   ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
             - name: Set up Node.js
-              uses: actions/setup-node@v5
+              uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
               with:
                   node-version: "22.x"
                   cache: "npm"
@@ -145,13 +145,13 @@ jobs:
                 node-version: [20.x, 22.x]
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
               with:
                   fetch-depth: 0
                   ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
             - name: Use Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v5
+              uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
               with:
                   node-version: ${{ matrix.node-version }}
                   cache: "npm"
@@ -183,12 +183,12 @@ jobs:
         timeout-minutes: 30
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
               with:
                   ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
             - name: Setup Node.js
-              uses: actions/setup-node@v5
+              uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
               with:
                   node-version: "22"
                   cache: "npm"
@@ -213,7 +213,7 @@ jobs:
             # on every PR; only the upload is skipped on forks. fail_ci_if_error
             # is false so a flaky/absent upload never blocks the PR.
             - name: Upload coverage to Codecov
-              uses: codecov/codecov-action@v5
+              uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # v5.5.4
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   files: ./coverage/lcov.info
@@ -231,12 +231,12 @@ jobs:
         timeout-minutes: 45
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
               with:
                   ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
             - name: Setup Node.js
-              uses: actions/setup-node@v5
+              uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
               with:
                   node-version: "22"
                   cache: "npm"
@@ -262,12 +262,12 @@ jobs:
         timeout-minutes: 30
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
               with:
                   ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
             - name: Setup Node.js
-              uses: actions/setup-node@v5
+              uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
               with:
                   node-version: "22"
                   cache: "npm"
@@ -285,7 +285,7 @@ jobs:
               shell: bash
 
             - name: Run Cypress E2E tests
-              uses: cypress-io/github-action@v7
+              uses: cypress-io/github-action@c541a95ea92d9239347a2355f2e895cd4b3f8060 # v7.4.6
               with:
                   install: false
                   start: npm start
@@ -296,7 +296,7 @@ jobs:
 
             - name: Upload Cypress screenshots on failure
               if: failure()
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
               with:
                   name: cypress-screenshots
                   path: cypress/screenshots
@@ -313,12 +313,12 @@ jobs:
         timeout-minutes: 30
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
               with:
                   ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
             - name: Setup Node.js
-              uses: actions/setup-node@v5
+              uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
               with:
                   node-version: "22"
 

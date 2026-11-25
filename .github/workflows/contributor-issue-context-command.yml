@@ -35,7 +35,7 @@ jobs:
         steps:
             - name: Check for the /context command
               id: command
-              uses: actions/github-script@v7
+              uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
               with:
                   script: |
                       const body = context.payload.comment.body || '';
@@ -59,7 +59,7 @@ jobs:
             - name: Find the canonical context comment
               id: existing
               if: steps.command.outputs.requested == 'true'
-              uses: actions/github-script@v7
+              uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
               with:
                   script: |
                       const MARKER = '<!-- contributor-issue-context -->';
@@ -91,7 +91,7 @@ jobs:
 
             - name: Checkout code
               if: steps.command.outputs.requested == 'true' && steps.existing.outputs.fresh != 'true'
-              uses: actions/checkout@v4
+              uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
               with:
                   persist-credentials: false
 
@@ -122,7 +122,7 @@ jobs:
 
             - name: Create or update the canonical comment
               if: steps.command.outputs.requested == 'true' && steps.existing.outputs.fresh != 'true'
-              uses: actions/github-script@v7
+              uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
               env:
                   COMMENT_ID: ${{ steps.existing.outputs.comment_id }}
                   DUPLICATE_IDS: ${{ steps.existing.outputs.duplicate_ids }}
@@ -165,7 +165,7 @@ jobs:
 
             - name: Report failure on the request
               if: failure() && steps.command.outputs.requested == 'true'
-              uses: actions/github-script@v7
+              uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
               with:
                   script: |
                       try {
