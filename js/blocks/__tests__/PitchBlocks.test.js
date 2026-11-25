@@ -406,6 +406,9 @@ describe("setupPitchBlocks", () => {
             activity.blocks.blockList[20] = { name: "print" };
             block.arg(logo, 0, 10);
             expect(logo.statusFields).toContainEqual([10, "transposition"]);
+
+            activity.blocks.blockList[10].connections[0] = null;
+            expect(() => block.arg(logo, 0, 10)).not.toThrow();
         });
     });
 
@@ -429,6 +432,9 @@ describe("setupPitchBlocks", () => {
             activity.blocks.blockList[20] = { name: "print", connections: [null] };
             block.arg(logo, 0, 10);
             expect(logo.statusFields).toContainEqual([10, "mypitch"]);
+
+            activity.blocks.blockList[10].connections[0] = null;
+            expect(() => block.arg(logo, 0, 10)).not.toThrow();
         });
         it("Scalar change in pitch has its own help text and example", () => {
             const half = createdBlocks["deltapitch"].helpString;
@@ -526,6 +532,9 @@ describe("setupPitchBlocks", () => {
             activity.blocks.blockList[30] = { name: "print", connections: [null] };
             block.arg(logo, 0, 10);
             expect(logo.statusFields).toContainEqual([10, "mypitch"]);
+
+            activity.blocks.blockList[10].connections[0] = null;
+            expect(() => block.arg(logo, 0, 10)).not.toThrow();
 
             logo.inStatusMatrix = false;
 
@@ -784,6 +793,58 @@ describe("setupPitchBlocks", () => {
             expect(spy).toHaveBeenCalledTimes(2);
 
             spy.mockRestore();
+        });
+
+        it("handles disconnected input by stopping turtle", () => {
+            const block = createdBlocks["number2pitch"];
+            activity.blocks.blockList[10].name = "number2pitch";
+            activity.blocks.blockList[10].connections[1] = null;
+            logo.stopTurtle = false;
+
+            const result = block.arg(logo, 0, 10);
+            expect(result).toBeUndefined();
+            expect(logo.stopTurtle).toBe(true);
+        });
+
+        it("handles NoArgError by calling activity.errorMsg and stopping turtle", () => {
+            const block = createdBlocks["number2pitch"];
+            activity.blocks.blockList[10].name = "number2pitch";
+            activity.blocks.blockList[10].connections[1] = 15;
+            logo.stopTurtle = false;
+
+            global.Singer.PitchActions.numToPitch.mockImplementation(() => {
+                throw new Error("NoArgError");
+            });
+
+            const result = block.arg(logo, 0, 10, null);
+            expect(result).toBeUndefined();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+            expect(logo.stopTurtle).toBe(true);
+
+            // Also verify for Number2OctaveBlock
+            const blockOct = createdBlocks["number2octave"];
+            activity.blocks.blockList[20] = {
+                name: "number2octave",
+                connections: [null, 25, null, null, null]
+            };
+            logo.stopTurtle = false;
+
+            const resultOct = blockOct.arg(logo, 0, 20, null);
+            expect(resultOct).toBeUndefined();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 20);
+            expect(logo.stopTurtle).toBe(true);
+        });
+
+        it("handles NaN input by calling activity.errorMsg and stopping turtle", () => {
+            const block = createdBlocks["number2pitch"];
+            activity.blocks.blockList[10].name = "number2pitch";
+            activity.blocks.blockList[10].connections[1] = 15;
+            logo.stopTurtle = false;
+
+            const result = block.arg(logo, 0, 10, NaN);
+            expect(result).toBeUndefined();
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+            expect(logo.stopTurtle).toBe(true);
         });
     });
 
@@ -1650,6 +1711,9 @@ describe("setupPitchBlocks", () => {
                     block.arg(logo, 0, 10);
                     expect(logo.statusFields).toContainEqual([10, "pitchinhertz"]);
 
+                    activity.blocks.blockList[10].connections[0] = null;
+                    expect(() => block.arg(logo, 0, 10)).not.toThrow();
+
                     // Test normal case
                     logo.inStatusMatrix = false;
                     turtles.ithTurtle(0).singer.lastNotePlayed = ["C4", 0.5];
@@ -1683,6 +1747,11 @@ describe("setupPitchBlocks", () => {
                     turtles.ithTurtle(0).singer.lastNotePlayed = ["A4", 0.5];
                     result = block.arg(logo, 0, 10);
                     expect(result).toBe("A4");
+
+                    // Test detached currentpitch in status matrix
+                    activity.blocks.blockList[10].connections[0] = null;
+                    expect(() => block.arg(logo, 0, 10)).not.toThrow();
+                    expect(block.arg(logo, 0, 10)).toBe("A4");
                 }
             });
         });
@@ -1754,6 +1823,9 @@ describe("setupPitchBlocks", () => {
                     activity.blocks.blockList[30] = { name: "print" };
                     block.arg(logo, 0, 10);
                     expect(logo.statusFields).toContainEqual([10, "outputtools"]);
+
+                    activity.blocks.blockList[10].connections[0] = null;
+                    expect(() => block.arg(logo, 0, 10)).not.toThrow();
                 }
             });
         });

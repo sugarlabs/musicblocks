@@ -45,6 +45,104 @@ function _lazyRequire(modules, callback) {
     }
 }
 
+/**
+ * Restore previously recorded notation from the recording buffer.
+ *
+ * @param {object} activity - The activity object.
+ * @returns {void}
+ */
+function restoreRecordedNotation(activity) {
+    if (!activity || !activity.logo || !activity.logo.recordingBuffer) {
+        return;
+    }
+    const { recordingBuffer } = activity.logo;
+    activity.logo.notationOutput = recordingBuffer.notationOutput;
+    activity.logo.notationNotes = recordingBuffer.notationNotes;
+
+    if (!activity.logo.notation) {
+        activity.logo.notation = {
+            notationStaging: {},
+            notationDrumStaging: {}
+        };
+    }
+    if (!activity.logo.notation.notationStaging) {
+        activity.logo.notation.notationStaging = {};
+    }
+    if (!activity.logo.notation.notationDrumStaging) {
+        activity.logo.notation.notationDrumStaging = {};
+    }
+
+    const turtleCount =
+        activity.turtles && typeof activity.turtles.getTurtleCount === "function"
+            ? activity.turtles.getTurtleCount()
+            : 0;
+
+    for (let t = 0; t < turtleCount; t++) {
+        if (
+            recordingBuffer.notationStaging &&
+            Object.prototype.hasOwnProperty.call(recordingBuffer.notationStaging, t) &&
+            recordingBuffer.notationStaging[t]
+        ) {
+            activity.logo.notation.notationStaging[t] = recordingBuffer.notationStaging[t];
+        }
+        if (
+            recordingBuffer.notationDrumStaging &&
+            Object.prototype.hasOwnProperty.call(recordingBuffer.notationDrumStaging, t) &&
+            recordingBuffer.notationDrumStaging[t]
+        ) {
+            activity.logo.notation.notationDrumStaging[t] = recordingBuffer.notationDrumStaging[t];
+        }
+    }
+}
+
+/**
+ * Prepare a fresh notation run by resetting notes, staging arrays, and clearing painters.
+ *
+ * @param {object} activity - The activity object.
+ * @returns {void}
+ */
+function prepareFreshNotation(activity) {
+    if (!activity) {
+        return;
+    }
+    if (activity.logo) {
+        activity.logo.notationNotes = {};
+        if (!activity.logo.notation) {
+            activity.logo.notation = {
+                notationStaging: {},
+                notationDrumStaging: {}
+            };
+        }
+        if (!activity.logo.notation.notationStaging) {
+            activity.logo.notation.notationStaging = {};
+        }
+        if (!activity.logo.notation.notationDrumStaging) {
+            activity.logo.notation.notationDrumStaging = {};
+        }
+    }
+
+    const turtleCount =
+        activity.turtles && typeof activity.turtles.getTurtleCount === "function"
+            ? activity.turtles.getTurtleCount()
+            : 0;
+
+    for (let t = 0; t < turtleCount; t++) {
+        if (activity.logo && activity.logo.notation) {
+            activity.logo.notation.notationStaging[t] = [];
+            activity.logo.notation.notationDrumStaging[t] = [];
+        }
+        if (
+            activity.turtles &&
+            typeof activity.turtles.getTurtle === "function" &&
+            activity.turtles.getTurtle(t) &&
+            activity.turtles.getTurtle(t).painter &&
+            typeof activity.turtles.getTurtle(t).painter.doClear === "function"
+        ) {
+            activity.turtles.getTurtle(t).painter.doClear(true, true, true);
+        }
+    }
+}
+
 class SaveInterface {
     /**
      * Creates an instance of SaveInterface.
@@ -423,7 +521,11 @@ class SaveInterface {
         // Suppress music and turtle output when generating
         activity.logo.runningMIDI = true;
         activity.logo.runLogoCommands();
-        document.body.style.cursor = "wait";
+        if (activity.logo.runningMIDI) {
+            document.body.style.cursor = "wait";
+        } else {
+            document.body.style.cursor = "default";
+        }
     }
 
     /**
@@ -521,6 +623,19 @@ class SaveInterface {
                 writeTempoAndMeter(midi.header, firstTrack);
             }
 
+            // A MIDI channel plays one instrument at a time, whichever track set it last, so
+            // each instrument in the file gets its own channel. Channel 9 is for drums; past
+            // 15 instruments the other channels are shared.
+            const melodicChannels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15];
+            const programChannels = new Map();
+            const channelFor = program => {
+                if (!programChannels.has(program)) {
+                    const next = programChannels.size % melodicChannels.length;
+                    programChannels.set(program, melodicChannels[next]);
+                }
+                return programChannels.get(program);
+            };
+
             Object.entries(data).forEach(([blockIndex, notes]) => {
                 const mainTrack = midi.addTrack();
                 mainTrack.name = `Track ${parseInt(blockIndex, 10) + 1}`;
@@ -535,17 +650,19 @@ class SaveInterface {
                     if (duration === null) return;
                     const instrument = noteData.instrument || "default";
 
-                    if (noteData.drum) {
-                        const drum = noteData.drum || false;
+                    const drums = Array.isArray(noteData.drum)
+                        ? noteData.drum
+                        : noteData.drum
+                          ? [noteData.drum]
+                          : [];
+                    for (const drum of drums) {
                         if (!drumTracks.has(drum)) {
                             const drumTrack = midi.addTrack();
                             drumTrack.name = `Track ${parseInt(blockIndex, 10) + 1} - ${drum}`;
                             drumTrack.channel = 9; // Drums must be on Channel 10
                             drumTracks.set(drum, drumTrack);
                         }
-
                         const drumTrack = drumTracks.get(drum);
-
                         const midiNumber =
                             Object.prototype.hasOwnProperty.call(drumMIDI, drum) && drumMIDI[drum]
                                 ? drumMIDI[drum]
@@ -558,9 +675,9 @@ class SaveInterface {
                         });
                     }
 
-                    // A note can play pitches together with a drum: write those as well.
+                    // A note can play pitches together with drums: write those as well.
                     const pitches = noteData.note.filter(pitch => !pitch.includes("R"));
-                    if (!noteData.drum || pitches.length > 0) {
+                    if (drums.length === 0 || pitches.length > 0) {
                         if (!instrumentTracks.has(instrument)) {
                             const instrumentTrack = midi.addTrack();
                             instrumentTrack.name = `Track ${
@@ -570,6 +687,7 @@ class SaveInterface {
                                 Object.prototype.hasOwnProperty.call(instrumentMIDI, instrument)
                                     ? instrumentMIDI[instrument]
                                     : instrumentMIDI["default"];
+                            instrumentTrack.channel = channelFor(instrumentTrack.instrument.number);
                             instrumentTracks.set(instrument, instrumentTrack);
                         }
 
@@ -587,6 +705,12 @@ class SaveInterface {
                     globalTime += duration;
                 });
                 globalTime = 0;
+
+                // The empty track still writes a program change: give it the one its first
+                // instrument part writes, or the drum channel's, so it changes no instrument.
+                const firstPart = instrumentTracks.values().next().value;
+                mainTrack.channel = firstPart ? firstPart.channel : 9;
+                mainTrack.instrument.number = firstPart ? firstPart.instrument.number : 0;
             });
 
             // Generate the MIDI file and trigger download.
@@ -692,6 +816,38 @@ class SaveInterface {
     }
 
     /**
+     * Restore previously recorded notation from the recording buffer.
+     *
+     * Copies recorded notation output, notes, and per-turtle note and drum staging
+     * arrays from the recording buffer into the logo notation state.
+     *
+     * @param {object} [activity=this.activity] - The activity object.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
+    restoreRecordedNotation(activity = this.activity) {
+        restoreRecordedNotation(activity);
+    }
+
+    /**
+     * Prepare a fresh notation run.
+     *
+     * Resets notation notes, initializes empty note and drum staging arrays
+     * for every turtle, and clears each turtle's painter canvas.
+     *
+     * @param {object} [activity=this.activity] - The activity object.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
+    prepareFreshNotation(activity = this.activity) {
+        prepareFreshNotation(activity);
+    }
+
+    /**
      * Save ABC notation representation of an activity.
      *
      * This method generates and prepares ABC notation output for the provided activity.
@@ -707,34 +863,11 @@ class SaveInterface {
 
         // Lazy-load abc module before using ABCHEADER
 
-        _lazyRequire(["activity/abc"], function () {
+        _lazyRequire(["activity/abc"], () => {
             // Check if we have buffered notation data (Issue #2330)
             if (activity.logo.recordingBuffer.hasData) {
                 // Use buffered data - restore it temporarily
-                activity.logo.notationOutput = activity.logo.recordingBuffer.notationOutput;
-                activity.logo.notationNotes = activity.logo.recordingBuffer.notationNotes;
-                for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
-                    if (
-                        Object.prototype.hasOwnProperty.call(
-                            activity.logo.recordingBuffer.notationStaging,
-                            t
-                        ) &&
-                        activity.logo.recordingBuffer.notationStaging[t]
-                    ) {
-                        activity.logo.notation.notationStaging[t] =
-                            activity.logo.recordingBuffer.notationStaging[t];
-                    }
-                    if (
-                        Object.prototype.hasOwnProperty.call(
-                            activity.logo.recordingBuffer.notationDrumStaging,
-                            t
-                        ) &&
-                        activity.logo.recordingBuffer.notationDrumStaging[t]
-                    ) {
-                        activity.logo.notation.notationDrumStaging[t] =
-                            activity.logo.recordingBuffer.notationDrumStaging[t];
-                    }
-                }
+                this.restoreRecordedNotation(activity);
 
                 // Save immediately
                 setTimeout(() => {
@@ -752,12 +885,7 @@ class SaveInterface {
                 //Suppress music and turtle output when generating Abc output.
                 activity.logo.runningAbc = true;
                 activity.logo.notationOutput = ABCHEADER;
-                activity.logo.notationNotes = {};
-                for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
-                    activity.logo.notation.notationStaging[t] = [];
-                    activity.logo.notation.notationDrumStaging[t] = [];
-                    activity.turtles.getTurtle(t).painter.doClear(true, true, true);
-                }
+                this.prepareFreshNotation(activity);
                 activity.logo.runLogoCommands();
             }
         });
@@ -828,30 +956,7 @@ class SaveInterface {
         // If so, use it directly; otherwise run the program
         if (activity.logo.recordingBuffer.hasData) {
             // Load buffered data
-            activity.logo.notationOutput = activity.logo.recordingBuffer.notationOutput;
-            activity.logo.notationNotes = activity.logo.recordingBuffer.notationNotes;
-            for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
-                if (
-                    Object.prototype.hasOwnProperty.call(
-                        activity.logo.recordingBuffer.notationStaging,
-                        t
-                    ) &&
-                    activity.logo.recordingBuffer.notationStaging[t]
-                ) {
-                    activity.logo.notation.notationStaging[t] =
-                        activity.logo.recordingBuffer.notationStaging[t];
-                }
-                if (
-                    Object.prototype.hasOwnProperty.call(
-                        activity.logo.recordingBuffer.notationDrumStaging,
-                        t
-                    ) &&
-                    activity.logo.recordingBuffer.notationDrumStaging[t]
-                ) {
-                    activity.logo.notation.notationDrumStaging[t] =
-                        activity.logo.recordingBuffer.notationDrumStaging[t];
-                }
-            }
+            this.restoreRecordedNotation(activity);
         }
 
         const lyext = "ly";
@@ -1012,12 +1117,7 @@ class SaveInterface {
                     this.notationConvert = "";
                 }
                 this.activity.logo.notationOutput = lyheader;
-                this.activity.logo.notationNotes = {};
-                for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
-                    this.activity.logo.notation.notationStaging[t] = [];
-                    this.activity.logo.notation.notationDrumStaging[t] = [];
-                    this.activity.turtles.getTurtle(t).painter.doClear(true, true, true);
-                }
+                this.prepareFreshNotation(this.activity);
                 document.body.style.cursor = "wait";
                 this.activity.logo.runLogoCommands();
 
@@ -1197,12 +1297,7 @@ class SaveInterface {
 
     saveMxml(filename) {
         this.activity.logo.runningMxml = true;
-        for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
-            this.activity.logo.notation.notationStaging[t] = [];
-            this.activity.logo.notation.notationDrumStaging[t] = [];
-            this.activity.turtles.getTurtle(t).painter.doClear(true, true, true);
-        }
-
+        this.prepareFreshNotation(this.activity);
         this.activity.logo.runLogoCommands();
     }
 
@@ -1230,5 +1325,9 @@ class SaveInterface {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { SaveInterface };
+    module.exports = {
+        SaveInterface,
+        restoreRecordedNotation,
+        prepareFreshNotation
+    };
 }

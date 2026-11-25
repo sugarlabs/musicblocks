@@ -107,7 +107,7 @@ const makeActivity = (overrides = {}) => ({
         bottomMostBlock: jest.fn(() => 100)
     },
     logo: {
-        tempo: { speedUp: jest.fn(), slowDown: jest.fn() },
+        tempo: { activeBPMIndex: 0, BPMInputs: [], speedUp: jest.fn(), slowDown: jest.fn() },
         doStopTurtles: jest.fn()
     },
     toolbar: { highlightStop: jest.fn() },
@@ -577,7 +577,7 @@ describe("KeyboardController", () => {
             controller.__keyPressed(makeEvent({ keyCode: KEYCODE.UP }));
 
             expect(activity.inTempoWidget).toBe(true);
-            expect(activity.logo.tempo.speedUp).toHaveBeenCalledWith(0);
+            expect(activity.logo.tempo.speedUp).toHaveBeenCalledWith(0, 1);
             expect(activity.blocks.moveStackRelative).not.toHaveBeenCalled();
         });
 
@@ -589,7 +589,47 @@ describe("KeyboardController", () => {
             controller.__keyPressed(makeEvent({ keyCode: KEYCODE.DOWN }));
 
             expect(activity.inTempoWidget).toBe(true);
-            expect(activity.logo.tempo.slowDown).toHaveBeenCalledWith(0);
+            expect(activity.logo.tempo.slowDown).toHaveBeenCalledWith(0, 1);
+        });
+
+        it.each([
+            ["up", KEYCODE.UP, "speedUp"],
+            ["down", KEYCODE.DOWN, "slowDown"]
+        ])("changes the selected row by 1 BPM on the %s arrow", (_label, keyCode, method) => {
+            const activity = makeActivity();
+            activity.logo.tempo.activeBPMIndex = 1;
+            window.widgetWindows.isOpen.mockImplementation(name => name === "tempo");
+            const controller = createController(activity);
+
+            controller.__keyPressed(makeEvent({ keyCode }));
+
+            expect(activity.logo.tempo[method]).toHaveBeenCalledTimes(1);
+            expect(activity.logo.tempo[method]).toHaveBeenCalledWith(1, 1);
+        });
+
+        it.each([
+            ["up", KEYCODE.UP, "speedUp"],
+            ["down", KEYCODE.DOWN, "slowDown"]
+        ])("leaves the %s arrow to a BPM input being edited", (_label, keyCode, method) => {
+            const activity = makeActivity();
+            const inputs = [document.createElement("input"), document.createElement("input")];
+            inputs.forEach(input => document.body.appendChild(input));
+            activity.logo.tempo.BPMInputs = inputs;
+            activity.logo.tempo.activeBPMIndex = 1;
+            window.widgetWindows.isOpen.mockImplementation(name => name === "tempo");
+            const controller = createController(activity);
+
+            inputs[1].focus();
+            controller.__keyPressed(makeEvent({ keyCode }));
+            const callsWhileEditing = activity.logo.tempo[method].mock.calls.length;
+            inputs[1].blur();
+            controller.__keyPressed(makeEvent({ keyCode }));
+            inputs.forEach(input => input.remove());
+
+            expect(callsWhileEditing).toBe(0);
+            expect(activity.logo.tempo[method]).toHaveBeenCalledTimes(1);
+            expect(activity.logo.tempo[method]).toHaveBeenCalledWith(1, 1);
+            expect(activity.blocks.moveStackRelative).not.toHaveBeenCalled();
         });
 
         it("resets inTempoWidget and moves blocks when tempo widget is closed", () => {
@@ -601,7 +641,7 @@ describe("KeyboardController", () => {
             window.widgetWindows.isOpen.mockImplementation(name => name === "tempo");
             controller.__keyPressed(makeEvent({ keyCode: KEYCODE.UP }));
             expect(activity.inTempoWidget).toBe(true);
-            expect(activity.logo.tempo.speedUp).toHaveBeenCalledWith(0);
+            expect(activity.logo.tempo.speedUp).toHaveBeenCalledWith(0, 1);
             expect(activity.blocks.moveStackRelative).not.toHaveBeenCalled();
 
             // Now simulate tempo widget closed
@@ -634,7 +674,7 @@ describe("KeyboardController", () => {
             window.widgetWindows.isOpen.mockImplementation(name => name === "tempo");
             controller.__keyPressed(makeEvent({ keyCode: KEYCODE.UP }));
             expect(activity.inTempoWidget).toBe(true);
-            expect(activity.logo.tempo.speedUp).toHaveBeenCalledWith(0);
+            expect(activity.logo.tempo.speedUp).toHaveBeenCalledWith(0, 1);
             expect(rhythm.scrollEvent).not.toHaveBeenCalled();
 
             // Now simulate tempo widget closed

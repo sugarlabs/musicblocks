@@ -503,6 +503,51 @@ describe("FlowBlocks integration", () => {
         expect(remaining).toHaveLength(1);
     });
 
+    test("WaitForBlock flushes older duplicate requeues while preserving unrelated trailing queue items", () => {
+        const block = getBlock("waitFor");
+        const blk = 6;
+        activity.blocks.blockList[blk] = { connections: [60] };
+        const turtle = activity.turtles.ithTurtle(0);
+        turtle.queue = [];
+
+        turtle.queue.push(new Queue(blk, 1, blk));
+        turtle.queue.push(new Queue(blk, 1, blk));
+        turtle.queue.push(new Queue(blk, 1, blk));
+        turtle.queue.push(new Queue(99, 1, 999));
+
+        block.flow([true], logo, 0, blk);
+
+        expect(turtle.queue).toHaveLength(2);
+        expect(turtle.queue[0].blk).toBe(blk);
+        expect(turtle.queue[0].parentBlk).toBe(blk);
+        expect(turtle.queue[1].blk).toBe(99);
+        expect(turtle.queue[1].parentBlk).toBe(999);
+    });
+
+    test("WaitForBlock cleanup respects actionBoundaries and does not remove entries below nested action boundary", () => {
+        const block = getBlock("waitFor");
+        const blk = 6;
+        activity.blocks.blockList[blk] = { connections: [60] };
+        const turtle = activity.turtles.ithTurtle(0);
+
+        turtle.queue = [];
+        turtle.queue.push(new Queue(50, 1, 500));
+        turtle.queue.push(new Queue(51, 1, 501));
+        turtle.queue.push(new Queue(blk, 1, blk));
+        turtle.queue.push(new Queue(blk, 1, blk));
+        turtle.queue.push(new Queue(99, 1, 999));
+
+        turtle.actionBoundaries = [2];
+
+        block.flow([true], logo, 0, blk);
+
+        expect(turtle.queue).toHaveLength(4);
+        expect(turtle.queue[0].blk).toBe(50);
+        expect(turtle.queue[1].blk).toBe(51);
+        expect(turtle.queue[2].parentBlk).toBe(blk);
+        expect(turtle.queue[3].blk).toBe(99);
+    });
+
     test("UntilBlock requeues when false and cleans when true", () => {
         const block = getBlock("until");
         const blk = 7;
@@ -1013,6 +1058,28 @@ describe("FlowBlocks integration", () => {
             logo.inStatusMatrix = true;
             logo.statusFields = [];
             const res = block.arg(logo, 0, blk);
+
+            expect(logo.statusFields).toHaveLength(0);
+            expect(res).toBe(7);
+            expect(activity.blocks.blockList[blk].value).toBe(7);
+        });
+
+        test("status-matrix with detached block does not throw TypeError", () => {
+            const block = getBlock("duplicatefactor");
+            const blk = 11;
+            activity.blocks.blockList[blk] = {
+                protoblock: block,
+                connections: [null],
+                value: undefined
+            };
+            activity.turtles.ithTurtle(0).singer.duplicateFactor = 7;
+
+            logo.inStatusMatrix = true;
+            logo.statusFields = [];
+            let res;
+            expect(() => {
+                res = block.arg(logo, 0, blk);
+            }).not.toThrow();
 
             expect(logo.statusFields).toHaveLength(0);
             expect(res).toBe(7);

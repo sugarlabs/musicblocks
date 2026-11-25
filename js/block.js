@@ -1811,6 +1811,13 @@ class Block {
                             platformColor.blockText
                         );
                         break;
+                    case "chordbuilder":
+                        that.collapseText = new createjs.Text(
+                            _("chords"),
+                            fontSize + "px Sans",
+                            platformColor.blockText
+                        );
+                        break;
                     case "status":
                         that.collapseText = new createjs.Text(
                             _("status"),
@@ -2834,6 +2841,9 @@ class Block {
 
         this.updateCache();
         this.unhighlight();
+        if (typeof this.blocks._updateViewportGrid === "function") {
+            this.blocks._updateViewportGrid(thisBlock);
+        }
         this.activity.refreshCanvas();
     }
 

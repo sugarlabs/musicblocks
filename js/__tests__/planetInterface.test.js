@@ -48,7 +48,8 @@ const mockActivity = {
     turtles: {},
     loading: false,
     prepareExport: jest.fn(),
-    _allClear: jest.fn()
+    _allClear: jest.fn(),
+    artworkRevision: 0
 };
 
 document.body.innerHTML = `
@@ -85,6 +86,7 @@ describe("PlanetInterface", () => {
     beforeEach(() => {
         planetInterface = new PlanetInterface(mockActivity);
         mockActivity.errorMsg.mockClear();
+        mockActivity.artworkRevision = 0;
     });
 
     test("hideMusicBlocks hides relevant elements and disables DOM events", () => {
@@ -133,7 +135,7 @@ describe("PlanetInterface", () => {
         jest.spyOn(planetInterface, "hideMusicBlocks").mockImplementation(() => {});
         jest.spyOn(planetInterface, "showPlanet").mockImplementation(() => {});
         planetInterface.openPlanet();
-        expect(planetInterface.saveLocally).toHaveBeenCalled();
+        expect(planetInterface.saveLocally).toHaveBeenCalledWith({ forceThumbnail: true });
         expect(planetInterface.hideMusicBlocks).toHaveBeenCalled();
         expect(planetInterface.showPlanet).toHaveBeenCalled();
     });
@@ -1731,5 +1733,229 @@ describe("PlanetInterface", () => {
 
         expect(consoleErrorSpy).toHaveBeenCalledWith(expect.any(Error));
         consoleErrorSpy.mockRestore();
+    });
+
+    /**
+     * Wires up a ProjectStorage mock plus the Image/createjs stubs needed for
+     * saveLocally to complete its thumbnail path synchronously.
+     */
+    const setupThumbnailHarness = projectIdGetter => {
+        doSVG.mockReturnValue("<svg/>");
+        mockActivity.prepareExport.mockReturnValue("EXPORT");
+        global.base64Encode = jest.fn(s => s);
+
+        const saveLocally = jest.fn(async () => {});
+        planetInterface.planet = {
+            ProjectStorage: {
+                getCurrentProjectID: jest.fn(projectIdGetter),
+                getCurrentProjectImage: jest.fn(() => "OLD_IMAGE"),
+                saveLocally
+            }
+        };
+
+        global.Image = class {
+            set src(_value) {
+                this.onload();
+            }
+        };
+        global.createjs = {
+            Bitmap: class {
+                getBounds() {
+                    return { x: 0, y: 0, width: 1, height: 1 };
+                }
+                cache() {
+                    this.bitmapCache = { getCacheDataURL: () => "DATAURL" };
+                }
+            }
+        };
+
+        return saveLocally;
+    };
+
+    test("saveLocally: reuses a fresh thumbnail for the same project", async () => {
+        const saveLocally = setupThumbnailHarness(() => "proj-1");
+
+        await planetInterface.saveLocally();
+        expect(doSVG).toHaveBeenCalledTimes(1);
+
+        await planetInterface.saveLocally();
+        expect(doSVG).toHaveBeenCalledTimes(1);
+        expect(saveLocally).toHaveBeenNthCalledWith(1, "EXPORT", "OLD_IMAGE", "proj-1");
+        expect(saveLocally).toHaveBeenNthCalledWith(2, "EXPORT", "DATAURL", "proj-1");
+        expect(saveLocally).toHaveBeenNthCalledWith(3, "EXPORT", "DATAURL", "proj-1");
+    });
+
+    test("saveLocally: rebuilds the thumbnail once the artwork revision changes", async () => {
+        setupThumbnailHarness(() => "proj-1");
+
+        await planetInterface.saveLocally();
+        expect(doSVG).toHaveBeenCalledTimes(1);
+
+        mockActivity.artworkRevision += 1;
+        await planetInterface.saveLocally();
+        expect(doSVG).toHaveBeenCalledTimes(2);
+    });
+
+    test("saveLocally: a text-only edit after a save does not reuse the old thumbnail", async () => {
+        require("../turtle");
+        const Turtle = global.Turtle;
+        const saveLocally = setupThumbnailHarness(() => "proj-1");
+
+        await planetInterface.saveLocally();
+        expect(doSVG).toHaveBeenCalledTimes(1);
+        expect(saveLocally).toHaveBeenNthCalledWith(2, "EXPORT", "DATAURL", "proj-1");
+
+        // Render text through the real doShowText so the artwork revision is
+        // advanced by the production code rather than by the test.
+        global.createjs.Text = class {
+            constructor(text, font, color) {
+                this.text = text;
+                this.font = font;
+                this.color = color;
+            }
+            getMeasuredWidth() {
+                return 10;
+            }
+            getMeasuredHeight() {
+                return 10;
+            }
+        };
+        const view = new Turtle.TurtleView();
+        view.activity = mockActivity;
+        view.container = { x: 0, y: 0 };
+        view.orientation = 0;
+        view._media = [];
+        view.painter = { font: "sans-serif", canvasColor: "#00f", svgOutput: "" };
+        view.turtles = { scale: 1, stage: { addChild: jest.fn() } };
+
+        view.doShowText(20, "hi");
+        expect(mockActivity.artworkRevision).toBe(1);
+
+        await planetInterface.saveLocally();
+        expect(doSVG).toHaveBeenCalledTimes(2);
+        expect(saveLocally).toHaveBeenLastCalledWith("EXPORT", "DATAURL", "proj-1");
+    });
+
+    test("saveLocally: invalidates a thumbnail whose artwork changed while it was rendering", async () => {
+        doSVG.mockReturnValue("<svg/>");
+        mockActivity.prepareExport.mockReturnValue("EXPORT");
+        global.base64Encode = jest.fn(s => s);
+
+        let pendingImage;
+        global.Image = class {
+            constructor() {
+                pendingImage = this;
+            }
+            set src(_value) {}
+        };
+        global.createjs = {
+            Bitmap: class {
+                getBounds() {
+                    return { x: 0, y: 0, width: 1, height: 1 };
+                }
+                cache() {
+                    this.bitmapCache = { getCacheDataURL: () => "DATAURL" };
+                }
+            }
+        };
+        const saveLocally = jest.fn(async () => {});
+        planetInterface.planet = {
+            ProjectStorage: {
+                getCurrentProjectID: jest.fn(() => "proj-1"),
+                getCurrentProjectImage: jest.fn(() => "OLD_IMAGE"),
+                saveLocally
+            }
+        };
+
+        // The thumbnail renders against the artwork revision at this moment.
+        await planetInterface.saveLocally();
+        expect(doSVG).toHaveBeenCalledTimes(1);
+
+        // Drawing continues before the deferred onload commits the thumbnail,
+        // which records the revision captured at render time.
+        mockActivity.artworkRevision += 1;
+        pendingImage.onload();
+        await Promise.resolve();
+
+        // The recorded revision no longer matches, so the next save rebuilds.
+        await planetInterface.saveLocally();
+        expect(doSVG).toHaveBeenCalledTimes(2);
+    });
+
+    test("saveLocally: rebuilds the thumbnail when a different project becomes current", async () => {
+        let currentProject = "proj-1";
+        const saveLocally = setupThumbnailHarness(() => currentProject);
+
+        await planetInterface.saveLocally();
+        expect(doSVG).toHaveBeenCalledTimes(1);
+
+        currentProject = "proj-2";
+        await planetInterface.saveLocally();
+
+        expect(doSVG).toHaveBeenCalledTimes(2);
+        expect(saveLocally).toHaveBeenLastCalledWith("EXPORT", "DATAURL", "proj-2");
+    });
+
+    test("saveLocally: forceThumbnail rebuilds the thumbnail even when the cache is fresh", async () => {
+        setupThumbnailHarness(() => "proj-1");
+
+        await planetInterface.saveLocally();
+        expect(doSVG).toHaveBeenCalledTimes(1);
+
+        await planetInterface.saveLocally({ forceThumbnail: true });
+        expect(doSVG).toHaveBeenCalledTimes(2);
+    });
+
+    test("saveLocally: never reuses a thumbnail when the storage cannot report a project id", async () => {
+        doSVG.mockReturnValue("<svg/>");
+        mockActivity.prepareExport.mockReturnValue("EXPORT");
+        global.base64Encode = jest.fn(s => s);
+
+        const saveLocally = jest.fn(async () => {});
+        planetInterface.planet = { ProjectStorage: { saveLocally } };
+
+        global.Image = class {
+            set src(_value) {
+                this.onload();
+            }
+        };
+        global.createjs = {
+            Bitmap: class {
+                getBounds() {
+                    return { x: 0, y: 0, width: 1, height: 1 };
+                }
+                cache() {
+                    this.bitmapCache = { getCacheDataURL: () => "DATAURL" };
+                }
+            }
+        };
+
+        await planetInterface.saveLocally();
+        await planetInterface.saveLocally();
+
+        expect(doSVG).toHaveBeenCalledTimes(2);
+        expect(saveLocally).toHaveBeenNthCalledWith(1, "EXPORT", null);
+        expect(planetInterface._thumbnailCache.projectId).toBeUndefined();
+        expect(planetInterface._thumbnailCache.url).toBeNull();
+    });
+
+    test("saveLocally: clears the thumbnail cache when no image is produced", async () => {
+        const saveLocally = setupThumbnailHarness(() => "proj-1");
+
+        // First save generates and caches a thumbnail.
+        await planetInterface.saveLocally();
+        expect(planetInterface._thumbnailCache.url).toBe("DATAURL");
+
+        // A forced save with no artwork must drop the cached URL...
+        doSVG.mockReturnValue("");
+        await planetInterface.saveLocally({ forceThumbnail: true });
+        expect(saveLocally).toHaveBeenLastCalledWith("EXPORT", null, "proj-1");
+        expect(planetInterface._thumbnailCache.projectId).toBeUndefined();
+        expect(planetInterface._thumbnailCache.url).toBeNull();
+
+        // ...so the next save rebuilds instead of restoring the stale URL.
+        doSVG.mockReturnValue("<svg/>");
+        await planetInterface.saveLocally();
+        expect(doSVG).toHaveBeenCalledTimes(3);
     });
 });

@@ -179,6 +179,18 @@ describe("setupVolumeBlocks", () => {
             expect(logo.statusFields).toContainEqual([blk, "synth volume"]);
         });
 
+        it("should handle detached synth volume block in status matrix without throwing", () => {
+            const blk = "blkSynthVolDetached";
+            activity.blocks.blockList[blk] = { connections: [null, null] };
+            logo.inStatusMatrix = true;
+            const synthVolBlock = createdBlocks["synthvolumefactor"];
+            let ret;
+            expect(() => {
+                ret = synthVolBlock.arg(logo, turtleIndex, blk, "piano");
+            }).not.toThrow();
+            expect(ret).toEqual(0);
+        });
+
         it("should call getSynthVolume when connection is valid", () => {
             const blk = "blkSynthVol2";
             activity.blocks.blockList[blk] = { connections: [null, 30] };
@@ -218,6 +230,19 @@ describe("setupVolumeBlocks", () => {
             const masterVolBlock = createdBlocks["notevolumefactor"];
             masterVolBlock.arg(logo, turtleIndex, blk);
             expect(logo.statusFields).toContainEqual([blk, "volume"]);
+        });
+
+        it("should handle detached master volume block in status matrix without throwing", () => {
+            const blk = "blkMasterVolDetached";
+            activity.blocks.blockList[blk] = { connections: [null] };
+            logo.inStatusMatrix = true;
+            Singer.VolumeActions.masterVolume = 85;
+            const masterVolBlock = createdBlocks["notevolumefactor"];
+            let ret;
+            expect(() => {
+                ret = masterVolBlock.arg(logo, turtleIndex, blk);
+            }).not.toThrow();
+            expect(ret).toEqual(85);
         });
 
         it("should return master volume when not in status matrix", () => {

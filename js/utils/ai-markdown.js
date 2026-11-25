@@ -39,28 +39,34 @@ function escapeChatText(text) {
  * @returns {string}
  */
 function renderInline(text) {
-    // Code spans are set aside so ** and * inside them stay as written. They
-    // are marked with a private-use character, which is removed from the reply
-    // first so the reply cannot contain a marker of its own.
+    // Code spans and link addresses are set aside so ** and * inside them stay
+    // as written. They are marked with a private-use character, which is
+    // removed from the reply first so the reply cannot contain a marker of its
+    // own.
     const marker = String.fromCharCode(0xe000);
-    const codes = [];
-    let html = text
+    const saved = [];
+    const save = value => {
+        saved.push(value);
+        return `${marker}${saved.length - 1}${marker}`;
+    };
+    const codeSpans = value =>
+        value.replace(/`([^`]+)`/g, (_match, code) => save(`<code>${code}</code>`));
+    // One pass from left to right, so whatever starts first wins: a link inside
+    // a code span stays code, and a backtick inside a link address stays part of
+    // the address. The link text is still formatted.
+    const html = text
         .split(marker)
         .join("")
-        .replace(/`([^`]+)`/g, (_match, code) => {
-            codes.push(`<code>${code}</code>`);
-            return `${marker}${codes.length - 1}${marker}`;
-        });
-    html = html
+        .replace(/`([^`]+)`|\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (match, code, label, url) =>
+            code === undefined
+                ? `<a href="${save(url)}" target="_blank" rel="noopener noreferrer">${codeSpans(label)}</a>`
+                : save(`<code>${code}</code>`)
+        )
         .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-        .replace(/(^|[^*\w])\*(?!\s)(.+?)\*(?!\w)/g, "$1<em>$2</em>")
-        .replace(
-            /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
-            '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
-        );
+        .replace(/(^|[^*\w])\*(?!\s)(.+?)\*(?!\w)/g, "$1<em>$2</em>");
     return html.replace(
         new RegExp(`${marker}(\\d+)${marker}`, "g"),
-        (_match, index) => codes[Number(index)]
+        (_match, index) => saved[Number(index)]
     );
 }
 

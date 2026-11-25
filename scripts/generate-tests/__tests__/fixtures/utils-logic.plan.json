@@ -475,7 +475,7 @@
       "isGenerator": false,
       "returns": 0,
       "throws": 0,
-      "branches": 0
+      "branches": 2
     },
     {
       "name": "isValidHex",
@@ -1004,7 +1004,7 @@
     }
   ],
   "totals": {
-    "branches": 214,
+    "branches": 216,
     "returns": 110,
     "throws": 0
   }

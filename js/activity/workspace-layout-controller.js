@@ -26,6 +26,7 @@ class WorkspaceLayoutController {
 
         this._previousCanvasWidth = undefined;
         this._resizeSession = null;
+        this._homeIndicatorState = { left: false, right: false, above: false, below: false };
     }
 
     /**
@@ -688,6 +689,69 @@ class WorkspaceLayoutController {
         } else {
             changeImage(activity.homeButtonContainer.children[0], GOHOMEBUTTON, GOHOMEFADEDBUTTON);
         }
+    }
+
+    /**
+     * Updates the directional markers shown around the Home button.
+     * @param {{left: boolean, right: boolean, above: boolean, below: boolean}} directions
+     * @returns {void}
+     */
+    setHomeIndicators(directions = {}) {
+        const indicatorState = {
+            left: Boolean(directions.left),
+            right: Boolean(directions.right),
+            above: Boolean(directions.above),
+            below: Boolean(directions.below)
+        };
+        this._homeIndicatorState = indicatorState;
+        const container = this.activity.homeButtonContainer;
+        if (
+            !container ||
+            typeof container.appendChild !== "function" ||
+            typeof container.querySelector !== "function"
+        ) {
+            return;
+        }
+
+        const positions = {
+            left: "left: -4px; top: 50%; transform: translateY(-50%);",
+            right: "right: -4px; top: 50%; transform: translateY(-50%);",
+            above: "left: 50%; top: -4px; transform: translateX(-50%);",
+            below: "left: 50%; bottom: -4px; transform: translateX(-50%);"
+        };
+        container.style.overflow = "visible";
+
+        for (const direction of Object.keys(positions)) {
+            let indicator = container.querySelector(`[data-home-indicator="${direction}"]`);
+            if (!indicator) {
+                indicator = document.createElement("span");
+                indicator.setAttribute("data-home-indicator", direction);
+                indicator.setAttribute("aria-hidden", "true");
+                indicator.style.cssText =
+                    "position: absolute; width: 7px; height: 7px; border-radius: 50%; " +
+                    "background-color: #f00; pointer-events: none; z-index: 1; " +
+                    positions[direction];
+                container.appendChild(indicator);
+            }
+
+            indicator.hidden = !directions[direction];
+            indicator.style.display = directions[direction] ? "block" : "none";
+        }
+    }
+
+    /**
+     * Reapplies the last directional state after the Home button is recreated.
+     * @returns {void}
+     */
+    refreshHomeIndicators() {
+        this.setHomeIndicators(
+            this._homeIndicatorState || {
+                left: false,
+                right: false,
+                above: false,
+                below: false
+            }
+        );
     }
 }
 

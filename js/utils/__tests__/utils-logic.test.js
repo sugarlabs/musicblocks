@@ -698,6 +698,23 @@ describe("Utility Logic Functions", () => {
             expect(isUnsafeObjectKey("FLOWPLUGINS")).toBe(false);
             expect(isUnsafeObjectKey("")).toBe(false);
         });
+
+        it("flags non-string representations of reserved keys", () => {
+            expect(isUnsafeObjectKey(["__proto__"])).toBe(true);
+            expect(isUnsafeObjectKey(["constructor"])).toBe(true);
+            expect(isUnsafeObjectKey(["prototype"])).toBe(true);
+            expect(isUnsafeObjectKey(new String("__proto__"))).toBe(true);
+            expect(isUnsafeObjectKey({ toString: () => "__proto__" })).toBe(true);
+        });
+
+        it("allows null, undefined, numbers, and ordinary objects", () => {
+            expect(isUnsafeObjectKey(null)).toBe(false);
+            expect(isUnsafeObjectKey(undefined)).toBe(false);
+            expect(isUnsafeObjectKey(0)).toBe(false);
+            expect(isUnsafeObjectKey(42)).toBe(false);
+            expect(isUnsafeObjectKey({})).toBe(false);
+            expect(isUnsafeObjectKey(["safeKey"])).toBe(false);
+        });
     });
 
     describe("GCD()", () => {
