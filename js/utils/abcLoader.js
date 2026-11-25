@@ -54,11 +54,13 @@ function loadABCJSViaScriptTag() {
                 resolve();
             } else {
                 const onLoad = () => {
+                    existing.removeEventListener("load", onLoad);
                     existing.removeEventListener("error", onError);
                     resolve();
                 };
                 const onError = err => {
                     existing.removeEventListener("load", onLoad);
+                    existing.removeEventListener("error", onError);
                     existing.remove();
                     reject(err);
                 };

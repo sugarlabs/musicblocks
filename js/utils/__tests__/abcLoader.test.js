@@ -105,6 +105,7 @@ describe("ensureABCJS", () => {
 
         const appendChildSpy = jest.spyOn(document.head, "appendChild");
         const addEventListenerSpy = jest.spyOn(existingScript, "addEventListener");
+        const removeEventListenerSpy = jest.spyOn(existingScript, "removeEventListener");
 
         const promise = ensureABCJS();
 
@@ -113,16 +114,19 @@ describe("ensureABCJS", () => {
 
         // Should attach an event listener to wait for loading
         expect(addEventListenerSpy).toHaveBeenCalledWith("load", expect.any(Function));
+        expect(addEventListenerSpy).toHaveBeenCalledWith("error", expect.any(Function));
 
-        // Get the resolved callback function and call it manually
-        const onloadCallback = addEventListenerSpy.mock.calls[0][1];
-        onloadCallback();
+        // Dispatch load and wait for settlement
+        existingScript.dispatchEvent(new Event("load"));
 
         // Wait for settlement
         await expect(promise).resolves.toBeUndefined();
+        expect(removeEventListenerSpy).toHaveBeenCalledWith("load", expect.any(Function));
+        expect(removeEventListenerSpy).toHaveBeenCalledWith("error", expect.any(Function));
 
         appendChildSpy.mockRestore();
         addEventListenerSpy.mockRestore();
+        removeEventListenerSpy.mockRestore();
     });
 
     it("should reject existing-script callers on error and remove the failed tag", async () => {
