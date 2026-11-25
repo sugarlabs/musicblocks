@@ -726,6 +726,35 @@ describe("MeterBlocks setup", () => {
         expect(logo.setTurtleListener).not.toHaveBeenCalled();
     });
 
+    it("reports missing argument error for null and non-numeric inputs in setbpm2 and setbpm but runs child flow", () => {
+        const block2 = getBlock("setbpm2");
+        const turtle = { singer: { bpm: [] } };
+        activity.turtles.ithTurtle.mockReturnValue(turtle);
+
+        [
+            [null, 0.25, "childBlock"],
+            [90, null, "childBlock"],
+            ["not-a-number", 0.25, "childBlock"],
+            [90, "not-a-number", "childBlock"],
+            [undefined, undefined, "childBlock"]
+        ].forEach(args => {
+            activity.errorMsg.mockClear();
+            expect(block2.flow(args, logo, 0, "flow")).toEqual(["childBlock", 1]);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, "flow");
+        });
+
+        const block1 = getBlock("setbpm");
+        [
+            [null, "childBlock"],
+            ["not-a-number", "childBlock"],
+            [undefined, "childBlock"]
+        ].forEach(args => {
+            activity.errorMsg.mockClear();
+            expect(block1.flow(args, logo, 0, "legacyBpm")).toEqual(["childBlock", 1]);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, "legacyBpm");
+        });
+    });
+
     it("pushes and pops BPM values with the older setbpm block", () => {
         const block = getBlock("setbpm");
         const turtle = { singer: { bpm: [] } };
