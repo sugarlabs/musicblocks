@@ -161,7 +161,6 @@ var keySignatureToMode = keySignature => {
 
         key = getNote(key, 4, 0, "C Major", false)[0];
     } else if (!NOTESSHARP.includes(key) && !NOTESFLAT.includes(key)) {
-        console.debug("Invalid key or missing name; reverting to C.");
         // Is is possible that the key was left out?
         keySignature = "C " + keySignature;
         parts = keySignature.split(" ");
@@ -204,7 +203,6 @@ var keySignatureToMode = keySignature => {
     if (modeKey in MUSICALMODES) {
         return [key, modeKey];
     } else {
-        console.debug("Invalid mode name: " + mode + " reverting to major.");
         return [key, "major"];
     }
 };
@@ -978,13 +976,6 @@ var getNoteFromSolfege = (
         // Ensure it is a valid key signature.
         offset = thisScale.indexOf(myKeySignature);
         if (offset === -1) {
-            console.debug(
-                "WARNING: Key " +
-                    myKeySignature +
-                    " not found in " +
-                    thisScale +
-                    ". Using default of C"
-            );
             offset = 0;
             thisScale = NOTESSHARP;
         }
@@ -1207,8 +1198,6 @@ function getNote(
             }
             if (kOffset === -1) {
                 kOffset = 0;
-
-                console.log("Cannot find " + keySignature.split(" ")[0] + ". Reverting to C");
             }
         }
         // Apply the key offset before normalizing the pitch index.
@@ -1340,15 +1329,6 @@ function getNote(
                     octave = solfegeNote[1];
                     transpositionFloor = solfegeNote[2];
                 } else if (errorMsg !== undefined) {
-                    console.debug(
-                        "WARNING: EDO note [" +
-                            noteArg +
-                            "] (normalized: " +
-                            normalizedName +
-                            ") not found in generateNoteNames(" +
-                            octaveLength +
-                            ")"
-                    );
                     errorMsg(INVALIDPITCH, null);
                     return ["R", "", 0];
                 } else {
@@ -1375,9 +1355,6 @@ function getNote(
                 transpositionFloor
             );
             if (solfegeNote === null) {
-                console.debug(
-                    "WARNING: Note [" + noteArg + "] not found in the scale. Returning REST"
-                );
                 if (errorMsg !== undefined) {
                     errorMsg(INVALIDPITCH, null);
                 }
@@ -1422,8 +1399,6 @@ function getNote(
                         }
                     }
                     note = generateNoteNames(octaveLength)[i];
-                } else {
-                    console.debug("note not found in EDO table? " + note);
                 }
             }
         }
