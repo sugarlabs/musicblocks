@@ -527,19 +527,23 @@ class Notation {
             firstStagingStart >= 0 &&
             firstStagingStart < staging.length
         ) {
-            const firstEntry = staging.slice(firstStagingStart).find(Array.isArray);
-            let lastEntry = null;
-            for (let i = staging.length - 1; i >= firstStagingStart; i--) {
+            let firstIdx = -1;
+            let lastIdx = -1;
+            for (let i = firstStagingStart; i < staging.length; i++) {
                 if (Array.isArray(staging[i])) {
-                    lastEntry = staging[i];
-                    break;
+                    if (firstIdx === -1) firstIdx = i;
+                    lastIdx = i;
                 }
             }
-            if (firstEntry && lastEntry && firstEntry !== lastEntry) {
-                firstEntry[7] = notatedDrums;
-                firstEntry[8] = [obj[0], obj[1], obj[2], obj[3]];
-                lastEntry[7] = null;
-                lastEntry[8] = "merged-tied-drum";
+            if (firstIdx !== -1 && lastIdx !== -1 && firstIdx !== lastIdx) {
+                staging[firstIdx][7] = notatedDrums;
+                staging[firstIdx][8] = [obj[0], obj[1], obj[2], obj[3]];
+                for (let i = firstIdx + 1; i <= lastIdx; i++) {
+                    if (Array.isArray(staging[i])) {
+                        staging[i][7] = null;
+                        staging[i][8] = i === lastIdx ? "merged-tied-drum" : "merged-tied-drum-mid";
+                    }
+                }
             }
         }
     }

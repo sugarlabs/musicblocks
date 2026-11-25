@@ -443,6 +443,28 @@ describe("Notation Class", () => {
                 [["bd"], 2, 0, null, null, -1, false]
             ]);
         });
+
+        it("should suppress barline-split intermediate staging entries for a tied drum note", () => {
+            const turtle = "turtle1";
+            global.durationToNoteValue.mockReturnValueOnce([4, 0, null, null]);
+            notation.doUpdateNotation(["R"], 4, turtle, -1, ["snare drum"]);
+            global.durationToNoteValue.mockReturnValueOnce([8, 0, null, null]);
+            notation.doUpdateNotation(["R"], 8, turtle, -1, ["snare drum"]);
+            notation.notationInsertTie(turtle);
+            global.durationToNoteValue.mockReturnValueOnce([8, 0, null, null]);
+            notation.doUpdateNotation(["R"], 8, turtle, -1, ["snare drum"]);
+
+            global.durationToNoteValue.mockReturnValueOnce([2, 0, null, null]);
+            global.getDrumSymbol.mockReturnValueOnce("sn");
+            notation.stageTiedDrums(turtle, 0, 0, ["snare drum"], 2);
+
+            expect(notation._notationStaging[turtle][0][7]).toEqual(["snare drum"]);
+            expect(notation._notationStaging[turtle][0][8]).toEqual([2, 0, null, null]);
+            expect(notation._notationStaging[turtle][1][7]).toBeNull();
+            expect(notation._notationStaging[turtle][1][8]).toBe("merged-tied-drum-mid");
+            expect(notation._notationStaging[turtle][3][7]).toBeNull();
+            expect(notation._notationStaging[turtle][3][8]).toBe("merged-tied-drum");
+        });
     });
 
     describe("Edge Cases", () => {

@@ -1779,4 +1779,56 @@ describe("saveMxmlOutput - key mode", () => {
             /<\/unpitched>\s*<duration>8<\/duration>\s*<instrument id="D1-X3"\/>\s*<type>quarter<\/type>/
         );
     });
+
+    it("preserves markdown print text reading 'tie' between merged tied drum notes", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [
+                        [["R"], 4, 0, null, null, -1, false, ["snare drum"], [2, 0, null, null]],
+                        "markdown",
+                        "tie",
+                        "tie",
+                        [["R"], 4, 0, null, null, -1, false, null, "merged-tied-drum"]
+                    ]
+                }
+            }
+        });
+        const percussion = output.split('<part id="D1">')[1].split("</part>")[0];
+
+        expect(percussion).toMatch(
+            /<direction placement="below">\s*<direction-type>\s*<words>tie<\/words>/
+        );
+        expect(percussion).not.toContain("<tie ");
+        expect(percussion.match(/<unpitched>/g)).toHaveLength(1);
+    });
+
+    it("splits a merged tied drum event across a measure boundary and ties its continuation", () => {
+        const quarterDrum = [["R"], 4, 0, null, null, -1, false, ["snare drum"]];
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [
+                        quarterDrum,
+                        quarterDrum,
+                        quarterDrum,
+                        [["R"], 4, 0, null, null, -1, false, ["snare drum"], [2, 0, null, null]],
+                        "tie",
+                        [["R"], 4, 0, null, null, -1, false, null, "merged-tied-drum"]
+                    ]
+                }
+            }
+        });
+        const percussion = output.split('<part id="D1">')[1].split("</part>")[0];
+        const m1 = percussion.split('<measure number="1">')[1].split("</measure>")[0];
+        const m2 = percussion.split('<measure number="2">')[1].split("</measure>")[0];
+
+        expect(m1.match(/<unpitched>/g)).toHaveLength(4);
+        expect(m1).toContain('<tie type="start"/>');
+        expect(m1).toContain('<tied type="start"/>');
+        expect(m2.match(/<unpitched>/g)).toHaveLength(1);
+        expect(m2).toContain('<tie type="stop"/>');
+        expect(m2).toContain('<tied type="stop"/>');
+        expect(m2).toMatch(/<duration>8<\/duration>[\s\S]*?<type>quarter<\/type>/);
+    });
 });
