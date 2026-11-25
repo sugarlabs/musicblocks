@@ -177,6 +177,9 @@ const MusicKeyboardEditing = {
          * @param {string} start - The start attribute of the cell.
          */
         this._createpiesubmenu = function (cellId, start) {
+            // Rebuilding the menu for the same owner must remove the old wheels
+            // first: wheelnav's keydown listener lives on the wheel instance.
+            this._closeWheelMenu();
             this._claimWheelMenu();
             docById("wheelDivptm").style.display = "";
             docById("wheelDivptm").style.zIndex = "10001";

@@ -86,6 +86,7 @@ const makeKeyboard = (deps = {}) => {
 
 describe("MusicKeyboardEditing", () => {
     afterEach(() => {
+        MusicKeyboardEditing._wheelMenuOwner = null;
         delete window.configureExitWheel;
         delete global.docById;
     });
@@ -132,6 +133,34 @@ describe("MusicKeyboardEditing", () => {
 
             keyboard._durationWheel.navigateWheel(1);
             expect(keyboard._updateDuration).toHaveBeenCalledWith("250", ["1", "4"]);
+        });
+
+        test("removes the previous duration wheel before rebuilding the menu", () => {
+            const keyboard = makeKeyboard();
+            keyboard._mkbEl = () => ({ getBoundingClientRect: () => ({ x: 10, y: 20 }) });
+            keyboard.activity = {
+                canvas: { width: 600, height: 400 },
+                getStageScale: () => 1
+            };
+            keyboard._updateDuration = jest.fn();
+            global.docById = id => document.getElementById(id);
+
+            const wheelDiv = document.createElement("div");
+            wheelDiv.id = "wheelDivptm";
+            const title = document.createElement("div");
+            title.id = "wheelnav-wheelDivptm-title-3";
+            title.appendChild(document.createElement("span"));
+            document.body.append(wheelDiv, title);
+
+            keyboard._createpiesubmenu("cells-0", "250");
+            const firstDurationWheel = keyboard._durationWheel;
+            const removeWheel = jest.spyOn(firstDurationWheel, "removeWheel");
+
+            keyboard._createpiesubmenu("cells-1", "500");
+
+            expect(removeWheel).toHaveBeenCalledTimes(1);
+            expect(keyboard._durationWheel).not.toBe(firstDurationWheel);
+            expect(keyboard._durationWheel.keynavigateAtCreate).toBe(true);
         });
     });
 

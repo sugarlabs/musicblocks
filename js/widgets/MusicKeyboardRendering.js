@@ -196,10 +196,11 @@ const MusicKeyboardRendering = {
         this.makeClickable = function () {
             const selectedNotes = getSelectedNotes();
             const rowNote = this._mkbEl("mkbNoteDurationRow");
-            let cell;
 
             for (let i = 0; i < selectedNotes.length; i++) {
-                cell = rowNote.cells[i];
+                // Keep the handler closures bound to their own cell. A shared
+                // variable would leave every handler pointing at the last cell.
+                let cell = rowNote.cells[i];
 
                 if (typeof cell.setAttribute === "function") {
                     cell.setAttribute("tabindex", "0");
@@ -244,7 +245,7 @@ const MusicKeyboardRendering = {
                 // The buttons get added to the embedded table.
                 row = this._mkbEl("mkb" + i);
                 for (let j = 0; j < row.cells.length; j++) {
-                    cell = row.cells[j];
+                    let cell = row.cells[j];
                     // Give each clickable cell a unique id
                     cell.setAttribute("id", i + ":" + j);
 

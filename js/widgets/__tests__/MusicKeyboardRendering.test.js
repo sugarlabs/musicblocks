@@ -223,8 +223,44 @@ describe("MusicKeyboardRendering", () => {
     test("makeClickable handles an empty keyboard grid", () => {
         const keyboard = makeKeyboard({ getSelectedNotes: () => [] });
         keyboard.layout = [];
+        keyboard._setNotes = jest.fn();
+        keyboard._createpiesubmenu = jest.fn();
 
         expect(() => keyboard.makeClickable()).not.toThrow();
+        expect(keyboard._setNotes).not.toHaveBeenCalled();
+        expect(keyboard._createpiesubmenu).not.toHaveBeenCalled();
+    });
+
+    test("makeClickable keeps each handler bound to its own cell", () => {
+        const keyboard = makeKeyboard({ getSelectedNotes: () => [{ duration: [0.25] }] });
+        keyboard._setNotes = jest.fn();
+        keyboard._createpiesubmenu = jest.fn();
+        keyboard.layout = [{ noteName: "C", noteOctave: 4, blockNumber: 1 }];
+
+        const durationTable = document.createElement("table");
+        const durationRow = durationTable.insertRow();
+        durationRow.id = "mkbNoteDurationRow";
+        durationRow.insertCell().textContent = "1/4";
+        document.body.append(durationTable);
+
+        const gridTable = document.createElement("table");
+        const gridRow = gridTable.insertRow();
+        gridRow.id = "mkb0";
+        const firstCell = gridRow.insertCell();
+        const secondCell = gridRow.insertCell();
+        for (const gridCell of [firstCell, secondCell]) {
+            gridCell.setAttribute("cellColor", "white");
+        }
+        document.body.append(gridTable);
+
+        keyboard.makeClickable();
+
+        // With no event target the handler must fall back to the cell it was
+        // created for, not the last cell visited by makeClickable.
+        firstCell.onkeydown({ key: " ", preventDefault() {}, stopPropagation() {} });
+        expect(firstCell.getAttribute("aria-pressed")).toBe("true");
+        expect(secondCell.getAttribute("aria-pressed")).toBe("false");
+        expect(keyboard._setNotes).toHaveBeenCalledWith(0, true);
     });
 
     test("_createTable draws the note list that processSelected() leaves behind", () => {
