@@ -1445,7 +1445,7 @@ a full circle.
 
 The *On-Every-Note-Do* block is found in the Crab Canon project on the
 Planet to "plot the music". The mouse moves up and down based on the
-change in pich between notes and to the right in proportion to the
+change in pitch between notes and to the right in proportion to the
 note value.
 
 ![crab-canon](./crab-canon.svg)
@@ -2144,7 +2144,7 @@ clockwise, transforming it into *Locrian*.
 In the above example, the *Major* mode has been inverted, transforming
 it into *Phrygian*.
 
-Note: The build-in modes in Music Blocks can be found in
+Note: The built-in modes in Music Blocks can be found in
 [musicutils.js](https://github.com/sugarlabs/musicblocks/blob/master/js/utils/musicutils.js#L68).
 
 ![widget](./mode6.svg "phrase maker block")
@@ -2521,7 +2521,7 @@ of your sample so that it can be tuned.
 The pitch selector displays both the note name (such as A4) and its corresponding frequency in Hertz (Hz). This helps you understand the mathematical relationship between musical notes and sound frequencies - each octave represents a doubling of frequency (e.g., A4 is 440 Hz while A5 is 880 Hz).
 
 ### How to import sound samples ?
-By clicking the upload samples icon or by perfoming a drag and drop to sample canvas.  
+By clicking the upload samples icon or by performing a drag and drop to sample canvas.  
 
 ![widget](./sampler1.svg "Sampler Widget")
 
@@ -2545,12 +2545,12 @@ The numeric argument to the widget block, ```12``` in the figure
 above, designates the number of columns. The widget always provides a
 range of half-steps (one octave in the default a [12-step
 equal-temperament tuning](#412-changing-temperament)). (If you are in
-a temperament with more notes per ocatve, the grid will expand.) The
+a temperament with more notes per octave, the grid will expand.) The
 rows that represent notes in the current mode are highlighted.
 
 ![widget](./arpeggio_widget.svg "Arpeggio_widget")
 
-The horizonal axis is time and the verical axis is half-step offsets
+The horizontal axis is time and the vertical axis is half-step offsets
 from the base note.
 
 The toolbar on the left includes buttons to play the sequence, save the pattern to a custom chord block, clear the grid, and move (shift) the active note pattern up or down by an octave.
@@ -2685,7 +2685,7 @@ program into JavaScript.
 
 The JavaScript code is written and viewed on the **JavaScript Editor**
 widget which can be opened by pressing on the "*Toggle JavaScript
-Editor*" (`<>`) button in the auxilliary menu.
+Editor*" (`<>`) button in the auxiliary menu.
 
 ### Example code
 
