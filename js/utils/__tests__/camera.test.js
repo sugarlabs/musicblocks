@@ -399,6 +399,35 @@ describe("doStopVideoCam", () => {
         expect(video.srcObject).toBeNull();
     });
 
+    test("video mode: Stop before canplay releases the tracks and capture never starts", async () => {
+        const { video } = makeDom();
+        const track = { stop: jest.fn() };
+        const stream = { getTracks: () => [track] };
+        Object.defineProperty(global.navigator, "mediaDevices", {
+            configurable: true,
+            value: { getUserMedia: jest.fn(() => Promise.resolve(stream)) }
+        });
+        CameraManager.reset();
+        const { turtles } = makeTurtles();
+        const setCameraID = jest.fn();
+
+        doUseCamera(["x"], turtles, 0, true, null, setCameraID, jest.fn());
+        await Promise.resolve();
+        await Promise.resolve();
+
+        // Stop arrives after the stream is attached but before canplay fires.
+        doStopVideoCam(null, setCameraID);
+        expect(track.stop).toHaveBeenCalledTimes(1);
+        expect(video.srcObject).toBeNull();
+
+        setCameraID.mockClear();
+        video.fireCanplay();
+
+        // The canplay handler was removed by Stop, so capture must not start.
+        expect(setCameraID).not.toHaveBeenCalledWith(expect.any(Number));
+        expect(CameraManager.intervalId).toBeNull();
+    });
+
     test("a Stop followed by a fresh Camera+Show run behaves like a first run again", async () => {
         const dom = makeDom();
         const turtlesCtx = makeTurtles();
