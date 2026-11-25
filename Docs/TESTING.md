@@ -4,11 +4,35 @@ How to write unit tests for block files.
 
 ## Running Tests
 
+`jest.config.js` enables coverage collection by default (`collectCoverage: true`), so running `npm test` collects coverage across the repository.
+
 ```bash
-npm test                                    # Run all tests
-npm test -- path/to/file.test.js           # Run specific test file
-npm test -- --coverage                      # Run with coverage report
+npm test                                    # Run all tests (collects coverage by default)
+npm run test:coverage                       # Run full test suite with coverage report
+npm test -- path/to/file.test.js            # Run matching test file(s)
 ```
+
+### Focused Development Runs
+
+When iterating on a specific test file during development, you can disable coverage collection and target an exact file path to get faster feedback:
+
+```bash
+npm test -- --coverage=false --runTestsByPath planet/js/__tests__/ProjectStorage.test.js
+```
+
+- `--coverage=false`: Disables coverage instrumentation and reporting for faster local runs.
+- `--runTestsByPath`: Runs only the exact file path(s) specified instead of treating the argument as a regex pattern.
+- `--runInBand`: Runs tests serially in the current process instead of spawning worker processes. This is helpful in resource-constrained environments or when debugging timing/memory issues:
+
+```bash
+npm test -- --runInBand --coverage=false --runTestsByPath planet/js/__tests__/ProjectStorage.test.js
+```
+
+> **Note:** Focused test runs with `--coverage=false` are intended for rapid iteration only and do not replace full repository validation (`npm test` or `npm run test:coverage`) before opening or finalizing a PR.
+
+### Coverage Validation in CI
+
+Instead of enforcing a fixed minimum coverage threshold, CI uses the [coverage-delta workflow](../.github/workflows/coverage-delta.yml) to compare statement, branch, function, and line coverage against the base branch. A pull request fails this check if any coverage metric drops by more than `0.1` percentage points.
 
 ## Shared Test Infrastructure
 
