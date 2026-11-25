@@ -19,6 +19,7 @@
 const MXML_TUPLETVALUE = 3;
 const MXML_ROUNDDOWN = 4;
 const MXML_DRUM = 7;
+const MXML_TIED_DRUM_DURATION = 8;
 
 // Iterative, and only defined for finite numbers: Infinity % b is NaN, which never reaches
 // the b === 0 base case, so the recursive form ran until the stack overflowed.
@@ -438,12 +439,31 @@ class MusicXMLExporter {
             const instruments = new Map(
                 drums.map((name, instrumentIndex) => [name, `D${partNum}-X${instrumentIndex + 1}`])
             );
-            const drumNotes = notes.map(entry => {
-                if (!Array.isArray(entry)) return entry;
+            const drumNotes = [];
+            let skipTieForMergedDrum = false;
+            for (const entry of notes) {
+                if (!Array.isArray(entry)) {
+                    if (skipTieForMergedDrum && entry === "tie") {
+                        continue;
+                    }
+                    drumNotes.push(entry);
+                    continue;
+                }
+                if (entry[MXML_TIED_DRUM_DURATION] === "merged-tied-drum") {
+                    skipTieForMergedDrum = false;
+                    continue;
+                }
                 const drumEntry = entry.slice();
                 drumEntry[0] = entry[MXML_DRUM] || ["R"];
-                return drumEntry;
-            });
+                if (Array.isArray(entry[MXML_TIED_DRUM_DURATION])) {
+                    drumEntry[1] = entry[MXML_TIED_DRUM_DURATION][0];
+                    drumEntry[2] = entry[MXML_TIED_DRUM_DURATION][1];
+                    drumEntry[MXML_TUPLETVALUE] = entry[MXML_TIED_DRUM_DURATION][2];
+                    drumEntry[MXML_ROUNDDOWN] = entry[MXML_TIED_DRUM_DURATION][3];
+                    skipTieForMergedDrum = true;
+                }
+                drumNotes.push(drumEntry);
+            }
             parts.push({ id: `D${partNum}`, notes: drumNotes, isPercussion: true, instruments });
         });
 

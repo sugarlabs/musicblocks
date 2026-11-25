@@ -1739,4 +1739,44 @@ describe("saveMxmlOutput - key mode", () => {
 
         expect(percussion).not.toContain("<mode>");
     });
+
+    it("writes merged tied drums as one chord of combined duration at the start of the tie", () => {
+        const output = saveMxmlOutput({
+            notation: {
+                notationStaging: {
+                    0: [
+                        [
+                            ["R"],
+                            4,
+                            0,
+                            null,
+                            null,
+                            -1,
+                            false,
+                            ["snare drum", "bass drum"],
+                            [2, 0, null, null]
+                        ],
+                        "tie",
+                        [["R"], 4, 0, null, null, -1, false, null, "merged-tied-drum"],
+                        [["R"], 4, 0, null, null, -1, false, ["kick drum"]]
+                    ]
+                }
+            }
+        });
+        const percussion = output.split('<part id="D1">')[1].split("</part>")[0];
+
+        expect(percussion).not.toContain("<rest/>");
+        expect(percussion).not.toContain("<tie ");
+        expect(percussion.match(/<unpitched>/g)).toHaveLength(3);
+        expect(percussion.match(/<chord\/>/g)).toHaveLength(1);
+        expect(percussion).toMatch(
+            /<\/unpitched>\s*<duration>16<\/duration>\s*<instrument id="D1-X1"\/>\s*<type>half<\/type>/
+        );
+        expect(percussion).toMatch(
+            /<chord\/>\s*<unpitched>[\s\S]*?<\/unpitched>\s*<duration>16<\/duration>\s*<instrument id="D1-X2"\/>\s*<type>half<\/type>/
+        );
+        expect(percussion).toMatch(
+            /<\/unpitched>\s*<duration>8<\/duration>\s*<instrument id="D1-X3"\/>\s*<type>quarter<\/type>/
+        );
+    });
 });

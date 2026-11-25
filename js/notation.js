@@ -487,6 +487,64 @@ class Notation {
     }
 
     /**
+     * Stages tied drums as a single hit on the first note's beat with the
+     * combined duration and deduplicated drum list for LilyPond and MusicXML.
+     *
+     * @param {number} turtle - Index of the active turtle.
+     * @param {number|null} firstStagingStart - Index in _notationStaging where the first note began.
+     * @param {number|null} firstDrumStagingStart - Index in _notationDrumStaging where the first note began.
+     * @param {string[]} drums - Combined drum patch names from both tied notes.
+     * @param {number} combinedDuration - Total reciprocal duration of the tied pair.
+     * @returns {void}
+     */
+    stageTiedDrums(turtle, firstStagingStart, firstDrumStagingStart, drums, combinedDuration) {
+        const notatedDrums = [
+            ...new Set(drums.filter(name => !["noise1", "noise2", "noise3"].includes(name)))
+        ];
+        if (notatedDrums.length === 0) {
+            return;
+        }
+
+        const obj = durationToNoteValue(combinedDuration);
+        const drumStaging = this._notationDrumStaging[turtle];
+        if (
+            typeof firstDrumStagingStart === "number" &&
+            Array.isArray(drumStaging) &&
+            firstDrumStagingStart >= 0 &&
+            firstDrumStagingStart < drumStaging.length
+        ) {
+            const firstDrumEntry = drumStaging[firstDrumStagingStart];
+            const staccato = Array.isArray(firstDrumEntry) ? Boolean(firstDrumEntry[6]) : false;
+            const drumSymbols = [...new Set(notatedDrums.map(name => getDrumSymbol(name)))];
+            drumStaging.length = firstDrumStagingStart;
+            drumStaging.push([drumSymbols, obj[0], obj[1], obj[2], obj[3], -1, staccato]);
+        }
+
+        const staging = this._notationStaging[turtle];
+        if (
+            typeof firstStagingStart === "number" &&
+            Array.isArray(staging) &&
+            firstStagingStart >= 0 &&
+            firstStagingStart < staging.length
+        ) {
+            const firstEntry = staging.slice(firstStagingStart).find(Array.isArray);
+            let lastEntry = null;
+            for (let i = staging.length - 1; i >= firstStagingStart; i--) {
+                if (Array.isArray(staging[i])) {
+                    lastEntry = staging[i];
+                    break;
+                }
+            }
+            if (firstEntry && lastEntry && firstEntry !== lastEntry) {
+                firstEntry[7] = notatedDrums;
+                firstEntry[8] = [obj[0], obj[1], obj[2], obj[3]];
+                lastEntry[7] = null;
+                lastEntry[8] = "merged-tied-drum";
+            }
+        }
+    }
+
+    /**
      * Begins harmonics.
      *
      * @param turtle

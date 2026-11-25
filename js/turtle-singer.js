@@ -370,6 +370,8 @@ class Singer {
         this.tieNoteExtras = [];
         this.tieCarryOver = 0;
         this.tieFirstDrums = [];
+        this.tieFirstStagingStart = null;
+        this.tieFirstDrumStagingStart = null;
         this.drift = 0;
         // Maximum fraction of note duration that can be used for lag correction per note.
         // This prevents notes from being rushed when catching up to the master clock.
@@ -2278,7 +2280,9 @@ class Singer {
                     ];
 
                     // We play any drums in the first tied note along with the drums in the second tied note
-                    tur.singer.tieFirstDrums = tur.singer.noteDrums[saveBlk];
+                    tur.singer.tieFirstDrums = [...(tur.singer.noteDrums[saveBlk] || [])];
+                    tur.singer.tieFirstStagingStart = null;
+                    tur.singer.tieFirstDrumStagingStart = null;
                     noteBeatValue = 0;
                 } else {
                     carry = tur.singer.tieCarryOver;
@@ -2676,13 +2680,70 @@ class Singer {
                                     );
                                 }
                                 if (exporting || tur.singer.recordingNotation) {
+                                    const isFirstTiedNote =
+                                        duration === 0 &&
+                                        tur.singer.tieCarryOver > 0 &&
+                                        tur.singer.justCounting.length === 0;
+                                    if (isFirstTiedNote) {
+                                        const staging =
+                                            activity.logo.notation &&
+                                            activity.logo.notation.notationStaging
+                                                ? activity.logo.notation.notationStaging[turtle]
+                                                : null;
+                                        const drumStaging =
+                                            activity.logo.notation &&
+                                            activity.logo.notation.notationDrumStaging
+                                                ? activity.logo.notation.notationDrumStaging[turtle]
+                                                : null;
+                                        tur.singer.tieFirstStagingStart = Array.isArray(staging)
+                                            ? staging.length
+                                            : null;
+                                        tur.singer.tieFirstDrumStagingStart = Array.isArray(
+                                            drumStaging
+                                        )
+                                            ? drumStaging.length
+                                            : null;
+                                    }
+
+                                    const combinedTieDrums = [];
+                                    if (carry > 0 && tur.singer.justCounting.length === 0) {
+                                        for (const drumName of tur.singer.tieFirstDrums) {
+                                            if (!combinedTieDrums.includes(drumName)) {
+                                                combinedTieDrums.push(drumName);
+                                            }
+                                        }
+                                        for (const drumName of chordDrums) {
+                                            if (!combinedTieDrums.includes(drumName)) {
+                                                combinedTieDrums.push(drumName);
+                                            }
+                                        }
+                                    }
+
                                     activity.logo.updateNotation(
                                         chordNotes,
                                         d,
                                         turtle,
                                         -1,
-                                        chordDrums
+                                        carry > 0 && combinedTieDrums.length > 0 ? [] : chordDrums
                                     );
+
+                                    if (carry > 0 && tur.singer.justCounting.length === 0) {
+                                        if (
+                                            combinedTieDrums.length > 0 &&
+                                            typeof activity.logo.notation.stageTiedDrums ===
+                                                "function"
+                                        ) {
+                                            activity.logo.notation.stageTiedDrums(
+                                                turtle,
+                                                tur.singer.tieFirstStagingStart,
+                                                tur.singer.tieFirstDrumStagingStart,
+                                                combinedTieDrums,
+                                                duration
+                                            );
+                                        }
+                                        tur.singer.tieFirstStagingStart = null;
+                                        tur.singer.tieFirstDrumStagingStart = null;
+                                    }
                                 }
                             }
                         }
@@ -2941,7 +3002,10 @@ class Singer {
                 }
 
                 // Process drums
-                if (tur.singer.noteDrums[thisBlk].length > 0) {
+                if (
+                    tur.singer.noteDrums[thisBlk].length > 0 ||
+                    (carry > 0 && tur.singer.tieFirstDrums.length > 0)
+                ) {
                     for (let i = 0; i < tur.singer.noteDrums[thisBlk].length; i++) {
                         drums.push(tur.singer.noteDrums[thisBlk][i]);
                     }
@@ -2966,7 +3030,7 @@ class Singer {
                             newBeatValue = 0;
                         } else {
                             newBeatValue = beatValue;
-                            if (tieDelay > 0) {
+                            if (tieDelay > 0 || carry > 0) {
                                 tur.singer.tieFirstDrums = [];
                             }
                         }
