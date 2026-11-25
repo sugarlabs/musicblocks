@@ -214,4 +214,55 @@ describe("PitchDrumMatrixPlayback", () => {
         expect(pdm._playing).toBe(false);
         expect(pitchesPlayed()).toEqual(["C4"]);
     });
+
+    test("plays all selected drums on a row while triggering the pitch once", () => {
+        jest.useFakeTimers();
+        document.body.innerHTML = "";
+        synth = { trigger: jest.fn(), stop: jest.fn() };
+        pdm = new PitchDrumMatrix();
+        pdm.activity = {
+            logo: { synth },
+            turtles: { ithTurtle: () => ({ singer: { keySignature: "C major" } }) },
+            errorMsg: jest.fn(),
+            textMsg: jest.fn()
+        };
+        pdm.widgetWindow = {
+            _maximized: false,
+            timerManager: { setTimeout: (callback, delay) => setTimeout(callback, delay) }
+        };
+        pdm.playButton = document.createElement("div");
+        pdm._cellScale = 1;
+        pdm.rowLabels = ["C"];
+        pdm.rowArgs = [4];
+        pdm.drums = ["kick drum", "snare drum"];
+        const savedGetDrumName = global.getDrumName;
+        global.getDrumName = name => (pdm.drums.includes(name) ? name : null);
+        try {
+            pdm.addRowBlock(20);
+            pdm.addColBlock(30);
+            pdm.addColBlock(31);
+            const table = document.createElement("table");
+            table.id = "pdmTable";
+            document.body.appendChild(table);
+            pdm._pdmTable = table;
+            pdm._pdmCellTables = [];
+            pdm._makeDrumRow(pdm._makeRows());
+            pdm.makeClickable();
+
+            document.getElementById("0,0").click();
+            document.getElementById("0,1").click();
+            jest.advanceTimersByTime(500);
+            synth.trigger.mockClear();
+
+            play();
+            expect(pitchesPlayed()).toEqual(["C4"]);
+
+            jest.advanceTimersByTime(250);
+            expect(
+                synth.trigger.mock.calls.filter(call => call[1] === "C2").map(call => call[3])
+            ).toEqual(["kick drum", "snare drum"]);
+        } finally {
+            global.getDrumName = savedGetDrumName;
+        }
+    });
 });

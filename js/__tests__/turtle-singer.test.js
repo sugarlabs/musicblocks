@@ -3562,6 +3562,41 @@ describe("processPitch internal addPitch behavior", () => {
         expect(mapping["C4"]).toBe("snare");
     });
 
+    test("maps multiple distinct drums to the same pitch and preserves uniqueness", () => {
+        const blk = "blk";
+        turtleMock.singer.drumStyle = ["snare"];
+        Singer.processPitch(activityMock, "C", 4, 0, turtleMock, blk);
+        turtleMock.singer.drumStyle = ["kick"];
+        Singer.processPitch(activityMock, "C", 4, 0, turtleMock, blk);
+        turtleMock.singer.drumStyle = ["snare"];
+        Singer.processPitch(activityMock, "C", 4, 0, turtleMock, blk);
+        expect(turtleMock.singer.pitchDrumTable["C4"]).toEqual(["snare", "kick"]);
+    });
+
+    test("triggers all drums mapped to a pitch during playback", () => {
+        Singer.processNote.mockRestore();
+        const blk = "blk";
+        turtleMock.doWait = jest.fn();
+        turtleMock.blink = jest.fn();
+        activityMock.logo.dispatchTurtleSignals = jest.fn();
+        activityMock.logo.synth.start = jest.fn();
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.pitchDrumTable = { C4: ["snare", "kick"] };
+        turtleMock.singer.notePitches[blk] = ["C"];
+        turtleMock.singer.noteOctaves[blk] = [4];
+        turtleMock.singer.noteCents[blk] = [0];
+        turtleMock.singer.noteHertz[blk] = [0];
+        turtleMock.singer.oscList[blk] = [];
+        turtleMock.singer.noteBeatValues[blk] = [4];
+        turtleMock.singer.noteDrums[blk] = [];
+        turtleMock.singer.embeddedGraphics[blk] = [];
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+        const triggeredInstruments = activityMock.logo.synth.trigger.mock.calls.map(c => c[3]);
+        expect(triggeredInstruments).toEqual(expect.arrayContaining(["snare", "kick"]));
+    });
+
     it("should maintain consistent state relationships when updating pitch (invariant)", () => {
         const blk = "blk";
         Singer.processPitch(activityMock, "C", 4, 0, turtleMock, blk);

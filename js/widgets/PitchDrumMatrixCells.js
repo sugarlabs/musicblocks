@@ -33,8 +33,8 @@
 
 /**
  * @file PitchDrumMatrixCells.js
- * @description Pitch-Drum Matrix cells: clicking a cell to map a pitch to a drum (one drum for each
- * pitch), marking the pairs from an earlier run, and sounding a pair.
+ * @description Pitch-Drum Matrix cells: clicking a cell to map a pitch to one or more drums,
+ * marking the pairs from an earlier run, and sounding a pair.
  *
  * The methods are moved as they were from the PitchDrumMatrix class, which copies them onto
  * PitchDrumMatrix.prototype (see PitchDrumMatrix.installModules), so `this` is still the widget.
@@ -127,48 +127,17 @@ class PitchDrumMatrixCells {
         const rowi = Number(rowIndex);
 
         // Find the drum cell
-        const drumTable = this._pdmDrumTable;
-        let row = drumTable.rows[0];
-        let table = this._pdmCellTables[rowi];
-        row = table.rows[0];
+        const table = this._pdmCellTables[rowi];
+        const row = table.rows[0];
 
-        // For the moment, we can only have one drum per pitch, so
-        // clear the row.
-        let pitchBlock;
-        let drumBlock;
-        let cell;
-        if (playNote) {
-            for (let i = 0; i < row.cells.length; i++) {
-                if (i === coli) {
-                    continue;
-                }
-
-                cell = row.cells[i];
-                if (cell.style.backgroundColor === "black") {
-                    pitchBlock = this._rowBlocks[rowi];
-                    drumBlock = this._colBlocks[i];
-                    this.removeNode(pitchBlock, drumBlock, this._rowRepeat(rowi));
-                    cell.style.backgroundColor = platformColor.selectorBackground;
-                }
-            }
-        }
-
-        pitchBlock = this._rowBlocks[rowi];
-        drumBlock = this._colBlocks[coli];
+        const pitchBlock = this._rowBlocks[rowi];
+        const drumBlock = this._colBlocks[coli];
 
         if (playNote) {
             this.addNode(pitchBlock, drumBlock, this._rowRepeat(rowi));
+            this._setPairCell(rowi, coli, row.cells[coli], true);
         } else {
             this.removeNode(pitchBlock, drumBlock, this._rowRepeat(rowi));
-        }
-
-        table = this._pdmCellTables[rowi];
-        row = table.rows[0];
-        for (let i = 0; i < row.cells.length; i++) {
-            cell = row.cells[i];
-            if (cell.style.backgroundColor === "black") {
-                this._setPairCell(rowi, i, cell, playNote);
-            }
         }
     }
 
@@ -182,9 +151,10 @@ class PitchDrumMatrixCells {
      * @param {boolean} playNote - A flag indicating whether to play the note or not.
      * @param {number|null} [run] - The playback run when called from playback, so a stopped
      *     run doesn't play its delayed drum. Omitted for clicks in the grid.
+     * @param {boolean} [playPitch=true] - Whether to trigger the pitch note before the drum.
      * @returns {void}
      */
-    _setPairCell(rowIndex, colIndex, cell, playNote, run = null) {
+    _setPairCell(rowIndex, colIndex, cell, playNote, run = null, playPitch = true) {
         const pdmTable = this._pdmTable;
         let row = pdmTable.rows[rowIndex];
         const noteArg = row.cells[0].dataset.noteArg;
@@ -208,14 +178,16 @@ class PitchDrumMatrixCells {
 
         if (playNote) {
             const waitTime = Singer.defaultBPMFactor * 1000 * 0.25;
-            this.activity.logo.synth.trigger(
-                0,
-                normalizeNoteAccidentals(note),
-                0.125,
-                "default",
-                null,
-                null
-            );
+            if (playPitch) {
+                this.activity.logo.synth.trigger(
+                    0,
+                    normalizeNoteAccidentals(note),
+                    0.125,
+                    "default",
+                    null,
+                    null
+                );
+            }
 
             this.widgetWindow.timerManager.setTimeout(() => {
                 if (run !== null && (!this._playing || run !== this._playRun)) {

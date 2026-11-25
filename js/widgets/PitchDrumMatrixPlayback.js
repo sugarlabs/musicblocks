@@ -94,17 +94,20 @@ class PitchDrumMatrixPlayback {
         for (let i = 0; i < pdmTable.rows.length - 1; i++) {
             table = this._pdmCellTables[i];
             row = table.rows[0];
-            let j;
-            for (j = 0; j < row.cells.length; j++) {
+            const cols = [];
+            for (let j = 0; j < row.cells.length; j++) {
                 cell = row.cells[j];
                 if (cell.style.backgroundColor === "black") {
-                    pairs.push([i, j]);
-                    break;
+                    cols.push(j);
                 }
             }
 
-            if (j === row.cells.length) {
+            if (cols.length === 0) {
                 pairs.push([i, -1]);
+            } else if (cols.length === 1) {
+                pairs.push([i, cols[0]]);
+            } else {
+                pairs.push([i, cols]);
             }
         }
         let isEmpty = true;
@@ -165,7 +168,12 @@ class PitchDrumMatrixPlayback {
         this._resetRowHighlights();
         this._pdmTable.rows[i].cells[0].style.backgroundColor = platformColor.selectorBackground;
 
-        if (pairs[i][1] !== -1) {
+        if (Array.isArray(pairs[i][1])) {
+            pairs[i][1].forEach((colIndex, idx) => {
+                const cell = this._pdmCellTables[i].rows[0].cells[colIndex];
+                this._setPairCell(pairs[i][0], colIndex, cell, true, run, idx === 0);
+            });
+        } else if (pairs[i][1] !== -1) {
             const cell = this._pdmCellTables[i].rows[0].cells[pairs[i][1]];
             this._setPairCell(pairs[i][0], pairs[i][1], cell, true, run);
         }
