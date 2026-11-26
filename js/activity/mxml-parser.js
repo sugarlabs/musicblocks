@@ -717,7 +717,7 @@ function _lyricTexts(noteEl) {
         if (!parts.some(el => el.localName === "text" && el.textContent.trim() !== "")) continue;
         const raw = parts
             .map(el =>
-                el.localName === "elision" && el.textContent === ""
+                el.localName === "elision" && /^[\t\n\r ]*$/.test(el.textContent)
                     ? _MXML_DEFAULT_ELISION
                     : el.textContent
             )

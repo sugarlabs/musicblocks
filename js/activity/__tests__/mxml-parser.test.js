@@ -2536,6 +2536,13 @@ describe("Test 20: Lyrics", () => {
         }
     });
 
+    it("treats a pretty-printed empty <elision> as an undertie", async () => {
+        const lyric = "<lyric><text>Lo</text><elision>\n  </elision><text>rem</text></lyric>";
+        const { blocks } = await parseAndCapture(scorePartwise(sungNote("C", lyric)));
+
+        expect(lyricTexts(blocks)).toEqual(["Lo‿rem"]);
+    });
+
     it("keeps the elision symbol a score gives, including a no-break space", async () => {
         const lyric = "<lyric><text>e</text><elision> </elision><text>il</text></lyric>";
         const { blocks } = await parseAndCapture(scorePartwise(sungNote("C", lyric)));
