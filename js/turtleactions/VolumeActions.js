@@ -76,6 +76,16 @@ function setupVolumeActions(activity) {
         return null;
     };
 
+    const cleanupTurtleListener = (tur, listenerName, listener) => {
+        if (activity.logo?.stage && typeof activity.logo.stage.removeEventListener === "function") {
+            activity.logo.stage.removeEventListener(listenerName, listener, false);
+        }
+
+        if (tur?.listeners && tur.listeners[listenerName] === listener) {
+            delete tur.listeners[listenerName];
+        }
+    };
+
     Singer.VolumeActions = class {
         /**
          * Increases/decreases the volume of the contained notes by a specified amount for every note played.
@@ -114,7 +124,12 @@ function setupVolumeActions(activity) {
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
+            let cleanedUp = false;
             const __listener = () => {
+                if (cleanedUp) return;
+                cleanedUp = true;
+                cleanupTurtleListener(tur, listenerName, __listener);
+
                 if (tur.singer.justCounting.length === 0) {
                     activity.logo.notation.notationEndCrescendo(
                         turtle,
@@ -188,7 +203,12 @@ function setupVolumeActions(activity) {
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
+            let cleanedUp = false;
             const __listener = () => {
+                if (cleanedUp) return;
+                cleanedUp = true;
+                cleanupTurtleListener(tur, listenerName, __listener);
+
                 for (const synth of synthList) {
                     tur.singer.synthVolume[synth].pop();
                     Singer.setSynthVolume(

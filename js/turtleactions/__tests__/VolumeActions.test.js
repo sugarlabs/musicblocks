@@ -651,6 +651,187 @@ describe("setupVolumeActions", () => {
                 [0, 5]
             ]);
         });
+
+        test("doCrescendo unregisters its stage listener, deletes tur.listeners, and ignores repeated dispatch", () => {
+            const removeSpy = jest.spyOn(activity.logo.stage, "removeEventListener");
+            // Outer crescendo establishes a stack frame that a duplicate inner cleanup would corrupt.
+            crescendo(5, 1);
+            targetTurtle.singer.synthVolume.default[1] = 60;
+
+            crescendo(10, 2);
+            const innerListenerName = "_crescendo_0_2";
+            const innerListener = targetTurtle.listeners[innerListenerName];
+            expect(innerListener).toEqual(expect.any(Function));
+            expect(stageListeners.get(innerListenerName)).toBe(innerListener);
+
+            targetTurtle.singer.synthVolume.default[2] = 75;
+            synthVolumeSpy.mockClear();
+            crescendoEndSpy.mockClear();
+
+            dispatch(targetTurtle.endOfClampSignals[4].pop());
+
+            expect(removeSpy).toHaveBeenCalledWith(innerListenerName, innerListener, false);
+            expect(stageListeners.has(innerListenerName)).toBe(false);
+            expect(innerListenerName in targetTurtle.listeners).toBe(false);
+            expect("_crescendo_0_1" in targetTurtle.listeners).toBe(true);
+            expect(stageListeners.has("_crescendo_0_1")).toBe(true);
+            expectVolumes({ default: [50, 60] });
+            expect(targetTurtle.singer.crescendoInitialVolume.default).toEqual([50, 50]);
+            expect(targetTurtle.singer.crescendoDelta).toEqual([5]);
+            expect(targetTurtle.singer.inCrescendo).toEqual([true]);
+            expect(synthVolumeSpy).toHaveBeenCalledTimes(1);
+            expect(synthVolumeSpy).toHaveBeenCalledWith(activity.logo, 0, "default", 60);
+            expect(crescendoEndSpy).toHaveBeenCalledTimes(1);
+            expect(crescendoEndSpy).toHaveBeenCalledWith(0, 10);
+
+            // Re-dispatching the signal or directly re-invoking the captured callback is a no-op.
+            dispatch(innerListenerName);
+            innerListener();
+
+            expectVolumes({ default: [50, 60] });
+            expect(targetTurtle.singer.crescendoDelta).toEqual([5]);
+            expect(targetTurtle.singer.inCrescendo).toEqual([true]);
+            expect(synthVolumeSpy).toHaveBeenCalledTimes(1);
+            expect(crescendoEndSpy).toHaveBeenCalledTimes(1);
+
+            dispatch(targetTurtle.endOfClampSignals[3].pop());
+            expect(stageListeners.size).toBe(0);
+            expect(targetTurtle.listeners).toEqual({});
+            expectVolumes({ default: [50] });
+        });
+
+        test("setRelativeVolume unregisters its stage listener, deletes tur.listeners, and ignores repeated dispatch", () => {
+            const removeSpy = jest.spyOn(activity.logo.stage, "removeEventListener");
+            relative(20, 1);
+            relative(50, 2);
+
+            const innerListenerName = "_articulation_0_2";
+            const innerListener = targetTurtle.listeners[innerListenerName];
+            expect(innerListener).toEqual(expect.any(Function));
+            expect(stageListeners.get(innerListenerName)).toBe(innerListener);
+            expectVolumes({ default: [50, 60, 90] });
+
+            synthVolumeSpy.mockClear();
+            endArticulationSpy.mockClear();
+
+            dispatch(targetTurtle.endOfClampSignals[4].pop());
+
+            expect(removeSpy).toHaveBeenCalledWith(innerListenerName, innerListener, false);
+            expect(stageListeners.has(innerListenerName)).toBe(false);
+            expect(innerListenerName in targetTurtle.listeners).toBe(false);
+            expect("_articulation_0_1" in targetTurtle.listeners).toBe(true);
+            expect(stageListeners.has("_articulation_0_1")).toBe(true);
+            expectVolumes({ default: [50, 60] });
+            expect(synthVolumeSpy).toHaveBeenCalledTimes(1);
+            expect(synthVolumeSpy).toHaveBeenCalledWith(activity.logo, 0, "default", 60);
+            expect(endArticulationSpy).toHaveBeenCalledTimes(1);
+            expect(endArticulationSpy).toHaveBeenCalledWith(0);
+
+            // Re-dispatching the signal or directly re-invoking the captured callback is a no-op.
+            dispatch(innerListenerName);
+            innerListener();
+
+            expectVolumes({ default: [50, 60] });
+            expect(synthVolumeSpy).toHaveBeenCalledTimes(1);
+            expect(endArticulationSpy).toHaveBeenCalledTimes(1);
+
+            dispatch(targetTurtle.endOfClampSignals[3].pop());
+            expect(stageListeners.size).toBe(0);
+            expect(targetTurtle.listeners).toEqual({});
+            expectVolumes({ default: [50] });
+        });
+
+        test("cleanup for one turtle does not remove another turtle's crescendo or articulation listeners", () => {
+            const secondTurtle = {
+                listeners: {},
+                endOfClampSignals: {},
+                singer: {
+                    synthVolume: { default: [80] },
+                    crescendoInitialVolume: { default: [80] },
+                    crescendoDelta: [],
+                    inCrescendo: [],
+                    backward: [],
+                    instrumentNames: ["default"],
+                    suppressOutput: false,
+                    justCounting: [],
+                    panner: null
+                }
+            };
+            activity.turtles.ithTurtle.mockImplementation(idx =>
+                idx === 1 ? secondTurtle : targetTurtle
+            );
+
+            Singer.VolumeActions.doCrescendo("crescendo", 10, 0, 1);
+            Singer.VolumeActions.doCrescendo("crescendo", 20, 1, 1);
+            Singer.VolumeActions.setRelativeVolume(10, 0, 2);
+            Singer.VolumeActions.setRelativeVolume(25, 1, 2);
+
+            expect("_crescendo_0_1" in targetTurtle.listeners).toBe(true);
+            expect("_crescendo_1_1" in secondTurtle.listeners).toBe(true);
+            expect("_articulation_0_2" in targetTurtle.listeners).toBe(true);
+            expect("_articulation_1_2" in secondTurtle.listeners).toBe(true);
+
+            // Complete turtle 0's blocks first.
+            dispatch(targetTurtle.endOfClampSignals[4].pop());
+            dispatch(targetTurtle.endOfClampSignals[3].pop());
+
+            expect(targetTurtle.listeners).toEqual({});
+            expect(stageListeners.has("_crescendo_0_1")).toBe(false);
+            expect(stageListeners.has("_articulation_0_2")).toBe(false);
+
+            // Turtle 1's listeners and state must remain intact.
+            expect("_crescendo_1_1" in secondTurtle.listeners).toBe(true);
+            expect("_articulation_1_2" in secondTurtle.listeners).toBe(true);
+            expect(stageListeners.has("_crescendo_1_1")).toBe(true);
+            expect(stageListeners.has("_articulation_1_2")).toBe(true);
+            expect(secondTurtle.singer.synthVolume).toEqual({ default: [80, 80, 100] });
+
+            // Complete turtle 1's blocks and verify full restoration and cleanup.
+            dispatch(secondTurtle.endOfClampSignals[4].pop());
+            dispatch(secondTurtle.endOfClampSignals[3].pop());
+
+            expect(secondTurtle.listeners).toEqual({});
+            expect(stageListeners.size).toBe(0);
+            expect(secondTurtle.singer.synthVolume).toEqual({ default: [80] });
+            expect(secondTurtle.singer.crescendoDelta).toEqual([]);
+            expect(secondTurtle.singer.inCrescendo).toEqual([]);
+        });
+
+        test("repeated block runs do not leave stale stage listeners or tur.listeners entries", () => {
+            for (let run = 0; run < 3; run++) {
+                crescendo(10, 1);
+                targetTurtle.singer.synthVolume.default[1] = 65;
+                relative(10, 2);
+
+                expect(stageListeners.size).toBe(2);
+                expect(Object.keys(targetTurtle.listeners)).toEqual([
+                    "_crescendo_0_1",
+                    "_articulation_0_2"
+                ]);
+
+                dispatch(targetTurtle.endOfClampSignals[4].pop());
+                dispatch(targetTurtle.endOfClampSignals[3].pop());
+
+                expect(stageListeners.size).toBe(0);
+                expect(targetTurtle.listeners).toEqual({});
+                expectVolumes({ default: [50] });
+            }
+        });
+
+        test("stale replaced listener does not delete a newer listener registered under the same name", () => {
+            crescendo(5, 1);
+            const staleListener = targetTurtle.listeners["_crescendo_0_1"];
+
+            // Re-entering the same block overwrites _crescendo_0_1 via setTurtleListener.
+            crescendo(10, 1);
+            const activeListener = targetTurtle.listeners["_crescendo_0_1"];
+            expect(activeListener).not.toBe(staleListener);
+
+            staleListener();
+
+            expect(targetTurtle.listeners["_crescendo_0_1"]).toBe(activeListener);
+            expect(stageListeners.get("_crescendo_0_1")).toBe(activeListener);
+        });
     });
 
     // setMasterVolume tests
