@@ -48,6 +48,7 @@ if (typeof module !== "undefined" && module.exports) {
         PITCHES2,
         PITCHES,
         INTERVALVALUES,
+        INTERVAL_ALIASES,
         SOLFNOTES,
         NOTESFLAT2,
         EQUIVALENTFLATS,
@@ -65,6 +66,7 @@ if (typeof module !== "undefined" && module.exports) {
     var {
         generateNoteNames,
         getCurrentEDO,
+        normalizeEDO,
         getEdoNoteNamePosition,
         isTrueEDO,
         isCustomTemperament,
@@ -118,7 +120,7 @@ var NOTESYMBOLS = {
  */
 var keySignatureToMode = keySignature => {
     // Convert from "A Minor" to "A" and "MINOR"
-    if (keySignature === "" || keySignature === null) {
+    if (typeof keySignature !== "string" || keySignature.trim() === "") {
         return ["C", "major"];
     }
 
@@ -215,6 +217,12 @@ var keySignatureToMode = keySignature => {
  * @returns {Array} An array containing the scale notes, solfege with half-steps, key signature, and mode.
  */
 var getScaleAndHalfSteps = (keySignature, edo = 12) => {
+    // Normalise before branching: getModePattern already falls back to
+    // the 12-EDO pattern for a bad EDO, but the branch below keys off
+    // the raw value, so Infinity or NaN returned the EDO name table
+    // where the 12-EDO path returns solfege slots. After normalising,
+    // a bad EDO takes exactly the 12-EDO path.
+    edo = normalizeEDO(edo);
     // Determine scale and half-step pattern from key signature
     const obj = keySignatureToMode(keySignature);
     let myKeySignature = obj[0];
@@ -314,6 +322,9 @@ var getSharpFlatPreference = keySignature => {
  * @returns {number} The numeric representation of the pitch.
  */
 var pitchToNumber = (pitch, octave, keySignature, temperament) => {
+    if (typeof pitch !== "string") {
+        return 0;
+    }
     const currentEDO = getCurrentEDO(temperament);
     // Calculate the pitch index based on pitch and octave.
     if (pitch.toUpperCase() === "R") {
@@ -322,43 +333,53 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
     const originalPitch = pitch;
     // Check for flat, sharp, double flat, or double sharp.
     let transposition = 0;
-    const len = pitch.length;
-    let lastOne, lastTwo;
-    if (len > 1) {
-        if (len > 2) {
-            lastTwo = pitch.slice(len - 2);
-            //Unsure why slice is not working for double flats and double sharps.
-            lastOne = pitch.substring(1, len);
-            if (lastTwo === "bb") {
-                pitch = pitch.substring(0, 1);
-                transposition -= 2;
-            } else if (lastOne === DOUBLEFLAT) {
-                pitch = pitch.substring(0, 1);
-                transposition -= 2;
-            } else if (lastTwo === "##" || lastTwo === "*" || lastTwo === DOUBLESHARP) {
-                pitch = pitch.substring(0, 1);
-                transposition += 2;
-            } else if (
-                lastTwo === "#b" ||
-                lastTwo === SHARP + FLAT ||
-                lastTwo === "b#" ||
-                lastTwo === FLAT + SHARP
-            ) {
-                // Not sure this could occur... but just in case.
-                pitch = pitch.slice(0, len - 2);
-            }
-        }
+    if (pitch.length > 1) {
+        const doubleFlat = pitch.endsWith("bb")
+            ? "bb"
+            : pitch.endsWith(FLAT + FLAT)
+              ? FLAT + FLAT
+              : pitch.endsWith(DOUBLEFLAT)
+                ? DOUBLEFLAT
+                : null;
+        const doubleSharp = pitch.endsWith("##")
+            ? "##"
+            : pitch.endsWith(SHARP + SHARP)
+              ? SHARP + SHARP
+              : pitch.endsWith(DOUBLESHARP)
+                ? DOUBLESHARP
+                : null;
 
-        if (pitch.length > 1) {
-            lastOne = pitch.slice(len - 1);
+        if (doubleFlat) {
+            pitch = pitch.slice(0, -doubleFlat.length);
+            transposition -= 2;
+        } else if (doubleSharp) {
+            pitch = pitch.slice(0, -doubleSharp.length);
+            transposition += 2;
+        } else if (
+            pitch.endsWith("#b") ||
+            pitch.endsWith(SHARP + FLAT) ||
+            pitch.endsWith("#" + FLAT) ||
+            pitch.endsWith(SHARP + "b") ||
+            pitch.endsWith("b#") ||
+            pitch.endsWith(FLAT + SHARP) ||
+            pitch.endsWith("b" + SHARP) ||
+            pitch.endsWith(FLAT + "#")
+        ) {
+            // Mixed sharp+flat cancels out to a natural; this must be checked
+            // before the single-accidental checks below, since a mixed suffix
+            // also ends in "b" or "#" and would otherwise be caught by those
+            // first, stripping only one character instead of both.
+            pitch = pitch.slice(0, -2);
+        } else {
+            const lastOne = pitch.slice(-1);
             if (lastOne === "b" || lastOne === FLAT) {
-                pitch = pitch.slice(0, len - 1);
+                pitch = pitch.slice(0, -1);
                 transposition -= 1;
             } else if (lastOne === "#" || lastOne === SHARP) {
-                pitch = pitch.slice(0, len - 1);
+                pitch = pitch.slice(0, -1);
                 transposition += 1;
             } else if (lastOne === "x" || lastOne === "*") {
-                pitch = pitch.slice(0, len - 1);
+                pitch = pitch.slice(0, -1);
                 transposition += 2;
             }
         }
@@ -416,7 +437,7 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
     } else {
         // obj[1] is the solfege mapping for the current key/mode
         const obj = getScaleAndHalfSteps(keySignature);
-        if (obj[1].includes(pitch.toLowerCase())) {
+        if (pitch.length > 0 && obj[1].includes(pitch.toLowerCase())) {
             pitchNumber = obj[1].indexOf(pitch.toLowerCase());
         } else {
             console.debug("pitch " + pitch + " not found in mode.");
@@ -437,7 +458,7 @@ var pitchToNumber = (pitch, octave, keySignature, temperament) => {
  * Get the note based on a given pitch and interval.
  * @function
  * @param {string} pitch - The pitch, including the note name and octave (e.g., "C4").
- * @param {string} interval - The interval for which the note needs to be determined (e.g., "major 3rd").
+ * @param {string} interval - An INTERVALVALUES key, e.g. "major 3" or "octave".
  * @param {string} [temperament="equal"] - The temperament to use for pitch calculations.
  * @returns {Array} An array containing the note and octave.
  */
@@ -445,6 +466,12 @@ var getNoteFromInterval = (pitch, interval, temperament) => {
     if (temperament === undefined) {
         temperament = "equal";
     }
+
+    // Read another name for an interval as the "<quality> <number>" name it stands for.
+    if (Object.prototype.hasOwnProperty.call(INTERVAL_ALIASES, interval)) {
+        interval = INTERVAL_ALIASES[interval];
+    }
+
     const pitch1 = pitch.substring(0, 1);
     const parsed = parseNoteString(pitch);
     const note1 = parsed[0];
@@ -456,7 +483,7 @@ var getNoteFromInterval = (pitch, interval, temperament) => {
     /**
      * Find the note that corresponds to a major interval.
      * @function
-     * @param {string} interval - The interval for which the note needs to be determined (e.g., "major 3rd").
+     * @param {string} interval - The interval for which the note needs to be determined (e.g., "major 3").
      * @returns {Array} An array containing the note and octave.
      */
     const findMajorInterval = interval => {
@@ -740,6 +767,13 @@ var getNoteFromInterval = (pitch, interval, temperament) => {
 var numberToPitch = (i, temperament, startPitch, offset, activity) => {
     // Calculate the pitch and octave based on index.
     // We start at A0.
+    // A non-finite pitch number has no pitch: return the A0 default (the
+    // fallback #9126 specified for this hang class) instead of letting
+    // -Infinity spin the normalisation below forever or NaN/Infinity
+    // fall through to an undefined note name.
+    if (!Number.isFinite(i)) {
+        return ["A", 0];
+    }
     if (temperament === undefined) {
         temperament = "equal";
     }
@@ -748,9 +782,26 @@ var numberToPitch = (i, temperament, startPitch, offset, activity) => {
     let n = 0;
     let pitchNumber;
     if (i < 0) {
-        while (i < 0) {
+        // Bump up by whole octaves in one step, the way numberToPitchSharp
+        // converts with modulo arithmetic: adding one octave per loop
+        // iteration needs ~10^306 iterations for a finite input like
+        // -1e308, which freezes the main thread just the same.
+        // A negative input always needs at least one octave bump: for a
+        // subnormal like -Number.MIN_VALUE, -i / currentEDO underflows to
+        // 0, so Math.ceil alone gives n = 0 and the rounded-up remainder
+        // then lands one octave too high (["A", 1] instead of ["A", 0]).
+        n = Math.max(1, Math.ceil(-i / currentEDO)); // Count octave bump ups.
+        // Normalise with remainder arithmetic instead of i += n * currentEDO:
+        // the remainder is exact, while the addition rounds the adjusted
+        // value at that magnitude (returning the wrong note for -1e308) and
+        // overflows to Infinity for -Number.MAX_VALUE (returning an
+        // undefined note). The octave count n is applied separately below.
+        // Keep the sub-octave remainder as-is: a second modulo would turn a
+        // remainder that rounds up to exactly currentEDO (e.g. for
+        // -Number.EPSILON) into 0 and shift the octave by one.
+        i %= currentEDO;
+        if (i < 0) {
             i += currentEDO;
-            n += 1; // Count octave bump ups.
         }
 
         if (isTrueEDO(temperament)) {
@@ -893,10 +944,18 @@ var getNoteFromSolfege = (
     octave,
     transpositionFloor
 ) => {
-    let sharpFlat = false;
-    if (["#", SHARP, FLAT, "b"].includes(noteArg.slice(-1))) {
-        sharpFlat = true;
+    if (typeof noteArg !== "string" || noteArg.length === 0) {
+        return null;
     }
+    const normalizedNoteArg = noteArg.replace(/##$/g, DOUBLESHARP).replace(/bb$/g, DOUBLEFLAT);
+    const doubleSharp = normalizedNoteArg.endsWith(DOUBLESHARP);
+    const doubleFlat = normalizedNoteArg.endsWith(DOUBLEFLAT);
+    const accidentalLength = doubleSharp || doubleFlat ? DOUBLESHARP.length : 0;
+    const solfegeRoot = accidentalLength
+        ? normalizedNoteArg.slice(0, -accidentalLength)
+        : normalizedNoteArg;
+    const sharpFlat =
+        doubleSharp || doubleFlat || ["#", SHARP, FLAT, "b"].includes(normalizedNoteArg.slice(-1));
 
     if (!keySignature) {
         keySignature = "C major";
@@ -943,24 +1002,28 @@ var getNoteFromSolfege = (
     }
 
     if (sharpFlat) {
-        if (noteArg.slice(-1) === "#") {
+        if (doubleSharp) {
+            offset += 2;
+        } else if (doubleFlat) {
+            offset -= 2;
+        } else if (normalizedNoteArg.slice(-1) === "#") {
             offset += 1;
-        } else if (noteArg.slice(-1) === SHARP) {
+        } else if (normalizedNoteArg.slice(-1) === SHARP) {
             offset += 1;
-        } else if (noteArg.slice(-1) === FLAT) {
+        } else if (normalizedNoteArg.slice(-1) === FLAT) {
             offset -= 1;
-        } else if (noteArg.slice(-1) === "b") {
+        } else if (normalizedNoteArg.slice(-1) === "b") {
             offset -= 1;
         }
     }
 
     let solfegePart;
-    if (halfSteps.includes(noteArg.slice(0, 1).toLowerCase())) {
-        solfegePart = noteArg.slice(0, 1).toLowerCase();
-    } else if (halfSteps.includes(noteArg.slice(0, 2).toLowerCase())) {
-        solfegePart = noteArg.slice(0, 2).toLowerCase();
-    } else if (halfSteps.includes(noteArg.slice(0, 3).toLowerCase())) {
-        solfegePart = noteArg.slice(0, 3).toLowerCase();
+    if (halfSteps.includes(solfegeRoot.slice(0, 1).toLowerCase())) {
+        solfegePart = solfegeRoot.slice(0, 1).toLowerCase();
+    } else if (halfSteps.includes(solfegeRoot.slice(0, 2).toLowerCase())) {
+        solfegePart = solfegeRoot.slice(0, 2).toLowerCase();
+    } else if (halfSteps.includes(solfegeRoot.slice(0, 3).toLowerCase())) {
+        solfegePart = solfegeRoot.slice(0, 3).toLowerCase();
     } else {
         // The note should already be translated, but just in case...
         // Reverse any i18n
@@ -1002,8 +1065,15 @@ var getNoteFromSolfege = (
         let note = thisScale[index];
         // In non-12 EDO temperaments, enharmonic spellings are distinct
         // pitches, so the resolved note must honor the input's accidental.
+        // Use the already-parsed doubleSharp/normalizedNoteArg values rather
+        // than re-checking the raw noteArg, so ASCII ("##") and Unicode
+        // (DOUBLESHARP) double-sharp spellings resolve the same way.
         if (octaveLength !== 12 && sharpFlat) {
-            if (noteArg.slice(-1) === "#" || noteArg.slice(-1) === SHARP) {
+            if (
+                doubleSharp ||
+                normalizedNoteArg.slice(-1) === "#" ||
+                normalizedNoteArg.slice(-1) === SHARP
+            ) {
                 note = NOTESSHARP[index];
             } else {
                 note = NOTESFLAT[index];
@@ -1229,8 +1299,22 @@ function getNote(
             const edoNames = generateNoteNames(octaveLength);
             const normalizedName = noteArg.replaceAll("#", SHARP).replaceAll("b", FLAT);
             const edoIdx = edoNames.indexOf(normalizedName);
+            const keyTonic = keySignature ? keySignatureToMode(keySignature)[0] : null;
             if (edoIdx !== -1) {
                 note = edoNames[edoIdx];
+            } else if (
+                normalizedName === "C" + FLAT &&
+                keyTonic === "C" + FLAT &&
+                edoNames.includes("B" + SHARP)
+            ) {
+                note = "B" + SHARP;
+                octave -= 1;
+            } else if (
+                normalizedName === "F" + FLAT &&
+                keyTonic === "F" + FLAT &&
+                edoNames.includes("E" + SHARP)
+            ) {
+                note = "E" + SHARP;
             } else if (noteArg in EXTRATRANSPOSITIONS) {
                 octave += EXTRATRANSPOSITIONS[noteArg][1];
                 note = EXTRATRANSPOSITIONS[noteArg][0];

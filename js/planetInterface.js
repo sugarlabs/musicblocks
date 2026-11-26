@@ -31,6 +31,8 @@ class PlanetInterface {
         this.iframe = null;
         this.mainCanvas = null;
         this.activity = activity;
+        // Last generated thumbnail, so it can be reused for the same project.
+        this._thumbnailCache = { projectId: undefined, url: null, revision: -1 };
         this._getProjectStorage = () => {
             if (!this.planet || !this.planet.ProjectStorage) {
                 return null;
@@ -86,6 +88,14 @@ class PlanetInterface {
             ) {
                 this.activity.gitDropdownUI._syncMenuState();
             }
+
+            if (
+                this.activity &&
+                this.activity.toolbar &&
+                typeof this.activity.toolbar.syncToolbarHeight === "function"
+            ) {
+                this.activity.toolbar.syncToolbarHeight();
+            }
         };
 
         /**
@@ -128,7 +138,7 @@ class PlanetInterface {
                 return;
             }
 
-            this.saveLocally();
+            this.saveLocally({ forceThumbnail: true });
             this.hideMusicBlocks();
             this.showPlanet();
         };
@@ -177,8 +187,26 @@ class PlanetInterface {
             pubsub.on("finishedLoading", __afterLoad);
 
             try {
-                const obj = JSON.parse(data);
-                this.activity.blocks.loadNewBlocks(obj);
+                if (
+                    data === null ||
+                    data === "undefined" ||
+                    data === "null" ||
+                    data === "[]" ||
+                    (typeof data === "string" && data.trim() === "")
+                ) {
+                    this.activity.justLoadStart();
+                } else {
+                    const obj = typeof data === "string" ? JSON.parse(data) : data;
+                    if (
+                        obj === null ||
+                        obj === undefined ||
+                        (Array.isArray(obj) && obj.length === 0)
+                    ) {
+                        this.activity.justLoadStart();
+                    } else {
+                        this.activity.blocks.loadNewBlocks(obj);
+                    }
+                }
             } catch (e) {
                 this.activity.errorMsg(e);
             }
@@ -212,6 +240,7 @@ class PlanetInterface {
         /**
          * Initializes a new project with the provided name or a default name.
          * Resets project state and optionally clears and refreshes the workspace.
+         * Refreshes the browser title after project initialization succeeds.
          * @param {string} [name] - The name of the new project.
          * @param {boolean} [clearWorkspace=true] - Whether to clear the current workspace.
          */
@@ -225,7 +254,10 @@ class PlanetInterface {
                 this.activity.refreshCanvas();
             }
             this._resetTrashHistory();
-            return initialization;
+            return initialization.then(projectID => {
+                document.title = this.getCurrentProjectName();
+                return projectID;
+            });
         };
 
         /**
@@ -243,16 +275,25 @@ class PlanetInterface {
          * Prepares project data for export, generates SVG data, and saves the project data locally.
          * @param {Object} [options] - Save behavior options.
          * @param {boolean} [options.rejectOnProjectSaveError=false] - Reject when project data cannot be saved.
+         * @param {boolean} [options.forceThumbnail=false] - Rebuild the thumbnail even if it is still fresh.
          * @returns {Promise|boolean} False if project data could not be saved.
          */
         this.saveLocally = (options = {}) => {
             const rejectOnProjectSaveError = options.rejectOnProjectSaveError === true;
+            const forceThumbnail = options.forceThumbnail === true;
             if (!this.planet || !this.planet.ProjectStorage) {
                 const error = new Error(
                     "[PlanetInterface] saveLocally called before Planet storage is ready."
                 );
                 console.error(error.message);
                 return rejectOnProjectSaveError ? Promise.reject(error) : Promise.resolve(null);
+            }
+
+            // Do not save workspace state to Planet storage while Planet is open,
+            // because the user may be switching or deleting projects in Planet,
+            // and the hidden workspace still contains the previous project's blocks.
+            if (this.iframe && this.iframe.style.display === "block") {
+                return Promise.resolve(null);
             }
 
             // The project being loaded is already the current one, so saving
@@ -265,14 +306,29 @@ class PlanetInterface {
 
             this.activity.stage.update();
             const data = this.activity.prepareExport();
-            const svgData = doSVG(
-                this.activity.canvas,
-                this.activity.logo,
-                this.activity.turtles,
-                320,
-                240,
-                320 / this.activity.canvas.width
-            );
+            const projectStorage = this.planet.ProjectStorage;
+            const currentProjectId =
+                typeof projectStorage.getCurrentProjectID === "function"
+                    ? projectStorage.getCurrentProjectID()
+                    : undefined;
+            const artworkRevision = this.activity.artworkRevision;
+            const cachedThumbnail = this._thumbnailCache;
+            const reuseThumbnail =
+                !forceThumbnail &&
+                currentProjectId !== undefined &&
+                cachedThumbnail.projectId === currentProjectId &&
+                cachedThumbnail.url !== null &&
+                cachedThumbnail.revision === artworkRevision;
+            const svgData = reuseThumbnail
+                ? null
+                : doSVG(
+                      this.activity.canvas,
+                      this.activity.logo,
+                      this.activity.turtles,
+                      320,
+                      240,
+                      320 / this.activity.canvas.width
+                  );
             const isQuotaError = e =>
                 e?.name === "QuotaExceededError" ||
                 e?.code === DOMException.QUOTA_EXCEEDED_ERR ||
@@ -296,16 +352,65 @@ class PlanetInterface {
                 return result;
             };
             try {
-                const projectStorage = this.planet.ProjectStorage;
-                const projectId =
+                let projectId =
                     typeof projectStorage.getCurrentProjectID === "function"
                         ? projectStorage.getCurrentProjectID()
                         : undefined;
-                const saveProject = image =>
-                    projectId === undefined
-                        ? projectStorage.saveLocally(data, image)
-                        : projectStorage.saveLocally(data, image, projectId);
-                if (svgData === null || svgData === undefined || svgData === "") {
+                const saveProject = image => {
+                    if (projectId !== undefined) {
+                        return projectStorage.saveLocally(data, image, projectId);
+                    }
+                    const result = projectStorage.saveLocally(data, image);
+                    if (typeof projectStorage.getCurrentProjectID === "function") {
+                        projectId = projectStorage.getCurrentProjectID();
+                    }
+                    if (result && typeof result.then === "function") {
+                        return result.then(res => {
+                            if (
+                                projectId === undefined &&
+                                typeof projectStorage.getCurrentProjectID === "function"
+                            ) {
+                                projectId = projectStorage.getCurrentProjectID();
+                            }
+                            return res;
+                        });
+                    }
+                    return result;
+                };
+                const saveThumbnail = image => {
+                    if (this.iframe && this.iframe.style.display === "block") {
+                        if (
+                            projectId === undefined ||
+                            projectStorage.data?.Projects?.[projectId] === undefined
+                        ) {
+                            return Promise.resolve(null);
+                        }
+                    }
+                    if (
+                        projectId === undefined &&
+                        typeof projectStorage.getCurrentProjectID === "function"
+                    ) {
+                        projectId = projectStorage.getCurrentProjectID();
+                    }
+                    if (typeof projectStorage.saveThumbnail === "function") {
+                        if (projectId === undefined) {
+                            return Promise.resolve(null);
+                        }
+                        return projectStorage.saveThumbnail(image, projectId);
+                    }
+                    if (projectId !== undefined) {
+                        return projectStorage.saveLocally(data, image, projectId);
+                    }
+                    return projectStorage.saveLocally(data, image);
+                };
+                if (reuseThumbnail) {
+                    return Promise.resolve(saveProject(cachedThumbnail.url)).catch(
+                        handleProjectSaveError
+                    );
+                } else if (svgData === null || svgData === undefined || svgData === "") {
+                    // No image to save, so drop any cached thumbnail to avoid
+                    // reusing a stale URL on a subsequent save.
+                    this._thumbnailCache = { projectId: undefined, url: null, revision: -1 };
                     return Promise.resolve(saveProject(null)).catch(handleProjectSaveError);
                 } else {
                     const fallbackImage =
@@ -321,9 +426,30 @@ class PlanetInterface {
                             const bitmap = new createjs.Bitmap(img);
                             const bounds = bitmap.getBounds();
                             bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-                            Promise.resolve(
-                                saveProject(bitmap.bitmapCache.getCacheDataURL())
-                            ).catch(reportSaveError);
+                            const thumbUrl = bitmap.bitmapCache.getCacheDataURL();
+                            if (projectId !== undefined) {
+                                this._thumbnailCache = {
+                                    projectId: projectId,
+                                    url: thumbUrl,
+                                    revision: artworkRevision
+                                };
+                            }
+                            const commitThumbnail = () => {
+                                if (
+                                    projectId === undefined &&
+                                    typeof projectStorage.getCurrentProjectID === "function"
+                                ) {
+                                    projectId = projectStorage.getCurrentProjectID();
+                                }
+                                return saveThumbnail(thumbUrl);
+                            };
+                            if (projectId !== undefined) {
+                                Promise.resolve(commitThumbnail()).catch(reportSaveError);
+                            } else {
+                                Promise.resolve(savePromise)
+                                    .then(commitThumbnail)
+                                    .catch(reportSaveError);
+                            }
                         } catch (error) {
                             console.error(error);
                         }
@@ -394,6 +520,45 @@ class PlanetInterface {
             }
 
             return projectStorage.getCurrentProjectName();
+        };
+
+        /**
+         * Retrieves the id of the current project. It changes whenever a new
+         * project is started or another one is opened.
+         * @returns {string|undefined} - The id, or undefined before Planet loads.
+         */
+        this.getCurrentProjectID = () => {
+            const projectStorage = this._getProjectStorage();
+            if (!projectStorage || typeof projectStorage.getCurrentProjectID !== "function") {
+                return undefined;
+            }
+
+            return projectStorage.getCurrentProjectID();
+        };
+
+        /**
+         * Retrieves the GitHub repo linked to the current project.
+         * @returns {Object|null} - The project ID, repo name, key and project name, or null
+         * when Planet storage is not ready.
+         */
+        this.getCurrentGitRepoData = () => {
+            const projectStorage = this._getProjectStorage();
+            if (!projectStorage || !projectStorage.data || !projectStorage.data.Projects) {
+                return null;
+            }
+
+            const projectId = projectStorage.getCurrentProjectID();
+            const project = projectStorage.data.Projects[projectId];
+            const gitData = project && project.GitRepoData;
+            const repoName = (gitData && gitData.repoName) || "";
+            return {
+                projectId,
+                repoName,
+                hashedKey: repoName
+                    ? gitData.hashedKey || localStorage.getItem("mb_git_key_" + repoName) || ""
+                    : "",
+                displayName: project ? project.ProjectName : ""
+            };
         };
 
         /**

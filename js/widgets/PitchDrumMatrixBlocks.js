@@ -86,6 +86,7 @@ class PitchDrumMatrixBlocks {
             }
         }
         this._blockMap.push([pitchBlock, drumBlock, repeat]);
+        this._storeCells();
     }
 
     /**
@@ -104,6 +105,34 @@ class PitchDrumMatrixBlocks {
             if (obj[0] === pitchBlock && obj[1] === drumBlock && (obj[2] || 0) === repeat) {
                 this._blockMap.splice(i, 1);
             }
+        }
+        this._storeCells();
+    }
+
+    /**
+     * Uses the block map of the block that opened the matrix, starting from the cells saved
+     * with the project.
+     *
+     * @public
+     * @returns {void}
+     */
+    selectBlockMap() {
+        this._blockMap = this._blockMaps[this.blockNo] ??= (
+            this.activity?.blocks?.blockList?.[this.blockNo]?.drumCells ?? []
+        ).map(cell => cell.slice());
+    }
+
+    /**
+     * Copies the selected cells to the block that opened the matrix, so they are saved with the
+     * project.
+     *
+     * @private
+     * @returns {void}
+     */
+    _storeCells() {
+        const block = this.activity?.blocks?.blockList?.[this.blockNo];
+        if (block) {
+            block.drumCells = this._blockMap.map(cell => [cell[0], cell[1], cell[2] || 0]);
         }
     }
 

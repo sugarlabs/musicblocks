@@ -1068,6 +1068,17 @@ describe("ExplorerJournalUI general note page", () => {
         expect(notes[0].text).toBe("rewritten");
     });
 
+    test("will not save an entry edited down to blank", () => {
+        const { page, container } = openNote();
+        const noteId = page.artifacts.notes[0].id;
+        container.querySelector(`textarea[data-note-id="${noteId}"]`).value = "   ";
+
+        container.querySelector(`.journal-update-note[data-note-id="${noteId}"]`).onclick();
+
+        expect(PracticeManager.getGeneralNote(page.id).artifacts.notes[0].text).toBe("first");
+        expect(document.getElementById("practice-quest-notice").className).toContain("hint");
+    });
+
     test("removes an entry", () => {
         const { page, container } = openNote();
         const noteId = page.artifacts.notes[0].id;
@@ -1140,6 +1151,19 @@ describe("ExplorerJournalUI lesson page notes", () => {
         container.querySelector(`.journal-delete-note[data-note-id="${noteId}"]`).onclick();
 
         expect(PracticeManager.getJournalPage(1).artifacts.notes).toEqual([]);
+    });
+
+    test("will not save a memory edited down to blank", () => {
+        PracticeManager.saveJournalNote(PracticeProblems[0], "first", "Why?");
+        const noteId = PracticeManager.getJournalPage(1).artifacts.notes[0].id;
+        const container = mountJournalContent();
+        ExplorerJournalUI.renderLessonPage(1);
+
+        container.querySelector(`textarea[data-note-id="${noteId}"]`).value = "";
+        container.querySelector(`.journal-update-note[data-note-id="${noteId}"]`).onclick();
+
+        expect(PracticeManager.getJournalPage(1).artifacts.notes[0].text).toBe("first");
+        expect(document.getElementById("practice-quest-notice").className).toContain("hint");
     });
 });
 
@@ -1412,5 +1436,163 @@ describe("PracticeUI extra action help cards", () => {
         expect(document.getElementById("practice-quest-notice").textContent).toContain(
             "Swing the pendulum"
         );
+    });
+});
+
+describe("PracticeUI toolbar adaptation and positioning regression tests", () => {
+    let toolbarsElement;
+
+    beforeEach(() => {
+        document.body.innerHTML = "";
+        toolbarsElement = document.createElement("nav");
+        toolbarsElement.id = "toolbars";
+        Object.defineProperty(toolbarsElement, "offsetHeight", {
+            configurable: true,
+            writable: true,
+            value: 64
+        });
+        document.body.appendChild(toolbarsElement);
+    });
+
+    afterEach(() => {
+        document.body.innerHTML = "";
+    });
+
+    test("refreshOnToolbarChange repositions docked panels to new toolbar height", () => {
+        const panel = document.createElement("div");
+        panel.id = "explorer-journal-panel";
+        panel.style.display = "flex";
+        panel.dataset.userMoved = "false";
+        document.body.appendChild(panel);
+
+        toolbarsElement.offsetHeight = 118;
+        PracticeUI.refreshOnToolbarChange();
+
+        expect(panel.style.top).toBe("118px");
+    });
+
+    test("preserves manually dragged positions when toolbar expands and collapses without drift", () => {
+        const panel = document.createElement("div");
+        panel.id = "explorer-journal-panel";
+        panel.style.display = "flex";
+        panel.dataset.userMoved = "true";
+        panel.dataset.draggedTop = "250";
+        panel.style.top = "250px";
+        panel.getBoundingClientRect = () => ({
+            top: 250,
+            left: 200,
+            width: 360,
+            height: 400,
+            right: 560,
+            bottom: 650
+        });
+        document.body.appendChild(panel);
+
+        // When dragged to 250px and toolbar expands to 114px, panel should not move
+        toolbarsElement.offsetHeight = 114;
+        PracticeUI.refreshOnToolbarChange();
+        expect(panel.style.top).toBe("250px");
+
+        // When dragged to 70px (near top) and toolbar expands to 114px, panel should be clamped to 114px
+        panel.dataset.draggedTop = "70";
+        panel.style.top = "70px";
+        panel.getBoundingClientRect = () => ({
+            top: 70,
+            left: 200,
+            width: 360,
+            height: 400,
+            right: 560,
+            bottom: 470
+        });
+        PracticeUI.refreshOnToolbarChange();
+        expect(panel.style.top).toBe("114px");
+
+        // When toolbar collapses back to 64px, panel should cleanly restore to 70px without drift
+        toolbarsElement.offsetHeight = 64;
+        PracticeUI.refreshOnToolbarChange();
+        expect(panel.style.top).toBe("70px");
+    });
+
+    test("collapsed side tabs dynamically adjust below expanded toolbar", () => {
+        const panel = document.createElement("div");
+        panel.id = "explorer-journal-panel";
+        panel.classList.add("practice-panel-collapsed");
+        document.body.appendChild(panel);
+
+        // Toolbar expands to 114px -> tab should sit at 114 + 12 = 126px
+        toolbarsElement.offsetHeight = 114;
+        PracticeUI.refreshOnToolbarChange();
+        expect(panel.style.top).toBe("126px");
+
+        // Toolbar collapses to 64px -> tab should sit at 64 + 12 = 76px
+        toolbarsElement.offsetHeight = 64;
+        PracticeUI.refreshOnToolbarChange();
+        expect(panel.style.top).toBe("76px");
+    });
+
+    test("Explorer Journal panel shell sets up scoped journal-header class", () => {
+        const shell = PracticeUI.createPanelShell(
+            "explorer-journal-panel",
+            "Explorer Journal",
+            "close-explorer-journal",
+            "explorer-journal-content",
+            "journal-header"
+        );
+        const header = shell.querySelector(".practice-menu-header");
+        expect(header).not.toBeNull();
+        expect(header.classList.contains("journal-header")).toBe(true);
+        expect(header.querySelector("#close-explorer-journal")).not.toBeNull();
+    });
+
+    test("repositions Explorer Journal immediately when auxiliary toolbar expands without user drag", () => {
+        toolbarsElement.offsetHeight = 64;
+        const panel = PracticeUI.createPanelShell(
+            "explorer-journal-panel",
+            "Explorer Journal",
+            "close-explorer-journal",
+            "explorer-journal-content",
+            "journal-header"
+        );
+        document.body.appendChild(panel);
+        PracticeUI.restorePanel(panel, PracticeUI.getJournalDefaultRight());
+        expect(panel.style.top).toBe("64px");
+
+        // Auxiliary toolbar expands to 128px
+        toolbarsElement.offsetHeight = 128;
+        PracticeUI.refreshOnToolbarChange();
+
+        // Panel must immediately sit at 128px without user drag
+        expect(panel.style.top).toBe("128px");
+    });
+
+    test("getCollapsedLaneTop stacks journal tab below collapsed practice tab", () => {
+        const practicePanel = document.createElement("div");
+        practicePanel.id = "practice-panel";
+        practicePanel.classList.add("practice-panel-collapsed");
+        practicePanel.style.display = "flex";
+        document.body.appendChild(practicePanel);
+
+        const journalPanel = document.createElement("div");
+        journalPanel.id = "explorer-journal-panel";
+        journalPanel.classList.add("practice-panel-collapsed");
+        journalPanel.style.display = "flex";
+        document.body.appendChild(journalPanel);
+
+        const expectedTop =
+            64 + 12 + PracticeUI.COLLAPSE_TOGGLE_HEIGHT + PracticeUI.COLLAPSE_TOGGLE_GAP;
+        expect(PracticeUI.getCollapsedLaneTop(journalPanel)).toBe(expectedTop);
+    });
+
+    test("restorePanel refreshes collapsed lane when reopening a collapsed panel", () => {
+        const panel = document.createElement("div");
+        panel.id = "explorer-journal-panel";
+        panel.classList.add("practice-panel-collapsed");
+        document.body.appendChild(panel);
+
+        toolbarsElement.offsetHeight = 64;
+        PracticeUI.restorePanel(panel, "0");
+
+        expect(panel.style.display).toBe("flex");
+        expect(panel.style.top).toBe("76px");
     });
 });

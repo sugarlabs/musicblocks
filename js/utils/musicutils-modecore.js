@@ -14,7 +14,7 @@
 
    _b64Cache, wholeNoteImg, halfNoteImg, quarterNoteImg, eighthNoteImg,
    sixteenthNoteImg, thirtysecondNoteImg, sixtyfourthNoteImg, CHORDVALUES,
-   setCustomChord, MUSICALMODES, customMode, getModeNumbers,
+   setCustomChord, MUSICALMODES, getModeNumbers,
    getNonEDOModeSteps, getArticulation, modeMapper, getCustomNote,
    GetNotesForInterval, base64Encode, MOVABLE_TONIC_DEGREE, scalePatternToEDO,
    PITCH_COLLECTIONS_EDO_OVERRIDES, getModePattern, MusicUtilsModeCore
@@ -38,17 +38,19 @@ if (typeof module !== "undefined" && module.exports) {
         FLAT,
         DOUBLEFLAT,
         DOUBLESHARP,
+        NOTENAMES,
         PITCH_COLLECTIONS,
         PITCH_COLLECTION_ALIASES
     } = MusicUtilsConstants;
     var MusicUtilsTemperament =
         (typeof window !== "undefined" && window.MusicUtilsTemperament) ||
         (typeof require !== "undefined" ? require("./musicutils-temperament") : {});
-    var { getTemperament } = MusicUtilsTemperament;
+    var { getTemperament, normalizeEDO } = MusicUtilsTemperament;
     var MusicUtilsPitch =
         (typeof window !== "undefined" && window.MusicUtilsPitch) ||
         (typeof require !== "undefined" ? require("./musicutils-pitch") : {});
-    var { stripMicrotonalPrefix, normalizeNoteAccidentals } = MusicUtilsPitch;
+    var { stripMicrotonalPrefix, normalizeNoteAccidentals, parseNoteString, frequencyToPitch } =
+        MusicUtilsPitch;
     var UtilsLogic =
         (typeof window !== "undefined" && window.UtilsLogic) ||
         (typeof require !== "undefined" ? require("./utils-logic") : {});
@@ -230,18 +232,15 @@ for (const alias in PITCH_COLLECTION_ALIASES) {
 MUSICALMODES["custom"] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 
 /**
- * Custom mode from the musical modes dictionary.
- * @constant {Object}
- */
-var customMode = MUSICALMODES["custom"];
-
-/**
  * Get the mode numbers for a specific mode name.
  * @function
  * @param {string} name - The name of the mode.
  * @returns {string} The mode numbers.
  */
 var getModeNumbers = name => {
+    if (typeof name !== "string") {
+        return "";
+    }
     const __convert = obj => {
         let n = 0;
         let m = "";
@@ -256,6 +255,10 @@ var getModeNumbers = name => {
 
         return m;
     };
+
+    if (typeof name !== "string") {
+        return "";
+    }
 
     const lowercaseName = name.toLowerCase();
     for (const mode in MUSICALMODES) {
@@ -347,8 +350,11 @@ var getNonEDOModeSteps = (mode, temperament) => {
  *     or the full string unchanged if no recognised prefix is found.
  */
 var getArticulation = note => {
+    if (typeof note !== "string") {
+        return "";
+    }
     const stripped = stripMicrotonalPrefix(note);
-    const match = stripped.match(/^(?:sol|do|re|mi|fa|la|ti|[A-G])(.*)/);
+    const match = stripped.match(/^(?:sol|do|re|mi|fa|la|ti|[A-Ga-g])(.*)/);
     return match ? match[1] : stripped;
 };
 
@@ -362,8 +368,8 @@ var getArticulation = note => {
 var modeMapper = (key, mode) => {
     // map common modes into their major/minor equivalent
     // console.debug(key + ' ' + mode + ' >>');
-    key = key.toLowerCase();
-    mode = mode.toLowerCase();
+    key = typeof key === "string" && key.trim() !== "" ? key.trim().toLowerCase() : "c";
+    mode = typeof mode === "string" && mode.trim() !== "" ? mode.trim().toLowerCase() : "major";
 
     switch (mode) {
         case "ionian":
@@ -682,6 +688,13 @@ var modeMapper = (key, mode) => {
         case "natural minor":
             mode = "minor";
             break;
+        case "major pentatonic":
+            mode = "major";
+            break;
+        case "minor pentatonic":
+        case "minyo":
+            mode = "minor";
+            break;
         case "major":
         case "minor":
         default:
@@ -700,8 +713,11 @@ var modeMapper = (key, mode) => {
  */
 var getCustomNote = note => {
     // For custom temperament note
-    if (note instanceof Array) {
+    if (Array.isArray(note)) {
         note = note[0];
+    }
+    if (typeof note !== "string") {
+        return "";
     }
 
     let centsInfo = "";
@@ -739,24 +755,78 @@ var getCustomNote = note => {
     return note;
 };
 
-var GetNotesForInterval = tur => {
-    const noteStatus = tur.singer.noteStatus;
-    const notePitches = tur.singer.notePitches;
-    const intervals = tur.singer.intervals;
-    const noteOctave = tur.singer.noteOctaves;
+var GetNotesForInterval = (tur, temperament) => {
+    /**
+     * Counts whole octaves between two notes the same way a scalar interval does
+     * (Math.floor(steps / 7)), so 0 means up by less than an octave and -1 means
+     * down by up to an octave. Octave numbers change at C, so their plain
+     * difference is wrong for intervals that cross a C (A4 to C5 is a third, not
+     * an octave and a third).
+     * @param {string} firstNote - Note name, e.g. "A" or "C#".
+     * @param {number} firstOctave
+     * @param {string} secondNote
+     * @param {number} secondOctave
+     * @returns {number}
+     */
+    const octavesBetween = (firstNote, firstOctave, secondNote, secondOctave) => {
+        // Drop microtonal prefixes such as "^" and "v" so "^C" counts as C.
+        const letterIndex = note =>
+            NOTENAMES.indexOf(normalizeNoteAccidentals(String(note)).charAt(0).toUpperCase());
+        const index1 = letterIndex(firstNote);
+        const index2 = letterIndex(secondNote);
+        if (index1 === -1 || index2 === -1) {
+            return secondOctave - firstOctave;
+        }
+        const letterSteps = index2 + 7 * secondOctave - (index1 + 7 * firstOctave);
+        return Math.floor(letterSteps / 7);
+    };
+
+    const parseFn =
+        typeof parseNoteString !== "undefined"
+            ? parseNoteString
+            : typeof MusicUtilsPitch !== "undefined"
+              ? MusicUtilsPitch.parseNoteString
+              : null;
+    const freqToPitchFn =
+        typeof frequencyToPitch !== "undefined"
+            ? frequencyToPitch
+            : typeof MusicUtilsPitch !== "undefined"
+              ? MusicUtilsPitch.frequencyToPitch
+              : null;
+    const noteStatus = tur?.singer?.noteStatus;
+    const notePitches = tur?.singer?.notePitches;
+    const intervals = tur?.singer?.intervals;
+    const noteOctave = tur?.singer?.noteOctaves;
     let firstNote = "C",
         secondNote = "C",
         octave = 0;
-    if (noteStatus && noteStatus[0]) {
-        firstNote = noteStatus[0][0].replace(/\d/g, ""); //removing all numbers like '1'
+    if (noteStatus && noteStatus[0]?.length) {
+        const formatNote = note => {
+            if (note === undefined || note === null) {
+                return "";
+            }
+            if (typeof note === "number" && freqToPitchFn) {
+                const [name, noteOct] = freqToPitchFn(note, temperament);
+                return name + noteOct;
+            }
+            return String(note);
+        };
+        const [parsedFirstNote, parsedOctaveA] = parseFn
+            ? parseFn(formatNote(noteStatus[0][0]))
+            : ["C", NaN];
+        firstNote = parsedFirstNote || "C";
         if (!noteStatus[0][1]) {
+            firstNote = normalizeNoteAccidentals(firstNote);
             return { firstNote, secondNote: firstNote, octave };
         }
-        secondNote = noteStatus[0][1].replace(/\d/g, "");
-        const octavea = parseInt(noteStatus[0][0].replace(/[^0-9]/g, ""), 10);
-        const octaveb = parseInt(noteStatus[0][1].replace(/[^0-9]/g, ""), 10);
-        octave = octaveb - octavea;
-    } else if (notePitches && notePitches[last(tur.singer.inNoteBlock)]?.length) {
+        const [parsedSecondNote, parsedOctaveB] = parseFn
+            ? parseFn(formatNote(noteStatus[0][1]))
+            : ["C", NaN];
+        secondNote = parsedSecondNote || "C";
+        if (!Number.isNaN(parsedOctaveA) && !Number.isNaN(parsedOctaveB)) {
+            octave = octavesBetween(firstNote, parsedOctaveA, secondNote, parsedOctaveB);
+        }
+    } else if (notePitches && notePitches[last(tur?.singer?.inNoteBlock)]?.length) {
         // Outside a note block there is no pitch list to read from, so keep
         // the C to C default instead of indexing into undefined.
         const pitchBlk = notePitches[last(tur.singer.inNoteBlock)];
@@ -766,9 +836,14 @@ var GetNotesForInterval = tur => {
 
     if (intervals && intervals.length) {
         octave = Math.floor(intervals[0] / 7);
-    } else if (noteOctave && noteOctave[last(tur.singer.inNoteBlock)]) {
+    } else if (noteOctave && noteOctave[last(tur?.singer?.inNoteBlock)]) {
         const octaveblk = noteOctave[last(tur.singer.inNoteBlock)];
-        octave = octaveblk[octaveblk.length - 1] - octaveblk[0];
+        octave = octavesBetween(
+            firstNote,
+            octaveblk[0],
+            secondNote,
+            octaveblk[octaveblk.length - 1]
+        );
     }
 
     firstNote = normalizeNoteAccidentals(firstNote);
@@ -863,9 +938,12 @@ var PITCH_COLLECTIONS_EDO_OVERRIDES = {};
  * Get the step pattern for a mode in the given EDO (or temperament).
  *
  * Lookup order: PITCH_COLLECTIONS_EDO_OVERRIDES[edo][mode] first, then the
- * scalePatternToEDO conversion of MUSICALMODES[mode]. For the "custom"
- * (chromatic) mode, 12-EDO uses the stored customMode pattern and non-12 EDO
- * returns a full EDO-length step-1 pattern.
+ * scalePatternToEDO conversion of MUSICALMODES[mode]. For the "custom" mode,
+ * the current MUSICALMODES.custom pattern is used when its steps sum to the
+ * EDO; otherwise a full EDO-length step-1 (chromatic) pattern is returned.
+ * Unlike other modes, custom is not rescaled with scalePatternToEDO: define
+ * mode always stores steps that sum to the current EDO, and set temperament
+ * resets it when the EDO changes.
  *
  * When `temperament` is a non-EDO temperament (JI, meantone, Pythagorean), the
  * EDO step model does not apply, so the returned array is a list of per-step
@@ -878,13 +956,29 @@ var PITCH_COLLECTIONS_EDO_OVERRIDES = {};
  * @returns {Array} Integer step pattern.
  */
 var getModePattern = (mode, edo = 12) => {
+    // Normalise first: scalePatternToEDO turns a bad EDO into NaN
+    // steps, and the custom branch below sizes an array with it, so
+    // an invalid EDO passed straight here (bypassing generateNoteNames)
+    // would still break or throw. A bad value means the 12-EDO pattern.
+    edo = normalizeEDO(edo);
+    if (typeof mode !== "string") {
+        return scalePatternToEDO(MUSICALMODES.major, edo);
+    }
     const overrides = PITCH_COLLECTIONS_EDO_OVERRIDES[edo];
     if (overrides && Object.prototype.hasOwnProperty.call(overrides, mode)) {
         return overrides[mode].slice();
     }
     if (mode.toLowerCase() === "custom") {
-        if (edo === 12) {
-            return customMode.slice();
+        // Read MUSICALMODES.custom on each call instead of keeping a copy: the
+        // define mode block, set temperament and saved custom modes all
+        // replace that array, so the copy taken at load time goes stale.
+        const custom = MUSICALMODES.custom;
+        if (
+            Array.isArray(custom) &&
+            custom.every(step => Number.isInteger(step) && step > 0) &&
+            custom.reduce((a, b) => a + b, 0) === edo
+        ) {
+            return custom.slice();
         }
         return new Array(edo).fill(1);
     }
@@ -906,7 +1000,6 @@ var MusicUtilsModeCore = {
     CHORDVALUES,
     setCustomChord,
     MUSICALMODES,
-    customMode,
     getModeNumbers,
     getNonEDOModeSteps,
     getArticulation,

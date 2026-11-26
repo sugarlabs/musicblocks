@@ -46,6 +46,14 @@ describe("musicutils-constants", () => {
         expect(constants.MODEPIEMENU_SLOT_COUNT).toBe(12);
     });
 
+    it("maps each interval alias to an interval with the same INTERVALVALUES entry", () => {
+        for (const [alias, interval] of Object.entries(constants.INTERVAL_ALIASES)) {
+            expect(constants.INTERVALVALUES[alias]).toBeDefined();
+            expect(interval).toMatch(/ \d+$/);
+            expect(constants.INTERVALVALUES[alias]).toEqual(constants.INTERVALVALUES[interval]);
+        }
+    });
+
     it("exports every table the file declares", () => {
         const declared = [...readSource("musicutils-constants.js").matchAll(/^var (\w+) =/gm)]
             .map(match => match[1])

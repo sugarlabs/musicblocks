@@ -19,8 +19,9 @@ class SearchController {
         this.searchUI = searchUI || activity.searchUI || null;
 
         this.searchSuggestions = [];
-        this._searchCache = {};
+        this._searchCache = Object.create(null);
         this._searchCloseListener = null;
+        this._searchEscapeListener = null;
         this.isHelpfulSearchWidgetOn = false;
         this.searchBlockPosition = [100, 100];
         this.deprecatedBlockNames = [];
@@ -35,7 +36,7 @@ class SearchController {
     prepSearchWidget() {
         this.searchBlockPosition = [100, 100];
         this.searchSuggestions = [];
-        this._searchCache = {};
+        this._searchCache = Object.create(null);
         this.deprecatedBlockNames = [];
 
         const activity = this.activity;
@@ -225,9 +226,18 @@ class SearchController {
             this._searchCloseListener = null;
         }
 
+        if (this._searchEscapeListener) {
+            this.activity.removeEventListener(document, "keydown", this._searchEscapeListener);
+            this._searchEscapeListener = null;
+        }
+
         this.activity.searchWidget.style.visibility = "hidden";
         this.activity.searchWidget.idInput_custom = "";
         this._hideSearchDragHandle();
+        const closeButton = document.getElementById("searchCloseButton");
+        if (closeButton) {
+            closeButton.style.display = "none";
+        }
     }
 
     /**
@@ -255,6 +265,7 @@ class SearchController {
                 activity.searchWidget.style.left = searchPos.x + "px";
                 activity.searchWidget.style.top = searchPos.y + "px";
                 this._addSearchDragHandle();
+                this._addSearchCloseButton();
             }
 
             this.searchBlockPosition = [100, 100];
@@ -266,11 +277,14 @@ class SearchController {
                 const menuEl = document.getElementById("ui-id-1");
                 const dragHandleEl = document.getElementById("searchDragHandle");
                 const paletteRowEl = document.querySelector("#palette tbody tr");
+                const closeButtonEl = document.getElementById("searchCloseButton");
 
                 if (
                     (searchEl && (e.target === searchEl || searchEl.contains(e.target))) ||
                     (dragHandleEl &&
                         (e.target === dragHandleEl || dragHandleEl.contains(e.target))) ||
+                    (closeButtonEl &&
+                        (e.target === closeButtonEl || closeButtonEl.contains(e.target))) ||
                     (menuEl &&
                         menuEl.style.display !== "none" &&
                         (e.target === menuEl || menuEl.contains(e.target))) ||
@@ -284,6 +298,17 @@ class SearchController {
 
             this._searchCloseListener = closeListener;
             activity.addEventListener(document, "mousedown", closeListener);
+
+            const escapeListener = event => {
+                if (event.key === "Escape") {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.hideSearchWidget();
+                }
+            };
+
+            this._searchEscapeListener = escapeListener;
+            activity.addEventListener(document, "keydown", escapeListener);
 
             setTimeout(() => {
                 activity.searchWidget.focus();
@@ -384,29 +409,49 @@ class SearchController {
                             img.style.top = pageY - img.offsetHeight / 2 + "px";
                         };
 
+                        let rAFId = null;
+                        let ticking = false;
+                        let lastX, lastY;
                         const onMouseMove = e => {
                             e.preventDefault();
-                            let x, y;
                             if (e.type === "touchstart" || e.type === "touchmove") {
-                                x = e.touches[0].pageX;
-                                y = e.touches[0].pageY;
+                                const touch = e.touches && e.touches[0];
+                                if (touch) {
+                                    lastX = touch.pageX !== undefined ? touch.pageX : touch.clientX;
+                                    lastY = touch.pageY !== undefined ? touch.pageY : touch.clientY;
+                                }
                             } else {
-                                x = e.pageX;
-                                y = e.pageY;
+                                lastX = e.pageX;
+                                lastY = e.pageY;
                             }
-                            moveAt(x, y);
+                            if (!ticking) {
+                                ticking = true;
+                                rAFId = window.requestAnimationFrame(() => {
+                                    moveAt(lastX, lastY);
+                                    ticking = false;
+                                });
+                            }
                         };
                         onMouseMove(event);
 
                         document.addEventListener("touchmove", onMouseMove, { passive: false });
                         document.addEventListener("mousemove", onMouseMove);
 
-                        const up = () => {
+                        let cancel;
+                        const up = (event, cancelled = false) => {
                             document.body.style.cursor = "default";
                             document.removeEventListener("mousemove", onMouseMove);
                             document.removeEventListener("touchmove", onMouseMove);
                             document.removeEventListener("mouseup", up);
                             document.removeEventListener("touchend", up);
+                            document.removeEventListener("touchcancel", cancel);
+
+                            if (rAFId) {
+                                window.cancelAnimationFrame(rAFId);
+                                rAFId = null;
+                                ticking = false;
+                                moveAt(lastX, lastY);
+                            }
 
                             const x = parseInt(img.style.left, 10);
                             const y = parseInt(img.style.top, 10);
@@ -417,6 +462,7 @@ class SearchController {
                                 document.body.removeChild(img);
                             }
 
+                            if (cancelled) return;
                             if (isNaN(x) && isNaN(y)) return;
 
                             const protoblk = item.specialDict;
@@ -437,9 +483,11 @@ class SearchController {
                                 }
                             );
                         };
+                        cancel = () => up(null, true);
 
                         document.addEventListener("mouseup", up, { once: true });
                         document.addEventListener("touchend", up, { once: true });
+                        document.addEventListener("touchcancel", cancel, { once: true });
                     };
 
                     li[0].addEventListener("mousedown", down, true);
@@ -501,6 +549,55 @@ class SearchController {
     }
 
     /**
+     * Creates and positions a close button for the main search input.
+     */
+    _addSearchCloseButton() {
+        const searchWidget = this.activity.searchWidget;
+        if (!searchWidget) return;
+
+        let closeButton = document.getElementById("searchCloseButton");
+
+        if (!closeButton) {
+            closeButton = document.createElement("button");
+            closeButton.id = "searchCloseButton";
+            closeButton.type = "button";
+            closeButton.textContent = "×";
+            closeButton.setAttribute("aria-label", _("Close search"));
+            closeButton.style.cssText =
+                "position:absolute;width:28px;height:28px;border:0;" +
+                "border-radius:50%;background:transparent;color:inherit;" +
+                "font-size:22px;line-height:28px;cursor:pointer;" +
+                "z-index:2002;display:flex;align-items:center;" +
+                "justify-content:center;padding:0;";
+
+            closeButton.addEventListener("click", () => {
+                this.hideSearchWidget();
+            });
+
+            document.body.appendChild(closeButton);
+        }
+
+        closeButton.style.display = "flex";
+        this._positionSearchCloseButton();
+    }
+
+    /**
+     * Keeps the close button aligned with the right edge of #search.
+     */
+    _positionSearchCloseButton() {
+        const searchWidget = this.activity.searchWidget;
+        const closeButton = document.getElementById("searchCloseButton");
+
+        if (!searchWidget || !closeButton) return;
+        if (typeof searchWidget.getBoundingClientRect !== "function") return;
+
+        const rect = searchWidget.getBoundingClientRect();
+
+        closeButton.style.left = rect.right - 36 + "px";
+        closeButton.style.top = rect.top + (rect.height - 28) / 2 + "px";
+    }
+
+    /**
      * Creates (once) and positions a drag handle for the classic #search
      * input, so it can be dragged the same way helpfulSearchDiv can.
      */
@@ -537,6 +634,7 @@ class SearchController {
                 activity.searchWidget.style.left = newLeft + "px";
                 activity.searchWidget.style.top = newTop + "px";
                 this._positionSearchDragHandle();
+                this._positionSearchCloseButton();
             });
 
             handle.addEventListener("pointerup", e => {

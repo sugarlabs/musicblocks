@@ -50,6 +50,7 @@ class GlobalPlanet {
         this.searching = false;
         this.searchString = "";
         this.oldSearchString = "";
+        this._requestId = 0;
         this.remixPrefix = _("Remix of");
 
         /** @type {IntersectionObserver|null} */
@@ -126,6 +127,7 @@ class GlobalPlanet {
 
     refreshProjects() {
         const Planet = this.Planet;
+        const requestId = ++this._requestId;
 
         this.index = 0;
         this._cleanupCards();
@@ -139,7 +141,7 @@ class GlobalPlanet {
                 this.sortBy,
                 this.index,
                 this.index + this.page + 1,
-                this.afterRefreshProjects.bind(this)
+                data => this.afterRefreshProjects(data, requestId)
             );
         } else {
             Planet.ServerInterface.downloadProjectList(
@@ -147,13 +149,14 @@ class GlobalPlanet {
                 this.sortBy,
                 this.index,
                 this.index + this.page + 1,
-                this.afterRefreshProjects.bind(this)
+                data => this.afterRefreshProjects(data, requestId)
             );
         }
     }
 
     loadMoreProjects() {
         const Planet = this.Planet;
+        const requestId = this._requestId;
 
         this.showLoading();
         this.hideLoadMore();
@@ -164,7 +167,7 @@ class GlobalPlanet {
                 this.sortBy,
                 this.index,
                 this.index + this.page + 1,
-                this.afterRefreshProjects.bind(this)
+                data => this.afterRefreshProjects(data, requestId)
             );
         } else {
             Planet.ServerInterface.downloadProjectList(
@@ -172,7 +175,7 @@ class GlobalPlanet {
                 this.sortBy,
                 this.index,
                 this.index + this.page + 1,
-                this.afterRefreshProjects.bind(this)
+                data => this.afterRefreshProjects(data, requestId)
             );
         }
     }
@@ -192,6 +195,7 @@ class GlobalPlanet {
         }
 
         // A real search query — go into search mode.
+        const requestId = ++this._requestId;
         this.searching = true;
         this.hideTags();
         this.oldSearchString = this.searchString;
@@ -205,7 +209,7 @@ class GlobalPlanet {
             this.sortBy,
             this.index,
             this.index + this.page + 1,
-            this.afterRefreshProjects.bind(this)
+            data => this.afterRefreshProjects(data, requestId)
         );
     }
 
@@ -226,16 +230,22 @@ class GlobalPlanet {
         if (this.searchString !== this.oldSearchString) this.search();
     }
 
-    afterRefreshProjects(data) {
-        data.success ? this.addProjects(data.data) : this.throwOfflineError();
+    afterRefreshProjects(data, requestId = this._requestId) {
+        if (requestId !== this._requestId) return;
+        data.success ? this.addProjects(data.data, requestId) : this.throwOfflineError();
     }
 
-    addProjects(data) {
+    addProjects(data, requestId = this._requestId) {
         const toDownload = [];
+        this.batchHasOfflineError = false;
 
         for (let i = 0; i < data.length; i++) {
             if (this.cache.hasOwnProperty(data[i][0])) {
-                if (this.cache[data[i][0]].ProjectLastUpdated !== data[i][1])
+                const visibility = Number(this.cache[data[i][0]].visible);
+                if (
+                    (this.searchMode === "USER_PROJECTS" && visibility !== 0 && visibility !== 1) ||
+                    this.cache[data[i][0]].ProjectLastUpdated !== data[i][1]
+                )
                     toDownload.push(data[i]);
             } else toDownload.push(data[i]);
         }
@@ -250,6 +260,8 @@ class GlobalPlanet {
             if (this.index === 0) {
                 // Initial load returned nothing — show the empty-state message.
                 this.throwNoProjectsError();
+            } else if (this.cards.length === 0) {
+                this.throwNoProjectsError();
             } else {
                 // Load-more returned nothing — pagination is exhausted.
                 // Keep the cards already rendered; just hide the Load More button.
@@ -257,28 +269,27 @@ class GlobalPlanet {
             }
             this.afterAddProjects();
         } else if (this.loadCount === 0) {
-            this.render(data);
-            hasMore ? this.showLoadMore() : this.hideLoadMore();
+            if (this.render(data, hasMore)) hasMore ? this.showLoadMore() : this.hideLoadMore();
         } else if (hasMore) {
             this.downloadProjectsToCache(
                 toDownload,
                 function () {
-                    this.render(data);
-                    this.showLoadMore();
-                }.bind(this)
+                    if (this.render(data, hasMore)) this.showLoadMore();
+                }.bind(this),
+                requestId
             );
         } else {
             this.downloadProjectsToCache(
                 toDownload,
                 function () {
-                    this.render(data);
-                    this.hideLoadMore();
-                }.bind(this)
+                    if (this.render(data, hasMore)) this.hideLoadMore();
+                }.bind(this),
+                requestId
             );
         }
     }
 
-    downloadProjectsToCache(data, callback) {
+    downloadProjectsToCache(data, callback, requestId = this._requestId) {
         const Planet = this.Planet;
         this.loadCount = data.length;
         this.batchHasOfflineError = false;
@@ -289,6 +300,7 @@ class GlobalPlanet {
                 Planet.ServerInterface.getProjectDetails(
                     id,
                     function (d) {
+                        if (requestId !== this._requestId) return;
                         const tempid = id;
                         this.addProjectToCache(tempid, d, callback);
                     }.bind(this)
@@ -301,6 +313,12 @@ class GlobalPlanet {
         if (data.success) {
             this.cache[id] = data.data;
             this.cache[id].ProjectData = null;
+            if (this.searchMode === "USER_PROJECTS" && Number(this.cache[id].visible) !== 1) {
+                const card = this.cards.find(item => item.id === id);
+                if (card) card.cleanup();
+                this.cards = this.cards.filter(item => item.id !== id);
+                document.getElementById(`global-project-open-${id}`)?.closest(".col")?.remove();
+            }
         } else if (data.error === "PROJECT_NOT_FOUND") {
             delete this.cache[id];
         } else {
@@ -391,13 +409,38 @@ class GlobalPlanet {
         });
     }
 
-    render(data) {
+    render(data, hasMore = false) {
         // Make sure the container doesn't display the offlineHTML or noProjectsHTML even when cards are being rendered.
         this.cleanContainer();
+        if (this.searchMode === "USER_PROJECTS") {
+            data = data.filter(idAndDate => {
+                const project = this.cache[idAndDate[0]];
+                return project && Number(project.visible) === 1;
+            });
+        }
+
+        if (data.length === 0) {
+            if (hasMore) {
+                const requestId = this._requestId;
+                this.afterAddProjects();
+                if (requestId === this._requestId) this.loadMoreProjects();
+            } else {
+                if (this.cards.length === 0) {
+                    if (this.batchHasOfflineError) this.throwOfflineError();
+                    else this.throwNoProjectsError();
+                }
+                this.afterAddProjects();
+            }
+            return false;
+        }
 
         let rendered = 0;
         for (let i = 0; i < data.length; i++) {
-            if (this.cache.hasOwnProperty(data[i][0])) {
+            if (
+                this.cache.hasOwnProperty(data[i][0]) &&
+                (this.searchMode !== "USER_PROJECTS" ||
+                    Number(this.cache[data[i][0]].visible) === 1)
+            ) {
                 const g = new GlobalCard(this.Planet);
                 g.init(data[i][0]);
                 g.render();
@@ -420,8 +463,8 @@ class GlobalPlanet {
             return;
         }
 
-        jQuery(".tooltipped").tooltip({ delay: 50 });
         this.afterAddProjects();
+        return true;
     }
 
     afterAddProjects() {
@@ -431,7 +474,11 @@ class GlobalPlanet {
         if (this.oldSearchString !== "") this.afterSearch();
     }
 
+    // Both error screens end whatever list was loading. A search that ends here never
+    // reaches afterSearch(), so clear the flag too, or search() ignores every later
+    // query (and the clear button) until reload.
     throwOfflineError() {
+        this.searching = false;
         this.hideLoading();
         this.hideLoadMore();
 
@@ -441,6 +488,7 @@ class GlobalPlanet {
     }
 
     throwNoProjectsError() {
+        this.searching = false;
         this.hideLoading();
         this.hideLoadMore();
 

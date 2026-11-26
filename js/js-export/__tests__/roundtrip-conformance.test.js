@@ -47,6 +47,11 @@ const {
     controlFlow,
     pitchAndPitches,
     switchCases,
+    heapOperations,
+    toneAndTimbre,
+    meterAndTempo,
+    intervalsAndTransposition,
+    penAttributes,
     allCorpusCases
 } = require("./conformance-corpus");
 
@@ -324,6 +329,50 @@ MusicBlocks.run();`;
         });
     });
 
+    describe("Heap Operations Corpus", () => {
+        test.each(heapOperations)("$description ($name)", ({ blocks }) => {
+            const { recoveredBlocks } = runRoundTrip(blocks);
+            const normalizedOriginal = normalizeBlockStructure(blocks);
+            const normalizedRecovered = normalizeBlockStructure(recoveredBlocks);
+            expect(normalizedRecovered).toEqual(normalizedOriginal);
+        });
+    });
+
+    describe("Tone and Timbre Corpus", () => {
+        test.each(toneAndTimbre)("$description ($name)", ({ blocks }) => {
+            const { recoveredBlocks } = runRoundTrip(blocks);
+            const normalizedOriginal = normalizeBlockStructure(blocks);
+            const normalizedRecovered = normalizeBlockStructure(recoveredBlocks);
+            expect(normalizedRecovered).toEqual(normalizedOriginal);
+        });
+    });
+
+    describe("Meter and Tempo Corpus", () => {
+        test.each(meterAndTempo)("$description ($name)", ({ blocks }) => {
+            const { recoveredBlocks } = runRoundTrip(blocks);
+            const normalizedOriginal = normalizeBlockStructure(blocks);
+            const normalizedRecovered = normalizeBlockStructure(recoveredBlocks);
+            expect(normalizedRecovered).toEqual(normalizedOriginal);
+        });
+    });
+
+    describe("Intervals and Transposition Corpus", () => {
+        test.each(intervalsAndTransposition)("$description ($name)", ({ blocks }) => {
+            const { recoveredBlocks } = runRoundTrip(blocks);
+            const normalizedOriginal = normalizeBlockStructure(blocks);
+            const normalizedRecovered = normalizeBlockStructure(recoveredBlocks);
+            expect(normalizedRecovered).toEqual(normalizedOriginal);
+        });
+    });
+
+    describe("Pen Attributes Corpus", () => {
+        test.each(penAttributes)("$description ($name)", ({ blocks }) => {
+            const { recoveredBlocks } = runRoundTrip(blocks);
+            const normalizedOriginal = normalizeBlockStructure(blocks);
+            const normalizedRecovered = normalizeBlockStructure(recoveredBlocks);
+            expect(normalizedRecovered).toEqual(normalizedOriginal);
+        });
+    });
     describe("Second-Export Stability and Fixed-Point Invariance", () => {
         test.each(allCorpusCases)("$description ($name)", ({ blocks, name }) => {
             const result = verifySecondExportStability(blocks);

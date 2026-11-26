@@ -592,17 +592,29 @@ class JSInterface {
                     } else if (props["constraints"]["type"] === "drum") {
                         const drums = [
                             "snare drum",
+                            "snare hard",
+                            "snare soft",
+                            "snare roll",
                             "kick drum",
+                            "heavy kick",
+                            "bass drum",
                             "tom tom",
-                            "floor tom tom",
+                            "tom hi",
+                            "tom mid",
+                            "tom lo",
+                            "floor tom",
                             "cup drum",
                             "darbuka drum",
                             "japanese drum",
                             "hi hat",
+                            "cymbal closed",
+                            "cymbal open",
+                            "cymbal pedal",
+                            "finger cymbals",
                             "ride bell",
                             "cow bell",
+                            "sonic cowbell",
                             "triangle bell",
-                            "finger cymbals",
                             "chime",
                             "gong",
                             "clang",
@@ -1031,6 +1043,12 @@ class JSInterface {
                     values: ["even", "odd", "scalar"],
                     defaultIndex: 0
                 }
+            },
+            {
+                type: "function",
+                constraints: {
+                    async: true
+                }
             }
         ],
         setPitchNumberOffset: [
@@ -1087,7 +1105,7 @@ class JSInterface {
                         "dorian",
                         "phrygian",
                         "lydian",
-                        "myxolydian",
+                        "mixolydian",
                         "minor",
                         "aeolian"
                     ],

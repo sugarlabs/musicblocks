@@ -30,7 +30,7 @@ global._ = s => s;
 global.docById = id => document.getElementById(id);
 
 const PitchDrumMatrixWindow = global.PitchDrumMatrixWindow;
-const METHODS = ["_addToolbar", "_closeWindow", "_onMaximize", "_scale"];
+const METHODS = ["_addToolbar", "_closeWindow", "_onMaximize"];
 
 describe("PitchDrumMatrixWindow", () => {
     let pdm;
@@ -166,5 +166,47 @@ describe("PitchDrumMatrixWindow", () => {
             expect(div.style.height).toBe("400px");
             expect(div.style.width).toBe("500px");
         }
+    });
+
+    test("falls back to pdm.widgetWindow when no window argument is provided", () => {
+        pdm.widgetWindow = widgetWindow;
+        widgetWindow._maximized = true;
+
+        pdm._onMaximize();
+
+        expect(body.style.position).toBe("absolute");
+        expect(document.getElementById("pdmOuterDiv").style.height).toBe("calc(-95px + 100vh)");
+    });
+
+    test("_onMaximize safely handles missing body or missing scroll divs without throwing", () => {
+        expect(() => pdm._onMaximize(null)).not.toThrow();
+        expect(() => pdm._onMaximize({})).not.toThrow();
+
+        const emptyBodyWin = {
+            getWidgetBody: () => document.createElement("div"),
+            _maximized: true
+        };
+        expect(() => pdm._onMaximize(emptyBodyWin)).not.toThrow();
+        expect(() => pdm._onMaximize({ getWidgetBody: () => null })).not.toThrow();
+        expect(() => pdm._onMaximize({ getWidgetBody: () => ({ style: null }) })).not.toThrow();
+    });
+
+    test("widgetWindow.onmaximize callback invokes _onMaximize and resizes the container", () => {
+        pdm.widgetWindow = widgetWindow;
+        widgetWindow.onmaximize = () => {
+            pdm._onMaximize(widgetWindow);
+        };
+
+        widgetWindow._maximized = true;
+        widgetWindow.onmaximize();
+
+        expect(body.style.position).toBe("absolute");
+        expect(document.getElementById("pdmOuterDiv").style.height).toBe("calc(-95px + 100vh)");
+
+        widgetWindow._maximized = false;
+        widgetWindow.onmaximize();
+
+        expect(body.style.position).toBe("relative");
+        expect(document.getElementById("pdmOuterDiv").style.height).toBe("400px");
     });
 });

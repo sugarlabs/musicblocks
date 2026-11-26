@@ -15,7 +15,7 @@
    _, toFraction, last, SHARP, FLAT, frequencyToPitch, NATURAL,
    DOUBLESHARP, DOUBLEFLAT, getScaleAndHalfSteps, NOTATIONTUPLETVALUE,
    NOTATIONNOTE, NOTATIONDURATION, NOTATIONROUNDDOWN, NOTATIONSTACCATO,
-   NOTATIONDOTCOUNT, getCurrentEDO
+   NOTATIONDOTCOUNT, getCurrentEDO, plainUnwritableTuplets
  */
 
 /*
@@ -25,7 +25,7 @@
      
       - js/utils/musicutils.js
           toFraction, frequencyToPitch, NATURAL, DOUBLESHARP, DOUBLEFLAT, getScaleAndHalfSteps,
-          getCurrentEDO
+          getCurrentEDO, plainUnwritableTuplets
      
      - js/utils/utils.js
          _, last
@@ -36,6 +36,9 @@
  */
 
 /* exported saveLilypondOutput, escapeLilypondString */
+
+// Lilypond has no limit, but a larger count is what is left of a note at a bar line.
+const LILYPOND_MAX_TUPLET = 32;
 
 // This header is prepended to the Lilypond output.
 const LILYPONDHEADER =
@@ -100,6 +103,10 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
     // obj = [note, duration, dotCount, tupletValue, roundDown, insideChord, staccato]
 
     logo.notationNotes[turtle] = "\\meter\n";
+    logo.notation.notationStaging[turtle] = plainUnwritableTuplets(
+        logo.notation.notationStaging[turtle],
+        LILYPOND_MAX_TUPLET
+    );
 
     const __toLilynote = note => {
         // Lilypond notes use is for sharp, es for flat,
@@ -123,9 +130,12 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             "𝄫": "eses",
             "♯": "is",
             "♭": "es",
+            "-2": ",,,,,",
+            "-1": ",,,,",
             "10": "'''''''",
-            "1": ",, ",
-            "2": ", ",
+            "0": ",,,",
+            "1": ",,",
+            "2": ",",
             "3": "",
             "4": "'",
             "5": "''",
@@ -136,8 +146,9 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
         };
 
         return (
-            note.replace(/[♮♯♭𝄪𝄫]|10|[1-9]/gu, match => replacements[match]).toLowerCase() +
-            (natural ? "!" : "")
+            note
+                .replace(/[♮♯♭𝄪𝄫]|10|-[12]|[0-9]/gu, match => replacements[match] ?? match)
+                .toLowerCase() + (natural ? "!" : "")
         );
     };
 
@@ -150,6 +161,38 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
     const staged = logo.notation.notationStaging[turtle];
     const lastRepeat = staged.lastIndexOf("begin repeat");
     const repeatStart = staged.slice(lastRepeat + 1).some(Array.isArray) ? lastRepeat : -1;
+    // Lilypond cannot end a slur or hairpin on the note it starts on ("cannot end
+    // slur", "unterminated slur"), so one that covers fewer than two notes is left
+    // out: both its begin and its end marker are skipped.
+    const skippedSpanners = new Set();
+    const openSpanners = { slur: [], crescendo: [], decrescendo: [] };
+    let notesStaged = 0;
+    for (let s = 0; s < staged.length; s++) {
+        const entry = staged[s];
+        if (Array.isArray(entry)) {
+            notesStaged++;
+            continue;
+        }
+        if (entry === "markup" || entry === "markdown") {
+            s++; // The text that follows is not a marker.
+            continue;
+        }
+        const match =
+            typeof entry === "string" && entry.match(/^(begin|end) (slur|crescendo|decrescendo)$/);
+        if (!match) {
+            continue;
+        }
+        const [, edge, kind] = match;
+        if (edge === "begin") {
+            openSpanners[kind].push({ index: s, notesBefore: notesStaged });
+        } else if (openSpanners[kind].length > 0) {
+            const begin = openSpanners[kind].pop();
+            if (notesStaged - begin.notesBefore < 2) {
+                skippedSpanners.add(begin.index);
+                skippedSpanners.add(s);
+            }
+        }
+    }
     let articulation = false;
     let targetDuration = 0;
     let tupletDuration = 0;
@@ -241,7 +284,9 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
         while (
             ["end slur", "end crescendo", "end decrescendo", "markup", "markdown"].includes(nextObj)
         ) {
-            if (nextObj === "end slur") {
+            if (skippedSpanners.has(i + j)) {
+                j += 1; // Its begin marker was skipped too.
+            } else if (nextObj === "end slur") {
                 logo.notationNotes[turtle] += ")  ";
                 j += 1;
             } else if (nextObj === "end crescendo" || nextObj === "end decrescendo") {
@@ -270,6 +315,9 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
     };
 
     for (let i = 0; i < logo.notation.notationStaging[turtle].length; i++) {
+        if (skippedSpanners.has(i)) {
+            continue;
+        }
         let obj = logo.notation.notationStaging[turtle][i];
         if (typeof obj === "string") {
             switch (obj) {
@@ -704,7 +752,8 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                         logo.notationNotes[turtle] += ">";
                     }
 
-                    logo.notationNotes[turtle] += obj[NOTATIONDURATION];
+                    logo.notationNotes[turtle] +=
+                        obj[NOTATIONDURATION] === 0.5 ? "\\breve" : obj[NOTATIONDURATION];
                     for (let d = 0; d < obj[NOTATIONDOTCOUNT]; d++) {
                         logo.notationNotes[turtle] += ".";
                     }
@@ -842,7 +891,8 @@ const saveLilypondOutput = function (activity) {
                         if (obj[0][ii] === "R") {
                             continue;
                         } else if (typeof obj[0][ii] === "string") {
-                            octaveTotal += Number(obj[0][ii].slice(-1));
+                            const match = String(obj[0][ii]).match(/(-?\d+)$/);
+                            octaveTotal += match ? Number(match[1]) : 4;
                         } else {
                             const pitchObj = frequencyToPitch(obj[0][ii]);
                             octaveTotal += pitchObj[1];
@@ -859,18 +909,13 @@ const saveLilypondOutput = function (activity) {
                 console.debug(
                     octaveTotal + " " + noteCount + " " + Math.floor(0.5 + octaveTotal / noteCount)
                 );
-                switch (Math.floor(0.5 + octaveTotal / noteCount)) {
-                    case 0:
-                    case 1:
-                    case 2:
-                        clef.push("bass_8");
-                        break;
-                    case 3:
-                        clef.push("bass");
-                        break;
-                    default:
-                        clef.push("treble");
-                        break;
+                const avgOctave = Math.floor(0.5 + octaveTotal / noteCount);
+                if (avgOctave <= 2) {
+                    clef.push("bass_8");
+                } else if (avgOctave === 3) {
+                    clef.push("bass");
+                } else {
+                    clef.push("treble");
                 }
             } else {
                 clef.push("treble");

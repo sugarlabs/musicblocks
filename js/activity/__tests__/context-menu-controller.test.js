@@ -101,6 +101,10 @@ function makeBitmap() {
     return { y: 0 };
 }
 
+function makeAccidentals() {
+    return Array.from({ length: 7 }, makeBitmap);
+}
+
 function makeActivity() {
     return {
         addEventListener: jest.fn(),
@@ -119,7 +123,7 @@ function makeActivity() {
         cellSize: 40,
         findBlocks: jest.fn(),
         boundary: { hide: jest.fn() },
-        toolbar: { changeWrap: jest.fn() },
+        toolbar: { changeWrap: jest.fn(), syncToolbarHeight: jest.fn() },
         _changeBlockVisibility: jest.fn(),
         _toggleCollapsibleStacks: jest.fn(),
         _restoreTrashById: jest.fn(),
@@ -161,6 +165,18 @@ function makeActivity() {
         altoBitmap: makeBitmap(),
         tenorBitmap: makeBitmap(),
         bassBitmap: makeBitmap(),
+        grandSharpBitmap: makeAccidentals(),
+        grandFlatBitmap: makeAccidentals(),
+        trebleSharpBitmap: makeAccidentals(),
+        trebleFlatBitmap: makeAccidentals(),
+        sopranoSharpBitmap: makeAccidentals(),
+        sopranoFlatBitmap: makeAccidentals(),
+        altoSharpBitmap: makeAccidentals(),
+        altoFlatBitmap: makeAccidentals(),
+        tenorSharpBitmap: makeAccidentals(),
+        tenorFlatBitmap: makeAccidentals(),
+        bassSharpBitmap: makeAccidentals(),
+        bassFlatBitmap: makeAccidentals(),
         refreshCanvas: jest.fn(),
         menuButtonsVisible: false,
         onscreenButtons: [],
@@ -301,11 +317,17 @@ describe("ContextMenuController", () => {
             expect(displaySpy).toHaveBeenCalledWith(event);
         });
 
-        test("does nothing in beginner mode", () => {
+        test("shows the helpful wheel in beginner mode", () => {
             activity.beginnerMode = true;
+            activity.helpfulWheelItems = [
+                { label: "Move to trash", display: false },
+                { label: "Duplicate", display: false }
+            ];
             controller.doContextMenus();
             const handler = activity.addEventListener.mock.calls[0][2];
-            const displaySpy = jest.spyOn(controller, "displayHelpfulWheel");
+            const displaySpy = jest
+                .spyOn(controller, "displayHelpfulWheel")
+                .mockImplementation(() => {});
 
             handler({
                 preventDefault: jest.fn(),
@@ -315,7 +337,7 @@ describe("ContextMenuController", () => {
                 target: { id: "myCanvas" }
             });
 
-            expect(displaySpy).not.toHaveBeenCalled();
+            expect(displaySpy).toHaveBeenCalled();
         });
 
         test("hides the helpful search widget first if it is open", () => {
@@ -491,6 +513,39 @@ describe("ContextMenuController", () => {
             expect(dup.fn).toBe(activity.copyMultipleBlocks);
         });
 
+        test("keeps horizontal scrolling hidden in beginner mode after rebuilding", () => {
+            activity.beginnerMode = true;
+
+            controller.setupPaletteMenu();
+            controller.setupPaletteMenu();
+
+            const enableScrolling = activity.helpfulWheelItems.find(
+                ele => ele.label === "Enable horizontal scrolling"
+            );
+            expect(enableScrolling.display).toBe(false);
+        });
+
+        test("keeps Select available in the background wheel", () => {
+            controller.setupPaletteMenu();
+
+            const select = activity.helpfulWheelItems.find(ele => ele.label === "Select");
+            expect(select.display).toBe(true);
+            expect(select.fn).toBe(activity.selectMode);
+        });
+
+        test("shows Clean and Select while keeping Clear hidden in the background wheel", () => {
+            controller.setupPaletteMenu();
+
+            controller.displayHelpfulWheel({ clientX: 10, clientY: 10 });
+
+            expect(wheelInstances[0].labels).toContain("Clean");
+            expect(wheelInstances[0].labels).toContain("Select");
+            expect(wheelInstances[0].labels).not.toContain("Clear");
+            expect(activity.helpfulWheelItems.find(ele => ele.label === "Clean").fn).toBe(
+                activity.findBlocks
+            );
+        });
+
         test("removes any pre-existing bottom toolbar container before rebuilding", () => {
             controller.setupPaletteMenu();
             expect(mockElement.parentNode.removeChild).toHaveBeenCalledWith(mockElement);
@@ -544,21 +599,17 @@ describe("ContextMenuController", () => {
             expect(activity._restoreTrashById).toHaveBeenCalledWith("block-1");
         });
 
-        test("search delegation entries call back into the controller's own methods", () => {
+        test("search is registered without adding a Close slice to the wheel", () => {
             const displaySpy = jest.spyOn(controller, "_displayHelpfulSearchDiv");
-            const hideSpy = jest.spyOn(controller, "_hideHelpfulSearchWidget");
             controller.setupPaletteMenu();
 
             const search = activity.helpfulWheelItems.find(
                 ele => ele.label === "Search for Blocks"
             );
-            const close = activity.helpfulWheelItems.find(ele => ele.label === "Close");
-
             search.fn();
-            close.fn();
 
             expect(displaySpy).toHaveBeenCalled();
-            expect(hideSpy).toHaveBeenCalled();
+            expect(activity.helpfulWheelItems.some(ele => ele.label === "Close")).toBe(false);
         });
     });
 
@@ -690,6 +741,7 @@ describe("ContextMenuController", () => {
             expect(activity.turtles.deltaY).toHaveBeenCalledWith(128);
             expect(canvasButton.style.top).toBe("204px");
             expect(activity.refreshCanvas).toHaveBeenCalled();
+            expect(activity.toolbar.syncToolbarHeight).toHaveBeenCalled();
 
             controller._showHideAuxMenu(true);
             expect(canvasButton.style.top).toBe("76px");
@@ -700,6 +752,39 @@ describe("ContextMenuController", () => {
             activity.palettes.deltaY.mockClear();
             controller._showHideAuxMenu(true);
             expect(activity.toolbarHeight).toBe(0);
+        });
+
+        test("keeps key signature accidentals aligned with staff grids", () => {
+            const staffs = ["grand", "treble", "soprano", "alto", "tenor", "bass"];
+            for (const staff of staffs) {
+                activity[`${staff}Bitmap`].y = 100;
+                for (const kind of ["Sharp", "Flat"]) {
+                    activity[`${staff}${kind}Bitmap`].forEach((bitmap, i) => {
+                        bitmap.y = 10 + i;
+                    });
+                }
+            }
+
+            mockElement.offsetHeight = 60;
+            controller._showHideAuxMenu(false);
+            for (const staff of staffs) {
+                expect(activity[`${staff}Bitmap`].y).toBe(160);
+                for (const kind of ["Sharp", "Flat"]) {
+                    activity[`${staff}${kind}Bitmap`].forEach((bitmap, i) => {
+                        expect(bitmap.y).toBe(70 + i);
+                    });
+                }
+            }
+
+            controller._showHideAuxMenu(true);
+            for (const staff of staffs) {
+                expect(activity[`${staff}Bitmap`].y).toBe(100);
+                for (const kind of ["Sharp", "Flat"]) {
+                    activity[`${staff}${kind}Bitmap`].forEach((bitmap, i) => {
+                        expect(bitmap.y).toBe(10 + i);
+                    });
+                }
+            }
         });
 
         test("hideAuxMenu hides the menu only when it is open", () => {

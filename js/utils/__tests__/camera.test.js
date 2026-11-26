@@ -105,6 +105,25 @@ describe("CameraManager lifecycle", () => {
         expect(intervalSpy).toHaveBeenCalledTimes(1);
     });
 
+    test("a reused interval draws for the latest camera caller", () => {
+        let tick;
+        intervalSpy.mockImplementation(callback => {
+            tick = callback;
+            return fakeId++;
+        });
+        const firstDraw = jest.fn();
+        const secondDraw = jest.fn();
+
+        const firstId = CameraManager.startCapture(firstDraw, 100);
+        const secondId = CameraManager.startCapture(secondDraw, 100);
+        tick();
+
+        expect(secondId).toBe(firstId);
+        expect(intervalSpy).toHaveBeenCalledTimes(1);
+        expect(firstDraw).not.toHaveBeenCalled();
+        expect(secondDraw).toHaveBeenCalledTimes(1);
+    });
+
     test("startCapture called rapidly and repeatedly (simulating a forever loop) never prevents the interval from firing", () => {
         // Use REAL timers here so we can assert the interval genuinely fires,
         // which is exactly what broke when startCapture unconditionally
@@ -271,6 +290,29 @@ describe("doUseCamera", () => {
         expect(window.clearInterval).not.toHaveBeenCalled();
         expect(setCameraID).toHaveBeenCalledTimes(2);
         expect(setCameraID.mock.calls[1][0]).toBe(firstId);
+    });
+
+    test("Video capture switches the drawing target when another turtle calls it", async () => {
+        let tick;
+        window.setInterval.mockImplementation(callback => {
+            tick = callback;
+            return 42;
+        });
+        const first = { doShowImage: jest.fn() };
+        const second = { doShowImage: jest.fn() };
+        const turtles = { getTurtle: jest.fn(name => (name === "first" ? first : second)) };
+
+        doUseCamera([10], turtles, "first", true, null, setCameraID, errorMsg);
+        await Promise.resolve();
+        dom.video.fireCanplay();
+        tick();
+        expect(first.doShowImage).toHaveBeenCalledTimes(1);
+
+        doUseCamera([20], turtles, "second", true, null, setCameraID, errorMsg);
+        tick();
+        expect(first.doShowImage).toHaveBeenCalledTimes(1);
+        expect(second.doShowImage).toHaveBeenCalledWith(20, "data:image/png;base64,FAKE");
+        expect(window.setInterval).toHaveBeenCalledTimes(1);
     });
 
     test("browser without getUserMedia support reports an error and does not throw", () => {

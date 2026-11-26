@@ -24,9 +24,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * (such as selector and label colors) align with the canonical tokens in tokens.css.
  */
 
-/* global showMaterialHighlight,platform,platformColor */
+/* global showMaterialHighlight,platform,platformColor,deepClone */
 
-/* exported showButtonHighlight */
+/* exported showButtonHighlight, clonePlatformTheme */
 
 let themePreference;
 try {
@@ -538,7 +538,12 @@ const getSystemThemePreference = () => {
 // Use stored preference, or fallback to system preference
 const activeTheme = themePreference || getSystemThemePreference();
 
-const clonePlatformTheme = theme => JSON.parse(JSON.stringify(theme));
+const clonePlatformTheme = theme => {
+    if (typeof deepClone === "function") {
+        return deepClone(theme);
+    }
+    return JSON.parse(JSON.stringify(theme));
+};
 
 // Keep the mutable runtime colors separate from the canonical theme definitions.
 if (platformThemes[activeTheme]) {
@@ -572,6 +577,7 @@ if (typeof module !== "undefined" && module.exports) {
         platformColor: window.platformColor,
         SEMANTIC_PALETTE_COLORS,
         PALETTE_CATEGORY_MAP,
-        buildPaletteColors
+        buildPaletteColors,
+        clonePlatformTheme
     };
 }

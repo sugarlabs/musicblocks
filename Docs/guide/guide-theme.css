@@ -1,0 +1,122 @@
+/*
+ * MusicBlocks v3.8.0
+ *
+ * @author Sugar Labs contributors
+ *
+ * @copyright 2026 Sugar Labs
+ *
+ * @license
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+:root {
+    color-scheme: light;
+    --guide-background: #ffffff;
+    --guide-text: #333333;
+    --guide-muted: #666666;
+    --guide-sidebar: #f8f9fa;
+    --guide-surface: #f8f8f8;
+    --guide-heading-surface: #f2f2f2;
+    --guide-border: #dddddd;
+    --guide-link: #337ab7;
+    --guide-link-hover: #23527c;
+    --guide-active-background: #337ab7;
+    --guide-active-text: #ffffff;
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --guide-background: #121212;
+    --guide-text: #e2e2e2;
+    --guide-muted: #b0b0b0;
+    --guide-sidebar: #1c1c1c;
+    --guide-surface: #242424;
+    --guide-heading-surface: #2c2c2c;
+    --guide-border: #555555;
+    --guide-link: #90caf9;
+    --guide-link-hover: #bbdefb;
+    --guide-active-background: #1e3a5f;
+    --guide-active-text: #ffffff;
+}
+
+:root[data-theme="highcontrast"] {
+    color-scheme: dark;
+    --guide-background: #000000;
+    --guide-text: #ffffff;
+    --guide-muted: #ffffff;
+    --guide-sidebar: #000000;
+    --guide-surface: #111111;
+    --guide-heading-surface: #111111;
+    --guide-border: #ffffff;
+    --guide-link: #00ffff;
+    --guide-link-hover: #ffff00;
+    --guide-active-background: #ffff00;
+    --guide-active-text: #000000;
+}
+
+body {
+    color: var(--guide-text);
+    background-color: var(--guide-background);
+}
+
+.sidebar {
+    background-color: var(--guide-sidebar);
+    border-right-color: var(--guide-border);
+}
+
+a,
+a:visited {
+    color: var(--guide-link);
+}
+
+a:hover,
+a:focus {
+    color: var(--guide-link-hover);
+}
+
+.nav-pills > li.active > a,
+.nav-pills > li.active > a:hover,
+.nav-pills > li.active > a:focus {
+    color: var(--guide-active-text);
+    background-color: var(--guide-active-background);
+}
+
+.nav-pills > li > a:hover,
+.nav-pills > li > a:focus {
+    background-color: var(--guide-surface);
+}
+
+.text-muted {
+    color: var(--guide-muted);
+}
+
+pre,
+code {
+    color: var(--guide-text);
+    background-color: var(--guide-surface);
+    border-color: var(--guide-border);
+}
+
+table th,
+table td {
+    border-color: var(--guide-border);
+}
+
+table th {
+    background-color: var(--guide-heading-surface);
+}
+
+hr {
+    border-top-color: var(--guide-border);
+}

@@ -54,6 +54,8 @@ class JSEditor {
         this._code = null;
         /** actual code backup up when help is shown */
         this._codeBck = null;
+        /** trashsignal listener registered while converting code to blocks */
+        this._trashSignalListener = null;
 
         // setup editor window styles
         this._currentStyle = 0;
@@ -1083,9 +1085,17 @@ class JSEditor {
 
                 const __listener = () => {
                     activity.blocks.loadNewBlocks(blockList);
-                    activity.stage.removeAllEventListeners("trashsignal");
+                    activity.stage.removeEventListener("trashsignal", __listener, false);
+                    this._trashSignalListener = null;
                 };
-                activity.stage.removeAllEventListeners("trashsignal");
+                if (this._trashSignalListener) {
+                    activity.stage.removeEventListener(
+                        "trashsignal",
+                        this._trashSignalListener,
+                        false
+                    );
+                }
+                this._trashSignalListener = __listener;
                 activity.stage.addEventListener("trashsignal", __listener, false);
                 // Clear the canvas but leave the JS editor open
                 activity.sendAllToTrash(false, false, false);

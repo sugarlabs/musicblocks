@@ -424,6 +424,7 @@ function setupIntervalsBlocks(activity) {
 
             const tur = activity.turtles.ithTurtle(turtle);
             const saveSuppressStatus = tur.singer.suppressOutput;
+            const saveRunning = tur.running;
 
             // Save the state of the boxes, dicts, and heap
             const saveBoxes = deepClone(logo.boxes);
@@ -445,6 +446,11 @@ function setupIntervalsBlocks(activity) {
             const previousButNotThese = tur.butNotThese;
             tur.butNotThese = deepClone(tur.butNotThese);
 
+            const initialFirstPitchLength = tur.singer.firstPitch.length;
+            const initialLastPitchLength = tur.singer.lastPitch.length;
+            const initialJustCountingLength = tur.singer.justCounting.length;
+            const initialJustMeasuringLength = tur.singer.justMeasuring.length;
+
             tur.singer.suppressOutput = true;
             tur.singer.justCounting.push(true);
             tur.singer.justMeasuring.push(true);
@@ -461,41 +467,57 @@ function setupIntervalsBlocks(activity) {
             let distance = 0;
             tur.running = true;
 
-            // Run the program from the specified block
-            logo.runFromBlockNow(logo, turtle, cblk, true, actionArgs, tur.queue.length);
+            try {
+                // Run the program from the specified block
+                logo.runFromBlockNow(logo, turtle, cblk, true, actionArgs, tur.queue.length);
 
-            if (tur.singer.firstPitch.length > 0 && tur.singer.lastPitch.length > 0) {
-                distance = last(tur.singer.lastPitch) - last(tur.singer.firstPitch);
-                tur.singer.firstPitch.pop();
-                tur.singer.lastPitch.pop();
-            } else {
-                distance = 0;
-                activity.errorMsg(_("You must use two pitch blocks when measuring an interval."));
+                if (
+                    tur.singer.firstPitch.length > initialFirstPitchLength &&
+                    tur.singer.lastPitch.length > initialLastPitchLength
+                ) {
+                    distance = last(tur.singer.lastPitch) - last(tur.singer.firstPitch);
+                } else {
+                    distance = 0;
+                    activity.errorMsg(
+                        _("You must use two pitch blocks when measuring an interval.")
+                    );
+                }
+            } finally {
+                while (tur.singer.firstPitch.length > initialFirstPitchLength) {
+                    tur.singer.firstPitch.pop();
+                }
+                while (tur.singer.lastPitch.length > initialLastPitchLength) {
+                    tur.singer.lastPitch.pop();
+                }
+                while (tur.singer.justMeasuring.length > initialJustMeasuringLength) {
+                    tur.singer.justMeasuring.pop();
+                }
+                while (tur.singer.justCounting.length > initialJustCountingLength) {
+                    tur.singer.justCounting.pop();
+                }
+
+                tur.singer.notesPlayed = saveNoteCount;
+                restoreMeterState(tur.singer, saveMeter);
+
+                // Restore previous state
+                logo.boxes = saveBoxes;
+                logo.turtleHeaps[turtle] = saveTurtleHeaps ?? [];
+                logo.turtleDicts[turtle] = saveTurtleDicts ?? {};
+
+                tur.running = saveRunning;
+                tur.singer.suppressOutput = saveSuppressStatus;
+                tur.butNotThese = previousButNotThese;
+
+                tur.painter.doPenUp();
+                tur.painter.doSetXY(saveX, saveY);
+                tur.painter.color = saveColor;
+                tur.painter.value = saveValue;
+                tur.painter.chroma = saveChroma;
+                tur.painter.stroke = saveStroke;
+                tur.painter.canvasAlpha = saveCanvasAlpha;
+                tur.painter.doSetHeading(saveOrientation);
+                tur.painter.penState = savePenState;
             }
-
-            tur.singer.notesPlayed = saveNoteCount;
-            restoreMeterState(tur.singer, saveMeter);
-
-            // Restore previous state
-            logo.boxes = saveBoxes;
-            logo.turtleHeaps[turtle] = saveTurtleHeaps ?? [];
-            logo.turtleDicts[turtle] = saveTurtleDicts ?? {};
-
-            tur.painter.doPenUp();
-            tur.painter.doSetXY(saveX, saveY);
-            tur.painter.color = saveColor;
-            tur.painter.value = saveValue;
-            tur.painter.chroma = saveChroma;
-            tur.painter.stroke = saveStroke;
-            tur.painter.canvasAlpha = saveCanvasAlpha;
-            tur.painter.doSetHeading(saveOrientation);
-            tur.painter.penState = savePenState;
-
-            tur.singer.justCounting.pop();
-            tur.singer.justMeasuring.pop();
-            tur.singer.suppressOutput = saveSuppressStatus;
-
-            tur.butNotThese = previousButNotThese;
 
             return distance;
         }
@@ -541,6 +563,7 @@ function setupIntervalsBlocks(activity) {
             const tur = activity.turtles.ithTurtle(turtle);
 
             const saveSuppressStatus = tur.singer.suppressOutput;
+            const saveRunning = tur.running;
 
             // We need to save the state of the boxes, dicts, and heap
             // although there is a potential of a boxes
@@ -563,6 +586,11 @@ function setupIntervalsBlocks(activity) {
             const previousButNotThese = tur.butNotThese;
             tur.butNotThese = deepClone(tur.butNotThese);
 
+            const initialFirstPitchLength = tur.singer.firstPitch.length;
+            const initialLastPitchLength = tur.singer.lastPitch.length;
+            const initialJustCountingLength = tur.singer.justCounting.length;
+            const initialJustMeasuringLength = tur.singer.justMeasuring.length;
+
             tur.singer.suppressOutput = true;
 
             tur.singer.justCounting.push(true);
@@ -577,45 +605,63 @@ function setupIntervalsBlocks(activity) {
             const saveMeter = saveMeterState(tur.singer);
             tur.running = true;
             let distance = 0;
-            logo.runFromBlockNow(logo, turtle, cblk, true, actionArgs, tur.queue.length);
 
-            if (tur.singer.firstPitch.length > 0 && tur.singer.lastPitch.length > 0) {
-                distance = Singer.scalarDistance(
-                    logo,
-                    turtle,
-                    last(tur.singer.firstPitch),
-                    last(tur.singer.lastPitch)
-                );
-                tur.singer.firstPitch.pop();
-                tur.singer.lastPitch.pop();
-            } else {
-                distance = 0;
-                activity.errorMsg(_("You must use two pitch blocks when measuring an interval."));
+            try {
+                logo.runFromBlockNow(logo, turtle, cblk, true, actionArgs, tur.queue.length);
+
+                if (
+                    tur.singer.firstPitch.length > initialFirstPitchLength &&
+                    tur.singer.lastPitch.length > initialLastPitchLength
+                ) {
+                    distance = Singer.scalarDistance(
+                        logo,
+                        turtle,
+                        last(tur.singer.firstPitch),
+                        last(tur.singer.lastPitch)
+                    );
+                } else {
+                    distance = 0;
+                    activity.errorMsg(
+                        _("You must use two pitch blocks when measuring an interval.")
+                    );
+                }
+            } finally {
+                while (tur.singer.firstPitch.length > initialFirstPitchLength) {
+                    tur.singer.firstPitch.pop();
+                }
+                while (tur.singer.lastPitch.length > initialLastPitchLength) {
+                    tur.singer.lastPitch.pop();
+                }
+                while (tur.singer.justMeasuring.length > initialJustMeasuringLength) {
+                    tur.singer.justMeasuring.pop();
+                }
+                while (tur.singer.justCounting.length > initialJustCountingLength) {
+                    tur.singer.justCounting.pop();
+                }
+
+                tur.singer.notesPlayed = saveNoteCount;
+                restoreMeterState(tur.singer, saveMeter);
+
+                // Restore previous state
+                logo.boxes = saveBoxes;
+                logo.turtleHeaps[turtle] = saveTurtleHeaps ?? [];
+                logo.turtleDicts[turtle] = saveTurtleDicts ?? {};
+
+                tur.running = saveRunning;
+                tur.singer.suppressOutput = saveSuppressStatus;
+                tur.butNotThese = previousButNotThese;
+
+                tur.painter.doPenUp();
+                tur.painter.doSetXY(saveX, saveY);
+                tur.painter.color = saveColor;
+                tur.painter.value = saveValue;
+                tur.painter.chroma = saveChroma;
+                tur.painter.stroke = saveStroke;
+                tur.painter.canvasAlpha = saveCanvasAlpha;
+                tur.painter.doSetHeading(saveOrientation);
+                tur.painter.penState = savePenState;
             }
 
-            tur.singer.notesPlayed = saveNoteCount;
-            restoreMeterState(tur.singer, saveMeter);
-
-            // Restore previous state
-            logo.boxes = saveBoxes;
-            logo.turtleHeaps[turtle] = saveTurtleHeaps ?? [];
-            logo.turtleDicts[turtle] = saveTurtleDicts ?? {};
-
-            tur.painter.doPenUp();
-            tur.painter.doSetXY(saveX, saveY);
-            tur.painter.color = saveColor;
-            tur.painter.value = saveValue;
-            tur.painter.chroma = saveChroma;
-            tur.painter.stroke = saveStroke;
-            tur.painter.canvasAlpha = saveCanvasAlpha;
-            tur.painter.doSetHeading(saveOrientation);
-            tur.painter.penState = savePenState;
-
-            tur.singer.justCounting.pop();
-            tur.singer.justMeasuring.pop();
-            tur.singer.suppressOutput = saveSuppressStatus;
-
-            tur.butNotThese = previousButNotThese;
             return distance;
         }
     }
@@ -756,7 +802,7 @@ function setupIntervalsBlocks(activity) {
                     _("The output of the example is: do, mi, sol, sol, ti, mi"),
                 "documentation",
                 null,
-                ""
+                "arpeggiohelp"
             ]);
 
             this.formBlock({
@@ -1196,7 +1242,7 @@ function setupIntervalsBlocks(activity) {
                 ),
                 "documentation",
                 null,
-                "moveablehelp"
+                "movablehelp"
             ]);
             this.size = 0;
             this.formBlock({

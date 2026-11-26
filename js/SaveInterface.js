@@ -45,6 +45,104 @@ function _lazyRequire(modules, callback) {
     }
 }
 
+/**
+ * Restore previously recorded notation from the recording buffer.
+ *
+ * @param {object} activity - The activity object.
+ * @returns {void}
+ */
+function restoreRecordedNotation(activity) {
+    if (!activity || !activity.logo || !activity.logo.recordingBuffer) {
+        return;
+    }
+    const { recordingBuffer } = activity.logo;
+    activity.logo.notationOutput = recordingBuffer.notationOutput;
+    activity.logo.notationNotes = recordingBuffer.notationNotes;
+
+    if (!activity.logo.notation) {
+        activity.logo.notation = {
+            notationStaging: {},
+            notationDrumStaging: {}
+        };
+    }
+    if (!activity.logo.notation.notationStaging) {
+        activity.logo.notation.notationStaging = {};
+    }
+    if (!activity.logo.notation.notationDrumStaging) {
+        activity.logo.notation.notationDrumStaging = {};
+    }
+
+    const turtleCount =
+        activity.turtles && typeof activity.turtles.getTurtleCount === "function"
+            ? activity.turtles.getTurtleCount()
+            : 0;
+
+    for (let t = 0; t < turtleCount; t++) {
+        if (
+            recordingBuffer.notationStaging &&
+            Object.prototype.hasOwnProperty.call(recordingBuffer.notationStaging, t) &&
+            recordingBuffer.notationStaging[t]
+        ) {
+            activity.logo.notation.notationStaging[t] = recordingBuffer.notationStaging[t];
+        }
+        if (
+            recordingBuffer.notationDrumStaging &&
+            Object.prototype.hasOwnProperty.call(recordingBuffer.notationDrumStaging, t) &&
+            recordingBuffer.notationDrumStaging[t]
+        ) {
+            activity.logo.notation.notationDrumStaging[t] = recordingBuffer.notationDrumStaging[t];
+        }
+    }
+}
+
+/**
+ * Prepare a fresh notation run by resetting notes, staging arrays, and clearing painters.
+ *
+ * @param {object} activity - The activity object.
+ * @returns {void}
+ */
+function prepareFreshNotation(activity) {
+    if (!activity) {
+        return;
+    }
+    if (activity.logo) {
+        activity.logo.notationNotes = {};
+        if (!activity.logo.notation) {
+            activity.logo.notation = {
+                notationStaging: {},
+                notationDrumStaging: {}
+            };
+        }
+        if (!activity.logo.notation.notationStaging) {
+            activity.logo.notation.notationStaging = {};
+        }
+        if (!activity.logo.notation.notationDrumStaging) {
+            activity.logo.notation.notationDrumStaging = {};
+        }
+    }
+
+    const turtleCount =
+        activity.turtles && typeof activity.turtles.getTurtleCount === "function"
+            ? activity.turtles.getTurtleCount()
+            : 0;
+
+    for (let t = 0; t < turtleCount; t++) {
+        if (activity.logo && activity.logo.notation) {
+            activity.logo.notation.notationStaging[t] = [];
+            activity.logo.notation.notationDrumStaging[t] = [];
+        }
+        if (
+            activity.turtles &&
+            typeof activity.turtles.getTurtle === "function" &&
+            activity.turtles.getTurtle(t) &&
+            activity.turtles.getTurtle(t).painter &&
+            typeof activity.turtles.getTurtle(t).painter.doClear === "function"
+        ) {
+            activity.turtles.getTurtle(t).painter.doClear(true, true, true);
+        }
+    }
+}
+
 class SaveInterface {
     /**
      * Creates an instance of SaveInterface.
@@ -213,15 +311,20 @@ class SaveInterface {
      * @param {string} extension - The file extension (including the dot).
      * @param {string} dataurl - The base64 data url of the file.
      * @param {string} defaultfilename - The default filename to be used.
+     * @param {Function} [onSuccess] - Called after the user confirms the download.
      * @returns {void}
      */
-    download(extension, dataurl, defaultfilename) {
+    download(extension, dataurl, defaultfilename, onSuccess = null) {
         let message = _("Enter a filename to save your project:");
         let filename = null;
         //const self = this;
         const finishDownload = name => {
             if (name === null) {
                 console.debug("save cancelled");
+                // downloadURL() won't run to free a Blob URL, so free it here.
+                if (typeof URL.revokeObjectURL === "function") {
+                    URL.revokeObjectURL(dataurl);
+                }
                 return;
             }
 
@@ -238,6 +341,9 @@ class SaveInterface {
                 message = _("File saved! Check Downloads.");
             }
             this.showToast(message);
+            if (typeof onSuccess === "function") {
+                onSuccess();
+            }
         };
 
         if (defaultfilename === undefined || defaultfilename === null) {
@@ -346,11 +452,12 @@ class SaveInterface {
             image = planet.getCurrentProjectImage();
         }
 
+        // Function replacers keep "$&", "$$", etc. in user data from being expanded.
         file = file
-            .replace(/{{ project_description }}/g, escapeHTML(description))
-            .replace(/{{ project_name }}/g, escapeHTML(name))
-            .replace(/{{ data }}/g, escapeHTML(data))
-            .replace(/{{ project_image }}/g, escapeHTML(sanitizeImageURL(image)));
+            .replace(/{{ project_description }}/g, () => escapeHTML(description))
+            .replace(/{{ project_name }}/g, () => escapeHTML(name))
+            .replace(/{{ data }}/g, () => escapeHTML(data))
+            .replace(/{{ project_image }}/g, () => escapeHTML(sanitizeImageURL(image)));
 
         return file;
     }
@@ -414,7 +521,11 @@ class SaveInterface {
         // Suppress music and turtle output when generating
         activity.logo.runningMIDI = true;
         activity.logo.runLogoCommands();
-        document.body.style.cursor = "wait";
+        if (activity.logo.runningMIDI) {
+            document.body.style.cursor = "wait";
+        } else {
+            document.body.style.cursor = "default";
+        }
     }
 
     /**
@@ -430,47 +541,128 @@ class SaveInterface {
     afterSaveMIDI() {
         const instrumentMIDI = getMidiInstrument();
         const drumMIDI = getMidiDrum();
+
+        // Both count quarter notes per minute.
+        const noteBpm = noteData =>
+            typeof noteData.bpm === "number" && noteData.bpm > 0 && isFinite(noteData.bpm)
+                ? noteData.bpm
+                : 90;
+
+        // How long a note plays, in seconds, or null for a note that is not written.
+        const noteSeconds = noteData => {
+            if (!noteData.note || noteData.note.length === 0) return null;
+            if (
+                typeof noteData.duration !== "number" ||
+                noteData.duration <= 0 ||
+                !isFinite(noteData.duration)
+            ) {
+                return null;
+            }
+            const duration = ((1 / noteData.duration) * 60 * 4) / noteBpm(noteData);
+            return isFinite(duration) && duration > 0 ? duration : null;
+        };
+
+        // A MIDI time signature's note value is a power of two.
+        const isMidiMeter = meter =>
+            Array.isArray(meter) &&
+            Number.isInteger(meter[0]) &&
+            meter[0] > 0 &&
+            meter[0] < 256 &&
+            Number.isInteger(meter[1]) &&
+            meter[1] > 0 &&
+            (meter[1] & (meter[1] - 1)) === 0;
+
+        // Without a tempo and a time signature a MIDI file is read at 120 bpm in 4/4, so
+        // notes played at any other tempo fall off the beat grid. A MIDI file has one tempo
+        // map and one set of time signatures for all its tracks: take them from the first
+        // track. Notes are placed by the time they play, so every track keeps its timing.
+        const writeTempoAndMeter = (header, notes) => {
+            let time = 0;
+            let lastMeter = null;
+            notes.forEach(noteData => {
+                const duration = noteSeconds(noteData);
+                if (duration === null) return;
+
+                const bpm = noteBpm(noteData);
+                const tempos = header.tempos;
+                if (tempos.length === 0 || tempos[tempos.length - 1].bpm !== bpm) {
+                    tempos.push({ ticks: header.secondsToTicks(time), bpm });
+                    header.update();
+                }
+
+                const meter = noteData.meter;
+                if (
+                    isMidiMeter(meter) &&
+                    (lastMeter === null || meter[0] !== lastMeter[0] || meter[1] !== lastMeter[1])
+                ) {
+                    header.timeSignatures.push({
+                        ticks: header.secondsToTicks(time),
+                        timeSignature: [meter[0], meter[1]]
+                    });
+                    header.update();
+                    lastMeter = meter;
+                }
+
+                time += duration;
+            });
+        };
+
         const generateMidi = data => {
             const midi = new Midi();
             midi.header.ticksPerBeat = 480;
+
+            // The first track with a drum or pitch written to the file, not just rests.
+            const firstTrack = Object.values(data).find(notes =>
+                notes.some(
+                    noteData =>
+                        noteSeconds(noteData) !== null &&
+                        (noteData.drum || noteData.note.some(pitch => !pitch.includes("R")))
+                )
+            );
+            if (firstTrack) {
+                writeTempoAndMeter(midi.header, firstTrack);
+            }
+
+            // A MIDI channel plays one instrument at a time, whichever track set it last, so
+            // each instrument in the file gets its own channel. Channel 9 is for drums; past
+            // 15 instruments the other channels are shared.
+            const melodicChannels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15];
+            const programChannels = new Map();
+            const channelFor = program => {
+                if (!programChannels.has(program)) {
+                    const next = programChannels.size % melodicChannels.length;
+                    programChannels.set(program, melodicChannels[next]);
+                }
+                return programChannels.get(program);
+            };
 
             Object.entries(data).forEach(([blockIndex, notes]) => {
                 const mainTrack = midi.addTrack();
                 mainTrack.name = `Track ${parseInt(blockIndex, 10) + 1}`;
 
-                const trackMap = new Map();
+                // Kept apart, so an instrument named like a drum gets its own track.
+                const drumTracks = new Map();
+                const instrumentTracks = new Map();
                 let globalTime = 0;
 
                 notes.forEach(noteData => {
-                    if (!noteData.note || noteData.note.length === 0) return;
-                    if (
-                        typeof noteData.duration !== "number" ||
-                        noteData.duration <= 0 ||
-                        !isFinite(noteData.duration)
-                    ) {
-                        return;
-                    }
-                    const bpm =
-                        typeof noteData.bpm === "number" &&
-                        noteData.bpm > 0 &&
-                        isFinite(noteData.bpm)
-                            ? noteData.bpm
-                            : 90;
-                    const duration = ((1 / noteData.duration) * 60 * 4) / bpm;
-                    if (!isFinite(duration) || duration <= 0) return;
+                    const duration = noteSeconds(noteData);
+                    if (duration === null) return;
                     const instrument = noteData.instrument || "default";
 
-                    if (noteData.drum) {
-                        const drum = noteData.drum || false;
-                        if (!trackMap.has(drum)) {
+                    const drums = Array.isArray(noteData.drum)
+                        ? noteData.drum
+                        : noteData.drum
+                          ? [noteData.drum]
+                          : [];
+                    for (const drum of drums) {
+                        if (!drumTracks.has(drum)) {
                             const drumTrack = midi.addTrack();
                             drumTrack.name = `Track ${parseInt(blockIndex, 10) + 1} - ${drum}`;
                             drumTrack.channel = 9; // Drums must be on Channel 10
-                            trackMap.set(drum, drumTrack);
+                            drumTracks.set(drum, drumTrack);
                         }
-
-                        const drumTrack = trackMap.get(drum);
-
+                        const drumTrack = drumTracks.get(drum);
                         const midiNumber =
                             Object.prototype.hasOwnProperty.call(drumMIDI, drum) && drumMIDI[drum]
                                 ? drumMIDI[drum]
@@ -481,8 +673,12 @@ class SaveInterface {
                             duration: duration,
                             velocity: 0.9
                         });
-                    } else {
-                        if (!trackMap.has(instrument)) {
+                    }
+
+                    // A note can play pitches together with drums: write those as well.
+                    const pitches = noteData.note.filter(pitch => !pitch.includes("R"));
+                    if (drums.length === 0 || pitches.length > 0) {
+                        if (!instrumentTracks.has(instrument)) {
                             const instrumentTrack = midi.addTrack();
                             instrumentTrack.name = `Track ${
                                 parseInt(blockIndex, 10) + 1
@@ -491,25 +687,30 @@ class SaveInterface {
                                 Object.prototype.hasOwnProperty.call(instrumentMIDI, instrument)
                                     ? instrumentMIDI[instrument]
                                     : instrumentMIDI["default"];
-                            trackMap.set(instrument, instrumentTrack);
+                            instrumentTrack.channel = channelFor(instrumentTrack.instrument.number);
+                            instrumentTracks.set(instrument, instrumentTrack);
                         }
 
-                        const instrumentTrack = trackMap.get(instrument);
+                        const instrumentTrack = instrumentTracks.get(instrument);
 
-                        noteData.note.forEach(pitch => {
-                            if (!pitch.includes("R")) {
-                                instrumentTrack.addNote({
-                                    name: normalizeNoteAccidentals(pitch),
-                                    time: globalTime,
-                                    duration: duration,
-                                    velocity: 0.8
-                                });
-                            }
+                        pitches.forEach(pitch => {
+                            instrumentTrack.addNote({
+                                name: normalizeNoteAccidentals(pitch),
+                                time: globalTime,
+                                duration: duration,
+                                velocity: 0.8
+                            });
                         });
                     }
                     globalTime += duration;
                 });
                 globalTime = 0;
+
+                // The empty track still writes a program change: give it the one its first
+                // instrument part writes, or the drum channel's, so it changes no instrument.
+                const firstPart = instrumentTracks.values().next().value;
+                mainTrack.channel = firstPart ? firstPart.channel : 9;
+                mainTrack.instrument.number = firstPart ? firstPart.instrument.number : 0;
             });
 
             // Generate the MIDI file and trigger download.
@@ -536,17 +737,19 @@ class SaveInterface {
      * @instance
      */
     saveSVG(activity, filename) {
-        const svg =
-            "data:image/svg+xml;utf8," +
-            doSVG(
-                activity.canvas,
-                activity.logo,
-                activity.turtles,
-                activity.canvas.width,
-                activity.canvas.height,
-                1.0
-            );
-        activity.save.download("svg", svg, filename || null);
+        const svg = doSVG(
+            activity.canvas,
+            activity.logo,
+            activity.turtles,
+            activity.canvas.width,
+            activity.canvas.height,
+            1.0
+        );
+        // Use a Blob, not a data URL: there the first "#" (a colour like
+        // fill="#ffffff") starts the fragment and cuts the file off.
+        const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        activity.save.download("svg", url, filename || null);
     }
 
     /**
@@ -571,8 +774,11 @@ class SaveInterface {
      * @instance
      */
     saveBlockArtwork(activity) {
-        const svg = "data:image/svg+xml;utf8," + activity.printBlockSVG();
-        activity.save.download("svg", svg, null);
+        // printBlockSVG() returns the inside of the SVG URI-encoded.
+        const svg = decodeURIComponent(activity.printBlockSVG());
+        const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        activity.save.download("svg", url, null);
     }
 
     /**
@@ -610,6 +816,38 @@ class SaveInterface {
     }
 
     /**
+     * Restore previously recorded notation from the recording buffer.
+     *
+     * Copies recorded notation output, notes, and per-turtle note and drum staging
+     * arrays from the recording buffer into the logo notation state.
+     *
+     * @param {object} [activity=this.activity] - The activity object.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
+    restoreRecordedNotation(activity = this.activity) {
+        restoreRecordedNotation(activity);
+    }
+
+    /**
+     * Prepare a fresh notation run.
+     *
+     * Resets notation notes, initializes empty note and drum staging arrays
+     * for every turtle, and clears each turtle's painter canvas.
+     *
+     * @param {object} [activity=this.activity] - The activity object.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
+    prepareFreshNotation(activity = this.activity) {
+        prepareFreshNotation(activity);
+    }
+
+    /**
      * Save ABC notation representation of an activity.
      *
      * This method generates and prepares ABC notation output for the provided activity.
@@ -625,34 +863,11 @@ class SaveInterface {
 
         // Lazy-load abc module before using ABCHEADER
 
-        _lazyRequire(["activity/abc"], function () {
+        _lazyRequire(["activity/abc"], () => {
             // Check if we have buffered notation data (Issue #2330)
             if (activity.logo.recordingBuffer.hasData) {
                 // Use buffered data - restore it temporarily
-                activity.logo.notationOutput = activity.logo.recordingBuffer.notationOutput;
-                activity.logo.notationNotes = activity.logo.recordingBuffer.notationNotes;
-                for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
-                    if (
-                        Object.prototype.hasOwnProperty.call(
-                            activity.logo.recordingBuffer.notationStaging,
-                            t
-                        ) &&
-                        activity.logo.recordingBuffer.notationStaging[t]
-                    ) {
-                        activity.logo.notation.notationStaging[t] =
-                            activity.logo.recordingBuffer.notationStaging[t];
-                    }
-                    if (
-                        Object.prototype.hasOwnProperty.call(
-                            activity.logo.recordingBuffer.notationDrumStaging,
-                            t
-                        ) &&
-                        activity.logo.recordingBuffer.notationDrumStaging[t]
-                    ) {
-                        activity.logo.notation.notationDrumStaging[t] =
-                            activity.logo.recordingBuffer.notationDrumStaging[t];
-                    }
-                }
+                this.restoreRecordedNotation(activity);
 
                 // Save immediately
                 setTimeout(() => {
@@ -670,12 +885,7 @@ class SaveInterface {
                 //Suppress music and turtle output when generating Abc output.
                 activity.logo.runningAbc = true;
                 activity.logo.notationOutput = ABCHEADER;
-                activity.logo.notationNotes = {};
-                for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
-                    activity.logo.notation.notationStaging[t] = [];
-                    activity.logo.notation.notationDrumStaging[t] = [];
-                    activity.turtles.getTurtle(t).painter.doClear(true, true, true);
-                }
+                this.prepareFreshNotation(activity);
                 activity.logo.runLogoCommands();
             }
         });
@@ -698,7 +908,23 @@ class SaveInterface {
         _lazyRequire(["activity/abc"], () => {
             try {
                 const abc = encodeURIComponent(saveAbcOutput(this.activity));
-                this.activity.save.download("abc", "data:text;utf8," + abc, filename || null);
+                if (this.activity.logo?.abcExportWarnings?.length > 0) {
+                    this.activity.save.download(
+                        "abc",
+                        "data:text;utf8," + abc,
+                        filename || null,
+                        () => {
+                            this.activity.textMsg(
+                                _(
+                                    "ABC export rounded one or more Hertz pitches to the nearest note."
+                                ),
+                                5000
+                            );
+                        }
+                    );
+                } else {
+                    this.activity.save.download("abc", "data:text;utf8," + abc, filename || null);
+                }
             } catch (e) {
                 console.error("Error in ABC output generation: ", e);
                 this.activity.errorMsg(`${_("Error generating ABC output.")} ${e.message}`);
@@ -730,30 +956,7 @@ class SaveInterface {
         // If so, use it directly; otherwise run the program
         if (activity.logo.recordingBuffer.hasData) {
             // Load buffered data
-            activity.logo.notationOutput = activity.logo.recordingBuffer.notationOutput;
-            activity.logo.notationNotes = activity.logo.recordingBuffer.notationNotes;
-            for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
-                if (
-                    Object.prototype.hasOwnProperty.call(
-                        activity.logo.recordingBuffer.notationStaging,
-                        t
-                    ) &&
-                    activity.logo.recordingBuffer.notationStaging[t]
-                ) {
-                    activity.logo.notation.notationStaging[t] =
-                        activity.logo.recordingBuffer.notationStaging[t];
-                }
-                if (
-                    Object.prototype.hasOwnProperty.call(
-                        activity.logo.recordingBuffer.notationDrumStaging,
-                        t
-                    ) &&
-                    activity.logo.recordingBuffer.notationDrumStaging[t]
-                ) {
-                    activity.logo.notation.notationDrumStaging[t] =
-                        activity.logo.recordingBuffer.notationDrumStaging[t];
-                }
-            }
+            this.restoreRecordedNotation(activity);
         }
 
         const lyext = "ly";
@@ -914,12 +1117,7 @@ class SaveInterface {
                     this.notationConvert = "";
                 }
                 this.activity.logo.notationOutput = lyheader;
-                this.activity.logo.notationNotes = {};
-                for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
-                    this.activity.logo.notation.notationStaging[t] = [];
-                    this.activity.logo.notation.notationDrumStaging[t] = [];
-                    this.activity.turtles.getTurtle(t).painter.doClear(true, true, true);
-                }
+                this.prepareFreshNotation(this.activity);
                 document.body.style.cursor = "wait";
                 this.activity.logo.runLogoCommands();
 
@@ -1099,12 +1297,7 @@ class SaveInterface {
 
     saveMxml(filename) {
         this.activity.logo.runningMxml = true;
-        for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
-            this.activity.logo.notation.notationStaging[t] = [];
-            this.activity.logo.notation.notationDrumStaging[t] = [];
-            this.activity.turtles.getTurtle(t).painter.doClear(true, true, true);
-        }
-
+        this.prepareFreshNotation(this.activity);
         this.activity.logo.runLogoCommands();
     }
 
@@ -1132,5 +1325,9 @@ class SaveInterface {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { SaveInterface };
+    module.exports = {
+        SaveInterface,
+        restoreRecordedNotation,
+        prepareFreshNotation
+    };
 }

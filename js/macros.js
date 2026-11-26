@@ -201,6 +201,29 @@ const getMacroExpansion = (activity, blkname, x, y) => {
         [15, "amsynth", 0, 0, [12, 16, null]],
         [16, ["number", { value: 1 }], 0, 0, [15]]
     ];
+    const ARPEGGIOHELP = [
+        [0, "arpeggio", x, y, [null, 1, 2, 20]],
+        [1, ["chordname", { value: "major" }], 0, 0, [0]],
+        [2, ["newnote", { collapsed: false }], 0, 0, [0, 3, 6, 10]],
+        [3, "divide", 0, 0, [2, 4, 5]],
+        [4, ["number", { value: 1 }], 0, 0, [3]],
+        [5, ["number", { value: 16 }], 0, 0, [3]],
+        [6, "vspace", 0, 0, [2, 7]],
+        [7, "pitch", 0, 0, [6, 8, 9, null]],
+        [8, ["solfege", { value: "do" }], 0, 0, [7]],
+        [9, ["number", { value: 4 }], 0, 0, [7]],
+        [10, "hidden", 0, 0, [2, 11]],
+        [11, ["newnote", { collapsed: false }], 0, 0, [10, 12, 15, 19]],
+        [12, "divide", 0, 0, [11, 13, 14]],
+        [13, ["number", { value: 1 }], 0, 0, [12]],
+        [14, ["number", { value: 16 }], 0, 0, [12]],
+        [15, "vspace", 0, 0, [11, 16]],
+        [16, "pitch", 0, 0, [15, 17, 18, null]],
+        [17, ["solfege", { value: "sol" }], 0, 0, [16]],
+        [18, ["number", { value: 4 }], 0, 0, [16]],
+        [19, "hidden", 0, 0, [11, null]],
+        [20, "hidden", 0, 0, [0, null]]
+    ];
     const ARTICULATIONHELP = [
         [0, "articulation", x, y, [null, 31, 1, null]],
         [1, "settimbre", 0, 0, [0, 2, 4, 3]],
@@ -814,6 +837,11 @@ const getMacroExpansion = (activity, blkname, x, y) => {
         [6, "right", 0, 0, [4, 7, null]],
         [7, ["number", { value: 90 }], 0, 0, [6]]
     ];
+    const FLOAT2STRINGHELP = [
+        [0, "print", x, y, [null, 1, null]],
+        [1, "float2string", 0, 0, [0, 2]],
+        [2, ["number", { value: 0.5 }], 0, 0, [1]]
+    ];
     const FMSYNTHHELP = [
         [0, ["newnote", { collapsed: false }], 0, 0, [9, 1, 4, 8]],
         [1, "divide", 0, 0, [0, 2, 3]],
@@ -880,6 +908,14 @@ const getMacroExpansion = (activity, blkname, x, y) => {
         [8, "playdrum", 0, 0, [7, 9, null]],
         [9, ["drumname", { value: "kick drum" }], 0, 0, [8]],
         [10, "hidden", 0, 0, [3, null]]
+    ];
+    const INPUTVALUEHELP = [
+        [0, "input", x, y, [null, 1, 2]],
+        [1, ["text", { value: "Input a value" }], 0, 0, [0]],
+        [2, "forward", 0, 0, [0, 3, 4]],
+        [3, "inputvalue", 0, 0, [2]],
+        [4, "print", 0, 0, [2, 5, null]],
+        [5, "inputvalue", 0, 0, [4]]
     ];
     const INTERVALHELP = [
         [0, ["interval", { collapsed: false }], x, y, [null, 1, 6, 8]],
@@ -1686,6 +1722,7 @@ const getMacroExpansion = (activity, blkname, x, y) => {
         actionhelp: ACTIONHELP,
         archelp: ARCHELP,
         amsynthhelp: AMSYNTHHELP,
+        arpeggiohelp: ARPEGGIOHELP,
         articulationhelp: ARTICULATIONHELP,
         beatvaluehelp: BEATVALUEHELP,
         bottomposhelp: BOTTOMPOSHELP,
@@ -1717,11 +1754,13 @@ const getMacroExpansion = (activity, blkname, x, y) => {
         elapsedhelp: ELAPSEDHELP,
         everybeathelp: EVERYBEATHELP,
         fillhelp: FILLHELP,
+        float2stringhelp: FLOAT2STRINGHELP,
         fmsynthhelp: FMSYNTHHELP,
         foreverhelp: FOREVERHELP,
         forwardhelp: FORWARDHELP,
         harmonichelp: HARMONICHELP,
         ifhelp: IFHELP,
+        inputvaluehelp: INPUTVALUEHELP,
         intervalhelp: INTERVALHELP,
         inverthelp: INVERTHELP,
         lrhelp: LRHELP,

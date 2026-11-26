@@ -602,9 +602,83 @@ describe("Block Foundation", () => {
                 block.collapseText = null;
                 mockBlocks.findDragGroup = jest.fn();
                 mockBlocks.dragGroup = [0];
+                mockBlocks._updateViewportGrid = jest.fn();
+                block.blockIndex = 7;
 
                 expect(() => block.collapseToggle()).not.toThrow();
                 expect(block.collapsed).toBe(true);
+                expect(mockBlocks._updateViewportGrid).toHaveBeenCalledWith(7);
+            });
+        });
+
+        describe("collapsed block labels", () => {
+            it("should translate the chord progression widget label", () => {
+                const globalNames = [
+                    "Image",
+                    "COLLAPSEBUTTON",
+                    "EXPANDBUTTON",
+                    "PALETTEFILLCOLORS",
+                    "PALETTESTROKECOLORS",
+                    "PALETTEHIGHLIGHTCOLORS",
+                    "HIGHLIGHTSTROKECOLORS",
+                    "COLLAPSETEXTX",
+                    "COLLAPSETEXTY",
+                    "safeSVG"
+                ];
+                const savedGlobals = Object.fromEntries(
+                    globalNames.map(name => [name, global[name]])
+                );
+                const originalText = global.createjs.Text;
+                const originalTranslate = global._;
+                const originalBase64Encode = global.window.base64Encode;
+                const originalBlockTextColor = global.platformColor.blockText;
+                const block = new Block(
+                    {
+                        ...mockProtoBlock,
+                        name: "chordbuilder",
+                        scale: 1,
+                        palette: { name: "test" }
+                    },
+                    mockBlocks
+                );
+
+                global.Image = class {
+                    set src(value) {
+                        if (this.onload) this.onload();
+                    }
+                };
+                global.COLLAPSEBUTTON = "collapse";
+                global.EXPANDBUTTON = "expand";
+                global.PALETTEFILLCOLORS = { test: "fill" };
+                global.PALETTESTROKECOLORS = { test: "stroke" };
+                global.PALETTEHIGHLIGHTCOLORS = { test: "highlight" };
+                global.HIGHLIGHTSTROKECOLORS = { test: "highlight-stroke" };
+                global.COLLAPSETEXTX = 0;
+                global.COLLAPSETEXTY = 0;
+                global.safeSVG = text => text;
+                global.platformColor.blockText = "#000000";
+                global._ = jest.fn(key => (key === "chords" ? "translated chords" : key));
+                global.window.base64Encode = text => text;
+                global.createjs.Text = jest.fn(text => ({ text, visible: true }));
+                block.blockIndex = 0;
+                block.collapseArtwork =
+                    "<svg>fill_color stroke_color block_text_color block_label</svg>";
+                block.container = new global.createjs.Container();
+                block.blocks.blockCollapseArt = {};
+                block.blocks.cleanupAfterLoad = jest.fn();
+
+                try {
+                    block._generateCollapseArtwork(null);
+
+                    expect(block.collapseText.text).toBe("translated chords");
+                    expect(global._).toHaveBeenCalledWith("chords");
+                } finally {
+                    Object.assign(global, savedGlobals);
+                    global.createjs.Text = originalText;
+                    global._ = originalTranslate;
+                    global.window.base64Encode = originalBase64Encode;
+                    global.platformColor.blockText = originalBlockTextColor;
+                }
             });
         });
 
@@ -614,6 +688,17 @@ describe("Block Foundation", () => {
                 global.NSYMBOLS = global.NSYMBOLS || {};
                 global.RSYMBOLS = global.RSYMBOLS || {};
                 global.DEGREES = global.DEGREES || "unison 2nd 3rd 4th 5th 6th 7th octave";
+                global.SHARP = "♯";
+                global.FLAT = "♭";
+                global.DOUBLESHARP = "𝄪";
+                global.DOUBLEFLAT = "𝄫";
+                global.NATURAL = "♮";
+                global.splitScaleDegree = jest.fn(val => {
+                    if (val && val.includes("♯")) {
+                        return [val.replace("♯", ""), "♯"];
+                    }
+                    return [val, global.NATURAL];
+                });
             });
 
             it("should not throw for a note whose divide has an empty slot", () => {
@@ -639,6 +724,333 @@ describe("Block Foundation", () => {
                 mockBlocks.findNoteBlock = jest.fn(() => null);
 
                 expect(() => block._intervalLabel()).not.toThrow();
+            });
+
+            it("should return empty string from _getPitch when connection is null or missing", () => {
+                mockBlocks.blockList = [block];
+                expect(block._getPitch(null)).toBe("");
+                expect(block._getPitch(999)).toBe("");
+            });
+
+            it("should return empty string from _getPitch when pitch block has disconnected octave slot", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "pitch", connections: [0, 2, null] },
+                    { name: "notename", value: "C" }
+                ];
+                expect(block._getPitch(1)).toBe("");
+            });
+
+            it("should return empty string from _getPitch when pitch block has disconnected note name slot", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "pitch", connections: [0, null, 2] },
+                    { name: "number", value: 4 }
+                ];
+                expect(block._getPitch(1)).toBe("");
+            });
+
+            it("should return empty string from _getPitch when nthmodalpitch has an empty slot", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "nthmodalpitch", connections: [0, null, 2] },
+                    { name: "number", value: 4 }
+                ];
+                expect(block._getPitch(1)).toBe("");
+
+                mockBlocks.blockList[1].connections = [0, 2, null];
+                expect(block._getPitch(1)).toBe("");
+            });
+
+            it("should return empty string from _getPitch when hertz, steppitch, or pitchnumber has an empty slot", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "hertz", connections: [null, null] },
+                    { name: "steppitch", connections: [0, null] },
+                    { name: "pitchnumber", connections: [0, null] }
+                ];
+                expect(block._getPitch(1)).toBe("");
+                expect(block._getPitch(2)).toBe("");
+                expect(block._getPitch(3)).toBe("");
+            });
+
+            it("should resolve valid pitches correctly in _getPitch", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "pitch", connections: [0, 2, 3] },
+                    { name: "notename", value: "A" },
+                    { name: "number", value: 4 },
+                    { name: "hertz", connections: [null, 5] },
+                    { name: "number", value: 440 },
+                    { name: "steppitch", connections: [0, 7] },
+                    { name: "number", value: -2 },
+                    { name: "pitchnumber", connections: [0, 9] },
+                    { name: "number", value: 60 }
+                ];
+                expect(block._getPitch(1)).toBe("A 4");
+                expect(block._getPitch(4)).toBe("440HZ");
+                expect(block._getPitch(6)).toBe("down 2");
+                expect(block._getPitch(8)).toBe("pitch 60");
+            });
+
+            it("should format solfege pitches with various accidentals and fallbacks in _getPitch", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "pitch", connections: [0, 2, 8] },
+                    { name: "solfege", value: "do" },
+                    { name: "solfege", value: "fa" + global.SHARP },
+                    { name: "solfege", value: "la" + global.FLAT },
+                    { name: "solfege", value: "sol" + global.DOUBLESHARP },
+                    { name: "solfege", value: "mi" + global.DOUBLEFLAT },
+                    { name: "solfege", value: "unknown" },
+                    { name: "number", value: 4 }
+                ];
+
+                // uninflected solfege
+                expect(block._getPitch(1)).toBe("do 4");
+
+                // sharp
+                mockBlocks.blockList[1].connections[1] = 3;
+                expect(block._getPitch(1)).toBe("fa" + global.SHARP + " 4");
+
+                // flat
+                mockBlocks.blockList[1].connections[1] = 4;
+                expect(block._getPitch(1)).toBe("la" + global.FLAT + " 4");
+
+                // double sharp
+                mockBlocks.blockList[1].connections[1] = 5;
+                expect(block._getPitch(1)).toBe("sol" + global.DOUBLESHARP + " 4");
+
+                // double flat
+                mockBlocks.blockList[1].connections[1] = 6;
+                expect(block._getPitch(1)).toBe("mi" + global.DOUBLEFLAT + " 4");
+
+                // unknown note fallback
+                mockBlocks.blockList[1].connections[1] = 7;
+                expect(block._getPitch(1)).toBe("unknown 4");
+            });
+
+            it("should format scaledegree2 pitches in _getPitch", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "pitch", connections: [0, 2, 4] },
+                    { name: "scaledegree2", value: "1" },
+                    { name: "scaledegree2", value: "3♯" },
+                    { name: "number", value: 4 }
+                ];
+
+                // natural degree
+                expect(block._getPitch(1)).toBe("1 4");
+
+                // accidental degree
+                mockBlocks.blockList[1].connections[1] = 3;
+                expect(block._getPitch(1)).toBe("3♯ 4");
+            });
+
+            it("should format nthmodalpitch both in-range and out-of-range in _getPitch", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "nthmodalpitch", connections: [0, 2, 3] },
+                    { name: "number", value: 2 },
+                    { name: "number", value: 4 }
+                ];
+                expect(block._getPitch(1)).toBe("3rd 4");
+
+                mockBlocks.blockList[2].value = 99;
+                expect(block._getPitch(1)).toBe("99 4");
+
+                // fractional value: rounds to nearest integer index
+                mockBlocks.blockList[2].value = 2.4;
+                expect(block._getPitch(1)).toBe("3rd 4");
+
+                mockBlocks.blockList[2].value = 2.6;
+                expect(block._getPitch(1)).toBe("4th 4");
+            });
+
+            it("should format hertz via connection 0 in _getPitch", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "hertz", connections: [2, null] },
+                    { name: "number", value: 220 }
+                ];
+                expect(block._getPitch(1)).toBe("220HZ");
+            });
+
+            it("should format steppitch positive (up) in _getPitch", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "steppitch", connections: [0, 2] },
+                    { name: "number", value: 5 }
+                ];
+                expect(block._getPitch(1)).toBe("up 5");
+            });
+
+            it("should return expected labels for playdrum, rest2, and unknown in _getPitch", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "playdrum" },
+                    { name: "rest2" },
+                    { name: "unknown" }
+                ];
+                expect(block._getPitch(1)).toBe("drum");
+                expect(block._getPitch(2)).toBe("silence");
+                expect(block._getPitch(3)).toBe("");
+            });
+
+            it("should return empty string from _getPitch when connection points to out-of-range index", () => {
+                mockBlocks.blockList = [
+                    block,
+                    { name: "pitch", connections: [0, 999, 2] },
+                    { name: "number", value: 4 }
+                ];
+                expect(block._getPitch(1)).toBe("");
+
+                mockBlocks.blockList[1].connections = [0, 2, 999];
+                expect(block._getPitch(1)).toBe("");
+            });
+
+            it("should format collapsed newnote label cleanly when pitch is empty but duration is present", () => {
+                block.name = "newnote";
+                block.connections = [null, 1, 4];
+                mockBlocks.blockList = [
+                    block,
+                    { name: "divide", connections: [0, 2, 3] },
+                    { name: "number", value: 1, connections: [1] },
+                    { name: "number", value: 4, connections: [1] },
+                    { name: "pitch", connections: [0, null, null] }
+                ];
+                mockBlocks.findFirstPitchBlock = jest.fn(c => (c === 4 ? 4 : null));
+
+                block._newNoteLabel();
+                expect(block.collapseText.text).toBe("1/4");
+            });
+
+            it("should format collapsed newnote label cleanly when duration is empty but pitch is present", () => {
+                block.name = "newnote";
+                block.connections = [null, null, 1];
+                mockBlocks.blockList = [
+                    block,
+                    { name: "pitch", connections: [0, 2, 3] },
+                    { name: "notename", value: "C", connections: [1] },
+                    { name: "number", value: 4, connections: [1] }
+                ];
+                mockBlocks.findFirstPitchBlock = jest.fn(c => (c === 1 ? 1 : null));
+
+                block._newNoteLabel();
+                expect(block.collapseText.text).toBe("C 4");
+            });
+
+            it("should format collapsed osctime label cleanly when pitch is empty but time is present", () => {
+                block.name = "osctime";
+                block.connections = [null, 1, 6];
+                mockBlocks.blockList = [
+                    block,
+                    { name: "divide", connections: [0, 2, 3] },
+                    { name: "number", value: 1000, connections: [1] },
+                    { name: "divide", connections: [1, 4, 5] },
+                    { name: "number", value: 2, connections: [3] },
+                    { name: "number", value: 1, connections: [3] },
+                    { name: "pitch", connections: [0, null, null] }
+                ];
+                mockBlocks.findFirstPitchBlock = jest.fn(c => (c === 6 ? 6 : null));
+
+                block._oscTimeLabel();
+                expect(block.collapseText.text).toBe("500");
+            });
+
+            it("should omit non-finite oscillator time when division by zero occurs in _oscTimeLabel", () => {
+                block.name = "osctime";
+                block.connections = [null, 1, 6];
+                mockBlocks.blockList = [
+                    block,
+                    { name: "divide", connections: [0, 2, 3] },
+                    { name: "number", value: 1000, connections: [1] },
+                    { name: "divide", connections: [1, 4, 5] },
+                    { name: "number", value: 0, connections: [3] }, // division by zero
+                    { name: "number", value: 1, connections: [3] },
+                    { name: "pitch", connections: [0, 7, 8] },
+                    { name: "notename", value: "C", connections: [6] },
+                    { name: "number", value: 4, connections: [6] }
+                ];
+                mockBlocks.findFirstPitchBlock = jest.fn(c => (c === 6 ? 6 : null));
+
+                block._oscTimeLabel();
+                // Non-finite time must be omitted; only pitch should be shown
+                expect(block.collapseText.text).toBe("C 4");
+            });
+
+            it("should omit non-finite oscillator time in silence display in _oscTimeLabel", () => {
+                block.name = "osctime";
+                block.connections = [null, 1, null];
+                mockBlocks.blockList = [
+                    block,
+                    { name: "divide", connections: [0, 2, 3] },
+                    { name: "number", value: 1000, connections: [1] },
+                    { name: "divide", connections: [1, 4, 5] },
+                    { name: "number", value: 0, connections: [3] },
+                    { name: "number", value: 1, connections: [3] }
+                ];
+                mockBlocks.findFirstPitchBlock = jest.fn(() => null);
+
+                block._oscTimeLabel();
+                expect(block.collapseText.text).toBe("silence");
+            });
+
+            it("should format combined pitch and finite time in _oscTimeLabel", () => {
+                block.name = "osctime";
+                block.connections = [null, 1, 6];
+                mockBlocks.blockList = [
+                    block,
+                    { name: "divide", connections: [0, 2, 3] },
+                    { name: "number", value: 1000, connections: [1] },
+                    { name: "divide", connections: [1, 4, 5] },
+                    { name: "number", value: 4, connections: [3] },
+                    { name: "number", value: 1, connections: [3] },
+                    { name: "pitch", connections: [0, 7, 8] },
+                    { name: "notename", value: "A", connections: [6] },
+                    { name: "number", value: 4, connections: [6] }
+                ];
+                mockBlocks.findFirstPitchBlock = jest.fn(c => (c === 6 ? 6 : null));
+
+                block._oscTimeLabel();
+                expect(block.collapseText.text).toBe("A 4 | 250");
+            });
+
+            it("should not throw in _newNoteLabel when child pitch block has empty slot", () => {
+                block.name = "newnote";
+                block.connections = [null, null, 1];
+                mockBlocks.blockList = [block, { name: "pitch", connections: [0, null, null] }];
+                mockBlocks.findFirstPitchBlock = jest.fn(c => (c === 1 ? 1 : null));
+
+                expect(() => block._newNoteLabel()).not.toThrow();
+                expect(block.collapseText.text).toBe("note value");
+            });
+
+            it("should not throw in _intervalLabel when child pitch block has empty slot", () => {
+                block.name = "interval";
+                block.blockIndex = 0;
+                block.connections = [null, null, null];
+                mockBlocks.blockList = [
+                    block,
+                    { name: "note", connections: [0, null, 2] },
+                    { name: "pitch", connections: [1, null, null] }
+                ];
+                mockBlocks.findNestedIntervalBlock = jest.fn(() => null);
+                mockBlocks.findNoteBlock = jest.fn(() => 1);
+                mockBlocks.findFirstPitchBlock = jest.fn(c => (c === 2 ? 2 : null));
+
+                expect(() => block._intervalLabel()).not.toThrow();
+                expect(block.collapseText.text).toContain("scalar interval");
+            });
+
+            it("should not throw in _oscTimeLabel when child pitch block has empty slot", () => {
+                block.name = "osctime";
+                block.connections = [null, null, 1];
+                mockBlocks.blockList = [block, { name: "pitch", connections: [0, null, null] }];
+                mockBlocks.findFirstPitchBlock = jest.fn(c => (c === 1 ? 1 : null));
+
+                expect(() => block._oscTimeLabel()).not.toThrow();
+                expect(block.collapseText.text).toBe("note value");
             });
         });
 
@@ -715,6 +1127,181 @@ describe("Block Foundation", () => {
                 );
                 generateSpy.mockRestore();
             });
+        });
+    });
+
+    describe("isDisconnected()", () => {
+        it("should return false when disconnected artwork is unavailable", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+
+            expect(block.isDisconnected()).toBe(false);
+        });
+
+        it("should return false when the block has a parent connection", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.disconnectedBitmap = {};
+            block.connections = [4, null];
+
+            expect(block.isDisconnected()).toBe(false);
+        });
+
+        it("should return true for an unconnected argument block", () => {
+            mockProtoBlock.style = "arg";
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.disconnectedBitmap = {};
+            block.connections = [null, 2];
+
+            expect(block.isDisconnected()).toBe(true);
+        });
+
+        it("should return true for an unconnected command block with no child", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.disconnectedBitmap = {};
+            block.connections = [null, null];
+
+            expect(block.isDisconnected()).toBe(true);
+        });
+
+        it("should recognize a hidden child with no parent as disconnected", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.disconnectedBitmap = {};
+            block.connections = [null, 1];
+            mockBlocks.blockList = [block, { name: "hidden", connections: [null] }];
+
+            expect(block.isDisconnected()).toBe(true);
+        });
+
+        it("should not treat a non-inline collapsible block as disconnected", () => {
+            mockProtoBlock.capabilities.collapsible = true;
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.disconnectedBitmap = {};
+            block.connections = [null, null];
+
+            expect(block.isDisconnected()).toBe(false);
+        });
+    });
+
+    describe("block type and layout helpers", () => {
+        it.each([
+            ["value", "isValueBlock", true],
+            ["arg", "isArgBlock", true],
+            ["twoarg", "isTwoArgBlock", true],
+            ["argflowclamp", "isArgFlowClampBlock", true],
+            ["doubleclamp", "isDoubleClampBlock", true],
+            ["argclamp", "isArgClamp", true],
+            ["argclamparg", "isArgClamp", true],
+            ["command", "isValueBlock", false]
+        ])("%s style returns %s for %s", (style, method, expected) => {
+            const block = new Block({ ...mockProtoBlock, style }, mockBlocks);
+
+            expect(block[method]()).toBe(expected);
+        });
+
+        it("recognizes boolean comparison block names", () => {
+            expect(
+                ["equal", "greater", "less"].map(name => {
+                    const block = new Block({ ...mockProtoBlock, name }, mockBlocks);
+                    return block.isTwoArgBooleanBlock();
+                })
+            ).toEqual([true, true, true]);
+
+            const block = new Block({ ...mockProtoBlock, name: "forward" }, mockBlocks);
+            expect(block.isTwoArgBooleanBlock()).toBe(false);
+        });
+
+        it("recognizes left clamp, no-run, and expandable metadata", () => {
+            const action = new Block(
+                { ...mockProtoBlock, name: "action", isLeftClamp: true, expandable: true },
+                mockBlocks
+            );
+
+            expect(action.isLeftClampBlock()).toBe(true);
+            expect(action.isNoRunBlock()).toBe(true);
+            expect(action.isExpandableBlock()).toBe(true);
+        });
+
+        it("returns false for non-expandable and non-left-clamp blocks", () => {
+            const block = new Block(
+                { ...mockProtoBlock, name: "forward", isLeftClamp: false, expandable: false },
+                mockBlocks
+            );
+
+            expect(block.isLeftClampBlock()).toBe(false);
+            expect(block.isNoRunBlock()).toBe(false);
+            expect(block.isExpandableBlock()).toBe(false);
+        });
+
+        it("uses protoblock capability methods when available", () => {
+            const protoblock = {
+                ...mockProtoBlock,
+                hasCapability: jest.fn().mockReturnValue(true),
+                getCapability: jest.fn().mockReturnValue("configured")
+            };
+            const block = new Block(protoblock, mockBlocks);
+
+            expect(block.hasCapability("custom")).toBe(true);
+            expect(block.getCapability("custom")).toBe("configured");
+            expect(protoblock.hasCapability).toHaveBeenCalledWith("custom");
+            expect(protoblock.getCapability).toHaveBeenCalledWith("custom");
+        });
+
+        it("returns ARG for a two-argument block's first argument slot", () => {
+            const block = new Block({ ...mockProtoBlock, style: "twoarg" }, mockBlocks);
+            block.connections = [null, null, null];
+            block.docks = [
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, "in"]
+            ];
+
+            expect(block.getLayoutUpdateType(1)).toBe("ARG");
+        });
+
+        it("returns ARG for expandable argument blocks", () => {
+            const block = new Block(
+                { ...mockProtoBlock, style: "value", expandable: true },
+                mockBlocks
+            );
+            block.connections = [null, null];
+            block.docks = [
+                [0, 0, 0],
+                [0, 0, "in"]
+            ];
+
+            expect(block.getLayoutUpdateType(1)).toBe("ARG");
+        });
+
+        it("returns FLOW for a flow input at the final connection", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.connections = [null, null, null];
+            block.docks = [
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, "in"]
+            ];
+
+            expect(block.getLayoutUpdateType(1)).toBe("FLOW");
+        });
+
+        it("returns null for invalid, argument-clamp, and unrelated connections", () => {
+            const block = new Block({ ...mockProtoBlock, style: "argclamp" }, mockBlocks);
+            block.connections = [null, null, null];
+            block.docks = [
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, "in"]
+            ];
+
+            expect(block.getLayoutUpdateType(-1)).toBeNull();
+            expect(block.getLayoutUpdateType(1)).toBeNull();
+            expect(block.getLayoutUpdateType(0)).toBeNull();
+        });
+
+        it("builds a stable id from the block index", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 37;
+
+            expect(block.getBlockId()).toBe("_37");
         });
     });
 
@@ -1311,6 +1898,55 @@ describe("Block Foundation", () => {
     });
 
     describe("hide", () => {
+        it.each([
+            ["ordinary", false, false],
+            ["expanded", true, false],
+            ["collapsed", true, true]
+        ])(
+            "should defer cache updates until showing a %s block",
+            async (_, collapsible, collapsed) => {
+                mockProtoBlock.capabilities.collapsible = collapsible;
+                const b = new Block(mockProtoBlock, mockBlocks);
+                b.container = {
+                    visible: true,
+                    bitmapCache: {},
+                    updateCache: jest.fn(),
+                    uncache: jest.fn()
+                };
+                b.bounds = { x: 0, y: 0, width: 100, height: 100 };
+                b.collapsed = collapsed;
+                b.collapseText = { visible: true };
+                b.expandButtonBitmap = { visible: true };
+                b.collapseButtonBitmap = { visible: true };
+                b._removeAccessibleElement = jest.fn();
+                b._setupAccessibleElement = jest.fn();
+
+                b.hide();
+
+                expect(b.container.visible).toBe(false);
+                expect(b.container.updateCache).not.toHaveBeenCalled();
+                expect(b.container.uncache).not.toHaveBeenCalled();
+                expect(b._removeAccessibleElement).toHaveBeenCalledTimes(1);
+                if (collapsible) {
+                    expect(b.collapseText.visible).toBe(false);
+                    expect(b.expandButtonBitmap.visible).toBe(false);
+                    expect(b.collapseButtonBitmap.visible).toBe(false);
+                }
+
+                b.show();
+                await Promise.resolve();
+
+                expect(b.container.visible).toBe(true);
+                expect(b.container.updateCache).toHaveBeenCalledTimes(1);
+                expect(b._setupAccessibleElement).toHaveBeenCalledTimes(1);
+                if (collapsible) {
+                    expect(b.collapseText.visible).toBe(collapsed);
+                    expect(b.expandButtonBitmap.visible).toBe(collapsed);
+                    expect(b.collapseButtonBitmap.visible).toBe(!collapsed);
+                }
+            }
+        );
+
         it("should not throw when container is null", () => {
             const b = new Block(mockProtoBlock, mockBlocks);
             b.container = null;
@@ -1335,6 +1971,25 @@ describe("Block Foundation", () => {
     });
 
     describe("show", () => {
+        it("updates viewport tracking when showing a block", () => {
+            mockBlocks._updateViewportGrid = jest.fn();
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.blockIndex = 7;
+            b._viewportVisible = false;
+            b.container = { visible: false };
+            b.bitmap = { visible: false };
+            b.highlightBitmap = { visible: false };
+            b.disconnectedBitmap = null;
+            b.disconnectedHighlightBitmap = null;
+            b.updateCache = jest.fn();
+            b._setupAccessibleElement = jest.fn();
+
+            b.show();
+
+            expect(b._viewportVisible).toBe(true);
+            expect(mockBlocks._updateViewportGrid).toHaveBeenCalledWith(7);
+        });
+
         it("should not throw when container is null and not trashed", () => {
             const b = new Block(mockProtoBlock, mockBlocks);
             b.container = null;
@@ -1359,6 +2014,55 @@ describe("Block Foundation", () => {
             b.disconnectedHighlightBitmap = null;
             b.show();
             expect(b.container.visible).toBe(true);
+        });
+
+        it("should restore collapsed artwork and controls for a collapsed block", () => {
+            mockProtoBlock.capabilities.collapsible = true;
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.container = { visible: false };
+            b.collapsed = true;
+            b.bitmap = { visible: true };
+            b.highlightBitmap = { visible: true };
+            b.collapseBlockBitmap = { visible: false };
+            b.highlightCollapseBlockBitmap = { visible: true };
+            b.collapseText = { visible: false };
+            b.expandButtonBitmap = { visible: false };
+            b.collapseButtonBitmap = { visible: true };
+            b.updateCache = jest.fn();
+            b._setupAccessibleElement = jest.fn();
+
+            b.show();
+
+            expect(b.container.visible).toBe(true);
+            expect(b.bitmap.visible).toBe(false);
+            expect(b.highlightBitmap.visible).toBe(false);
+            expect(b.collapseBlockBitmap.visible).toBe(true);
+            expect(b.highlightCollapseBlockBitmap.visible).toBe(false);
+            expect(b.collapseText.visible).toBe(true);
+            expect(b.expandButtonBitmap.visible).toBe(true);
+            expect(b.collapseButtonBitmap.visible).toBe(false);
+            expect(b.updateCache).toHaveBeenCalled();
+            expect(b._setupAccessibleElement).toHaveBeenCalled();
+        });
+
+        it("should show disconnected artwork for an unconnected block", () => {
+            const b = new Block(mockProtoBlock, mockBlocks);
+            b.container = { visible: false };
+            b.connections = [null, null];
+            b.bitmap = { visible: true };
+            b.highlightBitmap = { visible: true };
+            b.disconnectedBitmap = { visible: false };
+            b.disconnectedHighlightBitmap = { visible: true };
+            b.updateCache = jest.fn();
+            b._setupAccessibleElement = jest.fn();
+
+            b.show();
+
+            expect(b.disconnectedBitmap.visible).toBe(true);
+            expect(b.bitmap.visible).toBe(false);
+            expect(b.highlightBitmap.visible).toBe(false);
+            expect(b.disconnectedHighlightBitmap.visible).toBe(false);
+            expect(b.updateCache).toHaveBeenCalled();
         });
     });
 
@@ -1461,6 +2165,7 @@ describe("Block Foundation", () => {
             mockBlocks.invalidateTopBlockCache = jest.fn();
             mockBlocks.unhighlight = jest.fn();
             mockBlocks.syncDragGroupSpatialGrid = jest.fn();
+            mockBlocks._updateViewportCulling = jest.fn();
 
             block.activity.getStageScale = jest.fn().mockReturnValue(1);
             block.activity.blocksContainer = { y: 0 };
@@ -1544,12 +2249,20 @@ describe("Block Foundation", () => {
             };
             mockBlocks.longPressTimeout = null;
             mockBlocks.syncDragGroupSpatialGrid = jest.fn(() => order.push("sync-grid"));
+            mockBlocks._updateViewportCulling = jest.fn(() => order.push("cull"));
             mockBlocks.blockMoved = jest.fn(() => order.push("dock"));
             mockBlocks.adjustDocks = jest.fn(() => order.push("adjust"));
 
             block._mouseoutCallback({ stageX: 100, stageY: 100 }, true, false, false, true, true);
 
-            expect(order).toEqual(["restore", "sync-grid", "query-trash", "dock", "adjust"]);
+            expect(order).toEqual([
+                "restore",
+                "sync-grid",
+                "cull",
+                "query-trash",
+                "dock",
+                "adjust"
+            ]);
         });
 
         it("waits for asynchronous blockMoved resolution before adjusting docks at stack top", async () => {
@@ -1565,6 +2278,7 @@ describe("Block Foundation", () => {
             };
             mockBlocks.longPressTimeout = null;
             mockBlocks.syncDragGroupSpatialGrid = jest.fn();
+            mockBlocks._updateViewportCulling = jest.fn();
             mockBlocks.findTopBlock = jest.fn().mockReturnValue(0);
             mockBlocks.adjustDocks = jest.fn();
 
@@ -1664,10 +2378,12 @@ describe("Block Foundation", () => {
             block.activity.trashcan = { hide: jest.fn() };
             mockBlocks.longPressTimeout = null;
             mockBlocks.syncDragGroupSpatialGrid = jest.fn();
+            mockBlocks._updateViewportCulling = jest.fn();
 
             block._mouseoutCallback({}, false, false, false, true, false);
 
             expect(mockBlocks.syncDragGroupSpatialGrid).not.toHaveBeenCalled();
+            expect(mockBlocks._updateViewportCulling).not.toHaveBeenCalled();
         });
     });
 
@@ -2534,6 +3250,256 @@ describe("Block Foundation", () => {
             // Expand: should call _setupAccessibleElement
             block._toggle_inline(0, true);
             expect(childBlock._setupAccessibleElement).toHaveBeenCalled();
+        });
+    });
+
+    describe("trash hover scaling", () => {
+        it("shrinks every block in the active drag group around the group origin", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            const groupedBlock = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 0;
+            block.blocks.dragGroup = [0, 1];
+            block.blocks.blockList = [block, groupedBlock];
+            block.activity = { refreshCanvas: jest.fn() };
+            block.container = { x: 100, y: 100, scaleX: 1, scaleY: 1 };
+            groupedBlock.container = { x: 200, y: 140, scaleX: 2, scaleY: 3 };
+            const blockTween = { to: jest.fn().mockReturnThis() };
+            const groupedBlockTween = { to: jest.fn().mockReturnThis() };
+            createjs.Tween.get
+                .mockImplementationOnce(target => {
+                    blockTween.target = target;
+                    return blockTween;
+                })
+                .mockImplementationOnce(target => {
+                    groupedBlockTween.target = target;
+                    return groupedBlockTween;
+                });
+
+            block._setDragGroupTrashHoverScale(true, 0, 0, true);
+
+            expect(createjs.Tween.get).toHaveBeenCalledTimes(2);
+            expect(createjs.Tween.get).toHaveBeenNthCalledWith(1, block.container, {
+                override: true
+            });
+            expect(createjs.Tween.get).toHaveBeenNthCalledWith(2, groupedBlock.container, {
+                override: true
+            });
+            expect(blockTween.target).toBe(block.container);
+            expect(groupedBlockTween.target).toBe(groupedBlock.container);
+            expect(blockTween.to).toHaveBeenCalledWith(
+                { x: 100, y: 100, scaleX: 0.5, scaleY: 0.5 },
+                0
+            );
+            expect(groupedBlockTween.to).toHaveBeenCalledWith(
+                { x: 150, y: 120, scaleX: 1, scaleY: 1.5 },
+                0
+            );
+            expect(block.activity.refreshCanvas).toHaveBeenCalled();
+        });
+
+        it("restores original positions and scales when leaving the trash", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 0;
+            block.blocks.dragGroup = [0];
+            block.blocks.blockList = [block];
+            block.activity = { refreshCanvas: jest.fn() };
+            block.container = { x: 80, y: 60, scaleX: 1.5, scaleY: 2 };
+
+            block._setDragGroupTrashHoverScale(true, 10, 20, true);
+            createjs.Tween.get.mockClear();
+            block._setDragGroupTrashHoverScale(false, 0, 0, true);
+
+            expect(createjs.Tween.get).toHaveBeenCalledTimes(1);
+            expect(createjs.Tween.get.mock.results[0].value.to).toHaveBeenCalledWith(
+                { x: 90, y: 80, scaleX: 1.5, scaleY: 2 },
+                0
+            );
+            expect(block._trashHoverGroupState).toBeNull();
+        });
+
+        it("does nothing when the drag group has no usable containers", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 0;
+            block.blocks.dragGroup = [0, 1];
+            block.blocks.blockList = [block, { container: null }];
+            block.activity = { refreshCanvas: jest.fn() };
+            block.container = null;
+
+            block._setDragGroupTrashHoverScale(true);
+
+            expect(createjs.Tween.get).not.toHaveBeenCalled();
+            expect(block.activity.refreshCanvas).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("collapsed state transitions", () => {
+        it("marks a block as collapsed and hides it", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.hide = jest.fn();
+
+            block.setCollapsedState();
+
+            expect(block.inCollapsed).toBe(true);
+            expect(block.hide).toHaveBeenCalledTimes(1);
+        });
+
+        it("shows a block when its containing block is not collapsed", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 1;
+            block.show = jest.fn();
+            mockBlocks.blockList = [{ collapsed: false }, block];
+
+            block.setUncollapsedState(0);
+
+            expect(block.inCollapsed).toBe(false);
+            expect(block.show).toHaveBeenCalledTimes(1);
+        });
+
+        it("keeps a block hidden when its containing block is still collapsed", () => {
+            const block = new Block(mockProtoBlock, mockBlocks);
+            block.blockIndex = 1;
+            block.inCollapsed = true;
+            block.show = jest.fn();
+            mockBlocks.blockList = [{ collapsed: true }, block];
+
+            block.setUncollapsedState(0);
+
+            expect(block.inCollapsed).toBe(true);
+            expect(block.show).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("getLayoutUpdateType()", () => {
+        let block;
+        let mockPb;
+
+        beforeEach(() => {
+            mockPb = {
+                style: "twoarg",
+                expandable: true,
+                dockTypes: ["out", "numberin", "numberin", "in"]
+            };
+            block = new Block(mockPb, mockBlocks);
+            block.connections = [null, null, null, null];
+            block.docks = [
+                [0, 0, "out"],
+                [10, 10, "numberin"],
+                [10, 30, "numberin"],
+                [0, 40, "in"]
+            ];
+        });
+
+        it("returns null for negative connectionIndex", () => {
+            expect(block.getLayoutUpdateType(-1)).toBeNull();
+        });
+
+        it("returns 'ARG' for connectionIndex 1 and 2 on twoArgBlock", () => {
+            expect(block.isTwoArgBlock()).toBe(true);
+            expect(block.getLayoutUpdateType(1)).toBe("ARG");
+            expect(block.getLayoutUpdateType(2)).toBe("ARG");
+        });
+
+        it("returns 'ARG' for connectionIndex 1 and 2 on expandable arg blocks", () => {
+            mockPb.style = "arg";
+            mockPb.expandable = true;
+            expect(block.isArgBlock()).toBe(true);
+            expect(block.isExpandableBlock()).toBe(true);
+            expect(block.getLayoutUpdateType(1)).toBe("ARG");
+            expect(block.getLayoutUpdateType(2)).toBe("ARG");
+        });
+
+        it("returns 'FLOW' for flow connections (connectionIndex === n - 2)", () => {
+            mockPb.style = "flow";
+            mockPb.expandable = false;
+            block.connections = [null, null];
+            block.docks = [
+                [0, 0, "out"],
+                [0, 20, "in"]
+            ];
+            expect(block.getLayoutUpdateType(0)).toBe("FLOW");
+        });
+
+        it("returns null for other connection indices", () => {
+            expect(block.getLayoutUpdateType(0)).toBeNull();
+            expect(block.getLayoutUpdateType(3)).toBeNull();
+        });
+    });
+
+    describe("_newArtwork() clamp counts propagation", () => {
+        let block;
+        let mockPb;
+
+        beforeEach(() => {
+            mockPb = {
+                style: "arg",
+                expandable: true,
+                generator: jest.fn(() => ["<svg></svg>", [[0, 0]], 100, 40, 40])
+            };
+            block = new Block(mockPb, mockBlocks);
+            block.clampCount = [2, 3];
+            block.isInlineCollapsible = () => false;
+            block.isCollapsible = () => false;
+        });
+
+        it("passes both clamp counts to generator for argument blocks", () => {
+            block.name = "multiply";
+            block._newArtwork(1);
+            expect(mockPb.generator).toHaveBeenCalledWith(2, 3);
+        });
+
+        it("passes both clamp counts to generator for comparison blocks", () => {
+            for (const compName of ["equal", "greater", "less"]) {
+                block.name = compName;
+                mockPb.generator.mockClear();
+                block._newArtwork(1);
+                expect(mockPb.generator).toHaveBeenCalledWith(2, 3);
+            }
+        });
+    });
+
+    describe("isClampBlock()", () => {
+        /**
+         * isClampBlock() is a composite predicate:
+         *   protoblock.style === "clamp"  ||  isDoubleClampBlock()  ||  isArgFlowClampBlock()
+         *
+         * Each of the three branches is exercised independently so we know every
+         * path through the OR chain is covered.
+         */
+
+        it("returns true when protoblock style is 'clamp'", () => {
+            const block = new Block({ ...mockProtoBlock, style: "clamp" }, mockBlocks);
+            expect(block.isClampBlock()).toBe(true);
+        });
+
+        it("returns true when protoblock style is 'doubleclamp' (via isDoubleClampBlock)", () => {
+            const block = new Block({ ...mockProtoBlock, style: "doubleclamp" }, mockBlocks);
+            // isDoubleClampBlock is the second OR-branch, isClampBlock must delegate to it
+            expect(block.isDoubleClampBlock()).toBe(true);
+            expect(block.isClampBlock()).toBe(true);
+        });
+
+        it("returns true when protoblock style is 'argflowclamp' (via isArgFlowClampBlock)", () => {
+            const block = new Block({ ...mockProtoBlock, style: "argflowclamp" }, mockBlocks);
+            // isArgFlowClampBlock is the third OR-branch
+            expect(block.isArgFlowClampBlock()).toBe(true);
+            expect(block.isClampBlock()).toBe(true);
+        });
+
+        it("returns false for a plain value block (no clamp style)", () => {
+            const block = new Block({ ...mockProtoBlock, style: "value" }, mockBlocks);
+            expect(block.isClampBlock()).toBe(false);
+        });
+
+        it("returns false for a twoarg block (not a clamp variant)", () => {
+            const block = new Block({ ...mockProtoBlock, style: "twoarg" }, mockBlocks);
+            expect(block.isClampBlock()).toBe(false);
+        });
+
+        it("returns false for an argclamp block (argclamp is not a clamp-style block)", () => {
+            // argclamp is its own category — isArgClamp() is true but isClampBlock() should be false
+            const block = new Block({ ...mockProtoBlock, style: "argclamp" }, mockBlocks);
+            expect(block.isArgClamp()).toBe(true);
+            expect(block.isClampBlock()).toBe(false);
         });
     });
 });

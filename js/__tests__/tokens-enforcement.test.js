@@ -117,15 +117,18 @@ describe("Design Tokens Single Source of Truth", () => {
         expect(Object.keys(declared)).toEqual([]);
     });
 
-    it("keeps the floating widget roll-up button white in dark mode", () => {
-        expect(darkmodeCss).toMatch(
-            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\.rollup\s*\{[^}]*background-color:\s*#ffffff;/
+    it("does not hardcode dark-mode widget title bar button backgrounds", () => {
+        expect(darkmodeCss).not.toMatch(
+            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\.(?:rollup|close)\s*\{[^}]*background(?:-color)?\s*:\s*#[0-9a-f]{3,8}\b/i
+        );
+        expect(themesCss).toMatch(
+            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\s*\{[^}]*background-color\s*:\s*var\(--color-bg-tertiary\)\s*;/
         );
     });
 
-    it("keeps the floating widget close button white in dark mode", () => {
-        expect(darkmodeCss).toMatch(
-            /\.dark\s+#floatingWindows\s*>\s*\.windowFrame\s*>\s*\.wfTopBar\s+\.wftButton\.close\s*\{[^}]*background-color:\s*#ffffff;/
+    it("does not apply an inverse background to tour icons in dark mode", () => {
+        expect(darkmodeCss).not.toMatch(
+            /\.dark\s+#helpBodyDiv\s+\.help-tour-icon\s*\{[^}]*background(?:-color)?\s*:\s*var\(--color-bg-inverse\)/i
         );
     });
 
@@ -428,6 +431,19 @@ describe("Theme Switching & Inline Styles Purity", () => {
         // Strip comments before checking for raw hex values
         const strippedCss = windowsCss.replace(/\/\*[\s\S]*?\*\//g, "");
         expect(strippedCss).not.toMatch(/#[0-9a-fA-F]{3,6}/);
+    });
+
+    it("allows inline toolbar offsets to override mobile window positioning", () => {
+        const windowsCss = fs.readFileSync(
+            path.join(ROOT_DIR, "dist", "css", "windows.css"),
+            "utf8"
+        );
+
+        const strippedWindowsCss = windowsCss.replace(/\/\*[\s\S]*?\*\//g, "");
+
+        expect(strippedWindowsCss).not.toMatch(
+            /[^{}]*\.windowFrame\s*\{[^}]*\btop:\s*0\s*!important;/
+        );
     });
 
     it("ensures body element in index.html and activities stylesheets uses tokens without inline styles or !important", () => {

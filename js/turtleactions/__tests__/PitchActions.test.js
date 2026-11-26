@@ -282,7 +282,7 @@ describe("Tests for Singer.PitchActions setup", () => {
             expect(turtle.singer.previousNotePlayed).toEqual(["X9", 9]);
         });
 
-        test("non-numeric lastNotePlayed is sliced into pitch name and octave correctly", () => {
+        test("non-numeric lastNotePlayed is parsed into pitch name and octave correctly", () => {
             Singer.addScalarTransposition.mockClear();
             turtle.singer.lastNotePlayed = ["F#4", 4];
             activity.logo.inMatrix = true; // avoid the reset-to-G4 guard
@@ -292,6 +292,42 @@ describe("Tests for Singer.PitchActions setup", () => {
                 0,
                 "F#",
                 4,
+                1
+            );
+
+            // Multi-digit octave (e.g. 10)
+            Singer.addScalarTransposition.mockClear();
+            turtle.singer.lastNotePlayed = ["C10", 4];
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+            expect(Singer.addScalarTransposition).toHaveBeenCalledWith(
+                activity.logo,
+                0,
+                "C",
+                10,
+                1
+            );
+
+            // Multi-digit octave with accidental
+            Singer.addScalarTransposition.mockClear();
+            turtle.singer.lastNotePlayed = ["F#10", 4];
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+            expect(Singer.addScalarTransposition).toHaveBeenCalledWith(
+                activity.logo,
+                0,
+                "F#",
+                10,
+                1
+            );
+
+            // Negative octave
+            Singer.addScalarTransposition.mockClear();
+            turtle.singer.lastNotePlayed = ["D-1", 4];
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+            expect(Singer.addScalarTransposition).toHaveBeenCalledWith(
+                activity.logo,
+                0,
+                "D",
+                -1,
                 1
             );
         });
@@ -856,7 +892,7 @@ describe("Tests for Singer.PitchActions setup", () => {
             const tl = jest.spyOn(activity.logo, "setTurtleListener");
             Singer.PitchActions.setScalarTranspose(1, 0, 999); // 999 is not a key in blockList
             expect(dsp).not.toHaveBeenCalled();
-            expect(tl).toHaveBeenCalledWith(0, "_scalar_transposition_0", expect.any(Function));
+            expect(tl).toHaveBeenCalledWith(0, "_scalar_transposition_0_999", expect.any(Function));
             dsp.mockRestore();
             tl.mockRestore();
         });
@@ -868,7 +904,7 @@ describe("Tests for Singer.PitchActions setup", () => {
             MusicBlocks.isRun = false;
             Singer.PitchActions.setScalarTranspose(1, 0);
             expect(dsp).not.toHaveBeenCalled();
-            expect(fakeMouse.MB.listeners).not.toContain("_scalar_transposition_0");
+            expect(fakeMouse.MB.listeners).not.toContain("_scalar_transposition_0_undefined");
             dsp.mockRestore();
             Mouse.getMouseFromTurtle = originalGetMouse;
         });
@@ -893,7 +929,7 @@ describe("Tests for Singer.PitchActions setup", () => {
             const tl = jest.spyOn(activity.logo, "setTurtleListener");
             Singer.PitchActions.setSemitoneTranspose(1, 0, 999);
             expect(dsp).not.toHaveBeenCalled();
-            expect(tl).toHaveBeenCalledWith(0, "_transposition_0", expect.any(Function));
+            expect(tl).toHaveBeenCalledWith(0, "_transposition_0_999", expect.any(Function));
             dsp.mockRestore();
             tl.mockRestore();
         });
@@ -905,7 +941,7 @@ describe("Tests for Singer.PitchActions setup", () => {
             MusicBlocks.isRun = false;
             Singer.PitchActions.setSemitoneTranspose(1, 0);
             expect(dsp).not.toHaveBeenCalled();
-            expect(fakeMouse.MB.listeners).not.toContain("_transposition_0");
+            expect(fakeMouse.MB.listeners).not.toContain("_transposition_0_undefined");
             dsp.mockRestore();
             Mouse.getMouseFromTurtle = originalGetMouse;
         });
@@ -932,7 +968,7 @@ describe("Tests for Singer.PitchActions setup", () => {
             const tl = jest.spyOn(activity.logo, "setTurtleListener");
             Singer.PitchActions.setRatioTranspose(2, 0, 999);
             expect(dsp).not.toHaveBeenCalled();
-            expect(tl).toHaveBeenCalledWith(0, "_transposition_ratio_0", expect.any(Function));
+            expect(tl).toHaveBeenCalledWith(0, "_transposition_ratio_0_999", expect.any(Function));
             dsp.mockRestore();
             tl.mockRestore();
         });
@@ -944,7 +980,7 @@ describe("Tests for Singer.PitchActions setup", () => {
             MusicBlocks.isRun = false;
             Singer.PitchActions.setRatioTranspose(2, 0);
             expect(dsp).not.toHaveBeenCalled();
-            expect(fakeMouse.MB.listeners).not.toContain("_transposition_ratio_0");
+            expect(fakeMouse.MB.listeners).not.toContain("_transposition_ratio_0_undefined");
             dsp.mockRestore();
             Mouse.getMouseFromTurtle = originalGetMouse;
         });
@@ -979,7 +1015,7 @@ describe("Tests for Singer.PitchActions setup", () => {
             const tl = jest.spyOn(activity.logo, "setTurtleListener");
             Singer.PitchActions.invert("C", 4, "even", 0, 999);
             expect(dsp).not.toHaveBeenCalled();
-            expect(tl).toHaveBeenCalledWith(0, "_invert_0", expect.any(Function));
+            expect(tl).toHaveBeenCalledWith(0, "_invert_0_999", expect.any(Function));
             dsp.mockRestore();
             tl.mockRestore();
         });
@@ -1139,43 +1175,51 @@ describe("Tests for Singer.PitchActions setup", () => {
         test("setScalarTranspose: blockList path", () => {
             Singer.PitchActions.setScalarTranspose(5, 0, blkId);
             expect(turtle.singer.scalarTranspositionValues.pop()).toBe(5);
-            expect(dsp).toHaveBeenCalledWith(blkId, 0, "_scalar_transposition_0");
-            expect(tl).toHaveBeenCalledWith(0, "_scalar_transposition_0", expect.any(Function));
+            expect(dsp).toHaveBeenCalledWith(blkId, 0, "_scalar_transposition_0_1");
+            expect(tl).toHaveBeenCalledWith(0, "_scalar_transposition_0_1", expect.any(Function));
         });
 
         test("setScalarTranspose: MusicBlocks.isRun path", () => {
             MusicBlocks.isRun = true;
             Singer.PitchActions.setScalarTranspose(2, 0);
-            expect(fakeMouse.MB.listeners).toContain("_scalar_transposition_0");
-            expect(tl).toHaveBeenCalledWith(0, "_scalar_transposition_0", expect.any(Function));
+            expect(fakeMouse.MB.listeners).toContain("_scalar_transposition_0_undefined");
+            expect(tl).toHaveBeenCalledWith(
+                0,
+                "_scalar_transposition_0_undefined",
+                expect.any(Function)
+            );
         });
 
         test("setSemitoneTranspose: blockList path", () => {
             Singer.PitchActions.setSemitoneTranspose(3, 0, blkId);
             expect(turtle.singer.transpositionValues.pop()).toBe(3);
-            expect(dsp).toHaveBeenCalledWith(blkId, 0, "_transposition_0");
-            expect(tl).toHaveBeenCalledWith(0, "_transposition_0", expect.any(Function));
+            expect(dsp).toHaveBeenCalledWith(blkId, 0, "_transposition_0_1");
+            expect(tl).toHaveBeenCalledWith(0, "_transposition_0_1", expect.any(Function));
         });
 
         test("setSemitoneTranspose: MusicBlocks.isRun path", () => {
             MusicBlocks.isRun = true;
             Singer.PitchActions.setSemitoneTranspose(4, 0);
-            expect(fakeMouse.MB.listeners).toContain("_transposition_0");
-            expect(tl).toHaveBeenCalledWith(0, "_transposition_0", expect.any(Function));
+            expect(fakeMouse.MB.listeners).toContain("_transposition_0_undefined");
+            expect(tl).toHaveBeenCalledWith(0, "_transposition_0_undefined", expect.any(Function));
         });
 
         test("setRatioTranspose: blockList path", () => {
             Singer.PitchActions.setRatioTranspose(7, 0, blkId);
             expect(turtle.singer.transpositionRatios.pop()).toBe(7);
-            expect(dsp).toHaveBeenCalledWith(blkId, 0, "_transposition_ratio_0");
-            expect(tl).toHaveBeenCalledWith(0, "_transposition_ratio_0", expect.any(Function));
+            expect(dsp).toHaveBeenCalledWith(blkId, 0, "_transposition_ratio_0_1");
+            expect(tl).toHaveBeenCalledWith(0, "_transposition_ratio_0_1", expect.any(Function));
         });
 
         test("setRatioTranspose: MusicBlocks.isRun path", () => {
             MusicBlocks.isRun = true;
             Singer.PitchActions.setRatioTranspose(9, 0);
-            expect(fakeMouse.MB.listeners).toContain("_transposition_ratio_0");
-            expect(tl).toHaveBeenCalledWith(0, "_transposition_ratio_0", expect.any(Function));
+            expect(fakeMouse.MB.listeners).toContain("_transposition_ratio_0_undefined");
+            expect(tl).toHaveBeenCalledWith(
+                0,
+                "_transposition_ratio_0_undefined",
+                expect.any(Function)
+            );
         });
     });
 
@@ -1275,7 +1319,7 @@ describe("Tests for Singer.PitchActions setup", () => {
         });
         test("pushes listenerName into Mouse.MB.listeners", () => {
             Singer.PitchActions.invert("C", 4, "even", 0 /*turtle*/ /*blk*/);
-            expect(fakeMouse.MB.listeners).toContain("_invert_0");
+            expect(fakeMouse.MB.listeners).toContain("_invert_0_undefined");
         });
     });
 
@@ -1297,22 +1341,30 @@ describe("Tests for Singer.PitchActions setup", () => {
 
         test("setScalarTranspose registers listener only", () => {
             Singer.PitchActions.setScalarTranspose(3, 0);
-            expect(tl).toHaveBeenCalledWith(0, "_scalar_transposition_0", expect.any(Function));
+            expect(tl).toHaveBeenCalledWith(
+                0,
+                "_scalar_transposition_0_undefined",
+                expect.any(Function)
+            );
         });
 
         test("setSemitoneTranspose registers listener only", () => {
             Singer.PitchActions.setSemitoneTranspose(2, 0);
-            expect(tl).toHaveBeenCalledWith(0, "_transposition_0", expect.any(Function));
+            expect(tl).toHaveBeenCalledWith(0, "_transposition_0_undefined", expect.any(Function));
         });
 
         test("setRatioTranspose registers listener only", () => {
             Singer.PitchActions.setRatioTranspose(5, 0);
-            expect(tl).toHaveBeenCalledWith(0, "_transposition_ratio_0", expect.any(Function));
+            expect(tl).toHaveBeenCalledWith(
+                0,
+                "_transposition_ratio_0_undefined",
+                expect.any(Function)
+            );
         });
 
         test("invert registers listener only", () => {
             Singer.PitchActions.invert("C", 4, "even", 0);
-            expect(tl).toHaveBeenCalledWith(0, "_invert_0", expect.any(Function));
+            expect(tl).toHaveBeenCalledWith(0, "_invert_0_undefined", expect.any(Function));
         });
     });
 
@@ -1361,6 +1413,298 @@ describe("Tests for Singer.PitchActions setup", () => {
             expect(hasTemperament).toBe(true);
             global.getStepSizeUp = originalUp;
             global.getStepSizeDown = originalDown;
+        });
+    });
+
+    describe("nested clamp isolation", () => {
+        let callbacks;
+
+        beforeEach(() => {
+            callbacks = {};
+            activity.logo.setTurtleListener = (_t, name, cb) => {
+                callbacks[name] = cb;
+            };
+        });
+
+        test("nested setScalarTranspose blocks have isolated listeners and pop in order", () => {
+            Singer.PitchActions.setScalarTranspose(2, 0, 1);
+            Singer.PitchActions.setScalarTranspose(3, 0, 2);
+            expect(turtle.singer.scalarTransposition).toBe(5);
+            expect(turtle.singer.scalarTranspositionValues).toEqual([2, 3]);
+
+            callbacks["_scalar_transposition_0_2"]();
+            expect(turtle.singer.scalarTransposition).toBe(2);
+            expect(turtle.singer.scalarTranspositionValues).toEqual([2]);
+
+            callbacks["_scalar_transposition_0_1"]();
+            expect(turtle.singer.scalarTransposition).toBe(0);
+            expect(turtle.singer.scalarTranspositionValues).toEqual([]);
+        });
+
+        test("nested setScalarTranspose blocks restore correct state when outer clamp finishes before inner clamp", () => {
+            Singer.PitchActions.setScalarTranspose(2, 0, 1);
+            Singer.PitchActions.setScalarTranspose(3, 0, 2);
+            expect(turtle.singer.scalarTransposition).toBe(5);
+            expect(turtle.singer.scalarTranspositionValues).toEqual([2, 3]);
+
+            callbacks["_scalar_transposition_0_1"]();
+            expect(turtle.singer.scalarTransposition).toBe(3);
+            expect(turtle.singer.scalarTranspositionValues).toEqual([3]);
+
+            callbacks["_scalar_transposition_0_2"]();
+            expect(turtle.singer.scalarTransposition).toBe(0);
+            expect(turtle.singer.scalarTranspositionValues).toEqual([]);
+        });
+
+        test("nested setScalarTranspose blocks with identical values clean up correctly out of order", () => {
+            Singer.PitchActions.setScalarTranspose(2, 0, 1);
+            Singer.PitchActions.setScalarTranspose(2, 0, 2);
+            expect(turtle.singer.scalarTransposition).toBe(4);
+            expect(turtle.singer.scalarTranspositionValues).toEqual([2, 2]);
+
+            callbacks["_scalar_transposition_0_1"]();
+            expect(turtle.singer.scalarTransposition).toBe(2);
+            expect(turtle.singer.scalarTranspositionValues).toEqual([2]);
+
+            callbacks["_scalar_transposition_0_2"]();
+            expect(turtle.singer.scalarTransposition).toBe(0);
+            expect(turtle.singer.scalarTranspositionValues).toEqual([]);
+        });
+
+        test("nested setSemitoneTranspose blocks have isolated listeners and pop in order", () => {
+            Singer.PitchActions.setSemitoneTranspose(4, 0, 1);
+            Singer.PitchActions.setSemitoneTranspose(7, 0, 2);
+            expect(turtle.singer.transposition).toBe(11);
+            expect(turtle.singer.transpositionValues).toEqual([4, 7]);
+
+            callbacks["_transposition_0_2"]();
+            expect(turtle.singer.transposition).toBe(4);
+            expect(turtle.singer.transpositionValues).toEqual([4]);
+
+            callbacks["_transposition_0_1"]();
+            expect(turtle.singer.transposition).toBe(0);
+            expect(turtle.singer.transpositionValues).toEqual([]);
+        });
+
+        test("nested setSemitoneTranspose blocks restore correct state when outer clamp finishes before inner clamp", () => {
+            Singer.PitchActions.setSemitoneTranspose(4, 0, 1);
+            Singer.PitchActions.setSemitoneTranspose(7, 0, 2);
+            expect(turtle.singer.transposition).toBe(11);
+            expect(turtle.singer.transpositionValues).toEqual([4, 7]);
+
+            callbacks["_transposition_0_1"]();
+            expect(turtle.singer.transposition).toBe(7);
+            expect(turtle.singer.transpositionValues).toEqual([7]);
+
+            callbacks["_transposition_0_2"]();
+            expect(turtle.singer.transposition).toBe(0);
+            expect(turtle.singer.transpositionValues).toEqual([]);
+        });
+
+        test("nested setRatioTranspose blocks have isolated listeners and pop in order", () => {
+            Singer.PitchActions.setRatioTranspose(1.5, 0, 1);
+            Singer.PitchActions.setRatioTranspose(2.0, 0, 2);
+            expect(turtle.singer.transpositionRatios).toEqual([1.5, 2.0]);
+
+            callbacks["_transposition_ratio_0_2"]();
+            expect(turtle.singer.transpositionRatios).toEqual([1.5]);
+
+            callbacks["_transposition_ratio_0_1"]();
+            expect(turtle.singer.transpositionRatios).toEqual([]);
+        });
+
+        test("nested setRatioTranspose blocks restore correct state when outer clamp finishes before inner clamp", () => {
+            Singer.PitchActions.setRatioTranspose(1.5, 0, 1);
+            Singer.PitchActions.setRatioTranspose(2.0, 0, 2);
+            expect(turtle.singer.transpositionRatios).toEqual([1.5, 2.0]);
+
+            callbacks["_transposition_ratio_0_1"]();
+            expect(turtle.singer.transpositionRatios).toEqual([2.0]);
+
+            callbacks["_transposition_ratio_0_2"]();
+            expect(turtle.singer.transpositionRatios).toEqual([]);
+        });
+
+        test("nested invert blocks have isolated listeners and pop in order", () => {
+            Singer.PitchActions.invert("C", 4, "even", 0, 1);
+            Singer.PitchActions.invert("G", 4, "odd", 0, 2);
+            expect(turtle.singer.invertList).toHaveLength(2);
+
+            callbacks["_invert_0_2"]();
+            expect(turtle.singer.invertList).toHaveLength(1);
+
+            callbacks["_invert_0_1"]();
+            expect(turtle.singer.invertList).toHaveLength(0);
+        });
+
+        test("nested invert blocks restore correct state when outer clamp finishes before inner clamp", () => {
+            Singer.PitchActions.invert("C", 4, "even", 0, 1);
+            Singer.PitchActions.invert("G", 4, "odd", 0, 2);
+            expect(turtle.singer.invertList).toHaveLength(2);
+
+            callbacks["_invert_0_1"]();
+            expect(turtle.singer.invertList).toHaveLength(1);
+            expect(turtle.singer.invertList[0]).toEqual(["G", 4, "odd"]);
+
+            callbacks["_invert_0_2"]();
+            expect(turtle.singer.invertList).toHaveLength(0);
+        });
+
+        test("listener callbacks are idempotent and ignore duplicate dispatches", () => {
+            Singer.PitchActions.setScalarTranspose(2, 0, 1);
+            callbacks["_scalar_transposition_0_1"]();
+            expect(turtle.singer.scalarTransposition).toBe(0);
+            expect(turtle.singer.scalarTranspositionValues).toEqual([]);
+
+            // Second dispatch should be a no-op
+            callbacks["_scalar_transposition_0_1"]();
+            expect(turtle.singer.scalarTransposition).toBe(0);
+            expect(turtle.singer.scalarTranspositionValues).toEqual([]);
+
+            Singer.PitchActions.setSemitoneTranspose(3, 0, 2);
+            callbacks["_transposition_0_2"]();
+            expect(turtle.singer.transposition).toBe(0);
+            expect(turtle.singer.transpositionValues).toEqual([]);
+
+            callbacks["_transposition_0_2"]();
+            expect(turtle.singer.transposition).toBe(0);
+            expect(turtle.singer.transpositionValues).toEqual([]);
+
+            Singer.PitchActions.setRatioTranspose(1.5, 0, 3);
+            callbacks["_transposition_ratio_0_3"]();
+            expect(turtle.singer.transpositionRatios).toEqual([]);
+
+            callbacks["_transposition_ratio_0_3"]();
+            expect(turtle.singer.transpositionRatios).toEqual([]);
+
+            Singer.PitchActions.invert("C", 4, "even", 0, 4);
+            callbacks["_invert_0_4"]();
+            expect(turtle.singer.invertList).toHaveLength(0);
+
+            callbacks["_invert_0_4"]();
+            expect(turtle.singer.invertList).toHaveLength(0);
+        });
+
+        test("setSemitoneTranspose preserves applied delta if invertList changes before clamp exit", () => {
+            turtle.singer.invertList = [["C", 4, "even"]];
+            Singer.PitchActions.setSemitoneTranspose(3, 0, 1);
+            expect(turtle.singer.transposition).toBe(-3);
+
+            // Invert clamp finishes while semitone transpose is still active
+            turtle.singer.invertList = [];
+
+            // Semitone clamp finishes: should undo -3 (restoring 0) rather than dynamically subtracting +3
+            callbacks["_transposition_0_1"]();
+            expect(turtle.singer.transposition).toBe(0);
+            expect(turtle.singer.transpositionValues).toEqual([]);
+        });
+
+        test("invert with invalid mode does not push to invertList or pop existing entries on cleanup", () => {
+            Singer.PitchActions.invert("C", 4, "even", 0, 1);
+            Singer.PitchActions.invert("D", 4, "invalid_mode", 0, 2);
+            expect(turtle.singer.invertList).toHaveLength(1);
+
+            callbacks["_invert_0_2"]();
+            expect(turtle.singer.invertList).toHaveLength(1);
+            expect(turtle.singer.invertList[0]).toEqual(["C", 4, "even"]);
+
+            callbacks["_invert_0_1"]();
+            expect(turtle.singer.invertList).toHaveLength(0);
+        });
+    });
+
+    describe("concurrent re-entry listener disambiguation (real setTurtleListener)", () => {
+        beforeEach(() => {
+            turtle.listeners = {};
+            activity.stage = {
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn()
+            };
+            activity.logo.stage = activity.stage;
+            activity.logo.turtles = activity.turtles;
+            activity.logo.setTurtleListener = (t, name, cb) => {
+                const tur = activity.turtles.ithTurtle(t);
+                if (name in tur.listeners) {
+                    activity.stage.removeEventListener(name, tur.listeners[name], false);
+                }
+                tur.listeners[name] = cb;
+                activity.stage.addEventListener(name, cb, false);
+            };
+        });
+
+        test("concurrent setScalarTranspose with undefined blk allocates suffixed listener names and cleans up independently", () => {
+            Singer.PitchActions.setScalarTranspose(2, 0, undefined);
+            expect("_scalar_transposition_0_undefined" in turtle.listeners).toBe(true);
+
+            Singer.PitchActions.setScalarTranspose(3, 0, undefined);
+            expect("_scalar_transposition_0_undefined_1" in turtle.listeners).toBe(true);
+            expect(turtle.singer.scalarTransposition).toBe(5);
+
+            // Fire inner callback
+            turtle.listeners["_scalar_transposition_0_undefined_1"]();
+            expect(turtle.singer.scalarTransposition).toBe(2);
+            expect("_scalar_transposition_0_undefined_1" in turtle.listeners).toBe(false);
+            expect("_scalar_transposition_0_undefined" in turtle.listeners).toBe(true);
+
+            // Fire outer callback
+            turtle.listeners["_scalar_transposition_0_undefined"]();
+            expect(turtle.singer.scalarTransposition).toBe(0);
+            expect("_scalar_transposition_0_undefined" in turtle.listeners).toBe(false);
+        });
+
+        test("concurrent setSemitoneTranspose with identical blk allocates suffixed listener names and cleans up independently", () => {
+            Singer.PitchActions.setSemitoneTranspose(4, 0, 1);
+            expect("_transposition_0_1" in turtle.listeners).toBe(true);
+
+            Singer.PitchActions.setSemitoneTranspose(7, 0, 1);
+            expect("_transposition_0_1_1" in turtle.listeners).toBe(true);
+            expect(turtle.singer.transposition).toBe(11);
+
+            // Fire outer callback first (out of order)
+            turtle.listeners["_transposition_0_1"]();
+            expect(turtle.singer.transposition).toBe(7);
+            expect("_transposition_0_1" in turtle.listeners).toBe(false);
+            expect("_transposition_0_1_1" in turtle.listeners).toBe(true);
+
+            // Fire inner callback second
+            turtle.listeners["_transposition_0_1_1"]();
+            expect(turtle.singer.transposition).toBe(0);
+            expect("_transposition_0_1_1" in turtle.listeners).toBe(false);
+        });
+
+        test("concurrent setRatioTranspose with undefined blk allocates suffixed listener names and cleans up independently", () => {
+            Singer.PitchActions.setRatioTranspose(1.5, 0, undefined);
+            expect("_transposition_ratio_0_undefined" in turtle.listeners).toBe(true);
+
+            Singer.PitchActions.setRatioTranspose(2.0, 0, undefined);
+            expect("_transposition_ratio_0_undefined_1" in turtle.listeners).toBe(true);
+            expect(turtle.singer.transpositionRatios).toEqual([1.5, 2.0]);
+
+            turtle.listeners["_transposition_ratio_0_undefined"]();
+            expect(turtle.singer.transpositionRatios).toEqual([2.0]);
+            expect("_transposition_ratio_0_undefined" in turtle.listeners).toBe(false);
+
+            turtle.listeners["_transposition_ratio_0_undefined_1"]();
+            expect(turtle.singer.transpositionRatios).toEqual([]);
+            expect("_transposition_ratio_0_undefined_1" in turtle.listeners).toBe(false);
+        });
+
+        test("concurrent invert with identical blk allocates suffixed listener names and cleans up independently", () => {
+            Singer.PitchActions.invert("C", 4, "even", 0, 1);
+            expect("_invert_0_1" in turtle.listeners).toBe(true);
+
+            Singer.PitchActions.invert("G", 4, "odd", 0, 1);
+            expect("_invert_0_1_1" in turtle.listeners).toBe(true);
+            expect(turtle.singer.invertList).toHaveLength(2);
+
+            turtle.listeners["_invert_0_1"]();
+            expect(turtle.singer.invertList).toHaveLength(1);
+            expect(turtle.singer.invertList[0]).toEqual(["G", 4, "odd"]);
+            expect("_invert_0_1" in turtle.listeners).toBe(false);
+
+            turtle.listeners["_invert_0_1_1"]();
+            expect(turtle.singer.invertList).toHaveLength(0);
+            expect("_invert_0_1_1" in turtle.listeners).toBe(false);
         });
     });
 });

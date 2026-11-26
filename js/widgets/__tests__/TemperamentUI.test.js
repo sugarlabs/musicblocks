@@ -90,6 +90,17 @@ describe("TemperamentUI module", () => {
             initWheel: jest.fn(labels => {
                 wheel.initWheelArgs = labels ? [...labels] : [];
                 wheel.navItemCount = labels.length;
+                wheel.navItems = labels.map(title => ({
+                    title: title,
+                    fillAttr: "",
+                    sliceHoverAttr: {},
+                    slicePathAttr: {},
+                    sliceSelectedAttr: {},
+                    titleAttr: { font: "" },
+                    titleSelectedAttr: { font: "" },
+                    sliceAngle: 0,
+                    menuRadius: 0
+                }));
             }),
             createWheel: jest.fn(),
             refreshWheel: jest.fn(),
@@ -311,7 +322,9 @@ describe("TemperamentUI module", () => {
         expect(mockTW.notesCircle).toBeDefined();
         expect(mockTW.notesCircle.initWheel).toHaveBeenCalledWith(["0", "1"]);
         expect(mockTW.notesCircle.slicePathCustom.menuRadius).toBeGreaterThan(0);
-        expect(mockTW.notesCircle.navItems[0].sliceAngle).toBe(180);
+        // [1, 2] is a degenerate full-octave fixture: no proportional widths,
+        // so the wheel keeps its equal-slice default (mock init value 0).
+        expect(mockTW.notesCircle.navItems[0].sliceAngle).toBe(0);
         expect(mockTW.notesCircle.createWheel).toHaveBeenCalled();
     });
 
@@ -320,7 +333,7 @@ describe("TemperamentUI module", () => {
         expect(mockTW.wheel1).toBeDefined();
         expect(mockTW.wheel1.initWheel).toHaveBeenCalledWith(["0", "1"]);
         expect(mockTW.wheel1.slicePathCustom.menuRadius).toBeGreaterThan(0);
-        expect(mockTW.wheel1.navItems[0].sliceAngle).toBe(180);
+        expect(mockTW.wheel1.navItems[0].sliceAngle).toBe(0);
         expect(mockTW.wheel1.createWheel).toHaveBeenCalled();
     });
 
@@ -338,7 +351,7 @@ describe("TemperamentUI module", () => {
         TemperamentUI.createOuterWheel(mockTW, [1, 2], 2);
         expect(mockTW.wheel).toBeDefined();
         expect(mockTW.wheel.initWheel).toHaveBeenCalledWith(["|", "|"]);
-        expect(mockTW.wheel.navItems[0].sliceAngle).toBe(180);
+        expect(mockTW.wheel.navItems[0].sliceAngle).toBe(0);
         expect(mockTW.wheel.createWheel).toHaveBeenCalled();
     });
 
@@ -671,6 +684,62 @@ describe("TemperamentUI module", () => {
 
             spyMainWheel.mockRestore();
         });
+
+        const useTwelveEdo = () => {
+            mockTW.ratios = [];
+            mockTW.frequencies = [];
+            for (let i = 0; i <= 12; i++) {
+                mockTW.ratios.push(Math.pow(2, i / 12));
+                mockTW.frequencies.push((261.63 * Math.pow(2, i / 12)).toFixed(2));
+            }
+            mockTW.pitchNumber = 12;
+        };
+
+        const runEqualEdit = (from, to, divisions) => {
+            TemperamentUI.equalEdit(mockTW);
+            document.getElementById("octaveIn").value = from;
+            document.getElementById("octaveOut").value = to;
+            document.getElementById("divisions").value = divisions;
+            mockTW.performEqualEdit({ target: { textContent: "done" } });
+        };
+
+        test("performEqualEdit gives the same ratios when the pitch range is reversed", () => {
+            useTwelveEdo();
+            runEqualEdit("0", "4", "2");
+            const forward = mockTW.ratios.slice();
+            const forwardPitchNumber = mockTW.pitchNumber;
+
+            useTwelveEdo();
+            runEqualEdit("4", "0", "2");
+
+            expect(mockTW.activity.errorMsg).not.toHaveBeenCalled();
+            expect(mockTW.pitchNumber).toBe(forwardPitchNumber);
+            expect(mockTW.ratios).toEqual(forward);
+            for (let i = 1; i < mockTW.ratios.length; i++) {
+                expect(mockTW.ratios[i]).toBeGreaterThan(mockTW.ratios[i - 1]);
+            }
+        });
+
+        test.each([
+            ["0", "20"],
+            ["-1", "4"],
+            ["a", "4"],
+            ["0", "2.5"],
+            ["", "4"],
+            ["0", "  "]
+        ])("performEqualEdit rejects the pitch range %s to %s", (from, to) => {
+            useTwelveEdo();
+            const ratios = mockTW.ratios.slice();
+            runEqualEdit(from, to, "2");
+
+            expect(mockTW.activity.errorMsg).toHaveBeenCalledWith(
+                "Please enter pitch numbers between 0 and 12.",
+                3000
+            );
+            expect(mockTW.ratios).toEqual(ratios);
+            expect(mockTW.pitchNumber).toBe(12);
+            expect(mockTW._visualizerView).not.toHaveBeenCalled();
+        });
     });
 
     describe("ratioEdit calculations and callbacks", () => {
@@ -779,6 +848,78 @@ describe("TemperamentUI module", () => {
             expect(mockTW.ratios).toEqual([1, 1.5, 2]);
         });
 
+        const runRatioEdit = (input, output, recursion) => {
+            TemperamentUI.ratioEdit(mockTW);
+            document.getElementById("ratioIn").value = input;
+            document.getElementById("ratioOut").value = output;
+            document.getElementById("recursion").value = recursion;
+            document.getElementById("divAppend").onclick({ target: { textContent: "done" } });
+        };
+
+        test("ratioEdit folds a ratio below 1 up into the octave", () => {
+            mockTW.ratios = [1, 1.5, 2];
+            mockTW.frequencies = [440, 660, 880];
+            mockTW.powerBase = 2;
+            runRatioEdit("2", "3", "1");
+
+            expect(mockTW.activity.errorMsg).not.toHaveBeenCalled();
+            expect(mockTW.ratios[0]).toBe(1);
+            expect(mockTW.ratios.length).toBe(4);
+            expect(mockTW.ratios[1]).toBeCloseTo(4 / 3, 10);
+        });
+
+        test("ratioEdit folds by the octave space, not by 2", () => {
+            mockTW.ratios = [1, 3];
+            mockTW.frequencies = [100, 300];
+            mockTW.powerBase = 3;
+            runRatioEdit("5", "2", "2");
+
+            expect(mockTW.ratios.length).toBe(4);
+            expect(mockTW.ratios[1]).toBeCloseTo(6.25 / 3, 10);
+            expect(mockTW.ratios[2]).toBeCloseTo(2.5, 10);
+            expect(mockTW.ratios[3]).toBe(3);
+        });
+
+        test("ratioEdit keeps a ratio above the last listed pitch", () => {
+            mockTW.ratios = [1, 1.5];
+            mockTW.frequencies = [440, 660];
+            mockTW.powerBase = 2;
+            runRatioEdit("7", "4", "1");
+
+            expect(mockTW.ratios).toEqual([1, 1.5, 1.75]);
+        });
+
+        test.each(["0", "57", "1.5", "abc", "", "1000000000"])(
+            "ratioEdit rejects the recursion %p",
+            recursion => {
+                mockTW.ratios = [1, 1.5, 2];
+                mockTW.frequencies = [440, 660, 880];
+                mockTW.powerBase = 2;
+                runRatioEdit("2", "3", recursion);
+
+                expect(mockTW.activity.errorMsg).toHaveBeenCalledWith(
+                    "Please enter a recursion between 1 and 56.",
+                    3000
+                );
+                expect(mockTW.ratios).toEqual([1, 1.5, 2]);
+                expect(mockTW._visualizerView).not.toHaveBeenCalled();
+            }
+        );
+
+        test("ratioEdit rejects a ratio that overflows instead of looping forever", () => {
+            mockTW.ratios = [1, 1e300];
+            mockTW.frequencies = [1, 1e300];
+            mockTW.powerBase = 1e300;
+            runRatioEdit("1e299", "1", "2");
+
+            expect(mockTW.activity.errorMsg).toHaveBeenCalledWith(
+                "Please enter a valid ratio (e.g. 3:2) within the octave space.",
+                3000
+            );
+            expect(mockTW.ratios).toEqual([1, 1e300]);
+            expect(mockTW._visualizerView).not.toHaveBeenCalled();
+        });
+
         test("ratioEdit handles overDivisionCap", () => {
             TemperamentUI.ratioEdit(mockTW);
             mockTW.overDivisionCap.mockReturnValueOnce(true);
@@ -859,11 +1000,12 @@ describe("TemperamentUI module", () => {
             document.getElementById("done").onclick();
             expect(mockTW.tempRatios1).toEqual([1, 1.4, 2]);
             expect(spyOuter).toHaveBeenCalled();
-
+            expect(spyOuter.mock.calls[0][2]).toBe(2); // tempRatios1 was [1, 1.4, 2]
             mockTW.tempRatios1 = [1, 1.5, 2];
             document.getElementById("close").onclick();
             expect(mockTW.tempRatios).toEqual([1, 1.5, 2]);
             expect(spyInner).toHaveBeenCalled();
+            expect(spyInner.mock.calls[0][2]).toBe(2);
             expect(document.getElementById("noteInfo1")).toBeNull();
 
             spyRefresh.mockRestore();
@@ -978,6 +1120,34 @@ describe("TemperamentUI module", () => {
             expect(mockTW._visualizerView).toHaveBeenCalled();
         });
 
+        test.each([
+            ["3", "0"],
+            ["x", "1"],
+            ["1", "2"],
+            ["1", "1"],
+            ["-4", "-2"],
+            ["-3", "-1"],
+            ["4", "-2"],
+            ["-4", "2"]
+        ])("octaveSpaceEdit rejects the octave ratio %s:%s", (start, end) => {
+            const ratios = mockTW.ratios.slice();
+            const frequencies = mockTW.frequencies.slice();
+            TemperamentUI.octaveSpaceEdit(mockTW);
+            document.getElementById("startNote").value = start;
+            document.getElementById("endNote").value = end;
+
+            document.getElementById("divAppend").onclick();
+
+            expect(mockTW.activity.errorMsg).toHaveBeenCalledWith(
+                "Please enter an octave ratio greater than 1 (e.g. 2:1).",
+                3000
+            );
+            expect(mockTW.powerBase).toBe(2);
+            expect(mockTW.ratios).toEqual(ratios);
+            expect(mockTW.frequencies).toEqual(frequencies);
+            expect(mockTW._visualizerView).not.toHaveBeenCalled();
+        });
+
         test("octaveSpaceEdit divAppend mouseover sets pointer cursor", () => {
             TemperamentUI.octaveSpaceEdit(mockTW);
             const divAppend = document.getElementById("divAppend");
@@ -996,7 +1166,37 @@ describe("TemperamentUI module", () => {
         });
     });
 
-    describe("Wheel Characterization tests (Master vs Refactor)", () => {
+    describe("proportional slice geometry", () => {
+        test("outer tick wheel gets proportional widths", () => {
+            mockTW.ratios = [1, 1.5, 1.75, 2];
+            mockTW.pitchNumber = 3;
+            mockTW.powerBase = 2;
+
+            TemperamentUI.arbitraryEdit(mockTW);
+
+            expect(mockTW.wheel.navItemsContinuous).toBe(true);
+            const widths = mockTW.wheel.navItems.map(item => item.sliceAngle);
+            expect(widths.reduce((sum, w) => sum + w, 0)).toBeCloseTo(360, 6);
+            expect(widths).toEqual([
+                expect.closeTo(210.5865, 3),
+                expect.closeTo(80.0613, 3),
+                expect.closeTo(69.3522, 3)
+            ]);
+        });
+
+        test("non-positive widths keep the equal-slice default", () => {
+            mockTW.ratios = [1, 1.75, 1.5, 2];
+            mockTW.pitchNumber = 3;
+            mockTW.powerBase = 2;
+
+            TemperamentUI.arbitraryEdit(mockTW);
+
+            expect(mockTW.wheel.navItemsContinuous).toBe(false);
+            expect(mockTW.wheel.navItems.map(item => item.sliceAngle)).toEqual([0, 0, 0]);
+        });
+    });
+
+    describe("Proportional wheel geometry", () => {
         function getWheelSnapshot(wheelInstance, count) {
             return {
                 divId: wheelInstance.divId,
@@ -1011,7 +1211,7 @@ describe("TemperamentUI module", () => {
             };
         }
 
-        test("Case 1: 12 equal pitches matches master values exactly", () => {
+        test("Case 1: 12 equal pitches pins proportional widths", () => {
             const ratios = Array.from({ length: 12 }, (_, i) => Math.pow(2, i / 12));
             const tw = { pitchNumber: 12, ratios, powerBase: 2 };
 
@@ -1077,7 +1277,7 @@ describe("TemperamentUI module", () => {
             expect(outerSnap.sliceAngles.slice(0, 11)).toEqual(Array(11).fill(30));
         });
 
-        test("Case 2: 7 pitches matches master values exactly", () => {
+        test("Case 2: 7 pitches pins proportional widths", () => {
             const ratios = [1, 9 / 8, 5 / 4, 4 / 3, 3 / 2, 5 / 3, 15 / 8];
             const tw = { pitchNumber: 7, ratios, powerBase: 2 };
 
@@ -1088,11 +1288,11 @@ describe("TemperamentUI module", () => {
                 capturedWheelnavInstances[capturedWheelnavInstances.length - 1],
                 7
             );
-            expect(mainSnap.navAngle).toBe(270);
+            expect(mainSnap.navAngle).toBeCloseTo(300.58650025961623, 6);
             expect(mainSnap.menuRadius).toBeCloseTo(28.559933214452663, 6);
             expect(mainSnap.initWheelArgs).toEqual(["0", "1", "2", "3", "4", "5", "6"]);
             expect(mainSnap.sliceAngles).toEqual([
-                51.428571, 70.91743, 38.524798, 28.513973, 93.832028, 15.6102, 106.735801
+                61.173001, 54.721114, 33.519386, 61.173001, 54.721114, 61.173001, 33.519386
             ]);
 
             // 2. createInnerWheel (radius 128)
@@ -1102,11 +1302,11 @@ describe("TemperamentUI module", () => {
                 capturedWheelnavInstances[capturedWheelnavInstances.length - 1],
                 7
             );
-            expect(innerSnap.navAngle).toBe(270);
+            expect(innerSnap.navAngle).toBeCloseTo(300.58650025961623, 6);
             expect(innerSnap.menuRadius).toBeCloseTo(24.371143009666273, 6);
             expect(innerSnap.initWheelArgs).toEqual(["0", "1", "2", "3", "4", "5", "6"]);
             expect(innerSnap.sliceAngles).toEqual([
-                51.428571, 70.91743, 38.524798, 28.513973, 93.832028, 15.6102, 106.735801
+                61.173001, 54.721114, 33.519386, 61.173001, 54.721114, 61.173001, 33.519386
             ]);
 
             // 3. createOuterWheel
@@ -1119,11 +1319,11 @@ describe("TemperamentUI module", () => {
             expect(outerSnap.navAngle).toBeCloseTo(300.58650025961623, 6);
             expect(outerSnap.initWheelArgs).toEqual(["|", "|", "|", "|", "|", "|", "|"]);
             expect(outerSnap.sliceAngles.slice(0, 6)).toEqual([
-                51.428571, 64.465543, 23.774956, 70.91743, 44.976685, 43.263815
+                61.173001, 54.721114, 33.519386, 61.173001, 54.721114, 61.173001
             ]);
         });
 
-        test("Case 3: Clustered set with gap < 11 deg matches master values exactly", () => {
+        test("Case 3: Clustered set with gap < 11 deg pins proportional widths", () => {
             const ratios = [1.0, 1.15, 1.3, 1.45, 1.6, 1.75, 1.98];
             const tw = { pitchNumber: 7, ratios, powerBase: 2 };
 
@@ -1134,11 +1334,11 @@ describe("TemperamentUI module", () => {
                 capturedWheelnavInstances[capturedWheelnavInstances.length - 1],
                 7
             );
-            expect(mainSnap.navAngle).toBe(270);
+            expect(mainSnap.navAngle).toBeCloseTo(306.29409501053703, 6);
             expect(mainSnap.menuRadius).toBeCloseTo(22.439947525641376, 6);
             expect(mainSnap.initWheelArgs).toEqual(["0", "1", "2", "3", "4", "5", "6"]);
             expect(mainSnap.sliceAngles).toEqual([
-                51.428571, 93.747809, 33.60418, 79.825539, 22.428144, 70.655628, 57.609138
+                72.58819, 63.675994, 56.71486, 51.126842, 46.541886, 64.132383, 5.219845
             ]);
 
             // 2. createInnerWheel (radius 128)
@@ -1148,11 +1348,11 @@ describe("TemperamentUI module", () => {
                 capturedWheelnavInstances[capturedWheelnavInstances.length - 1],
                 7
             );
-            expect(innerSnap.navAngle).toBe(270);
+            expect(innerSnap.navAngle).toBeCloseTo(306.29409501053703, 6);
             expect(innerSnap.menuRadius).toBeCloseTo(19.148755221880645, 6);
             expect(innerSnap.initWheelArgs).toEqual(["0", "1", "2", "3", "4", "5", "6"]);
             expect(innerSnap.sliceAngles).toEqual([
-                51.428571, 93.747809, 33.60418, 79.825539, 22.428144, 70.655628, 57.609138
+                72.58819, 63.675994, 56.71486, 51.126842, 46.541886, 64.132383, 5.219845
             ]);
 
             // 3. createOuterWheel
@@ -1165,15 +1365,15 @@ describe("TemperamentUI module", () => {
             expect(outerSnap.navAngle).toBeCloseTo(306.29409501053703, 6);
             expect(outerSnap.initWheelArgs).toEqual(["|", "|", "|", "|", "|", "|", "|"]);
             expect(outerSnap.sliceAngles.slice(0, 6)).toEqual([
-                51.428571, 84.835613, 35.555241, 72.28646, 25.382268, 26.379464
+                72.58819, 63.675994, 56.71486, 51.126842, 46.541886, 64.132383
             ]);
         });
 
-        test("Case 4: Supplied pitchNumber different (tw=12, supplied=7) matches master except inner wheel pitchNumber fix", () => {
+        test("Case 4: Supplied pitchNumber different (tw=12, supplied=7) pins proportional widths", () => {
             const ratios = [1.0, 1.15, 1.3, 1.45, 1.6, 1.75, 1.98];
             const tw = { pitchNumber: 12, ratios, powerBase: 2 };
 
-            // 1. createMainWheel matches master exactly
+            // 1. createMainWheel pins proportional widths
             capturedWheelnavInstances = [];
             TemperamentUI.createMainWheel(tw, ratios, 7);
             const mainSnap = getWheelSnapshot(
@@ -1182,10 +1382,10 @@ describe("TemperamentUI module", () => {
             );
             expect(mainSnap.menuRadius).toBeCloseTo(22.439947525641376, 6);
             expect(mainSnap.sliceAngles).toEqual([
-                51.428571, 93.747809, 33.60418, 79.825539, 22.428144, 70.655628, 57.609138
+                72.58819, 63.675994, 56.71486, 51.126842, 46.541886, 64.132383, 5.219845
             ]);
 
-            // 2. createOuterWheel matches master exactly
+            // 2. createOuterWheel pins proportional widths
             capturedWheelnavInstances = [];
             TemperamentUI.createOuterWheel(tw, ratios, 7);
             const outerSnap = getWheelSnapshot(
@@ -1194,7 +1394,7 @@ describe("TemperamentUI module", () => {
             );
             expect(outerSnap.navAngle).toBeCloseTo(306.29409501053703, 6);
             expect(outerSnap.sliceAngles.slice(0, 6)).toEqual([
-                51.428571, 84.835613, 35.555241, 72.28646, 25.382268, 26.379464
+                72.58819, 63.675994, 56.71486, 51.126842, 46.541886, 64.132383
             ]);
 
             // 3. createInnerWheel:
@@ -1212,11 +1412,11 @@ describe("TemperamentUI module", () => {
                 7
             );
 
-            // Angles, labels, and navAngle still match master exactly:
-            expect(innerSnap.navAngle).toBe(270);
+            // Angles, labels, and navAngle stay aligned with the other rings:
+            expect(innerSnap.navAngle).toBeCloseTo(306.29409501053703, 6);
             expect(innerSnap.initWheelArgs).toEqual(["0", "1", "2", "3", "4", "5", "6"]);
             expect(innerSnap.sliceAngles).toEqual([
-                51.428571, 93.747809, 33.60418, 79.825539, 22.428144, 70.655628, 57.609138
+                72.58819, 63.675994, 56.71486, 51.126842, 46.541886, 64.132383, 5.219845
             ]);
 
             // Intended fix assertion:

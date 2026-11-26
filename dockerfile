@@ -5,7 +5,11 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+# Only what the server needs at runtime. The final stage copies all of /app,
+# so dev dependencies (Electron, Jest, the gulp toolchain) would otherwise
+# ship in the image. --ignore-scripts because `prepare` runs husky, which is
+# a dev dependency and has no place in a container.
+RUN npm ci --omit=dev --ignore-scripts
 
 COPY . .
 

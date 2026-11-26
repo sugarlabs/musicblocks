@@ -193,16 +193,22 @@ function createMockActivity() {
             removeAllEventListeners: jest.fn(event => {
                 if (event) delete stageListeners[event];
             }),
-            addEventListener: jest.fn((event, fn) => {
-                stageListeners[event] = fn;
+            removeEventListener: jest.fn((event, fn) => {
+                if (!stageListeners[event]) return;
+                stageListeners[event] = stageListeners[event].filter(listener => listener !== fn);
             }),
+            addEventListener: jest.fn((event, fn) => {
+                if (!stageListeners[event]) stageListeners[event] = [];
+                stageListeners[event].push(fn);
+            }),
+            getEventListeners: event => stageListeners[event] || [],
             _listeners: stageListeners
         },
         sendAllToTrash: jest.fn(function () {
             // Simulate the real sendAllToTrash which dispatches "trashsignal"
             // after a timeout. In tests we fire it synchronously.
-            const listener = stageListeners["trashsignal"];
-            if (listener) listener();
+            const listeners = (stageListeners["trashsignal"] || []).slice();
+            listeners.forEach(listener => listener());
         })
     };
 }
@@ -713,6 +719,21 @@ describe("JSEditor", () => {
             await conversionPromise;
 
             expect(AST2BlockList.toBlockList).toHaveBeenCalledWith(ast, { loaded: true });
+        });
+
+        test("_codeToBlocks keeps other trashsignal listeners registered", async () => {
+            const editor = createEditor();
+            const foreign = jest.fn();
+            editor.activity.stage.addEventListener("trashsignal", foreign, false);
+            global.ast2blocklist_config = { loaded: true };
+            window.ast2blocklist_config_ready = Promise.resolve(global.ast2blocklist_config);
+            acorn.parse.mockReturnValue(ast);
+            AST2BlockList.toBlockList.mockReturnValue([[0, "start", 0, 0, [null, null, null]]]);
+
+            await editor._codeToBlocks();
+
+            expect(editor.activity.stage.getEventListeners("trashsignal")).toContain(foreign);
+            expect(editor.activity.stage.removeAllEventListeners).not.toHaveBeenCalled();
         });
 
         test("_codeToBlocks logs a clear error when AST config fails", async () => {

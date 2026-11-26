@@ -126,6 +126,61 @@ describe("setupMeterActions", () => {
         expect(targetTurtle.singer.defaultStrongBeats).toBe(false);
     });
 
+    describe("strong beats chosen with on strong beat", () => {
+        beforeEach(() => {
+            Singer.MeterActions.setMeter(4, 1 / 4, 0);
+            Singer.MeterActions.onStrongBeatDo(2, "testAction", false, null, 0, 1);
+            Singer.MeterActions.onWeakBeatDo("testAction", false, null, 0, 1);
+        });
+
+        it("replace the default strong beats", () => {
+            expect(targetTurtle.singer.beatList).toEqual([2, "offbeat"]);
+        });
+
+        it("survive later meter changes", () => {
+            Singer.MeterActions.setMeter(4, 1 / 4, 0);
+            Singer.MeterActions.setMeter(4, 1 / 4, 0);
+            expect(targetTurtle.singer.beatList).toEqual([2, "offbeat"]);
+            expect(targetTurtle.singer.defaultStrongBeats).toBe(false);
+        });
+
+        it("survive a change to a meter with different defaults", () => {
+            Singer.MeterActions.setMeter(6, 1 / 8, 0);
+            expect(targetTurtle.singer.beatList).toEqual([2, "offbeat"]);
+        });
+    });
+
+    describe("weak beat chosen with on weak beat alone", () => {
+        beforeEach(() => {
+            Singer.MeterActions.setMeter(4, 1 / 4, 0);
+            Singer.MeterActions.onWeakBeatDo("testAction", false, null, 0, 1);
+        });
+
+        // Weak beats are determined by exclusion from beatList (beatValue > 1 and
+        // !beatList.includes(beatValue)), so default strong beats must return for
+        // the new meter to distinguish strong beats from weak beats.
+        it("restores default strong beats for the new meter while preserving offbeat", () => {
+            Singer.MeterActions.setMeter(6, 1 / 8, 0);
+            expect(targetTurtle.singer.beatList).toEqual(["offbeat", 1, 4]);
+            expect(targetTurtle.singer.defaultStrongBeats).toBe(true);
+        });
+
+        it("restores default strong beats across multiple meter changes", () => {
+            Singer.MeterActions.setMeter(6, 1 / 8, 0);
+            Singer.MeterActions.setMeter(4, 1 / 4, 0);
+            expect(targetTurtle.singer.beatList).toEqual(["offbeat", 1, 3]);
+            expect(targetTurtle.singer.defaultStrongBeats).toBe(true);
+        });
+    });
+
+    it("keeps a strong beat past the end of the measure from bringing the defaults back", () => {
+        Singer.MeterActions.setMeter(4, 1 / 4, 0);
+        Singer.MeterActions.onStrongBeatDo(9, "testAction", false, null, 0, 1);
+        Singer.MeterActions.setMeter(4, 1 / 4, 0);
+        expect(targetTurtle.singer.factorList).toEqual([9]);
+        expect(targetTurtle.singer.beatList).toEqual([]);
+    });
+
     it("should not clear manually-set beats when defaultStrongBeats is false", () => {
         targetTurtle.singer.beatList = [2, 5];
         targetTurtle.singer.defaultStrongBeats = false;
@@ -179,6 +234,16 @@ describe("setupMeterActions", () => {
             expect(targetTurtle.singer.bpm).toContain(expected);
         });
 
+        test.each([
+            [5000, 0.25, 1000],
+            [10, 0.25, 30],
+            [120, 0.5, 120],
+            [600, 0.5, 500],
+            [10, 0.5, 15]
+        ])("setBPM(%s, %s) returns the tempo in use, %s, in its beat value", (bpm, beat, used) => {
+            expect(Singer.MeterActions.setBPM(bpm, beat, 0, 1)).toBe(used);
+        });
+
         // --- NaN / zero / negative / Infinity guard ---
         // These inputs must be rejected before any arithmetic so that a zero
         // or NaN value never enters singer.bpm and hangs the audio scheduler.
@@ -191,7 +256,7 @@ describe("setupMeterActions", () => {
         ])("setBPM(%s) shows an error and does not push to bpm", (label, badBpm) => {
             activity.errorMsg.mockClear();
             const bpmBefore = [...targetTurtle.singer.bpm];
-            Singer.MeterActions.setBPM(badBpm, 0.25, 0, 1);
+            expect(Singer.MeterActions.setBPM(badBpm, 0.25, 0, 1)).toBeNull();
             expect(activity.errorMsg).toHaveBeenCalledWith("BPM must be a positive number.", 1);
             // bpm stack must be unchanged — no bad value was stored
             expect(targetTurtle.singer.bpm).toEqual(bpmBefore);
@@ -208,7 +273,7 @@ describe("setupMeterActions", () => {
             (label, badBeatVal) => {
                 activity.errorMsg.mockClear();
                 const bpmBefore = [...targetTurtle.singer.bpm];
-                Singer.MeterActions.setBPM(120, badBeatVal, 0, 1);
+                expect(Singer.MeterActions.setBPM(120, badBeatVal, 0, 1)).toBeNull();
                 expect(activity.errorMsg).toHaveBeenCalledWith(
                     "Beat value must be a positive number.",
                     1
@@ -223,8 +288,6 @@ describe("setupMeterActions", () => {
             [100, [], 100],
             [500, [], 500],
             [10, ["1/4 beats per minute must be greater than 30"], 30],
-            [0, ["1/4 beats per minute must be greater than 30"], 30],
-            [-60, ["1/4 beats per minute must be greater than 30"], 30],
             [5000, ["maximum 1/4 beats per minute is 1000"], 1000],
             [30, [], 30],
             [1000, [], 1000]
@@ -240,12 +303,30 @@ describe("setupMeterActions", () => {
             if (!errors.length) expect(Singer.defaultBPMFactor).toBe(TONEBPM / expected);
         });
 
-        test("setMasterBPM(NaN) shows an error and does not mutate masterBPM", () => {
+        test.each([
+            [5000, 0.25, 1000],
+            [10, 0.25, 30],
+            [120, 0.5, 120],
+            [600, 0.5, 500]
+        ])(
+            "setMasterBPM(%s, %s) returns the tempo in use, %s, in its beat value",
+            (bpm, beat, used) => {
+                expect(Singer.MeterActions.setMasterBPM(bpm, beat, 1)).toBe(used);
+            }
+        );
+
+        test.each([
+            ["NaN", NaN],
+            ["zero", 0],
+            ["negative", -60],
+            ["Infinity", Infinity],
+            ["-Infinity", -Infinity]
+        ])("setMasterBPM(%s) shows an error and does not mutate masterBPM", (label, badBpm) => {
             activity.errorMsg.mockClear();
             const masterBpmBefore = Singer.masterBPM;
             const factorBefore = Singer.defaultBPMFactor;
 
-            Singer.MeterActions.setMasterBPM(NaN, 0.25, 1);
+            expect(Singer.MeterActions.setMasterBPM(badBpm, 0.25, 1)).toBeNull();
 
             expect(activity.errorMsg).toHaveBeenCalledWith("BPM must be a positive number.", 1);
             expect(Singer.masterBPM).toBe(masterBpmBefore);
@@ -265,7 +346,7 @@ describe("setupMeterActions", () => {
                 const masterBpmBefore = Singer.masterBPM;
                 const factorBefore = Singer.defaultBPMFactor;
 
-                Singer.MeterActions.setMasterBPM(120, badBeatValue, 1);
+                expect(Singer.MeterActions.setMasterBPM(120, badBeatValue, 1)).toBeNull();
 
                 expect(activity.errorMsg).toHaveBeenCalledWith(
                     "Beat value must be a positive number.",
@@ -321,6 +402,44 @@ describe("setupMeterActions", () => {
             "__everybeat_1__",
             expect.any(Function)
         );
+    });
+
+    it("should reuse a companion turtle at index 0", () => {
+        const ownerTurtle = {
+            ...targetTurtle,
+            id: 1,
+            companionTurtle: 0
+        };
+        const companionTurtle = {
+            ...targetTurtle,
+            id: 0,
+            running: false
+        };
+        activity.turtles.getTurtle.mockImplementation(id =>
+            id === 1 ? ownerTurtle : companionTurtle
+        );
+        activity.turtles.ithTurtle.mockImplementation(id =>
+            id === 1 ? ownerTurtle : companionTurtle
+        );
+        activity.turtles.getTurtleCount.mockReturnValue(2);
+
+        Singer.MeterActions.onEveryBeatDo("testAction", false, null, 1, 1);
+
+        expect(activity.turtles.addTurtle).not.toHaveBeenCalled();
+        expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+            0,
+            "__everybeat_0__",
+            expect.any(Function)
+        );
+    });
+
+    it("should create a companion when the reference is undefined", () => {
+        delete targetTurtle.companionTurtle;
+
+        Singer.MeterActions.onEveryBeatDo("testAction", false, null, 0, 1);
+
+        expect(activity.turtles.addTurtle).toHaveBeenCalledTimes(1);
+        expect(targetTurtle.companionTurtle).toBe(1);
     });
 
     it("should handle running turtle in onEveryBeatDo listener", () => {
@@ -599,7 +718,7 @@ describe("setupMeterActions", () => {
         Singer.MeterActions.setNoClock(0, 1);
 
         expect(targetTurtle.singer.drift).toBe(1);
-        expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_drift_0");
+        expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_drift_0_1");
         const listenerFunc = activity.logo.setTurtleListener.mock.calls[0][2];
         targetTurtle.singer.drift = 2;
         listenerFunc();
@@ -648,10 +767,20 @@ describe("setupMeterActions", () => {
 
         Singer.MeterActions.setNoClock(0);
 
-        expect(mockMouse.MB.listeners).toContain("_drift_0");
+        expect(mockMouse.MB.listeners).toContain("_drift_0_undefined");
     });
 
-    test.each([[null], [0]])("should return 0 when noteValue is %p", noteValue => {
+    test.each([
+        [null],
+        [0],
+        [undefined],
+        [NaN],
+        [-1],
+        [-0.25],
+        [Infinity],
+        [-Infinity],
+        ["invalid"]
+    ])("should return 0 when noteValue is %p", noteValue => {
         const result = Singer.MeterActions.getNotesPlayed(noteValue, 0);
         expect(result).toBe(0);
     });
@@ -660,6 +789,7 @@ describe("setupMeterActions", () => {
         targetTurtle.singer.notesPlayed = [12, 3];
         const result = Singer.MeterActions.getNotesPlayed(2, 0);
         expect(result).toBe(2);
+        expect(Singer.MeterActions.getNotesPlayed(0.25, 0)).toBe(16);
     });
 
     it("should calculate whole notes played correctly", () => {
@@ -849,7 +979,7 @@ describe("setupMeterActions", () => {
             expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
             expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
                 0,
-                "_drift_0",
+                "_drift_0_undefined",
                 expect.any(Function)
             );
         });
@@ -934,7 +1064,7 @@ describe("setupMeterActions", () => {
         Singer.MeterActions.setNoClock(0);
         expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
             0,
-            "_drift_0",
+            "_drift_0_undefined",
             expect.any(Function)
         );
     });
@@ -955,5 +1085,72 @@ describe("setupMeterActions", () => {
             expect.any(Function)
         );
         expect(targetTurtle.listeners[eventName]).toEqual(expect.any(Function));
+    });
+
+    describe("nested drift clamp isolation", () => {
+        it("nested setNoClock clamps register distinct block-scoped listeners and decrement drift on listener invocation", () => {
+            activity.blocks.blockList["outer"] = {};
+            activity.blocks.blockList["inner"] = {};
+            targetTurtle.singer.drift = 0;
+
+            Singer.MeterActions.setNoClock(0, "outer");
+            expect(targetTurtle.singer.drift).toBe(1);
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(
+                "outer",
+                0,
+                "_drift_0_outer"
+            );
+            expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                "_drift_0_outer",
+                expect.any(Function)
+            );
+
+            Singer.MeterActions.setNoClock(0, "inner");
+            expect(targetTurtle.singer.drift).toBe(2);
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(
+                "inner",
+                0,
+                "_drift_0_inner"
+            );
+            expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
+                0,
+                "_drift_0_inner",
+                expect.any(Function)
+            );
+
+            const calls = activity.logo.setTurtleListener.mock.calls;
+            const outerListener = calls.find(c => c[1] === "_drift_0_outer")[2];
+            const innerListener = calls.find(c => c[1] === "_drift_0_inner")[2];
+
+            innerListener();
+            expect(targetTurtle.singer.drift).toBe(1);
+
+            outerListener();
+            expect(targetTurtle.singer.drift).toBe(0);
+        });
+
+        it("nested setNoClock clamps preserve both listeners in turtle listeners dictionary", () => {
+            targetTurtle.listeners = {};
+            activity.logo.setTurtleListener = jest.fn((tur, name, fn) => {
+                targetTurtle.listeners[name] = fn;
+            });
+            activity.blocks.blockList["clamp1"] = {};
+            activity.blocks.blockList["clamp2"] = {};
+            targetTurtle.singer.drift = 0;
+
+            Singer.MeterActions.setNoClock(0, "clamp1");
+            Singer.MeterActions.setNoClock(0, "clamp2");
+
+            expect(typeof targetTurtle.listeners["_drift_0_clamp1"]).toBe("function");
+            expect(typeof targetTurtle.listeners["_drift_0_clamp2"]).toBe("function");
+            expect(targetTurtle.singer.drift).toBe(2);
+
+            targetTurtle.listeners["_drift_0_clamp2"]();
+            expect(targetTurtle.singer.drift).toBe(1);
+
+            targetTurtle.listeners["_drift_0_clamp1"]();
+            expect(targetTurtle.singer.drift).toBe(0);
+        });
     });
 });

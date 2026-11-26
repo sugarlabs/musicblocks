@@ -584,10 +584,11 @@ function setupDrumBlocks(activity) {
                 }
             } else if (logo.inMusicKeyboard) {
                 // Handle Music Keyboard context
-                logo.musicKeyboard.instruments.push(drumname);
-                logo.musicKeyboard.noteNames.push("drum");
-                logo.musicKeyboard.octaves.push(null);
-                logo.musicKeyboard.addRowBlock(blk);
+                const musicKeyboard = logo.musicKeyboardByTurtle?.[turtle] || logo.musicKeyboard;
+                musicKeyboard.instruments.push(drumname);
+                musicKeyboard.noteNames.push("drum");
+                musicKeyboard.octaves.push(null);
+                musicKeyboard.addRowBlock(blk);
             } else if (
                 tur.singer.inNoteBlock.length > 0 ||
                 (activity.blocks.blockList[blk].connections[0] === null &&

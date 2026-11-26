@@ -306,6 +306,19 @@ describe("piemenuBlockContext", () => {
         expect(dyHistory).toEqual([0, 21]);
     });
 
+    test("duplicate hides the context wheel after copying", () => {
+        const block = makeBlock();
+
+        piemenuBlockContext(block);
+        getDomElement("contextWheelDiv").style.display = "block";
+        const wheel = global.wheelnav.mock.instances[0];
+
+        wheel.navItems[0].navigateFunction();
+
+        expect(block.blocks.pasteStack).toHaveBeenCalled();
+        expect(getDomElement("contextWheelDiv").style.display).toBe("none");
+    });
+
     test("duplicate re-enables the 'Paste previous stack' helper item and rebinds its handler", () => {
         const block = makeBlock();
         const matchingItem = { label: "Paste previous stack", display: false, fn: null };
@@ -426,6 +439,20 @@ describe("piemenuBlockContext", () => {
         expect(getDomElement("contextWheelDiv").style.display).toBe("block");
         expect(window._contextWheelIgnoreNextClick).toBe(false);
         expect(global.document.body.removeEventListener).not.toHaveBeenCalled();
+    });
+
+    test("closes on the first outside click after a right-button long press", () => {
+        const block = makeBlock();
+
+        piemenuBlockContext(block);
+        getDomElement("contextWheelDiv").style.display = "block";
+        computedDisplay = "block";
+
+        bodyClickHandler({ target: document.createElement("canvas") });
+
+        expect(getDomElement("contextWheelDiv").style.display).toBe("none");
+        expect(window._contextWheelIgnoreNextClick).toBe(false);
+        expect(global.document.body.removeEventListener).toHaveBeenCalled();
     });
 
     test("replaces the previous outside-click handler instead of accumulating listeners", () => {

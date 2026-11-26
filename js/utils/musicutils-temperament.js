@@ -18,7 +18,7 @@
 /*
    exported
 
-   getCurrentEDO, EDO_NOTE_NAMES, SHARP_NAMES, generateNoteNames,
+   getCurrentEDO, EDO_NOTE_NAMES, SHARP_NAMES, normalizeEDO, generateNoteNames,
    getEdoNoteNamePosition, octaveRatio, INITIALTEMPERAMENTS, TEMPERAMENTS,
    PreDefinedTemperaments, INTERVAL_CENTS, INTERVAL_ORDER, TEMPERAMENT,
    setOctaveRatio, getOctaveRatio, ratioToWheelAngle, getTemperamentsList,
@@ -26,6 +26,7 @@
    deleteTemperamentFromList, addTemperamentToDictionary, updateTemperaments,
    isCustomTemperament, temperamentHasRatios, isTrueEDO, isEquallyTempered,
    isNonEDO, getTemperamentRatio, getTemperamentCents, getTemperamentName,
+   getEffectiveOctaveRatio,
    MusicUtilsTemperament
  */
 
@@ -61,6 +62,24 @@ var getCurrentEDO = temperament => {
     return t && t.pitchNumber ? t.pitchNumber : 12;
 };
 
+/**
+ * Normalises an EDO value to one the note/scale math can use.
+ *
+ * Valid EDOs (integers from 1 to 256) pass through unchanged. Anything
+ * else — non-finite, non-integer, below 1, or above 256 — falls back to
+ * the standard 12, the same fallback getCurrentEDO uses for an unknown
+ * temperament. Every entry point that accepts an EDO from a caller
+ * (generateNoteNames, getEdoNoteNamePosition, getModePattern and
+ * buildScale) runs its value through here first, so a single bad value
+ * cannot hang a loop, throw on an array length, or leak NaN steps into
+ * a scale downstream.
+ * @param {number} edo - number of steps per octave
+ * @returns {number} a valid EDO, or 12 for an invalid one
+ */
+var normalizeEDO = edo => {
+    return Number.isInteger(edo) && edo >= 1 && edo <= 256 ? edo : 12;
+};
+
 var EDO_NOTE_NAMES = {};
 
 var SHARP_NAMES = [
@@ -91,10 +110,23 @@ var SHARP_NAMES = [
  * For small EDOs (5, 7): returns the subset of natural letters without accidentals.
  * For EDO > 12: interleaves sharp and flat accidentals between naturals.
  * Results are cached in EDO_NOTE_NAMES.
+ * Invalid EDOs (non-finite, non-integer, below 1, or above 256) fall
+ * back to the standard 12-EDO names instead of hanging or allocating
+ * a table no temperament uses.
  * @param {number} edo - number of steps per octave
  * @returns {string[]} array of note names, length = edo
  */
 function generateNoteNames(edo) {
+    // An invalid EDO must not reach the step distribution below:
+    // Infinity yields an infinite sharp count and the name-building
+    // loop never terminates, and an absurdly large finite value would
+    // allocate a huge table with ever-longer accidental strings
+    // (built-in temperaments top out at 31 divisions, so 256 leaves
+    // ample headroom). Normalising first gives every caller the
+    // standard 12-EDO table instead, and the fallback is never cached
+    // under the bad key — only under 12.
+    edo = normalizeEDO(edo);
+
     if (EDO_NOTE_NAMES[edo]) {
         return EDO_NOTE_NAMES[edo];
     }
@@ -191,6 +223,12 @@ function generateNoteNames(edo) {
  * @returns {number} position in the EDO name table, or -1 if not found
  */
 function getEdoNoteNamePosition(name, edo) {
+    // Normalise first: generateNoteNames already falls back to the
+    // 12-EDO table for a bad EDO, but the enharmonic checks below key
+    // off `edo === 12` and the proportional fallback divides by the
+    // EDO, so an unnormalised Infinity or NaN would still return NaN.
+    edo = normalizeEDO(edo);
+
     const normalizedName = name
         .replaceAll("#", SHARP)
         .replaceAll("b", FLAT)
@@ -1098,6 +1136,36 @@ var getOctaveRatio = () => {
 };
 
 /**
+ * Resolves the effective octave / period ratio (powerBase) for a given temperament.
+ * If the temperament explicitly defines an octaveRatio other than 2, that value is used.
+ * Otherwise, if the global octave ratio (via getOctaveRatio()) has been customized (!== 2),
+ * that is used. Otherwise it falls back to the temperament's octaveRatio or 2.
+ * @function
+ * @param {string|Object} [temperament] - Temperament key or definition object.
+ * @returns {number} The effective power base ratio.
+ */
+var getEffectiveOctaveRatio = temperament => {
+    const t =
+        typeof temperament === "object" && temperament !== null
+            ? temperament
+            : typeof getTemperament === "function"
+              ? getTemperament(temperament)
+              : undefined;
+    const temperamentRatio = Number(t?.octaveRatio);
+    if (Number.isFinite(temperamentRatio) && temperamentRatio > 1) {
+        return temperamentRatio;
+    }
+    if (typeof getOctaveRatio === "function") {
+        const gr = getOctaveRatio();
+        const globalRatio = Number(gr);
+        if (Number.isFinite(globalRatio) && globalRatio > 1) {
+            return globalRatio;
+        }
+    }
+    return 2;
+};
+
+/**
  * Converts a frequency ratio to a circle-of-notes wheel angle in degrees.
  * @function
  * @param {number} ratio - The ratio relative to the tonic.
@@ -1122,6 +1190,9 @@ var getTemperamentsList = () => {
  * @returns {Object} The interval ratios for the specified temperament.
  */
 var getTemperament = entry => {
+    if (typeof entry === "object" && entry !== null) {
+        return entry;
+    }
     if (TEMPERAMENT[entry]) {
         return TEMPERAMENT[entry];
     }
@@ -1284,13 +1355,14 @@ var isEquallyTempered = temperament => {
     if (!t || typeof t !== "object") return false;
     if (t.isEDO === true) return true;
     if (t.isEDO === false) return false;
+    const base = Number.isFinite(Number(t.octaveRatio)) ? Number(t.octaveRatio) : 2;
     if (t.ratios) {
         if (!Array.isArray(t.ratios) || t.ratios.length < 2) return false;
         const n = Number.isInteger(t.pitchNumber) ? t.pitchNumber : t.ratios.length;
         // 1e-9 is safe: stored ratios are exact Math.pow values or full-precision
         // editor output (toFixed(3) is display-only, never persisted).
         for (let i = 0; i < t.ratios.length; i++) {
-            if (Math.abs(t.ratios[i] - Math.pow(2, i / n)) > 1e-9) return false;
+            if (Math.abs(t.ratios[i] - Math.pow(base, i / n)) > 1e-9) return false;
         }
         return true;
     }
@@ -1299,7 +1371,7 @@ var isEquallyTempered = temperament => {
     for (let i = 0; i < n; i++) {
         const entry = t["" + i];
         if (!Array.isArray(entry) || typeof entry[0] !== "number") return false;
-        if (Math.abs(entry[0] - Math.pow(2, i / n)) > 1e-9) return false;
+        if (Math.abs(entry[0] - Math.pow(base, i / n)) > 1e-9) return false;
     }
     return true;
 };
@@ -1390,6 +1462,7 @@ var MusicUtilsTemperament = {
     getCurrentEDO,
     EDO_NOTE_NAMES,
     SHARP_NAMES,
+    normalizeEDO,
     generateNoteNames,
     getEdoNoteNamePosition,
     INITIALTEMPERAMENTS,
@@ -1400,6 +1473,7 @@ var MusicUtilsTemperament = {
     TEMPERAMENT,
     setOctaveRatio,
     getOctaveRatio,
+    getEffectiveOctaveRatio,
     ratioToWheelAngle,
     getTemperamentsList,
     getTemperament,

@@ -245,3 +245,93 @@ describe("Logo dispatch drives the real Singer.ToneActions.setTimbre", () => {
         expect(logo.synth.loadSynth).toHaveBeenCalledWith(0, "customsample_mysample");
     });
 });
+
+describe("nested Set Instrument blocks under the real Logo dispatch", () => {
+    let logo;
+    let turtle;
+    let activity;
+    let snapshots;
+
+    const snapshot = label => () => {
+        snapshots[label] = {
+            instrumentNames: [...turtle.singer.instrumentNames],
+            inSetTimbre: turtle.inSetTimbre
+        };
+        return null;
+    };
+
+    const setTimbreFlow = (args, l, t, blk) => {
+        Singer.ToneActions.setTimbre(args[0], t, blk);
+        return [args[1], 1];
+    };
+
+    const voice = value => ({
+        name: "voicename",
+        value,
+        connections: [],
+        protoblock: { parameter: false, dockTypes: ["anyout"] },
+        isValueBlock: () => true,
+        isArgBlock: () => false
+    });
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        global.document.body.style.cursor = "default";
+        global.CUSTOMSAMPLES = {};
+
+        turtle = createTurtle();
+        activity = createActivity(turtle);
+        logo = new Logo(activity);
+        activity.logo = logo;
+        logo.synth = { loadSynth: jest.fn(), createSynth: jest.fn() };
+        snapshots = {};
+
+        setupToneActions(activity);
+    });
+
+    const run = (outerVoice, innerVoice) => {
+        // outer settimbre (0, voice 1) { inner settimbre (2, voice 3) { inner probe (4) },
+        // probe after the inner clamp (6) }, probe after both clamps (8). Blocks 5 and 7 are
+        // the "hidden" blocks that end the inner and outer clamps.
+        const blocks = [
+            makeFlowBlock(
+                "settimbre",
+                [null, 1, 2, 7],
+                setTimbreFlow,
+                [null, "anyin", "in", "in"],
+                2
+            ),
+            voice(outerVoice),
+            makeFlowBlock("settimbre", [0, 3, 4, 5], setTimbreFlow, [null, "anyin", "in", "in"], 2),
+            voice(innerVoice),
+            makeFlowBlock("probe", [2, null], snapshot("insideInner")),
+            makeFlowBlock("hidden", [2, 6], null),
+            makeFlowBlock("probe", [5, null], snapshot("afterInner")),
+            makeFlowBlock("hidden", [0, 8], null),
+            makeFlowBlock("probe", [7, null], snapshot("afterOuter"))
+        ];
+        logo.blockList = blocks;
+        activity.blocks.blockList = blocks;
+
+        logo.runFromBlockNow(logo, 0, 0, 1, null);
+    };
+
+    test("the same instrument nested inside itself is popped when the outer clamp ends", () => {
+        run("cello", "cello");
+
+        expect(snapshots.insideInner).toEqual({ instrumentNames: ["cello"], inSetTimbre: true });
+        expect(snapshots.afterInner).toEqual({ instrumentNames: ["cello"], inSetTimbre: true });
+        expect(snapshots.afterOuter).toEqual({ instrumentNames: [], inSetTimbre: false });
+    });
+
+    test("a different inner instrument is popped at its own clamp end", () => {
+        run("cello", "kazoo");
+
+        expect(snapshots.insideInner).toEqual({
+            instrumentNames: ["cello", "kazoo"],
+            inSetTimbre: true
+        });
+        expect(snapshots.afterInner).toEqual({ instrumentNames: ["cello"], inSetTimbre: true });
+        expect(snapshots.afterOuter).toEqual({ instrumentNames: [], inSetTimbre: false });
+    });
+});

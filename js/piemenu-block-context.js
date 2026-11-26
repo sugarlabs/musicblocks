@@ -154,6 +154,7 @@ const piemenuBlockContext = block => {
             );
         } else {
             stackPasting();
+            docById("contextWheelDiv").style.display = "none";
         }
     };
 
