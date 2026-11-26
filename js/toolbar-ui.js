@@ -106,7 +106,7 @@ class ToolbarUI {
     dispose() {
         this._cleanupRecordDropdownListeners();
         if (this._tooltipDropdownGuardHandler) {
-            document.removeEventListener("mouseenter", this._tooltipDropdownGuardHandler, true);
+            document.removeEventListener("mouseover", this._tooltipDropdownGuardHandler, true);
             this._tooltipDropdownGuardHandler = null;
         }
         if (this._dimTimeout) {
@@ -344,7 +344,7 @@ class ToolbarUI {
         // or appear behind the open menu. Items inside the open menu still
         // show their tooltips (layered above via CSS z-index).
         if (this._tooltipDropdownGuardHandler) {
-            document.removeEventListener("mouseenter", this._tooltipDropdownGuardHandler, true);
+            document.removeEventListener("mouseover", this._tooltipDropdownGuardHandler, true);
         }
         const isDropdownOpen = dropdown =>
             dropdown.style.display === "block" || dropdown.classList.contains("active");
@@ -373,7 +373,7 @@ class ToolbarUI {
             }
             e.stopImmediatePropagation();
         };
-        document.addEventListener("mouseenter", this._tooltipDropdownGuardHandler, true);
+        document.addEventListener("mouseover", this._tooltipDropdownGuardHandler, true);
 
         const restoreWidgetFocus = () => {
             const focusedWindow = window.widgetWindows?.focused;
