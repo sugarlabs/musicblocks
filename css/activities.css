@@ -1195,6 +1195,11 @@ body.highcontrast #aux-toolbar .aux-group > li > a.toolbar-btn-focused {
     z-index: 10002 !important;
 }
 
+/* Keep Materialize tooltips above toolbars (10001) and dropdown menus (10002) */
+.material-tooltip {
+    z-index: 10005 !important;
+}
+
 body.dark .materialize-iso .dropdown-content {
     background-color: var(--color-bg-secondary, #1f2937) !important;
     border-color: var(--color-border-primary, #374151) !important;

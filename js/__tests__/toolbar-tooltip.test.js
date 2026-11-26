@@ -23,6 +23,7 @@
 
 describe("ToolbarUI tooltip dismissal", () => {
     let ToolbarUI;
+    let toolbar;
     let calls;
     let clickHandler;
 
@@ -69,11 +70,15 @@ describe("ToolbarUI tooltip dismissal", () => {
         global._ = jest.fn(x => x);
 
         ToolbarUI = require("../toolbar-ui");
-        const toolbar = new ToolbarUI();
+        toolbar = new ToolbarUI();
         toolbar.init({ beginnerMode: true });
     });
 
     afterEach(() => {
+        if (toolbar) {
+            toolbar.dispose();
+        }
+        document.body.innerHTML = "";
         delete global.window.jQuery;
         delete global.window.platformColor;
         delete global._THIS_IS_MUSIC_BLOCKS_;
@@ -113,5 +118,68 @@ describe("ToolbarUI tooltip dismissal", () => {
         clickHandler.call(element);
 
         expect(calls.trigger).toContainEqual({ selector: element, event: "mouseleave.tooltip" });
+    });
+
+    describe("open-dropdown tooltip guard", () => {
+        const buildToolbarDom = isOpen => {
+            const otherBtn = document.createElement("a");
+            otherBtn.id = "advancedMode";
+            otherBtn.className = "tooltipped";
+
+            const dropdown = document.createElement("ul");
+            dropdown.id = "themedropdown";
+            dropdown.className = "dropdown-content";
+            dropdown.style.display = isOpen ? "block" : "none";
+
+            const itemBtn = document.createElement("a");
+            itemBtn.id = "light";
+            itemBtn.className = "tooltipped";
+            dropdown.appendChild(itemBtn);
+
+            document.body.appendChild(otherBtn);
+            document.body.appendChild(dropdown);
+            return { otherBtn, dropdown, itemBtn };
+        };
+
+        it("suppresses mouseenter on outside tooltipped elements while a dropdown is open", () => {
+            const { otherBtn } = buildToolbarDom(true);
+            const targetListener = jest.fn();
+            otherBtn.addEventListener("mouseenter", targetListener);
+
+            otherBtn.dispatchEvent(new MouseEvent("mouseenter", { bubbles: false }));
+
+            expect(targetListener).not.toHaveBeenCalled();
+        });
+
+        it("allows mouseenter on tooltipped items inside the open dropdown", () => {
+            const { itemBtn } = buildToolbarDom(true);
+            const targetListener = jest.fn();
+            itemBtn.addEventListener("mouseenter", targetListener);
+
+            itemBtn.dispatchEvent(new MouseEvent("mouseenter", { bubbles: false }));
+
+            expect(targetListener).toHaveBeenCalledTimes(1);
+        });
+
+        it("allows mouseenter on outside tooltipped elements when all dropdowns are closed", () => {
+            const { otherBtn } = buildToolbarDom(false);
+            const targetListener = jest.fn();
+            otherBtn.addEventListener("mouseenter", targetListener);
+
+            otherBtn.dispatchEvent(new MouseEvent("mouseenter", { bubbles: false }));
+
+            expect(targetListener).toHaveBeenCalledTimes(1);
+        });
+
+        it("removes the capture listener on dispose", () => {
+            const { otherBtn } = buildToolbarDom(true);
+            const targetListener = jest.fn();
+            otherBtn.addEventListener("mouseenter", targetListener);
+
+            toolbar.dispose();
+            otherBtn.dispatchEvent(new MouseEvent("mouseenter", { bubbles: false }));
+
+            expect(targetListener).toHaveBeenCalledTimes(1);
+        });
     });
 });
