@@ -1520,6 +1520,16 @@ describe("keySignatureToMode", () => {
         expect(keySignatureToMode("C𝄪")).toEqual(["D", "major"]);
     });
 
+    it("starts a double-accidental key on the tuning's own step when it has one", () => {
+        // 31 EDO names C♯♯ as a step of its own, below D; 12 and 19 EDO have none.
+        const edo31 = buildScale("C𝄪 major", 31)[0];
+        expect(edo31[0]).toBe("C♯♯");
+        expect(buildScale("Cx major", 31)[0]).toEqual(edo31);
+        expect(buildScale("C♯♯ major", 31)[0]).toEqual(edo31);
+        expect(buildScale("C𝄪 major", 12)[0][0]).toBe("D");
+        expect(buildScale("C𝄪 major", 19)[0][0]).toBe("D");
+    });
+
     beforeEach(() => {
         global.MAQAMTABLE = {};
         global.BTOFLAT = {};
