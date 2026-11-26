@@ -552,8 +552,12 @@ class MusicBlocks {
             return;
         }
 
+        const heap = this._ensureHeap();
         let idx = Math.floor(index);
-        if (idx < 1) {
+        // Same as the set heap block: -1 is the last entry, -heap.length the first.
+        if (idx < 0 && -idx <= heap.length) {
+            idx = heap.length + idx + 1;
+        } else if (idx < 1) {
             JSEditor.logConsole("Index must be > 0.", "maroon");
             idx = 1;
         }
@@ -563,7 +567,6 @@ class MusicBlocks {
             idx = 1000;
         }
 
-        const heap = this._ensureHeap();
         while (heap.length < idx) {
             heap.push(0);
         }

@@ -301,6 +301,20 @@ describe("MusicBlocks Class", () => {
             ]);
         });
 
+        test("should setHeapEntry with a negative index like the set heap block", () => {
+            globalActivity.logo.turtleHeaps[musicBlocks.turIndex] = [1, 2, 3];
+            musicBlocks.setHeapEntry(-1, 99);
+            expect(globalActivity.logo.turtleHeaps[musicBlocks.turIndex]).toEqual([1, 2, 99]);
+
+            musicBlocks.setHeapEntry(-3, 77);
+            expect(globalActivity.logo.turtleHeaps[musicBlocks.turIndex]).toEqual([77, 2, 99]);
+            expect(JSEditor.logConsole).not.toHaveBeenCalled();
+
+            musicBlocks.setHeapEntry(-4, 55);
+            expect(globalActivity.logo.turtleHeaps[musicBlocks.turIndex]).toEqual([55, 2, 99]);
+            expect(JSEditor.logConsole).toHaveBeenCalledWith("Index must be > 0.", "maroon");
+        });
+
         test("should push to heap", () => {
             globalActivity.logo.turtleHeaps[musicBlocks.turIndex] = [1];
             musicBlocks.push(2);
