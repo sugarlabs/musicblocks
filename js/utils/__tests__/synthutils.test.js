@@ -2214,6 +2214,68 @@ describe("Utility Functions (logic-only)", () => {
             Synth._getFrequency = originalGetFrequency;
             Synth.inTemperament = "equal";
         });
+
+        it("should handle chord playback with real frequency conversion for non-EDO temperaments", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            Synth.inTemperament = "Pythagorean";
+            Synth.temperamentChanged("Pythagorean", "C4");
+
+            await expect(
+                _performNotes.call(
+                    Synth,
+                    mockSynth,
+                    ["F#4", "A#4", "C#5"],
+                    0.25,
+                    null,
+                    null,
+                    false,
+                    0
+                )
+            ).resolves.not.toThrow();
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+            const calledNotes = mockSynth.triggerAttackRelease.mock.calls[0][0];
+            expect(Array.isArray(calledNotes)).toBe(true);
+            expect(calledNotes.length).toBe(3);
+            calledNotes.forEach(freq => {
+                expect(typeof freq).toBe("number");
+                expect(freq).toBeGreaterThan(0);
+                expect(isNaN(freq)).toBe(false);
+            });
+
+            Synth.inTemperament = "equal";
+        });
+
+        it("should fall back gracefully for partially unresolved chord notes without producing NaN", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            Synth.inTemperament = "just intonation";
+
+            await expect(
+                _performNotes.call(
+                    Synth,
+                    mockSynth,
+                    ["C4", "unresolvedPitch"],
+                    0.25,
+                    null,
+                    null,
+                    false,
+                    10
+                )
+            ).resolves.not.toThrow();
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+            const calledNotes = mockSynth.triggerAttackRelease.mock.calls[0][0];
+            expect(Array.isArray(calledNotes)).toBe(true);
+            expect(calledNotes.includes(NaN)).toBe(false);
+
+            Synth.inTemperament = "equal";
+        });
     });
 
     describe("_performNotes glide/portamento setNote routing ", () => {
