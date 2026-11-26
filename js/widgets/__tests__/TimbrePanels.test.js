@@ -211,7 +211,11 @@ describe("TimbrePanels", () => {
             expect(global.instrumentsFilters[0]["custom"][0]["filterFrequency"]).toBe(880);
             expect(mockWidget._update).toHaveBeenCalledWith(0, "880", 2);
 
-            // 4. Unrelated event still bubbles to parent
+            // 4. Frequency span click is contained
+            span.dispatchEvent(new Event("click", { bubbles: true }));
+            expect(parentListener).not.toHaveBeenCalled();
+
+            // 5. Unrelated event still bubbles to parent
             unrelatedBtn.dispatchEvent(new Event("click", { bubbles: true }));
             expect(parentListener).toHaveBeenCalledTimes(1);
 
@@ -237,6 +241,28 @@ describe("TimbrePanels", () => {
 
             expect(removeEventListener).toHaveBeenCalledWith("change", handler);
             expect(mockWidget._eventListeners).toEqual({});
+        });
+
+        test("removes _eventHandler from active table container directly", () => {
+            const tableDiv = document.createElement("div");
+            const table = document.createElement("div");
+            table.id = "timbreTable";
+            tableDiv.appendChild(table);
+
+            const removeSpy = jest.spyOn(table, "removeEventListener");
+            const eventHandler = jest.fn();
+
+            const mockWidget = {
+                timbreTableDiv: tableDiv,
+                _eventHandler: eventHandler,
+                _eventListeners: {}
+            };
+
+            TimbrePanels.prototype._cleanupEventListeners.call(mockWidget);
+
+            expect(removeSpy).toHaveBeenCalledWith("change", eventHandler);
+            expect(removeSpy).toHaveBeenCalledWith("click", eventHandler);
+            expect(removeSpy).toHaveBeenCalledWith("input", eventHandler);
         });
     });
 });
