@@ -69,6 +69,15 @@ const HarmonyUtils = {
     STEP_LIMIT: 250,
 
     /**
+     * Normalizes a semitone count to a non-negative pitch class in 0..11.
+     * @param {number} semitones
+     * @returns {number}
+     */
+    _normalizePitchClass(semitones) {
+        return ((Math.trunc(semitones) % 12) + 12) % 12;
+    },
+
+    /**
      * Names the perfect interval between two frequencies, within
      * PERFECT_TOLERANCE cents.
      * @param {number} lowFreq
@@ -106,6 +115,9 @@ const HarmonyUtils = {
         }
 
         const played = highFreq / lowFreq;
+        if (!(played > 0) || !Number.isFinite(played)) {
+            return null;
+        }
         const semitones = Math.round(12 * Math.log2(played));
         let octaves = Math.floor(semitones / 12);
         const simple = semitones - 12 * octaves;
@@ -136,7 +148,10 @@ const HarmonyUtils = {
      *     and `root` is the matching pitch class, or null if nothing matches.
      */
     findChord(pitchClasses) {
-        const unique = [...new Set(pitchClasses)];
+        const valid = (Array.isArray(pitchClasses) ? pitchClasses : [])
+            .filter(pc => typeof pc === "number" && Number.isFinite(pc))
+            .map(pc => HarmonyUtils._normalizePitchClass(pc));
+        const unique = [...new Set(valid)];
         if (unique.length < 3) {
             return null;
         }
@@ -155,7 +170,7 @@ const HarmonyUtils = {
 
             for (const root of unique) {
                 const relative = unique
-                    .map(pc => (((pc - root) % 12) + 12) % 12)
+                    .map(pc => HarmonyUtils._normalizePitchClass(pc - root))
                     .sort((a, b) => a - b)
                     .join(",");
                 if (relative === shape) {
@@ -185,21 +200,25 @@ const HarmonyUtils = {
         }
 
         const bass = sorted[0];
-        const intervals = sorted
-            .slice(1)
-            .map(voice =>
-                Object.assign(
-                    { from: bass.label, to: voice.label },
-                    HarmonyUtils.describeInterval(bass.frequency, voice.frequency)
-                )
-            );
+        const intervals = [];
+        const pitchClasses = [0];
+        const chordVoices = [bass];
+        for (const voice of sorted.slice(1)) {
+            const described = HarmonyUtils.describeInterval(bass.frequency, voice.frequency);
+            if (!described || !Number.isFinite(described.semitones)) {
+                continue;
+            }
+            intervals.push(Object.assign({ from: bass.label, to: voice.label }, described));
+            pitchClasses.push(HarmonyUtils._normalizePitchClass(described.semitones));
+            chordVoices.push(voice);
+        }
 
-        const pitchClasses = [0].concat(intervals.map(interval => interval.semitones % 12));
         const found = HarmonyUtils.findChord(pitchClasses);
         let chord = null;
         if (found) {
-            const rootVoice = sorted[pitchClasses.indexOf(found.root)];
-            chord = { name: found.name, root: rootVoice.label };
+            const rootIdx = pitchClasses.indexOf(found.root);
+            const rootVoice = rootIdx !== -1 ? chordVoices[rootIdx] : null;
+            chord = { name: found.name, root: rootVoice?.label ?? "" };
         }
 
         return { voices: sorted, intervals, chord };
@@ -284,7 +303,10 @@ const HarmonyUtils = {
         if (HarmonyUtils.perfectKind(1, interval.played)) {
             return "perfect";
         }
-        const simple = ((interval.semitones % 12) + 12) % 12;
+        if (!Number.isFinite(interval.semitones)) {
+            return null;
+        }
+        const simple = HarmonyUtils._normalizePitchClass(interval.semitones);
         return [3, 4, 8, 9].includes(simple) ? "imperfect" : "dissonant";
     },
 

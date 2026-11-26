@@ -92,6 +92,11 @@ describe("HarmonyUtils.describeInterval", () => {
         expect(HarmonyUtils.describeInterval(Infinity, E4)).toBeNull();
         expect(HarmonyUtils.describeInterval(undefined, E4)).toBeNull();
     });
+
+    it("returns null when the frequency ratio overflows or underflows", () => {
+        expect(HarmonyUtils.describeInterval(1e-308, 1e308)).toBeNull();
+        expect(HarmonyUtils.describeInterval(1e308, 1e-308)).toBeNull();
+    });
 });
 
 describe("HarmonyUtils.findChord", () => {
@@ -122,6 +127,13 @@ describe("HarmonyUtils.findChord", () => {
     it("returns null for dyads and unknown shapes", () => {
         expect(HarmonyUtils.findChord([0, 4])).toBeNull();
         expect(HarmonyUtils.findChord([0, 1, 2])).toBeNull();
+    });
+
+    it("normalizes negative pitch classes, filters non-finite values, and handles non-arrays", () => {
+        expect(HarmonyUtils.findChord([0, -8, -5])).toEqual({ name: "major", root: 0 });
+        expect(HarmonyUtils.findChord([0, 4, NaN, 7])).toEqual({ name: "major", root: 0 });
+        expect(HarmonyUtils.findChord(null)).toBeNull();
+        expect(HarmonyUtils.findChord(undefined)).toBeNull();
     });
 });
 
@@ -169,6 +181,82 @@ describe("HarmonyUtils.analyze", () => {
         ]);
         expect(result.intervals).toHaveLength(1);
         expect(result.intervals[0].name).toBe("major 3");
+        expect(result.chord).toBeNull();
+    });
+
+    it("filters null or non-finite interval results without breaking chord voice alignment", () => {
+        const spy = jest.spyOn(HarmonyUtils, "describeInterval");
+        spy.mockImplementationOnce(() => null)
+            .mockImplementationOnce(() => ({ name: "minor 3", semitones: 3, played: 1.2 }))
+            .mockImplementationOnce(() => ({ name: "minor 6", semitones: 8, played: 1.6 }))
+            .mockImplementationOnce(() => ({ name: "invalid", semitones: NaN, played: 1 }));
+
+        try {
+            const result = HarmonyUtils.analyze([
+                { label: "E4", frequency: E4 },
+                { label: "SKIP", frequency: E4 + 1 },
+                { label: "G4", frequency: G4 },
+                { label: "C5", frequency: 2 * C4 },
+                { label: "BAD", frequency: 2 * E4 }
+            ]);
+
+            expect(result.intervals).toHaveLength(2);
+            expect(result.chord).toEqual({ name: "major", root: "C5" });
+        } finally {
+            spy.mockRestore();
+        }
+    });
+
+    it("normalizes negative semitones when computing chord pitch classes", () => {
+        const spy = jest.spyOn(HarmonyUtils, "describeInterval");
+        spy.mockImplementationOnce(() => ({
+            name: "minor 6",
+            semitones: -8,
+            played: 0.63
+        })).mockImplementationOnce(() => ({ name: "perfect 4", semitones: -5, played: 0.75 }));
+
+        try {
+            const result = HarmonyUtils.analyze([
+                { label: "C4", frequency: C4 },
+                { label: "E4", frequency: E4 },
+                { label: "G4", frequency: G4 }
+            ]);
+            expect(result.chord).toEqual({ name: "major", root: "C4" });
+        } finally {
+            spy.mockRestore();
+        }
+    });
+
+    it("handles missing rootVoice label or unmatched chord root safely", () => {
+        const spy = jest.spyOn(HarmonyUtils, "findChord").mockReturnValueOnce({
+            name: "major",
+            root: 99
+        });
+        try {
+            const result = HarmonyUtils.analyze([
+                { label: "C4", frequency: C4 },
+                { label: "E4", frequency: E4 },
+                { label: "G4", frequency: G4 }
+            ]);
+            expect(result.chord).toEqual({ name: "major", root: "" });
+        } finally {
+            spy.mockRestore();
+        }
+
+        const noLabel = HarmonyUtils.analyze([
+            { frequency: C4 },
+            { label: "E4", frequency: E4 },
+            { label: "G4", frequency: G4 }
+        ]);
+        expect(noLabel.chord).toEqual({ name: "major", root: "" });
+    });
+
+    it("handles extreme frequency ratios without crashing", () => {
+        const result = HarmonyUtils.analyze([
+            { label: "LOW", frequency: 1e-308 },
+            { label: "HIGH", frequency: 1e308 }
+        ]);
+        expect(result.intervals).toEqual([]);
         expect(result.chord).toBeNull();
     });
 });
@@ -395,6 +483,13 @@ describe("HarmonyUtils.classifyConsonance", () => {
     it("returns null for an invalid interval", () => {
         expect(HarmonyUtils.classifyConsonance(null)).toBeNull();
         expect(HarmonyUtils.classifyConsonance({ played: NaN, semitones: 7 })).toBeNull();
+        expect(HarmonyUtils.classifyConsonance({ played: 1.25, semitones: NaN })).toBeNull();
+    });
+
+    it("normalizes negative semitones when classifying consonance", () => {
+        expect(HarmonyUtils.classifyConsonance({ played: 200 / 320, semitones: -8 })).toBe(
+            "imperfect"
+        );
     });
 });
 
