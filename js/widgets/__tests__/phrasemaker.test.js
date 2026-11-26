@@ -1366,6 +1366,127 @@ describe("PhraseMaker Widget", () => {
 
         phraseMaker.makeClickable();
     });
+
+    describe("note grid keyboard access", () => {
+        const makeGridCell = () => {
+            const attrs = {};
+            return {
+                style: {},
+                focus: jest.fn(),
+                setAttribute: jest.fn((name, value) => {
+                    attrs[name] = String(value);
+                }),
+                getAttribute: jest.fn(name => (name in attrs ? attrs[name] : null)),
+                addEventListener: jest.fn(),
+                removeEventListener: jest.fn()
+            };
+        };
+
+        const setupGrid = () => {
+            phraseMaker.rowLabels = ["sol", "mi"];
+            phraseMaker._rows = [
+                { cells: [makeGridCell(), makeGridCell()] },
+                { cells: [makeGridCell(), makeGridCell()] }
+            ];
+            phraseMaker._noteValueRow = { cells: [] };
+            phraseMaker._tupletValueRow = { cells: [] };
+            phraseMaker._notesToPlay = [
+                [["C"], 4],
+                [["C"], 4]
+            ];
+            phraseMaker._colBlocks = [[0, 0]];
+            phraseMaker._rowBlocks = [0, 1];
+            phraseMaker._rowMap = [0, 1];
+            phraseMaker._rowOffset = [0, 0];
+            phraseMaker._blockMap = { 0: [] };
+            phraseMaker.blockNo = 0;
+            phraseMaker._setNotes = jest.fn();
+            phraseMaker.makeClickable();
+            return phraseMaker._rows;
+        };
+
+        const keyEvent = (key, target) => ({
+            key,
+            target,
+            preventDefault: jest.fn(),
+            stopPropagation: jest.fn()
+        });
+
+        test("cells join the tab order with a single roving tab stop", () => {
+            const rows = setupGrid();
+
+            expect(rows[0].cells[0].getAttribute("tabindex")).toBe("0");
+            expect(rows[0].cells[1].getAttribute("tabindex")).toBe("-1");
+            expect(rows[1].cells[0].getAttribute("tabindex")).toBe("-1");
+            expect(rows[0].cells[0].getAttribute("role")).toBe("button");
+        });
+
+        test("Enter toggles a cell on and off like a click", () => {
+            const rows = setupGrid();
+            const cell = rows[0].cells[1];
+
+            const on = keyEvent("Enter", cell);
+            cell.onkeydown(on);
+            expect(cell.style.backgroundColor).toBe("black");
+            expect(phraseMaker._setNotes).toHaveBeenCalledWith(1, 0, true);
+            expect(on.preventDefault).toHaveBeenCalled();
+
+            cell.onkeydown(keyEvent("Enter", cell));
+            expect(cell.style.backgroundColor).not.toBe("black");
+            expect(phraseMaker._notesToPlay[1][0]).toEqual(["R"]);
+            expect(phraseMaker._setNotes).toHaveBeenCalledWith(1, 0, false);
+        });
+
+        test("Space toggles a cell too", () => {
+            const rows = setupGrid();
+            const cell = rows[1].cells[0];
+
+            cell.onkeydown(keyEvent(" ", cell));
+
+            expect(cell.style.backgroundColor).toBe("black");
+            expect(phraseMaker._setNotes).toHaveBeenCalledWith(0, 1, true);
+        });
+
+        test("arrow keys move the roving tab stop", () => {
+            const rows = setupGrid();
+            const from = rows[0].cells[0];
+            const right = rows[0].cells[1];
+            const down = rows[1].cells[1];
+
+            from.onkeydown(keyEvent("ArrowRight", from));
+            expect(from.getAttribute("tabindex")).toBe("-1");
+            expect(right.getAttribute("tabindex")).toBe("0");
+            expect(right.focus).toHaveBeenCalled();
+
+            right.onkeydown(keyEvent("ArrowDown", right));
+            expect(down.getAttribute("tabindex")).toBe("0");
+            expect(down.focus).toHaveBeenCalled();
+        });
+
+        test("arrows at the grid edge keep focus where it is", () => {
+            const rows = setupGrid();
+            const corner = rows[0].cells[0];
+
+            expect(() => {
+                corner.onkeydown(keyEvent("ArrowLeft", corner));
+                corner.onkeydown(keyEvent("ArrowUp", corner));
+            }).not.toThrow();
+            expect(corner.getAttribute("tabindex")).toBe("0");
+        });
+
+        test("unrelated keys are left for the rest of the app", () => {
+            const rows = setupGrid();
+            const cell = rows[0].cells[0];
+
+            const evt = keyEvent("a", cell);
+            cell.onkeydown(evt);
+
+            expect(evt.preventDefault).not.toHaveBeenCalled();
+            expect(evt.stopPropagation).not.toHaveBeenCalled();
+            expect(cell.style.backgroundColor).not.toBe("black");
+        });
+    });
+
     test("audio proxy methods execute", () => {
         global.PhraseMakerAudio = {
             playAll: jest.fn(),

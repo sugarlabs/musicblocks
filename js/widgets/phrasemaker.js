@@ -4271,6 +4271,49 @@ class PhraseMaker {
     }
 
     /**
+     * Toggles a note cell between selected (black) and unselected, updating
+     * the notes to play. Shared by the mouse and keyboard activation paths.
+     * @private
+     * @param {number} i - row index of the cell
+     * @param {number} j - column index of the cell
+     * @param {HTMLElement} cell - the grid cell element
+     */
+    _toggleCell(i, j, cell) {
+        if (cell.style.backgroundColor === "black") {
+            cell.style.backgroundColor = cell.getAttribute("cellColor");
+            this._notesToPlay[j][0] = ["R"];
+            if (!this._noteBlocks) this._setNotes(j, i, false);
+        } else {
+            cell.style.backgroundColor = "black";
+            if (!this._noteBlocks) this._setNotes(j, i, true);
+        }
+    }
+
+    /**
+     * Moves the roving tab stop to the note cell at (i, j) and focuses it.
+     * Targets outside the grid leave focus where it is.
+     * @private
+     * @param {number} i - row index of the destination cell
+     * @param {number} j - column index of the destination cell
+     * @param {HTMLElement} from - the cell that currently holds the tab stop
+     */
+    _focusCell(i, j, from) {
+        const row = this._rows[i];
+        if (!row || !row.cells || j < 0 || j >= row.cells.length) {
+            return;
+        }
+        const cell = row.cells[j];
+        if (!cell) {
+            return;
+        }
+        from.setAttribute("tabindex", "-1");
+        cell.setAttribute("tabindex", "0");
+        if (typeof cell.focus === "function") {
+            cell.focus();
+        }
+    }
+
+    /**
      * Makes the matrix clickable by adding event listeners to each cell.
      * When a cell is clicked, it triggers appropriate actions based on the cell's content.
      * @private
@@ -4368,6 +4411,12 @@ class PhraseMaker {
                 // Give each clickable cell a unique id
                 cell.setAttribute("data-i", i);
                 cell.setAttribute("data-j", j);
+                // Keyboard access: one roving tab stop for the whole grid,
+                // arrows move it, Enter/Space toggle like a click. A visible
+                // outline comes from the global :focus-visible rule.
+                cell.setAttribute("tabindex", i === 0 && j === 0 ? "0" : "-1");
+                cell.setAttribute("role", "button");
+                cell.setAttribute("aria-label", this.rowLabels[i] + " " + (j + 1));
 
                 isMouseDown = false;
 
@@ -4375,33 +4424,46 @@ class PhraseMaker {
                     isMouseDown = true;
                     const i = Number(evt.target.getAttribute("data-i"));
                     const j = Number(evt.target.getAttribute("data-j"));
-                    if (evt.target.style.backgroundColor === "black") {
-                        evt.target.style.backgroundColor = evt.target.getAttribute("cellColor");
-                        this._notesToPlay[j][0] = ["R"];
-                        if (!this._noteBlocks) this._setNotes(j, i, false);
-                    } else {
-                        evt.target.style.backgroundColor = "black";
-                        if (!this._noteBlocks) this._setNotes(j, i, true);
-                    }
+                    this._toggleCell(i, j, evt.target);
                 };
 
                 cell.onmouseover = evt => {
                     const i = Number(evt.target.getAttribute("data-i"));
                     const j = Number(evt.target.getAttribute("data-j"));
                     if (isMouseDown) {
-                        if (evt.target.style.backgroundColor === "black") {
-                            evt.target.style.backgroundColor = evt.target.getAttribute("cellColor");
-                            this._notesToPlay[j][0] = ["R"];
-                            if (!this._noteBlocks) this._setNotes(j, i, false);
-                        } else {
-                            evt.target.style.backgroundColor = "black";
-                            if (!this._noteBlocks) this._setNotes(j, i, true);
-                        }
+                        this._toggleCell(i, j, evt.target);
                     }
                 };
 
                 cell.onmouseup = () => {
                     isMouseDown = false;
+                };
+
+                cell.onkeydown = evt => {
+                    const i = Number(evt.target.getAttribute("data-i"));
+                    const j = Number(evt.target.getAttribute("data-j"));
+                    switch (evt.key) {
+                        case "Enter":
+                        case " ":
+                            this._toggleCell(i, j, evt.target);
+                            break;
+                        case "ArrowRight":
+                            this._focusCell(i, j + 1, evt.target);
+                            break;
+                        case "ArrowLeft":
+                            this._focusCell(i, j - 1, evt.target);
+                            break;
+                        case "ArrowDown":
+                            this._focusCell(i + 1, j, evt.target);
+                            break;
+                        case "ArrowUp":
+                            this._focusCell(i - 1, j, evt.target);
+                            break;
+                        default:
+                            return;
+                    }
+                    evt.preventDefault();
+                    evt.stopPropagation();
                 };
             }
         }
