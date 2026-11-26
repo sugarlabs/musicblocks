@@ -193,6 +193,39 @@ describe("loader.js coverage", () => {
         expect(mockI18next.t).toHaveBeenCalled();
     });
 
+    test("Sets the page language and keeps it in step with language changes", async () => {
+        Object.defineProperty(document, "readyState", {
+            value: "complete",
+            configurable: true
+        });
+        document.documentElement.lang = "en";
+        mockI18next.language = "ar";
+        mockI18next.resolvedLanguage = "ar";
+
+        await loadScript();
+        expect(document.documentElement.lang).toBe("ar");
+
+        const onCall = mockI18next.on.mock.calls.find(call => call[0] === "languageChanged");
+        mockI18next.language = "zh_CN";
+        mockI18next.resolvedLanguage = "zh_CN";
+        onCall[1]();
+        expect(document.documentElement.lang).toBe("zh-CN");
+    });
+
+    test("Keeps the page language as English when the requested language has no locale", async () => {
+        Object.defineProperty(document, "readyState", {
+            value: "complete",
+            configurable: true
+        });
+        document.documentElement.lang = "en";
+        // A Chinese browser asks for "zh", but only zh_CN and zh_TW exist, so English is shown.
+        mockI18next.language = "zh";
+        mockI18next.resolvedLanguage = "en";
+
+        await loadScript();
+        expect(document.documentElement.lang).toBe("en");
+    });
+
     test("Triggering languageChanged event updates content", async () => {
         await loadScript();
 

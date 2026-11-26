@@ -95,14 +95,29 @@ button.project-icon {
 	color: #343434;
 }
 
+.global-share-container {
+	position: relative;
+}
+
 .share-card {
 	position: absolute;
 	z-index: 200;
-	left: 50%;
-	-webkit-transform: translateX(-50%);
-	-ms-transform: translateX(-50%);
-	transform: translateX(-50%);
-	min-width: 350px;
+	right: 0;
+	left: auto;
+	width: 350px;
+	max-width: calc(100vw - 24px);
+	max-height: calc(100vh - 24px);
+	overflow-y: auto;
+}
+
+.share-card-below {
+	top: calc(100% + 8px);
+	bottom: auto;
+}
+
+.share-card-above {
+	top: auto;
+	bottom: calc(100% + 8px);
 }
 
 .shareurltext {
@@ -318,11 +333,15 @@ div.select-wrapper * {
 	align-items: center;
 }
 
-#search-close {
+#search-close,
+#search-close-2 {
 	display: none;
+	cursor: pointer;
+}
+
+#search-close {
 	position: absolute;
 	top: -4px;
-	cursor: pointer;
 }
 
 #localglobal {
@@ -465,8 +484,10 @@ a {
 	.input-field-2 {
        display: flex;
 	}
-	#two-header.nav-extended.light-green.lighten-1{
+	#two_header.nav-extended.light-green.lighten-1{
 		position: relative;
+		top: 0;
+		z-index: 99;
 	}
 	.input-field-2.search{
 		position: absolute;
@@ -569,6 +590,11 @@ a {
     z-index: 5;
 }
 
+#globalcontents .card.share-popup-open {
+	position: relative;
+	z-index: 10;
+}
+
 @media (prefers-reduced-motion: reduce) {
     #globalcontents .card,
     #local-projects .card {
@@ -656,4 +682,25 @@ a {
 @keyframes mb-fadein {
     from { opacity: 0.3; }
     to   { opacity: 1;   }
+}
+.planet-toast {
+    position: fixed;
+    z-index: 10000;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-sizing: border-box;
+    width: max-content;
+    max-width: calc(100% - 32px);
+    padding: 10px 20px;
+    border-radius: 4px;
+    background: #323232;
+    color: #fff;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.26);
+}
+
+.planet-toast-error {
+    background: #d32f2f;
 }

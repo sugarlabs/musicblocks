@@ -77,7 +77,7 @@ jobs:
 
               // Check that the MusicBlocks Project Screenshot section has an actual image or screen-recording attachment.
               // Strip the heading itself, HTML comments, and template separators (e.g. ---).
-              const screenshotMatch = prBody.match(/##\s*MusicBlocks Project Screenshot or Screen-Recording\s*[\r\n]+([\s\S]*?)(?=\n##\s|\s*$)/i);
+              const screenshotMatch = prBody.match(/##\s*MusicBlocks Project Screenshot or Screen-Recording(?:\s*\[[^\]\r\n]*\])?\s*[\r\n]+([\s\S]*?)(?=\n##\s|\s*$)/i);
               const screenshotRaw = screenshotMatch ? screenshotMatch[1] : '';
               const screenshotContent = screenshotRaw
                 .replace(/<!--[\s\S]*?-->/g, '')
@@ -164,6 +164,13 @@ jobs:
                 displayName: 'i18n',
                 pattern: /-\s*\[x\]\s*i18n/i,
               },
+              {
+                label: 'other',
+                color: '64748B',
+                description: 'Changes not covered by the other PR categories',
+                displayName: 'Other',
+                pattern: /-\s*\[x\]\s*Other/i,
+              },
             ];
 
             const checkedCategories = categories.filter(cat => cat.pattern.test(prBody));
@@ -192,6 +199,7 @@ jobs:
                 '| CI/CD | Changes to CI/CD workflows and automation |',
                 '| UI/UX | Changes to the user interface or user experience |',
                 '| i18n | Internationalization and localization changes |',
+                '| Other | Changes not covered by the other PR categories |',
                 '',
                 'Example: Change `- [ ] Bug Fix` to `- [x] Bug Fix`',
                 '',

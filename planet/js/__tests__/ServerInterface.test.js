@@ -372,6 +372,37 @@ describe("ServerInterface", () => {
     });
 
     describe("endpoint methods", () => {
+        it("aborts a stalled visibility request and reports failure", async () => {
+            jest.useFakeTimers();
+            server.getKey = jest.fn().mockReturnValue("owner-key");
+            const callback = jest.fn();
+            const originalFetch = global.fetch;
+            global.fetch = jest.fn(
+                (url, options) =>
+                    new Promise((resolve, reject) => {
+                        options.signal.addEventListener("abort", () =>
+                            reject(new DOMException("Aborted", "AbortError"))
+                        );
+                    })
+            );
+
+            try {
+                const request = server.toggleProjectVisibility("project", false, callback);
+                jest.advanceTimersByTime(server.RequestTimeout);
+                await request;
+
+                expect(global.fetch.mock.calls[0][1].method).toBe("PUT");
+                expect(global.fetch.mock.calls[0][1].signal.aborted).toBe(true);
+                expect(callback).toHaveBeenCalledWith({
+                    success: false,
+                    error: "VISIBILITY_UPDATE_FAILED"
+                });
+            } finally {
+                global.fetch = originalFetch;
+                jest.useRealTimers();
+            }
+        });
+
         it("should call addProject using POST /create", async () => {
             const callback = jest.fn();
             const projectData = { ProjectName: "Test", ProjectData: "{}" };

@@ -584,6 +584,12 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
     function updateContent() {
         if (!i18next.isInitialized) return;
         const lang = i18next.language;
+        // Screen readers pick their voice from the page language. Use the language
+        // that is actually shown (a browser language with no locale file falls back
+        // to English). Locale files use underscores (zh_CN); lang needs hyphens.
+        if (i18next.resolvedLanguage) {
+            document.documentElement.lang = i18next.resolvedLanguage.replace(/_/g, "-");
+        }
         const elements = document.querySelectorAll("[data-i18n]");
         elements.forEach(element => {
             const key = element.getAttribute("data-i18n");

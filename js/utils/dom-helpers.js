@@ -241,7 +241,8 @@ function downloadTextFile(content, filename) {
 /**
  * Builds an export/import popup anchored to a toolbar button. Clicking
  * the button again (existing popup found), choosing an item, or clicking
- * outside closes it.
+ * outside closes it. Supports keyboard navigation (Escape dismissal,
+ * Arrow/Home/End cycling, Enter/Space activation) and sets ARIA menu semantics.
  * @param {string} popupId - The DOM id for the popup element.
  * @param {Array} items - [label, handler] pairs, one per menu item.
  * @param {HTMLElement} anchor - The button the popup is anchored to.
@@ -255,19 +256,58 @@ function createSharePopup(popupId, items, anchor) {
 
     const popup = document.createElement("div");
     popup.id = popupId;
+    popup.setAttribute("role", "menu");
+    const anchorLabel =
+        (anchor && typeof anchor.getAttribute === "function"
+            ? anchor.getAttribute("aria-label") || anchor.getAttribute("title")
+            : "") || anchor?.id;
+    if (anchorLabel) {
+        popup.setAttribute("aria-label", anchorLabel);
+    }
     popup.style.cssText =
         "position:fixed;z-index:99999;background:var(--color-bg-primary);" +
         "color:var(--color-text-primary);border:1px solid var(--color-border-primary);" +
         "border-radius:var(--radius-md);box-shadow:var(--shadow-md);padding:4px 0;" +
         "min-width:140px;";
-    const rect = anchor.getBoundingClientRect();
+    const rect =
+        anchor && typeof anchor.getBoundingClientRect === "function"
+            ? anchor.getBoundingClientRect()
+            : { left: 0, bottom: 0 };
     popup.style.top = rect.bottom + 4 + "px";
     popup.style.left = rect.left + "px";
+
+    if (anchor && typeof anchor.setAttribute === "function") {
+        anchor.setAttribute("aria-haspopup", "menu");
+        anchor.setAttribute("aria-expanded", "true");
+    }
+
+    const itemElements = [];
+
+    const cleanup = (restoreFocus = true) => {
+        if (popup._keydownHandler) {
+            if (typeof window !== "undefined" && typeof window.removeEventListener === "function") {
+                window.removeEventListener("keydown", popup._keydownHandler, true);
+            }
+            document.removeEventListener("keydown", popup._keydownHandler, true);
+            document.removeEventListener("keydown", popup._keydownHandler);
+        }
+        if (popup._closeHandler) {
+            document.removeEventListener("mousedown", popup._closeHandler);
+        }
+        if (anchor && typeof anchor.setAttribute === "function") {
+            anchor.setAttribute("aria-expanded", "false");
+        }
+        if (restoreFocus && anchor && typeof anchor.focus === "function") {
+            anchor.focus();
+        }
+        popup.remove();
+    };
+    popup._cleanup = cleanup;
 
     const addItem = (label, handler) => {
         const item = document.createElement("div");
         item.textContent = label;
-        item.setAttribute("role", "button");
+        item.setAttribute("role", "menuitem");
         item.setAttribute("tabindex", "0");
         item.style.cssText = "padding:6px 16px;cursor:pointer;";
         item.onmouseenter = () => {
@@ -277,43 +317,103 @@ function createSharePopup(popupId, items, anchor) {
             item.style.background = "";
         };
         item.onclick = () => {
-            cleanup();
+            cleanup(true);
             handler();
         };
         item.onkeydown = e => {
             if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                cleanup();
+                cleanup(true);
                 handler();
+            } else if (e.key === "Escape") {
+                e.preventDefault();
+                if (typeof e.stopImmediatePropagation === "function") {
+                    e.stopImmediatePropagation();
+                } else if (typeof e.stopPropagation === "function") {
+                    e.stopPropagation();
+                }
+                cleanup(true);
+            } else if (e.key === "ArrowDown") {
+                e.preventDefault();
+                const idx = itemElements.indexOf(item);
+                const nextIdx = (idx + 1) % itemElements.length;
+                if (typeof itemElements[nextIdx].focus === "function") {
+                    itemElements[nextIdx].focus();
+                }
+            } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                const idx = itemElements.indexOf(item);
+                const prevIdx = (idx - 1 + itemElements.length) % itemElements.length;
+                if (typeof itemElements[prevIdx].focus === "function") {
+                    itemElements[prevIdx].focus();
+                }
+            } else if (e.key === "Home") {
+                e.preventDefault();
+                if (itemElements[0] && typeof itemElements[0].focus === "function") {
+                    itemElements[0].focus();
+                }
+            } else if (e.key === "End") {
+                e.preventDefault();
+                const lastIdx = itemElements.length - 1;
+                if (itemElements[lastIdx] && typeof itemElements[lastIdx].focus === "function") {
+                    itemElements[lastIdx].focus();
+                }
+            } else if (e.key === "Tab") {
+                cleanup(false);
             }
         };
         return item;
     };
 
     for (const [label, handler] of items) {
-        popup.appendChild(addItem(label, handler));
+        const item = addItem(label, handler);
+        itemElements.push(item);
+        popup.appendChild(item);
     }
     document.body.appendChild(popup);
 
-    const cleanup = () => {
-        popup.remove();
-        document.removeEventListener("mousedown", closeHandler);
-    };
-
     const closeHandler = e => {
         if (!popup.contains(e.target) && !anchor.contains?.(e.target)) {
-            cleanup();
+            cleanup(false);
         }
     };
     popup._closeHandler = closeHandler;
     document.addEventListener("mousedown", closeHandler);
+
+    const keydownHandler = e => {
+        if (!document.body.contains(popup)) {
+            cleanup(false);
+            return;
+        }
+        if (e.key === "Escape") {
+            e.preventDefault();
+            if (typeof e.stopImmediatePropagation === "function") {
+                e.stopImmediatePropagation();
+            } else if (typeof e.stopPropagation === "function") {
+                e.stopPropagation();
+            }
+            cleanup(true);
+        }
+    };
+    popup._keydownHandler = keydownHandler;
+    if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+        window.addEventListener("keydown", keydownHandler, true);
+    }
+    document.addEventListener("keydown", keydownHandler, true);
+    document.addEventListener("keydown", keydownHandler);
+
+    if (itemElements.length > 0 && typeof itemElements[0].focus === "function") {
+        itemElements[0].focus();
+    }
+
     return popup;
 }
 
 /**
  * Closes a share popup opened by createSharePopup: removes it from the
- * DOM and unregisters its document mousedown listener. No-op when no
- * popup with that id exists (e.g. widget teardown with popup closed).
+ * DOM and unregisters its document mousedown and keydown listeners. Resets
+ * anchor aria-expanded state. No-op when no popup with that id exists
+ * (e.g. widget teardown with popup closed).
  * @param {string} popupId - The DOM id of the popup element.
  * @returns {void}
  */
@@ -322,8 +422,19 @@ function closeSharePopup(popupId) {
     if (!existing) {
         return;
     }
+    if (typeof existing._cleanup === "function") {
+        existing._cleanup(false);
+        return;
+    }
     if (existing._closeHandler) {
         document.removeEventListener("mousedown", existing._closeHandler);
+    }
+    if (existing._keydownHandler) {
+        if (typeof window !== "undefined" && typeof window.removeEventListener === "function") {
+            window.removeEventListener("keydown", existing._keydownHandler, true);
+        }
+        document.removeEventListener("keydown", existing._keydownHandler, true);
+        document.removeEventListener("keydown", existing._keydownHandler);
     }
     existing.remove();
 }

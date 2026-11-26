@@ -323,43 +323,120 @@
 	    modes. You invoke the widget with the <em>Custom mode</em> block. The mode
 	    specified in the <em>Set key</em> block will be the default mode when the
 	    widget launches.</p>
-	  <p><img alt="widget" src="./mode2.svg" title="launching widget with Major mode" /></p>
+	  <p><img alt="widget" src="./mode_scalar_overview.svg" title="mode widget overview" /></p>
 	  <p>In the above example, the widget has been launched with <em>Major</em> mode
 	    (the default). Note that the notes included in the mode are indicated
 	    by the protruding sectors with 'X's, which are arrayed in a circular
-	    pattern of twelve half-steps to complete the octave.</p>
-	  <p>Since the intervals in the <em>Major</em> mode are <code>2, 2, 1, 2, 2, 2, 1</code>, the
-	    notes are <code>0</code>, <code>2</code>, <code>4</code>, <code>5</code>, <code>7</code>, <code>9</code>,<code>11</code>, and <code>12</code> (one octave
-	    above <code>0</code>).</p>
-	  <p>The widget controls run along the toolbar at the top. From left to
-	    right are:</p>
-	  <p><em>Play all</em>, which will play a scale using the current mode;</p>
-	  <p><em>Save</em>, which will save the current mode as the <em>Custom</em> mode and save
-	    a stack of <em>Pitch</em> blocks that can be used with the <em>Phrase Maker</em> block;</p>
+	    pattern. The number of slices in the wheel matches the current EDO
+	    setting (12 by default).</p>
+	  <p>In 12-EDO, the intervals in the <em>Major</em> mode are <code>2, 2, 1, 2, 2, 2,
+	      1</code> (half-steps), so the notes are <code>0</code>, <code>2</code>, <code>4</code>, <code>5</code>, <code>7</code>, <code>9</code>, <code>11</code>,
+	    and <code>12</code> (one octave above <code>0</code>). Other EDOs use different step counts
+	    that sum to their respective division count.</p>
+	  <p>The widget controls are arranged in two areas. The left column contains:</p>
+	  <p><em>Play</em>, which will play a scale using the current mode;</p>
+	  <p><em>Clear</em>, which will remove all non-root selections while keeping
+	    the root note selected;</p>
 	  <p><em>Rotate counter-clockwise</em>, which will rotate the mode
-	    counter-clockwise (See the example below);</p>
-	  <p><em>Rotate clockwise</em>, which will rotate the mode clockwise (See the
-	    example below);</p>
-	  <p><em>Invert</em>, which will invert the mode (See the example below);</p>
+	    counter-clockwise (for example, rotating <em>Major</em> counter-clockwise
+	    transforms it into <em>Dorian</em>);</p>
+	  <p><em>Rotate clockwise</em>, which will rotate the mode clockwise (for
+	    example, rotating <em>Major</em> clockwise transforms it into <em>Locrian</em>);</p>
+	  <p><em>Invert</em>, which will invert the mode (for example, inverting
+	    <em>Major</em> transforms it into <em>Phrygian</em>);</p>
 	  <p><em>Undo</em>, which will restore the mode to the previous version; and</p>
-	  <p><em>Close</em>, which will close the widget.</p>
-	  <p>You can also click on individual notes to activate or deactivate them.</p>
+	  <p><em>Share</em>.</p>
+	  <p>The bottom row contains:</p>
+	  <p><em>Temperament</em> (hamburger icon), which opens the EDO/Temperament
+	    dropdown to control how the octave is divided;</p>
+	  <p><em>Mode menu</em> (pie-chart icon), which will open the mode selection
+	    pie menu;</p>
+	  <p><em>Name field</em>, where you can type a name for a custom mode before
+	    saving;</p>
+	  <p><em>Save</em>, which will save the current mode as a custom mode and export
+	    an <em>Action</em> block and a <em>Define Mode</em> block to the workspace; and</p>
+	  <p><em>Delete</em>, which will remove the currently loaded custom mode from
+	    saved modes.</p>
+	  <p><img alt="widget" src="./mode_scalar_edo_dropdown.svg" title="EDO/Temperament dropdown" /></p>
+	  <p>For equal-temperament choices, the <em>EDO/Temperament</em> dropdown lets you select how many equal
+	    divisions the octave is split into. The default is <code>12-EDO</code> (standard
+	    Western tuning). Selecting a different tuning (the <code>5</code>, <code>7</code>, <code>17</code>, <code>19</code>, and
+	    <code>31</code> EDOs, or a non-EDO temperament) redraws the pie wheel with that many
+	    slices. The mode wheel shows numeric indices (<code>0</code>, <code>1</code>, <code>2</code>, ...) while the
+	    note wheel uses <code>x</code> markers to indicate selected scale degrees.</p>
+	  <p>Non-EDO temperaments (<em>5-limit Just Intonation</em>, <em>Pythagorean
+	    Tuning</em>, <em>1/3 Comma Meantone</em>, <em>1/4 Comma Meantone</em>) use ratio-based
+	    tuning rather than equal divisions. For these the pie wheel draws
+	    each slice roughly in proportion to that interval's real size, so a wide
+	    interval such as a major third takes up visibly more of the circle
+	    than a narrow one. The widget enforces a 12-degree minimum slice width.
+	    Narrower slices are widened, and wider slices shrink to compensate.
+	    In 1/4 Comma Meantone, this affects two slices. Each slice spans the
+	    interval from its pitch to the
+	    next, so the numeric labels sit in the centres of those intervals;
+	    equal EDOs keep evenly sized slices and their original label positions.
+	    Degree labels are hidden on slices too narrow to
+	    hold them; the <code>x</code> markers on the outer ring still show which degrees
+	    are selected.</p>
+	  <p>State is cached per-EDO when switching between equally-tempered
+	    settings, so switching back to a previous EDO restores your previous
+	    notes. Selecting a non-EDO temperament does not use the per-EDO cache;
+	    the switch keeps the selected mode name, reapplies that mode (replacing
+	    any edited notes), and clears undo history. Be sure to save a custom
+	    mode before switching tunings so your edits are not lost.
+	    When playing under non-EDO temperaments, frequencies
+	    are computed from the temperament's ratios rather than
+	    equal-temperament formulas.</p>
+	  <p>A custom mode also remembers the tuning it was saved in. Opening a
+	    mode with a different EDO adopts that mode's EDO and saved
+	    temperament when the saved temperament serves the mode's pitch
+	    count. If it does not, the widget falls back to equal divisions of
+	    that EDO. When the mode's pitch count already matches the current
+	    tuning, the widget keeps the current tuning, even if that is a
+	    non-EDO temperament. The exception is a valid saved temperament
+	    that differs from the current tuning: the widget restores that
+	    saved temperament.</p>
+	  <p><img alt="widget" src="./mode_scalar_21edo.svg" title="widget with 1/4 Comma Meantone selected" /></p>
+	  <p>In the above example, the widget has been switched to the <em>1/4 Comma
+	    Meantone</em> temperament, which uses 21 pitches per octave based on
+	    ratio-based tuning. The pie wheel now shows more slices, allowing
+	    finer-grained mode construction.</p>
+	  <p>You can click on individual non-root notes to activate or deactivate them. The root note remains selected and cannot be deactivated.</p>
+	  <p>The <em>Mode menu</em> button opens a two-ring pie menu for selecting
+	    built-in and saved custom modes:</p>
+	  <p><img alt="widget" src="./mode_scalar_pie_menu.svg" title="mode pie menu" /></p>
+	  <p>The inner ring shows mode categories grouped by note count: <code>5</code>, <code>6</code>,
+	    <code>7</code>, <code>7a</code>, <code>7b</code>, <code>8</code>, <code>12</code>, and <code>custom</code> (your saved modes). The
+	    outer ring shows the modes within the selected category, with names
+	    like <em>major</em>, <em>minor</em>, <em>Dorian</em>, etc. Clicking a mode applies it to
+	    the wheel immediately. Use the <em>Play</em> button to hear the scale.</p>
+	  <p>To save a custom mode, adjust the notes on the wheel, then type a name
+	    in the <em>Name</em> field and click <em>Save</em>. Enter the name last:
+	    every change to the notes re-checks the mode name, which can clear the
+	    <em>Name</em> field or replace it with the name of a matching mode.
+	    Saving exports two blocks to
+	    the workspace: an <em>Action</em> block containing the mode pattern and a
+	    <em>Define Mode</em> block that registers it. Saved custom modes appear in
+	    the mode pie menu under the <code>custom</code> category in the inner ring. To
+	    delete a saved custom mode, load it via the pie menu and click
+	    <em>Delete</em>. The <code>custom</code> category shows at most 12 saved modes.
+	    Further modes are still saved, but they cannot be loaded or deleted
+	    through the menu until an earlier custom mode is deleted.</p>
 	  <p>Note that the mode inside the <em>Custom mode</em> block is updated whenever
 	    the mode is changed inside the widget.</p>
-	  <p><img alt="widget" src="./mode3.svg" title="creating Dorian mode" /></p>
-	  <p>In the above example, the <em>Major</em> mode has been rotated counter-clockwise,
-	    transforming it into <em>Dorian</em>.</p>
-	  <p><img alt="widget" src="./mode4.svg" title="creating Locrian mode" /></p>
-	  <p>In the above example, the <em>Major</em> mode has been rotated
-	    clockwise, transforming it into <em>Locrian</em>.</p>
-	  <p><img alt="widget" src="./mode5.svg" title="creating Phrygian mode" /></p>
-	  <p>In the above example, the <em>Major</em> mode has been inverted, transforming
-	    it into <em>Phrygian</em>.</p>
 	  <p>Note: The build-in modes in Music Blocks can be found in
 	    <a href="https://github.com/sugarlabs/musicblocks/blob/master/js/utils/musicutils.js#L68">musicutils.js</a>.</p>
 	  <p><img alt="widget" src="./mode6.svg" title="phrase maker block" /></p>
-	  <p>The <em>Save</em> button exports a stack of blocks representing the mode that
-	    can be used inside the <em>Phrase maker</em> block.
+	  <p>The <em>Save</em> button creates an <em>Action</em> block and a
+	    <em>Define Mode</em> block on the workspace. They are named from the mode
+	    label shown in the widget, which includes the current key (for example,
+	    saving a mode called <code>foo</code> in the key of C creates blocks named
+	    <code>C foo</code>). The <em>Action</em> block contains the
+	    mode pattern and can be used with the <em>Phrase Maker</em> block or any
+	    pitch stack. The <em>Define Mode</em> block can register the custom mode
+	    when it is run. Saving also registers the mode in the current session, so
+	    you can use it with the <em>Set Key</em> block without first running
+	    <em>Define Mode</em>.
 	    <a href="https://musicblocks.sugarlabs.org/index.html?id=1725877046734200&amp;run=True">RUN LIVE</a></p>
 	  <h3><a name="meters">4.5 Meters</a></h3>
 	  <p><img alt="widget" src="./meter1.svg" title="meter widget block" /></p>

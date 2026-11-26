@@ -372,12 +372,36 @@ const PracticeValidator = {
 
     hasChangedPitchOctave(expectedOctaves) {
         if (Array.isArray(expectedOctaves)) {
-            const currentOctaves = this.getPitchOctaves();
-            const baselineOctaves = [...expectedOctaves].sort((a, b) => a - b);
-            return JSON.stringify(currentOctaves) !== JSON.stringify(baselineOctaves);
+            return this.hasMovedOctave(this.getPitchOctaves(), expectedOctaves);
         }
 
         return this.getPitchOctaves().some(octave => octave !== 4);
+    },
+
+    // Adding or deleting a note changes how many notes there are, not where they sit. A note
+    // has moved when it lands in an octave the starter never used, or when one octave gains
+    // a note while another loses one.
+    hasMovedOctave(currentOctaves, baselineOctaves) {
+        const countByOctave = octaves => {
+            const counts = new Map();
+            octaves.forEach(octave => counts.set(octave, (counts.get(octave) || 0) + 1));
+            return counts;
+        };
+        const current = countByOctave(currentOctaves);
+        const baseline = countByOctave(baselineOctaves);
+        let gained = false;
+        let lost = false;
+
+        for (const [octave, count] of current) {
+            if (!baseline.has(octave)) return true;
+            if (count > baseline.get(octave)) gained = true;
+        }
+
+        for (const [octave, count] of baseline) {
+            if ((current.get(octave) || 0) < count) lost = true;
+        }
+
+        return gained && lost;
     },
 
     getPitchOctaves() {

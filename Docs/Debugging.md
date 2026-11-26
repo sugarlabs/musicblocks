@@ -1,4 +1,4 @@
-﻿# Debugging in Music Blocks
+# Debugging in Music Blocks
 
 *Learning is hard fun.*&mdash;Marvin Minsky
 
@@ -76,13 +76,13 @@ the *Print* block, except it only prints a message when the program is
 being run in *Playback Slow* mode (See below). Comments are also
 written to the browser console. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732825564345176&run=True)
 
-![Comment Block](./images/Comment_block_DebuggingMd.svg "Comment Block")
+![Comment Block](../images/Comment_block_DebuggingMd.svg "Comment Block")
 
 ## <a>3. Status Widget</a>
 
 [Back to Table of Contents](#table-of-contents)
 
-![Status Widget Block](./images/Status_widget_debuggingMd.svg "Status Widget Block")
+![Status Widget Block](../images/Status_widget_debuggingMd.svg "Status Widget Block")
 
 ![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/images/status_example_debug_guide.png "Status in tabular form")
 
@@ -97,7 +97,7 @@ skip, [staccato](#MORE-TRANSFORMATIONS),
 [slur](#MORE-TRANSFORMATIONS), and [graphics](#GRAPHICS) factors,
 e.g., x, y, heading, color, shade, grey, and pensize.
 
-![Additional Programming within the Status Widget Block](./images/Status_Widget_additional_programming_DebuggingMd.svg "Additional Programming within the Status Widget Block")
+![Additional Programming within the Status Widget Block](../images/Status_Widget_additional_programming_DebuggingMd.svg "Additional Programming within the Status Widget Block")
 
 You can do additional programming within the status block. In the
 example above, `whole notes played` is multiplied by `4` (e.g. quarter notes)

@@ -560,6 +560,8 @@ describe("setupWidgetBlocks", () => {
             runBlock(widget([], []));
 
             expect(logo.inPitchDrumMatrix).toBe(true);
+            // So the selected cells are saved on this block.
+            expect(logo.pitchDrumMatrix.blockNo).toBe("pdmBlk");
             expect(logo.setDispatchBlock).toHaveBeenCalledWith("pdmBlk", 0, "_pitchdrummatrix_0");
         });
 
@@ -1370,6 +1372,25 @@ describe("setupWidgetBlocks", () => {
             expect(global.ReflectionMatrix).toHaveBeenCalledTimes(1);
             expect(logo.reflection.init).toHaveBeenCalledTimes(1);
             expect(logo.inReflectionMatrix).toBe(false);
+        });
+
+        it("leaves the Status widget's fields alone", () => {
+            const reflection = getBlock("reflection");
+            const fields = [
+                ["xBlk", "x"],
+                ["bpmBlk", "bpm"]
+            ];
+            logo.statusFields = fields;
+
+            reflection.flow(["childBlk"], logo, 0, "reflBlk", "received");
+            reflection.flow(["childBlk"], logo, 0, "reflBlk");
+            logo.setTurtleListener.mock.calls[0][2]();
+
+            expect(logo.statusFields).toBe(fields);
+            expect(logo.statusFields).toEqual([
+                ["xBlk", "x"],
+                ["bpmBlk", "bpm"]
+            ]);
         });
     });
 

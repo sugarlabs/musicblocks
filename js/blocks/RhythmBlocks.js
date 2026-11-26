@@ -550,8 +550,11 @@ function setupRhythmBlocks(activity) {
             if (args[1] === undefined) return;
 
             let factor = args[0];
-            if (factor === null || typeof factor !== "number" || factor <= 0) {
+            if (factor === null || typeof factor !== "number") {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
+                factor = 2;
+            } else if (factor <= 0) {
+                activity.errorMsg(_("Multiply note value must be greater than 0."), blk);
                 factor = 2;
             }
 
