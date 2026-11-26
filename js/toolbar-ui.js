@@ -73,6 +73,7 @@ class ToolbarUI {
         this._recordDropdownArrowClickHandler = null;
         this._recordDropdownOutsideClickHandler = null;
         this._tooltipDropdownGuardHandler = null;
+        this._dropdownTooltipObserver = null;
         this._dimTimeout = null;
     }
 
@@ -108,6 +109,10 @@ class ToolbarUI {
         if (this._tooltipDropdownGuardHandler) {
             document.removeEventListener("mouseover", this._tooltipDropdownGuardHandler, true);
             this._tooltipDropdownGuardHandler = null;
+        }
+        if (this._dropdownTooltipObserver) {
+            this._dropdownTooltipObserver.disconnect();
+            this._dropdownTooltipObserver = null;
         }
         if (this._dimTimeout) {
             clearTimeout(this._dimTimeout);
@@ -374,6 +379,39 @@ class ToolbarUI {
             e.stopImmediatePropagation();
         };
         document.addEventListener("mouseover", this._tooltipDropdownGuardHandler, true);
+
+        if (this._dropdownTooltipObserver) {
+            this._dropdownTooltipObserver.disconnect();
+            this._dropdownTooltipObserver = null;
+        }
+        if (typeof MutationObserver !== "undefined") {
+            const openDropdowns = new WeakSet();
+            this._dropdownTooltipObserver = new MutationObserver(mutations => {
+                for (let i = 0; i < mutations.length; i++) {
+                    const dropdown = mutations[i].target;
+                    const nowOpen = isDropdownOpen(dropdown);
+                    if (nowOpen && !openDropdowns.has(dropdown)) {
+                        openDropdowns.add(dropdown);
+                        document.querySelectorAll(".tooltipped").forEach(el => {
+                            if (!dropdown.contains(el)) {
+                                $j(el).trigger("mouseleave.tooltip");
+                            }
+                        });
+                    } else if (!nowOpen) {
+                        openDropdowns.delete(dropdown);
+                    }
+                }
+            });
+            document.querySelectorAll(".dropdown-content").forEach(dropdown => {
+                if (isDropdownOpen(dropdown)) {
+                    openDropdowns.add(dropdown);
+                }
+                this._dropdownTooltipObserver.observe(dropdown, {
+                    attributes: true,
+                    attributeFilter: ["style", "class"]
+                });
+            });
+        }
 
         const restoreWidgetFocus = () => {
             const focusedWindow = window.widgetWindows?.focused;

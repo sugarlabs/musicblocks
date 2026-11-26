@@ -223,5 +223,42 @@ describe("ToolbarUI tooltip dismissal", () => {
             otherBtn.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
             expect(targetListener).toHaveBeenCalledTimes(1);
         });
+
+        it("cancels outside tooltips when a dropdown opens and ignores items inside it", async () => {
+            const { otherBtn, dropdown, itemBtn } = buildToolbarDom(false);
+            const scopedToolbar = new ToolbarUI();
+            scopedToolbar.init({ beginnerMode: true });
+            calls.trigger.length = 0;
+
+            dropdown.style.display = "block";
+            await Promise.resolve();
+
+            expect(calls.trigger).toContainEqual({
+                selector: otherBtn,
+                event: "mouseleave.tooltip"
+            });
+            expect(calls.trigger).not.toContainEqual({
+                selector: itemBtn,
+                event: "mouseleave.tooltip"
+            });
+
+            scopedToolbar.dispose();
+        });
+
+        it("stops observing dropdowns after dispose()", async () => {
+            const { otherBtn, dropdown } = buildToolbarDom(false);
+            const scopedToolbar = new ToolbarUI();
+            scopedToolbar.init({ beginnerMode: true });
+            calls.trigger.length = 0;
+
+            scopedToolbar.dispose();
+            dropdown.style.display = "block";
+            await Promise.resolve();
+
+            expect(calls.trigger).not.toContainEqual({
+                selector: otherBtn,
+                event: "mouseleave.tooltip"
+            });
+        });
     });
 });
