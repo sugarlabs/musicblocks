@@ -115,27 +115,35 @@ function _createPitchBlocks(
     pitchDuration,
     keySignature,
     actionBlock,
-    inlineAccidentals
+    inlineAccidentals,
+    decoration = []
 ) {
     const duration = toFraction(pitchDuration);
-    const hiddenBlockId = blockId + 5 + (chord.length ? 3 * chord.length : 1);
+    // A staccato note is wrapped in a Staccato (newstaccato) clamp: five blocks
+    // before the note hold the clamp and its 1/32 duration, the note is the
+    // clamp's content, and a closing hidden block after it carries the stack on.
+    // abcjs reports the ABC staccato mark (".C") as decoration ["staccato"].
+    const staccato =
+        chord.length > 0 && Array.isArray(decoration) && decoration.includes("staccato");
+    const base = staccato ? blockId + 5 : blockId;
+    const hiddenBlockId = base + 5 + (chord.length ? 3 * chord.length : 1);
 
     const noteBlocks = [
         [
-            blockId,
+            base,
             ["newnote", { collapsed: true }],
             0,
             0,
-            [blockId - 1, blockId + 1, blockId + 4, hiddenBlockId]
+            [base - 1, base + 1, base + 4, hiddenBlockId]
         ],
-        [blockId + 1, "divide", 0, 0, [blockId, blockId + 2, blockId + 3]],
-        [blockId + 2, ["number", { value: duration[0] }], 0, 0, [blockId + 1]],
-        [blockId + 3, ["number", { value: duration[1] }], 0, 0, [blockId + 1]],
-        [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]]
+        [base + 1, "divide", 0, 0, [base, base + 2, base + 3]],
+        [base + 2, ["number", { value: duration[0] }], 0, 0, [base + 1]],
+        [base + 3, ["number", { value: duration[1] }], 0, 0, [base + 1]],
+        [base + 4, "vspace", 0, 0, [base, base + 5]]
     ];
 
     chord.forEach((pitch, i) => {
-        const id = blockId + 5 + 3 * i;
+        const id = base + 5 + 3 * i;
         const adjustedNote = _adjustPitch(
             pitch.name,
             keySignature,
@@ -148,7 +156,7 @@ function _createPitchBlocks(
                 0,
                 0,
                 [
-                    i === 0 ? blockId + 4 : id - 3,
+                    i === 0 ? base + 4 : id - 3,
                     id + 1,
                     id + 2,
                     i === chord.length - 1 ? null : id + 3
@@ -159,12 +167,32 @@ function _createPitchBlocks(
         );
     });
     if (chord.length === 0) {
-        noteBlocks.push([blockId + 5, "rest2", 0, 0, [blockId + 4, null]]);
+        noteBlocks.push([base + 5, "rest2", 0, 0, [base + 4, null]]);
     }
 
-    noteBlocks.push([hiddenBlockId, "hidden", 0, 0, [blockId, hiddenBlockId + 1]]);
-    actionBlock.push(...noteBlocks);
-    return noteBlocks.length;
+    // Inside a staccato clamp the note's hidden block ends the clamp's content
+    // (next = null); otherwise it carries the stack to the next element, as before.
+    noteBlocks.push([hiddenBlockId, "hidden", 0, 0, [base, staccato ? null : hiddenBlockId + 1]]);
+
+    if (!staccato) {
+        actionBlock.push(...noteBlocks);
+        return noteBlocks.length;
+    }
+
+    // The clamp's own closing hidden block is the last id, so the next element
+    // chains from it exactly as it would from a plain note's hidden block.
+    const staccatoHiddenId = hiddenBlockId + 1;
+    const staccatoBlocks = [
+        [blockId, "newstaccato", 0, 0, [blockId - 1, blockId + 1, blockId + 4, staccatoHiddenId]],
+        [blockId + 1, "divide", 0, 0, [blockId, blockId + 2, blockId + 3]],
+        [blockId + 2, ["number", { value: 1 }], 0, 0, [blockId + 1]],
+        [blockId + 3, ["number", { value: 32 }], 0, 0, [blockId + 1]],
+        [blockId + 4, "vspace", 0, 0, [blockId, base]],
+        ...noteBlocks,
+        [staccatoHiddenId, "hidden", 0, 0, [blockId, staccatoHiddenId + 1]]
+    ];
+    actionBlock.push(...staccatoBlocks);
+    return staccatoBlocks.length;
 }
 
 /**
@@ -461,7 +489,8 @@ function _processVoice(voice, blockId, staff, voiceNumber, staffRecord, voiceIdx
                 element.duration * (isSpacerRest ? 1 : (tuplets[voiceIdx]?.multiplier ?? 1)),
                 staffRecord.keySignature,
                 actionBlock,
-                accidentals
+                accidentals,
+                element.decoration
             );
 
             if (tuplets[voiceIdx] && !isSpacerRest) {

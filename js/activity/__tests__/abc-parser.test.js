@@ -1796,3 +1796,49 @@ describe("Key and meter changes inside a tune", () => {
         expectLinked(blocks);
     });
 });
+
+describe("Note decorations", () => {
+    const parse = abc => parseAndCapture(ABCJS.parseOnly(abc)[0]);
+
+    const typeOf = block => (Array.isArray(block[1]) ? block[1][0] : block[1]);
+
+    // Every block id is unique and every connection is returned by the block it
+    // points to, so the staccato clamp sits in the stack like a note does.
+    const expectLinked = blocks => {
+        const byId = new Map(blocks.map(b => [b[0], b]));
+        expect(byId.size).toBe(blocks.length);
+        blocks.forEach(block => {
+            block[4].forEach(id => {
+                if (id !== null) {
+                    expect(byId.get(id)[4]).toContain(block[0]);
+                }
+            });
+        });
+    };
+
+    // ".C" marks the first quarter note staccato; the other three are plain.
+    test("a staccato ABC note imports wrapped in a Staccato block", async () => {
+        const blocks = await parse("X:1\nM:4/4\nL:1/4\nK:C\n.C D E F|");
+
+        expect(blocksOfType(blocks, "newnote")).toHaveLength(4);
+        expect(blocksOfType(blocks, "newstaccato")).toHaveLength(1);
+    });
+
+    test("the Staccato clamp wraps a note and the stack stays linked", async () => {
+        const blocks = await parse("X:1\nM:4/4\nL:1/4\nK:C\n.C D E F|");
+        const byId = new Map(blocks.map(b => [b[0], b]));
+
+        // newstaccato clamp slot -> vspace -> the wrapped note's newnote.
+        const staccato = blocksOfType(blocks, "newstaccato")[0];
+        const clampTop = byId.get(staccato[4][2]);
+        expect(typeOf(clampTop)).toBe("vspace");
+        expect(typeOf(byId.get(clampTop[4][1]))).toBe("newnote");
+
+        expectLinked(blocks);
+    });
+
+    test("a plain tune produces no Staccato blocks", async () => {
+        const blocks = await parse("X:1\nM:4/4\nL:1/4\nK:C\nC D E F|");
+        expect(blocksOfType(blocks, "newstaccato")).toHaveLength(0);
+    });
+});
