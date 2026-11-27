@@ -181,6 +181,8 @@ function _createStaccatoBlocks(blockId, actionBlock, addNote) {
     );
 
     const noteLength = addNote(blockId + 5);
+    // _createPitchBlocks pushes the note's hidden block last. Inside the clamp
+    // nothing follows it.
     actionBlock[actionBlock.length - 1][4][1] = null;
 
     const hiddenBlockId = blockId + 5 + noteLength;
