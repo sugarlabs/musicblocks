@@ -208,6 +208,10 @@ var SELECTORSTRINGS = [
     //.TRANS: major blues scale for music
     _("major blues"),
     _("whole tone"),
+    //.TRANS: augmented (hexatonic) scale for music: alternating minor thirds and semitones
+    _("augmented"),
+    //.TRANS: Prometheus scale for music, named after a work by Scriabin
+    _("prometheus"),
     //.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "minor pentatonic"
     _("minor pentatonic"),
     //.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "major pentatonic"

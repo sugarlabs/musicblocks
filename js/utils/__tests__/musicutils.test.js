@@ -2568,6 +2568,16 @@ describe("buildScale", () => {
         expect(buildScale("F minor bebop")[0].join(" ")).toBe("F G A♭ A B♭ C D E♭ F");
     });
 
+    it("should build the augmented scale from alternating minor thirds and semitones", () => {
+        expect(buildScale("C augmented")[0].join(" ")).toBe("C E♭ E G A♭ B C");
+        expect(buildScale("F augmented")[0].join(" ")).toBe("F A♭ A C D♭ E F");
+    });
+
+    it("should build the Prometheus scale as C D E F♯ A B♭", () => {
+        expect(buildScale("C prometheus")[0].join(" ")).toBe("C D E F♯ A B♭ C");
+        expect(buildScale("F prometheus")[0].join(" ")).toBe("F G A B D E♭ F");
+    });
+
     it("should keep the old spelling when a degree needs more than a double accidental", () => {
         // Its sixth note, G♯, would need a triple sharp to be spelled as an F, so the scale is
         // left as it was.
@@ -4657,6 +4667,8 @@ describe("MUSICALMODES", () => {
         expect(sum(MUSICALMODES["minor"])).toBe(12);
         expect(sum(MUSICALMODES["dorian"])).toBe(12);
         expect(sum(MUSICALMODES["whole tone"])).toBe(12);
+        expect(sum(MUSICALMODES["augmented"])).toBe(12);
+        expect(sum(MUSICALMODES["prometheus"])).toBe(12);
     });
 
     it("should contain custom mode for user definitions", () => {

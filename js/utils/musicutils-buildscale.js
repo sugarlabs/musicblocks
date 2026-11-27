@@ -360,6 +360,12 @@ var buildScale = (keySignature, edo) => {
             letterDegrees = [0, 2, 3, 4, 4, 6];
         } else if (obj[1] === "major blues" && halfSteps.length === 6) {
             letterDegrees = [0, 1, 2, 2, 4, 5];
+        } else if (obj[1] === "augmented" && halfSteps.length === 6) {
+            // C E♭ E G A♭ B: the minor and major third share the letter E.
+            letterDegrees = [0, 2, 2, 4, 5, 6];
+        } else if (obj[1] === "prometheus" && halfSteps.length === 6) {
+            // C D E F♯ A B♭: no fifth, so the sixth note takes the A.
+            letterDegrees = [0, 1, 2, 3, 5, 6];
         }
         if (letterDegrees !== null) {
             const letters = "CDEFGAB";
