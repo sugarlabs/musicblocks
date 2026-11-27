@@ -167,6 +167,28 @@ function _createPitchBlocks(
     return noteBlocks.length;
 }
 
+// Wraps the note that addNote creates in a newstaccato clamp, laid out like the
+// staccato help macro: the note sits inside the clamp, and the clamp's own hidden
+// block leads on to the next note.
+function _createStaccatoBlocks(blockId, actionBlock, addNote) {
+    const staccato = [blockId, "newstaccato", 0, 0, [blockId - 1, blockId + 1, blockId + 4, null]];
+    actionBlock.push(
+        staccato,
+        [blockId + 1, "divide", 0, 0, [blockId, blockId + 2, blockId + 3]],
+        [blockId + 2, ["number", { value: 1 }], 0, 0, [blockId + 1]],
+        [blockId + 3, ["number", { value: 32 }], 0, 0, [blockId + 1]],
+        [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]]
+    );
+
+    const noteLength = addNote(blockId + 5);
+    actionBlock[actionBlock.length - 1][4][1] = null;
+
+    const hiddenBlockId = blockId + 5 + noteLength;
+    staccato[4][3] = hiddenBlockId;
+    actionBlock.push([hiddenBlockId, "hidden", 0, 0, [blockId, hiddenBlockId + 1]]);
+    return noteLength + 6;
+}
+
 /**
  * Links blocks into one stack hanging from a connection slot of parent:
  * each block's first connection is its previous block and its last
@@ -455,14 +477,21 @@ function _processVoice(voice, blockId, staff, voiceNumber, staffRecord, voiceIdx
                 return barAccidentals[voiceIdx][pitch.pitch];
             });
 
-            blockId += _createPitchBlocks(
-                chord,
-                blockId,
-                element.duration * (isSpacerRest ? 1 : (tuplets[voiceIdx]?.multiplier ?? 1)),
-                staffRecord.keySignature,
-                actionBlock,
-                accidentals
-            );
+            const addNote = noteId =>
+                _createPitchBlocks(
+                    chord,
+                    noteId,
+                    element.duration * (isSpacerRest ? 1 : (tuplets[voiceIdx]?.multiplier ?? 1)),
+                    staffRecord.keySignature,
+                    actionBlock,
+                    accidentals
+                );
+            // abcjs lists a note's articulation marks, such as ".C", in decoration.
+            if (chord.length > 0 && element.decoration?.includes("staccato")) {
+                blockId += _createStaccatoBlocks(blockId, actionBlock, addNote);
+            } else {
+                blockId += addNote(blockId);
+            }
 
             if (tuplets[voiceIdx] && !isSpacerRest) {
                 // abcjs can omit endTriplet when the group crosses a staff line.
