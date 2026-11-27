@@ -264,6 +264,59 @@ const _contentsEqual = (a, b) => {
     return a.type === "pitch" ? a.name === b.name && a.octave === b.octave : a.name === b.name;
 };
 
+const _noteContent = (noteEl, instrumentMap) => {
+    const unpitchedEl = noteEl.querySelector(":scope > unpitched");
+    const pitchEl = noteEl.querySelector(":scope > pitch");
+    const isRest =
+        noteEl.querySelector(":scope > rest") !== null ||
+        noteEl.querySelector(":scope > cue") !== null ||
+        (pitchEl === null && unpitchedEl === null);
+
+    if (isRest) return null;
+    if (unpitchedEl !== null) return { type: "drum", name: _drumName(noteEl, instrumentMap) };
+    return { type: "pitch", ..._pitchToNoteName(pitchEl) };
+};
+
+function _firstEndingTieStopHasStaccato(partEl, measureEl, barlineEl, content, instrumentMap) {
+    const measures = Array.from(partEl.querySelectorAll(":scope > measure"));
+    const measureIndex = measures.indexOf(measureEl);
+    for (let index = measureIndex; index < measures.length; index++) {
+        const children = measures[index].children;
+        const start = index === measureIndex ? Array.from(children).indexOf(barlineEl) + 1 : 0;
+        for (let childIndex = start; childIndex < children.length; childIndex++) {
+            const child = children[childIndex];
+            if (child.tagName === "barline") {
+                const endingType = child.querySelector(":scope > ending")?.getAttribute("type");
+                const repeatDirection = child
+                    .querySelector(":scope > repeat")
+                    ?.getAttribute("direction");
+                if (
+                    endingType === "stop" ||
+                    endingType === "discontinue" ||
+                    repeatDirection === "backward"
+                ) {
+                    return false;
+                }
+                continue;
+            }
+            if (
+                child.tagName !== "note" ||
+                child.querySelector(":scope > chord, :scope > grace") !== null
+            ) {
+                continue;
+            }
+
+            const hasTieStop = child.querySelector(':scope > tie[type="stop"]') !== null;
+            return (
+                hasTieStop &&
+                _contentsEqual(_noteContent(child, instrumentMap), content) &&
+                child.querySelector(":scope > notations > articulations > staccato") !== null
+            );
+        }
+    }
+    return false;
+}
+
 // A note's <time-modification> as [actual-notes, normal-notes], the ratio a
 // tuplet is played at, or 1:1 for a note that is not in one. Anything missing or
 // not a positive number is read as 1:1, so a malformed tuplet keeps its written
@@ -873,7 +926,10 @@ function _createVolumeBlocks(blockId, volume, prevId) {
  */
 function _setNoteDuration(blocks, noteId, duration) {
     const byId = new Map(blocks.map(block => [block[0], block]));
-    const note = byId.get(noteId);
+    let note = byId.get(noteId);
+    if (note[1] === "newstaccato") {
+        note = byId.get(byId.get(note[4][2])[4][1]);
+    }
     const divide = byId.get(note[4][1]);
     byId.get(divide[4][1])[1][1].value = duration[0];
     byId.get(divide[4][2])[1][1].value = duration[1];
@@ -1359,7 +1415,16 @@ function _processPart(
                         const index = noteStartIds.length;
                         const duration = tieDuration;
                         const content = tieContent;
-                        emitNote(tieDuration, tieContent, tieLyrics, tieStaccato);
+                        const staccato =
+                            tieStaccato ||
+                            _firstEndingTieStopHasStaccato(
+                                partEl,
+                                measureEl,
+                                child,
+                                tieContent,
+                                instrumentMap
+                            );
+                        emitNote(tieDuration, tieContent, tieLyrics, staccato);
                         firstEndingBodyTie = { index, duration, content };
                         bodyTieDurations.push({ index, duration });
                         tieDuration = null;
@@ -1416,23 +1481,9 @@ function _processPart(
             const lyrics = _lyricTexts(child);
             const hasStaccato =
                 child.querySelector(":scope > notations > articulations > staccato") !== null;
-            const unpitchedEl = child.querySelector(":scope > unpitched");
-            const pitchEl = child.querySelector(":scope > pitch");
             // A cue note shows another part's line during this one's rest
             // and MusicXML says it isn't played, but it still fills the time.
-            const isRest =
-                child.querySelector(":scope > rest") !== null ||
-                child.querySelector(":scope > cue") !== null ||
-                (pitchEl === null && unpitchedEl === null);
-
-            let content;
-            if (isRest) {
-                content = null;
-            } else if (unpitchedEl !== null) {
-                content = { type: "drum", name: _drumName(child, instrumentMap) };
-            } else {
-                content = { type: "pitch", ..._pitchToNoteName(pitchEl) };
-            }
+            const content = _noteContent(child, instrumentMap);
 
             let hasTieStart = false;
             let hasTieStop = false;
