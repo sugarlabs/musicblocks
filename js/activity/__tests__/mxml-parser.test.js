@@ -185,6 +185,25 @@ describe("Test 1: A single pitched note", () => {
         expect(settimbre[4][2]).toBe(newnote[0]);
     });
 
+    it("wraps a staccato-marked note in one newstaccato block", async () => {
+        const note =
+            "<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration>" +
+            "<type>quarter</type><notations><articulations><staccato/></articulations></notations></note>";
+        const { blocks } = await parseAndCapture(scorePartwise(note));
+        const staccatos = blocks.filter(b => blockName(b) === "newstaccato");
+        const newnotes = blocks.filter(b => blockName(b) === "newnote");
+        expect(newnotes).toHaveLength(1);
+        expect(staccatos).toHaveLength(1);
+
+        const byIndex = new Map(blocks.map(block => [block[0], block]));
+        const staccatoVspace = byIndex.get(staccatos[0][4][2]);
+
+        expect(blockName(byIndex.get(staccatoVspace[4][1]))).toBe("newnote");
+        expect(newnotes[0][4][0]).toBe(staccatoVspace[0]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
     it("returns loadNewBlocks's own token so callers can track this load's completion", async () => {
         const activity = makeActivity();
         const result = await activity.parseMXML(scorePartwise(SIMPLE_NOTE("C", 4, "quarter")));

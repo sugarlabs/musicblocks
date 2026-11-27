@@ -762,9 +762,26 @@ function _mergeLyrics(existing, incoming) {
  *     | {type: "drum", name: string} | null} content - null for a rest
  * @param {number} prevId - the previous block's id, for this note's top connection
  * @param {Array<{number: string, text: string}>} lyrics - this note's verses
+ * @param {boolean} staccato - whether to wrap the note in newstaccato
  * @returns {Array} the pushed block literals
  */
-function _createNoteBlocks(blockId, duration, content, prevId, lyrics = []) {
+function _createNoteBlocks(blockId, duration, content, prevId, lyrics = [], staccato = false) {
+    if (staccato) {
+        const noteBlockId = blockId + 5;
+        const noteBlocks = _createNoteBlocks(noteBlockId, duration, content, blockId + 4, lyrics);
+        const hiddenId = noteBlockId + noteBlocks.length;
+        noteBlocks[noteBlocks.length - 1][4][1] = null;
+        return [
+            [blockId, "newstaccato", 0, 0, [prevId, blockId + 1, blockId + 4, hiddenId]],
+            [blockId + 1, "divide", 0, 0, [blockId, blockId + 2, blockId + 3]],
+            [blockId + 2, ["number", { value: 1 }], 0, 0, [blockId + 1]],
+            [blockId + 3, ["number", { value: 32 }], 0, 0, [blockId + 1]],
+            [blockId + 4, "vspace", 0, 0, [blockId, noteBlockId]],
+            ...noteBlocks,
+            [hiddenId, "hidden", 0, 0, [blockId, hiddenId + 1]]
+        ];
+    }
+
     const contentBlockCount = content === null ? 1 : content.type === "pitch" ? 3 : 2;
     const contentStartId = blockId + 5 + lyrics.length * 2;
     const contentPrevId = lyrics.length === 0 ? blockId + 4 : contentStartId - 2;
@@ -1215,6 +1232,7 @@ function _processPart(
     let tieDuration = null;
     let tieContent = null;
     let tieLyrics = [];
+    let tieStaccato = false;
     let currentTempoBpm = initialTempoBpm;
     let nextTempoIndex = 0;
     let pendingVolumes = [];
@@ -1231,7 +1249,7 @@ function _processPart(
         }
     }
 
-    const emitNote = (duration, content, lyrics = []) => {
+    const emitNote = (duration, content, lyrics = [], staccato = false) => {
         let startId = blockId;
         let previousVolumeBlock = null;
         pendingVolumes.forEach(volume => {
@@ -1244,7 +1262,7 @@ function _processPart(
         });
         pendingVolumes = [];
 
-        const blocks = _createNoteBlocks(blockId, duration, content, prevId, lyrics);
+        const blocks = _createNoteBlocks(blockId, duration, content, prevId, lyrics, staccato);
         if (previousVolumeBlock !== null) previousVolumeBlock[4][3] = blockId;
         noteBlocks.push(...blocks);
         noteStartIds.push(startId);
@@ -1257,10 +1275,11 @@ function _processPart(
 
     const flushTie = () => {
         if (tieDuration !== null) {
-            emitNote(tieDuration, tieContent, tieLyrics);
+            emitNote(tieDuration, tieContent, tieLyrics, tieStaccato);
             tieDuration = null;
             tieContent = null;
             tieLyrics = [];
+            tieStaccato = false;
         }
     };
 
@@ -1340,12 +1359,13 @@ function _processPart(
                         const index = noteStartIds.length;
                         const duration = tieDuration;
                         const content = tieContent;
-                        emitNote(tieDuration, tieContent, tieLyrics);
+                        emitNote(tieDuration, tieContent, tieLyrics, tieStaccato);
                         firstEndingBodyTie = { index, duration, content };
                         bodyTieDurations.push({ index, duration });
                         tieDuration = null;
                         tieContent = null;
                         tieLyrics = [];
+                        tieStaccato = false;
                     }
                     firstEndingStartIndex = noteStartIds.length;
                 }
@@ -1394,6 +1414,8 @@ function _processPart(
 
             const duration = _noteDuration(child, divisions);
             const lyrics = _lyricTexts(child);
+            const hasStaccato =
+                child.querySelector(":scope > notations > articulations > staccato") !== null;
             const unpitchedEl = child.querySelector(":scope > unpitched");
             const pitchEl = child.querySelector(":scope > pitch");
             // A cue note shows another part's line during this one's rest
@@ -1451,21 +1473,24 @@ function _processPart(
 
             if (continuesTie) {
                 tieLyrics = _mergeLyrics(tieLyrics, lyrics);
+                tieStaccato = tieStaccato || hasStaccato;
                 const combined = _addFractions(tieDuration, duration);
                 if (hasTieStart) {
                     tieDuration = combined;
                 } else {
-                    emitNote(combined, tieContent, tieLyrics);
+                    emitNote(combined, tieContent, tieLyrics, tieStaccato);
                     tieDuration = null;
                     tieContent = null;
                     tieLyrics = [];
+                    tieStaccato = false;
                 }
             } else if (hasTieStart && !hasTieStop) {
                 tieDuration = duration;
                 tieContent = content;
                 tieLyrics = lyrics;
+                tieStaccato = hasStaccato;
             } else {
-                emitNote(duration, content, lyrics);
+                emitNote(duration, content, lyrics, hasStaccato);
             }
 
             offset += (duration[0] * 4) / duration[1];
