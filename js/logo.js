@@ -2338,21 +2338,12 @@ class Logo {
             this.receivedArg = receivedArg;
 
             const tur = logo.turtles.ithTurtle(turtle);
-            let remainingBudget;
-            if (tur) {
-                if (typeof tur._iterationBudget !== "number") {
-                    tur._iterationBudget = logo._iterationBudget;
-                }
-                tur._iterationBudget -= 1;
-                logo._iterationBudgets[turtle] = tur._iterationBudget;
-                remainingBudget = tur._iterationBudget;
-            } else {
-                if (typeof logo._iterationBudgets[turtle] !== "number") {
-                    logo._iterationBudgets[turtle] = logo._iterationBudget;
-                }
-                logo._iterationBudgets[turtle] -= 1;
-                remainingBudget = logo._iterationBudgets[turtle];
+            if (typeof tur._iterationBudget !== "number") {
+                tur._iterationBudget = logo._iterationBudget;
             }
+            tur._iterationBudget -= 1;
+            logo._iterationBudgets[turtle] = tur._iterationBudget;
+            const remainingBudget = tur._iterationBudget;
 
             if (remainingBudget <= 0) {
                 const turtleIndex = Number(turtle);
