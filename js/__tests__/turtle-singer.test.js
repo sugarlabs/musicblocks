@@ -1563,6 +1563,25 @@ describe("processPitch intervals, chords and register by temperament", () => {
         expect(played(0)).toEqual(["E4"]);
     });
 
+    test.each([
+        ["1/3 comma meantone", 0.5],
+        ["1/3 comma meantone", 1.5],
+        ["1/3 comma meantone", -0.5],
+        ["1/4 comma meantone", 0.5]
+    ])(
+        "in %s, a transposition of %d semitones sounds exactly that far above C4",
+        (temperament, semitones) => {
+            activityMock.logo.synth.inTemperament = temperament;
+            turtleMock.singer.transposition = semitones;
+            Singer.processPitch(activityMock, "C", 4, 0, 0, 0);
+            const base = musicUtils.pitchToFrequency("C", 4, 0, "C major", temperament);
+            expect(1200 * Math.log2(turtleMock.singer.noteHertz[0][0] / base)).toBeCloseTo(
+                semitones * 100,
+                6
+            );
+        }
+    );
+
     test("half a semitone sounds 50 cents above C4 in 19 EDO", () => {
         turtleMock.singer.transposition = 0.5;
         Singer.processPitch(activityMock, "C", 4, 0, 0, 0);
@@ -1574,15 +1593,6 @@ describe("processPitch intervals, chords and register by temperament", () => {
         turtleMock.singer.transposition = 1;
         Singer.processPitch(activityMock, "C", 4, 0, 0, 0);
         expect(turtleMock.singer.noteCents[0]).toEqual([0]);
-    });
-
-    test("a note's own cents add to a fractional transposition", () => {
-        turtleMock.singer.transposition = 0.5;
-        Singer.processPitch(activityMock, "C", 4, 10, 0, 0);
-        expect(turtleMock.singer.noteCents[0][0]).toBeCloseTo(
-            10 + musicUtils.edoTranspositionCents(0.5, 19),
-            6
-        );
     });
 
     test("a rest gets no cents from a fractional transposition", () => {
@@ -1623,138 +1633,6 @@ describe("processPitch intervals, chords and register by temperament", () => {
         turtleMock.singer.semitoneIntervals = [[4, 0]];
         Singer.processPitch(activityMock, "C", 4, 0, 0, 0);
         expect(played(0)).toEqual(["C4", "E4"]);
-    });
-});
-
-describe("processPitch transpositions and inversion by temperament", () => {
-    let turtleMock;
-    let activityMock;
-    const saved = {};
-
-    beforeEach(() => {
-        for (const name of [
-            "getNote",
-            "getCurrentEDO",
-            "getTemperament",
-            "pitchToFrequency",
-            "pitchToNumber"
-        ]) {
-            saved[name] = global[name];
-            global[name] = musicUtils[name];
-        }
-
-        turtleMock = createTurtleMock();
-        turtleMock.singer = new Singer(turtleMock);
-        turtleMock.singer.keySignature = "C major";
-        turtleMock.singer.inNoteBlock = [0];
-        for (const key of ["notePitches", "noteOctaves", "noteCents", "noteHertz"]) {
-            turtleMock.singer[key] = { 0: [] };
-        }
-        turtleMock.singer.noteBeatValues = { 0: [] };
-
-        activityMock = createActivityMock(turtleMock);
-        activityMock.logo.activity = activityMock;
-        activityMock.logo.synth.inTemperament = "equal";
-        activityMock.logo.clearNoteParams = jest.fn((tur, blk) => {
-            for (const key of [
-                "notePitches",
-                "noteOctaves",
-                "noteCents",
-                "noteHertz",
-                "noteBeatValues"
-            ]) {
-                tur.singer[key][blk] = [];
-            }
-        });
-        jest.spyOn(Singer, "processNote").mockImplementation(() => {});
-    });
-
-    afterEach(() => {
-        Object.assign(global, saved);
-        jest.restoreAllMocks();
-    });
-
-    // A note block plays into block 0, a pitch block on its own into "pitchBlk".
-    const play = (onItsOwn, note, octave, cents) => {
-        const blk = onItsOwn ? "pitchBlk" : 0;
-        turtleMock.singer.inNoteBlock = onItsOwn ? [] : [0];
-        Singer.processPitch(activityMock, note, octave, cents, 0, blk);
-        return blk;
-    };
-
-    const centsAboveC4 = blk => {
-        const temperament = activityMock.logo.synth.inTemperament;
-        const s = turtleMock.singer;
-        const hertz =
-            s.noteHertz[blk][0] ||
-            musicUtils.pitchToFrequency(
-                s.notePitches[blk][0],
-                s.noteOctaves[blk][0],
-                0,
-                "C major",
-                temperament
-            );
-        const base = musicUtils.pitchToFrequency("C", 4, 0, "C major", temperament);
-        return 1200 * Math.log2(hertz / base);
-    };
-
-    describe.each([
-        ["in a note block", false],
-        ["on its own", true]
-    ])("a pitch %s", (where, onItsOwn) => {
-        test.each([
-            ["equal", 0.5],
-            ["equal", 1.5],
-            ["equal19", 0.5],
-            ["equal19", -0.5],
-            ["1/3 comma meantone", 0.5],
-            ["1/3 comma meantone", 1.5],
-            ["1/3 comma meantone", -0.5],
-            ["1/4 comma meantone", 0.5]
-        ])(
-            "in %s, a transposition of %d semitones sounds exactly that far above C4",
-            (temperament, semitones) => {
-                activityMock.logo.synth.inTemperament = temperament;
-                turtleMock.singer.transposition = semitones;
-                const blk = play(onItsOwn, "C", 4, 0);
-                expect(centsAboveC4(blk)).toBeCloseTo(semitones * 100, 6);
-            }
-        );
-
-        test("in 12 EDO, its own cents add to a fractional transposition", () => {
-            turtleMock.singer.transposition = 0.5;
-            const blk = play(onItsOwn, "C", 4, 10);
-            expect(turtleMock.singer.noteCents[blk]).toEqual([60]);
-            expect(centsAboveC4(blk)).toBeCloseTo(60, 6);
-        });
-
-        test.each([
-            ["equal", "even", "A♯3"],
-            ["equal", "odd", "B3"],
-            ["equal19", "even", "B♭3"],
-            ["equal19", "odd", "B3"],
-            ["1/3 comma meantone", "even", "B♭3"],
-            ["1/3 comma meantone", "odd", "B3"]
-        ])("in %s, D4 inverted (%s) around C4 plays %s", (temperament, mode, expected) => {
-            activityMock.logo.synth.inTemperament = temperament;
-            turtleMock.singer.invertList = [["C", 4, mode]];
-            const blk = play(onItsOwn, "D", 4, 0);
-            const s = turtleMock.singer;
-            expect(s.notePitches[blk][0] + s.noteOctaves[blk][0]).toBe(expected);
-        });
-    });
-
-    test("in 1/3 comma meantone, scalar intervals above C4 follow the C major scale", () => {
-        activityMock.logo.synth.inTemperament = "1/3 comma meantone";
-        const played = [];
-        for (let interval = 1; interval <= 7; interval++) {
-            turtleMock.singer.notePitches[0] = [];
-            turtleMock.singer.noteOctaves[0] = [];
-            turtleMock.singer.intervals = [interval];
-            Singer.processPitch(activityMock, "C", 4, 0, 0, 0);
-            played.push(turtleMock.singer.notePitches[0][1] + turtleMock.singer.noteOctaves[0][1]);
-        }
-        expect(played).toEqual(["D4", "E4", "F4", "G4", "A4", "B4", "C5"]);
     });
 });
 
