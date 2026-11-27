@@ -591,19 +591,9 @@ var getNoteFromInterval = (pitch, interval, temperament) => {
             }
         }
 
-        // Special case: diminished 2nd (from unison)
-        else if (interval === "diminished 2") {
-            majorNote = findMajorInterval("perfect 1");
-            accidental = majorNote[0].substring(1, majorNote[0].length);
-            index1 = priorAttrs.indexOf(accidental);
-            if (index1 === 0) {
-                accidental = priorAttrs[index1] + FLAT;
-            } else {
-                accidental = priorAttrs[index1 - 1];
-            }
-        }
-
-        // Handle standard diminished intervals not covered by microtonal cases
+        // Handle standard diminished intervals not covered by microtonal cases.
+        // This includes the diminished 2nd: a second, so the next letter name,
+        // a whole step below the major 2nd (C to D𝄫), not the unison flattened.
         else if (interval.startsWith("diminished ")) {
             const intervalNum = interval.split(" ")[1];
             const perfectBased = ["4", "5", "8"].includes(intervalNum);

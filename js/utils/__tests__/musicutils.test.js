@@ -5150,7 +5150,7 @@ describe("getSolfege movable do matches getNote", () => {
 
 describe("getNoteFromInterval edge intervals", () => {
     const cases = [
-        ["C4", "diminished 2", ["C" + FLAT, 4]],
+        ["C4", "diminished 2", ["D" + DOUBLEFLAT, 4]],
         ["C4", "down 4", ["F" + FLAT, 4]],
         ["C4", "down-diminished 5", ["G" + DOUBLEFLAT, 4]],
         ["C4", "up 4", ["F" + SHARP, 4]],
@@ -5170,6 +5170,24 @@ describe("getNoteFromInterval edge intervals", () => {
         it(`finds ${interval} from ${pitch}`, () => {
             expect(getNoteFromInterval(pitch, interval)).toEqual(expected);
         });
+    });
+
+    it("spells a diminished 2nd on the next letter at the same pitch", () => {
+        const cases = [
+            ["C4", ["D" + DOUBLEFLAT, 4]],
+            ["E4", ["F" + FLAT, 4]],
+            ["B4", ["C" + FLAT, 5]],
+            ["F" + SHARP + "4", ["G" + FLAT, 4]],
+            ["E" + FLAT + "4", ["F" + DOUBLEFLAT, 4]]
+        ];
+        for (const [root, expected] of cases) {
+            const result = getNoteFromInterval(root, "diminished 2");
+            expect(result).toEqual(expected);
+            const [rootNote, rootOctave] = [root.slice(0, -1), Number(root.slice(-1))];
+            expect(pitchToNumber(result[0], result[1], "C major")).toBe(
+                pitchToNumber(rootNote, rootOctave, "C major")
+            );
+        }
     });
 
     it.each(Object.keys(INTERVALVALUES))("spells %s from any root", interval => {
