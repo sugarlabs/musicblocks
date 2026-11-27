@@ -1045,7 +1045,7 @@ function _buildPreamble(startId, title, voiceLabel, timeSignature, keySignature,
  *
  * @param {Array<{startIndex: number, endIndex: number, times: number,
  *     firstEndingStartIndex: number|null,
- *     bodyTieDurations: Array<{index: number, duration: [number, number]}>}>} repeats
+ *     bodyTieDurations: Array<{index: number, duration: [number, number], bodyStaccato: boolean}>}>} repeats
  * @param {Array} noteBlocks - every note/rest/drum block literal for this
  *     part, already with the final note's trailing connection nulled
  *     (mutated in place: connections are redirected around each range)
@@ -1080,25 +1080,91 @@ function _applyRepeats(
     const byId = new Map(noteBlocks.map(block => [block[0], block]));
     const repeatBlocks = [];
 
-    const cloneNotes = (startIndex, endIndex, prevId, durationOverrides = []) => {
+    const cloneNotes = (
+        startIndex,
+        endIndex,
+        prevId,
+        durationOverrides = [],
+        unwrappedNoteIndices = []
+    ) => {
         const firstId = noteStartIds[startIndex];
         const lastId = noteEndIds[endIndex];
-        const sourceBlocks = noteBlocks.filter(block => block[0] >= firstId && block[0] <= lastId);
+        let sourceBlocks = noteBlocks
+            .filter(block => block[0] >= firstId && block[0] <= lastId)
+            .map(block => [
+                block[0],
+                Array.isArray(block[1]) ? [block[1][0], { ...block[1][1] }] : block[1],
+                block[2],
+                block[3],
+                block[4].slice()
+            ]);
+        const cloneNoteStartIds = new Map(
+            Array.from({ length: endIndex - startIndex + 1 }, (_, index) => [
+                startIndex + index,
+                noteStartIds[startIndex + index]
+            ])
+        );
+        const cloneNoteEndIds = new Map(
+            Array.from({ length: endIndex - startIndex + 1 }, (_, index) => [
+                startIndex + index,
+                noteEndIds[startIndex + index]
+            ])
+        );
+
+        for (const index of unwrappedNoteIndices) {
+            const sourceById = new Map(sourceBlocks.map(block => [block[0], block]));
+            const wrapper = sourceById.get(noteStartIds[index]);
+            if (!wrapper || wrapper[1] !== "newstaccato") continue;
+
+            const divide = sourceById.get(wrapper[4][1]);
+            const vspace = sourceById.get(wrapper[4][2]);
+            const outerHidden = sourceById.get(wrapper[4][3]);
+            const note = sourceById.get(vspace[4][1]);
+            const innerHidden = sourceById.get(note[4][3]);
+            const previous = sourceById.get(wrapper[4][0]);
+            const next = sourceById.get(outerHidden[4][1]);
+
+            if (previous) {
+                previous[4] = previous[4].map(id => (id === wrapper[0] ? note[0] : id));
+            }
+            if (next) {
+                next[4] = next[4].map(id => (id === outerHidden[0] ? innerHidden[0] : id));
+            }
+            note[4][0] = wrapper[4][0];
+            innerHidden[4][1] = outerHidden[4][1];
+
+            const removedIds = new Set([
+                wrapper[0],
+                divide[0],
+                divide[4][1],
+                divide[4][2],
+                vspace[0],
+                outerHidden[0]
+            ]);
+            sourceBlocks = sourceBlocks.filter(block => !removedIds.has(block[0]));
+            cloneNoteStartIds.set(index, note[0]);
+            cloneNoteEndIds.set(index, innerHidden[0]);
+        }
+
         const idMap = new Map(sourceBlocks.map((block, index) => [block[0], blockId + index]));
         const blocks = sourceBlocks.map(block => [
             idMap.get(block[0]),
-            Array.isArray(block[1]) ? [block[1][0], { ...block[1][1] }] : block[1],
+            block[1],
             block[2],
             block[3],
             block[4].map(connection => idMap.get(connection) ?? connection)
         ]);
-        const firstBlock = blocks.find(block => block[0] === idMap.get(firstId));
-        const lastBlock = blocks.find(block => block[0] === idMap.get(lastId));
+        const firstBlock = blocks.find(
+            block => block[0] === idMap.get(cloneNoteStartIds.get(startIndex))
+        );
+        const lastBlock = blocks.find(
+            block => block[0] === idMap.get(cloneNoteEndIds.get(endIndex))
+        );
         firstBlock[4][0] = prevId;
         lastBlock[4][1] = null;
         durationOverrides.forEach(({ index, duration }) => {
             if (index >= startIndex && index <= endIndex) {
-                _setNoteDuration(blocks, idMap.get(noteStartIds[index]), duration);
+                _setNoteDuration(blocks, idMap.get(cloneNoteStartIds.get(index)), duration);
             }
         });
         blockId += blocks.length;
@@ -1132,7 +1198,12 @@ function _applyRepeats(
             // replay only the body before falling through to the second ending.
             let previousEnd = endHidden;
             const copies = [];
-            const clonePass = (cloneStartIndex, cloneEndIndex, durationOverrides = []) => {
+            const clonePass = (
+                cloneStartIndex,
+                cloneEndIndex,
+                durationOverrides = [],
+                unwrappedNoteIndices = []
+            ) => {
                 let clonePrevId = previousEnd[0];
                 let resetTempoBlocks = [];
                 if (Number.isFinite(startTempoBpm)) {
@@ -1150,7 +1221,8 @@ function _applyRepeats(
                     cloneStartIndex,
                     cloneEndIndex,
                     clonePrevId,
-                    durationOverrides
+                    durationOverrides,
+                    unwrappedNoteIndices
                 );
                 if (resetTempoBlocks.length === 0) {
                     previousEnd[4][1] = copy.firstId;
@@ -1164,7 +1236,15 @@ function _applyRepeats(
                 clonePass(startIndex, endIndex);
             }
             if (firstEndingStartIndex > startIndex) {
-                clonePass(startIndex, firstEndingStartIndex - 1, bodyTieDurations);
+                const unwrappedNoteIndices = bodyTieDurations
+                    .filter(tie => !tie.bodyStaccato)
+                    .map(tie => tie.index);
+                clonePass(
+                    startIndex,
+                    firstEndingStartIndex - 1,
+                    bodyTieDurations,
+                    unwrappedNoteIndices
+                );
             }
             previousEnd[4][1] = nextFlowId;
             byId.get(nextFlowId)[4][0] = previousEnd[0];
@@ -1415,8 +1495,9 @@ function _processPart(
                         const index = noteStartIds.length;
                         const duration = tieDuration;
                         const content = tieContent;
+                        const bodyStaccato = tieStaccato;
                         const staccato =
-                            tieStaccato ||
+                            bodyStaccato ||
                             _firstEndingTieStopHasStaccato(
                                 partEl,
                                 measureEl,
@@ -1426,7 +1507,7 @@ function _processPart(
                             );
                         emitNote(tieDuration, tieContent, tieLyrics, staccato);
                         firstEndingBodyTie = { index, duration, content };
-                        bodyTieDurations.push({ index, duration });
+                        bodyTieDurations.push({ index, duration, bodyStaccato });
                         tieDuration = null;
                         tieContent = null;
                         tieLyrics = [];

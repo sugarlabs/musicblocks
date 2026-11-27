@@ -2235,44 +2235,53 @@ describe("Test 17: Repeats", () => {
         expect(findPositionMismatches(blocks)).toEqual([]);
     });
 
-    it("keeps first-ending staccato on the combined tie and repeat clone", async () => {
-        const tiedNote = (step, tie) =>
-            `<note><pitch><step>${step}</step><octave>4</octave></pitch>` +
-            `<duration>1</duration><type>quarter</type>${tie}</note>`;
-        const xml =
-            '<score-partwise><part id="P1"><measure number="1"><attributes><divisions>1</divisions></attributes>' +
-            '<barline location="left"><repeat direction="forward"/></barline>' +
-            tiedNote("C", '<tie type="start"/>') +
-            '<barline location="left"><ending number="1" type="start"/></barline>' +
-            tiedNote(
-                "C",
-                '<tie type="stop"/><notations><articulations><staccato/></articulations></notations>'
-            ) +
-            '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
-            '<barline location="left"><ending number="2" type="start"/></barline>' +
-            SIMPLE_NOTE("F", 4, "quarter") +
-            "</measure></part></score-partwise>";
-        const { blocks } = await parseAndCapture(xml);
-        const byIndex = new Map(blocks.map(block => [block[0], block]));
-        const staccatos = blocks.filter(block => blockName(block) === "newstaccato");
-        const staccatoFactors = staccatos.map(block => {
-            const divide = byIndex.get(block[4][1]);
-            return [byIndex.get(divide[4][1])[1][1].value, byIndex.get(divide[4][2])[1][1].value];
-        });
+    it.each([
+        ["unmarked", "", 1],
+        ["already staccato", "<notations><articulations><staccato/></articulations></notations>", 2]
+    ])(
+        "preserves original body articulation in the repeat clone (%s)",
+        async (_, bodyArticulation, expectedStaccatos) => {
+            const tiedNote = (step, tie) =>
+                `<note><pitch><step>${step}</step><octave>4</octave></pitch>` +
+                `<duration>1</duration><type>quarter</type>${tie}</note>`;
+            const xml =
+                '<score-partwise><part id="P1"><measure number="1"><attributes><divisions>1</divisions></attributes>' +
+                '<barline location="left"><repeat direction="forward"/></barline>' +
+                tiedNote("C", `<tie type="start"/>${bodyArticulation}`) +
+                '<barline location="left"><ending number="1" type="start"/></barline>' +
+                tiedNote(
+                    "C",
+                    '<tie type="stop"/><notations><articulations><staccato/></articulations></notations>'
+                ) +
+                '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+                '<barline location="left"><ending number="2" type="start"/></barline>' +
+                SIMPLE_NOTE("F", 4, "quarter") +
+                "</measure></part></score-partwise>";
+            const { blocks } = await parseAndCapture(xml);
+            const byIndex = new Map(blocks.map(block => [block[0], block]));
+            const staccatos = blocks.filter(block => blockName(block) === "newstaccato");
+            const staccatoFactors = staccatos.map(block => {
+                const divide = byIndex.get(block[4][1]);
+                return [
+                    byIndex.get(divide[4][1])[1][1].value,
+                    byIndex.get(divide[4][2])[1][1].value
+                ];
+            });
 
-        expect(noteValues(blocks)).toEqual([
-            [1, 2],
-            [1, 4],
-            [1, 4]
-        ]);
-        expect(staccatos).toHaveLength(2);
-        expect(staccatoFactors).toEqual([
-            [1, 32],
-            [1, 32]
-        ]);
-        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
-        expect(findPositionMismatches(blocks)).toEqual([]);
-    });
+            expect(noteValues(blocks)).toEqual([
+                [1, 2],
+                [1, 4],
+                [1, 4]
+            ]);
+            expect(blocks.filter(block => blockName(block) === "newnote")).toHaveLength(3);
+            expect(staccatos).toHaveLength(expectedStaccatos);
+            expect(staccatoFactors).toEqual(
+                Array.from({ length: expectedStaccatos }, () => [1, 32])
+            );
+            expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+            expect(findPositionMismatches(blocks)).toEqual([]);
+        }
+    );
 
     it("keeps a tie chain through the first ending", async () => {
         const tiedNote = (step, tie) =>
