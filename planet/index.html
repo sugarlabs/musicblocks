@@ -54,6 +54,19 @@
     <script type="text/javascript" src="js/main.js"></script>
 </head>
 <script>
+    function updateBackToTopVisibility() {
+        var backToTopBtn = document.getElementById("backToTopBtn");
+        if (!backToTopBtn) {
+            return;
+        }
+        if (document.body.scrollTop > 210 || document.documentElement.scrollTop > 210) {
+            backToTopBtn.classList.add("is-visible");
+        }
+        else {
+            backToTopBtn.classList.remove("is-visible");
+        }
+    }
+
     document.addEventListener("scroll", function () {
         var navbar = document.querySelector(".nav-extended");
         if (navbar) {
@@ -64,7 +77,9 @@
                 navbar.classList.add("lighten-1");
             }
         }
+        updateBackToTopVisibility();
     });
+    document.addEventListener("DOMContentLoaded", updateBackToTopVisibility);
     // Function to scroll to the top of the page
     function scrollToTop() {
         window.scrollTo({
