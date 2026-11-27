@@ -1282,18 +1282,19 @@ var pitchToFrequency = (pitch, octave, cents, keySignature, temperament) => {
             );
         if (entries.length > 0) {
             const stripCents = name => name.replace(/\(.*\)/, "").trim();
-            const pitchClass = _notePitchClass(pitch);
+            const cleanPitch = stripCents(pitch);
+            const pitchClass = _notePitchClass(cleanPitch);
             let resolvedOctave = octave;
             let matched = entries.find(
                 entry =>
-                    stripCents(entry[1])[0] === pitch[0] &&
+                    stripCents(entry[1])[0] === cleanPitch[0] &&
                     _notePitchClass(stripCents(entry[1])) === pitchClass
             );
             if (!matched && !Number.isNaN(pitchClass)) {
                 matched = entries.find(
                     entry => _notePitchClass(stripCents(entry[1])) === pitchClass
                 );
-                const letter = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }[pitch[0]];
+                const letter = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }[cleanPitch[0]];
                 if (matched && entries.length === 12 && letter !== undefined) {
                     resolvedOctave += Math.floor(
                         (letter + ((pitchClass - letter + 18) % 12) - 6) / 12

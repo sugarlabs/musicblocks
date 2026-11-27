@@ -1852,7 +1852,7 @@ describe("ModeWidget", () => {
                 isEDO: false,
                 pitchNumber: 12,
                 0: [1, "C", 4],
-                4: [5 / 4, "E", 4]
+                4: [5 / 4, "E(-14)", 4]
             };
             global.TEMPERAMENT[customKey] = table;
             musicUtilsTEMPERAMENT[customKey] = table;
@@ -1867,6 +1867,17 @@ describe("ModeWidget", () => {
                 modeWidget._triggerNote(4, 12);
 
                 const expectedC4 = pitchToFrequency("C", 4, 0, "C major", "equal");
+                expect(mockActivity.logo.synth.trigger).toHaveBeenLastCalledWith(
+                    0,
+                    expect.closeTo(expectedC4 * (5 / 4), 6),
+                    modeWidget._noteValue,
+                    DEFAULTVOICE,
+                    null,
+                    null
+                );
+
+                global.getNote.mockReturnValueOnce(["E(-14)", 4]);
+                modeWidget._triggerNote(4, 12);
                 expect(mockActivity.logo.synth.trigger).toHaveBeenLastCalledWith(
                     0,
                     expect.closeTo(expectedC4 * (5 / 4), 6),

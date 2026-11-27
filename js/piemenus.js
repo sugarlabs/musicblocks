@@ -3834,7 +3834,13 @@ const piemenuModes = (block, selectedMode, onSelect, temperament = null) => {
             true
         );
         if (temperament) {
-            const freq = pitchToFrequency(obj[0], obj[1], 0, key + " chromatic", inTemperament);
+            const freq = pitchToFrequency(
+                obj[0],
+                obj[1],
+                obj[2] || 0,
+                key + " chromatic",
+                inTemperament
+            );
             that.activity.logo.synth.trigger(0, [freq], 1 / 12, DEFAULTVOICE, null, null);
             return;
         }
@@ -3868,7 +3874,8 @@ const piemenuModes = (block, selectedMode, onSelect, temperament = null) => {
     const __prepScale = () => {
         const activeTabs = [0];
         const scaleInfo = buildScale(key + " " + that.value, temperament ? currentEDO : undefined);
-        const modeIntervals = scaleInfo[1];
+        const modeIntervals =
+            (nonEDO && getNonEDOModeSteps(that.value, inTemperament)) || scaleInfo[1];
         for (let k = 0; k < modeIntervals.length - 1; k++) {
             activeTabs.push(last(activeTabs) + modeIntervals[k]);
         }
