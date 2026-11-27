@@ -33,10 +33,11 @@ msgstr ""
 #: js/piemenu-block-context.js:118
 #: js/palette.js:1673
 #: js/palette.js:1677
+#: js/gitDropdown.js:950
 #: js/widgets/TemperamentUI.js:491
 #: js/widgets/TemperamentUI.js:492
 #: js/widgets/widgetWindows.js:547
-#: planet/js/StringHelper.js:76
+#: planet/js/StringHelper.js:80
 msgid "Close"
 msgstr ""
 
@@ -68,6 +69,7 @@ msgstr ""
 #: planet/js/Planet.js:225
 #: planet/js/StringHelper.js:42
 #: planet/js/StringHelper.js:49
+#: planet/js/StringHelper.js:53
 msgid "Cancel"
 msgstr ""
 
@@ -215,16 +217,16 @@ msgstr ""
 #: js/palette.js:2064
 #: js/block.js:1788
 #: js/block.js:5387
+#: js/turtledefs.js:132
+#: js/turtledefs.js:230
 #: js/blocks.js:1749
 #: js/blocks.js:3806
 #: js/blocks.js:3807
 #: js/blocks.js:3980
 #: js/blocks.js:4379
 #: js/blocks.js:4564
-#: js/blocks.js:6058
-#: js/blocks.js:7609
-#: js/turtledefs.js:132
-#: js/turtledefs.js:230
+#: js/blocks.js:6062
+#: js/blocks.js:7613
 #: js/blocks/ActionBlocks.js:252
 #: js/blocks/ActionBlocks.js:329
 #: js/blocks/ActionBlocks.js:640
@@ -258,9 +260,9 @@ msgstr ""
 #: js/turtles.js:116
 #: js/lilypond.js:957
 #: js/block.js:1802
-#: js/logo.js:2057
 #: js/turtle-painter.js:1427
 #: js/turtle-painter.js:1428
+#: js/logo.js:2057
 #: js/blocks/ActionBlocks.js:1253
 #: js/blocks/ProgramBlocks.js:1420
 msgid "start"
@@ -531,10 +533,10 @@ msgstr ""
 #: js/project-manager.js:747
 #: js/project-manager.js:860
 #: js/project-manager.js:1364
-#: planet/js/GlobalPlanet.js:564
-#: planet/js/GlobalPlanet.js:566
-#: planet/js/GlobalPlanet.js:703
 #: planet/js/ProjectStorage.js:26
+#: planet/js/GlobalPlanet.js:600
+#: planet/js/GlobalPlanet.js:602
+#: planet/js/GlobalPlanet.js:739
 msgid "My Project"
 msgstr ""
 
@@ -628,9 +630,9 @@ msgstr ""
 #: js/toolbar-ui.js:159
 #: js/toolbar-ui.js:239
 #: js/turtledefs.js:619
-#: planet/js/LocalCard.js:79
 #: planet/js/GlobalCard.js:66
-#: planet/js/StringHelper.js:78
+#: planet/js/LocalCard.js:79
+#: planet/js/StringHelper.js:82
 msgid "Merge with current project"
 msgstr ""
 
@@ -880,7 +882,7 @@ msgstr ""
 #: js/blocks.js:4148
 #: js/blocks.js:4203
 #: js/blocks.js:4249
-#: js/blocks.js:7635
+#: js/blocks.js:7639
 #: js/blocks/BoxesBlocks.js:289
 #: js/blocks/BoxesBlocks.js:292
 #: js/blocks/BoxesBlocks.js:412
@@ -1486,122 +1488,6 @@ msgstr ""
 msgid "Numbers can have at most 10 digits."
 msgstr ""
 
-#: js/blocks.js:2462
-#: js/blocks.js:2466
-#: js/blocks.js:2472
-#: js/blocks.js:2474
-msgid "audio file"
-msgstr ""
-
-#: js/blocks.js:3764
-#: js/blocks.js:4169
-#: js/blocks.js:4215
-#: js/blocks.js:4261
-#: js/blocks.js:6823
-#: js/blocks.js:6847
-#: js/blocks/BoxesBlocks.js:783
-msgid "box1"
-msgstr ""
-
-#: js/blocks.js:3766
-#: js/blocks.js:4171
-#: js/blocks.js:4217
-#: js/blocks.js:4263
-#: js/blocks.js:6825
-#: js/blocks.js:6849
-#: js/blocks/BoxesBlocks.js:674
-msgid "box2"
-msgstr ""
-
-#: js/blocks.js:4421
-#: js/blocks/MediaBlocks.js:827
-#: js/blocks/BoxesBlocks.js:606
-#: js/blocks/DictBlocks.js:215
-#: js/blocks/DictBlocks.js:289
-#: js/blocks/EnsembleBlocks.js:441
-#: js/blocks/EnsembleBlocks.js:458
-#: js/blocks/PitchBlocks.js:731
-#: js/blocks/PitchBlocks.js:1084
-#: js/blocks/PitchBlocks.js:2038
-#: js/blocks/ProgramBlocks.js:412
-#: js/blocks/ProgramBlocks.js:539
-#: js/blocks/ProgramBlocks.js:724
-#: js/blocks/ToneBlocks.js:1082
-msgid "name"
-msgstr ""
-
-#: js/blocks.js:4421
-#: js/blocks/BoxesBlocks.js:75
-#: js/blocks/BoxesBlocks.js:606
-#: js/blocks/DictBlocks.js:289
-#: js/blocks/DictBlocks.js:430
-#: js/blocks/NumberBlocks.js:973
-#: js/blocks/HeapBlocks.js:573
-#: js/blocks/RhythmBlocks.js:1164
-msgid "value"
-msgstr ""
-
-#: js/blocks.js:4760
-msgid "Forever loop detected inside a note value block. Unexpected things may happen."
-msgstr ""
-
-#: js/blocks.js:5319
-msgid "There is no block selected."
-msgstr ""
-
-#: js/blocks.js:5429
-#: js/blocks/MediaBlocks.js:884
-#.TRANS: Avatar is the image used to determine the appearance of the mouse.
-msgid "avatar"
-msgstr ""
-
-#: js/blocks.js:5432
-#: js/blocks/ToneBlocks.js:1067
-#: js/widgets/SamplerCanvas.js:169
-#.TRANS: The sound sample that the user uploads.
-msgid "sample"
-msgstr ""
-
-#: js/blocks.js:5733
-#: js/project-manager.js:1940
-msgid "Something went wrong reading JSON-encoded project data."
-msgstr ""
-
-#: js/blocks.js:5756
-msgid "Cannot load project: invalid project structure."
-msgstr ""
-
-#: js/blocks.js:5766
-#: js/blocks.js:6201
-#: js/blocks.js:6277
-msgid "Cannot load project: malformed block structure detected."
-msgstr ""
-
-#: js/blocks.js:5883
-msgid "Cannot load project: circular block connection detected."
-msgstr ""
-
-#: js/blocks.js:6231
-#: js/blocks.js:6482
-msgid "Cannot load project: invalid block connection detected."
-msgstr ""
-
-#: js/blocks.js:7668
-msgid "Some blocks in this project are unsupported and were replaced with placeholders: %s"
-msgstr ""
-
-#: js/blocks.js:8053
-msgid "Nothing to undo."
-msgstr ""
-
-#: js/blocks.js:8105
-msgid "Nothing to redo."
-msgstr ""
-
-#: js/blocks.js:8266
-msgid "block sent to trash"
-msgstr ""
-
 #: js/loader.js:770
 msgid "Failed to load EaselJS. Please refresh the page."
 msgstr ""
@@ -1612,56 +1498,6 @@ msgstr ""
 
 #: js/loader.js:806
 msgid "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: %s"
-msgstr ""
-
-#: js/logo.js:854
-msgid "Downloading Kokoro voice: %s"
-msgstr ""
-
-#: js/logo.js:998
-#: js/blocks/ProgramBlocks.js:277
-#: js/blocks/ProgramBlocks.js:453
-msgid "You must select a file."
-msgstr ""
-
-#: js/logo.js:2319
-msgid "Infinite loop detected. Execution stopped to prevent browser freeze."
-msgstr ""
-
-#: js/logo.js:2527
-#: js/blocks/MediaBlocks.js:338
-msgid "width"
-msgstr ""
-
-#: js/logo.js:2528
-#: js/blocks/MediaBlocks.js:395
-msgid "height"
-msgstr ""
-
-#: js/logo.js:2529
-#: js/blocks/MediaBlocks.js:35
-#.TRANS: right side of the screen
-msgid "right (screen)"
-msgstr ""
-
-#: js/logo.js:2530
-#: js/blocks/MediaBlocks.js:111
-#.TRANS: left side of the screen
-msgid "left (screen)"
-msgstr ""
-
-#: js/logo.js:2531
-#: js/blocks/MediaBlocks.js:186
-msgid "top (screen)"
-msgstr ""
-
-#: js/logo.js:2532
-#: js/blocks/MediaBlocks.js:261
-msgid "bottom (screen)"
-msgstr ""
-
-#: js/logo.js:2900
-msgid "Playback is ready."
 msgstr ""
 
 #: js/planetInterface.js:171
@@ -1759,6 +1595,11 @@ msgstr ""
 #: js/project-manager.js:1914
 #: js/project-manager.js:1971
 msgid "Invalid parameters"
+msgstr ""
+
+#: js/project-manager.js:1940
+#: js/blocks.js:5737
+msgid "Something went wrong reading JSON-encoded project data."
 msgstr ""
 
 #: js/search-ui.js:212
@@ -2306,6 +2147,289 @@ msgstr ""
 msgid "You have finished the tour. Please enjoy Music Blocks!"
 msgstr ""
 
+#: js/logo.js:854
+msgid "Downloading Kokoro voice: %s"
+msgstr ""
+
+#: js/logo.js:998
+#: js/blocks/ProgramBlocks.js:277
+#: js/blocks/ProgramBlocks.js:453
+msgid "You must select a file."
+msgstr ""
+
+#: js/logo.js:2319
+msgid "Infinite loop detected. Execution stopped to prevent browser freeze."
+msgstr ""
+
+#: js/logo.js:2527
+#: js/blocks/MediaBlocks.js:338
+msgid "width"
+msgstr ""
+
+#: js/logo.js:2528
+#: js/blocks/MediaBlocks.js:395
+msgid "height"
+msgstr ""
+
+#: js/logo.js:2529
+#: js/blocks/MediaBlocks.js:35
+#.TRANS: right side of the screen
+msgid "right (screen)"
+msgstr ""
+
+#: js/logo.js:2530
+#: js/blocks/MediaBlocks.js:111
+#.TRANS: left side of the screen
+msgid "left (screen)"
+msgstr ""
+
+#: js/logo.js:2531
+#: js/blocks/MediaBlocks.js:186
+msgid "top (screen)"
+msgstr ""
+
+#: js/logo.js:2532
+#: js/blocks/MediaBlocks.js:261
+msgid "bottom (screen)"
+msgstr ""
+
+#: js/logo.js:2900
+msgid "Playback is ready."
+msgstr ""
+
+#: js/blocks.js:2462
+#: js/blocks.js:2466
+#: js/blocks.js:2472
+#: js/blocks.js:2474
+msgid "audio file"
+msgstr ""
+
+#: js/blocks.js:3764
+#: js/blocks.js:4169
+#: js/blocks.js:4215
+#: js/blocks.js:4261
+#: js/blocks.js:6827
+#: js/blocks.js:6851
+#: js/blocks/BoxesBlocks.js:783
+msgid "box1"
+msgstr ""
+
+#: js/blocks.js:3766
+#: js/blocks.js:4171
+#: js/blocks.js:4217
+#: js/blocks.js:4263
+#: js/blocks.js:6829
+#: js/blocks.js:6853
+#: js/blocks/BoxesBlocks.js:674
+msgid "box2"
+msgstr ""
+
+#: js/blocks.js:4421
+#: js/blocks/MediaBlocks.js:827
+#: js/blocks/BoxesBlocks.js:606
+#: js/blocks/DictBlocks.js:215
+#: js/blocks/DictBlocks.js:289
+#: js/blocks/EnsembleBlocks.js:441
+#: js/blocks/EnsembleBlocks.js:458
+#: js/blocks/PitchBlocks.js:731
+#: js/blocks/PitchBlocks.js:1084
+#: js/blocks/PitchBlocks.js:2038
+#: js/blocks/ProgramBlocks.js:412
+#: js/blocks/ProgramBlocks.js:539
+#: js/blocks/ProgramBlocks.js:724
+#: js/blocks/ToneBlocks.js:1082
+msgid "name"
+msgstr ""
+
+#: js/blocks.js:4421
+#: js/blocks/BoxesBlocks.js:75
+#: js/blocks/BoxesBlocks.js:606
+#: js/blocks/DictBlocks.js:289
+#: js/blocks/DictBlocks.js:430
+#: js/blocks/NumberBlocks.js:973
+#: js/blocks/HeapBlocks.js:573
+#: js/blocks/RhythmBlocks.js:1164
+msgid "value"
+msgstr ""
+
+#: js/blocks.js:4760
+msgid "Forever loop detected inside a note value block. Unexpected things may happen."
+msgstr ""
+
+#: js/blocks.js:5319
+msgid "There is no block selected."
+msgstr ""
+
+#: js/blocks.js:5429
+#: js/blocks/MediaBlocks.js:884
+#.TRANS: Avatar is the image used to determine the appearance of the mouse.
+msgid "avatar"
+msgstr ""
+
+#: js/blocks.js:5432
+#: js/blocks/ToneBlocks.js:1067
+#: js/widgets/SamplerCanvas.js:169
+#.TRANS: The sound sample that the user uploads.
+msgid "sample"
+msgstr ""
+
+#: js/blocks.js:5617
+#: js/blocks.js:5760
+msgid "Cannot load project: invalid project structure."
+msgstr ""
+
+#: js/blocks.js:5770
+#: js/blocks.js:6205
+#: js/blocks.js:6281
+msgid "Cannot load project: malformed block structure detected."
+msgstr ""
+
+#: js/blocks.js:5887
+msgid "Cannot load project: circular block connection detected."
+msgstr ""
+
+#: js/blocks.js:6235
+#: js/blocks.js:6486
+msgid "Cannot load project: invalid block connection detected."
+msgstr ""
+
+#: js/blocks.js:7672
+msgid "Some blocks in this project are unsupported and were replaced with placeholders: %s"
+msgstr ""
+
+#: js/blocks.js:8057
+msgid "Nothing to undo."
+msgstr ""
+
+#: js/blocks.js:8109
+msgid "Nothing to redo."
+msgstr ""
+
+#: js/blocks.js:8270
+msgid "block sent to trash"
+msgstr ""
+
+#: js/gitDropdown.js:875
+msgid "Saved moment"
+msgstr ""
+
+#: js/gitDropdown.js:893
+msgid "You're offline. Connect to the network to view commits for this project."
+msgstr ""
+
+#: js/gitDropdown.js:894
+msgid "Network Connection Required"
+msgstr ""
+
+#: js/gitDropdown.js:907
+msgid "No moments marked yet. Click \"Mark this moment\" to save your first one!"
+msgstr ""
+
+#: js/gitDropdown.js:908
+msgid "No Saved Moments Yet"
+msgstr ""
+
+#: js/gitDropdown.js:939
+#: js/gitDropdown.js:969
+msgid "Time Travel"
+msgstr ""
+
+#: js/gitDropdown.js:972
+msgid "Every save, forever yours"
+msgstr ""
+
+#: js/gitDropdown.js:1091
+#: js/gitDropdown.js:1196
+msgid "YOU ARE HERE"
+msgstr ""
+
+#: js/gitDropdown.js:1118
+msgid "Sync Pending"
+msgstr ""
+
+#: js/gitDropdown.js:1124
+msgid "Latest"
+msgstr ""
+
+#: js/gitDropdown.js:1137
+#: js/gitDropdown.js:1232
+msgid "Undo my changes"
+msgstr ""
+
+#: js/gitDropdown.js:1147
+#: js/gitDropdown.js:1242
+msgid "Go back to this version"
+msgstr ""
+
+#: js/gitDropdown.js:1210
+msgid "The very beginning"
+msgstr ""
+
+#: js/gitDropdown.js:1214
+msgid "Where your project started"
+msgstr ""
+
+#: js/gitDropdown.js:1221
+msgid "Setting Up Tracking"
+msgstr ""
+
+#: js/gitDropdown.js:1235
+#: js/gitDropdown.js:1245
+msgid "Start point"
+msgstr ""
+
+#: js/gitDropdown.js:1269
+msgid "no more offline commits can be made"
+msgstr ""
+
+#: js/gitDropdown.js:1271
+msgid "1 more commit can be made"
+msgstr ""
+
+#: js/gitDropdown.js:1272
+msgid "%s more commits can be made"
+msgstr ""
+
+#: js/gitDropdown.js:1284
+msgid "Showing locally saved drafts"
+msgstr ""
+
+#: js/gitDropdown.js:1783
+msgid "Just now"
+msgstr ""
+
+#: js/gitDropdown.js:1784
+msgid "1 minute ago"
+msgstr ""
+
+#: js/gitDropdown.js:1784
+msgid "%s minutes ago"
+msgstr ""
+
+#: js/gitDropdown.js:1786
+msgid "1 hour ago"
+msgstr ""
+
+#: js/gitDropdown.js:1786
+msgid "%s hours ago"
+msgstr ""
+
+#: js/gitDropdown.js:1788
+msgid "1 day ago"
+msgstr ""
+
+#: js/gitDropdown.js:1788
+msgid "%s days ago"
+msgstr ""
+
+#: js/gitDropdown.js:1790
+msgid "1 month ago"
+msgstr ""
+
+#: js/gitDropdown.js:1790
+msgid "%s months ago"
+msgstr ""
+
 #: js/utils/plugin-utils.js:55
 msgid "Security Warning"
 msgstr ""
@@ -2456,8 +2580,8 @@ msgstr ""
 #: js/blocks/IntervalsBlocks.js:1187
 #: js/blocks/WidgetBlocks.js:640
 #: js/blocks/WidgetBlocks.js:645
-#: js/blocks/ToneBlocks.js:1003
 #: js/blocks/VolumeBlocks.js:420
+#: js/blocks/ToneBlocks.js:1003
 #: js/turtleactions/VolumeActions.js:49
 #: js/widgets/modewidget.js:1741
 #.TRANS: customize voice
@@ -3458,6 +3582,14 @@ msgstr ""
 msgid "half-diminished 7th"
 msgstr ""
 
+#: js/utils/utils-logic.js:431
+msgid "Invalid input passed to rational sum"
+msgstr ""
+
+#: js/utils/utils-logic.js:438
+msgid "Note calculation failed: zero denominator"
+msgstr ""
+
 #: js/utils/synthutils.js:130
 #.TRANS: simple monotone synthesizer
 msgid "simple-2"
@@ -3485,14 +3617,6 @@ msgstr ""
 
 #: js/utils/synthutils.js:2493
 msgid "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
-msgstr ""
-
-#: js/utils/utils-logic.js:431
-msgid "Invalid input passed to rational sum"
-msgstr ""
-
-#: js/utils/utils-logic.js:438
-msgid "Note calculation failed: zero denominator"
 msgstr ""
 
 #: js/blocks/BooleanBlocks.js:44
@@ -7098,6 +7222,112 @@ msgstr ""
 msgid "The Get blue block returns the blue component of the pixel under the turtle."
 msgstr ""
 
+#: js/blocks/VolumeBlocks.js:35
+msgid "synth volume"
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:39
+msgid "The Synth volume block returns the current volume of the current synthesizer."
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:109
+msgid "master volume"
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:113
+msgid "The Master volume block returns the master volume."
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:364
+#: js/blocks/VolumeBlocks.js:535
+msgid "set synth volume"
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:371
+#: js/blocks/VolumeBlocks.js:556
+msgid "synth"
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:412
+#: js/blocks/VolumeBlocks.js:588
+#: js/blocks/VolumeBlocks.js:751
+#: js/turtleactions/VolumeActions.js:222
+msgid "Setting volume to 0."
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:449
+msgid "Synth not found"
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:505
+msgid "set drum volume"
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:541
+msgid "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc."
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:545
+msgid "The default volume is 50."
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:547
+msgid "The range is 0 for silence to 100 for full volume."
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:608
+msgid "set panning"
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:614
+msgid "The Set Panning block sets the panning for all synthesizers."
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:636
+msgid "Warning: Sound is coming out from only the left or right side."
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:658
+#: js/blocks/VolumeBlocks.js:706
+msgid "set master volume"
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:664
+msgid "The Set master volume block sets the volume for all synthesizers."
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:794
+msgid "The Set relative volume block changes the volume of the contained notes."
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:801
+msgid "set relative volume"
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:853
+msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:857
+msgid "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:867
+msgid "decrescendo"
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:917
+msgid "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:921
+msgid "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
+msgstr ""
+
+#: js/blocks/VolumeBlocks.js:931
+msgid "crescendo"
+msgstr ""
+
 #: js/blocks/ToneBlocks.js:34
 #: js/widgets/timbre.js:314
 msgid "Oscillator"
@@ -7345,112 +7575,6 @@ msgstr ""
 
 #: js/blocks/ToneBlocks.js:1174
 msgid "Upload a sound file to connect with the sample block."
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:35
-msgid "synth volume"
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:39
-msgid "The Synth volume block returns the current volume of the current synthesizer."
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:109
-msgid "master volume"
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:113
-msgid "The Master volume block returns the master volume."
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:364
-#: js/blocks/VolumeBlocks.js:535
-msgid "set synth volume"
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:371
-#: js/blocks/VolumeBlocks.js:556
-msgid "synth"
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:412
-#: js/blocks/VolumeBlocks.js:588
-#: js/blocks/VolumeBlocks.js:751
-#: js/turtleactions/VolumeActions.js:222
-msgid "Setting volume to 0."
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:449
-msgid "Synth not found"
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:505
-msgid "set drum volume"
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:541
-msgid "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc."
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:545
-msgid "The default volume is 50."
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:547
-msgid "The range is 0 for silence to 100 for full volume."
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:608
-msgid "set panning"
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:614
-msgid "The Set Panning block sets the panning for all synthesizers."
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:636
-msgid "Warning: Sound is coming out from only the left or right side."
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:658
-#: js/blocks/VolumeBlocks.js:706
-msgid "set master volume"
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:664
-msgid "The Set master volume block sets the volume for all synthesizers."
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:794
-msgid "The Set relative volume block changes the volume of the contained notes."
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:801
-msgid "set relative volume"
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:853
-msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:857
-msgid "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:867
-msgid "decrescendo"
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:917
-msgid "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:921
-msgid "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
-msgstr ""
-
-#: js/blocks/VolumeBlocks.js:931
-msgid "crescendo"
 msgstr ""
 
 #: js/turtleactions/OrnamentActions.js:49
@@ -9282,71 +9406,6 @@ msgstr ""
 msgid "Code Snippet"
 msgstr ""
 
-#: planet/js/GlobalPlanet.js:37
-msgid "No results found."
-msgstr ""
-
-#: planet/js/GlobalPlanet.js:54
-msgid "Remix of"
-msgstr ""
-
-#: planet/js/GlobalPlanet.js:381
-msgid "Could not load project. Please check your connection and try again."
-msgstr ""
-
-#: planet/js/GlobalPlanet.js:735
-msgid "Cannot connect to server"
-msgstr ""
-
-#: planet/js/SaveInterface.js:34
-#: planet/js/GlobalCard.js:60
-msgid "Open in Music Blocks"
-msgstr ""
-
-#: planet/js/SaveInterface.js:37
-msgid "Open in Turtle Blocks"
-msgstr ""
-
-#: planet/js/LocalCard.js:37
-msgid "View published project"
-msgstr ""
-
-#: planet/js/LocalCard.js:42
-msgid "Being tracked"
-msgstr ""
-
-#: planet/js/LocalCard.js:54
-#: planet/js/ProjectViewer.js:92
-#: planet/js/GlobalCard.js:44
-msgid "Project thumbnail"
-msgstr ""
-
-#: planet/js/LocalCard.js:57
-#: planet/js/Publisher.js:236
-#: planet/js/StringHelper.js:37
-msgid "Publish project"
-msgstr ""
-
-#: planet/js/LocalCard.js:63
-msgid "Project name"
-msgstr ""
-
-#: planet/js/LocalCard.js:70
-msgid "Edit project"
-msgstr ""
-
-#: planet/js/LocalCard.js:73
-msgid "Delete project"
-msgstr ""
-
-#: planet/js/LocalCard.js:76
-msgid "Download project"
-msgstr ""
-
-#: planet/js/LocalCard.js:82
-msgid "Duplicate project"
-msgstr ""
-
 #: planet/js/ProjectStorage.js:541
 msgid "anonymous"
 msgstr ""
@@ -9360,14 +9419,14 @@ msgid "Thank you for reporting this project. A moderator will review the project
 msgstr ""
 
 #: planet/js/ProjectViewer.js:33
-#: planet/js/StringHelper.js:64
-#: planet/js/StringHelper.js:66
-#: planet/js/StringHelper.js:75
+#: planet/js/StringHelper.js:68
+#: planet/js/StringHelper.js:70
+#: planet/js/StringHelper.js:79
 msgid "Report Project"
 msgstr ""
 
 #: planet/js/ProjectViewer.js:34
-#: planet/js/StringHelper.js:65
+#: planet/js/StringHelper.js:69
 msgid "Project Reported"
 msgstr ""
 
@@ -9379,8 +9438,19 @@ msgstr ""
 msgid "Report description too long"
 msgstr ""
 
+#: planet/js/ProjectViewer.js:92
+#: planet/js/GlobalCard.js:44
+#: planet/js/LocalCard.js:54
+msgid "Project thumbnail"
+msgstr ""
+
 #: planet/js/GlobalCard.js:57
 msgid "More Details"
+msgstr ""
+
+#: planet/js/GlobalCard.js:60
+#: planet/js/SaveInterface.js:34
+msgid "Open in Music Blocks"
 msgstr ""
 
 #: planet/js/GlobalCard.js:63
@@ -9417,8 +9487,8 @@ msgstr ""
 
 #: planet/js/GlobalCard.js:218
 #: planet/js/GlobalCard.js:219
-#: planet/js/StringHelper.js:51
-#: planet/js/helper.js:187
+#: planet/js/StringHelper.js:55
+#: planet/js/helper.js:188
 msgid "Show all tags"
 msgstr ""
 
@@ -9446,6 +9516,12 @@ msgstr ""
 msgid "Republish project"
 msgstr ""
 
+#: planet/js/Publisher.js:236
+#: planet/js/LocalCard.js:57
+#: planet/js/StringHelper.js:37
+msgid "Publish project"
+msgstr ""
+
 #: planet/js/Publisher.js:275
 #: planet/js/Publisher.js:292
 msgid "This field is required"
@@ -9465,6 +9541,74 @@ msgstr ""
 
 #: planet/js/Publisher.js:546
 msgid "Try Again"
+msgstr ""
+
+#: planet/js/GlobalPlanet.js:37
+msgid "No results found."
+msgstr ""
+
+#: planet/js/GlobalPlanet.js:54
+msgid "Remix of"
+msgstr ""
+
+#: planet/js/GlobalPlanet.js:391
+msgid "Could not load project. Please check your connection and try again."
+msgstr ""
+
+#: planet/js/GlobalPlanet.js:771
+msgid "Cannot connect to server"
+msgstr ""
+
+#: planet/js/LocalCard.js:37
+msgid "View published project"
+msgstr ""
+
+#: planet/js/LocalCard.js:42
+msgid "Being tracked"
+msgstr ""
+
+#: planet/js/LocalCard.js:63
+msgid "Project name"
+msgstr ""
+
+#: planet/js/LocalCard.js:70
+msgid "Edit project"
+msgstr ""
+
+#: planet/js/LocalCard.js:73
+msgid "Delete project"
+msgstr ""
+
+#: planet/js/LocalCard.js:76
+msgid "Download project"
+msgstr ""
+
+#: planet/js/LocalCard.js:82
+msgid "Duplicate project"
+msgstr ""
+
+#: planet/js/LocalCard.js:133
+msgid "You do not have permission to unpublish this project from this browser."
+msgstr ""
+
+#: planet/js/LocalCard.js:144
+msgid "Could not unpublish project. Please try again."
+msgstr ""
+
+#: planet/js/LocalCard.js:175
+msgid "Project unpublished."
+msgstr ""
+
+#: planet/js/LocalCard.js:179
+msgid "Project unpublished, but the change could not be saved on this device."
+msgstr ""
+
+#: planet/js/LocalCard.js:251
+msgid "Unpublish project"
+msgstr ""
+
+#: planet/js/SaveInterface.js:37
+msgid "Open in Turtle Blocks"
 msgstr ""
 
 #: planet/js/StringHelper.js:30
@@ -9492,12 +9636,12 @@ msgid "Tags (max 5)"
 msgstr ""
 
 #: planet/js/StringHelper.js:40
-#: planet/js/StringHelper.js:63
+#: planet/js/StringHelper.js:67
 msgid "Description"
 msgstr ""
 
 #: planet/js/StringHelper.js:41
-#: planet/js/StringHelper.js:74
+#: planet/js/StringHelper.js:78
 msgid "Submit"
 msgstr ""
 
@@ -9510,66 +9654,78 @@ msgid "Permanently delete project \"<span id=\"deleter-name\"></span>\"?"
 msgstr ""
 
 #: planet/js/StringHelper.js:50
-msgid "Explore Projects"
+msgid "Unpublish project?"
+msgstr ""
+
+#: planet/js/StringHelper.js:51
+msgid "This project will no longer appear in public listings."
 msgstr ""
 
 #: planet/js/StringHelper.js:52
-msgid "Most recent"
-msgstr ""
-
-#: planet/js/StringHelper.js:53
-msgid "Most liked"
+msgid "Unpublish"
 msgstr ""
 
 #: planet/js/StringHelper.js:54
-msgid "Most downloaded"
-msgstr ""
-
-#: planet/js/StringHelper.js:55
-msgid "A-Z"
+msgid "Explore Projects"
 msgstr ""
 
 #: planet/js/StringHelper.js:56
-msgid "Sort by"
+msgid "Most recent"
 msgstr ""
 
 #: planet/js/StringHelper.js:57
-msgid "Load More Projects"
+msgid "Most liked"
 msgstr ""
 
 #: planet/js/StringHelper.js:58
-msgid "Last Updated"
+msgid "Most downloaded"
 msgstr ""
 
 #: planet/js/StringHelper.js:59
-msgid "Creation Date"
+msgid "A-Z"
 msgstr ""
 
 #: planet/js/StringHelper.js:60
-msgid "Number of Downloads:"
+msgid "Sort by"
 msgstr ""
 
 #: planet/js/StringHelper.js:61
-msgid "Number of Likes:"
+msgid "Load More Projects"
 msgstr ""
 
 #: planet/js/StringHelper.js:62
+msgid "Last Updated"
+msgstr ""
+
+#: planet/js/StringHelper.js:63
+msgid "Creation Date"
+msgstr ""
+
+#: planet/js/StringHelper.js:64
+msgid "Number of Downloads:"
+msgstr ""
+
+#: planet/js/StringHelper.js:65
+msgid "Number of Likes:"
+msgstr ""
+
+#: planet/js/StringHelper.js:66
 msgid "Tags:"
 msgstr ""
 
-#: planet/js/StringHelper.js:69
+#: planet/js/StringHelper.js:73
 msgid "Report projects which violate the <a href=\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\" target=\"_blank\" rel=\"noopener noreferrer\">Sugar Labs Code of Conduct</a>."
 msgstr ""
 
-#: planet/js/StringHelper.js:73
+#: planet/js/StringHelper.js:77
 msgid "Reason for reporting project"
 msgstr ""
 
-#: planet/js/StringHelper.js:77
+#: planet/js/StringHelper.js:81
 msgid "Download as File"
 msgstr ""
 
-#: planet/js/helper.js:188
+#: planet/js/helper.js:189
 msgid "Show fewer tags"
 msgstr ""
 
@@ -9793,357 +9949,8 @@ msgstr ""
 #~msgid ""
 #~msgstr ""
 
-#: js/keyboard-controller.js:165
-#~msgid "Saving block artwork"
-#~msgstr ""
-
-#: js/keyboard-controller.js:173
-#~msgid "Erase"
-#~msgstr ""
-
-#: js/keyboard-controller.js:213
-#: js/keyboard-controller.js:243
-#~msgid "Paste"
-#~msgstr ""
-
-#: js/keyboard-controller.js:217
-#~msgid "Save block help"
-#~msgstr ""
-
-#: js/keyboard-controller.js:285
-#~msgid "Jumping to the bottom of the page."
-#~msgstr ""
-
-#: js/keyboard-controller.js:291
-#~msgid "Scrolling up."
-#~msgstr ""
-
-#: js/keyboard-controller.js:296
-#~msgid "Scrolling down."
-#~msgstr ""
-
-#: js/keyboard-controller.js:301
-#~msgid "Extracting block"
-#~msgstr ""
-
-#: js/keyboard-controller.js:309
-#~msgid "Moving block up."
-#~msgstr ""
-
-#: js/keyboard-controller.js:330
-#~msgid "Moving block down."
-#~msgstr ""
-
-#: js/keyboard-controller.js:352
-#~msgid "Moving block left."
-#~msgstr ""
-
-#: js/keyboard-controller.js:369
-#~msgid "Moving block right."
-#~msgstr ""
-
-#: js/keyboard-controller.js:384
-#~msgid "Jump to home position."
-#~msgstr ""
-
-#: js/block-drag-controller.js:534
-#~msgid "Consider breaking this stack into parts."
-#~msgstr ""
-
-#: js/context-menu-controller.js:438
-#: js/trash-controller.js:57
-#: js/trash-controller.js:75
-#~msgid "Trash can is empty."
-#~msgstr ""
-
-#: js/context-menu-controller.js:444
-#: js/trash-controller.js:79
-#: js/trash-controller.js:215
-#~msgid "Item restored from the trash."
-#~msgstr ""
-
-#: js/help-controller.js:92
-#~msgid "Windows/Linux"
-#~msgstr ""
-
-#: js/help-controller.js:92
-#~msgid "Mac"
-#~msgstr ""
-
-#: js/help-controller.js:96
-#~msgid "Workspace"
-#~msgstr ""
-
-#: js/help-controller.js:108
-#~msgid "Play or stop depending on the current state"
-#~msgstr ""
-
-#: js/help-controller.js:112
-#~msgid "Play or stop when no text input or widget is active"
-#~msgstr ""
-
-#: js/help-controller.js:116
-#~msgid "Toggle stage scale"
-#~msgstr ""
-
-#: js/help-controller.js:120
-#~msgid "Jump to home position"
-#~msgstr ""
-
-#: js/help-controller.js:124
-#~msgid "Jump to the bottom of the workspace"
-#~msgstr ""
-
-#: js/help-controller.js:128
-#~msgid "Scroll workspace up"
-#~msgstr ""
-
-#: js/help-controller.js:132
-#~msgid "Scroll workspace down"
-#~msgstr ""
-
-#: js/help-controller.js:136
-#~msgid "Hide block search when it is open"
-#~msgstr ""
-
-#: js/help-controller.js:141
-#~msgid "Editing"
-#~msgstr ""
-
-#: js/help-controller.js:145
-#~msgid "Copy selected stack."
-#~msgstr ""
-
-#: js/help-controller.js:149
-#~msgid "Paste previous stack."
-#~msgstr ""
-
-#: js/help-controller.js:153
-#~msgid "Open the JSON paste box."
-#~msgstr ""
-
-#: js/help-controller.js:157
-#~msgid "Paste JSON when the paste box is focused."
-#~msgstr ""
-
-#: js/help-controller.js:161
-#~msgid "Extract the active block."
-#~msgstr ""
-
-#: js/help-controller.js:165
-#~msgid "Clear workspace."
-#~msgstr ""
-
-#: js/help-controller.js:169
-#~msgid "Save block artwork."
-#~msgstr ""
-
-#: js/help-controller.js:173
-#~msgid "Save block help."
-#~msgstr ""
-
-#: js/help-controller.js:178
-#~msgid "Navigation"
-#~msgstr ""
-
-#: js/help-controller.js:182
-#~msgid "Move focus between the toolbar, palettes, and workspace."
-#~msgstr ""
-
-#: js/help-controller.js:185
-#: js/help-controller.js:248
-#~msgid "Arrow keys"
-#~msgstr ""
-
-#: js/help-controller.js:186
-#~msgid "Move the active block, scroll palettes, adjust the tempo widget, or pan the workspace depending on context."
-#~msgstr ""
-
-#: js/help-controller.js:192
-#~msgid "Pan workspace right when horizontal scrolling is enabled."
-#~msgstr ""
-
-#: js/help-controller.js:196
-#~msgid "Pan workspace left when horizontal scrolling is enabled."
-#~msgstr ""
-
-#: js/help-controller.js:201
-#~msgid "Toolbar"
-#~msgstr ""
-
-#: js/help-controller.js:205
-#: js/help-controller.js:206
-#: js/help-controller.js:242
-#: js/help-controller.js:243
-#~msgid "Arrow Left / Arrow Right"
-#~msgstr ""
-
-#: js/help-controller.js:208
-#~msgid "Move focus within the current toolbar."
-#~msgstr ""
-
-#: js/help-controller.js:211
-#~msgid "Arrow Up / Arrow Down"
-#~msgstr ""
-
-#: js/help-controller.js:212
-#~msgid "Move focus between main and auxiliary toolbars."
-#~msgstr ""
-
-#: js/help-controller.js:216
-#~msgid "Activate the focused toolbar button."
-#~msgstr ""
-
-#: js/help-controller.js:220
-#~msgid "Exit toolbar keyboard navigation."
-#~msgstr ""
-
-#: js/help-controller.js:225
-#~msgid "Widget Windows"
-#~msgstr ""
-
-#: js/help-controller.js:229
-#~msgid "Close the focused widget window."
-#~msgstr ""
-
-#: js/help-controller.js:233
-#~msgid "Maximize or restore the focused widget window."
-#~msgstr ""
-
-#: js/help-controller.js:238
-#~msgid "Help and Pitch Slider"
-#~msgstr ""
-
-#: js/help-controller.js:245
-#~msgid "Move between help pages when Help is open."
-#~msgstr ""
-
-#: js/help-controller.js:249
-#~msgid "Adjust pitch by semitone when Pitch Slider is open."
-#~msgstr ""
-
-#: js/help-controller.js:284
-#~msgid "Shortcuts are context-sensitive. Some only work when a related panel, widget, or mode is active. Windows/Linux and Mac equivalents are shown together."
-#~msgstr ""
-
-#: js/toolbar-ui.js:139
-#: js/toolbar-ui.js:215
-#: js/toolbar-ui.js:272
-#: js/toolbar-ui.js:342
-#~msgid "Find and share projects"
-#~msgstr ""
-
-#: js/toolbar-ui.js:140
-#: js/toolbar-ui.js:216
-#: js/toolbar-ui.js:273
-#: js/toolbar-ui.js:343
-#~msgid "Offline. Sharing is unavailable"
-#~msgstr ""
-
-#: js/trash-controller.js:286
-#~msgid "Restore last item"
-#~msgstr ""
-
-#: js/trash-controller.js:287
-#~msgid "Restore all items"
-#~msgstr ""
-
-#: js/activity.js:751
-#~msgid "Clear workspace"
-#~msgstr ""
-
-#: js/activity.js:757
-#~msgid "Are you sure you want to clear the workspace?"
-#~msgstr ""
-
-#: js/activity.js:1110
-#~msgid "plugins will be removed upon restart."
-#~msgstr ""
-
-#: js/block.js:1709
-#~msgid "ruler"
-#~msgstr ""
-
-#: js/utils/synthutils.js:3787
-#~msgid "Cents Adjustment"
-#~msgstr ""
-
-#: js/blocks/MediaBlocks.js:579
-#~msgid "The Speak block outputs to the text-to-speech synthesizer"
-#~msgstr ""
-
-#: js/blocks/WidgetBlocks.js:977
-#.TRANS: makes a mapping between pitches and drum sounds
-#~msgid "pitch-drum mapper"
-#~msgstr ""
-
-#: js/blocks/IntervalsBlocks.js:1235
+#: js/blocks/IntervalsBlocks.js:1240
 #~msgid "When Movable do is false, the solfege note names are always tied to specific pitches, eg \"do\" is always \"C-natural\" when Movable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
-#~msgstr ""
-
-#: js/turtleactions/OrnamentActions.js:49
-#~msgid "Staccato value must be non-zero."
-#~msgstr ""
-
-#: js/turtleactions/OrnamentActions.js:79
-#~msgid "Slur value must be non-zero."
-#~msgstr ""
-
-#: js/widgets/plugin-dialog.js:76
-#~msgid "Enter the name of a built-in plugin, or leave blank to upload a plugin file:"
-#~msgstr ""
-
-#: js/widgets/aidebugger.js:570
-#~msgid "Analyze my project"
-#~msgstr ""
-
-#: js/widgets/aidebugger.js:599
-#~msgid "AI analysis was not started. You can type a question below, but project data will not be sent until you agree."
-#~msgstr ""
-
-#: js/widgets/aiwidget.js:651
-#~msgid "MIDI loading. This may take some time depending upon the number of notes in the track"
-#~msgstr ""
-
-#: js/widgets/reflection.js:378
-#: js/widgets/reflection.js:626
-#~msgid "Failed to send message."
-#~msgstr ""
-
-#: js/widgets/musickeyboard.js:2296
-#~msgid "All 12 pitches are already in the keyboard. Adding duplicate."
-#~msgstr ""
-
-#: js/widgets/temperament.js:391
-#~msgid "back to 2:1 octave space"
-#~msgstr ""
-
-#: js/widgets/temperament.js:534
-#~msgid "edit"
-#~msgstr ""
-
-#: js/widgets/temperament.js:657
-#~msgid "cents"
-#~msgstr ""
-
-#: js/widgets/temperament.js:946
-#~msgid "non scalar"
-#~msgstr ""
-
-#: js/widgets/temperament.js:1129
-#~msgid "The Number of divisions is too large."
-#~msgstr ""
-
-#: js/widgets/temperament.js:2563
-#~msgid "Table"
-#~msgstr ""
-
-#: js/widgets/temperament.js:2694
-#~msgid "Add pitches"
-#~msgstr ""
-
-#: planet/js/StringHelper.js:29
-#~msgid "Planet"
 #~msgstr ""
 
 #: planet/js/StringHelper.js:43
@@ -10154,472 +9961,7 @@ msgstr ""
 #~msgid "Permanently delete project \"<span id=\"deleter-name\"></span>\"?"
 #~msgstr ""
 
-#: planet/js/StringHelper.js:51
-#: planet/js/helper.js:149
-#~msgid "Show more tags"
-#~msgstr ""
-
 #: planet/js/StringHelper.js:69
 #~msgid "Report projects which violate the <a href=\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\" target=\"_blank\" rel=\"noopener noreferrer\">Sugar Labs Code of Conduct</a>."
-#~msgstr ""
-
-#: js/svgAssetSelector.js:83
-#: js/svgAssetSelector.js:92
-#: js/svgAssetSelector.js:156
-#: js/activity.js:2014
-#: js/activity.js:2092
-#: js/activity.js:2021
-#: js/activity.js:2071
-#: js/activity.js:2042
-#: js/activity.js:2052
-#: js/activity.js:2069
-#: js/activity.js:2099
-#: js/activity.js:2082
-#: js/activity.js:2089
-#: js/activity.js:2094
-#: js/activity.js:2131
-#: js/activity.js:2211
-#: js/activity.js:2671
-#: js/activity.js:3340
-#: js/activity.js:3343
-#: js/activity.js:3346
-#: js/activity.js:3361
-#: js/activity.js:3367
-#: js/activity.js:3370
-#: js/activity.js:3385
-#: js/activity.js:3388
-#: js/activity.js:3717
-#: js/activity.js:7467
-#: js/activity.js:3719
-#: js/activity.js:7469
-#: js/activity.js:7080
-#: js/activity.js:7586
-#: js/activity.js:8099
-#: js/activity.js:8100
-#: js/activity.js:9291
-#: js/blocks/IntervalsBlocks.js:1214
-#: js/widgets/sampler.js:615
-#: planet/js/StringHelper.js:43
-#: planet/js/StringHelper.js:46
-#: planet/js/StringHelper.js:69
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Collapse Lesson Plans"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Collapse Explorer Journal"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Expand Lesson Plans"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Expand Explorer Journal"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Practice Lessons Not Ready"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "The lesson file could not be loaded. Please check js/practiceLessons/practiceLessons.json."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Practice"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Level"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Back"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Check My Work"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Quest Rewards"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Discoveries"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "The lesson song shines, and the island answers."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Melody Fragment restored. Captain's Journal Page found."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "The bridge song is still shining."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Discovery Already Saved"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Lyra has this mark in her map. Keep exploring the island for another secret."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Hidden Discovery"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "The Bridge Is Still Sleeping"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Beat hears a few echoes, but the stone tablet is waiting for A A B A. Try the bridge song again, then press Check My Work."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Discovery badge"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "My Explorer Book"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Memories from every island you have helped wake up."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Island Pages"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "My Notes"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Save your own ideas, drawings-in-words, or music thoughts here."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Add new note"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "+ New Note"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Page"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Notes"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Entries"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "New Note"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Title"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Give your note a name..."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "First thought"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Write anything you want to remember..."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Save Note"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Blank Page Waiting"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Add a title or a thought first, or come back when you are ready."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Note Saved"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Your personal note is tucked safely in My Notes."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Add another thought"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Write more here..."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Add Entry"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Delete Note"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Note Removed"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "That personal note has been cleared from your book."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Entry Added"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Another thought has been added to your note."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Entry Removed"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "That entry has been removed from your note."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Things I learned"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Add a new memory"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Today I discovered..."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Add Note"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Note Added"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "A new memory has been tucked into this page."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "That memory has been removed from this page."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Note Updated"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Your Explorer Book remembers the new version."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Title Updated"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Your note title has been saved."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "That memory has been removed."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Write a small memory first, or come back when you are ready."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "No notes yet"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "This page is ready whenever you want to write."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Your book is waiting"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Complete a practice level and Captain Cadence will share the first page."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#~msgid "Next Lesson"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#~msgid "Lesson Complete"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#~msgid "My Note"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#~msgid "Save Edit"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Close Explorer Journal prompt"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Captain's Journal"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Every explorer notices something different. Before you sail onward, save one tiny memory from today."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "What surprised you today?"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "I discovered..."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Skip"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Explorer Book Updated"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Captain Cadence saves your page. You can edit it later from Help > Explorer Journal."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Page Saved For Later"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "The Explorer Book keeps a blank page ready whenever you want to write."
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Saved in your journal"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "Untitled Note"
-#~msgstr ""
-
-#: js/practiceLessons/practiceUI.js
-#: js/practiceLessons/practiceManager.js
-#~msgid "My thought"
 #~msgstr ""
 

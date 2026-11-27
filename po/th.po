@@ -195,6 +195,7 @@ msgstr ""
 #: js/widgets/rhythmruler.js:2713
 #: js/widgets/musickeyboard.js:3344
 #: js/logoconstants.js:42
+#: js/logoconstants.js:42
 msgid "Not a valid pitch name"
 msgstr "ไม่ใช่ชื่อเสนอขายที่ถูกต้อง"
 
@@ -210,10 +211,11 @@ msgstr ""
 #: js/piemenu-block-context.js:118
 #: js/palette.js:1673
 #: js/palette.js:1677
+#: js/gitDropdown.js:950
 #: js/widgets/TemperamentUI.js:491
 #: js/widgets/TemperamentUI.js:492
 #: js/widgets/widgetWindows.js:547
-#: planet/js/StringHelper.js:76
+#: planet/js/StringHelper.js:80
 msgid "Close"
 msgstr "ปิด"
 
@@ -245,6 +247,7 @@ msgstr ""
 #: planet/js/Planet.js:225
 #: planet/js/StringHelper.js:42
 #: planet/js/StringHelper.js:49
+#: planet/js/StringHelper.js:53
 msgid "Cancel"
 msgstr "ยกเลิก"
 
@@ -392,16 +395,16 @@ msgstr "Music Blocks ได้รับการตั้งค่าเป็�
 #: js/palette.js:2064
 #: js/block.js:1788
 #: js/block.js:5387
+#: js/turtledefs.js:132
+#: js/turtledefs.js:230
 #: js/blocks.js:1749
 #: js/blocks.js:3806
 #: js/blocks.js:3807
 #: js/blocks.js:3980
 #: js/blocks.js:4379
 #: js/blocks.js:4564
-#: js/blocks.js:6058
-#: js/blocks.js:7609
-#: js/turtledefs.js:132
-#: js/turtledefs.js:230
+#: js/blocks.js:6062
+#: js/blocks.js:7613
 #: js/blocks/ActionBlocks.js:252
 #: js/blocks/ActionBlocks.js:329
 #: js/blocks/ActionBlocks.js:640
@@ -435,9 +438,9 @@ msgstr "เป็ด"
 #: js/turtles.js:116
 #: js/lilypond.js:957
 #: js/block.js:1802
-#: js/logo.js:2057
 #: js/turtle-painter.js:1427
 #: js/turtle-painter.js:1428
+#: js/logo.js:2057
 #: js/blocks/ActionBlocks.js:1253
 #: js/blocks/ProgramBlocks.js:1420
 msgid "start"
@@ -708,10 +711,10 @@ msgstr ""
 #: js/project-manager.js:747
 #: js/project-manager.js:860
 #: js/project-manager.js:1364
-#: planet/js/GlobalPlanet.js:564
-#: planet/js/GlobalPlanet.js:566
-#: planet/js/GlobalPlanet.js:703
 #: planet/js/ProjectStorage.js:26
+#: planet/js/GlobalPlanet.js:600
+#: planet/js/GlobalPlanet.js:602
+#: planet/js/GlobalPlanet.js:739
 msgid "My Project"
 msgstr "โครงการของฉัน"
 
@@ -805,9 +808,9 @@ msgstr "โหมดคอนทราสต์สูง"
 #: js/toolbar-ui.js:159
 #: js/toolbar-ui.js:239
 #: js/turtledefs.js:619
-#: planet/js/LocalCard.js:79
 #: planet/js/GlobalCard.js:66
-#: planet/js/StringHelper.js:78
+#: planet/js/LocalCard.js:79
+#: planet/js/StringHelper.js:82
 msgid "Merge with current project"
 msgstr "รวมกับโครงการปัจจุบัน"
 
@@ -1057,7 +1060,7 @@ msgstr "สลับจานสี"
 #: js/blocks.js:4148
 #: js/blocks.js:4203
 #: js/blocks.js:4249
-#: js/blocks.js:7635
+#: js/blocks.js:7639
 #: js/blocks/BoxesBlocks.js:289
 #: js/blocks/BoxesBlocks.js:292
 #: js/blocks/BoxesBlocks.js:412
@@ -1663,122 +1666,6 @@ msgstr "ค่าอ็อกเทฟต้องอยู่ระหว่า
 msgid "Numbers can have at most 10 digits."
 msgstr "ตัวเลขสามารถมีได้สูงสุด 10 หลัก"
 
-#: js/blocks.js:2462
-#: js/blocks.js:2466
-#: js/blocks.js:2472
-#: js/blocks.js:2474
-msgid "audio file"
-msgstr "ไฟล์เสียง"
-
-#: js/blocks.js:3764
-#: js/blocks.js:4169
-#: js/blocks.js:4215
-#: js/blocks.js:4261
-#: js/blocks.js:6823
-#: js/blocks.js:6847
-#: js/blocks/BoxesBlocks.js:783
-msgid "box1"
-msgstr "กล่อง1"
-
-#: js/blocks.js:3766
-#: js/blocks.js:4171
-#: js/blocks.js:4217
-#: js/blocks.js:4263
-#: js/blocks.js:6825
-#: js/blocks.js:6849
-#: js/blocks/BoxesBlocks.js:674
-msgid "box2"
-msgstr "กล่อง2"
-
-#: js/blocks.js:4421
-#: js/blocks/MediaBlocks.js:827
-#: js/blocks/BoxesBlocks.js:606
-#: js/blocks/DictBlocks.js:215
-#: js/blocks/DictBlocks.js:289
-#: js/blocks/EnsembleBlocks.js:441
-#: js/blocks/EnsembleBlocks.js:458
-#: js/blocks/PitchBlocks.js:731
-#: js/blocks/PitchBlocks.js:1084
-#: js/blocks/PitchBlocks.js:2038
-#: js/blocks/ProgramBlocks.js:412
-#: js/blocks/ProgramBlocks.js:539
-#: js/blocks/ProgramBlocks.js:724
-#: js/blocks/ToneBlocks.js:1082
-msgid "name"
-msgstr "ชื่อ"
-
-#: js/blocks.js:4421
-#: js/blocks/BoxesBlocks.js:75
-#: js/blocks/BoxesBlocks.js:606
-#: js/blocks/DictBlocks.js:289
-#: js/blocks/DictBlocks.js:430
-#: js/blocks/NumberBlocks.js:973
-#: js/blocks/HeapBlocks.js:573
-#: js/blocks/RhythmBlocks.js:1164
-msgid "value"
-msgstr "ค่า"
-
-#: js/blocks.js:4760
-msgid "Forever loop detected inside a note value block. Unexpected things may happen."
-msgstr "ตรวจพบการวนซ้ำตลอดกาลภายในบล็อกค่าบันทึก สิ่งที่ไม่คาดคิดอาจเกิดขึ้นได้"
-
-#: js/blocks.js:5319
-msgid "There is no block selected."
-msgstr "ไม่มีการเลือกบล็อก"
-
-#: js/blocks.js:5429
-#: js/blocks/MediaBlocks.js:884
-#.TRANS: Avatar is the image used to determine the appearance of the mouse.
-msgid "avatar"
-msgstr "อวตาร"
-
-#: js/blocks.js:5432
-#: js/blocks/ToneBlocks.js:1067
-#: js/widgets/SamplerCanvas.js:169
-#.TRANS: The sound sample that the user uploads.
-msgid "sample"
-msgstr "ตัวอย่าง"
-
-#: js/blocks.js:5733
-#: js/project-manager.js:1940
-msgid "Something went wrong reading JSON-encoded project data."
-msgstr "เกิดข้อผิดพลาดในการอ่านข้อมูลโปรเจ็กต์ที่เข้ารหัสด้วย JSON"
-
-#: js/blocks.js:5756
-msgid "Cannot load project: invalid project structure."
-msgstr ""
-
-#: js/blocks.js:5766
-#: js/blocks.js:6201
-#: js/blocks.js:6277
-msgid "Cannot load project: malformed block structure detected."
-msgstr ""
-
-#: js/blocks.js:5883
-msgid "Cannot load project: circular block connection detected."
-msgstr ""
-
-#: js/blocks.js:6231
-#: js/blocks.js:6482
-msgid "Cannot load project: invalid block connection detected."
-msgstr ""
-
-#: js/blocks.js:7668
-msgid "Some blocks in this project are unsupported and were replaced with placeholders: %s"
-msgstr ""
-
-#: js/blocks.js:8053
-msgid "Nothing to undo."
-msgstr ""
-
-#: js/blocks.js:8105
-msgid "Nothing to redo."
-msgstr ""
-
-#: js/blocks.js:8266
-msgid "block sent to trash"
-msgstr ""
-
 #: js/loader.js:770
 msgid "Failed to load EaselJS. Please refresh the page."
 msgstr "โหลด EaselJS.dll ไม่สำเร็จ กรุณารีเฟรชหน้า"
@@ -1790,56 +1677,6 @@ msgstr "โหลด Music Blocks ไม่สำเร็จ กรุณาร
 #: js/loader.js:806
 msgid "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: %s"
 msgstr "ไม่สามารถเริ่มต้นแกนหลักของ Music Blocks กรุณารีเฟรชหน้า\n\nข้อผิดพลาด: %s"
-
-#: js/logo.js:854
-msgid "Downloading Kokoro voice: %s"
-msgstr ""
-
-#: js/logo.js:998
-#: js/blocks/ProgramBlocks.js:277
-#: js/blocks/ProgramBlocks.js:453
-msgid "You must select a file."
-msgstr "คุณต้องเลือกไฟล์."
-
-#: js/logo.js:2319
-msgid "Infinite loop detected. Execution stopped to prevent browser freeze."
-msgstr "ตรวจพบการวนซ้ำไม่สิ้นสุด การดำเนินการหยุดลงเพื่อป้องกันเบราว์เซอร์ค้าง"
-
-#: js/logo.js:2527
-#: js/blocks/MediaBlocks.js:338
-msgid "width"
-msgstr "ความกว้าง"
-
-#: js/logo.js:2528
-#: js/blocks/MediaBlocks.js:395
-msgid "height"
-msgstr "ความสูง"
-
-#: js/logo.js:2529
-#: js/blocks/MediaBlocks.js:35
-#.TRANS: right side of the screen
-msgid "right (screen)"
-msgstr "ขวา (หน้าจอ)"
-
-#: js/logo.js:2530
-#: js/blocks/MediaBlocks.js:111
-#.TRANS: left side of the screen
-msgid "left (screen)"
-msgstr "ซ้าย (หน้าจอ)"
-
-#: js/logo.js:2531
-#: js/blocks/MediaBlocks.js:186
-msgid "top (screen)"
-msgstr "ด้านบน (หน้าจอ)"
-
-#: js/logo.js:2532
-#: js/blocks/MediaBlocks.js:261
-msgid "bottom (screen)"
-msgstr "ด้านล่าง (หน้าจอ)"
-
-#: js/logo.js:2900
-msgid "Playback is ready."
-msgstr "การเล่นพร้อมแล้ว"
 
 #: js/planetInterface.js:171
 msgid "project undefined"
@@ -1937,6 +1774,11 @@ msgstr ""
 #: js/project-manager.js:1971
 msgid "Invalid parameters"
 msgstr "พารามิเตอร์ไม่ถูกต้อง"
+
+#: js/project-manager.js:1940
+#: js/blocks.js:5737
+msgid "Something went wrong reading JSON-encoded project data."
+msgstr "เกิดข้อผิดพลาดในการอ่านข้อมูลโปรเจ็กต์ที่เข้ารหัสด้วย JSON"
 
 #: js/search-ui.js:212
 msgid "No results found for %s"
@@ -2483,6 +2325,289 @@ msgstr "ยินดีด้วย!"
 msgid "You have finished the tour. Please enjoy Music Blocks!"
 msgstr "ทัวร์จบแล้ว เริ่มเล่น Music Blockกัน"
 
+#: js/logo.js:854
+msgid "Downloading Kokoro voice: %s"
+msgstr ""
+
+#: js/logo.js:998
+#: js/blocks/ProgramBlocks.js:277
+#: js/blocks/ProgramBlocks.js:453
+msgid "You must select a file."
+msgstr "คุณต้องเลือกไฟล์."
+
+#: js/logo.js:2319
+msgid "Infinite loop detected. Execution stopped to prevent browser freeze."
+msgstr "ตรวจพบการวนซ้ำไม่สิ้นสุด การดำเนินการหยุดลงเพื่อป้องกันเบราว์เซอร์ค้าง"
+
+#: js/logo.js:2527
+#: js/blocks/MediaBlocks.js:338
+msgid "width"
+msgstr "ความกว้าง"
+
+#: js/logo.js:2528
+#: js/blocks/MediaBlocks.js:395
+msgid "height"
+msgstr "ความสูง"
+
+#: js/logo.js:2529
+#: js/blocks/MediaBlocks.js:35
+#.TRANS: right side of the screen
+msgid "right (screen)"
+msgstr "ขวา (หน้าจอ)"
+
+#: js/logo.js:2530
+#: js/blocks/MediaBlocks.js:111
+#.TRANS: left side of the screen
+msgid "left (screen)"
+msgstr "ซ้าย (หน้าจอ)"
+
+#: js/logo.js:2531
+#: js/blocks/MediaBlocks.js:186
+msgid "top (screen)"
+msgstr "ด้านบน (หน้าจอ)"
+
+#: js/logo.js:2532
+#: js/blocks/MediaBlocks.js:261
+msgid "bottom (screen)"
+msgstr "ด้านล่าง (หน้าจอ)"
+
+#: js/logo.js:2900
+msgid "Playback is ready."
+msgstr "การเล่นพร้อมแล้ว"
+
+#: js/blocks.js:2462
+#: js/blocks.js:2466
+#: js/blocks.js:2472
+#: js/blocks.js:2474
+msgid "audio file"
+msgstr "ไฟล์เสียง"
+
+#: js/blocks.js:3764
+#: js/blocks.js:4169
+#: js/blocks.js:4215
+#: js/blocks.js:4261
+#: js/blocks.js:6827
+#: js/blocks.js:6851
+#: js/blocks/BoxesBlocks.js:783
+msgid "box1"
+msgstr "กล่อง1"
+
+#: js/blocks.js:3766
+#: js/blocks.js:4171
+#: js/blocks.js:4217
+#: js/blocks.js:4263
+#: js/blocks.js:6829
+#: js/blocks.js:6853
+#: js/blocks/BoxesBlocks.js:674
+msgid "box2"
+msgstr "กล่อง2"
+
+#: js/blocks.js:4421
+#: js/blocks/MediaBlocks.js:827
+#: js/blocks/BoxesBlocks.js:606
+#: js/blocks/DictBlocks.js:215
+#: js/blocks/DictBlocks.js:289
+#: js/blocks/EnsembleBlocks.js:441
+#: js/blocks/EnsembleBlocks.js:458
+#: js/blocks/PitchBlocks.js:731
+#: js/blocks/PitchBlocks.js:1084
+#: js/blocks/PitchBlocks.js:2038
+#: js/blocks/ProgramBlocks.js:412
+#: js/blocks/ProgramBlocks.js:539
+#: js/blocks/ProgramBlocks.js:724
+#: js/blocks/ToneBlocks.js:1082
+msgid "name"
+msgstr "ชื่อ"
+
+#: js/blocks.js:4421
+#: js/blocks/BoxesBlocks.js:75
+#: js/blocks/BoxesBlocks.js:606
+#: js/blocks/DictBlocks.js:289
+#: js/blocks/DictBlocks.js:430
+#: js/blocks/NumberBlocks.js:973
+#: js/blocks/HeapBlocks.js:573
+#: js/blocks/RhythmBlocks.js:1164
+msgid "value"
+msgstr "ค่า"
+
+#: js/blocks.js:4760
+msgid "Forever loop detected inside a note value block. Unexpected things may happen."
+msgstr "ตรวจพบการวนซ้ำตลอดกาลภายในบล็อกค่าบันทึก สิ่งที่ไม่คาดคิดอาจเกิดขึ้นได้"
+
+#: js/blocks.js:5319
+msgid "There is no block selected."
+msgstr "ไม่มีการเลือกบล็อก"
+
+#: js/blocks.js:5429
+#: js/blocks/MediaBlocks.js:884
+#.TRANS: Avatar is the image used to determine the appearance of the mouse.
+msgid "avatar"
+msgstr "อวตาร"
+
+#: js/blocks.js:5432
+#: js/blocks/ToneBlocks.js:1067
+#: js/widgets/SamplerCanvas.js:169
+#.TRANS: The sound sample that the user uploads.
+msgid "sample"
+msgstr "ตัวอย่าง"
+
+#: js/blocks.js:5617
+#: js/blocks.js:5760
+msgid "Cannot load project: invalid project structure."
+msgstr ""
+
+#: js/blocks.js:5770
+#: js/blocks.js:6205
+#: js/blocks.js:6281
+msgid "Cannot load project: malformed block structure detected."
+msgstr ""
+
+#: js/blocks.js:5887
+msgid "Cannot load project: circular block connection detected."
+msgstr ""
+
+#: js/blocks.js:6235
+#: js/blocks.js:6486
+msgid "Cannot load project: invalid block connection detected."
+msgstr ""
+
+#: js/blocks.js:7672
+msgid "Some blocks in this project are unsupported and were replaced with placeholders: %s"
+msgstr ""
+
+#: js/blocks.js:8057
+msgid "Nothing to undo."
+msgstr ""
+
+#: js/blocks.js:8109
+msgid "Nothing to redo."
+msgstr ""
+
+#: js/blocks.js:8270
+msgid "block sent to trash"
+msgstr ""
+
+#: js/gitDropdown.js:875
+msgid "Saved moment"
+msgstr ""
+
+#: js/gitDropdown.js:893
+msgid "You're offline. Connect to the network to view commits for this project."
+msgstr ""
+
+#: js/gitDropdown.js:894
+msgid "Network Connection Required"
+msgstr ""
+
+#: js/gitDropdown.js:907
+msgid "No moments marked yet. Click \"Mark this moment\" to save your first one!"
+msgstr ""
+
+#: js/gitDropdown.js:908
+msgid "No Saved Moments Yet"
+msgstr ""
+
+#: js/gitDropdown.js:939
+#: js/gitDropdown.js:969
+msgid "Time Travel"
+msgstr ""
+
+#: js/gitDropdown.js:972
+msgid "Every save, forever yours"
+msgstr ""
+
+#: js/gitDropdown.js:1091
+#: js/gitDropdown.js:1196
+msgid "YOU ARE HERE"
+msgstr ""
+
+#: js/gitDropdown.js:1118
+msgid "Sync Pending"
+msgstr ""
+
+#: js/gitDropdown.js:1124
+msgid "Latest"
+msgstr ""
+
+#: js/gitDropdown.js:1137
+#: js/gitDropdown.js:1232
+msgid "Undo my changes"
+msgstr ""
+
+#: js/gitDropdown.js:1147
+#: js/gitDropdown.js:1242
+msgid "Go back to this version"
+msgstr ""
+
+#: js/gitDropdown.js:1210
+msgid "The very beginning"
+msgstr ""
+
+#: js/gitDropdown.js:1214
+msgid "Where your project started"
+msgstr ""
+
+#: js/gitDropdown.js:1221
+msgid "Setting Up Tracking"
+msgstr ""
+
+#: js/gitDropdown.js:1235
+#: js/gitDropdown.js:1245
+msgid "Start point"
+msgstr ""
+
+#: js/gitDropdown.js:1269
+msgid "no more offline commits can be made"
+msgstr ""
+
+#: js/gitDropdown.js:1271
+msgid "1 more commit can be made"
+msgstr ""
+
+#: js/gitDropdown.js:1272
+msgid "%s more commits can be made"
+msgstr ""
+
+#: js/gitDropdown.js:1284
+msgid "Showing locally saved drafts"
+msgstr ""
+
+#: js/gitDropdown.js:1783
+msgid "Just now"
+msgstr ""
+
+#: js/gitDropdown.js:1784
+msgid "1 minute ago"
+msgstr ""
+
+#: js/gitDropdown.js:1784
+msgid "%s minutes ago"
+msgstr ""
+
+#: js/gitDropdown.js:1786
+msgid "1 hour ago"
+msgstr ""
+
+#: js/gitDropdown.js:1786
+msgid "%s hours ago"
+msgstr ""
+
+#: js/gitDropdown.js:1788
+msgid "1 day ago"
+msgstr ""
+
+#: js/gitDropdown.js:1788
+msgid "%s days ago"
+msgstr ""
+
+#: js/gitDropdown.js:1790
+msgid "1 month ago"
+msgstr ""
+
+#: js/gitDropdown.js:1790
+msgid "%s months ago"
+msgstr ""
+
 #: js/utils/plugin-utils.js:55
 msgid "Security Warning"
 msgstr "คำเตือนด้านความปลอดภัย"
@@ -2633,8 +2758,8 @@ msgstr "มีความหมาย"
 #: js/blocks/IntervalsBlocks.js:1187
 #: js/blocks/WidgetBlocks.js:640
 #: js/blocks/WidgetBlocks.js:645
-#: js/blocks/ToneBlocks.js:1003
 #: js/blocks/VolumeBlocks.js:420
+#: js/blocks/ToneBlocks.js:1003
 #: js/turtleactions/VolumeActions.js:49
 #: js/widgets/modewidget.js:1741
 #.TRANS: customize voice
@@ -3635,6 +3760,14 @@ msgstr "ลดลงเหลือ 7"
 msgid "half-diminished 7th"
 msgstr "ลดลงครึ่งหนึ่งที่ 7"
 
+#: js/utils/utils-logic.js:431
+msgid "Invalid input passed to rational sum"
+msgstr ""
+
+#: js/utils/utils-logic.js:438
+msgid "Note calculation failed: zero denominator"
+msgstr ""
+
 #: js/utils/synthutils.js:130
 #.TRANS: simple monotone synthesizer
 msgid "simple-2"
@@ -3663,14 +3796,6 @@ msgstr "ระฆังญี่ปุ่น"
 #: js/utils/synthutils.js:2493
 msgid "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
 msgstr "⚠️ ปิดเสียงแล้ว!\n\nโปรดตรวจสอบการตั้งค่าเบราว์เซอร์ของคุณ (การตั้งค่าไซต์ > เสียง) เพื่ออนุญาตเสียงสำหรับบล็อกเพลง"
-
-#: js/utils/utils-logic.js:431
-msgid "Invalid input passed to rational sum"
-msgstr ""
-
-#: js/utils/utils-logic.js:438
-msgid "Note calculation failed: zero denominator"
-msgstr ""
 
 #: js/blocks/BooleanBlocks.js:44
 msgid "The Not block is the logical not operator."
@@ -7275,6 +7400,112 @@ msgstr "บล็อก Get blue ส่งคืนองค์ประกอ�
 msgid "The Get blue block returns the blue component of the pixel under the turtle."
 msgstr "บล็อก Get blue ส่งคืนองค์ประกอบสีน้ำเงินของพิกเซลใต้เต่า"
 
+#: js/blocks/VolumeBlocks.js:35
+msgid "synth volume"
+msgstr "ปริมาณการสังเคราะห์"
+
+#: js/blocks/VolumeBlocks.js:39
+msgid "The Synth volume block returns the current volume of the current synthesizer."
+msgstr "บล็อกวอลุ่ม Synth ส่งกลับระดับเสียงปัจจุบันของซินธิไซเซอร์ปัจจุบัน"
+
+#: js/blocks/VolumeBlocks.js:109
+msgid "master volume"
+msgstr "ระดับเสียงหลัก"
+
+#: js/blocks/VolumeBlocks.js:113
+msgid "The Master volume block returns the master volume."
+msgstr "บล็อกวอลลุ่มหลักจะส่งกลับวอลลุ่มหลัก"
+
+#: js/blocks/VolumeBlocks.js:364
+#: js/blocks/VolumeBlocks.js:535
+msgid "set synth volume"
+msgstr "ตั้งค่าระดับเสียงซินธ์"
+
+#: js/blocks/VolumeBlocks.js:371
+#: js/blocks/VolumeBlocks.js:556
+msgid "synth"
+msgstr "สังเคราะห์"
+
+#: js/blocks/VolumeBlocks.js:412
+#: js/blocks/VolumeBlocks.js:588
+#: js/blocks/VolumeBlocks.js:751
+#: js/turtleactions/VolumeActions.js:222
+msgid "Setting volume to 0."
+msgstr "การตั้งค่าระดับเสียงเป็น 0"
+
+#: js/blocks/VolumeBlocks.js:449
+msgid "Synth not found"
+msgstr "ไม่พบซินธ์"
+
+#: js/blocks/VolumeBlocks.js:505
+msgid "set drum volume"
+msgstr "ตั้งระดับเสียงของดรัม"
+
+#: js/blocks/VolumeBlocks.js:541
+msgid "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc."
+msgstr "บล็อกระดับเสียงซินธ์การตั้งค่าจะเปลี่ยนระดับเสียงของซินธ์เฉพาะ เช่น กีตาร์ ไวโอลิน สแนร์ กลอง ฯลฯ"
+
+#: js/blocks/VolumeBlocks.js:545
+msgid "The default volume is 50."
+msgstr "ระดับเสียงเริ่มต้นคือ 50"
+
+#: js/blocks/VolumeBlocks.js:547
+msgid "The range is 0 for silence to 100 for full volume."
+msgstr "ช่วงคือ 0 สำหรับความเงียบ ไปจนถึง 100 สำหรับระดับเสียงสูงสุด"
+
+#: js/blocks/VolumeBlocks.js:608
+msgid "set panning"
+msgstr "ตั้งค่าการแพน"
+
+#: js/blocks/VolumeBlocks.js:614
+msgid "The Set Panning block sets the panning for all synthesizers."
+msgstr "บล็อก Set Panning จะตั้งค่าการแพนสำหรับซินธิไซเซอร์ทั้งหมด"
+
+#: js/blocks/VolumeBlocks.js:636
+msgid "Warning: Sound is coming out from only the left or right side."
+msgstr "คำเตือน: เสียงออกมาจากด้านซ้ายหรือด้านขวาเท่านั้น"
+
+#: js/blocks/VolumeBlocks.js:658
+#: js/blocks/VolumeBlocks.js:706
+msgid "set master volume"
+msgstr "ตั้งระดับเสียงหลัก"
+
+#: js/blocks/VolumeBlocks.js:664
+msgid "The Set master volume block sets the volume for all synthesizers."
+msgstr "บล็อกการตั้งค่าระดับเสียงหลักจะตั้งค่าระดับเสียงสำหรับซินธิไซเซอร์ทั้งหมด"
+
+#: js/blocks/VolumeBlocks.js:794
+msgid "The Set relative volume block changes the volume of the contained notes."
+msgstr "บล็อกการตั้งค่าระดับเสียงสัมพันธ์จะเปลี่ยนระดับเสียงของบันทึกที่มีอยู่"
+
+#: js/blocks/VolumeBlocks.js:801
+msgid "set relative volume"
+msgstr "ตั้งค่าระดับเสียงสัมพัทธ์"
+
+#: js/blocks/VolumeBlocks.js:853
+msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
+msgstr "บล็อก Decrescendo จะลดระดับเสียงของโน้ตที่มีอยู่ตามจำนวนที่ระบุสำหรับโน้ตแต่ละตัวที่เล่น"
+
+#: js/blocks/VolumeBlocks.js:857
+msgid "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
+msgstr "ตัวอย่างเช่น หากคุณมีโน้ต 7 ตัวตามลำดับที่อยู่ในบล็อก Decrescendo ที่มีค่า 5 โน้ตสุดท้ายจะน้อยกว่าระดับเสียงเริ่มต้น 35%"
+
+#: js/blocks/VolumeBlocks.js:867
+msgid "decrescendo"
+msgstr "ลดลง"
+
+#: js/blocks/VolumeBlocks.js:917
+msgid "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
+msgstr "บล็อก Crescendo จะเพิ่มระดับเสียงของโน้ตที่มีอยู่ตามจำนวนที่ระบุสำหรับทุกๆ โน้ตที่เล่น"
+
+#: js/blocks/VolumeBlocks.js:921
+msgid "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
+msgstr "ตัวอย่างเช่น หากคุณมีโน้ต 7 ตัวเรียงตามลำดับในบล็อก Crescendo ที่มีค่า 5 โน้ตสุดท้ายจะมากกว่าระดับเสียงเริ่มต้น 35%"
+
+#: js/blocks/VolumeBlocks.js:931
+msgid "crescendo"
+msgstr "เพิ่มขึ้น"
+
 #: js/blocks/ToneBlocks.js:34
 #: js/widgets/timbre.js:314
 msgid "Oscillator"
@@ -7523,112 +7754,6 @@ msgstr "นำเข้าไฟล์เสียงเพื่อใช้เ
 #: js/blocks/ToneBlocks.js:1174
 msgid "Upload a sound file to connect with the sample block."
 msgstr "อัปโหลดไฟล์เสียงเพื่อเชื่อมต่อกับบล็อกตัวอย่าง"
-
-#: js/blocks/VolumeBlocks.js:35
-msgid "synth volume"
-msgstr "ปริมาณการสังเคราะห์"
-
-#: js/blocks/VolumeBlocks.js:39
-msgid "The Synth volume block returns the current volume of the current synthesizer."
-msgstr "บล็อกวอลุ่ม Synth ส่งกลับระดับเสียงปัจจุบันของซินธิไซเซอร์ปัจจุบัน"
-
-#: js/blocks/VolumeBlocks.js:109
-msgid "master volume"
-msgstr "ระดับเสียงหลัก"
-
-#: js/blocks/VolumeBlocks.js:113
-msgid "The Master volume block returns the master volume."
-msgstr "บล็อกวอลลุ่มหลักจะส่งกลับวอลลุ่มหลัก"
-
-#: js/blocks/VolumeBlocks.js:364
-#: js/blocks/VolumeBlocks.js:535
-msgid "set synth volume"
-msgstr "ตั้งค่าระดับเสียงซินธ์"
-
-#: js/blocks/VolumeBlocks.js:371
-#: js/blocks/VolumeBlocks.js:556
-msgid "synth"
-msgstr "สังเคราะห์"
-
-#: js/blocks/VolumeBlocks.js:412
-#: js/blocks/VolumeBlocks.js:588
-#: js/blocks/VolumeBlocks.js:751
-#: js/turtleactions/VolumeActions.js:222
-msgid "Setting volume to 0."
-msgstr "การตั้งค่าระดับเสียงเป็น 0"
-
-#: js/blocks/VolumeBlocks.js:449
-msgid "Synth not found"
-msgstr "ไม่พบซินธ์"
-
-#: js/blocks/VolumeBlocks.js:505
-msgid "set drum volume"
-msgstr "ตั้งระดับเสียงของดรัม"
-
-#: js/blocks/VolumeBlocks.js:541
-msgid "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc."
-msgstr "บล็อกระดับเสียงซินธ์การตั้งค่าจะเปลี่ยนระดับเสียงของซินธ์เฉพาะ เช่น กีตาร์ ไวโอลิน สแนร์ กลอง ฯลฯ"
-
-#: js/blocks/VolumeBlocks.js:545
-msgid "The default volume is 50."
-msgstr "ระดับเสียงเริ่มต้นคือ 50"
-
-#: js/blocks/VolumeBlocks.js:547
-msgid "The range is 0 for silence to 100 for full volume."
-msgstr "ช่วงคือ 0 สำหรับความเงียบ ไปจนถึง 100 สำหรับระดับเสียงสูงสุด"
-
-#: js/blocks/VolumeBlocks.js:608
-msgid "set panning"
-msgstr "ตั้งค่าการแพน"
-
-#: js/blocks/VolumeBlocks.js:614
-msgid "The Set Panning block sets the panning for all synthesizers."
-msgstr "บล็อก Set Panning จะตั้งค่าการแพนสำหรับซินธิไซเซอร์ทั้งหมด"
-
-#: js/blocks/VolumeBlocks.js:636
-msgid "Warning: Sound is coming out from only the left or right side."
-msgstr "คำเตือน: เสียงออกมาจากด้านซ้ายหรือด้านขวาเท่านั้น"
-
-#: js/blocks/VolumeBlocks.js:658
-#: js/blocks/VolumeBlocks.js:706
-msgid "set master volume"
-msgstr "ตั้งระดับเสียงหลัก"
-
-#: js/blocks/VolumeBlocks.js:664
-msgid "The Set master volume block sets the volume for all synthesizers."
-msgstr "บล็อกการตั้งค่าระดับเสียงหลักจะตั้งค่าระดับเสียงสำหรับซินธิไซเซอร์ทั้งหมด"
-
-#: js/blocks/VolumeBlocks.js:794
-msgid "The Set relative volume block changes the volume of the contained notes."
-msgstr "บล็อกการตั้งค่าระดับเสียงสัมพันธ์จะเปลี่ยนระดับเสียงของบันทึกที่มีอยู่"
-
-#: js/blocks/VolumeBlocks.js:801
-msgid "set relative volume"
-msgstr "ตั้งค่าระดับเสียงสัมพัทธ์"
-
-#: js/blocks/VolumeBlocks.js:853
-msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
-msgstr "บล็อก Decrescendo จะลดระดับเสียงของโน้ตที่มีอยู่ตามจำนวนที่ระบุสำหรับโน้ตแต่ละตัวที่เล่น"
-
-#: js/blocks/VolumeBlocks.js:857
-msgid "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
-msgstr "ตัวอย่างเช่น หากคุณมีโน้ต 7 ตัวตามลำดับที่อยู่ในบล็อก Decrescendo ที่มีค่า 5 โน้ตสุดท้ายจะน้อยกว่าระดับเสียงเริ่มต้น 35%"
-
-#: js/blocks/VolumeBlocks.js:867
-msgid "decrescendo"
-msgstr "ลดลง"
-
-#: js/blocks/VolumeBlocks.js:917
-msgid "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
-msgstr "บล็อก Crescendo จะเพิ่มระดับเสียงของโน้ตที่มีอยู่ตามจำนวนที่ระบุสำหรับทุกๆ โน้ตที่เล่น"
-
-#: js/blocks/VolumeBlocks.js:921
-msgid "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
-msgstr "ตัวอย่างเช่น หากคุณมีโน้ต 7 ตัวเรียงตามลำดับในบล็อก Crescendo ที่มีค่า 5 โน้ตสุดท้ายจะมากกว่าระดับเสียงเริ่มต้น 35%"
-
-#: js/blocks/VolumeBlocks.js:931
-msgid "crescendo"
-msgstr "เพิ่มขึ้น"
 
 #: js/turtleactions/OrnamentActions.js:49
 msgid "Staccato value must be a positive number."
@@ -9459,71 +9584,6 @@ msgstr "เกม"
 msgid "Code Snippet"
 msgstr "ข้อมูลโค้ด"
 
-#: planet/js/GlobalPlanet.js:37
-msgid "No results found."
-msgstr "ไม่พบผลลัพธ์"
-
-#: planet/js/GlobalPlanet.js:54
-msgid "Remix of"
-msgstr "รีมิกซ์ของ"
-
-#: planet/js/GlobalPlanet.js:381
-msgid "Could not load project. Please check your connection and try again."
-msgstr ""
-
-#: planet/js/GlobalPlanet.js:735
-msgid "Cannot connect to server"
-msgstr "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้"
-
-#: planet/js/SaveInterface.js:34
-#: planet/js/GlobalCard.js:60
-msgid "Open in Music Blocks"
-msgstr "เปิดในบล็อกเพลง"
-
-#: planet/js/SaveInterface.js:37
-msgid "Open in Turtle Blocks"
-msgstr "เปิดใน Turtle Blocks"
-
-#: planet/js/LocalCard.js:37
-msgid "View published project"
-msgstr "ดูโครงการที่เผยแพร่"
-
-#: planet/js/LocalCard.js:42
-msgid "Being tracked"
-msgstr ""
-
-#: planet/js/LocalCard.js:54
-#: planet/js/ProjectViewer.js:92
-#: planet/js/GlobalCard.js:44
-msgid "Project thumbnail"
-msgstr ""
-
-#: planet/js/LocalCard.js:57
-#: planet/js/Publisher.js:236
-#: planet/js/StringHelper.js:37
-msgid "Publish project"
-msgstr "เผยแพร่โครงการ"
-
-#: planet/js/LocalCard.js:63
-msgid "Project name"
-msgstr ""
-
-#: planet/js/LocalCard.js:70
-msgid "Edit project"
-msgstr "แก้ไขโครงการ"
-
-#: planet/js/LocalCard.js:73
-msgid "Delete project"
-msgstr "ลบโปรเจ็กต์"
-
-#: planet/js/LocalCard.js:76
-msgid "Download project"
-msgstr "ดาวน์โหลดโครงการ"
-
-#: planet/js/LocalCard.js:82
-msgid "Duplicate project"
-msgstr "โครงการที่ซ้ำกัน"
-
 #: planet/js/ProjectStorage.js:541
 msgid "anonymous"
 msgstr "ไม่ระบุชื่อ"
@@ -9537,14 +9597,14 @@ msgid "Thank you for reporting this project. A moderator will review the project
 msgstr "ขอบคุณสำหรับการรายงานโครงการนี้ ผู้ดำเนินรายการจะตรวจสอบโครงการในไม่ช้า เพื่อตรวจสอบการละเมิดหลักปฏิบัติของ Sugar Labs"
 
 #: planet/js/ProjectViewer.js:33
-#: planet/js/StringHelper.js:64
-#: planet/js/StringHelper.js:66
-#: planet/js/StringHelper.js:75
+#: planet/js/StringHelper.js:68
+#: planet/js/StringHelper.js:70
+#: planet/js/StringHelper.js:79
 msgid "Report Project"
 msgstr "รายงานโครงการ"
 
 #: planet/js/ProjectViewer.js:34
-#: planet/js/StringHelper.js:65
+#: planet/js/StringHelper.js:69
 msgid "Project Reported"
 msgstr "รายงานโครงการแล้ว"
 
@@ -9556,9 +9616,20 @@ msgstr "จำเป็นต้องมีคำอธิบายรายง
 msgid "Report description too long"
 msgstr "คำอธิบายรายงานยาวเกินไป"
 
+#: planet/js/ProjectViewer.js:92
+#: planet/js/GlobalCard.js:44
+#: planet/js/LocalCard.js:54
+msgid "Project thumbnail"
+msgstr ""
+
 #: planet/js/GlobalCard.js:57
 msgid "More Details"
 msgstr "รายละเอียดเพิ่มเติม"
+
+#: planet/js/GlobalCard.js:60
+#: planet/js/SaveInterface.js:34
+msgid "Open in Music Blocks"
+msgstr "เปิดในบล็อกเพลง"
 
 #: planet/js/GlobalCard.js:63
 msgid "Remix project"
@@ -9594,8 +9665,8 @@ msgstr "ตัวเลือกขั้นสูง"
 
 #: planet/js/GlobalCard.js:218
 #: planet/js/GlobalCard.js:219
-#: planet/js/StringHelper.js:51
-#: planet/js/helper.js:187
+#: planet/js/StringHelper.js:55
+#: planet/js/helper.js:188
 msgid "Show all tags"
 msgstr ""
 
@@ -9623,6 +9694,12 @@ msgstr "คุณสมบัติไม่พร้อมใช้งาน - 
 msgid "Republish project"
 msgstr ""
 
+#: planet/js/Publisher.js:236
+#: planet/js/LocalCard.js:57
+#: planet/js/StringHelper.js:37
+msgid "Publish project"
+msgstr "เผยแพร่โครงการ"
+
 #: planet/js/Publisher.js:275
 #: planet/js/Publisher.js:292
 msgid "This field is required"
@@ -9643,6 +9720,74 @@ msgstr "ข้อผิดพลาดของเซิร์ฟเวอร์
 #: planet/js/Publisher.js:546
 msgid "Try Again"
 msgstr "ลองอีกครั้ง"
+
+#: planet/js/GlobalPlanet.js:37
+msgid "No results found."
+msgstr "ไม่พบผลลัพธ์"
+
+#: planet/js/GlobalPlanet.js:54
+msgid "Remix of"
+msgstr "รีมิกซ์ของ"
+
+#: planet/js/GlobalPlanet.js:391
+msgid "Could not load project. Please check your connection and try again."
+msgstr ""
+
+#: planet/js/GlobalPlanet.js:771
+msgid "Cannot connect to server"
+msgstr "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้"
+
+#: planet/js/LocalCard.js:37
+msgid "View published project"
+msgstr "ดูโครงการที่เผยแพร่"
+
+#: planet/js/LocalCard.js:42
+msgid "Being tracked"
+msgstr ""
+
+#: planet/js/LocalCard.js:63
+msgid "Project name"
+msgstr ""
+
+#: planet/js/LocalCard.js:70
+msgid "Edit project"
+msgstr "แก้ไขโครงการ"
+
+#: planet/js/LocalCard.js:73
+msgid "Delete project"
+msgstr "ลบโปรเจ็กต์"
+
+#: planet/js/LocalCard.js:76
+msgid "Download project"
+msgstr "ดาวน์โหลดโครงการ"
+
+#: planet/js/LocalCard.js:82
+msgid "Duplicate project"
+msgstr "โครงการที่ซ้ำกัน"
+
+#: planet/js/LocalCard.js:133
+msgid "You do not have permission to unpublish this project from this browser."
+msgstr ""
+
+#: planet/js/LocalCard.js:144
+msgid "Could not unpublish project. Please try again."
+msgstr ""
+
+#: planet/js/LocalCard.js:175
+msgid "Project unpublished."
+msgstr ""
+
+#: planet/js/LocalCard.js:179
+msgid "Project unpublished, but the change could not be saved on this device."
+msgstr ""
+
+#: planet/js/LocalCard.js:251
+msgid "Unpublish project"
+msgstr ""
+
+#: planet/js/SaveInterface.js:37
+msgid "Open in Turtle Blocks"
+msgstr "เปิดใน Turtle Blocks"
 
 #: planet/js/StringHelper.js:30
 msgid "Close Planet"
@@ -9669,12 +9814,12 @@ msgid "Tags (max 5)"
 msgstr "แท็ก (สูงสุด 5)"
 
 #: planet/js/StringHelper.js:40
-#: planet/js/StringHelper.js:63
+#: planet/js/StringHelper.js:67
 msgid "Description"
 msgstr "คำอธิบาย"
 
 #: planet/js/StringHelper.js:41
-#: planet/js/StringHelper.js:74
+#: planet/js/StringHelper.js:78
 msgid "Submit"
 msgstr "ส่ง"
 
@@ -9687,66 +9832,78 @@ msgid "Permanently delete project \"<span id=\"deleter-name\"></span>\"?"
 msgstr "ลบโครงการ \"<span id=\"deleter-name\"></span>\" อย่างถาวรหรือไม่"
 
 #: planet/js/StringHelper.js:50
+msgid "Unpublish project?"
+msgstr ""
+
+#: planet/js/StringHelper.js:51
+msgid "This project will no longer appear in public listings."
+msgstr ""
+
+#: planet/js/StringHelper.js:52
+msgid "Unpublish"
+msgstr ""
+
+#: planet/js/StringHelper.js:54
 msgid "Explore Projects"
 msgstr "สำรวจโครงการ"
 
-#: planet/js/StringHelper.js:52
+#: planet/js/StringHelper.js:56
 msgid "Most recent"
 msgstr "ล่าสุด"
 
-#: planet/js/StringHelper.js:53
+#: planet/js/StringHelper.js:57
 msgid "Most liked"
 msgstr "ชอบมากที่สุด"
 
-#: planet/js/StringHelper.js:54
+#: planet/js/StringHelper.js:58
 msgid "Most downloaded"
 msgstr "ดาวน์โหลดมากที่สุด"
 
-#: planet/js/StringHelper.js:55
+#: planet/js/StringHelper.js:59
 msgid "A-Z"
 msgstr "ก-ฮ"
 
-#: planet/js/StringHelper.js:56
+#: planet/js/StringHelper.js:60
 msgid "Sort by"
 msgstr "เรียงตาม"
 
-#: planet/js/StringHelper.js:57
+#: planet/js/StringHelper.js:61
 msgid "Load More Projects"
 msgstr "โหลดโครงการเพิ่มเติม"
 
-#: planet/js/StringHelper.js:58
+#: planet/js/StringHelper.js:62
 msgid "Last Updated"
 msgstr "อัปเดตล่าสุด"
 
-#: planet/js/StringHelper.js:59
+#: planet/js/StringHelper.js:63
 msgid "Creation Date"
 msgstr "วันที่สร้าง"
 
-#: planet/js/StringHelper.js:60
+#: planet/js/StringHelper.js:64
 msgid "Number of Downloads:"
 msgstr "จำนวนการดาวน์โหลด:"
 
-#: planet/js/StringHelper.js:61
+#: planet/js/StringHelper.js:65
 msgid "Number of Likes:"
 msgstr "จำนวนไลค์:"
 
-#: planet/js/StringHelper.js:62
+#: planet/js/StringHelper.js:66
 msgid "Tags:"
 msgstr "แท็ก:"
 
-#: planet/js/StringHelper.js:69
+#: planet/js/StringHelper.js:73
 msgid "Report projects which violate the <a href=\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\" target=\"_blank\" rel=\"noopener noreferrer\">Sugar Labs Code of Conduct</a>."
 msgstr "รายงานโครงการที่ละเมิด<a href=\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\" target=\"_blank\" rel=\"noopener noreferrer\">จรรยาบรรณของ Sugar Labs</a>"
 
-#: planet/js/StringHelper.js:73
+#: planet/js/StringHelper.js:77
 msgid "Reason for reporting project"
 msgstr "เหตุผลในการรายงานโครงการ"
 
-#: planet/js/StringHelper.js:77
+#: planet/js/StringHelper.js:81
 msgid "Download as File"
 msgstr "ดาวน์โหลดเป็นไฟล์"
 
-#: planet/js/helper.js:188
+#: planet/js/helper.js:189
 msgid "Show fewer tags"
 msgstr "แสดงแท็กน้อยลง"
 

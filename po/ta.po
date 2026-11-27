@@ -194,6 +194,7 @@ msgstr ""
 #: js/widgets/rhythmruler.js:2713
 #: js/widgets/musickeyboard.js:3344
 #: js/logoconstants.js:42
+#: js/logoconstants.js:42
 msgid "Not a valid pitch name"
 msgstr "சரியான பிட்ச் பெயர் இல்லை"
 
@@ -209,10 +210,11 @@ msgstr ""
 #: js/piemenu-block-context.js:118
 #: js/palette.js:1673
 #: js/palette.js:1677
+#: js/gitDropdown.js:950
 #: js/widgets/TemperamentUI.js:491
 #: js/widgets/TemperamentUI.js:492
 #: js/widgets/widgetWindows.js:547
-#: planet/js/StringHelper.js:76
+#: planet/js/StringHelper.js:80
 msgid "Close"
 msgstr "மூடு"
 
@@ -244,6 +246,7 @@ msgstr ""
 #: planet/js/Planet.js:225
 #: planet/js/StringHelper.js:42
 #: planet/js/StringHelper.js:49
+#: planet/js/StringHelper.js:53
 msgid "Cancel"
 msgstr "ரத்து செய்"
 
@@ -391,16 +394,16 @@ msgstr "இசைத் தொகுதிகள் ஏற்கனவே இந
 #: js/palette.js:2064
 #: js/block.js:1788
 #: js/block.js:5387
+#: js/turtledefs.js:132
+#: js/turtledefs.js:230
 #: js/blocks.js:1749
 #: js/blocks.js:3806
 #: js/blocks.js:3807
 #: js/blocks.js:3980
 #: js/blocks.js:4379
 #: js/blocks.js:4564
-#: js/blocks.js:6058
-#: js/blocks.js:7609
-#: js/turtledefs.js:132
-#: js/turtledefs.js:230
+#: js/blocks.js:6062
+#: js/blocks.js:7613
 #: js/blocks/ActionBlocks.js:252
 #: js/blocks/ActionBlocks.js:329
 #: js/blocks/ActionBlocks.js:640
@@ -434,9 +437,9 @@ msgstr "வாத்து"
 #: js/turtles.js:116
 #: js/lilypond.js:957
 #: js/block.js:1802
-#: js/logo.js:2057
 #: js/turtle-painter.js:1427
 #: js/turtle-painter.js:1428
+#: js/logo.js:2057
 #: js/blocks/ActionBlocks.js:1253
 #: js/blocks/ProgramBlocks.js:1420
 msgid "start"
@@ -707,10 +710,10 @@ msgstr ""
 #: js/project-manager.js:747
 #: js/project-manager.js:860
 #: js/project-manager.js:1364
-#: planet/js/GlobalPlanet.js:564
-#: planet/js/GlobalPlanet.js:566
-#: planet/js/GlobalPlanet.js:703
 #: planet/js/ProjectStorage.js:26
+#: planet/js/GlobalPlanet.js:600
+#: planet/js/GlobalPlanet.js:602
+#: planet/js/GlobalPlanet.js:739
 msgid "My Project"
 msgstr "எனது திட்டம்"
 
@@ -804,9 +807,9 @@ msgstr "உயர்-கான்ட்ராஸ்ட் பயன்முற�
 #: js/toolbar-ui.js:159
 #: js/toolbar-ui.js:239
 #: js/turtledefs.js:619
-#: planet/js/LocalCard.js:79
 #: planet/js/GlobalCard.js:66
-#: planet/js/StringHelper.js:78
+#: planet/js/LocalCard.js:79
+#: planet/js/StringHelper.js:82
 msgid "Merge with current project"
 msgstr "தற்போதைய திட்டத்துடன் இணைக்கவும்"
 
@@ -1056,7 +1059,7 @@ msgstr "தட்டு நிலைமாற்று"
 #: js/blocks.js:4148
 #: js/blocks.js:4203
 #: js/blocks.js:4249
-#: js/blocks.js:7635
+#: js/blocks.js:7639
 #: js/blocks/BoxesBlocks.js:289
 #: js/blocks/BoxesBlocks.js:292
 #: js/blocks/BoxesBlocks.js:412
@@ -1662,122 +1665,6 @@ msgstr "ஆக்டேவ் மதிப்பு 1 முதல் 8 வர�
 msgid "Numbers can have at most 10 digits."
 msgstr "எண்களில் அதிகபட்சம் 10 இலக்கங்கள் இருக்கலாம்."
 
-#: js/blocks.js:2462
-#: js/blocks.js:2466
-#: js/blocks.js:2472
-#: js/blocks.js:2474
-msgid "audio file"
-msgstr "ஆடியோ கோப்பு"
-
-#: js/blocks.js:3764
-#: js/blocks.js:4169
-#: js/blocks.js:4215
-#: js/blocks.js:4261
-#: js/blocks.js:6823
-#: js/blocks.js:6847
-#: js/blocks/BoxesBlocks.js:783
-msgid "box1"
-msgstr "பெட்டி1"
-
-#: js/blocks.js:3766
-#: js/blocks.js:4171
-#: js/blocks.js:4217
-#: js/blocks.js:4263
-#: js/blocks.js:6825
-#: js/blocks.js:6849
-#: js/blocks/BoxesBlocks.js:674
-msgid "box2"
-msgstr "பெட்டி2"
-
-#: js/blocks.js:4421
-#: js/blocks/MediaBlocks.js:827
-#: js/blocks/BoxesBlocks.js:606
-#: js/blocks/DictBlocks.js:215
-#: js/blocks/DictBlocks.js:289
-#: js/blocks/EnsembleBlocks.js:441
-#: js/blocks/EnsembleBlocks.js:458
-#: js/blocks/PitchBlocks.js:731
-#: js/blocks/PitchBlocks.js:1084
-#: js/blocks/PitchBlocks.js:2038
-#: js/blocks/ProgramBlocks.js:412
-#: js/blocks/ProgramBlocks.js:539
-#: js/blocks/ProgramBlocks.js:724
-#: js/blocks/ToneBlocks.js:1082
-msgid "name"
-msgstr "பெயர்"
-
-#: js/blocks.js:4421
-#: js/blocks/BoxesBlocks.js:75
-#: js/blocks/BoxesBlocks.js:606
-#: js/blocks/DictBlocks.js:289
-#: js/blocks/DictBlocks.js:430
-#: js/blocks/NumberBlocks.js:973
-#: js/blocks/HeapBlocks.js:573
-#: js/blocks/RhythmBlocks.js:1164
-msgid "value"
-msgstr "மதிப்பு"
-
-#: js/blocks.js:4760
-msgid "Forever loop detected inside a note value block. Unexpected things may happen."
-msgstr "குறிப்பு மதிப்பு தொகுதிக்குள் எப்போதும் லூப் கண்டறியப்பட்டது. எதிர்பாராத விஷயங்கள் நடக்கலாம்."
-
-#: js/blocks.js:5319
-msgid "There is no block selected."
-msgstr "எந்தத் தொகுதியும் தேர்ந்தெடுக்கப்படவில்லை."
-
-#: js/blocks.js:5429
-#: js/blocks/MediaBlocks.js:884
-#.TRANS: Avatar is the image used to determine the appearance of the mouse.
-msgid "avatar"
-msgstr "அவதாரம்"
-
-#: js/blocks.js:5432
-#: js/blocks/ToneBlocks.js:1067
-#: js/widgets/SamplerCanvas.js:169
-#.TRANS: The sound sample that the user uploads.
-msgid "sample"
-msgstr "மாதிரி"
-
-#: js/blocks.js:5733
-#: js/project-manager.js:1940
-msgid "Something went wrong reading JSON-encoded project data."
-msgstr "JSON-குறியீடு செய்யப்பட்ட திட்டத் தரவைப் படிப்பதில் ஏதோ தவறு ஏற்பட்டது."
-
-#: js/blocks.js:5756
-msgid "Cannot load project: invalid project structure."
-msgstr ""
-
-#: js/blocks.js:5766
-#: js/blocks.js:6201
-#: js/blocks.js:6277
-msgid "Cannot load project: malformed block structure detected."
-msgstr ""
-
-#: js/blocks.js:5883
-msgid "Cannot load project: circular block connection detected."
-msgstr ""
-
-#: js/blocks.js:6231
-#: js/blocks.js:6482
-msgid "Cannot load project: invalid block connection detected."
-msgstr ""
-
-#: js/blocks.js:7668
-msgid "Some blocks in this project are unsupported and were replaced with placeholders: %s"
-msgstr ""
-
-#: js/blocks.js:8053
-msgid "Nothing to undo."
-msgstr ""
-
-#: js/blocks.js:8105
-msgid "Nothing to redo."
-msgstr ""
-
-#: js/blocks.js:8266
-msgid "block sent to trash"
-msgstr ""
-
 #: js/loader.js:770
 msgid "Failed to load EaselJS. Please refresh the page."
 msgstr "EaselJS ஐ ஏற்றுவதில் தோல்வி. பக்கத்தைப் புதுப்பிக்கவும்."
@@ -1789,56 +1676,6 @@ msgstr "இசைத் தொகுதிகளை ஏற்றுவதில�
 #: js/loader.js:806
 msgid "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: %s"
 msgstr "மியூசிக் பிளாக்ஸ் கோரை துவக்குவதில் தோல்வி. பக்கத்தைப் புதுப்பிக்கவும்.\n\nபிழை: %s"
-
-#: js/logo.js:854
-msgid "Downloading Kokoro voice: %s"
-msgstr ""
-
-#: js/logo.js:998
-#: js/blocks/ProgramBlocks.js:277
-#: js/blocks/ProgramBlocks.js:453
-msgid "You must select a file."
-msgstr "நீங்கள் ஒரு கோப்பைத் தேர்ந்தெடுக்க வேண்டும்."
-
-#: js/logo.js:2319
-msgid "Infinite loop detected. Execution stopped to prevent browser freeze."
-msgstr "எல்லையற்ற வளையம் கண்டறியப்பட்டது. உலாவி முடக்கத்தைத் தடுக்க செயல்படுத்தல் நிறுத்தப்பட்டது."
-
-#: js/logo.js:2527
-#: js/blocks/MediaBlocks.js:338
-msgid "width"
-msgstr "அகலம்"
-
-#: js/logo.js:2528
-#: js/blocks/MediaBlocks.js:395
-msgid "height"
-msgstr "உயரம்"
-
-#: js/logo.js:2529
-#: js/blocks/MediaBlocks.js:35
-#.TRANS: right side of the screen
-msgid "right (screen)"
-msgstr "வலது (திரை)"
-
-#: js/logo.js:2530
-#: js/blocks/MediaBlocks.js:111
-#.TRANS: left side of the screen
-msgid "left (screen)"
-msgstr "இடது (திரை)"
-
-#: js/logo.js:2531
-#: js/blocks/MediaBlocks.js:186
-msgid "top (screen)"
-msgstr "மேல் (திரை)"
-
-#: js/logo.js:2532
-#: js/blocks/MediaBlocks.js:261
-msgid "bottom (screen)"
-msgstr "கீழ் (திரை)"
-
-#: js/logo.js:2900
-msgid "Playback is ready."
-msgstr "பின்னணி தயாராக உள்ளது."
 
 #: js/planetInterface.js:171
 msgid "project undefined"
@@ -1936,6 +1773,11 @@ msgstr ""
 #: js/project-manager.js:1971
 msgid "Invalid parameters"
 msgstr "தவறான அளவுருக்கள்"
+
+#: js/project-manager.js:1940
+#: js/blocks.js:5737
+msgid "Something went wrong reading JSON-encoded project data."
+msgstr "JSON-குறியீடு செய்யப்பட்ட திட்டத் தரவைப் படிப்பதில் ஏதோ தவறு ஏற்பட்டது."
 
 #: js/search-ui.js:212
 msgid "No results found for %s"
@@ -2482,6 +2324,289 @@ msgstr "வாழ்த்துகள்!"
 msgid "You have finished the tour. Please enjoy Music Blocks!"
 msgstr "நீங்கள் சுற்றுப்பயணத்தை முடித்துவிட்டீர்கள். தயவு செய்து மியூசிக் பிளாக்குகளை அனுபவிக்கவும்!"
 
+#: js/logo.js:854
+msgid "Downloading Kokoro voice: %s"
+msgstr ""
+
+#: js/logo.js:998
+#: js/blocks/ProgramBlocks.js:277
+#: js/blocks/ProgramBlocks.js:453
+msgid "You must select a file."
+msgstr "நீங்கள் ஒரு கோப்பைத் தேர்ந்தெடுக்க வேண்டும்."
+
+#: js/logo.js:2319
+msgid "Infinite loop detected. Execution stopped to prevent browser freeze."
+msgstr "எல்லையற்ற வளையம் கண்டறியப்பட்டது. உலாவி முடக்கத்தைத் தடுக்க செயல்படுத்தல் நிறுத்தப்பட்டது."
+
+#: js/logo.js:2527
+#: js/blocks/MediaBlocks.js:338
+msgid "width"
+msgstr "அகலம்"
+
+#: js/logo.js:2528
+#: js/blocks/MediaBlocks.js:395
+msgid "height"
+msgstr "உயரம்"
+
+#: js/logo.js:2529
+#: js/blocks/MediaBlocks.js:35
+#.TRANS: right side of the screen
+msgid "right (screen)"
+msgstr "வலது (திரை)"
+
+#: js/logo.js:2530
+#: js/blocks/MediaBlocks.js:111
+#.TRANS: left side of the screen
+msgid "left (screen)"
+msgstr "இடது (திரை)"
+
+#: js/logo.js:2531
+#: js/blocks/MediaBlocks.js:186
+msgid "top (screen)"
+msgstr "மேல் (திரை)"
+
+#: js/logo.js:2532
+#: js/blocks/MediaBlocks.js:261
+msgid "bottom (screen)"
+msgstr "கீழ் (திரை)"
+
+#: js/logo.js:2900
+msgid "Playback is ready."
+msgstr "பின்னணி தயாராக உள்ளது."
+
+#: js/blocks.js:2462
+#: js/blocks.js:2466
+#: js/blocks.js:2472
+#: js/blocks.js:2474
+msgid "audio file"
+msgstr "ஆடியோ கோப்பு"
+
+#: js/blocks.js:3764
+#: js/blocks.js:4169
+#: js/blocks.js:4215
+#: js/blocks.js:4261
+#: js/blocks.js:6827
+#: js/blocks.js:6851
+#: js/blocks/BoxesBlocks.js:783
+msgid "box1"
+msgstr "பெட்டி1"
+
+#: js/blocks.js:3766
+#: js/blocks.js:4171
+#: js/blocks.js:4217
+#: js/blocks.js:4263
+#: js/blocks.js:6829
+#: js/blocks.js:6853
+#: js/blocks/BoxesBlocks.js:674
+msgid "box2"
+msgstr "பெட்டி2"
+
+#: js/blocks.js:4421
+#: js/blocks/MediaBlocks.js:827
+#: js/blocks/BoxesBlocks.js:606
+#: js/blocks/DictBlocks.js:215
+#: js/blocks/DictBlocks.js:289
+#: js/blocks/EnsembleBlocks.js:441
+#: js/blocks/EnsembleBlocks.js:458
+#: js/blocks/PitchBlocks.js:731
+#: js/blocks/PitchBlocks.js:1084
+#: js/blocks/PitchBlocks.js:2038
+#: js/blocks/ProgramBlocks.js:412
+#: js/blocks/ProgramBlocks.js:539
+#: js/blocks/ProgramBlocks.js:724
+#: js/blocks/ToneBlocks.js:1082
+msgid "name"
+msgstr "பெயர்"
+
+#: js/blocks.js:4421
+#: js/blocks/BoxesBlocks.js:75
+#: js/blocks/BoxesBlocks.js:606
+#: js/blocks/DictBlocks.js:289
+#: js/blocks/DictBlocks.js:430
+#: js/blocks/NumberBlocks.js:973
+#: js/blocks/HeapBlocks.js:573
+#: js/blocks/RhythmBlocks.js:1164
+msgid "value"
+msgstr "மதிப்பு"
+
+#: js/blocks.js:4760
+msgid "Forever loop detected inside a note value block. Unexpected things may happen."
+msgstr "குறிப்பு மதிப்பு தொகுதிக்குள் எப்போதும் லூப் கண்டறியப்பட்டது. எதிர்பாராத விஷயங்கள் நடக்கலாம்."
+
+#: js/blocks.js:5319
+msgid "There is no block selected."
+msgstr "எந்தத் தொகுதியும் தேர்ந்தெடுக்கப்படவில்லை."
+
+#: js/blocks.js:5429
+#: js/blocks/MediaBlocks.js:884
+#.TRANS: Avatar is the image used to determine the appearance of the mouse.
+msgid "avatar"
+msgstr "அவதாரம்"
+
+#: js/blocks.js:5432
+#: js/blocks/ToneBlocks.js:1067
+#: js/widgets/SamplerCanvas.js:169
+#.TRANS: The sound sample that the user uploads.
+msgid "sample"
+msgstr "மாதிரி"
+
+#: js/blocks.js:5617
+#: js/blocks.js:5760
+msgid "Cannot load project: invalid project structure."
+msgstr ""
+
+#: js/blocks.js:5770
+#: js/blocks.js:6205
+#: js/blocks.js:6281
+msgid "Cannot load project: malformed block structure detected."
+msgstr ""
+
+#: js/blocks.js:5887
+msgid "Cannot load project: circular block connection detected."
+msgstr ""
+
+#: js/blocks.js:6235
+#: js/blocks.js:6486
+msgid "Cannot load project: invalid block connection detected."
+msgstr ""
+
+#: js/blocks.js:7672
+msgid "Some blocks in this project are unsupported and were replaced with placeholders: %s"
+msgstr ""
+
+#: js/blocks.js:8057
+msgid "Nothing to undo."
+msgstr ""
+
+#: js/blocks.js:8109
+msgid "Nothing to redo."
+msgstr ""
+
+#: js/blocks.js:8270
+msgid "block sent to trash"
+msgstr ""
+
+#: js/gitDropdown.js:875
+msgid "Saved moment"
+msgstr ""
+
+#: js/gitDropdown.js:893
+msgid "You're offline. Connect to the network to view commits for this project."
+msgstr ""
+
+#: js/gitDropdown.js:894
+msgid "Network Connection Required"
+msgstr ""
+
+#: js/gitDropdown.js:907
+msgid "No moments marked yet. Click \"Mark this moment\" to save your first one!"
+msgstr ""
+
+#: js/gitDropdown.js:908
+msgid "No Saved Moments Yet"
+msgstr ""
+
+#: js/gitDropdown.js:939
+#: js/gitDropdown.js:969
+msgid "Time Travel"
+msgstr ""
+
+#: js/gitDropdown.js:972
+msgid "Every save, forever yours"
+msgstr ""
+
+#: js/gitDropdown.js:1091
+#: js/gitDropdown.js:1196
+msgid "YOU ARE HERE"
+msgstr ""
+
+#: js/gitDropdown.js:1118
+msgid "Sync Pending"
+msgstr ""
+
+#: js/gitDropdown.js:1124
+msgid "Latest"
+msgstr ""
+
+#: js/gitDropdown.js:1137
+#: js/gitDropdown.js:1232
+msgid "Undo my changes"
+msgstr ""
+
+#: js/gitDropdown.js:1147
+#: js/gitDropdown.js:1242
+msgid "Go back to this version"
+msgstr ""
+
+#: js/gitDropdown.js:1210
+msgid "The very beginning"
+msgstr ""
+
+#: js/gitDropdown.js:1214
+msgid "Where your project started"
+msgstr ""
+
+#: js/gitDropdown.js:1221
+msgid "Setting Up Tracking"
+msgstr ""
+
+#: js/gitDropdown.js:1235
+#: js/gitDropdown.js:1245
+msgid "Start point"
+msgstr ""
+
+#: js/gitDropdown.js:1269
+msgid "no more offline commits can be made"
+msgstr ""
+
+#: js/gitDropdown.js:1271
+msgid "1 more commit can be made"
+msgstr ""
+
+#: js/gitDropdown.js:1272
+msgid "%s more commits can be made"
+msgstr ""
+
+#: js/gitDropdown.js:1284
+msgid "Showing locally saved drafts"
+msgstr ""
+
+#: js/gitDropdown.js:1783
+msgid "Just now"
+msgstr ""
+
+#: js/gitDropdown.js:1784
+msgid "1 minute ago"
+msgstr ""
+
+#: js/gitDropdown.js:1784
+msgid "%s minutes ago"
+msgstr ""
+
+#: js/gitDropdown.js:1786
+msgid "1 hour ago"
+msgstr ""
+
+#: js/gitDropdown.js:1786
+msgid "%s hours ago"
+msgstr ""
+
+#: js/gitDropdown.js:1788
+msgid "1 day ago"
+msgstr ""
+
+#: js/gitDropdown.js:1788
+msgid "%s days ago"
+msgstr ""
+
+#: js/gitDropdown.js:1790
+msgid "1 month ago"
+msgstr ""
+
+#: js/gitDropdown.js:1790
+msgid "%s months ago"
+msgstr ""
+
 #: js/utils/plugin-utils.js:55
 msgid "Security Warning"
 msgstr "பாதுகாப்பு எச்சரிக்கை"
@@ -2632,8 +2757,8 @@ msgstr "அர்த்தம்"
 #: js/blocks/IntervalsBlocks.js:1187
 #: js/blocks/WidgetBlocks.js:640
 #: js/blocks/WidgetBlocks.js:645
-#: js/blocks/ToneBlocks.js:1003
 #: js/blocks/VolumeBlocks.js:420
+#: js/blocks/ToneBlocks.js:1003
 #: js/turtleactions/VolumeActions.js:49
 #: js/widgets/modewidget.js:1741
 #.TRANS: customize voice
@@ -3634,6 +3759,14 @@ msgstr "முழுவதுமாக குறைந்து 7வது"
 msgid "half-diminished 7th"
 msgstr "பாதி குறைந்து 7வது"
 
+#: js/utils/utils-logic.js:431
+msgid "Invalid input passed to rational sum"
+msgstr ""
+
+#: js/utils/utils-logic.js:438
+msgid "Note calculation failed: zero denominator"
+msgstr ""
+
 #: js/utils/synthutils.js:130
 #.TRANS: simple monotone synthesizer
 msgid "simple-2"
@@ -3662,14 +3795,6 @@ msgstr "ஜப்பானிய மணி"
 #: js/utils/synthutils.js:2493
 msgid "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
 msgstr "⚠️ ஒலி முடக்கப்பட்டுள்ளது!\n\nமியூசிக் பிளாக்குகளுக்கு ஆடியோவை அனுமதிக்க உங்கள் உலாவி அமைப்புகளை (தள அமைப்புகள் > ஒலி) சரிபார்க்கவும்."
-
-#: js/utils/utils-logic.js:431
-msgid "Invalid input passed to rational sum"
-msgstr ""
-
-#: js/utils/utils-logic.js:438
-msgid "Note calculation failed: zero denominator"
-msgstr ""
 
 #: js/blocks/BooleanBlocks.js:44
 msgid "The Not block is the logical not operator."
@@ -7274,6 +7399,112 @@ msgstr "கெட் ப்ளூ பிளாக் மவுஸின் க�
 msgid "The Get blue block returns the blue component of the pixel under the turtle."
 msgstr "கெட் ப்ளூ பிளாக் ஆமையின் கீழ் உள்ள பிக்சலின் நீல பாகத்தை வழங்குகிறது."
 
+#: js/blocks/VolumeBlocks.js:35
+msgid "synth volume"
+msgstr "சின்த் தொகுதி"
+
+#: js/blocks/VolumeBlocks.js:39
+msgid "The Synth volume block returns the current volume of the current synthesizer."
+msgstr "சின்த் தொகுதி தொகுதி தற்போதைய சின்தசைசரின் தற்போதைய அளவை வழங்குகிறது."
+
+#: js/blocks/VolumeBlocks.js:109
+msgid "master volume"
+msgstr "முதன்மை தொகுதி"
+
+#: js/blocks/VolumeBlocks.js:113
+msgid "The Master volume block returns the master volume."
+msgstr "முதன்மை தொகுதி தொகுதி முதன்மை தொகுதியை வழங்குகிறது."
+
+#: js/blocks/VolumeBlocks.js:364
+#: js/blocks/VolumeBlocks.js:535
+msgid "set synth volume"
+msgstr "சின்த் தொகுதியை அமைக்கவும்"
+
+#: js/blocks/VolumeBlocks.js:371
+#: js/blocks/VolumeBlocks.js:556
+msgid "synth"
+msgstr "சின்த்"
+
+#: js/blocks/VolumeBlocks.js:412
+#: js/blocks/VolumeBlocks.js:588
+#: js/blocks/VolumeBlocks.js:751
+#: js/turtleactions/VolumeActions.js:222
+msgid "Setting volume to 0."
+msgstr "தொகுதியை 0 ஆக அமைக்கிறது."
+
+#: js/blocks/VolumeBlocks.js:449
+msgid "Synth not found"
+msgstr "சின்த் கிடைக்கவில்லை"
+
+#: js/blocks/VolumeBlocks.js:505
+msgid "set drum volume"
+msgstr "டிரம் தொகுதி அமைக்க"
+
+#: js/blocks/VolumeBlocks.js:541
+msgid "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc."
+msgstr "செட் சின்த் வால்யூம் பிளாக் ஒரு குறிப்பிட்ட சின்த்தின் ஒலியளவை மாற்றும், எ.கா. கிட்டார் வயலின் ஸ்னேர் டிரம் போன்றவை."
+
+#: js/blocks/VolumeBlocks.js:545
+msgid "The default volume is 50."
+msgstr "இயல்புநிலை தொகுதி 50 ஆகும்."
+
+#: js/blocks/VolumeBlocks.js:547
+msgid "The range is 0 for silence to 100 for full volume."
+msgstr "அமைதிக்கான வரம்பு 0 முதல் முழு ஒலியளவுக்கு 100."
+
+#: js/blocks/VolumeBlocks.js:608
+msgid "set panning"
+msgstr "செட் பேனிங்"
+
+#: js/blocks/VolumeBlocks.js:614
+msgid "The Set Panning block sets the panning for all synthesizers."
+msgstr "செட் பேனிங் பிளாக் அனைத்து சின்தசைசர்களுக்கும் பேனிங்கை அமைக்கிறது."
+
+#: js/blocks/VolumeBlocks.js:636
+msgid "Warning: Sound is coming out from only the left or right side."
+msgstr "எச்சரிக்கை: இடது அல்லது வலது பக்கத்திலிருந்து மட்டுமே ஒலி வருகிறது."
+
+#: js/blocks/VolumeBlocks.js:658
+#: js/blocks/VolumeBlocks.js:706
+msgid "set master volume"
+msgstr "மாஸ்டர் தொகுதியை அமைக்கவும்"
+
+#: js/blocks/VolumeBlocks.js:664
+msgid "The Set master volume block sets the volume for all synthesizers."
+msgstr "செட் மாஸ்டர் தொகுதி தொகுதி அனைத்து சின்தசைசர்களுக்கும் ஒலியளவை அமைக்கிறது."
+
+#: js/blocks/VolumeBlocks.js:794
+msgid "The Set relative volume block changes the volume of the contained notes."
+msgstr "செட் ரிலேடிவ் வால்யூம் பிளாக் அடங்கிய குறிப்புகளின் அளவை மாற்றுகிறது."
+
+#: js/blocks/VolumeBlocks.js:801
+msgid "set relative volume"
+msgstr "தொடர்புடைய அளவை அமைக்கவும்"
+
+#: js/blocks/VolumeBlocks.js:853
+msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
+msgstr "Decrescendo பிளாக் விளையாடப்படும் ஒவ்வொரு குறிப்பிற்கும் ஒரு குறிப்பிட்ட அளவு உள்ள குறிப்புகளின் அளவைக் குறைக்கும்."
+
+#: js/blocks/VolumeBlocks.js:857
+msgid "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
+msgstr "எடுத்துக்காட்டாக, 5 மதிப்புள்ள Decrescendo தொகுதியில் 7 குறிப்புகள் வரிசையாக இருந்தால், இறுதிக் குறிப்பு தொடக்க அளவை விட 35% குறைவாக இருக்கும்."
+
+#: js/blocks/VolumeBlocks.js:867
+msgid "decrescendo"
+msgstr "குறைகிறது"
+
+#: js/blocks/VolumeBlocks.js:917
+msgid "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
+msgstr "க்ரெசெண்டோ பிளாக் விளையாடப்படும் ஒவ்வொரு நோட்டுக்கும் ஒரு குறிப்பிட்ட அளவு உள்ள குறிப்புகளின் அளவை அதிகரிக்கும்."
+
+#: js/blocks/VolumeBlocks.js:921
+msgid "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
+msgstr "எடுத்துக்காட்டாக, 5 மதிப்புள்ள கிரெசெண்டோ தொகுதியில் 7 குறிப்புகள் வரிசையாக இருந்தால், இறுதிக் குறிப்பு தொடக்க அளவை விட 35% அதிகமாக இருக்கும்."
+
+#: js/blocks/VolumeBlocks.js:931
+msgid "crescendo"
+msgstr "பிறை"
+
 #: js/blocks/ToneBlocks.js:34
 #: js/widgets/timbre.js:314
 msgid "Oscillator"
@@ -7522,112 +7753,6 @@ msgstr "கருவியாகப் பயன்படுத்த ஒலி 
 #: js/blocks/ToneBlocks.js:1174
 msgid "Upload a sound file to connect with the sample block."
 msgstr "மாதிரித் தொகுதியுடன் இணைக்க ஒலிக் கோப்பைப் பதிவேற்றவும்."
-
-#: js/blocks/VolumeBlocks.js:35
-msgid "synth volume"
-msgstr "சின்த் தொகுதி"
-
-#: js/blocks/VolumeBlocks.js:39
-msgid "The Synth volume block returns the current volume of the current synthesizer."
-msgstr "சின்த் தொகுதி தொகுதி தற்போதைய சின்தசைசரின் தற்போதைய அளவை வழங்குகிறது."
-
-#: js/blocks/VolumeBlocks.js:109
-msgid "master volume"
-msgstr "முதன்மை தொகுதி"
-
-#: js/blocks/VolumeBlocks.js:113
-msgid "The Master volume block returns the master volume."
-msgstr "முதன்மை தொகுதி தொகுதி முதன்மை தொகுதியை வழங்குகிறது."
-
-#: js/blocks/VolumeBlocks.js:364
-#: js/blocks/VolumeBlocks.js:535
-msgid "set synth volume"
-msgstr "சின்த் தொகுதியை அமைக்கவும்"
-
-#: js/blocks/VolumeBlocks.js:371
-#: js/blocks/VolumeBlocks.js:556
-msgid "synth"
-msgstr "சின்த்"
-
-#: js/blocks/VolumeBlocks.js:412
-#: js/blocks/VolumeBlocks.js:588
-#: js/blocks/VolumeBlocks.js:751
-#: js/turtleactions/VolumeActions.js:222
-msgid "Setting volume to 0."
-msgstr "தொகுதியை 0 ஆக அமைக்கிறது."
-
-#: js/blocks/VolumeBlocks.js:449
-msgid "Synth not found"
-msgstr "சின்த் கிடைக்கவில்லை"
-
-#: js/blocks/VolumeBlocks.js:505
-msgid "set drum volume"
-msgstr "டிரம் தொகுதி அமைக்க"
-
-#: js/blocks/VolumeBlocks.js:541
-msgid "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc."
-msgstr "செட் சின்த் வால்யூம் பிளாக் ஒரு குறிப்பிட்ட சின்த்தின் ஒலியளவை மாற்றும், எ.கா. கிட்டார் வயலின் ஸ்னேர் டிரம் போன்றவை."
-
-#: js/blocks/VolumeBlocks.js:545
-msgid "The default volume is 50."
-msgstr "இயல்புநிலை தொகுதி 50 ஆகும்."
-
-#: js/blocks/VolumeBlocks.js:547
-msgid "The range is 0 for silence to 100 for full volume."
-msgstr "அமைதிக்கான வரம்பு 0 முதல் முழு ஒலியளவுக்கு 100."
-
-#: js/blocks/VolumeBlocks.js:608
-msgid "set panning"
-msgstr "செட் பேனிங்"
-
-#: js/blocks/VolumeBlocks.js:614
-msgid "The Set Panning block sets the panning for all synthesizers."
-msgstr "செட் பேனிங் பிளாக் அனைத்து சின்தசைசர்களுக்கும் பேனிங்கை அமைக்கிறது."
-
-#: js/blocks/VolumeBlocks.js:636
-msgid "Warning: Sound is coming out from only the left or right side."
-msgstr "எச்சரிக்கை: இடது அல்லது வலது பக்கத்திலிருந்து மட்டுமே ஒலி வருகிறது."
-
-#: js/blocks/VolumeBlocks.js:658
-#: js/blocks/VolumeBlocks.js:706
-msgid "set master volume"
-msgstr "மாஸ்டர் தொகுதியை அமைக்கவும்"
-
-#: js/blocks/VolumeBlocks.js:664
-msgid "The Set master volume block sets the volume for all synthesizers."
-msgstr "செட் மாஸ்டர் தொகுதி தொகுதி அனைத்து சின்தசைசர்களுக்கும் ஒலியளவை அமைக்கிறது."
-
-#: js/blocks/VolumeBlocks.js:794
-msgid "The Set relative volume block changes the volume of the contained notes."
-msgstr "செட் ரிலேடிவ் வால்யூம் பிளாக் அடங்கிய குறிப்புகளின் அளவை மாற்றுகிறது."
-
-#: js/blocks/VolumeBlocks.js:801
-msgid "set relative volume"
-msgstr "தொடர்புடைய அளவை அமைக்கவும்"
-
-#: js/blocks/VolumeBlocks.js:853
-msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
-msgstr "Decrescendo பிளாக் விளையாடப்படும் ஒவ்வொரு குறிப்பிற்கும் ஒரு குறிப்பிட்ட அளவு உள்ள குறிப்புகளின் அளவைக் குறைக்கும்."
-
-#: js/blocks/VolumeBlocks.js:857
-msgid "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
-msgstr "எடுத்துக்காட்டாக, 5 மதிப்புள்ள Decrescendo தொகுதியில் 7 குறிப்புகள் வரிசையாக இருந்தால், இறுதிக் குறிப்பு தொடக்க அளவை விட 35% குறைவாக இருக்கும்."
-
-#: js/blocks/VolumeBlocks.js:867
-msgid "decrescendo"
-msgstr "குறைகிறது"
-
-#: js/blocks/VolumeBlocks.js:917
-msgid "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
-msgstr "க்ரெசெண்டோ பிளாக் விளையாடப்படும் ஒவ்வொரு நோட்டுக்கும் ஒரு குறிப்பிட்ட அளவு உள்ள குறிப்புகளின் அளவை அதிகரிக்கும்."
-
-#: js/blocks/VolumeBlocks.js:921
-msgid "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
-msgstr "எடுத்துக்காட்டாக, 5 மதிப்புள்ள கிரெசெண்டோ தொகுதியில் 7 குறிப்புகள் வரிசையாக இருந்தால், இறுதிக் குறிப்பு தொடக்க அளவை விட 35% அதிகமாக இருக்கும்."
-
-#: js/blocks/VolumeBlocks.js:931
-msgid "crescendo"
-msgstr "பிறை"
 
 #: js/turtleactions/OrnamentActions.js:49
 msgid "Staccato value must be a positive number."
@@ -9458,71 +9583,6 @@ msgstr "விளையாட்டு"
 msgid "Code Snippet"
 msgstr "குறியீடு துணுக்கு"
 
-#: planet/js/GlobalPlanet.js:37
-msgid "No results found."
-msgstr "முடிவுகள் எதுவும் கிடைக்கவில்லை."
-
-#: planet/js/GlobalPlanet.js:54
-msgid "Remix of"
-msgstr "ரீமிக்ஸ்"
-
-#: planet/js/GlobalPlanet.js:381
-msgid "Could not load project. Please check your connection and try again."
-msgstr ""
-
-#: planet/js/GlobalPlanet.js:735
-msgid "Cannot connect to server"
-msgstr "சேவையகத்துடன் இணைக்க முடியவில்லை"
-
-#: planet/js/SaveInterface.js:34
-#: planet/js/GlobalCard.js:60
-msgid "Open in Music Blocks"
-msgstr "இசைத் தொகுதிகளில் திறக்கவும்"
-
-#: planet/js/SaveInterface.js:37
-msgid "Open in Turtle Blocks"
-msgstr "ஆமைத் தொகுதிகளில் திறக்கவும்"
-
-#: planet/js/LocalCard.js:37
-msgid "View published project"
-msgstr "வெளியிடப்பட்ட திட்டத்தைப் பார்க்கவும்"
-
-#: planet/js/LocalCard.js:42
-msgid "Being tracked"
-msgstr ""
-
-#: planet/js/LocalCard.js:54
-#: planet/js/ProjectViewer.js:92
-#: planet/js/GlobalCard.js:44
-msgid "Project thumbnail"
-msgstr ""
-
-#: planet/js/LocalCard.js:57
-#: planet/js/Publisher.js:236
-#: planet/js/StringHelper.js:37
-msgid "Publish project"
-msgstr "திட்டத்தை வெளியிடவும்"
-
-#: planet/js/LocalCard.js:63
-msgid "Project name"
-msgstr ""
-
-#: planet/js/LocalCard.js:70
-msgid "Edit project"
-msgstr "திட்டத்தை திருத்து"
-
-#: planet/js/LocalCard.js:73
-msgid "Delete project"
-msgstr "திட்டத்தை நீக்கு"
-
-#: planet/js/LocalCard.js:76
-msgid "Download project"
-msgstr "திட்டத்தைப் பதிவிறக்கவும்"
-
-#: planet/js/LocalCard.js:82
-msgid "Duplicate project"
-msgstr "நகல் திட்டம்"
-
 #: planet/js/ProjectStorage.js:541
 msgid "anonymous"
 msgstr "அநாமதேய"
@@ -9536,14 +9596,14 @@ msgid "Thank you for reporting this project. A moderator will review the project
 msgstr "இந்தத் திட்டத்தைப் புகாரளித்ததற்கு நன்றி. சுகர் லேப்ஸ் நடத்தை விதிகளை மீறுவதை சரிபார்க்க, மதிப்பீட்டாளர் திட்டத்தை விரைவில் மதிப்பாய்வு செய்வார்."
 
 #: planet/js/ProjectViewer.js:33
-#: planet/js/StringHelper.js:64
-#: planet/js/StringHelper.js:66
-#: planet/js/StringHelper.js:75
+#: planet/js/StringHelper.js:68
+#: planet/js/StringHelper.js:70
+#: planet/js/StringHelper.js:79
 msgid "Report Project"
 msgstr "அறிக்கை திட்டம்"
 
 #: planet/js/ProjectViewer.js:34
-#: planet/js/StringHelper.js:65
+#: planet/js/StringHelper.js:69
 msgid "Project Reported"
 msgstr "திட்ட அறிக்கை"
 
@@ -9555,9 +9615,20 @@ msgstr "அறிக்கை விளக்கம் தேவை"
 msgid "Report description too long"
 msgstr "அறிக்கையின் விளக்கம் மிக நீளமானது"
 
+#: planet/js/ProjectViewer.js:92
+#: planet/js/GlobalCard.js:44
+#: planet/js/LocalCard.js:54
+msgid "Project thumbnail"
+msgstr ""
+
 #: planet/js/GlobalCard.js:57
 msgid "More Details"
 msgstr "மேலும் விவரங்கள்"
+
+#: planet/js/GlobalCard.js:60
+#: planet/js/SaveInterface.js:34
+msgid "Open in Music Blocks"
+msgstr "இசைத் தொகுதிகளில் திறக்கவும்"
 
 #: planet/js/GlobalCard.js:63
 msgid "Remix project"
@@ -9593,8 +9664,8 @@ msgstr "மேம்பட்ட விருப்பங்கள்"
 
 #: planet/js/GlobalCard.js:218
 #: planet/js/GlobalCard.js:219
-#: planet/js/StringHelper.js:51
-#: planet/js/helper.js:187
+#: planet/js/StringHelper.js:55
+#: planet/js/helper.js:188
 msgid "Show all tags"
 msgstr ""
 
@@ -9622,6 +9693,12 @@ msgstr "அம்சம் கிடைக்கவில்லை - சேவ�
 msgid "Republish project"
 msgstr ""
 
+#: planet/js/Publisher.js:236
+#: planet/js/LocalCard.js:57
+#: planet/js/StringHelper.js:37
+msgid "Publish project"
+msgstr "திட்டத்தை வெளியிடவும்"
+
 #: planet/js/Publisher.js:275
 #: planet/js/Publisher.js:292
 msgid "This field is required"
@@ -9642,6 +9719,74 @@ msgstr "சர்வர் பிழை"
 #: planet/js/Publisher.js:546
 msgid "Try Again"
 msgstr "மீண்டும் முயற்சிக்கவும்"
+
+#: planet/js/GlobalPlanet.js:37
+msgid "No results found."
+msgstr "முடிவுகள் எதுவும் கிடைக்கவில்லை."
+
+#: planet/js/GlobalPlanet.js:54
+msgid "Remix of"
+msgstr "ரீமிக்ஸ்"
+
+#: planet/js/GlobalPlanet.js:391
+msgid "Could not load project. Please check your connection and try again."
+msgstr ""
+
+#: planet/js/GlobalPlanet.js:771
+msgid "Cannot connect to server"
+msgstr "சேவையகத்துடன் இணைக்க முடியவில்லை"
+
+#: planet/js/LocalCard.js:37
+msgid "View published project"
+msgstr "வெளியிடப்பட்ட திட்டத்தைப் பார்க்கவும்"
+
+#: planet/js/LocalCard.js:42
+msgid "Being tracked"
+msgstr ""
+
+#: planet/js/LocalCard.js:63
+msgid "Project name"
+msgstr ""
+
+#: planet/js/LocalCard.js:70
+msgid "Edit project"
+msgstr "திட்டத்தை திருத்து"
+
+#: planet/js/LocalCard.js:73
+msgid "Delete project"
+msgstr "திட்டத்தை நீக்கு"
+
+#: planet/js/LocalCard.js:76
+msgid "Download project"
+msgstr "திட்டத்தைப் பதிவிறக்கவும்"
+
+#: planet/js/LocalCard.js:82
+msgid "Duplicate project"
+msgstr "நகல் திட்டம்"
+
+#: planet/js/LocalCard.js:133
+msgid "You do not have permission to unpublish this project from this browser."
+msgstr ""
+
+#: planet/js/LocalCard.js:144
+msgid "Could not unpublish project. Please try again."
+msgstr ""
+
+#: planet/js/LocalCard.js:175
+msgid "Project unpublished."
+msgstr ""
+
+#: planet/js/LocalCard.js:179
+msgid "Project unpublished, but the change could not be saved on this device."
+msgstr ""
+
+#: planet/js/LocalCard.js:251
+msgid "Unpublish project"
+msgstr ""
+
+#: planet/js/SaveInterface.js:37
+msgid "Open in Turtle Blocks"
+msgstr "ஆமைத் தொகுதிகளில் திறக்கவும்"
 
 #: planet/js/StringHelper.js:30
 msgid "Close Planet"
@@ -9668,12 +9813,12 @@ msgid "Tags (max 5)"
 msgstr "குறிச்சொற்கள் (அதிகபட்சம் 5)"
 
 #: planet/js/StringHelper.js:40
-#: planet/js/StringHelper.js:63
+#: planet/js/StringHelper.js:67
 msgid "Description"
 msgstr "விளக்கம்"
 
 #: planet/js/StringHelper.js:41
-#: planet/js/StringHelper.js:74
+#: planet/js/StringHelper.js:78
 msgid "Submit"
 msgstr "சமர்ப்பிக்கவும்"
 
@@ -9686,66 +9831,78 @@ msgid "Permanently delete project \"<span id=\"deleter-name\"></span>\"?"
 msgstr "\"<span id=\"deleter-name\"></span>\" திட்டத்தை நிரந்தரமாக நீக்கவா?"
 
 #: planet/js/StringHelper.js:50
+msgid "Unpublish project?"
+msgstr ""
+
+#: planet/js/StringHelper.js:51
+msgid "This project will no longer appear in public listings."
+msgstr ""
+
+#: planet/js/StringHelper.js:52
+msgid "Unpublish"
+msgstr ""
+
+#: planet/js/StringHelper.js:54
 msgid "Explore Projects"
 msgstr "திட்டங்களை ஆராயுங்கள்"
 
-#: planet/js/StringHelper.js:52
+#: planet/js/StringHelper.js:56
 msgid "Most recent"
 msgstr "மிக சமீபத்தியது"
 
-#: planet/js/StringHelper.js:53
+#: planet/js/StringHelper.js:57
 msgid "Most liked"
 msgstr "மிகவும் பிடித்தது"
 
-#: planet/js/StringHelper.js:54
+#: planet/js/StringHelper.js:58
 msgid "Most downloaded"
 msgstr "அதிகம் பதிவிறக்கம் செய்யப்பட்டது"
 
-#: planet/js/StringHelper.js:55
+#: planet/js/StringHelper.js:59
 msgid "A-Z"
 msgstr "A-Z"
 
-#: planet/js/StringHelper.js:56
+#: planet/js/StringHelper.js:60
 msgid "Sort by"
 msgstr "வரிசைப்படுத்து"
 
-#: planet/js/StringHelper.js:57
+#: planet/js/StringHelper.js:61
 msgid "Load More Projects"
 msgstr "மேலும் திட்டங்களை ஏற்றவும்"
 
-#: planet/js/StringHelper.js:58
+#: planet/js/StringHelper.js:62
 msgid "Last Updated"
 msgstr "கடைசியாக புதுப்பிக்கப்பட்டது"
 
-#: planet/js/StringHelper.js:59
+#: planet/js/StringHelper.js:63
 msgid "Creation Date"
 msgstr "உருவாக்கிய தேதி"
 
-#: planet/js/StringHelper.js:60
+#: planet/js/StringHelper.js:64
 msgid "Number of Downloads:"
 msgstr "பதிவிறக்கங்களின் எண்ணிக்கை:"
 
-#: planet/js/StringHelper.js:61
+#: planet/js/StringHelper.js:65
 msgid "Number of Likes:"
 msgstr "விருப்பங்களின் எண்ணிக்கை:"
 
-#: planet/js/StringHelper.js:62
+#: planet/js/StringHelper.js:66
 msgid "Tags:"
 msgstr "குறிச்சொற்கள்:"
 
-#: planet/js/StringHelper.js:69
+#: planet/js/StringHelper.js:73
 msgid "Report projects which violate the <a href=\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\" target=\"_blank\" rel=\"noopener noreferrer\">Sugar Labs Code of Conduct</a>."
 msgstr "<a href=\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\" target=\"_blank\" rel=\"noopener noreferrer\">சர்க்கரை ஆய்வக நடத்தை விதிகளை</a> மீறும் திட்டப்பணிகளைப் புகாரளிக்கவும்."
 
-#: planet/js/StringHelper.js:73
+#: planet/js/StringHelper.js:77
 msgid "Reason for reporting project"
 msgstr "திட்டத்தைப் புகாரளிப்பதற்கான காரணம்"
 
-#: planet/js/StringHelper.js:77
+#: planet/js/StringHelper.js:81
 msgid "Download as File"
 msgstr "கோப்பாக பதிவிறக்கவும்"
 
-#: planet/js/helper.js:188
+#: planet/js/helper.js:189
 msgid "Show fewer tags"
 msgstr "குறைவான குறிச்சொற்களைக் காட்டு"
 
