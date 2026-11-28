@@ -204,6 +204,14 @@ class FocusCycleManager {
         // Always exit keyboard mode on any mouse interaction.
         this._keyboardMode = false;
 
+        // Do not treat clicks in block value editors as workspace clicks.
+        // Native number spinner controls must retain input focus.
+        if (e.target?.closest?.("#labelDiv input, #labelDiv textarea, #labelDiv select")) {
+            this._clearAllRings();
+            this._currentZone = null;
+            return;
+        }
+
         const toolbars = document.getElementById("toolbars");
         const paletteEl = document.getElementById("palette");
         const clickedToolbar = this._isWithin(toolbars, e.target);
