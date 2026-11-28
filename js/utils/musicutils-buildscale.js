@@ -387,7 +387,10 @@ var buildScale = (keySignature, edo) => {
 
     let idx = thisScale.indexOf(myKeySignature);
     if (idx === -1) {
-        idx = 0;
+        idx = _notePitchClass(myKeySignature);
+        if (Number.isNaN(idx)) {
+            idx = 0;
+        }
     }
 
     const scale = [myKeySignature];
@@ -499,6 +502,12 @@ var buildScale = (keySignature, edo) => {
                 return [letterScale, halfSteps];
             }
         }
+    }
+    if (
+        scale.length > 1 &&
+        _notePitchClass(scale[scale.length - 1]) === _notePitchClass(myKeySignature)
+    ) {
+        scale[scale.length - 1] = myKeySignature;
     }
     return [scale, halfSteps];
 };
