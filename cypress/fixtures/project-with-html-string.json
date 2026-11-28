@@ -1,0 +1,23 @@
+[
+    [
+        0,
+        [
+            "start",
+            {
+                "collapsed": false,
+                "xcor": 0,
+                "ycor": 0,
+                "heading": 0,
+                "color": 0,
+                "shade": 50,
+                "pensize": 5,
+                "grey": 100
+            }
+        ],
+        100,
+        100,
+        [null, 1, null]
+    ],
+    [1, "print", 0, 0, [0, 2, null]],
+    [2, ["text", { "value": "learning html basics" }], 0, 0, [1]]
+]

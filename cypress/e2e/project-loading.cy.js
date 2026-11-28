@@ -107,4 +107,41 @@ describe("Project loading", () => {
             cy.title().should("equal", projectName);
         }
     });
+
+    it("loads a JSON project containing the word 'html' without error banner", () => {
+        let baselineBlockCount = 0;
+
+        cy.window().then(win => {
+            baselineBlockCount = win.ActivityContext.getActivity().blocks.blockList.length;
+        });
+
+        cy.get("#load").click();
+        cy.get("#myOpenFile").selectFile("cypress/fixtures/project-with-html-string.json", {
+            force: true
+        });
+
+        // Wait for completed load and the new non-trashed imported text block
+        cy.window({ timeout: 30000 }).should(win => {
+            const activity = win.ActivityContext.getActivity();
+            expect(activity, "activity context").to.exist;
+            expect(activity.blocks, "blocks manager").to.exist;
+            expect(activity.blocks._loadInProgress, "load in progress").to.be.false;
+
+            const { blockList } = activity.blocks;
+            expect(blockList.length).to.be.greaterThan(baselineBlockCount);
+
+            const hasHtmlTextBlock = blockList.some(
+                block =>
+                    !block.trash && block.name === "text" && block.value === "learning html basics"
+            );
+            expect(
+                hasHtmlTextBlock,
+                "project containing 'html' in non-trashed text block should be loaded"
+            ).to.be.true;
+        });
+
+        cy.get("#load-container").should("not.be.visible");
+        cy.get("#errorText").should("not.be.visible");
+        cy.get("#canvas").should("be.visible");
+    });
 });

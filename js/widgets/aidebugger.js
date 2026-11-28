@@ -552,12 +552,20 @@ function AIDebuggerWidget() {
         const cleanData = String(text || "").replace(/\n/g, " ");
         let project;
         try {
-            if (cleanData.includes("html")) {
-                const extracted = extractProjectDataFromHTML(cleanData);
-                if (!extracted) throw new Error("no project data in the HTML");
-                project = JSON.parse(unescapeHTML(extracted));
-            } else {
+            try {
                 project = JSON.parse(cleanData);
+            } catch (jsonErr) {
+                const isHtmlFile =
+                    (name && /\.html?$/i.test(name)) ||
+                    cleanData.includes('class="code"') ||
+                    /^\s*<(!DOCTYPE|html)/i.test(cleanData);
+                if (isHtmlFile) {
+                    const extracted = extractProjectDataFromHTML(cleanData);
+                    if (!extracted) throw new Error("no project data in the HTML");
+                    project = JSON.parse(unescapeHTML(extracted));
+                } else {
+                    throw jsonErr;
+                }
             }
             if (!Array.isArray(project)) throw new Error("not a list of blocks");
         } catch (error) {
