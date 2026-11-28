@@ -129,21 +129,34 @@ function setupRhythmBlockPaletteBlocks(activity) {
          * @returns {Array} - Array containing the result of the flow.
          */
         flow(args, logo, turtle, blk) {
-            let noteBeatValue, arg0, arg1;
+            let noteDuration, noteDenominator, arg0, arg1;
             arg0 = getNoteCount(args[0], 3, blk);
 
             if (args[1] === null || typeof args[1] !== "number" || args[1] <= 0) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
-                arg1 = 1 / 4;
+                arg1 = activity.blocks.blockList[blk].name === "rhythm2" ? 4 : 1 / 4;
             } else {
                 arg1 = args[1];
             }
 
-            if (activity.blocks.blockList[blk].name === "rhythm2") {
-                noteBeatValue = 1 / arg1;
-            } else {
-                noteBeatValue = arg1;
+            const isRhythm2 = activity.blocks.blockList[blk].name === "rhythm2";
+
+            if (isRhythm2) {
+                // rhythm2 expresses its note value as a denominator (4 = quarter, 8 = eighth).
+                // Accept a duration (< 1, e.g. 0.25) and normalize it to a denominator so the
+                // value is consistent regardless of how the caller expressed it.
+                if (arg1 < 1) {
+                    arg1 = 1 / arg1;
+                }
             }
+
+            noteDuration = isRhythm2 ? 1 / arg1 : arg1;
+            noteDenominator = isRhythm2 ? arg1 : 1 / arg1;
+
+            // processNote expects a denominator (matching getNoteValue's contract), which for
+            // rhythm2 is the normalized denominator. For the deprecated rhythm block, args[1]
+            // is already a duration, so pass that through unchanged.
+            const noteValueForProcess = isRhythm2 ? noteDenominator : noteDuration;
 
             const isTuplet =
                 typeof logo.tuplet === "object" &&
@@ -188,7 +201,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                                 logo.addingNotesToTuplet = true;
                             }
                         }
-                        last(tRhythms).push(noteBeatValue);
+                        last(tRhythms).push(noteDuration);
                     }
                 } else {
                     const tRhythms =
@@ -198,19 +211,19 @@ function setupRhythmBlockPaletteBlocks(activity) {
                             ? (logo.tupletRhythms[turtle] = logo.tupletRhythms[turtle] || [])
                             : logo.tupletRhythms;
                     for (let i = 0; i < arg0; i++) {
-                        tRhythms.push(["individual", 1, noteBeatValue]);
+                        tRhythms.push(["individual", 1, noteDuration]);
                     }
                 }
 
                 for (let i = 0; i < arg0; i++) {
-                    Singer.processNote(activity, noteBeatValue, false, blk, turtle);
+                    Singer.processNote(activity, noteValueForProcess, false, blk, turtle);
                 }
             } else if (logo.inRhythmRuler) {
                 // We don't check for balance since we want to support
                 // polyphonic rhythms.
                 if (logo.rhythmRulerMeasure === null) {
-                    logo.rhythmRulerMeasure = arg0 * arg1;
-                } else if (logo.rhythmRulerMeasure !== arg0 * arg1) {
+                    logo.rhythmRulerMeasure = arg0 * noteDuration;
+                } else if (logo.rhythmRulerMeasure !== arg0 * noteDuration) {
                     activity.textMsg(_("polyphonic rhythm"));
                 }
 
@@ -230,7 +243,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
 
                 if (drumIndex !== -1) {
                     for (let i = 0; i < arg0; i++) {
-                        logo.rhythmRuler.Rulers[drumIndex][0].push(noteBeatValue);
+                        logo.rhythmRuler.Rulers[drumIndex][0].push(noteDuration);
                     }
                 }
             } else {
@@ -249,10 +262,14 @@ function setupRhythmBlockPaletteBlocks(activity) {
                     tur.singer.noteCents[last(tur.singer.inNoteBlock)] = [0];
                 }
 
+                if (isRhythm2) {
+                    tur.singer.noteValue[blk] = noteDuration;
+                }
+
                 const bpmFactor =
                     TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 
-                const beatValue = bpmFactor === null ? 1 : bpmFactor / noteBeatValue;
+                const beatValue = bpmFactor === null ? 1 : bpmFactor / noteValueForProcess;
 
                 let __callback;
 
@@ -269,7 +286,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                     scheduleNote(
                         logo,
                         activity,
-                        noteBeatValue,
+                        noteValueForProcess,
                         blk,
                         turtle,
                         __callback,
