@@ -513,6 +513,14 @@ describe("setupVolumeBlocks", () => {
             );
             expect(ret).toEqual([99, 1]);
         });
+
+        it("should still play the notes inside when the value is 0", () => {
+            const decBlock = createdBlocks["decrescendo"];
+            activity.blocks.blockList["blkDec0"] = { name: "decrescendo" };
+            const ret = decBlock.flow([0, 99], logo, turtleIndex, "blkDec0");
+            expect(Singer.VolumeActions.doCrescendo).not.toHaveBeenCalled();
+            expect(ret).toEqual([99, 1]);
+        });
     });
 
     describe("CrescendoBlock", () => {
@@ -526,6 +534,14 @@ describe("setupVolumeBlocks", () => {
                 turtleIndex,
                 "blkCres"
             );
+            expect(ret).toEqual([88, 1]);
+        });
+
+        it("should still play the notes inside when the value is 0", () => {
+            const cresBlock = createdBlocks["crescendo"];
+            activity.blocks.blockList["blkCres0"] = { name: "crescendo" };
+            const ret = cresBlock.flow([0, 88], logo, turtleIndex, "blkCres0");
+            expect(Singer.VolumeActions.doCrescendo).not.toHaveBeenCalled();
             expect(ret).toEqual([88, 1]);
         });
     });
