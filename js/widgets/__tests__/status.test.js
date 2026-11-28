@@ -33,6 +33,11 @@ global.platformColor = {
     selectorBackground: "#aaa"
 };
 
+if (typeof global.TextDecoder === "undefined") {
+    const { TextDecoder } = require("util");
+    global.TextDecoder = TextDecoder;
+}
+
 const createMockElement = tagName => ({
     tagName,
     style: {},
@@ -49,6 +54,11 @@ const createMockElement = tagName => ({
         insertCell: jest.fn().mockImplementation(() => createMockElement("TD"))
     })),
     createTHead: jest.fn().mockImplementation(() => ({
+        insertRow: jest.fn().mockImplementation(() => ({
+            insertCell: jest.fn().mockImplementation(() => createMockElement("TD"))
+        }))
+    })),
+    createTBody: jest.fn().mockImplementation(() => ({
         insertRow: jest.fn().mockImplementation(() => ({
             insertCell: jest.fn().mockImplementation(() => createMockElement("TD"))
         }))
@@ -748,7 +758,7 @@ describe("StatusMatrix Widget", () => {
                             singer: {
                                 currentBeat: 1,
                                 currentMeasure: 1,
-                                noteStatus: [["C4"], 0.25]
+                                noteStatus: [["C4"], 4]
                             }
                         };
                     case 1:
@@ -756,7 +766,7 @@ describe("StatusMatrix Widget", () => {
                             singer: {
                                 currentBeat: 1,
                                 currentMeasure: 1,
-                                noteStatus: [["X4"], 0.25]
+                                noteStatus: [["X4"], 4]
                             }
                         };
                     case 2:
@@ -764,7 +774,7 @@ describe("StatusMatrix Widget", () => {
                             singer: {
                                 currentBeat: 1,
                                 currentMeasure: 1,
-                                noteStatus: [["E4"], 0.5]
+                                noteStatus: [["E4"], 2]
                             }
                         };
                     default:
@@ -783,16 +793,24 @@ describe("StatusMatrix Widget", () => {
         });
 
         test("displays note names from noteStatus", () => {
+            const mockCell = createMockElement("TD");
+            statusMatrix._statusTable.rows[2] = { cells: [createMockElement("TD"), mockCell] };
+
             mockActivity.turtles.ithTurtle.mockReturnValue({
                 singer: {
                     currentBeat: 1,
                     currentMeasure: 1,
-                    noteStatus: [["C4", "E4"], 0.25]
+                    noteStatus: [["C4", "E4"], 4]
                 }
             });
 
+            rationalToFraction.mockReturnValueOnce([4, 1]);
+
             statusMatrix.updateAll();
-            expect(rationalToFraction).toHaveBeenCalledWith(0.25);
+            expect(rationalToFraction).toHaveBeenCalledWith(4);
+            expect(mockCell.textContent).toContain("C4");
+            expect(mockCell.textContent).toContain("E4");
+            expect(mockCell.textContent).toBe("C4 E4 1/4");
         });
 
         test("collapses duplicate note names in the note row display", () => {
@@ -803,7 +821,7 @@ describe("StatusMatrix Widget", () => {
                 singer: {
                     currentBeat: 1,
                     currentMeasure: 1,
-                    noteStatus: [["G4", "G4"], 0.125]
+                    noteStatus: [["G4", "G4"], 8]
                 }
             });
 
@@ -812,6 +830,25 @@ describe("StatusMatrix Widget", () => {
             statusMatrix.updateAll();
 
             expect(mockCell.textContent).toBe("G4 1/8");
+        });
+
+        test("formats non-unit fraction durations with numerator and denominator", () => {
+            const mockCell = createMockElement("TD");
+            statusMatrix._statusTable.rows[2] = { cells: [createMockElement("TD"), mockCell] };
+
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: {
+                    currentBeat: 1,
+                    currentMeasure: 1,
+                    noteStatus: [["C4"], 8 / 3]
+                }
+            });
+
+            rationalToFraction.mockReturnValueOnce([8, 3]);
+
+            statusMatrix.updateAll();
+
+            expect(mockCell.textContent).toBe("C4 3/8");
         });
 
         test("formats numeric frequencies with Hz suffix", () => {
@@ -1151,7 +1188,7 @@ describe("StatusMatrix Widget", () => {
                 singer: {
                     currentBeat: 1,
                     currentMeasure: 1,
-                    noteStatus: [["C4", "C4", 440], 0.25]
+                    noteStatus: [["C4", "C4", 440], 4]
                 }
             });
 
@@ -1159,6 +1196,731 @@ describe("StatusMatrix Widget", () => {
             const noteCell = statusMatrix._statusTable.rows[1].cells[1];
             expect(noteCell.textContent.match(/C4/g) || []).toHaveLength(1);
             expect(noteCell.textContent).toBe("C4 440.00Hz 1/4");
+        });
+
+        test("formats duration correctly using real rationalToFraction helper", () => {
+            const utilsLogic = require("../../utils/utils-logic.js");
+            const originalRationalToFraction = global.rationalToFraction;
+            global.rationalToFraction = utilsLogic.rationalToFraction;
+
+            try {
+                // Quarter note: beat value 4 -> duration 1/4
+                mockActivity.turtles.ithTurtle.mockReturnValue({
+                    singer: {
+                        currentBeat: 1,
+                        currentMeasure: 1,
+                        noteStatus: [["C4"], 4]
+                    }
+                });
+
+                statusMatrix.updateAll();
+                let noteCell = statusMatrix._statusTable.rows[1].cells[1];
+                expect(noteCell.textContent).toBe("C4 1/4");
+
+                // Half note: beat value 2 -> duration 1/2
+                mockActivity.turtles.ithTurtle.mockReturnValue({
+                    singer: {
+                        currentBeat: 1,
+                        currentMeasure: 1,
+                        noteStatus: [["G4"], 2]
+                    }
+                });
+
+                statusMatrix.updateAll();
+                noteCell = statusMatrix._statusTable.rows[1].cells[1];
+                expect(noteCell.textContent).toBe("G4 1/2");
+
+                // Dotted quarter note: beat value 8/3 -> duration 3/8
+                mockActivity.turtles.ithTurtle.mockReturnValue({
+                    singer: {
+                        currentBeat: 1,
+                        currentMeasure: 1,
+                        noteStatus: [["D4"], 8 / 3]
+                    }
+                });
+
+                statusMatrix.updateAll();
+                noteCell = statusMatrix._statusTable.rows[1].cells[1];
+                expect(noteCell.textContent).toBe("D4 3/8");
+            } finally {
+                global.rationalToFraction = originalRationalToFraction;
+            }
+        });
+    });
+
+    describe("Table Section Structure (thead vs tbody)", () => {
+        let originalCreateElement;
+        let originalCreateTextNode;
+        let originalWindow;
+        let originalIsMusicBlocks;
+
+        beforeEach(() => {
+            const { JSDOM } = require("jsdom");
+            const dom = new JSDOM("<!DOCTYPE html><html><body></body></html>");
+
+            originalCreateElement = global.document.createElement;
+            originalCreateTextNode = global.document.createTextNode;
+            originalWindow = global.window;
+            originalIsMusicBlocks = global._THIS_IS_MUSIC_BLOCKS_;
+
+            global.document.createElement = dom.window.document.createElement.bind(
+                dom.window.document
+            );
+            global.document.createTextNode = dom.window.document.createTextNode.bind(
+                dom.window.document
+            );
+            global.window = dom.window;
+            global.window.innerWidth = 1200;
+            global._THIS_IS_MUSIC_BLOCKS_ = true;
+
+            const realWidgetBody = dom.window.document.createElement("div");
+            global.window.widgetWindows = {
+                windowFor: jest.fn().mockReturnValue({
+                    clear: jest.fn(),
+                    show: jest.fn(),
+                    getWidgetBody: () => realWidgetBody,
+                    sendToCenter: jest.fn(),
+                    destroy: jest.fn(),
+                    onclose: null,
+                    onmaximize: null
+                })
+            };
+        });
+
+        afterEach(() => {
+            global.document.createElement = originalCreateElement;
+            if (originalCreateTextNode !== undefined) {
+                global.document.createTextNode = originalCreateTextNode;
+            } else {
+                delete global.document.createTextNode;
+            }
+            global.window = originalWindow;
+            global._THIS_IS_MUSIC_BLOCKS_ = originalIsMusicBlocks;
+        });
+
+        test("places turtle/icon header row in thead and keeps dynamic data rows out of thead", () => {
+            mockActivity.logo.statusFields = [
+                [0, "letterclass"],
+                [1, "beatvalue"]
+            ];
+            mockActivity.blocks.blockList = {
+                0: { name: "x", protoblock: { staticLabels: ["letter class"] }, value: "G" },
+                1: { name: "beatvalue", protoblock: { staticLabels: ["beat count"] }, value: 1 }
+            };
+
+            statusMatrix.init(mockActivity);
+
+            const table = statusMatrix._statusTable;
+            expect(table.tHead).not.toBeNull();
+            expect(table.tHead.rows).toHaveLength(1);
+
+            const headerRow = table.tHead.rows[0];
+            const mouseImg = headerRow.querySelector("img");
+            expect(mouseImg).not.toBeNull();
+            expect(mouseImg.getAttribute("src")).toBe("images/mouse.svg");
+        });
+
+        test("places dynamic status rows in tbody", () => {
+            mockActivity.logo.statusFields = [
+                [0, "letterclass"],
+                [1, "beatvalue"]
+            ];
+            mockActivity.blocks.blockList = {
+                0: { name: "x", protoblock: { staticLabels: ["letter class"] }, value: "G" },
+                1: { name: "beatvalue", protoblock: { staticLabels: ["beat count"] }, value: 1 }
+            };
+
+            statusMatrix.init(mockActivity);
+
+            const table = statusMatrix._statusTable;
+            expect(table.tBodies).toHaveLength(1);
+            const tbody = table.tBodies[0];
+
+            // 2 status fields + note row + harmony row = 4 rows in tbody
+            expect(tbody.rows).toHaveLength(4);
+            expect(tbody.rows[0].cells[0].textContent).toContain("Letter class");
+            expect(tbody.rows[1].cells[0].textContent).toContain("Beat count");
+        });
+
+        test("places Note row in tbody when Music Blocks is enabled", () => {
+            mockActivity.logo.statusFields = [[0, "beatvalue"]];
+            mockActivity.blocks.blockList = {
+                0: { name: "beatvalue", protoblock: { staticLabels: ["beat count"] }, value: 1 }
+            };
+
+            statusMatrix.init(mockActivity);
+
+            const tbody = statusMatrix._statusTable.tBodies[0];
+            const noteRow = tbody.rows[tbody.rows.length - 2];
+            expect(noteRow.cells[0].textContent).toContain("Note");
+            const harmonyRow = tbody.rows[tbody.rows.length - 1];
+            expect(harmonyRow.cells[0].textContent).toContain("Harmony");
+        });
+
+        test("omits Note row in tbody when Music Blocks path is disabled", () => {
+            global._THIS_IS_MUSIC_BLOCKS_ = false;
+            mockActivity.logo.statusFields = [[0, "beatvalue"]];
+            mockActivity.blocks.blockList = {
+                0: { name: "beatvalue", protoblock: { staticLabels: ["beat count"] }, value: 1 }
+            };
+
+            statusMatrix.init(mockActivity);
+
+            const table = statusMatrix._statusTable;
+            expect(table.tHead.rows).toHaveLength(1);
+            expect(table.tBodies[0].rows).toHaveLength(1);
+            expect(table.tBodies[0].rows[0].cells[0].textContent).toContain("Beat count");
+        });
+
+        test("preserves row and cell indexing so updateAll updates data cells across sections", () => {
+            mockActivity.logo.statusFields = [
+                [0, "beatvalue"],
+                [1, "measurevalue"]
+            ];
+            mockActivity.blocks.blockList = {
+                0: { name: "beatvalue", protoblock: { staticLabels: ["beat count"] }, value: 1 },
+                1: {
+                    name: "measurevalue",
+                    protoblock: { staticLabels: ["measure count"] },
+                    value: 2
+                }
+            };
+            mockActivity.turtles.ithTurtle.mockReturnValue({
+                singer: {
+                    currentBeat: 1,
+                    currentMeasure: 2,
+                    noteStatus: [["C4"], 0.25]
+                }
+            });
+
+            statusMatrix.init(mockActivity);
+            statusMatrix.updateAll();
+
+            const table = statusMatrix._statusTable;
+            // Row 0 is header in thead
+            // Row 1 is beatvalue in tbody
+            expect(table.rows[1].cells[1].textContent).toBe("1");
+            // Row 2 is measurevalue in tbody
+            expect(table.rows[2].cells[1].textContent).toBe("2");
+            // Row 3 is note row in tbody
+            expect(table.rows[3].cells[1].textContent).toBe("C4 1/4");
+        });
+
+        test("handles empty status fields gracefully without exceptions or misindexing", () => {
+            mockActivity.logo.statusFields = [];
+            mockActivity.blocks.blockList = {};
+
+            expect(() => statusMatrix.init(mockActivity)).not.toThrow();
+
+            const table = statusMatrix._statusTable;
+            expect(table.tHead.rows).toHaveLength(1);
+            expect(table.tBodies[0].rows).toHaveLength(2); // Note and Harmony rows only
+            expect(table.rows).toHaveLength(3);
+
+            expect(() => statusMatrix.updateAll()).not.toThrow();
+        });
+
+        test("handles missing block references without throwing or misaligning cells", () => {
+            mockActivity.logo.statusFields = [
+                [999, "missingBlock"],
+                [0, "beatvalue"]
+            ];
+            mockActivity.blocks.blockList = {
+                0: { name: "beatvalue", protoblock: { staticLabels: ["beat count"] }, value: 1 }
+            };
+
+            expect(() => statusMatrix.init(mockActivity)).not.toThrow();
+
+            const table = statusMatrix._statusTable;
+            expect(table.tBodies[0].rows).toHaveLength(4); // missing, beatvalue, note, harmony
+
+            expect(() => statusMatrix.updateAll()).not.toThrow();
+            expect(table.rows[1].cells[1].textContent).toBe("");
+            expect(table.rows[2].cells[1].textContent).toBe("1");
+        });
+
+        test("preserves the thead/tbody row distribution matching the observed defect", () => {
+            mockActivity.blocks.blockList = {
+                0: { name: "x", protoblock: { staticLabels: ["letter class"] }, value: "G" },
+                1: { name: "x", protoblock: { staticLabels: ["beat count"] }, value: "0/1" },
+                2: { name: "x", protoblock: { staticLabels: ["measure count"] }, value: 0 },
+                3: {
+                    name: "x",
+                    protoblock: { staticLabels: ["whole notes played"] },
+                    value: "0/1"
+                },
+                4: { name: "bpm", protoblock: { staticLabels: ["beats per minute"] }, value: 90 }
+            };
+            mockActivity.logo.statusFields = [
+                [0, "outputtools"],
+                [1, "outputtools"],
+                [2, "outputtools"],
+                [3, "outputtools"],
+                [4, "bpm"]
+            ];
+
+            statusMatrix.init(mockActivity);
+
+            const table = statusMatrix._statusTable;
+            const totalRows = table.rows.length;
+            const theadRows = table.tHead?.rows.length ?? 0;
+            const tbodyRows = [...table.tBodies].reduce((n, b) => n + b.rows.length, 0);
+
+            // header, 5 fields, note, harmony
+            expect(totalRows).toBe(8);
+            expect(theadRows).toBe(1);
+            expect(tbodyRows).toBe(7);
+        });
+    });
+
+    describe("Harmony row", () => {
+        // 12-EDO frequencies, A4 = 440 Hz.
+        const FREQUENCIES = { C4: 261.6256, E4: 329.6276, G4: 391.9954 };
+        const RATIOS = { 1.25: [5, 4], 1.5: [3, 2] };
+        let originalCreateElement;
+        let originalCreateTextNode;
+        let originalWindow;
+
+        // A mouse whose latest note group sounds from 10000 to 11000 ms.
+        const mouse = (notes, previousTurtleTime = 0, endsAt = 11000) => ({
+            singer: {
+                previousTurtleTime,
+                pitchStatus: [{ notes, start: 0, startsAt: 10000, endsAt }],
+                noteStatus: null
+            }
+        });
+
+        const useMice = mice => {
+            mockActivity.turtles.turtleList = mice.map((_, i) => ({ name: "Mouse" + i }));
+            mockActivity.turtles.ithTurtle.mockImplementation(i => mice[i]);
+        };
+
+        const harmonyText = () =>
+            Array.from(statusMatrix._harmonyCell.querySelectorAll("tr"))
+                .slice(1)
+                .map(tr => Array.from(tr.children).map(td => td.textContent));
+
+        beforeAll(() => {
+            // musicutils-modecore builds note images with window.btoa when it loads.
+            const savedWindow = global.window;
+            global.window = { btoa: str => Buffer.from(str, "binary").toString("base64") };
+            global.INTERVALVALUES = require("../../utils/musicutils-constants").INTERVALVALUES;
+            global.CHORDNAMES = require("../../utils/musicutils-constants").CHORDNAMES;
+            global.CHORDVALUES = require("../../utils/musicutils-modecore").CHORDVALUES;
+            global.HarmonyUtils = require("../HarmonyUtils");
+            global.window = savedWindow;
+        });
+
+        afterAll(() => {
+            delete global.HarmonyUtils;
+        });
+
+        beforeEach(() => {
+            const { JSDOM } = require("jsdom");
+            const dom = new JSDOM("<!DOCTYPE html><html><body></body></html>");
+            originalCreateElement = global.document.createElement;
+            originalCreateTextNode = global.document.createTextNode;
+            originalWindow = global.window;
+            global.document.createElement = dom.window.document.createElement.bind(
+                dom.window.document
+            );
+            global.document.createTextNode = dom.window.document.createTextNode.bind(
+                dom.window.document
+            );
+            global.window = dom.window;
+            global.window.innerWidth = 1200;
+            global.window.widgetWindows = {
+                windowFor: jest.fn().mockReturnValue(createMockWidgetWindow())
+            };
+            global._THIS_IS_MUSIC_BLOCKS_ = true;
+            global.rationalToFraction.mockImplementation(value => RATIOS[value] || [value, 1]);
+            mockActivity.logo.synth.getFrequency.mockImplementation(note =>
+                typeof note === "number" ? note : FREQUENCIES[note]
+            );
+            jest.spyOn(Date, "now").mockReturnValue(10500);
+            jest.useFakeTimers({ doNotFake: ["Date", "requestAnimationFrame"] });
+        });
+
+        afterEach(() => {
+            statusMatrix._clearHarmonyTimer();
+            jest.useRealTimers();
+            jest.restoreAllMocks();
+            global.rationalToFraction.mockReset();
+            global.rationalToFraction.mockReturnValue([4, 1]);
+            global.document.createElement = originalCreateElement;
+            if (originalCreateTextNode !== undefined) {
+                global.document.createTextNode = originalCreateTextNode;
+            } else {
+                delete global.document.createTextNode;
+            }
+            global.window = originalWindow;
+        });
+
+        test("adds a Harmony row with one cell across all the mice", () => {
+            useMice([mouse(["C4"]), mouse(["E4"])]);
+            statusMatrix.init(mockActivity);
+
+            const tbody = statusMatrix._statusTable.tBodies[0];
+            const row = tbody.rows[tbody.rows.length - 1];
+            expect(row.cells[0].textContent).toContain("Harmony");
+            expect(row.cells[1]).toBe(statusMatrix._harmonyCell);
+            expect(row.cells[1].colSpan).toBe(2);
+        });
+
+        test("shows the chord and intervals sounding across the mice", () => {
+            useMice([mouse(["C4"]), mouse(["E4"]), mouse(["G4"])]);
+            statusMatrix.init(mockActivity);
+            statusMatrix.updateAll();
+
+            expect(statusMatrix._harmonyCell.textContent).toContain("C major");
+            expect(harmonyText()).toEqual([
+                ["C4 → E4", "major 3", "5:4", "1.260", "+13.7", "imperfect"],
+                ["C4 → G4", "perfect 5", "3:2", "1.498", "-2.0", "perfect"]
+            ]);
+        });
+
+        test("leaves out a mouse that has moved on to a rest or a drum", () => {
+            // The second mouse's last pitched note started at 0, but it is now at 0.5.
+            useMice([mouse(["C4"]), mouse(["E4"], 0.5)]);
+            statusMatrix.init(mockActivity);
+            statusMatrix.updateAll();
+
+            expect(statusMatrix._harmonyCell.textContent).toBe("");
+        });
+
+        test("clears the row when the project is stopped", () => {
+            useMice([mouse(["C4"]), mouse(["E4"])]);
+            mockActivity.logo.stopTurtle = true;
+            statusMatrix.init(mockActivity);
+            statusMatrix.updateAll();
+
+            expect(statusMatrix._harmonyCell.textContent).toBe("");
+        });
+
+        test("refreshes when a note stops sounding between blocks", () => {
+            // A staccato E4 that stops at 10600 ms, before the next block runs.
+            useMice([mouse(["C4"]), mouse(["E4"], 0, 10600)]);
+            statusMatrix.init(mockActivity);
+            statusMatrix.updateAll();
+            expect(harmonyText()).toHaveLength(1);
+
+            // The refresh is due 100 ms after the note ends.
+            Date.now.mockReturnValue(10701);
+            jest.advanceTimersByTime(201);
+
+            expect(statusMatrix._harmonyCell.textContent).toBe("");
+        });
+
+        test("stops refreshing when the window is closed", () => {
+            useMice([mouse(["C4"]), mouse(["E4"])]);
+            statusMatrix.init(mockActivity);
+            statusMatrix.updateAll();
+            expect(statusMatrix._harmonyTimer).not.toBeNull();
+
+            statusMatrix.widgetWindow.onclose();
+
+            expect(statusMatrix._harmonyTimer).toBeNull();
+        });
+
+        test("is not added in Turtle Blocks", () => {
+            global._THIS_IS_MUSIC_BLOCKS_ = false;
+            useMice([mouse(["C4"]), mouse(["E4"])]);
+            statusMatrix.init(mockActivity);
+            statusMatrix.updateAll();
+
+            expect(statusMatrix._harmonyCell).toBeNull();
+        });
+
+        describe("parallel motion", () => {
+            const MIDI = {
+                C3: 48,
+                D3: 50,
+                E3: 52,
+                C4: 60,
+                D4: 62,
+                E4: 64,
+                F4: 65,
+                G4: 67,
+                A4: 69,
+                B4: 71,
+                C5: 72
+            };
+            let mice;
+
+            // Moves a mouse to a note group (or a rest, with no notes) that starts
+            // at `start` in turtle time, lasts `length` seconds and is sounding now.
+            const play = (i, notes, start, length = 1) => {
+                mice[i].running = true;
+                mice[i].singer.previousTurtleTime = start;
+                mice[i].singer.turtleTime = start + length;
+                mice[i].singer.pitchStatus =
+                    notes.length > 0
+                        ? [{ notes, start, startsAt: 10000, endsAt: 10000 + length * 1000 }]
+                        : [];
+                statusMatrix.updateAll();
+            };
+
+            const warnings = () =>
+                Array.from(statusMatrix._harmonyCell.children)
+                    .map(child => child.textContent)
+                    .filter(text => /^(parallel|hidden) /.test(text));
+
+            beforeEach(() => {
+                mockActivity.logo.synth.getFrequency.mockImplementation(
+                    note => 440 * Math.pow(2, (MIDI[note] - 69) / 12)
+                );
+                mice = [0, 1, 2].map(() => ({
+                    singer: { previousTurtleTime: 0, pitchStatus: null, noteStatus: null }
+                }));
+            });
+
+            test("shows parallel fifths when two mice move together", () => {
+                useMice(mice.slice(0, 2));
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["G4"], 0);
+                expect(warnings()).toEqual([]);
+
+                // The interpreter moves the mice on one at a time.
+                play(0, ["D4"], 1);
+                expect(warnings()).toEqual([]);
+                play(1, ["A4"], 1);
+
+                expect(warnings()).toEqual(["parallel fifths: mouse 1 C4 → D4, mouse 2 G4 → A4"]);
+            });
+
+            test("shows the warning only while those notes are sounding", () => {
+                useMice(mice.slice(0, 2));
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["G4"], 0);
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+                expect(warnings()).toHaveLength(1);
+
+                Date.now.mockReturnValue(11200);
+                statusMatrix.updateAll();
+
+                expect(warnings()).toEqual([]);
+            });
+
+            test("hides the warning once one of the two mice moves on", () => {
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["G4"], 0);
+                play(2, ["C3"], 0);
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+                play(2, ["E3"], 1);
+                expect(warnings()).toEqual(["parallel fifths: mouse 1 C4 → D4, mouse 2 G4 → A4"]);
+
+                // Mouse 1 moves on while mice 2 and 3 hold the notes that started at 1.
+                play(0, ["E4"], 2);
+
+                expect(warnings()).toEqual([]);
+            });
+
+            test("compares each mouse with its own previous note", () => {
+                // The second mouse repeats G4 while the first moves, then moves
+                // while the first repeats D4: no beat has both mice moving.
+                useMice(mice.slice(0, 2));
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["G4"], 0);
+                play(0, ["D4"], 1);
+                play(1, ["G4"], 1);
+                play(0, ["D4"], 2);
+                play(1, ["A4"], 2);
+
+                expect(warnings()).toEqual([]);
+            });
+
+            test("does not follow a mouse through a rest or a chord", () => {
+                useMice(mice.slice(0, 2));
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["G4"], 0);
+                play(0, [], 1);
+                play(1, ["B4"], 1);
+                play(0, ["D4"], 2);
+                play(1, ["A4"], 2);
+                expect(warnings()).toEqual([]);
+
+                play(0, ["C4", "E4"], 3);
+                play(1, ["G4"], 3);
+                play(0, ["D4", "F4"], 4);
+                play(1, ["A4"], 4);
+                expect(warnings()).toEqual([]);
+            });
+
+            test("checks every pair of mice", () => {
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                ["C3", "C4", "G4"].forEach((note, i) => play(i, [note], 0));
+                ["D3", "D4", "A4"].forEach((note, i) => play(i, [note], 1));
+
+                expect(warnings()).toEqual([
+                    "parallel octaves: mouse 1 C3 → D3, mouse 2 C4 → D4",
+                    "parallel fifths: mouse 1 C3 → D3, mouse 3 G4 → A4",
+                    "parallel fifths: mouse 2 C4 → D4, mouse 3 G4 → A4"
+                ]);
+            });
+
+            test("shows hidden fifths between the outer voices", () => {
+                useMice(mice.slice(0, 2));
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["E4"], 0);
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+
+                expect(warnings()).toEqual(["hidden fifths: mouse 1 C4 → D4, mouse 2 E4 → A4"]);
+            });
+
+            test("checks hidden fifths only between the lowest and highest notes", () => {
+                // A third mouse holds C3, below the two that move into a fifth.
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                play(2, ["C3"], 0, 2);
+                play(0, ["C4"], 0);
+                play(1, ["E4"], 0);
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+                expect(warnings()).toEqual([]);
+
+                // Between them, it leaves them the outer voices.
+                play(2, ["F4"], 2, 3);
+                play(0, ["C4"], 3);
+                play(1, ["E4"], 3);
+                play(0, ["D4"], 4);
+                play(1, ["A4"], 4);
+                expect(warnings()).toEqual(["hidden fifths: mouse 1 C4 → D4, mouse 2 E4 → A4"]);
+            });
+
+            test("does not count a mouse that rests when the others move", () => {
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                play(2, ["C3"], 0, 1);
+                play(0, ["C4"], 0);
+                play(1, ["E4"], 0);
+                play(2, [], 1);
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+
+                expect(warnings()).toEqual(["hidden fifths: mouse 1 C4 → D4, mouse 2 E4 → A4"]);
+            });
+
+            test("waits for a mouse that has not reached the move yet", () => {
+                // Mouse 3 plays C5 twice, above the others, but the interpreter
+                // moves it on after them.
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["E4"], 0);
+                play(2, ["C5"], 0);
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+                expect(warnings()).toEqual([]);
+
+                play(2, ["C5"], 1);
+                expect(warnings()).toEqual([]);
+            });
+
+            test("forgets a mouse that is put in the trash during a run", () => {
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["E4"], 0);
+                play(2, ["C5"], 0);
+                // Mouse 3 is still running when it goes in the trash.
+                mockActivity.turtles.turtleList[2].inTrash = true;
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+
+                expect(warnings()).toEqual(["hidden fifths: mouse 1 C4 → D4, mouse 2 E4 → A4"]);
+                expect([...statusMatrix._voices.keys()]).toEqual([0, 1]);
+            });
+
+            test("does not wait for a mouse that has finished", () => {
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["E4"], 0);
+                play(2, ["C5"], 0);
+                mice[2].running = false;
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+
+                expect(warnings()).toEqual(["hidden fifths: mouse 1 C4 → D4, mouse 2 E4 → A4"]);
+            });
+
+            test("marks each interval above the bass as consonant or dissonant", () => {
+                useMice(mice);
+                statusMatrix.init(mockActivity);
+                ["C4", "F4", "A4"].forEach((note, i) => play(i, [note], 0));
+
+                expect(harmonyText().map(row => [row[0], row[5]])).toEqual([
+                    ["C4 → F4", "dissonant"],
+                    ["C4 → A4", "imperfect"]
+                ]);
+            });
+
+            test("starts again when the project is played again", () => {
+                useMice(mice.slice(0, 2));
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["G4"], 0);
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+
+                // Turtle time goes back to 0 for every mouse on a new run.
+                mice.forEach(tur => {
+                    tur.singer.previousTurtleTime = 0;
+                    tur.singer.pitchStatus = null;
+                });
+                play(0, ["E4"], 0);
+                play(1, ["A4"], 0);
+                expect(warnings()).toEqual([]);
+                expect(
+                    [...statusMatrix._voices.values()].map(voice => voice.moments.length)
+                ).toEqual([1, 1]);
+
+                play(0, ["F4"], 1);
+                play(1, ["B4"], 1);
+                expect(warnings()).toEqual([]);
+            });
+
+            test("measures each note once, not on every refresh", () => {
+                useMice(mice.slice(0, 2));
+                statusMatrix.init(mockActivity);
+                play(0, ["C4"], 0);
+                play(1, ["G4"], 0);
+                play(0, ["D4"], 1);
+                play(1, ["A4"], 1);
+                expect(warnings()).toHaveLength(1);
+
+                // The interpreter refreshes the Status after every block.
+                const calls = mockActivity.logo.synth.getFrequency.mock.calls.length;
+                for (let i = 0; i < 20; i++) {
+                    statusMatrix.updateAll();
+                }
+
+                expect(mockActivity.logo.synth.getFrequency.mock.calls.length).toBe(calls);
+                expect(warnings()).toHaveLength(1);
+            });
+
+            test("numbers the mice as the columns, leaving out mice in the trash", () => {
+                useMice(mice);
+                mockActivity.turtles.turtleList[0].inTrash = true;
+                statusMatrix.init(mockActivity);
+                play(1, ["C4"], 0);
+                play(2, ["G4"], 0);
+                play(1, ["D4"], 1);
+                play(2, ["A4"], 1);
+
+                expect(warnings()).toEqual(["parallel fifths: mouse 1 C4 → D4, mouse 2 G4 → A4"]);
+            });
         });
     });
 });

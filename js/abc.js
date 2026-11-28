@@ -14,24 +14,29 @@
 
    frequencyToPitch, NOTATIONNOTE, NOTATIONTUPLETVALUE, NOTATIONDURATION,
    NOTATIONROUNDDOWN, NOTATIONINSIDECHORD, NOTATIONDOTCOUNT,
-   NOTATIONSTACCATO
+   NOTATIONSTACCATO, plainUnwritableTuplets
 */
 
 /* exported saveAbcOutput */
 
 // This header is prepended to the Abc output.
 const ABCHEADER = "X:1\nT:Music Blocks composition\nC:Mr. Mouse\nL:1/16\nM:C\n";
+// abcjs, which this exporter is tested against, reads no larger a tuplet count.
+const ABC_MAX_TUPLET = 9;
 const OCTAVE_NOTATION_MAP = {
-    10: "'''''",
-    9: "''''",
-    8: "'''",
-    7: "''",
-    6: "'",
-    5: "",
-    4: "",
-    3: ",",
-    2: ",,",
-    1: ",,,"
+    "10": "'''''",
+    "9": "''''",
+    "8": "'''",
+    "7": "''",
+    "6": "'",
+    "5": "",
+    "4": "",
+    "3": ",",
+    "2": ",,",
+    "1": ",,,",
+    "0": ",,,,",
+    "-1": ",,,,,",
+    "-2": ",,,,,,"
 };
 
 const ACCIDENTAL_MAP = {
@@ -51,7 +56,7 @@ const PITCH_ACCIDENTAL_PATTERN = new RegExp(`^([A-Ga-g])([${ACCIDENTAL_SYMBOLS}]
 // A staged pitch name: a letter, then accidentals, an octave, and the accidental a courtesy
 // natural adds after the octave ("C♯4", "F4♮").
 const STAGED_PITCH_PATTERN = new RegExp(
-    `^([A-Ga-g])([${ACCIDENTAL_SYMBOLS}]*)(\\d+)([${ACCIDENTAL_SYMBOLS}]*)$`,
+    `^([A-Ga-g])([${ACCIDENTAL_SYMBOLS}]*)(-?\\d+)([${ACCIDENTAL_SYMBOLS}]*)$`,
     "u"
 );
 
@@ -224,7 +229,10 @@ class AbcExporter {
         this.turtle = turtle;
         this.keySignature = keySignature;
         this.voiceId = voiceId;
-        this.staging = logo.notation.notationStaging[turtle] || [];
+        this.staging = plainUnwritableTuplets(
+            logo.notation.notationStaging[turtle] || [],
+            ABC_MAX_TUPLET
+        );
         // With nested forevers, only the innermost one ever repeats, and a
         // forever with no notes after it has nothing to repeat.
         const repeatStart = this.staging.lastIndexOf("begin repeat");
@@ -255,8 +263,12 @@ class AbcExporter {
         const { field: keyField, alterations: keyAlterations } = abcKeySignature(keySignature);
         this.keyField = keyField;
         this.keyAlterations = keyAlterations;
+        // The voice's K: field: the key it starts in, or one set before its first note.
+        this.startKeyField = keyField;
+        this.hasNotes = false;
         this.accidentalsInForce = {};
         this.pitchesInDoubt = new Set();
+        this.roundedFrequencyWarnings = [];
     }
 
     /**
@@ -348,6 +360,13 @@ class AbcExporter {
 
         if (typeof note === "number") {
             const pitchObj = frequencyToPitch(note);
+            const cents = Number(pitchObj[2]);
+            if (Number.isFinite(cents) && Math.abs(cents) >= 0.5) {
+                const sign = cents > 0 ? "+" : "";
+                this.roundedFrequencyWarnings.push(
+                    `${note} Hz was rounded to ${pitchObj[0]}${pitchObj[1]} (${sign}${cents.toFixed(1)} cents)`
+                );
+            }
             note = pitchObj[0] + pitchObj[1];
         }
 
@@ -368,10 +387,10 @@ class AbcExporter {
             note = note.replace(accidentalSymbols, "");
         }
 
-        const match = note.match(/\d+$/);
+        const match = note.match(/-?\d+$/);
         const octave = match ? parseInt(match[0], 10) : null;
         if (octave !== null && OCTAVE_NOTATION_MAP[octave] !== undefined) {
-            note = note.replace(/\d+$/, OCTAVE_NOTATION_MAP[octave]);
+            note = note.replace(/-?\d+$/, OCTAVE_NOTATION_MAP[octave]);
         }
 
         if (octave !== null) {
@@ -604,7 +623,13 @@ class AbcExporter {
             case "key": {
                 const changed = abcKeySignature(`${this.staging[i + 1]} ${this.staging[i + 2]}`);
                 if (changed.field !== this.keyField) {
-                    this.__pushField(`[K:${changed.field}]`);
+                    if (this.hasNotes) {
+                        // A key change on a barline belongs to the measure after it.
+                        if (this.__onBarline() && this.sixteenths > 0) this.__pushBarLine();
+                        this.__pushField(`[K:${changed.field}]`);
+                    } else {
+                        this.startKeyField = changed.field;
+                    }
                     this.keyField = changed.field;
                     this.keyAlterations = changed.alterations;
                 }
@@ -719,6 +744,7 @@ class AbcExporter {
 
     processNoteArray(obj, i) {
         this.firstMeasure = false;
+        this.hasNotes = true;
         const inChordContinuation =
             obj[NOTATIONINSIDECHORD] > 0 &&
             i > 0 &&
@@ -870,13 +896,26 @@ class AbcExporter {
  * Processes musical notes and converts them into ABC notation format.
  * @param {object} logo - The logo object containing notationNotes to update.
  * @param {string} turtle - The identifier for the turtle.
- * @param {string} [keySignature] - the key the tune is written in, e.g. "G major". Staged
- *   pitches are absolute, so this is what the accidentals are written against.
+ * @param {string} [keySignature] - the key the turtle starts in, e.g. "G major". Staged
+ *   pitches are absolute, so accidentals are written against it until a staged key change.
  * @param {string} [voiceId] - the ABC voice these notes belong to. Staged voice
  *   changes are written inside it, so they cannot move notes to another turtle.
+ * @returns {string} the voice's K: field: the starting key, or a key set before its
+ *   first note.
  */
-const processABCNotes = function (logo, turtle, keySignature = "C major", voiceId = "") {
-    new AbcExporter(logo, turtle, keySignature, voiceId).process();
+const processABCNotes = function (
+    logo,
+    turtle,
+    keySignature = "C major",
+    voiceId = "",
+    warningCollector = null
+) {
+    const exporter = new AbcExporter(logo, turtle, keySignature, voiceId);
+    exporter.process();
+    if (warningCollector !== null) {
+        warningCollector.push(...exporter.roundedFrequencyWarnings);
+    }
+    return exporter.startKeyField;
 };
 
 /**
@@ -886,6 +925,7 @@ const processABCNotes = function (logo, turtle, keySignature = "C major", voiceI
  */
 const saveAbcOutput = function (activity) {
     const outputParts = [getABCHeader()];
+    const roundedFrequencyWarnings = [];
     let atLineStart = true;
     let voice = 0;
 
@@ -897,10 +937,17 @@ const saveAbcOutput = function (activity) {
             continue;
         }
 
-        const keySignature = activity.turtles.ithTurtle(t).singer.keySignature;
         voice += 1;
         const voiceId = "t" + voice;
-        processABCNotes(activity.logo, t, keySignature, voiceId);
+        // Every turtle starts a run in C major (Singer.reset()); its staged key changes
+        // follow. The turtle's keySignature is the key it ended in.
+        const keyField = processABCNotes(
+            activity.logo,
+            t,
+            "C major",
+            voiceId,
+            roundedFrequencyWarnings
+        );
         const notes = activity.logo.notationNotes[t];
         // A V: or K: field is only a field at the start of a line.
         if (!atLineStart) {
@@ -908,13 +955,20 @@ const saveAbcOutput = function (activity) {
         }
         // Without a V: field every turtle lands in one voice, one after another.
         outputParts.push("V:" + voiceId + "\n");
-        outputParts.push("K:" + abcKeySignature(keySignature).field + "\n");
+        outputParts.push("K:" + keyField + "\n");
         outputParts.push(notes);
         atLineStart = notes === "" || notes.endsWith("\n");
     }
 
+    const uniqueWarnings = [...new Set(roundedFrequencyWarnings)];
+    for (const warning of uniqueWarnings) {
+        outputParts.push(
+            `% WARNING: Music Blocks ${warning}; the cents offset was not exported.\n`
+        );
+    }
     outputParts.push("\n");
     activity.logo.notationOutput = outputParts.join("");
+    activity.logo.abcExportWarnings = uniqueWarnings;
     return activity.logo.notationOutput;
 };
 
@@ -925,7 +979,8 @@ if (typeof module !== "undefined" && module.exports) {
         saveAbcOutput,
         abcKeySignature,
         ACCIDENTAL_MAP,
-        OCTAVE_NOTATION_MAP
+        OCTAVE_NOTATION_MAP,
+        AbcExporter
     };
 }
 

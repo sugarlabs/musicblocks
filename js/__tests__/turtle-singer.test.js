@@ -29,6 +29,7 @@ global.saveMeterState = saveMeterState;
 global.restoreMeterState = restoreMeterState;
 
 const Singer = require("../turtle-singer");
+const setupRhythmActions = require("../turtleactions/RhythmActions");
 
 const mockGlobals = {
     getNote: jest.fn().mockReturnValue(["C", 4]),
@@ -37,6 +38,7 @@ const mockGlobals = {
     temperamentHasRatios: jest.fn().mockReturnValue(false),
     isNonEDO: jest.fn().mockReturnValue(false),
     getStepSizeUp: jest.fn().mockReturnValue(1),
+    getStepSizeDown: jest.fn().mockReturnValue(-1),
     numberToPitch: jest.fn().mockReturnValue(["C", 4]),
     pitchToNumber: jest.fn().mockReturnValue(60),
     getTemperament: jest.fn().mockReturnValue({ pitchNumber: 12 }),
@@ -56,6 +58,7 @@ global.isEquallyTempered = mockGlobals.isEquallyTempered;
 global.temperamentHasRatios = mockGlobals.temperamentHasRatios;
 global.isNonEDO = mockGlobals.isNonEDO;
 global.getStepSizeUp = mockGlobals.getStepSizeUp;
+global.getStepSizeDown = mockGlobals.getStepSizeDown;
 global.numberToPitch = mockGlobals.numberToPitch;
 global.pitchToNumber = mockGlobals.pitchToNumber;
 global.getTemperament = mockGlobals.getTemperament;
@@ -288,9 +291,49 @@ describe("Singer Class", () => {
         });
     });
 
+    test("dropPendingNotes() forgets the notes it had started", () => {
+        singer.inNoteBlock = [12, 14];
+        singer.multipleVoices = true;
+        singer.noteValue = { 12: 4, 14: 8 };
+        singer.notePitches = { 12: ["G"], 14: ["A"] };
+        singer.delayedNotes = [[14, 8]];
+        singer.turtleTime = 3;
+
+        singer.dropPendingNotes();
+
+        expect(singer.inNoteBlock).toEqual([]);
+        expect(singer.multipleVoices).toBe(false);
+        expect(singer.noteValue).toEqual({});
+        expect(singer.notePitches).toEqual({});
+        expect(singer.delayedNotes).toEqual([]);
+        expect(singer.turtleTime).toBe(3);
+    });
+
     test("should correctly add scalar transposition", () => {
         const result = Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, 2);
         expect(result).toEqual(["C", 4]);
+    });
+
+    test("should return promptly for a huge finite step count instead of hanging", () => {
+        const start = Date.now();
+        const result = Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, 1e308);
+        expect(Date.now() - start).toBeLessThan(5000);
+        expect(result).toEqual(["C", 4]);
+    });
+
+    test("should clamp non-finite step counts instead of hanging", () => {
+        // Under this suite's getNote mock every walk returns ["C", 4], so
+        // the capped Infinity walks and the unchanged NaN both read the
+        // same; the real-getNote suite below pins the actual notes.
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, Infinity)).toEqual([
+            "C",
+            4
+        ]);
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, -Infinity)).toEqual([
+            "C",
+            4
+        ]);
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, NaN)).toEqual(["C", 4]);
     });
 
     test("should correctly calculate scalar distance", () => {
@@ -298,9 +341,246 @@ describe("Singer Class", () => {
         expect(result).toBeGreaterThan(0);
     });
 
-    test("should correctly calculate inversion", () => {
-        const result = Singer.calculateInvert(logoMock, turtleMock, "C", 4);
-        expect(result).toBe(0);
+    describe("calculateInvert", () => {
+        let originalGetNote;
+        let originalPitchToNumber;
+
+        beforeEach(() => {
+            originalGetNote = global.getNote;
+            originalPitchToNumber = global.pitchToNumber;
+        });
+
+        afterEach(() => {
+            global.getNote = originalGetNote;
+            global.pitchToNumber = originalPitchToNumber;
+        });
+
+        test("should return 0 when invertList is empty", () => {
+            const result = Singer.calculateInvert(logoMock, turtleMock, "C", 4);
+            expect(result).toBe(0);
+        });
+
+        test("should correctly calculate single even inversion delta", () => {
+            const noteMap = { C: 39, D: 41, E: 43 };
+            global.getNote = jest.fn((note, octave) => [note, octave]);
+            global.pitchToNumber = jest.fn(
+                (note, octave) => (noteMap[note] || 39) + (octave - 4) * 12
+            );
+
+            turtleMock.singer.pitchNumberOffset = 39;
+            turtleMock.singer.invertList = [["D", 4, "even"]];
+
+            // Invert C4 (0) around D4 (2): stepDelta = 2 - 0 = 2 -> delta = 2 (inverts to E4)
+            const result = Singer.calculateInvert(logoMock, turtleMock, "C", 4);
+            expect(result).toBe(2);
+        });
+
+        test("should correctly calculate single odd inversion delta", () => {
+            const noteMap = { C: 39, D: 41, E: 43 };
+            global.getNote = jest.fn((note, octave) => [note, octave]);
+            global.pitchToNumber = jest.fn(
+                (note, octave) => (noteMap[note] || 39) + (octave - 4) * 12
+            );
+
+            turtleMock.singer.pitchNumberOffset = 39;
+            turtleMock.singer.invertList = [["C", 4, "odd"]];
+
+            // Invert C4 (0) around C4 odd axis: stepDelta = 0 - 0 + 0.5 = 0.5 -> delta = 0.5
+            const result = Singer.calculateInvert(logoMock, turtleMock, "C", 4);
+            expect(result).toBe(0.5);
+        });
+
+        test("should calculate correct pitch for nested multiple inversions without corrupting intermediate pitch", () => {
+            const noteMap = { C: 39, D: 41, E: 43 };
+            global.getNote = jest.fn((note, octave) => [note, octave]);
+            global.pitchToNumber = jest.fn(
+                (note, octave) => (noteMap[note] || 39) + (octave - 4) * 12
+            );
+
+            turtleMock.singer.pitchNumberOffset = 39;
+            // Nested inversions: outer is D4 (2), inner is E4 (4)
+            turtleMock.singer.invertList = [
+                ["D", 4, "even"],
+                ["E", 4, "even"]
+            ];
+
+            // Inner inversion (E4=4): C4 (0) reflects around 4 -> 8 (G#4). stepDelta1 = 4 - 0 = 4.
+            // Outer inversion (D4=2): 8 reflects around 2 -> -4 (G#3). stepDelta2 = 2 - 8 = -6.
+            // Net delta = 4 + (-6) = -2 (transposition = 2 * delta = -4, taking C4 to -4).
+            const result = Singer.calculateInvert(logoMock, turtleMock, "C", 4);
+            expect(result).toBe(-2);
+        });
+
+        test("should correctly invert through three nested layers", () => {
+            const noteMap = { C: 39, D: 41, E: 43 };
+            global.getNote = jest.fn((note, octave) => [note, octave]);
+            global.pitchToNumber = jest.fn(
+                (note, octave) => (noteMap[note] || 39) + (octave - 4) * 12
+            );
+
+            turtleMock.singer.pitchNumberOffset = 39;
+            // Three nested clamps: outer C4 (0), middle D4 (2), inner E4 (4)
+            turtleMock.singer.invertList = [
+                ["C", 4, "even"],
+                ["D", 4, "even"],
+                ["E", 4, "even"]
+            ];
+
+            // Inner E4: 0 -> 8, stepDelta = 4
+            // Middle D4: 8 -> -4, stepDelta = -6
+            // Outer C4: -4 -> 4, stepDelta = 4
+            // Total delta = 4 + (-6) + 4 = 2 (transposition = 4, takes C4 to E4=4)
+            const result = Singer.calculateInvert(logoMock, turtleMock, "C", 4);
+            expect(result).toBe(2);
+        });
+
+        test("should resolve target note without forwarding cents and evaluate axis at 0", () => {
+            global.getNote = jest.fn((note, octave, transposition) => [
+                note,
+                octave,
+                transposition * 100
+            ]);
+            turtleMock.singer.invertList = [["D", 4, "even"]];
+
+            Singer.calculateInvert(logoMock, turtleMock, "C", 4, 35);
+
+            // Target-note lookup receives 0 cents; the original cents are applied separately
+            // in the pitch calculation to avoid double-counting.
+            expect(global.getNote).toHaveBeenNthCalledWith(
+                1,
+                "C",
+                4,
+                0,
+                turtleMock.singer.keySignature,
+                turtleMock.singer.movable,
+                null,
+                activityMock.errorMsg,
+                activityMock.logo.synth.inTemperament
+            );
+
+            // Second call evaluates inversion center axis at 0 semitones
+            expect(global.getNote).toHaveBeenNthCalledWith(
+                2,
+                "D",
+                4,
+                0,
+                turtleMock.singer.keySignature,
+                turtleMock.singer.movable,
+                null,
+                activityMock.errorMsg,
+                activityMock.logo.synth.inTemperament
+            );
+        });
+
+        test("should not double-count cents in equal19 inversion", () => {
+            global.getNote = musicUtils.getNote;
+            global.pitchToNumber = musicUtils.pitchToNumber;
+            global.getCurrentEDO = () => 19;
+
+            turtleMock.singer.keySignature = "C major";
+            turtleMock.singer.movable = false;
+            activityMock.logo.synth.inTemperament = "equal19";
+
+            turtleMock.singer.pitchNumberOffset = musicUtils.pitchToNumber(
+                "C",
+                4,
+                "C major",
+                "equal19"
+            );
+
+            turtleMock.singer.invertList = [["C", 4, "even"]];
+
+            const delta = Singer.calculateInvert(logoMock, turtleMock, "C", 4, 35);
+
+            expect(delta).toBeCloseTo(-(35 * 19) / 1200, 6);
+        });
+
+        test("should preserve microtonal cents precision and calculate exact inversion delta with real getNote", () => {
+            global.getNote = musicUtils.getNote;
+            global.pitchToNumber = musicUtils.pitchToNumber;
+            global.getCurrentEDO = () => 12;
+
+            turtleMock.singer.pitchNumberOffset = 39;
+            turtleMock.singer.keySignature = "C major";
+            turtleMock.singer.movable = false;
+            activityMock.logo.synth.inTemperament = "equal";
+
+            // Invert C4 + 35 cents across D4 (even mode)
+            // num1 = 39 - 39 + 0.35 = 0.35
+            // num2 = 41 - 39 + 0 = 2.0
+            // stepDelta = 2.0 - 0.35 = 1.65
+            turtleMock.singer.invertList = [["D", 4, "even"]];
+            const deltaPositive = Singer.calculateInvert(logoMock, turtleMock, "C", 4, 35);
+            expect(deltaPositive).toBeCloseTo(1.65, 4);
+
+            // Verify the inverted note resolved through real getNote with (2 * delta + cents / 100):
+            // Transposition = 2 * 1.65 + 0.35 = 3.65 semitones above C4 (39 + 3.65 = 42.65 semitones = E4 - 35 cents)
+            const invertedNote = musicUtils.getNote(
+                "C",
+                4,
+                2 * deltaPositive + 0.35,
+                "C major",
+                false,
+                null,
+                () => {},
+                "equal"
+            );
+            const invertedPitch =
+                musicUtils.pitchToNumber(invertedNote[0], invertedNote[1], "C major", "equal") +
+                invertedNote[2] / 100;
+            expect(invertedPitch).toBeCloseTo(42.65, 4);
+
+            // Invert C4 - 35 cents across D4 (even mode)
+            // num1 = 39 - 39 - 0.35 = -0.35
+            // num2 = 41 - 39 = 2.0
+            // stepDelta = 2.0 - (-0.35) = 2.35
+            const deltaNegative = Singer.calculateInvert(logoMock, turtleMock, "C", 4, -35);
+            expect(deltaNegative).toBeCloseTo(2.35, 4);
+
+            // Verify negative cents inverted note: 2 * 2.35 - 0.35 = 4.35 semitones above C4 (E4 + 35 cents)
+            const invertedNegative = musicUtils.getNote(
+                "C",
+                4,
+                2 * deltaNegative - 0.35,
+                "C major",
+                false,
+                null,
+                () => {},
+                "equal"
+            );
+            const invertedNegativePitch =
+                musicUtils.pitchToNumber(
+                    invertedNegative[0],
+                    invertedNegative[1],
+                    "C major",
+                    "equal"
+                ) +
+                invertedNegative[2] / 100;
+            expect(invertedNegativePitch).toBeCloseTo(43.35, 4);
+        });
+
+        test("should preserve microtonal precision across nested multiple inversions", () => {
+            global.getNote = musicUtils.getNote;
+            global.pitchToNumber = musicUtils.pitchToNumber;
+            global.getCurrentEDO = () => 12;
+
+            turtleMock.singer.pitchNumberOffset = 39;
+            turtleMock.singer.keySignature = "C major";
+            turtleMock.singer.movable = false;
+            activityMock.logo.synth.inTemperament = "equal";
+
+            // Invert C4 + 20 cents:
+            // 1st layer: Invert around D4 (even): num1 = 0.2, num2 = 2.0 -> stepDelta = 1.8, num1 becomes 3.8 (E4 - 20 cents)
+            // 2nd layer: Invert around E4 (even): num2 = 4.0 -> stepDelta = 4.0 - 3.8 = 0.2, num1 becomes 4.2 (E4 + 20 cents)
+            // Total delta = 1.8 + 0.2 = 2.0
+            turtleMock.singer.invertList = [
+                ["E", 4, "even"],
+                ["D", 4, "even"]
+            ];
+
+            const delta = Singer.calculateInvert(logoMock, turtleMock, "C", 4, 20);
+            expect(delta).toBeCloseTo(2.0, 4);
+        });
     });
 
     test("should set master volume correctly", () => {
@@ -988,7 +1268,9 @@ describe("numberOfNotes — state restoration and tally logic", () => {
             stroke: 3,
             canvasAlpha: 1,
             penState: true,
-            doPenUp: jest.fn(),
+            doPenUp: jest.fn(() => {
+                turtleMock.painter.penState = false;
+            }),
             doSetXY: jest.fn(),
             doSetHeading: jest.fn()
         };
@@ -1024,6 +1306,49 @@ describe("numberOfNotes — state restoration and tally logic", () => {
         expect(result).toBe(5);
         expect(turtleMock.singer.tallyNotes).toBe(2);
         expect(turtleMock.painter.doPenUp).toHaveBeenCalled();
+        expect(turtleMock.painter.doSetXY).toHaveBeenCalledWith(10, 20);
+        expect(turtleMock.painter.doSetHeading).toHaveBeenCalledWith(90);
+        expect(turtleMock.painter.penState).toBe(true);
+    });
+
+    test("should restore pen state when pen starts down and keep pen up during position restore", () => {
+        turtleMock.painter.penState = true;
+        let penStateDuringSetXY;
+        turtleMock.painter.doSetXY = jest.fn(() => {
+            penStateDuringSetXY = turtleMock.painter.penState;
+        });
+
+        const result = Singer.numberOfNotes(logoMock, 0, 123);
+
+        expect(result).toBe(5);
+        expect(penStateDuringSetXY).toBe(false);
+        expect(turtleMock.painter.penState).toBe(true);
+        expect(turtleMock.painter.doSetXY).toHaveBeenCalledWith(10, 20);
+        expect(turtleMock.painter.doSetHeading).toHaveBeenCalledWith(90);
+    });
+
+    test("should keep pen up when pen starts up even if altered during counted run", () => {
+        turtleMock.painter.penState = false;
+        logoMock.runFromBlockNow = jest.fn(() => {
+            turtleMock.singer.tallyNotes += 5;
+            turtleMock.painter.penState = true;
+            turtleMock.x = 42;
+            turtleMock.y = 84;
+            turtleMock.orientation = 180;
+        });
+
+        let penStateDuringSetXY;
+        turtleMock.painter.doSetXY = jest.fn(() => {
+            penStateDuringSetXY = turtleMock.painter.penState;
+        });
+
+        const result = Singer.numberOfNotes(logoMock, 0, 123);
+
+        expect(result).toBe(5);
+        expect(penStateDuringSetXY).toBe(false);
+        expect(turtleMock.painter.penState).toBe(false);
+        expect(turtleMock.painter.doSetXY).toHaveBeenCalledWith(10, 20);
+        expect(turtleMock.painter.doSetHeading).toHaveBeenCalledWith(90);
     });
 
     test("should hold back the enclosing clamp signals by index", () => {
@@ -1165,6 +1490,97 @@ describe("processPitch — note block execution path", () => {
         expect(turtleMock.singer.noteOctaves[0].length).toBe(1);
         expect(turtleMock.singer.noteBeatValues[0].length).toBe(1);
         expect(turtleMock.singer.pushedNote).toBe(true);
+    });
+});
+
+describe("processPitch — neighbor ornament step resolution", () => {
+    let turtleMock;
+    let activityMock;
+    let savedGlobals;
+
+    beforeEach(() => {
+        savedGlobals = {
+            getNote: global.getNote,
+            getStepSizeUp: global.getStepSizeUp,
+            getStepSizeDown: global.getStepSizeDown
+        };
+        global.getNote = musicUtils.getNote;
+        global.getStepSizeUp = musicUtils.getStepSizeUp;
+        global.getStepSizeDown = musicUtils.getStepSizeDown;
+
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.singer.inNoteBlock = [0];
+        turtleMock.singer.notePitches = { 0: [] };
+        turtleMock.singer.noteOctaves = { 0: [] };
+        turtleMock.singer.noteCents = { 0: [] };
+        turtleMock.singer.noteHertz = { 0: [] };
+        turtleMock.singer.noteBeatValues = { 0: [] };
+        turtleMock.singer.beatFactor = 1;
+        turtleMock.singer.transposition = 0;
+        turtleMock.singer.keySignature = "C major";
+        turtleMock.singer.movable = false;
+
+        activityMock = createActivityMock(turtleMock);
+        activityMock.errorMsg = jest.fn();
+        activityMock.logo = createLogoMock(activityMock);
+        activityMock.logo.synth.inTemperament = false;
+    });
+
+    afterEach(() => {
+        global.getNote = savedGlobals.getNote;
+        global.getStepSizeUp = savedGlobals.getStepSizeUp;
+        global.getStepSizeDown = savedGlobals.getStepSizeDown;
+    });
+
+    test("resolves neighbor pitch with active inner clamp interval when chromatic neighbor clamps are nested", () => {
+        activityMock.blocks.blockList[10] = { name: "neighbor" };
+        activityMock.blocks.blockList[20] = { name: "neighbor" };
+        turtleMock.singer.inNeighbor = [10, 20];
+        turtleMock.singer.neighborStepPitch = [1, 3];
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(turtleMock.singer.neighborArgNote1).toEqual(["C4"]);
+        // Inner clamp interval 3 produces D♯4, resolving the active interval rather than outer clamp 1 (C♯4)
+        expect(turtleMock.singer.neighborArgNote2).toEqual(["D♯4"]);
+    });
+
+    test("resolves neighbor pitch with active inner clamp interval when scalar neighbor2 clamps are nested", () => {
+        activityMock.blocks.blockList[10] = { name: "neighbor2" };
+        activityMock.blocks.blockList[20] = { name: "neighbor2" };
+        turtleMock.singer.inNeighbor = [10, 20];
+        turtleMock.singer.neighborStepPitch = [1, 2];
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(turtleMock.singer.neighborArgNote1).toEqual(["C4"]);
+        // In C major, inner scalar step 2 from C4 produces E4, resolving active step rather than outer step 1 (D4)
+        expect(turtleMock.singer.neighborArgNote2).toEqual(["E4"]);
+    });
+
+    test("resolves negative interval from active inner clamp", () => {
+        activityMock.blocks.blockList[10] = { name: "neighbor" };
+        activityMock.blocks.blockList[20] = { name: "neighbor" };
+        turtleMock.singer.inNeighbor = [10, 20];
+        turtleMock.singer.neighborStepPitch = [2, -1];
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(turtleMock.singer.neighborArgNote1).toEqual(["C4"]);
+        // Inner clamp interval -1 produces B3, rather than outer clamp 2 (D4)
+        expect(turtleMock.singer.neighborArgNote2).toEqual(["B3"]);
+    });
+
+    test("resolves neighbor pitch correctly for a single non-nested neighbor clamp", () => {
+        activityMock.blocks.blockList[10] = { name: "neighbor" };
+        turtleMock.singer.inNeighbor = [10];
+        turtleMock.singer.neighborStepPitch = [2];
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, 123);
+
+        expect(turtleMock.singer.neighborArgNote1).toEqual(["C4"]);
+        expect(turtleMock.singer.neighborArgNote2).toEqual(["D4"]);
     });
 });
 
@@ -1756,6 +2172,568 @@ describe("processNote — delayedNotes reset on zero-duration tied notes (#8176)
     });
 });
 
+describe("processNote — nested tie note pairing and duration semantics (MB-010)", () => {
+    let turtleMock;
+    let activityMock;
+    let singer;
+    let savedGetNote;
+
+    const seedNoteBlock = (s, blk, pitch = "C", octave = 4, beatValue = 4, drums = []) => {
+        s.notePitches[blk] = [pitch];
+        s.noteOctaves[blk] = [octave];
+        s.noteCents[blk] = [0];
+        s.noteHertz[blk] = [261.63];
+        s.oscList[blk] = false;
+        s.noteBeat[blk] = 1;
+        s.noteBeatValues[blk] = beatValue;
+        s.noteDrums[blk] = drums;
+        s.embeddedGraphics[blk] = [];
+        activityMock.blocks.blockList[blk] = { name: "note", connections: [] };
+    };
+
+    const getScheduledEvents = () => {
+        return activityMock.logo.synth.trigger.mock.calls.map(call => ({
+            turtle: call[0],
+            note: call[1],
+            beatValue: call[2],
+            instrument: call[3],
+            paramsEffects: call[4],
+            future: call[7]
+        }));
+    };
+
+    beforeEach(() => {
+        savedGetNote = global.getNote;
+        global.getNote = jest.fn((p, oct) => [p, oct || 4]);
+
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        activityMock = createActivityMock(turtleMock);
+        activityMock.turtles = {
+            ithTurtle: jest.fn(() => turtleMock)
+        };
+        activityMock.blocks = {
+            blockList: {
+                outerTie: { name: "tie" },
+                innerTie: { name: "tie" },
+                note1: { name: "note" },
+                note2: { name: "note" },
+                note3: { name: "note" },
+                note4: { name: "note" },
+                note5: { name: "note" },
+                note6: { name: "note" }
+            }
+        };
+        activityMock.logo.setDispatchBlock = jest.fn();
+        activityMock.logo.setTurtleListener = jest.fn();
+        activityMock.logo.dispatchTurtleSignals = jest.fn();
+        activityMock.logo.synth.getFrequency = jest.fn().mockReturnValue(261.63);
+        activityMock.logo.synth.getCustomFrequency = jest.fn().mockReturnValue(261.63);
+        activityMock.logo.synth.start = jest.fn();
+        activityMock.logo.synth.trigger = jest.fn();
+        activityMock.logo.notation = {
+            notationRemoveTie: jest.fn(),
+            notationInsertTie: jest.fn(),
+            notationStaging: { 0: [] }
+        };
+        activityMock.errorMsg = jest.fn();
+        activityMock.stage = { update: jest.fn() };
+        turtleMock.doWait = jest.fn();
+        turtleMock.blink = jest.fn();
+        singer = turtleMock.singer;
+
+        // Enable real scheduling pathway: suppressOutput = false, active instrument, BPM = 120, drift = 1 (no clock lag)
+        singer.suppressOutput = false;
+        singer.instrumentNames = ["synthLead"];
+        singer.bpm = [120];
+        singer.drift = 1;
+        global.TONEBPM = 120;
+
+        setupRhythmActions(activityMock);
+    });
+
+    afterEach(() => {
+        global.getNote = savedGetNote;
+        global.TONEBPM = 60;
+    });
+
+    test("4-note nested arrangement: verifies exact effective half-note durations at synth scheduling boundary", () => {
+        let outerCleanupListener;
+        activityMock.logo.setTurtleListener = jest.fn((_, __, cb) => {
+            outerCleanupListener = cb;
+        });
+
+        // 1. Outer Tie starts
+        Singer.RhythmActions.doTie(0, "outerTie");
+        expect(singer.tie).toBe(true);
+
+        // Note 1 (C4, quarter note: beatValue = 4, duration = 1/4 = 0.25)
+        seedNoteBlock(singer, "note1", "C", 4, 4);
+        singer.inNoteBlock = ["note1"];
+        Singer.processNote(activityMock, 4, false, "note1", 0, jest.fn());
+
+        // First note duration held in carryover; NO synth event scheduled yet
+        expect(singer.tieCarryOver).toBe(4);
+        expect(singer.tie).toBe(true);
+        expect(getScheduledEvents()).toHaveLength(0);
+        expect(turtleMock.doWait).not.toHaveBeenCalled();
+
+        // 2. Inner Tie starts: defensive guard preserves outer state
+        Singer.RhythmActions.doTie(0, "innerTie");
+        expect(singer.tieCarryOver).toBe(4);
+        expect(singer.tie).toBe(true);
+        expect(getScheduledEvents()).toHaveLength(0);
+
+        // Note 2 (C4, quarter note: beatValue = 4) inside inner Tie -> pairs with Note 1!
+        seedNoteBlock(singer, "note2", "C", 4, 4);
+        singer.inNoteBlock = ["note2"];
+        Singer.processNote(activityMock, 4, false, "note2", 0, jest.fn());
+
+        // Pair 1 scheduled! Combined duration: 1 / (1/4 + 1/4) = 2 (half note -> beatValue = 0.5s)
+        expect(singer.tieCarryOver).toBe(0);
+        expect(singer.lastNotePlayed).toEqual(["C4", 2]);
+        expect(getScheduledEvents()).toHaveLength(1);
+        expect(getScheduledEvents()[0]).toEqual(
+            expect.objectContaining({
+                turtle: 0,
+                note: "C4",
+                beatValue: 0.5,
+                instrument: "synthLead"
+            })
+        );
+        expect(turtleMock.doWait).toHaveBeenCalledTimes(1);
+        expect(turtleMock.doWait).toHaveBeenCalledWith(0.5);
+
+        // Note 3 (C4, quarter note: beatValue = 4) inside inner Tie -> starts second pair
+        seedNoteBlock(singer, "note3", "C", 4, 4);
+        singer.inNoteBlock = ["note3"];
+        Singer.processNote(activityMock, 4, false, "note3", 0, jest.fn());
+        expect(singer.tieCarryOver).toBe(4);
+        expect(getScheduledEvents()).toHaveLength(1); // still only 1 scheduled call
+
+        // Inner Tie exits (transparent non-owning scope: no cleanup listener registered)
+
+        // Note 4 (C4, quarter note: beatValue = 4) in outer Tie -> pairs with Note 3!
+        seedNoteBlock(singer, "note4", "C", 4, 4);
+        singer.inNoteBlock = ["note4"];
+        Singer.processNote(activityMock, 4, false, "note4", 0, jest.fn());
+
+        // Pair 2 scheduled! Combined duration: half note -> beatValue = 0.5s
+        expect(singer.tieCarryOver).toBe(0);
+        expect(singer.lastNotePlayed).toEqual(["C4", 2]);
+        expect(getScheduledEvents()).toHaveLength(2);
+        expect(getScheduledEvents()[1]).toEqual(
+            expect.objectContaining({
+                turtle: 0,
+                note: "C4",
+                beatValue: 0.5,
+                instrument: "synthLead"
+            })
+        );
+        expect(turtleMock.doWait).toHaveBeenCalledTimes(2);
+        expect(turtleMock.doWait).toHaveBeenLastCalledWith(0.5);
+
+        // Total scheduled duration across both pairs = 0.5s + 0.5s = 1.0s (whole note)
+        const totalDuration = getScheduledEvents().reduce((sum, e) => sum + e.beatValue, 0);
+        expect(totalDuration).toBe(1.0);
+
+        // Outer Tie exits
+        outerCleanupListener();
+        expect(singer.tie).toBe(false);
+        expect(singer.tieCarryOver).toBe(0);
+        expect(singer.tieNotePitches).toEqual([]);
+        expect(singer.tieNoteExtras).toEqual([]);
+    });
+
+    test("two matching notes combine into half note duration at synth scheduling boundary", () => {
+        Singer.RhythmActions.doTie(0, "outerTie");
+
+        seedNoteBlock(singer, "note1", "C", 4, 4);
+        singer.inNoteBlock = ["note1"];
+        Singer.processNote(activityMock, 4, false, "note1", 0, jest.fn());
+        expect(getScheduledEvents()).toHaveLength(0);
+
+        seedNoteBlock(singer, "note2", "C", 4, 4);
+        singer.inNoteBlock = ["note2"];
+        Singer.processNote(activityMock, 4, false, "note2", 0, jest.fn());
+
+        expect(getScheduledEvents()).toHaveLength(1);
+        expect(getScheduledEvents()[0].note).toBe("C4");
+        expect(getScheduledEvents()[0].beatValue).toBe(0.5);
+        expect(singer.lastNotePlayed).toEqual(["C4", 2]);
+        expect(turtleMock.doWait).toHaveBeenCalledWith(0.5);
+    });
+
+    test("six matching notes across nested boundary pair sequentially into three half notes", () => {
+        let outerCleanupListener;
+        activityMock.logo.setTurtleListener = jest.fn((_, __, cb) => {
+            outerCleanupListener = cb;
+        });
+
+        Singer.RhythmActions.doTie(0, "outerTie");
+
+        // Note 1 (outer)
+        seedNoteBlock(singer, "note1", "C", 4, 4);
+        singer.inNoteBlock = ["note1"];
+        Singer.processNote(activityMock, 4, false, "note1", 0, jest.fn());
+
+        // Inner tie starts
+        Singer.RhythmActions.doTie(0, "innerTie");
+
+        // Note 2 (inner) -> pairs with Note 1 (Pair 1)
+        seedNoteBlock(singer, "note2", "C", 4, 4);
+        singer.inNoteBlock = ["note2"];
+        Singer.processNote(activityMock, 4, false, "note2", 0, jest.fn());
+
+        // Note 3 (inner)
+        seedNoteBlock(singer, "note3", "C", 4, 4);
+        singer.inNoteBlock = ["note3"];
+        Singer.processNote(activityMock, 4, false, "note3", 0, jest.fn());
+
+        // Note 4 (inner) -> pairs with Note 3 (Pair 2)
+        seedNoteBlock(singer, "note4", "C", 4, 4);
+        singer.inNoteBlock = ["note4"];
+        Singer.processNote(activityMock, 4, false, "note4", 0, jest.fn());
+
+        // Note 5 (outer)
+        seedNoteBlock(singer, "note5", "C", 4, 4);
+        singer.inNoteBlock = ["note5"];
+        Singer.processNote(activityMock, 4, false, "note5", 0, jest.fn());
+
+        // Note 6 (outer) -> pairs with Note 5 (Pair 3)
+        seedNoteBlock(singer, "note6", "C", 4, 4);
+        singer.inNoteBlock = ["note6"];
+        Singer.processNote(activityMock, 4, false, "note6", 0, jest.fn());
+
+        outerCleanupListener();
+
+        expect(getScheduledEvents()).toHaveLength(3);
+        getScheduledEvents().forEach(evt => {
+            expect(evt.note).toBe("C4");
+            expect(evt.beatValue).toBe(0.5);
+        });
+        const totalDuration = getScheduledEvents().reduce((sum, e) => sum + e.beatValue, 0);
+        expect(totalDuration).toBe(1.5);
+    });
+
+    test("odd-length sequence flushes remaining carried-over note without dropped duration on outer clamp exit", () => {
+        let outerCleanupListener;
+        activityMock.logo.setTurtleListener = jest.fn((_, __, cb) => {
+            outerCleanupListener = cb;
+        });
+
+        Singer.RhythmActions.doTie(0, "outerTie");
+
+        // Note 1 (outer)
+        seedNoteBlock(singer, "note1", "C", 4, 4);
+        singer.inNoteBlock = ["note1"];
+        Singer.processNote(activityMock, 4, false, "note1", 0, jest.fn());
+
+        // Inner tie enters
+        Singer.RhythmActions.doTie(0, "innerTie");
+
+        // Note 2 (inner) -> pairs with Note 1 (half note)
+        seedNoteBlock(singer, "note2", "C", 4, 4);
+        singer.inNoteBlock = ["note2"];
+        Singer.processNote(activityMock, 4, false, "note2", 0, jest.fn());
+        expect(getScheduledEvents()).toHaveLength(1);
+        expect(getScheduledEvents()[0].beatValue).toBe(0.5);
+
+        // Note 3 (inner) -> odd note, duration deferred into carryover
+        seedNoteBlock(singer, "note3", "C", 4, 4);
+        singer.inNoteBlock = ["note3"];
+        Singer.processNote(activityMock, 4, false, "note3", 0, jest.fn());
+        expect(singer.tieCarryOver).toBe(4);
+
+        // Outer clamp exits -> listener flushes Note 3 at its original quarter-note duration (0.25s)
+        outerCleanupListener();
+
+        expect(getScheduledEvents()).toHaveLength(2);
+        expect(getScheduledEvents()[1]).toEqual(
+            expect.objectContaining({
+                note: "C4",
+                beatValue: 0.25,
+                instrument: "synthLead"
+            })
+        );
+        expect(turtleMock.doWait).toHaveBeenCalledWith(0.25);
+
+        // Total duration: 0.5s + 0.25s = 0.75s (three quarter notes exactly; 0 dropped duration)
+        const totalDuration = getScheduledEvents().reduce((sum, e) => sum + e.beatValue, 0);
+        expect(totalDuration).toBe(0.75);
+        expect(singer.tie).toBe(false);
+        expect(singer.tieCarryOver).toBe(0);
+    });
+
+    test("pitch mismatch inside nested tie emits user warning and plays both notes without loss", () => {
+        let outerCleanupListener;
+        activityMock.logo.setTurtleListener = jest.fn((_, __, cb) => {
+            outerCleanupListener = cb;
+        });
+
+        Singer.RhythmActions.doTie(0, "outerTie");
+
+        // Note 1: C4 (quarter note)
+        seedNoteBlock(singer, "note1", "C", 4, 4);
+        singer.inNoteBlock = ["note1"];
+        Singer.processNote(activityMock, 4, false, "note1", 0, jest.fn());
+        expect(singer.tieCarryOver).toBe(4);
+
+        // Inner tie starts
+        Singer.RhythmActions.doTie(0, "innerTie");
+
+        // Note 2: D4 (quarter note, pitch mismatch)
+        seedNoteBlock(singer, "note2", "D", 4, 4);
+        singer.inNoteBlock = ["note2"];
+        Singer.processNote(activityMock, 4, false, "note2", 0, jest.fn());
+
+        // Error message emitted identifying mismatched note block
+        expect(activityMock.errorMsg).toHaveBeenCalledWith(
+            expect.stringContaining("You can only tie notes of the same pitch"),
+            "note2"
+        );
+
+        // Note 1 (C4) was immediately played at its original duration (0.25s)
+        expect(getScheduledEvents()).toHaveLength(1);
+        expect(getScheduledEvents()[0].note).toBe("C4");
+        expect(getScheduledEvents()[0].beatValue).toBe(0.25);
+        expect(singer.previousNotePlayed).toEqual(["C4", 4]);
+
+        // D4 is preserved in carryover as the first note for the next pair
+        expect(singer.tieCarryOver).toBe(4);
+        expect(singer.tieNotePitches).toEqual([["D", 4, 0, 261.63]]);
+
+        // Outer clamp exits -> flushes D4 at its original duration (0.25s)
+        outerCleanupListener();
+
+        expect(getScheduledEvents()).toHaveLength(2);
+        expect(getScheduledEvents()[1].note).toBe("D4");
+        expect(getScheduledEvents()[1].beatValue).toBe(0.25);
+        expect(singer.lastNotePlayed).toEqual(["D4", 4]);
+        expect(singer.previousNotePlayed).toEqual(["D4", 0]);
+
+        // Neither note was lost, both played at full quarter-note duration
+        const totalDuration = getScheduledEvents().reduce((sum, e) => sum + e.beatValue, 0);
+        expect(totalDuration).toBe(0.5);
+    });
+
+    test("combines different note durations: eighth note + quarter note -> 3/8 note (0.375s)", () => {
+        Singer.RhythmActions.doTie(0, "outerTie");
+
+        // Note 1: eighth note (beatValue = 8, raw duration = 1/8 = 0.125s)
+        seedNoteBlock(singer, "note1", "C", 4, 8);
+        singer.inNoteBlock = ["note1"];
+        Singer.processNote(activityMock, 8, false, "note1", 0, jest.fn());
+        expect(singer.tieCarryOver).toBe(8);
+
+        // Inner tie enters
+        Singer.RhythmActions.doTie(0, "innerTie");
+
+        // Note 2: quarter note (beatValue = 4, raw duration = 1/4 = 0.25s)
+        seedNoteBlock(singer, "note2", "C", 4, 4);
+        singer.inNoteBlock = ["note2"];
+        Singer.processNote(activityMock, 4, false, "note2", 0, jest.fn());
+
+        // Combined beat value: 1 / (1/4 + 1/8) = 1 / 0.375 = 8/3 ≈ 2.6667
+        // Scheduled duration: bpmFactor / noteBeatValue = 1 / (8/3) = 3/8 = 0.375s!
+        expect(getScheduledEvents()).toHaveLength(1);
+        expect(getScheduledEvents()[0].beatValue).toBeCloseTo(0.375, 4);
+        expect(turtleMock.doWait).toHaveBeenCalledWith(expect.closeTo(0.375, 4));
+    });
+
+    test("carries drum metadata across tied notes so both drums play with combined note", () => {
+        Singer.RhythmActions.doTie(0, "outerTie");
+
+        // Note 1 has snare drum
+        seedNoteBlock(singer, "note1", "C", 4, 4, ["snare"]);
+        singer.inNoteBlock = ["note1"];
+        Singer.processNote(activityMock, 4, false, "note1", 0, jest.fn());
+        expect(singer.tieFirstDrums).toEqual(["snare"]);
+
+        // Inner tie enters
+        Singer.RhythmActions.doTie(0, "innerTie");
+
+        // Note 2 has bassdrum
+        seedNoteBlock(singer, "note2", "C", 4, 4, ["bassdrum"]);
+        singer.inNoteBlock = ["note2"];
+        Singer.processNote(activityMock, 4, false, "note2", 0, jest.fn());
+
+        // Note 2 triggers synth with combined duration (0.5s) for pitched note and both drums
+        expect(getScheduledEvents()).toHaveLength(3);
+        expect(getScheduledEvents().map(e => e.instrument)).toEqual(
+            expect.arrayContaining(["synthLead", "snare", "bassdrum"])
+        );
+        getScheduledEvents().forEach(e => {
+            expect(e.beatValue).toBe(0.5);
+        });
+
+        // tieFirstDrums was consumed and reset
+        expect(singer.tieFirstDrums).toEqual([]);
+    });
+
+    test("sequential sibling ties execute independently without cross-talk", () => {
+        let capturedListener;
+        activityMock.logo.setTurtleListener = jest.fn((_, __, cb) => {
+            capturedListener = cb;
+        });
+
+        // Sibling Tie 1: C4 + C4
+        Singer.RhythmActions.doTie(0, "outerTie1");
+        seedNoteBlock(singer, "note1", "C", 4, 4);
+        singer.inNoteBlock = ["note1"];
+        Singer.processNote(activityMock, 4, false, "note1", 0, jest.fn());
+        seedNoteBlock(singer, "note2", "C", 4, 4);
+        singer.inNoteBlock = ["note2"];
+        Singer.processNote(activityMock, 4, false, "note2", 0, jest.fn());
+        capturedListener(); // clamp 1 exits
+        expect(singer.tie).toBe(false);
+
+        // Sibling Tie 2: D4 + D4
+        Singer.RhythmActions.doTie(0, "outerTie2");
+        expect(singer.tie).toBe(true);
+        seedNoteBlock(singer, "note3", "D", 4, 4);
+        singer.inNoteBlock = ["note3"];
+        Singer.processNote(activityMock, 4, false, "note3", 0, jest.fn());
+        seedNoteBlock(singer, "note4", "D", 4, 4);
+        singer.inNoteBlock = ["note4"];
+        Singer.processNote(activityMock, 4, false, "note4", 0, jest.fn());
+        capturedListener(); // clamp 2 exits
+        expect(singer.tie).toBe(false);
+
+        expect(getScheduledEvents()).toHaveLength(2);
+        expect(getScheduledEvents()[0].note).toBe("C4");
+        expect(getScheduledEvents()[0].beatValue).toBe(0.5);
+        expect(getScheduledEvents()[1].note).toBe("D4");
+        expect(getScheduledEvents()[1].beatValue).toBe(0.5);
+    });
+
+    test("exact maintainer lifecycle: outer tie -> pending note -> inner tie enters & exits -> outer note executes & pairs -> outer tie exits", () => {
+        let outerCleanupListener;
+        activityMock.logo.setTurtleListener = jest.fn((_, __, cb) => {
+            outerCleanupListener = cb;
+        });
+
+        // 1. Enter outer Tie
+        Singer.RhythmActions.doTie(0, "outerTie");
+        expect(singer.tie).toBe(true);
+        expect(singer.tieCarryOver).toBe(0);
+        expect(singer.tieNotePitches).toEqual([]);
+        expect(singer.tieNoteExtras).toEqual([]);
+        expect(singer.tieFirstDrums).toEqual([]);
+        expect(activityMock.logo.setDispatchBlock).toHaveBeenCalledWith("outerTie", 0, "_tie_0");
+
+        // 2. Create a pending outer note: Note 1 (C4, quarter note: beatValue = 4)
+        seedNoteBlock(singer, "note1", "C", 4, 4);
+        singer.inNoteBlock = ["note1"];
+        Singer.processNote(activityMock, 4, false, "note1", 0, jest.fn());
+        expect(singer.tie).toBe(true);
+        expect(singer.tieCarryOver).toBe(4);
+        expect(singer.tieNotePitches).toEqual([["C", 4, 0, 261.63]]);
+        expect(singer.tieNoteExtras[0]).toBe("note1");
+        expect(getScheduledEvents()).toHaveLength(0);
+
+        // 3. Enter nested inner Tie
+        activityMock.logo.setDispatchBlock.mockClear();
+        activityMock.logo.setTurtleListener.mockClear();
+        Singer.RhythmActions.doTie(0, "innerTie");
+        // Inner entry returned early: no dispatch block registered, no listener overwritten
+        expect(activityMock.logo.setDispatchBlock).not.toHaveBeenCalled();
+        expect(activityMock.logo.setTurtleListener).not.toHaveBeenCalled();
+        expect(singer.tie).toBe(true);
+        expect(singer.tieCarryOver).toBe(4);
+        expect(singer.tieNotePitches).toEqual([["C", 4, 0, 261.63]]);
+        expect(singer.tieNoteExtras[0]).toBe("note1");
+
+        // 4. Exit the inner Tie clamp (non-owning: no cleanup listener fires because none was attached)
+        // 5. Verify the outer Tie remains active
+        expect(singer.tie).toBe(true);
+        expect(singer.tieCarryOver).toBe(4);
+        expect(singer.tieNotePitches).toEqual([["C", 4, 0, 261.63]]);
+        expect(singer.tieNoteExtras[0]).toBe("note1");
+        expect(getScheduledEvents()).toHaveLength(0);
+
+        // 6. Execute the next outer note: Note 2 (C4, quarter note: beatValue = 4)
+        seedNoteBlock(singer, "note2", "C", 4, 4);
+        singer.inNoteBlock = ["note2"];
+        Singer.processNote(activityMock, 4, false, "note2", 0, jest.fn());
+
+        // 7. Verify correct note pairing and effective duration
+        expect(singer.tieCarryOver).toBe(0);
+        expect(getScheduledEvents()).toHaveLength(1);
+        expect(getScheduledEvents()[0]).toEqual(
+            expect.objectContaining({
+                turtle: 0,
+                note: "C4",
+                beatValue: 0.5, // half note (1/4 + 1/4)
+                instrument: "synthLead"
+            })
+        );
+        expect(turtleMock.doWait).toHaveBeenCalledWith(0.5);
+
+        // 8. Exit the outer Tie clamp
+        outerCleanupListener();
+
+        // 9. Verify all Tie-related state is cleaned up
+        expect(singer.tie).toBe(false);
+        expect(singer.tieCarryOver).toBe(0);
+        expect(singer.tieNotePitches).toEqual([]);
+        expect(singer.tieNoteExtras).toEqual([]);
+        expect(singer.tieFirstDrums).toEqual([]);
+    });
+
+    test("sequential sibling Ties execute independently with correct note pairing and duration calculation", () => {
+        let currentListener;
+        activityMock.logo.setTurtleListener = jest.fn((_, __, cb) => {
+            currentListener = cb;
+        });
+
+        // --- Sibling Tie 1: Pair two C4 quarter notes -> half note (0.5s) ---
+        Singer.RhythmActions.doTie(0, "tie1");
+        expect(singer.tie).toBe(true);
+        const tie1Cleanup = currentListener;
+
+        seedNoteBlock(singer, "tie1_n1", "C", 4, 4);
+        singer.inNoteBlock = ["tie1_n1"];
+        Singer.processNote(activityMock, 4, false, "tie1_n1", 0, jest.fn());
+        expect(singer.tieCarryOver).toBe(4);
+
+        seedNoteBlock(singer, "tie1_n2", "C", 4, 4);
+        singer.inNoteBlock = ["tie1_n2"];
+        Singer.processNote(activityMock, 4, false, "tie1_n2", 0, jest.fn());
+        expect(singer.tieCarryOver).toBe(0);
+
+        tie1Cleanup();
+        expect(singer.tie).toBe(false);
+        expect(singer.tieCarryOver).toBe(0);
+        expect(getScheduledEvents()).toHaveLength(1);
+        expect(getScheduledEvents()[0].note).toBe("C4");
+        expect(getScheduledEvents()[0].beatValue).toBe(0.5);
+
+        // --- Sibling Tie 2: Pair two D4 eighth notes -> quarter note (0.25s) ---
+        Singer.RhythmActions.doTie(0, "tie2");
+        expect(singer.tie).toBe(true);
+        const tie2Cleanup = currentListener;
+
+        seedNoteBlock(singer, "tie2_n1", "D", 4, 8);
+        singer.inNoteBlock = ["tie2_n1"];
+        Singer.processNote(activityMock, 8, false, "tie2_n1", 0, jest.fn());
+        expect(singer.tieCarryOver).toBe(8);
+
+        seedNoteBlock(singer, "tie2_n2", "D", 4, 8);
+        singer.inNoteBlock = ["tie2_n2"];
+        Singer.processNote(activityMock, 8, false, "tie2_n2", 0, jest.fn());
+        expect(singer.tieCarryOver).toBe(0);
+
+        tie2Cleanup();
+        expect(singer.tie).toBe(false);
+        expect(singer.tieCarryOver).toBe(0);
+
+        expect(getScheduledEvents()).toHaveLength(2);
+        expect(getScheduledEvents()[1].note).toBe("D4");
+        expect(getScheduledEvents()[1].beatValue).toBe(0.25);
+    });
+});
+
 describe("processNote notation and MIDI emission guards against non-positive durations", () => {
     let turtleMock;
     let activityMock;
@@ -1824,6 +2802,89 @@ describe("processNote notation and MIDI emission guards against non-positive dur
         expect(activityMock.logo.updateNotation).toHaveBeenCalledWith(["C4"], 4, 0, -1, []);
     });
 
+    test("passes every drum in a note to the notation", () => {
+        const blk = "twoDrumsNoteBlk";
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["C", "C"] };
+        turtleMock.singer.noteOctaves = { [blk]: [2, 2] };
+        turtleMock.singer.noteCents = { [blk]: [0, 0] };
+        turtleMock.singer.noteHertz = { [blk]: [0, 0] };
+        turtleMock.singer.noteDrums = { [blk]: ["kick drum", "snare drum"] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1, 1] };
+        turtleMock.singer.instrumentNames = ["piano"];
+        turtleMock.singer.oscList = { [blk]: [] };
+        turtleMock.singer.bpm = [90];
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+        expect(activityMock.logo.updateNotation.mock.calls[0][4]).toEqual([
+            "kick drum",
+            "snare drum"
+        ]);
+    });
+
+    test("passes a hertz note to notationMIDI as its nearest note name", () => {
+        const blk = "hertzNoteBlk";
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["A"] };
+        turtleMock.singer.noteOctaves = { [blk]: [4] };
+        turtleMock.singer.noteCents = { [blk]: [39] };
+        turtleMock.singer.noteHertz = { [blk]: [450] };
+        turtleMock.singer.noteDrums = { [blk]: [] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1] };
+        turtleMock.singer.instrumentNames = ["piano"];
+        turtleMock.singer.oscList = { [blk]: [] };
+        turtleMock.singer.bpm = [90];
+
+        const savedFrequencyToPitch = global.frequencyToPitch;
+        global.frequencyToPitch = jest.fn(() => ["A", 4, 39.1]);
+        try {
+            Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+        } finally {
+            global.frequencyToPitch = savedFrequencyToPitch;
+        }
+
+        expect(activityMock.logo.notationMIDI).toHaveBeenCalledWith(
+            ["A4"],
+            [],
+            4,
+            0,
+            90,
+            "piano",
+            [4, 4]
+        );
+        // The other notations read frequencies themselves.
+        expect(activityMock.logo.updateNotation).toHaveBeenCalledWith([450], 4, 0, -1, []);
+    });
+
+    test("does not add a courtesy natural to a hertz note in a chord with its sharp", () => {
+        // A4 at 450 Hz (39 cents) with A♯4 in the same note gets a courtesy natural.
+        const blk = "hertzChordBlk";
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["A", "A♯"] };
+        turtleMock.singer.noteOctaves = { [blk]: [4, 4] };
+        turtleMock.singer.noteCents = { [blk]: [39, 0] };
+        turtleMock.singer.noteHertz = { [blk]: [450, 0] };
+        turtleMock.singer.noteDrums = { [blk]: [] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1] };
+        turtleMock.singer.instrumentNames = ["piano"];
+        turtleMock.singer.oscList = { [blk]: [] };
+        turtleMock.singer.bpm = [90];
+
+        const savedFrequencyToPitch = global.frequencyToPitch;
+        global.frequencyToPitch = jest.fn(() => ["A", 4, 39.1]);
+        try {
+            Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+        } finally {
+            global.frequencyToPitch = savedFrequencyToPitch;
+        }
+
+        const midiNotes = activityMock.logo.notationMIDI.mock.calls[0][0];
+        expect(midiNotes[0]).toBe("A4");
+        expect(midiNotes.some(note => String(note).includes("450"))).toBe(false);
+        expect(activityMock.logo.updateNotation.mock.calls[0][0][0]).toBe(450);
+    });
+
     test.each([
         { bpm: [], masterBPM: 180, recorded: 180 },
         { bpm: [120], masterBPM: 180, recorded: 120 }
@@ -1865,6 +2926,108 @@ describe("processNote notation and MIDI emission guards against non-positive dur
             );
         }
     );
+
+    test("passes every drum in one Note to the MIDI recorder", () => {
+        const blk = "drumNoteBlk";
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["C"] };
+        turtleMock.singer.noteOctaves = { [blk]: [4] };
+        turtleMock.singer.noteCents = { [blk]: [0] };
+        turtleMock.singer.noteHertz = { [blk]: [0] };
+        turtleMock.singer.noteDrums = { [blk]: ["kick drum", "snare drum"] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1] };
+        turtleMock.singer.instrumentNames = ["piano"];
+        turtleMock.singer.oscList = { [blk]: [] };
+        turtleMock.singer.bpm = [90];
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+        expect(activityMock.logo.notationMIDI).toHaveBeenCalledWith(
+            ["C4"],
+            ["kick drum", "snare drum"],
+            4,
+            0,
+            90,
+            "piano",
+            [4, 4]
+        );
+    });
+
+    describe("inside Set Drum", () => {
+        const blk = "setDrumNoteBlk";
+        const recordNote = ({ pitches, drums = [], osc = [] }) => {
+            Object.assign(turtleMock.singer, {
+                inNoteBlock: [blk],
+                notePitches: { [blk]: pitches },
+                noteOctaves: { [blk]: pitches.map(() => 4) },
+                noteCents: { [blk]: pitches.map(() => 0) },
+                noteHertz: { [blk]: pitches.map(() => 0) },
+                noteDrums: { [blk]: drums },
+                noteBeatValues: { [blk]: [1] },
+                instrumentNames: ["piano"],
+                oscList: { [blk]: osc },
+                drumStyle: ["snare drum"],
+                bpm: [90]
+            });
+            Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+            return activityMock.logo.notationMIDI.mock.calls[0].slice(0, 2);
+        };
+
+        // The note sits in the clamp of a setdrum block, with a settimbre block
+        // between them when setTimbre is true.
+        const nest = setTimbre => {
+            const blockList = activityMock.blocks.blockList;
+            blockList[blk] = { name: "newnote", connections: ["parentBlk"] };
+            blockList.parentBlk = {
+                name: setTimbre ? "settimbre" : "setdrum",
+                connections: [setTimbre ? "setDrumBlk" : null]
+            };
+            blockList.setDrumBlk = { name: "setdrum", connections: [null] };
+        };
+
+        test("records the drum it plays instead of the pitch", () => {
+            nest(false);
+            expect(recordNote({ pitches: ["C"] })).toEqual([["R"], ["snare drum"]]);
+        });
+
+        test("records only the drum when the note has a drum of its own", () => {
+            nest(false);
+            expect(recordNote({ pitches: ["C"], drums: ["snare drum"] })).toEqual([
+                ["R"],
+                ["snare drum"]
+            ]);
+        });
+
+        test("keeps the pitch that a Set Instrument inside it plays", () => {
+            nest(true);
+            expect(recordNote({ pitches: ["C"] })).toEqual([["C4"], []]);
+        });
+
+        test("keeps the pitch that an oscillator plays", () => {
+            nest(false);
+            expect(recordNote({ pitches: ["C"], osc: ["sine"] })).toEqual([["C4"], []]);
+        });
+
+        test.each([
+            ["has no connections", { [blk]: { name: "newnote" } }],
+            ["has a parent that is gone", { [blk]: { name: "newnote", connections: ["goneBlk"] } }],
+            [
+                "has a parent with no connections",
+                {
+                    [blk]: { name: "newnote", connections: ["vspaceBlk"] },
+                    vspaceBlk: { name: "vspace" }
+                }
+            ]
+        ])("records the drum when the note %s", (_case, blocks) => {
+            Object.assign(activityMock.blocks.blockList, blocks);
+            expect(recordNote({ pitches: ["C"] })).toEqual([["R"], ["snare drum"]]);
+        });
+
+        test("records a rest as a rest, with no drum", () => {
+            nest(false);
+            expect(recordNote({ pitches: ["rest"] })).toEqual([["R"], []]);
+        });
+    });
 });
 
 describe("processNote playback path avoids discarded ratio computation", () => {
@@ -2105,6 +3268,100 @@ describe("addScalarTransposition on non-EDO temperaments", () => {
     });
 });
 
+describe("addScalarTransposition with real getNote", () => {
+    // The shared getNote mock always returns ["C", 4], so the mocked
+    // tests cannot verify the musical result. These tests use the real
+    // pitch resolver instead.
+    let turtleMock;
+    let activityMock;
+    let logoMock;
+    let savedGlobals;
+
+    beforeEach(() => {
+        savedGlobals = {
+            getNote: global.getNote,
+            getStepSizeUp: global.getStepSizeUp,
+            getStepSizeDown: global.getStepSizeDown
+        };
+        global.getNote = musicUtils.getNote;
+        global.getStepSizeUp = musicUtils.getStepSizeUp;
+        global.getStepSizeDown = musicUtils.getStepSizeDown;
+
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.singer.keySignature = "C major";
+        turtleMock.singer.movable = false;
+        activityMock = createActivityMock(turtleMock);
+        activityMock.errorMsg = jest.fn();
+        logoMock = createLogoMock(activityMock);
+        logoMock.synth.inTemperament = false;
+    });
+
+    afterEach(() => {
+        global.getNote = savedGlobals.getNote;
+        global.getStepSizeUp = savedGlobals.getStepSizeUp;
+        global.getStepSizeDown = savedGlobals.getStepSizeDown;
+    });
+
+    test("1000 steps up from C4 in C major lands on B10", () => {
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, 1000)).toEqual([
+            "B",
+            10,
+            0
+        ]);
+    });
+
+    test("1001 steps is capped to the same 1000-step result", () => {
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, 1001)).toEqual([
+            "B",
+            10,
+            0
+        ]);
+    });
+
+    test("the cap is not musically neutral: an uncapped 1001-step walk lands on C10", () => {
+        // Walk the same EDO loop without the cap, using the real resolver.
+        let noteObj = musicUtils.getNote("C", 4, 0, "C major", false, null, jest.fn(), false);
+        for (let i = 0; i < 1001; i++) {
+            const stepEdo = musicUtils.getStepSizeUp("C major", noteObj[0], undefined, false, 12);
+            noteObj = musicUtils.getNote(
+                noteObj[0],
+                noteObj[1],
+                stepEdo,
+                "C major",
+                false,
+                null,
+                jest.fn(),
+                false,
+                true,
+                false
+            );
+        }
+        expect(noteObj).toEqual(["C", 10, 0]);
+    });
+
+    test("Infinity is handled like a huge finite value, NaN leaves the note unchanged", () => {
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, Infinity)).toEqual(
+            Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, 1e308)
+        );
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, Infinity)).toEqual([
+            "B",
+            10,
+            0
+        ]);
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, -Infinity)).toEqual(
+            Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, -1e308)
+        );
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, -Infinity)).toEqual([
+            "D",
+            1,
+            // The resolver returns cents as -0 on the downward walk.
+            -0
+        ]);
+        expect(Singer.addScalarTransposition(logoMock, turtleMock, "C", 4, NaN)).toEqual(["C", 4]);
+    });
+});
+
 describe("processPitch music keyboard with movable Do", () => {
     const saved = {};
 
@@ -2143,6 +3400,28 @@ describe("processPitch music keyboard with movable Do", () => {
 
         expect(activityMock.logo.musicKeyboard.noteNames).toEqual([name]);
         expect(activityMock.logo.musicKeyboard.octaves).toEqual([oct]);
+    });
+
+    test("routes the row to the turtle's own keyboard", () => {
+        const turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        const activityMock = createActivityMock(turtleMock);
+        activityMock.logo.synth = { inTemperament: "equal" };
+        activityMock.logo.inMusicKeyboard = true;
+        const lastActive = {
+            instruments: [],
+            noteNames: [],
+            octaves: [],
+            addRowBlock: jest.fn()
+        };
+        const own = { instruments: [], noteNames: [], octaves: [], addRowBlock: jest.fn() };
+        activityMock.logo.musicKeyboard = lastActive;
+        activityMock.logo.musicKeyboardByTurtle = { 0: own };
+
+        Singer.processPitch(activityMock, "C", 4, 0, 0, "blk");
+
+        expect(own.noteNames).toEqual(["C"]);
+        expect(lastActive.noteNames).toEqual([]);
     });
 });
 
@@ -3277,5 +4556,694 @@ describe("processNote — drum mode parent block traversal null and cycle safety
         expect(
             activityMock.logo.synth.trigger.mock.calls.some(call => call[3] === "acoustic")
         ).toBe(false);
+    });
+
+    describe("pitchStatus - active note duration and drum filtering", () => {
+        it("records sounding duration using beatValue for staccato notes", () => {
+            const blk = "staccatoNoteBlk";
+            singer.inNoteBlock = [blk];
+            singer.notePitches[blk] = ["C"];
+            singer.noteOctaves[blk] = [4];
+            singer.noteCents[blk] = [0];
+            singer.noteHertz[blk] = [0];
+            singer.oscList[blk] = false;
+            singer.noteBeat[blk] = 1;
+            singer.noteBeatValues[blk] = 1;
+            singer.noteDrums[blk] = [];
+            singer.embeddedGraphics[blk] = [];
+            singer.previousTurtleTime = 0;
+            singer.turtleTime = 0;
+            singer.bpm = [60];
+            singer.staccato = [4];
+
+            activityMock.blocks.blockList = {
+                [blk]: { name: "note", connections: [null] }
+            };
+
+            jest.spyOn(Date, "now").mockReturnValue(5000);
+            Singer.processNote(activityMock, 1, false, blk, 0, jest.fn());
+            expect(singer.pitchStatus).toEqual([
+                { notes: ["C4"], start: 0, startsAt: 5000, endsAt: 5250 }
+            ]);
+            expect(singer.turtleTime).toBe(1);
+        });
+
+        it("records sounding duration using beatValueOverride when glideOverride is set", () => {
+            const blk = "glideNoteBlk";
+            singer.inNoteBlock = [blk];
+            singer.notePitches[blk] = ["C"];
+            singer.noteOctaves[blk] = [4];
+            singer.noteCents[blk] = [0];
+            singer.noteHertz[blk] = [0];
+            singer.oscList[blk] = false;
+            singer.noteBeat[blk] = 1;
+            singer.noteBeatValues[blk] = 1;
+            singer.noteDrums[blk] = [];
+            singer.embeddedGraphics[blk] = [];
+            singer.previousTurtleTime = 0;
+            singer.turtleTime = 0;
+            singer.bpm = [60];
+            singer.instrumentNames = ["flute"];
+            singer.glide = [1];
+            singer.glideOverride = 2;
+
+            activityMock.blocks.blockList = {
+                [blk]: { name: "note", connections: [null] }
+            };
+
+            jest.spyOn(Date, "now").mockReturnValue(5000);
+            Singer.processNote(activityMock, 1, false, blk, 0, jest.fn());
+            expect(singer.pitchStatus).toEqual([
+                { notes: ["C4"], start: 0, startsAt: 5000, endsAt: 7000 }
+            ]);
+            expect(singer.glideOverride).toBe(0);
+        });
+
+        it("does not record the zero-length first half of a tie", () => {
+            const blk = "tiedNoteBlk";
+            const previous = [{ notes: ["G4"], start: 0, startsAt: 1000, endsAt: 2000 }];
+            singer.pitchStatus = previous;
+            singer.tie = true;
+            singer.tieCarryOver = 0;
+            singer.inNoteBlock = [blk];
+            singer.notePitches[blk] = ["C"];
+            singer.noteOctaves[blk] = [4];
+            singer.noteCents[blk] = [0];
+            singer.noteHertz[blk] = [0];
+            singer.oscList[blk] = false;
+            singer.noteBeat[blk] = 1;
+            singer.noteBeatValues[blk] = 1;
+            singer.noteDrums[blk] = [];
+            singer.embeddedGraphics[blk] = [];
+
+            activityMock.blocks.blockList = {
+                [blk]: { name: "note", connections: [null] }
+            };
+
+            Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+            expect(singer.tieCarryOver).toBe(4);
+            expect(singer.pitchStatus).toBe(previous);
+        });
+
+        it("filters out notes played in drumStyle without settimbre", () => {
+            const blk = "drumOnlyNoteBlk";
+            singer.drumStyle = ["acoustic"];
+            singer.inNoteBlock = [blk];
+            singer.notePitches[blk] = ["C"];
+            singer.noteOctaves[blk] = [4];
+            singer.noteCents[blk] = [0];
+            singer.noteHertz[blk] = [0];
+            singer.oscList[blk] = false;
+            singer.noteBeat[blk] = 1;
+            singer.noteBeatValues[blk] = 1;
+            singer.noteDrums[blk] = [];
+            singer.embeddedGraphics[blk] = [];
+
+            activityMock.blocks.blockList = {
+                [blk]: { name: "note", connections: [null] }
+            };
+
+            Singer.processNote(activityMock, 1, false, blk, 0, jest.fn());
+            expect(singer.pitchStatus).toEqual([]);
+        });
+
+        it("filters out notes present in pitchDrumTable", () => {
+            const blk = "pitchDrumBlk";
+            singer.pitchDrumTable = { C4: "snare" };
+            singer.inNoteBlock = [blk];
+            singer.notePitches[blk] = ["C"];
+            singer.noteOctaves[blk] = [4];
+            singer.noteCents[blk] = [0];
+            singer.noteHertz[blk] = [0];
+            singer.oscList[blk] = false;
+            singer.noteBeat[blk] = 1;
+            singer.noteBeatValues[blk] = 1;
+            singer.noteDrums[blk] = [];
+            singer.embeddedGraphics[blk] = [];
+
+            activityMock.blocks.blockList = {
+                [blk]: { name: "note", connections: [null] }
+            };
+
+            Singer.processNote(activityMock, 1, false, blk, 0, jest.fn());
+            expect(singer.pitchStatus).toEqual([]);
+        });
+
+        it("does not update pitchStatus during note-counting passes", () => {
+            const blk = "countingBlk";
+            singer.justCounting = [1];
+            singer.pitchStatus = null;
+            singer.inNoteBlock = [blk];
+            singer.notePitches[blk] = ["C"];
+            singer.noteOctaves[blk] = [4];
+            singer.noteCents[blk] = [0];
+            singer.noteHertz[blk] = [0];
+            singer.oscList[blk] = false;
+            singer.noteBeat[blk] = 1;
+            singer.noteBeatValues[blk] = 1;
+            singer.noteDrums[blk] = [];
+            singer.embeddedGraphics[blk] = [];
+
+            activityMock.blocks.blockList = {
+                [blk]: { name: "note", connections: [null] }
+            };
+
+            Singer.processNote(activityMock, 1, false, blk, 0, jest.fn());
+            expect(singer.pitchStatus).toBeNull();
+        });
+
+        it("keeps a note nested in another note, which starts at the same time", () => {
+            const setUpNote = (blk, pitch) => {
+                singer.notePitches[blk] = [pitch];
+                singer.noteOctaves[blk] = [4];
+                singer.noteCents[blk] = [0];
+                singer.noteHertz[blk] = [0];
+                singer.oscList[blk] = false;
+                singer.noteBeat[blk] = 1;
+                singer.noteBeatValues[blk] = 1;
+                singer.noteDrums[blk] = [];
+                singer.embeddedGraphics[blk] = [];
+            };
+            setUpNote("outerBlk", "C");
+            setUpNote("innerBlk", "E");
+            singer.bpm = [60];
+            activityMock.blocks.blockList = {
+                outerBlk: { name: "note", connections: [null] },
+                innerBlk: { name: "note", connections: ["outerBlk"] }
+            };
+            jest.spyOn(Date, "now").mockReturnValue(5000);
+
+            // The nested note is played first, then the note around it.
+            singer.inNoteBlock = ["outerBlk", "innerBlk"];
+            global.getNote.mockImplementationOnce(() => ["E", 4]);
+            Singer.processNote(activityMock, 4, false, "innerBlk", 0, jest.fn());
+            singer.inNoteBlock = ["outerBlk"];
+            Singer.processNote(activityMock, 2, false, "outerBlk", 0, jest.fn());
+
+            expect(singer.pitchStatus).toEqual([
+                { notes: ["E4"], start: 0, startsAt: 5000, endsAt: 5250 },
+                { notes: ["C4"], start: 0, startsAt: 5000, endsAt: 5500 }
+            ]);
+
+            // The next note group replaces both.
+            singer.inNoteBlock = ["outerBlk"];
+            Singer.processNote(activityMock, 2, false, "outerBlk", 0, jest.fn());
+            expect(singer.pitchStatus).toEqual([
+                { notes: ["C4"], start: 0.5, startsAt: 5000, endsAt: 5500 }
+            ]);
+        });
+    });
+});
+
+describe("Singer.resolveNoteEffects — isolate note effect resolution from playback", () => {
+    describe("resolveNoteEffects unit rules", () => {
+        it("returns disabled defaults when turtle state and instrument settings are empty", () => {
+            const resolved = Singer.resolveNoteEffects({}, {});
+            expect(resolved).toEqual({
+                doVibrato: false,
+                vibratoRate: 0,
+                vibratoIntensity: 0,
+                doDistortion: false,
+                distortionAmount: 0,
+                doTremolo: false,
+                tremoloFrequency: 0,
+                tremoloDepth: 0,
+                doPhaser: false,
+                rate: 0,
+                octaves: 0,
+                baseFrequency: 0,
+                doChorus: false,
+                chorusRate: 0,
+                delayTime: 0,
+                chorusDepth: 0
+            });
+        });
+
+        it("applies instrument settings when no overriding block exists", () => {
+            const turtleState = {
+                singer: {
+                    vibratoRate: [],
+                    vibratoIntensity: [],
+                    distortionAmount: [],
+                    tremoloDepth: [],
+                    tremoloFrequency: [],
+                    rate: [],
+                    octaves: [],
+                    baseFrequency: [],
+                    chorusRate: [],
+                    delayTime: [],
+                    chorusDepth: []
+                }
+            };
+            const instrumentSettings = {
+                vibratoActive: true,
+                vibratoRate: 16,
+                vibratoIntensity: 0.05,
+                distortionActive: true,
+                distortionAmount: 0.4,
+                tremoloActive: true,
+                tremoloFrequency: 10,
+                tremoloDepth: 0.5,
+                phaserActive: true,
+                rate: 2,
+                octaves: 3,
+                baseFrequency: 350,
+                chorusActive: true,
+                chorusRate: 1.5,
+                delayTime: 3.5,
+                chorusDepth: 0.7
+            };
+
+            const resolved = Singer.resolveNoteEffects(turtleState, instrumentSettings);
+            expect(resolved).toEqual({
+                doVibrato: true,
+                vibratoRate: 16,
+                vibratoIntensity: 0.05,
+                doDistortion: true,
+                distortionAmount: 0.4,
+                doTremolo: true,
+                tremoloFrequency: 10,
+                tremoloDepth: 0.5,
+                doPhaser: true,
+                rate: 2,
+                octaves: 3,
+                baseFrequency: 350,
+                doChorus: true,
+                chorusRate: 1.5,
+                delayTime: 3.5,
+                chorusDepth: 0.7
+            });
+        });
+
+        it("ensures inner effect blocks override outer ones", () => {
+            const turtleState = {
+                singer: {
+                    distortionAmount: [0.2, 0.5, 0.8],
+                    tremoloFrequency: [4, 8],
+                    tremoloDepth: [0.3, 0.6],
+                    rate: [1, 3],
+                    octaves: [2, 4],
+                    baseFrequency: [200, 400],
+                    chorusRate: [1.0, 2.5],
+                    delayTime: [2.0, 4.0],
+                    chorusDepth: [0.4, 0.9],
+                    vibratoRate: [8, 16],
+                    vibratoIntensity: [0.1, 0.2]
+                }
+            };
+
+            const resolved = Singer.resolveNoteEffects(turtleState, null);
+            expect(resolved.doDistortion).toBe(true);
+            expect(resolved.distortionAmount).toBe(0.8);
+
+            expect(resolved.doTremolo).toBe(true);
+            expect(resolved.tremoloFrequency).toBe(8);
+            expect(resolved.tremoloDepth).toBe(0.6);
+
+            expect(resolved.doPhaser).toBe(true);
+            expect(resolved.rate).toBe(3);
+            expect(resolved.octaves).toBe(4);
+            expect(resolved.baseFrequency).toBe(400);
+
+            expect(resolved.doChorus).toBe(true);
+            expect(resolved.chorusRate).toBe(2.5);
+            expect(resolved.delayTime).toBe(4.0);
+            expect(resolved.chorusDepth).toBe(0.9);
+
+            expect(resolved.doVibrato).toBe(true);
+            expect(resolved.vibratoRate).toBe(16);
+            expect(resolved.vibratoIntensity).toBe(0.2);
+        });
+
+        it("treats zero as a valid override", () => {
+            const turtleState = {
+                singer: {
+                    distortionAmount: [0]
+                }
+            };
+            const instrumentSettings = {
+                distortionActive: true,
+                distortionAmount: 0.4,
+                chorusActive: true,
+                chorusRate: 1.5,
+                delayTime: 3.5,
+                chorusDepth: 0.7
+            };
+
+            const resolved = Singer.resolveNoteEffects(turtleState, instrumentSettings);
+            expect(resolved.doDistortion).toBe(true);
+            expect(resolved.distortionAmount).toBe(0);
+
+            // Chorus remains enabled from instrument
+            expect(resolved.doChorus).toBe(true);
+            expect(resolved.chorusRate).toBe(1.5);
+            expect(resolved.delayTime).toBe(3.5);
+            expect(resolved.chorusDepth).toBe(0.7);
+        });
+
+        it("overriding one effect preserves unrelated effects", () => {
+            const turtleState = {
+                singer: {
+                    distortionAmount: [0.1]
+                }
+            };
+            const instrumentSettings = {
+                distortionActive: true,
+                distortionAmount: 0.4,
+                chorusActive: true,
+                chorusRate: 1.5,
+                delayTime: 3.5,
+                chorusDepth: 0.7,
+                tremoloActive: true,
+                tremoloFrequency: 6,
+                tremoloDepth: 0.3
+            };
+
+            const resolved = Singer.resolveNoteEffects(turtleState, instrumentSettings);
+            // Overridden effect
+            expect(resolved.doDistortion).toBe(true);
+            expect(resolved.distortionAmount).toBe(0.1);
+
+            // Preserved unrelated effects from instrument
+            expect(resolved.doChorus).toBe(true);
+            expect(resolved.chorusRate).toBe(1.5);
+            expect(resolved.delayTime).toBe(3.5);
+            expect(resolved.chorusDepth).toBe(0.7);
+
+            expect(resolved.doTremolo).toBe(true);
+            expect(resolved.tremoloFrequency).toBe(6);
+            expect(resolved.tremoloDepth).toBe(0.3);
+
+            // Unset effect remains disabled
+            expect(resolved.doVibrato).toBe(false);
+            expect(resolved.doPhaser).toBe(false);
+        });
+
+        it("ensures different turtles retain independent settings", () => {
+            const turtle0 = {
+                singer: {
+                    distortionAmount: [0.2],
+                    chorusRate: [1.2]
+                }
+            };
+            const turtle1 = {
+                singer: {
+                    distortionAmount: [0.8],
+                    chorusRate: [3.4]
+                }
+            };
+            const instSettings0 = {
+                tremoloActive: true,
+                tremoloFrequency: 5,
+                tremoloDepth: 0.2
+            };
+            const instSettings1 = {
+                tremoloActive: true,
+                tremoloFrequency: 15,
+                tremoloDepth: 0.8
+            };
+
+            const resolved0 = Singer.resolveNoteEffects(turtle0, instSettings0);
+            const resolved1 = Singer.resolveNoteEffects(turtle1, instSettings1);
+
+            expect(resolved0.distortionAmount).toBe(0.2);
+            expect(resolved0.chorusRate).toBe(1.2);
+            expect(resolved0.tremoloFrequency).toBe(5);
+            expect(resolved0.tremoloDepth).toBe(0.2);
+
+            expect(resolved1.distortionAmount).toBe(0.8);
+            expect(resolved1.chorusRate).toBe(3.4);
+            expect(resolved1.tremoloFrequency).toBe(15);
+            expect(resolved1.tremoloDepth).toBe(0.8);
+        });
+
+        it("ensures original settings and stacks remain unchanged", () => {
+            const distortionStack = [0.2, 0.6];
+            const chorusRateStack = [1.5];
+            const turtleState = {
+                singer: {
+                    distortionAmount: distortionStack,
+                    chorusRate: chorusRateStack
+                }
+            };
+            const instrumentSettings = Object.freeze({
+                distortionActive: true,
+                distortionAmount: 0.4,
+                vibratoActive: true,
+                vibratoRate: 10,
+                vibratoIntensity: 0.2
+            });
+
+            const resolved = Singer.resolveNoteEffects(turtleState, instrumentSettings);
+            expect(resolved.distortionAmount).toBe(0.6);
+
+            // Verify stacks were not popped or altered
+            expect(turtleState.singer.distortionAmount).toEqual([0.2, 0.6]);
+            expect(turtleState.singer.distortionAmount).toBe(distortionStack);
+            expect(turtleState.singer.chorusRate).toEqual([1.5]);
+            expect(turtleState.singer.chorusRate).toBe(chorusRateStack);
+            expect(instrumentSettings.distortionAmount).toBe(0.4);
+        });
+
+        it("resolves instrument settings from a map of instruments matching turtle active instrument name", () => {
+            const turtleState = {
+                singer: {
+                    instrumentNames: ["customFlute"],
+                    distortionAmount: []
+                }
+            };
+            const instrumentsMap = {
+                leadGuitar: {
+                    distortionActive: true,
+                    distortionAmount: 0.9
+                },
+                customFlute: {
+                    chorusActive: true,
+                    chorusRate: 1.8,
+                    delayTime: 2.2,
+                    chorusDepth: 0.6
+                }
+            };
+
+            const resolved = Singer.resolveNoteEffects(turtleState, instrumentsMap);
+            expect(resolved.doChorus).toBe(true);
+            expect(resolved.chorusRate).toBe(1.8);
+            expect(resolved.delayTime).toBe(2.2);
+            expect(resolved.chorusDepth).toBe(0.6);
+            expect(resolved.doDistortion).toBe(false);
+        });
+
+        it("resolves vibratoRate and vibratoIntensity fallback when only vibratoFrequency is present", () => {
+            const turtleState = {
+                singer: {
+                    vibratoRate: [],
+                    vibratoIntensity: []
+                }
+            };
+            const instrumentSettings = {
+                vibratoActive: true,
+                vibratoFrequency: 0.0625
+            };
+
+            const resolved = Singer.resolveNoteEffects(turtleState, instrumentSettings);
+            expect(resolved.doVibrato).toBe(true);
+            expect(resolved.vibratoRate).toBe(16);
+            expect(resolved.vibratoIntensity).toBe(0.05);
+        });
+
+        it("preserves finite zero vibratoIntensity without overriding with fallback", () => {
+            const turtleState = {
+                singer: {
+                    vibratoRate: [],
+                    vibratoIntensity: []
+                }
+            };
+            const instrumentSettings = {
+                vibratoActive: true,
+                vibratoFrequency: 0.0625,
+                vibratoIntensity: 0
+            };
+
+            const resolved = Singer.resolveNoteEffects(turtleState, instrumentSettings);
+            expect(resolved.doVibrato).toBe(true);
+            expect(resolved.vibratoRate).toBe(16);
+            expect(resolved.vibratoIntensity).toBe(0);
+        });
+    });
+
+    describe("Singer.processNote playback integration", () => {
+        let turtleMock;
+        let activityMock;
+        let singer;
+
+        beforeEach(() => {
+            turtleMock = createTurtleMock();
+            turtleMock.doWait = jest.fn();
+            turtleMock.blink = jest.fn();
+            turtleMock.singer = new Singer(turtleMock);
+            turtleMock.inSetTimbre = true;
+            activityMock = createActivityMock(turtleMock);
+            activityMock.logo.specialArgs = [];
+            activityMock.logo.synth.trigger = jest.fn();
+            activityMock.logo.synth.start = jest.fn();
+            activityMock.logo.dispatchTurtleSignals = jest.fn();
+            activityMock.stage = {
+                update: jest.fn()
+            };
+            singer = turtleMock.singer;
+
+            global.instrumentsEffects = {
+                0: {
+                    synthLead: {
+                        distortionActive: true,
+                        distortionAmount: 0.4,
+                        chorusActive: true,
+                        chorusRate: 1.5,
+                        delayTime: 3.5,
+                        chorusDepth: 0.7,
+                        vibratoActive: true,
+                        vibratoRate: 10,
+                        vibratoIntensity: 0.05
+                    }
+                }
+            };
+            global.instrumentsFilters = {
+                0: {}
+            };
+        });
+
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
+
+        it("synthesizer receives the same final parameters as before with instrument settings and block overrides", () => {
+            const blk = "playbackBlock";
+            singer.inNoteBlock = [blk];
+            singer.instrumentNames = ["synthLead"];
+            singer.notePitches[blk] = ["C"];
+            singer.noteOctaves[blk] = [4];
+            singer.noteCents[blk] = [0];
+            singer.noteHertz[blk] = [0];
+            singer.oscList[blk] = false;
+            singer.noteBeat[blk] = 1;
+            singer.noteBeatValues[blk] = 4;
+            singer.noteDrums[blk] = [];
+            singer.embeddedGraphics[blk] = [];
+
+            // Override distortion to 0% via active block stack
+            singer.distortionAmount = [0];
+
+            Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+
+            expect(activityMock.logo.synth.trigger).toHaveBeenCalledTimes(1);
+            const callArgs = activityMock.logo.synth.trigger.mock.calls[0];
+            const paramsEffects = callArgs[4];
+
+            // Distortion overridden to 0
+            expect(paramsEffects.doDistortion).toBe(true);
+            expect(paramsEffects.distortionAmount).toBe(0);
+
+            // Chorus preserved from instrument
+            expect(paramsEffects.doChorus).toBe(true);
+            expect(paramsEffects.chorusRate).toBe(1.5);
+            expect(paramsEffects.delayTime).toBe(3.5);
+            expect(paramsEffects.chorusDepth).toBe(0.7);
+
+            // Vibrato preserved and converted with note duration
+            expect(paramsEffects.doVibrato).toBe(true);
+            expect(paramsEffects.vibratoIntensity).toBe(0.05);
+            expect(paramsEffects.vibratoFrequency).toBeGreaterThan(0);
+        });
+    });
+});
+
+describe("processNote neighbor effect when the neighbor note value was rejected", () => {
+    const blk = "mockBlk";
+    let turtleMock;
+    let activityMock;
+    let savedGlobals;
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        savedGlobals = {
+            rationalToFraction: global.rationalToFraction,
+            getOctaveRatio: global.getOctaveRatio
+        };
+        global.rationalToFraction = jest.fn(() => [3, 2]);
+        global.getOctaveRatio = jest.fn(() => 2);
+
+        turtleMock = createTurtleMock();
+        turtleMock.singer = new Singer(turtleMock);
+        turtleMock.blink = jest.fn();
+        turtleMock.doWait = jest.fn();
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.notePitches = { [blk]: ["C"] };
+        turtleMock.singer.noteOctaves = { [blk]: [4] };
+        turtleMock.singer.noteCents = { [blk]: [0] };
+        turtleMock.singer.noteHertz = { [blk]: [0] };
+        turtleMock.singer.noteDrums = { [blk]: [] };
+        turtleMock.singer.noteBeatValues = { [blk]: [1] };
+        turtleMock.singer.keySignature = "C major";
+        turtleMock.singer.suppressOutput = false;
+        turtleMock.singer.justCounting = [];
+        turtleMock.singer.oscList = { [blk]: [] };
+        turtleMock.singer.inNeighbor = ["neighborBlk"];
+        turtleMock.singer.neighborArgNote1 = ["C4"];
+        turtleMock.singer.neighborArgNote2 = ["D4"];
+        turtleMock.singer.neighborArgBeat = [1];
+
+        activityMock = createActivityMock(turtleMock);
+        activityMock.errorMsg = jest.fn();
+        Object.assign(activityMock.logo, {
+            runningLilypond: false,
+            runningMxml: false,
+            runningAbc: false,
+            runningMIDI: false,
+            specialArgs: [],
+            dispatchTurtleSignals: jest.fn()
+        });
+        Object.assign(activityMock.logo.synth, {
+            start: jest.fn(),
+            inTemperament: "equal",
+            changeInTemperament: false,
+            startingPitch: "A0",
+            getFrequency: jest.fn(() => [261.63]),
+            getCustomFrequency: jest.fn(() => [261.63])
+        });
+        activityMock.stage = { update: jest.fn() };
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+        global.rationalToFraction = savedGlobals.rationalToFraction;
+        global.getOctaveRatio = savedGlobals.getOctaveRatio;
+    });
+
+    const effectsSentToSynth = () => {
+        for (const call of activityMock.logo.synth.trigger.mock.calls) {
+            const effects = call.find(arg => arg && typeof arg === "object" && "doNeighbor" in arg);
+            if (effects) {
+                return effects;
+            }
+        }
+        return null;
+    };
+
+    test("plays the neighbor effect when the neighbor beats are valid", () => {
+        turtleMock.singer.neighborArgCurrentBeat = [2];
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+        jest.runAllTimers();
+
+        expect(effectsSentToSynth().doNeighbor).toBe(true);
+    });
+
+    test("plays the plain note when the neighbor note value was rejected", () => {
+        turtleMock.singer.neighborArgCurrentBeat = [null];
+
+        Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
+        jest.runAllTimers();
+
+        expect(effectsSentToSynth().doNeighbor).toBe(false);
     });
 });

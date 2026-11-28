@@ -188,12 +188,7 @@ class RhythmRulerLayout {
             if (event.key === "Enter") {
                 event.preventDefault();
                 event.stopPropagation();
-                const inputValue = parseInt(this._dissectNumber.value, 10);
-                if (!isNaN(inputValue) && inputValue > 0) {
-                    // Validate the input value - allow any number from 2 to 128
-                    const validatedValue = clampNumber(inputValue, 2, 128);
-                    this._dissectNumber.value = validatedValue;
-                }
+                this._getDissectNumber();
                 this._dissectNumber.blur();
             }
         });

@@ -60,6 +60,9 @@ class LanguageBox {
     ja_onclick() {
         this._language = "ja-kanji";
         this.activity.storage.kanaPreference = "kanji";
+        if (typeof window !== "undefined" && typeof window._resetKanaCache === "function") {
+            window._resetKanaCache();
+        }
         this.hide();
     }
 
@@ -70,6 +73,9 @@ class LanguageBox {
     kana_onclick() {
         this._language = "ja-kana";
         this.activity.storage.kanaPreference = "kana";
+        if (typeof window !== "undefined" && typeof window._resetKanaCache === "function") {
+            window._resetKanaCache();
+        }
         this.hide();
     }
 

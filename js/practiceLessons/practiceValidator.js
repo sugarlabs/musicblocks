@@ -42,6 +42,9 @@ const LOOP_BODY_CONNECTION = new Map([
     ["repeat", 2],
     ["forever", 1]
 ]);
+// The set name block holds the new name in this connection slot. The older, deprecated
+// setturtlename block is left out: it can rename a different mouse than its own.
+const MOUSE_NAME_CONNECTION = new Map([["setturtlename2", 1]]);
 // A ring passes the beat once the conductor has two mice to call.
 const RING_MOUSE_MINIMUM = 3;
 // A polygon closes whichever way the child turns, so both turn blocks count.
@@ -272,11 +275,7 @@ const PracticeValidator = {
             case "spacedTheKeys":
                 return this.hasConnectedBlockNamed(["setxy", "setxyturtle"]);
             case "namedTheKeys":
-                return this.hasConnectedBlockNamed([
-                    "setturtlename",
-                    "setturtlename2",
-                    "turtlename"
-                ]);
+                return this.getMouseNames().size >= 2;
             case "completeMetronome":
                 return this.validateMetronome();
             case "swungThePendulum":
@@ -373,12 +372,36 @@ const PracticeValidator = {
 
     hasChangedPitchOctave(expectedOctaves) {
         if (Array.isArray(expectedOctaves)) {
-            const currentOctaves = this.getPitchOctaves();
-            const baselineOctaves = [...expectedOctaves].sort((a, b) => a - b);
-            return JSON.stringify(currentOctaves) !== JSON.stringify(baselineOctaves);
+            return this.hasMovedOctave(this.getPitchOctaves(), expectedOctaves);
         }
 
         return this.getPitchOctaves().some(octave => octave !== 4);
+    },
+
+    // Adding or deleting a note changes how many notes there are, not where they sit. A note
+    // has moved when it lands in an octave the starter never used, or when one octave gains
+    // a note while another loses one.
+    hasMovedOctave(currentOctaves, baselineOctaves) {
+        const countByOctave = octaves => {
+            const counts = new Map();
+            octaves.forEach(octave => counts.set(octave, (counts.get(octave) || 0) + 1));
+            return counts;
+        };
+        const current = countByOctave(currentOctaves);
+        const baseline = countByOctave(baselineOctaves);
+        let gained = false;
+        let lost = false;
+
+        for (const [octave, count] of current) {
+            if (!baseline.has(octave)) return true;
+            if (count > baseline.get(octave)) gained = true;
+        }
+
+        for (const [octave, count] of baseline) {
+            if ((current.get(octave) || 0) < count) lost = true;
+        }
+
+        return gained && lost;
     },
 
     getPitchOctaves() {
@@ -559,6 +582,48 @@ const PracticeValidator = {
         const drumNames = this.getSetDrumNames();
 
         return drumNames.some(drumName => drumName && drumName !== "snare drum");
+    },
+
+    // The starter's one key already has a name, so the keys only count as named
+    // once two of them answer to different names. Each mouse is one key, and it
+    // answers to the last name its stack gives it.
+    getMouseNames() {
+        const blockList = this.getBlockList();
+        const names = new Set();
+
+        Object.values(blockList).forEach(block => {
+            if (!block || block.trash || block.name !== "start") return;
+
+            const name = this.getLastMouseName(block.connections?.[1], blockList);
+            if (name) names.add(name);
+        });
+
+        return names;
+    },
+
+    // Follows the top of a stack, keeping the most recent name it sets, even an empty
+    // one. A name set inside a loop or an if may never run, so it is left out.
+    // Returns null when the stack never sets a name.
+    getLastMouseName(blockId, blockList) {
+        let currentId = this.unwrapHiddenFlow(blockId, blockList);
+        let name = null;
+        let guard = 0;
+
+        while (currentId && guard < 100) {
+            const block = blockList[currentId];
+            if (!block || block.trash) break;
+
+            if (MOUSE_NAME_CONNECTION.has(block.name)) {
+                const slot = MOUSE_NAME_CONNECTION.get(block.name);
+                const value = blockList[block.connections?.[slot]]?.value;
+                if (value !== undefined && value !== null) name = String(value);
+            }
+
+            currentId = this.getNextFlowId(block, blockList);
+            guard++;
+        }
+
+        return name;
     },
 
     getSetDrumNames() {

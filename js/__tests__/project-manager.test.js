@@ -10,7 +10,15 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 const path = require("path");
+const { Blob } = require("node:buffer");
+const { DecompressionStream } = require("node:stream/web");
+const { TextDecoder } = require("node:util");
 const { PubSub } = require("../pubsub");
+const { makeMXL } = require("./helpers/mxl.js");
+
+const originalBlob = global.Blob;
+const originalDecompressionStream = global.DecompressionStream;
+const originalTextDecoder = global.TextDecoder;
 
 // ---------------------------------------------------------------------------
 // Globals required by project-manager.js at call time (not load time)
@@ -21,6 +29,9 @@ let pubsubInstance;
 beforeAll(() => {
     pubsubInstance = new PubSub();
 
+    global.Blob = Blob;
+    global.DecompressionStream = DecompressionStream;
+    global.TextDecoder = TextDecoder;
     global._ = key => key;
     global.pubsub = pubsubInstance;
     global.DATAOBJS = [{ name: "start" }];
@@ -54,6 +65,12 @@ beforeAll(() => {
     global.amdRequire = jest.fn((deps, cb) => cb && cb());
 });
 
+afterAll(() => {
+    global.Blob = originalBlob;
+    global.DecompressionStream = originalDecompressionStream;
+    global.TextDecoder = originalTextDecoder;
+});
+
 afterEach(() => {
     jest.clearAllMocks();
     pubsubInstance = new PubSub();
@@ -72,6 +89,7 @@ beforeAll(() => {
         path.resolve(__dirname, "../project-manager.js")
     ));
 });
+const { MAX_MXL_ARCHIVE_SIZE } = require("../project-manager.js");
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -1144,6 +1162,58 @@ describe("prepareExport", () => {
         });
     });
 
+    describe("Pitch-Drum Matrix cells", () => {
+        const block = (name, extra = {}) => ({
+            name,
+            trash: false,
+            value: null,
+            collapsed: false,
+            container: { x: 0, y: 0 },
+            connections: [null],
+            isValueBlock: () => false,
+            ...extra
+        });
+
+        // Block 0 is in the trash, so the matrix (1), pitch (2) and drum (3) become 0, 1 and 2.
+        const exportMatrix = drumCells => {
+            const activity = makeActivity();
+            activity.blocks.blockList = [
+                block("pitch", { trash: true }),
+                block("pitchdrummatrix", { drumCells }),
+                block("pitch"),
+                block("playdrum")
+            ];
+            const pm = new ProjectManager(activity);
+            return JSON.parse(pm.prepareExport())[0][1];
+        };
+
+        it("exports the selected cells with the block ids renumbered like connections", () => {
+            expect(
+                exportMatrix([
+                    [2, 3, 0],
+                    // The second row of a repeated pitch block.
+                    [2, 3, 1],
+                    // A pitch in the trash, and a drum no longer in the project.
+                    [0, 3, 0],
+                    [2, 9, 0]
+                ])
+            ).toEqual([
+                "pitchdrummatrix",
+                {
+                    collapsed: false,
+                    drumCells: [
+                        [1, 2, 0],
+                        [1, 2, 1]
+                    ]
+                }
+            ]);
+        });
+
+        it("exports only the collapsed state when there are no cells", () => {
+            expect(exportMatrix()).toEqual(["pitchdrummatrix", { collapsed: false }]);
+        });
+    });
+
     describe("while a duplicate notes clamp plays", () => {
         const block = (name, connections, trash = false) => ({
             name,
@@ -2190,6 +2260,19 @@ describe("prepareExport additional block types", () => {
         expect(result[0][1]).toEqual(["pluginvalue", { value: 7 }]);
     });
 
+    it("preserves legacy matrixData through an unknown-block stand-in", () => {
+        const activity = makeActivity();
+        activity.blocks.blockList = [
+            makeStandIn("nopZeroArgBlock", ["matrixData", { notes: [["C4"]], count: [4] }], false, [
+                null,
+                null
+            ])
+        ];
+        const pm = new ProjectManager(activity);
+        const result = JSON.parse(pm.prepareExport());
+        expect(result[0][1]).toEqual(["matrixData", { notes: [["C4"]], count: [4] }]);
+    });
+
     it("never exports a null block name for a stand-in", () => {
         const activity = makeActivity();
         activity.blocks.blockList = [
@@ -2206,30 +2289,6 @@ describe("prepareExport additional block types", () => {
         const pm = new ProjectManager(activity);
         const result = JSON.parse(pm.prepareExport());
         expect(result[0][1]).toBe("nopOneArgBlock");
-    });
-
-    it("exports matrixData block with notes and count", () => {
-        window.savedMatricesNotes = [["C4"]];
-        window.savedMatricesCount = [4];
-        const activity = makeActivity();
-        activity.blocks.blockList = [
-            {
-                name: "matrixData",
-                trash: false,
-                value: null,
-                collapsed: false,
-                container: { x: 0, y: 0 },
-                connections: [null],
-                isValueBlock: () => false
-            }
-        ];
-        const pm = new ProjectManager(activity);
-        const result = JSON.parse(pm.prepareExport());
-        expect(result[0][1][1]).toMatchObject({
-            notes: [["C4"]],
-            count: [4]
-        });
-        expect(activity.hasMatrixDataBlock).toBe(true);
     });
 
     it("exports wrapmode block with value", () => {
@@ -2536,6 +2595,52 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(global.ErrorHandler.capture).toHaveBeenCalledWith(expect.any(SyntaxError), {
             operation: "loadProjectFromFile"
         });
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
+    it.each([
+        ["an object", '{"name":"equal","pitchNumber":12}'],
+        ["a list of numbers", "[1,2,3]"],
+        ["a list with one empty list", "[[]]"],
+        ["a list of lists that are not blocks", '[["name","age"],["a",1]]']
+    ])("change handler rejects %s and leaves the project alone", async (_label, rawData) => {
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = rawData;
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+
+        const planet = {
+            saveLocally: jest.fn().mockResolvedValue(),
+            closePlanet: jest.fn(),
+            initialiseNewProject: jest.fn().mockResolvedValue()
+        };
+        const activity = makeActivity({ planet });
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "temperament-equal.json" }];
+        handlers.change();
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Cannot load project from the file. Please check the file type."
+        );
+        expect(planet.saveLocally).not.toHaveBeenCalled();
+        expect(planet.initialiseNewProject).not.toHaveBeenCalled();
+        expect(activity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
         expect(activity.loading).toBe(false);
         expect(document.body.style.cursor).toBe("default");
         expect(activity.stopLoadAnimation).toHaveBeenCalled();
@@ -3136,6 +3241,73 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(activity.stopLoadAnimation).toHaveBeenCalled();
     });
 
+    it("change handler imports a compressed MusicXML archive", async () => {
+        origFileReader = global.FileReader;
+        const score = "<score-partwise/>";
+        const archive = makeMXL(score);
+        const archiveBuffer = archive.buffer.slice(
+            archive.byteOffset,
+            archive.byteOffset + archive.byteLength
+        );
+        const readers = [];
+        class MockFR {
+            constructor() {
+                this.result = archiveBuffer;
+                this.onload = null;
+                this.readAsArrayBuffer = jest.fn(() => {
+                    this.promise = this.onload({ target: { result: this.result } });
+                    return this.promise;
+                });
+                readers.push(this);
+            }
+            readAsText() {}
+        }
+        global.FileReader = MockFR;
+
+        const activity = makeActivity();
+        activity.parseMXML.mockResolvedValueOnce(null);
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "song.mxl", size: archive.byteLength }];
+        handlers.change();
+        await readers[3].promise;
+
+        expect(readers[3].readAsArrayBuffer).toHaveBeenCalledWith(activity.fileChooser.files[0]);
+        expect(activity.parseMXML).toHaveBeenCalledWith(score);
+        expect(global.ErrorHandler.capture).not.toHaveBeenCalled();
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(activity.loading).toBe(false);
+    });
+
+    it("change handler rejects compressed MusicXML archives above the size limit", () => {
+        origFileReader = global.FileReader;
+        const readers = [];
+        class MockFR {
+            constructor() {
+                this.readAsArrayBuffer = jest.fn();
+                readers.push(this);
+            }
+            readAsText() {}
+        }
+        global.FileReader = MockFR;
+
+        const activity = makeActivity();
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "too-large.mxl", size: MAX_MXL_ARCHIVE_SIZE + 1 }];
+        handlers.change();
+
+        expect(readers[3].readAsArrayBuffer).not.toHaveBeenCalled();
+        expect(global.ErrorHandler.capture).toHaveBeenCalledWith(expect.any(Error), {
+            operation: "mxmlImport"
+        });
+        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+    });
+
     it("change handler reports a rejected parseMXML call and restores state", async () => {
         origFileReader = global.FileReader;
         const readers = [];
@@ -3432,6 +3604,56 @@ describe("_setupFileHandlers inner callbacks", () => {
         );
     });
 
+    it.each([
+        ["an object", '{"name":"equal","pitchNumber":12}'],
+        ["a list of numbers", "[1,2,3]"],
+        ["a list with one empty list", "[[]]"],
+        ["a list of lists that are not blocks", '[["name","age"],["a",1]]']
+    ])("drop handler rejects %s and leaves the project alone", async (_label, rawData) => {
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = rawData;
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+        jest.spyOn(window, "scroll").mockImplementation(() => {});
+
+        const planet = {
+            saveLocally: jest.fn().mockResolvedValue(),
+            closePlanet: jest.fn(),
+            initialiseNewProject: jest.fn().mockResolvedValue()
+        };
+        const activity = makeActivity({ planet });
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        handlers.drop({
+            stopPropagation: jest.fn(),
+            preventDefault: jest.fn(),
+            dataTransfer: { files: [{ name: "temperament-equal.json" }] }
+        });
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(activity.errorMsg).toHaveBeenCalledTimes(1);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Cannot load project from the file. Please check the file type."
+        );
+        expect(planet.saveLocally).not.toHaveBeenCalled();
+        expect(planet.initialiseNewProject).not.toHaveBeenCalled();
+        expect(activity.sendAllToTrash).not.toHaveBeenCalled();
+        expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
+        expect(activity.loading).toBe(false);
+        expect(document.body.style.cursor).toBe("default");
+        expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
     it("drop handler catches a deferred block-load failure and restores state", async () => {
         origFileReader = global.FileReader;
         class MockFR {
@@ -3606,6 +3828,51 @@ describe("_setupFileHandlers inner callbacks", () => {
         expect(activity.loading).toBe(false);
         expect(document.body.style.cursor).toBe("default");
         expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
+    it("drop handler imports a compressed MusicXML archive", async () => {
+        origFileReader = global.FileReader;
+        const score = "<score-partwise/>";
+        const archive = makeMXL(score);
+        const archiveBuffer = archive.buffer.slice(
+            archive.byteOffset,
+            archive.byteOffset + archive.byteLength
+        );
+        const readers = [];
+        class MockFR {
+            constructor() {
+                this.result = archiveBuffer;
+                this.onload = null;
+                this.readAsArrayBuffer = jest.fn(() => {
+                    this.promise = this.onload({ target: { result: this.result } });
+                    return this.promise;
+                });
+                readers.push(this);
+            }
+            readAsText() {}
+        }
+        global.FileReader = MockFR;
+        jest.spyOn(window, "scroll").mockImplementation(() => {});
+
+        const activity = makeActivity();
+        activity.parseMXML.mockResolvedValueOnce(null);
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+        const file = { name: "song.mxl", size: archive.byteLength };
+
+        handlers.drop({
+            stopPropagation: jest.fn(),
+            preventDefault: jest.fn(),
+            dataTransfer: { files: [file] }
+        });
+        await readers[3].promise;
+
+        expect(readers[3].readAsArrayBuffer).toHaveBeenCalledWith(file);
+        expect(activity.parseMXML).toHaveBeenCalledWith(score);
+        expect(global.ErrorHandler.capture).not.toHaveBeenCalled();
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(activity.loading).toBe(false);
     });
 
     it("drop handler reports a rejected parseMXML call and restores state", async () => {

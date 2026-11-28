@@ -90,6 +90,10 @@ describe("Toolbar Class", () => {
     });
 
     afterEach(() => {
+        delete global.window.widgetWindows;
+        delete global.window.startPracticeMode;
+        delete global.window.openExplorerJournal;
+        delete global.GitTutorial;
         jest.clearAllMocks();
     });
 
@@ -820,6 +824,11 @@ describe("Toolbar Class", () => {
 
         const mockOnClick = jest.fn();
         toolbar.activity = {};
+        const handleResize = jest.fn();
+
+        global.window.widgetWindows = {
+            _handleResize: handleResize
+        };
         toolbar.renderMenuIcon(mockOnClick);
 
         expect(elements.toggleAuxBtn.onclick).toBeInstanceOf(Function);
@@ -829,6 +838,7 @@ describe("Toolbar Class", () => {
 
         elements["aux-toolbar"].style.display = "none";
         clickHandler();
+        expect(handleResize).toHaveBeenCalledTimes(1);
 
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, false);
         expect(elements.menu.textContent).toBe("more_vert");
@@ -837,6 +847,7 @@ describe("Toolbar Class", () => {
 
         elements["aux-toolbar"].style.display = "block";
         clickHandler();
+        expect(handleResize).toHaveBeenCalledTimes(2);
 
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, true);
         expect(elements["aux-toolbar"].style.display).toBe("none");
@@ -949,6 +960,79 @@ describe("Toolbar Class", () => {
 
         explorerJournalItem.onclick({ preventDefault: jest.fn(), stopPropagation: jest.fn() });
         expect(global.window.openExplorerJournal).toHaveBeenCalled();
+    });
+
+    test.each([
+        [
+            "helpGuideItem",
+            (activity, mocks) => {
+                expect(mocks.mockHelpOnClick).toHaveBeenCalledWith(activity);
+            }
+        ],
+        [
+            "shortcutsGuideItem",
+            (activity, mocks) => {
+                expect(mocks.mockShortcutsOnClick).toHaveBeenCalledWith(activity);
+            }
+        ],
+        [
+            "practiceLessonsItem",
+            () => {
+                expect(global.window.startPracticeMode).toHaveBeenCalled();
+            }
+        ],
+        [
+            "explorerJournalItem",
+            () => {
+                expect(global.window.openExplorerJournal).toHaveBeenCalled();
+            }
+        ],
+        [
+            "gitTutorialItem",
+            activity => {
+                expect(global.GitTutorial.open).toHaveBeenCalledWith(activity);
+            }
+        ]
+    ])("renderHelpIcon closes the help dropdown when %s is clicked", (itemId, verifyAction) => {
+        const helpIcon = {
+            setAttribute: jest.fn(),
+            onclick: "existing-handler"
+        };
+        const dropdownMock = jest.fn();
+        global.jQuery.mockReturnValue({
+            dropdown: dropdownMock,
+            on: jest.fn(),
+            tooltip: jest.fn(),
+            trigger: jest.fn()
+        });
+
+        const elements = {
+            helpIcon,
+            helpGuideItem: { onclick: null },
+            shortcutsGuideItem: { onclick: null },
+            practiceLessonsItem: { onclick: null },
+            explorerJournalItem: { onclick: null },
+            gitTutorialItem: { onclick: null }
+        };
+
+        global.window.startPracticeMode = jest.fn();
+        global.window.openExplorerJournal = jest.fn();
+        global.GitTutorial = { open: jest.fn() };
+
+        global.docById.mockImplementation(id => elements[id] || null);
+
+        const mockHelpOnClick = jest.fn();
+        const mockShortcutsOnClick = jest.fn();
+
+        toolbar.renderHelpIcon(mockHelpOnClick, mockShortcutsOnClick);
+
+        const mockEvent = { preventDefault: jest.fn(), stopPropagation: jest.fn() };
+        elements[itemId].onclick(mockEvent);
+
+        expect(mockEvent.preventDefault).toHaveBeenCalled();
+        expect(mockEvent.stopPropagation).toHaveBeenCalled();
+        expect(dropdownMock).toHaveBeenCalledWith("close");
+        verifyAction(toolbar.activity, { mockHelpOnClick, mockShortcutsOnClick });
     });
 
     test("renderModeSelectIcon handles mode switching and UI updates", () => {
@@ -1208,7 +1292,13 @@ describe("Toolbar Class", () => {
         global.docById.mockImplementation(id => elements[id] || {});
         const mockOnClick = jest.fn();
         toolbar.activity = {};
+        const handleResize = jest.fn();
+
+        global.window.widgetWindows = {
+            _handleResize: handleResize
+        };
         toolbar.closeAuxToolbar(mockOnClick);
+        expect(handleResize).toHaveBeenCalledTimes(1);
         expect(elements["aux-toolbar"].style.display).toBe("none");
         expect(elements.menu.textContent).toBe("menu");
         expect(mockOnClick).toHaveBeenCalledWith(toolbar.activity, false);

@@ -21,7 +21,7 @@
     rotateSliceAngles,
     scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes,
     isUnsafeObjectKey, ManagedTimer, readTextFile, downloadTextFile, createSharePopup,
-    closeSharePopup
+    closeSharePopup, makeKeyboardAccessible
  */
 
 /*
@@ -722,14 +722,23 @@ class ModeWidget {
         bar.style.gap = "8px";
         bar.style.padding = "6px 16px";
 
-        // Icon button with MB theme styling (wfbtItem class).
+        /**
+         * Creates an accessible action button, or a decorative icon when no action is provided.
+         * @param {string} icon - Header icon filename.
+         * @param {string} label - Translated control label.
+         * @param {Function|null} onclick - Action to activate with mouse or keyboard.
+         * @param {string} [imgFilter] - Optional CSS image filter.
+         * @returns {HTMLDivElement} The styled control or decorative icon.
+         */
         const iconButton = (icon, label, onclick, imgFilter) => {
             const btn = document.createElement("div");
             btn.className = "wfbtItem";
             btn.title = label;
-            btn.setAttribute("role", "button");
-            btn.setAttribute("aria-label", label);
-            btn.setAttribute("tabindex", "0");
+            if (typeof onclick === "function") {
+                makeKeyboardAccessible(btn, label);
+            } else {
+                btn.setAttribute("aria-hidden", "true");
+            }
             btn.style.flexShrink = "0";
             btn.style.display = "flex";
             btn.style.alignItems = "center";
@@ -778,6 +787,7 @@ class ModeWidget {
         });
 
         const tuningGroup = document.createElement("div");
+        tuningGroup.className = "mode-temperament-control";
         tuningGroup.style.position = "relative";
         tuningGroup.style.display = "inline-flex";
         tuningGroup.style.alignItems = "center";
@@ -1522,8 +1532,27 @@ class ModeWidget {
         );
     }
 
+    /**
+     * Find the equal division of the octave an imported .scl mode sits on.
+     * A mode on n-EDO also fits every multiple of n, so the search can't
+     * just take the finest grid that fits: that read a 12-EDO major scale
+     * back as 48-EDO and switched the project's temperament with it. The
+     * wheel's current EDO wins when the file fits it; otherwise the
+     * coarsest grid that holds every pitch.
+     * @param {Array<{cents: number}>} pitches - The .scl pitches above 1/1
+     * @returns {{edo: number, pattern: number[]}|null}
+     */
     _findEdoSteps(pitches) {
-        for (let edo = TuningFormats.EDO_MAX; edo >= TuningFormats.EDO_MIN; edo--) {
+        const candidates = [];
+        for (let edo = TuningFormats.EDO_MIN; edo <= TuningFormats.EDO_MAX; edo++) {
+            candidates.push(edo);
+        }
+        if (candidates.includes(this._activeEDO)) {
+            candidates.splice(candidates.indexOf(this._activeEDO), 1);
+            candidates.unshift(this._activeEDO);
+        }
+
+        for (const edo of candidates) {
             const step = 1200 / edo;
             const steps = [];
             let prevStepCount = 0;
@@ -1660,7 +1689,11 @@ class ModeWidget {
         this._rebuildWheel(foundEdo);
         this._applyModePattern(foundPattern);
         this._selectedModeName = name;
-        this.textMsg(_("Mode imported: ") + name, 3000);
+        // A .scl file doesn't say which EDO it was written on, so the import
+        // picks one (the current wheel when the file fits it, otherwise the
+        // coarsest grid that does); name it, so a 12-EDO file landing on a
+        // 24-EDO wheel, or whole tone becoming 6-EDO, isn't a surprise.
+        this.textMsg(_("Mode imported: ") + name + " (" + foundEdo + "-EDO)", 3000);
         this._updateModeDisplay(name);
         if (this._modeBlock !== null) {
             const modeBlock = this.blocks.blockList[this._modeBlock];

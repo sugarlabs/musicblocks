@@ -12,7 +12,8 @@
 /*
    global
 
-   LeftBlock, FlowBlock, NOINPUTERRORMSG, getTargetTurtle, Turtle, isSafeUrl, isUnsafeObjectKey
+   LeftBlock, FlowBlock, NOINPUTERRORMSG, getTargetTurtle, Turtle, isSafeUrl, isUnsafeObjectKey,
+   i18next
  */
 
 /* exported setupProgramBlocks */
@@ -87,8 +88,15 @@ function setupProgramBlocks(activity) {
             }
 
             const url = args[1];
-            const name = args[0];
-            const oldHeap = name in logo.turtleHeaps ? logo.turtleHeaps[name] : [];
+            const name = String(args[0]);
+            if (isUnsafeObjectKey(name)) {
+                activity.errorMsg(_("The heap name is reserved."), blk);
+                return;
+            }
+
+            const oldHeap = Object.prototype.hasOwnProperty.call(logo.turtleHeaps, name)
+                ? logo.turtleHeaps[name]
+                : [];
 
             // Use async fetch to avoid blocking the UI
             if (!isSafeUrl(url)) {
@@ -178,10 +186,14 @@ function setupProgramBlocks(activity) {
                 return;
             }
 
-            const name = args[0];
+            const name = String(args[0]);
             const url = args[1];
+            if (isUnsafeObjectKey(name)) {
+                activity.errorMsg(_("The heap name is reserved."), blk);
+                return;
+            }
 
-            if (name in logo.turtleHeaps) {
+            if (Object.prototype.hasOwnProperty.call(logo.turtleHeaps, name)) {
                 const data = JSON.stringify(logo.turtleHeaps[name]);
                 if (!isSafeUrl(url)) {
                     activity.errorMsg(_("Invalid URL"), blk);
@@ -451,6 +463,9 @@ function setupProgramBlocks(activity) {
                             // Copy any internal entries now.
                             const k = Object.keys(d);
                             for (let i = 0; i < k.length; i++) {
+                                if (isUnsafeObjectKey(k[i])) {
+                                    continue;
+                                }
                                 Turtle.DictActions.SetDictValue(target, turtle, k[i], d[k[i]]);
                                 if (!isTurtleStatusKey(k[i])) {
                                     if (
@@ -572,6 +587,9 @@ function setupProgramBlocks(activity) {
                         // Copy any internal entries now.
                         const k = Object.keys(d);
                         for (let i = 0; i < k.length; i++) {
+                            if (isUnsafeObjectKey(k[i])) {
+                                continue;
+                            }
                             Turtle.DictActions.SetDictValue(target, turtle, k[i], d[k[i]]);
                             if (!isTurtleStatusKey(k[i])) {
                                 if (
@@ -815,15 +833,60 @@ function setupProgramBlocks(activity) {
          * @param {number} blk - The block identifier.
          */
         flow(args, logo, turtle, blk) {
-            if (args.length < 1) {
+            if (!args || args.length < 1 || args[0] === null || args[0] === undefined) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
 
+            if (!activity.blocks || !activity.blocks.palettes || !activity.blocks.palettes.dict) {
+                return;
+            }
+
+            let input;
+            try {
+                input = String(args[0]).trim();
+            } catch {
+                return;
+            }
+            if (input === "") {
+                return;
+            }
+
+            const locale =
+                typeof i18next !== "undefined" && typeof i18next.language === "string"
+                    ? i18next.language.replace(/_/g, "-")
+                    : typeof window !== "undefined" &&
+                        window.i18next &&
+                        typeof window.i18next.language === "string"
+                      ? window.i18next.language.replace(/_/g, "-")
+                      : undefined;
+            const target = input.toLowerCase();
+            const targetLocale = input.toLocaleLowerCase(locale);
+
             for (const p in activity.blocks.palettes.dict) {
-                if (_(activity.blocks.palettes.dict[p].name) === args[0].toLowerCase()) {
+                const palette = activity.blocks.palettes.dict[p];
+                if (!palette) {
+                    continue;
+                }
+                const paletteName = palette.name || p;
+                const localizedName = typeof _ === "function" ? _(paletteName) : paletteName;
+
+                const matches = value =>
+                    typeof value === "string" &&
+                    (value.toLowerCase() === target ||
+                        value.toLocaleLowerCase(locale) === targetLocale);
+
+                const matchLocalized = matches(localizedName);
+                const matchRaw = matches(paletteName);
+                const matchKey = matches(p);
+
+                if (matchLocalized || matchRaw || matchKey) {
                     activity.blocks.palettes.hide();
-                    activity.blocks.palettes.dict[p].show();
+                    if (typeof palette.show === "function") {
+                        palette.show();
+                    } else if (typeof activity.blocks.palettes.dict[p].show === "function") {
+                        activity.blocks.palettes.dict[p].show();
+                    }
                     activity.blocks.palettes.show();
                     return;
                 }
@@ -1041,14 +1104,39 @@ function setupProgramBlocks(activity) {
 
             if (typeof args[0] === "string") {
                 // Look for a block with logo name
+                let staticMatch = -1;
                 for (let i = 0; i < activity.blocks.blockList.length; i++) {
-                    if (
-                        activity.blocks.blockList[i]?.protoblock.staticLabels.length > 0 &&
-                        activity.blocks.blockList[i].protoblock.staticLabels[0] === args[0]
-                    ) {
-                        args[0] = i;
-                        return;
+                    const candidate = activity.blocks.blockList[i];
+                    if (!candidate || candidate.trash) {
+                        continue;
                     }
+
+                    let matchesName;
+
+                    if (candidate.name === "action") {
+                        matchesName =
+                            logo.actions &&
+                            Object.prototype.hasOwnProperty.call(logo.actions, args[0]) &&
+                            candidate.connections[2] === logo.actions[args[0]];
+                    } else {
+                        matchesName =
+                            candidate.protoblock.staticLabels.length > 0 &&
+                            candidate.protoblock.staticLabels[0] === args[0];
+                    }
+
+                    if (matchesName) {
+                        if (candidate.name === "action") {
+                            args[0] = i;
+                            break;
+                        }
+                        if (staticMatch === -1) {
+                            staticMatch = i;
+                        }
+                    }
+                }
+
+                if (typeof args[0] === "string" && staticMatch !== -1) {
+                    args[0] = staticMatch;
                 }
             }
 

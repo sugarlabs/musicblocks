@@ -71,6 +71,33 @@ function createTestWindow(title = "Test Title", fullscreen = true) {
     return win;
 }
 
+function createToolbarLayout(auxDisplay = "none") {
+    const toolbars = document.createElement("div");
+    toolbars.id = "toolbars";
+
+    const mainToolbar = document.createElement("div");
+    mainToolbar.className = "main-nav-container";
+    mainToolbar.getBoundingClientRect = () => ({
+        top: 0,
+        bottom: 64,
+        height: 64
+    });
+
+    const auxToolbar = document.createElement("div");
+    auxToolbar.id = "aux-toolbar";
+    auxToolbar.style.display = auxDisplay;
+    auxToolbar.getBoundingClientRect = () => ({
+        top: 64,
+        bottom: 128,
+        height: 64
+    });
+
+    toolbars.append(mainToolbar, auxToolbar);
+    document.body.appendChild(toolbars);
+
+    return { toolbars, auxToolbar };
+}
+
 beforeEach(() => {
     if (window.widgetWindows._boundHandleGlobalKeyDown) {
         document.removeEventListener(
@@ -108,6 +135,7 @@ beforeEach(() => {
     };
     window.widgetWindows.openWindows = {};
     window.widgetWindows._posCache = {};
+    window.widgetWindows._maximizedCache = {};
     window.widgetWindows._globalListenersInitialized = false;
     window.widgetWindows.draggingWindow = null;
     // Restore functions
@@ -577,6 +605,266 @@ describe("widgetWindows", () => {
         });
     });
 
+    describe("touch dragging", () => {
+        // `changed` is the finger this event is about. `others` are fingers that
+        // stay down and appear in `touches` but not in `changedTouches`, like a
+        // real TouchEvent for a multi-finger gesture.
+        function makeTouchEvent(type, x, y, id = 0, others = []) {
+            const event = new Event(type, { bubbles: true, cancelable: true });
+            const touch = { clientX: x, clientY: y, identifier: id };
+            event.touches =
+                type === "touchend" || type === "touchcancel" ? others : [touch, ...others];
+            event.changedTouches = [touch];
+            return event;
+        }
+
+        const dragRect = () => ({ left: 50, top: 60, right: 250, bottom: 260 });
+
+        test("registers touch listeners alongside mouse listeners on init", () => {
+            const spy = jest.spyOn(document, "addEventListener");
+            window.widgetWindows._globalListenersInitialized = false;
+
+            createTestWindow();
+
+            const registeredTypes = spy.mock.calls.map(call => call[0]);
+            expect(registeredTypes).toEqual(
+                expect.arrayContaining(["touchmove", "touchend", "touchcancel"])
+            );
+            spy.mockRestore();
+        });
+
+        test("touchstart on the title bar starts a drag and records offsets", () => {
+            const win = createTestWindow();
+            win._drag.getBoundingClientRect = jest.fn(() => ({
+                left: 50,
+                top: 60,
+                right: 250,
+                bottom: 260
+            }));
+
+            win._nonclose.dispatchEvent(makeTouchEvent("touchstart", 80, 100));
+
+            expect(window.widgetWindows.draggingWindow).toBe(win);
+            expect(win._dx).toBe(30);
+            expect(win._dy).toBe(40);
+        });
+
+        test("touchstart while maximized does not restore; the first touchmove does", () => {
+            const win = createTestWindow();
+            win._maximize();
+            win._drag.getBoundingClientRect = jest.fn(dragRect);
+
+            win._nonclose.dispatchEvent(makeTouchEvent("touchstart", 80, 100));
+            expect(win._maximized).toBe(true);
+            expect(window.widgetWindows.draggingWindow).toBe(win);
+
+            document.dispatchEvent(makeTouchEvent("touchmove", 90, 110));
+            expect(win._maximized).toBe(false);
+        });
+
+        test("touchmove on the document repositions the dragging window", () => {
+            const win = createTestWindow();
+            win._drag.getBoundingClientRect = jest.fn(() => ({
+                left: 50,
+                top: 60,
+                right: 250,
+                bottom: 260
+            }));
+
+            win._nonclose.dispatchEvent(makeTouchEvent("touchstart", 80, 100));
+            document.dispatchEvent(makeTouchEvent("touchmove", 130, 150));
+
+            expect(win._frame.style.left).toBe("100px");
+            expect(win._frame.style.top).toBe("110px");
+        });
+
+        test("touchend on the document ends the drag", () => {
+            const win = createTestWindow();
+            win._drag.getBoundingClientRect = jest.fn(() => ({
+                left: 50,
+                top: 60,
+                right: 250,
+                bottom: 260
+            }));
+
+            win._nonclose.dispatchEvent(makeTouchEvent("touchstart", 80, 100));
+            document.dispatchEvent(makeTouchEvent("touchend", 130, 150));
+
+            expect(window.widgetWindows.draggingWindow).toBe(null);
+        });
+
+        test("touchcancel on the document ends the drag", () => {
+            const win = createTestWindow();
+            win._drag.getBoundingClientRect = jest.fn(() => ({
+                left: 50,
+                top: 60,
+                right: 250,
+                bottom: 260
+            }));
+
+            win._nonclose.dispatchEvent(makeTouchEvent("touchstart", 80, 100));
+            document.dispatchEvent(makeTouchEvent("touchcancel", 130, 150));
+
+            expect(window.widgetWindows.draggingWindow).toBe(null);
+        });
+
+        test("a second finger touching elsewhere does not hijack an in-progress drag", () => {
+            const win = createTestWindow();
+            win._drag.getBoundingClientRect = jest.fn(() => ({
+                left: 50,
+                top: 60,
+                right: 250,
+                bottom: 260
+            }));
+
+            win._nonclose.dispatchEvent(makeTouchEvent("touchstart", 80, 100, 0));
+            // A different finger (identifier 1) moves elsewhere on the page —
+            // must not be mistaken for the finger driving this drag.
+            document.dispatchEvent(makeTouchEvent("touchmove", 500, 500, 1));
+
+            expect(window.widgetWindows.draggingWindow).toBe(win);
+            expect(win._frame.style.left).toBe("200px");
+            expect(win._frame.style.top).toBe("140px");
+        });
+
+        test("an unrelated finger lifting does not end an in-progress drag", () => {
+            const win = createTestWindow();
+            win._drag.getBoundingClientRect = jest.fn(() => ({
+                left: 50,
+                top: 60,
+                right: 250,
+                bottom: 260
+            }));
+
+            win._nonclose.dispatchEvent(makeTouchEvent("touchstart", 80, 100, 0));
+            // A different finger (identifier 1) lifts — the drag driven by
+            // finger 0 must keep going.
+            document.dispatchEvent(makeTouchEvent("touchend", 500, 500, 1));
+
+            expect(window.widgetWindows.draggingWindow).toBe(win);
+        });
+
+        test("another finger's touchmove is ignored even though the drag finger is still in touches", () => {
+            const win = createTestWindow();
+            win._drag.getBoundingClientRect = jest.fn(dragRect);
+            const rafSpy = jest.spyOn(window, "requestAnimationFrame");
+
+            win._nonclose.dispatchEvent(makeTouchEvent("touchstart", 80, 100, 0));
+            rafSpy.mockClear();
+            // Finger 1 moves; finger 0 is still down so it is listed in touches.
+            document.dispatchEvent(
+                makeTouchEvent("touchmove", 500, 500, 1, [
+                    { clientX: 80, clientY: 100, identifier: 0 }
+                ])
+            );
+
+            expect(rafSpy).not.toHaveBeenCalled();
+            expect(win._frame.style.left).toBe("200px");
+            rafSpy.mockRestore();
+        });
+
+        test("touchcancel at the top edge ends the drag without maximizing", () => {
+            const win = createTestWindow();
+            win._drag.getBoundingClientRect = jest.fn(dragRect);
+            win._frame.style.top = `${window.widgetWindows._getToolbarBottom()}px`;
+
+            win._nonclose.dispatchEvent(makeTouchEvent("touchstart", 80, 100));
+            document.dispatchEvent(makeTouchEvent("touchcancel", 80, 100));
+
+            expect(window.widgetWindows.draggingWindow).toBe(null);
+            expect(win._maximized).toBe(false);
+        });
+
+        test("touchend at the top edge maximizes like a mouse release", () => {
+            const win = createTestWindow();
+            win._drag.getBoundingClientRect = jest.fn(dragRect);
+            win._frame.style.top = `${window.widgetWindows._getToolbarBottom()}px`;
+
+            win._nonclose.dispatchEvent(makeTouchEvent("touchstart", 80, 100));
+            document.dispatchEvent(makeTouchEvent("touchend", 80, 100));
+
+            expect(window.widgetWindows.draggingWindow).toBe(null);
+            expect(win._maximized).toBe(true);
+        });
+
+        test("a second finger on the title bar does not take over the drag", () => {
+            const win = createTestWindow();
+            win._drag.getBoundingClientRect = jest.fn(dragRect);
+
+            win._nonclose.dispatchEvent(makeTouchEvent("touchstart", 80, 100, 0));
+            win._nonclose.dispatchEvent(
+                makeTouchEvent("touchstart", 200, 220, 1, [
+                    { clientX: 80, clientY: 100, identifier: 0 }
+                ])
+            );
+
+            expect(win._activeTouchId).toBe(0);
+            expect(win._dx).toBe(30);
+            expect(win._dy).toBe(40);
+
+            // Lifting the first finger still ends the drag.
+            document.dispatchEvent(
+                makeTouchEvent("touchend", 80, 100, 0, [
+                    { clientX: 200, clientY: 220, identifier: 1 }
+                ])
+            );
+            expect(window.widgetWindows.draggingWindow).toBe(null);
+        });
+
+        test("touchstart on the title bar buttons does not start a drag or block the click", () => {
+            const win = createTestWindow();
+            win._drag.getBoundingClientRect = jest.fn(dragRect);
+            const event = makeTouchEvent("touchstart", 80, 100);
+
+            win._maxminButton.dispatchEvent(event);
+
+            expect(window.widgetWindows.draggingWindow).toBe(null);
+            expect(event.defaultPrevented).toBe(false);
+        });
+
+        test("mousedown on the maximize button does not restore or start a drag", () => {
+            const win = createTestWindow();
+            win._maximize();
+            win._drag.getBoundingClientRect = jest.fn(dragRect);
+
+            win._maxminButton.dispatchEvent(
+                new MouseEvent("mousedown", { bubbles: true, cancelable: true })
+            );
+
+            expect(win._maximized).toBe(true);
+            expect(window.widgetWindows.draggingWindow).toBe(null);
+        });
+
+        test("touch events do not move or end a mouse-initiated drag", () => {
+            const win = createTestWindow();
+            win._drag.getBoundingClientRect = jest.fn(dragRect);
+
+            win._nonclose.dispatchEvent(
+                new MouseEvent("mousedown", {
+                    bubbles: true,
+                    cancelable: true,
+                    clientX: 80,
+                    clientY: 100
+                })
+            );
+            document.dispatchEvent(makeTouchEvent("touchmove", 500, 500));
+            document.dispatchEvent(makeTouchEvent("touchend", 500, 500));
+
+            expect(window.widgetWindows.draggingWindow).toBe(win);
+            expect(win._frame.style.left).toBe("200px");
+        });
+
+        test("mouse events do not end a touch-initiated drag", () => {
+            const win = createTestWindow();
+            win._drag.getBoundingClientRect = jest.fn(dragRect);
+
+            win._nonclose.dispatchEvent(makeTouchEvent("touchstart", 80, 100));
+            document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true, cancelable: true }));
+
+            expect(window.widgetWindows.draggingWindow).toBe(win);
+        });
+    });
+
     describe("sendToCenter", () => {
         test("returns this for chaining", () => {
             const win = createTestWindow();
@@ -661,6 +949,69 @@ describe("widgetWindows", () => {
                 window.innerWidth = originalWidth;
             }
         });
+
+        test("updates maximized windows on small viewports without moving floating windows", () => {
+            const { toolbars, auxToolbar } = createToolbarLayout("block");
+            const originalWidth = window.innerWidth;
+
+            window.innerWidth = 500;
+
+            try {
+                const maximized = createTestWindow("Maximized");
+                maximized._maximize();
+
+                expect(maximized._frame.style.top).toBe("128px");
+                expect(maximized._frame.style.height).toBe("calc(100vh - 128px)");
+
+                const floating = createTestWindow("Floating");
+                floating.setPosition(100, 200);
+
+                const leftBefore = floating._frame.style.left;
+                const topBefore = floating._frame.style.top;
+
+                auxToolbar.style.display = "none";
+                window.widgetWindows._handleResize();
+
+                expect(maximized._frame.style.top).toBe("64px");
+                expect(maximized._frame.style.height).toBe("calc(100vh - 64px)");
+                expect(floating._frame.style.left).toBe(leftBefore);
+                expect(floating._frame.style.top).toBe(topBefore);
+            } finally {
+                window.innerWidth = originalWidth;
+                toolbars.remove();
+            }
+        });
+
+        test("updates a maximized window when the auxiliary toolbar opens and closes", () => {
+            const { toolbars, auxToolbar } = createToolbarLayout("none");
+            const originalWidth = window.innerWidth;
+
+            window.innerWidth = 1024;
+
+            try {
+                const win = createTestWindow();
+
+                win._maximize();
+
+                expect(win._frame.style.top).toBe("64px");
+                expect(win._frame.style.height).toBe("calc(100vh - 64px)");
+
+                auxToolbar.style.display = "block";
+                window.widgetWindows._handleResize();
+
+                expect(win._frame.style.top).toBe("128px");
+                expect(win._frame.style.height).toBe("calc(100vh - 128px)");
+
+                auxToolbar.style.display = "none";
+                window.widgetWindows._handleResize();
+
+                expect(win._frame.style.top).toBe("64px");
+                expect(win._frame.style.height).toBe("calc(100vh - 64px)");
+            } finally {
+                window.innerWidth = originalWidth;
+                toolbars.remove();
+            }
+        });
     });
 
     describe("_maximize and _restore", () => {
@@ -670,6 +1021,7 @@ describe("widgetWindows", () => {
             win._maximize();
 
             expect(win._maximized).toBe(true);
+            expect(window.widgetWindows._maximizedCache[win._key]).toBe(true);
         });
 
         test("_maximize sets frame to full viewport dimensions", () => {
@@ -714,6 +1066,7 @@ describe("widgetWindows", () => {
             win._restore();
 
             expect(win._maximized).toBe(false);
+            expect(window.widgetWindows._maximizedCache[win._key]).toBe(false);
         });
 
         test("_restore changes icon to expand", () => {
@@ -754,6 +1107,21 @@ describe("widgetWindows", () => {
             win._restore();
 
             expect(win._savedPos).toBeNull();
+        });
+
+        test("_maximize starts below the visible auxiliary toolbar", () => {
+            const { toolbars } = createToolbarLayout("block");
+
+            try {
+                const win = createTestWindow();
+
+                win._maximize();
+
+                expect(win._frame.style.top).toBe("128px");
+                expect(win._frame.style.height).toBe("calc(100vh - 128px)");
+            } finally {
+                toolbars.remove();
+            }
         });
     });
 
@@ -859,6 +1227,15 @@ describe("widgetWindows", () => {
 
             expect(win1._frame.style.zIndex).toBe("0");
             expect(win2._frame.style.zIndex).toBe("10000");
+        });
+
+        test("notifies the window via onfocused", () => {
+            const win = createTestWindow();
+            win.onfocused = jest.fn();
+
+            win.takeFocus();
+
+            expect(win.onfocused).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -1002,6 +1379,88 @@ describe("widgetWindows", () => {
 
             expect(win._rolled).toBe(false);
             expect(win._body.style.display).toBe("flex");
+        });
+
+        test("unroll restores maximized viewport dimensions when _maximized is true", () => {
+            const win = createTestWindow("testMaximizedRollup");
+            const toolbarBottom = window.widgetWindows._getToolbarBottom();
+            win._maximize();
+
+            expect(win._maximized).toBe(true);
+            expect(win._frame.style.width).toBe("100vw");
+
+            win._rollup();
+            expect(win._rolled).toBe(true);
+            expect(win._frame.style.width).toBe("auto");
+            expect(win._frame.style.height).toBe("auto");
+            expect(win._frame.style.minHeight).toBe("0px");
+
+            win.unroll();
+            expect(win._rolled).toBe(false);
+            expect(win._maximized).toBe(true);
+            expect(win._frame.style.width).toBe("100vw");
+            expect(win._frame.style.height).toBe(`calc(100vh - ${toolbarBottom}px)`);
+            expect(win._frame.style.left).toBe("0px");
+            expect(win._frame.style.top).toBe(`${toolbarBottom}px`);
+            expect(win._maxminButton.title).toBe("Restore");
+        });
+
+        test("unroll restores minHeight and minWidth when window is floating", () => {
+            const win = createTestWindow("testFloatingRollup");
+            win._rollup();
+            expect(win._frame.style.minHeight).toBe("0px");
+
+            win.unroll();
+            expect(win._frame.style.minHeight).toBe("420px");
+            expect(win._frame.style.minWidth).toBe("470px");
+        });
+
+        test("unroll on narrow screens (<= 600px) does not force minWidth 470px", () => {
+            const originalInnerWidth = window.innerWidth;
+            window.innerWidth = 390;
+            const win = createTestWindow("testNarrowScreenRollup");
+            win._rollup();
+            win.unroll();
+
+            expect(win._frame.style.minWidth).toBe("0px");
+            expect(win._frame.style.maxWidth).toBe("100vw");
+
+            window.innerWidth = originalInnerWidth;
+        });
+
+        test("unroll clamps floating window position so it does not extend below viewport", () => {
+            const originalInnerHeight = window.innerHeight;
+            const originalInnerWidth = window.innerWidth;
+            window.innerHeight = 500;
+            window.innerWidth = 1024;
+
+            const win = createTestWindow("testUnrollClamp");
+            win.setPosition(100, 400);
+            expect(win._frame.style.top).toBe("400px");
+
+            win._rollup();
+            // Window is rolled up at top: 400px. Now unroll in a 500px tall viewport.
+            win.unroll();
+
+            // 500 (innerHeight) - 420 (height) = 80px maxY.
+            expect(parseFloat(win._frame.style.top)).toBeLessThanOrEqual(80);
+            expect(win._frame.style.top).toBe("80px");
+
+            window.innerHeight = originalInnerHeight;
+            window.innerWidth = originalInnerWidth;
+        });
+
+        test("_handleResize does not stretch maximized window height while rolled up", () => {
+            const win = createTestWindow("testResizeRolledMax");
+            const toolbarBottom = window.widgetWindows._getToolbarBottom();
+            win._maximize();
+            win._rollup();
+
+            window.widgetWindows._handleResize();
+            expect(win._frame.style.height).toBe("auto");
+
+            win.unroll();
+            expect(win._frame.style.height).toBe(`calc(100vh - ${toolbarBottom}px)`);
         });
 
         test("destroy removes window elements and deletes key from openWindows", () => {
@@ -1167,6 +1626,39 @@ describe("widgetWindows", () => {
             expect(win2._frame.style.zIndex).toBe("10000");
             expect(win1._frame.style.opacity).toBe("0.7");
             expect(win1._frame.style.zIndex).toBe("0");
+        });
+
+        test("notifies the clicked window via onfocused", () => {
+            const win1 = createTestWindow("Window 1");
+            const win2 = createTestWindow("Window 2");
+            win1.onfocused = jest.fn();
+            win2.onfocused = jest.fn();
+
+            win1._frame.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+            expect(win1.onfocused).toHaveBeenCalledTimes(1);
+            expect(win2.onfocused).not.toHaveBeenCalled();
+        });
+
+        test("notifies the window that loses focus via onblurred", () => {
+            const win1 = createTestWindow("Window 1");
+            const win2 = createTestWindow("Window 2");
+            win1.onblurred = jest.fn();
+            win2.onblurred = jest.fn();
+
+            win1._frame.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+            expect(win2.onblurred).toHaveBeenCalledTimes(1);
+            expect(win1.onblurred).not.toHaveBeenCalled();
+        });
+
+        test("notifies the focused window when clicking outside all windows", () => {
+            const win1 = createTestWindow("Window 1");
+            win1.onblurred = jest.fn();
+
+            canvas.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+
+            expect(win1.onblurred).toHaveBeenCalledTimes(1);
         });
 
         test("clears focus and dims all windows when clicking outside all windows", () => {
@@ -1394,6 +1886,29 @@ describe("widgetWindows", () => {
             expect(win._dx).not.toBe(999);
             expect(win._dy).not.toBe(999);
         });
+
+        test("_dragTopHandler maximizes at the visible auxiliary toolbar boundary", () => {
+            const { toolbars } = createToolbarLayout("block");
+
+            try {
+                const win = createTestWindow();
+                const event = {
+                    preventDefault: jest.fn()
+                };
+
+                win.onmaximize = jest.fn();
+                win._frame.style.top = "128px";
+
+                win._dragTopHandler(event);
+
+                expect(win._maximized).toBe(true);
+                expect(win._frame.style.top).toBe("128px");
+                expect(win.onmaximize).toHaveBeenCalledTimes(1);
+                expect(event.preventDefault).toHaveBeenCalledTimes(1);
+            } finally {
+                toolbars.remove();
+            }
+        });
     });
 
     describe("window visibility and management helpers", () => {
@@ -1457,6 +1972,102 @@ describe("widgetWindows", () => {
             window.widgetWindows.clear(win._key);
 
             expect(win.onclose).toHaveBeenCalledTimes(1);
+        });
+
+        test("windowFor restores a saved position instead of centering", () => {
+            const widget = { blockNo: 99 };
+            const win = windowFor(widget, "Saved Position", undefined, true);
+            win.setPosition(123, 200);
+            win.destroy();
+
+            const reopened = windowFor(widget, "Saved Position", undefined, true);
+
+            expect(reopened._frame.style.left).toBe("123px");
+            expect(reopened._frame.style.top).toBe("200px");
+        });
+
+        test("windowFor centers a window that has no saved position", () => {
+            const widget = { blockNo: 98 };
+
+            const win = windowFor(widget, "Fresh Window", undefined, true);
+
+            expect(win._frame.style.left).toBe("200px");
+            expect(win._frame.style.top).toBe("140px");
+        });
+
+        test("windowFor keeps a restored position when the widget centers itself", () => {
+            const widget = { blockNo: 97 };
+            const win = windowFor(widget, "Self Centering", undefined, true);
+            win.setPosition(140, 220);
+            win.destroy();
+
+            const reopened = windowFor(widget, "Self Centering", undefined, true);
+            reopened.sendToCenter();
+
+            expect(reopened._frame.style.left).toBe("140px");
+            expect(reopened._frame.style.top).toBe("220px");
+        });
+
+        test("windowFor keeps a restored position when the widget centers itself twice", () => {
+            const widget = { blockNo: 93 };
+            const win = windowFor(widget, "Double Centering", undefined, true);
+            win.setPosition(160, 240);
+            win.destroy();
+
+            const reopened = windowFor(widget, "Double Centering", undefined, true);
+            reopened.sendToCenter();
+            reopened.sendToCenter();
+
+            expect(reopened._frame.style.left).toBe("160px");
+            expect(reopened._frame.style.top).toBe("240px");
+        });
+
+        test("windowFor centers a restored window after a title bar interaction", () => {
+            const widget = { blockNo: 92 };
+            const win = windowFor(widget, "Interactive Centering", undefined, true);
+            win.setPosition(180, 260);
+            win.destroy();
+
+            const reopened = windowFor(widget, "Interactive Centering", undefined, true);
+            reopened._nonclose.dispatchEvent(
+                new MouseEvent("mousedown", { bubbles: true, clientX: 10, clientY: 10 })
+            );
+            reopened.sendToCenter();
+
+            expect(reopened._frame.style.left).toBe("200px");
+            expect(reopened._frame.style.top).toBe("140px");
+        });
+
+        test("windowFor clamps a restored position to the viewport", () => {
+            const widget = { blockNo: 96 };
+            window.widgetWindows._posCache[96] = [5000, 5000];
+
+            const win = windowFor(widget, "Offscreen Window", undefined, true);
+
+            expect(win._frame.style.left).toBe(`${window.innerWidth - 470}px`);
+            expect(win._frame.style.top).toBe(`${window.innerHeight - 420}px`);
+        });
+
+        test("windowFor restores a position saved at the top edge", () => {
+            const widget = { blockNo: 95 };
+            window.widgetWindows._posCache[95] = [120, 64];
+
+            const win = windowFor(widget, "Maximized Window", undefined, true);
+
+            expect(win._frame.style.left).toBe("120px");
+            expect(win._frame.style.top).toBe("64px");
+        });
+
+        test("windowFor centers a window explicitly cached as maximized", () => {
+            const widget = { blockNo: 94 };
+            window.widgetWindows._posCache[94] = [120, 64];
+            window.widgetWindows._maximizedCache[94] = true;
+
+            const win = windowFor(widget, "Maximized Window", undefined, true);
+
+            expect(win._frame.style.left).toBe("200px");
+            expect(win._frame.style.top).toBe("140px");
+            expect(window.widgetWindows._maximizedCache[94]).toBe(false);
         });
     });
 
@@ -1819,6 +2430,143 @@ describe("widgetWindows", () => {
             expect(win._restore).toHaveBeenCalledTimes(1);
             expect(win.sendToCenter).toHaveBeenCalledTimes(1);
             expect(win.onmaximize).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe("Window Control Button Keyboard Accessibility", () => {
+        test("closes window when Enter or Space is pressed on closeButton", () => {
+            const win = createTestWindow();
+            win.onclose = jest.fn();
+
+            expect(win._closeButton).toBeDefined();
+            expect(win._closeButton.getAttribute("role")).toBe("button");
+            expect(win._closeButton.getAttribute("tabindex")).toBe("0");
+
+            const enterEvent = new KeyboardEvent("keydown", {
+                key: "Enter",
+                bubbles: true,
+                cancelable: true
+            });
+            win._closeButton.dispatchEvent(enterEvent);
+            expect(win.onclose).toHaveBeenCalledTimes(1);
+
+            const spaceEvent = new KeyboardEvent("keydown", {
+                key: " ",
+                bubbles: true,
+                cancelable: true
+            });
+            win._closeButton.dispatchEvent(spaceEvent);
+            expect(win.onclose).toHaveBeenCalledTimes(2);
+
+            const arrowEvent = new KeyboardEvent("keydown", {
+                key: "ArrowDown",
+                bubbles: true,
+                cancelable: true
+            });
+            win._closeButton.dispatchEvent(arrowEvent);
+            expect(win.onclose).toHaveBeenCalledTimes(2);
+        });
+
+        test("toggles rollup/unroll when Enter or Space is pressed on rollButton", () => {
+            const win = createTestWindow();
+            expect(win._rollButton).toBeDefined();
+            expect(win._rollButton.getAttribute("role")).toBe("button");
+            expect(win._rollButton.getAttribute("tabindex")).toBe("0");
+
+            expect(win._rolled).toBe(false);
+
+            // Press Enter to roll up
+            const enterEvent = new KeyboardEvent("keydown", {
+                key: "Enter",
+                bubbles: true,
+                cancelable: true
+            });
+            win._rollButton.dispatchEvent(enterEvent);
+
+            expect(win._rolled).toBe(true);
+            expect(win._body.style.display).toBe("none");
+
+            // Press Space to unroll
+            const spaceEvent = new KeyboardEvent("keydown", {
+                key: " ",
+                bubbles: true,
+                cancelable: true
+            });
+            win._rollButton.dispatchEvent(spaceEvent);
+
+            expect(win._rolled).toBe(false);
+            expect(win._body.style.display).toBe("flex");
+        });
+
+        test("toggles maximize/restore when Enter or Space is pressed on maxminButton", () => {
+            const win = createTestWindow("Fullscreen Window", true);
+            expect(win._maxminButton).toBeDefined();
+            expect(win._maxminButton.getAttribute("role")).toBe("button");
+            expect(win._maxminButton.getAttribute("tabindex")).toBe("0");
+
+            expect(win._maximized).toBe(false);
+
+            // Press Enter to maximize
+            const enterEvent = new KeyboardEvent("keydown", {
+                key: "Enter",
+                bubbles: true,
+                cancelable: true
+            });
+            win._maxminButton.dispatchEvent(enterEvent);
+
+            expect(win._maximized).toBe(true);
+
+            // Press Space to restore
+            const spaceEvent = new KeyboardEvent("keydown", {
+                key: " ",
+                bubbles: true,
+                cancelable: true
+            });
+            win._maxminButton.dispatchEvent(spaceEvent);
+
+            expect(win._maximized).toBe(false);
+        });
+
+        test("ignores repeated keydown events when activation key is held down", () => {
+            const win = createTestWindow();
+            win.onclose = jest.fn();
+
+            const repeatEvent = new KeyboardEvent("keydown", {
+                key: "Enter",
+                repeat: true,
+                bubbles: true,
+                cancelable: true
+            });
+            win._closeButton.dispatchEvent(repeatEvent);
+
+            expect(win.onclose).not.toHaveBeenCalled();
+        });
+
+        test("restores focus to previously focused element when window closes", () => {
+            const externalButton = document.createElement("button");
+            document.body.appendChild(externalButton);
+            externalButton.focus();
+
+            const win = createTestWindow();
+            win._closeButton.focus();
+            expect(document.activeElement).toBe(win._closeButton);
+
+            win.destroy();
+
+            expect(document.activeElement).toBe(externalButton);
+            document.body.removeChild(externalButton);
+        });
+
+        test("transfers focus to remaining open window when closed with multiple open windows", () => {
+            const win1 = createTestWindow("First Window");
+            const win2 = createTestWindow("Second Window");
+
+            win2._closeButton.focus();
+            expect(document.activeElement).toBe(win2._closeButton);
+
+            win2.destroy();
+
+            expect(window.widgetWindows.focused).toBe(win1);
         });
     });
 });

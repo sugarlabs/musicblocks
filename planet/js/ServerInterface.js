@@ -248,9 +248,12 @@ class ServerInterface {
      * @param {string}         path
      * @param {Object}         body
      * @param {"POST"|"PUT"}   method
+     * @param {boolean}        [withTimeout=false] Apply the request deadline.
      * @returns {Promise<any|null>}
      */
-    async _post(path, body, method = "POST") {
+    async _post(path, body, method = "POST", withTimeout = false) {
+        const controller = withTimeout ? new AbortController() : null;
+        const timer = controller ? setTimeout(() => controller.abort(), this.RequestTimeout) : null;
         try {
             const res = await fetch(this.BaseURL + path, {
                 method,
@@ -258,7 +261,8 @@ class ServerInterface {
                     "Content-Type": "application/json",
                     "Accept": "application/json"
                 },
-                body: JSON.stringify(body)
+                body: JSON.stringify(body),
+                ...(controller ? { signal: controller.signal } : {})
             });
             if (!res.ok) {
                 const text = await res.text().catch(() => "");
@@ -273,6 +277,8 @@ class ServerInterface {
         } catch (err) {
             console.error(`[ServerInterface] ${method} ${path} failed:`, err);
             return null;
+        } finally {
+            if (timer) clearTimeout(timer);
         }
     }
 
@@ -827,6 +833,37 @@ class ServerInterface {
             callback({ success: true, message: response.message });
         } catch (err) {
             console.error("[ServerInterface] publishProject error:", err);
+            callback(this.ConnectionFailureData);
+        }
+    }
+
+    /**
+     * Changes whether a project appears in public Planet listings.
+     * The backend verifies ownership using the key returned by /create.
+     * @param {string} repoName
+     * @param {boolean} visible
+     * @param {Function} callback
+     */
+    async toggleProjectVisibility(repoName, visible, callback) {
+        const key = this.getKey(repoName);
+        if (!key) {
+            callback({ success: false, error: "MISSING_OWNERSHIP_KEY" });
+            return;
+        }
+
+        try {
+            const response = await this._post(
+                "/toggleVisibility",
+                { repoName, key, visible },
+                "PUT",
+                true
+            );
+            if (!response || response.error || response.success === false) {
+                callback({ success: false, error: response?.error || "VISIBILITY_UPDATE_FAILED" });
+                return;
+            }
+            callback({ success: true, visible });
+        } catch (_) {
             callback(this.ConnectionFailureData);
         }
     }

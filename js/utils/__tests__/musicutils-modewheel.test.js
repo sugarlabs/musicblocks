@@ -91,7 +91,10 @@ describe("musicutils-modewheel", () => {
         });
 
         it("returns parsed custom modes when valid array is stored", () => {
-            const validModes = [{ name: "custom-1" }, { name: "custom-2" }];
+            const validModes = [
+                { name: "custom-1", pattern: [2, 2, 1, 2, 2, 2, 1] },
+                { name: "custom-2", pattern: [3, 4, 5] }
+            ];
             localStorage.setItem("customModes", JSON.stringify(validModes));
             expect(modewheel.getSavedCustomModes()).toEqual(validModes);
         });
@@ -115,10 +118,12 @@ describe("musicutils-modewheel", () => {
                 undefined,
                 { name: 123 },
                 { otherKey: "val" },
-                { name: "valid-mode" }
+                { name: "valid-mode", pattern: [12] }
             ];
             localStorage.setItem("customModes", JSON.stringify(mixedModes));
-            expect(modewheel.getSavedCustomModes()).toEqual([{ name: "valid-mode" }]);
+            expect(modewheel.getSavedCustomModes()).toEqual([
+                { name: "valid-mode", pattern: [12] }
+            ]);
         });
     });
 

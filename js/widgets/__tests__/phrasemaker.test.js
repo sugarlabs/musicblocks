@@ -1788,6 +1788,92 @@ describe("PhraseMaker Widget", () => {
         expect(phraseMaker.isInitial).toBe(false);
     });
 
+    test("init shows the Export button only outside beginner mode", () => {
+        const exportButtonCount = (beginnerMode, stored) => {
+            const pm = new PhraseMaker(mockDeps);
+            const mockActivity = {
+                beginnerMode,
+                turtles: {
+                    ithTurtle: jest.fn(() => ({
+                        singer: { beatsPerMeasure: 4, noteValuePerBeat: 4, keySignature: 0 }
+                    }))
+                },
+                logo: {
+                    tupletRhythms: [["notes", 0, 4]],
+                    synth: {
+                        inTemperament: "equal",
+                        stopSound: jest.fn(),
+                        stop: jest.fn(),
+                        loadSynth: jest.fn()
+                    }
+                },
+                blocks: { protoBlockDict: { forward: { staticLabels: ["Forward"] } } },
+                canvas: { width: 800, height: 600 },
+                getStageScale: jest.fn(() => 1),
+                hideMsgs: jest.fn(),
+                textMsg: jest.fn()
+            };
+            const addButton = jest.fn().mockReturnValue({
+                onclick: null,
+                innerHTML: "",
+                style: {},
+                setAttribute: jest.fn()
+            });
+
+            pm._rows = [];
+            pm._headcols = [];
+            pm._labelcols = [];
+            pm._blockMap = {};
+            pm.blockNo = 0;
+            pm.rowLabels = ["C", "kick", "forward"];
+            pm.rowArgs = [4, 4, 100];
+            pm._deps.getDrumName = jest.fn(name => (name === "kick" ? "kick" : null));
+            pm.lyricsON = true;
+
+            global.PhraseMakerUtils = {
+                MATRIXGRAPHICS: ["forward"],
+                MATRIXGRAPHICS2: [],
+                MATRIXSYNTHS: []
+            };
+            global.window.widgetWindows = {
+                windowFor: jest.fn().mockReturnValue({
+                    clear: jest.fn(),
+                    show: jest.fn(),
+                    addButton,
+                    getWidgetBody: jest.fn().mockReturnValue({
+                        appendChild: jest.fn(),
+                        append: jest.fn()
+                    }),
+                    sendToCenter: jest.fn(),
+                    destroy: jest.fn()
+                })
+            };
+            global.PhraseMakerUI = {
+                calculateNoteWidth: jest.fn(() => 80),
+                resetMatrix: jest.fn()
+            };
+
+            if (stored === undefined) {
+                localStorage.removeItem("beginnerMode");
+            } else {
+                localStorage.setItem("beginnerMode", stored);
+            }
+            pm.init(mockActivity);
+            return addButton.mock.calls.filter(call => call[0] === "export-button.svg").length;
+        };
+
+        try {
+            // The toolbar saves the mode as the string "true" or "false", never a
+            // boolean, so the saved string must not decide whether Export shows.
+            expect(exportButtonCount(true, "true")).toBe(0);
+            expect(exportButtonCount(false, "false")).toBe(1);
+            // A first-time user has nothing saved yet but starts in beginner mode.
+            expect(exportButtonCount(true, undefined)).toBe(0);
+        } finally {
+            localStorage.removeItem("beginnerMode");
+        }
+    });
+
     test("announces widget opened to screen readers only on genuine first open", () => {
         const mockActivity = {
             turtles: {

@@ -82,7 +82,7 @@ function setupToneActions(activity) {
                 }
             }
 
-            if (!accounted && typeof instrument === "object") {
+            if (!accounted && typeof instrument === "object" && instrument !== null) {
                 if (instrument[0] !== "") {
                     synth = "customsample_" + instrument[0];
                     // data, pitch, octave and the cent adjustment from the sampler
@@ -105,10 +105,16 @@ function setupToneActions(activity) {
                 activity.logo.phraseMaker._instrumentName = synth;
             }
 
+            // Notes play the last instrument on the stack, so push the synth
+            // unless it is already last: piano > violin > piano plays piano.
+            const loaded = tur.singer.instrumentNames.includes(synth);
             let pushed = false;
-            if (!tur.singer.instrumentNames.includes(synth)) {
+            if (last(tur.singer.instrumentNames) !== synth) {
                 tur.singer.instrumentNames.push(synth);
                 pushed = true;
+            }
+
+            if (!loaded) {
                 activity.logo.synth.loadSynth(turtle, synth);
 
                 if (tur.singer.synthVolume[synth] === undefined) {

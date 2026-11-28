@@ -30,6 +30,7 @@ const {
     ManualClient,
     createClient,
     generateTests,
+    safeJson,
     NOT_YET_IMPLEMENTED
 } = require("../llm-client");
 const cli = require("../cli");
@@ -109,6 +110,29 @@ describe("NoopClient", () => {
         expect(() => parseSource(source, "noop-escaped-output.js")).not.toThrow();
     });
 
+    it("escapes Unicode line terminators in generated comments and source", () => {
+        const hostilePlan = {
+            file: "js/hostile.js\u2028const injected = 1;\u2029//",
+            exports: [{ name: "hostile\u2028export", kind: "value" }]
+        };
+        const { source } = new NoopClient().generate(buildGenerationRequest(hostilePlan));
+
+        expect(source).not.toContain("\u2028");
+        expect(source).not.toContain("\u2029");
+        expect(source).toContain("\\u2028");
+        expect(source).toContain("\\u2029");
+
+        const { ast, comments } = parseSource(source, "noop-hostile-output.js");
+        expect(() => parseSource(source, "noop-hostile-output.js")).not.toThrow();
+
+        const hasInjectedStatement = JSON.stringify(ast).includes('"name":"injected"');
+        expect(hasInjectedStatement).toBe(false);
+
+        const placeholderComment = comments.find(c => c.value.includes("Placeholder generated"));
+        expect(placeholderComment).toBeDefined();
+        expect(placeholderComment.value).toContain("\\u2028");
+    });
+
     it("is deterministic for a given request", () => {
         const a = new NoopClient().generate(request).source;
         const b = new NoopClient().generate(request).source;
@@ -121,6 +145,22 @@ describe("NoopClient", () => {
         );
         expect(source).toContain("module exposes no direct exports");
         expect(() => parseSource(source, "noop-output.js")).not.toThrow();
+    });
+});
+
+describe("safeJson", () => {
+    it("escapes U+2028 and U+2029 characters", () => {
+        const str = "hello\u2028world\u2029!";
+        const serialized = safeJson(str);
+        expect(serialized).not.toContain("\u2028");
+        expect(serialized).not.toContain("\u2029");
+        expect(serialized).toBe('"hello\\u2028world\\u2029!"');
+    });
+
+    it("serializes regular values identically to JSON.stringify", () => {
+        expect(safeJson({ a: 1, b: "test" })).toBe(JSON.stringify({ a: 1, b: "test" }));
+        expect(safeJson(null)).toBe(JSON.stringify(null));
+        expect(safeJson(123)).toBe(JSON.stringify(123));
     });
 });
 

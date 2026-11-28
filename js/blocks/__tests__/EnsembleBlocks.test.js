@@ -238,6 +238,7 @@ describe("setupEnsembleBlocks", () => {
             }),
             runFromBlock: jest.fn(),
             doBreak: jest.fn(),
+            stopTurtleRun: jest.fn(),
             initTurtle: jest.fn(),
             synth: {
                 inTemperament: "equal"
@@ -291,6 +292,12 @@ describe("setupEnsembleBlocks", () => {
             }));
             const result = getTargetTurtle(turtles, "Yertle");
             expect(result).toBeNull();
+        });
+
+        it("should return null when targetTurtle is null or undefined without throwing", () => {
+            expect(getTargetTurtle(turtles, null)).toBeNull();
+            expect(getTargetTurtle(turtles, undefined)).toBeNull();
+            expect(getTargetTurtle(null, "Yertle")).toBeNull();
         });
     });
 
@@ -451,7 +458,19 @@ describe("setupEnsembleBlocks", () => {
             expect(tur.parentFlowQueue).toEqual([]);
             expect(tur.unhighlightQueue).toEqual([]);
             expect(tur.parameterQueue).toEqual([]);
+            expect(tur.running).toBe(false);
             expect(logo.doBreak).toHaveBeenCalledWith(tur);
+            expect(logo.stopTurtleRun).not.toHaveBeenCalled();
+        });
+
+        it("should stop another turtle and keep the caller running", () => {
+            const caller = turtles.ithTurtle(1);
+            caller.running = true;
+            stopTurtleBlock.flow(["Yertle"], logo, 1, 10);
+            expect(logo.stopTurtleRun).toHaveBeenCalledWith("0");
+            expect(caller.running).toBe(true);
+            expect(caller.queue).toEqual([1, 2, 3]);
+            expect(logo.doBreak).not.toHaveBeenCalled();
         });
     });
 
@@ -694,7 +713,7 @@ describe("setupEnsembleBlocks", () => {
         it("should return pitch number from lastNotePlayed", () => {
             logo.parseArg.mockReturnValue("Yertle");
             const result = turtlePitchBlock.arg(logo, 0, blk, null);
-            expect(result).toBeUndefined(); // Missing return in implementation
+            expect(result).toBe(40);
             expect(activity.blocks.blockList[blk].value).toBeDefined();
         });
 
@@ -739,7 +758,7 @@ describe("setupEnsembleBlocks", () => {
         it("should return note value from inNoteBlock", () => {
             logo.parseArg.mockReturnValue("Yertle");
             const result = turtleNoteBlock.arg(logo, 0, blk, null);
-            expect(result).toBeUndefined(); // Missing return in implementation
+            expect(result).toBe(0.25);
             expect(activity.blocks.blockList[blk].value).toBe(1 / 4);
         });
 
@@ -757,7 +776,7 @@ describe("setupEnsembleBlocks", () => {
             tur.singer.lastNotePlayed = null;
             logo.parseArg.mockReturnValue("Yertle");
             const result = turtleNoteBlock.arg(logo, 0, blk, null);
-            expect(result).toBeUndefined(); // Missing return in implementation
+            expect(result).toBe(0.25);
             expect(activity.blocks.blockList[blk].value).toBe(0.25);
         });
 
@@ -785,6 +804,51 @@ describe("setupEnsembleBlocks", () => {
             expect(turtleNote2Block).toBeDefined();
             expect(turtleNote2Block.hidden).toBe(true);
             expect(turtleNote2Block.deprecated).toBe(true);
+        });
+    });
+
+    describe("legacy ensemble reporters through Logo.parseArg", () => {
+        const { Logo } = require("../../logo");
+
+        it.each([
+            ["turtlepitch", "Yertle", 40],
+            ["turtlepitch", "Missing", 40],
+            ["turtlenote", "Yertle", 0.25],
+            ["turtlenote2", "Yertle", 4],
+            ["turtlenote", "Missing", -1],
+            ["turtlenote2", "Missing", -1]
+        ])("evaluates %s for %s as %p", (name, target, expected) => {
+            const blk = 50;
+            activity.blocks.blockList[blk] = {
+                name,
+                connections: [null, 100],
+                protoblock: createdBlocks[name],
+                value: null
+            };
+            logo.turtles = turtles;
+            logo.blockList = activity.blocks.blockList;
+            logo.parseArg.mockReturnValue(target);
+
+            expect(Logo.prototype.parseArg(logo, 0, blk, null, null)).toBe(expected);
+            expect(activity.blocks.blockList[blk].value).toBe(expected);
+        });
+
+        it("returns zero for a zero-valued reciprocal note reporter", () => {
+            const blk = 50;
+            activity.blocks.blockList[blk] = {
+                name: "turtlenote2",
+                connections: [null, 100],
+                protoblock: createdBlocks.turtlenote2
+            };
+            const tur = turtles.ithTurtle(0);
+            tur.singer.inNoteBlock = [];
+            tur.singer.lastNotePlayed = ["C4", 0];
+            logo.turtles = turtles;
+            logo.blockList = activity.blocks.blockList;
+            logo.parseArg.mockReturnValue("Yertle");
+
+            expect(Logo.prototype.parseArg(logo, 0, blk, null, null)).toBe(0);
+            expect(activity.blocks.blockList[blk].value).toBe(0);
         });
     });
 
@@ -987,6 +1051,15 @@ describe("setupEnsembleBlocks", () => {
             expect(result).toBe("Yertle");
         });
 
+        it.each([
+            [1.2, "Yertle"],
+            [1.99, "Yertle"],
+            [2.5, "Turtle1"]
+        ])("uses the turtle at the floored one-based index %p", (index, expected) => {
+            logo.parseArg.mockReturnValue(index);
+            expect(nthTurtleNameBlock.arg(logo, 0, blk, null)).toBe(expected);
+        });
+
         it("should return error if index is out of range", () => {
             logo.parseArg.mockReturnValue(10);
             const result = nthTurtleNameBlock.arg(logo, 0, blk, null);
@@ -1018,12 +1091,62 @@ describe("setupEnsembleBlocks", () => {
             const tur = turtles.getTurtle(0);
             setTurtleNameBlock.flow([-1, "NewName"], logo, 0, 10);
             expect(tur.rename).toHaveBeenCalledWith("NewName");
+            expect(tur.rename).toHaveBeenCalledTimes(1);
+        });
+
+        it.each([1, "Turtle1"])("renames only the selected mouse %p", source => {
+            global._THIS_IS_MUSIC_BLOCKS_ = true;
+            for (let i = 0; i < turtles.getTurtleCount(); i++) {
+                const mouse = turtles.getTurtle(i);
+                mouse.rename.mockImplementation(name => {
+                    mouse.name = name;
+                });
+            }
+
+            setTurtleNameBlock.flow([source, "Melody"], logo, 0, 10);
+
+            expect(turtles.getTurtle(0).name).toBe("Yertle");
+            expect(turtles.getTurtle(0).rename).not.toHaveBeenCalled();
+            expect(turtles.getTurtle(1).name).toBe("Melody");
+            expect(turtles.getTurtle(1).rename).toHaveBeenCalledTimes(1);
+            expect(turtles.getTurtle(2).rename).not.toHaveBeenCalled();
+            expect(getTargetTurtle(turtles, "Melody")).toBe("1");
+            expect(activity.errorMsg).not.toHaveBeenCalled();
         });
 
         it("should rename turtle by index", () => {
             const tur = turtles.getTurtle(1);
             setTurtleNameBlock.flow([1, "NewName"], logo, 0, 10);
             expect(tur.rename).toHaveBeenCalledWith("NewName");
+        });
+
+        it("should rename the last turtle by index", () => {
+            const lastTurtle = turtles.getTurtle(2);
+            setTurtleNameBlock.flow([2, "NewName"], logo, 0, 10);
+
+            expect(lastTurtle.rename).toHaveBeenCalledWith("NewName");
+            expect(lastTurtle.rename).toHaveBeenCalledTimes(1);
+            expect(turtles.getTurtle(0).rename).not.toHaveBeenCalled();
+            expect(turtles.getTurtle(1).rename).not.toHaveBeenCalled();
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        it("should return an error for the first out-of-range index", () => {
+            setTurtleNameBlock.flow([3, "NewName"], logo, 0, 10);
+
+            expect(activity.errorMsg).toHaveBeenCalledWith("Cannot find turtle 3", 10);
+            expect(turtles.getTurtle(0).rename).not.toHaveBeenCalled();
+            expect(turtles.getTurtle(1).rename).not.toHaveBeenCalled();
+            expect(turtles.getTurtle(2).rename).not.toHaveBeenCalled();
+        });
+
+        it("should return an error if the new name is null", () => {
+            setTurtleNameBlock.flow([1, null], logo, 0, 10);
+
+            expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 10);
+            expect(turtles.getTurtle(0).rename).not.toHaveBeenCalled();
+            expect(turtles.getTurtle(1).rename).not.toHaveBeenCalled();
+            expect(turtles.getTurtle(2).rename).not.toHaveBeenCalled();
         });
 
         it("should rename turtle by name", () => {

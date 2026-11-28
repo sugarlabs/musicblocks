@@ -151,10 +151,14 @@ function setupPitchBlocks(activity) {
         }
 
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId !== null &&
+                parentId !== undefined &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "transposition"]);
             } else {
@@ -233,10 +237,14 @@ function setupPitchBlocks(activity) {
         }
 
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId !== null &&
+                parentId !== undefined &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "mypitch"]);
             }
@@ -297,10 +305,14 @@ function setupPitchBlocks(activity) {
         }
 
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId !== null &&
+                parentId !== undefined &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "mypitch"]);
             } else {
@@ -316,7 +328,8 @@ function setupPitchBlocks(activity) {
                         obj = frequencyToPitch(tur.singer.lastNotePlayed[0]);
                     }
                 } else if (
-                    tur.singer.inNoteBlock in tur.singer.notePitches &&
+                    tur.singer.inNoteBlock.length > 0 &&
+                    last(tur.singer.inNoteBlock) in tur.singer.notePitches &&
                     tur.singer.notePitches[last(tur.singer.inNoteBlock)].length > 0
                 ) {
                     obj = getNote(
@@ -366,10 +379,14 @@ function setupPitchBlocks(activity) {
         }
 
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId !== null &&
+                parentId !== undefined &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "pitchinhertz"]);
             } else {
@@ -408,10 +425,14 @@ function setupPitchBlocks(activity) {
 
         arg(logo, turtle, blk) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 !logo.inStatusMatrix ||
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name !==
-                    "outputtools"
+                parentId === null ||
+                parentId === undefined ||
+                !(parentId in activity.blocks.blockList) ||
+                activity.blocks.blockList[parentId]?.name !== "outputtools"
             ) {
                 if (tur.singer.lastNotePlayed !== null) {
                     return tur.singer.lastNotePlayed[0];
@@ -486,10 +507,14 @@ function setupPitchBlocks(activity) {
         }
 
         arg(logo, turtle, blk, receivedArg) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId !== null &&
+                parentId !== undefined &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "outputtools"]);
             } else {
@@ -544,13 +569,17 @@ function setupPitchBlocks(activity) {
                         notePlayed = arg1;
                     }
                 } else if (activity.blocks.blockList[cblk1].name === "scaledegree2") {
-                    notePlayed = scaleDegreeToPitchMapping(
+                    const mappedPitch = scaleDegreeToPitchMapping(
                         tur.singer.keySignature,
                         activity.blocks.blockList[cblk1].value,
                         tur.singer.movable,
                         null
                     );
-                    notePlayed += tur.singer.currentOctave ? tur.singer.currentOctave : 4;
+                    if (mappedPitch === null) {
+                        return INVALIDPITCH;
+                    }
+                    notePlayed =
+                        mappedPitch + (tur.singer.currentOctave ? tur.singer.currentOctave : 4);
                 } else {
                     if (typeof arg1 === "string") {
                         // Is it a number encoded as a string?
@@ -742,12 +771,21 @@ function setupPitchBlocks(activity) {
             const cblk = activity.blocks.blockList[blk].connections[1];
             const num = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
 
+            // eslint-disable-next-line eqeqeq
+            if (cblk == null && receivedArg === undefined) {
+                logo.stopTurtle = true;
+                return;
+            }
+
             try {
+                if (Number.isNaN(num)) {
+                    throw new Error("NoArgError");
+                }
                 const outType =
                     activity.blocks.blockList[blk].name === "number2pitch" ? "pitch" : "octave";
                 return Singer.PitchActions.numToPitch(num, outType, turtle);
             } catch (e) {
-                if (e === "NoArgError") {
+                if (e.message === "NoArgError" || e === "NoArgError") {
                     activity.errorMsg(NOINPUTERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else {
@@ -793,7 +831,8 @@ function setupPitchBlocks(activity) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
             const obj = keySignatureToMode(tur.singer.keySignature);
             const modeLength = MUSICALMODES[obj[1]].length;
-            const thisScale = buildScale(tur.singer.keySignature)[0];
+            const scaleObj = buildScale(tur.singer.keySignature);
+            const thisScale = scaleObj ? scaleObj[0] : null;
 
             let arg1 = 0;
             if (cblk1 !== null) {
@@ -828,17 +867,37 @@ function setupPitchBlocks(activity) {
                     lc += modeLength;
                 }
 
-                const thisNote = thisScale[lc];
-
-                // Now that we have the note, look for its pitch number.
-                lc = NOTESSHARP.indexOf(thisNote);
-                if (lc === -1) {
-                    lc = NOTESFLAT.indexOf(thisNote);
+                let thisNote = thisScale ? thisScale[lc] : null;
+                if (!thisNote) {
+                    while (noteIdx < 0) {
+                        noteIdx += NOTENAMES.length;
+                    }
+                    thisNote = NOTENAMES[noteIdx % NOTENAMES.length];
                 }
 
-                // Since we are using the staff, it is OK to assume 12
-                // half-steps per octave.
-                return lc + 12 * o;
+                // Now that we have the note, look for its pitch number.
+                const temperament = logo?.synth?.inTemperament || "equal";
+                const currentEDO = getCurrentEDO(temperament);
+                if (currentEDO === 12) {
+                    lc = NOTESSHARP.indexOf(thisNote);
+                    if (lc === -1) {
+                        lc = NOTESFLAT.indexOf(thisNote);
+                    }
+                    return lc + 12 * o;
+                } else {
+                    const edoNames = generateNoteNames(currentEDO);
+                    lc = edoNames.indexOf(thisNote);
+                    if (lc === -1) {
+                        lc = NOTESSHARP.indexOf(thisNote);
+                        if (lc === -1) {
+                            lc = NOTESFLAT.indexOf(thisNote);
+                        }
+                        if (lc !== -1) {
+                            lc = Math.round((lc / 12) * currentEDO);
+                        }
+                    }
+                    return (lc !== -1 ? lc : 0) + currentEDO * o;
+                }
             } else if (activity.blocks.blockList[cblk0].name === "nthmodalpitch") {
                 if (cblk1 === null) {
                     return 5;
@@ -867,12 +926,27 @@ function setupPitchBlocks(activity) {
                     return ["sol", 4];
                 }
 
+                if (!thisScale) {
+                    while (noteIdx < 0) {
+                        noteIdx += NOTENAMES.length;
+                    }
+                    const note = NOTENAMES[noteIdx % NOTENAMES.length];
+                    return [note, o2];
+                }
+
                 // Calculate the offset relative to the current key.
                 let lc = noteIdx - NOTENAMES.indexOf(obj[0][0]);
                 if (lc < 0) {
                     lc += modeLength;
                 }
-                return [thisScale[lc], o2];
+                const note = thisScale[lc];
+                if (!note) {
+                    while (noteIdx < 0) {
+                        noteIdx += NOTENAMES.length;
+                    }
+                    return [NOTENAMES[noteIdx % NOTENAMES.length], o2];
+                }
+                return [note, o2];
             } else {
                 if (cblk1 === null) {
                     return "G4";
@@ -1712,10 +1786,11 @@ function setupPitchBlocks(activity) {
                 const note = obj;
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];
             } else if (logo.inMusicKeyboard) {
-                logo.musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
-                logo.musicKeyboard.noteNames.push("hertz");
-                logo.musicKeyboard.octaves.push(arg);
-                logo.musicKeyboard.addRowBlock(blk);
+                const musicKeyboard = logo.musicKeyboardByTurtle?.[turtle] || logo.musicKeyboard;
+                musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
+                musicKeyboard.noteNames.push("hertz");
+                musicKeyboard.octaves.push(arg);
+                musicKeyboard.addRowBlock(blk);
                 // convert hertz to note/octave
                 const note = obj;
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];
@@ -2044,6 +2119,11 @@ function setupPitchBlocks(activity) {
                         tur.singer.movable,
                         null
                     );
+                    if (note === null) {
+                        activity.errorMsg(INVALIDPITCH, blk);
+                        logo.stopTurtle = true;
+                        return;
+                    }
                     if (attr !== NATURAL) {
                         // A sharp on a flat note of the key, or a flat on a sharp
                         // one, cancels it (7♭ in G major is F, not F♯♭).
@@ -2104,7 +2184,19 @@ function setupPitchBlocks(activity) {
 
                 const currentEDO = getCurrentEDO(logo.synth.inTemperament);
 
-                if (arg0 <= currentEDO) {
+                if (!Number.isFinite(arg0)) {
+                    // Non-finite values fit neither interpretation below:
+                    // NaN fails every comparison (so frequencyToPitch(NaN)
+                    // returns [null, null, null] and the null note then
+                    // throws inside processPitch), and -Infinity satisfies
+                    // arg0 <= currentEDO, so it would be misread as a
+                    // movable solfege scale degree. Send all of them to
+                    // the 392 hertz (G4) fallback instead.
+                    activity.errorMsg(INVALIDPITCH, blk);
+                    arg0 = 392; // set default to 392 hertz (G4)
+
+                    [note, octave, cents] = frequencyToPitch(arg0);
+                } else if (arg0 <= currentEDO) {
                     // movable solfege
                     if (arg0 < 1) {
                         activity.errorMsg(INVALIDPITCH, blk);

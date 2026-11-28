@@ -30,15 +30,21 @@ global.frequencyToPitch = jest.fn(freq => {
     if (freq === 440) return ["A", "4"];
     return ["G♯", "4"];
 });
+const mockFrequencyToPitch = global.frequencyToPitch;
 
 global.toFraction = jest.fn(num => [1, 1]);
+global._ = jest.fn(str => str);
+global.plainUnwritableTuplets = require("../utils/musicutils-rhythm").plainUnwritableTuplets;
+
+const { frequencyToPitch: realFrequencyToPitch } = require("../utils/musicutils-pitch");
 
 const {
     getABCHeader,
     processABCNotes,
     saveAbcOutput,
     ACCIDENTAL_MAP,
-    OCTAVE_NOTATION_MAP
+    OCTAVE_NOTATION_MAP,
+    AbcExporter
 } = require("../abc");
 
 describe("getABCHeader", () => {
@@ -97,6 +103,24 @@ describe("processABCNotes - Basic Note Processing", () => {
         processABCNotes(logo, "0");
         // Check if newline exists in the output
         expect(logo.notationNotes["0"]).toMatch(/\n/);
+    });
+
+    it("should format octave 0 and negative octaves (-1 and -2) with correct ABC octave commas and no hyphens", () => {
+        logo.notation.notationStaging["0"] = [
+            [["C0"], 4, 0, null, null, -1, false],
+            [["C-1"], 4, 0, null, null, -1, false],
+            [["D-2"], 4, 0, null, null, -1, false]
+        ];
+        processABCNotes(logo, "0", "C major");
+        expect(logo.notationNotes["0"]).toBe("C,,,,4 C,,,,,4 D,,,,,,4 ");
+    });
+
+    it("should format signed octaves in unkeyed __toABCnote fallback", () => {
+        const mockLogo = { notation: { notationStaging: { 0: [] } } };
+        const exporter = new AbcExporter(mockLogo, "0", "C major", "0");
+        expect(exporter.__toABCnote("C♯♯♯0")).toBe("^^^C,,,,");
+        expect(exporter.__toABCnote("C♯♯♯-1")).toBe("^^^C,,,,,");
+        expect(exporter.__toABCnote("C♯♯♯-2")).toBe("^^^C,,,,,,");
     });
 });
 describe("processABCNotes - Advanced Note Handling", () => {
@@ -445,6 +469,7 @@ describe("saveAbcOutput", () => {
     let activity;
 
     beforeEach(() => {
+        global.frequencyToPitch = mockFrequencyToPitch;
         activity = {
             logo: {
                 notationOutput: "",
@@ -465,15 +490,144 @@ describe("saveAbcOutput", () => {
         };
     });
 
+    afterEach(() => {
+        global.frequencyToPitch = mockFrequencyToPitch;
+    });
+
     it("should generate the correct ABC notation output with key signature replacements", () => {
-        activity.turtles.ithTurtle = () => ({
-            singer: { keySignature: "B ♭ major" }
-        });
+        // A key set before the first note is the key the voice starts in.
+        activity.logo.notation.notationStaging[0].unshift("key", "B♭", "major");
 
         const result = saveAbcOutput(activity);
 
         expect(result).toContain("K:Bb\n");
+        expect(result).not.toContain("[K:");
         expect(result).toContain("b");
+    });
+
+    it("warns when a Hertz pitch has cents that ABC cannot preserve", () => {
+        global.frequencyToPitch = realFrequencyToPitch;
+        activity.logo.notation.notationStaging[0] = [[[445], 4, 0, null, null, -1, false]];
+
+        const result = saveAbcOutput(activity);
+
+        expect(result).toContain(
+            "% WARNING: Music Blocks 445 Hz was rounded to A4 (+19.6 cents); the cents offset was not exported."
+        );
+        expect(activity.logo.abcExportWarnings).toEqual(["445 Hz was rounded to A4 (+19.6 cents)"]);
+    });
+
+    it("warns only when a Hertz pitch is at least half a cent from its ABC note", () => {
+        global.frequencyToPitch = jest.fn(frequency => {
+            const centsByFrequency = {
+                440: 0,
+                441: 0.49,
+                442: -0.49,
+                443: 0.5,
+                444: -0.5
+            };
+            return ["A", 4, centsByFrequency[frequency]];
+        });
+        activity.logo.notation.notationStaging[0] = [440, 441, 442, 443, 444].map(frequency => [
+            [frequency],
+            4,
+            0,
+            null,
+            null,
+            -1,
+            false
+        ]);
+
+        const result = saveAbcOutput(activity);
+
+        expect(result).toContain("443 Hz was rounded to A4 (+0.5 cents)");
+        expect(result).toContain("444 Hz was rounded to A4 (-0.5 cents)");
+        expect(result).not.toContain("440 Hz was rounded");
+        expect(result).not.toContain("441 Hz was rounded");
+        expect(result).not.toContain("442 Hz was rounded");
+    });
+
+    it("does not warn when the score is empty", () => {
+        activity.logo.notation.notationStaging[0] = [];
+
+        saveAbcOutput(activity);
+
+        expect(activity.logo.abcExportWarnings).toEqual([]);
+    });
+
+    const note = pitch => [[pitch], 4, 0, null, null, -1, false];
+
+    it("starts in C major and writes a later key change where it happens", () => {
+        // The turtle's keySignature is the key the run ended in.
+        activity.turtles.ithTurtle = () => ({ singer: { keySignature: "D major" } });
+        activity.logo.notation.notationStaging[0] = [
+            note("C4"),
+            note("F4"),
+            "key",
+            "D",
+            "major",
+            note("F♯4"),
+            note("C5")
+        ];
+
+        const result = saveAbcOutput(activity);
+
+        expect(result).toContain("V:t1\nK:C\nC4 F4 [K:D]F4 =c4 ");
+    });
+
+    it("writes a key change on a barline after the barline", () => {
+        activity.logo.notation.notationStaging[0] = [
+            note("C4"),
+            note("D4"),
+            note("E4"),
+            note("F4"),
+            "key",
+            "D",
+            "major",
+            note("F♯4"),
+            note("A4")
+        ];
+
+        expect(saveAbcOutput(activity)).toContain("K:C\nC4 D4 E4 F4 | [K:D]F4 A4 ");
+    });
+
+    it("writes a return to the starting key", () => {
+        activity.logo.notation.notationStaging[0] = [
+            note("F4"),
+            "key",
+            "D",
+            "major",
+            note("F♯4"),
+            "key",
+            "C",
+            "major",
+            note("F4")
+        ];
+
+        expect(saveAbcOutput(activity)).toContain("K:C\nF4 [K:D]F4 [K:C]F4 ");
+    });
+
+    it("writes each voice's own starting key", () => {
+        activity.logo.notationNotes[1] = "";
+        activity.logo.notation.notationStaging = {
+            0: ["key", "G", "major", note("F♯4"), note("G4")],
+            1: [note("B♭4"), "key", "F", "major", note("B♭4")]
+        };
+
+        const result = saveAbcOutput(activity);
+
+        expect(result).toContain("V:t1\nK:G\nF4 G4 ");
+        expect(result).toContain("V:t2\nK:C\n_B4 [K:F]B4 ");
+    });
+
+    it("returns the voice's starting key from processABCNotes", () => {
+        const logo = {
+            notationNotes: { 0: "" },
+            notation: { notationStaging: { 0: ["key", "E♭", "major", note("E♭4")] } }
+        };
+
+        expect(processABCNotes(logo, "0")).toBe("Eb");
+        expect(logo.notationNotes["0"]).toBe("E4 ");
     });
 });
 
@@ -545,7 +699,9 @@ describe("OCTAVE_NOTATION_MAP", () => {
         expect(OCTAVE_NOTATION_MAP[10]).toBe("'''''");
         expect(OCTAVE_NOTATION_MAP[2]).toBe(",,");
         expect(OCTAVE_NOTATION_MAP[1]).toBe(",,,");
-        expect(OCTAVE_NOTATION_MAP[0]).toBeUndefined();
+        expect(OCTAVE_NOTATION_MAP[0]).toBe(",,,,");
+        expect(OCTAVE_NOTATION_MAP[-1]).toBe(",,,,,");
+        expect(OCTAVE_NOTATION_MAP[-2]).toBe(",,,,,,");
     });
 });
 
@@ -1602,5 +1758,48 @@ describe("processABCNotes - bar lines", () => {
         ];
         const body = exportBody(staged);
         expect(body).toContain("[V:2]\nM:3/4\nc4 d4 e4 |");
+    });
+});
+
+describe("processABCNotes - fractional tuplets", () => {
+    const abcjs = require("abcjs");
+
+    const exportParsed = staged => {
+        const logo = { notationNotes: { 0: "" }, notation: { notationStaging: { 0: staged } } };
+        processABCNotes(logo, "0");
+        const body = logo.notationNotes["0"];
+        const [tune] = abcjs.parseOnly(`${getABCHeader()}K:C\n${body}\n`);
+        expect((tune.warnings || []).map(w => w.replace(/<[^>]*>/g, ""))).toEqual([]);
+        return body;
+    };
+
+    it("writes the rows examples/test-suite.html stages as plain notes", () => {
+        const body = exportParsed([
+            [["G4"], 4, 0, null, 0, -1, false, null],
+            [["G4"], 1, 0, [4.012036108324975, 0.5], 2, -1, false, null],
+            [["A4"], 1, 0, [3.988035892323031, 0.5], 1, -1, false, null]
+        ]);
+        expect(body).not.toContain("(");
+        expect(body).toContain("G8");
+        expect(body).toContain("A8");
+    });
+
+    it("writes a rest for a pitchless fractional tuplet", () => {
+        expect(exportParsed([[[], 1, 0, [4.012036108324975, 0.5], 2, -1, false, null]])).toContain(
+            "z8"
+        );
+    });
+
+    it("writes what is left of a note at a bar line as a plain note", () => {
+        expect(exportParsed([[["A4"], 1, 0, [27, 1], 16, -1, false, null]])).not.toContain("(");
+    });
+
+    it("writes a note of two whole notes as a breve", () => {
+        expect(exportParsed([[["G4"], 1, 0, [1, 0.5], 1, -1, false, null]])).toContain("G32");
+    });
+
+    it("leaves a whole tuplet alone", () => {
+        const triplet = [["G4"], 1, 0, [3, 0.5], 1, -1, false, null];
+        expect(exportParsed([triplet, triplet, triplet])).toContain("(3:2");
     });
 });

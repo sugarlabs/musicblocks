@@ -443,6 +443,11 @@ describe("JSInterface", () => {
                 );
             });
 
+            it("accepts 'floor tom' and 'bass drum'", () => {
+                expect(JSInterface.validateArgs("testMethod", ["floor tom"])[0]).toBe("floor tom");
+                expect(JSInterface.validateArgs("testMethod", ["bass drum"])[0]).toBe("bass drum");
+            });
+
             it("resets invalid drum to kick drum and logs", () => {
                 const result = JSInterface.validateArgs("testMethod", ["bongo"]);
                 expect(result[0]).toBe("kick drum");

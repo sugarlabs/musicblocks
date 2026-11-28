@@ -460,6 +460,22 @@ describe("ActionBlocks", () => {
             expect(block.formDefn.argTypes).toEqual(["anyin"]);
         });
 
+        test("ReturnBlock flow pushes value and returns halt signal", () => {
+            const block = getBlock("return");
+            logo.returns = { 0: [] };
+            const res = block.flow([42], logo, 0);
+            expect(logo.returns[0]).toEqual([42]);
+            expect(res).toEqual([null, null, true]);
+        });
+
+        test("ReturnBlock flow returns halt signal when args empty", () => {
+            const block = getBlock("return");
+            logo.returns = { 0: [] };
+            const res = block.flow([], logo, 0);
+            expect(logo.returns[0]).toEqual([]);
+            expect(res).toEqual([null, null, true]);
+        });
+
         test("CalcBlock has anyout type", () => {
             const block = getBlock("calc");
             expect(block.formDefn.outType).toBe("anyout");
@@ -844,19 +860,22 @@ describe("ActionBlocks", () => {
         });
     });
     describe("NamedCalcBlock - arg (line 334-352)", () => {
-        test("returns shifted result when action exists", () => {
+        test("returns popped result when action exists", () => {
             const block = activity.registeredBlocks["namedcalc"];
             activity.blocks.blockList[55] = { privateData: "myCalc" };
             logo.actions["myCalc"] = [];
-            logo.runFromBlockNow = jest.fn();
+            logo.runFromBlockNow = jest.fn(() => {
+                logo.returns[0].push(88);
+            });
             logo.returns = { 0: [42] };
-            logo.returns[0] = [88];
             activity.turtles.getTurtle = jest.fn(() => ({
                 running: false,
                 queue: []
             }));
             const result = block.arg(logo, 0, 55, []);
+            expect(logo.runFromBlockNow).toHaveBeenCalled();
             expect(result).toBe(88);
+            expect(logo.returns[0]).toEqual([42]);
         });
 
         test("calls errorMsg when action not found", () => {

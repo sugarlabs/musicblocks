@@ -73,10 +73,14 @@ function setupVolumeBlocks(activity) {
          * @returns {number} The synth volume.
          */
         arg(logo, turtle, blk, receivedArg) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId !== null &&
+                parentId !== undefined &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "synth volume"]);
             } else {
@@ -146,10 +150,14 @@ function setupVolumeBlocks(activity) {
          * @returns {number} The master volume.
          */
         arg(logo, turtle, blk) {
+            const connections = activity.blocks.blockList[blk]?.connections;
+            const parentId = connections?.[0];
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                parentId !== null &&
+                parentId !== undefined &&
+                parentId in activity.blocks.blockList &&
+                activity.blocks.blockList[parentId]?.name === "print"
             ) {
                 logo.statusFields.push([blk, "volume"]);
             } else {

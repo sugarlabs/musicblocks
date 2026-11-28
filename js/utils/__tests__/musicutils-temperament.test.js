@@ -198,6 +198,55 @@ describe("musicutils-temperament", () => {
         });
     });
 
+    describe("generateNoteNames with an invalid EDO", () => {
+        it("falls back to the 12-EDO names instead of hanging", () => {
+            for (const edo of [Infinity, -Infinity, NaN, 12.5, 0, -3, 10000, "19"]) {
+                expect(temperament.generateNoteNames(edo)).toEqual(temperament.SHARP_NAMES);
+                expect(temperament.generateNoteNames(edo)).toHaveLength(12);
+            }
+        });
+
+        it("does not cache the fallback under the invalid key", () => {
+            temperament.generateNoteNames(Infinity);
+            expect(temperament.EDO_NOTE_NAMES[Infinity]).toBeUndefined();
+        });
+
+        it("keeps ordinary EDO tables unchanged", () => {
+            expect(temperament.generateNoteNames(12)).toHaveLength(12);
+            expect(temperament.generateNoteNames(19)).toHaveLength(19);
+            expect(temperament.generateNoteNames(5)).toEqual(["C", "D", "E", "G", "A"]);
+        });
+
+        it("keeps delegates returning promptly for a non-finite EDO", () => {
+            expect(temperament.getEdoNoteNamePosition("C", Infinity)).toBe(0);
+            expect(temperament.getEdoNoteNamePosition("C♯", Infinity)).toBe(1);
+            expect(temperament.getEdoNoteNamePosition("C4", Infinity)).toBe(-1);
+        });
+
+        it("normalises an invalid EDO to 12 and leaves valid ones alone", () => {
+            for (const edo of [Infinity, -Infinity, NaN, 12.5, 0, -3, 257, "19", undefined]) {
+                expect(temperament.normalizeEDO(edo)).toBe(12);
+            }
+            for (const edo of [1, 5, 12, 19, 256]) {
+                expect(temperament.normalizeEDO(edo)).toBe(edo);
+            }
+        });
+
+        it("resolves flat spellings through the 12-EDO fallback for an invalid EDO", () => {
+            // D♭ is not in the sharp name table, so this only resolves
+            // when the enharmonic/proportional fallbacks also see the
+            // normalised 12; with the raw bad EDO it returned NaN.
+            for (const edo of [Infinity, NaN, 0, 12.5, 257]) {
+                expect(temperament.getEdoNoteNamePosition("D♭", edo)).toBe(1);
+                expect(temperament.getEdoNoteNamePosition("D♭", edo)).toBe(
+                    temperament.getEdoNoteNamePosition("D♭", 12)
+                );
+            }
+            // A valid non-12 EDO keeps its own table.
+            expect(temperament.getEdoNoteNamePosition("D♭", 19)).toBe(2);
+        });
+    });
+
     describe("what musicutils.js still exports", () => {
         it("re-exports the same tables and functions", () => {
             for (const name of [

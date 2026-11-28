@@ -14,6 +14,19 @@ describe("ai-markdown", () => {
         expect(renderChatMarkdown("1. one\n2. two")).toBe("<ol><li>one</li><li>two</li></ol>");
     });
 
+    it("keeps step numbers when a numbered list is split by blank lines or bullets", () => {
+        expect(renderChatMarkdown("1. one\n\n2. two")).toBe(
+            '<ol><li>one</li></ol><ol start="2"><li>two</li></ol>'
+        );
+        expect(renderChatMarkdown("1. one\n- detail\n2. two")).toContain('<ol start="2">');
+    });
+
+    it("keeps a list that starts at zero", () => {
+        expect(renderChatMarkdown("0. zero\n1. one")).toBe(
+            '<ol start="0"><li>zero</li><li>one</li></ol>'
+        );
+    });
+
     it("turns headings into bold lines", () => {
         expect(renderChatMarkdown("## What you made")).toBe(
             '<p class="ai-chat-heading"><strong>What you made</strong></p>'
@@ -38,6 +51,47 @@ describe("ai-markdown", () => {
             '<a href="https://musicblocks.sugarlabs.org" target="_blank"'
         );
         expect(renderChatMarkdown("[bad](javascript:alert(1))")).not.toContain("<a");
+    });
+
+    it("keeps asterisks inside a link address as written", () => {
+        expect(renderChatMarkdown("[x](https://example.com/a**b**c)")).toContain(
+            '<a href="https://example.com/a**b**c" target="_blank"'
+        );
+        const html = renderChatMarkdown(
+            "[old copies](https://web.archive.org/web/*/musicblocks.sugarlabs.org) and *try* it"
+        );
+        expect(html).toContain('href="https://web.archive.org/web/*/musicblocks.sugarlabs.org"');
+        expect(html).toContain("and <em>try</em> it");
+    });
+
+    it("keeps backticks inside a link address and still links it", () => {
+        const html = renderChatMarkdown("see [x](https://a.com/`b`) and `code`");
+        expect(html).toContain('<a href="https://a.com/`b`" target="_blank"');
+        expect(html).toContain("<code>code</code>");
+        expect(html).not.toContain(String.fromCharCode(0xe000));
+    });
+
+    it("leaves a link inside a code span as code and formats code in a link label", () => {
+        expect(renderChatMarkdown("`[x](https://a.com)`")).toBe(
+            "<p><code>[x](https://a.com)</code></p>"
+        );
+        expect(renderChatMarkdown("[`fn`](https://a.com/x)")).toContain(
+            '<a href="https://a.com/x" target="_blank" rel="noopener noreferrer"><code>fn</code></a>'
+        );
+    });
+
+    it("still formats bold and italic text inside a link label", () => {
+        const html = renderChatMarkdown("[**guide** and *tips*](https://example.com/a)");
+        expect(html).toContain('<a href="https://example.com/a" target="_blank"');
+        expect(html).toContain("<strong>guide</strong> and <em>tips</em></a>");
+    });
+
+    it("keeps a link inside bold and italic text", () => {
+        const link = '<a href="https://a.com" target="_blank" rel="noopener noreferrer">guide</a>';
+        expect(renderChatMarkdown("**[guide](https://a.com)**")).toBe(
+            `<p><strong>${link}</strong></p>`
+        );
+        expect(renderChatMarkdown("*[guide](https://a.com)*")).toBe(`<p><em>${link}</em></p>`);
     });
 
     it("keeps a reply that contains the code span marker readable", () => {

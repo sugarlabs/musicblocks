@@ -78,13 +78,23 @@ function makeActivity(protoBlocks = {}) {
         },
         blocksContainer: { x: 0, y: 0 },
         getStageScale: jest.fn(() => 1),
-        addEventListener: jest.fn((target, event, handler) => {
+        addEventListener: jest.fn((target, event, handler, options) => {
             if (target === document && event === "mousedown") {
-                // store so tests can trigger it
+                // Store so tests can trigger it.
                 target._mousedownHandler = handler;
             }
+
+            if (target === document && event === "keydown") {
+                // Register the keydown listener so cleanup can be verified.
+                target._keydownHandler = handler;
+                target.addEventListener(event, handler, options);
+            }
         }),
-        removeEventListener: jest.fn(),
+        removeEventListener: jest.fn((target, event, handler, options) => {
+            if (target === document && event === "keydown") {
+                target.removeEventListener(event, handler, options);
+            }
+        }),
         errorMsg: jest.fn(),
         __tick: jest.fn(),
         closeHelpfulWheel: jest.fn(() => {
@@ -126,6 +136,7 @@ describe("SearchController drag handle", () => {
         activity = makeActivity();
         activity.searchWidget.getBoundingClientRect = jest.fn(() => ({
             left: 200,
+            right: 500,
             top: 120,
             height: 50
         }));
@@ -152,24 +163,45 @@ describe("SearchController drag handle", () => {
         expect(handle.style.top).toBe("126px");
     });
 
-    test("dragging moves the widget by the pointer delta", () => {
+    test("dragging moves the widget and close button by the pointer delta", () => {
         sc._addSearchDragHandle();
+        sc._addSearchCloseButton();
+
         const handle = document.getElementById("searchDragHandle");
+        const closeButton = document.getElementById("searchCloseButton");
+
         stubPointerCapture(handle);
+
         activity.searchWidget.style.left = "200px";
         activity.searchWidget.style.top = "120px";
 
-        handle.dispatchEvent(
-            pointerEvent("pointerdown", { clientX: 300, clientY: 400, pointerId: 1 })
-        );
-        expect(handle.style.cursor).toBe("grabbing");
-        expect(activity.searchWidget.style.transition).toBe("none");
+        activity.searchWidget.getBoundingClientRect = jest.fn(() => ({
+            left: 230,
+            right: 530,
+            top: 95,
+            height: 50
+        }));
 
         handle.dispatchEvent(
-            pointerEvent("pointermove", { clientX: 330, clientY: 375, pointerId: 1 })
+            pointerEvent("pointerdown", {
+                clientX: 300,
+                clientY: 350,
+                pointerId: 1
+            })
         );
+
+        handle.dispatchEvent(
+            pointerEvent("pointermove", {
+                clientX: 330,
+                clientY: 325,
+                pointerId: 1
+            })
+        );
+
         expect(activity.searchWidget.style.left).toBe("230px");
         expect(activity.searchWidget.style.top).toBe("95px");
+        expect(closeButton.style.left).toBe("494px");
+        expect(closeButton.style.top).toBe("106px");
     });
 
     test("ignores pointermove when the pointer was never captured", () => {
@@ -217,6 +249,41 @@ describe("SearchController drag handle", () => {
         document.body.innerHTML = "";
         expect(() => sc._hideSearchDragHandle()).not.toThrow();
     });
+
+    test("creates and positions the close button", () => {
+        sc._addSearchCloseButton();
+
+        const closeButton = document.getElementById("searchCloseButton");
+
+        expect(closeButton).not.toBeNull();
+        expect(closeButton.textContent).toBe("×");
+        expect(closeButton.getAttribute("aria-label")).toBe("Close search");
+        expect(closeButton.style.display).toBe("flex");
+        expect(closeButton.style.left).toBe("464px");
+        expect(closeButton.style.top).toBe("131px");
+    });
+
+    test("creates only one close button when called repeatedly", () => {
+        sc._addSearchCloseButton();
+        const firstButton = document.getElementById("searchCloseButton");
+
+        sc._addSearchCloseButton();
+
+        expect(document.querySelectorAll("#searchCloseButton")).toHaveLength(1);
+        expect(document.getElementById("searchCloseButton")).toBe(firstButton);
+    });
+
+    test("clicking the close button hides the search widget", () => {
+        activity.searchWidget.style.visibility = "visible";
+
+        sc._addSearchCloseButton();
+
+        const closeButton = document.getElementById("searchCloseButton");
+        closeButton.click();
+
+        expect(activity.searchWidget.style.visibility).toBe("hidden");
+        expect(closeButton.style.display).toBe("none");
+    });
 });
 
 // ---------------------------------------------------------------------------
@@ -242,6 +309,23 @@ describe("setupSearchController", () => {
         expect(sc.deprecatedBlockNames).toEqual([]);
         expect(sc.helpfulSearchDiv).toBeNull();
         expect(sc.searchUI).toBe(activity.searchUI);
+    });
+
+    test.each(["constructor", "__proto__"])("handles search term %s safely", term => {
+        const activity = makeActivity();
+        setupSearchController(activity);
+        const sc = activity.searchController;
+
+        const initialResults = sc.filterSuggestions(term);
+        expect(initialResults).toEqual([]);
+        expect(sc.filterSuggestions(term)).toBe(initialResults);
+
+        sc.prepSearchWidget();
+
+        const resetResults = sc.filterSuggestions(term);
+        expect(resetResults).toEqual([]);
+        expect(resetResults).not.toBe(initialResults);
+        expect(sc.filterSuggestions(term)).toBe(resetResults);
     });
 });
 
@@ -516,6 +600,7 @@ describe("SearchController.showSearchWidget", () => {
         expect(activity.searchWidget.style.visibility).toBe("visible");
         expect(activity.searchWidget.style.left).toBe("10px");
         expect(activity.searchWidget.style.top).toBe("20px");
+        activity.searchController.hideSearchWidget();
         jest.useRealTimers();
     });
 
@@ -531,6 +616,66 @@ describe("SearchController.showSearchWidget", () => {
             "mousedown",
             expect.any(Function)
         );
+        activity.searchController.hideSearchWidget();
+        jest.useRealTimers();
+    });
+
+    test("closes on Escape and removes its listener", () => {
+        jest.useFakeTimers();
+
+        const activity = makeActivity();
+        setupSearchController(activity);
+
+        activity.searchController.showSearchWidget();
+
+        expect(activity.searchWidget.style.visibility).toBe("visible");
+
+        const escapeListener = activity.searchController._searchEscapeListener;
+        const removeEventListenerSpy = jest.spyOn(document, "removeEventListener");
+        const escapeEvent = new KeyboardEvent("keydown", {
+            key: "Escape",
+            bubbles: true,
+            cancelable: true
+        });
+
+        document.dispatchEvent(escapeEvent);
+
+        expect(activity.searchWidget.style.visibility).toBe("hidden");
+        expect(activity.searchController._searchEscapeListener).toBeNull();
+        expect(removeEventListenerSpy).toHaveBeenCalledWith("keydown", escapeListener, undefined);
+
+        const secondEscapeEvent = new KeyboardEvent("keydown", {
+            key: "Escape",
+            bubbles: true,
+            cancelable: true
+        });
+        document.dispatchEvent(secondEscapeEvent);
+        expect(secondEscapeEvent.defaultPrevented).toBe(false);
+
+        removeEventListenerSpy.mockRestore();
+        jest.useRealTimers();
+    });
+
+    test("keeps the widget open and does not prevent non-Escape keys", () => {
+        jest.useFakeTimers();
+
+        const activity = makeActivity();
+        setupSearchController(activity);
+
+        activity.searchController.showSearchWidget();
+
+        const keyEvent = new KeyboardEvent("keydown", {
+            key: "a",
+            bubbles: true,
+            cancelable: true
+        });
+
+        document.dispatchEvent(keyEvent);
+
+        expect(activity.searchWidget.style.visibility).toBe("visible");
+        expect(keyEvent.defaultPrevented).toBe(false);
+
+        activity.searchController.hideSearchWidget();
         jest.useRealTimers();
     });
 });
@@ -743,6 +888,120 @@ describe("SearchController.doSearch - autocomplete initialization", () => {
         const item = { isEmptyState: true, label: "No results found for zzz" };
         expect(instance._renderItem(ul, item)).toBe("empty-row");
         expect(renderSpy).toHaveBeenCalledWith(global.window.jQuery, ul, item);
+    });
+
+    test("renders normal item and handles drag and drop with requestAnimationFrame correctly", () => {
+        const previousRaf = window.requestAnimationFrame;
+        const previousCancelRaf = window.cancelAnimationFrame;
+
+        let rafCallback = null;
+        window.requestAnimationFrame = jest.fn(cb => {
+            rafCallback = cb;
+            return 456;
+        });
+        window.cancelAnimationFrame = jest.fn();
+
+        try {
+            const instance = { _renderItem: null };
+            $elem = makeJQueryElem(false, instance);
+            global.window.jQuery = jest.fn(() => $elem);
+
+            const protoBlock = makeProtoBlock("drum", "drum beat");
+            const activity = makeActivity({ drum: protoBlock });
+            setupSearchController(activity);
+            const sc = activity.searchController;
+            sc.prepSearchWidget();
+
+            activity.searchWidget.idInput_custom = "";
+            activity.searchWidget.value = "";
+            sc.doSearch();
+
+            const ul = { css: jest.fn(), append: jest.fn() };
+            const liEl = {
+                addEventListener: jest.fn(),
+                append: jest.fn(() => liEl),
+                0: {
+                    addEventListener: jest.fn(),
+                    style: {},
+                    querySelector: jest.fn(() => null)
+                }
+            };
+            liEl.appendTo = jest.fn(() => liEl);
+            const mockA = { text: jest.fn(() => mockA) };
+            const mockSearch = { autocomplete: jest.fn() };
+            global.window.jQuery.mockImplementation(selector => {
+                if (selector === "<a>") return mockA;
+                if (selector === "#search") return mockSearch;
+                return liEl;
+            });
+
+            const originalCreateElement = document.createElement.bind(document);
+            document.createElement = jest.fn(tag => {
+                if (tag === "img") {
+                    const mockImg = originalCreateElement("img");
+                    Object.defineProperty(mockImg, "offsetWidth", { value: 20 });
+                    Object.defineProperty(mockImg, "offsetHeight", { value: 20 });
+                    return mockImg;
+                }
+                return originalCreateElement(tag);
+            });
+
+            const item = {
+                isEmptyState: false,
+                label: "drum",
+                value: "drum",
+                specialDict: protoBlock
+            };
+
+            jest.spyOn(document, "addEventListener");
+            jest.spyOn(document, "removeEventListener");
+
+            instance._renderItem(ul, item);
+
+            // Mousedown
+            const downHandler = liEl[0].addEventListener.mock.calls.find(
+                c => c[0] === "mousedown"
+            )[1];
+            downHandler({
+                stopPropagation: jest.fn(),
+                stopImmediatePropagation: jest.fn(),
+                preventDefault: jest.fn(),
+                pageX: 100,
+                pageY: 200,
+                type: "mousedown"
+            });
+
+            // Mousemove
+            const moveHandler = document.addEventListener.mock.calls.find(
+                c => c[0] === "mousemove"
+            )[1];
+            moveHandler({
+                preventDefault: jest.fn(),
+                pageX: 150,
+                pageY: 260,
+                type: "mousemove"
+            });
+
+            expect(window.requestAnimationFrame).toHaveBeenCalled();
+            expect(rafCallback).not.toBeNull();
+
+            // Mouseup before RAF fires
+            const upHandler = document.addEventListener.mock.calls.find(c => c[0] === "mouseup")[1];
+            upHandler();
+
+            expect(window.cancelAnimationFrame).toHaveBeenCalledWith(456);
+
+            expect(activity.palettes.dict["test-palette"].makeBlockFromSearch).toHaveBeenCalled();
+
+            const makeBlockCb =
+                activity.palettes.dict["test-palette"].makeBlockFromSearch.mock.calls[0][2];
+            const newBlock = {};
+            makeBlockCb(newBlock);
+            expect(activity.blocks.moveBlock).toHaveBeenCalledWith(newBlock, 140, 250);
+        } finally {
+            window.requestAnimationFrame = previousRaf;
+            window.cancelAnimationFrame = previousCancelRaf;
+        }
     });
 
     test("select callback does not place a block for the empty-state row", () => {

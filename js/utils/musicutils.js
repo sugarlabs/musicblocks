@@ -147,6 +147,7 @@ if (typeof module !== "undefined" && module.exports) {
         reducedFraction,
         calcNoteValueToDisplay,
         durationToNoteValue,
+        plainUnwritableTuplets,
         convertFactor,
         getMeasurePosition,
         getMeterAnchor,
@@ -181,7 +182,6 @@ if (typeof module !== "undefined" && module.exports) {
         (typeof require !== "undefined" ? require("./musicutils-modecore") : {});
     var {
         MUSICALMODES,
-        customMode,
         getModeNumbers,
         getNonEDOModeSteps,
         getArticulation,
@@ -312,6 +312,7 @@ if (typeof module !== "undefined" && module.exports) {
         reducedFraction,
         toFraction,
         durationToNoteValue,
+        plainUnwritableTuplets,
         calcNoteValueToDisplay,
         noteToPitchOctave,
         pitchToFrequency,
@@ -351,7 +352,6 @@ if (typeof module !== "undefined" && module.exports) {
         addTemperamentToDictionary,
         DEFAULTINVERT,
         DEFAULTMODE,
-        customMode,
         getInvertMode,
         getIntervalNumber,
         getIntervalDirection,

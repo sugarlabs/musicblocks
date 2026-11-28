@@ -71,10 +71,10 @@ const createMockWidgetWindow = () => {
                 global.window.widgetWindows.focused = mockWindow;
             }
         }),
-        addRangeSlider: jest.fn().mockImplementation(() => ({
+        addRangeSlider: jest.fn().mockImplementation(value => ({
             addEventListener: jest.fn(),
             style: {},
-            value: "440",
+            value: String(value),
             min: "110",
             max: "880",
             dispatchEvent: jest.fn()
@@ -109,6 +109,7 @@ describe("PitchSlider Widget", () => {
             windowFor: jest.fn().mockImplementation(() => createMockWidgetWindow())
         };
         global.window.btoa = jest.fn(str => Buffer.from(str).toString("base64"));
+        global.window.requestAnimationFrame = jest.fn(cb => cb());
 
         if (!global.document) global.document = {};
         global.document.activeElement = null;
@@ -141,6 +142,39 @@ describe("PitchSlider Widget", () => {
         test("ICONSIZE is 32", () => {
             expect(PitchSlider.ICONSIZE).toBe(32);
         });
+
+        test("defines MIN_FREQUENCY, MAX_FREQUENCY, and DEFAULT_FREQUENCY", () => {
+            expect(PitchSlider.MIN_FREQUENCY).toBe(27.5);
+            expect(PitchSlider.MAX_FREQUENCY).toBe(16744.04);
+            expect(PitchSlider.DEFAULT_FREQUENCY).toBe(392);
+        });
+    });
+
+    describe("Frequency Normalization", () => {
+        test("returns valid frequency unchanged", () => {
+            expect(PitchSlider.normalizeFrequency(440)).toBe(440);
+        });
+
+        test("accepts numeric strings", () => {
+            expect(PitchSlider.normalizeFrequency("440")).toBe(440);
+        });
+
+        test("uses default for invalid inputs", () => {
+            expect(PitchSlider.normalizeFrequency("440Hz")).toBe(392);
+            expect(PitchSlider.normalizeFrequency(0)).toBe(392);
+            expect(PitchSlider.normalizeFrequency(-100)).toBe(392);
+            expect(PitchSlider.normalizeFrequency(NaN)).toBe(392);
+            expect(PitchSlider.normalizeFrequency(Infinity)).toBe(392);
+            expect(PitchSlider.normalizeFrequency(null)).toBe(392);
+            expect(PitchSlider.normalizeFrequency(true)).toBe(392);
+            expect(PitchSlider.normalizeFrequency(false)).toBe(392);
+            expect(PitchSlider.normalizeFrequency({})).toBe(392);
+        });
+
+        test("clamps valid positive frequencies to supported limits", () => {
+            expect(PitchSlider.normalizeFrequency(20)).toBe(27.5);
+            expect(PitchSlider.normalizeFrequency(20000)).toBe(16744.04);
+        });
     });
 
     describe("Constructor", () => {
@@ -170,11 +204,95 @@ describe("PitchSlider Widget", () => {
     });
 
     describe("Initialization (init)", () => {
-        test("returns early if slider window already open", () => {
-            global.window.widgetWindows.openWindows["slider"] = true;
+        test("rerunning releases the previous controls and rebuilds from block input", () => {
+            slider.frequencies = [392, 784];
             slider.init(activityMock);
-            expect(Tone.AMSynth).not.toHaveBeenCalled();
-            global.window.widgetWindows.openWindows = {}; // Reset
+            const previousWindow = slider.widgetWindow;
+            const previousHandler = slider._keyHandler;
+            global.window.widgetWindows.openWindows.slider = previousWindow;
+            slider.sliders[0].value = "440";
+            slider.sliders[0].oninput();
+            slider.activeSlider = "1";
+
+            // WidgetBlocks collects fresh block inputs before calling init again.
+            slider.frequencies = [392];
+            slider.init(activityMock);
+
+            expect(previousWindow.destroy).toHaveBeenCalledTimes(1);
+            expect(mockOscillator.dispose).toHaveBeenCalledTimes(2);
+            expect(document.removeEventListener).toHaveBeenCalledWith(
+                "keydown",
+                previousHandler,
+                true
+            );
+            expect(activityMock.logo.pitchSlider).toBe(slider);
+            expect(Object.keys(slider.sliders)).toEqual(["0"]);
+            expect(slider.activeSlider).toBe("0");
+            expect(slider.initialFrequencies).toEqual([392]);
+            expect(Number(slider.sliders[0].value)).toBe(392);
+            expect(slider.widgetWindow.addRangeSlider).toHaveBeenCalledWith(
+                392,
+                expect.anything(),
+                196,
+                784,
+                "pitchSlider"
+            );
+            slider.widgetWindow
+                .getButtons()
+                .find(button => button.tip === "Save")
+                .onclick();
+            expect(activityMock.blocks.loadNewBlocks.mock.calls[0][0][6][1]).toEqual([
+                "number",
+                { value: 392 }
+            ]);
+        });
+
+        test("preserves newly supplied frequency when reinitializing an open slider", () => {
+            slider.frequencies = [440];
+            slider.init(activityMock);
+
+            const previousWindow = slider.widgetWindow;
+
+            global.window.widgetWindows.openWindows.slider = previousWindow;
+            const oncloseSpy = jest.spyOn(previousWindow, "onclose");
+
+            // Simulate PitchActions supplying a new frequency.
+            slider.frequencies = [];
+            slider.frequency = 660;
+
+            slider.init(activityMock);
+
+            expect(slider.frequencies).toEqual([660]);
+            expect(slider.initialFrequencies).toEqual([660]);
+            expect(Number(slider.sliders[0].value)).toBe(660);
+
+            expect(oncloseSpy).toHaveBeenCalledTimes(1);
+            expect(previousWindow.destroy).toHaveBeenCalledTimes(1);
+            expect(activityMock.logo.pitchSlider).toBe(slider);
+        });
+
+        test("rerunning uses changed block input for Reset and Save", () => {
+            slider.frequencies = [392];
+            slider.init(activityMock);
+            global.window.widgetWindows.openWindows.slider = slider.widgetWindow;
+            slider.frequencies = [523.25];
+            slider.init(activityMock);
+
+            slider.sliders[0].value = "600";
+            slider.sliders[0].oninput();
+            slider.widgetWindow
+                .getButtons()
+                .find(button => button.tip === "Reset")
+                .onclick();
+            expect(slider.frequencies).toEqual([523.25]);
+            slider.widgetWindow
+                .getButtons()
+                .find(button => button.tip === "Save")
+                .onclick();
+            expect(activityMock.blocks.loadNewBlocks.mock.calls[0][0][6][1]).toEqual([
+                "number",
+                { value: 523.25 }
+            ]);
         });
 
         test("initializes frequencies to [392] if not set", () => {
@@ -186,6 +304,58 @@ describe("PitchSlider Widget", () => {
             slider.frequencies = [440, 880];
             slider.init(activityMock);
             expect(slider.frequencies).toEqual([440, 880]);
+        });
+
+        test("uses this.frequency when frequencies array is empty and clears it", () => {
+            slider.frequency = 660;
+            slider.frequencies = [];
+            slider.init(activityMock);
+            expect(slider.frequencies).toEqual([660]);
+            expect(slider.frequency).toBeNull();
+        });
+
+        test("normalizes string frequencies to numeric values", () => {
+            slider.frequencies = ["440", "880"];
+            slider.init(activityMock);
+            expect(slider.frequencies).toEqual([440, 880]);
+        });
+
+        test("normalizes invalid and out-of-range frequencies", () => {
+            slider.frequencies = [0, -100, 20, 500, 20000, NaN, "invalid"];
+            slider.init(activityMock);
+            expect(slider.frequencies).toEqual([392, 392, 27.5, 500, 16744.04, 392, 392]);
+        });
+
+        test("clamps this.frequency when frequencies array is empty", () => {
+            slider.frequency = 10;
+            slider.frequencies = [];
+            slider.init(activityMock);
+            expect(slider.frequencies).toEqual([27.5]);
+
+            slider.frequency = 25000;
+            slider.frequencies = [];
+            slider.init(activityMock);
+            expect(slider.frequencies).toEqual([16744.04]);
+        });
+
+        test("handles missing window.widgetWindows or openWindows safely", () => {
+            const savedWidgetWindows = global.window.widgetWindows;
+            global.window.widgetWindows = {
+                windowFor: jest.fn().mockImplementation(() => createMockWidgetWindow())
+            };
+            expect(() => slider.init(activityMock)).not.toThrow();
+            global.window.widgetWindows = savedWidgetWindows;
+        });
+
+        test("does not create extra sliders for non-numeric Array.prototype properties", () => {
+            Array.prototype.customProp = "custom";
+            try {
+                slider.frequencies = [440];
+                slider.init(activityMock);
+                expect(Object.keys(slider.sliders)).toEqual(["0"]);
+            } finally {
+                delete Array.prototype.customProp;
+            }
         });
 
         test("creates one oscillator per frequency", () => {
@@ -312,6 +482,12 @@ describe("PitchSlider Widget", () => {
         test("clears activity.logo.pitchSlider reference", () => {
             slider.widgetWindow.onclose();
             expect(activityMock.logo.pitchSlider).toBeNull();
+        });
+
+        test("clears frequency property", () => {
+            slider.frequency = 440;
+            slider.widgetWindow.onclose();
+            expect(slider.frequency).toBeNull();
         });
 
         test("destroys widget window", () => {
@@ -711,6 +887,52 @@ describe("PitchSlider Widget", () => {
             expect(slider.activeSlider).toBe("0");
         });
 
+        test("focus event sets activeSlider to slider id", () => {
+            const focusCall = slider.sliders[0].addEventListener.mock.calls.find(
+                call => call[0] === "focus"
+            );
+            const focusHandler = focusCall[1];
+            slider.activeSlider = null;
+            focusHandler();
+            expect(slider.activeSlider).toBe("0");
+        });
+
+        test("Reset frequency button falls back to DEFAULT_FREQUENCY when initialFrequencies is missing", () => {
+            slider.init(activityMock);
+            slider.initialFrequencies = null;
+            const resetBtn = slider.widgetWindow.getButtons().find(b => b.tip === "Reset");
+            resetBtn.onclick();
+            expect(slider.frequencies[0]).toBe(PitchSlider.DEFAULT_FREQUENCY);
+        });
+
+        test("handles widgetWindow without takeFocus gracefully", () => {
+            const mockWindow = createMockWidgetWindow();
+            delete mockWindow.takeFocus;
+            global.window.widgetWindows.windowFor = jest.fn(() => mockWindow);
+            expect(() => slider.init(activityMock)).not.toThrow();
+
+            const pointerdownHandler = slider.sliders[0].addEventListener.mock.calls.find(
+                call => call[0] === "pointerdown"
+            )[1];
+            expect(() => pointerdownHandler()).not.toThrow();
+
+            const mousedownHandler = slider.sliders[0].addEventListener.mock.calls.find(
+                call => call[0] === "mousedown"
+            )[1];
+            expect(() => mousedownHandler()).not.toThrow();
+
+            const focusHandler = slider.sliders[0].addEventListener.mock.calls.find(
+                call => call[0] === "focus"
+            )[1];
+            expect(() => focusHandler()).not.toThrow();
+        });
+
+        test("widgetWindow.onclose handles already-cleared _keyHandler", () => {
+            slider.init(activityMock);
+            slider._keyHandler = null;
+            expect(() => slider.widgetWindow.onclose()).not.toThrow();
+        });
+
         test("Shift + ArrowUp keydown steps frequency up by an octave", () => {
             slider.sliders[0].value = "440";
             slider.sliders[0].min = "220";
@@ -819,53 +1041,56 @@ describe("PitchSlider Widget", () => {
             expect(activityMock.refreshCanvas).toHaveBeenCalled();
         });
 
-        test("creates 5-element block stack", () => {
+        test("creates 8-element block stack", () => {
             slider._save(440);
             const stack = activityMock.blocks.loadNewBlocks.mock.calls[0][0];
 
-            expect(stack).toHaveLength(5);
+            expect(stack).toHaveLength(8);
         });
 
-        test("first block is note block", () => {
+        test("first block is newnote clamp block with correct connections", () => {
             slider._save(440);
             const stack = activityMock.blocks.loadNewBlocks.mock.calls[0][0];
 
-            expect(stack[0][1]).toBe("note");
+            expect(stack[0][1]).toBe("newnote");
+            expect(stack[0][4]).toEqual([null, 1, 4, 7]);
         });
 
-        test("second block is number 8 (eighth note)", () => {
+        test("second block is divide duration block with 1/4 quarter note", () => {
             slider._save(440);
             const stack = activityMock.blocks.loadNewBlocks.mock.calls[0][0];
 
-            expect(stack[1][1]).toEqual(["number", { value: 8 }]);
+            expect(stack[1][1]).toBe("divide");
+            expect(stack[1][4]).toEqual([0, 2, 3]);
+            expect(stack[2][1]).toEqual(["number", { value: 1 }]);
+            expect(stack[3][1]).toEqual(["number", { value: 4 }]);
         });
 
-        test("third block is hertz block", () => {
+        test("interior flow connects vspace to hertz block with frequency", () => {
             slider._save(440);
             const stack = activityMock.blocks.loadNewBlocks.mock.calls[0][0];
 
-            expect(stack[2][1]).toBe("hertz");
+            expect(stack[4][1]).toBe("vspace");
+            expect(stack[4][4]).toEqual([0, 5]);
+            expect(stack[5][1]).toBe("hertz");
+            expect(stack[5][4]).toEqual([4, 6, null]);
+            expect(stack[6][1]).toEqual(["number", { value: 440 }]);
+            expect(stack[6][4]).toEqual([5]);
         });
 
-        test("fourth block contains frequency value", () => {
+        test("closing block terminates newnote clamp with hidden block", () => {
             slider._save(440);
             const stack = activityMock.blocks.loadNewBlocks.mock.calls[0][0];
 
-            expect(stack[3][1]).toEqual(["number", { value: 440 }]);
-        });
-
-        test("fifth block is hidden block", () => {
-            slider._save(440);
-            const stack = activityMock.blocks.loadNewBlocks.mock.calls[0][0];
-
-            expect(stack[4][1]).toBe("hidden");
+            expect(stack[7][1]).toBe("hidden");
+            expect(stack[7][4]).toEqual([0, null]);
         });
 
         test("uses different frequency values correctly", () => {
             slider._save(523.25);
             const stack = activityMock.blocks.loadNewBlocks.mock.calls[0][0];
 
-            expect(stack[3][1]).toEqual(["number", { value: 523.25 }]);
+            expect(stack[6][1]).toEqual(["number", { value: 523.25 }]);
         });
 
         test("increments _delta by 21 for each save", () => {
@@ -893,12 +1118,22 @@ describe("PitchSlider Widget", () => {
             slider._save(440);
             const stack = activityMock.blocks.loadNewBlocks.mock.calls[0][0];
 
-            // Note block: [null, 1, 2, null] - connects to number and hertz
-            expect(stack[0][4]).toEqual([null, 1, 2, null]);
-            // Number block: [0] - connects back to note
-            expect(stack[1][4]).toEqual([0]);
-            // Hertz block: [0, freq, hidden] - connects to note, frequency, hidden
-            expect(stack[2][4]).toEqual([0, 3, 4]);
+            // newnote: [null, divide, vspace, hidden]
+            expect(stack[0][4]).toEqual([null, 1, 4, 7]);
+            // divide: [newnote, num1, num4]
+            expect(stack[1][4]).toEqual([0, 2, 3]);
+            // number 1: [divide]
+            expect(stack[2][4]).toEqual([1]);
+            // number 4: [divide]
+            expect(stack[3][4]).toEqual([1]);
+            // vspace: [newnote, hertz]
+            expect(stack[4][4]).toEqual([0, 5]);
+            // hertz: [vspace, frequencyNumber, null]
+            expect(stack[5][4]).toEqual([4, 6, null]);
+            // frequency number: [hertz]
+            expect(stack[6][4]).toEqual([5]);
+            // hidden: [newnote, null]
+            expect(stack[7][4]).toEqual([0, null]);
         });
     });
 

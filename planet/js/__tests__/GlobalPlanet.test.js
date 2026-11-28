@@ -234,6 +234,17 @@ describe("GlobalPlanet", () => {
         });
     });
 
+    describe("render", () => {
+        it("should not initialize document-wide tooltips", () => {
+            gp.cache.project1 = { ProjectName: "Project 1" };
+            jest.spyOn(gp, "afterAddProjects").mockImplementation(() => {});
+
+            gp.render([["project1", 1]]);
+
+            expect(global.jQuery).not.toHaveBeenCalledWith(".tooltipped");
+        });
+    });
+
     describe("afterRefreshProjects", () => {
         it("should call addProjects on success", () => {
             const spy = jest.spyOn(gp, "addProjects").mockImplementation(() => {});
@@ -329,11 +340,110 @@ describe("GlobalPlanet", () => {
             expect(gp.cache.old).toBeUndefined();
             expect(gp.cache.new.ProjectName).toBe("New");
             expect(render).toHaveBeenCalledTimes(1);
-            expect(render).toHaveBeenCalledWith([["new", 2]]);
+            expect(render).toHaveBeenCalledWith([["new", 2]], false);
         });
     });
 
     describe("batch project offline error fix", () => {
+        it("shows the connection error when final-page metadata fails in My Projects", () => {
+            gp.searchMode = "USER_PROJECTS";
+            mockPlanet.ServerInterface.getProjectDetails.mockImplementation((id, callback) => {
+                callback({ success: false });
+            });
+
+            gp.addProjects([["unavailable", 1]]);
+
+            expect(document.getElementById("global-projects").innerHTML).toContain(
+                "Feature unavailable"
+            );
+        });
+
+        it.each([false, true])(
+            "starts a queued search once after a private page (more=%s)",
+            more => {
+                gp.searchMode = "USER_PROJECTS";
+                gp.page = 1;
+                gp.cache.private = { visible: 0, ProjectLastUpdated: 1 };
+                gp.cache.next = { visible: 1, ProjectLastUpdated: 1 };
+                const search = mockPlanet.ServerInterface.searchProjects;
+                gp.searchString = "first";
+                gp.search();
+                gp.searchString = "second";
+                gp.search();
+
+                const data = [["private", 1]];
+                if (more) data.push(["next", 1]);
+                search.mock.calls[0][4]({ success: true, data });
+
+                expect(search).toHaveBeenCalledTimes(2);
+                expect(search).toHaveBeenLastCalledWith(
+                    "second",
+                    gp.sortBy,
+                    0,
+                    2,
+                    expect.any(Function)
+                );
+            }
+        );
+
+        it("continues past private pages and shows a later published project", () => {
+            gp.page = 1;
+            gp.searchMode = "USER_PROJECTS";
+            gp.cache.private = { visible: 0, ProjectLastUpdated: 1 };
+            gp.cache.public = { visible: 1, ProjectLastUpdated: 1 };
+            mockPlanet.ServerInterface.downloadProjectList.mockImplementation(
+                (mode, sort, start, end, cb) => {
+                    cb({
+                        success: true,
+                        data:
+                            start === 0
+                                ? [
+                                      ["private", 1],
+                                      ["public", 1]
+                                  ]
+                                : [["public", 1]]
+                    });
+                }
+            );
+
+            gp.refreshProjects();
+
+            expect(mockPlanet.ServerInterface.downloadProjectList).toHaveBeenCalledTimes(2);
+            expect(mockPlanet.ServerInterface.downloadProjectList.mock.calls[1][2]).toBe(1);
+            expect(global.GlobalCard).toHaveBeenCalledTimes(1);
+            expect(document.getElementById("global-projects").innerHTML).not.toContain(
+                "No results"
+            );
+        });
+
+        it("shows the empty state after every page contains only private projects", () => {
+            gp.page = 1;
+            gp.searchMode = "USER_PROJECTS";
+            gp.cache.private = { visible: 0, ProjectLastUpdated: 1 };
+            gp.cache.private2 = { visible: 0, ProjectLastUpdated: 1 };
+            mockPlanet.ServerInterface.downloadProjectList.mockImplementation(
+                (mode, sort, start, end, cb) => {
+                    cb({
+                        success: true,
+                        data:
+                            start === 0
+                                ? [
+                                      ["private", 1],
+                                      ["private2", 1]
+                                  ]
+                                : [["private2", 1]]
+                    });
+                }
+            );
+
+            gp.refreshProjects();
+
+            expect(mockPlanet.ServerInterface.downloadProjectList).toHaveBeenCalledTimes(2);
+            expect(document.getElementById("global-projects").innerHTML).toContain(
+                "No results found."
+            );
+        });
+
         it("should preserve offline error when all project details fail", () => {
             // Provide a non-empty batch of projects
             const mockData = [

@@ -12,7 +12,7 @@
 /*
    global
 
-   DRUMNAMES, NOISENAMES, VOICENAMES, CUSTOMSAMPLES
+   DRUMNAMES, NOISENAMES, VOICENAMES, CUSTOMSAMPLES, _
  */
 
 /*
@@ -82,15 +82,26 @@ var getReverseDrumMidi = () => {
  * @returns {string} The name of the invert mode.
  */
 var getInvertMode = name => {
+    if (typeof name !== "string" || !name) {
+        return name;
+    }
+
+    const trimmed = name.trim();
+    const lower = trimmed.toLowerCase();
+
     for (const interval in INVERTMODES) {
+        const localized = INVERTMODES[interval][0];
+        const english = INVERTMODES[interval][1];
+
         if (
-            INVERTMODES[interval][0] === name ||
-            INVERTMODES[interval][1].toLowerCase() === name.toLowerCase()
+            localized === trimmed ||
+            (typeof localized === "string" && localized.toLowerCase() === lower) ||
+            (typeof english === "string" && english.toLowerCase() === lower)
         ) {
-            if (INVERTMODES[interval][0] !== "") {
-                return INVERTMODES[interval][0];
+            if (localized !== "") {
+                return localized;
             } else {
-                return INVERTMODES[interval][1];
+                return english;
             }
         }
     }
@@ -251,7 +262,7 @@ var getDrumSymbol = name => {
  * @returns {string} The filter type, or the default filter type if not found.
  */
 var getFilterTypes = name => {
-    if (name === "") {
+    if (typeof name !== "string" || name === "") {
         name = DEFAULTFILTERTYPE;
     }
 
@@ -274,8 +285,8 @@ var getFilterTypes = name => {
  * @returns {string|null} The oscillator type, or null if not found.
  */
 var getOscillatorTypes = name => {
-    if (name === "") {
-        name = null; // DEFAULTOSCILLATORTYPE;
+    if (typeof name !== "string" || name === "") {
+        return null;
     }
 
     for (let type = 0; type < OSCTYPES.length; type++) {
@@ -298,21 +309,24 @@ var getOscillatorTypes = name => {
  */
 var getDrumIcon = name => {
     if (typeof name !== "string") {
-        return "images/drum.svg";
+        return "images/snaredrum.svg";
     } else if (name === "") {
         name = DEFAULTDRUM;
     } else if (name.slice(0, 4) === "http") {
-        return "images/drum.svg";
+        return "images/snaredrum.svg";
     }
 
     for (let i = 0; i < DRUMNAMES.length; i++) {
-        if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1].toLowerCase() === name.toLowerCase()) {
+        if (
+            DRUMNAMES[i][0].toLowerCase() === name.toLowerCase() ||
+            DRUMNAMES[i][1].toLowerCase() === name.toLowerCase()
+        ) {
             return DRUMNAMES[i][2];
         }
     }
 
     // console.debug(name + " not found in DRUMNAMES");
-    return "images/drum.svg";
+    return "images/snaredrum.svg";
 };
 
 /**
@@ -332,7 +346,10 @@ var getDrumSynthName = name => {
     }
 
     for (let i = 0; i < DRUMNAMES.length; i++) {
-        if (DRUMNAMES[i][0] === name || DRUMNAMES[i][1].toLowerCase() === name.toLowerCase()) {
+        if (
+            DRUMNAMES[i][0].toLowerCase() === name.toLowerCase() ||
+            DRUMNAMES[i][1].toLowerCase() === name.toLowerCase()
+        ) {
             return DRUMNAMES[i][1];
         }
     }
@@ -355,7 +372,12 @@ var getNoiseName = name => {
     }
 
     for (let i = 0; i < NOISENAMES.length; i++) {
-        if (NOISENAMES[i][1] === name) {
+        const isMatch =
+            NOISENAMES[i][0] === name ||
+            NOISENAMES[i][1] === name ||
+            (typeof _ === "function" &&
+                (_(name) === NOISENAMES[i][0] || _(NOISENAMES[i][0]) === name));
+        if (isMatch) {
             if (NOISENAMES[i][0] !== "") {
                 return NOISENAMES[i][0];
             } else {
@@ -379,11 +401,16 @@ var getNoiseIcon = name => {
     } else if (name === "") {
         name = DEFAULTNOISE;
     } else if (name.slice(0, 4) === "http") {
-        return "images/noises.svg";
+        return "images/synth.svg";
     }
 
     for (let i = 0; i < NOISENAMES.length; i++) {
-        if (NOISENAMES[i][0] === name || NOISENAMES[i][1] === name) {
+        const isMatch =
+            NOISENAMES[i][0] === name ||
+            NOISENAMES[i][1] === name ||
+            (typeof _ === "function" &&
+                (_(name) === NOISENAMES[i][0] || _(NOISENAMES[i][0]) === name));
+        if (isMatch) {
             return NOISENAMES[i][2];
         }
     }
@@ -406,7 +433,12 @@ var getNoiseSynthName = name => {
     }
 
     for (let i = 0; i < NOISENAMES.length; i++) {
-        if (NOISENAMES[i][0] === name || NOISENAMES[i][1] === name) {
+        const isMatch =
+            NOISENAMES[i][0] === name ||
+            NOISENAMES[i][1] === name ||
+            (typeof _ === "function" &&
+                (_(name) === NOISENAMES[i][0] || _(NOISENAMES[i][0]) === name));
+        if (isMatch) {
             return NOISENAMES[i][1];
         }
     }
@@ -431,10 +463,10 @@ var getVoiceName = name => {
     }
 
     for (let i = 0; i < VOICENAMES.length; i++) {
-        if (VOICENAMES[i][0] === name) {
+        if (VOICENAMES[i][0] === name || VOICENAMES[i][1] === name) {
             if (VOICENAMES[i][0] !== "") {
                 return VOICENAMES[i][0];
-            } else if (VOICENAMES[i][1] === name) {
+            } else {
                 return VOICENAMES[i][1];
             }
         }

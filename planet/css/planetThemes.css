@@ -381,6 +381,13 @@
     outline-offset: 2px;
 }
 
+.highcontrast .global-tags-container .global-tags-more:active,
+.highcontrast .global-tags-container .global-tags-more:focus,
+.highcontrast .global-tags-container .global-tags-more:focus-visible {
+    background-color: #000080;
+    color: #ffff00;
+}
+
 .highcontrast #local-projects .card {
     background-color: #000000;
     color: #ffff00;

@@ -213,6 +213,10 @@ describe("StatsWindow", () => {
         expect(body.style.display).toBe("flex");
         expect(body.style.justifyContent).toBe("space-between");
         expect(body.style.padding).toBe("0px 2vw");
+        expect(body.style.alignItems).toBe("flex-start");
+        expect(body.style.flexWrap).toBe("wrap");
+        expect(body.style.gap).toBe("16px");
+        expect(body.style.overflow).toBe("auto");
         expect(global.analyzeProject).toHaveBeenCalled();
     });
 
@@ -263,6 +267,21 @@ describe("StatsWindow", () => {
 
         const imgs = body.querySelectorAll("img");
         expect(imgs[imgs.length - 1].width).toBe(420); // 500 - 80
+    });
+
+    test("chart image stays within the widget body when the viewport narrows", () => {
+        widgetWin.isMaximized.mockReturnValue(true);
+        new StatsWindow(activity);
+
+        capturedCb();
+
+        const imgs = body.querySelectorAll("img");
+        const img = imgs[imgs.length - 1];
+
+        expect(img.style.maxWidth).toBe("100%");
+        expect(img.style.height).toBe("auto");
+        expect(img.style.minWidth).toBe("0");
+        expect(img.style.objectFit).toBe("contain");
     });
 
     test("doAnalytics initializes chart with canvas context and analytics data", () => {
