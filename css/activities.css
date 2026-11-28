@@ -778,6 +778,11 @@ nav {
         box-shadow 0.25s ease;
 }
 
+/* Materialize appends tooltips to body, so they must stack above the toolbar. */
+.material-tooltip {
+    z-index: 10003 !important;
+}
+
 body.dark #toolbars {
     background-color: var(--color-bg-secondary, #1f2937);
     border-bottom: 1px solid var(--color-border-primary, #374151);
