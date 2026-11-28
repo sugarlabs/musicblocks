@@ -185,6 +185,49 @@ describe("Test 1: A single pitched note", () => {
         expect(settimbre[4][2]).toBe(newnote[0]);
     });
 
+    it("wraps a staccato-marked note in one newstaccato block", async () => {
+        const note =
+            "<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration>" +
+            "<type>quarter</type><notations><articulations><staccato/></articulations></notations></note>";
+        const { blocks } = await parseAndCapture(scorePartwise(note));
+        const staccatos = blocks.filter(b => blockName(b) === "newstaccato");
+        const newnotes = blocks.filter(b => blockName(b) === "newnote");
+        expect(newnotes).toHaveLength(1);
+        expect(staccatos).toHaveLength(1);
+
+        const byIndex = new Map(blocks.map(block => [block[0], block]));
+        const staccatoVspace = byIndex.get(staccatos[0][4][2]);
+
+        expect(blockName(byIndex.get(staccatoVspace[4][1]))).toBe("newnote");
+        expect(newnotes[0][4][0]).toBe(staccatoVspace[0]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("connects the staccato wrapper to a following ordinary note", async () => {
+        const staccatoNote =
+            "<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration>" +
+            "<type>quarter</type><notations><articulations><staccato/></articulations></notations></note>";
+        const { blocks } = await parseAndCapture(
+            scorePartwise(staccatoNote + SIMPLE_NOTE("D", 4, "quarter"))
+        );
+        const staccato = blocks.find(block => blockName(block) === "newstaccato");
+        const newnotes = blocks.filter(block => blockName(block) === "newnote");
+        const byIndex = new Map(blocks.map(block => [block[0], block]));
+        const staccatoVspace = byIndex.get(staccato[4][2]);
+        const innerNoteId = staccatoVspace[4][1];
+        const outerHidden = byIndex.get(staccato[4][3]);
+        const followingNote = newnotes.find(block => block[0] !== innerNoteId);
+
+        expect(newnotes).toHaveLength(2);
+        expect(blockName(byIndex.get(innerNoteId))).toBe("newnote");
+        expect(blockName(byIndex.get(outerHidden[4][1]))).toBe("newnote");
+        expect(followingNote[4][0]).toBe(outerHidden[0]);
+        expect(outerHidden[4][0]).toBe(staccato[0]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
     it("returns loadNewBlocks's own token so callers can track this load's completion", async () => {
         const activity = makeActivity();
         const result = await activity.parseMXML(scorePartwise(SIMPLE_NOTE("C", 4, "quarter")));
@@ -1497,6 +1540,33 @@ describe("Test 16: Ties", () => {
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
+    it("does not carry a completed staccato tie into the following ordinary note", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                tiedNote(
+                    "C",
+                    4,
+                    '<tie type="start"/><notations><articulations><staccato/></articulations></notations>'
+                ) +
+                    tiedNote("C", 4, '<tie type="stop"/>') +
+                    SIMPLE_NOTE("D", 4, "quarter")
+            )
+        );
+        const staccatos = blocks.filter(block => blockName(block) === "newstaccato");
+        const newnotes = blocks.filter(block => blockName(block) === "newnote");
+        const byIndex = new Map(blocks.map(block => [block[0], block]));
+        const outerHidden = byIndex.get(staccatos[0][4][3]);
+        const staccatoVspace = byIndex.get(staccatos[0][4][2]);
+        const innerNoteId = staccatoVspace[4][1];
+        const followingNote = newnotes.find(block => block[0] !== innerNoteId);
+
+        expect(staccatos).toHaveLength(1);
+        expect(newnotes).toHaveLength(2);
+        expect(followingNote[4][0]).toBe(outerHidden[0]);
+        expect(blocks.filter(block => blockName(block) === "pitch")).toHaveLength(2);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
     it("keeps a long tie chain finite when importing its combined duration", async () => {
         const notes = Array.from({ length: 512 }, (_, index) => {
             const ties =
@@ -2164,6 +2234,54 @@ describe("Test 17: Repeats", () => {
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
         expect(findPositionMismatches(blocks)).toEqual([]);
     });
+
+    it.each([
+        ["unmarked", "", 1],
+        ["already staccato", "<notations><articulations><staccato/></articulations></notations>", 2]
+    ])(
+        "preserves original body articulation in the repeat clone (%s)",
+        async (_, bodyArticulation, expectedStaccatos) => {
+            const tiedNote = (step, tie) =>
+                `<note><pitch><step>${step}</step><octave>4</octave></pitch>` +
+                `<duration>1</duration><type>quarter</type>${tie}</note>`;
+            const xml =
+                '<score-partwise><part id="P1"><measure number="1"><attributes><divisions>1</divisions></attributes>' +
+                '<barline location="left"><repeat direction="forward"/></barline>' +
+                tiedNote("C", `<tie type="start"/>${bodyArticulation}`) +
+                '<barline location="left"><ending number="1" type="start"/></barline>' +
+                tiedNote(
+                    "C",
+                    '<tie type="stop"/><notations><articulations><staccato/></articulations></notations>'
+                ) +
+                '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+                '<barline location="left"><ending number="2" type="start"/></barline>' +
+                SIMPLE_NOTE("F", 4, "quarter") +
+                "</measure></part></score-partwise>";
+            const { blocks } = await parseAndCapture(xml);
+            const byIndex = new Map(blocks.map(block => [block[0], block]));
+            const staccatos = blocks.filter(block => blockName(block) === "newstaccato");
+            const staccatoFactors = staccatos.map(block => {
+                const divide = byIndex.get(block[4][1]);
+                return [
+                    byIndex.get(divide[4][1])[1][1].value,
+                    byIndex.get(divide[4][2])[1][1].value
+                ];
+            });
+
+            expect(noteValues(blocks)).toEqual([
+                [1, 2],
+                [1, 4],
+                [1, 4]
+            ]);
+            expect(blocks.filter(block => blockName(block) === "newnote")).toHaveLength(3);
+            expect(staccatos).toHaveLength(expectedStaccatos);
+            expect(staccatoFactors).toEqual(
+                Array.from({ length: expectedStaccatos }, () => [1, 32])
+            );
+            expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+            expect(findPositionMismatches(blocks)).toEqual([]);
+        }
+    );
 
     it("keeps a tie chain through the first ending", async () => {
         const tiedNote = (step, tie) =>

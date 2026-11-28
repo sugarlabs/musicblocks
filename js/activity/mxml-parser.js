@@ -264,6 +264,59 @@ const _contentsEqual = (a, b) => {
     return a.type === "pitch" ? a.name === b.name && a.octave === b.octave : a.name === b.name;
 };
 
+const _noteContent = (noteEl, instrumentMap) => {
+    const unpitchedEl = noteEl.querySelector(":scope > unpitched");
+    const pitchEl = noteEl.querySelector(":scope > pitch");
+    const isRest =
+        noteEl.querySelector(":scope > rest") !== null ||
+        noteEl.querySelector(":scope > cue") !== null ||
+        (pitchEl === null && unpitchedEl === null);
+
+    if (isRest) return null;
+    if (unpitchedEl !== null) return { type: "drum", name: _drumName(noteEl, instrumentMap) };
+    return { type: "pitch", ..._pitchToNoteName(pitchEl) };
+};
+
+function _firstEndingTieStopHasStaccato(partEl, measureEl, barlineEl, content, instrumentMap) {
+    const measures = Array.from(partEl.querySelectorAll(":scope > measure"));
+    const measureIndex = measures.indexOf(measureEl);
+    for (let index = measureIndex; index < measures.length; index++) {
+        const children = measures[index].children;
+        const start = index === measureIndex ? Array.from(children).indexOf(barlineEl) + 1 : 0;
+        for (let childIndex = start; childIndex < children.length; childIndex++) {
+            const child = children[childIndex];
+            if (child.tagName === "barline") {
+                const endingType = child.querySelector(":scope > ending")?.getAttribute("type");
+                const repeatDirection = child
+                    .querySelector(":scope > repeat")
+                    ?.getAttribute("direction");
+                if (
+                    endingType === "stop" ||
+                    endingType === "discontinue" ||
+                    repeatDirection === "backward"
+                ) {
+                    return false;
+                }
+                continue;
+            }
+            if (
+                child.tagName !== "note" ||
+                child.querySelector(":scope > chord, :scope > grace") !== null
+            ) {
+                continue;
+            }
+
+            const hasTieStop = child.querySelector(':scope > tie[type="stop"]') !== null;
+            return (
+                hasTieStop &&
+                _contentsEqual(_noteContent(child, instrumentMap), content) &&
+                child.querySelector(":scope > notations > articulations > staccato") !== null
+            );
+        }
+    }
+    return false;
+}
+
 // A note's <time-modification> as [actual-notes, normal-notes], the ratio a
 // tuplet is played at, or 1:1 for a note that is not in one. Anything missing or
 // not a positive number is read as 1:1, so a malformed tuplet keeps its written
@@ -762,9 +815,26 @@ function _mergeLyrics(existing, incoming) {
  *     | {type: "drum", name: string} | null} content - null for a rest
  * @param {number} prevId - the previous block's id, for this note's top connection
  * @param {Array<{number: string, text: string}>} lyrics - this note's verses
+ * @param {boolean} staccato - whether to wrap the note in newstaccato
  * @returns {Array} the pushed block literals
  */
-function _createNoteBlocks(blockId, duration, content, prevId, lyrics = []) {
+function _createNoteBlocks(blockId, duration, content, prevId, lyrics = [], staccato = false) {
+    if (staccato) {
+        const noteBlockId = blockId + 5;
+        const noteBlocks = _createNoteBlocks(noteBlockId, duration, content, blockId + 4, lyrics);
+        const hiddenId = noteBlockId + noteBlocks.length;
+        noteBlocks[noteBlocks.length - 1][4][1] = null;
+        return [
+            [blockId, "newstaccato", 0, 0, [prevId, blockId + 1, blockId + 4, hiddenId]],
+            [blockId + 1, "divide", 0, 0, [blockId, blockId + 2, blockId + 3]],
+            [blockId + 2, ["number", { value: 1 }], 0, 0, [blockId + 1]],
+            [blockId + 3, ["number", { value: 32 }], 0, 0, [blockId + 1]],
+            [blockId + 4, "vspace", 0, 0, [blockId, noteBlockId]],
+            ...noteBlocks,
+            [hiddenId, "hidden", 0, 0, [blockId, hiddenId + 1]]
+        ];
+    }
+
     const contentBlockCount = content === null ? 1 : content.type === "pitch" ? 3 : 2;
     const contentStartId = blockId + 5 + lyrics.length * 2;
     const contentPrevId = lyrics.length === 0 ? blockId + 4 : contentStartId - 2;
@@ -856,7 +926,10 @@ function _createVolumeBlocks(blockId, volume, prevId) {
  */
 function _setNoteDuration(blocks, noteId, duration) {
     const byId = new Map(blocks.map(block => [block[0], block]));
-    const note = byId.get(noteId);
+    let note = byId.get(noteId);
+    if (note[1] === "newstaccato") {
+        note = byId.get(byId.get(note[4][2])[4][1]);
+    }
     const divide = byId.get(note[4][1]);
     byId.get(divide[4][1])[1][1].value = duration[0];
     byId.get(divide[4][2])[1][1].value = duration[1];
@@ -972,7 +1045,7 @@ function _buildPreamble(startId, title, voiceLabel, timeSignature, keySignature,
  *
  * @param {Array<{startIndex: number, endIndex: number, times: number,
  *     firstEndingStartIndex: number|null,
- *     bodyTieDurations: Array<{index: number, duration: [number, number]}>}>} repeats
+ *     bodyTieDurations: Array<{index: number, duration: [number, number], bodyStaccato: boolean}>}>} repeats
  * @param {Array} noteBlocks - every note/rest/drum block literal for this
  *     part, already with the final note's trailing connection nulled
  *     (mutated in place: connections are redirected around each range)
@@ -1007,25 +1080,91 @@ function _applyRepeats(
     const byId = new Map(noteBlocks.map(block => [block[0], block]));
     const repeatBlocks = [];
 
-    const cloneNotes = (startIndex, endIndex, prevId, durationOverrides = []) => {
+    const cloneNotes = (
+        startIndex,
+        endIndex,
+        prevId,
+        durationOverrides = [],
+        unwrappedNoteIndices = []
+    ) => {
         const firstId = noteStartIds[startIndex];
         const lastId = noteEndIds[endIndex];
-        const sourceBlocks = noteBlocks.filter(block => block[0] >= firstId && block[0] <= lastId);
+        let sourceBlocks = noteBlocks
+            .filter(block => block[0] >= firstId && block[0] <= lastId)
+            .map(block => [
+                block[0],
+                Array.isArray(block[1]) ? [block[1][0], { ...block[1][1] }] : block[1],
+                block[2],
+                block[3],
+                block[4].slice()
+            ]);
+        const cloneNoteStartIds = new Map(
+            Array.from({ length: endIndex - startIndex + 1 }, (_, index) => [
+                startIndex + index,
+                noteStartIds[startIndex + index]
+            ])
+        );
+        const cloneNoteEndIds = new Map(
+            Array.from({ length: endIndex - startIndex + 1 }, (_, index) => [
+                startIndex + index,
+                noteEndIds[startIndex + index]
+            ])
+        );
+
+        for (const index of unwrappedNoteIndices) {
+            const sourceById = new Map(sourceBlocks.map(block => [block[0], block]));
+            const wrapper = sourceById.get(noteStartIds[index]);
+            if (!wrapper || wrapper[1] !== "newstaccato") continue;
+
+            const divide = sourceById.get(wrapper[4][1]);
+            const vspace = sourceById.get(wrapper[4][2]);
+            const outerHidden = sourceById.get(wrapper[4][3]);
+            const note = sourceById.get(vspace[4][1]);
+            const innerHidden = sourceById.get(note[4][3]);
+            const previous = sourceById.get(wrapper[4][0]);
+            const next = sourceById.get(outerHidden[4][1]);
+
+            if (previous) {
+                previous[4] = previous[4].map(id => (id === wrapper[0] ? note[0] : id));
+            }
+            if (next) {
+                next[4] = next[4].map(id => (id === outerHidden[0] ? innerHidden[0] : id));
+            }
+            note[4][0] = wrapper[4][0];
+            innerHidden[4][1] = outerHidden[4][1];
+
+            const removedIds = new Set([
+                wrapper[0],
+                divide[0],
+                divide[4][1],
+                divide[4][2],
+                vspace[0],
+                outerHidden[0]
+            ]);
+            sourceBlocks = sourceBlocks.filter(block => !removedIds.has(block[0]));
+            cloneNoteStartIds.set(index, note[0]);
+            cloneNoteEndIds.set(index, innerHidden[0]);
+        }
+
         const idMap = new Map(sourceBlocks.map((block, index) => [block[0], blockId + index]));
         const blocks = sourceBlocks.map(block => [
             idMap.get(block[0]),
-            Array.isArray(block[1]) ? [block[1][0], { ...block[1][1] }] : block[1],
+            block[1],
             block[2],
             block[3],
             block[4].map(connection => idMap.get(connection) ?? connection)
         ]);
-        const firstBlock = blocks.find(block => block[0] === idMap.get(firstId));
-        const lastBlock = blocks.find(block => block[0] === idMap.get(lastId));
+        const firstBlock = blocks.find(
+            block => block[0] === idMap.get(cloneNoteStartIds.get(startIndex))
+        );
+        const lastBlock = blocks.find(
+            block => block[0] === idMap.get(cloneNoteEndIds.get(endIndex))
+        );
         firstBlock[4][0] = prevId;
         lastBlock[4][1] = null;
         durationOverrides.forEach(({ index, duration }) => {
             if (index >= startIndex && index <= endIndex) {
-                _setNoteDuration(blocks, idMap.get(noteStartIds[index]), duration);
+                _setNoteDuration(blocks, idMap.get(cloneNoteStartIds.get(index)), duration);
             }
         });
         blockId += blocks.length;
@@ -1059,7 +1198,12 @@ function _applyRepeats(
             // replay only the body before falling through to the second ending.
             let previousEnd = endHidden;
             const copies = [];
-            const clonePass = (cloneStartIndex, cloneEndIndex, durationOverrides = []) => {
+            const clonePass = (
+                cloneStartIndex,
+                cloneEndIndex,
+                durationOverrides = [],
+                unwrappedNoteIndices = []
+            ) => {
                 let clonePrevId = previousEnd[0];
                 let resetTempoBlocks = [];
                 if (Number.isFinite(startTempoBpm)) {
@@ -1077,7 +1221,8 @@ function _applyRepeats(
                     cloneStartIndex,
                     cloneEndIndex,
                     clonePrevId,
-                    durationOverrides
+                    durationOverrides,
+                    unwrappedNoteIndices
                 );
                 if (resetTempoBlocks.length === 0) {
                     previousEnd[4][1] = copy.firstId;
@@ -1091,7 +1236,15 @@ function _applyRepeats(
                 clonePass(startIndex, endIndex);
             }
             if (firstEndingStartIndex > startIndex) {
-                clonePass(startIndex, firstEndingStartIndex - 1, bodyTieDurations);
+                const unwrappedNoteIndices = bodyTieDurations
+                    .filter(tie => !tie.bodyStaccato)
+                    .map(tie => tie.index);
+                clonePass(
+                    startIndex,
+                    firstEndingStartIndex - 1,
+                    bodyTieDurations,
+                    unwrappedNoteIndices
+                );
             }
             previousEnd[4][1] = nextFlowId;
             byId.get(nextFlowId)[4][0] = previousEnd[0];
@@ -1215,6 +1368,7 @@ function _processPart(
     let tieDuration = null;
     let tieContent = null;
     let tieLyrics = [];
+    let tieStaccato = false;
     let currentTempoBpm = initialTempoBpm;
     let nextTempoIndex = 0;
     let pendingVolumes = [];
@@ -1231,7 +1385,7 @@ function _processPart(
         }
     }
 
-    const emitNote = (duration, content, lyrics = []) => {
+    const emitNote = (duration, content, lyrics = [], staccato = false) => {
         let startId = blockId;
         let previousVolumeBlock = null;
         pendingVolumes.forEach(volume => {
@@ -1244,7 +1398,7 @@ function _processPart(
         });
         pendingVolumes = [];
 
-        const blocks = _createNoteBlocks(blockId, duration, content, prevId, lyrics);
+        const blocks = _createNoteBlocks(blockId, duration, content, prevId, lyrics, staccato);
         if (previousVolumeBlock !== null) previousVolumeBlock[4][3] = blockId;
         noteBlocks.push(...blocks);
         noteStartIds.push(startId);
@@ -1257,10 +1411,11 @@ function _processPart(
 
     const flushTie = () => {
         if (tieDuration !== null) {
-            emitNote(tieDuration, tieContent, tieLyrics);
+            emitNote(tieDuration, tieContent, tieLyrics, tieStaccato);
             tieDuration = null;
             tieContent = null;
             tieLyrics = [];
+            tieStaccato = false;
         }
     };
 
@@ -1340,12 +1495,23 @@ function _processPart(
                         const index = noteStartIds.length;
                         const duration = tieDuration;
                         const content = tieContent;
-                        emitNote(tieDuration, tieContent, tieLyrics);
+                        const bodyStaccato = tieStaccato;
+                        const staccato =
+                            bodyStaccato ||
+                            _firstEndingTieStopHasStaccato(
+                                partEl,
+                                measureEl,
+                                child,
+                                tieContent,
+                                instrumentMap
+                            );
+                        emitNote(tieDuration, tieContent, tieLyrics, staccato);
                         firstEndingBodyTie = { index, duration, content };
-                        bodyTieDurations.push({ index, duration });
+                        bodyTieDurations.push({ index, duration, bodyStaccato });
                         tieDuration = null;
                         tieContent = null;
                         tieLyrics = [];
+                        tieStaccato = false;
                     }
                     firstEndingStartIndex = noteStartIds.length;
                 }
@@ -1394,23 +1560,11 @@ function _processPart(
 
             const duration = _noteDuration(child, divisions);
             const lyrics = _lyricTexts(child);
-            const unpitchedEl = child.querySelector(":scope > unpitched");
-            const pitchEl = child.querySelector(":scope > pitch");
+            const hasStaccato =
+                child.querySelector(":scope > notations > articulations > staccato") !== null;
             // A cue note shows another part's line during this one's rest
             // and MusicXML says it isn't played, but it still fills the time.
-            const isRest =
-                child.querySelector(":scope > rest") !== null ||
-                child.querySelector(":scope > cue") !== null ||
-                (pitchEl === null && unpitchedEl === null);
-
-            let content;
-            if (isRest) {
-                content = null;
-            } else if (unpitchedEl !== null) {
-                content = { type: "drum", name: _drumName(child, instrumentMap) };
-            } else {
-                content = { type: "pitch", ..._pitchToNoteName(pitchEl) };
-            }
+            const content = _noteContent(child, instrumentMap);
 
             let hasTieStart = false;
             let hasTieStop = false;
@@ -1451,21 +1605,24 @@ function _processPart(
 
             if (continuesTie) {
                 tieLyrics = _mergeLyrics(tieLyrics, lyrics);
+                tieStaccato = tieStaccato || hasStaccato;
                 const combined = _addFractions(tieDuration, duration);
                 if (hasTieStart) {
                     tieDuration = combined;
                 } else {
-                    emitNote(combined, tieContent, tieLyrics);
+                    emitNote(combined, tieContent, tieLyrics, tieStaccato);
                     tieDuration = null;
                     tieContent = null;
                     tieLyrics = [];
+                    tieStaccato = false;
                 }
             } else if (hasTieStart && !hasTieStop) {
                 tieDuration = duration;
                 tieContent = content;
                 tieLyrics = lyrics;
+                tieStaccato = hasStaccato;
             } else {
-                emitNote(duration, content, lyrics);
+                emitNote(duration, content, lyrics, hasStaccato);
             }
 
             offset += (duration[0] * 4) / duration[1];
