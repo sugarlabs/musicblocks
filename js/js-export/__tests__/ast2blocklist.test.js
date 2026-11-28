@@ -172,7 +172,18 @@ describe("AST2BlockList Class", () => {
             ["bool_true", "bool_false"],
             ["start", "print", "xor", "boolean", "boolean", "vspace"]
         ],
-        ["equal", [1, "1"], ["start", "print", "equal", "number", "text", "vspace"]]
+        ["equal", [1, "1"], ["start", "print", "equal", "number", "text", "vspace"]],
+        ["not_equal_to", [1, "1"], ["start", "print", "not_equal_to", "number", "text", "vspace"]],
+        [
+            "less_than_or_equal_to",
+            [1, 2],
+            ["start", "print", "less_than_or_equal_to", "number", "number", "vspace"]
+        ],
+        [
+            "greater_than_or_equal_to",
+            [1, 2],
+            ["start", "print", "greater_than_or_equal_to", "number", "number", "vspace"]
+        ]
     ])("should convert exported %s back to blocks", (methodName, args, expected) => {
         const ASTUtils = require("../ASTutils");
         const astring = require("../../../lib/astring.min");

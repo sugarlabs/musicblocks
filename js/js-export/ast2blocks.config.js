@@ -26,6 +26,7 @@ window.ast2blocklist_config = {
                 "==": "equal",
                 "===": "equal",
                 "!=": "not_equal_to",
+                "!==": "not_equal_to",
                 "<": "less",
                 ">": "greater",
                 "<=": "less_than_or_equal_to",
