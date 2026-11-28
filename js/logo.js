@@ -2198,11 +2198,12 @@ class Logo {
     }
 
     _scheduleExportSteps() {
+        const generation = this.runGeneration;
         this._exportStepsPending = true;
         this._timerManager.setGuardedTimeout(
             () => this._runExportSteps(),
             0,
-            () => this.stopTurtle
+            () => this.stopTurtle || this.runGeneration !== generation
         );
     }
 

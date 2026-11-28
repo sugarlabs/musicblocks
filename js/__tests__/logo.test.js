@@ -3029,6 +3029,18 @@ describe("Logo runFromBlock", () => {
             expect(ran).toEqual([]);
         });
 
+        test("leaves the steps of a new run to its own timer", () => {
+            logo.runFromBlock(logo, 0, 3, 0, null);
+            logo.runGeneration += 1;
+            logo._resetExportSteps();
+            for (let i = 0; i < logo._EXPORT_YIELD_AFTER_SYNC_RUNS + 5; i++) {
+                logo.runFromBlock(logo, 1, i, 0, null);
+            }
+
+            jest.advanceTimersByTime(0);
+            expect(ran).toHaveLength(logo._EXPORT_YIELD_AFTER_SYNC_RUNS);
+        });
+
         test("_exportingNotation is false outside exports", () => {
             logo.runningLilypond = false;
             logo.runningAbc = false;
