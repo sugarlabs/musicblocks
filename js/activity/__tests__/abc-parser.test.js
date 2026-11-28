@@ -1796,3 +1796,53 @@ describe("Key and meter changes inside a tune", () => {
         expectLinked(blocks);
     });
 });
+
+describe("Staccato", () => {
+    const parse = abc => parseAndCapture(ABCJS.parseOnly(abc)[0]);
+    const expectLoadable = blocks => {
+        blocks.forEach((block, position) => {
+            expect(block[0]).toBe(position);
+            block[4].forEach(connection => {
+                if (connection !== null) {
+                    expect(blocks[connection][4]).toContain(position);
+                }
+            });
+        });
+    };
+
+    test("wraps each staccato note in a staccato block", async () => {
+        const blocks = await parse("X:1\nL:1/4\nK:C\n.C D .E F|\n");
+
+        const staccatos = blocksOfType(blocks, "newstaccato");
+        expect(staccatos).toHaveLength(2);
+        expect(blocksOfType(blocks, "newnote")).toHaveLength(4);
+
+        // Each staccato holds one note, at the 1/32 factor the block defaults to,
+        // and its hidden block leads on to the next note.
+        const [c, d, e] = blocksOfType(blocks, "newnote");
+        const factor = blocks[staccatos[0][4][1]];
+        expect([blocks[factor[4][1]][1][1].value, blocks[factor[4][2]][1][1].value]).toEqual([
+            1, 32
+        ]);
+        expect(blocks[staccatos[0][4][2]][4][1]).toBe(c[0]);
+        expect(blocks[c[4][3]][4][1]).toBeNull();
+        expect(blocks[staccatos[0][4][3]][4][1]).toBe(d[0]);
+        expect(blocks[staccatos[1][4][2]][4][1]).toBe(e[0]);
+        expectLoadable(blocks);
+    });
+
+    test("wraps a staccato chord and a staccato note that starts a repeat", async () => {
+        const blocks = await parse("X:1\nL:1/4\nK:C\n.[CE] D|:.E F:|\n");
+
+        expect(blocksOfType(blocks, "newstaccato")).toHaveLength(2);
+        expect(blocksOfType(blocks, "newnote")).toHaveLength(4);
+        expectLoadable(blocks);
+    });
+
+    test("leaves a staccato rest as a plain rest", async () => {
+        const blocks = await parse("X:1\nL:1/4\nK:C\n.z C|\n");
+
+        expect(blocksOfType(blocks, "newstaccato")).toHaveLength(0);
+        expectLoadable(blocks);
+    });
+});
