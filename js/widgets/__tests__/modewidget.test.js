@@ -781,11 +781,13 @@ describe("ModeWidget", () => {
             fireEdoChange(select, "equal");
             expect(w2._activeEDO).toBe(12);
 
+            const synthTemperamentBefore = w2.logo.synth.inTemperament;
+
             w2._loadMode("m41", Array(41).fill(1), select);
 
             expect(w2._activeEDO).toBe(41);
             expect(w2._activeTemperamentKey).toBe("equal41");
-            expect(w2.logo.synth.inTemperament).toBe("equal41");
+            expect(w2.logo.synth.inTemperament).toBe(synthTemperamentBefore);
             expect(select.value).toBe("equal41");
 
             // The reported lock: the dropdown used to match a stale key and no-op.
@@ -793,7 +795,7 @@ describe("ModeWidget", () => {
 
             expect(w2._activeEDO).toBe(12);
             expect(w2._activeTemperamentKey).toBe("equal");
-            expect(w2.logo.synth.inTemperament).toBe("equal");
+            expect(w2.logo.synth.inTemperament).toBe(synthTemperamentBefore);
             expect(select.value).toBe("equal");
             expect(w2._modeWheel.navItems).toHaveLength(12);
             expect(w2._modeLabelCell.textContent).toBe("C ionian");
@@ -828,7 +830,7 @@ describe("ModeWidget", () => {
 
             expect(w2._activeEDO).toBe(41);
             expect(w2._activeTemperamentKey).toBe("equal41");
-            expect(w2.logo.synth.inTemperament).toBe("equal41");
+            expect(w2.logo.synth.inTemperament).toBe("just intonation");
             expect(select.value).toBe("equal41");
         } finally {
             teardown();
@@ -881,8 +883,8 @@ describe("ModeWidget", () => {
 
         modeWidget._loadMode("jiChromatic", pattern, fakeSelect);
 
-        // Both the live synth tuning and the cached key follow the saved mode.
-        expect(modeWidget.logo.synth.inTemperament).toBe("just intonation");
+        // Widget preview tuning follows the saved mode while the project synth remains unchanged.
+        expect(modeWidget.logo.synth.inTemperament).toBe("equal");
         expect(modeWidget._activeTemperamentKey).toBe("just intonation");
         expect(modeWidget._activeEDO).toBe(12);
         expect(modeWidget._selectedNotes).toEqual(Array(12).fill(true));
@@ -1254,13 +1256,16 @@ describe("ModeWidget", () => {
 
         test("delegates to piemenuModes with a mock block", () => {
             modeWidget._selectedModeName = "dorian";
+            modeWidget._activeTemperamentKey = "just intonation";
             modeWidget._piemenuModes();
 
             expect(global.piemenuModes).toHaveBeenCalledTimes(1);
-            const [mockBlock, selectedMode] = global.piemenuModes.mock.calls[0];
+            const [mockBlock, selectedMode, , previewTemperament] =
+                global.piemenuModes.mock.calls[0];
             expect(selectedMode).toBe("dorian");
             expect(mockBlock.value).toBe("dorian");
             expect(mockBlock.activity).toBeDefined();
+            expect(previewTemperament).toBe("just intonation");
         });
 
         test("sets _modePiemenuOpen to true while open", () => {
@@ -1717,6 +1722,175 @@ describe("ModeWidget", () => {
             modeWidget._piemenuMode();
 
             expect(modeWidget._modeWheel.navAngle).toBe(-90);
+        });
+    });
+
+    describe("preview-only tuning scope (#9627)", () => {
+        test("switching EDO dropdown updates _activeTemperamentKey and preserves logo.synth.inTemperament", () => {
+            global.TEMPERAMENT.equal19 = { isEDO: true, pitchNumber: 19, name: "19-EDO" };
+            const savedGetCurrentEDO = global.getCurrentEDO;
+            const savedIsEquallyTempered = global.isEquallyTempered;
+            global.getCurrentEDO = jest.fn(k => (k === "equal19" ? 19 : 12));
+            global.isEquallyTempered = jest.fn(k => k === "equal" || k === "equal19");
+            try {
+                modeWidget.logo.synth.inTemperament = "just intonation";
+                modeWidget._activeTemperamentKey = "just intonation";
+                modeWidget._activeEDO = 12;
+
+                const fakeSelect = {
+                    options: [],
+                    value: "just intonation",
+                    appendChild: jest.fn(o => fakeSelect.options.push(o)),
+                    addEventListener: jest.fn()
+                };
+                modeWidget._edoSelect = fakeSelect;
+                modeWidget._wireEdoSelect(fakeSelect);
+                const handler = fakeSelect.addEventListener.mock.calls.find(
+                    call => call[0] === "change"
+                )[1];
+
+                fakeSelect.value = "equal19";
+                handler();
+
+                expect(modeWidget._activeTemperamentKey).toBe("equal19");
+                expect(modeWidget._activeEDO).toBe(19);
+                expect(modeWidget.logo.synth.inTemperament).toBe("just intonation");
+                expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                    "Previewing in 19-EDO tuning.",
+                    3000
+                );
+            } finally {
+                delete global.TEMPERAMENT.equal19;
+                global.getCurrentEDO = savedGetCurrentEDO;
+                global.isEquallyTempered = savedIsEquallyTempered;
+            }
+        });
+
+        test("_applyImportedMode scopes tuning to _activeTemperamentKey without modifying logo.synth", () => {
+            modeWidget.logo.synth.inTemperament = "just intonation";
+            jest.spyOn(modeWidget, "_temperamentKeyForEDO").mockReturnValue("equal");
+            jest.spyOn(modeWidget, "_rebuildWheel").mockImplementation(() => {});
+            jest.spyOn(modeWidget, "_applyModePattern").mockImplementation(() => {});
+            jest.spyOn(modeWidget, "_updateModeDisplay").mockImplementation(() => {});
+
+            modeWidget._applyImportedMode(12, [2, 2, 1, 2, 2, 2, 1], "importedMajor");
+
+            expect(modeWidget._activeTemperamentKey).toBe("equal");
+            expect(modeWidget.logo.synth.inTemperament).toBe("just intonation");
+        });
+
+        test("_triggerNote calculates 12-EDO preview frequencies from _activeTemperamentKey instead of logo.synth", () => {
+            modeWidget.logo.synth.inTemperament = "just intonation";
+            modeWidget._activeTemperamentKey = "equal";
+            modeWidget._activeEDO = 12;
+            global.getNote.mockReturnValueOnce(["E", 4]);
+            mockActivity.logo.synth.trigger.mockClear();
+
+            modeWidget._triggerNote(4, 12);
+
+            const expectedEqualFreq = pitchToFrequency("E", 4, 0, ["C"], "equal");
+            expect(mockActivity.logo.synth.trigger).toHaveBeenLastCalledWith(
+                0,
+                expectedEqualFreq,
+                modeWidget._noteValue,
+                DEFAULTVOICE,
+                null,
+                null
+            );
+            expect(modeWidget.logo.synth.inTemperament).toBe("just intonation");
+        });
+
+        test("_triggerNote handles 12-EDO root and octave boundaries using real getNote conversion", () => {
+            const realGetNote = require("../../utils/musicutils.js").getNote;
+            const prevGetNote = global.getNote;
+            const spyGetNote = jest.fn(realGetNote);
+            global.getNote = spyGetNote;
+
+            try {
+                modeWidget.logo.synth.inTemperament = "just intonation";
+                modeWidget._activeTemperamentKey = "equal";
+                modeWidget._activeEDO = 12;
+                modeWidget._pitch = "C";
+                mockActivity.logo.synth.trigger.mockClear();
+
+                modeWidget._triggerNote(0, 12);
+                const rootFreq = mockActivity.logo.synth.trigger.mock.calls[0][1];
+                expect(spyGetNote).toHaveBeenLastCalledWith(
+                    "C",
+                    4,
+                    0,
+                    "C major",
+                    false,
+                    null,
+                    modeWidget.errorMsg,
+                    "equal"
+                );
+
+                modeWidget._triggerNote(12, 12);
+                const octaveFreq = mockActivity.logo.synth.trigger.mock.calls[1][1];
+                expect(spyGetNote).toHaveBeenLastCalledWith(
+                    "C",
+                    4,
+                    12,
+                    "C major",
+                    false,
+                    null,
+                    modeWidget.errorMsg,
+                    "equal"
+                );
+                expect(octaveFreq).toBeCloseTo(rootFreq * 2, 6);
+                expect(modeWidget.logo.synth.inTemperament).toBe("just intonation");
+            } finally {
+                global.getNote = prevGetNote;
+            }
+        });
+
+        test("_triggerNote resolves numeric-entry custom 12-pitch ratios without modifying logo.synth", () => {
+            const customKey = "custom_numeric_12_test";
+            const { TEMPERAMENT: musicUtilsTEMPERAMENT } = require("../../utils/musicutils.js");
+            const table = {
+                isEDO: false,
+                pitchNumber: 12,
+                0: [1, "C", 4],
+                4: [5 / 4, "E(-14)", 4]
+            };
+            global.TEMPERAMENT[customKey] = table;
+            musicUtilsTEMPERAMENT[customKey] = table;
+
+            try {
+                modeWidget.logo.synth.inTemperament = "equal";
+                modeWidget._activeTemperamentKey = customKey;
+                modeWidget._activeEDO = 12;
+                global.getNote.mockReturnValueOnce(["E", 4]);
+                mockActivity.logo.synth.trigger.mockClear();
+
+                modeWidget._triggerNote(4, 12);
+
+                const expectedC4 = pitchToFrequency("C", 4, 0, "C major", "equal");
+                expect(mockActivity.logo.synth.trigger).toHaveBeenLastCalledWith(
+                    0,
+                    expect.closeTo(expectedC4 * (5 / 4), 6),
+                    modeWidget._noteValue,
+                    DEFAULTVOICE,
+                    null,
+                    null
+                );
+
+                global.getNote.mockReturnValueOnce(["E(-14)", 4]);
+                modeWidget._triggerNote(4, 12);
+                expect(mockActivity.logo.synth.trigger).toHaveBeenLastCalledWith(
+                    0,
+                    expect.closeTo(expectedC4 * (5 / 4), 6),
+                    modeWidget._noteValue,
+                    DEFAULTVOICE,
+                    null,
+                    null
+                );
+                expect(modeWidget.logo.synth.inTemperament).toBe("equal");
+            } finally {
+                delete global.TEMPERAMENT[customKey];
+                delete musicUtilsTEMPERAMENT[customKey];
+            }
         });
     });
 });

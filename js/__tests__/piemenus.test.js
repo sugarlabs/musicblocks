@@ -956,6 +956,62 @@ describe("piemenus behavioral tests", () => {
             global.updateWheelItems = prevUpdate;
             global.MODE_PIE_MENUS = savedModes;
         });
+
+        test("uses explicit temperament argument instead of logo.synth.inTemperament", () => {
+            const savedGetCurrentEDO = global.getCurrentEDO;
+            const savedIsNonEDO = global.isNonEDO;
+            const savedGetNonEDOModeSteps = global.getNonEDOModeSteps;
+            const savedGetNonEDOFrequency = global.getNonEDOFrequency;
+            const savedPitchToFrequency = global.pitchToFrequency;
+            const savedTurtles = mockBlock.activity.turtles;
+
+            try {
+                mockBlock.activity.logo.synth.inTemperament = "equal19";
+                mockBlock.activity.turtles = {
+                    ithTurtle: () => ({ singer: { instrumentNames: [global.DEFAULTVOICE] } })
+                };
+                global.getCurrentEDO = jest.fn(t => (t === "just intonation" ? 12 : 19));
+                global.isNonEDO = jest.fn(t => t === "just intonation");
+                global.getNonEDOModeSteps = jest.fn().mockReturnValue([2, 2, 1, 2, 2, 2, 1]);
+                global.getNonEDOFrequency = jest.fn().mockReturnValue({ freq: 327.03 });
+                global.pitchToFrequency = jest.fn().mockReturnValue(329.63);
+
+                piemenuModes(mockBlock, "ionian", jest.fn(), "just intonation");
+
+                expect(global.getCurrentEDO).toHaveBeenCalledWith("just intonation");
+                expect(global.isNonEDO).toHaveBeenCalledWith("just intonation");
+                expect(global.getNonEDOModeSteps).toHaveBeenCalledWith(
+                    expect.any(String),
+                    "just intonation"
+                );
+                expect(mockBlock._modeWheel.navItems).toHaveLength(12);
+
+                mockBlock._modeWheel.selectedNavItemIndex = 4;
+                mockBlock._modeWheel.navItems[4].navigateFunction();
+                expect(global.getNonEDOFrequency).toHaveBeenCalledWith(
+                    4,
+                    4,
+                    "just intonation",
+                    "C chromatic"
+                );
+                expect(mockBlock.activity.logo.synth.trigger).toHaveBeenLastCalledWith(
+                    0,
+                    [327.03],
+                    1 / 12,
+                    expect.anything(),
+                    null,
+                    null
+                );
+                expect(mockBlock.activity.logo.synth.inTemperament).toBe("equal19");
+            } finally {
+                mockBlock.activity.turtles = savedTurtles;
+                global.getCurrentEDO = savedGetCurrentEDO;
+                global.isNonEDO = savedIsNonEDO;
+                global.getNonEDOModeSteps = savedGetNonEDOModeSteps;
+                global.getNonEDOFrequency = savedGetNonEDOFrequency;
+                global.pitchToFrequency = savedPitchToFrequency;
+            }
+        });
     });
 });
 

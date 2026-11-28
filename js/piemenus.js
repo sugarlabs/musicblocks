@@ -3549,7 +3549,7 @@ const piemenuIntervals = (block, selectedInterval) => {
  * @param {Function} [onSelect] Optional callback invoked with (modeName, label) when a mode is chosen
  * @returns {void}
  */
-const piemenuModes = (block, selectedMode, onSelect) => {
+const piemenuModes = (block, selectedMode, onSelect, temperament = null) => {
     // pie menu for mode selection
 
     wheelnav.cssMode = true;
@@ -3589,8 +3589,8 @@ const piemenuModes = (block, selectedMode, onSelect) => {
     // exit button
     block._exitWheel = new wheelnav("_exitWheel", block._modeWheel.raphael);
 
-    const currentEDO = getCurrentEDO(block.activity.logo.synth.inTemperament);
-    const inTemperament = block.activity.logo.synth.inTemperament;
+    const inTemperament = temperament || block.activity.logo.synth.inTemperament;
+    const currentEDO = getCurrentEDO(inTemperament);
     const nonEDO = isNonEDO(inTemperament);
     const modeWheelLabels = Array.from({ length: currentEDO }, (_, i) => String(i));
 
@@ -3822,7 +3822,28 @@ const piemenuModes = (block, selectedMode, onSelect) => {
             }
         }
 
-        const obj = getNote(key, 4, i + o, key + " chromatic", false, null, null, null, true);
+        const obj = getNote(
+            key,
+            4,
+            i + o,
+            key + " chromatic",
+            false,
+            null,
+            null,
+            temperament ? inTemperament : null,
+            true
+        );
+        if (temperament) {
+            const freq = pitchToFrequency(
+                obj[0],
+                obj[1],
+                obj[2] || 0,
+                key + " chromatic",
+                inTemperament
+            );
+            that.activity.logo.synth.trigger(0, [freq], 1 / 12, DEFAULTVOICE, null, null);
+            return;
+        }
         obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
 
         that.activity.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 12, DEFAULTVOICE, null, null);
@@ -3852,8 +3873,9 @@ const piemenuModes = (block, selectedMode, onSelect) => {
      */
     const __prepScale = () => {
         const activeTabs = [0];
-        const scaleInfo = buildScale(key + " " + that.value);
-        const modeIntervals = scaleInfo[1];
+        const scaleInfo = buildScale(key + " " + that.value, temperament ? currentEDO : undefined);
+        const modeIntervals =
+            (nonEDO && getNonEDOModeSteps(that.value, inTemperament)) || scaleInfo[1];
         for (let k = 0; k < modeIntervals.length - 1; k++) {
             activeTabs.push(last(activeTabs) + modeIntervals[k]);
         }
