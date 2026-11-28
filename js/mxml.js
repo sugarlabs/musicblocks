@@ -933,38 +933,45 @@ class MusicXMLExporter {
                             this.indent--;
                             this.add("</time-modification>");
                         }
-                        this.indent--;
+                        const isRest = part.isPercussion ? !obj[MXML_DRUM] : p[0] === "R";
+                        const hasArticulations =
+                            !isRest && (articulationDepth > 0 || Boolean(obj[6]));
+                        const hasTechnical = !isRest && harmonicsDepth > 0;
+                        const hasNotations =
+                            tieStop ||
+                            tieStart ||
+                            hasArticulations ||
+                            hasTechnical ||
+                            slurStart ||
+                            slurStop;
 
-                        this.add("<notations>");
-                        this.indent++;
-                        // <tie> only sets playback; notation programs draw the tie from <tied>.
-                        if (tieStop) this.add('<tied type="stop"/>');
-                        if (tieStart) this.add('<tied type="start"/>');
-                        this.add("<articulations>");
-                        this.indent++;
-                        if (articulationDepth > 0) this.add("<accent/>");
-                        if (obj[6]) this.add('<staccato placement="below"/>');
-                        this.indent--;
-                        this.add("</articulations>");
-                        if (harmonicsDepth > 0) {
-                            this.add("<technical>");
+                        if (hasNotations) {
+                            this.add("<notations>");
                             this.indent++;
-                            this.add("<harmonic/>");
+                            // <tie> only sets playback; notation programs draw the tie from <tied>.
+                            if (tieStop) this.add('<tied type="stop"/>');
+                            if (tieStart) this.add('<tied type="start"/>');
+                            if (hasArticulations) {
+                                this.add("<articulations>");
+                                this.indent++;
+                                if (articulationDepth > 0) this.add("<accent/>");
+                                if (obj[6]) this.add('<staccato placement="below"/>');
+                                this.indent--;
+                                this.add("</articulations>");
+                            }
+                            if (hasTechnical) {
+                                this.add("<technical>");
+                                this.indent++;
+                                this.add("<harmonic/>");
+                                this.indent--;
+                                this.add("</technical>");
+                            }
+                            if (slurStart) this.add('<slur type="start"/>');
+                            if (slurStop) this.add('<slur type="stop"/>');
                             this.indent--;
-                            this.add("</technical>");
+                            this.add("</notations>");
                         }
                         this.indent--;
-                        if (slurStart) {
-                            this.indent++;
-                            this.add('<slur type="start"/>');
-                            this.indent--;
-                        }
-                        if (slurStop) {
-                            this.indent++;
-                            this.add('<slur type="stop"/>');
-                            this.indent--;
-                        }
-                        this.add("</notations>");
                         this.add("</note>");
                         isChordNote = true;
                     }
