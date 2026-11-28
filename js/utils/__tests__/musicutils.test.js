@@ -4924,6 +4924,82 @@ describe("getScaleAndHalfSteps extended modes", () => {
     });
 });
 
+describe("getNote: movable Do outside 12 EDO", () => {
+    const movable = (syllable, key, temperament) =>
+        getNote(syllable, 4, 0, key, true, null, () => {}, temperament)[0];
+
+    it("plays the degree of the key's own scale, not its flat enharmonic", () => {
+        // ti in G major came out G♭, a different pitch from F♯ in 19 EDO.
+        expect(movable("ti", "G major", "equal19")).toBe("F♯");
+        expect(movable("mi", "D major", "equal19")).toBe("F♯");
+        expect(movable("ti", "D major", "equal19")).toBe("C♯");
+        expect(movable("ti", "G major", "1/3 comma meantone")).toBe("F♯");
+    });
+
+    it("agrees with the scale Scalar Step walks in every EDO", () => {
+        const syllables = ["do", "re", "mi", "fa", "sol", "la", "ti"];
+        for (const [temperament, edo] of [
+            ["equal19", 19],
+            ["equal31", 31],
+            ["1/4 comma meantone", 21]
+        ]) {
+            for (const key of [
+                "G major",
+                "D major",
+                "E♭ major",
+                "A major",
+                "B♯ major",
+                "F♭ major"
+            ]) {
+                expect(syllables.map(s => movable(s, key, temperament))).toEqual(
+                    buildScale(key, edo)[0].slice(0, 7)
+                );
+            }
+        }
+    });
+
+    it("plays F♭ major's degrees in 19 EDO, where F♭ is E♯ and not E", () => {
+        // 19 EDO has no double flats, so F♭ major is spelled E♯ G♭ A♭ A♯ B♯ D♭ E♭.
+        expect(movable("do", "F♭ major", "equal19")).toBe("E♯");
+        expect(movable("mi", "F♭ major", "equal19")).toBe("A♭");
+        expect(movable("ti", "F♭ major", "equal19")).toBe("E♭");
+    });
+
+    const movableNote = (syllable, key, temperament) =>
+        getNote(syllable, 4, 0, key, true, null, () => {}, temperament).slice(0, 2);
+
+    it("puts each degree in the octave its letter is in", () => {
+        // A 5-EDO major scale runs out of letters and carries on into the next
+        // octave, as Scalar Step does: la and ti are C5 and D5, above sol.
+        expect(movableNote("sol", "C major", "equal5")).toEqual(["A", 4]);
+        expect(movableNote("la", "C major", "equal5")).toEqual(["C", 5]);
+        expect(movableNote("ti", "C major", "equal5")).toEqual(["D", 5]);
+        // C♭ and B♯ are written in the octave of their letter, across the C.
+        expect(movableNote("do", "C♭ major", "equal31")).toEqual(["C♭", 4]);
+        expect(movableNote("re", "C♭ major", "equal31")).toEqual(["D♭", 4]);
+        expect(movableNote("do", "B♯ major", "equal19")).toEqual(["B♯", 3]);
+        expect(movableNote("re", "B♯ major", "equal19")).toEqual(["D♭", 4]);
+        expect(movableNote("ti", "G major", "equal19")).toEqual(["F♯", 4]);
+    });
+
+    it("moves the key's own degree by the syllable's accidental", () => {
+        // ti in G major is F♯, so ti♯ is F𝄪, which 19 EDO plays as G♭: one step
+        // above ti, as in 12 EDO, not the G two steps above it.
+        expect(movableNote("ti♯", "G major", "equal19")).toEqual(["G♭", 4]);
+        expect(movableNote("ti♯", "D major", "equal19")).toEqual(["D♭", 5]);
+        expect(movableNote("la♭", "B major", "equal19")).toEqual(["G", 4]);
+        expect(movableNote("do♯", "B major", "equal19")).toEqual(["B♯", 3]);
+        // 31 EDO has double flats, spelled ♭♭.
+        expect(movableNote("la♭", "C♭ major", "equal31")).toEqual(["A♭♭", 4]);
+        expect(movableNote("mi♯", "A minor", "equal31")).toEqual(["E♯", 4]);
+    });
+
+    it("leaves 12 EDO alone", () => {
+        expect(movable("ti", "G major", "equal")).toBe("F♯");
+        expect(movable("mi", "E♭ major", "equal")).toBe("G");
+    });
+});
+
 describe("getNote additional paths", () => {
     it("parses matrix-style note labels with embedded octave markup", () => {
         expect(getNote("mi<sub>5</sub>", 4, 0, "C major", false)).toEqual(["E", 5, 0]);
