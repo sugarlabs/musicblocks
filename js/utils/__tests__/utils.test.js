@@ -2008,3 +2008,97 @@ describe("UtilsLogic re-exports in utils.js", () => {
         expect(utils.formatSeconds(null)).toBe("00:00");
     });
 });
+
+describe("extractProjectDataFromHTML()", () => {
+    const { extractProjectDataFromHTML } = require("../utils");
+
+    it("extracts project JSON from div#codeBlock", () => {
+        const html =
+            '<html><body><div class="code" id="codeBlock">[[0,"start",0,0,[]]]</div></body></html>';
+        expect(extractProjectDataFromHTML(html)).toBe('[[0,"start",0,0,[]]]');
+    });
+
+    it('falls back to <div class="code"> when id="codeBlock" is absent', () => {
+        const html = '<div>header</div><div class="code">[1,2,3]</div>';
+        expect(extractProjectDataFromHTML(html)).toBe("[1,2,3]");
+    });
+
+    it("returns null when the project data div is empty or absent", () => {
+        expect(extractProjectDataFromHTML('<div class="code" id="codeBlock"></div>')).toBeNull();
+        expect(extractProjectDataFromHTML("<div>no project data</div>")).toBeNull();
+    });
+});
+
+describe("waitForReadiness()", () => {
+    const { waitForReadiness } = require("../utils");
+    let origRaf;
+    let origCreatejs;
+    let origHowler;
+    let origJQuery;
+
+    beforeEach(() => {
+        origRaf = global.requestAnimationFrame;
+        origCreatejs = global.createjs;
+        origHowler = global.Howler;
+        origJQuery = global.jQuery;
+    });
+
+    afterEach(() => {
+        global.requestAnimationFrame = origRaf;
+        global.createjs = origCreatejs;
+        global.Howler = origHowler;
+        global.jQuery = origJQuery;
+        jest.restoreAllMocks();
+    });
+
+    it("polls until minWait and dependencies/DOM are ready, then invokes callback", () => {
+        const frames = [];
+        global.requestAnimationFrame = jest.fn(cb => frames.push(cb));
+        let now = 1000;
+        jest.spyOn(Date, "now").mockImplementation(() => now);
+        global.createjs = { Stage: jest.fn() };
+        global.Howler = {};
+        global.jQuery = jest.fn();
+        global.document.getElementById = jest.fn(id =>
+            ["myCanvas", "loader", "toolbars"].includes(id) ? {} : null
+        );
+        const logSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+        const cb = jest.fn();
+
+        waitForReadiness(cb, { minWait: 500, maxWait: 5000 });
+        expect(frames).toHaveLength(1);
+
+        // Before minWait, keeps polling
+        now = 1200;
+        frames.shift()();
+        expect(cb).not.toHaveBeenCalled();
+        expect(frames).toHaveLength(1);
+
+        // Once minWait elapses and deps/DOM exist, invokes callback
+        now = 1600;
+        frames.shift()();
+        expect(cb).toHaveBeenCalledTimes(1);
+        expect(logSpy).toHaveBeenCalledWith("[Firefox] Initialized in 600ms (readiness-based)");
+    });
+
+    it("invokes callback as fallback when maxWait elapses without readiness", () => {
+        const frames = [];
+        global.requestAnimationFrame = jest.fn(cb => frames.push(cb));
+        let now = 2000;
+        jest.spyOn(Date, "now").mockImplementation(() => now);
+        delete global.createjs;
+        delete global.Howler;
+        delete global.jQuery;
+        const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+        const cb = jest.fn();
+
+        waitForReadiness(cb, { minWait: 100, maxWait: 1000 });
+        now = 3100;
+        frames.shift()();
+
+        expect(cb).toHaveBeenCalledTimes(1);
+        expect(warnSpy).toHaveBeenCalledWith(
+            "[Firefox] Initialization timed out after 1000ms, proceeding anyway"
+        );
+    });
+});
