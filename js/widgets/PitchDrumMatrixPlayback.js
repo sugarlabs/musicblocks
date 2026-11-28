@@ -63,6 +63,7 @@ class PitchDrumMatrixPlayback {
         img.style.verticalAlign = "middle";
         icon.appendChild(img);
         icon.appendChild(document.createTextNode("\u00A0\u00A0"));
+        icon.setAttribute("aria-label", label);
     }
 
     /**

@@ -86,6 +86,7 @@ describe("RhythmRulerEditing", () => {
             _playingAll: true,
             _playingOne: true,
             _setButtonIcon: jest.fn(),
+            _setPlayAllAccessibleName: jest.fn(),
             _refreshCircularView: jest.fn()
         };
         widget._undo = jest.fn(() => widget.Rulers[widget._rulerSelected][1].pop());
@@ -203,17 +204,25 @@ describe("RhythmRulerEditing", () => {
             }
             document.body.append(table);
 
+            // A real button, so _setButtonIcon/_setPlayAllAccessibleName can be
+            // exercised for real instead of stubbed, and the resulting aria-label
+            // can be asserted on (#10399).
+            const playAllCell = document.createElement("button");
+
             return {
                 activity: { logo: { synth: { stop: jest.fn() } } },
                 _rulers: [row],
                 Rulers: [[noteValues, history]],
                 _undoList: undoList,
+                _playAllCell: playAllCell,
                 _noteWidth: value => 200 / Math.abs(value),
                 __setNoteValueDisplay: jest.fn(),
                 __addCellEventHandlers: jest.fn(),
                 __toggleRestState: jest.fn(),
                 _calculateZebraStripes: jest.fn(),
                 _refreshCircularView: jest.fn(),
+                _setButtonIcon: global.RhythmRuler.prototype._setButtonIcon,
+                _setPlayAllAccessibleName: global.RhythmRuler.prototype._setPlayAllAccessibleName,
                 // Records the ruler history as it is when saved.
                 saveDissectHistory: jest.fn(function () {
                     this.savedHistory = JSON.parse(JSON.stringify(this.Rulers[0][1]));
@@ -233,6 +242,11 @@ describe("RhythmRulerEditing", () => {
             expect(widget._playing).toBe(false);
             expect(widget._rulerPlaying).toBe(-1);
             expect(widget._rulers[0].cells).toHaveLength(1);
+            // Undo during playback must restore the Play all button too (#10399).
+            expect(widget._playAllCell.querySelector("img").getAttribute("src")).toBe(
+                "header-icons/play-button.svg"
+            );
+            expect(widget._playAllCell.getAttribute("aria-label")).toBe("Play all");
         });
 
         test("puts a dissected cell back together", () => {

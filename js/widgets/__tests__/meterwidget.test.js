@@ -101,6 +101,7 @@ window.innerWidth = 1024;
 let mockAddButton = jest.fn().mockImplementation((img, size, tip) => ({
     onclick: () => {},
     appendChild: jest.fn(),
+    setAttribute: jest.fn(),
     textContent: "",
     innerHTML: "",
     tip,
@@ -286,6 +287,7 @@ describe("Meter Widget", () => {
         playBtnMock.onclick();
         expect(meterWidget._playing).toBe(true);
         expect(mockActivity.logo.resetSynth).toHaveBeenCalled();
+        expect(playBtnMock.setAttribute).toHaveBeenLastCalledWith("aria-label", "Stop");
 
         // Fast-forward time to unlock click
         jest.advanceTimersByTime(1100);
@@ -297,6 +299,7 @@ describe("Meter Widget", () => {
         // Click Stop
         playBtnMock.onclick();
         expect(meterWidget._playing).toBe(false);
+        expect(playBtnMock.setAttribute).toHaveBeenLastCalledWith("aria-label", "Play");
         for (const item of meterWidget._playWheel.navItems) {
             expect(item.navItem.hide).toHaveBeenCalledTimes(1);
         }

@@ -230,6 +230,7 @@ window.widgetWindows = {
                 appendChild: jest.fn(),
                 replaceChildren: jest.fn(),
                 removeChild: jest.fn(),
+                setAttribute: jest.fn(),
                 firstChild: null
             };
             btn.onclick = jest.fn();
@@ -1521,6 +1522,17 @@ describe("ModeWidget", () => {
             expect(setIcon).toHaveBeenCalledWith("play-button.svg", "Play all");
         });
 
+        test("play button's accessible name tracks Play/Stop so screen readers hear its current state", () => {
+            modeWidget._playButton.onclick();
+            expect(modeWidget._playButton.setAttribute).toHaveBeenCalledWith("aria-label", "Stop");
+
+            modeWidget._playButton.onclick();
+            expect(modeWidget._playButton.setAttribute).toHaveBeenCalledWith(
+                "aria-label",
+                "Play all"
+            );
+        });
+
         test("idle Clear preserves the root and can be undone", () => {
             const original = [...modeWidget._selectedNotes];
             modeWidget._clear();
@@ -1596,6 +1608,11 @@ describe("ModeWidget", () => {
             expect(widget._playing).toBe(false);
             expect(widget._newPattern).toBeNull();
             expect(widget._notesToPlay).toBeNull();
+            // Changing tuning mid-playback must not leave a stale "Stop" label (#10399).
+            expect(widget._playButton.setAttribute).toHaveBeenLastCalledWith(
+                "aria-label",
+                "Play all"
+            );
         });
 
         test("widgetWindow.onclose invokes _clearWidgetTimers and stops synth", () => {

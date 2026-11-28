@@ -769,6 +769,8 @@ class RhythmRulerEditing {
         this._playingOne = false;
         this._rulerPlaying = -1;
         this._startingTime = null;
+        this._setButtonIcon(this._playAllCell, "play-button.svg", _("Play all"));
+        this._setPlayAllAccessibleName(_("Play all"));
 
         if (this._undoList.length === 0) {
             return;
@@ -917,6 +919,7 @@ class RhythmRulerEditing {
         this._rulerPlaying = -1;
         this._startingTime = null;
         this._setButtonIcon(this._playAllCell, "play-button.svg", _("Play all"));
+        this._setPlayAllAccessibleName(_("Play all"));
         for (let r = 0; r < this.Rulers.length; r++) {
             this._rulerSelected = r;
             while (this.Rulers[r][1].length > 0) {

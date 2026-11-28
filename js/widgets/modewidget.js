@@ -330,6 +330,7 @@ class ModeWidget {
         this._playing = false;
         this._newPattern = null;
         this._notesToPlay = null;
+        this._setPlayButtonIcon("play-button.svg", _("Play all"));
     }
 
     _setPlayButtonIcon(iconName, titleText) {
@@ -345,6 +346,7 @@ class ModeWidget {
             img,
             document.createTextNode("\u00a0\u00a0")
         );
+        this._playButton.setAttribute("aria-label", titleText);
     }
 
     // ── EDO helpers ───────────────────────────────────────────────

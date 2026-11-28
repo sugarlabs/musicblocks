@@ -608,6 +608,21 @@ class RhythmRuler {
     }
 
     /**
+     * Updates the accessible name of the toolbar-level "Play all" button so it
+     * matches its current function. The icon swap above already updates the
+     * image's own title/alt, but the button's own aria-label (set once by
+     * makeKeyboardAccessible() when the button was created) otherwise goes stale.
+     * @private
+     * @param {string} label - The accessible name to apply.
+     * @returns {void}
+     */
+    _setPlayAllAccessibleName(label) {
+        if (this._playAllCell && typeof this._playAllCell.setAttribute === "function") {
+            this._playAllCell.setAttribute("aria-label", label);
+        }
+    }
+
+    /**
      * Resets playback/sync state and ensures at least one (default) drum/ruler
      * exists. Called at the start of init().
      * @private
