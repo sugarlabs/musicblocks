@@ -114,6 +114,7 @@ class ModeWidget {
          * @private
          */
         this._activeTimeouts = new Set();
+        this._animationTimeouts = new Set();
 
         // Layout: pie wheel + mode table (label row) + bottom control bar
         this.modeTableDiv = document.createElement("div");
@@ -227,7 +228,7 @@ class ModeWidget {
             // Non-EDO temperaments are used by their pitch count (12/19/21);
             // switching the tuning below will replace them with an equal
             // temperament. Inform, but do not block.
-            this._setTimeout(
+            this._setWidgetTimeout(
                 () =>
                     this.textMsg(
                         _(
@@ -306,6 +307,7 @@ class ModeWidget {
             count++;
         }
         this._activeTimeouts.clear();
+        this._animationTimeouts.clear();
 
         if (Array.isArray(this._timeouts)) {
             for (const id of this._timeouts) {
@@ -318,14 +320,23 @@ class ModeWidget {
         return count;
     }
 
-    _setTimeout(fn, delay) {
-        return this._setWidgetTimeout(fn, delay);
+    _setAnimationTimeout(fn, delay) {
+        let id;
+        id = this._setWidgetTimeout(() => {
+            this._animationTimeouts.delete(id);
+            fn();
+        }, delay);
+        this._animationTimeouts.add(id);
+        return id;
     }
 
     _cancelAnimations() {
         // Clear stale rotate/invert/play callbacks before rebuilding for a
         // new EDO; they reference old navItem indexes.
-        this._clearWidgetTimers();
+        for (const id of this._animationTimeouts) {
+            this._clearWidgetTimeout(id);
+        }
+        this._animationTimeouts.clear();
         this._locked = false;
         this._playing = false;
         this._newPattern = null;
@@ -904,7 +915,7 @@ class ModeWidget {
         svg.style.pointerEvents = "none";
         svg.setAttribute("height", `${ModeWidget.WHEELSIZE * scale}px`);
         svg.setAttribute("width", `${ModeWidget.WHEELSIZE * scale}px`);
-        this._setTimeout(() => {
+        this._setWidgetTimeout(() => {
             svg.style.pointerEvents = "auto";
         }, 100);
     }
@@ -1053,7 +1064,7 @@ class ModeWidget {
             this._setModeName();
             this._locked = false;
         } else {
-            this._setTimeout(() => {
+            this._setAnimationTimeout(() => {
                 this.__invertOnePair(i + 1);
             }, ModeWidget.ROTATESPEED);
         }
@@ -1150,11 +1161,11 @@ class ModeWidget {
         }
 
         if (i === 0) {
-            this._setTimeout(() => {
+            this._setAnimationTimeout(() => {
                 this._finishRotation();
             }, ModeWidget.ROTATESPEED);
         } else {
-            this._setTimeout(() => {
+            this._setAnimationTimeout(() => {
                 this.__rotateRightOneCell((i + 1) % this._activeEDO);
             }, ModeWidget.ROTATESPEED);
         }
@@ -1181,11 +1192,11 @@ class ModeWidget {
         }
 
         if (i === 0) {
-            this._setTimeout(() => {
+            this._setAnimationTimeout(() => {
                 this._finishRotation();
             }, ModeWidget.ROTATESPEED);
         } else {
-            this._setTimeout(() => {
+            this._setAnimationTimeout(() => {
                 this.__rotateLeftOneCell(i - 1);
             }, ModeWidget.ROTATESPEED);
         }
@@ -1227,7 +1238,7 @@ class ModeWidget {
         const time = this._noteValue + 0.125;
 
         if (i > this._notesToPlay.length - 1) {
-            this._setTimeout(() => {
+            this._setAnimationTimeout(() => {
                 this._playing = false;
                 this._setPlayButtonIcon("play-button.svg", _("Play all"));
                 this._resetNotes();
@@ -1236,7 +1247,7 @@ class ModeWidget {
             return;
         }
 
-        this._setTimeout(() => {
+        this._setAnimationTimeout(() => {
             if (this._lastNotePlayed !== null) {
                 this._playWheel.navItems[this._lastNotePlayed % n].navItem.hide();
             }
@@ -1250,7 +1261,7 @@ class ModeWidget {
                 this.__playNextNote(i + 1);
             } else {
                 this._locked = false;
-                this._setTimeout(() => this._resetNotes(), ModeWidget.RESET_NOTES_DELAY);
+                this._setAnimationTimeout(() => this._resetNotes(), ModeWidget.RESET_NOTES_DELAY);
             }
         }, 1000 * time);
     }
@@ -1305,6 +1316,11 @@ class ModeWidget {
 
     _undo() {
         if (this._undoStack.length > 0) {
+            if (this._playing) {
+                this.logo.synth.stop();
+            }
+            this._cancelAnimations();
+            this._setPlayButtonIcon("play-button.svg", _("Play all"));
             const prevState = JSON.parse(this._undoStack.pop());
             for (let i = 0; i < this._activeEDO; i++) {
                 this._selectedNotes[i] = prevState[i];
@@ -1810,7 +1826,7 @@ class ModeWidget {
             previousBlock = idx;
         }
 
-        this._setTimeout(() => {
+        this._setWidgetTimeout(() => {
             this.blocks.loadNewBlocks(newStack);
         }, 2000);
     }
