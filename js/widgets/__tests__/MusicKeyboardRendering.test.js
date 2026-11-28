@@ -142,6 +142,127 @@ describe("MusicKeyboardRendering", () => {
         expect(keyboard._createpiesubmenu).toHaveBeenCalledWith("cells-1", "250", "0.25");
     });
 
+    test("makeClickable makes note cells keyboard accessible", () => {
+        let selectedNotes = [];
+        const keyboard = makeKeyboard({ getSelectedNotes: () => selectedNotes });
+        keyboard._createpiesubmenu = jest.fn();
+        keyboard._setNotes = jest.fn();
+
+        const table = document.createElement("table");
+        const row = table.insertRow();
+        row.id = "mkbNoteDurationRow";
+        row.insertCell();
+        const secondCell = row.insertCell();
+        secondCell.id = "cells-1";
+        secondCell.setAttribute("start", "250");
+        secondCell.setAttribute("dur", "0.25");
+        secondCell.textContent = "1/4";
+        document.body.append(table);
+
+        const labelCell = document.createElement("td");
+        labelCell.id = "labelcol0";
+        labelCell.textContent = "C4";
+        document.body.append(labelCell);
+
+        const gridTable = document.createElement("table");
+        const gridRow = gridTable.insertRow();
+        gridRow.id = "mkb0";
+        const firstGridCell = gridRow.insertCell();
+        const secondGridCell = gridRow.insertCell();
+        for (const gridCell of [firstGridCell, secondGridCell]) {
+            gridCell.setAttribute("cellColor", "white");
+        }
+        document.body.append(gridTable);
+
+        selectedNotes = [{ duration: [0.25] }, { duration: [0.25] }];
+        keyboard.layout = [{ noteName: "C", noteOctave: 4, blockNumber: 1 }];
+        keyboard.makeClickable();
+
+        expect(secondCell.getAttribute("tabindex")).toBe("0");
+        expect(secondCell.getAttribute("role")).toBe("button");
+        expect(secondCell.getAttribute("aria-label")).toBe("note duration 1/4, column 2");
+
+        const enterEvent = { key: "Enter", preventDefault: jest.fn(), target: secondCell };
+        secondCell.onkeydown(enterEvent);
+        expect(enterEvent.preventDefault).toHaveBeenCalled();
+        expect(keyboard._createpiesubmenu).toHaveBeenCalledWith("cells-1", "250", "0.25");
+
+        expect(secondGridCell.getAttribute("tabindex")).toBe("0");
+        expect(secondGridCell.getAttribute("role")).toBe("button");
+        expect(secondGridCell.getAttribute("aria-label")).toBe("C4, column 2, duration 1/4");
+
+        const space = new KeyboardEvent("keydown", { key: " ", cancelable: true, bubbles: true });
+        secondGridCell.dispatchEvent(space);
+        expect(space.defaultPrevented).toBe(true);
+        expect(secondGridCell.style.backgroundColor).toBe("black");
+        expect(secondGridCell.getAttribute("aria-pressed")).toBe("true");
+        expect(keyboard._setNotes).toHaveBeenCalledWith(1, true);
+
+        secondGridCell.dispatchEvent(
+            new KeyboardEvent("keydown", { key: " ", cancelable: true, bubbles: true })
+        );
+        expect(secondGridCell.getAttribute("aria-pressed")).toBe("false");
+        expect(keyboard._setNotes).toHaveBeenLastCalledWith(1, false);
+
+        keyboard._setNotes.mockClear();
+        secondGridCell.dispatchEvent(new KeyboardEvent("keydown", { key: "a", bubbles: true }));
+        expect(keyboard._setNotes).not.toHaveBeenCalled();
+
+        // Dragging toggles the cell entered, not the one where the drag began.
+        firstGridCell.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+        secondGridCell.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+        expect(secondGridCell.getAttribute("aria-pressed")).toBe("true");
+        expect(keyboard._setNotes).toHaveBeenLastCalledWith(1, true);
+
+        // Assistive-technology activation arrives as a detail-0 click.
+        secondGridCell.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        expect(secondGridCell.getAttribute("aria-pressed")).toBe("false");
+        expect(keyboard._setNotes).toHaveBeenLastCalledWith(1, false);
+    });
+
+    test("makeClickable handles an empty keyboard grid", () => {
+        const keyboard = makeKeyboard({ getSelectedNotes: () => [] });
+        keyboard.layout = [];
+        keyboard._setNotes = jest.fn();
+        keyboard._createpiesubmenu = jest.fn();
+
+        expect(() => keyboard.makeClickable()).not.toThrow();
+        expect(keyboard._setNotes).not.toHaveBeenCalled();
+        expect(keyboard._createpiesubmenu).not.toHaveBeenCalled();
+    });
+
+    test("makeClickable keeps each handler bound to its own cell", () => {
+        const keyboard = makeKeyboard({ getSelectedNotes: () => [{ duration: [0.25] }] });
+        keyboard._setNotes = jest.fn();
+        keyboard._createpiesubmenu = jest.fn();
+        keyboard.layout = [{ noteName: "C", noteOctave: 4, blockNumber: 1 }];
+
+        const durationTable = document.createElement("table");
+        const durationRow = durationTable.insertRow();
+        durationRow.id = "mkbNoteDurationRow";
+        durationRow.insertCell().textContent = "1/4";
+        document.body.append(durationTable);
+
+        const gridTable = document.createElement("table");
+        const gridRow = gridTable.insertRow();
+        gridRow.id = "mkb0";
+        const firstCell = gridRow.insertCell();
+        const secondCell = gridRow.insertCell();
+        for (const gridCell of [firstCell, secondCell]) {
+            gridCell.setAttribute("cellColor", "white");
+        }
+        document.body.append(gridTable);
+
+        keyboard.makeClickable();
+
+        // With no event target the handler must fall back to the cell it was
+        // created for, not the last cell visited by makeClickable.
+        firstCell.onkeydown({ key: " ", preventDefault() {}, stopPropagation() {} });
+        expect(firstCell.getAttribute("aria-pressed")).toBe("true");
+        expect(secondCell.getAttribute("aria-pressed")).toBe("false");
+        expect(keyboard._setNotes).toHaveBeenCalledWith(0, true);
+    });
+
     test("_createTable draws the note list that processSelected() leaves behind", () => {
         // processSelected() replaces selectedNotes. Reading it before that call
         // would draw the old list and leave makeClickable() short of cells.

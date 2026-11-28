@@ -177,6 +177,9 @@ const MusicKeyboardEditing = {
          * @param {string} start - The start attribute of the cell.
          */
         this._createpiesubmenu = function (cellId, start) {
+            // Rebuilding the menu for the same owner must remove the old wheels
+            // first: wheelnav's keydown listener lives on the wheel instance.
+            this._closeWheelMenu();
             this._claimWheelMenu();
             docById("wheelDivptm").style.display = "";
             docById("wheelDivptm").style.zIndex = "10001";
@@ -238,7 +241,8 @@ const MusicKeyboardEditing = {
             this._tabsWheel.createWheel(tabsLabels);
 
             this._durationWheel.colors = platformColor.pitchWheelcolors;
-            this._durationWheel.keynavigateEnabled = false;
+            // Arrow keys must select a duration after Enter opens this submenu.
+            this._durationWheel.keynavigateEnabled = true;
             this._durationWheel.slicePathFunction = slicePath().DonutSlice;
             this._durationWheel.slicePathCustom = slicePath().DonutSliceCustomization();
             this._durationWheel.slicePathCustom.minRadiusPercent = 0.7;
