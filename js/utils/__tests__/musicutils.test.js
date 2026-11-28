@@ -1413,19 +1413,35 @@ describe("cents calculations", () => {
     });
 
     describe("pitchToFrequency cents with non-12 EDO", () => {
+        // A cent is 1/1200 of an octave in every temperament, not a hundredth of a step:
+        // A4 + 50 cents is 440 * 2^(50/1200) Hz in 19 and 31 EDO as in 12 EDO.
         it("handles non-zero cents with 19-EDO", () => {
-            // A4 in 19-EDO = pitchNumber 76 (4 * 19)
             const result = pitchToFrequency("A", 4, 50, "C", "equal19");
-            const expected = A0 * Math.pow(2, 1 / (19 * 100)) ** (76 * 100 + 50);
-            expect(result).toBeCloseTo(expected, 4);
+            expect(result).toBeCloseTo(440 * Math.pow(2, 50 / 1200), 4);
         });
 
         it("handles non-zero cents with 31-EDO", () => {
-            // A4 in 31-EDO = pitchNumber 124 (4 * 31)
             const result = pitchToFrequency("A", 4, 50, "C", "equal31");
-            const expected = A0 * Math.pow(2, 1 / (31 * 100)) ** (124 * 100 + 50);
-            expect(result).toBeCloseTo(expected, 4);
+            expect(result).toBeCloseTo(440 * Math.pow(2, 50 / 1200), 4);
         });
+
+        it.each(["equal5", "equal17", "equal19", "equal31"])(
+            "plays back the cents frequencyToPitch measured in %s",
+            temperament => {
+                for (const hz of [271.3, 452.9, 600]) {
+                    const [note, octave, cents] = frequencyToPitch(hz, temperament);
+                    // frequencyToPitch drops less than half a cent.
+                    expect(
+                        Math.abs(
+                            1200 *
+                                Math.log2(
+                                    pitchToFrequency(note, octave, cents, "C", temperament) / hz
+                                )
+                        )
+                    ).toBeLessThan(0.51);
+                }
+            }
+        );
 
         it("handles negative cents", () => {
             const result = pitchToFrequency("A", 4, -30, "C");
