@@ -159,6 +159,8 @@ Object.assign(global, {
     A0: musicUtils.A0,
     C8: musicUtils.C8,
     getCurrentEDO: musicUtils.getCurrentEDO,
+    edoTransposition: musicUtils.edoTransposition,
+    edoTranspositionCents: musicUtils.edoTranspositionCents,
     getModeLength: musicUtils.getModeLength,
     getInterval: musicUtils.getInterval,
     getTemperament: musicUtils.getTemperament,

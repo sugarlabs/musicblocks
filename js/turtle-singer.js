@@ -25,7 +25,8 @@
    noteIsSolfege, getSolfege, SOLFEGENAMES1, NOTENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
    noteToFrequency, getTemperament,
-   SEMITONES, normalizeNoteAccidentals, parseNoteString, getCurrentEDO,
+   SEMITONES, normalizeNoteAccidentals, parseNoteString, getCurrentEDO, edoTransposition,
+   edoTranspositionCents,
    keySignatureToMode, getSavedCustomModes,
    clampNumber, saveMeterState, restoreMeterState
  */
@@ -38,7 +39,7 @@
         frequencyToPitch, pitchToFrequency, getNote, isCustomTemperament, getStepSizeUp, getStepSizeDown,
         numberToPitch, pitchToNumber, noteIsSolfege, getSolfege, SOLFEGENAMES1, NOTENAMES1,
         SOLFEGECONVERSIONTABLE, getInterval, noteToFrequency, getTemperament,
-        getCurrentEDO, isEquallyTempered
+        getCurrentEDO, isEquallyTempered, edoTransposition, edoTranspositionCents
     js/utils/musicutils-rhythm.js
         saveMeterState, restoreMeterState
     js/utils/utils.js
@@ -1080,12 +1081,13 @@ class Singer {
      * @param {Number} octave - Scale octave
      * @param {String|null} direction - Interval direction or null
      * @param {Number} edo - The current EDO steps per octave
-     * @returns {{ arpeggioTrans: Number, anote: String }}
+     * @returns {{ arpeggioSteps: Number, arpeggioSemitones: Number, anote: String }}
+     *     the scalar part in steps of the temperament and the semitone part
      */
     static resolveArpeggio(activity, tur, note, octave, direction, edo) {
         const alen = tur.singer.arpeggio.length;
         if (alen === 0) {
-            return { arpeggioTrans: 0, anote: note };
+            return { arpeggioSteps: 0, arpeggioSemitones: 0, anote: note };
         }
 
         const keySig = Array.isArray(tur.singer.keySignature)
@@ -1117,12 +1119,16 @@ class Singer {
 
         const entry = tur.singer.arpeggio[tur.singer.arpeggioIndex];
         let anote = note;
-        let arpeggioTrans = 0;
+        let arpeggioSteps = 0;
+        let arpeggioSemitones = 0;
 
         if (isNaN(entry[0])) {
             anote = "rest";
         } else {
-            arpeggioTrans = getInterval(entry[0], keySig, basePitch, edo) + entry[1];
+            // Each arpeggio is a [scalar, semitone]. getInterval counts the scalar
+            // part in steps of the temperament.
+            arpeggioSteps = getInterval(entry[0], keySig, basePitch, edo);
+            arpeggioSemitones = entry[1];
         }
 
         tur.singer.arpeggioIndex += 1;
@@ -1130,7 +1136,72 @@ class Singer {
             tur.singer.arpeggioIndex = 0;
         }
 
-        return { arpeggioTrans, anote };
+        return { arpeggioSteps, arpeggioSemitones, anote };
+    }
+
+    /**
+     * The cents to add to a note when a fractional transposition was rounded to
+     * a whole number of steps outside 12 EDO, so the note sounds exactly
+     * `semitones` above where the step-based shifts put it.
+     *
+     * In an EDO every step has the same size and pitchToFrequency reads cents
+     * as hundredths of a step, so this is edoTranspositionCents. A temperament
+     * with its own table of ratios (the meantones) has steps of different
+     * sizes, and pitchToFrequency reads its cents as hundredths of a semitone,
+     * so the cents come from where the rounded step actually landed.
+     *
+     * @static
+     * @param {Object} activity
+     * @param {Object} tur - the turtle
+     * @param {String} note - the note before any shift
+     * @param {Number} octave - its octave
+     * @param {Number} semitones - the transposition in semitones
+     * @param {Number} steps - the other shifts, in steps of the temperament
+     * @param {Array} noteObj - what getNote returned for both shifts
+     * @param {String|null} direction - passed on to getNote
+     * @returns {Number} the cents to add, or 0
+     */
+    static fractionalTranspositionCents(
+        activity,
+        tur,
+        note,
+        octave,
+        semitones,
+        steps,
+        noteObj,
+        direction
+    ) {
+        const temperament = activity.logo.synth.inTemperament;
+        const edo = getCurrentEDO(temperament);
+        if (edo === 12 || Number.isInteger(semitones) || noteObj[0] === "R") {
+            return 0;
+        }
+
+        const t = getTemperament(temperament);
+        if (!(t && !t.isEDO && t.noteLabels && t.ratios)) {
+            return edoTranspositionCents(semitones, edo);
+        }
+
+        // Use the same key signature as the getNote call that produced noteObj,
+        // so both notes are resolved the same way.
+        const keySig = tur.singer.keySignature;
+        const from = getNote(
+            note,
+            octave,
+            steps,
+            keySig,
+            tur.singer.movable,
+            direction,
+            activity.errorMsg,
+            temperament,
+            true
+        );
+        if (from[0] === "R") {
+            return 0;
+        }
+        const fromHertz = pitchToFrequency(from[0], from[1], 0, keySig, temperament);
+        const toHertz = pitchToFrequency(noteObj[0], noteObj[1], 0, keySig, temperament);
+        return semitones * 100 - 1200 * Math.log2(toHertz / fromHertz);
     }
 
     /**
@@ -1248,7 +1319,7 @@ class Singer {
 
             // Apply transpositions
             const transposition = 2 * delta + tur.singer.transposition;
-            const { arpeggioTrans, anote } = Singer.resolveArpeggio(
+            const { arpeggioSteps, arpeggioSemitones, anote } = Singer.resolveArpeggio(
                 activity,
                 tur,
                 note,
@@ -1256,7 +1327,11 @@ class Singer {
                 null,
                 edo
             );
-            const atrans = transposition + cents / 100 + arpeggioTrans;
+            const [atrans, atransInSteps] = edoTransposition(
+                transposition + cents / 100 + arpeggioSemitones,
+                arpeggioSteps,
+                edo
+            );
             const keySig = Array.isArray(tur.singer.keySignature)
                 ? tur.singer.keySignature.join(" ")
                 : tur.singer.keySignature;
@@ -1269,7 +1344,8 @@ class Singer {
                 tur.singer.movable,
                 null,
                 activity.errorMsg,
-                activity.logo.synth.inTemperament
+                activity.logo.synth.inTemperament,
+                atransInSteps
             );
             // Step Pitch steps from the row before, as in the Phrase Maker. Only a pitch row
             // counts, not a rest or a drum column.
@@ -1309,7 +1385,7 @@ class Singer {
 
             // Apply transpositions
             const transposition = 2 * delta + tur.singer.transposition;
-            const { arpeggioTrans, anote } = Singer.resolveArpeggio(
+            const { arpeggioSteps, arpeggioSemitones, anote } = Singer.resolveArpeggio(
                 activity,
                 tur,
                 note,
@@ -1317,7 +1393,11 @@ class Singer {
                 null,
                 edo
             );
-            const atrans = transposition + cents / 100 + arpeggioTrans;
+            const [atrans, atransInSteps] = edoTransposition(
+                transposition + cents / 100 + arpeggioSemitones,
+                arpeggioSteps,
+                edo
+            );
             const keySig = Array.isArray(tur.singer.keySignature)
                 ? tur.singer.keySignature.join(" ")
                 : tur.singer.keySignature;
@@ -1330,7 +1410,8 @@ class Singer {
                 tur.singer.movable,
                 null,
                 activity.errorMsg,
-                activity.logo.synth.inTemperament
+                activity.logo.synth.inTemperament,
+                atransInSteps
             );
             tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
             tur.singer.lastNotePlayed = [noteObj[0] + noteObj[1], 4];
@@ -1384,7 +1465,7 @@ class Singer {
 
             // Apply transpositions
             const transposition = 2 * delta + tur.singer.transposition;
-            const { arpeggioTrans, anote } = Singer.resolveArpeggio(
+            const { arpeggioSteps, arpeggioSemitones, anote } = Singer.resolveArpeggio(
                 activity,
                 tur,
                 note,
@@ -1392,7 +1473,11 @@ class Singer {
                 null,
                 edo
             );
-            const atrans = transposition + cents / 100 + arpeggioTrans;
+            const [atrans, atransInSteps] = edoTransposition(
+                transposition + cents / 100 + arpeggioSemitones,
+                arpeggioSteps,
+                edo
+            );
             const keySig = Array.isArray(tur.singer.keySignature)
                 ? tur.singer.keySignature.join(" ")
                 : tur.singer.keySignature;
@@ -1405,7 +1490,8 @@ class Singer {
                 tur.singer.movable,
                 null,
                 activity.errorMsg,
-                activity.logo.synth.inTemperament
+                activity.logo.synth.inTemperament,
+                atransInSteps
             );
             tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
             tur.singer.lastNotePlayed = [noteObj[0] + noteObj[1], 4];
@@ -1443,6 +1529,7 @@ class Singer {
                 const transposition = isInterval ? 0 : 2 * delta + tur.singer.transposition;
                 const alen = isInterval ? 0 : tur.singer.arpeggio.length;
                 let atrans = transposition;
+                let arpeggioSteps = 0;
                 let anote = note;
                 let noteObj;
                 if (alen > 0) {
@@ -1461,14 +1548,15 @@ class Singer {
                         anote = "rest";
                         tur.singer.arpeggioIndex += 1;
                     } else {
-                        const arpeggioTrans =
-                            getInterval(
-                                tur.singer.arpeggio[tur.singer.arpeggioIndex][0],
-                                tur.singer.keySignature,
-                                noteObj[0],
-                                edo
-                            ) + tur.singer.arpeggio[tur.singer.arpeggioIndex][1];
-                        atrans += arpeggioTrans;
+                        // The scalar part is in steps of the temperament, the
+                        // semitone part in semitones.
+                        arpeggioSteps = getInterval(
+                            tur.singer.arpeggio[tur.singer.arpeggioIndex][0],
+                            tur.singer.keySignature,
+                            noteObj[0],
+                            edo
+                        );
+                        atrans += tur.singer.arpeggio[tur.singer.arpeggioIndex][1];
 
                         tur.singer.arpeggioIndex += 1;
                     }
@@ -1478,7 +1566,12 @@ class Singer {
                 }
 
                 const register = isInterval ? 0 : tur.singer.register;
-                const pitchTransform = atrans + register * getOctaveInterval(activity);
+                // getOctaveInterval is the number of steps in an octave.
+                const [pitchTransform, pitchTransformInSteps] = edoTransposition(
+                    atrans,
+                    arpeggioSteps + register * getOctaveInterval(activity),
+                    edo
+                );
                 noteObj = getNote(
                     anote,
                     octave,
@@ -1487,8 +1580,24 @@ class Singer {
                     tur.singer.movable,
                     direction,
                     activity.errorMsg,
-                    activity.logo.synth.inTemperament
+                    activity.logo.synth.inTemperament,
+                    pitchTransformInSteps
                 );
+
+                // Keep the part of a fractional transposition lost to rounding.
+                const transformCents = Singer.fractionalTranspositionCents(
+                    activity,
+                    tur,
+                    anote,
+                    octave,
+                    atrans,
+                    arpeggioSteps + register * getOctaveInterval(activity),
+                    noteObj,
+                    direction
+                );
+                if (transformCents !== 0) {
+                    noteObj = [noteObj[0], noteObj[1], (noteObj[2] || 0) + transformCents];
+                }
 
                 // Apply ratio transposition:
                 // (1) convert note to Hertz
@@ -1554,15 +1663,21 @@ class Singer {
 
             const intervals = tur.singer.intervals;
             for (let i = 0, len = intervals.length; i < len; i++) {
+                const [intervalTrans, intervalInSteps] = edoTransposition(
+                    0,
+                    getInterval(intervals[i], tur.singer.keySignature, noteObj1[0], edo),
+                    edo
+                );
                 const noteObj2 = getNote(
                     noteObj1[0],
                     noteObj1[1],
-                    getInterval(intervals[i], tur.singer.keySignature, noteObj1[0], edo),
+                    intervalTrans,
                     tur.singer.keySignature,
                     tur.singer.movable,
                     null,
                     activity.errorMsg,
-                    activity.logo.synth.inTemperament
+                    activity.logo.synth.inTemperament,
+                    intervalInSteps
                 );
                 addPitch(noteObj2[0], noteObj2[1], noteObj1[2], true);
             }
@@ -1587,16 +1702,21 @@ class Singer {
             const chordIntervals = tur.singer.chordIntervals;
             for (let i = 0, len = chordIntervals.length; i < len; i++) {
                 const chordInterval = chordIntervals[i];
+                const [chordTrans, chordInSteps] = edoTransposition(
+                    chordInterval[1],
+                    getInterval(chordInterval[0], tur.singer.keySignature, noteObj1[0], edo),
+                    edo
+                );
                 const noteObj2 = getNote(
                     noteObj1[0],
                     noteObj1[1],
-                    getInterval(chordInterval[0], tur.singer.keySignature, noteObj1[0], edo) +
-                        chordInterval[1],
+                    chordTrans,
                     tur.singer.keySignature,
                     tur.singer.movable,
                     null,
                     activity.errorMsg,
-                    activity.logo.synth.inTemperament
+                    activity.logo.synth.inTemperament,
+                    chordInSteps
                 );
                 addPitch(noteObj2[0], noteObj2[1], noteObj1[2], true);
             }
@@ -1712,7 +1832,12 @@ class Singer {
                 const transposition = isInterval ? 0 : 2 * delta + tur.singer.transposition;
                 const register = isInterval ? 0 : tur.singer.register;
 
-                const pitchTransform = transposition + register * getOctaveInterval(activity);
+                // getOctaveInterval is the number of steps in an octave.
+                const [pitchTransform, pitchTransformInSteps] = edoTransposition(
+                    transposition,
+                    register * getOctaveInterval(activity),
+                    edo
+                );
                 const noteObj = getNote(
                     note,
                     octave,
@@ -1721,7 +1846,8 @@ class Singer {
                     tur.singer.movable,
                     direction,
                     activity.errorMsg,
-                    activity.logo.synth.inTemperament
+                    activity.logo.synth.inTemperament,
+                    pitchTransformInSteps
                 );
 
                 if (tur.singer.drumStyle.length > 0) {
@@ -1758,15 +1884,21 @@ class Singer {
 
             const intervals = tur.singer.intervals;
             for (let i = 0, len = intervals.length; i < len; i++) {
+                const [intervalTrans, intervalInSteps] = edoTransposition(
+                    0,
+                    getInterval(intervals[i], tur.singer.keySignature, noteObj1[0], edo),
+                    edo
+                );
                 const noteObj2 = getNote(
                     noteObj1[0],
                     noteObj1[1],
-                    getInterval(intervals[i], tur.singer.keySignature, noteObj1[0], edo),
+                    intervalTrans,
                     tur.singer.keySignature,
                     tur.singer.movable,
                     null,
                     activity.errorMsg,
-                    activity.logo.synth.inTemperament
+                    activity.logo.synth.inTemperament,
+                    intervalInSteps
                 );
                 addPitch(noteObj2[0], noteObj2[1], cents, true);
             }
