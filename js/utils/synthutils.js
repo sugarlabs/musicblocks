@@ -494,6 +494,11 @@ const _effectsInFlight = new WeakMap();
 // The output each synth should play into, as last set by routeInstrument().
 const _routedOutput = new WeakMap();
 
+// Resolves true once a URL sample's own buffer has loaded, false if it failed.
+// Waiting on this instead of Tone's global download queue means an unrelated
+// failing or stalled download cannot drop or delay this sample.
+const _sampleReady = new WeakMap();
+
 /**
  * Object containing effects associated with instruments in the timbre widget.
  * @type {Object.<number, Object>}
@@ -1898,11 +1903,20 @@ function Synth() {
             }
         } else {
             if (sourceName.length >= 4) {
-                if (sourceName.slice(0, 4) === "http") {
-                    instruments[turtle][sourceName] = new Tone.Sampler(sourceName).toDestination();
-                    instrumentsSource[instrumentName] = [1, "drum"];
-                } else if (sourceName.slice(0, 4) === "file") {
-                    instruments[turtle][sourceName] = new Tone.Sampler(sourceName).toDestination();
+                // A sample given as a URL is played as a drum, i.e. by calling
+                // start(). Tone.Player takes the URL directly, while Tone.Sampler
+                // expects a note-to-URL map and has no start(). Keep the player's
+                // own load promise so playback waits for this sample only.
+                if (sourceName.slice(0, 4) === "http" || sourceName.slice(0, 4) === "file") {
+                    let markReady;
+                    const ready = new Promise(resolve => (markReady = resolve));
+                    const player = new Tone.Player({
+                        url: sourceName,
+                        onload: () => markReady(true),
+                        onerror: () => markReady(false)
+                    }).toDestination();
+                    _sampleReady.set(player, ready);
+                    instruments[turtle][sourceName] = player;
                     instrumentsSource[instrumentName] = [1, "drum"];
                 } else if (sourceName === "drum") {
                     instruments[turtle][sourceName] = this._createSampleSynth(
@@ -2571,18 +2585,57 @@ function Synth() {
 
                 tempSynth = instruments[turtle][instrumentName];
                 flag = instrumentsSource[instrumentName] ? instrumentsSource[instrumentName][0] : 0;
+            }
 
-                // Wait for the sample buffer to finish decoding so the reloaded
-                // instrument is audible on the first trigger after a Stop.
-                // Tone.js exposes buffer readiness as a boolean `loaded` flag (it
-                // is not a promise), so wait on the global download queue, like
-                // _performNotes() does, when the sample is not ready yet.
-                if (tempSynth && typeof tempSynth.loaded === "boolean" && !tempSynth.loaded) {
+            // Wait for the sample buffer to finish decoding so the sample is
+            // audible on the first trigger. This also covers a URL player that
+            // was registered before its download finished: start() throws while
+            // the buffer is not loaded. A URL sample waits on its own load
+            // promise, so an unrelated failing or stalled download cannot break
+            // it; other samples fall back to Tone's download queue. Re-check
+            // after waiting, because a second loadSynth() for the same URL can
+            // replace the player in the meantime.
+            while (tempSynth && typeof tempSynth.loaded === "boolean" && !tempSynth.loaded) {
+                const waitingFor = tempSynth;
+                let ready = true;
+                const ownReady = _sampleReady.get(waitingFor);
+                if (ownReady) {
+                    ready = await ownReady;
+                } else {
                     try {
                         await Tone.ToneAudioBuffer.loaded();
                     } catch (e) {
                         console.debug("Error waiting for sample to load:", e);
                     }
+                }
+
+                if (!ready) {
+                    // This sample's own download failed; do not start an empty buffer.
+                    return;
+                }
+
+                if (this._instrumentEpoch !== epoch) {
+                    return; // Exit gracefully - instruments were disposed
+                }
+
+                const current = instruments[turtle][instrumentName];
+                if (!current) {
+                    return; // Exit gracefully - the instrument is gone
+                }
+
+                if (current !== waitingFor) {
+                    // Wait for the player that replaced it as well.
+                    tempSynth = current;
+                    flag = instrumentsSource[instrumentName]
+                        ? instrumentsSource[instrumentName][0]
+                        : 0;
+                } else if (!current.loaded) {
+                    // This one will not load any further. A URL sample is
+                    // dropped; other samples are still tried, as before.
+                    if (ownReady) {
+                        return;
+                    }
+                    break;
                 }
             }
 

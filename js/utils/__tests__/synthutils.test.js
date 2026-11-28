@@ -313,14 +313,14 @@ describe("Utility Functions (logic-only)", () => {
             const instrumentName = "drumKick";
             const sourceName = "http://example.com/drumKick.wav";
             await __createSynth(turtle, instrumentName, sourceName, {});
-            expect(instruments[turtle][sourceName]["noteDict"]).toBe(sourceName);
+            expect(instruments[turtle][sourceName]).toBeInstanceOf(Tone.Player);
             expect(instrumentsSource[instrumentName]).toStrictEqual([1, "drum"]);
         });
         it("it should create a CUSTOMSAMPLES based on the specified parameters, either using samples, built-in synths, or custom synths", async () => {
             const instrumentName = "guitar";
             const sourceName = "file://testing.wav";
             await __createSynth(turtle, instrumentName, sourceName, {});
-            expect(instruments[turtle][sourceName]["noteDict"]).toBe(sourceName);
+            expect(instruments[turtle][sourceName]).toBeInstanceOf(Tone.Player);
             expect(instrumentsSource[instrumentName]).toStrictEqual([1, "drum"]);
         });
         it("it should create a CUSTOMSAMPLES based on the specified parameters, either using samples, built-in synths, or custom synths", async () => {
@@ -541,6 +541,138 @@ describe("Utility Functions (logic-only)", () => {
             }
 
             expect(instruments[turtle]["snare drum"].start).toHaveBeenCalled();
+        });
+
+        test("should wait for a URL sample's own download before playing it (#10319)", async () => {
+            if (!instruments[turtle]) {
+                instruments[turtle] = {}; // Initialize instruments for the turtle
+            }
+
+            const sourceName = "https://example.com/custom-noise.wav";
+            const queueSpy = jest.spyOn(Tone.ToneAudioBuffer, "loaded");
+            try {
+                const playback = trigger(
+                    turtle,
+                    ["C2"],
+                    beatValue,
+                    sourceName,
+                    null,
+                    null,
+                    false,
+                    0
+                );
+
+                for (let i = 0; i < 100 && !instruments[turtle][sourceName]; i++) {
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+
+                const player = instruments[turtle][sourceName];
+                expect(player).toBeInstanceOf(Tone.Player);
+                expect(player.loaded).toBe(false);
+                expect(player.start).not.toHaveBeenCalled();
+
+                player.onload();
+                await playback;
+
+                expect(player.start).toHaveBeenCalledTimes(1);
+                // The URL player waits on its own buffer, not the global queue.
+                expect(queueSpy).not.toHaveBeenCalled();
+            } finally {
+                queueSpy.mockRestore();
+            }
+        });
+
+        test("should still play a URL sample when another download rejects (#10319)", async () => {
+            if (!instruments[turtle]) {
+                instruments[turtle] = {}; // Initialize instruments for the turtle
+            }
+
+            const sourceName = "https://example.com/noise-before-trigger.wav";
+            const queueSpy = jest
+                .spyOn(Tone.ToneAudioBuffer, "loaded")
+                .mockRejectedValue(new Error("unrelated download failed"));
+            try {
+                // The player is registered while its download is still pending.
+                await loadSynth(turtle, sourceName);
+                const player = instruments[turtle][sourceName];
+                expect(player).toBeInstanceOf(Tone.Player);
+
+                const playback = trigger(
+                    turtle,
+                    ["C2"],
+                    beatValue,
+                    sourceName,
+                    null,
+                    null,
+                    false,
+                    0
+                );
+                await new Promise(resolve => setTimeout(resolve, 0));
+                expect(player.start).not.toHaveBeenCalled();
+
+                player.onload();
+                await playback;
+
+                expect(player.start).toHaveBeenCalledTimes(1);
+                expect(queueSpy).not.toHaveBeenCalled();
+            } finally {
+                queueSpy.mockRestore();
+            }
+        });
+
+        test("should not start a URL sample that failed to load (#10319)", async () => {
+            if (!instruments[turtle]) {
+                instruments[turtle] = {}; // Initialize instruments for the turtle
+            }
+
+            const sourceName = "https://example.com/broken-noise.wav";
+            const playback = trigger(turtle, ["C2"], beatValue, sourceName, null, null, false, 0);
+
+            for (let i = 0; i < 100 && !instruments[turtle][sourceName]; i++) {
+                await new Promise(resolve => setTimeout(resolve, 0));
+            }
+
+            const player = instruments[turtle][sourceName];
+            player.onerror();
+            await playback;
+
+            expect(player.start).not.toHaveBeenCalled();
+        });
+
+        test("should wait for a URL player that replaced the one it was waiting for (#10319)", async () => {
+            if (!instruments[turtle]) {
+                instruments[turtle] = {}; // Initialize instruments for the turtle
+            }
+
+            const sourceName = "https://example.com/replaced-noise.wav";
+            const playback = trigger(turtle, ["C2"], beatValue, sourceName, null, null, false, 0);
+
+            for (let i = 0; i < 100 && !instruments[turtle][sourceName]; i++) {
+                await new Promise(resolve => setTimeout(resolve, 0));
+            }
+            const first = instruments[turtle][sourceName];
+
+            // Let trigger() capture this player and settle on its wait.
+            for (let i = 0; i < 5; i++) {
+                await new Promise(resolve => setTimeout(resolve, 0));
+            }
+
+            // A second loadSynth() for the same URL replaces the player.
+            await loadSynth(turtle, sourceName);
+            const second = instruments[turtle][sourceName];
+            expect(second).not.toBe(first);
+
+            // Let the first player finish, so trigger() notices the replacement.
+            first.onload();
+            await new Promise(resolve => setTimeout(resolve, 0));
+
+            expect(second.start).not.toHaveBeenCalled();
+
+            second.onload();
+            await playback;
+
+            expect(second.start).toHaveBeenCalledTimes(1);
+            expect(first.start).not.toHaveBeenCalled();
         });
 
         test("should reapply the cent adjustment when a voice sample is reloaded after Stop (#7996)", async () => {

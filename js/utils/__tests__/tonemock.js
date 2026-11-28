@@ -46,7 +46,6 @@ class Sampler {
 
 class Player {
     constructor(sample) {
-        this.sample = sample;
         this.toDestination = jest.fn().mockReturnThis();
         this.connect = jest.fn().mockReturnThis();
         this.load = jest.fn().mockResolvedValue(this);
@@ -64,7 +63,24 @@ class Player {
             })
         };
         this.playbackRate = { value: 1 };
-        this.loaded = true;
+        if (sample && typeof sample === "object" && typeof sample.url === "string") {
+            // A URL player: Tone loads the buffer asynchronously, so the test
+            // drives onload()/onerror() instead of loading immediately.
+            this.sample = sample.url;
+            this.loaded = false;
+            this.onload = () => {
+                this.loaded = true;
+                if (sample.onload) sample.onload();
+            };
+            this.onerror = () => {
+                if (sample.onerror) sample.onerror();
+            };
+        } else {
+            this.sample = sample;
+            this.loaded = true;
+            this.onload = jest.fn();
+            this.onerror = jest.fn();
+        }
     }
 }
 
