@@ -1475,7 +1475,7 @@ describe("StatusMatrix Widget", () => {
 
     describe("Harmony row", () => {
         // 12-EDO frequencies, A4 = 440 Hz.
-        const FREQUENCIES = { C4: 261.6256, E4: 329.6276, G4: 391.9954 };
+        const FREQUENCIES = { C4: 261.6256, E4: 329.6276, G4: 391.9954, C5: 523.2511 };
         const RATIOS = { 1.25: [5, 4], 1.5: [3, 2] };
         let originalCreateElement;
         let originalCreateTextNode;
@@ -1491,7 +1491,10 @@ describe("StatusMatrix Widget", () => {
         });
 
         const useMice = mice => {
-            mockActivity.turtles.turtleList = mice.map((_, i) => ({ name: "Mouse" + i }));
+            mockActivity.turtles.turtleList = mice.map((m, i) => ({
+                name: "Mouse" + i,
+                inTrash: Boolean(m.inTrash)
+            }));
             mockActivity.turtles.ithTurtle.mockImplementation(i => mice[i]);
         };
 
@@ -1577,6 +1580,79 @@ describe("StatusMatrix Widget", () => {
                 ["C4 → E4", "major 3", "5:4", "1.260", "+13.7", "imperfect"],
                 ["C4 → G4", "perfect 5", "3:2", "1.498", "-2.0", "perfect"]
             ]);
+        });
+
+        test("shows key-aware Roman numeral analysis when a turtle has a key signature", () => {
+            const m0 = mouse(["C4"]);
+            m0.singer.keySignature = "C major";
+            useMice([m0, mouse(["E4"]), mouse(["G4"])]);
+            statusMatrix.init(mockActivity);
+            statusMatrix.updateAll();
+
+            expect(statusMatrix._harmonyCell.textContent).toContain("C major — I in C major");
+        });
+
+        test("shows slash chord and inversion analysis for inverted chords", () => {
+            const m0 = mouse(["E4"]);
+            m0.singer.keySignature = "C major";
+            useMice([m0, mouse(["G4"]), mouse(["C5"])]);
+            statusMatrix.init(mockActivity);
+            statusMatrix.updateAll();
+
+            expect(statusMatrix._harmonyCell.textContent).toContain(
+                "C/E major — I⁶ (1st inversion) in C major"
+            );
+        });
+
+        test("uses the key signature from the first non-trashed turtle", () => {
+            const trashed = mouse(["C4"]);
+            trashed.inTrash = true;
+            trashed.singer.keySignature = "F major";
+            const active = mouse(["C4"]);
+            active.singer.keySignature = "C major";
+            useMice([trashed, active, mouse(["E4"]), mouse(["G4"])]);
+            statusMatrix.init(mockActivity);
+            statusMatrix.updateAll();
+
+            expect(statusMatrix._harmonyCell.textContent).toContain("C major — I in C major");
+        });
+
+        test("invalidates harmony cache when key signature changes", () => {
+            const m0 = mouse(["C4"]);
+            m0.singer.keySignature = "C major";
+            useMice([m0, mouse(["E4"]), mouse(["G4"])]);
+            statusMatrix.init(mockActivity);
+            statusMatrix.updateAll();
+
+            expect(statusMatrix._harmonyCell.textContent).toContain("C major — I in C major");
+
+            // Change key signature while sounding notes remain the same
+            m0.singer.keySignature = "G major";
+            statusMatrix.updateAll();
+
+            expect(statusMatrix._harmonyCell.textContent).toContain("C major — IV in G major");
+        });
+
+        test("does not look up turtle 0 or crash when turtleList is empty", () => {
+            useMice([]);
+            mockActivity.turtles.ithTurtle = jest.fn(() => {
+                throw new Error("Turtle 0 not found");
+            });
+            statusMatrix.init(mockActivity);
+            expect(() => statusMatrix.updateAll()).not.toThrow();
+            expect(mockActivity.turtles.ithTurtle).not.toHaveBeenCalled();
+            expect(mockActivity.logo.updatingStatusMatrix).toBe(false);
+        });
+
+        test("falls back to raw chord display when turtle key mode is invalid", () => {
+            const m0 = mouse(["C4"]);
+            m0.singer.keySignature = "C not-a-mode";
+            useMice([m0, mouse(["E4"]), mouse(["G4"])]);
+            statusMatrix.init(mockActivity);
+            statusMatrix.updateAll();
+
+            expect(statusMatrix._harmonyCell.textContent).toContain("C major");
+            expect(statusMatrix._harmonyCell.textContent).not.toContain("—");
         });
 
         test("leaves out a mouse that has moved on to a rest or a drum", () => {

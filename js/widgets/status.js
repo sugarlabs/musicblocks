@@ -825,8 +825,24 @@ class StatusMatrix {
             );
         }
 
+        const turtles = this.activity?.turtles;
+        let activeTurtle = null;
+        if (turtles) {
+            const list = turtles.turtleList || [];
+            const activeIndex = list.findIndex(t => !t.inTrash);
+            if (activeIndex >= 0 && typeof turtles.ithTurtle === "function") {
+                activeTurtle = turtles.ithTurtle(activeIndex);
+            } else if (list.length > 0 && typeof turtles.ithTurtle === "function") {
+                activeTurtle = turtles.ithTurtle(0);
+            } else if (list.length > 0) {
+                activeTurtle = list[0];
+            }
+        }
+        const keySig = activeTurtle?.singer?.keySignature || "";
+
         const key = [
             synth?.inTemperament || "",
+            keySig,
             notes.join("|"),
             parallels
                 .map(parallel =>
@@ -850,14 +866,37 @@ class StatusMatrix {
         }
 
         if (analysis.chord) {
-            const root = analysis.voices.find(voice => voice.label === analysis.chord.root);
+            const root =
+                analysis.voices.find(voice => voice.label === analysis.chord.root) ||
+                analysis.voices[0];
             const rootName =
                 typeof root.label === "string" && !root.label.endsWith("Hz")
                     ? root.label.replace(/-?\d+$/, "")
                     : frequencyToPitch(root.frequency)[0];
+            const bass = analysis.voices[0];
+            const bassName =
+                typeof bass.label === "string" && !bass.label.endsWith("Hz")
+                    ? bass.label.replace(/-?\d+$/, "")
+                    : frequencyToPitch(bass.frequency)[0];
+
+            let chordText = rootName + " " + _(analysis.chord.name);
+            if (bassName && bassName !== rootName) {
+                chordText = rootName + "/" + bassName + " " + _(analysis.chord.name);
+            }
+
+            const roman = HarmonyUtils.romanNumeral(
+                rootName,
+                analysis.chord.name,
+                keySig,
+                bassName
+            );
+            if (roman && roman.formatted) {
+                chordText += " \u2014 " + roman.formatted;
+            }
+
             const chord = document.createElement("div");
             chord.style.fontWeight = "bold";
-            chord.textContent = rootName + " " + _(analysis.chord.name);
+            chord.textContent = chordText;
             this._harmonyCell.appendChild(chord);
         }
 
