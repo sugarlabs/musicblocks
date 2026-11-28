@@ -22,6 +22,7 @@
 
 // Set up globals required by oscilloscope.js
 global._ = str => str;
+global.announceToScreenReader = jest.fn();
 global.platformColor = {
     fillColor: "#F9F9F9",
     textColor: "#000000",
@@ -211,6 +212,12 @@ describe("Oscilloscope", () => {
 
             expect(mockWidgetWindow.clear).toHaveBeenCalled();
             expect(mockWidgetWindow.show).toHaveBeenCalled();
+        });
+
+        test("announces Oscilloscope opened", () => {
+            createOscilloscope();
+
+            expect(announceToScreenReader).toHaveBeenCalledWith("Oscilloscope opened");
         });
 
         test("sets widgetWindow reference", () => {
@@ -503,6 +510,15 @@ describe("Oscilloscope", () => {
             osc.close();
 
             expect(mockWidgetWindow.destroy).toHaveBeenCalled();
+        });
+
+        test("announces Oscilloscope closed", () => {
+            const osc = createOscilloscope();
+            announceToScreenReader.mockClear();
+
+            osc.close();
+
+            expect(announceToScreenReader).toHaveBeenCalledWith("Oscilloscope closed");
         });
 
         test("sets widgetWindow to null", () => {

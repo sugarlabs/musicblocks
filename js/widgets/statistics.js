@@ -13,7 +13,7 @@
    global
 
    docById, analyzeProject, runAnalytics, scoreToChartData,
-   getChartOptions
+   getChartOptions, _, announceToScreenReader
  */
 
 /* exported StatsWindow */
@@ -32,6 +32,7 @@ class StatsWindow {
         this.widgetWindow = window.widgetWindows.windowFor(this, "stats", "stats");
         this.widgetWindow.clear();
         this.widgetWindow.show();
+        announceToScreenReader(_("Statistics opened"));
         this.widgetWindow.addButton("reload.svg", 32, _("Refresh")).onclick = () => {
             this.refresh();
         };
@@ -44,6 +45,7 @@ class StatsWindow {
             this._destroyChart();
             this._inFlight = false;
             this.activity.blocks.showBlocks();
+            announceToScreenReader(_("Statistics closed"));
             this.widgetWindow.destroy();
             this.activity.logo.statsWindow = null;
         };

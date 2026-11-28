@@ -32,6 +32,7 @@ global.Tempo = Tempo;
 
 // --- 1. Global Mocks (Fake the Browser Environment) ---
 global._ = msg => msg; // Mock translation function
+global.announceToScreenReader = jest.fn();
 global.rationalToFraction = require("../../utils/utils-logic.js").rationalToFraction;
 global.TONEBPM = 240;
 global.Singer = { masterBPM: 90, defaultBPMFactor: 240 / 90 };
@@ -694,6 +695,7 @@ describe("Tempo Widget", () => {
             expect(mockWindow.getWidgetBody().appendChild).toHaveBeenCalled();
             expect(mockWindow.addButton).toHaveBeenCalled();
             expect(mockWindow.addInputButton).toHaveBeenCalled();
+            expect(announceToScreenReader).toHaveBeenCalledWith("Tempo opened");
         });
 
         test("should bind event listeners to the BPM inputs and trigger _useBPM on Enter key", () => {

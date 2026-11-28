@@ -32,6 +32,7 @@ const LegoWidget = require("../legobricks");
 global.LegoWidget = LegoWidget;
 const ManagedTimer = require("../../utils/ManagedTimer.js");
 global.ManagedTimer = ManagedTimer;
+global.announceToScreenReader = jest.fn();
 
 describe("LegoWidget Core Logic", () => {
     let legoWidget;
@@ -1467,6 +1468,7 @@ describe("LegoWidget — _createWidgetWindow", () => {
     let originalWidgetWindows;
 
     beforeEach(() => {
+        global._ = val => val;
         legoWidget = new LegoWidget();
         mockWindow = {
             clear: jest.fn(),
@@ -1487,6 +1489,7 @@ describe("LegoWidget — _createWidgetWindow", () => {
 
     afterEach(() => {
         window.widgetWindows = originalWidgetWindows;
+        delete global._;
     });
 
     it("should look up, clear, and show the widget window", () => {

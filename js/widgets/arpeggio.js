@@ -17,7 +17,7 @@
 
    _, docById, getNote, setCustomChord, keySignatureToMode,
    getModeNumbers, getTemperament, normalizeNoteAccidentals, DEFAULTVOICE,
-   ManagedTimer, parseNoteString
+   ManagedTimer, parseNoteString, announceToScreenReader
 */
 /*
    Global locations
@@ -124,6 +124,7 @@ class Arpeggio {
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
+        announceToScreenReader(_("Arpeggio opened"));
         if (typeof widgetWindow.takeFocus === "function") {
             widgetWindow.takeFocus();
         }
@@ -204,6 +205,7 @@ class Arpeggio {
 
             arpeggioTableDiv.style.visibility = "hidden";
             this._activity.hideMsgs();
+            announceToScreenReader(_("Arpeggio closed"));
             widgetWindow.destroy();
         };
 

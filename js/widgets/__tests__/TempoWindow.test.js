@@ -21,6 +21,7 @@
 const ManagedTimer = require("../../utils/ManagedTimer");
 
 global._ = msg => msg;
+global.announceToScreenReader = jest.fn();
 global.TempoWindow = require("../TempoWindow.js");
 global.TempoRows = require("../TempoRows.js");
 global.TempoKeyboard = require("../TempoKeyboard.js");
@@ -204,6 +205,7 @@ describe("TempoWindow", () => {
             expect(tempo._tapTimes).toEqual([]);
             expect(tempo._lastTapIndex).toBeNull();
             expect(widgetWindow.destroy).toHaveBeenCalledTimes(1);
+            expect(announceToScreenReader).toHaveBeenCalledWith("Tempo closed");
         });
 
         test("stops listening for the keyboard shortcuts", () => {

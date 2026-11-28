@@ -17,12 +17,12 @@
 /*
    global
 
-   _, docById, PitchDrumMatrix
+   _, docById, PitchDrumMatrix, announceToScreenReader
 */
 /*
     Globals location
     - js/utils/utils.js
-        _, docById
+        _, docById, announceToScreenReader
     - js/widgets/pitchdrummatrix.js
         PitchDrumMatrix
 */
@@ -100,6 +100,7 @@ class PitchDrumMatrixWindow {
         this.activity.logo.synth.stop();
         this.pitchDrumDiv.style.visibility = "hidden";
         this.activity.hideMsgs();
+        announceToScreenReader(_("Pitch Drum Matrix closed"));
         widgetWindow.destroy();
     }
 

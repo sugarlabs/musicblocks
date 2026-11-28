@@ -21,6 +21,7 @@
 const { clampNumber, rationalToFraction } = require("../../utils/utils-logic.js");
 
 global._ = msg => msg;
+global.announceToScreenReader = jest.fn();
 global.last = arr => arr[arr.length - 1];
 global.clampNumber = clampNumber;
 global.rationalToFraction = rationalToFraction;
@@ -128,6 +129,7 @@ describe("MeterWidgetWindow", () => {
             expect(widget.activity.logo.synth.setMasterVolume).toHaveBeenCalledWith(80);
             expect(widget.activity.hideMsgs).toHaveBeenCalled();
             expect(widgetWindow.destroy).toHaveBeenCalled();
+            expect(announceToScreenReader).toHaveBeenCalledWith("Meter closed");
         });
 
         test("leaves the volume when no master volume was set", () => {

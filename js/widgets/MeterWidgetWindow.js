@@ -16,7 +16,7 @@
 
 /*
    global
-   _, Singer, last, clampNumber, MeterWidget
+   _, Singer, last, clampNumber, MeterWidget, announceToScreenReader
  */
 
 /*
@@ -54,6 +54,7 @@ class MeterWidgetWindow {
             this.activity.logo.synth.setMasterVolume(last(Singer.masterVolume));
         }
         this.activity.hideMsgs();
+        announceToScreenReader(_("Meter closed"));
         this.widgetWindow.destroy();
     }
 
