@@ -545,6 +545,19 @@
       "branches": 7
     },
     {
+      "name": "normalizeChannel",
+      "params": [
+        "value"
+      ],
+      "arity": 1,
+      "hasRestParam": false,
+      "isAsync": false,
+      "isGenerator": false,
+      "returns": 2,
+      "throws": 0,
+      "branches": 1
+    },
+    {
       "name": "oneHundredToFraction",
       "params": [
         "d"
@@ -1004,8 +1017,8 @@
     }
   ],
   "totals": {
-    "branches": 216,
-    "returns": 110,
+    "branches": 217,
+    "returns": 112,
     "throws": 0
   }
 }
