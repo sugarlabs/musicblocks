@@ -796,6 +796,9 @@ class Singer {
         const savePrevTurtleTime = tur.singer.previousTurtleTime;
         const saveTurtleTime = tur.singer.turtleTime;
 
+        const saveLastNotePlayed = tur.singer.lastNotePlayed;
+        const savePrevNotePlayed = tur.singer.previousNotePlayed;
+
         const previousButNotThese = tur.butNotThese;
         tur.butNotThese = deepClone(tur.butNotThese);
 
@@ -853,6 +856,9 @@ class Singer {
         tur.singer.previousTurtleTime = savePrevTurtleTime;
         tur.singer.turtleTime = saveTurtleTime;
 
+        tur.singer.lastNotePlayed = saveLastNotePlayed;
+        tur.singer.previousNotePlayed = savePrevNotePlayed;
+
         tur.singer.whichNoteToCount = saveWhichNoteToCount;
 
         tur.singer.justCounting.pop();
@@ -898,6 +904,8 @@ class Singer {
             whichNoteToCount: tur.singer.whichNoteToCount,
             prevTurtleTime: tur.singer.previousTurtleTime,
             turtleTime: tur.singer.turtleTime,
+            lastNotePlayed: tur.singer.lastNotePlayed,
+            prevNotePlayed: tur.singer.previousNotePlayed,
             noteCount: tur.singer.notesPlayed,
             meter: saveMeterState(tur.singer),
             tallyNotes: tur.singer.tallyNotes
@@ -932,6 +940,8 @@ class Singer {
             tallyNotes: saveState.tallyNotes,
             previousTurtleTime: saveState.prevTurtleTime,
             turtleTime: saveState.turtleTime,
+            lastNotePlayed: saveState.lastNotePlayed,
+            previousNotePlayed: saveState.prevNotePlayed,
             whichNoteToCount: saveState.whichNoteToCount,
             suppressOutput: saveState.suppressOutput
         });

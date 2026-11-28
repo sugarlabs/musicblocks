@@ -1311,6 +1311,21 @@ describe("numberOfNotes — state restoration and tally logic", () => {
         expect(turtleMock.painter.penState).toBe(true);
     });
 
+    test("should restore lastNotePlayed and previousNotePlayed", () => {
+        turtleMock.singer.lastNotePlayed = ["G4", 4];
+        turtleMock.singer.previousNotePlayed = ["F4", 4];
+        // The counted stack steps up from G4 to B4.
+        logoMock.runFromBlockNow = jest.fn(() => {
+            turtleMock.singer.lastNotePlayed = ["B4", 4];
+            turtleMock.singer.previousNotePlayed = ["A4", 4];
+        });
+
+        Singer.numberOfNotes(logoMock, 0, 123);
+
+        expect(turtleMock.singer.lastNotePlayed).toEqual(["G4", 4]);
+        expect(turtleMock.singer.previousNotePlayed).toEqual(["F4", 4]);
+    });
+
     test("should restore pen state when pen starts down and keep pen up during position restore", () => {
         turtleMock.painter.penState = true;
         let penStateDuringSetXY;
@@ -1851,6 +1866,21 @@ describe("noteCounter regression behavior", () => {
         expect(singer.suppressOutput).toBe(originalSuppress);
         expect(singer.turtleTime).toBe(originalTime);
         expect(singer.previousTurtleTime).toBe(originalPrevTime);
+    });
+
+    test("should restore lastNotePlayed and previousNotePlayed", () => {
+        singer.lastNotePlayed = ["G4", 4];
+        singer.previousNotePlayed = ["F4", 4];
+        // The counted stack steps up from G4 to B4.
+        activityMock.logo.runFromBlockNow = jest.fn(() => {
+            singer.lastNotePlayed = ["B4", 4];
+            singer.previousNotePlayed = ["A4", 4];
+        });
+
+        Singer.noteCounter(logoMock, 0, 1);
+
+        expect(singer.lastNotePlayed).toEqual(["G4", 4]);
+        expect(singer.previousNotePlayed).toEqual(["F4", 4]);
     });
 
     test("should push and pop justCounting correctly", () => {
