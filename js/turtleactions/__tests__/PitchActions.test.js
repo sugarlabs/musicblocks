@@ -991,6 +991,37 @@ describe("Tests for Singer.PitchActions setup", () => {
             Singer.PitchActions.setRegister(5.7, 0);
             expect(turtle.singer.register).toBe(5);
         });
+        test("ignores Infinity, leaving the register unchanged", () => {
+            Singer.PitchActions.setRegister(2, 0);
+            Singer.PitchActions.setRegister(Infinity, 0);
+            expect(turtle.singer.register).toBe(2);
+        });
+        test("ignores NaN, leaving the register unchanged", () => {
+            Singer.PitchActions.setRegister(2, 0);
+            Singer.PitchActions.setRegister(NaN, 0);
+            expect(turtle.singer.register).toBe(2);
+        });
+        test("ignores -Infinity, leaving the register unchanged", () => {
+            Singer.PitchActions.setRegister(2, 0);
+            Singer.PitchActions.setRegister(-Infinity, 0);
+            expect(turtle.singer.register).toBe(2);
+        });
+        test("ignores 1e308, leaving the register unchanged", () => {
+            Singer.PitchActions.setRegister(2, 0);
+            Singer.PitchActions.setRegister(1e308, 0);
+            expect(turtle.singer.register).toBe(2);
+        });
+        test("ignores -1e308, leaving the register unchanged", () => {
+            Singer.PitchActions.setRegister(2, 0);
+            Singer.PitchActions.setRegister(-1e308, 0);
+            expect(turtle.singer.register).toBe(2);
+        });
+        test("accepts 1000 but ignores 1001", () => {
+            Singer.PitchActions.setRegister(1000, 0);
+            expect(turtle.singer.register).toBe(1000);
+            Singer.PitchActions.setRegister(1001, 0);
+            expect(turtle.singer.register).toBe(1000);
+        });
     });
 
     describe("Tests for invert", () => {
