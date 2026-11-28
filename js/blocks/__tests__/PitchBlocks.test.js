@@ -1572,6 +1572,30 @@ describe("setupPitchBlocks", () => {
                     expect(activity.errorMsg).toHaveBeenCalled();
                 }
             });
+
+            it("NthModalPitchBlock handles non-finite inputs by reporting INVALIDPITCH and stopping turtle", () => {
+                const block = createdBlocks["nthmodalpitch"];
+                [NaN, Infinity, -Infinity].forEach(val => {
+                    jest.clearAllMocks();
+                    logo.stopTurtle = false;
+                    block.flow([val, 4], logo, 0, 10);
+                    expect(activity.errorMsg).toHaveBeenCalledWith(global.INVALIDPITCH, 10);
+                    expect(logo.stopTurtle).toBe(true);
+                    expect(global.Singer.PitchActions.playNthModalPitch).not.toHaveBeenCalled();
+                });
+            });
+
+            it("ScaleDegreeBlock handles non-finite inputs by reporting INVALIDPITCH and stopping turtle", () => {
+                const block = createdBlocks["scaledegree"];
+                [NaN, Infinity, -Infinity].forEach(val => {
+                    jest.clearAllMocks();
+                    logo.stopTurtle = false;
+                    block.flow([val, 4], logo, 0, 10);
+                    expect(activity.errorMsg).toHaveBeenCalledWith(global.INVALIDPITCH, 10);
+                    expect(logo.stopTurtle).toBe(true);
+                    expect(global.Singer.PitchActions.playNthModalPitch).not.toHaveBeenCalled();
+                });
+            });
         });
 
         describe("Solfege and Note Name Blocks", () => {
