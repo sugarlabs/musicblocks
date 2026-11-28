@@ -692,6 +692,9 @@ describe("Planet", () => {
         let mockStringHelper;
         let mockProjectStorage;
         let mockServerInterface;
+        let mockSaveInterface;
+        let mockLocalPlanet;
+        let mockGlobalPlanet;
 
         beforeEach(() => {
             planet = new Planet(true, {});
@@ -704,10 +707,16 @@ describe("Planet", () => {
             mockStringHelper = { init: jest.fn() };
             mockProjectStorage = { init: jest.fn().mockResolvedValue() };
             mockServerInterface = { init: jest.fn(), getTagManifest: jest.fn() };
+            mockSaveInterface = { init: jest.fn() };
+            mockLocalPlanet = { init: jest.fn(), updateProjects: jest.fn() };
+            mockGlobalPlanet = { init: jest.fn(), openGlobalProject: jest.fn() };
 
             global.StringHelper = jest.fn().mockReturnValue(mockStringHelper);
             global.ProjectStorage = jest.fn().mockReturnValue(mockProjectStorage);
             global.ServerInterface = jest.fn().mockReturnValue(mockServerInterface);
+            global.SaveInterface = jest.fn().mockReturnValue(mockSaveInterface);
+            global.LocalPlanet = jest.fn().mockReturnValue(mockLocalPlanet);
+            global.GlobalPlanet = jest.fn().mockReturnValue(mockGlobalPlanet);
 
             document.body.innerHTML = `
                 <button id="close-planet"></button>
@@ -720,7 +729,43 @@ describe("Planet", () => {
             delete global.StringHelper;
             delete global.ProjectStorage;
             delete global.ServerInterface;
+            delete global.SaveInterface;
+            delete global.LocalPlanet;
+            delete global.GlobalPlanet;
             document.body.innerHTML = "";
+        });
+
+        it("builds the local and global planets before the tag manifest answers", async () => {
+            await planet.init();
+
+            expect(global.SaveInterface).toHaveBeenCalledWith(planet);
+            expect(mockSaveInterface.init).toHaveBeenCalled();
+            expect(planet.LocalPlanet).toBe(mockLocalPlanet);
+            expect(mockLocalPlanet.init).toHaveBeenCalled();
+            expect(planet.GlobalPlanet).toBe(mockGlobalPlanet);
+            expect(mockGlobalPlanet.init).not.toHaveBeenCalled();
+            expect(planet.initPlanets).not.toHaveBeenCalled();
+        });
+
+        it("opens a shared project while the tag manifest is still loading", async () => {
+            const error = jest.fn();
+
+            await planet.init();
+            planet.openProjectFromPlanet("shared-song", error);
+
+            expect(mockGlobalPlanet.openGlobalProject).toHaveBeenCalledWith("shared-song", error);
+        });
+
+        it("shows the local projects while the tag manifest is still loading", async () => {
+            mockLocalPlanet.setCurrentProjectImage = jest.fn();
+            mockProjectStorage.getCurrentProjectID = jest.fn(() => "song");
+
+            await planet.init();
+            planet.open("thumbnail");
+
+            expect(mockLocalPlanet.setCurrentProjectImage).toHaveBeenCalledWith("thumbnail");
+            expect(mockLocalPlanet.updateProjects).toHaveBeenCalled();
+            expect(planet.oldCurrentProjectID).toBe("song");
         });
 
         it("should initialize dependencies and set up event listeners", async () => {
@@ -791,7 +836,6 @@ describe("Planet", () => {
     describe("initPlanets", () => {
         let planet;
         let mockConverter;
-        let mockSaveInterface;
         let mockLocalPlanet;
         let mockGlobalPlanet;
 
@@ -800,21 +844,16 @@ describe("Planet", () => {
             planet.onConverterLoad = jest.fn();
 
             mockConverter = { init: jest.fn() };
-            mockSaveInterface = { init: jest.fn() };
-            mockLocalPlanet = { init: jest.fn() };
+            mockLocalPlanet = { Publisher: { init: jest.fn() } };
             mockGlobalPlanet = { init: jest.fn() };
+            planet.LocalPlanet = mockLocalPlanet;
+            planet.GlobalPlanet = mockGlobalPlanet;
 
             global.Converter = jest.fn().mockReturnValue(mockConverter);
-            global.SaveInterface = jest.fn().mockReturnValue(mockSaveInterface);
-            global.LocalPlanet = jest.fn().mockReturnValue(mockLocalPlanet);
-            global.GlobalPlanet = jest.fn().mockReturnValue(mockGlobalPlanet);
         });
 
         afterEach(() => {
             delete global.Converter;
-            delete global.SaveInterface;
-            delete global.LocalPlanet;
-            delete global.GlobalPlanet;
         });
 
         it("should initialize planets with success status", () => {
@@ -829,13 +868,7 @@ describe("Planet", () => {
             expect(mockConverter.init).toHaveBeenCalled();
             expect(planet.onConverterLoad).toHaveBeenCalled();
 
-            expect(global.SaveInterface).toHaveBeenCalledWith(planet);
-            expect(mockSaveInterface.init).toHaveBeenCalled();
-
-            expect(global.LocalPlanet).toHaveBeenCalledWith(planet);
-            expect(mockLocalPlanet.init).toHaveBeenCalled();
-
-            expect(global.GlobalPlanet).toHaveBeenCalledWith(planet);
+            expect(mockLocalPlanet.Publisher.init).toHaveBeenCalled();
             expect(mockGlobalPlanet.init).toHaveBeenCalled();
         });
 
@@ -848,9 +881,26 @@ describe("Planet", () => {
             expect(planet.TagsManifest).toBeNull();
 
             expect(global.Converter).toHaveBeenCalled();
-            expect(global.SaveInterface).toHaveBeenCalled();
-            expect(global.LocalPlanet).toHaveBeenCalled();
-            expect(global.GlobalPlanet).toHaveBeenCalled();
+            expect(mockLocalPlanet.Publisher.init).toHaveBeenCalled();
+            expect(mockGlobalPlanet.init).toHaveBeenCalled();
+        });
+
+        it("keeps the planets built at startup", () => {
+            planet.initPlanets({ success: true, data: {} });
+
+            expect(planet.LocalPlanet).toBe(mockLocalPlanet);
+            expect(planet.GlobalPlanet).toBe(mockGlobalPlanet);
+        });
+
+        it("sets up the publisher only once the server state is known", () => {
+            mockLocalPlanet.Publisher.init.mockImplementation(() => {
+                expect(planet.ConnectedToServer).toBe(true);
+                expect(planet.TagsManifest).toEqual({ music: { TagName: "Music" } });
+            });
+
+            planet.initPlanets({ success: true, data: { music: { TagName: "Music" } } });
+
+            expect(mockLocalPlanet.Publisher.init).toHaveBeenCalledTimes(1);
         });
     });
 

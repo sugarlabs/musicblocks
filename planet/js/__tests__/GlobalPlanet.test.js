@@ -752,6 +752,48 @@ describe("GlobalPlanet", () => {
         });
     });
 
+    describe("openGlobalProject before init", () => {
+        beforeEach(() => {
+            mockPlanet.ProjectStorage.initialiseNewProject = jest.fn().mockResolvedValue("remix");
+            mockPlanet._postGitState = jest.fn();
+        });
+
+        it("downloads and opens a shared project as a new local copy", async () => {
+            mockPlanet.ServerInterface.downloadProject.mockImplementation((id, callback) =>
+                callback({ success: true, data: "sharedData" })
+            );
+
+            gp.openGlobalProject("shared-song");
+            await Promise.resolve();
+
+            expect(mockPlanet.ServerInterface.downloadProject).toHaveBeenCalledWith(
+                "shared-song",
+                expect.any(Function),
+                null
+            );
+            expect(mockPlanet.ProjectStorage.initialiseNewProject).toHaveBeenCalledWith(
+                "Remix of  My Project",
+                "sharedData",
+                null
+            );
+            expect(mockPlanet.loadProjectFromData).toHaveBeenCalledWith("sharedData");
+            expect(mockPlanet._postGitState).toHaveBeenCalledWith("remix");
+        });
+
+        it("reports a failed download without opening anything", () => {
+            const error = jest.fn();
+            mockPlanet.ServerInterface.downloadProject.mockImplementation((id, callback) =>
+                callback({ success: false })
+            );
+
+            gp.openGlobalProject("missing-song", error);
+
+            expect(error).toHaveBeenCalled();
+            expect(mockPlanet.ProjectStorage.initialiseNewProject).not.toHaveBeenCalled();
+            expect(mockPlanet.loadProjectFromData).not.toHaveBeenCalled();
+        });
+    });
+
     describe("initTagList", () => {
         it("loads the default tag's projects once", () => {
             const loadAll = jest.fn();

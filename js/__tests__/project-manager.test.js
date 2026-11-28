@@ -2006,7 +2006,7 @@ describe("_loadStart removeBadSessionKey error", () => {
 });
 
 // ---------------------------------------------------------------------------
-// PART 22 — _loadProject: textMsg error + 2500ms body
+// PART 22 — _loadProject: textMsg error + opening the shared project
 // ---------------------------------------------------------------------------
 
 describe("_loadProject additional branches", () => {
@@ -2038,18 +2038,47 @@ describe("_loadProject additional branches", () => {
         );
     });
 
-    it("calls openProjectFromPlanet and finishLoading after 2500ms", () => {
+    it("asks Planet for the shared project right away", () => {
         const activity = makePlanetActivity();
         const pm = new ProjectManager(activity);
 
         pm._loadProject("proj-1", { run: false, show: false, collapse: false });
-        jest.advanceTimersByTime(2500);
 
         expect(activity.planet.openProjectFromPlanet).toHaveBeenCalledWith(
             "proj-1",
             expect.any(Function)
         );
         expect(activity.planet.initialiseNewProject).toHaveBeenCalled();
+    });
+
+    it("keeps loading until the shared project arrives", () => {
+        const activity = makePlanetActivity();
+        const pm = new ProjectManager(activity);
+
+        pm._loadProject("proj-1", { run: false, show: false, collapse: false });
+        jest.runAllTimers();
+
+        expect(activity.loading).toBe(true);
+        expect(activity.loadStartWrapper).not.toHaveBeenCalled();
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+    });
+
+    it("tells the user when the shared project cannot be loaded", () => {
+        const activity = makePlanetActivity({
+            planet: {
+                getCurrentProjectName: jest.fn(() => "Test"),
+                openProjectFromPlanet: jest.fn((id, error) => error()),
+                initialiseNewProject: jest.fn()
+            }
+        });
+        const pm = new ProjectManager(activity);
+
+        pm._loadProject("missing-song", { run: false, show: false, collapse: false });
+
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Could not load project. Please check your connection and try again."
+        );
+        expect(activity.loadStartWrapper).toHaveBeenCalled();
         expect(activity.loading).toBe(false);
     });
 
@@ -2064,12 +2093,12 @@ describe("_loadProject additional branches", () => {
         const pm = new ProjectManager(activity);
 
         pm._loadProject("proj-1", { run: false, show: false, collapse: false });
-        jest.advanceTimersByTime(2500);
 
         expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(expect.any(Error), {
             operation: "openProjectFromPlanet"
         });
         expect(activity.loadStartWrapper).toHaveBeenCalled();
+        expect(activity.loading).toBe(false);
     });
 
     it("warns when initialiseNewProject is not a function", () => {
@@ -2083,7 +2112,6 @@ describe("_loadProject additional branches", () => {
         const pm = new ProjectManager(activity);
 
         pm._loadProject("proj-1", { run: false, show: false, collapse: false });
-        jest.advanceTimersByTime(2500);
 
         expect(global.ErrorHandler.warn).toHaveBeenCalledWith(
             "Planet initialiseNewProject is unavailable.",
