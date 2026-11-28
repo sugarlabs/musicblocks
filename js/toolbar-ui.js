@@ -755,7 +755,13 @@ class ToolbarUI {
 
                 const listItem = option.parentElement;
                 if (listItem) {
-                    listItem.style.display = theme === themeBox._theme ? "none" : "";
+                    listItem.style.display = "";
+                }
+
+                if (theme === themeBox._theme) {
+                    option.classList.add("active");
+                } else {
+                    option.classList.remove("active");
                 }
             });
         };
@@ -769,10 +775,15 @@ class ToolbarUI {
             }
 
             option.onclick = () => {
+                const dropdown = docById("themedropdown");
+                if (dropdown) {
+                    dropdown.style.display = "none";
+                    dropdown.classList.remove("active");
+                }
+                $j(icon).dropdown("close");
                 themeBox[`${theme}_onclick`](this.activity);
                 updateThemeIcon(theme);
                 updateThemeOptions();
-                $j(icon).dropdown("close");
             };
         });
 
