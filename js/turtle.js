@@ -70,6 +70,10 @@ class Turtle {
         // Widget-related attributes
         this.inSetTimbre = false;
 
+        // A muted mouse runs and keeps time as usual, but its notes and drums
+        // are not heard. Set from the Start block's menu and saved with it.
+        this.muted = false;
+
         this._blinkFinished = true; // whether not blinking or blinking
 
         this._transportTime = null;

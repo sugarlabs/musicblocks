@@ -117,6 +117,26 @@ class Turtles {
 
         // Instantiate a new Turtle object
         const turtle = new Turtle(this.activity, id, turtleName, this, startBlock);
+        // The companion that plays a mouse's "on every beat" action follows
+        // that mouse (which already points to the index it is about to get).
+        // Otherwise, a mouse saved as muted loads muted, and a mouse added
+        // while another one is soloed is muted, so the solo goes on.
+        let owner = null;
+        for (let j = 0; j < this.getTurtleCount(); j++) {
+            if (this.getTurtle(j).companionTurtle === this.getTurtleCount()) {
+                owner = this.getTurtle(j);
+                break;
+            }
+        }
+        const soloed = this._soloTurtle;
+        if (owner) {
+            turtle.muted = owner.muted;
+        } else if (
+            (blkInfoAvailable && infoDict["muted"] === true) ||
+            (soloed && !soloed.inTrash && this.turtleList.includes(soloed))
+        ) {
+            this._mute(turtle, true);
+        }
 
         // Add turtle model properties and store color index for turtle
         this.addTurtleStageProps(turtle, blkInfoAvailable, infoDict);
@@ -236,6 +256,80 @@ class Turtles {
         }
 
         this.activity.refreshCanvas();
+    }
+
+    /**
+     * Mutes or unmutes a mouse. A muted mouse still runs and keeps time, so it
+     * stays in step with the others, but its notes and drums are not heard.
+     * Its Start block is drawn faded.
+     *
+     * @param {Object} turtle - Turtle object
+     * @param {Boolean} muted
+     * @returns {void}
+     */
+    setMuted(turtle, muted) {
+        this._mute(turtle, muted);
+        // Muting by hand ends a solo, so the next Solo solos again.
+        this._soloTurtle = null;
+    }
+
+    /**
+     * @private
+     * @param {Object} turtle - Turtle object
+     * @param {Boolean} muted
+     * @returns {void}
+     */
+    _mute(turtle, muted) {
+        turtle.muted = muted;
+        // The companion that plays this mouse's "on every beat" action follows
+        // it. Read the list directly, since getTurtle() throws for a bad index.
+        const companion = this.turtleList?.[turtle.companionTurtle];
+        if (companion) {
+            companion.muted = muted;
+        }
+        const startBlock = turtle.startBlock;
+        if (startBlock?.container && ["start", "drum"].includes(startBlock.name)) {
+            startBlock.container.alpha = muted ? 0.5 : 1;
+        }
+        this.activity.refreshCanvas();
+    }
+
+    /**
+     * @private
+     * @param {Object} turtle - Turtle object
+     * @returns {Boolean} Whether this is the companion that plays another
+     *     mouse's "on every beat" action.
+     */
+    _isCompanion(turtle) {
+        const index = this.turtleList.indexOf(turtle);
+        return index !== -1 && this.turtleList.some(other => other.companionTurtle === index);
+    }
+
+    /**
+     * @param {Object} turtle - Turtle object
+     * @returns {Boolean} Whether this mouse was soloed and nothing was muted by hand since.
+     */
+    isSoloed(turtle) {
+        return this._soloTurtle === turtle;
+    }
+
+    /**
+     * Solo: hears only this mouse by muting every other one. Soloing the same
+     * mouse again unmutes them all.
+     *
+     * @param {Object} turtle - Turtle object
+     * @returns {void}
+     */
+    toggleSolo(turtle) {
+        const unsolo = this.isSoloed(turtle);
+        this._mute(turtle, false);
+        // Companions are muted and unmuted with their mouse.
+        for (const other of this.turtleList) {
+            if (other !== turtle && !other.inTrash && !this._isCompanion(other)) {
+                this._mute(other, !unsolo);
+            }
+        }
+        this._soloTurtle = unsolo ? null : turtle;
     }
 
     // ================================ MODEL =================================
