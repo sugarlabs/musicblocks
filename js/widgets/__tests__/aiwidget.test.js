@@ -137,6 +137,20 @@ describe("AIWidget Instance", () => {
         expect(aiWidget.pitchAnalysers[1]).toBeDefined();
     });
 
+    it("updates the play button's accessible name when resuming and pausing", () => {
+        aiWidget.init(mockActivity);
+        const onclick = aiWidget.playBtn.onclick;
+        aiWidget.playBtn = document.createElement("div");
+
+        aiWidget.resume();
+        expect(aiWidget.isMoving).toBe(true);
+        expect(aiWidget.playBtn.getAttribute("aria-label")).toBe("Pause");
+
+        onclick();
+        expect(aiWidget.isMoving).toBe(false);
+        expect(aiWidget.playBtn.getAttribute("aria-label")).toBe("Play");
+    });
+
     it("should dispose pitch analysers from the previous initialization", () => {
         const disconnectMock = jest.fn();
         const analysers = [];
@@ -871,7 +885,8 @@ describe("AIWidget Instance", () => {
                 const button = {
                     onclick: null,
                     textContent: "",
-                    appendChild: jest.fn()
+                    appendChild: jest.fn(),
+                    setAttribute: jest.fn()
                 };
                 if (iconName === "play-button.svg") {
                     playButton = button;
@@ -892,6 +907,7 @@ describe("AIWidget Instance", () => {
         expect(aiWidget.isMoving).toBe(false);
         expect(playButton.textContent).toBe("");
         expect(playButton.appendChild).toHaveBeenCalled();
+        expect(playButton.setAttribute).toHaveBeenCalledWith("aria-label", "Play");
     });
 
     it("should not add duplicate custom samples", () => {

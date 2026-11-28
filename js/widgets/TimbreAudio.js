@@ -193,6 +193,7 @@ class TimbreAudio {
             stopImg.setAttribute("align-content", "center");
             cell.appendChild(stopImg);
             cell.appendChild(document.createTextNode("\u00A0\u00A0"));
+            cell.setAttribute("aria-label", _("Stop"));
         } else {
             this._clearWidgetTimeout(this._previewTimerId);
             this._previewTimerId = null;
@@ -209,6 +210,7 @@ class TimbreAudio {
             playImg.setAttribute("align-content", "center");
             cell.appendChild(playImg);
             cell.appendChild(document.createTextNode("\u00A0\u00A0"));
+            cell.setAttribute("aria-label", _("Play"));
         }
 
         if (this.notesToPlay.length === 0) {
@@ -245,6 +247,7 @@ class TimbreAudio {
                 playImg2.setAttribute("align-content", "center");
                 cell.appendChild(playImg2);
                 cell.appendChild(document.createTextNode("\u00A0\u00A0"));
+                cell.setAttribute("aria-label", _("Play"));
                 this._playing = false;
             }
         };

@@ -163,6 +163,7 @@ function AIWidget() {
         pauseImg.style.verticalAlign = "middle";
         this.playBtn.textContent = "";
         this.playBtn.appendChild(pauseImg);
+        this.playBtn.setAttribute("aria-label", _("Pause"));
         this.isMoving = true;
     };
 
@@ -333,6 +334,7 @@ function AIWidget() {
                 playImg.style.verticalAlign = "middle";
                 this.playBtn.textContent = "";
                 this.playBtn.appendChild(playImg);
+                this.playBtn.setAttribute("aria-label", _("Play"));
                 this.isMoving = false;
             } else {
                 if (!(abcNotationSong === "")) {
