@@ -20,7 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const { setupPitchBlocks } = require("../PitchBlocks");
+const { setupPitchBlocks, hasDispatchCompletionRoute } = require("../PitchBlocks");
 const PitchStaircaseSteps = require("../../widgets/PitchStaircaseSteps");
 
 const SHARP = "\u266F";
@@ -220,12 +220,12 @@ describe("setupPitchBlocks", () => {
                 blockList: {
                     10: {
                         name: "test",
-                        connections: [null, null, null, null, null],
+                        connections: [null, null, null, null, 100],
                         value: null,
                         privateData: {}
                     },
-                    20: { name: "test2", connections: [null, null, null, null, null], value: null },
-                    30: { name: "test3", connections: [null, null, null, null, null], value: null }
+                    20: { name: "test2", connections: [null, null, null, null, 200], value: null },
+                    30: { name: "test3", connections: [null, null, null, null, 300], value: null }
                 }
             },
             turtles: turtles,
@@ -1522,17 +1522,367 @@ describe("setupPitchBlocks", () => {
                 }
             });
 
-            it("FlatBlock flow", () => {
+            it("FlatBlock flow applies transposition and registers block-scoped listener", () => {
                 const block = createdBlocks["flat"];
-                if (block && block.flow) {
-                    block.flow([], logo, 0, 10);
+                const tur = turtles.ithTurtle(0);
+                tur.singer.transposition = 0;
+                tur.listeners = {};
+
+                const res = block.flow(["childFlow"], logo, 0, 10);
+                expect(res).toEqual(["childFlow", 1]);
+                expect(tur.singer.transposition).toBe(-1);
+                expect(logo.setDispatchBlock).toHaveBeenCalledWith(10, 0, "_flat_0_10");
+                expect(logo.setTurtleListener).toHaveBeenCalledWith(
+                    0,
+                    "_flat_0_10",
+                    expect.any(Function)
+                );
+
+                // Invoking the registered listener restores transposition
+                const listenerCall = logo.setTurtleListener.mock.calls.find(
+                    c => c[1] === "_flat_0_10"
+                );
+                expect(listenerCall).toBeDefined();
+                listenerCall[2]();
+                expect(tur.singer.transposition).toBe(0);
+            });
+
+            it("FlatBlock flow returns early when args[0] is undefined", () => {
+                const block = createdBlocks["flat"];
+                const tur = turtles.ithTurtle(0);
+                tur.singer.transposition = 0;
+                logo.setDispatchBlock.mockClear();
+                logo.setTurtleListener.mockClear();
+
+                const res = block.flow([], logo, 0, 10);
+                expect(res).toBeUndefined();
+                expect(tur.singer.transposition).toBe(0);
+                expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+                expect(logo.setTurtleListener).not.toHaveBeenCalled();
+            });
+
+            it("SharpBlock flow applies transposition and registers block-scoped listener", () => {
+                const block = createdBlocks["sharp"];
+                const tur = turtles.ithTurtle(0);
+                tur.singer.transposition = 0;
+                tur.listeners = {};
+
+                const res = block.flow(["childFlow"], logo, 0, 20);
+                expect(res).toEqual(["childFlow", 1]);
+                expect(tur.singer.transposition).toBe(1);
+                expect(logo.setDispatchBlock).toHaveBeenCalledWith(20, 0, "_sharp_0_20");
+                expect(logo.setTurtleListener).toHaveBeenCalledWith(
+                    0,
+                    "_sharp_0_20",
+                    expect.any(Function)
+                );
+
+                const listenerCall = logo.setTurtleListener.mock.calls.find(
+                    c => c[1] === "_sharp_0_20"
+                );
+                expect(listenerCall).toBeDefined();
+                listenerCall[2]();
+                expect(tur.singer.transposition).toBe(0);
+            });
+
+            it("SharpBlock flow returns early when args[0] is undefined", () => {
+                const block = createdBlocks["sharp"];
+                const tur = turtles.ithTurtle(0);
+                tur.singer.transposition = 0;
+                logo.setDispatchBlock.mockClear();
+                logo.setTurtleListener.mockClear();
+
+                const res = block.flow([], logo, 0, 20);
+                expect(res).toBeUndefined();
+                expect(tur.singer.transposition).toBe(0);
+                expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+                expect(logo.setTurtleListener).not.toHaveBeenCalled();
+            });
+
+            it("nested flat clamps isolate listeners and restore transposition in order", () => {
+                const block = createdBlocks["flat"];
+                const tur = turtles.ithTurtle(0);
+                tur.singer.transposition = 0;
+                tur.listeners = {};
+                activity.blocks.blockList["outer"] = { connections: [null, "inner", "outerExit"] };
+                activity.blocks.blockList["inner"] = { connections: [null, null, "innerExit"] };
+                logo.setTurtleListener.mockImplementation((t, name, fn) => {
+                    tur.listeners[name] = fn;
+                });
+
+                // Outer flat clamp
+                block.flow(["outerChild"], logo, 0, "outer");
+                expect(tur.singer.transposition).toBe(-1);
+                expect(logo.setDispatchBlock).toHaveBeenCalledWith("outer", 0, "_flat_0_outer");
+
+                // Inner flat clamp
+                block.flow(["innerChild"], logo, 0, "inner");
+                expect(tur.singer.transposition).toBe(-2);
+                expect(logo.setDispatchBlock).toHaveBeenCalledWith("inner", 0, "_flat_0_inner");
+
+                expect(typeof tur.listeners["_flat_0_outer"]).toBe("function");
+                expect(typeof tur.listeners["_flat_0_inner"]).toBe("function");
+
+                // Inner exits
+                tur.listeners["_flat_0_inner"]();
+                expect(tur.singer.transposition).toBe(-1);
+
+                // Outer exits
+                tur.listeners["_flat_0_outer"]();
+                expect(tur.singer.transposition).toBe(0);
+            });
+
+            it("nested sharp clamps isolate listeners and restore transposition in order", () => {
+                const block = createdBlocks["sharp"];
+                const tur = turtles.ithTurtle(0);
+                tur.singer.transposition = 0;
+                tur.listeners = {};
+                activity.blocks.blockList["outerSharp"] = {
+                    connections: [null, "innerSharp", "outerExit"]
+                };
+                activity.blocks.blockList["innerSharp"] = {
+                    connections: [null, null, "innerExit"]
+                };
+                logo.setTurtleListener.mockImplementation((t, name, fn) => {
+                    tur.listeners[name] = fn;
+                });
+
+                // Outer sharp clamp
+                block.flow(["outerChild"], logo, 0, "outerSharp");
+                expect(tur.singer.transposition).toBe(1);
+
+                // Inner sharp clamp
+                block.flow(["innerChild"], logo, 0, "innerSharp");
+                expect(tur.singer.transposition).toBe(2);
+
+                expect(typeof tur.listeners["_sharp_0_outerSharp"]).toBe("function");
+                expect(typeof tur.listeners["_sharp_0_innerSharp"]).toBe("function");
+
+                // Inner exits
+                tur.listeners["_sharp_0_innerSharp"]();
+                expect(tur.singer.transposition).toBe(1);
+
+                // Outer exits
+                tur.listeners["_sharp_0_outerSharp"]();
+                expect(tur.singer.transposition).toBe(0);
+            });
+
+            it("handles flat and sharp under inversion properly", () => {
+                const flatBlock = createdBlocks["flat"];
+                const sharpBlock = createdBlocks["sharp"];
+                const tur = turtles.ithTurtle(0);
+                tur.singer.transposition = 0;
+                tur.singer.invertList = [["sol", 4, "even"]];
+                tur.listeners = {};
+                activity.blocks.blockList["invFlat"] = { connections: [null, null, "invFlatExit"] };
+                activity.blocks.blockList["invSharp"] = {
+                    connections: [null, null, "invSharpExit"]
+                };
+                logo.setTurtleListener.mockImplementation((t, name, fn) => {
+                    tur.listeners[name] = fn;
+                });
+
+                // Inverted flat shifts UP by 1
+                flatBlock.flow(["child"], logo, 0, "invFlat");
+                expect(tur.singer.transposition).toBe(1);
+                tur.listeners["_flat_0_invFlat"]();
+                expect(tur.singer.transposition).toBe(0);
+
+                // Inverted sharp shifts DOWN by 1
+                sharpBlock.flow(["child"], logo, 0, "invSharp");
+                expect(tur.singer.transposition).toBe(-1);
+                tur.listeners["_sharp_0_invSharp"]();
+                expect(tur.singer.transposition).toBe(0);
+
+                tur.singer.invertList = [];
+            });
+
+            it("FlatBlock and SharpBlock flow return safely and do not mutate state when blk is invalid or unlisted", () => {
+                const flatBlock = createdBlocks["flat"];
+                const sharpBlock = createdBlocks["sharp"];
+                const tur = turtles.ithTurtle(0);
+                const invalidIds = [undefined, null, "", "nonexistent", 99999];
+
+                for (const blk of invalidIds) {
+                    tur.singer.transposition = 0;
+                    tur.listeners = {};
+                    logo.setDispatchBlock.mockClear();
+                    logo.setTurtleListener.mockClear();
+
+                    expect(() => {
+                        flatBlock.flow(["child"], logo, 0, blk);
+                    }).not.toThrow();
+                    expect(tur.singer.transposition).toBe(0);
+                    expect(tur.listeners).toEqual({});
+                    expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+                    expect(logo.setTurtleListener).not.toHaveBeenCalled();
+
+                    expect(() => {
+                        sharpBlock.flow(["child"], logo, 0, blk);
+                    }).not.toThrow();
+                    expect(tur.singer.transposition).toBe(0);
+                    expect(tur.listeners).toEqual({});
+                    expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+                    expect(logo.setTurtleListener).not.toHaveBeenCalled();
                 }
             });
 
-            it("SharpBlock flow", () => {
-                const block = createdBlocks["sharp"];
-                if (block && block.flow) {
-                    block.flow([], logo, 0, 10);
+            it("FlatBlock and SharpBlock flow return safely and do not mutate state when exit connection is missing, null, or undefined", () => {
+                const flatBlock = createdBlocks["flat"];
+                const sharpBlock = createdBlocks["sharp"];
+                const tur = turtles.ithTurtle(0);
+
+                activity.blocks.blockList["nullExit"] = { connections: [null, 1, null] };
+                activity.blocks.blockList["undefinedExit"] = { connections: [null, 1, undefined] };
+                activity.blocks.blockList["emptyConns"] = { connections: [] };
+                activity.blocks.blockList["malformedConns"] = { connections: "notAnArray" };
+                activity.blocks.blockList["noConns"] = {};
+
+                const testIds = [
+                    "nullExit",
+                    "undefinedExit",
+                    "emptyConns",
+                    "malformedConns",
+                    "noConns"
+                ];
+
+                for (const blk of testIds) {
+                    tur.singer.transposition = 0;
+                    tur.listeners = {};
+                    logo.setDispatchBlock.mockClear();
+                    logo.setTurtleListener.mockClear();
+
+                    expect(() => {
+                        const res = flatBlock.flow(["child"], logo, 0, blk);
+                        expect(res).toEqual(["child", 1]);
+                    }).not.toThrow();
+                    expect(tur.singer.transposition).toBe(0);
+                    expect(tur.listeners).toEqual({});
+                    expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+                    expect(logo.setTurtleListener).not.toHaveBeenCalled();
+
+                    expect(() => {
+                        const res = sharpBlock.flow(["child"], logo, 0, blk);
+                        expect(res).toEqual(["child", 1]);
+                    }).not.toThrow();
+                    expect(tur.singer.transposition).toBe(0);
+                    expect(tur.listeners).toEqual({});
+                    expect(logo.setDispatchBlock).not.toHaveBeenCalled();
+                    expect(logo.setTurtleListener).not.toHaveBeenCalled();
+                }
+            });
+
+            it("FlatBlock and SharpBlock flow register with mouse when MusicBlocks.isRun is true", () => {
+                const flatBlock = createdBlocks["flat"];
+                const sharpBlock = createdBlocks["sharp"];
+                const tur = turtles.ithTurtle(0);
+                const mockListeners = [];
+                const origMusicBlocks = global.MusicBlocks;
+                const origMouse = global.Mouse;
+
+                global.MusicBlocks = { isRun: true };
+                global.Mouse = {
+                    getMouseFromTurtle: jest.fn(() => ({ MB: { listeners: mockListeners } }))
+                };
+                logo.setTurtleListener.mockImplementation((t, name, fn) => {
+                    tur.listeners[name] = fn;
+                });
+
+                try {
+                    tur.singer.transposition = 0;
+                    tur.listeners = {};
+                    mockListeners.length = 0;
+
+                    flatBlock.flow(["child"], logo, 0, undefined);
+                    expect(tur.singer.transposition).toBe(-1);
+                    expect(mockListeners.length).toBe(1);
+                    const flatListenerName = mockListeners[0];
+                    expect(typeof tur.listeners[flatListenerName]).toBe("function");
+
+                    tur.listeners[flatListenerName]();
+                    expect(tur.singer.transposition).toBe(0);
+
+                    // SharpBlock under mouse mode
+                    mockListeners.length = 0;
+                    sharpBlock.flow(["child"], logo, 0, 99999);
+                    expect(tur.singer.transposition).toBe(1);
+                    expect(mockListeners.length).toBe(1);
+                    const sharpListenerName = mockListeners[0];
+                    expect(typeof tur.listeners[sharpListenerName]).toBe("function");
+
+                    tur.listeners[sharpListenerName]();
+                    expect(tur.singer.transposition).toBe(0);
+
+                    // When block has null exit connection, mouse completion handles it
+                    activity.blocks.blockList["nullExit"] = { connections: [null, 1, null] };
+                    mockListeners.length = 0;
+                    flatBlock.flow(["child"], logo, 0, "nullExit");
+                    expect(tur.singer.transposition).toBe(-1);
+                    expect(mockListeners.length).toBe(1);
+                    tur.listeners[mockListeners[0]]();
+                    expect(tur.singer.transposition).toBe(0);
+
+                    mockListeners.length = 0;
+                    sharpBlock.flow(["child"], logo, 0, "nullExit");
+                    expect(tur.singer.transposition).toBe(1);
+                    expect(mockListeners.length).toBe(1);
+                    tur.listeners[mockListeners[0]]();
+                    expect(tur.singer.transposition).toBe(0);
+                } finally {
+                    global.MusicBlocks = origMusicBlocks;
+                    global.Mouse = origMouse;
+                }
+            });
+
+            it("FlatBlock and SharpBlock flow return safely in mouse mode when mouse completion route is unavailable", () => {
+                const flatBlock = createdBlocks["flat"];
+                const sharpBlock = createdBlocks["sharp"];
+                const tur = turtles.ithTurtle(0);
+                const origMusicBlocks = global.MusicBlocks;
+                const origMouse = global.Mouse;
+
+                global.MusicBlocks = { isRun: true };
+                // Mouse route unavailable (null or missing MB.listeners)
+                global.Mouse = {
+                    getMouseFromTurtle: jest.fn(() => null)
+                };
+
+                try {
+                    tur.singer.transposition = 0;
+                    tur.listeners = {};
+                    logo.setDispatchBlock.mockClear();
+                    logo.setTurtleListener.mockClear();
+
+                    expect(() => {
+                        flatBlock.flow(["child"], logo, 0, undefined);
+                    }).not.toThrow();
+                    expect(tur.singer.transposition).toBe(0);
+                    expect(tur.listeners).toEqual({});
+                    expect(logo.setTurtleListener).not.toHaveBeenCalled();
+
+                    expect(() => {
+                        sharpBlock.flow(["child"], logo, 0, undefined);
+                    }).not.toThrow();
+                    expect(tur.singer.transposition).toBe(0);
+                    expect(tur.listeners).toEqual({});
+                    expect(logo.setTurtleListener).not.toHaveBeenCalled();
+
+                    // Block exists with null exit connection, but mouse is unavailable
+                    activity.blocks.blockList["nullExit"] = { connections: [null, 1, null] };
+                    expect(() => {
+                        const res = flatBlock.flow(["child"], logo, 0, "nullExit");
+                        expect(res).toEqual(["child", 1]);
+                    }).not.toThrow();
+                    expect(tur.singer.transposition).toBe(0);
+
+                    expect(() => {
+                        const res = sharpBlock.flow(["child"], logo, 0, "nullExit");
+                        expect(res).toEqual(["child", 1]);
+                    }).not.toThrow();
+                    expect(tur.singer.transposition).toBe(0);
+                } finally {
+                    global.MusicBlocks = origMusicBlocks;
+                    global.Mouse = origMouse;
                 }
             });
 
@@ -2000,6 +2350,102 @@ describe("setupPitchBlocks", () => {
                         }
                     });
                 });
+            });
+        });
+
+        describe("hasDispatchCompletionRoute", () => {
+            it("returns false for invalid activity or block inputs", () => {
+                expect(hasDispatchCompletionRoute(null, logo, 0, 1)).toBe(false);
+                expect(hasDispatchCompletionRoute({}, logo, 0, 1)).toBe(false);
+                expect(hasDispatchCompletionRoute({ blocks: {} }, logo, 0, 1)).toBe(false);
+                expect(hasDispatchCompletionRoute(activity, logo, 0, undefined)).toBe(false);
+                expect(hasDispatchCompletionRoute(activity, logo, 0, null)).toBe(false);
+                expect(hasDispatchCompletionRoute(activity, logo, 0, 99999)).toBe(false);
+            });
+
+            it("returns false for malformed block or missing connections", () => {
+                activity.blocks.blockList[100] = null;
+                expect(hasDispatchCompletionRoute(activity, logo, 0, 100)).toBe(false);
+                activity.blocks.blockList[101] = { connections: null };
+                expect(hasDispatchCompletionRoute(activity, logo, 0, 101)).toBe(false);
+                activity.blocks.blockList[102] = { connections: [] };
+                expect(hasDispatchCompletionRoute(activity, logo, 0, 102)).toBe(false);
+            });
+
+            it("evaluates forward clamp completion correctly", () => {
+                activity.blocks.blockList[103] = { connections: [0, 1, 2] };
+                expect(hasDispatchCompletionRoute(activity, logo, 0, 103)).toBe(true);
+
+                activity.blocks.blockList[104] = { connections: [0, 1, null] };
+                expect(hasDispatchCompletionRoute(activity, logo, 0, 104)).toBe(false);
+
+                activity.blocks.blockList[105] = { connections: [0, 1, undefined] };
+                expect(hasDispatchCompletionRoute(activity, logo, 0, 105)).toBe(false);
+            });
+
+            it("handles backward mode when backward block is backward", () => {
+                const tur = turtles.ithTurtle(0);
+                tur.singer.inDuplicate = false;
+                tur.singer.backward = [200];
+                activity.blocks.blockList[200] = { name: "backward", connections: [null, 300] };
+                activity.blocks.blockList[106] = { connections: [400, 1, 500] };
+
+                logo.blocks = {
+                    sameGeneration: jest.fn((c, blk) => c === 300 && blk === 106)
+                };
+
+                // sameGeneration is true -> nextBlock is connection 0 (400)
+                expect(hasDispatchCompletionRoute(activity, logo, 0, 106)).toBe(true);
+
+                // when connection 0 is null -> false
+                activity.blocks.blockList[106].connections[0] = null;
+                expect(hasDispatchCompletionRoute(activity, logo, 0, 106)).toBe(false);
+            });
+
+            it("handles backward mode when backward block is action/clamp boundary", () => {
+                const tur = turtles.ithTurtle(0);
+                tur.singer.inDuplicate = false;
+                tur.singer.backward = [201];
+                activity.blocks.blockList[201] = { name: "action", connections: [null, null, 301] };
+                activity.blocks.blockList[107] = { connections: [401, 1, 501] };
+
+                logo.blocks = {
+                    sameGeneration: jest.fn(() => false)
+                };
+
+                // sameGeneration is false -> falls back to utilsLast (501)
+                expect(hasDispatchCompletionRoute(activity, logo, 0, 107)).toBe(true);
+            });
+
+            it("skips backward logic when inDuplicate is true", () => {
+                const tur = turtles.ithTurtle(0);
+                tur.singer.inDuplicate = true;
+                tur.singer.backward = [200];
+                activity.blocks.blockList[108] = { connections: [null, 1, 502] };
+
+                // Uses utilsLast despite backward list
+                expect(hasDispatchCompletionRoute(activity, logo, 0, 108)).toBe(true);
+            });
+
+            it("uses act.utils.last or fallback arrow function when log.deps.utils is absent", () => {
+                const minimalAct = {
+                    blocks: {
+                        blockList: {
+                            109: { connections: [1, 2, 3] }
+                        }
+                    },
+                    utils: { last: arr => arr[arr.length - 1] }
+                };
+                expect(hasDispatchCompletionRoute(minimalAct, null, 0, 109)).toBe(true);
+
+                const noUtilsAct = {
+                    blocks: {
+                        blockList: {
+                            110: { connections: [1, 2, 4] }
+                        }
+                    }
+                };
+                expect(hasDispatchCompletionRoute(noUtilsAct, null, 0, 110)).toBe(true);
             });
         });
     });

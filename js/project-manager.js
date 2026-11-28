@@ -561,7 +561,13 @@ class ProjectManager {
                 return null;
             }
             window.loadedSession = data;
-            return that.blocks.loadNewBlocks(parsed);
+            const token = that.blocks.loadNewBlocks(parsed);
+            if (token === null) {
+                const err = new Error("Cannot load project: invalid project structure.");
+                err.isRejected = true;
+                throw err;
+            }
+            return token;
         };
 
         const deleteFromSource = async source => {
@@ -651,8 +657,21 @@ class ProjectManager {
             // before it threw. Clear those leftover blocks before loading
             // anything else, or the next attempt's blocks render on top of
             // them instead of replacing them (reported against this fix).
-            if (typeof that.sendAllToTrash === "function") {
-                that.sendAllToTrash(false, false);
+            // Pass doNotSave=true so clearing does not write an empty workspace
+            // over a good fallback session in storage.
+            // When a request is rejected during an active load, no blocks were created
+            // by this request and an active load is still in progress; do not trash
+            // the in-flight blocks.
+            const isRejected = Boolean(error && error.isRejected);
+            const isBlocksLoading = Boolean(
+                that.blocks &&
+                typeof that.blocks.isLoading === "function" &&
+                that.blocks.isLoading()
+            );
+            if (!isRejected && !isBlocksLoading) {
+                if (typeof that.sendAllToTrash === "function") {
+                    that.sendAllToTrash(false, true);
+                }
             }
 
             let fallbackData = null;
@@ -684,8 +703,14 @@ class ProjectManager {
                 }
             }
 
-            that.errorMsg(_("Your saved project could not be loaded. Starting a new project."));
-            that.justLoadStart();
+            if (!isRejected && !isBlocksLoading) {
+                if (that && typeof that.errorMsg === "function") {
+                    that.errorMsg(
+                        _("Your saved project could not be loaded. Starting a new project.")
+                    );
+                }
+                that.justLoadStart();
+            }
         };
 
         if (that.sessionData) {

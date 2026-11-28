@@ -2329,7 +2329,8 @@ describe("Blocks Foundation", () => {
             document.body.appendChild(loadContainer);
         });
 
-        afterEach(() => {
+        afterEach(async () => {
+            await new Promise(resolve => setTimeout(resolve, 0));
             loadContainer.remove();
             delete global.pubsub;
         });
@@ -2399,7 +2400,8 @@ describe("Blocks Foundation", () => {
             document.body.appendChild(loadContainer);
         });
 
-        afterEach(() => {
+        afterEach(async () => {
+            await new Promise(resolve => setTimeout(resolve, 0));
             loadContainer.remove();
             delete global.pubsub;
         });
@@ -3218,7 +3220,8 @@ describe("Blocks Foundation", () => {
             document.body.appendChild(loadContainer);
         });
 
-        afterEach(() => {
+        afterEach(async () => {
+            await new Promise(resolve => setTimeout(resolve, 0));
             loadContainer.remove();
             delete global.pubsub;
         });
@@ -3382,7 +3385,8 @@ describe("Blocks Foundation", () => {
             document.body.appendChild(loadContainer);
         });
 
-        afterEach(() => {
+        afterEach(async () => {
+            await new Promise(resolve => setTimeout(resolve, 0));
             loadContainer.remove();
             delete global.pubsub;
         });
@@ -3930,15 +3934,133 @@ describe("Blocks Foundation", () => {
             );
         });
 
-        it("reports invalid data without queuing it behind a running load", () => {
-            blocks.loadNewBlocks(makeBatch(1));
+        it.each([
+            ["an object", { name: "equal", pitchNumber: 12 }],
+            ["null", null],
+            ["undefined", undefined]
+        ])(
+            "rejects %s during an active load, returning null and keeping active load intact",
+            async (_label, notBlocks) => {
+                const finishedPromise = nextLoadEvent("finishedLoading");
+                const initialToken = blocks.loadNewBlocks(makeBatch(1));
+                expect(blocks.isLoading()).toBe(true);
+                const activeToken = blocks._activeLoadToken;
+                const activeGeneration = blocks._activeLoadGeneration;
 
-            expect(() => blocks.loadNewBlocks({})).not.toThrow();
-            expect(blocks.isLoading()).toBe(true);
-            expect(blocks._loadQueue).toHaveLength(0);
+                const res = blocks.loadNewBlocks(notBlocks);
+
+                expect(res).toBeNull();
+                expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                    "Cannot load project: invalid project structure."
+                );
+                expect(blocks._activeLoadToken).toBe(activeToken);
+                expect(blocks._activeLoadGeneration).toBe(activeGeneration);
+                expect(blocks.isLoading()).toBe(true);
+                expect(blocks._loadQueue).toHaveLength(0);
+
+                const finishedEvent = await finishedPromise;
+                expect(finishedEvent.token).toBe(initialToken);
+                expect(blocks.isLoading()).toBe(false);
+            }
+        );
+
+        it("safely rejects non-array input during active load even if activity.errorMsg is missing", () => {
+            const savedErrorMsg = mockActivity.errorMsg;
+            delete mockActivity.errorMsg;
+            try {
+                blocks.loadNewBlocks(makeBatch(1));
+                expect(blocks.isLoading()).toBe(true);
+
+                let res;
+                expect(() => {
+                    res = blocks.loadNewBlocks({ invalid: "data" });
+                }).not.toThrow();
+
+                expect(res).toBeNull();
+                expect(blocks.isLoading()).toBe(true);
+                expect(blocks._loadQueue).toHaveLength(0);
+            } finally {
+                mockActivity.errorMsg = savedErrorMsg;
+            }
+        });
+
+        it("preserves _lastLoadFailed flag when an invalid non-array load is attempted and emits loadFailed", async () => {
+            blocks._lastLoadFailed = true;
+
+            const failurePromise = new Promise(resolve => {
+                global.pubsub.once("loadFailed", resolve);
+            });
+
+            const returnedToken = blocks.loadNewBlocks({ invalid: "data" });
+
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
                 "Cannot load project: invalid project structure."
             );
+            expect(blocks._lastLoadFailed).toBe(true);
+            expect(blocks.isLoading()).toBe(false);
+
+            const payload = await failurePromise;
+            expect(payload.token).toBe(returnedToken);
+            expect(payload.error.message).toBe("Cannot load project: invalid project structure.");
+
+            // A subsequent successful load attempt clears the failure flag
+            blocks.loadNewBlocks([[0, "forward", 100, 100, [null, null]]]);
+            expect(blocks._lastLoadFailed).toBe(false);
+        });
+
+        it("preserves _lastLoadFailed flag when loading an empty array into a non-empty failed workspace", () => {
+            blocks._lastLoadFailed = true;
+            blocks.blockList = [makeBatch(1)[0]];
+
+            blocks.loadNewBlocks([]);
+
+            // Empty load completes, but must not clear failure flag while a failed workspace remains
+            expect(blocks._lastLoadFailed).toBe(true);
+            expect(blocks.isLoading()).toBe(false);
+        });
+
+        it("preserves _lastLoadFailed flag when an array load is rejected before block creation", () => {
+            blocks._lastLoadFailed = true;
+
+            // Malformed block element in array
+            blocks.loadNewBlocks([null]);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Cannot load project: malformed block structure detected."
+            );
+            expect(blocks._lastLoadFailed).toBe(true);
+            expect(blocks.isLoading()).toBe(false);
+
+            // Circular connection in array
+            blocks.loadNewBlocks([[0, "forward", 100, 100, [null, 0]]]);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Cannot load project: circular block connection detected."
+            );
+            expect(blocks._lastLoadFailed).toBe(true);
+            expect(blocks.isLoading()).toBe(false);
+
+            // Out-of-range connection in array
+            blocks.loadNewBlocks([[0, "forward", 100, 100, [null, 999]]]);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Cannot load project: invalid block connection detected."
+            );
+            expect(blocks._lastLoadFailed).toBe(true);
+            expect(blocks.isLoading()).toBe(false);
+
+            // A subsequent valid load clears the failure flag once validated
+            blocks.loadNewBlocks([[0, "forward", 100, 100, [null, null]]]);
+            expect(blocks._lastLoadFailed).toBe(false);
+        });
+
+        it("does not set _lastLoadFailed when an abort occurs before any block is created", () => {
+            blocks._lastLoadFailed = false;
+
+            blocks.loadNewBlocks([null]);
+
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                "Cannot load project: malformed block structure detected."
+            );
+            // Workspace remains intact, so autosave is not disabled
+            expect(blocks._lastLoadFailed).toBe(false);
         });
 
         it("runAfterLoad runs the callback right away when nothing is loading", () => {
@@ -4233,7 +4355,7 @@ describe("Blocks Foundation", () => {
 
             window.removeEventListener("error", onWindowError);
 
-            expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, false);
+            expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, true);
             expect(activity.errorMsg).toHaveBeenCalled();
 
             // The fallback's own load (DATAOBJS) must have found the flag
