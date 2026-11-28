@@ -605,8 +605,9 @@ class ServerInterface {
      * @param {string}   repoName   GitHub repo slug
      * @param {Function} callback   called with { success, data: normalisedRow }
      * @param {boolean}  [skipCache=false] if true, bypasses metadata cache
+     * @param {boolean}  [fallbackToCache=true] if false, report refresh failures instead
      */
-    async getProjectDetails(repoName, callback, skipCache = false) {
+    async getProjectDetails(repoName, callback, skipCache = false, fallbackToCache = true) {
         try {
             await this._initCache();
             if (!skipCache) {
@@ -630,7 +631,7 @@ class ServerInterface {
             }
 
             if (!response || response.error || response.__httpError) {
-                if (skipCache) {
+                if (skipCache && fallbackToCache) {
                     const fallback = await this.cacheManager.getMetadata(repoName);
                     if (fallback) {
                         callback({ success: true, data: fallback });
@@ -647,7 +648,7 @@ class ServerInterface {
             callback({ success: true, data: normalised });
         } catch (err) {
             console.error("[ServerInterface] getProjectDetails error:", err);
-            if (skipCache) {
+            if (skipCache && fallbackToCache) {
                 try {
                     const fallback = await this.cacheManager.getMetadata(repoName);
                     if (fallback) {
@@ -949,7 +950,7 @@ class ServerInterface {
     async likeProject(repoName, like, callback) {
         try {
             const userId = this.Planet.UserID || "anon";
-            const response = await this._post("/like", { repoName, userId, like });
+            const response = await this._post("/like", { repoName, userId, like }, "POST", true);
 
             if (!response || response.error) {
                 callback({ success: false, error: response?.error || "LIKE_FAILED" });

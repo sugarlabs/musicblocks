@@ -183,6 +183,22 @@ describe("ServerInterface", () => {
             });
         });
 
+        it.each([null, new Error("Network offline")])(
+            "should not return stale metadata for a required server refresh (%p)",
+            async result => {
+                mockCacheManager.getMetadata.mockResolvedValue({ ProjectLikes: 5 });
+                const request = jest.spyOn(server, "_get");
+                if (result instanceof Error) request.mockRejectedValue(result);
+                else request.mockResolvedValue(result);
+                const callback = jest.fn();
+
+                await server.getProjectDetails("123", callback, true, false);
+
+                expect(mockCacheManager.getMetadata).not.toHaveBeenCalled();
+                expect(callback).toHaveBeenCalledWith(server.ConnectionFailureData);
+            }
+        );
+
         it("should return ConnectionFailureData when skipCache is true, network fails, and cache is empty", async () => {
             mockCacheManager.getMetadata.mockResolvedValue(null);
             jest.spyOn(server, "_get").mockResolvedValue(null);
@@ -250,7 +266,9 @@ describe("ServerInterface", () => {
                 expect.objectContaining({
                     repoName: "123",
                     like: true
-                })
+                }),
+                "POST",
+                true
             );
             expect(callback).toHaveBeenCalledWith({ success: true, likes: 1 });
         });
@@ -806,6 +824,52 @@ describe("ServerInterface", () => {
             });
 
             await expect(server._get("/allRepos?page=1&limit=25")).resolves.toEqual({ data: [] });
+            expect(jest.getTimerCount()).toBe(0);
+        });
+    });
+
+    describe("_post timeout", () => {
+        afterEach(() => {
+            jest.useRealTimers();
+            delete global.fetch;
+        });
+
+        it("gives up on a request that never answers", async () => {
+            jest.useFakeTimers();
+            // A server that accepts the connection and then goes quiet.
+            global.fetch = jest.fn(
+                (url, { signal }) =>
+                    new Promise((resolve, reject) => {
+                        signal.addEventListener("abort", () =>
+                            reject(new DOMException("aborted", "AbortError"))
+                        );
+                    })
+            );
+
+            let settled = false;
+            const pending = server
+                ._post("/like", { repoName: "x", like: true }, "POST", true)
+                .then(response => {
+                    settled = true;
+                    return response;
+                });
+            await jest.advanceTimersByTimeAsync(server.RequestTimeout - 1);
+            expect(settled).toBe(false);
+            await jest.advanceTimersByTimeAsync(1);
+
+            await expect(pending).resolves.toBeNull();
+        });
+
+        it("clears the timer once the request answers", async () => {
+            jest.useFakeTimers();
+            global.fetch = jest.fn().mockResolvedValue({
+                ok: true,
+                json: jest.fn().mockResolvedValue({ likes: 1 })
+            });
+
+            await expect(
+                server._post("/like", { repoName: "x", like: true }, "POST", true)
+            ).resolves.toEqual({ likes: 1 });
             expect(jest.getTimerCount()).toBe(0);
         });
     });

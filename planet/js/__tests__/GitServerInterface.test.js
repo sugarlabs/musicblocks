@@ -135,11 +135,16 @@ describe("ServerInterface - Git Endpoints & Integration", () => {
             const cb = jest.fn();
             await server.likeProject("test-org/my-song", true, cb);
 
-            expect(mockPost).toHaveBeenCalledWith("/like", {
-                repoName: "test-org/my-song",
-                userId: "user-12345",
-                like: true
-            });
+            expect(mockPost).toHaveBeenCalledWith(
+                "/like",
+                {
+                    repoName: "test-org/my-song",
+                    userId: "user-12345",
+                    like: true
+                },
+                "POST",
+                true
+            );
 
             expect(cb).toHaveBeenCalledWith({ success: true, likes: 42 });
         });
