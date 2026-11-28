@@ -385,6 +385,22 @@ describe("Utility Logic Functions", () => {
             expect(res4).toEqual([0, 1]);
             expect(err4).not.toBeNull();
         });
+
+        it("safely falls back when _ translation helper is undefined", () => {
+            const original_ = global._;
+            try {
+                delete global._;
+                const [resInvalid, errInvalid] = rationalSum(null, [1, 2]);
+                expect(resInvalid).toEqual([0, 1]);
+                expect(errInvalid).toBe("Invalid input passed to rational sum");
+
+                const [resZeroDenom, errZeroDenom] = rationalSum([1, 0], [1, 2]);
+                expect(resZeroDenom).toEqual([0, 1]);
+                expect(errZeroDenom).toBe("Note calculation failed: zero denominator");
+            } finally {
+                global._ = original_;
+            }
+        });
     });
 
     describe("clampNumber()", () => {

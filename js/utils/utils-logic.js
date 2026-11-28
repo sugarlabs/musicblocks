@@ -415,6 +415,8 @@ var rationalSum = (a, b) => {
     // Rejects non-array, wrong-length, or non-number inputs.
     // A zero numerator ([0, n]) is valid and passes through — only the
     // denominator (index 1) must be non-zero.
+    const translate = text => (typeof _ === "function" ? _(text) : text);
+
     if (
         !Array.isArray(a) ||
         a.length < 2 ||
@@ -428,14 +430,14 @@ var rationalSum = (a, b) => {
         if (typeof console !== "undefined") {
             console.warn("Invalid input passed to rationalSum:", a, b);
         }
-        return [[0, 1], _("Invalid input passed to rational sum")];
+        return [[0, 1], translate("Invalid input passed to rational sum")];
     }
 
     if (a[1] === 0 || b[1] === 0) {
         if (typeof console !== "undefined") {
             console.error("rationalSum: zero denominator — corrupted rhythm state", { a, b });
         }
-        return [[0, 1], _("Note calculation failed: zero denominator")];
+        return [[0, 1], translate("Note calculation failed: zero denominator")];
     }
 
     let obja0, objb0, obja1, objb1;
