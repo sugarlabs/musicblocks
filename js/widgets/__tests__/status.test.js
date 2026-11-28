@@ -628,6 +628,17 @@ describe("StatusMatrix Widget", () => {
             expect(() => statusMatrix.updateAll()).not.toThrow();
         });
 
+        test("namedbox 'toString' shows blank instead of the inherited function", () => {
+            mockActivity.blocks.blockList = {
+                0: { name: "namedbox", privateData: "toString" }
+            };
+            mockActivity.logo.statusFields = [[0, "namedbox"]];
+            mockActivity.logo.boxes = {};
+
+            statusMatrix.updateAll();
+            expect(statusMatrix._statusTable.rows[1].cells[1].textContent).toBe("");
+        });
+
         test("handles heap value directly", () => {
             mockActivity.blocks.blockList = {
                 0: { name: "heap", value: [1, 2, 3] }
