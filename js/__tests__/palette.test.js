@@ -1728,6 +1728,66 @@ describe("Palettes Class", () => {
             expect(mockRemove).toHaveBeenCalled();
         });
 
+        test("showMenu drops the outside click listener of the menu open before it", () => {
+            const palDiv = {
+                childNodes: [{ style: {} }],
+                children: [{ offsetWidth: 180 }],
+                offsetLeft: 0,
+                offsetTop: 0,
+                style: {},
+                parentNode: { appendChild: jest.fn() }
+            };
+            const paletteBody = {
+                appendChild: jest.fn(),
+                style: {},
+                childNodes: [{ style: {} }, { style: {} }],
+                children: [
+                    {
+                        insertRow: jest.fn(() => ({
+                            style: {},
+                            appendChild: jest.fn(),
+                            children: [{ style: {}, appendChild: jest.fn() }]
+                        }))
+                    },
+                    {}
+                ]
+            };
+            global.document.createElement = jest.fn(tag =>
+                tag === "table"
+                    ? paletteBody
+                    : {
+                          style: {},
+                          children: [],
+                          appendChild: jest.fn(),
+                          removeAttribute: jest.fn(),
+                          setAttribute: jest.fn()
+                      }
+            );
+            global.docById = jest.fn(id => (id === "palette" ? palDiv : null));
+
+            palettes.add("rhythm");
+            palettes.add("meter");
+            const rhythm = palettes.dict.rhythm;
+            const meter = palettes.dict.meter;
+            meter._showMenuItems = jest.fn();
+
+            // Rhythm is open and listening for a click outside its menu.
+            const hideRhythm = jest.fn();
+            rhythm._outsideClickListener = () => hideRhythm();
+            document.addEventListener("click", rhythm._outsideClickListener);
+
+            // The user clicks Meter: its menu opens, then the click reaches the document.
+            meter.showMenu(true);
+            document.body.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+            // Rhythm's listener must not fire, or it would remove the Meter menu.
+            expect(hideRhythm).not.toHaveBeenCalled();
+            expect(rhythm._outsideClickListener).toBeNull();
+            if (meter._outsideClickListener) {
+                document.removeEventListener("click", meter._outsideClickListener);
+            }
+        });
+
         test("_hideMenuItems does not throw when PaletteBody is absent", () => {
             global.docById = jest.fn(() => null);
             palettes.add("testAbsent");

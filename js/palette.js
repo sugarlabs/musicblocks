@@ -1692,11 +1692,16 @@ class Palette {
             paletteItems.style.maxHeight = height;
         }
 
-        // Close palette menu on outside click
-        // Remove any existing outside-click listener
-        if (this._outsideClickListener) {
-            document.removeEventListener("click", this._outsideClickListener);
-            this._outsideClickListener = null;
+        // Close palette menu on outside click.
+        // Only one menu is open at a time, so drop the listener of every
+        // palette, not just this one. Otherwise the menu that was open before
+        // still listens, and the click that opened this one closes it again.
+        for (const name in this.palettes.dict) {
+            const palette = this.palettes.dict[name];
+            if (palette && palette._outsideClickListener) {
+                document.removeEventListener("click", palette._outsideClickListener);
+                palette._outsideClickListener = null;
+            }
         }
 
         this._outsideClickListener = event => {
