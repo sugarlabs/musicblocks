@@ -707,10 +707,19 @@ var formatSeconds = seconds => {
     return `${pad(mins)}:${pad(secs)}`;
 };
 
+var normalizeChannel = value => {
+    if (!Number.isFinite(value)) {
+        return 0;
+    }
+    return Math.round(Math.max(0, Math.min(value, 255)));
+};
 /**
  * Converts RGB values to a hexadecimal color code.
  */
 var rgbToHex = (r, g, b) => {
+    r = normalizeChannel(r);
+    g = normalizeChannel(g);
+    b = normalizeChannel(b);
     return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 };
 
