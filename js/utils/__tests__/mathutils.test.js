@@ -941,6 +941,22 @@ describe("MathUtility", () => {
             expect(Number.isNaN(MathUtility.doInt("abc"))).toBe(true);
             expect(MathUtility.doNegate("abc")).toBe("cba");
         });
+
+        test("throws NanError when arithmetic operations evaluate to NaN", () => {
+            expect(() => MathUtility.doMinus(Infinity, Infinity)).toThrow("NanError");
+            expect(() => MathUtility.doMultiply(0, Infinity)).toThrow("NanError");
+            expect(() => MathUtility.doMultiply(Infinity, 0)).toThrow("NanError");
+            expect(() => MathUtility.doDivide(Infinity, Infinity)).toThrow("NanError");
+            expect(() => MathUtility.doMod(Infinity, 2)).toThrow("NanError");
+            expect(() => MathUtility.doPlus(Infinity, -Infinity)).toThrow("NanError");
+            expect(() => MathUtility.doPlus(-Infinity, Infinity)).toThrow("NanError");
+            expect(() => MathUtility.doCalculateDistance(Infinity, 0, Infinity, 5)).toThrow(
+                "NanError"
+            );
+            expect(() => MathUtility.doLerp(Infinity, Infinity, 0.5)).toThrow("NanError");
+            expect(() => MathUtility.doMap(Infinity, 0, 10, 0, 0)).toThrow("NanError");
+            expect(() => MathUtility.doRandom(Infinity, Infinity)).toThrow("NanError");
+        });
     });
 
     describe("doLerp", () => {

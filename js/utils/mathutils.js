@@ -95,7 +95,11 @@ class MathUtility {
                 // No whole number between them (e.g. 2.2 and 2.8).
                 return Number(n1);
             }
-            return low + Math.floor(Math.random() * (high - low + 1));
+            const result = low + Math.floor(Math.random() * (high - low + 1));
+            if (Number.isNaN(result)) {
+                throw new Error("NanError");
+            }
+            return result;
         };
 
         /**
@@ -178,7 +182,11 @@ class MathUtility {
             throw new Error("DivByZeroError");
         }
         if (MathUtility._isNumber(a) && MathUtility._isNumber(b)) {
-            return Number(a) % Number(b);
+            const result = Number(a) % Number(b);
+            if (Number.isNaN(result)) {
+                throw new Error("NanError");
+            }
+            return result;
         } else {
             throw new Error("NanError");
         }
@@ -227,7 +235,11 @@ class MathUtility {
             if (Number.isNaN(a) || Number.isNaN(b)) {
                 throw new Error("NanError");
             }
-            return Number(a) + Number(b);
+            const result = Number(a) + Number(b);
+            if (Number.isNaN(result)) {
+                throw new Error("NanError");
+            }
+            return result;
         }
     }
 
@@ -245,7 +257,11 @@ class MathUtility {
             throw new Error("NanError");
         }
 
-        return Number(a) - Number(b);
+        const result = Number(a) - Number(b);
+        if (Number.isNaN(result)) {
+            throw new Error("NanError");
+        }
+        return result;
     }
 
     /**
@@ -262,7 +278,11 @@ class MathUtility {
             throw new Error("NanError");
         }
 
-        return Number(a) * Number(b);
+        const result = Number(a) * Number(b);
+        if (Number.isNaN(result)) {
+            throw new Error("NanError");
+        }
+        return result;
     }
 
     /**
@@ -284,7 +304,11 @@ class MathUtility {
             throw new Error("DivByZeroError");
         }
         if (MathUtility._isNumber(a) && MathUtility._isNumber(b)) {
-            return Number(a) / Number(b);
+            const result = Number(a) / Number(b);
+            if (Number.isNaN(result)) {
+                throw new Error("NanError");
+            }
+            return result;
         } else {
             throw new Error("NanError");
         }
@@ -312,7 +336,11 @@ class MathUtility {
                 return 0;
             }
 
-            return Math.hypot(x1 - x2, y1 - y2);
+            const result = Math.hypot(x1 - x2, y1 - y2);
+            if (Number.isNaN(result)) {
+                throw new Error("NanError");
+            }
+            return result;
         } else {
             throw new Error("NanError");
         }
@@ -439,7 +467,11 @@ class MathUtility {
             MathUtility._isNumber(stop) &&
             MathUtility._isNumber(amt)
         ) {
-            return start + (stop - start) * amt;
+            const result = start + (stop - start) * amt;
+            if (Number.isNaN(result)) {
+                throw new Error("NanError");
+            }
+            return result;
         } else {
             throw new Error("NanError");
         }
@@ -468,7 +500,11 @@ class MathUtility {
             if (inMin === inMax) {
                 throw new Error("DivByZeroError");
             }
-            return outMin + ((val - inMin) / (inMax - inMin)) * (outMax - outMin);
+            const result = outMin + ((val - inMin) / (inMax - inMin)) * (outMax - outMin);
+            if (Number.isNaN(result)) {
+                throw new Error("NanError");
+            }
+            return result;
         } else {
             throw new Error("NanError");
         }
