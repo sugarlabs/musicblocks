@@ -1262,8 +1262,8 @@ describe("ModeWidget", () => {
     });
 
     describe("the 0.5-cent EDO tolerance on .scl import", () => {
-        // A major scale with its third moved off 400 cents. 400 is a step of 12, 24, 36 and
-        // 48 EDO and of no other division up to 55, so 48 EDO (25-cent steps) is the only fit.
+        // A major scale with its third moved off 400 cents. Every other pitch is a whole
+        // semitone, so within the tolerance the coarsest fit is 12 EDO (#9615).
         const importMajorWithThird = third => {
             const saveSpy = jest.spyOn(modeWidget, "_saveCustomMode").mockReturnValue(true);
             jest.spyOn(modeWidget, "_temperamentKeyForEDO").mockReturnValue("equal");
@@ -1297,8 +1297,8 @@ describe("ModeWidget", () => {
             const calls = importMajorWithThird("400.5");
 
             expect(calls.length).toBe(1);
-            expect(calls[0][2]).toBe(48);
-            expect(calls[0][1]).toEqual([8, 8, 4, 8, 8, 8, 4]);
+            expect(calls[0][2]).toBe(12);
+            expect(calls[0][1]).toEqual([2, 2, 1, 2, 2, 2, 1]);
             expect(mockActivity.errorMsg).not.toHaveBeenCalled();
         });
 
