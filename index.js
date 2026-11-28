@@ -50,6 +50,7 @@ app.use(
 const SENSITIVE_PATTERNS = [
     /^\/package\.json$/i,
     /^\/package-lock\.json$/i,
+    /^\/nodemon\.json$/i,
     /^\/index\.js$/i,
     /^\/dockerfile$/i,
     /^\/jest\.config\.js$/i,
