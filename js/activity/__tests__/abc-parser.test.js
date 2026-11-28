@@ -1544,6 +1544,52 @@ describe("Chords", () => {
     });
 });
 
+describe("Grace notes", () => {
+    const parse = abc => parseAndCapture(ABCJS.parseOnly(`X:1\nL:1/8\nM:4/4\nK:C\n${abc}|]\n`)[0]);
+
+    // Each newnote as its pitches and its note value, in order.
+    const notes = blocks => {
+        const byId = new Map(blocks.map(b => [b[0], b]));
+        const value = id => byId.get(id)[1][1].value;
+        return blocksOfType(blocks, "newnote").map(newnote => {
+            const divide = byId.get(newnote[4][1]);
+            const pitches = [];
+            for (let p = byId.get(byId.get(newnote[4][2])[4][1]); p?.[1] === "pitch";) {
+                pitches.push(`${value(p[4][1])}${value(p[4][2])}`);
+                p = byId.get(p[4][3]);
+            }
+            return [pitches.join("+") || "rest", `${value(divide[4][1])}/${value(divide[4][2])}`];
+        });
+    };
+
+    test("plays grace notes in half the note they lead into, as abcjs does", async () => {
+        const blocks = await parse("{ga}c2 d");
+
+        expect(notes(blocks)).toEqual([
+            ["G5", "1/16"],
+            ["A5", "1/16"],
+            ["C5", "1/8"],
+            ["D5", "1/8"]
+        ]);
+    });
+
+    test("an accidental on a grace note carries to the end of the bar", async () => {
+        const blocks = await parse("{^f}c2 f2 | f2");
+
+        expect(notes(blocks).map(([pitches]) => pitches)).toEqual(["F♯5", "C5", "F♯5", "F5"]);
+    });
+
+    test("leads into a chord, and is not played before a rest", async () => {
+        const blocks = await parse("{g}[CE]2 {g}z2");
+
+        expect(notes(blocks)).toEqual([
+            ["G5", "1/8"],
+            ["C4+E4", "1/8"],
+            ["rest", "1/4"]
+        ]);
+    });
+});
+
 describe("Key and meter changes inside a tune", () => {
     const parse = abc => parseAndCapture(ABCJS.parseOnly(abc)[0]);
 
