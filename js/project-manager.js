@@ -1527,7 +1527,7 @@ class ProjectManager {
                             try {
                                 obj = parseProjectFileData(cleanData);
                                 if (obj === null) {
-                                    that.errorMsg(_("Cannot find project data in this HTML file."));
+                                    that.errorMsg(_("Cannot find project data in this file."));
                                     finishLoading();
                                     return;
                                 }
@@ -1727,7 +1727,7 @@ class ProjectManager {
                         try {
                             obj = parseProjectFileData(cleanData);
                             if (obj === null) {
-                                that.errorMsg(_("Cannot find project data in this HTML file."));
+                                that.errorMsg(_("Cannot find project data in this file."));
                                 finishLoading();
                                 return;
                             }

@@ -2603,7 +2603,8 @@ describe("_setupFileHandlers inner callbacks", () => {
         ["an object", '{"name":"equal","pitchNumber":12}'],
         ["a list of numbers", "[1,2,3]"],
         ["a list with one empty list", "[[]]"],
-        ["a list of lists that are not blocks", '[["name","age"],["a",1]]']
+        ["a list of lists that are not blocks", '[["name","age"],["a",1]]'],
+        ["a JSON string containing html", '"html"']
     ])("change handler rejects %s and leaves the project alone", async (_label, rawData) => {
         origFileReader = global.FileReader;
         class MockFR {
@@ -2669,9 +2670,7 @@ describe("_setupFileHandlers inner callbacks", () => {
         jest.advanceTimersByTime(200);
 
         expect(activity.errorMsg).toHaveBeenCalledTimes(1);
-        expect(activity.errorMsg).toHaveBeenCalledWith(
-            "Cannot find project data in this HTML file."
-        );
+        expect(activity.errorMsg).toHaveBeenCalledWith("Cannot find project data in this file.");
         expect(global.ErrorHandler.capture).not.toHaveBeenCalled();
         expect(activity.sendAllToTrash).not.toHaveBeenCalled();
         expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
@@ -3556,9 +3555,7 @@ describe("_setupFileHandlers inner callbacks", () => {
         jest.advanceTimersByTime(200);
 
         expect(activity.errorMsg).toHaveBeenCalledTimes(1);
-        expect(activity.errorMsg).toHaveBeenCalledWith(
-            "Cannot find project data in this HTML file."
-        );
+        expect(activity.errorMsg).toHaveBeenCalledWith("Cannot find project data in this file.");
         expect(global.ErrorHandler.capture).not.toHaveBeenCalled();
         expect(activity.sendAllToTrash).not.toHaveBeenCalled();
         expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
@@ -3695,7 +3692,8 @@ describe("_setupFileHandlers inner callbacks", () => {
         ["an object", '{"name":"equal","pitchNumber":12}'],
         ["a list of numbers", "[1,2,3]"],
         ["a list with one empty list", "[[]]"],
-        ["a list of lists that are not blocks", '[["name","age"],["a",1]]']
+        ["a list of lists that are not blocks", '[["name","age"],["a",1]]'],
+        ["a JSON string containing html", '"html"']
     ])("drop handler rejects %s and leaves the project alone", async (_label, rawData) => {
         origFileReader = global.FileReader;
         class MockFR {
