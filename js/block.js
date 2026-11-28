@@ -2503,7 +2503,14 @@ class Block {
      * @param {string|null} oldText - Displayed text before the edit.
      * @param {string|null} newText - Displayed text after the edit.
      */
-    _recordValueChange(oldValue, newValue, oldText = null, newText = null) {
+    _recordValueChange(
+        oldValue,
+        newValue,
+        oldText = null,
+        newText = null,
+        oldCustomID = undefined,
+        newCustomID = undefined
+    ) {
         const valuesMatch =
             oldValue === newValue ||
             (Array.isArray(oldValue) &&
@@ -2511,8 +2518,11 @@ class Block {
                 oldValue.length === newValue.length &&
                 oldValue.every((value, index) => value === newValue[index]));
 
+        const customIDChanged =
+            oldCustomID !== undefined && newCustomID !== undefined && oldCustomID !== newCustomID;
+
         if (
-            valuesMatch ||
+            (valuesMatch && !customIDChanged) ||
             !this.blocks.actionHistory ||
             this.blocks.isUndoingOrRedoing ||
             this.blockIndex < 0
@@ -2520,14 +2530,22 @@ class Block {
             return;
         }
 
-        this.blocks.actionHistory.push({
+        const action = {
             type: "value_change",
             blockId: this.blockIndex,
             oldValue,
             newValue,
             oldText,
             newText
-        });
+        };
+        if (
+            this.name === "customNote" &&
+            (oldCustomID !== undefined || newCustomID !== undefined)
+        ) {
+            action.oldCustomID = oldCustomID;
+            action.newCustomID = newCustomID;
+        }
+        this.blocks.actionHistory.push(action);
         this.blocks.redoActionHistory = [];
     }
 
@@ -3424,6 +3442,7 @@ class Block {
 
         let haveClick = false;
         let moved = false;
+        let suppressClickAfterDrag = false;
         let locked = false;
         let getInput = window.hasMouse;
 
@@ -3455,6 +3474,10 @@ class Block {
                 }
             };
             // We might be able to check which button was clicked.
+            if (suppressClickAfterDrag) {
+                suppressClickAfterDrag = false;
+                return;
+            }
             if (that._triggerLongPress) {
                 that._triggerLongPress = false;
                 if (
@@ -3643,6 +3666,10 @@ class Block {
             }
 
             moved = false;
+            suppressClickAfterDrag = false;
+            getInput =
+                window.hasMouse ||
+                (typeof that.hasValueDrivenLabel === "function" && that.hasValueDrivenLabel());
             that.original = {
                 x: event.stageX / that.activity.getStageScale(),
                 y: event.stageY / that.activity.getStageScale()
@@ -3718,14 +3745,23 @@ class Block {
                 return;
             }
 
+            // Do not move blocks while a pie menu is visible.
+            const wheelDiv = typeof docById === "function" ? docById("wheelDiv") : null;
+            if (wheelDiv && wheelDiv.style && wheelDiv.style.display !== "none") {
+                return;
+            }
+
+            const stageScale = that.activity.getStageScale();
+            const movedDx = Math.abs(event.stageX / stageScale - that.original.x);
+            const movedDy = Math.abs(event.stageY / stageScale - that.original.y);
+            const dragThreshold =
+                typeof that.hasValueDrivenLabel === "function" && that.hasValueDrivenLabel()
+                    ? 8
+                    : 5;
+            const dragDistance = Math.hypot(movedDx, movedDy);
+
             if (window.hasMouse) {
-                const movedDx = Math.abs(
-                    event.stageX / that.activity.getStageScale() - that.original.x
-                );
-                const movedDy = Math.abs(
-                    event.stageY / that.activity.getStageScale() - that.original.y
-                );
-                if (movedDx + movedDy > 5) {
+                if (dragDistance > dragThreshold) {
                     moved = true;
                     // Announce block drag to screen readers (screen reader only, no visual message)
                     if (!that._announced) {
@@ -3735,8 +3771,19 @@ class Block {
                             that.name;
                         announceToScreenReader(_("picked up") + " " + blockLabel);
                     }
+                } else if (!moved) {
+                    return;
                 }
             } else {
+                // Keep small click jitter on value-driven pie-menu blocks from moving the block.
+                if (
+                    typeof that.hasValueDrivenLabel === "function" &&
+                    that.hasValueDrivenLabel() &&
+                    dragDistance <= dragThreshold &&
+                    !moved
+                ) {
+                    return;
+                }
                 // Make it easier to select text on mobile.
                 const checkMoved = () => {
                     moved =
@@ -3961,6 +4008,9 @@ class Block {
             that.blocks.invalidateTopBlockCache();
 
             // Clear cached drag state.
+            if (moved) {
+                suppressClickAfterDrag = true;
+            }
             _dragHasRest2 = false;
             _dragSpatialGridDirty = false;
             moved = false;
@@ -4054,7 +4104,7 @@ class Block {
                 }
             }
         } else if (this.hasValueDrivenLabel() || ["media", "loadFile"].includes(this.name)) {
-            if (!haveClick) {
+            if (!haveClick && !window.hasMouse) {
                 // Simulate click on Android.
                 if (new Date().getTime() - this.blocks.mouseDownTime < 500) {
                     if (!this.trash) {
@@ -4264,6 +4314,7 @@ class Block {
         const that = this;
         this._capturedInitialValue = this.value;
         this._capturedInitialText = this.text ? this.text.text : null;
+        this._capturedInitialCustomID = this.customID;
         const x = this.container.x;
         const y = this.container.y;
 
@@ -4396,8 +4447,15 @@ class Block {
                 }
             }
             let selectedCustom;
+            const activeTemperament =
+                this.activity &&
+                this.activity.logo &&
+                this.activity.logo.synth &&
+                this.activity.logo.synth.inTemperament;
             if (this.customID !== null && customLabels.includes(this.customID)) {
                 selectedCustom = this.customID;
+            } else if (activeTemperament && customLabels.includes(activeTemperament)) {
+                selectedCustom = activeTemperament;
             } else {
                 selectedCustom = customLabels[0];
             }
@@ -5139,6 +5197,13 @@ class Block {
             : this.text
               ? this.text.text
               : null;
+        if (this._capturedInitialCustomID === undefined && this.customID !== undefined) {
+            this._capturedInitialCustomID = this.customID;
+        }
+        const oldCustomID =
+            this._capturedInitialCustomID !== undefined
+                ? this._capturedInitialCustomID
+                : this.customID;
         const commitLabelEdit = closeInput || notPieMenu === false;
 
         if (closeInput) {
@@ -5148,6 +5213,7 @@ class Block {
             }
             docById("wheelDiv").style.display = "none";
             delete this._capturedInitialValue;
+            delete this._capturedInitialCustomID;
         }
 
         // The pie menu may be visible too, so hide it.
@@ -5186,6 +5252,7 @@ class Block {
                 if (commitLabelEdit) {
                     delete this._capturedInitialValue;
                     delete this._capturedInitialText;
+                    delete this._capturedInitialCustomID;
                 }
                 return;
             }
@@ -5482,10 +5549,13 @@ class Block {
                 oldValue,
                 this.value,
                 oldText,
-                this.text ? this.text.text : null
+                this.text ? this.text.text : null,
+                oldCustomID,
+                this.customID
             );
             delete this._capturedInitialValue;
             delete this._capturedInitialText;
+            delete this._capturedInitialCustomID;
         }
         this._updateAccessibleElement();
     }

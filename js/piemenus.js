@@ -1529,102 +1529,90 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
         ) - 200;
     positionWheelDiv(block, 400, desiredLeft, desiredTop);
 
+    const reportPreviewError = msg => {
+        if (that.activity && typeof that.activity.errorMsg === "function") {
+            that.activity.errorMsg(msg, that);
+        } else if (
+            that.activity &&
+            that.activity.logo &&
+            typeof that.activity.logo.errorMsg === "function"
+        ) {
+            that.activity.logo.errorMsg(msg, that);
+        }
+    };
+
+    const clampOctaveWithWarning = rawOctave => {
+        const numericOctave = Number(rawOctave);
+        if (!Number.isFinite(numericOctave)) {
+            reportPreviewError(_("Octave must be between 1 and 8."));
+            return 4;
+        }
+        const rounded = Math.round(numericOctave);
+        if (numericOctave < 1 || numericOctave > 8 || rounded !== numericOctave) {
+            reportPreviewError(_("Octave must be between 1 and 8."));
+            return Math.min(8, Math.max(1, rounded));
+        }
+        return rounded;
+    };
+
     if (hasOctaveWheel) {
         // Use the octave associated with the block, if available.
-        const pitchOctave = block.blocks.findPitchOctave(block.connections[0]);
+        const rawPitchOctave =
+            typeof block.blocks.findPitchOctave === "function"
+                ? block.blocks.findPitchOctave(block.connections[0])
+                : 4;
+        const pitchOctave = clampOctaveWithWarning(rawPitchOctave);
+        if (pitchOctave !== rawPitchOctave && typeof block.blocks.setPitchOctave === "function") {
+            block.blocks.setPitchOctave(block.connections[0], pitchOctave);
+        }
 
         // Navigate to current octave
         block._octavesWheel.navigateWheel(8 - pitchOctave);
     }
 
+    const initialValue = block.value;
+    const initialText = block.text ? block.text.text : null;
+    const initialCustomID = block.customID;
+    let activeCustomID = selectedCustom;
     let prevPitch = 0;
+    let isInitialized = false;
+    let menuClosed = false;
+    let previewRequestId = 0;
+    let triggerUnlockTimer = null;
 
-    // Add function to each main menu for show/hide sub menus
-    const __setupAction = i => {
-        that._customWheel.navItems[i].navigateFunction = () => {
-            that.customID =
-                that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
-            labels = [];
-            for (let ii = 0; ii < max; ii++) {
-                if (ii < labelsDict[that.customID].length) {
-                    labels.push(labelsDict[that.customID][ii]);
-                } else {
-                    labels.push("");
-                }
-            }
-            // Update the navItems
-            for (let ii = 0; ii < labels.length; ii++) {
-                if (labels[ii].length === 0) {
-                    that._cusNoteWheel.navItems[ii].navItem.hide();
-                } else {
-                    that._cusNoteWheel.navItems[ii].title = labels[ii];
-                    that._cusNoteWheel.navItems[ii].navItem.title = labels[ii];
-                    that._cusNoteWheel.navItems[ii].basicNavTitleMax.title = labels[ii];
-                    that._cusNoteWheel.navItems[ii].basicNavTitleMin.title = labels[ii];
-                    that._cusNoteWheel.navItems[ii].hoverNavTitleMax.title = labels[ii];
-                    that._cusNoteWheel.navItems[ii].hoverNavTitleMin.title = labels[ii];
-                    that._cusNoteWheel.navItems[ii].selectedNavTitleMax.title = labels[ii];
-                    that._cusNoteWheel.navItems[ii].selectedNavTitleMin.title = labels[ii];
-                    that._cusNoteWheel.navItems[ii].initNavTitle.title = labels[ii];
-                    that._cusNoteWheel.navItems[ii].navItem.show();
-                }
-            }
-            that._customWheel.refreshWheel();
-            that._cusNoteWheel.navigateWheel(0);
-            prevPitch = 0;
-        };
-    };
+    const centsRegex = /\(([+-]?\d+(?:\.\d+)?)\s*(?:[¢c])?\)/;
+    const stripNoteCents = value => (value || "").replace(/\([+-]?\d+(?:\.\d+)?\s*[¢c]?\)/g, "");
+    const normalizeNoteCents = value =>
+        (value || "").replace(/\(([+-]?\d+(?:\.\d+)?)\s*[¢c]?\)/g, "($1¢)");
 
-    // Set up action for interval name so number tabs will
-    // initialize on load.
-    for (let ii = 0; ii < customLabels.length; ii++) {
-        __setupAction(ii);
-    }
-
-    // navigate to a specific starting point
-
-    let ii;
-    for (ii = 0; ii < customLabels.length; ii++) {
-        if (selectedCustom === customLabels[ii]) {
-            break;
+    const __selectionChanged = async (fromOctaveWheel = false) => {
+        if (menuClosed) {
+            return;
         }
-    }
-
-    if (ii === customLabels.length) {
-        ii = 0;
-    }
-
-    block._customWheel.navigateWheel(ii);
-    that.customID = selectedCustom;
-
-    const cleanSelectedNote = (selectedNote || "").replace(/\([+-]?\d+¢\)/g, "");
-    let initialIndex = labels.findIndex(
-        l => l && l.replace(/\([+-]?\d+¢\)/g, "") === cleanSelectedNote
-    );
-    if (initialIndex === -1) {
-        initialIndex = 0;
-    }
-
-    block._cusNoteWheel.navigateWheel(initialIndex);
-    prevPitch = initialIndex;
-
-    const __exitMenu = () => {
-        that._piemenuExitTime = new Date().getTime();
-        hideWheelDiv();
-    };
-
-    const __selectionChanged = async () => {
+        const currentRequestId = ++previewRequestId;
         const label = that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
         that.customID = label;
+        activeCustomID = label;
         const rawNote = that._cusNoteWheel.navItems[that._cusNoteWheel.selectedNavItemIndex].title;
-        const centsMatch = (that.value || "").match(/\([+-]?\d+¢\)/);
-        const note = (rawNote || "").replace(/\([+-]?\d+¢\)/g, "");
-        that.value = centsMatch ? note + centsMatch[0] : note;
-        that.text.text = centsMatch ? note + centsMatch[0] : note;
+        const rawCentsMatch = (rawNote || "").match(centsRegex);
+        const existingCentsMatch = (that.value || "").match(centsRegex);
+        const activeCentsMatch = fromOctaveWheel
+            ? existingCentsMatch || rawCentsMatch
+            : rawCentsMatch;
+        const note = stripNoteCents(rawNote);
+        const updatedValue = activeCentsMatch ? note + activeCentsMatch[0] : note;
+        const cents = activeCentsMatch ? parseFloat(activeCentsMatch[1]) : 0;
+        that.value = updatedValue;
+        that.text.text = updatedValue;
 
         let octave = 4;
-        if (hasOctaveWheel) {
-            octave = Number(
+        if (
+            hasOctaveWheel &&
+            that._octavesWheel &&
+            that._octavesWheel.selectedNavItemIndex !== undefined &&
+            that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex]
+        ) {
+            octave = clampOctaveWithWarning(
                 that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
             );
         }
@@ -1660,71 +1648,336 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
             octave = 8;
         }
 
-        if (hasOctaveWheel && deltaOctave !== 0) {
-            that._octavesWheel.navigateWheel(8 - octave);
-            that.blocks.setPitchOctave(that.connections[0], octave);
+        if (hasOctaveWheel) {
+            if (deltaOctave !== 0) {
+                that._octavesWheel.navigateWheel(8 - octave);
+                that.blocks.setPitchOctave(that.connections[0], octave);
+            }
+        } else if (that.connections[0] !== null) {
+            const rawPitchOctave =
+                typeof that.blocks.findPitchOctave === "function"
+                    ? that.blocks.findPitchOctave(that.connections[0])
+                    : 4;
+            octave = clampOctaveWithWarning(rawPitchOctave);
+        }
+        if (typeof octave !== "number" || isNaN(octave)) {
+            octave = 4;
         }
 
-        // Make sure text is on top.
+        // Make sure text is on top and update accessible label immediately.
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
-
-        try {
-            await Tone.start();
-        } catch (e) {
-            console.debug("Tone.start() skipped or failed", e);
+        if (typeof that._updateAccessibleElement === "function") {
+            that._updateAccessibleElement();
         }
 
+        if (typeof Tone !== "undefined" && Tone.start) {
+            try {
+                await Tone.start();
+            } catch (e) {
+                console.debug("Tone.start() skipped or failed", e);
+            }
+            if (menuClosed || currentRequestId !== previewRequestId) {
+                return;
+            }
+        }
+
+        const customID = label;
+
+        // Create and load synth if needed
         if (!instruments[0] || !instruments[0][DEFAULTVOICE]) {
             try {
                 that.activity.logo.synth.createDefaultSynth(0);
                 await that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
             } catch (e) {
-                console.debug(e);
+                console.warn("Failed to load synth for preview:", e);
+                return;
+            }
+            if (menuClosed || currentRequestId !== previewRequestId) {
+                return;
             }
         }
 
+        // Wait for sample buffer to finish decoding so first preview is audible right away
+        const activeInstrument = instruments[0]?.[DEFAULTVOICE];
+        if (
+            activeInstrument &&
+            typeof activeInstrument.loaded === "boolean" &&
+            !activeInstrument.loaded
+        ) {
+            try {
+                if (
+                    typeof Tone !== "undefined" &&
+                    Tone.ToneAudioBuffer &&
+                    typeof Tone.ToneAudioBuffer.loaded === "function"
+                ) {
+                    await Tone.ToneAudioBuffer.loaded();
+                }
+            } catch (e) {
+                console.debug("Error waiting for buffer load:", e);
+            }
+            if (menuClosed || currentRequestId !== previewRequestId) {
+                return;
+            }
+        }
+
+        // Ensure synth is properly initialized
         if (!that.activity.logo.synth.tone) {
             that.activity.logo.synth.newTone();
         }
 
+        // Set volume
         try {
             that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
             that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
         } catch (e) {
-            console.debug(e);
+            console.warn("Failed to set preview volume:", e);
+            return;
         }
 
-        if (!that._triggerLock) {
-            that._triggerLock = true;
-            try {
-                const customID = that.customID || label || selectedCustom;
-                const no = that.activity.logo.synth.getCustomFrequency([note + octave], customID);
-                await that.activity.logo.synth.trigger(
-                    0,
-                    no !== undefined && no !== "undefined" ? no : [note + octave],
-                    1 / 8,
-                    DEFAULTVOICE,
-                    null,
-                    null,
-                    false
-                );
-                announceToScreenReader(_("played") + " " + note + octave);
-            } catch (e) {
-                console.error("Synth trigger error:", e);
+        if (triggerUnlockTimer !== null) {
+            clearTimeout(triggerUnlockTimer);
+            triggerUnlockTimer = null;
+        }
+        that._triggerLock = true;
+        try {
+            if (typeof that.activity.logo.synth.stopSound === "function") {
+                try {
+                    that.activity.logo.synth.stopSound(0, DEFAULTVOICE);
+                } catch (e) {
+                    console.debug("Failed to stop previous preview sound:", e);
+                }
             }
-            setTimeout(() => {
+            // Format custom note with octave for frequency calculation
+            const noteWithOctave = note + octave;
+            const freqs = that.activity.logo.synth.getCustomFrequency([noteWithOctave], customID);
+            const freq = Array.isArray(freqs) ? freqs[0] : freqs;
+
+            if (Number.isFinite(freq) && freq > 0) {
+                const detuneRatio = cents !== 0 ? Math.pow(2, cents / 1200) : 1;
+                const triggerFreqs =
+                    detuneRatio === 1
+                        ? freqs
+                        : Array.isArray(freqs)
+                          ? freqs.map(f => f * detuneRatio)
+                          : freqs * detuneRatio;
+                if (menuClosed || currentRequestId !== previewRequestId) {
+                    return;
+                }
+                if (typeof that.activity.logo.synth.trigger === "function") {
+                    try {
+                        await that.activity.logo.synth.trigger(
+                            0,
+                            triggerFreqs,
+                            1 / 8,
+                            DEFAULTVOICE,
+                            null,
+                            null,
+                            false
+                        );
+                    } catch (e) {
+                        console.error("Synth trigger error:", e);
+                    }
+                }
+                if (menuClosed || currentRequestId !== previewRequestId) {
+                    if (menuClosed && typeof that.activity.logo.synth.stopSound === "function") {
+                        try {
+                            that.activity.logo.synth.stopSound(0, DEFAULTVOICE);
+                        } catch (e) {
+                            console.debug("Failed to stop closed preview sound:", e);
+                        }
+                    }
+                    return;
+                }
+                if (typeof announceToScreenReader === "function") {
+                    announceToScreenReader(_("played") + " " + updatedValue + octave);
+                }
+            } else {
+                reportPreviewError(_("Cannot preview invalid pitch or octave."));
+            }
+        } catch (err) {
+            console.error("Error during custom note preview:", err);
+        } finally {
+            if (menuClosed) {
+                triggerUnlockTimer = null;
                 that._triggerLock = false;
-            }, 125);
+            } else {
+                triggerUnlockTimer = setTimeout(() => {
+                    triggerUnlockTimer = null;
+                    that._triggerLock = false;
+                }, 125); // 1/8 second in milliseconds
+            }
+        }
+    };
+
+    // Add function to each main menu for show/hide sub menus
+    const __setupAction = i => {
+        that._customWheel.navItems[i].navigateFunction = () => {
+            const newCustomID =
+                that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
+            const temperamentChanged = newCustomID !== activeCustomID;
+            activeCustomID = newCustomID;
+            that.customID = newCustomID;
+            const nextLabels = labelsDict[that.customID] || [];
+            labels = [];
+            for (let ii = 0; ii < max; ii++) {
+                if (ii < nextLabels.length) {
+                    labels.push(nextLabels[ii]);
+                } else {
+                    labels.push("");
+                }
+            }
+            // Update the navItems
+            for (let ii = 0; ii < labels.length; ii++) {
+                const navItem = that._cusNoteWheel.navItems[ii];
+                if (labels[ii].length === 0) {
+                    navItem.title = "";
+                    if (navItem.navItem) {
+                        navItem.navItem.title = "";
+                        navItem.navItem.hide();
+                    }
+                    navItem.enabled = false;
+                } else {
+                    navItem.title = labels[ii];
+                    if (navItem.navItem) {
+                        navItem.navItem.title = labels[ii];
+                        navItem.navItem.show();
+                    }
+                    if (navItem.basicNavTitleMax) navItem.basicNavTitleMax.title = labels[ii];
+                    if (navItem.basicNavTitleMin) navItem.basicNavTitleMin.title = labels[ii];
+                    if (navItem.hoverNavTitleMax) navItem.hoverNavTitleMax.title = labels[ii];
+                    if (navItem.hoverNavTitleMin) navItem.hoverNavTitleMin.title = labels[ii];
+                    if (navItem.selectedNavTitleMax) {
+                        navItem.selectedNavTitleMax.title = labels[ii];
+                    }
+                    if (navItem.selectedNavTitleMin) {
+                        navItem.selectedNavTitleMin.title = labels[ii];
+                    }
+                    if (navItem.initNavTitle) navItem.initNavTitle.title = labels[ii];
+                    navItem.enabled = true;
+                }
+            }
+            that._customWheel.refreshWheel();
+            if (typeof that._cusNoteWheel.refreshWheel === "function") {
+                that._cusNoteWheel.refreshWheel();
+            }
+            that._cusNoteWheel.navigateWheel(0);
+            prevPitch = 0;
+            if (isInitialized && temperamentChanged) {
+                void __selectionChanged(false);
+            }
+        };
+    };
+
+    // Set up action for interval name so number tabs will
+    // initialize on load.
+    for (let ii = 0; ii < customLabels.length; ii++) {
+        __setupAction(ii);
+    }
+
+    // navigate to a specific starting point
+
+    let ii;
+    for (ii = 0; ii < customLabels.length; ii++) {
+        if (selectedCustom === customLabels[ii]) {
+            break;
+        }
+    }
+
+    if (ii === customLabels.length) {
+        ii = 0;
+    }
+
+    block._customWheel.navigateWheel(ii);
+    that.customID = selectedCustom;
+    activeCustomID = selectedCustom;
+
+    const cleanSelectedNote = stripNoteCents(selectedNote);
+    const normalizedSelectedNote = normalizeNoteCents(selectedNote);
+    let initialIndex = labels.findIndex(
+        l => l && (l === selectedNote || normalizeNoteCents(l) === normalizedSelectedNote)
+    );
+    if (initialIndex === -1) {
+        initialIndex = labels.findIndex(l => l && stripNoteCents(l) === cleanSelectedNote);
+    }
+    if (initialIndex === -1) {
+        initialIndex = 0;
+    }
+
+    block._cusNoteWheel.navigateWheel(initialIndex);
+    prevPitch = initialIndex;
+
+    const __exitMenu = () => {
+        if (menuClosed) {
+            return;
+        }
+        menuClosed = true;
+        ++previewRequestId;
+        if (triggerUnlockTimer !== null) {
+            clearTimeout(triggerUnlockTimer);
+            triggerUnlockTimer = null;
+        }
+        that._triggerLock = false;
+        if (
+            that.activity &&
+            that.activity.logo &&
+            that.activity.logo.synth &&
+            typeof that.activity.logo.synth.stopSound === "function"
+        ) {
+            try {
+                that.activity.logo.synth.stopSound(0, DEFAULTVOICE);
+            } catch (e) {
+                console.debug("Failed to stop preview sound on close:", e);
+            }
+        }
+        if (typeof that._recordValueChange === "function") {
+            that._recordValueChange(
+                initialValue,
+                that.value,
+                initialText,
+                that.text ? that.text.text : null,
+                initialCustomID,
+                that.customID
+            );
+        }
+        delete that._capturedInitialValue;
+        delete that._capturedInitialText;
+        delete that._capturedInitialCustomID;
+        if (typeof that._updateAccessibleElement === "function") {
+            that._updateAccessibleElement();
+        }
+        that._piemenuExitTime = new Date().getTime();
+        hideWheelDiv();
+        if (that._customWheel && typeof that._customWheel.removeWheel === "function") {
+            that._customWheel.removeWheel();
+        }
+        if (that._cusNoteWheel && typeof that._cusNoteWheel.removeWheel === "function") {
+            that._cusNoteWheel.removeWheel();
+        }
+        if (that._exitWheel && typeof that._exitWheel.removeWheel === "function") {
+            that._exitWheel.removeWheel();
+        }
+        if (
+            hasOctaveWheel &&
+            that._octavesWheel &&
+            typeof that._octavesWheel.removeWheel === "function"
+        ) {
+            that._octavesWheel.removeWheel();
+        }
+        if (that.blocks) {
+            that.blocks.activeBlock = null;
         }
     };
 
     const __selectionChangedOctave = () => {
-        const octave = Number(
-            that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
-        );
+        const rawOctave =
+            that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title;
+        const octave = clampOctaveWithWarning(rawOctave);
+        if (octave !== Number(rawOctave)) {
+            that._octavesWheel.navigateWheel(8 - octave);
+        }
         that.blocks.setPitchOctave(that.connections[0], octave);
-        __selectionChanged();
+        return __selectionChanged(true);
     };
 
     if (hasOctaveWheel) {
@@ -1735,10 +1988,11 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
 
     // Set up handlers for preview.
     for (let i = 0; i < labels.length; i++) {
-        block._cusNoteWheel.navItems[i].navigateFunction = __selectionChanged;
+        block._cusNoteWheel.navItems[i].navigateFunction = () => __selectionChanged(false);
     }
 
     block._exitWheel.navItems[0].navigateFunction = __exitMenu;
+    isInitialized = true;
 };
 
 /**

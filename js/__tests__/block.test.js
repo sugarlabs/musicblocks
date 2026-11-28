@@ -2488,6 +2488,142 @@ describe("Block Foundation", () => {
 
             expect(block.blocks.moveBlockRelativeBatched).not.toHaveBeenCalled();
         });
+
+        it("opens customNote pie menu on small drag jitter without moving block", () => {
+            const origHasMouse = window.hasMouse;
+            window.hasMouse = true;
+            try {
+                const { block, handlers } = makeClickBlock(false);
+                block.name = "customNote";
+                block.hasValueDrivenLabel = jest.fn().mockReturnValue(true);
+                block._changeLabel = jest.fn();
+                block.blocks.moveBlockRelativeBatched = jest.fn();
+                block.blocks.blockMoved = jest.fn();
+                block.blocks.adjustDocks = jest.fn();
+                block.blocks.cacheDragGroup = jest.fn();
+                block.blocks.clearCachedDragGroup = jest.fn();
+                block.blocks.invalidateTopBlockCache = jest.fn();
+                block.blocks.raiseStackToTop = jest.fn();
+                block.blocks.unhighlight = jest.fn();
+                block.blocks.clearLongPress = jest.fn();
+                block.blocks.syncDragGroupSpatialGrid = jest.fn();
+                block.blocks._updateViewportCulling = jest.fn();
+                block.activity.getStageScale = jest.fn().mockReturnValue(1);
+                block.activity.blocksContainer = { y: 0 };
+                block.activity.scrollBlockContainer = false;
+                block.activity.refreshCanvas = jest.fn();
+                block.activity.trashcan = { show: jest.fn(), hide: jest.fn() };
+                block._setDragGroupTrashHoverScale = jest.fn();
+                block.isValueBlock = jest.fn().mockReturnValue(true);
+                block.isCollapsible = jest.fn().mockReturnValue(false);
+                global.docById = jest.fn().mockReturnValue({ style: { display: "none" } });
+                global.hideDOMLabel = jest.fn();
+                block._checkWidgets = jest.fn();
+
+                handlers.mousedown({ stageX: 100, stageY: 100, nativeEvent: { button: 0 } });
+                handlers.pressmove({
+                    stageX: 103,
+                    stageY: 102,
+                    nativeEvent: { preventDefault: jest.fn() }
+                });
+                handlers.pressup({ stageX: 103, stageY: 102 });
+                handlers.click({ stageX: 103, stageY: 102, nativeEvent: { button: 0 } });
+
+                expect(block.blocks.moveBlockRelativeBatched).not.toHaveBeenCalled();
+                expect(block.blocks.blockMoved).not.toHaveBeenCalled();
+                expect(block.container.x).toBe(100);
+                expect(block.container.y).toBe(100);
+                expect(block._changeLabel).toHaveBeenCalledTimes(1);
+            } finally {
+                window.hasMouse = origHasMouse;
+            }
+        });
+
+        it("still drags a customNote block cleanly when movement exceeds threshold", () => {
+            const origHasMouse = window.hasMouse;
+            const origAnnounce = global.announceToScreenReader;
+            window.hasMouse = true;
+            global.announceToScreenReader = jest.fn();
+            try {
+                const { block, handlers } = makeClickBlock(false);
+                block.name = "customNote";
+                block.hasValueDrivenLabel = jest.fn().mockReturnValue(true);
+                block._changeLabel = jest.fn();
+                block.blocks.moveBlockRelativeBatched = jest.fn();
+                block.blocks.blockMoved = jest.fn();
+                block.blocks.adjustDocks = jest.fn();
+                block.blocks.cacheDragGroup = jest.fn();
+                block.blocks._cachedDragGroup = [3];
+                block.blocks.clearCachedDragGroup = jest.fn();
+                block.blocks.invalidateTopBlockCache = jest.fn();
+                block.blocks.raiseStackToTop = jest.fn();
+                block.blocks.unhighlight = jest.fn();
+                block.blocks.clearLongPress = jest.fn();
+                block.blocks.syncDragGroupSpatialGrid = jest.fn();
+                block.blocks._updateViewportCulling = jest.fn();
+                block.blocks.scheduleCheckBounds = jest.fn();
+                block.activity.getStageScale = jest.fn().mockReturnValue(1);
+                block.activity.blocksContainer = { y: 0 };
+                block.activity.scrollBlockContainer = false;
+                block.activity.refreshCanvas = jest.fn();
+                block.activity.trashcan = {
+                    show: jest.fn(),
+                    hide: jest.fn(),
+                    overTrashcan: jest.fn().mockReturnValue(false),
+                    stopHighlightAnimation: jest.fn()
+                };
+                block._setDragGroupTrashHoverScale = jest.fn();
+                block.isValueBlock = jest.fn().mockReturnValue(false);
+                block.isCollapsible = jest.fn().mockReturnValue(false);
+                global.docById = jest.fn().mockReturnValue({ style: { display: "none" } });
+                global.hideDOMLabel = jest.fn();
+                block._checkWidgets = jest.fn();
+
+                handlers.mousedown({ stageX: 100, stageY: 100, nativeEvent: { button: 0 } });
+                handlers.pressmove({
+                    stageX: 120,
+                    stageY: 100,
+                    nativeEvent: { preventDefault: jest.fn() }
+                });
+                handlers.pressup({ stageX: 120, stageY: 100 });
+                handlers.click({ stageX: 120, stageY: 100, nativeEvent: { button: 0 } });
+
+                expect(block.blocks.moveBlockRelativeBatched).toHaveBeenCalledWith(3, 20, 0, true);
+                expect(block.blocks.blockMoved).toHaveBeenCalledWith(3);
+                expect(block._changeLabel).not.toHaveBeenCalled();
+            } finally {
+                window.hasMouse = origHasMouse;
+                global.announceToScreenReader = origAnnounce;
+            }
+        });
+
+        it("does not move block during pressmove while wheelDiv pie menu is visible", () => {
+            const origHasMouse = window.hasMouse;
+            window.hasMouse = true;
+            try {
+                const { block, handlers } = makeClickBlock(false);
+                block.blocks.moveBlockRelativeBatched = jest.fn();
+                block.blocks.cacheDragGroup = jest.fn();
+                block.blocks.invalidateTopBlockCache = jest.fn();
+                block.blocks.raiseStackToTop = jest.fn();
+                block.activity.getStageScale = jest.fn().mockReturnValue(1);
+                block.activity.trashcan = { show: jest.fn(), hide: jest.fn() };
+                global.docById = jest.fn(id => ({
+                    style: { display: id === "wheelDiv" ? "block" : "none" }
+                }));
+
+                handlers.mousedown({ stageX: 100, stageY: 100, nativeEvent: { button: 0 } });
+                handlers.pressmove({
+                    stageX: 140,
+                    stageY: 100,
+                    nativeEvent: { preventDefault: jest.fn() }
+                });
+
+                expect(block.blocks.moveBlockRelativeBatched).not.toHaveBeenCalled();
+            } finally {
+                window.hasMouse = origHasMouse;
+            }
+        });
     });
 
     describe("_checkWidgets()", () => {
@@ -2908,6 +3044,38 @@ describe("Block Foundation", () => {
             expect(args[2]).toContain("custom");
             expect(args[3]).toBe("custom");
             expect(args[4]).toBe("C(+0¢)");
+        });
+
+        it("_changeLabel customNote seeds selectedCustom from active inTemperament when customID is null", () => {
+            global.piemenuCustomNotes = jest.fn();
+            global.piemenuPitches = jest.fn();
+            block.name = "customNote";
+            block.value = "C(+0¢)";
+            block.customID = null;
+            block.activity = {
+                logo: {
+                    customTemperamentDefined: true,
+                    synth: { inTemperament: "active_custom" }
+                },
+                canvas: { offsetLeft: 0, offsetTop: 0 },
+                blocksContainer: { y: 0 }
+            };
+            block.blocks = { blockScale: 1 };
+            block.container = { x: 0, y: 0 };
+            block.piemenuOKtoLaunch = jest.fn().mockReturnValue(true);
+            block._usePiemenu = jest.fn().mockReturnValue(true);
+
+            const customDef = {
+                0: [1, "C", 4],
+                1: [1.2, "D", 4],
+                pitchNumber: 2
+            };
+            addTemperamentToDictionary("active_custom", customDef);
+
+            block._changeLabel();
+            expect(global.piemenuCustomNotes).toHaveBeenCalledTimes(1);
+            const args = global.piemenuCustomNotes.mock.calls[0];
+            expect(args[3]).toBe("active_custom");
         });
     });
 
