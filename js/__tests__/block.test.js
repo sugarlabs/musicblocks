@@ -3180,6 +3180,157 @@ describe("Block Foundation", () => {
             expect(activateSpy).toHaveBeenCalledTimes(2);
         });
 
+        it("announces a value set after the accessible element was created", () => {
+            const el = block._setupAccessibleElement();
+            expect(el.getAttribute("aria-label")).toBe("forward block");
+
+            block.value = 4;
+            // Nothing refreshed the label yet, so it is still stale.
+            expect(el.getAttribute("aria-label")).toBe("forward block");
+
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward, value: 4");
+        });
+
+        it("keeps the label current when the value changes between focuses", () => {
+            block.value = 1;
+            const el = block._setupAccessibleElement();
+            expect(el.getAttribute("aria-label")).toBe("forward, value: 1");
+
+            block.value = 9;
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward, value: 9");
+
+            block.value = null;
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward block");
+        });
+
+        it("announces falsy values that are real values, and clears an empty string", () => {
+            block.value = 5;
+            const el = block._setupAccessibleElement();
+            const refresh = value => {
+                block.value = value;
+                el.dispatchEvent(new FocusEvent("focus"));
+                return el.getAttribute("aria-label");
+            };
+
+            expect(refresh(0)).toBe("forward, value: 0");
+            expect(refresh(false)).toBe("forward, value: false");
+            expect(refresh("")).toBe("forward block");
+        });
+
+        it("describes a file block by its filename and never its data URL", () => {
+            block.value = ["song.wav", "data:audio/wav;base64,AAAA"];
+            const el = block._setupAccessibleElement();
+            expect(el.getAttribute("aria-label")).toBe("forward, value: song.wav");
+            expect(el.getAttribute("aria-label")).not.toContain("base64");
+
+            block.value = ["", "data:audio/wav;base64,AAAA"];
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward block");
+
+            block.value = "data:audio/wav;base64,AAAA";
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward block");
+
+            block.value = [];
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward block");
+        });
+
+        it("announces a sample block's pitch and octave along with its name", () => {
+            block.value = ["kick", "data:audio/wav;base64,AAAA", "do", 4];
+            const el = block._setupAccessibleElement();
+            expect(el.getAttribute("aria-label")).toBe("forward, value: kick, do, 4");
+
+            // The same sample at another octave is announced differently.
+            block.value = ["kick", "data:audio/wav;base64,AAAA", "do", 5];
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward, value: kick, do, 5");
+
+            // A sample with no name yet still announces its pitch, and never the payload.
+            block.value = ["", "", "do", 4];
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward, value: do, 4");
+        });
+
+        it("includes a sample's cent adjustment when it has one", () => {
+            block.value = ["kick", "data:audio/wav;base64,AAAA", "do", 4, 25];
+            const el = block._setupAccessibleElement();
+            expect(el.getAttribute("aria-label")).toBe("forward, value: kick, do, 4, 25");
+
+            block.value = ["kick", "data:audio/wav;base64,AAAA", "do", 4, 0];
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward, value: kick, do, 4, 0");
+        });
+
+        it("keeps the blob: URL of a recorded sample out of the label", () => {
+            const url = "blob:https://musicblocks.example/1f3c-9a";
+            block.value = [url, url, "do", 4];
+            const el = block._setupAccessibleElement();
+            expect(el.getAttribute("aria-label")).toBe("forward, value: do, 4");
+            expect(el.getAttribute("aria-label")).not.toContain("blob:");
+
+            // A real name next to a blob: URL still shows the name.
+            block.value = ["snare", url, "re", 3];
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward, value: snare, re, 3");
+
+            // Only the URL schemes are filtered, not names that merely contain the word.
+            block.value = ["blobfish", "data:audio/wav;base64,AAAA", "do", 4];
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("forward, value: blobfish, do, 4");
+        });
+
+        it.each(["loadFile", "audiofile"])(
+            "announces only the filename of a %s block, never its contents",
+            name => {
+                const fileBlock = new Block(
+                    { name, staticLabels: [name], image: "", docks: [] },
+                    testBlocks
+                );
+                fileBlock.blockIndex = 9;
+                fileBlock.container = { x: 0, y: 0, on: jest.fn(), children: [] };
+
+                // loadFile reads plain text, which no data: filter can recognise.
+                fileBlock.value = ["notes.txt", "hello world, this is the whole file"];
+                expect(fileBlock.getAccessibleLabel()).toBe(`${name}, value: notes.txt`);
+
+                const el = fileBlock._setupAccessibleElement();
+                expect(el.getAttribute("aria-label")).toBe(`${name}, value: notes.txt`);
+                expect(el.getAttribute("aria-label")).not.toContain("hello world");
+
+                fileBlock.value = ["song.wav", "data:audio/wav;base64,AAAA"];
+                el.dispatchEvent(new FocusEvent("focus"));
+                expect(el.getAttribute("aria-label")).toBe(`${name}, value: song.wav`);
+
+                // No filename yet: fall back to the plain label, whatever the contents are.
+                fileBlock.value = ["", "some text"];
+                el.dispatchEvent(new FocusEvent("focus"));
+                expect(el.getAttribute("aria-label")).toBe(`${name} block`);
+            }
+        );
+
+        it("does not announce the turtle number held by a start block", () => {
+            const startBlock = new Block(
+                { name: "start", staticLabels: ["start"], image: "start.svg", docks: [] },
+                testBlocks
+            );
+            startBlock.blockIndex = 7;
+            startBlock.container = { x: 0, y: 0, on: jest.fn(), children: [] };
+            startBlock.value = 0;
+
+            expect(startBlock.getAccessibleLabel()).toBe("start block");
+
+            const el = startBlock._setupAccessibleElement();
+            expect(el.getAttribute("aria-label")).toBe("start block");
+
+            startBlock.value = 2;
+            el.dispatchEvent(new FocusEvent("focus"));
+            expect(el.getAttribute("aria-label")).toBe("start block");
+        });
+
         it("arrow keys navigate between sibling block elements", () => {
             const block2 = new Block(
                 { name: "right", staticLabels: ["right"], image: "right.svg", docks: [] },

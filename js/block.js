@@ -5526,13 +5526,28 @@ class Block {
             (this.protoblock && this.protoblock.staticLabels && this.protoblock.staticLabels[0]) ||
             this.name ||
             "block";
-        if (
-            this.value !== null &&
-            this.value !== undefined &&
-            this.value !== "" &&
-            !(typeof this.value === "string" && this.value.startsWith("data:"))
-        ) {
-            return `${name}, value: ${this.value}`;
+        // A start block carries its turtle number, which means nothing to a listener.
+        if (this.name === "start") {
+            return `${name} block`;
+        }
+        // A file block holds [filename, contents], and the contents can be a data URL or the
+        // whole text of the file, so announce only the filename.
+        let value = this.value;
+        if (["audiofile", "loadFile"].includes(this.name) && Array.isArray(value)) {
+            value = value.slice(0, 1);
+        }
+        // Other blocks can hold a list of values, such as a sample's [name, dataURL, pitch,
+        // octave]. Announce every part except empty ones and data: or blob: URLs (a recorded
+        // sample keeps its blob: URL as both name and data).
+        const parts = (Array.isArray(value) ? value : [value]).filter(
+            part =>
+                part !== null &&
+                part !== undefined &&
+                part !== "" &&
+                !(typeof part === "string" && /^(data|blob):/.test(part))
+        );
+        if (parts.length > 0) {
+            return `${name}, value: ${parts.join(", ")}`;
         }
         return `${name} block`;
     }
@@ -5585,6 +5600,10 @@ class Block {
         }
 
         el.setAttribute("aria-label", this.getAccessibleLabel());
+
+        // The value is often set after this element is created (project load, undo,
+        // programmatic changes), so refresh the label when the block gains focus.
+        el.addEventListener("focus", () => this._updateAccessibleElement());
 
         el.addEventListener("keydown", event => {
             if (event.key === "Enter" || event.key === " " || event.key === "Spacebar") {
