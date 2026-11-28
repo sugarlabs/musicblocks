@@ -580,6 +580,29 @@ generate a binary choice, one of "this" or "that", because sometimes
 being unpredictable is nice. [RUN
 LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732113139904914&run=True)
 
+The _Clamp_ block, found on the _Numbers_ palette, restricts a number
+so that it stays within an inclusive minimum and maximum range.
+
+The _Lerp_ block, found on the _Numbers_ palette, computes linear
+interpolation between a start value and a stop value based on an amount
+factor. In musical compositions, this is especially useful for smooth
+parameter modulations such as continuous volume swells (crescendo /
+decrescendo) or smooth pitch gliding.
+
+The _GCD_ (Greatest Common Divisor) and _LCM_ (Least Common Multiple)
+blocks, found on the _Numbers_ palette, provide core integer and
+rhythmic arithmetic primitives. GCD is ideal for reducing Just
+Intonation harmonic frequency ratios (such as simplifying 300Hz:450Hz
+to a 2:3 Perfect Fifth), while LCM determines the repeating cycle
+length for polyrhythms and polymeters (such as 3 against 4 pulses
+cycling every 12 beats).
+
+The _Map_ block, found on the _Numbers_ palette, linearly re-maps a
+number from an incoming range [inMin, inMax] to a target output range
+[outMin, outMax]. It provides an intuitive tool for continuous
+sonification, such as mapping turtle coordinates to pitch frequencies
+or volume levels.
+
 ![alt tag](./show_block.svg "Show media Block")
 
 The *Show* block, found on the *Media* palette, is used to display

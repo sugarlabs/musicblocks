@@ -162,7 +162,41 @@ global.MathUtility = {
     doOneOf: (a, b) => a,
     doRandom: (a, b, octave) => a,
     doMinus: (a, b) => Number(a) - Number(b),
-    clampNumber: (a, min, max) => Math.max(min, Math.min(a, max))
+    clampNumber: (a, min, max) => Math.max(min, Math.min(a, max)),
+    doLerp: (start, stop, amt) => Number(start) + (Number(stop) - Number(start)) * Number(amt),
+    doGcd: (a, b) => {
+        let x = Math.abs(Math.trunc(a));
+        let y = Math.abs(Math.trunc(b));
+        while (y !== 0) {
+            const t = y;
+            y = x % y;
+            x = t;
+        }
+        return x;
+    },
+    doLcm: (a, b) => {
+        let x = Math.abs(Math.trunc(a));
+        let y = Math.abs(Math.trunc(b));
+        if (x === 0 || y === 0) return 0;
+        let tempX = x;
+        let tempY = y;
+        while (tempY !== 0) {
+            const t = tempY;
+            tempY = tempX % tempY;
+            tempX = t;
+        }
+        return Math.abs(Math.trunc((x / tempX) * y));
+    },
+    doMap: (val, inMin, inMax, outMin, outMax) => {
+        if (Number(inMin) === Number(inMax)) {
+            throw new Error("DivByZeroError");
+        }
+        return (
+            Number(outMin) +
+            ((Number(val) - Number(inMin)) * (Number(outMax) - Number(outMin))) /
+                (Number(inMax) - Number(inMin))
+        );
+    }
 };
 
 global.calcOctave = (currentOctave, val, lastNote, noteValue) => currentOctave + parseInt(val, 10);
@@ -297,6 +331,18 @@ describe("setupNumberBlocks", () => {
             expect(result).toEqual(50.25);
         });
 
+        it("should accept strings with leading/trailing whitespace like ' 12.5 '", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2", "c3"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return " 12.5 ";
+                if (c === "c2") return 0;
+                if (c === "c3") return 100;
+            });
+            const clampBlock = createdBlocks["clampNumber"];
+            const result = clampBlock.arg(logo, 0, 110, null);
+            expect(result).toEqual(12.5);
+        });
+
         it("should reject invalid numeric-prefix strings", () => {
             activity.blocks.blockList[110] = { connections: [null, "c1", "c2", "c3"] };
             logo.parseArg = jest.fn((l, t, c) => {
@@ -335,6 +381,517 @@ describe("setupNumberBlocks", () => {
             expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
             expect(result).toEqual(0);
             global.clampNumber = originalClampNumber;
+        });
+    });
+
+    describe("LerpBlock", () => {
+        it("should register correctly with default configuration", () => {
+            const lerpBlock = createdBlocks["lerp"];
+            expect(lerpBlock).toBeDefined();
+            expect(lerpBlock.config.name).toEqual("lerp");
+            expect(lerpBlock.config.args).toEqual(3);
+            expect(lerpBlock.config.defaults).toEqual([0, 100, 0.5]);
+        });
+
+        it("should format parameter correctly in updateParameter", () => {
+            const lerpBlock = createdBlocks["lerp"];
+            activity.blocks.blockList[110] = { value: "customString" };
+            expect(lerpBlock.updateParameter(logo, 0, 110)).toEqual("customString");
+
+            activity.blocks.blockList[111] = { value: 12.3456 };
+            expect(lerpBlock.updateParameter(logo, 0, 111)).toEqual("12.35");
+        });
+
+        it("should push to statusFields when inStatusMatrix is true", () => {
+            activity.blocks.blockList[310] = {
+                connections: [311, "c1", "c2", "c3"],
+                name: "lerp"
+            };
+            activity.blocks.blockList[311] = { name: "print" };
+            logo.inStatusMatrix = true;
+            logo.statusFields = [];
+            const lerpBlock = createdBlocks["lerp"];
+            lerpBlock.arg(logo, 0, 310, null);
+            expect(logo.statusFields).toContainEqual([310, "lerp"]);
+            logo.inStatusMatrix = false;
+        });
+
+        it("should return 0 when required connections are missing", () => {
+            activity.blocks.blockList[110] = { connections: [null, null, "c2", "c3"] };
+            const lerpBlock = createdBlocks["lerp"];
+            const result = lerpBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 110);
+            expect(result).toEqual(0);
+        });
+
+        it("should compute linear interpolation for numeric inputs", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2", "c3"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return 10;
+                if (c === "c2") return 30;
+                if (c === "c3") return 0.5;
+            });
+            const lerpBlock = createdBlocks["lerp"];
+            const result = lerpBlock.arg(logo, 0, 110, null);
+            expect(result).toEqual(20);
+        });
+
+        it("should handle string inputs without truncating fractions", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2", "c3"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return "10.5";
+                if (c === "c2") return "20.5";
+                if (c === "c3") return "0.25";
+            });
+            const lerpBlock = createdBlocks["lerp"];
+            const result = lerpBlock.arg(logo, 0, 110, null);
+            expect(result).toEqual(13);
+        });
+
+        it("should reject non-numeric strings with NANERRORMSG", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2", "c3"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return "abc";
+                if (c === "c2") return "20";
+                if (c === "c3") return "0.5";
+            });
+            const lerpBlock = createdBlocks["lerp"];
+            const result = lerpBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(logo.stopTurtle).toBe(true);
+            expect(result).toEqual(0);
+        });
+
+        it("should reject empty, whitespace, or whitespace-bearing numeric strings with NANERRORMSG", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2", "c3"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return 0;
+                if (c === "c2") return "   ";
+                if (c === "c3") return 0.5;
+            });
+            const lerpBlock = createdBlocks["lerp"];
+            let result = lerpBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(logo.stopTurtle).toBe(true);
+            expect(result).toEqual(0);
+
+            activity.errorMsg.mockClear();
+            logo.stopTurtle = false;
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return " 12.5 ";
+                if (c === "c2") return 100;
+                if (c === "c3") return 0.5;
+            });
+            result = lerpBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(logo.stopTurtle).toBe(true);
+            expect(result).toEqual(0);
+        });
+
+        it("should reject non-finite numbers and strings with NANERRORMSG", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2", "c3"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return Infinity;
+                if (c === "c2") return "100";
+                if (c === "c3") return 0.5;
+            });
+            const lerpBlock = createdBlocks["lerp"];
+            const result = lerpBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(logo.stopTurtle).toBe(true);
+            expect(result).toEqual(0);
+        });
+
+        it("should reject overflow strings like '1e999' with NANERRORMSG", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2", "c3"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return 0;
+                if (c === "c2") return "1e999";
+                if (c === "c3") return 0.5;
+            });
+            const lerpBlock = createdBlocks["lerp"];
+            const result = lerpBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(logo.stopTurtle).toBe(true);
+            expect(result).toEqual(0);
+        });
+
+        it("should reject non-decimal numeric strings like '0x10' with NANERRORMSG", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2", "c3"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return "0x10";
+                if (c === "c2") return 100;
+                if (c === "c3") return 0.5;
+            });
+            const lerpBlock = createdBlocks["lerp"];
+            const result = lerpBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(logo.stopTurtle).toBe(true);
+            expect(result).toEqual(0);
+        });
+
+        it("should handle errors thrown by MathUtility.doLerp", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2", "c3"] };
+            logo.parseArg = jest.fn(() => 5);
+            const originalDoLerp = global.MathUtility.doLerp;
+            global.MathUtility.doLerp = () => {
+                throw new Error("NanError");
+            };
+            const lerpBlock = createdBlocks["lerp"];
+            const result = lerpBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(result).toEqual(0);
+            global.MathUtility.doLerp = originalDoLerp;
+        });
+    });
+
+    describe("GcdBlock", () => {
+        it("should register correctly with default configuration", () => {
+            const gcdBlock = createdBlocks["gcd"];
+            expect(gcdBlock).toBeDefined();
+            expect(gcdBlock.config.name).toEqual("gcd");
+            expect(gcdBlock.config.args).toEqual(2);
+            expect(gcdBlock.config.defaults).toEqual([12, 18]);
+        });
+
+        it("should format parameter correctly in updateParameter", () => {
+            const gcdBlock = createdBlocks["gcd"];
+            activity.blocks.blockList[110] = { value: 6 };
+            expect(gcdBlock.updateParameter(logo, 0, 110)).toEqual("6.00");
+        });
+
+        it("should push to statusFields when inStatusMatrix is true", () => {
+            activity.blocks.blockList[310] = {
+                connections: [311, "c1", "c2"],
+                name: "gcd"
+            };
+            activity.blocks.blockList[311] = { name: "print" };
+            logo.inStatusMatrix = true;
+            logo.statusFields = [];
+            const gcdBlock = createdBlocks["gcd"];
+            gcdBlock.arg(logo, 0, 310, null);
+            expect(logo.statusFields).toContainEqual([310, "gcd"]);
+            logo.inStatusMatrix = false;
+        });
+
+        it("should return 0 when connections are missing", () => {
+            activity.blocks.blockList[110] = { connections: [null, null, "c2"] };
+            const gcdBlock = createdBlocks["gcd"];
+            const result = gcdBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 110);
+            expect(result).toEqual(0);
+        });
+
+        it("should compute GCD for integers and numeric strings", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return "48";
+                if (c === "c2") return 18;
+            });
+            const gcdBlock = createdBlocks["gcd"];
+            const result = gcdBlock.arg(logo, 0, 110, null);
+            expect(result).toEqual(6);
+        });
+
+        it("should reject non-integer strings with NANERRORMSG", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return "invalid";
+                if (c === "c2") return 18;
+            });
+            const gcdBlock = createdBlocks["gcd"];
+            const result = gcdBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(result).toEqual(0);
+        });
+
+        it("should reject strings with trailing characters like '5abc'", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return "5abc";
+                if (c === "c2") return 18;
+            });
+            const gcdBlock = createdBlocks["gcd"];
+            const result = gcdBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(logo.stopTurtle).toBe(true);
+            expect(result).toEqual(0);
+        });
+
+        it("should reject non-decimal strings like '0x10' with NANERRORMSG", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return "0x10";
+                if (c === "c2") return 18;
+            });
+            const gcdBlock = createdBlocks["gcd"];
+            const result = gcdBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(logo.stopTurtle).toBe(true);
+            expect(result).toEqual(0);
+        });
+
+        it("should handle errors thrown by MathUtility.doGcd", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn(() => 10);
+            const originalDoGcd = global.MathUtility.doGcd;
+            global.MathUtility.doGcd = () => {
+                throw new Error("NanError");
+            };
+            const gcdBlock = createdBlocks["gcd"];
+            const result = gcdBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(result).toEqual(0);
+            global.MathUtility.doGcd = originalDoGcd;
+        });
+    });
+
+    describe("LcmBlock", () => {
+        it("should register correctly with default configuration", () => {
+            const lcmBlock = createdBlocks["lcm"];
+            expect(lcmBlock).toBeDefined();
+            expect(lcmBlock.config.name).toEqual("lcm");
+            expect(lcmBlock.config.args).toEqual(2);
+            expect(lcmBlock.config.defaults).toEqual([4, 6]);
+        });
+
+        it("should format parameter correctly in updateParameter", () => {
+            const lcmBlock = createdBlocks["lcm"];
+            activity.blocks.blockList[110] = { value: 12 };
+            expect(lcmBlock.updateParameter(logo, 0, 110)).toEqual("12.00");
+        });
+
+        it("should push to statusFields when inStatusMatrix is true", () => {
+            activity.blocks.blockList[310] = {
+                connections: [311, "c1", "c2"],
+                name: "lcm"
+            };
+            activity.blocks.blockList[311] = { name: "print" };
+            logo.inStatusMatrix = true;
+            logo.statusFields = [];
+            const lcmBlock = createdBlocks["lcm"];
+            lcmBlock.arg(logo, 0, 310, null);
+            expect(logo.statusFields).toContainEqual([310, "lcm"]);
+            logo.inStatusMatrix = false;
+        });
+
+        it("should return 0 when connections are missing", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", null] };
+            const lcmBlock = createdBlocks["lcm"];
+            const result = lcmBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 110);
+            expect(result).toEqual(0);
+        });
+
+        it("should compute LCM for integers and numeric strings", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return "4";
+                if (c === "c2") return 6;
+            });
+            const lcmBlock = createdBlocks["lcm"];
+            const result = lcmBlock.arg(logo, 0, 110, null);
+            expect(result).toEqual(12);
+        });
+
+        it("should reject non-integer strings with NANERRORMSG", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return 4;
+                if (c === "c2") return "invalid";
+            });
+            const lcmBlock = createdBlocks["lcm"];
+            const result = lcmBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(result).toEqual(0);
+        });
+
+        it("should reject strings with trailing characters like '5abc'", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return 4;
+                if (c === "c2") return "5abc";
+            });
+            const lcmBlock = createdBlocks["lcm"];
+            const result = lcmBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(logo.stopTurtle).toBe(true);
+            expect(result).toEqual(0);
+        });
+
+        it("should handle errors thrown by MathUtility.doLcm", () => {
+            activity.blocks.blockList[110] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn(() => 4);
+            const originalDoLcm = global.MathUtility.doLcm;
+            global.MathUtility.doLcm = () => {
+                throw new Error("NanError");
+            };
+            const lcmBlock = createdBlocks["lcm"];
+            const result = lcmBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(result).toEqual(0);
+            global.MathUtility.doLcm = originalDoLcm;
+        });
+    });
+
+    describe("MapBlock", () => {
+        it("should register correctly with default configuration", () => {
+            const mapBlock = createdBlocks["map"];
+            expect(mapBlock).toBeDefined();
+            expect(mapBlock.config.name).toEqual("map");
+            expect(mapBlock.config.args).toEqual(5);
+            expect(mapBlock.config.defaults).toEqual([5, 0, 10, 0, 100]);
+        });
+
+        it("should format parameter correctly in updateParameter", () => {
+            const mapBlock = createdBlocks["map"];
+            activity.blocks.blockList[110] = { value: "mappedVal" };
+            expect(mapBlock.updateParameter(logo, 0, 110)).toEqual("mappedVal");
+
+            activity.blocks.blockList[111] = { value: 50.123 };
+            expect(mapBlock.updateParameter(logo, 0, 111)).toEqual("50.12");
+        });
+
+        it("should push to statusFields when inStatusMatrix is true", () => {
+            activity.blocks.blockList[310] = {
+                connections: [311, "c1", "c2", "c3", "c4", "c5"],
+                name: "map"
+            };
+            activity.blocks.blockList[311] = { name: "print" };
+            logo.inStatusMatrix = true;
+            logo.statusFields = [];
+            const mapBlock = createdBlocks["map"];
+            mapBlock.arg(logo, 0, 310, null);
+            expect(logo.statusFields).toContainEqual([310, "map"]);
+            logo.inStatusMatrix = false;
+        });
+
+        it("should return 0 when required connections are missing", () => {
+            activity.blocks.blockList[110] = {
+                connections: [null, "c1", "c2", null, "c4", "c5"]
+            };
+            const mapBlock = createdBlocks["map"];
+            const result = mapBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 110);
+            expect(result).toEqual(0);
+        });
+
+        it("should map value from input range to output range", () => {
+            activity.blocks.blockList[110] = {
+                connections: [null, "c1", "c2", "c3", "c4", "c5"]
+            };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return 5;
+                if (c === "c2") return 0;
+                if (c === "c3") return 10;
+                if (c === "c4") return 0;
+                if (c === "c5") return 100;
+            });
+            const mapBlock = createdBlocks["map"];
+            const result = mapBlock.arg(logo, 0, 110, null);
+            expect(result).toEqual(50);
+        });
+
+        it("should handle floating point string arguments", () => {
+            activity.blocks.blockList[110] = {
+                connections: [null, "c1", "c2", "c3", "c4", "c5"]
+            };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return "2.5";
+                if (c === "c2") return "0";
+                if (c === "c3") return "10";
+                if (c === "c4") return "0";
+                if (c === "c5") return "100";
+            });
+            const mapBlock = createdBlocks["map"];
+            const result = mapBlock.arg(logo, 0, 110, null);
+            expect(result).toEqual(25);
+        });
+
+        it("should reject invalid numeric-prefix strings with NANERRORMSG", () => {
+            activity.blocks.blockList[110] = {
+                connections: [null, "c1", "c2", "c3", "c4", "c5"]
+            };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return "5abc";
+                if (c === "c2") return 0;
+                if (c === "c3") return 10;
+                if (c === "c4") return 0;
+                if (c === "c5") return 100;
+            });
+            const mapBlock = createdBlocks["map"];
+            const result = mapBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(result).toEqual(0);
+        });
+
+        it("should reject empty strings with NANERRORMSG", () => {
+            activity.blocks.blockList[110] = {
+                connections: [null, "c1", "c2", "c3", "c4", "c5"]
+            };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return 5;
+                if (c === "c2") return 0;
+                if (c === "c3") return "  ";
+                if (c === "c4") return 0;
+                if (c === "c5") return 100;
+            });
+            const mapBlock = createdBlocks["map"];
+            const result = mapBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(result).toEqual(0);
+        });
+
+        it("should reject non-finite values like Infinity or overflow strings with NANERRORMSG", () => {
+            activity.blocks.blockList[110] = {
+                connections: [null, "c1", "c2", "c3", "c4", "c5"]
+            };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return "Infinity";
+                if (c === "c2") return 0;
+                if (c === "c3") return 10;
+                if (c === "c4") return 0;
+                if (c === "c5") return 100;
+            });
+            const mapBlock = createdBlocks["map"];
+            const result = mapBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(logo.stopTurtle).toBe(true);
+            expect(result).toEqual(0);
+        });
+
+        it("should report ZERODIVIDEERRORMSG when inMin equals inMax", () => {
+            activity.blocks.blockList[110] = {
+                connections: [null, "c1", "c2", "c3", "c4", "c5"]
+            };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return 5;
+                if (c === "c2") return 10;
+                if (c === "c3") return 10;
+                if (c === "c4") return 0;
+                if (c === "c5") return 100;
+            });
+            const mapBlock = createdBlocks["map"];
+            const result = mapBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.ZERODIVIDEERRORMSG, 110);
+            expect(logo.stopTurtle).toBe(true);
+            expect(result).toEqual(0);
+        });
+
+        it("should handle generic errors thrown by MathUtility.doMap", () => {
+            activity.blocks.blockList[110] = {
+                connections: [null, "c1", "c2", "c3", "c4", "c5"]
+            };
+            logo.parseArg = jest.fn(() => 5);
+            const originalDoMap = global.MathUtility.doMap;
+            global.MathUtility.doMap = () => {
+                throw new Error("NanError");
+            };
+            const mapBlock = createdBlocks["map"];
+            const result = mapBlock.arg(logo, 0, 110, null);
+            expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 110);
+            expect(result).toEqual(0);
+            global.MathUtility.doMap = originalDoMap;
         });
     });
 
