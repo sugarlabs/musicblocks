@@ -1235,7 +1235,7 @@ function getNote(
     let articulation;
 
     if (
-        temperament in PreDefinedTemperaments ||
+        Object.prototype.hasOwnProperty.call(PreDefinedTemperaments, temperament) ||
         (isCustomTemperament(temperament) && isEquallyTempered(temperament))
     ) {
         // Check for double flat or double sharp. Since bb and x behave
