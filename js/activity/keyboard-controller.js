@@ -238,7 +238,7 @@ class KeyboardController {
                 activity.toolbar.highlightStop(platformColor.stopIconcolor);
                 activity._doFastButton();
             }
-        } else if ((event.altKey && !disableKeys) || event.key === "/" || event.key === "\\") {
+        } else if (!disableKeys && (event.altKey || event.key === "/" || event.key === "\\")) {
             switch (event.keyCode) {
                 case 66: // 'B'
                     activity.textMsg("Alt-B " + _("Saving block artwork"));
@@ -340,7 +340,11 @@ class KeyboardController {
             if (event.keyCode === SPACE) {
                 // Check if any widget window is open
                 const hasOpenWidget = this._hasOpenWidget();
-                if (activity.turtles.running()) {
+                if (
+                    activity.turtles.running() &&
+                    activity.searchWidget.style.visibility !== "visible" &&
+                    activity.helpfulSearchWidget.style.visibility !== "visible"
+                ) {
                     event.preventDefault();
                     activity._doHardStopButton();
                 } else if (!disableKeys && !hasOpenWidget) {
