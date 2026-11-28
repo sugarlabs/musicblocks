@@ -2788,6 +2788,8 @@ describe("processNote notation and MIDI emission guards against non-positive dur
 
         turtleMock.singer.bpm = [90];
 
+        turtleMock.singer.keySignature = "F major";
+
         Singer.processNote(activityMock, 4, false, blk, 0, jest.fn());
 
         expect(activityMock.logo.notationMIDI).toHaveBeenCalledWith(
@@ -2797,7 +2799,8 @@ describe("processNote notation and MIDI emission guards against non-positive dur
             0,
             90,
             "piano",
-            [4, 4]
+            [4, 4],
+            "F major"
         );
         expect(activityMock.logo.updateNotation).toHaveBeenCalledWith(["C4"], 4, 0, -1, []);
     });
@@ -2851,7 +2854,8 @@ describe("processNote notation and MIDI emission guards against non-positive dur
             0,
             90,
             "piano",
-            [4, 4]
+            [4, 4],
+            "C major"
         );
         // The other notations read frequencies themselves.
         expect(activityMock.logo.updateNotation).toHaveBeenCalledWith([450], 4, 0, -1, []);
@@ -2922,7 +2926,8 @@ describe("processNote notation and MIDI emission guards against non-positive dur
                 0,
                 recorded,
                 "piano",
-                [6, 8]
+                [6, 8],
+                "C major"
             );
         }
     );
@@ -2949,7 +2954,8 @@ describe("processNote notation and MIDI emission guards against non-positive dur
             0,
             90,
             "piano",
-            [4, 4]
+            [4, 4],
+            "C major"
         );
     });
 

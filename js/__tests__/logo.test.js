@@ -4442,7 +4442,7 @@ describe("Logo notationMIDI", () => {
         logo._midiData = {};
 
         logo.notationMIDI(["C4", "E4"], ["kick", "snare drum"], 0.5, 0, 90, "piano", [3, 4]);
-        logo.notationMIDI("D4", null, 0.25, 0, 120, "flute", [6, 8]);
+        logo.notationMIDI("D4", null, 0.25, 0, 120, "flute", [6, 8], "B♭ minor");
 
         expect(logo._midiData[0]).toEqual([
             {
@@ -4459,7 +4459,8 @@ describe("Logo notationMIDI", () => {
                 bpm: 120,
                 instrument: "flute",
                 drum: null,
-                meter: [6, 8]
+                meter: [6, 8],
+                key: "B♭ minor"
             }
         ]);
     });
