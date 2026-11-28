@@ -20,6 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+/* global _ */
 /* exported PracticeValidator */
 
 function getActivity() {
@@ -359,8 +360,24 @@ const PracticeValidator = {
             if (!block || block.trash || block.name !== "action") return false;
 
             const label = this.getActionName(block, blockList);
-            return label && !originalNames.has(label);
+            return (
+                label && !originalNames.has(label) && !this.isDefaultActionName(label, chunkNames)
+            );
         });
+    },
+
+    // A new action is named "action", then "action1", "action2" and so on, in the learner's
+    // language. Where a lesson starts from those default names, none of them is a rename.
+    isDefaultActionName(label, chunkNames) {
+        if (!chunkNames.includes("action")) return false;
+
+        const defaultNames = new Set(["action"]);
+        if (typeof _ === "function") defaultNames.add(_("action"));
+
+        const text = String(label);
+        return [...defaultNames].some(
+            name => text.startsWith(name) && /^\d*$/.test(text.slice(name.length))
+        );
     },
 
     getActionName(actionBlock, blockList) {
