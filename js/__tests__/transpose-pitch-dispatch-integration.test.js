@@ -433,4 +433,44 @@ describe("real newnote/settransposition/pitch blocks dispatch through Logo into 
         expect(turtle.singer.transposition).toBe(0);
         expect(turtle.singer.transpositionValues).toEqual([]);
     });
+
+    test("a semi-tone transpose clamp with disconnected argument reports NOINPUTERRORMSG, defaults to 0 shift, and executes child notes", () => {
+        const newnote = makeRealBlock("newnote", [null, 1, null, 2], protos.newnote);
+        const clamp = makeRealBlock(
+            "settransposition",
+            [0, null, null, 4],
+            protos.settransposition
+        );
+        const hidden = makeHidden(3);
+        const pitch = makeRealBlock("pitch", [3, 6, 7, null], protos.pitch);
+        const sol = makeValueBlock("solfege", "sol");
+        const oct = makeValueBlock("number", 4);
+
+        const blocks = [
+            newnote, // 0
+            makeValueBlock("number", 1 / 4), // 1
+            makeHidden(0), // 2
+            clamp, // 3
+            hidden, // 4
+            pitch, // 5
+            sol, // 6
+            oct // 7
+        ];
+        newnote.connections[2] = 3;
+        clamp.connections[2] = 5;
+
+        logo.blockList = blocks;
+        activity.blocks.blockList = blocks;
+
+        logo.runFromBlockNow(logo, 0, 0, 1, null);
+
+        expect(scheduledForBlk).toBe(0);
+        expect(transpositionWhilePitchResolved).toBe(0);
+        expect(notePitchesAtSchedule).toEqual(["G"]);
+        expect(noteOctavesAtSchedule).toEqual([4]);
+        expect(Singer.processNote).toHaveBeenCalledTimes(1);
+        expect(turtle.singer.transposition).toBe(0);
+        expect(turtle.singer.transpositionValues).toEqual([]);
+        expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, 3);
+    });
 });
