@@ -546,17 +546,12 @@ const _MXML_MODE_NAME = {
 const _MXML_ASCII_ACCIDENTAL_SUFFIX = { "#": "♯", "b": "♭", "": "" };
 
 /**
- * Returns the Music Blocks volume for a supported dynamic marking in a
- * MusicXML <direction>, or null when there is no supported marking.
- * @param {Element} directionEl - a MusicXML <direction> element
+ * Returns the Music Blocks volume for a supported MusicXML <dynamics>
+ * element, or null when there is no supported marking.
+ * @param {Element|null} dynamicsEl - a MusicXML <dynamics> element
  * @returns {number|null}
  */
-function _dynamicVolume(directionEl) {
-    // Positioning an offset direction requires timeline-aware placement. Until
-    // that is supported, skip it rather than attaching it to the next note.
-    if (directionEl.querySelector(":scope > offset") !== null) return null;
-
-    const dynamicsEl = directionEl.querySelector(":scope > direction-type > dynamics");
+function _dynamicVolume(dynamicsEl) {
     if (dynamicsEl === null) return null;
 
     for (const marking of dynamicsEl.children) {
@@ -565,6 +560,20 @@ function _dynamicVolume(directionEl) {
     }
 
     return null;
+}
+
+/**
+ * Returns the volume for a supported dynamic marking in a MusicXML
+ * <direction>, or null when there is no supported marking.
+ * @param {Element} directionEl - a MusicXML <direction> element
+ * @returns {number|null}
+ */
+function _directionDynamicVolume(directionEl) {
+    // Positioning an offset direction requires timeline-aware placement. Until
+    // that is supported, skip it rather than attaching it to the next note.
+    if (directionEl.querySelector(":scope > offset") !== null) return null;
+
+    return _dynamicVolume(directionEl.querySelector(":scope > direction-type > dynamics"));
 }
 
 /**
@@ -992,6 +1001,7 @@ function _applyRepeats(
     repeats,
     noteBlocks,
     noteStartIds,
+    noteIds,
     noteEndIds,
     noteTempoBpms,
     timeSignature,
@@ -1025,7 +1035,7 @@ function _applyRepeats(
         lastBlock[4][1] = null;
         durationOverrides.forEach(({ index, duration }) => {
             if (index >= startIndex && index <= endIndex) {
-                _setNoteDuration(blocks, idMap.get(noteStartIds[index]), duration);
+                _setNoteDuration(blocks, idMap.get(noteIds[index]), duration);
             }
         });
         blockId += blocks.length;
@@ -1196,6 +1206,7 @@ function _processPart(
     const startingBlockId = blockId;
     const noteBlocks = [];
     const noteStartIds = [];
+    const noteIds = [];
     const noteEndIds = [];
     const noteTempoBpms = [];
     const repeats = [];
@@ -1248,6 +1259,7 @@ function _processPart(
         if (previousVolumeBlock !== null) previousVolumeBlock[4][3] = blockId;
         noteBlocks.push(...blocks);
         noteStartIds.push(startId);
+        noteIds.push(blockId);
         noteEndIds.push(blocks[blocks.length - 1][0]);
         noteTempoBpms.push(currentTempoBpm);
         producedNotes = true;
@@ -1302,7 +1314,7 @@ function _processPart(
                 const directionVoice = _text(child, "voice")?.trim();
                 if (directionVoice && directionVoice !== importedVoice) continue;
 
-                const volume = _dynamicVolume(child);
+                const volume = _directionDynamicVolume(child);
                 if (volume !== null) {
                     // A tied note is emitted as one block. Keep it open so a
                     // dynamic between its start and stop cannot split it.
@@ -1392,6 +1404,12 @@ function _processPart(
             if (child.querySelector(":scope > chord") !== null) continue;
             if (child.querySelector(":scope > grace") !== null) continue;
 
+            let noteVolume = null;
+            for (const dynamicsEl of child.querySelectorAll(":scope > notations > dynamics")) {
+                noteVolume = _dynamicVolume(dynamicsEl);
+                if (noteVolume !== null) break;
+            }
+
             const duration = _noteDuration(child, divisions);
             const lyrics = _lyricTexts(child);
             const unpitchedEl = child.querySelector(":scope > unpitched");
@@ -1425,7 +1443,7 @@ function _processPart(
                     const combinedDuration = _addFractions(firstEndingBodyTie.duration, duration);
                     _setNoteDuration(
                         noteBlocks,
-                        noteStartIds[firstEndingBodyTie.index],
+                        noteIds[firstEndingBodyTie.index],
                         combinedDuration
                     );
                     firstEndingBodyTie = hasTieStart
@@ -1448,6 +1466,8 @@ function _processPart(
                 tieDuration !== null && hasTieStop && _contentsEqual(content, tieContent);
 
             if (tieDuration !== null && !continuesTie) flushTie();
+
+            if (noteVolume !== null) pendingVolumes.push(noteVolume);
 
             if (continuesTie) {
                 tieLyrics = _mergeLyrics(tieLyrics, lyrics);
@@ -1495,6 +1515,7 @@ function _processPart(
         repeats,
         noteBlocks,
         noteStartIds,
+        noteIds,
         noteEndIds,
         noteTempoBpms,
         timeSignature,

@@ -901,6 +901,7 @@ describe("Test 12: Tempo", () => {
 describe("Test 13: Dynamic markings", () => {
     const dynamic = marking =>
         `<direction><direction-type><dynamics><${marking}/></dynamics></direction-type></direction>`;
+    const noteDynamic = marking => `<notations><dynamics><${marking}/></dynamics></notations>`;
 
     it("places each supported dynamic's synth-volume block before its following note", async () => {
         const { blocks } = await parseAndCapture(
@@ -919,6 +920,45 @@ describe("Test 13: Dynamic markings", () => {
         expect(blockName(byIndex.get(volumeBlocks[1][4][3]))).toBe("newnote");
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
         expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("places a note-attached dynamic's synth-volume block before that note", async () => {
+        const noteWithDynamic =
+            "<note><pitch><step>C</step><octave>4</octave></pitch>" +
+            "<duration>1</duration><type>quarter</type>" +
+            noteDynamic("f") +
+            "</note>";
+        const { blocks } = await parseAndCapture(scorePartwise(noteWithDynamic));
+
+        expect(synthVolumes(blocks)).toEqual([80]);
+        const volumeBlock = blocks.find(block => blockName(block) === "setsynthvolume");
+        const byIndex = new Map(blocks.map(block => [block[0], block]));
+        expect(blockName(byIndex.get(volumeBlock[4][3]))).toBe("newnote");
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("uses a supported dynamic after an unsupported note-attached marking", async () => {
+        const xml =
+            "<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type><notations><dynamics><sfz/></dynamics><dynamics><p/></dynamics></notations></note>";
+        const { blocks } = await parseAndCapture(scorePartwise(xml));
+        expect(synthVolumes(blocks)).toEqual([35]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("imports the note-attached dynamics example", async () => {
+        const fixture = path.join(
+            __dirname,
+            "../../../cypress/fixtures/mxml-note-dynamics.musicxml"
+        );
+        const { blocks } = await parseAndCapture(fs.readFileSync(fixture, "utf8"));
+        expect(synthVolumes(blocks)).toEqual([35, 80]);
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 }
+        ]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
     it("imports common dynamics from the committed MusicXML fixture", async () => {
@@ -1434,6 +1474,10 @@ describe("Test 16: Ties", () => {
     const tiedNote = (step, octave, tieAttrs) =>
         `<note><pitch><step>${step}</step><octave>${octave}</octave></pitch>` +
         `<duration>8</duration><type>quarter</type>${tieAttrs}</note>`;
+    const tiedNoteWithDynamic = (step, octave, tieAttrs, marking) =>
+        `<note><pitch><step>${step}</step><octave>${octave}</octave></pitch>` +
+        `<duration>8</duration><type>quarter</type>${tieAttrs}` +
+        `<notations><dynamics><${marking}/></dynamics></notations></note>`;
 
     it("merges two tied notes into one note block with their durations summed", async () => {
         const { blocks } = await parseAndCapture(
@@ -1495,6 +1539,43 @@ describe("Test 16: Ties", () => {
             { name: "D", octave: 4 }
         ]);
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("keeps a note-attached dynamic with an unrelated note after an open tie", async () => {
+        const noteWithDynamic =
+            "<note><pitch><step>D</step><octave>4</octave></pitch>" +
+            "<duration>8</duration><type>quarter</type>" +
+            "<notations><dynamics><f/></dynamics></notations></note>";
+        const { blocks } = await parseAndCapture(
+            scorePartwise(tiedNote("C", 4, '<tie type="start"/>') + noteWithDynamic)
+        );
+
+        const [, dNote] = blocks.filter(b => blockName(b) === "newnote");
+        const volumeBlock = blocks.find(block => blockName(block) === "setsynthvolume");
+        expect(synthVolumes(blocks)).toEqual([80]);
+        expect(volumeBlock[4][3]).toBe(dNote[0]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("does not leak a first-ending continuation's dynamic to a later note", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                tiedNote("C", 4, '<tie type="start"/>') +
+                    '<barline><ending number="1" type="start"/></barline>' +
+                    tiedNoteWithDynamic("C", 4, '<tie type="stop"/>', "f") +
+                    '<barline><ending number="1" type="stop"/></barline>' +
+                    SIMPLE_NOTE("D", 4, "quarter")
+            )
+        );
+
+        expect(noteValues(blocks)).toEqual([
+            [1, 2],
+            [1, 4]
+        ]);
+        expect(synthVolumes(blocks)).toEqual([]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
     });
 
     it("keeps a long tie chain finite when importing its combined duration", async () => {
@@ -1869,6 +1950,28 @@ describe("Test 16: Ties", () => {
 });
 
 describe("Test 17: Repeats", () => {
+    it("updates the tied note rather than its preceding dynamic in a first ending", async () => {
+        const tied = (type, dynamic = "") =>
+            `<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type><tie type="${type}"/>${dynamic}</note>`;
+        const xml =
+            '<score-partwise><part id="P1"><measure number="1"><attributes><divisions>1</divisions></attributes>' +
+            '<barline location="left"><repeat direction="forward"/></barline>' +
+            tied("start", "<notations><dynamics><p/></dynamics></notations>") +
+            '<barline location="left"><ending number="1" type="start"/></barline>' +
+            tied("stop") +
+            '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            "</measure></part></score-partwise>";
+        const { blocks } = await parseAndCapture(xml);
+        expect(noteValues(blocks)).toEqual([
+            [1, 2],
+            [1, 4],
+            [1, 4]
+        ]);
+        expect(synthVolumes(blocks)).toEqual([35, 35]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
     const BARLINE_FORWARD = '<barline location="left"><repeat direction="forward"/></barline>';
     const barlineBackward = times =>
         `<barline location="right"><repeat direction="backward"${times ? ` times="${times}"` : ""}/></barline>`;
