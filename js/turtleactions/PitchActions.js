@@ -648,6 +648,7 @@ function setupPitchActions(activity) {
          * @param {Number} turtle - Turtle index in turtles.turtleList
          */
         static setRegister(value, turtle) {
+            if (!Number.isFinite(value)) return;
             activity.turtles.ithTurtle(turtle).singer.register = Math.floor(value);
         }
 

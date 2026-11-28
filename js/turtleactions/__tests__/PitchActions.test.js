@@ -991,6 +991,21 @@ describe("Tests for Singer.PitchActions setup", () => {
             Singer.PitchActions.setRegister(5.7, 0);
             expect(turtle.singer.register).toBe(5);
         });
+        test("ignores Infinity, leaving the register unchanged", () => {
+            Singer.PitchActions.setRegister(2, 0);
+            Singer.PitchActions.setRegister(Infinity, 0);
+            expect(turtle.singer.register).toBe(2);
+        });
+        test("ignores NaN, leaving the register unchanged", () => {
+            Singer.PitchActions.setRegister(2, 0);
+            Singer.PitchActions.setRegister(NaN, 0);
+            expect(turtle.singer.register).toBe(2);
+        });
+        test("ignores -Infinity, leaving the register unchanged", () => {
+            Singer.PitchActions.setRegister(2, 0);
+            Singer.PitchActions.setRegister(-Infinity, 0);
+            expect(turtle.singer.register).toBe(2);
+        });
     });
 
     describe("Tests for invert", () => {
