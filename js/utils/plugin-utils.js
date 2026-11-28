@@ -155,10 +155,7 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
                 strokeHighlightColor
             ];
 
-            if (name in activity.palettes.buttons) {
-                console.debug("palette " + name + " already exists");
-            } else {
-                console.debug("adding palette " + name);
+            if (!(name in activity.palettes.buttons)) {
                 activity.palettes.add(name);
                 if (!MULTIPALETTES[2].includes(name)) MULTIPALETTES[2].push(name);
                 newPalette = true;
@@ -168,10 +165,9 @@ const processPluginData = async (activity, pluginData, pluginSource) => {
 
     if (newPalette) {
         try {
-            // console.debug("Calling makePalettes");
             activity.palettes.makePalettes(1);
         } catch (e) {
-            console.debug("makePalettes: " + e);
+            console.warn("makePalettes:", e);
         }
     }
 
@@ -233,9 +229,7 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, turtle, blk, par
             try {
                 activity.palettes.pluginMacros[macro] = JSON.parse(obj["MACROPLUGINS"][macro]);
             } catch (e) {
-                console.debug("could not parse macro " + macro);
-
-                console.debug(e);
+                console.warn("could not parse macro " + macro, e);
             }
         }
     }
@@ -263,7 +257,6 @@ window.__mb_plugin_registry["${registryName}"] = function(logo, blk, value, turt
     if ("BLOCKPLUGINS" in obj) {
         for (const block of Object.keys(obj["BLOCKPLUGINS"])) {
             if (isUnsafeObjectKey(block)) continue;
-            console.debug("adding plugin block " + block);
             safeEval(obj["BLOCKPLUGINS"][block], "BLOCKPLUGINS:" + block);
         }
     }
@@ -442,22 +435,16 @@ window.__mb_plugin_registry["${registryName}"] = function(activity, globalActivi
     for (const protoblock in activity.blocks.protoBlockDict) {
         try {
             // Push the protoblocks onto their palettes.
-            if (activity.blocks.protoBlockDict[protoblock].palette === undefined) {
-                console.debug("Cannot find palette for protoblock " + protoblock);
-            } else if (activity.blocks.protoBlockDict[protoblock].palette === null) {
-                console.debug("Cannot find palette for protoblock " + protoblock);
-            } else {
-                activity.blocks.protoBlockDict[protoblock].palette.add(
-                    activity.blocks.protoBlockDict[protoblock]
-                );
+            const palette = activity.blocks.protoBlockDict[protoblock].palette;
+            if (palette !== undefined && palette !== null) {
+                palette.add(activity.blocks.protoBlockDict[protoblock]);
             }
         } catch (e) {
-            console.debug(e);
+            console.warn(e);
         }
     }
 
     if (paletteName !== null) {
-        // console.debug("updating palette " + paletteName);
         activity.palettes.updatePalettes(paletteName);
     }
 
@@ -501,10 +488,7 @@ const processRawPluginData = async (activity, rawData, pluginSource) => {
         obj = await processPluginData(activity, cleanData.replace(/\n/g, ""), pluginSource);
     } catch (e) {
         obj = null;
-
         console.debug(rawData);
-
-        console.debug(cleanData);
         activity.errorMsg("Error loading plugin: " + e);
     }
 
