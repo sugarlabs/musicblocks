@@ -5609,16 +5609,6 @@ class Blocks {
         this.loadNewBlocks = blockObjs => {
             const loadToken = ++this._nextLoadToken;
 
-            // Invalid input is reported by _loadNewBlocksNow when idle. Do not
-            // queue it behind a valid load: it cannot complete normally and
-            // must not interfere with the active load's bookkeeping.
-            if (!Array.isArray(blockObjs) && this._loadInProgress) {
-                if (typeof this.activity?.errorMsg === "function") {
-                    this.activity.errorMsg(_("Cannot load project: invalid project structure."));
-                }
-                return loadToken;
-            }
-
             if (this._loadInProgress) {
                 this._loadQueue.push({ blockObjs, loadToken });
                 return loadToken;
@@ -5744,13 +5734,38 @@ class Blocks {
                      * successful path leaves it.
                      */
                     document.body.style.cursor = "default";
+                    const loadContainer = document.getElementById("load-container");
+                    if (loadContainer) {
+                        loadContainer.style.display = "none";
+                    }
                     if (this.activity && typeof this.activity.stopLoadAnimation === "function") {
                         this.activity.stopLoadAnimation();
                     }
                     // Nothing was loaded, so a waiting save would only store
                     // the cleared workspace over the project.
-                    this._afterLoadCallbacks.clear();
+                    this._lastLoadFailed = true;
+                    // Advance the queue synchronously so _loadInProgress and
+                    // _loadQueue stay atomic (no race window where a new load
+                    // can jump ahead of queued items or get clobbered by a
+                    // deferred _advanceLoadQueue call).
                     this._advanceLoadQueue();
+                    // Defer loadFailed by one turn so callers like
+                    // ProjectManager._loadStart (which receive loadToken from
+                    // loadNewBlocks() and register their listener right after)
+                    // do not miss the event.
+                    if (
+                        typeof pubsub !== "undefined" &&
+                        pubsub &&
+                        typeof pubsub.emit === "function"
+                    ) {
+                        const err = new Error(warning);
+                        this.setTimeout(() => {
+                            pubsub.emit("loadFailed", {
+                                token: loadToken,
+                                error: err
+                            });
+                        }, 0);
+                    }
                 };
 
                 if (!Array.isArray(blockObjs)) {
