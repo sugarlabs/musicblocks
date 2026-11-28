@@ -1097,6 +1097,22 @@ var __MB_methodArgConstraints = {
             }
         }
     ],
+    fillShape: [
+        {
+            type: "function",
+            constraints: {
+                async: true
+            }
+        }
+    ],
+    hollowLine: [
+        {
+            type: "function",
+            constraints: {
+                async: true
+            }
+        }
+    ],
     // Dictionary blocks
     setValue: [
         [

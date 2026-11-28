@@ -81,8 +81,9 @@ class PenBlocksAPI {
     }
 
     async fillShape(flow) {
+        const args = JSInterface.validateArgs("fillShape", [flow]);
         await this.runCommand("doStartFill");
-        await flow();
+        await args[0]();
         await this.runCommand("doEndFill");
         globalActivity.turtles.refreshCanvas();
 
@@ -90,8 +91,9 @@ class PenBlocksAPI {
     }
 
     async hollowLine(flow) {
+        const args = JSInterface.validateArgs("hollowLine", [flow]);
         await this.runCommand("doStartHollowLine");
-        await flow();
+        await args[0]();
         await this.runCommand("doEndHollowLine");
         globalActivity.turtles.refreshCanvas();
 
