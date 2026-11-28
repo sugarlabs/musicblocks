@@ -633,6 +633,29 @@ class Singer {
     }
 
     /**
+     * Maps a pitch key to one or more drum names in `pitchDrumTable` without mutating
+     * existing array entries (preserving shallow snapshot isolation in `DrumActions.setDrum`).
+     *
+     * @static
+     * @param {Object.<string, string|string[]>} pitchDrumTable
+     * @param {string} pitchKey
+     * @param {string} drumname
+     * @returns {void}
+     */
+    static _mapPitchDrum(pitchDrumTable, pitchKey, drumname) {
+        const existing = pitchDrumTable[pitchKey];
+        if (Array.isArray(existing)) {
+            if (!existing.includes(drumname)) {
+                pitchDrumTable[pitchKey] = [...existing, drumname];
+            }
+        } else if (existing && existing !== drumname) {
+            pitchDrumTable[pitchKey] = [existing, drumname];
+        } else {
+            pitchDrumTable[pitchKey] = drumname;
+        }
+    }
+
+    /**
      * Returns a distance for scalar transposition.
      *
      * @static
@@ -1521,7 +1544,11 @@ class Singer {
 
                 if (tur.singer.drumStyle.length > 0) {
                     const drumname = last(tur.singer.drumStyle);
-                    tur.singer.pitchDrumTable[noteObj[0] + noteObj[1]] = drumname;
+                    Singer._mapPitchDrum(
+                        tur.singer.pitchDrumTable,
+                        noteObj[0] + noteObj[1],
+                        drumname
+                    );
                 }
 
                 const notationPitch = getNotationPitch(
@@ -1638,7 +1665,7 @@ class Singer {
                 activity.errorMsg,
                 activity.logo.synth.inTemperament
             );
-            tur.singer.pitchDrumTable[noteObj1[0] + noteObj1[1]] = drumname;
+            Singer._mapPitchDrum(tur.singer.pitchDrumTable, noteObj1[0] + noteObj1[1], drumname);
         } else if (activity.logo.inPitchStaircase) {
             const frequency = getCachedPitchToFrequency(
                 note,
@@ -1726,7 +1753,11 @@ class Singer {
 
                 if (tur.singer.drumStyle.length > 0) {
                     const drumname = last(tur.singer.drumStyle);
-                    tur.singer.pitchDrumTable[noteObj[0] + noteObj[1]] = drumname;
+                    Singer._mapPitchDrum(
+                        tur.singer.pitchDrumTable,
+                        noteObj[0] + noteObj[1],
+                        drumname
+                    );
                 }
 
                 const notationPitch = getNotationPitch(
@@ -2796,17 +2827,23 @@ class Singer {
                                             !hasSetTimbreInSetDrum
                                         ) {
                                             if (!tur.singer.suppressOutput) {
-                                                activity.logo.synth.trigger(
-                                                    turtle,
-                                                    notes[d],
-                                                    beatValue,
-                                                    tur.singer.pitchDrumTable[notes[d]],
-                                                    null,
-                                                    null,
-                                                    false,
-                                                    future,
-                                                    tur.singer.panner
-                                                );
+                                                const mapped = tur.singer.pitchDrumTable[notes[d]];
+                                                const mappedDrums = Array.isArray(mapped)
+                                                    ? mapped
+                                                    : [mapped];
+                                                for (const mappedDrum of mappedDrums) {
+                                                    activity.logo.synth.trigger(
+                                                        turtle,
+                                                        notes[d],
+                                                        beatValue,
+                                                        mappedDrum,
+                                                        null,
+                                                        null,
+                                                        false,
+                                                        future,
+                                                        tur.singer.panner
+                                                    );
+                                                }
                                             }
                                         } else if (last(tur.singer.instrumentNames)) {
                                             if (!tur.singer.suppressOutput) {

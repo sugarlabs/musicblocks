@@ -129,14 +129,17 @@ describe("PitchDrumMatrixCells", () => {
         expect(pdm._blockMap).toEqual([]);
     });
 
-    test("a row has one drum: picking another replaces it", () => {
+    test("a row can have multiple drums: picking another keeps both mapped", () => {
         grid([20]);
         click(0, 0);
 
         click(0, 1);
 
-        expect(selected()).toEqual(["01"]);
-        expect(pdm._blockMap).toEqual([[20, 31, 0]]);
+        expect(selected()).toEqual(["11"]);
+        expect(pdm._blockMap).toEqual([
+            [20, 30, 0],
+            [20, 31, 0]
+        ]);
     });
 
     test("clicking plays the pitch, then the drum a moment later", () => {
@@ -219,6 +222,7 @@ describe("PitchDrumMatrixCells", () => {
         click(1, 0);
 
         expect(matrixBlock.drumCells).toEqual([
+            [20, 30, 0],
             [20, 31, 0],
             [21, 30, 0]
         ]);

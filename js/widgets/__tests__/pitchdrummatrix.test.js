@@ -1131,11 +1131,14 @@ describe("PitchDrumMatrix Widget", () => {
 
             pdm.addNode(10, 100);
 
-            // Selecting column 1 should clear column 0
+            // Selecting column 1 should keep column 0 so both map to the pitch
             pdm._setCellPitchDrum(1, 0, true);
 
-            expect(cell0.style.backgroundColor).toBe(platformColor.selectorBackground);
-            expect(pdm._blockMap).toEqual([[10, 200, 0]]);
+            expect(cell0.style.backgroundColor).toBe("black");
+            expect(pdm._blockMap).toEqual([
+                [10, 100, 0],
+                [10, 200, 0]
+            ]);
         });
 
         test("_save creates and loads action stack when grid has selections", () => {
@@ -1374,7 +1377,7 @@ describe("PitchDrumMatrix with a real DOM", () => {
             expect(pdm._blockMap).toEqual([[20, 30]]);
         });
 
-        test("picking another drum in a row replaces the old one without throwing", () => {
+        test("picking another drum in a row keeps both mapped without throwing", () => {
             const { pdm } = build({
                 labels: ["C"],
                 args: [4],
@@ -1386,10 +1389,11 @@ describe("PitchDrumMatrix with a real DOM", () => {
             click(0, 1);
             expect(() => pdm._setCellPitchDrum(0, 0, true)).not.toThrow();
 
-            expect(pdm._blockMap).toEqual([[20, 30, 0]]);
-            expect(jsdomDocument.getElementById("0,1").style.backgroundColor).toBe(
-                selectorBackground
-            );
+            expect(pdm._blockMap).toEqual([
+                [20, 31, 0],
+                [20, 30, 0]
+            ]);
+            expect(jsdomDocument.getElementById("0,1").style.backgroundColor).toBe("black");
         });
     });
 
@@ -1552,17 +1556,18 @@ describe("PitchDrumMatrix with a real DOM", () => {
             expect(black(pdm)).toEqual(["10", "01"]);
         });
 
-        test("picking another drum in one row leaves the other row alone", () => {
+        test("picking another drum in one row keeps both and leaves the other row alone", () => {
             const { pdm } = repeated();
             click(0, 0);
             click(1, 0);
             click(0, 1);
 
             expect(pdm._blockMap).toEqual([
+                [20, 30, 0],
                 [20, 30, 1],
                 [20, 31, 0]
             ]);
-            expect(black(pdm)).toEqual(["01", "10"]);
+            expect(black(pdm)).toEqual(["11", "10"]);
         });
 
         test("toggling one row off keeps the other row's drum", () => {

@@ -185,4 +185,22 @@ describe("PitchDrumMatrixSave", () => {
 
         expect(pairs(saved())).toEqual([["text:" + url, "do", 4]]);
     });
+
+    test("saves multiple drums mapped to the same pitch", () => {
+        matrix(
+            [["do", 4]],
+            ["kick drum", "snare drum"],
+            [
+                [0, 0],
+                [0, 1]
+            ]
+        );
+
+        pdm._save();
+
+        expect(pairs(saved())).toEqual([
+            ["drumname:kick drum", "do", 4],
+            ["drumname:snare drum", "do", 4]
+        ]);
+    });
 });
