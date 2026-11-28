@@ -21,7 +21,7 @@
     rotateSliceAngles,
     scalePatternToEDO, isNonEDO, getNonEDOModeSteps, getNonEDOFrequency, isEquallyTempered, piemenuModes,
     isUnsafeObjectKey, ManagedTimer, readTextFile, downloadTextFile, createSharePopup,
-    closeSharePopup, makeKeyboardAccessible
+    closeSharePopup, makeKeyboardAccessible, buildScale, _namesAreMeantone
  */
 
 /*
@@ -924,6 +924,10 @@ class ModeWidget {
         if (Array.isArray(nativePattern)) {
             return nativePattern;
         }
+        const scaleSteps = this._scaleStepPattern(modeName);
+        if (scaleSteps !== null) {
+            return scaleSteps;
+        }
         if (isNonEDO(this._activeTemperamentKey)) {
             const steps = getNonEDOModeSteps(modeName, this._activeTemperamentKey);
             if (steps) {
@@ -931,6 +935,47 @@ class ModeWidget {
             }
         }
         return getModePattern(modeName, this._activeEDO);
+    }
+
+    /**
+     * The steps of the scale Scalar Step plays for a seven-note mode, where the tuning
+     * spells sharps and flats as meantone does (19 EDO and 1/3-comma meantone).
+     * Stretching the 12-EDO pattern rounds each degree on its own: the 19-EDO tritone is
+     * 9.5 steps and rounds up, so the wheel drew and played lydian with G♭ for F♯,
+     * while buildScale spells it with F♯.
+     * @param {String} modeName - mode name in MUSICALMODES
+     * @returns {Array|null} integer step counts, or null to stretch the 12-EDO pattern
+     */
+    _scaleStepPattern(modeName) {
+        const edo = this._activeEDO;
+        const pattern = MUSICALMODES[modeName];
+        if (
+            edo === 12 ||
+            modeName === "custom" ||
+            !Array.isArray(pattern) ||
+            pattern.length !== 7 ||
+            typeof buildScale !== "function" ||
+            typeof _namesAreMeantone !== "function"
+        ) {
+            return null;
+        }
+        const names = generateNoteNames(edo);
+        // A ratio tuning's wheel counts positions in its own labels, so the scale's
+        // steps only fit it when those labels are the EDO's names in the same order.
+        const labels = TEMPERAMENT[this._activeTemperamentKey]?.noteLabels;
+        if (
+            isNonEDO(this._activeTemperamentKey) &&
+            !(Array.isArray(labels) && labels.join() === names.join())
+        ) {
+            return null;
+        }
+        if (!_namesAreMeantone(names)) {
+            return null;
+        }
+        const steps = buildScale("C " + modeName, edo)[1];
+        return steps.length === 7 && steps.reduce((a, b) => a + b, 0) === edo
+            ? steps.slice()
+            : null;
     }
 
     _rebuildModeIndex() {
