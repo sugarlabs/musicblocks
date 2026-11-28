@@ -9,6 +9,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+/*
+   global
+
+   _
+*/
+
 // Camera functionality module
 // Encapsulates camera-related operations for video/image capture.
 // All interval/listener lifecycle state lives here (not in doUseCamera's
@@ -150,7 +156,7 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
 
     if (!CameraManager.isSetup) {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            errorMsg("Your browser does not support the webcam");
+            errorMsg(_("Your browser does not support the webcam"));
             return;
         }
 
@@ -178,7 +184,7 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
                     return;
                 }
                 CameraManager._pendingRequest = false;
-                errorMsg("Could not connect to camera");
+                errorMsg(_("Could not connect to camera"));
                 console.debug(error);
             });
     } else {

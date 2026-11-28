@@ -8,6 +8,8 @@
  * (at your option) any later version.
  */
 
+global._ = text => `[translated] ${text}`;
+
 const { doUseCamera, doStopVideoCam, CameraManager } = require("../camera-utils.js");
 
 /**
@@ -320,7 +322,22 @@ describe("doUseCamera", () => {
         expect(() =>
             doUseCamera(["t"], turtlesCtx.turtles, "t", false, null, setCameraID, errorMsg)
         ).not.toThrow();
-        expect(errorMsg).toHaveBeenCalledWith("Your browser does not support the webcam");
+        expect(errorMsg).toHaveBeenCalledWith(
+            "[translated] Your browser does not support the webcam"
+        );
+    });
+
+    test("rejected camera request reports a translated error", async () => {
+        const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+        navigator.mediaDevices = {
+            getUserMedia: jest.fn(() => Promise.reject(new Error("denied")))
+        };
+
+        doUseCamera(["t"], turtlesCtx.turtles, "t", false, null, setCameraID, errorMsg);
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(errorMsg).toHaveBeenCalledWith("[translated] Could not connect to camera");
+        debugSpy.mockRestore();
     });
 });
 
