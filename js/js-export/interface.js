@@ -1651,24 +1651,24 @@ class JSInterface {
                 }
             }
         ],
-        // setBezierControlPoint1: [
-        //     {
-        //         type: "number",
-        //         constraints: {
-        //             min: -100000,
-        //             max: 100000,
-        //             integer: false
-        //         }
-        //     },
-        //     {
-        //         type: "number",
-        //         constraints: {
-        //             min: -100000,
-        //             max: 100000,
-        //             integer: false
-        //         }
-        //     }
-        // ],
+        setBezierControlPoint2: [
+            {
+                type: "number",
+                constraints: {
+                    min: -100000,
+                    max: 100000,
+                    integer: false
+                }
+            },
+            {
+                type: "number",
+                constraints: {
+                    min: -100000,
+                    max: 100000,
+                    integer: false
+                }
+            }
+        ],
         scrollXY: [
             {
                 type: "number",
