@@ -623,6 +623,7 @@ a {
 
 #backToTopBtn {
 	position: fixed;
+	display: none;
 	bottom: 20px;
 	right: 20px;
 	background-color: #007BFF;
@@ -633,6 +634,10 @@ a {
 	cursor: pointer;
 	font-size: 16px;
 	outline: none;
+}
+
+#backToTopBtn.is-visible {
+	display: block;
 }
 
 /* ── Fork button ───────────────────────────────────────────────────────── */
