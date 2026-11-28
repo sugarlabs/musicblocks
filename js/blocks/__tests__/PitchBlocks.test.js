@@ -567,12 +567,18 @@ describe("setupPitchBlocks", () => {
             expect(block.arg(logo, 0, 10)).toBeDefined();
 
             turtles.ithTurtle(0).singer.lastNotePlayed = ["C4", 0.5];
+            turtles.ithTurtle(0).singer.lastNoteTransposition = 2;
+            turtles.ithTurtle(0).singer.lastNoteScalarTransposition = 1;
             block.setter(logo, 60, 0);
             expect(turtles.ithTurtle(0).singer.lastNotePlayed).toBeDefined();
+            expect(turtles.ithTurtle(0).singer.lastNoteTransposition).toBe(0);
+            expect(turtles.ithTurtle(0).singer.lastNoteScalarTransposition).toBe(0);
 
             turtles.ithTurtle(0).singer.lastNotePlayed = null;
             block.setter(logo, 60, 0);
             expect(turtles.ithTurtle(0).singer.lastNotePlayed).toEqual(["C5", 4]);
+            expect(turtles.ithTurtle(0).singer.lastNoteTransposition).toBe(0);
+            expect(turtles.ithTurtle(0).singer.lastNoteScalarTransposition).toBe(0);
         });
 
         it("MyPitchBlock reads the innermost note being built in nested notes", () => {
@@ -749,6 +755,80 @@ describe("setupPitchBlocks", () => {
 
             expect(singer.lastNotePlayed).toEqual(["G4", 4]);
             expect(singer.previousNotePlayed).toEqual(["F4", 4]);
+        });
+    });
+
+    describe("HertzBlock resets lastNoteTransposition and lastNoteScalarTransposition", () => {
+        let singer;
+        const block = () => createdBlocks["hertz"];
+
+        beforeEach(() => {
+            singer = turtles.ithTurtle(0).singer;
+            singer.lastNotePlayed = ["F#4", 4];
+            singer.lastNoteTransposition = 2;
+            singer.lastNoteScalarTransposition = 1;
+            singer.drumStyle = [];
+            global.frequencyToPitch.mockReturnValue(["A", 4, 0]);
+        });
+
+        afterEach(() => {
+            logo.inMatrix = false;
+            logo.inPitchDrumMatrix = false;
+            logo.inLegoWidget = false;
+            logo.inMusicKeyboard = false;
+            global.frequencyToPitch.mockReset();
+        });
+
+        it("resets transposition metadata in Phrase Maker (inMatrix)", () => {
+            logo.inMatrix = true;
+            logo.pitchBlocks = [];
+            block().flow([440], logo, 0, 10);
+
+            expect(singer.lastNotePlayed).toEqual(["A4", 4]);
+            expect(singer.lastNoteTransposition).toBe(0);
+            expect(singer.lastNoteScalarTransposition).toBe(0);
+        });
+
+        it("resets transposition metadata in Pitch-Drum Matrix (inPitchDrumMatrix)", () => {
+            logo.inPitchDrumMatrix = true;
+            logo.pitchDrumMatrix = {
+                rowLabels: [],
+                rowArgs: [],
+                drums: [],
+                addRowBlock: jest.fn(),
+                addColBlock: jest.fn()
+            };
+            logo.pitchBlocks = [];
+            block().flow([440], logo, 0, 10);
+
+            expect(singer.lastNotePlayed).toEqual(["A4", 4]);
+            expect(singer.lastNoteTransposition).toBe(0);
+            expect(singer.lastNoteScalarTransposition).toBe(0);
+        });
+
+        it("resets transposition metadata in LEGO Widget (inLegoWidget)", () => {
+            logo.inLegoWidget = true;
+            logo.pitchBlocks = [];
+            block().flow([440], logo, 0, 10);
+
+            expect(singer.lastNotePlayed).toEqual(["A4", 4]);
+            expect(singer.lastNoteTransposition).toBe(0);
+            expect(singer.lastNoteScalarTransposition).toBe(0);
+        });
+
+        it("resets transposition metadata in Music Keyboard (inMusicKeyboard)", () => {
+            logo.inMusicKeyboard = true;
+            logo.musicKeyboard = {
+                instruments: [],
+                noteNames: [],
+                octaves: [],
+                addRowBlock: jest.fn()
+            };
+            block().flow([440], logo, 0, 10);
+
+            expect(singer.lastNotePlayed).toEqual(["A4", 4]);
+            expect(singer.lastNoteTransposition).toBe(0);
+            expect(singer.lastNoteScalarTransposition).toBe(0);
         });
     });
 

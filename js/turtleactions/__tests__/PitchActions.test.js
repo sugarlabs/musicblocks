@@ -98,6 +98,8 @@ describe("Tests for Singer.PitchActions setup", () => {
             logo: {
                 inMatrix: false,
                 inMusicKeyboard: false,
+                inPitchDrumMatrix: false,
+                inArpeggio: false,
                 inLegoWidget: false,
                 inPitchSlider: false,
                 pitchBlocks: [],
@@ -129,6 +131,8 @@ describe("Tests for Singer.PitchActions setup", () => {
         };
         setupPitchActions(activity);
         Singer.processPitch.mockImplementation(() => {});
+        Singer.addScalarTransposition.mockReset();
+        Singer.addScalarTransposition.mockReturnValue(["C", 4]);
     });
 
     afterEach(() => {
@@ -146,6 +150,12 @@ describe("Tests for Singer.PitchActions setup", () => {
     });
 
     describe("Tests for stepPitch", () => {
+        afterEach(() => {
+            jest.restoreAllMocks();
+            activity.logo.inMusicKeyboard = false;
+            activity.logo.inArpeggio = false;
+        });
+
         test("non‑number value → error path", () => {
             Singer.PitchActions.stepPitch("foo", 0, blkId);
             expect(activity.logo.stopTurtle).toBe(true);
@@ -195,7 +205,6 @@ describe("Tests for Singer.PitchActions setup", () => {
             // getNote's 3rd argument is transposition_temp; only reached if the
             // inverted branch actually runs.
             expect(spy.mock.calls[0][2]).toBe(6);
-            spy.mockRestore();
         });
 
         // Regression coverage for #8189: closing a nested Invert block used to
@@ -370,7 +379,394 @@ describe("Tests for Singer.PitchActions setup", () => {
             const spy = jest.spyOn(global, "frequencyToPitch");
             Singer.PitchActions.stepPitch(2, 0, blkId);
             expect(spy).toHaveBeenCalledWith(440);
-            spy.mockRestore();
+        });
+
+        test("in the Arpeggio widget, steps from the row before instead of G4", () => {
+            activity.logo.inArpeggio = true;
+            turtle.singer.inNoteBlock = [];
+            turtle.singer.lastNotePlayed = ["E4", 4];
+            Singer.addScalarTransposition.mockClear();
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+            expect(Singer.addScalarTransposition).toHaveBeenCalledWith(activity.logo, 0, "E", 4, 1);
+        });
+
+        test("un-transposes semitone transposition before applying scalar step", () => {
+            turtle.singer.inNoteBlock = [1];
+            turtle.singer.transposition = -2;
+            turtle.singer.lastNotePlayed = ["F4", 4]; // e.g. G4 transposed by -2
+            const spyGetNote = jest.spyOn(global, "getNote").mockReturnValue(["G", 4]);
+            Singer.addScalarTransposition.mockReset();
+            Singer.addScalarTransposition.mockReturnValue(["C", 4]);
+            Singer.addScalarTransposition.mockReturnValue(["C", 4]);
+
+            Singer.PitchActions.stepPitch(2, 0, blkId);
+
+            // getNote should be called with -transposition = +2 to recover base pitch
+            expect(spyGetNote).toHaveBeenCalledWith(
+                "F",
+                4,
+                2,
+                turtle.singer.keySignature,
+                turtle.singer.movable,
+                null,
+                activity.errorMsg,
+                activity.logo.synth.inTemperament
+            );
+            // Singer.addScalarTransposition should be called with un-transposed note "G4"
+            expect(Singer.addScalarTransposition).toHaveBeenCalledWith(activity.logo, 0, "G", 4, 2);
+        });
+
+        test("un-transposes semitone transposition using real getNote and asserts resulting un-transposed pitch", () => {
+            turtle.singer.inNoteBlock = [1];
+            turtle.singer.transposition = 2;
+            turtle.singer.lastNoteTransposition = 2;
+            turtle.singer.lastNotePlayed = ["F#4", 4];
+            turtle.singer.keySignature = "C";
+
+            Singer.addScalarTransposition.mockReset();
+            Singer.addScalarTransposition.mockReturnValue(["C", 4]);
+            Singer.addScalarTransposition.mockImplementation((logo, tur, pitch, oct, val) => [
+                pitch,
+                oct
+            ]);
+
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+
+            // Real getNote un-transposes F#4 by -2 semitones to E4 in C major
+            expect(Singer.addScalarTransposition).toHaveBeenCalledWith(activity.logo, 0, "E", 4, 1);
+            expect(Singer.processPitch).toHaveBeenCalledWith(activity, "E", 4, 0, 0, blkId);
+        });
+
+        test("does not un-transpose when previous note was played outside transpose block", () => {
+            turtle.singer.inNoteBlock = [1];
+            turtle.singer.lastNotePlayed = ["C4", 4];
+            turtle.singer.lastNoteTransposition = 0; // played outside clamp
+            turtle.singer.transposition = 2; // currently inside transpose +2
+            turtle.singer.keySignature = "C";
+
+            Singer.addScalarTransposition.mockReset();
+            Singer.addScalarTransposition.mockReturnValue(["C", 4]);
+            Singer.addScalarTransposition.mockImplementation((logo, tur, pitch, oct, val) => {
+                if (pitch === "C" && oct === 4 && val === 1) return ["D", 4];
+                return [pitch, oct];
+            });
+
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+
+            // Must step from C4, NOT un-transposed to Bb3
+            expect(Singer.addScalarTransposition).toHaveBeenCalledWith(activity.logo, 0, "C", 4, 1);
+            expect(Singer.processPitch).toHaveBeenCalledWith(activity, "D", 4, 0, 0, blkId);
+        });
+
+        test("un-transposes when stepping outside transpose block after note was played inside", () => {
+            turtle.singer.inNoteBlock = [1];
+            turtle.singer.lastNotePlayed = ["E4", 4]; // D4 transposed by +2 inside clamp
+            turtle.singer.lastNoteTransposition = 2;
+            turtle.singer.transposition = 0; // exited clamp
+
+            const spyGetNote = jest.spyOn(global, "getNote").mockReturnValue(["D", 4]);
+            Singer.addScalarTransposition.mockReset();
+            Singer.addScalarTransposition.mockReturnValue(["C", 4]);
+            Singer.addScalarTransposition.mockReturnValue(["E", 4]);
+
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+
+            // Should un-transpose by -lastNoteTransposition (-2)
+            expect(spyGetNote).toHaveBeenCalledWith(
+                "E",
+                4,
+                -2,
+                turtle.singer.keySignature,
+                turtle.singer.movable,
+                null,
+                activity.errorMsg,
+                activity.logo.synth.inTemperament
+            );
+            expect(Singer.addScalarTransposition).toHaveBeenCalledWith(activity.logo, 0, "D", 4, 1);
+            expect(Singer.processPitch).toHaveBeenCalledWith(activity, "E", 4, 0, 0, blkId);
+        });
+
+        test("un-transposes scalarTransposition before applying scalar step", () => {
+            turtle.singer.inNoteBlock = [1];
+            turtle.singer.scalarTransposition = 2;
+            turtle.singer.lastNotePlayed = ["E4", 4]; // e.g. C4 scalar stepped by 2
+            Singer.addScalarTransposition.mockReset();
+            Singer.addScalarTransposition.mockReturnValue(["C", 4]);
+            Singer.addScalarTransposition
+                .mockReturnValueOnce(["C", 4]) // un-step by -2
+                .mockReturnValueOnce(["D", 4]); // step by 1
+
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+
+            // First call un-steps scalar transposition (-2)
+            expect(Singer.addScalarTransposition).toHaveBeenNthCalledWith(
+                1,
+                activity.logo,
+                0,
+                "E",
+                4,
+                -2
+            );
+            // Second call steps by value (1) from un-stepped note "C4"
+            expect(Singer.addScalarTransposition).toHaveBeenNthCalledWith(
+                2,
+                activity.logo,
+                0,
+                "C",
+                4,
+                1
+            );
+            expect(Singer.processPitch).toHaveBeenCalledWith(activity, "D", 4, 0, 0, blkId);
+        });
+
+        test("reverses both semitone and scalar transpositions when active together", () => {
+            turtle.singer.inNoteBlock = [1];
+            turtle.singer.transposition = 2;
+            turtle.singer.lastNoteTransposition = 2;
+            turtle.singer.scalarTransposition = 1;
+            turtle.singer.lastNoteScalarTransposition = 1;
+            turtle.singer.lastNotePlayed = ["F#4", 4];
+
+            const spyGetNote = jest.spyOn(global, "getNote").mockReturnValue(["E", 4]);
+            Singer.addScalarTransposition.mockReset();
+            Singer.addScalarTransposition.mockReturnValue(["C", 4]);
+            Singer.addScalarTransposition
+                .mockReturnValueOnce(["D", 4]) // un-step scalar by -1 from E4
+                .mockReturnValueOnce(["E", 4]); // step by 1 from D4
+
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+
+            expect(spyGetNote).toHaveBeenCalledWith(
+                "F#",
+                4,
+                -2,
+                turtle.singer.keySignature,
+                turtle.singer.movable,
+                null,
+                activity.errorMsg,
+                activity.logo.synth.inTemperament
+            );
+            expect(Singer.addScalarTransposition).toHaveBeenNthCalledWith(
+                1,
+                activity.logo,
+                0,
+                "E",
+                4,
+                -1
+            );
+            expect(Singer.addScalarTransposition).toHaveBeenNthCalledWith(
+                2,
+                activity.logo,
+                0,
+                "D",
+                4,
+                1
+            );
+            expect(Singer.processPitch).toHaveBeenCalledWith(activity, "E", 4, 0, 0, blkId);
+        });
+
+        test("un-transposes semitone transposition before un-inverting invertList", () => {
+            turtle.singer.inNoteBlock = [1];
+            turtle.singer.transposition = -2;
+            turtle.singer.invertList = [["C", 4, "even"]];
+            turtle.singer.lastNotePlayed = ["F4", 4];
+
+            const callOrder = [];
+            const spyGetNote = jest
+                .spyOn(global, "getNote")
+                .mockImplementation((pitch, oct, trans) => {
+                    callOrder.push({ fn: "getNote", trans });
+                    return [pitch, oct];
+                });
+            Singer.calculateInvert.mockImplementation(() => {
+                callOrder.push({ fn: "calculateInvert" });
+                return 2;
+            });
+            Singer.addScalarTransposition.mockReset();
+            Singer.addScalarTransposition.mockReturnValue(["C", 4]);
+
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+
+            // First getNote un-transposes -(-2) = 2
+            expect(callOrder[0]).toEqual({ fn: "getNote", trans: 2 });
+            // Then calculateInvert runs
+            expect(callOrder[1]).toEqual({ fn: "calculateInvert" });
+            // Then getNote un-inverts with 2 * delta = 4
+            expect(callOrder[2]).toEqual({ fn: "getNote", trans: 4 });
+        });
+
+        test("scalar un-transposition combines with invertList in correct order", () => {
+            turtle.singer.inNoteBlock = [1];
+            turtle.singer.transposition = 2;
+            turtle.singer.lastNoteTransposition = 2;
+            turtle.singer.invertList = [["C", 4, "even"]];
+            turtle.singer.scalarTransposition = 1;
+            turtle.singer.lastNoteScalarTransposition = 1;
+            turtle.singer.lastNotePlayed = ["F#4", 4];
+
+            const operations = [];
+            const spyGetNote = jest
+                .spyOn(global, "getNote")
+                .mockImplementation((pitch, oct, trans) => {
+                    operations.push({ op: "getNote", trans });
+                    return [pitch, oct];
+                });
+            Singer.calculateInvert.mockImplementation(() => {
+                operations.push({ op: "calculateInvert" });
+                return 1;
+            });
+            Singer.addScalarTransposition.mockReset();
+            Singer.addScalarTransposition.mockReturnValue(["C", 4]);
+            Singer.addScalarTransposition.mockImplementation((logo, tur, pitch, oct, val) => {
+                operations.push({ op: "addScalarTransposition", val });
+                return [pitch, oct];
+            });
+
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+
+            // Expected pipeline order:
+            // 1. getNote with -2 (un-transpose semitone)
+            // 2. calculateInvert & getNote with 2*delta = 2 (un-invert)
+            // 3. addScalarTransposition with -1 (un-step scalar)
+            // 4. addScalarTransposition with 1 (apply step value)
+            expect(operations).toEqual([
+                { op: "getNote", trans: -2 },
+                { op: "calculateInvert" },
+                { op: "getNote", trans: 2 },
+                { op: "addScalarTransposition", val: -1 },
+                { op: "addScalarTransposition", val: 1 }
+            ]);
+        });
+
+        test("un-transposes nonzero transposition when lastNotePlayed is a numeric frequency", () => {
+            turtle.singer.inNoteBlock = [1];
+            turtle.singer.transposition = 2;
+            turtle.singer.lastNoteTransposition = 2;
+            turtle.singer.lastNotePlayed = [440]; // 440 Hz -> A4
+
+            const spyGetNote = jest.spyOn(global, "getNote").mockReturnValue(["G", 4]);
+            Singer.addScalarTransposition.mockReset();
+            Singer.addScalarTransposition.mockReturnValue(["C", 4]);
+            Singer.addScalarTransposition.mockReturnValue(["C", 4]);
+            Singer.addScalarTransposition.mockReturnValue(["A", 4]);
+
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+
+            // frequencyToPitch(440) -> A4; un-transpose by -2
+            expect(spyGetNote).toHaveBeenCalledWith(
+                "A",
+                4,
+                -2,
+                turtle.singer.keySignature,
+                turtle.singer.movable,
+                null,
+                activity.errorMsg,
+                activity.logo.synth.inTemperament
+            );
+            expect(Singer.addScalarTransposition).toHaveBeenCalledWith(activity.logo, 0, "G", 4, 1);
+            expect(Singer.processPitch).toHaveBeenCalledWith(activity, "A", 4, 0, 0, blkId);
+        });
+
+        test("consecutive stepPitch calls under semitone transposition do not compound pitch drift", () => {
+            turtle.singer.inNoteBlock = [1];
+            turtle.singer.transposition = 2;
+            turtle.singer.keySignature = "C";
+
+            // Step 1: from initial C4 (played outside clamp, lastNoteTransposition = 0)
+            turtle.singer.lastNotePlayed = ["C4", 4];
+            turtle.singer.lastNoteTransposition = 0;
+
+            Singer.addScalarTransposition.mockReset();
+            Singer.addScalarTransposition.mockImplementation((logo, tur, pitch, oct, val) => {
+                const diatonicScale = ["C", "D", "E", "F", "G", "A", "B"];
+                const idx = diatonicScale.indexOf(pitch);
+                return [diatonicScale[(idx + val) % diatonicScale.length], oct];
+            });
+
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+            // Base note stepped from C4 -> D4 (not Bb3)
+            expect(Singer.processPitch).toHaveBeenLastCalledWith(activity, "D", 4, 0, 0, blkId);
+
+            // Step 2: note was played inside transpose 2 (sounds as E4 = D4 + 2 semitones)
+            turtle.singer.lastNotePlayed = ["E4", 4];
+            turtle.singer.lastNoteTransposition = 2;
+
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+            // E4 un-transposes by -2 to D4, then steps up 1 to E4
+            expect(Singer.processPitch).toHaveBeenLastCalledWith(activity, "E", 4, 0, 0, blkId);
+
+            // Step 3: note was played inside transpose 2 (sounds as F#4 = E4 + 2 semitones)
+            turtle.singer.lastNotePlayed = ["F#4", 4];
+            turtle.singer.lastNoteTransposition = 2;
+
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+            // F#4 un-transposes by -2 to E4, then steps up 1 to F4
+            expect(Singer.processPitch).toHaveBeenLastCalledWith(activity, "F", 4, 0, 0, blkId);
+
+            // Each step advanced by exactly 1 diatonic degree without compounding (+2, +4, +6)
+            expect(Singer.processPitch).toHaveBeenCalledTimes(3);
+        });
+
+        test("consecutive stepPitch calls under scalar transposition do not compound scalar steps", () => {
+            turtle.singer.inNoteBlock = [1];
+            turtle.singer.transposition = 0;
+            turtle.singer.scalarTransposition = 1;
+            turtle.singer.keySignature = "C";
+
+            // Step 1: from initial C4 (played outside clamp, lastNoteScalarTransposition = 0)
+            turtle.singer.lastNotePlayed = ["C4", 4];
+            turtle.singer.lastNoteScalarTransposition = 0;
+
+            Singer.addScalarTransposition.mockReset();
+            Singer.addScalarTransposition.mockImplementation((logo, tur, pitch, oct, val) => {
+                const diatonicScale = ["C", "D", "E", "F", "G", "A", "B"];
+                let idx = diatonicScale.indexOf(pitch);
+                let nextIdx = (idx + val) % diatonicScale.length;
+                if (nextIdx < 0) nextIdx += diatonicScale.length;
+                return [diatonicScale[nextIdx], oct];
+            });
+
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+            // Step 1 advances from C4 to D4
+            expect(Singer.processPitch).toHaveBeenLastCalledWith(activity, "D", 4, 0, 0, blkId);
+
+            // Step 2: note was played with scalarTransposition = 1 (sounds as E4 = D4 + 1 scalar step)
+            turtle.singer.lastNotePlayed = ["E4", 4];
+            turtle.singer.lastNoteScalarTransposition = 1;
+
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+            // E4 un-steps by -1 to D4, then steps by 1 to E4
+            expect(Singer.processPitch).toHaveBeenLastCalledWith(activity, "E", 4, 0, 0, blkId);
+
+            // Step 3: note was played with scalarTransposition = 1 (sounds as F4 = E4 + 1 scalar step)
+            turtle.singer.lastNotePlayed = ["F4", 4];
+            turtle.singer.lastNoteScalarTransposition = 1;
+
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+            // F4 un-steps by -1 to E4, then steps by 1 to F4
+            expect(Singer.processPitch).toHaveBeenLastCalledWith(activity, "F", 4, 0, 0, blkId);
+
+            expect(Singer.processPitch).toHaveBeenCalledTimes(3);
+        });
+
+        test("Music Keyboard with transposed lastNotePlayed steps from correct base pitch", () => {
+            activity.logo.inMusicKeyboard = true;
+            turtle.singer.transposition = 2;
+            turtle.singer.keySignature = "C";
+            // In C major: C4 transposed by +2 semitones was recorded as D4
+            turtle.singer.lastNotePlayed = ["D4", 4];
+            turtle.singer.lastNoteTransposition = 2;
+
+            Singer.addScalarTransposition.mockReset();
+            Singer.addScalarTransposition.mockImplementation((logo, tur, pitch, oct, val) => {
+                if (pitch === "C" && val === 1) return ["D", 4];
+                return [pitch, oct];
+            });
+
+            Singer.PitchActions.stepPitch(1, 0, blkId);
+
+            // D4 un-transposes by -2 back to C4, then steps by 1 to D4
+            expect(Singer.processPitch).toHaveBeenLastCalledWith(activity, "D", 4, 0, 0, blkId);
         });
     });
 

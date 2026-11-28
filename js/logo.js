@@ -303,6 +303,7 @@ class Logo {
         this.inSample = false;
         this.inReflectionMatrix = false;
         this.inArpeggio = false;
+        this.arpeggioTurtle = null;
         this.insideModeWidget = false;
         this.insideMeterWidget = false;
         this.insideTemperament = false;
@@ -1946,6 +1947,7 @@ class Logo {
         this.inReflectionMatrix = false;
         this.inOscilloscope = false;
         this.inArpeggio = false;
+        this.arpeggioTurtle = null;
         this.inRhythmRuler = false;
         this.inTempo = false;
         this.insideModeWidget = false;

@@ -1492,6 +1492,39 @@ describe("setupWidgetBlocks", () => {
             expect(logo.rhythmRuler.Rulers).toEqual([]);
         });
 
+        it("arpeggiomatrix sets logo.inArpeggio to true and listener resets it to false", () => {
+            let capturedListener;
+            logo.setTurtleListener = jest.fn((turtle, name, cb) => {
+                capturedListener = cb;
+            });
+            logo.setDispatchBlock = jest.fn();
+            logo.arpeggio = { defaultCols: 4, notesToPlay: [], init: jest.fn() };
+
+            const block = getBlock("arpeggiomatrix");
+            block.flow([4, "childBlk"], logo, 0, "arpBlk", [null, 0]);
+
+            expect(logo.inArpeggio).toBe(true);
+            expect(logo.arpeggioTurtle).toBe(0);
+            expect(capturedListener).toBeDefined();
+
+            capturedListener();
+            expect(logo.inArpeggio).toBe(false);
+            expect(logo.arpeggioTurtle).toBeNull();
+            expect(logo.arpeggio.init).toHaveBeenCalledWith(activity);
+        });
+
+        it("rejects overlapping arpeggiomatrix clamps to protect active collection state", () => {
+            logo.arpeggio = { defaultCols: 4, notesToPlay: ["existing"], init: jest.fn() };
+            logo.inArpeggio = true;
+            logo.arpeggioTurtle = 0;
+
+            const block = getBlock("arpeggiomatrix");
+            const result = block.flow([4, "childBlk"], logo, 1, "arpBlk2", [null, 0]);
+
+            expect(result).toEqual([null, 0]);
+            expect(logo.arpeggio.notesToPlay).toEqual(["existing"]);
+        });
+
         it.each([
             ["meterwidget", "meterBlk", "meterWidget", global.MeterWidget],
             ["oscilloscope", "oscBlk", "Oscilloscope", global.Oscilloscope],
