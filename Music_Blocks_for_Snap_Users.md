@@ -443,7 +443,7 @@ You can place multiple Pitch blocks within a note in order to play
 chords. You can also put graphics blocks inside of a Note block in
 order to sync your music with your drawing.
 
-![Music Blocks Multiple Piches](./images/snap/chord.png)
+![Music Blocks Multiple Pitches](./images/snap/chord.png)
 
 ![Music Blocks Graphics](./images/snap/graphics-in-note.png)
 

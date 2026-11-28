@@ -32,7 +32,7 @@ files are updated from this POT file.
 As per above, translators work with the PO files, either through the
 web interface or by making a pull request.
 
-The localization.ini file is compliled from the PO files. The INI file
+The localization.ini file is compiled from the PO files. The INI file
 is used by JavaScript to do the actual translation of the interface.
 
 There are instructions for adding a new language to the pull-down menu
