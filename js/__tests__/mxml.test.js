@@ -1126,6 +1126,79 @@ describe("saveMxmlOutput notation markers", () => {
         expect(harmonics).toEqual([false, true, false]);
     });
 
+    it("does not emit <notations> or <articulations> on plain notes and rests", () => {
+        const doc = parseScore(exportVoice([note("C4"), note("R")]));
+        expect(doc.getElementsByTagName("notations")).toHaveLength(0);
+        expect(doc.getElementsByTagName("articulations")).toHaveLength(0);
+    });
+
+    it("emits <articulations> with <accent/> only for accented notes, omitting it on rests", () => {
+        const doc = parseScore(
+            exportVoice([
+                note("C4"),
+                "begin articulation",
+                note("D4"),
+                note("R"),
+                "end articulation",
+                note("E4")
+            ])
+        );
+        const notes = notesOf(doc);
+        expect(notes[0].getElementsByTagName("articulations")).toHaveLength(0);
+        expect(notes[1].getElementsByTagName("accent")).toHaveLength(1);
+        expect(notes[2].getElementsByTagName("articulations")).toHaveLength(0);
+        expect(notes[3].getElementsByTagName("articulations")).toHaveLength(0);
+    });
+
+    it("emits <staccato> inside <articulations> for notes with staccato flag", () => {
+        const staccatoNote = [["C4"], 4, 0, null, null, false, true];
+        const plainNote = note("D4");
+        const doc = parseScore(exportVoice([staccatoNote, plainNote]));
+        const notes = notesOf(doc);
+        const staccato = notes[0].getElementsByTagName("staccato");
+        expect(staccato).toHaveLength(1);
+        expect(staccato[0].getAttribute("placement")).toBe("below");
+        expect(notes[1].getElementsByTagName("articulations")).toHaveLength(0);
+    });
+
+    it("emits both <accent/> and <staccato> within a single <articulations> container", () => {
+        const staccatoNote = [["C4"], 4, 0, null, null, false, true];
+        const doc = parseScore(
+            exportVoice(["begin articulation", staccatoNote, "end articulation"])
+        );
+        const notes = notesOf(doc);
+        expect(notes[0].getElementsByTagName("articulations")).toHaveLength(1);
+        expect(notes[0].getElementsByTagName("accent")).toHaveLength(1);
+        expect(notes[0].getElementsByTagName("staccato")).toHaveLength(1);
+    });
+
+    it("does not emit <articulations> for notes that only have technical harmonics", () => {
+        const doc = parseScore(exportVoice(["begin harmonics", note("C4"), "end harmonics"]));
+        const notes = notesOf(doc);
+        expect(notes[0].getElementsByTagName("technical")).toHaveLength(1);
+        expect(notes[0].getElementsByTagName("articulations")).toHaveLength(0);
+    });
+
+    it("correctly indents <note>, <notations>, and <articulations> hierarchy", () => {
+        const xml = exportVoice(["begin articulation", note("C4"), "end articulation"]);
+        const lines = xml.split("\n");
+        const noteLine = lines.find(l => l.includes("<note>"));
+        const notationsLine = lines.find(l => l.includes("<notations>"));
+        const articulationsLine = lines.find(l => l.includes("<articulations>"));
+        const accentLine = lines.find(l => l.includes("<accent/>"));
+        const closeArticulationsLine = lines.find(l => l.includes("</articulations>"));
+        const closeNotationsLine = lines.find(l => l.includes("</notations>"));
+        const closeNoteLine = lines.find(l => l.includes("</note>"));
+
+        expect(noteLine).toBe("            <note>");
+        expect(notationsLine).toBe("                <notations>");
+        expect(articulationsLine).toBe("                    <articulations>");
+        expect(accentLine).toBe("                        <accent/>");
+        expect(closeArticulationsLine).toBe("                    </articulations>");
+        expect(closeNotationsLine).toBe("                </notations>");
+        expect(closeNoteLine).toBe("            </note>");
+    });
+
     it("writes markup above and print text below the note they follow", () => {
         // Notation.doUpdateNotation stages a note's markup right after that note.
         const doc = parseScore(
