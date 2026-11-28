@@ -500,6 +500,12 @@ describe("Utility Logic Functions", () => {
             expect(rgbToHex(0, 0, 0)).toBe("#000000");
             expect(rgbToHex(255, 255, 255)).toBe("#ffffff");
         });
+        it("handles invalid and out-of-range RGB values", () => {
+            expect(rgbToHex(-1, 0, 0)).toBe("#000000");
+            expect(rgbToHex(300, 0, 0)).toBe("#ff0000");
+            expect(rgbToHex(255, 128, 12.7)).toBe("#ff800d");
+            expect(rgbToHex(255, 0, NaN)).toBe("#ff0000");
+        });
     });
 
     describe("hexToRGB()", () => {
