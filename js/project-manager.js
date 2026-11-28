@@ -719,6 +719,10 @@ class ProjectManager {
 
     _loadProject(projectID, flags) {
         const that = this.activity;
+        if (that.multisampleEditor) {
+            that.multisampleEditor.requestClose(() => this._loadProject(projectID, flags));
+            return;
+        }
 
         if (that.planet === undefined) {
             return;
@@ -890,6 +894,10 @@ class ProjectManager {
     }
 
     newProject() {
+        if (this.activity.multisampleEditor) {
+            this.activity.multisampleEditor.requestClose(() => this.newProject());
+            return;
+        }
         this._afterDelete();
     }
 
@@ -899,6 +907,10 @@ class ProjectManager {
 
     _doLoad(merge) {
         const that = this.activity;
+        if (!merge && that.multisampleEditor) {
+            that.multisampleEditor.requestClose(() => this._doLoad(merge));
+            return;
+        }
 
         that.toolbar.closeAuxToolbar((act, resize) => act._showHideAuxMenu(resize));
         if (merge === undefined) {
@@ -1175,6 +1187,7 @@ class ProjectManager {
 
         const data = this.prepareExport();
         const rejectOnProjectSaveError = options.rejectOnProjectSaveError === true;
+        const reportSaveErrors = options.reportSaveErrors ?? !activity.sessionStorageManager;
 
         if (activity.storage.currentProject === undefined) {
             try {
@@ -1182,7 +1195,15 @@ class ProjectManager {
                 activity.storage.allProjects = JSON.stringify(["My Project"]);
             } catch (e) {
                 ErrorHandler.recoverable(e, { operation: "saveLocally_setCurrentProject" });
+                if (reportSaveErrors) {
+                    activity.textMsg(
+                        _(
+                            "Could not write the local-storage session. Retry saving or export a Music Blocks project to keep your work."
+                        )
+                    );
+                }
                 if (rejectOnProjectSaveError) throw e;
+                return false;
             }
         }
 
@@ -1196,7 +1217,15 @@ class ProjectManager {
             // (IndexedDB) handles large payloads.
             console.warn("localStorage quota exceeded for SESSION. Relying on IndexedDB.", e);
             ErrorHandler.recoverable(e, { operation: "saveLocally_saveSession" });
+            if (reportSaveErrors) {
+                activity.textMsg(
+                    _(
+                        "Could not write the local-storage session. Retry saving or export a Music Blocks project to keep your work."
+                    )
+                );
+            }
             if (rejectOnProjectSaveError) throw e;
+            return false;
         }
 
         const img = new Image();
@@ -1447,6 +1476,19 @@ class ProjectManager {
                 throw new Error("The file does not contain a Music Blocks project.");
             }
 
+            if (that.multisampleEditor) {
+                finishLoading();
+                that.multisampleEditor.requestClose(() => {
+                    that.loading = true;
+                    document.body.style.cursor = "wait";
+                    that.doLoadAnimation();
+                    replaceProjectFromFile(obj, file, errorOperation, clearCanvas).catch(error => {
+                        ErrorHandler.capture(error, { operation: errorOperation });
+                        finishLoading();
+                    });
+                });
+                return;
+            }
             if (that.planet) {
                 try {
                     await that.planet.saveLocally({ rejectOnProjectSaveError: true });

@@ -65,6 +65,125 @@ describe("JSGenerate Class", () => {
         JSGenerate.generateFailed = false;
     });
 
+    test.each([
+        { type: "multisample", version: 1, name: "Strings $& $1 %s" },
+        { type: "multisample", version: 99, name: "Strings", extra: [1] },
+        null
+    ])("refuses an instrument stored in a box before generating any JavaScript: %p", value => {
+        const previousTranslate = global._;
+        global._ = text => text;
+        globalActivity.errorMsg = jest.fn();
+        JSGenerate.code = "previous output";
+        globalActivity.blocks.stackList = [0];
+        globalActivity.blocks.blockList = {
+            0: { name: "start", connections: [null, 1, null] },
+            1: {
+                name: "storein2",
+                privateData: "voice",
+                connections: [0, 2, null],
+                protoblock: { style: "flow", args: 1 }
+            },
+            2: { name: "multisample", value, protoblock: { style: "value", args: 0 } }
+        };
+        try {
+            expect(JSGenerate.run(false, false)).toBe(false);
+            expect(JSGenerate.generateFailed).toBe(true);
+            expect(JSGenerate.code).toBe("");
+            expect(astring.generate).not.toHaveBeenCalled();
+            expect(globalActivity.errorMsg).toHaveBeenCalledWith(
+                expect.stringMatching(/instrument.*Music Blocks project/)
+            );
+            if (value)
+                expect(globalActivity.errorMsg).toHaveBeenCalledWith(
+                    expect.stringContaining(value.name)
+                );
+        } finally {
+            global._ = previousTranslate;
+            globalActivity.blocks.stackList = [];
+            globalActivity.blocks.blockList = {};
+        }
+    });
+
+    test("translates the complete export refusal and preserves literal name placeholders", () => {
+        const previousTranslate = global._;
+        const message =
+            "JavaScript export does not support multisample instrument “%s” yet. Export the Music Blocks project instead.";
+        global._ = jest.fn(text =>
+            text === message ? "Export a Music Blocks project instead: %s is unsupported." : text
+        );
+        globalActivity.errorMsg = jest.fn();
+        globalActivity.blocks.stackList = [0];
+        globalActivity.blocks.blockList = {
+            0: { name: "start", connections: [null, 1, null] },
+            1: {
+                name: "settimbre",
+                connections: [0, 2, null, null],
+                protoblock: { style: "flow", args: 1 }
+            },
+            2: {
+                name: "multisample",
+                value: { name: "Strings $& $1 %s" },
+                protoblock: { style: "value", args: 0 }
+            }
+        };
+        try {
+            expect(JSGenerate.run(false, false)).toBe(false);
+            expect(global._).toHaveBeenCalledWith(message);
+            expect(globalActivity.errorMsg).toHaveBeenCalledWith(
+                "Export a Music Blocks project instead: Strings $& $1 %s is unsupported."
+            );
+        } finally {
+            global._ = previousTranslate;
+        }
+    });
+
+    test("unrelated and trashed values do not prevent ordinary JavaScript generation", () => {
+        globalActivity.blocks.stackList = [0, 3];
+        globalActivity.blocks.blockList = {
+            0: { name: "start", connections: [null, null, null] },
+            1: { name: "multisample", value: { type: "multisample", name: "Unused" } },
+            2: { name: "multisample", trash: true, value: { type: "multisample" } },
+            3: { name: "start", trash: true, connections: [null, 2, null] }
+        };
+        astring.generate.mockReturnValue("ordinary JavaScript");
+        try {
+            JSGenerate.run(false, false);
+            expect(JSGenerate.generateFailed).toBe(false);
+            expect(JSGenerate.code).toBe("ordinary JavaScript");
+        } finally {
+            globalActivity.blocks.stackList = [];
+            globalActivity.blocks.blockList = {};
+        }
+    });
+
+    test("exports a box expression despite an obsolete cached multisample result", () => {
+        globalActivity.blocks.stackList = [0];
+        globalActivity.blocks.blockList = {
+            0: { name: "start", connections: [null, 1, null] },
+            1: {
+                name: "settimbre",
+                connections: [0, 2, null, null],
+                protoblock: { style: "clamp", args: 2 }
+            },
+            2: {
+                name: "namedbox",
+                privateData: "voice",
+                value: { type: "multisample", name: "Old cached result" },
+                protoblock: { style: "value", args: 0 }
+            }
+        };
+        astring.generate.mockReturnValue("ordinary box program");
+        try {
+            JSGenerate.run(false, false);
+            expect(JSGenerate.generateFailed).toBe(false);
+            expect(JSGenerate.startTrees[0][0][1]).toEqual(["box_voice"]);
+            expect(JSGenerate.code).toBe("ordinary box program");
+        } finally {
+            globalActivity.blocks.stackList = [];
+            globalActivity.blocks.blockList = {};
+        }
+    });
+
     test("should generate correct AST structure", () => {
         JSGenerate.actionTrees = [[["action", null, null]]];
         JSGenerate.actionNames = ["action1"];
