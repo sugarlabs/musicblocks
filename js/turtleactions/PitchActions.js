@@ -648,7 +648,13 @@ function setupPitchActions(activity) {
          * @param {Number} turtle - Turtle index in turtles.turtleList
          */
         static setRegister(value, turtle) {
-            if (!Number.isFinite(value)) return;
+            // A finite value can still overflow at playback: the register
+            // is multiplied by the octave interval (12 in equal
+            // temperament), so e.g. 1e308 * 12 is Infinity, which then
+            // poisons every following note. Ignore magnitudes beyond
+            // 1000 octaves — far outside any audible range, and small
+            // enough that the resulting frequency stays finite.
+            if (!Number.isFinite(value) || Math.abs(value) > 1000) return;
             activity.turtles.ithTurtle(turtle).singer.register = Math.floor(value);
         }
 
