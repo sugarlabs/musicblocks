@@ -611,19 +611,21 @@ class Singer {
                               temperament,
                               modeEdo
                           );
-                // getStepSizeUp returns EDO-step counts off 12-EDO; normalize to
-                // a semitone offset (isAlreadyEdoSteps=false) so getNote remaps it.
-                const stepSemis = (stepCount * 12) / modeEdo;
+                // getStepSizeUp counts steps of modeEdo. When that is the temperament's own
+                // pitch count, move by those steps of its table directly. Going through
+                // semitones (stepCount * 12 / modeEdo) only came back to the same steps
+                // because getNote rounded the fraction into a step.
+                const inTableSteps = modeEdo === edo;
                 noteObj = getNote(
                     noteObj[0],
                     noteObj[1],
-                    stepSemis,
+                    inTableSteps ? stepCount : (stepCount * 12) / modeEdo,
                     tur.singer.keySignature,
                     tur.singer.movable,
                     null,
                     activity.errorMsg,
                     temperament,
-                    false, // isAlreadyEdoSteps — stepSemis is a raw semitone offset
+                    inTableSteps, // isAlreadyEdoSteps
                     false // allow octave wrap
                 );
             }

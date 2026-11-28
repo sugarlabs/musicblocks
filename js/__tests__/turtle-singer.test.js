@@ -3260,10 +3260,9 @@ describe("addScalarTransposition on non-EDO temperaments", () => {
         // normalization getNote call.
         const loopCalls = getNote.mock.calls.slice(1);
         expect(loopCalls).toHaveLength(3);
-        // Every application passes the measured semitone distance as a RAW offset,
-        // not pre-scaled EDO steps. In getNote's signature, isAlreadyEdoSteps is
-        // the 9th positional argument (index 8).
-        expect(loopCalls.every(c => c[8] === false)).toBe(true);
+        // The mode is counted in the temperament's own pitches, so every application
+        // moves by those steps of its table (isAlreadyEdoSteps, getNote's 9th argument).
+        expect(loopCalls.every(c => c[2] === 2 && c[8] === true)).toBe(true);
         expect(loopCalls.every(c => c[9] === false)).toBe(true);
     });
 });
