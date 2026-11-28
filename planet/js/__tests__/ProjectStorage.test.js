@@ -824,6 +824,272 @@ describe("ProjectStorage", () => {
         });
     });
 
+    describe("Regression Tests: BUG-10 Thumbnail Identity, Ownership and Preservation (Tests 1 - 11)", () => {
+        beforeEach(() => {
+            storage.data = {
+                CurrentProject: "projA",
+                Projects: {
+                    projA: {
+                        ProjectName: "Project A",
+                        ProjectData: "data-A",
+                        ProjectImage: "thumbnail-A",
+                        PublishedData: null,
+                        DateLastModified: 1000
+                    },
+                    projB: {
+                        ProjectName: "Project B",
+                        ProjectData: "data-B",
+                        ProjectImage: "thumbnail-B",
+                        PublishedData: null,
+                        DateLastModified: 2000
+                    }
+                },
+                LikedProjects: {},
+                ReportedProjects: {},
+                DefaultCreatorName: "anonymous"
+            };
+        });
+
+        // Test 1 — Preserve thumbnail when image is undefined
+        it("Test 1 — Preserve thumbnail when image is undefined: existing thumbnail + saveLocally(data, undefined, projectId) must preserve the thumbnail", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+
+            // Explicit target with undefined image
+            await storage.saveLocally("updated-data-A", undefined, "projA");
+            expect(storage.data.Projects["projA"].ProjectData).toBe("updated-data-A");
+            expect(storage.data.Projects["projA"].ProjectImage).toBe("thumbnail-A");
+
+            // CurrentProject save with undefined image
+            storage.data.CurrentProject = "projA";
+            await storage.saveLocally("another-update-A", undefined);
+            expect(storage.data.Projects["projA"].ProjectData).toBe("another-update-A");
+            expect(storage.data.Projects["projA"].ProjectImage).toBe("thumbnail-A");
+        });
+
+        // Test 2 — Missing SVG
+        it("Test 2 — Missing SVG: saveLocally with missing image data preserves existing thumbnail instead of erasing it", async () => {
+            const saveSpy = jest.spyOn(storage, "save").mockResolvedValue();
+
+            // When no new SVG/image is available during auto-save or workspace edit
+            await storage.saveLocally("new-blocks-no-art", undefined, "projA");
+            expect(storage.data.Projects["projA"].ProjectImage).toBe("thumbnail-A");
+
+            await storage.saveThumbnail(undefined, "projA");
+            expect(storage.data.Projects["projA"].ProjectImage).toBe("thumbnail-A");
+
+            // Empty string or whitespace preserves existing thumbnail without saving
+            await storage.saveLocally("new-blocks-empty-thumb", "", "projA");
+            expect(storage.data.Projects["projA"].ProjectImage).toBe("thumbnail-A");
+
+            saveSpy.mockClear();
+            await storage.saveThumbnail("", "projA");
+            expect(storage.data.Projects["projA"].ProjectImage).toBe("thumbnail-A");
+            expect(saveSpy).not.toHaveBeenCalled();
+
+            await storage.saveThumbnail("   ", "projA");
+            expect(storage.data.Projects["projA"].ProjectImage).toBe("thumbnail-A");
+            expect(saveSpy).not.toHaveBeenCalled();
+        });
+
+        // Test 3 — Valid thumbnail replacement
+        it("Test 3 — Valid thumbnail replacement: a valid newly generated thumbnail replaces the previous thumbnail", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+
+            await storage.saveThumbnail("new-thumbnail-A", "projA");
+            expect(storage.data.Projects["projA"].ProjectImage).toBe("new-thumbnail-A");
+            expect(storage.data.Projects["projA"].ProjectData).toBe("data-A");
+            expect(storage.data.Projects["projB"].ProjectImage).toBe("thumbnail-B");
+
+            await storage.saveLocally("data-A-v2", "replacement-thumb-A", "projA");
+            expect(storage.data.Projects["projA"].ProjectData).toBe("data-A-v2");
+            expect(storage.data.Projects["projA"].ProjectImage).toBe("replacement-thumb-A");
+            expect(storage.data.Projects["projB"].ProjectImage).toBe("thumbnail-B");
+        });
+
+        // Test 4 — Explicit clearing
+        it("Test 4 — Explicit clearing: intentional clearing via null works without making missing-image saves destructive", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+
+            // undefined must preserve thumbnail
+            await storage.saveLocally("data-preserved", undefined, "projA");
+            expect(storage.data.Projects["projA"].ProjectImage).toBe("thumbnail-A");
+
+            // explicit null must clear thumbnail
+            await storage.saveLocally("data-cleared", null, "projA");
+            expect(storage.data.Projects["projA"].ProjectImage).toBeNull();
+
+            // explicit null via saveThumbnail must clear thumbnail
+            await storage.saveThumbnail(null, "projB");
+            expect(storage.data.Projects["projB"].ProjectImage).toBeNull();
+
+            // explicit null without explicit projectId clears CurrentProject thumbnail
+            storage.data.CurrentProject = "projA";
+            storage.data.Projects["projA"].ProjectImage = "persisted-thumb";
+            await storage.saveLocally("data-cleared-current", null);
+            expect(storage.data.Projects["projA"].ProjectImage).toBeNull();
+        });
+
+        // Test 5 — Two-project isolation
+        it("Test 5 — Two-project isolation: create projects A and B with different thumbnails; edit and save A; verify B remains unchanged", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+
+            await storage.saveLocally("modified-data-A", "modified-thumb-A", "projA");
+
+            expect(storage.data.Projects["projA"].ProjectData).toBe("modified-data-A");
+            expect(storage.data.Projects["projA"].ProjectImage).toBe("modified-thumb-A");
+            expect(storage.data.Projects["projB"].ProjectData).toBe("data-B");
+            expect(storage.data.Projects["projB"].ProjectImage).toBe("thumbnail-B");
+        });
+
+        // Test 6 — Project switch during pending thumbnail generation
+        it("Test 6 — Project switch during pending thumbnail generation: start save for A, switch current project to B, resolve A; verify A is updated and B untouched", async () => {
+            let resolveStorageSave;
+            jest.spyOn(storage, "save").mockImplementation(
+                () =>
+                    new Promise(resolve => {
+                        resolveStorageSave = resolve;
+                    })
+            );
+
+            // Start saving Project A
+            const savePromise = storage.saveLocally("async-data-A", "async-thumb-A", "projA");
+
+            // User switches to Project B before async save finishes
+            storage.data.CurrentProject = "projB";
+
+            // Complete save operation
+            resolveStorageSave();
+            await savePromise;
+
+            // Verify Project A received updates and Project B was completely untouched
+            expect(storage.data.Projects["projA"].ProjectData).toBe("async-data-A");
+            expect(storage.data.Projects["projA"].ProjectImage).toBe("async-thumb-A");
+            expect(storage.data.Projects["projB"].ProjectData).toBe("data-B");
+            expect(storage.data.Projects["projB"].ProjectImage).toBe("thumbnail-B");
+            expect(storage.data.CurrentProject).toBe("projB");
+        });
+
+        // Test 7 — Sequential thumbnail operations with reverse settlement
+        it("Test 7 — Sequential thumbnail operations: start two thumbnail operations on projA; verify in-memory update order and that latest thumbnail is preserved even under reverse persistence settlement", async () => {
+            const saveOrder = [];
+            let resolveSave1, resolveSave2;
+            const save1Promise = new Promise(resolve => {
+                resolveSave1 = resolve;
+            });
+            const save2Promise = new Promise(resolve => {
+                resolveSave2 = resolve;
+            });
+
+            let saveCount = 0;
+            jest.spyOn(storage, "save").mockImplementation(() => {
+                saveCount++;
+                saveOrder.push(storage.data.Projects["projA"].ProjectImage);
+                if (saveCount === 1) return save1Promise;
+                return save2Promise;
+            });
+
+            // Start Op 1 (early thumbnail) and Op 2 (late thumbnail) sequentially
+            const op1 = storage.saveThumbnail("thumb-early", "projA");
+            const op2 = storage.saveThumbnail("thumb-late", "projA");
+
+            // Deliberately resolve the second persistence promise before the first
+            resolveSave2();
+            await op2;
+            resolveSave1();
+            await op1;
+
+            // In-memory data updates occurred in invocation order
+            expect(saveOrder).toEqual(["thumb-early", "thumb-late"]);
+            // Invariant: latest thumbnail remains persisted without getting clobbered
+            expect(storage.data.Projects["projA"].ProjectImage).toBe("thumb-late");
+            expect(storage.data.Projects["projB"].ProjectImage).toBe("thumbnail-B");
+        });
+
+        // Test 8 — Reload persistence
+        it("Test 8 — Reload persistence: save both projects, reload/restore storage layer, and verify both project-thumbnail associations remain correct", async () => {
+            // Persist the two projects
+            await storage.save();
+
+            // Verify storage has written to mockLocalforage
+            const rawStored = mockLocalforage._store[storage.LocalStorageKey];
+            expect(rawStored).toBeDefined();
+
+            // Create a completely new ProjectStorage instance and restore/initialize it
+            const reloadedStorage = new ProjectStorage(storage.Planet);
+            reloadedStorage.LocalStorage = mockLocalforage;
+            await reloadedStorage.restore();
+            await reloadedStorage.initialiseStorage();
+
+            // Verify both project associations are intact after storage reload
+            expect(reloadedStorage.data.Projects["projA"].ProjectName).toBe("Project A");
+            expect(reloadedStorage.data.Projects["projA"].ProjectImage).toBe("thumbnail-A");
+            expect(reloadedStorage.data.Projects["projB"].ProjectName).toBe("Project B");
+            expect(reloadedStorage.data.Projects["projB"].ProjectImage).toBe("thumbnail-B");
+        });
+
+        // Test 9 — Repeated editing
+        it("Test 9 — Repeated editing: edit and save the same project multiple times; verify thumbnail remains stable unless intentionally replaced", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+
+            // Multiple edits without generating new artwork
+            await storage.saveLocally("edit-v1", undefined, "projA");
+            expect(storage.data.Projects["projA"].ProjectImage).toBe("thumbnail-A");
+
+            await storage.saveLocally("edit-v2", undefined, "projA");
+            expect(storage.data.Projects["projA"].ProjectImage).toBe("thumbnail-A");
+
+            await storage.saveLocally("edit-v3", undefined, "projA");
+            expect(storage.data.Projects["projA"].ProjectImage).toBe("thumbnail-A");
+
+            // Valid replacement
+            await storage.saveLocally("edit-v4", "new-thumb-A", "projA");
+            expect(storage.data.Projects["projA"].ProjectImage).toBe("new-thumb-A");
+
+            // Subsequent edit preserves the new thumbnail
+            await storage.saveLocally("edit-v5", undefined, "projA");
+            expect(storage.data.Projects["projA"].ProjectImage).toBe("new-thumb-A");
+        });
+
+        // Test 10 — Deleted project
+        it("Test 10 — Deleted project: delete project while thumbnail operation is pending; verify callback cannot recreate deleted project", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+
+            // Delete project A
+            delete storage.data.Projects["projA"];
+
+            // Delayed thumbnail callback arrives targeting deleted project A
+            await storage.saveThumbnail("stale-thumb-A", "projA");
+            await storage.saveLocally("stale-data-A", "stale-thumb-A", "projA");
+
+            // Project A must NOT be recreated
+            expect(storage.data.Projects["projA"]).toBeUndefined();
+            expect(storage.data.Projects["projB"].ProjectImage).toBe("thumbnail-B");
+        });
+
+        // Test 11 — Same workspace content
+        it("Test 11 — Same workspace content: two projects with identical workspace content retain independent thumbnail identities", async () => {
+            jest.spyOn(storage, "save").mockResolvedValue();
+
+            const sharedWorkspaceContent = JSON.stringify({ blocks: ["do", "note", "440"] });
+
+            // Both projects have identical block data
+            storage.data.Projects["projA"].ProjectData = sharedWorkspaceContent;
+            storage.data.Projects["projB"].ProjectData = sharedWorkspaceContent;
+
+            // Save project A
+            await storage.saveLocally(sharedWorkspaceContent, undefined, "projA");
+
+            // Verify project identities and thumbnails remain completely independent
+            expect(storage.data.Projects["projA"].ProjectImage).toBe("thumbnail-A");
+            expect(storage.data.Projects["projB"].ProjectImage).toBe("thumbnail-B");
+
+            // Update thumbnail for project B only
+            await storage.saveThumbnail("custom-turtle-B", "projB");
+            expect(storage.data.Projects["projA"].ProjectImage).toBe("thumbnail-A");
+            expect(storage.data.Projects["projB"].ProjectImage).toBe("custom-turtle-B");
+        });
+    });
+
     describe("project CRUD operations", () => {
         beforeEach(() => {
             storage.data = {
