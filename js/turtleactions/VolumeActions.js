@@ -76,6 +76,27 @@ function setupVolumeActions(activity) {
         return null;
     };
 
+    const getUniqueListenerName = (tur, baseName) => {
+        let name = baseName;
+        if (tur && tur.listeners) {
+            let suffix = 1;
+            while (name in tur.listeners) {
+                name = baseName + "_" + suffix++;
+            }
+        }
+        return name;
+    };
+
+    const cleanupTurtleListener = (tur, listenerName, listener) => {
+        if (activity.logo?.stage && typeof activity.logo.stage.removeEventListener === "function") {
+            activity.logo.stage.removeEventListener(listenerName, listener, false);
+        }
+
+        if (tur?.listeners && tur.listeners[listenerName] === listener) {
+            delete tur.listeners[listenerName];
+        }
+    };
+
     Singer.VolumeActions = class {
         /**
          * Increases/decreases the volume of the contained notes by a specified amount for every note played.
@@ -106,7 +127,8 @@ function setupVolumeActions(activity) {
 
             tur.singer.inCrescendo.push(true);
 
-            const listenerName = "_crescendo_" + turtle + "_" + blk;
+            const baseListenerName = "_crescendo_" + turtle + "_" + blk;
+            const listenerName = getUniqueListenerName(tur, baseListenerName);
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -114,7 +136,12 @@ function setupVolumeActions(activity) {
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
+            let cleanedUp = false;
             const __listener = () => {
+                if (cleanedUp) return;
+                cleanedUp = true;
+                cleanupTurtleListener(tur, listenerName, __listener);
+
                 if (tur.singer.justCounting.length === 0) {
                     activity.logo.notation.notationEndCrescendo(
                         turtle,
@@ -180,7 +207,8 @@ function setupVolumeActions(activity) {
                 activity.logo.notation.notationBeginArticulation(turtle);
             }
 
-            const listenerName = "_articulation_" + turtle + "_" + blk;
+            const baseListenerName = "_articulation_" + turtle + "_" + blk;
+            const listenerName = getUniqueListenerName(tur, baseListenerName);
             if (blk !== undefined && blk in activity.blocks.blockList) {
                 activity.logo.setDispatchBlock(blk, turtle, listenerName);
             } else if (typeof MusicBlocks !== "undefined" && MusicBlocks.isRun) {
@@ -188,7 +216,12 @@ function setupVolumeActions(activity) {
                 if (mouse !== null) mouse.MB.listeners.push(listenerName);
             }
 
+            let cleanedUp = false;
             const __listener = () => {
+                if (cleanedUp) return;
+                cleanedUp = true;
+                cleanupTurtleListener(tur, listenerName, __listener);
+
                 for (const synth of synthList) {
                     tur.singer.synthVolume[synth].pop();
                     Singer.setSynthVolume(
