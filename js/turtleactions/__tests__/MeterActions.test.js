@@ -234,6 +234,70 @@ describe("setupMeterActions", () => {
             expect(targetTurtle.singer.bpm).toContain(expected);
         });
 
+        test("rounds floating-point precision leakage in lower bound error message", () => {
+            rationalToFraction.mockReturnValueOnce([3, 11]);
+            activity.errorMsg.mockClear();
+            Singer.MeterActions.setBPM(10, 3 / 11, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "3/11 beats per minute must be greater than 27.5",
+                1
+            );
+        });
+
+        test("rounds floating-point precision leakage in upper bound error message", () => {
+            rationalToFraction.mockReturnValueOnce([3, 10]);
+            activity.errorMsg.mockClear();
+            Singer.MeterActions.setBPM(5000, 0.3, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "maximum 3/10 beats per minute is 833.33",
+                1
+            );
+        });
+
+        test("formats fractional thresholds correctly for 1/3 and 2/3 beat values", () => {
+            rationalToFraction.mockReturnValueOnce([1, 3]);
+            activity.errorMsg.mockClear();
+            Singer.MeterActions.setBPM(20, 1 / 3, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "1/3 beats per minute must be greater than 22.5",
+                1
+            );
+
+            rationalToFraction.mockReturnValueOnce([1, 3]);
+            activity.errorMsg.mockClear();
+            Singer.MeterActions.setBPM(800, 1 / 3, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "maximum 1/3 beats per minute is 750",
+                1
+            );
+
+            rationalToFraction.mockReturnValueOnce([2, 3]);
+            activity.errorMsg.mockClear();
+            Singer.MeterActions.setBPM(10, 2 / 3, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "2/3 beats per minute must be greater than 11.25",
+                1
+            );
+
+            rationalToFraction.mockReturnValueOnce([2, 3]);
+            activity.errorMsg.mockClear();
+            Singer.MeterActions.setBPM(400, 2 / 3, 0, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "maximum 2/3 beats per minute is 375",
+                1
+            );
+        });
+
+        test("does not trigger errors at exact min and max boundaries for fractional beats", () => {
+            activity.errorMsg.mockClear();
+            Singer.MeterActions.setBPM(22.5, 1 / 3, 0, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+
+            activity.errorMsg.mockClear();
+            Singer.MeterActions.setBPM(750, 1 / 3, 0, 1);
+            expect(activity.errorMsg).not.toHaveBeenCalled();
+        });
+
         test.each([
             [5000, 0.25, 1000],
             [10, 0.25, 30],
@@ -301,6 +365,26 @@ describe("setupMeterActions", () => {
             }
             expect(Singer.masterBPM).toBe(expected);
             if (!errors.length) expect(Singer.defaultBPMFactor).toBe(TONEBPM / expected);
+        });
+
+        test("rounds floating-point precision leakage in master BPM lower bound error message", () => {
+            rationalToFraction.mockReturnValueOnce([3, 11]);
+            activity.errorMsg.mockClear();
+            Singer.MeterActions.setMasterBPM(10, 3 / 11, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "3/11 beats per minute must be greater than 27.5",
+                1
+            );
+        });
+
+        test("rounds floating-point precision leakage in master BPM upper bound error message", () => {
+            rationalToFraction.mockReturnValueOnce([3, 10]);
+            activity.errorMsg.mockClear();
+            Singer.MeterActions.setMasterBPM(5000, 0.3, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "maximum 3/10 beats per minute is 833.33",
+                1
+            );
         });
 
         test.each([
