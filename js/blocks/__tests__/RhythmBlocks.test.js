@@ -369,6 +369,23 @@ describe("RhythmBlocks", () => {
     });
 
     describe("NewSwing2Block", () => {
+        test("handles zero swing value", () => {
+            const block = getBlock("newswing2");
+            block.flow([0, 1 / 8, true], logo, 0, 10);
+
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Swing value must be greater than 0.",
+                10
+            );
+            expect(activity.errorMsg).not.toHaveBeenCalledWith(global.NOINPUTERRORMSG, 10);
+            expect(global.global.Singer.RhythmActions.addSwing).toHaveBeenCalledWith(
+                1 / 24,
+                1 / 8,
+                0,
+                10
+            );
+        });
+
         test("calls addSwing with valid arguments", () => {
             const block = getBlock("newswing2");
             block.flow([1 / 24, 1 / 8, true], logo, 0, 10);
@@ -398,7 +415,11 @@ describe("RhythmBlocks", () => {
             const block = getBlock("newswing2");
             block.flow([1 / 24, 0, true], logo, 0, 10);
 
-            expect(activity.errorMsg).toHaveBeenCalledWith(global.NOINPUTERRORMSG, 10);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Note value must be greater than 0.",
+                10
+            );
+            expect(activity.errorMsg).not.toHaveBeenCalledWith(global.NOINPUTERRORMSG, 10);
             expect(global.global.Singer.RhythmActions.addSwing).toHaveBeenCalledWith(
                 1 / 24,
                 1 / 8,
