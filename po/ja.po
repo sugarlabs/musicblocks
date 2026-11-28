@@ -774,7 +774,7 @@ msgstr ""
 
 #: js/toolbar-ui.js:253
 msgid "Mark this moment"
-msgstr ""
+msgstr "この時点を保存"
 
 #: js/toolbar-ui.js:254
 msgid "Time travel"
@@ -2341,124 +2341,124 @@ msgstr "ブロックがゴミ箱に送られる"
 
 #: js/gitDropdown.js:875
 msgid "Saved moment"
-msgstr ""
+msgstr "保存した時点"
 
 #: js/gitDropdown.js:893
 msgid "You're offline. Connect to the network to view commits for this project."
-msgstr ""
+msgstr "オフラインです。コミットを見るにはネットワークに接続してください"
 
 #: js/gitDropdown.js:894
 msgid "Network Connection Required"
-msgstr ""
+msgstr "ネットワーク接続が必要です"
 
 #: js/gitDropdown.js:907
 msgid "No moments marked yet. Click \"Mark this moment\" to save your first one!"
-msgstr ""
+msgstr "まだ時点が保存されていません。「この時点を保存」をクリックして、最初の記録を作りましょう"
 
 #: js/gitDropdown.js:908
 msgid "No Saved Moments Yet"
-msgstr ""
+msgstr "まだ保存した時点がありません"
 
 #: js/gitDropdown.js:939
 #: js/gitDropdown.js:969
 msgid "Time Travel"
-msgstr ""
+msgstr "タイムトラベル"
 
 #: js/gitDropdown.js:972
 msgid "Every save, forever yours"
-msgstr ""
+msgstr "保存したものは、ずっとあなたのもの"
 
 #: js/gitDropdown.js:1091
 #: js/gitDropdown.js:1196
 msgid "YOU ARE HERE"
-msgstr ""
+msgstr "いまここ"
 
 #: js/gitDropdown.js:1118
 msgid "Sync Pending"
-msgstr ""
+msgstr "同期待ち"
 
 #: js/gitDropdown.js:1124
 msgid "Latest"
-msgstr ""
+msgstr "最新"
 
 #: js/gitDropdown.js:1137
 #: js/gitDropdown.js:1232
 msgid "Undo my changes"
-msgstr ""
+msgstr "変更をもとに戻す"
 
 #: js/gitDropdown.js:1147
 #: js/gitDropdown.js:1242
 msgid "Go back to this version"
-msgstr ""
+msgstr "このバージョンに戻る"
 
 #: js/gitDropdown.js:1210
 msgid "The very beginning"
-msgstr ""
+msgstr "一番はじめ"
 
 #: js/gitDropdown.js:1214
 msgid "Where your project started"
-msgstr ""
+msgstr "プロジェクトが始まったところ"
 
 #: js/gitDropdown.js:1221
 msgid "Setting Up Tracking"
-msgstr ""
+msgstr "記録の準備中"
 
 #: js/gitDropdown.js:1235
 #: js/gitDropdown.js:1245
 msgid "Start point"
-msgstr ""
+msgstr "スタート地点"
 
 #: js/gitDropdown.js:1269
 msgid "no more offline commits can be made"
-msgstr ""
+msgstr "オフラインでは、もうコミットできません"
 
 #: js/gitDropdown.js:1271
 msgid "1 more commit can be made"
-msgstr ""
+msgstr "あと1回コミットできます"
 
 #: js/gitDropdown.js:1272
 msgid "%s more commits can be made"
-msgstr ""
+msgstr "あと%s回コミットできます"
 
 #: js/gitDropdown.js:1284
 msgid "Showing locally saved drafts"
-msgstr ""
+msgstr "ローカルに保存した下書きを表示しています"
 
 #: js/gitDropdown.js:1783
 msgid "Just now"
-msgstr ""
+msgstr "たったいま"
 
 #: js/gitDropdown.js:1784
 msgid "1 minute ago"
-msgstr ""
+msgstr "1分前"
 
 #: js/gitDropdown.js:1784
 msgid "%s minutes ago"
-msgstr ""
+msgstr "%s分前"
 
 #: js/gitDropdown.js:1786
 msgid "1 hour ago"
-msgstr ""
+msgstr "1時間前"
 
 #: js/gitDropdown.js:1786
 msgid "%s hours ago"
-msgstr ""
+msgstr "%s時間前"
 
 #: js/gitDropdown.js:1788
 msgid "1 day ago"
-msgstr ""
+msgstr "1日前"
 
 #: js/gitDropdown.js:1788
 msgid "%s days ago"
-msgstr ""
+msgstr "%s日前"
 
 #: js/gitDropdown.js:1790
 msgid "1 month ago"
-msgstr ""
+msgstr "1か月前"
 
 #: js/gitDropdown.js:1790
 msgid "%s months ago"
-msgstr ""
+msgstr "%sか月前"
 
 #: js/utils/plugin-utils.js:55
 msgid "Security Warning"
