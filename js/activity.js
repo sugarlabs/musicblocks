@@ -110,6 +110,7 @@ let MYDEFINES = [
     "utils/camera-utils",
     "utils/plugin-utils",
     "utils/macro-utils",
+    "utils/project-validator",
     "utils/retryWithBackoff",
     "utils/error-handler",
     "utils/debugLog",
@@ -2856,6 +2857,7 @@ class Activity {
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.toolbar.renderChooseKeyIcon(chooseKeyMenu);
             }
+            this.toolbar.renderCheckProjectIcon(this.showProjectChecker);
             this.toolbar.renderJavaScriptIcon(this.toggleJSWindow);
             this.toolbar.renderLanguageSelectIcon(this.languageBox);
             this.toolbar.renderWrapIcon();

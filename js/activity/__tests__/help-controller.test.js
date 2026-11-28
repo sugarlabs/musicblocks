@@ -37,6 +37,16 @@ class StatsWindowMock {
 StatsWindowMock.instances = [];
 global.StatsWindow = StatsWindowMock;
 
+class ProjectCheckerWindowMock {
+    constructor(activity) {
+        this.activity = activity;
+        this.isOpen = true;
+        ProjectCheckerWindowMock.instances.push(this);
+    }
+}
+ProjectCheckerWindowMock.instances = [];
+global.ProjectCheckerWindow = ProjectCheckerWindowMock;
+
 class JSEditorMock {
     constructor(activity) {
         JSEditorMock.instances.push(activity);
@@ -80,6 +90,7 @@ beforeEach(() => {
     jest.useFakeTimers();
     HelpWidgetMock.instances = [];
     StatsWindowMock.instances = [];
+    ProjectCheckerWindowMock.instances = [];
     JSEditorMock.instances = [];
     window.widgetWindows = {
         openWindows: {},
@@ -119,6 +130,7 @@ describe("setupHelpController", () => {
         expect(typeof activity.showKeyboardShortcuts).toBe("function");
         expect(typeof activity.toggleJSWindow).toBe("function");
         expect(typeof activity.doAnalytics).toBe("function");
+        expect(typeof activity.showProjectChecker).toBe("function");
         expect(typeof activity._saveHelpBlocks).toBe("function");
     });
 
@@ -132,6 +144,7 @@ describe("setupHelpController", () => {
         jest.spyOn(controller, "showKeyboardShortcuts").mockReturnValue();
         jest.spyOn(controller, "toggleJSEditor").mockResolvedValue();
         jest.spyOn(controller, "showStats").mockResolvedValue();
+        jest.spyOn(controller, "showProjectChecker").mockResolvedValue();
         jest.spyOn(controller, "saveHelpBlocks").mockReturnValue();
 
         await activity.showHelp();
@@ -139,6 +152,7 @@ describe("setupHelpController", () => {
         activity.showKeyboardShortcuts();
         await activity.toggleJSWindow();
         await activity.doAnalytics();
+        await activity.showProjectChecker();
         activity._saveHelpBlocks();
 
         expect(controller.showHelp).toHaveBeenCalledTimes(1);
@@ -146,6 +160,7 @@ describe("setupHelpController", () => {
         expect(controller.showKeyboardShortcuts).toHaveBeenCalledTimes(1);
         expect(controller.toggleJSEditor).toHaveBeenCalledTimes(1);
         expect(controller.showStats).toHaveBeenCalledTimes(1);
+        expect(controller.showProjectChecker).toHaveBeenCalledTimes(1);
         expect(controller.saveHelpBlocks).toHaveBeenCalledTimes(1);
     });
 });
@@ -410,6 +425,56 @@ describe("HelpController.showStats", () => {
 
         expect(global.lazyLoad).not.toHaveBeenCalled();
         expect(activity.statsWindow).toBe(existing);
+    });
+});
+
+describe("HelpController.showProjectChecker", () => {
+    test("lazy-loads project-validator and project-checker and creates a ProjectCheckerWindow when none is open", async () => {
+        const activity = makeActivity();
+        const controller = new HelpController(activity);
+
+        await controller.showProjectChecker();
+
+        expect(global.lazyLoad).toHaveBeenCalledWith([
+            "utils/project-validator",
+            "widgets/project-checker"
+        ]);
+        expect(activity.projectCheckerWindow).toBeInstanceOf(ProjectCheckerWindowMock);
+    });
+
+    test("does not recreate a ProjectCheckerWindow that is already open", async () => {
+        const activity = makeActivity();
+        const controller = new HelpController(activity);
+        const existing = { isOpen: true };
+        activity.projectCheckerWindow = existing;
+
+        await controller.showProjectChecker();
+
+        expect(global.lazyLoad).not.toHaveBeenCalled();
+        expect(activity.projectCheckerWindow).toBe(existing);
+    });
+
+    test("coalesces concurrent overlapping calls while lazy load is pending", async () => {
+        const activity = makeActivity();
+        const controller = new HelpController(activity);
+
+        let resolveLazyLoad;
+        global.lazyLoad = jest.fn(
+            () =>
+                new Promise(resolve => {
+                    resolveLazyLoad = resolve;
+                })
+        );
+
+        const call1 = controller.showProjectChecker();
+        const call2 = controller.showProjectChecker();
+
+        expect(global.lazyLoad).toHaveBeenCalledTimes(1);
+
+        resolveLazyLoad();
+        await Promise.all([call1, call2]);
+
+        expect(activity.projectCheckerWindow).toBeInstanceOf(ProjectCheckerWindowMock);
     });
 });
 
