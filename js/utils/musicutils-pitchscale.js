@@ -591,16 +591,23 @@ var getNoteFromInterval = (pitch, interval, temperament) => {
             }
         }
 
-        // Special case: diminished 2nd (from unison)
+        // A diminished 2nd sounds the same as the unison but is a second, so it
+        // takes the next letter name spelled at the root's pitch: C to D𝄫, E to F♭,
+        // E𝄪 to F♯. Work this out from the pitch numbers rather than from the major
+        // 2nd, which can need more accidentals than priorAttrs holds (F𝄪♯ from E𝄪).
         else if (interval === "diminished 2") {
-            majorNote = findMajorInterval("perfect 1");
-            accidental = majorNote[0].substring(1, majorNote[0].length);
-            index1 = priorAttrs.indexOf(accidental);
-            if (index1 === 0) {
-                accidental = priorAttrs[index1] + FLAT;
+            const letter = pitches[(pitches.indexOf(pitch1.toUpperCase()) + 1) % 7];
+            const octave = letter === "C" ? octave1 + 1 : octave1;
+            const offset = getNumber(note1, octave1, "equal") - getNumber(letter, octave, "equal");
+            const naturalIndex = priorAttrs.indexOf("");
+            if (offset < -2) {
+                accidental = DOUBLEFLAT + FLAT.repeat(-offset - 2);
+            } else if (offset > 2) {
+                accidental = DOUBLESHARP + SHARP.repeat(offset - 2);
             } else {
-                accidental = priorAttrs[index1 - 1];
+                accidental = priorAttrs[naturalIndex + offset];
             }
+            majorNote = [letter, octave];
         }
 
         // Handle standard diminished intervals not covered by microtonal cases
