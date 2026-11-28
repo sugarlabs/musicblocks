@@ -438,11 +438,13 @@ describe("Temperament Functions", () => {
             return t.interval.slice(0, -1).map(name => {
                 const spelled = getNoteFromInterval("C4", name);
                 const note = Array.isArray(spelled) ? spelled[0] : String(spelled);
+                // A diminished octave above C4 is C♭5, just below C5.
+                const octave = Array.isArray(spelled) ? spelled[1] : 4;
                 return {
                     name,
                     note,
                     widget: root * getTemperamentRatio(t[name]),
-                    synth: pitchToFrequency(note, 4, 0, "C major", key)
+                    synth: pitchToFrequency(note, octave, 0, "C major", key)
                 };
             });
         };

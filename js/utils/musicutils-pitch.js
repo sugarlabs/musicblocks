@@ -21,7 +21,7 @@
    stripMicrotonalPrefix, normalizeNoteAccidentals, noteToObj,
    frequencyToPitch, numberToPitchSharp, getNumber, _parse_pitch_string,
    _calculate_pitch_number, parseNoteString, noteToPitchOctave, getNumNote,
-   calcOctave, calcOctaveInterval, MusicUtilsPitch
+   calcOctave, calcOctaveInterval, ratioTableOctaveShift, MusicUtilsPitch
  */
 
 // var, not const or let: a hoisted var in musicutils.js cannot redeclare a top-level const or let.
@@ -100,6 +100,34 @@ var noteToObj = note => {
 };
 
 /**
+ * How many octaves above its row of a ratio table a label is written. A table row is an
+ * octave from C upwards, but a pitch spelled below C, such as C♭, belongs to the next C's
+ * octave when the table lists it at the top: the C♭ of 1/4-comma meantone (1124 cents)
+ * is just below C5 in row 4, so it is C♭5, as C♭5 is B4 in 12 EDO and in the synth.
+ * Likewise a B♯ listed at the bottom of a row would belong to the row below.
+ * @function
+ * @param {string} label - A note label of the table, e.g. "C♭".
+ * @param {number} ratio - Its ratio above the row's C, from 1 up to the octave.
+ * @returns {number} 1, -1 or 0.
+ */
+var ratioTableOctaveShift = (label, ratio) => {
+    if (typeof label !== "string" || label.length < 2) {
+        return 0;
+    }
+    let accidentals = 0;
+    for (const symbol of label.slice(1)) {
+        accidentals += { "♭": -1, "b": -1, "𝄫": -2, "♯": 1, "#": 1, "𝄪": 2, "x": 2 }[symbol] || 0;
+    }
+    if (label[0] === "C" && accidentals < 0 && ratio > Math.SQRT2) {
+        return 1;
+    }
+    if (label[0] === "B" && accidentals > 0 && ratio < Math.SQRT2) {
+        return -1;
+    }
+    return 0;
+};
+
+/**
  * Convert a frequency to pitch, returning the note, octave, and cents.
  * @function
  * @param {number} hz - The frequency in hertz.
@@ -125,7 +153,7 @@ var frequencyToPitch = (hz, temperament) => {
                 if (Math.abs(centsDiff) < Math.abs(bestCents)) {
                     bestCents = centsDiff;
                     bestNote = t.noteLabels[i];
-                    bestOctave = o;
+                    bestOctave = o + ratioTableOctaveShift(t.noteLabels[i], t.ratios[i]);
                 }
             }
         }
@@ -634,7 +662,8 @@ var MusicUtilsPitch = {
     noteToPitchOctave,
     getNumNote,
     calcOctave,
-    calcOctaveInterval
+    calcOctaveInterval,
+    ratioTableOctaveShift
 };
 
 if (typeof module !== "undefined" && module.exports) {

@@ -104,7 +104,8 @@ if (typeof module !== "undefined" && module.exports) {
         noteToPitchOctave,
         getNumNote,
         calcOctave,
-        calcOctaveInterval
+        calcOctaveInterval,
+        ratioTableOctaveShift
     } = MusicUtilsPitch;
     var MusicUtilsPitchScale =
         (typeof window !== "undefined" && window.MusicUtilsPitchScale) ||
@@ -250,7 +251,7 @@ if (typeof module !== "undefined" && module.exports) {
    getTemperamentName, getStepSizeUp, getStepSizeDown, getModeLength,
    nthDegreeToPitch, getInterval, _parse_pitch_string, calcNoteValueToDisplay,
    durationToNoteValue, noteToFrequency, computeTargetPitchFrequency, getSolfege, splitScaleDegree,
-   getNumNote, calcOctave, calcOctaveInterval, isInt,
+   getNumNote, calcOctave, calcOctaveInterval, ratioTableOctaveShift, isInt,
    convertFromSolfege, getPitchInfo, i18nSolfege,
    convertFactor, getMeasurePosition, getMeterAnchor, saveMeterState, restoreMeterState,
    getReverseDrumMidi, getOctaveRatio, getEffectiveOctaveRatio, setOctaveRatio, getTemperamentsList,
@@ -324,6 +325,7 @@ if (typeof module !== "undefined" && module.exports) {
         getNumNote,
         calcOctave,
         calcOctaveInterval,
+        ratioTableOctaveShift,
         isInt,
         convertFromSolfege,
         convertFactor,
