@@ -321,7 +321,7 @@ class Singer {
         // when it sounds, in wall-clock milliseconds (for the Harmony row of the Status widget)
         this.pitchStatus = null;
         this.noteDirection = 0;
-        this.pitchNumberOffset = 39; // 39, C4
+        this.setPitchNumberOffsetPitch("C", 4, "C major"); // pitch number 0 is C4
         this.currentOctave = 4;
         this.currentCalculatedOctave = {}; // for a stand-alone pitch block
         this.inHarmonic = [];
@@ -435,6 +435,57 @@ class Singer {
      *
      * @returns {void}
      */
+    /**
+     * Pitch number 0. Pitch numbers count steps of the current temperament, so the offset
+     * is kept as a pitch and counted in whatever temperament is current when it is read:
+     * C4 is 39 in 12 EDO, 62 in 19 EDO and 101 in 31 EDO. A fixed 39 made pitch number 0
+     * A♯2 in 19 EDO and C2 in 31 EDO. A number assigned directly is used as it is.
+     * @type {number}
+     */
+    get pitchNumberOffset() {
+        const offset = this._pitchNumberOffset;
+        if (offset === undefined || offset.pitch === null) {
+            return offset === undefined ? 39 : offset.value;
+        }
+
+        const activity = this.turtle && this.turtle.activity;
+        const temperament =
+            activity && activity.logo && activity.logo.synth
+                ? activity.logo.synth.inTemperament
+                : undefined;
+        if (offset.temperament !== temperament) {
+            offset.temperament = temperament;
+            offset.value = pitchToNumber(
+                offset.pitch,
+                offset.octave,
+                offset.keySignature,
+                temperament
+            );
+        }
+        return offset.value;
+    }
+
+    set pitchNumberOffset(value) {
+        this._pitchNumberOffset = { pitch: null, value };
+    }
+
+    /**
+     * Makes a pitch pitch number 0, counted in the temperament in use when it is read.
+     * @param {string} pitch
+     * @param {number} octave
+     * @param {string} keySignature - to resolve a solfege pitch
+     * @returns {void}
+     */
+    setPitchNumberOffsetPitch(pitch, octave, keySignature) {
+        this._pitchNumberOffset = {
+            pitch,
+            octave,
+            keySignature,
+            temperament: null,
+            value: undefined
+        };
+    }
+
     dropPendingNotes() {
         this.oscList = {};
         this.noteBeat = {};

@@ -632,7 +632,15 @@ describe("State initialization — note parameters", () => {
     });
 
     test("should initialize pitchNumberOffset to 39 (C4)", () => {
-        expect(singer.pitchNumberOffset).toBe(39);
+        // The offset is C4 counted in the current temperament; this file mocks
+        // pitchToNumber, so count it with the real one.
+        const mockedPitchToNumber = global.pitchToNumber;
+        global.pitchToNumber = musicUtils.pitchToNumber;
+        try {
+            expect(singer.pitchNumberOffset).toBe(39);
+        } finally {
+            global.pitchToNumber = mockedPitchToNumber;
+        }
     });
 
     test("should initialize currentOctave to 4", () => {
