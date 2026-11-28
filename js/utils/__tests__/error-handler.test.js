@@ -19,6 +19,11 @@ describe("ErrorHandler", () => {
     let consoleWarnSpy;
 
     beforeEach(() => {
+        try {
+            window.sessionStorage.clear();
+        } catch (e) {
+            // Ignore storage cleanup errors in the test environment.
+        }
         jest.resetModules();
         consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
         consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
@@ -26,6 +31,21 @@ describe("ErrorHandler", () => {
     });
 
     afterEach(() => {
+        if (
+            typeof window !== "undefined" &&
+            typeof window.__MB_ERROR_HANDLER_DISPOSE__ === "function"
+        ) {
+            window.__MB_ERROR_HANDLER_DISPOSE__();
+        }
+        if (typeof window !== "undefined") {
+            delete window.__MB_ERROR_HANDLER_INSTALLED__;
+            delete window.__MB_ERROR_HANDLER_DISPOSE__;
+            delete window.ActivityContext;
+            delete window.VERSION;
+            delete window.BrowserUtils;
+            delete window.i18next;
+            window.localStorage.removeItem("beginnerMode");
+        }
         consoleErrorSpy.mockRestore();
         consoleWarnSpy.mockRestore();
     });
@@ -148,6 +168,498 @@ describe("ErrorHandler", () => {
             }).not.toThrow();
 
             delete global.window.ActivityContext;
+        });
+    });
+
+    describe("recent error buffer", () => {
+        it("deduplicates repeated errors and counts them", () => {
+            const error = new Error("loop");
+            ErrorHandler.capture(error, { operation: "run" });
+            ErrorHandler.capture(error, { operation: "run" });
+            ErrorHandler.capture(error, { operation: "run" });
+
+            const records = ErrorHandler.getRecentErrors();
+            expect(records).toHaveLength(1);
+            expect(records[0].count).toBe(3);
+            expect(records[0].level).toBe("error");
+            expect(records[0].operation).toBe("run");
+            expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("keeps separate records for different operations", () => {
+            const error = new Error("same message");
+            ErrorHandler.capture(error, { operation: "one" });
+            ErrorHandler.capture(error, { operation: "two" });
+
+            expect(ErrorHandler.getRecentErrors()).toHaveLength(2);
+        });
+
+        it("keeps separate records for different levels", () => {
+            ErrorHandler.warn("failed", { operation: "save" });
+            ErrorHandler.capture("failed", { operation: "save" });
+
+            const records = ErrorHandler.getRecentErrors();
+            expect(records).toHaveLength(2);
+            expect(records[0].level).toBe("warn");
+            expect(records[1].level).toBe("error");
+            expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
+            expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("keeps separate records for Firefox and Safari stack frames", () => {
+            const first = new Error("same message");
+            first.stack = "firstStep@http://localhost/a.js:10:5";
+            const second = new Error("same message");
+            second.stack = "secondStep@http://localhost/a.js:20:7";
+
+            ErrorHandler.capture(first, { operation: "gecko" });
+            ErrorHandler.capture(second, { operation: "gecko" });
+
+            expect(ErrorHandler.getRecentErrors()).toHaveLength(2);
+            expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
+        });
+
+        it("returns a copy of the buffer", () => {
+            ErrorHandler.capture("boom", { operation: "copy" });
+
+            const records = ErrorHandler.getRecentErrors();
+            records.push({});
+
+            expect(ErrorHandler.getRecentErrors()).toHaveLength(1);
+        });
+
+        it("returns copies of the records themselves", () => {
+            ErrorHandler.capture("boom", { operation: "mutate" });
+
+            const records = ErrorHandler.getRecentErrors();
+            records[0].count = 0;
+
+            ErrorHandler.capture("boom", { operation: "mutate" });
+
+            expect(ErrorHandler.getRecentErrors()[0].count).toBe(2);
+        });
+
+        it("keeps delimiter-like content in operation and message separate", () => {
+            ErrorHandler.capture("b|c", { operation: "a" });
+            ErrorHandler.capture("c", { operation: "a|b" });
+
+            expect(ErrorHandler.getRecentErrors()).toHaveLength(2);
+            expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
+        });
+
+        it("separates long messages thrown from different frames", () => {
+            const message = "x".repeat(1200);
+            const first = new Error(message);
+            first.stack = "Error: " + message + "\n    at one (http://localhost/a.js:1:1)";
+            const second = new Error(message);
+            second.stack = "Error: " + message + "\n    at two (http://localhost/b.js:2:2)";
+
+            ErrorHandler.capture(first, { operation: "long" });
+            ErrorHandler.capture(second, { operation: "long" });
+
+            expect(ErrorHandler.getRecentErrors()).toHaveLength(2);
+            expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
+        });
+
+        it("clears the buffer", () => {
+            ErrorHandler.capture("boom", { operation: "clear" });
+            ErrorHandler.clearRecentErrors();
+
+            expect(ErrorHandler.getRecentErrors()).toHaveLength(0);
+        });
+
+        it("attaches diagnostics metadata to each record", () => {
+            window.VERSION = "9.9.9";
+            window.BrowserUtils = { fnBrowserDetect: () => "firefox" };
+            window.i18next = { language: "es-MX" };
+            window.localStorage.setItem("beginnerMode", "true");
+            const getActivity = jest.fn(() => ({ beginnerMode: false }));
+            window.ActivityContext = { getActivity };
+
+            ErrorHandler.capture("boom", { operation: "metadata" });
+
+            const record = ErrorHandler.getRecentErrors()[0];
+            expect(record.appVersion).toBe("9.9.9");
+            expect(record.browser).toBe("firefox");
+            expect(record.language).toBe("es-MX");
+            expect(record.mode).toBe("beginner");
+            expect(getActivity).not.toHaveBeenCalled();
+        });
+
+        it("recognizes the persisted string beginner mode", () => {
+            window.localStorage.setItem("beginnerMode", "true");
+
+            ErrorHandler.capture("boom", { operation: "metadata-string-mode" });
+
+            expect(ErrorHandler.getRecentErrors()[0].mode).toBe("beginner");
+        });
+
+        it("recognizes the persisted string advanced mode", () => {
+            window.localStorage.setItem("beginnerMode", "false");
+
+            ErrorHandler.capture("boom", { operation: "metadata-string-advanced" });
+
+            expect(ErrorHandler.getRecentErrors()[0].mode).toBe("advanced");
+        });
+
+        it("falls back to safe metadata when sources are unavailable", () => {
+            window.localStorage.setItem("beginnerMode", "false");
+
+            ErrorHandler.capture("boom", { operation: "metadata-fallback" });
+
+            const record = ErrorHandler.getRecentErrors()[0];
+            expect(record.appVersion).toBe("unknown");
+            expect(record.mode).toBe("advanced");
+            expect(typeof record.browser).toBe("string");
+            expect(typeof record.language).toBe("string");
+        });
+
+        it("records errors even when metadata sources throw", () => {
+            const getActivity = jest.fn(() => {
+                throw new Error("not ready");
+            });
+            window.ActivityContext = { getActivity };
+            window.i18next = {
+                get language() {
+                    throw new Error("no language");
+                }
+            };
+
+            expect(() =>
+                ErrorHandler.capture("boom", { operation: "metadata-throw" })
+            ).not.toThrow();
+
+            const record = ErrorHandler.getRecentErrors()[0];
+            expect(record.mode).toBe("unknown");
+            expect(record.language).toBe("unknown");
+            expect(getActivity).not.toHaveBeenCalled();
+        });
+
+        it("still shows the user-facing message on repeats", () => {
+            const errorMsgMock = jest.fn();
+            global.window.ActivityContext = {
+                getActivity: () => ({ errorMsg: errorMsgMock })
+            };
+            const error = new Error("repeat");
+
+            ErrorHandler.userFacing(error, { operation: "save" }, "Could not save");
+            ErrorHandler.userFacing(error, { operation: "save" }, "Could not save");
+
+            expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+            expect(errorMsgMock).toHaveBeenCalledTimes(2);
+
+            delete global.window.ActivityContext;
+        });
+    });
+
+    describe("global handlers", () => {
+        afterEach(() => {
+            ErrorHandler.uninstallGlobalHandlers();
+        });
+
+        it("installs idempotently", () => {
+            const first = ErrorHandler.installGlobalHandlers();
+            const second = ErrorHandler.installGlobalHandlers();
+
+            expect(second).toBe(first);
+        });
+
+        it("captures uncaught errors", () => {
+            window.dispatchEvent(
+                new ErrorEvent("error", {
+                    message: "boom",
+                    error: new Error("boom"),
+                    filename: "http://localhost/app.js",
+                    lineno: 10,
+                    colno: 5
+                })
+            );
+
+            const records = ErrorHandler.getRecentErrors();
+            expect(records).toHaveLength(1);
+            expect(records[0].level).toBe("uncaught");
+            expect(records[0].operation).toBe("uncaught");
+            expect(records[0].source).toBe("http://localhost/app.js");
+            expect(records[0].line).toBe(10);
+            expect(records[0].column).toBe(5);
+            expect(consoleErrorSpy).toHaveBeenCalled();
+        });
+
+        it("captures unhandled promise rejections", () => {
+            const event = new Event("unhandledrejection");
+            event.reason = new Error("rejected");
+            window.dispatchEvent(event);
+
+            const records = ErrorHandler.getRecentErrors();
+            expect(records).toHaveLength(1);
+            expect(records[0].level).toBe("unhandledrejection");
+            expect(records[0].operation).toBe("unhandledrejection");
+            expect(consoleErrorSpy).toHaveBeenCalled();
+        });
+
+        it("records rejections whose reason cannot be stringified", () => {
+            const event = new Event("unhandledrejection");
+            event.reason = Object.create(null);
+
+            window.dispatchEvent(event);
+
+            const records = ErrorHandler.getRecentErrors();
+            expect(records).toHaveLength(1);
+            expect(records[0].level).toBe("unhandledrejection");
+            expect(records[0].message).toBe("[unstringifiable rejection reason]");
+        });
+
+        it("ignores extension errors and ResizeObserver noise", () => {
+            window.dispatchEvent(
+                new ErrorEvent("error", {
+                    message: "extension failure",
+                    filename: "chrome-extension://abc/content.js"
+                })
+            );
+            window.dispatchEvent(
+                new ErrorEvent("error", {
+                    message: "ResizeObserver loop completed with undelivered notifications.",
+                    filename: "http://localhost/app.js"
+                })
+            );
+            window.dispatchEvent(
+                new ErrorEvent("error", {
+                    message: "safari web extension failure",
+                    filename: "safari-web-extension://abc/content.js"
+                })
+            );
+
+            expect(ErrorHandler.getRecentErrors()).toHaveLength(0);
+        });
+
+        it("keeps a newer installation when an older disposer is called again", () => {
+            const firstDispose = ErrorHandler.installGlobalHandlers();
+            firstDispose();
+            const secondDispose = ErrorHandler.installGlobalHandlers();
+
+            firstDispose();
+
+            expect(ErrorHandler._disposeGlobalHandlers).toBe(secondDispose);
+            expect(ErrorHandler._installed).toBe(true);
+
+            const event = new Event("unhandledrejection");
+            event.reason = new Error("still listening");
+            window.dispatchEvent(event);
+
+            expect(ErrorHandler.getRecentErrors()).toHaveLength(1);
+        });
+
+        it("deduplicates repeated uncaught errors", () => {
+            const error = new Error("repeat");
+            const dispatch = () => {
+                window.dispatchEvent(
+                    new ErrorEvent("error", {
+                        message: "repeat",
+                        error,
+                        filename: "http://localhost/app.js",
+                        lineno: 20,
+                        colno: 3
+                    })
+                );
+            };
+
+            dispatch();
+            dispatch();
+
+            const records = ErrorHandler.getRecentErrors();
+            expect(records).toHaveLength(1);
+            expect(records[0].count).toBe(2);
+        });
+
+        it("removes listeners when disposed", () => {
+            ErrorHandler.uninstallGlobalHandlers();
+
+            const event = new Event("unhandledrejection");
+            event.reason = new Error("after dispose");
+            window.dispatchEvent(event);
+
+            expect(consoleErrorSpy).not.toHaveBeenCalled();
+            expect(ErrorHandler.getRecentErrors()).toHaveLength(0);
+        });
+    });
+
+    describe("persistence", () => {
+        const storageKey = "mb_error_log_v1";
+
+        it("persists records to sessionStorage", () => {
+            ErrorHandler.capture("boom", { operation: "persist" });
+
+            const stored = JSON.parse(window.sessionStorage.getItem(storageKey));
+            expect(stored).toHaveLength(1);
+            expect(stored[0].operation).toBe("persist");
+            expect(stored[0].message).toBe("boom");
+        });
+
+        it("restores records after a module reload", () => {
+            ErrorHandler.capture("boom", { operation: "restore" });
+
+            jest.resetModules();
+            const Reloaded = require("../error-handler");
+            const records = Reloaded.getRecentErrors();
+
+            expect(records).toHaveLength(1);
+            expect(records[0].operation).toBe("restore");
+        });
+
+        it("indexes restored records for deduplication", () => {
+            ErrorHandler.capture("boom", { operation: "restore-count" });
+
+            jest.resetModules();
+            const Reloaded = require("../error-handler");
+            Reloaded.capture("boom", { operation: "restore-count" });
+
+            const records = Reloaded.getRecentErrors();
+            expect(records).toHaveLength(1);
+            expect(records[0].count).toBe(2);
+            expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("writes a trailing update for throttled counts", () => {
+            jest.useFakeTimers();
+            try {
+                ErrorHandler.capture("boom", { operation: "throttle" });
+                ErrorHandler.capture("boom", { operation: "throttle" });
+
+                const throttled = JSON.parse(window.sessionStorage.getItem(storageKey));
+                expect(throttled[0].count).toBe(1);
+
+                jest.advanceTimersByTime(ErrorHandler._persistThrottleMs);
+
+                const flushed = JSON.parse(window.sessionStorage.getItem(storageKey));
+                expect(flushed[0].count).toBe(2);
+            } finally {
+                ErrorHandler._cancelScheduledPersist();
+                jest.useRealTimers();
+            }
+        });
+
+        it("keeps valid records and drops malformed ones when restoring", () => {
+            const valid = {
+                key: "kept",
+                level: "error",
+                operation: "restore-valid",
+                message: "boom",
+                count: 2
+            };
+            window.sessionStorage.setItem(
+                storageKey,
+                JSON.stringify([null, { key: "bad", count: "1" }, valid])
+            );
+
+            jest.resetModules();
+            const Reloaded = require("../error-handler");
+            const records = Reloaded.getRecentErrors();
+
+            expect(records).toHaveLength(1);
+            expect(records[0].key).toBe("kept");
+            expect(records[0].count).toBe(2);
+        });
+
+        it("clears persisted records", () => {
+            ErrorHandler.capture("boom", { operation: "clear-storage" });
+            expect(window.sessionStorage.getItem(storageKey)).not.toBeNull();
+
+            ErrorHandler.clearRecentErrors();
+
+            expect(window.sessionStorage.getItem(storageKey)).toBeNull();
+        });
+
+        it("does not throw when sessionStorage is unavailable", () => {
+            const original = window.sessionStorage;
+            Object.defineProperty(window, "sessionStorage", {
+                configurable: true,
+                value: {
+                    getItem() {
+                        throw new Error("access denied");
+                    },
+                    setItem() {
+                        throw new Error("quota exceeded");
+                    },
+                    removeItem() {
+                        throw new Error("access denied");
+                    }
+                }
+            });
+
+            try {
+                expect(() =>
+                    ErrorHandler.capture("boom", { operation: "no-storage" })
+                ).not.toThrow();
+                expect(ErrorHandler.getRecentErrors()).toHaveLength(1);
+            } finally {
+                Object.defineProperty(window, "sessionStorage", {
+                    configurable: true,
+                    value: original
+                });
+            }
+        });
+
+        it("does not throw when restoring from unavailable storage", () => {
+            const original = window.sessionStorage;
+            Object.defineProperty(window, "sessionStorage", {
+                configurable: true,
+                value: {
+                    getItem() {
+                        throw new Error("access denied");
+                    }
+                }
+            });
+
+            let reloaded;
+            try {
+                jest.resetModules();
+                expect(() => {
+                    reloaded = require("../error-handler");
+                }).not.toThrow();
+            } finally {
+                Object.defineProperty(window, "sessionStorage", {
+                    configurable: true,
+                    value: original
+                });
+            }
+
+            expect(reloaded.getRecentErrors()).toHaveLength(0);
+        });
+    });
+
+    describe("logging helpers", () => {
+        it("delegates debug and info to debugLog", () => {
+            const original = global.debugLog;
+            const logger = jest.fn();
+            global.debugLog = logger;
+
+            try {
+                ErrorHandler.debug("debug message", { a: 1 });
+                ErrorHandler.info("info message");
+
+                expect(logger).toHaveBeenNthCalledWith(1, "debug message", { a: 1 });
+                expect(logger).toHaveBeenNthCalledWith(2, "[info]", "info message");
+            } finally {
+                if (original === undefined) {
+                    delete global.debugLog;
+                } else {
+                    global.debugLog = original;
+                }
+            }
+        });
+
+        it("does not throw when debugLog is unavailable", () => {
+            const original = global.debugLog;
+            delete global.debugLog;
+
+            try {
+                expect(() => ErrorHandler.debug("debug")).not.toThrow();
+                expect(() => ErrorHandler.info("info")).not.toThrow();
+            } finally {
+                if (original !== undefined) {
+                    global.debugLog = original;
+                }
+            }
         });
     });
 });
