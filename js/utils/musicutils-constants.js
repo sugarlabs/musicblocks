@@ -987,7 +987,20 @@ var MODE_PIE_MENUS = {
         "fibonacci",
         " "
     ],
-    "6": ["minor blues", " ", " ", " ", "major blues", " ", " ", " ", "whole tone", " ", " ", " "],
+    "6": [
+        "minor blues",
+        " ",
+        "augmented",
+        " ",
+        "major blues",
+        " ",
+        "prometheus",
+        " ",
+        "whole tone",
+        " ",
+        " ",
+        " "
+    ],
     "7": [
         "ionian",
         " ",
@@ -1104,7 +1117,9 @@ var PITCH_COLLECTIONS = {
     6: {
         "minor blues": [3, 2, 1, 1, 3, 2],
         "major blues": [2, 1, 1, 3, 2, 3],
-        "whole tone": [2, 2, 2, 2, 2, 2]
+        "whole tone": [2, 2, 2, 2, 2, 2],
+        "augmented": [3, 1, 3, 1, 3, 1],
+        "prometheus": [2, 2, 2, 3, 1, 2]
     },
     5: {
         "major pentatonic": [2, 2, 3, 2, 3],
