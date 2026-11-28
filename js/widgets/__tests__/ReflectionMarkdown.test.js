@@ -101,6 +101,28 @@ describe("ReflectionMarkdown", () => {
             expect(link.getAttribute("rel")).toBe("noopener noreferrer");
         });
 
+        test("keeps asterisks in a link address out of italics", () => {
+            const link = parse(
+                reflection.mdToHTML("[wiki](https://en.wikipedia.org/wiki/Foo_*bar*)")
+            ).firstChild;
+
+            expect(link.getAttribute("href")).toBe("https://en.wikipedia.org/wiki/Foo_*bar*");
+            expect(link.querySelector("i")).toBeNull();
+            expect(link.textContent).toBe("wiki");
+        });
+
+        test("still marks up emphasis in link text and around a link", () => {
+            const doc = parse(
+                reflection.mdToHTML("*see* [**the** guide](https://example.com) *now*")
+            );
+
+            expect(doc.querySelector("a b").textContent).toBe("the");
+            expect(Array.from(doc.querySelectorAll("i")).map(i => i.textContent)).toEqual([
+                "see",
+                "now"
+            ]);
+        });
+
         test("drops the target of an unsafe link", () => {
             const link = parse(reflection.mdToHTML("[click](javascript:alert(1))")).firstChild;
 
