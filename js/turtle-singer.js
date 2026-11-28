@@ -644,6 +644,7 @@ class Singer {
      */
     static scalarDistance(logo, turtle, firstNote, lastNote) {
         if (lastNote === firstNote) return 0;
+        if (!Number.isFinite(firstNote) || !Number.isFinite(lastNote)) return 0;
 
         const activity = logo.activity;
 
@@ -663,15 +664,24 @@ class Singer {
 
         const temp = activity.logo.synth.inTemperament;
         const edo = getCurrentEDO(temp);
+        const maxSteps = Math.max(1000, 10 * edo);
 
         let i = 0;
         let noteObj = numberToPitch(n2, temp, undefined, tur.singer.pitchNumberOffset, activity);
-        while (i++ < 100) {
-            n2 += getStepSizeUp(tur.singer.keySignature, noteObj[0], 1, temp, edo);
-            if (n2 >= n1) break;
+        while (n2 < n1 && i < maxSteps) {
+            const stepSize = getStepSizeUp(tur.singer.keySignature, noteObj[0], 1, temp, edo);
+            if (stepSize <= 0 || !Number.isFinite(stepSize)) {
+                break;
+            }
+            n2 += stepSize;
+            i++;
+            if (n2 >= n1) {
+                break;
+            }
             noteObj = numberToPitch(n2, temp, undefined, tur.singer.pitchNumberOffset, activity);
         }
 
+        if (i === 0) return 0;
         return positive ? i : -i;
     }
 
