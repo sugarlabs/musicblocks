@@ -5517,6 +5517,107 @@ class Block {
     }
 
     /**
+     * Block indexes in program order: each stack from its top block, a block before its
+     * arguments, clamp contents and next block, and stacks in order of their top block.
+     * @static
+     * @param {Array} blockList - The workspace block list.
+     * @returns {number[]}
+     */
+    static getProgramOrder(blockList) {
+        const order = [];
+        if (!Array.isArray(blockList)) {
+            return order;
+        }
+        const visited = new Set();
+        // Walk with an explicit stack: a long flow chains one block after another.
+        const visitFrom = start => {
+            const pending = [start];
+            while (pending.length > 0) {
+                const index = pending.pop();
+                if (index === null || index === undefined || visited.has(index)) {
+                    continue;
+                }
+                const block = blockList[index];
+                if (!block) {
+                    continue;
+                }
+                visited.add(index);
+                order.push(index);
+                const connections = block.connections || [];
+                // Connection 0 is the parent or previous block, so only follow the rest.
+                for (let c = connections.length - 1; c >= 1; c--) {
+                    pending.push(connections[c]);
+                }
+            }
+        };
+
+        blockList.forEach((block, index) => {
+            if (
+                block &&
+                (!block.connections ||
+                    block.connections[0] === null ||
+                    block.connections[0] === undefined)
+            ) {
+                visitFrom(index);
+            }
+        });
+        // Anything not reached from a top block (for example a broken connection).
+        blockList.forEach((block, index) => visitFrom(index));
+        return order;
+    }
+
+    /**
+     * Put the accessible block elements in program order so that arrow-key navigation
+     * follows the program. Does nothing if they are already in order.
+     * @static
+     * @param {Array} blockList - The workspace block list.
+     * @returns {void}
+     */
+    static reorderAccessibleElements(blockList) {
+        if (typeof document === "undefined" || !document.getElementById) {
+            return;
+        }
+        const container = document.getElementById("accessibleBlocks");
+        if (!container) {
+            return;
+        }
+
+        const current = Array.from(container.children);
+        const wanted = Block.getProgramOrder(blockList)
+            .map(index => document.getElementById("accessible-block-" + index))
+            .filter(el => el && el.parentNode === container);
+        const placed = new Set(wanted);
+        const target = wanted.concat(current.filter(el => !placed.has(el)));
+        if (target.every((el, i) => el === current[i])) {
+            return;
+        }
+
+        // Moving a focused element drops its focus, so give it back afterwards.
+        const active = document.activeElement;
+        target.forEach(el => container.appendChild(el));
+        if (active && container.contains(active) && document.activeElement !== active) {
+            active.focus();
+        }
+    }
+
+    /**
+     * Queue one reorder for after the current burst of block creation, so loading a
+     * project with many blocks sorts once rather than once per block.
+     * @static
+     * @param {Object} blocks - The Blocks manager that owns the block list.
+     * @returns {void}
+     */
+    static _scheduleAccessibleReorder(blocks) {
+        if (Block._accessibleReorderTimer || !blocks || !Array.isArray(blocks.blockList)) {
+            return;
+        }
+        Block._accessibleReorderTimer = setTimeout(() => {
+            Block._accessibleReorderTimer = null;
+            Block.reorderAccessibleElements(blocks.blockList);
+        }, 0);
+    }
+
+    /**
      * Get an accessible descriptive label for assistive technology.
      * @returns {string}
      */
@@ -5608,6 +5709,7 @@ class Block {
 
         container.appendChild(el);
         this.accessibleElement = el;
+        Block._scheduleAccessibleReorder(this.blocks);
         return el;
     }
 
