@@ -92,6 +92,30 @@ describe("PitchDrumMatrixGrid", () => {
         expect(pdm._pdmCellTables.map(t => t.id)).toEqual(["pdmCellTable0", "pdmCellTable1"]);
     });
 
+    test("handles pitch rows without octaves safely", () => {
+        grid(["do", "re"], [null, undefined]);
+
+        expect(rowLabels()).toEqual(["do", "re"]);
+        const firstLabel = pdm._pdmTable.rows[0].cells[0];
+        const secondLabel = pdm._pdmTable.rows[1].cells[0];
+        expect(firstLabel.dataset.noteArg).toBe("do");
+        expect(firstLabel.dataset.octave).toBeUndefined();
+        expect(firstLabel.querySelector("sub")).toBeNull();
+        expect(secondLabel.dataset.noteArg).toBe("re");
+        expect(secondLabel.dataset.octave).toBeUndefined();
+        expect(secondLabel.querySelector("sub")).toBeNull();
+    });
+
+    test("handles empty rowArgs without crashing", () => {
+        grid(["do"], []);
+
+        expect(rowLabels()).toEqual(["do"]);
+        const label = pdm._pdmTable.rows[0].cells[0];
+        expect(label.dataset.noteArg).toBe("do");
+        expect(label.dataset.octave).toBeUndefined();
+        expect(label.querySelector("sub")).toBeNull();
+    });
+
     test("skips rests, however they are written", () => {
         grid(["do", "rest", "R", "re"], [4, 4, 4, 4]);
 

@@ -90,11 +90,16 @@ class PitchDrumMatrixGrid {
             labelCell.style.maxWidth = 0;
             labelCell.className = "headcol";
             labelCell.textContent = this.rowLabels[i];
-            const sub = document.createElement("sub");
-            sub.textContent = this.rowArgs[i].toString();
-            labelCell.appendChild(sub);
+            const hasOctave =
+                this.rowArgs && this.rowArgs[i] !== undefined && this.rowArgs[i] !== null;
+            if (hasOctave) {
+                const octave = this.rowArgs[i].toString();
+                const sub = document.createElement("sub");
+                sub.textContent = octave;
+                labelCell.appendChild(sub);
+                labelCell.dataset.octave = octave;
+            }
             labelCell.dataset.noteArg = this.rowLabels[i];
-            labelCell.dataset.octave = this.rowArgs[i].toString();
             labelCell.style.position = "sticky";
             labelCell.style.left = "0";
             labelCell.style.top = "0";
