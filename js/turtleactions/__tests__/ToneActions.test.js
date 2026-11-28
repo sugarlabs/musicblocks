@@ -230,7 +230,7 @@ describe("setupToneActions", () => {
             expect(activity.logo.synth.loadSynth).toHaveBeenCalledWith(0, expected);
         });
 
-        it.each(["not-a-voice", "", "   "])(
+        it.each(["not-a-voice", "  Not-A-Voice  ", "", "   "])(
             "should keep the unknown or blank name %j as typed",
             typed => {
                 Singer.ToneActions.setTimbre(typed, 0, 1);
