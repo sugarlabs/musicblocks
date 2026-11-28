@@ -2182,6 +2182,100 @@ describe("Utility Functions (logic-only)", () => {
 
             Synth._getFrequency = originalGetFrequency;
         });
+
+        it("should handle chord array when frequency conversion returns undefined without throwing TypeError", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            Synth.inTemperament = "just intonation";
+            const originalGetFrequency = Synth._getFrequency;
+            Synth._getFrequency = jest.fn().mockReturnValue(undefined);
+
+            await expect(
+                _performNotes.call(
+                    Synth,
+                    mockSynth,
+                    ["F#4", "A#4", "C#5"],
+                    0.25,
+                    null,
+                    null,
+                    false,
+                    0
+                )
+            ).resolves.not.toThrow();
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalledWith(
+                ["F#4", "A#4", "C#5"],
+                0.25,
+                expect.anything()
+            );
+
+            Synth._getFrequency = originalGetFrequency;
+            Synth.inTemperament = "equal";
+        });
+
+        it("should handle chord playback with real frequency conversion for non-EDO temperaments", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            Synth.inTemperament = "Pythagorean";
+            Synth.temperamentChanged("Pythagorean", "C4");
+
+            await expect(
+                _performNotes.call(
+                    Synth,
+                    mockSynth,
+                    ["F#4", "A#4", "C#5"],
+                    0.25,
+                    null,
+                    null,
+                    false,
+                    0
+                )
+            ).resolves.not.toThrow();
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+            const calledNotes = mockSynth.triggerAttackRelease.mock.calls[0][0];
+            expect(Array.isArray(calledNotes)).toBe(true);
+            expect(calledNotes.length).toBe(3);
+            calledNotes.forEach(freq => {
+                expect(typeof freq).toBe("number");
+                expect(freq).toBeGreaterThan(0);
+                expect(isNaN(freq)).toBe(false);
+            });
+
+            Synth.inTemperament = "equal";
+        });
+
+        it("should fall back gracefully for partially unresolved chord notes without producing NaN", async () => {
+            const mockSynth = {
+                toDestination: jest.fn().mockReturnThis(),
+                triggerAttackRelease: jest.fn()
+            };
+            Synth.inTemperament = "just intonation";
+
+            await expect(
+                _performNotes.call(
+                    Synth,
+                    mockSynth,
+                    ["C4", "unresolvedPitch"],
+                    0.25,
+                    null,
+                    null,
+                    false,
+                    10
+                )
+            ).resolves.not.toThrow();
+
+            expect(mockSynth.triggerAttackRelease).toHaveBeenCalled();
+            const calledNotes = mockSynth.triggerAttackRelease.mock.calls[0][0];
+            expect(Array.isArray(calledNotes)).toBe(true);
+            expect(calledNotes.includes(NaN)).toBe(false);
+
+            Synth.inTemperament = "equal";
+        });
     });
 
     describe("_performNotes glide/portamento setNote routing ", () => {
@@ -3641,11 +3735,22 @@ describe("Use-after-dispose race in Synth.trigger async path", () => {
             synth.temperamentChanged("equal", "F♯4");
 
             // Pythagorean and Just intonation
-            synth.temperamentChanged("pythagorean", "C4");
+            synth.temperamentChanged("Pythagorean", "C4");
             expect(Object.keys(synth.noteFrequencies).length).toBeGreaterThan(0);
+            expect(synth.noteFrequencies["C#"]).toBeDefined();
+            expect(synth.noteFrequencies["D#"]).toBeDefined();
+            expect(synth.noteFrequencies["F#"]).toBeDefined();
+            expect(synth.noteFrequencies["G#"]).toBeDefined();
+            expect(synth.noteFrequencies["A#"]).toBeDefined();
+            expect(synth._getFrequency("F#4", false)).toBeGreaterThan(0);
 
             synth.temperamentChanged("just intonation", "C4");
             expect(Object.keys(synth.noteFrequencies).length).toBeGreaterThan(0);
+            expect(synth.noteFrequencies["C#"]).toBeDefined();
+            expect(synth.noteFrequencies["D#"]).toBeDefined();
+            expect(synth.noteFrequencies["F#"]).toBeDefined();
+            expect(synth.noteFrequencies["G#"]).toBeDefined();
+            expect(synth.noteFrequencies["A#"]).toBeDefined();
 
             // Custom EDO temperament (t.isEDO path)
             const customEdoTemp = { isEDO: true, pitchNumber: 19 };
