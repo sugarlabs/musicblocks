@@ -1001,6 +1001,8 @@ var getNoteFromSolfege = (
         offset = 0;
     }
 
+    // The key's offset, before the syllable's own accidental is added to it.
+    const keyOffset = offset;
     if (sharpFlat) {
         if (doubleSharp) {
             offset += 2;
@@ -1063,12 +1065,28 @@ var getNoteFromSolfege = (
         }
 
         let note = thisScale[index];
-        // In non-12 EDO temperaments, enharmonic spellings are distinct
-        // pitches, so the resolved note must honor the input's accidental.
-        // Use the already-parsed doubleSharp/normalizedNoteArg values rather
-        // than re-checking the raw noteArg, so ASCII ("##") and Unicode
-        // (DOUBLESHARP) double-sharp spellings resolve the same way.
-        if (octaveLength !== 12 && sharpFlat) {
+        const degreeName =
+            octaveLength !== 12 && movable
+                ? _movableDegreeName(keySignature, octaveLength, solfegePart, offset - keyOffset)
+                : null;
+        if (degreeName !== null) {
+            // getScaleAndHalfSteps() hands every natural tonic the flat list, so ti in
+            // G major came out G♭. 12 EDO respells it by the key later; outside 12 EDO
+            // G♭ and F♯ are different pitches, so take the degree from the scale this EDO
+            // builds for the key, the one Scalar Step walks. Its octave is the one that
+            // puts its letter nearest the 12-EDO note: C♭ for a B goes up one, B♯ for a
+            // C down one, and a 5-EDO scale that runs out of letters carries on above.
+            const letterPosition = (name, oct) => 7 * oct + "CDEFGAB".indexOf(name[0]);
+            octave += Math.round(
+                (letterPosition(note, octave) - letterPosition(degreeName, octave)) / 7
+            );
+            note = degreeName;
+        } else if (octaveLength !== 12 && sharpFlat) {
+            // In non-12 EDO temperaments, enharmonic spellings are distinct
+            // pitches, so the resolved note must honor the input's accidental.
+            // Use the already-parsed doubleSharp/normalizedNoteArg values rather
+            // than re-checking the raw noteArg, so ASCII ("##") and Unicode
+            // (DOUBLESHARP) double-sharp spellings resolve the same way.
             if (
                 doubleSharp ||
                 normalizedNoteArg.slice(-1) === "#" ||
@@ -1078,33 +1096,6 @@ var getNoteFromSolfege = (
             } else {
                 note = NOTESFLAT[index];
             }
-        } else if (octaveLength !== 12 && movable) {
-            // getScaleAndHalfSteps() hands every natural tonic the flat list, so ti in
-            // G major came out G♭. 12 EDO respells it by the key later; outside 12 EDO
-            // G♭ and F♯ are different pitches, so take the degree from the scale this EDO
-            // builds for the key, the one Scalar Step walks.
-            const buildScaleFn =
-                typeof buildScale === "function"
-                    ? buildScale
-                    : typeof require !== "undefined"
-                      ? require("./musicutils-buildscale").buildScale
-                      : null;
-            const scale = buildScaleFn ? buildScaleFn(keySignature, octaveLength)[0] : [];
-            const degree = SOLFEGENAMES.indexOf(solfegePart);
-            // Any seven-note scale names its degrees, even when an EDO without double
-            // sharps spells one with a letter twice: E♯ major in 19 EDO is E♯ G♭ A♭ A♯ B♯
-            // D♭ E♭ (F𝄪 is G♭ there), and the 12-EDO fallback, F G A A♯ C D E, is
-            // another set of pitches.
-            if (scale.length === 8 && degree !== -1) {
-                const name = scale[degree];
-                // B♯ and C♭ are spelled across the C where octaves change.
-                if (name[0] === "B" && note[0] === "C") {
-                    octave -= 1;
-                } else if (name[0] === "C" && note[0] === "B") {
-                    octave += 1;
-                }
-                note = name;
-            }
         }
 
         if (octaveLength === 12 && note in EXTRATRANSPOSITIONS) {
@@ -1113,6 +1104,72 @@ var getNoteFromSolfege = (
         }
 
         return [note, octave, transpositionFloor];
+    }
+
+    return null;
+};
+
+/**
+ * The name movable Do gives a syllable outside 12 EDO: the degree of the scale the
+ * temperament builds for the key, moved by the syllable's own accidental. ti♯ in G
+ * major is F𝄪, which 19 EDO plays as G♭, not the G the 12-EDO lists give.
+ * @param {string} keySignature - The key, e.g. "G major".
+ * @param {number} edo - Pitches per octave.
+ * @param {string} syllable - The natural syllable, do to ti.
+ * @param {number} accidental - Chromatic steps the syllable adds (♯ +1, 𝄫 -2, …).
+ * @returns {string|null} The note name, or null when the scale isn't seven notes
+ *     or the temperament has no name for the altered degree.
+ */
+const _movableDegreeName = (keySignature, edo, syllable, accidental) => {
+    const buildScaleFn =
+        typeof buildScale === "function"
+            ? buildScale
+            : typeof require !== "undefined"
+              ? require("./musicutils-buildscale").buildScale
+              : null;
+    const scale = buildScaleFn ? buildScaleFn(keySignature, edo)[0] : [];
+    const degree = SOLFEGENAMES.indexOf(syllable);
+    // Any seven-note scale names its degrees, even when an EDO without double
+    // sharps spells one with a letter twice: E♯ major in 19 EDO is E♯ G♭ A♭ A♯ B♯
+    // D♭ E♭ (F𝄪 is G♭ there), and the 12-EDO fallback, F G A A♯ C D E, is
+    // another set of pitches.
+    if (scale.length !== 8 || degree === -1) {
+        return null;
+    }
+
+    const name = scale[degree];
+    let alteration = accidental;
+    for (const sign of name.slice(1)) {
+        alteration += { [SHARP]: 1, [FLAT]: -1, [DOUBLESHARP]: 2, [DOUBLEFLAT]: -2 }[sign] || 0;
+    }
+
+    if (Math.abs(alteration) > 2) {
+        return null;
+    }
+
+    // The name as the temperament's own table spells it: 31 EDO writes a double
+    // sharp as ♯♯. 19 EDO has no double sharps, so F𝄪 is the step a sharp is
+    // above F♯ again: G♭ there.
+    const names = generateNoteNames(edo);
+    const letter = name[0];
+    const sign = alteration > 0 ? SHARP : FLAT;
+    const spellings =
+        alteration === 0
+            ? [""]
+            : Math.abs(alteration) === 1
+              ? [sign]
+              : [alteration > 0 ? DOUBLESHARP : DOUBLEFLAT, sign + sign];
+    for (const accidentals of spellings) {
+        if (names.includes(letter + accidentals)) {
+            return letter + accidentals;
+        }
+    }
+
+    const natural = names.indexOf(letter);
+    const single = names.indexOf(letter + sign);
+    if (Math.abs(alteration) === 2 && natural !== -1 && single !== -1) {
+        const n = names.length;
+        return names[(((2 * single - natural) % n) + n) % n];
     }
 
     return null;

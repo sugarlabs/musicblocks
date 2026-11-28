@@ -4951,6 +4951,35 @@ describe("getNote: movable Do outside 12 EDO", () => {
         expect(movable("ti", "F♭ major", "equal19")).toBe("E♭");
     });
 
+    const movableNote = (syllable, key, temperament) =>
+        getNote(syllable, 4, 0, key, true, null, () => {}, temperament).slice(0, 2);
+
+    it("puts each degree in the octave its letter is in", () => {
+        // A 5-EDO major scale runs out of letters and carries on into the next
+        // octave, as Scalar Step does: la and ti are C5 and D5, above sol.
+        expect(movableNote("sol", "C major", "equal5")).toEqual(["A", 4]);
+        expect(movableNote("la", "C major", "equal5")).toEqual(["C", 5]);
+        expect(movableNote("ti", "C major", "equal5")).toEqual(["D", 5]);
+        // C♭ and B♯ are written in the octave of their letter, across the C.
+        expect(movableNote("do", "C♭ major", "equal31")).toEqual(["C♭", 4]);
+        expect(movableNote("re", "C♭ major", "equal31")).toEqual(["D♭", 4]);
+        expect(movableNote("do", "B♯ major", "equal19")).toEqual(["B♯", 3]);
+        expect(movableNote("re", "B♯ major", "equal19")).toEqual(["D♭", 4]);
+        expect(movableNote("ti", "G major", "equal19")).toEqual(["F♯", 4]);
+    });
+
+    it("moves the key's own degree by the syllable's accidental", () => {
+        // ti in G major is F♯, so ti♯ is F𝄪, which 19 EDO plays as G♭: one step
+        // above ti, as in 12 EDO, not the G two steps above it.
+        expect(movableNote("ti♯", "G major", "equal19")).toEqual(["G♭", 4]);
+        expect(movableNote("ti♯", "D major", "equal19")).toEqual(["D♭", 5]);
+        expect(movableNote("la♭", "B major", "equal19")).toEqual(["G", 4]);
+        expect(movableNote("do♯", "B major", "equal19")).toEqual(["B♯", 3]);
+        // 31 EDO has double flats, spelled ♭♭.
+        expect(movableNote("la♭", "C♭ major", "equal31")).toEqual(["A♭♭", 4]);
+        expect(movableNote("mi♯", "A minor", "equal31")).toEqual(["E♯", 4]);
+    });
+
     it("leaves 12 EDO alone", () => {
         expect(movable("ti", "G major", "equal")).toBe("F♯");
         expect(movable("mi", "E♭ major", "equal")).toBe("G");
