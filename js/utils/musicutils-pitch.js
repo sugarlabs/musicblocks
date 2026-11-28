@@ -187,6 +187,21 @@ var frequencyToPitch = (hz, temperament) => {
  */
 var numberToPitchSharp = (i, temperament) => {
     const currentEDO = getCurrentEDO(temperament);
+    const temperamentData = getTemperament(temperament);
+    if (
+        temperamentData &&
+        !isTrueEDO(temperament) &&
+        temperamentData.noteLabels &&
+        temperamentData.ratios
+    ) {
+        const noteLabels = temperamentData.noteLabels;
+        const aIndex = noteLabels.indexOf("A");
+        const stepsFromC = Math.round(i + (aIndex !== -1 ? aIndex : 0));
+        const noteIndex =
+            ((stepsFromC % noteLabels.length) + noteLabels.length) % noteLabels.length;
+        return [noteLabels[noteIndex], Math.floor(stepsFromC / noteLabels.length)];
+    }
+
     if (currentEDO === 12) {
         const aIndex = 9;
         const octave = Math.floor((i + aIndex) / 12);
@@ -201,7 +216,8 @@ var numberToPitchSharp = (i, temperament) => {
     const octave = Math.floor((i + aIndex) / currentEDO);
     const nameIndex =
         Math.round((((i + aIndex) % currentEDO) + currentEDO) % currentEDO) % currentEDO;
-    return [edoNames[nameIndex], octave];
+    const noteName = edoNames[nameIndex];
+    return [noteName, octave + (noteName === "C" + FLAT ? 1 : 0)];
 };
 
 /**
