@@ -329,6 +329,14 @@ describe("musicutils-pitch", () => {
             expect(pitch.getNumber("^C", 4, "equal")).toBe(37);
             expect(pitch.getNumber("vD", 4, "equal")).toBe(39);
         });
+
+        it("clamps negative octaves to bottom bound (octave 0) instead of jumping to octave 1", () => {
+            const octave0 = pitch.getNumber("C", 0, "equal");
+            expect(octave0).toBe(-11);
+            expect(pitch.getNumber("C", -1, "equal")).toBe(octave0);
+            expect(pitch.getNumber("C", -2, "equal")).toBe(octave0);
+            expect(pitch.getNumber("C", 11, "equal")).toBe(pitch.getNumber("C", 10, "equal"));
+        });
     });
 
     describe("loaded as classic scripts, the way the browser does", () => {
