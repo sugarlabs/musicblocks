@@ -16,7 +16,7 @@
    global
 
    _, _THIS_IS_MUSIC_BLOCKS_, MATRIXBUTTONHEIGHT, MATRIXSOLFEHEIGHT, toFixed2,
-   mixedNumber, rationalToFraction, frequencyToPitch, HarmonyUtils
+   mixedNumber, rationalToFraction, frequencyToPitch, HarmonyUtils, normalizeBoxName
  */
 
 /* exported StatusMatrix */
@@ -401,7 +401,7 @@ class StatusMatrix {
                         value = mixedNumber(block.value);
                         break;
                     case "namedbox":
-                        name = block.privateData;
+                        name = normalizeBoxName(block.privateData);
                         if (
                             name &&
                             this.activity?.logo?.boxes &&

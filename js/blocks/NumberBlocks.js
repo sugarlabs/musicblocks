@@ -14,7 +14,7 @@
 
    _, ValueBlock, LeftBlock, NOINPUTERRORMSG, MathUtility,
    NANERRORMSG, toFixed2, NOSQRTERRORMSG, ZERODIVIDEERRORMSG,
-   calcOctave, clampNumber
+   calcOctave, clampNumber, normalizeBoxName
  */
 
 /* exported setupNumberBlocks */
@@ -751,7 +751,10 @@ function setupNumberBlocks(activity) {
                 if (activity.blocks.blockList[cblk2].name === "accidentalname") {
                     let scaledegree;
                     if (activity.blocks.blockList[cblk1].name === "namedbox") {
-                        scaledegree = logo.boxes[activity.blocks.blockList[cblk1].overrideName];
+                        scaledegree =
+                            logo.boxes[
+                                normalizeBoxName(activity.blocks.blockList[cblk1].overrideName)
+                            ];
                     } else {
                         scaledegree = activity.blocks.blockList[cblk1].value;
                     }
