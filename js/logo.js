@@ -990,6 +990,14 @@ class Logo {
         } else if (
             typeof arg1 === "object" &&
             blk !== null &&
+            this.blockList[blk].connections[2] === null
+        ) {
+            // The obj slot is empty. parseArg has already put "Missing argument."
+            // on the block, so stopping is all that is left to do.
+            this.stopTurtle = true;
+        } else if (
+            typeof arg1 === "object" &&
+            blk !== null &&
             this.blockList[this.blockList[blk].connections[2]].name === "loadFile"
         ) {
             if (arg1) {
