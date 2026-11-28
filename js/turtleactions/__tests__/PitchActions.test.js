@@ -45,6 +45,7 @@ Object.assign(global, {
     SHARP: musicUtils.SHARP,
     FLAT: musicUtils.FLAT,
     getCurrentEDO: musicUtils.getCurrentEDO,
+    isNonEDO: musicUtils.isNonEDO,
     getModeLength: musicUtils.getModeLength,
     noteToObj: musicUtils.noteToObj
 });
@@ -1077,6 +1078,19 @@ describe("Tests for Singer.PitchActions setup", () => {
             expect(Singer.PitchActions.deltaPitch("deltapitch", 0)).toBe(0);
             expect(Singer.PitchActions.deltaPitch("deltascalarpitch", 0)).toBe(0);
         });
+        test.each(["equal19", "equal31", "just intonation", "1/3 comma meantone"])(
+            "scalar delta counts scale degrees, not overshooting steps, in %s",
+            temperament => {
+                activity.logo.synth.inTemperament = temperament;
+                turtle.singer.previousNotePlayed = ["C4", 4];
+                turtle.singer.lastNotePlayed = ["E4", 4];
+                expect(Singer.PitchActions.deltaPitch("deltascalarpitch", 0)).toBe(2);
+                turtle.singer.lastNotePlayed = ["G3", 4];
+                expect(Singer.PitchActions.deltaPitch("deltascalarpitch", 0)).toBe(-3);
+                activity.logo.synth.inTemperament = "equal";
+            }
+        );
+
         test("scalar step follows the mode for a custom EDO temperament", () => {
             // No ratio table = equal division; step follows mode degrees (C -> D = 2).
             turtle.singer.previousNotePlayed = ["C4", 4];
