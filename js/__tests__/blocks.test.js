@@ -3922,13 +3922,27 @@ describe("Blocks Foundation", () => {
             ["an object", { name: "equal", pitchNumber: 12 }],
             ["null", null],
             ["undefined", undefined]
-        ])("reports %s without leaving a load in progress", (_label, notBlocks) => {
-            expect(() => blocks.loadNewBlocks(notBlocks)).not.toThrow();
-            expect(blocks.isLoading()).toBe(false);
-            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
-                "Cannot load project: invalid project structure."
-            );
-        });
+        ])(
+            "rejects %s cleanly via abortLoad without throwing or leaving a load in progress",
+            async (_label, notBlocks) => {
+                const loadFailedPromise = nextLoadEvent("loadFailed");
+                let loadToken;
+
+                expect(() => {
+                    loadToken = blocks.loadNewBlocks(notBlocks);
+                }).not.toThrow();
+                expect(blocks.isLoading()).toBe(false);
+                expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                    "Cannot load project: invalid project structure."
+                );
+                expect(mockActivity.stopLoadAnimation).toHaveBeenCalled();
+                expect(blocks._lastLoadFailed).toBe(true);
+
+                const failedPayload = await loadFailedPromise;
+                expect(failedPayload.token).toBe(loadToken);
+                expect(failedPayload.error.message).toContain("Invalid block data");
+            }
+        );
 
         it("reports invalid data without queuing it behind a running load", () => {
             blocks.loadNewBlocks(makeBatch(1));
@@ -3939,6 +3953,43 @@ describe("Blocks Foundation", () => {
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
                 "Cannot load project: invalid project structure."
             );
+        });
+
+        it("session recovery: runAfterLoad callbacks are cleared when non-array input aborts", () => {
+            const staleCallback = jest.fn();
+            blocks._afterLoadCallbacks.add(staleCallback);
+
+            expect(() => blocks.loadNewBlocks({ bad: "data" })).not.toThrow();
+
+            expect(blocks.isLoading()).toBe(false);
+            expect(staleCallback).not.toHaveBeenCalled();
+            expect(blocks._afterLoadCallbacks.size).toBe(0);
+            expect(mockActivity.stopLoadAnimation).toHaveBeenCalled();
+        });
+
+        it("does not allow stale deferred queue advancement from failed load A to clear newer load B", async () => {
+            const nextLoadFailed = nextLoadEvent("loadFailed");
+            const tokenA = blocks.loadNewBlocks({});
+            expect(blocks.isLoading()).toBe(false);
+
+            // Start load B immediately before A's failure timeout fires
+            const callbackB = jest.fn();
+            const tokenB = blocks.loadNewBlocks(makeBatch(25));
+            blocks.runAfterLoad(callbackB);
+            expect(blocks.isLoading()).toBe(true);
+
+            // A's deferred failure fires
+            const failedPayload = await nextLoadFailed;
+            expect(failedPayload.token).toBe(tokenA);
+
+            // Verify load B remains in progress and its callback has not fired prematurely
+            expect(blocks.isLoading()).toBe(true);
+            expect(callbackB).not.toHaveBeenCalled();
+
+            // Allow load B to finish
+            await nextLoadEvent("finishedLoading");
+            expect(blocks.isLoading()).toBe(false);
+            expect(callbackB).toHaveBeenCalled();
         });
 
         it("runAfterLoad runs the callback right away when nothing is loading", () => {
@@ -4063,6 +4114,44 @@ describe("Blocks Foundation", () => {
             expect(blocks._loadQueue).toHaveLength(0);
             expect(mockActivity.errorMsg).toHaveBeenCalled();
             expect(callback).not.toHaveBeenCalled();
+        });
+
+        it("runAfterLoad registered between abort and queue advance does not fire prematurely", async () => {
+            // Scenario: A runs async; B (invalid) and C (valid) are both queued behind it.
+            // When A finishes, _advanceLoadQueue dequeues B. B aborts synchronously.
+            // At that point C is still in _loadQueue. Without the fix, abortLoad would set
+            // _loadInProgress = false even though C is pending, causing runAfterLoad to
+            // fire before C starts. With the fix, _loadInProgress stays true until
+            // _advanceLoadQueue dequeues C and C finishes.
+            const prematureCallback = jest.fn();
+
+            const firstLoadDone = nextLoadEvent("finishedLoading"); // A's event
+            blocks.loadNewBlocks(makeBatch(25)); // A: runs immediately (async)
+            blocks.loadNewBlocks([null]); // B: queued behind A (invalid block entry → will abort)
+            blocks.loadNewBlocks(makeBatch(3)); // C: queued behind B (valid → will finish)
+            expect(blocks._loadQueue).toHaveLength(2);
+
+            blocks.runAfterLoad(prematureCallback);
+            expect(prematureCallback).not.toHaveBeenCalled();
+
+            // A finishes; _advanceLoadQueue dequeues B; B aborts synchronously;
+            // C is still in _loadQueue. With the fix _loadInProgress must stay true.
+            await firstLoadDone;
+
+            // B aborted synchronously (malformed block check), cleared _afterLoadCallbacks.
+            // The prematureCallback was cleared by abortLoad. Even so, _loadInProgress
+            // must NOT have been false in the gap between B's abort and C starting.
+            // The deferred _advanceLoadQueue for B now fires and dequeues C.
+            const cDone = nextLoadEvent("finishedLoading"); // C's event
+            await nextLoadEvent("loadFailed"); // B's deferred failure
+            await cDone;
+
+            // Once C finishes the queue is fully drained.
+            expect(blocks.isLoading()).toBe(false);
+            expect(blocks._loadQueue).toHaveLength(0);
+            // The callback was cleared by B's abortLoad — it must not have been
+            // invoked prematurely or at all.
+            expect(prematureCallback).not.toHaveBeenCalled();
         });
     });
 

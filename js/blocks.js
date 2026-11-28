@@ -5602,7 +5602,7 @@ class Blocks {
          * (see "finishedLoading"/"loadFailed" in _loadNewBlocksNow) should
          * keep this token rather than assuming whatever is currently active
          * when the request eventually runs is still this one (issue #8855).
-         * @param - blockObj - Block Objects
+         * @param {*} blockObjs - Block Objects
          * @public
          * @returns {number} this request's load token
          */
@@ -5625,6 +5625,7 @@ class Blocks {
             }
 
             this._loadInProgress = true;
+            this._activeLoadToken = loadToken;
             this._loadNewBlocksNow(blockObjs, loadToken);
             return loadToken;
         };
@@ -5634,10 +5635,20 @@ class Blocks {
          * queued while it ran, starts that one. Otherwise runs whatever
          * was waiting on runAfterLoad().
          * @private
+         * @param {number} [token] - Optional token of the completing request.
+         * Stale tokens (superseded by a newer load) are ignored.
          * @returns {void}
          */
-        this._advanceLoadQueue = () => {
+        this._advanceLoadQueue = token => {
+            if (
+                token !== undefined &&
+                this._activeLoadToken !== null &&
+                this._activeLoadToken !== token
+            ) {
+                return;
+            }
             this._loadInProgress = false;
+            this._activeLoadToken = null;
 
             // A failed load leaves only part of the project behind, which is
             // exactly what the waiting callbacks were held back from seeing.
@@ -5744,13 +5755,41 @@ class Blocks {
                      * successful path leaves it.
                      */
                     document.body.style.cursor = "default";
+                    const loadContainer = document.getElementById("load-container");
+                    if (loadContainer) {
+                        loadContainer.style.display = "none";
+                    }
                     if (this.activity && typeof this.activity.stopLoadAnimation === "function") {
                         this.activity.stopLoadAnimation();
                     }
                     // Nothing was loaded, so a waiting save would only store
                     // the cleared workspace over the project.
+                    this._lastLoadFailed = true;
                     this._afterLoadCallbacks.clear();
-                    this._advanceLoadQueue();
+                    // Keep the loader non-idle while requests remain queued so
+                    // that runAfterLoad() does not fire prematurely before the
+                    // next queued request starts. _advanceLoadQueue sets
+                    // _loadInProgress = false once the queue is drained.
+                    if (this._loadQueue.length === 0) {
+                        this._loadInProgress = false;
+                    }
+                    this._activeLoadToken = null;
+                    if (
+                        typeof pubsub !== "undefined" &&
+                        pubsub &&
+                        typeof pubsub.emit === "function"
+                    ) {
+                        const err = new Error(warning);
+                        this.setTimeout(() => {
+                            pubsub.emit("loadFailed", {
+                                token: loadToken,
+                                error: err
+                            });
+                            this._advanceLoadQueue(loadToken);
+                        }, 0);
+                    } else {
+                        this._advanceLoadQueue(loadToken);
+                    }
                 };
 
                 if (!Array.isArray(blockObjs)) {
