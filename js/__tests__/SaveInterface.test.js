@@ -751,6 +751,141 @@ describe("afterSaveMIDI", () => {
         });
     });
 
+    it("should convert ## to x for Tone.js Midi compatibility (Issue #10423)", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                {
+                    note: ["D##4"],
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "guitar"
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const instrumentTrack = tracks.find(track => track.name === "Track 1 - guitar");
+        expect(instrumentTrack.addNote).toHaveBeenCalledWith({
+            name: "Dx4",
+            time: 0,
+            duration: 0.6666666666666666,
+            velocity: 0.8
+        });
+    });
+
+    it("should safely fall back to sounding pitch when addNote throws on unparseable accidentals (Issue #10423)", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                {
+                    note: ["D###4"],
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "guitar"
+                }
+            ]
+        };
+
+        const savedParseNoteString = global.parseNoteString;
+        const savedMidi = global.Midi;
+
+        global.parseNoteString = jest.fn(() => ["D###", 4]);
+
+        let firstCall = true;
+        const mockTrack = {
+            addNote: jest.fn(arg => {
+                if (firstCall) {
+                    firstCall = false;
+                    throw new TypeError("Cannot read properties of null (reading '1')");
+                }
+            }),
+            name: "",
+            instrument: { number: 0 },
+            channel: 0
+        };
+
+        global.Midi = jest.fn(() => ({
+            header: {
+                ticksPerBeat: 480,
+                tempos: [],
+                timeSignatures: [],
+                secondsToTicks: jest.fn(() => 0),
+                update: jest.fn()
+            },
+            addTrack: jest.fn(() => mockTrack),
+            toArray: jest.fn(() => new Uint8Array([1, 2, 3]))
+        }));
+
+        try {
+            instance.afterSaveMIDI();
+            jest.runAllTimers();
+        } finally {
+            global.parseNoteString = savedParseNoteString;
+            global.Midi = savedMidi;
+        }
+
+        expect(mockTrack.addNote).toHaveBeenCalledTimes(2);
+        // D + 3 semitones = F4
+        expect(mockTrack.addNote).toHaveBeenLastCalledWith({
+            name: "F4",
+            time: 0,
+            duration: 0.6666666666666666,
+            velocity: 0.8
+        });
+    });
+
+    it("should handle failed recovery gracefully when addNote throws on unparseable input (Issue #10423)", () => {
+        mockActivity.logo._midiData = {
+            0: [
+                {
+                    note: ["invalidNote"],
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "guitar"
+                }
+            ]
+        };
+
+        const savedParseNoteString = global.parseNoteString;
+        const savedMidi = global.Midi;
+
+        global.parseNoteString = jest.fn(() => null);
+
+        const mockTrack = {
+            addNote: jest.fn(() => {
+                throw new TypeError("Cannot read properties of null (reading '1')");
+            }),
+            name: "",
+            instrument: { number: 0 },
+            channel: 0
+        };
+
+        global.Midi = jest.fn(() => ({
+            header: {
+                ticksPerBeat: 480,
+                tempos: [],
+                timeSignatures: [],
+                secondsToTicks: jest.fn(() => 0),
+                update: jest.fn()
+            },
+            addTrack: jest.fn(() => mockTrack),
+            toArray: jest.fn(() => new Uint8Array([1, 2, 3]))
+        }));
+
+        try {
+            instance.afterSaveMIDI();
+            jest.runAllTimers();
+        } finally {
+            global.parseNoteString = savedParseNoteString;
+            global.Midi = savedMidi;
+        }
+
+        // Export finishes without unhandled exception
+        expect(mockActivity.save.download).toHaveBeenCalled();
+    });
+
     it("should skip notes with zero or invalid duration and not corrupt globalTime with Infinity", () => {
         mockActivity.logo._midiData = {
             0: [

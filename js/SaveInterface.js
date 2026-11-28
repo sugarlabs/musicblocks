@@ -694,12 +694,83 @@ class SaveInterface {
                         const instrumentTrack = instrumentTracks.get(instrument);
 
                         pitches.forEach(pitch => {
-                            instrumentTrack.addNote({
-                                name: normalizeNoteAccidentals(pitch),
-                                time: globalTime,
-                                duration: duration,
-                                velocity: 0.8
-                            });
+                            let noteName = normalizeNoteAccidentals(pitch);
+                            if (noteName.includes("##")) {
+                                noteName = noteName.replace(/##/g, "x");
+                            }
+                            try {
+                                instrumentTrack.addNote({
+                                    name: noteName,
+                                    time: globalTime,
+                                    duration: duration,
+                                    velocity: 0.8
+                                });
+                            } catch (e) {
+                                try {
+                                    if (typeof parseNoteString === "function") {
+                                        const parsed = parseNoteString(pitch);
+                                        if (parsed && parsed[0]) {
+                                            const clean =
+                                                typeof normalizeNoteAccidentals === "function"
+                                                    ? normalizeNoteAccidentals(parsed[0])
+                                                    : String(parsed[0]);
+                                            const letter = clean.charAt(0).toUpperCase();
+                                            const naturalSteps = {
+                                                C: 0,
+                                                D: 2,
+                                                E: 4,
+                                                F: 5,
+                                                G: 7,
+                                                A: 9,
+                                                B: 11
+                                            };
+                                            if (naturalSteps[letter] !== undefined) {
+                                                let semitones = naturalSteps[letter];
+                                                for (const char of clean.slice(1)) {
+                                                    if (char === "#" || char === "♯")
+                                                        semitones += 1;
+                                                    else if (char === "b" || char === "♭")
+                                                        semitones -= 1;
+                                                    else if (char === "x" || char === "𝄪")
+                                                        semitones += 2;
+                                                    else if (char === "𝄫") semitones -= 2;
+                                                }
+                                                const oct =
+                                                    typeof parsed[1] === "number" &&
+                                                    !isNaN(parsed[1])
+                                                        ? parsed[1]
+                                                        : 4;
+                                                const midiNumber = (oct + 1) * 12 + semitones;
+                                                const noteNames = [
+                                                    "C",
+                                                    "C#",
+                                                    "D",
+                                                    "Eb",
+                                                    "E",
+                                                    "F",
+                                                    "F#",
+                                                    "G",
+                                                    "Ab",
+                                                    "A",
+                                                    "Bb",
+                                                    "B"
+                                                ];
+                                                const fallbackName =
+                                                    noteNames[((midiNumber % 12) + 12) % 12] +
+                                                    (Math.floor(midiNumber / 12) - 1);
+                                                instrumentTrack.addNote({
+                                                    name: fallbackName,
+                                                    time: globalTime,
+                                                    duration: duration,
+                                                    velocity: 0.8
+                                                });
+                                            }
+                                        }
+                                    }
+                                } catch (fallbackErr) {
+                                    // Ignore fallback error
+                                }
+                            }
                         });
                     }
                     globalTime += duration;
