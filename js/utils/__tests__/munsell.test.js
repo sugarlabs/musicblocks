@@ -48,6 +48,30 @@ describe("munsell", () => {
             expect(interpColor(undefined, "#123456", 0.5)).toBe("rgba(18, 52, 86, 1)");
             expect(interpColor("#123456", undefined, 0.5)).toBe("rgba(18, 52, 86, 1)");
         });
+
+        it("should return null when both colors are undefined or null", () => {
+            expect(interpColor(undefined, undefined, 0.5)).toBeNull();
+            expect(interpColor(null, null, 0.5)).toBeNull();
+            expect(interpColor(undefined, null, 0.5)).toBeNull();
+            expect(interpColor(null, undefined, 0.5)).toBeNull();
+            expect(interpColor(undefined, undefined, 0)).toBeNull();
+            expect(interpColor(undefined, undefined, 1)).toBeNull();
+            expect(interpColor(null, null, 0)).toBeNull();
+            expect(interpColor(null, null, 1)).toBeNull();
+        });
+
+        it("should handle null color inputs gracefully", () => {
+            expect(interpColor(null, "#ff0000", 0.5)).toBe("rgba(255, 0, 0, 1)");
+            expect(interpColor("#00ff00", null, 0.5)).toBe("rgba(0, 255, 0, 1)");
+            expect(interpColor(null, "#ff0000", 0)).toBe("#ff0000");
+            expect(interpColor(null, "#ff0000", 1)).toBe("#ff0000");
+            expect(interpColor("#00ff00", null, 0)).toBe("#00ff00");
+            expect(interpColor("#00ff00", null, 1)).toBe("#00ff00");
+            expect(interpColor(undefined, "#ff0000", 0)).toBe("#ff0000");
+            expect(interpColor(undefined, "#ff0000", 1)).toBe("#ff0000");
+            expect(interpColor("#00ff00", undefined, 0)).toBe("#00ff00");
+            expect(interpColor("#00ff00", undefined, 1)).toBe("#00ff00");
+        });
     });
 
     describe("getMunsellColor", () => {
