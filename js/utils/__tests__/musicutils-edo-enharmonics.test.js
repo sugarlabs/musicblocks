@@ -19,7 +19,8 @@
 
 global._ = str => str;
 
-const { getNote } = require("../musicutils");
+const { getNote, generateNoteNames } = require("../musicutils");
+const { _edoEnharmonicSlot } = require("../musicutils-pitchscale");
 
 describe("getNote: enharmonics outside 12 EDO", () => {
     const note = (name, temperament) =>
@@ -48,5 +49,34 @@ describe("getNote: enharmonics outside 12 EDO", () => {
         expect(note("mi♯", "equal")).toEqual(["F", 4]);
         expect(note("E♯", "equal17")).toEqual(["F", 4]);
         expect(note("F♭", "equal17")).toEqual(["E", 4]);
+    });
+
+    it("keeps C♭ in the lowest octave there is", () => {
+        // C♭2 is B♯1, but C♭1 can't go to octave 0: the clamp holds it at
+        // octave 1, as it holds B0.
+        const lowest = (name, octave) =>
+            getNote(name, octave, 0, "C major", false, null, () => {}, "equal19").slice(0, 2);
+        expect(lowest("C♭", 2)).toEqual(["B♯", 1]);
+        expect(lowest("C♭", 1)).toEqual(["B♯", 1]);
+        expect(lowest("B", 0)).toEqual(["B", 1]);
+    });
+});
+
+describe("_edoEnharmonicSlot", () => {
+    const edo19 = generateNoteNames(19);
+
+    it("finds a missing single sharp or flat one chromatic step from its letter", () => {
+        expect(_edoEnharmonicSlot(edo19, "F♭")).toEqual(["E♯", 0]);
+        expect(_edoEnharmonicSlot(edo19, "C♭")).toEqual(["B♯", -1]);
+    });
+
+    it("gives up on what it can't place", () => {
+        expect(_edoEnharmonicSlot([], "C♭")).toBeNull();
+        // Without C, D, E and F there is no chromatic step to measure.
+        expect(_edoEnharmonicSlot(["G", "A", "B"], "C♭")).toBeNull();
+        // Only one sharp or flat: naturals and double accidentals go elsewhere.
+        expect(_edoEnharmonicSlot(edo19, "C")).toBeNull();
+        expect(_edoEnharmonicSlot(edo19, "C𝄪")).toBeNull();
+        expect(_edoEnharmonicSlot(edo19, "H♯")).toBeNull();
     });
 });
