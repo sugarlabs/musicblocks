@@ -369,6 +369,36 @@ describe("setupDictActions", () => {
             });
             expect(serialized).toBe(expected);
         });
+
+        it("should localize coordinates and turtle keys when in another language", () => {
+            const originalI18n = global._;
+            const translations = {
+                "color": "couleur",
+                "shade": "nuance",
+                "grey": "gris",
+                "pen size": "taille du stylo",
+                "font": "police",
+                "heading": "cap",
+                "x": "axe x",
+                "y": "axe y"
+            };
+            global._ = jest.fn(key => translations[key] || key);
+            try {
+                const serialized = JSON.parse(Turtle.DictActions.SerializeDict(0, turtle));
+                expect(serialized).toEqual({
+                    "couleur": "red",
+                    "nuance": 10,
+                    "gris": 0.5,
+                    "taille du stylo": 2,
+                    "police": "Arial",
+                    "cap": 90,
+                    "axe y": 200,
+                    "axe x": 100
+                });
+            } finally {
+                global._ = originalI18n;
+            }
+        });
     });
 
     describe("getDict", () => {
@@ -533,6 +563,32 @@ describe("setupDictActions", () => {
                 123
             );
             global._ = originalI18n;
+        });
+
+        it("should preserve regex tokens in dictionary names without corruption", () => {
+            activity.logo.turtleDicts[turtle] = {
+                "$&_dict": {},
+                "$$price": {},
+                "$1_group": {}
+            };
+
+            Turtle.DictActions.getValue("$&_dict", "missingKey", turtle, 101);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Key with this name does not exist in $&_dict",
+                101
+            );
+
+            Turtle.DictActions.getValue("$$price", "missingKey", turtle, 102);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Key with this name does not exist in $$price",
+                102
+            );
+
+            Turtle.DictActions.getValue("$1_group", "missingKey", turtle, 103);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Key with this name does not exist in $1_group",
+                103
+            );
         });
 
         it("should initialize turtleDicts if it does not exist for the turtle", () => {
