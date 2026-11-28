@@ -281,14 +281,43 @@ describe("ChordBuilderWidget", () => {
             expect(mockAudio.playChord).toHaveBeenCalledWith(chord, 0.4, { octave: 4 });
         });
 
-        it("removes chord at index", () => {
+        it("removes chord at index preserving slots and trimming trailing nulls", () => {
             widget.addChord(widget.diatonicChords[0]); // C
             widget.addChord(widget.diatonicChords[4]); // G
             expect(widget.progression).toHaveLength(2);
 
             widget.removeChord(0);
-            expect(widget.progression).toHaveLength(1);
-            expect(widget.progression[0].name).toBe("G");
+            expect(widget.progression).toHaveLength(2);
+            expect(widget.progression[0]).toBeNull();
+            expect(widget.progression[1].name).toBe("G");
+
+            widget.removeChord(1);
+            expect(widget.progression).toHaveLength(0);
+        });
+
+        it("preserves chord positions across bar boundaries when earlier chord is removed", () => {
+            widget.progression = [
+                { ...widget.diatonicChords[0] }, // Bar 1 Beat 1 (cell 0)
+                null,
+                null,
+                null,
+                { ...widget.diatonicChords[4] } // Bar 2 Beat 1 (cell 4)
+            ];
+
+            widget.removeChord(0);
+            expect(widget.progression).toHaveLength(5);
+            expect(widget.progression[0]).toBeNull();
+            expect(widget.progression[4].name).toBe("G");
+        });
+
+        it("stops active playback when progression becomes empty after removal", () => {
+            widget.progression = [{ ...widget.diatonicChords[0] }];
+            widget.playProgression();
+
+            widget.removeChord(0);
+            expect(widget.progression).toHaveLength(0);
+            expect(mockAudio.stop).toHaveBeenCalled();
+            expect(widget.activeStep).toBe(-1);
         });
 
         it("clears entire progression and stops audio", () => {
@@ -338,8 +367,29 @@ describe("ChordBuilderWidget", () => {
                 widget.tempo,
                 expect.any(Function),
                 expect.any(Function),
-                { octave: 4 }
+                { octave: 4, beatsPerChord: 1 }
             );
+        });
+
+        it("stops active playback when key or mode changes", () => {
+            widget.loadPreset("pop");
+            widget.playProgression();
+            expect(mockAudio.playProgression).toHaveBeenCalled();
+
+            const stopCountBefore = mockAudio.stop.mock.calls.length;
+            widget.setKeyAndMode("G", "major");
+            expect(mockAudio.stop.mock.calls.length).toBe(stopCountBefore + 1);
+            expect(widget.progression).toHaveLength(0);
+        });
+
+        it("restores playhead highlight when grid is re-rendered during playback", () => {
+            widget.progression = [{ roman: "I", name: "C" }, null, { roman: "V", name: "G" }];
+            widget.activeStep = 1;
+            widget._renderBarGrid();
+
+            const cells = widget.barGridContainer.querySelectorAll(".bar-grid-cell");
+            expect(cells[1].style.background).toBe("rgba(255, 215, 0, 0.35)");
+            expect(cells[0].style.background).toBe("rgb(238, 244, 253)");
         });
 
         it("stops playback when _stopPlayback is called", () => {
@@ -836,6 +886,26 @@ describe("ChordBuilderWidget", () => {
             const picker1 = cell1.querySelector("select");
             picker1.onchange({ target: { value: "2" } });
             expect(widget.progression[1]).not.toBeNull();
+        });
+
+        it("highlights active step across chords and rests", () => {
+            widget.progression = [
+                { name: "C", roman: "I", notes: ["C", "E", "G"] },
+                null,
+                { name: "G", roman: "V", notes: ["G", "B", "D"] }
+            ];
+            widget._renderBarGrid();
+
+            const cells = body.querySelectorAll(".bar-grid-cell");
+            widget._highlightActiveStep(0);
+            expect(cells[0].style.background).toBe("rgb(255, 215, 0)");
+
+            widget._highlightActiveStep(1);
+            expect(cells[1].style.background).toBe("rgba(255, 215, 0, 0.35)");
+            expect(cells[0].style.background).toBe("rgb(238, 244, 253)");
+
+            widget._highlightActiveStep(-1);
+            expect(cells[1].style.background).toBe("transparent");
         });
     });
 
