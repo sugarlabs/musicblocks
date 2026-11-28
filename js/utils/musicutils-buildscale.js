@@ -89,7 +89,7 @@ if (typeof module !== "undefined" && module.exports) {
     var MusicUtilsModeCore =
         (typeof window !== "undefined" && window.MusicUtilsModeCore) ||
         (typeof require !== "undefined" ? require("./musicutils-modecore") : {});
-    var { getModePattern, modeMapper, MOVABLE_TONIC_DEGREE } = MusicUtilsModeCore;
+    var { getModePattern, isBuiltInMode, modeMapper, MOVABLE_TONIC_DEGREE } = MusicUtilsModeCore;
     var UtilsLogic =
         (typeof window !== "undefined" && window.UtilsLogic) ||
         (typeof require !== "undefined" ? require("./utils-logic") : {});
@@ -329,7 +329,40 @@ var buildScale = (keySignature, edo) => {
         // pitch class, so no pitch class is left unreachable.
         const edoHalfSteps = getModePattern(obj[1], currentEDO);
 
-        const startNote = edoNames[idx];
+        // Keep the usual spelling in 21-note meantone. Its note positions do
+        // not match a proportional 12-EDO scale.
+        if (currentEDO === 21 && isBuiltInMode(obj[1])) {
+            const twelveEDOScale = buildScale(keySignature, 12)[0];
+            const positions = [];
+            let previous = edoNames.indexOf(twelveEDOScale[0]);
+            if (previous !== -1) {
+                positions.push(previous);
+                for (let i = 1; i < twelveEDOScale.length; i++) {
+                    let position = edoNames.indexOf(twelveEDOScale[i]);
+                    if (position === -1) {
+                        positions.length = 0;
+                        break;
+                    }
+                    while (position <= previous) {
+                        position += edoNames.length;
+                    }
+                    positions.push(position);
+                    previous = position;
+                }
+            }
+            if (positions.length === twelveEDOScale.length && positions[0] === idx) {
+                const steps = positions.slice(1).map((position, i) => position - positions[i]);
+                return [twelveEDOScale, steps];
+            }
+        }
+
+        const startNote =
+            currentEDO === 21 &&
+            idx !== edoNames.indexOf(myKeySignature) &&
+            typeof EXTRATRANSPOSITIONS !== "undefined" &&
+            myKeySignature in EXTRATRANSPOSITIONS
+                ? myKeySignature
+                : edoNames[idx];
         const scale = [startNote];
         let ii = idx;
         for (let i = 0; i < edoHalfSteps.length; i++) {
@@ -593,7 +626,7 @@ var _getStepSize = (keySignature, pitch, direction, transposition, temperament, 
         }
         if (
             keyTonic === "C" + FLAT &&
-            scale[0] === "B" + SHARP &&
+            (scale[0] === "B" + SHARP || (currentEDO === 21 && scale[0] === "C" + FLAT)) &&
             ((s1 === "C" + FLAT && s2 === "B" + SHARP) || (s1 === "B" + SHARP && s2 === "C" + FLAT))
         ) {
             return true;
@@ -808,6 +841,25 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
     const obj1 = buildScale(keySignature, edo);
     const chosenModeScale = obj1[0];
     const chosenModePattern = obj1[1];
+    let currentEDO = edo;
+    if (currentEDO === undefined) {
+        currentEDO = 12;
+        if (typeof globalActivity !== "undefined" && globalActivity?.logo?.synth?.inTemperament) {
+            currentEDO = getCurrentEDO(globalActivity.logo.synth.inTemperament);
+        }
+    }
+    currentEDO = normalizeEDO(currentEDO);
+
+    let classificationPattern = chosenModePattern;
+    if (currentEDO === 21 && isBuiltInMode(chosenMode[1])) {
+        const twelveEDOScale = buildScale(keySignature, 12);
+        const usesTwelveEDOSpelling =
+            chosenModeScale.length === twelveEDOScale[0].length &&
+            chosenModeScale.every((note, i) => note === twelveEDOScale[0][i]);
+        if (usesTwelveEDOSpelling) {
+            classificationPattern = twelveEDOScale[1];
+        }
+    }
 
     // Pitch numbers of the chosen mode
     const semitones = [0];
@@ -921,7 +973,7 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
                     case 6:
                         if (definedScaleDegree[definedScaleDegree.length - 1] !== 4) {
                             definedScaleDegree.push(4);
-                        } else if (semitones[i] + chosenModePattern[i] !== 7) {
+                        } else if (semitones[i] + classificationPattern[i] !== 7) {
                             definedScaleDegree.push(5);
                         } else {
                             // Keep indices aligned with chosenModeScale
@@ -943,7 +995,7 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
                         continue;
                 }
 
-                semitones.push(semitones[i] + chosenModePattern[i]);
+                semitones.push(semitones[i] + classificationPattern[i]);
             }
 
             // For scale degrees which are defined --> Use choosen Mode's notes
@@ -977,7 +1029,7 @@ var scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch, edo)
             // All scales degrees are defined, just prefer the perfect/major ones
 
             for (let i = 0; i < chosenModePattern.length; i++) {
-                semitones.push(semitones[i] + chosenModePattern[i]);
+                semitones.push(semitones[i] + classificationPattern[i]);
             }
 
             for (let i = 0; i < semitones.length; i++) {
