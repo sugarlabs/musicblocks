@@ -2844,6 +2844,7 @@ class Block {
         if (typeof this.blocks._updateViewportGrid === "function") {
             this.blocks._updateViewportGrid(thisBlock);
         }
+        this._updateAccessibleElement();
         this.activity.refreshCanvas();
     }
 
@@ -5585,9 +5586,18 @@ class Block {
         }
 
         el.setAttribute("aria-label", this.getAccessibleLabel());
+        this._syncAccessibleExpanded(el);
 
         el.addEventListener("keydown", event => {
-            if (event.key === "Enter" || event.key === " " || event.key === "Spacebar") {
+            const isActivateKey =
+                event.key === "Enter" || event.key === " " || event.key === "Spacebar";
+            if (isActivateKey && event.shiftKey && this.isCollapsible()) {
+                // Shift+Enter / Shift+Space collapses or expands the block, the way the
+                // collapse button does for a pointer. Plain Enter / Space still activates it.
+                event.preventDefault();
+                event.stopPropagation();
+                this.collapseToggle();
+            } else if (isActivateKey) {
                 event.preventDefault();
                 event.stopPropagation();
                 this.activate();
@@ -5638,6 +5648,22 @@ class Block {
             this.accessibleElement.id = "accessible-block-" + this.blockIndex;
         }
         this.accessibleElement.setAttribute("aria-label", this.getAccessibleLabel());
+        this._syncAccessibleExpanded(this.accessibleElement);
+    }
+
+    /**
+     * Tell assistive technology whether a collapsible block is expanded.
+     * Blocks that cannot collapse carry no aria-expanded attribute.
+     * @private
+     * @param {HTMLElement} el - The accessible mirror element.
+     * @returns {void}
+     */
+    _syncAccessibleExpanded(el) {
+        if (this.isCollapsible()) {
+            el.setAttribute("aria-expanded", String(!this.collapsed));
+        } else {
+            el.removeAttribute("aria-expanded");
+        }
     }
 }
 
