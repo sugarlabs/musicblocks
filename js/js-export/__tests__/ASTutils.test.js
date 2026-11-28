@@ -1113,6 +1113,57 @@ describe("ASTUtils", () => {
         });
     });
 
+    describe("box names", () => {
+        const acorn = require("../../../lib/acorn.min");
+        const mockInterface = global.JSInterface;
+
+        beforeAll(() => {
+            global.JSInterface = require("../interface");
+        });
+
+        afterAll(() => {
+            global.JSInterface = mockInterface;
+        });
+
+        const exportBox = name => {
+            const program = {
+                type: "Program",
+                sourceType: "script",
+                body: [
+                    ASTUtils.getMouseAST([
+                        ["storein", [name, 5]],
+                        [`storein2_${name}`, [6]],
+                        ["increment", [`box_${name}`, 1]],
+                        ["print", [["box", [name]]]],
+                        ["print", [`box_${name}`]]
+                    ])
+                ]
+            };
+            return astring.generate(program);
+        };
+
+        it.each(["class", "for", "new", "delete", "mouse", "actionArgs", "Math"])(
+            "exports a box named %p through setBox/getBox",
+            name => {
+                const code = exportBox(name);
+                expect(() => acorn.parse(code, { ecmaVersion: 2020 })).not.toThrow();
+                expect(code).not.toMatch(/\bvar\b/);
+                expect(code).toContain(`mouse.setBox("${name}", 5)`);
+                expect(code).toContain(`mouse.setBox("${name}", 6)`);
+                expect(code).toContain(`mouse.incrementBox("${name}", 1)`);
+                expect(code).toContain(`mouse.print(mouse.getBox("${name}"))`);
+            }
+        );
+
+        it("still exports an ordinary box name as a variable", () => {
+            const code = exportBox("n");
+            expect(code).toContain("var n = 5;");
+            expect(code).toContain("n = n + 1;");
+            expect(code).toContain("mouse.print(n)");
+            expect(code).not.toContain("setBox");
+        });
+    });
+
     describe("getMouseAST", () => {
         it("should return the AST for a mouse", () => {
             const tree = ["flow"];
