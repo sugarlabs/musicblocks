@@ -103,6 +103,25 @@ describe("NetworkMonitor", () => {
     });
 
     describe("State transitions and callbacks", () => {
+        test.each([500, 503])(
+            "treats HTTP %i as offline and reconnects on success",
+            async status => {
+                const onOnline = jest.fn();
+                const onOffline = jest.fn();
+                mockFetch.mockResolvedValueOnce({ ok: false, status });
+                const monitor = new NetworkMonitor(onOnline, onOffline);
+                await Promise.resolve();
+                expect(monitor.isOnline).toBe(false);
+                expect(onOffline).toHaveBeenCalledTimes(1);
+                expect(onOnline).not.toHaveBeenCalled();
+
+                mockFetch.mockResolvedValueOnce({ ok: true, status: 200 });
+                await monitor.forceProbe();
+                expect(monitor.isOnline).toBe(true);
+                expect(onOnline).toHaveBeenCalledTimes(1);
+                monitor.destroy();
+            }
+        );
         test("calls onOnline when state transitions from offline to online", async () => {
             setNavigatorOnLine(false);
             const onOnline = jest.fn();
