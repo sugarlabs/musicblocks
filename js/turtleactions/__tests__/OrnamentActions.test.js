@@ -521,9 +521,25 @@ describe("OrnamentActions", () => {
         });
 
         test("dispatches errorMsg and skips push when noteValue is invalid", () => {
-            const invalidNoteValues = [NaN, -1, -0.5, 0, Infinity, null, undefined, "invalid"];
+            const invalidNoteValues = [
+                NaN,
+                -1,
+                -0.5,
+                0,
+                -0,
+                Infinity,
+                -Infinity,
+                null,
+                undefined,
+                "invalid",
+                Number.MIN_VALUE,
+                1e-309
+            ];
             invalidNoteValues.forEach(val => {
                 errorMsgCalls.length = 0;
+                const dispatchCount = dispatchCalls.length;
+                const listenerCount = listenerCalls.length;
+                const mouseCount = mouseMB.listeners.length;
                 const before = {
                     inNeighbor: [...turtle.singer.inNeighbor],
                     neighborStepPitch: [...turtle.singer.neighborStepPitch],
@@ -537,6 +553,9 @@ describe("OrnamentActions", () => {
                 expect(turtle.singer.inNeighbor).toEqual(before.inNeighbor);
                 expect(turtle.singer.neighborStepPitch).toEqual(before.neighborStepPitch);
                 expect(turtle.singer.neighborNoteValue).toEqual(before.neighborNoteValue);
+                expect(dispatchCalls.length).toBe(dispatchCount);
+                expect(listenerCalls.length).toBe(listenerCount);
+                expect(mouseMB.listeners.length).toBe(mouseCount);
             });
         });
 
