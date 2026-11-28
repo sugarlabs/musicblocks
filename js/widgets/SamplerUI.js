@@ -56,6 +56,12 @@ const SamplerUI = {
          * @returns {void}
          */
         this.init = function (activity, timbreBlock) {
+            // If the window is already open, just show it. Do not build a second copy.
+            if (this._windowOpen && this.widgetWindow) {
+                this.widgetWindow.show();
+                return;
+            }
+
             this.activity = activity;
             this.timbreBlock = timbreBlock;
             this.running = true;
@@ -200,6 +206,7 @@ const SamplerUI = {
                     this._dropZone = null;
                 }
 
+                this._windowOpen = false;
                 widgetWindow.destroy();
             };
 
@@ -891,6 +898,7 @@ const SamplerUI = {
 
             widgetWindow.sendToCenter();
             this.widgetWindow = widgetWindow;
+            this._windowOpen = true;
 
             this._scale();
 
