@@ -402,6 +402,47 @@ describe("setupVolumeBlocks", () => {
             expect(logo.synth.loadSynth).not.toHaveBeenCalled();
             expect(last(turtleObj.singer.synthVolume.guitar)).toBe(40);
         });
+
+        it("isolates nested synth volume clamp listeners and restores independent voice volumes", () => {
+            const setSynthVol2Block = createdBlocks["setsynthvolume2"];
+            const turtleObj = activity.turtles.ithTurtle(turtleIndex);
+            turtleObj.singer.instrumentNames = ["piano", "guitar"];
+            turtleObj.singer.synthVolume = {
+                piano: [50],
+                guitar: [50]
+            };
+            turtleObj.singer.crescendoInitialVolume = {};
+            logo.synth.loadSynth = jest.fn();
+            logo.setDispatchBlock = jest.fn();
+            logo.setTurtleListener = jest.fn();
+
+            setSynthVol2Block.flow(["piano", 80, 100], logo, turtleIndex, "outer_blk");
+            setSynthVol2Block.flow(["guitar", 40, 101], logo, turtleIndex, "inner_blk");
+
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith(
+                "outer_blk",
+                turtleIndex,
+                `_synthvolume_${turtleIndex}_outer_blk`
+            );
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith(
+                "inner_blk",
+                turtleIndex,
+                `_synthvolume_${turtleIndex}_inner_blk`
+            );
+
+            const innerListener = logo.setTurtleListener.mock.calls.find(
+                call => call[1] === `_synthvolume_${turtleIndex}_inner_blk`
+            )[2];
+            innerListener();
+            expect(last(turtleObj.singer.synthVolume.guitar)).toBe(50);
+            expect(last(turtleObj.singer.synthVolume.piano)).toBe(80);
+
+            const outerListener = logo.setTurtleListener.mock.calls.find(
+                call => call[1] === `_synthvolume_${turtleIndex}_outer_blk`
+            )[2];
+            outerListener();
+            expect(last(turtleObj.singer.synthVolume.piano)).toBe(50);
+        });
     });
 
     describe("SetSynthVolumeBlock", () => {
@@ -478,6 +519,39 @@ describe("setupVolumeBlocks", () => {
             );
             expect(logo.setTurtleListener).toHaveBeenCalled();
             expect(ret).toEqual([100, 1]);
+        });
+
+        it("isolates nested master volume clamp listeners across distinct block IDs", () => {
+            const noteVol2Block = createdBlocks["setnotevolume2"];
+            Singer.masterVolume = [50];
+            logo.setDispatchBlock = jest.fn();
+            logo.setTurtleListener = jest.fn();
+
+            noteVol2Block.flow([80, 100], logo, turtleIndex, "outer_vol_blk");
+            noteVol2Block.flow([40, 101], logo, turtleIndex, "inner_vol_blk");
+
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith(
+                "outer_vol_blk",
+                turtleIndex,
+                `_volume_${turtleIndex}_outer_vol_blk`
+            );
+            expect(logo.setDispatchBlock).toHaveBeenCalledWith(
+                "inner_vol_blk",
+                turtleIndex,
+                `_volume_${turtleIndex}_inner_vol_blk`
+            );
+
+            const innerListener = logo.setTurtleListener.mock.calls.find(
+                call => call[1] === `_volume_${turtleIndex}_inner_vol_blk`
+            )[2];
+            innerListener();
+            expect(last(Singer.masterVolume)).toBe(80);
+
+            const outerListener = logo.setTurtleListener.mock.calls.find(
+                call => call[1] === `_volume_${turtleIndex}_outer_vol_blk`
+            )[2];
+            outerListener();
+            expect(last(Singer.masterVolume)).toBe(50);
         });
     });
 

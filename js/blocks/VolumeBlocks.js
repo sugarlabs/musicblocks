@@ -470,7 +470,7 @@ function setupVolumeBlocks(activity) {
                 Singer.setSynthVolume(logo, turtle, synth, arg1);
             }
 
-            const listenerName = "_synthvolume_" + turtle;
+            const listenerName = "_synthvolume_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = event => {
@@ -759,7 +759,7 @@ function setupVolumeBlocks(activity) {
                 Singer.setMasterVolume(logo, arg);
             }
 
-            const listenerName = "_volume_" + turtle;
+            const listenerName = "_volume_" + turtle + "_" + blk;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             const __listener = event => {
