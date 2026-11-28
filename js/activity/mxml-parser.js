@@ -186,6 +186,17 @@ const _addFractionsWithoutCrossMultiplication = ([n1, d1], [n2, d2]) => {
     return [value, 1];
 };
 
+// A duration times num/den, reduced: grace notes take a share of the note
+// they lead into, and unreduced shares would put needlessly large numbers
+// in the divide blocks.
+const _scaleFraction = ([numerator, denominator], num, den) => {
+    const top = numerator * num;
+    const bottom = denominator * den;
+    if (!Number.isInteger(top) || !Number.isInteger(bottom)) return [top / bottom, 1];
+    const divisor = GCD(top, bottom);
+    return [top / divisor, bottom / divisor];
+};
+
 // Keep tie durations reduced as they accumulate. Multiplying denominators on
 // every note can overflow before the resulting divide block is ever evaluated.
 const _addFractions = ([n1, d1], [n2, d2]) => {
@@ -1214,6 +1225,8 @@ function _processPart(
     let producedNotes = false;
     let tieDuration = null;
     let tieContent = null;
+    // Grace notes read since the last sounding note, waiting to lead into the next one.
+    let pendingGraces = [];
     let tieLyrics = [];
     let currentTempoBpm = initialTempoBpm;
     let nextTempoIndex = 0;
@@ -1390,7 +1403,6 @@ function _processPart(
 
             if (child.tagName !== "note") continue;
             if (child.querySelector(":scope > chord") !== null) continue;
-            if (child.querySelector(":scope > grace") !== null) continue;
 
             const duration = _noteDuration(child, divisions);
             const lyrics = _lyricTexts(child);
@@ -1410,6 +1422,17 @@ function _processPart(
                 content = { type: "drum", name: _drumName(child, instrumentMap) };
             } else {
                 content = { type: "pitch", ..._pitchToNoteName(pitchEl) };
+            }
+
+            // A grace note has no <duration> of its own: it is played in time
+            // taken from the note it leads into, so it waits for that note.
+            const graceEl = child.querySelector(":scope > grace");
+            if (graceEl !== null) {
+                if (content !== null) {
+                    const steal = Number(graceEl.getAttribute("steal-time-following"));
+                    pendingGraces.push({ content, steal });
+                }
+                continue;
             }
 
             let hasTieStart = false;
@@ -1432,6 +1455,7 @@ function _processPart(
                         ? { ...firstEndingBodyTie, duration: combinedDuration }
                         : null;
                     offset += (duration[0] * 4) / duration[1];
+                    pendingGraces = [];
                     continue;
                 }
                 firstEndingBodyTie = null;
@@ -1449,6 +1473,27 @@ function _processPart(
 
             if (tieDuration !== null && !continuesTie) flushTie();
 
+            // The grace notes share the part of this note's length that
+            // steal-time-following gives them, or half when the file doesn't
+            // say -- the share ABC import gives them, as abcjs plays them.
+            // Before a rest, or a note that only continues a tie, there is
+            // no new note to lead into, so they are dropped.
+            let noteDuration = duration;
+            if (pendingGraces.length > 0) {
+                if (content !== null && !continuesTie) {
+                    const steal = pendingGraces[0].steal;
+                    const percent = steal > 0 && steal < 100 ? steal : 50;
+                    for (const grace of pendingGraces) {
+                        emitNote(
+                            _scaleFraction(duration, percent, 100 * pendingGraces.length),
+                            grace.content
+                        );
+                    }
+                    noteDuration = _scaleFraction(duration, 100 - percent, 100);
+                }
+                pendingGraces = [];
+            }
+
             if (continuesTie) {
                 tieLyrics = _mergeLyrics(tieLyrics, lyrics);
                 const combined = _addFractions(tieDuration, duration);
@@ -1461,11 +1506,11 @@ function _processPart(
                     tieLyrics = [];
                 }
             } else if (hasTieStart && !hasTieStop) {
-                tieDuration = duration;
+                tieDuration = noteDuration;
                 tieContent = content;
                 tieLyrics = lyrics;
             } else {
-                emitNote(duration, content, lyrics);
+                emitNote(noteDuration, content, lyrics);
             }
 
             offset += (duration[0] * 4) / duration[1];
