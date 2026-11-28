@@ -5571,6 +5571,12 @@ class Block {
         }
         this._removeAccessibleElement();
 
+        // Hidden connector blocks have no size and no artwork (see ignore()), so
+        // they must not become empty keyboard and screen-reader stops.
+        if (this.name === "hidden" || this.name === "hiddennoflow") {
+            return null;
+        }
+
         const container = Block.getAccessibleContainer();
         if (!container || typeof container.appendChild !== "function") {
             return null;
