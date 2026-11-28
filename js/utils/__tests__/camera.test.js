@@ -356,6 +356,153 @@ describe("doStopVideoCam", () => {
         expect(CameraManager.isSetup).toBe(false);
     });
 
+    test("releases the webcam tracks even when cameraID is null (still-photo path)", () => {
+        const track = { stop: jest.fn() };
+        const video = {
+            pause: jest.fn(),
+            srcObject: { getTracks: () => [track] }
+        };
+        document.querySelector = jest.fn(() => video);
+        const setCameraID = jest.fn();
+
+        doStopVideoCam(null, setCameraID);
+
+        expect(window.clearInterval).not.toHaveBeenCalled();
+        expect(track.stop).toHaveBeenCalledTimes(1);
+        expect(video.srcObject).toBeNull();
+        expect(setCameraID).toHaveBeenCalledWith(null);
+    });
+
+    test("still photo via doUseCamera leaves cameraID null, and Stop still stops the tracks", async () => {
+        const { video } = makeDom();
+        const track = { stop: jest.fn() };
+        const stream = { getTracks: () => [track] };
+        Object.defineProperty(global.navigator, "mediaDevices", {
+            configurable: true,
+            value: { getUserMedia: jest.fn(() => Promise.resolve(stream)) }
+        });
+        CameraManager.reset();
+        const { turtles } = makeTurtles();
+        const setCameraID = jest.fn();
+
+        doUseCamera(["x"], turtles, 0, false, null, setCameraID, jest.fn());
+        await Promise.resolve();
+        await Promise.resolve();
+        video.fireCanplay();
+
+        // Still photo never registers a camera ID...
+        expect(setCameraID).not.toHaveBeenCalled();
+
+        // ...so Stop is called with a null ID and must still release the stream.
+        doStopVideoCam(null, setCameraID);
+        expect(track.stop).toHaveBeenCalledTimes(1);
+        expect(video.srcObject).toBeNull();
+    });
+
+    test("video mode: Stop before canplay releases the tracks and capture never starts", async () => {
+        const { video } = makeDom();
+        const track = { stop: jest.fn() };
+        const stream = { getTracks: () => [track] };
+        Object.defineProperty(global.navigator, "mediaDevices", {
+            configurable: true,
+            value: { getUserMedia: jest.fn(() => Promise.resolve(stream)) }
+        });
+        CameraManager.reset();
+        const { turtles } = makeTurtles();
+        const setCameraID = jest.fn();
+
+        doUseCamera(["x"], turtles, 0, true, null, setCameraID, jest.fn());
+        await Promise.resolve();
+        await Promise.resolve();
+
+        // Stop arrives after the stream is attached but before canplay fires.
+        doStopVideoCam(null, setCameraID);
+        expect(track.stop).toHaveBeenCalledTimes(1);
+        expect(video.srcObject).toBeNull();
+
+        setCameraID.mockClear();
+        video.fireCanplay();
+
+        // The canplay handler was removed by Stop, so capture must not start.
+        expect(setCameraID).not.toHaveBeenCalledWith(expect.any(Number));
+        expect(CameraManager.intervalId).toBeNull();
+    });
+
+    describe("still-photo idle release", () => {
+        const setupStill = async () => {
+            const { video } = makeDom();
+            const track = { stop: jest.fn() };
+            const stream = { getTracks: () => [track] };
+            Object.defineProperty(global.navigator, "mediaDevices", {
+                configurable: true,
+                value: { getUserMedia: jest.fn(() => Promise.resolve(stream)) }
+            });
+            CameraManager.reset();
+            const { turtles } = makeTurtles();
+            const setCameraID = jest.fn();
+            doUseCamera(["x"], turtles, 0, false, null, setCameraID, jest.fn());
+            await Promise.resolve();
+            await Promise.resolve();
+            video.fireCanplay();
+            return { video, track, turtles, setCameraID };
+        };
+
+        beforeEach(() => jest.useFakeTimers());
+        afterEach(() => {
+            CameraManager.reset();
+            jest.useRealTimers();
+        });
+
+        test("releases the webcam by itself once the photo has been taken and the camera is idle", async () => {
+            const { video, track } = await setupStill();
+
+            expect(track.stop).not.toHaveBeenCalled();
+            jest.advanceTimersByTime(2000);
+
+            expect(track.stop).toHaveBeenCalledTimes(1);
+            expect(video.srcObject).toBeNull();
+        });
+
+        test("a further Camera call inside the idle window keeps the stream open", async () => {
+            const { track, turtles, setCameraID } = await setupStill();
+
+            jest.advanceTimersByTime(1500);
+            doUseCamera(["x"], turtles, 0, false, null, setCameraID, jest.fn());
+            jest.advanceTimersByTime(1500);
+
+            // 3s since the first photo, but the second call restarted the idle timer.
+            expect(track.stop).not.toHaveBeenCalled();
+            jest.advanceTimersByTime(600);
+            expect(track.stop).toHaveBeenCalledTimes(1);
+        });
+
+        test("Stop cancels the pending idle release so it cannot fire twice", async () => {
+            const { track, setCameraID } = await setupStill();
+
+            doStopVideoCam(null, setCameraID);
+            expect(track.stop).toHaveBeenCalledTimes(1);
+
+            jest.advanceTimersByTime(5000);
+            expect(track.stop).toHaveBeenCalledTimes(1);
+            expect(CameraManager.idleTimer).toBeNull();
+        });
+
+        test("no release is scheduled while the camera permission is still pending", () => {
+            makeDom();
+            Object.defineProperty(global.navigator, "mediaDevices", {
+                configurable: true,
+                value: { getUserMedia: jest.fn(() => new Promise(() => {})) }
+            });
+            CameraManager.reset();
+            const { turtles } = makeTurtles();
+
+            doUseCamera(["x"], turtles, 0, false, null, jest.fn(), jest.fn());
+            jest.advanceTimersByTime(10000);
+
+            expect(CameraManager.idleTimer).toBeNull();
+        });
+    });
+
     test("a Stop followed by a fresh Camera+Show run behaves like a first run again", async () => {
         const dom = makeDom();
         const turtlesCtx = makeTurtles();

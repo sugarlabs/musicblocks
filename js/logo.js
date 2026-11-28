@@ -1625,6 +1625,10 @@ class Logo {
 
         this.clearTurtleListeners(true);
 
+        // Natural completion only releases a camera that is actively capturing
+        // (video mode). A still-photo capture with no cameraID may still be
+        // waiting for the user to grant permission, so it must not be cancelled
+        // here; explicit Stop releases it in doStopTurtles().
         // eslint-disable-next-line eqeqeq
         if (this.cameraID != null) {
             if (this.deps.utils.doStopVideoCam) {
@@ -1673,6 +1677,13 @@ class Logo {
         document.body.style.cursor = "default";
 
         this._cleanupAfterCompletion();
+
+        // Explicit Stop always releases the webcam, even for a still-photo
+        // Camera block (which never sets cameraID) and even if the cleanup
+        // above returned early because it had already run.
+        if (this.deps.utils.doStopVideoCam) {
+            this.deps.utils.doStopVideoCam(this.cameraID, this.setCameraID);
+        }
 
         for (const arg in this.evalOnStopList) {
             this.safePluginExecute(this.evalOnStopList[arg], this);

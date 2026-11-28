@@ -422,6 +422,15 @@ describe("setupMediaBlocks", () => {
             stopVideoCamBlock.flow([], logo);
             expect(doStopVideoCam).toHaveBeenCalledWith("cam1", logo.setCameraID);
         });
+
+        it("should still call doStopVideoCam when logo.cameraID is null (still-photo mode)", () => {
+            doStopVideoCam.mockClear();
+            logo.cameraID = null;
+            logo.setCameraID = jest.fn();
+            const stopVideoCamBlock = createdBlocks["stopvideocam"];
+            stopVideoCamBlock.flow([], logo);
+            expect(doStopVideoCam).toHaveBeenCalledWith(null, logo.setCameraID);
+        });
     });
 
     describe("ToneBlock", () => {

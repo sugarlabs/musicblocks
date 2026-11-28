@@ -478,6 +478,18 @@ describe("_cleanupAfterCompletion", () => {
 
         expect(logo.deps.utils.doStopVideoCam).toHaveBeenCalledWith("cam-1", logo.setCameraID);
     });
+
+    test("natural completion does not cancel a still-photo capture with no cameraID", () => {
+        // A pending getUserMedia request (user has not clicked Allow yet) must
+        // survive natural completion; only explicit Stop cancels it.
+        logo._synthsInitialized = true;
+        logo.cameraID = null;
+        logo.deps.utils.doStopVideoCam = jest.fn();
+
+        logo._cleanupAfterCompletion();
+
+        expect(logo.deps.utils.doStopVideoCam).not.toHaveBeenCalled();
+    });
 });
 
 // ─── notationMIDI ────────────────────────────────────────────────────────────
@@ -783,6 +795,28 @@ describe("doStopTurtles", () => {
     test("sets stopTurtle", () => {
         logo.doStopTurtles();
         expect(logo.stopTurtle).toBe(true);
+    });
+
+    test("explicit Stop releases the webcam even when cameraID is null (still-photo Camera block)", () => {
+        logo.cameraID = null;
+        logo.deps.utils.doStopVideoCam = jest.fn();
+
+        logo.doStopTurtles();
+
+        expect(logo.deps.utils.doStopVideoCam).toHaveBeenCalledWith(null, logo.setCameraID);
+    });
+
+    test("explicit Stop releases the webcam even if completion cleanup already ran", () => {
+        // _cleanupAfterCompletion returns early when nothing is left to clean,
+        // so the webcam release must not live only inside it.
+        logo._synthsInitialized = false;
+        logo.sounds = [];
+        logo.cameraID = null;
+        logo.deps.utils.doStopVideoCam = jest.fn();
+
+        logo.doStopTurtles();
+
+        expect(logo.deps.utils.doStopVideoCam).toHaveBeenCalledTimes(1);
     });
 
     test("clears _alreadyRunning so the next Run can start", () => {
