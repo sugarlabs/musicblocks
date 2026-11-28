@@ -227,7 +227,7 @@ var getNumber = (notename, octave, temperament, edo) => {
     }
     let num;
     if (octave < 0) {
-        num = 0;
+        num = -currentEDO;
     } else if (octave > 10) {
         num = 9 * currentEDO;
     } else {
