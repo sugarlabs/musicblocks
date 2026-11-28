@@ -319,7 +319,11 @@ class Blocks {
          */
         this._loadQueue = [];
         this._loadInProgress = false;
-        /** Callbacks waiting for the load queue to drain, see runAfterLoad(). */
+        /**
+         * Callbacks waiting for the load queue to drain, see runAfterLoad().
+         * Entries are either a bare callback or a { callback, loadToken }
+         * pair for callbacks scoped to one specific load.
+         */
         this._afterLoadCallbacks = new Set();
         /**
          * Set while the most recent loadNewBlocks() attempt ended in a
@@ -5630,9 +5634,28 @@ class Blocks {
         };
 
         /**
+         * Drops waiting callbacks invalidated by a failed load. Unscoped
+         * callbacks can act on a partially loaded workspace, and callbacks
+         * for the failed or an already-replaced load must not run at all.
+         * Token-scoped callbacks for requests still in _loadQueue are kept:
+         * their blocks have not been touched by the failure yet.
+         * @private
+         * @returns {void}
+         */
+        this._dropFailedLoadCallbacks = () => {
+            const queuedTokens = new Set(this._loadQueue.map(request => request.loadToken));
+            for (const entry of [...this._afterLoadCallbacks]) {
+                if (typeof entry === "function" || !queuedTokens.has(entry.loadToken)) {
+                    this._afterLoadCallbacks.delete(entry);
+                }
+            }
+        };
+
+        /**
          * Marks the current load as finished and, if another load was
          * queued while it ran, starts that one. Otherwise runs whatever
-         * was waiting on runAfterLoad().
+         * was waiting on runAfterLoad(), except callbacks scoped to a load
+         * that a newer one has since replaced.
          * @private
          * @returns {void}
          */
@@ -5641,9 +5664,11 @@ class Blocks {
 
             // A failed load leaves only part of the project behind, which is
             // exactly what the waiting callbacks were held back from seeing.
-            // Drop them now, since a queued load clears _lastLoadFailed.
+            // Drop those, but keep token-scoped callbacks for requests still
+            // queued behind the failure: their blocks have not been touched
+            // by it and are still coming.
             if (this._lastLoadFailed) {
-                this._afterLoadCallbacks.clear();
+                this._dropFailedLoadCallbacks();
             }
 
             if (this._loadQueue.length > 0) {
@@ -5656,7 +5681,13 @@ class Blocks {
             const callbacks = [...this._afterLoadCallbacks];
             this._afterLoadCallbacks.clear();
 
-            for (const callback of callbacks) {
+            for (const entry of callbacks) {
+                const callback = typeof entry === "function" ? entry : entry.callback;
+                // A callback scoped to an earlier load must not run once a
+                // newer load has replaced the blocks it belongs to.
+                if (typeof entry !== "function" && entry.loadToken !== this._activeLoadToken) {
+                    continue;
+                }
                 try {
                     callback();
                 } catch (e) {
@@ -5678,17 +5709,38 @@ class Blocks {
          * Runs callback once every pending load has finished, or right away
          * if nothing is loading. Passing the same callback again while it is
          * waiting does not queue it twice.
+         *
+         * When loadToken is given (the value loadNewBlocks() returned for the
+         * request the callback belongs to), the callback is dropped instead
+         * if a newer load replaced that request before the queue drained.
+         * Callers must not act on blocks that are no longer in the workspace,
+         * e.g. recentring a project opened while the default template was
+         * still loading.
          * @public
          * @param {Function} callback
+         * @param {number} [loadToken]
          * @returns {void}
          */
-        this.runAfterLoad = callback => {
+        this.runAfterLoad = (callback, loadToken) => {
             if (!this._loadInProgress) {
                 callback();
                 return;
             }
 
-            this._afterLoadCallbacks.add(callback);
+            if (loadToken === undefined) {
+                this._afterLoadCallbacks.add(callback);
+                return;
+            }
+
+            const alreadyQueued = [...this._afterLoadCallbacks].some(
+                entry =>
+                    typeof entry !== "function" &&
+                    entry.callback === callback &&
+                    entry.loadToken === loadToken
+            );
+            if (!alreadyQueued) {
+                this._afterLoadCallbacks.add({ callback, loadToken });
+            }
         };
 
         /**
@@ -5748,8 +5800,9 @@ class Blocks {
                         this.activity.stopLoadAnimation();
                     }
                     // Nothing was loaded, so a waiting save would only store
-                    // the cleared workspace over the project.
-                    this._afterLoadCallbacks.clear();
+                    // the cleared workspace over the project. Keep callbacks
+                    // scoped to loads still queued behind this one.
+                    this._dropFailedLoadCallbacks();
                     this._advanceLoadQueue();
                 };
 

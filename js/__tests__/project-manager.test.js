@@ -373,6 +373,33 @@ describe("justLoadStart", () => {
         pm.justLoadStart();
         expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith(global.DATAOBJS);
     });
+
+    it("recenters the workspace after the default blocks finish loading", () => {
+        const activity = makeActivity();
+        const loadToken = 12;
+        activity.blocks.loadNewBlocks.mockReturnValue(loadToken);
+        activity.workspaceLayoutController = { centerBlocksInViewport: jest.fn() };
+        activity.blocks.runAfterLoad = jest.fn(callback => callback());
+        const pm = new ProjectManager(activity);
+
+        pm.justLoadStart();
+
+        expect(activity.blocks.runAfterLoad).toHaveBeenCalledTimes(1);
+        expect(activity.blocks.runAfterLoad).toHaveBeenCalledWith(expect.any(Function), loadToken);
+        expect(activity.workspaceLayoutController.centerBlocksInViewport).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not throw when no workspace controller is attached", () => {
+        const activity = makeActivity();
+        const loadToken = 5;
+        activity.blocks.loadNewBlocks.mockReturnValue(loadToken);
+        activity.blocks.runAfterLoad = jest.fn(callback => callback());
+        const pm = new ProjectManager(activity);
+
+        expect(() => pm.justLoadStart()).not.toThrow();
+        expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith(global.DATAOBJS);
+        expect(activity.blocks.runAfterLoad).toHaveBeenCalledWith(expect.any(Function), loadToken);
+    });
 });
 
 // ---------------------------------------------------------------------------
@@ -1438,8 +1465,10 @@ describe("newProject / _afterDelete", () => {
         jest.useRealTimers();
     });
 
-    it("schedules sendAllToTrash and loadNewBlocks when no planet", () => {
+    it("schedules sendAllToTrash and a centered default load when no planet", () => {
         const activity = makeActivity({ planet: undefined });
+        const loadToken = 9;
+        activity.blocks.loadNewBlocks.mockReturnValue(loadToken);
         const pm = new ProjectManager(activity);
         jest.useFakeTimers();
 
@@ -1448,6 +1477,7 @@ describe("newProject / _afterDelete", () => {
 
         expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, false);
         expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith(global.DATAOBJS);
+        expect(activity.blocks.runAfterLoad).toHaveBeenCalledWith(expect.any(Function), loadToken);
         jest.useRealTimers();
     });
 

@@ -399,7 +399,24 @@ class ProjectManager {
     }
 
     justLoadStart() {
-        this.activity.blocks.loadNewBlocks(DATAOBJS);
+        const activity = this.activity;
+        const loadToken = activity.blocks.loadNewBlocks(DATAOBJS);
+
+        // The default project's blocks come from a fixed template whose
+        // coordinates assume a full-screen window, so they can load
+        // off-centre (or off-screen) in a smaller one. Recentre once the load
+        // finishes; loaded projects take the tryParseAndLoad() path above and
+        // never reach here, so their layout is left untouched.
+        //
+        // The token scopes the callback to this load. The template spans more
+        // than one 20-block chunk, so it may still be loading when the user
+        // opens another project; that project replaces these blocks and must
+        // not be recentred.
+        activity.blocks.runAfterLoad(() => {
+            if (activity.workspaceLayoutController) {
+                activity.workspaceLayoutController.centerBlocksInViewport();
+            }
+        }, loadToken);
     }
 
     async _loadStart(that) {
@@ -884,7 +901,9 @@ class ProjectManager {
 
             setTimeout(() => {
                 that.sendAllToTrash(false, false);
-                that.blocks.loadNewBlocks(DATAOBJS);
+                // Route through justLoadStart() so the fresh default stack is
+                // also recentred, like a first load.
+                pm.justLoadStart();
             }, 1000);
         }
     }
