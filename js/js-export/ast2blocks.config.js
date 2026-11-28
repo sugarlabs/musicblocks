@@ -1499,7 +1499,7 @@ window.ast2blocklist_config = {
         {
             name: "setdrum",
             comment: "Set drum block",
-            arguments: [{ type: "effectsname" }],
+            arguments: [{ type: "drumname" }],
             ast: {
                 identifiers: [
                     { property: "type", value: "ExpressionStatement" },
@@ -1552,7 +1552,7 @@ window.ast2blocklist_config = {
         {
             name: "setdrum",
             comment: "Set drum block",
-            arguments: [{ type: "effectsname" }],
+            arguments: [{ type: "drumname" }],
             ast: {
                 identifiers: [
                     { property: "type", value: "ExpressionStatement" },

@@ -2447,6 +2447,25 @@ describe("AST2BlockList Class", () => {
         expect(blockList).toEqual(expectedBlockList);
     });
 
+    test("should import set drum with a drum name block, not an effects name block", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.setDrum("kick drum", async () => {
+                await mouse.playPitch("sol", 4);
+                return mouse.ENDFLOW;
+            });
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        const blockList = AST2BlockList.toBlockList(AST, config);
+        const setDrum = blockList.find(b => b[1] === "setdrum");
+        const nameBlock = blockList[setDrum[4][1]];
+
+        expect(nameBlock[1]).toEqual(["drumname", { value: "kick drum" }]);
+    });
+
     // Test all Graphics and Pen Blocks.
     test("should generate correct blockList for all Graphics and Pen blocks", () => {
         const code = `

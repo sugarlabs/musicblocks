@@ -3131,7 +3131,7 @@
             "comment": "Set drum block",
             "arguments": [
                 {
-                    "type": "effectsname"
+                    "type": "drumname"
                 }
             ],
             "ast": {
@@ -3256,7 +3256,7 @@
             "comment": "Set drum block",
             "arguments": [
                 {
-                    "type": "effectsname"
+                    "type": "drumname"
                 }
             ],
             "ast": {
