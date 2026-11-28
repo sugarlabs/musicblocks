@@ -34,6 +34,17 @@ class ASTUtils {
     }
 
     /**
+     * Whether a box is exported as a plain variable rather than through setBox/getBox.
+     *
+     * @static
+     * @param {String} name - box name
+     * @returns {Boolean}
+     */
+    static _isBoxVariable(name) {
+        return ASTUtils._isValidIdentifier(name) && !ASTUtils._sharedBoxes.has(name);
+    }
+
+    /**
      * Returns a valid JavaScript identifier for an action name.
      *
      * Action names are free text ("chorus 2", "1st verse"), but an action is exported as a
@@ -129,6 +140,63 @@ class ASTUtils {
         trees.forEach(walk);
         return names;
     }
+
+    /**
+     * Records the boxes that have to go through setBox/getBox instead of a variable.
+     *
+     * A box is shared by the whole program, but a `var` is local to the action or mouse that
+     * declares it. So a box can only be a variable when one Start stack is the only place that
+     * uses it. A box used in an action (which keeps its value between calls and can be called
+     * from anywhere) or in more than one Start stack is read and written through the program's
+     * box store, the same way a box name that isn't an identifier already is.
+     *
+     * @static
+     * @param {Object[]} actionTrees - action stack trees, as built by JSGenerate
+     * @param {Object[]} startTrees - start stack trees, as built by JSGenerate
+     * @returns {void}
+     */
+    static setSharedBoxes(actionTrees, startTrees) {
+        const boxesIn = tree => {
+            const names = new Set();
+            const walk = node => {
+                if (typeof node === "string") {
+                    if (node.startsWith("box_")) names.add(node.slice("box_".length));
+                    return;
+                }
+                if (!Array.isArray(node)) return;
+                if (typeof node[0] === "string") {
+                    if (node[0].startsWith("storein2_")) {
+                        names.add(node[0].slice("storein2_".length));
+                    } else if (
+                        (node[0] === "storein" || node[0] === "box") &&
+                        Array.isArray(node[1]) &&
+                        typeof node[1][0] === "string"
+                    ) {
+                        names.add(node[1][0]);
+                    }
+                }
+                node.forEach(walk);
+            };
+            walk(tree);
+            return names;
+        };
+
+        const shared = new Set();
+        for (const tree of actionTrees) {
+            boxesIn(tree).forEach(name => shared.add(name));
+        }
+        const seen = new Set();
+        for (const tree of startTrees) {
+            for (const name of boxesIn(tree)) {
+                if (seen.has(name)) shared.add(name);
+                seen.add(name);
+            }
+        }
+        ASTUtils._sharedBoxes = shared;
+    }
+
+    /** Boxes used by more than one stack, or by an action; see setSharedBoxes. */
+    static _sharedBoxes = new Set();
 
     /** Action name → identifier for the program being generated; see setActionNames. */
     static _actionIdentifiers = new Map();
@@ -557,7 +625,7 @@ class ASTUtils {
             typeof args[0] === "string" && args[0].startsWith("box_") ? args[0].slice(4) : args[0];
         const arg = ASTUtils._getArgsAST([args[1]])[0];
 
-        if (!ASTUtils._isValidIdentifier(identifier)) {
+        if (!ASTUtils._isBoxVariable(identifier)) {
             const deltaAst = isIncrement
                 ? arg
                 : {
@@ -815,7 +883,7 @@ class ASTUtils {
                 return nameAst;
             }
             if (nameAst && nameAst.type === "Literal" && typeof nameAst.value === "string") {
-                if (ASTUtils._isValidIdentifier(nameAst.value)) {
+                if (ASTUtils._isBoxVariable(nameAst.value)) {
                     return {
                         type: "Identifier",
                         name: nameAst.value
@@ -933,7 +1001,7 @@ class ASTUtils {
                             value: argVal === "true"
                         });
                     } else if (type === "box") {
-                        if (ASTUtils._isValidIdentifier(argVal)) {
+                        if (ASTUtils._isBoxVariable(argVal)) {
                             ASTs.push({
                                 type: "Identifier",
                                 name: argVal
@@ -1428,7 +1496,7 @@ class ASTUtils {
                 if (
                     nameAst &&
                     nameAst.type === "Literal" &&
-                    ASTUtils._isValidIdentifier(nameAst.value)
+                    ASTUtils._isBoxVariable(nameAst.value)
                 ) {
                     ASTs.push({
                         type: "VariableDeclaration",
@@ -1461,7 +1529,7 @@ class ASTUtils {
                 const instruction = flow[0].slice(0, splitIndex);
                 const idName = flow[0].slice(splitIndex + 1);
                 if (instruction === "storein2") {
-                    if (ASTUtils._isValidIdentifier(idName)) {
+                    if (ASTUtils._isBoxVariable(idName)) {
                         ASTs.push({
                             type: "VariableDeclaration",
                             kind: "var",

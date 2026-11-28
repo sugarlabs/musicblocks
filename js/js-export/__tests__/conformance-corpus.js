@@ -464,6 +464,21 @@ const actionsAndCalls = [
             [10, "start", 300, 100, [null, 11, null]],
             [11, ["nameddo", { value: "computeLocal" }], 0, 0, [10, null]]
         ]
+    },
+    {
+        name: "box_shared_between_start_and_action",
+        description: "Box stored in start and read inside the action it calls",
+        category: "actions",
+        blocks: [
+            [0, "action", 100, 100, [null, 1, 2, null]],
+            [1, ["text", { value: "show" }], 0, 0, [0]],
+            [2, "print", 0, 0, [0, 3, null]],
+            [3, ["namedbox", { value: "n" }], 0, 0, [2]],
+            [10, "start", 300, 100, [null, 11, null]],
+            [11, ["storein2", { value: "n" }], 0, 0, [10, 12, 13]],
+            [12, ["number", { value: 5 }], 0, 0, [11]],
+            [13, ["nameddo", { value: "show" }], 0, 0, [11, null]]
+        ]
     }
 ];
 

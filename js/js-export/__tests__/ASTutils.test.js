@@ -1113,6 +1113,126 @@ describe("ASTUtils", () => {
         });
     });
 
+    describe("boxes shared between stacks", () => {
+        const mockInterface = global.JSInterface;
+
+        beforeAll(() => {
+            global.JSInterface = require("../interface");
+        });
+
+        afterAll(() => {
+            global.JSInterface = mockInterface;
+            ASTUtils.setActionNames([]);
+            ASTUtils.setSharedBoxes([], []);
+        });
+
+        const exportProgram = (actions, starts) => {
+            const names = Object.keys(actions);
+            const actionTrees = Object.values(actions);
+            ASTUtils.setActionNames(names);
+            ASTUtils.setSharedBoxes(actionTrees, starts);
+            const program = ASTUtils.BAREBONE_AST;
+            program.body.splice(
+                0,
+                0,
+                ...names.map((name, i) => ASTUtils.getMethodAST(name, actionTrees[i])),
+                ...starts.map(tree => ASTUtils.getMouseAST(tree))
+            );
+            return astring.generate(program);
+        };
+
+        // Runs exported code against a stand-in for the JS editor's runtime, with one box
+        // store shared by every mouse like logo.boxes.
+        const run = async code => {
+            const boxes = {};
+            const printed = [];
+            const mice = [];
+            const mouse = {
+                ENDFLOW: "ENDFLOW",
+                ENDMOUSE: "ENDMOUSE",
+                print: async value => printed.push(value),
+                getBox: name => boxes[name],
+                setBox: async (name, value) => (boxes[name] = value),
+                incrementBox: async (name, delta) => (boxes[name] = (boxes[name] ?? 0) + delta)
+            };
+            const Mouse = function (fn) {
+                mice.push(fn);
+            };
+            const MusicBlocks = {
+                run: () => {}
+            };
+            new Function("Mouse", "MusicBlocks", "MathUtility", code)(
+                Mouse,
+                MusicBlocks,
+                MathUtility
+            );
+            for (const fn of mice) await fn(mouse);
+            return printed;
+        };
+
+        it("lets an action read a box stored in start", async () => {
+            const code = exportProgram({ show: [["print", ["box_n"], null]] }, [
+                [
+                    ["storein2_n", [5], null],
+                    ["nameddo_show", null, null]
+                ]
+            ]);
+            expect(code).toContain('mouse.setBox("n", 5)');
+            expect(code).toContain('mouse.print(mouse.getBox("n"))');
+            expect(await run(code)).toEqual([5]);
+        });
+
+        it("lets start read a box stored in an action", async () => {
+            const code = exportProgram({ set: [["storein", ["n", 7], null]] }, [
+                [
+                    ["nameddo_set", null, null],
+                    ["print", [["box", ["n"]]], null]
+                ]
+            ]);
+            expect(await run(code)).toEqual([7]);
+        });
+
+        it("keeps a box's value between calls to an action", async () => {
+            const code = exportProgram(
+                {
+                    count: [
+                        ["increment", ["box_n", 1], null],
+                        ["print", ["box_n"], null]
+                    ]
+                },
+                [
+                    [
+                        ["storein2_n", [0], null],
+                        ["nameddo_count", null, null],
+                        ["nameddo_count", null, null]
+                    ]
+                ]
+            );
+            expect(code).toContain('mouse.incrementBox("n", 1)');
+            expect(await run(code)).toEqual([1, 2]);
+        });
+
+        it("shares a box between two start stacks", async () => {
+            const code = exportProgram({}, [
+                [["storein2_n", [3], null]],
+                [["print", ["box_n"], null]]
+            ]);
+            expect(await run(code)).toEqual([3]);
+        });
+
+        it("still exports a box used by a single start stack as a variable", () => {
+            const code = exportProgram({}, [
+                [
+                    ["storein2_n", [3], null],
+                    ["print", ["box_n"], null]
+                ]
+            ]);
+            expect(code).toContain("var n = 3;");
+            expect(code).toContain("mouse.print(n)");
+            expect(code).not.toContain("setBox");
+        });
+    });
+
     describe("getMouseAST", () => {
         it("should return the AST for a mouse", () => {
             const tree = ["flow"];
