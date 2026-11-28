@@ -3947,6 +3947,156 @@ describe("Logo parseArg", () => {
             expect(logo.parseArg(logo, 0, 4, null, null)).toBe(1234);
         });
 
+        describe("status matrix parent and input boundaries (#10339)", () => {
+            test("handles detached dectofrac and hue blocks in status matrix without throwing", () => {
+                const tur = logo.turtles.ithTurtle(0);
+                tur.painter.color = 45;
+                logo.blockList = [
+                    {
+                        name: "dectofrac",
+                        value: null,
+                        connections: [null, 1],
+                        protoblock: { parameter: false, dockTypes: ["numberout"] },
+                        isValueBlock: () => false
+                    },
+                    {
+                        name: "number",
+                        value: 0.75,
+                        protoblock: { parameter: false },
+                        isValueBlock: () => true
+                    },
+                    {
+                        name: "hue",
+                        value: null,
+                        connections: [null],
+                        protoblock: { parameter: false, dockTypes: ["numberout"] },
+                        isValueBlock: () => false
+                    }
+                ];
+
+                logo.inStatusMatrix = true;
+                logo.statusFields = [];
+
+                expect(() => {
+                    expect(logo.parseArg(logo, 0, 0, null, null)).toBe("0.75");
+                }).not.toThrow();
+                expect(logo.statusFields).toEqual([]);
+
+                expect(() => {
+                    expect(logo.parseArg(logo, 0, 2, null, null)).toBe(45);
+                }).not.toThrow();
+                expect(logo.statusFields).toEqual([]);
+            });
+
+            test("handles absent or out-of-bounds parent index in status matrix", () => {
+                const tur = logo.turtles.ithTurtle(0);
+                tur.painter.color = 60;
+                logo.blockList = [
+                    {
+                        name: "dectofrac",
+                        value: null,
+                        connections: [999, 1],
+                        protoblock: { parameter: false, dockTypes: ["numberout"] },
+                        isValueBlock: () => false
+                    },
+                    {
+                        name: "number",
+                        value: 0.25,
+                        protoblock: { parameter: false },
+                        isValueBlock: () => true
+                    },
+                    {
+                        name: "hue",
+                        value: null,
+                        connections: [],
+                        protoblock: { parameter: false, dockTypes: ["numberout"] },
+                        isValueBlock: () => false
+                    },
+                    {
+                        name: "hue",
+                        value: null,
+                        connections: [999],
+                        protoblock: { parameter: false, dockTypes: ["numberout"] },
+                        isValueBlock: () => false
+                    }
+                ];
+
+                logo.inStatusMatrix = true;
+                logo.statusFields = [];
+
+                expect(() => {
+                    expect(logo.parseArg(logo, 0, 0, null, null)).toBe("0.25");
+                }).not.toThrow();
+                expect(logo.statusFields).toEqual([]);
+
+                expect(() => {
+                    expect(logo.parseArg(logo, 0, 2, null, null)).toBe(60);
+                }).not.toThrow();
+                expect(logo.statusFields).toEqual([]);
+
+                expect(() => {
+                    expect(logo.parseArg(logo, 0, 3, null, null)).toBe(60);
+                }).not.toThrow();
+                expect(logo.statusFields).toEqual([]);
+            });
+
+            test("correctly registers status fields when print parent is at index 0", () => {
+                logo.blockList = [
+                    { name: "print" },
+                    {
+                        name: "dectofrac",
+                        value: null,
+                        connections: [0, 2],
+                        protoblock: { parameter: false, dockTypes: ["numberout"] },
+                        isValueBlock: () => false
+                    },
+                    {
+                        name: "number",
+                        value: 0.5,
+                        protoblock: { parameter: false },
+                        isValueBlock: () => true
+                    },
+                    {
+                        name: "hue",
+                        value: null,
+                        connections: [0],
+                        protoblock: { parameter: false, dockTypes: ["numberout"] },
+                        isValueBlock: () => false
+                    }
+                ];
+
+                logo.inStatusMatrix = true;
+                logo.statusFields = [];
+
+                logo.parseArg(logo, 0, 1, null, null);
+                expect(logo.statusFields).toContainEqual([1, "dectofrac"]);
+
+                logo.parseArg(logo, 0, 3, null, null);
+                expect(logo.statusFields).toContainEqual([3, "color"]);
+            });
+
+            test("reports NOINPUTERRORMSG and returns 0 when dectofrac has missing input in status matrix", () => {
+                const errorHandlerSpy = jest.spyOn(logo.deps, "errorHandler");
+                logo.blockList = [
+                    {
+                        name: "dectofrac",
+                        value: null,
+                        connections: [null, null],
+                        protoblock: { parameter: false, dockTypes: ["numberout"] },
+                        isValueBlock: () => false
+                    }
+                ];
+
+                logo.inStatusMatrix = true;
+                logo.statusFields = [];
+
+                const result = logo.parseArg(logo, 0, 0, null, null);
+                expect(result).toBe(0);
+                expect(errorHandlerSpy).toHaveBeenCalledWith(NOINPUTERRORMSG, 0);
+                expect(logo.statusFields).toEqual([]);
+            });
+        });
+
         test("covers arg-function, non-string interval, and fallback id branches", () => {
             logo.blockList = [
                 {
