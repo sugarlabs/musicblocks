@@ -31,13 +31,15 @@ describe("ModeWidget control bar keyboard access", () => {
         widget = Object.create(ModeWidget.prototype);
         Object.assign(widget, {
             _selectedModeName: "test mode",
+            _locked: false,
+            _selectedNotes: [true, false, true, false, true, true, false, true],
             _modeBlock: null,
             _onModePieButtonClick: jest.fn(),
             _calculateMode: jest.fn().mockReturnValue(pattern),
             _saveCustomMode: jest.fn().mockReturnValue(true),
             _deleteCustomMode: jest.fn(),
             _setModeName: jest.fn(),
-            _save: jest.fn(),
+            _save: jest.fn().mockReturnValue(true),
             textMsg: jest.fn(),
             errorMsg: jest.fn(),
             _initEdoSelect: jest.fn(select => {
@@ -71,6 +73,7 @@ describe("ModeWidget control bar keyboard access", () => {
             expect(widget._saveCustomMode).toHaveBeenCalledWith("test mode", pattern);
             expect(widget._saveCustomMode).toHaveBeenCalledTimes(1);
             expect(widget._save).toHaveBeenCalledTimes(1);
+            expect(widget.textMsg).toHaveBeenCalledWith("Mode saved: test mode", 3000);
         } else {
             expect(widget._deleteCustomMode).toHaveBeenCalledWith("test mode");
             expect(widget._deleteCustomMode).toHaveBeenCalledTimes(1);
@@ -105,6 +108,26 @@ describe("ModeWidget control bar keyboard access", () => {
         save.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown" }));
         expect(widget._save).not.toHaveBeenCalled();
         expect(widget._saveCustomMode).not.toHaveBeenCalled();
+    });
+
+    test("does not save while the wheel is mid-rotation", () => {
+        widget._locked = true;
+        button("Save").click();
+        expect(widget._saveCustomMode).not.toHaveBeenCalled();
+        expect(widget._save).not.toHaveBeenCalled();
+        expect(widget.errorMsg).toHaveBeenCalledWith(
+            "Please wait for the current operation to finish before saving."
+        );
+    });
+
+    test("does not store a custom mode when no notes are selected", () => {
+        widget._selectedNotes = Array(12).fill(false);
+        button("Save").click();
+        expect(widget.errorMsg).toHaveBeenCalledWith(
+            "Please select at least one note before saving."
+        );
+        expect(widget._saveCustomMode).not.toHaveBeenCalled();
+        expect(widget._save).not.toHaveBeenCalled();
     });
 
     test("keeps name validation when Save is activated from the keyboard", () => {
