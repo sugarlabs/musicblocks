@@ -469,11 +469,22 @@ class CacheManager {
      */
     async _updateLastAccessed(storeName, key) {
         try {
-            const data = await this._getFromStore(storeName, key);
-            if (data) {
-                data.lastAccessed = Date.now();
-                await this._putToStore(storeName, data);
-            }
+            await new Promise((resolve, reject) => {
+                const transaction = this.db.transaction([storeName], "readwrite");
+                const store = transaction.objectStore(storeName);
+                const request = store.get(key);
+
+                request.onsuccess = () => {
+                    if (request.result) {
+                        request.result.lastAccessed = Date.now();
+                        store.put(request.result);
+                    }
+                };
+
+                transaction.oncomplete = () => resolve();
+                transaction.onerror = () => reject(transaction.error);
+                transaction.onabort = () => reject(transaction.error);
+            });
         } catch (error) {
             // Silently fail - this is not critical
         }

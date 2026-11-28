@@ -709,6 +709,37 @@ describe("IndexedDB CacheManager integration", () => {
     });
 
     describe("updateLastAccessed", () => {
+        test.each([
+            ["projectMetadata", "cacheMetadata", "metadata", { name: "Old" }, { name: "New" }],
+            ["projectData", "cacheProject", "projectData", { data: "Old" }, { data: "New" }]
+        ])(
+            "does not restore stale %s after a concurrent write",
+            async (store, write, field, oldValue, newValue) => {
+                await cacheManager[write]("race", oldValue);
+
+                const originalRead = cacheManager._getFromStore.bind(cacheManager);
+                let releaseRead;
+                const readGate = new Promise(resolve => {
+                    releaseRead = resolve;
+                });
+                jest.spyOn(cacheManager, "_getFromStore").mockImplementationOnce(
+                    async (...args) => {
+                        const snapshot = await originalRead(...args);
+                        await readGate;
+                        return snapshot;
+                    }
+                );
+
+                const access = cacheManager._updateLastAccessed(store, "race");
+                await cacheManager[write]("race", newValue);
+                releaseRead();
+                await access;
+
+                const entry = await originalRead(store, "race");
+                expect(entry[field]).toEqual(newValue);
+            }
+        );
+
         test("getMetadata updates lastAccessed", async () => {
             const BASE = 1000;
             jest.useFakeTimers();
