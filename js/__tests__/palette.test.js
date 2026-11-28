@@ -1269,6 +1269,97 @@ describe("Palettes Class", () => {
     });
 
     describe("Palette methods", () => {
+        test("places a newly created block at its selected dock and reports stale targets", () => {
+            palettes.add("test");
+            const palette = palettes.dict.test;
+            const destination = { docks: [[10, 20, "out"]], container: { x: 100, y: 200 } };
+            const source = { docks: [[2, 3, "in"]], container: { x: 5, y: 6 } };
+            const target = { targetBlock: 0, connectionIndex: 0 };
+            const candidates = [target];
+            mockActivity.blocks.blockList = [destination, source];
+            mockActivity.blocks.blockDragController = { getEmptyDockTargets: () => candidates };
+            mockActivity.blocks.findDragGroup = jest.fn(() => {
+                mockActivity.blocks.dragGroup = [1];
+            });
+            mockActivity.blocks.moveBlockRelative = jest.fn();
+            mockActivity.blocks.blockMoved = jest.fn();
+            mockActivity.blocks.checkBounds = jest.fn();
+            mockActivity.textMsg = jest.fn();
+
+            palette._placeAtDock(1, target);
+            expect(mockActivity.blocks.moveBlockRelative).toHaveBeenCalledWith(1, 103, 211);
+            expect(mockActivity.blocks.blockMoved).toHaveBeenCalledWith(1, target);
+
+            candidates.pop();
+            palette._placeAtDock(1, target);
+            expect(mockActivity.textMsg).toHaveBeenCalledWith(
+                "The selected connection is no longer available."
+            );
+            expect(mockActivity.blocks.blockMoved).toHaveBeenCalledTimes(1);
+        });
+
+        test("tap placement labels and connects a visible empty dock", () => {
+            palettes.add("test");
+            const palette = palettes.dict.test;
+            const target = {
+                docks: [[0, 0, "out"]],
+                container: { localToGlobal: () => ({ x: 120, y: 80 }), x: 120, y: 80 },
+                protoblock: { staticLabels: ["start"] },
+                name: "start"
+            };
+            const candidates = [{ targetBlock: 0, connectionIndex: 0 }];
+            mockActivity.blocks.blockList = [target];
+            mockActivity.blocks.blockScale = 1;
+            mockActivity.blocks.isLoading = () => false;
+            mockActivity.blocks.blockDragController = {
+                getEmptyDockTargets: () => candidates
+            };
+            mockActivity.canvas = {
+                width: 300,
+                height: 200,
+                getBoundingClientRect: () => ({
+                    left: 0,
+                    top: 0,
+                    right: 300,
+                    bottom: 200,
+                    width: 300,
+                    height: 200
+                })
+            };
+            const image = document.createElement("img");
+            const row = document.createElement("tr");
+            row.appendChild(image);
+            document.body.appendChild(row);
+            const buttonRect = { left: 120, top: 80, right: 184, bottom: 128 };
+            const originalRect = HTMLElement.prototype.getBoundingClientRect;
+            HTMLElement.prototype.getBoundingClientRect = function () {
+                return this.dataset.tapPlacement
+                    ? buttonRect
+                    : { left: 0, top: 0, right: 0, bottom: 0 };
+            };
+            HTMLButtonElement.prototype.getBoundingClientRect = () => buttonRect;
+            palette._makeBlockFromProtoblock = jest.fn();
+            palette.hideMenu = jest.fn();
+            try {
+                expect(
+                    palette._selectForPlacement(
+                        { dockTypes: ["in"] },
+                        { staticLabels: ["note"], docks: [[0, 0]], modname: "note" },
+                        image
+                    )
+                ).toBe(true);
+                const button = document.querySelector("[data-tap-placement] button");
+                expect(button.getAttribute("aria-label")).toBe("Place note — start");
+                button.click();
+                expect(palette._makeBlockFromProtoblock).toHaveBeenCalled();
+            } finally {
+                HTMLElement.prototype.getBoundingClientRect = originalRect;
+                delete HTMLButtonElement.prototype.getBoundingClientRect;
+                row.remove();
+                document.querySelector("[data-tap-placement]")?.remove();
+            }
+        });
+
         test("hide and show toggle menu", () => {
             palettes.add("test");
             const palette = palettes.dict.test;
@@ -2662,6 +2753,18 @@ describe("Palettes Class", () => {
     });
 
     describe("resetKeyboardNavigation method", () => {
+        test("remembers the active palette without replacing it on a later reset", () => {
+            palettes.activePalette = "rhythm";
+            palettes.lastActivePalette = "pitch";
+
+            palettes.resetKeyboardNavigation();
+            expect(palettes.activePalette).toBeNull();
+            expect(palettes.lastActivePalette).toBe("rhythm");
+
+            palettes.resetKeyboardNavigation();
+            expect(palettes.lastActivePalette).toBe("rhythm");
+        });
+
         test("closes menus, clears keyboard focus, and cancels pending submenu opens", () => {
             jest.useFakeTimers();
 

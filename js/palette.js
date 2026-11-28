@@ -562,6 +562,9 @@ class Palettes {
         this._navTypeIndex = 0;
         this._navBlockIndex = 0;
         this._navPaletteBlockIndex = 0;
+        if (this.activePalette !== null) {
+            this.lastActivePalette = this.activePalette;
+        }
         this.activePalette = null;
         this._clearPendingMenuOpen();
         this._clearKeyboardFocus();
@@ -1554,6 +1557,7 @@ class Palette {
     }
 
     hideMenu() {
+        this.palettes._cancelPlacement?.();
         docById("palette").childNodes[0].style.borderRight =
             `1px solid ${platformColor.selectorSelected}`;
         if (this._outsideClickListener) {
@@ -1724,6 +1728,167 @@ class Palette {
         }
     }
 
+    _selectForPlacement(protoblk, preview, img) {
+        const blocks = this.activity.blocks;
+        const type = protoblk.dockTypes?.[0];
+        if (!type || blocks.isLoading()) return false;
+        const targets = blocks.blockDragController.getEmptyDockTargets(type);
+        if (!targets.length) return false;
+
+        const overlay = document.createElement("div");
+        overlay.dataset.tapPlacement = "true";
+        Object.assign(overlay.style, {
+            position: "fixed",
+            inset: "0",
+            zIndex: "1100",
+            pointerEvents: "none"
+        });
+        const outline = img.style.outline;
+        const row = img.closest("tr");
+        img.style.outline = "3px solid #2563eb";
+        row?.setAttribute("aria-pressed", "true");
+        const cancel = () => {
+            overlay.remove();
+            img.style.outline = outline;
+            row?.removeAttribute("aria-pressed");
+            document.removeEventListener("pointerdown", outside, true);
+            document.removeEventListener("keydown", escape);
+            window.removeEventListener("resize", cancel);
+            window.removeEventListener("scroll", cancel, true);
+            this.palettes._cancelPlacement = null;
+        };
+        const outside = event => {
+            if (!overlay.contains(event.target)) cancel();
+        };
+        const escape = event => {
+            if (event.key === "Escape") cancel();
+        };
+        this.palettes._cancelPlacement = cancel;
+        const canvas = this.activity.canvas;
+        const rect = canvas.getBoundingClientRect();
+        const paletteRects = [docById("palette"), docById("PaletteBody")]
+            .filter(Boolean)
+            .map(panel => panel.getBoundingClientRect());
+        const scale = blocks.blockScale / DEFAULTBLOCKSCALE;
+        const acceptedRects = [];
+        document.body.appendChild(overlay);
+        for (const target of targets) {
+            const block = blocks.blockList[target.targetBlock];
+            const dock = block.docks[target.connectionIndex];
+            const point = block.container.localToGlobal(
+                dock[0] - preview.docks[0][0] * scale,
+                dock[1] - preview.docks[0][1] * scale
+            );
+            const left = rect.left + (point.x * rect.width) / canvas.width;
+            const top = rect.top + (point.y * rect.height) / canvas.height;
+            const button = document.createElement("button");
+            button.type = "button";
+            const previewLabel = _(preview.staticLabels?.[0] || preview.name || preview.blkname);
+            button.setAttribute(
+                "aria-label",
+                _("Place") +
+                    " " +
+                    previewLabel +
+                    " — " +
+                    (block.protoblock.staticLabels[0] || block.name)
+            );
+            Object.assign(button.style, {
+                position: "absolute",
+                left: left + "px",
+                top: top + "px",
+                minWidth: "64px",
+                minHeight: "48px",
+                padding: "4px",
+                border: "3px dashed #0f766e",
+                borderRadius: "10px",
+                background: "rgba(204, 251, 241, 0.85)",
+                cursor: "pointer",
+                pointerEvents: "auto",
+                touchAction: "manipulation"
+            });
+            const ghost = img.cloneNode();
+            ghost.style.cssText = "display:block;opacity:0.55;pointer-events:none";
+            button.appendChild(ghost);
+            overlay.appendChild(button);
+            const buttonRect = button.getBoundingClientRect();
+            const intersects = other =>
+                buttonRect.left < other.right &&
+                buttonRect.right > other.left &&
+                buttonRect.top < other.bottom &&
+                buttonRect.bottom > other.top;
+            if (
+                buttonRect.left < rect.left ||
+                buttonRect.right > rect.right ||
+                buttonRect.top < rect.top ||
+                buttonRect.bottom > rect.bottom ||
+                paletteRects.some(intersects) ||
+                acceptedRects.some(intersects)
+            ) {
+                button.remove();
+                continue;
+            }
+            acceptedRects.push(buttonRect);
+            button.onclick = event => {
+                event.stopPropagation();
+                cancel();
+                if (
+                    !blocks.blockDragController
+                        .getEmptyDockTargets(type)
+                        .some(
+                            candidate =>
+                                candidate.targetBlock === target.targetBlock &&
+                                candidate.connectionIndex === target.connectionIndex
+                        )
+                )
+                    return;
+                this.hideMenu();
+                this._makeBlockFromProtoblock(
+                    protoblk,
+                    true,
+                    preview.modname,
+                    null,
+                    0,
+                    0,
+                    newBlock => this._placeAtDock(newBlock, target)
+                );
+            };
+        }
+        if (!overlay.childElementCount) {
+            cancel();
+            return false;
+        }
+        document.addEventListener("pointerdown", outside, true);
+        document.addEventListener("keydown", escape);
+        window.addEventListener("resize", cancel);
+        window.addEventListener("scroll", cancel, true);
+        return true;
+    }
+
+    _placeAtDock(newBlock, target) {
+        const blocks = this.activity.blocks;
+        const source = blocks.blockList[newBlock];
+        if (!source || source.trash) return;
+        const valid = blocks.blockDragController.getEmptyDockTargets(source.docks[0][2]);
+        if (
+            !valid.some(
+                candidate =>
+                    candidate.targetBlock === target.targetBlock &&
+                    candidate.connectionIndex === target.connectionIndex
+            )
+        ) {
+            this.activity.textMsg(_("The selected connection is no longer available."));
+            return;
+        }
+        const destination = blocks.blockList[target.targetBlock];
+        const dock = destination.docks[target.connectionIndex];
+        const dx = destination.container.x + dock[0] - source.container.x - source.docks[0][0];
+        const dy = destination.container.y + dock[1] - source.container.y - source.docks[0][1];
+        blocks.findDragGroup(newBlock);
+        for (const id of blocks.dragGroup) blocks.moveBlockRelative(id, dx, dy);
+        blocks.blockMoved(newBlock, target);
+        blocks.checkBounds();
+    }
+
     _showMenuItems() {
         this.model.update();
         const paletteList = docById("PaletteBody_items");
@@ -1765,6 +1930,13 @@ class Palette {
             img.ondragstart = () => false;
 
             const down = event => {
+                if (event.button > 0 || (event.touches && event.touches.length !== 1)) return;
+                this.palettes._cancelPlacement?.();
+                const first = event.touches?.[0] || event;
+                const touchId = event.type === "touchstart" ? first.identifier : null;
+                const startX = first.pageX ?? first.clientX;
+                const startY = first.pageY ?? first.clientY;
+                let dragged = false;
                 // (1) prepare to moving: make absolute and on top by z-index
                 const posit = img.style.position;
                 const zInd = img.style.zIndex;
@@ -1800,6 +1972,7 @@ class Palette {
                         lastX = e.pageX;
                         lastY = e.pageY;
                     }
+                    dragged ||= Math.hypot(lastX - startX, lastY - startY) > 8;
                     if (!ticking) {
                         ticking = true;
                         rAFId = window.requestAnimationFrame(() => {
@@ -1816,6 +1989,14 @@ class Palette {
                 const that = this;
                 let cancel;
                 const up = (event, cancelled = false) => {
+                    if (
+                        touchId !== null &&
+                        event?.type?.startsWith("touch") &&
+                        !Array.from(event.changedTouches || []).some(
+                            touch => touch.identifier === touchId
+                        )
+                    )
+                        return;
                     document.body.style.cursor = "default";
                     document.removeEventListener("mousemove", onMouseMove);
                     document.removeEventListener("touchmove", onMouseMove);
@@ -1839,6 +2020,14 @@ class Palette {
                     itemCell.appendChild(img);
 
                     if (cancelled) return;
+                    if (
+                        !dragged &&
+                        document.body.classList.contains("compact-edit") &&
+                        event.type === "touchend" &&
+                        event.isTrusted &&
+                        this._selectForPlacement(protoListScope[blk], b, img)
+                    )
+                        return;
 
                     // if (!x || !y) return;
 
@@ -1853,7 +2042,7 @@ class Palette {
                             that.activity.blocksContainer.y
                     );
                 };
-                cancel = () => up(null, true);
+                cancel = event => up(event, true);
 
                 document.addEventListener("mouseup", up);
                 document.addEventListener("touchend", up);
@@ -2096,7 +2285,7 @@ class Palette {
         }
     }
 
-    _makeBlockFromProtoblock(protoblk, moved, blkname, event, saveX, saveY) {
+    _makeBlockFromProtoblock(protoblk, moved, blkname, event, saveX, saveY, onCreated = null) {
         // Prevent block creation from triggering a 'move' undo action
         // by clearing the palette block's drag start coordinates
         this.activity.blocks.dragStartX = undefined;
@@ -2104,6 +2293,7 @@ class Palette {
 
         let newBlock;
         const __myCallback = newBlock => {
+            if (onCreated) return;
             // Move the drag group under the cursor.
             this.activity.blocks.findDragGroup(newBlock);
             for (const blockId of this.activity.blocks.dragGroup) {
@@ -2226,9 +2416,14 @@ class Palette {
             }
 
             if (macroExpansion !== null) {
+                if (onCreated && this.activity.blocks.isLoading()) {
+                    this.activity.textMsg(_("Please wait for blocks to finish loading."));
+                    return;
+                }
                 this.activity.blocks.loadNewBlocks(macroExpansion);
                 const thisBlock = this.activity.blocks.blockList.length - 1;
                 const topBlk = this.activity.blocks.findTopBlock(thisBlock);
+                newBlock = topBlk;
                 // Ensure that the newly created block is not under
                 // the palette.
                 if (
@@ -2304,6 +2499,7 @@ class Palette {
 
                 const thisBlock = this.activity.blocks.blockList.length - 1;
                 const topBlk = this.activity.blocks.findTopBlock(thisBlock);
+                newBlock = topBlk;
                 // Ensure that the newly created block is not under
                 // the palette.
                 if (
@@ -2358,6 +2554,9 @@ class Palette {
                     });
                     this.activity.blocks.redoActionHistory = [];
                 }
+            }
+            if (onCreated && newBlock !== undefined) {
+                this.activity.blocks.runAfterLoad(() => onCreated(newBlock));
             }
         }
     }

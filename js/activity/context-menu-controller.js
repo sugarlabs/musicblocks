@@ -189,8 +189,8 @@ class ContextMenuController {
         const activity = this.activity;
         activity.helpfulWheelItems = [];
         const btnSize = activity.cellSize;
-        const createButton = (icon, label, action) => {
-            const button = this.makeButton(icon, label, x, y, btnSize, 0);
+        const createButton = (icon, label, action, id) => {
+            const button = this.makeButton(icon, label, x, y, id);
             this.loadButtonDragHandler(button, action, activity);
             x += btnSize;
             return button;
@@ -243,7 +243,8 @@ class ContextMenuController {
         activity.hideBlocksContainer = createButton(
             SHOWBLOCKSBUTTON,
             _("Show/hide blocks"),
-            this.changeBlockVisibility
+            this.changeBlockVisibility,
+            "showHideBlocksButton"
         );
 
         if (!activity.helpfulWheelItems.find(ele => ele.label === "Show/hide blocks"))
@@ -259,7 +260,8 @@ class ContextMenuController {
         activity.collapseBlocksContainer = createButton(
             COLLAPSEBLOCKSBUTTON,
             _("Expand/collapse blocks"),
-            this.toggleCollapsibleStacks
+            this.toggleCollapsibleStacks,
+            "expandCollapseBlocksButton"
         );
 
         if (!activity.helpfulWheelItems.find(ele => ele.label === "Expand/collapse blocks"))
@@ -275,7 +277,8 @@ class ContextMenuController {
         activity.smallerContainer = createButton(
             SMALLERBUTTON,
             _("Decrease block size"),
-            activity.doSmallerBlocks
+            activity.doSmallerBlocks,
+            "decreaseBlockSizeButton"
         );
 
         if (!activity.helpfulWheelItems.find(ele => ele.label === "Decrease block size"))
@@ -290,7 +293,8 @@ class ContextMenuController {
         activity.largerContainer = createButton(
             BIGGERBUTTON,
             _("Increase block size"),
-            activity.doLargerBlocks
+            activity.doLargerBlocks,
+            "increaseBlockSizeButton"
         );
 
         if (!activity.helpfulWheelItems.find(ele => ele.label === "Increase block size"))
@@ -493,10 +497,10 @@ class ContextMenuController {
     /**
      * Makes non-toolbar buttons, e.g., the palette menu buttons.
      */
-    makeButton(name, label, x, y) {
+    makeButton(name, label, x, y, id = label) {
         const activity = this.activity;
         const container = document.createElement("div");
-        container.setAttribute("id", "" + label);
+        container.setAttribute("id", id);
         container.setAttribute("class", "tooltipped");
         container.setAttribute("data-tooltip", label);
         container.setAttribute("data-position", "top");
