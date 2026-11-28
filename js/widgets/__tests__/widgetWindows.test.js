@@ -543,6 +543,23 @@ describe("widgetWindows", () => {
             );
             removeSpy.mockRestore();
         });
+
+        test("resets activity.isInputON when destroyed with focus inside (#10570)", () => {
+            const win = createTestWindow();
+            const input = document.createElement("input");
+            win._frame.appendChild(input);
+            input.focus();
+
+            const mockActivity = { isInputON: true };
+            window.ActivityContext = {
+                getActivity: jest.fn(() => mockActivity)
+            };
+
+            win.destroy();
+
+            expect(mockActivity.isInputON).toBe(false);
+            delete window.ActivityContext;
+        });
     });
 
     describe("widget scroll handling", () => {

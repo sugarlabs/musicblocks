@@ -3493,6 +3493,7 @@ describe("PhraseMaker Widget", () => {
     describe("handleClose", () => {
         test("cleans up state and calls PhraseMakerAudio.clearPlaybackTimers on close", () => {
             phraseMaker.activity = {
+                isInputON: true,
                 logo: {
                     synth: {
                         stopSound: jest.fn(),
@@ -3517,11 +3518,29 @@ describe("PhraseMaker Widget", () => {
             expect(phraseMaker.playingNow).toBe(false);
             expect(phraseMaker._rowOffset).toEqual([]);
             expect(phraseMaker._rowMap).toEqual([0, 1, 2]);
+            expect(phraseMaker.activity.isInputON).toBe(false);
             expect(phraseMaker.activity.hideMsgs).toHaveBeenCalled();
             expect(global.PhraseMakerAudio.clearPlaybackTimers).toHaveBeenCalledWith(phraseMaker);
             expect(phraseMaker.activity.logo.synth.stop).toHaveBeenCalled();
             expect(phraseMaker.activity.logo.synth.stopSound).toHaveBeenCalledWith(0, "piano");
             expect(phraseMaker.widgetWindow.destroy).toHaveBeenCalled();
+        });
+        test("resets activity.isInputON when closed while typing in lyrics input (#10570)", () => {
+            phraseMaker.activity = {
+                isInputON: true,
+                logo: {
+                    synth: {
+                        stopSound: jest.fn(),
+                        stop: jest.fn()
+                    }
+                },
+                hideMsgs: jest.fn()
+            };
+            phraseMaker.widgetWindow = { destroy: jest.fn() };
+
+            phraseMaker.handleClose();
+
+            expect(phraseMaker.activity.isInputON).toBe(false);
         });
         test("announces widget closed to screen readers", () => {
             phraseMaker.activity = {
