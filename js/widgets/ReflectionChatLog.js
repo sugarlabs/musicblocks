@@ -193,8 +193,10 @@ class ReflectionChatLog {
             (typeof window !== "undefined" && window.DOMPurify);
         if (purify) {
             element.innerHTML = purify.sanitize(this.mdToHTML(text), { ADD_ATTR: ["target"] });
+        } else if (typeof this.sanitizeHTML === "function") {
+            element.innerHTML = this.sanitizeHTML(this.mdToHTML(text));
         } else {
-            element.innerHTML = this.mdToHTML(text);
+            element.textContent = text;
         }
     }
 
