@@ -2571,6 +2571,61 @@ describe("processNote — nested tie note pairing and duration semantics (MB-010
         expect(singer.tieFirstDrums).toEqual([]);
     });
 
+    test("stages combined tied drums on the first beat during notation export", () => {
+        activityMock.logo.runningLilypond = true;
+        activityMock.logo.notationMIDI = jest.fn();
+        activityMock.logo.notation.notationStaging = { 0: [] };
+        activityMock.logo.notation.notationDrumStaging = { 0: [] };
+        activityMock.logo.notation.stageTiedDrums = jest.fn();
+        activityMock.logo.updateNotation = jest.fn(note => {
+            activityMock.logo.notation.notationStaging[0].push([
+                note,
+                4,
+                0,
+                null,
+                null,
+                -1,
+                false,
+                null
+            ]);
+            activityMock.logo.notation.notationDrumStaging[0].push([
+                ["R"],
+                4,
+                0,
+                null,
+                null,
+                -1,
+                false
+            ]);
+        });
+        activityMock.logo.notation.notationInsertTie = jest.fn(() => {
+            activityMock.logo.notation.notationStaging[0].push("tie");
+        });
+
+        Singer.RhythmActions.doTie(0, "outerTie");
+
+        // Note 1: rest + snare drum
+        seedNoteBlock(singer, "note1", "rest", 4, 4, ["snare"]);
+        singer.inNoteBlock = ["note1"];
+        Singer.processNote(activityMock, 4, false, "note1", 0, jest.fn());
+
+        // Note 2: rest + bassdrum
+        Singer.RhythmActions.doTie(0, "innerTie");
+        seedNoteBlock(singer, "note2", "rest", 4, 4, ["bassdrum"]);
+        singer.inNoteBlock = ["note2"];
+        Singer.processNote(activityMock, 4, false, "note2", 0, jest.fn());
+
+        expect(activityMock.logo.updateNotation).toHaveBeenNthCalledWith(1, ["R"], 4, 0, -1, []);
+        expect(activityMock.logo.updateNotation).toHaveBeenNthCalledWith(2, ["R"], 4, 0, -1, []);
+        expect(activityMock.logo.notation.stageTiedDrums).toHaveBeenCalledWith(
+            0,
+            0,
+            0,
+            ["snare", "bassdrum"],
+            2
+        );
+    });
+
     test("sequential sibling ties execute independently without cross-talk", () => {
         let capturedListener;
         activityMock.logo.setTurtleListener = jest.fn((_, __, cb) => {
