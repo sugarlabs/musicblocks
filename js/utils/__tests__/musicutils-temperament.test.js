@@ -361,3 +361,37 @@ describe("musicutils-temperament", () => {
         });
     });
 });
+
+describe("just intonation's minor seventh", () => {
+    // The interval entries (what the synth plays a note from) and the ratios array (what
+    // pitchToFrequency and frequencyToPitch read) have to describe the same pitches, or a
+    // note sounds different depending on whether it carries cents.
+    const INTERVAL_FOR_LABEL = [
+        "perfect 1",
+        "minor 2",
+        "major 2",
+        "minor 3",
+        "major 3",
+        "perfect 4",
+        "augmented 4",
+        "perfect 5",
+        "minor 6",
+        "major 6",
+        "minor 7",
+        "major 7"
+    ];
+
+    it.each(["just intonation", "Pythagorean"])(
+        "%s: every ratio matches its interval entry",
+        name => {
+            const t = temperament.TEMPERAMENT[name];
+            t.ratios.forEach((ratio, i) => {
+                expect(ratio).toBeCloseTo(t[INTERVAL_FOR_LABEL[i]].ratio, 12);
+            });
+        }
+    );
+
+    it("is 16/9 above the tonic, as in its interval table and in Music Blocks v4", () => {
+        expect(temperament.TEMPERAMENT["just intonation"].ratios[10]).toBe(16 / 9);
+    });
+});
