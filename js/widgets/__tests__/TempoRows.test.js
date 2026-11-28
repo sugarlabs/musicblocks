@@ -44,7 +44,8 @@ const makeWidgetWindow = () => ({
         input.value = value;
         cell.appendChild(input);
         return input;
-    })
+    }),
+    takeFocus: jest.fn()
 });
 
 describe("TempoRows", () => {
@@ -217,6 +218,64 @@ describe("TempoRows", () => {
             expect(canvas.style.width).toBe("700px");
             expect(canvas.style.height).toBe("100px");
             expect(click).toHaveBeenCalledWith(0);
+        });
+
+        test("makes each tempo canvas keyboard accessible", () => {
+            tempo.BPMs = [100];
+
+            tempo._makeRows(widgetWindow);
+
+            const canvas = tempo.tempoCanvases[0];
+            expect(canvas.getAttribute("tabindex")).toBe("0");
+            expect(canvas.getAttribute("role")).toBe("button");
+            expect(canvas.getAttribute("aria-label")).toBe("Tap tempo");
+
+            const click = jest.spyOn(tempo, "_onCanvasClick");
+            const event = {
+                key: "Enter",
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            canvas.onkeydown(event);
+            expect(event.preventDefault).toHaveBeenCalled();
+            expect(event.stopPropagation).toHaveBeenCalled();
+            expect(click).toHaveBeenCalledWith(0);
+
+            click.mockClear();
+            const spaceEvent = { key: " ", preventDefault: jest.fn(), stopPropagation: jest.fn() };
+            canvas.onkeydown(spaceEvent);
+            expect(spaceEvent.preventDefault).toHaveBeenCalled();
+            expect(click).toHaveBeenCalledWith(0);
+
+            // Held keys do not create repeated taps, but remain consumed.
+            click.mockClear();
+            const repeatEvent = {
+                key: "Enter",
+                repeat: true,
+                preventDefault: jest.fn(),
+                stopPropagation: jest.fn()
+            };
+            canvas.onkeydown(repeatEvent);
+            expect(repeatEvent.preventDefault).toHaveBeenCalled();
+            expect(repeatEvent.stopPropagation).toHaveBeenCalled();
+            expect(click).not.toHaveBeenCalled();
+
+            // Unknown keys do not trigger tap tempo.
+            click.mockClear();
+            canvas.onkeydown({ key: "a", preventDefault: jest.fn(), stopPropagation: jest.fn() });
+            expect(click).not.toHaveBeenCalled();
+        });
+
+        test("focus on a tempo canvas sets the active BPM index", () => {
+            tempo.BPMs = [100, 120];
+
+            tempo._makeRows(widgetWindow);
+
+            const canvas = tempo.tempoCanvases[1];
+            expect(tempo.activeBPMIndex).not.toBe(1);
+            canvas.dispatchEvent(new Event("focus"));
+            expect(tempo.activeBPMIndex).toBe(1);
+            expect(widgetWindow.takeFocus).toHaveBeenCalled();
         });
     });
 
