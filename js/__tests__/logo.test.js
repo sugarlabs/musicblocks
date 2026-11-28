@@ -2157,6 +2157,24 @@ describe("Logo runLogoCommands", () => {
         jest.restoreAllMocks();
     });
 
+    test.each(["runningLilypond", "runningAbc", "runningMIDI", "runningMxml"])(
+        "skips singing validation and preparation during %s export",
+        flag => {
+            logo[flag] = true;
+            logo.synth.singingSamples = new Map();
+            logo.synth.prepareSinging = jest.fn();
+            jest.spyOn(logo, "_getSingingTexts").mockImplementation(() => {
+                throw new Error("Must not validate singing during export");
+            });
+            logo._restoreConnections = jest.fn();
+            logo.runFromBlock = jest.fn();
+            logo.blockList = [];
+            logo.runLogoCommands(null, null);
+            expect(logo._getSingingTexts).not.toHaveBeenCalled();
+            expect(logo.synth.prepareSinging).not.toHaveBeenCalled();
+        }
+    );
+
     describe("performance mode detection from the URL", () => {
         // window.location cannot be reassigned in this jsdom, so drive the query
         // string through history.replaceState, which jsdom does support.
@@ -4948,4 +4966,219 @@ describe("Logo.processSpeak", () => {
             expect(tur.queue).toEqual([]);
         });
     });
+});
+
+describe("Kokoro singing preflight", () => {
+    test.each([
+        null,
+        { name: "number", value: 12 },
+        { name: "text", value: " " },
+        { name: "text", value: "x".repeat(41) }
+    ])("rejects a missing or invalid literal singing input: %j", input => {
+        const blocks = [
+            { name: "start", connections: [null, 1] },
+            { name: "sing", connections: [0, input ? 2 : null, null, null] },
+            input
+        ];
+        expect(() =>
+            Logo.prototype._getSingingTexts.call({ blocks: { blockList: blocks } })
+        ).toThrow("Sing needs a text block containing one short syllable.");
+    });
+    test("accepts 32 distinct syllables, then rejects a 33rd", () => {
+        const blocks = [{ name: "start", connections: [null, 1] }];
+        for (let i = 0; i < 33; i++) {
+            const id = blocks.length;
+            blocks.push(
+                { name: "sing", connections: [id - 2, id + 1, null, i === 32 ? null : id + 2] },
+                { name: "text", value: i === 0 ? "x".repeat(40) : "la" + i, connections: [id] }
+            );
+        }
+        const logo = { blocks: { blockList: blocks.slice(0, -2) } };
+        expect(Logo.prototype._getSingingTexts.call(logo)).toHaveLength(32);
+        logo.blocks.blockList = blocks;
+        expect(() => Logo.prototype._getSingingTexts.call(logo)).toThrow(
+            expect.objectContaining({
+                message: "Use at most 32 different singing syllables.",
+                blk: 65
+            })
+        );
+    });
+    function preflight() {
+        let complete;
+        const pending = new Promise(resolve => {
+            complete = resolve;
+        });
+        const logo = {
+            synth: { singingSamples: new Map(), prepareSinging: jest.fn(() => pending) },
+            _getSingingTexts: jest.fn(() => ["la"]),
+            _cancelSpeech: jest.fn(),
+            _showKokoroProgress: jest.fn(),
+            deps: { textMsg: jest.fn(), errorHandler: jest.fn() },
+            runGeneration: 0,
+            runLogoCommands: jest.fn(),
+            onRunTurtle: jest.fn(),
+            onStopTurtle: jest.fn()
+        };
+        return { logo, complete };
+    }
+    test("reports validation failure without preparing or starting playback", () => {
+        const { logo } = preflight();
+        logo.blocks = {
+            blockList: [
+                null,
+                { name: "sing", connections: [null, 2] },
+                { name: "number", value: 12 }
+            ]
+        };
+        logo._getSingingTexts = Logo.prototype._getSingingTexts;
+        Logo.prototype.runLogoCommands.call(logo, 7);
+        expect(logo.deps.errorHandler).toHaveBeenCalledWith(
+            "Sing needs a text block containing one short syllable.",
+            1
+        );
+        expect(logo.synth.prepareSinging).not.toHaveBeenCalled();
+        expect(logo.onRunTurtle).not.toHaveBeenCalled();
+        expect(logo.runLogoCommands).not.toHaveBeenCalled();
+    });
+    test("announces syllable preparation and ignores stale progress after Stop", () => {
+        const { logo } = preflight();
+        Logo.prototype.runLogoCommands.call(logo, 7);
+        const progress = logo.synth.prepareSinging.mock.calls[0][1];
+        progress({ status: "singing", index: 1, total: 2 });
+        expect(logo.deps.textMsg).toHaveBeenLastCalledWith("Preparing voice: 1 of 2");
+        const count = logo.deps.textMsg.mock.calls.length;
+        logo.runGeneration++;
+        progress({ status: "singing", index: 2, total: 2 });
+        expect(logo.deps.textMsg).toHaveBeenCalledTimes(count);
+    });
+    test("waits for model preparation before restarting the requested program", async () => {
+        const { logo, complete } = preflight();
+        Logo.prototype.runLogoCommands.call(logo, 7, "env");
+        expect(logo.runLogoCommands).not.toHaveBeenCalled();
+        complete();
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(logo.runLogoCommands).toHaveBeenCalledWith(7, "env");
+    });
+    test("reports and cleans up a startup failure after singing preparation", async () => {
+        const { logo, complete } = preflight();
+        logo.doStopTurtles = jest.fn();
+        logo.runLogoCommands.mockImplementation(() => {
+            logo.runGeneration++;
+            throw new Error("synth startup failed");
+        });
+        Logo.prototype.runLogoCommands.call(logo, 7);
+        complete();
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(logo.doStopTurtles).toHaveBeenCalledTimes(1);
+        expect(logo.deps.errorHandler).toHaveBeenCalledWith("synth startup failed");
+    });
+    test("continues the latest Play when superseded preparation fails", async () => {
+        const { logo } = preflight();
+        let fail;
+        logo.synth.prepareSinging.mockReturnValueOnce(
+            new Promise((_, reject) => {
+                fail = reject;
+            })
+        );
+        Logo.prototype.runLogoCommands.call(logo, 7);
+        logo._getSingingTexts.mockReturnValue(["oh"]);
+        Logo.prototype.runLogoCommands.call(logo, 8);
+        fail(new Error("old syllable failed"));
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(logo.runLogoCommands).toHaveBeenCalledTimes(1);
+        expect(logo.runLogoCommands).toHaveBeenCalledWith(8, undefined);
+        expect(logo.deps.errorHandler).not.toHaveBeenCalled();
+        expect(logo.onStopTurtle).not.toHaveBeenCalled();
+    });
+    test("Stop while loading prevents delayed playback", async () => {
+        const { logo, complete } = preflight();
+        Logo.prototype.runLogoCommands.call(logo, 7);
+        logo.runGeneration++;
+        complete();
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(logo.runLogoCommands).not.toHaveBeenCalled();
+    });
+    test("reports preparation errors and permits a new attempt", async () => {
+        const { logo, complete } = preflight();
+        logo.synth.prepareSinging.mockRejectedValueOnce(new Error("offline"));
+        Logo.prototype.runLogoCommands.call(logo, 7);
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(logo.deps.errorHandler).toHaveBeenCalledWith("offline");
+        expect(logo.onStopTurtle).toHaveBeenCalled();
+        expect(logo._singingPreparation).toBeNull();
+        expect(logo.runLogoCommands).not.toHaveBeenCalled();
+        Logo.prototype.runLogoCommands.call(logo, 8);
+        expect(logo.synth.prepareSinging).toHaveBeenCalledTimes(2);
+        logo.synth.singingSamples.set("la", {});
+        complete();
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(logo.runLogoCommands).toHaveBeenCalledWith(8, undefined);
+        expect(logo.deps.errorHandler).toHaveBeenCalledTimes(1);
+    });
+    test("repeated Play prepares only once and starts only the latest request", async () => {
+        const { logo, complete } = preflight();
+        Logo.prototype.runLogoCommands.call(logo, 7);
+        Logo.prototype.runLogoCommands.call(logo, 8);
+        complete();
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(logo.synth.prepareSinging).toHaveBeenCalledTimes(1);
+        expect(logo.runLogoCommands).toHaveBeenCalledTimes(1);
+        expect(logo.runLogoCommands).toHaveBeenCalledWith(8, undefined);
+    });
+    test("repeated Play keeps progress and cancellation attached to the latest request", () => {
+        const { logo } = preflight();
+        Logo.prototype.runLogoCommands.call(logo, 7);
+        const [, progress, cancelled] = logo.synth.prepareSinging.mock.calls[0];
+        Logo.prototype.runLogoCommands.call(logo, 8);
+        expect(cancelled()).toBe(false);
+        progress({ status: "singing", index: 2, total: 3 });
+        expect(logo.deps.textMsg).toHaveBeenLastCalledWith("Preparing voice: 2 of 3");
+        const download = { status: "progress", progress: 50 };
+        progress(download);
+        expect(logo._showKokoroProgress).toHaveBeenCalledWith(download);
+        logo.runGeneration++;
+        expect(cancelled()).toBe(true);
+    });
+    test.each([false, true])(
+        "does not revive old preparation after %s Stop or an edited project",
+        async stopped => {
+            const { logo, complete } = preflight();
+            Logo.prototype.runLogoCommands.call(logo, 7);
+            const [, progress, cancelled] = logo.synth.prepareSinging.mock.calls[0];
+            if (stopped) logo.runGeneration++;
+            else logo._getSingingTexts.mockReturnValue(["oh"]);
+            Logo.prototype.runLogoCommands.call(logo, 8);
+            expect(cancelled()).toBe(true);
+            const count = logo.deps.textMsg.mock.calls.length;
+            progress({ status: "singing", index: 2, total: 2 });
+            expect(logo.deps.textMsg).toHaveBeenCalledTimes(count);
+            complete();
+            await new Promise(resolve => setTimeout(resolve, 0));
+            expect(logo._singingPreparation).toBeNull();
+            expect(logo._singingPreparationRequest).toBeNull();
+            expect(logo.runLogoCommands).toHaveBeenCalledTimes(1);
+            expect(logo.runLogoCommands).toHaveBeenCalledWith(8, undefined);
+        }
+    );
+    test.each(["runblock", "startTurtle"])(
+        "prepares disconnected Sing stacks before executing %s",
+        name => {
+            const { logo } = preflight();
+            logo.blocks = {
+                blockList: [
+                    { name, connections: [null, null] },
+                    { name: "sing", connections: [null, 2, null] },
+                    { name: "text", value: " la ", connections: [1] },
+                    { name: "sing", trash: true, connections: [null, null, null] }
+                ]
+            };
+            logo._getSingingTexts = Logo.prototype._getSingingTexts;
+            Logo.prototype.runLogoCommands.call(logo, 0);
+            expect(logo.synth.prepareSinging).toHaveBeenCalledWith(
+                ["la"],
+                expect.any(Function),
+                expect.any(Function)
+            );
+        }
+    );
 });

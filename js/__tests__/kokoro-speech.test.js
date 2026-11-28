@@ -171,6 +171,43 @@ describe("KokoroSpeech", () => {
         });
     });
 
+    test.each(["module", "model"])(
+        "retries a failed %s load on the same instance",
+        async failure => {
+            const speech = new KokoroSpeech();
+            const engine = { generate: jest.fn() };
+            const fromPretrained = jest.fn().mockResolvedValue(engine);
+            const load = jest.spyOn(speech, "_loadVerifiedModule").mockResolvedValue({
+                KokoroTTS: { from_pretrained: fromPretrained }
+            });
+            const revoke = jest.spyOn(speech, "_revokeAssetURLs");
+            (failure === "module" ? load : fromPretrained).mockRejectedValueOnce(
+                new Error("offline")
+            );
+            await expect(speech._ensureEngine()).rejects.toThrow("offline");
+            expect(speech._enginePromise).toBeNull();
+            expect(revoke).toHaveBeenCalled();
+            const retry = speech._ensureEngine();
+            expect(speech._ensureEngine()).toBe(retry);
+            await expect(retry).resolves.toBe(engine);
+        }
+    );
+
+    test("Speak does not retry a failed engine load on each block", async () => {
+        const speech = new KokoroSpeech();
+        const load = jest
+            .spyOn(speech, "_loadVerifiedModule")
+            .mockRejectedValue(new Error("offline"));
+        jest.spyOn(console, "warn").mockImplementation(() => {});
+        speech.speak("first");
+        await settle();
+        speech.speak("second");
+        await settle();
+        expect(load).toHaveBeenCalledTimes(1);
+        expect(speech._unavailable).toBe(true);
+        expect(audio.started).toHaveLength(0);
+    });
+
     test("verifies every executable asset before importing Kokoro", async () => {
         const speech = new KokoroSpeech();
         const assets = KokoroSpeech.ASSETS;
@@ -402,5 +439,271 @@ describe("KokoroSpeech", () => {
         speech._reportProgress({ progress: 42, status: "progress" });
 
         expect(onProgress).toHaveBeenCalledWith({ progress: 42, status: "progress" });
+    });
+});
+
+describe("Kokoro singing resynthesis", () => {
+    const rate = 24000;
+    const tone = frequency => ({
+        audio: Float32Array.from(
+            { length: rate / 2 },
+            (_, i) => 0.5 * Math.sin((2 * Math.PI * frequency * i) / rate)
+        ),
+        sampling_rate: rate
+    });
+
+    test("renders with the real speech engine interface", async () => {
+        const speech = new KokoroSpeech();
+        const generate = jest.fn().mockResolvedValue(tone(220));
+        jest.spyOn(speech, "_ensureEngine").mockResolvedValue({ generate });
+        const source = await speech.renderSyllable("la");
+        expect(generate).toHaveBeenCalledWith("la", { voice: "af_heart" });
+        expect(source.rate / source.period).toBeCloseTo(220, 0);
+    });
+
+    test.each([110, 220, 440])("sings a %i Hz note for the requested duration", frequency => {
+        const source = KokoroSpeech.analyzeSyllable(tone(220));
+        const output = KokoroSpeech.tuneSyllable(source, frequency, 0.8);
+        expect(output).toHaveLength(rate * 0.8);
+        expect(output.every(Number.isFinite)).toBe(true);
+        expect(output[0]).toBe(0);
+        expect(Math.abs(output[output.length - 1])).toBe(0);
+        const analyzed = KokoroSpeech.analyzeSyllable({ audio: output, sampling_rate: rate });
+        expect(Math.abs(rate / analyzed.period - frequency) / frequency).toBeLessThan(0.03);
+    });
+
+    test("rejects silence and non-finite audio", () => {
+        expect(() =>
+            KokoroSpeech.analyzeSyllable({ audio: new Float32Array(rate), sampling_rate: rate })
+        ).toThrow("silent");
+        const bad = tone(220);
+        bad.audio[20] = NaN;
+        expect(() => KokoroSpeech.analyzeSyllable(bad)).toThrow("Invalid singing");
+    });
+
+    test.each([110, 220, 440])("held %i Hz notes ease into bounded vibrato", frequency => {
+        const source = {
+            samples: Float32Array.from(
+                { length: rate / 2 },
+                (_, i) => 0.5 * Math.sin((2 * Math.PI * (i % 120)) / 120)
+            ),
+            rate,
+            period: 120
+        };
+        const short = KokoroSpeech.tuneSyllable(source, frequency, 0.5);
+        const held = KokoroSpeech.tuneSyllable(source, frequency, 2);
+        expect(held).toHaveLength(rate * 2);
+        expect(held.every(Number.isFinite)).toBe(true);
+        expect(held[0]).toBe(0);
+        expect(held[held.length - 1]).toBe(0);
+        // A periodic source keeps the same steady attack before vibrato begins.
+        let attackDifference = 0;
+        for (let i = 0; i < rate * 0.2; i++)
+            attackDifference = Math.max(attackDifference, Math.abs(held[i] - short[i]));
+        expect(attackDifference).toBeLessThan(0.00001);
+        const pitches = [];
+        let previous;
+        for (let i = rate * 0.8; i < rate * 1.8; i++) {
+            if (held[i - 1] <= 0 && held[i] > 0) {
+                const crossing = i - held[i] / (held[i] - held[i - 1]);
+                if (previous !== undefined)
+                    pitches.push(1200 * Math.log2(rate / (crossing - previous) / frequency));
+                previous = crossing;
+            }
+        }
+        expect(Math.max(...pitches)).toBeGreaterThan(10);
+        expect(Math.min(...pitches)).toBeLessThan(-10);
+        expect(Math.max(...pitches.map(Math.abs))).toBeLessThan(30);
+        // A short note retains its original pitch for its entire sustain.
+        const analyzed = KokoroSpeech.analyzeSyllable({ audio: short, sampling_rate: rate });
+        expect(Math.abs(rate / analyzed.period - frequency) / frequency).toBeLessThan(0.02);
+    });
+
+    test("pitching a voiced syllable up preserves its vowel resonance", () => {
+        const source = {
+            rate,
+            period: 120,
+            samples: Float32Array.from({ length: rate / 2 }, (_, i) => {
+                let sample = 0;
+                for (let harmonic = 1; harmonic < 15; harmonic++) {
+                    const amplitude =
+                        (harmonic === 1 ? 0.1 : 0) +
+                        Math.exp(-0.5 * ((harmonic * 200 - 1000) / 180) ** 2);
+                    sample += amplitude * Math.cos((2 * Math.PI * harmonic * (i % 120)) / 120);
+                }
+                return sample * 0.15;
+            })
+        };
+        const output = KokoroSpeech.tuneSyllable(source, 300, 0.5);
+        const energyAt = frequency => {
+            let sine = 0;
+            let cosine = 0;
+            for (let i = rate * 0.1; i < rate * 0.4; i++) {
+                sine += output[i] * Math.sin((2 * Math.PI * frequency * i) / rate);
+                cosine += output[i] * Math.cos((2 * Math.PI * frequency * i) / rate);
+            }
+            return sine * sine + cosine * cosine;
+        };
+        // The 1 kHz vowel resonance stays near 1 kHz instead of shifting to 1.5 kHz.
+        expect(energyAt(900) + energyAt(1200)).toBeGreaterThan(
+            10 * (energyAt(1500) + energyAt(1800))
+        );
+    });
+
+    test("a held note sustains its vowel instead of stretching the attack and release", () => {
+        const source = {
+            rate,
+            period: 120,
+            samples: Float32Array.from({ length: rate / 2 }, (_, i) => {
+                const amplitude = i < rate * 0.05 || i > rate * 0.45 ? 0.8 : 0.2;
+                return amplitude * Math.cos((2 * Math.PI * (i % 120)) / 120);
+            })
+        };
+        const output = KokoroSpeech.tuneSyllable(source, 200, 2);
+        expect(Math.max(...output.slice(0, rate * 0.08))).toBeGreaterThan(0.5);
+        expect(Math.max(...output.slice(rate * 0.15, rate * 1.85).map(Math.abs))).toBeLessThan(
+            0.25
+        );
+    });
+
+    test("sustain selects a voiced region when the syllable's middle is noisy", () => {
+        const source = {
+            rate,
+            period: 120,
+            samples: Float32Array.from({ length: rate / 2 }, (_, i) => {
+                if (i > rate * 0.2 && i < rate * 0.3)
+                    return 0.35 * Math.sin(i * 1.713 + i * i * 0.001);
+                return (
+                    0.2 *
+                    (Math.cos((2 * Math.PI * i) / 120) + 0.35 * Math.cos((4 * Math.PI * i) / 120))
+                );
+            })
+        };
+        const output = KokoroSpeech.tuneSyllable(source, 200, 0.7);
+        let cross = 0;
+        let left = 0;
+        let right = 0;
+        for (let i = rate * 0.15; i < rate * 0.55; i++) {
+            cross += output[i] * output[i + 120];
+            left += output[i] * output[i];
+            right += output[i + 120] * output[i + 120];
+        }
+        expect(cross / Math.sqrt(left * right)).toBeGreaterThan(0.99);
+    });
+
+    test.each([
+        [NaN, 1],
+        [440, Infinity],
+        [440, -1],
+        [440, 31]
+    ])("rejects unsupported pitch or duration (%s, %s)", (frequency, duration) => {
+        expect(() =>
+            KokoroSpeech.tuneSyllable(KokoroSpeech.analyzeSyllable(tone(220)), frequency, duration)
+        ).toThrow();
+    });
+});
+
+describe("Persistent singing syllable cache", () => {
+    let originalCaches;
+    let originalResponse;
+    let cache;
+    let records;
+    beforeEach(() => {
+        originalCaches = global.caches;
+        originalResponse = global.Response;
+        records = new Map();
+        cache = {
+            match: jest.fn(async key => records.get(key)),
+            put: jest.fn(async (key, value) => records.set(key, value)),
+            keys: jest.fn(async () => [...records.keys()]),
+            delete: jest.fn(async key => records.delete(key))
+        };
+        global.caches = { open: jest.fn(async () => cache) };
+        global.Response = class {
+            constructor(data, options) {
+                this.data = data.slice();
+                this.headers = { get: key => options.headers[key] };
+            }
+            async arrayBuffer() {
+                return this.data.buffer.slice(0);
+            }
+        };
+    });
+    afterEach(() => {
+        global.caches = originalCaches;
+        global.Response = originalResponse;
+    });
+    test("a new engine instance uses saved syllables without loading the model", async () => {
+        const rate = 24000;
+        const first = new KokoroSpeech();
+        jest.spyOn(first, "_ensureEngine").mockResolvedValue({
+            generate: async () => ({
+                audio: Float32Array.from(
+                    { length: 12000 },
+                    (_, i) => 0.5 * Math.sin((2 * Math.PI * 220 * i) / rate)
+                ),
+                sampling_rate: rate
+            })
+        });
+        const source = await first.renderSyllable("la");
+        const reloaded = new KokoroSpeech();
+        const load = jest.spyOn(reloaded, "_ensureEngine");
+        expect(await reloaded.renderSyllable("la")).toEqual(source);
+        expect(load).not.toHaveBeenCalled();
+        expect(reloaded._syllableCacheKey("la")).not.toBe(
+            new KokoroSpeech({ voice: "am_adam" })._syllableCacheKey("la")
+        );
+    });
+    test.each([
+        ["empty audio", new Float32Array(0), 24000, 109],
+        ["oversized audio", new Float32Array(1024 * 1024 + 1), 24000, 109],
+        ["partial float", new Uint8Array(3), 24000, 109],
+        ["wrong sample rate", new Float32Array(1000), 22050, 109],
+        ["fractional period", new Float32Array(1000), 24000, 109.5],
+        ["period too short", new Float32Array(1000), 24000, 0],
+        ["period too long", new Float32Array(1000), 24000, 400],
+        ["too few periods", new Float32Array(217), 24000, 109],
+        ["non-finite sample", new Float32Array(1000).fill(NaN), 24000, 109]
+    ])("ignores cache entries with %s", async (reason, samples, rate, period) => {
+        const speech = new KokoroSpeech();
+        records.set(
+            speech._syllableCacheKey("la"),
+            new Response(samples, {
+                headers: { "X-Sample-Rate": String(rate), "X-Pitch-Period": String(period) }
+            })
+        );
+        expect(await speech._readSyllableCache("la")).toBeNull();
+    });
+    test("storage failure is non-fatal", async () => {
+        const speech = new KokoroSpeech();
+        global.caches.open.mockRejectedValue(new Error("quota"));
+        expect(await speech._readSyllableCache("la")).toBeNull();
+        await expect(
+            speech._writeSyllableCache("la", {
+                samples: new Float32Array(1),
+                rate: 24000,
+                period: 109
+            })
+        ).resolves.toBeUndefined();
+    });
+    test("does not persist syllables larger than 4 MiB", async () => {
+        await new KokoroSpeech()._writeSyllableCache("la", {
+            samples: new Float32Array(1024 * 1024 + 1),
+            rate: 24000,
+            period: 109
+        });
+        expect(cache.put).not.toHaveBeenCalled();
+    });
+    test("keeps no more than 32 syllables on disk", async () => {
+        const speech = new KokoroSpeech();
+        for (let i = 0; i < 35; i++) {
+            await speech._writeSyllableCache(String(i), {
+                samples: new Float32Array(1000),
+                rate: 24000,
+                period: 109
+            });
+        }
+        expect(records.size).toBe(32);
+        expect(records.has(speech._syllableCacheKey("0"))).toBe(false);
     });
 });

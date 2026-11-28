@@ -13,7 +13,7 @@
 /*
    global
 
-   last, Tone, getTemperament, pitchToNumber,
+   last, Tone, KokoroSpeech, getTemperament, pitchToNumber,
    getNoteFromInterval, FLAT, SHARP, pitchToFrequency, getCustomNote,
    getOctaveRatio, getEffectiveOctaveRatio, isCustomTemperament, isEquallyTempered, Singer, DOUBLEFLAT, DOUBLESHARP,
    DEFAULTDRUM, getOscillatorTypes, numberToPitch, platform,
@@ -1782,6 +1782,80 @@ function Synth() {
         return tempSynth;
     };
 
+    this.singingSamples = new Map();
+    this._singingBuffers = new Map();
+    this._singingBufferBytes = 0;
+    this._getSingingBuffer = (text, frequency, duration) => {
+        const source = this.singingSamples.get(text);
+        if (!source) throw new Error("Prepare the singing voice before playing.");
+        const key = JSON.stringify([text, frequency, duration]);
+        const cached = this._singingBuffers.get(key);
+        if (cached?.source === source) {
+            this._singingBuffers.delete(key);
+            this._singingBuffers.set(key, cached);
+            return cached.buffer;
+        }
+        if (cached) {
+            this._singingBuffers.delete(key);
+            this._singingBufferBytes -= cached.bytes;
+        }
+        const data = KokoroSpeech.tuneSyllable(source, frequency, duration);
+        const buffer = Tone.getContext().createBuffer(1, data.length, source.rate);
+        buffer.getChannelData(0).set(data);
+        const bytes = data.byteLength;
+        // Keep rendered notes across Stop/replay, with an 8 MiB / 64-note memory bound.
+        while (
+            this._singingBuffers.size &&
+            (this._singingBufferBytes + bytes > 8 * 1024 * 1024 || this._singingBuffers.size >= 64)
+        ) {
+            const oldest = this._singingBuffers.keys().next().value;
+            this._singingBufferBytes -= this._singingBuffers.get(oldest).bytes;
+            this._singingBuffers.delete(oldest);
+        }
+        if (bytes <= 8 * 1024 * 1024) {
+            this._singingBuffers.set(key, { source, buffer, bytes });
+            this._singingBufferBytes += bytes;
+        }
+        return buffer;
+    };
+
+    /** Prepare every requested syllable before the interpreter starts its audio clock. */
+    this.prepareSinging = async (texts, onProgress, isCancelled = () => false) => {
+        const needed = new Set(texts);
+        if (
+            needed.size > 32 ||
+            [...needed].some(text => typeof text !== "string" || !text.trim() || text.length > 40)
+        ) {
+            throw new Error("Use at most 32 singing syllables of 1-40 characters each.");
+        }
+        const missing = [...needed].filter(text => !this.singingSamples.has(text));
+        this._singingProgress = onProgress;
+        for (const text of this.singingSamples.keys()) {
+            if (this.singingSamples.size + missing.length <= 32) break;
+            if (!needed.has(text)) this.singingSamples.delete(text);
+        }
+        for (const text of needed) {
+            if (isCancelled()) return;
+            if (this.singingSamples.has(text)) continue;
+            if (onProgress)
+                onProgress({
+                    status: "singing",
+                    index: missing.indexOf(text) + 1,
+                    total: missing.length
+                });
+            if (!this._singingSpeech)
+                this._singingSpeech = new KokoroSpeech({
+                    onProgress: progress => this._singingProgress?.(progress)
+                });
+            try {
+                this.singingSamples.set(text, await this._singingSpeech.renderSyllable(text));
+            } catch (error) {
+                if (isCancelled()) return;
+                throw error;
+            }
+        }
+    };
+
     /**
      * Creates a synth based on the specified parameters, either using samples, built-in synths, or custom synths.
      * @function
@@ -1829,6 +1903,50 @@ function Synth() {
      * Internal implementation of createSynth, called after sample is ensured loaded.
      */
     this.___createSynth = (turtle, instrumentName, sourceName, params) => {
+        if (typeof sourceName === "string" && sourceName.startsWith("sing:")) {
+            if (!instruments[turtle][instrumentName]) {
+                const source = this.singingSamples.get(sourceName.slice(5));
+                if (!source) throw new Error("Prepare the singing voice before playing.");
+                const voice = new Tone.Sampler({ urls: {}, attack: 0, release: 0.02 });
+                const play = voice.triggerAttackRelease.bind(voice);
+                const silence = Tone.getContext().createBuffer(1, 1, source.rate);
+                // Keep Tone's scheduling, routing, polyphony and Stop lifecycle.
+                voice.triggerAttackRelease = (notes, duration, time, velocity) => {
+                    const pitches = Array.isArray(notes) ? notes : [notes];
+                    const rendered = pitches.map(note => {
+                        const pitch = Tone.Frequency(note);
+                        const midi = Math.round(pitch.toMidi());
+                        const buffer = this._getSingingBuffer(
+                            sourceName.slice(5),
+                            pitch.toFrequency(),
+                            duration
+                        );
+                        return { midi, buffer };
+                    });
+                    const start = voice.toSeconds(time);
+                    for (const { midi, buffer } of rendered) {
+                        voice.add(midi, buffer);
+                        try {
+                            // The buffer already has its exact pitch. Playing at the slot's
+                            // center frequency preserves duration for microtonal notes too.
+                            play(
+                                Tone.Frequency(midi, "midi").toFrequency(),
+                                duration,
+                                start,
+                                velocity
+                            );
+                        } finally {
+                            // Scheduled sources own their audio; only the replay cache retains it.
+                            voice.add(midi, silence);
+                        }
+                    }
+                    return voice;
+                };
+                instruments[turtle][instrumentName] = voice;
+                instrumentsSource[instrumentName] = [2, sourceName];
+            }
+            return;
+        }
         // this._loadSample(sourceName); // Already loaded by __createSynth wrapper
         if (sourceName in this.samples.voice || sourceName in this.samples.drum) {
             if (!instruments[turtle][instrumentName]) {

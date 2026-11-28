@@ -1763,6 +1763,30 @@ class Logo {
         }
     }
 
+    /** Collect literal syllables, including stacks that can be started dynamically. */
+    _getSingingTexts() {
+        const blocks = this.blocks.blockList;
+        const texts = new Set();
+        for (const [id, block] of blocks.entries()) {
+            if (block?.name !== "sing" || block.trash) continue;
+            const input = blocks[block.connections[1]];
+            const text = typeof input?.value === "string" ? input.value.trim() : "";
+            let message;
+            if (input?.name !== "text" || !text || text.length > 40) {
+                message = _("Sing needs a text block containing one short syllable.");
+            } else {
+                texts.add(text);
+                if (texts.size > 32) message = _("Use at most 32 different singing syllables.");
+            }
+            if (message) {
+                const error = new Error(message);
+                error.blk = id;
+                throw error;
+            }
+        }
+        return [...texts];
+    }
+
     /**
      * Initialises interpreter state and launches all turtle execution queues.
      *
@@ -1786,6 +1810,79 @@ class Logo {
      * @returns {void}
      */
     runLogoCommands(startHere, env) {
+        if (this.synth.singingSamples && !this._exportingNotation) {
+            let texts;
+            try {
+                texts = this._getSingingTexts();
+            } catch (error) {
+                this.runGeneration++;
+                if (!this._alreadyRunning) this.onStopTurtle();
+                this.deps.errorHandler(error.message, error.blk);
+                return;
+            }
+            if (texts.some(text => !this.synth.singingSamples.has(text))) {
+                if (this._alreadyRunning) this.doStopTurtles();
+                // Share active requests only; Stop or edited syllables cancel the old work.
+                const previous = this._singingPreparationRequest;
+                const reuse =
+                    previous &&
+                    previous.generation === this.runGeneration &&
+                    previous.texts.length === texts.length &&
+                    texts.every(text => previous.texts.includes(text));
+                const generation = ++this.runGeneration;
+                if (previous) previous.generation = reuse ? generation : null;
+                this._cancelSpeech();
+                this.deps.textMsg(
+                    _("Preparing Kokoro singing voice. First use downloads the model.")
+                );
+                this.onRunTurtle();
+                if (!this._singingPreparation) {
+                    const request = { generation, texts };
+                    this._singingPreparationRequest = request;
+                    const cancelled = () => this.runGeneration !== request.generation;
+                    this._singingPreparation = this.synth
+                        .prepareSinging(
+                            texts,
+                            progress => {
+                                if (cancelled()) return;
+                                if (progress.status === "singing") {
+                                    this.deps.textMsg(
+                                        _("Preparing voice: %s of %s")
+                                            .replace("%s", progress.index)
+                                            .replace("%s", progress.total)
+                                    );
+                                } else this._showKokoroProgress(progress);
+                            },
+                            cancelled
+                        )
+                        .finally(() => {
+                            this._singingPreparation = null;
+                            this._singingPreparationRequest = null;
+                        });
+                }
+                const request = this._singingPreparationRequest;
+                const resume = () => {
+                    if (this.runGeneration !== generation) return;
+                    try {
+                        this.runLogoCommands(startHere, env);
+                    } catch (error) {
+                        this.doStopTurtles();
+                        this.deps.errorHandler(error.message);
+                    }
+                };
+                this._singingPreparation.then(resume, error => {
+                    if (this.runGeneration !== generation) return;
+                    if (request.generation !== generation) {
+                        // The failed preparation belonged to a superseded Play request.
+                        resume();
+                        return;
+                    }
+                    this.deps.errorHandler(error.message);
+                    this.onStopTurtle();
+                });
+                return;
+            }
+        }
         // Drop any speech the previous run left queued immediately, including
         // while the optional performance tracker is still loading.
         this._cancelSpeech();

@@ -1181,7 +1181,7 @@ class BlockDragController {
         blocks.adjustExpandableClampBlock();
         blocks.activity.refreshCanvas();
 
-        if (blocks.activity.turtles.running()) {
+        if (blocks.activity.turtles.running() || blocks.activity.logo?._singingPreparation) {
             blocks.activity.logo.doStopTurtles();
             const stopBtn = document.getElementById("stop");
             if (stopBtn) stopBtn.style.color = "white";
