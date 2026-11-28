@@ -69,10 +69,36 @@ function _pointFromEvent(e, touchId) {
     // actually moved or lifted in this event.
     return _touchWithId(e.changedTouches, touchId);
 }
+const WIDGET_WINDOW_POSITIONS_KEY = "musicblocks.widgetWindows.positions";
 
+function loadWidgetWindowPositions() {
+    try {
+        const savedPositions = window.localStorage.getItem(WIDGET_WINDOW_POSITIONS_KEY);
+
+        if (!savedPositions) return {};
+
+        const positions = JSON.parse(savedPositions);
+
+        if (!positions || typeof positions !== "object" || Array.isArray(positions)) {
+            return {};
+        }
+
+        return positions;
+    } catch {
+        return {};
+    }
+}
+
+function saveWidgetWindowPositions(positions) {
+    try {
+        window.localStorage.setItem(WIDGET_WINDOW_POSITIONS_KEY, JSON.stringify(positions));
+    } catch {
+        // Keep widget windows working if browser storage is unavailable.
+    }
+}
 window.widgetWindows = {
     openWindows: {},
-    _posCache: {},
+    _posCache: loadWidgetWindowPositions(),
     _maximizedCache: {},
     focused: null,
     draggingWindow: null,
@@ -360,6 +386,7 @@ window.widgetWindows = {
         // A touch-initiated drag ends only through its own touchend/touchcancel.
         if (this.draggingWindow && this.draggingWindow._activeTouchId === null) {
             this.draggingWindow._dragTopHandler(e);
+            saveWidgetWindowPositions(this._posCache);
             this.draggingWindow = null;
         }
     },
@@ -377,6 +404,7 @@ window.widgetWindows = {
         if (e.type !== "touchcancel") {
             win._dragTopHandler(e);
         }
+        saveWidgetWindowPositions(this._posCache);
         win._activeTouchId = null;
         this.draggingWindow = null;
     },
