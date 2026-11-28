@@ -372,6 +372,56 @@ describe("Tests for Singer.PitchActions setup", () => {
             expect(spy).toHaveBeenCalledWith(440);
             spy.mockRestore();
         });
+
+        test("undoes active semitone transposition before stepping so stepPitch does not double-transpose", () => {
+            Singer.addScalarTransposition.mockClear();
+            Singer.processPitch.mockClear();
+            turtle.singer.inNoteBlock = [1];
+            turtle.singer.transposition = -2;
+            // Previous note C4 transposed down by -2 semitones played as A#3 / Bb3
+            turtle.singer.lastNotePlayed = ["A#3", 4];
+
+            Singer.PitchActions.stepPitch(2, 0, blkId);
+
+            // Undoing -2 semitones recovers C4 before stepping by +2 scale steps
+            expect(Singer.addScalarTransposition).toHaveBeenCalledWith(activity.logo, 0, "C", 4, 2);
+            expect(Singer.processPitch).toHaveBeenCalledTimes(1);
+        });
+
+        test("undoes active scalar transposition before stepping so stepPitch does not double-step", () => {
+            Singer.addScalarTransposition.mockReset();
+            Singer.addScalarTransposition
+                .mockReturnValueOnce(["C", 4]) // undo scalarTransposition = -2 from A3
+                .mockReturnValueOnce(["E", 4]); // stepPitch(+2) from C4
+            Singer.processPitch.mockClear();
+            turtle.singer.inNoteBlock = [1];
+            turtle.singer.transposition = 0;
+            turtle.singer.scalarTransposition = -2;
+            turtle.singer.lastNotePlayed = ["A3", 4];
+
+            Singer.PitchActions.stepPitch(2, 0, blkId);
+
+            expect(Singer.addScalarTransposition).toHaveBeenNthCalledWith(
+                1,
+                activity.logo,
+                0,
+                "A",
+                3,
+                2
+            );
+            expect(Singer.addScalarTransposition).toHaveBeenNthCalledWith(
+                2,
+                activity.logo,
+                0,
+                "C",
+                4,
+                2
+            );
+            expect(Singer.processPitch).toHaveBeenCalledWith(activity, "E", 4, 0, 0, blkId);
+
+            // Restore default mock behavior for subsequent tests
+            Singer.addScalarTransposition.mockReturnValue(["C", 4]);
+        });
     });
 
     describe("Tests for playNthModalPitch", () => {

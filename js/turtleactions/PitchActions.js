@@ -25,7 +25,8 @@
    nthDegreeToPitch, SHARP, FLAT, pitchToFrequency, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    numberToPitch, ACCIDENTALNAMES, ACCIDENTALVALUES, NOTESFLAT, NOTESSHARP, NOTESTEP,
    keySignatureToMode, getInterval, EFFECTSNAMES, NANERRORMSG, frequencyToPitch,
-   MusicBlocks, Mouse, isCustomTemperament, getCurrentEDO, getModeLength, noteToObj
+   MusicBlocks, Mouse, isCustomTemperament, getCurrentEDO, getModeLength, noteToObj,
+   getOctaveInterval
 */
 
 /*
@@ -146,6 +147,26 @@ function setupPitchActions(activity) {
                 pitchName = noteObj[0];
                 octave = noteObj[1];
             }
+            const registerShift = tur.singer.register || 0;
+            const octaveInterval =
+                registerShift !== 0 && typeof getOctaveInterval === "function"
+                    ? getOctaveInterval(activity)
+                    : 0;
+            const semitoneUndo = -(tur.singer.transposition || 0) - registerShift * octaveInterval;
+            if (semitoneUndo !== 0) {
+                const untransposedNote = getNote(
+                    pitchName,
+                    octave,
+                    semitoneUndo,
+                    tur.singer.keySignature,
+                    tur.singer.movable,
+                    null,
+                    activity.errorMsg,
+                    activity.logo.synth.inTemperament
+                );
+                pitchName = untransposedNote[0];
+                octave = untransposedNote[1];
+            }
             if (tur.singer.invertList.length > 0) {
                 // If the last note is inverted then inverting it
                 // again to get the original note
@@ -169,6 +190,17 @@ function setupPitchActions(activity) {
                 );
                 pitchName = invertedNote[0];
                 octave = invertedNote[1];
+            }
+            if (tur.singer.scalarTransposition) {
+                const unscalarNote = Singer.addScalarTransposition(
+                    activity.logo,
+                    turtle,
+                    pitchName,
+                    octave,
+                    -tur.singer.scalarTransposition
+                );
+                pitchName = unscalarNote[0];
+                octave = unscalarNote[1];
             }
 
             const noteObj = Singer.addScalarTransposition(
