@@ -422,25 +422,53 @@ function setupVolumeBlocks(activity) {
             }
 
             if (synth === null) {
-                for (const voice in VOICENAMES) {
-                    if (VOICENAMES[voice][0] === arg0) {
-                        synth = VOICENAMES[voice][1];
-                        break;
-                    } else if (VOICENAMES[voice][1] === arg0) {
-                        synth = arg0;
-                        break;
-                    }
-                }
-            }
+                const trimmed = typeof arg0 === "string" ? arg0.trim() : "";
+                if (trimmed) {
+                    const normalizedSynthName = trimmed.toLowerCase();
+                    const normalizedWithoutHyphens = normalizedSynthName.replace(/-/g, " ");
 
-            if (synth === null) {
-                for (const drum in DRUMNAMES) {
-                    if (DRUMNAMES[drum][0].replace("-", " ") === arg0) {
-                        synth = DRUMNAMES[drum][1];
-                        break;
-                    } else if (DRUMNAMES[drum][1].replace("-", " ") === arg0) {
-                        synth = arg0;
-                        break;
+                    for (const voice in VOICENAMES) {
+                        if (
+                            VOICENAMES[voice][0].toLowerCase() === normalizedSynthName ||
+                            VOICENAMES[voice][1].toLowerCase() === normalizedSynthName
+                        ) {
+                            synth = VOICENAMES[voice][1];
+                            break;
+                        }
+                    }
+
+                    if (synth === null) {
+                        for (const drum in DRUMNAMES) {
+                            const entry = DRUMNAMES[drum];
+                            if (!entry) continue;
+                            const displayName = typeof entry[0] === "string" ? entry[0] : "";
+                            const technicalName = typeof entry[1] === "string" ? entry[1] : "";
+
+                            const normDisplay = displayName.toLowerCase();
+                            const normTech = technicalName.toLowerCase();
+
+                            if (
+                                normDisplay === normalizedSynthName ||
+                                normDisplay.replace(/-/g, " ") === normalizedWithoutHyphens ||
+                                displayName.replace(/-/g, " ") === arg0
+                            ) {
+                                synth = technicalName;
+                                break;
+                            }
+
+                            if (
+                                normTech === normalizedSynthName ||
+                                normTech.replace(/-/g, " ") === normalizedWithoutHyphens ||
+                                technicalName.replace(/-/g, " ") === arg0
+                            ) {
+                                if (technicalName.replace("-", " ") === arg0) {
+                                    synth = arg0;
+                                } else {
+                                    synth = technicalName;
+                                }
+                                break;
+                            }
+                        }
                     }
                 }
             }

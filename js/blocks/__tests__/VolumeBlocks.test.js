@@ -402,6 +402,40 @@ describe("setupVolumeBlocks", () => {
             expect(logo.synth.loadSynth).not.toHaveBeenCalled();
             expect(last(turtleObj.singer.synthVolume.guitar)).toBe(40);
         });
+
+        it("matches drum names case-insensitively and with hyphens or spaces", () => {
+            const setSynthVol2Block = createdBlocks["setsynthvolume2"];
+            const turtleObj = activity.turtles.ithTurtle(turtleIndex);
+            turtleObj.singer.instrumentNames = ["piano"];
+            turtleObj.singer.synthVolume = {};
+            turtleObj.singer.crescendoInitialVolume = {};
+            logo.synth.loadSynth = jest.fn();
+
+            DRUMNAMES.HiHat = ["hi-hat", "hihat"];
+            DRUMNAMES.BassDrum = ["bass drum", "bass-drum"];
+            try {
+                setSynthVol2Block.flow(["Hi Hat", 75, 100], logo, turtleIndex, "blkSSV2");
+                expect(logo.synth.loadSynth).toHaveBeenCalledWith(turtleIndex, "hihat");
+                expect(last(turtleObj.singer.synthVolume.hihat)).toBe(75);
+
+                setSynthVol2Block.flow(["hi-hat", 80, 100], logo, turtleIndex, "blkSSV2");
+                expect(logo.synth.loadSynth).toHaveBeenCalledWith(turtleIndex, "hihat");
+                expect(last(turtleObj.singer.synthVolume.hihat)).toBe(80);
+
+                setSynthVol2Block.flow(["Bass Drum", 65, 100], logo, turtleIndex, "blkSSV2");
+                expect(logo.synth.loadSynth).toHaveBeenCalledWith(turtleIndex, "bass-drum");
+                expect(last(turtleObj.singer.synthVolume["bass-drum"])).toBe(65);
+
+                setSynthVol2Block.flow(["bass-drum", 70, 100], logo, turtleIndex, "blkSSV2");
+                expect(logo.synth.loadSynth).toHaveBeenCalledWith(turtleIndex, "bass-drum");
+                expect(last(turtleObj.singer.synthVolume["bass-drum"])).toBe(70);
+
+                expect(activity.errorMsg).not.toHaveBeenCalledWith("Synth not found", "blkSSV2");
+            } finally {
+                delete DRUMNAMES.HiHat;
+                delete DRUMNAMES.BassDrum;
+            }
+        });
     });
 
     describe("SetSynthVolumeBlock", () => {

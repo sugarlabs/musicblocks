@@ -49,7 +49,10 @@ function setupVolumeActions(activity) {
         if (synthname === "custom" || synthname === _("custom")) return "custom";
         if (typeof synthname !== "string") return null;
 
-        const normalizedSynthName = synthname.toLowerCase();
+        const trimmed = synthname.trim();
+        if (!trimmed) return null;
+        const normalizedSynthName = trimmed.toLowerCase();
+        const normalizedWithoutHyphens = normalizedSynthName.replace(/-/g, " ");
 
         for (const voice in VOICENAMES) {
             if (VOICENAMES[voice][0].toLowerCase() === normalizedSynthName) {
@@ -61,15 +64,31 @@ function setupVolumeActions(activity) {
         }
 
         for (const drum in DRUMNAMES) {
-            const displayName = DRUMNAMES[drum][0];
-            const technicalName = DRUMNAMES[drum][1];
+            const entry = DRUMNAMES[drum];
+            if (!entry) continue;
+            const displayName = typeof entry[0] === "string" ? entry[0] : "";
+            const technicalName = typeof entry[1] === "string" ? entry[1] : "";
 
-            if (displayName.replace("-", " ") === synthname) {
+            const normDisplay = displayName.toLowerCase();
+            const normTech = technicalName.toLowerCase();
+
+            if (
+                normDisplay === normalizedSynthName ||
+                normDisplay.replace(/-/g, " ") === normalizedWithoutHyphens ||
+                displayName.replace(/-/g, " ") === synthname
+            ) {
                 return technicalName;
             }
 
-            if (technicalName.replace("-", " ") === synthname) {
-                return synthname;
+            if (
+                normTech === normalizedSynthName ||
+                normTech.replace(/-/g, " ") === normalizedWithoutHyphens ||
+                technicalName.replace(/-/g, " ") === synthname
+            ) {
+                if (technicalName.replace("-", " ") === synthname) {
+                    return synthname;
+                }
+                return technicalName;
             }
         }
 
