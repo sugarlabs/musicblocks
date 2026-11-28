@@ -232,6 +232,52 @@ describe("Tuner Widget", () => {
                 expect(result[0]).toBe("A");
             });
 
+            test.each([0, -5, 1.5, 257, NaN, Infinity])(
+                "falls back to 12-EDO for invalid EDO %p",
+                edo => {
+                    const {
+                        generateNoteNames: realGenerateNoteNames
+                    } = require("../../utils/musicutils-temperament");
+                    let generatedEDO;
+                    const generateNoteNamesSpy = jest
+                        .spyOn(global, "generateNoteNames")
+                        .mockImplementation(edoValue => {
+                            generatedEDO = edoValue;
+                            return realGenerateNoteNames(edoValue);
+                        });
+                    let result;
+
+                    try {
+                        result = TunerUtils.frequencyToPitch(440, edo);
+                    } finally {
+                        generateNoteNamesSpy.mockRestore();
+                    }
+
+                    expect(result).toEqual(["A", 0, 440]);
+                    expect(generatedEDO).toBe(12);
+                }
+            );
+
+            test("preserves valid boundary EDOs 1 and 256 with the real generator", () => {
+                const {
+                    generateNoteNames: realGenerateNoteNames
+                } = require("../../utils/musicutils-temperament");
+                const generateNoteNamesSpy = jest
+                    .spyOn(global, "generateNoteNames")
+                    .mockImplementation(edoValue => realGenerateNoteNames(edoValue));
+
+                try {
+                    const result1 = TunerUtils.frequencyToPitch(440, 1);
+                    const result256 = TunerUtils.frequencyToPitch(440, 256);
+
+                    expect(result1).toEqual(["C", -300, 440]);
+                    expect(result256).toEqual([realGenerateNoteNames(256)[192], 0, 440]);
+                    expect(result256[0]).toBeDefined();
+                } finally {
+                    generateNoteNamesSpy.mockRestore();
+                }
+            });
+
             test("preserves original frequency in return value", () => {
                 const freq = 523.25; // C5
                 const result = TunerUtils.frequencyToPitch(freq);

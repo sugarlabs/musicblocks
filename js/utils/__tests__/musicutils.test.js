@@ -6055,7 +6055,7 @@ describe("generateNoteNames EDO length contract", () => {
     // arithmetic from the EDO but wraps note names on the table length, so a
     // table longer than the EDO desynchronises the two and yields note names
     // outside the temperament.
-    it.each([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 17, 19, 22, 24, 31, 41, 53])(
+    it.each([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 17, 19, 22, 24, 31, 41, 53, 256])(
         "returns exactly %i names for %i-EDO",
         edo => {
             expect(generateNoteNames(edo)).toHaveLength(edo);
@@ -6095,6 +6095,24 @@ describe("generateNoteNames EDO length contract", () => {
     it("keeps the small special-cased tables unchanged", () => {
         expect(generateNoteNames(5)).toEqual(["C", "D", "E", "G", "A"]);
         expect(generateNoteNames(7)).toEqual(["C", "D", "E", "F", "G", "A", "B"]);
+    });
+
+    it.each([Infinity, NaN, 0, -1, 1.5, 257])(
+        "falls back to the 12-EDO table for invalid EDO %p",
+        edo => {
+            expect(generateNoteNames(edo)).toEqual(generateNoteNames(12));
+        }
+    );
+
+    it.each([0, -5, NaN, 1.5, Infinity])(
+        "uses 12-EDO for invalid EDO %p when resolving fallback note positions",
+        edo => {
+            expect(getEdoNoteNamePosition("D♭", edo)).toBe(1);
+        }
+    );
+
+    it("preserves valid 19-EDO lookup positions", () => {
+        expect(getEdoNoteNamePosition("D♭", 19)).toBe(2);
     });
 
     it.each([3, 6, 12, 19, 31])("produces no duplicate names for %i-EDO", edo => {
