@@ -337,7 +337,12 @@ function setupGraphicsBlocks(activity) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
-                if (typeof args[0] === "string" || typeof args[1] === "string") {
+                if (
+                    typeof args[0] === "string" ||
+                    typeof args[1] === "string" ||
+                    !Number.isFinite(args[0]) ||
+                    !Number.isFinite(args[1])
+                ) {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else if (logo.inMatrix) {
                     recordMatrixRow(logo, blk, [args[0], args[1]]);
@@ -448,7 +453,12 @@ function setupGraphicsBlocks(activity) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
-                if (typeof args[0] === "string" || typeof args[1] === "string") {
+                if (
+                    typeof args[0] === "string" ||
+                    typeof args[1] === "string" ||
+                    !Number.isFinite(args[0]) ||
+                    !Number.isFinite(args[1])
+                ) {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -499,7 +509,12 @@ function setupGraphicsBlocks(activity) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
-                if (typeof args[0] === "string" || typeof args[1] === "string") {
+                if (
+                    typeof args[0] === "string" ||
+                    typeof args[1] === "string" ||
+                    !Number.isFinite(args[0]) ||
+                    !Number.isFinite(args[1])
+                ) {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -546,7 +561,12 @@ function setupGraphicsBlocks(activity) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
-                if (typeof args[0] === "string" || typeof args[1] === "string") {
+                if (
+                    typeof args[0] === "string" ||
+                    typeof args[1] === "string" ||
+                    !Number.isFinite(args[0]) ||
+                    !Number.isFinite(args[1])
+                ) {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
@@ -636,7 +656,12 @@ function setupGraphicsBlocks(activity) {
                         blk
                     );
                 } else {
-                    if (typeof args[0] === "string" || typeof args[1] === "string") {
+                    if (
+                        typeof args[0] === "string" ||
+                        typeof args[1] === "string" ||
+                        !Number.isFinite(args[0]) ||
+                        !Number.isFinite(args[1])
+                    ) {
                         activity.errorMsg(NANERRORMSG, blk);
                     } else if (logo.inMatrix) {
                         recordMatrixRow(logo, blk, [args[0], args[1]]);
@@ -703,7 +728,7 @@ function setupGraphicsBlocks(activity) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
-                if (typeof args[0] === "string") {
+                if (typeof args[0] === "string" || !Number.isFinite(args[0])) {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else if (logo.inMatrix) {
                     recordMatrixRow(logo, blk, args[0]);
@@ -785,7 +810,12 @@ function setupGraphicsBlocks(activity) {
                         blk
                     );
                 } else {
-                    if (typeof args[0] === "string" || typeof args[1] === "string") {
+                    if (
+                        typeof args[0] === "string" ||
+                        typeof args[1] === "string" ||
+                        !Number.isFinite(args[0]) ||
+                        !Number.isFinite(args[1])
+                    ) {
                         activity.errorMsg(NANERRORMSG, blk);
                     } else if (logo.inMatrix) {
                         recordMatrixRow(logo, blk, [args[0], args[1]]);
@@ -861,7 +891,7 @@ function setupGraphicsBlocks(activity) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
-                if (typeof args[0] === "string") {
+                if (typeof args[0] === "string" || !Number.isFinite(args[0])) {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else if (logo.inMatrix) {
                     recordMatrixRow(logo, blk, args[0]);
@@ -936,7 +966,7 @@ function setupGraphicsBlocks(activity) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
-                if (typeof args[0] === "string") {
+                if (typeof args[0] === "string" || !Number.isFinite(args[0])) {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else if (logo.inMatrix) {
                     recordMatrixRow(logo, blk, args[0]);
@@ -1019,7 +1049,7 @@ function setupGraphicsBlocks(activity) {
                         blk
                     );
                 } else {
-                    if (typeof args[0] === "string") {
+                    if (typeof args[0] === "string" || !Number.isFinite(args[0])) {
                         activity.errorMsg(NANERRORMSG, blk);
                     } else if (logo.inMatrix) {
                         recordMatrixRow(logo, blk, args[0]);
@@ -1103,7 +1133,7 @@ function setupGraphicsBlocks(activity) {
                         blk
                     );
                 } else {
-                    if (typeof args[0] === "string") {
+                    if (typeof args[0] === "string" || !Number.isFinite(args[0])) {
                         activity.errorMsg(NANERRORMSG, blk);
                     } else if (logo.inMatrix) {
                         recordMatrixRow(logo, blk, args[0]);

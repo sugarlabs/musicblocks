@@ -275,6 +275,17 @@ describe("GraphicsBlocks", () => {
             block.flow([-50, -75], logo, turtle, 1);
             expect(turtleObj.painter.doBezier).toHaveBeenCalledWith(-50, -75);
         });
+        test("flow reports error and does not call doBezier when args contain NaN", () => {
+            const block = new activity.blocks.bezier();
+            block.flow([NaN, 100], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG, 1);
+            expect(turtleObj.painter.doBezier).not.toHaveBeenCalled();
+
+            activity.errorMsg.mockClear();
+            block.flow([100, NaN], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG, 1);
+            expect(turtleObj.painter.doBezier).not.toHaveBeenCalled();
+        });
     });
 
     // ── ControlPoint1Block ───────────────────────────
@@ -292,6 +303,17 @@ describe("GraphicsBlocks", () => {
             block.flow([0, 0], logo, turtle, 1);
             expect(turtleObj.painter.setControlPoint1).toHaveBeenCalledWith([0, 0]);
         });
+        test("flow reports error and does not call setControlPoint1 when args contain NaN", () => {
+            const block = new activity.blocks.controlpoint1();
+            block.flow([NaN, 50], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG, 1);
+            expect(turtleObj.painter.setControlPoint1).not.toHaveBeenCalled();
+
+            activity.errorMsg.mockClear();
+            block.flow([50, NaN], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG, 1);
+            expect(turtleObj.painter.setControlPoint1).not.toHaveBeenCalled();
+        });
     });
 
     // ── ControlPoint2Block ───────────────────────────
@@ -308,6 +330,17 @@ describe("GraphicsBlocks", () => {
             const block = new activity.blocks.controlpoint2();
             block.flow([-30, -40], logo, turtle, 1);
             expect(turtleObj.painter.setControlPoint2).toHaveBeenCalledWith([-30, -40]);
+        });
+        test("flow reports error and does not call setControlPoint2 when args contain NaN", () => {
+            const block = new activity.blocks.controlpoint2();
+            block.flow([NaN, 50], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG, 1);
+            expect(turtleObj.painter.setControlPoint2).not.toHaveBeenCalled();
+
+            activity.errorMsg.mockClear();
+            block.flow([50, NaN], logo, turtle, 1);
+            expect(activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG, 1);
+            expect(turtleObj.painter.setControlPoint2).not.toHaveBeenCalled();
         });
     });
 
@@ -582,6 +615,22 @@ describe("GraphicsBlocks", () => {
                 index => {
                     const invalidArgs = [...args];
                     invalidArgs[index] = "invalid";
+                    block.flow(invalidArgs, logo, turtle, 1);
+
+                    expect(activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG, 1);
+                    expect(logo.phraseMaker.addRowBlock).not.toHaveBeenCalled();
+                    expect(logo.pitchBlocks).toEqual([]);
+                    expect(logo.phraseMaker.rowLabels).toEqual([]);
+                    expect(logo.phraseMaker.rowArgs).toEqual([]);
+                    expect(turtleObj.painter[painterMethod]).not.toHaveBeenCalled();
+                }
+            );
+
+            test.each(args.map((_, index) => [index]))(
+                "rejects NaN at argument %i before recording or painting",
+                index => {
+                    const invalidArgs = [...args];
+                    invalidArgs[index] = NaN;
                     block.flow(invalidArgs, logo, turtle, 1);
 
                     expect(activity.errorMsg).toHaveBeenCalledWith(NANERRORMSG, 1);
