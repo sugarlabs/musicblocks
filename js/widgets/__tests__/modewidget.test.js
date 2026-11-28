@@ -910,6 +910,83 @@ describe("ModeWidget", () => {
         expect(modeWidget._modeLabelCell.textContent).toBe("C ionian");
     });
 
+    describe("seven-note modes in meantone-spelled tunings", () => {
+        // Real tables here: the mocks above stand in for a 12-note world.
+        const real = require("../../utils/musicutils.js");
+        const { _namesAreMeantone } = require("../../utils/musicutils-buildscale.js");
+        const stubs = {
+            MUSICALMODES: real.MUSICALMODES,
+            TEMPERAMENT: real.TEMPERAMENT,
+            generateNoteNames: real.generateNoteNames,
+            buildScale: real.buildScale,
+            _namesAreMeantone
+        };
+        const saved = {};
+
+        beforeEach(() => {
+            for (const name of Object.keys(stubs)) {
+                saved[name] = global[name];
+                global[name] = stubs[name];
+            }
+        });
+
+        afterEach(() => {
+            for (const name of Object.keys(stubs)) {
+                global[name] = saved[name];
+            }
+        });
+
+        const stepsIn = (temperament, edo, mode) => {
+            modeWidget._activeTemperamentKey = temperament;
+            modeWidget._activeEDO = edo;
+            return modeWidget._modeStepPattern(mode, null);
+        };
+
+        test("draws 19-EDO lydian with F♯, the scale Scalar Step plays", () => {
+            // C D E F♯ G A B: F♯ is 9 steps up. The stretched 12-EDO pattern rounded
+            // the 9.5-step tritone up to G♭ and gave 3, 3, 4, 1, ...
+            expect(stepsIn("equal19", 19, "lydian")).toEqual([3, 3, 3, 2, 3, 3, 2]);
+            expect(stepsIn("1/3 comma meantone", 19, "lydian")).toEqual([3, 3, 3, 2, 3, 3, 2]);
+            expect(stepsIn("equal19", 19, "hungarian")).toEqual(
+                real.buildScale("C hungarian", 19)[1]
+            );
+        });
+
+        test("matches every seven-note mode to the scale it builds in 19 EDO", () => {
+            for (const mode of Object.keys(real.MUSICALMODES)) {
+                if (mode !== "custom" && real.MUSICALMODES[mode].length === 7) {
+                    expect([mode, stepsIn("equal19", 19, mode)]).toEqual([
+                        mode,
+                        real.buildScale("C " + mode, 19)[1]
+                    ]);
+                }
+            }
+        });
+
+        test("leaves 12 EDO, other tables and other mode sizes to the stretched pattern", () => {
+            global.getModePattern.mockReturnValue([9]);
+            expect(stepsIn("equal", 12, "lydian")).toEqual([9]);
+            // 31 EDO's sharps and flats are one step, not meantone's chromatic semitone.
+            expect(stepsIn("equal31", 31, "lydian")).toEqual([9]);
+            expect(stepsIn("equal19", 19, "major pentatonic")).toEqual([9]);
+        });
+
+        test("names C lydian on the wheel in 19 EDO", () => {
+            modeWidget._activeTemperamentKey = "equal19";
+            modeWidget._activeEDO = 19;
+            modeWidget._modeLabelCell = { textContent: "" };
+            modeWidget.widgetWindow = { updateTitle: jest.fn() };
+            modeWidget._selectedNotes = Array.from({ length: 19 }, (_, i) =>
+                [0, 3, 6, 9, 11, 14, 17].includes(i)
+            );
+            modeWidget._rebuildModeIndex();
+
+            modeWidget._setModeName();
+
+            expect(modeWidget._modeLabelCell.textContent).toBe("C lydian");
+        });
+    });
+
     describe("cross-EDO custom mode shadowing", () => {
         // 41-EDO major: rescales to 12-EDO major, so only the EDO guard
         // decides the match. All patterns resolve alike via the getModePattern mock.
