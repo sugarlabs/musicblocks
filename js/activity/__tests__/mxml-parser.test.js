@@ -2516,6 +2516,61 @@ describe("Test 20: Lyrics", () => {
         expect(lyricTexts(blocks)).toEqual(["cro‿a"]);
     });
 
+    it("shows an empty <elision/> as an undertie instead of joining the syllables", async () => {
+        const lyric =
+            "<lyric><syllabic>single</syllabic><text>Lo</text>" +
+            "<elision/><syllabic>single</syllabic><text>rem</text></lyric>";
+        const { blocks } = await parseAndCapture(scorePartwise(sungNote("C", lyric)));
+
+        expect(lyricTexts(blocks)).toEqual(["Lo‿rem"]);
+    });
+
+    it("adds no lyric for an elision between empty syllables", async () => {
+        for (const lyric of [
+            "<lyric><text/><elision/><text/></lyric>",
+            "<lyric><text> </text><elision>‿</elision><text/></lyric>"
+        ]) {
+            const { blocks } = await parseAndCapture(scorePartwise(sungNote("C", lyric)));
+
+            expect(lyricTexts(blocks)).toEqual([]);
+        }
+    });
+
+    it("treats a pretty-printed empty <elision> as an undertie", async () => {
+        const lyric = "<lyric><text>Lo</text><elision>\n  </elision><text>rem</text></lyric>";
+        const { blocks } = await parseAndCapture(scorePartwise(sungNote("C", lyric)));
+
+        expect(lyricTexts(blocks)).toEqual(["Lo‿rem"]);
+    });
+
+    it("keeps the elision symbol a score gives, including a no-break space", async () => {
+        const lyric = "<lyric><text>e</text><elision> </elision><text>il</text></lyric>";
+        const { blocks } = await parseAndCapture(scorePartwise(sungNote("C", lyric)));
+
+        expect(lyricTexts(blocks)).toEqual(["e il"]);
+    });
+
+    it("hyphenates an elided lyric by its last syllable's <syllabic>", async () => {
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                sungNote(
+                    "C",
+                    "<lyric><syllabic>end</syllabic><text>ma</text><elision>‿</elision>" +
+                        "<syllabic>begin</syllabic><text>a</text></lyric>"
+                ) +
+                    sungNote("D", LYRIC("mor", { syllabic: "end" })) +
+                    sungNote(
+                        "E",
+                        "<lyric><syllabic>begin</syllabic><text>can</text><elision>‿</elision>" +
+                            "<syllabic>end</syllabic><text>to</text></lyric>"
+                    )
+            )
+        );
+
+        expect(lyricTexts(blocks)).toEqual(["ma‿a-", "mor", "can‿to"]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
     it("writes <syllabic> as the hyphen a singer reads", async () => {
         const { blocks } = await parseAndCapture(
             scorePartwise(
