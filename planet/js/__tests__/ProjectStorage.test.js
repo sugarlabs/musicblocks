@@ -1268,6 +1268,18 @@ describe("ProjectStorage", () => {
             expect(persisted.Projects["proj2"].ProjectData).toBe("data-B-orig");
         });
 
+        it("persists publication intent until it is cleared", async () => {
+            const saveSpy = jest.spyOn(storage, "save").mockResolvedValue();
+            const details = { projectName: "Queued song", tags: ["music"] };
+
+            await storage.setPendingPublication("proj1", details);
+            expect(storage.data.Projects.proj1.pendingPublication).toEqual(details);
+
+            await storage.clearPendingPublication("proj1");
+            expect(storage.data.Projects.proj1.pendingPublication).toBeNull();
+            expect(saveSpy).toHaveBeenCalledTimes(2);
+        });
+
         it("renameProject should update project name", async () => {
             const saveSpy = jest.spyOn(storage, "save").mockResolvedValue();
             await storage.renameProject("proj1", "New Name");

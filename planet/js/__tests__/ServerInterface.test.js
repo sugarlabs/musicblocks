@@ -98,6 +98,67 @@ describe("ServerInterface", () => {
         jest.clearAllMocks();
     });
 
+    describe("offline publication", () => {
+        it("queues the selected project rather than the current project", async () => {
+            const callback = jest.fn();
+            mockPlanet.ProjectStorage = { getCurrentProjectID: jest.fn(() => "current") };
+            server.offlineManager = {
+                isOnline: false,
+                queueRepoCreation: jest.fn(async () => ({
+                    success: true,
+                    offline: true,
+                    repository: "selected-repo"
+                }))
+            };
+
+            await server.addProject(
+                JSON.stringify({ ProjectID: "selected", ProjectName: "Selected" }),
+                callback
+            );
+
+            expect(server.offlineManager.queueRepoCreation).toHaveBeenCalledWith(
+                "selected",
+                expect.objectContaining({ projectName: "Selected" })
+            );
+            expect(callback).toHaveBeenCalledWith({
+                success: true,
+                offline: true,
+                repository: "selected-repo"
+            });
+        });
+
+        it("persists publication details before reporting that it was queued", async () => {
+            const callback = jest.fn();
+            mockPlanet.ProjectStorage = {
+                setPendingPublication: jest.fn().mockResolvedValue()
+            };
+            server.offlineManager = { isOnline: false };
+
+            await server.publishProject(
+                "selected-repo",
+                undefined,
+                callback,
+                "Selected",
+                "A song",
+                ["music"],
+                "data:image/png;base64,AAAA",
+                "selected"
+            );
+
+            expect(mockPlanet.ProjectStorage.setPendingPublication).toHaveBeenCalledWith(
+                "selected",
+                {
+                    repoName: "selected-repo",
+                    projectName: "Selected",
+                    description: "A song",
+                    tags: ["music"],
+                    thumbnail: "data:image/png;base64,AAAA"
+                }
+            );
+            expect(callback).toHaveBeenCalledWith({ success: true, offline: true });
+        });
+    });
+
     describe("caching behavior", () => {
         it("should retrieve project details from cache if available", async () => {
             const cachedData = { name: "Cached Project" };
