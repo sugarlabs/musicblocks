@@ -23,6 +23,7 @@
 
 describe("ToolbarUI tooltip dismissal", () => {
     let ToolbarUI;
+    let toolbar;
     let calls;
     let clickHandler;
 
@@ -69,11 +70,15 @@ describe("ToolbarUI tooltip dismissal", () => {
         global._ = jest.fn(x => x);
 
         ToolbarUI = require("../toolbar-ui");
-        const toolbar = new ToolbarUI();
+        toolbar = new ToolbarUI();
         toolbar.init({ beginnerMode: true });
     });
 
     afterEach(() => {
+        if (toolbar) {
+            toolbar.dispose();
+        }
+        document.body.innerHTML = "";
         delete global.window.jQuery;
         delete global.window.platformColor;
         delete global._THIS_IS_MUSIC_BLOCKS_;
@@ -113,5 +118,147 @@ describe("ToolbarUI tooltip dismissal", () => {
         clickHandler.call(element);
 
         expect(calls.trigger).toContainEqual({ selector: element, event: "mouseleave.tooltip" });
+    });
+
+    describe("open-dropdown tooltip guard", () => {
+        const $ = jest.requireActual("jquery");
+
+        const buildToolbarDom = isOpen => {
+            const otherBtn = document.createElement("a");
+            otherBtn.id = "advancedMode";
+            otherBtn.className = "tooltipped";
+
+            const dropdown = document.createElement("ul");
+            dropdown.id = "themedropdown";
+            dropdown.className = "dropdown-content";
+            dropdown.style.display = isOpen ? "block" : "none";
+
+            const itemBtn = document.createElement("a");
+            itemBtn.id = "light";
+            itemBtn.className = "tooltipped";
+            dropdown.appendChild(itemBtn);
+
+            document.body.appendChild(otherBtn);
+            document.body.appendChild(dropdown);
+            return { otherBtn, dropdown, itemBtn };
+        };
+
+        it("suppresses jQuery mouseenter.tooltip on outside elements while a dropdown is open", () => {
+            const { otherBtn } = buildToolbarDom(true);
+            const targetListener = jest.fn();
+            $(otherBtn).on("mouseenter.tooltip", targetListener);
+
+            otherBtn.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+
+            expect(targetListener).not.toHaveBeenCalled();
+        });
+
+        it("suppresses mouseover when a dropdown is open via active class only", () => {
+            const { otherBtn, dropdown } = buildToolbarDom(false);
+            dropdown.style.display = "";
+            dropdown.classList.add("active");
+            const targetListener = jest.fn();
+            $(otherBtn).on("mouseenter.tooltip", targetListener);
+
+            otherBtn.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+
+            expect(targetListener).not.toHaveBeenCalled();
+        });
+
+        it("allows jQuery mouseenter.tooltip on items inside the open dropdown", () => {
+            const { itemBtn } = buildToolbarDom(true);
+            const targetListener = jest.fn();
+            $(itemBtn).on("mouseenter.tooltip", targetListener);
+
+            itemBtn.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+
+            expect(targetListener).toHaveBeenCalledTimes(1);
+        });
+
+        it("allows jQuery mouseenter.tooltip when all dropdowns are closed", () => {
+            const { otherBtn } = buildToolbarDom(false);
+            const targetListener = jest.fn();
+            $(otherBtn).on("mouseenter.tooltip", targetListener);
+
+            otherBtn.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+
+            expect(targetListener).toHaveBeenCalledTimes(1);
+        });
+
+        it("allows jQuery mouseenter.tooltip when no dropdown exists in the DOM", () => {
+            const otherBtn = document.createElement("a");
+            otherBtn.id = "advancedMode";
+            otherBtn.className = "tooltipped";
+            document.body.appendChild(otherBtn);
+
+            const targetListener = jest.fn();
+            $(otherBtn).on("mouseenter.tooltip", targetListener);
+
+            otherBtn.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+
+            expect(targetListener).toHaveBeenCalledTimes(1);
+        });
+
+        it("removes the capture listener on dispose", () => {
+            const { otherBtn } = buildToolbarDom(true);
+            const targetListener = jest.fn();
+            $(otherBtn).on("mouseenter.tooltip", targetListener);
+
+            toolbar.dispose();
+            otherBtn.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+
+            expect(targetListener).toHaveBeenCalledTimes(1);
+        });
+
+        it("replaces previous listener on repeated init() so dispose() cleans up completely", () => {
+            toolbar.init({ beginnerMode: true });
+            const { otherBtn } = buildToolbarDom(true);
+            const targetListener = jest.fn();
+            $(otherBtn).on("mouseenter.tooltip", targetListener);
+
+            otherBtn.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+            expect(targetListener).not.toHaveBeenCalled();
+
+            toolbar.dispose();
+            otherBtn.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+            expect(targetListener).toHaveBeenCalledTimes(1);
+        });
+
+        it("cancels outside tooltips when a dropdown opens and ignores items inside it", async () => {
+            const { otherBtn, dropdown, itemBtn } = buildToolbarDom(false);
+            const scopedToolbar = new ToolbarUI();
+            scopedToolbar.init({ beginnerMode: true });
+            calls.trigger.length = 0;
+
+            dropdown.style.display = "block";
+            await Promise.resolve();
+
+            expect(calls.trigger).toContainEqual({
+                selector: otherBtn,
+                event: "mouseleave.tooltip"
+            });
+            expect(calls.trigger).not.toContainEqual({
+                selector: itemBtn,
+                event: "mouseleave.tooltip"
+            });
+
+            scopedToolbar.dispose();
+        });
+
+        it("stops observing dropdowns after dispose()", async () => {
+            const { otherBtn, dropdown } = buildToolbarDom(false);
+            const scopedToolbar = new ToolbarUI();
+            scopedToolbar.init({ beginnerMode: true });
+            calls.trigger.length = 0;
+
+            scopedToolbar.dispose();
+            dropdown.style.display = "block";
+            await Promise.resolve();
+
+            expect(calls.trigger).not.toContainEqual({
+                selector: otherBtn,
+                event: "mouseleave.tooltip"
+            });
+        });
     });
 });

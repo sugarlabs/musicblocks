@@ -72,6 +72,8 @@ class ToolbarUI {
         this._recordDropdownArrowElement = null;
         this._recordDropdownArrowClickHandler = null;
         this._recordDropdownOutsideClickHandler = null;
+        this._tooltipDropdownGuardHandler = null;
+        this._dropdownTooltipObserver = null;
         this._dimTimeout = null;
     }
 
@@ -104,6 +106,14 @@ class ToolbarUI {
      */
     dispose() {
         this._cleanupRecordDropdownListeners();
+        if (this._tooltipDropdownGuardHandler) {
+            document.removeEventListener("mouseover", this._tooltipDropdownGuardHandler, true);
+            this._tooltipDropdownGuardHandler = null;
+        }
+        if (this._dropdownTooltipObserver) {
+            this._dropdownTooltipObserver.disconnect();
+            this._dropdownTooltipObserver = null;
+        }
         if (this._dimTimeout) {
             clearTimeout(this._dimTimeout);
             this._dimTimeout = null;
@@ -333,6 +343,75 @@ class ToolbarUI {
         $j(".tooltipped").on("click", function () {
             $j(this).trigger("mouseleave.tooltip");
         });
+
+        // When a dropdown menu is expanded, suppress tooltips for elements
+        // outside that menu so adjacent toolbar descriptions do not overlap
+        // or appear behind the open menu. Items inside the open menu still
+        // show their tooltips (layered above via CSS z-index).
+        if (this._tooltipDropdownGuardHandler) {
+            document.removeEventListener("mouseover", this._tooltipDropdownGuardHandler, true);
+        }
+        const isDropdownOpen = dropdown =>
+            dropdown.style.display === "block" || dropdown.classList.contains("active");
+        this._tooltipDropdownGuardHandler = e => {
+            if (!e.target || typeof e.target.closest !== "function") {
+                return;
+            }
+            const tooltipped = e.target.closest(".tooltipped");
+            if (!tooltipped) {
+                return;
+            }
+            const dropdowns = document.querySelectorAll(".dropdown-content");
+            let anyOpen = false;
+            for (let i = 0; i < dropdowns.length; i++) {
+                if (isDropdownOpen(dropdowns[i])) {
+                    anyOpen = true;
+                    break;
+                }
+            }
+            if (!anyOpen) {
+                return;
+            }
+            const parentDropdown = tooltipped.closest(".dropdown-content");
+            if (parentDropdown && isDropdownOpen(parentDropdown)) {
+                return;
+            }
+            e.stopImmediatePropagation();
+        };
+        document.addEventListener("mouseover", this._tooltipDropdownGuardHandler, true);
+
+        if (this._dropdownTooltipObserver) {
+            this._dropdownTooltipObserver.disconnect();
+            this._dropdownTooltipObserver = null;
+        }
+        if (typeof MutationObserver !== "undefined") {
+            const openDropdowns = new WeakSet();
+            this._dropdownTooltipObserver = new MutationObserver(mutations => {
+                for (let i = 0; i < mutations.length; i++) {
+                    const dropdown = mutations[i].target;
+                    const nowOpen = isDropdownOpen(dropdown);
+                    if (nowOpen && !openDropdowns.has(dropdown)) {
+                        openDropdowns.add(dropdown);
+                        document.querySelectorAll(".tooltipped").forEach(el => {
+                            if (!dropdown.contains(el)) {
+                                $j(el).trigger("mouseleave.tooltip");
+                            }
+                        });
+                    } else if (!nowOpen) {
+                        openDropdowns.delete(dropdown);
+                    }
+                }
+            });
+            document.querySelectorAll(".dropdown-content").forEach(dropdown => {
+                if (isDropdownOpen(dropdown)) {
+                    openDropdowns.add(dropdown);
+                }
+                this._dropdownTooltipObserver.observe(dropdown, {
+                    attributes: true,
+                    attributeFilter: ["style", "class"]
+                });
+            });
+        }
 
         const restoreWidgetFocus = () => {
             const focusedWindow = window.widgetWindows?.focused;
