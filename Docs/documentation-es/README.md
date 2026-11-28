@@ -109,9 +109,6 @@ remove an individual block from a stack.
 *Alt-C* is copy and *Alt-V* is paste. Be sure that the cursor is
 highlighting the block(s) you want to copy.
 
-You can directly type notes using *d* for `Do`, *r* for `Re`, *m* for
-`Mi`, *f* for `Fa`, *s* for `Sol`, *l* for `La`, and *t* for `Ti`.
-
 Block Palettes
 --------------
 
