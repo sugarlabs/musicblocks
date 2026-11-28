@@ -231,9 +231,14 @@ class OfflineCommitManager {
             repoName: pendingCreation.repoName // pre-generated, GitHub-safe
         });
 
-        const result = await new Promise(resolve => {
-            this.server.addProject(payload, resolve);
-        });
+        // ServerInterface saves the ownership key before reporting a successful create.
+        // If persisting GitRepoData failed afterwards, reuse that repo on the next sync.
+        const savedKey = this.server.getKey?.(pendingCreation.repoName);
+        const result = savedKey
+            ? { success: true, repository: pendingCreation.repoName, key: savedKey }
+            : await new Promise(resolve => {
+                  this.server.addProject(payload, resolve);
+              });
 
         if (!result || !result.success) {
             console.error(
@@ -285,7 +290,7 @@ class OfflineCommitManager {
         }
 
         console.debug(
-            `[OfflineCommitManager] Pending repo created: ${actualRepoName}. Syncing all drafts…`
+            `[OfflineCommitManager] Pending repo ready: ${actualRepoName}. Syncing all drafts…`
         );
 
         // Push ALL drafts (draft 1, 2, 3, …) to the real repo as proper commits
