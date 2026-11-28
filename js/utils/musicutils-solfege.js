@@ -50,6 +50,13 @@ var noteIsSolfege = note => {
     if (SOLFEGECONVERSIONTABLE[altNote] !== undefined) {
         return false;
     }
+    // An uppercase letter A–G followed only by accidentals (any combination of ♯ ♭ 𝄪 𝄫 # b x)
+    // is always a note name, never a solfege syllable — even with double accidentals
+    // like B𝄫, C𝄪, E♭♭, D♯♯, Cx, Ebb, which SOLFEGECONVERSIONTABLE does not list.
+    // Lowercase-only strings like "bbb" or "b##" are not note names and pass through.
+    if (/^[A-G][♯♭𝄪𝄫#bx]*$/u.test(note)) {
+        return false;
+    }
     return true;
 };
 

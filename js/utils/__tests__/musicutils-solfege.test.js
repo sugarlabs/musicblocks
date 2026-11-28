@@ -37,6 +37,44 @@ describe("musicutils-solfege", () => {
         }
     });
 
+    it("does not take double-accidental note names for solfege", () => {
+        // B𝄫, C𝄪, E♭♭, D♯♯, Cx, Ebb, Dbb, etc. are note names, not solfege syllables.
+        // SOLFEGECONVERSIONTABLE only has single-accidental spellings, so without an
+        // explicit note-name check these would incorrectly return true (bug #10419).
+        for (const note of [
+            "B𝄫",
+            "C𝄪",
+            "E♭♭",
+            "D♯♯",
+            "G𝄪",
+            "A𝄫", // Unicode double accidentals
+            "Ebb",
+            "Dbb",
+            "Gbb",
+            "Cx",
+            "Dx",
+            "Bx", // ASCII double accidentals
+            "Fbb",
+            "Ex",
+            "Bbb", // further edge cases
+            "C♯♯",
+            "D♭♭",
+            "F##",
+            "C#x",
+            "E♭𝄫" // mixed or longer accidental sequences
+        ]) {
+            expect(solfege.noteIsSolfege(note)).toBe(false);
+        }
+    });
+
+    it("treats non-note strings and lowercase accidental inputs as solfege or unknown pass-throughs", () => {
+        // Empty string and lowercase inputs like b##, bbb do not match note-name syntax
+        // and pass through without conversion
+        for (const val of ["", "b##", "bbb", "h#"]) {
+            expect(solfege.noteIsSolfege(val)).toBe(true);
+        }
+    });
+
     it("gives E sharp and F flat their fixed solfege names", () => {
         expect(musicutils.getSolfege("E♯")).toBe("mi♯");
         expect(musicutils.getSolfege("F♭")).toBe("fa♭");
