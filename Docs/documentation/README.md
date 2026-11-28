@@ -193,8 +193,11 @@ the canvas.
 
 - **Show Grids**: Displays a grid overlay on the canvas for alignment
       and organization.
-- **Clear Screen**: Clears the entire canvas, removing all blocks and
-      drawings.
+- **Clear Screen**: Clears drawings, grids, overlays, and temporary
+      canvas state, then returns the turtles to their starting
+      positions. The block program remains in the workspace (use
+      **New Project** in the Main Toolbar to reset the workspace and
+      blocks).
 - **Toggle Display Size**: Adjusts the size of the canvas or blocks
       for a better viewing experience.
 
