@@ -418,14 +418,21 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 }
 
 .trash-view {
-    position: relative;
-    background-color: var(--color-bg-primary);
-    max-width: 396px;
-    max-height: 200px;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10002;
+    width: min(264px, calc(100vw - 24px));
+    max-height: min(360px, calc(100vh - 88px));
+    box-sizing: border-box;
     overflow-y: auto;
+    background-color: var(--color-bg-primary);
     font-size: 16px;
     color: var(--color-text-primary);
-    border: 2px solid var(--color-brand-secondary);
+    border: 1px solid var(--color-border-primary);
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
     list-style-type: none;
     margin: 0;
     padding: 0;
@@ -434,38 +441,51 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
 
 .button-container {
     position: sticky;
-    display: flex;
-    justify-content: space-between;
     top: 0;
-    z-index: 10;
     display: flex;
-    gap: 10px;
-    background: var(--color-brand-primary);
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    z-index: 1;
+    background: var(--color-bg-secondary);
     margin: 0;
-    padding: 5px;
-    border-bottom: 1px solid var(--color-bg-tertiary);
+    padding: 8px;
+    border-bottom: 1px solid var(--color-border-primary);
 }
 
 .trash-item {
-    padding: 2px 12px;
-    margin: 1px 0;
-    border-radius: 4px;
-    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 6px;
+    padding: 8px 12px;
+    min-height: 64px;
+    overflow-wrap: anywhere;
+    font-size: 15px;
+    line-height: 1.35;
+    cursor: pointer;
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--radius-md);
+    transition:
+        background-color 0.18s ease,
+        border-color 0.18s ease;
 }
 
 .trash-item.hover {
     background-color: var(--color-bg-tertiary);
+    border-color: var(--color-brand-primary);
 }
 
 .trash-item-icon {
-    width: 60px;
-    height: 60px;
-    margin-right: 15px;
-    vertical-align: middle;
+    flex: 0 0 48px;
+    width: 48px;
+    height: 48px;
+    margin: 0;
     object-fit: contain;
     background-color: var(--color-bg-tertiary);
-    border-radius: var(--radius-sm);
-    padding: 2px;
+    border-radius: var(--radius-md);
+    padding: 4px;
+    box-sizing: border-box;
 }
 
 #restoreLastIcon,
@@ -473,24 +493,34 @@ body:not(.dark):not(.highcontrast) #helpfulSearchDiv {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
+    width: 36px;
+    height: 36px;
     padding: 0;
     border: 0;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     background: transparent;
-    color: inherit;
+    color: var(--color-brand-primary);
     font: inherit;
     cursor: pointer;
+}
+
+#restoreLastIcon .material-icons,
+#restoreAllIcon .material-icons {
+    font-size: 24px;
 }
 
 #restoreLastIcon:hover,
 #restoreAllIcon:hover,
 #restoreLastIcon:focus-visible,
 #restoreAllIcon:focus-visible {
-    background-color: var(--color-brand-primary-hover);
-    outline: 2px solid var(--color-text-inverse);
-    outline-offset: -2px;
+    background-color: var(--color-brand-primary);
+    color: var(--color-text-inverse);
+}
+
+#restoreLastIcon:focus-visible,
+#restoreAllIcon:focus-visible {
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: 2px;
 }
 
 .highcontrast #restoreLastIcon:hover .material-icons,
