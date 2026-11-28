@@ -2383,13 +2383,13 @@ describe("Logo runLogoCommands", () => {
             logo.synth.startingPitch = "D4";
         });
 
-        test("is kept while the project still has a set temperament block", () => {
+        test("is dropped even while the project still has a set temperament block", () => {
             logo.blockList = [{ name: "settemperament", trash: false, connections: [] }];
 
             logo.runLogoCommands(null, null);
 
-            expect(logo.synth.inTemperament).toBe("just intonation");
-            expect(logo.synth.startingPitch).toBe("D4");
+            expect(logo.synth.inTemperament).toBe("equal");
+            expect(logo.synth.startingPitch).toBe("C4");
         });
 
         test("is dropped once no set temperament block is left", () => {
