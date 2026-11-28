@@ -155,6 +155,7 @@ const makeActivity = (overrides = {}) => ({
     _doFastButton: jest.fn(),
     _onResize: jest.fn(),
     errorMsg: jest.fn(),
+    prepareExport: jest.fn(() => "workspace"),
     textMsg: jest.fn(),
     refreshCanvas: jest.fn(),
     parseABC: jest.fn(),
@@ -1451,7 +1452,149 @@ describe("newProject / _afterDelete", () => {
         jest.useRealTimers();
     });
 
-    it("uses planet new-project path when available", () => {
+    it("waits for the current Planet project to save before creating a new one", async () => {
+        let finishSave;
+        const planet = {
+            planet: {},
+            getCurrentProjectName: jest.fn(() => "Real Project"),
+            saveLocally: jest
+                .fn()
+                .mockImplementationOnce(
+                    () =>
+                        new Promise(resolve => {
+                            finishSave = resolve;
+                        })
+                )
+                .mockResolvedValue(undefined),
+            initialiseNewProject: jest.fn()
+        };
+        const activity = makeActivity({ planet });
+        const pm = new ProjectManager(activity);
+        pm._loadStart = jest.fn();
+
+        const newProject = pm._afterDelete();
+
+        expect(planet.saveLocally).toHaveBeenCalledWith({ rejectOnProjectSaveError: true });
+        expect(planet.initialiseNewProject).not.toHaveBeenCalled();
+        finishSave();
+        await newProject;
+        expect(planet.initialiseNewProject).toHaveBeenCalled();
+        expect(pm._loadStart).toHaveBeenCalled();
+    });
+
+    it("keeps the current project when its save fails", async () => {
+        const planet = {
+            planet: {},
+            getCurrentProjectName: jest.fn(() => "Real Project"),
+            saveLocally: jest.fn().mockRejectedValue(new Error("Storage full")),
+            initialiseNewProject: jest.fn()
+        };
+        const activity = makeActivity({ planet });
+        const pm = new ProjectManager(activity);
+        pm._loadStart = jest.fn();
+
+        await pm._afterDelete();
+
+        expect(planet.initialiseNewProject).not.toHaveBeenCalled();
+        expect(pm._loadStart).not.toHaveBeenCalled();
+        expect(activity.storage.removeItem).not.toHaveBeenCalled();
+        expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(expect.any(Error), {
+            operation: "saveProjectBeforeNewProject"
+        });
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Could not save the current project, so the new project was not created."
+        );
+    });
+
+    it("saves edits made while the previous save is pending before clearing", async () => {
+        let finishSave;
+        let currentData = "before";
+        const savedData = [];
+        const planet = {
+            planet: {},
+            getCurrentProjectName: jest.fn(() => "Real Project"),
+            saveLocally: jest
+                .fn()
+                .mockImplementationOnce(() => {
+                    savedData.push(currentData);
+                    return new Promise(resolve => {
+                        finishSave = resolve;
+                    });
+                })
+                .mockImplementation(() => {
+                    savedData.push(currentData);
+                    return Promise.resolve();
+                }),
+            initialiseNewProject: jest.fn()
+        };
+        const activity = makeActivity({ planet });
+        activity.prepareExport.mockImplementation(() => currentData);
+        const pm = new ProjectManager(activity);
+        pm._loadStart = jest.fn();
+
+        const request = pm.newProject();
+        expect(planet.saveLocally).toHaveBeenCalledTimes(1);
+        currentData = "after";
+        finishSave();
+        await request;
+
+        expect(savedData).toEqual(["before", "after", "after"]);
+        expect(planet.saveLocally).toHaveBeenCalledTimes(3);
+        expect(planet.initialiseNewProject).toHaveBeenCalledTimes(1);
+        expect(planet.saveLocally.mock.invocationCallOrder[1]).toBeLessThan(
+            planet.initialiseNewProject.mock.invocationCallOrder[0]
+        );
+        expect(planet.initialiseNewProject.mock.invocationCallOrder[0]).toBeLessThan(
+            planet.saveLocally.mock.invocationCallOrder[2]
+        );
+    });
+
+    it("keeps the current project when edits continue throughout the save attempts", async () => {
+        const planet = {
+            planet: {},
+            getCurrentProjectName: jest.fn(() => "Real Project"),
+            saveLocally: jest.fn().mockResolvedValue(undefined),
+            initialiseNewProject: jest.fn()
+        };
+        const activity = makeActivity({ planet });
+        let version = 0;
+        activity.prepareExport.mockImplementation(() => `version-${++version}`);
+        const pm = new ProjectManager(activity);
+
+        await pm.newProject();
+
+        expect(planet.saveLocally).toHaveBeenCalledTimes(3);
+        expect(planet.initialiseNewProject).not.toHaveBeenCalled();
+        expect(activity.storage.removeItem).not.toHaveBeenCalled();
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Could not save the current project, so the new project was not created."
+        );
+        expect(pm._newProjectPending).toBe(false);
+    });
+
+    it("reports an initialization failure and releases the pending guard", async () => {
+        const error = new Error("Storage full");
+        const planet = {
+            planet: {},
+            getCurrentProjectName: jest.fn(() => "Real Project"),
+            saveLocally: jest.fn().mockResolvedValue(undefined),
+            initialiseNewProject: jest.fn().mockRejectedValue(error)
+        };
+        const activity = makeActivity({ planet });
+        const pm = new ProjectManager(activity);
+
+        await pm.newProject();
+
+        expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(error, {
+            operation: "createNewProject"
+        });
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Could not finish creating the new project."
+        );
+        expect(pm._newProjectPending).toBe(false);
+    });
+
+    it("reports that a project must finish loading before a new one can be created", async () => {
         const planet = {
             planet: {},
             getCurrentProjectName: jest.fn(() => "Real Project"),
@@ -1459,14 +1602,244 @@ describe("newProject / _afterDelete", () => {
             initialiseNewProject: jest.fn()
         };
         const activity = makeActivity({ planet });
+        activity.blocks.isLoading.mockReturnValue(true);
+        const pm = new ProjectManager(activity);
+
+        await pm.newProject();
+
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Please wait for the current project to finish loading before creating a new one."
+        );
+        expect(planet.saveLocally).not.toHaveBeenCalled();
+        expect(planet.initialiseNewProject).not.toHaveBeenCalled();
+        expect(pm._newProjectPending).toBe(false);
+    });
+
+    it("ignores a second New project request while the first save is pending", async () => {
+        let finishSave;
+        const pendingSave = new Promise(resolve => {
+            finishSave = resolve;
+        });
+        const planet = {
+            planet: {},
+            getCurrentProjectName: jest.fn(() => "Real Project"),
+            saveLocally: jest.fn().mockReturnValueOnce(pendingSave).mockResolvedValue(undefined),
+            initialiseNewProject: jest.fn()
+        };
+        const activity = makeActivity({ planet });
         const pm = new ProjectManager(activity);
         pm._loadStart = jest.fn();
 
-        pm._afterDelete();
+        const first = pm.newProject();
+        const second = pm.newProject();
 
-        expect(planet.saveLocally).toHaveBeenCalled();
-        expect(planet.initialiseNewProject).toHaveBeenCalled();
-        expect(pm._loadStart).toHaveBeenCalled();
+        expect(second).toBeUndefined();
+        expect(planet.saveLocally).toHaveBeenCalledTimes(1);
+
+        finishSave();
+        await first;
+
+        expect(planet.initialiseNewProject).toHaveBeenCalledTimes(1);
+    });
+
+    it("keeps new-project requests blocked until loading and the final save finish", async () => {
+        let finishLoad;
+        let finishNewSave;
+        const planet = {
+            planet: {},
+            getCurrentProjectName: jest.fn(() => "Real Project"),
+            saveLocally: jest
+                .fn()
+                .mockResolvedValueOnce(undefined)
+                .mockImplementationOnce(
+                    () =>
+                        new Promise(resolve => {
+                            finishNewSave = resolve;
+                        })
+                ),
+            initialiseNewProject: jest.fn().mockResolvedValue(undefined)
+        };
+        const activity = makeActivity({ planet });
+        const pm = new ProjectManager(activity);
+        pm._loadStart = jest.fn(
+            () =>
+                new Promise(resolve => {
+                    finishLoad = resolve;
+                })
+        );
+
+        const first = pm.newProject();
+        await Promise.resolve();
+        await Promise.resolve();
+        expect(pm.newProject()).toBeUndefined();
+        expect(pm._newProjectPending).toBe(true);
+        finishLoad();
+        await Promise.resolve();
+        await Promise.resolve();
+        expect(pm.newProject()).toBeUndefined();
+        finishNewSave();
+        await first;
+        expect(pm._newProjectPending).toBe(false);
+        expect(planet.initialiseNewProject).toHaveBeenCalledTimes(1);
+    });
+
+    it("waits for the new blocks to finish loading before saving the new project", async () => {
+        const planet = {
+            planet: {},
+            getCurrentProjectName: jest.fn(() => "Real Project"),
+            saveLocally: jest.fn().mockResolvedValue(undefined),
+            initialiseNewProject: jest.fn().mockResolvedValue(undefined)
+        };
+        const activity = makeActivity({ planet });
+        const pm = new ProjectManager(activity);
+        pm._loadStart = jest.fn(() => {
+            activity.blocks.isLoading.mockReturnValue(true);
+        });
+
+        const request = pm.newProject();
+        await Promise.resolve();
+        await Promise.resolve();
+        await Promise.resolve();
+
+        expect(activity.blocks.runAfterLoad).toHaveBeenCalledTimes(1);
+        expect(planet.saveLocally).toHaveBeenCalledTimes(1);
+        expect(pm.newProject()).toBeUndefined();
+
+        activity.blocks.isLoading.mockReturnValue(false);
+        activity.blocks.runAfterLoad.mock.calls[0][0]();
+        await request;
+        expect(planet.saveLocally).toHaveBeenCalledTimes(2);
+    });
+
+    it("reports a failed new-project load without saving partial blocks", async () => {
+        const error = new Error("Block loading failed");
+        const planet = {
+            planet: {},
+            getCurrentProjectName: jest.fn(() => "Real Project"),
+            saveLocally: jest.fn().mockResolvedValue(undefined),
+            initialiseNewProject: jest.fn().mockResolvedValue(undefined)
+        };
+        const activity = makeActivity({ planet });
+        const pm = new ProjectManager(activity);
+        pm._loadStart = jest.fn(() => {
+            activity.blocks.isLoading.mockReturnValue(true);
+            return 17;
+        });
+
+        const request = pm.newProject();
+        await Promise.resolve();
+        await Promise.resolve();
+        await Promise.resolve();
+
+        expect(activity.blocks.runAfterLoad).toHaveBeenCalledTimes(1);
+        global.pubsub.emit("loadFailed", { token: 17, error });
+        await request;
+
+        expect(planet.saveLocally).toHaveBeenCalledTimes(1);
+        expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(error, {
+            operation: "createNewProject"
+        });
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Could not finish creating the new project."
+        );
+        expect(pm._newProjectPending).toBe(false);
+    });
+
+    it("does not save when the new-project load failed before the wait starts", async () => {
+        const planet = {
+            planet: {},
+            getCurrentProjectName: jest.fn(() => "Real Project"),
+            saveLocally: jest.fn().mockResolvedValue(undefined),
+            initialiseNewProject: jest.fn().mockResolvedValue(undefined)
+        };
+        const activity = makeActivity({ planet });
+        const pm = new ProjectManager(activity);
+        pm._loadStart = jest.fn(() => {
+            activity.blocks._activeLoadToken = 17;
+            activity.blocks._lastLoadFailed = true;
+            return 17;
+        });
+
+        await pm.newProject();
+
+        expect(planet.saveLocally).toHaveBeenCalledTimes(1);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Could not finish creating the new project."
+        );
+        expect(pm._newProjectPending).toBe(false);
+    });
+
+    it("ignores an unrelated load failure while waiting for the new project", async () => {
+        const planet = {
+            planet: {},
+            getCurrentProjectName: jest.fn(() => "Real Project"),
+            saveLocally: jest.fn().mockResolvedValue(undefined),
+            initialiseNewProject: jest.fn().mockResolvedValue(undefined)
+        };
+        const activity = makeActivity({ planet });
+        const pm = new ProjectManager(activity);
+        pm._loadStart = jest.fn(() => {
+            activity.blocks.isLoading.mockReturnValue(true);
+            return 17;
+        });
+
+        const request = pm.newProject();
+        await Promise.resolve();
+        await Promise.resolve();
+        await Promise.resolve();
+
+        global.pubsub.emit("loadFailed", { token: 16, error: new Error("Unrelated load") });
+        await Promise.resolve();
+        expect(pm._newProjectPending).toBe(true);
+        expect(activity.blocks.runAfterLoad).toHaveBeenCalledTimes(2);
+
+        activity.blocks.isLoading.mockReturnValue(false);
+        activity.blocks.runAfterLoad.mock.calls[1][0]();
+        await request;
+
+        expect(planet.saveLocally).toHaveBeenCalledTimes(2);
+        expect(pm._newProjectPending).toBe(false);
+    });
+
+    it.each(["sendAllToTrash", "loadNewBlocks"])(
+        "reports an error and releases the guard if %s throws during reset",
+        async method => {
+            const activity = makeActivity({ planet: undefined });
+            const error = new Error("Reset failed");
+            const target = method === "sendAllToTrash" ? activity : activity.blocks;
+            target[method].mockImplementation(() => {
+                throw error;
+            });
+            const pm = new ProjectManager(activity);
+            jest.useFakeTimers();
+
+            const request = pm.newProject();
+            jest.advanceTimersByTime(1000);
+            await request;
+
+            expect(global.ErrorHandler.recoverable).toHaveBeenCalledWith(error, {
+                operation: "createNewProject"
+            });
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "Could not finish creating the new project."
+            );
+            expect(pm._newProjectPending).toBe(false);
+            jest.useRealTimers();
+        }
+    );
+
+    it("blocks a second non-Planet request while the delayed reset is pending", async () => {
+        const activity = makeActivity({ planet: undefined });
+        const pm = new ProjectManager(activity);
+        jest.useFakeTimers();
+
+        const request = pm.newProject();
+        expect(pm.newProject()).toBeUndefined();
+        jest.advanceTimersByTime(1000);
+        await request;
+
+        expect(activity.blocks.loadNewBlocks).toHaveBeenCalledTimes(1);
+        jest.useRealTimers();
     });
 
     it("does not use planet path when project name is 'My Project'", () => {

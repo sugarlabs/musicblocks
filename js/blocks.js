@@ -330,6 +330,7 @@ class Blocks {
          * saved session (issue #8855).
          */
         this._lastLoadFailed = false;
+        this._failedLoadSnapshot = null;
         /**
          * Bumped once per load attempt (see _loadNewBlocksNow). Every block
          * created during a load is tagged with the value active at the time,
@@ -5636,6 +5637,17 @@ class Blocks {
          * @private
          * @returns {void}
          */
+        this._recordFailedLoad = () => {
+            this._lastLoadFailed = true;
+            try {
+                this._failedLoadSnapshot = this.activity.prepareExport();
+            } catch (e) {
+                // If the incomplete blocks cannot be exported, keep autosave
+                // disabled until another load starts.
+                this._failedLoadSnapshot = null;
+            }
+        };
+
         this._advanceLoadQueue = () => {
             this._loadInProgress = false;
 
@@ -5649,7 +5661,14 @@ class Blocks {
             if (this._loadQueue.length > 0) {
                 const next = this._loadQueue.shift();
                 this._loadInProgress = true;
-                this._loadNewBlocksNow(next.blockObjs, next.loadToken);
+                try {
+                    this._loadNewBlocksNow(next.blockObjs, next.loadToken);
+                } catch (error) {
+                    // A queued request has no synchronous caller to receive
+                    // its first-chunk exception. Its own catch already
+                    // advanced the queue; notify its token's waiting caller.
+                    pubsub.emit("loadFailed", { token: next.loadToken, error });
+                }
                 return;
             }
 
@@ -5707,6 +5726,7 @@ class Blocks {
             // Optimistically clear the previous attempt's failure flag; the
             // catch blocks below set it again if this attempt fails too.
             this._lastLoadFailed = false;
+            this._failedLoadSnapshot = null;
             // Every load attempt gets its own generation, win or lose, so a
             // completion that lands after this one has been abandoned can be
             // told apart from a completion belonging to whatever load is
@@ -5747,9 +5767,13 @@ class Blocks {
                     if (this.activity && typeof this.activity.stopLoadAnimation === "function") {
                         this.activity.stopLoadAnimation();
                     }
-                    // Nothing was loaded, so a waiting save would only store
-                    // the cleared workspace over the project.
-                    this._afterLoadCallbacks.clear();
+                    // Report this failed load before discarding waits, so
+                    // callers cannot save an incomplete workspace.
+                    this._recordFailedLoad();
+                    pubsub.emit("loadFailed", {
+                        token: loadToken,
+                        error: new Error(warning)
+                    });
                     this._advanceLoadQueue();
                 };
 
@@ -6565,7 +6589,7 @@ class Blocks {
                                 processChunk();
                             } catch (e) {
                                 this.activity._suppressRefresh = false;
-                                this._lastLoadFailed = true;
+                                this._recordFailedLoad();
                                 this._advanceLoadQueue();
                                 pubsub.emit("loadFailed", {
                                     token: loadToken,
@@ -6589,7 +6613,7 @@ class Blocks {
                 }
             } catch (e) {
                 this.activity._suppressRefresh = false;
-                this._lastLoadFailed = true;
+                this._recordFailedLoad();
                 this._advanceLoadQueue();
                 // Not emitting "loadFailed" here: this catch only ever runs
                 // for the first, synchronous chunk, so the throw below
