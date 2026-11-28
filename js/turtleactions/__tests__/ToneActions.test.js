@@ -217,6 +217,28 @@ describe("setupToneActions", () => {
             MusicBlocks.isRun = true;
         });
 
+        it.each([
+            ["Piano", "grand-piano"],
+            ["PIANO", "grand-piano"],
+            ["  piano  ", "grand-piano"],
+            ["Grand-Piano", "grand-piano"],
+            ["acoustic-VIOLIN", "acoustic-violin"],
+            ["Violin", "acoustic-violin"]
+        ])("should match the typed name %j regardless of case and spaces", (typed, expected) => {
+            Singer.ToneActions.setTimbre(typed, 0, 1);
+            expect(targetTurtle.singer.instrumentNames).toEqual([expected]);
+            expect(activity.logo.synth.loadSynth).toHaveBeenCalledWith(0, expected);
+        });
+
+        it.each(["not-a-voice", "  Not-A-Voice  ", "", "   "])(
+            "should keep the unknown or blank name %j as typed",
+            typed => {
+                Singer.ToneActions.setTimbre(typed, 0, 1);
+                expect(targetTurtle.singer.instrumentNames).toEqual([typed]);
+                expect(activity.logo.synth.loadSynth).toHaveBeenCalledWith(0, typed);
+            }
+        );
+
         it("should handle direct synth name", () => {
             Singer.ToneActions.setTimbre("grand-piano", 0, 1);
             expect(targetTurtle.singer.instrumentNames).toContain("grand-piano");
