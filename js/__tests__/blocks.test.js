@@ -1744,17 +1744,19 @@ describe("Blocks Foundation", () => {
                 newCustomID: "temperamentB"
             });
 
-            // Undo: should restore old value and oldCustomID
+            // Undo: should restore old value and oldCustomID and refresh ARIA
             blocks.undoAction();
             expect(mockCustomBlock.value).toBe("C(+10¢)");
             expect(mockCustomBlock.customID).toBe("temperamentA");
             expect(mockCustomBlock.text.text).toBe("C(+10¢)");
+            expect(mockCustomBlock._updateAccessibleElement).toHaveBeenCalledTimes(1);
 
-            // Redo: should restore new value and newCustomID
+            // Redo: should restore new value and newCustomID and refresh ARIA
             blocks.redoAction();
             expect(mockCustomBlock.value).toBe("D(+20¢)");
             expect(mockCustomBlock.customID).toBe("temperamentB");
             expect(mockCustomBlock.text.text).toBe("D(+20¢)");
+            expect(mockCustomBlock._updateAccessibleElement).toHaveBeenCalledTimes(2);
         });
     });
 
@@ -7192,5 +7194,69 @@ describe("adjustDocks - customNote preservation", () => {
         expect(replacementOctave.name).toBe("number");
         expect(replacementOctave.value).toBe(6);
         expect(customPitchBlock.connections[2]).toBe(3);
+    });
+
+    it("preserves customNote value, cents, and customID across saveStack and loadNewBlocks roundtrip", () => {
+        const blocks = new Blocks(mockActivity);
+        blocks.protoBlockDict = {
+            customNote: { hasCapability: () => false, dockTypes: [] }
+        };
+        blocks.setActionProtoVisibility = jest.fn();
+        blocks.updateBlockText = jest.fn();
+        blocks._updateSpatialGrid = jest.fn();
+        blocks.storage = {};
+        blocks.addToMyPalette = jest.fn();
+        mockActivity.palettes = {
+            updatePalettes: jest.fn()
+        };
+        mockActivity.logo.synth = {
+            ...mockActivity.logo.synth,
+            preloadProjectSamples: jest.fn()
+        };
+
+        blocks.blockList = [
+            {
+                name: "customNote",
+                value: "D(+30¢)",
+                customID: "temp_b",
+                collapsed: false,
+                container: { x: 40, y: 80 },
+                connections: [null],
+                isValueBlock: jest.fn().mockReturnValue(true),
+                isArgBlock: jest.fn().mockReturnValue(true),
+                isPropertyBlock: jest.fn().mockReturnValue(false),
+                isExpandableBlock: jest.fn().mockReturnValue(false),
+                isTwoArgBooleanBlock: jest.fn().mockReturnValue(false)
+            }
+        ];
+        blocks.selectedStack = 0;
+        blocks.findDragGroup = jest.fn(() => {
+            blocks.dragGroup = [0];
+        });
+
+        blocks.saveStack();
+        const savedMacros = JSON.parse(blocks.storage.macros);
+        const macroKey = Object.keys(savedMacros)[0];
+        const saved = savedMacros[macroKey];
+        expect(saved[0][1]).toEqual(["customNote", { value: "D(+30¢)", customID: "temp_b" }]);
+
+        blocks.blockList = [];
+        blocks._makeNewBlockWithConnections = jest.fn((name, offset, conns, postProcess, args) => {
+            blocks.blockList[args[0]] = {
+                name,
+                value: null,
+                customID: null,
+                connections: [null],
+                container: { x: 0, y: 0 }
+            };
+            if (postProcess) {
+                postProcess(args);
+            }
+        });
+
+        blocks.loadNewBlocks(saved);
+        expect(blocks.blockList[0].value).toBe("D(+30¢)");
+        expect(blocks.blockList[0].customID).toBe("temp_b");
+        expect(blocks.updateBlockText).toHaveBeenCalledWith(0);
     });
 });

@@ -8120,6 +8120,9 @@ class Blocks {
                         this.updateBlockText(action.blockId);
                     }
                     block.updateCache();
+                    if (typeof block._updateAccessibleElement === "function") {
+                        block._updateAccessibleElement();
+                    }
                     this.activity.refreshCanvas();
                 }
             }
@@ -8175,6 +8178,9 @@ class Blocks {
                         this.updateBlockText(action.blockId);
                     }
                     block.updateCache();
+                    if (typeof block._updateAccessibleElement === "function") {
+                        block._updateAccessibleElement();
+                    }
                     this.activity.refreshCanvas();
                 }
             }

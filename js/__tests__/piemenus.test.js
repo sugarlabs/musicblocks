@@ -3269,7 +3269,7 @@ describe("piemenuCustomNotes preview sound and frequency resolution", () => {
         );
     });
 
-    test("preserves existing cents when selecting a wheel note without cents and detunes preview", async () => {
+    test("resets previous cents when selecting a wheel note without cents", async () => {
         mockBlock.value = "C(+14¢)";
         synth.getCustomFrequency.mockReturnValue([293.66]);
 
@@ -3290,12 +3290,12 @@ describe("piemenuCustomNotes preview sound and frequency resolution", () => {
 
         await mockBlock._cusNoteWheel.navItems[0].navigateFunction();
 
-        expect(mockBlock.value).toBe("D(+14¢)");
-        expect(mockBlock.text.text).toBe("D(+14¢)");
+        expect(mockBlock.value).toBe("D");
+        expect(mockBlock.text.text).toBe("D");
         expect(synth.getCustomFrequency).toHaveBeenCalledWith(["D4"], "my_temperament");
         expect(synth.trigger).toHaveBeenCalledTimes(1);
         const triggeredFreqs = synth.trigger.mock.calls[0][1];
-        expect(triggeredFreqs[0]).toBeCloseTo(293.66 * Math.pow(2, 14 / 1200), 4);
+        expect(triggeredFreqs[0]).toBeCloseTo(293.66, 4);
     });
 
     test("preserves tuned cents on octave change and applies cents detune on preview", async () => {
@@ -3397,5 +3397,229 @@ describe("piemenuCustomNotes preview sound and frequency resolution", () => {
         } finally {
             global.Tone.start = originalToneStart;
         }
+    });
+
+    test("resets previous temperament cents when switching temperament and selecting a new note", async () => {
+        mockBlock.value = "C(+14¢)";
+        mockBlock.text.text = "C(+14¢)";
+        mockBlock.customID = "temp_a";
+
+        const noteLabels = {
+            temp_a: {
+                pitchNumber: 2,
+                0: [1, "C(+14¢)", 4],
+                1: [1.125, "D", 4]
+            },
+            temp_b: {
+                pitchNumber: 2,
+                0: [1, "C", 4],
+                1: [1.125, "D(+30¢)", 4]
+            }
+        };
+        const customLabels = ["temp_a", "temp_b"];
+
+        synth.getCustomFrequency.mockImplementation(notes => {
+            if (notes[0] === "C4") return [261.63];
+            if (notes[0] === "D4") return [293.66];
+            return [0];
+        });
+
+        piemenuCustomNotes(mockBlock, noteLabels, customLabels, "temp_a", "C(+14¢)");
+
+        mockBlock._customWheel.selectedNavItemIndex = 1;
+        mockBlock._customWheel.navItems[1].title = "temp_b";
+        mockBlock._customWheel.navItems[1].navigateFunction();
+        await Promise.resolve();
+
+        expect(mockBlock.customID).toBe("temp_b");
+        expect(mockBlock._cusNoteWheel.refreshWheel).toHaveBeenCalled();
+
+        // Select "D(+30¢)" (index 0 since labelsDict is reversed: ["D(+30¢)", "C"])
+        mockBlock._cusNoteWheel.selectedNavItemIndex = 0;
+        await mockBlock._cusNoteWheel.navItems[0].navigateFunction();
+
+        expect(mockBlock.value).toBe("D(+30¢)");
+        expect(mockBlock.text.text).toBe("D(+30¢)");
+        const lastFreqs = synth.trigger.mock.calls[synth.trigger.mock.calls.length - 1][1];
+        expect(lastFreqs[0]).toBeCloseTo(293.66 * Math.pow(2, 30 / 1200), 4);
+    });
+
+    test("matches full label with cents before stripped note letter so G(+14) and G(-14) stay distinct", () => {
+        const noteLabels = {
+            split_fifth: {
+                pitchNumber: 4,
+                0: [1.0, "C", 4],
+                1: [1.488, "G(-14)", 4],
+                2: [1.5, "E", 4],
+                3: [1.512, "G(+14)", 4]
+            }
+        };
+        const customLabels = ["split_fifth"];
+
+        // Reversed wheel order: ["G(+14)", "E", "G(-14)", "C"]
+        piemenuCustomNotes(mockBlock, noteLabels, customLabels, "split_fifth", "G(-14¢)");
+        expect(mockBlock._cusNoteWheel.navigateWheel).toHaveBeenCalledWith(2);
+        expect(mockBlock._cusNoteWheel.selectedNavItemIndex).toBe(2);
+
+        piemenuCustomNotes(mockBlock, noteLabels, customLabels, "split_fifth", "G(+14)");
+        expect(mockBlock._cusNoteWheel.navigateWheel).toHaveBeenCalledWith(0);
+    });
+
+    test("cancels pending audio preview and screen reader announcement when menu closes early", async () => {
+        const originalToneStart = global.Tone.start;
+        let resolveToneStart;
+        global.Tone.start = jest.fn().mockImplementation(
+            () =>
+                new Promise(resolve => {
+                    resolveToneStart = resolve;
+                })
+        );
+        synth.stopSound = jest.fn();
+        global.announceToScreenReader.mockClear();
+
+        try {
+            const noteLabels = {
+                my_temperament: {
+                    pitchNumber: 1,
+                    0: [1, "C(+14¢)", 4]
+                }
+            };
+            piemenuCustomNotes(
+                mockBlock,
+                noteLabels,
+                ["my_temperament"],
+                "my_temperament",
+                "C(+14¢)"
+            );
+
+            mockBlock._customWheel.selectedNavItemIndex = 0;
+            mockBlock._cusNoteWheel.selectedNavItemIndex = 0;
+            const pendingPreview = mockBlock._cusNoteWheel.navItems[0].navigateFunction();
+
+            // Close menu via exit wheel (same handler invoked by Escape and outside click)
+            mockBlock._exitWheel.navItems[0].navigateFunction();
+            resolveToneStart();
+            await pendingPreview;
+
+            expect(synth.trigger).not.toHaveBeenCalled();
+            expect(global.announceToScreenReader).not.toHaveBeenCalled();
+            expect(synth.stopSound).toHaveBeenCalledWith(0, global.DEFAULTVOICE);
+            expect(mockBlock._triggerLock).toBe(false);
+        } finally {
+            global.Tone.start = originalToneStart;
+        }
+    });
+
+    test("rapid navigation always plays and announces latest note instead of skipping", async () => {
+        synth.stopSound = jest.fn();
+        global.announceToScreenReader.mockClear();
+
+        const noteLabels = {
+            my_temperament: {
+                pitchNumber: 2,
+                0: [1, "C(+0¢)", 4],
+                1: [1.125, "D(+30¢)", 4]
+            }
+        };
+        synth.getCustomFrequency.mockImplementation(notes => {
+            if (notes[0] === "C4") return [261.63];
+            if (notes[0] === "D4") return [293.66];
+            return [0];
+        });
+
+        piemenuCustomNotes(mockBlock, noteLabels, ["my_temperament"], "my_temperament", "C(+0¢)");
+
+        mockBlock._customWheel.selectedNavItemIndex = 0;
+        mockBlock._cusNoteWheel.navItems[0].title = "D(+30¢)";
+        mockBlock._cusNoteWheel.navItems[1].title = "C(+0¢)";
+
+        // Select C(+0¢), which sets _triggerLock = true, then immediately select D(+30¢)
+        mockBlock._cusNoteWheel.selectedNavItemIndex = 1;
+        await mockBlock._cusNoteWheel.navItems[1].navigateFunction();
+        expect(mockBlock._triggerLock).toBe(true);
+
+        mockBlock._cusNoteWheel.selectedNavItemIndex = 0;
+        await mockBlock._cusNoteWheel.navItems[0].navigateFunction();
+
+        expect(synth.stopSound).toHaveBeenCalledWith(0, global.DEFAULTVOICE);
+        expect(synth.trigger).toHaveBeenCalledTimes(2);
+        expect(synth.trigger.mock.calls[1][1][0]).toBeCloseTo(293.66 * Math.pow(2, 30 / 1200), 4);
+        expect(global.announceToScreenReader).toHaveBeenLastCalledWith("played D(+30¢)4");
+    });
+
+    test("records undoable value_change and updates accessible ARIA label across wheel flow", async () => {
+        mockBlock.customID = "temp_a";
+        mockBlock.value = "C(+0¢)";
+        mockBlock.text.text = "C(+0¢)";
+        mockBlock._updateAccessibleElement = jest.fn();
+        mockBlock._recordValueChange = jest.fn();
+
+        const noteLabels = {
+            temp_a: {
+                pitchNumber: 2,
+                0: [1, "C(+0¢)", 4],
+                1: [1.125, "D(+14¢)", 4]
+            }
+        };
+
+        piemenuCustomNotes(mockBlock, noteLabels, ["temp_a"], "temp_a", "C(+0¢)");
+
+        mockBlock._customWheel.selectedNavItemIndex = 0;
+        mockBlock._cusNoteWheel.selectedNavItemIndex = 0;
+        mockBlock._cusNoteWheel.navItems[0].title = "D(+14¢)";
+
+        await mockBlock._cusNoteWheel.navItems[0].navigateFunction();
+        expect(mockBlock._updateAccessibleElement).toHaveBeenCalled();
+
+        mockBlock._exitWheel.navItems[0].navigateFunction();
+        expect(mockBlock._recordValueChange).toHaveBeenCalledWith(
+            "C(+0¢)",
+            "D(+14¢)",
+            "C(+0¢)",
+            "D(+14¢)",
+            "temp_a",
+            "temp_a"
+        );
+        expect(mockBlock._cusNoteWheel.removeWheel).toHaveBeenCalled();
+        expect(mockBlock._exitWheel.removeWheel).toHaveBeenCalled();
+    });
+
+    test("clamps out-of-range octaves into [1, 8] and emits errorMsg warning", async () => {
+        mockBlock.connections = [0];
+        mockBlock.blocks.blockList = [{ name: "playnote" }];
+        mockBlock.blocks.findPitchOctave = jest.fn().mockReturnValue(12);
+        synth.getCustomFrequency.mockImplementation(notes => {
+            if (notes[0] === "C8") return [4186.01];
+            return [0];
+        });
+
+        const noteLabels = {
+            my_temperament: {
+                pitchNumber: 1,
+                0: [1, "C(+0¢)", 4]
+            }
+        };
+        piemenuCustomNotes(mockBlock, noteLabels, ["my_temperament"], "my_temperament", "C(+0¢)");
+
+        mockBlock._customWheel.selectedNavItemIndex = 0;
+        mockBlock._cusNoteWheel.selectedNavItemIndex = 0;
+        mockBlock._cusNoteWheel.navItems[0].title = "C(+0¢)";
+
+        await mockBlock._cusNoteWheel.navItems[0].navigateFunction();
+
+        expect(mockBlock.activity.logo.errorMsg).toHaveBeenCalledWith(
+            "Octave must be between 1 and 8.",
+            mockBlock
+        );
+        expect(synth.getCustomFrequency).toHaveBeenCalledWith(["C8"], "my_temperament");
+        expect(synth.trigger).toHaveBeenCalledWith(
+            0,
+            [4186.01],
+            1 / 8,
+            global.DEFAULTVOICE,
+            null,
+            null,
+            false
+        );
     });
 });
