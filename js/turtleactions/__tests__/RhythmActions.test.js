@@ -1274,6 +1274,114 @@ describe("setupRhythmActions", () => {
         });
     });
 
+    it("rejects a denormal factor that would make beatFactor Infinity", () => {
+        activity.errorMsg = jest.fn();
+
+        // 1 / 5e-324 overflows to Infinity, and the clamp-exit listener
+        // could then never restore beatFactor (Infinity * 5e-324 is
+        // still Infinity), poisoning the turtle clock permanently.
+        Singer.RhythmActions.multiplyNoteValue(5e-324, 0, 1);
+
+        expect(targetTurtle.singer.beatFactor).toBe(1);
+        expect(targetTurtle.singer.beatFactorValues).toEqual([]);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Multiply note value factor is too small.",
+            1
+        );
+        expect(activity.logo.setTurtleListener).not.toHaveBeenCalled();
+    });
+
+    it("rejects a tiny factor that would overflow ordinary note values", () => {
+        activity.errorMsg = jest.fn();
+
+        // 1 / 1e-308 leaves beatFactor at 1e308, where an ordinary
+        // quarter note overflows (4 * 1e308 === Infinity) so its note
+        // value reaches processNote as Infinity and the clock stalls.
+        Singer.RhythmActions.multiplyNoteValue(1e-308, 0, 1);
+
+        expect(targetTurtle.singer.beatFactor).toBe(1);
+        expect(targetTurtle.singer.beatFactorValues).toEqual([]);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Multiply note value factor is too small.",
+            1
+        );
+
+        // A quarter note played after the refused clamp still has a
+        // finite note value and reaches processNote finite.
+        Singer.RhythmActions.playNote(4, "note", 0, 1);
+        expect(targetTurtle.singer.noteValue[1]).toBe(0.25);
+        const callsBefore = global.Singer.processNote.mock.calls.length;
+        const listener = activity.logo.setTurtleListener.mock.calls[0][2];
+        listener();
+        expect(global.Singer.processNote.mock.calls).toHaveLength(callsBefore + 1);
+        expect(global.Singer.processNote.mock.calls[callsBefore][1]).toBe(4);
+    });
+
+    it("still accepts a factor that leaves headroom for ordinary note values", () => {
+        activity.errorMsg = jest.fn();
+
+        Singer.RhythmActions.multiplyNoteValue(1e-300, 0, 1);
+
+        expect(Number.isFinite(targetTurtle.singer.beatFactor)).toBe(true);
+        expect(targetTurtle.singer.beatFactor).toBeGreaterThan(9.9e299);
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+    });
+
+    it("accepts a factor whose resulting beatFactor equals the cutoff exactly", () => {
+        activity.errorMsg = jest.fn();
+
+        // (MAX_VALUE / 512) / 2 is exactly Number.MAX_VALUE / 1024 (both
+        // divisions are by powers of two, so nothing rounds): the guard
+        // rejects only results strictly above the cutoff.
+        targetTurtle.singer.beatFactor = Number.MAX_VALUE / 512;
+        Singer.RhythmActions.multiplyNoteValue(2, 0, 1);
+
+        expect(targetTurtle.singer.beatFactor).toBe(Number.MAX_VALUE / 1024);
+        expect(targetTurtle.singer.beatFactorValues).toEqual([2]);
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(activity.logo.setTurtleListener).toHaveBeenCalledTimes(1);
+    });
+
+    it("rejects a factor whose resulting beatFactor is just above the cutoff", () => {
+        activity.errorMsg = jest.fn();
+
+        // The factor just below 2 pushes the result one step past
+        // Number.MAX_VALUE / 1024, so the clamp is refused outright.
+        targetTurtle.singer.beatFactor = Number.MAX_VALUE / 512;
+        Singer.RhythmActions.multiplyNoteValue(2 - Number.EPSILON, 0, 1);
+
+        expect(targetTurtle.singer.beatFactor).toBe(Number.MAX_VALUE / 512);
+        expect(targetTurtle.singer.beatFactorValues).toEqual([]);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Multiply note value factor is too small.",
+            1
+        );
+        expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
+        expect(activity.logo.setTurtleListener).not.toHaveBeenCalled();
+    });
+
+    it("rejects a millisecond note whose scaled value overflows at a huge beatFactor", () => {
+        activity.errorMsg = jest.fn();
+
+        // A beatFactor the multiply guard accepts (below its cutoff) can
+        // still overflow a long millisecond note: 2000 * 1.5e305 is
+        // Infinity, which would store a note value of 1 / Infinity === 0
+        // and hand processNote a zero beat duration.
+        targetTurtle.singer.beatFactor = 1.5e305;
+        Singer.RhythmActions.playNote(2000, "osctime", 0, 1);
+
+        expect(activity.errorMsg).toHaveBeenCalledWith("Note value is too large.", 1);
+        expect(targetTurtle.singer.inNoteBlock).toEqual([]);
+        expect(targetTurtle.singer.noteValue).toEqual({});
+        expect(activity.logo.setTurtleListener).not.toHaveBeenCalled();
+
+        // The same note at an ordinary beatFactor is stored finite.
+        targetTurtle.singer.beatFactor = 1;
+        Singer.RhythmActions.playNote(2000, "osctime", 0, 1);
+        expect(targetTurtle.singer.noteValue[1]).toBe(1 / 2000);
+        expect(activity.logo.setTurtleListener).toHaveBeenCalledTimes(1);
+    });
+
     it("adds swing when not suppressed", () => {
         targetTurtle.singer.suppressOutput = false;
         targetTurtle.singer.swing = [];

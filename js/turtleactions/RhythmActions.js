@@ -122,12 +122,26 @@ function setupRhythmActions(activity) {
 
             const noteBeatValue = blkName === "newnote" ? 1 / value : value;
 
+            // The multiplyNoteValue guard caps beatFactor at
+            // Number.MAX_VALUE / 1024, but scaling a note value by a
+            // beatFactor under that cap can still overflow: a 2000 ms
+            // note at a beatFactor above ~8.99e304 makes the product
+            // Infinity, so the stored note value would be
+            // 1 / Infinity === 0 and the listener would hand processNote
+            // Infinity, which converts back to a zero beat duration and
+            // never advances the turtle clock. Reject before any singer
+            // state changes.
+            const scaledNoteBeatValue = noteBeatValue * tur.singer.beatFactor;
+            if (!Number.isFinite(scaledNoteBeatValue)) {
+                activity.errorMsg(_("Note value is too large."), blk);
+                return;
+            }
+
             tur.singer.inNoteBlock.push(blk);
             tur.singer.multipleVoices = tur.singer.inNoteBlock.length > 1;
 
             // Adjust the note value based on the beatFactor
-            tur.singer.noteValue[last(tur.singer.inNoteBlock)] =
-                1 / (noteBeatValue * tur.singer.beatFactor);
+            tur.singer.noteValue[last(tur.singer.inNoteBlock)] = 1 / scaledNoteBeatValue;
 
             const listenerName = "_playnote_" + turtle + "_" + blk;
             if (blk !== undefined && blk in activity.blocks.blockList) {
@@ -441,7 +455,23 @@ function setupRhythmActions(activity) {
                 return;
             }
 
-            tur.singer.beatFactor /= factor;
+            // A tiny finite factor makes beatFactor huge enough to overflow
+            // the note-value arithmetic downstream: 1 / 5e-324 is Infinity
+            // (and the clamp-exit listener can then never restore it, since
+            // Infinity * 5e-324 === Infinity), while even 1 / 1e-308 leaves
+            // beatFactor at 1e308, where an ordinary quarter note overflows
+            // (4 * 1e308 === Infinity) so its note value reaches processNote
+            // as Infinity and the turtle clock stalls (turtleTime += 0).
+            // Reject before touching beatFactor when the new beatFactor
+            // would be non-finite or leave no headroom for ordinary note
+            // values (a 128th note is 128; 1024 leaves ample headroom).
+            const newBeatFactor = tur.singer.beatFactor / factor;
+            if (!Number.isFinite(newBeatFactor) || newBeatFactor > Number.MAX_VALUE / 1024) {
+                activity.errorMsg(_("Multiply note value factor is too small."), blk);
+                return;
+            }
+
+            tur.singer.beatFactor = newBeatFactor;
             tur.singer.beatFactorValues.push(factor);
 
             const listenerName = "_multiplybeat_" + turtle;
