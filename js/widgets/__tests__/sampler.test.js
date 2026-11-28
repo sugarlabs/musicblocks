@@ -893,8 +893,10 @@ describe("Sampler Widget", () => {
             widget._addSample = jest.fn();
             widget._playbackBtn.onclick();
             expect(widget._addSample).toHaveBeenCalled();
+            expect(widget._playbackBtn.getAttribute("aria-label")).toBe("Stop");
             widget._playbackBtn.onclick();
             expect(mockActivity.logo.synth.stopPlayBackRecording).toHaveBeenCalled();
+            expect(widget._playbackBtn.getAttribute("aria-label")).toBe("Playback");
 
             await widget._tunerBtn.onclick();
             await widget._tunerBtn.onclick();

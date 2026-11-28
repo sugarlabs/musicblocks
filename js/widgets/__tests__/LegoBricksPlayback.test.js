@@ -340,6 +340,7 @@ describe("LegoBricksPlayback", () => {
             expect(widget.playButton.querySelector("img").src).toContain(
                 "header-icons/play-button.svg"
             );
+            expect(widget.playButton.getAttribute("aria-label")).toBe("Play");
             expect(widget.activity.hideMsgs).toHaveBeenCalled();
         });
 
