@@ -692,6 +692,9 @@ describe("Planet", () => {
         let mockStringHelper;
         let mockProjectStorage;
         let mockServerInterface;
+        let mockOfflineCommitManager;
+        let reconnectCallback;
+        let mockGlobalPlanet;
 
         beforeEach(() => {
             planet = new Planet(true, {});
@@ -703,11 +706,27 @@ describe("Planet", () => {
 
             mockStringHelper = { init: jest.fn() };
             mockProjectStorage = { init: jest.fn().mockResolvedValue() };
-            mockServerInterface = { init: jest.fn(), getTagManifest: jest.fn() };
+            mockServerInterface = {
+                init: jest.fn(),
+                getTagManifest: jest.fn(),
+                attachOfflineManager: jest.fn()
+            };
+            mockOfflineCommitManager = {};
+            reconnectCallback = null;
+            mockGlobalPlanet = {
+                init: jest.fn()
+            };
+
+            global.GlobalPlanet = jest.fn().mockReturnValue(mockGlobalPlanet);
 
             global.StringHelper = jest.fn().mockReturnValue(mockStringHelper);
             global.ProjectStorage = jest.fn().mockReturnValue(mockProjectStorage);
             global.ServerInterface = jest.fn().mockReturnValue(mockServerInterface);
+            global.NetworkMonitor = jest.fn();
+            global.OfflineCommitManager = jest.fn((storage, server, onReconnect) => {
+                reconnectCallback = onReconnect;
+                return mockOfflineCommitManager;
+            });
 
             document.body.innerHTML = `
                 <button id="close-planet"></button>
@@ -720,6 +739,9 @@ describe("Planet", () => {
             delete global.StringHelper;
             delete global.ProjectStorage;
             delete global.ServerInterface;
+            delete global.NetworkMonitor;
+            delete global.OfflineCommitManager;
+            delete global.GlobalPlanet;
             document.body.innerHTML = "";
         });
 
@@ -785,6 +807,266 @@ describe("Planet", () => {
                 "guitar-key"
             );
             expect(planet._postGitState).toHaveBeenCalledWith("guitar");
+        });
+
+        it("should recover Global Planet when connectivity is restored", async () => {
+            const recoverFromOffline = jest.fn().mockReturnValue(true);
+            planet.GlobalPlanet = { recoverFromOffline };
+
+            await planet.init();
+
+            expect(global.OfflineCommitManager).toHaveBeenCalledWith(
+                mockProjectStorage,
+                mockServerInterface,
+                expect.any(Function)
+            );
+
+            expect(mockServerInterface.attachOfflineManager).toHaveBeenCalledWith(
+                mockOfflineCommitManager
+            );
+
+            reconnectCallback();
+
+            expect(recoverFromOffline).toHaveBeenCalledTimes(1);
+            expect(mockServerInterface.getTagManifest).toHaveBeenCalledTimes(1);
+        });
+
+        it("refreshes Global Planet on reconnect when already connected", async () => {
+            const refreshProjects = jest.fn();
+            const recoverFromOffline = jest.fn().mockReturnValue(false);
+
+            planet.GlobalPlanet = {
+                recoverFromOffline,
+                refreshProjects
+            };
+
+            await planet.init();
+
+            planet.ConnectedToServer = true;
+
+            reconnectCallback();
+
+            expect(recoverFromOffline).toHaveBeenCalledTimes(1);
+            expect(refreshProjects).toHaveBeenCalledTimes(1);
+
+            // No unnecessary manifest request.
+            expect(mockServerInterface.getTagManifest).toHaveBeenCalledTimes(1);
+        });
+
+        it("should retry the tag manifest when startup failed before Global Planet initialized", async () => {
+            const offlineGlobalPlanet = {
+                recoverFromOffline: jest.fn().mockReturnValue(false),
+                destroy: jest.fn()
+            };
+
+            await planet.init();
+
+            planet.ConnectedToServer = false;
+            planet.GlobalPlanet = offlineGlobalPlanet;
+            planet.LocalPlanet = {};
+
+            mockServerInterface.getTagManifest.mockImplementationOnce(callback => {
+                callback({
+                    success: true,
+                    data: { music: { TagName: "Music" } }
+                });
+            });
+
+            reconnectCallback();
+
+            expect(offlineGlobalPlanet.recoverFromOffline).toHaveBeenCalledTimes(1);
+
+            expect(mockServerInterface.getTagManifest).toHaveBeenCalledTimes(2);
+
+            expect(planet.ConnectedToServer).toBe(true);
+            expect(planet.TagsManifest).toEqual({
+                music: { TagName: "Music" }
+            });
+
+            expect(offlineGlobalPlanet.destroy).toHaveBeenCalledTimes(1);
+            expect(global.GlobalPlanet).toHaveBeenCalledWith(planet);
+            expect(mockGlobalPlanet.init).toHaveBeenCalledTimes(1);
+        });
+
+        it("ignores a late startup manifest failure after reconnect succeeds", async () => {
+            const callbacks = [];
+
+            mockServerInterface.getTagManifest.mockImplementation(callback => {
+                callbacks.push(callback);
+            });
+
+            planet.initPlanets.mockImplementation(data => {
+                planet.ConnectedToServer = data.success;
+                planet.LocalPlanet = {};
+            });
+
+            await planet.init();
+
+            expect(callbacks).toHaveLength(1);
+
+            // Start the reconnect request while startup is still pending.
+            reconnectCallback();
+
+            expect(callbacks).toHaveLength(2);
+
+            const manifest = {
+                success: true,
+                data: { music: { TagName: "Music" } }
+            };
+
+            // Newer reconnect request succeeds first.
+            callbacks[1](manifest);
+
+            expect(planet.initPlanets).toHaveBeenCalledTimes(1);
+            expect(planet.initPlanets).toHaveBeenCalledWith(manifest);
+            expect(planet.ConnectedToServer).toBe(true);
+
+            // Original startup request fails afterward.
+            callbacks[0]({ success: false });
+
+            // Stale failure must be ignored.
+            expect(planet.initPlanets).toHaveBeenCalledTimes(1);
+            expect(planet.ConnectedToServer).toBe(true);
+        });
+
+        it("accepts a pending startup success when the reconnect request fails", async () => {
+            const callbacks = [];
+
+            mockServerInterface.getTagManifest.mockImplementation(callback => {
+                callbacks.push(callback);
+            });
+
+            planet.initPlanets.mockImplementation(data => {
+                planet.ConnectedToServer = data.success;
+                planet.LocalPlanet = {};
+            });
+
+            await planet.init();
+
+            expect(callbacks).toHaveLength(1);
+
+            // Reconnect starts another request.
+            reconnectCallback();
+
+            expect(callbacks).toHaveLength(2);
+
+            // The reconnect request fails first.
+            callbacks[1]({ success: false });
+
+            // The original startup request succeeds later.
+            const manifest = {
+                success: true,
+                data: { music: { TagName: "Music" } }
+            };
+
+            callbacks[0](manifest);
+
+            expect(planet.initPlanets).toHaveBeenCalledTimes(1);
+            expect(planet.initPlanets).toHaveBeenCalledWith(manifest);
+            expect(planet.ConnectedToServer).toBe(true);
+        });
+
+        it("retries failed reconnect manifest requests and stops after success", async () => {
+            jest.useFakeTimers();
+
+            try {
+                await planet.init();
+
+                planet.ConnectedToServer = false;
+                planet.LocalPlanet = {};
+                planet.GlobalPlanet = {
+                    recoverFromOffline: jest.fn().mockReturnValue(false),
+                    destroy: jest.fn()
+                };
+
+                const manifest = {
+                    success: true,
+                    data: { music: { TagName: "Music" } }
+                };
+
+                mockServerInterface.getTagManifest
+                    .mockImplementationOnce(cb => cb({ success: false }))
+                    .mockImplementationOnce(cb => cb({ success: false }))
+                    .mockImplementationOnce(cb => cb(manifest));
+
+                reconnectCallback();
+
+                expect(mockServerInterface.getTagManifest).toHaveBeenCalledTimes(2);
+
+                jest.advanceTimersByTime(2000);
+                expect(mockServerInterface.getTagManifest).toHaveBeenCalledTimes(3);
+
+                jest.advanceTimersByTime(4000);
+                expect(mockServerInterface.getTagManifest).toHaveBeenCalledTimes(4);
+
+                expect(planet.ConnectedToServer).toBe(true);
+                expect(planet.TagsManifest).toEqual(manifest.data);
+
+                jest.advanceTimersByTime(10000);
+                expect(mockServerInterface.getTagManifest).toHaveBeenCalledTimes(4);
+            } finally {
+                planet._finishReconnectRecovery();
+                jest.useRealTimers();
+            }
+        });
+
+        it("retries a failed project refresh without another online transition", async () => {
+            jest.useFakeTimers();
+
+            try {
+                await planet.init();
+                planet.ConnectedToServer = true;
+
+                const refreshProjects = jest
+                    .fn()
+                    .mockImplementationOnce(() => planet._scheduleReconnectRetry())
+                    .mockImplementationOnce(() => planet._finishReconnectRecovery());
+
+                planet.GlobalPlanet = {
+                    recoverFromOffline: jest.fn().mockReturnValue(false),
+                    refreshProjects
+                };
+
+                reconnectCallback();
+
+                expect(refreshProjects).toHaveBeenCalledTimes(1);
+
+                jest.advanceTimersByTime(2000);
+
+                expect(refreshProjects).toHaveBeenCalledTimes(2);
+
+                jest.advanceTimersByTime(10000);
+
+                expect(refreshProjects).toHaveBeenCalledTimes(2);
+                expect(mockServerInterface.getTagManifest).toHaveBeenCalledTimes(1);
+            } finally {
+                planet._finishReconnectRecovery();
+                jest.useRealTimers();
+            }
+        });
+
+        it("stops reconnect retries after the configured limit", async () => {
+            jest.useFakeTimers();
+
+            try {
+                await planet.init();
+                planet.ConnectedToServer = false;
+
+                mockServerInterface.getTagManifest.mockImplementation(cb => cb({ success: false }));
+
+                reconnectCallback();
+
+                jest.advanceTimersByTime(2000);
+                jest.advanceTimersByTime(4000);
+                jest.advanceTimersByTime(20000);
+
+                // Initial startup request + three reconnect attempts.
+                expect(mockServerInterface.getTagManifest).toHaveBeenCalledTimes(4);
+                expect(planet._reconnectRetriesLeft).toBe(0);
+            } finally {
+                planet._finishReconnectRecovery();
+                jest.useRealTimers();
+            }
         });
     });
 
