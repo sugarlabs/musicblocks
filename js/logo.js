@@ -385,6 +385,7 @@ class Logo {
         this._EXPORT_YIELD_AFTER_SYNC_RUNS = 100; // Sync yield threshold during exports.
         this._MAX_ITERATIONS = 1000000;
         this._iterationBudget = this._MAX_ITERATIONS + 1;
+        this._iterationBudgets = {};
 
         // When running in step-by-step mode, the next command to run
         // is queued here.
@@ -1490,16 +1491,18 @@ class Logo {
             );
         }
         this.dispatchUnissuedSignals(tur);
-        tur.singer.dropPendingNotes();
+        if (tur.singer && typeof tur.singer.dropPendingNotes === "function") {
+            tur.singer.dropPendingNotes();
+        }
         tur.endOfClampSignals = {};
         tur.butNotThese = {};
 
         tur.runGeneration += 1;
-        if (tur.delayTimeout !== null) {
+        if (tur.delayTimeout !== null && tur.delayTimeout !== undefined) {
             this._timerManager.clearTimeout(tur.delayTimeout);
             tur.delayTimeout = null;
         }
-        if (tur._transportEventId !== null) {
+        if (tur._transportEventId !== null && tur._transportEventId !== undefined) {
             this.synth.transport.clear(tur._transportEventId);
             tur._transportEventId = null;
         }
@@ -1535,6 +1538,21 @@ class Logo {
     }
 
     /**
+     * Resets the iteration budget for a single turtle.
+     *
+     * @param {number|string} turtle - Index of the turtle.
+     * @returns {void}
+     */
+    _resetTurtleIterationBudget(turtle) {
+        const budget = this._iterationBudget;
+        this._iterationBudgets[turtle] = budget;
+        const tur = this.turtles && this.turtles.ithTurtle(turtle);
+        if (tur) {
+            tur._iterationBudget = budget;
+        }
+    }
+
+    /**
      * Initialises a turtle.
      *
      * @param turtle
@@ -1552,6 +1570,7 @@ class Logo {
         this.notation.pickupPoint[turtle] = null;
         this.notation.pickupPOW2[turtle] = false;
 
+        this._resetTurtleIterationBudget(turtle);
         this.turtles.ithTurtle(turtle).initTurtle(this._exportingNotation);
     }
 
@@ -1852,6 +1871,7 @@ class Logo {
 
         this._syncCounter = 0;
         this._iterationBudget = this._MAX_ITERATIONS + 1;
+        this._iterationBudgets = {};
 
         this.blocks.unhighlightAll();
         this.blocks.bringToTop(); // Draw under the blocks.
@@ -2081,6 +2101,7 @@ class Logo {
             tur.parameterQueue = [];
             tur.actionBoundaries = [];
 
+            this._resetTurtleIterationBudget(turtle);
             tur.running = true;
             this.runFromBlock(this, turtle, startHere, 0, env);
         } else if (startBlocks.length > 0) {
@@ -2101,6 +2122,7 @@ class Logo {
                     tur.parameterQueue = [];
                     tur.actionBoundaries = [];
 
+                    this._resetTurtleIterationBudget(turtle);
                     tur.running = true;
                     delayStart = 250;
                     this.runFromBlock(this, turtle, startBlocks[b], 0, env);
@@ -2132,6 +2154,7 @@ class Logo {
                             tur.actionBoundaries = [];
 
                             if (!tur.inTrash) {
+                                this._resetTurtleIterationBudget(turtle);
                                 tur.running = true;
                                 this.runFromBlock(this, turtle, startBlocks[b], 0, env);
                             }
@@ -2314,15 +2337,40 @@ class Logo {
 
             this.receivedArg = receivedArg;
 
-            if (--logo._iterationBudget <= 0) {
+            const tur = logo.turtles.ithTurtle(turtle);
+            if (typeof tur._iterationBudget !== "number") {
+                tur._iterationBudget = logo._iterationBudget;
+            }
+            tur._iterationBudget -= 1;
+            logo._iterationBudgets[turtle] = tur._iterationBudget;
+            const remainingBudget = tur._iterationBudget;
+
+            if (remainingBudget <= 0) {
+                const turtleIndex = Number(turtle);
+                const otherTurtleActive =
+                    logo.turtles.turtleList.some(
+                        (other, idx) => idx !== turtleIndex && other && other.running
+                    ) ||
+                    Object.keys(logo.stepQueue).some(
+                        idx =>
+                            Number(idx) !== turtleIndex &&
+                            logo.stepQueue[idx] &&
+                            logo.stepQueue[idx].length > 0
+                    );
+                const turtleLabel = tur && tur.name ? `${tur.name} (#${turtle})` : `#${turtle}`;
                 logo.deps.errorHandler(
-                    _("Infinite loop detected. Execution stopped to prevent browser freeze."),
+                    `${_(
+                        "Infinite loop detected. Execution stopped to prevent browser freeze."
+                    )} (${_("Turtle")}: ${turtleLabel})`,
                     blk
                 );
-                logo.stopTurtle = true;
-                logo._alreadyRunning = false;
+                logo.stopTurtleRun(turtle);
+                logo._resetTurtleIterationBudget(turtle);
+                if (!otherTurtleActive) {
+                    logo.stopTurtle = true;
+                    logo._alreadyRunning = false;
+                }
                 logo._syncCounter = 0;
-                logo._iterationBudget = logo._MAX_ITERATIONS + 1;
                 if (profilingEnabled) {
                     Logo._recordBlockTiming(logo, blk, profilingStart);
                     performanceTracker.exitBlock();
@@ -2341,7 +2389,6 @@ class Logo {
 (1) Evaluate any arguments (beginning with connection[1]).
 ===========================================================================
 */
-            const tur = logo.turtles.ithTurtle(turtle);
             if (tur && !tur.actionBoundaries) tur.actionBoundaries = [];
             const args = [];
 
