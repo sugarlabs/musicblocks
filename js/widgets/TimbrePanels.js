@@ -42,6 +42,7 @@ class TimbrePanels {
      * @returns {HTMLElement} the fresh #timbreTable element.
      */
     _resetTimbreTable() {
+        this._cleanupEventListeners?.();
         this.timbreTableDiv.style.display = "inline";
         this.timbreTableDiv.style.visibility = "visible";
         this.timbreTableDiv.style.border = "0px";
@@ -873,6 +874,16 @@ class TimbrePanels {
         this._eventHandler = event => {
             const target = event.target;
             const targetId = target.id || "";
+            if (
+                targetId.startsWith("sel") ||
+                targetId.startsWith("radio") ||
+                targetId.startsWith("myRangeF") ||
+                target.closest?.(
+                    "[id^='sel'], [id^='radio'], [id^='myRangeF'], [id^='myspanF'], [id^='wrapper'], .sel, .filterselector, .insideDivFilter, .rectangle"
+                )
+            ) {
+                event.stopPropagation?.();
+            }
 
             if (targetId.startsWith("sel") && event.type === "change") {
                 filterButtonCell.style.backgroundColor = "#C8C8C0";
@@ -941,10 +952,23 @@ class TimbrePanels {
      */
     _cleanupEventListeners() {
         if (this._eventListeners && this._eventListeners.element) {
-            this._eventListeners.listeners.forEach(listener => {
-                this._eventListeners.element.removeEventListener(listener.type, listener.handler);
-            });
+            const element = this._eventListeners.element;
+            if (this._eventListeners.listeners) {
+                this._eventListeners.listeners.forEach(listener => {
+                    element.removeEventListener(listener.type, listener.handler);
+                });
+            }
             this._eventListeners = {};
+        }
+
+        if (this._eventHandler) {
+            const table =
+                this.timbreTableDiv?.querySelector?.("#timbreTable") || docById("timbreTable");
+            if (table) {
+                table.removeEventListener("change", this._eventHandler);
+                table.removeEventListener("click", this._eventHandler);
+                table.removeEventListener("input", this._eventHandler);
+            }
         }
     }
 
