@@ -570,7 +570,6 @@ describe("save HTML methods", () => {
         };
 
         instance.saveHTMLNoPrompt(activity);
-        jest.runAllTimers();
 
         expect(mockPrepareHTML).toHaveBeenCalled();
         expect(mockGetProjectName).toHaveBeenCalled();
@@ -589,7 +588,6 @@ describe("save HTML methods", () => {
         };
 
         instance.saveHTMLNoPrompt(activity);
-        jest.runAllTimers();
 
         expect(activity.save.downloadURL).toHaveBeenCalledWith(
             "Planet Project.html",
@@ -606,7 +604,6 @@ describe("save HTML methods", () => {
         };
 
         instance.saveHTMLNoPrompt(activity);
-        jest.runAllTimers();
 
         expect(activity.save.downloadURL).toHaveBeenCalledWith("My_Project.html", "blob:mock-html");
     });
