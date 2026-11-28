@@ -391,7 +391,7 @@ describe("Test 6: Multiple notes chain correctly", () => {
     });
 });
 
-describe("Test 7: Chords and a second voice are skipped, not misread", () => {
+describe("Test 7: Chords and voices within a part", () => {
     it("keeps only the first note of a chord", async () => {
         const { blocks } = await parseAndCapture(
             scorePartwise(
@@ -404,7 +404,7 @@ describe("Test 7: Chords and a second voice are skipped, not misread", () => {
         expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
     });
 
-    it("stops a measure at <backup>, taking only the first voice", async () => {
+    it("imports both voices separated by <backup> as simultaneous turtles", async () => {
         const xml = scorePartwise(
             SIMPLE_NOTE("C", 4, "quarter") +
                 "<backup><duration>1</duration></backup>" +
@@ -412,7 +412,92 @@ describe("Test 7: Chords and a second voice are skipped, not misread", () => {
         );
 
         const { blocks } = await parseAndCapture(xml);
-        expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "G", octave: 3 }
+        ]);
+        expect(blocks.filter(b => blockName(b) === "start")).toHaveLength(2);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+        expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("applies score tempo changes to both voices after splitting a part", async () => {
+        const xml =
+            '<score-partwise><part id="P1">' +
+            '<measure number="1"><attributes><divisions>4</divisions></attributes>' +
+            '<direction><sound tempo="60"/></direction>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "<backup><duration>4</duration></backup>" +
+            SIMPLE_NOTE("E", 4, "quarter") +
+            '</measure><measure number="2"><direction><sound tempo="120"/></direction>' +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            "<backup><duration>4</duration></backup>" +
+            SIMPLE_NOTE("F", 4, "quarter") +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        expect(tempos(blocks)).toEqual([60, 120, 60, 120]);
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 },
+            { name: "E", octave: 4 },
+            { name: "F", octave: 4 }
+        ]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("keeps a later voice aligned when it enters in the second measure", async () => {
+        const xml =
+            '<score-partwise><part id="P1">' +
+            '<measure number="1"><attributes><divisions>4</divisions></attributes>' +
+            "<note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration><type>quarter</type><voice>1</voice></note>" +
+            '</measure><measure number="2">' +
+            "<note><pitch><step>D</step><octave>4</octave></pitch><duration>4</duration><type>quarter</type><voice>1</voice></note>" +
+            "<backup><duration>4</duration></backup>" +
+            "<note><pitch><step>E</step><octave>4</octave></pitch><duration>4</duration><type>quarter</type><voice>2</voice></note>" +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 },
+            { name: "E", octave: 4 }
+        ]);
+        expect(blocks.filter(b => blockName(b) === "start")).toHaveLength(2);
+        expect(blocks.filter(b => blockName(b) === "rest2")).toHaveLength(1);
+        expect(noteValues(blocks)).toEqual([
+            [1, 4],
+            [1, 4],
+            [4, 16],
+            [1, 4]
+        ]);
+    });
+
+    it("keeps a voice's <forward> gap and does not count grace notes as time", async () => {
+        const xml = scorePartwise(
+            "<note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration><type>quarter</type><voice>1</voice></note>" +
+                "<note><pitch><step>D</step><octave>4</octave></pitch><duration>4</duration><type>quarter</type><voice>1</voice></note>" +
+                "<backup><duration>8</duration></backup>" +
+                "<forward><duration>4</duration></forward>" +
+                "<note><grace/><pitch><step>F</step><octave>4</octave></pitch><voice>2</voice></note>" +
+                "<note><pitch><step>E</step><octave>4</octave></pitch><duration>4</duration><type>quarter</type><voice>2</voice></note>",
+            "<divisions>4</divisions>"
+        );
+
+        const { blocks } = await parseAndCapture(xml);
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 },
+            { name: "E", octave: 4 }
+        ]);
+        expect(blocks.filter(b => blockName(b) === "rest2")).toHaveLength(1);
+        expect(noteValues(blocks)).toEqual([
+            [1, 4],
+            [1, 4],
+            [4, 16],
+            [1, 4]
+        ]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 });
 
@@ -996,7 +1081,7 @@ describe("Test 13: Dynamic markings", () => {
         expect(synthVolumes(blocks)).toEqual([]);
     });
 
-    it("ignores a dynamic that explicitly targets another voice", async () => {
+    it("applies a dynamic targeting the second voice only to that voice", async () => {
         const voiceTwoDynamic =
             "<direction><voice>2</voice><direction-type><dynamics><f/></dynamics></direction-type></direction>";
         const voiceOneNote =
@@ -1009,8 +1094,95 @@ describe("Test 13: Dynamic markings", () => {
             scorePartwise(voiceTwoDynamic + voiceOneNote + "<backup/>" + voiceTwoNote)
         );
 
-        expect(pitches(blocks)).toEqual([{ name: "C", octave: 4 }]);
-        expect(synthVolumes(blocks)).toEqual([]);
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 }
+        ]);
+        expect(synthVolumes(blocks)).toEqual([80]);
+        const settimbres = blocks.filter(block => blockName(block) === "settimbre");
+        const volume = blocks.find(block => blockName(block) === "setsynthvolume");
+        expect(settimbres).toHaveLength(2);
+        expect(volume[4][0]).toBe(settimbres[1][0]);
+    });
+
+    it("keeps unscoped directions with their voice across a backup", async () => {
+        const firstNote =
+            "<note><voice>1</voice><pitch><step>C</step><octave>4</octave></pitch>" +
+            "<duration>1</duration><type>quarter</type></note>";
+        const secondNote =
+            "<note><voice>2</voice><pitch><step>D</step><octave>4</octave></pitch>" +
+            "<duration>1</duration><type>quarter</type></note>";
+        const quiet =
+            "<direction><direction-type><dynamics><p/></dynamics></direction-type></direction>";
+        const loud =
+            "<direction><direction-type><dynamics><f/></dynamics></direction-type></direction>";
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                quiet + firstNote + "<backup><duration>1</duration></backup>" + loud + secondNote
+            )
+        );
+
+        const settimbres = blocks.filter(block => blockName(block) === "settimbre");
+        const volumes = blocks.filter(block => blockName(block) === "setsynthvolume");
+        expect(synthVolumes(blocks)).toEqual([35, 80]);
+        expect(volumes.map(block => block[4][0])).toEqual(settimbres.map(block => block[0]));
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("uses explicit voice labels for unscoped directions in reversed sections", async () => {
+        const note = (name, voice) =>
+            `<note><voice>${voice}</voice><pitch><step>${name}</step><octave>4</octave></pitch>` +
+            "<duration>1</duration><type>quarter</type></note>";
+        const quiet =
+            "<direction><direction-type><dynamics><p/></dynamics></direction-type></direction>";
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                quiet + note("D", 2) + "<backup><duration>1</duration></backup>" + note("C", 1)
+            )
+        );
+
+        const settimbres = blocks.filter(block => blockName(block) === "settimbre");
+        const volume = blocks.find(block => blockName(block) === "setsynthvolume");
+        expect(pitches(blocks)).toEqual([
+            { name: "D", octave: 4 },
+            { name: "C", octave: 4 }
+        ]);
+        expect(synthVolumes(blocks)).toEqual([35]);
+        expect(volume[4][0]).toBe(settimbres[0][0]);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
+    });
+
+    it("does not insert a forward gap twice when a direction precedes the note", async () => {
+        const note = (name, voice) =>
+            `<note><voice>${voice}</voice><pitch><step>${name}</step><octave>4</octave></pitch>` +
+            "<duration>4</duration><type>quarter</type></note>";
+        const quiet =
+            "<direction><direction-type><dynamics><p/></dynamics></direction-type></direction>";
+        const { blocks } = await parseAndCapture(
+            scorePartwise(
+                note("C", 1) +
+                    note("D", 1) +
+                    "<backup><duration>8</duration></backup>" +
+                    "<forward><duration>4</duration></forward>" +
+                    quiet +
+                    note("E", 2),
+                "<divisions>4</divisions>"
+            )
+        );
+
+        expect(pitches(blocks)).toEqual([
+            { name: "C", octave: 4 },
+            { name: "D", octave: 4 },
+            { name: "E", octave: 4 }
+        ]);
+        expect(synthVolumes(blocks)).toEqual([35]);
+        expect(blocks.filter(block => blockName(block) === "rest2")).toHaveLength(1);
+        expect(noteValues(blocks)).toEqual([
+            [1, 4],
+            [1, 4],
+            [4, 16],
+            [1, 4]
+        ]);
     });
 
     it("keeps a dynamic that explicitly targets the imported voice", async () => {
@@ -1999,6 +2171,34 @@ describe("Test 17: Repeats", () => {
         expect(blocks.filter(b => blockName(b) === "repeat")).toHaveLength(0);
         expect(findUnreciprocatedConnections(blocks)).toEqual([]);
         expect(findPositionMismatches(blocks)).toEqual([]);
+    });
+
+    it("keeps a split voice's left first-ending barline before its notes", async () => {
+        const xml =
+            '<score-partwise><part id="P1">' +
+            '<measure number="1"><attributes><divisions>1</divisions></attributes>' +
+            '<barline location="left"><repeat direction="forward"/></barline>' +
+            SIMPLE_NOTE("C", 4, "quarter") +
+            "<backup><duration>1</duration></backup>" +
+            SIMPLE_NOTE("G", 3, "quarter") +
+            "</measure>" +
+            '<measure number="2"><barline location="left"><ending number="1" type="start"/></barline>' +
+            SIMPLE_NOTE("D", 4, "quarter") +
+            "<backup><duration>1</duration></backup>" +
+            SIMPLE_NOTE("A", 3, "quarter") +
+            '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>' +
+            "</measure>" +
+            '<measure number="3"><barline location="left"><ending number="2" type="start"/></barline>' +
+            SIMPLE_NOTE("E", 4, "quarter") +
+            "<backup><duration>1</duration></backup>" +
+            SIMPLE_NOTE("B", 3, "quarter") +
+            '<barline location="right"><ending number="2" type="stop"/></barline>' +
+            "</measure></part></score-partwise>";
+
+        const { blocks } = await parseAndCapture(xml);
+        expect(playedPitches(blocks).map(pitch => pitch.name)).toEqual(["C", "D", "C", "E"]);
+        expect(blocks.filter(block => blockName(block) === "start")).toHaveLength(2);
+        expect(findUnreciprocatedConnections(blocks)).toEqual([]);
     });
 
     it("flattens a first ending with no shared repeat-body notes", async () => {
