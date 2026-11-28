@@ -19,6 +19,7 @@
  */
 
 global._ = s => s;
+global.announceToScreenReader = jest.fn();
 global.instruments = [{}];
 global.TunerUtils = {
     calculatePlaybackRate: jest.fn(),
@@ -907,6 +908,20 @@ describe("Sampler Widget", () => {
 
             expect(addSpy).toHaveBeenCalled();
             addSpy.mockRestore();
+        });
+
+        test("announces Sampler opened on init", () => {
+            widget.init(mockActivity, 1);
+            expect(announceToScreenReader).toHaveBeenCalledWith("Sampler opened");
+        });
+
+        test("announces Sampler closed on onclose", () => {
+            widget.init(mockActivity, 1);
+            announceToScreenReader.mockClear();
+
+            widgetWindow.onclose();
+
+            expect(announceToScreenReader).toHaveBeenCalledWith("Sampler closed");
         });
 
         test("init save button debounces and onclose cleans up", () => {
