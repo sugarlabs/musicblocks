@@ -298,7 +298,7 @@ function AIDebuggerWidget() {
         const mainContainer = document.createElement("div");
         mainContainer.style.display = "flex";
         mainContainer.style.height = "100%";
-        mainContainer.style.width = "100%";
+        mainContainer.classList.add("mb-w-full");
 
         this._createChatArea(mainContainer);
         this.widgetWindow.getWidgetBody().appendChild(mainContainer);
@@ -312,7 +312,7 @@ function AIDebuggerWidget() {
      */
     this._createChatArea = function (container) {
         const chatContainer = document.createElement("div");
-        chatContainer.style.width = "100%";
+        chatContainer.classList.add("mb-w-full");
         chatContainer.style.display = "flex";
         chatContainer.style.flexDirection = "column";
         chatContainer.style.height = "100%";
@@ -325,7 +325,7 @@ function AIDebuggerWidget() {
         this.chatLog.style.minHeight = "0";
         this.chatLog.style.overflowY = "auto";
         this.chatLog.style.padding = "15px";
-        this.chatLog.style.backgroundColor = "var(--color-bg-primary)";
+        this.chatLog.classList.add("mb-bg-primary");
         this.chatLog.style.color = "var(--color-text-primary)";
         this.chatLog.style.display = "flex";
         this.chatLog.style.flexDirection = "column";
@@ -342,7 +342,7 @@ function AIDebuggerWidget() {
         inputArea.style.flexDirection = "column";
         inputArea.style.padding = "15px";
         inputArea.style.gap = "10px";
-        inputArea.style.backgroundColor = "var(--color-bg-primary)";
+        inputArea.classList.add("mb-bg-primary");
         inputArea.style.borderTop = "1px solid var(--color-border-primary)";
 
         // Another project of the child's to take something from, such as the
@@ -384,7 +384,7 @@ function AIDebuggerWidget() {
         this.messageInput.maxLength = 2000;
         this.messageInput.style.flex = "1";
         this.messageInput.style.padding = "12px";
-        this.messageInput.style.backgroundColor = "var(--color-bg-primary)";
+        this.messageInput.classList.add("mb-bg-primary");
         this.messageInput.style.color = "var(--color-text-primary)";
         this.messageInput.style.border = "1px solid #ddd";
         this.messageInput.style.borderRadius = "25px";
@@ -735,7 +735,7 @@ function AIDebuggerWidget() {
         } else if (message.type === "bot") {
             messageDiv.className = "aidebugger-message aidebugger-message-bot";
             messageDiv.style.alignSelf = "flex-start";
-            messageDiv.style.backgroundColor = "var(--color-bg-tertiary)";
+            messageDiv.classList.add("mb-bg-tertiary");
             messageDiv.style.color = "var(--color-text-primary)";
             messageDiv.style.border = "1px solid var(--color-border-primary)";
             const render =
@@ -755,7 +755,7 @@ function AIDebuggerWidget() {
         } else if (message.type === "system") {
             messageDiv.className = "aidebugger-message aidebugger-message-system";
             messageDiv.style.alignSelf = "center";
-            messageDiv.style.backgroundColor = "var(--color-warning-bg)";
+            messageDiv.classList.add("mb-bg-warning");
             messageDiv.style.color = "var(--color-text-primary)";
             messageDiv.style.border = "1px solid var(--color-border-primary)";
             messageDiv.style.fontStyle = "italic";
@@ -975,7 +975,7 @@ function AIDebuggerWidget() {
         const typingDiv = document.createElement("div");
         typingDiv.className = "typing-indicator aidebugger-typing-indicator";
         typingDiv.style.alignSelf = "flex-start";
-        typingDiv.style.backgroundColor = "var(--color-bg-tertiary)";
+        typingDiv.classList.add("mb-bg-tertiary");
         typingDiv.style.color = "var(--color-text-secondary)";
         typingDiv.style.border = "1px solid var(--color-border-primary)";
         typingDiv.style.padding = "12px 16px";

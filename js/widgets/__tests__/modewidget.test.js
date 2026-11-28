@@ -45,8 +45,25 @@ global.DEFAULTVOICE = "piano";
 global.last = arr => arr[arr.length - 1];
 
 // Mock utils
+const createClassListMock = () => {
+    const classes = new Set();
+    return {
+        add: jest.fn((...cls) => cls.forEach(c => classes.add(c))),
+        remove: jest.fn((...cls) => cls.forEach(c => classes.delete(c))),
+        contains: jest.fn(c => classes.has(c)),
+        toggle: jest.fn((c, force) => {
+            const has = classes.has(c);
+            const next = force !== undefined ? !!force : !has;
+            if (next) classes.add(c);
+            else classes.delete(c);
+            return next;
+        })
+    };
+};
+
 global.docById = jest.fn().mockImplementation(id => ({
     style: {},
+    classList: createClassListMock(),
     innerHTML: "",
     append: jest.fn(),
     appendChild: jest.fn(),
@@ -57,6 +74,7 @@ global.docById = jest.fn().mockImplementation(id => ({
     insertRow: jest.fn().mockReturnValue({
         insertCell: jest.fn().mockReturnValue({
             style: {},
+            classList: createClassListMock(),
             innerHTML: "",
             appendChild: jest.fn(),
             append: jest.fn()
@@ -261,6 +279,7 @@ if (typeof document === "undefined") {
 }
 document.createElement = jest.fn().mockImplementation(tag => ({
     style: {},
+    classList: createClassListMock(),
     setAttribute: jest.fn(),
     innerHTML: "",
     append: jest.fn(),
@@ -278,6 +297,7 @@ document.createElement = jest.fn().mockImplementation(tag => ({
     insertRow: jest.fn().mockReturnValue({
         insertCell: jest.fn().mockReturnValue({
             style: {},
+            classList: createClassListMock(),
             innerHTML: ""
         })
     }),
