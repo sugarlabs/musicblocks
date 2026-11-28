@@ -726,6 +726,52 @@ describe("MeterBlocks setup", () => {
         expect(logo.setTurtleListener).not.toHaveBeenCalled();
     });
 
+    it("handles missing and non-numeric inputs in setbpm2 and continues child flow", () => {
+        const block = getBlock("setbpm2");
+        const turtle = { singer: { bpm: [] } };
+        activity.turtles.ithTurtle.mockReturnValue(turtle);
+
+        // Missing BPM argument (null)
+        activity.errorMsg.mockClear();
+        expect(block.flow([null, 0.25, "childNext"], logo, 0, "flowBpm")).toEqual(["childNext", 1]);
+        expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, "flowBpm");
+
+        // Missing beat value argument (null)
+        activity.errorMsg.mockClear();
+        expect(block.flow([90, null, "childNext"], logo, 0, "flowBpm")).toEqual(["childNext", 1]);
+        expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, "flowBpm");
+
+        // Both arguments missing (null)
+        activity.errorMsg.mockClear();
+        expect(block.flow([null, null, "childNext"], logo, 0, "flowBpm")).toEqual(["childNext", 1]);
+        expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, "flowBpm");
+
+        // Non-numeric string BPM
+        activity.errorMsg.mockClear();
+        expect(block.flow(["fast", 0.25, "childNext"], logo, 0, "flowBpm")).toEqual([
+            "childNext",
+            1
+        ]);
+        expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, "flowBpm");
+
+        // Non-numeric string beat value
+        activity.errorMsg.mockClear();
+        expect(block.flow([90, "quarter", "childNext"], logo, 0, "flowBpm")).toEqual([
+            "childNext",
+            1
+        ]);
+        expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, "flowBpm");
+
+        // No child flow connected
+        activity.errorMsg.mockClear();
+        expect(block.flow([null, 0.25], logo, 0, "flowBpm")).toBeUndefined();
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+
+        expect(logo.notation.notationTempo).not.toHaveBeenCalled();
+        expect(turtle.singer.bpm).toEqual([]);
+        expect(logo.setTurtleListener).not.toHaveBeenCalled();
+    });
+
     it("pushes and pops BPM values with the older setbpm block", () => {
         const block = getBlock("setbpm");
         const turtle = { singer: { bpm: [] } };
@@ -754,6 +800,43 @@ describe("MeterBlocks setup", () => {
         expect(logo.setDispatchBlock).toHaveBeenCalledWith("legacyBpm", 0, "_bpm_0_legacyBpm");
         listeners.forEach(handler => handler());
         expect(turtle.singer.bpm).toEqual([]);
+    });
+
+    it("handles missing, non-numeric, and non-finite inputs in legacy setbpm and continues child flow", () => {
+        const block = getBlock("setbpm");
+        const turtle = { singer: { bpm: [] } };
+        activity.turtles.ithTurtle.mockReturnValue(turtle);
+
+        // Missing argument (null)
+        activity.errorMsg.mockClear();
+        expect(block.flow([null, "childNext"], logo, 0, "legacyFlow")).toEqual(["childNext", 1]);
+        expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, "legacyFlow");
+
+        // Non-numeric string argument
+        activity.errorMsg.mockClear();
+        expect(block.flow(["allegro", "childNext"], logo, 0, "legacyFlow")).toEqual([
+            "childNext",
+            1
+        ]);
+        expect(activity.errorMsg).toHaveBeenCalledWith(NOINPUTERRORMSG, "legacyFlow");
+
+        // Non-positive and non-finite numeric arguments
+        [0, -50, NaN, Infinity].forEach(bpm => {
+            activity.errorMsg.mockClear();
+            expect(block.flow([bpm, "childNext"], logo, 0, "legacyFlow")).toEqual(["childNext", 1]);
+            expect(activity.errorMsg).toHaveBeenCalledWith(
+                "BPM must be a positive number.",
+                "legacyFlow"
+            );
+        });
+
+        // No child flow connected
+        activity.errorMsg.mockClear();
+        expect(block.flow([null], logo, 0, "legacyFlow")).toBeUndefined();
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+
+        expect(turtle.singer.bpm).toEqual([]);
+        expect(logo.setTurtleListener).not.toHaveBeenCalled();
     });
 
     it("validates pickup values and sets meters", () => {

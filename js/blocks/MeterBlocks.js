@@ -1249,42 +1249,52 @@ function setupMeterBlocks(activity) {
         flow(args, logo, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (args.length === 3 && typeof args[0] === "number" && typeof args[1] === "number") {
-                // Same guard as Singer.MeterActions.setBPM: zero would make the
-                // notated tempo Infinity, and negatives give a nonsense tempo.
-                if (!Number.isFinite(args[0]) || args[0] <= 0) {
-                    activity.errorMsg(_("BPM must be a positive number."), blk);
-                    return [args[2], 1];
-                }
+            if (args[2] === undefined) return;
 
-                if (!Number.isFinite(args[1]) || args[1] <= 0) {
-                    activity.errorMsg(_("Beat value must be a positive number."), blk);
-                    return [args[2], 1];
-                }
-
-                let bpm = (args[0] * args[1]) / 0.25;
-                if (bpm < 30) {
-                    activity.errorMsg(_("Beats per minute must be > 30."));
-                    bpm = 30;
-                } else if (bpm > 1000) {
-                    activity.errorMsg(_("Maximum beats per minute is 1000."));
-                    bpm = 1000;
-                }
-
-                logo.notation.notationTempo(turtle, (bpm * 0.25) / args[1], args[1]);
-                tur.singer.bpm.push(bpm);
-
-                const listenerName = "_bpm_" + turtle + "_" + blk;
-                logo.setDispatchBlock(blk, turtle, listenerName);
-
-                const __listener = event => {
-                    tur.singer.bpm.pop();
-                };
-
-                logo.setTurtleListener(turtle, listenerName, __listener);
-
+            if (
+                args[0] === null ||
+                typeof args[0] !== "number" ||
+                args[1] === null ||
+                typeof args[1] !== "number"
+            ) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return [args[2], 1];
             }
+
+            // Same guard as Singer.MeterActions.setBPM: zero would make the
+            // notated tempo Infinity, and negatives give a nonsense tempo.
+            if (!Number.isFinite(args[0]) || args[0] <= 0) {
+                activity.errorMsg(_("BPM must be a positive number."), blk);
+                return [args[2], 1];
+            }
+
+            if (!Number.isFinite(args[1]) || args[1] <= 0) {
+                activity.errorMsg(_("Beat value must be a positive number."), blk);
+                return [args[2], 1];
+            }
+
+            let bpm = (args[0] * args[1]) / 0.25;
+            if (bpm < 30) {
+                activity.errorMsg(_("Beats per minute must be > 30."));
+                bpm = 30;
+            } else if (bpm > 1000) {
+                activity.errorMsg(_("Maximum beats per minute is 1000."));
+                bpm = 1000;
+            }
+
+            logo.notation.notationTempo(turtle, (bpm * 0.25) / args[1], args[1]);
+            tur.singer.bpm.push(bpm);
+
+            const listenerName = "_bpm_" + turtle + "_" + blk;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            const __listener = event => {
+                tur.singer.bpm.pop();
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            return [args[2], 1];
         }
     }
 
@@ -1334,31 +1344,41 @@ function setupMeterBlocks(activity) {
         flow(args, logo, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (args.length === 2 && typeof args[0] === "number") {
-                let bpm;
-                if (args[0] < 30) {
-                    activity.errorMsg(_("Beats per minute must be > 30."), blk);
-                    bpm = 30;
-                } else if (args[0] > 1000) {
-                    activity.errorMsg(_("Maximum beats per minute is 1000."), blk);
-                    bpm = 1000;
-                } else {
-                    bpm = args[0];
-                }
+            if (args[1] === undefined) return;
 
-                tur.singer.bpm.push(bpm);
-
-                const listenerName = "_bpm_" + turtle + "_" + blk;
-                logo.setDispatchBlock(blk, turtle, listenerName);
-
-                const __listener = event => {
-                    tur.singer.bpm.pop();
-                };
-
-                logo.setTurtleListener(turtle, listenerName, __listener);
-
+            if (args[0] === null || typeof args[0] !== "number") {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
                 return [args[1], 1];
             }
+
+            if (!Number.isFinite(args[0]) || args[0] <= 0) {
+                activity.errorMsg(_("BPM must be a positive number."), blk);
+                return [args[1], 1];
+            }
+
+            let bpm;
+            if (args[0] < 30) {
+                activity.errorMsg(_("Beats per minute must be > 30."), blk);
+                bpm = 30;
+            } else if (args[0] > 1000) {
+                activity.errorMsg(_("Maximum beats per minute is 1000."), blk);
+                bpm = 1000;
+            } else {
+                bpm = args[0];
+            }
+
+            tur.singer.bpm.push(bpm);
+
+            const listenerName = "_bpm_" + turtle + "_" + blk;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            const __listener = event => {
+                tur.singer.bpm.pop();
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            return [args[1], 1];
         }
     }
 
