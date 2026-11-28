@@ -1138,6 +1138,7 @@ class ChordBuilderWidget {
                         td.innerHTML = "";
                         td.style.lineHeight = "";
                         const picker = document.createElement("select");
+                        picker.onclick = e => e.stopPropagation();
                         picker.style.width = "100%";
                         picker.style.fontSize = "11px";
                         picker.style.padding = "2px";
