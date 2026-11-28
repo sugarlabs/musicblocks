@@ -52,5 +52,3 @@ Luckily, you can recreate these behaviors using the <video> element.
 
 
 [Learn More](https://web.dev/efficient-animated-content/?utm_source=lighthouse&utm_medium=lr#why-you-should-replace-animated-gifs-with-video)
-
-
