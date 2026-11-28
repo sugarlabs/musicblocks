@@ -408,3 +408,42 @@ describe("getNoteFromInterval - diminished intervals", () => {
         }
     });
 });
+
+describe("getNote: a fractional transposition outside 12 EDO", () => {
+    const transpose = (semitones, temperament) =>
+        pitchscale.getNote("C", 4, semitones, "C major", false, null, jest.fn(), temperament);
+    const stepsAboveC4 = (note, octave, temperament) =>
+        pitchscale.pitchToNumber(note, octave, "C major", temperament) -
+        pitchscale.pitchToNumber("C", 4, "C major", temperament);
+
+    it("keeps the fraction as cents and does not also round it into a step", () => {
+        // Half a semitone is 50 cents in any temperament, not a 63-cent step of 19 EDO plus 50.
+        expect(transpose(0.5, "equal19")).toEqual(["C", 4, 50]);
+        expect(transpose(-0.5, "equal19")).toEqual(["C", 4, -50]);
+        expect(transpose(0.25, "equal31")).toEqual(["C", 4, 25]);
+    });
+
+    it("still moves the whole semitones by the nearest number of steps", () => {
+        // 1.5 semitones: one semitone is two steps of 19 EDO, and the half is 50 cents.
+        const [note, octave, cents] = transpose(1.5, "equal19");
+        expect(stepsAboveC4(note, octave, "equal19")).toBe(2);
+        expect(cents).toBe(50);
+
+        const [down, downOctave, downCents] = transpose(-1.5, "equal19");
+        expect(stepsAboveC4(down, downOctave, "equal19")).toBe(-2);
+        expect(downCents).toBe(-50);
+
+        // 2.5 semitones: two semitones round to three steps (190 cents), plus 50 cents. Rounding
+        // all of 2.5 gave four steps (253 cents) and then added the 50 cents again.
+        const [up, upOctave, upCents] = transpose(2.5, "equal19");
+        expect(stepsAboveC4(up, upOctave, "equal19")).toBe(3);
+        expect(upCents).toBe(50);
+    });
+
+    it("leaves whole-semitone transpositions and 12 EDO as they were", () => {
+        const [note, octave, cents] = transpose(7, "equal19");
+        expect(stepsAboveC4(note, octave, "equal19")).toBe(11);
+        expect(cents).toBe(0);
+        expect(transpose(0.5, "equal")).toEqual(["C", 4, 50]);
+    });
+});
