@@ -1678,10 +1678,11 @@ class Logo {
             this.safePluginExecute(this.evalOnStopList[arg], this);
         }
 
-        // Recorder stop is Stop-only — natural completion must not
-        // interrupt an in-progress WAV recording.
-        if (this.synth.recorder && this.synth.recorder.state === "recording")
+        if (this.synth.recorder && this.synth.recorder.state === "recording") {
             this.synth.recorder.stop();
+        }
+        this.recording = false;
+        document.body.style.cursor = "default";
 
         this.onStopTurtle();
         if (
@@ -2144,6 +2145,10 @@ class Logo {
         } else {
             this.runningMIDI = false;
             document.body.style.cursor = "default";
+            if (this.synth.recorder && this.synth.recorder.state === "recording") {
+                this.synth.abortRecorder();
+            }
+            this.recording = false;
         }
 
         this.deps.refreshCanvas();
@@ -2964,6 +2969,11 @@ class Logo {
                     }
                     if (tur && tur.singer && tur.singer.suppressOutput && logo.recording) {
                         tur.singer.suppressOutput = false;
+                    }
+                    if (logo.recording && logo.synth.recorder && logo.synth.recorder.state === "recording") {
+                        logo.synth.recorder.stop();
+                        logo.recording = false;
+                        document.body.style.cursor = "default";
                     }
                     logo._cleanupAfterCompletion();
                 }, 1000);
