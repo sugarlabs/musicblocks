@@ -104,11 +104,24 @@ class TrashController {
         activity.blocks.findDragGroup(blockId);
         for (let b = 0; b < activity.blocks.dragGroup.length; b++) {
             const blk = activity.blocks.dragGroup[b];
-            activity.blocks.blockList[blk].trash = false;
-            activity.blocks.moveBlockRelative(blk, dx, dy);
-            activity.blocks._updateViewportGrid(blk);
-
             const block = activity.blocks.blockList[blk];
+            block.trash = false;
+
+            const savedPos = activity.blocks.trashPositions && activity.blocks.trashPositions[blk];
+            if (
+                savedPos &&
+                block.container &&
+                typeof block.container.x === "number" &&
+                typeof block.container.y === "number"
+            ) {
+                const restoreDx = savedPos.x - block.container.x;
+                const restoreDy = savedPos.y - block.container.y;
+                activity.blocks.moveBlockRelative(blk, restoreDx, restoreDy);
+                delete activity.blocks.trashPositions[blk];
+            } else {
+                activity.blocks.moveBlockRelative(blk, dx, dy);
+            }
+            activity.blocks._updateViewportGrid(blk);
 
             // Re-populate blocks.blockArt[blk] if it was deleted on trash.
             // sendStackToTrash() and sendAllToTrash() both delete blockArt[blk]
