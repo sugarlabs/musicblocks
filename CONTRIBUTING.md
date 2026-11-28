@@ -114,13 +114,14 @@ Run these commands locally before submitting a PR:
 
 ```bash
 npm run lint              # ESLint
-npx prettier --check .    # Formatting
+npx prettier --check <changed .js files>    # Formatting
 npm test                  # Jest
 ```
 
-NOTE: Only run `prettier` on the files you have modified.
+NOTE: CI runs `prettier` only on the JavaScript files you changed. Running it on the whole
+repository, or on other files such as Markdown, reports many pre-existing formatting issues.
 
-If formatting fails, run `npx prettier --write .` to fix it.
+If formatting fails, run `npx prettier --write <changed .js files>` to fix it.
 
 ### Dependencies and `package-lock.json`
 
@@ -181,7 +182,7 @@ Follow these steps when contributing:
 
     ```
     npm run lint
-    npx prettier --check .
+    npx prettier --check <changed .js files>
     npm test
     ```
 
