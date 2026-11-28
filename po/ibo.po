@@ -197,6 +197,7 @@ msgstr ""
 #: js/widgets/rhythmruler.js:2713
 #: js/widgets/musickeyboard.js:3344
 #: js/logoconstants.js:42
+#: js/logoconstants.js:42
 msgid "Not a valid pitch name"
 msgstr "Ọ bụghị aha ọkwa dị mma"
 
@@ -212,10 +213,11 @@ msgstr ""
 #: js/piemenu-block-context.js:118
 #: js/palette.js:1673
 #: js/palette.js:1677
+#: js/gitDropdown.js:950
 #: js/widgets/TemperamentUI.js:491
 #: js/widgets/TemperamentUI.js:492
 #: js/widgets/widgetWindows.js:547
-#: planet/js/StringHelper.js:76
+#: planet/js/StringHelper.js:80
 msgid "Close"
 msgstr "Mechie"
 
@@ -247,6 +249,7 @@ msgstr ""
 #: planet/js/Planet.js:225
 #: planet/js/StringHelper.js:42
 #: planet/js/StringHelper.js:49
+#: planet/js/StringHelper.js:53
 msgid "Cancel"
 msgstr "Kagbuo"
 
@@ -394,16 +397,16 @@ msgstr "మ్యూజిక్ బ్లాక్స్ ఇప్పటిక�
 #: js/palette.js:2064
 #: js/block.js:1788
 #: js/block.js:5387
+#: js/turtledefs.js:132
+#: js/turtledefs.js:230
 #: js/blocks.js:1749
 #: js/blocks.js:3806
 #: js/blocks.js:3807
 #: js/blocks.js:3980
 #: js/blocks.js:4379
 #: js/blocks.js:4564
-#: js/blocks.js:6058
-#: js/blocks.js:7609
-#: js/turtledefs.js:132
-#: js/turtledefs.js:230
+#: js/blocks.js:6062
+#: js/blocks.js:7613
 #: js/blocks/ActionBlocks.js:252
 #: js/blocks/ActionBlocks.js:329
 #: js/blocks/ActionBlocks.js:640
@@ -437,9 +440,9 @@ msgstr "ọbọgwụ"
 #: js/turtles.js:116
 #: js/lilypond.js:957
 #: js/block.js:1802
-#: js/logo.js:2057
 #: js/turtle-painter.js:1427
 #: js/turtle-painter.js:1428
+#: js/logo.js:2057
 #: js/blocks/ActionBlocks.js:1253
 #: js/blocks/ProgramBlocks.js:1420
 msgid "start"
@@ -710,10 +713,10 @@ msgstr ""
 #: js/project-manager.js:747
 #: js/project-manager.js:860
 #: js/project-manager.js:1364
-#: planet/js/GlobalPlanet.js:564
-#: planet/js/GlobalPlanet.js:566
-#: planet/js/GlobalPlanet.js:703
 #: planet/js/ProjectStorage.js:26
+#: planet/js/GlobalPlanet.js:600
+#: planet/js/GlobalPlanet.js:602
+#: planet/js/GlobalPlanet.js:739
 msgid "My Project"
 msgstr "Ihe oru m"
 
@@ -807,9 +810,9 @@ msgstr "Ụdị ọdịiche dị elu"
 #: js/toolbar-ui.js:159
 #: js/toolbar-ui.js:239
 #: js/turtledefs.js:619
-#: planet/js/LocalCard.js:79
 #: planet/js/GlobalCard.js:66
-#: planet/js/StringHelper.js:78
+#: planet/js/LocalCard.js:79
+#: planet/js/StringHelper.js:82
 msgid "Merge with current project"
 msgstr "Jikọọ na oru ngo dị ugbu a"
 
@@ -1059,7 +1062,7 @@ msgstr "Gbanwee palette"
 #: js/blocks.js:4148
 #: js/blocks.js:4203
 #: js/blocks.js:4249
-#: js/blocks.js:7635
+#: js/blocks.js:7639
 #: js/blocks/BoxesBlocks.js:289
 #: js/blocks/BoxesBlocks.js:292
 #: js/blocks/BoxesBlocks.js:412
@@ -1665,122 +1668,6 @@ msgstr "Uru Octave ga-abụrịrị n'etiti 1 na 8."
 msgid "Numbers can have at most 10 digits."
 msgstr "Ọnụọgụ nwere ike ịnwe ma ọ dịkarịa ala nkeji iri."
 
-#: js/blocks.js:2462
-#: js/blocks.js:2466
-#: js/blocks.js:2472
-#: js/blocks.js:2474
-msgid "audio file"
-msgstr "ọdịyo faịlụ"
-
-#: js/blocks.js:3764
-#: js/blocks.js:4169
-#: js/blocks.js:4215
-#: js/blocks.js:4261
-#: js/blocks.js:6823
-#: js/blocks.js:6847
-#: js/blocks/BoxesBlocks.js:783
-msgid "box1"
-msgstr "igbe1"
-
-#: js/blocks.js:3766
-#: js/blocks.js:4171
-#: js/blocks.js:4217
-#: js/blocks.js:4263
-#: js/blocks.js:6825
-#: js/blocks.js:6849
-#: js/blocks/BoxesBlocks.js:674
-msgid "box2"
-msgstr "igbe2"
-
-#: js/blocks.js:4421
-#: js/blocks/MediaBlocks.js:827
-#: js/blocks/BoxesBlocks.js:606
-#: js/blocks/DictBlocks.js:215
-#: js/blocks/DictBlocks.js:289
-#: js/blocks/EnsembleBlocks.js:441
-#: js/blocks/EnsembleBlocks.js:458
-#: js/blocks/PitchBlocks.js:731
-#: js/blocks/PitchBlocks.js:1084
-#: js/blocks/PitchBlocks.js:2038
-#: js/blocks/ProgramBlocks.js:412
-#: js/blocks/ProgramBlocks.js:539
-#: js/blocks/ProgramBlocks.js:724
-#: js/blocks/ToneBlocks.js:1082
-msgid "name"
-msgstr "aha"
-
-#: js/blocks.js:4421
-#: js/blocks/BoxesBlocks.js:75
-#: js/blocks/BoxesBlocks.js:606
-#: js/blocks/DictBlocks.js:289
-#: js/blocks/DictBlocks.js:430
-#: js/blocks/NumberBlocks.js:973
-#: js/blocks/HeapBlocks.js:573
-#: js/blocks/RhythmBlocks.js:1164
-msgid "value"
-msgstr "uru"
-
-#: js/blocks.js:4760
-msgid "Forever loop detected inside a note value block. Unexpected things may happen."
-msgstr "Achọpụtara loop ebighi ebi n'ime ngọngọ uru ndetu. Ihe ndị a na-atụghị anya ya nwere ike ime."
-
-#: js/blocks.js:5319
-msgid "There is no block selected."
-msgstr "Enweghị ngọngọ ahọpụtara."
-
-#: js/blocks.js:5429
-#: js/blocks/MediaBlocks.js:884
-#.TRANS: Avatar is the image used to determine the appearance of the mouse.
-msgid "avatar"
-msgstr "avatar"
-
-#: js/blocks.js:5432
-#: js/blocks/ToneBlocks.js:1067
-#: js/widgets/SamplerCanvas.js:169
-#.TRANS: The sound sample that the user uploads.
-msgid "sample"
-msgstr "sample"
-
-#: js/blocks.js:5733
-#: js/project-manager.js:1940
-msgid "Something went wrong reading JSON-encoded project data."
-msgstr "Ọ nwere ihe na-agaghị nke ọma n'ịgụ data ọrụ agbakwunyere na JSON."
-
-#: js/blocks.js:5756
-msgid "Cannot load project: invalid project structure."
-msgstr ""
-
-#: js/blocks.js:5766
-#: js/blocks.js:6201
-#: js/blocks.js:6277
-msgid "Cannot load project: malformed block structure detected."
-msgstr ""
-
-#: js/blocks.js:5883
-msgid "Cannot load project: circular block connection detected."
-msgstr ""
-
-#: js/blocks.js:6231
-#: js/blocks.js:6482
-msgid "Cannot load project: invalid block connection detected."
-msgstr ""
-
-#: js/blocks.js:7668
-msgid "Some blocks in this project are unsupported and were replaced with placeholders: %s"
-msgstr ""
-
-#: js/blocks.js:8053
-msgid "Nothing to undo."
-msgstr ""
-
-#: js/blocks.js:8105
-msgid "Nothing to redo."
-msgstr ""
-
-#: js/blocks.js:8266
-msgid "block sent to trash"
-msgstr ""
-
 #: js/loader.js:770
 msgid "Failed to load EaselJS. Please refresh the page."
 msgstr "Ịbunye EaselJS agaghị. Biko megharịa ibe ahụ."
@@ -1792,56 +1679,6 @@ msgstr "Ịdọba ngọngọ egwu agaghị. Biko megharịa ibe ahụ."
 #: js/loader.js:806
 msgid "Failed to initialize Music Blocks core. Please refresh the page.\n\nError: %s"
 msgstr "Ịmalite isi ihe ngọngọ egwu agaghị. Biko megharịa ibe ahụ.\n\nNjehie: %s"
-
-#: js/logo.js:854
-msgid "Downloading Kokoro voice: %s"
-msgstr ""
-
-#: js/logo.js:998
-#: js/blocks/ProgramBlocks.js:277
-#: js/blocks/ProgramBlocks.js:453
-msgid "You must select a file."
-msgstr "Ị ga-ahọrọ faịlụ."
-
-#: js/logo.js:2319
-msgid "Infinite loop detected. Execution stopped to prevent browser freeze."
-msgstr "Achọpụtara loop na-enweghị ngwụcha. Akwụsịrị igbuchapụ iji gbochie ifriizi ihe nchọgharị."
-
-#: js/logo.js:2527
-#: js/blocks/MediaBlocks.js:338
-msgid "width"
-msgstr "obosara"
-
-#: js/logo.js:2528
-#: js/blocks/MediaBlocks.js:395
-msgid "height"
-msgstr "elu"
-
-#: js/logo.js:2529
-#: js/blocks/MediaBlocks.js:35
-#.TRANS: right side of the screen
-msgid "right (screen)"
-msgstr "akanri (ihuenyo)"
-
-#: js/logo.js:2530
-#: js/blocks/MediaBlocks.js:111
-#.TRANS: left side of the screen
-msgid "left (screen)"
-msgstr "aka ekpe (ihuenyo)"
-
-#: js/logo.js:2531
-#: js/blocks/MediaBlocks.js:186
-msgid "top (screen)"
-msgstr "elu (ihuenyo)"
-
-#: js/logo.js:2532
-#: js/blocks/MediaBlocks.js:261
-msgid "bottom (screen)"
-msgstr "ala (screen)"
-
-#: js/logo.js:2900
-msgid "Playback is ready."
-msgstr "Nkpọghachi adịla njikere."
 
 #: js/planetInterface.js:171
 msgid "project undefined"
@@ -1939,6 +1776,11 @@ msgstr ""
 #: js/project-manager.js:1971
 msgid "Invalid parameters"
 msgstr "Parampat ezighi ezi"
+
+#: js/project-manager.js:1940
+#: js/blocks.js:5737
+msgid "Something went wrong reading JSON-encoded project data."
+msgstr "Ọ nwere ihe na-agaghị nke ọma n'ịgụ data ọrụ agbakwunyere na JSON."
 
 #: js/search-ui.js:212
 msgid "No results found for %s"
@@ -2485,6 +2327,289 @@ msgstr "Ekele!"
 msgid "You have finished the tour. Please enjoy Music Blocks!"
 msgstr "Ị na-okokụre na njegharị. Biko enwe egwu nkwa ngọngọ!"
 
+#: js/logo.js:854
+msgid "Downloading Kokoro voice: %s"
+msgstr ""
+
+#: js/logo.js:998
+#: js/blocks/ProgramBlocks.js:277
+#: js/blocks/ProgramBlocks.js:453
+msgid "You must select a file."
+msgstr "Ị ga-ahọrọ faịlụ."
+
+#: js/logo.js:2319
+msgid "Infinite loop detected. Execution stopped to prevent browser freeze."
+msgstr "Achọpụtara loop na-enweghị ngwụcha. Akwụsịrị igbuchapụ iji gbochie ifriizi ihe nchọgharị."
+
+#: js/logo.js:2527
+#: js/blocks/MediaBlocks.js:338
+msgid "width"
+msgstr "obosara"
+
+#: js/logo.js:2528
+#: js/blocks/MediaBlocks.js:395
+msgid "height"
+msgstr "elu"
+
+#: js/logo.js:2529
+#: js/blocks/MediaBlocks.js:35
+#.TRANS: right side of the screen
+msgid "right (screen)"
+msgstr "akanri (ihuenyo)"
+
+#: js/logo.js:2530
+#: js/blocks/MediaBlocks.js:111
+#.TRANS: left side of the screen
+msgid "left (screen)"
+msgstr "aka ekpe (ihuenyo)"
+
+#: js/logo.js:2531
+#: js/blocks/MediaBlocks.js:186
+msgid "top (screen)"
+msgstr "elu (ihuenyo)"
+
+#: js/logo.js:2532
+#: js/blocks/MediaBlocks.js:261
+msgid "bottom (screen)"
+msgstr "ala (screen)"
+
+#: js/logo.js:2900
+msgid "Playback is ready."
+msgstr "Nkpọghachi adịla njikere."
+
+#: js/blocks.js:2462
+#: js/blocks.js:2466
+#: js/blocks.js:2472
+#: js/blocks.js:2474
+msgid "audio file"
+msgstr "ọdịyo faịlụ"
+
+#: js/blocks.js:3764
+#: js/blocks.js:4169
+#: js/blocks.js:4215
+#: js/blocks.js:4261
+#: js/blocks.js:6827
+#: js/blocks.js:6851
+#: js/blocks/BoxesBlocks.js:783
+msgid "box1"
+msgstr "igbe1"
+
+#: js/blocks.js:3766
+#: js/blocks.js:4171
+#: js/blocks.js:4217
+#: js/blocks.js:4263
+#: js/blocks.js:6829
+#: js/blocks.js:6853
+#: js/blocks/BoxesBlocks.js:674
+msgid "box2"
+msgstr "igbe2"
+
+#: js/blocks.js:4421
+#: js/blocks/MediaBlocks.js:827
+#: js/blocks/BoxesBlocks.js:606
+#: js/blocks/DictBlocks.js:215
+#: js/blocks/DictBlocks.js:289
+#: js/blocks/EnsembleBlocks.js:441
+#: js/blocks/EnsembleBlocks.js:458
+#: js/blocks/PitchBlocks.js:731
+#: js/blocks/PitchBlocks.js:1084
+#: js/blocks/PitchBlocks.js:2038
+#: js/blocks/ProgramBlocks.js:412
+#: js/blocks/ProgramBlocks.js:539
+#: js/blocks/ProgramBlocks.js:724
+#: js/blocks/ToneBlocks.js:1082
+msgid "name"
+msgstr "aha"
+
+#: js/blocks.js:4421
+#: js/blocks/BoxesBlocks.js:75
+#: js/blocks/BoxesBlocks.js:606
+#: js/blocks/DictBlocks.js:289
+#: js/blocks/DictBlocks.js:430
+#: js/blocks/NumberBlocks.js:973
+#: js/blocks/HeapBlocks.js:573
+#: js/blocks/RhythmBlocks.js:1164
+msgid "value"
+msgstr "uru"
+
+#: js/blocks.js:4760
+msgid "Forever loop detected inside a note value block. Unexpected things may happen."
+msgstr "Achọpụtara loop ebighi ebi n'ime ngọngọ uru ndetu. Ihe ndị a na-atụghị anya ya nwere ike ime."
+
+#: js/blocks.js:5319
+msgid "There is no block selected."
+msgstr "Enweghị ngọngọ ahọpụtara."
+
+#: js/blocks.js:5429
+#: js/blocks/MediaBlocks.js:884
+#.TRANS: Avatar is the image used to determine the appearance of the mouse.
+msgid "avatar"
+msgstr "avatar"
+
+#: js/blocks.js:5432
+#: js/blocks/ToneBlocks.js:1067
+#: js/widgets/SamplerCanvas.js:169
+#.TRANS: The sound sample that the user uploads.
+msgid "sample"
+msgstr "sample"
+
+#: js/blocks.js:5617
+#: js/blocks.js:5760
+msgid "Cannot load project: invalid project structure."
+msgstr ""
+
+#: js/blocks.js:5770
+#: js/blocks.js:6205
+#: js/blocks.js:6281
+msgid "Cannot load project: malformed block structure detected."
+msgstr ""
+
+#: js/blocks.js:5887
+msgid "Cannot load project: circular block connection detected."
+msgstr ""
+
+#: js/blocks.js:6235
+#: js/blocks.js:6486
+msgid "Cannot load project: invalid block connection detected."
+msgstr ""
+
+#: js/blocks.js:7672
+msgid "Some blocks in this project are unsupported and were replaced with placeholders: %s"
+msgstr ""
+
+#: js/blocks.js:8057
+msgid "Nothing to undo."
+msgstr ""
+
+#: js/blocks.js:8109
+msgid "Nothing to redo."
+msgstr ""
+
+#: js/blocks.js:8270
+msgid "block sent to trash"
+msgstr ""
+
+#: js/gitDropdown.js:875
+msgid "Saved moment"
+msgstr ""
+
+#: js/gitDropdown.js:893
+msgid "You're offline. Connect to the network to view commits for this project."
+msgstr ""
+
+#: js/gitDropdown.js:894
+msgid "Network Connection Required"
+msgstr ""
+
+#: js/gitDropdown.js:907
+msgid "No moments marked yet. Click \"Mark this moment\" to save your first one!"
+msgstr ""
+
+#: js/gitDropdown.js:908
+msgid "No Saved Moments Yet"
+msgstr ""
+
+#: js/gitDropdown.js:939
+#: js/gitDropdown.js:969
+msgid "Time Travel"
+msgstr ""
+
+#: js/gitDropdown.js:972
+msgid "Every save, forever yours"
+msgstr ""
+
+#: js/gitDropdown.js:1091
+#: js/gitDropdown.js:1196
+msgid "YOU ARE HERE"
+msgstr ""
+
+#: js/gitDropdown.js:1118
+msgid "Sync Pending"
+msgstr ""
+
+#: js/gitDropdown.js:1124
+msgid "Latest"
+msgstr ""
+
+#: js/gitDropdown.js:1137
+#: js/gitDropdown.js:1232
+msgid "Undo my changes"
+msgstr ""
+
+#: js/gitDropdown.js:1147
+#: js/gitDropdown.js:1242
+msgid "Go back to this version"
+msgstr ""
+
+#: js/gitDropdown.js:1210
+msgid "The very beginning"
+msgstr ""
+
+#: js/gitDropdown.js:1214
+msgid "Where your project started"
+msgstr ""
+
+#: js/gitDropdown.js:1221
+msgid "Setting Up Tracking"
+msgstr ""
+
+#: js/gitDropdown.js:1235
+#: js/gitDropdown.js:1245
+msgid "Start point"
+msgstr ""
+
+#: js/gitDropdown.js:1269
+msgid "no more offline commits can be made"
+msgstr ""
+
+#: js/gitDropdown.js:1271
+msgid "1 more commit can be made"
+msgstr ""
+
+#: js/gitDropdown.js:1272
+msgid "%s more commits can be made"
+msgstr ""
+
+#: js/gitDropdown.js:1284
+msgid "Showing locally saved drafts"
+msgstr ""
+
+#: js/gitDropdown.js:1783
+msgid "Just now"
+msgstr ""
+
+#: js/gitDropdown.js:1784
+msgid "1 minute ago"
+msgstr ""
+
+#: js/gitDropdown.js:1784
+msgid "%s minutes ago"
+msgstr ""
+
+#: js/gitDropdown.js:1786
+msgid "1 hour ago"
+msgstr ""
+
+#: js/gitDropdown.js:1786
+msgid "%s hours ago"
+msgstr ""
+
+#: js/gitDropdown.js:1788
+msgid "1 day ago"
+msgstr ""
+
+#: js/gitDropdown.js:1788
+msgid "%s days ago"
+msgstr ""
+
+#: js/gitDropdown.js:1790
+msgid "1 month ago"
+msgstr ""
+
+#: js/gitDropdown.js:1790
+msgid "%s months ago"
+msgstr ""
+
 #: js/utils/plugin-utils.js:55
 msgid "Security Warning"
 msgstr "Ịdọ aka ná ntị nchekwa"
@@ -2635,8 +2760,8 @@ msgstr "pụtara"
 #: js/blocks/IntervalsBlocks.js:1187
 #: js/blocks/WidgetBlocks.js:640
 #: js/blocks/WidgetBlocks.js:645
-#: js/blocks/ToneBlocks.js:1003
 #: js/blocks/VolumeBlocks.js:420
+#: js/blocks/ToneBlocks.js:1003
 #: js/turtleactions/VolumeActions.js:49
 #: js/widgets/modewidget.js:1741
 #.TRANS: customize voice
@@ -3637,6 +3762,14 @@ msgstr "ebelatara n'ụzọ zuru ezu 7th"
 msgid "half-diminished 7th"
 msgstr "nke ọkara belatara nke asaa"
 
+#: js/utils/utils-logic.js:431
+msgid "Invalid input passed to rational sum"
+msgstr ""
+
+#: js/utils/utils-logic.js:438
+msgid "Note calculation failed: zero denominator"
+msgstr ""
+
 #: js/utils/synthutils.js:130
 #.TRANS: simple monotone synthesizer
 msgid "simple-2"
@@ -3665,14 +3798,6 @@ msgstr "mgbịrịgba Japanese"
 #: js/utils/synthutils.js:2493
 msgid "⚠️ Sound is disabled!\n\nPlease check your browser settings (Site Settings > Sound) to allow audio for Music Blocks."
 msgstr "⚠️ Agbanyụrụ ụda!\n\nBiko lelee ntọala ihe nchọgharị gị (Ntọala saịtị> ụda) iji kwe ka ọdịyo maka ngọngọ egwu."
-
-#: js/utils/utils-logic.js:431
-msgid "Invalid input passed to rational sum"
-msgstr ""
-
-#: js/utils/utils-logic.js:438
-msgid "Note calculation failed: zero denominator"
-msgstr ""
 
 #: js/blocks/BooleanBlocks.js:44
 msgid "The Not block is the logical not operator."
@@ -7277,6 +7402,112 @@ msgstr "Ihe mgbochi Get blue na-eweghachi akụkụ acha anụnụ anụnụ nke
 msgid "The Get blue block returns the blue component of the pixel under the turtle."
 msgstr "Ihe mgbochi Get acha anụnụ anụnụ na-eweghachi akụkụ na-acha anụnụ anụnụ nke pixel n'okpuru mbe."
 
+#: js/blocks/VolumeBlocks.js:35
+msgid "synth volume"
+msgstr "synth olu"
+
+#: js/blocks/VolumeBlocks.js:39
+msgid "The Synth volume block returns the current volume of the current synthesizer."
+msgstr "Mgbochi ụda Synth na-eweghachite olu ugbu a nke synthesizer ugbu a."
+
+#: js/blocks/VolumeBlocks.js:109
+msgid "master volume"
+msgstr "olu ukwu"
+
+#: js/blocks/VolumeBlocks.js:113
+msgid "The Master volume block returns the master volume."
+msgstr "Ihe ngọngọ olu Master na-eweghachite olu ukwu."
+
+#: js/blocks/VolumeBlocks.js:364
+#: js/blocks/VolumeBlocks.js:535
+msgid "set synth volume"
+msgstr "tọọ ụda synth"
+
+#: js/blocks/VolumeBlocks.js:371
+#: js/blocks/VolumeBlocks.js:556
+msgid "synth"
+msgstr "synth"
+
+#: js/blocks/VolumeBlocks.js:412
+#: js/blocks/VolumeBlocks.js:588
+#: js/blocks/VolumeBlocks.js:751
+#: js/turtleactions/VolumeActions.js:222
+msgid "Setting volume to 0."
+msgstr "Ịtọ olu ka ọ bụrụ 0."
+
+#: js/blocks/VolumeBlocks.js:449
+msgid "Synth not found"
+msgstr "Ahụghị Synth"
+
+#: js/blocks/VolumeBlocks.js:505
+msgid "set drum volume"
+msgstr "tọọ olu ilu"
+
+#: js/blocks/VolumeBlocks.js:541
+msgid "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc."
+msgstr "Set synth volume block ga-agbanwe olu nke otu synth, eg guitar violin snare drum wdg."
+
+#: js/blocks/VolumeBlocks.js:545
+msgid "The default volume is 50."
+msgstr "Olu ndabara bụ 50."
+
+#: js/blocks/VolumeBlocks.js:547
+msgid "The range is 0 for silence to 100 for full volume."
+msgstr "Oke ahụ bụ 0 maka ịgbachi nkịtị ruo 100 maka olu zuru oke."
+
+#: js/blocks/VolumeBlocks.js:608
+msgid "set panning"
+msgstr "set panning"
+
+#: js/blocks/VolumeBlocks.js:614
+msgid "The Set Panning block sets the panning for all synthesizers."
+msgstr "Ihe ngọngọ Set Panning na-edozi panning maka ndị nrụpụta niile."
+
+#: js/blocks/VolumeBlocks.js:636
+msgid "Warning: Sound is coming out from only the left or right side."
+msgstr "Ịdọ aka ná ntị: ụda na-apụta naanị n'akụkụ aka ekpe ma ọ bụ aka nri."
+
+#: js/blocks/VolumeBlocks.js:658
+#: js/blocks/VolumeBlocks.js:706
+msgid "set master volume"
+msgstr "tọọ olu ukwu"
+
+#: js/blocks/VolumeBlocks.js:664
+msgid "The Set master volume block sets the volume for all synthesizers."
+msgstr "Ihe ngọngọ olu Set Master na-edobe olu maka ndị nrụpụta niile."
+
+#: js/blocks/VolumeBlocks.js:794
+msgid "The Set relative volume block changes the volume of the contained notes."
+msgstr "Ntọala olu ngọngọ na-agbanwe olu ndetu ndị ahụ nwere."
+
+#: js/blocks/VolumeBlocks.js:801
+msgid "set relative volume"
+msgstr "tọọ olu ikwu"
+
+#: js/blocks/VolumeBlocks.js:853
+msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
+msgstr "Ihe mgbochi Decrescendo ga-ebelata olu ndetu ndị dị n'ime ya site na ego a kapịrị ọnụ maka ndetu ọ bụla a na-egwu."
+
+#: js/blocks/VolumeBlocks.js:857
+msgid "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
+msgstr "Dịka ọmụmaatụ ma ọ bụrụ na ị nwere ndetu 7 n'usoro nke dị na ngọngọ Decrescendo na uru nke 5 nke ikpeazụ ga-adị na 35% na-erughị olu mmalite."
+
+#: js/blocks/VolumeBlocks.js:867
+msgid "decrescendo"
+msgstr "na-ebelata"
+
+#: js/blocks/VolumeBlocks.js:917
+msgid "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
+msgstr "Ihe mgbochi Crescendo ga-abawanye olu ndetu ndị dị n'ime ya site na ego a kapịrị ọnụ maka ndetu ọ bụla a na-akpọ."
+
+#: js/blocks/VolumeBlocks.js:921
+msgid "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
+msgstr "Dịka ọmụmaatụ ọ bụrụ na ị nwere ndetu 7 n'usoro dị na ngọngọ Crescendo nwere uru nke 5 ndetu ikpeazụ ga-adị na 35% karịa olu mmalite."
+
+#: js/blocks/VolumeBlocks.js:931
+msgid "crescendo"
+msgstr "crescendo"
+
 #: js/blocks/ToneBlocks.js:34
 #: js/widgets/timbre.js:314
 msgid "Oscillator"
@@ -7525,112 +7756,6 @@ msgstr "Bubata faịlụ ụda maka iji dị ka ngwa wee tọọ etiti pitch ya.
 #: js/blocks/ToneBlocks.js:1174
 msgid "Upload a sound file to connect with the sample block."
 msgstr "Bulite faịlụ ụda iji jikọọ na ngọngọ nlele."
-
-#: js/blocks/VolumeBlocks.js:35
-msgid "synth volume"
-msgstr "synth olu"
-
-#: js/blocks/VolumeBlocks.js:39
-msgid "The Synth volume block returns the current volume of the current synthesizer."
-msgstr "Mgbochi ụda Synth na-eweghachite olu ugbu a nke synthesizer ugbu a."
-
-#: js/blocks/VolumeBlocks.js:109
-msgid "master volume"
-msgstr "olu ukwu"
-
-#: js/blocks/VolumeBlocks.js:113
-msgid "The Master volume block returns the master volume."
-msgstr "Ihe ngọngọ olu Master na-eweghachite olu ukwu."
-
-#: js/blocks/VolumeBlocks.js:364
-#: js/blocks/VolumeBlocks.js:535
-msgid "set synth volume"
-msgstr "tọọ ụda synth"
-
-#: js/blocks/VolumeBlocks.js:371
-#: js/blocks/VolumeBlocks.js:556
-msgid "synth"
-msgstr "synth"
-
-#: js/blocks/VolumeBlocks.js:412
-#: js/blocks/VolumeBlocks.js:588
-#: js/blocks/VolumeBlocks.js:751
-#: js/turtleactions/VolumeActions.js:222
-msgid "Setting volume to 0."
-msgstr "Ịtọ olu ka ọ bụrụ 0."
-
-#: js/blocks/VolumeBlocks.js:449
-msgid "Synth not found"
-msgstr "Ahụghị Synth"
-
-#: js/blocks/VolumeBlocks.js:505
-msgid "set drum volume"
-msgstr "tọọ olu ilu"
-
-#: js/blocks/VolumeBlocks.js:541
-msgid "The Set synth volume block will change the volume of a particular synth, eg guitar violin snare drum etc."
-msgstr "Set synth volume block ga-agbanwe olu nke otu synth, eg guitar violin snare drum wdg."
-
-#: js/blocks/VolumeBlocks.js:545
-msgid "The default volume is 50."
-msgstr "Olu ndabara bụ 50."
-
-#: js/blocks/VolumeBlocks.js:547
-msgid "The range is 0 for silence to 100 for full volume."
-msgstr "Oke ahụ bụ 0 maka ịgbachi nkịtị ruo 100 maka olu zuru oke."
-
-#: js/blocks/VolumeBlocks.js:608
-msgid "set panning"
-msgstr "set panning"
-
-#: js/blocks/VolumeBlocks.js:614
-msgid "The Set Panning block sets the panning for all synthesizers."
-msgstr "Ihe ngọngọ Set Panning na-edozi panning maka ndị nrụpụta niile."
-
-#: js/blocks/VolumeBlocks.js:636
-msgid "Warning: Sound is coming out from only the left or right side."
-msgstr "Ịdọ aka ná ntị: ụda na-apụta naanị n'akụkụ aka ekpe ma ọ bụ aka nri."
-
-#: js/blocks/VolumeBlocks.js:658
-#: js/blocks/VolumeBlocks.js:706
-msgid "set master volume"
-msgstr "tọọ olu ukwu"
-
-#: js/blocks/VolumeBlocks.js:664
-msgid "The Set master volume block sets the volume for all synthesizers."
-msgstr "Ihe ngọngọ olu Set Master na-edobe olu maka ndị nrụpụta niile."
-
-#: js/blocks/VolumeBlocks.js:794
-msgid "The Set relative volume block changes the volume of the contained notes."
-msgstr "Ntọala olu ngọngọ na-agbanwe olu ndetu ndị ahụ nwere."
-
-#: js/blocks/VolumeBlocks.js:801
-msgid "set relative volume"
-msgstr "tọọ olu ikwu"
-
-#: js/blocks/VolumeBlocks.js:853
-msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
-msgstr "Ihe mgbochi Decrescendo ga-ebelata olu ndetu ndị dị n'ime ya site na ego a kapịrị ọnụ maka ndetu ọ bụla a na-egwu."
-
-#: js/blocks/VolumeBlocks.js:857
-msgid "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
-msgstr "Dịka ọmụmaatụ ma ọ bụrụ na ị nwere ndetu 7 n'usoro nke dị na ngọngọ Decrescendo na uru nke 5 nke ikpeazụ ga-adị na 35% na-erughị olu mmalite."
-
-#: js/blocks/VolumeBlocks.js:867
-msgid "decrescendo"
-msgstr "na-ebelata"
-
-#: js/blocks/VolumeBlocks.js:917
-msgid "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
-msgstr "Ihe mgbochi Crescendo ga-abawanye olu ndetu ndị dị n'ime ya site na ego a kapịrị ọnụ maka ndetu ọ bụla a na-akpọ."
-
-#: js/blocks/VolumeBlocks.js:921
-msgid "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
-msgstr "Dịka ọmụmaatụ ọ bụrụ na ị nwere ndetu 7 n'usoro dị na ngọngọ Crescendo nwere uru nke 5 ndetu ikpeazụ ga-adị na 35% karịa olu mmalite."
-
-#: js/blocks/VolumeBlocks.js:931
-msgid "crescendo"
-msgstr "crescendo"
 
 #: js/turtleactions/OrnamentActions.js:49
 msgid "Staccato value must be a positive number."
@@ -9461,71 +9586,6 @@ msgstr "Egwuregwu"
 msgid "Code Snippet"
 msgstr "Koodu Snippet"
 
-#: planet/js/GlobalPlanet.js:37
-msgid "No results found."
-msgstr "Ọnweghị nsonaazụ ahụrụ."
-
-#: planet/js/GlobalPlanet.js:54
-msgid "Remix of"
-msgstr "Remix nke"
-
-#: planet/js/GlobalPlanet.js:381
-msgid "Could not load project. Please check your connection and try again."
-msgstr ""
-
-#: planet/js/GlobalPlanet.js:735
-msgid "Cannot connect to server"
-msgstr "Enweghị ike ijikọ na ihe nkesa"
-
-#: planet/js/SaveInterface.js:34
-#: planet/js/GlobalCard.js:60
-msgid "Open in Music Blocks"
-msgstr "Mepee na ngọngọ egwu"
-
-#: planet/js/SaveInterface.js:37
-msgid "Open in Turtle Blocks"
-msgstr "Mepee n'ime ngọngọ Turtle"
-
-#: planet/js/LocalCard.js:37
-msgid "View published project"
-msgstr "Lelee oru ngo ebipụtara"
-
-#: planet/js/LocalCard.js:42
-msgid "Being tracked"
-msgstr ""
-
-#: planet/js/LocalCard.js:54
-#: planet/js/ProjectViewer.js:92
-#: planet/js/GlobalCard.js:44
-msgid "Project thumbnail"
-msgstr ""
-
-#: planet/js/LocalCard.js:57
-#: planet/js/Publisher.js:236
-#: planet/js/StringHelper.js:37
-msgid "Publish project"
-msgstr "Bipụta oru ngo"
-
-#: planet/js/LocalCard.js:63
-msgid "Project name"
-msgstr ""
-
-#: planet/js/LocalCard.js:70
-msgid "Edit project"
-msgstr "Dezie oru ngo"
-
-#: planet/js/LocalCard.js:73
-msgid "Delete project"
-msgstr "Hichapụ oru ngo"
-
-#: planet/js/LocalCard.js:76
-msgid "Download project"
-msgstr "Budata oru ngo"
-
-#: planet/js/LocalCard.js:82
-msgid "Duplicate project"
-msgstr "Oru ngo oyiri"
-
 #: planet/js/ProjectStorage.js:541
 msgid "anonymous"
 msgstr "amaghị aha"
@@ -9539,14 +9599,14 @@ msgid "Thank you for reporting this project. A moderator will review the project
 msgstr "Daalụ maka ịkọ ọrụ a. Onye nhazi ga-enyocha ọrụ ahụ n'oge na-adịghị anya, iji chọpụta mmebi nke Usoro Omume Labs Sugar."
 
 #: planet/js/ProjectViewer.js:33
-#: planet/js/StringHelper.js:64
-#: planet/js/StringHelper.js:66
-#: planet/js/StringHelper.js:75
+#: planet/js/StringHelper.js:68
+#: planet/js/StringHelper.js:70
+#: planet/js/StringHelper.js:79
 msgid "Report Project"
 msgstr "Akuko oru ngo"
 
 #: planet/js/ProjectViewer.js:34
-#: planet/js/StringHelper.js:65
+#: planet/js/StringHelper.js:69
 msgid "Project Reported"
 msgstr "Akuko oru ngo"
 
@@ -9558,9 +9618,20 @@ msgstr "Achọrọ nkọwa nkọwa"
 msgid "Report description too long"
 msgstr "Kpesa nkọwa ogologo"
 
+#: planet/js/ProjectViewer.js:92
+#: planet/js/GlobalCard.js:44
+#: planet/js/LocalCard.js:54
+msgid "Project thumbnail"
+msgstr ""
+
 #: planet/js/GlobalCard.js:57
 msgid "More Details"
 msgstr "Nkọwa ndị ọzọ"
+
+#: planet/js/GlobalCard.js:60
+#: planet/js/SaveInterface.js:34
+msgid "Open in Music Blocks"
+msgstr "Mepee na ngọngọ egwu"
 
 #: planet/js/GlobalCard.js:63
 msgid "Remix project"
@@ -9596,8 +9667,8 @@ msgstr "Nhọrọ dị elu"
 
 #: planet/js/GlobalCard.js:218
 #: planet/js/GlobalCard.js:219
-#: planet/js/StringHelper.js:51
-#: planet/js/helper.js:187
+#: planet/js/StringHelper.js:55
+#: planet/js/helper.js:188
 msgid "Show all tags"
 msgstr ""
 
@@ -9625,6 +9696,12 @@ msgstr "Njirimara adịghị - enweghị ike ijikọ na ihe nkesa. Bugharịa ng
 msgid "Republish project"
 msgstr ""
 
+#: planet/js/Publisher.js:236
+#: planet/js/LocalCard.js:57
+#: planet/js/StringHelper.js:37
+msgid "Publish project"
+msgstr "Bipụta oru ngo"
+
 #: planet/js/Publisher.js:275
 #: planet/js/Publisher.js:292
 msgid "This field is required"
@@ -9645,6 +9722,74 @@ msgstr "Njehie nkesa"
 #: planet/js/Publisher.js:546
 msgid "Try Again"
 msgstr "Nwaa ọzọ"
+
+#: planet/js/GlobalPlanet.js:37
+msgid "No results found."
+msgstr "Ọnweghị nsonaazụ ahụrụ."
+
+#: planet/js/GlobalPlanet.js:54
+msgid "Remix of"
+msgstr "Remix nke"
+
+#: planet/js/GlobalPlanet.js:391
+msgid "Could not load project. Please check your connection and try again."
+msgstr ""
+
+#: planet/js/GlobalPlanet.js:771
+msgid "Cannot connect to server"
+msgstr "Enweghị ike ijikọ na ihe nkesa"
+
+#: planet/js/LocalCard.js:37
+msgid "View published project"
+msgstr "Lelee oru ngo ebipụtara"
+
+#: planet/js/LocalCard.js:42
+msgid "Being tracked"
+msgstr ""
+
+#: planet/js/LocalCard.js:63
+msgid "Project name"
+msgstr ""
+
+#: planet/js/LocalCard.js:70
+msgid "Edit project"
+msgstr "Dezie oru ngo"
+
+#: planet/js/LocalCard.js:73
+msgid "Delete project"
+msgstr "Hichapụ oru ngo"
+
+#: planet/js/LocalCard.js:76
+msgid "Download project"
+msgstr "Budata oru ngo"
+
+#: planet/js/LocalCard.js:82
+msgid "Duplicate project"
+msgstr "Oru ngo oyiri"
+
+#: planet/js/LocalCard.js:133
+msgid "You do not have permission to unpublish this project from this browser."
+msgstr ""
+
+#: planet/js/LocalCard.js:144
+msgid "Could not unpublish project. Please try again."
+msgstr ""
+
+#: planet/js/LocalCard.js:175
+msgid "Project unpublished."
+msgstr ""
+
+#: planet/js/LocalCard.js:179
+msgid "Project unpublished, but the change could not be saved on this device."
+msgstr ""
+
+#: planet/js/LocalCard.js:251
+msgid "Unpublish project"
+msgstr ""
+
+#: planet/js/SaveInterface.js:37
+msgid "Open in Turtle Blocks"
+msgstr "Mepee n'ime ngọngọ Turtle"
 
 #: planet/js/StringHelper.js:30
 msgid "Close Planet"
@@ -9671,12 +9816,12 @@ msgid "Tags (max 5)"
 msgstr "Mkpado (kacha 5)"
 
 #: planet/js/StringHelper.js:40
-#: planet/js/StringHelper.js:63
+#: planet/js/StringHelper.js:67
 msgid "Description"
 msgstr "Nkọwa"
 
 #: planet/js/StringHelper.js:41
-#: planet/js/StringHelper.js:74
+#: planet/js/StringHelper.js:78
 msgid "Submit"
 msgstr "Nyefee"
 
@@ -9689,66 +9834,78 @@ msgid "Permanently delete project \"<span id=\"deleter-name\"></span>\"?"
 msgstr "Hichapụ oru ngo \"<span id=\"deleter-name\"></span> ruo mgbe ebighị ebi?"
 
 #: planet/js/StringHelper.js:50
+msgid "Unpublish project?"
+msgstr ""
+
+#: planet/js/StringHelper.js:51
+msgid "This project will no longer appear in public listings."
+msgstr ""
+
+#: planet/js/StringHelper.js:52
+msgid "Unpublish"
+msgstr ""
+
+#: planet/js/StringHelper.js:54
 msgid "Explore Projects"
 msgstr "Nyochaa oru ngo"
 
-#: planet/js/StringHelper.js:52
+#: planet/js/StringHelper.js:56
 msgid "Most recent"
 msgstr "Kacha ọhụrụ"
 
-#: planet/js/StringHelper.js:53
+#: planet/js/StringHelper.js:57
 msgid "Most liked"
 msgstr "Kacha mmasị"
 
-#: planet/js/StringHelper.js:54
+#: planet/js/StringHelper.js:58
 msgid "Most downloaded"
 msgstr "Ọtụtụ ebudatara"
 
-#: planet/js/StringHelper.js:55
+#: planet/js/StringHelper.js:59
 msgid "A-Z"
 msgstr "A-Z"
 
-#: planet/js/StringHelper.js:56
+#: planet/js/StringHelper.js:60
 msgid "Sort by"
 msgstr "Hazie site na"
 
-#: planet/js/StringHelper.js:57
+#: planet/js/StringHelper.js:61
 msgid "Load More Projects"
 msgstr "Bujuru oru ngo ndị ọzọ"
 
-#: planet/js/StringHelper.js:58
+#: planet/js/StringHelper.js:62
 msgid "Last Updated"
 msgstr "Emelitere ikpeazụ"
 
-#: planet/js/StringHelper.js:59
+#: planet/js/StringHelper.js:63
 msgid "Creation Date"
 msgstr "Ụbọchị okike"
 
-#: planet/js/StringHelper.js:60
+#: planet/js/StringHelper.js:64
 msgid "Number of Downloads:"
 msgstr "Ọnụọgụ nke nbudata:"
 
-#: planet/js/StringHelper.js:61
+#: planet/js/StringHelper.js:65
 msgid "Number of Likes:"
 msgstr "Ọnụọgụ nke mmasị:"
 
-#: planet/js/StringHelper.js:62
+#: planet/js/StringHelper.js:66
 msgid "Tags:"
 msgstr "Tags:"
 
-#: planet/js/StringHelper.js:69
+#: planet/js/StringHelper.js:73
 msgid "Report projects which violate the <a href=\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\" target=\"_blank\" rel=\"noopener noreferrer\">Sugar Labs Code of Conduct</a>."
 msgstr "Kpesa ọrụ ndị na-emebi <a href=\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\" target=\"_blank\" rel=\"noopener noreferrer\"> Usoro ụkpụrụ omume ụlọ nyocha shuga</a>."
 
-#: planet/js/StringHelper.js:73
+#: planet/js/StringHelper.js:77
 msgid "Reason for reporting project"
 msgstr "Ihe kpatara akuko oru ngo"
 
-#: planet/js/StringHelper.js:77
+#: planet/js/StringHelper.js:81
 msgid "Download as File"
 msgstr "Budata dị ka faịlụ"
 
-#: planet/js/helper.js:188
+#: planet/js/helper.js:189
 msgid "Show fewer tags"
 msgstr "Gosi mkpado ole na ole"
 

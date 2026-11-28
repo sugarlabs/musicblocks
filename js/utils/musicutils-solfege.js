@@ -50,6 +50,13 @@ var noteIsSolfege = note => {
     if (SOLFEGECONVERSIONTABLE[altNote] !== undefined) {
         return false;
     }
+    // The table only spells single accidentals, but scales outside 12 EDO name notes such as
+    // E♭♭ (31 EDO) and D♯♯ (21 EDO), and 12-EDO scales use B𝄫 and C𝄪. A letter followed only
+    // by accidentals is a note name, not a syllable: getSolfege used to hand these back
+    // unchanged, so movable Do showed "B𝄫" where it should say fa.
+    if (/^[A-G](?:♯|♭|𝄪|𝄫|#|b|x)+$/u.test(note)) {
+        return false;
+    }
     return true;
 };
 

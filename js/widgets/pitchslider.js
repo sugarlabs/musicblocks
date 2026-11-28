@@ -27,6 +27,28 @@ class PitchSlider {
     static dependencies = ["widgets/pitchslider"];
 
     static ICONSIZE = 32;
+    static MIN_FREQUENCY = 27.5;
+    static MAX_FREQUENCY = 16744.04;
+    static DEFAULT_FREQUENCY = 392;
+
+    static normalizeFrequency(value) {
+        const frequency = Number(value);
+
+        if (
+            (typeof value !== "number" && typeof value !== "string") ||
+            (typeof value === "string" && value.trim() === "") ||
+            !Number.isFinite(frequency) ||
+            frequency <= 0
+        ) {
+            return PitchSlider.DEFAULT_FREQUENCY;
+        }
+        return clampNumber(
+            frequency,
+            PitchSlider.MIN_FREQUENCY,
+            PitchSlider.MAX_FREQUENCY,
+            PitchSlider.DEFAULT_FREQUENCY
+        );
+    }
     /**
      * @constructor
      */
@@ -47,11 +69,36 @@ class PitchSlider {
         this.activity = activity;
         const edo = getCurrentEDO(activity.logo.synth.inTemperament);
         const semitone = Math.pow(2, 1 / edo);
-        const openWindow = window.widgetWindows.openWindows["slider"];
-        if (openWindow) openWindow.onclose();
+        // Preserve pending frequency before closing an existing window.
+        const pendingFrequency = this.frequency;
+
+        const openWindow =
+            typeof window !== "undefined" &&
+            window.widgetWindows &&
+            window.widgetWindows.openWindows
+                ? window.widgetWindows.openWindows["slider"]
+                : null;
+
+        if (openWindow && typeof openWindow.onclose === "function") {
+            openWindow.onclose();
+
+            // Preserve a newly supplied frequency during reinitialization.
+            if (pendingFrequency !== undefined && pendingFrequency !== null) {
+                this.frequency = pendingFrequency;
+            }
+        }
         this.sliders = {};
         this.activeSlider = null;
-        if (!this.frequencies || !this.frequencies.length) this.frequencies = [392];
+        if (!this.frequencies || !this.frequencies.length) {
+            if (this.frequency !== undefined && this.frequency !== null) {
+                this.frequencies = [PitchSlider.normalizeFrequency(this.frequency)];
+                this.frequency = null;
+            } else {
+                this.frequencies = [PitchSlider.DEFAULT_FREQUENCY];
+            }
+        } else {
+            this.frequencies = this.frequencies.map(f => PitchSlider.normalizeFrequency(f));
+        }
         this.initialFrequencies = [...this.frequencies];
 
         const oscillators = [];
@@ -86,6 +133,7 @@ class PitchSlider {
                 osc.dispose();
             }
             this.isActive = false;
+            this.frequency = null;
             activity.logo.pitchSlider = null;
             announceToScreenReader(_("Pitch Slider closed"));
             this.widgetWindow.destroy();
@@ -210,7 +258,7 @@ class PitchSlider {
             const freqLabel = document.createElement("div");
             freqLabel.className = "wfbtItem";
             toolBarDiv.appendChild(freqLabel);
-            freqLabel.textContent = parseFloat(this.frequencies[id].toFixed(2));
+            freqLabel.textContent = parseFloat(Number(this.frequencies[id]).toFixed(2));
 
             this.sliders[id] = slider;
             const changeFreq = () => {
@@ -276,15 +324,15 @@ class PitchSlider {
                 const initialFreq =
                     this.initialFrequencies && this.initialFrequencies[id] !== undefined
                         ? this.initialFrequencies[id]
-                        : 392;
+                        : PitchSlider.DEFAULT_FREQUENCY;
                 slider.value = initialFreq;
                 changeFreq();
                 oscillators[id].triggerAttackRelease(this.frequencies[id], "4n");
             };
         };
 
-        for (const id in this.frequencies) {
-            MakeToolbar(id);
+        for (let i = 0; i < this.frequencies.length; i++) {
+            MakeToolbar(String(i));
         }
 
         activity.textMsg(_("Use the up/down buttons or arrow keys to change pitch."), 3000);

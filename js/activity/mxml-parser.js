@@ -18,6 +18,12 @@
 // pitch/duration/timing effect) and Music Blocks has no block that represents
 // one; writing something half-equivalent would be worse than writing nothing.
 // Wiring this into the app's Load menu is PR 4.
+//
+// Lyrics are imported the way Music Blocks already writes them: a print block
+// nested inside the note (see issue #948), which LilyPond export reads as a
+// lyric. Each MusicXML verse becomes its own print, so the verses stay
+// separately editable, and <syllabic> becomes the trailing hyphen a singer
+// reads between syllables of the same word.
 
 // Maps a MusicXML <alter> value to the Music Blocks Unicode accidental suffix
 // appended to the bare step letter. Double sharp/flat use the standard MB symbols.
@@ -252,10 +258,13 @@ const _addFractions = ([n1, d1], [n2, d2]) => {
 // _processPart) are the same. A real tie is always same-pitch; used to
 // decide whether a <tie type="stop"/> note genuinely continues the open
 // chain, or just happens to carry a tie tag that doesn't actually apply to it.
+// A chord is compared as a set: MusicXML doesn't fix the order its <chord/>
+// notes are written in, so C-E tied to E-C is still the same chord.
 const _contentsEqual = (a, b) => {
     if (a === null || b === null) return a === b;
     if (a.type !== b.type) return false;
-    return a.type === "pitch" ? a.name === b.name && a.octave === b.octave : a.name === b.name;
+    const membersOf = c => [c, ...(c.chord ?? [])].map(m => `${m.name}/${m.octave ?? ""}`).sort();
+    return membersOf(a).join(" ") === membersOf(b).join(" ");
 };
 
 // A note's <time-modification> as [actual-notes, normal-notes], the ratio a
@@ -676,6 +685,62 @@ function _tempoChanges(partEls) {
         );
 }
 
+// <syllabic> values that mean "this word continues on the next note". Music
+// Blocks' lyric convention writes the break as a trailing hyphen -- the shape
+// a singer reads -- so begin/middle syllables get one and end/single don't.
+const _MXML_SYLLABIC_HYPHEN = new Set(["begin", "middle"]);
+
+// Verse numbers are strings in MusicXML ("1", "2", ...), so order them
+// numerically: a score with ten verses reads 1, 2, 10, not 1, 10, 2.
+const _byVerseNumber = (a, b) => a.number.localeCompare(b.number, undefined, { numeric: true });
+
+/**
+ * A note's <lyric> lines, one per verse, in verse-number order.
+ *
+ * A <lyric> carries one syllable; <syllabic> says whether that syllable
+ * begins, continues, or ends a word (or stands alone). An empty <text> is a
+ * melisma continuation (<extend/>) or an empty verse slot, so it adds no line
+ * rather than a blank print. A <lyric> with no number is verse 1, MusicXML's
+ * own default.
+ *
+ * @param {Element} noteEl - a MusicXML <note> element
+ * @returns {Array<{number: string, text: string}>}
+ */
+function _lyricTexts(noteEl) {
+    const lines = [];
+    for (const lyricEl of noteEl.querySelectorAll(":scope > lyric")) {
+        const raw = Array.from(
+            lyricEl.querySelectorAll(":scope > text, :scope > elision"),
+            textEl => textEl.textContent
+        )
+            .join("")
+            .trim();
+        if (raw === "") continue;
+        const syllabic = (_text(lyricEl, "syllabic") ?? "").trim();
+        const text = _MXML_SYLLABIC_HYPHEN.has(syllabic) && !raw.endsWith("-") ? `${raw}-` : raw;
+        lines.push({ number: lyricEl.getAttribute("number") ?? "1", text });
+    }
+    return lines.sort(_byVerseNumber);
+}
+
+/**
+ * Combines the lyric lines a tie's notes carry, keeping the first non-empty
+ * text for each verse. A tie's lyric normally sits on its first note, and a
+ * continuation's <lyric> (when present at all) repeats or extends it, so the
+ * first text is the one the merged note should keep.
+ *
+ * @param {Array<{number: string, text: string}>} existing
+ * @param {Array<{number: string, text: string}>} incoming
+ * @returns {Array<{number: string, text: string}>}
+ */
+function _mergeLyrics(existing, incoming) {
+    const byVerse = new Map(existing.map(line => [line.number, line]));
+    for (const line of incoming) {
+        if (!byVerse.has(line.number)) byVerse.set(line.number, line);
+    }
+    return [...byVerse.values()].sort(_byVerseNumber);
+}
+
 /**
  * Builds the block literals for one note, drum hit or rest, in the same shape
  * js/activity/abc-parser.js's _createPitchBlocks uses: a newnote wrapper
@@ -689,16 +754,28 @@ function _tempoChanges(partEls) {
  * way (patching the drum block's prev to the newnote's vspace) -- or just
  * rest2 for a rest.
  *
+ * A lyric is a print nested inside the note, between its vspace and its
+ * content -- Music Blocks' own lyric convention (see issue #948), which
+ * LilyPond export also reads as a lyric. One print per verse keeps each verse
+ * separately editable.
+ *
  * @param {number} blockId - this note's own starting block id
  * @param {[number, number]} duration - [numerator, denominator]
  * @param {{type: "pitch", name: string, octave: number}
  *     | {type: "drum", name: string} | null} content - null for a rest
  * @param {number} prevId - the previous block's id, for this note's top connection
+ * @param {Array<{number: string, text: string}>} lyrics - this note's verses
  * @returns {Array} the pushed block literals
  */
-function _createNoteBlocks(blockId, duration, content, prevId) {
-    const contentBlockCount = content === null ? 1 : content.type === "pitch" ? 3 : 2;
-    const hiddenId = blockId + 5 + contentBlockCount;
+function _createNoteBlocks(blockId, duration, content, prevId, lyrics = []) {
+    // A chord is the note itself plus content.chord, each its own pitch (or
+    // playdrum) block chained inside the newnote's clamp, after any lyrics.
+    const members = content === null ? [] : [content, ...(content.chord ?? [])];
+    const perMember = content !== null && content.type === "pitch" ? 3 : 2;
+    const contentBlockCount = content === null ? 1 : perMember * members.length;
+    const contentStartId = blockId + 5 + lyrics.length * 2;
+    const contentPrevId = lyrics.length === 0 ? blockId + 4 : contentStartId - 2;
+    const hiddenId = contentStartId + contentBlockCount;
     const blocks = [
         [
             blockId,
@@ -710,22 +787,39 @@ function _createNoteBlocks(blockId, duration, content, prevId) {
         [blockId + 1, "divide", 0, 0, [blockId, blockId + 2, blockId + 3]],
         [blockId + 2, ["number", { value: duration[0] }], 0, 0, [blockId + 1]],
         [blockId + 3, ["number", { value: duration[1] }], 0, 0, [blockId + 1]],
-        [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]]
+        [blockId + 4, "vspace", 0, 0, [blockId, lyrics.length === 0 ? contentStartId : blockId + 5]]
     ];
 
+    lyrics.forEach((line, index) => {
+        const printId = blockId + 5 + index * 2;
+        const prevBlockId = index === 0 ? blockId + 4 : printId - 2;
+        const nextBlockId = index === lyrics.length - 1 ? contentStartId : printId + 2;
+        blocks.push(
+            [printId, "print", 0, 0, [prevBlockId, printId + 1, nextBlockId]],
+            [printId + 1, ["text", { value: line.text }], 0, 0, [printId]]
+        );
+    });
+
     if (content === null) {
-        blocks.push([blockId + 5, "rest2", 0, 0, [blockId + 4, null]]);
-    } else if (content.type === "pitch") {
-        blocks.push(
-            [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
-            [blockId + 6, ["notename", { value: content.name }], 0, 0, [blockId + 5]],
-            [blockId + 7, ["number", { value: content.octave }], 0, 0, [blockId + 5]]
-        );
+        blocks.push([contentStartId, "rest2", 0, 0, [contentPrevId, null]]);
     } else {
-        blocks.push(
-            [blockId + 5, "playdrum", 0, 0, [blockId + 4, blockId + 6, null]],
-            [blockId + 6, ["drumname", { value: content.name }], 0, 0, [blockId + 5]]
-        );
+        members.forEach((member, i) => {
+            const id = contentStartId + perMember * i;
+            const prev = i === 0 ? contentPrevId : id - perMember;
+            const next = i === members.length - 1 ? null : id + perMember;
+            if (content.type === "pitch") {
+                blocks.push(
+                    [id, "pitch", 0, 0, [prev, id + 1, id + 2, next]],
+                    [id + 1, ["notename", { value: member.name }], 0, 0, [id]],
+                    [id + 2, ["number", { value: member.octave }], 0, 0, [id]]
+                );
+            } else {
+                blocks.push(
+                    [id, "playdrum", 0, 0, [prev, id + 1, next]],
+                    [id + 1, ["drumname", { value: member.name }], 0, 0, [id]]
+                );
+            }
+        });
     }
 
     blocks.push([hiddenId, "hidden", 0, 0, [blockId, hiddenId + 1]]);
@@ -1071,9 +1165,9 @@ function _applyRepeats(
  * <backup> (a second voice sharing the part): multi-voice parts are a
  * follow-up PR, and taking only the first voice is the safe reading rather
  * than misinterpreting the backed-up time as forward motion. <chord/>-marked
- * notes (chord members after the first) are skipped for the same reason --
- * melody-only is correct-but-incomplete, where including them without chord
- * support would just be wrong. A grace note (<grace/>, a <type> but no
+ * notes (chord members after the first) join the note they sound with, one
+ * pitch or playdrum block each inside its clamp, the same shape js/midi.js and
+ * the ABC importer give a chord. A grace note (<grace/>, a <type> but no
  * <duration>) is skipped outright: it doesn't take up measure time, and
  * importing it as a full-length note would make every later note start late.
  *
@@ -1083,6 +1177,10 @@ function _applyRepeats(
  * (js/blocks/RhythmBlocks.js's TieBlock) -- musically equivalent for the
  * common case of a sustained same-pitch note, and avoids needing a second,
  * less-precedented block-wrapping mechanism alongside repeat's.
+ *
+ * Lyrics (<lyric>/<syllabic>/<text>) are carried through as nested print
+ * blocks on the note that holds them; a tie keeps the first verse text it
+ * sees, since a tied note is sung as one syllable.
  *
  * @param {Element} partEl - a MusicXML <part> element
  * @param {number} blockId - the next free block id (the preamble's last id + 1)
@@ -1124,6 +1222,7 @@ function _processPart(
     let producedNotes = false;
     let tieDuration = null;
     let tieContent = null;
+    let tieLyrics = [];
     let currentTempoBpm = initialTempoBpm;
     let nextTempoIndex = 0;
     let pendingVolumes = [];
@@ -1140,7 +1239,7 @@ function _processPart(
         }
     }
 
-    const emitNote = (duration, content) => {
+    const emitNote = (duration, content, lyrics = []) => {
         let startId = blockId;
         let previousVolumeBlock = null;
         pendingVolumes.forEach(volume => {
@@ -1153,7 +1252,7 @@ function _processPart(
         });
         pendingVolumes = [];
 
-        const blocks = _createNoteBlocks(blockId, duration, content, prevId);
+        const blocks = _createNoteBlocks(blockId, duration, content, prevId, lyrics);
         if (previousVolumeBlock !== null) previousVolumeBlock[4][3] = blockId;
         noteBlocks.push(...blocks);
         noteStartIds.push(startId);
@@ -1166,9 +1265,10 @@ function _processPart(
 
     const flushTie = () => {
         if (tieDuration !== null) {
-            emitNote(tieDuration, tieContent);
+            emitNote(tieDuration, tieContent, tieLyrics);
             tieDuration = null;
             tieContent = null;
+            tieLyrics = [];
         }
     };
 
@@ -1248,11 +1348,12 @@ function _processPart(
                         const index = noteStartIds.length;
                         const duration = tieDuration;
                         const content = tieContent;
-                        emitNote(tieDuration, tieContent);
+                        emitNote(tieDuration, tieContent, tieLyrics);
                         firstEndingBodyTie = { index, duration, content };
                         bodyTieDurations.push({ index, duration });
                         tieDuration = null;
                         tieContent = null;
+                        tieLyrics = [];
                     }
                     firstEndingStartIndex = noteStartIds.length;
                 }
@@ -1260,9 +1361,7 @@ function _processPart(
                     repeatPendingStart = noteStartIds.length;
                 } else if (direction === "backward") {
                     if (firstEndingStartIndex !== null && tieDuration !== null) {
-                        emitNote(tieDuration, tieContent);
-                        tieDuration = null;
-                        tieContent = null;
+                        flushTie();
                     }
                     const parsedTimes = Number(repeatEl.getAttribute("times"));
                     const times =
@@ -1302,6 +1401,7 @@ function _processPart(
             if (child.querySelector(":scope > grace") !== null) continue;
 
             const duration = _noteDuration(child, divisions);
+            const lyrics = _lyricTexts(child);
             const unpitchedEl = child.querySelector(":scope > unpitched");
             const pitchEl = child.querySelector(":scope > pitch");
             // A cue note shows another part's line during this one's rest
@@ -1318,6 +1418,39 @@ function _processPart(
                 content = { type: "drum", name: _drumName(child, instrumentMap) };
             } else {
                 content = { type: "pitch", ..._pitchToNoteName(pitchEl) };
+            }
+
+            // The <chord/> notes that follow sound with this one (a triad, or a
+            // kick and hi-hat on the same beat), so they join its content
+            // rather than being dropped.
+            if (content !== null) {
+                content.chord = [];
+                for (
+                    let next = child.nextElementSibling;
+                    next !== null &&
+                    next.tagName === "note" &&
+                    next.querySelector(":scope > chord") !== null;
+                    next = next.nextElementSibling
+                ) {
+                    const nextPitch = next.querySelector(":scope > pitch");
+                    const nextUnpitched = next.querySelector(":scope > unpitched");
+                    const member =
+                        content.type === "pitch" && nextPitch !== null
+                            ? _pitchToNoteName(nextPitch)
+                            : content.type === "drum" && nextUnpitched !== null
+                              ? { name: _drumName(next, instrumentMap) }
+                              : null;
+                    // Each sounding note on its own: the lead's content.chord
+                    // already holds the members pushed so far, and comparing
+                    // the whole chord against one note would keep a doubled C.
+                    const sounding = [content, ...content.chord];
+                    if (
+                        member !== null &&
+                        !sounding.some(m => m.name === member.name && m.octave === member.octave)
+                    ) {
+                        content.chord.push(member);
+                    }
+                }
             }
 
             let hasTieStart = false;
@@ -1358,19 +1491,22 @@ function _processPart(
             if (tieDuration !== null && !continuesTie) flushTie();
 
             if (continuesTie) {
+                tieLyrics = _mergeLyrics(tieLyrics, lyrics);
                 const combined = _addFractions(tieDuration, duration);
                 if (hasTieStart) {
                     tieDuration = combined;
                 } else {
-                    emitNote(combined, tieContent);
+                    emitNote(combined, tieContent, tieLyrics);
                     tieDuration = null;
                     tieContent = null;
+                    tieLyrics = [];
                 }
             } else if (hasTieStart && !hasTieStop) {
                 tieDuration = duration;
                 tieContent = content;
+                tieLyrics = lyrics;
             } else {
-                emitNote(duration, content);
+                emitNote(duration, content, lyrics);
             }
 
             offset += (duration[0] * 4) / duration[1];

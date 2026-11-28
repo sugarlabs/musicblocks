@@ -1218,6 +1218,106 @@ describe("ModeWidget", () => {
         expect(wholeTone).toEqual({ edo: 6, pattern: [1, 1, 1, 1, 1, 1] });
     });
 
+    test("points a ratio-based .scl file to the temperament widget", () => {
+        global.readTextFile = jest.fn((_inputId, cb) => {
+            // 5-limit just major: no equal division up to 55 fits it within 0.5 cents.
+            const content = [
+                "! ji.scl",
+                "Just major",
+                "7",
+                "9/8",
+                "5/4",
+                "4/3",
+                "3/2",
+                "5/3",
+                "15/8",
+                "2/1"
+            ].join("\n");
+            cb(null, { text: content, file: { name: "ji.scl", size: 100 } });
+        });
+
+        modeWidget._importFile();
+
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+            expect.stringContaining("Not a valid EDO mode.")
+        );
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+            expect.stringContaining("import the file in the temperament widget")
+        );
+    });
+
+    test("_importFile reports an empty .scl file as unreadable", () => {
+        const saveSpy = jest.spyOn(modeWidget, "_saveCustomMode");
+        global.readTextFile = jest.fn((_inputId, cb) => {
+            cb(null, { text: "", file: { name: "empty.scl", size: 0 } });
+        });
+
+        modeWidget._importFile();
+
+        expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+            expect.stringContaining("Error reading .scl file")
+        );
+        expect(saveSpy).not.toHaveBeenCalled();
+        saveSpy.mockRestore();
+    });
+
+    describe("the 0.5-cent EDO tolerance on .scl import", () => {
+        // A major scale with its third moved off 400 cents. 400 is a step of 12, 24, 36 and
+        // 48 EDO and of no other division up to 55, so 48 EDO (25-cent steps) is the only fit.
+        const importMajorWithThird = third => {
+            const saveSpy = jest.spyOn(modeWidget, "_saveCustomMode").mockReturnValue(true);
+            jest.spyOn(modeWidget, "_temperamentKeyForEDO").mockReturnValue("equal");
+            jest.spyOn(modeWidget, "_cacheState").mockImplementation(() => {});
+            jest.spyOn(modeWidget, "_rebuildWheel").mockImplementation(() => {});
+            jest.spyOn(modeWidget, "_applyModePattern").mockImplementation(() => {});
+            jest.spyOn(modeWidget, "_updateModeDisplay").mockImplementation(() => {});
+            global.readTextFile = jest.fn((_inputId, cb) => {
+                const content = [
+                    "! major.scl",
+                    "Major scale",
+                    "7",
+                    "200.0",
+                    third,
+                    "500.0",
+                    "700.0",
+                    "900.0",
+                    "1100.0",
+                    "2/1"
+                ].join("\n");
+                cb(null, { text: content, file: { name: "major.scl", size: 100 } });
+            });
+
+            modeWidget._importFile();
+            const calls = saveSpy.mock.calls;
+            saveSpy.mockRestore();
+            return calls;
+        };
+
+        test("a pitch exactly 0.5 cents off its step still imports", () => {
+            const calls = importMajorWithThird("400.5");
+
+            expect(calls.length).toBe(1);
+            expect(calls[0][2]).toBe(48);
+            expect(calls[0][1]).toEqual([8, 8, 4, 8, 8, 8, 4]);
+            expect(mockActivity.errorMsg).not.toHaveBeenCalled();
+        });
+
+        test("a pitch just past 0.5 cents off fits no EDO and is refused", () => {
+            const pitches = [200, 400.6, 500, 700, 900, 1100, 1200].map(cents => ({
+                cents,
+                ratio: Math.pow(2, cents / 1200)
+            }));
+            expect(modeWidget._findEdoSteps(pitches)).toBeNull();
+
+            const calls = importMajorWithThird("400.6");
+
+            expect(calls.length).toBe(0);
+            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                expect.stringContaining("Not a valid EDO mode.")
+            );
+        });
+    });
+
     test("_findEdoSteps rejects multi-octave .scl files", () => {
         const pitches = [200, 400, 1200, 1400].map(c => ({
             cents: c,
