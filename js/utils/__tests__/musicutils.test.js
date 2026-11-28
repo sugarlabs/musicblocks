@@ -5178,7 +5178,10 @@ describe("getNoteFromInterval edge intervals", () => {
             ["E4", ["F" + FLAT, 4]],
             ["B4", ["C" + FLAT, 5]],
             ["F" + SHARP + "4", ["G" + FLAT, 4]],
-            ["E" + FLAT + "4", ["F" + DOUBLEFLAT, 4]]
+            ["E" + FLAT + "4", ["F" + DOUBLEFLAT, 4]],
+            ["E" + DOUBLESHARP + "4", ["F" + SHARP, 4]],
+            ["B" + SHARP + "4", ["C", 5]],
+            ["A" + DOUBLESHARP + "4", ["B", 4]]
         ];
         for (const [root, expected] of cases) {
             const result = getNoteFromInterval(root, "diminished 2");
@@ -5188,6 +5191,22 @@ describe("getNoteFromInterval edge intervals", () => {
                 pitchToNumber(rootNote, rootOctave, "C major")
             );
         }
+    });
+
+    it("spells a diminished 2nd the same way in 19 and 31 EDO", () => {
+        for (const temperament of ["equal19", "equal31"]) {
+            expect(getNoteFromInterval("C4", "diminished 2", temperament)).toEqual([
+                "D" + DOUBLEFLAT,
+                4
+            ]);
+        }
+    });
+
+    it("spells a diminished 2nd from a flatted root with a triple flat", () => {
+        expect(getNoteFromInterval("C" + FLAT + "4", "diminished 2")).toEqual([
+            "D" + DOUBLEFLAT + FLAT,
+            4
+        ]);
     });
 
     it.each(Object.keys(INTERVALVALUES))("spells %s from any root", interval => {
