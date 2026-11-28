@@ -106,7 +106,7 @@ describe("LocalPlanet", () => {
     });
 
     describe("init", () => {
-        it("should set ProjectTable, refresh projects, init delete modal, and init Publisher", () => {
+        it("should set ProjectTable, refresh projects, init delete modal, and create Publisher", () => {
             const refreshSpy = jest.spyOn(localPlanet, "refreshProjectArray");
             const initDeleteModalSpy = jest.spyOn(localPlanet, "initDeleteModal");
 
@@ -116,7 +116,12 @@ describe("LocalPlanet", () => {
             expect(refreshSpy).toHaveBeenCalled();
             expect(initDeleteModalSpy).toHaveBeenCalled();
             expect(global.Publisher).toHaveBeenCalledWith(mockPlanet);
-            expect(localPlanet.Publisher.init).toHaveBeenCalled();
+        });
+
+        it("leaves the publisher setup to Planet, which waits for the server state", () => {
+            localPlanet.init();
+
+            expect(localPlanet.Publisher.init).not.toHaveBeenCalled();
         });
     });
 

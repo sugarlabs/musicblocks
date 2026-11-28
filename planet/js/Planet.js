@@ -438,6 +438,12 @@ class Planet {
             }
         });
 
+        this.SaveInterface = new SaveInterface(this);
+        this.SaveInterface.init();
+        this.LocalPlanet = new LocalPlanet(this);
+        this.LocalPlanet.init();
+        this.GlobalPlanet = new GlobalPlanet(this);
+
         this.ServerInterface.getTagManifest(
             function (data) {
                 this.initPlanets(data);
@@ -477,12 +483,7 @@ class Planet {
         this.Converter = new Converter(this);
         this.Converter.init();
         this.onConverterLoad();
-        this.SaveInterface = new SaveInterface(this);
-        this.SaveInterface.init();
-        this.LocalPlanet = new LocalPlanet(this);
-        this.LocalPlanet.init();
-        if (this.GlobalPlanet) this.GlobalPlanet.destroy();
-        this.GlobalPlanet = new GlobalPlanet(this);
+        this.LocalPlanet.Publisher.init();
         this.GlobalPlanet.init();
     }
 }

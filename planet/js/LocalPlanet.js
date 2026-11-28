@@ -138,7 +138,6 @@ class LocalPlanet {
         this.refreshProjectArray();
         this.initDeleteModal();
         this.Publisher = new Publisher(Planet);
-        this.Publisher.init();
     }
 }
 

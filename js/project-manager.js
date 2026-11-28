@@ -748,34 +748,35 @@ class ProjectManager {
         }
 
         const pm = this;
-        setTimeout(() => {
-            try {
-                if (that.planet && typeof that.planet.openProjectFromPlanet === "function") {
-                    that.planet.openProjectFromPlanet(projectID, () => {
-                        that.loadStartWrapper((act, ...args) => pm._loadStart(act, ...args));
-                    });
-                } else {
-                    throw new Error("Planet openProjectFromPlanet is unavailable.");
-                }
-            } catch (e) {
-                ErrorHandler.recoverable(e, { operation: "openProjectFromPlanet" });
-                that.loadStartWrapper((act, ...args) => pm._loadStart(act, ...args));
-            }
-
-            if (that.planet && typeof that.planet.initialiseNewProject === "function") {
-                try {
-                    that.planet.initialiseNewProject();
-                } catch (e) {
-                    ErrorHandler.recoverable(e, { operation: "planetInitialiseNewProject" });
-                }
-            } else {
-                ErrorHandler.warn("Planet initialiseNewProject is unavailable.", {
-                    operation: "loadFromPlanet"
+        try {
+            if (that.planet && typeof that.planet.openProjectFromPlanet === "function") {
+                that.planet.openProjectFromPlanet(projectID, () => {
+                    that.errorMsg(
+                        _("Could not load project. Please check your connection and try again.")
+                    );
+                    that.loadStartWrapper((act, ...args) => pm._loadStart(act, ...args));
+                    pm._finishLoading();
                 });
+            } else {
+                throw new Error("Planet openProjectFromPlanet is unavailable.");
             }
-
+        } catch (e) {
+            ErrorHandler.recoverable(e, { operation: "openProjectFromPlanet" });
+            that.loadStartWrapper((act, ...args) => pm._loadStart(act, ...args));
             pm._finishLoading();
-        }, 2500);
+        }
+
+        if (that.planet && typeof that.planet.initialiseNewProject === "function") {
+            try {
+                that.planet.initialiseNewProject();
+            } catch (e) {
+                ErrorHandler.recoverable(e, { operation: "planetInitialiseNewProject" });
+            }
+        } else {
+            ErrorHandler.warn("Planet initialiseNewProject is unavailable.", {
+                operation: "loadFromPlanet"
+            });
+        }
 
         const run = flags.run;
         const show = flags.show;
