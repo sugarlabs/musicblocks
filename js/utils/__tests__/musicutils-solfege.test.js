@@ -37,6 +37,22 @@ describe("musicutils-solfege", () => {
         }
     });
 
+    it("does not take a note with double or stacked accidentals for solfege", () => {
+        // 12-EDO scales spell B𝄫 and C𝄪; the EDO name tables stack accidentals (E♭♭, D♯♯).
+        for (const note of ["B𝄫", "C𝄪", "Bbb", "Cx", "C##", "E♭♭", "D♯♯", "G♭♭♭♭", "A♯♯♯"]) {
+            expect(solfege.noteIsSolfege(note)).toBe(false);
+        }
+        for (const note of ["do", "sol♯", "ti♭", "la𝄫", "fa𝄪", "Fa", "La"]) {
+            expect(solfege.noteIsSolfege(note)).toBe(true);
+        }
+        // Only accidentals may follow the letter: these are not note names.
+        for (const note of ["C#z", "Cq", ""]) {
+            expect(solfege.noteIsSolfege(note)).toBe(true);
+        }
+        // Mixed accidentals are still accidentals.
+        expect(solfege.noteIsSolfege("C#♭")).toBe(false);
+    });
+
     it("gives E sharp and F flat their fixed solfege names", () => {
         expect(musicutils.getSolfege("E♯")).toBe("mi♯");
         expect(musicutils.getSolfege("F♭")).toBe("fa♭");
