@@ -1488,6 +1488,48 @@ describe("getArticulation", () => {
 });
 
 describe("keySignatureToMode", () => {
+    it("keeps E♯ as the tonic, as it does B♯, C♭ and F♭", () => {
+        // E♯ was in neither NOTESSHARP nor NOTESFLAT, so E♯ major played C major.
+        expect(keySignatureToMode("E♯ major")).toEqual(["E♯", "major"]);
+        expect(keySignatureToMode("E# minor")).toEqual(["E♯", "minor"]);
+        expect(keySignatureToMode("E♯m")).toEqual(["E♯", "natural minor"]);
+        expect(buildScale("E♯ major", 12)[0]).toEqual([
+            "E♯",
+            "F𝄪",
+            "G𝄪",
+            "A♯",
+            "B♯",
+            "C𝄪",
+            "D𝄪",
+            "E♯"
+        ]);
+    });
+
+    it("starts the steps of a non-seven-note E♯ scale from F", () => {
+        // E♯ is in neither note list, so the steps started from C (E♯ D E G A).
+        expect(buildScale("E♯ major pentatonic", 12)[0]).toEqual(["E♯", "G", "A", "C", "D", "F"]);
+    });
+
+    it("plays a tonic with a double accidental as the key it sounds as", () => {
+        // The Set Key wheel offers 𝄪 and 𝄫; every such key used to play C major.
+        expect(keySignatureToMode("C𝄪 major")).toEqual(["D", "major"]);
+        expect(keySignatureToMode("B𝄪 major")).toEqual(["C♯", "major"]);
+        expect(keySignatureToMode("Gx dorian")).toEqual(["A", "dorian"]);
+        expect(keySignatureToMode("F𝄫 minor")).toEqual(["E♭", "minor"]);
+        expect(keySignatureToMode("Cbb lydian")).toEqual(["B♭", "lydian"]);
+        expect(keySignatureToMode("C𝄪")).toEqual(["D", "major"]);
+    });
+
+    it("starts a double-accidental key on the tuning's own step when it has one", () => {
+        // 31 EDO names C♯♯ as a step of its own, below D; 12 and 19 EDO have none.
+        const edo31 = buildScale("C𝄪 major", 31)[0];
+        expect(edo31[0]).toBe("C♯♯");
+        expect(buildScale("Cx major", 31)[0]).toEqual(edo31);
+        expect(buildScale("C♯♯ major", 31)[0]).toEqual(edo31);
+        expect(buildScale("C𝄪 major", 12)[0][0]).toBe("D");
+        expect(buildScale("C𝄪 major", 19)[0][0]).toBe("D");
+    });
+
     beforeEach(() => {
         global.MAQAMTABLE = {};
         global.BTOFLAT = {};

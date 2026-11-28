@@ -118,6 +118,24 @@ var NOTESYMBOLS = {
  * @param {string} keySignature - The key signature string.
  * @returns {Array} An array containing the key and mode.
  */
+/**
+ * The tonic a Set Key block plays for a letter with a double accidental, which no key
+ * signature uses: the same pitch named as a key in NOTESSHARP (for 𝄪) or NOTESFLAT (for 𝄫),
+ * e.g. C𝄪 is D and F𝄫 is E♭. Null for anything else.
+ * @param {string} name - A tonic such as "C𝄪", "Fbb" or "Gx".
+ * @returns {string|null}
+ */
+var _enharmonicKeyForDoubleAccidental = name => {
+    const match = /^([A-G])(𝄪|x|##|𝄫|bb)$/u.exec(name);
+    if (match === null) {
+        return null;
+    }
+    const sharp = ["𝄪", "x", "##"].includes(match[2]);
+    const natural = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }[match[1]];
+    const pitchClass = (natural + (sharp ? 2 : -2) + 12) % 12;
+    return (sharp ? NOTESSHARP : NOTESFLAT)[pitchClass];
+};
+
 var keySignatureToMode = keySignature => {
     // Convert from "A Minor" to "A" and "MINOR"
     if (typeof keySignature !== "string" || keySignature.trim() === "") {
@@ -156,6 +174,14 @@ var keySignatureToMode = keySignature => {
     } else if (key === "F" + FLAT) {
         parts = keySignature.split(" ");
         key = "F" + FLAT;
+    } else if (key === "E" + SHARP) {
+        // Like B♯, C♭ and F♭: not in NOTESSHARP or NOTESFLAT, so it fell through to the
+        // "invalid key" branch below and E♯ major played C major.
+        parts = keySignature.split(" ");
+        key = "E" + SHARP;
+    } else if (_enharmonicKeyForDoubleAccidental(key) !== null) {
+        // C𝄪 major used to play C major too.
+        key = _enharmonicKeyForDoubleAccidental(key);
     } else if (SOLFEGENAMES1.includes(key)) {
         // This conversion will be a bit iffy depending upon the current mode.
 
@@ -1657,6 +1683,7 @@ function getNote(
 }
 
 var MusicUtilsPitchScale = {
+    _enharmonicKeyForDoubleAccidental,
     NOTESYMBOLS,
     keySignatureToMode,
     getScaleAndHalfSteps,

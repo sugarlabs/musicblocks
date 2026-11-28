@@ -301,7 +301,17 @@ var buildScale = (keySignature, edo) => {
     // using cumulative positions to preserve the total interval sum.
     if (currentEDO !== 12) {
         const edoNames = generateNoteNames(currentEDO);
-        let idx = edoNames.indexOf(myKeySignature);
+        // Try the tonic as written first: keySignatureToMode folds a double accidental to
+        // its 12-EDO enharmonic (C𝄪 to D), but 31 EDO has a C♯♯ step of its own. The
+        // name tables write double accidentals as two signs.
+        const writtenTonic = (keySignature.trim().split(/\s+/)[0] || "")
+            .replace(/^([a-g])/, letter => letter.toUpperCase())
+            .replace(/𝄪|x|##/g, SHARP + SHARP)
+            .replace(/𝄫|bb/g, FLAT + FLAT);
+        let idx = /^[A-G](♯♯|♭♭)$/u.test(writtenTonic) ? edoNames.indexOf(writtenTonic) : -1;
+        if (idx === -1) {
+            idx = edoNames.indexOf(myKeySignature);
+        }
         if (
             idx === -1 &&
             typeof EXTRATRANSPOSITIONS !== "undefined" &&
@@ -387,7 +397,9 @@ var buildScale = (keySignature, edo) => {
 
     let idx = thisScale.indexOf(myKeySignature);
     if (idx === -1) {
-        idx = 0;
+        // E♯ is in neither list: start the steps from the pitch it sounds as (F), not C.
+        const pitchClass = _notePitchClass(myKeySignature);
+        idx = Number.isFinite(pitchClass) ? pitchClass : 0;
     }
 
     const scale = [myKeySignature];
