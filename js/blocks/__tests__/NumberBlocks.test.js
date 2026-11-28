@@ -21,6 +21,7 @@
  */
 
 const { setupNumberBlocks } = require("../NumberBlocks");
+const realMathUtility = require("../../utils/mathutils");
 
 let createdBlocks = {};
 
@@ -809,6 +810,26 @@ describe("setupNumberBlocks", () => {
                 global.MathUtility.doPlus = defaultDoPlus;
             }
         });
+
+        it("should catch NanError and stop turtle when operands are valid but sum is NaN", () => {
+            activity.blocks.blockList[200] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn((l, t, c) => {
+                if (c === "c1") return Infinity;
+                if (c === "c2") return -Infinity;
+            });
+            logo.stopTurtle = false;
+            const defaultDoPlus = global.MathUtility.doPlus;
+            try {
+                global.MathUtility.doPlus = MathUtility.doPlus;
+                const plusBlock = createdBlocks["plus"];
+                const result = plusBlock.arg(logo, 0, 200, null);
+                expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 200);
+                expect(logo.stopTurtle).toBe(true);
+                expect(result).toEqual(0);
+            } finally {
+                global.MathUtility.doPlus = defaultDoPlus;
+            }
+        });
     });
 
     describe("OneOfBlock - extra branches", () => {
@@ -1066,6 +1087,29 @@ describe("setupNumberBlocks", () => {
             const result = distanceBlock.arg(logo, turtleIndex, 150, null);
             expect(activity.errorMsg).toHaveBeenCalledWith("No input provided", 150);
             expect(result).toEqual(0);
+        });
+        it("should handle NanError, stop turtle, and display NANERRORMSG when calculation throws", () => {
+            activity.blocks.blockList[150] = {
+                connections: [null, "c1", "c2", "c3", "c4"]
+            };
+            logo.parseArg = jest.fn((l, t, c, blk, r) => {
+                if (c === "c1") return 0;
+                if (c === "c2") return 0;
+                if (c === "c3") return 3;
+                if (c === "c4") return "invalid";
+            });
+            logo.stopTurtle = false;
+            const defaultDoCalculateDistance = global.MathUtility.doCalculateDistance;
+            try {
+                global.MathUtility.doCalculateDistance = realMathUtility.doCalculateDistance;
+                const distanceBlock = createdBlocks["distance"];
+                const result = distanceBlock.arg(logo, turtleIndex, 150, null);
+                expect(activity.errorMsg).toHaveBeenCalledWith(global.NANERRORMSG, 150);
+                expect(logo.stopTurtle).toBe(true);
+                expect(result).toEqual(0);
+            } finally {
+                global.MathUtility.doCalculateDistance = defaultDoCalculateDistance;
+            }
         });
     });
 
