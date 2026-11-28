@@ -52,8 +52,7 @@ beforeAll(() => {
     };
     global.ABCJS = { parseOnly: jest.fn(() => [{ header: {} }]) };
     global.ensureABCJS = jest.fn().mockResolvedValue(undefined);
-    global.extractProjectDataFromHTML = jest.fn();
-    global.unescapeHTML = jest.fn(x => x);
+    global.parseProjectFileData = require("../utils/utils").parseProjectFileData;
     global.isSafeUrl = jest.fn(url => /^https?:\/\//i.test(url));
     global.doSVG = jest.fn(() => "<svg></svg>");
     global.base64Encode = jest.fn(x => x);
@@ -2604,7 +2603,8 @@ describe("_setupFileHandlers inner callbacks", () => {
         ["an object", '{"name":"equal","pitchNumber":12}'],
         ["a list of numbers", "[1,2,3]"],
         ["a list with one empty list", "[[]]"],
-        ["a list of lists that are not blocks", '[["name","age"],["a",1]]']
+        ["a list of lists that are not blocks", '[["name","age"],["a",1]]'],
+        ["a JSON string containing html", '"html"']
     ])("change handler rejects %s and leaves the project alone", async (_label, rawData) => {
         origFileReader = global.FileReader;
         class MockFR {
@@ -2659,7 +2659,6 @@ describe("_setupFileHandlers inner callbacks", () => {
             readAsArrayBuffer() {}
         }
         global.FileReader = MockFR;
-        global.extractProjectDataFromHTML.mockImplementationOnce(() => null);
 
         const activity = makeActivity();
         const handlers = captureHandlers(activity);
@@ -2671,15 +2670,44 @@ describe("_setupFileHandlers inner callbacks", () => {
         jest.advanceTimersByTime(200);
 
         expect(activity.errorMsg).toHaveBeenCalledTimes(1);
-        expect(activity.errorMsg).toHaveBeenCalledWith(
-            "Cannot find project data in this HTML file."
-        );
+        expect(activity.errorMsg).toHaveBeenCalledWith("Cannot find project data in this file.");
         expect(global.ErrorHandler.capture).not.toHaveBeenCalled();
         expect(activity.sendAllToTrash).not.toHaveBeenCalled();
         expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
         expect(activity.loading).toBe(false);
         expect(document.body.style.cursor).toBe("default");
         expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
+    it("change handler loads a JSON project whose block values contain 'html'", async () => {
+        const project = [
+            [0, "print", 0, 0, [null, 1, null]],
+            [1, ["text", { value: "see https://example.org/lesson.html" }], 0, 0, [0]]
+        ];
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = JSON.stringify(project);
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+
+        const activity = makeActivity({ merging: true });
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        activity.fileChooser.files = [{ name: "lesson.tb" }];
+        handlers.change();
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(activity.blocks.loadNewBlocks).toHaveBeenCalledWith(project);
     });
 
     it("change handler preserves the old project and saves the import after loading", async () => {
@@ -3512,7 +3540,6 @@ describe("_setupFileHandlers inner callbacks", () => {
             readAsArrayBuffer() {}
         }
         global.FileReader = MockFR;
-        global.extractProjectDataFromHTML.mockImplementationOnce(() => null);
         jest.spyOn(window, "scroll").mockImplementation(() => {});
 
         const activity = makeActivity();
@@ -3528,15 +3555,72 @@ describe("_setupFileHandlers inner callbacks", () => {
         jest.advanceTimersByTime(200);
 
         expect(activity.errorMsg).toHaveBeenCalledTimes(1);
-        expect(activity.errorMsg).toHaveBeenCalledWith(
-            "Cannot find project data in this HTML file."
-        );
+        expect(activity.errorMsg).toHaveBeenCalledWith("Cannot find project data in this file.");
         expect(global.ErrorHandler.capture).not.toHaveBeenCalled();
         expect(activity.sendAllToTrash).not.toHaveBeenCalled();
         expect(activity.blocks.loadNewBlocks).not.toHaveBeenCalled();
         expect(activity.loading).toBe(false);
         expect(document.body.style.cursor).toBe("default");
         expect(activity.stopLoadAnimation).toHaveBeenCalled();
+    });
+
+    it("drop handler loads a JSON project whose block values contain 'html'", async () => {
+        const project = [
+            [0, "print", 0, 0, [null, 1, null]],
+            [1, ["text", { value: "see https://example.org/lesson.html" }], 0, 0, [0]]
+        ];
+        origFileReader = global.FileReader;
+        class MockFR {
+            constructor() {
+                this.result = JSON.stringify(project);
+                this.onload = null;
+            }
+            readAsText() {
+                if (this.onload) this.onload();
+            }
+            readAsArrayBuffer() {}
+        }
+        global.FileReader = MockFR;
+        jest.spyOn(window, "scroll").mockImplementation(() => {});
+
+        const listeners = {};
+        const stage = {
+            update: jest.fn(),
+            addEventListener: jest.fn((event, listener) => {
+                listeners[event] = listener;
+            }),
+            removeAllEventListeners: jest.fn(event => {
+                delete listeners[event];
+            }),
+            dispatchEvent: jest.fn(event => listeners[event]?.())
+        };
+        const blocks = {
+            ...makeActivity().blocks,
+            loadNewBlocks: jest.fn(() => {
+                global.pubsub.emit("finishedLoading", { token: 9 });
+                return 9;
+            })
+        };
+        const planet = {
+            saveLocally: jest.fn().mockResolvedValue(),
+            closePlanet: jest.fn(),
+            initialiseNewProject: jest.fn().mockResolvedValue()
+        };
+        const activity = makeActivity({ stage, blocks, planet, saveLocally: jest.fn() });
+        activity.sendAllToTrash = jest.fn(() => stage.dispatchEvent("trashsignal"));
+        const handlers = captureHandlers(activity);
+        const pm = new ProjectManager(activity);
+        pm._setupFileHandlers();
+
+        handlers.drop({
+            stopPropagation: jest.fn(),
+            preventDefault: jest.fn(),
+            dataTransfer: { files: [{ name: "lesson.tb" }] }
+        });
+        await jest.advanceTimersByTimeAsync(200);
+
+        expect(activity.errorMsg).not.toHaveBeenCalled();
+        expect(blocks.loadNewBlocks).toHaveBeenCalledWith(project);
     });
 
     it("drop handler clears without saving an empty project and saves after loading", async () => {
@@ -3608,7 +3692,8 @@ describe("_setupFileHandlers inner callbacks", () => {
         ["an object", '{"name":"equal","pitchNumber":12}'],
         ["a list of numbers", "[1,2,3]"],
         ["a list with one empty list", "[[]]"],
-        ["a list of lists that are not blocks", '[["name","age"],["a",1]]']
+        ["a list of lists that are not blocks", '[["name","age"],["a",1]]'],
+        ["a JSON string containing html", '"html"']
     ])("drop handler rejects %s and leaves the project alone", async (_label, rawData) => {
         origFileReader = global.FileReader;
         class MockFR {
