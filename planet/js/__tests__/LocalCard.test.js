@@ -404,6 +404,29 @@ describe("LocalCard", () => {
 
             expect(planet.GlobalPlanet.ProjectViewer.open).toHaveBeenCalledWith("p13");
         });
+
+        it("sanitizes malicious project IDs to prevent DOM XSS", () => {
+            const xssId = 'evil"><img src="x" onerror="alert(1)"><div data-x="';
+            const card = prepareCard(xssId, { ProjectName: "Evil Local" });
+            card.render();
+
+            const container = document.getElementById("local-projects");
+            expect(container.querySelectorAll('img[src="x"]')).toHaveLength(0);
+            expect(container.querySelectorAll("[onerror]")).toHaveLength(0);
+            expect(document.getElementById(`local-project-input-${xssId}`).value).toBe(
+                "Evil Local"
+            );
+        });
+
+        it("preserves regex replacement tokens like $& literally in project IDs", () => {
+            const dollarId = "proj$&1";
+            const card = prepareCard(dollarId, { ProjectName: "Dollar Local" });
+            card.render();
+
+            expect(document.getElementById(`local-project-input-${dollarId}`).value).toBe(
+                "Dollar Local"
+            );
+        });
     });
 
     // ─── download() ─────────────────────────────────────────────────────────────

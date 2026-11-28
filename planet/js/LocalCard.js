@@ -12,7 +12,7 @@
 /*
    global
 
-   _
+   _, escapeHTML, jQuery
 */
 /*
    exported
@@ -189,8 +189,11 @@ class LocalCard {
 
     render() {
         const Planet = this.Planet;
-
-        const html = this.renderData.replace(new RegExp("{ID}", "g"), this.id);
+        const escape =
+            typeof escapeHTML === "function"
+                ? escapeHTML
+                : require("../../js/utils/utils-logic").escapeHTML;
+        const html = this.renderData.replace(/\{ID\}/g, () => escape(this.id));
         const frag = document.createRange().createContextualFragment(html);
 
         // set image

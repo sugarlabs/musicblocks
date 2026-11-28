@@ -12,7 +12,7 @@
 /*
    global
 
-   _, hideOnClickOutside, toggleExpandable, updateCheckboxes, ClipboardJS, jQuery
+   _, hideOnClickOutside, toggleExpandable, updateCheckboxes, ClipboardJS, jQuery, escapeHTML
 */
 /*
    exported
@@ -156,7 +156,11 @@ class GlobalCard {
 
     render() {
         const Planet = this.Planet;
-        const html = this.renderData.replace(new RegExp("{ID}", "g"), this.id);
+        const escape =
+            typeof escapeHTML === "function"
+                ? escapeHTML
+                : require("../../js/utils/utils-logic").escapeHTML;
+        const html = this.renderData.replace(/\{ID\}/g, () => escape(this.id));
         const frag = document.createRange().createContextualFragment(html);
 
         // ── Thumbnail (lazy) ─────────────────────────────────────────────
@@ -375,6 +379,7 @@ class GlobalCard {
         });
 
         this._tooltipped = frag.querySelectorAll(".tooltipped");
+        const copyButton = frag.querySelector(".copyshareurl");
         document.getElementById("global-projects").appendChild(frag);
         jQuery(this._tooltipped).tooltip({ delay: 50 });
         updateCheckboxes(`global-sharebox-${this.id}`);
@@ -383,7 +388,7 @@ class GlobalCard {
             this.clipboard.destroy();
         }
 
-        this.clipboard = new ClipboardJS(`.copyshareurl[data-clipboard-text*="${this.id}"]`);
+        this.clipboard = copyButton ? new ClipboardJS(copyButton) : null;
 
         this.clipboard.on("success", e => {
             console.info("Copied:", e.text);
