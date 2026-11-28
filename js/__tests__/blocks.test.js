@@ -3922,23 +3922,150 @@ describe("Blocks Foundation", () => {
             ["an object", { name: "equal", pitchNumber: 12 }],
             ["null", null],
             ["undefined", undefined]
-        ])("reports %s without leaving a load in progress", (_label, notBlocks) => {
-            expect(() => blocks.loadNewBlocks(notBlocks)).not.toThrow();
+        ])(
+            "rejects %s cleanly via abortLoad without throwing or leaving a load in progress",
+            async (_label, notBlocks) => {
+                const loadFailedPromise = nextLoadEvent("loadFailed");
+                let loadToken;
+
+                expect(() => {
+                    loadToken = blocks.loadNewBlocks(notBlocks);
+                }).not.toThrow();
+                expect(blocks.isLoading()).toBe(false);
+                expect(mockActivity.errorMsg).toHaveBeenCalledWith(
+                    "Cannot load project: invalid project structure."
+                );
+                // abortLoad() must stop the loading animation so the UI
+                // does not spin indefinitely after a bad project load.
+                expect(mockActivity.stopLoadAnimation).toHaveBeenCalled();
+                expect(blocks._lastLoadFailed).toBe(true);
+
+                const failedPayload = await loadFailedPromise;
+                expect(failedPayload.token).toBe(loadToken);
+                expect(failedPayload.error.message).toContain("Invalid block data");
+            }
+        );
+
+        it("queues non-array data behind a running load and aborts cleanly when its turn runs", async () => {
+            const nextLoadFailed = nextLoadEvent("loadFailed");
+            blocks.loadNewBlocks(makeBatch(1));
+
+            let queuedToken;
+            expect(() => {
+                queuedToken = blocks.loadNewBlocks({});
+            }).not.toThrow();
+            expect(blocks._loadQueue).toHaveLength(1);
+
+            // Once the running load finishes and advances, the queued load runs abortLoad()
+            const failedPayload = await nextLoadFailed;
+            expect(failedPayload.token).toBe(queuedToken);
+            expect(failedPayload.error.message).toContain("Invalid block data");
+            expect(blocks._loadQueue).toHaveLength(0);
             expect(blocks.isLoading()).toBe(false);
             expect(mockActivity.errorMsg).toHaveBeenCalledWith(
                 "Cannot load project: invalid project structure."
             );
         });
 
-        it("reports invalid data without queuing it behind a running load", () => {
-            blocks.loadNewBlocks(makeBatch(1));
+        it("session recovery: runAfterLoad callbacks are cleared when non-array input aborts", () => {
+            // Simulate a callback registered to run after a load — if
+            // abortLoad() does not clear _afterLoadCallbacks, stale callbacks
+            // from a previous session could fire against an empty workspace.
+            const staleCallback = jest.fn();
+            blocks._afterLoadCallbacks.add(staleCallback);
 
-            expect(() => blocks.loadNewBlocks({})).not.toThrow();
-            expect(blocks.isLoading()).toBe(true);
-            expect(blocks._loadQueue).toHaveLength(0);
-            expect(mockActivity.errorMsg).toHaveBeenCalledWith(
-                "Cannot load project: invalid project structure."
+            expect(() => blocks.loadNewBlocks({ bad: "data" })).not.toThrow();
+
+            expect(blocks.isLoading()).toBe(false);
+            expect(staleCallback).not.toHaveBeenCalled();
+            expect(blocks._afterLoadCallbacks.size).toBe(0);
+            expect(mockActivity.stopLoadAnimation).toHaveBeenCalled();
+        });
+
+        it("autosave guard: _lastLoadFailed stays true after abortLoad until a valid load clears it", async () => {
+            // After abortLoad, _lastLoadFailed must be true so that
+            // idle-watcher.js autosave skips persisting the truncated
+            // workspace (issue #8855).
+            blocks.loadNewBlocks({ bad: "data" });
+            expect(blocks._lastLoadFailed).toBe(true);
+            expect(blocks.isLoading()).toBe(false);
+
+            // A subsequent valid load clears the flag optimistically
+            // at the start of _loadNewBlocksNow.
+            const finished = nextLoadEvent("finishedLoading");
+            blocks.loadNewBlocks(makeBatch(1));
+            expect(blocks._lastLoadFailed).toBe(false);
+
+            await finished;
+            expect(blocks._lastLoadFailed).toBe(false);
+            expect(blocks.isLoading()).toBe(false);
+        });
+
+        it("queue ordering: valid → invalid → valid loads run in order without race", async () => {
+            const startedOrder = [];
+            const origLoadNow = blocks._loadNewBlocksNow;
+            blocks._loadNewBlocksNow = (blockObjs, loadToken) => {
+                startedOrder.push(loadToken);
+                return origLoadNow(blockObjs, loadToken);
+            };
+
+            const events = [];
+            const allThreeDone = new Promise(resolve => {
+                const onEvent = (type, payload) => {
+                    events.push({ type, token: payload.token });
+                    if (events.length === 3) {
+                        resolve();
+                    }
+                };
+                global.pubsub.on("finishedLoading", p => onEvent("ok", p));
+                global.pubsub.on("loadFailed", p => onEvent("fail", p));
+            });
+
+            const t1 = blocks.loadNewBlocks(makeBatch(1));
+            const t2 = blocks.loadNewBlocks({ bad: "data" });
+            const t3 = blocks.loadNewBlocks(makeBatch(1));
+
+            // t1 is running, t2 and t3 are queued
+            expect(blocks._loadQueue).toHaveLength(2);
+
+            await allThreeDone;
+
+            expect(startedOrder).toEqual([t1, t2, t3]);
+            expect(events).toEqual(
+                expect.arrayContaining([
+                    { type: "ok", token: t1 },
+                    { type: "fail", token: t2 },
+                    { type: "ok", token: t3 }
+                ])
             );
+            expect(blocks.isLoading()).toBe(false);
+            // The final load succeeded, so _lastLoadFailed must be false
+            expect(blocks._lastLoadFailed).toBe(false);
+        });
+
+        it("queue ordering: valid load started right after an aborted load is not clobbered by deferred loadFailed", async () => {
+            const loadFailed = nextLoadEvent("loadFailed");
+            const finishedLoading = nextLoadEvent("finishedLoading");
+
+            const badToken = blocks.loadNewBlocks({ bad: "data" });
+            expect(blocks.isLoading()).toBe(false);
+            expect(blocks._lastLoadFailed).toBe(true);
+
+            // Start a valid load synchronously before badToken's deferred
+            // loadFailed timer fires.
+            const goodToken = blocks.loadNewBlocks(makeBatch(1));
+            expect(blocks.isLoading()).toBe(true);
+            expect(blocks._lastLoadFailed).toBe(false);
+
+            const failedPayload = await loadFailed;
+            expect(failedPayload.token).toBe(badToken);
+            // The deferred loadFailed must NOT clobber goodToken's in-progress state
+            expect(blocks.isLoading()).toBe(true);
+
+            const finishedPayload = await finishedLoading;
+            expect(finishedPayload.token).toBe(goodToken);
+            expect(blocks.isLoading()).toBe(false);
+            expect(blocks._lastLoadFailed).toBe(false);
         });
 
         it("runAfterLoad runs the callback right away when nothing is loading", () => {
@@ -4246,6 +4373,38 @@ describe("Blocks Foundation", () => {
 
             // And once the fallback's own (single, valid) block finishes,
             // the flag is released again rather than left stuck true.
+            expect(blocks._loadInProgress).toBe(false);
+            expect(blocks._lastLoadFailed).toBe(false);
+        });
+
+        it("session recovery triggers fallback when session data contains non-array data", async () => {
+            activity.sessionData = JSON.stringify({ invalid: "not an array" });
+            activity.storage["SESSIONRecovery Test"] = activity.sessionData;
+
+            let fallbackToken = null;
+            const originalLoadNewBlocks = blocks.loadNewBlocks;
+            blocks.loadNewBlocks = blockObjs => {
+                if (blockObjs === global.DATAOBJS) {
+                    blocks._processOneBlock = stubProcessOneBlock(blocks);
+                }
+                fallbackToken = originalLoadNewBlocks(blockObjs);
+                return fallbackToken;
+            };
+
+            const fallbackFinished = new Promise(resolve => {
+                global.pubsub.on("finishedLoading", payload => {
+                    if (fallbackToken !== null && payload && payload.token === fallbackToken) {
+                        resolve();
+                    }
+                });
+            });
+
+            await pm._loadStart(activity);
+            await fallbackFinished;
+
+            expect(activity.sendAllToTrash).toHaveBeenCalledWith(false, false);
+            expect(activity.errorMsg).toHaveBeenCalled();
+            expect(activity.storage.removeItem).toHaveBeenCalledWith("SESSIONRecovery Test");
             expect(blocks._loadInProgress).toBe(false);
             expect(blocks._lastLoadFailed).toBe(false);
         });
