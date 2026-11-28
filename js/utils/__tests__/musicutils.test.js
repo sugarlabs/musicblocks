@@ -5062,7 +5062,7 @@ describe("getNote additional paths", () => {
         expect(errorMsg).toHaveBeenCalledWith(global.INVALIDPITCH, null);
     });
 
-    it("resolves C♭ and F♭ in non-12 EDO only when matching key tonic", () => {
+    it("resolves C♭ and F♭ in non-12 EDO to the pitch the EDO gives them", () => {
         // In 19-EDO, C♭ tonic maps to B♯ (with octave - 1) and F♭ tonic maps to E♯
         expect(getNote("C♭", 4, 0, "C♭ major", false, undefined, undefined, "equal19")).toEqual([
             "B♯",
@@ -5075,14 +5075,15 @@ describe("getNote additional paths", () => {
             0
         ]);
 
-        // When key tonic is not C♭ / F♭, falls back to standard EXTRATRANSPOSITIONS (B and E)
+        // In any other key they are the same pitches too: 19-EDO F♭ is E♯ and C♭ is B♯,
+        // a step from E and B (they used to fall back to 12-EDO B and E).
         expect(getNote("C♭", 4, 0, "G major", false, undefined, undefined, "equal19")).toEqual([
-            "B",
+            "B♯",
             3,
             0
         ]);
         expect(getNote("F♭", 4, 0, "G major", false, undefined, undefined, "equal19")).toEqual([
-            "E",
+            "E♯",
             4,
             0
         ]);
