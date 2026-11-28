@@ -4,11 +4,33 @@ How to write unit tests for block files.
 
 ## Running Tests
 
+By default, `jest.config.js` enables coverage collection (`collectCoverage: true`), so `npm test` collects coverage on every run:
+
 ```bash
-npm test                                    # Run all tests
-npm test -- path/to/file.test.js           # Run specific test file
-npm test -- --coverage                      # Run with coverage report
+npm test                                    # Run all tests with coverage (default)
+npm test -- --coverage                      # Explicitly run all tests with coverage report
+npm test -- path/to/file.test.js            # Run tests matching a path pattern
 ```
+
+### Focused Testing During Development
+
+When iterating on a single test file, disable coverage collection (`--coverage=false`) to skip instrumentation overhead, and use `--runTestsByPath` for exact-path execution:
+
+```bash
+npm test -- --coverage=false --runTestsByPath planet/js/__tests__/ProjectStorage.test.js
+```
+
+In resource-constrained environments (or when debugging worker/timing issues), add `--runInBand` to execute tests serially in the current process rather than spawning parallel workers:
+
+```bash
+npm test -- --runInBand --coverage=false --runTestsByPath planet/js/__tests__/ProjectStorage.test.js
+```
+
+> **Note:** Focused runs with `--coverage=false` are for fast regression feedback during development and do **not** replace full repository validation (`npm test`).
+
+### CI Coverage Validation
+
+Instead of enforcing a fixed minimum threshold in `jest.config.js`, CI runs the [Coverage delta workflow](../.github/workflows/coverage-delta.yml) (`coverage-delta.yml`), which compares statement, branch, function, and line coverage against the base branch and fails if any metric regresses beyond the allowed threshold. Before opening a PR, run the full `npm test` suite to verify both test passes and coverage.
 
 ## Shared Test Infrastructure
 
