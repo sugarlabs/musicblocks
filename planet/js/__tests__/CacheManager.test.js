@@ -335,6 +335,152 @@ describe("IndexedDB CacheManager integration", () => {
         });
     });
 
+    describe("transaction commitment", () => {
+        const writers = [
+            ["metadata", "projectMetadata", "cacheMetadata", "metadata"],
+            ["project", "projectData", "cacheProject", "projectData"],
+            ["thumbnail", "projectThumbnails", "cacheThumbnail", "thumbnail"]
+        ];
+
+        const observeNextRequest = (method, onSuccess, storeName) => {
+            const database = cacheManager.db;
+            const originalTransaction = database.transaction.bind(database);
+            const transactionSpy = jest.spyOn(database, "transaction");
+            transactionSpy.mockImplementation((...args) => {
+                const transaction = originalTransaction(...args);
+                if (storeName && args[0][0] !== storeName) return transaction;
+                transactionSpy.mockRestore();
+                const store = transaction.objectStore(args[0][0]);
+                const originalRequest = store[method].bind(store);
+                jest.spyOn(store, method).mockImplementationOnce((...requestArgs) => {
+                    const request = originalRequest(...requestArgs);
+                    request.addEventListener("success", () => onSuccess(transaction));
+                    return request;
+                });
+                return transaction;
+            });
+        };
+
+        test.each(writers)(
+            "reports a failed %s write when the transaction aborts after request success",
+            async (name, storeName, method, field) => {
+                expect(await cacheManager[method]("entry", "old")).toBe(true);
+                observeNextRequest("put", transaction => transaction.abort());
+
+                expect(await cacheManager[method]("entry", "new")).toBe(false);
+                const entry = await cacheManager._getFromStore(storeName, "entry");
+                expect(entry[field]).toBe("old");
+            }
+        );
+
+        test("rejects a write when a later request fails and rolls back the transaction", async () => {
+            await cacheManager.cacheProject("entry", { value: "old" });
+            observeNextRequest("put", transaction => {
+                transaction.objectStore("projectData").add({ id: "entry" });
+            });
+
+            expect(await cacheManager.cacheProject("entry", { value: "new" })).toBe(false);
+            expect(await cacheManager.getProject("entry")).toEqual({ value: "old" });
+        });
+
+        test("rejects a transaction aborted before the write request runs", async () => {
+            const originalTransaction = cacheManager.db.transaction.bind(cacheManager.db);
+            jest.spyOn(cacheManager.db, "transaction").mockImplementationOnce((...args) => {
+                const transaction = originalTransaction(...args);
+                queueMicrotask(() => transaction.abort());
+                return transaction;
+            });
+
+            expect(await cacheManager.cacheThumbnail("entry", "new")).toBe(false);
+            expect(await cacheManager.getThumbnail("entry")).toBeNull();
+        });
+
+        test("keeps metadata invalidated after an aborted refresh", async () => {
+            await cacheManager.cacheMetadata("entry", { name: "old" });
+            cacheManager.invalidatedMetadataIds.add("entry");
+            observeNextRequest("put", transaction => transaction.abort());
+
+            expect(await cacheManager.cacheMetadata("entry", { name: "new" })).toBe(false);
+            expect(cacheManager.invalidatedMetadataIds.has("entry")).toBe(true);
+            expect(await cacheManager.getMetadata("entry")).toBeNull();
+        });
+
+        test.each(["put", "clear", "count"])(
+            "waits for the transaction to commit after a %s request succeeds",
+            async method => {
+                let settled = false;
+                let settledAtRequest;
+                let committed = false;
+                observeNextRequest(
+                    method,
+                    transaction => {
+                        transaction.addEventListener("complete", () => {
+                            committed = true;
+                        });
+                        queueMicrotask(() => {
+                            settledAtRequest = settled;
+                        });
+                    },
+                    method === "clear" ? "projectThumbnails" : undefined
+                );
+
+                const operation =
+                    method === "put"
+                        ? cacheManager._putToStore("projectData", { id: "entry" })
+                        : method === "clear"
+                          ? cacheManager.clearAll()
+                          : cacheManager._enforceMaxSize("projectData");
+                operation.then(() => {
+                    settled = true;
+                });
+                await operation;
+
+                expect(settledAtRequest).toBe(false);
+                expect(committed).toBe(true);
+            }
+        );
+
+        test.each(["projectMetadata", "projectData", "projectThumbnails"])(
+            "reports a failed clear when the %s transaction aborts",
+            async storeName => {
+                await cacheManager.cacheMetadata("entry", { name: "old" });
+                await cacheManager.cacheProject("entry", { value: "old" });
+                await cacheManager.cacheThumbnail("entry", "old");
+                const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+                observeNextRequest("clear", transaction => transaction.abort(), storeName);
+
+                try {
+                    expect(await cacheManager.clearAll()).toBe(false);
+                    expect(await cacheManager.getStats()).toEqual({
+                        metadata: storeName === "projectMetadata" ? 1 : 0,
+                        projects: storeName === "projectThumbnails" ? 0 : 1,
+                        thumbnails: 1
+                    });
+                    expect(errorSpy).toHaveBeenCalledWith(
+                        "[CacheManager] Error clearing cache:",
+                        expect.any(Error)
+                    );
+                } finally {
+                    errorSpy.mockRestore();
+                }
+            }
+        );
+
+        test("rejects a size-check transaction aborted after count succeeds", async () => {
+            await cacheManager.cacheProject("entry", { value: "old" });
+            observeNextRequest("count", transaction => transaction.abort());
+
+            await expect(cacheManager._enforceMaxSize("projectData")).rejects.toThrow(
+                "Transaction aborted"
+            );
+            expect(await cacheManager.getStats()).toEqual({
+                metadata: 0,
+                projects: 1,
+                thumbnails: 0
+            });
+        });
+    });
+
     describe("cacheMetadata / getMetadata", () => {
         test("caches and retrieves metadata by id", async () => {
             const metadata = { name: "Project A", author: "ABC" };
