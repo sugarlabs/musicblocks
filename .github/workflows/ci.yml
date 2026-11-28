@@ -291,7 +291,7 @@ jobs:
                   start: npm start
                   wait-on: "http://127.0.0.1:3000"
                   wait-on-timeout: 120
-                  browser: chrome
+                  browser: electron
                   config: video=false
 
             - name: Upload Cypress screenshots on failure
