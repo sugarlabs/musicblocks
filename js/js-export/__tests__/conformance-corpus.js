@@ -464,6 +464,108 @@ const actionsAndCalls = [
             [10, "start", 300, 100, [null, 11, null]],
             [11, ["nameddo", { value: "computeLocal" }], 0, 0, [10, null]]
         ]
+    },
+    {
+        name: "action_with_stop_nested_in_if",
+        description: "Stop block nested inside an if in an action body",
+        category: "actions",
+        blocks: [
+            [0, "action", 100, 100, [null, 1, 2, null]],
+            [1, ["text", { value: "act" }], 0, 0, [0]],
+            [2, "if", 0, 0, [0, 3, 6, null]],
+            [3, "equal", 0, 0, [2, 4, 5]],
+            [4, ["number", { value: 1 }], 0, 0, [3]],
+            [5, ["number", { value: 2 }], 0, 0, [3]],
+            [6, "break", 0, 0, [2, null]],
+            [10, "start", 300, 100, [null, 11, null]],
+            [11, ["nameddo", { value: "act" }], 0, 0, [10, null]]
+        ]
+    },
+    {
+        name: "action_with_stop_in_if_else_branch",
+        description: "Stop block in the else branch of an if-then-else in an action body",
+        category: "actions",
+        blocks: [
+            [0, "action", 100, 100, [null, 1, 2, null]],
+            [1, ["text", { value: "act" }], 0, 0, [0]],
+            [2, "ifthenelse", 0, 0, [0, 3, 6, 8, null]],
+            [3, "equal", 0, 0, [2, 4, 5]],
+            [4, ["number", { value: 1 }], 0, 0, [3]],
+            [5, ["number", { value: 2 }], 0, 0, [3]],
+            [6, "forward", 0, 0, [2, 7, null]],
+            [7, ["number", { value: 10 }], 0, 0, [6]],
+            [8, "break", 0, 0, [2, null]],
+            [10, "start", 300, 100, [null, 11, null]],
+            [11, ["nameddo", { value: "act" }], 0, 0, [10, null]]
+        ]
+    },
+    {
+        name: "action_with_stop_in_switch_case",
+        description: "Stop block inside a switch case in an action body",
+        category: "actions",
+        blocks: [
+            [0, "action", 100, 100, [null, 1, 2, null]],
+            [1, ["text", { value: "act" }], 0, 0, [0]],
+            [2, "switch", 0, 0, [0, 3, 4, null]],
+            [3, ["number", { value: 1 }], 0, 0, [2]],
+            [4, "case", 0, 0, [2, 5, 6, 7]],
+            [5, ["number", { value: 1 }], 0, 0, [4]],
+            [6, "break", 0, 0, [4, null]],
+            [7, "defaultcase", 0, 0, [4, 8, null]],
+            [8, "forward", 0, 0, [7, 9, null]],
+            [9, ["number", { value: 50 }], 0, 0, [8]],
+            [10, "start", 300, 100, [null, 11, null]],
+            [11, ["nameddo", { value: "act" }], 0, 0, [10, null]]
+        ]
+    },
+    {
+        name: "action_with_stop_in_repeat",
+        description: "Stop block inside a repeat loop in an action body",
+        category: "actions",
+        blocks: [
+            [0, "action", 100, 100, [null, 1, 2, null]],
+            [1, ["text", { value: "act" }], 0, 0, [0]],
+            [2, "repeat", 0, 0, [0, 3, 4, null]],
+            [3, ["number", { value: 4 }], 0, 0, [2]],
+            [4, "break", 0, 0, [2, null]],
+            [10, "start", 300, 100, [null, 11, null]],
+            [11, ["nameddo", { value: "act" }], 0, 0, [10, null]]
+        ]
+    },
+    {
+        name: "action_with_stop_then_statement",
+        description: "Stop block followed by more blocks in an action body",
+        category: "actions",
+        blocks: [
+            [0, "action", 100, 100, [null, 1, 2, null]],
+            [1, ["text", { value: "act" }], 0, 0, [0]],
+            [2, "break", 0, 0, [0, 3]],
+            [3, "forward", 0, 0, [2, 4, null]],
+            [4, ["number", { value: 10 }], 0, 0, [3]],
+            [10, "start", 300, 100, [null, 11, null]],
+            [11, ["nameddo", { value: "act" }], 0, 0, [10, null]]
+        ]
+    },
+    {
+        name: "action_with_two_nested_stops",
+        description: "Two Stop blocks nested in two sequential ifs in an action body",
+        category: "actions",
+        blocks: [
+            [0, "action", 100, 100, [null, 1, 2, null]],
+            [1, ["text", { value: "act" }], 0, 0, [0]],
+            [2, "if", 0, 0, [0, 3, 6, 7]],
+            [3, "equal", 0, 0, [2, 4, 5]],
+            [4, ["number", { value: 1 }], 0, 0, [3]],
+            [5, ["number", { value: 2 }], 0, 0, [3]],
+            [6, "break", 0, 0, [2, null]],
+            [7, "if", 0, 0, [2, 8, 11, null]],
+            [8, "equal", 0, 0, [7, 9, 10]],
+            [9, ["number", { value: 3 }], 0, 0, [8]],
+            [10, ["number", { value: 4 }], 0, 0, [8]],
+            [11, "break", 0, 0, [7, null]],
+            [20, "start", 300, 100, [null, 21, null]],
+            [21, ["nameddo", { value: "act" }], 0, 0, [20, null]]
+        ]
     }
 ];
 
