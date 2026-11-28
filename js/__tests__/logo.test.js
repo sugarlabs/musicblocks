@@ -3947,6 +3947,37 @@ describe("Logo parseArg", () => {
             expect(logo.parseArg(logo, 0, 4, null, null)).toBe(1234);
         });
 
+        test("evaluates detached dectofrac and hue blocks without throwing when inStatusMatrix is true", () => {
+            logo.inStatusMatrix = true;
+            logo.blockList = [
+                {
+                    name: "dectofrac",
+                    value: null,
+                    connections: [null, 1],
+                    protoblock: { parameter: false, dockTypes: ["numberout"] },
+                    isValueBlock: () => false
+                },
+                {
+                    name: "number",
+                    value: 0.5,
+                    protoblock: { parameter: false },
+                    isValueBlock: () => true
+                },
+                {
+                    name: "hue",
+                    value: null,
+                    connections: [null],
+                    protoblock: { parameter: false, dockTypes: ["numberout"] },
+                    isValueBlock: () => false
+                }
+            ];
+
+            expect(() => logo.parseArg(logo, 0, 0, null, null)).not.toThrow();
+            expect(logo.blockList[0].value).toBe("0.5");
+            expect(() => logo.parseArg(logo, 0, 2, null, null)).not.toThrow();
+            expect(logo.blockList[2].value).toBe(mockTurtle.painter.color);
+        });
+
         test("covers arg-function, non-string interval, and fallback id branches", () => {
             logo.blockList = [
                 {
