@@ -118,7 +118,8 @@ function setupOrnamentActions(activity) {
                 return;
             }
 
-            if (!Number.isFinite(noteValue) || noteValue <= 0) {
+            // Reject positive subnormals whose reciprocal (used by RhythmActions.playNote as 1 / neighborNoteValue) overflows to Infinity.
+            if (!Number.isFinite(noteValue) || noteValue <= 0 || !Number.isFinite(1 / noteValue)) {
                 activity.errorMsg(_("Neighbor note value must be a positive number."), blk);
                 return;
             }
