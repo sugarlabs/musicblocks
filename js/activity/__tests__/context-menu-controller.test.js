@@ -146,6 +146,7 @@ function makeActivity() {
         turtles: {
             collapse: jest.fn(),
             expand: jest.fn(),
+            isShrunk: jest.fn(() => false),
             running: jest.fn(() => false),
             deltaY: jest.fn()
         },
@@ -523,6 +524,59 @@ describe("ContextMenuController", () => {
                 ele => ele.label === "Enable horizontal scrolling"
             );
             expect(enableScrolling.display).toBe(false);
+        });
+
+        const displayOf = label =>
+            activity.helpfulWheelItems.find(ele => ele.label === label).display;
+
+        test("offers Expand, not Collapse or Grid, after rebuilding on a collapsed canvas", () => {
+            controller.setupPaletteMenu();
+            activity.turtles.isShrunk = jest.fn(() => true);
+
+            controller.setupPaletteMenu();
+
+            expect(displayOf("Expand")).toBe(true);
+            expect(displayOf("Collapse")).toBe(false);
+            expect(displayOf("Grid")).toBe(false);
+        });
+
+        test("offers Turtle Wrap On when rebuilt while wrap is off", () => {
+            global.WRAP = false;
+            try {
+                controller.setupPaletteMenu();
+
+                expect(displayOf("Turtle Wrap On")).toBe(true);
+                expect(displayOf("Turtle Wrap Off")).toBe(false);
+            } finally {
+                delete global.WRAP;
+            }
+        });
+
+        test("offers Disable horizontal scrolling when rebuilt while it is enabled", () => {
+            activity.scrollBlockContainer = true;
+
+            controller.setupPaletteMenu();
+
+            expect(displayOf("Disable horizontal scrolling")).toBe(true);
+            expect(displayOf("Enable horizontal scrolling")).toBe(false);
+        });
+
+        test("keeps the default pairs on an expanded canvas with wrap on and no scrolling", () => {
+            activity.turtles.isShrunk = jest.fn(() => false);
+            global.WRAP = true;
+            try {
+                controller.setupPaletteMenu();
+
+                expect(displayOf("Collapse")).toBe(true);
+                expect(displayOf("Grid")).toBe(true);
+                expect(displayOf("Expand")).toBe(false);
+                expect(displayOf("Turtle Wrap Off")).toBe(true);
+                expect(displayOf("Turtle Wrap On")).toBe(false);
+                expect(displayOf("Enable horizontal scrolling")).toBe(true);
+                expect(displayOf("Disable horizontal scrolling")).toBe(false);
+            } finally {
+                delete global.WRAP;
+            }
         });
 
         test("keeps Select available in the background wheel", () => {

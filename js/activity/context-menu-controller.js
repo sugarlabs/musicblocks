@@ -12,7 +12,7 @@
 /* global _, wheelnav, slicePath, platformColor, base64Encode, GOHOMEFADEDBUTTON,
    SHOWBLOCKSBUTTON, COLLAPSEBLOCKSBUTTON, SMALLERBUTTON, BIGGERBUTTON, CARTESIANBUTTON,
    SELECTBUTTON, CLEARBUTTON, COLLAPSEBUTTON, EXPANDBUTTON, piemenuGrid, LEADING,
-   _THIS_IS_MUSIC_BLOCKS_, makeKeyboardAccessible */
+   _THIS_IS_MUSIC_BLOCKS_, makeKeyboardAccessible, WRAP */
 
 /* exported setupContextMenuController, ContextMenuController */
 
@@ -434,12 +434,41 @@ class ContextMenuController {
                 display: false,
                 fn: activity.turtles.expand
             });
+
+        this.syncToggleItems();
+
         // Initialize tooltips after all bottom-toolbar buttons have been appended.
         if (!(activity.toolbar && activity.toolbar.tooltipsDisabled)) {
             window.jQuery("#buttoncontainerBOTTOM .tooltipped").tooltip({
                 html: true,
                 delay: 100
             });
+        }
+    }
+
+    /**
+     * setupPaletteMenu runs on every resize and rebuilds the items with default flags, so the
+     * on/off pairs are set from the current state (else a collapsed canvas offers Collapse).
+     */
+    syncToggleItems() {
+        const activity = this.activity;
+        const collapsed = Boolean(activity.turtles.isShrunk?.());
+        const wrap = typeof WRAP === "undefined" ? true : WRAP;
+        const scrolling = Boolean(activity.scrollBlockContainer);
+        const display = {
+            "Collapse": !collapsed,
+            "Expand": collapsed,
+            "Grid": !collapsed,
+            "Turtle Wrap Off": wrap,
+            "Turtle Wrap On": !wrap,
+            "Enable horizontal scrolling": !activity.beginnerMode && !scrolling,
+            "Disable horizontal scrolling": scrolling
+        };
+
+        for (const item of activity.helpfulWheelItems) {
+            if (Object.prototype.hasOwnProperty.call(display, item.label)) {
+                item.display = display[item.label];
+            }
         }
     }
 
